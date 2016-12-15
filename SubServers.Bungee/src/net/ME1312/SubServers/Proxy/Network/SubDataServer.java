@@ -1,39 +1,34 @@
 package net.ME1312.SubServers.Proxy.Network;
 
-import net.ME1312.SubServers.Proxy.Libraries.Exception.IllegalPacketException;
-import net.ME1312.SubServers.Proxy.Libraries.Version.Version;
-import net.ME1312.SubServers.Proxy.Network.Packet.PacketAuthorization;
-import net.ME1312.SubServers.Proxy.Network.Packet.PacketLinkServer;
-import net.ME1312.SubServers.Proxy.Network.Packet.PacketRequestServerInfo;
-import net.ME1312.SubServers.Proxy.Network.Packet.PacketRequestServers;
+import net.ME1312.SubServers.Proxy.Library.Exception.IllegalPacketException;
+import net.ME1312.SubServers.Proxy.Library.Version.Version;
+import net.ME1312.SubServers.Proxy.Network.Packet.*;
 import net.ME1312.SubServers.Proxy.SubPlugin;
 import org.json.JSONObject;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.net.InetAddress;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.net.SocketAddress;
+import java.net.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 /**
- * NetworkManager Class
+ * SubDataServer Class
  *
  * @author ME1312
  */
-public final class NetworkManager {
-    private HashMap<Class<? extends PacketOut>, String> pOut = new HashMap<Class<? extends PacketOut>, String>();
-    private HashMap<String, PacketIn> pIn = new HashMap<String, PacketIn>();
-    private HashMap<SocketAddress, Client> clients = new HashMap<SocketAddress, Client>();
-    private List<InetAddress> allowedAddresses = new ArrayList<InetAddress>();
+public final class SubDataServer {
+    private static HashMap<Class<? extends PacketOut>, String> pOut = new HashMap<Class<? extends PacketOut>, String>();
+    private static HashMap<String, PacketIn> pIn = new HashMap<String, PacketIn>();
+    private static List<InetAddress> allowedAddresses = new ArrayList<InetAddress>();
+    private static boolean defaults = false;
+    private HashMap<InetSocketAddress, Client> clients = new HashMap<InetSocketAddress, Client>();
     private ServerSocket server;
     private SubPlugin plugin;
 
     /**
-     * SubServers Network Manager
+     * SubData Server Instance
      *
      * @param plugin SubPlugin
      * @param port Port
@@ -41,15 +36,16 @@ public final class NetworkManager {
      * @param address Bind Address
      * @throws IOException
      */
-    public NetworkManager(SubPlugin plugin, int port, int backlog, InetAddress address) throws IOException {
+    public SubDataServer(SubPlugin plugin, int port, int backlog, InetAddress address) throws IOException {
         server = new ServerSocket(port, backlog, address);
         this.plugin = plugin;
 
         allowConnection(address);
-        loadDefaults();
+        if (!defaults) loadDefaults();
     }
 
     private void loadDefaults() {
+        defaults = true;
         for (String s : plugin.config.get().getSection("Settings").getSection("SubData").getStringList("Allowed-Connections")) {
             try {
                 allowedAddresses.add(InetAddress.getByName(s));
@@ -59,14 +55,24 @@ public final class NetworkManager {
         }
 
         registerPacket(new PacketAuthorization(plugin), "Authorization");
+        registerPacket(new PacketDownloadBuildScript(plugin), "DownloadBuildScript");
+        registerPacket(new PacketDownloadHostInfo(plugin), "DownloadHostInfo");
+        registerPacket(new PacketDownloadLang(plugin), "DownloadLang");
+        registerPacket(new PacketDownloadPlayerList(plugin), "DownloadPlayerList");
+        registerPacket(new PacketDownloadServerInfo(plugin), "DownloadServerInfo");
+        registerPacket(new PacketDownloadServerList(plugin), "DownloadServerList");
+        registerPacket(new PacketInfoPassthrough(plugin), "InfoPassthrough");
         registerPacket(new PacketLinkServer(plugin), "LinkServer");
-        registerPacket(new PacketRequestServerInfo(plugin), "RequestServerInfo");
-        registerPacket(new PacketRequestServers(plugin), "RequestServers");
 
         registerPacket(PacketAuthorization.class, "Authorization");
+        registerPacket(PacketDownloadBuildScript.class, "DownloadBuildScript");
+        registerPacket(PacketDownloadHostInfo.class, "DownloadHostInfo");
+        registerPacket(PacketDownloadLang.class, "DownloadLang");
+        registerPacket(PacketDownloadPlayerList.class, "DownloadPlayerList");
+        registerPacket(PacketDownloadServerInfo.class, "DownloadServerInfo");
+        registerPacket(PacketDownloadServerList.class, "DownloadServerList");
+        registerPacket(PacketInfoPassthrough.class, "InfoPassthrough");
         registerPacket(PacketLinkServer.class, "LinkServer");
-        registerPacket(PacketRequestServerInfo.class, "RequestServerInfo");
-        registerPacket(PacketRequestServers.class, "RequestServers");
     }
 
     /**
@@ -91,7 +97,7 @@ public final class NetworkManager {
             clients.put(client.getAddress(), client);
             return client;
         } else {
-            System.out.println("SubData > " + socket.getRemoteSocketAddress().toString() + " attempted to connect, but isn't whitelisted");
+            System.out.println("SubData > " + socket.getInetAddress().toString() + ":" + socket.getPort() + " attempted to connect, but isn't whitelisted");
             socket.close();
             return null;
         }
@@ -104,7 +110,7 @@ public final class NetworkManager {
      * @return Client
      */
     public Client getClient(Socket socket) {
-        return clients.get(socket.getRemoteSocketAddress());
+        return clients.get(new InetSocketAddress(socket.getInetAddress(), socket.getPort()));
     }
 
     /**
@@ -113,7 +119,7 @@ public final class NetworkManager {
      * @param address Address to search
      * @return Client
      */
-    public Client getClient(SocketAddress address) {
+    public Client getClient(InetSocketAddress address) {
         return clients.get(address);
     }
 
@@ -138,7 +144,7 @@ public final class NetworkManager {
      * @param address Address to Kick
      * @throws IOException
      */
-    public void removeClient(SocketAddress address) throws IOException {
+    public void removeClient(InetSocketAddress address) throws IOException {
         Client client = clients.get(address);
         if (clients.keySet().contains(address)) {
             clients.remove(address);
@@ -148,23 +154,41 @@ public final class NetworkManager {
     }
 
     /**
-     * Register Packet to the Network
+     * Register PacketIn to the Network
      *
      * @param packet PacketIn to register
      * @param handle Handle to Bind
      */
-    public void registerPacket(PacketIn packet, String handle) {
-        pIn.put(handle, packet);
+    public static void registerPacket(PacketIn packet, String handle) {
+        if (!pIn.keySet().contains(handle)) {
+            pIn.put(handle, packet);
+        } else {
+            throw new IllegalStateException("PacketIn Handle \"" + handle + "\" is already in use!");
+        }
     }
 
     /**
-     * Register Packet to the Network
+     * Register PacketOut to the Network
      *
      * @param packet PacketOut to register
      * @param handle Handle to bind
      */
-    public void registerPacket(Class<? extends PacketOut> packet, String handle) {
-        pOut.put(packet, handle);
+    public static void registerPacket(Class<? extends PacketOut> packet, String handle) {
+        if (!pOut.values().contains(handle)) {
+            pOut.put(packet, handle);
+        } else {
+            throw new IllegalStateException("PacketOut Handle \"" + handle + "\" is already in use!");
+        }
+    }
+
+    /**
+     * Grab PacketIn Instance via handle
+     *
+     * @param handle Handle
+     * @return PacketIn
+     */
+    public static PacketIn getPacket(String handle) {
+        return pIn.get(handle);
     }
 
     /**
@@ -184,7 +208,7 @@ public final class NetworkManager {
      *
      * @param address Address to allow
      */
-    public void allowConnection(InetAddress address) {
+    public static void allowConnection(InetAddress address) {
         if (!allowedAddresses.contains(address)) allowedAddresses.add(address);
     }
 
@@ -193,7 +217,7 @@ public final class NetworkManager {
      *
      * @param address Address to deny
      */
-    public void denyConnection(InetAddress address) {
+    public static void denyConnection(InetAddress address) {
         allowedAddresses.remove(address);
     }
 
@@ -204,7 +228,7 @@ public final class NetworkManager {
      * @return JSON Formatted Packet
      * @throws IllegalPacketException
      */
-    protected JSONObject encodePacket(PacketOut packet) throws IllegalPacketException {
+    protected static JSONObject encodePacket(PacketOut packet) throws IllegalPacketException {
         JSONObject json = new JSONObject();
 
         if (!pOut.keySet().contains(packet.getClass())) throw new IllegalPacketException("Unknown PacketOut Channel: " + packet.getClass().getCanonicalName());
@@ -225,7 +249,7 @@ public final class NetworkManager {
      * @throws IllegalPacketException
      * @throws InvocationTargetException
      */
-    protected PacketIn decodePacket(JSONObject json) throws IllegalPacketException, InvocationTargetException {
+    protected static PacketIn decodePacket(JSONObject json) throws IllegalPacketException, InvocationTargetException {
         if (!json.keySet().contains("h") || !json.keySet().contains("v")) throw new IllegalPacketException("Unknown Packet Format: " + json.toString());
         if (!pIn.keySet().contains(json.getString("h"))) throw new IllegalPacketException("Unknown PacketIn Channel: " + json.getString("h"));
 

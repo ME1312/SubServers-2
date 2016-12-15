@@ -1,6 +1,6 @@
 package net.ME1312.SubServers.Proxy.Network;
 
-import net.ME1312.SubServers.Proxy.Libraries.Exception.IllegalPacketException;
+import net.ME1312.SubServers.Proxy.Library.Exception.IllegalPacketException;
 import net.ME1312.SubServers.Proxy.Network.Packet.PacketAuthorization;
 import net.ME1312.SubServers.Proxy.SubPlugin;
 import org.json.JSONException;
@@ -11,10 +11,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.lang.reflect.InvocationTargetException;
+import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketAddress;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -23,11 +22,11 @@ import java.util.TimerTask;
  *
  * @author ME1312
  */
-public class Client {
+public final class Client {
     private Socket socket;
-    private SocketAddress address;
+    private InetSocketAddress address;
     private ClientHandler handler;
-    private List<PacketOut> queue = new ArrayList<PacketOut>();
+    private PrintWriter writer;
     private Timer authorized;
     private SubPlugin plugin;
     private Client instance;
@@ -38,10 +37,11 @@ public class Client {
      * @param plugin SubPlugin
      * @param client Socket to Bind
      */
-    public Client(SubPlugin plugin, Socket client) {
+    public Client(SubPlugin plugin, Socket client) throws IOException {
         this.plugin = plugin;
         socket = client;
-        address = client.getRemoteSocketAddress();
+        writer = new PrintWriter(client.getOutputStream(), true);
+        address = new InetSocketAddress(client.getInetAddress(), client.getPort());
         instance = this;
         authorized = new Timer("auth" + client.getRemoteSocketAddress().toString());
         authorized.schedule(new TimerTask() {
@@ -61,73 +61,41 @@ public class Client {
      * Network Loop
      */
     protected void loop() {
-        new Thread() {
-            public void run() {
-                try {
-                    BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                    String input;
-                    while ((input = in.readLine()) != null) {
-                        try {
-                            JSONObject json = new JSONObject(input);
-                            PacketIn packet = plugin.subdata.decodePacket(json);
-                            if (authorized == null || packet instanceof PacketAuthorization) {
-                                try {
-                                    packet.execute(instance, (json.keySet().contains("c")) ? json.getJSONObject("c") : null);
-                                } catch (Exception e) {
-                                    new InvocationTargetException(e, "Exception while executing PacketIn").printStackTrace();
-                                }
-                            }
-                        } catch (IllegalPacketException e) {
-                            e.printStackTrace();
-                        } catch (JSONException e) {
-                            new IllegalPacketException("Unknown Packet Format: " + input).printStackTrace();
-                        }
-                    }
+        new Thread(() -> {
+            try {
+                BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                String input;
+                while ((input = in.readLine()) != null) {
                     try {
-                        plugin.subdata.removeClient(instance);
-                    } catch (IOException e1) {
-                        e1.printStackTrace();
-                    }
-                } catch (Exception e) {
-                    if (e.getMessage() == null || !e.getMessage().equals("Socket closed")) e.printStackTrace();
-                    try {
-                        plugin.subdata.removeClient(instance);
-                    } catch (IOException e1) {
-                        e1.printStackTrace();
-                    }
-                }
-            }
-        }.start();
-        new Thread() {
-            public void run() {
-                try {
-                    PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-                    while (!socket.isClosed()) {
-                        while (queue.size() > 0) {
+                        JSONObject json = new JSONObject(input);
+                        PacketIn packet = SubDataServer.decodePacket(json);
+                        if (authorized == null || packet instanceof PacketAuthorization) {
                             try {
-                                out.println(plugin.subdata.encodePacket(queue.get(0)));
-                                queue.remove(0);
-                            } catch (IllegalPacketException e) {
-                                e.printStackTrace();
+                                packet.execute(instance, (json.keySet().contains("c")) ? json.getJSONObject("c") : null);
+                            } catch (Exception e) {
+                                new InvocationTargetException(e, "Exception while executing PacketIn").printStackTrace();
                             }
                         }
-                        sleep(100);
-                    }
-                    try {
-                        plugin.subdata.removeClient(instance);
-                    } catch (IOException e1) {
-                        e1.printStackTrace();
-                    }
-                } catch (Exception e) {
-                    if (e.getMessage() == null || !e.getMessage().equals("Socket closed")) e.printStackTrace();
-                    try {
-                        plugin.subdata.removeClient(instance);
-                    } catch (IOException e1) {
-                        e1.printStackTrace();
+                    } catch (IllegalPacketException e) {
+                        e.printStackTrace();
+                    } catch (JSONException e) {
+                        new IllegalPacketException("Unknown Packet Format: " + input).printStackTrace();
                     }
                 }
+                try {
+                    plugin.subdata.removeClient(instance);
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
+            } catch (Exception e) {
+                if (e.getMessage() == null || !e.getMessage().equals("Socket closed")) e.printStackTrace();
+                try {
+                    plugin.subdata.removeClient(instance);
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
             }
-        }.start();
+        }).start();
     }
 
     /**
@@ -147,7 +115,11 @@ public class Client {
      * @param packet Packet to send
      */
     public void sendPacket(PacketOut packet) {
-        queue.add(packet);
+        try {
+            writer.println(SubDataServer.encodePacket(packet));
+        } catch (IllegalPacketException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -164,7 +136,7 @@ public class Client {
      *
      * @return Address
      */
-    public SocketAddress getAddress() {
+    public InetSocketAddress getAddress() {
         return address;
     }
 

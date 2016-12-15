@@ -1,5 +1,6 @@
-package net.ME1312.SubServers.Proxy.Libraries.Config;
+package net.ME1312.SubServers.Proxy.Library.Config;
 
+import net.ME1312.SubServers.Proxy.Library.Util;
 import net.md_5.bungee.api.ChatColor;
 import org.yaml.snakeyaml.Yaml;
 
@@ -94,25 +95,25 @@ public class YAMLValue {
     }
 
     public String asString() {
-        return YAMLSection.unescapeJavaString((String) obj);
+        return Util.unescapeJavaString((String) obj);
     }
 
     public List<String> asStringList() {
         List<String> values = new ArrayList<String>();
         for (String value : (List<String>) obj) {
-            values.add(YAMLSection.unescapeJavaString(value));
+            values.add(Util.unescapeJavaString(value));
         }
         return values;
     }
 
     public String asColoredString(char color) {
-        return ChatColor.translateAlternateColorCodes(color, YAMLSection.unescapeJavaString((String) obj));
+        return ChatColor.translateAlternateColorCodes(color, Util.unescapeJavaString((String) obj));
     }
 
     public List<String> asColoredStringList(char color) {
         List<String> values = new ArrayList<String>();
         for (String value : (List<String>) obj) {
-            values.add(ChatColor.translateAlternateColorCodes(color, YAMLSection.unescapeJavaString(value)));
+            values.add(ChatColor.translateAlternateColorCodes(color, Util.unescapeJavaString(value)));
         }
         return values;
     }

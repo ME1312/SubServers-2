@@ -12,12 +12,12 @@ public class SubSendCommandEvent extends Event {
     private String command;
 
     /**
-     * Server Start Event
+     * Server Command Event
      *
-     * @param server Server Starting
-     * @param player Player Starting Server
+     * @param player Player Commanding Server
+     * @param server Server being Commanded
      */
-    public SubSendCommandEvent(SubServer server, UUID player, String command) {
+    public SubSendCommandEvent(UUID player, SubServer server, String command) {
         this.player = player;
         this.server = server;
         this.command = command;
@@ -30,8 +30,8 @@ public class SubSendCommandEvent extends Event {
     public SubServer getServer() { return server; }
 
     /**
-     * Gets the player that Triggered the Event
-     * @return The Player that triggered this Event or Null if Console
+     * Gets the player that triggered the Event
+     * @return The Player that triggered this Event or null if Console
      */
     public UUID getPlayer() { return player; }
 
@@ -50,7 +50,7 @@ public class SubSendCommandEvent extends Event {
      * @param value Value
      */
     public void setCommand(String value) {
-
+        command = value;
     }
 
     /**

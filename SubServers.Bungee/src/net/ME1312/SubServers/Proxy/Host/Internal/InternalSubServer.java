@@ -5,17 +5,16 @@ import net.ME1312.SubServers.Proxy.Event.SubStartEvent;
 import net.ME1312.SubServers.Proxy.Event.SubStopEvent;
 import net.ME1312.SubServers.Proxy.Event.SubStoppedEvent;
 import net.ME1312.SubServers.Proxy.Host.Executable;
-import net.ME1312.SubServers.Proxy.Libraries.Container;
-import net.ME1312.SubServers.Proxy.Libraries.Exception.InvalidServerException;
+import net.ME1312.SubServers.Proxy.Library.Container;
+import net.ME1312.SubServers.Proxy.Library.Exception.InvalidServerException;
 import net.ME1312.SubServers.Proxy.Host.Host;
 import net.ME1312.SubServers.Proxy.Host.SubServer;
+import net.ME1312.SubServers.Proxy.Library.NamedContainer;
 
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 public class InternalSubServer extends SubServer {
@@ -26,21 +25,22 @@ public class InternalSubServer extends SubServer {
     private Executable executable;
     private String stopcmd;
     private Process process;
-    private List<String> queue;
+    private BufferedWriter command;
     private boolean restart;
+    private boolean allowrestart;
     private boolean temporary;
     private InternalSubServer instance;
 
-    public InternalSubServer(Host host, String name, boolean enabled, int port, String motd, boolean log, String directory, Executable executable, String stopcmd, boolean start, boolean restart, boolean temporary) throws InvalidServerException {
-        super(host, name, port, motd);
+    public InternalSubServer(Host host, String name, boolean enabled, int port, String motd, boolean log, String directory, Executable executable, String stopcmd, boolean start, boolean restart, boolean restricted, boolean temporary) throws InvalidServerException {
+        super(host, name, port, motd, restricted);
         this.host = (InternalHost) host;
         this.enabled = enabled;
         this.log = new Container<Boolean>(log);
-        this.directory = new File(((InternalHost) host).directory, directory);
+        this.directory = new File(host.getDirectory(), directory);
         this.executable = executable;
         this.stopcmd = stopcmd;
         this.process = null;
-        this.queue = new ArrayList<String>();
+        this.command = null;
         this.restart = restart;
         this.temporary = temporary;
         this.instance = this;
@@ -49,82 +49,54 @@ public class InternalSubServer extends SubServer {
     }
 
     private void run() {
-        new Thread() {
-            public void run() {
-                final Container<Boolean> allowRestart = new Container<Boolean>(true);
+        new Thread(() -> {
+            allowrestart = true;
+            try {
+                process = Runtime.getRuntime().exec(executable.toString(), null, directory);
+                System.out.println("SubServers > Now starting " + instance.getName());
+                final InternalSubLogger read = new InternalSubLogger(process.getInputStream(), instance.getName(), log, null);
+                read.start();
+                command = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
+
                 try {
-                    process = Runtime.getRuntime().exec(executable.toString(), null, directory);
-                    System.out.println("SubServers > Now starting " + instance.getName());
-                    final InternalSubLogger read = new InternalSubLogger(process.getInputStream(), instance.getName(), log, null);
-                    read.start();
-                    final BufferedWriter cmd = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
-                    new Thread() {
-                        @Override
-                        public void run() {
-                            try {
-                                do {
-                                    if (!queue.isEmpty()) {
-                                        while (queue.size() > 0) {
-                                            try {
-                                                if (queue.get(0).equalsIgnoreCase(stopcmd)) allowRestart.set(false);
-                                                cmd.write(queue.get(0));
-                                                cmd.newLine();
-                                                cmd.flush();
-                                                queue.remove(0);
-                                                Thread.sleep(100);
-                                            } catch (IOException | InterruptedException e) {
-                                                e.printStackTrace();
-                                            }
-                                        }
-                                    }
-                                    Thread.sleep(500);
-
-                                } while (read.isAlive());
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    }.start();
-                    try {
-                        process.waitFor();
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                } catch (IOException e) {
+                    process.waitFor();
+                } catch (InterruptedException e) {
                     e.printStackTrace();
-                    allowRestart.set(false);
                 }
+            } catch (IOException e) {
+                e.printStackTrace();
+                allowrestart = false;
+            }
 
-                SubStoppedEvent event = new SubStoppedEvent(instance);
-                host.plugin.getPluginManager().callEvent(event);
-                System.out.println("SubServers > " + instance.getName() + " has stopped");
-                process = null;
-                queue.clear();
+            SubStoppedEvent event = new SubStoppedEvent(instance);
+            host.plugin.getPluginManager().callEvent(event);
+            System.out.println("SubServers > " + instance.getName() + " has stopped");
+            process = null;
+            command = null;
 
-                if (temporary) {
+            if (temporary) {
+                try {
+                    host.removeSubServer(instance.getName());
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                if (restart && allowrestart) {
                     try {
-                        host.removeSubServer(instance.getName());
+                        Thread.sleep(2500);
+                        start();
                     } catch (InterruptedException e) {
                         e.printStackTrace();
-                    }
-                } else {
-                    if (restart && allowRestart.get()) {
-                        try {
-                            Thread.sleep(2500);
-                            start();
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
                     }
                 }
             }
-        }.start();
+        }).start();
     }
 
     @Override
     public void start(UUID player) {
         if (enabled && !isRunning()) {
-            SubStartEvent event = new SubStartEvent(this, player);
+            SubStartEvent event = new SubStartEvent(player, this);
             host.plugin.getPluginManager().callEvent(event);
             if (!event.isCancelled()) {
                 run();
@@ -135,10 +107,17 @@ public class InternalSubServer extends SubServer {
     @Override
     public void stop(UUID player) {
         if (isRunning()) {
-            SubStopEvent event = new SubStopEvent(this, player, false);
+            SubStopEvent event = new SubStopEvent(player, this, false);
             host.plugin.getPluginManager().callEvent(event);
             if (!event.isCancelled()) {
-                queue.add(stopcmd);
+                try {
+                    command.write(stopcmd);
+                    command.newLine();
+                    command.flush();
+                    allowrestart = false;
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         }
     }
@@ -146,7 +125,7 @@ public class InternalSubServer extends SubServer {
     @Override
     public void terminate(UUID player) {
         if (isRunning()) {
-            SubStopEvent event = new SubStopEvent(this, player, true);
+            SubStopEvent event = new SubStopEvent(player, this, true);
             host.plugin.getPluginManager().callEvent(event);
             if (!event.isCancelled()) {
                 process.destroyForcibly();
@@ -157,10 +136,25 @@ public class InternalSubServer extends SubServer {
     @Override
     public void command(UUID player, String command) {
         if (isRunning()) {
-            SubSendCommandEvent event = new SubSendCommandEvent(this, player, command);
+            SubSendCommandEvent event = new SubSendCommandEvent(player, this, command);
             host.plugin.getPluginManager().callEvent(event);
             if (!event.isCancelled()) {
-                queue.add(command);
+                try {
+                    this.command.write(event.getCommand());
+                    this.command.newLine();
+                    this.command.flush();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    @Override
+    public void edit(NamedContainer<String, ?>... changes) {
+        for (NamedContainer<String, ?> change : changes) {
+            switch (change.name().toLowerCase()) {
+                // TODO SubEditor
             }
         }
     }
@@ -190,6 +184,11 @@ public class InternalSubServer extends SubServer {
     @Override
     public void setEnabled(boolean value) {
         enabled = value;
+    }
+
+    @Override
+    public boolean isEditable() {
+        return host.isEditable() && !isRunning();
     }
 
     @Override

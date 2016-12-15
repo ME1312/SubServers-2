@@ -1,4 +1,4 @@
-package net.ME1312.SubServers.Proxy.Libraries;
+package net.ME1312.SubServers.Proxy.Library;
 
 import java.io.File;
 

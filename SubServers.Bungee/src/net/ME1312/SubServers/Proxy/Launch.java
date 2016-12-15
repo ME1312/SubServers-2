@@ -25,6 +25,7 @@ public final class Launch {
      * @param args
      * @throws Exception
      */
+    @SuppressWarnings("deprecation")
     public static void main(String[] args) throws Exception {
         System.out.println("");
         System.out.println("*******************************************");

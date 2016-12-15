@@ -1,19 +1,19 @@
-package net.ME1312.SubServers.Proxy.Libraries;
+package net.ME1312.SubServers.Proxy.Library;
 
 /**
  * Container Class
  *
  * @author ME1312
  */
-public class Container<T> {
-    private T obj;
+public class Container<V> {
+    private V obj;
 
     /**
      * Creates a Container
      *
      * @param item Object to Store
      */
-    public Container(T item) {
+    public Container(V item) {
         obj = item;
     }
 
@@ -22,7 +22,7 @@ public class Container<T> {
      *
      * @return The Object
      */
-    public T get() {
+    public V get() {
         return obj;
     }
 
@@ -31,7 +31,7 @@ public class Container<T> {
      *
      * @param value Object to Store
      */
-    public void set(T value) {
+    public void set(V value) {
         obj = value;
     }
 }

@@ -1,4 +1,4 @@
-package net.ME1312.SubServers.Proxy.Libraries.Version;
+package net.ME1312.SubServers.Proxy.Library.Version;
 
 import java.io.Serializable;
 

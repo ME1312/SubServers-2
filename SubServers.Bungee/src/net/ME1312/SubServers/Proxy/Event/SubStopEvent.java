@@ -14,11 +14,11 @@ public class SubStopEvent extends Event {
     /**
      * Server Stop Event
      *
-     * @param server Server Stopping
      * @param player Player Stopping Server
+     * @param server Server Stopping
      * @param force If it was a Forced Shutdown
      */
-    public SubStopEvent(SubServer server, UUID player, boolean force) {
+    public SubStopEvent(UUID player, SubServer server, boolean force) {
         this.player = player;
         this.server = server;
         this.force = force;
@@ -31,8 +31,8 @@ public class SubStopEvent extends Event {
     public SubServer getServer() { return server; }
 
     /**
-     * Gets the player that Triggered the Event
-     * @return The Player that triggered this Event or Null if Console
+     * Gets the player that triggered the Event
+     * @return The Player that triggered this Event or null if Console
      */
     public UUID getPlayer() { return player; }
 

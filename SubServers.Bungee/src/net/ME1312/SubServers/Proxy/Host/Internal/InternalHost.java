@@ -1,14 +1,14 @@
 package net.ME1312.SubServers.Proxy.Host.Internal;
 
+import net.ME1312.SubServers.Proxy.Event.SubAddServerEvent;
 import net.ME1312.SubServers.Proxy.Host.Executable;
-import net.ME1312.SubServers.Proxy.Libraries.Exception.InvalidServerException;
+import net.ME1312.SubServers.Proxy.Library.Exception.InvalidServerException;
 import net.ME1312.SubServers.Proxy.Host.Host;
 import net.ME1312.SubServers.Proxy.Host.SubCreator;
 import net.ME1312.SubServers.Proxy.Host.SubServer;
-import net.ME1312.SubServers.Proxy.Libraries.UniversalFile;
+import net.ME1312.SubServers.Proxy.Library.NamedContainer;
 import net.ME1312.SubServers.Proxy.SubPlugin;
 
-import java.io.File;
 import java.net.InetAddress;
 import java.util.HashMap;
 import java.util.Map;
@@ -22,16 +22,16 @@ public class InternalHost extends Host {
     private boolean enabled;
     private InetAddress address;
     private InternalSubCreator creator;
-    UniversalFile directory;
+    private String directory;
     SubPlugin plugin;
 
-    public InternalHost(SubPlugin plugin, String name, Boolean enabled, InetAddress address, UniversalFile directory) {
-        super(plugin, name, enabled, address, directory);
+    public InternalHost(SubPlugin plugin, String name, Boolean enabled, InetAddress address, String directory, String gitBash) {
+        super(plugin, name, enabled, address, directory, gitBash);
         this.plugin = plugin;
         this.name = name;
         this.enabled = enabled;
         this.address = address;
-        this.creator = new InternalSubCreator(this);
+        this.creator = new InternalSubCreator(this, gitBash);
         this.directory = directory;
     }
 
@@ -48,6 +48,16 @@ public class InternalHost extends Host {
     @Override
     public InetAddress getAddress() {
         return address;
+    }
+
+    @Override
+    public String getDirectory() {
+        return directory;
+    }
+
+    @Override
+    public boolean isEditable() {
+        return true;
     }
 
     @Override
@@ -84,6 +94,15 @@ public class InternalHost extends Host {
     }
 
     @Override
+    public void edit(NamedContainer<String, ?>... changes) {
+        for (NamedContainer<String, ?> change : changes) {
+            switch (change.name().toLowerCase()) {
+                // TODO SubEditor
+            }
+        }
+    }
+
+    @Override
     public SubCreator getCreator() {
         return creator;
     }
@@ -99,11 +118,17 @@ public class InternalHost extends Host {
     }
 
     @Override
-    public SubServer addSubServer(UUID player, String name, boolean enabled, int port, String motd, boolean log, String directory, Executable executable, String stopcmd, boolean start, boolean restart, boolean temporary) throws InvalidServerException {
-        if (plugin.getServers().keySet().contains(name.toLowerCase())) throw new InvalidServerException("A Server already exists with this name!");
-        SubServer server = new InternalSubServer(this, name, enabled, port, motd, log, directory, executable, stopcmd, start, restart, temporary);
-        servers.put(name.toLowerCase(), server);
-        return server;
+    public SubServer addSubServer(UUID player, String name, boolean enabled, int port, String motd, boolean log, String directory, Executable executable, String stopcmd, boolean start, boolean restart, boolean restricted, boolean temporary) throws InvalidServerException {
+        if (plugin.api.getServers().keySet().contains(name.toLowerCase())) throw new InvalidServerException("A Server already exists with this name!");
+        SubServer server = new InternalSubServer(this, name, enabled, port, motd, log, directory, executable, stopcmd, start, restart, restricted, temporary);
+        SubAddServerEvent event = new SubAddServerEvent(player, this, server);
+        plugin.getPluginManager().callEvent(event);
+        if (!event.isCancelled()) {
+            servers.put(name.toLowerCase(), server);
+            return server;
+        } else {
+            return null;
+        }
     }
 
     @Override

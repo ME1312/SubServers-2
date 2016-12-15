@@ -2,34 +2,40 @@ package net.ME1312.SubServers.Proxy.Network.Packet;
 
 import net.ME1312.SubServers.Proxy.Host.Server;
 import net.ME1312.SubServers.Proxy.Host.SubServer;
-import net.ME1312.SubServers.Proxy.Libraries.Version.Version;
+import net.ME1312.SubServers.Proxy.Library.Version.Version;
 import net.ME1312.SubServers.Proxy.Network.Client;
 import net.ME1312.SubServers.Proxy.Network.PacketIn;
 import net.ME1312.SubServers.Proxy.Network.PacketOut;
 import net.ME1312.SubServers.Proxy.SubPlugin;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
-public class PacketRequestServerInfo implements PacketIn, PacketOut {
+public class PacketDownloadServerInfo implements PacketIn, PacketOut {
     private SubPlugin plugin;
     private Server server;
+    private String id;
 
-    public PacketRequestServerInfo(SubPlugin plugin, Server server) {
-        this.server = server;
-    }
-
-    public PacketRequestServerInfo(SubPlugin plugin) {
+    public PacketDownloadServerInfo(SubPlugin plugin) {
         this.plugin = plugin;
+    }
+    public PacketDownloadServerInfo(SubPlugin plugin, Server server, String id) {
+        this.plugin = plugin;
+        this.server = server;
+        this.id = id;
     }
 
     @Override
     public JSONObject generate() {
         JSONObject json = new JSONObject();
-        JSONObject info = new JSONObject();
+        json.put("id", id);
         json.put("type", (server == null)?"invalid":((server instanceof SubServer)?"subserver":"server"));
+        JSONObject info = new JSONObject();
 
         if (server != null && server instanceof SubServer) {
             info.put("host", ((SubServer) server).getHost().getName());
             info.put("enabled", ((SubServer) server).isEnabled());
+            info.put("editable", ((SubServer) server).isEditable());
             info.put("log", ((SubServer) server).isLogging());
             info.put("dir", plugin.config.get().getSection("Servers").getSection(server.getName()).getString("Directory"));
             info.put("exec", plugin.config.get().getSection("Servers").getSection(server.getName()).getString("Executable"));
@@ -44,6 +50,15 @@ public class PacketRequestServerInfo implements PacketIn, PacketOut {
             info.put("restricted", server.isRestricted());
             info.put("motd", server.getMotd());
             info.put("subdata", server.getSubDataClient() == null);
+
+            JSONObject players = new JSONObject();
+            for (ProxiedPlayer player : server.getPlayers()) {
+                JSONObject pinfo = new JSONObject();
+                pinfo.put("name", player.getName());
+                pinfo.put("nick", player.getDisplayName());
+                players.put(player.getUniqueId().toString(), pinfo);
+            }
+            info.put("players", players);
         }
 
         json.put("server", info);
@@ -52,7 +67,7 @@ public class PacketRequestServerInfo implements PacketIn, PacketOut {
 
     @Override
     public void execute(Client client, JSONObject data) {
-        client.sendPacket(new PacketRequestServerInfo(plugin, plugin.api.getServer(data.getString("server"))));
+        client.sendPacket(new PacketDownloadServerInfo(plugin, plugin.api.getServer(data.getString("server")), (data.keySet().contains("id"))?data.getString("id"):null));
     }
 
     @Override

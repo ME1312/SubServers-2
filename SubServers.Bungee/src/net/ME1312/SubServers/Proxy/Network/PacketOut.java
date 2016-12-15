@@ -1,6 +1,6 @@
 package net.ME1312.SubServers.Proxy.Network;
 
-import net.ME1312.SubServers.Proxy.Libraries.Version.Version;
+import net.ME1312.SubServers.Proxy.Library.Version.Version;
 import org.json.JSONObject;
 
 /**

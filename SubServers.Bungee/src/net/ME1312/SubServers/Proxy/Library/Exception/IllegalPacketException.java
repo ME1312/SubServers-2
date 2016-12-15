@@ -1,4 +1,4 @@
-package net.ME1312.SubServers.Proxy.Libraries.Exception;
+package net.ME1312.SubServers.Proxy.Library.Exception;
 
 public class IllegalPacketException extends IllegalStateException {
     public IllegalPacketException() {}

@@ -1,6 +1,6 @@
 package net.ME1312.SubServers.Proxy.Host;
 
-import net.ME1312.SubServers.Proxy.Libraries.Exception.InvalidServerException;
+import net.ME1312.SubServers.Proxy.Library.Exception.InvalidServerException;
 import net.ME1312.SubServers.Proxy.Network.Client;
 import net.ME1312.SubServers.Proxy.Network.ClientHandler;
 import net.md_5.bungee.BungeeServerInfo;

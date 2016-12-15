@@ -1,6 +1,7 @@
 package net.ME1312.SubServers.Proxy.Host;
 
-import net.ME1312.SubServers.Proxy.Libraries.Exception.InvalidServerException;
+import net.ME1312.SubServers.Proxy.Library.Exception.InvalidServerException;
+import net.ME1312.SubServers.Proxy.Library.NamedContainer;
 
 import java.net.InetSocketAddress;
 import java.util.UUID;
@@ -19,10 +20,11 @@ public abstract class SubServer extends Server {
      * @param name Server Name
      * @param port Port Number
      * @param motd Server MOTD
+     * @param restricted Players will need a permission to join if true
      * @throws InvalidServerException
      */
-    public SubServer(Host host, String name, int port, String motd) throws InvalidServerException {
-        super(name, InetSocketAddress.createUnresolved(host.getAddress().getHostAddress(), port), motd, false);
+    public SubServer(Host host, String name, int port, String motd, boolean restricted) throws InvalidServerException {
+        super(name, InetSocketAddress.createUnresolved(host.getAddress().getHostAddress(), port), motd, restricted);
     }
 
     /**
@@ -85,6 +87,13 @@ public abstract class SubServer extends Server {
     }
 
     /**
+     * Applies edits to the SubServer
+     *
+     * @param change Change(s) to be applied
+     */
+    public abstract void edit(NamedContainer<String, ?>... change);
+
+    /**
      * Waits for the Server to Stop
      *
      * @throws InterruptedException
@@ -118,6 +127,13 @@ public abstract class SubServer extends Server {
      * @param value Value
      */
     public abstract void setEnabled(boolean value);
+
+    /**
+     * Get if the SubServer can be Edited
+     *
+     * @return Editable Status
+     */
+    public abstract boolean isEditable();
 
     /**
      * If the Server is Logging

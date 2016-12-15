@@ -26,7 +26,11 @@ crashlytics.properties
 crashlytics-build.properties
 
 # Hide Unfinished Project Files
-# (none)
+/Artifacts/SubServers.Client.Bukkit.jar
+/Artifacts/SubServers.Host.jar
+/SubServers.Client/Bukkit/
+/SubServers.Host/
 
 # Hide Others
 .DS_STORE
+.alias

@@ -1,5 +1,6 @@
-package net.ME1312.SubServers.Proxy.Libraries.Config;
+package net.ME1312.SubServers.Proxy.Library.Config;
 
+import net.ME1312.SubServers.Proxy.Library.Util;
 import net.md_5.bungee.api.ChatColor;
 import org.json.JSONObject;
 import org.yaml.snakeyaml.Yaml;
@@ -27,6 +28,10 @@ public class YAMLSection {
 
     public YAMLSection(Reader reader) throws YAMLException {
         this.map = (Map<String, Object>) (this.yaml = new Yaml(YAMLConfig.getDumperOptions())).load(reader);
+    }
+
+    public YAMLSection(JSONObject json) {
+        this.map = (Map<String, Object>) (this.yaml = new Yaml(YAMLConfig.getDumperOptions())).load(json.toString(4));
     }
 
     public YAMLSection(String yaml) throws YAMLException {
@@ -341,18 +346,18 @@ public class YAMLSection {
     }
 
     public String getString(String label) {
-        return (map.get(label) != null)?unescapeJavaString((String) map.get(label)):null;
+        return (map.get(label) != null)?Util.unescapeJavaString((String) map.get(label)):null;
     }
 
     public String getString(String label, String def) {
-        return unescapeJavaString((String) ((map.get(label) != null) ? map.get(label) : def));
+        return Util.unescapeJavaString((String) ((map.get(label) != null) ? map.get(label) : def));
     }
 
     public List<String> getStringList(String label) {
         if (map.get(label) != null) {
             List<String> values = new ArrayList<String>();
             for (String value : (List<String>) map.get(label)) {
-                values.add(unescapeJavaString(value));
+                values.add(Util.unescapeJavaString(value));
             }
             return values;
         } else {
@@ -366,25 +371,25 @@ public class YAMLSection {
         } else {
             List<String> values = new ArrayList<String>();
             for (String value : def) {
-                values.add(unescapeJavaString(value));
+                values.add(Util.unescapeJavaString(value));
             }
             return values;
         }
     }
 
     public String getColoredString(String label, char color) {
-        return (map.get(label) != null)? ChatColor.translateAlternateColorCodes(color, unescapeJavaString((String) map.get(label))):null;
+        return (map.get(label) != null)? ChatColor.translateAlternateColorCodes(color, Util.unescapeJavaString((String) map.get(label))):null;
     }
 
     public String getColoredString(String label, String def, char color) {
-        return ChatColor.translateAlternateColorCodes(color, unescapeJavaString((String) ((map.get(label) != null) ? map.get(label) : def)));
+        return ChatColor.translateAlternateColorCodes(color, Util.unescapeJavaString((String) ((map.get(label) != null) ? map.get(label) : def)));
     }
 
     public List<String> getColoredStringList(String label, char color) {
         if (map.get(label) != null) {
             List<String> values = new ArrayList<String>();
             for (String value : (List<String>) map.get(label)) {
-                values.add(ChatColor.translateAlternateColorCodes(color, unescapeJavaString(value)));
+                values.add(ChatColor.translateAlternateColorCodes(color, Util.unescapeJavaString(value)));
             }
             return values;
         } else {
@@ -398,7 +403,7 @@ public class YAMLSection {
         } else {
             List<String> values = new ArrayList<String>();
             for (String value : def) {
-                values.add(ChatColor.translateAlternateColorCodes(color, unescapeJavaString(value)));
+                values.add(ChatColor.translateAlternateColorCodes(color, Util.unescapeJavaString(value)));
             }
             return values;
         }
@@ -434,76 +439,5 @@ public class YAMLSection {
 
     public boolean isString(String label) {
         return (map.get(label) instanceof String);
-    }
-
-    static String unescapeJavaString(String str) {
-
-        StringBuilder sb = new StringBuilder(str.length());
-
-        for (int i = 0; i < str.length(); i++) {
-            char ch = str.charAt(i);
-            if (ch == '\\') {
-                char nextChar = (i == str.length() - 1) ? '\\' : str
-                        .charAt(i + 1);
-                // Octal escape?
-                if (nextChar >= '0' && nextChar <= '7') {
-                    String code = "" + nextChar;
-                    i++;
-                    if ((i < str.length() - 1) && str.charAt(i + 1) >= '0'
-                            && str.charAt(i + 1) <= '7') {
-                        code += str.charAt(i + 1);
-                        i++;
-                        if ((i < str.length() - 1) && str.charAt(i + 1) >= '0'
-                                && str.charAt(i + 1) <= '7') {
-                            code += str.charAt(i + 1);
-                            i++;
-                        }
-                    }
-                    sb.append((char) Integer.parseInt(code, 8));
-                    continue;
-                }
-                switch (nextChar) {
-                    case '\\':
-                        ch = '\\';
-                        break;
-                    case 'b':
-                        ch = '\b';
-                        break;
-                    case 'f':
-                        ch = '\f';
-                        break;
-                    case 'n':
-                        ch = '\n';
-                        break;
-                    case 'r':
-                        ch = '\r';
-                        break;
-                    case 't':
-                        ch = '\t';
-                        break;
-                    case '\"':
-                        ch = '\"';
-                        break;
-                    case '\'':
-                        ch = '\'';
-                        break;
-                    // Hex Unicode: u????
-                    case 'u':
-                        if (i >= str.length() - 5) {
-                            ch = 'u';
-                            break;
-                        }
-                        int code = Integer.parseInt(
-                                "" + str.charAt(i + 2) + str.charAt(i + 3)
-                                        + str.charAt(i + 4) + str.charAt(i + 5), 16);
-                        sb.append(Character.toChars(code));
-                        i += 5;
-                        continue;
-                }
-                i++;
-            }
-            sb.append(ch);
-        }
-        return sb.toString();
     }
 }

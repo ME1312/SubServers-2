@@ -1,6 +1,6 @@
 package net.ME1312.SubServers.Proxy.Network.Packet;
 
-import net.ME1312.SubServers.Proxy.Libraries.Version.Version;
+import net.ME1312.SubServers.Proxy.Library.Version.Version;
 import net.ME1312.SubServers.Proxy.Network.Client;
 import net.ME1312.SubServers.Proxy.Network.PacketIn;
 import net.ME1312.SubServers.Proxy.Network.PacketOut;
@@ -23,7 +23,10 @@ public class PacketAuthorization implements PacketIn, PacketOut {
 
     @Override
     public JSONObject generate() {
-        return new JSONObject("{\"r\": " + response + ", \"" + message.replace("\"", "\\\"") + "\"}");
+        JSONObject json = new JSONObject();
+        json.put("r", response);
+        json.put("m", message);
+        return json;
     }
 
     @Override

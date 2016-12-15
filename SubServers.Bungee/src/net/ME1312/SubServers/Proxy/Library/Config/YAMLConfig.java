@@ -1,4 +1,4 @@
-package net.ME1312.SubServers.Proxy.Libraries.Config;
+package net.ME1312.SubServers.Proxy.Library.Config;
 
 import org.json.JSONObject;
 import org.yaml.snakeyaml.DumperOptions;

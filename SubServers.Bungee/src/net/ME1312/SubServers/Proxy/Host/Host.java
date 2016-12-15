@@ -1,10 +1,10 @@
 package net.ME1312.SubServers.Proxy.Host;
 
-import net.ME1312.SubServers.Proxy.Libraries.Exception.InvalidServerException;
-import net.ME1312.SubServers.Proxy.Libraries.UniversalFile;
+import net.ME1312.SubServers.Proxy.Library.Exception.InvalidHostException;
+import net.ME1312.SubServers.Proxy.Library.Exception.InvalidServerException;
+import net.ME1312.SubServers.Proxy.Library.NamedContainer;
 import net.ME1312.SubServers.Proxy.SubPlugin;
 
-import java.io.File;
 import java.net.InetAddress;
 import java.util.Map;
 import java.util.UUID;
@@ -20,11 +20,15 @@ public abstract class Host {
      * This constructor is required to launch your host from the drivers list. Do not add or remove any arguments.
      *
      * @param plugin SubServers Internals
-     * @param enabled If your host is enabled
-     * @param address The address of your host
-     * @param directory The runtime directory of your host
+     * @param name The Name of your Host
+     * @param enabled If your host is Enabled
+     * @param address The address of your Host
+     * @param directory The runtime directory of your Host
+     * @param gitBash The Git Bash directory
      */
-    public Host(SubPlugin plugin, String name, Boolean enabled, InetAddress address, UniversalFile directory) {}
+    public Host(SubPlugin plugin, String name, Boolean enabled, InetAddress address, String directory, String gitBash) {
+        if (name.contains(" ")) throw new InvalidHostException("Host names cannot have spaces: " + name);
+    }
 
     /**
      * Is this Host Enabled?
@@ -46,6 +50,20 @@ public abstract class Host {
      * @return Host Address
      */
     public abstract InetAddress getAddress();
+
+    /**
+     * Get the Directory of this Host
+     *
+     * @return Host Directory
+     */
+    public abstract String getDirectory();
+
+    /**
+     * Get if the Host can be Edited
+     *
+     * @return Editable Status
+     */
+    public abstract boolean isEditable();
 
     /**
      * Get the Name of this Host
@@ -125,6 +143,13 @@ public abstract class Host {
     public abstract void command(UUID player, String command, String... servers);
 
     /**
+     * Applies edits to the Host
+     *
+     * @param change Change(s) to be applied
+     */
+    public abstract void edit(NamedContainer<String, ?>... change);
+
+    /**
      * Gets the SubCreator Instance for this Host
      *
      * @return SubCreator
@@ -159,11 +184,12 @@ public abstract class Host {
      * @param executable Executable
      * @param stopcmd Command to Stop the Server
      * @param restart Auto Restart Status
+     * @param restricted Players will need a permission to join if true
      * @param temporary Temporary Status
      * @return The SubServer
      * @throws InvalidServerException
      */
-    public abstract SubServer addSubServer(UUID player, String name, boolean enabled, int port, String motd, boolean log, String directory, Executable executable, String stopcmd, boolean start, boolean restart, boolean temporary) throws InvalidServerException;
+    public abstract SubServer addSubServer(UUID player, String name, boolean enabled, int port, String motd, boolean log, String directory, Executable executable, String stopcmd, boolean start, boolean restart, boolean restricted, boolean temporary) throws InvalidServerException;
 
     /**
      * Adds a SubServer
@@ -177,12 +203,13 @@ public abstract class Host {
      * @param executable Executable
      * @param stopcmd Command to Stop the Server
      * @param restart Auto Restart Status
+     * @param restricted Players will need a permission to join if true
      * @param temporary Temporary Status
      * @return The SubServer
      * @throws InvalidServerException
      */
-    public SubServer addSubServer(String name, boolean enabled, int port, String motd, boolean log, String directory, Executable executable, String stopcmd, boolean start, boolean restart, boolean temporary) throws InvalidServerException {
-        return addSubServer(null, name, enabled, port, motd, log, directory, executable, stopcmd, start, restart, temporary);
+    public SubServer addSubServer(String name, boolean enabled, int port, String motd, boolean log, String directory, Executable executable, String stopcmd, boolean start, boolean restart, boolean restricted, boolean temporary) throws InvalidServerException {
+        return addSubServer(null, name, enabled, port, motd, log, directory, executable, stopcmd, start, restart, restricted, temporary);
     }
 
     /**

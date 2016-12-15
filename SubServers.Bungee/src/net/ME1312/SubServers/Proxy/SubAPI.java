@@ -1,14 +1,18 @@
 package net.ME1312.SubServers.Proxy;
 
+import net.ME1312.SubServers.Proxy.Event.SubAddServerEvent;
 import net.ME1312.SubServers.Proxy.Host.Server;
 import net.ME1312.SubServers.Proxy.Host.Host;
 import net.ME1312.SubServers.Proxy.Host.SubServer;
-import net.ME1312.SubServers.Proxy.Libraries.UniversalFile;
-import net.ME1312.SubServers.Proxy.Libraries.Version.Version;
-import net.ME1312.SubServers.Proxy.Network.NetworkManager;
+import net.ME1312.SubServers.Proxy.Library.UniversalFile;
+import net.ME1312.SubServers.Proxy.Library.Version.Version;
+import net.ME1312.SubServers.Proxy.Network.SubDataServer;
 
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.UUID;
 
 /**
  * SubAPI Class
@@ -49,7 +53,7 @@ public final class SubAPI {
      *
      * @return SubData Network Manager
      */
-    public NetworkManager getSubDataNetwork() {
+    public SubDataServer getSubDataNetwork() {
         return plugin.subdata;
     }
 
@@ -95,6 +99,43 @@ public final class SubAPI {
             servers.putAll(host.getSubServers());
         }
         return servers;
+    }
+
+    /**
+     * Adds a Server to the Network
+     *
+     * @param name Name of the Server
+     * @param ip IP of the Server
+     * @param port Port of the Server
+     * @param motd MOTD of the Server
+     * @param restricted Players will need a permission to join if true
+     * @return The Server
+     */
+    public Server addServer(String name, InetAddress ip, int port, String motd, boolean restricted) {
+        return addServer(null, name, ip, port, motd, restricted);
+    }
+
+    /**
+     * Adds a Server to the Network
+     *
+     * @param player Player who added
+     * @param name Name of the Server
+     * @param ip IP of the Server
+     * @param port Port of the Server
+     * @param motd MOTD of the Server
+     * @param restricted Players will need a permission to join if true
+     * @return The Server
+     */
+    public Server addServer(UUID player, String name, InetAddress ip, int port, String motd, boolean restricted) {
+        Server server = new Server(name, new InetSocketAddress(ip, port), motd, restricted);
+        SubAddServerEvent event = new SubAddServerEvent(player, null, server);
+        plugin.getPluginManager().callEvent(event);
+        if (!event.isCancelled()) {
+            plugin.exServers.put(name.toLowerCase(), server);
+            return server;
+        } else {
+            return null;
+        }
     }
 
     /**
