@@ -36,7 +36,7 @@ public final class SubPlugin extends BungeeCord {
     public HashMap<String, String> exLang = new HashMap<String, String>();
     public SubDataServer subdata = null;
     public final Version version = new Version("2.11.0a");
-    protected Version bversion = new Version(2);
+    protected Version bversion = new Version(3);
 
     protected boolean running = false;
     public final SubAPI api = new SubAPI(this);

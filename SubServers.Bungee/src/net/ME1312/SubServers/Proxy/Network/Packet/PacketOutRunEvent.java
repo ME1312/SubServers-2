@@ -111,6 +111,7 @@ public class PacketOutRunEvent implements Listener, PacketOut {
                 HashMap<String, Object> args = new HashMap<String, Object>();
                 args.put("player", ((event.getPlayer() == null)?null:event.getPlayer().toString()));
                 args.put("server", event.getServer().getName());
+                args.put("force", event.isForced());
                 if (server.getSubDataClient() != null) server.getSubDataClient().sendPacket(new PacketOutRunEvent(event.getClass(), args));
             }
         }
@@ -123,6 +124,20 @@ public class PacketOutRunEvent implements Listener, PacketOut {
             HashMap<String, Object> args = new HashMap<String, Object>();
             args.put("server", event.getServer().getName());
             if (server.getSubDataClient() != null) server.getSubDataClient().sendPacket(new PacketOutRunEvent(event.getClass(), args));
+        }
+    }
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void event(SubRemoveServerEvent event) {
+        if (!event.isCancelled()) {
+            List<Server> list = new ArrayList<Server>();
+            list.addAll(plugin.api.getServers().values());
+            for (Server server : list) {
+                HashMap<String, Object> args = new HashMap<String, Object>();
+                args.put("player", ((event.getPlayer() == null)?null:event.getPlayer().toString()));
+                args.put("host", event.getHost().getName());
+                args.put("server", event.getServer().getName());
+                if (server.getSubDataClient() != null) server.getSubDataClient().sendPacket(new PacketOutRunEvent(event.getClass(), args));
+            }
         }
     }
 }

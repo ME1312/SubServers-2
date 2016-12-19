@@ -100,10 +100,21 @@ public abstract class SubServer extends Server {
     /**
      * Applies edits to the SubServer
      *
+     * @param player Player Editing
      * @param change Change(s) to be applied
      * @return Success Status
      */
-    public abstract boolean edit(NamedContainer<String, ?>... change);
+    public abstract int edit(UUID player, NamedContainer<String, ?>... change);
+
+    /**
+     * Applies edits to the SubServer
+     *
+     * @param change Change(s) to be applied
+     * @return Success Status
+     */
+    public int edit(NamedContainer<String, ?>... change) {
+        return edit(null, change);
+    }
 
     /**
      * Waits for the Server to Stop

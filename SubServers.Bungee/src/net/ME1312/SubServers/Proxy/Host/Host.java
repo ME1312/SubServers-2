@@ -76,6 +76,7 @@ public abstract class Host {
      * Starts the Servers Specified
      *
      * @param servers Servers
+     * @return Success Status
      */
     public int start(String... servers) {
         return start(null, servers);
@@ -86,6 +87,7 @@ public abstract class Host {
      *
      * @param player Player who started
      * @param servers Servers
+     * @return Success Status
      */
     public abstract int start(UUID player, String... servers);
 
@@ -93,6 +95,7 @@ public abstract class Host {
      * Stops the Servers Specified
      *
      * @param servers Servers
+     * @return Success Status
      */
     public int stop(String... servers) {
         return stop(null, servers);
@@ -103,6 +106,7 @@ public abstract class Host {
      *
      * @param player Player who started
      * @param servers Servers
+     * @return Success Status
      */
     public abstract int stop(UUID player, String... servers);
 
@@ -110,6 +114,7 @@ public abstract class Host {
      * Terminates the Servers Specified
      *
      * @param servers Servers
+     * @return Success Status
      */
     public int terminate(String... servers) {
         return terminate(null, servers);
@@ -120,6 +125,7 @@ public abstract class Host {
      *
      * @param player Player who started
      * @param servers Servers
+     * @return Success Status
      */
     public abstract int terminate(UUID player, String... servers);
 
@@ -128,6 +134,7 @@ public abstract class Host {
      *
      * @param command Command to send
      * @param servers Servers
+     * @return Success Status
      */
     public int command(String command, String... servers) {
         return command(null, command, servers);
@@ -139,15 +146,28 @@ public abstract class Host {
      * @param player Player who started
      * @param command Command to send
      * @param servers Servers
+     * @return Success Status
      */
     public abstract int command(UUID player, String command, String... servers);
 
     /**
      * Applies edits to the Host
      *
+     * @param player Player Editing
      * @param change Change(s) to be applied
+     * @return Success Status
      */
-    public abstract boolean edit(NamedContainer<String, ?>... change);
+    public abstract int edit(UUID player, NamedContainer<String, ?>... change);
+
+    /**
+     * Applies edits to the SubServer
+     *
+     * @param change Change(s) to be applied
+     * @return Success Status
+     */
+    public int edit(NamedContainer<String, ?>... change) {
+        return edit(null, change);
+    }
 
     /**
      * Gets the SubCreator Instance for this Host
@@ -219,14 +239,37 @@ public abstract class Host {
      *
      * @param name SubServer Name
      * @throws InterruptedException
+     * @return Success Status
      */
-    public abstract void removeSubServer(String name) throws InterruptedException;
+    public boolean removeSubServer(String name) throws InterruptedException {
+        return removeSubServer(null, name);
+    };
+
+    /**
+     * Removes a SubServer
+     *
+     * @param player Player Removing
+     * @param name SubServer Name
+     * @throws InterruptedException
+     * @return Success Status
+     */
+    public abstract boolean removeSubServer(UUID player, String name) throws InterruptedException;
 
     /**
      * Forces the Removal of a SubServer
      *
      * @param name SubServer Name
      */
-    public abstract void forceRemoveSubServer(String name);
+    public boolean forceRemoveSubServer(String name) {
+        return forceRemoveSubServer(null, name);
+    }
+
+    /**
+     * Forces the Removal of a SubServer
+     *
+     * @param player Player Removing
+     * @param name SubServer Name
+     */
+    public abstract boolean forceRemoveSubServer(UUID player, String name);
 
 }

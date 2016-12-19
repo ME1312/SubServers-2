@@ -1,0 +1,56 @@
+name: 'SubServers'
+main: 'net.ME1312.SubServers.Client.Bukkit.SubPlugin'
+version: '2.11.0a'
+authors: [ME1312]
+softdepend: [TitleManager]
+website: 'http://www.ME1312.net/'
+commands:
+  subservers:
+    description: 'The SubServers Command'
+    usage: /subservers help
+permissions:
+  subservers.*:
+    description: 'Grants Access to to Everything in SubServers.Client'
+    default: op
+    children:
+      subserver.interface:
+        description: 'Grants Access to the SubServers Interface'
+        default: op
+      subserver.command:
+        description: 'Grants Access to the SubServers Command'
+        default: op
+      subservers.reload:
+        description: 'Grants Access to Reload SubServers.Client'
+        default: op
+      subservers.host.*:
+        description: 'Grants Access to SubServers Host Actions'
+        default: op
+        children:
+          subservers.host.create.*:
+            description: 'Grants Access to Create a SubServer'
+            default: op
+          subservers.host.edit.*:
+            description: 'Grants Access to Edit a Host'
+            default: op
+      subservers.subserver.*:
+        description: 'Grants Access to SubServers Server Actions'
+        default: op
+        children:
+          subservers.subserver.start.*:
+            description: 'Grants Access to Start a SubServer'
+            default: op
+          subservers.subserver.stop.*:
+            description: 'Grants Access to Stop a SubServer'
+            default: op
+          subservers.subserver.terminate.*:
+            description: 'Grants Access to Terminate a SubServer'
+            default: op
+          subservers.subserver.command.*:
+            description: 'Grants Access to Send Commands to a SubServer'
+            default: op
+          subservers.subserver.edit.*:
+            description: 'Grants Access to Edit a SubServer'
+            default: op
+          subservers.subserver.teleport.*:
+            description: 'Grants Acces to Teleport to a SubServer'
+            default: op

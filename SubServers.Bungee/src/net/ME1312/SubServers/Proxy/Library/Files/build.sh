@@ -26,7 +26,7 @@ if [ $2 == bukkit ] || [ $2 == spigot ]
     else
         echo ERROR: Failed Downloading Buildtools. Is SpigotMC.org down?
         rm -Rf build-subserver.sh
-        exit 1
+        exit 3
     fi
     if [ -d "Buildtools" ]
     then
@@ -62,7 +62,7 @@ if [ $2 == bukkit ] || [ $2 == spigot ]
         rm -Rf BuildTools.jar
         rm -Rf Buildtools
         rm -Rf build-subserver.sh
-        exit 1
+        exit 4
     fi
 else
     if [ $2 == "vanilla" ]; then
@@ -76,7 +76,7 @@ else
         curl -o Buildtools/Vanilla/minecraft_server.$1.jar https://s3.amazonaws.com/Minecraft.Download/versions/$1/minecraft_server.$1.jar; retvald=$?
         if [ $retvald -eq 0 ]; then
             echo Downloading Vanilla Patches...
-            curl -o Buildtools/Vanilla/bungee-patch.jar http://minecraft.me1312.net/lib/subservers/vanilla-bungee-patch.1.2.jar; retvale=$?
+            curl -o Buildtools/Vanilla/bungee-patch.jar https://raw.githubusercontent.com/ME1312/SubServers-2/master/SubServers.Bungee/Vanilla-Patch.jar; retvale=$?
             if [ $retvale -eq 0 ]; then
                 echo Patching Vanilla for BungeeCord Support
                 cd Buildtools/Vanilla
@@ -96,19 +96,19 @@ else
                     echo ERROR: Failed Applying Patch.
                     rm -Rf Buildtools
                     rm -Rf build-subserver.sh
-                    exit 1
+                    exit 5
                 fi
             else
-                echo ERROR: Failed Downloading Patch. Is Dropbox.com down?
+                echo ERROR: Failed Downloading Patch. Is Github.com down?
                 rm -Rf Buildtools
                 rm -Rf build-subserver.sh
-                exit 1
+                exit 4
             fi
         else
             echo ERROR: Failed Downloading Jarfile. Is Minecraft.net down?
             rm -Rf Buildtools
             rm -Rf build-subserver.sh
-            exit 1
+            exit 3
         fi
     else
         if [ $2 == "sponge" ]; then
@@ -137,20 +137,21 @@ else
                         rm -Rf forge-${version[0]}-installer.jar.log
                         rm -Rf forge-${version[0]}-universal.jar
                         rm -Rf build-subserver.sh
-                        exit 1
+                        exit 5
                     fi
                 else
                     echo ERROR: Failed Installing Forge.
                     rm -Rf forge-${version[0]}-installer.jar
                     rm -Rf forge-${version[0]}-installer.jar.log
                     rm -Rf build-subserver.sh
-                    exit 1
+                    exit 4
                 fi
             else
                 echo ERROR: Failed Downloading Jarfile. Is MinecraftForge.net down?
                 rm -Rf build-subserver.sh
-                exit 1
+                exit 3
             fi
         fi
     fi
 fi
+exit 2

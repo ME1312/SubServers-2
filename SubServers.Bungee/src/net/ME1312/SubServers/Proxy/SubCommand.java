@@ -151,8 +151,7 @@ public final class SubCommand extends Command {
                 i++;
                 str = str + " " + args[i];
             }
-            System.out.println("/subserver" + str);
-            ((ProxiedPlayer) sender).chat("/subserver" + str);
+            ((ProxiedPlayer) sender).chat("/subservers" + str);
         }
     }
 

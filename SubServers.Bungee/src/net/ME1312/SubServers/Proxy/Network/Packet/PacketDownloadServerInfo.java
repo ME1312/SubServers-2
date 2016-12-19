@@ -48,6 +48,7 @@ public class PacketDownloadServerInfo implements PacketIn, PacketOut {
             info.put("name", server.getName());
             info.put("address", server.getAddress().toString());
             info.put("restricted", server.isRestricted());
+            info.put("hidden", server.isHidden());
             info.put("motd", server.getMotd());
             info.put("subdata", server.getSubDataClient() == null);
 

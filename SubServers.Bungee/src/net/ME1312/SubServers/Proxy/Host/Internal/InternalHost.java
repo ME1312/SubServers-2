@@ -1,6 +1,7 @@
 package net.ME1312.SubServers.Proxy.Host.Internal;
 
 import net.ME1312.SubServers.Proxy.Event.SubAddServerEvent;
+import net.ME1312.SubServers.Proxy.Event.SubRemoveServerEvent;
 import net.ME1312.SubServers.Proxy.Host.Executable;
 import net.ME1312.SubServers.Proxy.Library.Exception.InvalidServerException;
 import net.ME1312.SubServers.Proxy.Host.Host;
@@ -16,7 +17,7 @@ import java.util.TreeMap;
 import java.util.UUID;
 
 public class InternalHost extends Host {
-    private HashMap<String, SubServer> servers = new HashMap<String, SubServer>();
+    HashMap<String, SubServer> servers = new HashMap<String, SubServer>();
 
     private String name;
     private boolean enabled;
@@ -102,13 +103,14 @@ public class InternalHost extends Host {
     }
 
     @Override
-    public boolean edit(NamedContainer<String, ?>... changes) {
+    public int edit(UUID player, NamedContainer<String, ?>... changes) {
+        int i = 0;
         for (NamedContainer<String, ?> change : changes) {
             switch (change.name().toLowerCase()) {
                 // TODO SubEditor
             }
         }
-        return true;
+        return i;
     }
 
     @Override
@@ -141,19 +143,29 @@ public class InternalHost extends Host {
     }
 
     @Override
-    public void removeSubServer(String name) throws InterruptedException {
-        if (getSubServer(name).isRunning()) {
-            getSubServer(name).stop();
-            getSubServer(name).waitFor();
-        }
-        servers.remove(name.toLowerCase());
+    public boolean removeSubServer(UUID player, String name) throws InterruptedException {
+        SubRemoveServerEvent event = new SubRemoveServerEvent(player, this, getSubServer(name));
+        plugin.getPluginManager().callEvent(event);
+        if (!event.isCancelled()) {
+            if (getSubServer(name).isRunning()) {
+                getSubServer(name).stop();
+                getSubServer(name).waitFor();
+            }
+            servers.remove(name.toLowerCase());
+            return true;
+        } else return false;
     }
 
     @Override
-    public void forceRemoveSubServer(String name) {
-        if (getSubServer(name).isRunning()) {
-            getSubServer(name).terminate();
-        }
-        servers.remove(name.toLowerCase());
+    public boolean forceRemoveSubServer(UUID player, String name) {
+        SubRemoveServerEvent event = new SubRemoveServerEvent(player, this, getSubServer(name));
+        plugin.getPluginManager().callEvent(event);
+        if (!event.isCancelled()) {
+            if (getSubServer(name).isRunning()) {
+                getSubServer(name).terminate();
+            }
+            servers.remove(name.toLowerCase());
+            return true;
+        } else return false;
     }
 }
