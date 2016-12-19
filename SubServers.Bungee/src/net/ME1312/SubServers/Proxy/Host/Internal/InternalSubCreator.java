@@ -46,7 +46,6 @@ public class InternalSubCreator extends SubCreator {
 
         writer.close();
     }
-
     private void GenerateProperties(File dir, int port) throws FileNotFoundException, UnsupportedEncodingException {
         PrintWriter writer = new PrintWriter(new File(dir, "server.properties"), "UTF-8");
 
@@ -363,7 +362,7 @@ public class InternalSubCreator extends SubCreator {
 
     }
 
-    private void run(String name, ServerType type, Version version, int memory, int port) {
+    private void run(UUID player, String name, ServerType type, Version version, int memory, int port) {
         Executable exec = null;
         UniversalFile dir = new UniversalFile(new File(host.getDirectory()), name);
         dir.mkdirs();
@@ -474,7 +473,8 @@ public class InternalSubCreator extends SubCreator {
                 }
 
                 if (process2.exitValue() == 0) {
-                    host.addSubServer(name, true, port, "&aThis is a SubServer", true, dir.getPath(), exec, "stop", true, false, false, false);
+                    if (host.plugin.exServers.keySet().contains(name.toLowerCase())) host.plugin.exServers.remove(name.toLowerCase());
+                    host.addSubServer(player, name, true, port, "&aThis is a SubServer", true, dir.getPath(), exec, "stop", true, false, false, false, false);
 
                     YAMLSection server = new YAMLSection();
                     server.set("Enabled", true);
@@ -487,7 +487,7 @@ public class InternalSubCreator extends SubCreator {
                     server.set("Stop-Command", "stop");
                     server.set("Run-On-Launch", false);
                     server.set("Auto-Restart", false);
-                    server.set("Auto-Restart", false);
+                    server.set("Hidden", false);
                     server.set("Restricted", false);
                     host.plugin.config.get().getSection("Servers").set(name, server);
                     host.plugin.config.save();
@@ -502,16 +502,17 @@ public class InternalSubCreator extends SubCreator {
     }
 
     @Override
-    public void create(UUID player, String name, ServerType type, Version version, int memory, int port) {
+    public boolean create(UUID player, String name, ServerType type, Version version, int memory, int port) {
         if (!isBusy()) {
             final SubCreateEvent event = new SubCreateEvent(player, host, name, type, version, memory, port);
             host.plugin.getPluginManager().callEvent(event);
             if (!event.isCancelled()) {
                 (thread = new Thread(() -> {
-                        InternalSubCreator.this.run(name, event.getType(), event.getVersion(), event.getMemory(), port);
+                        InternalSubCreator.this.run(player, name, event.getType(), event.getVersion(), event.getMemory(), port);
                     })).start();
-            }
-        }
+                return true;
+            } else return false;
+        } else return false;
     }
 
     @Override

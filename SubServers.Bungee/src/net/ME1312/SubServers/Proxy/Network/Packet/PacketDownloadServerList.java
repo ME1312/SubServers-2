@@ -60,7 +60,7 @@ public class PacketDownloadServerList implements PacketIn, PacketOut {
                     JSONObject servers = new JSONObject();
                     for (SubServer server : host.getSubServers().values()) {
                         JSONObject sinfo = new JSONObject();
-                        sinfo.put("enabled", server.isEnabled());
+                        sinfo.put("enabled", server.isEnabled() && host.isEnabled());
                         sinfo.put("running", server.isRunning());
                         sinfo.put("temp", server.isTemporary());
                         JSONObject players = new JSONObject();

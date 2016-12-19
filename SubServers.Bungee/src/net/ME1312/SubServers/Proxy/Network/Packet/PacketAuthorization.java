@@ -9,14 +9,14 @@ import org.json.JSONObject;
 
 public class PacketAuthorization implements PacketIn, PacketOut {
     private SubPlugin plugin;
-    private boolean response;
+    private int response;
     private String message;
 
     public PacketAuthorization(SubPlugin plugin) {
         this.plugin = plugin;
     }
 
-    public PacketAuthorization(boolean response, String message) {
+    public PacketAuthorization(int response, String message) {
         this.response = response;
         this.message = message;
     }
@@ -34,12 +34,12 @@ public class PacketAuthorization implements PacketIn, PacketOut {
         try {
             if (data.getString("password").equals(plugin.config.get().getSection("Settings").getSection("SubData").getString("Password"))) {
                 client.authorize();
-                client.sendPacket(new PacketAuthorization(true, "Successfully Logged in"));
+                client.sendPacket(new PacketAuthorization(0, "Successfully Logged in"));
             } else {
-                client.sendPacket(new PacketAuthorization(false, "Invalid Password"));
+                client.sendPacket(new PacketAuthorization(2, "Invalid Password"));
             }
         } catch (Exception e) {
-            client.sendPacket(new PacketAuthorization(false, e.getClass().getCanonicalName() + ": " + e.getMessage()));
+            client.sendPacket(new PacketAuthorization(1, e.getClass().getCanonicalName() + ": " + e.getMessage()));
         }
     }
 

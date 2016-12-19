@@ -23,7 +23,7 @@ public class PacketDownloadLang implements PacketIn, PacketOut {
     public JSONObject generate() {
         JSONObject json = new JSONObject();
         json.put("id", id);
-        json.put("Lang", plugin.lang.get().getSection("Lang").toJSON());
+        json.put("Lang", plugin.api.getLang());
         return json;
     }
 

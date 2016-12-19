@@ -13,14 +13,14 @@ import java.util.Map;
 
 public class PacketLinkServer implements PacketIn, PacketOut {
     private SubPlugin plugin;
-    private boolean response;
+    private int response;
     private String message;
 
     public PacketLinkServer(SubPlugin plugin) {
         this.plugin = plugin;
     }
 
-    public PacketLinkServer(boolean response, String message) {
+    public PacketLinkServer(int response, String message) {
         this.response = response;
         this.message = message;
     }
@@ -43,15 +43,16 @@ public class PacketLinkServer implements PacketIn, PacketOut {
                 if (server.getSubDataClient() == null) {
                     server.linkSubDataClient(client);
                     System.out.println("SubData > " + client.getAddress().toString() + " has been defined as " + ((server instanceof SubServer) ? "SubServer" : "Server") + ": " + server.getName());
-                    client.sendPacket(new PacketLinkServer(true, "Definition Successful"));
+                    client.sendPacket(new PacketLinkServer(0, "Definition Successful"));
+                    if (server instanceof SubServer && !((SubServer) server).isRunning()) client.sendPacket(new PacketOutShutdown("Rogue SubServer Detected"));
                 } else {
-                    client.sendPacket(new PacketLinkServer(false, "Server already linked"));
+                    client.sendPacket(new PacketLinkServer(3, "Server already linked"));
                 }
             } else {
-                client.sendPacket(new PacketLinkServer(false, "There is no server with that name"));
+                client.sendPacket(new PacketLinkServer(2, "There is no server with that name"));
             }
         } catch (Exception e) {
-            client.sendPacket(new PacketLinkServer(false, e.getClass().getCanonicalName() + ": " + e.getMessage()));
+            client.sendPacket(new PacketLinkServer(1, e.getClass().getCanonicalName() + ": " + e.getMessage()));
         }
     }
 

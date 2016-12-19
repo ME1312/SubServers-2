@@ -77,8 +77,8 @@ public abstract class Host {
      *
      * @param servers Servers
      */
-    public void start(String... servers) {
-        start(null, servers);
+    public int start(String... servers) {
+        return start(null, servers);
     }
 
     /**
@@ -87,15 +87,15 @@ public abstract class Host {
      * @param player Player who started
      * @param servers Servers
      */
-    public abstract void start(UUID player, String... servers);
+    public abstract int start(UUID player, String... servers);
 
     /**
      * Stops the Servers Specified
      *
      * @param servers Servers
      */
-    public void stop(String... servers) {
-        stop(null, servers);
+    public int stop(String... servers) {
+        return stop(null, servers);
     }
 
     /**
@@ -104,15 +104,15 @@ public abstract class Host {
      * @param player Player who started
      * @param servers Servers
      */
-    public abstract void stop(UUID player, String... servers);
+    public abstract int stop(UUID player, String... servers);
 
     /**
      * Terminates the Servers Specified
      *
      * @param servers Servers
      */
-    public void terminate(String... servers) {
-        terminate(null, servers);
+    public int terminate(String... servers) {
+        return terminate(null, servers);
     }
 
     /**
@@ -121,7 +121,7 @@ public abstract class Host {
      * @param player Player who started
      * @param servers Servers
      */
-    public abstract void terminate(UUID player, String... servers);
+    public abstract int terminate(UUID player, String... servers);
 
     /**
      * Commands the Servers Specified
@@ -129,8 +129,8 @@ public abstract class Host {
      * @param command Command to send
      * @param servers Servers
      */
-    public void command(String command, String... servers) {
-        command(null, command, servers);
+    public int command(String command, String... servers) {
+        return command(null, command, servers);
     }
 
     /**
@@ -140,14 +140,14 @@ public abstract class Host {
      * @param command Command to send
      * @param servers Servers
      */
-    public abstract void command(UUID player, String command, String... servers);
+    public abstract int command(UUID player, String command, String... servers);
 
     /**
      * Applies edits to the Host
      *
      * @param change Change(s) to be applied
      */
-    public abstract void edit(NamedContainer<String, ?>... change);
+    public abstract boolean edit(NamedContainer<String, ?>... change);
 
     /**
      * Gets the SubCreator Instance for this Host
@@ -184,12 +184,13 @@ public abstract class Host {
      * @param executable Executable
      * @param stopcmd Command to Stop the Server
      * @param restart Auto Restart Status
+     * @param hidden if the server should be hidden from players
      * @param restricted Players will need a permission to join if true
      * @param temporary Temporary Status
      * @return The SubServer
      * @throws InvalidServerException
      */
-    public abstract SubServer addSubServer(UUID player, String name, boolean enabled, int port, String motd, boolean log, String directory, Executable executable, String stopcmd, boolean start, boolean restart, boolean restricted, boolean temporary) throws InvalidServerException;
+    public abstract SubServer addSubServer(UUID player, String name, boolean enabled, int port, String motd, boolean log, String directory, Executable executable, String stopcmd, boolean start, boolean restart, boolean hidden, boolean restricted, boolean temporary) throws InvalidServerException;
 
     /**
      * Adds a SubServer
@@ -203,13 +204,14 @@ public abstract class Host {
      * @param executable Executable
      * @param stopcmd Command to Stop the Server
      * @param restart Auto Restart Status
+     * @param hidden if the server should be hidden from players
      * @param restricted Players will need a permission to join if true
      * @param temporary Temporary Status
      * @return The SubServer
      * @throws InvalidServerException
      */
-    public SubServer addSubServer(String name, boolean enabled, int port, String motd, boolean log, String directory, Executable executable, String stopcmd, boolean start, boolean restart, boolean restricted, boolean temporary) throws InvalidServerException {
-        return addSubServer(null, name, enabled, port, motd, log, directory, executable, stopcmd, start, restart, restricted, temporary);
+    public SubServer addSubServer(String name, boolean enabled, int port, String motd, boolean log, String directory, Executable executable, String stopcmd, boolean start, boolean restart, boolean hidden, boolean restricted, boolean temporary) throws InvalidServerException {
+        return addSubServer(null, name, enabled, port, motd, log, directory, executable, stopcmd, start, restart, hidden, restricted, temporary);
     }
 
     /**

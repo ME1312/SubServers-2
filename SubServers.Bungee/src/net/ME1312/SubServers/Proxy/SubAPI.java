@@ -4,12 +4,14 @@ import net.ME1312.SubServers.Proxy.Event.SubAddServerEvent;
 import net.ME1312.SubServers.Proxy.Host.Server;
 import net.ME1312.SubServers.Proxy.Host.Host;
 import net.ME1312.SubServers.Proxy.Host.SubServer;
+import net.ME1312.SubServers.Proxy.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Proxy.Library.UniversalFile;
 import net.ME1312.SubServers.Proxy.Library.Version.Version;
 import net.ME1312.SubServers.Proxy.Network.SubDataServer;
 
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.UUID;
@@ -108,11 +110,12 @@ public final class SubAPI {
      * @param ip IP of the Server
      * @param port Port of the Server
      * @param motd MOTD of the Server
+     * @param hidden if the server should be hidden from players
      * @param restricted Players will need a permission to join if true
      * @return The Server
      */
-    public Server addServer(String name, InetAddress ip, int port, String motd, boolean restricted) {
-        return addServer(null, name, ip, port, motd, restricted);
+    public Server addServer(String name, InetAddress ip, int port, String motd, boolean hidden, boolean restricted) {
+        return addServer(null, name, ip, port, motd, hidden, restricted);
     }
 
     /**
@@ -123,11 +126,12 @@ public final class SubAPI {
      * @param ip IP of the Server
      * @param port Port of the Server
      * @param motd MOTD of the Server
+     * @param hidden If the server should be hidden from players
      * @param restricted Players will need a permission to join if true
      * @return The Server
      */
-    public Server addServer(UUID player, String name, InetAddress ip, int port, String motd, boolean restricted) {
-        Server server = new Server(name, new InetSocketAddress(ip, port), motd, restricted);
+    public Server addServer(UUID player, String name, InetAddress ip, int port, String motd, boolean hidden, boolean restricted) {
+        Server server = new Server(name, new InetSocketAddress(ip, port), motd, hidden, restricted);
         SubAddServerEvent event = new SubAddServerEvent(player, null, server);
         plugin.getPluginManager().callEvent(event);
         if (!event.isCancelled()) {
@@ -169,6 +173,30 @@ public final class SubAPI {
      */
     public SubServer getSubServer(String name) {
         return getSubServers().get(name.toLowerCase());
+    }
+
+    /**
+     * Gets the SubServers Lang
+     *
+     * @return SubServers Lang
+     */
+    public Map<String, String> getLang() {
+        HashMap<String, String> lang = new HashMap<String, String>();
+        for (String key : plugin.lang.get().getSection("Lang").getKeys()) {
+            if (plugin.lang.get().getSection("Lang").isString(key)) lang.put(key, plugin.lang.get().getSection("Lang").getString(key));
+        }
+        lang.putAll(plugin.exLang);
+        return lang;
+    }
+
+    /**
+     * Adds to the Language Map
+     *
+     * @param key Key
+     * @param value Lang Value
+     */
+    public void addLang(String key, String value) {
+        plugin.exLang.put(key, value);
     }
 
     /**

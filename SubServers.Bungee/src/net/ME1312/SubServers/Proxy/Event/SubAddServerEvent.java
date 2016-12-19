@@ -2,11 +2,13 @@ package net.ME1312.SubServers.Proxy.Event;
 
 import net.ME1312.SubServers.Proxy.Host.Host;
 import net.ME1312.SubServers.Proxy.Host.Server;
+import net.ME1312.SubServers.Proxy.Library.SubEvent;
+import net.md_5.bungee.api.plugin.Cancellable;
 import net.md_5.bungee.api.plugin.Event;
 
 import java.util.UUID;
 
-public class SubAddServerEvent extends Event {
+public class SubAddServerEvent extends Event implements SubEvent, Cancellable {
     private boolean cancelled = false;
     private UUID player;
     private Host host;

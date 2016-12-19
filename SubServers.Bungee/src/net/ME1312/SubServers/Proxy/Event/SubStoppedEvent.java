@@ -1,9 +1,10 @@
 package net.ME1312.SubServers.Proxy.Event;
 
 import net.ME1312.SubServers.Proxy.Host.SubServer;
+import net.ME1312.SubServers.Proxy.Library.SubEvent;
 import net.md_5.bungee.api.plugin.Event;
 
-public class SubStoppedEvent extends Event {
+public class SubStoppedEvent extends Event implements SubEvent {
     private SubServer server;
 
     /**

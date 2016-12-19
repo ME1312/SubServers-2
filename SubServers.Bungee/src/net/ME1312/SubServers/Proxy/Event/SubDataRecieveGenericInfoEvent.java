@@ -1,10 +1,11 @@
 package net.ME1312.SubServers.Proxy.Event;
 
+import net.ME1312.SubServers.Proxy.Library.SubEvent;
 import net.ME1312.SubServers.Proxy.Library.Version.Version;
 import net.md_5.bungee.api.plugin.Event;
 import org.json.JSONObject;
 
-public class SubDataRecieveGenericInfoEvent extends Event {
+public class SubDataRecieveGenericInfoEvent extends Event implements SubEvent{
     private String handle;
     private Version version;
     private JSONObject content;

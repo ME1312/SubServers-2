@@ -120,8 +120,8 @@ public final class SubCommand extends Command {
                     }
                 } else if (args[0].equalsIgnoreCase("create")) {
                     if (args.length > 5) {
-                        if (plugin.api.getServers().keySet().contains(args[1].toLowerCase())) {
-                            sender.sendMessage("SubServers > There is already a server with that name");
+                        if (plugin.api.getSubServers().keySet().contains(args[1].toLowerCase())) {
+                            sender.sendMessage("SubServers > There is already a SubServer with that name");
                         } else if (!plugin.hosts.keySet().contains(args[2].toLowerCase())) {
                             sender.sendMessage("SubServers > There is no host with that name");
                         } else if (plugin.hosts.get(args[2].toLowerCase()).getCreator().isBusy()) {

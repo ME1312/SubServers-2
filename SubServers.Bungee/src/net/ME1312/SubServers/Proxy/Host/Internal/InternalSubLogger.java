@@ -34,40 +34,37 @@ public class InternalSubLogger extends Thread {
             BufferedReader br = new BufferedReader(isr);
             String line = null;
             while ((line = br.readLine()) != null) {
-                if (log.get() && !line.startsWith(">")) {
-                    String msg = line;
-                    // REGEX Formatting
-                    String type = "INFO";
-                    Matcher matcher = Pattern.compile("^((?:\\s*\\[?[0-9]{2}:[0-9]{2}:[0-9]{2}]?)?\\s*(?:\\[|\\[.*\\/)?(INFO|WARN|WARNING|ERROR|ERR|SEVERE)\\]:?\\s*)").matcher(msg);
-                    while (matcher.find()) {
-                        type = matcher.group(2);
+                if (!line.startsWith(">")) {
+                    if (log.get()) {
+                        String msg = line;
+                        // REGEX Formatting
+                        String type = "INFO";
+                        Matcher matcher = Pattern.compile("^((?:\\s*\\[?[0-9]{2}:[0-9]{2}:[0-9]{2}]?)?\\s*(?:\\[|\\[.*\\/)?(INFO|WARN|WARNING|ERROR|ERR|SEVERE)\\]:?\\s*)").matcher(msg);
+                        while (matcher.find()) {
+                            type = matcher.group(2);
+                        }
+
+                        msg = msg.replaceAll("^((?:\\s*\\[?[0-9]{2}:[0-9]{2}:[0-9]{2}]?)?\\s*(?:\\[|\\[.*\\/)?(INFO|WARN|WARNING|ERROR|ERR|SEVERE)\\]:?\\s*)", "");
+
+                        switch (type) {
+                            case "INFO":
+                                ProxyServer.getInstance().getLogger().info(name + " > " + msg);
+                                break;
+                            case "WARNING":
+                            case "WARN":
+                                ProxyServer.getInstance().getLogger().warning(name + " > " + msg);
+                                break;
+                            case "SEVERE":
+                            case "ERROR":
+                            case "ERR":
+                                ProxyServer.getInstance().getLogger().severe(name + " > " + msg);
+                                break;
+                        }
                     }
-
-                    msg = msg.replaceAll("^((?:\\s*\\[?[0-9]{2}:[0-9]{2}:[0-9]{2}]?)?\\s*(?:\\[|\\[.*\\/)?(INFO|WARN|WARNING|ERROR|ERR|SEVERE)\\]:?\\s*)", "");
-
-                    switch (type) {
-                        case "INFO":
-                            ProxyServer.getInstance().getLogger().info(name + " > " + msg);
-                            break;
-                        case "WARNING":
-                        case "WARN":
-                            ProxyServer.getInstance().getLogger().warning(name + " > " + msg);
-                            break;
-                        case "SEVERE":
-                        case "ERROR":
-                        case "ERR":
-                            ProxyServer.getInstance().getLogger().severe(name + " > " + msg);
-                            break;
-                    }
-
                     if (writer != null) {
                         writer.println(line);
                         writer.flush();
                     }
-                }
-                if (writer != null) {
-                    writer.println(line);
-                    writer.flush();
                 }
             }
         } catch (IOException ioe) {} finally {

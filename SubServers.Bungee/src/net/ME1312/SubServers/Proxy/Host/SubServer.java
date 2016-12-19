@@ -23,50 +23,59 @@ public abstract class SubServer extends Server {
      * @param restricted Players will need a permission to join if true
      * @throws InvalidServerException
      */
-    public SubServer(Host host, String name, int port, String motd, boolean restricted) throws InvalidServerException {
-        super(name, InetSocketAddress.createUnresolved(host.getAddress().getHostAddress(), port), motd, restricted);
+    public SubServer(Host host, String name, int port, String motd, boolean hidden, boolean restricted) throws InvalidServerException {
+        super(name, InetSocketAddress.createUnresolved(host.getAddress().getHostAddress(), port), motd, hidden, restricted);
     }
 
     /**
      * Starts the Server
      *
      * @param player Player who Started
+     * @return Success Status
      */
-    public abstract void start(UUID player);
+    public abstract boolean start(UUID player);
 
     /**
      * Starts the Server
+     *
+     * @return Success Status
      */
-    public void start() {
-        start(null);
+    public boolean start() {
+        return start(null);
     }
 
     /**
      * Stops the Server
      *
      * @param player Player who Stopped
+     * @return Success Status
      */
-    public abstract void stop(UUID player);
+    public abstract boolean stop(UUID player);
 
     /**
      * Stops the Server
+     *
+     * @return Success Status
      */
-    public void stop() {
-        stop(null);
+    public boolean stop() {
+        return stop(null);
     }
 
     /**
      * Terminates the Server
      *
      * @param player Player who Terminated
+     * @return Success Status
      */
-    public abstract void terminate(UUID player);
+    public abstract boolean terminate(UUID player);
 
     /**
      * Terminates the Server
+     *
+     * @return Success Status
      */
-    public void terminate() {
-        terminate(null);
+    public boolean terminate() {
+        return terminate(null);
     }
 
     /**
@@ -74,24 +83,27 @@ public abstract class SubServer extends Server {
      *
      * @param player Player who Commanded
      * @param command Command to Send
+     * @return Success Status
      */
-    public abstract void command(UUID player, String command);
+    public abstract boolean command(UUID player, String command);
 
     /**
      * Commands the Server
      *
      * @param command Command to Send
+     * @return Success Status
      */
-    public void command(String command) {
-        command(null, command);
+    public boolean command(String command) {
+        return command(null, command);
     }
 
     /**
      * Applies edits to the SubServer
      *
      * @param change Change(s) to be applied
+     * @return Success Status
      */
-    public abstract void edit(NamedContainer<String, ?>... change);
+    public abstract boolean edit(NamedContainer<String, ?>... change);
 
     /**
      * Waits for the Server to Stop

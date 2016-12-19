@@ -33,9 +33,10 @@ public final class SubPlugin extends BungeeCord {
     public final UniversalFile dir = new UniversalFile(new File(System.getProperty("user.dir")));
     public YAMLConfig config;
     public YAMLConfig lang;
+    public HashMap<String, String> exLang = new HashMap<String, String>();
     public SubDataServer subdata = null;
     public final Version version = new Version("2.11.0a");
-    protected Version bversion = new Version(1);
+    protected Version bversion = new Version(2);
 
     protected boolean running = false;
     public final SubAPI api = new SubAPI(this);
@@ -51,7 +52,7 @@ public final class SubPlugin extends BungeeCord {
      */
     protected void enable() throws IOException {
         if (running) throw new IllegalStateException("SubServers has already been loaded");
-        System.out.println("SubServers > Loading SubServers v" + version.toString() + " Library... ");
+        System.out.println("SubServers > Loading SubServers v" + version.toString() + " Libraries... ");
         running = true;
         UniversalFile dir = new UniversalFile(this.dir, "SubServers");
         dir.mkdir();
@@ -94,7 +95,7 @@ public final class SubPlugin extends BungeeCord {
 
         hostDrivers.put("built-in", net.ME1312.SubServers.Proxy.Host.Internal.InternalHost.class);
 
-        System.out.println("SubServers > Loading BungeeCord Library...");
+        System.out.println("SubServers > Loading BungeeCord Libraries...");
     }
 
     /**
@@ -134,7 +135,7 @@ public final class SubPlugin extends BungeeCord {
                 try {
                     Server server = new Server(name, new InetSocketAddress(bungee.get().getSection("servers").getSection(name).getRawString("address").split(":")[0],
                             Integer.parseInt(bungee.get().getSection("servers").getSection(name).getRawString("address").split(":")[1])), bungee.get().getSection("servers").getSection(name).getColoredString("motd", '&'),
-                            bungee.get().getSection("servers").getSection(name).getBoolean("restricted"));
+                            bungee.get().getSection("servers").getSection(name).getBoolean("hidden", false), bungee.get().getSection("servers").getSection(name).getBoolean("restricted"));
                     exServers.put(name.toLowerCase(), server);
                     SubDataServer.allowConnection(server.getAddress().getAddress());
                     servers++;
@@ -155,7 +156,7 @@ public final class SubPlugin extends BungeeCord {
                     SubServer server = this.hosts.get(config.get().getSection("Servers").getSection(name).getString("Host").toLowerCase()).addSubServer(name, config.get().getSection("Servers").getSection(name).getBoolean("Enabled"),
                             config.get().getSection("Servers").getSection(name).getInt("Port"), config.get().getSection("Servers").getSection(name).getColoredString("Motd", '&'), config.get().getSection("Servers").getSection(name).getBoolean("Log"),
                             config.get().getSection("Servers").getSection(name).getRawString("Directory"), new Executable(config.get().getSection("Servers").getSection(name).getRawString("Executable")), config.get().getSection("Servers").getSection(name).getRawString("Stop-Command"),
-                            config.get().getSection("Servers").getSection(name).getBoolean("Run-On-Launch"), config.get().getSection("Servers").getSection(name).getBoolean("Auto-Restart"), config.get().getSection("Servers").getSection(name).getBoolean("Restricted"), false);
+                            config.get().getSection("Servers").getSection(name).getBoolean("Run-On-Launch"), config.get().getSection("Servers").getSection(name).getBoolean("Hidden", false), config.get().getSection("Servers").getSection(name).getBoolean("Auto-Restart"), config.get().getSection("Servers").getSection(name).getBoolean("Restricted"), false);
                     subservers++;
                 } catch (Exception e) {
                     e.printStackTrace();

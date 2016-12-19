@@ -16,7 +16,7 @@ import java.net.InetSocketAddress;
 public class Server extends BungeeServerInfo implements ClientHandler {
     private Client client = null;
 
-    public Server(String name, InetSocketAddress address, String motd, boolean restricted) throws InvalidServerException {
+    public Server(String name, InetSocketAddress address, String motd, boolean hidden, boolean restricted) throws InvalidServerException {
         super(name, address, ChatColor.translateAlternateColorCodes('&', motd), restricted);
         if (name.contains(" ")) throw new InvalidServerException("Server names cannot have spaces: " + name);
     }

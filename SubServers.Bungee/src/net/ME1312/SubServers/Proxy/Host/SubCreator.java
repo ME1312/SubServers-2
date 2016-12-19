@@ -17,9 +17,9 @@ public abstract class SubCreator {
         SPONGE,
     }
 
-    public abstract void create(UUID player, String name, ServerType type, Version version, int memory, int port);
-    public void create(String name, ServerType type, Version version, int memory, int port) {
-        create(null, name, type, version, memory, port);
+    public abstract boolean create(UUID player, String name, ServerType type, Version version, int memory, int port);
+    public boolean create(String name, ServerType type, Version version, int memory, int port) {
+        return create(null, name, type, version, memory, port);
     }
 
     public abstract void waitFor() throws InterruptedException;

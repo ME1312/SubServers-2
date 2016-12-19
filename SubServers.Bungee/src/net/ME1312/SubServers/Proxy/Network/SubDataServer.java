@@ -54,25 +54,39 @@ public final class SubDataServer {
             }
         }
 
+        plugin.getPluginManager().registerListener(null, new PacketOutRunEvent(plugin));
+
         registerPacket(new PacketAuthorization(plugin), "Authorization");
-        registerPacket(new PacketDownloadBuildScript(plugin), "DownloadBuildScript");
-        registerPacket(new PacketDownloadHostInfo(plugin), "DownloadHostInfo");
-        registerPacket(new PacketDownloadLang(plugin), "DownloadLang");
-        registerPacket(new PacketDownloadPlayerList(plugin), "DownloadPlayerList");
-        registerPacket(new PacketDownloadServerInfo(plugin), "DownloadServerInfo");
-        registerPacket(new PacketDownloadServerList(plugin), "DownloadServerList");
-        registerPacket(new PacketInfoPassthrough(plugin), "InfoPassthrough");
-        registerPacket(new PacketLinkServer(plugin), "LinkServer");
+        registerPacket(new PacketCommandServer(plugin), "SubCommandServer");
+        registerPacket(new PacketCreateServer(plugin), "SubCreateServer");
+        registerPacket(new PacketDownloadBuildScript(plugin), "SubDownloadBuildScript");
+        registerPacket(new PacketDownloadHostInfo(plugin), "SubDownloadHostInfo");
+        registerPacket(new PacketDownloadLang(plugin), "SubDownloadLang");
+        registerPacket(new PacketDownloadPlayerList(plugin), "SubDownloadPlayerList");
+        registerPacket(new PacketDownloadServerInfo(plugin), "SubDownloadServerInfo");
+        registerPacket(new PacketDownloadServerList(plugin), "SubDownloadServerList");
+        registerPacket(new PacketInfoPassthrough(plugin), "SubInfoPassthrough");
+        registerPacket(new PacketLinkServer(plugin), "SubLinkServer");
+        registerPacket(new PacketStartServer(plugin), "SubStartServer");
+        registerPacket(new PacketStopServer(plugin), "SubStopServer");
+        registerPacket(new PacketTeleportPlayer(plugin), "SubTeleportPlayer");
 
         registerPacket(PacketAuthorization.class, "Authorization");
-        registerPacket(PacketDownloadBuildScript.class, "DownloadBuildScript");
-        registerPacket(PacketDownloadHostInfo.class, "DownloadHostInfo");
-        registerPacket(PacketDownloadLang.class, "DownloadLang");
-        registerPacket(PacketDownloadPlayerList.class, "DownloadPlayerList");
-        registerPacket(PacketDownloadServerInfo.class, "DownloadServerInfo");
-        registerPacket(PacketDownloadServerList.class, "DownloadServerList");
-        registerPacket(PacketInfoPassthrough.class, "InfoPassthrough");
-        registerPacket(PacketLinkServer.class, "LinkServer");
+        registerPacket(PacketCommandServer.class, "SubCommandServer");
+        registerPacket(PacketCreateServer.class, "SubCreateServer");
+        registerPacket(PacketDownloadBuildScript.class, "SubDownloadBuildScript");
+        registerPacket(PacketDownloadHostInfo.class, "SubDownloadHostInfo");
+        registerPacket(PacketDownloadLang.class, "SubDownloadLang");
+        registerPacket(PacketDownloadPlayerList.class, "SubDownloadPlayerList");
+        registerPacket(PacketDownloadServerInfo.class, "SubDownloadServerInfo");
+        registerPacket(PacketDownloadServerList.class, "SubDownloadServerList");
+        registerPacket(PacketInfoPassthrough.class, "SubInfoPassthrough");
+        registerPacket(PacketLinkServer.class, "SubLinkServer");
+        registerPacket(PacketOutRunEvent.class, "SubRunEvent");
+        registerPacket(PacketOutShutdown.class, "SubShutdown");
+        registerPacket(PacketStartServer.class, "SubStartServer");
+        registerPacket(PacketStopServer.class, "SubStopServer");
+        registerPacket(PacketTeleportPlayer.class, "SubTeleportPlayer");
     }
 
     /**
