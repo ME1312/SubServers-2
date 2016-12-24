@@ -7,30 +7,37 @@ import net.ME1312.SubServers.Client.Bukkit.Network.PacketOut;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class PacketDownloadPlayerList implements PacketIn, PacketOut {
-    private List<JSONCallback> callbacks = new ArrayList<JSONCallback>();
+    private static HashMap<String, JSONCallback> callbacks = new HashMap<String, JSONCallback>();
+    private String id;
 
     public PacketDownloadPlayerList() {}
-
+    public PacketDownloadPlayerList(String id, JSONCallback callback) {
+        this.id = id;
+        callbacks.put(id, callback);
+    }
     @Override
     public JSONObject generate() {
-        return null;
+        if (id != null) {
+            JSONObject json = new JSONObject();
+            json.put("id", id);
+            return json;
+        } else {
+            return null;
+        }
     }
 
     @Override
     public void execute(JSONObject data) {
-        callbacks.get(0).run(data);
-        callbacks.remove(0);
+        callbacks.get(data.getString("id")).run(data);
+        callbacks.remove(data.getString("id"));
     }
 
     @Override
     public Version getVersion() {
         return new Version("2.11.0a");
-    }
-
-    public void callback(String id, JSONCallback callback) {
-        callbacks.add(callback);
     }
 }

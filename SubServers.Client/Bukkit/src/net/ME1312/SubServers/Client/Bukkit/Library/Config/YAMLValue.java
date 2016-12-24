@@ -6,6 +6,7 @@ import org.yaml.snakeyaml.Yaml;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @SuppressWarnings({"unchecked", "unused"})
 public class YAMLValue {
@@ -113,6 +114,18 @@ public class YAMLValue {
         List<String> values = new ArrayList<String>();
         for (String value : (List<String>) obj) {
             values.add(ChatColor.translateAlternateColorCodes(color, YAMLSection.unescapeJavaString(value)));
+        }
+        return values;
+    }
+
+    public UUID asUUID() {
+        return UUID.fromString((String) obj);
+    }
+
+    public List<UUID> asUUIDList() {
+        List<UUID> values = new ArrayList<UUID>();
+        for (String value : (List<String>) obj) {
+            values.add(UUID.fromString(value));
         }
         return values;
     }

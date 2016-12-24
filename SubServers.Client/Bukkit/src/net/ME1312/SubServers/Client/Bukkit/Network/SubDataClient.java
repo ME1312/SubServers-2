@@ -15,6 +15,7 @@ import java.io.PrintWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.HashMap;
 
 public final class SubDataClient {
@@ -106,7 +107,7 @@ public final class SubDataClient {
                     e1.printStackTrace();
                 }
             } catch (Exception e) {
-                if (e.getMessage() == null || !e.getMessage().equals("Socket closed")) e.printStackTrace();
+                if (!(e instanceof SocketException)) e.printStackTrace();
                 try {
                     destroy(true);
                 } catch (IOException e1) {

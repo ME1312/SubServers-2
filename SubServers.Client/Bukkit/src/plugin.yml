@@ -1,6 +1,6 @@
 name: 'SubServers'
 main: 'net.ME1312.SubServers.Client.Bukkit.SubPlugin'
-version: '2.11.0a'
+version: '2.11.2a'
 authors: [ME1312]
 softdepend: [TitleManager]
 website: 'http://www.ME1312.net/'
@@ -8,15 +8,21 @@ commands:
   subservers:
     description: 'The SubServers Command'
     usage: /subservers help
+  subserver:
+    description: 'The SubServers Command'
+    usage: /subserver help
+  sub:
+    description: 'The SubServers Command'
+    usage: /sub help
 permissions:
   subservers.*:
     description: 'Grants Access to to Everything in SubServers.Client'
     default: op
     children:
-      subserver.interface:
+      subservers.interface:
         description: 'Grants Access to the SubServers Interface'
         default: op
-      subserver.command:
+      subservers.command:
         description: 'Grants Access to the SubServers Command'
         default: op
       subservers.reload:
@@ -33,7 +39,7 @@ permissions:
             description: 'Grants Access to Edit a Host'
             default: op
       subservers.subserver.*:
-        description: 'Grants Access to SubServers Server Actions'
+        description: 'Grants Access to SubServers SubServer Actions'
         default: op
         children:
           subservers.subserver.start.*:
@@ -51,6 +57,13 @@ permissions:
           subservers.subserver.edit.*:
             description: 'Grants Access to Edit a SubServer'
             default: op
-          subservers.subserver.teleport.*:
-            description: 'Grants Acces to Teleport to a SubServer'
+      subservers.server.*:
+        description: 'Grants Access to SubServer Server Actions'
+        default: op
+        children:
+          subservers.server.teleport-others:
+            description: 'Grants Acces to Teleport Others to a Server'
+            default: op
+          subservers.server.teleport.*:
+            description: 'Grants Acces to Teleport to a Server'
             default: op

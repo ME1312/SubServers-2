@@ -29,6 +29,16 @@ public final class Util {
         }
     }
 
+    public static boolean isSpigot() {
+        boolean spigot = false;
+        try {
+            if (Class.forName("org.spigotmc.SpigotConfig") != null) {
+                spigot = true;
+            }
+        } catch (ClassNotFoundException e) {}
+        return spigot;
+    }
+
     public static boolean isException(Runnable runnable) {
         try {
             runnable.run();

@@ -20,13 +20,14 @@ public final class SubPlugin extends JavaPlugin {
     public SubDataClient subdata = null;
 
     public UIListener gui = null;
-    public final Version version = new Version("2.11.0a");
-    protected Version bversion = new Version(3);
+    public Version version;
+    protected Version bversion = new Version(4);
     
     //public final SubAPI api = new SubAPI(this);
 
     @Override
     public void onEnable() {
+        version = new Version(getDescription().getVersion());
         try {
             Bukkit.getLogger().info("SubServers > Loading SubServers v" + version.toString() + " Libraries... ");
             getDataFolder().mkdirs();
@@ -47,7 +48,8 @@ public final class SubPlugin extends JavaPlugin {
 
             gui = new UIListener(this);
             getCommand("subservers").setExecutor(new SubCommand(this));
-            getCommand("subservers").setAliases(Arrays.asList("sub", "subserver"));
+            getCommand("subserver").setExecutor(new SubCommand(this));
+            getCommand("sub").setExecutor(new SubCommand(this));
         } catch (IOException e) {
             setEnabled(false);
             e.printStackTrace();
@@ -56,11 +58,12 @@ public final class SubPlugin extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        try {
-            subdata.destroy(false);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        if (subdata != null)
+            try {
+                subdata.destroy(false);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
     }
 
     private void copyFromJar(String resource, String destination) {

@@ -86,6 +86,8 @@ public class YAMLSection {
             map.put(label, ((YAMLSection) value).map);
         } else if (value instanceof YAMLValue) {
             map.put(label, ((YAMLValue) value).asObject());
+        } else if (value instanceof UUID) {
+            map.put(label, ((UUID) value).toString());
         } else {
             map.put(label, value);
         }
@@ -405,6 +407,26 @@ public class YAMLSection {
                 values.add(ChatColor.translateAlternateColorCodes(color, unescapeJavaString(value)));
             }
             return values;
+        }
+    }
+
+    public List<UUID> getUUIDList(String label) {
+        if (map.get(label) != null) {
+            List<UUID> values = new ArrayList<UUID>();
+            for (String value : (List<String>) map.get(label)) {
+                values.add(UUID.fromString(value));
+            }
+            return values;
+        } else {
+            return null;
+        }
+    }
+
+    public List<UUID> getUUIDList(String label, List<UUID> def) {
+        if (map.get(label) != null) {
+            return getUUIDList(label);
+        } else {
+            return def;
         }
     }
 

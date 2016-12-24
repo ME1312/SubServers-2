@@ -24,7 +24,7 @@ public class PacketDownloadHostInfo implements PacketIn, PacketOut {
     public JSONObject generate() {
         JSONObject json = new JSONObject();
         json.put("id", id);
-        if (host != null) json.put("host", host);
+        json.put("host", host);
         return json;
     }
 

@@ -50,7 +50,11 @@ public class UIListener implements Listener {
         if (!event.isCancelled() && gui.keySet().contains(player.getUniqueId())) {
             UIRenderer gui = this.gui.get(player.getUniqueId());
             if (gui.open && event.getClickedInventory() != null && event.getClickedInventory().getTitle() != null) {
-                if (event.getClickedInventory().getTitle().equals(plugin.lang.getSection("Lang").getColoredString("Interface.Host-Menu.Title", '&'))) { // Host Menu
+                if (plugin.subdata == null) {
+                    new IllegalStateException("SubData is not connected").printStackTrace();
+                } else if (plugin.lang == null) {
+                    new IllegalStateException("There are no lang options available at this time").printStackTrace();
+                } else if (event.getClickedInventory().getTitle().equals(plugin.lang.getSection("Lang").getColoredString("Interface.Host-Menu.Title", '&'))) { // Host Menu
                     if (event.getCurrentItem() != null && event.getCurrentItem().getType() != Material.AIR && event.getCurrentItem().hasItemMeta()) {
                         String item = event.getCurrentItem().getItemMeta().getDisplayName();
 
@@ -305,14 +309,14 @@ public class UIListener implements Listener {
                                     player.sendMessage(plugin.lang.getSection("Lang").getColoredString("Interface.SubServer-Admin.Command.Message", '&'));
                                 input.put(player.getUniqueId(), m -> {
                                     gui.setDownloading(plugin.lang.getSection("Lang").getColoredString("Interface.Generic.Downloading.Response", '&'));
-                                    plugin.subdata.sendPacket(new PacketCommandServer(player.getUniqueId(), gui.lastVistedObject, m.getString("message"), UUID.randomUUID().toString(), json -> {
+                                    plugin.subdata.sendPacket(new PacketCommandServer(player.getUniqueId(), gui.lastVistedObject, (m.getString("message").startsWith("/"))?m.getString("message").substring(1):m.getString("message"), UUID.randomUUID().toString(), json -> {
                                         gui.reopen();
                                     }));
                                 });
                             } else gui.reopen();
                         } else if (item.equals(plugin.lang.getSection("Lang").getColoredString("Interface.SubServer-Admin.Teleport", '&'))) {
                             player.closeInventory();
-                            if (player.hasPermission("subservers.subserver.teleport.*") || player.hasPermission("subservers.subserver.teleport." + gui.lastVistedObject.toLowerCase())) {
+                            if (player.hasPermission("subservers.server.teleport.*") || player.hasPermission("subservers.server.teleport." + gui.lastVistedObject.toLowerCase())) {
                                 gui.setDownloading(plugin.lang.getSection("Lang").getColoredString("Interface.Generic.Downloading.Response", '&'));
                                 plugin.subdata.sendPacket(new PacketTeleportPlayer(player.getUniqueId(), gui.lastVistedObject, UUID.randomUUID().toString(), json -> {
                                     if (json.getInt("r") != 0) gui.reopen();
