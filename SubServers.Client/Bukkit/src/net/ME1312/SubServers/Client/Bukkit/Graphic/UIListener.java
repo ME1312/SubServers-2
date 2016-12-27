@@ -181,7 +181,33 @@ public class UIListener implements Listener {
                                 }
                             });
                         }
-
+                    }
+                } else if (event.getClickedInventory().getTitle().startsWith(plugin.lang.getSection("Lang").getColoredString("Interface.Host-Plugin.Title", '&').split("\\$str\\$")[0]) && // Host Plugin
+                        (plugin.lang.getSection("Lang").getColoredString("Interface.Host-Plugin.Title", '&').split("\\$str\\$").length == 1 ||
+                                event.getClickedInventory().getTitle().endsWith(plugin.lang.getSection("Lang").getColoredString("Interface.Host-Plugin.Title", '&').split("\\$str\\$")[1]))) {
+                    if (event.getCurrentItem() != null && event.getCurrentItem().getType() != Material.AIR && event.getCurrentItem().hasItemMeta()) {
+                        String item = event.getCurrentItem().getItemMeta().getDisplayName();
+                        if (item.equals(plugin.lang.getSection("Lang").getColoredString("Interface.Generic.Back-Arrow", '&'))) {
+                            player.closeInventory();
+                            gui.hostPlugin(gui.lastPage - 1, gui.lastVistedObject);
+                        } else if (item.equals(plugin.lang.getSection("Lang").getColoredString("Interface.Generic.Next-Arrow", '&'))) {
+                            player.closeInventory();
+                            gui.hostPlugin(gui.lastPage + 1, gui.lastVistedObject);
+                        } else if (item.equals(plugin.lang.getSection("Lang").getColoredString("Interface.Generic.Back", '&'))) {
+                            player.closeInventory();
+                            gui.back();
+                        } else {
+                            player.closeInventory();
+                            Renderer plugin = null;
+                            for (Renderer renderer : UIRenderer.hostPlugins.values()) {
+                                if (item.equals(renderer.getIcon().getItemMeta().getDisplayName())) plugin = renderer;
+                            }
+                            if (plugin == null) {
+                                gui.reopen();
+                            } else {
+                                plugin.open(player, gui.lastVistedObject);
+                            }
+                        }
                     }
                 } else if (event.getClickedInventory().getTitle().equals(plugin.lang.getSection("Lang").getColoredString("Interface.SubServer-Menu.Title", '&')) || // SubServer Menu
                         event.getClickedInventory().getTitle().startsWith(plugin.lang.getSection("Lang").getColoredString("Interface.Host-SubServer.Title", '&').split("\\$str\\$")[0]) &&
@@ -192,10 +218,10 @@ public class UIListener implements Listener {
 
                         if (item.equals(plugin.lang.getSection("Lang").getColoredString("Interface.Generic.Back-Arrow", '&'))) {
                             player.closeInventory();
-                            gui.subserverMenu(gui.lastPage - 1, null);
+                            gui.subserverMenu(gui.lastPage - 1, gui.lastVistedObject);
                         } else if (item.equals(plugin.lang.getSection("Lang").getColoredString("Interface.Generic.Next-Arrow", '&'))) {
                             player.closeInventory();
-                            gui.subserverMenu(gui.lastPage + 1, null);
+                            gui.subserverMenu(gui.lastPage + 1, gui.lastVistedObject);
                         } else if (item.equals(plugin.lang.getSection("Lang").getColoredString("Interface.SubServer-Menu.Host-Menu", '&'))) {
                             player.closeInventory();
                             gui.hostMenu(1);
@@ -221,14 +247,12 @@ public class UIListener implements Listener {
                             if (player.hasPermission("subservers.host.create.*") || player.hasPermission("subservers.host.create." + gui.lastVistedObject.toLowerCase())) {
                                 gui.hostCreator(new UIRenderer.CreatorOptions(gui.lastVistedObject));
                             } else gui.reopen();
-                        } else if (item.equals(plugin.lang.getSection("Lang").getColoredString("Interface.Host-Admin.Editor", '&'))) {
-                            player.closeInventory();
-                            if (player.hasPermission("subservers.host.edit.*") || player.hasPermission("subservers.host.edit." + gui.lastVistedObject.toLowerCase())) {
-                                gui.hostEditor(new UIRenderer.HostEditorOptions(gui.lastVistedObject));
-                            } else gui.reopen();
                         } else if (item.equals(plugin.lang.getSection("Lang").getColoredString("Interface.Host-Admin.SubServers", '&'))) {
                             player.closeInventory();
                             gui.subserverMenu(1, gui.lastVistedObject);
+                        } else if (item.equals(plugin.lang.getSection("Lang").getColoredString("Interface.Host-Admin.Plugins", '&'))) {
+                            player.closeInventory();
+                            gui.hostPlugin(1, gui.lastVistedObject);
                         }
                     }
                 } else if (event.getClickedInventory().getTitle().startsWith(plugin.lang.getSection("Lang").getColoredString("Interface.SubServer-Admin.Title", '&').split("\\$str\\$")[0]) && // SubServer Admin
@@ -240,11 +264,6 @@ public class UIListener implements Listener {
                         if (item.equals(plugin.lang.getSection("Lang").getColoredString("Interface.Generic.Back", '&'))) {
                             player.closeInventory();
                             gui.back();
-                        } else if (item.equals(plugin.lang.getSection("Lang").getColoredString("Interface.SubServer-Admin.Editor", '&'))) {
-                            player.closeInventory();
-                            if (player.hasPermission("subservers.subserver.edit.*") || player.hasPermission("subservers.subserver.edit." + gui.lastVistedObject.toLowerCase())) {
-                                gui.subserverEditor(new UIRenderer.SubServerEditorOptions(gui.lastVistedObject));
-                            } else gui.reopen();
                         } else if (item.equals(plugin.lang.getSection("Lang").getColoredString("Interface.SubServer-Admin.Start", '&'))) {
                             player.closeInventory();
                             if (player.hasPermission("subservers.subserver.start.*") || player.hasPermission("subservers.subserver.start." + gui.lastVistedObject.toLowerCase())) {
@@ -314,14 +333,36 @@ public class UIListener implements Listener {
                                     }));
                                 });
                             } else gui.reopen();
-                        } else if (item.equals(plugin.lang.getSection("Lang").getColoredString("Interface.SubServer-Admin.Teleport", '&'))) {
+                        } else if (item.equals(plugin.lang.getSection("Lang").getColoredString("Interface.SubServer-Admin.Plugins", '&'))) {
                             player.closeInventory();
-                            if (player.hasPermission("subservers.server.teleport.*") || player.hasPermission("subservers.server.teleport." + gui.lastVistedObject.toLowerCase())) {
-                                gui.setDownloading(plugin.lang.getSection("Lang").getColoredString("Interface.Generic.Downloading.Response", '&'));
-                                plugin.subdata.sendPacket(new PacketTeleportPlayer(player.getUniqueId(), gui.lastVistedObject, UUID.randomUUID().toString(), json -> {
-                                    if (json.getInt("r") != 0) gui.reopen();
-                                }));
-                            } else gui.reopen();
+                            gui.subserverPlugin(1, gui.lastVistedObject);
+                        }
+                    }
+                } else if (event.getClickedInventory().getTitle().startsWith(plugin.lang.getSection("Lang").getColoredString("Interface.SubServer-Plugin.Title", '&').split("\\$str\\$")[0]) && // SubServer Plugin
+                        (plugin.lang.getSection("Lang").getColoredString("Interface.SubServer-Plugin.Title", '&').split("\\$str\\$").length == 1 ||
+                                event.getClickedInventory().getTitle().endsWith(plugin.lang.getSection("Lang").getColoredString("Interface.SubServer-Plugin.Title", '&').split("\\$str\\$")[1]))) {
+                    if (event.getCurrentItem() != null && event.getCurrentItem().getType() != Material.AIR && event.getCurrentItem().hasItemMeta()) {
+                        String item = event.getCurrentItem().getItemMeta().getDisplayName();
+                        if (item.equals(plugin.lang.getSection("Lang").getColoredString("Interface.Generic.Back-Arrow", '&'))) {
+                            player.closeInventory();
+                            gui.subserverPlugin(gui.lastPage - 1, gui.lastVistedObject);
+                        } else if (item.equals(plugin.lang.getSection("Lang").getColoredString("Interface.Generic.Next-Arrow", '&'))) {
+                            player.closeInventory();
+                            gui.subserverPlugin(gui.lastPage + 1, gui.lastVistedObject);
+                        } else if (item.equals(plugin.lang.getSection("Lang").getColoredString("Interface.Generic.Back", '&'))) {
+                            player.closeInventory();
+                            gui.back();
+                        } else {
+                            player.closeInventory();
+                            Renderer plugin = null;
+                            for (Renderer renderer : UIRenderer.subserverPlugins.values()) {
+                                if (item.equals(renderer.getIcon().getItemMeta().getDisplayName())) plugin = renderer;
+                            }
+                            if (plugin == null) {
+                                gui.reopen();
+                            } else {
+                                plugin.open(player, gui.lastVistedObject);
+                            }
                         }
                     }
                 }

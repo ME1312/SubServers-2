@@ -16,7 +16,6 @@ import java.util.UUID;
 
 public class InternalSubServer extends SubServer {
     private InternalHost host;
-    private String name;
     private boolean enabled;
     private Container<Boolean> log;
     private File directory;
@@ -32,7 +31,6 @@ public class InternalSubServer extends SubServer {
     public InternalSubServer(Host host, String name, boolean enabled, int port, String motd, boolean log, String directory, Executable executable, String stopcmd, boolean start, boolean restart, boolean hidden, boolean restricted, boolean temporary) throws InvalidServerException {
         super(host, name, port, motd, hidden, restricted);
         this.host = (InternalHost) host;
-        this.name = name;
         this.enabled = enabled;
         this.log = new Container<Boolean>(log);
         this.directory = new File(host.getDirectory(), directory);
@@ -158,191 +156,10 @@ public class InternalSubServer extends SubServer {
     }
 
     @Override
-    public int edit(UUID player, NamedContainer<String, ?>... changes) {
-        int i = 0;
-        SubEditServerEvent eEvent = new SubEditServerEvent(player, this, changes);
-        host.plugin.getPluginManager().callEvent(eEvent);
-        if (!eEvent.isCancelled()) {
-            for (NamedContainer<String, ?> change : changes) {
-                try {
-                    boolean running = isRunning();
-                    switch (change.name().toLowerCase()) {
-                        case "host":
-                            if (change.get() instanceof String) {
-                                InternalHost oldhost = host;
-                                Host newhost = host.plugin.hosts.get(((String) change.get()).toLowerCase());
-                                if (newhost != null) {
-                                    if (running) allowrestart = false;
-                                    if (host.removeSubServer(player, getName())) {
-                                        if (newhost.addSubServer(player, getName(), isEnabled(), getAddress().getPort(), getMotd(), isLogging(), directory.getPath(), executable, getStopCommand(), running, willAutoRestart(), isHidden(), isRestricted(), isTemporary()) != null) {
-                                            if (host.plugin.config.get().getSection("Servers").getKeys().contains(getName())) {
-                                                host.plugin.config.get().getSection("Servers").getSection(getName()).set("Host", newhost.getName());
-                                                host.plugin.config.save();
-                                            }
-                                            i++;
-                                        } else {
-                                            oldhost.servers.put(getName().toLowerCase(), this);
-                                            if (running) start(player);
-                                        }
-                                    }
-                                }
-                            }
-                            break;
-                        case "name":
-                            if (change.get() instanceof String) {
-                                host.servers.remove(getName().toLowerCase());
-                                if (host.plugin.config.get().getSection("Servers").getKeys().contains(getName())) {
-                                    host.plugin.config.get().getSection("Servers").set((String) change.get(), host.plugin.config.get().getSection("Servers").getSection(getName()));
-                                    host.plugin.config.get().getSection("Servers").remove(getName());
-                                    host.plugin.config.save();
-                                }
-                                name = (String) change.get();
-                                host.servers.put(((String) change.get()).toLowerCase(), this);
-                                i++;
-                            }
-                            break;
-                        case "enabled":
-                            if (change.get() instanceof Boolean) {
-                                setEnabled((Boolean) change.get());
-                                if (host.plugin.config.get().getSection("Servers").getKeys().contains(getName())) {
-                                    host.plugin.config.get().getSection("Servers").getSection(getName()).set("Enabled", isEnabled());
-                                    host.plugin.config.save();
-                                }
-                                i++;
-                            }
-                            break;
-                        case "log":
-                            if (change.get() instanceof Boolean) {
-                                setLogging((Boolean) change.get());
-                                if (host.plugin.config.get().getSection("Servers").getKeys().contains(getName())) {
-                                    host.plugin.config.get().getSection("Servers").getSection(getName()).set("Log", isLogging());
-                                    host.plugin.config.save();
-                                }
-                                i++;
-                            }
-                            break;
-                        case "dir":
-                            if (change.get() instanceof String) {
-                                directory = new File((String) change.get());
-                                if (host.plugin.config.get().getSection("Servers").getKeys().contains(getName())) {
-                                    host.plugin.config.get().getSection("Servers").getSection(getName()).set("Directory", directory.getPath());
-                                    host.plugin.config.save();
-                                }
-                                i++;
-                            } else if (change.get() instanceof File) {
-                                directory = (File) change.get();
-                                if (host.plugin.config.get().getSection("Servers").getKeys().contains(getName())) {
-                                    host.plugin.config.get().getSection("Servers").getSection(getName()).set("Directory", directory.getPath());
-                                    host.plugin.config.save();
-                                }
-                                i++;
-                            }
-                            break;
-                        case "exec":
-                            if (change.get() instanceof String) {
-                                executable = new Executable((String) change.get());
-                                if (host.plugin.config.get().getSection("Servers").getKeys().contains(getName())) {
-                                    host.plugin.config.get().getSection("Servers").getSection(getName()).set("Executable", executable.toString());
-                                    host.plugin.config.save();
-                                }
-                                i++;
-                            } else if (change.get() instanceof Executable) {
-                                executable = (Executable) change.get();
-                                if (host.plugin.config.get().getSection("Servers").getKeys().contains(getName())) {
-                                    host.plugin.config.get().getSection("Servers").getSection(getName()).set("Executable", executable.toString());
-                                    host.plugin.config.save();
-                                }
-                                i++;
-                            }
-                            break;
-                        case "running":
-                            if (change.get() instanceof Boolean) {
-                                if (running) {
-                                    if (!((Boolean) change.get())) stop(player);
-                                } else {
-                                    if (((Boolean) change.get())) start(player);
-                                }
-                                i++;
-                            }
-                            break;
-                        case "stop-cmd":
-                            if (change.get() instanceof String) {
-                                setStopCommand((String) change.get());
-                                if (host.plugin.config.get().getSection("Servers").getKeys().contains(getName())) {
-                                    host.plugin.config.get().getSection("Servers").getSection(getName()).set("Stop-Command", getStopCommand());
-                                    host.plugin.config.save();
-                                }
-                                i++;
-                            }
-                            break;
-                        case "auto-run":
-                            if (change.get() instanceof Boolean) {
-                                if (host.plugin.config.get().getSection("Servers").getKeys().contains(getName())) {
-                                    host.plugin.config.get().getSection("Servers").getSection(getName()).set("Run-On-Launch", change.get());
-                                    host.plugin.config.save();
-                                    i++;
-                                }
-                            }
-                            break;
-                        case "auto-restart":
-                            if (change.get() instanceof Boolean) {
-                                setAutoRestart((Boolean) change.get());
-                                if (host.plugin.config.get().getSection("Servers").getKeys().contains(getName())) {
-                                    host.plugin.config.get().getSection("Servers").getSection(getName()).set("Auto-Restart", willAutoRestart());
-                                    host.plugin.config.save();
-                                }
-                                i++;
-                            }
-                            break;
-                        case "restricted":
-                            if (change.get() instanceof Boolean) {
-                                setRestricted((Boolean) change.get());
-                                if (host.plugin.config.get().getSection("Servers").getKeys().contains(getName())) {
-                                    host.plugin.config.get().getSection("Servers").getSection(getName()).set("Restricted", isRestricted());
-                                    host.plugin.config.save();
-                                }
-                                i++;
-                            }
-                            break;
-                        case "hidden":
-                            if (change.get() instanceof Boolean) {
-                                setHidden((Boolean) change.get());
-                                if (host.plugin.config.get().getSection("Servers").getKeys().contains(getName())) {
-                                    host.plugin.config.get().getSection("Servers").getSection(getName()).set("Hidden", isHidden());
-                                    host.plugin.config.save();
-                                }
-                                i++;
-                            }
-                            break;
-                        case "motd":
-                            if (change.get() instanceof String) {
-                                setMotd((String) change.get());
-                                if (host.plugin.config.get().getSection("Servers").getKeys().contains(getName())) {
-                                    host.plugin.config.get().getSection("Servers").getSection(getName()).set("Motd", getMotd());
-                                    host.plugin.config.save();
-                                }
-                                i++;
-                            }
-                            break;
-                    }
-                } catch (Throwable e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-        return i;
-    }
-
-    @Override
     public void waitFor() throws InterruptedException {
         while (thread != null && thread.isAlive()) {
             Thread.sleep(250);
         }
-    }
-
-    @Override
-    public String getName() {
-        return name;
     }
 
     @Override
@@ -363,11 +180,6 @@ public class InternalSubServer extends SubServer {
     @Override
     public void setEnabled(boolean value) {
         enabled = value;
-    }
-
-    @Override
-    public boolean isEditable() {
-        return host.isEditable() && !isRunning();
     }
 
     @Override

@@ -4,6 +4,7 @@ import net.ME1312.SubServers.Client.Bukkit.Graphic.UIListener;
 import net.ME1312.SubServers.Client.Bukkit.Library.Config.YAMLConfig;
 import net.ME1312.SubServers.Client.Bukkit.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Client.Bukkit.Library.UniversalFile;
+import net.ME1312.SubServers.Client.Bukkit.Library.Util;
 import net.ME1312.SubServers.Client.Bukkit.Library.Version.Version;
 import net.ME1312.SubServers.Client.Bukkit.Network.SubDataClient;
 import org.bukkit.Bukkit;
@@ -21,7 +22,7 @@ public final class SubPlugin extends JavaPlugin {
 
     public UIListener gui = null;
     public Version version;
-    protected Version bversion = new Version(4);
+    protected Version bversion = new Version(5);
     
     //public final SubAPI api = new SubAPI(this);
 
@@ -32,12 +33,12 @@ public final class SubPlugin extends JavaPlugin {
             Bukkit.getLogger().info("SubServers > Loading SubServers v" + version.toString() + " Libraries... ");
             getDataFolder().mkdirs();
             if (!(new UniversalFile(getDataFolder(), "config.yml").exists())) {
-                copyFromJar("config.yml", new UniversalFile(getDataFolder(), "config.yml").getPath());
+                Util.copyFromJar(SubPlugin.class.getClassLoader(), "config.yml", new UniversalFile(getDataFolder(), "config.yml").getPath());
                 Bukkit.getLogger().info("SubServers > Created ~/plugins/SubServers/config.yml");
             } else if ((new Version((new YAMLConfig(new UniversalFile(getDataFolder(), "config.yml"))).get().getSection("Settings").getString("Version", "0")).compareTo(new Version("2.11.0a+"))) != 0) {
                 Files.move(new UniversalFile(getDataFolder(), "config.yml").toPath(), new UniversalFile(getDataFolder(), "config.old" + Math.round(Math.random() * 100000) + ".yml").toPath());
 
-                copyFromJar("config.yml", new UniversalFile(getDataFolder(), "config.yml").getPath());
+                Util.copyFromJar(SubPlugin.class.getClassLoader(), "config.yml", new UniversalFile(getDataFolder(), "config.yml").getPath());
                 Bukkit.getLogger().info("SubServers > Updated ~/plugins/SubServers/config.yml");
             }
             pluginconf = new YAMLConfig(new UniversalFile(getDataFolder(), "config.yml"));
@@ -64,22 +65,5 @@ public final class SubPlugin extends JavaPlugin {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-    }
-
-    private void copyFromJar(String resource, String destination) {
-        InputStream resStreamIn = SubPlugin.class.getClassLoader().getResourceAsStream(resource);
-        File resDestFile = new File(destination);
-        try {
-            OutputStream resStreamOut = new FileOutputStream(resDestFile);
-            int readBytes;
-            byte[] buffer = new byte[4096];
-            while ((readBytes = resStreamIn.read(buffer)) > 0) {
-                resStreamOut.write(buffer, 0, readBytes);
-            }
-            resStreamOut.close();
-            resStreamIn.close();
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
     }
 }

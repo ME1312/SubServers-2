@@ -3,11 +3,11 @@ Settings:
   Log-Creator: true
   SubData:
     Address: '127.0.0.1:4391'
-    Password: 'password123'
+    Password: ''
     Allowed-Connections: []
 
 Hosts:
-  '~Built-In':
+  '~':
     Enabled: true
     Driver: 'BUILT-IN'
     Address: '127.0.0.1'
@@ -15,13 +15,13 @@ Hosts:
     Git-Bash: 'C:\Program Files\Git'
 
 Servers:
-  'Server_1':
+  'Example':
     Enabled: false
-    Host: '~Built-In'
-    Port: 25566
+    Host: '~'
+    Port: 25567
     Motd: '&aThis is a SubServer'
     Log: true
-    Directory: './Server_1'
+    Directory: './Example'
     Executable: 'java -Djline.terminal=jline.UnsupportedTerminal -jar Spigot.jar'
     Stop-Command: 'stop'
     Run-On-Launch: false

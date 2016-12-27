@@ -2,6 +2,6 @@ Settings:
   Version: '2.11.2a+'
   Use-Title-Messages: true
   SubData:
-    Name: 'Server_1'
+    Name: 'undefined'
     Address: '127.0.0.1:4391'
-    Password: 'password123'
+    Password: ''

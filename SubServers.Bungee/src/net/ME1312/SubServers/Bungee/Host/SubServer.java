@@ -98,25 +98,6 @@ public abstract class SubServer extends Server {
     }
 
     /**
-     * Applies edits to the SubServer
-     *
-     * @param player Player Editing
-     * @param change Change(s) to be applied
-     * @return Success Status
-     */
-    public abstract int edit(UUID player, NamedContainer<String, ?>... change);
-
-    /**
-     * Applies edits to the SubServer
-     *
-     * @param change Change(s) to be applied
-     * @return Success Status
-     */
-    public int edit(NamedContainer<String, ?>... change) {
-        return edit(null, change);
-    }
-
-    /**
      * Waits for the Server to Stop
      *
      * @throws InterruptedException
@@ -150,13 +131,6 @@ public abstract class SubServer extends Server {
      * @param value Value
      */
     public abstract void setEnabled(boolean value);
-
-    /**
-     * Get if the SubServer can be Edited
-     *
-     * @return Editable Status
-     */
-    public abstract boolean isEditable();
 
     /**
      * If the Server is Logging

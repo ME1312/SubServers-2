@@ -181,6 +181,7 @@ public final class SubCommand implements CommandExecutor {
                                             sender.sendMessage(plugin.lang.getSection("Lang").getColoredString("Command.Start.Running", '&'));
                                             break;
                                         case 0:
+                                        case 1:
                                             sender.sendMessage(plugin.lang.getSection("Lang").getColoredString("Command.Start", '&'));
                                             break;
                                         default:
@@ -211,6 +212,7 @@ public final class SubCommand implements CommandExecutor {
                                             sender.sendMessage(plugin.lang.getSection("Lang").getColoredString("Command.Stop.Not-Running", '&'));
                                             break;
                                         case 0:
+                                        case 1:
                                             sender.sendMessage(plugin.lang.getSection("Lang").getColoredString("Command.Stop", '&'));
                                             break;
                                         default:
@@ -240,6 +242,7 @@ public final class SubCommand implements CommandExecutor {
                                             sender.sendMessage(plugin.lang.getSection("Lang").getColoredString("Command.Terminate.Not-Running", '&'));
                                             break;
                                         case 0:
+                                        case 1:
                                             sender.sendMessage(plugin.lang.getSection("Lang").getColoredString("Command.Terminate", '&'));
                                             break;
                                         default:
@@ -278,6 +281,7 @@ public final class SubCommand implements CommandExecutor {
                                             sender.sendMessage(plugin.lang.getSection("Lang").getColoredString("Command.Command.Not-Running", '&'));
                                             break;
                                         case 0:
+                                        case 1:
                                             sender.sendMessage(plugin.lang.getSection("Lang").getColoredString("Command.Command", '&'));
                                             break;
                                         default:
@@ -326,6 +330,7 @@ public final class SubCommand implements CommandExecutor {
                                                 sender.sendMessage(plugin.lang.getSection("Lang").getColoredString("Command.Creator.Invalid-Memory", '&'));
                                                 break;
                                             case 0:
+                                            case 1:
                                                 sender.sendMessage(plugin.lang.getSection("Lang").getColoredString("Command.Creator", '&'));
                                                 break;
                                             default:
@@ -356,8 +361,8 @@ public final class SubCommand implements CommandExecutor {
                                     case "host/creator":
                                         if (sender.hasPermission("subservers.host.create.*") || sender.hasPermission("subservers.host.create." + args[2].toLowerCase())) plugin.gui.getRenderer((Player) sender).hostCreator(new UIRenderer.CreatorOptions(args[2]));
                                         break;
-                                    case "host/editor":
-                                        if (sender.hasPermission("subservers.host.edit.*") || sender.hasPermission("subservers.host.edit." + args[2].toLowerCase())) plugin.gui.getRenderer((Player) sender).hostEditor(new UIRenderer.HostEditorOptions(args[2]));
+                                    case "host/plugins":
+                                        plugin.gui.getRenderer((Player) sender).hostPlugin(Integer.parseInt(args[2]), args[3]);
                                         break;
                                     case "subserver":
                                         if (args.length > 3) plugin.gui.getRenderer((Player) sender).subserverMenu(Integer.parseInt(args[2]), args[3]);
@@ -367,8 +372,8 @@ public final class SubCommand implements CommandExecutor {
                                     case "subserver/":
                                         plugin.gui.getRenderer((Player) sender).subserverAdmin(args[2]);
                                         break;
-                                    case "subserver/editor":
-                                        if (sender.hasPermission("subservers.subserver.edit.*") || sender.hasPermission("subservers.subserver.edit." + args[2].toLowerCase())) plugin.gui.getRenderer((Player) sender).subserverEditor(new UIRenderer.SubServerEditorOptions(args[2]));
+                                    case "subserver/plugins":
+                                        plugin.gui.getRenderer((Player) sender).subserverPlugin(Integer.parseInt(args[2]), args[3]);
                                         break;
                                 }
                             } catch (Throwable e) {}
@@ -398,6 +403,7 @@ public final class SubCommand implements CommandExecutor {
                                                         sender.sendMessage(plugin.lang.getSection("Lang").getColoredString("Command.Teleport.Offline", '&'));
                                                         break;
                                                     case 0:
+                                                    case 1:
                                                         sender.sendMessage(plugin.lang.getSection("Lang").getColoredString("Command.Teleport", '&'));
                                                         break;
                                                     default:
@@ -425,6 +431,7 @@ public final class SubCommand implements CommandExecutor {
                                                 sender.sendMessage(plugin.lang.getSection("Lang").getColoredString("Command.Teleport.Offline", '&'));
                                                 break;
                                             case 0:
+                                            case 1:
                                                 sender.sendMessage(plugin.lang.getSection("Lang").getColoredString("Command.Teleport", '&'));
                                                 break;
                                             default:

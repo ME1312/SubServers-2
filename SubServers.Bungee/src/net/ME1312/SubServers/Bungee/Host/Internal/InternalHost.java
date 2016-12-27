@@ -57,11 +57,6 @@ public class InternalHost extends Host {
     }
 
     @Override
-    public boolean isEditable() {
-        return true;
-    }
-
-    @Override
     public String getName() {
         return name;
     }
@@ -98,17 +93,6 @@ public class InternalHost extends Host {
         int i = 0;
         for (String server : servers) {
             if (this.servers.get(server.toLowerCase()).command(player, command)) i++;
-        }
-        return i;
-    }
-
-    @Override
-    public int edit(UUID player, NamedContainer<String, ?>... changes) {
-        int i = 0;
-        for (NamedContainer<String, ?> change : changes) {
-            switch (change.name().toLowerCase()) {
-                // TODO SubEditor
-            }
         }
         return i;
     }

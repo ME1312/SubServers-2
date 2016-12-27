@@ -59,13 +59,6 @@ public abstract class Host {
     public abstract String getDirectory();
 
     /**
-     * Get if the Host can be Edited
-     *
-     * @return Editable Status
-     */
-    public abstract boolean isEditable();
-
-    /**
      * Get the Name of this Host
      *
      * @return Host Name
@@ -149,25 +142,6 @@ public abstract class Host {
      * @return Success Status
      */
     public abstract int command(UUID player, String command, String... servers);
-
-    /**
-     * Applies edits to the Host
-     *
-     * @param player Player Editing
-     * @param change Change(s) to be applied
-     * @return Success Status
-     */
-    public abstract int edit(UUID player, NamedContainer<String, ?>... change);
-
-    /**
-     * Applies edits to the SubServer
-     *
-     * @param change Change(s) to be applied
-     * @return Success Status
-     */
-    public int edit(NamedContainer<String, ?>... change) {
-        return edit(null, change);
-    }
 
     /**
      * Gets the SubCreator Instance for this Host

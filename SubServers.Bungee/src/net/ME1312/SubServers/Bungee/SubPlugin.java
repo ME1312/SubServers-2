@@ -37,7 +37,7 @@ public final class SubPlugin extends BungeeCord {
     public HashMap<String, String> exLang = new HashMap<String, String>();
     public SubDataServer subdata = null;
     public final Version version = new Version("2.11.2a");
-    protected Version bversion = new Version(4);
+    protected Version bversion = new Version(5);
 
     protected boolean running = false;
     public final SubAPI api = new SubAPI(this);
@@ -98,7 +98,7 @@ public final class SubPlugin extends BungeeCord {
             } catch (NullPointerException e) {}
             brText.close();
 
-            if (!Version.equalsIgnoreCase("2.11.0a+")) {
+            if (!Version.equalsIgnoreCase("2.11.2a+")) {
                 Files.move(new UniversalFile(dir, "build.sh").toPath(), new UniversalFile(dir, "build.old" + Math.round(Math.random() * 100000) + ".sh").toPath());
                 Util.copyFromJar(SubPlugin.class.getClassLoader(), "net/ME1312/SubServers/Bungee/Library/Files/build.sh", new UniversalFile(dir, "build.sh").getPath());
                 System.out.println("SubServers > Updated ~/SubServers/build.sh");

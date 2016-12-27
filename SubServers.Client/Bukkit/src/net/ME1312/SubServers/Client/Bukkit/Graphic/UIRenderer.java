@@ -21,6 +21,8 @@ import java.text.DecimalFormat;
 import java.util.*;
 
 public class UIRenderer {
+    protected static HashMap<String, Renderer> hostPlugins = new HashMap<String, Renderer>();
+    protected static HashMap<String, Renderer> subserverPlugins = new HashMap<String, Renderer>();
     private List<Runnable> windowHistory = new LinkedList<Runnable>();
     protected Options lastUsedOptions = null;
     protected String lastVistedObject = null;
@@ -217,6 +219,26 @@ public class UIRenderer {
     }
 
     /**
+     * Add Host Plugin
+     *
+     * @param handle Handle to bind
+     * @param renderer Renderer
+     */
+    public static void addHostPlugin(String handle, Renderer renderer) {
+        hostPlugins.put(handle, renderer);
+    }
+
+    /**
+     * Add SubServer Plugin
+     *
+     * @param handle Handle to bind
+     * @param renderer Renderer
+     */
+    public static void addSubServerPlugin(String handle, Renderer renderer) {
+        subserverPlugins.put(handle, renderer);
+    }
+
+    /**
      * Opens the Host Menu
      *
      * @param page Page Number (starting from page 1)
@@ -384,33 +406,15 @@ public class UIRenderer {
                 }
                 block.setItemMeta(blockMeta);
                 inv.setItem(1, block);
+                inv.setItem(2, block);
+                inv.setItem(3, block);
                 inv.setItem(10, block);
+                inv.setItem(11, block);
+                inv.setItem(12, block);
 
                 block = new ItemStack(Material.STAINED_GLASS_PANE, 1, (short) 5);
                 blockMeta = block.getItemMeta();
                 blockMeta.setDisplayName(plugin.lang.getSection("Lang").getColoredString("Interface.Host-Admin.SubServers", '&'));
-                block.setItemMeta(blockMeta);
-                inv.setItem(2, block);
-                inv.setItem(3, block);
-                inv.setItem(11, block);
-                inv.setItem(12, block);
-
-                if (!(Bukkit.getPlayer(player).hasPermission("subservers.host.edit.*") || Bukkit.getPlayer(player).hasPermission("subservers.host.edit." + host.toLowerCase()))) {
-                    block = new ItemStack(Material.STAINED_GLASS_PANE, 1, (short) 7);
-                    blockMeta = block.getItemMeta();
-                    blockMeta.setDisplayName(ChatColor.GRAY+ChatColor.stripColor(plugin.lang.getSection("Lang").getColoredString("Interface.Host-Admin.Editor", '&')));
-                    blockMeta.setLore(Arrays.asList(plugin.lang.getSection("Lang").getColoredString("Interface.Generic.Invalid-Permission", '&').replace("$str$", "subservers.host.edit." + host.toLowerCase())));
-                } else if (!json.getJSONObject("host").getBoolean("editable")) {
-                    block = new ItemStack(Material.STAINED_GLASS_PANE, 1, (short) 7);
-                    blockMeta = block.getItemMeta();
-                    blockMeta.setDisplayName(ChatColor.GRAY+ChatColor.stripColor(plugin.lang.getSection("Lang").getColoredString("Interface.Host-Admin.Editor", '&')));
-                    blockMeta.setLore(Arrays.asList(plugin.lang.getSection("Lang").getColoredString("Interface.Host-Admin.Editor-Unavailable", '&')));
-                } else {
-                    block = new ItemStack(Material.STAINED_GLASS_PANE, 1, (short) 1);
-                    blockMeta = block.getItemMeta();
-                    blockMeta.setDisplayName(plugin.lang.getSection("Lang").getColoredString("Interface.Host-Admin.Editor", '&'));
-
-                }
                 block.setItemMeta(blockMeta);
                 inv.setItem(5, block);
                 inv.setItem(6, block);
@@ -419,6 +423,17 @@ public class UIRenderer {
                 inv.setItem(15, block);
                 inv.setItem(16, block);
 
+                if (!json.getJSONObject("host").getBoolean("enabled")) {
+                    block = new ItemStack(Material.STAINED_GLASS_PANE, 1, (short) 7);
+                    blockMeta = block.getItemMeta();
+                    blockMeta.setDisplayName(ChatColor.GRAY+ChatColor.stripColor(plugin.lang.getSection("Lang").getColoredString("Interface.Host-Admin.Plugins", '&')));
+                } else {
+                    block = new ItemStack(Material.STAINED_GLASS_PANE, 1, (short) 11);
+                    blockMeta = block.getItemMeta();
+                    blockMeta.setDisplayName(plugin.lang.getSection("Lang").getColoredString("Interface.Host-Admin.Plugins", '&'));
+                }
+                inv.setItem(27, block);
+                inv.setItem(28, block);
 
                 if (json.getJSONObject("host").getBoolean("enabled")) {
                     block = new ItemStack(Material.STAINED_GLASS_PANE, 1, (short) 11);
@@ -731,37 +746,116 @@ public class UIRenderer {
     }
 
     /**
-     * Opens Host/&lt;name&gt;/Edit
+     * Opens Host/&lt;name&gt;/Plugins
      *
-     * @param options Host Editor Options
+     * @param host Host Name
      */
-    public void hostEditor(final HostEditorOptions options) {
-        lastUsedOptions = options;
-        if (!options.init()) {
-            windowHistory.add(() -> hostEditor(options));
-            lastVistedObject = options.getHost();
-        }
-    }
-    public static class HostEditorOptions extends Options {
-        private String host;
+    public void hostPlugin(final Integer page, final String host) {
+        setDownloading(ChatColor.stripColor(plugin.lang.getSection("Lang").getColoredString("Interface.Host-Plugin.Title", '&').replace("$str$", host)));
+        plugin.subdata.sendPacket(new PacketDownloadHostInfo(host, UUID.randomUUID().toString(), (json) -> {
+            windowHistory.add(() -> hostPlugin(page, host));
+            if (!json.getBoolean("valid")) {
+                if (hasHistory()) back();
+            } else {
+                setDownloading(null);
+                lastVistedObject = host;
+                lastPage = page;
+                List<String> renderers = new ArrayList<String>();
+                for (String renderer : renderers) {
+                    if (subserverPlugins.get(renderer).isEnabled(host)) renderers.add(renderer);
+                }
+                Collections.sort(renderers);
 
-        /**
-         * Grabs a raw HostCreatorOptions instance
-         *
-         * @param host Host Name
-         */
-        public HostEditorOptions(String host) {
-            this.host = host;
-        }
+                ItemStack block;
+                ItemMeta blockMeta;
+                ItemStack div = new ItemStack(Material.STAINED_GLASS_PANE, 1, (short) 15);
+                ItemMeta divMeta = div.getItemMeta();
+                divMeta.setDisplayName(ChatColor.RESET.toString());
+                div.setItemMeta(divMeta);
 
-        /**
-         * Gets the Host Name
-         *
-         * @return Host Name
-         */
-        public String getHost() {
-            return this.host;
-        }
+                int i = 0;
+                int min = ((page - 1) * 36);
+                int max = (min + 35);
+                int count = (renderers.size() == 0)?27:((renderers.size() - min - 1 >= max)?36:renderers.size() - min);
+                int area = (count % 9 == 0) ? count : (int) (Math.floor(count / 9) + 1) * 9;
+
+                Inventory inv = Bukkit.createInventory(null, 18 + area, plugin.lang.getSection("Lang").getColoredString("Interface.Host-Plugin.Title", '&').replace("$str$", host));
+                block = new ItemStack(Material.STAINED_GLASS_PANE, 1, (short) 7);
+                block.setItemMeta(divMeta);
+                while (i < area) {
+                    inv.setItem(i, block);
+                    i++;
+                }
+                ItemStack adiv = block;
+                i = (int) ((count < 9) ? Math.floor((9 - count) / 2) : 0);
+
+                boolean even = (count & 1) == 0 && count < 9;
+
+                for (String renderer : renderers) {
+                    if (renderers.indexOf(renderer) >= min && renderers.indexOf(renderer) <= max) {
+                        if (even && (i == 4 || i == 13 || i == 22 || i == 31)) inv.setItem(i++, adiv);
+
+                        inv.setItem(i, hostPlugins.get(renderer).getIcon());
+
+                        count--;
+                        if (count < 9 && (i == 8 || i == 17 || i == 26)) {
+                            i += (int) Math.floor((9 - count) / 2) + 1;
+                            even = (count & 1) == 0;
+                        } else {
+                            i++;
+                        }
+                    }
+                }
+
+                if (renderers.size() == 0) {
+                    block = new ItemStack(Material.STAINED_GLASS_PANE, 1, (short) 14);
+                    blockMeta = block.getItemMeta();
+                    blockMeta.setDisplayName(plugin.lang.getSection("Lang").getColoredString("Interface.Host-Plugin.No-Plugins", '&'));
+                    block.setItemMeta(blockMeta);
+                    inv.setItem(12, block);
+                    inv.setItem(13, block);
+                    inv.setItem(14, block);
+                }
+
+                i = inv.getSize() - 18;
+                while (i < inv.getSize()) {
+                    inv.setItem(i, div);
+                    i++;
+                }
+                i = inv.getSize() - 9;
+
+                if (min != 0) {
+                    block = new ItemStack(Material.STAINED_GLASS_PANE, 1, (short) 4);
+                    blockMeta = block.getItemMeta();
+                    blockMeta.setDisplayName(plugin.lang.getSection("Lang").getColoredString("Interface.Generic.Back-Arrow", '&'));
+                    block.setItemMeta(blockMeta);
+                    inv.setItem(i++, block);
+                    inv.setItem(i++, block);
+                } else i += 2;
+                i++;
+                if (hasHistory()) {
+                    block = new ItemStack(Material.STAINED_GLASS_PANE, 1, (short) 14);
+                    blockMeta = block.getItemMeta();
+                    blockMeta.setDisplayName(plugin.lang.getSection("Lang").getColoredString("Interface.Generic.Back", '&'));
+                    block.setItemMeta(blockMeta);
+                    inv.setItem(i++, block);
+                    inv.setItem(i++, block);
+                    inv.setItem(i++, block);
+                    i++;
+                }
+                if (renderers.size() - 1 > max) {
+                    block = new ItemStack(Material.STAINED_GLASS_PANE, 1, (short) 4);
+                    blockMeta = block.getItemMeta();
+                    blockMeta.setDisplayName(plugin.lang.getSection("Lang").getColoredString("Interface.Generic.Next-Arrow", '&'));
+                    block.setItemMeta(blockMeta);
+                    inv.setItem(i++, block);
+                    inv.setItem(i, block);
+                }
+
+                Bukkit.getPlayer(player).openInventory(inv);
+                open = true;
+            }
+        }));
     }
 
     /**
@@ -994,20 +1088,6 @@ public class UIRenderer {
                     inv.setItem(14, block);
                     inv.setItem(15, block);
                     inv.setItem(16, block);
-
-                    if (!(Bukkit.getPlayer(player).hasPermission("subservers.server.teleport.*") || Bukkit.getPlayer(player).hasPermission("subservers.server.teleport." + subserver.toLowerCase()))) {
-                        block = new ItemStack(Material.STAINED_GLASS_PANE, 1, (short) 7);
-                        blockMeta = block.getItemMeta();
-                        blockMeta.setDisplayName(ChatColor.GRAY+ChatColor.stripColor(plugin.lang.getSection("Lang").getColoredString("Interface.SubServer-Admin.Teleport", '&')));
-                        blockMeta.setLore(Arrays.asList(plugin.lang.getSection("Lang").getColoredString("Interface.Generic.Invalid-Permission", '&').replace("$str$", "subservers.server.teleport." + subserver.toLowerCase())));
-                    } else {
-                        block = new ItemStack(Material.STAINED_GLASS_PANE, 1, (short) 11);
-                        blockMeta = block.getItemMeta();
-                        blockMeta.setDisplayName(plugin.lang.getSection("Lang").getColoredString("Interface.SubServer-Admin.Teleport", '&'));
-                    }
-                    block.setItemMeta(blockMeta);
-                    inv.setItem(27, block);
-                    inv.setItem(28, block);
                 } else {
                     if (!(Bukkit.getPlayer(player).hasPermission("subservers.subserver.start.*") || Bukkit.getPlayer(player).hasPermission("subservers.subserver.start." + subserver.toLowerCase()))) {
                         block = new ItemStack(Material.STAINED_GLASS_PANE, 1, (short) 7);
@@ -1024,37 +1104,26 @@ public class UIRenderer {
                         blockMeta.setDisplayName(plugin.lang.getSection("Lang").getColoredString("Interface.SubServer-Admin.Start", '&'));
                     }
                     block.setItemMeta(blockMeta);
-                    inv.setItem(1, block);
-                    inv.setItem(2, block);
                     inv.setItem(3, block);
-                    inv.setItem(10, block);
-                    inv.setItem(11, block);
-                    inv.setItem(12, block);
-
-                    if (!(Bukkit.getPlayer(player).hasPermission("subservers.subserver.edit.*") || Bukkit.getPlayer(player).hasPermission("subservers.subserver.edit." + subserver.toLowerCase()))) {
-                        block = new ItemStack(Material.STAINED_GLASS_PANE, 1, (short) 7);
-                        blockMeta = block.getItemMeta();
-                        blockMeta.setDisplayName(ChatColor.GRAY+ChatColor.stripColor(plugin.lang.getSection("Lang").getColoredString("Interface.SubServer-Admin.Editor", '&')));
-                        blockMeta.setLore(Arrays.asList(plugin.lang.getSection("Lang").getColoredString("Interface.Generic.Invalid-Permission", '&').replace("$str$", "subservers.subserver.edit." + subserver.toLowerCase())));
-                    } else if (!json.getJSONObject("server").getBoolean("editable")) {
-                        block = new ItemStack(Material.STAINED_GLASS_PANE, 1, (short) 7);
-                        blockMeta = block.getItemMeta();
-                        blockMeta.setDisplayName(ChatColor.GRAY+ChatColor.stripColor(plugin.lang.getSection("Lang").getColoredString("Interface.SubServer-Admin.Editor", '&')));
-                        blockMeta.setLore(Arrays.asList(plugin.lang.getSection("Lang").getColoredString("Interface.SubServer-Admin.Editor-Unavailable", '&')));
-                    } else {
-                        block = new ItemStack(Material.STAINED_GLASS_PANE, 1, (short) 1);
-                        blockMeta = block.getItemMeta();
-                        blockMeta.setDisplayName(plugin.lang.getSection("Lang").getColoredString("Interface.SubServer-Admin.Editor", '&'));
-
-                    }
-                    block.setItemMeta(blockMeta);
+                    inv.setItem(4, block);
                     inv.setItem(5, block);
-                    inv.setItem(6, block);
-                    inv.setItem(7, block);
+                    inv.setItem(12, block);
+                    inv.setItem(13, block);
                     inv.setItem(14, block);
-                    inv.setItem(15, block);
-                    inv.setItem(16, block);
                 }
+
+                if (!json.getJSONObject("server").getBoolean("enabled")) {
+                    block = new ItemStack(Material.STAINED_GLASS_PANE, 1, (short) 7);
+                    blockMeta = block.getItemMeta();
+                    blockMeta.setDisplayName(ChatColor.GRAY+ChatColor.stripColor(plugin.lang.getSection("Lang").getColoredString("Interface.SubServer-Admin.Plugins", '&')));
+                } else {
+                    block = new ItemStack(Material.STAINED_GLASS_PANE, 1, (short) 11);
+                    blockMeta = block.getItemMeta();
+                    blockMeta.setDisplayName(plugin.lang.getSection("Lang").getColoredString("Interface.SubServer-Admin.Plugins", '&'));
+                }
+                block.setItemMeta(blockMeta);
+                inv.setItem(27, block);
+                inv.setItem(28, block);
 
                 if (json.getJSONObject("server").getBoolean("temp")) {
                     block = new ItemStack(Material.STAINED_GLASS_PANE, 1, (short) 11);
@@ -1099,38 +1168,115 @@ public class UIRenderer {
     }
 
     /**
-     * Opens SubServer/&lt;name&gt;/Edit
+     * Opens SubServer/&lt;name&gt;/Plugins
      *
-     * @param options SubServerEditorOptions
+     * @param subserver SubServer Name
      */
-    public void subserverEditor(final SubServerEditorOptions options) {
-        lastUsedOptions = options;
-        if (!options.init()) {
-            windowHistory.add(() -> subserverEditor(options));
-            lastVistedObject = options.getSubserver();
-        }
-    }
-    public static class SubServerEditorOptions extends Options {
-        private List<Runnable> history = new LinkedList<Runnable>();
-        private String subserver;
-        private boolean init = false;
+    public void subserverPlugin(final Integer page, final String subserver) {
+        setDownloading(ChatColor.stripColor(plugin.lang.getSection("Lang").getColoredString("Interface.SubServer-Plugin.Title", '&').replace("$str$", subserver)));
+        plugin.subdata.sendPacket(new PacketDownloadServerInfo(subserver, UUID.randomUUID().toString(), json -> {
+            windowHistory.add(() -> subserverPlugin(page, subserver));
+            if (!json.getString("type").equals("subserver")) {
+                if (hasHistory()) back();
+            } else {
+                setDownloading(null);
+                lastVistedObject = subserver;
+                lastPage = page;
+                List<String> renderers = new ArrayList<String>();
+                for (String renderer : renderers) {
+                    if (subserverPlugins.get(renderer).isEnabled(subserver)) renderers.add(renderer);
+                }
+                Collections.sort(renderers);
 
-        /**
-         * Grabs a raw SubServerEditorOptions instance
-         *
-         * @param subserver SubServer Name
-         */
-        public SubServerEditorOptions(String subserver) {
-            this.subserver = subserver;
-        }
+                ItemStack block;
+                ItemMeta blockMeta;
+                ItemStack div = new ItemStack(Material.STAINED_GLASS_PANE, 1, (short) 15);
+                ItemMeta divMeta = div.getItemMeta();
+                divMeta.setDisplayName(ChatColor.RESET.toString());
+                div.setItemMeta(divMeta);
 
-        /**
-         * Gets the SubServer Name
-         *
-         * @return SubServer Name
-         */
-        public String getSubserver() {
-            return this.subserver;
-        }
+                int i = 0;
+                int min = ((page - 1) * 36);
+                int max = (min + 35);
+                int count = (renderers.size() == 0)?27:((renderers.size() - min - 1 >= max)?36:renderers.size() - min);
+                int area = (count % 9 == 0) ? count : (int) (Math.floor(count / 9) + 1) * 9;
+
+                Inventory inv = Bukkit.createInventory(null, 18 + area, plugin.lang.getSection("Lang").getColoredString("Interface.SubServer-Plugin.Title", '&').replace("$str$", subserver));
+                block = new ItemStack(Material.STAINED_GLASS_PANE, 1, (short) 7);
+                block.setItemMeta(divMeta);
+                while (i < area) {
+                    inv.setItem(i, block);
+                    i++;
+                }
+                ItemStack adiv = block;
+                i = (int) ((count < 9) ? Math.floor((9 - count) / 2) : 0);
+
+                boolean even = (count & 1) == 0 && count < 9;
+
+                for (String renderer : renderers) {
+                    if (renderers.indexOf(renderer) >= min && renderers.indexOf(renderer) <= max) {
+                        if (even && (i == 4 || i == 13 || i == 22 || i == 31)) inv.setItem(i++, adiv);
+
+                        inv.setItem(i, subserverPlugins.get(renderer).getIcon());
+
+                        count--;
+                        if (count < 9 && (i == 8 || i == 17 || i == 26)) {
+                            i += (int) Math.floor((9 - count) / 2) + 1;
+                            even = (count & 1) == 0;
+                        } else {
+                            i++;
+                        }
+                    }
+                }
+
+                if (renderers.size() == 0) {
+                    block = new ItemStack(Material.STAINED_GLASS_PANE, 1, (short) 14);
+                    blockMeta = block.getItemMeta();
+                    blockMeta.setDisplayName(plugin.lang.getSection("Lang").getColoredString("Interface.SubServer-Plugin.No-Plugins", '&'));
+                    block.setItemMeta(blockMeta);
+                    inv.setItem(12, block);
+                    inv.setItem(13, block);
+                    inv.setItem(14, block);
+                }
+
+                i = inv.getSize() - 18;
+                while (i < inv.getSize()) {
+                    inv.setItem(i, div);
+                    i++;
+                }
+                i = inv.getSize() - 9;
+
+                if (min != 0) {
+                    block = new ItemStack(Material.STAINED_GLASS_PANE, 1, (short) 4);
+                    blockMeta = block.getItemMeta();
+                    blockMeta.setDisplayName(plugin.lang.getSection("Lang").getColoredString("Interface.Generic.Back-Arrow", '&'));
+                    block.setItemMeta(blockMeta);
+                    inv.setItem(i++, block);
+                    inv.setItem(i++, block);
+                } else i += 2;
+                i++;
+                if (hasHistory()) {
+                    block = new ItemStack(Material.STAINED_GLASS_PANE, 1, (short) 14);
+                    blockMeta = block.getItemMeta();
+                    blockMeta.setDisplayName(plugin.lang.getSection("Lang").getColoredString("Interface.Generic.Back", '&'));
+                    block.setItemMeta(blockMeta);
+                    inv.setItem(i++, block);
+                    inv.setItem(i++, block);
+                    inv.setItem(i++, block);
+                    i++;
+                }
+                if (renderers.size() - 1 > max) {
+                    block = new ItemStack(Material.STAINED_GLASS_PANE, 1, (short) 4);
+                    blockMeta = block.getItemMeta();
+                    blockMeta.setDisplayName(plugin.lang.getSection("Lang").getColoredString("Interface.Generic.Next-Arrow", '&'));
+                    block.setItemMeta(blockMeta);
+                    inv.setItem(i++, block);
+                    inv.setItem(i, block);
+                }
+
+                Bukkit.getPlayer(player).openInventory(inv);
+                open = true;
+            }
+        }));
     }
 }

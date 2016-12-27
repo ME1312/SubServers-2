@@ -1,6 +1,6 @@
 ip_forward: true
 network_compression_threshold: 256
-stats: undefined
+stats: 'undefined'
 permissions:
   default:
   - bungeecord.command.server

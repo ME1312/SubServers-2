@@ -36,7 +36,6 @@ public class PacketDownloadHostInfo implements PacketIn, PacketOut {
 
             info.put("name", host.getName());
             info.put("enabled", host.isEnabled());
-            info.put("editable", host.isEditable());
             info.put("address", host.getAddress().toString());
             info.put("dir", host.getDirectory());
 
