@@ -37,7 +37,7 @@ public final class SubPlugin extends BungeeCord {
     public HashMap<String, String> exLang = new HashMap<String, String>();
     public SubDataServer subdata = null;
     public final Version version = new Version("2.11.2a");
-    protected Version bversion = new Version(5);
+    protected Version bversion = null;
 
     protected boolean running = false;
     public final SubAPI api = new SubAPI(this);
@@ -237,6 +237,10 @@ public final class SubPlugin extends BungeeCord {
                     this.hosts.get(host).removeSubServer(server);
                 }
                 subservers.clear();
+                if (this.hosts.get(host).getCreator().isBusy()) {
+                    this.hosts.get(host).getCreator().terminate();
+                    this.hosts.get(host).getCreator().waitFor();
+                }
                 this.hosts.remove(host);
             }
             hosts.clear();

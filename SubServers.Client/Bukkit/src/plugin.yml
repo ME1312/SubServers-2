@@ -35,9 +35,6 @@ permissions:
           subservers.host.create.*:
             description: 'Grants Access to Create a SubServer'
             default: op
-          subservers.host.edit.*:
-            description: 'Grants Access to Edit a Host'
-            default: op
       subservers.subserver.*:
         description: 'Grants Access to SubServers SubServer Actions'
         default: op
@@ -53,9 +50,6 @@ permissions:
             default: op
           subservers.subserver.command.*:
             description: 'Grants Access to Send Commands to a SubServer'
-            default: op
-          subservers.subserver.edit.*:
-            description: 'Grants Access to Edit a SubServer'
             default: op
       subservers.server.*:
         description: 'Grants Access to SubServer Server Actions'

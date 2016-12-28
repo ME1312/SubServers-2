@@ -22,7 +22,7 @@ public final class SubPlugin extends JavaPlugin {
 
     public UIListener gui = null;
     public Version version;
-    protected Version bversion = new Version(5);
+    protected Version bversion = null;
     
     //public final SubAPI api = new SubAPI(this);
 
@@ -35,7 +35,7 @@ public final class SubPlugin extends JavaPlugin {
             if (!(new UniversalFile(getDataFolder(), "config.yml").exists())) {
                 Util.copyFromJar(SubPlugin.class.getClassLoader(), "config.yml", new UniversalFile(getDataFolder(), "config.yml").getPath());
                 Bukkit.getLogger().info("SubServers > Created ~/plugins/SubServers/config.yml");
-            } else if ((new Version((new YAMLConfig(new UniversalFile(getDataFolder(), "config.yml"))).get().getSection("Settings").getString("Version", "0")).compareTo(new Version("2.11.0a+"))) != 0) {
+            } else if ((new Version((new YAMLConfig(new UniversalFile(getDataFolder(), "config.yml"))).get().getSection("Settings").getString("Version", "0")).compareTo(new Version("2.11.2a+"))) != 0) {
                 Files.move(new UniversalFile(getDataFolder(), "config.yml").toPath(), new UniversalFile(getDataFolder(), "config.old" + Math.round(Math.random() * 100000) + ".yml").toPath());
 
                 Util.copyFromJar(SubPlugin.class.getClassLoader(), "config.yml", new UniversalFile(getDataFolder(), "config.yml").getPath());
@@ -45,7 +45,6 @@ public final class SubPlugin extends JavaPlugin {
             subdata = new SubDataClient(this, pluginconf.get().getSection("Settings").getSection("SubData").getString("Name", "~no_name"),
                     InetAddress.getByName(pluginconf.get().getSection("Settings").getSection("SubData").getString("Address", "127.0.0.1:4391").split(":")[0]),
                     Integer.parseInt(pluginconf.get().getSection("Settings").getSection("SubData").getString("Address", "127.0.0.1:4391").split(":")[1]));
-            Bukkit.getLogger().info("SubServers > SubData Connected to " + subdata.getClient().getRemoteSocketAddress().toString());
 
             gui = new UIListener(this);
             getCommand("subservers").setExecutor(new SubCommand(this));

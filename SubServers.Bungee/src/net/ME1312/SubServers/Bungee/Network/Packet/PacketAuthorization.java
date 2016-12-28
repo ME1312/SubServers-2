@@ -32,7 +32,7 @@ public class PacketAuthorization implements PacketIn, PacketOut {
     @Override
     public void execute(Client client, JSONObject data) {
         try {
-            if (data.getString("password").equals(plugin.config.get().getSection("Settings").getSection("SubData").getString("Password"))) {
+            if (data.getString("password").equals(plugin.config.get().getSection("Settings").getSection("SubData").getRawString("Password"))) {
                 client.authorize();
                 client.sendPacket(new PacketAuthorization(0, "Successfully Logged in"));
             } else {

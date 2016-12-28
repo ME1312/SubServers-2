@@ -4,11 +4,13 @@ import net.ME1312.SubServers.Bungee.Event.SubCreateEvent;
 import net.ME1312.SubServers.Bungee.Host.Executable;
 import net.ME1312.SubServers.Bungee.Host.Host;
 import net.ME1312.SubServers.Bungee.Host.SubCreator;
+import net.ME1312.SubServers.Bungee.Library.Config.YAMLConfig;
 import net.ME1312.SubServers.Bungee.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Bungee.Library.Container;
 import net.ME1312.SubServers.Bungee.Library.UniversalFile;
 import net.ME1312.SubServers.Bungee.Library.Util;
 import net.ME1312.SubServers.Bungee.Library.Version.Version;
+import net.ME1312.SubServers.Bungee.SubPlugin;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -27,6 +29,7 @@ import java.util.UUID;
 public class InternalSubCreator extends SubCreator {
     private InternalHost host;
     private String gitBash;
+    private Process process = null;
     private Thread thread = null;
 
     public InternalSubCreator(Host host, String gitBash) {
@@ -370,7 +373,15 @@ public class InternalSubCreator extends SubCreator {
             try {
                 GenerateSpigotYAML(dir);
                 GenerateProperties(dir, port);
-            } catch (IOException e) {
+                new UniversalFile(dir, "plugins:SubServers").mkdirs();
+                Util.copyFromJar(SubPlugin.class.getClassLoader(), "net/ME1312/SubServers/Bungee/Library/Files/bukkit.jar", new UniversalFile(dir, "plugins:SubServers.Client.jar").getPath());
+                Util.copyFromJar(SubPlugin.class.getClassLoader(), "net/ME1312/SubServers/Bungee/Library/Files/bukkit.yml", new UniversalFile(dir, "plugins:Subservers:config.yml").getPath());
+                YAMLConfig config = new YAMLConfig(new UniversalFile(dir, "plugins:Subservers:config.yml"));
+                config.get().getSection("Settings").getSection("SubData").set("Name", name);
+                config.get().getSection("Settings").getSection("SubData").set("Address", host.plugin.config.get().getSection("Settings").getSection("SubData").getRawString("Address"));
+                config.get().getSection("Settings").getSection("SubData").set("Password", host.plugin.config.get().getSection("Settings").getSection("SubData").getRawString("Password"));
+                config.save();
+            } catch (Exception e) {
                 e.printStackTrace();
             }
 
@@ -426,7 +437,7 @@ public class InternalSubCreator extends SubCreator {
             OutputStream output = null;
             try {
                 input = new FileInputStream(new UniversalFile(host.plugin.dir, "SubServers:build.sh"));
-                output = new FileOutputStream(new File(dir, "build-subserver.sh"));
+                output = new FileOutputStream(new File(dir, "build.sh"));
                 byte[] buf = new byte[1024];
                 int bytesRead;
                 while ((bytesRead = input.read(buf)) > 0) {
@@ -439,39 +450,39 @@ public class InternalSubCreator extends SubCreator {
                     output.close();
             }
 
-            if (!(new File(dir, "build-subserver.sh").exists())) {
-                System.out.println("SubCreator > Problem Copying build-subserver.sh!");
+            if (!(new File(dir, "build.sh").exists())) {
+                System.out.println(host.getName() + "/Creator > Problem Copying build.sh!");
             } else {
                 File gitBash = new File(this.gitBash, "bin" + File.separatorChar + "bash.exe");
                 if (!(System.getProperty("os.name").toLowerCase().indexOf("win") >= 0)) {
-                    Process process1 = Runtime.getRuntime().exec("chmod +x build-subserver.sh", null, dir);
+                    Process process = Runtime.getRuntime().exec("chmod +x build.sh", null, dir);
                     try {
-                        process1.waitFor();
+                        process.waitFor();
                         Thread.sleep(500);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-                    if (process1.exitValue() != 0) {
-                        System.out.println("SubCreator > Problem Setting Executable Permissions for build-subserver.sh");
-                        System.out.println("SubCreator > This may cause errors in the Build Process");
+                    if (process.exitValue() != 0) {
+                        System.out.println(host.getName() + "/Creator > Problem Setting Executable Permissions for build.sh");
+                        System.out.println(host.getName() + "/Creator > This may cause errors in the Build Process");
                     }
                 }
 
-                Process process2 = Runtime.getRuntime().exec((System.getProperty("os.name").toLowerCase().indexOf("win") >= 0)?
-                        "\"" + gitBash + "\" --login -i -c \"bash build-subserver.sh " + version.toString() + " " + type.toString().toLowerCase() + "\""
-                        :("bash build-subserver.sh " + version.toString() + " " + type.toString().toLowerCase() + " " + System.getProperty("user.home")), null, dir);
-                InternalSubLogger read = new InternalSubLogger(process2.getInputStream(), host.getName() + "/Creator", new Container<Boolean>(host.plugin.config.get().getSection("Settings").getBoolean("Log-Creator")), new File(dir, "SubCreator-" + type.toString() + "-" + version.toString().replace("::", "@") + ".log"));
+                this.process = Runtime.getRuntime().exec((System.getProperty("os.name").toLowerCase().indexOf("win") >= 0)?
+                        "\"" + gitBash + "\" --login -i -c \"bash build.sh " + version.toString() + " " + type.toString().toLowerCase() + "\""
+                        :("bash build.sh " + version.toString() + " " + type.toString().toLowerCase() + " " + System.getProperty("user.home")), null, dir);
+                InternalSubLogger read = new InternalSubLogger(this.process.getInputStream(), host.getName() + "/Creator", new Container<Boolean>(host.plugin.config.get().getSection("Settings").getBoolean("Log-Creator")), new File(dir, "SubCreator-" + type.toString() + "-" + version.toString().replace("::", "@") + ".log"));
                 read.start();
                 try {
-                    process2.waitFor();
+                    this.process.waitFor();
                     Thread.sleep(500);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
 
-                if (process2.exitValue() == 0) {
+                if (this.process.exitValue() == 0) {
                     if (host.plugin.exServers.keySet().contains(name.toLowerCase())) host.plugin.exServers.remove(name.toLowerCase());
-                    host.addSubServer(player, name, true, port, "&aThis is a SubServer", true, new UniversalFile(".:" + name).getPath(), exec, "stop", true, false, false, false, false);
+                    host.addSubServer(player, name, true, port, "&aThis is a SubServer", true, "." + File.separatorChar + name, exec, "stop", true, false, false, false, false);
 
                     YAMLSection server = new YAMLSection();
                     server.set("Enabled", true);
@@ -479,7 +490,7 @@ public class InternalSubCreator extends SubCreator {
                     server.set("Port", port);
                     server.set("Motd", "&aThis is a SubServer");
                     server.set("Log", true);
-                    server.set("Directory", new UniversalFile(".:" + name));
+                    server.set("Directory", "." + File.separatorChar + name);
                     server.set("Executable", exec.toString());
                     server.set("Stop-Command", "stop");
                     server.set("Run-On-Launch", false);
@@ -490,7 +501,7 @@ public class InternalSubCreator extends SubCreator {
                     host.plugin.config.save();
 
                 } else {
-                    System.out.println("SubCreator > build-subserver.sh exited with an errors. Please try again.");
+                    System.out.println(host.getName() + "/Creator build.sh exited with an errors. Please try again.");
                 }
             }
         } catch (IOException e) {
@@ -510,6 +521,15 @@ public class InternalSubCreator extends SubCreator {
                 return true;
             } else return false;
         } else return false;
+    }
+
+    @Override
+    public void terminate() {
+        if (process != null && this.process.isAlive()) {
+            process.destroyForcibly();
+        } else if (thread != null && this.thread.isAlive()) {
+            thread.interrupt();
+        }
     }
 
     @Override
