@@ -51,7 +51,7 @@ public class InternalSubServer extends SubServer {
             try {
                 process = Runtime.getRuntime().exec(executable.toString(), null, directory);
                 System.out.println("SubServers > Now starting " + getName());
-                final InternalSubLogger read = new InternalSubLogger(process.getInputStream(), getName(), log, null);
+                final InternalSubLogger read = new InternalSubLogger(process, getName(), log, null);
                 read.start();
                 command = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
 

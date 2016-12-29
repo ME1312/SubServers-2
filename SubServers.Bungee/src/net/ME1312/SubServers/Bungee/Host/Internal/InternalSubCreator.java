@@ -4,9 +4,11 @@ import net.ME1312.SubServers.Bungee.Event.SubCreateEvent;
 import net.ME1312.SubServers.Bungee.Host.Executable;
 import net.ME1312.SubServers.Bungee.Host.Host;
 import net.ME1312.SubServers.Bungee.Host.SubCreator;
+import net.ME1312.SubServers.Bungee.Host.SubServer;
 import net.ME1312.SubServers.Bungee.Library.Config.YAMLConfig;
 import net.ME1312.SubServers.Bungee.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Bungee.Library.Container;
+import net.ME1312.SubServers.Bungee.Library.Exception.InvalidServerException;
 import net.ME1312.SubServers.Bungee.Library.UniversalFile;
 import net.ME1312.SubServers.Bungee.Library.Util;
 import net.ME1312.SubServers.Bungee.Library.Version.Version;
@@ -367,6 +369,7 @@ public class InternalSubCreator extends SubCreator {
         UniversalFile dir = new UniversalFile(new File(host.getDirectory()), name);
         dir.mkdirs();
 
+        System.out.println(host.getName() + "/Creator > Generating Server Files...");
         if (type == ServerType.SPIGOT) {
             exec = new Executable("java -Xmx" + memory + "M -Djline.terminal=jline.UnsupportedTerminal -Dcom.mojang.eula.agree=true -jar Spigot.jar");
 
@@ -396,6 +399,13 @@ public class InternalSubCreator extends SubCreator {
             }
         } else if (type == ServerType.SPONGE) {
             try {
+                exec = new Executable("java -Xmx" + memory + "M -jar Forge.jar");
+
+                GenerateEULA(dir);
+                GenerateProperties(dir, port);
+                GenerateSpongeConf(dir);
+
+                System.out.println(host.getName() + "/Creator > Searching Versions...");
                 Document spongexml = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new InputSource(new StringReader(Util.readAll(new BufferedReader(new InputStreamReader(new URL("http://files.minecraftforge.net/maven/org/spongepowered/spongeforge/maven-metadata.xml").openStream(), Charset.forName("UTF-8")))))));
                 Document forgexml = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new InputSource(new StringReader(Util.readAll(new BufferedReader(new InputStreamReader(new URL("http://files.minecraftforge.net/maven/net/minecraftforge/forge/maven-metadata.xml").openStream(), Charset.forName("UTF-8")))))));
 
@@ -409,6 +419,8 @@ public class InternalSubCreator extends SubCreator {
                         }
                     }
                 }
+                if (spversion == null) throw new InvalidServerException("Cannot find sponge version for Minecraft " + version.toString());
+                System.out.println(host.getName() + "/Creator > Found spongeforge-" + spversion.toString());
 
                 NodeList mcfnodeList = forgexml.getElementsByTagName("version");
                 Version mcfversion = null;
@@ -420,18 +432,14 @@ public class InternalSubCreator extends SubCreator {
                         }
                     }
                 }
+                if (mcfversion == null) throw new InvalidServerException("Cannot find forge version for Sponge " + spversion.toString());
+                System.out.println(host.getName() + "/Creator > Found forge-" + mcfversion.toString());
 
-                exec = new Executable("java -Xmx" + memory + "M -jar Forge.jar");
                 version = new Version(mcfversion.toString() + "::" + spversion.toString());
-
-                GenerateEULA(dir);
-                GenerateProperties(dir, port);
-                GenerateSpongeConf(dir);
             } catch (ParserConfigurationException | IOException | SAXException | NullPointerException e) {
                 e.printStackTrace();
             }
         }
-
         try {
             InputStream input = null;
             OutputStream output = null;
@@ -451,7 +459,7 @@ public class InternalSubCreator extends SubCreator {
             }
 
             if (!(new File(dir, "build.sh").exists())) {
-                System.out.println(host.getName() + "/Creator > Problem Copying build.sh!");
+                System.out.println(host.getName() + "/Creator > Problem copying build.sh");
             } else {
                 File gitBash = new File(this.gitBash, "bin" + File.separatorChar + "bash.exe");
                 if (!(System.getProperty("os.name").toLowerCase().indexOf("win") >= 0)) {
@@ -463,15 +471,15 @@ public class InternalSubCreator extends SubCreator {
                         e.printStackTrace();
                     }
                     if (process.exitValue() != 0) {
-                        System.out.println(host.getName() + "/Creator > Problem Setting Executable Permissions for build.sh");
-                        System.out.println(host.getName() + "/Creator > This may cause errors in the Build Process");
+                        System.out.println(host.getName() + "/Creator > Problem Setting Executable Permissions.");
                     }
                 }
 
+                System.out.println(host.getName() + "/Creator > Launching build.sh");
                 this.process = Runtime.getRuntime().exec((System.getProperty("os.name").toLowerCase().indexOf("win") >= 0)?
                         "\"" + gitBash + "\" --login -i -c \"bash build.sh " + version.toString() + " " + type.toString().toLowerCase() + "\""
                         :("bash build.sh " + version.toString() + " " + type.toString().toLowerCase() + " " + System.getProperty("user.home")), null, dir);
-                InternalSubLogger read = new InternalSubLogger(this.process.getInputStream(), host.getName() + "/Creator", new Container<Boolean>(host.plugin.config.get().getSection("Settings").getBoolean("Log-Creator")), new File(dir, "SubCreator-" + type.toString() + "-" + version.toString().replace("::", "@") + ".log"));
+                InternalSubLogger read = new InternalSubLogger(this.process, host.getName() + "/Creator", new Container<Boolean>(host.plugin.config.get().getSection("Settings").getBoolean("Log-Creator")), new File(dir, "SubCreator-" + type.toString() + "-" + version.toString().replace("::", "@") + ".log"));
                 read.start();
                 try {
                     this.process.waitFor();
@@ -481,8 +489,9 @@ public class InternalSubCreator extends SubCreator {
                 }
 
                 if (this.process.exitValue() == 0) {
+                    System.out.println(host.getName() + "/Creator > Saving...");
                     if (host.plugin.exServers.keySet().contains(name.toLowerCase())) host.plugin.exServers.remove(name.toLowerCase());
-                    host.addSubServer(player, name, true, port, "&aThis is a SubServer", true, "." + File.separatorChar + name, exec, "stop", true, false, false, false, false);
+                    SubServer subserver = host.addSubServer(player, name, true, port, "&aThis is a SubServer", true, "." + File.separatorChar + name, exec, "stop", false, false, false, false, false);
 
                     YAMLSection server = new YAMLSection();
                     server.set("Enabled", true);
@@ -500,8 +509,9 @@ public class InternalSubCreator extends SubCreator {
                     host.plugin.config.get().getSection("Servers").set(name, server);
                     host.plugin.config.save();
 
+                    subserver.start(player);
                 } else {
-                    System.out.println(host.getName() + "/Creator build.sh exited with an errors. Please try again.");
+                    System.out.println(host.getName() + "/Creator > Couldn't build the server jar. See \"SubCreator-" + type.toString() + "-" + version.toString().replace("::", "@") + ".log\" for more details.");
                 }
             }
         } catch (IOException e) {
