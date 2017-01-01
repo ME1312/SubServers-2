@@ -30,5 +30,6 @@ crashlytics-build.properties
 /SubServers.Host/
 
 # Hide Others
+/build.ant
 .DS_STORE
 .alias
