@@ -384,6 +384,8 @@ public class InternalSubCreator extends SubCreator {
                 config.get().getSection("Settings").getSection("SubData").set("Address", host.plugin.config.get().getSection("Settings").getSection("SubData").getRawString("Address"));
                 config.get().getSection("Settings").getSection("SubData").set("Password", host.plugin.config.get().getSection("Settings").getSection("SubData").getRawString("Password"));
                 config.save();
+                System.out.println(host.getName() + "/Creator > Copying Plugins...");
+                copyFolder(new UniversalFile(host.plugin.dir, "SubServers:Plugin Templates:Spigot Plugins"), new UniversalFile(dir, "plugins"));
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -401,6 +403,8 @@ public class InternalSubCreator extends SubCreator {
             try {
                 exec = new Executable("java -Xmx" + memory + "M -jar Forge.jar");
 
+                new UniversalFile(dir, "config").mkdirs();
+                new UniversalFile(dir, "mods").mkdirs();
                 GenerateEULA(dir);
                 GenerateProperties(dir, port);
                 GenerateSpongeConf(dir);
@@ -420,7 +424,7 @@ public class InternalSubCreator extends SubCreator {
                     }
                 }
                 if (spversion == null) throw new InvalidServerException("Cannot find sponge version for Minecraft " + version.toString());
-                System.out.println(host.getName() + "/Creator > Found spongeforge-" + spversion.toString());
+                System.out.println(host.getName() + "/Creator > Found \"spongeforge-" + spversion.toString() + '"');
 
                 NodeList mcfnodeList = forgexml.getElementsByTagName("version");
                 Version mcfversion = null;
@@ -433,9 +437,13 @@ public class InternalSubCreator extends SubCreator {
                     }
                 }
                 if (mcfversion == null) throw new InvalidServerException("Cannot find forge version for Sponge " + spversion.toString());
-                System.out.println(host.getName() + "/Creator > Found forge-" + mcfversion.toString());
+                System.out.println(host.getName() + "/Creator > Found \"forge-" + mcfversion.toString() + '"');
 
                 version = new Version(mcfversion.toString() + "::" + spversion.toString());
+
+                System.out.println(host.getName() + "/Creator > Copying Mods...");
+                copyFolder(new UniversalFile(host.plugin.dir, "SubServers:Plugin Templates:Sponge Config"), new UniversalFile(dir, "config"));
+                copyFolder(new UniversalFile(host.plugin.dir, "SubServers:Plugin Templates:Sponge Mods"), new UniversalFile(dir, "mods"));
             } catch (ParserConfigurationException | IOException | SAXException | NullPointerException e) {
                 e.printStackTrace();
             }
@@ -562,5 +570,49 @@ public class InternalSubCreator extends SubCreator {
     @Override
     public boolean isBusy() {
         return thread != null && thread.isAlive();
+    }
+
+    private void copyFolder(File source, File destination) {
+        if (source.isDirectory()) {
+            if (!destination.exists()) {
+                destination.mkdirs();
+            }
+
+            String files[] = source.list();
+
+            for (String file : files) {
+                File srcFile = new File(source, file);
+                File destFile = new File(destination, file);
+
+                copyFolder(srcFile, destFile);
+            }
+        } else {
+            InputStream in = null;
+            OutputStream out = null;
+
+            try {
+                in = new FileInputStream(source);
+                out = new FileOutputStream(destination);
+
+                byte[] buffer = new byte[1024];
+
+                int length;
+                while ((length = in.read(buffer)) > 0) {
+                    out.write(buffer, 0, length);
+                }
+            } catch (Exception e) {
+                try {
+                    in.close();
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
+
+                try {
+                    out.close();
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
+            }
+        }
     }
 }

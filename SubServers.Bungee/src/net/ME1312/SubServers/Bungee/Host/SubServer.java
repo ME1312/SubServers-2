@@ -146,6 +146,14 @@ public abstract class SubServer extends Server {
      */
     public abstract void setLogging(boolean value);
 
+
+    /**
+     * Get the Server Directory
+     *
+     * @return Server Directory
+     */
+    public abstract String getDirectory();
+
     /**
      * Grab the Command to Stop the Server
      *

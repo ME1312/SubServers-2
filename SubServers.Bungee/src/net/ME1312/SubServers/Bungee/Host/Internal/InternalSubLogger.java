@@ -42,15 +42,16 @@ public class InternalSubLogger {
                             String msg = line;
                             // REGEX Formatting
                             String type = "INFO";
-                            Matcher matcher = Pattern.compile("^((?:\\s*\\[?[0-9]{2}:[0-9]{2}:[0-9]{2}]?)?\\s*(?:\\[|\\[.*\\/)?(INFO|WARN|WARNING|ERROR|ERR|SEVERE)\\]:?\\s*)").matcher(msg);
+                            Matcher matcher = Pattern.compile("^((?:\\s*\\[?([0-9]{2}:[0-9]{2}:[0-9]{2})]?)?[\\s\\/\\\\\\|]*(?:\\[|\\[.*\\/)?(MESSAGE|INFO|WARN|WARNING|ERROR|ERR|SEVERE)\\]?:?\\s*)").matcher(msg);
                             while (matcher.find()) {
-                                type = matcher.group(2);
+                                type = matcher.group(3).toUpperCase();
                             }
 
-                            msg = msg.replaceAll("^((?:\\s*\\[?[0-9]{2}:[0-9]{2}:[0-9]{2}]?)?\\s*(?:\\[|\\[.*\\/)?(INFO|WARN|WARNING|ERROR|ERR|SEVERE)\\]:?\\s*)", "");
+                            msg = msg.replaceAll("^((?:\\s*\\[?([0-9]{2}:[0-9]{2}:[0-9]{2})]?)?[\\s\\/\\\\\\|]*(?:\\[|\\[.*\\/)?(MESSAGE|INFO|WARN|WARNING|ERROR|ERR|SEVERE)\\]?:?\\s*)", "");
 
                             switch (type) {
                                 case "INFO":
+                                case "MESSAGE":
                                     ProxyServer.getInstance().getLogger().info(name + " > " + msg);
                                     break;
                                 case "WARNING":
@@ -70,8 +71,7 @@ public class InternalSubLogger {
                         }
                     }
                 }
-            } catch (IOException ioe) {
-            } finally {
+            } catch (IOException e) {} finally {
                 stop();
             }
         }).start();
@@ -83,8 +83,30 @@ public class InternalSubLogger {
                     if (!line.startsWith(">")) {
                         if (log.get()) {
                             String msg = line;
-                            msg = msg.replaceAll("^((?:\\s*\\[?[0-9]{2}:[0-9]{2}:[0-9]{2}]?)?\\s*(?:\\[|\\[.*\\/)?(INFO|WARN|WARNING|ERROR|ERR|SEVERE)\\]:?\\s*)", "");
-                            ProxyServer.getInstance().getLogger().severe(name + " > " + msg);
+                            // REGEX Formatting
+                            String type = "INFO";
+                            Matcher matcher = Pattern.compile("^((?:\\s*\\[?([0-9]{2}:[0-9]{2}:[0-9]{2})]?)?[\\s\\/\\\\\\|]*(?:\\[|\\[.*\\/)?(MESSAGE|INFO|WARN|WARNING|ERROR|ERR|SEVERE)\\]?:?\\s*)").matcher(msg);
+                            while (matcher.find()) {
+                                type = matcher.group(3).toUpperCase();
+                            }
+
+                            msg = msg.replaceAll("^((?:\\s*\\[?([0-9]{2}:[0-9]{2}:[0-9]{2})]?)?[\\s\\/\\\\\\|]*(?:\\[|\\[.*\\/)?(MESSAGE|INFO|WARN|WARNING|ERROR|ERR|SEVERE)\\]?:?\\s*)", "");
+
+                            switch (type) {
+                                case "INFO":
+                                case "MESSAGE":
+                                    ProxyServer.getInstance().getLogger().info(name + " > " + msg);
+                                    break;
+                                case "WARNING":
+                                case "WARN":
+                                    ProxyServer.getInstance().getLogger().warning(name + " > " + msg);
+                                    break;
+                                case "SEVERE":
+                                case "ERROR":
+                                case "ERR":
+                                    ProxyServer.getInstance().getLogger().severe(name + " > " + msg);
+                                    break;
+                            }
                         }
                         if (writer != null) {
                             writer.println(line);
@@ -92,8 +114,7 @@ public class InternalSubLogger {
                         }
                     }
                 }
-            } catch (IOException ioe) {
-            } finally {
+            } catch (IOException e) {} finally {
                 stop();
             }
         }).start();

@@ -13,7 +13,12 @@ public abstract class SubCreator {
     public enum ServerType {
         SPIGOT,
         VANILLA,
-        SPONGE,
+        SPONGE,;
+
+        @Override
+        public String toString() {
+            return super.toString().substring(0, 1).toUpperCase()+super.toString().substring(1).toLowerCase();
+        }
     }
 
     /**

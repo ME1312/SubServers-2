@@ -13,6 +13,7 @@ import net.ME1312.SubServers.Bungee.Library.Version.Version;
 import net.ME1312.SubServers.Bungee.Network.SubDataServer;
 import net.md_5.bungee.BungeeCord;
 import net.md_5.bungee.api.config.ServerInfo;
+import org.json.JSONObject;
 
 import java.io.*;
 import java.net.InetAddress;
@@ -20,6 +21,7 @@ import java.net.InetSocketAddress;
 import java.net.SocketException;
 import java.nio.file.Files;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Main Plugin Class
@@ -36,7 +38,7 @@ public final class SubPlugin extends BungeeCord {
     public YAMLConfig lang;
     public HashMap<String, String> exLang = new HashMap<String, String>();
     public SubDataServer subdata = null;
-    public final Version version = new Version("2.11.2b");
+    public final Version version = new Version("2.11.2c");
     protected Version bversion = null;
 
     protected boolean running = false;
@@ -105,6 +107,57 @@ public final class SubPlugin extends BungeeCord {
             }
         }
 
+        if (!(new UniversalFile(dir, "Plugin Templates:Spigot Plugins").exists())) {
+            new UniversalFile(dir, "Plugin Templates:Spigot Plugins").mkdirs();
+            System.out.println("SubServers > Created ~/SubServers/Plugin Templates/Spigot Plugins");
+        }
+        if (!(new UniversalFile(dir, "Plugin Templates:Sponge Config").exists())) {
+            new UniversalFile(dir, "Plugin Templates:Sponge Config").mkdir();
+            System.out.println("SubServers > Created ~/SubServers/Plugin Templates/Sponge Config");
+        }
+        if (!(new UniversalFile(dir, "Plugin Templates:Sponge Mods").exists())) {
+            new UniversalFile(dir, "Plugin Templates:Sponge Mods").mkdir();
+            System.out.println("SubServers > Created ~/SubServers/Plugin Templates/Sponge Mods");
+        }
+
+        if (new UniversalFile(dir, "Recently Deleted").exists()) {
+            int f = new UniversalFile(dir, "Recently Deleted").listFiles().length;
+            for (File file : new UniversalFile(dir, "Recently Deleted").listFiles()) {
+                try {
+                    if (file.isDirectory()) {
+                        if (new UniversalFile(dir, "Recently Deleted:" + file.getName() + ":info.json").exists()) {
+                            JSONObject json = new JSONObject(Util.readAll(new FileReader(new UniversalFile(dir, "Recently Deleted:" + file.getName() + ":info.json"))));
+                            if (json.keySet().contains("Timestamp")) {
+                                if (TimeUnit.MILLISECONDS.toDays(Calendar.getInstance().getTime().getTime() - json.getLong("Timestamp")) >= 7) {
+                                    Util.deleteDirectory(file);
+                                    f--;
+                                    System.out.println("SubServers > Removed ~/SubServers/Recently Deleted/" + file.getName());
+                                }
+                            } else {
+                                Util.deleteDirectory(file);
+                                f--;
+                                System.out.println("SubServers > Removed ~/SubServers/Recently Deleted/" + file.getName());
+                            }
+                        } else {
+                            Util.deleteDirectory(file);
+                            f--;
+                            System.out.println("SubServers > Removed ~/SubServers/Recently Deleted/" + file.getName());
+                        }
+                    } else {
+                        Files.delete(file.toPath());
+                        f--;
+                        System.out.println("SubServers > Removed ~/SubServers/Recently Deleted/" + file.getName());
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            if (f == 0) {
+                System.out.println("SubServers > Removed ~/SubServers/Recently Deleted");
+                Files.delete(new UniversalFile(dir, "Recently Deleted").toPath());
+            }
+        }
+
         hostDrivers.put("built-in", net.ME1312.SubServers.Bungee.Host.Internal.InternalHost.class);
 
         System.out.println("SubServers > Loading BungeeCord Libraries...");
@@ -160,7 +213,7 @@ public final class SubPlugin extends BungeeCord {
             System.out.println("SubServers > Loading SubServers...");
             for (String name : config.get().getSection("Servers").getKeys()) {
                 try {
-                    if (!this.hosts.keySet().contains(config.get().getSection("Servers").getSection(name).getString("Host").toLowerCase())) throw new InvalidServerException("There is no host with this name:" + name);
+                    if (!this.hosts.keySet().contains(config.get().getSection("Servers").getSection(name).getString("Host").toLowerCase())) throw new InvalidServerException("There is no host with this name: " + config.get().getSection("Servers").getSection(name).getString("Host"));
                     if (exServers.keySet().contains(name.toLowerCase())) {
                         exServers.remove(name.toLowerCase());
                         servers--;

@@ -1,9 +1,11 @@
 package net.ME1312.SubServers.Bungee;
 
+import com.google.common.io.Files;
 import net.ME1312.SubServers.Bungee.Host.Host;
 import net.ME1312.SubServers.Bungee.Host.Server;
 import net.ME1312.SubServers.Bungee.Host.SubCreator;
 import net.ME1312.SubServers.Bungee.Host.SubServer;
+import net.ME1312.SubServers.Bungee.Library.UniversalFile;
 import net.ME1312.SubServers.Bungee.Library.Util;
 import net.ME1312.SubServers.Bungee.Library.Version.Version;
 import net.md_5.bungee.api.ChatColor;
@@ -11,22 +13,25 @@ import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
-import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
+import net.md_5.bungee.api.plugin.TabExecutor;
 import net.md_5.bungee.command.ConsoleCommandSender;
+import org.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.*;
 
 /**
  * Plugin Command Class
  *
  * @author ME1312
  */
-public final class SubCommand extends Command {
+@SuppressWarnings("deprecation")
+public final class SubCommand extends Command implements TabExecutor {
     private SubPlugin plugin;
     private String label;
 
@@ -42,7 +47,6 @@ public final class SubCommand extends Command {
      * @param sender
      * @param args
      */
-    @SuppressWarnings("deprecation")
     @Override
     public void execute(CommandSender sender, String[] args) {
         if (sender instanceof ConsoleCommandSender) {
@@ -150,10 +154,64 @@ public final class SubCommand extends Command {
                         } else if (args.length > 6 && (Util.isException(() -> Integer.parseInt(args[6])) || Integer.parseInt(args[6]) < 256)) {
                             sender.sendMessage("SubServers > Invalid Ram Amount");
                         } else {
-                            plugin.hosts.get(args[2].toLowerCase()).getCreator().create(args[1], SubCreator.ServerType.valueOf(args[3].toUpperCase()), new Version(args[4]), (args.length > 6)?Integer.parseInt(args[6]):1024, Integer.parseInt(args[5]));
+                            plugin.hosts.get(args[2].toLowerCase()).getCreator().create(args[1], SubCreator.ServerType.valueOf(args[3].toUpperCase()), new Version(args[4]), (args.length > 6) ? Integer.parseInt(args[6]) : 1024, Integer.parseInt(args[5]));
                         }
                     } else {
                         sender.sendMessage("SubServers > Usage: " + label + " " + args[0].toLowerCase() + " <Name> <Host> <Type> <Version> <Port> [RAM]");
+                    }
+                } else if (args[0].equalsIgnoreCase("del") || args[0].equalsIgnoreCase("delete")) {
+                    if (args.length > 1) {
+                        Map<String, Server> servers = plugin.api.getServers();
+                        try {
+                            if (!servers.keySet().contains(args[1].toLowerCase())) {
+                                sender.sendMessage("SubServers > There is no server with that name");
+                            } else if (!(servers.get(args[1].toLowerCase()) instanceof SubServer)) {
+                                sender.sendMessage("SubServers > That Server is not a SubServer");
+                            } else if (((SubServer) servers.get(args[1].toLowerCase())).isRunning()) {
+                                sender.sendMessage("SubServers > That SubServer is still running");
+                            } else if (!((SubServer) servers.get(args[1].toLowerCase())).getHost().removeSubServer(args[1])) {
+                                sender.sendMessage("SubServers > Couldn't Remove SubServer");
+                            } else {
+                                new Thread(() -> {
+                                    UniversalFile to = new UniversalFile(plugin.dir, "SubServers:Recently Deleted:" + args[1].toLowerCase());
+                                    try {
+                                        File from = new File(((SubServer) servers.get(args[1].toLowerCase())).getHost().getDirectory(), ((SubServer) servers.get(args[1].toLowerCase())).getDirectory());
+                                        if (from.exists()) {
+                                            sender.sendMessage("SubServers > Removing Files...");
+                                            if (to.exists()) {
+                                                if (to.isDirectory()) Util.deleteDirectory(to);
+                                                else to.delete();
+                                            }
+                                            to.mkdirs();
+                                            Files.move(from, to);
+                                        }
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                    }
+                                    sender.sendMessage("SubServers > Saving...");
+                                    JSONObject json = (plugin.config.get().getSection("Servers").getKeys().contains(servers.get(args[1].toLowerCase()).getName()))?plugin.config.get().getSection("Servers").getSection(servers.get(args[1].toLowerCase()).getName()).toJSON():new JSONObject();
+                                    json.put("Name", servers.get(args[1].toLowerCase()).getName());
+                                    json.put("Timestamp", Calendar.getInstance().getTime().getTime());
+                                    try {
+                                        if (plugin.config.get().getSection("Servers").getKeys().contains(servers.get(args[1].toLowerCase()).getName())) {
+                                            plugin.config.get().getSection("Servers").remove(servers.get(args[1].toLowerCase()).getName());
+                                            plugin.config.save();
+                                        }
+                                        if (!to.exists()) to.mkdirs();
+                                        FileWriter writer = new FileWriter(new File(to, "info.json"));
+                                        json.write(writer);
+                                        writer.close();
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                    }
+                                    sender.sendMessage("SubServers > Done!");
+                                }).start();
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+                        sender.sendMessage("SubServers > Usage: " + label + " " + args[0].toLowerCase() + " <SubServer>");
                     }
                 } else {
                     sender.sendMessage("SubServers > Unknown sub-command: " + args[0]);
@@ -162,13 +220,105 @@ public final class SubCommand extends Command {
                 sender.sendMessages(printHelp());
             }
         } else {
-            String str = "";
-            int i = -1;
-            while ((i + 1) != args.length) {
-                i++;
-                str = str + " " + args[i];
+            String str = label;
+            for (String arg : args) str += ' ' + arg;
+            ((ProxiedPlayer) sender).chat(str);
+        }
+    }
+
+    @Override
+    public Iterable<String> onTabComplete(CommandSender sender, String[] args) {
+        String last = (args.length > 0)?args[args.length - 1].toLowerCase():"";
+        if (args.length <= 1) {
+            List<String> cmds = Arrays.asList("help", "list", "version", "start", "stop", "kill", "terminate", "cmd", "command", "create");
+            if (last.length() == 0) {
+                return cmds;
+            } else {
+                List<String> list = new ArrayList<String>();
+                for (String cmd : cmds) {
+                    if (cmd.startsWith(last)) list.add(cmd);
+                }
+                return list;
             }
-            ((ProxiedPlayer) sender).chat(label + str);
+        } else {
+            if (args[0].equals("start") ||
+                    args[0].equals("stop") ||
+                    args[0].equals("kill") || args[0].equals("terminate")) {
+                if (args.length == 2) {
+                    List<String> list = new ArrayList<String>();
+                    if (last.length() == 0) {
+                        for (SubServer server : plugin.api.getSubServers().values()) list.add(server.getName());
+                    } else {
+                        for (SubServer server : plugin.api.getSubServers().values()) {
+                            if (server.getName().toLowerCase().startsWith(last)) list.add(server.getName());
+                        }
+                    }
+                    return list;
+                }
+                return Collections.emptyList();
+            } else if (args[0].equals("cmd") || args[0].equals("command")) {
+                if (args.length == 2) {
+                    List<String> list = new ArrayList<String>();
+                    if (last.length() == 0) {
+                        for (SubServer server : plugin.api.getSubServers().values()) list.add(server.getName());
+                    } else {
+                        for (SubServer server : plugin.api.getSubServers().values()) {
+                            if (server.getName().toLowerCase().startsWith(last)) list.add(server.getName());
+                        }
+                    }
+                    return list;
+                } else if (args.length == 3) {
+                    if (last.length() == 0) {
+                        return Collections.singletonList("<Command>");
+                    }
+                } else {
+                    if (last.length() == 0) {
+                        return Collections.singletonList("[Args...]");
+                    }
+                }
+                return Collections.emptyList();
+            } else if (args[0].equals("create")) {
+                if (args.length == 2) {
+                    if (last.length() == 0) {
+                        return Collections.singletonList("<Name>");
+                    }
+                } else if (args.length == 3) {
+                    List<String> list = new ArrayList<String>();
+                    if (last.length() == 0) {
+                        for (Host host : plugin.api.getHosts().values()) list.add(host.getName());
+                    } else {
+                        for (Host host : plugin.api.getHosts().values()) {
+                            if (host.getName().toLowerCase().startsWith(last)) list.add(host.getName());
+                        }
+                    }
+                    return list;
+                } else if (args.length == 4) {
+                    List<String> list = new ArrayList<String>();
+                    if (last.length() == 0) {
+                        for (SubCreator.ServerType type : SubCreator.ServerType.values()) list.add(type.toString());
+                    } else {
+                        for (SubCreator.ServerType type : SubCreator.ServerType.values()) {
+                            if (type.toString().toLowerCase().startsWith(last)) list.add(type.toString());
+                        }
+                    }
+                    return list;
+                } else if (args.length == 5) {
+                    if (last.length() == 0) {
+                        return Collections.singletonList("<Version>");
+                    }
+                } else if (args.length == 6) {
+                    if (last.length() == 0) {
+                        return Collections.singletonList("<Port>");
+                    }
+                } else if (args.length == 7) {
+                    if (last.length() == 0) {
+                        return Collections.singletonList("[RAM]");
+                    }
+                }
+                return Collections.emptyList();
+            } else {
+                return Collections.emptyList();
+            }
         }
     }
 
@@ -183,15 +333,14 @@ public final class SubCommand extends Command {
                 "   Terminate Server: /sub kill <SubServer>",
                 "   Command Server: /sub cmd <SubServer> <Command> [Args...]",
                 "   Create Server: /sub create <Name> <Host> <Type> <Version> <Port> [RAM]",
+                "   Remove Server: /sub delete <SubServer>",
                 "",
                 "   To see BungeeCord Supplied Commands, please visit:",
                 "   https://www.spigotmc.org/wiki/bungeecord-commands/"
         };
     }
 
-
-
-    public static class BungeeServer extends Command {
+    public static class BungeeServer extends Command implements TabExecutor {
         private SubPlugin plugin;
         protected BungeeServer(SubPlugin plugin, String command) {
             super(command, "bungeecord.command.server");
@@ -230,6 +379,24 @@ public final class SubCommand extends Command {
                 }
             } else {
                 sender.sendMessage(plugin.lang.get().getSection("Lang").getColoredString("Command.Generic.Player-Only", '&'));
+            }
+        }
+
+        @Override
+        public Iterable<String> onTabComplete(CommandSender sender, String[] args) {
+            if (args.length <= 1) {
+                String last = (args.length > 0)?args[args.length - 1].toLowerCase():"";
+                if (last.length() == 0) {
+                    return plugin.getServers().keySet();
+                } else {
+                    List<String> list = new ArrayList<String>();
+                    for (String server : plugin.getServers().keySet()) {
+                        if (server.toLowerCase().startsWith(last)) list.add(server);
+                    }
+                    return list;
+                }
+            } else {
+                return Collections.emptyList();
             }
         }
     }

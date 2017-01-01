@@ -18,6 +18,7 @@ public class InternalSubServer extends SubServer {
     private InternalHost host;
     private boolean enabled;
     private Container<Boolean> log;
+    private String dir;
     private File directory;
     private Executable executable;
     private String stopcmd;
@@ -33,6 +34,7 @@ public class InternalSubServer extends SubServer {
         this.host = (InternalHost) host;
         this.enabled = enabled;
         this.log = new Container<Boolean>(log);
+        this.dir = directory;
         this.directory = new File(host.getDirectory(), directory);
         this.executable = executable;
         this.stopcmd = stopcmd;
@@ -190,6 +192,11 @@ public class InternalSubServer extends SubServer {
     @Override
     public void setLogging(boolean value) {
         log.set(value);
+    }
+
+    @Override
+    public String getDirectory() {
+        return dir;
     }
 
     @Override

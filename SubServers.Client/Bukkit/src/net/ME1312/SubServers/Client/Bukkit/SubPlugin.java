@@ -42,14 +42,15 @@ public final class SubPlugin extends JavaPlugin {
                 Bukkit.getLogger().info("SubServers > Updated ~/plugins/SubServers/config.yml");
             }
             pluginconf = new YAMLConfig(new UniversalFile(getDataFolder(), "config.yml"));
-            subdata = new SubDataClient(this, pluginconf.get().getSection("Settings").getSection("SubData").getString("Name", "~no_name"),
+            subdata = new SubDataClient(this, pluginconf.get().getSection("Settings").getSection("SubData").getString("Name", "undefined"),
                     InetAddress.getByName(pluginconf.get().getSection("Settings").getSection("SubData").getString("Address", "127.0.0.1:4391").split(":")[0]),
                     Integer.parseInt(pluginconf.get().getSection("Settings").getSection("SubData").getString("Address", "127.0.0.1:4391").split(":")[1]));
 
             gui = new UIListener(this);
-            getCommand("subservers").setExecutor(new SubCommand(this));
-            getCommand("subserver").setExecutor(new SubCommand(this));
-            getCommand("sub").setExecutor(new SubCommand(this));
+            SubCommand cmd = new SubCommand(this);
+            getCommand("subservers").setExecutor(cmd);
+            getCommand("subserver").setExecutor(cmd);
+            getCommand("sub").setExecutor(cmd);
         } catch (IOException e) {
             setEnabled(false);
             e.printStackTrace();

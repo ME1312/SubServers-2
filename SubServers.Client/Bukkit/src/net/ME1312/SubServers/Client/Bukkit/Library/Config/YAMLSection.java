@@ -69,6 +69,10 @@ public class YAMLSection {
 
     public void remove(String label) {
         map.remove(label);
+
+        if (this.label != null && this.up != null) {
+            this.up.set(this.label, this);
+        }
     }
 
     public void clear() {
