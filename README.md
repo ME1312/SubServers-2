@@ -1,5 +1,5 @@
 # SubServers 2
-SubServers 2 is a rewrite of SubServers, the Server Management Plugin.
+SubServers 2 is a rewrite of SubServers, the Server Management Plugin.<br>
 https://www.spigotmc.org/resources/subservers-2.11264/
 
 ### Documentation
