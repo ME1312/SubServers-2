@@ -1,4 +1,4 @@
-# SubServers 2
+#![SubServers 2](https://s30.postimg.org/fu575r281/Sub_Servers_Title.png)
 SubServers 2 is a rewrite of SubServers, the Server Management Plugin.<br>
 https://www.spigotmc.org/resources/subservers-2.11264/
 
