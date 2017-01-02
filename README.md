@@ -1,14 +1,12 @@
-# SubServers 2 [BETA]
+# SubServers 2
 SubServers 2 is a rewrite of SubServers, the Server Management Plugin.
+https://www.spigotmc.org/resources/subservers-2.11264/
 
-## Notable Improvements (Over SubServers v1)
-* Hosts (and Host Driver API)
-* SubData Direct (and API)
-* Names arn't case sensitive
-* The Proxy hosts the Servers (instead of the Servers hosting the Proxy)
-* Just about everything your players will see either looks like BungeeCord or is Customizable
+### Documentation
+> https://me1312.github.io/SubServers-2/JavaDoc/SubServers.Bungee/<br>
+> https://me1312.github.io/SubServers-2/JavaDoc/SubServers.Client.Bukkit/
 
-## How to Install/Update SubServers.Bungee
+## How to Install/Update SubServers.Bungee Pre-Releases
 1. Download BungeeCord ([Link](https://www.spigotmc.org/link-forums/bungeecord.28/))
 2. Download your favorite commit of SubServers.Bungee ([Click Here](https://github.com/ME1312/SubServers-2/tree/master/Artifacts) for the latest commit)
 3. Put them both in a folder together. It should now look like this:
@@ -17,7 +15,7 @@ SubServers 2 is a rewrite of SubServers, the Server Management Plugin.
 5. You can now launch SubServers via your terminal: `java -jar SubServers.Bungee.jar`
 6. All SubServers.Bungee commands can be accessed in console using `sub help`
 
-## How to Install/Update SubServers.Client
+## How to Install/Update SubServers.Client Pre-Releases
 1. Download your favorite commit of SubServers.Client ([Click Here](https://github.com/ME1312/SubServers-2/tree/master/Artifacts) for the latest commit)
 2. Put SubServers.Client into your server's plugins 
 3. If you are updating, make sure to update the files in `~/plugins/SubServers`, they wont reset themselves.
