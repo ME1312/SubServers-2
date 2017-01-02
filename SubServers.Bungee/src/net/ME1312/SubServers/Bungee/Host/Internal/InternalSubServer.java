@@ -57,12 +57,8 @@ public class InternalSubServer extends SubServer {
                 read.start();
                 command = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
 
-                try {
-                    process.waitFor();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            } catch (IOException e) {
+                process.waitFor();
+            } catch (IOException | InterruptedException e) {
                 e.printStackTrace();
                 allowrestart = false;
             }

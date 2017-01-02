@@ -38,7 +38,7 @@ public final class SubPlugin extends BungeeCord {
     public YAMLConfig lang;
     public HashMap<String, String> exLang = new HashMap<String, String>();
     public SubDataServer subdata = null;
-    public final Version version = new Version("2.11.2c");
+    public final Version version = new Version("2.11.2d");
     protected Version bversion = null;
 
     protected boolean running = false;
@@ -153,7 +153,6 @@ public final class SubPlugin extends BungeeCord {
                 }
             }
             if (f == 0) {
-                System.out.println("SubServers > Removed ~/SubServers/Recently Deleted");
                 Files.delete(new UniversalFile(dir, "Recently Deleted").toPath());
             }
         }
@@ -221,7 +220,7 @@ public final class SubPlugin extends BungeeCord {
                     SubServer server = this.hosts.get(config.get().getSection("Servers").getSection(name).getString("Host").toLowerCase()).addSubServer(name, config.get().getSection("Servers").getSection(name).getBoolean("Enabled"),
                             config.get().getSection("Servers").getSection(name).getInt("Port"), config.get().getSection("Servers").getSection(name).getColoredString("Motd", '&'), config.get().getSection("Servers").getSection(name).getBoolean("Log"),
                             config.get().getSection("Servers").getSection(name).getRawString("Directory"), new Executable(config.get().getSection("Servers").getSection(name).getRawString("Executable")), config.get().getSection("Servers").getSection(name).getRawString("Stop-Command"),
-                            config.get().getSection("Servers").getSection(name).getBoolean("Run-On-Launch"), config.get().getSection("Servers").getSection(name).getBoolean("Hidden"), config.get().getSection("Servers").getSection(name).getBoolean("Auto-Restart"), config.get().getSection("Servers").getSection(name).getBoolean("Restricted"), false);
+                            config.get().getSection("Servers").getSection(name).getBoolean("Run-On-Launch"), config.get().getSection("Servers").getSection(name).getBoolean("Auto-Restart"), config.get().getSection("Servers").getSection(name).getBoolean("Hidden"), config.get().getSection("Servers").getSection(name).getBoolean("Restricted"), false);
                     subservers++;
                 } catch (Exception e) {
                     e.printStackTrace();
