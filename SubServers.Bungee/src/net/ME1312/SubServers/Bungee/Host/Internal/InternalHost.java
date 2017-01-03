@@ -65,7 +65,7 @@ public class InternalHost extends Host {
     public int start(UUID player, String... servers) {
         int i = 0;
         for (String server : servers) {
-            if (this.servers.get(server.toLowerCase()).start(player)) i++;
+            if (getSubServer(server.toLowerCase()).start(player)) i++;
         }
         return i;
     }
@@ -74,7 +74,7 @@ public class InternalHost extends Host {
     public int stop(UUID player, String... servers) {
         int i = 0;
         for (String server : servers) {
-            if (this.servers.get(server.toLowerCase()).stop(player)) i++;
+            if (getSubServer(server.toLowerCase()).stop(player)) i++;
         }
         return i;
     }
@@ -83,7 +83,7 @@ public class InternalHost extends Host {
     public int terminate(UUID player, String... servers) {
         int i = 0;
         for (String server : servers) {
-            if (this.servers.get(server.toLowerCase()).terminate(player)) i++;
+            if (getSubServer(server.toLowerCase()).terminate(player)) i++;
         }
         return i;
     }
@@ -92,7 +92,7 @@ public class InternalHost extends Host {
     public int command(UUID player, String command, String... servers) {
         int i = 0;
         for (String server : servers) {
-            if (this.servers.get(server.toLowerCase()).command(player, command)) i++;
+            if (getSubServer(server.toLowerCase()).command(player, command)) i++;
         }
         return i;
     }
