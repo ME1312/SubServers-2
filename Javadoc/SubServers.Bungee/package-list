@@ -1,0 +1,10 @@
+net.ME1312.SubServers.Bungee
+net.ME1312.SubServers.Bungee.Event
+net.ME1312.SubServers.Bungee.Host
+net.ME1312.SubServers.Bungee.Host.Internal
+net.ME1312.SubServers.Bungee.Library
+net.ME1312.SubServers.Bungee.Library.Config
+net.ME1312.SubServers.Bungee.Library.Exception
+net.ME1312.SubServers.Bungee.Library.Version
+net.ME1312.SubServers.Bungee.Network
+net.ME1312.SubServers.Bungee.Network.Packet
