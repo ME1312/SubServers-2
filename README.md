@@ -1,6 +1,6 @@
 ![https://s30.postimg.org/fu575r281/Sub_Servers_Title.png](https://s30.postimg.org/fu575r281/Sub_Servers_Title.png)<br>
 SubServers 2 is a rewrite of SubServers, the Server Management Plugin.<br>
-https://www.spigotmc.org/resources/subservers-2.11264/
+[https://www.spigotmc.org/resources/subservers-2.11264/](https://www.spigotmc.org/resources/subservers-2.11264/)
 
 ### Documentation
 > [https://me1312.github.io/SubServers-2/JavaDoc/SubServers.Bungee/](https://me1312.github.io/SubServers-2/JavaDoc/SubServers.Bungee/)<br>
