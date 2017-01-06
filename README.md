@@ -3,8 +3,8 @@ SubServers 2 is a rewrite of SubServers, the Server Management Plugin.<br>
 [https://www.spigotmc.org/resources/subservers-2.11264/](https://www.spigotmc.org/resources/subservers-2.11264/)
 
 ### Documentation
-> [https://me1312.github.io/SubServers-2/Javadoc/SubServers.Bungee/](https://me1312.github.io/SubServers-2/Javadoc/SubServers.Bungee/)<br>
-> [https://me1312.github.io/SubServers-2/Javadoc/SubServers.Client.Bukkit/](https://me1312.github.io/SubServers-2/Javadoc/SubServers.Client.Bukkit/)
+> [https://repo.ME1312.net/SubServers-2/Javadoc/SubServers.Bungee/](https://repo.ME1312.net/SubServers-2/Javadoc/SubServers.Bungee/)<br>
+> [https://repo.ME1312.net/SubServers-2/Javadoc/SubServers.Client.Bukkit/](https://repo.ME1312.net/SubServers-2/Javadoc/SubServers.Client.Bukkit/)
 
 ## How to Install/Update SubServers.Bungee Pre-Releases
 1. Download BungeeCord ([Link](https://www.spigotmc.org/link-forums/bungeecord.28/))
