@@ -3,13 +3,13 @@ SubServers 2 is a rewrite of SubServers, the Server Management Plugin.<br>
 [https://www.spigotmc.org/resources/subservers-2.11264/](https://www.spigotmc.org/resources/subservers-2.11264/)
 
 ### Documentation
-> [https://repo.ME1312.net/SubServers-2/Javadoc/SubServers.Bungee/](https://repo.ME1312.net/SubServers-2/Javadoc/SubServers.Bungee/)<br>
-> [https://repo.ME1312.net/SubServers-2/Javadoc/SubServers.Client.Bukkit/](https://repo.ME1312.net/SubServers-2/Javadoc/SubServers.Client.Bukkit/)
+> [https://subservers.ME1312.net/Javadoc/SubServers.Bungee/](https://subservers.ME1312.net/Javadoc/SubServers.Bungee/)<br>
+> [https://subservers.ME1312.net/Javadoc/SubServers.Client.Bukkit/](https://subservers.ME1312.net/Javadoc/SubServers.Client.Bukkit/)
 
 ## How to Install/Update SubServers.Bungee Pre-Releases
 1. Download BungeeCord ([Link](https://www.spigotmc.org/link-forums/bungeecord.28/))
 2. Download your favorite commit of SubServers.Bungee ([Click Here](https://github.com/ME1312/SubServers-2/tree/master/Artifacts) for the latest commit)
-3. Put them both in a folder together. It should now look like this:
+3. Put them both in a folder together. It should now look like this:<br>
 ![Example Folder](https://s30.postimg.org/qhcx95jep/Screen_Shot_2016_12_15_at_4_30_15_PM.png)
 4. If you are updating, make sure to update the files in `~/SubServers`, they wont reset themselves.
 5. You can now launch SubServers via your terminal: `java -jar SubServers.Bungee.jar`
