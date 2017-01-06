@@ -20,7 +20,7 @@ import java.util.List;
  */
 public final class SubDataServer {
     private static HashMap<Class<? extends PacketOut>, String> pOut = new HashMap<Class<? extends PacketOut>, String>();
-    private static HashMap<String, PacketIn> pIn = new HashMap<String, PacketIn>();
+    private static HashMap<String, List<PacketIn>> pIn = new HashMap<String, List<PacketIn>>();
     private static List<InetAddress> allowedAddresses = new ArrayList<InetAddress>();
     private static boolean defaults = false;
     private HashMap<InetSocketAddress, Client> clients = new HashMap<InetSocketAddress, Client>();
@@ -174,11 +174,9 @@ public final class SubDataServer {
      * @param handle Handle to Bind
      */
     public static void registerPacket(PacketIn packet, String handle) {
-        if (!pIn.keySet().contains(handle)) {
-            pIn.put(handle, packet);
-        } else {
-            throw new IllegalStateException("PacketIn Handle \"" + handle + "\" is already in use!");
-        }
+        List<PacketIn> list = (pIn.keySet().contains(handle))?pIn.get(handle):new ArrayList<PacketIn>();
+        if (!list.contains(packet)) list.add(packet);
+        pIn.put(handle, list);
     }
 
     /**
@@ -188,25 +186,21 @@ public final class SubDataServer {
      * @param handle Handle to bind
      */
     public static void registerPacket(Class<? extends PacketOut> packet, String handle) {
-        if (!pOut.values().contains(handle)) {
-            pOut.put(packet, handle);
-        } else {
-            throw new IllegalStateException("PacketOut Handle \"" + handle + "\" is already in use!");
-        }
+        pOut.put(packet, handle);
     }
 
     /**
-     * Grab PacketIn Instance via handle
+     * Grab PacketIn Instances via handle
      *
      * @param handle Handle
      * @return PacketIn
      */
-    public static PacketIn getPacket(String handle) {
+    public static List<? extends PacketIn> getPacket(String handle) {
         return pIn.get(handle);
     }
 
     /**
-     * Broadcast a Packet to everything on the Network
+     * Broadcast a Packet to everything on the Network<br>
      * <b>Warning:</b> There are usually different types of applications on the network at once, they may not recognise the same packet handles
      *
      * @param packet Packet to send
@@ -263,13 +257,20 @@ public final class SubDataServer {
      * @throws IllegalPacketException
      * @throws InvocationTargetException
      */
-    protected static PacketIn decodePacket(JSONObject json) throws IllegalPacketException, InvocationTargetException {
+    protected static List<PacketIn> decodePacket(JSONObject json) throws IllegalPacketException, InvocationTargetException {
         if (!json.keySet().contains("h") || !json.keySet().contains("v")) throw new IllegalPacketException("Unknown Packet Format: " + json.toString());
         if (!pIn.keySet().contains(json.getString("h"))) throw new IllegalPacketException("Unknown PacketIn Channel: " + json.getString("h"));
 
-        PacketIn packet = pIn.get(json.getString("h"));
-        if (!new Version(json.getString("v")).equals(packet.getVersion())) throw new IllegalPacketException("Packet Version Mismatch in " + json.getString("h") + ": " + json.getString("v") + "->" + packet.getVersion().toString());
-        return packet;
+        List<PacketIn> list = new ArrayList<PacketIn>();
+        for (PacketIn packet : pIn.get(json.getString("h"))) {
+            if (new Version(json.getString("v")).equals(packet.getVersion())) {
+                list.add(packet);
+            } else {
+                new IllegalPacketException("Packet Version Mismatch in " + json.getString("h") + ": " + json.getString("v") + " -> " + packet.getVersion().toString()).printStackTrace();
+            }
+        }
+
+        return list;
     }
 
     /**

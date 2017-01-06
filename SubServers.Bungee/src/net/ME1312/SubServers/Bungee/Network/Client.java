@@ -68,12 +68,13 @@ public final class Client {
                 while ((input = in.readLine()) != null) {
                     try {
                         JSONObject json = new JSONObject(input);
-                        PacketIn packet = SubDataServer.decodePacket(json);
-                        if (authorized == null || packet instanceof PacketAuthorization) {
-                            try {
-                                packet.execute(instance, (json.keySet().contains("c")) ? json.getJSONObject("c") : null);
-                            } catch (Exception e) {
-                                new InvocationTargetException(e, "Exception while executing PacketIn").printStackTrace();
+                        for (PacketIn packet : SubDataServer.decodePacket(json)) {
+                            if (authorized == null || packet instanceof PacketAuthorization) {
+                                try {
+                                    packet.execute(instance, (json.keySet().contains("c")) ? json.getJSONObject("c") : null);
+                                } catch (Exception e) {
+                                    new InvocationTargetException(e, "Exception while executing PacketIn").printStackTrace();
+                                }
                             }
                         }
                     } catch (IllegalPacketException e) {
@@ -159,7 +160,7 @@ public final class Client {
     }
 
     /**
-     * Sets the Handler
+     * Sets the Handler<br>
      * <b>Warning:</b> This method should only be called by ClientHandler methods
      *
      * @see ClientHandler

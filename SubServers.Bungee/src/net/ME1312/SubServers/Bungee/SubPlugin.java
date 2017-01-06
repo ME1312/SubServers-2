@@ -38,8 +38,8 @@ public final class SubPlugin extends BungeeCord {
     public YAMLConfig lang;
     public HashMap<String, String> exLang = new HashMap<String, String>();
     public SubDataServer subdata = null;
-    public final Version version = new Version("2.11.2d");
-    protected Version bversion = null;
+    public final Version version = new Version("2.11.2e");
+    protected Version bversion = new Version(1);
 
     protected boolean running = false;
     public final SubAPI api = new SubAPI(this);

@@ -17,14 +17,13 @@ import java.util.TreeMap;
 import java.util.UUID;
 
 public class InternalHost extends Host {
-    HashMap<String, SubServer> servers = new HashMap<String, SubServer>();
-
+    private HashMap<String, SubServer> servers = new HashMap<String, SubServer>();
     private String name;
     private boolean enabled;
     private InetAddress address;
     private InternalSubCreator creator;
     private String directory;
-    SubPlugin plugin;
+    protected SubPlugin plugin;
 
     public InternalHost(SubPlugin plugin, String name, Boolean enabled, InetAddress address, String directory, String gitBash) {
         super(plugin, name, enabled, address, directory, gitBash);

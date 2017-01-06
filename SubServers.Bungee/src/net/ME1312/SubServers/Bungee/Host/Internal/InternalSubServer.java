@@ -48,53 +48,52 @@ public class InternalSubServer extends SubServer {
     }
 
     private void run() {
-        (thread = new Thread(() -> {
-            allowrestart = true;
+
+        allowrestart = true;
+        try {
+            process = Runtime.getRuntime().exec(executable.toString(), null, directory);
+            System.out.println("SubServers > Now starting " + getName());
+            final InternalSubLogger read = new InternalSubLogger(process, getName(), log, null);
+            read.start();
+            command = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
+
+            process.waitFor();
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+            allowrestart = false;
+        }
+
+        SubStoppedEvent event = new SubStoppedEvent(this);
+        host.plugin.getPluginManager().callEvent(event);
+        System.out.println("SubServers > " + getName() + " has stopped");
+        process = null;
+        command = null;
+
+        if (isTemporary()) {
             try {
-                process = Runtime.getRuntime().exec(executable.toString(), null, directory);
-                System.out.println("SubServers > Now starting " + getName());
-                final InternalSubLogger read = new InternalSubLogger(process, getName(), log, null);
-                read.start();
-                command = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
-
-                process.waitFor();
-            } catch (IOException | InterruptedException e) {
+                host.removeSubServer(getName());
+            } catch (InterruptedException e) {
                 e.printStackTrace();
-                allowrestart = false;
             }
-
-            SubStoppedEvent event = new SubStoppedEvent(this);
-            host.plugin.getPluginManager().callEvent(event);
-            System.out.println("SubServers > " + getName() + " has stopped");
-            process = null;
-            command = null;
-
-            if (temporary) {
+        } else {
+            if (willAutoRestart() && allowrestart) {
                 try {
-                    host.removeSubServer(getName());
+                    Thread.sleep(2500);
+                    start();
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-            } else {
-                if (restart && allowrestart) {
-                    try {
-                        Thread.sleep(2500);
-                        start();
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
             }
-        })).start();
+        }
     }
 
     @Override
     public boolean start(UUID player) {
-        if (enabled && !isRunning()) {
+        if (isEnabled() && !isRunning()) {
             SubStartEvent event = new SubStartEvent(player, this);
             host.plugin.getPluginManager().callEvent(event);
             if (!event.isCancelled()) {
-                run();
+                (thread = new Thread(() -> run())).start();
                 return true;
             } else return false;
         } else return false;

@@ -16,11 +16,13 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.SocketException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public final class SubDataClient {
     private static HashMap<Class<? extends PacketOut>, String> pOut = new HashMap<Class<? extends PacketOut>, String>();
-    private static HashMap<String, PacketIn> pIn = new HashMap<String, PacketIn>();
+    private static HashMap<String, List<PacketIn>> pIn = new HashMap<String, List<PacketIn>>();
     private static boolean defaults = false;
     private PrintWriter writer;
     private Socket socket;
@@ -89,11 +91,12 @@ public final class SubDataClient {
                 while ((input = in.readLine()) != null) {
                     try {
                         JSONObject json = new JSONObject(input);
-                        PacketIn packet = decodePacket(json);
-                        try {
-                            packet.execute((json.keySet().contains("c")) ? json.getJSONObject("c") : null);
-                        } catch (Exception e) {
-                            new InvocationTargetException(e, "Exception while executing PacketIn").printStackTrace();
+                        for (PacketIn packet : decodePacket(json)) {
+                            try {
+                                packet.execute((json.keySet().contains("c")) ? json.getJSONObject("c") : null);
+                            } catch (Exception e) {
+                                new InvocationTargetException(e, "Exception while executing PacketIn").printStackTrace();
+                            }
                         }
                     } catch (IllegalPacketException e) {
                         e.printStackTrace();
@@ -142,7 +145,9 @@ public final class SubDataClient {
      * @param handle Handle to Bind
      */
     public static void registerPacket(PacketIn packet, String handle) {
-        pIn.put(handle, packet);
+        List<PacketIn> list = (pIn.keySet().contains(handle))?pIn.get(handle):new ArrayList<PacketIn>();
+        if (!list.contains(packet)) list.add(packet);
+        pIn.put(handle, list);
     }
 
     /**
@@ -156,12 +161,12 @@ public final class SubDataClient {
     }
 
     /**
-     * Grab PacketIn Instance via handle
+     * Grab PacketIn Instances via handle
      *
      * @param handle Handle
      * @return PacketIn
      */
-    public static PacketIn getPacket(String handle) {
+    public static List<? extends PacketIn> getPacket(String handle) {
         return pIn.get(handle);
     }
 
@@ -185,7 +190,7 @@ public final class SubDataClient {
      * @return JSON Formatted Packet
      * @throws IllegalPacketException
      */
-    protected static JSONObject encodePacket(PacketOut packet) throws IllegalPacketException {
+    private static JSONObject encodePacket(PacketOut packet) throws IllegalPacketException {
         JSONObject json = new JSONObject();
 
         if (!pOut.keySet().contains(packet.getClass())) throw new IllegalPacketException("Unknown PacketOut Channel: " + packet.getClass().getCanonicalName());
@@ -206,13 +211,20 @@ public final class SubDataClient {
      * @throws IllegalPacketException
      * @throws InvocationTargetException
      */
-    protected static PacketIn decodePacket(JSONObject json) throws IllegalPacketException, InvocationTargetException {
+    private static List<PacketIn> decodePacket(JSONObject json) throws IllegalPacketException, InvocationTargetException {
         if (!json.keySet().contains("h") || !json.keySet().contains("v")) throw new IllegalPacketException("Unknown Packet Format: " + json.toString());
         if (!pIn.keySet().contains(json.getString("h"))) throw new IllegalPacketException("Unknown PacketIn Channel: " + json.getString("h"));
 
-        PacketIn packet = pIn.get(json.getString("h"));
-        if (!new Version(json.getString("v")).equals(packet.getVersion())) throw new IllegalPacketException("Packet Version Mismatch in " + json.getString("h") + ": " + json.getString("v") + "->" + packet.getVersion().toString());
-        return packet;
+        List<PacketIn> list = new ArrayList<PacketIn>();
+        for (PacketIn packet : pIn.get(json.getString("h"))) {
+            if (new Version(json.getString("v")).equals(packet.getVersion())) {
+                list.add(packet);
+            } else {
+                new IllegalPacketException("Packet Version Mismatch in " + json.getString("h") + ": " + json.getString("v") + " -> " + packet.getVersion().toString()).printStackTrace();
+            }
+        }
+
+        return list;
     }
 
     /**
