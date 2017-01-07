@@ -25,8 +25,6 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * Main Plugin Class
- *
- * @author ME1312
  */
 public final class SubPlugin extends BungeeCord {
     protected final HashMap<String, Class<? extends Host>> hostDrivers = new HashMap<String, Class<? extends Host>>();
@@ -39,7 +37,7 @@ public final class SubPlugin extends BungeeCord {
     public HashMap<String, String> exLang = new HashMap<String, String>();
     public SubDataServer subdata = null;
     public final Version version = new Version("2.11.2e");
-    protected Version bversion = new Version(1);
+    protected Version bversion = new Version(2);
 
     protected boolean running = false;
     public final SubAPI api = new SubAPI(this);

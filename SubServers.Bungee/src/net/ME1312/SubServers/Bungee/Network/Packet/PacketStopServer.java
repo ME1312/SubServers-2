@@ -12,16 +12,31 @@ import org.json.JSONObject;
 import java.util.Map;
 import java.util.UUID;
 
+/**
+ * Stop Server Packet
+ */
 public class PacketStopServer implements PacketIn, PacketOut {
     private SubPlugin plugin;
     private int response;
     private String message;
     private String id;
 
+    /**
+     * New PacketStopServer (In)
+     *
+     * @param plugin SubPlugin
+     */
     public PacketStopServer(SubPlugin plugin) {
         this.plugin = plugin;
     }
 
+    /**
+     * New PacketStopServer (Out)
+     *
+     * @param response Response ID
+     * @param message Message
+     * @param id Receiver ID
+     */
     public PacketStopServer(int response, String message, String id) {
         this.response = response;
         this.message = message;

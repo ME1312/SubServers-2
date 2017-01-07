@@ -9,6 +9,9 @@ import net.md_5.bungee.api.plugin.Event;
 
 import java.util.UUID;
 
+/**
+ * Server Create Event
+ */
 public class SubCreateEvent extends Event implements SubEvent, Cancellable {
     private boolean cancelled = false;
     private UUID player;
@@ -123,12 +126,14 @@ public class SubCreateEvent extends Event implements SubEvent, Cancellable {
 
     /**
      * Gets the player that triggered the Event
+     *
      * @return The Player that triggered this Event or null if Console
      */
     public UUID getPlayer() { return player; }
 
     /**
      * Gets the Cancelled Status
+     *
      * @return Cancelled Status
      */
     public boolean isCancelled() {

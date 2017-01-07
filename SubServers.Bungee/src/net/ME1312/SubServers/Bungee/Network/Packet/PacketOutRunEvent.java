@@ -16,15 +16,29 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Event Send Packet
+ */
 public class PacketOutRunEvent implements Listener, PacketOut {
     private SubPlugin plugin;
     private Map<String, ?> args;
     private String type;
 
+    /**
+     * New PacketOutRunEvent (Registerer)
+     *
+     * @param plugin
+     */
     public PacketOutRunEvent(SubPlugin plugin) {
         this.plugin = plugin;
     }
 
+    /**
+     * New PacketOutRunEvent (Out)
+     *
+     * @param event Event to be run
+     * @param args Arguments
+     */
     public PacketOutRunEvent(Class<? extends SubEvent> event, Map<String, ?> args) {
         this.type = event.getSimpleName();
         this.args = args;

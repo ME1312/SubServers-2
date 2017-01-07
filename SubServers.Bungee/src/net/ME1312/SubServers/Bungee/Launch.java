@@ -14,8 +14,6 @@ import net.md_5.bungee.command.ConsoleCommandSender;
 
 /**
  * SubServers/BungeeCord Class
- *
- * @author ME1312
  */
 public final class Launch {
 

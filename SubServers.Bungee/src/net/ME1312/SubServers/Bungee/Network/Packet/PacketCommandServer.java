@@ -12,16 +12,31 @@ import org.json.JSONObject;
 import java.util.Map;
 import java.util.UUID;
 
+/**
+ * Server Command Packet
+ */
 public class PacketCommandServer implements PacketIn, PacketOut {
     private SubPlugin plugin;
     private int response;
     private String message;
     private String id;
 
+    /**
+     * New PacketCommandServer (In)
+     *
+     * @param plugin SubPlugin
+     */
     public PacketCommandServer(SubPlugin plugin) {
         this.plugin = plugin;
     }
 
+    /**
+     * New PacketCommandServer (Out)
+     *
+     * @param response Response ID
+     * @param message Message
+     * @param id Receiver ID
+     */
     public PacketCommandServer(int response, String message, String id) {
         this.response = response;
         this.message = message;

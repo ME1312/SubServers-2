@@ -7,15 +7,29 @@ import net.ME1312.SubServers.Bungee.Network.PacketOut;
 import net.ME1312.SubServers.Bungee.SubPlugin;
 import org.json.JSONObject;
 
-public class PacketAuthorization implements PacketIn, PacketOut {
+/**
+ * Authorization Packet
+ */
+public final class PacketAuthorization implements PacketIn, PacketOut {
     private SubPlugin plugin;
     private int response;
     private String message;
 
+    /**
+     * New PacketAuthorization (In)
+     *
+     * @param plugin SubPlugin
+     */
     public PacketAuthorization(SubPlugin plugin) {
         this.plugin = plugin;
     }
 
+    /**
+     * New PacketAuthorization (Out)
+     *
+     * @param response Response ID
+     * @param message Message
+     */
     public PacketAuthorization(int response, String message) {
         this.response = response;
         this.message = message;

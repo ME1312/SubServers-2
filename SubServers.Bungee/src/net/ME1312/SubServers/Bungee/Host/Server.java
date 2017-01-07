@@ -1,19 +1,21 @@
 package net.ME1312.SubServers.Bungee.Host;
 
+import net.ME1312.SubServers.Bungee.Library.Config.YAMLSection;
+import net.ME1312.SubServers.Bungee.Library.Config.YAMLValue;
 import net.ME1312.SubServers.Bungee.Library.Exception.InvalidServerException;
 import net.ME1312.SubServers.Bungee.Network.Client;
 import net.ME1312.SubServers.Bungee.Network.ClientHandler;
 import net.md_5.bungee.BungeeServerInfo;
 import net.md_5.bungee.api.ChatColor;
+import org.json.JSONObject;
 
 import java.net.InetSocketAddress;
 
 /**
  * Server Class
- *
- * @author ME1312
  */
 public class Server extends BungeeServerInfo implements ClientHandler {
+    private YAMLSection extra = new YAMLSection();
     private Client client = null;
     private String motd;
     private boolean restricted;
@@ -96,5 +98,44 @@ public class Server extends BungeeServerInfo implements ClientHandler {
      */
     public void setRestricted(boolean value) {
         this.restricted = value;
+    }
+
+    /**
+     * Add an extra value to this Server
+     *
+     * @param key Key
+     * @param value Value
+     */
+    public void addExtra(String key, Object value) {
+        extra.set(key, value);
+    }
+
+    /**
+     * Determine if an extra value exists
+     *
+     * @param key Key
+     * @return Value Status
+     */
+    public boolean hasExtra(String key) {
+        return extra.getKeys().contains(key);
+    }
+
+    /**
+     * Get an extra value
+     *
+     * @param key Key
+     * @return Value
+     */
+    public YAMLValue getExtra(String key) {
+        return extra.get(key);
+    }
+
+    /**
+     * Get all of the extra values
+     *
+     * @return JSON Formatted Extra Values
+     */
+    public JSONObject getExtra() {
+        return extra.toJSON();
     }
 }

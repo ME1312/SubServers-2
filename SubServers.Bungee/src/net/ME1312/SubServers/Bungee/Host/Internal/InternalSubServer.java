@@ -6,7 +6,6 @@ import net.ME1312.SubServers.Bungee.Library.Container;
 import net.ME1312.SubServers.Bungee.Library.Exception.InvalidServerException;
 import net.ME1312.SubServers.Bungee.Host.Host;
 import net.ME1312.SubServers.Bungee.Host.SubServer;
-import net.ME1312.SubServers.Bungee.Library.NamedContainer;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -14,6 +13,9 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.UUID;
 
+/**
+ * Internal SubServer Class
+ */
 public class InternalSubServer extends SubServer {
     private InternalHost host;
     private boolean enabled;
@@ -29,9 +31,28 @@ public class InternalSubServer extends SubServer {
     private boolean allowrestart;
     private boolean temporary;
 
-    public InternalSubServer(Host host, String name, boolean enabled, int port, String motd, boolean log, String directory, Executable executable, String stopcmd, boolean start, boolean restart, boolean hidden, boolean restricted, boolean temporary) throws InvalidServerException {
+    /**
+     * Creates an Internal SubServer
+     *
+     * @param host Host
+     * @param name Name
+     * @param enabled Enabled Status
+     * @param port Port Number
+     * @param motd MOTD
+     * @param log Logging Status
+     * @param directory Directory
+     * @param executable Executable String
+     * @param stopcmd Stop Command
+     * @param start Auto-Start
+     * @param restart Auto-Restart
+     * @param hidden Hidden Status
+     * @param restricted Restricted Status
+     * @param temporary Temporary Status
+     * @throws InvalidServerException
+     */
+    public InternalSubServer(InternalHost host, String name, boolean enabled, int port, String motd, boolean log, String directory, Executable executable, String stopcmd, boolean start, boolean restart, boolean hidden, boolean restricted, boolean temporary) throws InvalidServerException {
         super(host, name, port, motd, hidden, restricted);
-        this.host = (InternalHost) host;
+        this.host = host;
         this.enabled = enabled;
         this.log = new Container<Boolean>(log);
         this.dir = directory;

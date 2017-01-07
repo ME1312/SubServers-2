@@ -167,7 +167,7 @@ public final class SubDataClient {
      * @return PacketIn
      */
     public static List<? extends PacketIn> getPacket(String handle) {
-        return pIn.get(handle);
+        return new ArrayList<PacketIn>(pIn.get(handle));
     }
 
     /**

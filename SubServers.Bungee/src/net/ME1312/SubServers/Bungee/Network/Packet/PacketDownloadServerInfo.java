@@ -10,14 +10,30 @@ import net.ME1312.SubServers.Bungee.SubPlugin;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import org.json.JSONObject;
 
+/**
+ * Download Server Info Packet
+ */
 public class PacketDownloadServerInfo implements PacketIn, PacketOut {
     private SubPlugin plugin;
     private Server server;
     private String id;
 
+    /**
+     * New PacketDownloadServerInfo (In)
+     *
+     * @param plugin SubPlugin
+     */
     public PacketDownloadServerInfo(SubPlugin plugin) {
         this.plugin = plugin;
     }
+
+    /**
+     * New PacketDownloadServerInfo (Out)
+     *
+     * @param plugin SubPlugin
+     * @param server Server
+     * @param id Receiver ID
+     */
     public PacketDownloadServerInfo(SubPlugin plugin, Server server, String id) {
         this.plugin = plugin;
         this.server = server;
@@ -49,6 +65,7 @@ public class PacketDownloadServerInfo implements PacketIn, PacketOut {
             info.put("hidden", server.isHidden());
             info.put("motd", server.getMotd());
             info.put("subdata", server.getSubDataClient() == null);
+            info.put("extra", server.getExtra());
 
             JSONObject players = new JSONObject();
             for (ProxiedPlayer player : server.getPlayers()) {

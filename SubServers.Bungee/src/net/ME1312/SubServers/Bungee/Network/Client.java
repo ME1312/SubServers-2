@@ -19,8 +19,6 @@ import java.util.TimerTask;
 
 /**
  * Network Client Class
- *
- * @author ME1312
  */
 public final class Client {
     private Socket socket;
@@ -72,7 +70,7 @@ public final class Client {
                             if (authorized == null || packet instanceof PacketAuthorization) {
                                 try {
                                     packet.execute(instance, (json.keySet().contains("c")) ? json.getJSONObject("c") : null);
-                                } catch (Exception e) {
+                                } catch (Throwable e) {
                                     new InvocationTargetException(e, "Exception while executing PacketIn").printStackTrace();
                                 }
                             }

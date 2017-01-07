@@ -7,13 +7,28 @@ import net.ME1312.SubServers.Bungee.Network.PacketOut;
 import net.ME1312.SubServers.Bungee.SubPlugin;
 import org.json.JSONObject;
 
+/**
+ * Download Lang Packet
+ */
 public class PacketDownloadLang implements PacketIn, PacketOut {
     private SubPlugin plugin;
     private String id;
 
+    /**
+     * New PacketDownloadLang (In)
+     *
+     * @param plugin SubPlugin
+     */
     public PacketDownloadLang(SubPlugin plugin) {
         this.plugin = plugin;
     }
+
+    /**
+     * New PacketDownloadLang (Out)
+     *
+     * @param plugin SubPlugin
+     * @param id Receiver ID
+     */
     public PacketDownloadLang(SubPlugin plugin, String id) {
         this.plugin = plugin;
         this.id = id;

@@ -11,12 +11,22 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Map;
 
+/**
+ * YAML Config Class
+ */
 @SuppressWarnings("unused")
 public class YAMLConfig {
     private File file;
     private Yaml yaml;
     private YAMLSection config;
 
+    /**
+     * Creates/Loads a YAML Formatted Config
+     *
+     * @param file
+     * @throws IOException
+     * @throws YAMLException
+     */
     @SuppressWarnings("unchecked")
     public YAMLConfig(File file) throws IOException, YAMLException {
         if (file.exists()) {
@@ -26,19 +36,39 @@ public class YAMLConfig {
         }
     }
 
+    /**
+     * Get Config Contents
+     *
+     * @return Config Contents
+     */
     public YAMLSection get() {
         return config;
     }
 
-    public void set(YAMLSection yaml) {
-        config = yaml;
+    /**
+     * Set Config Contents
+     *
+     * @param value Value
+     */
+    public void set(YAMLSection value) {
+        config = value;
     }
 
+    /**
+     * Reload Config Contents
+     *
+     * @throws IOException
+     */
     @SuppressWarnings("unchecked")
     public void reload() throws IOException {
         config = new YAMLSection((Map<String, Object>) yaml.load(new FileInputStream(file)), null, null, yaml);
     }
 
+    /**
+     * Save Config Contents
+     *
+     * @throws IOException
+     */
     public void save() throws IOException {
         FileWriter writer = new FileWriter(file);
         yaml.dump(config.map, writer);
@@ -50,6 +80,11 @@ public class YAMLConfig {
         return yaml.dump(config.map);
     }
 
+    /**
+     * Converts Config Contents to JSON
+     *
+     * @return JSON Formatted Config Contents
+     */
     public JSONObject toJSON() {
         return new JSONObject(config.map);
     }

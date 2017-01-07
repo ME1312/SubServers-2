@@ -11,14 +11,30 @@ import net.ME1312.SubServers.Bungee.SubPlugin;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import org.json.JSONObject;
 
+/**
+ * Download Server List Packet
+ */
 public class PacketDownloadServerList implements PacketIn, PacketOut {
     private SubPlugin plugin;
     private String host;
     private String id;
 
+    /**
+     * New PacketDownloadServerList (In)
+     *
+     * @param plugin SubPlugin
+     */
     public PacketDownloadServerList(SubPlugin plugin) {
         this.plugin = plugin;
     }
+
+    /**
+     * New PacketDownloadServerList (Out)
+     *
+     * @param plugin SubPlugin
+     * @param host Host (or null for all)
+     * @param id Receiver ID
+     */
     public PacketDownloadServerList(SubPlugin plugin, String host, String id) {
         this.plugin = plugin;
         this.host = host;

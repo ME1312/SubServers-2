@@ -11,8 +11,6 @@ import java.util.UUID;
 
 /**
  * Host Layout Class
- *
- * @author ME1312
  */
 public abstract class Host {
 

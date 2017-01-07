@@ -9,7 +9,7 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 
-public class PacketAuthorization implements PacketIn, PacketOut {
+public final class PacketAuthorization implements PacketIn, PacketOut {
     private SubPlugin plugin;
 
     public PacketAuthorization(SubPlugin plugin) {

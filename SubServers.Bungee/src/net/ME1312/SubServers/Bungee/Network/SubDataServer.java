@@ -7,7 +7,6 @@ import net.ME1312.SubServers.Bungee.SubPlugin;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.net.*;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,8 +14,6 @@ import java.util.List;
 
 /**
  * SubDataServer Class
- *
- * @author ME1312
  */
 public final class SubDataServer {
     private static HashMap<Class<? extends PacketOut>, String> pOut = new HashMap<Class<? extends PacketOut>, String>();
@@ -196,7 +193,7 @@ public final class SubDataServer {
      * @return PacketIn
      */
     public static List<? extends PacketIn> getPacket(String handle) {
-        return pIn.get(handle);
+        return new ArrayList<PacketIn>(pIn.get(handle));
     }
 
     /**
@@ -240,7 +237,7 @@ public final class SubDataServer {
         JSONObject json = new JSONObject();
 
         if (!pOut.keySet().contains(packet.getClass())) throw new IllegalPacketException("Unknown PacketOut Channel: " + packet.getClass().getCanonicalName());
-        if (packet.getVersion().toString() == null) throw new NullPointerException("PacketOut Version cannot be null: " + packet.getClass().getCanonicalName());
+        if (packet.getVersion().toString() == null) throw new NullPointerException("PacketOut getVersion() cannot be null: " + packet.getClass().getCanonicalName());
 
         JSONObject contents = packet.generate();
         json.put("h", pOut.get(packet.getClass()));
@@ -255,9 +252,8 @@ public final class SubDataServer {
      * @param json JSON to Decode
      * @return PacketIn
      * @throws IllegalPacketException
-     * @throws InvocationTargetException
      */
-    protected static List<PacketIn> decodePacket(JSONObject json) throws IllegalPacketException, InvocationTargetException {
+    protected static List<PacketIn> decodePacket(JSONObject json) throws IllegalPacketException {
         if (!json.keySet().contains("h") || !json.keySet().contains("v")) throw new IllegalPacketException("Unknown Packet Format: " + json.toString());
         if (!pIn.keySet().contains(json.getString("h"))) throw new IllegalPacketException("Unknown PacketIn Channel: " + json.getString("h"));
 

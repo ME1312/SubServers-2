@@ -16,6 +16,9 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.UUID;
 
+/**
+ * Internal Host Class
+ */
 public class InternalHost extends Host {
     private HashMap<String, SubServer> servers = new HashMap<String, SubServer>();
     private String name;
@@ -25,6 +28,16 @@ public class InternalHost extends Host {
     private String directory;
     protected SubPlugin plugin;
 
+    /**
+     * Creates an Internal Host
+     *
+     * @param plugin Plugin
+     * @param name Name
+     * @param enabled Enabled Status
+     * @param address Address
+     * @param directory Directory
+     * @param gitBash Git Bash Location
+     */
     public InternalHost(SubPlugin plugin, String name, Boolean enabled, InetAddress address, String directory, String gitBash) {
         super(plugin, name, enabled, address, directory, gitBash);
         this.plugin = plugin;

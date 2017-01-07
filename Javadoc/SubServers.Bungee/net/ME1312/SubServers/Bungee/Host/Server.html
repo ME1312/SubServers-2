@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10};
+var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10,"i8":10,"i9":10,"i10":10,"i11":10};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -124,10 +124,6 @@ var activeTableTab = "activeTableTab";
 extends net.md_5.bungee.BungeeServerInfo
 implements <a href="../../../../../net/ME1312/SubServers/Bungee/Network/ClientHandler.html" title="interface in net.ME1312.SubServers.Bungee.Network">ClientHandler</a></pre>
 <div class="block">Server Class</div>
-<dl>
-<dt><span class="simpleTagLabel">Author:</span></dt>
-<dd>ME1312</dd>
-</dl>
 </li>
 </ul>
 </div>
@@ -168,48 +164,73 @@ implements <a href="../../../../../net/ME1312/SubServers/Bungee/Network/ClientHa
 <th class="colLast" scope="col">Method and Description</th>
 </tr>
 <tr id="i0" class="altColor">
+<td class="colFirst"><code>void</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/Server.html#addExtra-java.lang.String-java.lang.Object-">addExtra</a></span>(java.lang.String&nbsp;key,
+        java.lang.Object&nbsp;value)</code>
+<div class="block">Add an extra value to this Server</div>
+</td>
+</tr>
+<tr id="i1" class="rowColor">
+<td class="colFirst"><code>org.json.JSONObject</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/Server.html#getExtra--">getExtra</a></span>()</code>
+<div class="block">Get all of the extra values</div>
+</td>
+</tr>
+<tr id="i2" class="altColor">
+<td class="colFirst"><code><a href="../../../../../net/ME1312/SubServers/Bungee/Library/Config/YAMLValue.html" title="class in net.ME1312.SubServers.Bungee.Library.Config">YAMLValue</a></code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/Server.html#getExtra-java.lang.String-">getExtra</a></span>(java.lang.String&nbsp;key)</code>
+<div class="block">Get an extra value</div>
+</td>
+</tr>
+<tr id="i3" class="rowColor">
 <td class="colFirst"><code>java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/Server.html#getMotd--">getMotd</a></span>()</code>
 <div class="block">Gets the MOTD of the Server</div>
 </td>
 </tr>
-<tr id="i1" class="rowColor">
+<tr id="i4" class="altColor">
 <td class="colFirst"><code><a href="../../../../../net/ME1312/SubServers/Bungee/Network/Client.html" title="class in net.ME1312.SubServers.Bungee.Network">Client</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/Server.html#getSubDataClient--">getSubDataClient</a></span>()</code>
 <div class="block">Gets the SubData Client</div>
 </td>
 </tr>
-<tr id="i2" class="altColor">
+<tr id="i5" class="rowColor">
+<td class="colFirst"><code>boolean</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/Server.html#hasExtra-java.lang.String-">hasExtra</a></span>(java.lang.String&nbsp;key)</code>
+<div class="block">Determine if an extra value exists</div>
+</td>
+</tr>
+<tr id="i6" class="altColor">
 <td class="colFirst"><code>boolean</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/Server.html#isHidden--">isHidden</a></span>()</code>
 <div class="block">If the server is hidden from players</div>
 </td>
 </tr>
-<tr id="i3" class="rowColor">
+<tr id="i7" class="rowColor">
 <td class="colFirst"><code>boolean</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/Server.html#isRestricted--">isRestricted</a></span>()</code>
 <div class="block">Gets if the Server is Restricted</div>
 </td>
 </tr>
-<tr id="i4" class="altColor">
+<tr id="i8" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/Server.html#linkSubDataClient-net.ME1312.SubServers.Bungee.Network.Client-">linkSubDataClient</a></span>(<a href="../../../../../net/ME1312/SubServers/Bungee/Network/Client.html" title="class in net.ME1312.SubServers.Bungee.Network">Client</a>&nbsp;client)</code>
 <div class="block">Link a SubData Client to this Object</div>
 </td>
 </tr>
-<tr id="i5" class="rowColor">
+<tr id="i9" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/Server.html#setHidden-boolean-">setHidden</a></span>(boolean&nbsp;value)</code>
 <div class="block">Set if the server is hidden from players</div>
 </td>
 </tr>
-<tr id="i6" class="altColor">
+<tr id="i10" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/Server.html#setMotd-java.lang.String-">setMotd</a></span>(java.lang.String&nbsp;value)</code>
 <div class="block">Sets the MOTD of the Server</div>
 </td>
 </tr>
-<tr id="i7" class="rowColor">
+<tr id="i11" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/Server.html#setRestricted-boolean-">setRestricted</a></span>(boolean&nbsp;value)</code>
 <div class="block">Sets if the Server is Restricted</div>
@@ -383,7 +404,7 @@ implements <a href="../../../../../net/ME1312/SubServers/Bungee/Network/ClientHa
 <a name="setRestricted-boolean-">
 <!--   -->
 </a>
-<ul class="blockListLast">
+<ul class="blockList">
 <li class="blockList">
 <h4>setRestricted</h4>
 <pre>public&nbsp;void&nbsp;setRestricted(boolean&nbsp;value)</pre>
@@ -391,6 +412,68 @@ implements <a href="../../../../../net/ME1312/SubServers/Bungee/Network/ClientHa
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>value</code> - Value</dd>
+</dl>
+</li>
+</ul>
+<a name="addExtra-java.lang.String-java.lang.Object-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>addExtra</h4>
+<pre>public&nbsp;void&nbsp;addExtra(java.lang.String&nbsp;key,
+                     java.lang.Object&nbsp;value)</pre>
+<div class="block">Add an extra value to this Server</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>key</code> - Key</dd>
+<dd><code>value</code> - Value</dd>
+</dl>
+</li>
+</ul>
+<a name="hasExtra-java.lang.String-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>hasExtra</h4>
+<pre>public&nbsp;boolean&nbsp;hasExtra(java.lang.String&nbsp;key)</pre>
+<div class="block">Determine if an extra value exists</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>key</code> - Key</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>Value Status</dd>
+</dl>
+</li>
+</ul>
+<a name="getExtra-java.lang.String-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getExtra</h4>
+<pre>public&nbsp;<a href="../../../../../net/ME1312/SubServers/Bungee/Library/Config/YAMLValue.html" title="class in net.ME1312.SubServers.Bungee.Library.Config">YAMLValue</a>&nbsp;getExtra(java.lang.String&nbsp;key)</pre>
+<div class="block">Get an extra value</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>key</code> - Key</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>Value</dd>
+</dl>
+</li>
+</ul>
+<a name="getExtra--">
+<!--   -->
+</a>
+<ul class="blockListLast">
+<li class="blockList">
+<h4>getExtra</h4>
+<pre>public&nbsp;org.json.JSONObject&nbsp;getExtra()</pre>
+<div class="block">Get all of the extra values</div>
+<dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>JSON Formatted Extra Values</dd>
 </dl>
 </li>
 </ul>

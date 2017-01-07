@@ -5,8 +5,6 @@ import java.io.Serializable;
 
 /**
  * Executable Variable Class
- *
- * @author ME1312
  */
 @SuppressWarnings("serial")
 public class Executable implements Serializable {

@@ -11,16 +11,31 @@ import org.json.JSONObject;
 import java.util.Map;
 import java.util.UUID;
 
+/**
+ * Teleport Player Packet
+ */
 public class PacketTeleportPlayer implements PacketIn, PacketOut {
     private SubPlugin plugin;
     private int response;
     private String message;
     private String id;
 
+    /**
+     * New PacketTeleportPlayer (In)
+     *
+     * @param plugin SubPlugin
+     */
     public PacketTeleportPlayer(SubPlugin plugin) {
         this.plugin = plugin;
     }
 
+    /**
+     * New PacketTeleportPlayer (Out)
+     *
+     * @param response Response ID
+     * @param message Message
+     * @param id Receiver ID
+     */
     public PacketTeleportPlayer(int response, String message, String id) {
         this.response = response;
         this.message = message;

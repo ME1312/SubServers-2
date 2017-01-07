@@ -5,6 +5,9 @@ import net.ME1312.SubServers.Bungee.Library.Version.Version;
 import net.md_5.bungee.api.plugin.Event;
 import org.json.JSONObject;
 
+/**
+ * SubData Generic Info Event
+ */
 public class SubDataRecieveGenericInfoEvent extends Event implements SubEvent{
     private String handle;
     private Version version;

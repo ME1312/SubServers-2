@@ -27,8 +27,6 @@ import java.util.*;
 
 /**
  * Plugin Command Class
- *
- * @author ME1312
  */
 @SuppressWarnings("deprecation")
 public final class SubCommand extends Command implements TabExecutor {

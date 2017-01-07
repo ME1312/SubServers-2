@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":10};
+var methods = {"i0":10,"i1":10};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -74,13 +74,13 @@ var activeTableTab = "activeTableTab";
 <li>Summary:&nbsp;</li>
 <li>Nested&nbsp;|&nbsp;</li>
 <li>Field&nbsp;|&nbsp;</li>
-<li>Constr&nbsp;|&nbsp;</li>
+<li><a href="#constructor.summary">Constr</a>&nbsp;|&nbsp;</li>
 <li><a href="#method.summary">Method</a></li>
 </ul>
 <ul class="subNavList">
 <li>Detail:&nbsp;</li>
 <li>Field&nbsp;|&nbsp;</li>
-<li>Constr&nbsp;|&nbsp;</li>
+<li><a href="#constructor.detail">Constr</a>&nbsp;|&nbsp;</li>
 <li><a href="#method.detail">Method</a></li>
 </ul>
 </div>
@@ -109,12 +109,35 @@ var activeTableTab = "activeTableTab";
 <br>
 <pre>public class <span class="typeNameLabel">InternalSubLogger</span>
 extends java.lang.Object</pre>
+<div class="block">Internal Process Logger Class</div>
 </li>
 </ul>
 </div>
 <div class="summary">
 <ul class="blockList">
 <li class="blockList">
+<!-- ======== CONSTRUCTOR SUMMARY ======== -->
+<ul class="blockList">
+<li class="blockList"><a name="constructor.summary">
+<!--   -->
+</a>
+<h3>Constructor Summary</h3>
+<table class="memberSummary" border="0" cellpadding="3" cellspacing="0" summary="Constructor Summary table, listing constructors, and an explanation">
+<caption><span>Constructors</span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colOne" scope="col">Constructor and Description</th>
+</tr>
+<tr class="altColor">
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/Internal/InternalSubLogger.html#InternalSubLogger-java.lang.Process-java.lang.String-net.ME1312.SubServers.Bungee.Library.Container-java.io.File-">InternalSubLogger</a></span>(java.lang.Process&nbsp;process,
+                 java.lang.String&nbsp;name,
+                 <a href="../../../../../../net/ME1312/SubServers/Bungee/Library/Container.html" title="class in net.ME1312.SubServers.Bungee.Library">Container</a>&lt;java.lang.Boolean&gt;&nbsp;log,
+                 java.io.File&nbsp;file)</code>
+<div class="block">Creates a new Internal Process Logger</div>
+</td>
+</tr>
+</table>
+</li>
+</ul>
 <!-- ========== METHOD SUMMARY =========== -->
 <ul class="blockList">
 <li class="blockList"><a name="method.summary">
@@ -129,7 +152,15 @@ extends java.lang.Object</pre>
 </tr>
 <tr id="i0" class="altColor">
 <td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/Internal/InternalSubLogger.html#start--">start</a></span>()</code>&nbsp;</td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/Internal/InternalSubLogger.html#start--">start</a></span>()</code>
+<div class="block">Start the Logger</div>
+</td>
+</tr>
+<tr id="i1" class="rowColor">
+<td class="colFirst"><code>void</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/Internal/InternalSubLogger.html#stop--">stop</a></span>()</code>
+<div class="block">Stop the Logger</div>
+</td>
 </tr>
 </table>
 <ul class="blockList">
@@ -147,6 +178,34 @@ extends java.lang.Object</pre>
 <div class="details">
 <ul class="blockList">
 <li class="blockList">
+<!-- ========= CONSTRUCTOR DETAIL ======== -->
+<ul class="blockList">
+<li class="blockList"><a name="constructor.detail">
+<!--   -->
+</a>
+<h3>Constructor Detail</h3>
+<a name="InternalSubLogger-java.lang.Process-java.lang.String-net.ME1312.SubServers.Bungee.Library.Container-java.io.File-">
+<!--   -->
+</a>
+<ul class="blockListLast">
+<li class="blockList">
+<h4>InternalSubLogger</h4>
+<pre>public&nbsp;InternalSubLogger(java.lang.Process&nbsp;process,
+                         java.lang.String&nbsp;name,
+                         <a href="../../../../../../net/ME1312/SubServers/Bungee/Library/Container.html" title="class in net.ME1312.SubServers.Bungee.Library">Container</a>&lt;java.lang.Boolean&gt;&nbsp;log,
+                         java.io.File&nbsp;file)</pre>
+<div class="block">Creates a new Internal Process Logger</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>process</code> - Process</dd>
+<dd><code>name</code> - Prefix</dd>
+<dd><code>log</code> - Console Logging Status</dd>
+<dd><code>file</code> - File to log to (or null for disabled)</dd>
+</dl>
+</li>
+</ul>
+</li>
+</ul>
 <!-- ============ METHOD DETAIL ========== -->
 <ul class="blockList">
 <li class="blockList"><a name="method.detail">
@@ -156,10 +215,21 @@ extends java.lang.Object</pre>
 <a name="start--">
 <!--   -->
 </a>
-<ul class="blockListLast">
+<ul class="blockList">
 <li class="blockList">
 <h4>start</h4>
 <pre>public&nbsp;void&nbsp;start()</pre>
+<div class="block">Start the Logger</div>
+</li>
+</ul>
+<a name="stop--">
+<!--   -->
+</a>
+<ul class="blockListLast">
+<li class="blockList">
+<h4>stop</h4>
+<pre>public&nbsp;void&nbsp;stop()</pre>
+<div class="block">Stop the Logger</div>
 </li>
 </ul>
 </li>
@@ -216,13 +286,13 @@ extends java.lang.Object</pre>
 <li>Summary:&nbsp;</li>
 <li>Nested&nbsp;|&nbsp;</li>
 <li>Field&nbsp;|&nbsp;</li>
-<li>Constr&nbsp;|&nbsp;</li>
+<li><a href="#constructor.summary">Constr</a>&nbsp;|&nbsp;</li>
 <li><a href="#method.summary">Method</a></li>
 </ul>
 <ul class="subNavList">
 <li>Detail:&nbsp;</li>
 <li>Field&nbsp;|&nbsp;</li>
-<li>Constr&nbsp;|&nbsp;</li>
+<li><a href="#constructor.detail">Constr</a>&nbsp;|&nbsp;</li>
 <li><a href="#method.detail">Method</a></li>
 </ul>
 </div>

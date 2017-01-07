@@ -12,13 +12,28 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.LinkedList;
 
+/**
+ * Download Build Script Packet
+ */
 public class PacketDownloadBuildScript implements PacketIn, PacketOut {
     private SubPlugin plugin;
     private String id;
 
+    /**
+     * New PacketDownloadBuildScript (In)
+     *
+     * @param plugin SubPlugin
+     */
     public PacketDownloadBuildScript(SubPlugin plugin) {
         this.plugin = plugin;
     }
+
+    /**
+     * New PacketDownloadBuildScript (Out)
+     *
+     * @param plugin SubPlugin
+     * @param id Receiver ID
+     */
     public PacketDownloadBuildScript(SubPlugin plugin, String id) {
         this.plugin = plugin;
         this.id = id;

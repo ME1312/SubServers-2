@@ -4,9 +4,17 @@ import net.ME1312.SubServers.Bungee.Library.Version.Version;
 import net.ME1312.SubServers.Bungee.Network.PacketOut;
 import org.json.JSONObject;
 
+/**
+ * Shutdown Packet
+ */
 public class PacketOutShutdown implements PacketOut {
     private String message;
 
+    /**
+     * New PacketOutShutdown
+     *
+     * @param message Message
+     */
     public PacketOutShutdown(String message) {
         this.message = message;
     }

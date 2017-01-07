@@ -11,16 +11,31 @@ import org.json.JSONObject;
 
 import java.util.UUID;
 
+/**
+ * Create Server Packet
+ */
 public class PacketCreateServer implements PacketIn, PacketOut {
     private SubPlugin plugin;
     private int response;
     private String message;
     private String id;
 
+    /**
+     * New PacketCreateServer (In)
+     *
+     * @param plugin SubPlugin
+     */
     public PacketCreateServer(SubPlugin plugin) {
         this.plugin = plugin;
     }
 
+    /**
+     * New PacketCreateServer (Out)
+     *
+     * @param response Response ID
+     * @param message Message
+     * @param id Receiver ID
+     */
     public PacketCreateServer(int response, String message, String id) {
         this.response = response;
         this.message = message;

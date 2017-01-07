@@ -11,15 +11,29 @@ import org.json.JSONObject;
 
 import java.util.Map;
 
-public class PacketLinkServer implements PacketIn, PacketOut {
+/**
+ * Link Server Packet
+ */
+public final class PacketLinkServer implements PacketIn, PacketOut {
     private SubPlugin plugin;
     private int response;
     private String message;
 
+    /**
+     * New PacketLinkServer (In)
+     *
+     * @param plugin SubPlugin
+     */
     public PacketLinkServer(SubPlugin plugin) {
         this.plugin = plugin;
     }
 
+    /**
+     * New PacketLinkServer (Out)
+     *
+     * @param response Response ID
+     * @param message Message
+     */
     public PacketLinkServer(int response, String message) {
         this.response = response;
         this.message = message;

@@ -7,6 +7,9 @@ import net.md_5.bungee.api.plugin.Event;
 
 import java.util.UUID;
 
+/**
+ * Server Stop Event
+ */
 public class SubStopEvent extends Event implements SubEvent, Cancellable {
     private boolean cancelled = false;
     private UUID player;
@@ -28,12 +31,14 @@ public class SubStopEvent extends Event implements SubEvent, Cancellable {
 
     /**
      * Gets the Server Effected
+     *
      * @return The Server Effected
      */
     public SubServer getServer() { return server; }
 
     /**
      * Gets the player that triggered the Event
+     *
      * @return The Player that triggered this Event or null if Console
      */
     public UUID getPlayer() { return player; }
@@ -49,6 +54,7 @@ public class SubStopEvent extends Event implements SubEvent, Cancellable {
 
     /**
      * Gets the Cancelled Status
+     *
      * @return Cancelled Status
      */
     public boolean isCancelled() {

@@ -8,8 +8,6 @@ import java.util.UUID;
 
 /**
  * SubServer Layout Class
- *
- * @author ME1312
  */
 public abstract class SubServer extends Server {
 

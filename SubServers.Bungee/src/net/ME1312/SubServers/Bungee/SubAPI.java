@@ -17,8 +17,6 @@ import java.util.UUID;
 
 /**
  * SubAPI Class
- *
- * @author ME1312
  */
 public final class SubAPI {
     private SubPlugin plugin;

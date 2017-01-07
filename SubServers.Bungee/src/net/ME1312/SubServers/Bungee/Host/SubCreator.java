@@ -6,8 +6,6 @@ import java.util.UUID;
 
 /**
  * SubCreator Layout Class
- *
- * @author ME1312
  */
 public abstract class SubCreator {
     public enum ServerType {
