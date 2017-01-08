@@ -4,8 +4,6 @@ import java.io.Serializable;
 
 /**
  * Version Class
- *
- * @author ME1312
  */
 @SuppressWarnings("serial")
 public class Version implements Serializable, Comparable<Version> {

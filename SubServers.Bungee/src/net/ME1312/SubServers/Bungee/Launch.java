@@ -33,15 +33,8 @@ public final class Launch {
             System.out.println("***  http://ci.md-5.net/job/BungeeCord  ***");
             System.out.println("*******************************************");
             System.out.println("");
+            System.exit(1);
         } else {
-            System.out.println("");
-            System.out.println("*******************************************");
-            System.out.println("***  Warning: this build is Unofficial  ***");
-            System.out.println("***                                     ***");
-            System.out.println("*** Please report all issues to ME1312, ***");
-            System.out.println("***   NOT the Spigot Team. Thank You!   ***");
-            System.out.println("*******************************************");
-
             Security.setProperty("networkaddress.cache.ttl", "30");
             Security.setProperty("networkaddress.cache.negative.ttl", "10");
             joptsimple.OptionParser parser = new joptsimple.OptionParser();
@@ -58,6 +51,13 @@ public final class Launch {
                 System.out.println("SubServers v" + SubPlugin.class.getPackage().getImplementationVersion() + ((SubPlugin.class.getPackage().getSpecificationVersion().equals("0"))?"":" BETA "+SubPlugin.class.getPackage().getSpecificationVersion()));
                 System.out.println("");
             } else {
+                System.out.println("");
+                System.out.println("*******************************************");
+                System.out.println("***  Warning: this build is Unofficial  ***");
+                System.out.println("***                                     ***");
+                System.out.println("*** Please report all issues to ME1312, ***");
+                System.out.println("***   NOT the Spigot Team. Thank You!   ***");
+                System.out.println("*******************************************");
                 try {
                     if (net.md_5.bungee.BungeeCord.class.getPackage().getSpecificationVersion() != null) {
                         Date date = (new SimpleDateFormat("yyyyMMdd")).parse(net.md_5.bungee.BungeeCord.class.getPackage().getSpecificationVersion());

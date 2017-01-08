@@ -23,11 +23,19 @@ import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.UUID;
 
+/**
+ * GUI Listener
+ */
 public class UIListener implements Listener {
     private HashMap<UUID, JSONCallback> input = new HashMap<UUID, JSONCallback>();
     private HashMap<UUID, UIRenderer> gui = new HashMap<UUID, UIRenderer>();
     private SubPlugin plugin;
 
+    /**
+     * Creates a new GUI Listener
+     *
+     * @param plugin Event
+     */
     public UIListener(SubPlugin plugin) {
         this.plugin = plugin;
         Bukkit.getPluginManager().registerEvents(this, plugin);
@@ -44,6 +52,11 @@ public class UIListener implements Listener {
         return gui.get(player.getUniqueId());
     }
 
+    /**
+     * Click Listener
+     *
+     * @param event Event
+     */
     @EventHandler(priority = EventPriority.HIGHEST)
     public void click(InventoryClickEvent event) {
         Player player = (Player) event.getWhoClicked();
@@ -371,6 +384,11 @@ public class UIListener implements Listener {
         }
     }
 
+    /**
+     * Input Listener
+     *
+     * @param event Event
+     */
     @SuppressWarnings("deprecation")
     @EventHandler(priority = EventPriority.HIGHEST)
     public void input(org.bukkit.event.player.PlayerChatEvent event) {
@@ -383,6 +401,11 @@ public class UIListener implements Listener {
         }
     }
 
+    /**
+     * Input Listener
+     *
+     * @param event Event
+     */
     @EventHandler(priority = EventPriority.HIGHEST)
     public void input(PlayerCommandPreprocessEvent event) {
         if (!event.isCancelled() && input.keySet().contains(event.getPlayer().getUniqueId())) {
@@ -394,11 +417,21 @@ public class UIListener implements Listener {
         }
     }
 
+    /**
+     * GUI Close Listener
+     *
+     * @param event Event
+     */
     @EventHandler
     public void close(InventoryCloseEvent event) {
         if (gui.keySet().contains(event.getPlayer().getUniqueId())) gui.get(event.getPlayer().getUniqueId()).open = false;
     }
 
+    /**
+     * Clean Renderers
+     *
+     * @param event Event
+     */
     @EventHandler
     public void clean(PlayerQuitEvent event) {
         if (gui.keySet().contains(event.getPlayer().getUniqueId())) {

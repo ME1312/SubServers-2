@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10,"i8":10,"i9":10,"i10":10,"i11":10,"i12":10,"i13":10,"i14":10,"i15":10,"i16":10,"i17":10,"i18":10,"i19":10,"i20":10,"i21":10,"i22":10,"i23":10,"i24":10,"i25":10,"i26":10,"i27":10,"i28":10,"i29":10,"i30":10,"i31":10};
+var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10,"i8":10,"i9":10,"i10":10,"i11":10,"i12":10,"i13":10,"i14":10,"i15":10,"i16":10,"i17":10,"i18":10,"i19":10,"i20":10,"i21":10,"i22":10,"i23":10,"i24":10,"i25":10,"i26":10,"i27":10,"i28":10,"i29":10,"i30":10,"i31":10,"i32":10};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -74,13 +74,13 @@ var activeTableTab = "activeTableTab";
 <li>Summary:&nbsp;</li>
 <li>Nested&nbsp;|&nbsp;</li>
 <li>Field&nbsp;|&nbsp;</li>
-<li><a href="#constructor.summary">Constr</a>&nbsp;|&nbsp;</li>
+<li>Constr&nbsp;|&nbsp;</li>
 <li><a href="#method.summary">Method</a></li>
 </ul>
 <ul class="subNavList">
 <li>Detail:&nbsp;</li>
 <li>Field&nbsp;|&nbsp;</li>
-<li><a href="#constructor.detail">Constr</a>&nbsp;|&nbsp;</li>
+<li>Constr&nbsp;|&nbsp;</li>
 <li><a href="#method.detail">Method</a></li>
 </ul>
 </div>
@@ -109,32 +109,13 @@ var activeTableTab = "activeTableTab";
 <br>
 <pre>public class <span class="typeNameLabel">YAMLValue</span>
 extends java.lang.Object</pre>
+<div class="block">YAML Value Class</div>
 </li>
 </ul>
 </div>
 <div class="summary">
 <ul class="blockList">
 <li class="blockList">
-<!-- ======== CONSTRUCTOR SUMMARY ======== -->
-<ul class="blockList">
-<li class="blockList"><a name="constructor.summary">
-<!--   -->
-</a>
-<h3>Constructor Summary</h3>
-<table class="memberSummary" border="0" cellpadding="3" cellspacing="0" summary="Constructor Summary table, listing constructors, and an explanation">
-<caption><span>Constructors</span><span class="tabEnd">&nbsp;</span></caption>
-<tr>
-<th class="colOne" scope="col">Constructor and Description</th>
-</tr>
-<tr class="altColor">
-<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Config/YAMLValue.html#YAMLValue-java.lang.Object-net.ME1312.SubServers.Client.Bukkit.Library.Config.YAMLSection-java.lang.String-org.yaml.snakeyaml.Yaml-">YAMLValue</a></span>(java.lang.Object&nbsp;obj,
-         <a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Config/YAMLSection.html" title="class in net.ME1312.SubServers.Client.Bukkit.Library.Config">YAMLSection</a>&nbsp;up,
-         java.lang.String&nbsp;label,
-         org.yaml.snakeyaml.Yaml&nbsp;yaml)</code>&nbsp;</td>
-</tr>
-</table>
-</li>
-</ul>
 <!-- ========== METHOD SUMMARY =========== -->
 <ul class="blockList">
 <li class="blockList"><a name="method.summary">
@@ -149,87 +130,129 @@ extends java.lang.Object</pre>
 </tr>
 <tr id="i0" class="altColor">
 <td class="colFirst"><code>boolean</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Config/YAMLValue.html#asBoolean--">asBoolean</a></span>()</code>&nbsp;</td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Config/YAMLValue.html#asBoolean--">asBoolean</a></span>()</code>
+<div class="block">Get Object as Boolean</div>
+</td>
 </tr>
 <tr id="i1" class="rowColor">
 <td class="colFirst"><code>java.util.List&lt;java.lang.Boolean&gt;</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Config/YAMLValue.html#asBooleanList--">asBooleanList</a></span>()</code>&nbsp;</td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Config/YAMLValue.html#asBooleanList--">asBooleanList</a></span>()</code>
+<div class="block">Get Object as List</div>
+</td>
 </tr>
 <tr id="i2" class="altColor">
 <td class="colFirst"><code>java.lang.String</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Config/YAMLValue.html#asColoredString-char-">asColoredString</a></span>(char&nbsp;color)</code>&nbsp;</td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Config/YAMLValue.html#asColoredString-char-">asColoredString</a></span>(char&nbsp;color)</code>
+<div class="block">Get Object as Colored String</div>
+</td>
 </tr>
 <tr id="i3" class="rowColor">
 <td class="colFirst"><code>java.util.List&lt;java.lang.String&gt;</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Config/YAMLValue.html#asColoredStringList-char-">asColoredStringList</a></span>(char&nbsp;color)</code>&nbsp;</td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Config/YAMLValue.html#asColoredStringList-char-">asColoredStringList</a></span>(char&nbsp;color)</code>
+<div class="block">Get Object as Colored String List</div>
+</td>
 </tr>
 <tr id="i4" class="altColor">
 <td class="colFirst"><code>double</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Config/YAMLValue.html#asDouble--">asDouble</a></span>()</code>&nbsp;</td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Config/YAMLValue.html#asDouble--">asDouble</a></span>()</code>
+<div class="block">Get Object as Double</div>
+</td>
 </tr>
 <tr id="i5" class="rowColor">
 <td class="colFirst"><code>java.util.List&lt;java.lang.Double&gt;</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Config/YAMLValue.html#asDoubleList--">asDoubleList</a></span>()</code>&nbsp;</td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Config/YAMLValue.html#asDoubleList--">asDoubleList</a></span>()</code>
+<div class="block">Get Object as Double List</div>
+</td>
 </tr>
 <tr id="i6" class="altColor">
 <td class="colFirst"><code>float</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Config/YAMLValue.html#asFloat--">asFloat</a></span>()</code>&nbsp;</td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Config/YAMLValue.html#asFloat--">asFloat</a></span>()</code>
+<div class="block">Get Object as Float</div>
+</td>
 </tr>
 <tr id="i7" class="rowColor">
 <td class="colFirst"><code>java.util.List&lt;java.lang.Float&gt;</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Config/YAMLValue.html#asFloatList--">asFloatList</a></span>()</code>&nbsp;</td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Config/YAMLValue.html#asFloatList--">asFloatList</a></span>()</code>
+<div class="block">Get Object as Float List</div>
+</td>
 </tr>
 <tr id="i8" class="altColor">
 <td class="colFirst"><code>int</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Config/YAMLValue.html#asInt--">asInt</a></span>()</code>&nbsp;</td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Config/YAMLValue.html#asInt--">asInt</a></span>()</code>
+<div class="block">Get Object as Integer</div>
+</td>
 </tr>
 <tr id="i9" class="rowColor">
 <td class="colFirst"><code>java.util.List&lt;java.lang.Integer&gt;</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Config/YAMLValue.html#asIntList--">asIntList</a></span>()</code>&nbsp;</td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Config/YAMLValue.html#asIntList--">asIntList</a></span>()</code>
+<div class="block">Get Object as Integer List</div>
+</td>
 </tr>
 <tr id="i10" class="altColor">
 <td class="colFirst"><code>long</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Config/YAMLValue.html#asLong--">asLong</a></span>()</code>&nbsp;</td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Config/YAMLValue.html#asLong--">asLong</a></span>()</code>
+<div class="block">Get Object as Long</div>
+</td>
 </tr>
 <tr id="i11" class="rowColor">
 <td class="colFirst"><code>java.util.List&lt;java.lang.Long&gt;</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Config/YAMLValue.html#asLongList--">asLongList</a></span>()</code>&nbsp;</td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Config/YAMLValue.html#asLongList--">asLongList</a></span>()</code>
+<div class="block">Get Object as Long List</div>
+</td>
 </tr>
 <tr id="i12" class="altColor">
 <td class="colFirst"><code>java.lang.Object</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Config/YAMLValue.html#asObject--">asObject</a></span>()</code>&nbsp;</td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Config/YAMLValue.html#asObject--">asObject</a></span>()</code>
+<div class="block">Get Object</div>
+</td>
 </tr>
 <tr id="i13" class="rowColor">
 <td class="colFirst"><code>java.util.List&lt;?&gt;</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Config/YAMLValue.html#asObjectList--">asObjectList</a></span>()</code>&nbsp;</td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Config/YAMLValue.html#asObjectList--">asObjectList</a></span>()</code>
+<div class="block">Get Object as List</div>
+</td>
 </tr>
 <tr id="i14" class="altColor">
 <td class="colFirst"><code>java.lang.String</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Config/YAMLValue.html#asRawString--">asRawString</a></span>()</code>&nbsp;</td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Config/YAMLValue.html#asRawString--">asRawString</a></span>()</code>
+<div class="block">Get Object as Unparsed String</div>
+</td>
 </tr>
 <tr id="i15" class="rowColor">
 <td class="colFirst"><code>java.util.List&lt;java.lang.String&gt;</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Config/YAMLValue.html#asRawStringList--">asRawStringList</a></span>()</code>&nbsp;</td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Config/YAMLValue.html#asRawStringList--">asRawStringList</a></span>()</code>
+<div class="block">Get Object as Unparsed String List</div>
+</td>
 </tr>
 <tr id="i16" class="altColor">
 <td class="colFirst"><code><a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Config/YAMLSection.html" title="class in net.ME1312.SubServers.Client.Bukkit.Library.Config">YAMLSection</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Config/YAMLValue.html#asSection--">asSection</a></span>()</code>&nbsp;</td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Config/YAMLValue.html#asSection--">asSection</a></span>()</code>
+<div class="block">Get Object as YAML Section</div>
+</td>
 </tr>
 <tr id="i17" class="rowColor">
 <td class="colFirst"><code>java.util.List&lt;<a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Config/YAMLSection.html" title="class in net.ME1312.SubServers.Client.Bukkit.Library.Config">YAMLSection</a>&gt;</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Config/YAMLValue.html#asSectionList--">asSectionList</a></span>()</code>&nbsp;</td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Config/YAMLValue.html#asSectionList--">asSectionList</a></span>()</code>
+<div class="block">Get Object as YAML Section List</div>
+</td>
 </tr>
 <tr id="i18" class="altColor">
 <td class="colFirst"><code>java.lang.String</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Config/YAMLValue.html#asString--">asString</a></span>()</code>&nbsp;</td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Config/YAMLValue.html#asString--">asString</a></span>()</code>
+<div class="block">Get Object as String</div>
+</td>
 </tr>
 <tr id="i19" class="rowColor">
 <td class="colFirst"><code>java.util.List&lt;java.lang.String&gt;</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Config/YAMLValue.html#asStringList--">asStringList</a></span>()</code>&nbsp;</td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Config/YAMLValue.html#asStringList--">asStringList</a></span>()</code>
+<div class="block">Get Object as String List</div>
+</td>
 </tr>
 <tr id="i20" class="altColor">
 <td class="colFirst"><code>java.util.UUID</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Config/YAMLValue.html#asUUID--">asUUID</a></span>()</code>&nbsp;</td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Config/YAMLValue.html#asUUID--">asUUID</a></span>()</code>
+<div class="block">Get Object as UUID</div>
+</td>
 </tr>
 <tr id="i21" class="rowColor">
 <td class="colFirst"><code>java.util.List&lt;java.util.UUID&gt;</code></td>
@@ -237,41 +260,65 @@ extends java.lang.Object</pre>
 </tr>
 <tr id="i22" class="altColor">
 <td class="colFirst"><code><a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Config/YAMLSection.html" title="class in net.ME1312.SubServers.Client.Bukkit.Library.Config">YAMLSection</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Config/YAMLValue.html#getDefiningSection--">getDefiningSection</a></span>()</code>&nbsp;</td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Config/YAMLValue.html#getDefiningSection--">getDefiningSection</a></span>()</code>
+<div class="block">Get the YAML Section this Object was defined in</div>
+</td>
 </tr>
 <tr id="i23" class="rowColor">
 <td class="colFirst"><code>boolean</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Config/YAMLValue.html#isBoolean--">isBoolean</a></span>()</code>&nbsp;</td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Config/YAMLValue.html#isBoolean--">isBoolean</a></span>()</code>
+<div class="block">Check if object is a Boolean</div>
+</td>
 </tr>
 <tr id="i24" class="altColor">
 <td class="colFirst"><code>boolean</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Config/YAMLValue.html#isDouble--">isDouble</a></span>()</code>&nbsp;</td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Config/YAMLValue.html#isDouble--">isDouble</a></span>()</code>
+<div class="block">Check if object is a Double</div>
+</td>
 </tr>
 <tr id="i25" class="rowColor">
 <td class="colFirst"><code>boolean</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Config/YAMLValue.html#isFloat-java.lang.String-">isFloat</a></span>(java.lang.String&nbsp;path)</code>&nbsp;</td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Config/YAMLValue.html#isFloat-java.lang.String-">isFloat</a></span>(java.lang.String&nbsp;path)</code>
+<div class="block">Check if object is a Float</div>
+</td>
 </tr>
 <tr id="i26" class="altColor">
 <td class="colFirst"><code>boolean</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Config/YAMLValue.html#isInt--">isInt</a></span>()</code>&nbsp;</td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Config/YAMLValue.html#isInt--">isInt</a></span>()</code>
+<div class="block">Check if object is an Integer</div>
+</td>
 </tr>
 <tr id="i27" class="rowColor">
 <td class="colFirst"><code>boolean</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Config/YAMLValue.html#isList--">isList</a></span>()</code>&nbsp;</td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Config/YAMLValue.html#isList--">isList</a></span>()</code>
+<div class="block">Check if object is a List</div>
+</td>
 </tr>
 <tr id="i28" class="altColor">
 <td class="colFirst"><code>boolean</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Config/YAMLValue.html#isLong--">isLong</a></span>()</code>&nbsp;</td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Config/YAMLValue.html#isLong--">isLong</a></span>()</code>
+<div class="block">Check if object is a Long</div>
+</td>
 </tr>
 <tr id="i29" class="rowColor">
 <td class="colFirst"><code>boolean</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Config/YAMLValue.html#isSection--">isSection</a></span>()</code>&nbsp;</td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Config/YAMLValue.html#isSection--">isSection</a></span>()</code>
+<div class="block">Check if object is a YAML Section</div>
+</td>
 </tr>
 <tr id="i30" class="altColor">
 <td class="colFirst"><code>boolean</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Config/YAMLValue.html#isString--">isString</a></span>()</code>&nbsp;</td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Config/YAMLValue.html#isString--">isString</a></span>()</code>
+<div class="block">Check if object is a String</div>
+</td>
 </tr>
 <tr id="i31" class="rowColor">
+<td class="colFirst"><code>boolean</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Config/YAMLValue.html#isUUID-java.lang.String-">isUUID</a></span>(java.lang.String&nbsp;handle)</code>
+<div class="block">Check if object is a UUID</div>
+</td>
+</tr>
+<tr id="i32" class="altColor">
 <td class="colFirst"><code>java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Config/YAMLValue.html#toString--">toString</a></span>()</code>&nbsp;</td>
 </tr>
@@ -291,26 +338,6 @@ extends java.lang.Object</pre>
 <div class="details">
 <ul class="blockList">
 <li class="blockList">
-<!-- ========= CONSTRUCTOR DETAIL ======== -->
-<ul class="blockList">
-<li class="blockList"><a name="constructor.detail">
-<!--   -->
-</a>
-<h3>Constructor Detail</h3>
-<a name="YAMLValue-java.lang.Object-net.ME1312.SubServers.Client.Bukkit.Library.Config.YAMLSection-java.lang.String-org.yaml.snakeyaml.Yaml-">
-<!--   -->
-</a>
-<ul class="blockListLast">
-<li class="blockList">
-<h4>YAMLValue</h4>
-<pre>public&nbsp;YAMLValue(java.lang.Object&nbsp;obj,
-                 <a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Config/YAMLSection.html" title="class in net.ME1312.SubServers.Client.Bukkit.Library.Config">YAMLSection</a>&nbsp;up,
-                 java.lang.String&nbsp;label,
-                 org.yaml.snakeyaml.Yaml&nbsp;yaml)</pre>
-</li>
-</ul>
-</li>
-</ul>
 <!-- ============ METHOD DETAIL ========== -->
 <ul class="blockList">
 <li class="blockList"><a name="method.detail">
@@ -324,6 +351,11 @@ extends java.lang.Object</pre>
 <li class="blockList">
 <h4>getDefiningSection</h4>
 <pre>public&nbsp;<a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Config/YAMLSection.html" title="class in net.ME1312.SubServers.Client.Bukkit.Library.Config">YAMLSection</a>&nbsp;getDefiningSection()</pre>
+<div class="block">Get the YAML Section this Object was defined in</div>
+<dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>YAML Section</dd>
+</dl>
 </li>
 </ul>
 <a name="asObject--">
@@ -333,6 +365,11 @@ extends java.lang.Object</pre>
 <li class="blockList">
 <h4>asObject</h4>
 <pre>public&nbsp;java.lang.Object&nbsp;asObject()</pre>
+<div class="block">Get Object</div>
+<dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>Object</dd>
+</dl>
 </li>
 </ul>
 <a name="asObjectList--">
@@ -342,6 +379,11 @@ extends java.lang.Object</pre>
 <li class="blockList">
 <h4>asObjectList</h4>
 <pre>public&nbsp;java.util.List&lt;?&gt;&nbsp;asObjectList()</pre>
+<div class="block">Get Object as List</div>
+<dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>List</dd>
+</dl>
 </li>
 </ul>
 <a name="asBoolean--">
@@ -351,6 +393,11 @@ extends java.lang.Object</pre>
 <li class="blockList">
 <h4>asBoolean</h4>
 <pre>public&nbsp;boolean&nbsp;asBoolean()</pre>
+<div class="block">Get Object as Boolean</div>
+<dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>Boolean</dd>
+</dl>
 </li>
 </ul>
 <a name="asBooleanList--">
@@ -360,6 +407,11 @@ extends java.lang.Object</pre>
 <li class="blockList">
 <h4>asBooleanList</h4>
 <pre>public&nbsp;java.util.List&lt;java.lang.Boolean&gt;&nbsp;asBooleanList()</pre>
+<div class="block">Get Object as List</div>
+<dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>List</dd>
+</dl>
 </li>
 </ul>
 <a name="asSection--">
@@ -369,6 +421,11 @@ extends java.lang.Object</pre>
 <li class="blockList">
 <h4>asSection</h4>
 <pre>public&nbsp;<a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Config/YAMLSection.html" title="class in net.ME1312.SubServers.Client.Bukkit.Library.Config">YAMLSection</a>&nbsp;asSection()</pre>
+<div class="block">Get Object as YAML Section</div>
+<dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>YAML Section</dd>
+</dl>
 </li>
 </ul>
 <a name="asSectionList--">
@@ -378,6 +435,11 @@ extends java.lang.Object</pre>
 <li class="blockList">
 <h4>asSectionList</h4>
 <pre>public&nbsp;java.util.List&lt;<a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Config/YAMLSection.html" title="class in net.ME1312.SubServers.Client.Bukkit.Library.Config">YAMLSection</a>&gt;&nbsp;asSectionList()</pre>
+<div class="block">Get Object as YAML Section List</div>
+<dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>YAML Section List</dd>
+</dl>
 </li>
 </ul>
 <a name="asDouble--">
@@ -387,6 +449,11 @@ extends java.lang.Object</pre>
 <li class="blockList">
 <h4>asDouble</h4>
 <pre>public&nbsp;double&nbsp;asDouble()</pre>
+<div class="block">Get Object as Double</div>
+<dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>Double</dd>
+</dl>
 </li>
 </ul>
 <a name="asDoubleList--">
@@ -396,6 +463,11 @@ extends java.lang.Object</pre>
 <li class="blockList">
 <h4>asDoubleList</h4>
 <pre>public&nbsp;java.util.List&lt;java.lang.Double&gt;&nbsp;asDoubleList()</pre>
+<div class="block">Get Object as Double List</div>
+<dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>Double List</dd>
+</dl>
 </li>
 </ul>
 <a name="asFloat--">
@@ -405,6 +477,11 @@ extends java.lang.Object</pre>
 <li class="blockList">
 <h4>asFloat</h4>
 <pre>public&nbsp;float&nbsp;asFloat()</pre>
+<div class="block">Get Object as Float</div>
+<dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>Float</dd>
+</dl>
 </li>
 </ul>
 <a name="asFloatList--">
@@ -414,6 +491,11 @@ extends java.lang.Object</pre>
 <li class="blockList">
 <h4>asFloatList</h4>
 <pre>public&nbsp;java.util.List&lt;java.lang.Float&gt;&nbsp;asFloatList()</pre>
+<div class="block">Get Object as Float List</div>
+<dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>Float List</dd>
+</dl>
 </li>
 </ul>
 <a name="asInt--">
@@ -423,6 +505,11 @@ extends java.lang.Object</pre>
 <li class="blockList">
 <h4>asInt</h4>
 <pre>public&nbsp;int&nbsp;asInt()</pre>
+<div class="block">Get Object as Integer</div>
+<dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>Integer</dd>
+</dl>
 </li>
 </ul>
 <a name="asIntList--">
@@ -432,6 +519,11 @@ extends java.lang.Object</pre>
 <li class="blockList">
 <h4>asIntList</h4>
 <pre>public&nbsp;java.util.List&lt;java.lang.Integer&gt;&nbsp;asIntList()</pre>
+<div class="block">Get Object as Integer List</div>
+<dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>Integer List</dd>
+</dl>
 </li>
 </ul>
 <a name="asLong--">
@@ -441,6 +533,11 @@ extends java.lang.Object</pre>
 <li class="blockList">
 <h4>asLong</h4>
 <pre>public&nbsp;long&nbsp;asLong()</pre>
+<div class="block">Get Object as Long</div>
+<dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>Long</dd>
+</dl>
 </li>
 </ul>
 <a name="asLongList--">
@@ -450,6 +547,11 @@ extends java.lang.Object</pre>
 <li class="blockList">
 <h4>asLongList</h4>
 <pre>public&nbsp;java.util.List&lt;java.lang.Long&gt;&nbsp;asLongList()</pre>
+<div class="block">Get Object as Long List</div>
+<dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>Long List</dd>
+</dl>
 </li>
 </ul>
 <a name="asRawString--">
@@ -459,6 +561,11 @@ extends java.lang.Object</pre>
 <li class="blockList">
 <h4>asRawString</h4>
 <pre>public&nbsp;java.lang.String&nbsp;asRawString()</pre>
+<div class="block">Get Object as Unparsed String</div>
+<dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>Unparsed String</dd>
+</dl>
 </li>
 </ul>
 <a name="asRawStringList--">
@@ -468,6 +575,11 @@ extends java.lang.Object</pre>
 <li class="blockList">
 <h4>asRawStringList</h4>
 <pre>public&nbsp;java.util.List&lt;java.lang.String&gt;&nbsp;asRawStringList()</pre>
+<div class="block">Get Object as Unparsed String List</div>
+<dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>Unparsed String List</dd>
+</dl>
 </li>
 </ul>
 <a name="asString--">
@@ -477,6 +589,11 @@ extends java.lang.Object</pre>
 <li class="blockList">
 <h4>asString</h4>
 <pre>public&nbsp;java.lang.String&nbsp;asString()</pre>
+<div class="block">Get Object as String</div>
+<dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>String</dd>
+</dl>
 </li>
 </ul>
 <a name="asStringList--">
@@ -486,6 +603,11 @@ extends java.lang.Object</pre>
 <li class="blockList">
 <h4>asStringList</h4>
 <pre>public&nbsp;java.util.List&lt;java.lang.String&gt;&nbsp;asStringList()</pre>
+<div class="block">Get Object as String List</div>
+<dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>String List</dd>
+</dl>
 </li>
 </ul>
 <a name="asColoredString-char-">
@@ -495,6 +617,13 @@ extends java.lang.Object</pre>
 <li class="blockList">
 <h4>asColoredString</h4>
 <pre>public&nbsp;java.lang.String&nbsp;asColoredString(char&nbsp;color)</pre>
+<div class="block">Get Object as Colored String</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>color</code> - Color Char to parse</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>Colored String</dd>
+</dl>
 </li>
 </ul>
 <a name="asColoredStringList-char-">
@@ -504,6 +633,13 @@ extends java.lang.Object</pre>
 <li class="blockList">
 <h4>asColoredStringList</h4>
 <pre>public&nbsp;java.util.List&lt;java.lang.String&gt;&nbsp;asColoredStringList(char&nbsp;color)</pre>
+<div class="block">Get Object as Colored String List</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>color</code> - Color Char to parse</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>Colored String List</dd>
+</dl>
 </li>
 </ul>
 <a name="asUUID--">
@@ -513,6 +649,11 @@ extends java.lang.Object</pre>
 <li class="blockList">
 <h4>asUUID</h4>
 <pre>public&nbsp;java.util.UUID&nbsp;asUUID()</pre>
+<div class="block">Get Object as UUID</div>
+<dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>UUID</dd>
+</dl>
 </li>
 </ul>
 <a name="asUUIDList--">
@@ -531,6 +672,11 @@ extends java.lang.Object</pre>
 <li class="blockList">
 <h4>isBoolean</h4>
 <pre>public&nbsp;boolean&nbsp;isBoolean()</pre>
+<div class="block">Check if object is a Boolean</div>
+<dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>Boolean Status</dd>
+</dl>
 </li>
 </ul>
 <a name="isSection--">
@@ -540,6 +686,11 @@ extends java.lang.Object</pre>
 <li class="blockList">
 <h4>isSection</h4>
 <pre>public&nbsp;boolean&nbsp;isSection()</pre>
+<div class="block">Check if object is a YAML Section</div>
+<dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>YAML Section Status</dd>
+</dl>
 </li>
 </ul>
 <a name="isDouble--">
@@ -549,6 +700,11 @@ extends java.lang.Object</pre>
 <li class="blockList">
 <h4>isDouble</h4>
 <pre>public&nbsp;boolean&nbsp;isDouble()</pre>
+<div class="block">Check if object is a Double</div>
+<dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>Double Status</dd>
+</dl>
 </li>
 </ul>
 <a name="isFloat-java.lang.String-">
@@ -558,6 +714,11 @@ extends java.lang.Object</pre>
 <li class="blockList">
 <h4>isFloat</h4>
 <pre>public&nbsp;boolean&nbsp;isFloat(java.lang.String&nbsp;path)</pre>
+<div class="block">Check if object is a Float</div>
+<dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>Float Status</dd>
+</dl>
 </li>
 </ul>
 <a name="isInt--">
@@ -567,6 +728,11 @@ extends java.lang.Object</pre>
 <li class="blockList">
 <h4>isInt</h4>
 <pre>public&nbsp;boolean&nbsp;isInt()</pre>
+<div class="block">Check if object is an Integer</div>
+<dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>Integer Status</dd>
+</dl>
 </li>
 </ul>
 <a name="isList--">
@@ -576,6 +742,11 @@ extends java.lang.Object</pre>
 <li class="blockList">
 <h4>isList</h4>
 <pre>public&nbsp;boolean&nbsp;isList()</pre>
+<div class="block">Check if object is a List</div>
+<dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>List Status</dd>
+</dl>
 </li>
 </ul>
 <a name="isLong--">
@@ -585,6 +756,11 @@ extends java.lang.Object</pre>
 <li class="blockList">
 <h4>isLong</h4>
 <pre>public&nbsp;boolean&nbsp;isLong()</pre>
+<div class="block">Check if object is a Long</div>
+<dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>Long Status</dd>
+</dl>
 </li>
 </ul>
 <a name="isString--">
@@ -594,6 +770,25 @@ extends java.lang.Object</pre>
 <li class="blockList">
 <h4>isString</h4>
 <pre>public&nbsp;boolean&nbsp;isString()</pre>
+<div class="block">Check if object is a String</div>
+<dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>String Status</dd>
+</dl>
+</li>
+</ul>
+<a name="isUUID-java.lang.String-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>isUUID</h4>
+<pre>public&nbsp;boolean&nbsp;isUUID(java.lang.String&nbsp;handle)</pre>
+<div class="block">Check if object is a UUID</div>
+<dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>UUID Status</dd>
+</dl>
 </li>
 </ul>
 <a name="toString--">
@@ -663,13 +858,13 @@ extends java.lang.Object</pre>
 <li>Summary:&nbsp;</li>
 <li>Nested&nbsp;|&nbsp;</li>
 <li>Field&nbsp;|&nbsp;</li>
-<li><a href="#constructor.summary">Constr</a>&nbsp;|&nbsp;</li>
+<li>Constr&nbsp;|&nbsp;</li>
 <li><a href="#method.summary">Method</a></li>
 </ul>
 <ul class="subNavList">
 <li>Detail:&nbsp;</li>
 <li>Field&nbsp;|&nbsp;</li>
-<li><a href="#constructor.detail">Constr</a>&nbsp;|&nbsp;</li>
+<li>Constr&nbsp;|&nbsp;</li>
 <li><a href="#method.detail">Method</a></li>
 </ul>
 </div>

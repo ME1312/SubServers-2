@@ -109,6 +109,7 @@ var activeTableTab = "activeTableTab";
 <br>
 <pre>public final class <span class="typeNameLabel">Util</span>
 extends java.lang.Object</pre>
+<div class="block">SubServers Utility Class</div>
 </li>
 </ul>
 </div>
@@ -150,23 +151,33 @@ extends java.lang.Object</pre>
 <td class="colFirst"><code>static void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Util.html#copyFromJar-java.lang.ClassLoader-java.lang.String-java.lang.String-">copyFromJar</a></span>(java.lang.ClassLoader&nbsp;loader,
            java.lang.String&nbsp;resource,
-           java.lang.String&nbsp;destination)</code>&nbsp;</td>
+           java.lang.String&nbsp;destination)</code>
+<div class="block">Copy from the Class Loader</div>
+</td>
 </tr>
 <tr id="i1" class="rowColor">
-<td class="colFirst"><code>static boolean</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Util.html#isException-net.ME1312.SubServers.Client.Bukkit.Library.Util.ExceptionRunnable-">isException</a></span>(<a href="../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Util.ExceptionRunnable.html" title="interface in net.ME1312.SubServers.Client.Bukkit.Library">Util.ExceptionRunnable</a>&nbsp;runnable)</code>&nbsp;</td>
+<td class="colFirst"><code>static void</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Util.html#deleteDirectory-java.io.File-">deleteDirectory</a></span>(java.io.File&nbsp;folder)</code>
+<div class="block">Delete Directory</div>
+</td>
 </tr>
 <tr id="i2" class="altColor">
 <td class="colFirst"><code>static boolean</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Util.html#isSpigot--">isSpigot</a></span>()</code>&nbsp;</td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Util.html#isException-net.ME1312.SubServers.Client.Bukkit.Library.Util.ExceptionRunnable-">isException</a></span>(<a href="../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Util.ExceptionRunnable.html" title="interface in net.ME1312.SubServers.Client.Bukkit.Library">Util.ExceptionRunnable</a>&nbsp;runnable)</code>
+<div class="block">Determines if an Exception will occur</div>
+</td>
 </tr>
 <tr id="i3" class="rowColor">
 <td class="colFirst"><code>static java.lang.String</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Util.html#readAll-java.io.Reader-">readAll</a></span>(java.io.Reader&nbsp;rd)</code>&nbsp;</td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Util.html#readAll-java.io.Reader-">readAll</a></span>(java.io.Reader&nbsp;rd)</code>
+<div class="block">Read Everything from Reader</div>
+</td>
 </tr>
 <tr id="i4" class="altColor">
 <td class="colFirst"><code>static java.lang.String</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Util.html#unescapeJavaString-java.lang.String-">unescapeJavaString</a></span>(java.lang.String&nbsp;str)</code>&nbsp;</td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Util.html#unescapeJavaString-java.lang.String-">unescapeJavaString</a></span>(java.lang.String&nbsp;str)</code>
+<div class="block">Parse escapes in a Java String</div>
+</td>
 </tr>
 </table>
 <ul class="blockList">
@@ -198,7 +209,12 @@ extends java.lang.Object</pre>
 <h4>readAll</h4>
 <pre>public static&nbsp;java.lang.String&nbsp;readAll(java.io.Reader&nbsp;rd)
                                 throws java.io.IOException</pre>
+<div class="block">Read Everything from Reader</div>
 <dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>rd</code> - Reader</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>Reader Contents</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
 <dd><code>java.io.IOException</code></dd>
 </dl>
@@ -213,15 +229,13 @@ extends java.lang.Object</pre>
 <pre>public static&nbsp;void&nbsp;copyFromJar(java.lang.ClassLoader&nbsp;loader,
                                java.lang.String&nbsp;resource,
                                java.lang.String&nbsp;destination)</pre>
-</li>
-</ul>
-<a name="isSpigot--">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>isSpigot</h4>
-<pre>public static&nbsp;boolean&nbsp;isSpigot()</pre>
+<div class="block">Copy from the Class Loader</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>loader</code> - ClassLoader</dd>
+<dd><code>resource</code> - Location From</dd>
+<dd><code>destination</code> - Location To</dd>
+</dl>
 </li>
 </ul>
 <a name="isException-net.ME1312.SubServers.Client.Bukkit.Library.Util.ExceptionRunnable-">
@@ -231,6 +245,27 @@ extends java.lang.Object</pre>
 <li class="blockList">
 <h4>isException</h4>
 <pre>public static&nbsp;boolean&nbsp;isException(<a href="../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Util.ExceptionRunnable.html" title="interface in net.ME1312.SubServers.Client.Bukkit.Library">Util.ExceptionRunnable</a>&nbsp;runnable)</pre>
+<div class="block">Determines if an Exception will occur</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>runnable</code> - Runnable</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>If an Exception occured</dd>
+</dl>
+</li>
+</ul>
+<a name="deleteDirectory-java.io.File-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>deleteDirectory</h4>
+<pre>public static&nbsp;void&nbsp;deleteDirectory(java.io.File&nbsp;folder)</pre>
+<div class="block">Delete Directory</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>folder</code> - Location</dd>
+</dl>
 </li>
 </ul>
 <a name="unescapeJavaString-java.lang.String-">
@@ -240,6 +275,13 @@ extends java.lang.Object</pre>
 <li class="blockList">
 <h4>unescapeJavaString</h4>
 <pre>public static&nbsp;java.lang.String&nbsp;unescapeJavaString(java.lang.String&nbsp;str)</pre>
+<div class="block">Parse escapes in a Java String</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>str</code> - String</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>Unescaped String</dd>
+</dl>
 </li>
 </ul>
 </li>

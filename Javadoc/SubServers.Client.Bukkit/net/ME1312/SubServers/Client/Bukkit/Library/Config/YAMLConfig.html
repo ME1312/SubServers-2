@@ -109,6 +109,7 @@ var activeTableTab = "activeTableTab";
 <br>
 <pre>public class <span class="typeNameLabel">YAMLConfig</span>
 extends java.lang.Object</pre>
+<div class="block">YAML Config Class</div>
 </li>
 </ul>
 </div>
@@ -127,7 +128,9 @@ extends java.lang.Object</pre>
 <th class="colOne" scope="col">Constructor and Description</th>
 </tr>
 <tr class="altColor">
-<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Config/YAMLConfig.html#YAMLConfig-java.io.File-">YAMLConfig</a></span>(java.io.File&nbsp;file)</code>&nbsp;</td>
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Config/YAMLConfig.html#YAMLConfig-java.io.File-">YAMLConfig</a></span>(java.io.File&nbsp;file)</code>
+<div class="block">Creates/Loads a YAML Formatted Config</div>
+</td>
 </tr>
 </table>
 </li>
@@ -146,23 +149,33 @@ extends java.lang.Object</pre>
 </tr>
 <tr id="i0" class="altColor">
 <td class="colFirst"><code><a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Config/YAMLSection.html" title="class in net.ME1312.SubServers.Client.Bukkit.Library.Config">YAMLSection</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Config/YAMLConfig.html#get--">get</a></span>()</code>&nbsp;</td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Config/YAMLConfig.html#get--">get</a></span>()</code>
+<div class="block">Get Config Contents</div>
+</td>
 </tr>
 <tr id="i1" class="rowColor">
 <td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Config/YAMLConfig.html#reload--">reload</a></span>()</code>&nbsp;</td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Config/YAMLConfig.html#reload--">reload</a></span>()</code>
+<div class="block">Reload Config Contents</div>
+</td>
 </tr>
 <tr id="i2" class="altColor">
 <td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Config/YAMLConfig.html#save--">save</a></span>()</code>&nbsp;</td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Config/YAMLConfig.html#save--">save</a></span>()</code>
+<div class="block">Save Config Contents</div>
+</td>
 </tr>
 <tr id="i3" class="rowColor">
 <td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Config/YAMLConfig.html#set-net.ME1312.SubServers.Client.Bukkit.Library.Config.YAMLSection-">set</a></span>(<a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Config/YAMLSection.html" title="class in net.ME1312.SubServers.Client.Bukkit.Library.Config">YAMLSection</a>&nbsp;yaml)</code>&nbsp;</td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Config/YAMLConfig.html#set-net.ME1312.SubServers.Client.Bukkit.Library.Config.YAMLSection-">set</a></span>(<a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Config/YAMLSection.html" title="class in net.ME1312.SubServers.Client.Bukkit.Library.Config">YAMLSection</a>&nbsp;value)</code>
+<div class="block">Set Config Contents</div>
+</td>
 </tr>
 <tr id="i4" class="altColor">
 <td class="colFirst"><code>org.json.JSONObject</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Config/YAMLConfig.html#toJSON--">toJSON</a></span>()</code>&nbsp;</td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Config/YAMLConfig.html#toJSON--">toJSON</a></span>()</code>
+<div class="block">Converts Config Contents to JSON</div>
+</td>
 </tr>
 <tr id="i5" class="rowColor">
 <td class="colFirst"><code>java.lang.String</code></td>
@@ -199,7 +212,10 @@ extends java.lang.Object</pre>
 <pre>public&nbsp;YAMLConfig(java.io.File&nbsp;file)
            throws java.io.IOException,
                   org.yaml.snakeyaml.error.YAMLException</pre>
+<div class="block">Creates/Loads a YAML Formatted Config</div>
 <dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>file</code> - </dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
 <dd><code>java.io.IOException</code></dd>
 <dd><code>org.yaml.snakeyaml.error.YAMLException</code></dd>
@@ -221,6 +237,11 @@ extends java.lang.Object</pre>
 <li class="blockList">
 <h4>get</h4>
 <pre>public&nbsp;<a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Config/YAMLSection.html" title="class in net.ME1312.SubServers.Client.Bukkit.Library.Config">YAMLSection</a>&nbsp;get()</pre>
+<div class="block">Get Config Contents</div>
+<dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>Config Contents</dd>
+</dl>
 </li>
 </ul>
 <a name="set-net.ME1312.SubServers.Client.Bukkit.Library.Config.YAMLSection-">
@@ -229,7 +250,12 @@ extends java.lang.Object</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>set</h4>
-<pre>public&nbsp;void&nbsp;set(<a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Config/YAMLSection.html" title="class in net.ME1312.SubServers.Client.Bukkit.Library.Config">YAMLSection</a>&nbsp;yaml)</pre>
+<pre>public&nbsp;void&nbsp;set(<a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Config/YAMLSection.html" title="class in net.ME1312.SubServers.Client.Bukkit.Library.Config">YAMLSection</a>&nbsp;value)</pre>
+<div class="block">Set Config Contents</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>value</code> - Value</dd>
+</dl>
 </li>
 </ul>
 <a name="reload--">
@@ -240,6 +266,7 @@ extends java.lang.Object</pre>
 <h4>reload</h4>
 <pre>public&nbsp;void&nbsp;reload()
             throws java.io.IOException</pre>
+<div class="block">Reload Config Contents</div>
 <dl>
 <dt><span class="throwsLabel">Throws:</span></dt>
 <dd><code>java.io.IOException</code></dd>
@@ -254,6 +281,7 @@ extends java.lang.Object</pre>
 <h4>save</h4>
 <pre>public&nbsp;void&nbsp;save()
           throws java.io.IOException</pre>
+<div class="block">Save Config Contents</div>
 <dl>
 <dt><span class="throwsLabel">Throws:</span></dt>
 <dd><code>java.io.IOException</code></dd>
@@ -280,6 +308,11 @@ extends java.lang.Object</pre>
 <li class="blockList">
 <h4>toJSON</h4>
 <pre>public&nbsp;org.json.JSONObject&nbsp;toJSON()</pre>
+<div class="block">Converts Config Contents to JSON</div>
+<dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>JSON Formatted Config Contents</dd>
+</dl>
 </li>
 </ul>
 </li>

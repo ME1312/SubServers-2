@@ -2,12 +2,22 @@ package net.ME1312.SubServers.Client.Bukkit.Library;
 
 import java.io.*;
 
+/**
+ * SubServers Utility Class
+ */
 public final class Util {
     private Util(){}
     public interface ExceptionRunnable {
         void run() throws Throwable;
     }
 
+    /**
+     * Read Everything from Reader
+     *
+     * @param rd Reader
+     * @return Reader Contents
+     * @throws IOException
+     */
     public static String readAll(Reader rd) throws IOException {
         StringBuilder sb = new StringBuilder();
         int cp;
@@ -17,6 +27,13 @@ public final class Util {
         return sb.toString();
     }
 
+    /**
+     * Copy from the Class Loader
+     *
+     * @param loader ClassLoader
+     * @param resource Location From
+     * @param destination Location To
+     */
     public static void copyFromJar(ClassLoader loader, String resource, String destination) {
         InputStream resStreamIn = loader.getResourceAsStream(resource);
         File resDestFile = new File(destination);
@@ -34,13 +51,12 @@ public final class Util {
         }
     }
 
-    public static boolean isSpigot() {
-        final Container<Boolean> spigot = new Container<Boolean>(false);
-        return !isException(() -> {
-            if (Class.forName("org.spigotmc.SpigotConfig") != null) spigot.set(true);
-        }) && spigot.get();
-    }
-
+    /**
+     * Determines if an Exception will occur
+     *
+     * @param runnable Runnable
+     * @return If an Exception occured
+     */
     public static boolean isException(ExceptionRunnable runnable) {
         try {
             runnable.run();
@@ -50,6 +66,31 @@ public final class Util {
         }
     }
 
+    /**
+     * Delete Directory
+     *
+     * @param folder Location
+     */
+    public static void deleteDirectory(File folder) {
+        File[] files = folder.listFiles();
+        if(files!=null) {
+            for(File f: files) {
+                if(f.isDirectory()) {
+                    deleteDirectory(f);
+                } else {
+                    f.delete();
+                }
+            }
+        }
+        folder.delete();
+    }
+
+    /**
+     * Parse escapes in a Java String
+     *
+     * @param str String
+     * @return Unescaped String
+     */
     public static String unescapeJavaString(String str) {
 
         StringBuilder sb = new StringBuilder(str.length());

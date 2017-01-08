@@ -6,6 +6,9 @@ import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import org.json.JSONObject;
 
+/**
+ * SubData Recieve Generic Info Event
+ */
 public class SubDataRecieveGenericInfoEvent extends Event implements SubEvent {
     private String handle;
     private Version version;

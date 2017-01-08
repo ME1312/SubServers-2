@@ -1,6 +1,8 @@
 package net.ME1312.SubServers.Client.Bukkit.Library.Config;
 
-import org.bukkit.ChatColor;
+import net.ME1312.SubServers.Client.Bukkit.Library.Util;
+import net.md_5.bungee.api.ChatColor;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.error.YAMLException;
@@ -9,38 +11,67 @@ import java.io.InputStream;
 import java.io.Reader;
 import java.util.*;
 
+/**
+ * YAML Config Section Class
+ */
 @SuppressWarnings({"unchecked", "unused"})
 public class YAMLSection {
     protected Map<String, Object> map;
-    protected String label = null;
+    protected String handle = null;
     protected YAMLSection up = null;
     private Yaml yaml;
 
+    /**
+     * Creates an empty YAML Section
+     */
     public YAMLSection() {
         this.map = new HashMap<>();
         this.yaml = new Yaml(YAMLConfig.getDumperOptions());
     }
 
-    public YAMLSection(InputStream io) throws YAMLException {
-        this.map = (Map<String, Object>) (this.yaml = new Yaml(YAMLConfig.getDumperOptions())).load(io);
+    /**
+     * Creates a YAML Section from an Input Stream
+     *
+     * @param stream Input Stream
+     * @throws YAMLException
+     */
+    public YAMLSection(InputStream stream) throws YAMLException {
+        this.map = (Map<String, Object>) (this.yaml = new Yaml(YAMLConfig.getDumperOptions())).load(stream);
     }
 
+    /**
+     * Creates a YAML Section from a Reader
+     *
+     * @param reader Reader
+     * @throws YAMLException
+     */
     public YAMLSection(Reader reader) throws YAMLException {
         this.map = (Map<String, Object>) (this.yaml = new Yaml(YAMLConfig.getDumperOptions())).load(reader);
     }
 
+    /**
+     * Creates a YAML Section from JSON Contents
+     *
+     * @param json JSON
+     */
     public YAMLSection(JSONObject json) {
         this.map = (Map<String, Object>) (this.yaml = new Yaml(YAMLConfig.getDumperOptions())).load(json.toString(4));
     }
 
-    public YAMLSection(String yaml) throws YAMLException {
-        this.map = (Map<String, Object>) (this.yaml = new Yaml(YAMLConfig.getDumperOptions())).load(yaml);
+    /**
+     * Creates a YAML Section from String
+     *
+     * @param str String
+     * @throws YAMLException
+     */
+    public YAMLSection(String str) throws YAMLException {
+        this.map = (Map<String, Object>) (this.yaml = new Yaml(YAMLConfig.getDumperOptions())).load(str);
     }
     
-    protected YAMLSection(Map<String, ?> map, YAMLSection up, String label, Yaml yaml) {
+    protected YAMLSection(Map<String, ?> map, YAMLSection up, String handle, Yaml yaml) {
         this.map = new HashMap<String, Object>();
         this.yaml = yaml;
-        this.label = label;
+        this.handle = handle;
         this.up = up;
 
         if (map != null) {
@@ -50,11 +81,21 @@ public class YAMLSection {
         }
     }
 
+    /**
+     * Get the Keys
+     *
+     * @return KeySet
+     */
     public Set<String> getKeys() {
         return map.keySet();
     }
 
 
+    /**
+     * Get the Values
+     *
+     * @return Values
+     */
     public Collection<YAMLValue> getValues() {
         List<YAMLValue> values = new ArrayList<YAMLValue>();
         for (String value : map.keySet()) {
@@ -63,58 +104,137 @@ public class YAMLSection {
         return values;
     }
 
-    public boolean contains(String label) {
-        return map.keySet().contains(label);
+    /**
+     * Check if a Handle exists
+     *
+     * @param handle Handle
+     * @return if that handle exists
+     */
+    public boolean contains(String handle) {
+        return map.keySet().contains(handle);
     }
 
-    public void remove(String label) {
-        map.remove(label);
+    /**
+     * Remove an Object by Handle
+     *
+     * @param handle Handle
+     */
+    public void remove(String handle) {
+        map.remove(handle);
 
-        if (this.label != null && this.up != null) {
-            this.up.set(this.label, this);
+        if (this.handle != null && this.up != null) {
+            this.up.set(this.handle, this);
         }
     }
 
+    /**
+     * Remove all Objects from this YAML Section
+     */
     public void clear() {
         map.clear();
     }
 
-    public void set(String label, Object value) {
-        if (value instanceof YAMLConfig) { // YAML Handler Values
-            ((YAMLConfig) value).get().up = this;
-            ((YAMLConfig) value).get().label = label;
-            map.put(label, ((YAMLConfig) value).get().map);
-        } else if (value instanceof YAMLSection) {
-            ((YAMLSection) value).up = this;
-            ((YAMLSection) value).label = label;
-            map.put(label, ((YAMLSection) value).map);
-        } else if (value instanceof YAMLValue) {
-            map.put(label, ((YAMLValue) value).asObject());
-        } else if (value instanceof UUID) {
-            map.put(label, ((UUID) value).toString());
-        } else {
-            map.put(label, value);
+    private Object convert(Object value) {
+        if (value instanceof JSONObject) {
+            value = new YAMLSection((JSONObject) value);
         }
 
-        if (this.label != null && this.up != null) {
-            this.up.set(this.label, this);
+        if (value instanceof YAMLConfig) {
+            ((YAMLConfig) value).get().up = this;
+            ((YAMLConfig) value).get().handle = handle;
+            return ((YAMLConfig) value).get().map;
+        } else if (value instanceof YAMLSection) {
+            ((YAMLSection) value).up = this;
+            ((YAMLSection) value).handle = handle;
+            return ((YAMLSection) value).map;
+        } else if (value instanceof YAMLValue) {
+            return ((YAMLValue) value).asObject();
+        } else if (value instanceof JSONArray) {
+            List<Object> list = new ArrayList<Object>();
+            for (int i=0; i < ((JSONArray) value).length(); i++) list.add(((JSONArray) value).getString(i));
+            return list;
+        } else if (value instanceof UUID) {
+            return ((UUID) value).toString();
+        } else {
+            return value;
         }
     }
 
+    /**
+     * Set Object into this YAML Section
+     *
+     * @param handle Handle
+     * @param value Value
+     */
+    public void set(String handle, Object value) {
+        if (value instanceof Collection) {
+            set(handle, (Collection<?>) value);
+        } else {
+            map.put(handle, convert(value));
+
+            if (this.handle != null && this.up != null) {
+                this.up.set(this.handle, this);
+            }
+        }
+    }
+
+    /**
+     * Set Collection&lt;V&gt; into this YAML Section
+     *
+     * @param handle Handle
+     * @param list Value
+     * @param <V> Collection Type
+     */
+    public <V> void set(String handle, Collection<V> list) {
+        List<Object> values = new LinkedList<Object>();
+        for (V value : list) {
+            values.add(convert(value));
+        }
+        map.put(handle, values);
+
+        if (this.handle != null && this.up != null) {
+            this.up.set(this.handle, this);
+        }
+    }
+
+    /**
+     * Set All Objects into this YAML Section
+     *
+     * @param values Map to set
+     */
     public void setAll(Map<String, ?> values) {
         for (String value : values.keySet()) {
             set(value, values.get(value));
         }
     }
 
+    /**
+     * Copy YAML Values to this YAML Section
+     *
+     * @param values
+     */
     public void setAll(YAMLSection values) {
         for (String value : values.map.keySet()) {
             set(value, values.map.get(value));
         }
     }
 
+    /**
+     * Go up a level in the config (or null if this is the top layer)
+     *
+     * @return Super Section
+     */
     public YAMLSection superSection() {
         return up;
+    }
+
+    /**
+     * Clone this YAML Section
+     *
+     * @return
+     */
+    public YAMLSection clone() {
+        return new YAMLSection(map, null, null, yaml);
     }
 
     @Override
@@ -122,26 +242,57 @@ public class YAMLSection {
         return yaml.dump(map);
     }
 
+    /**
+     * Convert to JSON
+     *
+     * @return JSON
+     */
     public JSONObject toJSON() {
         return new JSONObject(map);
     }
 
-    public YAMLValue get(String label) {
-        return (map.get(label) != null)?(new YAMLValue(map.get(label), this, label, yaml)):null;
+    /**
+     * Get an Object by Handle
+     *
+     * @param handle Handle
+     * @return Object
+     */
+    public YAMLValue get(String handle) {
+        return (map.get(handle) != null)?(new YAMLValue(map.get(handle), this, handle, yaml)):null;
     }
 
-    public YAMLValue get(String label, Object def) {
-        return new YAMLValue((map.get(label) != null)?map.get(label):def, this, label, yaml);
+    /**
+     * Get an Object by Handle
+     *
+     * @param handle Handle
+     * @param def Default
+     * @return Object
+     */
+    public YAMLValue get(String handle, Object def) {
+        return new YAMLValue((map.get(handle) != null)?map.get(handle):def, this, handle, yaml);
     }
 
-    public YAMLValue get(String label, YAMLValue def) {
-        return (map.get(label) != null) ? (new YAMLValue(map.get(label), this, label, yaml)) : def;
+    /**
+     * Get an Object by Handle
+     *
+     * @param handle Handle
+     * @param def Default
+     * @return Object
+     */
+    public YAMLValue get(String handle, YAMLValue def) {
+        return (map.get(handle) != null) ? (new YAMLValue(map.get(handle), this, handle, yaml)) : def;
     }
 
-    public List<YAMLValue> getList(String label) {
-        if (map.get(label) != null) {
+    /**
+     * Get a List by Handle
+     *
+     * @param handle Handle
+     * @return Object
+     */
+    public List<YAMLValue> getList(String handle) {
+        if (map.get(handle) != null) {
             List<YAMLValue> values = new ArrayList<YAMLValue>();
-            for (Object value : (List<?>) map.get(label)) {
+            for (Object value : (List<?>) map.get(handle)) {
                 values.add(new YAMLValue(value, null, null, yaml));
             }
             return values;
@@ -150,9 +301,16 @@ public class YAMLSection {
         }
     }
 
-    public List<YAMLValue> getList(String label, Collection<?> def) {
-        if (map.get(label) != null) {
-            return getList(label);
+    /**
+     * Get a List by Handle
+     *
+     * @param handle Handle
+     * @param def Default
+     * @return Object List
+     */
+    public List<YAMLValue> getList(String handle, Collection<?> def) {
+        if (map.get(handle) != null) {
+            return getList(handle);
         } else {
             List<YAMLValue> values = new ArrayList<YAMLValue>();
             for (Object value : def) {
@@ -162,9 +320,16 @@ public class YAMLSection {
         }
     }
 
-    public List<YAMLValue> getList(String label, List<? extends YAMLValue> def) {
-        if (map.get(label) != null) {
-            return getList(label);
+    /**
+     * Get a List by Handle
+     *
+     * @param handle Handle
+     * @param def Default
+     * @return Object List
+     */
+    public List<YAMLValue> getList(String handle, List<? extends YAMLValue> def) {
+        if (map.get(handle) != null) {
+            return getList(handle);
         } else {
             List<YAMLValue> values = new ArrayList<YAMLValue>();
             for (YAMLValue value : def) {
@@ -174,54 +339,132 @@ public class YAMLSection {
         }
     }
 
-    public Object getObject(String label) {
-        return map.get(label);
+    /**
+     * Get a Object by Handle
+     *
+     * @param handle Handle
+     * @return Object
+     */
+    public Object getObject(String handle) {
+        return map.get(handle);
     }
 
-    public Object getObject(String label, Object def) {
-        return (map.get(label) != null)?map.get(label):def;
+    /**
+     * Get a Object by Handle
+     *
+     * @param handle Handle
+     * @param def Default
+     * @return Object
+     */
+    public Object getObject(String handle, Object def) {
+        return (map.get(handle) != null)?map.get(handle):def;
     }
 
-    public List<?> getObjectList(String label) {
-        return (List<?>) map.get(label);
+    /**
+     * Get a Object List by Handle
+     *
+     * @param handle Handle
+     * @return Object List
+     */
+    public List<?> getObjectList(String handle) {
+        return (List<?>) map.get(handle);
     }
 
-    public List<?> getObjectList(String label, List<?> def) {
-        return (List<?>) ((map.get(label) != null)?map.get(label):def);
+    /**
+     * Get a Object List by Handle
+     *
+     * @param handle Handle
+     * @param def Default
+     * @return Object List
+     */
+    public List<?> getObjectList(String handle, List<?> def) {
+        return (List<?>) ((map.get(handle) != null)?map.get(handle):def);
     }
 
-    public boolean getBoolean(String label) {
-        return (boolean) map.get(label);
+    /**
+     * Get a Boolean by Handle
+     *
+     * @param handle Handle
+     * @return Boolean
+     */
+    public boolean getBoolean(String handle) {
+        return (boolean) map.get(handle);
     }
 
-    public boolean getBoolean(String label, boolean def) {
-        return (boolean) ((map.get(label) != null)?map.get(label):def);
+    /**
+     * Get a Boolean by Handle
+     *
+     * @param handle Handle
+     * @param def Default
+     * @return Boolean
+     */
+    public boolean getBoolean(String handle, boolean def) {
+        return (boolean) ((map.get(handle) != null)?map.get(handle):def);
     }
 
-    public List<Boolean> getBooleanList(String label) {
-        return (List<Boolean>) map.get(label);
+    /**
+     * Get a Boolean List by Handle
+     *
+     * @param handle Handle
+     * @return Boolean List
+     */
+    public List<Boolean> getBooleanList(String handle) {
+        return (List<Boolean>) map.get(handle);
     }
 
-    public List<Boolean> getBooleanList(String label, List<Boolean> def) {
-        return (List<Boolean>) ((map.get(label) != null)?map.get(label):def);
+    /**
+     * Get a Boolean List by Handle
+     *
+     * @param handle Handle
+     * @param def Default
+     * @return Boolean List
+     */
+    public List<Boolean> getBooleanList(String handle, List<Boolean> def) {
+        return (List<Boolean>) ((map.get(handle) != null)?map.get(handle):def);
     }
 
-    public YAMLSection getSection(String label) {
-        return (map.get(label) != null)?(new YAMLSection((Map<String, Object>) map.get(label), this, label, yaml)):null;
+    /**
+     * Get a YAML Section by Handle
+     *
+     * @param handle Handle
+     * @return YAML Section
+     */
+    public YAMLSection getSection(String handle) {
+        return (map.get(handle) != null)?(new YAMLSection((Map<String, Object>) map.get(handle), this, handle, yaml)):null;
     }
 
-    public YAMLSection getSection(String label, Map<String, ?> def) {
-        return new YAMLSection((Map<String, Object>) ((map.get(label) != null)?map.get(label):def), this, label, yaml);
+    /**
+     * Get a YAML Section by Handle
+     *
+     * @param handle Handle
+     * @param def Default
+     * @return YAML Section
+     */
+    public YAMLSection getSection(String handle, Map<String, ?> def) {
+        return new YAMLSection((Map<String, Object>) ((map.get(handle) != null)?map.get(handle):def), this, handle, yaml);
     }
 
-    public YAMLSection getSection(String label, YAMLSection def) {
-        return (map.get(label) != null)?(new YAMLSection((Map<String, Object>) map.get(label), this, label, yaml)):def;
+    /**
+     * Get a YAML Section by Handle
+     *
+     * @param handle Handle
+     * @param def Default
+     * @return YAML Section
+     */
+    public YAMLSection getSection(String handle, YAMLSection def) {
+        return (map.get(handle) != null)?(new YAMLSection((Map<String, Object>) map.get(handle), this, handle, yaml)):def;
     }
 
-    public List<YAMLSection> getSectionList(String label) {
-        if (map.get(label) != null) {
+    /**
+     * Get a YAML Section List by Handle
+     *
+     * @param handle Handle
+     * @return YAML Section List
+     */
+    public List<YAMLSection> getSectionList(String handle) {
+        if (map.get(handle) != null) {
             List<YAMLSection> values = new ArrayList<YAMLSection>();
-            for (Map<String, ?> value : (List<? extends Map<String, ?>>) map.get(label)) {
+            for (Map<String, ?> value : (List<? extends Map<String, ?>>) map.get(handle)) {
                 values.add(new YAMLSection(value, null, null, yaml));
             }
             return values;
@@ -230,9 +473,16 @@ public class YAMLSection {
         }
     }
 
-    public List<YAMLSection> getSectionList(String label, Collection<? extends Map<String, ?>> def) {
-        if (map.get(label) != null) {
-            return getSectionList(label);
+    /**
+     * Get a YAML Section List by Handle
+     *
+     * @param handle Handle
+     * @param def Default
+     * @return YAML Section List
+     */
+    public List<YAMLSection> getSectionList(String handle, Collection<? extends Map<String, ?>> def) {
+        if (map.get(handle) != null) {
+            return getSectionList(handle);
         } else {
             List<YAMLSection> values = new ArrayList<YAMLSection>();
             for (Map<String, ?> value : def) {
@@ -242,9 +492,16 @@ public class YAMLSection {
         }
     }
 
-    public List<YAMLSection> getSectionList(String label, List<? extends YAMLSection> def) {
-        if (map.get(label) != null) {
-            return getSectionList(label);
+    /**
+     * Get a YAML Section List by Handle
+     *
+     * @param handle Handle
+     * @param def Default
+     * @return YAML Section List
+     */
+    public List<YAMLSection> getSectionList(String handle, List<? extends YAMLSection> def) {
+        if (map.get(handle) != null) {
+            return getSectionList(handle);
         } else {
             List<YAMLSection> values = new ArrayList<YAMLSection>();
             for (YAMLSection value : def) {
@@ -254,115 +511,290 @@ public class YAMLSection {
         }
     }
 
-    public double getDouble(String label) {
-        return (double) map.get(label);
+    /**
+     * Get a Double by Handle
+     *
+     * @param handle Handle
+     * @return Double
+     */
+    public double getDouble(String handle) {
+        return (double) map.get(handle);
     }
 
-    public double getDouble(String label, double def) {
-        return (double) ((map.get(label) != null)?map.get(label):def);
+    /**
+     * Get a Double by Handle
+     *
+     * @param handle Handle
+     * @param def Default
+     * @return Double
+     */
+    public double getDouble(String handle, double def) {
+        return (double) ((map.get(handle) != null)?map.get(handle):def);
     }
 
-    public List<Double> getDoubleList(String label) {
-        return (List<Double>) map.get(label);
+    /**
+     * Get a Double List by Handle
+     *
+     * @param handle Handle
+     * @return Double List
+     */
+    public List<Double> getDoubleList(String handle) {
+        return (List<Double>) map.get(handle);
     }
 
-    public List<Double> getDoubleList(String label, List<Double> def) {
-        return (List<Double>) ((map.get(label) != null)?map.get(label):def);
+    /**
+     * Get a Double List by Handle
+     *
+     * @param handle Handle
+     * @param def Default
+     * @return Double List
+     */
+    public List<Double> getDoubleList(String handle, List<Double> def) {
+        return (List<Double>) ((map.get(handle) != null)?map.get(handle):def);
     }
 
-    public float getFloat(String label) {
-        return (float) map.get(label);
+    /**
+     * Get a Float by Handle
+     *
+     * @param handle Handle
+     * @return Float
+     */
+    public float getFloat(String handle) {
+        return (float) map.get(handle);
     }
 
-    public float getFloat(String label, float def) {
-        return (float) ((map.get(label) != null)?map.get(label):def);
+    /**
+     * Get a Float by Handle
+     *
+     * @param handle Handle
+     * @param def Default
+     * @return Float
+     */
+    public float getFloat(String handle, float def) {
+        return (float) ((map.get(handle) != null)?map.get(handle):def);
     }
 
-    public List<Float> getFloatList(String label) {
-        return (List<Float>) map.get(label);
+    /**
+     * Get a Float List by Handle
+     *
+     * @param handle Handle
+     * @return Float List
+     */
+    public List<Float> getFloatList(String handle) {
+        return (List<Float>) map.get(handle);
     }
 
-    public List<Float> getFloatList(String label, float def) {
-        return (List<Float>) ((map.get(label) != null)?map.get(label):def);
+    /**
+     * Get a Float List by Handle
+     *
+     * @param handle Handle
+     * @param def Default
+     * @return Float List
+     */
+    public List<Float> getFloatList(String handle, float def) {
+        return (List<Float>) ((map.get(handle) != null)?map.get(handle):def);
     }
 
-    public int getInt(String label) {
-        return (int) map.get(label);
+    /**
+     * Get an Integer by Handle
+     *
+     * @param handle Handle
+     * @return Integer
+     */
+    public int getInt(String handle) {
+        return (int) map.get(handle);
     }
 
-    public int getInt(String label, int def) {
-        return (int) ((map.get(label) != null)?map.get(label):def);
+    /**
+     * Get an Integer by Handle
+     *
+     * @param handle Handle
+     * @param def Default
+     * @return Integer
+     */
+    public int getInt(String handle, int def) {
+        return (int) ((map.get(handle) != null)?map.get(handle):def);
     }
 
-    public List<Integer> getIntList(String label) {
-        return (List<Integer>) map.get(label);
+    /**
+     * Get an Integer List by Handle
+     *
+     * @param handle Handle
+     * @return Integer List
+     */
+    public List<Integer> getIntList(String handle) {
+        return (List<Integer>) map.get(handle);
     }
 
-    public List<Integer> getIntList(String label, List<Integer> def) {
-        return (List<Integer>) ((map.get(label) != null)?map.get(label):def);
+    /**
+     * Get an Integer List by Handle
+     *
+     * @param handle Handle
+     * @param def Default
+     * @return Integer List
+     */
+    public List<Integer> getIntList(String handle, List<Integer> def) {
+        return (List<Integer>) ((map.get(handle) != null)?map.get(handle):def);
     }
 
-    public long getLong(String label) {
-        return (long) map.get(label);
+    /**
+     * Get a Long by Handle
+     *
+     * @param handle Handle
+     * @return Long
+     */
+    public long getLong(String handle) {
+        return (long) map.get(handle);
     }
 
-    public long getLong(String label, long def) {
-        return (long) ((map.get(label) != null)?map.get(label):def);
+    /**
+     * Get a Long by Handle
+     *
+     * @param handle Handle
+     * @param def Default
+     * @return Long
+     */
+    public long getLong(String handle, long def) {
+        return (long) ((map.get(handle) != null)?map.get(handle):def);
     }
 
-    public List<Long> getLongList(String label) {
-        return (List<Long>) map.get(label);
+    /**
+     * Get a Long List by Handle
+     *
+     * @param handle Handle
+     * @return Long List
+     */
+    public List<Long> getLongList(String handle) {
+        return (List<Long>) map.get(handle);
     }
 
-    public List<Long> getLongList(String label, List<Long> def) {
-        return (List<Long>) ((map.get(label) != null)?map.get(label):def);
+    /**
+     * Get a Long List by Handle
+     *
+     * @param handle Handle
+     * @param def Default
+     * @return Long List
+     */
+    public List<Long> getLongList(String handle, List<Long> def) {
+        return (List<Long>) ((map.get(handle) != null)?map.get(handle):def);
     }
 
-    public short getShort(String label) {
-        return (short) map.get(label);
+    /**
+     * Get a Short by Handle
+     *
+     * @param handle Handle
+     * @return Short
+     */
+    public short getShort(String handle) {
+        return (short) map.get(handle);
     }
 
-    public short getShort(String label, short def) {
-        return (short) ((map.get(label) != null)?map.get(label):def);
+    /**
+     * Get a Short by Handle
+     *
+     * @param handle Handle
+     * @param def Default
+     * @return Short
+     */
+    public short getShort(String handle, short def) {
+        return (short) ((map.get(handle) != null)?map.get(handle):def);
     }
 
-    public List<Short> getShortList(String label) {
-        return (List<Short>) map.get(label);
+    /**
+     * Get a Short List by Handle
+     *
+     * @param handle Handle
+     * @return Short List
+     */
+    public List<Short> getShortList(String handle) {
+        return (List<Short>) map.get(handle);
     }
 
-    public List<Short> getShortList(String label, List<Short> def) {
-        return (List<Short>) ((map.get(label) != null)?map.get(label):def);
+    /**
+     * Get a Short List by Handle
+     *
+     * @param handle Handle
+     * @param def Default
+     * @return Short List
+     */
+    public List<Short> getShortList(String handle, List<Short> def) {
+        return (List<Short>) ((map.get(handle) != null)?map.get(handle):def);
     }
 
-    public String getRawString(String label) {
-        return (String) map.get(label);
+    /**
+     * Get an Unparsed String by Handle
+     *
+     * @param handle Handle
+     * @return Unparsed String
+     */
+    public String getRawString(String handle) {
+        return (String) map.get(handle);
     }
 
-    public String getRawString(String label, String def) {
-        return (String) ((map.get(label) != null)?map.get(label):def);
+    /**
+     * Get an Unparsed String by Handle
+     *
+     * @param handle Handle
+     * @param def Default
+     * @return Unparsed String
+     */
+    public String getRawString(String handle, String def) {
+        return (String) ((map.get(handle) != null)?map.get(handle):def);
     }
 
-    public List<String> getRawStringList(String label) {
-        return (List<String>) map.get(label);
+    /**
+     * Get an Unparsed String List by Handle
+     *
+     * @param handle Handle
+     * @return Unparsed String List
+     */
+    public List<String> getRawStringList(String handle) {
+        return (List<String>) map.get(handle);
     }
 
-    public List<String> getRawStringList(String label, List<String> def) {
-        return (List<String>) ((map.get(label) != null)?map.get(label):def);
+    /**
+     * Get an Unparsed String List by Handle
+     *
+     * @param handle Handle
+     * @param def Default
+     * @return Unparsed String List
+     */
+    public List<String> getRawStringList(String handle, List<String> def) {
+        return (List<String>) ((map.get(handle) != null)?map.get(handle):def);
     }
 
-    public String getString(String label) {
-        return (map.get(label) != null)?unescapeJavaString((String) map.get(label)):null;
+    /**
+     * Get a String by Handle
+     *
+     * @param handle Handle
+     * @return String
+     */
+    public String getString(String handle) {
+        return (map.get(handle) != null)?Util.unescapeJavaString((String) map.get(handle)):null;
     }
 
-    public String getString(String label, String def) {
-        return unescapeJavaString((String) ((map.get(label) != null) ? map.get(label) : def));
+    /**
+     * Get a String by Handle
+     *
+     * @param handle Handle
+     * @param def Default
+     * @return String
+     */
+    public String getString(String handle, String def) {
+        return Util.unescapeJavaString((String) ((map.get(handle) != null) ? map.get(handle) : def));
     }
 
-    public List<String> getStringList(String label) {
-        if (map.get(label) != null) {
+    /**
+     * Get a String List by Handle
+     *
+     * @param handle Handle
+     * @return String List
+     */
+    public List<String> getStringList(String handle) {
+        if (map.get(handle) != null) {
             List<String> values = new ArrayList<String>();
-            for (String value : (List<String>) map.get(label)) {
-                values.add(unescapeJavaString(value));
+            for (String value : (List<String>) map.get(handle)) {
+                values.add(Util.unescapeJavaString(value));
             }
             return values;
         } else {
@@ -370,31 +802,59 @@ public class YAMLSection {
         }
     }
 
-    public List<String> getStringList(String label, List<String> def) {
-        if (map.get(label) != null) {
-            return getStringList(label);
+    /**
+     * Get a String List by Handle
+     *
+     * @param handle Handle
+     * @param def Default
+     * @return String List
+     */
+    public List<String> getStringList(String handle, List<String> def) {
+        if (map.get(handle) != null) {
+            return getStringList(handle);
         } else {
             List<String> values = new ArrayList<String>();
             for (String value : def) {
-                values.add(unescapeJavaString(value));
+                values.add(Util.unescapeJavaString(value));
             }
             return values;
         }
     }
 
-    public String getColoredString(String label, char color) {
-        return (map.get(label) != null)? ChatColor.translateAlternateColorCodes(color, unescapeJavaString((String) map.get(label))):null;
+    /**
+     * Get a Colored String by Handle
+     *
+     * @param handle Handle
+     * @param color Color Char to parse
+     * @return Colored String
+     */
+    public String getColoredString(String handle, char color) {
+        return (map.get(handle) != null)? ChatColor.translateAlternateColorCodes(color, Util.unescapeJavaString((String) map.get(handle))):null;
     }
 
-    public String getColoredString(String label, String def, char color) {
-        return ChatColor.translateAlternateColorCodes(color, unescapeJavaString((String) ((map.get(label) != null) ? map.get(label) : def)));
+    /**
+     * Get a Colored String by Handle
+     *
+     * @param handle Handle
+     * @param def Default
+     * @param color Color Char to parse
+     * @return Colored String
+     */
+    public String getColoredString(String handle, String def, char color) {
+        return ChatColor.translateAlternateColorCodes(color, Util.unescapeJavaString((String) ((map.get(handle) != null) ? map.get(handle) : def)));
     }
-
-    public List<String> getColoredStringList(String label, char color) {
-        if (map.get(label) != null) {
+    /**
+     * Get a Colored String List by Handle
+     *
+     * @param handle Handle
+     * @param color Color Char to parse
+     * @return Colored String List
+     */
+    public List<String> getColoredStringList(String handle, char color) {
+        if (map.get(handle) != null) {
             List<String> values = new ArrayList<String>();
-            for (String value : (List<String>) map.get(label)) {
-                values.add(ChatColor.translateAlternateColorCodes(color, unescapeJavaString(value)));
+            for (String value : (List<String>) map.get(handle)) {
+                values.add(ChatColor.translateAlternateColorCodes(color, Util.unescapeJavaString(value)));
             }
             return values;
         } else {
@@ -402,22 +862,57 @@ public class YAMLSection {
         }
     }
 
-    public List<String> getColoredStringList(String label, List<String> def, char color) {
-        if (map.get(label) != null) {
-            return getColoredStringList(label, color);
+    /**
+     * Get a Colored String List by Handle
+     *
+     * @param handle Handle
+     * @param def Default
+     * @param color Color Char to parse
+     * @return Colored String List
+     */
+    public List<String> getColoredStringList(String handle, List<String> def, char color) {
+        if (map.get(handle) != null) {
+            return getColoredStringList(handle, color);
         } else {
             List<String> values = new ArrayList<String>();
             for (String value : def) {
-                values.add(ChatColor.translateAlternateColorCodes(color, unescapeJavaString(value)));
+                values.add(ChatColor.translateAlternateColorCodes(color, Util.unescapeJavaString(value)));
             }
             return values;
         }
     }
 
-    public List<UUID> getUUIDList(String label) {
-        if (map.get(label) != null) {
+    /**
+     * Get a UUID by Handle
+     *
+     * @param handle Handle
+     * @return UUID
+     */
+    public UUID getUUID(String handle) {
+        return (map.get(handle) != null)?UUID.fromString((String) map.get(handle)):null;
+    }
+
+    /**
+     * Get a UUID by Handle
+     *
+     * @param handle Handle
+     * @param def Default
+     * @return UUID
+     */
+    public UUID getUUID(String handle, UUID def) {
+        return UUID.fromString((String) ((map.get(handle) != null) ? map.get(handle) : def));
+    }
+
+    /**
+     * Get a UUID List by Handle
+     *
+     * @param handle Handle
+     * @return UUID List
+     */
+    public List<UUID> getUUIDList(String handle) {
+        if (map.get(handle) != null) {
             List<UUID> values = new ArrayList<UUID>();
-            for (String value : (List<String>) map.get(label)) {
+            for (String value : (List<String>) map.get(handle)) {
                 values.add(UUID.fromString(value));
             }
             return values;
@@ -426,114 +921,109 @@ public class YAMLSection {
         }
     }
 
-    public List<UUID> getUUIDList(String label, List<UUID> def) {
-        if (map.get(label) != null) {
-            return getUUIDList(label);
+    /**
+     * Get a UUID List by Handle
+     *
+     * @param handle Handle
+     * @param def Default
+     * @return UUID List
+     */
+    public List<UUID> getUUIDList(String handle, List<UUID> def) {
+        if (map.get(handle) != null) {
+            return getUUIDList(handle);
         } else {
             return def;
         }
     }
 
-    public boolean isBoolean(String label) {
-        return (map.get(label) instanceof Boolean);
+    /**
+     * Check if object is a Boolean by Handle
+     *
+     * @param handle Handle
+     * @return Object Boolean Status
+     */
+    public boolean isBoolean(String handle) {
+        return (map.get(handle) instanceof Boolean);
     }
 
-    public boolean isSection(String label) {
-        return (map.get(label) instanceof Map);
+    /**
+     * Check if object is a YAML Section by Handle
+     *
+     * @param handle Handle
+     * @return Object YAML Section Status
+     */
+    public boolean isSection(String handle) {
+        return (map.get(handle) instanceof Map);
     }
 
-    public boolean isDouble(String label) {
-        return (map.get(label) instanceof Double);
+    /**
+     * Check if object is a Double by Handle
+     *
+     * @param handle Handle
+     * @return Object Double Status
+     */
+    public boolean isDouble(String handle) {
+        return (map.get(handle) instanceof Double);
     }
 
-    public boolean isFloat(String label) {
-        return (map.get(label) instanceof Float);
+    /**
+     * Check if object is a Float by Handle
+     *
+     * @param handle Handle
+     * @return Object Float Status
+     */
+    public boolean isFloat(String handle) {
+        return (map.get(handle) instanceof Float);
     }
 
-    public boolean isInt(String label) {
-        return (map.get(label) instanceof Integer);
+    /**
+     * Check if object is an Integer by Handle
+     *
+     * @param handle Handle
+     * @return Object Integer Status
+     */
+    public boolean isInt(String handle) {
+        return (map.get(handle) instanceof Integer);
     }
 
-    public boolean isList(String label) {
-        return (map.get(label) instanceof List);
+    /**
+     * Check if object is a List by Handle
+     *
+     * @param handle Handle
+     * @return Object List Status
+     */
+    public boolean isList(String handle) {
+        return (map.get(handle) instanceof List);
     }
 
-    public boolean isLong(String label) {
-        return (map.get(label) instanceof Long);
+    /**
+     * Check if object is a Long by Handle
+     *
+     * @param handle Handle
+     * @return Object Long Status
+     */
+    public boolean isLong(String handle) {
+        return (map.get(handle) instanceof Long);
     }
 
-    public boolean isString(String label) {
-        return (map.get(label) instanceof String);
+    /**
+     * Check if object is a String by Handle
+     *
+     * @param handle Handle
+     * @return Object String Status
+     */
+    public boolean isString(String handle) {
+        return (map.get(handle) instanceof String);
     }
 
-    static String unescapeJavaString(String str) {
-
-        StringBuilder sb = new StringBuilder(str.length());
-
-        for (int i = 0; i < str.length(); i++) {
-            char ch = str.charAt(i);
-            if (ch == '\\') {
-                char nextChar = (i == str.length() - 1) ? '\\' : str
-                        .charAt(i + 1);
-                // Octal escape?
-                if (nextChar >= '0' && nextChar <= '7') {
-                    String code = "" + nextChar;
-                    i++;
-                    if ((i < str.length() - 1) && str.charAt(i + 1) >= '0'
-                            && str.charAt(i + 1) <= '7') {
-                        code += str.charAt(i + 1);
-                        i++;
-                        if ((i < str.length() - 1) && str.charAt(i + 1) >= '0'
-                                && str.charAt(i + 1) <= '7') {
-                            code += str.charAt(i + 1);
-                            i++;
-                        }
-                    }
-                    sb.append((char) Integer.parseInt(code, 8));
-                    continue;
-                }
-                switch (nextChar) {
-                    case '\\':
-                        ch = '\\';
-                        break;
-                    case 'b':
-                        ch = '\b';
-                        break;
-                    case 'f':
-                        ch = '\f';
-                        break;
-                    case 'n':
-                        ch = '\n';
-                        break;
-                    case 'r':
-                        ch = '\r';
-                        break;
-                    case 't':
-                        ch = '\t';
-                        break;
-                    case '\"':
-                        ch = '\"';
-                        break;
-                    case '\'':
-                        ch = '\'';
-                        break;
-                    // Hex Unicode: u????
-                    case 'u':
-                        if (i >= str.length() - 5) {
-                            ch = 'u';
-                            break;
-                        }
-                        int code = Integer.parseInt(
-                                "" + str.charAt(i + 2) + str.charAt(i + 3)
-                                        + str.charAt(i + 4) + str.charAt(i + 5), 16);
-                        sb.append(Character.toChars(code));
-                        i += 5;
-                        continue;
-                }
-                i++;
-            }
-            sb.append(ch);
-        }
-        return sb.toString();
+    /**
+     * Check if object is a UUID by Handle
+     *
+     * @param handle Handle
+     * @return Object UUID Status
+     */
+    public boolean isUUID(String handle) {
+        return (map.get(handle) instanceof String && !Util.isException(() -> UUID.fromString((String) map.get(handle))));
     }
+
 }

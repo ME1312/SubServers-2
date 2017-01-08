@@ -5,8 +5,6 @@ import org.json.JSONObject;
 
 /**
  * PacketOut Layout Class
- *
- * @author ME1312
  */
 public interface PacketOut {
     /**

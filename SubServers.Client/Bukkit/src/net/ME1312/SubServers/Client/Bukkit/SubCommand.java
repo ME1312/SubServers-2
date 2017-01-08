@@ -1,6 +1,7 @@
 package net.ME1312.SubServers.Client.Bukkit;
 
 import net.ME1312.SubServers.Client.Bukkit.Graphic.UIRenderer;
+import net.ME1312.SubServers.Client.Bukkit.Library.Container;
 import net.ME1312.SubServers.Client.Bukkit.Library.Util;
 import net.ME1312.SubServers.Client.Bukkit.Library.Version.Version;
 import net.ME1312.SubServers.Client.Bukkit.Network.Packet.*;
@@ -42,7 +43,10 @@ public final class SubCommand implements CommandExecutor {
                         plugin.subdata.sendPacket(new PacketDownloadServerList(null, UUID.randomUUID().toString(), json -> {
                             int i = 0;
                             TreeMap<String, JSONObject> servers = new TreeMap<String, JSONObject>();
-                            if (Util.isSpigot() && sender instanceof Player) {
+                            Container<Boolean> spigot = new Container<Boolean>(false);
+                            if (!Util.isException(() -> {
+                                if (Class.forName("org.spigotmc.SpigotConfig") != null) spigot.set(true);
+                            }) && spigot.get() && sender instanceof Player) {
                                 net.md_5.bungee.api.chat.TextComponent hostm = new net.md_5.bungee.api.chat.TextComponent(ChatColor.RESET.toString());
                                 net.md_5.bungee.api.chat.TextComponent serverm = new net.md_5.bungee.api.chat.TextComponent(ChatColor.RESET.toString());
                                 net.md_5.bungee.api.chat.TextComponent div = new net.md_5.bungee.api.chat.TextComponent(plugin.lang.getSection("Lang").getColoredString("Command.List.Divider", '&'));

@@ -32,6 +32,10 @@ public class UIRenderer {
     protected boolean open = false;
     protected final UUID player;
     private SubPlugin plugin;
+
+    /**
+     * Options Layout Class
+     */
     public abstract static class Options {
         List<Runnable> history = new LinkedList<Runnable>();
         private boolean init = false;
@@ -618,6 +622,10 @@ public class UIRenderer {
             }
         }));
     }
+
+    /**
+     * SubCreator Options Class
+     */
     public static class CreatorOptions extends Options {
         private String host;
         private String name = null;

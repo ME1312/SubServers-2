@@ -4,6 +4,9 @@ import net.ME1312.SubServers.Client.Bukkit.Library.SubEvent;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
+/**
+ * Server Shell Exit Event
+ */
 public class SubStoppedEvent extends Event implements SubEvent {
     private String server;
 
@@ -18,6 +21,7 @@ public class SubStoppedEvent extends Event implements SubEvent {
 
     /**
      * Gets the Server Effected
+     *
      * @return The Server Effected
      */
     public String getServer() { return server; }

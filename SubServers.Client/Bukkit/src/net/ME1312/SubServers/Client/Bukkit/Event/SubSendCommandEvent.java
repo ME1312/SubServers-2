@@ -6,6 +6,9 @@ import org.bukkit.event.HandlerList;
 
 import java.util.UUID;
 
+/**
+ * Send Command Event
+ */
 public class SubSendCommandEvent extends Event implements SubEvent {
     private UUID player;
     private String server;
@@ -25,12 +28,14 @@ public class SubSendCommandEvent extends Event implements SubEvent {
 
     /**
      * Gets the Server Effected
+     *
      * @return The Server Effected
      */
     public String getServer() { return server; }
 
     /**
      * Gets the player that triggered the Event
+     *
      * @return The Player that triggered this Event or null if Console
      */
     public UUID getPlayer() { return player; }

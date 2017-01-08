@@ -20,6 +20,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+/**
+ * SubData Direct Client Class
+ */
 public final class SubDataClient {
     private static HashMap<Class<? extends PacketOut>, String> pOut = new HashMap<Class<? extends PacketOut>, String>();
     private static HashMap<String, List<PacketIn>> pIn = new HashMap<String, List<PacketIn>>();

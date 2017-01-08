@@ -4,8 +4,6 @@ import java.io.File;
 
 /**
  * Universal File Class
- *
- * @author ME1312
  */
 public class UniversalFile extends File {
 

@@ -13,22 +13,31 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.io.*;
 import java.net.InetAddress;
 import java.nio.file.Files;
-import java.util.Arrays;
 
+/**
+ * SubServers Client Plugin Class
+ */
 public final class SubPlugin extends JavaPlugin {
     public YAMLConfig pluginconf;
     public YAMLSection lang = null;
     public SubDataClient subdata = null;
 
     public UIListener gui = null;
-    public Version version;
-    protected Version bversion = new Version(2);
+    public final Version version;
+    public final Version bversion = new Version(2);
     
     //public final SubAPI api = new SubAPI(this);
 
+    public SubPlugin() {
+        super();
+        version = new Version(getDescription().getVersion());
+    }
+
+    /**
+     * Enable Plugin
+     */
     @Override
     public void onEnable() {
-        version = new Version(getDescription().getVersion());
         try {
             Bukkit.getLogger().info("SubServers > Loading SubServers v" + version.toString() + " Libraries... ");
             getDataFolder().mkdirs();
@@ -57,6 +66,9 @@ public final class SubPlugin extends JavaPlugin {
         }
     }
 
+    /**
+     * Disable Plugin
+     */
     @Override
     public void onDisable() {
         if (subdata != null)

@@ -3,7 +3,7 @@ package net.ME1312.SubServers.Client.Bukkit.Library;
 /**
  * Container Class
  *
- * @author ME1312
+ * @param <V> Item
  */
 public class Container<V> {
     private V obj;

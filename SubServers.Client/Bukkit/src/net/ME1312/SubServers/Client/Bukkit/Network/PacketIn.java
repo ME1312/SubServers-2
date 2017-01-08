@@ -5,8 +5,6 @@ import org.json.JSONObject;
 
 /**
  * PacketIn Layout Class
- *
- * @author ME1312
  */
 public interface PacketIn {
     /**

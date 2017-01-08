@@ -6,6 +6,9 @@ import org.bukkit.event.HandlerList;
 
 import java.util.UUID;
 
+/**
+ * Add Server Event
+ */
 public class SubAddServerEvent extends Event implements SubEvent {
     private UUID player;
     private String host;
@@ -25,6 +28,7 @@ public class SubAddServerEvent extends Event implements SubEvent {
 
     /**
      * Gets the Server to be Added
+     *
      * @return The Server to be Added
      */
     public String getServer() { return server; }
@@ -40,6 +44,7 @@ public class SubAddServerEvent extends Event implements SubEvent {
 
     /**
      * Gets the player that triggered the Event
+     *
      * @return The Player that triggered this Event or null if Console
      */
     public UUID getPlayer() { return player; }

@@ -1,5 +1,10 @@
 package net.ME1312.SubServers.Client.Bukkit.Library;
 
+/**
+ * Named Container Class
+ * @param <T> Name
+ * @param <V> Item
+ */
 public class NamedContainer<T, V> extends Container<V> {
     private T name;
 

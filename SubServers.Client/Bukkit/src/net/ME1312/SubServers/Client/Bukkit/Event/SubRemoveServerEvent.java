@@ -6,13 +6,16 @@ import org.bukkit.event.HandlerList;
 
 import java.util.UUID;
 
+/**
+ * Remove Server Event
+ */
 public class SubRemoveServerEvent extends Event implements SubEvent {
     private UUID player;
     private String host;
     private String server;
 
     /**
-     * Server Add Event
+     * Server Remove Event
      *
      * @param player Player Adding Server
      * @param server Server Starting
@@ -24,8 +27,9 @@ public class SubRemoveServerEvent extends Event implements SubEvent {
     }
 
     /**
-     * Gets the Server to be Added
-     * @return The Server to be Added
+     * Gets the Server to be Removed
+     *
+     * @return The Server to be Removed
      */
     public String getServer() { return server; }
 
@@ -40,6 +44,7 @@ public class SubRemoveServerEvent extends Event implements SubEvent {
 
     /**
      * Gets the player that triggered the Event
+     *
      * @return The Player that triggered this Event or null if Console
      */
     public UUID getPlayer() { return player; }
