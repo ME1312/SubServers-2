@@ -143,28 +143,36 @@ extends net.md_5.bungee.BungeeCord</pre>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Bungee/SubPlugin.html#api">api</a></span></code>&nbsp;</td>
 </tr>
 <tr class="rowColor">
+<td class="colFirst"><code><a href="../../../../net/ME1312/SubServers/Bungee/Library/Version/Version.html" title="class in net.ME1312.SubServers.Bungee.Library.Version">Version</a></code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Bungee/SubPlugin.html#bversion">bversion</a></span></code>&nbsp;</td>
+</tr>
+<tr class="altColor">
 <td class="colFirst"><code><a href="../../../../net/ME1312/SubServers/Bungee/Library/Config/YAMLConfig.html" title="class in net.ME1312.SubServers.Bungee.Library.Config">YAMLConfig</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Bungee/SubPlugin.html#config">config</a></span></code>&nbsp;</td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><code><a href="../../../../net/ME1312/SubServers/Bungee/Library/UniversalFile.html" title="class in net.ME1312.SubServers.Bungee.Library">UniversalFile</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Bungee/SubPlugin.html#dir">dir</a></span></code>&nbsp;</td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><code>java.util.HashMap&lt;java.lang.String,java.lang.String&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Bungee/SubPlugin.html#exLang">exLang</a></span></code>&nbsp;</td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><code>java.util.HashMap&lt;java.lang.String,<a href="../../../../net/ME1312/SubServers/Bungee/Host/Server.html" title="class in net.ME1312.SubServers.Bungee.Host">Server</a>&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Bungee/SubPlugin.html#exServers">exServers</a></span></code>&nbsp;</td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><code>java.util.HashMap&lt;java.lang.String,<a href="../../../../net/ME1312/SubServers/Bungee/Host/Host.html" title="class in net.ME1312.SubServers.Bungee.Host">Host</a>&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Bungee/SubPlugin.html#hosts">hosts</a></span></code>&nbsp;</td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><code><a href="../../../../net/ME1312/SubServers/Bungee/Library/Config/YAMLConfig.html" title="class in net.ME1312.SubServers.Bungee.Library.Config">YAMLConfig</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Bungee/SubPlugin.html#lang">lang</a></span></code>&nbsp;</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code>java.io.PrintStream</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Bungee/SubPlugin.html#out">out</a></span></code>&nbsp;</td>
 </tr>
 <tr class="rowColor">
 <td class="colFirst"><code><a href="../../../../net/ME1312/SubServers/Bungee/Network/SubDataServer.html" title="class in net.ME1312.SubServers.Bungee.Network">SubDataServer</a></code></td>
@@ -205,7 +213,7 @@ extends net.md_5.bungee.BungeeCord</pre>
 <tr id="i1" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Bungee/SubPlugin.html#startListeners--">startListeners</a></span>()</code>
-<div class="block">Load Hosts, Servers, SubServers, and SubData.</div>
+<div class="block">Load Hosts, Servers, SubServers, and SubData Direct</div>
 </td>
 </tr>
 <tr id="i2" class="altColor">
@@ -280,6 +288,15 @@ extends net.md_5.bungee.BungeeCord</pre>
 <pre>public final&nbsp;java.util.HashMap&lt;java.lang.String,<a href="../../../../net/ME1312/SubServers/Bungee/Host/Host.html" title="class in net.ME1312.SubServers.Bungee.Host">Host</a>&gt; hosts</pre>
 </li>
 </ul>
+<a name="out">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>out</h4>
+<pre>public final&nbsp;java.io.PrintStream out</pre>
+</li>
+</ul>
 <a name="dir">
 <!--   -->
 </a>
@@ -334,6 +351,15 @@ extends net.md_5.bungee.BungeeCord</pre>
 <pre>public final&nbsp;<a href="../../../../net/ME1312/SubServers/Bungee/Library/Version/Version.html" title="class in net.ME1312.SubServers.Bungee.Library.Version">Version</a> version</pre>
 </li>
 </ul>
+<a name="bversion">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>bversion</h4>
+<pre>public final&nbsp;<a href="../../../../net/ME1312/SubServers/Bungee/Library/Version/Version.html" title="class in net.ME1312.SubServers.Bungee.Library.Version">Version</a> bversion</pre>
+</li>
+</ul>
 <a name="api">
 <!--   -->
 </a>
@@ -358,7 +384,7 @@ extends net.md_5.bungee.BungeeCord</pre>
 <li class="blockList">
 <h4>startListeners</h4>
 <pre>public&nbsp;void&nbsp;startListeners()</pre>
-<div class="block">Load Hosts, Servers, SubServers, and SubData.</div>
+<div class="block">Load Hosts, Servers, SubServers, and SubData Direct</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Overrides:</span></dt>
 <dd><code>startListeners</code>&nbsp;in class&nbsp;<code>net.md_5.bungee.BungeeCord</code></dd>

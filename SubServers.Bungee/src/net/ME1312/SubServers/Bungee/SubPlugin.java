@@ -3,6 +3,7 @@ package net.ME1312.SubServers.Bungee;
 import net.ME1312.SubServers.Bungee.Host.Executable;
 import net.ME1312.SubServers.Bungee.Host.Server;
 import net.ME1312.SubServers.Bungee.Library.Config.YAMLConfig;
+import net.ME1312.SubServers.Bungee.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Bungee.Library.Exception.InvalidHostException;
 import net.ME1312.SubServers.Bungee.Library.Exception.InvalidServerException;
 import net.ME1312.SubServers.Bungee.Host.Host;
@@ -31,18 +32,20 @@ public final class SubPlugin extends BungeeCord {
     public final HashMap<String, Server> exServers = new HashMap<String, Server>();
     public final HashMap<String, Host> hosts = new HashMap<String, Host>();
 
+    public final PrintStream out;
     public final UniversalFile dir = new UniversalFile(new File(System.getProperty("user.dir")));
     public YAMLConfig config;
     public YAMLConfig lang;
     public HashMap<String, String> exLang = new HashMap<String, String>();
     public SubDataServer subdata = null;
-    public final Version version = new Version("2.11.2e");
-    protected Version bversion = new Version(2);
+    public final Version version = new Version(SubPlugin.class.getPackage().getImplementationVersion());
+    public final Version bversion = (SubPlugin.class.getPackage().getSpecificationVersion().equals("0"))?null:new Version(SubPlugin.class.getPackage().getSpecificationVersion());
 
     protected boolean running = false;
     public final SubAPI api = new SubAPI(this);
 
-    protected SubPlugin() throws IOException {
+    protected SubPlugin(PrintStream out) throws IOException {
+        this.out = out;
         enable();
     }
 
@@ -54,7 +57,7 @@ public final class SubPlugin extends BungeeCord {
     protected void enable() throws IOException {
         if (running) throw new IllegalStateException("SubServers has already been loaded");
         System.out.println("SubServers > Loading SubServers v" + version.toString() + " Libraries... ");
-        running = true;
+
         if (!(new UniversalFile(dir, "config.yml").exists())) {
             Util.copyFromJar(SubPlugin.class.getClassLoader(), "net/ME1312/SubServers/Bungee/Library/Files/bungee.yml", new UniversalFile(dir, "config.yml").getPath());
             YAMLConfig tmp = new YAMLConfig(new UniversalFile("config.yml"));
@@ -157,11 +160,17 @@ public final class SubPlugin extends BungeeCord {
 
         hostDrivers.put("built-in", net.ME1312.SubServers.Bungee.Host.Internal.InternalHost.class);
 
+        getPluginManager().registerCommand(null, new SubCommand.BungeeServer(this, "server"));
+        getPluginManager().registerCommand(null, new SubCommand.BungeeList(this, "glist"));
+        getPluginManager().registerCommand(null, new SubCommand(this, "subservers"));
+        getPluginManager().registerCommand(null, new SubCommand(this, "subserver"));
+        getPluginManager().registerCommand(null, new SubCommand(this, "sub"));
+
         System.out.println("SubServers > Loading BungeeCord Libraries...");
     }
 
     /**
-     * Load Hosts, Servers, SubServers, and SubData.
+     * Load Hosts, Servers, SubServers, and SubData Direct
      */
     @Override
     public void startListeners() {
@@ -195,10 +204,9 @@ public final class SubPlugin extends BungeeCord {
             YAMLConfig bungee = new YAMLConfig(new UniversalFile(dir, "config.yml"));
             for (String name : bungee.get().getSection("servers").getKeys()) {
                 try {
-                    Server server = new Server(name, new InetSocketAddress(bungee.get().getSection("servers").getSection(name).getRawString("address").split(":")[0],
-                            Integer.parseInt(bungee.get().getSection("servers").getSection(name).getRawString("address").split(":")[1])), bungee.get().getSection("servers").getSection(name).getColoredString("motd", '&'),
+                    Server server = api.addServer(name, InetAddress.getByName(bungee.get().getSection("servers").getSection(name).getRawString("address").split(":")[0]),
+                            Integer.parseInt(bungee.get().getSection("servers").getSection(name).getRawString("address").split(":")[1]), bungee.get().getSection("servers").getSection(name).getColoredString("motd", '&'),
                             bungee.get().getSection("servers").getSection(name).getBoolean("hidden", false), bungee.get().getSection("servers").getSection(name).getBoolean("restricted"));
-                    exServers.put(name.toLowerCase(), server);
                     SubDataServer.allowConnection(server.getAddress().getAddress());
                     servers++;
                 } catch (Exception e) {
@@ -227,11 +235,7 @@ public final class SubPlugin extends BungeeCord {
 
             System.out.println("SubServers > " + hosts + " Host(s), " + servers + " Server(s), and " + subservers + " SubServer(s) loaded in " + (Calendar.getInstance().getTime().getTime() - begin) + "ms");
 
-            getPluginManager().registerCommand(null, new SubCommand.BungeeServer(this, "server"));
-            getPluginManager().registerCommand(null, new SubCommand.BungeeList(this, "glist"));
-            getPluginManager().registerCommand(null, new SubCommand(this, "subservers"));
-            getPluginManager().registerCommand(null, new SubCommand(this, "subserver"));
-            getPluginManager().registerCommand(null, new SubCommand(this, "sub"));
+            running = true;
 
             super.startListeners();
         } catch (IOException e) {
@@ -259,12 +263,16 @@ public final class SubPlugin extends BungeeCord {
      */
     @Override
     public Map<String, ServerInfo> getServers() {
-        HashMap<String, ServerInfo> servers = new HashMap<String, ServerInfo>();
-        for (ServerInfo server : exServers.values()) servers.put(server.getName(), server);
-        for (Host host : this.hosts.values()) {
-            for (ServerInfo server : host.getSubServers().values()) servers.put(server.getName(), server);
+        if (!running) {
+            return super.getServers();
+        } else {
+            HashMap<String, ServerInfo> servers = new HashMap<String, ServerInfo>();
+            for (ServerInfo server : exServers.values()) servers.put(server.getName(), server);
+            for (Host host : this.hosts.values()) {
+                for (ServerInfo server : host.getSubServers().values()) servers.put(server.getName(), server);
+            }
+            return servers;
         }
-        return servers;
     }
 
     /**
@@ -275,6 +283,7 @@ public final class SubPlugin extends BungeeCord {
     @Override
     public void stopListeners() {
         try {
+            running = false;
             System.out.println("SubServers > Resetting Hosts and Server Data");
             List<String> hosts = new ArrayList<String>();
             hosts.addAll(this.hosts.keySet());

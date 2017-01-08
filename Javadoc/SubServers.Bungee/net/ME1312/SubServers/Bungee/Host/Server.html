@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10,"i8":10,"i9":10,"i10":10,"i11":10};
+var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10,"i8":10,"i9":10,"i10":10,"i11":10,"i12":10};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -112,7 +112,7 @@ var activeTableTab = "activeTableTab";
 <li class="blockList">
 <dl>
 <dt>All Implemented Interfaces:</dt>
-<dd>net.md_5.bungee.api.config.ServerInfo, <a href="../../../../../net/ME1312/SubServers/Bungee/Network/ClientHandler.html" title="interface in net.ME1312.SubServers.Bungee.Network">ClientHandler</a></dd>
+<dd>net.md_5.bungee.api.config.ServerInfo, <a href="../../../../../net/ME1312/SubServers/Bungee/Library/ExtraDataHandler.html" title="interface in net.ME1312.SubServers.Bungee.Library">ExtraDataHandler</a>, <a href="../../../../../net/ME1312/SubServers/Bungee/Network/ClientHandler.html" title="interface in net.ME1312.SubServers.Bungee.Network">ClientHandler</a></dd>
 </dl>
 <dl>
 <dt>Direct Known Subclasses:</dt>
@@ -122,7 +122,7 @@ var activeTableTab = "activeTableTab";
 <br>
 <pre>public class <span class="typeNameLabel">Server</span>
 extends net.md_5.bungee.BungeeServerInfo
-implements <a href="../../../../../net/ME1312/SubServers/Bungee/Network/ClientHandler.html" title="interface in net.ME1312.SubServers.Bungee.Network">ClientHandler</a></pre>
+implements <a href="../../../../../net/ME1312/SubServers/Bungee/Network/ClientHandler.html" title="interface in net.ME1312.SubServers.Bungee.Network">ClientHandler</a>, <a href="../../../../../net/ME1312/SubServers/Bungee/Library/ExtraDataHandler.html" title="interface in net.ME1312.SubServers.Bungee.Library">ExtraDataHandler</a></pre>
 <div class="block">Server Class</div>
 </li>
 </ul>
@@ -165,20 +165,20 @@ implements <a href="../../../../../net/ME1312/SubServers/Bungee/Network/ClientHa
 </tr>
 <tr id="i0" class="altColor">
 <td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/Server.html#addExtra-java.lang.String-java.lang.Object-">addExtra</a></span>(java.lang.String&nbsp;key,
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/Server.html#addExtra-java.lang.String-java.lang.Object-">addExtra</a></span>(java.lang.String&nbsp;handle,
         java.lang.Object&nbsp;value)</code>
 <div class="block">Add an extra value to this Server</div>
 </td>
 </tr>
 <tr id="i1" class="rowColor">
-<td class="colFirst"><code>org.json.JSONObject</code></td>
+<td class="colFirst"><code><a href="../../../../../net/ME1312/SubServers/Bungee/Library/Config/YAMLSection.html" title="class in net.ME1312.SubServers.Bungee.Library.Config">YAMLSection</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/Server.html#getExtra--">getExtra</a></span>()</code>
-<div class="block">Get all of the extra values</div>
+<div class="block">Get the extra value section</div>
 </td>
 </tr>
 <tr id="i2" class="altColor">
 <td class="colFirst"><code><a href="../../../../../net/ME1312/SubServers/Bungee/Library/Config/YAMLValue.html" title="class in net.ME1312.SubServers.Bungee.Library.Config">YAMLValue</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/Server.html#getExtra-java.lang.String-">getExtra</a></span>(java.lang.String&nbsp;key)</code>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/Server.html#getExtra-java.lang.String-">getExtra</a></span>(java.lang.String&nbsp;handle)</code>
 <div class="block">Get an extra value</div>
 </td>
 </tr>
@@ -196,7 +196,7 @@ implements <a href="../../../../../net/ME1312/SubServers/Bungee/Network/ClientHa
 </tr>
 <tr id="i5" class="rowColor">
 <td class="colFirst"><code>boolean</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/Server.html#hasExtra-java.lang.String-">hasExtra</a></span>(java.lang.String&nbsp;key)</code>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/Server.html#hasExtra-java.lang.String-">hasExtra</a></span>(java.lang.String&nbsp;handle)</code>
 <div class="block">Determine if an extra value exists</div>
 </td>
 </tr>
@@ -220,17 +220,23 @@ implements <a href="../../../../../net/ME1312/SubServers/Bungee/Network/ClientHa
 </tr>
 <tr id="i9" class="rowColor">
 <td class="colFirst"><code>void</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/Server.html#removeExtra-java.lang.String-">removeExtra</a></span>(java.lang.String&nbsp;handle)</code>
+<div class="block">Remove an extra value from this Server</div>
+</td>
+</tr>
+<tr id="i10" class="altColor">
+<td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/Server.html#setHidden-boolean-">setHidden</a></span>(boolean&nbsp;value)</code>
 <div class="block">Set if the server is hidden from players</div>
 </td>
 </tr>
-<tr id="i10" class="altColor">
+<tr id="i11" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/Server.html#setMotd-java.lang.String-">setMotd</a></span>(java.lang.String&nbsp;value)</code>
 <div class="block">Sets the MOTD of the Server</div>
 </td>
 </tr>
-<tr id="i11" class="rowColor">
+<tr id="i12" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/Server.html#setRestricted-boolean-">setRestricted</a></span>(boolean&nbsp;value)</code>
 <div class="block">Sets if the Server is Restricted</div>
@@ -421,12 +427,15 @@ implements <a href="../../../../../net/ME1312/SubServers/Bungee/Network/ClientHa
 <ul class="blockList">
 <li class="blockList">
 <h4>addExtra</h4>
-<pre>public&nbsp;void&nbsp;addExtra(java.lang.String&nbsp;key,
+<pre>public&nbsp;void&nbsp;addExtra(java.lang.String&nbsp;handle,
                      java.lang.Object&nbsp;value)</pre>
+<div class="block"><span class="descfrmTypeLabel">Description copied from interface:&nbsp;<code><a href="../../../../../net/ME1312/SubServers/Bungee/Library/ExtraDataHandler.html#addExtra-java.lang.String-java.lang.Object-">ExtraDataHandler</a></code></span></div>
 <div class="block">Add an extra value to this Server</div>
 <dl>
+<dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
+<dd><code><a href="../../../../../net/ME1312/SubServers/Bungee/Library/ExtraDataHandler.html#addExtra-java.lang.String-java.lang.Object-">addExtra</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../net/ME1312/SubServers/Bungee/Library/ExtraDataHandler.html" title="interface in net.ME1312.SubServers.Bungee.Library">ExtraDataHandler</a></code></dd>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>key</code> - Key</dd>
+<dd><code>handle</code> - Handle</dd>
 <dd><code>value</code> - Value</dd>
 </dl>
 </li>
@@ -437,11 +446,14 @@ implements <a href="../../../../../net/ME1312/SubServers/Bungee/Network/ClientHa
 <ul class="blockList">
 <li class="blockList">
 <h4>hasExtra</h4>
-<pre>public&nbsp;boolean&nbsp;hasExtra(java.lang.String&nbsp;key)</pre>
+<pre>public&nbsp;boolean&nbsp;hasExtra(java.lang.String&nbsp;handle)</pre>
+<div class="block"><span class="descfrmTypeLabel">Description copied from interface:&nbsp;<code><a href="../../../../../net/ME1312/SubServers/Bungee/Library/ExtraDataHandler.html#hasExtra-java.lang.String-">ExtraDataHandler</a></code></span></div>
 <div class="block">Determine if an extra value exists</div>
 <dl>
+<dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
+<dd><code><a href="../../../../../net/ME1312/SubServers/Bungee/Library/ExtraDataHandler.html#hasExtra-java.lang.String-">hasExtra</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../net/ME1312/SubServers/Bungee/Library/ExtraDataHandler.html" title="interface in net.ME1312.SubServers.Bungee.Library">ExtraDataHandler</a></code></dd>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>key</code> - Key</dd>
+<dd><code>handle</code> - Handle</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>Value Status</dd>
 </dl>
@@ -453,11 +465,14 @@ implements <a href="../../../../../net/ME1312/SubServers/Bungee/Network/ClientHa
 <ul class="blockList">
 <li class="blockList">
 <h4>getExtra</h4>
-<pre>public&nbsp;<a href="../../../../../net/ME1312/SubServers/Bungee/Library/Config/YAMLValue.html" title="class in net.ME1312.SubServers.Bungee.Library.Config">YAMLValue</a>&nbsp;getExtra(java.lang.String&nbsp;key)</pre>
+<pre>public&nbsp;<a href="../../../../../net/ME1312/SubServers/Bungee/Library/Config/YAMLValue.html" title="class in net.ME1312.SubServers.Bungee.Library.Config">YAMLValue</a>&nbsp;getExtra(java.lang.String&nbsp;handle)</pre>
+<div class="block"><span class="descfrmTypeLabel">Description copied from interface:&nbsp;<code><a href="../../../../../net/ME1312/SubServers/Bungee/Library/ExtraDataHandler.html#getExtra-java.lang.String-">ExtraDataHandler</a></code></span></div>
 <div class="block">Get an extra value</div>
 <dl>
+<dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
+<dd><code><a href="../../../../../net/ME1312/SubServers/Bungee/Library/ExtraDataHandler.html#getExtra-java.lang.String-">getExtra</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../net/ME1312/SubServers/Bungee/Library/ExtraDataHandler.html" title="interface in net.ME1312.SubServers.Bungee.Library">ExtraDataHandler</a></code></dd>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>key</code> - Key</dd>
+<dd><code>handle</code> - Handle</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>Value</dd>
 </dl>
@@ -466,14 +481,34 @@ implements <a href="../../../../../net/ME1312/SubServers/Bungee/Network/ClientHa
 <a name="getExtra--">
 <!--   -->
 </a>
-<ul class="blockListLast">
+<ul class="blockList">
 <li class="blockList">
 <h4>getExtra</h4>
-<pre>public&nbsp;org.json.JSONObject&nbsp;getExtra()</pre>
-<div class="block">Get all of the extra values</div>
+<pre>public&nbsp;<a href="../../../../../net/ME1312/SubServers/Bungee/Library/Config/YAMLSection.html" title="class in net.ME1312.SubServers.Bungee.Library.Config">YAMLSection</a>&nbsp;getExtra()</pre>
+<div class="block"><span class="descfrmTypeLabel">Description copied from interface:&nbsp;<code><a href="../../../../../net/ME1312/SubServers/Bungee/Library/ExtraDataHandler.html#getExtra--">ExtraDataHandler</a></code></span></div>
+<div class="block">Get the extra value section</div>
 <dl>
+<dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
+<dd><code><a href="../../../../../net/ME1312/SubServers/Bungee/Library/ExtraDataHandler.html#getExtra--">getExtra</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../net/ME1312/SubServers/Bungee/Library/ExtraDataHandler.html" title="interface in net.ME1312.SubServers.Bungee.Library">ExtraDataHandler</a></code></dd>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd>JSON Formatted Extra Values</dd>
+<dd>Extra Value Section</dd>
+</dl>
+</li>
+</ul>
+<a name="removeExtra-java.lang.String-">
+<!--   -->
+</a>
+<ul class="blockListLast">
+<li class="blockList">
+<h4>removeExtra</h4>
+<pre>public&nbsp;void&nbsp;removeExtra(java.lang.String&nbsp;handle)</pre>
+<div class="block"><span class="descfrmTypeLabel">Description copied from interface:&nbsp;<code><a href="../../../../../net/ME1312/SubServers/Bungee/Library/ExtraDataHandler.html#removeExtra-java.lang.String-">ExtraDataHandler</a></code></span></div>
+<div class="block">Remove an extra value from this Server</div>
+<dl>
+<dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
+<dd><code><a href="../../../../../net/ME1312/SubServers/Bungee/Library/ExtraDataHandler.html#removeExtra-java.lang.String-">removeExtra</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../net/ME1312/SubServers/Bungee/Library/ExtraDataHandler.html" title="interface in net.ME1312.SubServers.Bungee.Library">ExtraDataHandler</a></code></dd>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>handle</code> - Handle</dd>
 </dl>
 </li>
 </ul>

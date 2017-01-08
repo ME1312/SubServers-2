@@ -22,7 +22,7 @@ public final class SubPlugin extends JavaPlugin {
 
     public UIListener gui = null;
     public Version version;
-    protected Version bversion = new Version(1);
+    protected Version bversion = new Version(2);
     
     //public final SubAPI api = new SubAPI(this);
 

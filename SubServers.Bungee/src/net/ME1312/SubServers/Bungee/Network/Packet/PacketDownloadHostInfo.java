@@ -77,6 +77,7 @@ public class PacketDownloadHostInfo implements PacketIn, PacketOut {
                 servers.put(server.getName(), sinfo);
             }
             info.put("servers", servers);
+            info.put("extra", host.getExtra().toJSON());
         } else json.put("valid", false);
 
         json.put("host", info);

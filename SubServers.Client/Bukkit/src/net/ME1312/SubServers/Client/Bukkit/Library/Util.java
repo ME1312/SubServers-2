@@ -3,6 +3,11 @@ package net.ME1312.SubServers.Client.Bukkit.Library;
 import java.io.*;
 
 public final class Util {
+    private Util(){}
+    public interface ExceptionRunnable {
+        void run() throws Throwable;
+    }
+
     public static String readAll(Reader rd) throws IOException {
         StringBuilder sb = new StringBuilder();
         int cp;
@@ -30,16 +35,13 @@ public final class Util {
     }
 
     public static boolean isSpigot() {
-        boolean spigot = false;
-        try {
-            if (Class.forName("org.spigotmc.SpigotConfig") != null) {
-                spigot = true;
-            }
-        } catch (ClassNotFoundException e) {}
-        return spigot;
+        final Container<Boolean> spigot = new Container<Boolean>(false);
+        return !isException(() -> {
+            if (Class.forName("org.spigotmc.SpigotConfig") != null) spigot.set(true);
+        }) && spigot.get();
     }
 
-    public static boolean isException(Runnable runnable) {
+    public static boolean isException(ExceptionRunnable runnable) {
         try {
             runnable.run();
             return false;

@@ -40,10 +40,10 @@ public final class SubCommand extends Command implements TabExecutor {
     }
 
     /**
-     * Load /Sub in console
+     * Load /sub in console
      *
-     * @param sender
-     * @param args
+     * @param sender Sender
+     * @param args Arguments
      */
     @Override
     public void execute(CommandSender sender, String[] args) {
@@ -224,6 +224,13 @@ public final class SubCommand extends Command implements TabExecutor {
         }
     }
 
+    /**
+     * Tab complete for players
+     *
+     * @param sender Sender
+     * @param args Arguments
+     * @return Tab completes
+     */
     @Override
     public Iterable<String> onTabComplete(CommandSender sender, String[] args) {
         String last = (args.length > 0)?args[args.length - 1].toLowerCase():"";
@@ -338,13 +345,22 @@ public final class SubCommand extends Command implements TabExecutor {
         };
     }
 
-    public static class BungeeServer extends Command implements TabExecutor {
+    /**
+     * BungeeCord /server
+     */
+    public static final class BungeeServer extends Command implements TabExecutor {
         private SubPlugin plugin;
         protected BungeeServer(SubPlugin plugin, String command) {
             super(command, "bungeecord.command.server");
             this.plugin = plugin;
         }
 
+        /**
+         * Override /server
+         *
+         * @param sender Sender
+         * @param args Arguments
+         */
         @SuppressWarnings("deprecation")
         @Override
         public void execute(CommandSender sender, String[] args) {
@@ -380,6 +396,13 @@ public final class SubCommand extends Command implements TabExecutor {
             }
         }
 
+        /**
+         * Tab completer
+         *
+         * @param sender Sender
+         * @param args Arguments
+         * @return Tab completes
+         */
         @Override
         public Iterable<String> onTabComplete(CommandSender sender, String[] args) {
             if (args.length <= 1) {
@@ -399,13 +422,22 @@ public final class SubCommand extends Command implements TabExecutor {
         }
     }
 
-    public static class BungeeList extends Command {
+    /**
+     * BungeeCord /glist
+     */
+    public static final class BungeeList extends Command {
         private SubPlugin plugin;
         protected BungeeList(SubPlugin plugin, String command) {
             super(command, "bungeecord.command.list");
             this.plugin = plugin;
         }
 
+        /**
+         * Override /glist
+         *
+         * @param sender
+         * @param args
+         */
         @SuppressWarnings("deprecation")
         @Override
         public void execute(CommandSender sender, String[] args) {

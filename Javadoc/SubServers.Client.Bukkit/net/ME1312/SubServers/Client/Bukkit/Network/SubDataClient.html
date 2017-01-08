@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":10,"i1":10,"i2":10,"i3":9,"i4":9,"i5":9,"i6":10};
+var methods = {"i0":10,"i1":10,"i2":10,"i3":9,"i4":9,"i5":9,"i6":10,"i7":9,"i8":9};
 var tabs = {65535:["t0","All Methods"],1:["t1","Static Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -177,20 +177,32 @@ extends java.lang.Object</pre>
 <td class="colFirst"><code>static void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Client/Bukkit/Network/SubDataClient.html#registerPacket-java.lang.Class-java.lang.String-">registerPacket</a></span>(java.lang.Class&lt;? extends <a href="../../../../../../net/ME1312/SubServers/Client/Bukkit/Network/PacketOut.html" title="interface in net.ME1312.SubServers.Client.Bukkit.Network">PacketOut</a>&gt;&nbsp;packet,
               java.lang.String&nbsp;handle)</code>
-<div class="block">Register Packet to the Network</div>
+<div class="block">Register PacketOut to the Network</div>
 </td>
 </tr>
 <tr id="i5" class="rowColor">
 <td class="colFirst"><code>static void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Client/Bukkit/Network/SubDataClient.html#registerPacket-net.ME1312.SubServers.Client.Bukkit.Network.PacketIn-java.lang.String-">registerPacket</a></span>(<a href="../../../../../../net/ME1312/SubServers/Client/Bukkit/Network/PacketIn.html" title="interface in net.ME1312.SubServers.Client.Bukkit.Network">PacketIn</a>&nbsp;packet,
               java.lang.String&nbsp;handle)</code>
-<div class="block">Register Packet to the Network</div>
+<div class="block">Register PacketIn to the Network</div>
 </td>
 </tr>
 <tr id="i6" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Client/Bukkit/Network/SubDataClient.html#sendPacket-net.ME1312.SubServers.Client.Bukkit.Network.PacketOut-">sendPacket</a></span>(<a href="../../../../../../net/ME1312/SubServers/Client/Bukkit/Network/PacketOut.html" title="interface in net.ME1312.SubServers.Client.Bukkit.Network">PacketOut</a>&nbsp;packet)</code>
 <div class="block">Send Packet to Client</div>
+</td>
+</tr>
+<tr id="i7" class="rowColor">
+<td class="colFirst"><code>static void</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Client/Bukkit/Network/SubDataClient.html#unregisterPacket-java.lang.Class-">unregisterPacket</a></span>(java.lang.Class&lt;? extends <a href="../../../../../../net/ME1312/SubServers/Client/Bukkit/Network/PacketOut.html" title="interface in net.ME1312.SubServers.Client.Bukkit.Network">PacketOut</a>&gt;&nbsp;packet)</code>
+<div class="block">Unregister PacketOut to the Network</div>
+</td>
+</tr>
+<tr id="i8" class="altColor">
+<td class="colFirst"><code>static void</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Client/Bukkit/Network/SubDataClient.html#unregisterPacket-net.ME1312.SubServers.Client.Bukkit.Network.PacketIn-">unregisterPacket</a></span>(<a href="../../../../../../net/ME1312/SubServers/Client/Bukkit/Network/PacketIn.html" title="interface in net.ME1312.SubServers.Client.Bukkit.Network">PacketIn</a>&nbsp;packet)</code>
+<div class="block">Unregister PacketIn from the Network</div>
 </td>
 </tr>
 </table>
@@ -281,11 +293,25 @@ extends java.lang.Object</pre>
 <h4>registerPacket</h4>
 <pre>public static&nbsp;void&nbsp;registerPacket(<a href="../../../../../../net/ME1312/SubServers/Client/Bukkit/Network/PacketIn.html" title="interface in net.ME1312.SubServers.Client.Bukkit.Network">PacketIn</a>&nbsp;packet,
                                   java.lang.String&nbsp;handle)</pre>
-<div class="block">Register Packet to the Network</div>
+<div class="block">Register PacketIn to the Network</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>packet</code> - PacketIn to register</dd>
 <dd><code>handle</code> - Handle to Bind</dd>
+</dl>
+</li>
+</ul>
+<a name="unregisterPacket-net.ME1312.SubServers.Client.Bukkit.Network.PacketIn-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>unregisterPacket</h4>
+<pre>public static&nbsp;void&nbsp;unregisterPacket(<a href="../../../../../../net/ME1312/SubServers/Client/Bukkit/Network/PacketIn.html" title="interface in net.ME1312.SubServers.Client.Bukkit.Network">PacketIn</a>&nbsp;packet)</pre>
+<div class="block">Unregister PacketIn from the Network</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>packet</code> - PacketIn to unregister</dd>
 </dl>
 </li>
 </ul>
@@ -297,11 +323,25 @@ extends java.lang.Object</pre>
 <h4>registerPacket</h4>
 <pre>public static&nbsp;void&nbsp;registerPacket(java.lang.Class&lt;? extends <a href="../../../../../../net/ME1312/SubServers/Client/Bukkit/Network/PacketOut.html" title="interface in net.ME1312.SubServers.Client.Bukkit.Network">PacketOut</a>&gt;&nbsp;packet,
                                   java.lang.String&nbsp;handle)</pre>
-<div class="block">Register Packet to the Network</div>
+<div class="block">Register PacketOut to the Network</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>packet</code> - PacketOut to register</dd>
 <dd><code>handle</code> - Handle to bind</dd>
+</dl>
+</li>
+</ul>
+<a name="unregisterPacket-java.lang.Class-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>unregisterPacket</h4>
+<pre>public static&nbsp;void&nbsp;unregisterPacket(java.lang.Class&lt;? extends <a href="../../../../../../net/ME1312/SubServers/Client/Bukkit/Network/PacketOut.html" title="interface in net.ME1312.SubServers.Client.Bukkit.Network">PacketOut</a>&gt;&nbsp;packet)</pre>
+<div class="block">Unregister PacketOut to the Network</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>packet</code> - PacketOut to unregister</dd>
 </dl>
 </li>
 </ul>

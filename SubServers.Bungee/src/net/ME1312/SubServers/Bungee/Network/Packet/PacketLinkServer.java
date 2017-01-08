@@ -14,7 +14,7 @@ import java.util.Map;
 /**
  * Link Server Packet
  */
-public final class PacketLinkServer implements PacketIn, PacketOut {
+public class PacketLinkServer implements PacketIn, PacketOut {
     private SubPlugin plugin;
     private int response;
     private String message;
@@ -38,7 +38,6 @@ public final class PacketLinkServer implements PacketIn, PacketOut {
         this.response = response;
         this.message = message;
     }
-
 
     @Override
     public JSONObject generate() {

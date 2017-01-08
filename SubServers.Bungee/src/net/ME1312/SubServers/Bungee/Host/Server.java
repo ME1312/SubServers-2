@@ -3,6 +3,7 @@ package net.ME1312.SubServers.Bungee.Host;
 import net.ME1312.SubServers.Bungee.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Bungee.Library.Config.YAMLValue;
 import net.ME1312.SubServers.Bungee.Library.Exception.InvalidServerException;
+import net.ME1312.SubServers.Bungee.Library.ExtraDataHandler;
 import net.ME1312.SubServers.Bungee.Network.Client;
 import net.ME1312.SubServers.Bungee.Network.ClientHandler;
 import net.md_5.bungee.BungeeServerInfo;
@@ -14,7 +15,7 @@ import java.net.InetSocketAddress;
 /**
  * Server Class
  */
-public class Server extends BungeeServerInfo implements ClientHandler {
+public class Server extends BungeeServerInfo implements ClientHandler, ExtraDataHandler {
     private YAMLSection extra = new YAMLSection();
     private Client client = null;
     private String motd;
@@ -100,42 +101,28 @@ public class Server extends BungeeServerInfo implements ClientHandler {
         this.restricted = value;
     }
 
-    /**
-     * Add an extra value to this Server
-     *
-     * @param key Key
-     * @param value Value
-     */
-    public void addExtra(String key, Object value) {
-        extra.set(key, value);
+    @Override
+    public void addExtra(String handle, Object value) {
+        extra.set(handle, value);
     }
 
-    /**
-     * Determine if an extra value exists
-     *
-     * @param key Key
-     * @return Value Status
-     */
-    public boolean hasExtra(String key) {
-        return extra.getKeys().contains(key);
+    @Override
+    public boolean hasExtra(String handle) {
+        return extra.getKeys().contains(handle);
     }
 
-    /**
-     * Get an extra value
-     *
-     * @param key Key
-     * @return Value
-     */
-    public YAMLValue getExtra(String key) {
-        return extra.get(key);
+    @Override
+    public YAMLValue getExtra(String handle) {
+        return extra.get(handle);
     }
 
-    /**
-     * Get all of the extra values
-     *
-     * @return JSON Formatted Extra Values
-     */
-    public JSONObject getExtra() {
-        return extra.toJSON();
+    @Override
+    public YAMLSection getExtra() {
+        return extra.clone();
+    }
+
+    @Override
+    public void removeExtra(String handle) {
+        extra.remove(handle);
     }
 }

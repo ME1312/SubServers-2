@@ -1,4 +1,6 @@
 Manifest-Version: 1.0
 Class-Path: BungeeCord.jar
 Main-Class: net.ME1312.SubServers.Bungee.Launch
+Implementation-Version: 2.11.2e
+Specification-Version: 3
 

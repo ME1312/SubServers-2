@@ -9,6 +9,7 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.net.*;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
@@ -135,6 +136,15 @@ public final class SubDataServer {
     }
 
     /**
+     * Grabs all the Clients from the Network
+     *
+     * @return Client List
+     */
+    public Collection<Client> getClients() {
+        return clients.values();
+    }
+
+    /**
      * Remove a Client from the Network
      *
      * @param client Client to Kick
@@ -177,6 +187,15 @@ public final class SubDataServer {
     }
 
     /**
+     * Unregister PacketIn from the Network
+     *
+     * @param packet PacketIn to unregister
+     */
+    public static void unregisterPacket(PacketIn packet) {
+        for (String handle : pIn.keySet()) if (pIn.get(handle).contains(packet)) pIn.get(handle).remove(packet);
+    }
+
+    /**
      * Register PacketOut to the Network
      *
      * @param packet PacketOut to register
@@ -184,6 +203,15 @@ public final class SubDataServer {
      */
     public static void registerPacket(Class<? extends PacketOut> packet, String handle) {
         pOut.put(packet, handle);
+    }
+
+    /**
+     * Unregister PacketOut to the Network
+     *
+     * @param packet PacketOut to unregister
+     */
+    public static void unregisterPacket(Class<? extends PacketOut> packet) {
+        pOut.remove(packet);
     }
 
     /**

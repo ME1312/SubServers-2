@@ -139,7 +139,7 @@ public final class SubDataClient {
     }
 
     /**
-     * Register Packet to the Network
+     * Register PacketIn to the Network
      *
      * @param packet PacketIn to register
      * @param handle Handle to Bind
@@ -151,13 +151,31 @@ public final class SubDataClient {
     }
 
     /**
-     * Register Packet to the Network
+     * Unregister PacketIn from the Network
+     *
+     * @param packet PacketIn to unregister
+     */
+    public static void unregisterPacket(PacketIn packet) {
+        for (String handle : pIn.keySet()) if (pIn.get(handle).contains(packet)) pIn.get(handle).remove(packet);
+    }
+
+    /**
+     * Register PacketOut to the Network
      *
      * @param packet PacketOut to register
      * @param handle Handle to bind
      */
     public static void registerPacket(Class<? extends PacketOut> packet, String handle) {
         pOut.put(packet, handle);
+    }
+
+    /**
+     * Unregister PacketOut to the Network
+     *
+     * @param packet PacketOut to unregister
+     */
+    public static void unregisterPacket(Class<? extends PacketOut> packet) {
+        pOut.remove(packet);
     }
 
     /**

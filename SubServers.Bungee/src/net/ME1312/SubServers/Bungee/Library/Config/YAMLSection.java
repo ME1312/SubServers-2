@@ -32,11 +32,11 @@ public class YAMLSection {
     /**
      * Creates a YAML Section from an Input Stream
      *
-     * @param io Input Stream
+     * @param stream Input Stream
      * @throws YAMLException
      */
-    public YAMLSection(InputStream io) throws YAMLException {
-        this.map = (Map<String, Object>) (this.yaml = new Yaml(YAMLConfig.getDumperOptions())).load(io);
+    public YAMLSection(InputStream stream) throws YAMLException {
+        this.map = (Map<String, Object>) (this.yaml = new Yaml(YAMLConfig.getDumperOptions())).load(stream);
     }
 
     /**
@@ -61,11 +61,11 @@ public class YAMLSection {
     /**
      * Creates a YAML Section from String
      *
-     * @param yaml String
+     * @param str String
      * @throws YAMLException
      */
-    public YAMLSection(String yaml) throws YAMLException {
-        this.map = (Map<String, Object>) (this.yaml = new Yaml(YAMLConfig.getDumperOptions())).load(yaml);
+    public YAMLSection(String str) throws YAMLException {
+        this.map = (Map<String, Object>) (this.yaml = new Yaml(YAMLConfig.getDumperOptions())).load(str);
     }
     
     protected YAMLSection(Map<String, ?> map, YAMLSection up, String handle, Yaml yaml) {
@@ -134,6 +134,32 @@ public class YAMLSection {
         map.clear();
     }
 
+    private Object convert(Object value) {
+        if (value instanceof JSONObject) {
+            value = new YAMLSection((JSONObject) value);
+        }
+
+        if (value instanceof YAMLConfig) {
+            ((YAMLConfig) value).get().up = this;
+            ((YAMLConfig) value).get().handle = handle;
+            return ((YAMLConfig) value).get().map;
+        } else if (value instanceof YAMLSection) {
+            ((YAMLSection) value).up = this;
+            ((YAMLSection) value).handle = handle;
+            return ((YAMLSection) value).map;
+        } else if (value instanceof YAMLValue) {
+            return ((YAMLValue) value).asObject();
+        } else if (value instanceof JSONArray) {
+            List<Object> list = new ArrayList<Object>();
+            for (int i=0; i < ((JSONArray) value).length(); i++) list.add(((JSONArray) value).getString(i));
+            return list;
+        } else if (value instanceof UUID) {
+            return ((UUID) value).toString();
+        } else {
+            return value;
+        }
+    }
+
     /**
      * Set Object into this YAML Section
      *
@@ -141,31 +167,30 @@ public class YAMLSection {
      * @param value Value
      */
     public void set(String handle, Object value) {
-        if (value instanceof JSONObject) { // JSON Values
-            value = new YAMLSection((JSONObject) value);
-        }
-
-        if (value instanceof YAMLConfig) { // YAML Wrapper Values
-            ((YAMLConfig) value).get().up = this;
-            ((YAMLConfig) value).get().handle = handle;
-            map.put(handle, ((YAMLConfig) value).get().map);
-        } else if (value instanceof YAMLSection) {
-            ((YAMLSection) value).up = this;
-            ((YAMLSection) value).handle = handle;
-            map.put(handle, ((YAMLSection) value).map);
-        } else if (value instanceof YAMLValue) {
-            map.put(handle, ((YAMLValue) value).asObject());
-        } else if (value instanceof UUID) { // Other Values YAML Doesn't Understand
-            map.put(handle, ((UUID) value).toString());
-        } else if (value instanceof JSONArray) {
-            List<Object> list = new ArrayList<Object>();
-            for (int i=0; i < ((JSONArray) value).length(); i++){
-                list.add(((JSONArray) value).getString(i));
-            }
-            map.put(handle, list);
+        if (value instanceof Collection) {
+            set(handle, (Collection<?>) value);
         } else {
-            map.put(handle, value);
+            map.put(handle, convert(value));
+
+            if (this.handle != null && this.up != null) {
+                this.up.set(this.handle, this);
+            }
         }
+    }
+
+    /**
+     * Set Collection&lt;V&gt; into this YAML Section
+     *
+     * @param handle Handle
+     * @param list Value
+     * @param <V> Collection Type
+     */
+    public <V> void set(String handle, Collection<V> list) {
+        List<Object> values = new LinkedList<Object>();
+        for (V value : list) {
+            values.add(convert(value));
+        }
+        map.put(handle, values);
 
         if (this.handle != null && this.up != null) {
             this.up.set(this.handle, this);
@@ -201,6 +226,15 @@ public class YAMLSection {
      */
     public YAMLSection superSection() {
         return up;
+    }
+
+    /**
+     * Clone this YAML Section
+     *
+     * @return
+     */
+    public YAMLSection clone() {
+        return new YAMLSection(map, null, null, yaml);
     }
 
     @Override

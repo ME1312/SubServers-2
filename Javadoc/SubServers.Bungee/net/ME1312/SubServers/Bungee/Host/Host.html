@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":10,"i1":6,"i2":10,"i3":6,"i4":10,"i5":6,"i6":6,"i7":6,"i8":6,"i9":6,"i10":6,"i11":6,"i12":6,"i13":10,"i14":6,"i15":6,"i16":10,"i17":6,"i18":10,"i19":6,"i20":10,"i21":6};
+var methods = {"i0":10,"i1":10,"i2":6,"i3":10,"i4":6,"i5":10,"i6":6,"i7":6,"i8":6,"i9":6,"i10":10,"i11":10,"i12":6,"i13":6,"i14":6,"i15":10,"i16":6,"i17":10,"i18":10,"i19":6,"i20":6,"i21":10,"i22":6,"i23":10,"i24":6,"i25":10,"i26":6};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],4:["t3","Abstract Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -106,13 +106,18 @@ var activeTableTab = "activeTableTab";
 <ul class="blockList">
 <li class="blockList">
 <dl>
+<dt>All Implemented Interfaces:</dt>
+<dd><a href="../../../../../net/ME1312/SubServers/Bungee/Library/ExtraDataHandler.html" title="interface in net.ME1312.SubServers.Bungee.Library">ExtraDataHandler</a></dd>
+</dl>
+<dl>
 <dt>Direct Known Subclasses:</dt>
 <dd><a href="../../../../../net/ME1312/SubServers/Bungee/Host/Internal/InternalHost.html" title="class in net.ME1312.SubServers.Bungee.Host.Internal">InternalHost</a></dd>
 </dl>
 <hr>
 <br>
 <pre>public abstract class <span class="typeNameLabel">Host</span>
-extends java.lang.Object</pre>
+extends java.lang.Object
+implements <a href="../../../../../net/ME1312/SubServers/Bungee/Library/ExtraDataHandler.html" title="interface in net.ME1312.SubServers.Bungee.Library">ExtraDataHandler</a></pre>
 <div class="block">Host Layout Class</div>
 </li>
 </ul>
@@ -157,6 +162,13 @@ extends java.lang.Object</pre>
 <th class="colLast" scope="col">Method and Description</th>
 </tr>
 <tr id="i0" class="altColor">
+<td class="colFirst"><code>void</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/Host.html#addExtra-java.lang.String-java.lang.Object-">addExtra</a></span>(java.lang.String&nbsp;handle,
+        java.lang.Object&nbsp;value)</code>
+<div class="block">Add an extra value to this Server</div>
+</td>
+</tr>
+<tr id="i1" class="rowColor">
 <td class="colFirst"><code><a href="../../../../../net/ME1312/SubServers/Bungee/Host/SubServer.html" title="class in net.ME1312.SubServers.Bungee.Host">SubServer</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/Host.html#addSubServer-java.lang.String-boolean-int-java.lang.String-boolean-java.lang.String-net.ME1312.SubServers.Bungee.Host.Executable-java.lang.String-boolean-boolean-boolean-boolean-boolean-">addSubServer</a></span>(java.lang.String&nbsp;name,
             boolean&nbsp;enabled,
@@ -174,7 +186,7 @@ extends java.lang.Object</pre>
 <div class="block">Adds a SubServer</div>
 </td>
 </tr>
-<tr id="i1" class="rowColor">
+<tr id="i2" class="altColor">
 <td class="colFirst"><code>abstract <a href="../../../../../net/ME1312/SubServers/Bungee/Host/SubServer.html" title="class in net.ME1312.SubServers.Bungee.Host">SubServer</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/Host.html#addSubServer-java.util.UUID-java.lang.String-boolean-int-java.lang.String-boolean-java.lang.String-net.ME1312.SubServers.Bungee.Host.Executable-java.lang.String-boolean-boolean-boolean-boolean-boolean-">addSubServer</a></span>(java.util.UUID&nbsp;player,
             java.lang.String&nbsp;name,
@@ -193,14 +205,14 @@ extends java.lang.Object</pre>
 <div class="block">Adds a SubServer</div>
 </td>
 </tr>
-<tr id="i2" class="altColor">
+<tr id="i3" class="rowColor">
 <td class="colFirst"><code>int</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/Host.html#command-java.lang.String-java.lang.String...-">command</a></span>(java.lang.String&nbsp;command,
        java.lang.String...&nbsp;servers)</code>
 <div class="block">Commands the Servers Specified</div>
 </td>
 </tr>
-<tr id="i3" class="rowColor">
+<tr id="i4" class="altColor">
 <td class="colFirst"><code>abstract int</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/Host.html#command-java.util.UUID-java.lang.String-java.lang.String...-">command</a></span>(java.util.UUID&nbsp;player,
        java.lang.String&nbsp;command,
@@ -208,113 +220,137 @@ extends java.lang.Object</pre>
 <div class="block">Commands the Servers Specified</div>
 </td>
 </tr>
-<tr id="i4" class="altColor">
+<tr id="i5" class="rowColor">
 <td class="colFirst"><code>boolean</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/Host.html#forceRemoveSubServer-java.lang.String-">forceRemoveSubServer</a></span>(java.lang.String&nbsp;name)</code>
 <div class="block">Forces the Removal of a SubServer</div>
 </td>
 </tr>
-<tr id="i5" class="rowColor">
+<tr id="i6" class="altColor">
 <td class="colFirst"><code>abstract boolean</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/Host.html#forceRemoveSubServer-java.util.UUID-java.lang.String-">forceRemoveSubServer</a></span>(java.util.UUID&nbsp;player,
                     java.lang.String&nbsp;name)</code>
 <div class="block">Forces the Removal of a SubServer</div>
 </td>
 </tr>
-<tr id="i6" class="altColor">
+<tr id="i7" class="rowColor">
 <td class="colFirst"><code>abstract java.net.InetAddress</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/Host.html#getAddress--">getAddress</a></span>()</code>
 <div class="block">Get the Address of this Host</div>
 </td>
 </tr>
-<tr id="i7" class="rowColor">
+<tr id="i8" class="altColor">
 <td class="colFirst"><code>abstract <a href="../../../../../net/ME1312/SubServers/Bungee/Host/SubCreator.html" title="class in net.ME1312.SubServers.Bungee.Host">SubCreator</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/Host.html#getCreator--">getCreator</a></span>()</code>
 <div class="block">Gets the SubCreator Instance for this Host</div>
 </td>
 </tr>
-<tr id="i8" class="altColor">
+<tr id="i9" class="rowColor">
 <td class="colFirst"><code>abstract java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/Host.html#getDirectory--">getDirectory</a></span>()</code>
 <div class="block">Get the Directory of this Host</div>
 </td>
 </tr>
-<tr id="i9" class="rowColor">
+<tr id="i10" class="altColor">
+<td class="colFirst"><code><a href="../../../../../net/ME1312/SubServers/Bungee/Library/Config/YAMLSection.html" title="class in net.ME1312.SubServers.Bungee.Library.Config">YAMLSection</a></code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/Host.html#getExtra--">getExtra</a></span>()</code>
+<div class="block">Get the extra value section</div>
+</td>
+</tr>
+<tr id="i11" class="rowColor">
+<td class="colFirst"><code><a href="../../../../../net/ME1312/SubServers/Bungee/Library/Config/YAMLValue.html" title="class in net.ME1312.SubServers.Bungee.Library.Config">YAMLValue</a></code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/Host.html#getExtra-java.lang.String-">getExtra</a></span>(java.lang.String&nbsp;handle)</code>
+<div class="block">Get an extra value</div>
+</td>
+</tr>
+<tr id="i12" class="altColor">
 <td class="colFirst"><code>abstract java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/Host.html#getName--">getName</a></span>()</code>
 <div class="block">Get the Name of this Host</div>
 </td>
 </tr>
-<tr id="i10" class="altColor">
+<tr id="i13" class="rowColor">
 <td class="colFirst"><code>abstract <a href="../../../../../net/ME1312/SubServers/Bungee/Host/SubServer.html" title="class in net.ME1312.SubServers.Bungee.Host">SubServer</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/Host.html#getSubServer-java.lang.String-">getSubServer</a></span>(java.lang.String&nbsp;name)</code>
 <div class="block">Gets a SubServer</div>
 </td>
 </tr>
-<tr id="i11" class="rowColor">
+<tr id="i14" class="altColor">
 <td class="colFirst"><code>abstract java.util.Map&lt;java.lang.String,? extends <a href="../../../../../net/ME1312/SubServers/Bungee/Host/SubServer.html" title="class in net.ME1312.SubServers.Bungee.Host">SubServer</a>&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/Host.html#getSubServers--">getSubServers</a></span>()</code>
 <div class="block">Gets the SubServers on this Host</div>
 </td>
 </tr>
-<tr id="i12" class="altColor">
+<tr id="i15" class="rowColor">
+<td class="colFirst"><code>boolean</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/Host.html#hasExtra-java.lang.String-">hasExtra</a></span>(java.lang.String&nbsp;handle)</code>
+<div class="block">Determine if an extra value exists</div>
+</td>
+</tr>
+<tr id="i16" class="altColor">
 <td class="colFirst"><code>abstract boolean</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/Host.html#isEnabled--">isEnabled</a></span>()</code>
 <div class="block">Is this Host Enabled?</div>
 </td>
 </tr>
-<tr id="i13" class="rowColor">
+<tr id="i17" class="rowColor">
+<td class="colFirst"><code>void</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/Host.html#removeExtra-java.lang.String-">removeExtra</a></span>(java.lang.String&nbsp;handle)</code>
+<div class="block">Remove an extra value from this Server</div>
+</td>
+</tr>
+<tr id="i18" class="altColor">
 <td class="colFirst"><code>boolean</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/Host.html#removeSubServer-java.lang.String-">removeSubServer</a></span>(java.lang.String&nbsp;name)</code>
 <div class="block">Removes a SubServer</div>
 </td>
 </tr>
-<tr id="i14" class="altColor">
+<tr id="i19" class="rowColor">
 <td class="colFirst"><code>abstract boolean</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/Host.html#removeSubServer-java.util.UUID-java.lang.String-">removeSubServer</a></span>(java.util.UUID&nbsp;player,
                java.lang.String&nbsp;name)</code>
 <div class="block">Removes a SubServer</div>
 </td>
 </tr>
-<tr id="i15" class="rowColor">
+<tr id="i20" class="altColor">
 <td class="colFirst"><code>abstract void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/Host.html#setEnabled-boolean-">setEnabled</a></span>(boolean&nbsp;value)</code>
 <div class="block">Set if this Host is Enabled</div>
 </td>
 </tr>
-<tr id="i16" class="altColor">
+<tr id="i21" class="rowColor">
 <td class="colFirst"><code>int</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/Host.html#start-java.lang.String...-">start</a></span>(java.lang.String...&nbsp;servers)</code>
 <div class="block">Starts the Servers Specified</div>
 </td>
 </tr>
-<tr id="i17" class="rowColor">
+<tr id="i22" class="altColor">
 <td class="colFirst"><code>abstract int</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/Host.html#start-java.util.UUID-java.lang.String...-">start</a></span>(java.util.UUID&nbsp;player,
      java.lang.String...&nbsp;servers)</code>
 <div class="block">Starts the Servers Specified</div>
 </td>
 </tr>
-<tr id="i18" class="altColor">
+<tr id="i23" class="rowColor">
 <td class="colFirst"><code>int</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/Host.html#stop-java.lang.String...-">stop</a></span>(java.lang.String...&nbsp;servers)</code>
 <div class="block">Stops the Servers Specified</div>
 </td>
 </tr>
-<tr id="i19" class="rowColor">
+<tr id="i24" class="altColor">
 <td class="colFirst"><code>abstract int</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/Host.html#stop-java.util.UUID-java.lang.String...-">stop</a></span>(java.util.UUID&nbsp;player,
     java.lang.String...&nbsp;servers)</code>
 <div class="block">Stops the Servers Specified</div>
 </td>
 </tr>
-<tr id="i20" class="altColor">
+<tr id="i25" class="rowColor">
 <td class="colFirst"><code>int</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/Host.html#terminate-java.lang.String...-">terminate</a></span>(java.lang.String...&nbsp;servers)</code>
 <div class="block">Terminates the Servers Specified</div>
 </td>
 </tr>
-<tr id="i21" class="rowColor">
+<tr id="i26" class="altColor">
 <td class="colFirst"><code>abstract int</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/Host.html#terminate-java.util.UUID-java.lang.String...-">terminate</a></span>(java.util.UUID&nbsp;player,
          java.lang.String...&nbsp;servers)</code>
@@ -772,7 +808,7 @@ extends java.lang.Object</pre>
 <a name="forceRemoveSubServer-java.util.UUID-java.lang.String-">
 <!--   -->
 </a>
-<ul class="blockListLast">
+<ul class="blockList">
 <li class="blockList">
 <h4>forceRemoveSubServer</h4>
 <pre>public abstract&nbsp;boolean&nbsp;forceRemoveSubServer(java.util.UUID&nbsp;player,
@@ -782,6 +818,97 @@ extends java.lang.Object</pre>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>player</code> - Player Removing</dd>
 <dd><code>name</code> - SubServer Name</dd>
+</dl>
+</li>
+</ul>
+<a name="addExtra-java.lang.String-java.lang.Object-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>addExtra</h4>
+<pre>public&nbsp;void&nbsp;addExtra(java.lang.String&nbsp;handle,
+                     java.lang.Object&nbsp;value)</pre>
+<div class="block"><span class="descfrmTypeLabel">Description copied from interface:&nbsp;<code><a href="../../../../../net/ME1312/SubServers/Bungee/Library/ExtraDataHandler.html#addExtra-java.lang.String-java.lang.Object-">ExtraDataHandler</a></code></span></div>
+<div class="block">Add an extra value to this Server</div>
+<dl>
+<dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
+<dd><code><a href="../../../../../net/ME1312/SubServers/Bungee/Library/ExtraDataHandler.html#addExtra-java.lang.String-java.lang.Object-">addExtra</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../net/ME1312/SubServers/Bungee/Library/ExtraDataHandler.html" title="interface in net.ME1312.SubServers.Bungee.Library">ExtraDataHandler</a></code></dd>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>handle</code> - Handle</dd>
+<dd><code>value</code> - Value</dd>
+</dl>
+</li>
+</ul>
+<a name="hasExtra-java.lang.String-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>hasExtra</h4>
+<pre>public&nbsp;boolean&nbsp;hasExtra(java.lang.String&nbsp;handle)</pre>
+<div class="block"><span class="descfrmTypeLabel">Description copied from interface:&nbsp;<code><a href="../../../../../net/ME1312/SubServers/Bungee/Library/ExtraDataHandler.html#hasExtra-java.lang.String-">ExtraDataHandler</a></code></span></div>
+<div class="block">Determine if an extra value exists</div>
+<dl>
+<dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
+<dd><code><a href="../../../../../net/ME1312/SubServers/Bungee/Library/ExtraDataHandler.html#hasExtra-java.lang.String-">hasExtra</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../net/ME1312/SubServers/Bungee/Library/ExtraDataHandler.html" title="interface in net.ME1312.SubServers.Bungee.Library">ExtraDataHandler</a></code></dd>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>handle</code> - Handle</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>Value Status</dd>
+</dl>
+</li>
+</ul>
+<a name="getExtra-java.lang.String-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getExtra</h4>
+<pre>public&nbsp;<a href="../../../../../net/ME1312/SubServers/Bungee/Library/Config/YAMLValue.html" title="class in net.ME1312.SubServers.Bungee.Library.Config">YAMLValue</a>&nbsp;getExtra(java.lang.String&nbsp;handle)</pre>
+<div class="block"><span class="descfrmTypeLabel">Description copied from interface:&nbsp;<code><a href="../../../../../net/ME1312/SubServers/Bungee/Library/ExtraDataHandler.html#getExtra-java.lang.String-">ExtraDataHandler</a></code></span></div>
+<div class="block">Get an extra value</div>
+<dl>
+<dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
+<dd><code><a href="../../../../../net/ME1312/SubServers/Bungee/Library/ExtraDataHandler.html#getExtra-java.lang.String-">getExtra</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../net/ME1312/SubServers/Bungee/Library/ExtraDataHandler.html" title="interface in net.ME1312.SubServers.Bungee.Library">ExtraDataHandler</a></code></dd>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>handle</code> - Handle</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>Value</dd>
+</dl>
+</li>
+</ul>
+<a name="getExtra--">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getExtra</h4>
+<pre>public&nbsp;<a href="../../../../../net/ME1312/SubServers/Bungee/Library/Config/YAMLSection.html" title="class in net.ME1312.SubServers.Bungee.Library.Config">YAMLSection</a>&nbsp;getExtra()</pre>
+<div class="block"><span class="descfrmTypeLabel">Description copied from interface:&nbsp;<code><a href="../../../../../net/ME1312/SubServers/Bungee/Library/ExtraDataHandler.html#getExtra--">ExtraDataHandler</a></code></span></div>
+<div class="block">Get the extra value section</div>
+<dl>
+<dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
+<dd><code><a href="../../../../../net/ME1312/SubServers/Bungee/Library/ExtraDataHandler.html#getExtra--">getExtra</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../net/ME1312/SubServers/Bungee/Library/ExtraDataHandler.html" title="interface in net.ME1312.SubServers.Bungee.Library">ExtraDataHandler</a></code></dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>Extra Value Section</dd>
+</dl>
+</li>
+</ul>
+<a name="removeExtra-java.lang.String-">
+<!--   -->
+</a>
+<ul class="blockListLast">
+<li class="blockList">
+<h4>removeExtra</h4>
+<pre>public&nbsp;void&nbsp;removeExtra(java.lang.String&nbsp;handle)</pre>
+<div class="block"><span class="descfrmTypeLabel">Description copied from interface:&nbsp;<code><a href="../../../../../net/ME1312/SubServers/Bungee/Library/ExtraDataHandler.html#removeExtra-java.lang.String-">ExtraDataHandler</a></code></span></div>
+<div class="block">Remove an extra value from this Server</div>
+<dl>
+<dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
+<dd><code><a href="../../../../../net/ME1312/SubServers/Bungee/Library/ExtraDataHandler.html#removeExtra-java.lang.String-">removeExtra</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../net/ME1312/SubServers/Bungee/Library/ExtraDataHandler.html" title="interface in net.ME1312.SubServers.Bungee.Library">ExtraDataHandler</a></code></dd>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>handle</code> - Handle</dd>
 </dl>
 </li>
 </ul>

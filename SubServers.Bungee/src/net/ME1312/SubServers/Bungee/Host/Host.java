@@ -1,9 +1,13 @@
 package net.ME1312.SubServers.Bungee.Host;
 
+import net.ME1312.SubServers.Bungee.Library.Config.YAMLSection;
+import net.ME1312.SubServers.Bungee.Library.Config.YAMLValue;
 import net.ME1312.SubServers.Bungee.Library.Exception.InvalidHostException;
 import net.ME1312.SubServers.Bungee.Library.Exception.InvalidServerException;
+import net.ME1312.SubServers.Bungee.Library.ExtraDataHandler;
 import net.ME1312.SubServers.Bungee.Library.NamedContainer;
 import net.ME1312.SubServers.Bungee.SubPlugin;
+import org.json.JSONObject;
 
 import java.net.InetAddress;
 import java.util.Map;
@@ -12,7 +16,8 @@ import java.util.UUID;
 /**
  * Host Layout Class
  */
-public abstract class Host {
+public abstract class Host implements ExtraDataHandler {
+    private YAMLSection extra = new YAMLSection();
 
     /**
      * This constructor is required to launch your host from the drivers list. Do not add or remove any arguments.
@@ -244,4 +249,28 @@ public abstract class Host {
      */
     public abstract boolean forceRemoveSubServer(UUID player, String name);
 
+    @Override
+    public void addExtra(String handle, Object value) {
+        extra.set(handle, value);
+    }
+
+    @Override
+    public boolean hasExtra(String handle) {
+        return extra.getKeys().contains(handle);
+    }
+
+    @Override
+    public YAMLValue getExtra(String handle) {
+        return extra.get(handle);
+    }
+
+    @Override
+    public YAMLSection getExtra() {
+        return extra.clone();
+    }
+
+    @Override
+    public void removeExtra(String handle) {
+        extra.remove(handle);
+    }
 }

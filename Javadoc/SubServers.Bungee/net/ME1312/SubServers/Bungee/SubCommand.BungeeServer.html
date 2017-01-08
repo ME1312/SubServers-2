@@ -120,9 +120,10 @@ var activeTableTab = "activeTableTab";
 </dl>
 <hr>
 <br>
-<pre>public static class <span class="typeNameLabel">SubCommand.BungeeServer</span>
+<pre>public static final class <span class="typeNameLabel">SubCommand.BungeeServer</span>
 extends net.md_5.bungee.api.plugin.Command
 implements net.md_5.bungee.api.plugin.TabExecutor</pre>
+<div class="block">BungeeCord /server</div>
 </li>
 </ul>
 </div>
@@ -144,12 +145,16 @@ implements net.md_5.bungee.api.plugin.TabExecutor</pre>
 <tr id="i0" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Bungee/SubCommand.BungeeServer.html#execute-net.md_5.bungee.api.CommandSender-java.lang.String:A-">execute</a></span>(net.md_5.bungee.api.CommandSender&nbsp;sender,
-       java.lang.String[]&nbsp;args)</code>&nbsp;</td>
+       java.lang.String[]&nbsp;args)</code>
+<div class="block">Override /server</div>
+</td>
 </tr>
 <tr id="i1" class="rowColor">
 <td class="colFirst"><code>java.lang.Iterable&lt;java.lang.String&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Bungee/SubCommand.BungeeServer.html#onTabComplete-net.md_5.bungee.api.CommandSender-java.lang.String:A-">onTabComplete</a></span>(net.md_5.bungee.api.CommandSender&nbsp;sender,
-             java.lang.String[]&nbsp;args)</code>&nbsp;</td>
+             java.lang.String[]&nbsp;args)</code>
+<div class="block">Tab completer</div>
+</td>
 </tr>
 </table>
 <ul class="blockList">
@@ -188,9 +193,13 @@ implements net.md_5.bungee.api.plugin.TabExecutor</pre>
 <h4>execute</h4>
 <pre>public&nbsp;void&nbsp;execute(net.md_5.bungee.api.CommandSender&nbsp;sender,
                     java.lang.String[]&nbsp;args)</pre>
+<div class="block">Override /server</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
 <dd><code>execute</code>&nbsp;in class&nbsp;<code>net.md_5.bungee.api.plugin.Command</code></dd>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>sender</code> - Sender</dd>
+<dd><code>args</code> - Arguments</dd>
 </dl>
 </li>
 </ul>
@@ -202,9 +211,15 @@ implements net.md_5.bungee.api.plugin.TabExecutor</pre>
 <h4>onTabComplete</h4>
 <pre>public&nbsp;java.lang.Iterable&lt;java.lang.String&gt;&nbsp;onTabComplete(net.md_5.bungee.api.CommandSender&nbsp;sender,
                                                           java.lang.String[]&nbsp;args)</pre>
+<div class="block">Tab completer</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
 <dd><code>onTabComplete</code>&nbsp;in interface&nbsp;<code>net.md_5.bungee.api.plugin.TabExecutor</code></dd>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>sender</code> - Sender</dd>
+<dd><code>args</code> - Arguments</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>Tab completes</dd>
 </dl>
 </li>
 </ul>

@@ -7,6 +7,9 @@ import java.io.*;
  */
 public final class Util {
     private Util(){}
+    public interface ExceptionRunnable {
+        void run() throws Throwable;
+    }
 
     /**
      * Read Everything from Reader
@@ -54,7 +57,7 @@ public final class Util {
      * @param runnable Runnable
      * @return If an Exception occured
      */
-    public static boolean isException(Runnable runnable) {
+    public static boolean isException(ExceptionRunnable runnable) {
         try {
             runnable.run();
             return false;

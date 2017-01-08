@@ -7,7 +7,7 @@ import net.ME1312.SubServers.Client.Bukkit.SubPlugin;
 import org.bukkit.Bukkit;
 import org.json.JSONObject;
 
-public final class PacketLinkServer implements PacketIn, PacketOut {
+public class PacketLinkServer implements PacketIn, PacketOut {
     private SubPlugin plugin;
 
     public PacketLinkServer(SubPlugin plugin) {
