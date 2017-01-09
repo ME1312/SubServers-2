@@ -74,10 +74,10 @@ public class ConsoleWindow extends JFrame implements SubLogFilter {
         log.setText("\n");
         log.setForeground(Color.WHITE);
         log.setBorder(BorderFactory.createLineBorder(new Color(40, 44, 45)));
-        new TextFieldPopup(log, false);
+        new TextFieldPopup(log);
         input.setForeground(Color.WHITE);
         input.setBorder(BorderFactory.createLineBorder(new Color(40, 44, 45)));
-        popup = new TextFieldPopup(input, true);
+        popup = new TextFieldPopup(input);
         input.addActionListener(event -> {
             if (input.getText().length() > 0 && !input.getText().equals("/")) server.command((input.getText().startsWith("/"))?input.getText().substring(1):input.getText());
             popup.commands.add(input.getText());
@@ -86,12 +86,13 @@ public class ConsoleWindow extends JFrame implements SubLogFilter {
             input.setText("/");
         });
         input.setText("/");
+        server.getLogger().registerFilter(this);
     }
 
     @Override
     public boolean log(Level level, String message) {
         log.setText(log.getText() + ' ' + new SimpleDateFormat("hh:mm:ss").format(Calendar.getInstance().getTime()) + " [" + level.getLocalizedName() + "] " + message + " \n");
-        return false;
+        return !open;
     }
 
     public SubServer getServer() {
@@ -100,7 +101,6 @@ public class ConsoleWindow extends JFrame implements SubLogFilter {
 
     public void open() {
         if (!open) {
-            server.getLogger().registerFilter(this);
             setVisible(true);
             toFront();
             this.open = true;
@@ -110,7 +110,6 @@ public class ConsoleWindow extends JFrame implements SubLogFilter {
     public void close() {
         if (open) {
             this.open = false;
-            server.getLogger().unregisterFilter(this);
             setVisible(false);
         }
     }
@@ -120,37 +119,42 @@ public class ConsoleWindow extends JFrame implements SubLogFilter {
         protected int current = 0;
         protected boolean last = true;
 
-        public TextFieldPopup(JTextComponent field, boolean writable) {
+        public TextFieldPopup(JTextComponent field) {
             JPopupMenu menu = new JPopupMenu();
 
-            if (writable) {
+            if (field.isEditable()) {
                 Action backward = new TextAction("Previous Command") {
                     public void actionPerformed(ActionEvent e) {
                         JTextComponent field = getFocusedComponent();
-                        LinkedList<String> list = new LinkedList<String>(commands);
-                        Collections.reverse(list);
-                        if (list.size() > current) {
-                            if (!last) current++;
-                            last = true;
-                            field.setText(list.get(current++));
+                        if (field.isEditable()) {
+                            LinkedList<String> list = new LinkedList<String>(commands);
+                            Collections.reverse(list);
+                            if (list.size() > current) {
+                                if (!last) current++;
+                                last = true;
+                                field.setText(list.get(current++));
+                            }
                         }
-
                     }
                 };
+                // TODO find a good shortcut key combo
                 menu.add(backward);
 
                 Action forward = new TextAction("Next Command") {
                     public void actionPerformed(ActionEvent e) {
                         JTextComponent field = getFocusedComponent();
-                        LinkedList<String> list = new LinkedList<String>(commands);
-                        Collections.reverse(list);
-                        if (current > 0) {
-                            if (last) current--;
-                            last = false;
-                            field.setText(list.get(--current));
-                        } else field.setText("/");
+                        if (field.isEditable()) {
+                            LinkedList<String> list = new LinkedList<String>(commands);
+                            Collections.reverse(list);
+                            if (current > 0) {
+                                if (last) current--;
+                                last = false;
+                                field.setText(list.get(--current));
+                            } else field.setText("/");
+                        }
                     }
                 };
+                // TODO find a good shortcut key combo
                 menu.add(forward);
                 menu.addSeparator();
 
@@ -165,7 +169,7 @@ public class ConsoleWindow extends JFrame implements SubLogFilter {
             copy.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('C', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), true));
             menu.add(copy);
 
-            if (writable) {
+            if (field.isEditable()) {
                 Action paste = new DefaultEditorKit.PasteAction();
                 paste.putValue(Action.NAME, "Paste");
                 paste.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('V', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), true));

@@ -27,9 +27,13 @@ public class PopoutCommand extends Command {
                 if (servers.keySet().contains(args[0].toLowerCase())) {
                     boolean success = false;
                     if (servers.get(args[0].toLowerCase()).isRunning()) {
-                        ConsoleWindow window = new ConsoleWindow(servers.get(args[0].toLowerCase()));
-                        plugin.current.put(args[0].toLowerCase(), window);
-                        window.open();
+                        if (!plugin.current.keySet().contains(args[0].toLowerCase())) {
+                            ConsoleWindow window = new ConsoleWindow(servers.get(args[0].toLowerCase()));
+                            plugin.current.put(args[0].toLowerCase(), window);
+                            window.open();
+                        } else {
+                            plugin.current.get(args[0].toLowerCase()).open();
+                        }
                         System.out.println("SubConsole > Opening Window...");
                         success = true;
                     }
