@@ -1,19 +1,25 @@
 package net.ME1312.SubServers.Bungee.Host.Internal;
 
+import net.ME1312.SubServers.Bungee.Host.SubLogFilter;
+import net.ME1312.SubServers.Bungee.Host.SubLogger;
 import net.ME1312.SubServers.Bungee.Library.Container;
 import net.md_5.bungee.api.ProxyServer;
 
 import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
  * Internal Process Logger Class
  */
-public class InternalSubLogger {
-    private Process process;
+public class InternalSubLogger extends SubLogger {
+    protected Process process;
     private String name;
     private Container<Boolean> log;
+    private List<SubLogFilter> filters = new ArrayList<SubLogFilter>();
     private File file;
     private PrintWriter writer = null;
     private boolean started = false;
@@ -35,9 +41,7 @@ public class InternalSubLogger {
         this.file = file;
     }
 
-    /**
-     * Start the Logger
-     */
+    @Override
     public void start() {
         started = true;
         if (file != null && writer == null) {
@@ -61,9 +65,10 @@ public class InternalSubLogger {
                 if (!line.startsWith(">")) {
                     if (log.get()) {
                         String msg = line;
+                        Level level;
 
                         // REGEX Formatting
-                        String type = "INFO";
+                        String type = "";
                         Matcher matcher = Pattern.compile("^((?:\\s*\\[?([0-9]{2}:[0-9]{2}:[0-9]{2})]?)?[\\s\\/\\\\\\|]*(?:\\[|\\[.*\\/)?(MESSAGE|INFO|WARN|WARNING|ERROR|ERR|SEVERE)\\]?:?\\s*)").matcher(msg);
                         while (matcher.find()) {
                             type = matcher.group(3).toUpperCase();
@@ -73,20 +78,24 @@ public class InternalSubLogger {
 
                         // Determine LOG LEVEL
                         switch (type) {
-                            case "INFO":
-                            case "MESSAGE":
-                                ProxyServer.getInstance().getLogger().info(name + " > " + msg);
-                                break;
                             case "WARNING":
                             case "WARN":
-                                ProxyServer.getInstance().getLogger().warning(name + " > " + msg);
+                                level = Level.WARNING;
                                 break;
                             case "SEVERE":
                             case "ERROR":
                             case "ERR":
-                                ProxyServer.getInstance().getLogger().severe(name + " > " + msg);
+                                level = Level.SEVERE;
                                 break;
+                            default:
+                                level = Level.INFO;
                         }
+
+                        // Filter Message
+                        boolean allow = true;
+                        for (SubLogFilter filter : filters) if (allow) allow = filter.log(level, msg);
+
+                        if (allow) ProxyServer.getInstance().getLogger().log(level, name + " > " + msg);
                     }
 
                     // Log to FILE
@@ -107,13 +116,21 @@ public class InternalSubLogger {
         }
     }
 
-    /**
-     * Stop the Logger
-     */
+    @Override
     public void stop() {
         if (out != null) out.interrupt();
         if (err != null) err.interrupt();
         destroy();
+    }
+
+    @Override
+    public void registerFilter(SubLogFilter filter) {
+        filters.add(filter);
+    }
+
+    @Override
+    public void unregisterFilter(SubLogFilter filter) {
+        filters.remove(filter);
     }
 
     private void destroy() {
@@ -128,5 +145,15 @@ public class InternalSubLogger {
                 writer = null;
             }
         }
+    }
+
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public boolean isLogging() {
+        return log.get();
     }
 }

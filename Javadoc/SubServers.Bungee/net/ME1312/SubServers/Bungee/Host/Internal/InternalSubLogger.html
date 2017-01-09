@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":10,"i1":10};
+var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -98,7 +98,12 @@ var activeTableTab = "activeTableTab";
 <li>java.lang.Object</li>
 <li>
 <ul class="inheritance">
+<li><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubLogger.html" title="class in net.ME1312.SubServers.Bungee.Host">net.ME1312.SubServers.Bungee.Host.SubLogger</a></li>
+<li>
+<ul class="inheritance">
 <li>net.ME1312.SubServers.Bungee.Host.Internal.InternalSubLogger</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -108,7 +113,7 @@ var activeTableTab = "activeTableTab";
 <hr>
 <br>
 <pre>public class <span class="typeNameLabel">InternalSubLogger</span>
-extends java.lang.Object</pre>
+extends <a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubLogger.html" title="class in net.ME1312.SubServers.Bungee.Host">SubLogger</a></pre>
 <div class="block">Internal Process Logger Class</div>
 </li>
 </ul>
@@ -151,15 +156,37 @@ extends java.lang.Object</pre>
 <th class="colLast" scope="col">Method and Description</th>
 </tr>
 <tr id="i0" class="altColor">
-<td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/Internal/InternalSubLogger.html#start--">start</a></span>()</code>
-<div class="block">Start the Logger</div>
+<td class="colFirst"><code>java.lang.String</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/Internal/InternalSubLogger.html#getName--">getName</a></span>()</code>
+<div class="block">Gets the Name of the task logging</div>
 </td>
 </tr>
 <tr id="i1" class="rowColor">
+<td class="colFirst"><code>boolean</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/Internal/InternalSubLogger.html#isLogging--">isLogging</a></span>()</code>&nbsp;</td>
+</tr>
+<tr id="i2" class="altColor">
+<td class="colFirst"><code>void</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/Internal/InternalSubLogger.html#registerFilter-net.ME1312.SubServers.Bungee.Host.SubLogFilter-">registerFilter</a></span>(<a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubLogFilter.html" title="interface in net.ME1312.SubServers.Bungee.Host">SubLogFilter</a>&nbsp;filter)</code>
+<div class="block">Register Filter</div>
+</td>
+</tr>
+<tr id="i3" class="rowColor">
+<td class="colFirst"><code>void</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/Internal/InternalSubLogger.html#start--">start</a></span>()</code>
+<div class="block">Start Logger</div>
+</td>
+</tr>
+<tr id="i4" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/Internal/InternalSubLogger.html#stop--">stop</a></span>()</code>
-<div class="block">Stop the Logger</div>
+<div class="block">Stop Logger</div>
+</td>
+</tr>
+<tr id="i5" class="rowColor">
+<td class="colFirst"><code>void</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/Internal/InternalSubLogger.html#unregisterFilter-net.ME1312.SubServers.Bungee.Host.SubLogFilter-">unregisterFilter</a></span>(<a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubLogFilter.html" title="interface in net.ME1312.SubServers.Bungee.Host">SubLogFilter</a>&nbsp;filter)</code>
+<div class="block">Unregister Filter</div>
 </td>
 </tr>
 </table>
@@ -219,17 +246,91 @@ extends java.lang.Object</pre>
 <li class="blockList">
 <h4>start</h4>
 <pre>public&nbsp;void&nbsp;start()</pre>
-<div class="block">Start the Logger</div>
+<div class="block"><span class="descfrmTypeLabel">Description copied from class:&nbsp;<code><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubLogger.html#start--">SubLogger</a></code></span></div>
+<div class="block">Start Logger</div>
+<dl>
+<dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
+<dd><code><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubLogger.html#start--">start</a></code>&nbsp;in class&nbsp;<code><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubLogger.html" title="class in net.ME1312.SubServers.Bungee.Host">SubLogger</a></code></dd>
+</dl>
 </li>
 </ul>
 <a name="stop--">
 <!--   -->
 </a>
-<ul class="blockListLast">
+<ul class="blockList">
 <li class="blockList">
 <h4>stop</h4>
 <pre>public&nbsp;void&nbsp;stop()</pre>
-<div class="block">Stop the Logger</div>
+<div class="block"><span class="descfrmTypeLabel">Description copied from class:&nbsp;<code><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubLogger.html#stop--">SubLogger</a></code></span></div>
+<div class="block">Stop Logger</div>
+<dl>
+<dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
+<dd><code><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubLogger.html#stop--">stop</a></code>&nbsp;in class&nbsp;<code><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubLogger.html" title="class in net.ME1312.SubServers.Bungee.Host">SubLogger</a></code></dd>
+</dl>
+</li>
+</ul>
+<a name="registerFilter-net.ME1312.SubServers.Bungee.Host.SubLogFilter-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>registerFilter</h4>
+<pre>public&nbsp;void&nbsp;registerFilter(<a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubLogFilter.html" title="interface in net.ME1312.SubServers.Bungee.Host">SubLogFilter</a>&nbsp;filter)</pre>
+<div class="block"><span class="descfrmTypeLabel">Description copied from class:&nbsp;<code><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubLogger.html#registerFilter-net.ME1312.SubServers.Bungee.Host.SubLogFilter-">SubLogger</a></code></span></div>
+<div class="block">Register Filter</div>
+<dl>
+<dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
+<dd><code><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubLogger.html#registerFilter-net.ME1312.SubServers.Bungee.Host.SubLogFilter-">registerFilter</a></code>&nbsp;in class&nbsp;<code><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubLogger.html" title="class in net.ME1312.SubServers.Bungee.Host">SubLogger</a></code></dd>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>filter</code> - Filter</dd>
+</dl>
+</li>
+</ul>
+<a name="unregisterFilter-net.ME1312.SubServers.Bungee.Host.SubLogFilter-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>unregisterFilter</h4>
+<pre>public&nbsp;void&nbsp;unregisterFilter(<a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubLogFilter.html" title="interface in net.ME1312.SubServers.Bungee.Host">SubLogFilter</a>&nbsp;filter)</pre>
+<div class="block"><span class="descfrmTypeLabel">Description copied from class:&nbsp;<code><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubLogger.html#unregisterFilter-net.ME1312.SubServers.Bungee.Host.SubLogFilter-">SubLogger</a></code></span></div>
+<div class="block">Unregister Filter</div>
+<dl>
+<dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
+<dd><code><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubLogger.html#unregisterFilter-net.ME1312.SubServers.Bungee.Host.SubLogFilter-">unregisterFilter</a></code>&nbsp;in class&nbsp;<code><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubLogger.html" title="class in net.ME1312.SubServers.Bungee.Host">SubLogger</a></code></dd>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>filter</code> - Filter</dd>
+</dl>
+</li>
+</ul>
+<a name="getName--">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getName</h4>
+<pre>public&nbsp;java.lang.String&nbsp;getName()</pre>
+<div class="block"><span class="descfrmTypeLabel">Description copied from class:&nbsp;<code><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubLogger.html#getName--">SubLogger</a></code></span></div>
+<div class="block">Gets the Name of the task logging</div>
+<dl>
+<dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
+<dd><code><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubLogger.html#getName--">getName</a></code>&nbsp;in class&nbsp;<code><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubLogger.html" title="class in net.ME1312.SubServers.Bungee.Host">SubLogger</a></code></dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>Log Task Name</dd>
+</dl>
+</li>
+</ul>
+<a name="isLogging--">
+<!--   -->
+</a>
+<ul class="blockListLast">
+<li class="blockList">
+<h4>isLogging</h4>
+<pre>public&nbsp;boolean&nbsp;isLogging()</pre>
+<dl>
+<dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
+<dd><code><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubLogger.html#isLogging--">isLogging</a></code>&nbsp;in class&nbsp;<code><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubLogger.html" title="class in net.ME1312.SubServers.Bungee.Host">SubLogger</a></code></dd>
+</dl>
 </li>
 </ul>
 </li>

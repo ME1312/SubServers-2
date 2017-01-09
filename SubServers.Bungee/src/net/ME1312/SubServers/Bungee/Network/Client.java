@@ -20,33 +20,33 @@ import java.util.TimerTask;
 /**
  * Network Client Class
  */
-public final class Client {
+public class Client {
     private Socket socket;
     private InetSocketAddress address;
     private ClientHandler handler;
     private PrintWriter writer;
     private Timer authorized;
-    private SubPlugin plugin;
+    private SubDataServer subdata;
     private Client instance;
 
     /**
      * Network Client
      *
-     * @param plugin SubPlugin
+     * @param subdata SubData Direct Server
      * @param client Socket to Bind
      */
-    public Client(SubPlugin plugin, Socket client) throws IOException {
-        this.plugin = plugin;
+    public Client(SubDataServer subdata, Socket client) throws IOException {
+        this.subdata = subdata;
         socket = client;
         writer = new PrintWriter(client.getOutputStream(), true);
         address = new InetSocketAddress(client.getInetAddress(), client.getPort());
         instance = this;
-        authorized = new Timer("auth" + client.getRemoteSocketAddress().toString());
+        authorized = new Timer("__subdata_auth_" + client.getRemoteSocketAddress().toString());
         authorized.schedule(new TimerTask() {
             @Override
             public void run() {
                 if (!socket.isClosed()) try {
-                    plugin.subdata.removeClient(instance);
+                    subdata.removeClient(instance);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -73,7 +73,7 @@ public final class Client {
                                 } catch (Throwable e) {
                                     new InvocationTargetException(e, "Exception while executing PacketIn").printStackTrace();
                                 }
-                            }
+                            } else sendPacket(new PacketAuthorization(-1, "Unauthorized"));
                         }
                     } catch (IllegalPacketException e) {
                         e.printStackTrace();
@@ -82,14 +82,14 @@ public final class Client {
                     }
                 }
                 try {
-                    plugin.subdata.removeClient(instance);
+                    subdata.removeClient(instance);
                 } catch (IOException e1) {
                     e1.printStackTrace();
                 }
             } catch (Exception e) {
                 if (!(e instanceof SocketException)) e.printStackTrace();
                 try {
-                    plugin.subdata.removeClient(instance);
+                    subdata.removeClient(instance);
                 } catch (IOException e1) {
                     e1.printStackTrace();
                 }

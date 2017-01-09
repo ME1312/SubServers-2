@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="net.ME1312.SubServers.Console.ConsoleWindow">
+  <grid id="27dc6" binding="window" layout-manager="GridLayoutManager" row-count="2" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+    <margin top="0" left="0" bottom="0" right="0"/>
+    <constraints>
+      <xy x="20" y="20" width="806" height="400"/>
+    </constraints>
+    <properties>
+      <background color="-12236470"/>
+    </properties>
+    <clientProperties>
+      <html.disable class="java.lang.Boolean" value="false"/>
+    </clientProperties>
+    <border type="none" title="SubServers 2 Console" title-justification="2" title-position="3">
+      <font/>
+      <title-color color="-1"/>
+    </border>
+    <children>
+      <component id="18cff" class="javax.swing.JTextField" binding="input">
+        <constraints>
+          <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="7" anchor="8" fill="1" indent="0" use-parent-layout="false">
+            <preferred-size width="150" height="-1"/>
+          </grid>
+        </constraints>
+        <properties>
+          <background color="-14144467"/>
+          <editable value="true"/>
+          <font name="Courier" size="14"/>
+          <foreground color="-14144467"/>
+          <horizontalAlignment value="10"/>
+          <text value=""/>
+          <toolTipText value="Write a command here..."/>
+        </properties>
+        <clientProperties>
+          <html.disable class="java.lang.Boolean" value="true"/>
+        </clientProperties>
+      </component>
+      <scrollpane id="d684e" binding="scroll">
+        <constraints>
+          <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="7" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <foreground color="-14144467"/>
+        </properties>
+        <border type="none"/>
+        <children>
+          <component id="71cb5" class="javax.swing.JTextArea" binding="log">
+            <constraints/>
+            <properties>
+              <background color="-14144467"/>
+              <editable value="false"/>
+              <enabled value="true"/>
+              <font name="Courier" size="12"/>
+              <foreground color="-14144467"/>
+              <lineWrap value="false"/>
+            </properties>
+            <clientProperties>
+              <html.disable class="java.lang.Boolean" value="true"/>
+            </clientProperties>
+          </component>
+        </children>
+      </scrollpane>
+    </children>
+  </grid>
+</form>

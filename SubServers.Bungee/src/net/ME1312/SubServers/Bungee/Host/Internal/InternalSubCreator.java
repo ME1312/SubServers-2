@@ -61,8 +61,8 @@ public class InternalSubCreator extends SubCreator {
             try {
                 generateSpigotYAML(dir);
                 generateProperties(dir, port);
-                generateClient(dir, name, type);
                 System.out.println(host.getName() + "/Creator > Copying Plugins...");
+                generateClient(dir, name, type);
                 copyFolder(new UniversalFile(host.plugin.dir, "SubServers:Plugin Templates:Spigot Plugins"), new UniversalFile(dir, "plugins"));
             } catch (Exception e) {
                 e.printStackTrace();

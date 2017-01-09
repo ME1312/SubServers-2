@@ -2,6 +2,7 @@ package net.ME1312.SubServers.Bungee.Host.Internal;
 
 import net.ME1312.SubServers.Bungee.Event.*;
 import net.ME1312.SubServers.Bungee.Host.Executable;
+import net.ME1312.SubServers.Bungee.Host.SubLogger;
 import net.ME1312.SubServers.Bungee.Library.Container;
 import net.ME1312.SubServers.Bungee.Library.Exception.InvalidServerException;
 import net.ME1312.SubServers.Bungee.Host.Host;
@@ -25,6 +26,7 @@ public class InternalSubServer extends SubServer {
     private Executable executable;
     private String stopcmd;
     private Process process;
+    private InternalSubLogger logger;
     private Thread thread;
     private BufferedWriter command;
     private boolean restart;
@@ -60,6 +62,7 @@ public class InternalSubServer extends SubServer {
         this.executable = executable;
         this.stopcmd = stopcmd;
         this.process = null;
+        this.logger = new InternalSubLogger(null, getName(), this.log, null);
         this.thread = null;
         this.command = null;
         this.restart = restart;
@@ -74,8 +77,8 @@ public class InternalSubServer extends SubServer {
         try {
             process = Runtime.getRuntime().exec(executable.toString(), null, directory);
             System.out.println("SubServers > Now starting " + getName());
-            final InternalSubLogger read = new InternalSubLogger(process, getName(), log, null);
-            read.start();
+            logger.process = process;
+            logger.start();
             command = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
 
             process.waitFor();
@@ -208,6 +211,11 @@ public class InternalSubServer extends SubServer {
     @Override
     public void setLogging(boolean value) {
         log.set(value);
+    }
+
+    @Override
+    public SubLogger getLogger() {
+        return logger;
     }
 
     @Override

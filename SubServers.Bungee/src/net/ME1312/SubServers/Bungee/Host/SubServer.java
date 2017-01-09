@@ -144,6 +144,10 @@ public abstract class SubServer extends Server {
      */
     public abstract void setLogging(boolean value);
 
+    /**
+     * Get Process Logger
+     */
+    public abstract SubLogger getLogger();
 
     /**
      * Get the Server Directory

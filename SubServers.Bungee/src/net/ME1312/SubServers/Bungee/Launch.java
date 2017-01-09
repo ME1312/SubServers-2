@@ -3,6 +3,7 @@ package net.ME1312.SubServers.Bungee;
 import net.ME1312.SubServers.Bungee.Library.Container;
 import net.ME1312.SubServers.Bungee.Library.Util;
 
+import javax.swing.*;
 import java.security.Security;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -21,6 +22,8 @@ public final class Launch {
      */
     @SuppressWarnings("deprecation")
     public static void main(String[] args) throws Exception {
+        System.setProperty("apple.laf.useScreenMenuBar", "true");
+
         final Container<Boolean> bungee = new Container<Boolean>(false);
         if (Util.isException(() -> {
             if (Class.forName("net.md_5.bungee.BungeeCord") != null) bungee.set(true);

@@ -104,7 +104,7 @@ public final class SubDataServer {
      */
     public Client addClient(Socket socket) throws IOException {
         if (allowedAddresses.contains(socket.getInetAddress())) {
-            Client client = new Client(plugin, socket);
+            Client client = new Client(this, socket);
             System.out.println("SubData > " + client.getAddress().toString() + " has connected");
             clients.put(client.getAddress(), client);
             return client;
