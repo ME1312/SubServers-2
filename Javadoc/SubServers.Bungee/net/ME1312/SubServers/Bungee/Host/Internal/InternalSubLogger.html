@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10};
+var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -133,7 +133,8 @@ extends <a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubLogger.h
 <th class="colOne" scope="col">Constructor and Description</th>
 </tr>
 <tr class="altColor">
-<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/Internal/InternalSubLogger.html#InternalSubLogger-java.lang.Process-java.lang.String-net.ME1312.SubServers.Bungee.Library.Container-java.io.File-">InternalSubLogger</a></span>(java.lang.Process&nbsp;process,
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/Internal/InternalSubLogger.html#InternalSubLogger-java.lang.Process-java.lang.Object-java.lang.String-net.ME1312.SubServers.Bungee.Library.Container-java.io.File-">InternalSubLogger</a></span>(java.lang.Process&nbsp;process,
+                 java.lang.Object&nbsp;user,
                  java.lang.String&nbsp;name,
                  <a href="../../../../../../net/ME1312/SubServers/Bungee/Library/Container.html" title="class in net.ME1312.SubServers.Bungee.Library">Container</a>&lt;java.lang.Boolean&gt;&nbsp;log,
                  java.io.File&nbsp;file)</code>
@@ -156,34 +157,40 @@ extends <a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubLogger.h
 <th class="colLast" scope="col">Method and Description</th>
 </tr>
 <tr id="i0" class="altColor">
+<td class="colFirst"><code>java.lang.Object</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/Internal/InternalSubLogger.html#getHandle--">getHandle</a></span>()</code>
+<div class="block">Gets the Object using this Logger</div>
+</td>
+</tr>
+<tr id="i1" class="rowColor">
 <td class="colFirst"><code>java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/Internal/InternalSubLogger.html#getName--">getName</a></span>()</code>
 <div class="block">Gets the Name of the task logging</div>
 </td>
 </tr>
-<tr id="i1" class="rowColor">
+<tr id="i2" class="altColor">
 <td class="colFirst"><code>boolean</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/Internal/InternalSubLogger.html#isLogging--">isLogging</a></span>()</code>&nbsp;</td>
 </tr>
-<tr id="i2" class="altColor">
+<tr id="i3" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/Internal/InternalSubLogger.html#registerFilter-net.ME1312.SubServers.Bungee.Host.SubLogFilter-">registerFilter</a></span>(<a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubLogFilter.html" title="interface in net.ME1312.SubServers.Bungee.Host">SubLogFilter</a>&nbsp;filter)</code>
 <div class="block">Register Filter</div>
 </td>
 </tr>
-<tr id="i3" class="rowColor">
+<tr id="i4" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/Internal/InternalSubLogger.html#start--">start</a></span>()</code>
 <div class="block">Start Logger</div>
 </td>
 </tr>
-<tr id="i4" class="altColor">
+<tr id="i5" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/Internal/InternalSubLogger.html#stop--">stop</a></span>()</code>
 <div class="block">Stop Logger</div>
 </td>
 </tr>
-<tr id="i5" class="rowColor">
+<tr id="i6" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/Internal/InternalSubLogger.html#unregisterFilter-net.ME1312.SubServers.Bungee.Host.SubLogFilter-">unregisterFilter</a></span>(<a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubLogFilter.html" title="interface in net.ME1312.SubServers.Bungee.Host">SubLogFilter</a>&nbsp;filter)</code>
 <div class="block">Unregister Filter</div>
@@ -211,13 +218,14 @@ extends <a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubLogger.h
 <!--   -->
 </a>
 <h3>Constructor Detail</h3>
-<a name="InternalSubLogger-java.lang.Process-java.lang.String-net.ME1312.SubServers.Bungee.Library.Container-java.io.File-">
+<a name="InternalSubLogger-java.lang.Process-java.lang.Object-java.lang.String-net.ME1312.SubServers.Bungee.Library.Container-java.io.File-">
 <!--   -->
 </a>
 <ul class="blockListLast">
 <li class="blockList">
 <h4>InternalSubLogger</h4>
 <pre>public&nbsp;InternalSubLogger(java.lang.Process&nbsp;process,
+                         java.lang.Object&nbsp;user,
                          java.lang.String&nbsp;name,
                          <a href="../../../../../../net/ME1312/SubServers/Bungee/Library/Container.html" title="class in net.ME1312.SubServers.Bungee.Library">Container</a>&lt;java.lang.Boolean&gt;&nbsp;log,
                          java.io.File&nbsp;file)</pre>
@@ -225,6 +233,7 @@ extends <a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubLogger.h
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>process</code> - Process</dd>
+<dd><code>user</code> - Object using this logger (or null)</dd>
 <dd><code>name</code> - Prefix</dd>
 <dd><code>log</code> - Console Logging Status</dd>
 <dd><code>file</code> - File to log to (or null for disabled)</dd>
@@ -300,6 +309,23 @@ extends <a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubLogger.h
 <dd><code><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubLogger.html#unregisterFilter-net.ME1312.SubServers.Bungee.Host.SubLogFilter-">unregisterFilter</a></code>&nbsp;in class&nbsp;<code><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubLogger.html" title="class in net.ME1312.SubServers.Bungee.Host">SubLogger</a></code></dd>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>filter</code> - Filter</dd>
+</dl>
+</li>
+</ul>
+<a name="getHandle--">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getHandle</h4>
+<pre>public&nbsp;java.lang.Object&nbsp;getHandle()</pre>
+<div class="block"><span class="descfrmTypeLabel">Description copied from class:&nbsp;<code><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubLogger.html#getHandle--">SubLogger</a></code></span></div>
+<div class="block">Gets the Object using this Logger</div>
+<dl>
+<dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
+<dd><code><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubLogger.html#getHandle--">getHandle</a></code>&nbsp;in class&nbsp;<code><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubLogger.html" title="class in net.ME1312.SubServers.Bungee.Host">SubLogger</a></code></dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>Object</dd>
 </dl>
 </li>
 </ul>

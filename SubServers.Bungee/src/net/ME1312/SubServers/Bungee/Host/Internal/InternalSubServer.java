@@ -62,7 +62,7 @@ public class InternalSubServer extends SubServer {
         this.executable = executable;
         this.stopcmd = stopcmd;
         this.process = null;
-        this.logger = new InternalSubLogger(null, getName(), this.log, null);
+        this.logger = new InternalSubLogger(null, this, getName(), this.log, null);
         this.thread = null;
         this.command = null;
         this.restart = restart;

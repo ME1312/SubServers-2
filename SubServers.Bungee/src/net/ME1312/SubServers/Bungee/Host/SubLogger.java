@@ -13,6 +13,13 @@ public abstract class SubLogger {
     public abstract String getName();
 
     /**
+     * Gets the Object using this Logger
+     *
+     * @return Object
+     */
+    public abstract Object getHandle();
+
+    /**
      * Start Logger
      */
     public abstract void start();

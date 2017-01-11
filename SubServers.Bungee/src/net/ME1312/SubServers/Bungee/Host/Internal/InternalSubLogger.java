@@ -17,10 +17,11 @@ import java.util.regex.Pattern;
  */
 public class InternalSubLogger extends SubLogger {
     protected Process process;
-    private String name;
-    private Container<Boolean> log;
+    private Object handle;
+    protected String name;
+    protected Container<Boolean> log;
     private List<SubLogFilter> filters = new ArrayList<SubLogFilter>();
-    private File file;
+    protected File file;
     private PrintWriter writer = null;
     private boolean started = false;
     private Thread out = null;
@@ -30,12 +31,14 @@ public class InternalSubLogger extends SubLogger {
      * Creates a new Internal Process Logger
      *
      * @param process Process
+     * @param user Object using this logger (or null)
      * @param name Prefix
      * @param log Console Logging Status
      * @param file File to log to (or null for disabled)
      */
-    public InternalSubLogger(Process process, String name, Container<Boolean> log, File file) {
+    public InternalSubLogger(Process process, Object user, String name, Container<Boolean> log, File file) {
         this.process = process;
+        this.handle = user;
         this.name = name;
         this.log = log;
         this.file = file;
@@ -55,6 +58,7 @@ public class InternalSubLogger extends SubLogger {
         }
         if (out == null) (out = new Thread(() -> start(process.getInputStream(), false))).start();
         if (err == null) (err = new Thread(() -> start(process.getErrorStream(), true))).start();
+        for (SubLogFilter filter : filters) filter.start();
     }
 
     private void start(InputStream in, boolean isErr) {
@@ -136,6 +140,7 @@ public class InternalSubLogger extends SubLogger {
     private void destroy() {
         if (started) {
             started = false;
+            for (SubLogFilter filter : filters) filter.stop();
             if (writer != null) {
                 int l = (int) Math.floor((("---------- LOG START \u2014 " + name + " ----------").length() - 9) / 2);
                 String s = "";
@@ -145,6 +150,11 @@ public class InternalSubLogger extends SubLogger {
                 writer = null;
             }
         }
+    }
+
+    @Override
+    public Object getHandle() {
+        return handle;
     }
 
     @Override

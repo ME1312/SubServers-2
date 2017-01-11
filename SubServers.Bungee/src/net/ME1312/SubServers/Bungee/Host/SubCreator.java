@@ -73,6 +73,13 @@ public abstract class SubCreator {
     public abstract String getGitBashDirectory();
 
     /**
+     * Gets the Logger for the creator
+     *
+     * @return
+     */
+    public abstract SubLogger getLogger();
+
+    /**
      * Gets the status of SubCreator
      *
      * @return SubCreator Status

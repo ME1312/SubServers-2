@@ -1,10 +1,7 @@
 package net.ME1312.SubServers.Bungee.Host.Internal;
 
 import net.ME1312.SubServers.Bungee.Event.SubCreateEvent;
-import net.ME1312.SubServers.Bungee.Host.Executable;
-import net.ME1312.SubServers.Bungee.Host.Host;
-import net.ME1312.SubServers.Bungee.Host.SubCreator;
-import net.ME1312.SubServers.Bungee.Host.SubServer;
+import net.ME1312.SubServers.Bungee.Host.*;
 import net.ME1312.SubServers.Bungee.Library.Config.YAMLConfig;
 import net.ME1312.SubServers.Bungee.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Bungee.Library.Container;
@@ -34,6 +31,7 @@ import java.util.UUID;
 public class InternalSubCreator extends SubCreator {
     private InternalHost host;
     private String gitBash;
+    private InternalSubLogger logger;
     private Process process = null;
     private Thread thread = null;
 
@@ -46,6 +44,7 @@ public class InternalSubCreator extends SubCreator {
     public InternalSubCreator(InternalHost host, String gitBash) {
         this.host = host;
         this.gitBash = gitBash;
+        this.logger = new InternalSubLogger(null, this, host.getName() + "/Creator", new Container<Boolean>(false), null);
     }
 
 
@@ -166,8 +165,10 @@ public class InternalSubCreator extends SubCreator {
                 this.process = Runtime.getRuntime().exec((System.getProperty("os.name").toLowerCase().indexOf("win") >= 0)?
                         "\"" + gitBash + "\" --login -i -c \"bash build.sh " + version.toString() + " " + type.toString().toLowerCase() + "\""
                         :("bash build.sh " + version.toString() + " " + type.toString().toLowerCase() + " " + System.getProperty("user.home")), null, dir);
-                InternalSubLogger read = new InternalSubLogger(this.process, host.getName() + "/Creator", new Container<Boolean>(host.plugin.config.get().getSection("Settings").getBoolean("Log-Creator")), new File(dir, "SubCreator-" + type.toString() + "-" + version.toString().replace("::", "@") + ".log"));
-                read.start();
+                logger.process = this.process;
+                logger.log.set(host.plugin.config.get().getSection("Settings").getBoolean("Log-Creator"));
+                logger.file = new File(dir, "SubCreator-" + type.toString() + "-" + version.toString().replace("::", "@") + ".log");
+                logger.start();
                 try {
                     this.process.waitFor();
                     Thread.sleep(500);
@@ -244,6 +245,11 @@ public class InternalSubCreator extends SubCreator {
     @Override
     public String getGitBashDirectory() {
         return gitBash;
+    }
+
+    @Override
+    public SubLogger getLogger() {
+        return logger;
     }
 
     @Override
