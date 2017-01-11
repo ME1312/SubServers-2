@@ -3,7 +3,7 @@ network_compression_threshold: 256
 stats: 'undefined'
 permissions:
   default:
-  - bungeecord.command.logger
+  - bungeecord.command.server
   - bungeecord.command.list
   admin:
   - bungeecord.command.find
@@ -21,7 +21,7 @@ servers:
 timeout: 30000
 listeners:
 - query_port: 25564
-  motd: '&1Another Bungee logger'
+  motd: '&1Another Bungee server'
   priorities:
   - Lobby
   bind_local_address: true

@@ -51,13 +51,13 @@ permissions:
           subservers.subserver.command.*:
             description: 'Grants Access to Send Commands to a SubServer'
             default: op
-      subservers.logger.*:
+      subservers.server.*:
         description: 'Grants Access to SubServer Server Actions'
         default: op
         children:
-          subservers.logger.teleport-others:
+          subservers.server.teleport-others:
             description: 'Grants Acces to Teleport Others to a Server'
             default: op
-          subservers.logger.teleport.*:
+          subservers.server.teleport.*:
             description: 'Grants Acces to Teleport to a Server'
             default: op
