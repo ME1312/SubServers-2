@@ -3,10 +3,13 @@ package net.ME1312.SubServers.Bungee.Host.Internal;
 import net.ME1312.SubServers.Bungee.Host.SubLogFilter;
 import net.ME1312.SubServers.Bungee.Host.SubLogger;
 import net.ME1312.SubServers.Bungee.Library.Container;
+import net.ME1312.SubServers.Bungee.Library.NamedContainer;
 import net.md_5.bungee.api.ProxyServer;
 
 import java.io.*;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.regex.Matcher;
@@ -21,6 +24,7 @@ public class InternalSubLogger extends SubLogger {
     protected String name;
     protected Container<Boolean> log;
     private List<SubLogFilter> filters = new ArrayList<SubLogFilter>();
+    private List<LogMessage> messages = new LinkedList<LogMessage>();
     protected File file;
     private PrintWriter writer = null;
     private boolean started = false;
@@ -58,7 +62,11 @@ public class InternalSubLogger extends SubLogger {
         }
         if (out == null) (out = new Thread(() -> start(process.getInputStream(), false))).start();
         if (err == null) (err = new Thread(() -> start(process.getErrorStream(), true))).start();
-        for (SubLogFilter filter : filters) filter.start();
+        for (SubLogFilter filter : filters) try {
+            filter.start();
+        } catch (Throwable e) {
+            new InvocationTargetException(e, "Exception while running SubLogger Event").printStackTrace();
+        }
     }
 
     private void start(InputStream in, boolean isErr) {
@@ -67,40 +75,47 @@ public class InternalSubLogger extends SubLogger {
             String line;
             while ((line = br.readLine()) != null) {
                 if (!line.startsWith(">")) {
-                    if (log.get()) {
-                        String msg = line;
-                        Level level;
+                    String msg = line;
+                    Level level;
 
-                        // REGEX Formatting
-                        String type = "";
-                        Matcher matcher = Pattern.compile("^((?:\\s*\\[?([0-9]{2}:[0-9]{2}:[0-9]{2})]?)?[\\s\\/\\\\\\|]*(?:\\[|\\[.*\\/)?(MESSAGE|INFO|WARN|WARNING|ERROR|ERR|SEVERE)\\]?:?\\s*)").matcher(msg);
-                        while (matcher.find()) {
-                            type = matcher.group(3).toUpperCase();
-                        }
-
-                        msg = msg.replaceAll("^((?:\\s*\\[?([0-9]{2}:[0-9]{2}:[0-9]{2})]?)?[\\s\\/\\\\\\|]*(?:\\[|\\[.*\\/)?(MESSAGE|INFO|WARN|WARNING|ERROR|ERR|SEVERE)\\]?:?\\s*)", "");
-
-                        // Determine LOG LEVEL
-                        switch (type) {
-                            case "WARNING":
-                            case "WARN":
-                                level = Level.WARNING;
-                                break;
-                            case "SEVERE":
-                            case "ERROR":
-                            case "ERR":
-                                level = Level.SEVERE;
-                                break;
-                            default:
-                                level = Level.INFO;
-                        }
-
-                        // Filter Message
-                        boolean allow = true;
-                        for (SubLogFilter filter : filters) if (allow) allow = filter.log(level, msg);
-
-                        if (allow) ProxyServer.getInstance().getLogger().log(level, name + " > " + msg);
+                    // REGEX Formatting
+                    String type = "";
+                    Matcher matcher = Pattern.compile("^((?:\\s*\\[?([0-9]{2}:[0-9]{2}:[0-9]{2})]?)?[\\s\\/\\\\\\|]*(?:\\[|\\[.*\\/)?(MESSAGE|INFO|WARN|WARNING|ERROR|ERR|SEVERE)\\]?:?\\s*)").matcher(msg);
+                    while (matcher.find()) {
+                        type = matcher.group(3).toUpperCase();
                     }
+
+                    msg = msg.replaceAll("^((?:\\s*\\[?([0-9]{2}:[0-9]{2}:[0-9]{2})]?)?[\\s\\/\\\\\\|]*(?:\\[|\\[.*\\/)?(MESSAGE|INFO|WARN|WARNING|ERROR|ERR|SEVERE)\\]?:?\\s*)", "");
+
+                    // Determine LOG LEVEL
+                    switch (type) {
+                        case "WARNING":
+                        case "WARN":
+                            level = Level.WARNING;
+                            break;
+                        case "SEVERE":
+                        case "ERROR":
+                        case "ERR":
+                            level = Level.SEVERE;
+                            break;
+                        default:
+                            level = Level.INFO;
+                    }
+
+                    // Filter Message
+                    boolean allow = true;
+                    for (SubLogFilter filter : filters)
+                        try {
+                            if (allow) allow = filter.log(level, msg);
+                        } catch (Throwable e) {
+                            new InvocationTargetException(e, "Exception while running SubLogger Event").printStackTrace();
+                        }
+
+                    // Log to CONSOLE
+                    if (log.get() && allow) ProxyServer.getInstance().getLogger().log(level, name + " > " + msg);
+
+                    // Log to MEMORY
+                    messages.add(new LogMessage(level, msg));
 
                     // Log to FILE
                     if (writer != null) {
@@ -140,7 +155,12 @@ public class InternalSubLogger extends SubLogger {
     private void destroy() {
         if (started) {
             started = false;
-            for (SubLogFilter filter : filters) filter.stop();
+            for (SubLogFilter filter : filters) try {
+                filter.stop();
+            } catch (Throwable e) {
+                new InvocationTargetException(e, "Exception while running SubLogger Event").printStackTrace();
+            }
+            messages.clear();
             if (writer != null) {
                 int l = (int) Math.floor((("---------- LOG START \u2014 " + name + " ----------").length() - 9) / 2);
                 String s = "";
@@ -153,7 +173,7 @@ public class InternalSubLogger extends SubLogger {
     }
 
     @Override
-    public Object getHandle() {
+    public Object getHandler() {
         return handle;
     }
 
@@ -165,5 +185,10 @@ public class InternalSubLogger extends SubLogger {
     @Override
     public boolean isLogging() {
         return log.get();
+    }
+
+    @Override
+    public List<LogMessage> getMessages() {
+        return new LinkedList<LogMessage>(messages);
     }
 }

@@ -7,6 +7,7 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
 import net.md_5.bungee.command.ConsoleCommandSender;
 
+import javax.swing.*;
 import java.util.List;
 import java.util.Map;
 
@@ -31,9 +32,11 @@ public class PopoutCommand {
                         boolean success = false;
                         if (servers.get(args[0].toLowerCase()).isRunning()) {
                             if (!plugin.sCurrent.keySet().contains(args[0].toLowerCase())) {
-                                ConsoleWindow window = new ConsoleWindow(servers.get(args[0].toLowerCase()).getLogger());
-                                plugin.sCurrent.put(args[0].toLowerCase(), window);
-                                window.open();
+                                SwingUtilities.invokeLater(() -> {
+                                    ConsoleWindow window = new ConsoleWindow(plugin, servers.get(args[0].toLowerCase()).getLogger());
+                                    plugin.sCurrent.put(args[0].toLowerCase(), window);
+                                    window.open();
+                                });
                             } else {
                                 plugin.sCurrent.get(args[0].toLowerCase()).open();
                             }
@@ -56,6 +59,7 @@ public class PopoutCommand {
                                     List<String> list = plugin.config.get().getStringList("Enabled-Servers");
                                     list.remove(args[0].toLowerCase());
                                     plugin.config.get().set("Enabled-Servers", list);
+                                    if (plugin.sCurrent.keySet().contains(args[0].toLowerCase()) && !plugin.sCurrent.get(args[0].toLowerCase()).isOpen()) plugin.onClose(plugin.sCurrent.get(args[0].toLowerCase()));
                                     if (!success) System.out.println("SubConsole > " + servers.get(args[0].toLowerCase()).getName() + " was removed from the enabled list");
                                     success = true;
                                 }
@@ -97,9 +101,11 @@ public class PopoutCommand {
                         boolean success = false;
                         if (hosts.get(args[0].toLowerCase()).getCreator().isBusy()) {
                             if (!plugin.cCurrent.keySet().contains(args[0].toLowerCase())) {
-                                ConsoleWindow window = new ConsoleWindow(hosts.get(args[0].toLowerCase()).getCreator().getLogger());
-                                plugin.cCurrent.put(args[0].toLowerCase(), window);
-                                window.open();
+                                SwingUtilities.invokeLater(() -> {
+                                    ConsoleWindow window = new ConsoleWindow(plugin, hosts.get(args[0].toLowerCase()).getCreator().getLogger());
+                                    plugin.cCurrent.put(args[0].toLowerCase(), window);
+                                    window.open();
+                                });
                             } else {
                                 plugin.cCurrent.get(args[0].toLowerCase()).open();
                             }
@@ -122,6 +128,7 @@ public class PopoutCommand {
                                     List<String> list = plugin.config.get().getStringList("Enabled-Creators");
                                     list.remove(args[0].toLowerCase());
                                     plugin.config.get().set("Enabled-Creators", list);
+                                    if (plugin.cCurrent.keySet().contains(args[0].toLowerCase()) && !plugin.cCurrent.get(args[0].toLowerCase()).isOpen()) plugin.onClose(plugin.cCurrent.get(args[0].toLowerCase()));
                                     if (!success) System.out.println("SubConsole > " + hosts.get(args[0].toLowerCase()).getName() + "/Creator was removed from the enabled list");
                                     success = true;
                                 }

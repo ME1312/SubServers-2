@@ -15,9 +15,11 @@ import java.util.List;
 import java.util.logging.Level;
 
 public class ConsoleWindow implements SubLogFilter {
+    private ConsolePlugin plugin;
     private JFrame window;
     private JPanel panel;
     private JTextField input;
+    private boolean ifocus = false;
     private TextFieldPopup popup;
     private JTextArea log;
     private JScrollPane vScroll;
@@ -31,32 +33,40 @@ public class ConsoleWindow implements SubLogFilter {
     private int findO = 0;
     private int findI = 0;
     private List<Runnable> events;
-    private boolean running;
-    private boolean open;
+    private boolean running = false;
+    private boolean open = false;
     private SubLogger logger;
     private KeyEventDispatcher keys = event -> {
         if (window.isVisible() && window.isFocused()) {
-            switch (event.getID()) {
-                case KeyEvent.KEY_PRESSED:
-                    if (event.getKeyCode() == KeyEvent.VK_UP) {
+            if (event.getID() == KeyEvent.KEY_RELEASED) switch (event.getKeyCode()) {
+                case KeyEvent.VK_UP:
+                    if (ifocus)
                         popup.prev(input);
+                    break;
+                case KeyEvent.VK_DOWN:
+                    if (ifocus)
+                        popup.next(input);
+                    break;
+                case KeyEvent.VK_ESCAPE:
+                    if (find.isVisible()) {
+                        find.setVisible(false);
+                        findI = 0;
+                        findO = 0;
                     }
                     break;
-
-                case KeyEvent.KEY_RELEASED:
-                    if (event.getKeyCode() == KeyEvent.VK_DOWN) {
-                        popup.next(input);
-                    }
+                case KeyEvent.VK_ENTER:
+                    if (find.isVisible() && !ifocus)
+                        find(true);
                     break;
             }
+
         }
         return false;
     };
 
-    public ConsoleWindow(SubLogger logger) {
+    public ConsoleWindow(ConsolePlugin plugin, SubLogger logger) {
+        this.plugin = plugin;
         this.logger = logger;
-        this.open = false;
-        this.running = false;
         this.events = new LinkedList<Runnable>();
 
         events.add(() -> {
@@ -112,6 +122,14 @@ public class ConsoleWindow implements SubLogFilter {
             item.setAccelerator(KeyStroke.getKeyStroke('L', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), true));
             item.addActionListener(event -> clear());
             menu.add(item);
+            item = new JMenuItem("Reload Log");
+            item.setAccelerator(KeyStroke.getKeyStroke('R', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), true));
+            item.addActionListener(event -> {
+                log.setText("\n");
+                for (SubLogger.LogMessage message : logger.getMessages()) log(message.getDate(), message.getLevel(), message.getMessage());
+                SwingUtilities.invokeLater(this::hScroll);
+            });
+            menu.add(item);
             jMenu.add(menu);
             window.setJMenuBar(jMenu);
             window.setContentPane(panel);
@@ -127,6 +145,11 @@ public class ConsoleWindow implements SubLogFilter {
                 @Override
                 public void windowClosing(WindowEvent e) {
                     close();
+                }
+            });
+            window.addComponentListener(new ComponentAdapter() {
+                public void componentResized(ComponentEvent e) {
+                    SwingUtilities.invokeLater(ConsoleWindow.this::hScroll);
                 }
             });
             vScroll.setBorder(BorderFactory.createLineBorder(new Color(40, 44, 45)));
@@ -158,8 +181,8 @@ public class ConsoleWindow implements SubLogFilter {
             popup = new TextFieldPopup(input, true);
             input.setBorder(BorderFactory.createLineBorder(new Color(69, 73, 74)));
             input.addActionListener((ActionEvent event) -> {
-                if (logger.getHandle() instanceof SubServer && input.getText().length() > 0 && !input.getText().equals(">")) {
-                    if (((SubServer) logger.getHandle()).command((input.getText().startsWith(">")) ? input.getText().substring(1) : input.getText())) {
+                if (logger.getHandler() instanceof SubServer && input.getText().length() > 0 && !input.getText().equals(">")) {
+                    if (((SubServer) logger.getHandler()).command((input.getText().startsWith(">")) ? input.getText().substring(1) : input.getText())) {
                         popup.commands.add((input.getText().startsWith(">")) ? input.getText().substring(1) : input.getText());
                         popup.current = 0;
                         popup.last = true;
@@ -196,6 +219,16 @@ public class ConsoleWindow implements SubLogFilter {
                     }
                 }
             });
+            input.addFocusListener(new FocusListener() {
+                @Override
+                public void focusGained(FocusEvent e) {
+                    ifocus = true;
+                }
+                @Override
+                public void focusLost(FocusEvent e) {
+                    ifocus = false;
+                }
+            });
 
             vScroll.getHorizontalScrollBar().addAdjustmentListener(event -> {
                 if (!eScroll.contains(event.getValue())) {
@@ -225,22 +258,125 @@ public class ConsoleWindow implements SubLogFilter {
             });
 
 
-            if (!(logger.getHandle() instanceof SubServer)) {
+            if (!(logger.getHandler() instanceof SubServer)) {
                 input.setVisible(false);
                 hScroll.setVisible(false);
                 vScroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
             }
 
+            logger.registerFilter(this);
+            for (SubLogger.LogMessage message : logger.getMessages()) log(message.getDate(), message.getLevel(), message.getMessage());
             KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(keys);
+            events.add(() -> {
+                if (logger.isLogging() && !open) open();
+            });
+            hScroll();
         });
-        logger.registerFilter(this);
         runEvents();
     }
-
     private void hScroll() {
         hScroll.setMaximum(vScroll.getHorizontalScrollBar().getMaximum());
         hScroll.setMinimum(vScroll.getHorizontalScrollBar().getMinimum());
         hScroll.setVisibleAmount(vScroll.getHorizontalScrollBar().getVisibleAmount());
+    }
+
+    public SubLogger getLogger() {
+        return logger;
+    }
+
+    public void log(Date date, String message) {
+        log.append(' ' + new SimpleDateFormat("hh:mm:ss").format(date) + ' ' + message + " \n");
+    }
+    public void log(String message) {
+        log(Calendar.getInstance().getTime(), message);
+    }
+    public void log(Date date, Level level, String message) {
+        log(date, "[" + level.getLocalizedName() + "] " + message);
+    }
+    @Override
+    public boolean log(Level level, String message) {
+        log(Calendar.getInstance().getTime(), level, message);
+        return !open;
+    }
+
+    public void clear() {
+        log.setText("\n");
+        SwingUtilities.invokeLater(this::hScroll);
+    }
+
+    public boolean runEvents() {
+        return runEvents(false);
+    }
+
+    private boolean runEvents(boolean force) {
+        if (events.size() > 0 && (force || !running)) {
+            try {
+                running = true;
+                final Runnable event = events.get(0);
+                if (event != null) {
+                    SwingUtilities.invokeLater(() -> {
+                        try {
+                            event.run();
+                        } catch (Throwable e) {
+                            new InvocationTargetException(e, "Exception while running SubServers Console Window Event").printStackTrace();
+                        }
+                        events.remove(0);
+                        if (!runEvents(true)) running = false;
+                    });
+                } else {
+                    events.remove(0);
+                    if (!runEvents(true)) running = false;
+                }
+                return true;
+            } catch (NullPointerException e) {
+                return false;
+            }
+        } else return false;
+    }
+
+    @Override
+    public void start() {
+        open();
+    }
+    public void open() {
+        events.add(() -> {
+            if (!open) {
+                window.setVisible(true);
+                this.open = true;
+            }
+            window.toFront();
+        });
+        runEvents();
+    }
+
+    public boolean isOpen() {
+        return open;
+    }
+
+    @Override
+    public void stop() {
+        close();
+    }
+    public void close() {
+        events.add(() -> {
+            if (open) {
+                this.open = false;
+                if (find.isVisible()) {
+                    find.setVisible(false);
+                    findI = 0;
+                    findO = 0;
+                }
+                window.setVisible(false);
+                plugin.onClose(this);
+            }
+        });
+        runEvents();
+    }
+
+    public void destroy() {
+        close();
+        logger.unregisterFilter(this);
+        KeyboardFocusManager.getCurrentKeyboardFocusManager().removeKeyEventDispatcher(keys);
     }
 
     private void find(boolean direction) {
@@ -285,87 +421,6 @@ public class ConsoleWindow implements SubLogFilter {
                         JOptionPane.WARNING_MESSAGE);
             }
         }
-    }
-
-    public void clear() {
-        events.add(() -> log.setText("\n"));
-        runEvents();
-    }
-
-    public void log(String message) {
-        events.add(() -> log.setText(log.getText() + ' ' + new SimpleDateFormat("hh:mm:ss").format(Calendar.getInstance().getTime()) + ' ' + message + " \n"));
-        runEvents();
-    }
-    @Override
-    public boolean log(Level level, String message) {
-        log("[" + level.getLocalizedName() + "] " + message);
-        return !open;
-    }
-
-    public boolean runEvents() {
-        return runEvents(false);
-    }
-
-    private boolean runEvents(boolean force) {
-        if (events.size() > 0 && (force || !running)) {
-            running = true;
-            final Runnable event = events.get(0);
-            SwingUtilities.invokeLater(() -> {
-                try {
-                    event.run();
-                } catch (Throwable e) {
-                    new InvocationTargetException(e, "Exception while running SubServers Console Window Event").printStackTrace();
-                }
-                events.remove(0);
-                if (!runEvents(true)) running = false;
-            });
-
-            return true;
-        } else return false;
-    }
-
-    @Override
-    public void start() {
-        open();
-    }
-    public void open() {
-        events.add(() -> {
-            if (!open) {
-                window.setVisible(true);
-                this.open = true;
-            }
-            window.toFront();
-        });
-        runEvents();
-    }
-
-    public SubLogger getLogger() {
-        return logger;
-    }
-
-    @Override
-    public void stop() {
-        close();
-    }
-    public void close() {
-        events.add(() -> {
-            if (open) {
-                this.open = false;
-                if (find.isVisible()) {
-                    find.setVisible(false);
-                    findI = 0;
-                    findO = 0;
-                }
-                window.setVisible(false);
-            }
-        });
-        runEvents();
-    }
-
-    public void destroy() {
-        close();
-        logger.unregisterFilter(this);
-        KeyboardFocusManager.getCurrentKeyboardFocusManager().removeKeyEventDispatcher(keys);
     }
 
     private class TextFieldPopup extends JPanel {
