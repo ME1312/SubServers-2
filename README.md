@@ -24,4 +24,10 @@ SubServers 2 is a rewrite of SubServers, the Server Management Plugin.<br>
 6. Change `Settings > SubData > Name` to whatever you named this server in BungeeCord/SubServers
 7. Make sure SubData Client can connect to your SubData Server (using the ip and password in the config)
 8. You can now startup your server
-9. All SubServers.Client commands can be accessed in-game by using `sub help`
+9. All SubServers.Client commands can be accessed in-game by using `/sub help`
+
+## How to Install/Update SubServers.Console Pre-Releases
+1. Download your favorite commit of SubServers.Console ([Click Here](https://github.com/ME1312/SubServers-2/tree/master/Artifacts) for the latest commit)
+2. Put SubServers.Console into your proxy's plugins
+3. Start your proxy
+4. You can now access the commands `/popouts` and `/popoutc` for subservers and subcreator instances respectively
