@@ -80,12 +80,12 @@ public class InternalSubLogger extends SubLogger {
 
                     // REGEX Formatting
                     String type = "";
-                    Matcher matcher = Pattern.compile("^((?:\\s*\\[?([0-9]{2}:[0-9]{2}:[0-9]{2})]?)?[\\s\\/\\\\\\|]*(?:\\[|\\[.*\\/)?(MESSAGE|INFO|WARN|WARNING|ERROR|ERR|SEVERE)\\]?:?\\s*)").matcher(msg);
+                    Matcher matcher = Pattern.compile("^((?:\\s*\\[?([0-9]{2}:[0-9]{2}:[0-9]{2})]?)?[\\s\\/\\\\\\|]*(?:\\[|\\[.*\\/)?(MESSAGE|INFO|WARNING|WARN|ERROR|ERR|SEVERE)\\]?:?\\s*)").matcher(msg);
                     while (matcher.find()) {
                         type = matcher.group(3).toUpperCase();
                     }
 
-                    msg = msg.replaceAll("^((?:\\s*\\[?([0-9]{2}:[0-9]{2}:[0-9]{2})]?)?[\\s\\/\\\\\\|]*(?:\\[|\\[.*\\/)?(MESSAGE|INFO|WARN|WARNING|ERROR|ERR|SEVERE)\\]?:?\\s*)", "");
+                    msg = msg.replaceAll("^((?:\\s*\\[?([0-9]{2}:[0-9]{2}:[0-9]{2})]?)?[\\s\\/\\\\\\|]*(?:\\[|\\[.*\\/)?(MESSAGE|INFO|WARNING|WARN|ERROR|ERR|SEVERE)\\]?:?\\s*)", "");
 
                     // Determine LOG LEVEL
                     switch (type) {

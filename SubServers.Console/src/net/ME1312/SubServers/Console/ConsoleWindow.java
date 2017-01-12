@@ -5,10 +5,10 @@ import net.ME1312.SubServers.Bungee.Host.SubLogger;
 import net.ME1312.SubServers.Bungee.Host.SubServer;
 
 import javax.swing.*;
+import javax.swing.border.Border;
 import javax.swing.text.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.lang.reflect.InvocationTargetException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.List;
@@ -32,13 +32,11 @@ public class ConsoleWindow implements SubLogFilter {
     private JButton findD;
     private int findO = 0;
     private int findI = 0;
-    private List<Runnable> events;
-    private boolean running = false;
     private boolean open = false;
     private SubLogger logger;
     private KeyEventDispatcher keys = event -> {
         if (window.isVisible() && window.isFocused()) {
-            if (event.getID() == KeyEvent.KEY_RELEASED) switch (event.getKeyCode()) {
+            if (event.getID() == KeyEvent.KEY_PRESSED) switch (event.getKeyCode()) {
                 case KeyEvent.VK_UP:
                     if (ifocus)
                         popup.prev(input);
@@ -67,212 +65,248 @@ public class ConsoleWindow implements SubLogFilter {
     public ConsoleWindow(ConsolePlugin plugin, SubLogger logger) {
         this.plugin = plugin;
         this.logger = logger;
-        this.events = new LinkedList<Runnable>();
 
-        events.add(() -> {
-            window = new JFrame();
+        window = new JFrame();
 
-            JMenuBar jMenu = new JMenuBar();
-            JMenu menu = new JMenu("View");
-            JMenuItem item = new JMenuItem("Scroll to Top");
-            item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_UP, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), true));
-            item.addActionListener(event -> vScroll.getVerticalScrollBar().setValue(0));
-            menu.add(item);
-            item = new JMenuItem("Scroll to Bottom");
-            item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), true));
-            item.addActionListener(event -> vScroll.getVerticalScrollBar().setValue(vScroll.getVerticalScrollBar().getMaximum() - vScroll.getVerticalScrollBar().getVisibleAmount()));
-            menu.add(item);
-            item = new JMenuItem("Find");
-            item.setAccelerator(KeyStroke.getKeyStroke('F', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), true));
-            item.addActionListener(event -> {
-                if (find.isVisible()) {
-                    find.setVisible(false);
-                    findI = 0;
-                    findO = 0;
-                } else {
-                    find.setVisible(true);
-                    findT.selectAll();
-                    findT.requestFocusInWindow();
-                }
-            });
-            menu.add(item);
-            menu.addSeparator();
-            item = new JMenuItem("Reset Text Size");
-            item.addActionListener(event -> {
-                log.setFont(new Font(log.getFont().getName(), log.getFont().getStyle(), 12));
-                SwingUtilities.invokeLater(this::hScroll);
-            });
-            menu.add(item);
-            item = new JMenuItem("Bigger Text");
-            item.setAccelerator(KeyStroke.getKeyStroke('=', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), true));
-            item.addActionListener(event -> {
-                log.setFont(new Font(log.getFont().getName(), log.getFont().getStyle(), log.getFont().getSize() + 2));
-                SwingUtilities.invokeLater(this::hScroll);
-            });
-            menu.add(item);
-            item = new JMenuItem("Smaller Text");
-            item.setAccelerator(KeyStroke.getKeyStroke('-', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), true));
-            item.addActionListener(event -> {
-                log.setFont(new Font(log.getFont().getName(), log.getFont().getStyle(), log.getFont().getSize() - 2));
-                SwingUtilities.invokeLater(this::hScroll);
-            });
-            menu.add(item);
-            menu.addSeparator();
-            item = new JMenuItem("Clear Screen");
-            item.setAccelerator(KeyStroke.getKeyStroke('L', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), true));
-            item.addActionListener(event -> clear());
-            menu.add(item);
-            item = new JMenuItem("Reload Log");
-            item.setAccelerator(KeyStroke.getKeyStroke('R', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), true));
-            item.addActionListener(event -> {
-                log.setText("\n");
-                for (SubLogger.LogMessage message : logger.getMessages()) log(message.getDate(), message.getLevel(), message.getMessage());
-                SwingUtilities.invokeLater(this::hScroll);
-            });
-            menu.add(item);
-            jMenu.add(menu);
-            window.setJMenuBar(jMenu);
-            window.setContentPane(panel);
-            window.pack();
-            window.setTitle(logger.getName() + " \u2014 SubServers 2");
-            window.setSize(1024, 576);
-            Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize();
-            int x = (int) ((dimension.getWidth() - window.getWidth()) / 2);
-            int y = (int) ((dimension.getHeight() - window.getHeight()) / 2);
-            window.setLocation(x, y);
-            window.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-            window.addWindowListener(new WindowAdapter() {
-                @Override
-                public void windowClosing(WindowEvent e) {
-                    close();
-                }
-            });
-            window.addComponentListener(new ComponentAdapter() {
-                public void componentResized(ComponentEvent e) {
-                    SwingUtilities.invokeLater(ConsoleWindow.this::hScroll);
-                }
-            });
-            vScroll.setBorder(BorderFactory.createLineBorder(new Color(40, 44, 45)));
-            new SmartScroller(vScroll, SmartScroller.VERTICAL, SmartScroller.END);
-            log.setText("\n");
-            log.setBorder(BorderFactory.createLineBorder(new Color(40, 44, 45)));
-            new TextFieldPopup(log, false);
-            ((AbstractDocument) log.getDocument()).setDocumentFilter(new DocumentFilter() {
-                @Override
-                public void insertString(FilterBypass fb, int offset, String string, AttributeSet attr) throws BadLocationException {
-                    super.insertString(fb, offset, string, attr);
-                    hScroll();
-                }
-
-                @Override
-                public void replace(FilterBypass fb, int offset, int length, String text, AttributeSet attrs) throws BadLocationException {
-                    super.replace(fb, offset, length, text, attrs);
-                    hScroll();
-                }
-
-                @Override
-                public void remove(FilterBypass fb, int offset, int length) throws BadLocationException {
-                    super.remove(fb, offset, length);
-                    hScroll();
-                }
-            });
-
-
-            popup = new TextFieldPopup(input, true);
-            input.setBorder(BorderFactory.createLineBorder(new Color(69, 73, 74)));
-            input.addActionListener((ActionEvent event) -> {
-                if (logger.getHandler() instanceof SubServer && input.getText().length() > 0 && !input.getText().equals(">")) {
-                    if (((SubServer) logger.getHandler()).command((input.getText().startsWith(">")) ? input.getText().substring(1) : input.getText())) {
-                        popup.commands.add((input.getText().startsWith(">")) ? input.getText().substring(1) : input.getText());
-                        popup.current = 0;
-                        popup.last = true;
-                        input.setText("");
-                    }
-                }
-            });
-            ((AbstractDocument) input.getDocument()).setDocumentFilter(new DocumentFilter() {
-                @Override
-                public void insertString(FilterBypass fb, int offset, String string, AttributeSet attr) throws BadLocationException {
-                    if (offset < 1) {
-                        return;
-                    }
-                    super.insertString(fb, offset, string, attr);
-                }
-
-                @Override
-                public void replace(FilterBypass fb, int offset, int length, String text, AttributeSet attrs) throws BadLocationException {
-                    if (offset < 1) {
-                        length = Math.max(0, length - 1);
-                        offset = 1;
-                    }
-                    super.replace(fb, offset, length, text, attrs);
-                }
-
-                @Override
-                public void remove(FilterBypass fb, int offset, int length) throws BadLocationException {
-                    if (offset < 1) {
-                        length = Math.max(0, length + offset - 1);
-                        offset = 1;
-                    }
-                    if (length > 0) {
-                        super.remove(fb, offset, length);
-                    }
-                }
-            });
-            input.addFocusListener(new FocusListener() {
-                @Override
-                public void focusGained(FocusEvent e) {
-                    ifocus = true;
-                }
-                @Override
-                public void focusLost(FocusEvent e) {
-                    ifocus = false;
-                }
-            });
-
-            vScroll.getHorizontalScrollBar().addAdjustmentListener(event -> {
-                if (!eScroll.contains(event.getValue())) {
-                    eScroll.add(event.getValue());
-                    hScroll.setValue(event.getValue());
-                } else {
-                    eScroll.remove((Object) event.getValue());
-                }
-            });
-            hScroll.addAdjustmentListener(event -> {
-                if (!eScroll.contains(event.getValue())) {
-                    eScroll.add(event.getValue());
-                    vScroll.getHorizontalScrollBar().setValue(event.getValue());
-                } else {
-                    eScroll.remove((Object) event.getValue());
-                }
-            });
-
-            new TextFieldPopup(findT, false);
-            findT.setBorder(BorderFactory.createLineBorder(new Color(69, 73, 74)));
-            findP.addActionListener(event -> find(false));
-            findN.addActionListener(event -> find(true));
-            findD.addActionListener(event -> {
+        JMenuBar jMenu = new JMenuBar();
+        JMenu menu = new JMenu("View");
+        JMenuItem item = new JMenuItem("Scroll to Top");
+        item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_UP, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), true));
+        item.addActionListener(event -> vScroll.getVerticalScrollBar().setValue(0));
+        menu.add(item);
+        item = new JMenuItem("Scroll to Bottom");
+        item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), true));
+        item.addActionListener(event -> vScroll.getVerticalScrollBar().setValue(vScroll.getVerticalScrollBar().getMaximum() - vScroll.getVerticalScrollBar().getVisibleAmount()));
+        menu.add(item);
+        item = new JMenuItem("Find");
+        item.setAccelerator(KeyStroke.getKeyStroke('F', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), true));
+        item.addActionListener(event -> {
+            if (find.isVisible()) {
                 find.setVisible(false);
                 findI = 0;
                 findO = 0;
-            });
-
-
-            if (!(logger.getHandler() instanceof SubServer)) {
-                input.setVisible(false);
-                hScroll.setVisible(false);
-                vScroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
+            } else {
+                find.setVisible(true);
+                findT.selectAll();
+                findT.requestFocusInWindow();
+            }
+        });
+        menu.add(item);
+        menu.addSeparator();
+        item = new JMenuItem("Reset Text Size");
+        item.addActionListener(event -> {
+            log.setFont(new Font(log.getFont().getName(), log.getFont().getStyle(), 12));
+            SwingUtilities.invokeLater(this::hScroll);
+        });
+        menu.add(item);
+        item = new JMenuItem("Bigger Text");
+        item.setAccelerator(KeyStroke.getKeyStroke('=', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), true));
+        item.addActionListener(event -> {
+            log.setFont(new Font(log.getFont().getName(), log.getFont().getStyle(), log.getFont().getSize() + 2));
+            SwingUtilities.invokeLater(this::hScroll);
+        });
+        menu.add(item);
+        item = new JMenuItem("Smaller Text");
+        item.setAccelerator(KeyStroke.getKeyStroke('-', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), true));
+        item.addActionListener(event -> {
+            log.setFont(new Font(log.getFont().getName(), log.getFont().getStyle(), log.getFont().getSize() - 2));
+            SwingUtilities.invokeLater(this::hScroll);
+        });
+        menu.add(item);
+        menu.addSeparator();
+        item = new JMenuItem("Clear Screen");
+        item.setAccelerator(KeyStroke.getKeyStroke('L', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), true));
+        item.addActionListener(event -> clear());
+        menu.add(item);
+        item = new JMenuItem("Reload Log");
+        item.setAccelerator(KeyStroke.getKeyStroke('R', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), true));
+        item.addActionListener(event -> {
+            log.setText("\n");
+            for (SubLogger.LogMessage message : logger.getMessages())
+                log(message.getDate(), message.getLevel(), message.getMessage());
+            SwingUtilities.invokeLater(this::hScroll);
+        });
+        menu.add(item);
+        jMenu.add(menu);
+        window.setJMenuBar(jMenu);
+        window.setContentPane(panel);
+        window.pack();
+        window.setTitle(logger.getName() + " \u2014 SubServers 2");
+        window.setSize(1024, 576);
+        Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize();
+        int x = (int) ((dimension.getWidth() - window.getWidth()) / 2);
+        int y = (int) ((dimension.getHeight() - window.getHeight()) / 2);
+        window.setLocation(x, y);
+        window.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        window.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                close();
+            }
+        });
+        window.addComponentListener(new ComponentAdapter() {
+            public void componentResized(ComponentEvent e) {
+                SwingUtilities.invokeLater(ConsoleWindow.this::hScroll);
+            }
+        });
+        vScroll.setBorder(BorderFactory.createEmptyBorder());
+        new SmartScroller(vScroll, SmartScroller.VERTICAL, SmartScroller.END);
+        log.setText("\n");
+        log.setBorder(BorderFactory.createLineBorder(new Color(40, 44, 45)));
+        new TextFieldPopup(log, false);
+        ((AbstractDocument) log.getDocument()).setDocumentFilter(new DocumentFilter() {
+            @Override
+            public void insertString(FilterBypass fb, int offset, String string, AttributeSet attr) throws BadLocationException {
+                super.insertString(fb, offset, string, attr);
+                hScroll();
             }
 
-            logger.registerFilter(this);
-            for (SubLogger.LogMessage message : logger.getMessages()) log(message.getDate(), message.getLevel(), message.getMessage());
-            KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(keys);
-            events.add(() -> {
-                if (logger.isLogging() && !open) open();
-            });
-            hScroll();
+            @Override
+            public void replace(FilterBypass fb, int offset, int length, String text, AttributeSet attrs) throws BadLocationException {
+                super.replace(fb, offset, length, text, attrs);
+                hScroll();
+            }
+
+            @Override
+            public void remove(FilterBypass fb, int offset, int length) throws BadLocationException {
+                super.remove(fb, offset, length);
+                hScroll();
+            }
         });
-        runEvents();
+
+
+        popup = new TextFieldPopup(input, true);
+        input.setBorder(BorderFactory.createLineBorder(new Color(40, 44, 45), 4));
+        input.addActionListener((ActionEvent event) -> {
+            if (logger.getHandler() instanceof SubServer && input.getText().length() > 0 && !input.getText().equals(">")) {
+                if (((SubServer) logger.getHandler()).command((input.getText().startsWith(">")) ? input.getText().substring(1) : input.getText())) {
+                    popup.commands.add((input.getText().startsWith(">")) ? input.getText().substring(1) : input.getText());
+                    popup.current = 0;
+                    popup.last = true;
+                    input.setText("");
+                }
+            }
+        });
+        ((AbstractDocument) input.getDocument()).setDocumentFilter(new DocumentFilter() {
+            @Override
+            public void insertString(FilterBypass fb, int offset, String string, AttributeSet attr) throws BadLocationException {
+                if (offset < 1) {
+                    return;
+                }
+                super.insertString(fb, offset, string, attr);
+            }
+
+            @Override
+            public void replace(FilterBypass fb, int offset, int length, String text, AttributeSet attrs) throws BadLocationException {
+                if (offset < 1) {
+                    length = Math.max(0, length - 1);
+                    offset = 1;
+                }
+                super.replace(fb, offset, length, text, attrs);
+            }
+
+            @Override
+            public void remove(FilterBypass fb, int offset, int length) throws BadLocationException {
+                if (offset < 1) {
+                    length = Math.max(0, length + offset - 1);
+                    offset = 1;
+                }
+                if (length > 0) {
+                    super.remove(fb, offset, length);
+                }
+            }
+        });
+        input.addFocusListener(new FocusListener() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                ifocus = true;
+            }
+
+            @Override
+            public void focusLost(FocusEvent e) {
+                ifocus = false;
+            }
+        });
+
+        vScroll.getVerticalScrollBar().setBackground(new Color(69, 73, 74));
+        vScroll.getHorizontalScrollBar().setBackground(new Color(69, 73, 74));
+        vScroll.getHorizontalScrollBar().addAdjustmentListener(event -> {
+            if (!eScroll.contains(event.getValue())) {
+                eScroll.add(event.getValue());
+                hScroll.setValue(event.getValue());
+            } else {
+                eScroll.remove((Object) event.getValue());
+            }
+        });
+        hScroll.setBackground(new Color(69, 73, 74));
+        hScroll.addAdjustmentListener(event -> {
+            if (!eScroll.contains(event.getValue())) {
+                eScroll.add(event.getValue());
+                vScroll.getHorizontalScrollBar().setValue(event.getValue());
+            } else {
+                eScroll.remove((Object) event.getValue());
+            }
+        });
+
+        new TextFieldPopup(findT, false);
+        findT.setBorder(BorderFactory.createLineBorder(new Color(40, 44, 45), 4));
+        ((AbstractDocument) findT.getDocument()).setDocumentFilter(new DocumentFilter() {
+            @Override
+            public void insertString(FilterBypass fb, int offset, String string, AttributeSet attr) throws BadLocationException {
+                super.insertString(fb, offset, string, attr);
+                findI = 0;
+                findO = 0;
+            }
+
+            @Override
+            public void replace(FilterBypass fb, int offset, int length, String text, AttributeSet attrs) throws BadLocationException {
+                super.replace(fb, offset, length, text, attrs);
+                findI = 0;
+                findO = 0;
+            }
+
+            @Override
+            public void remove(FilterBypass fb, int offset, int length) throws BadLocationException {
+                super.remove(fb, offset, length);
+                findI = 0;
+                findO = 0;
+            }
+        });
+        findP.addChangeListener(e -> {
+            if (findP.getModel().isPressed()) findP.setBackground(new Color(40, 44, 45));
+            else findP.setBackground(new Color(69, 73, 74));
+        });
+        findP.setBorder(new ButtonBorder(40, 44, 45, 4));
+        findP.addActionListener(event -> find(false));
+        findN.addChangeListener(e -> {
+            if (findN.getModel().isPressed()) findN.setBackground(new Color(40, 44, 45));
+            else findN.setBackground(new Color(69, 73, 74));
+        });
+        findN.setBorder(new ButtonBorder(40, 44, 45, 4));
+        findN.addActionListener(event -> find(true));
+        findD.addChangeListener(e -> {
+            if (findD.getModel().isPressed()) findD.setBackground(new Color(40, 44, 45));
+            else findD.setBackground(new Color(69, 73, 74));
+        });
+        findD.setBorder(new ButtonBorder(40, 44, 45, 4));
+        findD.addActionListener(event -> {
+            find.setVisible(false);
+            findI = 0;
+            findO = 0;
+        });
+
+
+        if (!(logger.getHandler() instanceof SubServer)) {
+            input.setVisible(false);
+            hScroll.setVisible(false);
+            vScroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
+        }
+
+        logger.registerFilter(this);
+        for (SubLogger.LogMessage message : logger.getMessages()) log(message.getDate(), message.getLevel(), message.getMessage());
+        KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(keys);
+        if (logger.isLogging() && !open) open();
+        SwingUtilities.invokeLater(this::hScroll);
     }
     private void hScroll() {
         hScroll.setMaximum(vScroll.getHorizontalScrollBar().getMaximum());
@@ -304,49 +338,18 @@ public class ConsoleWindow implements SubLogFilter {
         SwingUtilities.invokeLater(this::hScroll);
     }
 
-    public boolean runEvents() {
-        return runEvents(false);
-    }
-
-    private boolean runEvents(boolean force) {
-        if (events.size() > 0 && (force || !running)) {
-            try {
-                running = true;
-                final Runnable event = events.get(0);
-                if (event != null) {
-                    SwingUtilities.invokeLater(() -> {
-                        try {
-                            event.run();
-                        } catch (Throwable e) {
-                            new InvocationTargetException(e, "Exception while running SubServers Console Window Event").printStackTrace();
-                        }
-                        events.remove(0);
-                        if (!runEvents(true)) running = false;
-                    });
-                } else {
-                    events.remove(0);
-                    if (!runEvents(true)) running = false;
-                }
-                return true;
-            } catch (NullPointerException e) {
-                return false;
-            }
-        } else return false;
-    }
-
     @Override
     public void start() {
         open();
     }
     public void open() {
-        events.add(() -> {
+        SwingUtilities.invokeLater(() -> {
             if (!open) {
                 window.setVisible(true);
                 this.open = true;
             }
             window.toFront();
         });
-        runEvents();
     }
 
     public boolean isOpen() {
@@ -358,7 +361,7 @@ public class ConsoleWindow implements SubLogFilter {
         close();
     }
     public void close() {
-        events.add(() -> {
+        SwingUtilities.invokeLater(() -> {
             if (open) {
                 this.open = false;
                 if (find.isVisible()) {
@@ -370,7 +373,6 @@ public class ConsoleWindow implements SubLogFilter {
                 plugin.onClose(this);
             }
         });
-        runEvents();
     }
 
     public void destroy() {
@@ -416,7 +418,7 @@ public class ConsoleWindow implements SubLogFilter {
             } catch (BadLocationException e) {
                 findI = log.getText().length() - 1;
                 JOptionPane.showMessageDialog(window,
-                        "There are no more results\nSearch again to start from the " + ((direction)?"top":"bottom"),
+                        ((findO > 0)?"There are no more results\nSearch again to start from the " + ((direction)?"top":"bottom"):"Couldn't find \"" + findT.getText() + "\""),
                         "Find",
                         JOptionPane.WARNING_MESSAGE);
             }
@@ -466,6 +468,21 @@ public class ConsoleWindow implements SubLogFilter {
                 paste.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('V', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), true));
                 menu.add(paste);
             }
+
+            Action find = new TextAction("Find Selection") {
+                public void actionPerformed(ActionEvent e) {
+                    JTextComponent field = getFocusedComponent();
+                    if (field.getSelectedText() != null && field.getSelectedText().length() > 0) {
+                        findT.setText(field.getSelectedText());
+                        findI = 0;
+                        findO = 0;
+                        ConsoleWindow.this.find.setVisible(true);
+                        find(true);
+                    }
+                }
+            };
+            find.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('F', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() + KeyEvent.SHIFT_MASK, true));
+            menu.add(find);
 
             Action selectAll = new TextAction("Select All") {
                 public void actionPerformed(ActionEvent e) {
@@ -626,6 +643,31 @@ public class ConsoleWindow implements SubLogFilter {
 
             previousValue = value;
             previousMaximum = maximum;
+        }
+    }
+    private class ButtonBorder implements Border {
+        private int radius;
+        private Color color;
+
+        public ButtonBorder(int red, int green, int blue, int radius) {
+            this.color = new Color(red, green, blue);
+            this.radius = radius;
+        }
+
+
+        public Insets getBorderInsets(Component c) {
+            return new Insets(this.radius+1, this.radius+1, this.radius+2, this.radius);
+        }
+
+
+        public boolean isBorderOpaque() {
+            return true;
+        }
+
+
+        public void paintBorder(Component c, Graphics g, int x, int y, int width, int height) {
+            g.setColor(color);
+            g.drawRoundRect(x, y, width-1, height-1, radius, radius);
         }
     }
 }

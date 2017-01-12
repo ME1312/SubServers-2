@@ -31,7 +31,6 @@
           <foreground color="-1"/>
           <horizontalAlignment value="10"/>
           <text value="&gt;"/>
-          <toolTipText value="Write a command here..."/>
         </properties>
         <clientProperties>
           <html.disable class="java.lang.Boolean" value="true"/>
@@ -80,7 +79,7 @@
         </properties>
       </component>
       <grid id="35647" binding="find" layout-manager="GridLayoutManager" row-count="1" column-count="4" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
-        <margin top="0" left="0" bottom="0" right="0"/>
+        <margin top="6" left="6" bottom="0" right="6"/>
         <constraints>
           <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
         </constraints>
@@ -103,8 +102,9 @@
             <properties>
               <background color="-14144467"/>
               <caretColor color="-2302756"/>
-              <font name="Courier" size="14"/>
+              <font size="14"/>
               <foreground color="-1"/>
+              <text value=""/>
               <toolTipText value="Search"/>
             </properties>
             <clientProperties>
@@ -117,7 +117,11 @@
             </constraints>
             <properties>
               <background color="-12236470"/>
-              <text value="Next"/>
+              <contentAreaFilled value="false"/>
+              <focusPainted value="false"/>
+              <foreground color="-1"/>
+              <opaque value="true"/>
+              <text value="  Next  "/>
             </properties>
           </component>
           <component id="b4434" class="javax.swing.JButton" binding="findP">
@@ -126,7 +130,11 @@
             </constraints>
             <properties>
               <background color="-12236470"/>
-              <text value="Previous"/>
+              <contentAreaFilled value="false"/>
+              <focusPainted value="false"/>
+              <foreground color="-1"/>
+              <opaque value="true"/>
+              <text value="  Previous  "/>
             </properties>
           </component>
           <component id="e6826" class="javax.swing.JButton" binding="findD">
@@ -135,7 +143,10 @@
             </constraints>
             <properties>
               <background color="-12236470"/>
-              <text value="Done"/>
+              <contentAreaFilled value="false"/>
+              <focusPainted value="false"/>
+              <foreground color="-1"/>
+              <text value="  Done  "/>
             </properties>
           </component>
         </children>
