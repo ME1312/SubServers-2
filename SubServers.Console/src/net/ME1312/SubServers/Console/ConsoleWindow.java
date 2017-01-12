@@ -228,8 +228,6 @@ public class ConsoleWindow implements SubLogFilter {
             }
         });
 
-        vScroll.getVerticalScrollBar().setBackground(new Color(69, 73, 74));
-        vScroll.getHorizontalScrollBar().setBackground(new Color(69, 73, 74));
         vScroll.getHorizontalScrollBar().addAdjustmentListener(event -> {
             if (!eScroll.contains(event.getValue())) {
                 eScroll.add(event.getValue());
@@ -238,7 +236,6 @@ public class ConsoleWindow implements SubLogFilter {
                 eScroll.remove((Object) event.getValue());
             }
         });
-        hScroll.setBackground(new Color(69, 73, 74));
         hScroll.addAdjustmentListener(event -> {
             if (!eScroll.contains(event.getValue())) {
                 eScroll.add(event.getValue());
@@ -654,16 +651,13 @@ public class ConsoleWindow implements SubLogFilter {
             this.radius = radius;
         }
 
-
         public Insets getBorderInsets(Component c) {
             return new Insets(this.radius+1, this.radius+1, this.radius+2, this.radius);
         }
 
-
         public boolean isBorderOpaque() {
             return true;
         }
-
 
         public void paintBorder(Component c, Graphics g, int x, int y, int width, int height) {
             g.setColor(color);
