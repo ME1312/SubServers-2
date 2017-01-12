@@ -1,6 +1,7 @@
 ![https://s30.postimg.org/fu575r281/Sub_Servers_Title.png](https://s30.postimg.org/fu575r281/Sub_Servers_Title.png)<br>
 SubServers 2 is a rewrite of SubServers, the Server Management Plugin.<br>
-[http://www.spigotmc.org/resources/subservers-2.11264/](http://www.spigotmc.org/resources/subservers-2.11264/)
+[http://www.spigotmc.org/resources/subservers-2.11264/](http://www.spigotmc.org/resources/subservers-2.11264/)<br>
+[http://www.spigotmc.org/resources/subservers-client-bukkit.15506/](http://www.spigotmc.org/resources/subservers-client-bukkit.15506/)
 
 ### Documentation
 > [http://subservers.ME1312.net/Javadoc/SubServers.Bungee/](http://subservers.ME1312.net/Javadoc/SubServers.Bungee/)<br>
@@ -13,7 +14,7 @@ SubServers 2 is a rewrite of SubServers, the Server Management Plugin.<br>
 ![Example Folder](https://s30.postimg.org/qhcx95jep/Screen_Shot_2016_12_15_at_4_30_15_PM.png)
 4. If you are updating, make sure to update the files in `~/SubServers`, they wont reset themselves.
 5. You can now launch SubServers via your terminal: `java -jar SubServers.Bungee.jar`
-6. All SubServers.Bungee commands can be accessed in console using `sub help`
+6. All SubServers.Bungee commands can be accessed in console using `/sub help`
 
 ## How to Install/Update SubServers.Client Pre-Releases
 1. Download your favorite commit of SubServers.Client ([Click Here](https://github.com/ME1312/SubServers-2/tree/master/Artifacts) for the latest commit)
