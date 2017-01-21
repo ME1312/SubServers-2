@@ -243,7 +243,7 @@ public class InternalSubCreator extends SubCreator {
     }
 
     @Override
-    public String getGitBashDirectory() {
+    public String getBashDirectory() {
         return gitBash;
     }
 

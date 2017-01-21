@@ -1,6 +1,7 @@
 package net.ME1312.SubServers.Client.Bukkit;
 
-import net.ME1312.SubServers.Client.Bukkit.Graphic.UIListener;
+import net.ME1312.SubServers.Client.Bukkit.Graphic.InternalHandler;
+import net.ME1312.SubServers.Client.Bukkit.Graphic.UIHandler;
 import net.ME1312.SubServers.Client.Bukkit.Library.Config.YAMLConfig;
 import net.ME1312.SubServers.Client.Bukkit.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Client.Bukkit.Library.UniversalFile;
@@ -22,11 +23,10 @@ public final class SubPlugin extends JavaPlugin {
     public YAMLSection lang = null;
     public SubDataClient subdata = null;
 
-    public UIListener gui = null;
+    public UIHandler gui = null;
     public final Version version;
-    public final Version bversion = new Version(2);
-    
-    //public final SubAPI api = new SubAPI(this);
+    public final Version bversion = null;
+    public final SubAPI api = new SubAPI(this);
 
     public SubPlugin() {
         super();
@@ -55,7 +55,7 @@ public final class SubPlugin extends JavaPlugin {
                     InetAddress.getByName(pluginconf.get().getSection("Settings").getSection("SubData").getString("Address", "127.0.0.1:4391").split(":")[0]),
                     Integer.parseInt(pluginconf.get().getSection("Settings").getSection("SubData").getString("Address", "127.0.0.1:4391").split(":")[1]));
 
-            gui = new UIListener(this);
+            gui = new InternalHandler(this);
             SubCommand cmd = new SubCommand(this);
             getCommand("subservers").setExecutor(cmd);
             getCommand("subserver").setExecutor(cmd);
@@ -71,11 +71,10 @@ public final class SubPlugin extends JavaPlugin {
      */
     @Override
     public void onDisable() {
-        if (subdata != null)
-            try {
-                subdata.destroy(false);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+        if (subdata != null) try {
+            subdata.destroy(false);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

@@ -4,12 +4,87 @@ import net.ME1312.SubServers.Bungee.Library.Exception.InvalidServerException;
 import net.ME1312.SubServers.Bungee.Library.NamedContainer;
 
 import java.net.InetSocketAddress;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.LinkedList;
 import java.util.UUID;
+import java.util.logging.Level;
 
 /**
  * SubServer Layout Class
  */
 public abstract class SubServer extends Server {
+    /**
+     * Command Storage Class
+     */
+    public static class LoggedCommand {
+        private Date date;
+        private UUID sender;
+        private String command;
+
+        /**
+         * Store a Command
+         *
+         * @param command Command
+         */
+        public LoggedCommand(String command) {
+            this.date = Calendar.getInstance().getTime();
+            this.sender = null;
+            this.command = command;
+        }
+
+        /**
+         * Store a Command
+         *
+         * @param sender Command Sender (null for CONSOLE)
+         * @param command Command
+         */
+        public LoggedCommand(UUID sender, String command) {
+            this.date = Calendar.getInstance().getTime();
+            this.sender = sender;
+            this.command = command;
+        }
+
+        /**
+         * Store a Command
+         *
+         * @param date Date
+         * @param sender Command Sender (null for CONSOLE)
+         * @param command Command
+         */
+        public LoggedCommand(Date date, UUID sender, String command) {
+            this.date = Calendar.getInstance().getTime();
+            this.sender = sender;
+            this.command = command;
+        }
+
+        /**
+         * Get the date this command was logged
+         *
+         * @return Date
+         */
+        public Date getDate() {
+            return date;
+        }
+
+        /**
+         * Get the command sender
+         *
+         * @return Command Sender (null if CONSOLE)
+         */
+        public UUID getSender() {
+            return sender;
+        }
+
+        /**
+         * Get the command
+         *
+         * @return Command
+         */
+        public String getCommand() {
+            return command;
+        }
+    }
 
     /**
      * Creates a SubServer
@@ -150,6 +225,13 @@ public abstract class SubServer extends Server {
     public abstract SubLogger getLogger();
 
     /**
+     * Gets all the commands that were sent to this SubServer successfully
+     *
+     * @return Command History
+     */
+    public abstract LinkedList<LoggedCommand> getCommandHistory();
+
+    /**
      * Get the Server Directory
      *
      * @return Server Directory
@@ -191,5 +273,10 @@ public abstract class SubServer extends Server {
      */
     public abstract boolean isTemporary();
 
-
+    /**
+     * Set If the Server is Temporary (will start server if not running)
+     *
+     * @param value Value
+     */
+    public abstract void setTemporary(boolean value);
 }

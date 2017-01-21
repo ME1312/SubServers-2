@@ -3,6 +3,7 @@ package net.ME1312.SubServers.Console;
 import net.ME1312.SubServers.Bungee.Host.SubLogFilter;
 import net.ME1312.SubServers.Bungee.Host.SubLogger;
 import net.ME1312.SubServers.Bungee.Host.SubServer;
+import net.md_5.bungee.api.ProxyServer;
 
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -13,6 +14,8 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.List;
 import java.util.logging.Level;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class ConsoleWindow implements SubLogFilter {
     private ConsolePlugin plugin;
@@ -122,9 +125,7 @@ public class ConsoleWindow implements SubLogFilter {
         item.setAccelerator(KeyStroke.getKeyStroke('R', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), true));
         item.addActionListener(event -> {
             log.setText("\n");
-            for (SubLogger.LogMessage message : logger.getMessages())
-                log(message.getDate(), message.getLevel(), message.getMessage());
-            SwingUtilities.invokeLater(this::hScroll);
+            loadContent();
         });
         menu.add(item);
         jMenu.add(menu);
@@ -151,7 +152,6 @@ public class ConsoleWindow implements SubLogFilter {
         });
         vScroll.setBorder(BorderFactory.createEmptyBorder());
         new SmartScroller(vScroll, SmartScroller.VERTICAL, SmartScroller.END);
-        log.setText("\n");
         log.setBorder(BorderFactory.createLineBorder(new Color(40, 44, 45)));
         new TextFieldPopup(log, false);
         ((AbstractDocument) log.getDocument()).setDocumentFilter(new DocumentFilter() {
@@ -293,22 +293,46 @@ public class ConsoleWindow implements SubLogFilter {
         });
 
 
-        if (!(logger.getHandler() instanceof SubServer)) {
+        if (logger.getHandler() instanceof SubServer) {
+            for (SubServer.LoggedCommand command : ((SubServer) logger.getHandler()).getCommandHistory()) popup.commands.add(command.getCommand());
+        } else {
             input.setVisible(false);
             hScroll.setVisible(false);
             vScroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
         }
 
         logger.registerFilter(this);
-        for (SubLogger.LogMessage message : logger.getMessages()) log(message.getDate(), message.getLevel(), message.getMessage());
+        log.setText("\n");
+        loadContent();
         KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(keys);
         if (logger.isLogging() && !open) open();
-        SwingUtilities.invokeLater(this::hScroll);
     }
     private void hScroll() {
         hScroll.setMaximum(vScroll.getHorizontalScrollBar().getMaximum());
         hScroll.setMinimum(vScroll.getHorizontalScrollBar().getMinimum());
         hScroll.setVisibleAmount(vScroll.getHorizontalScrollBar().getVisibleAmount());
+    }
+
+    private void loadContent() {
+        LinkedList<Object> list = new LinkedList<Object>();
+        list.addAll(logger.getMessageHistory());
+        if (logger.getHandler() instanceof SubServer) list.addAll(((SubServer) logger.getHandler()).getCommandHistory());
+        list.sort((A, B) -> {
+            Date a = null, b = null;
+
+            if (A instanceof SubLogger.LogMessage) a = ((SubLogger.LogMessage) A).getDate();
+            if (A instanceof SubServer.LoggedCommand) a = ((SubServer.LoggedCommand) A).getDate();
+
+            if (B instanceof SubLogger.LogMessage) b = ((SubLogger.LogMessage) B).getDate();
+            if (B instanceof SubServer.LoggedCommand) b = ((SubServer.LoggedCommand) B).getDate();
+
+            return (a == null || b == null)?0:a.compareTo(b);
+        });
+        for (Object obj : list) {
+            if (obj instanceof SubLogger.LogMessage) log(((SubLogger.LogMessage) obj).getDate(), ((SubLogger.LogMessage) obj).getLevel(), ((SubLogger.LogMessage) obj).getMessage());
+            if (obj instanceof SubServer.LoggedCommand) log(((SubServer.LoggedCommand) obj).getDate(), '<' + ((((SubServer.LoggedCommand) obj).getSender() == null)?"CONSOLE":((ProxyServer.getInstance().getPlayer(((SubServer.LoggedCommand) obj).getSender()) == null)?((SubServer.LoggedCommand) obj).getSender().toString():ProxyServer.getInstance().getPlayer(((SubServer.LoggedCommand) obj).getSender()).getName())) + "> /" + ((SubServer.LoggedCommand) obj).getCommand());
+        }
+        SwingUtilities.invokeLater(this::hScroll);
     }
 
     public SubLogger getLogger() {
@@ -356,6 +380,7 @@ public class ConsoleWindow implements SubLogFilter {
     @Override
     public void stop() {
         close();
+        clear();
     }
     public void close() {
         SwingUtilities.invokeLater(() -> {

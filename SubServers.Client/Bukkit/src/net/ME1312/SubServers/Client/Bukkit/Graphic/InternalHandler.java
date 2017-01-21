@@ -24,44 +24,38 @@ import java.util.HashMap;
 import java.util.UUID;
 
 /**
- * GUI Listener
+ * Internal GUI Listener
  */
-public class UIListener implements Listener {
+public class InternalHandler implements UIHandler, Listener {
     private HashMap<UUID, JSONCallback> input = new HashMap<UUID, JSONCallback>();
-    private HashMap<UUID, UIRenderer> gui = new HashMap<UUID, UIRenderer>();
+    private HashMap<UUID, InternalRenderer> gui = new HashMap<UUID, InternalRenderer>();
+    private boolean enabled = true;
     private SubPlugin plugin;
 
     /**
-     * Creates a new GUI Listener
+     * Creates a new Internal GUI Listener
      *
      * @param plugin Event
      */
-    public UIListener(SubPlugin plugin) {
+    public InternalHandler(SubPlugin plugin) {
         this.plugin = plugin;
         Bukkit.getPluginManager().registerEvents(this, plugin);
     }
 
-    /**
-     * Grabs the current UIRenderer for the player
-     *
-     * @param player Player
-     * @return UIRenderer
-     */
-    public UIRenderer getRenderer(Player player) {
-        if (!gui.keySet().contains(player.getUniqueId())) gui.put(player.getUniqueId(), new UIRenderer(plugin, player.getUniqueId()));
+    public InternalRenderer getRenderer(Player player) {
+        if (!gui.keySet().contains(player.getUniqueId())) gui.put(player.getUniqueId(), new InternalRenderer(plugin, player.getUniqueId()));
         return gui.get(player.getUniqueId());
     }
 
-    /**
-     * Click Listener
-     *
-     * @param event Event
-     */
+    public void disable() {
+        enabled = false;
+    }
+
     @EventHandler(priority = EventPriority.HIGHEST)
     public void click(InventoryClickEvent event) {
         Player player = (Player) event.getWhoClicked();
-        if (!event.isCancelled() && gui.keySet().contains(player.getUniqueId())) {
-            UIRenderer gui = this.gui.get(player.getUniqueId());
+        if (!event.isCancelled() && enabled && gui.keySet().contains(player.getUniqueId())) {
+            InternalRenderer gui = this.gui.get(player.getUniqueId());
             if (gui.open && event.getClickedInventory() != null && event.getClickedInventory().getTitle() != null) {
                 if (plugin.subdata == null) {
                     new IllegalStateException("SubData is not connected").printStackTrace();
@@ -212,7 +206,7 @@ public class UIListener implements Listener {
                         } else {
                             player.closeInventory();
                             Renderer plugin = null;
-                            for (Renderer renderer : UIRenderer.hostPlugins.values()) {
+                            for (Renderer renderer : InternalRenderer.hostPlugins.values()) {
                                 if (item.equals(renderer.getIcon().getItemMeta().getDisplayName())) plugin = renderer;
                             }
                             if (plugin == null) {
@@ -368,7 +362,7 @@ public class UIListener implements Listener {
                         } else {
                             player.closeInventory();
                             Renderer plugin = null;
-                            for (Renderer renderer : UIRenderer.subserverPlugins.values()) {
+                            for (Renderer renderer : InternalRenderer.subserverPlugins.values()) {
                                 if (item.equals(renderer.getIcon().getItemMeta().getDisplayName())) plugin = renderer;
                             }
                             if (plugin == null) {
@@ -392,7 +386,7 @@ public class UIListener implements Listener {
     @SuppressWarnings("deprecation")
     @EventHandler(priority = EventPriority.HIGHEST)
     public void input(org.bukkit.event.player.PlayerChatEvent event) {
-        if (!event.isCancelled() && input.keySet().contains(event.getPlayer().getUniqueId())) {
+        if (!event.isCancelled() && enabled && input.keySet().contains(event.getPlayer().getUniqueId())) {
             JSONObject json = new JSONObject();
             json.put("message", event.getMessage());
             input.get(event.getPlayer().getUniqueId()).run(json);
@@ -408,7 +402,7 @@ public class UIListener implements Listener {
      */
     @EventHandler(priority = EventPriority.HIGHEST)
     public void input(PlayerCommandPreprocessEvent event) {
-        if (!event.isCancelled() && input.keySet().contains(event.getPlayer().getUniqueId())) {
+        if (!event.isCancelled() && enabled && input.keySet().contains(event.getPlayer().getUniqueId())) {
             JSONObject json = new JSONObject();
             json.put("message", event.getMessage());
             input.get(event.getPlayer().getUniqueId()).run(json);

@@ -17,8 +17,8 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":9,"i1":9,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10,"i8":10,"i9":10,"i10":10,"i11":10,"i12":10,"i13":10,"i14":10,"i15":10,"i16":10,"i17":10};
-var tabs = {65535:["t0","All Methods"],1:["t1","Static Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
+var methods = {"i0":9,"i1":9,"i2":6,"i3":6,"i4":9,"i5":9,"i6":6,"i7":6,"i8":6,"i9":6,"i10":6,"i11":6,"i12":9,"i13":9,"i14":6,"i15":10,"i16":10,"i17":10,"i18":10,"i19":6,"i20":6,"i21":6};
+var tabs = {65535:["t0","All Methods"],1:["t1","Static Methods"],2:["t2","Instance Methods"],4:["t3","Abstract Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
 var tableTab = "tableTab";
@@ -47,7 +47,7 @@ var activeTableTab = "activeTableTab";
 </div>
 <div class="subNav">
 <ul class="navList">
-<li><a href="../../../../../../net/ME1312/SubServers/Client/Bukkit/Graphic/UIListener.html" title="class in net.ME1312.SubServers.Client.Bukkit.Graphic"><span class="typeNameLink">Prev&nbsp;Class</span></a></li>
+<li><a href="../../../../../../net/ME1312/SubServers/Client/Bukkit/Graphic/UIHandler.html" title="interface in net.ME1312.SubServers.Client.Bukkit.Graphic"><span class="typeNameLink">Prev&nbsp;Class</span></a></li>
 <li><a href="../../../../../../net/ME1312/SubServers/Client/Bukkit/Graphic/UIRenderer.CreatorOptions.html" title="class in net.ME1312.SubServers.Client.Bukkit.Graphic"><span class="typeNameLink">Next&nbsp;Class</span></a></li>
 </ul>
 <ul class="navList">
@@ -74,13 +74,13 @@ var activeTableTab = "activeTableTab";
 <li>Summary:&nbsp;</li>
 <li><a href="#nested.class.summary">Nested</a>&nbsp;|&nbsp;</li>
 <li>Field&nbsp;|&nbsp;</li>
-<li>Constr&nbsp;|&nbsp;</li>
+<li><a href="#constructor.summary">Constr</a>&nbsp;|&nbsp;</li>
 <li><a href="#method.summary">Method</a></li>
 </ul>
 <ul class="subNavList">
 <li>Detail:&nbsp;</li>
 <li>Field&nbsp;|&nbsp;</li>
-<li>Constr&nbsp;|&nbsp;</li>
+<li><a href="#constructor.detail">Constr</a>&nbsp;|&nbsp;</li>
 <li><a href="#method.detail">Method</a></li>
 </ul>
 </div>
@@ -105,10 +105,15 @@ var activeTableTab = "activeTableTab";
 <div class="description">
 <ul class="blockList">
 <li class="blockList">
+<dl>
+<dt>Direct Known Subclasses:</dt>
+<dd><a href="../../../../../../net/ME1312/SubServers/Client/Bukkit/Graphic/InternalRenderer.html" title="class in net.ME1312.SubServers.Client.Bukkit.Graphic">InternalRenderer</a></dd>
+</dl>
 <hr>
 <br>
-<pre>public class <span class="typeNameLabel">UIRenderer</span>
+<pre>public abstract class <span class="typeNameLabel">UIRenderer</span>
 extends java.lang.Object</pre>
+<div class="block">GUI Renderer Layout Class</div>
 </li>
 </ul>
 </div>
@@ -142,6 +147,26 @@ extends java.lang.Object</pre>
 </table>
 </li>
 </ul>
+<!-- ======== CONSTRUCTOR SUMMARY ======== -->
+<ul class="blockList">
+<li class="blockList"><a name="constructor.summary">
+<!--   -->
+</a>
+<h3>Constructor Summary</h3>
+<table class="memberSummary" border="0" cellpadding="3" cellspacing="0" summary="Constructor Summary table, listing constructors, and an explanation">
+<caption><span>Constructors</span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colOne" scope="col">Constructor and Description</th>
+</tr>
+<tr class="altColor">
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Client/Bukkit/Graphic/UIRenderer.html#UIRenderer-net.ME1312.SubServers.Client.Bukkit.SubPlugin-java.util.UUID-">UIRenderer</a></span>(<a href="../../../../../../net/ME1312/SubServers/Client/Bukkit/SubPlugin.html" title="class in net.ME1312.SubServers.Client.Bukkit">SubPlugin</a>&nbsp;plugin,
+          java.util.UUID&nbsp;player)</code>
+<div class="block">Creates a new UIRenderer</div>
+</td>
+</tr>
+</table>
+</li>
+</ul>
 <!-- ========== METHOD SUMMARY =========== -->
 <ul class="blockList">
 <li class="blockList"><a name="method.summary">
@@ -149,7 +174,7 @@ extends java.lang.Object</pre>
 </a>
 <h3>Method Summary</h3>
 <table class="memberSummary" border="0" cellpadding="3" cellspacing="0" summary="Method Summary table, listing methods, and an explanation">
-<caption><span id="t0" class="activeTableTab"><span>All Methods</span><span class="tabEnd">&nbsp;</span></span><span id="t1" class="tableTab"><span><a href="javascript:show(1);">Static Methods</a></span><span class="tabEnd">&nbsp;</span></span><span id="t2" class="tableTab"><span><a href="javascript:show(2);">Instance Methods</a></span><span class="tabEnd">&nbsp;</span></span><span id="t4" class="tableTab"><span><a href="javascript:show(8);">Concrete Methods</a></span><span class="tabEnd">&nbsp;</span></span></caption>
+<caption><span id="t0" class="activeTableTab"><span>All Methods</span><span class="tabEnd">&nbsp;</span></span><span id="t1" class="tableTab"><span><a href="javascript:show(1);">Static Methods</a></span><span class="tabEnd">&nbsp;</span></span><span id="t2" class="tableTab"><span><a href="javascript:show(2);">Instance Methods</a></span><span class="tabEnd">&nbsp;</span></span><span id="t3" class="tableTab"><span><a href="javascript:show(4);">Abstract Methods</a></span><span class="tabEnd">&nbsp;</span></span><span id="t4" class="tableTab"><span><a href="javascript:show(8);">Concrete Methods</a></span><span class="tabEnd">&nbsp;</span></span></caption>
 <tr>
 <th class="colFirst" scope="col">Modifier and Type</th>
 <th class="colLast" scope="col">Method and Description</th>
@@ -169,74 +194,98 @@ extends java.lang.Object</pre>
 </td>
 </tr>
 <tr id="i2" class="altColor">
-<td class="colFirst"><code>void</code></td>
+<td class="colFirst"><code>abstract void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Client/Bukkit/Graphic/UIRenderer.html#back--">back</a></span>()</code>
 <div class="block">Reopens the previous window</div>
 </td>
 </tr>
 <tr id="i3" class="rowColor">
-<td class="colFirst"><code>void</code></td>
+<td class="colFirst"><code>abstract void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Client/Bukkit/Graphic/UIRenderer.html#clearHistory--">clearHistory</a></span>()</code>
 <div class="block">Clears the Window History</div>
 </td>
 </tr>
 <tr id="i4" class="altColor">
-<td class="colFirst"><code>boolean</code></td>
+<td class="colFirst"><code>static java.util.Map&lt;java.lang.String,<a href="../../../../../../net/ME1312/SubServers/Client/Bukkit/Graphic/Renderer.html" title="interface in net.ME1312.SubServers.Client.Bukkit.Graphic">Renderer</a>&gt;</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Client/Bukkit/Graphic/UIRenderer.html#getHostPlugins--">getHostPlugins</a></span>()</code>
+<div class="block">Get Host Plugins</div>
+</td>
+</tr>
+<tr id="i5" class="rowColor">
+<td class="colFirst"><code>static java.util.Map&lt;java.lang.String,<a href="../../../../../../net/ME1312/SubServers/Client/Bukkit/Graphic/Renderer.html" title="interface in net.ME1312.SubServers.Client.Bukkit.Graphic">Renderer</a>&gt;</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Client/Bukkit/Graphic/UIRenderer.html#getSubServerPlugins--">getSubServerPlugins</a></span>()</code>
+<div class="block">Get SubServer Plugins</div>
+</td>
+</tr>
+<tr id="i6" class="altColor">
+<td class="colFirst"><code>abstract boolean</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Client/Bukkit/Graphic/UIRenderer.html#hasHistory--">hasHistory</a></span>()</code>
 <div class="block">If there is any Window History</div>
 </td>
 </tr>
-<tr id="i5" class="rowColor">
-<td class="colFirst"><code>void</code></td>
+<tr id="i7" class="rowColor">
+<td class="colFirst"><code>abstract void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Client/Bukkit/Graphic/UIRenderer.html#hostAdmin-java.lang.String-">hostAdmin</a></span>(java.lang.String&nbsp;host)</code>
 <div class="block">Opens Host/&lt;name&gt;</div>
 </td>
 </tr>
-<tr id="i6" class="altColor">
-<td class="colFirst"><code>void</code></td>
+<tr id="i8" class="altColor">
+<td class="colFirst"><code>abstract void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Client/Bukkit/Graphic/UIRenderer.html#hostCreator-net.ME1312.SubServers.Client.Bukkit.Graphic.UIRenderer.CreatorOptions-">hostCreator</a></span>(<a href="../../../../../../net/ME1312/SubServers/Client/Bukkit/Graphic/UIRenderer.CreatorOptions.html" title="class in net.ME1312.SubServers.Client.Bukkit.Graphic">UIRenderer.CreatorOptions</a>&nbsp;options)</code>
 <div class="block">Opens Host/&lt;name&gt;/Create</div>
 </td>
 </tr>
-<tr id="i7" class="rowColor">
-<td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Client/Bukkit/Graphic/UIRenderer.html#hostMenu-java.lang.Integer-">hostMenu</a></span>(java.lang.Integer&nbsp;page)</code>
+<tr id="i9" class="rowColor">
+<td class="colFirst"><code>abstract void</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Client/Bukkit/Graphic/UIRenderer.html#hostMenu-int-">hostMenu</a></span>(int&nbsp;page)</code>
 <div class="block">Opens the Host Menu</div>
 </td>
 </tr>
-<tr id="i8" class="altColor">
-<td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Client/Bukkit/Graphic/UIRenderer.html#hostPlugin-java.lang.Integer-java.lang.String-">hostPlugin</a></span>(java.lang.Integer&nbsp;page,
+<tr id="i10" class="altColor">
+<td class="colFirst"><code>abstract void</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Client/Bukkit/Graphic/UIRenderer.html#hostPlugin-int-java.lang.String-">hostPlugin</a></span>(int&nbsp;page,
           java.lang.String&nbsp;host)</code>
 <div class="block">Opens Host/&lt;name&gt;/Plugins</div>
 </td>
 </tr>
-<tr id="i9" class="rowColor">
-<td class="colFirst"><code>void</code></td>
+<tr id="i11" class="rowColor">
+<td class="colFirst"><code>abstract void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Client/Bukkit/Graphic/UIRenderer.html#newUI--">newUI</a></span>()</code>
 <div class="block">Opens a new window</div>
 </td>
 </tr>
-<tr id="i10" class="altColor">
-<td class="colFirst"><code>void</code></td>
+<tr id="i12" class="altColor">
+<td class="colFirst"><code>static void</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Client/Bukkit/Graphic/UIRenderer.html#removeHostPlugin-java.lang.String-">removeHostPlugin</a></span>(java.lang.String&nbsp;handle)</code>
+<div class="block">Remove Host Plugin</div>
+</td>
+</tr>
+<tr id="i13" class="rowColor">
+<td class="colFirst"><code>static void</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Client/Bukkit/Graphic/UIRenderer.html#removeSubServerPlugin-java.lang.String-">removeSubServerPlugin</a></span>(java.lang.String&nbsp;handle)</code>
+<div class="block">Remove SubServer Plugin</div>
+</td>
+</tr>
+<tr id="i14" class="altColor">
+<td class="colFirst"><code>abstract void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Client/Bukkit/Graphic/UIRenderer.html#reopen--">reopen</a></span>()</code>
 <div class="block">Reopens the current window</div>
 </td>
 </tr>
-<tr id="i11" class="rowColor">
+<tr id="i15" class="rowColor">
 <td class="colFirst"><code>boolean</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Client/Bukkit/Graphic/UIRenderer.html#sendTitle-java.lang.String-">sendTitle</a></span>(java.lang.String&nbsp;str)</code>
 <div class="block">Attempt to send a Title Message</div>
 </td>
 </tr>
-<tr id="i12" class="altColor">
+<tr id="i16" class="altColor">
 <td class="colFirst"><code>boolean</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Client/Bukkit/Graphic/UIRenderer.html#sendTitle-java.lang.String-int-">sendTitle</a></span>(java.lang.String&nbsp;str,
          int&nbsp;stay)</code>
 <div class="block">Attempt to send a Title Message</div>
 </td>
 </tr>
-<tr id="i13" class="rowColor">
+<tr id="i17" class="rowColor">
 <td class="colFirst"><code>boolean</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Client/Bukkit/Graphic/UIRenderer.html#sendTitle-java.lang.String-int-int-int-">sendTitle</a></span>(java.lang.String&nbsp;str,
          int&nbsp;fadein,
@@ -245,29 +294,29 @@ extends java.lang.Object</pre>
 <div class="block">Attempt to send a Title Message</div>
 </td>
 </tr>
-<tr id="i14" class="altColor">
+<tr id="i18" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Client/Bukkit/Graphic/UIRenderer.html#setDownloading-java.lang.String-">setDownloading</a></span>(java.lang.String&nbsp;subtitle)</code>
 <div class="block">Shows/Hides the Downloading Title Message</div>
 </td>
 </tr>
-<tr id="i15" class="rowColor">
-<td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Client/Bukkit/Graphic/UIRenderer.html#subserverAdmin-java.lang.String-">subserverAdmin</a></span>(java.lang.String&nbsp;subserver)</code>
+<tr id="i19" class="rowColor">
+<td class="colFirst"><code>abstract void</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Client/Bukkit/Graphic/UIRenderer.html#subserverAdmin-java.lang.String-">subserverAdmin</a></span>(java.lang.String&nbsp;server)</code>
 <div class="block">Opens SubServer/&lt;name&gt;</div>
 </td>
 </tr>
-<tr id="i16" class="altColor">
-<td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Client/Bukkit/Graphic/UIRenderer.html#subserverMenu-java.lang.Integer-java.lang.String-">subserverMenu</a></span>(java.lang.Integer&nbsp;page,
+<tr id="i20" class="altColor">
+<td class="colFirst"><code>abstract void</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Client/Bukkit/Graphic/UIRenderer.html#subserverMenu-int-java.lang.String-">subserverMenu</a></span>(int&nbsp;page,
              java.lang.String&nbsp;host)</code>
 <div class="block">Opens the SubServer Menu</div>
 </td>
 </tr>
-<tr id="i17" class="rowColor">
-<td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Client/Bukkit/Graphic/UIRenderer.html#subserverPlugin-java.lang.Integer-java.lang.String-">subserverPlugin</a></span>(java.lang.Integer&nbsp;page,
-               java.lang.String&nbsp;subserver)</code>
+<tr id="i21" class="rowColor">
+<td class="colFirst"><code>abstract void</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Client/Bukkit/Graphic/UIRenderer.html#subserverPlugin-int-java.lang.String-">subserverPlugin</a></span>(int&nbsp;page,
+               java.lang.String&nbsp;server)</code>
 <div class="block">Opens SubServer/&lt;name&gt;/Plugins</div>
 </td>
 </tr>
@@ -287,6 +336,30 @@ extends java.lang.Object</pre>
 <div class="details">
 <ul class="blockList">
 <li class="blockList">
+<!-- ========= CONSTRUCTOR DETAIL ======== -->
+<ul class="blockList">
+<li class="blockList"><a name="constructor.detail">
+<!--   -->
+</a>
+<h3>Constructor Detail</h3>
+<a name="UIRenderer-net.ME1312.SubServers.Client.Bukkit.SubPlugin-java.util.UUID-">
+<!--   -->
+</a>
+<ul class="blockListLast">
+<li class="blockList">
+<h4>UIRenderer</h4>
+<pre>public&nbsp;UIRenderer(<a href="../../../../../../net/ME1312/SubServers/Client/Bukkit/SubPlugin.html" title="class in net.ME1312.SubServers.Client.Bukkit">SubPlugin</a>&nbsp;plugin,
+                  java.util.UUID&nbsp;player)</pre>
+<div class="block">Creates a new UIRenderer</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>plugin</code> - SubPlugin</dd>
+<dd><code>player</code> - Player</dd>
+</dl>
+</li>
+</ul>
+</li>
+</ul>
 <!-- ============ METHOD DETAIL ========== -->
 <ul class="blockList">
 <li class="blockList"><a name="method.detail">
@@ -299,7 +372,7 @@ extends java.lang.Object</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>newUI</h4>
-<pre>public&nbsp;void&nbsp;newUI()</pre>
+<pre>public abstract&nbsp;void&nbsp;newUI()</pre>
 <div class="block">Opens a new window</div>
 </li>
 </ul>
@@ -309,7 +382,7 @@ extends java.lang.Object</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>clearHistory</h4>
-<pre>public&nbsp;void&nbsp;clearHistory()</pre>
+<pre>public abstract&nbsp;void&nbsp;clearHistory()</pre>
 <div class="block">Clears the Window History</div>
 </li>
 </ul>
@@ -319,7 +392,7 @@ extends java.lang.Object</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>hasHistory</h4>
-<pre>public&nbsp;boolean&nbsp;hasHistory()</pre>
+<pre>public abstract&nbsp;boolean&nbsp;hasHistory()</pre>
 <div class="block">If there is any Window History</div>
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
@@ -333,7 +406,7 @@ extends java.lang.Object</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>reopen</h4>
-<pre>public&nbsp;void&nbsp;reopen()</pre>
+<pre>public abstract&nbsp;void&nbsp;reopen()</pre>
 <div class="block">Reopens the current window</div>
 </li>
 </ul>
@@ -343,7 +416,7 @@ extends java.lang.Object</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>back</h4>
-<pre>public&nbsp;void&nbsp;back()</pre>
+<pre>public abstract&nbsp;void&nbsp;back()</pre>
 <div class="block">Reopens the previous window</div>
 </li>
 </ul>
@@ -433,6 +506,34 @@ extends java.lang.Object</pre>
 </dl>
 </li>
 </ul>
+<a name="getHostPlugins--">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getHostPlugins</h4>
+<pre>public static&nbsp;java.util.Map&lt;java.lang.String,<a href="../../../../../../net/ME1312/SubServers/Client/Bukkit/Graphic/Renderer.html" title="interface in net.ME1312.SubServers.Client.Bukkit.Graphic">Renderer</a>&gt;&nbsp;getHostPlugins()</pre>
+<div class="block">Get Host Plugins</div>
+<dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>Host Plugins</dd>
+</dl>
+</li>
+</ul>
+<a name="removeHostPlugin-java.lang.String-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>removeHostPlugin</h4>
+<pre>public static&nbsp;void&nbsp;removeHostPlugin(java.lang.String&nbsp;handle)</pre>
+<div class="block">Remove Host Plugin</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>handle</code> - Handle</dd>
+</dl>
+</li>
+</ul>
 <a name="addSubServerPlugin-java.lang.String-net.ME1312.SubServers.Client.Bukkit.Graphic.Renderer-">
 <!--   -->
 </a>
@@ -449,13 +550,41 @@ extends java.lang.Object</pre>
 </dl>
 </li>
 </ul>
-<a name="hostMenu-java.lang.Integer-">
+<a name="getSubServerPlugins--">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getSubServerPlugins</h4>
+<pre>public static&nbsp;java.util.Map&lt;java.lang.String,<a href="../../../../../../net/ME1312/SubServers/Client/Bukkit/Graphic/Renderer.html" title="interface in net.ME1312.SubServers.Client.Bukkit.Graphic">Renderer</a>&gt;&nbsp;getSubServerPlugins()</pre>
+<div class="block">Get SubServer Plugins</div>
+<dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>SubServer Plugins</dd>
+</dl>
+</li>
+</ul>
+<a name="removeSubServerPlugin-java.lang.String-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>removeSubServerPlugin</h4>
+<pre>public static&nbsp;void&nbsp;removeSubServerPlugin(java.lang.String&nbsp;handle)</pre>
+<div class="block">Remove SubServer Plugin</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>handle</code> - Handle</dd>
+</dl>
+</li>
+</ul>
+<a name="hostMenu-int-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>hostMenu</h4>
-<pre>public&nbsp;void&nbsp;hostMenu(java.lang.Integer&nbsp;page)</pre>
+<pre>public abstract&nbsp;void&nbsp;hostMenu(int&nbsp;page)</pre>
 <div class="block">Opens the Host Menu</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
@@ -469,7 +598,7 @@ extends java.lang.Object</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>hostAdmin</h4>
-<pre>public&nbsp;void&nbsp;hostAdmin(java.lang.String&nbsp;host)</pre>
+<pre>public abstract&nbsp;void&nbsp;hostAdmin(java.lang.String&nbsp;host)</pre>
 <div class="block">Opens Host/&lt;name&gt;</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
@@ -483,7 +612,7 @@ extends java.lang.Object</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>hostCreator</h4>
-<pre>public&nbsp;void&nbsp;hostCreator(<a href="../../../../../../net/ME1312/SubServers/Client/Bukkit/Graphic/UIRenderer.CreatorOptions.html" title="class in net.ME1312.SubServers.Client.Bukkit.Graphic">UIRenderer.CreatorOptions</a>&nbsp;options)</pre>
+<pre>public abstract&nbsp;void&nbsp;hostCreator(<a href="../../../../../../net/ME1312/SubServers/Client/Bukkit/Graphic/UIRenderer.CreatorOptions.html" title="class in net.ME1312.SubServers.Client.Bukkit.Graphic">UIRenderer.CreatorOptions</a>&nbsp;options)</pre>
 <div class="block">Opens Host/&lt;name&gt;/Create</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
@@ -491,14 +620,14 @@ extends java.lang.Object</pre>
 </dl>
 </li>
 </ul>
-<a name="hostPlugin-java.lang.Integer-java.lang.String-">
+<a name="hostPlugin-int-java.lang.String-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>hostPlugin</h4>
-<pre>public&nbsp;void&nbsp;hostPlugin(java.lang.Integer&nbsp;page,
-                       java.lang.String&nbsp;host)</pre>
+<pre>public abstract&nbsp;void&nbsp;hostPlugin(int&nbsp;page,
+                                java.lang.String&nbsp;host)</pre>
 <div class="block">Opens Host/&lt;name&gt;/Plugins</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
@@ -506,14 +635,14 @@ extends java.lang.Object</pre>
 </dl>
 </li>
 </ul>
-<a name="subserverMenu-java.lang.Integer-java.lang.String-">
+<a name="subserverMenu-int-java.lang.String-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>subserverMenu</h4>
-<pre>public&nbsp;void&nbsp;subserverMenu(java.lang.Integer&nbsp;page,
-                          java.lang.String&nbsp;host)</pre>
+<pre>public abstract&nbsp;void&nbsp;subserverMenu(int&nbsp;page,
+                                   java.lang.String&nbsp;host)</pre>
 <div class="block">Opens the SubServer Menu</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
@@ -528,26 +657,26 @@ extends java.lang.Object</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>subserverAdmin</h4>
-<pre>public&nbsp;void&nbsp;subserverAdmin(java.lang.String&nbsp;subserver)</pre>
+<pre>public abstract&nbsp;void&nbsp;subserverAdmin(java.lang.String&nbsp;server)</pre>
 <div class="block">Opens SubServer/&lt;name&gt;</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>subserver</code> - SubServer Name</dd>
+<dd><code>server</code> - SubServer Name</dd>
 </dl>
 </li>
 </ul>
-<a name="subserverPlugin-java.lang.Integer-java.lang.String-">
+<a name="subserverPlugin-int-java.lang.String-">
 <!--   -->
 </a>
 <ul class="blockListLast">
 <li class="blockList">
 <h4>subserverPlugin</h4>
-<pre>public&nbsp;void&nbsp;subserverPlugin(java.lang.Integer&nbsp;page,
-                            java.lang.String&nbsp;subserver)</pre>
+<pre>public abstract&nbsp;void&nbsp;subserverPlugin(int&nbsp;page,
+                                     java.lang.String&nbsp;server)</pre>
 <div class="block">Opens SubServer/&lt;name&gt;/Plugins</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>subserver</code> - SubServer Name</dd>
+<dd><code>server</code> - SubServer Name</dd>
 </dl>
 </li>
 </ul>
@@ -578,7 +707,7 @@ extends java.lang.Object</pre>
 </div>
 <div class="subNav">
 <ul class="navList">
-<li><a href="../../../../../../net/ME1312/SubServers/Client/Bukkit/Graphic/UIListener.html" title="class in net.ME1312.SubServers.Client.Bukkit.Graphic"><span class="typeNameLink">Prev&nbsp;Class</span></a></li>
+<li><a href="../../../../../../net/ME1312/SubServers/Client/Bukkit/Graphic/UIHandler.html" title="interface in net.ME1312.SubServers.Client.Bukkit.Graphic"><span class="typeNameLink">Prev&nbsp;Class</span></a></li>
 <li><a href="../../../../../../net/ME1312/SubServers/Client/Bukkit/Graphic/UIRenderer.CreatorOptions.html" title="class in net.ME1312.SubServers.Client.Bukkit.Graphic"><span class="typeNameLink">Next&nbsp;Class</span></a></li>
 </ul>
 <ul class="navList">
@@ -605,13 +734,13 @@ extends java.lang.Object</pre>
 <li>Summary:&nbsp;</li>
 <li><a href="#nested.class.summary">Nested</a>&nbsp;|&nbsp;</li>
 <li>Field&nbsp;|&nbsp;</li>
-<li>Constr&nbsp;|&nbsp;</li>
+<li><a href="#constructor.summary">Constr</a>&nbsp;|&nbsp;</li>
 <li><a href="#method.summary">Method</a></li>
 </ul>
 <ul class="subNavList">
 <li>Detail:&nbsp;</li>
 <li>Field&nbsp;|&nbsp;</li>
-<li>Constr&nbsp;|&nbsp;</li>
+<li><a href="#constructor.detail">Constr</a>&nbsp;|&nbsp;</li>
 <li><a href="#method.detail">Method</a></li>
 </ul>
 </div>

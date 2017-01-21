@@ -57,7 +57,7 @@ public class PacketDownloadHostInfo implements PacketIn, PacketOut {
 
             JSONObject cinfo = new JSONObject();
             cinfo.put("busy", host.getCreator().isBusy());
-            cinfo.put("git-bash", host.getCreator().getGitBashDirectory());
+            cinfo.put("git-bash", host.getCreator().getBashDirectory());
             info.put("creator", cinfo);
 
             JSONObject servers = new JSONObject();

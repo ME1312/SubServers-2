@@ -120,7 +120,7 @@ public abstract class SubLogger {
      *
      * @return Log Messages (named by log level)
      */
-    public abstract List<LogMessage> getMessages();
+    public abstract List<LogMessage> getMessageHistory();
 
     /**
      * Register Filter

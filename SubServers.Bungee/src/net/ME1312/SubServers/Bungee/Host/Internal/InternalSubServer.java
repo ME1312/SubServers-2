@@ -7,11 +7,15 @@ import net.ME1312.SubServers.Bungee.Library.Container;
 import net.ME1312.SubServers.Bungee.Library.Exception.InvalidServerException;
 import net.ME1312.SubServers.Bungee.Host.Host;
 import net.ME1312.SubServers.Bungee.Host.SubServer;
+import net.ME1312.SubServers.Bungee.Library.NamedContainer;
 
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.LinkedList;
 import java.util.UUID;
 
 /**
@@ -25,6 +29,7 @@ public class InternalSubServer extends SubServer {
     private File directory;
     private Executable executable;
     private String stopcmd;
+    private LinkedList<LoggedCommand> history;
     private Process process;
     private InternalSubLogger logger;
     private Thread thread;
@@ -61,18 +66,16 @@ public class InternalSubServer extends SubServer {
         this.directory = new File(host.getDirectory(), directory);
         this.executable = executable;
         this.stopcmd = stopcmd;
+        this.history = new LinkedList<LoggedCommand>();
         this.process = null;
         this.logger = new InternalSubLogger(null, this, getName(), this.log, null);
         this.thread = null;
         this.command = null;
         this.restart = restart;
-        this.temporary = temporary;
-
-        if (start || temporary) start();
+        this.temporary = !((start || temporary) && !start()) && temporary;
     }
 
     private void run() {
-
         allowrestart = true;
         try {
             process = Runtime.getRuntime().exec(executable.toString(), null, directory);
@@ -80,8 +83,13 @@ public class InternalSubServer extends SubServer {
             logger.process = process;
             logger.start();
             command = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
+            for (LoggedCommand command : history) if (process.isAlive()) {
+                this.command.write(command.getCommand());
+                this.command.newLine();
+                this.command.flush();
+            }
 
-            process.waitFor();
+            if (process.isAlive()) process.waitFor();
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
             allowrestart = false;
@@ -92,6 +100,7 @@ public class InternalSubServer extends SubServer {
         System.out.println("SubServers > " + getName() + " has stopped");
         process = null;
         command = null;
+        history.clear();
 
         if (isTemporary()) {
             try {
@@ -113,11 +122,11 @@ public class InternalSubServer extends SubServer {
 
     @Override
     public boolean start(UUID player) {
-        if (isEnabled() && !isRunning()) {
+        if (isEnabled() && !(thread != null && thread.isAlive())) {
             SubStartEvent event = new SubStartEvent(player, this);
             host.plugin.getPluginManager().callEvent(event);
             if (!event.isCancelled()) {
-                (thread = new Thread(() -> run())).start();
+                (thread = new Thread(this::run)).start();
                 return true;
             } else return false;
         } else return false;
@@ -125,15 +134,18 @@ public class InternalSubServer extends SubServer {
 
     @Override
     public boolean stop(UUID player) {
-        if (isRunning()) {
+        if (thread != null && thread.isAlive()) {
             SubStopEvent event = new SubStopEvent(player, this, false);
             host.plugin.getPluginManager().callEvent(event);
             if (!event.isCancelled()) {
                 try {
                     allowrestart = false;
-                    command.write(stopcmd);
-                    command.newLine();
-                    command.flush();
+                    history.add(new LoggedCommand(player, stopcmd));
+                    if (process != null && process.isAlive()) {
+                        command.write(stopcmd);
+                        command.newLine();
+                        command.flush();
+                    }
                     return true;
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -145,12 +157,12 @@ public class InternalSubServer extends SubServer {
 
     @Override
     public boolean terminate(UUID player) {
-        if (isRunning()) {
+        if (thread != null && thread.isAlive()) {
             SubStopEvent event = new SubStopEvent(player, this, true);
             host.plugin.getPluginManager().callEvent(event);
             if (!event.isCancelled()) {
                 allowrestart = false;
-                process.destroyForcibly();
+                if (process != null && process.isAlive()) process.destroyForcibly();
                 return true;
             } else return false;
         } else return false;
@@ -158,15 +170,18 @@ public class InternalSubServer extends SubServer {
 
     @Override
     public boolean command(UUID player, String command) {
-        if (isRunning()) {
+        if (thread != null && thread.isAlive()) {
             SubSendCommandEvent event = new SubSendCommandEvent(player, this, command);
             host.plugin.getPluginManager().callEvent(event);
             if (!event.isCancelled()) {
                 try {
                     if (event.getCommand().equalsIgnoreCase(stopcmd)) allowrestart = false;
-                    this.command.write(event.getCommand());
-                    this.command.newLine();
-                    this.command.flush();
+                    history.add(new LoggedCommand(player, event.getCommand()));
+                    if (process != null && process.isAlive()) {
+                        this.command.write(event.getCommand());
+                        this.command.newLine();
+                        this.command.flush();
+                    }
                     return true;
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -219,6 +234,11 @@ public class InternalSubServer extends SubServer {
     }
 
     @Override
+    public LinkedList<LoggedCommand> getCommandHistory() {
+        return new LinkedList<LoggedCommand>(history);
+    }
+
+    @Override
     public String getDirectory() {
         return dir;
     }
@@ -246,5 +266,10 @@ public class InternalSubServer extends SubServer {
     @Override
     public boolean isTemporary() {
         return temporary;
+    }
+
+    @Override
+    public void setTemporary(boolean value) {
+        temporary = !(value && !isRunning() && !start()) && value;
     }
 }

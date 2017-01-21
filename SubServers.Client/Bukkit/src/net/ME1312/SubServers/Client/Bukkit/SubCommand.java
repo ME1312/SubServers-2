@@ -1,5 +1,6 @@
 package net.ME1312.SubServers.Client.Bukkit;
 
+import net.ME1312.SubServers.Client.Bukkit.Graphic.InternalRenderer;
 import net.ME1312.SubServers.Client.Bukkit.Graphic.UIRenderer;
 import net.ME1312.SubServers.Client.Bukkit.Library.Container;
 import net.ME1312.SubServers.Client.Bukkit.Library.Util;

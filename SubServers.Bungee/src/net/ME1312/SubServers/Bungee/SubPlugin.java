@@ -175,6 +175,9 @@ public final class SubPlugin extends BungeeCord {
     @Override
     public void startListeners() {
         try {
+            long begin = Calendar.getInstance().getTime().getTime();
+
+            running = true;
             config = new YAMLConfig(new UniversalFile(dir, "SubServers:config.yml"));
             lang = new YAMLConfig(new UniversalFile(dir, "SubServers:lang.yml"));
             subdata = new SubDataServer(this, Integer.parseInt(config.get().getSection("Settings").getSection("SubData").getRawString("Address", "127.0.0.1:4391").split(":")[1]), 10,
@@ -182,7 +185,6 @@ public final class SubPlugin extends BungeeCord {
             System.out.println("SubServers > SubData Listening on " + subdata.getServer().getLocalSocketAddress().toString());
             loop();
 
-            long begin = Calendar.getInstance().getTime().getTime();
             int hosts = 0;
             System.out.println("SubServers > Loading Hosts...");
             for (String name : config.get().getSection("Hosts").getKeys()) {
@@ -234,8 +236,6 @@ public final class SubPlugin extends BungeeCord {
             }
 
             System.out.println("SubServers > " + hosts + " Host(s), " + servers + " Server(s), and " + subservers + " SubServer(s) loaded in " + (Calendar.getInstance().getTime().getTime() - begin) + "ms");
-
-            running = true;
 
             super.startListeners();
         } catch (IOException e) {

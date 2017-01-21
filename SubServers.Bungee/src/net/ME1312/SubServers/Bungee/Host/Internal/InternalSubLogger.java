@@ -188,7 +188,7 @@ public class InternalSubLogger extends SubLogger {
     }
 
     @Override
-    public List<LogMessage> getMessages() {
+    public List<LogMessage> getMessageHistory() {
         return new LinkedList<LogMessage>(messages);
     }
 }

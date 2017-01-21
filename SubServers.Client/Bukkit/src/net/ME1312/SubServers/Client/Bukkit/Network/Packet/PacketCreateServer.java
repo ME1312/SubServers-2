@@ -1,5 +1,6 @@
 package net.ME1312.SubServers.Client.Bukkit.Network.Packet;
 
+import net.ME1312.SubServers.Client.Bukkit.Graphic.InternalRenderer;
 import net.ME1312.SubServers.Client.Bukkit.Graphic.UIRenderer;
 import net.ME1312.SubServers.Client.Bukkit.Library.JSONCallback;
 import net.ME1312.SubServers.Client.Bukkit.Library.Version.Version;

@@ -70,7 +70,7 @@ public abstract class SubCreator {
      *
      * @return Git Bash Directory
      */
-    public abstract String getGitBashDirectory();
+    public abstract String getBashDirectory();
 
     /**
      * Gets the Logger for the creator

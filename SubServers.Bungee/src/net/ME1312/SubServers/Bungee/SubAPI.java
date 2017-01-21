@@ -173,6 +173,26 @@ public final class SubAPI {
     }
 
     /**
+     * Adds to the Language Map
+     *
+     * @param key Key
+     * @param value Lang Value
+     */
+    public void setLang(String key, String value) {
+        plugin.exLang.put(key, value);
+    }
+
+    /**
+     * Gets a value from the SubServers Lang
+     *
+     * @param key Key
+     * @return Lang Value
+     */
+    public String getLang(String key) {
+        return getLang().get(key);
+    }
+
+    /**
      * Gets the SubServers Lang
      *
      * @return SubServers Lang
@@ -187,16 +207,6 @@ public final class SubAPI {
     }
 
     /**
-     * Adds to the Language Map
-     *
-     * @param key Key
-     * @param value Lang Value
-     */
-    public void addLang(String key, String value) {
-        plugin.exLang.put(key, value);
-    }
-
-    /**
      * Gets the Runtime Directory
      *
      * @return Directory
@@ -206,11 +216,38 @@ public final class SubAPI {
     }
 
     /**
+     * Gets the SubServers Beta Version
+     *
+     * @return SubServers Beta Version (or null if this is a release version)
+     */
+    public Version getBetaVersion() {
+        return plugin.bversion;
+    }
+
+    /**
      * Gets the SubServers Version
      *
      * @return SubServers Version
      */
     public Version getWrapperVersion() {
         return plugin.version;
+    }
+
+    /**
+     * Gets the BungeeCord Version
+     *
+     * @return BungeeCord Version
+     */
+    public Version getProxyVersion() {
+        return new Version(plugin.getVersion());
+    }
+
+    /**
+     * Gets the Recommended Minecraft Version
+     *
+     * @return Minecraft Version
+     */
+    public Version getGameVersion() {
+        return new Version(plugin.getGameVersion());
     }
 }

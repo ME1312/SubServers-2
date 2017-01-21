@@ -23,7 +23,7 @@ public final class SubDataServer {
     private static boolean defaults = false;
     private HashMap<InetSocketAddress, Client> clients = new HashMap<InetSocketAddress, Client>();
     private ServerSocket server;
-    private SubPlugin plugin;
+    protected SubPlugin plugin;
 
     /**
      * SubData Server Instance

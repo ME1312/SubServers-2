@@ -96,7 +96,7 @@ public final class SubDataClient {
                         JSONObject json = new JSONObject(input);
                         for (PacketIn packet : decodePacket(json)) {
                             try {
-                                packet.execute((json.keySet().contains("c")) ? json.getJSONObject("c") : null);
+                                Bukkit.getScheduler().runTask(plugin, () -> packet.execute((json.keySet().contains("c"))?json.getJSONObject("c"):null));
                             } catch (Exception e) {
                                 new InvocationTargetException(e, "Exception while executing PacketIn").printStackTrace();
                             }
