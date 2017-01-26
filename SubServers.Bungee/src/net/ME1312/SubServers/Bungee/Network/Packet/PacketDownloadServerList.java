@@ -49,6 +49,7 @@ public class PacketDownloadServerList implements PacketIn, PacketOut {
             JSONObject exServers = new JSONObject();
             for (Server server : plugin.exServers.values()) {
                 JSONObject info = new JSONObject();
+                info.put("display", server.getDisplayName());
                 JSONObject players = new JSONObject();
                 for (ProxiedPlayer player : server.getPlayers()) {
                     JSONObject pinfo = new JSONObject();
@@ -68,10 +69,12 @@ public class PacketDownloadServerList implements PacketIn, PacketOut {
                 if (this.host == null || this.host.equalsIgnoreCase(host.getName())) {
                     JSONObject hinfo = new JSONObject();
                     hinfo.put("enabled", host.isEnabled());
+                    hinfo.put("display", host.getDisplayName());
                     JSONObject servers = new JSONObject();
                     for (SubServer server : host.getSubServers().values()) {
                         JSONObject sinfo = new JSONObject();
                         sinfo.put("enabled", server.isEnabled() && host.isEnabled());
+                        sinfo.put("display", server.getDisplayName());
                         sinfo.put("running", server.isRunning());
                         sinfo.put("temp", server.isTemporary());
                         JSONObject players = new JSONObject();

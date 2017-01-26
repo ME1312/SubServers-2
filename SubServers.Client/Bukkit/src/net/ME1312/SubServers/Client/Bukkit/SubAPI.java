@@ -11,7 +11,7 @@ import java.util.Map;
 /**
  * SubAPI Class
  */
-public class SubAPI {
+public final class SubAPI {
     private SubPlugin plugin;
     private static SubAPI api;
 

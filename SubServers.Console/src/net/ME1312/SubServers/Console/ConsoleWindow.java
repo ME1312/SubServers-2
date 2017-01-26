@@ -10,6 +10,8 @@ import javax.swing.border.Border;
 import javax.swing.text.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.List;
@@ -17,7 +19,7 @@ import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class ConsoleWindow implements SubLogFilter {
+public final class ConsoleWindow implements SubLogFilter {
     private ConsolePlugin plugin;
     private JFrame window;
     private JPanel panel;
@@ -59,6 +61,9 @@ public class ConsoleWindow implements SubLogFilter {
                     if (find.isVisible() && !ifocus)
                         find(true);
                     break;
+                case KeyEvent.VK_TAB:
+                    if (!ifocus) input.requestFocusInWindow();
+                    break;
             }
 
         }
@@ -98,21 +103,21 @@ public class ConsoleWindow implements SubLogFilter {
         menu.addSeparator();
         item = new JMenuItem("Reset Text Size");
         item.addActionListener(event -> {
-            log.setFont(new Font(log.getFont().getName(), log.getFont().getStyle(), 12));
+            log.setFont(log.getFont().deriveFont(12f));
             SwingUtilities.invokeLater(this::hScroll);
         });
         menu.add(item);
         item = new JMenuItem("Bigger Text");
         item.setAccelerator(KeyStroke.getKeyStroke('=', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), true));
         item.addActionListener(event -> {
-            log.setFont(new Font(log.getFont().getName(), log.getFont().getStyle(), log.getFont().getSize() + 2));
+            log.setFont(log.getFont().deriveFont((float) log.getFont().getSize() + 2));
             SwingUtilities.invokeLater(this::hScroll);
         });
         menu.add(item);
         item = new JMenuItem("Smaller Text");
         item.setAccelerator(KeyStroke.getKeyStroke('-', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), true));
         item.addActionListener(event -> {
-            log.setFont(new Font(log.getFont().getName(), log.getFont().getStyle(), log.getFont().getSize() - 2));
+            log.setFont(log.getFont().deriveFont((float) log.getFont().getSize() - 2));
             SwingUtilities.invokeLater(this::hScroll);
         });
         menu.add(item);

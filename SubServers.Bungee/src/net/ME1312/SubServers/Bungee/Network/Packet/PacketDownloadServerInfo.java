@@ -60,6 +60,7 @@ public class PacketDownloadServerInfo implements PacketIn, PacketOut {
             info.put("temp", ((SubServer) server).isTemporary());
         } if (server != null) {
             info.put("name", server.getName());
+            info.put("display", server.getDisplayName());
             info.put("address", server.getAddress().toString());
             info.put("restricted", server.isRestricted());
             info.put("hidden", server.isHidden());

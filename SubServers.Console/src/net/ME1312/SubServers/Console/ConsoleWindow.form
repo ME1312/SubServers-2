@@ -146,6 +146,7 @@
               <contentAreaFilled value="false"/>
               <focusPainted value="false"/>
               <foreground color="-1"/>
+              <opaque value="true"/>
               <text value="  Done  "/>
             </properties>
           </component>

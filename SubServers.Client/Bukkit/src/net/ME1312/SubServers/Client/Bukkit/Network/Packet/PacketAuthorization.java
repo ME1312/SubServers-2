@@ -19,7 +19,7 @@ public final class PacketAuthorization implements PacketIn, PacketOut {
     @Override
     public JSONObject generate() {
         JSONObject json = new JSONObject();
-        json.put("password", plugin.pluginconf.get().getSection("Settings").getSection("SubData").getString("Password"));
+        json.put("password", plugin.config.get().getSection("Settings").getSection("SubData").getString("Password"));
         return json;
     }
 

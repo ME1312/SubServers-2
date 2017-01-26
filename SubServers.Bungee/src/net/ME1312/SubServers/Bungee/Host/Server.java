@@ -18,6 +18,7 @@ import java.net.InetSocketAddress;
 public class Server extends BungeeServerInfo implements ClientHandler, ExtraDataHandler {
     private YAMLSection extra = new YAMLSection();
     private Client client = null;
+    private String nick = null;
     private String motd;
     private boolean restricted;
     private boolean hidden;
@@ -43,6 +44,24 @@ public class Server extends BungeeServerInfo implements ClientHandler, ExtraData
         } else if (client == null) {
             this.client = null;
         } else throw new IllegalStateException("A SubData Client is already linked to Server: " + getName());
+    }
+
+    /**
+     * Get the Display Name of this Server
+     *
+     * @return Display Name
+     */
+    public String getDisplayName() {
+        return (nick == null)?getName():nick;
+    }
+
+    /**
+     * Sets the Display Name for this Server
+     *
+     * @param value Value (or null to reset)
+     */
+    public void setDisplayName(String value) {
+        this.nick = value;
     }
 
     /**

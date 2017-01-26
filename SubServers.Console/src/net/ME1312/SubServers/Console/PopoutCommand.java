@@ -11,7 +11,7 @@ import javax.swing.*;
 import java.util.List;
 import java.util.Map;
 
-public class PopoutCommand {
+public final class PopoutCommand {
     private PopoutCommand() {}
     public static class SERVER extends Command {
         private ConsolePlugin plugin;

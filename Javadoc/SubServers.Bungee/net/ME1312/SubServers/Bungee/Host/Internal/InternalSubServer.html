@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10,"i8":10,"i9":10,"i10":10,"i11":10,"i12":10,"i13":10,"i14":10,"i15":10,"i16":10,"i17":10,"i18":10,"i19":10};
+var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10,"i8":10,"i9":10,"i10":10,"i11":10,"i12":10,"i13":10,"i14":10,"i15":10,"i16":10,"i17":10,"i18":10,"i19":10,"i20":10};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -263,53 +263,59 @@ extends <a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubServer.h
 </tr>
 <tr id="i11" class="rowColor">
 <td class="colFirst"><code>void</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/Internal/InternalSubServer.html#setDisplayName-java.lang.String-">setDisplayName</a></span>(java.lang.String&nbsp;value)</code>
+<div class="block">Sets the Display Name for this Server</div>
+</td>
+</tr>
+<tr id="i12" class="altColor">
+<td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/Internal/InternalSubServer.html#setEnabled-boolean-">setEnabled</a></span>(boolean&nbsp;value)</code>
 <div class="block">Set if the Server is Enabled</div>
 </td>
 </tr>
-<tr id="i12" class="altColor">
+<tr id="i13" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/Internal/InternalSubServer.html#setLogging-boolean-">setLogging</a></span>(boolean&nbsp;value)</code>
 <div class="block">Set if the Server is Logging</div>
 </td>
 </tr>
-<tr id="i13" class="rowColor">
+<tr id="i14" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/Internal/InternalSubServer.html#setStopCommand-java.lang.String-">setStopCommand</a></span>(java.lang.String&nbsp;value)</code>
 <div class="block">Set the Command that Stops the Server</div>
 </td>
 </tr>
-<tr id="i14" class="altColor">
+<tr id="i15" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/Internal/InternalSubServer.html#setTemporary-boolean-">setTemporary</a></span>(boolean&nbsp;value)</code>
 <div class="block">Set If the Server is Temporary (will start server if not running)</div>
 </td>
 </tr>
-<tr id="i15" class="rowColor">
+<tr id="i16" class="altColor">
 <td class="colFirst"><code>boolean</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/Internal/InternalSubServer.html#start-java.util.UUID-">start</a></span>(java.util.UUID&nbsp;player)</code>
 <div class="block">Starts the Server</div>
 </td>
 </tr>
-<tr id="i16" class="altColor">
+<tr id="i17" class="rowColor">
 <td class="colFirst"><code>boolean</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/Internal/InternalSubServer.html#stop-java.util.UUID-">stop</a></span>(java.util.UUID&nbsp;player)</code>
 <div class="block">Stops the Server</div>
 </td>
 </tr>
-<tr id="i17" class="rowColor">
+<tr id="i18" class="altColor">
 <td class="colFirst"><code>boolean</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/Internal/InternalSubServer.html#terminate-java.util.UUID-">terminate</a></span>(java.util.UUID&nbsp;player)</code>
 <div class="block">Terminates the Server</div>
 </td>
 </tr>
-<tr id="i18" class="altColor">
+<tr id="i19" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/Internal/InternalSubServer.html#waitFor--">waitFor</a></span>()</code>
 <div class="block">Waits for the Server to Stop</div>
 </td>
 </tr>
-<tr id="i19" class="rowColor">
+<tr id="i20" class="altColor">
 <td class="colFirst"><code>boolean</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/Internal/InternalSubServer.html#willAutoRestart--">willAutoRestart</a></span>()</code>
 <div class="block">If the Server will Auto Restart on unexpected shutdowns</div>
@@ -328,7 +334,7 @@ extends <a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubServer.h
 <!--   -->
 </a>
 <h3>Methods inherited from class&nbsp;net.ME1312.SubServers.Bungee.Host.<a href="../../../../../../net/ME1312/SubServers/Bungee/Host/Server.html" title="class in net.ME1312.SubServers.Bungee.Host">Server</a></h3>
-<code><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/Server.html#addExtra-java.lang.String-java.lang.Object-">addExtra</a>, <a href="../../../../../../net/ME1312/SubServers/Bungee/Host/Server.html#getExtra--">getExtra</a>, <a href="../../../../../../net/ME1312/SubServers/Bungee/Host/Server.html#getExtra-java.lang.String-">getExtra</a>, <a href="../../../../../../net/ME1312/SubServers/Bungee/Host/Server.html#getMotd--">getMotd</a>, <a href="../../../../../../net/ME1312/SubServers/Bungee/Host/Server.html#getSubDataClient--">getSubDataClient</a>, <a href="../../../../../../net/ME1312/SubServers/Bungee/Host/Server.html#hasExtra-java.lang.String-">hasExtra</a>, <a href="../../../../../../net/ME1312/SubServers/Bungee/Host/Server.html#isHidden--">isHidden</a>, <a href="../../../../../../net/ME1312/SubServers/Bungee/Host/Server.html#isRestricted--">isRestricted</a>, <a href="../../../../../../net/ME1312/SubServers/Bungee/Host/Server.html#linkSubDataClient-net.ME1312.SubServers.Bungee.Network.Client-">linkSubDataClient</a>, <a href="../../../../../../net/ME1312/SubServers/Bungee/Host/Server.html#removeExtra-java.lang.String-">removeExtra</a>, <a href="../../../../../../net/ME1312/SubServers/Bungee/Host/Server.html#setHidden-boolean-">setHidden</a>, <a href="../../../../../../net/ME1312/SubServers/Bungee/Host/Server.html#setMotd-java.lang.String-">setMotd</a>, <a href="../../../../../../net/ME1312/SubServers/Bungee/Host/Server.html#setRestricted-boolean-">setRestricted</a></code></li>
+<code><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/Server.html#addExtra-java.lang.String-java.lang.Object-">addExtra</a>, <a href="../../../../../../net/ME1312/SubServers/Bungee/Host/Server.html#getDisplayName--">getDisplayName</a>, <a href="../../../../../../net/ME1312/SubServers/Bungee/Host/Server.html#getExtra--">getExtra</a>, <a href="../../../../../../net/ME1312/SubServers/Bungee/Host/Server.html#getExtra-java.lang.String-">getExtra</a>, <a href="../../../../../../net/ME1312/SubServers/Bungee/Host/Server.html#getMotd--">getMotd</a>, <a href="../../../../../../net/ME1312/SubServers/Bungee/Host/Server.html#getSubDataClient--">getSubDataClient</a>, <a href="../../../../../../net/ME1312/SubServers/Bungee/Host/Server.html#hasExtra-java.lang.String-">hasExtra</a>, <a href="../../../../../../net/ME1312/SubServers/Bungee/Host/Server.html#isHidden--">isHidden</a>, <a href="../../../../../../net/ME1312/SubServers/Bungee/Host/Server.html#isRestricted--">isRestricted</a>, <a href="../../../../../../net/ME1312/SubServers/Bungee/Host/Server.html#linkSubDataClient-net.ME1312.SubServers.Bungee.Network.Client-">linkSubDataClient</a>, <a href="../../../../../../net/ME1312/SubServers/Bungee/Host/Server.html#removeExtra-java.lang.String-">removeExtra</a>, <a href="../../../../../../net/ME1312/SubServers/Bungee/Host/Server.html#setHidden-boolean-">setHidden</a>, <a href="../../../../../../net/ME1312/SubServers/Bungee/Host/Server.html#setMotd-java.lang.String-">setMotd</a>, <a href="../../../../../../net/ME1312/SubServers/Bungee/Host/Server.html#setRestricted-boolean-">setRestricted</a></code></li>
 </ul>
 <ul class="blockList">
 <li class="blockList"><a name="methods.inherited.from.class.net.md_5.bungee.BungeeServerInfo">
@@ -519,6 +525,23 @@ extends <a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubServer.h
 <dd><code><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubServer.html#isRunning--">isRunning</a></code>&nbsp;in class&nbsp;<code><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubServer.html" title="class in net.ME1312.SubServers.Bungee.Host">SubServer</a></code></dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>Running Status</dd>
+</dl>
+</li>
+</ul>
+<a name="setDisplayName-java.lang.String-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>setDisplayName</h4>
+<pre>public&nbsp;void&nbsp;setDisplayName(java.lang.String&nbsp;value)</pre>
+<div class="block"><span class="descfrmTypeLabel">Description copied from class:&nbsp;<code><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/Server.html#setDisplayName-java.lang.String-">Server</a></code></span></div>
+<div class="block">Sets the Display Name for this Server</div>
+<dl>
+<dt><span class="overrideSpecifyLabel">Overrides:</span></dt>
+<dd><code><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/Server.html#setDisplayName-java.lang.String-">setDisplayName</a></code>&nbsp;in class&nbsp;<code><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/Server.html" title="class in net.ME1312.SubServers.Bungee.Host">Server</a></code></dd>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>value</code> - Value (or null to reset)</dd>
 </dl>
 </li>
 </ul>

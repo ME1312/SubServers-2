@@ -1,6 +1,7 @@
 package net.ME1312.SubServers.Client.Bukkit.Library;
 
 import java.io.*;
+import java.util.Random;
 
 /**
  * SubServers Utility Class
@@ -66,8 +67,10 @@ public final class Util {
         }
     }
 
+
+
     /**
-     * Delete Directory
+     * Delete a Directory
      *
      * @param folder Location
      */
@@ -83,6 +86,67 @@ public final class Util {
             }
         }
         folder.delete();
+    }
+
+    /**
+     * Copy a Directory
+     *
+     * @param from Source
+     * @param to Destination
+     */
+    public static void copyDirectory(File from, File to) {
+        if (from.isDirectory()) {
+            if (!to.exists()) {
+                to.mkdirs();
+            }
+
+            String files[] = from.list();
+
+            for (String file : files) {
+                File srcFile = new File(from, file);
+                File destFile = new File(to, file);
+
+                copyDirectory(srcFile, destFile);
+            }
+        } else {
+            InputStream in = null;
+            OutputStream out = null;
+
+            try {
+                in = new FileInputStream(from);
+                out = new FileOutputStream(to);
+
+                byte[] buffer = new byte[1024];
+
+                int length;
+                while ((length = in.read(buffer)) > 0) {
+                    out.write(buffer, 0, length);
+                }
+            } catch (Exception e) {
+                try {
+                    if (in != null) in.close();
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
+
+                try {
+                    if (out != null) out.close();
+                } catch (IOException e2) {
+                    e2.printStackTrace();
+                }
+            }
+        }
+    }
+
+    /**
+     * Get a Random Integer
+     *
+     * @param min Minimum Value
+     * @param max Maximum Value
+     * @return Random Integer
+     */
+    public static int random(int min, int max) {
+        return new Random().nextInt((max - min) + 1) + min;
     }
 
     /**

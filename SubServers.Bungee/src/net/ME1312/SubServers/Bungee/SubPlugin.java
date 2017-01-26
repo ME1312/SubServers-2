@@ -3,11 +3,11 @@ package net.ME1312.SubServers.Bungee;
 import net.ME1312.SubServers.Bungee.Host.Executable;
 import net.ME1312.SubServers.Bungee.Host.Server;
 import net.ME1312.SubServers.Bungee.Library.Config.YAMLConfig;
-import net.ME1312.SubServers.Bungee.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Bungee.Library.Exception.InvalidHostException;
 import net.ME1312.SubServers.Bungee.Library.Exception.InvalidServerException;
 import net.ME1312.SubServers.Bungee.Host.Host;
 import net.ME1312.SubServers.Bungee.Host.SubServer;
+import net.ME1312.SubServers.Bungee.Library.NamedContainer;
 import net.ME1312.SubServers.Bungee.Library.UniversalFile;
 import net.ME1312.SubServers.Bungee.Library.Util;
 import net.ME1312.SubServers.Bungee.Library.Version.Version;
@@ -18,7 +18,6 @@ import org.json.JSONObject;
 
 import java.io.*;
 import java.net.InetAddress;
-import java.net.InetSocketAddress;
 import java.net.SocketException;
 import java.nio.file.Files;
 import java.util.*;
@@ -235,7 +234,22 @@ public final class SubPlugin extends BungeeCord {
                 }
             }
 
-            System.out.println("SubServers > " + hosts + " Host(s), " + servers + " Server(s), and " + subservers + " SubServer(s) loaded in " + (Calendar.getInstance().getTime().getTime() - begin) + "ms");
+            int plugins = 0;
+            if (api.listeners.size() > 0) {
+                System.out.println("SubServers > Loading SubAPI Plugins...");
+                for (NamedContainer<Runnable, Runnable> listener : api.listeners) {
+                    try {
+                        if (listener.name() != null) {
+                            listener.name().run();
+                            plugins++;
+                        }
+                    } catch (Throwable e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+            System.out.println("SubServers > " + ((plugins > 0)?plugins + " Plugin(s), ":"") + hosts + " Host(s), " + servers + " Server(s), and " + subservers + " SubServer(s) loaded in " + (Calendar.getInstance().getTime().getTime() - begin) + "ms");
 
             super.startListeners();
         } catch (IOException e) {
@@ -283,6 +297,16 @@ public final class SubPlugin extends BungeeCord {
     @Override
     public void stopListeners() {
         try {
+            if (api.listeners.size() > 0) {
+                System.out.println("SubServers > Resetting SubAPI Plugins...");
+                for (NamedContainer<Runnable, Runnable> listener : api.listeners) {
+                    try {
+                        if (listener.get() != null) listener.get().run();
+                    } catch (Throwable e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
             running = false;
             System.out.println("SubServers > Resetting Hosts and Server Data");
             List<String> hosts = new ArrayList<String>();

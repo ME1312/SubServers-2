@@ -89,7 +89,7 @@ public abstract class UIRenderer {
      * @return Success Status
      */
     public boolean sendTitle(String str, int fadein, int stay, int fadeout) {
-        if (Bukkit.getPluginManager().getPlugin("TitleManager") != null && plugin.pluginconf.get().getSection("Settings").getBoolean("Use-Title-Messages", true)) {
+        if (Bukkit.getPluginManager().getPlugin("TitleManager") != null && plugin.config.get().getSection("Settings").getBoolean("Use-Title-Messages", true)) {
             String line1, line2;
             if (!str.startsWith("\n") && str.contains("\n")) {
                 line1 = str.split("\\n")[0];
@@ -119,7 +119,7 @@ public abstract class UIRenderer {
      * @param subtitle Subtitle to display (or null to hide)
      */
     public void setDownloading(String subtitle) {
-        if (subtitle != null && !(Bukkit.getPluginManager().getPlugin("TitleManager") != null && plugin.pluginconf.get().getSection("Settings").getBoolean("Use-Title-Messages", true))) {
+        if (subtitle != null && !(Bukkit.getPluginManager().getPlugin("TitleManager") != null && plugin.config.get().getSection("Settings").getBoolean("Use-Title-Messages", true))) {
             Bukkit.getPlayer(player).sendMessage(plugin.lang.getSection("Lang").getColoredString("Interface.Generic.Downloading", '&').replace("$str$", subtitle));
         } if (subtitle != null && downloading == null) {
             downloading = new NamedContainer<String, Integer>(subtitle, 0);

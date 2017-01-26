@@ -19,7 +19,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 
-public class ConsolePlugin extends Plugin implements Listener {
+public final class ConsolePlugin extends Plugin implements Listener {
     public HashMap<String, ConsoleWindow> cCurrent = new HashMap<String, ConsoleWindow>();
     public HashMap<String, ConsoleWindow> sCurrent = new HashMap<String, ConsoleWindow>();
     public YAMLConfig config;

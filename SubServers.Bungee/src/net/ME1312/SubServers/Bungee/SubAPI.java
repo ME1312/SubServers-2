@@ -4,21 +4,20 @@ import net.ME1312.SubServers.Bungee.Event.SubAddServerEvent;
 import net.ME1312.SubServers.Bungee.Host.Server;
 import net.ME1312.SubServers.Bungee.Host.Host;
 import net.ME1312.SubServers.Bungee.Host.SubServer;
+import net.ME1312.SubServers.Bungee.Library.NamedContainer;
 import net.ME1312.SubServers.Bungee.Library.UniversalFile;
 import net.ME1312.SubServers.Bungee.Library.Version.Version;
 import net.ME1312.SubServers.Bungee.Network.SubDataServer;
 
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.TreeMap;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * SubAPI Class
  */
 public final class SubAPI {
+    LinkedList<NamedContainer<Runnable, Runnable>> listeners = new LinkedList<NamedContainer<Runnable, Runnable>>();
     private SubPlugin plugin;
     private static SubAPI api;
 
@@ -45,6 +44,16 @@ public final class SubAPI {
     @Deprecated
     public SubPlugin getInternals() {
         return plugin;
+    }
+
+    /**
+     * Adds a SubAPI Listener
+     *
+     * @param enable An Event that will be called when SubAPI is ready
+     * @param disable An Event that will be called before SubAPI is disabled
+     */
+    public void addListener(Runnable enable, Runnable disable) {
+        listeners.add(new NamedContainer<Runnable, Runnable>(enable, disable));
     }
 
     /**

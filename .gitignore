@@ -28,6 +28,8 @@ crashlytics-build.properties
 # Hide Unfinished Project Files
 /Artifacts/SubServers.Host.jar
 /SubServers.Host/
+/Artifacts/SubServers.Test.jar
+/SubServers.Test/
 
 # Hide Others
 /build.ant

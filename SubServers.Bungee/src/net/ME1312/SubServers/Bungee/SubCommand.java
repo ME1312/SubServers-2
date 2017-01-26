@@ -56,10 +56,12 @@ public final class SubCommand extends Command implements TabExecutor {
                 } else if (args[0].equalsIgnoreCase("list")) {
                     List<String> hosts = new ArrayList<String>();
                     for (Host host : plugin.hosts.values())  {
-                        hosts.add(host.getName());
+                        hosts.add(host.getDisplayName() + ((host.getName().equals(host.getDisplayName()))?"":" (" + host.getName() + ')'));
                     }
                     List<String> servers = new ArrayList<String>();
-                    servers.addAll(plugin.getServers().keySet());
+                    for (Server server : plugin.api.getServers().values()) {
+                        servers.add(server.getDisplayName() + ((server.getName().equals(server.getDisplayName()))?"":" (" + server.getName() + ')'));
+                    }
                     sender.sendMessages(
                             "SubServers > Host List:", hosts.toString().substring(1, hosts.toString().length() - 1),
                             "SubServers > Server List:", servers.toString().substring(1, servers.toString().length() - 1));
@@ -379,7 +381,7 @@ public final class SubCommand extends Command implements TabExecutor {
                     for (Server server : plugin.api.getServers().values()) {
                         if (!server.isHidden() && (!(server instanceof SubServer) || ((SubServer) server).isRunning())) {
                             if (i != 0) serverm.addExtra(div);
-                            TextComponent message = new TextComponent(plugin.lang.get().getSection("Lang").getColoredString("Bungee.Server.List", '&').replace("$str$", server.getName()));
+                            TextComponent message = new TextComponent(plugin.lang.get().getSection("Lang").getColoredString("Bungee.Server.List", '&').replace("$str$", server.getDisplayName()));
                             message.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[]{new TextComponent(plugin.lang.get().getSection("Lang").getColoredString("Bungee.Server.Hover", '&').replace("$int$", Integer.toString(server.getPlayers().size())))}));
                             message.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/server " + server.getName()));
                             serverm.addExtra(message);
@@ -447,7 +449,7 @@ public final class SubCommand extends Command implements TabExecutor {
                 players += server.getPlayers().size();
                 if (!server.isHidden() && (!(server instanceof SubServer) || ((SubServer) server).isRunning())) {
                     int i = 0;
-                    String message = plugin.lang.get().getSection("Lang").getColoredString("Bungee.List.Format", '&').replace("$str$", server.getName()).replace("$int$", Integer.toString(server.getPlayers().size()));
+                    String message = plugin.lang.get().getSection("Lang").getColoredString("Bungee.List.Format", '&').replace("$str$", server.getDisplayName()).replace("$int$", Integer.toString(server.getPlayers().size()));
                     for (ProxiedPlayer player : server.getPlayers()) {
                         if (i != 0) message += plugin.lang.get().getSection("Lang").getColoredString("Bungee.List.Divider", '&');
                         message += plugin.lang.get().getSection("Lang").getColoredString("Bungee.List.List", '&').replace("$str$", player.getName());

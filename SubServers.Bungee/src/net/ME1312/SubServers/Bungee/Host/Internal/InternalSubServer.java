@@ -110,12 +110,16 @@ public class InternalSubServer extends SubServer {
             }
         } else {
             if (willAutoRestart() && allowrestart) {
-                try {
-                    Thread.sleep(2500);
-                    start();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+                new Thread(() -> {
+                    try {
+                        while (thread != null && thread.isAlive()) {
+                            Thread.sleep(250);
+                        }
+                        start();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }).start();
             }
         }
     }
@@ -201,6 +205,12 @@ public class InternalSubServer extends SubServer {
     @Override
     public boolean isRunning() {
         return process != null && process.isAlive();
+    }
+
+    @Override
+    public void setDisplayName(String value) {
+        super.setDisplayName(value);
+        logger.name = getDisplayName();
     }
 
     @Override

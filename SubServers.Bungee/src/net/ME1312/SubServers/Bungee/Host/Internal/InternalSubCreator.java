@@ -264,6 +264,7 @@ public class InternalSubCreator extends SubCreator {
             YAMLConfig config = new YAMLConfig(new UniversalFile(dir, "plugins:Subservers:config.yml"));
             YAMLSection settings = new YAMLSection();
             settings.set("Version", "2.11.2a+");
+            settings.set("Ingame-Access", true);
             settings.set("Use-Title-Messages", true);
             YAMLSection subdata = new YAMLSection();
             subdata.set("Name", name);

@@ -18,6 +18,7 @@ import java.util.UUID;
  */
 public abstract class Host implements ExtraDataHandler {
     private YAMLSection extra = new YAMLSection();
+    private String nick = null;
 
     /**
      * This constructor is required to launch your host from the drivers list. Do not add or remove any arguments.
@@ -67,6 +68,24 @@ public abstract class Host implements ExtraDataHandler {
      * @return Host Name
      */
     public abstract String getName();
+
+    /**
+     * Get the Display Name of this Host
+     *
+     * @return Display Name
+     */
+    public String getDisplayName() {
+        return (nick == null)?getName():nick;
+    }
+
+    /**
+     * Sets the Display Name for this Host
+     *
+     * @param value Value (or null to reset)
+     */
+    public void setDisplayName(String value) {
+        this.nick = value;
+    }
 
     /**
      * Starts the Servers Specified

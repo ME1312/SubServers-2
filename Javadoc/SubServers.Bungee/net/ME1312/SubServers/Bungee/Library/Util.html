@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":9,"i1":9,"i2":9,"i3":9,"i4":9};
+var methods = {"i0":9,"i1":9,"i2":9,"i3":9,"i4":9,"i5":9,"i6":9};
 var tabs = {65535:["t0","All Methods"],1:["t1","Static Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -149,31 +149,45 @@ extends java.lang.Object</pre>
 </tr>
 <tr id="i0" class="altColor">
 <td class="colFirst"><code>static void</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Library/Util.html#copyDirectory-java.io.File-java.io.File-">copyDirectory</a></span>(java.io.File&nbsp;from,
+             java.io.File&nbsp;to)</code>
+<div class="block">Copy a Directory</div>
+</td>
+</tr>
+<tr id="i1" class="rowColor">
+<td class="colFirst"><code>static void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Library/Util.html#copyFromJar-java.lang.ClassLoader-java.lang.String-java.lang.String-">copyFromJar</a></span>(java.lang.ClassLoader&nbsp;loader,
            java.lang.String&nbsp;resource,
            java.lang.String&nbsp;destination)</code>
 <div class="block">Copy from the Class Loader</div>
 </td>
 </tr>
-<tr id="i1" class="rowColor">
+<tr id="i2" class="altColor">
 <td class="colFirst"><code>static void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Library/Util.html#deleteDirectory-java.io.File-">deleteDirectory</a></span>(java.io.File&nbsp;folder)</code>
 <div class="block">Delete Directory</div>
 </td>
 </tr>
-<tr id="i2" class="altColor">
+<tr id="i3" class="rowColor">
 <td class="colFirst"><code>static boolean</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Library/Util.html#isException-net.ME1312.SubServers.Bungee.Library.Util.ExceptionRunnable-">isException</a></span>(<a href="../../../../../net/ME1312/SubServers/Bungee/Library/Util.ExceptionRunnable.html" title="interface in net.ME1312.SubServers.Bungee.Library">Util.ExceptionRunnable</a>&nbsp;runnable)</code>
 <div class="block">Determines if an Exception will occur</div>
 </td>
 </tr>
-<tr id="i3" class="rowColor">
+<tr id="i4" class="altColor">
+<td class="colFirst"><code>static int</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Library/Util.html#random-int-int-">random</a></span>(int&nbsp;min,
+      int&nbsp;max)</code>
+<div class="block">Get a Random Integer</div>
+</td>
+</tr>
+<tr id="i5" class="rowColor">
 <td class="colFirst"><code>static java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Library/Util.html#readAll-java.io.Reader-">readAll</a></span>(java.io.Reader&nbsp;rd)</code>
 <div class="block">Read Everything from Reader</div>
 </td>
 </tr>
-<tr id="i4" class="altColor">
+<tr id="i6" class="altColor">
 <td class="colFirst"><code>static java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Library/Util.html#unescapeJavaString-java.lang.String-">unescapeJavaString</a></span>(java.lang.String&nbsp;str)</code>
 <div class="block">Parse escapes in a Java String</div>
@@ -265,6 +279,40 @@ extends java.lang.Object</pre>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>folder</code> - Location</dd>
+</dl>
+</li>
+</ul>
+<a name="copyDirectory-java.io.File-java.io.File-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>copyDirectory</h4>
+<pre>public static&nbsp;void&nbsp;copyDirectory(java.io.File&nbsp;from,
+                                 java.io.File&nbsp;to)</pre>
+<div class="block">Copy a Directory</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>from</code> - Source</dd>
+<dd><code>to</code> - Destination</dd>
+</dl>
+</li>
+</ul>
+<a name="random-int-int-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>random</h4>
+<pre>public static&nbsp;int&nbsp;random(int&nbsp;min,
+                         int&nbsp;max)</pre>
+<div class="block">Get a Random Integer</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>min</code> - Minimum Value</dd>
+<dd><code>max</code> - Maximum Value</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>Random Integer</dd>
 </dl>
 </li>
 </ul>

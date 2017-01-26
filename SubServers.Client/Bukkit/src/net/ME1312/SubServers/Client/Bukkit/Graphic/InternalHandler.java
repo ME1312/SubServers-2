@@ -76,7 +76,13 @@ public class InternalHandler implements UIHandler, Listener {
                             gui.subserverMenu(1, null);
                         } else if (!item.equals(ChatColor.RESET.toString()) && !item.equals(plugin.lang.getSection("Lang").getColoredString("Interface.Host-Menu.No-Hosts", '&'))) {
                             player.closeInventory();
-                            gui.hostAdmin(ChatColor.stripColor(item));
+                            String obj;
+                            if (event.getCurrentItem().getItemMeta().getLore().size() > 0 && event.getCurrentItem().getItemMeta().getLore() != null && event.getCurrentItem().getItemMeta().getLore().get(0).startsWith(ChatColor.GRAY.toString())) {
+                                obj = ChatColor.stripColor(event.getCurrentItem().getItemMeta().getLore().get(0));
+                            } else {
+                                obj = ChatColor.stripColor(item);
+                            }
+                            gui.hostAdmin(obj);
                         }
                     }
                 } else if (event.getClickedInventory().getTitle().startsWith(plugin.lang.getSection("Lang").getColoredString("Interface.Host-Creator.Title", '&').split("\\$str\\$")[0]) && // Host Creator
@@ -205,14 +211,22 @@ public class InternalHandler implements UIHandler, Listener {
                             gui.back();
                         } else {
                             player.closeInventory();
-                            Renderer plugin = null;
+                            final Container<Renderer> plugin = new Container<Renderer>(null);
                             for (Renderer renderer : InternalRenderer.hostPlugins.values()) {
-                                if (item.equals(renderer.getIcon().getItemMeta().getDisplayName())) plugin = renderer;
+                                if (item.equals(renderer.getIcon().getItemMeta().getDisplayName())) plugin.set(renderer);
                             }
-                            if (plugin == null) {
+                            if (plugin.get() == null) {
                                 gui.reopen();
                             } else {
-                                plugin.open(player, gui.lastVistedObject);
+                                gui.setDownloading(ChatColor.stripColor(this.plugin.lang.getSection("Lang").getColoredString("Interface.Host-Plugin.Title", '&').replace("$str$", gui.lastVistedObject)));
+                                this.plugin.subdata.sendPacket(new PacketDownloadHostInfo(gui.lastVistedObject, UUID.randomUUID().toString(), (json) -> {
+                                    if (json.getBoolean("valid")) {
+                                        gui.setDownloading(null);
+                                        plugin.get().open(player, json.getJSONObject("host"));
+                                    } else {
+                                        gui.back();
+                                    }
+                                }));
                             }
                         }
                     }
@@ -237,7 +251,13 @@ public class InternalHandler implements UIHandler, Listener {
                             gui.back();
                         } else if (!item.equals(ChatColor.RESET.toString()) && !item.equals(plugin.lang.getSection("Lang").getColoredString("Interface.SubServer-Menu.No-SubServers", '&'))) {
                             player.closeInventory();
-                            gui.subserverAdmin(ChatColor.stripColor(item));
+                            String obj;
+                            if (event.getCurrentItem().getItemMeta().getLore().size() > 0 && event.getCurrentItem().getItemMeta().getLore() != null && event.getCurrentItem().getItemMeta().getLore().get(0).startsWith(ChatColor.GRAY.toString())) {
+                                obj = ChatColor.stripColor(event.getCurrentItem().getItemMeta().getLore().get(0));
+                            } else {
+                                obj = ChatColor.stripColor(item);
+                            }
+                            gui.subserverAdmin(obj);
                         }
                     }
                 } else if (event.getClickedInventory().getTitle().startsWith(plugin.lang.getSection("Lang").getColoredString("Interface.Host-Admin.Title", '&').split("\\$str\\$")[0]) && // Host Admin
@@ -361,14 +381,22 @@ public class InternalHandler implements UIHandler, Listener {
                             gui.back();
                         } else {
                             player.closeInventory();
-                            Renderer plugin = null;
+                            Container<Renderer> plugin = new Container<Renderer>(null);
                             for (Renderer renderer : InternalRenderer.subserverPlugins.values()) {
-                                if (item.equals(renderer.getIcon().getItemMeta().getDisplayName())) plugin = renderer;
+                                if (item.equals(renderer.getIcon().getItemMeta().getDisplayName())) plugin.set(renderer);
                             }
-                            if (plugin == null) {
+                            if (plugin.get() == null) {
                                 gui.reopen();
                             } else {
-                                plugin.open(player, gui.lastVistedObject);
+                                gui.setDownloading(ChatColor.stripColor(this.plugin.lang.getSection("Lang").getColoredString("Interface.SubServer-Plugin.Title", '&').replace("$str$", gui.lastVistedObject)));
+                                this.plugin.subdata.sendPacket(new PacketDownloadServerInfo(gui.lastVistedObject, UUID.randomUUID().toString(), json -> {
+                                    if (json.getString("type").equals("subserver")) {
+                                        gui.setDownloading(null);
+                                        plugin.get().open(player, json.getJSONObject("server"));
+                                    } else {
+                                        gui.back();
+                                    }
+                                }));
                             }
                         }
                     }

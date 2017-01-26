@@ -19,7 +19,7 @@ import java.nio.file.Files;
  * SubServers Client Plugin Class
  */
 public final class SubPlugin extends JavaPlugin {
-    public YAMLConfig pluginconf;
+    public YAMLConfig config;
     public YAMLSection lang = null;
     public SubDataClient subdata = null;
 
@@ -50,16 +50,18 @@ public final class SubPlugin extends JavaPlugin {
                 Util.copyFromJar(SubPlugin.class.getClassLoader(), "config.yml", new UniversalFile(getDataFolder(), "config.yml").getPath());
                 Bukkit.getLogger().info("SubServers > Updated ~/plugins/SubServers/config.yml");
             }
-            pluginconf = new YAMLConfig(new UniversalFile(getDataFolder(), "config.yml"));
-            subdata = new SubDataClient(this, pluginconf.get().getSection("Settings").getSection("SubData").getString("Name", "undefined"),
-                    InetAddress.getByName(pluginconf.get().getSection("Settings").getSection("SubData").getString("Address", "127.0.0.1:4391").split(":")[0]),
-                    Integer.parseInt(pluginconf.get().getSection("Settings").getSection("SubData").getString("Address", "127.0.0.1:4391").split(":")[1]));
+            config = new YAMLConfig(new UniversalFile(getDataFolder(), "config.yml"));
+            subdata = new SubDataClient(this, config.get().getSection("Settings").getSection("SubData").getString("Name", "undefined"),
+                    InetAddress.getByName(config.get().getSection("Settings").getSection("SubData").getString("Address", "127.0.0.1:4391").split(":")[0]),
+                    Integer.parseInt(config.get().getSection("Settings").getSection("SubData").getString("Address", "127.0.0.1:4391").split(":")[1]));
 
-            gui = new InternalHandler(this);
-            SubCommand cmd = new SubCommand(this);
-            getCommand("subservers").setExecutor(cmd);
-            getCommand("subserver").setExecutor(cmd);
-            getCommand("sub").setExecutor(cmd);
+            if (config.get().getSection("Settings").getBoolean("Ingame-Access", true)) {
+                gui = new InternalHandler(this);
+                SubCommand cmd = new SubCommand(this);
+                getCommand("subservers").setExecutor(cmd);
+                getCommand("subserver").setExecutor(cmd);
+                getCommand("sub").setExecutor(cmd);
+            }
         } catch (IOException e) {
             setEnabled(false);
             e.printStackTrace();

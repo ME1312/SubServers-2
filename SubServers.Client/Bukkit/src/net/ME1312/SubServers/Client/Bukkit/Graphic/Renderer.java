@@ -2,6 +2,7 @@ package net.ME1312.SubServers.Client.Bukkit.Graphic;
 
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.json.JSONObject;
 
 /**
  * GUI Renderer Layout Class
@@ -12,9 +13,9 @@ public interface Renderer {
      * Open the GUI
      *
      * @param player Player Opening
-     * @param object Object Name
+     * @param object JSON Representation of an Object
      */
-    void open(Player player, String object);
+    void open(Player player, JSONObject object);
 
     /**
      * Get Renderer Icon
@@ -26,8 +27,8 @@ public interface Renderer {
     /**
      * Check if this Renderer is enabled for this Object
      *
-     * @param object Object Name
+     * @param object JSON Representation of an Object
      * @return Enabled Status
      */
-    boolean isEnabled(String object);
+    boolean isEnabled(JSONObject object);
 }
