@@ -8,6 +8,7 @@ import net.ME1312.SubServers.Bungee.Host.SubServer;
 import net.ME1312.SubServers.Bungee.Library.UniversalFile;
 import net.ME1312.SubServers.Bungee.Library.Util;
 import net.ME1312.SubServers.Bungee.Library.Version.Version;
+import net.ME1312.SubServers.Bungee.Library.Config.YAMLConfig;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -53,6 +54,9 @@ public final class SubCommand extends Command implements TabExecutor {
                     sender.sendMessages(printHelp());
                 } else if (args[0].equalsIgnoreCase("version") || args[0].equalsIgnoreCase("ver")) {
                     sender.sendMessage("SubServers > SubServers.Bungee is running version " + plugin.version.toString() + ((plugin.bversion != null)?" BETA "+plugin.bversion.toString():""));
+                } else if (args[0].equalsIgnoreCase("reload")) {
+                    sender.sendMessage("SubServers > Reloading Config..."));
+                    YAMLConfig.reload(); //I'm not good at java, please check code :)
                 } else if (args[0].equalsIgnoreCase("list")) {
                     List<String> hosts = new ArrayList<String>();
                     for (Host host : plugin.hosts.values())  {
