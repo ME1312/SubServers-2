@@ -2,6 +2,7 @@ package net.ME1312.SubServers.Bungee.Host;
 
 import net.ME1312.SubServers.Bungee.Library.Exception.InvalidServerException;
 import net.ME1312.SubServers.Bungee.Library.NamedContainer;
+import net.ME1312.SubServers.Bungee.Library.Util;
 
 import java.net.InetSocketAddress;
 import java.util.Calendar;
@@ -28,6 +29,7 @@ public abstract class SubServer extends Server {
          * @param command Command
          */
         public LoggedCommand(String command) {
+            if (Util.isNull(command)) throw new NullPointerException();
             this.date = Calendar.getInstance().getTime();
             this.sender = null;
             this.command = command;
@@ -40,6 +42,7 @@ public abstract class SubServer extends Server {
          * @param command Command
          */
         public LoggedCommand(UUID sender, String command) {
+            if (Util.isNull(command)) throw new NullPointerException();
             this.date = Calendar.getInstance().getTime();
             this.sender = sender;
             this.command = command;
@@ -53,7 +56,8 @@ public abstract class SubServer extends Server {
          * @param command Command
          */
         public LoggedCommand(Date date, UUID sender, String command) {
-            this.date = Calendar.getInstance().getTime();
+            if (Util.isNull(date, command)) throw new NullPointerException();
+            this.date = date;
             this.sender = sender;
             this.command = command;
         }

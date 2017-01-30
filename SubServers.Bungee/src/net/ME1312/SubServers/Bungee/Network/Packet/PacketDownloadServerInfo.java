@@ -2,6 +2,7 @@ package net.ME1312.SubServers.Bungee.Network.Packet;
 
 import net.ME1312.SubServers.Bungee.Host.Server;
 import net.ME1312.SubServers.Bungee.Host.SubServer;
+import net.ME1312.SubServers.Bungee.Library.Util;
 import net.ME1312.SubServers.Bungee.Library.Version.Version;
 import net.ME1312.SubServers.Bungee.Network.Client;
 import net.ME1312.SubServers.Bungee.Network.PacketIn;
@@ -24,6 +25,7 @@ public class PacketDownloadServerInfo implements PacketIn, PacketOut {
      * @param plugin SubPlugin
      */
     public PacketDownloadServerInfo(SubPlugin plugin) {
+        if (Util.isNull(plugin)) throw new NullPointerException();
         this.plugin = plugin;
     }
 
@@ -35,6 +37,7 @@ public class PacketDownloadServerInfo implements PacketIn, PacketOut {
      * @param id Receiver ID
      */
     public PacketDownloadServerInfo(SubPlugin plugin, Server server, String id) {
+        if (Util.isNull(plugin, server)) throw new NullPointerException();
         this.plugin = plugin;
         this.server = server;
         this.id = id;

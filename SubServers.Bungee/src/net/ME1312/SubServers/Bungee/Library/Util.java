@@ -13,6 +13,20 @@ public final class Util {
     }
 
     /**
+     * Checks values to make sure they're not null
+     *
+     * @param values Values to check
+     * @return If any are null
+     */
+    public static boolean isNull(Object... values) {
+        boolean ret = false;
+        for (Object value : values) {
+            if (value == null) ret = true;
+        }
+        return ret;
+    }
+
+    /**
      * Read Everything from Reader
      *
      * @param rd Reader

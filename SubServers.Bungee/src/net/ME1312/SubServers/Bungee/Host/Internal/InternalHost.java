@@ -8,6 +8,7 @@ import net.ME1312.SubServers.Bungee.Host.Host;
 import net.ME1312.SubServers.Bungee.Host.SubCreator;
 import net.ME1312.SubServers.Bungee.Host.SubServer;
 import net.ME1312.SubServers.Bungee.Library.NamedContainer;
+import net.ME1312.SubServers.Bungee.Library.Util;
 import net.ME1312.SubServers.Bungee.SubPlugin;
 
 import java.net.InetAddress;
@@ -24,7 +25,7 @@ public class InternalHost extends Host {
     private String name;
     private boolean enabled;
     private InetAddress address;
-    private InternalSubCreator creator;
+    private SubCreator creator;
     private String directory;
     protected SubPlugin plugin;
 
@@ -40,6 +41,7 @@ public class InternalHost extends Host {
      */
     public InternalHost(SubPlugin plugin, String name, Boolean enabled, InetAddress address, String directory, String gitBash) {
         super(plugin, name, enabled, address, directory, gitBash);
+        if (Util.isNull(plugin, name, enabled, address, directory, gitBash)) throw new NullPointerException();
         this.plugin = plugin;
         this.name = name;
         this.enabled = enabled;
@@ -74,42 +76,6 @@ public class InternalHost extends Host {
     }
 
     @Override
-    public int start(UUID player, String... servers) {
-        int i = 0;
-        for (String server : servers) {
-            if (getSubServer(server.toLowerCase()).start(player)) i++;
-        }
-        return i;
-    }
-
-    @Override
-    public int stop(UUID player, String... servers) {
-        int i = 0;
-        for (String server : servers) {
-            if (getSubServer(server.toLowerCase()).stop(player)) i++;
-        }
-        return i;
-    }
-
-    @Override
-    public int terminate(UUID player, String... servers) {
-        int i = 0;
-        for (String server : servers) {
-            if (getSubServer(server.toLowerCase()).terminate(player)) i++;
-        }
-        return i;
-    }
-
-    @Override
-    public int command(UUID player, String command, String... servers) {
-        int i = 0;
-        for (String server : servers) {
-            if (getSubServer(server.toLowerCase()).command(player, command)) i++;
-        }
-        return i;
-    }
-
-    @Override
     public SubCreator getCreator() {
         return creator;
     }
@@ -121,7 +87,8 @@ public class InternalHost extends Host {
 
     @Override
     public SubServer getSubServer(String name) {
-        return servers.get(name.toLowerCase());
+        if (Util.isNull(name)) throw new NullPointerException();
+        return getSubServers().get(name.toLowerCase());
     }
 
     @Override
@@ -140,6 +107,7 @@ public class InternalHost extends Host {
 
     @Override
     public boolean removeSubServer(UUID player, String name) throws InterruptedException {
+        if (Util.isNull(name)) throw new NullPointerException();
         SubRemoveServerEvent event = new SubRemoveServerEvent(player, this, getSubServer(name));
         plugin.getPluginManager().callEvent(event);
         if (!event.isCancelled()) {
@@ -154,6 +122,7 @@ public class InternalHost extends Host {
 
     @Override
     public boolean forceRemoveSubServer(UUID player, String name) {
+        if (Util.isNull(name)) throw new NullPointerException();
         SubRemoveServerEvent event = new SubRemoveServerEvent(player, this, getSubServer(name));
         plugin.getPluginManager().callEvent(event);
         if (!event.isCancelled()) {

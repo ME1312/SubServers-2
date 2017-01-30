@@ -39,7 +39,7 @@ public final class SubCommand implements CommandExecutor {
                     if (args[0].equalsIgnoreCase("help") || args[0].equalsIgnoreCase("?")) {
                         sender.sendMessage(printHelp(label));
                     } else if (args[0].equalsIgnoreCase("version") || args[0].equalsIgnoreCase("ver")) {
-                        sender.sendMessage(plugin.lang.getSection("Lang").getColoredString("Command.Version", '&').replace("$str$", plugin.version.toString() + ((plugin.bversion != null)?" BETA "+plugin.bversion.toString():"")));
+                        sender.sendMessage(plugin.lang.getSection("Lang").getColoredString("Command.Version", '&').replace("$name$", "SubServers.Client").replace("$str$", plugin.version.toString() + ((plugin.bversion != null)?" BETA "+plugin.bversion.toString():"")));
                     } else if (args[0].equalsIgnoreCase("list")) {
                         final String fLabel = label;
                         plugin.subdata.sendPacket(new PacketDownloadServerList(null, UUID.randomUUID().toString(), json -> {

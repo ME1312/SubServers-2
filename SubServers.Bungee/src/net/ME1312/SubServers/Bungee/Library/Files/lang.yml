@@ -26,7 +26,7 @@ Lang:
   'Command.Help.SubServer.Stop': '   &7Stop Server:&f $str$'
   'Command.Help.SubServer.Terminate': '   &7Terminate Server:&f $str$'
   'Command.Help.SubServer.Command': '   &7Command Server:&f $str$'
-  'Command.Version': '&7SubServers \u00BB SubServers is running version &f$str$'
+  'Command.Version': '&7SubServers \u00BB $name$ is running version &f$str$'
   'Command.List.Host-Header': '&7SubServers \u00BB Host List:'
   'Command.List.Server-Header': '&7SubServers \u00BB Server List:'
   'Command.List.Divider': '&7, '

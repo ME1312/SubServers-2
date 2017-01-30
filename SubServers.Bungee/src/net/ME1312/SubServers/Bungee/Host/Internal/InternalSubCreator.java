@@ -42,6 +42,7 @@ public class InternalSubCreator extends SubCreator {
      * @param gitBash Git Bash
      */
     public InternalSubCreator(InternalHost host, String gitBash) {
+        if (Util.isNull(host, gitBash)) throw new NullPointerException();
         this.host = host;
         this.gitBash = gitBash;
         this.logger = new InternalSubLogger(null, this, host.getName() + "/Creator", new Container<Boolean>(false), null);
@@ -209,6 +210,7 @@ public class InternalSubCreator extends SubCreator {
 
     @Override
     public boolean create(UUID player, String name, ServerType type, Version version, int memory, int port) {
+        if (Util.isNull(name, type, version, memory, port)) throw new NullPointerException();
         if (!isBusy()) {
             final SubCreateEvent event = new SubCreateEvent(player, host, name, type, version, memory, port);
             host.plugin.getPluginManager().callEvent(event);

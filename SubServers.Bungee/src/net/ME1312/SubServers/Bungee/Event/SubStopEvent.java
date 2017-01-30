@@ -2,6 +2,7 @@ package net.ME1312.SubServers.Bungee.Event;
 
 import net.ME1312.SubServers.Bungee.Host.SubServer;
 import net.ME1312.SubServers.Bungee.Library.SubEvent;
+import net.ME1312.SubServers.Bungee.Library.Util;
 import net.md_5.bungee.api.plugin.Cancellable;
 import net.md_5.bungee.api.plugin.Event;
 
@@ -24,6 +25,7 @@ public class SubStopEvent extends Event implements SubEvent, Cancellable {
      * @param force If it was a Forced Shutdown
      */
     public SubStopEvent(UUID player, SubServer server, boolean force) {
+        if (Util.isNull(server, force)) throw new NullPointerException();
         this.player = player;
         this.server = server;
         this.force = force;

@@ -1,0 +1,382 @@
+package net.ME1312.SubServers.Host;
+
+import net.ME1312.SubServers.Host.API.Command;
+import net.ME1312.SubServers.Host.API.SubPluginInfo;
+import net.ME1312.SubServers.Host.API.SubTaskBuilder;
+import net.ME1312.SubServers.Host.Library.Event.*;
+import net.ME1312.SubServers.Host.Library.UniversalFile;
+import net.ME1312.SubServers.Host.Library.Util;
+import net.ME1312.SubServers.Host.Library.Version.Version;
+import net.ME1312.SubServers.Host.Network.SubDataClient;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.*;
+
+/**
+ * SubAPI Class
+ */
+public final class SubAPI {
+    final HashMap<EventPriority, HashMap<Class<? extends SubEvent>, HashMap<SubPluginInfo, HashMap<Object, List<Method>>>>> listeners = new HashMap<EventPriority, HashMap<Class<? extends SubEvent>, HashMap<SubPluginInfo, HashMap<Object, List<Method>>>>>();
+    final HashMap<UUID, Timer> schedule = new HashMap<UUID, Timer>();
+    final HashMap<String, Command> commands = new HashMap<String, Command>();
+    final HashMap<String, SubPluginInfo> plugins = new HashMap<String, SubPluginInfo>();
+    private SubServers plugin;
+    private static SubAPI api;
+
+    protected SubAPI(SubServers plugin) {
+        this.plugin = plugin;
+        api = this;
+    }
+
+    /**
+     * Gets the SubAPI Methods
+     *
+     * @return SubAPI
+     */
+    public static SubAPI getInstance() {
+        return api;
+    }
+
+    /**
+     * Gets the SubServers Internals
+     *
+     * @return SubServers.Host Internals
+     * @deprecated Use SubAPI Methods when available
+     */
+    @Deprecated
+    public SubServers getInternals() {
+        return plugin;
+    }
+
+    /**
+     * Gets the SubData Network Manager
+     *
+     * @return SubData Network Manager
+     */
+    public SubDataClient getSubDataNetwork() {
+        return plugin.subdata;
+    }
+
+    /**
+     * Get a map of the Plugins
+     *
+     * @return PluginInfo Map
+     */
+    public Map<String, SubPluginInfo> getPlugins() {
+        return new HashMap<String, SubPluginInfo>(plugins);
+    }
+
+    /**
+     * Gets a Plugin
+     *
+     * @param plugin Plugin Name
+     * @return PluginInfo
+     */
+    public SubPluginInfo getPlugin(String plugin) {
+        if (Util.isNull(plugin)) throw new NullPointerException();
+        return getPlugins().get(plugin.toLowerCase());
+    }
+
+    private UUID getFreeSID() {
+        UUID sid = null;
+        do {
+            UUID id = UUID.randomUUID();
+            if (!schedule.keySet().contains(id)) {
+                sid = id;
+            }
+        } while (sid == null);
+        return sid;
+    }
+
+    /**
+     * Registers a Command
+     *
+     * @param command Command
+     * @param handles Aliases
+     */
+    public void addCommand(Command command, String... handles) {
+        for (String handle : handles) {
+            commands.put(handle, command);
+        }
+    }
+
+    /**
+     * Unregisters a Command
+     *
+     * @param handles Aliases
+     */
+    public void removeCommand(String... handles) {
+        for (String handle : handles) {
+            commands.remove(handle.toLowerCase());
+        }
+    }
+
+    /**
+     * Schedule a task
+     *
+     * @param builder SubTaskBuilder
+     * @return Task ID
+     */
+    public UUID schedule(SubTaskBuilder builder) {
+        if (Util.isNull(builder)) throw new NullPointerException();
+        UUID sid = getFreeSID();
+        TimerTask task = new TimerTask() {
+            @Override
+            public void run() {
+                try {
+                    builder.run();
+                } catch (Throwable e) {
+                    plugin.log.error(new InvocationTargetException(e, "Unhandled exception while running SubTask " + sid.toString()));
+                }
+                if (builder.getRepeat() <= 0) schedule.remove(sid);
+            }
+        };
+
+        schedule.put(sid, new Timer("SubTask_" + sid.toString()));
+        if (builder.getRepeat() > 0) {
+            if (builder.getDelay() > 0) {
+                schedule.get(sid).scheduleAtFixedRate(task, builder.getDelay(), builder.getRepeat());
+            } else {
+                schedule.get(sid).scheduleAtFixedRate(task, new Date(), builder.getRepeat());
+            }
+        } else {
+            if (builder.getDelay() > 0) {
+                schedule.get(sid).schedule(task, builder.getDelay());
+            } else {
+                new Thread(task).start();
+            }
+        }
+        return sid;
+    }
+
+    /**
+     * Schedule a task
+     *
+     * @param plugin Plugin Scheduling
+     * @param run What to run
+     * @return Task ID
+     */
+    public UUID schedule(SubPluginInfo plugin, Runnable run) {
+        if (Util.isNull(plugin, run)) throw new NullPointerException();
+        return schedule(new SubTaskBuilder(plugin) {
+            @Override
+            public void run() {
+                run.run();
+            }
+        });
+    }
+
+    /**
+     * Schedule a task
+     *
+     * @param plugin Plugin Scheduling
+     * @param run What to Run
+     * @param delay Task Delay
+     * @return Task ID
+     */
+    public UUID schedule(SubPluginInfo plugin, Runnable run, long delay) {
+        if (Util.isNull(plugin, run, delay)) throw new NullPointerException();
+        return schedule(new SubTaskBuilder(plugin) {
+            @Override
+            public void run() {
+                run.run();
+            }
+        }.delay(delay));
+    }
+
+    /**
+     * Schedule a task
+     *
+     * @param plugin Plugin Scheduling
+     * @param run What to Run
+     * @param delay Task Delay
+     * @param repeat Task Repeat Interval
+     * @return Task ID
+     */
+    public UUID schedule(SubPluginInfo plugin, Runnable run, long delay, long repeat) {
+        if (Util.isNull(plugin, run, delay, repeat)) throw new NullPointerException();
+        return schedule(new SubTaskBuilder(plugin) {
+            @Override
+            public void run() {
+                run.run();
+            }
+        }.delay(delay).repeat(repeat));
+    }
+
+    /**
+     * Cancel a task
+     *
+     * @param sid Task ID
+     */
+    public void cancelTask(UUID sid) {
+        if (Util.isNull(sid)) throw new NullPointerException();
+        if (schedule.keySet().contains(sid)) {
+            schedule.get(sid).cancel();
+            schedule.remove(sid);
+        }
+    }
+
+    /**
+     * Register a SubEvent Listener
+     *
+     * @param plugin PluginInfo
+     * @param listener Listener
+     */
+    public void addListener(SubPluginInfo plugin, Listener listener) {
+        addListener(plugin, (Object) listener);
+    }
+    @SuppressWarnings("unchecked")
+    void addListener(SubPluginInfo plugin, Object listener) {
+        if (Util.isNull(plugin, listener)) throw new NullPointerException();
+        for (Method method : Arrays.asList(listener.getClass().getMethods())) {
+            if (!method.isAnnotationPresent(EventHandler.class)) continue;
+            if (method.getParameterTypes().length == 1) {
+                if (SubEvent.class.isAssignableFrom(method.getParameterTypes()[0])) {
+                    HashMap<Class<? extends SubEvent>, HashMap<SubPluginInfo, HashMap<Object, List<Method>>>> events = (listeners.keySet().contains(method.getAnnotation(EventHandler.class).priority()))?listeners.get(method.getAnnotation(EventHandler.class).priority()):new HashMap<Class<? extends SubEvent>, HashMap<SubPluginInfo, HashMap<Object, List<Method>>>>();
+                    HashMap<SubPluginInfo, HashMap<Object, List<Method>>> plugins = (events.keySet().contains((Class<SubEvent>) method.getParameterTypes()[0]))?events.get((Class<SubEvent>) method.getParameterTypes()[0]):new HashMap<SubPluginInfo, HashMap<Object, List<Method>>>();
+                    HashMap<Object, List<Method>> listeners = (plugins.keySet().contains(plugin))?plugins.get(plugin):new HashMap<Object, List<Method>>();
+                    List<Method> methods = (listeners.keySet().contains(listener))?listeners.get(listener):new LinkedList<Method>();
+                    methods.add(method);
+                    listeners.put(listener, methods);
+                    plugins.put(plugin, listeners);
+                    events.put((Class<SubEvent>) method.getParameterTypes()[0], plugins);
+                    this.listeners.put(method.getAnnotation(EventHandler.class).priority(), events);
+                } else {
+                    this.plugin.log.error(
+                            "Cannot register EventHandler in class \"" + listener.getClass().getCanonicalName() + "\" using method \"" + method.getName() + "\":",
+                            "\"" + method.getParameterTypes()[0].getCanonicalName() + "\" is not a SubEvent",
+                            "");
+                }
+            } else {
+                this.plugin.log.error(
+                        "Cannot register EventHandler in class \"" + listener.getClass().getCanonicalName() + "\" using method \"" + method.getName() + "\":",
+                        ((method.getParameterTypes().length > 0) ? "Too many" : "No") + " parameters for SubEvent to execute",
+                        "");
+            }
+        }
+    }
+
+    /**
+     * Unregister a SubEvent Listener
+     *
+     * @param plugin PluginInfo
+     * @param listener Listener
+     */
+    public void removeListener(SubPluginInfo plugin, Listener listener) {
+        removeListener(plugin, (Object) listener);
+    }
+    void removeListener(SubPluginInfo plugin, Object listener) {
+        if (Util.isNull(plugin, listener)) throw new NullPointerException();
+        HashMap<EventPriority, HashMap<Class<? extends SubEvent>, HashMap<SubPluginInfo, HashMap<Object, List<Method>>>>> map = new HashMap<EventPriority, HashMap<Class<? extends SubEvent>, HashMap<SubPluginInfo, HashMap<Object, List<Method>>>>>(listeners);
+        for (EventPriority priority : map.keySet()) {
+            for (Class<? extends SubEvent> event : map.get(priority).keySet()) {
+                if (map.get(priority).get(event).keySet().contains(plugin) && map.get(priority).get(event).get(plugin).keySet().contains(listener)) {
+                    HashMap<Class<? extends SubEvent>, HashMap<SubPluginInfo, HashMap<Object, List<Method>>>> events = listeners.get(priority);
+                    HashMap<SubPluginInfo, HashMap<Object, List<Method>>> plugins = listeners.get(priority).get(event);
+                    HashMap<Object, List<Method>> listeners = this.listeners.get(priority).get(event).get(plugin);
+                    listeners.remove(listener);
+                    plugins.put(plugin, listeners);
+                    events.put(event, plugins);
+                    this.listeners.put(priority, events);
+                }
+            }
+        }
+    }
+
+    /**
+     * Run a SubEvent
+     *
+     * @param event SubEvent
+     */
+    public void runEvent(SubEvent event) {
+        if (Util.isNull(event)) throw new NullPointerException();
+        for (EventPriority priority : listeners.keySet()) {
+            if (!listeners.get(priority).keySet().contains(event.getClass())) continue;
+            for (SubPluginInfo plugin : listeners.get(priority).get(event.getClass()).keySet()) {
+                try {
+                    Field pf = SubEvent.class.getDeclaredField("plugin");
+                    pf.setAccessible(true);
+                    pf.set(event, plugin);
+                    pf.setAccessible(false);
+                } catch (Exception e) {
+                    this.plugin.log.error(e);
+                }
+                for (Object listener : listeners.get(priority).get(event.getClass()).get(plugin).keySet()) {
+                    for (Method method : listeners.get(priority).get(event.getClass()).get(plugin).get(listener)) {
+                        if (event instanceof Cancellable && ((Cancellable) event).isCancelled() && !method.getAnnotation(EventHandler.class).override()) continue;
+                        try {
+                            method.invoke(listener, event);
+                        } catch (InvocationTargetException e) {
+                            this.plugin.log.error("Event \"" + method.getName() + "(" + event.getClass().getTypeName() + ")\" in class \"" + listener.getClass().getCanonicalName() + "\" had an unhandled exception:");
+                            this.plugin.log.error(e.getTargetException());
+                        } catch (IllegalAccessException e) {
+                            this.plugin.log.error("Cannot access method \"" + method.getName() + "\" in class \"" + listener.getClass().getCanonicalName() + "\"");
+                            this.plugin.log.error(e);
+                        }
+                    }
+                }
+            }
+        }
+        try {
+            Field pf = SubEvent.class.getDeclaredField("plugin");
+            pf.setAccessible(true);
+            pf.set(event, null);
+            pf.setAccessible(false);
+        } catch (Exception e) {
+            this.plugin.log.error(e);
+        }
+    }
+
+    /**
+     * Gets a value from the SubServers Lang
+     *
+     * @param key Key
+     * @return Lang Value
+     */
+    public String getLang(String key) {
+        if (Util.isNull(key)) throw new NullPointerException();
+        return getLang().get(key);
+    }
+
+    /**
+     * Gets the SubServers Lang
+     *
+     * @return SubServers Lang
+     */
+    public Map<String, String> getLang() {
+        HashMap<String, String> lang = new HashMap<String, String>();
+        for (String key : plugin.lang.getSection("Lang").getKeys()) {
+            if (plugin.lang.getSection("Lang").isString(key)) lang.put(key, plugin.lang.getSection("Lang").getString(key));
+        }
+        return lang;
+    }
+
+    /**
+     * Gets the Runtime Directory
+     *
+     * @return Directory
+     */
+    public UniversalFile getRuntimeDirectory() {
+        return plugin.dir;
+    }
+
+    /**
+     * Gets the SubServers Beta Version
+     *
+     * @return SubServers Beta Version (or null if this is a release version)
+     */
+    public Version getBetaVersion() {
+        return plugin.bversion;
+    }
+
+    /**
+     * Gets the SubServers Version
+     *
+     * @return SubServers Version
+     */
+    public Version getAppVersion() {
+        return plugin.version;
+    }
+}

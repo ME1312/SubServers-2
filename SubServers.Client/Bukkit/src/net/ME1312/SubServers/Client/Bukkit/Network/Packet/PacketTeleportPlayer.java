@@ -1,6 +1,7 @@
 package net.ME1312.SubServers.Client.Bukkit.Network.Packet;
 
 import net.ME1312.SubServers.Client.Bukkit.Library.JSONCallback;
+import net.ME1312.SubServers.Client.Bukkit.Library.Util;
 import net.ME1312.SubServers.Client.Bukkit.Library.Version.Version;
 import net.ME1312.SubServers.Client.Bukkit.Network.PacketIn;
 import net.ME1312.SubServers.Client.Bukkit.Network.PacketOut;
@@ -17,6 +18,7 @@ public class PacketTeleportPlayer implements PacketIn, PacketOut {
 
     public PacketTeleportPlayer() {}
     public PacketTeleportPlayer(UUID player, String server, String id, JSONCallback callback) {
+        if (Util.isNull(player, server, id, callback)) throw new NullPointerException();
         this.player = player;
         this.server = server;
         this.id = id;

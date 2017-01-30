@@ -1,6 +1,7 @@
 package net.ME1312.SubServers.Client.Bukkit.Event;
 
 import net.ME1312.SubServers.Client.Bukkit.Library.SubEvent;
+import net.ME1312.SubServers.Client.Bukkit.Library.Util;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
@@ -16,6 +17,7 @@ public class SubStoppedEvent extends Event implements SubEvent {
      * @param server Server that Stopped
      */
     public SubStoppedEvent(String server) {
+        if (Util.isNull(server)) throw new NullPointerException();
         this.server = server;
     }
 

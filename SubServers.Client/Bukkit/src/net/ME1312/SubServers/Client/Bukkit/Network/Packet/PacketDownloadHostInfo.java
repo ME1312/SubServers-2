@@ -1,6 +1,7 @@
 package net.ME1312.SubServers.Client.Bukkit.Network.Packet;
 
 import net.ME1312.SubServers.Client.Bukkit.Library.JSONCallback;
+import net.ME1312.SubServers.Client.Bukkit.Library.Util;
 import net.ME1312.SubServers.Client.Bukkit.Library.Version.Version;
 import net.ME1312.SubServers.Client.Bukkit.Network.PacketIn;
 import net.ME1312.SubServers.Client.Bukkit.Network.PacketOut;
@@ -15,6 +16,7 @@ public class PacketDownloadHostInfo implements PacketIn, PacketOut {
 
     public PacketDownloadHostInfo() {}
     public PacketDownloadHostInfo(String host, String id, JSONCallback callback) {
+        if (Util.isNull(host, id, callback)) throw new NullPointerException();
         this.host = host;
         this.id = id;
         callbacks.put(id, callback);

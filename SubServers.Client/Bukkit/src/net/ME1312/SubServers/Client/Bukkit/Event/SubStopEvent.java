@@ -2,6 +2,7 @@ package net.ME1312.SubServers.Client.Bukkit.Event;
 
 
 import net.ME1312.SubServers.Client.Bukkit.Library.SubEvent;
+import net.ME1312.SubServers.Client.Bukkit.Library.Util;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
@@ -23,6 +24,7 @@ public class SubStopEvent extends Event implements SubEvent {
      * @param force If it was a Forced Shutdown
      */
     public SubStopEvent(UUID player, String server, boolean force) {
+        if (Util.isNull(server, force)) throw new NullPointerException();
         this.player = player;
         this.server = server;
         this.force = force;

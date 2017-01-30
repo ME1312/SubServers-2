@@ -1,6 +1,7 @@
 package net.ME1312.SubServers.Bungee.Network;
 
 import net.ME1312.SubServers.Bungee.Library.Exception.IllegalPacketException;
+import net.ME1312.SubServers.Bungee.Library.Util;
 import net.ME1312.SubServers.Bungee.Library.Version.Version;
 import net.ME1312.SubServers.Bungee.Network.Packet.*;
 import net.ME1312.SubServers.Bungee.SubPlugin;
@@ -35,6 +36,7 @@ public final class SubDataServer {
      * @throws IOException
      */
     public SubDataServer(SubPlugin plugin, int port, int backlog, InetAddress address) throws IOException {
+        if (Util.isNull(plugin, port, backlog, address)) throw new NullPointerException();
         server = new ServerSocket(port, backlog, address);
         this.plugin = plugin;
 
@@ -63,7 +65,6 @@ public final class SubDataServer {
         registerPacket(new PacketDownloadPlayerList(plugin), "SubDownloadPlayerList");
         registerPacket(new PacketDownloadServerInfo(plugin), "SubDownloadServerInfo");
         registerPacket(new PacketDownloadServerList(plugin), "SubDownloadServerList");
-        registerPacket(new PacketInfoPassthrough(plugin), "SubInfoPassthrough");
         registerPacket(new PacketLinkServer(plugin), "SubLinkServer");
         registerPacket(new PacketStartServer(plugin), "SubStartServer");
         registerPacket(new PacketStopServer(plugin), "SubStopServer");
@@ -78,7 +79,6 @@ public final class SubDataServer {
         registerPacket(PacketDownloadPlayerList.class, "SubDownloadPlayerList");
         registerPacket(PacketDownloadServerInfo.class, "SubDownloadServerInfo");
         registerPacket(PacketDownloadServerList.class, "SubDownloadServerList");
-        registerPacket(PacketInfoPassthrough.class, "SubInfoPassthrough");
         registerPacket(PacketLinkServer.class, "SubLinkServer");
         registerPacket(PacketOutRunEvent.class, "SubRunEvent");
         registerPacket(PacketOutShutdown.class, "SubShutdown");
@@ -103,6 +103,7 @@ public final class SubDataServer {
      * @throws IOException
      */
     public Client addClient(Socket socket) throws IOException {
+        if (Util.isNull(socket)) throw new NullPointerException();
         if (allowedAddresses.contains(socket.getInetAddress())) {
             Client client = new Client(this, socket);
             System.out.println("SubData > " + client.getAddress().toString() + " has connected");
@@ -122,6 +123,7 @@ public final class SubDataServer {
      * @return Client
      */
     public Client getClient(Socket socket) {
+        if (Util.isNull(socket)) throw new NullPointerException();
         return clients.get(new InetSocketAddress(socket.getInetAddress(), socket.getPort()));
     }
 
@@ -132,6 +134,7 @@ public final class SubDataServer {
      * @return Client
      */
     public Client getClient(InetSocketAddress address) {
+        if (Util.isNull(address)) throw new NullPointerException();
         return clients.get(address);
     }
 
@@ -151,6 +154,7 @@ public final class SubDataServer {
      * @throws IOException
      */
     public void removeClient(Client client) throws IOException {
+        if (Util.isNull(client)) throw new NullPointerException();
         SocketAddress address = client.getAddress();
         if (clients.keySet().contains(address)) {
             clients.remove(address);
@@ -166,6 +170,7 @@ public final class SubDataServer {
      * @throws IOException
      */
     public void removeClient(InetSocketAddress address) throws IOException {
+        if (Util.isNull(address)) throw new NullPointerException();
         Client client = clients.get(address);
         if (clients.keySet().contains(address)) {
             clients.remove(address);
@@ -181,6 +186,7 @@ public final class SubDataServer {
      * @param handle Handle to Bind
      */
     public static void registerPacket(PacketIn packet, String handle) {
+        if (Util.isNull(packet, handle)) throw new NullPointerException();
         List<PacketIn> list = (pIn.keySet().contains(handle))?pIn.get(handle):new ArrayList<PacketIn>();
         if (!list.contains(packet)) list.add(packet);
         pIn.put(handle, list);
@@ -192,6 +198,7 @@ public final class SubDataServer {
      * @param packet PacketIn to unregister
      */
     public static void unregisterPacket(PacketIn packet) {
+        if (Util.isNull(packet)) throw new NullPointerException();
         for (String handle : pIn.keySet()) if (pIn.get(handle).contains(packet)) pIn.get(handle).remove(packet);
     }
 
@@ -202,6 +209,7 @@ public final class SubDataServer {
      * @param handle Handle to bind
      */
     public static void registerPacket(Class<? extends PacketOut> packet, String handle) {
+        if (Util.isNull(packet, handle)) throw new NullPointerException();
         pOut.put(packet, handle);
     }
 
@@ -211,6 +219,7 @@ public final class SubDataServer {
      * @param packet PacketOut to unregister
      */
     public static void unregisterPacket(Class<? extends PacketOut> packet) {
+        if (Util.isNull(packet)) throw new NullPointerException();
         pOut.remove(packet);
     }
 
@@ -221,6 +230,7 @@ public final class SubDataServer {
      * @return PacketIn
      */
     public static List<? extends PacketIn> getPacket(String handle) {
+        if (Util.isNull(handle)) throw new NullPointerException();
         return new ArrayList<PacketIn>(pIn.get(handle));
     }
 
@@ -231,6 +241,7 @@ public final class SubDataServer {
      * @param packet Packet to send
      */
     public void broadcastPacket(PacketOut packet) {
+        if (Util.isNull(packet)) throw new NullPointerException();
         for (Client client : clients.values()) {
             client.sendPacket(packet);
         }
@@ -242,6 +253,7 @@ public final class SubDataServer {
      * @param address Address to allow
      */
     public static void allowConnection(InetAddress address) {
+        if (Util.isNull(address)) throw new NullPointerException();
         if (!allowedAddresses.contains(address)) allowedAddresses.add(address);
     }
 
@@ -251,6 +263,7 @@ public final class SubDataServer {
      * @param address Address to deny
      */
     public static void denyConnection(InetAddress address) {
+        if (Util.isNull(address)) throw new NullPointerException();
         allowedAddresses.remove(address);
     }
 

@@ -1,6 +1,7 @@
 package net.ME1312.SubServers.Client.Bukkit.Network;
 
 import net.ME1312.SubServers.Client.Bukkit.Library.Exception.IllegalPacketException;
+import net.ME1312.SubServers.Client.Bukkit.Library.Util;
 import net.ME1312.SubServers.Client.Bukkit.Library.Version.Version;
 import net.ME1312.SubServers.Client.Bukkit.Network.Packet.*;
 import net.ME1312.SubServers.Client.Bukkit.SubPlugin;
@@ -41,6 +42,7 @@ public final class SubDataClient {
      * @throws IOException
      */
     public SubDataClient(SubPlugin plugin, String name, InetAddress address, int port) throws IOException {
+        if (Util.isNull(plugin, name, address, port)) throw new NullPointerException();
         socket = new Socket(address, port);
         this.plugin = plugin;
         this.name = name;
@@ -63,7 +65,6 @@ public final class SubDataClient {
         registerPacket(new PacketDownloadPlayerList(), "SubDownloadPlayerList");
         registerPacket(new PacketDownloadServerInfo(), "SubDownloadServerInfo");
         registerPacket(new PacketDownloadServerList(), "SubDownloadServerList");
-        registerPacket(new PacketInfoPassthrough(), "SubInfoPassthrough");
         registerPacket(new PacketInRunEvent(), "SubRunEvent");
         registerPacket(new PacketInShutdown(), "SubShutdown");
         registerPacket(new PacketLinkServer(plugin), "SubLinkServer");
@@ -79,7 +80,6 @@ public final class SubDataClient {
         registerPacket(PacketDownloadPlayerList.class, "SubDownloadPlayerList");
         registerPacket(PacketDownloadServerInfo.class, "SubDownloadServerInfo");
         registerPacket(PacketDownloadServerList.class, "SubDownloadServerList");
-        registerPacket(PacketInfoPassthrough.class, "SubInfoPassthrough");
         registerPacket(PacketLinkServer.class, "SubLinkServer");
         registerPacket(PacketStartServer.class, "SubStartServer");
         registerPacket(PacketStopServer.class, "SubStopServer");
@@ -148,6 +148,7 @@ public final class SubDataClient {
      * @param handle Handle to Bind
      */
     public static void registerPacket(PacketIn packet, String handle) {
+        if (Util.isNull(packet, handle)) throw new NullPointerException();
         List<PacketIn> list = (pIn.keySet().contains(handle))?pIn.get(handle):new ArrayList<PacketIn>();
         if (!list.contains(packet)) list.add(packet);
         pIn.put(handle, list);
@@ -159,6 +160,7 @@ public final class SubDataClient {
      * @param packet PacketIn to unregister
      */
     public static void unregisterPacket(PacketIn packet) {
+        if (Util.isNull(packet)) throw new NullPointerException();
         for (String handle : pIn.keySet()) if (pIn.get(handle).contains(packet)) pIn.get(handle).remove(packet);
     }
 
@@ -169,6 +171,7 @@ public final class SubDataClient {
      * @param handle Handle to bind
      */
     public static void registerPacket(Class<? extends PacketOut> packet, String handle) {
+        if (Util.isNull(packet, handle)) throw new NullPointerException();
         pOut.put(packet, handle);
     }
 
@@ -178,6 +181,7 @@ public final class SubDataClient {
      * @param packet PacketOut to unregister
      */
     public static void unregisterPacket(Class<? extends PacketOut> packet) {
+        if (Util.isNull(packet)) throw new NullPointerException();
         pOut.remove(packet);
     }
 
@@ -188,6 +192,7 @@ public final class SubDataClient {
      * @return PacketIn
      */
     public static List<? extends PacketIn> getPacket(String handle) {
+        if (Util.isNull(handle)) throw new NullPointerException();
         return new ArrayList<PacketIn>(pIn.get(handle));
     }
 
@@ -197,6 +202,7 @@ public final class SubDataClient {
      * @param packet Packet to send
      */
     public void sendPacket(PacketOut packet) {
+        if (Util.isNull(packet)) throw new NullPointerException();
         try {
             writer.println(encodePacket(packet));
         } catch (IllegalPacketException e) {
@@ -254,6 +260,7 @@ public final class SubDataClient {
      * @throws IOException
      */
     public void destroy(boolean reconnect) throws IOException {
+        if (Util.isNull(reconnect)) throw new NullPointerException();
         if (socket != null) {
             final Socket socket = this.socket;
             this.socket = null;
@@ -261,13 +268,17 @@ public final class SubDataClient {
             Bukkit.getLogger().info("SubServers > The SubData Connection was closed");
             if (reconnect) {
                 Bukkit.getLogger().info("SubServers > Attempting to reconnect in 10 seconds");
-                Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                    try {
-                        plugin.subdata = new SubDataClient(plugin, name, socket.getInetAddress(), socket.getPort());
-                    } catch (IOException e) {
-                        e.printStackTrace();
+                Bukkit.getScheduler().runTaskLater(plugin, new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            plugin.subdata = new SubDataClient(plugin, name, socket.getInetAddress(), socket.getPort());
+                        } catch (IOException e) {
+                            Bukkit.getLogger().info("SubServers > Connection was unsuccessful, retrying in 10 seconds");
+                            Bukkit.getScheduler().runTaskLater(plugin, this, 30 * 20);
+                        }
                     }
-                }, 10 * 20);
+                }, 30 * 20);
             }
             plugin.subdata = null;
         }

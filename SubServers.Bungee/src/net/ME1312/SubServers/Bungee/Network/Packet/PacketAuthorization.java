@@ -1,5 +1,6 @@
 package net.ME1312.SubServers.Bungee.Network.Packet;
 
+import net.ME1312.SubServers.Bungee.Library.Util;
 import net.ME1312.SubServers.Bungee.Library.Version.Version;
 import net.ME1312.SubServers.Bungee.Network.Client;
 import net.ME1312.SubServers.Bungee.Network.PacketIn;
@@ -21,6 +22,7 @@ public final class PacketAuthorization implements PacketIn, PacketOut {
      * @param plugin SubPlugin
      */
     public PacketAuthorization(SubPlugin plugin) {
+        if (Util.isNull(plugin)) throw new NullPointerException();
         this.plugin = plugin;
     }
 
@@ -31,6 +33,7 @@ public final class PacketAuthorization implements PacketIn, PacketOut {
      * @param message Message
      */
     public PacketAuthorization(int response, String message) {
+        if (Util.isNull(response, message)) throw new NullPointerException();
         this.response = response;
         this.message = message;
     }

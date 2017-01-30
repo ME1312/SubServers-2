@@ -8,6 +8,7 @@ import net.ME1312.SubServers.Bungee.Library.Exception.InvalidServerException;
 import net.ME1312.SubServers.Bungee.Host.Host;
 import net.ME1312.SubServers.Bungee.Host.SubServer;
 import net.ME1312.SubServers.Bungee.Library.NamedContainer;
+import net.ME1312.SubServers.Bungee.Library.Util;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -59,6 +60,7 @@ public class InternalSubServer extends SubServer {
      */
     public InternalSubServer(InternalHost host, String name, boolean enabled, int port, String motd, boolean log, String directory, Executable executable, String stopcmd, boolean start, boolean restart, boolean hidden, boolean restricted, boolean temporary) throws InvalidServerException {
         super(host, name, port, motd, hidden, restricted);
+        if (Util.isNull(host, name, enabled, port, motd, log, directory, executable, stopcmd, start, restart, hidden, restricted, temporary)) throw new NullPointerException();
         this.host = host;
         this.enabled = enabled;
         this.log = new Container<Boolean>(log);
@@ -174,6 +176,7 @@ public class InternalSubServer extends SubServer {
 
     @Override
     public boolean command(UUID player, String command) {
+        if (Util.isNull(command)) throw new NullPointerException();
         if (thread != null && thread.isAlive()) {
             SubSendCommandEvent event = new SubSendCommandEvent(player, this, command);
             host.plugin.getPluginManager().callEvent(event);
@@ -225,6 +228,7 @@ public class InternalSubServer extends SubServer {
 
     @Override
     public void setEnabled(boolean value) {
+        if (Util.isNull(value)) throw new NullPointerException();
         enabled = value;
     }
 
@@ -235,6 +239,7 @@ public class InternalSubServer extends SubServer {
 
     @Override
     public void setLogging(boolean value) {
+        if (Util.isNull(value)) throw new NullPointerException();
         log.set(value);
     }
 
@@ -260,6 +265,7 @@ public class InternalSubServer extends SubServer {
 
     @Override
     public void setStopCommand(String value) {
+        if (Util.isNull(value)) throw new NullPointerException();
         stopcmd = value;
     }
 
@@ -270,6 +276,7 @@ public class InternalSubServer extends SubServer {
 
     @Override
     public void setAutoRestart(boolean value) {
+        if (Util.isNull(value)) throw new NullPointerException();
         restart = value;
     }
 
@@ -280,6 +287,7 @@ public class InternalSubServer extends SubServer {
 
     @Override
     public void setTemporary(boolean value) {
+        if (Util.isNull(value)) throw new NullPointerException();
         temporary = !(value && !isRunning() && !start()) && value;
     }
 }

@@ -1,5 +1,6 @@
 package net.ME1312.SubServers.Bungee.Network.Packet;
 
+import net.ME1312.SubServers.Bungee.Library.Util;
 import net.ME1312.SubServers.Bungee.Library.Version.Version;
 import net.ME1312.SubServers.Bungee.Network.PacketOut;
 import org.json.JSONObject;
@@ -16,6 +17,7 @@ public class PacketOutShutdown implements PacketOut {
      * @param message Message
      */
     public PacketOutShutdown(String message) {
+        if (Util.isNull(message)) throw new NullPointerException();
         this.message = message;
     }
 

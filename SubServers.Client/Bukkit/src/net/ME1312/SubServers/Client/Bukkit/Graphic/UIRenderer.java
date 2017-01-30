@@ -2,6 +2,7 @@ package net.ME1312.SubServers.Client.Bukkit.Graphic;
 
 import net.ME1312.SubServers.Client.Bukkit.Library.Container;
 import net.ME1312.SubServers.Client.Bukkit.Library.NamedContainer;
+import net.ME1312.SubServers.Client.Bukkit.Library.Util;
 import net.ME1312.SubServers.Client.Bukkit.Library.Version.Version;
 import net.ME1312.SubServers.Client.Bukkit.Network.Packet.PacketCreateServer;
 import net.ME1312.SubServers.Client.Bukkit.SubPlugin;
@@ -27,6 +28,7 @@ public abstract class UIRenderer {
      * @param player Player
      */
     public UIRenderer(SubPlugin plugin, UUID player) {
+        if (Util.isNull(plugin, player)) throw new NullPointerException();
         this.plugin = plugin;
         this.player = player;
     }
@@ -89,6 +91,7 @@ public abstract class UIRenderer {
      * @return Success Status
      */
     public boolean sendTitle(String str, int fadein, int stay, int fadeout) {
+        if (Util.isNull(str, fadein, stay, fadeout)) throw new NullPointerException();
         if (Bukkit.getPluginManager().getPlugin("TitleManager") != null && plugin.config.get().getSection("Settings").getBoolean("Use-Title-Messages", true)) {
             String line1, line2;
             if (!str.startsWith("\n") && str.contains("\n")) {
@@ -169,6 +172,7 @@ public abstract class UIRenderer {
      * @param renderer Renderer
      */
     public static void addHostPlugin(String handle, Renderer renderer) {
+        if (Util.isNull(handle, renderer)) throw new NullPointerException();
         hostPlugins.put(handle, renderer);
     }
 
@@ -187,6 +191,7 @@ public abstract class UIRenderer {
      * @param handle Handle
      */
     public static void removeHostPlugin(String handle) {
+        if (Util.isNull(handle)) throw new NullPointerException();
         hostPlugins.remove(handle);
     }
 
@@ -197,6 +202,7 @@ public abstract class UIRenderer {
      * @param renderer Renderer
      */
     public static void addSubServerPlugin(String handle, Renderer renderer) {
+        if (Util.isNull(handle, renderer)) throw new NullPointerException();
         subserverPlugins.put(handle, renderer);
     }
 
@@ -215,6 +221,7 @@ public abstract class UIRenderer {
      * @param handle Handle
      */
     public static void removeSubServerPlugin(String handle) {
+        if (Util.isNull(handle)) throw new NullPointerException();
         subserverPlugins.remove(handle);
     }
 
@@ -347,6 +354,7 @@ public abstract class UIRenderer {
          * @param value Value
          */
         public void setName(String value) {
+            if (Util.isNull(value)) throw new NullPointerException();
             final String name = this.name;
             history.add(() -> this.name = name);
             this.name = value;
@@ -367,6 +375,7 @@ public abstract class UIRenderer {
          * @param value Value
          */
         public void setType(PacketCreateServer.ServerType value) {
+            if (Util.isNull(value)) throw new NullPointerException();
             final PacketCreateServer.ServerType type = this.type;
             history.add(() -> this.type = type);
             this.type = value;
@@ -387,6 +396,7 @@ public abstract class UIRenderer {
          * @param value Value
          */
         public void setVersion(Version value) {
+            if (Util.isNull(value)) throw new NullPointerException();
             final Version version = this.version;
             history.add(() -> this.version = version);
             this.version = value;
@@ -407,6 +417,7 @@ public abstract class UIRenderer {
          * @param value Value (in MB)
          */
         public void setMemory(int value) {
+            if (Util.isNull(value)) throw new NullPointerException();
             final int memory = this.memory;
             history.add(() -> this.memory = memory);
             this.memory = value;
@@ -427,6 +438,7 @@ public abstract class UIRenderer {
          * @param value Value
          */
         public void setPort(int value) {
+            if (Util.isNull(value)) throw new NullPointerException();
             final int port = this.port;
             history.add(() -> this.port = port);
             this.port = value;

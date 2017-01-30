@@ -1,6 +1,7 @@
 package net.ME1312.SubServers.Client.Bukkit.Network.Packet;
 
 import net.ME1312.SubServers.Client.Bukkit.Library.JSONCallback;
+import net.ME1312.SubServers.Client.Bukkit.Library.Util;
 import net.ME1312.SubServers.Client.Bukkit.Library.Version.Version;
 import net.ME1312.SubServers.Client.Bukkit.Network.PacketIn;
 import net.ME1312.SubServers.Client.Bukkit.Network.PacketOut;
@@ -17,14 +18,8 @@ public class PacketStopServer implements PacketIn, PacketOut {
     private String id;
 
     public PacketStopServer() {}
-    public PacketStopServer(String server, boolean force, String id, JSONCallback callback) {
-        this.player = null;
-        this.server = server;
-        this.force = force;
-        this.id = id;
-        callbacks.put(id, callback);
-    }
     public PacketStopServer(UUID player, String server, boolean force, String id, JSONCallback callback) {
+        if (Util.isNull(server, force, id, callback)) throw new NullPointerException();
         this.player = player;
         this.server = server;
         this.force = force;

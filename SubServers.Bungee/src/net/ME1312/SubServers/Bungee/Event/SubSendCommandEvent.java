@@ -2,6 +2,7 @@ package net.ME1312.SubServers.Bungee.Event;
 
 import net.ME1312.SubServers.Bungee.Host.SubServer;
 import net.ME1312.SubServers.Bungee.Library.SubEvent;
+import net.ME1312.SubServers.Bungee.Library.Util;
 import net.md_5.bungee.api.plugin.Cancellable;
 import net.md_5.bungee.api.plugin.Event;
 
@@ -23,6 +24,7 @@ public class SubSendCommandEvent extends Event implements SubEvent, Cancellable 
      * @param server Server being Commanded
      */
     public SubSendCommandEvent(UUID player, SubServer server, String command) {
+        if (Util.isNull(server, command)) throw new NullPointerException();
         this.player = player;
         this.server = server;
         this.command = command;

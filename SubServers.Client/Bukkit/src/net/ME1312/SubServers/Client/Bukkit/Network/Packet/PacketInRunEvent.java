@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.UUID;
 
 public class PacketInRunEvent implements PacketIn {
-    private HashMap<String, List<JSONCallback>> callbacks = new HashMap<String, List<JSONCallback>>();
+    private static HashMap<String, List<JSONCallback>> callbacks = new HashMap<String, List<JSONCallback>>();
 
     public PacketInRunEvent() {
         callback("SubAddServerEvent", new JSONCallback() {
@@ -71,8 +71,8 @@ public class PacketInRunEvent implements PacketIn {
     @Override
     public void execute(JSONObject data) {
         if (callbacks.keySet().contains(data.getString("type"))) {
-            List<JSONCallback> callbacks = this.callbacks.get(data.getString("type"));
-            this.callbacks.remove(data.getString("type"));
+            List<JSONCallback> callbacks = PacketInRunEvent.callbacks.get(data.getString("type"));
+            PacketInRunEvent.callbacks.remove(data.getString("type"));
             for (JSONCallback callback : callbacks) {
                 callback.run(data.getJSONObject("args"));
             }
@@ -84,9 +84,9 @@ public class PacketInRunEvent implements PacketIn {
         return new Version("2.11.0a");
     }
 
-    public void callback(String event, JSONCallback callback) {
-        List<JSONCallback> callbacks = (this.callbacks.keySet().contains(event))?this.callbacks.get(event):new ArrayList<JSONCallback>();
+    public static void callback(String event, JSONCallback callback) {
+        List<JSONCallback> callbacks = (PacketInRunEvent.callbacks.keySet().contains(event))?PacketInRunEvent.callbacks.get(event):new ArrayList<JSONCallback>();
         callbacks.add(callback);
-        this.callbacks.put(event, callbacks);
+        PacketInRunEvent.callbacks.put(event, callbacks);
     }
 }

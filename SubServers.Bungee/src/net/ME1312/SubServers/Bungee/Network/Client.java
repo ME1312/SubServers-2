@@ -1,6 +1,7 @@
 package net.ME1312.SubServers.Bungee.Network;
 
 import net.ME1312.SubServers.Bungee.Library.Exception.IllegalPacketException;
+import net.ME1312.SubServers.Bungee.Library.Util;
 import net.ME1312.SubServers.Bungee.Network.Packet.PacketAuthorization;
 import net.ME1312.SubServers.Bungee.SubPlugin;
 import org.json.JSONException;
@@ -36,6 +37,7 @@ public class Client {
      * @param client Socket to Bind
      */
     public Client(SubDataServer subdata, Socket client) throws IOException {
+        if (Util.isNull(subdata, client)) throw new NullPointerException();
         this.subdata = subdata;
         socket = client;
         writer = new PrintWriter(client.getOutputStream(), true);
@@ -114,6 +116,7 @@ public class Client {
      * @param packet Packet to send
      */
     public void sendPacket(PacketOut packet) {
+        if (Util.isNull(packet)) throw new NullPointerException();
         try {
             writer.println(SubDataServer.encodePacket(packet));
         } catch (IllegalPacketException e) {

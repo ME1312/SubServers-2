@@ -9,7 +9,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 /**
- * SubServers/BungeeCord Class
+ * SubServers/BungeeCord Launch Class
  */
 public final class Launch {
 
@@ -50,7 +50,7 @@ public final class Launch {
                 System.out.println(System.getProperty("os.name") + " " + System.getProperty("os.version") + ",");
                 System.out.println("Java " + System.getProperty("java.version") + ",");
                 System.out.println("BungeeCord " + net.md_5.bungee.Bootstrap.class.getPackage().getImplementationVersion() + ",");
-                System.out.println("SubServers v" + SubPlugin.class.getPackage().getImplementationVersion() + ((SubPlugin.class.getPackage().getSpecificationVersion().equals("0"))?"":" BETA "+SubPlugin.class.getPackage().getSpecificationVersion()));
+                System.out.println("SubServers.Bungee v" + SubPlugin.class.getPackage().getImplementationVersion() + ((SubPlugin.class.getPackage().getSpecificationVersion().equals("0"))?"":" BETA "+SubPlugin.class.getPackage().getSpecificationVersion()));
                 System.out.println("");
             } else {
                 System.out.println("");
@@ -66,7 +66,7 @@ public final class Launch {
                         Calendar line = Calendar.getInstance();
                         line.add(3, -4);
                         if (date.before(line.getTime())) {
-                            System.out.println("***   Warning: this build is outdated   ***");
+                            System.out.println("*** Warning: BungeeCord.jar is outdated ***");
                             System.out.println("***  Please download a new build from:  ***");
                             System.out.println("***  http://ci.md-5.net/job/BungeeCord  ***");
                             System.out.println("*** Errors may arise on older versions! ***");
@@ -75,7 +75,7 @@ public final class Launch {
                     } else throw new Exception();
                 } catch (Exception e) {
                     System.out.println("*** Problem checking BungeeCord Version ***");
-                    System.out.println("***    This build could be outdated.    ***");
+                    System.out.println("***  BungeeCord.jar could be outdated.  ***");
                     System.out.println("***                                     ***");
                     System.out.println("*** Errors may arise on older versions! ***");
                     System.out.println("*******************************************");

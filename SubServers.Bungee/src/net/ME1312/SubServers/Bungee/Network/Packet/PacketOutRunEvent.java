@@ -3,6 +3,7 @@ package net.ME1312.SubServers.Bungee.Network.Packet;
 import net.ME1312.SubServers.Bungee.Event.*;
 import net.ME1312.SubServers.Bungee.Host.Server;
 import net.ME1312.SubServers.Bungee.Library.SubEvent;
+import net.ME1312.SubServers.Bungee.Library.Util;
 import net.ME1312.SubServers.Bungee.Library.Version.Version;
 import net.ME1312.SubServers.Bungee.Network.PacketOut;
 import net.ME1312.SubServers.Bungee.SubPlugin;
@@ -30,6 +31,7 @@ public class PacketOutRunEvent implements Listener, PacketOut {
      * @param plugin
      */
     public PacketOutRunEvent(SubPlugin plugin) {
+        if (Util.isNull(plugin)) throw new NullPointerException();
         this.plugin = plugin;
     }
 
@@ -40,6 +42,7 @@ public class PacketOutRunEvent implements Listener, PacketOut {
      * @param args Arguments
      */
     public PacketOutRunEvent(Class<? extends SubEvent> event, Map<String, ?> args) {
+        if (Util.isNull(event, args)) throw new NullPointerException();
         this.type = event.getSimpleName();
         this.args = args;
     }

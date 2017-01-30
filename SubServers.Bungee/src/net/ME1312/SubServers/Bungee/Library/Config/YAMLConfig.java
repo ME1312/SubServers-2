@@ -1,5 +1,6 @@
 package net.ME1312.SubServers.Bungee.Library.Config;
 
+import net.ME1312.SubServers.Bungee.Library.Util;
 import org.json.JSONObject;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
@@ -26,6 +27,7 @@ public class YAMLConfig {
      */
     @SuppressWarnings("unchecked")
     public YAMLConfig(File file) throws IOException, YAMLException {
+        if (Util.isNull(file)) throw new NullPointerException();
         this.file = file;
         this.yaml = new Yaml(getDumperOptions());
         if (file.exists()) {
@@ -50,6 +52,7 @@ public class YAMLConfig {
      * @param value Value
      */
     public void set(YAMLSection value) {
+        if (Util.isNull(value)) throw new NullPointerException();
         config = value;
     }
 

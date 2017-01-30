@@ -1,5 +1,7 @@
 package net.ME1312.SubServers.Client.Bukkit.Library.Version;
 
+import net.ME1312.SubServers.Client.Bukkit.Library.Util;
+
 import java.io.Serializable;
 
 /**
@@ -15,6 +17,7 @@ public class Version implements Serializable, Comparable<Version> {
      * @param string Version String
      */
 	public Version(String string) {
+	    if (Util.isNull(string)) throw new NullPointerException();
 		this.string = string;
 	}
 

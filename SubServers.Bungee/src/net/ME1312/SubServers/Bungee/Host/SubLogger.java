@@ -1,6 +1,7 @@
 package net.ME1312.SubServers.Bungee.Host;
 
 import net.ME1312.SubServers.Bungee.Library.NamedContainer;
+import net.ME1312.SubServers.Bungee.Library.Util;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -25,6 +26,7 @@ public abstract class SubLogger {
          * @param message Message
          */
         public LogMessage(String message) {
+            if (Util.isNull(message)) throw new NullPointerException();
             this.date = Calendar.getInstance().getTime();
             this.level = Level.INFO;
             this.message = message;
@@ -37,6 +39,7 @@ public abstract class SubLogger {
          * @param message Message
          */
         public LogMessage(Level level, String message) {
+            if (Util.isNull(level, message)) throw new NullPointerException();
             this.date = Calendar.getInstance().getTime();
             this.level = level;
             this.message = message;
@@ -50,6 +53,7 @@ public abstract class SubLogger {
          * @param message Message
          */
         public LogMessage(Date date, Level level, String message) {
+            if (Util.isNull(date, level, message)) throw new NullPointerException();
             this.date = date;
             this.level = level;
             this.message = message;

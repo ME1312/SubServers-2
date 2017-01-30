@@ -1,6 +1,7 @@
 package net.ME1312.SubServers.Bungee.Network.Packet;
 
 import net.ME1312.SubServers.Bungee.Host.Server;
+import net.ME1312.SubServers.Bungee.Library.Util;
 import net.ME1312.SubServers.Bungee.Library.Version.Version;
 import net.ME1312.SubServers.Bungee.Network.Client;
 import net.ME1312.SubServers.Bungee.Network.PacketIn;
@@ -26,6 +27,7 @@ public class PacketTeleportPlayer implements PacketIn, PacketOut {
      * @param plugin SubPlugin
      */
     public PacketTeleportPlayer(SubPlugin plugin) {
+        if (Util.isNull(plugin)) throw new NullPointerException();
         this.plugin = plugin;
     }
 
@@ -37,6 +39,7 @@ public class PacketTeleportPlayer implements PacketIn, PacketOut {
      * @param id Receiver ID
      */
     public PacketTeleportPlayer(int response, String message, String id) {
+        if (Util.isNull(response, message)) throw new NullPointerException();
         this.response = response;
         this.message = message;
         this.id = id;

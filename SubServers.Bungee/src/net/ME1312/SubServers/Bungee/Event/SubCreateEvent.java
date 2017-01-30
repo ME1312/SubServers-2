@@ -3,6 +3,7 @@ package net.ME1312.SubServers.Bungee.Event;
 import net.ME1312.SubServers.Bungee.Host.Host;
 import net.ME1312.SubServers.Bungee.Host.SubCreator;
 import net.ME1312.SubServers.Bungee.Library.SubEvent;
+import net.ME1312.SubServers.Bungee.Library.Util;
 import net.ME1312.SubServers.Bungee.Library.Version.Version;
 import net.md_5.bungee.api.plugin.Cancellable;
 import net.md_5.bungee.api.plugin.Event;
@@ -34,6 +35,7 @@ public class SubCreateEvent extends Event implements SubEvent, Cancellable {
      * @param port Server Port Number
      */
     public SubCreateEvent(UUID player, Host host, String name, SubCreator.ServerType type, Version version, int memory, int port) {
+        if (Util.isNull(host, name, type, version, memory, port)) throw new NullPointerException();
         this.player = player;
         this.host = host;
         this.name = name;

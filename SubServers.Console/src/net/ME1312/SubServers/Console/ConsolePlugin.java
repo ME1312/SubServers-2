@@ -26,7 +26,7 @@ public final class ConsolePlugin extends Plugin implements Listener {
 
     @Override
     public void onEnable() {
-        try {
+        try {this.
             getDataFolder().mkdirs();
             config = new YAMLConfig(new File(getDataFolder(), "config.yml"));
             boolean save = false;

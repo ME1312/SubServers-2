@@ -4,6 +4,7 @@ import net.ME1312.SubServers.Bungee.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Bungee.Library.Config.YAMLValue;
 import net.ME1312.SubServers.Bungee.Library.Exception.InvalidServerException;
 import net.ME1312.SubServers.Bungee.Library.ExtraDataHandler;
+import net.ME1312.SubServers.Bungee.Library.Util;
 import net.ME1312.SubServers.Bungee.Network.Client;
 import net.ME1312.SubServers.Bungee.Network.ClientHandler;
 import net.md_5.bungee.BungeeServerInfo;
@@ -25,6 +26,7 @@ public class Server extends BungeeServerInfo implements ClientHandler, ExtraData
 
     public Server(String name, InetSocketAddress address, String motd, boolean hidden, boolean restricted) throws InvalidServerException {
         super(name, address, ChatColor.translateAlternateColorCodes('&', motd), restricted);
+        if (Util.isNull(name, address, motd, hidden, restricted)) throw new NullPointerException();
         if (name.contains(" ")) throw new InvalidServerException("Server names cannot have spaces: " + name);
         this.motd = motd;
         this.restricted = restricted;
@@ -79,6 +81,7 @@ public class Server extends BungeeServerInfo implements ClientHandler, ExtraData
      * @param value Value
      */
     public void setHidden(boolean value) {
+        if (Util.isNull(value)) throw new NullPointerException();
         this.hidden = value;
     }
 
@@ -98,6 +101,7 @@ public class Server extends BungeeServerInfo implements ClientHandler, ExtraData
      * @param value Value
      */
     public void setMotd(String value) {
+        if (Util.isNull(value)) throw new NullPointerException();
         this.motd = value;
     }
 
@@ -117,21 +121,25 @@ public class Server extends BungeeServerInfo implements ClientHandler, ExtraData
      * @param value Value
      */
     public void setRestricted(boolean value) {
+        if (Util.isNull(value)) throw new NullPointerException();
         this.restricted = value;
     }
 
     @Override
     public void addExtra(String handle, Object value) {
+        if (Util.isNull(handle, value)) throw new NullPointerException();
         extra.set(handle, value);
     }
 
     @Override
     public boolean hasExtra(String handle) {
+        if (Util.isNull(handle)) throw new NullPointerException();
         return extra.getKeys().contains(handle);
     }
 
     @Override
     public YAMLValue getExtra(String handle) {
+        if (Util.isNull(handle)) throw new NullPointerException();
         return extra.get(handle);
     }
 
@@ -142,6 +150,7 @@ public class Server extends BungeeServerInfo implements ClientHandler, ExtraData
 
     @Override
     public void removeExtra(String handle) {
+        if (Util.isNull(handle)) throw new NullPointerException();
         extra.remove(handle);
     }
 }

@@ -1,6 +1,7 @@
 package net.ME1312.SubServers.Client.Bukkit.Event;
 
 import net.ME1312.SubServers.Client.Bukkit.Library.SubEvent;
+import net.ME1312.SubServers.Client.Bukkit.Library.Util;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
@@ -21,6 +22,7 @@ public class SubRemoveServerEvent extends Event implements SubEvent {
      * @param server Server Starting
      */
     public SubRemoveServerEvent(UUID player, String host, String server) {
+        if (Util.isNull(host, server)) throw new NullPointerException();
         this.player = player;
         this.host = host;
         this.server = server;

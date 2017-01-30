@@ -212,6 +212,7 @@ public class YAMLValue {
      * @return Colored String
      */
     public String asColoredString(char color) {
+        if (Util.isNull(color)) throw new NullPointerException();
         return ChatColor.translateAlternateColorCodes(color, Util.unescapeJavaString((String) obj));
     }
 
@@ -222,6 +223,7 @@ public class YAMLValue {
      * @return Colored String List
      */
     public List<String> asColoredStringList(char color) {
+        if (Util.isNull(color)) throw new NullPointerException();
         List<String> values = new ArrayList<String>();
         for (String value : (List<String>) obj) {
             values.add(ChatColor.translateAlternateColorCodes(color, Util.unescapeJavaString(value)));
@@ -278,7 +280,7 @@ public class YAMLValue {
      *
      * @return Float Status
      */
-    public boolean isFloat(String path) {
+    public boolean isFloat() {
         return (obj instanceof Float);
     }
 
@@ -323,7 +325,7 @@ public class YAMLValue {
      *
      * @return UUID Status
      */
-    public boolean isUUID(String handle) {
+    public boolean isUUID() {
         return (obj instanceof String && !Util.isException(() -> UUID.fromString((String) obj)));
     }
 

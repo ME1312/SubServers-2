@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":10,"i1":10,"i2":6,"i3":10,"i4":6,"i5":10,"i6":6,"i7":6,"i8":6,"i9":6,"i10":10,"i11":10,"i12":10,"i13":6,"i14":6,"i15":6,"i16":10,"i17":6,"i18":10,"i19":10,"i20":6,"i21":10,"i22":6,"i23":10,"i24":6,"i25":10,"i26":6,"i27":10,"i28":6};
+var methods = {"i0":10,"i1":10,"i2":6,"i3":10,"i4":10,"i5":10,"i6":6,"i7":6,"i8":6,"i9":6,"i10":10,"i11":10,"i12":10,"i13":6,"i14":6,"i15":6,"i16":10,"i17":6,"i18":10,"i19":10,"i20":6,"i21":10,"i22":6,"i23":10,"i24":10,"i25":10,"i26":10,"i27":10,"i28":10};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],4:["t3","Abstract Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -213,7 +213,7 @@ implements <a href="../../../../../net/ME1312/SubServers/Bungee/Library/ExtraDat
 </td>
 </tr>
 <tr id="i4" class="altColor">
-<td class="colFirst"><code>abstract int</code></td>
+<td class="colFirst"><code>int</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/Host.html#command-java.util.UUID-java.lang.String-java.lang.String...-">command</a></span>(java.util.UUID&nbsp;player,
        java.lang.String&nbsp;command,
        java.lang.String...&nbsp;servers)</code>
@@ -337,7 +337,7 @@ implements <a href="../../../../../net/ME1312/SubServers/Bungee/Library/ExtraDat
 </td>
 </tr>
 <tr id="i24" class="altColor">
-<td class="colFirst"><code>abstract int</code></td>
+<td class="colFirst"><code>int</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/Host.html#start-java.util.UUID-java.lang.String...-">start</a></span>(java.util.UUID&nbsp;player,
      java.lang.String...&nbsp;servers)</code>
 <div class="block">Starts the Servers Specified</div>
@@ -350,7 +350,7 @@ implements <a href="../../../../../net/ME1312/SubServers/Bungee/Library/ExtraDat
 </td>
 </tr>
 <tr id="i26" class="altColor">
-<td class="colFirst"><code>abstract int</code></td>
+<td class="colFirst"><code>int</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/Host.html#stop-java.util.UUID-java.lang.String...-">stop</a></span>(java.util.UUID&nbsp;player,
     java.lang.String...&nbsp;servers)</code>
 <div class="block">Stops the Servers Specified</div>
@@ -363,7 +363,7 @@ implements <a href="../../../../../net/ME1312/SubServers/Bungee/Library/ExtraDat
 </td>
 </tr>
 <tr id="i28" class="altColor">
-<td class="colFirst"><code>abstract int</code></td>
+<td class="colFirst"><code>int</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/Host.html#terminate-java.util.UUID-java.lang.String...-">terminate</a></span>(java.util.UUID&nbsp;player,
          java.lang.String...&nbsp;servers)</code>
 <div class="block">Terminates the Servers Specified</div>
@@ -543,8 +543,8 @@ implements <a href="../../../../../net/ME1312/SubServers/Bungee/Library/ExtraDat
 <ul class="blockList">
 <li class="blockList">
 <h4>start</h4>
-<pre>public abstract&nbsp;int&nbsp;start(java.util.UUID&nbsp;player,
-                          java.lang.String...&nbsp;servers)</pre>
+<pre>public&nbsp;int&nbsp;start(java.util.UUID&nbsp;player,
+                 java.lang.String...&nbsp;servers)</pre>
 <div class="block">Starts the Servers Specified</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
@@ -577,8 +577,8 @@ implements <a href="../../../../../net/ME1312/SubServers/Bungee/Library/ExtraDat
 <ul class="blockList">
 <li class="blockList">
 <h4>stop</h4>
-<pre>public abstract&nbsp;int&nbsp;stop(java.util.UUID&nbsp;player,
-                         java.lang.String...&nbsp;servers)</pre>
+<pre>public&nbsp;int&nbsp;stop(java.util.UUID&nbsp;player,
+                java.lang.String...&nbsp;servers)</pre>
 <div class="block">Stops the Servers Specified</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
@@ -611,8 +611,8 @@ implements <a href="../../../../../net/ME1312/SubServers/Bungee/Library/ExtraDat
 <ul class="blockList">
 <li class="blockList">
 <h4>terminate</h4>
-<pre>public abstract&nbsp;int&nbsp;terminate(java.util.UUID&nbsp;player,
-                              java.lang.String...&nbsp;servers)</pre>
+<pre>public&nbsp;int&nbsp;terminate(java.util.UUID&nbsp;player,
+                     java.lang.String...&nbsp;servers)</pre>
 <div class="block">Terminates the Servers Specified</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
@@ -647,9 +647,9 @@ implements <a href="../../../../../net/ME1312/SubServers/Bungee/Library/ExtraDat
 <ul class="blockList">
 <li class="blockList">
 <h4>command</h4>
-<pre>public abstract&nbsp;int&nbsp;command(java.util.UUID&nbsp;player,
-                            java.lang.String&nbsp;command,
-                            java.lang.String...&nbsp;servers)</pre>
+<pre>public&nbsp;int&nbsp;command(java.util.UUID&nbsp;player,
+                   java.lang.String&nbsp;command,
+                   java.lang.String...&nbsp;servers)</pre>
 <div class="block">Commands the Servers Specified</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>

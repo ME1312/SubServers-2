@@ -3,6 +3,7 @@ package net.ME1312.SubServers.Client.Bukkit.Network.Packet;
 import net.ME1312.SubServers.Client.Bukkit.Graphic.InternalRenderer;
 import net.ME1312.SubServers.Client.Bukkit.Graphic.UIRenderer;
 import net.ME1312.SubServers.Client.Bukkit.Library.JSONCallback;
+import net.ME1312.SubServers.Client.Bukkit.Library.Util;
 import net.ME1312.SubServers.Client.Bukkit.Library.Version.Version;
 import net.ME1312.SubServers.Client.Bukkit.Network.PacketIn;
 import net.ME1312.SubServers.Client.Bukkit.Network.PacketOut;
@@ -33,18 +34,8 @@ public class PacketCreateServer implements PacketIn, PacketOut {
     private String id;
 
     public PacketCreateServer() {}
-    public PacketCreateServer(String name, String host, ServerType type, Version version, int port, int memory, String id, JSONCallback callback) {
-        this.player = null;
-        this.name = name;
-        this.host = host;
-        this.type = type;
-        this.version = version;
-        this.port = port;
-        this.ram = memory;
-        this.id = id;
-        callbacks.put(id, callback);
-    }
     public PacketCreateServer(UUID player, String name, String host, ServerType type, Version version, int port, int memory, String id, JSONCallback callback) {
+        if (Util.isNull(name, host, type, version, port, memory, id, callback)) throw new NullPointerException();
         this.player = player;
         this.name = name;
         this.host = host;
@@ -55,19 +46,8 @@ public class PacketCreateServer implements PacketIn, PacketOut {
         this.id = id;
         callbacks.put(id, callback);
     }
-    public PacketCreateServer(UIRenderer.CreatorOptions options, String id, JSONCallback callback) {
-        this.player = null;
-        this.name = options.getName();
-        this.host = options.getHost();
-        this.type = options.getType();
-        this.version = options.getVersion();
-        this.port = options.getPort();
-        this.ram = options.getMemory();
-        this.id = id;
-        callbacks.put(id, callback);
-
-    }
     public PacketCreateServer(UUID player, UIRenderer.CreatorOptions options, String id, JSONCallback callback) {
+        if (Util.isNull(options, id, callback)) throw new NullPointerException();
         this.player = player;
         this.name = options.getName();
         this.host = options.getHost();

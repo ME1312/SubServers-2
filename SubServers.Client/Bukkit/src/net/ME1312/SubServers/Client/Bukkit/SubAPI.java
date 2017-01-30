@@ -1,6 +1,7 @@
 package net.ME1312.SubServers.Client.Bukkit;
 
 import net.ME1312.SubServers.Client.Bukkit.Graphic.UIHandler;
+import net.ME1312.SubServers.Client.Bukkit.Library.Util;
 import net.ME1312.SubServers.Client.Bukkit.Library.Version.Version;
 import net.ME1312.SubServers.Client.Bukkit.Network.SubDataClient;
 import org.bukkit.Bukkit;
@@ -56,6 +57,7 @@ public final class SubAPI {
      * @return Lang Value
      */
     public String getLang(String key) {
+        if (Util.isNull(key)) throw new NullPointerException();
         return getLang().get(key);
     }
 
@@ -87,6 +89,7 @@ public final class SubAPI {
      * @param graphics Graphics Handler
      */
     public void setGraphicHandler(UIHandler graphics) {
+        if (Util.isNull(graphics)) throw new NullPointerException();
         plugin.gui.disable();
         plugin.gui = graphics;
     }

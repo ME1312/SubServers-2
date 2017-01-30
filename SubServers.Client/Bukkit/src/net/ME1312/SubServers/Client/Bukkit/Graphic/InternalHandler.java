@@ -38,6 +38,7 @@ public class InternalHandler implements UIHandler, Listener {
      * @param plugin Event
      */
     public InternalHandler(SubPlugin plugin) {
+        if (Util.isNull(plugin)) throw new NullPointerException();
         this.plugin = plugin;
         Bukkit.getPluginManager().registerEvents(this, plugin);
     }
@@ -305,12 +306,12 @@ public class InternalHandler implements UIHandler, Listener {
                             if (player.hasPermission("subservers.subserver.stop.*") || player.hasPermission("subservers.subserver.stop." + gui.lastVistedObject.toLowerCase())) {
                                 gui.setDownloading(plugin.lang.getSection("Lang").getColoredString("Interface.Generic.Downloading.Response", '&'));
                                 final Container<Boolean> listening = new Container<Boolean>(true);
-                                ((PacketInRunEvent) SubDataClient.getPacket("SubRunEvent")).callback("SubStoppedEvent", new JSONCallback() {
+                                PacketInRunEvent.callback("SubStoppedEvent", new JSONCallback() {
                                     @Override
                                     public void run(JSONObject json) {
                                         try {
                                             if (listening.get()) if (!json.getString("server").equalsIgnoreCase(gui.lastVistedObject)) {
-                                                ((PacketInRunEvent) SubDataClient.getPacket("RunEvent")).callback("SubStoppedEvent", this);
+                                                PacketInRunEvent.callback("SubStoppedEvent", this);
                                             } else {
                                                 gui.reopen();
                                             }
@@ -329,12 +330,12 @@ public class InternalHandler implements UIHandler, Listener {
                             if (player.hasPermission("subservers.subserver.terminate.*") || player.hasPermission("subservers.subserver.terminate." + gui.lastVistedObject.toLowerCase())) {
                                 gui.setDownloading(plugin.lang.getSection("Lang").getColoredString("Interface.Generic.Downloading.Response", '&'));
                                 final Container<Boolean> listening = new Container<Boolean>(true);
-                                ((PacketInRunEvent) SubDataClient.getPacket("SubRunEvent")).callback("SubStoppedEvent", new JSONCallback() {
+                                PacketInRunEvent.callback("SubStoppedEvent", new JSONCallback() {
                                     @Override
                                     public void run(JSONObject json) {
                                         try {
                                             if (listening.get()) if (!json.getString("server").equalsIgnoreCase(gui.lastVistedObject)) {
-                                               ((PacketInRunEvent) SubDataClient.getPacket("RunEvent")).callback("SubStoppedEvent", this);
+                                                PacketInRunEvent.callback("SubStoppedEvent", this);
                                             } else {
                                                 gui.reopen();
                                             }

@@ -4,6 +4,7 @@ import net.ME1312.SubServers.Bungee.Host.SubLogFilter;
 import net.ME1312.SubServers.Bungee.Host.SubLogger;
 import net.ME1312.SubServers.Bungee.Library.Container;
 import net.ME1312.SubServers.Bungee.Library.NamedContainer;
+import net.ME1312.SubServers.Bungee.Library.Util;
 import net.md_5.bungee.api.ProxyServer;
 
 import java.io.*;
@@ -40,7 +41,7 @@ public class InternalSubLogger extends SubLogger {
      * @param log Console Logging Status
      * @param file File to log to (or null for disabled)
      */
-    public InternalSubLogger(Process process, Object user, String name, Container<Boolean> log, File file) {
+    protected InternalSubLogger(Process process, Object user, String name, Container<Boolean> log, File file) {
         this.process = process;
         this.handle = user;
         this.name = name;
@@ -144,11 +145,13 @@ public class InternalSubLogger extends SubLogger {
 
     @Override
     public void registerFilter(SubLogFilter filter) {
+        if (Util.isNull(filter)) throw new NullPointerException();
         filters.add(filter);
     }
 
     @Override
     public void unregisterFilter(SubLogFilter filter) {
+        if (Util.isNull(filter)) throw new NullPointerException();
         filters.remove(filter);
     }
 

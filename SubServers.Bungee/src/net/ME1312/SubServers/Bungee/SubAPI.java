@@ -6,6 +6,7 @@ import net.ME1312.SubServers.Bungee.Host.Host;
 import net.ME1312.SubServers.Bungee.Host.SubServer;
 import net.ME1312.SubServers.Bungee.Library.NamedContainer;
 import net.ME1312.SubServers.Bungee.Library.UniversalFile;
+import net.ME1312.SubServers.Bungee.Library.Util;
 import net.ME1312.SubServers.Bungee.Library.Version.Version;
 import net.ME1312.SubServers.Bungee.Network.SubDataServer;
 
@@ -72,6 +73,7 @@ public final class SubAPI {
      * @param handle Handle to Bind
      */
     public void addHostDriver(Class<? extends Host> driver, String handle) {
+        if (Util.isNull(driver, handle)) throw new NullPointerException();
         if (plugin.hostDrivers.keySet().contains(handle.toLowerCase())) throw new IllegalStateException("Driver already exists: " + handle);
         plugin.hostDrivers.put(handle, driver);
     }
@@ -92,6 +94,7 @@ public final class SubAPI {
      * @return a Host
      */
     public Host getHost(String name) {
+        if (Util.isNull(name)) throw new NullPointerException();
         return getHosts().get(name.toLowerCase());
     }
 
@@ -155,6 +158,7 @@ public final class SubAPI {
      * @return a Server
      */
     public Server getServer(String name) {
+        if (Util.isNull(name)) throw new NullPointerException();
         return getServers().get(name.toLowerCase());
     }
 
@@ -178,6 +182,7 @@ public final class SubAPI {
      * @return a SubServer
      */
     public SubServer getSubServer(String name) {
+        if (Util.isNull(name)) throw new NullPointerException();
         return getSubServers().get(name.toLowerCase());
     }
 
@@ -188,6 +193,7 @@ public final class SubAPI {
      * @param value Lang Value
      */
     public void setLang(String key, String value) {
+        if (Util.isNull(key, value)) throw new NullPointerException();
         plugin.exLang.put(key, value);
     }
 
@@ -198,6 +204,7 @@ public final class SubAPI {
      * @return Lang Value
      */
     public String getLang(String key) {
+        if (Util.isNull(key)) throw new NullPointerException();
         return getLang().get(key);
     }
 

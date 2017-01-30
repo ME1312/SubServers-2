@@ -6,6 +6,7 @@ import net.ME1312.SubServers.Bungee.Library.Exception.InvalidHostException;
 import net.ME1312.SubServers.Bungee.Library.Exception.InvalidServerException;
 import net.ME1312.SubServers.Bungee.Library.ExtraDataHandler;
 import net.ME1312.SubServers.Bungee.Library.NamedContainer;
+import net.ME1312.SubServers.Bungee.Library.Util;
 import net.ME1312.SubServers.Bungee.SubPlugin;
 import org.json.JSONObject;
 
@@ -104,7 +105,13 @@ public abstract class Host implements ExtraDataHandler {
      * @param servers Servers
      * @return Success Status
      */
-    public abstract int start(UUID player, String... servers);
+    public int start(UUID player, String... servers) {
+        int i = 0;
+        for (String server : servers) {
+            if (getSubServer(server.toLowerCase()).start(player)) i++;
+        }
+        return i;
+    }
 
     /**
      * Stops the Servers Specified
@@ -123,7 +130,13 @@ public abstract class Host implements ExtraDataHandler {
      * @param servers Servers
      * @return Success Status
      */
-    public abstract int stop(UUID player, String... servers);
+    public int stop(UUID player, String... servers) {
+        int i = 0;
+        for (String server : servers) {
+            if (getSubServer(server.toLowerCase()).stop(player)) i++;
+        }
+        return i;
+    }
 
     /**
      * Terminates the Servers Specified
@@ -142,7 +155,13 @@ public abstract class Host implements ExtraDataHandler {
      * @param servers Servers
      * @return Success Status
      */
-    public abstract int terminate(UUID player, String... servers);
+    public int terminate(UUID player, String... servers) {
+        int i = 0;
+        for (String server : servers) {
+            if (getSubServer(server.toLowerCase()).terminate(player)) i++;
+        }
+        return i;
+    }
 
     /**
      * Commands the Servers Specified
@@ -163,7 +182,13 @@ public abstract class Host implements ExtraDataHandler {
      * @param servers Servers
      * @return Success Status
      */
-    public abstract int command(UUID player, String command, String... servers);
+    public int command(UUID player, String command, String... servers) {
+        int i = 0;
+        for (String server : servers) {
+            if (getSubServer(server.toLowerCase()).command(player, command)) i++;
+        }
+        return i;
+    }
 
     /**
      * Gets the SubCreator Instance for this Host
@@ -270,16 +295,19 @@ public abstract class Host implements ExtraDataHandler {
 
     @Override
     public void addExtra(String handle, Object value) {
+        if (Util.isNull(handle, value)) throw new NullPointerException();
         extra.set(handle, value);
     }
 
     @Override
     public boolean hasExtra(String handle) {
+        if (Util.isNull(handle)) throw new NullPointerException();
         return extra.getKeys().contains(handle);
     }
 
     @Override
     public YAMLValue getExtra(String handle) {
+        if (Util.isNull(handle)) throw new NullPointerException();
         return extra.get(handle);
     }
 
@@ -290,6 +318,7 @@ public abstract class Host implements ExtraDataHandler {
 
     @Override
     public void removeExtra(String handle) {
+        if (Util.isNull(handle)) throw new NullPointerException();
         extra.remove(handle);
     }
 }

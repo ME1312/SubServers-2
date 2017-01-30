@@ -17,6 +17,7 @@ import net.md_5.bungee.api.config.ServerInfo;
 import org.json.JSONObject;
 
 import java.io.*;
+import java.lang.reflect.InvocationTargetException;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.nio.file.Files;
@@ -44,19 +45,9 @@ public final class SubPlugin extends BungeeCord {
     public final SubAPI api = new SubAPI(this);
 
     protected SubPlugin(PrintStream out) throws IOException {
-        this.out = out;
-        enable();
-    }
-
-    /**
-     * Enable Plugin
-     *
-     * @throws IOException
-     */
-    protected void enable() throws IOException {
-        if (running) throw new IllegalStateException("SubServers has already been loaded");
         System.out.println("SubServers > Loading SubServers v" + version.toString() + " Libraries... ");
 
+        this.out = out;
         if (!(new UniversalFile(dir, "config.yml").exists())) {
             Util.copyFromJar(SubPlugin.class.getClassLoader(), "net/ME1312/SubServers/Bungee/Library/Files/bungee.yml", new UniversalFile(dir, "config.yml").getPath());
             YAMLConfig tmp = new YAMLConfig(new UniversalFile("config.yml"));
@@ -152,7 +143,7 @@ public final class SubPlugin extends BungeeCord {
                     e.printStackTrace();
                 }
             }
-            if (f == 0) {
+            if (f <= 0) {
                 Files.delete(new UniversalFile(dir, "Recently Deleted").toPath());
             }
         }
@@ -244,12 +235,12 @@ public final class SubPlugin extends BungeeCord {
                             plugins++;
                         }
                     } catch (Throwable e) {
-                        e.printStackTrace();
+                        new InvocationTargetException(e, "Problem enabling plugin").printStackTrace();
                     }
                 }
             }
 
-            System.out.println("SubServers > " + ((plugins > 0)?plugins + " Plugin(s), ":"") + hosts + " Host(s), " + servers + " Server(s), and " + subservers + " SubServer(s) loaded in " + (Calendar.getInstance().getTime().getTime() - begin) + "ms");
+            System.out.println("SubServers > " + ((plugins > 0)?plugins+" Plugin"+((plugins == 1)?"":"s")+", ":"") + hosts + " Host"+((hosts == 1)?"":"s")+", " + servers + " Server"+((servers == 1)?"":"s")+", and " + subservers + " SubServer"+((subservers == 1)?"":"s")+" loaded in " + (Calendar.getInstance().getTime().getTime() - begin) + "ms");
 
             super.startListeners();
         } catch (IOException e) {
@@ -303,7 +294,7 @@ public final class SubPlugin extends BungeeCord {
                     try {
                         if (listener.get() != null) listener.get().run();
                     } catch (Throwable e) {
-                        e.printStackTrace();
+                        new InvocationTargetException(e, "Problem disabling plugin").printStackTrace();
                     }
                 }
             }
@@ -335,34 +326,5 @@ public final class SubPlugin extends BungeeCord {
         }
 
         super.stopListeners();
-    }
-
-    /**
-     * Disable Plugin
-     */
-    protected void disable() {
-        if (running) {
-            running = false;
-        }
-    }
-
-    /**
-     * Override BungeeCord Stop Functions
-     */
-    @Override
-    public void stop() {
-        disable();
-        super.stop();
-    }
-
-    /**
-     * Override BungeeCord Stop Functions
-     *
-     * @param reason Reason
-     */
-    @Override
-    public void stop(String reason) {
-        disable();
-        super.stop(reason);
     }
 }

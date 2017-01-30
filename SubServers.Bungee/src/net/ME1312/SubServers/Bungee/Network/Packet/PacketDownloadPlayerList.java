@@ -1,5 +1,6 @@
 package net.ME1312.SubServers.Bungee.Network.Packet;
 
+import net.ME1312.SubServers.Bungee.Library.Util;
 import net.ME1312.SubServers.Bungee.Library.Version.Version;
 import net.ME1312.SubServers.Bungee.Network.Client;
 import net.ME1312.SubServers.Bungee.Network.PacketIn;
@@ -21,6 +22,7 @@ public class PacketDownloadPlayerList implements PacketIn, PacketOut {
      * @param plugin SubPlugin
      */
     public PacketDownloadPlayerList(SubPlugin plugin) {
+        if (Util.isNull(plugin)) throw new NullPointerException();
         this.plugin = plugin;
     }
 
@@ -31,6 +33,7 @@ public class PacketDownloadPlayerList implements PacketIn, PacketOut {
      * @param id Receiver ID
      */
     public PacketDownloadPlayerList(SubPlugin plugin, String id) {
+        if (Util.isNull(plugin)) throw new NullPointerException();
         this.plugin = plugin;
         this.id = id;
     }

@@ -1,0 +1,7 @@
+Settings:
+  Version: '2.11.2a+'
+  Log: true
+  SubData:
+    Name: 'undefined'
+    Address: '127.0.0.1:4391'
+    Password: ''

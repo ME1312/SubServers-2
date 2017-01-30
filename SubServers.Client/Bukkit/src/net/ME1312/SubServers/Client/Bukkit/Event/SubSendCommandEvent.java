@@ -1,6 +1,7 @@
 package net.ME1312.SubServers.Client.Bukkit.Event;
 
 import net.ME1312.SubServers.Client.Bukkit.Library.SubEvent;
+import net.ME1312.SubServers.Client.Bukkit.Library.Util;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
@@ -21,6 +22,7 @@ public class SubSendCommandEvent extends Event implements SubEvent {
      * @param server Server being Commanded
      */
     public SubSendCommandEvent(UUID player, String server, String command) {
+        if (Util.isNull(server, command)) throw new NullPointerException();
         this.player = player;
         this.server = server;
         this.command = command;

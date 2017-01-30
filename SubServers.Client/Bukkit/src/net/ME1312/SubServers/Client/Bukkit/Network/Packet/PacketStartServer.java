@@ -1,6 +1,7 @@
 package net.ME1312.SubServers.Client.Bukkit.Network.Packet;
 
 import net.ME1312.SubServers.Client.Bukkit.Library.JSONCallback;
+import net.ME1312.SubServers.Client.Bukkit.Library.Util;
 import net.ME1312.SubServers.Client.Bukkit.Library.Version.Version;
 import net.ME1312.SubServers.Client.Bukkit.Network.PacketIn;
 import net.ME1312.SubServers.Client.Bukkit.Network.PacketOut;
@@ -16,13 +17,8 @@ public class PacketStartServer implements PacketIn, PacketOut {
     private String id;
 
     public PacketStartServer() {}
-    public PacketStartServer(String server, String id, JSONCallback callback) {
-        this.player = null;
-        this.server = server;
-        this.id = id;
-        callbacks.put(id, callback);
-    }
     public PacketStartServer(UUID player, String server, String id, JSONCallback callback) {
+        if (Util.isNull(server, id, callback)) throw new NullPointerException();
         this.player = player;
         this.server = server;
         this.id = id;
