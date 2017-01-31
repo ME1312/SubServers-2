@@ -11,4 +11,5 @@ These are some quick links for common resources of SubServers 2.
 
 ### Javadocs for Developers
 > [http://subservers.ME1312.net/Javadoc/SubServers.Bungee/](http://subservers.ME1312.net/Javadoc/SubServers.Bungee/)<br>
+> [http://subservers.ME1312.net/Javadoc/SubServers.Host/](http://subservers.ME1312.net/Javadoc/SubServers.Host/)<br>
 > [http://subservers.ME1312.net/Javadoc/SubServers.Client.Bukkit/](http://subservers.ME1312.net/Javadoc/SubServers.Client.Bukkit/)

@@ -22,7 +22,7 @@ public class SubAddServerEvent extends Event implements SubEvent {
      * @param server Server Starting
      */
     public SubAddServerEvent(UUID player, String host, String server) {
-        if (Util.isNull(host, server)) throw new NullPointerException();
+        if (Util.isNull(server)) throw new NullPointerException();
         this.player = player;
         this.host = host;
         this.server = server;

@@ -1,20 +1,30 @@
 package net.ME1312.SubServers.Host.Network.Packet;
 
+import net.ME1312.SubServers.Host.Library.Log.Logger;
 import net.ME1312.SubServers.Host.Library.Util;
 import net.ME1312.SubServers.Host.Library.Version.Version;
 import net.ME1312.SubServers.Host.Network.PacketIn;
 import net.ME1312.SubServers.Host.Network.PacketOut;
+import net.ME1312.SubServers.Host.Network.SubDataClient;
 import net.ME1312.SubServers.Host.SubServers;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
 
 public final class PacketAuthorization implements PacketIn, PacketOut {
     private SubServers plugin;
+    private Logger log = null;
 
     public PacketAuthorization(SubServers plugin) {
         if (Util.isNull(plugin)) throw new NullPointerException();
         this.plugin = plugin;
+        try {
+            Field f = SubDataClient.class.getDeclaredField("log");
+            f.setAccessible(true);
+            this.log = (Logger) f.get(null);
+            f.setAccessible(false);
+        } catch (IllegalAccessException | NoSuchFieldException e) {}
     }
 
     @Override
@@ -31,11 +41,11 @@ public final class PacketAuthorization implements PacketIn, PacketOut {
                 //plugin.subdata.sendPacket(new PacketLinkServer(plugin));
                 plugin.subdata.sendPacket(new PacketDownloadLang());
             } else {
-                plugin.log.info("SubServers > Could not authorize SubData connection: " + data.getString("m"));
+                log.info("SubServers > Could not authorize SubData connection: " + data.getString("m"));
                 plugin.subdata.destroy(false);
             }
         } catch (IOException e) {
-            plugin.log.error(e);
+            log.error(e);
         }
     }
 

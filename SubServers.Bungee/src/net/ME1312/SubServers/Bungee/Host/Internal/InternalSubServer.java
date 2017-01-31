@@ -3,21 +3,25 @@ package net.ME1312.SubServers.Bungee.Host.Internal;
 import net.ME1312.SubServers.Bungee.Event.*;
 import net.ME1312.SubServers.Bungee.Host.Executable;
 import net.ME1312.SubServers.Bungee.Host.SubLogger;
+import net.ME1312.SubServers.Bungee.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Bungee.Library.Container;
 import net.ME1312.SubServers.Bungee.Library.Exception.InvalidServerException;
 import net.ME1312.SubServers.Bungee.Host.Host;
 import net.ME1312.SubServers.Bungee.Host.SubServer;
 import net.ME1312.SubServers.Bungee.Library.NamedContainer;
+import net.ME1312.SubServers.Bungee.Library.UniversalFile;
 import net.ME1312.SubServers.Bungee.Library.Util;
+import net.ME1312.SubServers.Bungee.Library.Version.Version;
+import net.ME1312.SubServers.Bungee.SubPlugin;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
+import java.io.*;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.UUID;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
+import java.util.jar.JarInputStream;
 
 /**
  * Internal SubServer Class
@@ -74,6 +78,21 @@ public class InternalSubServer extends SubServer {
         this.thread = null;
         this.command = null;
         this.restart = restart;
+
+        if (new UniversalFile(this.directory, "plugins:SubServers.Client.jar").exists()) {
+            try {
+                JarFile jar = new JarFile(new UniversalFile(this.directory, "plugins:SubServers.Client.jar"));
+                YAMLSection plugin = new YAMLSection(Util.readAll(new InputStreamReader(jar.getInputStream(jar.getJarEntry("plugin.yml")))));
+                YAMLSection bplugin = new YAMLSection(Util.readAll(new InputStreamReader(SubPlugin.class.getResourceAsStream("/net/ME1312/SubServers/Bungee/Library/Files/bukkit.yml"))));
+                if (new Version(plugin.getString("version")).compareTo(new Version(bplugin.getString("version"))) < 0) {
+                    new UniversalFile(this.directory, "plugins:SubServers.Client.jar").delete();
+                    Util.copyFromJar(SubPlugin.class.getClassLoader(), "net/ME1312/SubServers/Bungee/Library/Files/bukkit.jar", new UniversalFile(this.directory, "plugins:SubServers.Client.jar").getPath());
+                }
+            } catch (Throwable e) {
+                System.out.println("Couldn't auto-update SubServers.Client.jar");
+                e.printStackTrace();
+            }
+        }
         this.temporary = !((start || temporary) && !start()) && temporary;
     }
 
