@@ -18,10 +18,10 @@ import java.util.*;
  * SubAPI Class
  */
 public final class SubAPI {
-    final HashMap<EventPriority, HashMap<Class<? extends SubEvent>, HashMap<SubPluginInfo, HashMap<Object, List<Method>>>>> listeners = new HashMap<EventPriority, HashMap<Class<? extends SubEvent>, HashMap<SubPluginInfo, HashMap<Object, List<Method>>>>>();
+    final HashMap<EventPriority, HashMap<Class<? extends Event>, HashMap<SubPluginInfo, HashMap<Object, List<Method>>>>> listeners = new LinkedHashMap<EventPriority, HashMap<Class<? extends Event>, HashMap<SubPluginInfo, HashMap<Object, List<Method>>>>>();
     final HashMap<UUID, Timer> schedule = new HashMap<UUID, Timer>();
-    final HashMap<String, Command> commands = new HashMap<String, Command>();
-    final HashMap<String, SubPluginInfo> plugins = new HashMap<String, SubPluginInfo>();
+    final TreeMap<String, Command> commands = new TreeMap<String, Command>();
+    final HashMap<String, SubPluginInfo> plugins = new LinkedHashMap<String, SubPluginInfo>();
     private SubServers plugin;
     private static SubAPI api;
 
@@ -65,7 +65,7 @@ public final class SubAPI {
      * @return PluginInfo Map
      */
     public Map<String, SubPluginInfo> getPlugins() {
-        return new HashMap<String, SubPluginInfo>(plugins);
+        return new LinkedHashMap<String, SubPluginInfo>(plugins);
     }
 
     /**
@@ -233,27 +233,25 @@ public final class SubAPI {
         for (Method method : Arrays.asList(listener.getClass().getMethods())) {
             if (!method.isAnnotationPresent(EventHandler.class)) continue;
             if (method.getParameterTypes().length == 1) {
-                if (SubEvent.class.isAssignableFrom(method.getParameterTypes()[0])) {
-                    HashMap<Class<? extends SubEvent>, HashMap<SubPluginInfo, HashMap<Object, List<Method>>>> events = (listeners.keySet().contains(method.getAnnotation(EventHandler.class).priority()))?listeners.get(method.getAnnotation(EventHandler.class).priority()):new HashMap<Class<? extends SubEvent>, HashMap<SubPluginInfo, HashMap<Object, List<Method>>>>();
-                    HashMap<SubPluginInfo, HashMap<Object, List<Method>>> plugins = (events.keySet().contains((Class<SubEvent>) method.getParameterTypes()[0]))?events.get((Class<SubEvent>) method.getParameterTypes()[0]):new HashMap<SubPluginInfo, HashMap<Object, List<Method>>>();
-                    HashMap<Object, List<Method>> listeners = (plugins.keySet().contains(plugin))?plugins.get(plugin):new HashMap<Object, List<Method>>();
+                if (Event.class.isAssignableFrom(method.getParameterTypes()[0])) {
+                    HashMap<Class<? extends Event>, HashMap<SubPluginInfo, HashMap<Object, List<Method>>>> events = (listeners.keySet().contains(method.getAnnotation(EventHandler.class).priority()))?listeners.get(method.getAnnotation(EventHandler.class).priority()):new LinkedHashMap<Class<? extends Event>, HashMap<SubPluginInfo, HashMap<Object, List<Method>>>>();
+                    HashMap<SubPluginInfo, HashMap<Object, List<Method>>> plugins = (events.keySet().contains((Class<Event>) method.getParameterTypes()[0]))?events.get((Class<Event>) method.getParameterTypes()[0]):new LinkedHashMap<SubPluginInfo, HashMap<Object, List<Method>>>();
+                    HashMap<Object, List<Method>> listeners = (plugins.keySet().contains(plugin))?plugins.get(plugin):new LinkedHashMap<Object, List<Method>>();
                     List<Method> methods = (listeners.keySet().contains(listener))?listeners.get(listener):new LinkedList<Method>();
                     methods.add(method);
                     listeners.put(listener, methods);
                     plugins.put(plugin, listeners);
-                    events.put((Class<SubEvent>) method.getParameterTypes()[0], plugins);
+                    events.put((Class<Event>) method.getParameterTypes()[0], plugins);
                     this.listeners.put(method.getAnnotation(EventHandler.class).priority(), events);
                 } else {
                     this.plugin.log.error(
                             "Cannot register EventHandler in class \"" + listener.getClass().getCanonicalName() + "\" using method \"" + method.getName() + "\":",
-                            "\"" + method.getParameterTypes()[0].getCanonicalName() + "\" is not a SubEvent",
-                            "");
+                            "\"" + method.getParameterTypes()[0].getCanonicalName() + "\" is not a SubEvent");
                 }
             } else {
                 this.plugin.log.error(
                         "Cannot register EventHandler in class \"" + listener.getClass().getCanonicalName() + "\" using method \"" + method.getName() + "\":",
-                        ((method.getParameterTypes().length > 0) ? "Too many" : "No") + " parameters for SubEvent to execute",
-                        "");
+                        ((method.getParameterTypes().length > 0) ? "Too many" : "No") + " parameters for SubEvent to execute");
             }
         }
     }
@@ -269,11 +267,11 @@ public final class SubAPI {
     }
     void removeListener(SubPluginInfo plugin, Object listener) {
         if (Util.isNull(plugin, listener)) throw new NullPointerException();
-        HashMap<EventPriority, HashMap<Class<? extends SubEvent>, HashMap<SubPluginInfo, HashMap<Object, List<Method>>>>> map = new HashMap<EventPriority, HashMap<Class<? extends SubEvent>, HashMap<SubPluginInfo, HashMap<Object, List<Method>>>>>(listeners);
+        HashMap<EventPriority, HashMap<Class<? extends Event>, HashMap<SubPluginInfo, HashMap<Object, List<Method>>>>> map = new LinkedHashMap<EventPriority, HashMap<Class<? extends Event>, HashMap<SubPluginInfo, HashMap<Object, List<Method>>>>>(listeners);
         for (EventPriority priority : map.keySet()) {
-            for (Class<? extends SubEvent> event : map.get(priority).keySet()) {
+            for (Class<? extends Event> event : map.get(priority).keySet()) {
                 if (map.get(priority).get(event).keySet().contains(plugin) && map.get(priority).get(event).get(plugin).keySet().contains(listener)) {
-                    HashMap<Class<? extends SubEvent>, HashMap<SubPluginInfo, HashMap<Object, List<Method>>>> events = listeners.get(priority);
+                    HashMap<Class<? extends Event>, HashMap<SubPluginInfo, HashMap<Object, List<Method>>>> events = listeners.get(priority);
                     HashMap<SubPluginInfo, HashMap<Object, List<Method>>> plugins = listeners.get(priority).get(event);
                     HashMap<Object, List<Method>> listeners = this.listeners.get(priority).get(event).get(plugin);
                     listeners.remove(listener);
@@ -290,13 +288,13 @@ public final class SubAPI {
      *
      * @param event SubEvent
      */
-    public void runEvent(SubEvent event) {
+    public void runEvent(Event event) {
         if (Util.isNull(event)) throw new NullPointerException();
         for (EventPriority priority : listeners.keySet()) {
             if (!listeners.get(priority).keySet().contains(event.getClass())) continue;
             for (SubPluginInfo plugin : listeners.get(priority).get(event.getClass()).keySet()) {
                 try {
-                    Field pf = SubEvent.class.getDeclaredField("plugin");
+                    Field pf = Event.class.getDeclaredField("plugin");
                     pf.setAccessible(true);
                     pf.set(event, plugin);
                     pf.setAccessible(false);
@@ -320,7 +318,7 @@ public final class SubAPI {
             }
         }
         try {
-            Field pf = SubEvent.class.getDeclaredField("plugin");
+            Field pf = Event.class.getDeclaredField("plugin");
             pf.setAccessible(true);
             pf.set(event, null);
             pf.setAccessible(false);

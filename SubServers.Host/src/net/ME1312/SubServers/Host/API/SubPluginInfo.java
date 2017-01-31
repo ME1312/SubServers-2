@@ -17,7 +17,7 @@ import java.util.*;
  *
  * @see SubPlugin
  */
-public final class SubPluginInfo implements ExtraDataHandler {
+public class SubPluginInfo implements ExtraDataHandler {
     private Object plugin;
     private String name;
     private Version version;
@@ -43,7 +43,7 @@ public final class SubPluginInfo implements ExtraDataHandler {
      * @param softDependencies Soft Dependencies List
      * @param dependencies Dependencies List
      */
-    public SubPluginInfo(Object plugin, String name, Version version, List<String> authors, String description, URL website, List<String> softDependencies, List<String> dependencies) {
+    public SubPluginInfo(Object plugin, String name, Version version, List<String> authors, String description, URL website, List<String> dependencies, List<String> softDependencies) {
         if (Util.isNull(plugin, name, version, authors)) throw new NullPointerException();
         if (authors.size() == 0) throw new ArrayIndexOutOfBoundsException("Authors list cannot be empty");
         this.plugin = plugin;

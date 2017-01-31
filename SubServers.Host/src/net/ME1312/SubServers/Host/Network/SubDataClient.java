@@ -250,9 +250,9 @@ public final class SubDataClient {
             final Socket socket = this.socket;
             this.socket = null;
             if (!socket.isClosed()) socket.close();
-            plugin.log.info("SubServers > The SubData Connection was closed");
+            plugin.log.info("The SubData Connection was closed");
             if (reconnect) {
-                plugin.log.info("SubServers > Attempting to reconnect in 30 seconds");
+                plugin.log.info("Attempting to reconnect in 30 seconds");
                 final Container<Timer> timer = new Container<Timer>(new Timer());
                 timer.get().schedule(new TimerTask() {
                     @Override
@@ -260,7 +260,7 @@ public final class SubDataClient {
                         try {
                             plugin.subdata = new SubDataClient(plugin, name, socket.getInetAddress(), socket.getPort());
                         } catch (IOException e) {
-                            plugin.log.info("SubServers > Connection was unsuccessful, retrying in 30 seconds");
+                            plugin.log.info("Connection was unsuccessful, retrying in 30 seconds");
                             timer.set(new Timer());
                             timer.get().schedule(this, TimeUnit.SECONDS.toMillis(30));
                         }

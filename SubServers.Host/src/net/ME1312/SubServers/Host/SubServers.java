@@ -1,6 +1,7 @@
 package net.ME1312.SubServers.Host;
 
 import net.ME1312.SubServers.Host.API.Event.CommandPreProcessEvent;
+import net.ME1312.SubServers.Host.API.Event.SubDisableEvent;
 import net.ME1312.SubServers.Host.API.Event.SubEnableEvent;
 import net.ME1312.SubServers.Host.API.SubPluginInfo;
 import net.ME1312.SubServers.Host.API.SubPlugin;
@@ -33,7 +34,7 @@ public final class SubServers {
     public SubDataClient subdata = null;
 
     public final Version version = new Version("2.11.2a");
-    public final Version bversion = new Version(1);
+    public final Version bversion = new Version(2);
     public final SubAPI api = new SubAPI(this);
 
     private boolean running;
@@ -67,29 +68,36 @@ public final class SubServers {
                 long begin = Calendar.getInstance().getTime().getTime();
                 long i = 0;
                 log.info("Loading SubAPI Plugins...");
-                String encoded = URLDecoder.decode(System.getProperty("subservers.host.plugins"), "UTF-8");
-                List<String> classes = new ArrayList<String>();
-                HashMap<String, SubPluginInfo> plugins = new HashMap<String, SubPluginInfo>();
-                if (!encoded.contains(" ")) {
-                    classes.add(encoded);
+                String decoded = URLDecoder.decode(System.getProperty("subservers.host.plugins"), "UTF-8");
+                List<String> classes = new LinkedList<String>();
+                HashMap<String, SubPluginInfo> plugins = new LinkedHashMap<String, SubPluginInfo>();
+                if (!decoded.contains(" ")) {
+                    classes.add(decoded);
                 } else {
-                    classes.addAll(Arrays.asList(encoded.split(" ")));
+                    classes.addAll(Arrays.asList(decoded.split(" ")));
                 }
                 for (String main : classes) {
                     try {
                         Class<?> clazz = Class.forName(main);
                         if (!clazz.isAnnotationPresent(SubPlugin.class)) throw new ClassCastException("Cannot find plugin descriptor");
-                        SubPluginInfo plugin = new SubPluginInfo(clazz.getConstructor().newInstance(), clazz.getAnnotation(SubPlugin.class).name(), new Version(clazz.getAnnotation(SubPlugin.class).version()),
-                                Arrays.asList(clazz.getAnnotation(SubPlugin.class).authors()), (clazz.getAnnotation(SubPlugin.class).description().length() > 0)?clazz.getAnnotation(SubPlugin.class).description():null,
-                                (clazz.getAnnotation(SubPlugin.class).website().length() > 0 && !Util.isException(() -> new URL(clazz.getAnnotation(SubPlugin.class).website())))?new URL(clazz.getAnnotation(SubPlugin.class).website()):null,
-                                Arrays.asList(clazz.getAnnotation(SubPlugin.class).depend()), Arrays.asList(clazz.getAnnotation(SubPlugin.class).softDepend()));
-                        plugins.put(plugin.getName().toLowerCase(), plugin);
+
+                        Object obj = clazz.getConstructor().newInstance();
+                        try {
+                            SubPluginInfo plugin = new SubPluginInfo(obj, clazz.getAnnotation(SubPlugin.class).name(), new Version(clazz.getAnnotation(SubPlugin.class).version()),
+                                    Arrays.asList(clazz.getAnnotation(SubPlugin.class).authors()), (clazz.getAnnotation(SubPlugin.class).description().length() > 0)?clazz.getAnnotation(SubPlugin.class).description():null,
+                                    (clazz.getAnnotation(SubPlugin.class).website().length() > 0)?new URL(clazz.getAnnotation(SubPlugin.class).website()):null, Arrays.asList(clazz.getAnnotation(SubPlugin.class).depend()),
+                                    Arrays.asList(clazz.getAnnotation(SubPlugin.class).softDepend()));
+                            if (plugins.keySet().contains(plugin.getName().toLowerCase())) log.warn("Duplicate plugin: " + plugin.getName());
+                            plugins.put(plugin.getName().toLowerCase(), plugin);
+                        } catch (Throwable e) {
+                            log.error(new IllegalPluginException(e, "Cannot load plugin descriptor for main class: " + main));
+                        }
                     } catch (ClassCastException e) {
                         log.error(new IllegalPluginException(e, "Main class isn't annotated as a SubPlugin: " + main));
-                    } catch (ClassNotFoundException | IllegalAccessException | NoSuchMethodException | InstantiationException e) {
-                        log.error(new IllegalPluginException(e, "Cannot load plugin main class: " + main));
                     } catch (InvocationTargetException e) {
-                        log.error(new IllegalPluginException(e.getTargetException(), "Cannot load plugin main class: " + main));
+                        log.error(new IllegalPluginException(e.getTargetException(), "Uncaught exception occurred while loading main class: " + main));
+                    } catch (Throwable e) {
+                        log.error(new IllegalPluginException(e, "Cannot load main class: " + main));
                     }
                 }
 
@@ -103,7 +111,7 @@ public final class SubServers {
                                 if (plugins.keySet().contains(depend.toLowerCase())) {
                                     load = false;
                                 } else if (!api.plugins.keySet().contains(depend.toLowerCase())) {
-                                    throw new IllegalPluginException(new IllegalStateException("Unknown dependency: " + depend), "Cannot meet requirements for plugin: " + plugin.getName());
+                                    throw new IllegalPluginException(new IllegalStateException("Unknown dependency: " + depend), "Cannot meet requirements for plugin: " + plugin.getName() + " v" + plugin.getVersion().toString());
                                 }
                             }
                             for (String softdepend : plugin.getSoftDependancies()) {
@@ -112,23 +120,31 @@ public final class SubServers {
                                 }
                             }
                             if (load) {
-                                loaded.add(name);
                                 try {
                                     plugin.setEnabled(true);
                                     api.addListener(plugin, plugin.get());
-                                    i++;
+                                    api.plugins.put(plugin.getName().toLowerCase(), plugin);
+                                    loaded.add(name);
                                     log.info("Loaded " + plugin.getName() + " v" + plugin.getVersion().toString());
+                                    i++;
                                 } catch (Throwable e) {
                                     plugin.setEnabled(false);
-                                    log.error(new InvocationTargetException(e, "Problem enabling plugin: " + plugin.getName()) + " v" + plugin.getVersion().toString() + " (is it up to date?)");
+                                    throw new InvocationTargetException(e, "Problem enabling plugin: " + plugin.getName() + " v" + plugin.getVersion().toString() + " (is it up to date?)");
                                 }
                             }
-                        } catch (IllegalPluginException e) {
+                        } catch (InvocationTargetException e) {
                             log.error(e);
+                            loaded.add(name);
                         }
                     }
+                    int progress = 0;
                     for (String name : loaded) {
+                        progress++;
                         plugins.remove(name);
+                    }
+                    if (progress == 0 && plugins.size() != 0) {
+                        log.error(new IllegalStateException("Cannot load any more plugins but there's " + plugins.size() + " left"));
+                        break;
                     }
                 }
 
@@ -179,9 +195,12 @@ public final class SubServers {
 
     public void stop(int exit) {
         log.info("Shutting down...");
+        SubDisableEvent event = new SubDisableEvent(this, exit);
+        api.runEvent(event);
         running = false;
-        Util.isException(FileLogger::end);
         if (subdata != null) Util.isException(() -> subdata.destroy(false));
-        System.exit(exit);
+
+        Util.isException(FileLogger::end);
+        System.exit(event.getExitCode());
     }
 }

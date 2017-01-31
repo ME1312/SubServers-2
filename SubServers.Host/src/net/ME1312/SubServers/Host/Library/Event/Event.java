@@ -6,7 +6,7 @@ import net.ME1312.SubServers.Host.SubAPI;
 /**
  * SubEvent Layout Class
  */
-public abstract class SubEvent {
+public abstract class Event {
     private SubPluginInfo plugin = null;
 
     /**

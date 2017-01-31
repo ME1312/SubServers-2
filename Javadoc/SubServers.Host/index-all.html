@@ -280,6 +280,12 @@
 <dd>
 <div class="block">Log an exception on the ERROR Level</div>
 </dd>
+<dt><a href="net/ME1312/SubServers/Host/Library/Event/Event.html" title="class in net.ME1312.SubServers.Host.Library.Event"><span class="typeNameLink">Event</span></a> - Class in <a href="net/ME1312/SubServers/Host/Library/Event/package-summary.html">net.ME1312.SubServers.Host.Library.Event</a></dt>
+<dd>
+<div class="block">SubEvent Layout Class</div>
+</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Library/Event/Event.html#Event--">Event()</a></span> - Constructor for class net.ME1312.SubServers.Host.Library.Event.<a href="net/ME1312/SubServers/Host/Library/Event/Event.html" title="class in net.ME1312.SubServers.Host.Library.Event">Event</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="net/ME1312/SubServers/Host/Library/Event/EventHandler.html" title="annotation in net.ME1312.SubServers.Host.Library.Event"><span class="typeNameLink">EventHandler</span></a> - Annotation Type in <a href="net/ME1312/SubServers/Host/Library/Event/package-summary.html">net.ME1312.SubServers.Host.Library.Event</a></dt>
 <dd>
 <div class="block">EventHandler Method Annotation<br>
@@ -348,7 +354,7 @@
 <dd>
 <div class="block">Grabs the Object</div>
 </dd>
-<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Library/Event/SubEvent.html#getAPI--">getAPI()</a></span> - Method in class net.ME1312.SubServers.Host.Library.Event.<a href="net/ME1312/SubServers/Host/Library/Event/SubEvent.html" title="class in net.ME1312.SubServers.Host.Library.Event">SubEvent</a></dt>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Library/Event/Event.html#getAPI--">getAPI()</a></span> - Method in class net.ME1312.SubServers.Host.Library.Event.<a href="net/ME1312/SubServers/Host/Library/Event/Event.html" title="class in net.ME1312.SubServers.Host.Library.Event">Event</a></dt>
 <dd>
 <div class="block">Gets SubAPI</div>
 </dd>
@@ -421,6 +427,10 @@
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Library/Config/YAMLSection.html#getDoubleList-java.lang.String-java.util.List-">getDoubleList(String, List&lt;Double&gt;)</a></span> - Method in class net.ME1312.SubServers.Host.Library.Config.<a href="net/ME1312/SubServers/Host/Library/Config/YAMLSection.html" title="class in net.ME1312.SubServers.Host.Library.Config">YAMLSection</a></dt>
 <dd>
 <div class="block">Get a Double List by Handle</div>
+</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/API/Event/SubDisableEvent.html#getExitCode--">getExitCode()</a></span> - Method in class net.ME1312.SubServers.Host.API.Event.<a href="net/ME1312/SubServers/Host/API/Event/SubDisableEvent.html" title="class in net.ME1312.SubServers.Host.API.Event">SubDisableEvent</a></dt>
+<dd>
+<div class="block">Get the Exit Code</div>
 </dd>
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/API/SubPluginInfo.html#getExtra-java.lang.String-">getExtra(String)</a></span> - Method in class net.ME1312.SubServers.Host.API.<a href="net/ME1312/SubServers/Host/API/SubPluginInfo.html" title="class in net.ME1312.SubServers.Host.API">SubPluginInfo</a></dt>
 <dd>&nbsp;</dd>
@@ -554,7 +564,7 @@
 <dd>
 <div class="block">Get the Plugin that created this task</div>
 </dd>
-<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Library/Event/SubEvent.html#getPlugin--">getPlugin()</a></span> - Method in class net.ME1312.SubServers.Host.Library.Event.<a href="net/ME1312/SubServers/Host/Library/Event/SubEvent.html" title="class in net.ME1312.SubServers.Host.Library.Event">SubEvent</a></dt>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Library/Event/Event.html#getPlugin--">getPlugin()</a></span> - Method in class net.ME1312.SubServers.Host.Library.Event.<a href="net/ME1312/SubServers/Host/Library/Event/Event.html" title="class in net.ME1312.SubServers.Host.Library.Event">Event</a></dt>
 <dd>
 <div class="block">Gets your Plugin's Info</div>
 </dd>
@@ -1014,7 +1024,7 @@
 </dd>
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Library/Util.ExceptionRunnable.html#run--">run()</a></span> - Method in interface net.ME1312.SubServers.Host.Library.<a href="net/ME1312/SubServers/Host/Library/Util.ExceptionRunnable.html" title="interface in net.ME1312.SubServers.Host.Library">Util.ExceptionRunnable</a></dt>
 <dd>&nbsp;</dd>
-<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/SubAPI.html#runEvent-net.ME1312.SubServers.Host.Library.Event.SubEvent-">runEvent(SubEvent)</a></span> - Method in class net.ME1312.SubServers.Host.<a href="net/ME1312/SubServers/Host/SubAPI.html" title="class in net.ME1312.SubServers.Host">SubAPI</a></dt>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/SubAPI.html#runEvent-net.ME1312.SubServers.Host.Library.Event.Event-">runEvent(Event)</a></span> - Method in class net.ME1312.SubServers.Host.<a href="net/ME1312/SubServers/Host/SubAPI.html" title="class in net.ME1312.SubServers.Host">SubAPI</a></dt>
 <dd>
 <div class="block">Run a SubEvent</div>
 </dd>
@@ -1086,6 +1096,10 @@
 <dd>
 <div class="block">Gets if the Plugin is Enabled</div>
 </dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/API/Event/SubDisableEvent.html#setExitCode-int-">setExitCode(int)</a></span> - Method in class net.ME1312.SubServers.Host.API.Event.<a href="net/ME1312/SubServers/Host/API/Event/SubDisableEvent.html" title="class in net.ME1312.SubServers.Host.API.Event">SubDisableEvent</a></dt>
+<dd>
+<div class="block">Set the Exit Code</div>
+</dd>
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Library/Log/Logger.html#setup-java.io.PrintStream-java.io.PrintStream-java.io.File-">setup(PrintStream, PrintStream, File)</a></span> - Static method in class net.ME1312.SubServers.Host.Library.Log.<a href="net/ME1312/SubServers/Host/Library/Log/Logger.html" title="class in net.ME1312.SubServers.Host.Library.Log">Logger</a></dt>
 <dd>
 <div class="block">Setup the SubServers Logger</div>
@@ -1106,6 +1120,14 @@
 <dd>
 <div class="block">SubServers Client Instance</div>
 </dd>
+<dt><a href="net/ME1312/SubServers/Host/API/Event/SubDisableEvent.html" title="class in net.ME1312.SubServers.Host.API.Event"><span class="typeNameLink">SubDisableEvent</span></a> - Class in <a href="net/ME1312/SubServers/Host/API/Event/package-summary.html">net.ME1312.SubServers.Host.API.Event</a></dt>
+<dd>
+<div class="block">SubServers.Host Disable Event Class</div>
+</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/API/Event/SubDisableEvent.html#SubDisableEvent-net.ME1312.SubServers.Host.SubServers-int-">SubDisableEvent(SubServers, int)</a></span> - Constructor for class net.ME1312.SubServers.Host.API.Event.<a href="net/ME1312/SubServers/Host/API/Event/SubDisableEvent.html" title="class in net.ME1312.SubServers.Host.API.Event">SubDisableEvent</a></dt>
+<dd>
+<div class="block">SubServers.Host Disable Event</div>
+</dd>
 <dt><a href="net/ME1312/SubServers/Host/API/Event/SubEnableEvent.html" title="class in net.ME1312.SubServers.Host.API.Event"><span class="typeNameLink">SubEnableEvent</span></a> - Class in <a href="net/ME1312/SubServers/Host/API/Event/package-summary.html">net.ME1312.SubServers.Host.API.Event</a></dt>
 <dd>
 <div class="block">SubServers.Host Enable Event Class</div>
@@ -1114,12 +1136,6 @@
 <dd>
 <div class="block">SubServers.Host Enable Event</div>
 </dd>
-<dt><a href="net/ME1312/SubServers/Host/Library/Event/SubEvent.html" title="class in net.ME1312.SubServers.Host.Library.Event"><span class="typeNameLink">SubEvent</span></a> - Class in <a href="net/ME1312/SubServers/Host/Library/Event/package-summary.html">net.ME1312.SubServers.Host.Library.Event</a></dt>
-<dd>
-<div class="block">SubEvent Layout Class</div>
-</dd>
-<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Library/Event/SubEvent.html#SubEvent--">SubEvent()</a></span> - Constructor for class net.ME1312.SubServers.Host.Library.Event.<a href="net/ME1312/SubServers/Host/Library/Event/SubEvent.html" title="class in net.ME1312.SubServers.Host.Library.Event">SubEvent</a></dt>
-<dd>&nbsp;</dd>
 <dt><a href="net/ME1312/SubServers/Host/API/SubPlugin.html" title="annotation in net.ME1312.SubServers.Host.API"><span class="typeNameLink">SubPlugin</span></a> - Annotation Type in <a href="net/ME1312/SubServers/Host/API/package-summary.html">net.ME1312.SubServers.Host.API</a></dt>
 <dd>
 <div class="block">SubPlugin Class Annotation<br>

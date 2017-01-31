@@ -12,7 +12,7 @@ import java.util.zip.ZipInputStream;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import jline.console.ConsoleReader;
-import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
 
 /**
  * SubServers.Host Launcher Class
@@ -37,26 +37,24 @@ public final class Launch {
         System.out.println(">> Extracted ~/" + getCodeSourceLocation().getName());
         if (pldir.isDirectory() && pldir.listFiles().length > 0) {
             for (File mod : Arrays.asList(pldir.listFiles())) {
-                int i;
                 if (getFileExtension(mod.getName()).equalsIgnoreCase("zip")) {
                     extractZip(mod, tmpdir);
+                    System.out.println(">> Extracted ~/plugins/" + mod.getName());
                 } else if (getFileExtension(mod.getName()).equalsIgnoreCase("jar")) {
                     extractJar(mod, tmpdir);
+                    System.out.println(">> Extracted ~/plugins/" + mod.getName());
                 }
                 if (new File(tmpdir, "package.xml").exists()) {
-                    Document xml = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new File(tmpdir, "package.xml"));
-                    if (xml.getElementsByTagName("class").getLength() > 0) {
-                        for (i = 0; i < xml.getElementsByTagName("class").getLength(); ++i) {
-                            String modClass = xml.getElementsByTagName("class").item(i).getTextContent();
-                            mods = mods + (mods.equals("") ? "" : " ") + modClass;
+                    NodeList node = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new File(tmpdir, "package.xml")).getElementsByTagName("class");
+                    if (node.getLength() > 0) {
+                        for (int i = 0; i < node.getLength(); i++) {
+                            mods += (mods.equals("")?"":" ") + node.item(i).getTextContent();
                         }
                     }
                     new File(tmpdir, "package.xml").delete();
                 }
-                System.out.println(">> Extracted ~/plugins/" + mod.getName());
             }
         }
-
         ArrayList<String> arguments = new ArrayList<String>();
         String javaPath = String.valueOf(System.getProperty("java.home")) + File.separator + "bin" + File.separator + "java";
         arguments.add(javaPath);

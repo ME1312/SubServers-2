@@ -22,7 +22,7 @@ public @interface SubPlugin {
     /**
      * The Version of this Plugin
      *
-     * @return
+     * @return Plugin Version
      */
     String version();
 
