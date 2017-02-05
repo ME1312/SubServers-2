@@ -8,7 +8,7 @@ import java.util.UUID;
 /**
  * SubServers Task Builder Class
  */
-public abstract class SubTaskBuilder implements Runnable {
+public abstract class SubTask implements Runnable {
     private long repeat = -1L;
     private long delay = -1L;
     private SubPluginInfo plugin;
@@ -18,8 +18,7 @@ public abstract class SubTaskBuilder implements Runnable {
      *
      * @param plugin Plugin Creating
      */
-    public SubTaskBuilder(SubPluginInfo plugin) {
-        if (Util.isNull(plugin)) throw new NullPointerException();
+    public SubTask(SubPluginInfo plugin) {
         this.plugin = plugin;
     }
 
@@ -28,7 +27,7 @@ public abstract class SubTaskBuilder implements Runnable {
      *
      * @return Plugin Info
      */
-    public SubPluginInfo getPlugin() {
+    public SubPluginInfo plugin() {
         return this.plugin;
     }
 
@@ -38,7 +37,7 @@ public abstract class SubTaskBuilder implements Runnable {
      * @param value Value
      * @return Task Builder
      */
-    public SubTaskBuilder repeat(long value) {
+    public SubTask repeat(long value) {
         if (Util.isNull(value)) throw new NullPointerException();
         this.repeat = value;
         return this;
@@ -49,7 +48,7 @@ public abstract class SubTaskBuilder implements Runnable {
      *
      * @return Repeat Interval
      */
-    public long getRepeat() {
+    public long repeat() {
         return this.repeat;
     }
 
@@ -59,7 +58,7 @@ public abstract class SubTaskBuilder implements Runnable {
      * @param value Value
      * @return Task Builder
      */
-    public SubTaskBuilder delay(long value) {
+    public SubTask delay(long value) {
         if (Util.isNull(value)) throw new NullPointerException();
         this.delay = value;
         return this;
@@ -70,7 +69,7 @@ public abstract class SubTaskBuilder implements Runnable {
      *
      * @return Task Delay
      */
-    public long getDelay() {
+    public long delay() {
         return this.delay;
     }
 

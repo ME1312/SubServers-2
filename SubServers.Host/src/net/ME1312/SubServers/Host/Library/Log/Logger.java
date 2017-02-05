@@ -125,11 +125,11 @@ public class Logger {
      */
     public void error(Throwable exception) {
         Throwable error = exception;
-        String indent = "    ";
+        String indent = "  ";
         boolean hasException = true;
         while (hasException) {
             String[] arrstring = new String[1];
-            arrstring[0] = (!indent.substring(4).equals("") ? new StringBuilder().append(indent.substring(4)).append("Caused by ").toString() : "") + error.getClass().getCanonicalName() + ": " + error.getMessage();
+            arrstring[0] = (!indent.substring(2).equals("") ? new StringBuilder().append(indent.substring(2)).append("Caused by ").toString() : "") + error.getClass().getCanonicalName() + ": " + error.getMessage();
             this.error(arrstring);
             Iterator<StackTraceElement> items = Arrays.asList(error.getStackTrace()).iterator();
             while (items.hasNext()) {
@@ -138,7 +138,7 @@ public class Logger {
             if (error instanceof InvocationTargetException) {
                 this.error(indent);
                 error = ((InvocationTargetException)error).getTargetException();
-                indent = indent + "    ";
+                indent = indent + "  ";
                 continue;
             }
             hasException = false;

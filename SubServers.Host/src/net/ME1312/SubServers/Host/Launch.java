@@ -26,7 +26,7 @@ public final class Launch {
      * @throws Exception
      */
     public static void main(String[] args) throws Exception {
-        String mods = "";
+        String plugins = "";
         File rtdir = new File(System.getProperty("user.dir"));
         File tmpdir = File.createTempFile("SubServers.Host.", ".jar");
         File pldir = new File(rtdir, "Plugins");
@@ -37,21 +37,28 @@ public final class Launch {
         System.out.println(">> Extracted ~/" + getCodeSourceLocation().getName());
         if (pldir.isDirectory() && pldir.listFiles().length > 0) {
             for (File mod : Arrays.asList(pldir.listFiles())) {
-                if (getFileExtension(mod.getName()).equalsIgnoreCase("zip")) {
-                    extractZip(mod, tmpdir);
-                    System.out.println(">> Extracted ~/plugins/" + mod.getName());
-                } else if (getFileExtension(mod.getName()).equalsIgnoreCase("jar")) {
-                    extractJar(mod, tmpdir);
-                    System.out.println(">> Extracted ~/plugins/" + mod.getName());
-                }
-                if (new File(tmpdir, "package.xml").exists()) {
-                    NodeList node = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new File(tmpdir, "package.xml")).getElementsByTagName("class");
-                    if (node.getLength() > 0) {
-                        for (int i = 0; i < node.getLength(); i++) {
-                            mods += (mods.equals("")?"":" ") + node.item(i).getTextContent();
-                        }
+                try {
+                    boolean success = false;
+                    if (getFileExtension(mod.getName()).equalsIgnoreCase("zip")) {
+                        extractZip(mod, tmpdir);
+                        success = true;
+                    } else if (getFileExtension(mod.getName()).equalsIgnoreCase("jar")) {
+                        extractJar(mod, tmpdir);
+                        success = true;
                     }
-                    new File(tmpdir, "package.xml").delete();
+                    if (new File(tmpdir, "package.xml").exists()) {
+                        NodeList xml = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new File(tmpdir, "package.xml")).getElementsByTagName("class");
+                        if (xml.getLength() > 0) {
+                            for (int i = 0; i < xml.getLength(); i++) {
+                                plugins += ((plugins.length() == 0)?"":" ") + xml.item(i).getTextContent().replace(' ', '_');
+                            }
+                        }
+                        new File(tmpdir, "package.xml").delete();
+                    }
+                    if (success) System.out.println(">> Extracted ~/plugins/" + mod.getName());
+                } catch (Exception e) {
+                    System.out.println(">> Couldn't extract ~/plugins/" + mod.getName());
+                    e.printStackTrace();
                 }
             }
         }
@@ -60,8 +67,8 @@ public final class Launch {
         arguments.add(javaPath);
         arguments.addAll(getVmArgs());
         arguments.add("-Dsubservers.host.runtime=" + URLEncoder.encode(tmpdir.getPath(), "UTF-8"));
-        if (!mods.equals(""))
-            arguments.add("-Dsubservers.host.plugins=" + URLEncoder.encode(mods, "UTF-8"));
+        if (!plugins.equals(""))
+            arguments.add("-Dsubservers.host.plugins=" + URLEncoder.encode(plugins, "UTF-8"));
         arguments.add("-cp");
         arguments.add(tmpdir.getPath());
         arguments.add("net.ME1312.SubServers.Host.SubServers");

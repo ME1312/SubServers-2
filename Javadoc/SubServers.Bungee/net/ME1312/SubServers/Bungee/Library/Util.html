@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":9,"i1":9,"i2":9,"i3":9,"i4":9,"i5":9,"i6":9,"i7":9};
+var methods = {"i0":9,"i1":9,"i2":9,"i3":9,"i4":9,"i5":9,"i6":9,"i7":9,"i8":9};
 var tabs = {65535:["t0","All Methods"],1:["t1","Static Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -169,31 +169,38 @@ extends java.lang.Object</pre>
 </td>
 </tr>
 <tr id="i3" class="rowColor">
+<td class="colFirst"><code>static &lt;K,V&gt;&nbsp;java.util.List&lt;K&gt;</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Library/Util.html#getBackwards-java.util.Map-V-">getBackwards</a></span>(java.util.Map&lt;K,V&gt;&nbsp;map,
+            V&nbsp;value)</code>
+<div class="block">Get keys by value from map</div>
+</td>
+</tr>
+<tr id="i4" class="altColor">
 <td class="colFirst"><code>static boolean</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Library/Util.html#isException-net.ME1312.SubServers.Bungee.Library.Util.ExceptionRunnable-">isException</a></span>(<a href="../../../../../net/ME1312/SubServers/Bungee/Library/Util.ExceptionRunnable.html" title="interface in net.ME1312.SubServers.Bungee.Library">Util.ExceptionRunnable</a>&nbsp;runnable)</code>
 <div class="block">Determines if an Exception will occur</div>
 </td>
 </tr>
-<tr id="i4" class="altColor">
+<tr id="i5" class="rowColor">
 <td class="colFirst"><code>static boolean</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Library/Util.html#isNull-java.lang.Object...-">isNull</a></span>(java.lang.Object...&nbsp;values)</code>
 <div class="block">Checks values to make sure they're not null</div>
 </td>
 </tr>
-<tr id="i5" class="rowColor">
+<tr id="i6" class="altColor">
 <td class="colFirst"><code>static int</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Library/Util.html#random-int-int-">random</a></span>(int&nbsp;min,
       int&nbsp;max)</code>
 <div class="block">Get a Random Integer</div>
 </td>
 </tr>
-<tr id="i6" class="altColor">
+<tr id="i7" class="rowColor">
 <td class="colFirst"><code>static java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Library/Util.html#readAll-java.io.Reader-">readAll</a></span>(java.io.Reader&nbsp;rd)</code>
 <div class="block">Read Everything from Reader</div>
 </td>
 </tr>
-<tr id="i7" class="rowColor">
+<tr id="i8" class="altColor">
 <td class="colFirst"><code>static java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Library/Util.html#unescapeJavaString-java.lang.String-">unescapeJavaString</a></span>(java.lang.String&nbsp;str)</code>
 <div class="block">Parse escapes in a Java String</div>
@@ -234,6 +241,29 @@ extends java.lang.Object</pre>
 <dd><code>values</code> - Values to check</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>If any are null</dd>
+</dl>
+</li>
+</ul>
+<a name="getBackwards-java.util.Map-java.lang.Object-">
+<!--   -->
+</a><a name="getBackwards-java.util.Map-V-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getBackwards</h4>
+<pre>public static&nbsp;&lt;K,V&gt;&nbsp;java.util.List&lt;K&gt;&nbsp;getBackwards(java.util.Map&lt;K,V&gt;&nbsp;map,
+                                                   V&nbsp;value)</pre>
+<div class="block">Get keys by value from map</div>
+<dl>
+<dt><span class="paramLabel">Type Parameters:</span></dt>
+<dd><code>K</code> - Key</dd>
+<dd><code>V</code> - Value</dd>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>map</code> - Map to search</dd>
+<dd><code>value</code> - Value to search for</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>Search results</dd>
 </dl>
 </li>
 </ul>

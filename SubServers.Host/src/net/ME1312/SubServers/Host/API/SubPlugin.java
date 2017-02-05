@@ -48,6 +48,13 @@ public @interface SubPlugin {
     String website() default "";
 
     /**
+     * Load Before Plugins List
+     *
+     * @return Load Before List
+     */
+    String[] loadBefore() default {};
+
+    /**
      * Dependencies List
      *
      * @return Dependencies List

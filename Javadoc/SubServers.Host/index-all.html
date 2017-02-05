@@ -82,9 +82,9 @@
 <dd>
 <div class="block">Add an extra value to this Server</div>
 </dd>
-<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/SubAPI.html#addListener-net.ME1312.SubServers.Host.API.SubPluginInfo-net.ME1312.SubServers.Host.Library.Event.Listener-">addListener(SubPluginInfo, Listener)</a></span> - Method in class net.ME1312.SubServers.Host.<a href="net/ME1312/SubServers/Host/SubAPI.html" title="class in net.ME1312.SubServers.Host">SubAPI</a></dt>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/SubAPI.html#addListener-net.ME1312.SubServers.Host.API.SubPluginInfo-net.ME1312.SubServers.Host.Library.Event.Listener...-">addListener(SubPluginInfo, Listener...)</a></span> - Method in class net.ME1312.SubServers.Host.<a href="net/ME1312/SubServers/Host/SubAPI.html" title="class in net.ME1312.SubServers.Host">SubAPI</a></dt>
 <dd>
-<div class="block">Register a SubEvent Listener</div>
+<div class="block">Register SubEvent Listeners</div>
 </dd>
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/SubServers.html#api">api</a></span> - Variable in class net.ME1312.SubServers.Host.<a href="net/ME1312/SubServers/Host/SubServers.html" title="class in net.ME1312.SubServers.Host">SubServers</a></dt>
 <dd>&nbsp;</dd>
@@ -196,11 +196,13 @@
 <dd>
 <div class="block">Clone this YAML Section</div>
 </dd>
-<dt><a href="net/ME1312/SubServers/Host/API/Command.html" title="interface in net.ME1312.SubServers.Host.API"><span class="typeNameLink">Command</span></a> - Interface in <a href="net/ME1312/SubServers/Host/API/package-summary.html">net.ME1312.SubServers.Host.API</a></dt>
+<dt><a href="net/ME1312/SubServers/Host/API/Command.html" title="class in net.ME1312.SubServers.Host.API"><span class="typeNameLink">Command</span></a> - Class in <a href="net/ME1312/SubServers/Host/API/package-summary.html">net.ME1312.SubServers.Host.API</a></dt>
 <dd>
 <div class="block">Command Layout Class</div>
 </dd>
-<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/API/Command.html#command-java.lang.String-java.lang.String:A-">command(String, String[])</a></span> - Method in interface net.ME1312.SubServers.Host.API.<a href="net/ME1312/SubServers/Host/API/Command.html" title="interface in net.ME1312.SubServers.Host.API">Command</a></dt>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/API/Command.html#Command-net.ME1312.SubServers.Host.API.SubPluginInfo-">Command(SubPluginInfo)</a></span> - Constructor for class net.ME1312.SubServers.Host.API.<a href="net/ME1312/SubServers/Host/API/Command.html" title="class in net.ME1312.SubServers.Host.API">Command</a></dt>
+<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/API/Command.html#command-java.lang.String-java.lang.String:A-">command(String, String[])</a></span> - Method in class net.ME1312.SubServers.Host.API.<a href="net/ME1312/SubServers/Host/API/Command.html" title="class in net.ME1312.SubServers.Host.API">Command</a></dt>
 <dd>
 <div class="block">Run Command</div>
 </dd>
@@ -246,13 +248,25 @@
 </a>
 <h2 class="title">D</h2>
 <dl>
-<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/API/SubTaskBuilder.html#delay-long-">delay(long)</a></span> - Method in class net.ME1312.SubServers.Host.API.<a href="net/ME1312/SubServers/Host/API/SubTaskBuilder.html" title="class in net.ME1312.SubServers.Host.API">SubTaskBuilder</a></dt>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/API/SubTask.html#delay-long-">delay(long)</a></span> - Method in class net.ME1312.SubServers.Host.API.<a href="net/ME1312/SubServers/Host/API/SubTask.html" title="class in net.ME1312.SubServers.Host.API">SubTask</a></dt>
 <dd>
 <div class="block">Delay this task</div>
+</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/API/SubTask.html#delay--">delay()</a></span> - Method in class net.ME1312.SubServers.Host.API.<a href="net/ME1312/SubServers/Host/API/SubTask.html" title="class in net.ME1312.SubServers.Host.API">SubTask</a></dt>
+<dd>
+<div class="block">Get the Delay for this task</div>
 </dd>
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Library/Util.html#deleteDirectory-java.io.File-">deleteDirectory(File)</a></span> - Static method in class net.ME1312.SubServers.Host.Library.<a href="net/ME1312/SubServers/Host/Library/Util.html" title="class in net.ME1312.SubServers.Host.Library">Util</a></dt>
 <dd>
 <div class="block">Delete Directory</div>
+</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/API/Command.html#description--">description()</a></span> - Method in class net.ME1312.SubServers.Host.API.<a href="net/ME1312/SubServers/Host/API/Command.html" title="class in net.ME1312.SubServers.Host.API">Command</a></dt>
+<dd>
+<div class="block">Gets the Description of this Command</div>
+</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/API/Command.html#description-java.lang.String-">description(String)</a></span> - Method in class net.ME1312.SubServers.Host.API.<a href="net/ME1312/SubServers/Host/API/Command.html" title="class in net.ME1312.SubServers.Host.API">Command</a></dt>
+<dd>
+<div class="block">Set the Description of this Command</div>
 </dd>
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Network/SubDataClient.html#destroy-boolean-">destroy(boolean)</a></span> - Method in class net.ME1312.SubServers.Host.Network.<a href="net/ME1312/SubServers/Host/Network/SubDataClient.html" title="class in net.ME1312.SubServers.Host.Network">SubDataClient</a></dt>
 <dd>
@@ -303,6 +317,10 @@
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Network/PacketIn.html#execute-org.json.JSONObject-">execute(JSONObject)</a></span> - Method in interface net.ME1312.SubServers.Host.Network.<a href="net/ME1312/SubServers/Host/Network/PacketIn.html" title="interface in net.ME1312.SubServers.Host.Network">PacketIn</a></dt>
 <dd>
 <div class="block">Execute Incoming Packet</div>
+</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/SubAPI.html#executeEvent-net.ME1312.SubServers.Host.Library.Event.Event-">executeEvent(Event)</a></span> - Method in class net.ME1312.SubServers.Host.<a href="net/ME1312/SubServers/Host/SubAPI.html" title="class in net.ME1312.SubServers.Host">SubAPI</a></dt>
+<dd>
+<div class="block">Run a SubEvent</div>
 </dd>
 <dt><a href="net/ME1312/SubServers/Host/Library/ExtraDataHandler.html" title="interface in net.ME1312.SubServers.Host.Library"><span class="typeNameLink">ExtraDataHandler</span></a> - Interface in <a href="net/ME1312/SubServers/Host/Library/package-summary.html">net.ME1312.SubServers.Host.Library</a></dt>
 <dd>
@@ -366,6 +384,10 @@
 <dd>
 <div class="block">Get Authors List</div>
 </dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Library/Util.html#getBackwards-java.util.Map-V-">getBackwards(Map&lt;K, V&gt;, V)</a></span> - Static method in class net.ME1312.SubServers.Host.Library.<a href="net/ME1312/SubServers/Host/Library/Util.html" title="class in net.ME1312.SubServers.Host.Library">Util</a></dt>
+<dd>
+<div class="block">Get keys by value from map</div>
+</dd>
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/SubAPI.html#getBetaVersion--">getBetaVersion()</a></span> - Method in class net.ME1312.SubServers.Host.<a href="net/ME1312/SubServers/Host/SubAPI.html" title="class in net.ME1312.SubServers.Host">SubAPI</a></dt>
 <dd>
 <div class="block">Gets the SubServers Beta Version</div>
@@ -399,10 +421,6 @@
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Library/Config/YAMLValue.html#getDefiningSection--">getDefiningSection()</a></span> - Method in class net.ME1312.SubServers.Host.Library.Config.<a href="net/ME1312/SubServers/Host/Library/Config/YAMLValue.html" title="class in net.ME1312.SubServers.Host.Library.Config">YAMLValue</a></dt>
 <dd>
 <div class="block">Get the YAML Section this Object was defined in</div>
-</dd>
-<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/API/SubTaskBuilder.html#getDelay--">getDelay()</a></span> - Method in class net.ME1312.SubServers.Host.API.<a href="net/ME1312/SubServers/Host/API/SubTaskBuilder.html" title="class in net.ME1312.SubServers.Host.API">SubTaskBuilder</a></dt>
-<dd>
-<div class="block">Get the Delay for this task</div>
 </dd>
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/API/SubPluginInfo.html#getDependancies--">getDependancies()</a></span> - Method in class net.ME1312.SubServers.Host.API.<a href="net/ME1312/SubServers/Host/API/SubPluginInfo.html" title="class in net.ME1312.SubServers.Host.API">SubPluginInfo</a></dt>
 <dd>
@@ -460,6 +478,10 @@
 <dd>
 <div class="block">Get a Float List by Handle</div>
 </dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Library/Event/Event.html#getHandlers--">getHandlers()</a></span> - Method in class net.ME1312.SubServers.Host.Library.Event.<a href="net/ME1312/SubServers/Host/Library/Event/Event.html" title="class in net.ME1312.SubServers.Host.Library.Event">Event</a></dt>
+<dd>
+<div class="block">Get the handlers for this event</div>
+</dd>
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/SubAPI.html#getInstance--">getInstance()</a></span> - Static method in class net.ME1312.SubServers.Host.<a href="net/ME1312/SubServers/Host/SubAPI.html" title="class in net.ME1312.SubServers.Host">SubAPI</a></dt>
 <dd>
 <div class="block">Gets the SubAPI Methods</div>
@@ -509,6 +531,10 @@
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Library/Config/YAMLSection.html#getList-java.lang.String-java.util.List-">getList(String, List&lt;? extends YAMLValue&gt;)</a></span> - Method in class net.ME1312.SubServers.Host.Library.Config.<a href="net/ME1312/SubServers/Host/Library/Config/YAMLSection.html" title="class in net.ME1312.SubServers.Host.Library.Config">YAMLSection</a></dt>
 <dd>
 <div class="block">Get a List by Handle</div>
+</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/API/SubPluginInfo.html#getLoadBefore--">getLoadBefore()</a></span> - Method in class net.ME1312.SubServers.Host.API.<a href="net/ME1312/SubServers/Host/API/SubPluginInfo.html" title="class in net.ME1312.SubServers.Host.API">SubPluginInfo</a></dt>
+<dd>
+<div class="block">Gets the Load Before Plugins List</div>
 </dd>
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/API/SubPluginInfo.html#getLogger--">getLogger()</a></span> - Method in class net.ME1312.SubServers.Host.API.<a href="net/ME1312/SubServers/Host/API/SubPluginInfo.html" title="class in net.ME1312.SubServers.Host.API">SubPluginInfo</a></dt>
 <dd>
@@ -560,10 +586,6 @@
 <dd>
 <div class="block">Grab PacketIn Instances via handle</div>
 </dd>
-<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/API/SubTaskBuilder.html#getPlugin--">getPlugin()</a></span> - Method in class net.ME1312.SubServers.Host.API.<a href="net/ME1312/SubServers/Host/API/SubTaskBuilder.html" title="class in net.ME1312.SubServers.Host.API">SubTaskBuilder</a></dt>
-<dd>
-<div class="block">Get the Plugin that created this task</div>
-</dd>
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Library/Event/Event.html#getPlugin--">getPlugin()</a></span> - Method in class net.ME1312.SubServers.Host.Library.Event.<a href="net/ME1312/SubServers/Host/Library/Event/Event.html" title="class in net.ME1312.SubServers.Host.Library.Event">Event</a></dt>
 <dd>
 <div class="block">Gets your Plugin's Info</div>
@@ -591,10 +613,6 @@
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Library/Config/YAMLSection.html#getRawStringList-java.lang.String-java.util.List-">getRawStringList(String, List&lt;String&gt;)</a></span> - Method in class net.ME1312.SubServers.Host.Library.Config.<a href="net/ME1312/SubServers/Host/Library/Config/YAMLSection.html" title="class in net.ME1312.SubServers.Host.Library.Config">YAMLSection</a></dt>
 <dd>
 <div class="block">Get an Unparsed String List by Handle</div>
-</dd>
-<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/API/SubTaskBuilder.html#getRepeat--">getRepeat()</a></span> - Method in class net.ME1312.SubServers.Host.API.<a href="net/ME1312/SubServers/Host/API/SubTaskBuilder.html" title="class in net.ME1312.SubServers.Host.API">SubTaskBuilder</a></dt>
-<dd>
-<div class="block">Get the Repeat Interval for this task</div>
 </dd>
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/SubAPI.html#getRuntimeDirectory--">getRuntimeDirectory()</a></span> - Method in class net.ME1312.SubServers.Host.<a href="net/ME1312/SubServers/Host/SubAPI.html" title="class in net.ME1312.SubServers.Host">SubAPI</a></dt>
 <dd>
@@ -722,6 +740,14 @@
 <dd>
 <div class="block">Determine if an extra value exists</div>
 </dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/API/Command.html#help--">help()</a></span> - Method in class net.ME1312.SubServers.Host.API.<a href="net/ME1312/SubServers/Host/API/Command.html" title="class in net.ME1312.SubServers.Host.API">Command</a></dt>
+<dd>
+<div class="block">Get the Help Page for this Command</div>
+</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/API/Command.html#help-java.lang.String...-">help(String...)</a></span> - Method in class net.ME1312.SubServers.Host.API.<a href="net/ME1312/SubServers/Host/API/Command.html" title="class in net.ME1312.SubServers.Host.API">Command</a></dt>
+<dd>
+<div class="block">Set the Help Page for this Command</div>
+</dd>
 </dl>
 <a name="I:I">
 <!--   -->
@@ -743,6 +769,12 @@
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Library/Exception/IllegalPluginException.html#IllegalPluginException-java.lang.Throwable-">IllegalPluginException(Throwable)</a></span> - Constructor for exception net.ME1312.SubServers.Host.Library.Exception.<a href="net/ME1312/SubServers/Host/Library/Exception/IllegalPluginException.html" title="class in net.ME1312.SubServers.Host.Library.Exception">IllegalPluginException</a></dt>
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Library/Exception/IllegalPluginException.html#IllegalPluginException-java.lang.Throwable-java.lang.String-">IllegalPluginException(Throwable, String)</a></span> - Constructor for exception net.ME1312.SubServers.Host.Library.Exception.<a href="net/ME1312/SubServers/Host/Library/Exception/IllegalPluginException.html" title="class in net.ME1312.SubServers.Host.Library.Exception">IllegalPluginException</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="net/ME1312/SubServers/Host/Library/Exception/IllegalStringValueException.html" title="class in net.ME1312.SubServers.Host.Library.Exception"><span class="typeNameLink">IllegalStringValueException</span></a> - Exception in <a href="net/ME1312/SubServers/Host/Library/Exception/package-summary.html">net.ME1312.SubServers.Host.Library.Exception</a></dt>
+<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Library/Exception/IllegalStringValueException.html#IllegalStringValueException--">IllegalStringValueException()</a></span> - Constructor for exception net.ME1312.SubServers.Host.Library.Exception.<a href="net/ME1312/SubServers/Host/Library/Exception/IllegalStringValueException.html" title="class in net.ME1312.SubServers.Host.Library.Exception">IllegalStringValueException</a></dt>
+<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Library/Exception/IllegalStringValueException.html#IllegalStringValueException-java.lang.String-">IllegalStringValueException(String)</a></span> - Constructor for exception net.ME1312.SubServers.Host.Library.Exception.<a href="net/ME1312/SubServers/Host/Library/Exception/IllegalStringValueException.html" title="class in net.ME1312.SubServers.Host.Library.Exception">IllegalStringValueException</a></dt>
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Library/Log/Logger.html#info-java.lang.String...-">info(String...)</a></span> - Method in class net.ME1312.SubServers.Host.Library.Log.<a href="net/ME1312/SubServers/Host/Library/Log/Logger.html" title="class in net.ME1312.SubServers.Host.Library.Log">Logger</a></dt>
 <dd>
@@ -966,6 +998,14 @@
 <dd>
 <div class="block">PacketOut Layout Class</div>
 </dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/API/Command.html#plugin--">plugin()</a></span> - Method in class net.ME1312.SubServers.Host.API.<a href="net/ME1312/SubServers/Host/API/Command.html" title="class in net.ME1312.SubServers.Host.API">Command</a></dt>
+<dd>
+<div class="block">Gets the Plugin that registering this Command</div>
+</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/API/SubTask.html#plugin--">plugin()</a></span> - Method in class net.ME1312.SubServers.Host.API.<a href="net/ME1312/SubServers/Host/API/SubTask.html" title="class in net.ME1312.SubServers.Host.API">SubTask</a></dt>
+<dd>
+<div class="block">Get the Plugin that created this task</div>
+</dd>
 </dl>
 <a name="I:R">
 <!--   -->
@@ -979,6 +1019,10 @@
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Library/Util.html#readAll-java.io.Reader-">readAll(Reader)</a></span> - Static method in class net.ME1312.SubServers.Host.Library.<a href="net/ME1312/SubServers/Host/Library/Util.html" title="class in net.ME1312.SubServers.Host.Library">Util</a></dt>
 <dd>
 <div class="block">Read Everything from Reader</div>
+</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/API/Command.html#register-java.lang.String...-">register(String...)</a></span> - Method in class net.ME1312.SubServers.Host.API.<a href="net/ME1312/SubServers/Host/API/Command.html" title="class in net.ME1312.SubServers.Host.API">Command</a></dt>
+<dd>
+<div class="block">Register this Command</div>
 </dd>
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Network/SubDataClient.html#registerPacket-net.ME1312.SubServers.Host.Network.PacketIn-java.lang.String-">registerPacket(PacketIn, String)</a></span> - Static method in class net.ME1312.SubServers.Host.Network.<a href="net/ME1312/SubServers/Host/Network/SubDataClient.html" title="class in net.ME1312.SubServers.Host.Network">SubDataClient</a></dt>
 <dd>
@@ -1006,17 +1050,21 @@
 <dd>
 <div class="block">Remove an extra value from this Server</div>
 </dd>
-<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/SubAPI.html#removeListener-net.ME1312.SubServers.Host.API.SubPluginInfo-net.ME1312.SubServers.Host.Library.Event.Listener-">removeListener(SubPluginInfo, Listener)</a></span> - Method in class net.ME1312.SubServers.Host.<a href="net/ME1312/SubServers/Host/SubAPI.html" title="class in net.ME1312.SubServers.Host">SubAPI</a></dt>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/SubAPI.html#removeListener-net.ME1312.SubServers.Host.API.SubPluginInfo-net.ME1312.SubServers.Host.Library.Event.Listener...-">removeListener(SubPluginInfo, Listener...)</a></span> - Method in class net.ME1312.SubServers.Host.<a href="net/ME1312/SubServers/Host/SubAPI.html" title="class in net.ME1312.SubServers.Host">SubAPI</a></dt>
 <dd>
-<div class="block">Unregister a SubEvent Listener</div>
+<div class="block">Unregister SubEvent Listeners</div>
 </dd>
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Library/NamedContainer.html#rename-T-">rename(T)</a></span> - Method in class net.ME1312.SubServers.Host.Library.<a href="net/ME1312/SubServers/Host/Library/NamedContainer.html" title="class in net.ME1312.SubServers.Host.Library">NamedContainer</a></dt>
 <dd>
 <div class="block">Renames the Container</div>
 </dd>
-<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/API/SubTaskBuilder.html#repeat-long-">repeat(long)</a></span> - Method in class net.ME1312.SubServers.Host.API.<a href="net/ME1312/SubServers/Host/API/SubTaskBuilder.html" title="class in net.ME1312.SubServers.Host.API">SubTaskBuilder</a></dt>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/API/SubTask.html#repeat-long-">repeat(long)</a></span> - Method in class net.ME1312.SubServers.Host.API.<a href="net/ME1312/SubServers/Host/API/SubTask.html" title="class in net.ME1312.SubServers.Host.API">SubTask</a></dt>
 <dd>
 <div class="block">Set the Repeat Interval for this task</div>
+</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/API/SubTask.html#repeat--">repeat()</a></span> - Method in class net.ME1312.SubServers.Host.API.<a href="net/ME1312/SubServers/Host/API/SubTask.html" title="class in net.ME1312.SubServers.Host.API">SubTask</a></dt>
+<dd>
+<div class="block">Get the Repeat Interval for this task</div>
 </dd>
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Library/JSONCallback.html#run-org.json.JSONObject-">run(JSONObject)</a></span> - Method in interface net.ME1312.SubServers.Host.Library.<a href="net/ME1312/SubServers/Host/Library/JSONCallback.html" title="interface in net.ME1312.SubServers.Host.Library">JSONCallback</a></dt>
 <dd>
@@ -1024,10 +1072,6 @@
 </dd>
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Library/Util.ExceptionRunnable.html#run--">run()</a></span> - Method in interface net.ME1312.SubServers.Host.Library.<a href="net/ME1312/SubServers/Host/Library/Util.ExceptionRunnable.html" title="interface in net.ME1312.SubServers.Host.Library">Util.ExceptionRunnable</a></dt>
 <dd>&nbsp;</dd>
-<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/SubAPI.html#runEvent-net.ME1312.SubServers.Host.Library.Event.Event-">runEvent(Event)</a></span> - Method in class net.ME1312.SubServers.Host.<a href="net/ME1312/SubServers/Host/SubAPI.html" title="class in net.ME1312.SubServers.Host">SubAPI</a></dt>
-<dd>
-<div class="block">Run a SubEvent</div>
-</dd>
 </dl>
 <a name="I:S">
 <!--   -->
@@ -1038,11 +1082,11 @@
 <dd>
 <div class="block">Save Config Contents</div>
 </dd>
-<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/API/SubTaskBuilder.html#schedule--">schedule()</a></span> - Method in class net.ME1312.SubServers.Host.API.<a href="net/ME1312/SubServers/Host/API/SubTaskBuilder.html" title="class in net.ME1312.SubServers.Host.API">SubTaskBuilder</a></dt>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/API/SubTask.html#schedule--">schedule()</a></span> - Method in class net.ME1312.SubServers.Host.API.<a href="net/ME1312/SubServers/Host/API/SubTask.html" title="class in net.ME1312.SubServers.Host.API">SubTask</a></dt>
 <dd>
 <div class="block">Schedule this task</div>
 </dd>
-<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/SubAPI.html#schedule-net.ME1312.SubServers.Host.API.SubTaskBuilder-">schedule(SubTaskBuilder)</a></span> - Method in class net.ME1312.SubServers.Host.<a href="net/ME1312/SubServers/Host/SubAPI.html" title="class in net.ME1312.SubServers.Host">SubAPI</a></dt>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/SubAPI.html#schedule-net.ME1312.SubServers.Host.API.SubTask-">schedule(SubTask)</a></span> - Method in class net.ME1312.SubServers.Host.<a href="net/ME1312/SubServers/Host/SubAPI.html" title="class in net.ME1312.SubServers.Host">SubAPI</a></dt>
 <dd>
 <div class="block">Schedule a task</div>
 </dd>
@@ -1145,7 +1189,7 @@
 <dd>
 <div class="block">SubPlugin Info Class</div>
 </dd>
-<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/API/SubPluginInfo.html#SubPluginInfo-java.lang.Object-java.lang.String-net.ME1312.SubServers.Host.Library.Version.Version-java.util.List-java.lang.String-java.net.URL-java.util.List-java.util.List-">SubPluginInfo(Object, String, Version, List&lt;String&gt;, String, URL, List&lt;String&gt;, List&lt;String&gt;)</a></span> - Constructor for class net.ME1312.SubServers.Host.API.<a href="net/ME1312/SubServers/Host/API/SubPluginInfo.html" title="class in net.ME1312.SubServers.Host.API">SubPluginInfo</a></dt>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/API/SubPluginInfo.html#SubPluginInfo-net.ME1312.SubServers.Host.SubServers-java.lang.Object-java.lang.String-net.ME1312.SubServers.Host.Library.Version.Version-java.util.List-java.lang.String-java.net.URL-java.util.List-java.util.List-java.util.List-">SubPluginInfo(SubServers, Object, String, Version, List&lt;String&gt;, String, URL, List&lt;String&gt;, List&lt;String&gt;, List&lt;String&gt;)</a></span> - Constructor for class net.ME1312.SubServers.Host.API.<a href="net/ME1312/SubServers/Host/API/SubPluginInfo.html" title="class in net.ME1312.SubServers.Host.API">SubPluginInfo</a></dt>
 <dd>
 <div class="block">Create a SubPlugin Description</div>
 </dd>
@@ -1153,11 +1197,11 @@
 <dd>
 <div class="block">SubServers.Host Main Class</div>
 </dd>
-<dt><a href="net/ME1312/SubServers/Host/API/SubTaskBuilder.html" title="class in net.ME1312.SubServers.Host.API"><span class="typeNameLink">SubTaskBuilder</span></a> - Class in <a href="net/ME1312/SubServers/Host/API/package-summary.html">net.ME1312.SubServers.Host.API</a></dt>
+<dt><a href="net/ME1312/SubServers/Host/API/SubTask.html" title="class in net.ME1312.SubServers.Host.API"><span class="typeNameLink">SubTask</span></a> - Class in <a href="net/ME1312/SubServers/Host/API/package-summary.html">net.ME1312.SubServers.Host.API</a></dt>
 <dd>
 <div class="block">SubServers Task Builder Class</div>
 </dd>
-<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/API/SubTaskBuilder.html#SubTaskBuilder-net.ME1312.SubServers.Host.API.SubPluginInfo-">SubTaskBuilder(SubPluginInfo)</a></span> - Constructor for class net.ME1312.SubServers.Host.API.<a href="net/ME1312/SubServers/Host/API/SubTaskBuilder.html" title="class in net.ME1312.SubServers.Host.API">SubTaskBuilder</a></dt>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/API/SubTask.html#SubTask-net.ME1312.SubServers.Host.API.SubPluginInfo-">SubTask(SubPluginInfo)</a></span> - Constructor for class net.ME1312.SubServers.Host.API.<a href="net/ME1312/SubServers/Host/API/SubTask.html" title="class in net.ME1312.SubServers.Host.API">SubTask</a></dt>
 <dd>
 <div class="block">Create a new Task</div>
 </dd>
@@ -1184,6 +1228,8 @@
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Library/Config/YAMLSection.html#toString--">toString()</a></span> - Method in class net.ME1312.SubServers.Host.Library.Config.<a href="net/ME1312/SubServers/Host/Library/Config/YAMLSection.html" title="class in net.ME1312.SubServers.Host.Library.Config">YAMLSection</a></dt>
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Library/Config/YAMLValue.html#toString--">toString()</a></span> - Method in class net.ME1312.SubServers.Host.Library.Config.<a href="net/ME1312/SubServers/Host/Library/Config/YAMLValue.html" title="class in net.ME1312.SubServers.Host.Library.Config">YAMLValue</a></dt>
+<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Library/Event/Event.html#toString--">toString()</a></span> - Method in class net.ME1312.SubServers.Host.Library.Event.<a href="net/ME1312/SubServers/Host/Library/Event/Event.html" title="class in net.ME1312.SubServers.Host.Library.Event">Event</a></dt>
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Library/Version/Version.html#toString--">toString()</a></span> - Method in class net.ME1312.SubServers.Host.Library.Version.<a href="net/ME1312/SubServers/Host/Library/Version/Version.html" title="class in net.ME1312.SubServers.Host.Library.Version">Version</a></dt>
 <dd>&nbsp;</dd>
@@ -1228,6 +1274,14 @@
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Network/SubDataClient.html#unregisterPacket-java.lang.Class-">unregisterPacket(Class&lt;? extends PacketOut&gt;)</a></span> - Static method in class net.ME1312.SubServers.Host.Network.<a href="net/ME1312/SubServers/Host/Network/SubDataClient.html" title="class in net.ME1312.SubServers.Host.Network">SubDataClient</a></dt>
 <dd>
 <div class="block">Unregister PacketOut to the Network</div>
+</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/API/Command.html#usage--">usage()</a></span> - Method in class net.ME1312.SubServers.Host.API.<a href="net/ME1312/SubServers/Host/API/Command.html" title="class in net.ME1312.SubServers.Host.API">Command</a></dt>
+<dd>
+<div class="block">Get the Usage of this Command</div>
+</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/API/Command.html#usage-java.lang.String...-">usage(String...)</a></span> - Method in class net.ME1312.SubServers.Host.API.<a href="net/ME1312/SubServers/Host/API/Command.html" title="class in net.ME1312.SubServers.Host.API">Command</a></dt>
+<dd>
+<div class="block">Set the Usage of this Command</div>
 </dd>
 <dt><a href="net/ME1312/SubServers/Host/Library/Util.html" title="class in net.ME1312.SubServers.Host.Library"><span class="typeNameLink">Util</span></a> - Class in <a href="net/ME1312/SubServers/Host/Library/package-summary.html">net.ME1312.SubServers.Host.Library</a></dt>
 <dd>

@@ -17,8 +17,8 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":6};
-var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],4:["t3","Abstract Methods"]};
+var methods = {"i0":6,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10,"i8":10};
+var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],4:["t3","Abstract Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
 var tableTab = "tableTab";
@@ -74,13 +74,13 @@ var activeTableTab = "activeTableTab";
 <li>Summary:&nbsp;</li>
 <li>Nested&nbsp;|&nbsp;</li>
 <li>Field&nbsp;|&nbsp;</li>
-<li>Constr&nbsp;|&nbsp;</li>
+<li><a href="#constructor.summary">Constr</a>&nbsp;|&nbsp;</li>
 <li><a href="#method.summary">Method</a></li>
 </ul>
 <ul class="subNavList">
 <li>Detail:&nbsp;</li>
 <li>Field&nbsp;|&nbsp;</li>
-<li>Constr&nbsp;|&nbsp;</li>
+<li><a href="#constructor.detail">Constr</a>&nbsp;|&nbsp;</li>
 <li><a href="#method.detail">Method</a></li>
 </ul>
 </div>
@@ -91,15 +91,24 @@ var activeTableTab = "activeTableTab";
 <!-- ======== START OF CLASS DATA ======== -->
 <div class="header">
 <div class="subTitle">net.ME1312.SubServers.Host.API</div>
-<h2 title="Interface Command" class="title">Interface Command</h2>
+<h2 title="Class Command" class="title">Class Command</h2>
 </div>
 <div class="contentContainer">
+<ul class="inheritance">
+<li>java.lang.Object</li>
+<li>
+<ul class="inheritance">
+<li>net.ME1312.SubServers.Host.API.Command</li>
+</ul>
+</li>
+</ul>
 <div class="description">
 <ul class="blockList">
 <li class="blockList">
 <hr>
 <br>
-<pre>public interface <span class="typeNameLabel">Command</span></pre>
+<pre>public abstract class <span class="typeNameLabel">Command</span>
+extends java.lang.Object</pre>
 <div class="block">Command Layout Class</div>
 </li>
 </ul>
@@ -107,6 +116,23 @@ var activeTableTab = "activeTableTab";
 <div class="summary">
 <ul class="blockList">
 <li class="blockList">
+<!-- ======== CONSTRUCTOR SUMMARY ======== -->
+<ul class="blockList">
+<li class="blockList"><a name="constructor.summary">
+<!--   -->
+</a>
+<h3>Constructor Summary</h3>
+<table class="memberSummary" border="0" cellpadding="3" cellspacing="0" summary="Constructor Summary table, listing constructors, and an explanation">
+<caption><span>Constructors</span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colOne" scope="col">Constructor and Description</th>
+</tr>
+<tr class="altColor">
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Host/API/Command.html#Command-net.ME1312.SubServers.Host.API.SubPluginInfo-">Command</a></span>(<a href="../../../../../net/ME1312/SubServers/Host/API/SubPluginInfo.html" title="class in net.ME1312.SubServers.Host.API">SubPluginInfo</a>&nbsp;plugin)</code>&nbsp;</td>
+</tr>
+</table>
+</li>
+</ul>
 <!-- ========== METHOD SUMMARY =========== -->
 <ul class="blockList">
 <li class="blockList"><a name="method.summary">
@@ -114,19 +140,74 @@ var activeTableTab = "activeTableTab";
 </a>
 <h3>Method Summary</h3>
 <table class="memberSummary" border="0" cellpadding="3" cellspacing="0" summary="Method Summary table, listing methods, and an explanation">
-<caption><span id="t0" class="activeTableTab"><span>All Methods</span><span class="tabEnd">&nbsp;</span></span><span id="t2" class="tableTab"><span><a href="javascript:show(2);">Instance Methods</a></span><span class="tabEnd">&nbsp;</span></span><span id="t3" class="tableTab"><span><a href="javascript:show(4);">Abstract Methods</a></span><span class="tabEnd">&nbsp;</span></span></caption>
+<caption><span id="t0" class="activeTableTab"><span>All Methods</span><span class="tabEnd">&nbsp;</span></span><span id="t2" class="tableTab"><span><a href="javascript:show(2);">Instance Methods</a></span><span class="tabEnd">&nbsp;</span></span><span id="t3" class="tableTab"><span><a href="javascript:show(4);">Abstract Methods</a></span><span class="tabEnd">&nbsp;</span></span><span id="t4" class="tableTab"><span><a href="javascript:show(8);">Concrete Methods</a></span><span class="tabEnd">&nbsp;</span></span></caption>
 <tr>
 <th class="colFirst" scope="col">Modifier and Type</th>
 <th class="colLast" scope="col">Method and Description</th>
 </tr>
 <tr id="i0" class="altColor">
-<td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Host/API/Command.html#command-java.lang.String-java.lang.String:A-">command</a></span>(java.lang.String&nbsp;command,
+<td class="colFirst"><code>abstract void</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Host/API/Command.html#command-java.lang.String-java.lang.String:A-">command</a></span>(java.lang.String&nbsp;handle,
        java.lang.String[]&nbsp;args)</code>
 <div class="block">Run Command</div>
 </td>
 </tr>
+<tr id="i1" class="rowColor">
+<td class="colFirst"><code>java.lang.String</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Host/API/Command.html#description--">description</a></span>()</code>
+<div class="block">Gets the Description of this Command</div>
+</td>
+</tr>
+<tr id="i2" class="altColor">
+<td class="colFirst"><code><a href="../../../../../net/ME1312/SubServers/Host/API/Command.html" title="class in net.ME1312.SubServers.Host.API">Command</a></code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Host/API/Command.html#description-java.lang.String-">description</a></span>(java.lang.String&nbsp;value)</code>
+<div class="block">Set the Description of this Command</div>
+</td>
+</tr>
+<tr id="i3" class="rowColor">
+<td class="colFirst"><code>java.lang.String[]</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Host/API/Command.html#help--">help</a></span>()</code>
+<div class="block">Get the Help Page for this Command</div>
+</td>
+</tr>
+<tr id="i4" class="altColor">
+<td class="colFirst"><code><a href="../../../../../net/ME1312/SubServers/Host/API/Command.html" title="class in net.ME1312.SubServers.Host.API">Command</a></code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Host/API/Command.html#help-java.lang.String...-">help</a></span>(java.lang.String...&nbsp;lines)</code>
+<div class="block">Set the Help Page for this Command</div>
+</td>
+</tr>
+<tr id="i5" class="rowColor">
+<td class="colFirst"><code><a href="../../../../../net/ME1312/SubServers/Host/API/SubPluginInfo.html" title="class in net.ME1312.SubServers.Host.API">SubPluginInfo</a></code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Host/API/Command.html#plugin--">plugin</a></span>()</code>
+<div class="block">Gets the Plugin that registering this Command</div>
+</td>
+</tr>
+<tr id="i6" class="altColor">
+<td class="colFirst"><code>void</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Host/API/Command.html#register-java.lang.String...-">register</a></span>(java.lang.String...&nbsp;handles)</code>
+<div class="block">Register this Command</div>
+</td>
+</tr>
+<tr id="i7" class="rowColor">
+<td class="colFirst"><code>java.lang.String[]</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Host/API/Command.html#usage--">usage</a></span>()</code>
+<div class="block">Get the Usage of this Command</div>
+</td>
+</tr>
+<tr id="i8" class="altColor">
+<td class="colFirst"><code><a href="../../../../../net/ME1312/SubServers/Host/API/Command.html" title="class in net.ME1312.SubServers.Host.API">Command</a></code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Host/API/Command.html#usage-java.lang.String...-">usage</a></span>(java.lang.String...&nbsp;args)</code>
+<div class="block">Set the Usage of this Command</div>
+</td>
+</tr>
 </table>
+<ul class="blockList">
+<li class="blockList"><a name="methods.inherited.from.class.java.lang.Object">
+<!--   -->
+</a>
+<h3>Methods inherited from class&nbsp;java.lang.Object</h3>
+<code>equals, getClass, hashCode, notify, notifyAll, toString, wait, wait, wait</code></li>
+</ul>
 </li>
 </ul>
 </li>
@@ -135,6 +216,23 @@ var activeTableTab = "activeTableTab";
 <div class="details">
 <ul class="blockList">
 <li class="blockList">
+<!-- ========= CONSTRUCTOR DETAIL ======== -->
+<ul class="blockList">
+<li class="blockList"><a name="constructor.detail">
+<!--   -->
+</a>
+<h3>Constructor Detail</h3>
+<a name="Command-net.ME1312.SubServers.Host.API.SubPluginInfo-">
+<!--   -->
+</a>
+<ul class="blockListLast">
+<li class="blockList">
+<h4>Command</h4>
+<pre>public&nbsp;Command(<a href="../../../../../net/ME1312/SubServers/Host/API/SubPluginInfo.html" title="class in net.ME1312.SubServers.Host.API">SubPluginInfo</a>&nbsp;plugin)</pre>
+</li>
+</ul>
+</li>
+</ul>
 <!-- ============ METHOD DETAIL ========== -->
 <ul class="blockList">
 <li class="blockList"><a name="method.detail">
@@ -144,16 +242,134 @@ var activeTableTab = "activeTableTab";
 <a name="command-java.lang.String-java.lang.String:A-">
 <!--   -->
 </a>
-<ul class="blockListLast">
+<ul class="blockList">
 <li class="blockList">
 <h4>command</h4>
-<pre>void&nbsp;command(java.lang.String&nbsp;command,
-             java.lang.String[]&nbsp;args)</pre>
+<pre>public abstract&nbsp;void&nbsp;command(java.lang.String&nbsp;handle,
+                             java.lang.String[]&nbsp;args)</pre>
 <div class="block">Run Command</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>command</code> - Command Name</dd>
+<dd><code>handle</code> - Command Name</dd>
 <dd><code>args</code> - Arguments</dd>
+</dl>
+</li>
+</ul>
+<a name="plugin--">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>plugin</h4>
+<pre>public&nbsp;<a href="../../../../../net/ME1312/SubServers/Host/API/SubPluginInfo.html" title="class in net.ME1312.SubServers.Host.API">SubPluginInfo</a>&nbsp;plugin()</pre>
+<div class="block">Gets the Plugin that registering this Command</div>
+<dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>Plugin Info</dd>
+</dl>
+</li>
+</ul>
+<a name="description--">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>description</h4>
+<pre>public&nbsp;java.lang.String&nbsp;description()</pre>
+<div class="block">Gets the Description of this Command</div>
+<dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>Command Description</dd>
+</dl>
+</li>
+</ul>
+<a name="description-java.lang.String-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>description</h4>
+<pre>public&nbsp;<a href="../../../../../net/ME1312/SubServers/Host/API/Command.html" title="class in net.ME1312.SubServers.Host.API">Command</a>&nbsp;description(java.lang.String&nbsp;value)</pre>
+<div class="block">Set the Description of this Command</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>value</code> - Value</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>The Command</dd>
+</dl>
+</li>
+</ul>
+<a name="help--">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>help</h4>
+<pre>public&nbsp;java.lang.String[]&nbsp;help()</pre>
+<div class="block">Get the Help Page for this Command</div>
+<dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>Help Page</dd>
+</dl>
+</li>
+</ul>
+<a name="help-java.lang.String...-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>help</h4>
+<pre>public&nbsp;<a href="../../../../../net/ME1312/SubServers/Host/API/Command.html" title="class in net.ME1312.SubServers.Host.API">Command</a>&nbsp;help(java.lang.String...&nbsp;lines)</pre>
+<div class="block">Set the Help Page for this Command</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>lines</code> - Help Page Lines</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>The Command</dd>
+</dl>
+</li>
+</ul>
+<a name="usage--">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>usage</h4>
+<pre>public&nbsp;java.lang.String[]&nbsp;usage()</pre>
+<div class="block">Get the Usage of this Command</div>
+<dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>Command Usage</dd>
+</dl>
+</li>
+</ul>
+<a name="usage-java.lang.String...-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>usage</h4>
+<pre>public&nbsp;<a href="../../../../../net/ME1312/SubServers/Host/API/Command.html" title="class in net.ME1312.SubServers.Host.API">Command</a>&nbsp;usage(java.lang.String...&nbsp;args)</pre>
+<div class="block">Set the Usage of this Command</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>args</code> - Argument Placeholders</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>The Command</dd>
+</dl>
+</li>
+</ul>
+<a name="register-java.lang.String...-">
+<!--   -->
+</a>
+<ul class="blockListLast">
+<li class="blockList">
+<h4>register</h4>
+<pre>public&nbsp;void&nbsp;register(java.lang.String...&nbsp;handles)</pre>
+<div class="block">Register this Command</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>handles</code> - Aliases</dd>
 </dl>
 </li>
 </ul>
@@ -211,13 +427,13 @@ var activeTableTab = "activeTableTab";
 <li>Summary:&nbsp;</li>
 <li>Nested&nbsp;|&nbsp;</li>
 <li>Field&nbsp;|&nbsp;</li>
-<li>Constr&nbsp;|&nbsp;</li>
+<li><a href="#constructor.summary">Constr</a>&nbsp;|&nbsp;</li>
 <li><a href="#method.summary">Method</a></li>
 </ul>
 <ul class="subNavList">
 <li>Detail:&nbsp;</li>
 <li>Field&nbsp;|&nbsp;</li>
-<li>Constr&nbsp;|&nbsp;</li>
+<li><a href="#constructor.detail">Constr</a>&nbsp;|&nbsp;</li>
 <li><a href="#method.detail">Method</a></li>
 </ul>
 </div>

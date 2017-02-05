@@ -2,7 +2,7 @@ package net.ME1312.SubServers.Host;
 
 import net.ME1312.SubServers.Host.API.Command;
 import net.ME1312.SubServers.Host.API.SubPluginInfo;
-import net.ME1312.SubServers.Host.API.SubTaskBuilder;
+import net.ME1312.SubServers.Host.API.SubTask;
 import net.ME1312.SubServers.Host.Library.Event.*;
 import net.ME1312.SubServers.Host.Library.UniversalFile;
 import net.ME1312.SubServers.Host.Library.Util;
@@ -119,7 +119,7 @@ public final class SubAPI {
      * @param builder SubTaskBuilder
      * @return Task ID
      */
-    public UUID schedule(SubTaskBuilder builder) {
+    public UUID schedule(SubTask builder) {
         if (Util.isNull(builder)) throw new NullPointerException();
         UUID sid = getFreeSID();
         TimerTask task = new TimerTask() {
@@ -130,20 +130,20 @@ public final class SubAPI {
                 } catch (Throwable e) {
                     plugin.log.error(new InvocationTargetException(e, "Unhandled exception while running SubTask " + sid.toString()));
                 }
-                if (builder.getRepeat() <= 0) schedule.remove(sid);
+                if (builder.repeat() <= 0) schedule.remove(sid);
             }
         };
 
         schedule.put(sid, new Timer("SubTask_" + sid.toString()));
-        if (builder.getRepeat() > 0) {
-            if (builder.getDelay() > 0) {
-                schedule.get(sid).scheduleAtFixedRate(task, builder.getDelay(), builder.getRepeat());
+        if (builder.repeat() > 0) {
+            if (builder.delay() > 0) {
+                schedule.get(sid).scheduleAtFixedRate(task, builder.delay(), builder.repeat());
             } else {
-                schedule.get(sid).scheduleAtFixedRate(task, new Date(), builder.getRepeat());
+                schedule.get(sid).scheduleAtFixedRate(task, new Date(), builder.repeat());
             }
         } else {
-            if (builder.getDelay() > 0) {
-                schedule.get(sid).schedule(task, builder.getDelay());
+            if (builder.delay() > 0) {
+                schedule.get(sid).schedule(task, builder.delay());
             } else {
                 new Thread(task).start();
             }
@@ -159,13 +159,7 @@ public final class SubAPI {
      * @return Task ID
      */
     public UUID schedule(SubPluginInfo plugin, Runnable run) {
-        if (Util.isNull(plugin, run)) throw new NullPointerException();
-        return schedule(new SubTaskBuilder(plugin) {
-            @Override
-            public void run() {
-                run.run();
-            }
-        });
+        return schedule(plugin, run, -1L, -1L);
     }
 
     /**
@@ -177,13 +171,7 @@ public final class SubAPI {
      * @return Task ID
      */
     public UUID schedule(SubPluginInfo plugin, Runnable run, long delay) {
-        if (Util.isNull(plugin, run, delay)) throw new NullPointerException();
-        return schedule(new SubTaskBuilder(plugin) {
-            @Override
-            public void run() {
-                run.run();
-            }
-        }.delay(delay));
+        return schedule(plugin, run, delay, -1L);
     }
 
     /**
@@ -197,7 +185,7 @@ public final class SubAPI {
      */
     public UUID schedule(SubPluginInfo plugin, Runnable run, long delay, long repeat) {
         if (Util.isNull(plugin, run, delay, repeat)) throw new NullPointerException();
-        return schedule(new SubTaskBuilder(plugin) {
+        return schedule(new SubTask(plugin) {
             @Override
             public void run() {
                 run.run();
@@ -219,13 +207,13 @@ public final class SubAPI {
     }
 
     /**
-     * Register a SubEvent Listener
+     * Register SubEvent Listeners
      *
      * @param plugin PluginInfo
-     * @param listener Listener
+     * @param listeners Listeners
      */
-    public void addListener(SubPluginInfo plugin, Listener listener) {
-        addListener(plugin, (Object) listener);
+    public void addListener(SubPluginInfo plugin, Listener... listeners) {
+        for (Listener listener : listeners) addListener(plugin, (Object) listener);
     }
     @SuppressWarnings("unchecked")
     void addListener(SubPluginInfo plugin, Object listener) {
@@ -257,13 +245,13 @@ public final class SubAPI {
     }
 
     /**
-     * Unregister a SubEvent Listener
+     * Unregister SubEvent Listeners
      *
      * @param plugin PluginInfo
-     * @param listener Listener
+     * @param listeners Listeners
      */
-    public void removeListener(SubPluginInfo plugin, Listener listener) {
-        removeListener(plugin, (Object) listener);
+    public void removeListener(SubPluginInfo plugin, Listener... listeners) {
+        for (Listener listener : listeners) removeListener(plugin, (Object) listener);
     }
     void removeListener(SubPluginInfo plugin, Object listener) {
         if (Util.isNull(plugin, listener)) throw new NullPointerException();
@@ -288,7 +276,7 @@ public final class SubAPI {
      *
      * @param event SubEvent
      */
-    public void runEvent(Event event) {
+    public void executeEvent(Event event) {
         if (Util.isNull(event)) throw new NullPointerException();
         for (EventPriority priority : listeners.keySet()) {
             if (!listeners.get(priority).keySet().contains(event.getClass())) continue;

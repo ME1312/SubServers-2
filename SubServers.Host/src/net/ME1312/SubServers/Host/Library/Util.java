@@ -3,7 +3,7 @@ package net.ME1312.SubServers.Host.Library;
 import net.ME1312.SubServers.Host.SubAPI;
 
 import java.io.*;
-import java.util.Random;
+import java.util.*;
 
 /**
  * SubServers Utility Class
@@ -27,6 +27,27 @@ public final class Util {
             if (value == null) ret = true;
         }
         return ret;
+    }
+
+    /**
+     * Get keys by value from map
+     *
+     * @param map Map to search
+     * @param value Value to search for
+     * @param <K> Key
+     * @param <V> Value
+     * @return Search results
+     */
+    public static <K, V> List<K> getBackwards(Map<K, V> map, V value) {
+        List<K> values = new ArrayList<K>();
+
+        for (K key : map.keySet()) {
+            if (map.get(key).equals(value)) {
+                values.add(key);
+            }
+        }
+
+        return values;
     }
 
     /**

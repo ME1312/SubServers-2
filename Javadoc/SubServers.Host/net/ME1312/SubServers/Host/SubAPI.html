@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":9,"i6":42,"i7":10,"i8":10,"i9":10,"i10":10,"i11":10,"i12":10,"i13":10,"i14":10,"i15":10,"i16":10,"i17":10,"i18":10,"i19":10};
+var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":9,"i7":42,"i8":10,"i9":10,"i10":10,"i11":10,"i12":10,"i13":10,"i14":10,"i15":10,"i16":10,"i17":10,"i18":10,"i19":10};
 var tabs = {65535:["t0","All Methods"],1:["t1","Static Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"],32:["t6","Deprecated Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -130,16 +130,16 @@ extends java.lang.Object</pre>
 </tr>
 <tr id="i0" class="altColor">
 <td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Host/SubAPI.html#addCommand-net.ME1312.SubServers.Host.API.Command-java.lang.String...-">addCommand</a></span>(<a href="../../../../net/ME1312/SubServers/Host/API/Command.html" title="interface in net.ME1312.SubServers.Host.API">Command</a>&nbsp;command,
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Host/SubAPI.html#addCommand-net.ME1312.SubServers.Host.API.Command-java.lang.String...-">addCommand</a></span>(<a href="../../../../net/ME1312/SubServers/Host/API/Command.html" title="class in net.ME1312.SubServers.Host.API">Command</a>&nbsp;command,
           java.lang.String...&nbsp;handles)</code>
 <div class="block">Registers a Command</div>
 </td>
 </tr>
 <tr id="i1" class="rowColor">
 <td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Host/SubAPI.html#addListener-net.ME1312.SubServers.Host.API.SubPluginInfo-net.ME1312.SubServers.Host.Library.Event.Listener-">addListener</a></span>(<a href="../../../../net/ME1312/SubServers/Host/API/SubPluginInfo.html" title="class in net.ME1312.SubServers.Host.API">SubPluginInfo</a>&nbsp;plugin,
-           <a href="../../../../net/ME1312/SubServers/Host/Library/Event/Listener.html" title="interface in net.ME1312.SubServers.Host.Library.Event">Listener</a>&nbsp;listener)</code>
-<div class="block">Register a SubEvent Listener</div>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Host/SubAPI.html#addListener-net.ME1312.SubServers.Host.API.SubPluginInfo-net.ME1312.SubServers.Host.Library.Event.Listener...-">addListener</a></span>(<a href="../../../../net/ME1312/SubServers/Host/API/SubPluginInfo.html" title="class in net.ME1312.SubServers.Host.API">SubPluginInfo</a>&nbsp;plugin,
+           <a href="../../../../net/ME1312/SubServers/Host/Library/Event/Listener.html" title="interface in net.ME1312.SubServers.Host.Library.Event">Listener</a>...&nbsp;listeners)</code>
+<div class="block">Register SubEvent Listeners</div>
 </td>
 </tr>
 <tr id="i2" class="altColor">
@@ -149,24 +149,30 @@ extends java.lang.Object</pre>
 </td>
 </tr>
 <tr id="i3" class="rowColor">
+<td class="colFirst"><code>void</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Host/SubAPI.html#executeEvent-net.ME1312.SubServers.Host.Library.Event.Event-">executeEvent</a></span>(<a href="../../../../net/ME1312/SubServers/Host/Library/Event/Event.html" title="class in net.ME1312.SubServers.Host.Library.Event">Event</a>&nbsp;event)</code>
+<div class="block">Run a SubEvent</div>
+</td>
+</tr>
+<tr id="i4" class="altColor">
 <td class="colFirst"><code><a href="../../../../net/ME1312/SubServers/Host/Library/Version/Version.html" title="class in net.ME1312.SubServers.Host.Library.Version">Version</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Host/SubAPI.html#getAppVersion--">getAppVersion</a></span>()</code>
 <div class="block">Gets the SubServers Version</div>
 </td>
 </tr>
-<tr id="i4" class="altColor">
+<tr id="i5" class="rowColor">
 <td class="colFirst"><code><a href="../../../../net/ME1312/SubServers/Host/Library/Version/Version.html" title="class in net.ME1312.SubServers.Host.Library.Version">Version</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Host/SubAPI.html#getBetaVersion--">getBetaVersion</a></span>()</code>
 <div class="block">Gets the SubServers Beta Version</div>
 </td>
 </tr>
-<tr id="i5" class="rowColor">
+<tr id="i6" class="altColor">
 <td class="colFirst"><code>static <a href="../../../../net/ME1312/SubServers/Host/SubAPI.html" title="class in net.ME1312.SubServers.Host">SubAPI</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Host/SubAPI.html#getInstance--">getInstance</a></span>()</code>
 <div class="block">Gets the SubAPI Methods</div>
 </td>
 </tr>
-<tr id="i6" class="altColor">
+<tr id="i7" class="rowColor">
 <td class="colFirst"><code><a href="../../../../net/ME1312/SubServers/Host/SubServers.html" title="class in net.ME1312.SubServers.Host">SubServers</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Host/SubAPI.html#getInternals--">getInternals</a></span>()</code>
 <div class="block"><span class="deprecatedLabel">Deprecated.</span>&nbsp;
@@ -174,59 +180,53 @@ extends java.lang.Object</pre>
 </div>
 </td>
 </tr>
-<tr id="i7" class="rowColor">
+<tr id="i8" class="altColor">
 <td class="colFirst"><code>java.util.Map&lt;java.lang.String,java.lang.String&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Host/SubAPI.html#getLang--">getLang</a></span>()</code>
 <div class="block">Gets the SubServers Lang</div>
 </td>
 </tr>
-<tr id="i8" class="altColor">
+<tr id="i9" class="rowColor">
 <td class="colFirst"><code>java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Host/SubAPI.html#getLang-java.lang.String-">getLang</a></span>(java.lang.String&nbsp;key)</code>
 <div class="block">Gets a value from the SubServers Lang</div>
 </td>
 </tr>
-<tr id="i9" class="rowColor">
+<tr id="i10" class="altColor">
 <td class="colFirst"><code><a href="../../../../net/ME1312/SubServers/Host/API/SubPluginInfo.html" title="class in net.ME1312.SubServers.Host.API">SubPluginInfo</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Host/SubAPI.html#getPlugin-java.lang.String-">getPlugin</a></span>(java.lang.String&nbsp;plugin)</code>
 <div class="block">Gets a Plugin</div>
 </td>
 </tr>
-<tr id="i10" class="altColor">
+<tr id="i11" class="rowColor">
 <td class="colFirst"><code>java.util.Map&lt;java.lang.String,<a href="../../../../net/ME1312/SubServers/Host/API/SubPluginInfo.html" title="class in net.ME1312.SubServers.Host.API">SubPluginInfo</a>&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Host/SubAPI.html#getPlugins--">getPlugins</a></span>()</code>
 <div class="block">Get a map of the Plugins</div>
 </td>
 </tr>
-<tr id="i11" class="rowColor">
+<tr id="i12" class="altColor">
 <td class="colFirst"><code><a href="../../../../net/ME1312/SubServers/Host/Library/UniversalFile.html" title="class in net.ME1312.SubServers.Host.Library">UniversalFile</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Host/SubAPI.html#getRuntimeDirectory--">getRuntimeDirectory</a></span>()</code>
 <div class="block">Gets the Runtime Directory</div>
 </td>
 </tr>
-<tr id="i12" class="altColor">
+<tr id="i13" class="rowColor">
 <td class="colFirst"><code><a href="../../../../net/ME1312/SubServers/Host/Network/SubDataClient.html" title="class in net.ME1312.SubServers.Host.Network">SubDataClient</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Host/SubAPI.html#getSubDataNetwork--">getSubDataNetwork</a></span>()</code>
 <div class="block">Gets the SubData Network Manager</div>
 </td>
 </tr>
-<tr id="i13" class="rowColor">
+<tr id="i14" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Host/SubAPI.html#removeCommand-java.lang.String...-">removeCommand</a></span>(java.lang.String...&nbsp;handles)</code>
 <div class="block">Unregisters a Command</div>
 </td>
 </tr>
-<tr id="i14" class="altColor">
-<td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Host/SubAPI.html#removeListener-net.ME1312.SubServers.Host.API.SubPluginInfo-net.ME1312.SubServers.Host.Library.Event.Listener-">removeListener</a></span>(<a href="../../../../net/ME1312/SubServers/Host/API/SubPluginInfo.html" title="class in net.ME1312.SubServers.Host.API">SubPluginInfo</a>&nbsp;plugin,
-              <a href="../../../../net/ME1312/SubServers/Host/Library/Event/Listener.html" title="interface in net.ME1312.SubServers.Host.Library.Event">Listener</a>&nbsp;listener)</code>
-<div class="block">Unregister a SubEvent Listener</div>
-</td>
-</tr>
 <tr id="i15" class="rowColor">
 <td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Host/SubAPI.html#runEvent-net.ME1312.SubServers.Host.Library.Event.Event-">runEvent</a></span>(<a href="../../../../net/ME1312/SubServers/Host/Library/Event/Event.html" title="class in net.ME1312.SubServers.Host.Library.Event">Event</a>&nbsp;event)</code>
-<div class="block">Run a SubEvent</div>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Host/SubAPI.html#removeListener-net.ME1312.SubServers.Host.API.SubPluginInfo-net.ME1312.SubServers.Host.Library.Event.Listener...-">removeListener</a></span>(<a href="../../../../net/ME1312/SubServers/Host/API/SubPluginInfo.html" title="class in net.ME1312.SubServers.Host.API">SubPluginInfo</a>&nbsp;plugin,
+              <a href="../../../../net/ME1312/SubServers/Host/Library/Event/Listener.html" title="interface in net.ME1312.SubServers.Host.Library.Event">Listener</a>...&nbsp;listeners)</code>
+<div class="block">Unregister SubEvent Listeners</div>
 </td>
 </tr>
 <tr id="i16" class="altColor">
@@ -255,7 +255,7 @@ extends java.lang.Object</pre>
 </tr>
 <tr id="i19" class="rowColor">
 <td class="colFirst"><code>java.util.UUID</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Host/SubAPI.html#schedule-net.ME1312.SubServers.Host.API.SubTaskBuilder-">schedule</a></span>(<a href="../../../../net/ME1312/SubServers/Host/API/SubTaskBuilder.html" title="class in net.ME1312.SubServers.Host.API">SubTaskBuilder</a>&nbsp;builder)</code>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Host/SubAPI.html#schedule-net.ME1312.SubServers.Host.API.SubTask-">schedule</a></span>(<a href="../../../../net/ME1312/SubServers/Host/API/SubTask.html" title="class in net.ME1312.SubServers.Host.API">SubTask</a>&nbsp;builder)</code>
 <div class="block">Schedule a task</div>
 </td>
 </tr>
@@ -361,7 +361,7 @@ public&nbsp;<a href="../../../../net/ME1312/SubServers/Host/SubServers.html" tit
 <ul class="blockList">
 <li class="blockList">
 <h4>addCommand</h4>
-<pre>public&nbsp;void&nbsp;addCommand(<a href="../../../../net/ME1312/SubServers/Host/API/Command.html" title="interface in net.ME1312.SubServers.Host.API">Command</a>&nbsp;command,
+<pre>public&nbsp;void&nbsp;addCommand(<a href="../../../../net/ME1312/SubServers/Host/API/Command.html" title="class in net.ME1312.SubServers.Host.API">Command</a>&nbsp;command,
                        java.lang.String...&nbsp;handles)</pre>
 <div class="block">Registers a Command</div>
 <dl>
@@ -385,13 +385,13 @@ public&nbsp;<a href="../../../../net/ME1312/SubServers/Host/SubServers.html" tit
 </dl>
 </li>
 </ul>
-<a name="schedule-net.ME1312.SubServers.Host.API.SubTaskBuilder-">
+<a name="schedule-net.ME1312.SubServers.Host.API.SubTask-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>schedule</h4>
-<pre>public&nbsp;java.util.UUID&nbsp;schedule(<a href="../../../../net/ME1312/SubServers/Host/API/SubTaskBuilder.html" title="class in net.ME1312.SubServers.Host.API">SubTaskBuilder</a>&nbsp;builder)</pre>
+<pre>public&nbsp;java.util.UUID&nbsp;schedule(<a href="../../../../net/ME1312/SubServers/Host/API/SubTask.html" title="class in net.ME1312.SubServers.Host.API">SubTask</a>&nbsp;builder)</pre>
 <div class="block">Schedule a task</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
@@ -475,45 +475,45 @@ public&nbsp;<a href="../../../../net/ME1312/SubServers/Host/SubServers.html" tit
 </dl>
 </li>
 </ul>
-<a name="addListener-net.ME1312.SubServers.Host.API.SubPluginInfo-net.ME1312.SubServers.Host.Library.Event.Listener-">
+<a name="addListener-net.ME1312.SubServers.Host.API.SubPluginInfo-net.ME1312.SubServers.Host.Library.Event.Listener...-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>addListener</h4>
 <pre>public&nbsp;void&nbsp;addListener(<a href="../../../../net/ME1312/SubServers/Host/API/SubPluginInfo.html" title="class in net.ME1312.SubServers.Host.API">SubPluginInfo</a>&nbsp;plugin,
-                        <a href="../../../../net/ME1312/SubServers/Host/Library/Event/Listener.html" title="interface in net.ME1312.SubServers.Host.Library.Event">Listener</a>&nbsp;listener)</pre>
-<div class="block">Register a SubEvent Listener</div>
+                        <a href="../../../../net/ME1312/SubServers/Host/Library/Event/Listener.html" title="interface in net.ME1312.SubServers.Host.Library.Event">Listener</a>...&nbsp;listeners)</pre>
+<div class="block">Register SubEvent Listeners</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>plugin</code> - PluginInfo</dd>
-<dd><code>listener</code> - Listener</dd>
+<dd><code>listeners</code> - Listeners</dd>
 </dl>
 </li>
 </ul>
-<a name="removeListener-net.ME1312.SubServers.Host.API.SubPluginInfo-net.ME1312.SubServers.Host.Library.Event.Listener-">
+<a name="removeListener-net.ME1312.SubServers.Host.API.SubPluginInfo-net.ME1312.SubServers.Host.Library.Event.Listener...-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>removeListener</h4>
 <pre>public&nbsp;void&nbsp;removeListener(<a href="../../../../net/ME1312/SubServers/Host/API/SubPluginInfo.html" title="class in net.ME1312.SubServers.Host.API">SubPluginInfo</a>&nbsp;plugin,
-                           <a href="../../../../net/ME1312/SubServers/Host/Library/Event/Listener.html" title="interface in net.ME1312.SubServers.Host.Library.Event">Listener</a>&nbsp;listener)</pre>
-<div class="block">Unregister a SubEvent Listener</div>
+                           <a href="../../../../net/ME1312/SubServers/Host/Library/Event/Listener.html" title="interface in net.ME1312.SubServers.Host.Library.Event">Listener</a>...&nbsp;listeners)</pre>
+<div class="block">Unregister SubEvent Listeners</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>plugin</code> - PluginInfo</dd>
-<dd><code>listener</code> - Listener</dd>
+<dd><code>listeners</code> - Listeners</dd>
 </dl>
 </li>
 </ul>
-<a name="runEvent-net.ME1312.SubServers.Host.Library.Event.Event-">
+<a name="executeEvent-net.ME1312.SubServers.Host.Library.Event.Event-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
-<h4>runEvent</h4>
-<pre>public&nbsp;void&nbsp;runEvent(<a href="../../../../net/ME1312/SubServers/Host/Library/Event/Event.html" title="class in net.ME1312.SubServers.Host.Library.Event">Event</a>&nbsp;event)</pre>
+<h4>executeEvent</h4>
+<pre>public&nbsp;void&nbsp;executeEvent(<a href="../../../../net/ME1312/SubServers/Host/Library/Event/Event.html" title="class in net.ME1312.SubServers.Host.Library.Event">Event</a>&nbsp;event)</pre>
 <div class="block">Run a SubEvent</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>

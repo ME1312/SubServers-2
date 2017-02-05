@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10,"i8":10,"i9":10,"i10":10,"i11":10,"i12":10,"i13":10,"i14":10,"i15":10,"i16":10};
+var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10,"i8":10,"i9":10,"i10":10,"i11":10,"i12":10,"i13":10,"i14":10,"i15":10,"i16":10,"i17":10};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -48,7 +48,7 @@ var activeTableTab = "activeTableTab";
 <div class="subNav">
 <ul class="navList">
 <li><a href="../../../../../net/ME1312/SubServers/Host/API/SubPlugin.html" title="annotation in net.ME1312.SubServers.Host.API"><span class="typeNameLink">Prev&nbsp;Class</span></a></li>
-<li><a href="../../../../../net/ME1312/SubServers/Host/API/SubTaskBuilder.html" title="class in net.ME1312.SubServers.Host.API"><span class="typeNameLink">Next&nbsp;Class</span></a></li>
+<li><a href="../../../../../net/ME1312/SubServers/Host/API/SubTask.html" title="class in net.ME1312.SubServers.Host.API"><span class="typeNameLink">Next&nbsp;Class</span></a></li>
 </ul>
 <ul class="navList">
 <li><a href="../../../../../index.html?net/ME1312/SubServers/Host/API/SubPluginInfo.html" target="_top">Frames</a></li>
@@ -137,12 +137,14 @@ implements <a href="../../../../../net/ME1312/SubServers/Host/Library/ExtraDataH
 <th class="colOne" scope="col">Constructor and Description</th>
 </tr>
 <tr class="altColor">
-<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Host/API/SubPluginInfo.html#SubPluginInfo-java.lang.Object-java.lang.String-net.ME1312.SubServers.Host.Library.Version.Version-java.util.List-java.lang.String-java.net.URL-java.util.List-java.util.List-">SubPluginInfo</a></span>(java.lang.Object&nbsp;plugin,
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Host/API/SubPluginInfo.html#SubPluginInfo-net.ME1312.SubServers.Host.SubServers-java.lang.Object-java.lang.String-net.ME1312.SubServers.Host.Library.Version.Version-java.util.List-java.lang.String-java.net.URL-java.util.List-java.util.List-java.util.List-">SubPluginInfo</a></span>(<a href="../../../../../net/ME1312/SubServers/Host/SubServers.html" title="class in net.ME1312.SubServers.Host">SubServers</a>&nbsp;plugin,
+             java.lang.Object&nbsp;main,
              java.lang.String&nbsp;name,
              <a href="../../../../../net/ME1312/SubServers/Host/Library/Version/Version.html" title="class in net.ME1312.SubServers.Host.Library.Version">Version</a>&nbsp;version,
              java.util.List&lt;java.lang.String&gt;&nbsp;authors,
              java.lang.String&nbsp;description,
              java.net.URL&nbsp;website,
+             java.util.List&lt;java.lang.String&gt;&nbsp;loadBefore,
              java.util.List&lt;java.lang.String&gt;&nbsp;dependencies,
              java.util.List&lt;java.lang.String&gt;&nbsp;softDependencies)</code>
 <div class="block">Create a SubPlugin Description</div>
@@ -211,54 +213,60 @@ implements <a href="../../../../../net/ME1312/SubServers/Host/Library/ExtraDataH
 </td>
 </tr>
 <tr id="i8" class="altColor">
+<td class="colFirst"><code>java.util.List&lt;java.lang.String&gt;</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Host/API/SubPluginInfo.html#getLoadBefore--">getLoadBefore</a></span>()</code>
+<div class="block">Gets the Load Before Plugins List</div>
+</td>
+</tr>
+<tr id="i9" class="rowColor">
 <td class="colFirst"><code><a href="../../../../../net/ME1312/SubServers/Host/Library/Log/Logger.html" title="class in net.ME1312.SubServers.Host.Library.Log">Logger</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Host/API/SubPluginInfo.html#getLogger--">getLogger</a></span>()</code>
 <div class="block">Gets the default Logger for this Plugin</div>
 </td>
 </tr>
-<tr id="i9" class="rowColor">
+<tr id="i10" class="altColor">
 <td class="colFirst"><code>java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Host/API/SubPluginInfo.html#getName--">getName</a></span>()</code>
 <div class="block">Get Plugin's Name</div>
 </td>
 </tr>
-<tr id="i10" class="altColor">
+<tr id="i11" class="rowColor">
 <td class="colFirst"><code>java.util.List&lt;java.lang.String&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Host/API/SubPluginInfo.html#getSoftDependancies--">getSoftDependancies</a></span>()</code>
 <div class="block">Gets the Soft Dependencies List</div>
 </td>
 </tr>
-<tr id="i11" class="rowColor">
+<tr id="i12" class="altColor">
 <td class="colFirst"><code><a href="../../../../../net/ME1312/SubServers/Host/Library/Version/Version.html" title="class in net.ME1312.SubServers.Host.Library.Version">Version</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Host/API/SubPluginInfo.html#getVersion--">getVersion</a></span>()</code>
 <div class="block">Get Plugin's Version</div>
 </td>
 </tr>
-<tr id="i12" class="altColor">
+<tr id="i13" class="rowColor">
 <td class="colFirst"><code>java.net.URL</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Host/API/SubPluginInfo.html#getWebsite--">getWebsite</a></span>()</code>
 <div class="block">Get Authors' Website</div>
 </td>
 </tr>
-<tr id="i13" class="rowColor">
+<tr id="i14" class="altColor">
 <td class="colFirst"><code>boolean</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Host/API/SubPluginInfo.html#hasExtra-java.lang.String-">hasExtra</a></span>(java.lang.String&nbsp;handle)</code>
 <div class="block">Determine if an extra value exists</div>
 </td>
 </tr>
-<tr id="i14" class="altColor">
+<tr id="i15" class="rowColor">
 <td class="colFirst"><code>boolean</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Host/API/SubPluginInfo.html#isEnabled--">isEnabled</a></span>()</code>
 <div class="block">Sets the Plugin's Enabled Status</div>
 </td>
 </tr>
-<tr id="i15" class="rowColor">
+<tr id="i16" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Host/API/SubPluginInfo.html#removeExtra-java.lang.String-">removeExtra</a></span>(java.lang.String&nbsp;handle)</code>
 <div class="block">Remove an extra value from this Server</div>
 </td>
 </tr>
-<tr id="i16" class="altColor">
+<tr id="i17" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Host/API/SubPluginInfo.html#setEnabled-boolean-">setEnabled</a></span>(boolean&nbsp;value)</code>
 <div class="block">Gets if the Plugin is Enabled</div>
@@ -286,31 +294,34 @@ implements <a href="../../../../../net/ME1312/SubServers/Host/Library/ExtraDataH
 <!--   -->
 </a>
 <h3>Constructor Detail</h3>
-<a name="SubPluginInfo-java.lang.Object-java.lang.String-net.ME1312.SubServers.Host.Library.Version.Version-java.util.List-java.lang.String-java.net.URL-java.util.List-java.util.List-">
+<a name="SubPluginInfo-net.ME1312.SubServers.Host.SubServers-java.lang.Object-java.lang.String-net.ME1312.SubServers.Host.Library.Version.Version-java.util.List-java.lang.String-java.net.URL-java.util.List-java.util.List-java.util.List-">
 <!--   -->
 </a>
 <ul class="blockListLast">
 <li class="blockList">
 <h4>SubPluginInfo</h4>
-<pre>public&nbsp;SubPluginInfo(java.lang.Object&nbsp;plugin,
+<pre>public&nbsp;SubPluginInfo(<a href="../../../../../net/ME1312/SubServers/Host/SubServers.html" title="class in net.ME1312.SubServers.Host">SubServers</a>&nbsp;plugin,
+                     java.lang.Object&nbsp;main,
                      java.lang.String&nbsp;name,
                      <a href="../../../../../net/ME1312/SubServers/Host/Library/Version/Version.html" title="class in net.ME1312.SubServers.Host.Library.Version">Version</a>&nbsp;version,
                      java.util.List&lt;java.lang.String&gt;&nbsp;authors,
                      java.lang.String&nbsp;description,
                      java.net.URL&nbsp;website,
+                     java.util.List&lt;java.lang.String&gt;&nbsp;loadBefore,
                      java.util.List&lt;java.lang.String&gt;&nbsp;dependencies,
                      java.util.List&lt;java.lang.String&gt;&nbsp;softDependencies)</pre>
 <div class="block">Create a SubPlugin Description</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>plugin</code> - Plugin Instance</dd>
+<dd><code>plugin</code> - SubServers.Host</dd>
+<dd><code>main</code> - Plugin</dd>
 <dd><code>name</code> - Plugin Name</dd>
 <dd><code>version</code> - Plugin Version</dd>
 <dd><code>authors</code> - Authors List</dd>
 <dd><code>description</code> - Plugin Description</dd>
 <dd><code>website</code> - Authors' Website</dd>
-<dd><code>softDependencies</code> - Soft Dependencies List</dd>
 <dd><code>dependencies</code> - Dependencies List</dd>
+<dd><code>softDependencies</code> - Soft Dependencies List</dd>
 </dl>
 </li>
 </ul>
@@ -398,6 +409,20 @@ implements <a href="../../../../../net/ME1312/SubServers/Host/Library/ExtraDataH
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>Authors' Website</dd>
+</dl>
+</li>
+</ul>
+<a name="getLoadBefore--">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getLoadBefore</h4>
+<pre>public&nbsp;java.util.List&lt;java.lang.String&gt;&nbsp;getLoadBefore()</pre>
+<div class="block">Gets the Load Before Plugins List</div>
+<dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>Load Before Plugins List</dd>
 </dl>
 </li>
 </ul>
@@ -604,7 +629,7 @@ implements <a href="../../../../../net/ME1312/SubServers/Host/Library/ExtraDataH
 <div class="subNav">
 <ul class="navList">
 <li><a href="../../../../../net/ME1312/SubServers/Host/API/SubPlugin.html" title="annotation in net.ME1312.SubServers.Host.API"><span class="typeNameLink">Prev&nbsp;Class</span></a></li>
-<li><a href="../../../../../net/ME1312/SubServers/Host/API/SubTaskBuilder.html" title="class in net.ME1312.SubServers.Host.API"><span class="typeNameLink">Next&nbsp;Class</span></a></li>
+<li><a href="../../../../../net/ME1312/SubServers/Host/API/SubTask.html" title="class in net.ME1312.SubServers.Host.API"><span class="typeNameLink">Next&nbsp;Class</span></a></li>
 </ul>
 <ul class="navList">
 <li><a href="../../../../../index.html?net/ME1312/SubServers/Host/API/SubPluginInfo.html" target="_top">Frames</a></li>

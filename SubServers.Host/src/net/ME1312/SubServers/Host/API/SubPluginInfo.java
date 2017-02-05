@@ -7,6 +7,7 @@ import net.ME1312.SubServers.Host.Library.Log.Logger;
 import net.ME1312.SubServers.Host.Library.Util;
 import net.ME1312.SubServers.Host.Library.Version.Version;
 import net.ME1312.SubServers.Host.SubAPI;
+import net.ME1312.SubServers.Host.SubServers;
 
 import java.io.File;
 import java.net.URL;
@@ -18,14 +19,16 @@ import java.util.*;
  * @see SubPlugin
  */
 public class SubPluginInfo implements ExtraDataHandler {
-    private Object plugin;
+    private SubServers plugin;
+    private Object main;
     private String name;
     private Version version;
     private List<String> authors;
-    private String desc = null;
-    private URL website = null;
-    private List<String> depend = Collections.emptyList();
-    private List<String> softDepend = Collections.emptyList();
+    private String desc;
+    private URL website;
+    private List<String> loadBefore;
+    private List<String> depend;
+    private List<String> softDepend;
 
     private Logger logger;
     private boolean enabled = false;
@@ -34,24 +37,31 @@ public class SubPluginInfo implements ExtraDataHandler {
     /**
      * Create a SubPlugin Description
      *
-     * @param plugin Plugin Instance
+     * @param plugin SubServers.Host
+     * @param main Plugin
      * @param name Plugin Name
      * @param version Plugin Version
      * @param authors Authors List
      * @param description Plugin Description
      * @param website Authors' Website
-     * @param softDependencies Soft Dependencies List
      * @param dependencies Dependencies List
+     * @param softDependencies Soft Dependencies List
      */
-    public SubPluginInfo(Object plugin, String name, Version version, List<String> authors, String description, URL website, List<String> dependencies, List<String> softDependencies) {
-        if (Util.isNull(plugin, name, version, authors)) throw new NullPointerException();
-        if (authors.size() == 0) throw new ArrayIndexOutOfBoundsException("Authors list cannot be empty");
+    public SubPluginInfo(SubServers plugin, Object main, String name, Version version, List<String> authors, String description, URL website, List<String> loadBefore, List<String> dependencies, List<String> softDependencies) {
+        if (Util.isNull(plugin, main, name, version, authors)) throw new NullPointerException();
+        name = name.replaceAll("#|<|\\$|\\+|%|>|!|`|&|\\*|'|\\||\\{|\\?|\"|=|}|/|\\\\|\\s|@|\\.|\\n", "_");
+        if (name.length() == 0) throw new StringIndexOutOfBoundsException("Cannot use an empty name");
+        if (version.toString().length() == 0) throw new StringIndexOutOfBoundsException("Cannot use an empty version");
+        if (authors.size() == 0) throw new ArrayIndexOutOfBoundsException("Cannot use an empty authors list");
+        if (description != null && description.length() == 0) throw new StringIndexOutOfBoundsException("Cannot use an empty description");
         this.plugin = plugin;
+        this.main = main;
         this.name = name;
         this.version = version;
-        this.authors = (authors == null)?Collections.emptyList():authors;
+        this.authors = authors;
         this.desc = description;
         this.website = website;
+        this.loadBefore = (loadBefore == null)?Collections.emptyList():loadBefore;
         this.depend = (dependencies == null)?Collections.emptyList():dependencies;
         this.softDepend = (softDependencies == null)?Collections.emptyList():softDependencies;
 
@@ -59,7 +69,7 @@ public class SubPluginInfo implements ExtraDataHandler {
     }
 
     public Object get() {
-        return plugin;
+        return main;
     }
 
     /**
@@ -105,6 +115,15 @@ public class SubPluginInfo implements ExtraDataHandler {
      */
     public URL getWebsite() {
         return this.website;
+    }
+
+    /**
+     * Gets the Load Before Plugins List
+     *
+     * @return Load Before Plugins List
+     */
+    public List<String> getLoadBefore() {
+        return this.loadBefore;
     }
 
     /**
@@ -158,7 +177,7 @@ public class SubPluginInfo implements ExtraDataHandler {
      * @return Data Folder
      */
     public File getDataFolder() {
-        File dir = new File(SubAPI.getInstance().getRuntimeDirectory(), "Plugins" + File.separator + name);
+        File dir = new File(plugin.api.getRuntimeDirectory(), "Plugins" + File.separator + name);
         if (!dir.exists()) dir.mkdir();
         return dir;
     }
