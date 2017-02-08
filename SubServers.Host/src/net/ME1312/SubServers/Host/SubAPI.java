@@ -22,11 +22,11 @@ public final class SubAPI {
     final HashMap<UUID, Timer> schedule = new HashMap<UUID, Timer>();
     final TreeMap<String, Command> commands = new TreeMap<String, Command>();
     final HashMap<String, SubPluginInfo> plugins = new LinkedHashMap<String, SubPluginInfo>();
-    private SubServers plugin;
+    private SubServers host;
     private static SubAPI api;
 
-    protected SubAPI(SubServers plugin) {
-        this.plugin = plugin;
+    protected SubAPI(SubServers host) {
+        this.host = host;
         api = this;
     }
 
@@ -47,7 +47,7 @@ public final class SubAPI {
      */
     @Deprecated
     public SubServers getInternals() {
-        return plugin;
+        return host;
     }
 
     /**
@@ -56,7 +56,7 @@ public final class SubAPI {
      * @return SubData Network Manager
      */
     public SubDataClient getSubDataNetwork() {
-        return plugin.subdata;
+        return host.subdata;
     }
 
     /**
@@ -128,7 +128,7 @@ public final class SubAPI {
                 try {
                     builder.run();
                 } catch (Throwable e) {
-                    plugin.log.error(new InvocationTargetException(e, "Unhandled exception while running SubTask " + sid.toString()));
+                    host.log.error.println(new InvocationTargetException(e, "Unhandled exception while running SubTask " + sid.toString()));
                 }
                 if (builder.repeat() <= 0) schedule.remove(sid);
             }
@@ -232,12 +232,12 @@ public final class SubAPI {
                     events.put((Class<Event>) method.getParameterTypes()[0], plugins);
                     this.listeners.put(method.getAnnotation(EventHandler.class).priority(), events);
                 } else {
-                    this.plugin.log.error(
+                    this.host.log.error.println(
                             "Cannot register EventHandler in class \"" + listener.getClass().getCanonicalName() + "\" using method \"" + method.getName() + "\":",
                             "\"" + method.getParameterTypes()[0].getCanonicalName() + "\" is not a SubEvent");
                 }
             } else {
-                this.plugin.log.error(
+                this.host.log.error.println(
                         "Cannot register EventHandler in class \"" + listener.getClass().getCanonicalName() + "\" using method \"" + method.getName() + "\":",
                         ((method.getParameterTypes().length > 0) ? "Too many" : "No") + " parameters for SubEvent to execute");
             }
@@ -287,7 +287,7 @@ public final class SubAPI {
                     pf.set(event, plugin);
                     pf.setAccessible(false);
                 } catch (Exception e) {
-                    this.plugin.log.error(e);
+                    this.host.log.error.println(e);
                 }
                 for (Object listener : listeners.get(priority).get(event.getClass()).get(plugin).keySet()) {
                     for (Method method : listeners.get(priority).get(event.getClass()).get(plugin).get(listener)) {
@@ -295,11 +295,11 @@ public final class SubAPI {
                         try {
                             method.invoke(listener, event);
                         } catch (InvocationTargetException e) {
-                            this.plugin.log.error("Event \"" + method.getName() + "(" + event.getClass().getTypeName() + ")\" in class \"" + listener.getClass().getCanonicalName() + "\" had an unhandled exception:");
-                            this.plugin.log.error(e.getTargetException());
+                            this.host.log.error.println("Event \"" + method.getName() + "(" + event.getClass().getTypeName() + ")\" in class \"" + listener.getClass().getCanonicalName() + "\" had an unhandled exception:");
+                            this.host.log.error.println(e.getTargetException());
                         } catch (IllegalAccessException e) {
-                            this.plugin.log.error("Cannot access method \"" + method.getName() + "\" in class \"" + listener.getClass().getCanonicalName() + "\"");
-                            this.plugin.log.error(e);
+                            this.host.log.error.println("Cannot access method \"" + method.getName() + "\" in class \"" + listener.getClass().getCanonicalName() + "\"");
+                            this.host.log.error.println(e);
                         }
                     }
                 }
@@ -311,7 +311,7 @@ public final class SubAPI {
             pf.set(event, null);
             pf.setAccessible(false);
         } catch (Exception e) {
-            this.plugin.log.error(e);
+            this.host.log.error.println(e);
         }
     }
 
@@ -333,8 +333,8 @@ public final class SubAPI {
      */
     public Map<String, String> getLang() {
         HashMap<String, String> lang = new HashMap<String, String>();
-        for (String key : plugin.lang.getSection("Lang").getKeys()) {
-            if (plugin.lang.getSection("Lang").isString(key)) lang.put(key, plugin.lang.getSection("Lang").getString(key));
+        for (String key : host.lang.getSection("Lang").getKeys()) {
+            if (host.lang.getSection("Lang").isString(key)) lang.put(key, host.lang.getSection("Lang").getString(key));
         }
         return lang;
     }
@@ -345,7 +345,7 @@ public final class SubAPI {
      * @return Directory
      */
     public UniversalFile getRuntimeDirectory() {
-        return plugin.dir;
+        return host.dir;
     }
 
     /**
@@ -354,7 +354,7 @@ public final class SubAPI {
      * @return SubServers Beta Version (or null if this is a release version)
      */
     public Version getBetaVersion() {
-        return plugin.bversion;
+        return host.bversion;
     }
 
     /**
@@ -363,6 +363,6 @@ public final class SubAPI {
      * @return SubServers Version
      */
     public Version getAppVersion() {
-        return plugin.version;
+        return host.version;
     }
 }

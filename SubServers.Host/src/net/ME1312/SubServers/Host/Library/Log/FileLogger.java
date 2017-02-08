@@ -11,7 +11,7 @@ import java.util.Calendar;
 /**
  * Log File Writer Class
  */
-public class FileLogger extends OutputStream {
+public final class FileLogger extends OutputStream {
     private static FileWriter file = null;
     private PrintStream origin;
 
@@ -26,11 +26,14 @@ public class FileLogger extends OutputStream {
     @Override
     public void write(int b) throws IOException {
         origin.write((char)b);
-        file.write((char) b);
-        file.flush();
+        if (file != null) {
+            file.write((char) b);
+            file.flush();
+        }
     }
 
     public static void end() throws IOException {
         file.close();
+        file = null;
     }
 }

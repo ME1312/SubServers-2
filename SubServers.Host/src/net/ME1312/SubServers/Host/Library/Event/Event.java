@@ -59,7 +59,7 @@ public abstract class Event {
             }
             return map;
         } catch (NoSuchFieldException e) {
-            getAPI().getInternals().log.error(new InvocationTargetException(e, "Couldn't get handler list for event: " + toString()));
+            getAPI().getInternals().log.error.println(new InvocationTargetException(e, "Couldn't get handler list for event: " + toString()));
             return null;
         }
     }

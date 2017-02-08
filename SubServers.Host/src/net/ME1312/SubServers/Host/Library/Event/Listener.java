@@ -5,6 +5,6 @@ package net.ME1312.SubServers.Host.Library.Event;
  */
 public interface Listener {
     /*
-        Place Events Here
+     * Place Events Here
      */
 }

@@ -14,14 +14,14 @@ import java.lang.reflect.Field;
 import java.util.Calendar;
 
 public class PacketDownloadLang implements PacketIn, PacketOut {
-    private SubServers plugin;
+    private SubServers host;
     private Logger log = null;
 
     public PacketDownloadLang() {};
 
-    public PacketDownloadLang(SubServers plugin) {
-        if (Util.isNull(plugin)) throw new NullPointerException();
-        this.plugin = plugin;
+    public PacketDownloadLang(SubServers host) {
+        if (Util.isNull(host)) throw new NullPointerException();
+        this.host = host;
         try {
             Field f = SubDataClient.class.getDeclaredField("log");
             f.setAccessible(true);
@@ -38,8 +38,8 @@ public class PacketDownloadLang implements PacketIn, PacketOut {
     @Override
     public void execute(JSONObject data) {
         data.put("Updated", Calendar.getInstance().getTime().getTime());
-        plugin.lang = new YAMLSection(data);
-        log.info("Lang Settings Downloaded");
+        host.lang = new YAMLSection(data);
+        log.info.println("Lang Settings Downloaded");
     }
 
     @Override

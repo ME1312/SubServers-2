@@ -19,6 +19,7 @@ import net.ME1312.SubServers.Host.Network.SubDataClient;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.net.InetAddress;
+import java.net.SocketException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.file.Files;
@@ -40,25 +41,30 @@ public final class SubServers {
 
     private boolean running;
 
+    /**
+     * SubServers.Host Launch
+     *
+     * @param args Args
+     * @throws Exception
+     */
     public static void main(String[] args) throws Exception {
         new SubServers(args);
     }
-
     private SubServers(String[] args) {
         log = new Logger("SubServers");
         try {
             Logger.setup(System.out, System.err, dir);
-            log.info("Loading SubServers v" + version.toString() + " Libraries... ");
+            log.info.println("Loading SubServers v" + version.toString() + " Libraries... ");
             dir.mkdirs();
             new File(dir, "Plugins").mkdir();
             if (!(new UniversalFile(dir, "config.yml").exists())) {
                 Util.copyFromJar(SubServers.class.getClassLoader(), "net/ME1312/SubServers/Host/Library/Files/config.yml", new UniversalFile(dir, "config.yml").getPath());
-                log.info("Created ~/config.yml");
+                log.info.println("Created ~/config.yml");
             } else if ((new Version((new YAMLConfig(new UniversalFile(dir, "config.yml"))).get().getSection("Settings").getString("Version", "0")).compareTo(new Version("2.11.2a+"))) != 0) {
                 Files.move(new UniversalFile(dir, "config.yml").toPath(), new UniversalFile(dir, "config.old" + Math.round(Math.random() * 100000) + ".yml").toPath());
 
                 Util.copyFromJar(SubServers.class.getClassLoader(), "net/ME1312/SubServers/Host/Library/Files/config.yml", new UniversalFile(dir, "config.yml").getPath());
-                log.info("Updated ~/config.yml");
+                log.info.println("Updated ~/config.yml");
             }
             config = new YAMLConfig(new UniversalFile(dir, "config.yml"));
             subdata = new SubDataClient(this, config.get().getSection("Settings").getSection("SubData").getString("Name", "undefined"),
@@ -68,7 +74,7 @@ public final class SubServers {
             if (System.getProperty("subservers.host.plugins", "").length() > 0) {
                 long begin = Calendar.getInstance().getTime().getTime();
                 long i = 0;
-                log.info("Loading SubAPI Plugins...");
+                log.info.println("Loading SubAPI Plugins...");
 
                 /*
                  * Decode Plugin List Variable
@@ -95,19 +101,19 @@ public final class SubServers {
                             SubPluginInfo plugin = new SubPluginInfo(this, obj, clazz.getAnnotation(SubPlugin.class).name(), new Version(clazz.getAnnotation(SubPlugin.class).version()),
                                     Arrays.asList(clazz.getAnnotation(SubPlugin.class).authors()), (clazz.getAnnotation(SubPlugin.class).description().length() > 0)?clazz.getAnnotation(SubPlugin.class).description():null,
                                     (clazz.getAnnotation(SubPlugin.class).website().length() > 0)?new URL(clazz.getAnnotation(SubPlugin.class).website()):null, Arrays.asList(clazz.getAnnotation(SubPlugin.class).loadBefore()),
-                                    Arrays.asList(clazz.getAnnotation(SubPlugin.class).depend()), Arrays.asList(clazz.getAnnotation(SubPlugin.class).softDepend()));
-                            if (plugins.keySet().contains(plugin.getName().toLowerCase())) log.warn("Duplicate plugin: " + plugin.getName().toLowerCase());
+                                    Arrays.asList(clazz.getAnnotation(SubPlugin.class).dependencies()), Arrays.asList(clazz.getAnnotation(SubPlugin.class).softDependencies()));
+                            if (plugins.keySet().contains(plugin.getName().toLowerCase())) log.warn.println("Duplicate plugin: " + plugin.getName().toLowerCase());
                             plugin.addExtra("subservers.plugin.loadafter", new ArrayList<String>());
                             plugins.put(plugin.getName().toLowerCase(), plugin);
                         } catch (Throwable e) {
-                            log.error(new IllegalPluginException(e, "Cannot load plugin descriptor for main class: " + main));
+                            log.error.println(new IllegalPluginException(e, "Cannot load plugin descriptor for main class: " + main));
                         }
                     } catch (ClassCastException e) {
-                        log.error(new IllegalPluginException(e, "Main class isn't annotated as a SubPlugin: " + main));
+                        log.error.println(new IllegalPluginException(e, "Main class isn't annotated as a SubPlugin: " + main));
                     } catch (InvocationTargetException e) {
-                        log.error(new IllegalPluginException(e.getTargetException(), "Uncaught exception occurred while loading main class: " + main));
+                        log.error.println(new IllegalPluginException(e.getTargetException(), "Uncaught exception occurred while loading main class: " + main));
                     } catch (Throwable e) {
-                        log.error(new IllegalPluginException(e, "Cannot load main class: " + main));
+                        log.error.println(new IllegalPluginException(e, "Cannot load main class: " + main));
                     }
                 }
 
@@ -155,14 +161,14 @@ public final class SubServers {
                                 api.addListener(plugin, plugin.get());
                                 api.plugins.put(plugin.getName().toLowerCase(), plugin);
                                 loaded.add(plugin.getName().toLowerCase());
-                                log.info("Loaded " + plugin.getName() + " v" + plugin.getVersion().toString() + " by " + plugin.getAuthors().toString().substring(1, plugin.getAuthors().toString().length() - 1));
+                                log.info.println("Loaded " + plugin.getName() + " v" + plugin.getVersion().toString() + " by " + plugin.getAuthors().toString().substring(1, plugin.getAuthors().toString().length() - 1));
                                 i++;
                             } catch (Throwable e) {
                                 plugin.setEnabled(false);
                                 throw new InvocationTargetException(e, "Problem loading plugin: " + plugin.getName());
                             }
                         } catch (InvocationTargetException e) {
-                            log.error(e);
+                            log.error.println(e);
                             loaded.add(plugin.getName().toLowerCase());
                         }
                     }
@@ -172,7 +178,7 @@ public final class SubServers {
                         plugins.remove(name);
                     }
                     if (progress == 0 && plugins.size() != 0) {
-                        log.error(new IllegalStateException("Couldn't load more plugins but there are " + plugins.size() + " more"));
+                        log.error.println(new IllegalStateException("Couldn't load more plugins but there are " + plugins.size() + " more"));
                         break;
                     }
                 }
@@ -181,15 +187,17 @@ public final class SubServers {
                  * Enable Plugins
                  */
                 api.executeEvent(new SubEnableEvent(this));
-                log.info(i + " Plugin"+((i == 1)?"":"s") + " loaded in " + (Calendar.getInstance().getTime().getTime() - begin) + "ms");
+                log.info.println(i + " Plugin"+((i == 1)?"":"s") + " loaded in " + (Calendar.getInstance().getTime().getTime() - begin) + "ms");
             }
 
             loadDefaults();
 
             running = true;
             loop();
+        } catch (SocketException e) {
+            log.severe.println(e);
         } catch (Exception e) {
-            log.error(e);
+            log.error.println(e);
         }
     }
 
@@ -212,11 +220,11 @@ public final class SubServers {
                         try {
                             api.commands.get(cmd.toLowerCase()).command(cmd, args.toArray(new String[args.size()]));
                         } catch (Exception e) {
-                            log.error(new InvocationTargetException(e, "Uncaught exception while running command"));
+                            log.error.println(new InvocationTargetException(e, "Uncaught exception while running command"));
                         }
                     }).start();
                 } else {
-                    log.info("Unknown Command - " + umsg);
+                    log.message.println("Unknown Command - " + umsg);
                 }
             }
         }
@@ -227,17 +235,17 @@ public final class SubServers {
             @Override
             public void command(String handle, String[] args) {
                 if (args.length == 0) {
-                    log.info(
+                    log.message.println(
                             System.getProperty("os.name") + ' ' + System.getProperty("os.version") + ',',
                             "Java " + System.getProperty("java.version") + ',',
                             "SubServers.Host v" + version.toString() + ((bversion == null) ? "" : " BETA " + bversion.toString()));
                 } else if (api.plugins.get(args[0].toLowerCase()) != null) {
                     SubPluginInfo plugin = api.plugins.get(args[0].toLowerCase());
-                    log.info(plugin.getName() + " v" + plugin.getVersion() + " by " + plugin.getAuthors().toString().substring(1, plugin.getAuthors().toString().length() - 1));
-                    if (plugin.getWebsite() != null) log.info(plugin.getWebsite().toString());
-                    if (plugin.getDescription() != null) log.info("", plugin.getDescription());
+                    log.message.println(plugin.getName() + " v" + plugin.getVersion() + " by " + plugin.getAuthors().toString().substring(1, plugin.getAuthors().toString().length() - 1));
+                    if (plugin.getWebsite() != null) log.message.println(plugin.getWebsite().toString());
+                    if (plugin.getDescription() != null) log.message.println("", plugin.getDescription());
                 } else {
-                    log.info("There is no plugin with that name");
+                    log.message.println("There is no plugin with that name");
                 }
             }
         }.usage("[plugin]").description("Gets the version of the System and SubServers or the specified Plugin").help(
@@ -282,7 +290,7 @@ public final class SubServers {
                 }
 
                 if (args.length == 0) {
-                    log.info("SubServers.Host Command List:");
+                    log.message.println("SubServers.Host Command List:");
                     for (String command : commands.keySet()) {
                         String formatted = commands.get(command);
                         Command cmd = api.commands.get(command);
@@ -292,17 +300,17 @@ public final class SubServers {
                         }
                         formatted += ((cmd.description() == null || cmd.description().length() == 0)?"  ":"- "+cmd.description());
 
-                        log.info(formatted);
+                        log.message.println(formatted);
                     }
                 } else if (api.commands.keySet().contains((args[0].startsWith("/"))?args[0].toLowerCase().substring(1):args[0].toLowerCase())) {
                     Command cmd = api.commands.get((args[0].startsWith("/"))?args[0].toLowerCase().substring(1):args[0].toLowerCase());
                     String formatted = commands.get(Util.getBackwards(api.commands, cmd).get(0));
-                    log.info(formatted.substring(0, formatted.length() - 1));
+                    log.message.println(formatted.substring(0, formatted.length() - 1));
                     for (String line : cmd.help()) {
-                        log.info("  " + line);
+                        log.message.println("  " + line);
                     }
                 } else {
-                    log.info("There is no command with that name");
+                    log.message.println("There is no command with that name");
                 }
             }
         }.usage("[command]").description("Prints a list of the commands and/or their descriptions").help(
@@ -330,8 +338,13 @@ public final class SubServers {
         ).register("exit", "end");
     }
 
+    /**
+     * Stop SubServers.Host
+     *
+     * @param exit Exit Code
+     */
     public void stop(int exit) {
-        log.info("Shutting down...");
+        log.info.println("Shutting down...");
         running = false;
         SubDisableEvent event = new SubDisableEvent(this, exit);
         api.executeEvent(event);

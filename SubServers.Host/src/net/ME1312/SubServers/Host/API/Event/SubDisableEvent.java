@@ -13,11 +13,11 @@ public class SubDisableEvent extends Event {
     /**
      * SubServers.Host Disable Event
      *
-     * @param plugin SubServers.Host
+     * @param host SubServers.Host
      * @param exit Exit Code
      */
-    public SubDisableEvent(SubServers plugin, int exit) {
-        if (Util.isNull(plugin, exit)) throw new NullPointerException();
+    public SubDisableEvent(SubServers host, int exit) {
+        if (Util.isNull(host, exit)) throw new NullPointerException();
         this.exit = exit;
     }
 

@@ -86,7 +86,7 @@ public final class Util {
             resStreamOut.close();
             resStreamIn.close();
         } catch (Exception ex) {
-            SubAPI.getInstance().getInternals().log.error(ex);
+            SubAPI.getInstance().getInternals().log.error.println(ex);
         }
     }
 
@@ -162,13 +162,13 @@ public final class Util {
                 try {
                     if (in != null) in.close();
                 } catch (IOException e1) {
-                    SubAPI.getInstance().getInternals().log.error(e1);
+                    SubAPI.getInstance().getInternals().log.error.println(e1);
                 }
 
                 try {
                     if (out != null) out.close();
                 } catch (IOException e2) {
-                    SubAPI.getInstance().getInternals().log.error(e2);
+                    SubAPI.getInstance().getInternals().log.error.println(e2);
                 }
             }
         }

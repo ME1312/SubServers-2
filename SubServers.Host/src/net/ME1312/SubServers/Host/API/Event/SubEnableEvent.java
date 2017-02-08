@@ -12,9 +12,9 @@ public class SubEnableEvent extends Event {
     /**
      * SubServers.Host Enable Event
      *
-     * @param plugin SubServers.Host
+     * @param host SubServers.Host
      */
-    public SubEnableEvent(SubServers plugin) {
-        if (Util.isNull(plugin)) throw new NullPointerException();
+    public SubEnableEvent(SubServers host) {
+        if (Util.isNull(host)) throw new NullPointerException();
     }
 }

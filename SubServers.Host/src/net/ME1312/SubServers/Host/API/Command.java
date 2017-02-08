@@ -12,6 +12,11 @@ public abstract class Command {
     private String[] usage = new String[0];
     private SubPluginInfo plugin;
 
+    /**
+     * Creates a new Command
+     *
+     * @param plugin Plugin
+     */
     public Command(SubPluginInfo plugin) {
         this.plugin = plugin;
     }
@@ -112,7 +117,6 @@ public abstract class Command {
      * Register this Command
      *
      * @param handles Aliases
-     * @return
      */
     public void register(String... handles) {
         SubAPI.getInstance().addCommand(this, handles);

@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10,"i8":10,"i9":10,"i10":10,"i11":10,"i12":10,"i13":10,"i14":10,"i15":10,"i16":10,"i17":10};
+var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10,"i8":10,"i9":10,"i10":10,"i11":10,"i12":10,"i13":10,"i14":10,"i15":10,"i16":10,"i17":10,"i18":10};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -137,8 +137,8 @@ implements <a href="../../../../../net/ME1312/SubServers/Host/Library/ExtraDataH
 <th class="colOne" scope="col">Constructor and Description</th>
 </tr>
 <tr class="altColor">
-<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Host/API/SubPluginInfo.html#SubPluginInfo-net.ME1312.SubServers.Host.SubServers-java.lang.Object-java.lang.String-net.ME1312.SubServers.Host.Library.Version.Version-java.util.List-java.lang.String-java.net.URL-java.util.List-java.util.List-java.util.List-">SubPluginInfo</a></span>(<a href="../../../../../net/ME1312/SubServers/Host/SubServers.html" title="class in net.ME1312.SubServers.Host">SubServers</a>&nbsp;plugin,
-             java.lang.Object&nbsp;main,
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Host/API/SubPluginInfo.html#SubPluginInfo-net.ME1312.SubServers.Host.SubServers-java.lang.Object-java.lang.String-net.ME1312.SubServers.Host.Library.Version.Version-java.util.List-java.lang.String-java.net.URL-java.util.List-java.util.List-java.util.List-">SubPluginInfo</a></span>(<a href="../../../../../net/ME1312/SubServers/Host/SubServers.html" title="class in net.ME1312.SubServers.Host">SubServers</a>&nbsp;host,
+             java.lang.Object&nbsp;plugin,
              java.lang.String&nbsp;name,
              <a href="../../../../../net/ME1312/SubServers/Host/Library/Version/Version.html" title="class in net.ME1312.SubServers.Host.Library.Version">Version</a>&nbsp;version,
              java.util.List&lt;java.lang.String&gt;&nbsp;authors,
@@ -174,7 +174,9 @@ implements <a href="../../../../../net/ME1312/SubServers/Host/Library/ExtraDataH
 </tr>
 <tr id="i1" class="rowColor">
 <td class="colFirst"><code>java.lang.Object</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Host/API/SubPluginInfo.html#get--">get</a></span>()</code>&nbsp;</td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Host/API/SubPluginInfo.html#get--">get</a></span>()</code>
+<div class="block">Get Plugin Object</div>
+</td>
 </tr>
 <tr id="i2" class="altColor">
 <td class="colFirst"><code>java.util.List&lt;java.lang.String&gt;</code></td>
@@ -269,7 +271,13 @@ implements <a href="../../../../../net/ME1312/SubServers/Host/Library/ExtraDataH
 <tr id="i17" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Host/API/SubPluginInfo.html#setEnabled-boolean-">setEnabled</a></span>(boolean&nbsp;value)</code>
-<div class="block">Gets if the Plugin is Enabled</div>
+<div class="block">Sets if the Plugin is Enabled</div>
+</td>
+</tr>
+<tr id="i18" class="altColor">
+<td class="colFirst"><code>void</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Host/API/SubPluginInfo.html#setLogger-net.ME1312.SubServers.Host.Library.Log.Logger-">setLogger</a></span>(<a href="../../../../../net/ME1312/SubServers/Host/Library/Log/Logger.html" title="class in net.ME1312.SubServers.Host.Library.Log">Logger</a>&nbsp;value)</code>
+<div class="block">Replace this Plugin's Logger with a custom one</div>
 </td>
 </tr>
 </table>
@@ -300,8 +308,8 @@ implements <a href="../../../../../net/ME1312/SubServers/Host/Library/ExtraDataH
 <ul class="blockListLast">
 <li class="blockList">
 <h4>SubPluginInfo</h4>
-<pre>public&nbsp;SubPluginInfo(<a href="../../../../../net/ME1312/SubServers/Host/SubServers.html" title="class in net.ME1312.SubServers.Host">SubServers</a>&nbsp;plugin,
-                     java.lang.Object&nbsp;main,
+<pre>public&nbsp;SubPluginInfo(<a href="../../../../../net/ME1312/SubServers/Host/SubServers.html" title="class in net.ME1312.SubServers.Host">SubServers</a>&nbsp;host,
+                     java.lang.Object&nbsp;plugin,
                      java.lang.String&nbsp;name,
                      <a href="../../../../../net/ME1312/SubServers/Host/Library/Version/Version.html" title="class in net.ME1312.SubServers.Host.Library.Version">Version</a>&nbsp;version,
                      java.util.List&lt;java.lang.String&gt;&nbsp;authors,
@@ -313,13 +321,14 @@ implements <a href="../../../../../net/ME1312/SubServers/Host/Library/ExtraDataH
 <div class="block">Create a SubPlugin Description</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>plugin</code> - SubServers.Host</dd>
-<dd><code>main</code> - Plugin</dd>
+<dd><code>host</code> - SubServers.Host</dd>
+<dd><code>plugin</code> - Plugin</dd>
 <dd><code>name</code> - Plugin Name</dd>
 <dd><code>version</code> - Plugin Version</dd>
 <dd><code>authors</code> - Authors List</dd>
 <dd><code>description</code> - Plugin Description</dd>
 <dd><code>website</code> - Authors' Website</dd>
+<dd><code>loadBefore</code> - Load Before Plugins List</dd>
 <dd><code>dependencies</code> - Dependencies List</dd>
 <dd><code>softDependencies</code> - Soft Dependencies List</dd>
 </dl>
@@ -340,6 +349,11 @@ implements <a href="../../../../../net/ME1312/SubServers/Host/Library/ExtraDataH
 <li class="blockList">
 <h4>get</h4>
 <pre>public&nbsp;java.lang.Object&nbsp;get()</pre>
+<div class="block">Get Plugin Object</div>
+<dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>Plugin Object</dd>
+</dl>
 </li>
 </ul>
 <a name="getName--">
@@ -475,10 +489,24 @@ implements <a href="../../../../../net/ME1312/SubServers/Host/Library/ExtraDataH
 <li class="blockList">
 <h4>setEnabled</h4>
 <pre>public&nbsp;void&nbsp;setEnabled(boolean&nbsp;value)</pre>
-<div class="block">Gets if the Plugin is Enabled</div>
+<div class="block">Sets if the Plugin is Enabled</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>value</code> - Enabled Status</dd>
+<dd><code>value</code> - Value</dd>
+</dl>
+</li>
+</ul>
+<a name="setLogger-net.ME1312.SubServers.Host.Library.Log.Logger-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>setLogger</h4>
+<pre>public&nbsp;void&nbsp;setLogger(<a href="../../../../../net/ME1312/SubServers/Host/Library/Log/Logger.html" title="class in net.ME1312.SubServers.Host.Library.Log">Logger</a>&nbsp;value)</pre>
+<div class="block">Replace this Plugin's Logger with a custom one</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>value</code> - Value</dd>
 </dl>
 </li>
 </ul>

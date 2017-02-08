@@ -6,7 +6,6 @@ import net.ME1312.SubServers.Host.Library.ExtraDataHandler;
 import net.ME1312.SubServers.Host.Library.Log.Logger;
 import net.ME1312.SubServers.Host.Library.Util;
 import net.ME1312.SubServers.Host.Library.Version.Version;
-import net.ME1312.SubServers.Host.SubAPI;
 import net.ME1312.SubServers.Host.SubServers;
 
 import java.io.File;
@@ -19,8 +18,8 @@ import java.util.*;
  * @see SubPlugin
  */
 public class SubPluginInfo implements ExtraDataHandler {
-    private SubServers plugin;
-    private Object main;
+    private SubServers host;
+    private Object plugin;
     private String name;
     private Version version;
     private List<String> authors;
@@ -30,32 +29,33 @@ public class SubPluginInfo implements ExtraDataHandler {
     private List<String> depend;
     private List<String> softDepend;
 
-    private Logger logger;
+    private Logger logger = null;
     private boolean enabled = false;
     private YAMLSection extra = new YAMLSection();
 
     /**
      * Create a SubPlugin Description
      *
-     * @param plugin SubServers.Host
-     * @param main Plugin
+     * @param host SubServers.Host
+     * @param plugin Plugin
      * @param name Plugin Name
      * @param version Plugin Version
      * @param authors Authors List
      * @param description Plugin Description
      * @param website Authors' Website
+     * @param loadBefore Load Before Plugins List
      * @param dependencies Dependencies List
      * @param softDependencies Soft Dependencies List
      */
-    public SubPluginInfo(SubServers plugin, Object main, String name, Version version, List<String> authors, String description, URL website, List<String> loadBefore, List<String> dependencies, List<String> softDependencies) {
-        if (Util.isNull(plugin, main, name, version, authors)) throw new NullPointerException();
+    public SubPluginInfo(SubServers host, Object plugin, String name, Version version, List<String> authors, String description, URL website, List<String> loadBefore, List<String> dependencies, List<String> softDependencies) {
+        if (Util.isNull(host, plugin, name, version, authors)) throw new NullPointerException();
         name = name.replaceAll("#|<|\\$|\\+|%|>|!|`|&|\\*|'|\\||\\{|\\?|\"|=|}|/|\\\\|\\s|@|\\.|\\n", "_");
         if (name.length() == 0) throw new StringIndexOutOfBoundsException("Cannot use an empty name");
         if (version.toString().length() == 0) throw new StringIndexOutOfBoundsException("Cannot use an empty version");
         if (authors.size() == 0) throw new ArrayIndexOutOfBoundsException("Cannot use an empty authors list");
         if (description != null && description.length() == 0) throw new StringIndexOutOfBoundsException("Cannot use an empty description");
+        this.host = host;
         this.plugin = plugin;
-        this.main = main;
         this.name = name;
         this.version = version;
         this.authors = authors;
@@ -64,12 +64,15 @@ public class SubPluginInfo implements ExtraDataHandler {
         this.loadBefore = (loadBefore == null)?Collections.emptyList():loadBefore;
         this.depend = (dependencies == null)?Collections.emptyList():dependencies;
         this.softDepend = (softDependencies == null)?Collections.emptyList():softDependencies;
-
-        this.logger = new Logger(name);
     }
 
+    /**
+     * Get Plugin Object
+     *
+     * @return Plugin Object
+     */
     public Object get() {
-        return main;
+        return plugin;
     }
 
     /**
@@ -154,12 +157,21 @@ public class SubPluginInfo implements ExtraDataHandler {
     }
 
     /**
-     * Gets if the Plugin is Enabled
+     * Sets if the Plugin is Enabled
      *
-     * @param value Enabled Status
+     * @param value Value
      */
     public void setEnabled(boolean value) {
         enabled = value;
+    }
+
+    /**
+     * Replace this Plugin's Logger with a custom one
+     *
+     * @param value Value
+     */
+    public void setLogger(Logger value) {
+        logger = value;
     }
 
     /**
@@ -168,6 +180,7 @@ public class SubPluginInfo implements ExtraDataHandler {
      * @return Logger
      */
     public Logger getLogger() {
+        if (logger == null) logger = new Logger(name);
         return logger;
     }
 
@@ -177,8 +190,8 @@ public class SubPluginInfo implements ExtraDataHandler {
      * @return Data Folder
      */
     public File getDataFolder() {
-        File dir = new File(plugin.api.getRuntimeDirectory(), "Plugins" + File.separator + name);
-        if (!dir.exists()) dir.mkdir();
+        File dir = new File(host.api.getRuntimeDirectory(), "Plugins" + File.separator + name);
+        if (!dir.exists()) dir.mkdirs();
         return dir;
     }
 

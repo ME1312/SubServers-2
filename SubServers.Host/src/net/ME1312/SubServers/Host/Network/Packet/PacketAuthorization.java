@@ -13,12 +13,12 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 
 public final class PacketAuthorization implements PacketIn, PacketOut {
-    private SubServers plugin;
+    private SubServers host;
     private Logger log = null;
 
-    public PacketAuthorization(SubServers plugin) {
-        if (Util.isNull(plugin)) throw new NullPointerException();
-        this.plugin = plugin;
+    public PacketAuthorization(SubServers host) {
+        if (Util.isNull(host)) throw new NullPointerException();
+        this.host = host;
         try {
             Field f = SubDataClient.class.getDeclaredField("log");
             f.setAccessible(true);
@@ -30,7 +30,7 @@ public final class PacketAuthorization implements PacketIn, PacketOut {
     @Override
     public JSONObject generate() {
         JSONObject json = new JSONObject();
-        json.put("password", plugin.config.get().getSection("Settings").getSection("SubData").getString("Password"));
+        json.put("password", host.config.get().getSection("Settings").getSection("SubData").getString("Password"));
         return json;
     }
 
@@ -38,14 +38,14 @@ public final class PacketAuthorization implements PacketIn, PacketOut {
     public void execute(JSONObject data) {
         try {
             if (data.getInt("r") == 0) {
-                //plugin.subdata.sendPacket(new PacketLinkServer(plugin));
-                plugin.subdata.sendPacket(new PacketDownloadLang());
+                //host.subdata.sendPacket(new PacketLinkServer(host));
+                host.subdata.sendPacket(new PacketDownloadLang());
             } else {
-                log.info("SubServers > Could not authorize SubData connection: " + data.getString("m"));
-                plugin.subdata.destroy(false);
+                log.info.println("SubServers > Could not authorize SubData connection: " + data.getString("m"));
+                host.subdata.destroy(false);
             }
         } catch (IOException e) {
-            log.error(e);
+            log.error.println(e);
         }
     }
 

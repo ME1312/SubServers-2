@@ -1,52 +1,121 @@
 package net.ME1312.SubServers.Host.Library.Log;
 
+import net.ME1312.SubServers.Host.Library.Container;
+
 import java.io.File;
-import java.io.IOException;
-import java.io.OutputStream;
 import java.io.PrintStream;
-import java.util.Arrays;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 
 /**
- * System.out and System.err Override Class
+ * Log Stream Class
  */
-public class LogStream extends OutputStream {
-    private PrintStream origin;
-    private File dir;
-    private boolean type;
-    private boolean first;
+public class LogStream {
+    private static LogStream last = null;
+    private String prefix;
+    private String name;
+    private Container<PrintStream> stream;
+    private boolean first = true;
 
-    protected LogStream(PrintStream origin, File dir, boolean type) throws IOException {
-        if (!new File(dir, LogStream.class.getCanonicalName().replace(".", File.separator) + ".class").exists()) {
-            throw new IOException("Invalid directory for logging:" + dir.getPath());
-        }
-        this.origin = origin;
-        this.dir = dir;
-        this.type = type;
-        this.first = true;
+    protected LogStream(String prefix, String name, Container<PrintStream> stream) {
+        this.prefix = prefix;
+        this.name = name;
+        this.stream = stream;
     }
 
-    @Override
-    public void write(int b) throws IOException {
-        String origin = null;
-        for (StackTraceElement element : Arrays.asList(new NullPointerException().getStackTrace())) {
-            try {
-                Class e = Class.forName(element.getClassName());
-                if (origin != null || e.getCanonicalName().equals(LogStream.class.getCanonicalName()) || e.getCanonicalName().equals(Logger.class.getCanonicalName()) || !new File(this.dir, e.getCanonicalName().replace(".", File.separator) + ".class").exists()) continue;
-                origin = e.getCanonicalName();
-            }
-            catch (ClassNotFoundException e) {}
+    protected String prefix() {
+        return "[" + new SimpleDateFormat("HH:mm:ss").format(Calendar.getInstance().getTime()) + "] [" + prefix + File.separator + name + "] > ";
+    }
+
+    /**
+     * Print an Object
+     *
+     * @param obj Object
+     */
+    public void print(Object obj) {
+        print(obj.toString());
+    }
+
+    /**
+     * Print a String
+     *
+     * @param str String
+     */
+    public void print(String str) {
+        print(str.toCharArray());
+    }
+
+    /**
+     * Print an Array of Characters
+     *
+     * @param str Character Array
+     */
+    public void print(char[] str) {
+        for (char c : str) print(c);
+    }
+
+    /**
+     * Print a Character
+     *
+     * @param c Character
+     */
+    public void print(char c) {
+        if (last != this) {
+            if (last != null && !last.first) last.print('\n');
+            LogStream.last = this;
         }
-        if (origin == null) {
-            origin = "System";
+        String str = "";
+        if (first) str += prefix();
+        str += c;
+        first = c == '\n';
+        stream.get().print(str);
+    }
+
+    /**
+     * Print multiple Objects (separated by a new line)
+     *
+     * @param obj Objects
+     */
+    public void println(Object... obj) {
+        for (Object o : obj) {
+            print(o);
+            print('\n');
         }
-        String value = Character.toString((char)b);
-        StringBuilder s = new StringBuilder();
-        Logger log = new Logger(origin);
-        if (this.first) {
-            s.append(log.prefix(this.type ? "INFO" : "ERROR"));
+    }
+
+    /**
+     * Print multiple Strings (separated by a new line)
+     *
+     * @param str Objects
+     */
+    public void println(String... str) {
+        for (String s : str) {
+            print(s);
+            print('\n');
         }
-        s.append(value);
-        this.first = value.equals("\n");
-        this.origin.print(s.toString());
+    }
+
+    /**
+     * Print multiple Arrays of Characters (separated by a new line)
+     *
+     * @param str Character Arrays
+     */
+    public void println(char[]... str) {
+        for (char[] s : str) {
+            print(s);
+            print('\n');
+        }
+    }
+
+    /**
+     * Print multiple Characters (separated by a new line)
+     *
+     * @param c Characters
+     */
+    public void println(char... c) {
+        for (char character : c) {
+            print(character);
+            print('\n');
+        }
     }
 }

@@ -59,12 +59,12 @@ public @interface SubPlugin {
      *
      * @return Dependencies List
      */
-    String[] depend() default {};
+    String[] dependencies() default {};
 
     /**
      * Soft Dependencies List
      *
      * @return Soft Dependencies List
      */
-    String[] softDepend() default {};
+    String[] softDependencies() default {};
 }

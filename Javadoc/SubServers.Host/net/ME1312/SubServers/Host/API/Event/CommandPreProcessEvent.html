@@ -119,7 +119,7 @@ var activeTableTab = "activeTableTab";
 <pre>public class <span class="typeNameLabel">CommandPreProcessEvent</span>
 extends <a href="../../../../../../net/ME1312/SubServers/Host/Library/Event/Event.html" title="class in net.ME1312.SubServers.Host.Library.Event">Event</a>
 implements <a href="../../../../../../net/ME1312/SubServers/Host/Library/Event/Cancellable.html" title="interface in net.ME1312.SubServers.Host.Library.Event">Cancellable</a></pre>
-<div class="block">Command Pre-Process Event</div>
+<div class="block">Command Pre-Process Event Class</div>
 </li>
 </ul>
 </div>
@@ -138,8 +138,10 @@ implements <a href="../../../../../../net/ME1312/SubServers/Host/Library/Event/C
 <th class="colOne" scope="col">Constructor and Description</th>
 </tr>
 <tr class="altColor">
-<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Host/API/Event/CommandPreProcessEvent.html#CommandPreProcessEvent-net.ME1312.SubServers.Host.SubServers-java.lang.String-">CommandPreProcessEvent</a></span>(<a href="../../../../../../net/ME1312/SubServers/Host/SubServers.html" title="class in net.ME1312.SubServers.Host">SubServers</a>&nbsp;plugin,
-                      java.lang.String&nbsp;command)</code>&nbsp;</td>
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Host/API/Event/CommandPreProcessEvent.html#CommandPreProcessEvent-net.ME1312.SubServers.Host.SubServers-java.lang.String-">CommandPreProcessEvent</a></span>(<a href="../../../../../../net/ME1312/SubServers/Host/SubServers.html" title="class in net.ME1312.SubServers.Host">SubServers</a>&nbsp;host,
+                      java.lang.String&nbsp;command)</code>
+<div class="block">Command Pre-Process Event</div>
+</td>
 </tr>
 </table>
 </li>
@@ -158,7 +160,9 @@ implements <a href="../../../../../../net/ME1312/SubServers/Host/Library/Event/C
 </tr>
 <tr id="i0" class="altColor">
 <td class="colFirst"><code>java.lang.String</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Host/API/Event/CommandPreProcessEvent.html#getCommand--">getCommand</a></span>()</code>&nbsp;</td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Host/API/Event/CommandPreProcessEvent.html#getCommand--">getCommand</a></span>()</code>
+<div class="block">Gets the full Command String</div>
+</td>
 </tr>
 <tr id="i1" class="rowColor">
 <td class="colFirst"><code>boolean</code></td>
@@ -207,8 +211,14 @@ implements <a href="../../../../../../net/ME1312/SubServers/Host/Library/Event/C
 <ul class="blockListLast">
 <li class="blockList">
 <h4>CommandPreProcessEvent</h4>
-<pre>public&nbsp;CommandPreProcessEvent(<a href="../../../../../../net/ME1312/SubServers/Host/SubServers.html" title="class in net.ME1312.SubServers.Host">SubServers</a>&nbsp;plugin,
+<pre>public&nbsp;CommandPreProcessEvent(<a href="../../../../../../net/ME1312/SubServers/Host/SubServers.html" title="class in net.ME1312.SubServers.Host">SubServers</a>&nbsp;host,
                               java.lang.String&nbsp;command)</pre>
+<div class="block">Command Pre-Process Event</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>host</code> - SubServers.Host</dd>
+<dd><code>command</code> - Command</dd>
+</dl>
 </li>
 </ul>
 </li>
@@ -226,6 +236,11 @@ implements <a href="../../../../../../net/ME1312/SubServers/Host/Library/Event/C
 <li class="blockList">
 <h4>getCommand</h4>
 <pre>public&nbsp;java.lang.String&nbsp;getCommand()</pre>
+<div class="block">Gets the full Command String</div>
+<dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>Command</dd>
+</dl>
 </li>
 </ul>
 <a name="isCancelled--">

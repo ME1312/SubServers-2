@@ -210,5 +210,4 @@ public final class Launch {
         }
         return extension;
     }
-
 }
