@@ -5,6 +5,9 @@ import net.ME1312.SubServers.Client.Bukkit.Network.PacketIn;
 import org.bukkit.Bukkit;
 import org.json.JSONObject;
 
+/**
+ * Shutdown Packet
+ */
 public class PacketInShutdown implements PacketIn {
 
     @Override

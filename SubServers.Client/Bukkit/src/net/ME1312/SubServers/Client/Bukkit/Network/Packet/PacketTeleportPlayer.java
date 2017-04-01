@@ -10,18 +10,32 @@ import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.UUID;
 
+/**
+ * Teleport Player Packet
+ */
 public class PacketTeleportPlayer implements PacketIn, PacketOut {
-    private static HashMap<String, JSONCallback> callbacks = new HashMap<String, JSONCallback>();
+    private static HashMap<String, JSONCallback[]> callbacks = new HashMap<String, JSONCallback[]>();
     private UUID player;
     private String server;
     private String id;
 
+    /**
+     * New PacketTeleportPlayer (In)
+     */
     public PacketTeleportPlayer() {}
-    public PacketTeleportPlayer(UUID player, String server, String id, JSONCallback callback) {
-        if (Util.isNull(player, server, id, callback)) throw new NullPointerException();
+
+    /**
+     * New PacketTeleportPlayer (Out)
+     *
+     * @param player Player to teleport
+     * @param server Where to go
+     * @param callback Callbacks
+     */
+    public PacketTeleportPlayer(UUID player, String server, JSONCallback... callback) {
+        if (Util.isNull(player, server, callback)) throw new NullPointerException();
         this.player = player;
         this.server = server;
-        this.id = id;
+        this.id = Util.getNew(callbacks.keySet(), UUID::randomUUID).toString();
         callbacks.put(id, callback);
     }
 
@@ -36,7 +50,7 @@ public class PacketTeleportPlayer implements PacketIn, PacketOut {
 
     @Override
     public void execute(JSONObject data) {
-        callbacks.get(data.getString("id")).run(data);
+        for (JSONCallback callback : callbacks.get(data.getString("id"))) callback.run(data);
         callbacks.remove(data.getString("id"));
     }
 

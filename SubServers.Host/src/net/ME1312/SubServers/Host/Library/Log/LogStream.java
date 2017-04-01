@@ -64,11 +64,9 @@ public class LogStream {
             if (last != null && !last.first) last.print('\n');
             LogStream.last = this;
         }
-        String str = "";
-        if (first) str += prefix();
-        str += c;
+        if (first) stream.get().print(prefix());
+        stream.get().print(c);
         first = c == '\n';
-        stream.get().print(str);
     }
 
     /**
@@ -77,8 +75,8 @@ public class LogStream {
      * @param obj Objects
      */
     public void println(Object... obj) {
-        for (Object o : obj) {
-            print(o);
+        for (Object OBJ : obj) {
+            print(OBJ);
             print('\n');
         }
     }
@@ -89,8 +87,8 @@ public class LogStream {
      * @param str Objects
      */
     public void println(String... str) {
-        for (String s : str) {
-            print(s);
+        for (String STR : str) {
+            print(STR);
             print('\n');
         }
     }
@@ -101,8 +99,8 @@ public class LogStream {
      * @param str Character Arrays
      */
     public void println(char[]... str) {
-        for (char[] s : str) {
-            print(s);
+        for (char[] STR : str) {
+            print(STR);
             print('\n');
         }
     }
@@ -113,8 +111,8 @@ public class LogStream {
      * @param c Characters
      */
     public void println(char... c) {
-        for (char character : c) {
-            print(character);
+        for (char C : c) {
+            print(C);
             print('\n');
         }
     }

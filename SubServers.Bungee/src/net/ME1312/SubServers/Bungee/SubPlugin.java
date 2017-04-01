@@ -149,6 +149,7 @@ public final class SubPlugin extends BungeeCord {
         }
 
         hostDrivers.put("built-in", net.ME1312.SubServers.Bungee.Host.Internal.InternalHost.class);
+        hostDrivers.put("network", net.ME1312.SubServers.Bungee.Host.External.ExternalHost.class);
 
         getPluginManager().registerCommand(null, new SubCommand.BungeeServer(this, "server"));
         getPluginManager().registerCommand(null, new SubCommand.BungeeList(this, "glist"));

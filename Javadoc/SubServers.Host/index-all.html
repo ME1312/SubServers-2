@@ -180,6 +180,8 @@
 </a>
 <h2 class="title">C</h2>
 <dl>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Network/Packet/PacketInRunEvent.html#callback-java.lang.String-net.ME1312.SubServers.Host.Library.JSONCallback-">callback(String, JSONCallback)</a></span> - Static method in class net.ME1312.SubServers.Host.Network.Packet.<a href="net/ME1312/SubServers/Host/Network/Packet/PacketInRunEvent.html" title="class in net.ME1312.SubServers.Host.Network.Packet">PacketInRunEvent</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="net/ME1312/SubServers/Host/Library/Event/Cancellable.html" title="interface in net.ME1312.SubServers.Host.Library.Event"><span class="typeNameLink">Cancellable</span></a> - Interface in <a href="net/ME1312/SubServers/Host/Library/Event/package-summary.html">net.ME1312.SubServers.Host.Library.Event</a></dt>
 <dd>
 <div class="block">Cancellable SubEvent Layout Class</div>
@@ -207,6 +209,10 @@
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/API/Command.html#command-java.lang.String-java.lang.String:A-">command(String, String[])</a></span> - Method in class net.ME1312.SubServers.Host.API.<a href="net/ME1312/SubServers/Host/API/Command.html" title="class in net.ME1312.SubServers.Host.API">Command</a></dt>
 <dd>
 <div class="block">Run Command</div>
+</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Executable/SubServer.html#command-java.lang.String-">command(String)</a></span> - Method in class net.ME1312.SubServers.Host.Executable.<a href="net/ME1312/SubServers/Host/Executable/SubServer.html" title="class in net.ME1312.SubServers.Host.Executable">SubServer</a></dt>
+<dd>
+<div class="block">Commands the Server</div>
 </dd>
 <dt><a href="net/ME1312/SubServers/Host/API/Event/CommandPreProcessEvent.html" title="class in net.ME1312.SubServers.Host.API.Event"><span class="typeNameLink">CommandPreProcessEvent</span></a> - Class in <a href="net/ME1312/SubServers/Host/API/Event/package-summary.html">net.ME1312.SubServers.Host.API.Event</a></dt>
 <dd>
@@ -246,6 +252,10 @@
 <dd>
 <div class="block">Copy from the Class Loader</div>
 </dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Executable/SubCreator.html#create-java.lang.String-net.ME1312.SubServers.Host.Executable.SubCreator.ServerType-net.ME1312.SubServers.Host.Library.Version.Version-int-int-java.util.UUID-java.lang.String-">create(String, SubCreator.ServerType, Version, int, int, UUID, String)</a></span> - Method in class net.ME1312.SubServers.Host.Executable.<a href="net/ME1312/SubServers/Host/Executable/SubCreator.html" title="class in net.ME1312.SubServers.Host.Executable">SubCreator</a></dt>
+<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/SubServers.html#creator">creator</a></span> - Variable in class net.ME1312.SubServers.Host.<a href="net/ME1312/SubServers/Host/SubServers.html" title="class in net.ME1312.SubServers.Host">SubServers</a></dt>
+<dd>&nbsp;</dd>
 </dl>
 <a name="I:D">
 <!--   -->
@@ -312,9 +322,55 @@
 <div class="block">Event Priority Class<br>
  Events will be run Lowest to Highest</div>
 </dd>
+<dt><a href="net/ME1312/SubServers/Host/Executable/Executable.html" title="class in net.ME1312.SubServers.Host.Executable"><span class="typeNameLink">Executable</span></a> - Class in <a href="net/ME1312/SubServers/Host/Executable/package-summary.html">net.ME1312.SubServers.Host.Executable</a></dt>
+<dd>
+<div class="block">Executable Variable Class</div>
+</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Executable/Executable.html#Executable-java.lang.String-">Executable(String)</a></span> - Constructor for class net.ME1312.SubServers.Host.Executable.<a href="net/ME1312/SubServers/Host/Executable/Executable.html" title="class in net.ME1312.SubServers.Host.Executable">Executable</a></dt>
+<dd>
+<div class="block">New Executable</div>
+</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Executable/Executable.html#Executable-java.io.File-">Executable(File)</a></span> - Constructor for class net.ME1312.SubServers.Host.Executable.<a href="net/ME1312/SubServers/Host/Executable/Executable.html" title="class in net.ME1312.SubServers.Host.Executable">Executable</a></dt>
+<dd>
+<div class="block">New Executable</div>
+</dd>
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Network/Packet/PacketAuthorization.html#execute-org.json.JSONObject-">execute(JSONObject)</a></span> - Method in class net.ME1312.SubServers.Host.Network.Packet.<a href="net/ME1312/SubServers/Host/Network/Packet/PacketAuthorization.html" title="class in net.ME1312.SubServers.Host.Network.Packet">PacketAuthorization</a></dt>
 <dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Network/Packet/PacketCommandServer.html#execute-org.json.JSONObject-">execute(JSONObject)</a></span> - Method in class net.ME1312.SubServers.Host.Network.Packet.<a href="net/ME1312/SubServers/Host/Network/Packet/PacketCommandServer.html" title="class in net.ME1312.SubServers.Host.Network.Packet">PacketCommandServer</a></dt>
+<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Network/Packet/PacketCreateServer.html#execute-org.json.JSONObject-">execute(JSONObject)</a></span> - Method in class net.ME1312.SubServers.Host.Network.Packet.<a href="net/ME1312/SubServers/Host/Network/Packet/PacketCreateServer.html" title="class in net.ME1312.SubServers.Host.Network.Packet">PacketCreateServer</a></dt>
+<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Network/Packet/PacketDownloadBuildScript.html#execute-org.json.JSONObject-">execute(JSONObject)</a></span> - Method in class net.ME1312.SubServers.Host.Network.Packet.<a href="net/ME1312/SubServers/Host/Network/Packet/PacketDownloadBuildScript.html" title="class in net.ME1312.SubServers.Host.Network.Packet">PacketDownloadBuildScript</a></dt>
+<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Network/Packet/PacketDownloadHostInfo.html#execute-org.json.JSONObject-">execute(JSONObject)</a></span> - Method in class net.ME1312.SubServers.Host.Network.Packet.<a href="net/ME1312/SubServers/Host/Network/Packet/PacketDownloadHostInfo.html" title="class in net.ME1312.SubServers.Host.Network.Packet">PacketDownloadHostInfo</a></dt>
+<dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Network/Packet/PacketDownloadLang.html#execute-org.json.JSONObject-">execute(JSONObject)</a></span> - Method in class net.ME1312.SubServers.Host.Network.Packet.<a href="net/ME1312/SubServers/Host/Network/Packet/PacketDownloadLang.html" title="class in net.ME1312.SubServers.Host.Network.Packet">PacketDownloadLang</a></dt>
+<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Network/Packet/PacketDownloadPlayerList.html#execute-org.json.JSONObject-">execute(JSONObject)</a></span> - Method in class net.ME1312.SubServers.Host.Network.Packet.<a href="net/ME1312/SubServers/Host/Network/Packet/PacketDownloadPlayerList.html" title="class in net.ME1312.SubServers.Host.Network.Packet">PacketDownloadPlayerList</a></dt>
+<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Network/Packet/PacketDownloadServerInfo.html#execute-org.json.JSONObject-">execute(JSONObject)</a></span> - Method in class net.ME1312.SubServers.Host.Network.Packet.<a href="net/ME1312/SubServers/Host/Network/Packet/PacketDownloadServerInfo.html" title="class in net.ME1312.SubServers.Host.Network.Packet">PacketDownloadServerInfo</a></dt>
+<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Network/Packet/PacketDownloadServerList.html#execute-org.json.JSONObject-">execute(JSONObject)</a></span> - Method in class net.ME1312.SubServers.Host.Network.Packet.<a href="net/ME1312/SubServers/Host/Network/Packet/PacketDownloadServerList.html" title="class in net.ME1312.SubServers.Host.Network.Packet">PacketDownloadServerList</a></dt>
+<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Network/Packet/PacketExAddServer.html#execute-org.json.JSONObject-">execute(JSONObject)</a></span> - Method in class net.ME1312.SubServers.Host.Network.Packet.<a href="net/ME1312/SubServers/Host/Network/Packet/PacketExAddServer.html" title="class in net.ME1312.SubServers.Host.Network.Packet">PacketExAddServer</a></dt>
+<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Network/Packet/PacketExConfigureHost.html#execute-org.json.JSONObject-">execute(JSONObject)</a></span> - Method in class net.ME1312.SubServers.Host.Network.Packet.<a href="net/ME1312/SubServers/Host/Network/Packet/PacketExConfigureHost.html" title="class in net.ME1312.SubServers.Host.Network.Packet">PacketExConfigureHost</a></dt>
+<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Network/Packet/PacketExCreateServer.html#execute-org.json.JSONObject-">execute(JSONObject)</a></span> - Method in class net.ME1312.SubServers.Host.Network.Packet.<a href="net/ME1312/SubServers/Host/Network/Packet/PacketExCreateServer.html" title="class in net.ME1312.SubServers.Host.Network.Packet">PacketExCreateServer</a></dt>
+<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Network/Packet/PacketExRemoveServer.html#execute-org.json.JSONObject-">execute(JSONObject)</a></span> - Method in class net.ME1312.SubServers.Host.Network.Packet.<a href="net/ME1312/SubServers/Host/Network/Packet/PacketExRemoveServer.html" title="class in net.ME1312.SubServers.Host.Network.Packet">PacketExRemoveServer</a></dt>
+<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Network/Packet/PacketExUpdateServer.html#execute-org.json.JSONObject-">execute(JSONObject)</a></span> - Method in class net.ME1312.SubServers.Host.Network.Packet.<a href="net/ME1312/SubServers/Host/Network/Packet/PacketExUpdateServer.html" title="class in net.ME1312.SubServers.Host.Network.Packet">PacketExUpdateServer</a></dt>
+<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Network/Packet/PacketInRunEvent.html#execute-org.json.JSONObject-">execute(JSONObject)</a></span> - Method in class net.ME1312.SubServers.Host.Network.Packet.<a href="net/ME1312/SubServers/Host/Network/Packet/PacketInRunEvent.html" title="class in net.ME1312.SubServers.Host.Network.Packet">PacketInRunEvent</a></dt>
+<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Network/Packet/PacketLinkExHost.html#execute-org.json.JSONObject-">execute(JSONObject)</a></span> - Method in class net.ME1312.SubServers.Host.Network.Packet.<a href="net/ME1312/SubServers/Host/Network/Packet/PacketLinkExHost.html" title="class in net.ME1312.SubServers.Host.Network.Packet">PacketLinkExHost</a></dt>
+<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Network/Packet/PacketStartServer.html#execute-org.json.JSONObject-">execute(JSONObject)</a></span> - Method in class net.ME1312.SubServers.Host.Network.Packet.<a href="net/ME1312/SubServers/Host/Network/Packet/PacketStartServer.html" title="class in net.ME1312.SubServers.Host.Network.Packet">PacketStartServer</a></dt>
+<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Network/Packet/PacketStopServer.html#execute-org.json.JSONObject-">execute(JSONObject)</a></span> - Method in class net.ME1312.SubServers.Host.Network.Packet.<a href="net/ME1312/SubServers/Host/Network/Packet/PacketStopServer.html" title="class in net.ME1312.SubServers.Host.Network.Packet">PacketStopServer</a></dt>
+<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Network/Packet/PacketTeleportPlayer.html#execute-org.json.JSONObject-">execute(JSONObject)</a></span> - Method in class net.ME1312.SubServers.Host.Network.Packet.<a href="net/ME1312/SubServers/Host/Network/Packet/PacketTeleportPlayer.html" title="class in net.ME1312.SubServers.Host.Network.Packet">PacketTeleportPlayer</a></dt>
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Network/PacketIn.html#execute-org.json.JSONObject-">execute(JSONObject)</a></span> - Method in interface net.ME1312.SubServers.Host.Network.<a href="net/ME1312/SubServers/Host/Network/PacketIn.html" title="interface in net.ME1312.SubServers.Host.Network">PacketIn</a></dt>
 <dd>
@@ -346,7 +402,43 @@
 <dl>
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Network/Packet/PacketAuthorization.html#generate--">generate()</a></span> - Method in class net.ME1312.SubServers.Host.Network.Packet.<a href="net/ME1312/SubServers/Host/Network/Packet/PacketAuthorization.html" title="class in net.ME1312.SubServers.Host.Network.Packet">PacketAuthorization</a></dt>
 <dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Network/Packet/PacketCommandServer.html#generate--">generate()</a></span> - Method in class net.ME1312.SubServers.Host.Network.Packet.<a href="net/ME1312/SubServers/Host/Network/Packet/PacketCommandServer.html" title="class in net.ME1312.SubServers.Host.Network.Packet">PacketCommandServer</a></dt>
+<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Network/Packet/PacketCreateServer.html#generate--">generate()</a></span> - Method in class net.ME1312.SubServers.Host.Network.Packet.<a href="net/ME1312/SubServers/Host/Network/Packet/PacketCreateServer.html" title="class in net.ME1312.SubServers.Host.Network.Packet">PacketCreateServer</a></dt>
+<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Network/Packet/PacketDownloadBuildScript.html#generate--">generate()</a></span> - Method in class net.ME1312.SubServers.Host.Network.Packet.<a href="net/ME1312/SubServers/Host/Network/Packet/PacketDownloadBuildScript.html" title="class in net.ME1312.SubServers.Host.Network.Packet">PacketDownloadBuildScript</a></dt>
+<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Network/Packet/PacketDownloadHostInfo.html#generate--">generate()</a></span> - Method in class net.ME1312.SubServers.Host.Network.Packet.<a href="net/ME1312/SubServers/Host/Network/Packet/PacketDownloadHostInfo.html" title="class in net.ME1312.SubServers.Host.Network.Packet">PacketDownloadHostInfo</a></dt>
+<dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Network/Packet/PacketDownloadLang.html#generate--">generate()</a></span> - Method in class net.ME1312.SubServers.Host.Network.Packet.<a href="net/ME1312/SubServers/Host/Network/Packet/PacketDownloadLang.html" title="class in net.ME1312.SubServers.Host.Network.Packet">PacketDownloadLang</a></dt>
+<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Network/Packet/PacketDownloadPlayerList.html#generate--">generate()</a></span> - Method in class net.ME1312.SubServers.Host.Network.Packet.<a href="net/ME1312/SubServers/Host/Network/Packet/PacketDownloadPlayerList.html" title="class in net.ME1312.SubServers.Host.Network.Packet">PacketDownloadPlayerList</a></dt>
+<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Network/Packet/PacketDownloadServerInfo.html#generate--">generate()</a></span> - Method in class net.ME1312.SubServers.Host.Network.Packet.<a href="net/ME1312/SubServers/Host/Network/Packet/PacketDownloadServerInfo.html" title="class in net.ME1312.SubServers.Host.Network.Packet">PacketDownloadServerInfo</a></dt>
+<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Network/Packet/PacketDownloadServerList.html#generate--">generate()</a></span> - Method in class net.ME1312.SubServers.Host.Network.Packet.<a href="net/ME1312/SubServers/Host/Network/Packet/PacketDownloadServerList.html" title="class in net.ME1312.SubServers.Host.Network.Packet">PacketDownloadServerList</a></dt>
+<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Network/Packet/PacketExAddServer.html#generate--">generate()</a></span> - Method in class net.ME1312.SubServers.Host.Network.Packet.<a href="net/ME1312/SubServers/Host/Network/Packet/PacketExAddServer.html" title="class in net.ME1312.SubServers.Host.Network.Packet">PacketExAddServer</a></dt>
+<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Network/Packet/PacketExConfigureHost.html#generate--">generate()</a></span> - Method in class net.ME1312.SubServers.Host.Network.Packet.<a href="net/ME1312/SubServers/Host/Network/Packet/PacketExConfigureHost.html" title="class in net.ME1312.SubServers.Host.Network.Packet">PacketExConfigureHost</a></dt>
+<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Network/Packet/PacketExCreateServer.html#generate--">generate()</a></span> - Method in class net.ME1312.SubServers.Host.Network.Packet.<a href="net/ME1312/SubServers/Host/Network/Packet/PacketExCreateServer.html" title="class in net.ME1312.SubServers.Host.Network.Packet">PacketExCreateServer</a></dt>
+<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Network/Packet/PacketExRemoveServer.html#generate--">generate()</a></span> - Method in class net.ME1312.SubServers.Host.Network.Packet.<a href="net/ME1312/SubServers/Host/Network/Packet/PacketExRemoveServer.html" title="class in net.ME1312.SubServers.Host.Network.Packet">PacketExRemoveServer</a></dt>
+<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Network/Packet/PacketExUpdateServer.html#generate--">generate()</a></span> - Method in class net.ME1312.SubServers.Host.Network.Packet.<a href="net/ME1312/SubServers/Host/Network/Packet/PacketExUpdateServer.html" title="class in net.ME1312.SubServers.Host.Network.Packet">PacketExUpdateServer</a></dt>
+<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Network/Packet/PacketLinkExHost.html#generate--">generate()</a></span> - Method in class net.ME1312.SubServers.Host.Network.Packet.<a href="net/ME1312/SubServers/Host/Network/Packet/PacketLinkExHost.html" title="class in net.ME1312.SubServers.Host.Network.Packet">PacketLinkExHost</a></dt>
+<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Network/Packet/PacketOutExLogMessage.html#generate--">generate()</a></span> - Method in class net.ME1312.SubServers.Host.Network.Packet.<a href="net/ME1312/SubServers/Host/Network/Packet/PacketOutExLogMessage.html" title="class in net.ME1312.SubServers.Host.Network.Packet">PacketOutExLogMessage</a></dt>
+<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Network/Packet/PacketOutExRequestQueue.html#generate--">generate()</a></span> - Method in class net.ME1312.SubServers.Host.Network.Packet.<a href="net/ME1312/SubServers/Host/Network/Packet/PacketOutExRequestQueue.html" title="class in net.ME1312.SubServers.Host.Network.Packet">PacketOutExRequestQueue</a></dt>
+<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Network/Packet/PacketStartServer.html#generate--">generate()</a></span> - Method in class net.ME1312.SubServers.Host.Network.Packet.<a href="net/ME1312/SubServers/Host/Network/Packet/PacketStartServer.html" title="class in net.ME1312.SubServers.Host.Network.Packet">PacketStartServer</a></dt>
+<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Network/Packet/PacketStopServer.html#generate--">generate()</a></span> - Method in class net.ME1312.SubServers.Host.Network.Packet.<a href="net/ME1312/SubServers/Host/Network/Packet/PacketStopServer.html" title="class in net.ME1312.SubServers.Host.Network.Packet">PacketStopServer</a></dt>
+<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Network/Packet/PacketTeleportPlayer.html#generate--">generate()</a></span> - Method in class net.ME1312.SubServers.Host.Network.Packet.<a href="net/ME1312/SubServers/Host/Network/Packet/PacketTeleportPlayer.html" title="class in net.ME1312.SubServers.Host.Network.Packet">PacketTeleportPlayer</a></dt>
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Network/PacketOut.html#generate--">generate()</a></span> - Method in interface net.ME1312.SubServers.Host.Network.<a href="net/ME1312/SubServers/Host/Network/PacketOut.html" title="interface in net.ME1312.SubServers.Host.Network">PacketOut</a></dt>
 <dd>
@@ -384,6 +476,8 @@
 <dd>
 <div class="block">Gets the SubServers Version</div>
 </dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Network/Packet/PacketExUpdateServer.UpdateType.html#getArguments--">getArguments()</a></span> - Method in enum net.ME1312.SubServers.Host.Network.Packet.<a href="net/ME1312/SubServers/Host/Network/Packet/PacketExUpdateServer.UpdateType.html" title="enum in net.ME1312.SubServers.Host.Network.Packet">PacketExUpdateServer.UpdateType</a></dt>
+<dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/API/SubPluginInfo.html#getAuthors--">getAuthors()</a></span> - Method in class net.ME1312.SubServers.Host.API.<a href="net/ME1312/SubServers/Host/API/SubPluginInfo.html" title="class in net.ME1312.SubServers.Host.API">SubPluginInfo</a></dt>
 <dd>
 <div class="block">Get Authors List</div>
@@ -436,6 +530,10 @@
 <dd>
 <div class="block">Get Plugin Description</div>
 </dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Executable/SubServer.html#getDirectory--">getDirectory()</a></span> - Method in class net.ME1312.SubServers.Host.Executable.<a href="net/ME1312/SubServers/Host/Executable/SubServer.html" title="class in net.ME1312.SubServers.Host.Executable">SubServer</a></dt>
+<dd>
+<div class="block">Get the Server Directory</div>
+</dd>
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Library/Config/YAMLSection.html#getDouble-java.lang.String-">getDouble(String)</a></span> - Method in class net.ME1312.SubServers.Host.Library.Config.<a href="net/ME1312/SubServers/Host/Library/Config/YAMLSection.html" title="class in net.ME1312.SubServers.Host.Library.Config">YAMLSection</a></dt>
 <dd>
 <div class="block">Get a Double by Handle</div>
@@ -483,6 +581,10 @@
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Library/Config/YAMLSection.html#getFloatList-java.lang.String-float-">getFloatList(String, float)</a></span> - Method in class net.ME1312.SubServers.Host.Library.Config.<a href="net/ME1312/SubServers/Host/Library/Config/YAMLSection.html" title="class in net.ME1312.SubServers.Host.Library.Config">YAMLSection</a></dt>
 <dd>
 <div class="block">Get a Float List by Handle</div>
+</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Executable/SubLogger.html#getHandler--">getHandler()</a></span> - Method in class net.ME1312.SubServers.Host.Executable.<a href="net/ME1312/SubServers/Host/Executable/SubLogger.html" title="class in net.ME1312.SubServers.Host.Executable">SubLogger</a></dt>
+<dd>
+<div class="block">Gets the Object using this Logger</div>
 </dd>
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Library/Event/Event.html#getHandlers--">getHandlers()</a></span> - Method in class net.ME1312.SubServers.Host.Library.Event.<a href="net/ME1312/SubServers/Host/Library/Event/Event.html" title="class in net.ME1312.SubServers.Host.Library.Event">Event</a></dt>
 <dd>
@@ -546,6 +648,12 @@
 <dd>
 <div class="block">Gets the default Logger for this Plugin</div>
 </dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Executable/SubCreator.html#getLogger--">getLogger()</a></span> - Method in class net.ME1312.SubServers.Host.Executable.<a href="net/ME1312/SubServers/Host/Executable/SubCreator.html" title="class in net.ME1312.SubServers.Host.Executable">SubCreator</a></dt>
+<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Executable/SubServer.html#getLogger--">getLogger()</a></span> - Method in class net.ME1312.SubServers.Host.Executable.<a href="net/ME1312/SubServers/Host/Executable/SubServer.html" title="class in net.ME1312.SubServers.Host.Executable">SubServer</a></dt>
+<dd>
+<div class="block">Get Process Logger</div>
+</dd>
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Library/Config/YAMLSection.html#getLong-java.lang.String-">getLong(String)</a></span> - Method in class net.ME1312.SubServers.Host.Library.Config.<a href="net/ME1312/SubServers/Host/Library/Config/YAMLSection.html" title="class in net.ME1312.SubServers.Host.Library.Config">YAMLSection</a></dt>
 <dd>
 <div class="block">Get a Long by Handle</div>
@@ -566,9 +674,21 @@
 <dd>
 <div class="block">Get Plugin's Name</div>
 </dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Executable/SubLogger.html#getName--">getName()</a></span> - Method in class net.ME1312.SubServers.Host.Executable.<a href="net/ME1312/SubServers/Host/Executable/SubLogger.html" title="class in net.ME1312.SubServers.Host.Executable">SubLogger</a></dt>
+<dd>
+<div class="block">Gets the Name of the task logging</div>
+</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Executable/SubServer.html#getName--">getName()</a></span> - Method in class net.ME1312.SubServers.Host.Executable.<a href="net/ME1312/SubServers/Host/Executable/SubServer.html" title="class in net.ME1312.SubServers.Host.Executable">SubServer</a></dt>
+<dd>
+<div class="block">Gets the name of the Server</div>
+</dd>
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Network/SubDataClient.html#getName--">getName()</a></span> - Method in class net.ME1312.SubServers.Host.Network.<a href="net/ME1312/SubServers/Host/Network/SubDataClient.html" title="class in net.ME1312.SubServers.Host.Network">SubDataClient</a></dt>
 <dd>
-<div class="block">Gets the Assigned Server Name</div>
+<div class="block">Gets the Assigned Host Name</div>
+</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Library/Util.html#getNew-java.util.Collection-net.ME1312.SubServers.Host.Library.Util.ReturnRunnable-">getNew(Collection&lt;? extends V&gt;, Util.ReturnRunnable&lt;V&gt;)</a></span> - Static method in class net.ME1312.SubServers.Host.Library.<a href="net/ME1312/SubServers/Host/Library/Util.html" title="class in net.ME1312.SubServers.Host.Library">Util</a></dt>
+<dd>
+<div class="block">Gets a new Variable that doesn't match the existing Variables</div>
 </dd>
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Library/Config/YAMLSection.html#getObject-java.lang.String-">getObject(String)</a></span> - Method in class net.ME1312.SubServers.Host.Library.Config.<a href="net/ME1312/SubServers/Host/Library/Config/YAMLSection.html" title="class in net.ME1312.SubServers.Host.Library.Config">YAMLSection</a></dt>
 <dd>
@@ -666,6 +786,10 @@
 <dd>
 <div class="block">Gets the Soft Dependencies List</div>
 </dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Executable/SubServer.html#getStopCommand--">getStopCommand()</a></span> - Method in class net.ME1312.SubServers.Host.Executable.<a href="net/ME1312/SubServers/Host/Executable/SubServer.html" title="class in net.ME1312.SubServers.Host.Executable">SubServer</a></dt>
+<dd>
+<div class="block">Grab the Command to Stop the Server</div>
+</dd>
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Library/Config/YAMLSection.html#getString-java.lang.String-">getString(String)</a></span> - Method in class net.ME1312.SubServers.Host.Library.Config.<a href="net/ME1312/SubServers/Host/Library/Config/YAMLSection.html" title="class in net.ME1312.SubServers.Host.Library.Config">YAMLSection</a></dt>
 <dd>
 <div class="block">Get a String by Handle</div>
@@ -706,6 +830,8 @@
 <dd>
 <div class="block">Get a UUID List by Handle</div>
 </dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Network/Packet/PacketExUpdateServer.UpdateType.html#getValue--">getValue()</a></span> - Method in enum net.ME1312.SubServers.Host.Network.Packet.<a href="net/ME1312/SubServers/Host/Network/Packet/PacketExUpdateServer.UpdateType.html" title="enum in net.ME1312.SubServers.Host.Network.Packet">PacketExUpdateServer.UpdateType</a></dt>
+<dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Library/Config/YAMLSection.html#getValues--">getValues()</a></span> - Method in class net.ME1312.SubServers.Host.Library.Config.<a href="net/ME1312/SubServers/Host/Library/Config/YAMLSection.html" title="class in net.ME1312.SubServers.Host.Library.Config">YAMLSection</a></dt>
 <dd>
 <div class="block">Get the Values</div>
@@ -716,7 +842,45 @@
 </dd>
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Network/Packet/PacketAuthorization.html#getVersion--">getVersion()</a></span> - Method in class net.ME1312.SubServers.Host.Network.Packet.<a href="net/ME1312/SubServers/Host/Network/Packet/PacketAuthorization.html" title="class in net.ME1312.SubServers.Host.Network.Packet">PacketAuthorization</a></dt>
 <dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Network/Packet/PacketCommandServer.html#getVersion--">getVersion()</a></span> - Method in class net.ME1312.SubServers.Host.Network.Packet.<a href="net/ME1312/SubServers/Host/Network/Packet/PacketCommandServer.html" title="class in net.ME1312.SubServers.Host.Network.Packet">PacketCommandServer</a></dt>
+<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Network/Packet/PacketCreateServer.html#getVersion--">getVersion()</a></span> - Method in class net.ME1312.SubServers.Host.Network.Packet.<a href="net/ME1312/SubServers/Host/Network/Packet/PacketCreateServer.html" title="class in net.ME1312.SubServers.Host.Network.Packet">PacketCreateServer</a></dt>
+<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Network/Packet/PacketDownloadBuildScript.html#getVersion--">getVersion()</a></span> - Method in class net.ME1312.SubServers.Host.Network.Packet.<a href="net/ME1312/SubServers/Host/Network/Packet/PacketDownloadBuildScript.html" title="class in net.ME1312.SubServers.Host.Network.Packet">PacketDownloadBuildScript</a></dt>
+<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Network/Packet/PacketDownloadHostInfo.html#getVersion--">getVersion()</a></span> - Method in class net.ME1312.SubServers.Host.Network.Packet.<a href="net/ME1312/SubServers/Host/Network/Packet/PacketDownloadHostInfo.html" title="class in net.ME1312.SubServers.Host.Network.Packet">PacketDownloadHostInfo</a></dt>
+<dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Network/Packet/PacketDownloadLang.html#getVersion--">getVersion()</a></span> - Method in class net.ME1312.SubServers.Host.Network.Packet.<a href="net/ME1312/SubServers/Host/Network/Packet/PacketDownloadLang.html" title="class in net.ME1312.SubServers.Host.Network.Packet">PacketDownloadLang</a></dt>
+<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Network/Packet/PacketDownloadPlayerList.html#getVersion--">getVersion()</a></span> - Method in class net.ME1312.SubServers.Host.Network.Packet.<a href="net/ME1312/SubServers/Host/Network/Packet/PacketDownloadPlayerList.html" title="class in net.ME1312.SubServers.Host.Network.Packet">PacketDownloadPlayerList</a></dt>
+<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Network/Packet/PacketDownloadServerInfo.html#getVersion--">getVersion()</a></span> - Method in class net.ME1312.SubServers.Host.Network.Packet.<a href="net/ME1312/SubServers/Host/Network/Packet/PacketDownloadServerInfo.html" title="class in net.ME1312.SubServers.Host.Network.Packet">PacketDownloadServerInfo</a></dt>
+<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Network/Packet/PacketDownloadServerList.html#getVersion--">getVersion()</a></span> - Method in class net.ME1312.SubServers.Host.Network.Packet.<a href="net/ME1312/SubServers/Host/Network/Packet/PacketDownloadServerList.html" title="class in net.ME1312.SubServers.Host.Network.Packet">PacketDownloadServerList</a></dt>
+<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Network/Packet/PacketExAddServer.html#getVersion--">getVersion()</a></span> - Method in class net.ME1312.SubServers.Host.Network.Packet.<a href="net/ME1312/SubServers/Host/Network/Packet/PacketExAddServer.html" title="class in net.ME1312.SubServers.Host.Network.Packet">PacketExAddServer</a></dt>
+<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Network/Packet/PacketExConfigureHost.html#getVersion--">getVersion()</a></span> - Method in class net.ME1312.SubServers.Host.Network.Packet.<a href="net/ME1312/SubServers/Host/Network/Packet/PacketExConfigureHost.html" title="class in net.ME1312.SubServers.Host.Network.Packet">PacketExConfigureHost</a></dt>
+<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Network/Packet/PacketExCreateServer.html#getVersion--">getVersion()</a></span> - Method in class net.ME1312.SubServers.Host.Network.Packet.<a href="net/ME1312/SubServers/Host/Network/Packet/PacketExCreateServer.html" title="class in net.ME1312.SubServers.Host.Network.Packet">PacketExCreateServer</a></dt>
+<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Network/Packet/PacketExRemoveServer.html#getVersion--">getVersion()</a></span> - Method in class net.ME1312.SubServers.Host.Network.Packet.<a href="net/ME1312/SubServers/Host/Network/Packet/PacketExRemoveServer.html" title="class in net.ME1312.SubServers.Host.Network.Packet">PacketExRemoveServer</a></dt>
+<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Network/Packet/PacketExUpdateServer.html#getVersion--">getVersion()</a></span> - Method in class net.ME1312.SubServers.Host.Network.Packet.<a href="net/ME1312/SubServers/Host/Network/Packet/PacketExUpdateServer.html" title="class in net.ME1312.SubServers.Host.Network.Packet">PacketExUpdateServer</a></dt>
+<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Network/Packet/PacketInRunEvent.html#getVersion--">getVersion()</a></span> - Method in class net.ME1312.SubServers.Host.Network.Packet.<a href="net/ME1312/SubServers/Host/Network/Packet/PacketInRunEvent.html" title="class in net.ME1312.SubServers.Host.Network.Packet">PacketInRunEvent</a></dt>
+<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Network/Packet/PacketLinkExHost.html#getVersion--">getVersion()</a></span> - Method in class net.ME1312.SubServers.Host.Network.Packet.<a href="net/ME1312/SubServers/Host/Network/Packet/PacketLinkExHost.html" title="class in net.ME1312.SubServers.Host.Network.Packet">PacketLinkExHost</a></dt>
+<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Network/Packet/PacketOutExLogMessage.html#getVersion--">getVersion()</a></span> - Method in class net.ME1312.SubServers.Host.Network.Packet.<a href="net/ME1312/SubServers/Host/Network/Packet/PacketOutExLogMessage.html" title="class in net.ME1312.SubServers.Host.Network.Packet">PacketOutExLogMessage</a></dt>
+<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Network/Packet/PacketOutExRequestQueue.html#getVersion--">getVersion()</a></span> - Method in class net.ME1312.SubServers.Host.Network.Packet.<a href="net/ME1312/SubServers/Host/Network/Packet/PacketOutExRequestQueue.html" title="class in net.ME1312.SubServers.Host.Network.Packet">PacketOutExRequestQueue</a></dt>
+<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Network/Packet/PacketStartServer.html#getVersion--">getVersion()</a></span> - Method in class net.ME1312.SubServers.Host.Network.Packet.<a href="net/ME1312/SubServers/Host/Network/Packet/PacketStartServer.html" title="class in net.ME1312.SubServers.Host.Network.Packet">PacketStartServer</a></dt>
+<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Network/Packet/PacketStopServer.html#getVersion--">getVersion()</a></span> - Method in class net.ME1312.SubServers.Host.Network.Packet.<a href="net/ME1312/SubServers/Host/Network/Packet/PacketStopServer.html" title="class in net.ME1312.SubServers.Host.Network.Packet">PacketStopServer</a></dt>
+<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Network/Packet/PacketTeleportPlayer.html#getVersion--">getVersion()</a></span> - Method in class net.ME1312.SubServers.Host.Network.Packet.<a href="net/ME1312/SubServers/Host/Network/Packet/PacketTeleportPlayer.html" title="class in net.ME1312.SubServers.Host.Network.Packet">PacketTeleportPlayer</a></dt>
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Network/PacketIn.html#getVersion--">getVersion()</a></span> - Method in interface net.ME1312.SubServers.Host.Network.<a href="net/ME1312/SubServers/Host/Network/PacketIn.html" title="interface in net.ME1312.SubServers.Host.Network">PacketIn</a></dt>
 <dd>
@@ -750,6 +914,8 @@
 <dd>
 <div class="block">Set the Help Page for this Command</div>
 </dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/SubServers.html#host">host</a></span> - Variable in class net.ME1312.SubServers.Host.<a href="net/ME1312/SubServers/Host/SubServers.html" title="class in net.ME1312.SubServers.Host">SubServers</a></dt>
+<dd>&nbsp;</dd>
 </dl>
 <a name="I:I">
 <!--   -->
@@ -782,6 +948,14 @@
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Library/Log/Logger.html#info">info</a></span> - Variable in class net.ME1312.SubServers.Host.Library.Log.<a href="net/ME1312/SubServers/Host/Library/Log/Logger.html" title="class in net.ME1312.SubServers.Host.Library.Log">Logger</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="net/ME1312/SubServers/Host/Library/Exception/InvalidServerException.html" title="class in net.ME1312.SubServers.Host.Library.Exception"><span class="typeNameLink">InvalidServerException</span></a> - Exception in <a href="net/ME1312/SubServers/Host/Library/Exception/package-summary.html">net.ME1312.SubServers.Host.Library.Exception</a></dt>
+<dd>
+<div class="block">Invalid Server Exception</div>
+</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Library/Exception/InvalidServerException.html#InvalidServerException--">InvalidServerException()</a></span> - Constructor for exception net.ME1312.SubServers.Host.Library.Exception.<a href="net/ME1312/SubServers/Host/Library/Exception/InvalidServerException.html" title="class in net.ME1312.SubServers.Host.Library.Exception">InvalidServerException</a></dt>
+<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Library/Exception/InvalidServerException.html#InvalidServerException-java.lang.String-">InvalidServerException(String)</a></span> - Constructor for exception net.ME1312.SubServers.Host.Library.Exception.<a href="net/ME1312/SubServers/Host/Library/Exception/InvalidServerException.html" title="class in net.ME1312.SubServers.Host.Library.Exception">InvalidServerException</a></dt>
+<dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Library/Config/YAMLSection.html#isBoolean-java.lang.String-">isBoolean(String)</a></span> - Method in class net.ME1312.SubServers.Host.Library.Config.<a href="net/ME1312/SubServers/Host/Library/Config/YAMLSection.html" title="class in net.ME1312.SubServers.Host.Library.Config">YAMLSection</a></dt>
 <dd>
 <div class="block">Check if object is a Boolean by Handle</div>
@@ -790,6 +964,8 @@
 <dd>
 <div class="block">Check if object is a Boolean</div>
 </dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Executable/SubCreator.html#isBusy--">isBusy()</a></span> - Method in class net.ME1312.SubServers.Host.Executable.<a href="net/ME1312/SubServers/Host/Executable/SubCreator.html" title="class in net.ME1312.SubServers.Host.Executable">SubCreator</a></dt>
+<dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/API/Event/CommandPreProcessEvent.html#isCancelled--">isCancelled()</a></span> - Method in class net.ME1312.SubServers.Host.API.Event.<a href="net/ME1312/SubServers/Host/API/Event/CommandPreProcessEvent.html" title="class in net.ME1312.SubServers.Host.API.Event">CommandPreProcessEvent</a></dt>
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Library/Event/Cancellable.html#isCancelled--">isCancelled()</a></span> - Method in interface net.ME1312.SubServers.Host.Library.Event.<a href="net/ME1312/SubServers/Host/Library/Event/Cancellable.html" title="interface in net.ME1312.SubServers.Host.Library.Event">Cancellable</a></dt>
@@ -808,6 +984,10 @@
 <dd>
 <div class="block">Sets the Plugin's Enabled Status</div>
 </dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Executable/SubServer.html#isEnabled--">isEnabled()</a></span> - Method in class net.ME1312.SubServers.Host.Executable.<a href="net/ME1312/SubServers/Host/Executable/SubServer.html" title="class in net.ME1312.SubServers.Host.Executable">SubServer</a></dt>
+<dd>
+<div class="block">If the Server is Enabled</div>
+</dd>
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Library/Version/Version.html#isEqual-net.ME1312.SubServers.Host.Library.Version.Version-net.ME1312.SubServers.Host.Library.Version.Version-">isEqual(Version, Version)</a></span> - Static method in class net.ME1312.SubServers.Host.Library.Version.<a href="net/ME1312/SubServers/Host/Library/Version/Version.html" title="class in net.ME1312.SubServers.Host.Library.Version">Version</a></dt>
 <dd>
 <div class="block">See if Versions are Equal</div>
@@ -816,6 +996,8 @@
 <dd>
 <div class="block">Determines if an Exception will occur</div>
 </dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Executable/Executable.html#isFile">isFile</a></span> - Variable in class net.ME1312.SubServers.Host.Executable.<a href="net/ME1312/SubServers/Host/Executable/Executable.html" title="class in net.ME1312.SubServers.Host.Executable">Executable</a></dt>
+<dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Library/Config/YAMLSection.html#isFloat-java.lang.String-">isFloat(String)</a></span> - Method in class net.ME1312.SubServers.Host.Library.Config.<a href="net/ME1312/SubServers/Host/Library/Config/YAMLSection.html" title="class in net.ME1312.SubServers.Host.Library.Config">YAMLSection</a></dt>
 <dd>
 <div class="block">Check if object is a Float by Handle</div>
@@ -840,6 +1022,14 @@
 <dd>
 <div class="block">Check if object is a List</div>
 </dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Executable/SubLogger.html#isLogging--">isLogging()</a></span> - Method in class net.ME1312.SubServers.Host.Executable.<a href="net/ME1312/SubServers/Host/Executable/SubLogger.html" title="class in net.ME1312.SubServers.Host.Executable">SubLogger</a></dt>
+<dd>
+<div class="block">Get if the Logger is currently logging</div>
+</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Executable/SubServer.html#isLogging--">isLogging()</a></span> - Method in class net.ME1312.SubServers.Host.Executable.<a href="net/ME1312/SubServers/Host/Executable/SubServer.html" title="class in net.ME1312.SubServers.Host.Executable">SubServer</a></dt>
+<dd>
+<div class="block">If the Server is Logging</div>
+</dd>
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Library/Config/YAMLSection.html#isLong-java.lang.String-">isLong(String)</a></span> - Method in class net.ME1312.SubServers.Host.Library.Config.<a href="net/ME1312/SubServers/Host/Library/Config/YAMLSection.html" title="class in net.ME1312.SubServers.Host.Library.Config">YAMLSection</a></dt>
 <dd>
 <div class="block">Check if object is a Long by Handle</div>
@@ -851,6 +1041,10 @@
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Library/Util.html#isNull-java.lang.Object...-">isNull(Object...)</a></span> - Static method in class net.ME1312.SubServers.Host.Library.<a href="net/ME1312/SubServers/Host/Library/Util.html" title="class in net.ME1312.SubServers.Host.Library">Util</a></dt>
 <dd>
 <div class="block">Checks values to make sure they're not null</div>
+</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Executable/SubServer.html#isRunning--">isRunning()</a></span> - Method in class net.ME1312.SubServers.Host.Executable.<a href="net/ME1312/SubServers/Host/Executable/SubServer.html" title="class in net.ME1312.SubServers.Host.Executable">SubServer</a></dt>
+<dd>
+<div class="block">If the Server is Running</div>
 </dd>
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Library/Config/YAMLSection.html#isSection-java.lang.String-">isSection(String)</a></span> - Method in class net.ME1312.SubServers.Host.Library.Config.<a href="net/ME1312/SubServers/Host/Library/Config/YAMLSection.html" title="class in net.ME1312.SubServers.Host.Library.Config">YAMLSection</a></dt>
 <dd>
@@ -958,6 +1152,8 @@
 <dd>&nbsp;</dd>
 <dt><a href="net/ME1312/SubServers/Host/API/Event/package-summary.html">net.ME1312.SubServers.Host.API.Event</a> - package net.ME1312.SubServers.Host.API.Event</dt>
 <dd>&nbsp;</dd>
+<dt><a href="net/ME1312/SubServers/Host/Executable/package-summary.html">net.ME1312.SubServers.Host.Executable</a> - package net.ME1312.SubServers.Host.Executable</dt>
+<dd>&nbsp;</dd>
 <dt><a href="net/ME1312/SubServers/Host/Library/package-summary.html">net.ME1312.SubServers.Host.Library</a> - package net.ME1312.SubServers.Host.Library</dt>
 <dd>&nbsp;</dd>
 <dt><a href="net/ME1312/SubServers/Host/Library/Config/package-summary.html">net.ME1312.SubServers.Host.Library.Config</a> - package net.ME1312.SubServers.Host.Library.Config</dt>
@@ -981,22 +1177,232 @@
 <h2 class="title">P</h2>
 <dl>
 <dt><a href="net/ME1312/SubServers/Host/Network/Packet/PacketAuthorization.html" title="class in net.ME1312.SubServers.Host.Network.Packet"><span class="typeNameLink">PacketAuthorization</span></a> - Class in <a href="net/ME1312/SubServers/Host/Network/Packet/package-summary.html">net.ME1312.SubServers.Host.Network.Packet</a></dt>
-<dd>&nbsp;</dd>
+<dd>
+<div class="block">Authorization Packet</div>
+</dd>
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Network/Packet/PacketAuthorization.html#PacketAuthorization-net.ME1312.SubServers.Host.SubServers-">PacketAuthorization(SubServers)</a></span> - Constructor for class net.ME1312.SubServers.Host.Network.Packet.<a href="net/ME1312/SubServers/Host/Network/Packet/PacketAuthorization.html" title="class in net.ME1312.SubServers.Host.Network.Packet">PacketAuthorization</a></dt>
+<dd>
+<div class="block">New PacketAuthorization</div>
+</dd>
+<dt><a href="net/ME1312/SubServers/Host/Network/Packet/PacketCommandServer.html" title="class in net.ME1312.SubServers.Host.Network.Packet"><span class="typeNameLink">PacketCommandServer</span></a> - Class in <a href="net/ME1312/SubServers/Host/Network/Packet/package-summary.html">net.ME1312.SubServers.Host.Network.Packet</a></dt>
+<dd>
+<div class="block">Command Server Packet</div>
+</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Network/Packet/PacketCommandServer.html#PacketCommandServer--">PacketCommandServer()</a></span> - Constructor for class net.ME1312.SubServers.Host.Network.Packet.<a href="net/ME1312/SubServers/Host/Network/Packet/PacketCommandServer.html" title="class in net.ME1312.SubServers.Host.Network.Packet">PacketCommandServer</a></dt>
+<dd>
+<div class="block">New PacketCommandServer (In)</div>
+</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Network/Packet/PacketCommandServer.html#PacketCommandServer-java.util.UUID-java.lang.String-java.lang.String-net.ME1312.SubServers.Host.Library.JSONCallback...-">PacketCommandServer(UUID, String, String, JSONCallback...)</a></span> - Constructor for class net.ME1312.SubServers.Host.Network.Packet.<a href="net/ME1312/SubServers/Host/Network/Packet/PacketCommandServer.html" title="class in net.ME1312.SubServers.Host.Network.Packet">PacketCommandServer</a></dt>
+<dd>
+<div class="block">New PacketCommandServer (Out)</div>
+</dd>
+<dt><a href="net/ME1312/SubServers/Host/Network/Packet/PacketCreateServer.html" title="class in net.ME1312.SubServers.Host.Network.Packet"><span class="typeNameLink">PacketCreateServer</span></a> - Class in <a href="net/ME1312/SubServers/Host/Network/Packet/package-summary.html">net.ME1312.SubServers.Host.Network.Packet</a></dt>
+<dd>
+<div class="block">Create Server Packet</div>
+</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Network/Packet/PacketCreateServer.html#PacketCreateServer--">PacketCreateServer()</a></span> - Constructor for class net.ME1312.SubServers.Host.Network.Packet.<a href="net/ME1312/SubServers/Host/Network/Packet/PacketCreateServer.html" title="class in net.ME1312.SubServers.Host.Network.Packet">PacketCreateServer</a></dt>
+<dd>
+<div class="block">New PacketCreateServer (In)</div>
+</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Network/Packet/PacketCreateServer.html#PacketCreateServer-java.util.UUID-java.lang.String-java.lang.String-net.ME1312.SubServers.Host.Network.Packet.PacketCreateServer.ServerType-net.ME1312.SubServers.Host.Library.Version.Version-int-int-net.ME1312.SubServers.Host.Library.JSONCallback...-">PacketCreateServer(UUID, String, String, PacketCreateServer.ServerType, Version, int, int, JSONCallback...)</a></span> - Constructor for class net.ME1312.SubServers.Host.Network.Packet.<a href="net/ME1312/SubServers/Host/Network/Packet/PacketCreateServer.html" title="class in net.ME1312.SubServers.Host.Network.Packet">PacketCreateServer</a></dt>
+<dd>
+<div class="block">New PacketCreateServer (Out)</div>
+</dd>
+<dt><a href="net/ME1312/SubServers/Host/Network/Packet/PacketCreateServer.ServerType.html" title="enum in net.ME1312.SubServers.Host.Network.Packet"><span class="typeNameLink">PacketCreateServer.ServerType</span></a> - Enum in <a href="net/ME1312/SubServers/Host/Network/Packet/package-summary.html">net.ME1312.SubServers.Host.Network.Packet</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="net/ME1312/SubServers/Host/Network/Packet/PacketDownloadBuildScript.html" title="class in net.ME1312.SubServers.Host.Network.Packet"><span class="typeNameLink">PacketDownloadBuildScript</span></a> - Class in <a href="net/ME1312/SubServers/Host/Network/Packet/package-summary.html">net.ME1312.SubServers.Host.Network.Packet</a></dt>
+<dd>
+<div class="block">Download Build Script Packet</div>
+</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Network/Packet/PacketDownloadBuildScript.html#PacketDownloadBuildScript--">PacketDownloadBuildScript()</a></span> - Constructor for class net.ME1312.SubServers.Host.Network.Packet.<a href="net/ME1312/SubServers/Host/Network/Packet/PacketDownloadBuildScript.html" title="class in net.ME1312.SubServers.Host.Network.Packet">PacketDownloadBuildScript</a></dt>
+<dd>
+<div class="block">New PacketDownloadBuildScript (In)</div>
+</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Network/Packet/PacketDownloadBuildScript.html#PacketDownloadBuildScript-net.ME1312.SubServers.Host.Library.JSONCallback...-">PacketDownloadBuildScript(JSONCallback...)</a></span> - Constructor for class net.ME1312.SubServers.Host.Network.Packet.<a href="net/ME1312/SubServers/Host/Network/Packet/PacketDownloadBuildScript.html" title="class in net.ME1312.SubServers.Host.Network.Packet">PacketDownloadBuildScript</a></dt>
+<dd>
+<div class="block">New PacketDownloadBuildScript (Out)</div>
+</dd>
+<dt><a href="net/ME1312/SubServers/Host/Network/Packet/PacketDownloadHostInfo.html" title="class in net.ME1312.SubServers.Host.Network.Packet"><span class="typeNameLink">PacketDownloadHostInfo</span></a> - Class in <a href="net/ME1312/SubServers/Host/Network/Packet/package-summary.html">net.ME1312.SubServers.Host.Network.Packet</a></dt>
+<dd>
+<div class="block">Download Host Info Packet</div>
+</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Network/Packet/PacketDownloadHostInfo.html#PacketDownloadHostInfo--">PacketDownloadHostInfo()</a></span> - Constructor for class net.ME1312.SubServers.Host.Network.Packet.<a href="net/ME1312/SubServers/Host/Network/Packet/PacketDownloadHostInfo.html" title="class in net.ME1312.SubServers.Host.Network.Packet">PacketDownloadHostInfo</a></dt>
+<dd>
+<div class="block">New PacketDownloadHostInfo (In)</div>
+</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Network/Packet/PacketDownloadHostInfo.html#PacketDownloadHostInfo-java.lang.String-net.ME1312.SubServers.Host.Library.JSONCallback...-">PacketDownloadHostInfo(String, JSONCallback...)</a></span> - Constructor for class net.ME1312.SubServers.Host.Network.Packet.<a href="net/ME1312/SubServers/Host/Network/Packet/PacketDownloadHostInfo.html" title="class in net.ME1312.SubServers.Host.Network.Packet">PacketDownloadHostInfo</a></dt>
+<dd>
+<div class="block">New PacketDownloadHostInfo (Out)</div>
+</dd>
 <dt><a href="net/ME1312/SubServers/Host/Network/Packet/PacketDownloadLang.html" title="class in net.ME1312.SubServers.Host.Network.Packet"><span class="typeNameLink">PacketDownloadLang</span></a> - Class in <a href="net/ME1312/SubServers/Host/Network/Packet/package-summary.html">net.ME1312.SubServers.Host.Network.Packet</a></dt>
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Network/Packet/PacketDownloadLang.html#PacketDownloadLang--">PacketDownloadLang()</a></span> - Constructor for class net.ME1312.SubServers.Host.Network.Packet.<a href="net/ME1312/SubServers/Host/Network/Packet/PacketDownloadLang.html" title="class in net.ME1312.SubServers.Host.Network.Packet">PacketDownloadLang</a></dt>
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Network/Packet/PacketDownloadLang.html#PacketDownloadLang-net.ME1312.SubServers.Host.SubServers-">PacketDownloadLang(SubServers)</a></span> - Constructor for class net.ME1312.SubServers.Host.Network.Packet.<a href="net/ME1312/SubServers/Host/Network/Packet/PacketDownloadLang.html" title="class in net.ME1312.SubServers.Host.Network.Packet">PacketDownloadLang</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="net/ME1312/SubServers/Host/Network/Packet/PacketDownloadPlayerList.html" title="class in net.ME1312.SubServers.Host.Network.Packet"><span class="typeNameLink">PacketDownloadPlayerList</span></a> - Class in <a href="net/ME1312/SubServers/Host/Network/Packet/package-summary.html">net.ME1312.SubServers.Host.Network.Packet</a></dt>
+<dd>
+<div class="block">Download Player List Packet</div>
+</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Network/Packet/PacketDownloadPlayerList.html#PacketDownloadPlayerList--">PacketDownloadPlayerList()</a></span> - Constructor for class net.ME1312.SubServers.Host.Network.Packet.<a href="net/ME1312/SubServers/Host/Network/Packet/PacketDownloadPlayerList.html" title="class in net.ME1312.SubServers.Host.Network.Packet">PacketDownloadPlayerList</a></dt>
+<dd>
+<div class="block">New PacketDownloadPlayerList (In)</div>
+</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Network/Packet/PacketDownloadPlayerList.html#PacketDownloadPlayerList-net.ME1312.SubServers.Host.Library.JSONCallback...-">PacketDownloadPlayerList(JSONCallback...)</a></span> - Constructor for class net.ME1312.SubServers.Host.Network.Packet.<a href="net/ME1312/SubServers/Host/Network/Packet/PacketDownloadPlayerList.html" title="class in net.ME1312.SubServers.Host.Network.Packet">PacketDownloadPlayerList</a></dt>
+<dd>
+<div class="block">New PacketDownloadPlayerList (Out)</div>
+</dd>
+<dt><a href="net/ME1312/SubServers/Host/Network/Packet/PacketDownloadServerInfo.html" title="class in net.ME1312.SubServers.Host.Network.Packet"><span class="typeNameLink">PacketDownloadServerInfo</span></a> - Class in <a href="net/ME1312/SubServers/Host/Network/Packet/package-summary.html">net.ME1312.SubServers.Host.Network.Packet</a></dt>
+<dd>
+<div class="block">Download Server Info Packet</div>
+</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Network/Packet/PacketDownloadServerInfo.html#PacketDownloadServerInfo--">PacketDownloadServerInfo()</a></span> - Constructor for class net.ME1312.SubServers.Host.Network.Packet.<a href="net/ME1312/SubServers/Host/Network/Packet/PacketDownloadServerInfo.html" title="class in net.ME1312.SubServers.Host.Network.Packet">PacketDownloadServerInfo</a></dt>
+<dd>
+<div class="block">New PacketDownloadServerInfo (In)</div>
+</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Network/Packet/PacketDownloadServerInfo.html#PacketDownloadServerInfo-java.lang.String-net.ME1312.SubServers.Host.Library.JSONCallback...-">PacketDownloadServerInfo(String, JSONCallback...)</a></span> - Constructor for class net.ME1312.SubServers.Host.Network.Packet.<a href="net/ME1312/SubServers/Host/Network/Packet/PacketDownloadServerInfo.html" title="class in net.ME1312.SubServers.Host.Network.Packet">PacketDownloadServerInfo</a></dt>
+<dd>
+<div class="block">New PacketDownloadServerInfo (Out)</div>
+</dd>
+<dt><a href="net/ME1312/SubServers/Host/Network/Packet/PacketDownloadServerList.html" title="class in net.ME1312.SubServers.Host.Network.Packet"><span class="typeNameLink">PacketDownloadServerList</span></a> - Class in <a href="net/ME1312/SubServers/Host/Network/Packet/package-summary.html">net.ME1312.SubServers.Host.Network.Packet</a></dt>
+<dd>
+<div class="block">Download Server List Packet</div>
+</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Network/Packet/PacketDownloadServerList.html#PacketDownloadServerList--">PacketDownloadServerList()</a></span> - Constructor for class net.ME1312.SubServers.Host.Network.Packet.<a href="net/ME1312/SubServers/Host/Network/Packet/PacketDownloadServerList.html" title="class in net.ME1312.SubServers.Host.Network.Packet">PacketDownloadServerList</a></dt>
+<dd>
+<div class="block">New PacketDownloadServerList (In)</div>
+</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Network/Packet/PacketDownloadServerList.html#PacketDownloadServerList-java.lang.String-net.ME1312.SubServers.Host.Library.JSONCallback...-">PacketDownloadServerList(String, JSONCallback...)</a></span> - Constructor for class net.ME1312.SubServers.Host.Network.Packet.<a href="net/ME1312/SubServers/Host/Network/Packet/PacketDownloadServerList.html" title="class in net.ME1312.SubServers.Host.Network.Packet">PacketDownloadServerList</a></dt>
+<dd>
+<div class="block">New PacketDownloadServerList (Out)</div>
+</dd>
+<dt><a href="net/ME1312/SubServers/Host/Network/Packet/PacketExAddServer.html" title="class in net.ME1312.SubServers.Host.Network.Packet"><span class="typeNameLink">PacketExAddServer</span></a> - Class in <a href="net/ME1312/SubServers/Host/Network/Packet/package-summary.html">net.ME1312.SubServers.Host.Network.Packet</a></dt>
+<dd>
+<div class="block">Create Server Packet</div>
+</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Network/Packet/PacketExAddServer.html#PacketExAddServer-net.ME1312.SubServers.Host.SubServers-">PacketExAddServer(SubServers)</a></span> - Constructor for class net.ME1312.SubServers.Host.Network.Packet.<a href="net/ME1312/SubServers/Host/Network/Packet/PacketExAddServer.html" title="class in net.ME1312.SubServers.Host.Network.Packet">PacketExAddServer</a></dt>
+<dd>
+<div class="block">New PacketExAddServer (In)</div>
+</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Network/Packet/PacketExAddServer.html#PacketExAddServer-int-java.lang.String-java.lang.String-">PacketExAddServer(int, String, String)</a></span> - Constructor for class net.ME1312.SubServers.Host.Network.Packet.<a href="net/ME1312/SubServers/Host/Network/Packet/PacketExAddServer.html" title="class in net.ME1312.SubServers.Host.Network.Packet">PacketExAddServer</a></dt>
+<dd>
+<div class="block">New PacketExAddServer (Out)</div>
+</dd>
+<dt><a href="net/ME1312/SubServers/Host/Network/Packet/PacketExConfigureHost.html" title="class in net.ME1312.SubServers.Host.Network.Packet"><span class="typeNameLink">PacketExConfigureHost</span></a> - Class in <a href="net/ME1312/SubServers/Host/Network/Packet/package-summary.html">net.ME1312.SubServers.Host.Network.Packet</a></dt>
+<dd>
+<div class="block">External Host Configuration Packet</div>
+</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Network/Packet/PacketExConfigureHost.html#PacketExConfigureHost-net.ME1312.SubServers.Host.SubServers-">PacketExConfigureHost(SubServers)</a></span> - Constructor for class net.ME1312.SubServers.Host.Network.Packet.<a href="net/ME1312/SubServers/Host/Network/Packet/PacketExConfigureHost.html" title="class in net.ME1312.SubServers.Host.Network.Packet">PacketExConfigureHost</a></dt>
+<dd>
+<div class="block">New PacketExConfigureHost</div>
+</dd>
+<dt><a href="net/ME1312/SubServers/Host/Network/Packet/PacketExCreateServer.html" title="class in net.ME1312.SubServers.Host.Network.Packet"><span class="typeNameLink">PacketExCreateServer</span></a> - Class in <a href="net/ME1312/SubServers/Host/Network/Packet/package-summary.html">net.ME1312.SubServers.Host.Network.Packet</a></dt>
+<dd>
+<div class="block">Create Server Packet</div>
+</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Network/Packet/PacketExCreateServer.html#PacketExCreateServer-net.ME1312.SubServers.Host.SubServers-">PacketExCreateServer(SubServers)</a></span> - Constructor for class net.ME1312.SubServers.Host.Network.Packet.<a href="net/ME1312/SubServers/Host/Network/Packet/PacketExCreateServer.html" title="class in net.ME1312.SubServers.Host.Network.Packet">PacketExCreateServer</a></dt>
+<dd>
+<div class="block">New PacketExCreateServer (In)</div>
+</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Network/Packet/PacketExCreateServer.html#PacketExCreateServer-int-java.lang.String-org.json.JSONObject-java.lang.String-">PacketExCreateServer(int, String, JSONObject, String)</a></span> - Constructor for class net.ME1312.SubServers.Host.Network.Packet.<a href="net/ME1312/SubServers/Host/Network/Packet/PacketExCreateServer.html" title="class in net.ME1312.SubServers.Host.Network.Packet">PacketExCreateServer</a></dt>
+<dd>
+<div class="block">New PacketCreateServer (Out)</div>
+</dd>
+<dt><a href="net/ME1312/SubServers/Host/Network/Packet/PacketExRemoveServer.html" title="class in net.ME1312.SubServers.Host.Network.Packet"><span class="typeNameLink">PacketExRemoveServer</span></a> - Class in <a href="net/ME1312/SubServers/Host/Network/Packet/package-summary.html">net.ME1312.SubServers.Host.Network.Packet</a></dt>
+<dd>
+<div class="block">Create Server Packet</div>
+</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Network/Packet/PacketExRemoveServer.html#PacketExRemoveServer-net.ME1312.SubServers.Host.SubServers-">PacketExRemoveServer(SubServers)</a></span> - Constructor for class net.ME1312.SubServers.Host.Network.Packet.<a href="net/ME1312/SubServers/Host/Network/Packet/PacketExRemoveServer.html" title="class in net.ME1312.SubServers.Host.Network.Packet">PacketExRemoveServer</a></dt>
+<dd>
+<div class="block">New PacketExRemoveServer (In)</div>
+</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Network/Packet/PacketExRemoveServer.html#PacketExRemoveServer-int-java.lang.String-java.lang.String-">PacketExRemoveServer(int, String, String)</a></span> - Constructor for class net.ME1312.SubServers.Host.Network.Packet.<a href="net/ME1312/SubServers/Host/Network/Packet/PacketExRemoveServer.html" title="class in net.ME1312.SubServers.Host.Network.Packet">PacketExRemoveServer</a></dt>
+<dd>
+<div class="block">New PacketExRemoveServer (Out)</div>
+</dd>
+<dt><a href="net/ME1312/SubServers/Host/Network/Packet/PacketExUpdateServer.html" title="class in net.ME1312.SubServers.Host.Network.Packet"><span class="typeNameLink">PacketExUpdateServer</span></a> - Class in <a href="net/ME1312/SubServers/Host/Network/Packet/package-summary.html">net.ME1312.SubServers.Host.Network.Packet</a></dt>
+<dd>
+<div class="block">Update Server Packet</div>
+</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Network/Packet/PacketExUpdateServer.html#PacketExUpdateServer-net.ME1312.SubServers.Host.SubServers-">PacketExUpdateServer(SubServers)</a></span> - Constructor for class net.ME1312.SubServers.Host.Network.Packet.<a href="net/ME1312/SubServers/Host/Network/Packet/PacketExUpdateServer.html" title="class in net.ME1312.SubServers.Host.Network.Packet">PacketExUpdateServer</a></dt>
+<dd>
+<div class="block">New PacketExUpdateServer (In)</div>
+</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Network/Packet/PacketExUpdateServer.html#PacketExUpdateServer-net.ME1312.SubServers.Host.Executable.SubServer-net.ME1312.SubServers.Host.Network.Packet.PacketExUpdateServer.UpdateType-java.lang.Object...-">PacketExUpdateServer(SubServer, PacketExUpdateServer.UpdateType, Object...)</a></span> - Constructor for class net.ME1312.SubServers.Host.Network.Packet.<a href="net/ME1312/SubServers/Host/Network/Packet/PacketExUpdateServer.html" title="class in net.ME1312.SubServers.Host.Network.Packet">PacketExUpdateServer</a></dt>
+<dd>
+<div class="block">New PacketExUpdateServer (Out)</div>
+</dd>
+<dt><a href="net/ME1312/SubServers/Host/Network/Packet/PacketExUpdateServer.UpdateType.html" title="enum in net.ME1312.SubServers.Host.Network.Packet"><span class="typeNameLink">PacketExUpdateServer.UpdateType</span></a> - Enum in <a href="net/ME1312/SubServers/Host/Network/Packet/package-summary.html">net.ME1312.SubServers.Host.Network.Packet</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="net/ME1312/SubServers/Host/Network/PacketIn.html" title="interface in net.ME1312.SubServers.Host.Network"><span class="typeNameLink">PacketIn</span></a> - Interface in <a href="net/ME1312/SubServers/Host/Network/package-summary.html">net.ME1312.SubServers.Host.Network</a></dt>
 <dd>
 <div class="block">PacketIn Layout Class</div>
 </dd>
+<dt><a href="net/ME1312/SubServers/Host/Network/Packet/PacketInRunEvent.html" title="class in net.ME1312.SubServers.Host.Network.Packet"><span class="typeNameLink">PacketInRunEvent</span></a> - Class in <a href="net/ME1312/SubServers/Host/Network/Packet/package-summary.html">net.ME1312.SubServers.Host.Network.Packet</a></dt>
+<dd>
+<div class="block">Run Event Packet</div>
+</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Network/Packet/PacketInRunEvent.html#PacketInRunEvent--">PacketInRunEvent()</a></span> - Constructor for class net.ME1312.SubServers.Host.Network.Packet.<a href="net/ME1312/SubServers/Host/Network/Packet/PacketInRunEvent.html" title="class in net.ME1312.SubServers.Host.Network.Packet">PacketInRunEvent</a></dt>
+<dd>
+<div class="block">New PacketInRunEvent</div>
+</dd>
+<dt><a href="net/ME1312/SubServers/Host/Network/Packet/PacketLinkExHost.html" title="class in net.ME1312.SubServers.Host.Network.Packet"><span class="typeNameLink">PacketLinkExHost</span></a> - Class in <a href="net/ME1312/SubServers/Host/Network/Packet/package-summary.html">net.ME1312.SubServers.Host.Network.Packet</a></dt>
+<dd>
+<div class="block">Link Host Packet</div>
+</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Network/Packet/PacketLinkExHost.html#PacketLinkExHost-net.ME1312.SubServers.Host.SubServers-">PacketLinkExHost(SubServers)</a></span> - Constructor for class net.ME1312.SubServers.Host.Network.Packet.<a href="net/ME1312/SubServers/Host/Network/Packet/PacketLinkExHost.html" title="class in net.ME1312.SubServers.Host.Network.Packet">PacketLinkExHost</a></dt>
+<dd>
+<div class="block">New PacketLinkHost</div>
+</dd>
 <dt><a href="net/ME1312/SubServers/Host/Network/PacketOut.html" title="interface in net.ME1312.SubServers.Host.Network"><span class="typeNameLink">PacketOut</span></a> - Interface in <a href="net/ME1312/SubServers/Host/Network/package-summary.html">net.ME1312.SubServers.Host.Network</a></dt>
 <dd>
 <div class="block">PacketOut Layout Class</div>
+</dd>
+<dt><a href="net/ME1312/SubServers/Host/Network/Packet/PacketOutExLogMessage.html" title="class in net.ME1312.SubServers.Host.Network.Packet"><span class="typeNameLink">PacketOutExLogMessage</span></a> - Class in <a href="net/ME1312/SubServers/Host/Network/Packet/package-summary.html">net.ME1312.SubServers.Host.Network.Packet</a></dt>
+<dd>
+<div class="block">Message Log External Host Packet</div>
+</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Network/Packet/PacketOutExLogMessage.html#PacketOutExLogMessage-java.util.UUID-java.lang.String-">PacketOutExLogMessage(UUID, String)</a></span> - Constructor for class net.ME1312.SubServers.Host.Network.Packet.<a href="net/ME1312/SubServers/Host/Network/Packet/PacketOutExLogMessage.html" title="class in net.ME1312.SubServers.Host.Network.Packet">PacketOutExLogMessage</a></dt>
+<dd>
+<div class="block">New PacketInExLogMessage (Out)</div>
+</dd>
+<dt><a href="net/ME1312/SubServers/Host/Network/Packet/PacketOutExRequestQueue.html" title="class in net.ME1312.SubServers.Host.Network.Packet"><span class="typeNameLink">PacketOutExRequestQueue</span></a> - Class in <a href="net/ME1312/SubServers/Host/Network/Packet/package-summary.html">net.ME1312.SubServers.Host.Network.Packet</a></dt>
+<dd>
+<div class="block">Queue Request Packet</div>
+</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Network/Packet/PacketOutExRequestQueue.html#PacketOutExRequestQueue--">PacketOutExRequestQueue()</a></span> - Constructor for class net.ME1312.SubServers.Host.Network.Packet.<a href="net/ME1312/SubServers/Host/Network/Packet/PacketOutExRequestQueue.html" title="class in net.ME1312.SubServers.Host.Network.Packet">PacketOutExRequestQueue</a></dt>
+<dd>
+<div class="block">New PacketOutExRequestQueue</div>
+</dd>
+<dt><a href="net/ME1312/SubServers/Host/Network/Packet/PacketStartServer.html" title="class in net.ME1312.SubServers.Host.Network.Packet"><span class="typeNameLink">PacketStartServer</span></a> - Class in <a href="net/ME1312/SubServers/Host/Network/Packet/package-summary.html">net.ME1312.SubServers.Host.Network.Packet</a></dt>
+<dd>
+<div class="block">Start Server Packet</div>
+</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Network/Packet/PacketStartServer.html#PacketStartServer--">PacketStartServer()</a></span> - Constructor for class net.ME1312.SubServers.Host.Network.Packet.<a href="net/ME1312/SubServers/Host/Network/Packet/PacketStartServer.html" title="class in net.ME1312.SubServers.Host.Network.Packet">PacketStartServer</a></dt>
+<dd>
+<div class="block">New PacketStartServer (In)</div>
+</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Network/Packet/PacketStartServer.html#PacketStartServer-java.util.UUID-java.lang.String-net.ME1312.SubServers.Host.Library.JSONCallback...-">PacketStartServer(UUID, String, JSONCallback...)</a></span> - Constructor for class net.ME1312.SubServers.Host.Network.Packet.<a href="net/ME1312/SubServers/Host/Network/Packet/PacketStartServer.html" title="class in net.ME1312.SubServers.Host.Network.Packet">PacketStartServer</a></dt>
+<dd>
+<div class="block">New PacketStartServer (Out)</div>
+</dd>
+<dt><a href="net/ME1312/SubServers/Host/Network/Packet/PacketStopServer.html" title="class in net.ME1312.SubServers.Host.Network.Packet"><span class="typeNameLink">PacketStopServer</span></a> - Class in <a href="net/ME1312/SubServers/Host/Network/Packet/package-summary.html">net.ME1312.SubServers.Host.Network.Packet</a></dt>
+<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Network/Packet/PacketStopServer.html#PacketStopServer--">PacketStopServer()</a></span> - Constructor for class net.ME1312.SubServers.Host.Network.Packet.<a href="net/ME1312/SubServers/Host/Network/Packet/PacketStopServer.html" title="class in net.ME1312.SubServers.Host.Network.Packet">PacketStopServer</a></dt>
+<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Network/Packet/PacketStopServer.html#PacketStopServer-java.util.UUID-java.lang.String-boolean-net.ME1312.SubServers.Host.Library.JSONCallback...-">PacketStopServer(UUID, String, boolean, JSONCallback...)</a></span> - Constructor for class net.ME1312.SubServers.Host.Network.Packet.<a href="net/ME1312/SubServers/Host/Network/Packet/PacketStopServer.html" title="class in net.ME1312.SubServers.Host.Network.Packet">PacketStopServer</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="net/ME1312/SubServers/Host/Network/Packet/PacketTeleportPlayer.html" title="class in net.ME1312.SubServers.Host.Network.Packet"><span class="typeNameLink">PacketTeleportPlayer</span></a> - Class in <a href="net/ME1312/SubServers/Host/Network/Packet/package-summary.html">net.ME1312.SubServers.Host.Network.Packet</a></dt>
+<dd>
+<div class="block">Teleport Player Packet</div>
+</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Network/Packet/PacketTeleportPlayer.html#PacketTeleportPlayer--">PacketTeleportPlayer()</a></span> - Constructor for class net.ME1312.SubServers.Host.Network.Packet.<a href="net/ME1312/SubServers/Host/Network/Packet/PacketTeleportPlayer.html" title="class in net.ME1312.SubServers.Host.Network.Packet">PacketTeleportPlayer</a></dt>
+<dd>
+<div class="block">New PacketTeleportPlayer (In)</div>
+</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Network/Packet/PacketTeleportPlayer.html#PacketTeleportPlayer-java.util.UUID-java.lang.String-net.ME1312.SubServers.Host.Library.JSONCallback...-">PacketTeleportPlayer(UUID, String, JSONCallback...)</a></span> - Constructor for class net.ME1312.SubServers.Host.Network.Packet.<a href="net/ME1312/SubServers/Host/Network/Packet/PacketTeleportPlayer.html" title="class in net.ME1312.SubServers.Host.Network.Packet">PacketTeleportPlayer</a></dt>
+<dd>
+<div class="block">New PacketTeleportPlayer (Out)</div>
 </dd>
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/API/Command.html#plugin--">plugin()</a></span> - Method in class net.ME1312.SubServers.Host.API.<a href="net/ME1312/SubServers/Host/API/Command.html" title="class in net.ME1312.SubServers.Host.API">Command</a></dt>
 <dd>
@@ -1112,6 +1518,8 @@
 </dd>
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Library/Util.ExceptionRunnable.html#run--">run()</a></span> - Method in interface net.ME1312.SubServers.Host.Library.<a href="net/ME1312/SubServers/Host/Library/Util.ExceptionRunnable.html" title="interface in net.ME1312.SubServers.Host.Library">Util.ExceptionRunnable</a></dt>
 <dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Library/Util.ReturnRunnable.html#run--">run()</a></span> - Method in interface net.ME1312.SubServers.Host.Library.<a href="net/ME1312/SubServers/Host/Library/Util.ReturnRunnable.html" title="interface in net.ME1312.SubServers.Host.Library">Util.ReturnRunnable</a></dt>
+<dd>&nbsp;</dd>
 </dl>
 <a name="I:S">
 <!--   -->
@@ -1146,6 +1554,8 @@
 <dd>
 <div class="block">Send Packet to Client</div>
 </dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/SubServers.html#servers">servers</a></span> - Variable in class net.ME1312.SubServers.Host.<a href="net/ME1312/SubServers/Host/SubServers.html" title="class in net.ME1312.SubServers.Host">SubServers</a></dt>
+<dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Library/Config/YAMLConfig.html#set-net.ME1312.SubServers.Host.Library.Config.YAMLSection-">set(YAMLSection)</a></span> - Method in class net.ME1312.SubServers.Host.Library.Config.<a href="net/ME1312/SubServers/Host/Library/Config/YAMLConfig.html" title="class in net.ME1312.SubServers.Host.Library.Config">YAMLConfig</a></dt>
 <dd>
 <div class="block">Set Config Contents</div>
@@ -1180,6 +1590,10 @@
 <dd>
 <div class="block">Sets if the Plugin is Enabled</div>
 </dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Executable/SubServer.html#setEnabled-boolean-">setEnabled(boolean)</a></span> - Method in class net.ME1312.SubServers.Host.Executable.<a href="net/ME1312/SubServers/Host/Executable/SubServer.html" title="class in net.ME1312.SubServers.Host.Executable">SubServer</a></dt>
+<dd>
+<div class="block">Set if the Server is Enabled</div>
+</dd>
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/API/Event/SubDisableEvent.html#setExitCode-int-">setExitCode(int)</a></span> - Method in class net.ME1312.SubServers.Host.API.Event.<a href="net/ME1312/SubServers/Host/API/Event/SubDisableEvent.html" title="class in net.ME1312.SubServers.Host.API.Event">SubDisableEvent</a></dt>
 <dd>
 <div class="block">Set the Exit Code</div>
@@ -1188,12 +1602,36 @@
 <dd>
 <div class="block">Replace this Plugin's Logger with a custom one</div>
 </dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Executable/SubServer.html#setLogging-boolean-">setLogging(boolean)</a></span> - Method in class net.ME1312.SubServers.Host.Executable.<a href="net/ME1312/SubServers/Host/Executable/SubServer.html" title="class in net.ME1312.SubServers.Host.Executable">SubServer</a></dt>
+<dd>
+<div class="block">Set if the Server is Logging</div>
+</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Executable/SubServer.html#setStopCommand-java.lang.String-">setStopCommand(String)</a></span> - Method in class net.ME1312.SubServers.Host.Executable.<a href="net/ME1312/SubServers/Host/Executable/SubServer.html" title="class in net.ME1312.SubServers.Host.Executable">SubServer</a></dt>
+<dd>
+<div class="block">Set the Command that Stops the Server</div>
+</dd>
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Library/Log/Logger.html#setup-java.io.PrintStream-java.io.PrintStream-java.io.File-">setup(PrintStream, PrintStream, File)</a></span> - Static method in class net.ME1312.SubServers.Host.Library.Log.<a href="net/ME1312/SubServers/Host/Library/Log/Logger.html" title="class in net.ME1312.SubServers.Host.Library.Log">Logger</a></dt>
 <dd>
 <div class="block">Setup the SubServers Log System</div>
 </dd>
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Library/Log/Logger.html#severe">severe</a></span> - Variable in class net.ME1312.SubServers.Host.Library.Log.<a href="net/ME1312/SubServers/Host/Library/Log/Logger.html" title="class in net.ME1312.SubServers.Host.Library.Log">Logger</a></dt>
 <dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Executable/SubLogger.html#start--">start()</a></span> - Method in class net.ME1312.SubServers.Host.Executable.<a href="net/ME1312/SubServers/Host/Executable/SubLogger.html" title="class in net.ME1312.SubServers.Host.Executable">SubLogger</a></dt>
+<dd>
+<div class="block">Start Logger</div>
+</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Executable/SubServer.html#start-java.util.UUID-">start(UUID)</a></span> - Method in class net.ME1312.SubServers.Host.Executable.<a href="net/ME1312/SubServers/Host/Executable/SubServer.html" title="class in net.ME1312.SubServers.Host.Executable">SubServer</a></dt>
+<dd>
+<div class="block">Starts the Server</div>
+</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Executable/SubLogger.html#stop--">stop()</a></span> - Method in class net.ME1312.SubServers.Host.Executable.<a href="net/ME1312/SubServers/Host/Executable/SubLogger.html" title="class in net.ME1312.SubServers.Host.Executable">SubLogger</a></dt>
+<dd>
+<div class="block">Stop Logger</div>
+</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Executable/SubServer.html#stop--">stop()</a></span> - Method in class net.ME1312.SubServers.Host.Executable.<a href="net/ME1312/SubServers/Host/Executable/SubServer.html" title="class in net.ME1312.SubServers.Host.Executable">SubServer</a></dt>
+<dd>
+<div class="block">Stops the Server</div>
+</dd>
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/SubServers.html#stop-int-">stop(int)</a></span> - Method in class net.ME1312.SubServers.Host.<a href="net/ME1312/SubServers/Host/SubServers.html" title="class in net.ME1312.SubServers.Host">SubServers</a></dt>
 <dd>
 <div class="block">Stop SubServers.Host</div>
@@ -1202,6 +1640,16 @@
 <dd>
 <div class="block">SubAPI Class</div>
 </dd>
+<dt><a href="net/ME1312/SubServers/Host/Executable/SubCreator.html" title="class in net.ME1312.SubServers.Host.Executable"><span class="typeNameLink">SubCreator</span></a> - Class in <a href="net/ME1312/SubServers/Host/Executable/package-summary.html">net.ME1312.SubServers.Host.Executable</a></dt>
+<dd>
+<div class="block">Internal SubCreator Class</div>
+</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Executable/SubCreator.html#SubCreator-net.ME1312.SubServers.Host.SubServers-">SubCreator(SubServers)</a></span> - Constructor for class net.ME1312.SubServers.Host.Executable.<a href="net/ME1312/SubServers/Host/Executable/SubCreator.html" title="class in net.ME1312.SubServers.Host.Executable">SubCreator</a></dt>
+<dd>
+<div class="block">Creates a SubCreator Instance</div>
+</dd>
+<dt><a href="net/ME1312/SubServers/Host/Executable/SubCreator.ServerType.html" title="enum in net.ME1312.SubServers.Host.Executable"><span class="typeNameLink">SubCreator.ServerType</span></a> - Enum in <a href="net/ME1312/SubServers/Host/Executable/package-summary.html">net.ME1312.SubServers.Host.Executable</a></dt>
+<dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/SubServers.html#subdata">subdata</a></span> - Variable in class net.ME1312.SubServers.Host.<a href="net/ME1312/SubServers/Host/SubServers.html" title="class in net.ME1312.SubServers.Host">SubServers</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="net/ME1312/SubServers/Host/Network/SubDataClient.html" title="class in net.ME1312.SubServers.Host.Network"><span class="typeNameLink">SubDataClient</span></a> - Class in <a href="net/ME1312/SubServers/Host/Network/package-summary.html">net.ME1312.SubServers.Host.Network</a></dt>
@@ -1228,6 +1676,10 @@
 <dd>
 <div class="block">SubServers.Host Enable Event</div>
 </dd>
+<dt><a href="net/ME1312/SubServers/Host/Executable/SubLogger.html" title="class in net.ME1312.SubServers.Host.Executable"><span class="typeNameLink">SubLogger</span></a> - Class in <a href="net/ME1312/SubServers/Host/Executable/package-summary.html">net.ME1312.SubServers.Host.Executable</a></dt>
+<dd>
+<div class="block">Internal Process Logger Class</div>
+</dd>
 <dt><a href="net/ME1312/SubServers/Host/API/SubPlugin.html" title="annotation in net.ME1312.SubServers.Host.API"><span class="typeNameLink">SubPlugin</span></a> - Annotation Type in <a href="net/ME1312/SubServers/Host/API/package-summary.html">net.ME1312.SubServers.Host.API</a></dt>
 <dd>
 <div class="block">SubPlugin Class Annotation<br>
@@ -1240,6 +1692,14 @@
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/API/SubPluginInfo.html#SubPluginInfo-net.ME1312.SubServers.Host.SubServers-java.lang.Object-java.lang.String-net.ME1312.SubServers.Host.Library.Version.Version-java.util.List-java.lang.String-java.net.URL-java.util.List-java.util.List-java.util.List-">SubPluginInfo(SubServers, Object, String, Version, List&lt;String&gt;, String, URL, List&lt;String&gt;, List&lt;String&gt;, List&lt;String&gt;)</a></span> - Constructor for class net.ME1312.SubServers.Host.API.<a href="net/ME1312/SubServers/Host/API/SubPluginInfo.html" title="class in net.ME1312.SubServers.Host.API">SubPluginInfo</a></dt>
 <dd>
 <div class="block">Create a SubPlugin Description</div>
+</dd>
+<dt><a href="net/ME1312/SubServers/Host/Executable/SubServer.html" title="class in net.ME1312.SubServers.Host.Executable"><span class="typeNameLink">SubServer</span></a> - Class in <a href="net/ME1312/SubServers/Host/Executable/package-summary.html">net.ME1312.SubServers.Host.Executable</a></dt>
+<dd>
+<div class="block">Internal SubServer Class</div>
+</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Executable/SubServer.html#SubServer-net.ME1312.SubServers.Host.SubServers-java.lang.String-boolean-boolean-java.lang.String-net.ME1312.SubServers.Host.Executable.Executable-java.lang.String-">SubServer(SubServers, String, boolean, boolean, String, Executable, String)</a></span> - Constructor for class net.ME1312.SubServers.Host.Executable.<a href="net/ME1312/SubServers/Host/Executable/SubServer.html" title="class in net.ME1312.SubServers.Host.Executable">SubServer</a></dt>
+<dd>
+<div class="block">Creates a SubServer</div>
 </dd>
 <dt><a href="net/ME1312/SubServers/Host/SubServers.html" title="class in net.ME1312.SubServers.Host"><span class="typeNameLink">SubServers</span></a> - Class in <a href="net/ME1312/SubServers/Host/package-summary.html">net.ME1312.SubServers.Host</a></dt>
 <dd>
@@ -1267,6 +1727,16 @@
 </a>
 <h2 class="title">T</h2>
 <dl>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Executable/SubCreator.html#terminate--">terminate()</a></span> - Method in class net.ME1312.SubServers.Host.Executable.<a href="net/ME1312/SubServers/Host/Executable/SubCreator.html" title="class in net.ME1312.SubServers.Host.Executable">SubCreator</a></dt>
+<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Executable/SubServer.html#terminate--">terminate()</a></span> - Method in class net.ME1312.SubServers.Host.Executable.<a href="net/ME1312/SubServers/Host/Executable/SubServer.html" title="class in net.ME1312.SubServers.Host.Executable">SubServer</a></dt>
+<dd>
+<div class="block">Terminates the Server</div>
+</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Executable/Executable.html#toFile--">toFile()</a></span> - Method in class net.ME1312.SubServers.Host.Executable.<a href="net/ME1312/SubServers/Host/Executable/Executable.html" title="class in net.ME1312.SubServers.Host.Executable">Executable</a></dt>
+<dd>
+<div class="block">Get Executable File</div>
+</dd>
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Library/Config/YAMLConfig.html#toJSON--">toJSON()</a></span> - Method in class net.ME1312.SubServers.Host.Library.Config.<a href="net/ME1312/SubServers/Host/Library/Config/YAMLConfig.html" title="class in net.ME1312.SubServers.Host.Library.Config">YAMLConfig</a></dt>
 <dd>
 <div class="block">Converts Config Contents to JSON</div>
@@ -1275,6 +1745,10 @@
 <dd>
 <div class="block">Convert to JSON</div>
 </dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Executable/Executable.html#toString--">toString()</a></span> - Method in class net.ME1312.SubServers.Host.Executable.<a href="net/ME1312/SubServers/Host/Executable/Executable.html" title="class in net.ME1312.SubServers.Host.Executable">Executable</a></dt>
+<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Executable/SubCreator.ServerType.html#toString--">toString()</a></span> - Method in enum net.ME1312.SubServers.Host.Executable.<a href="net/ME1312/SubServers/Host/Executable/SubCreator.ServerType.html" title="enum in net.ME1312.SubServers.Host.Executable">SubCreator.ServerType</a></dt>
+<dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Library/Config/YAMLConfig.html#toString--">toString()</a></span> - Method in class net.ME1312.SubServers.Host.Library.Config.<a href="net/ME1312/SubServers/Host/Library/Config/YAMLConfig.html" title="class in net.ME1312.SubServers.Host.Library.Config">YAMLConfig</a></dt>
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Library/Config/YAMLSection.html#toString--">toString()</a></span> - Method in class net.ME1312.SubServers.Host.Library.Config.<a href="net/ME1312/SubServers/Host/Library/Config/YAMLSection.html" title="class in net.ME1312.SubServers.Host.Library.Config">YAMLSection</a></dt>
@@ -1284,6 +1758,8 @@
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Library/Event/Event.html#toString--">toString()</a></span> - Method in class net.ME1312.SubServers.Host.Library.Event.<a href="net/ME1312/SubServers/Host/Library/Event/Event.html" title="class in net.ME1312.SubServers.Host.Library.Event">Event</a></dt>
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Library/Version/Version.html#toString--">toString()</a></span> - Method in class net.ME1312.SubServers.Host.Library.Version.<a href="net/ME1312/SubServers/Host/Library/Version/Version.html" title="class in net.ME1312.SubServers.Host.Library.Version">Version</a></dt>
+<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Network/Packet/PacketCreateServer.ServerType.html#toString--">toString()</a></span> - Method in enum net.ME1312.SubServers.Host.Network.Packet.<a href="net/ME1312/SubServers/Host/Network/Packet/PacketCreateServer.ServerType.html" title="enum in net.ME1312.SubServers.Host.Network.Packet">PacketCreateServer.ServerType</a></dt>
 <dd>&nbsp;</dd>
 </dl>
 <a name="I:U">
@@ -1341,17 +1817,46 @@
 </dd>
 <dt><a href="net/ME1312/SubServers/Host/Library/Util.ExceptionRunnable.html" title="interface in net.ME1312.SubServers.Host.Library"><span class="typeNameLink">Util.ExceptionRunnable</span></a> - Interface in <a href="net/ME1312/SubServers/Host/Library/package-summary.html">net.ME1312.SubServers.Host.Library</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="net/ME1312/SubServers/Host/Library/Util.ReturnRunnable.html" title="interface in net.ME1312.SubServers.Host.Library"><span class="typeNameLink">Util.ReturnRunnable</span></a>&lt;<a href="net/ME1312/SubServers/Host/Library/Util.ReturnRunnable.html" title="type parameter in Util.ReturnRunnable">R</a>&gt; - Interface in <a href="net/ME1312/SubServers/Host/Library/package-summary.html">net.ME1312.SubServers.Host.Library</a></dt>
+<dd>&nbsp;</dd>
 </dl>
 <a name="I:V">
 <!--   -->
 </a>
 <h2 class="title">V</h2>
 <dl>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Executable/SubCreator.ServerType.html#valueOf-java.lang.String-">valueOf(String)</a></span> - Static method in enum net.ME1312.SubServers.Host.Executable.<a href="net/ME1312/SubServers/Host/Executable/SubCreator.ServerType.html" title="enum in net.ME1312.SubServers.Host.Executable">SubCreator.ServerType</a></dt>
+<dd>
+<div class="block">Returns the enum constant of this type with the specified name.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Library/Event/EventPriority.html#valueOf-java.lang.String-">valueOf(String)</a></span> - Static method in enum net.ME1312.SubServers.Host.Library.Event.<a href="net/ME1312/SubServers/Host/Library/Event/EventPriority.html" title="enum in net.ME1312.SubServers.Host.Library.Event">EventPriority</a></dt>
 <dd>
 <div class="block">Returns the enum constant of this type with the specified name.</div>
 </dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Network/Packet/PacketCreateServer.ServerType.html#valueOf-java.lang.String-">valueOf(String)</a></span> - Static method in enum net.ME1312.SubServers.Host.Network.Packet.<a href="net/ME1312/SubServers/Host/Network/Packet/PacketCreateServer.ServerType.html" title="enum in net.ME1312.SubServers.Host.Network.Packet">PacketCreateServer.ServerType</a></dt>
+<dd>
+<div class="block">Returns the enum constant of this type with the specified name.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Network/Packet/PacketExUpdateServer.UpdateType.html#valueOf-java.lang.String-">valueOf(String)</a></span> - Static method in enum net.ME1312.SubServers.Host.Network.Packet.<a href="net/ME1312/SubServers/Host/Network/Packet/PacketExUpdateServer.UpdateType.html" title="enum in net.ME1312.SubServers.Host.Network.Packet">PacketExUpdateServer.UpdateType</a></dt>
+<dd>
+<div class="block">Returns the enum constant of this type with the specified name.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Executable/SubCreator.ServerType.html#values--">values()</a></span> - Static method in enum net.ME1312.SubServers.Host.Executable.<a href="net/ME1312/SubServers/Host/Executable/SubCreator.ServerType.html" title="enum in net.ME1312.SubServers.Host.Executable">SubCreator.ServerType</a></dt>
+<dd>
+<div class="block">Returns an array containing the constants of this enum type, in
+the order they are declared.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Library/Event/EventPriority.html#values--">values()</a></span> - Static method in enum net.ME1312.SubServers.Host.Library.Event.<a href="net/ME1312/SubServers/Host/Library/Event/EventPriority.html" title="enum in net.ME1312.SubServers.Host.Library.Event">EventPriority</a></dt>
+<dd>
+<div class="block">Returns an array containing the constants of this enum type, in
+the order they are declared.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Network/Packet/PacketCreateServer.ServerType.html#values--">values()</a></span> - Static method in enum net.ME1312.SubServers.Host.Network.Packet.<a href="net/ME1312/SubServers/Host/Network/Packet/PacketCreateServer.ServerType.html" title="enum in net.ME1312.SubServers.Host.Network.Packet">PacketCreateServer.ServerType</a></dt>
+<dd>
+<div class="block">Returns an array containing the constants of this enum type, in
+the order they are declared.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Network/Packet/PacketExUpdateServer.UpdateType.html#values--">values()</a></span> - Static method in enum net.ME1312.SubServers.Host.Network.Packet.<a href="net/ME1312/SubServers/Host/Network/Packet/PacketExUpdateServer.UpdateType.html" title="enum in net.ME1312.SubServers.Host.Network.Packet">PacketExUpdateServer.UpdateType</a></dt>
 <dd>
 <div class="block">Returns an array containing the constants of this enum type, in
 the order they are declared.</div>
@@ -1378,6 +1883,12 @@ the order they are declared.</div>
 </a>
 <h2 class="title">W</h2>
 <dl>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Executable/SubCreator.html#waitFor--">waitFor()</a></span> - Method in class net.ME1312.SubServers.Host.Executable.<a href="net/ME1312/SubServers/Host/Executable/SubCreator.html" title="class in net.ME1312.SubServers.Host.Executable">SubCreator</a></dt>
+<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Executable/SubServer.html#waitFor--">waitFor()</a></span> - Method in class net.ME1312.SubServers.Host.Executable.<a href="net/ME1312/SubServers/Host/Executable/SubServer.html" title="class in net.ME1312.SubServers.Host.Executable">SubServer</a></dt>
+<dd>
+<div class="block">Waits for the Server to Stop</div>
+</dd>
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Library/Log/Logger.html#warn">warn</a></span> - Variable in class net.ME1312.SubServers.Host.Library.Log.<a href="net/ME1312/SubServers/Host/Library/Log/Logger.html" title="class in net.ME1312.SubServers.Host.Library.Log">Logger</a></dt>
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Library/Log/FileLogger.html#write-int-">write(int)</a></span> - Method in class net.ME1312.SubServers.Host.Library.Log.<a href="net/ME1312/SubServers/Host/Library/Log/FileLogger.html" title="class in net.ME1312.SubServers.Host.Library.Log">FileLogger</a></dt>

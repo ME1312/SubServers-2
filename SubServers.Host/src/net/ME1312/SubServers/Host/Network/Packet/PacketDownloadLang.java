@@ -17,7 +17,7 @@ public class PacketDownloadLang implements PacketIn, PacketOut {
     private SubServers host;
     private Logger log = null;
 
-    public PacketDownloadLang() {};
+    public PacketDownloadLang() {}
 
     public PacketDownloadLang(SubServers host) {
         if (Util.isNull(host)) throw new NullPointerException();

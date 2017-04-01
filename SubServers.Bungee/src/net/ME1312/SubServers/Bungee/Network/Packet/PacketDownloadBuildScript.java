@@ -51,7 +51,7 @@ public class PacketDownloadBuildScript implements PacketIn, PacketOut {
                 list.add(line);
             }
             script.close();
-            json.put("Script", list);
+            json.put("script", list);
         } catch (Exception e) {
             e.printStackTrace();
         }

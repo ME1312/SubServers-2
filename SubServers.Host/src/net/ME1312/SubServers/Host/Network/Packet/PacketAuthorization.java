@@ -12,10 +12,18 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.lang.reflect.Field;
 
+/**
+ * Authorization Packet
+ */
 public final class PacketAuthorization implements PacketIn, PacketOut {
     private SubServers host;
     private Logger log = null;
 
+    /**
+     * New PacketAuthorization
+     *
+     * @param host SubServers.Host
+     */
     public PacketAuthorization(SubServers host) {
         if (Util.isNull(host)) throw new NullPointerException();
         this.host = host;
@@ -38,8 +46,9 @@ public final class PacketAuthorization implements PacketIn, PacketOut {
     public void execute(JSONObject data) {
         try {
             if (data.getInt("r") == 0) {
-                //host.subdata.sendPacket(new PacketLinkServer(host));
+                host.subdata.sendPacket(new PacketLinkExHost(host));
                 host.subdata.sendPacket(new PacketDownloadLang());
+                host.subdata.sendPacket(new PacketOutExRequestQueue());
             } else {
                 log.info.println("SubServers > Could not authorize SubData connection: " + data.getString("m"));
                 host.subdata.destroy(false);

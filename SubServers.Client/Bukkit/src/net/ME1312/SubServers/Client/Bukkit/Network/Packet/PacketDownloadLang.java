@@ -11,11 +11,22 @@ import org.json.JSONObject;
 
 import java.util.Calendar;
 
+/**
+ * Download Lang Packet
+ */
 public class PacketDownloadLang implements PacketIn, PacketOut {
     private SubPlugin plugin;
 
-    public PacketDownloadLang() {};
+    /**
+     * New PacketDownloadLang (In)
+     */
+    public PacketDownloadLang() {}
 
+    /**
+     * New PacketDownloadLang (Out)
+     *
+     * @param plugin SubServers.Client
+     */
     public PacketDownloadLang(SubPlugin plugin) {
         if (Util.isNull(plugin)) throw new NullPointerException();
         this.plugin = plugin;

@@ -11,19 +11,19 @@ import java.util.HashMap;
 import java.util.UUID;
 
 public class PacketStopServer implements PacketIn, PacketOut {
-    private static HashMap<String, JSONCallback> callbacks = new HashMap<String, JSONCallback>();
+    private static HashMap<String, JSONCallback[]> callbacks = new HashMap<String, JSONCallback[]>();
     private UUID player;
     private boolean force;
     private String server;
     private String id;
 
     public PacketStopServer() {}
-    public PacketStopServer(UUID player, String server, boolean force, String id, JSONCallback callback) {
-        if (Util.isNull(server, force, id, callback)) throw new NullPointerException();
+    public PacketStopServer(UUID player, String server, boolean force, JSONCallback... callback) {
+        if (Util.isNull(server, force, callback)) throw new NullPointerException();
         this.player = player;
         this.server = server;
         this.force = force;
-        this.id = id;
+        this.id = Util.getNew(callbacks.keySet(), UUID::randomUUID).toString();
         callbacks.put(id, callback);
     }
 
@@ -39,7 +39,7 @@ public class PacketStopServer implements PacketIn, PacketOut {
 
     @Override
     public void execute(JSONObject data) {
-        callbacks.get(data.getString("id")).run(data);
+        for (JSONCallback callback : callbacks.get(data.getString("id"))) callback.run(data);
         callbacks.remove(data.getString("id"));
     }
 

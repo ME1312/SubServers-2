@@ -14,6 +14,9 @@ public final class Util {
     public interface ExceptionRunnable {
         void run() throws Throwable;
     }
+    public interface ReturnRunnable<R> {
+        R run();
+    }
 
     /**
      * Checks values to make sure they're not null
@@ -48,6 +51,23 @@ public final class Util {
         }
 
         return values;
+    }
+
+    /**
+     * Gets a new Variable that doesn't match the existing Variables
+     *
+     * @param existing Existing Variables
+     * @param generator Variable Generator
+     * @param <V> Variable Type
+     * @return Variable
+     */
+    public static <V> V getNew(Collection<? extends V> existing, ReturnRunnable<V> generator) {
+        V result = null;
+        while (result == null) {
+            V tmp = generator.run();
+            if (!existing.contains(tmp)) result = tmp;
+        }
+        return result;
     }
 
     /**

@@ -8,9 +8,17 @@ import net.ME1312.SubServers.Client.Bukkit.SubPlugin;
 import org.bukkit.Bukkit;
 import org.json.JSONObject;
 
+/**
+ * Link Server Packet
+ */
 public class PacketLinkServer implements PacketIn, PacketOut {
     private SubPlugin plugin;
 
+    /**
+     * New PacketLinkServer
+     *
+     * @param plugin SubServers.Client
+     */
     public PacketLinkServer(SubPlugin plugin) {
         if (Util.isNull(plugin)) throw new NullPointerException();
         this.plugin = plugin;

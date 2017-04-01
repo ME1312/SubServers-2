@@ -4,8 +4,7 @@ import net.ME1312.SubServers.Host.Library.Exception.IllegalPacketException;
 import net.ME1312.SubServers.Host.Library.Log.Logger;
 import net.ME1312.SubServers.Host.Library.Util;
 import net.ME1312.SubServers.Host.Library.Version.Version;
-import net.ME1312.SubServers.Host.Network.Packet.PacketAuthorization;
-import net.ME1312.SubServers.Host.Network.Packet.PacketDownloadLang;
+import net.ME1312.SubServers.Host.Network.Packet.*;
 import net.ME1312.SubServers.Host.SubAPI;
 import net.ME1312.SubServers.Host.SubServers;
 import org.json.JSONException;
@@ -34,6 +33,7 @@ public final class SubDataClient {
     private Socket socket;
     private String name;
     private SubServers host;
+    private LinkedList<PacketOut> queue;
 
     /**
      * SubServers Client Instance
@@ -49,6 +49,7 @@ public final class SubDataClient {
         this.host = host;
         this.name = name;
         this.writer = new PrintWriter(socket.getOutputStream(), true);
+        this.queue = new LinkedList<PacketOut>();
 
         if (!defaults) loadDefaults();
         loop();
@@ -66,10 +67,46 @@ public final class SubDataClient {
         log = new Logger("SubData");
 
         registerPacket(new PacketAuthorization(host), "Authorization");
+        registerPacket(new PacketCommandServer(), "SubCommandServer");
+        registerPacket(new PacketCreateServer(), "SubCreateServer");
+        registerPacket(new PacketDownloadBuildScript(), "SubDownloadBuildScript");
+        registerPacket(new PacketDownloadHostInfo(), "SubDownloadHostInfo");
         registerPacket(new PacketDownloadLang(host), "SubDownloadLang");
+        registerPacket(new PacketDownloadPlayerList(), "SubDownloadPlayerList");
+        registerPacket(new PacketDownloadServerInfo(), "SubDownloadServerInfo");
+        registerPacket(new PacketDownloadServerList(), "SubDownloadServerList");
+        registerPacket(new PacketExAddServer(host), "SubExAddServer");
+        registerPacket(new PacketExConfigureHost(host), "SubExConfigureHost");
+        registerPacket(new PacketExCreateServer(host), "SubExCreateServer");
+        registerPacket(new PacketExRemoveServer(host), "SubExRemoveServer");
+        registerPacket(new PacketExUpdateServer(host), "SubExUpdateServer");
+        registerPacket(new PacketInRunEvent(), "SubRunEvent");
+        registerPacket(new PacketLinkExHost(host), "SubLinkExHost");
+        registerPacket(new PacketStartServer(), "SubStartServer");
+        registerPacket(new PacketStopServer(), "SubStopServer");
+        registerPacket(new PacketTeleportPlayer(), "SubTeleportPlayer");
+
 
         registerPacket(PacketAuthorization.class, "Authorization");
+        registerPacket(PacketCommandServer.class, "SubCommandServer");
+        registerPacket(PacketCreateServer.class, "SubCreateServer");
+        registerPacket(PacketDownloadBuildScript.class, "SubDownloadBuildScript");
+        registerPacket(PacketDownloadHostInfo.class, "SubDownloadHostInfo");
         registerPacket(PacketDownloadLang.class, "SubDownloadLang");
+        registerPacket(PacketDownloadPlayerList.class, "SubDownloadPlayerList");
+        registerPacket(PacketDownloadServerInfo.class, "SubDownloadServerInfo");
+        registerPacket(PacketDownloadServerList.class, "SubDownloadServerList");
+        registerPacket(PacketExAddServer.class, "SubExAddServer");
+        registerPacket(PacketExConfigureHost.class, "SubExConfigureHost");
+        registerPacket(PacketExCreateServer.class, "SubExCreateServer");
+        registerPacket(PacketExRemoveServer.class, "SubExRemoveServer");
+        registerPacket(PacketExUpdateServer.class, "SubExUpdateServer");
+        registerPacket(PacketLinkExHost.class, "SubLinkExHost");
+        registerPacket(PacketOutExLogMessage.class, "SubExLogMessage");
+        registerPacket(PacketOutExRequestQueue.class, "SubExRequestQueue");
+        registerPacket(PacketStartServer.class, "SubStartServer");
+        registerPacket(PacketStopServer.class, "SubStopServer");
+        registerPacket(PacketTeleportPlayer.class, "SubTeleportPlayer");
     }
 
     private void loop() {
@@ -110,9 +147,9 @@ public final class SubDataClient {
     }
 
     /**
-     * Gets the Assigned Server Name
+     * Gets the Assigned Host Name
      *
-     * @return Server Name
+     * @return Host Name
      */
     public String getName() {
         return name;
@@ -189,10 +226,14 @@ public final class SubDataClient {
      */
     public void sendPacket(PacketOut packet) {
         if (Util.isNull(packet)) throw new NullPointerException();
-        try {
-            writer.println(encodePacket(packet));
-        } catch (IllegalPacketException e) {
-            log.error.println(e);
+        if (socket == null) {
+            queue.add(packet);
+        } else {
+            try {
+                writer.println(encodePacket(packet));
+            } catch (IllegalPacketException e) {
+                log.error.println(e);
+            }
         }
     }
 
@@ -262,6 +303,10 @@ public final class SubDataClient {
                         try {
                             host.subdata = new SubDataClient(host, name, socket.getInetAddress(), socket.getPort());
                             timer.cancel();
+                            while (queue.size() != 0) {
+                                sendPacket(queue.get(0));
+                                queue.remove(0);
+                            }
                         } catch (IOException e) {
                             log.warn.println("Connection was unsuccessful, retrying in 30 seconds");
                         }

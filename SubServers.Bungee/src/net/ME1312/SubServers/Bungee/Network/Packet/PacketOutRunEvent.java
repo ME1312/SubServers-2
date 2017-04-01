@@ -1,10 +1,12 @@
 package net.ME1312.SubServers.Bungee.Network.Packet;
 
 import net.ME1312.SubServers.Bungee.Event.*;
+import net.ME1312.SubServers.Bungee.Host.Host;
 import net.ME1312.SubServers.Bungee.Host.Server;
 import net.ME1312.SubServers.Bungee.Library.SubEvent;
 import net.ME1312.SubServers.Bungee.Library.Util;
 import net.ME1312.SubServers.Bungee.Library.Version.Version;
+import net.ME1312.SubServers.Bungee.Network.ClientHandler;
 import net.ME1312.SubServers.Bungee.Network.PacketOut;
 import net.ME1312.SubServers.Bungee.SubPlugin;
 import net.md_5.bungee.api.plugin.Listener;
@@ -22,7 +24,7 @@ import java.util.Map;
  */
 public class PacketOutRunEvent implements Listener, PacketOut {
     private SubPlugin plugin;
-    private Map<String, ?> args;
+    private JSONObject args;
     private String type;
 
     /**
@@ -41,7 +43,7 @@ public class PacketOutRunEvent implements Listener, PacketOut {
      * @param event Event to be run
      * @param args Arguments
      */
-    public PacketOutRunEvent(Class<? extends SubEvent> event, Map<String, ?> args) {
+    public PacketOutRunEvent(Class<? extends SubEvent> event, JSONObject args) {
         if (Util.isNull(event, args)) throw new NullPointerException();
         this.type = event.getSimpleName();
         this.args = args;
@@ -63,24 +65,26 @@ public class PacketOutRunEvent implements Listener, PacketOut {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void event(SubAddServerEvent event) {
         if (!event.isCancelled()) {
-            List<Server> list = new ArrayList<Server>();
+            List<ClientHandler> list = new ArrayList<ClientHandler>();
             list.addAll(plugin.api.getServers().values());
-            for (Server server : list) {
-                HashMap<String, Object> args = new HashMap<String, Object>();
+            for (Host host : plugin.api.getHosts().values()) if (host instanceof ClientHandler) list.add((ClientHandler) host);
+            for (ClientHandler client : list) {
+                JSONObject args = new JSONObject();
                 args.put("player", ((event.getPlayer() == null)?null:event.getPlayer().toString()));
-                args.put("host", event.getHost().getName());
+                args.put("host", ((event.getHost() == null)?null:event.getHost()));
                 args.put("server", event.getServer().getName());
-                if (server.getSubDataClient() != null) server.getSubDataClient().sendPacket(new PacketOutRunEvent(event.getClass(), args));
+                if (client.getSubDataClient() != null) client.getSubDataClient().sendPacket(new PacketOutRunEvent(event.getClass(), args));
             }
         }
     }
     @EventHandler(priority = EventPriority.HIGHEST)
     public void event(SubCreateEvent event) {
         if (!event.isCancelled()) {
-            List<Server> list = new ArrayList<Server>();
+            List<ClientHandler> list = new ArrayList<ClientHandler>();
             list.addAll(plugin.api.getServers().values());
-            for (Server server : list) {
-                HashMap<String, Object> args = new HashMap<String, Object>();
+            for (Host host : plugin.api.getHosts().values()) if (host instanceof ClientHandler) list.add((ClientHandler) host);
+            for (ClientHandler client : list) {
+                JSONObject args = new JSONObject();
                 args.put("player", ((event.getPlayer() == null)?null:event.getPlayer().toString()));
                 args.put("host", event.getHost().getName());
                 args.put("name", event.getName());
@@ -88,72 +92,77 @@ public class PacketOutRunEvent implements Listener, PacketOut {
                 args.put("version", event.getVersion().toString());
                 args.put("port", event.getPort());
                 args.put("memory", event.getMemory());
-                if (server.getSubDataClient() != null) server.getSubDataClient().sendPacket(new PacketOutRunEvent(event.getClass(), args));
+                if (client.getSubDataClient() != null) client.getSubDataClient().sendPacket(new PacketOutRunEvent(event.getClass(), args));
             }
         }
     }
     @EventHandler(priority = EventPriority.HIGHEST)
     public void event(SubSendCommandEvent event) {
         if (!event.isCancelled()) {
-            List<Server> list = new ArrayList<Server>();
+            List<ClientHandler> list = new ArrayList<ClientHandler>();
             list.addAll(plugin.api.getServers().values());
-            for (Server server : list) {
-                HashMap<String, Object> args = new HashMap<String, Object>();
+            for (Host host : plugin.api.getHosts().values()) if (host instanceof ClientHandler) list.add((ClientHandler) host);
+            for (ClientHandler client : list) {
+                JSONObject args = new JSONObject();
                 args.put("player", ((event.getPlayer() == null)?null:event.getPlayer().toString()));
                 args.put("server", event.getServer().getName());
                 args.put("command", event.getCommand());
-                if (server.getSubDataClient() != null) server.getSubDataClient().sendPacket(new PacketOutRunEvent(event.getClass(), args));
+                if (client.getSubDataClient() != null) client.getSubDataClient().sendPacket(new PacketOutRunEvent(event.getClass(), args));
             }
         }
     }
     @EventHandler(priority = EventPriority.HIGHEST)
     public void event(SubStartEvent event) {
         if (!event.isCancelled()) {
-            List<Server> list = new ArrayList<Server>();
+            List<ClientHandler> list = new ArrayList<ClientHandler>();
             list.addAll(plugin.api.getServers().values());
-            for (Server server : list) {
-                HashMap<String, Object> args = new HashMap<String, Object>();
+            for (Host host : plugin.api.getHosts().values()) if (host instanceof ClientHandler) list.add((ClientHandler) host);
+            for (ClientHandler client : list) {
+                JSONObject args = new JSONObject();
                 args.put("player", ((event.getPlayer() == null)?null:event.getPlayer().toString()));
                 args.put("server", event.getServer().getName());
-                if (server.getSubDataClient() != null) server.getSubDataClient().sendPacket(new PacketOutRunEvent(event.getClass(), args));
+                if (client.getSubDataClient() != null) client.getSubDataClient().sendPacket(new PacketOutRunEvent(event.getClass(), args));
             }
         }
     }
     @EventHandler(priority = EventPriority.HIGHEST)
     public void event(SubStopEvent event) {
         if (!event.isCancelled()) {
-            List<Server> list = new ArrayList<Server>();
+            List<ClientHandler> list = new ArrayList<ClientHandler>();
             list.addAll(plugin.api.getServers().values());
-            for (Server server : list) {
-                HashMap<String, Object> args = new HashMap<String, Object>();
+            for (Host host : plugin.api.getHosts().values()) if (host instanceof ClientHandler) list.add((ClientHandler) host);
+            for (ClientHandler client : list) {
+                JSONObject args = new JSONObject();
                 args.put("player", ((event.getPlayer() == null)?null:event.getPlayer().toString()));
                 args.put("server", event.getServer().getName());
                 args.put("force", event.isForced());
-                if (server.getSubDataClient() != null) server.getSubDataClient().sendPacket(new PacketOutRunEvent(event.getClass(), args));
+                if (client.getSubDataClient() != null) client.getSubDataClient().sendPacket(new PacketOutRunEvent(event.getClass(), args));
             }
         }
     }
     @EventHandler(priority = EventPriority.HIGHEST)
     public void event(SubStoppedEvent event) {
-        List<Server> list = new ArrayList<Server>();
+        List<ClientHandler> list = new ArrayList<ClientHandler>();
         list.addAll(plugin.api.getServers().values());
-        for (Server server : list) {
-            HashMap<String, Object> args = new HashMap<String, Object>();
+        for (Host host : plugin.api.getHosts().values()) if (host instanceof ClientHandler) list.add((ClientHandler) host);
+        for (ClientHandler client : list) {
+            JSONObject args = new JSONObject();
             args.put("server", event.getServer().getName());
-            if (server.getSubDataClient() != null) server.getSubDataClient().sendPacket(new PacketOutRunEvent(event.getClass(), args));
+            if (client.getSubDataClient() != null) client.getSubDataClient().sendPacket(new PacketOutRunEvent(event.getClass(), args));
         }
     }
     @EventHandler(priority = EventPriority.HIGHEST)
     public void event(SubRemoveServerEvent event) {
         if (!event.isCancelled()) {
-            List<Server> list = new ArrayList<Server>();
+            List<ClientHandler> list = new ArrayList<ClientHandler>();
             list.addAll(plugin.api.getServers().values());
-            for (Server server : list) {
-                HashMap<String, Object> args = new HashMap<String, Object>();
+            for (Host host : plugin.api.getHosts().values()) if (host instanceof ClientHandler) list.add((ClientHandler) host);
+            for (ClientHandler client : list) {
+                JSONObject args = new JSONObject();
                 args.put("player", ((event.getPlayer() == null)?null:event.getPlayer().toString()));
-                args.put("host", event.getHost().getName());
+                args.put("host", ((event.getHost() == null)?null:event.getHost()));
                 args.put("server", event.getServer().getName());
-                if (server.getSubDataClient() != null) server.getSubDataClient().sendPacket(new PacketOutRunEvent(event.getClass(), args));
+                if (client.getSubDataClient() != null) client.getSubDataClient().sendPacket(new PacketOutRunEvent(event.getClass(), args));
             }
         }
     }

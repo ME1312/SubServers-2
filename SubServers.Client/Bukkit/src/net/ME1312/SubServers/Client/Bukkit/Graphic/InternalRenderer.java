@@ -64,7 +64,7 @@ public class InternalRenderer extends UIRenderer {
 
     public void hostMenu(final int page) {
         setDownloading(ChatColor.stripColor(plugin.lang.getSection("Lang").getColoredString("Interface.Host-Menu.Title", '&')));
-        plugin.subdata.sendPacket(new PacketDownloadServerList(null, UUID.randomUUID().toString(), (json) -> {
+        plugin.subdata.sendPacket(new PacketDownloadServerList(null, (json) -> {
             setDownloading(null);
             lastVistedObject = null;
             lastPage = page;
@@ -187,7 +187,7 @@ public class InternalRenderer extends UIRenderer {
 
     public void hostAdmin(final String host) {
         setDownloading(ChatColor.stripColor(plugin.lang.getSection("Lang").getColoredString("Interface.Host-Admin.Title", '&').replace("$str$", host)));
-        plugin.subdata.sendPacket(new PacketDownloadHostInfo(host, UUID.randomUUID().toString(), (json) -> {
+        plugin.subdata.sendPacket(new PacketDownloadHostInfo(host, (json) -> {
             windowHistory.add(() -> hostAdmin(host));
             if (!json.getBoolean("valid")) {
                 if (hasHistory()) back();
@@ -304,7 +304,7 @@ public class InternalRenderer extends UIRenderer {
             lastVistedObject = options.getHost();
         }
 
-        plugin.subdata.sendPacket(new PacketDownloadHostInfo(options.getHost(), UUID.randomUUID().toString(), json -> {
+        plugin.subdata.sendPacket(new PacketDownloadHostInfo(options.getHost(), json -> {
             if (!json.getBoolean("valid")|| !json.getJSONObject("host").getBoolean("enabled") || json.getJSONObject("host").getJSONObject("creator").getBoolean("busy")) {
                 lastUsedOptions = null;
                 if (hasHistory()) back();
@@ -445,7 +445,7 @@ public class InternalRenderer extends UIRenderer {
 
     public void hostPlugin(final int page, final String host) {
         setDownloading(ChatColor.stripColor(plugin.lang.getSection("Lang").getColoredString("Interface.Host-Plugin.Title", '&').replace("$str$", host)));
-        plugin.subdata.sendPacket(new PacketDownloadHostInfo(host, UUID.randomUUID().toString(), (json) -> {
+        plugin.subdata.sendPacket(new PacketDownloadHostInfo(host, (json) -> {
             windowHistory.add(() -> hostPlugin(page, host));
             if (!json.getBoolean("valid")) {
                 if (hasHistory()) back();
@@ -553,7 +553,7 @@ public class InternalRenderer extends UIRenderer {
 
     public void subserverMenu(final int page, final String host) {
         setDownloading(ChatColor.stripColor((host == null)?plugin.lang.getSection("Lang").getColoredString("Interface.SubServer-Menu.Title", '&'):plugin.lang.getSection("Lang").getColoredString("Interface.Host-SubServer.Title", '&').replace("$str$", host)));
-        plugin.subdata.sendPacket(new PacketDownloadServerList(host, UUID.randomUUID().toString(), json -> {
+        plugin.subdata.sendPacket(new PacketDownloadServerList(host, json -> {
             setDownloading(null);
             lastPage = page;
 
@@ -715,7 +715,7 @@ public class InternalRenderer extends UIRenderer {
 
     public void subserverAdmin(final String subserver) {
         setDownloading(ChatColor.stripColor(plugin.lang.getSection("Lang").getColoredString("Interface.SubServer-Admin.Title", '&').replace("$str$", subserver)));
-        plugin.subdata.sendPacket(new PacketDownloadServerInfo(subserver, UUID.randomUUID().toString(), json -> {
+        plugin.subdata.sendPacket(new PacketDownloadServerInfo(subserver, json -> {
             windowHistory.add(() -> subserverAdmin(subserver));
             if (!json.getString("type").equals("subserver")) {
                 if (hasHistory()) back();
@@ -885,7 +885,7 @@ public class InternalRenderer extends UIRenderer {
 
     public void subserverPlugin(final int page, final String subserver) {
         setDownloading(ChatColor.stripColor(plugin.lang.getSection("Lang").getColoredString("Interface.SubServer-Plugin.Title", '&').replace("$str$", subserver)));
-        plugin.subdata.sendPacket(new PacketDownloadServerInfo(subserver, UUID.randomUUID().toString(), json -> {
+        plugin.subdata.sendPacket(new PacketDownloadServerInfo(subserver, json -> {
             windowHistory.add(() -> subserverPlugin(page, subserver));
             if (!json.getString("type").equals("subserver")) {
                 if (hasHistory()) back();

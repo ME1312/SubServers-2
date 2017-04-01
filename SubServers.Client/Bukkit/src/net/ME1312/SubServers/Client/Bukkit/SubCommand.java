@@ -1,6 +1,5 @@
 package net.ME1312.SubServers.Client.Bukkit;
 
-import net.ME1312.SubServers.Client.Bukkit.Graphic.InternalRenderer;
 import net.ME1312.SubServers.Client.Bukkit.Graphic.UIRenderer;
 import net.ME1312.SubServers.Client.Bukkit.Library.Container;
 import net.ME1312.SubServers.Client.Bukkit.Library.Util;
@@ -42,7 +41,7 @@ public final class SubCommand implements CommandExecutor {
                         sender.sendMessage(plugin.lang.getSection("Lang").getColoredString("Command.Version", '&').replace("$name$", "SubServers.Client").replace("$str$", plugin.version.toString() + ((plugin.bversion != null)?" BETA "+plugin.bversion.toString():"")));
                     } else if (args[0].equalsIgnoreCase("list")) {
                         final String fLabel = label;
-                        plugin.subdata.sendPacket(new PacketDownloadServerList(null, UUID.randomUUID().toString(), json -> {
+                        plugin.subdata.sendPacket(new PacketDownloadServerList(null, json -> {
                             int i = 0;
                             TreeMap<String, JSONObject> servers = new TreeMap<String, JSONObject>();
                             Container<Boolean> spigot = new Container<Boolean>(false);
@@ -198,7 +197,7 @@ public final class SubCommand implements CommandExecutor {
                     } else if (args[0].equalsIgnoreCase("start")) {
                         if (sender.hasPermission("subservers.subserver.start.*") || sender.hasPermission("subservers.subserver.start." + args[1].toLowerCase())) {
                             if (args.length > 1) {
-                                plugin.subdata.sendPacket(new PacketStartServer((sender instanceof Player)?((Player) sender).getUniqueId():null, args[1], UUID.randomUUID().toString(), json -> {
+                                plugin.subdata.sendPacket(new PacketStartServer((sender instanceof Player)?((Player) sender).getUniqueId():null, args[1], json -> {
                                     switch (json.getInt("r")) {
                                         case 3:
                                             sender.sendMessage(plugin.lang.getSection("Lang").getColoredString("Command.Start.Unknown", '&'));
@@ -236,7 +235,7 @@ public final class SubCommand implements CommandExecutor {
                     } else if (args[0].equalsIgnoreCase("stop")) {
                         if (sender.hasPermission("subservers.subserver.stop.*") || sender.hasPermission("subservers.subserver.stop." + args[1].toLowerCase())) {
                             if (args.length > 1) {
-                                plugin.subdata.sendPacket(new PacketStopServer((sender instanceof Player)?((Player) sender).getUniqueId():null, args[1], false, UUID.randomUUID().toString(), json -> {
+                                plugin.subdata.sendPacket(new PacketStopServer((sender instanceof Player)?((Player) sender).getUniqueId():null, args[1], false, json -> {
                                     switch (json.getInt("r")) {
                                         case 3:
                                             sender.sendMessage(plugin.lang.getSection("Lang").getColoredString("Command.Stop.Unknown", '&'));
@@ -266,7 +265,7 @@ public final class SubCommand implements CommandExecutor {
                     } else if (args[0].equalsIgnoreCase("kill") || args[0].equalsIgnoreCase("terminate")) {
                         if (sender.hasPermission("subservers.subserver.terminate.*") || sender.hasPermission("subservers.subserver.terminate." + args[1].toLowerCase())) {
                             if (args.length > 1) {
-                                plugin.subdata.sendPacket(new PacketStopServer((sender instanceof Player)?((Player) sender).getUniqueId():null, args[1], true, UUID.randomUUID().toString(), json -> {
+                                plugin.subdata.sendPacket(new PacketStopServer((sender instanceof Player)?((Player) sender).getUniqueId():null, args[1], true, json -> {
                                     switch (json.getInt("r")) {
                                         case 3:
                                             sender.sendMessage(plugin.lang.getSection("Lang").getColoredString("Command.Terminate.Unknown", '&'));
@@ -305,7 +304,7 @@ public final class SubCommand implements CommandExecutor {
                                     } while ((i + 1) != args.length);
                                 }
                                 final String cmd = str;
-                                plugin.subdata.sendPacket(new PacketCommandServer((sender instanceof Player)?((Player) sender).getUniqueId():null, args[1], cmd, UUID.randomUUID().toString(), json -> {
+                                plugin.subdata.sendPacket(new PacketCommandServer((sender instanceof Player)?((Player) sender).getUniqueId():null, args[1], cmd, json -> {
                                     switch (json.getInt("r")) {
                                         case 3:
                                             sender.sendMessage(plugin.lang.getSection("Lang").getColoredString("Command.Command.Unknown", '&'));
@@ -342,7 +341,7 @@ public final class SubCommand implements CommandExecutor {
                                 } else if (args.length > 6 && Util.isException(() -> Integer.parseInt(args[6]))) {
                                     sender.sendMessage(plugin.lang.getSection("Lang").getColoredString("Command.Creator.Invalid-Memory", '&'));
                                 } else {
-                                    plugin.subdata.sendPacket(new PacketCreateServer((sender instanceof Player)?((Player) sender).getUniqueId():null, args[1], args[2], PacketCreateServer.ServerType.valueOf(args[3].toUpperCase()), new Version(args[4]), Integer.parseInt(args[5]), (args.length > 6)?Integer.parseInt(args[6]):1024, UUID.randomUUID().toString(), json -> {
+                                    plugin.subdata.sendPacket(new PacketCreateServer((sender instanceof Player)?((Player) sender).getUniqueId():null, args[1], args[2], PacketCreateServer.ServerType.valueOf(args[3].toUpperCase()), new Version(args[4]), Integer.parseInt(args[5]), (args.length > 6)?Integer.parseInt(args[6]):1024, json -> {
                                         switch (json.getInt("r")) {
                                             case 3:
                                                 sender.sendMessage(plugin.lang.getSection("Lang").getColoredString("Command.Creator.Exists", '&'));
@@ -422,7 +421,7 @@ public final class SubCommand implements CommandExecutor {
                         if (args.length > 2) {
                             if (sender.hasPermission("subservers.server.teleport.*") || sender.hasPermission("subservers.server.teleport." + args[1].toLowerCase())) {
                                 if (sender.hasPermission("subservers.server.teleport-others")) {
-                                    plugin.subdata.sendPacket(new PacketDownloadPlayerList(UUID.randomUUID().toString(), players -> {
+                                    plugin.subdata.sendPacket(new PacketDownloadPlayerList(players -> {
                                         UUID uuid = null;
                                         for (String id : players.getJSONObject("players").keySet()) {
                                             if (players.getJSONObject("players").getJSONObject(id).getString("name").equalsIgnoreCase(args[2]))
@@ -432,7 +431,7 @@ public final class SubCommand implements CommandExecutor {
                                             sender.sendMessage(plugin.lang.getSection("Lang").getColoredString("Command.Teleport.Offline", '&'));
                                         } else {
                                             final UUID player = uuid;
-                                            plugin.subdata.sendPacket(new PacketTeleportPlayer(player, args[1], UUID.randomUUID().toString(), json -> {
+                                            plugin.subdata.sendPacket(new PacketTeleportPlayer(player, args[1], json -> {
                                                 switch (json.getInt("r")) {
                                                     case 2:
                                                         sender.sendMessage(plugin.lang.getSection("Lang").getColoredString("Command.Teleport.Invalid", '&'));
@@ -460,7 +459,7 @@ public final class SubCommand implements CommandExecutor {
                         } else if (args.length > 1) {
                             if (sender.hasPermission("subservers.server.teleport.*") || sender.hasPermission("subservers.server.teleport." + args[1].toLowerCase())) {
                                 if (sender instanceof Player) {
-                                    plugin.subdata.sendPacket(new PacketTeleportPlayer(((Player) sender).getUniqueId(), args[1], UUID.randomUUID().toString(), json -> {
+                                    plugin.subdata.sendPacket(new PacketTeleportPlayer(((Player) sender).getUniqueId(), args[1], json -> {
                                         switch (json.getInt("r")) {
                                             case 2:
                                                 sender.sendMessage(plugin.lang.getSection("Lang").getColoredString("Command.Teleport.Invalid", '&'));

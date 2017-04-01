@@ -33,7 +33,7 @@ public final class FileLogger extends OutputStream {
     }
 
     public static void end() throws IOException {
-        file.close();
+        if (file != null) file.close();
         file = null;
     }
 }

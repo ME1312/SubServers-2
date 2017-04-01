@@ -22,22 +22,21 @@ public final class SystemLogger extends OutputStream {
     }
 
     @Override
-    public void write(int b) throws IOException {
+    public void write(int c) throws IOException {
         int i = 0;
-        String origin = null;
+        String origin = java.lang.System.class.getCanonicalName();
         for (StackTraceElement element : Thread.currentThread().getStackTrace()) {
-            if (i > 1 && !element.getClassName().startsWith("net.ME1312.SubServers.Host.") && new File(dir, element.getClassName().replace(".", File.separator) + ".class").exists()) {
+            if (i > 1 && new File(dir, element.getClassName().replace(".", File.separator) + ".class").exists()) {
                 origin = element.getClassName().replaceFirst("\\$.*", "");
                 break;
             }
             i++;
         }
-        if (origin == null) origin = java.lang.System.class.getCanonicalName();
         if (!stream.keySet().contains(origin)) stream.put(origin, new Logger(origin));
         if (level) {
-            stream.get(origin).error.print((char) b);
+            stream.get(origin).error.print((char) c);
         } else {
-            stream.get(origin).info.print((char) b);
+            stream.get(origin).info.print((char) c);
         }
     }
 }

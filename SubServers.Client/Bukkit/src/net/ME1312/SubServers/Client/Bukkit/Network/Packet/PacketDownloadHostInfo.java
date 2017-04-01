@@ -8,17 +8,31 @@ import net.ME1312.SubServers.Client.Bukkit.Network.PacketOut;
 import org.json.JSONObject;
 
 import java.util.HashMap;
+import java.util.UUID;
 
+/**
+ * Download Host Info Packet
+ */
 public class PacketDownloadHostInfo implements PacketIn, PacketOut {
-    private static HashMap<String, JSONCallback> callbacks = new HashMap<String, JSONCallback>();
+    private static HashMap<String, JSONCallback[]> callbacks = new HashMap<String, JSONCallback[]>();
     private String host;
     private String id;
 
+    /**
+     * New PacketDownloadHostInfo (In)
+     */
     public PacketDownloadHostInfo() {}
-    public PacketDownloadHostInfo(String host, String id, JSONCallback callback) {
-        if (Util.isNull(host, id, callback)) throw new NullPointerException();
+
+    /**
+     * New PacketDownloadHostInfo (Out)
+     *
+     * @param host Host Name
+     * @param callback Callbacks
+     */
+    public PacketDownloadHostInfo(String host, JSONCallback... callback) {
+        if (Util.isNull(host, callback)) throw new NullPointerException();
         this.host = host;
-        this.id = id;
+        this.id = Util.getNew(callbacks.keySet(), UUID::randomUUID).toString();
         callbacks.put(id, callback);
     }
 
@@ -32,7 +46,7 @@ public class PacketDownloadHostInfo implements PacketIn, PacketOut {
 
     @Override
     public void execute(JSONObject data) {
-        callbacks.get(data.getString("id")).run(data);
+        for (JSONCallback callback : callbacks.get(data.getString("id"))) callback.run(data);
         callbacks.remove(data.getString("id"));
     }
 

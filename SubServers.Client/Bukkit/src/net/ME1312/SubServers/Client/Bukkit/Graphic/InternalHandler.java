@@ -102,7 +102,7 @@ public class InternalHandler implements UIHandler, Listener {
                             if (player.hasPermission("subservers.host.create.*") || player.hasPermission("subservers.host.create." + gui.lastVistedObject.toLowerCase())) {
                                 player.closeInventory();
                                 gui.setDownloading(plugin.lang.getSection("Lang").getColoredString("Interface.Generic.Downloading.Response", '&'));
-                                plugin.subdata.sendPacket(new PacketCreateServer(player.getUniqueId(), (UIRenderer.CreatorOptions) gui.lastUsedOptions, UUID.randomUUID().toString(), json -> {
+                                plugin.subdata.sendPacket(new PacketCreateServer(player.getUniqueId(), (UIRenderer.CreatorOptions) gui.lastUsedOptions, json -> {
                                     gui.back();
                                 }));
                             } else {
@@ -119,7 +119,7 @@ public class InternalHandler implements UIHandler, Listener {
                                     Bukkit.getScheduler().runTaskLater(plugin, () -> gui.hostCreator((UIRenderer.CreatorOptions) gui.lastUsedOptions), 4 * 20);
                                 } else {
                                     gui.setDownloading(plugin.lang.getSection("Lang").getColoredString("Interface.Generic.Downloading.Response", '&'));
-                                    plugin.subdata.sendPacket(new PacketDownloadServerList(null, UUID.randomUUID().toString(), json -> {
+                                    plugin.subdata.sendPacket(new PacketDownloadServerList(null, json -> {
                                         boolean match = false;
                                         for (String tmphost : json.getJSONObject("hosts").keySet()) {
                                             for (String tmpsubserver : json.getJSONObject("hosts").getJSONObject(tmphost).getJSONObject("servers").keySet()) {
@@ -220,7 +220,7 @@ public class InternalHandler implements UIHandler, Listener {
                                 gui.reopen();
                             } else {
                                 gui.setDownloading(ChatColor.stripColor(this.plugin.lang.getSection("Lang").getColoredString("Interface.Host-Plugin.Title", '&').replace("$str$", gui.lastVistedObject)));
-                                this.plugin.subdata.sendPacket(new PacketDownloadHostInfo(gui.lastVistedObject, UUID.randomUUID().toString(), (json) -> {
+                                this.plugin.subdata.sendPacket(new PacketDownloadHostInfo(gui.lastVistedObject, (json) -> {
                                     if (json.getBoolean("valid")) {
                                         gui.setDownloading(null);
                                         plugin.get().open(player, json.getJSONObject("host"));
@@ -296,7 +296,7 @@ public class InternalHandler implements UIHandler, Listener {
                             player.closeInventory();
                             if (player.hasPermission("subservers.subserver.start.*") || player.hasPermission("subservers.subserver.start." + gui.lastVistedObject.toLowerCase())) {
                                 gui.setDownloading(plugin.lang.getSection("Lang").getColoredString("Interface.Generic.Downloading.Response", '&'));
-                                plugin.subdata.sendPacket(new PacketStartServer(player.getUniqueId(), gui.lastVistedObject, UUID.randomUUID().toString(), json -> {
+                                plugin.subdata.sendPacket(new PacketStartServer(player.getUniqueId(), gui.lastVistedObject, json -> {
                                     gui.setDownloading(plugin.lang.getSection("Lang").getColoredString("Interface.SubServer-Admin.Start.Title", '&'));
                                     Bukkit.getScheduler().runTaskLater(plugin, gui::reopen, 30);
                                 }));
@@ -318,7 +318,7 @@ public class InternalHandler implements UIHandler, Listener {
                                         } catch (Exception e) {}
                                     }
                                 });
-                                plugin.subdata.sendPacket(new PacketStopServer(player.getUniqueId(), gui.lastVistedObject, false, UUID.randomUUID().toString(), json -> {
+                                plugin.subdata.sendPacket(new PacketStopServer(player.getUniqueId(), gui.lastVistedObject, false, json -> {
                                     if (json.getInt("r") != 0) {
                                         gui.reopen();
                                         listening.set(false);
@@ -342,7 +342,7 @@ public class InternalHandler implements UIHandler, Listener {
                                         } catch (Exception e) {}
                                     }
                                 });
-                                plugin.subdata.sendPacket(new PacketStopServer(player.getUniqueId(), gui.lastVistedObject, false, UUID.randomUUID().toString(), json -> {
+                                plugin.subdata.sendPacket(new PacketStopServer(player.getUniqueId(), gui.lastVistedObject, false, json -> {
                                     if (json.getInt("r") != 0) {
                                         gui.reopen();
                                         listening.set(false);
@@ -356,7 +356,7 @@ public class InternalHandler implements UIHandler, Listener {
                                     player.sendMessage(plugin.lang.getSection("Lang").getColoredString("Interface.SubServer-Admin.Command.Message", '&'));
                                 input.put(player.getUniqueId(), m -> {
                                     gui.setDownloading(plugin.lang.getSection("Lang").getColoredString("Interface.Generic.Downloading.Response", '&'));
-                                    plugin.subdata.sendPacket(new PacketCommandServer(player.getUniqueId(), gui.lastVistedObject, (m.getString("message").startsWith("/"))?m.getString("message").substring(1):m.getString("message"), UUID.randomUUID().toString(), json -> {
+                                    plugin.subdata.sendPacket(new PacketCommandServer(player.getUniqueId(), gui.lastVistedObject, (m.getString("message").startsWith("/"))?m.getString("message").substring(1):m.getString("message"), json -> {
                                         gui.reopen();
                                     }));
                                 });
@@ -390,7 +390,7 @@ public class InternalHandler implements UIHandler, Listener {
                                 gui.reopen();
                             } else {
                                 gui.setDownloading(ChatColor.stripColor(this.plugin.lang.getSection("Lang").getColoredString("Interface.SubServer-Plugin.Title", '&').replace("$str$", gui.lastVistedObject)));
-                                this.plugin.subdata.sendPacket(new PacketDownloadServerInfo(gui.lastVistedObject, UUID.randomUUID().toString(), json -> {
+                                this.plugin.subdata.sendPacket(new PacketDownloadServerInfo(gui.lastVistedObject, json -> {
                                     if (json.getString("type").equals("subserver")) {
                                         gui.setDownloading(null);
                                         plugin.get().open(player, json.getJSONObject("server"));

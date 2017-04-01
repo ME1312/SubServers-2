@@ -10,15 +10,28 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
 
+/**
+ * Download Player List Packet
+ */
 public class PacketDownloadPlayerList implements PacketIn, PacketOut {
-    private static HashMap<String, JSONCallback> callbacks = new HashMap<String, JSONCallback>();
+    private static HashMap<String, JSONCallback[]> callbacks = new HashMap<String, JSONCallback[]>();
     private String id;
 
+    /**
+     * New PacketDownloadPlayerList (In)
+     */
     public PacketDownloadPlayerList() {}
-    public PacketDownloadPlayerList(String id, JSONCallback callback) {
-        if (Util.isNull(id, callback)) throw new NullPointerException();
-        this.id = id;
+
+    /**
+     * New PacketDownloadPlayerList (Out)
+     *
+     * @param callback Callbacks
+     */
+    public PacketDownloadPlayerList(JSONCallback... callback) {
+        if (Util.isNull((Object) callback)) throw new NullPointerException();
+        this.id = Util.getNew(callbacks.keySet(), UUID::randomUUID).toString();
         callbacks.put(id, callback);
     }
     @Override
@@ -34,7 +47,7 @@ public class PacketDownloadPlayerList implements PacketIn, PacketOut {
 
     @Override
     public void execute(JSONObject data) {
-        callbacks.get(data.getString("id")).run(data);
+        for (JSONCallback callback : callbacks.get(data.getString("id"))) callback.run(data);
         callbacks.remove(data.getString("id"));
     }
 

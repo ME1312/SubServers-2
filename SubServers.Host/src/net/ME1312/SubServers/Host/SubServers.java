@@ -6,6 +6,8 @@ import net.ME1312.SubServers.Host.API.Event.SubDisableEvent;
 import net.ME1312.SubServers.Host.API.Event.SubEnableEvent;
 import net.ME1312.SubServers.Host.API.SubPluginInfo;
 import net.ME1312.SubServers.Host.API.SubPlugin;
+import net.ME1312.SubServers.Host.Executable.SubCreator;
+import net.ME1312.SubServers.Host.Executable.SubServer;
 import net.ME1312.SubServers.Host.Library.Config.YAMLConfig;
 import net.ME1312.SubServers.Host.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Host.Library.Exception.IllegalPluginException;
@@ -29,14 +31,18 @@ import java.util.*;
  * SubServers.Host Main Class
  */
 public final class SubServers {
+    public HashMap<String, SubServer> servers = new HashMap<String, SubServer>();
+    public SubCreator creator;
+
     public Logger log;
     public final UniversalFile dir = new UniversalFile(new File(System.getProperty("user.dir")));
     public YAMLConfig config;
+    public YAMLSection host = null;
     public YAMLSection lang = null;
     public SubDataClient subdata = null;
 
     public final Version version = new Version("2.11.2a");
-    public final Version bversion = new Version(2);
+    public final Version bversion = new Version(3);
     public final SubAPI api = new SubAPI(this);
 
     private boolean running;
@@ -66,10 +72,25 @@ public final class SubServers {
                 Util.copyFromJar(SubServers.class.getClassLoader(), "net/ME1312/SubServers/Host/Library/Files/config.yml", new UniversalFile(dir, "config.yml").getPath());
                 log.info.println("Updated ~/config.yml");
             }
+
+            if (!(new UniversalFile(dir, "Templates:Spigot Plugins").exists())) {
+                new UniversalFile(dir, "Templates:Spigot Plugins").mkdirs();
+                System.out.println("SubServers > Created ~/Templates/Spigot Plugins");
+            }
+            if (!(new UniversalFile(dir, "Templates:Sponge Config").exists())) {
+                new UniversalFile(dir, "Templates:Sponge Config").mkdir();
+                System.out.println("SubServers > Created ~/Templates/Sponge Config");
+            }
+            if (!(new UniversalFile(dir, "Templates:Sponge Mods").exists())) {
+                new UniversalFile(dir, "Templates:Sponge Mods").mkdir();
+                System.out.println("SubServers > Created ~/Templates/Sponge Mods");
+            }
+
             config = new YAMLConfig(new UniversalFile(dir, "config.yml"));
             subdata = new SubDataClient(this, config.get().getSection("Settings").getSection("SubData").getString("Name", "undefined"),
                     InetAddress.getByName(config.get().getSection("Settings").getSection("SubData").getString("Address", "127.0.0.1:4391").split(":")[0]),
                     Integer.parseInt(config.get().getSection("Settings").getSection("SubData").getString("Address", "127.0.0.1:4391").split(":")[1]));
+            creator = new SubCreator(this);
 
             if (System.getProperty("subservers.host.plugins", "").length() > 0) {
                 long begin = Calendar.getInstance().getTime().getTime();
@@ -348,6 +369,35 @@ public final class SubServers {
         running = false;
         SubDisableEvent event = new SubDisableEvent(this, exit);
         api.executeEvent(event);
+
+        List<String> subservers = new ArrayList<String>();
+        subservers.addAll(servers.keySet());
+
+        for (String server : subservers) {
+            servers.get(server).stop();
+            try {
+                servers.get(server).waitFor();
+            } catch (Exception e) {
+                log.error.println(e);
+            }
+        }
+        subservers.clear();
+        servers.clear();
+
+        if (creator.isBusy()) {
+            creator.terminate();
+            try {
+                creator.waitFor();
+            } catch (Exception e) {
+                log.error.println(e);
+            }
+        }
+
+        try {
+            Thread.sleep(500);
+        } catch (Exception e) {
+            log.error.println(e);
+        }
         if (subdata != null) Util.isException(() -> subdata.destroy(false));
 
         Util.isException(FileLogger::end);

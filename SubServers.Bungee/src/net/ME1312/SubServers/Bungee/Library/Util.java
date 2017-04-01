@@ -1,10 +1,7 @@
 package net.ME1312.SubServers.Bungee.Library;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
 /**
  * SubServers Utility Class
@@ -13,6 +10,9 @@ public final class Util {
     private Util(){}
     public interface ExceptionRunnable {
         void run() throws Throwable;
+    }
+    public interface ReturnRunnable<R> {
+        R run();
     }
 
     /**
@@ -48,6 +48,23 @@ public final class Util {
         }
 
         return values;
+    }
+
+    /**
+     * Gets a new Variable that doesn't match the existing Variables
+     *
+     * @param existing Existing Variables
+     * @param generator Variable Generator
+     * @param <V> Variable Type
+     * @return Variable
+     */
+    public static <V> V getNew(Collection<? extends V> existing, ReturnRunnable<V> generator) {
+        V result = null;
+        while (result == null) {
+            V tmp = generator.run();
+            if (!existing.contains(tmp)) result = tmp;
+        }
+        return result;
     }
 
     /**

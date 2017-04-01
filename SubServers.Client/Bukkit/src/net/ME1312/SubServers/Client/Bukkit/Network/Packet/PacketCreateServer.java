@@ -1,6 +1,5 @@
 package net.ME1312.SubServers.Client.Bukkit.Network.Packet;
 
-import net.ME1312.SubServers.Client.Bukkit.Graphic.InternalRenderer;
 import net.ME1312.SubServers.Client.Bukkit.Graphic.UIRenderer;
 import net.ME1312.SubServers.Client.Bukkit.Library.JSONCallback;
 import net.ME1312.SubServers.Client.Bukkit.Library.Util;
@@ -12,8 +11,11 @@ import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.UUID;
 
+/**
+ * Create Server Packet
+ */
 public class PacketCreateServer implements PacketIn, PacketOut {
-    private static HashMap<String, JSONCallback> callbacks = new HashMap<String, JSONCallback>();
+    private static HashMap<String, JSONCallback[]> callbacks = new HashMap<String, JSONCallback[]>();
     public enum ServerType {
         SPIGOT,
         VANILLA,
@@ -33,9 +35,25 @@ public class PacketCreateServer implements PacketIn, PacketOut {
     private int ram;
     private String id;
 
+    /**
+     * New PacketCreateServer (In)
+     */
     public PacketCreateServer() {}
-    public PacketCreateServer(UUID player, String name, String host, ServerType type, Version version, int port, int memory, String id, JSONCallback callback) {
-        if (Util.isNull(name, host, type, version, port, memory, id, callback)) throw new NullPointerException();
+
+    /**
+     * New PacketCreateServer (Out)
+     *
+     * @param player Player Creating
+     * @param name Server Name
+     * @param host Host to use
+     * @param type Server Type
+     * @param version Server Version
+     * @param port Server Port
+     * @param memory Server Memory
+     * @param callback Callbacks
+     */
+    public PacketCreateServer(UUID player, String name, String host, ServerType type, Version version, int port, int memory, JSONCallback... callback) {
+        if (Util.isNull(name, host, type, version, port, memory, callback)) throw new NullPointerException();
         this.player = player;
         this.name = name;
         this.host = host;
@@ -43,11 +61,19 @@ public class PacketCreateServer implements PacketIn, PacketOut {
         this.version = version;
         this.port = port;
         this.ram = memory;
-        this.id = id;
+        this.id = Util.getNew(callbacks.keySet(), UUID::randomUUID).toString();
         callbacks.put(id, callback);
     }
-    public PacketCreateServer(UUID player, UIRenderer.CreatorOptions options, String id, JSONCallback callback) {
-        if (Util.isNull(options, id, callback)) throw new NullPointerException();
+
+    /**
+     * New PacketCreateServer (Out)
+     *
+     * @param player Player Creating
+     * @param options Creator UI Options
+     * @param callback Callbacks
+     */
+    public PacketCreateServer(UUID player, UIRenderer.CreatorOptions options, JSONCallback... callback) {
+        if (Util.isNull(options, callback)) throw new NullPointerException();
         this.player = player;
         this.name = options.getName();
         this.host = options.getHost();
@@ -55,7 +81,7 @@ public class PacketCreateServer implements PacketIn, PacketOut {
         this.version = options.getVersion();
         this.port = options.getPort();
         this.ram = options.getMemory();
-        this.id = id;
+        this.id = Util.getNew(callbacks.keySet(), UUID::randomUUID).toString();
         callbacks.put(id, callback);
 
     }
@@ -78,7 +104,7 @@ public class PacketCreateServer implements PacketIn, PacketOut {
 
     @Override
     public void execute(JSONObject data) {
-        callbacks.get(data.getString("id")).run(data);
+        for (JSONCallback callback : callbacks.get(data.getString("id"))) callback.run(data);
         callbacks.remove(data.getString("id"));
     }
 

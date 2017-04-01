@@ -10,20 +10,35 @@ import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.UUID;
 
+/**
+ * Command Server Packet
+ */
 public class PacketCommandServer implements PacketIn, PacketOut {
-    private static HashMap<String, JSONCallback> callbacks = new HashMap<String, JSONCallback>();
+    private static HashMap<String, JSONCallback[]> callbacks = new HashMap<String, JSONCallback[]>();
     private UUID player;
     private String server;
     private String command;
     private String id;
 
+    /**
+     * New PacketCommandServer (In)
+     */
     public PacketCommandServer() {}
-    public PacketCommandServer(UUID player, String server, String command, String id, JSONCallback callback) {
-        if (Util.isNull(server, command, id, callback)) throw new NullPointerException();
+
+    /**
+     * New PacketCommandServer (Out)
+     *
+     * @param player Player Sending
+     * @param server Server to send to
+     * @param command Command to send
+     * @param callback Callbacks
+     */
+    public PacketCommandServer(UUID player, String server, String command, JSONCallback... callback) {
+        if (Util.isNull(server, command, callback)) throw new NullPointerException();
         this.player = player;
         this.server = server;
         this.command = command;
-        this.id = id;
+        this.id = Util.getNew(callbacks.keySet(), UUID::randomUUID).toString();
         callbacks.put(id, callback);
     }
 
@@ -39,7 +54,7 @@ public class PacketCommandServer implements PacketIn, PacketOut {
 
     @Override
     public void execute(JSONObject data) {
-        callbacks.get(data.getString("id")).run(data);
+        for (JSONCallback callback : callbacks.get(data.getString("id"))) callback.run(data);
         callbacks.remove(data.getString("id"));
     }
 

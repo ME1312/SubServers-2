@@ -19,6 +19,7 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -32,6 +33,7 @@ public final class SubDataClient {
     private Socket socket;
     private String name;
     private SubPlugin plugin;
+    private LinkedList<PacketOut> queue;
 
     /**
      * SubServers Client Instance
@@ -47,6 +49,7 @@ public final class SubDataClient {
         this.plugin = plugin;
         this.name = name;
         this.writer = new PrintWriter(socket.getOutputStream(), true);
+        this.queue = new LinkedList<PacketOut>();
 
         if (!defaults) loadDefaults();
         loop();
@@ -203,10 +206,14 @@ public final class SubDataClient {
      */
     public void sendPacket(PacketOut packet) {
         if (Util.isNull(packet)) throw new NullPointerException();
-        try {
-            writer.println(encodePacket(packet));
-        } catch (IllegalPacketException e) {
-            e.printStackTrace();
+        if (socket == null) {
+            queue.add(packet);
+        } else {
+            try {
+                writer.println(encodePacket(packet));
+            } catch (IllegalPacketException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -273,6 +280,10 @@ public final class SubDataClient {
                     public void run() {
                         try {
                             plugin.subdata = new SubDataClient(plugin, name, socket.getInetAddress(), socket.getPort());
+                            while (queue.size() != 0) {
+                                sendPacket(queue.get(0));
+                                queue.remove(0);
+                            }
                         } catch (IOException e) {
                             Bukkit.getLogger().info("SubServers > Connection was unsuccessful, retrying in 10 seconds");
                             Bukkit.getScheduler().runTaskLater(plugin, this, 30 * 20);

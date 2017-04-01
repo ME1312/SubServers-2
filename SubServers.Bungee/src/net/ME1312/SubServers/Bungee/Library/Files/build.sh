@@ -16,25 +16,32 @@ if [ -z "$2" ]
     rm -Rf $0
     exit 1
 fi
-if [ $2 == bukkit ] || [ $2 == spigot ]
-    then
+function __DL() {
+    if [ hash curl 2>/dev/null ]; then
+        curl -o $1 $2; return $?
+    fi
+    if [ hash wget 2>/dev/null ]; then
+        wget -o $1 $2; return $?
+    fi
+    echo Could not find a suitable download command: Please install curl or wget
+    exit 1;
+}
+if [ $2 == bukkit ] || [ $2 == spigot ]; then
     echo Downloading Buildtools...
-    curl -o BuildTools.jar https://hub.spigotmc.org/jenkins/job/BuildTools/lastSuccessfulBuild/artifact/target/BuildTools.jar; retvalb=$?
+    __DL BuildTools.jar https://hub.spigotmc.org/jenkins/job/BuildTools/lastSuccessfulBuild/artifact/target/BuildTools.jar; retvalb=$?
     if ! [ $retvalb -eq 0 ]; then
         echo ERROR: Failed Downloading Buildtools. Is SpigotMC.org down?
         rm -Rf $0
         exit 3
     fi
-    if [ -d "Buildtools" ]
-    then
+    if [ -d "Buildtools" ]; then
         rm -Rf Buildtools
     fi
     mkdir Buildtools
     cd "Buildtools"
     echo Launching BuildTools.jar
     export MAVEN_OPTS="-Xms2G"
-    if [ -z "$3" ]
-    then
+    if [ -z "$3" ]; then
         java -Xms2G -jar ../BuildTools.jar --rev $1; retvalc=$?
     else
         HOME=$3 java -Xms2G -jar ../BuildTools.jar --rev $1; retvalc=$?
@@ -61,22 +68,20 @@ if [ $2 == bukkit ] || [ $2 == spigot ]
     fi
 else
     if [ $2 == "vanilla" ]; then
-        if [ -d "Buildtools" ]
-        then
+        if [ -d "Buildtools" ]; then
             rm -Rf Buildtools
         fi
         mkdir Buildtools
         mkdir Buildtools/Vanilla
         echo Downloading Vanilla Jar...
-        curl -o Buildtools/Vanilla/minecraft_server.$1.jar https://s3.amazonaws.com/Minecraft.Download/versions/$1/minecraft_server.$1.jar; retvald=$?
+        __DL Buildtools/Vanilla/minecraft_server.$1.jar https://s3.amazonaws.com/Minecraft.Download/versions/$1/minecraft_server.$1.jar; retvald=$?
         if [ $retvald -eq 0 ]; then
             echo Downloading Vanilla Patches...
-            curl -o Buildtools/Vanilla/bungee-patch.jar https://raw.githubusercontent.com/ME1312/SubServers-2/master/SubServers.Bungee/Vanilla-Patch.jar; retvale=$?
+            __DL Buildtools/Vanilla/bungee-patch.jar https://raw.githubusercontent.com/ME1312/SubServers-2/master/SubServers.Bungee/Vanilla-Patch.jar; retvale=$?
             if [ $retvale -eq 0 ]; then
                 echo Patching Vanilla for BungeeCord Support
                 cd Buildtools/Vanilla
-                if [ -z "$3" ]
-                then
+                if [ -z "$3" ]; then
                     java -jar bungee-patch.jar $1; retvalf=$?;
                 else
                     HOME=$3 java -jar bungee-patch.jar $1; retvalf=$?;
@@ -113,11 +118,10 @@ else
             IFS='::' read -r -a version <<< "$1"
             sversion=$(echo ${version[@]:1} | tr -d ' ')
             echo Downloading Minecraft Forge...
-            curl -o forge-${version[0]}-installer.jar http://files.minecraftforge.net/maven/net/minecraftforge/forge/${version[0]}/forge-${version[0]}-installer.jar; retvalg=$?
+            __DL forge-${version[0]}-installer.jar http://files.minecraftforge.net/maven/net/minecraftforge/forge/${version[0]}/forge-${version[0]}-installer.jar; retvalg=$?
             if [ $retvalg -eq 0 ]; then
                 echo Installing Minecraft Forge Server...
-                if [ -z "$3" ]
-                then
+                if [ -z "$3" ]; then
                     java -jar ./forge-${version[0]}-installer.jar --installServer; retvalh=$?
                 else
                     HOME=$3 java -jar ./forge-${version[0]}-installer.jar --installServer; retvalh=$?
@@ -125,7 +129,7 @@ else
                 if [ $retvalh -eq 0 ]; then
                     mkdir ./mods
                     echo Downloading SpongeForge...
-                    curl -o mods/Sponge.jar http://files.minecraftforge.net/maven/org/spongepowered/spongeforge/$sversion/spongeforge-$sversion.jar; retvali=$?
+                    __DL mods/Sponge.jar http://files.minecraftforge.net/maven/org/spongepowered/spongeforge/$sversion/spongeforge-$sversion.jar; retvali=$?
                     if [ $retvali -eq 0 ]; then
                         echo Cleaning Up...
                         rm -Rf forge-${version[0]}-installer.jar

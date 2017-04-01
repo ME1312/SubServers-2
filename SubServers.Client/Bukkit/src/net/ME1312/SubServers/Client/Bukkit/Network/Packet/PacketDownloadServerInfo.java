@@ -7,23 +7,34 @@ import net.ME1312.SubServers.Client.Bukkit.Network.PacketIn;
 import net.ME1312.SubServers.Client.Bukkit.Network.PacketOut;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
+import java.util.UUID;
 
+/**
+ * Download Server Info Packet
+ */
 public class PacketDownloadServerInfo implements PacketIn, PacketOut {
-    private static HashMap<String, JSONCallback> callbacks = new HashMap<String, JSONCallback>();
+    private static HashMap<String, JSONCallback[]> callbacks = new HashMap<String, JSONCallback[]>();
     private String server;
     private String id;
 
-    public PacketDownloadServerInfo(String server, String id, JSONCallback callback) {
-        if (Util.isNull(server, id, callback)) throw new NullPointerException();
+    /**
+     * New PacketDownloadServerInfo (In)
+     */
+    public PacketDownloadServerInfo() {}
+
+    /**
+     * New PacketDownloadServerInfo (Out)
+     *
+     * @param server Server name
+     * @param callback Callbacks
+     */
+    public PacketDownloadServerInfo(String server, JSONCallback... callback) {
+        if (Util.isNull(server, callback)) throw new NullPointerException();
         this.server = server;
-        this.id = id;
+        this.id = Util.getNew(callbacks.keySet(), UUID::randomUUID).toString();
         callbacks.put(id, callback);
     }
-
-    public PacketDownloadServerInfo() {}
 
     @Override
     public JSONObject generate() {
@@ -35,7 +46,7 @@ public class PacketDownloadServerInfo implements PacketIn, PacketOut {
 
     @Override
     public void execute(JSONObject data) {
-        callbacks.get(data.getString("id")).run(data);
+        for (JSONCallback callback : callbacks.get(data.getString("id"))) callback.run(data);
         callbacks.remove(data.getString("id"));
     }
 

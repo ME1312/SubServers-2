@@ -12,9 +12,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Run Event Packet
+ */
 public class PacketInRunEvent implements PacketIn {
     private static HashMap<String, List<JSONCallback>> callbacks = new HashMap<String, List<JSONCallback>>();
 
+    /**
+     * New PacketInRunEvent
+     */
     public PacketInRunEvent() {
         callback("SubAddServerEvent", new JSONCallback() {
             @Override
