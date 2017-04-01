@@ -6,9 +6,9 @@ import org.bukkit.Bukkit;
 import org.json.JSONObject;
 
 /**
- * Shutdown Packet
+ * Reset Packet
  */
-public class PacketInShutdown implements PacketIn {
+public class PacketInReset implements PacketIn {
 
     @Override
     public void execute(JSONObject data) {

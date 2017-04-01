@@ -60,7 +60,7 @@ public class PacketLinkServer implements PacketIn, PacketOut {
                     server.linkSubDataClient(client);
                     System.out.println("SubData > " + client.getAddress().toString() + " has been defined as " + ((server instanceof SubServer) ? "SubServer" : "Server") + ": " + server.getName());
                     client.sendPacket(new PacketLinkServer(0, "Definition Successful"));
-                    if (server instanceof SubServer && !((SubServer) server).isRunning()) client.sendPacket(new PacketOutShutdown("Rogue SubServer Detected"));
+                    if (server instanceof SubServer && !((SubServer) server).isRunning()) client.sendPacket(new PacketOutReset("Rogue SubServer Detected"));
                 } else {
                     client.sendPacket(new PacketLinkServer(3, "Server already linked"));
                 }

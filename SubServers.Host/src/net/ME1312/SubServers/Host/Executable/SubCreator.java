@@ -56,7 +56,7 @@ public class SubCreator {
     public SubCreator(SubServers host) {
         if (Util.isNull(host)) throw new NullPointerException();
         this.host = host;
-        this.logger = new SubLogger(null, this, host.subdata.getName() + "/Creator", null, new Container<Boolean>(false), null);
+        this.logger = new SubLogger(null, this, "SubCreator", null, new Container<Boolean>(false), null);
     }
 
 
@@ -65,7 +65,7 @@ public class SubCreator {
         UniversalFile dir = new UniversalFile(new File(host.host.getRawString("Directory")), name);
         dir.mkdirs();
 
-        host.log.info.println(host.subdata.getName() + "/Creator > Generating Server Files...");
+        logger.logger.info.println("Generating Server Files...");
         host.subdata.sendPacket(new PacketOutExLogMessage(address, "Generating Server Files..."));
         if (type == ServerType.SPIGOT) {
             executable = new Executable("java -Xmx" + memory + "M -Djline.terminal=jline.UnsupportedTerminal -Dcom.mojang.eula.agree=true -jar Spigot.jar");
@@ -73,7 +73,7 @@ public class SubCreator {
             try {
                 generateSpigotYAML(dir);
                 generateProperties(dir, port);
-                host.log.info.println(host.subdata.getName() + "/Creator > Copying Plugins...");
+                logger.logger.info.println("Copying Plugins...");
                 host.subdata.sendPacket(new PacketOutExLogMessage(address, "Copying Plugins..."));
                 generateClient(dir, name, type);
                 copyFolder(new UniversalFile(host.dir, "Templates:Spigot Plugins"), new UniversalFile(dir, "plugins"));
@@ -101,7 +101,7 @@ public class SubCreator {
                 generateSpongeConf(dir);
                 generateClient(dir, name, type);
 
-                host.log.info.println(host.subdata.getName() + "/Creator > Searching Versions...");
+                logger.logger.info.println("Searching Versions...");
                 host.subdata.sendPacket(new PacketOutExLogMessage(address, "Searching Versions..."));
                 Document spongexml = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new InputSource(new StringReader(Util.readAll(new BufferedReader(new InputStreamReader(new URL("http://files.minecraftforge.net/maven/org/spongepowered/spongeforge/maven-metadata.xml").openStream(), Charset.forName("UTF-8")))))));
                 Document forgexml = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new InputSource(new StringReader(Util.readAll(new BufferedReader(new InputStreamReader(new URL("http://files.minecraftforge.net/maven/net/minecraftforge/forge/maven-metadata.xml").openStream(), Charset.forName("UTF-8")))))));
@@ -117,7 +117,7 @@ public class SubCreator {
                     }
                 }
                 if (spversion == null) throw new InvalidServerException("Cannot find sponge version for Minecraft " + version.toString());
-                host.log.info.println(host.subdata.getName() + "/Creator > Found \"spongeforge-" + spversion.toString() + '"');
+                logger.logger.info.println("Found \"spongeforge-" + spversion.toString() + '"');
                 host.subdata.sendPacket(new PacketOutExLogMessage(address, "Found \"spongeforge-" + spversion.toString() + '"'));
 
                 NodeList mcfnodeList = forgexml.getElementsByTagName("version");
@@ -131,12 +131,12 @@ public class SubCreator {
                     }
                 }
                 if (mcfversion == null) throw new InvalidServerException("Cannot find forge version for Sponge " + spversion.toString());
-                host.log.info.println(host.subdata.getName() + "/Creator > Found \"forge-" + mcfversion.toString() + '"');
+                logger.logger.info.println("Found \"forge-" + mcfversion.toString() + '"');
                 host.subdata.sendPacket(new PacketOutExLogMessage(address, "Found \"forge-" + mcfversion.toString() + '"'));
 
                 version = new Version(mcfversion.toString() + "::" + spversion.toString());
 
-                host.log.info.println(host.subdata.getName() + "/Creator > Copying Mods...");
+                logger.logger.info.println("Copying Mods...");
                 host.subdata.sendPacket(new PacketOutExLogMessage(address, "Copying Mods..."));
                 copyFolder(new UniversalFile(host.dir, "Templates:Sponge Config"), new UniversalFile(dir, "config"));
                 copyFolder(new UniversalFile(host.dir, "Templates:Sponge Mods"), new UniversalFile(dir, "mods"));
@@ -159,7 +159,7 @@ public class SubCreator {
                 writer.close();
 
                 if (!(new File(dir, "build.sh").exists())) {
-                    host.log.info.println(host.subdata.getName() + "/Creator > Problem copying build.sh");
+                    logger.logger.info.println("Problem copying build.sh");
                     host.subdata.sendPacket(new PacketOutExLogMessage(address, "Problem copying build.sh"));
                 } else {
                     File gitBash = new File(host.host.getRawString("Git-Bash"), "bin" + File.separatorChar + "bash.exe");
@@ -172,12 +172,12 @@ public class SubCreator {
                             e.printStackTrace();
                         }
                         if (process.exitValue() != 0) {
-                            host.log.info.println(host.subdata.getName() + "/Creator > Problem Setting Executable Permissions.");
+                            logger.logger.info.println("Problem Setting Executable Permissions.");
                             host.subdata.sendPacket(new PacketOutExLogMessage(address, "Problem Setting Executable Permissions."));
                         }
                     }
 
-                    host.log.info.println(host.subdata.getName() + "/Creator > Launching build.sh");
+                    logger.logger.info.println("Launching build.sh");
                     host.subdata.sendPacket(new PacketOutExLogMessage(address, "Launching build.sh"));
                     this.process = Runtime.getRuntime().exec((System.getProperty("os.name").toLowerCase().indexOf("win") >= 0)?
                             "\"" + gitBash + "\" --login -i -c \"bash build.sh " + ver.toString() + " " + type.toString().toLowerCase() + "\""
@@ -199,7 +199,7 @@ public class SubCreator {
                     info.put("exec", exec.toString());
                     host.subdata.sendPacket(new PacketExCreateServer(process.exitValue(), (this.process.exitValue() == 0)?"Created Server Successfully":("Couldn't build the server jar. See \"SubCreator-" + type.toString() + "-" + ver.toString().replace("::", "@") + ".log\" for more details."), info, id));
                     if (this.process.exitValue() != 0) {
-                        host.log.info.println(host.subdata.getName() + "/Creator > Couldn't build the server jar. See \"SubCreator-" + type.toString() + "-" + ver.toString().replace("::", "@") + ".log\" for more details.");
+                        logger.logger.info.println("Couldn't build the server jar. See \"SubCreator-" + type.toString() + "-" + ver.toString().replace("::", "@") + ".log\" for more details.");
                     }
                 }
             } catch (IOException e) {

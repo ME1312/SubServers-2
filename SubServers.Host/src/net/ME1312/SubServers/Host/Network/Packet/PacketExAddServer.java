@@ -70,9 +70,11 @@ public class PacketExAddServer implements PacketIn, PacketOut {
             if (host.servers.keySet().contains(data.getJSONObject("server").getString("name").toLowerCase())) {
                 host.subdata.sendPacket(new PacketExAddServer(0, "Server Already Added", (data.keySet().contains("id"))?data.getString("id"):null));
             } else {
-                host.servers.put(data.getJSONObject("server").getString("name").toLowerCase(), new SubServer(host, data.getJSONObject("server").getString("name"), data.getJSONObject("server").getBoolean("enabled"), data.getJSONObject("server").getBoolean("log"),
-                        data.getJSONObject("server").getString("dir"), new Executable(data.getJSONObject("server").getString("exec")), data.getJSONObject("server").getString("stopcmd")));
+                SubServer server = new SubServer(host, data.getJSONObject("server").getString("name"), data.getJSONObject("server").getBoolean("enabled"), data.getJSONObject("server").getBoolean("log"),
+                        data.getJSONObject("server").getString("dir"), new Executable(data.getJSONObject("server").getString("exec")), data.getJSONObject("server").getString("stopcmd"));
+                host.servers.put(data.getJSONObject("server").getString("name").toLowerCase(), server);
                 log.info.println("Added Server \u2014 " + data.getJSONObject("server").getString("name"));
+                if (data.getJSONObject("server").keySet().contains("running")) server.start(UUID.fromString(data.getJSONObject("server").getString("running")));
                 host.subdata.sendPacket(new PacketExAddServer(0, "Server Added Successfully", (data.keySet().contains("id"))?data.getString("id"):null));
             }
         } catch (Throwable e) {

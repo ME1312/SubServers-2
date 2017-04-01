@@ -69,7 +69,7 @@ public final class SubDataClient {
         registerPacket(new PacketDownloadServerInfo(), "SubDownloadServerInfo");
         registerPacket(new PacketDownloadServerList(), "SubDownloadServerList");
         registerPacket(new PacketInRunEvent(), "SubRunEvent");
-        registerPacket(new PacketInShutdown(), "SubShutdown");
+        registerPacket(new PacketInReset(), "SubReset");
         registerPacket(new PacketLinkServer(plugin), "SubLinkServer");
         registerPacket(new PacketStartServer(), "SubStartServer");
         registerPacket(new PacketStopServer(), "SubStopServer");

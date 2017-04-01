@@ -97,7 +97,7 @@ public final class SubDataServer {
         registerPacket(PacketLinkExHost.class, "SubLinkExHost");
         registerPacket(PacketLinkServer.class, "SubLinkServer");
         registerPacket(PacketOutRunEvent.class, "SubRunEvent");
-        registerPacket(PacketOutShutdown.class, "SubShutdown");
+        registerPacket(PacketOutReset.class, "SubReset");
         registerPacket(PacketStartServer.class, "SubStartServer");
         registerPacket(PacketStopServer.class, "SubStopServer");
         registerPacket(PacketTeleportPlayer.class, "SubTeleportPlayer");

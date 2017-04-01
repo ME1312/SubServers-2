@@ -14,6 +14,7 @@ import net.ME1312.SubServers.Bungee.Network.ClientHandler;
 import net.ME1312.SubServers.Bungee.Network.Packet.PacketExAddServer;
 import net.ME1312.SubServers.Bungee.Network.Packet.PacketExDeleteServer;
 import net.ME1312.SubServers.Bungee.Network.Packet.PacketExRemoveServer;
+import net.ME1312.SubServers.Bungee.Network.Packet.PacketOutReset;
 import net.ME1312.SubServers.Bungee.Network.PacketOut;
 import net.ME1312.SubServers.Bungee.SubPlugin;
 import org.json.JSONObject;
@@ -30,6 +31,7 @@ public class ExternalHost extends Host implements ClientHandler {
     private String directory;
     private NamedContainer<Boolean, Client> client;
     private LinkedList<PacketOut> queue;
+    private boolean clean;
     protected SubPlugin plugin;
 
     /**
@@ -53,6 +55,7 @@ public class ExternalHost extends Host implements ClientHandler {
         this.directory = directory;
         this.client = new NamedContainer<Boolean, Client>(false, null);
         this.queue = new LinkedList<PacketOut>();
+        this.clean = false;
     }
 
     @Override
@@ -78,8 +81,12 @@ public class ExternalHost extends Host implements ClientHandler {
         }
     }
     private void requeue() {
+        if (!clean) {
+            client.get().sendPacket(new PacketOutReset("Prevent Desync"));
+            clean = true;
+        }
         for (SubServer server : servers.values()) {
-            client.get().sendPacket(new PacketExAddServer(server.getName(), server.isEnabled(), server.isLogging(), server.getDirectory(), ((ExternalSubServer) server).exec, server.getStopCommand()));
+            client.get().sendPacket(new PacketExAddServer(server.getName(), server.isEnabled(), server.isLogging(), server.getDirectory(), ((ExternalSubServer) server).exec, server.getStopCommand(), (server.isRunning())?((ExternalSubLogger) server.getLogger()).getExternalAddress():null));
         }
         while (queue.size() != 0) {
             client.get().sendPacket(queue.get(0));
@@ -136,7 +143,7 @@ public class ExternalHost extends Host implements ClientHandler {
         SubAddServerEvent event = new SubAddServerEvent(player, this, server);
         plugin.getPluginManager().callEvent(event);
         if (!event.isCancelled()) {
-            queue(new PacketExAddServer(name, enabled, log, directory, executable, stopcmd, json -> {
+            queue(new PacketExAddServer(name, enabled, log, directory, executable, stopcmd, (server.isRunning())?((ExternalSubLogger) server.getLogger()).getExternalAddress():null, json -> {
                 if (json.getInt("r") == 0) {
                     if (!((start || temporary) && !server.start()) && temporary) server.setTemporary(true);
                     servers.put(name.toLowerCase(), server);

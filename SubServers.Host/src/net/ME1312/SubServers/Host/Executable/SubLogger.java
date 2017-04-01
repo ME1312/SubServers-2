@@ -17,8 +17,8 @@ import java.util.regex.Pattern;
 public class SubLogger {
     protected Process process;
     private Object handle;
-    private Logger logger;
-    private String name;
+    protected final Logger logger;
+    protected final String name;
     protected UUID address;
     protected Container<Boolean> log;
     protected File file;

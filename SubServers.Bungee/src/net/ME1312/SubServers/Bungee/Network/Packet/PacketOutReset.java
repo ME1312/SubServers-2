@@ -6,17 +6,17 @@ import net.ME1312.SubServers.Bungee.Network.PacketOut;
 import org.json.JSONObject;
 
 /**
- * Shutdown Packet
+ * Reset Packet
  */
-public class PacketOutShutdown implements PacketOut {
+public class PacketOutReset implements PacketOut {
     private String message;
 
     /**
-     * New PacketOutShutdown
+     * New PacketOutReset
      *
      * @param message Message
      */
-    public PacketOutShutdown(String message) {
+    public PacketOutReset(String message) {
         if (Util.isNull(message)) throw new NullPointerException();
         this.message = message;
     }

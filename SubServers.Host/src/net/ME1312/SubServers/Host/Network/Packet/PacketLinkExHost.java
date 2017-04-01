@@ -43,7 +43,10 @@ public class PacketLinkExHost implements PacketIn, PacketOut {
 
     @Override
     public void execute(JSONObject data) {
-        if (data.getInt("r") != 0) {
+        if (data.getInt("r") == 0) {
+            host.subdata.sendPacket(new PacketDownloadLang());
+            host.subdata.sendPacket(new PacketOutExRequestQueue());
+        } else {
             log.info.println("Could not link name with host: " + data.getString("m"));
         }
     }

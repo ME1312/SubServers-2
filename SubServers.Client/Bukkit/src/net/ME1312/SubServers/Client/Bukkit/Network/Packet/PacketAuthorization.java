@@ -30,7 +30,6 @@ public final class PacketAuthorization implements PacketIn, PacketOut {
         try {
             if (data.getInt("r") == 0) {
                 plugin.subdata.sendPacket(new PacketLinkServer(plugin));
-                plugin.subdata.sendPacket(new PacketDownloadLang());
             } else {
                 Bukkit.getLogger().info("SubServers > Could not authorize SubData connection: " + data.getString("m"));
                 plugin.subdata.destroy(false);

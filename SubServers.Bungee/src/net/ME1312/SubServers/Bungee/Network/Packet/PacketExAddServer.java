@@ -24,6 +24,7 @@ public class PacketExAddServer implements PacketIn, PacketOut {
     private String directory;
     private Executable executable;
     private String stopcmd;
+    private UUID running;
     private String id;
 
     /**
@@ -40,7 +41,7 @@ public class PacketExAddServer implements PacketIn, PacketOut {
      * @param directory Directory
      * @param executable Executable
      */
-    public PacketExAddServer(String name, boolean enabled, boolean log, String directory, Executable executable, String stopcmd, JSONCallback... callback) {
+    public PacketExAddServer(String name, boolean enabled, boolean log, String directory, Executable executable, String stopcmd, UUID running, JSONCallback... callback) {
         if (Util.isNull(name, enabled, log, directory, executable, callback)) throw new NullPointerException();
         this.name = name;
         this.enabled = enabled;
@@ -48,6 +49,7 @@ public class PacketExAddServer implements PacketIn, PacketOut {
         this.directory = directory;
         this.executable = executable;
         this.stopcmd = stopcmd;
+        this.running = running;
         this.id = Util.getNew(callbacks.keySet(), UUID::randomUUID).toString();
         callbacks.put(id, callback);
     }
@@ -63,6 +65,7 @@ public class PacketExAddServer implements PacketIn, PacketOut {
         server.put("dir", directory);
         server.put("exec", executable.toString());
         server.put("stopcmd", stopcmd);
+        if (running != null) server.put("running", running.toString());
         json.put("server", server);
         return json;
     }

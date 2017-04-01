@@ -33,7 +33,9 @@ public class PacketLinkServer implements PacketIn, PacketOut {
 
     @Override
     public void execute(JSONObject data) {
-        if (data.getInt("r") != 0) {
+        if (data.getInt("r") == 0) {
+            plugin.subdata.sendPacket(new PacketDownloadLang());
+        } else {
             Bukkit.getLogger().info("SubData > Could not link name with server: " + data.getString("m"));
         }
     }

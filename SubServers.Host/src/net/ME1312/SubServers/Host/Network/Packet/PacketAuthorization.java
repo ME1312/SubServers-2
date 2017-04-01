@@ -47,8 +47,6 @@ public final class PacketAuthorization implements PacketIn, PacketOut {
         try {
             if (data.getInt("r") == 0) {
                 host.subdata.sendPacket(new PacketLinkExHost(host));
-                host.subdata.sendPacket(new PacketDownloadLang());
-                host.subdata.sendPacket(new PacketOutExRequestQueue());
             } else {
                 log.info.println("SubServers > Could not authorize SubData connection: " + data.getString("m"));
                 host.subdata.destroy(false);

@@ -1,5 +1,6 @@
 package net.ME1312.SubServers.Host.Network.Packet;
 
+import net.ME1312.SubServers.Host.Executable.SubCreator;
 import net.ME1312.SubServers.Host.Library.JSONCallback;
 import net.ME1312.SubServers.Host.Library.Util;
 import net.ME1312.SubServers.Host.Library.Version.Version;
@@ -15,20 +16,10 @@ import java.util.UUID;
  */
 public class PacketCreateServer implements PacketIn, PacketOut {
     private static HashMap<String, JSONCallback[]> callbacks = new HashMap<String, JSONCallback[]>();
-    public enum ServerType {
-        SPIGOT,
-        VANILLA,
-        SPONGE,;
-
-        @Override
-        public String toString() {
-            return super.toString().substring(0, 1).toUpperCase()+super.toString().substring(1).toLowerCase();
-        }
-    }
     private UUID player;
     private String name;
     private String host;
-    private ServerType type;
+    private SubCreator.ServerType type;
     private Version version;
     private int port;
     private int ram;
@@ -51,7 +42,7 @@ public class PacketCreateServer implements PacketIn, PacketOut {
      * @param memory Server Memory
      * @param callback Callbacks
      */
-    public PacketCreateServer(UUID player, String name, String host, ServerType type, Version version, int port, int memory, JSONCallback... callback) {
+    public PacketCreateServer(UUID player, String name, String host, SubCreator.ServerType type, Version version, int port, int memory, JSONCallback... callback) {
         if (Util.isNull(name, host, type, version, port, memory, callback)) throw new NullPointerException();
         this.player = player;
         this.name = name;
