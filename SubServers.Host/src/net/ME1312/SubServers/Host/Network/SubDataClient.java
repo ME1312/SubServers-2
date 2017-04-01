@@ -78,6 +78,7 @@ public final class SubDataClient {
         registerPacket(new PacketExAddServer(host), "SubExAddServer");
         registerPacket(new PacketExConfigureHost(host), "SubExConfigureHost");
         registerPacket(new PacketExCreateServer(host), "SubExCreateServer");
+        registerPacket(new PacketExDeleteServer(host), "SubExDeleteServer");
         registerPacket(new PacketExRemoveServer(host), "SubExRemoveServer");
         registerPacket(new PacketExUpdateServer(host), "SubExUpdateServer");
         registerPacket(new PacketInRunEvent(), "SubRunEvent");
@@ -99,6 +100,7 @@ public final class SubDataClient {
         registerPacket(PacketExAddServer.class, "SubExAddServer");
         registerPacket(PacketExConfigureHost.class, "SubExConfigureHost");
         registerPacket(PacketExCreateServer.class, "SubExCreateServer");
+        registerPacket(PacketExDeleteServer.class, "SubExDeleteServer");
         registerPacket(PacketExRemoveServer.class, "SubExRemoveServer");
         registerPacket(PacketExUpdateServer.class, "SubExUpdateServer");
         registerPacket(PacketLinkExHost.class, "SubLinkExHost");

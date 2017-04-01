@@ -1,11 +1,9 @@
 package net.ME1312.SubServers.Bungee;
 
-import com.google.common.io.Files;
 import net.ME1312.SubServers.Bungee.Host.Host;
 import net.ME1312.SubServers.Bungee.Host.Server;
 import net.ME1312.SubServers.Bungee.Host.SubCreator;
 import net.ME1312.SubServers.Bungee.Host.SubServer;
-import net.ME1312.SubServers.Bungee.Library.UniversalFile;
 import net.ME1312.SubServers.Bungee.Library.Util;
 import net.ME1312.SubServers.Bungee.Library.Version.Version;
 import net.md_5.bungee.api.ChatColor;
@@ -17,12 +15,7 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
 import net.md_5.bungee.api.plugin.TabExecutor;
 import net.md_5.bungee.command.ConsoleCommandSender;
-import org.json.JSONObject;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.*;
 
 /**
@@ -169,43 +162,8 @@ public final class SubCommand extends Command implements TabExecutor {
                                 sender.sendMessage("SubServers > That Server is not a SubServer");
                             } else if (((SubServer) servers.get(args[1].toLowerCase())).isRunning()) {
                                 sender.sendMessage("SubServers > That SubServer is still running");
-                            } else if (!((SubServer) servers.get(args[1].toLowerCase())).getHost().removeSubServer(args[1])) {
-                                sender.sendMessage("SubServers > Couldn't Remove SubServer");
-                            } else {
-                                new Thread(() -> {
-                                    UniversalFile to = new UniversalFile(plugin.dir, "SubServers:Recently Deleted:" + args[1].toLowerCase());
-                                    try {
-                                        File from = new File(((SubServer) servers.get(args[1].toLowerCase())).getHost().getDirectory(), ((SubServer) servers.get(args[1].toLowerCase())).getDirectory());
-                                        if (from.exists()) {
-                                            sender.sendMessage("SubServers > Removing Files...");
-                                            if (to.exists()) {
-                                                if (to.isDirectory()) Util.deleteDirectory(to);
-                                                else to.delete();
-                                            }
-                                            to.mkdirs();
-                                            Files.move(from, to);
-                                        }
-                                    } catch (Exception e) {
-                                        e.printStackTrace();
-                                    }
-                                    sender.sendMessage("SubServers > Saving...");
-                                    JSONObject json = (plugin.config.get().getSection("Servers").getKeys().contains(servers.get(args[1].toLowerCase()).getName()))?plugin.config.get().getSection("Servers").getSection(servers.get(args[1].toLowerCase()).getName()).toJSON():new JSONObject();
-                                    json.put("Name", servers.get(args[1].toLowerCase()).getName());
-                                    json.put("Timestamp", Calendar.getInstance().getTime().getTime());
-                                    try {
-                                        if (plugin.config.get().getSection("Servers").getKeys().contains(servers.get(args[1].toLowerCase()).getName())) {
-                                            plugin.config.get().getSection("Servers").remove(servers.get(args[1].toLowerCase()).getName());
-                                            plugin.config.save();
-                                        }
-                                        if (!to.exists()) to.mkdirs();
-                                        FileWriter writer = new FileWriter(new File(to, "info.json"));
-                                        json.write(writer);
-                                        writer.close();
-                                    } catch (Exception e) {
-                                        e.printStackTrace();
-                                    }
-                                    sender.sendMessage("SubServers > Done!");
-                                }).start();
+                            } else if (!((SubServer) servers.get(args[1].toLowerCase())).getHost().deleteSubServer(args[1].toLowerCase())){
+                                System.out.println("SubServers > Couldn't remove server from memory.");
                             }
                         } catch (Exception e) {
                             e.printStackTrace();

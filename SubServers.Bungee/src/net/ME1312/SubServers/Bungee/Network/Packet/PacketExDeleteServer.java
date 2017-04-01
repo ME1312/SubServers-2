@@ -13,41 +13,30 @@ import java.util.HashMap;
 import java.util.UUID;
 
 /**
- * Create Server External Host Packet
+ * Delete Server External Host Packet
  */
 public class PacketExDeleteServer implements PacketIn, PacketOut {
     private static HashMap<String, JSONCallback[]> callbacks = new HashMap<String, JSONCallback[]>();
     private String name;
-    private SubCreator.ServerType type;
-    private Version version;
-    private int port;
-    private int ram;
-    private UUID log;
+    private JSONObject info;
     private String id = null;
 
     /**
-     * New PacketExCreateServer
+     * New PacketExDeleteServer
      */
     public PacketExDeleteServer() {}
 
     /**
-     * New PacketExCreateServer (Out)
+     * New PacketExDeleteServer (Out)
      *
      * @param name Server Name
-     * @param type Server Type
-     * @param version Server Version
-     * @param memory Server Memory Amount (in MB)
-     * @param port Server Port Number
+     * @param info Info.json Contents
      * @param callback Callbacks
      */
-    public PacketExDeleteServer(String name, SubCreator.ServerType type, Version version, int memory, int port, UUID log, JSONCallback... callback) {
-        if (Util.isNull(name, type, version, port, memory, log, callback)) throw new NullPointerException();
+    public PacketExDeleteServer(String name, JSONObject info, JSONCallback... callback) {
+        if (Util.isNull(name, info, callback)) throw new NullPointerException();
         this.name = name;
-        this.type = type;
-        this.version = version;
-        this.port = port;
-        this.ram = memory;
-        this.log = log;
+        this.info = info;
         this.id = Util.getNew(callbacks.keySet(), UUID::randomUUID).toString();
         callbacks.put(id, callback);
     }
@@ -59,14 +48,8 @@ public class PacketExDeleteServer implements PacketIn, PacketOut {
         } else {
             JSONObject json = new JSONObject();
             json.put("id", id);
-            JSONObject creator = new JSONObject();
-            creator.put("name", name);
-            creator.put("type", type.toString());
-            creator.put("version", version.toString());
-            creator.put("port", port);
-            creator.put("ram", ram);
-            creator.put("log", log.toString());
-            json.put("creator", creator);
+            json.put("server", name);
+            json.put("info", info);
             return json;
         }
     }

@@ -12,9 +12,11 @@ import net.ME1312.SubServers.Bungee.Library.Util;
 import net.ME1312.SubServers.Bungee.Network.Client;
 import net.ME1312.SubServers.Bungee.Network.ClientHandler;
 import net.ME1312.SubServers.Bungee.Network.Packet.PacketExAddServer;
+import net.ME1312.SubServers.Bungee.Network.Packet.PacketExDeleteServer;
 import net.ME1312.SubServers.Bungee.Network.Packet.PacketExRemoveServer;
 import net.ME1312.SubServers.Bungee.Network.PacketOut;
 import net.ME1312.SubServers.Bungee.SubPlugin;
+import org.json.JSONObject;
 
 import java.net.InetAddress;
 import java.util.*;
@@ -174,6 +176,44 @@ public class ExternalHost extends Host implements ClientHandler {
             }
             queue(new PacketExRemoveServer(name, json -> {
                 if (json.getInt("r") == 0) servers.remove(name.toLowerCase());
+            }));
+            return true;
+        } else return false;
+    }
+
+    @Override
+    public boolean deleteSubServer(UUID player, String name) throws InterruptedException {
+        if (Util.isNull(name)) throw new NullPointerException();
+
+        SubRemoveServerEvent event = new SubRemoveServerEvent(player, this, getSubServer(name));
+        plugin.getPluginManager().callEvent(event);
+        if (!event.isCancelled()) {
+            if (getSubServer(name).isRunning()) {
+                getSubServer(name).stop();
+                getSubServer(name).waitFor();
+            }
+
+            System.out.println("SubServers > Saving...");
+            JSONObject info = (plugin.config.get().getSection("Servers").getKeys().contains(servers.get(name.toLowerCase()).getName())) ? plugin.config.get().getSection("Servers").getSection(servers.get(name.toLowerCase()).getName()).toJSON() : new JSONObject();
+            info.put("Name", servers.get(name.toLowerCase()).getName());
+            info.put("Timestamp", Calendar.getInstance().getTime().getTime());
+            try {
+                if (plugin.config.get().getSection("Servers").getKeys().contains(servers.get(name.toLowerCase()).getName())) {
+                    plugin.config.get().getSection("Servers").remove(servers.get(name.toLowerCase()).getName());
+                    plugin.config.save();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            System.out.println("SubServers > Removing Files...");
+            queue(new PacketExDeleteServer(name, info, json -> {
+                if (json.getInt("r") == 0) {
+                    servers.remove(name.toLowerCase());
+                    System.out.println("SubServers > Done!");
+                } else {
+                    System.out.println("SubServers > Couldn't remove server from memory. See " + getName() + " console for more details");
+                }
             }));
             return true;
         } else return false;

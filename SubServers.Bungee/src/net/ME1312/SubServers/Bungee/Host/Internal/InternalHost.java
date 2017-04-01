@@ -1,5 +1,6 @@
 package net.ME1312.SubServers.Bungee.Host.Internal;
 
+import com.google.common.io.Files;
 import net.ME1312.SubServers.Bungee.Event.SubAddServerEvent;
 import net.ME1312.SubServers.Bungee.Event.SubRemoveServerEvent;
 import net.ME1312.SubServers.Bungee.Host.Executable;
@@ -7,15 +8,15 @@ import net.ME1312.SubServers.Bungee.Library.Exception.InvalidServerException;
 import net.ME1312.SubServers.Bungee.Host.Host;
 import net.ME1312.SubServers.Bungee.Host.SubCreator;
 import net.ME1312.SubServers.Bungee.Host.SubServer;
-import net.ME1312.SubServers.Bungee.Library.NamedContainer;
+import net.ME1312.SubServers.Bungee.Library.UniversalFile;
 import net.ME1312.SubServers.Bungee.Library.Util;
 import net.ME1312.SubServers.Bungee.SubPlugin;
+import org.json.JSONObject;
 
+import java.io.File;
+import java.io.FileWriter;
 import java.net.InetAddress;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.TreeMap;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Internal Host Class
@@ -130,6 +131,50 @@ public class InternalHost extends Host {
                 getSubServer(name).terminate();
             }
             servers.remove(name.toLowerCase());
+            return true;
+        } else return false;
+    }
+
+    @Override
+    public boolean deleteSubServer(UUID player, String name) throws InterruptedException {
+        if (Util.isNull(name)) throw new NullPointerException();
+
+        if (removeSubServer(player, name)) {
+            new Thread(() -> {
+                UniversalFile to = new UniversalFile(plugin.dir, "SubServers:Recently Deleted:" + name.toLowerCase());
+                try {
+                    File from = new File(getDirectory(), servers.get(name.toLowerCase()).getDirectory());
+                    if (from.exists()) {
+                        System.out.println("SubServers > Removing Files...");
+                        if (to.exists()) {
+                            if (to.isDirectory()) Util.deleteDirectory(to);
+                            else to.delete();
+                        }
+                        to.mkdirs();
+                        Files.move(from, to);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                System.out.println("SubServers > Saving...");
+                JSONObject json = (plugin.config.get().getSection("Servers").getKeys().contains(servers.get(name.toLowerCase()).getName()))?plugin.config.get().getSection("Servers").getSection(servers.get(name.toLowerCase()).getName()).toJSON():new JSONObject();
+                json.put("Name", servers.get(name.toLowerCase()).getName());
+                json.put("Timestamp", Calendar.getInstance().getTime().getTime());
+                try {
+                    if (plugin.config.get().getSection("Servers").getKeys().contains(servers.get(name.toLowerCase()).getName())) {
+                        plugin.config.get().getSection("Servers").remove(servers.get(name.toLowerCase()).getName());
+                        plugin.config.save();
+                    }
+                    if (!to.exists()) to.mkdirs();
+                    FileWriter writer = new FileWriter(new File(to, "info.json"));
+                    json.write(writer);
+                    writer.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                System.out.println("SubServers > Done!");
+            }).start();
             return true;
         } else return false;
     }

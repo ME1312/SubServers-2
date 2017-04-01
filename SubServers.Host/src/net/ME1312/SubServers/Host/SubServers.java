@@ -17,8 +17,10 @@ import net.ME1312.SubServers.Host.Library.UniversalFile;
 import net.ME1312.SubServers.Host.Library.Util;
 import net.ME1312.SubServers.Host.Library.Version.Version;
 import net.ME1312.SubServers.Host.Network.SubDataClient;
+import org.json.JSONObject;
 
 import java.io.File;
+import java.io.FileReader;
 import java.lang.reflect.InvocationTargetException;
 import java.net.InetAddress;
 import java.net.SocketException;
@@ -26,6 +28,7 @@ import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.file.Files;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 /**
  * SubServers.Host Main Class
@@ -84,6 +87,43 @@ public final class SubServers {
             if (!(new UniversalFile(dir, "Templates:Sponge Mods").exists())) {
                 new UniversalFile(dir, "Templates:Sponge Mods").mkdir();
                 System.out.println("SubServers > Created ~/Templates/Sponge Mods");
+            }
+
+            if (new UniversalFile(dir, "Recently Deleted").exists()) {
+                int f = new UniversalFile(dir, "Recently Deleted").listFiles().length;
+                for (File file : new UniversalFile(dir, "Recently Deleted").listFiles()) {
+                    try {
+                        if (file.isDirectory()) {
+                            if (new UniversalFile(dir, "Recently Deleted:" + file.getName() + ":info.json").exists()) {
+                                JSONObject json = new JSONObject(Util.readAll(new FileReader(new UniversalFile(dir, "Recently Deleted:" + file.getName() + ":info.json"))));
+                                if (json.keySet().contains("Timestamp")) {
+                                    if (TimeUnit.MILLISECONDS.toDays(Calendar.getInstance().getTime().getTime() - json.getLong("Timestamp")) >= 7) {
+                                        Util.deleteDirectory(file);
+                                        f--;
+                                        System.out.println("SubServers > Removed ~/Recently Deleted/" + file.getName());
+                                    }
+                                } else {
+                                    Util.deleteDirectory(file);
+                                    f--;
+                                    System.out.println("SubServers > Removed ~/Recently Deleted/" + file.getName());
+                                }
+                            } else {
+                                Util.deleteDirectory(file);
+                                f--;
+                                System.out.println("SubServers > Removed ~/Recently Deleted/" + file.getName());
+                            }
+                        } else {
+                            Files.delete(file.toPath());
+                            f--;
+                            System.out.println("SubServers > Removed ~/Recently Deleted/" + file.getName());
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+                if (f <= 0) {
+                    Files.delete(new UniversalFile(dir, "Recently Deleted").toPath());
+                }
             }
 
             config = new YAMLConfig(new UniversalFile(dir, "config.yml"));
