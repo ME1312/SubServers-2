@@ -270,8 +270,8 @@ public class InternalSubCreator extends SubCreator {
             settings.set("Use-Title-Messages", true);
             YAMLSection subdata = new YAMLSection();
             subdata.set("Name", name);
-            subdata.set("Address", host.plugin.config.get().getSection("Settings").getSection("SubData").getRawString("Address"));
-            subdata.set("Password", host.plugin.config.get().getSection("Settings").getSection("SubData").getRawString("Password"));
+            subdata.set("Address", host.plugin.config.get().getSection("Settings").getSection("SubData").getRawString("Address", "127.0.0.1").replace("0.0.0.0", "127.0.0.1"));
+            subdata.set("Password", host.plugin.config.get().getSection("Settings").getSection("SubData").getRawString("Password", ""));
             settings.set("SubData", subdata);
             config.get().set("Settings", settings);
             config.save();

@@ -8,6 +8,7 @@ import net.ME1312.SubServers.Client.Bukkit.Network.Packet.PacketCreateServer;
 import net.ME1312.SubServers.Client.Bukkit.SubPlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.util.*;
 
@@ -17,7 +18,8 @@ import java.util.*;
 public abstract class UIRenderer {
     protected static HashMap<String, Renderer> hostPlugins = new HashMap<String, Renderer>();
     protected static HashMap<String, Renderer> subserverPlugins = new HashMap<String, Renderer>();
-    private NamedContainer<String, Integer> downloading = null;
+    private NamedContainer<String, Integer> tdownload = null;
+    private BukkitTask download = null;
     private final UUID player;
     private SubPlugin plugin;
 
@@ -123,23 +125,26 @@ public abstract class UIRenderer {
      */
     public void setDownloading(String subtitle) {
         if (subtitle != null && !(Bukkit.getPluginManager().getPlugin("TitleManager") != null && plugin.config.get().getSection("Settings").getBoolean("Use-Title-Messages", true))) {
-            Bukkit.getPlayer(player).sendMessage(plugin.lang.getSection("Lang").getColoredString("Interface.Generic.Downloading", '&').replace("$str$", subtitle));
-        } if (subtitle != null && downloading == null) {
-            downloading = new NamedContainer<String, Integer>(subtitle, 0);
+            Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, () -> {
+                Bukkit.getPlayer(player).sendMessage(plugin.lang.getSection("Lang").getColoredString("Interface.Generic.Downloading", '&').replace("$str$", subtitle));
+                download = null;
+            }, 30L);
+        } if (subtitle != null && tdownload == null) {
+            tdownload = new NamedContainer<String, Integer>(subtitle, 0);
             final Container<Integer> delay = new Container<Integer>(0);
             Bukkit.getScheduler().runTask(plugin, new Runnable() {
                 @Override
                 public void run() {
-                    if (downloading != null) {
+                    if (tdownload != null) {
                         String word = ChatColor.stripColor(plugin.lang.getSection("Lang").getColoredString("Interface.Generic.Downloading.Title", '&'));
                         int i = 0;
-                        int start = (downloading.get() - 3 < 0)?0:downloading.get()-3;
-                        int end = (downloading.get() >= word.length())?word.length():downloading.get();
+                        int start = (tdownload.get() - 3 < 0)?0: tdownload.get()-3;
+                        int end = (tdownload.get() >= word.length())?word.length(): tdownload.get();
                         String str = plugin.lang.getSection("Lang").getColoredString((delay.get() > 7 && start == 0)?"Interface.Generic.Downloading.Title-Color-Alt":"Interface.Generic.Downloading.Title-Color", '&');
                         delay.set(delay.get() + 1);
-                        if (delay.get() > 7) downloading.set(downloading.get() + 1);
-                        if (downloading.get() >= word.length() + 3) {
-                            downloading.set(0);
+                        if (delay.get() > 7) tdownload.set(tdownload.get() + 1);
+                        if (tdownload.get() >= word.length() + 3) {
+                            tdownload.set(0);
                             delay.set(0);
                         }
 
@@ -150,7 +155,7 @@ public abstract class UIRenderer {
                             if (i == end) str += plugin.lang.getSection("Lang").getColoredString("Interface.Generic.Downloading.Title-Color", '&');
                         }
 
-                        str += '\n' + plugin.lang.getSection("Lang").getColoredString("Interface.Generic.Downloading.Title-Color-Alt", '&') + downloading.name();
+                        str += '\n' + plugin.lang.getSection("Lang").getColoredString("Interface.Generic.Downloading.Title-Color-Alt", '&') + tdownload.name();
                         sendTitle(str, 0, 10, 5);
                         Bukkit.getScheduler().runTaskLater(plugin, this, 1);
                     } else {
@@ -159,9 +164,11 @@ public abstract class UIRenderer {
                 }
             });
         } else if (subtitle != null) {
-            downloading.rename(subtitle);
-        } else if (downloading != null) {
-            downloading = null;
+            tdownload.rename(subtitle);
+        } else if (tdownload != null) {
+            tdownload = null;
+            if (download != null) download.cancel();
+            download = null;
         }
     }
 

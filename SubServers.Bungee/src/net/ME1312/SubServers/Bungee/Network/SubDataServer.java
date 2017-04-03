@@ -36,11 +36,16 @@ public final class SubDataServer {
      * @throws IOException
      */
     public SubDataServer(SubPlugin plugin, int port, int backlog, InetAddress address) throws IOException {
-        if (Util.isNull(plugin, port, backlog, address)) throw new NullPointerException();
-        server = new ServerSocket(port, backlog, address);
+        if (Util.isNull(plugin, port, backlog)) throw new NullPointerException();
+        if (address == null) {
+            server = new ServerSocket(port, backlog);
+            allowConnection(InetAddress.getByName("127.0.0.1"));
+        } else {
+            server = new ServerSocket(port, backlog, address);
+            allowConnection(address);
+        }
         this.plugin = plugin;
 
-        allowConnection(address);
         if (!defaults) loadDefaults();
     }
 

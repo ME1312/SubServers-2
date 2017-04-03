@@ -1,6 +1,5 @@
 package net.ME1312.SubServers.Host;
 
-import net.ME1312.SubServers.Host.API.Command;
 import net.ME1312.SubServers.Host.API.Event.CommandPreProcessEvent;
 import net.ME1312.SubServers.Host.API.Event.SubDisableEvent;
 import net.ME1312.SubServers.Host.API.Event.SubEnableEvent;
@@ -45,7 +44,7 @@ public final class SubServers {
     public SubDataClient subdata = null;
 
     public final Version version = new Version("2.11.2a");
-    public final Version bversion = new Version(3);
+    public final Version bversion = null;
     public final SubAPI api = new SubAPI(this);
 
     private boolean running;

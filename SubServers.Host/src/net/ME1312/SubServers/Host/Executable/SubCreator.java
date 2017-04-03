@@ -289,7 +289,7 @@ public class SubCreator {
         writer.println("enable-rcon=false");
         writer.println("level-seed=");
         writer.println("force-gamemode=false");
-        writer.println("server-ip=" + host.subdata.getClient().getLocalAddress().toString().substring(1));
+        writer.println("server-ip=" + host.config.get().getSection("Settings").getRawString("Server-Bind"));
         writer.println("network-compression-threshold=-1");
         writer.println("max-build-height=256");
         writer.println("spawn-npcs=true");

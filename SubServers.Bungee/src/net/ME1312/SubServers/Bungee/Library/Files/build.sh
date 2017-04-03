@@ -17,14 +17,11 @@ if [ -z "$2" ]
     exit 1
 fi
 function __DL() {
-    if [ hash curl 2>/dev/null ]; then
-        curl -o $1 $2; return $?
-    fi
     if [ hash wget 2>/dev/null ]; then
         wget -o $1 $2; return $?
+    else
+        curl -o $1 $2; return $?
     fi
-    echo Could not find a suitable download command: Please install curl or wget
-    exit 1;
 }
 if [ $2 == bukkit ] || [ $2 == spigot ]; then
     echo Downloading Buildtools...
