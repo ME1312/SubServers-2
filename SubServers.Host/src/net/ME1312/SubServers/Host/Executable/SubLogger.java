@@ -58,7 +58,7 @@ public class SubLogger {
                 this.writer.println("---------- LOG START \u2014 " + name + " ----------");
                 this.writer.flush();
             } catch (UnsupportedEncodingException | FileNotFoundException e) {
-                e.printStackTrace();
+                logger.error.println(e);
             }
         }
         if (out == null) (out = new Thread(() -> start(process.getInputStream(), false))).start();

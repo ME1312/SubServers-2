@@ -77,15 +77,15 @@ public final class SubServers {
 
             if (!(new UniversalFile(dir, "Templates:Spigot Plugins").exists())) {
                 new UniversalFile(dir, "Templates:Spigot Plugins").mkdirs();
-                System.out.println("SubServers > Created ~/Templates/Spigot Plugins");
+                log.info.println("SubServers > Created ~/Templates/Spigot Plugins");
             }
             if (!(new UniversalFile(dir, "Templates:Sponge Config").exists())) {
                 new UniversalFile(dir, "Templates:Sponge Config").mkdir();
-                System.out.println("SubServers > Created ~/Templates/Sponge Config");
+                log.info.println("SubServers > Created ~/Templates/Sponge Config");
             }
             if (!(new UniversalFile(dir, "Templates:Sponge Mods").exists())) {
                 new UniversalFile(dir, "Templates:Sponge Mods").mkdir();
-                System.out.println("SubServers > Created ~/Templates/Sponge Mods");
+                log.info.println("SubServers > Created ~/Templates/Sponge Mods");
             }
 
             if (new UniversalFile(dir, "Recently Deleted").exists()) {
@@ -99,25 +99,25 @@ public final class SubServers {
                                     if (TimeUnit.MILLISECONDS.toDays(Calendar.getInstance().getTime().getTime() - json.getLong("Timestamp")) >= 7) {
                                         Util.deleteDirectory(file);
                                         f--;
-                                        System.out.println("SubServers > Removed ~/Recently Deleted/" + file.getName());
+                                        log.info.println("SubServers > Removed ~/Recently Deleted/" + file.getName());
                                     }
                                 } else {
                                     Util.deleteDirectory(file);
                                     f--;
-                                    System.out.println("SubServers > Removed ~/Recently Deleted/" + file.getName());
+                                    log.info.println("SubServers > Removed ~/Recently Deleted/" + file.getName());
                                 }
                             } else {
                                 Util.deleteDirectory(file);
                                 f--;
-                                System.out.println("SubServers > Removed ~/Recently Deleted/" + file.getName());
+                                log.info.println("SubServers > Removed ~/Recently Deleted/" + file.getName());
                             }
                         } else {
                             Files.delete(file.toPath());
                             f--;
-                            System.out.println("SubServers > Removed ~/Recently Deleted/" + file.getName());
+                            log.info.println("SubServers > Removed ~/Recently Deleted/" + file.getName());
                         }
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        log.error.println(e);
                     }
                 }
                 if (f <= 0) {

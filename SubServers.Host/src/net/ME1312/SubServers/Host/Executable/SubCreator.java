@@ -78,7 +78,7 @@ public class SubCreator {
                 generateClient(dir, name, type);
                 copyFolder(new UniversalFile(host.dir, "Templates:Spigot Plugins"), new UniversalFile(dir, "plugins"));
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.logger.error.println(e);
             }
 
         } else if (type == ServerType.VANILLA) {
@@ -88,7 +88,7 @@ public class SubCreator {
                 generateEULA(dir);
                 generateProperties(dir, port);
             } catch (FileNotFoundException | UnsupportedEncodingException e) {
-                e.printStackTrace();
+                logger.logger.error.println(e);
             }
         } else if (type == ServerType.SPONGE) {
             try {
@@ -141,7 +141,7 @@ public class SubCreator {
                 copyFolder(new UniversalFile(host.dir, "Templates:Sponge Config"), new UniversalFile(dir, "config"));
                 copyFolder(new UniversalFile(host.dir, "Templates:Sponge Mods"), new UniversalFile(dir, "mods"));
             } catch (ParserConfigurationException | IOException | SAXException | NullPointerException e) {
-                e.printStackTrace();
+                logger.logger.error.println(e);
             }
         }
 
@@ -169,7 +169,7 @@ public class SubCreator {
                             process.waitFor();
                             Thread.sleep(500);
                         } catch (InterruptedException e) {
-                            e.printStackTrace();
+                            logger.logger.error.println(e);
                         }
                         if (process.exitValue() != 0) {
                             logger.logger.info.println("Problem Setting Executable Permissions.");
@@ -191,7 +191,7 @@ public class SubCreator {
                         this.process.waitFor();
                         Thread.sleep(500);
                     } catch (InterruptedException e) {
-                        e.printStackTrace();
+                        logger.logger.error.println(e);
                     }
 
                     JSONObject info = new JSONObject();

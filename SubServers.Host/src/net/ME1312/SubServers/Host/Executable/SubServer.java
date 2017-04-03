@@ -96,7 +96,7 @@ public class SubServer {
 
             if (process.isAlive()) process.waitFor();
         } catch (IOException | InterruptedException e) {
-            e.printStackTrace();
+            host.log.error.println(e);
             allowrestart = false;
             if (falsestart) host.subdata.sendPacket(new PacketExUpdateServer(this, PacketExUpdateServer.UpdateType.LAUNCH_EXCEPTION));
         }
@@ -132,7 +132,7 @@ public class SubServer {
                     command.flush();
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+                host.log.error.println(e);
             }
         }
     }
@@ -160,7 +160,7 @@ public class SubServer {
                     this.command.flush();
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+                host.log.error.println(e);
             }
         }
     }
