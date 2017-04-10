@@ -39,7 +39,7 @@ public final class SubDataClient {
      * SubServers Client Instance
      *
      * @param plugin SubPlugin
-     * @param address Bind Address
+     * @param address Address
      * @param port Port
      * @throws IOException
      */
@@ -275,7 +275,7 @@ public final class SubDataClient {
             Bukkit.getLogger().info("SubServers > The SubData Connection was closed");
             if (reconnect) {
                 Bukkit.getLogger().info("SubServers > Attempting to reconnect in 10 seconds");
-                Bukkit.getScheduler().runTaskLater(plugin, new Runnable() {
+                Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, new Runnable() {
                     @Override
                     public void run() {
                         try {

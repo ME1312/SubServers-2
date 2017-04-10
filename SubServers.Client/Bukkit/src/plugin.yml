@@ -1,4 +1,4 @@
-name: 'SubServers'
+name: 'SubServers-Client-Bukkit'
 main: 'net.ME1312.SubServers.Client.Bukkit.SubPlugin'
 version: '2.11.2e'
 authors: [ME1312]

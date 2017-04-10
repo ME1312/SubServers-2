@@ -173,7 +173,7 @@ public final class SubPlugin extends BungeeCord {
             lang = new YAMLConfig(new UniversalFile(dir, "SubServers:lang.yml"));
             subdata = new SubDataServer(this, Integer.parseInt(config.get().getSection("Settings").getSection("SubData").getRawString("Address", "127.0.0.1:4391").split(":")[1]), 10,
                     (config.get().getSection("Settings").getSection("SubData").getRawString("Address", "127.0.0.1:4391").split(":")[0].equals("0.0.0.0"))?null:InetAddress.getByName(config.get().getSection("Settings").getSection("SubData").getRawString("Address", "127.0.0.1:4391").split(":")[0]));
-            System.out.println("SubServers > SubData Listening on /" + config.get().getSection("Settings").getSection("SubData").getRawString("Address", "127.0.0.1:4391"));
+            System.out.println("SubServers > SubData Direct Listening on /" + config.get().getSection("Settings").getSection("SubData").getRawString("Address", "127.0.0.1:4391"));
             loop();
 
             int hosts = 0;

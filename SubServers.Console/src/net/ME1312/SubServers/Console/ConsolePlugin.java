@@ -7,6 +7,7 @@ import net.ME1312.SubServers.Bungee.Host.Host;
 import net.ME1312.SubServers.Bungee.Host.SubCreator;
 import net.ME1312.SubServers.Bungee.Host.SubServer;
 import net.ME1312.SubServers.Bungee.Library.Config.YAMLConfig;
+import net.ME1312.SubServers.Bungee.SubAPI;
 import net.ME1312.SubServers.Bungee.SubPlugin;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.api.plugin.Plugin;
@@ -26,6 +27,10 @@ public final class ConsolePlugin extends Plugin implements Listener {
 
     @Override
     public void onEnable() {
+        SubAPI.getInstance().addListener(this::enable, this::disable);
+    }
+
+    public void enable() {
         try {this.
             getDataFolder().mkdirs();
             config = new YAMLConfig(new File(getDataFolder(), "config.yml"));
@@ -102,8 +107,7 @@ public final class ConsolePlugin extends Plugin implements Listener {
         }
     }
 
-    @Override
-    public void onDisable() {
+    public void disable() {
         for (ConsoleWindow window : sCurrent.values()) {
             window.destroy();
         }

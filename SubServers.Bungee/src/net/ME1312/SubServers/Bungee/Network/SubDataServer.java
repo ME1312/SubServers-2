@@ -7,12 +7,15 @@ import net.ME1312.SubServers.Bungee.Network.Packet.*;
 import net.ME1312.SubServers.Bungee.SubPlugin;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * SubDataServer Class
@@ -68,6 +71,7 @@ public final class SubDataServer {
         registerPacket(new PacketDownloadHostInfo(plugin), "SubDownloadHostInfo");
         registerPacket(new PacketDownloadLang(plugin), "SubDownloadLang");
         registerPacket(new PacketDownloadPlayerList(plugin), "SubDownloadPlayerList");
+        registerPacket(new PacketDownloadProxyInfo(plugin), "SubDownloadProxyInfo");
         registerPacket(new PacketDownloadServerInfo(plugin), "SubDownloadServerInfo");
         registerPacket(new PacketDownloadServerList(plugin), "SubDownloadServerList");
         registerPacket(new PacketExAddServer(), "SubExAddServer");
@@ -91,6 +95,7 @@ public final class SubDataServer {
         registerPacket(PacketDownloadHostInfo.class, "SubDownloadHostInfo");
         registerPacket(PacketDownloadLang.class, "SubDownloadLang");
         registerPacket(PacketDownloadPlayerList.class, "SubDownloadPlayerList");
+        registerPacket(PacketDownloadProxyInfo.class, "SubDownloadProxyInfo");
         registerPacket(PacketDownloadServerInfo.class, "SubDownloadServerInfo");
         registerPacket(PacketDownloadServerList.class, "SubDownloadServerList");
         registerPacket(PacketExAddServer.class, "SubExAddServer");
@@ -131,7 +136,7 @@ public final class SubDataServer {
             clients.put(client.getAddress(), client);
             return client;
         } else {
-            System.out.println("SubData > " + socket.getInetAddress().toString() + ":" + socket.getPort() + " attempted to connect, but isn't whitelisted");
+            System.out.println("SubData > " + socket.getInetAddress().toString() + " attempted to connect, but isn't white-listed");
             socket.close();
             return null;
         }

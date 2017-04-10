@@ -1,23 +1,24 @@
 package net.ME1312.SubServers.Host.Library.Log;
 
+import net.ME1312.SubServers.Host.Library.NamedContainer;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.HashMap;
 
 /**
  * System.out and System.err Override Class
  */
 public final class SystemLogger extends OutputStream {
-    private HashMap<String, Logger> stream = new HashMap<String, Logger>();
-    private boolean level;
+    private NamedContainer<String, Logger> last = new NamedContainer<String, Logger>("", null);
+    private boolean error;
     private File dir;
 
     protected SystemLogger(boolean level, File dir) throws IOException {
         if (!new File(dir, SystemLogger.class.getCanonicalName().replace(".", File.separator) + ".class").exists()) {
             throw new IOException("Invalid directory for logging:" + dir.getPath());
         }
-        this.level = level;
+        this.error = level;
         this.dir = dir;
     }
 
@@ -32,11 +33,11 @@ public final class SystemLogger extends OutputStream {
             }
             i++;
         }
-        if (!stream.keySet().contains(origin)) stream.put(origin, new Logger(origin));
-        if (level) {
-            stream.get(origin).error.print((char) c);
+        if (!last.name().equals(origin)) last = new NamedContainer<String, Logger>(origin, new Logger(origin));
+        if (error) {
+            last.get().error.print((char) c);
         } else {
-            stream.get(origin).info.print((char) c);
+            last.get().info.print((char) c);
         }
     }
 }

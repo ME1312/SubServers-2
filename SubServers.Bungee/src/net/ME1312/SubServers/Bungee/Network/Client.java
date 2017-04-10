@@ -27,8 +27,7 @@ public class Client {
     private ClientHandler handler;
     private PrintWriter writer;
     private Timer authorized;
-    private SubDataServer subdata;
-    private Client instance;
+    protected SubDataServer subdata;
 
     /**
      * Network Client
@@ -42,13 +41,12 @@ public class Client {
         socket = client;
         writer = new PrintWriter(client.getOutputStream(), true);
         address = new InetSocketAddress(client.getInetAddress(), client.getPort());
-        instance = this;
         authorized = new Timer("__subdata_auth_" + client.getRemoteSocketAddress().toString());
         authorized.schedule(new TimerTask() {
             @Override
             public void run() {
                 if (!socket.isClosed()) try {
-                    subdata.removeClient(instance);
+                    subdata.removeClient(Client.this);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -66,32 +64,17 @@ public class Client {
                 BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                 String input;
                 while ((input = in.readLine()) != null) {
-                    try {
-                        JSONObject json = new JSONObject(input);
-                        for (PacketIn packet : SubDataServer.decodePacket(json)) {
-                            if (authorized == null || packet instanceof PacketAuthorization) {
-                                try {
-                                    packet.execute(instance, (json.keySet().contains("c")) ? json.getJSONObject("c") : null);
-                                } catch (Throwable e) {
-                                    new InvocationTargetException(e, "Exception while executing PacketIn").printStackTrace();
-                                }
-                            } else sendPacket(new PacketAuthorization(-1, "Unauthorized"));
-                        }
-                    } catch (IllegalPacketException e) {
-                        e.printStackTrace();
-                    } catch (JSONException e) {
-                        new IllegalPacketException("Unknown Packet Format: " + input).printStackTrace();
-                    }
+                    recievePacket(input);
                 }
                 try {
-                    subdata.removeClient(instance);
+                    subdata.removeClient(Client.this);
                 } catch (IOException e1) {
                     e1.printStackTrace();
                 }
             } catch (Exception e) {
                 if (!(e instanceof SocketException)) e.printStackTrace();
                 try {
-                    subdata.removeClient(instance);
+                    subdata.removeClient(Client.this);
                 } catch (IOException e1) {
                     e1.printStackTrace();
                 }
@@ -108,6 +91,25 @@ public class Client {
             System.out.println("SubData > " + socket.getRemoteSocketAddress().toString() + " logged in");
         }
         authorized = null;
+    }
+
+    protected void recievePacket(String raw) {
+        try {
+            JSONObject json = new JSONObject(raw);
+            for (PacketIn packet : SubDataServer.decodePacket(json)) {
+                if (authorized == null || packet instanceof PacketAuthorization) {
+                    try {
+                        packet.execute(Client.this, (json.keySet().contains("c")) ? json.getJSONObject("c") : null);
+                    } catch (Throwable e) {
+                        new InvocationTargetException(e, "Exception while executing PacketIn").printStackTrace();
+                    }
+                } else sendPacket(new PacketAuthorization(-1, "Unauthorized"));
+            }
+        } catch (IllegalPacketException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
+            new IllegalPacketException("Unknown Packet Format: " + raw).printStackTrace();
+        }
     }
 
     /**

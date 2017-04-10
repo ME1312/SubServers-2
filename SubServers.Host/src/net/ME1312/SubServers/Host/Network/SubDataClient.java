@@ -38,8 +38,8 @@ public final class SubDataClient {
     /**
      * SubServers Client Instance
      *
-     * @param host SubPlugin
-     * @param address Bind Address
+     * @param host SubServers.Host
+     * @param address Address
      * @param port Port
      * @throws IOException
      */

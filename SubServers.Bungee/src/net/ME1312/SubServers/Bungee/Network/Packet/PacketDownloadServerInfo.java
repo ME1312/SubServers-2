@@ -37,7 +37,7 @@ public class PacketDownloadServerInfo implements PacketIn, PacketOut {
      * @param id Receiver ID
      */
     public PacketDownloadServerInfo(SubPlugin plugin, Server server, String id) {
-        if (Util.isNull(plugin, server)) throw new NullPointerException();
+        if (Util.isNull(plugin)) throw new NullPointerException();
         this.plugin = plugin;
         this.server = server;
         this.id = id;
