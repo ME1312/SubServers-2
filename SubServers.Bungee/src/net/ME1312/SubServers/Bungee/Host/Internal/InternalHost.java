@@ -139,11 +139,11 @@ public class InternalHost extends Host {
     public boolean deleteSubServer(UUID player, String name) throws InterruptedException {
         if (Util.isNull(name)) throw new NullPointerException();
 
+        File from = new File(getDirectory(), servers.get(name.toLowerCase()).getDirectory());
         if (removeSubServer(player, name)) {
             new Thread(() -> {
                 UniversalFile to = new UniversalFile(plugin.dir, "SubServers:Recently Deleted:" + name.toLowerCase());
                 try {
-                    File from = new File(getDirectory(), servers.get(name.toLowerCase()).getDirectory());
                     if (from.exists()) {
                         System.out.println("SubServers > Removing Files...");
                         if (to.exists()) {
