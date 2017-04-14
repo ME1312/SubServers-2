@@ -1,9 +1,9 @@
 ![https://s30.postimg.org/fu575r281/Sub_Servers_Title.png](https://s30.postimg.org/fu575r281/Sub_Servers_Title.png)<br>
 SubServers 2 is a rewrite of SubServers, the Server Management Plugin.<br>
-[http://www.spigotmc.org/resources/subservers-2.11264/](http://www.spigotmc.org/resources/subservers-2.11264/)<br>
-[http://www.spigotmc.org/resources/subservers-host.38833/](http://www.spigotmc.org/resources/subservers-host.38833/)<br>
-[http://www.spigotmc.org/resources/subservers-console.37341/](http://www.spigotmc.org/resources/subservers-console.37341/)<br>
-[http://www.spigotmc.org/resources/subservers-client-bukkit.15506/](http://www.spigotmc.org/resources/subservers-client-bukkit.15506/)
+> [http://www.spigotmc.org/resources/subservers-2.11264/](http://www.spigotmc.org/resources/subservers-2.11264/)<br>
+> [http://www.spigotmc.org/resources/subservers-host.38833/](http://www.spigotmc.org/resources/subservers-host.38833/)<br>
+> [http://www.spigotmc.org/resources/subservers-console.37341/](http://www.spigotmc.org/resources/subservers-console.37341/)<br>
+> [http://www.spigotmc.org/resources/subservers-client-bukkit.15506/](http://www.spigotmc.org/resources/subservers-client-bukkit.15506/)
 
 ## Quick Links
 These are some quick links for common resources of SubServers 2.
