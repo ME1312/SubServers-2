@@ -59,6 +59,8 @@ public class ExternalSubLogger extends SubLogger {
                 e.printStackTrace();
             }
         }
+        List<SubLogFilter> filters = new ArrayList<SubLogFilter>();
+        filters.addAll(this.filters);
         for (SubLogFilter filter : filters) try {
             filter.start();
         } catch (Throwable e) {
@@ -111,6 +113,8 @@ public class ExternalSubLogger extends SubLogger {
 
             // Filter Message
             boolean allow = true;
+            List<SubLogFilter> filters = new ArrayList<SubLogFilter>();
+            filters.addAll(this.filters);
             for (SubLogFilter filter : filters)
                 try {
                     if (allow) allow = filter.log(level, msg);
@@ -150,6 +154,8 @@ public class ExternalSubLogger extends SubLogger {
             PacketInExLogMessage.unregister(id);
             id = null;
             started = false;
+            List<SubLogFilter> filters = new ArrayList<SubLogFilter>();
+            filters.addAll(this.filters);
             for (SubLogFilter filter : filters) try {
                 filter.stop();
             } catch (Throwable e) {
@@ -157,12 +163,13 @@ public class ExternalSubLogger extends SubLogger {
             }
             messages.clear();
             if (writer != null) {
+                PrintWriter writer = this.writer;
+                this.writer = null;
                 int l = (int) Math.floor((("---------- LOG START \u2014 " + name + " ----------").length() - 9) / 2);
                 String s = "";
                 while (s.length() < l) s += '-';
                 writer.println(s + " LOG END " + s);
                 writer.close();
-                writer = null;
             }
         }
     }

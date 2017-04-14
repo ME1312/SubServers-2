@@ -18,8 +18,7 @@ import net.ME1312.SubServers.Host.Library.Version.Version;
 import net.ME1312.SubServers.Host.Network.SubDataClient;
 import org.json.JSONObject;
 
-import java.io.File;
-import java.io.FileReader;
+import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.net.InetAddress;
 import java.net.SocketException;
@@ -28,6 +27,8 @@ import java.net.URLDecoder;
 import java.nio.file.Files;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 /**
  * SubServers.Host Main Class
@@ -43,7 +44,7 @@ public final class SubServers {
     public YAMLSection lang = null;
     public SubDataClient subdata = null;
 
-    public final Version version = new Version("2.11.2a");
+    public final Version version = new Version("2.11.2b");
     public final Version bversion = null;
     public final SubAPI api = new SubAPI(this);
 
@@ -75,17 +76,9 @@ public final class SubServers {
                 log.info.println("Updated ~/config.yml");
             }
 
-            if (!(new UniversalFile(dir, "Templates:Spigot Plugins").exists())) {
-                new UniversalFile(dir, "Templates:Spigot Plugins").mkdirs();
-                log.info.println("SubServers > Created ~/Templates/Spigot Plugins");
-            }
-            if (!(new UniversalFile(dir, "Templates:Sponge Config").exists())) {
-                new UniversalFile(dir, "Templates:Sponge Config").mkdir();
-                log.info.println("SubServers > Created ~/Templates/Sponge Config");
-            }
-            if (!(new UniversalFile(dir, "Templates:Sponge Mods").exists())) {
-                new UniversalFile(dir, "Templates:Sponge Mods").mkdir();
-                log.info.println("SubServers > Created ~/Templates/Sponge Mods");
+            if (!(new UniversalFile(dir, "Templates").exists())) {
+                unzip(SubServers.class.getResourceAsStream("/net/ME1312/SubServers/Host/Library/Files/templates.zip"), dir);
+                System.out.println("SubServers > Created ~/Templates");
             }
 
             if (new UniversalFile(dir, "Recently Deleted").exists()) {
@@ -337,5 +330,33 @@ public final class SubServers {
 
         Util.isException(FileLogger::end);
         System.exit(event.getExitCode());
+    }
+
+    private void unzip(InputStream zip, File dir) {
+        byte[] buffer = new byte[1024];
+        try{
+            ZipInputStream zis = new ZipInputStream(zip);
+            ZipEntry ze;
+            while ((ze = zis.getNextEntry()) != null) {
+                File newFile = new File(dir + File.separator + ze.getName());
+                if (ze.isDirectory()) {
+                    newFile.mkdirs();
+                    continue;
+                } else if (!newFile.getParentFile().exists()) {
+                    newFile.getParentFile().mkdirs();
+                }
+                FileOutputStream fos = new FileOutputStream(newFile);
+                int len;
+                while ((len = zis.read(buffer)) > 0) {
+                    fos.write(buffer, 0, len);
+                }
+
+                fos.close();
+            }
+            zis.closeEntry();
+            zis.close();
+        } catch(IOException ex) {
+            ex.printStackTrace();
+        }
     }
 }

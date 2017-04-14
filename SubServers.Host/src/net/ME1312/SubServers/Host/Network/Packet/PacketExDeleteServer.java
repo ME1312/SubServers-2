@@ -119,19 +119,17 @@ public class PacketExDeleteServer implements PacketIn, PacketOut {
         return new Version("2.11.0a");
     }
 
-    private boolean move(File sourceFile, File destFile) {
-        if (sourceFile.isDirectory()) {
-            for (File file : sourceFile.listFiles()) {
-                move(file, new File(file.getPath().substring("temp".length()+1)));
-            }
+    public void move(File from, File to) {
+        if (from.isDirectory()) {
+            to.mkdir();
+            for (File file : from.listFiles()) move(file, new File(to, file.getName()));
+            from.delete();
         } else {
             try {
-                Files.move(Paths.get(sourceFile.getPath()), Paths.get(destFile.getPath()), StandardCopyOption.REPLACE_EXISTING);
-                return true;
+                Files.move(from.toPath(), to.toPath());
             } catch (IOException e) {
-                return false;
+                e.printStackTrace();
             }
         }
-        return false;
     }
 }

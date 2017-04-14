@@ -139,12 +139,13 @@ public class SubLogger {
         if (started) {
             started = false;
             if (writer != null) {
+                PrintWriter writer = this.writer;
+                this.writer = null;
                 int l = (int) Math.floor((("---------- LOG START \u2014 " + name + " ----------").length() - 9) / 2);
                 String s = "";
                 while (s.length() < l) s += '-';
                 writer.println(s + " LOG END " + s);
                 writer.close();
-                writer = null;
             }
         }
     }

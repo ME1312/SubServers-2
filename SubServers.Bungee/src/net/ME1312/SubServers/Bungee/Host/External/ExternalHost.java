@@ -191,22 +191,23 @@ public class ExternalHost extends Host implements ClientHandler {
     @Override
     public boolean deleteSubServer(UUID player, String name) throws InterruptedException {
         if (Util.isNull(name)) throw new NullPointerException();
+        String server = servers.get(name.toLowerCase()).getName();
 
-        SubRemoveServerEvent event = new SubRemoveServerEvent(player, this, getSubServer(name));
+        SubRemoveServerEvent event = new SubRemoveServerEvent(player, this, getSubServer(server));
         plugin.getPluginManager().callEvent(event);
         if (!event.isCancelled()) {
-            if (getSubServer(name).isRunning()) {
-                getSubServer(name).stop();
-                getSubServer(name).waitFor();
+            if (getSubServer(server).isRunning()) {
+                getSubServer(server).stop();
+                getSubServer(server).waitFor();
             }
 
             System.out.println("SubServers > Saving...");
-            JSONObject info = (plugin.config.get().getSection("Servers").getKeys().contains(servers.get(name.toLowerCase()).getName())) ? plugin.config.get().getSection("Servers").getSection(servers.get(name.toLowerCase()).getName()).toJSON() : new JSONObject();
-            info.put("Name", servers.get(name.toLowerCase()).getName());
+            JSONObject info = (plugin.config.get().getSection("Servers").getKeys().contains(server)) ? plugin.config.get().getSection("Servers").getSection(server).toJSON() : new JSONObject();
+            info.put("Name", server);
             info.put("Timestamp", Calendar.getInstance().getTime().getTime());
             try {
-                if (plugin.config.get().getSection("Servers").getKeys().contains(servers.get(name.toLowerCase()).getName())) {
-                    plugin.config.get().getSection("Servers").remove(servers.get(name.toLowerCase()).getName());
+                if (plugin.config.get().getSection("Servers").getKeys().contains(server)) {
+                    plugin.config.get().getSection("Servers").remove(server);
                     plugin.config.save();
                 }
             } catch (Exception e) {
@@ -214,9 +215,9 @@ public class ExternalHost extends Host implements ClientHandler {
             }
 
             System.out.println("SubServers > Removing Files...");
-            queue(new PacketExDeleteServer(name, info, json -> {
+            queue(new PacketExDeleteServer(server, info, json -> {
                 if (json.getInt("r") == 0) {
-                    servers.remove(name.toLowerCase());
+                    servers.remove(server.toLowerCase());
                     System.out.println("SubServers > Done!");
                 } else {
                     System.out.println("SubServers > Couldn't remove server from memory. See " + getName() + " console for more details");

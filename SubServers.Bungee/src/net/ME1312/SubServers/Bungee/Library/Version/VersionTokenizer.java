@@ -1,6 +1,6 @@
 package net.ME1312.SubServers.Bungee.Library.Version;
 
-public final class VersionTokenizer {
+final class VersionTokenizer {
  private final String _versionString;
  private final int _length;
 

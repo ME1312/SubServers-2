@@ -138,11 +138,11 @@ public class InternalHost extends Host {
     @Override
     public boolean deleteSubServer(UUID player, String name) throws InterruptedException {
         if (Util.isNull(name)) throw new NullPointerException();
-
-        File from = new File(getDirectory(), servers.get(name.toLowerCase()).getDirectory());
-        if (removeSubServer(player, name)) {
+        String server = servers.get(name.toLowerCase()).getName();
+        File from = new File(getDirectory(), servers.get(server.toLowerCase()).getDirectory());
+        if (removeSubServer(player, server)) {
             new Thread(() -> {
-                UniversalFile to = new UniversalFile(plugin.dir, "SubServers:Recently Deleted:" + name.toLowerCase());
+                UniversalFile to = new UniversalFile(plugin.dir, "SubServers:Recently Deleted:" + server.toLowerCase());
                 try {
                     if (from.exists()) {
                         System.out.println("SubServers > Removing Files...");
@@ -158,12 +158,12 @@ public class InternalHost extends Host {
                 }
 
                 System.out.println("SubServers > Saving...");
-                JSONObject json = (plugin.config.get().getSection("Servers").getKeys().contains(servers.get(name.toLowerCase()).getName()))?plugin.config.get().getSection("Servers").getSection(servers.get(name.toLowerCase()).getName()).toJSON():new JSONObject();
-                json.put("Name", servers.get(name.toLowerCase()).getName());
+                JSONObject json = (plugin.config.get().getSection("Servers").getKeys().contains(server))?plugin.config.get().getSection("Servers").getSection(server).toJSON():new JSONObject();
+                json.put("Name", server);
                 json.put("Timestamp", Calendar.getInstance().getTime().getTime());
                 try {
-                    if (plugin.config.get().getSection("Servers").getKeys().contains(servers.get(name.toLowerCase()).getName())) {
-                        plugin.config.get().getSection("Servers").remove(servers.get(name.toLowerCase()).getName());
+                    if (plugin.config.get().getSection("Servers").getKeys().contains(server)) {
+                        plugin.config.get().getSection("Servers").remove(server);
                         plugin.config.save();
                     }
                     if (!to.exists()) to.mkdirs();

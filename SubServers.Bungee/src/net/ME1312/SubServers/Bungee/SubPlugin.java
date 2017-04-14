@@ -23,6 +23,8 @@ import java.net.SocketException;
 import java.nio.file.Files;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 /**
  * Main Plugin Class
@@ -98,17 +100,9 @@ public final class SubPlugin extends BungeeCord {
             }
         }
 
-        if (!(new UniversalFile(dir, "Plugin Templates:Spigot Plugins").exists())) {
-            new UniversalFile(dir, "Plugin Templates:Spigot Plugins").mkdirs();
-            System.out.println("SubServers > Created ~/SubServers/Plugin Templates/Spigot Plugins");
-        }
-        if (!(new UniversalFile(dir, "Plugin Templates:Sponge Config").exists())) {
-            new UniversalFile(dir, "Plugin Templates:Sponge Config").mkdir();
-            System.out.println("SubServers > Created ~/SubServers/Plugin Templates/Sponge Config");
-        }
-        if (!(new UniversalFile(dir, "Plugin Templates:Sponge Mods").exists())) {
-            new UniversalFile(dir, "Plugin Templates:Sponge Mods").mkdir();
-            System.out.println("SubServers > Created ~/SubServers/Plugin Templates/Sponge Mods");
+        if (!(new UniversalFile(dir, "Templates").exists())) {
+            unzip(SubPlugin.class.getResourceAsStream("/net/ME1312/SubServers/Bungee/Library/Files/templates.zip"), dir);
+            System.out.println("SubServers > Created ~/SubServers/Templates");
         }
 
         if (new UniversalFile(dir, "Recently Deleted").exists()) {
@@ -327,5 +321,33 @@ public final class SubPlugin extends BungeeCord {
         }
 
         super.stopListeners();
+    }
+
+    private void unzip(InputStream zip, File dir) {
+        byte[] buffer = new byte[1024];
+        try{
+            ZipInputStream zis = new ZipInputStream(zip);
+            ZipEntry ze;
+            while ((ze = zis.getNextEntry()) != null) {
+                File newFile = new File(dir + File.separator + ze.getName());
+                if (ze.isDirectory()) {
+                    newFile.mkdirs();
+                    continue;
+                } else if (!newFile.getParentFile().exists()) {
+                    newFile.getParentFile().mkdirs();
+                }
+                FileOutputStream fos = new FileOutputStream(newFile);
+                int len;
+                while ((len = zis.read(buffer)) > 0) {
+                    fos.write(buffer, 0, len);
+                }
+
+                fos.close();
+            }
+            zis.closeEntry();
+            zis.close();
+        } catch(IOException ex) {
+            ex.printStackTrace();
+        }
     }
 }

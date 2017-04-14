@@ -84,6 +84,7 @@ public final class SubDataServer {
         registerPacket(new PacketInExRequestQueue(plugin), "SubExRequestQueue");
         registerPacket(new PacketLinkExHost(plugin), "SubLinkExHost");
         registerPacket(new PacketLinkServer(plugin), "SubLinkServer");
+        registerPacket(new PacketListenServerLog(plugin), "SubListenServerLog");
         registerPacket(new PacketStartServer(plugin), "SubStartServer");
         registerPacket(new PacketStopServer(plugin), "SubStopServer");
         registerPacket(new PacketTeleportPlayer(plugin), "SubTeleportPlayer");
@@ -106,6 +107,7 @@ public final class SubDataServer {
         registerPacket(PacketExUpdateServer.class, "SubExUpdateServer");
         registerPacket(PacketLinkExHost.class, "SubLinkExHost");
         registerPacket(PacketLinkServer.class, "SubLinkServer");
+        registerPacket(PacketListenServerLog.class, "SubListenServerLog");
         registerPacket(PacketOutRunEvent.class, "SubRunEvent");
         registerPacket(PacketOutReset.class, "SubReset");
         registerPacket(PacketStartServer.class, "SubStartServer");
