@@ -12,6 +12,9 @@ import net.ME1312.SubServers.Bungee.Network.Packet.PacketExCreateServer;
 import java.io.File;
 import java.util.UUID;
 
+/**
+ * External SubCreator Class
+ */
 public class ExternalSubCreator extends SubCreator {
     private ExternalHost host;
     private String gitBash;

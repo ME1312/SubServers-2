@@ -33,7 +33,7 @@ import java.util.zip.ZipInputStream;
 /**
  * SubServers.Host Main Class
  */
-public final class SubServers {
+public final class ExHost {
     public HashMap<String, SubServer> servers = new HashMap<String, SubServer>();
     public SubCreator creator;
 
@@ -44,8 +44,8 @@ public final class SubServers {
     public YAMLSection lang = null;
     public SubDataClient subdata = null;
 
-    public final Version version = new Version("2.11.2b");
-    public final Version bversion = null;
+    public final Version version = new Version("2.11.2c");
+    public final Version bversion = new Version(1);
     public final SubAPI api = new SubAPI(this);
 
     private boolean running;
@@ -57,9 +57,9 @@ public final class SubServers {
      * @throws Exception
      */
     public static void main(String[] args) throws Exception {
-        new SubServers(args);
+        new ExHost(args);
     }
-    private SubServers(String[] args) {
+    private ExHost(String[] args) {
         log = new Logger("SubServers");
         try {
             Logger.setup(System.out, System.err, dir);
@@ -67,17 +67,17 @@ public final class SubServers {
             dir.mkdirs();
             new File(dir, "Plugins").mkdir();
             if (!(new UniversalFile(dir, "config.yml").exists())) {
-                Util.copyFromJar(SubServers.class.getClassLoader(), "net/ME1312/SubServers/Host/Library/Files/config.yml", new UniversalFile(dir, "config.yml").getPath());
+                Util.copyFromJar(ExHost.class.getClassLoader(), "net/ME1312/SubServers/Host/Library/Files/config.yml", new UniversalFile(dir, "config.yml").getPath());
                 log.info.println("Created ~/config.yml");
             } else if ((new Version((new YAMLConfig(new UniversalFile(dir, "config.yml"))).get().getSection("Settings").getString("Version", "0")).compareTo(new Version("2.11.2a+"))) != 0) {
                 Files.move(new UniversalFile(dir, "config.yml").toPath(), new UniversalFile(dir, "config.old" + Math.round(Math.random() * 100000) + ".yml").toPath());
 
-                Util.copyFromJar(SubServers.class.getClassLoader(), "net/ME1312/SubServers/Host/Library/Files/config.yml", new UniversalFile(dir, "config.yml").getPath());
+                Util.copyFromJar(ExHost.class.getClassLoader(), "net/ME1312/SubServers/Host/Library/Files/config.yml", new UniversalFile(dir, "config.yml").getPath());
                 log.info.println("Updated ~/config.yml");
             }
 
             if (!(new UniversalFile(dir, "Templates").exists())) {
-                unzip(SubServers.class.getResourceAsStream("/net/ME1312/SubServers/Host/Library/Files/templates.zip"), dir);
+                unzip(ExHost.class.getResourceAsStream("/net/ME1312/SubServers/Host/Library/Files/templates.zip"), dir);
                 System.out.println("SubServers > Created ~/Templates");
             }
 

@@ -6,7 +6,6 @@ import net.ME1312.SubServers.Host.Executable.SubCreator;
 import net.ME1312.SubServers.Host.Library.Util;
 import net.ME1312.SubServers.Host.Library.Version.Version;
 import net.ME1312.SubServers.Host.Network.Packet.*;
-import org.json.JSONObject;
 
 import java.util.*;
 
@@ -15,7 +14,7 @@ import java.util.*;
  */
 public class SubCommand {
     private SubCommand() {}
-    protected static void load(SubServers host) {
+    protected static void load(ExHost host) {
         new Command(null) {
             @Override
             public void command(String handle, String[] args) {

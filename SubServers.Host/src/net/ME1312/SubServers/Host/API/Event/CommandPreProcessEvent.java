@@ -3,7 +3,7 @@ package net.ME1312.SubServers.Host.API.Event;
 import net.ME1312.SubServers.Host.Library.Event.Cancellable;
 import net.ME1312.SubServers.Host.Library.Event.Event;
 import net.ME1312.SubServers.Host.Library.Util;
-import net.ME1312.SubServers.Host.SubServers;
+import net.ME1312.SubServers.Host.ExHost;
 
 /**
  * Command Pre-Process Event Class
@@ -18,7 +18,7 @@ public class CommandPreProcessEvent extends Event implements Cancellable {
      * @param host SubServers.Host
      * @param command Command
      */
-    public CommandPreProcessEvent(SubServers host, String command) {
+    public CommandPreProcessEvent(ExHost host, String command) {
         if (Util.isNull(host, command)) throw new NullPointerException();
         this.command = command;
     }

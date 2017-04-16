@@ -7,7 +7,7 @@ import net.ME1312.SubServers.Host.Library.UniversalFile;
 import net.ME1312.SubServers.Host.Library.Util;
 import net.ME1312.SubServers.Host.Library.Version.Version;
 import net.ME1312.SubServers.Host.Network.Packet.PacketExUpdateServer;
-import net.ME1312.SubServers.Host.SubServers;
+import net.ME1312.SubServers.Host.ExHost;
 
 import java.io.*;
 import java.util.LinkedList;
@@ -18,7 +18,7 @@ import java.util.jar.JarFile;
  * Internal SubServer Class
  */
 public class SubServer {
-    private SubServers host;
+    private ExHost host;
     private String name;
     private boolean enabled;
     private Container<Boolean> log;
@@ -45,7 +45,7 @@ public class SubServer {
      * @param stopcmd Stop Command
      * @throws InvalidServerException
      */
-    public SubServer(SubServers host, String name, boolean enabled, boolean log, String directory, Executable executable, String stopcmd) throws InvalidServerException {
+    public SubServer(ExHost host, String name, boolean enabled, boolean log, String directory, Executable executable, String stopcmd) throws InvalidServerException {
         if (Util.isNull(host, name, enabled, log, directory, executable)) throw new NullPointerException();
         this.host = host;
         this.name = name;
@@ -65,10 +65,10 @@ public class SubServer {
             try {
                 JarFile jar = new JarFile(new UniversalFile(this.directory, "plugins:SubServers.Client.jar"));
                 YAMLSection plugin = new YAMLSection(Util.readAll(new InputStreamReader(jar.getInputStream(jar.getJarEntry("plugin.yml")))));
-                YAMLSection bplugin = new YAMLSection(Util.readAll(new InputStreamReader(SubServers.class.getResourceAsStream("/net/ME1312/SubServers/Host/Library/Files/bukkit.yml"))));
+                YAMLSection bplugin = new YAMLSection(Util.readAll(new InputStreamReader(ExHost.class.getResourceAsStream("/net/ME1312/SubServers/Host/Library/Files/bukkit.yml"))));
                 if (new Version(plugin.getString("version")).compareTo(new Version(bplugin.getString("version"))) < 0) {
                     new UniversalFile(this.directory, "plugins:SubServers.Client.jar").delete();
-                    Util.copyFromJar(SubServers.class.getClassLoader(), "net/ME1312/SubServers/Host/Library/Files/bukkit.jar", new UniversalFile(this.directory, "plugins:SubServers.Client.jar").getPath());
+                    Util.copyFromJar(ExHost.class.getClassLoader(), "net/ME1312/SubServers/Host/Library/Files/bukkit.jar", new UniversalFile(this.directory, "plugins:SubServers.Client.jar").getPath());
                 }
             } catch (Throwable e) {
                 host.log.info.println("Couldn't auto-update SubServers.Client.jar");

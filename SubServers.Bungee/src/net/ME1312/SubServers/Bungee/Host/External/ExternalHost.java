@@ -22,6 +22,9 @@ import org.json.JSONObject;
 import java.net.InetAddress;
 import java.util.*;
 
+/**
+ * External Host Class
+ */
 public class ExternalHost extends Host implements ClientHandler {
     private HashMap<String, SubServer> servers = new HashMap<String, SubServer>();
     private String name;

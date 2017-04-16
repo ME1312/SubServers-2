@@ -8,7 +8,7 @@ import net.ME1312.SubServers.Host.Library.Version.Version;
 import net.ME1312.SubServers.Host.Network.PacketIn;
 import net.ME1312.SubServers.Host.Network.PacketOut;
 import net.ME1312.SubServers.Host.Network.SubDataClient;
-import net.ME1312.SubServers.Host.SubServers;
+import net.ME1312.SubServers.Host.ExHost;
 import org.json.JSONObject;
 
 import java.io.File;
@@ -16,15 +16,12 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-import java.util.Calendar;
 
 /**
  * Create Server Packet
  */
 public class PacketExDeleteServer implements PacketIn, PacketOut {
-    private SubServers host;
+    private ExHost host;
     private int response;
     private String message;
     private String id;
@@ -35,7 +32,7 @@ public class PacketExDeleteServer implements PacketIn, PacketOut {
      *
      * @param host SubPlugin
      */
-    public PacketExDeleteServer(SubServers host) {
+    public PacketExDeleteServer(ExHost host) {
         if (Util.isNull(host)) throw new NullPointerException();
         this.host = host;
         try {

@@ -6,7 +6,7 @@ import net.ME1312.SubServers.Host.Library.Version.Version;
 import net.ME1312.SubServers.Host.Network.PacketIn;
 import net.ME1312.SubServers.Host.Network.PacketOut;
 import net.ME1312.SubServers.Host.Network.SubDataClient;
-import net.ME1312.SubServers.Host.SubServers;
+import net.ME1312.SubServers.Host.ExHost;
 import org.json.JSONObject;
 
 import java.io.IOException;
@@ -16,7 +16,7 @@ import java.lang.reflect.Field;
  * Authorization Packet
  */
 public final class PacketAuthorization implements PacketIn, PacketOut {
-    private SubServers host;
+    private ExHost host;
     private Logger log = null;
 
     /**
@@ -24,7 +24,7 @@ public final class PacketAuthorization implements PacketIn, PacketOut {
      *
      * @param host SubServers.Host
      */
-    public PacketAuthorization(SubServers host) {
+    public PacketAuthorization(ExHost host) {
         if (Util.isNull(host)) throw new NullPointerException();
         this.host = host;
         try {

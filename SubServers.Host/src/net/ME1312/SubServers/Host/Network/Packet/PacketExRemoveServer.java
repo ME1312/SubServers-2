@@ -1,23 +1,21 @@
 package net.ME1312.SubServers.Host.Network.Packet;
 
-import net.ME1312.SubServers.Host.Executable.SubCreator;
 import net.ME1312.SubServers.Host.Library.Log.Logger;
 import net.ME1312.SubServers.Host.Library.Util;
 import net.ME1312.SubServers.Host.Library.Version.Version;
 import net.ME1312.SubServers.Host.Network.PacketIn;
 import net.ME1312.SubServers.Host.Network.PacketOut;
 import net.ME1312.SubServers.Host.Network.SubDataClient;
-import net.ME1312.SubServers.Host.SubServers;
+import net.ME1312.SubServers.Host.ExHost;
 import org.json.JSONObject;
 
 import java.lang.reflect.Field;
-import java.util.UUID;
 
 /**
  * Create Server Packet
  */
 public class PacketExRemoveServer implements PacketIn, PacketOut {
-    private SubServers host;
+    private ExHost host;
     private int response;
     private String message;
     private String id;
@@ -28,7 +26,7 @@ public class PacketExRemoveServer implements PacketIn, PacketOut {
      *
      * @param host SubPlugin
      */
-    public PacketExRemoveServer(SubServers host) {
+    public PacketExRemoveServer(ExHost host) {
         if (Util.isNull(host)) throw new NullPointerException();
         this.host = host;
         try {

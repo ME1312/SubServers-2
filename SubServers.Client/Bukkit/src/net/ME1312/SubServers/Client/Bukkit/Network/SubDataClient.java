@@ -1,5 +1,6 @@
 package net.ME1312.SubServers.Client.Bukkit.Network;
 
+import net.ME1312.SubServers.Client.Bukkit.Event.SubNetworkDisconnectEvent;
 import net.ME1312.SubServers.Client.Bukkit.Library.Exception.IllegalPacketException;
 import net.ME1312.SubServers.Client.Bukkit.Library.Util;
 import net.ME1312.SubServers.Client.Bukkit.Library.Version.Version;
@@ -272,6 +273,7 @@ public final class SubDataClient {
             final Socket socket = this.socket;
             this.socket = null;
             if (!socket.isClosed()) socket.close();
+            Bukkit.getPluginManager().callEvent(new SubNetworkDisconnectEvent());
             Bukkit.getLogger().info("SubServers > The SubData Connection was closed");
             if (reconnect) {
                 Bukkit.getLogger().info("SubServers > Attempting to reconnect in 10 seconds");

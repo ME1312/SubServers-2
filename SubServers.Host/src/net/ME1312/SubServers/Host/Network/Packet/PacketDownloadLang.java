@@ -7,19 +7,19 @@ import net.ME1312.SubServers.Host.Library.Version.Version;
 import net.ME1312.SubServers.Host.Network.PacketIn;
 import net.ME1312.SubServers.Host.Network.PacketOut;
 import net.ME1312.SubServers.Host.Network.SubDataClient;
-import net.ME1312.SubServers.Host.SubServers;
+import net.ME1312.SubServers.Host.ExHost;
 import org.json.JSONObject;
 
 import java.lang.reflect.Field;
 import java.util.Calendar;
 
 public class PacketDownloadLang implements PacketIn, PacketOut {
-    private SubServers host;
+    private ExHost host;
     private Logger log = null;
 
     public PacketDownloadLang() {}
 
-    public PacketDownloadLang(SubServers host) {
+    public PacketDownloadLang(ExHost host) {
         if (Util.isNull(host)) throw new NullPointerException();
         this.host = host;
         try {

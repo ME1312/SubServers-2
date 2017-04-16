@@ -6,7 +6,7 @@ import net.ME1312.SubServers.Host.Library.ExtraDataHandler;
 import net.ME1312.SubServers.Host.Library.Log.Logger;
 import net.ME1312.SubServers.Host.Library.Util;
 import net.ME1312.SubServers.Host.Library.Version.Version;
-import net.ME1312.SubServers.Host.SubServers;
+import net.ME1312.SubServers.Host.ExHost;
 
 import java.io.File;
 import java.net.URL;
@@ -18,7 +18,7 @@ import java.util.*;
  * @see SubPlugin
  */
 public class SubPluginInfo implements ExtraDataHandler {
-    private SubServers host;
+    private ExHost host;
     private Object plugin;
     private String name;
     private Version version;
@@ -47,7 +47,7 @@ public class SubPluginInfo implements ExtraDataHandler {
      * @param dependencies Dependencies List
      * @param softDependencies Soft Dependencies List
      */
-    public SubPluginInfo(SubServers host, Object plugin, String name, Version version, List<String> authors, String description, URL website, List<String> loadBefore, List<String> dependencies, List<String> softDependencies) {
+    public SubPluginInfo(ExHost host, Object plugin, String name, Version version, List<String> authors, String description, URL website, List<String> loadBefore, List<String> dependencies, List<String> softDependencies) {
         if (Util.isNull(host, plugin, name, version, authors)) throw new NullPointerException();
         name = name.replaceAll("#|<|\\$|\\+|%|>|!|`|&|\\*|'|\\||\\{|\\?|\"|=|}|/|\\\\|\\s|@|\\.|\\n", "_");
         if (name.length() == 0) throw new StringIndexOutOfBoundsException("Cannot use an empty name");

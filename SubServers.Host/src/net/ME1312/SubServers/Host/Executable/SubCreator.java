@@ -10,7 +10,7 @@ import net.ME1312.SubServers.Host.Library.Version.Version;
 import net.ME1312.SubServers.Host.Network.Packet.PacketDownloadBuildScript;
 import net.ME1312.SubServers.Host.Network.Packet.PacketExCreateServer;
 import net.ME1312.SubServers.Host.Network.Packet.PacketOutExLogMessage;
-import net.ME1312.SubServers.Host.SubServers;
+import net.ME1312.SubServers.Host.ExHost;
 import org.json.JSONObject;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -32,7 +32,7 @@ import java.util.UUID;
  * Internal SubCreator Class
  */
 public class SubCreator {
-    private SubServers host;
+    private ExHost host;
     private SubLogger logger;
     private Process process = null;
     private Thread thread = null;
@@ -53,7 +53,7 @@ public class SubCreator {
      *
      * @param host SubServers.Host
      */
-    public SubCreator(SubServers host) {
+    public SubCreator(ExHost host) {
         if (Util.isNull(host)) throw new NullPointerException();
         this.host = host;
         this.logger = new SubLogger(null, this, "SubCreator", null, new Container<Boolean>(false), null);
@@ -238,7 +238,7 @@ public class SubCreator {
     private void generateClient(File dir, String name, ServerType type) throws IOException {
         if (type == ServerType.SPIGOT) {
             new UniversalFile(dir, "plugins:SubServers-Client-Bukkit").mkdirs();
-            Util.copyFromJar(SubServers.class.getClassLoader(), "net/ME1312/SubServers/Host/Library/Files/bukkit.jar", new UniversalFile(dir, "plugins:SubServers.Client.jar").getPath());
+            Util.copyFromJar(ExHost.class.getClassLoader(), "net/ME1312/SubServers/Host/Library/Files/bukkit.jar", new UniversalFile(dir, "plugins:SubServers.Client.jar").getPath());
             YAMLConfig config = new YAMLConfig(new UniversalFile(dir, "plugins:Subservers-Client-Bukkit:config.yml"));
             YAMLSection settings = new YAMLSection();
             settings.set("Version", "2.11.2a+");

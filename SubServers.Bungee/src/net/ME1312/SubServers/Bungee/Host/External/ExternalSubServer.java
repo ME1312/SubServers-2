@@ -14,7 +14,7 @@ import java.util.LinkedList;
 import java.util.UUID;
 
 /**
- * Internal SubServer Class
+ * External SubServer Class
  */
 public class ExternalSubServer extends SubServer {
     private ExternalHost host;

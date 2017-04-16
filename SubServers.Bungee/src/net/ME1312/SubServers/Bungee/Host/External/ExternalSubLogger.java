@@ -20,6 +20,9 @@ import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * External Process Logger Class
+ */
 public class ExternalSubLogger extends SubLogger {
     private Object handle;
     protected UUID id = null;

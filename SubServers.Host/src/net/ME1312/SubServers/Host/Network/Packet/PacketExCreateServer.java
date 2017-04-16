@@ -5,8 +5,7 @@ import net.ME1312.SubServers.Host.Library.Util;
 import net.ME1312.SubServers.Host.Library.Version.Version;
 import net.ME1312.SubServers.Host.Network.PacketIn;
 import net.ME1312.SubServers.Host.Network.PacketOut;
-import net.ME1312.SubServers.Host.SubAPI;
-import net.ME1312.SubServers.Host.SubServers;
+import net.ME1312.SubServers.Host.ExHost;
 import org.json.JSONObject;
 
 import java.util.UUID;
@@ -15,7 +14,7 @@ import java.util.UUID;
  * Create Server Packet
  */
 public class PacketExCreateServer implements PacketIn, PacketOut {
-    private SubServers host;
+    private ExHost host;
     private int response;
     private String message;
     private JSONObject info;
@@ -26,7 +25,7 @@ public class PacketExCreateServer implements PacketIn, PacketOut {
      *
      * @param host SubPlugin
      */
-    public PacketExCreateServer(SubServers host) {
+    public PacketExCreateServer(ExHost host) {
         if (Util.isNull(host)) throw new NullPointerException();
         this.host = host;
     }

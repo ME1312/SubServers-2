@@ -10,7 +10,7 @@ import java.io.Serializable;
  */
 @SuppressWarnings("serial")
 public class Executable implements Serializable {
-    public boolean isFile;
+    private boolean isFile;
     private File File;
     private String Str;
     /**
@@ -52,6 +52,15 @@ public class Executable implements Serializable {
             String = Str;
         }
         return String;
+    }
+
+    /**
+     * Check if the Executable String is a file
+     *
+     * @return File Status
+     */
+    public boolean isFile() {
+        return isFile;
     }
 
     /**

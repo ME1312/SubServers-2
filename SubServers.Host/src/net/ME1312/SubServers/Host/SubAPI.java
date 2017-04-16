@@ -22,10 +22,10 @@ public final class SubAPI {
     final HashMap<UUID, Timer> schedule = new HashMap<UUID, Timer>();
     final TreeMap<String, Command> commands = new TreeMap<String, Command>();
     final HashMap<String, SubPluginInfo> plugins = new LinkedHashMap<String, SubPluginInfo>();
-    private SubServers host;
+    private ExHost host;
     private static SubAPI api;
 
-    protected SubAPI(SubServers host) {
+    protected SubAPI(ExHost host) {
         this.host = host;
         api = this;
     }
@@ -46,7 +46,7 @@ public final class SubAPI {
      * @deprecated Use SubAPI Methods when available
      */
     @Deprecated
-    public SubServers getInternals() {
+    public ExHost getInternals() {
         return host;
     }
 

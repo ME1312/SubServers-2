@@ -2,7 +2,7 @@ package net.ME1312.SubServers.Host.API.Event;
 
 import net.ME1312.SubServers.Host.Library.Event.Event;
 import net.ME1312.SubServers.Host.Library.Util;
-import net.ME1312.SubServers.Host.SubServers;
+import net.ME1312.SubServers.Host.ExHost;
 
 /**
  * SubServers.Host Enable Event Class
@@ -14,7 +14,7 @@ public class SubEnableEvent extends Event {
      *
      * @param host SubServers.Host
      */
-    public SubEnableEvent(SubServers host) {
+    public SubEnableEvent(ExHost host) {
         if (Util.isNull(host)) throw new NullPointerException();
     }
 }

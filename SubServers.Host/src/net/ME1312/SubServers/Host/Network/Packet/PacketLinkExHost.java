@@ -1,12 +1,13 @@
 package net.ME1312.SubServers.Host.Network.Packet;
 
+import net.ME1312.SubServers.Host.API.Event.SubNetworkConnectEvent;
 import net.ME1312.SubServers.Host.Library.Log.Logger;
 import net.ME1312.SubServers.Host.Library.Util;
 import net.ME1312.SubServers.Host.Library.Version.Version;
 import net.ME1312.SubServers.Host.Network.PacketIn;
 import net.ME1312.SubServers.Host.Network.PacketOut;
 import net.ME1312.SubServers.Host.Network.SubDataClient;
-import net.ME1312.SubServers.Host.SubServers;
+import net.ME1312.SubServers.Host.ExHost;
 import org.json.JSONObject;
 
 import java.lang.reflect.Field;
@@ -15,7 +16,7 @@ import java.lang.reflect.Field;
  * Link Host Packet
  */
 public class PacketLinkExHost implements PacketIn, PacketOut {
-    private SubServers host;
+    private ExHost host;
     private Logger log;
 
     /**
@@ -23,7 +24,7 @@ public class PacketLinkExHost implements PacketIn, PacketOut {
      *
      * @param host SubServers.Host
      */
-    public PacketLinkExHost(SubServers host) {
+    public PacketLinkExHost(ExHost host) {
         if (Util.isNull(host)) throw new NullPointerException();
         this.host = host;
         try {
@@ -46,6 +47,7 @@ public class PacketLinkExHost implements PacketIn, PacketOut {
         if (data.getInt("r") == 0) {
             host.subdata.sendPacket(new PacketDownloadLang());
             host.subdata.sendPacket(new PacketOutExRequestQueue());
+            host.api.executeEvent(new SubNetworkConnectEvent(host.subdata));
         } else {
             log.info.println("Could not link name with host: " + data.getString("m"));
         }

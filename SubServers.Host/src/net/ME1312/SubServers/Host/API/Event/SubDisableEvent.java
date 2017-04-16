@@ -2,7 +2,7 @@ package net.ME1312.SubServers.Host.API.Event;
 
 import net.ME1312.SubServers.Host.Library.Event.Event;
 import net.ME1312.SubServers.Host.Library.Util;
-import net.ME1312.SubServers.Host.SubServers;
+import net.ME1312.SubServers.Host.ExHost;
 
 /**
  * SubServers.Host Disable Event Class
@@ -16,7 +16,7 @@ public class SubDisableEvent extends Event {
      * @param host SubServers.Host
      * @param exit Exit Code
      */
-    public SubDisableEvent(SubServers host, int exit) {
+    public SubDisableEvent(ExHost host, int exit) {
         if (Util.isNull(host, exit)) throw new NullPointerException();
         this.exit = exit;
     }

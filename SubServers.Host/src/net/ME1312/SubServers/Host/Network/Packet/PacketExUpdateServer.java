@@ -4,7 +4,7 @@ import net.ME1312.SubServers.Host.Executable.SubServer;
 import net.ME1312.SubServers.Host.Library.Version.Version;
 import net.ME1312.SubServers.Host.Network.PacketIn;
 import net.ME1312.SubServers.Host.Network.PacketOut;
-import net.ME1312.SubServers.Host.SubServers;
+import net.ME1312.SubServers.Host.ExHost;
 import org.json.JSONObject;
 
 import java.util.Arrays;
@@ -14,7 +14,7 @@ import java.util.UUID;
  * Update Server Packet
  */
 public class PacketExUpdateServer implements PacketIn, PacketOut {
-    private SubServers host;
+    private ExHost host;
     private SubServer server;
     private UpdateType type;
     private Object[] args;
@@ -45,7 +45,7 @@ public class PacketExUpdateServer implements PacketIn, PacketOut {
      * New PacketExUpdateServer (In)
      * @param host SubPlugin
      */
-    public PacketExUpdateServer(SubServers host) {
+    public PacketExUpdateServer(ExHost host) {
         this.host = host;
     }
 

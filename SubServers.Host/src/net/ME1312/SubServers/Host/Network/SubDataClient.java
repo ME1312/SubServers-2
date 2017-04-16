@@ -1,12 +1,13 @@
 package net.ME1312.SubServers.Host.Network;
 
+import net.ME1312.SubServers.Host.API.Event.SubNetworkDisconnectEvent;
 import net.ME1312.SubServers.Host.Library.Exception.IllegalPacketException;
 import net.ME1312.SubServers.Host.Library.Log.Logger;
 import net.ME1312.SubServers.Host.Library.Util;
 import net.ME1312.SubServers.Host.Library.Version.Version;
 import net.ME1312.SubServers.Host.Network.Packet.*;
 import net.ME1312.SubServers.Host.SubAPI;
-import net.ME1312.SubServers.Host.SubServers;
+import net.ME1312.SubServers.Host.ExHost;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -32,7 +33,7 @@ public final class SubDataClient {
     private PrintWriter writer;
     private Socket socket;
     private String name;
-    private SubServers host;
+    private ExHost host;
     private LinkedList<PacketOut> queue;
 
     /**
@@ -43,7 +44,7 @@ public final class SubDataClient {
      * @param port Port
      * @throws IOException
      */
-    public SubDataClient(SubServers host, String name, InetAddress address, int port) throws IOException {
+    public SubDataClient(ExHost host, String name, InetAddress address, int port) throws IOException {
         if (Util.isNull(host, name, address, port)) throw new NullPointerException();
         socket = new Socket(address, port);
         this.host = host;
@@ -296,6 +297,7 @@ public final class SubDataClient {
             final Socket socket = this.socket;
             this.socket = null;
             if (!socket.isClosed()) socket.close();
+            host.api.executeEvent(new SubNetworkDisconnectEvent());
             log.info.println("The SubData Connection was closed");
             if (reconnect) {
                 log.info.println("Attempting to reconnect in 30 seconds");
