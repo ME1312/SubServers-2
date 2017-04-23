@@ -117,13 +117,11 @@ public final class SubCommand extends Command implements TabExecutor {
                         } else if (!((SubServer) servers.get(args[1].toLowerCase())).isRunning()) {
                             sender.sendMessage("SubServers > That SubServer is not running");
                         } else {
-                            int i = 2;
                             String str = args[2];
                             if (args.length > 3) {
-                                do {
-                                    i++;
-                                    str = str + " " + args[i];
-                                } while ((i + 1) != args.length);
+                                for (int i = 3; i < args.length; i++) {
+                                    str += " " + args[i];
+                                }
                             }
                             if (args[1].equals("*")) {
                                 for (Server server : servers.values()) {
