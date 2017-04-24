@@ -110,22 +110,26 @@ public final class SubCommand extends Command implements TabExecutor {
                 } else if (args[0].equalsIgnoreCase("cmd") || args[0].equalsIgnoreCase("command")) {
                     if (args.length > 2) {
                         Map<String, Server> servers = plugin.api.getServers();
-                        if (!servers.keySet().contains(args[1].toLowerCase())) {
+                        if (!(servers.keySet().contains(args[1].toLowerCase()) || args[1].equals("*"))) {
                             sender.sendMessage("SubServers > There is no server with that name");
                         } else if (!(servers.get(args[1].toLowerCase()) instanceof SubServer)) {
                             sender.sendMessage("SubServers > That Server is not a SubServer");
                         } else if (!((SubServer) servers.get(args[1].toLowerCase())).isRunning()) {
                             sender.sendMessage("SubServers > That SubServer is not running");
                         } else {
-                            int i = 2;
                             String str = args[2];
-                            if (args.length > 3) {
-                                do {
-                                    i++;
-                                    str = str + " " + args[i];
-                                } while ((i + 1) != args.length);
+                            for (int i = 3; i < args.length; i++) {
+                                str += " " + args[i];
                             }
-                            ((SubServer) servers.get(args[1].toLowerCase())).command(str);
+                            if (args[1].equals("*")) {
+                                for (Server server : servers.values()) {
+                                    if (((SubServer) server).isRunning()) {
+                                        ((SubServer) server).command(str);
+                                    }
+                                }
+                            } else {
+                                ((SubServer) servers.get(args[1].toLowerCase())).command(str);
+                            }
                         }
                     } else {
                         sender.sendMessage("SubServers > Usage: " + label + " " + args[0].toLowerCase() + " <SubServer> <Command> [Args...]");
