@@ -163,7 +163,7 @@ public final class SubPlugin extends BungeeCord {
             if (p >= 65535) p = 0;
             i++;
             p++;
-            legServers.put(name, new BungeeServerInfo(name, new InetSocketAddress(InetAddress.getByName(i + ".0.0.0"), p), "Loading SubServers v" + version.toString(), false));
+            legServers.put(name, new BungeeServerInfo(name, new InetSocketAddress(InetAddress.getByName(i + ".0.0.0"), p), "Some SubServer", false));
         }
 
     }

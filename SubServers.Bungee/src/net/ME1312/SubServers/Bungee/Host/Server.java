@@ -63,7 +63,11 @@ public class Server extends BungeeServerInfo implements ClientHandler, ExtraData
      * @param value Value (or null to reset)
      */
     public void setDisplayName(String value) {
-        this.nick = value;
+        if (value == null || value.length() == 0 || getName().equals(value)) {
+            this.nick = null;
+        } else {
+            this.nick = value;
+        }
     }
 
     /**

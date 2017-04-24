@@ -1,15 +1,16 @@
 package net.ME1312.SubServers.Bungee.Host;
 
+import net.ME1312.SubServers.Bungee.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Bungee.Library.Exception.InvalidServerException;
-import net.ME1312.SubServers.Bungee.Library.NamedContainer;
 import net.ME1312.SubServers.Bungee.Library.Util;
+import org.json.JSONObject;
 
+import java.io.File;
 import java.net.InetSocketAddress;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.UUID;
-import java.util.logging.Level;
 
 /**
  * SubServer Layout Class
@@ -175,6 +176,25 @@ public abstract class SubServer extends Server {
     }
 
     /**
+     * Edits the Server
+     *
+     * @param player Player Editing
+     * @param edit Edits
+     * @return Success Status
+     */
+    public abstract int edit(UUID player, YAMLSection edit);
+
+    /**
+     * Edits the Server
+     *
+     * @param edit Edits
+     * @return Success Status
+     */
+    public int edit(YAMLSection edit) {
+        return edit(null, edit);
+    }
+
+    /**
      * Waits for the Server to Stop
      *
      * @throws InterruptedException
@@ -236,11 +256,27 @@ public abstract class SubServer extends Server {
     public abstract LinkedList<LoggedCommand> getCommandHistory();
 
     /**
-     * Get the Server Directory
+     * Get the Server Directory Path
      *
-     * @return Server Directory
+     * @return Server Directory Path
      */
-    public abstract String getDirectory();
+    public abstract String getPath();
+
+    /**
+     * Get the Full Server Directory Path
+     *
+     * @return Full Server Directory Path
+     */
+    public String getFullPath() {
+        return new File(getHost().getPath(), getPath()).getPath();
+    }
+
+    /**
+     * Get the Server's Executable String
+     *
+     * @return Executable String
+     */
+    public abstract Executable getExecutable();
 
     /**
      * Grab the Command to Stop the Server

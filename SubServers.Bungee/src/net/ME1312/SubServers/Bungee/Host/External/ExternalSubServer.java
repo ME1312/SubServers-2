@@ -3,13 +3,17 @@ package net.ME1312.SubServers.Bungee.Host.External;
 import net.ME1312.SubServers.Bungee.Event.*;
 import net.ME1312.SubServers.Bungee.Host.Executable;
 import net.ME1312.SubServers.Bungee.Host.SubLogger;
+import net.ME1312.SubServers.Bungee.Library.Config.YAMLSection;
+import net.ME1312.SubServers.Bungee.Library.Config.YAMLValue;
 import net.ME1312.SubServers.Bungee.Library.Container;
 import net.ME1312.SubServers.Bungee.Library.Exception.InvalidServerException;
 import net.ME1312.SubServers.Bungee.Host.Host;
 import net.ME1312.SubServers.Bungee.Host.SubServer;
+import net.ME1312.SubServers.Bungee.Library.NamedContainer;
 import net.ME1312.SubServers.Bungee.Library.Util;
 import net.ME1312.SubServers.Bungee.Network.Packet.PacketExUpdateServer;
 
+import java.io.File;
 import java.util.LinkedList;
 import java.util.UUID;
 
@@ -151,6 +155,211 @@ public class ExternalSubServer extends SubServer {
         } else return false;
     }
 
+
+
+    public int edit(UUID player, YAMLSection edit) {
+        int c = 0;
+        boolean state = isRunning();
+        SubServer forward = null;
+        YAMLSection pending = edit.clone();
+        for (String key : edit.getKeys()) {
+            pending.remove(key);
+            YAMLValue value = edit.get(key);
+            SubEditServerEvent event = new SubEditServerEvent(player, this, new NamedContainer<String, YAMLValue>(key, value));
+            host.plugin.getPluginManager().callEvent(event);
+            if (!event.isCancelled()) {
+                try {
+                    switch (key) {
+                        case "name":
+                            if (value.isString() && host.removeSubServer(player, getName())) {
+                                SubServer server = host.addSubServer(player, value.asRawString(), isEnabled(), getAddress().getPort(), getMotd(), isLogging(), getPath(), getExecutable(), getStopCommand(), false, willAutoRestart(), isHidden(), isRestricted(), isTemporary());
+                                if (server != null) {
+                                    if (!getName().equals(getDisplayName())) server.setDisplayName(getDisplayName());
+                                    for (String extra : getExtra().getKeys()) server.addExtra(extra, getExtra(extra));
+                                    if (this.host.plugin.config.get().getSection("Servers").getKeys().contains(getName())) {
+                                        YAMLSection config = this.host.plugin.config.get().getSection("Servers").getSection(getName());
+                                        this.host.plugin.config.get().getSection("Servers").remove(getName());
+                                        this.host.plugin.config.get().getSection("Servers").set(server.getName(), config);
+                                        this.host.plugin.config.save();
+                                    }
+                                    forward = server;
+                                    c++;
+                                }
+                            }
+                            break;
+                        case "display":
+                            if (value.isString()) {
+                                setDisplayName(value.asString());
+                                if (this.host.plugin.config.get().getSection("Servers").getKeys().contains(getName())) {
+                                    if (getName().equals(getDisplayName())) {
+                                        this.host.plugin.config.get().getSection("Servers").getSection(getName()).remove("Display-Name");
+                                    } else {
+                                        this.host.plugin.config.get().getSection("Servers").getSection(getName()).set("Display-Name", getDisplayName());
+                                    }
+                                    this.host.plugin.config.save();
+                                }
+                                c++;
+                            }
+                            break;
+                        case "enabled":
+                            if (value.isBoolean()) {
+                                setEnabled(value.asBoolean());
+                                if (this.host.plugin.config.get().getSection("Servers").getKeys().contains(getName())) {
+                                    this.host.plugin.config.get().getSection("Servers").getSection(getName()).set("Enabled", isEnabled());
+                                    this.host.plugin.config.save();
+                                }
+                                c++;
+                            }
+                            break;
+                        case "host":
+                            if (value.isString() && host.removeSubServer(player, getName())) {
+                                SubServer server = this.host.plugin.api.getHost(value.asRawString()).addSubServer(player, getName(), isEnabled(), getAddress().getPort(), getMotd(), isLogging(), getPath(), getExecutable(), getStopCommand(), false, willAutoRestart(), isHidden(), isRestricted(), isTemporary());
+                                if (server != null) {
+                                    if (!getName().equals(getDisplayName())) server.setDisplayName(getDisplayName());
+                                    for (String extra : getExtra().getKeys()) server.addExtra(extra, getExtra(extra));
+                                    if (this.host.plugin.config.get().getSection("Servers").getKeys().contains(getName())) {
+                                        this.host.plugin.config.get().getSection("Servers").getSection(getName()).set("Host", server.getHost().getName());
+                                        this.host.plugin.config.save();
+                                    }
+                                    forward = server;
+                                    c++;
+                                }
+                            }
+                            break;
+                        case "port":
+                            if (value.isInt() && host.removeSubServer(player, getName())) {
+                                SubServer server = host.addSubServer(player, getName(), isEnabled(), value.asInt(), getMotd(), isLogging(), getPath(), getExecutable(), getStopCommand(), false, willAutoRestart(), isHidden(), isRestricted(), isTemporary());
+                                if (server != null) {
+                                    if (!getName().equals(getDisplayName())) server.setDisplayName(getDisplayName());
+                                    for (String extra : getExtra().getKeys()) server.addExtra(extra, getExtra(extra));
+                                    if (this.host.plugin.config.get().getSection("Servers").getKeys().contains(getName())) {
+                                        this.host.plugin.config.get().getSection("Servers").getSection(getName()).set("Port", server.getAddress().getPort());
+                                        this.host.plugin.config.save();
+                                    }
+                                    forward = server;
+                                    c++;
+                                }
+                            }
+                            break;
+                        case "motd":
+                            if (value.isString()) {
+                                setMotd(value.asColoredString('&'));
+                                if (this.host.plugin.config.get().getSection("Servers").getKeys().contains(getName())) {
+                                    this.host.plugin.config.get().getSection("Servers").getSection(getName()).set("Motd", value.asString());
+                                    this.host.plugin.config.save();
+                                }
+                                c++;
+                            }
+                            break;
+                        case "log":
+                            if (value.isBoolean()) {
+                                setLogging(value.asBoolean());
+                                if (this.host.plugin.config.get().getSection("Servers").getKeys().contains(getName())) {
+                                    this.host.plugin.config.get().getSection("Servers").getSection(getName()).set("Log", isLogging());
+                                    this.host.plugin.config.save();
+                                }
+                                c++;
+                            }
+                            break;
+                        case "dir":
+                            if (value.isString()) {
+                                SubServer server = host.addSubServer(player, getName(), isEnabled(), getAddress().getPort(), getMotd(), isLogging(), value.asRawString(), getExecutable(), getStopCommand(), false, willAutoRestart(), isHidden(), isRestricted(), isTemporary());
+                                if (server != null) {
+                                    if (!getName().equals(getDisplayName())) server.setDisplayName(getDisplayName());
+                                    for (String extra : getExtra().getKeys()) server.addExtra(extra, getExtra(extra));
+                                    if (this.host.plugin.config.get().getSection("Servers").getKeys().contains(getName())) {
+                                        this.host.plugin.config.get().getSection("Servers").getSection(getName()).set("Directory", server.getPath());
+                                        this.host.plugin.config.save();
+                                    }
+                                    forward = server;
+                                    c++;
+                                }
+                            }
+                            break;
+                        case "exec":
+                            if (value.isString()) {
+                                SubServer server = host.addSubServer(player, getName(), isEnabled(), getAddress().getPort(), getMotd(), isLogging(), getPath(), new Executable(value.asRawString()), getStopCommand(), false, willAutoRestart(), isHidden(), isRestricted(), isTemporary());
+                                if (server != null) {
+                                    if (!getName().equals(getDisplayName())) server.setDisplayName(getDisplayName());
+                                    for (String extra : getExtra().getKeys()) server.addExtra(extra, getExtra(extra));
+                                    if (this.host.plugin.config.get().getSection("Servers").getKeys().contains(getName())) {
+                                        this.host.plugin.config.get().getSection("Servers").getSection(getName()).set("Executable", value.asRawString());
+                                        this.host.plugin.config.save();
+                                    }
+                                    forward = server;
+                                    c++;
+                                }
+                            }
+                            break;
+                        case "state":
+                            if (value.isBoolean()) {
+                                state = value.asBoolean();
+                            }
+                            break;
+                        case "stop-cmd":
+                            if (value.isString()) {
+                                setStopCommand(value.asRawString());
+                                if (this.host.plugin.config.get().getSection("Servers").getKeys().contains(getName())) {
+                                    this.host.plugin.config.get().getSection("Servers").getSection(getName()).set("Stop-Command", getStopCommand());
+                                    this.host.plugin.config.save();
+                                }
+                                c++;
+                            }
+                            break;
+                        case "auto-run":
+                            if (value.isBoolean()) {
+                                if (this.host.plugin.config.get().getSection("Servers").getKeys().contains(getName())) {
+                                    this.host.plugin.config.get().getSection("Servers").getSection(getName()).set("Run-On-Launch", value.asBoolean());
+                                    this.host.plugin.config.save();
+                                }
+                                c++;
+                            }
+                            break;
+                        case "auto-restart":
+                            if (value.isBoolean()) {
+                                setAutoRestart(value.asBoolean());
+                                if (this.host.plugin.config.get().getSection("Servers").getKeys().contains(getName())) {
+                                    this.host.plugin.config.get().getSection("Servers").getSection(getName()).set("Auto-Restart", willAutoRestart());
+                                    this.host.plugin.config.save();
+                                }
+                                c++;
+                            }
+                            break;
+                        case "restricted":
+                            if (value.isBoolean()) {
+                                setRestricted(value.asBoolean());
+                                if (this.host.plugin.config.get().getSection("Servers").getKeys().contains(getName())) {
+                                    this.host.plugin.config.get().getSection("Servers").getSection(getName()).set("Restricted", isRestricted());
+                                    this.host.plugin.config.save();
+                                }
+                                c++;
+                            }
+                            break;
+                        case "hidden":
+                            if (value.isBoolean()) {
+                                setHidden(value.asBoolean());
+                                if (this.host.plugin.config.get().getSection("Servers").getKeys().contains(getName())) {
+                                    this.host.plugin.config.get().getSection("Servers").getSection(getName()).set("Hidden", isHidden());
+                                    this.host.plugin.config.save();
+                                }
+                                c++;
+                            }
+                            break;
+                    }
+                    if (forward != null) {
+                        if (state) pending.set("state", true);
+                        c += forward.edit(player, pending);
+                        break;
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        if (!isRunning() && forward == null && state) start(player);
+        return c;
+    }
+
     @Override
     public void waitFor() throws InterruptedException {
         while (running) {
@@ -209,8 +418,13 @@ public class ExternalSubServer extends SubServer {
     }
 
     @Override
-    public String getDirectory() {
+    public String getPath() {
         return dir;
+    }
+
+    @Override
+    public Executable getExecutable() {
+        return exec;
     }
 
     @Override

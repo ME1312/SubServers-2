@@ -49,13 +49,13 @@ public class ExternalSubCreator extends SubCreator {
                         if (json.getInt("r") == 0) {
                             System.out.println(host.getName() + "/Creator > Saving...");
                             if (host.plugin.exServers.keySet().contains(name.toLowerCase())) host.plugin.exServers.remove(name.toLowerCase());
-                            SubServer subserver = host.addSubServer(player, name, true, port, "&aThis is a SubServer", true, json.getJSONObject("c").getString("dir"), new Executable(json.getJSONObject("c").getString("exec")), "stop", false, false, false, false, false);
+                            SubServer subserver = host.addSubServer(player, name, true, port, "Some SubServer", true, json.getJSONObject("c").getString("dir"), new Executable(json.getJSONObject("c").getString("exec")), "stop", false, false, false, false, false);
 
                             YAMLSection server = new YAMLSection();
                             server.set("Enabled", true);
                             server.set("Host", host.getName());
                             server.set("Port", port);
-                            server.set("Motd", "&aThis is a SubServer");
+                            server.set("Motd", "Some SubServer");
                             server.set("Log", true);
                             server.set("Directory", json.getJSONObject("c").getString("dir"));
                             server.set("Executable", json.getJSONObject("c").getString("exec"));

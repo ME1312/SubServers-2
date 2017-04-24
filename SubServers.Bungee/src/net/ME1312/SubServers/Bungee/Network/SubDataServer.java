@@ -7,15 +7,12 @@ import net.ME1312.SubServers.Bungee.Network.Packet.*;
 import net.ME1312.SubServers.Bungee.SubPlugin;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
-import java.util.regex.Pattern;
 
 /**
  * SubDataServer Class
@@ -74,6 +71,7 @@ public final class SubDataServer {
         registerPacket(new PacketDownloadProxyInfo(plugin), "SubDownloadProxyInfo");
         registerPacket(new PacketDownloadServerInfo(plugin), "SubDownloadServerInfo");
         registerPacket(new PacketDownloadServerList(plugin), "SubDownloadServerList");
+        registerPacket(new PacketEditServer(plugin), "SubEditServer");
         registerPacket(new PacketExAddServer(), "SubExAddServer");
         registerPacket(new PacketExConfigureHost(plugin), "SubExConfigureHost");
         registerPacket(new PacketExCreateServer(), "SubExCreateServer");
@@ -84,7 +82,7 @@ public final class SubDataServer {
         registerPacket(new PacketInExRequestQueue(plugin), "SubExRequestQueue");
         registerPacket(new PacketLinkExHost(plugin), "SubLinkExHost");
         registerPacket(new PacketLinkServer(plugin), "SubLinkServer");
-        registerPacket(new PacketListenServerLog(plugin), "SubListenServerLog");
+        registerPacket(new PacketListenLog(plugin), "SubListenLog");
         registerPacket(new PacketStartServer(plugin), "SubStartServer");
         registerPacket(new PacketStopServer(plugin), "SubStopServer");
         registerPacket(new PacketTeleportPlayer(plugin), "SubTeleportPlayer");
@@ -99,6 +97,7 @@ public final class SubDataServer {
         registerPacket(PacketDownloadProxyInfo.class, "SubDownloadProxyInfo");
         registerPacket(PacketDownloadServerInfo.class, "SubDownloadServerInfo");
         registerPacket(PacketDownloadServerList.class, "SubDownloadServerList");
+        registerPacket(PacketEditServer.class, "SubEditServer");
         registerPacket(PacketExAddServer.class, "SubExAddServer");
         registerPacket(PacketExConfigureHost.class, "SubExConfigureHost");
         registerPacket(PacketExCreateServer.class, "SubExCreateServer");
@@ -107,7 +106,7 @@ public final class SubDataServer {
         registerPacket(PacketExUpdateServer.class, "SubExUpdateServer");
         registerPacket(PacketLinkExHost.class, "SubLinkExHost");
         registerPacket(PacketLinkServer.class, "SubLinkServer");
-        registerPacket(PacketListenServerLog.class, "SubListenServerLog");
+        registerPacket(PacketListenLog.class, "SubListenLog");
         registerPacket(PacketOutRunEvent.class, "SubRunEvent");
         registerPacket(PacketOutReset.class, "SubReset");
         registerPacket(PacketStartServer.class, "SubStartServer");

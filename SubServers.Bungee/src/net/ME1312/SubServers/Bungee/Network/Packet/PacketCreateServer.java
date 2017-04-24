@@ -72,7 +72,18 @@ public class PacketCreateServer implements PacketIn, PacketOut {
                 client.sendPacket(new PacketCreateServer(9, "Invalid Ram Amount", (data.keySet().contains("id")) ? data.getString("id") : null));
             } else {
                 if (plugin.hosts.get(data.getJSONObject("creator").getString("host").toLowerCase()).getCreator().create((data.keySet().contains("player"))?UUID.fromString(data.getString("player")):null, data.getJSONObject("creator").getString("name"), SubCreator.ServerType.valueOf(data.getJSONObject("creator").getString("type").toUpperCase()), new Version(data.getJSONObject("creator").getString("version")), data.getJSONObject("creator").getInt("ram"), data.getJSONObject("creator").getInt("port"))) {
-                    client.sendPacket(new PacketCreateServer(0, "Creaing SubServer", (data.keySet().contains("id")) ? data.getString("id") : null));
+                    if (data.keySet().contains("wait") && data.getBoolean("wait")) {
+                        new Thread(() -> {
+                            try {
+                                plugin.hosts.get(data.getJSONObject("creator").getString("host").toLowerCase()).getCreator().waitFor();
+                                client.sendPacket(new PacketCreateServer(0, "Created SubServer", (data.keySet().contains("id")) ? data.getString("id") : null));
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        }).start();
+                    } else {
+                        client.sendPacket(new PacketCreateServer(0, "Creating SubServer", (data.keySet().contains("id")) ? data.getString("id") : null));
+                    }
                 } else {
                     client.sendPacket(new PacketCreateServer(1, "Couldn't create SubServer", (data.keySet().contains("id")) ? data.getString("id") : null));
                 }

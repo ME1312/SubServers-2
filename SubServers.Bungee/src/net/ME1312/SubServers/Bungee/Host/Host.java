@@ -33,7 +33,7 @@ public abstract class Host implements ExtraDataHandler {
      */
     public Host(SubPlugin plugin, String name, Boolean enabled, InetAddress address, String directory, String gitBash) {
         if (name.contains(" ")) throw new InvalidHostException("Host names cannot have spaces: " + name);
-        if (name.equals("~")) setDisplayName("Default");
+        if (name.equals("~")) nick = "Default";
     }
 
     /**
@@ -58,11 +58,11 @@ public abstract class Host implements ExtraDataHandler {
     public abstract InetAddress getAddress();
 
     /**
-     * Get the Directory of this Host
+     * Get the host Directory Path
      *
-     * @return Host Directory
+     * @return Host Directory Path
      */
-    public abstract String getDirectory();
+    public abstract String getPath();
 
     /**
      * Get the Name of this Host
@@ -86,7 +86,11 @@ public abstract class Host implements ExtraDataHandler {
      * @param value Value (or null to reset)
      */
     public void setDisplayName(String value) {
-        this.nick = value;
+        if (value == null || value.length() == 0 || getName().equals(value)) {
+            this.nick = null;
+        } else {
+            this.nick = value;
+        }
     }
 
     /**
@@ -189,6 +193,25 @@ public abstract class Host implements ExtraDataHandler {
             if (getSubServer(server.toLowerCase()).command(player, command)) i++;
         }
         return i;
+    }
+
+    /**
+     * Edits the Host
+     *
+     * @param player Player Editing
+     * @param edit Edits
+     * @return Success Status
+     */
+    public abstract int edit(UUID player, YAMLSection edit);
+
+    /**
+     * Edits the Host
+     *
+     * @param edit Edits
+     * @return Success Status
+     */
+    public int edit(YAMLSection edit) {
+        return edit(null, edit);
     }
 
     /**
@@ -312,6 +335,25 @@ public abstract class Host implements ExtraDataHandler {
      * @return Success Status
      */
     public abstract boolean deleteSubServer(UUID player, String name) throws InterruptedException;
+
+    /**
+     * Forced the Deletion of a SubServer
+     *
+     * @param name SubServer Name
+     * @return Success Status
+     */
+    public boolean forceDeleteSubServer(String name) throws InterruptedException {
+        return deleteSubServer(null, name);
+    }
+
+    /**
+     * Forces the Deletion of a SubServer
+     *
+     * @param player Player Deleting
+     * @param name SubServer Name
+     * @return Success Status
+     */
+    public abstract boolean forceDeleteSubServer(UUID player, String name) throws InterruptedException;
 
     @Override
     public void addExtra(String handle, Object value) {

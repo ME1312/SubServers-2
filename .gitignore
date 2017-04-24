@@ -26,12 +26,16 @@ crashlytics.properties
 crashlytics-build.properties
 
 # Hide Unfinished Project Files
-/Artifacts/SubServers.Test.jar
+/Artifacts/SubServers.Sync.jar
+/SubServers.Sync/
 /Artifacts/SubServers.Web.jar
-/SubServers.Test/
 /SubServers.Web/
 
 # Hide Others
+/Artifacts/-History/
+/Artifacts/-Icon/
+/Artifacts/SubServers.Test.jar
+/SubServers.Test/
 /build.ant
 .DS_STORE
 .alias

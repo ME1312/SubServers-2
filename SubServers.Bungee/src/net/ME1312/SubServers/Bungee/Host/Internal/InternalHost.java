@@ -4,6 +4,7 @@ import com.google.common.io.Files;
 import net.ME1312.SubServers.Bungee.Event.SubAddServerEvent;
 import net.ME1312.SubServers.Bungee.Event.SubRemoveServerEvent;
 import net.ME1312.SubServers.Bungee.Host.Executable;
+import net.ME1312.SubServers.Bungee.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Bungee.Library.Exception.InvalidServerException;
 import net.ME1312.SubServers.Bungee.Host.Host;
 import net.ME1312.SubServers.Bungee.Host.SubCreator;
@@ -67,13 +68,18 @@ public class InternalHost extends Host {
     }
 
     @Override
-    public String getDirectory() {
+    public String getPath() {
         return directory;
     }
 
     @Override
     public String getName() {
         return name;
+    }
+
+    @Override
+    public int edit(UUID player, YAMLSection edit) {
+        return 0; // TODO
     }
 
     @Override
@@ -126,21 +132,63 @@ public class InternalHost extends Host {
         if (Util.isNull(name)) throw new NullPointerException();
         SubRemoveServerEvent event = new SubRemoveServerEvent(player, this, getSubServer(name));
         plugin.getPluginManager().callEvent(event);
-        if (!event.isCancelled()) {
-            if (getSubServer(name).isRunning()) {
-                getSubServer(name).terminate();
-            }
-            servers.remove(name.toLowerCase());
-            return true;
-        } else return false;
+        if (getSubServer(name).isRunning()) {
+            getSubServer(name).terminate();
+        }
+        servers.remove(name.toLowerCase());
+        return true;
     }
 
     @Override
     public boolean deleteSubServer(UUID player, String name) throws InterruptedException {
         if (Util.isNull(name)) throw new NullPointerException();
         String server = servers.get(name.toLowerCase()).getName();
-        File from = new File(getDirectory(), servers.get(server.toLowerCase()).getDirectory());
+        File from = new File(getPath(), servers.get(server.toLowerCase()).getPath());
         if (removeSubServer(player, server)) {
+            new Thread(() -> {
+                UniversalFile to = new UniversalFile(plugin.dir, "SubServers:Recently Deleted:" + server.toLowerCase());
+                try {
+                    if (from.exists()) {
+                        System.out.println("SubServers > Removing Files...");
+                        if (to.exists()) {
+                            if (to.isDirectory()) Util.deleteDirectory(to);
+                            else to.delete();
+                        }
+                        to.mkdirs();
+                        Files.move(from, to);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                System.out.println("SubServers > Saving...");
+                JSONObject json = (plugin.config.get().getSection("Servers").getKeys().contains(server))?plugin.config.get().getSection("Servers").getSection(server).toJSON():new JSONObject();
+                json.put("Name", server);
+                json.put("Timestamp", Calendar.getInstance().getTime().getTime());
+                try {
+                    if (plugin.config.get().getSection("Servers").getKeys().contains(server)) {
+                        plugin.config.get().getSection("Servers").remove(server);
+                        plugin.config.save();
+                    }
+                    if (!to.exists()) to.mkdirs();
+                    FileWriter writer = new FileWriter(new File(to, "info.json"));
+                    json.write(writer);
+                    writer.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                System.out.println("SubServers > Done!");
+            }).start();
+            return true;
+        } else return false;
+    }
+
+    @Override
+    public boolean forceDeleteSubServer(UUID player, String name) throws InterruptedException {
+        if (Util.isNull(name)) throw new NullPointerException();
+        String server = servers.get(name.toLowerCase()).getName();
+        File from = new File(getPath(), servers.get(server.toLowerCase()).getPath());
+        if (forceRemoveSubServer(player, server)) {
             new Thread(() -> {
                 UniversalFile to = new UniversalFile(plugin.dir, "SubServers:Recently Deleted:" + server.toLowerCase());
                 try {

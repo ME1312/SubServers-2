@@ -51,7 +51,7 @@ public class InternalSubCreator extends SubCreator {
 
     private void run(UUID player, String name, ServerType type, Version version, int memory, int port) {
         Executable exec = null;
-        UniversalFile dir = new UniversalFile(new File(host.getDirectory()), name);
+        UniversalFile dir = new UniversalFile(new File(host.getPath()), name);
         dir.mkdirs();
 
         System.out.println(host.getName() + "/Creator > Generating Server Files...");
@@ -173,13 +173,13 @@ public class InternalSubCreator extends SubCreator {
                 if (this.process.exitValue() == 0) {
                     System.out.println(host.getName() + "/Creator > Saving...");
                     if (host.plugin.exServers.keySet().contains(name.toLowerCase())) host.plugin.exServers.remove(name.toLowerCase());
-                    SubServer subserver = host.addSubServer(player, name, true, port, "&aThis is a SubServer", true, "." + File.separatorChar + name, exec, "stop", false, false, false, false, false);
+                    SubServer subserver = host.addSubServer(player, name, true, port, "Some SubServer", true, "." + File.separatorChar + name, exec, "stop", false, false, false, false, false);
 
                     YAMLSection server = new YAMLSection();
                     server.set("Enabled", true);
                     server.set("Host", host.getName());
                     server.set("Port", port);
-                    server.set("Motd", "&aThis is a SubServer");
+                    server.set("Motd", "Some SubServer");
                     server.set("Log", true);
                     server.set("Directory", "." + File.separatorChar + name);
                     server.set("Executable", exec.toString());

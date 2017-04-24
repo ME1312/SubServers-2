@@ -54,11 +54,11 @@ public class PacketDownloadServerInfo implements PacketIn, PacketOut {
             info.put("host", ((SubServer) server).getHost().getName());
             info.put("enabled", ((SubServer) server).isEnabled() && ((SubServer) server).getHost().isEnabled());
             info.put("log", ((SubServer) server).isLogging());
-            info.put("dir", plugin.config.get().getSection("Servers").getSection(server.getName()).getString("Directory"));
-            info.put("exec", plugin.config.get().getSection("Servers").getSection(server.getName()).getString("Executable"));
+            info.put("dir", ((SubServer) server).getPath());
+            info.put("exec", ((SubServer) server).getExecutable());
             info.put("running", ((SubServer) server).isRunning());
             info.put("stop-cmd", ((SubServer) server).getStopCommand());
-            info.put("auto-run", plugin.config.get().getSection("Servers").getSection(server.getName()).getBoolean("Run-On-Launch"));
+            info.put("auto-run", plugin.config.get().getSection("Servers").getSection(server.getName()).getKeys().contains("Run-On-Launch") && plugin.config.get().getSection("Servers").getSection(server.getName()).getBoolean("Run-On-Launch"));
             info.put("auto-restart", ((SubServer) server).willAutoRestart());
             info.put("temp", ((SubServer) server).isTemporary());
         } if (server != null) {

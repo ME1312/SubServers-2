@@ -22,7 +22,7 @@ import java.util.logging.Level;
 /**
  * Server Log Listener Packet
  */
-public class PacketListenServerLog implements PacketIn, PacketOut {
+public class PacketListenLog implements PacketIn, PacketOut {
     private static HashMap<String, NamedContainer<SubLogger, SubLogFilter>> filters = new HashMap<String, NamedContainer<SubLogger, SubLogFilter>>();
     private SubPlugin plugin;
     private SubLogger.LogMessage[] lines;
@@ -33,7 +33,7 @@ public class PacketListenServerLog implements PacketIn, PacketOut {
      *
      * @param plugin SubPlugin
      */
-    public PacketListenServerLog(SubPlugin plugin) {
+    public PacketListenLog(SubPlugin plugin) {
         if (Util.isNull(plugin)) throw new NullPointerException();
         this.plugin = plugin;
     }
@@ -44,7 +44,7 @@ public class PacketListenServerLog implements PacketIn, PacketOut {
      * @param line Message
      * @param id Receiver ID
      */
-    public PacketListenServerLog(String id, SubLogger.LogMessage... line) {
+    public PacketListenLog(String id, SubLogger.LogMessage... line) {
         if (Util.isNull(id, line)) throw new NullPointerException();
         this.lines = line;
         this.id = id;
@@ -86,7 +86,7 @@ public class PacketListenServerLog implements PacketIn, PacketOut {
     }
 
     private void register(Client client, String id, SubLogger logger) {
-        client.sendPacket(new PacketListenServerLog(id, logger.getMessageHistory().toArray(new SubLogger.LogMessage[logger.getMessageHistory().size()])));
+        client.sendPacket(new PacketListenLog(id, logger.getMessageHistory().toArray(new SubLogger.LogMessage[logger.getMessageHistory().size()])));
         SubLogFilter filter = new SubLogFilter() {
             @Override
             public void start() {
@@ -100,7 +100,7 @@ public class PacketListenServerLog implements PacketIn, PacketOut {
                 if (client.getConnection().isClosed()) {
                     unregister(id);
                 } else {
-                    client.sendPacket(new PacketListenServerLog(id, new SubLogger.LogMessage(level, message)));
+                    client.sendPacket(new PacketListenLog(id, new SubLogger.LogMessage(level, message)));
                 }
                 return true;
             }
