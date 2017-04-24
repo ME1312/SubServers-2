@@ -126,7 +126,7 @@ public abstract class UIRenderer {
     public void setDownloading(String subtitle) {
         if (subtitle != null && !(Bukkit.getPluginManager().getPlugin("TitleManager") != null && plugin.config.get().getSection("Settings").getBoolean("Use-Title-Messages", true))) {
             Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, () -> {
-                Bukkit.getPlayer(player).sendMessage(plugin.lang.getSection("Lang").getColoredString("Interface.Generic.Downloading", '&').replace("$str$", subtitle));
+                if (tdownload != null) Bukkit.getPlayer(player).sendMessage(plugin.lang.getSection("Lang").getColoredString("Interface.Generic.Downloading", '&').replace("$str$", subtitle));
                 download = null;
             }, 30L);
         } if (subtitle != null && tdownload == null) {
@@ -165,10 +165,14 @@ public abstract class UIRenderer {
             });
         } else if (subtitle != null) {
             tdownload.rename(subtitle);
-        } else if (tdownload != null) {
-            tdownload = null;
-            if (download != null) download.cancel();
-            download = null;
+        } else {
+            if (tdownload != null) {
+                tdownload = null;
+            }
+            if (download != null) {
+                download.cancel();
+                download = null;
+            }
         }
     }
 

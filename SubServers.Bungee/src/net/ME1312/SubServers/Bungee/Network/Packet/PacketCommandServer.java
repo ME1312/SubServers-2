@@ -59,17 +59,33 @@ public class PacketCommandServer implements PacketIn, PacketOut {
     public void execute(Client client, JSONObject data) {
         try {
             Map<String, Server> servers = plugin.api.getServers();
-            if (!servers.keySet().contains(data.getString("server").toLowerCase())) {
+            if (!data.getString("server").equals("*") && !servers.keySet().contains(data.getString("server").toLowerCase())) {
                 client.sendPacket(new PacketCommandServer(3, "There is no server with that name", (data.keySet().contains("id")) ? data.getString("id") : null));
-            } else if (!(servers.get(data.getString("server").toLowerCase()) instanceof SubServer)) {
+            } else if (!data.getString("server").equals("*") && !(servers.get(data.getString("server").toLowerCase()) instanceof SubServer)) {
                 client.sendPacket(new PacketCommandServer(4, "That Server is not a SubServer", (data.keySet().contains("id")) ? data.getString("id") : null));
-            } else if (!((SubServer) servers.get(data.getString("server").toLowerCase())).isRunning()) {
+            } else if (!data.getString("server").equals("*") && !((SubServer) servers.get(data.getString("server").toLowerCase())).isRunning()) {
                 client.sendPacket(new PacketCommandServer(5, "That SubServer is not running", (data.keySet().contains("id")) ? data.getString("id") : null));
             } else {
-                if (((SubServer) servers.get(data.getString("server").toLowerCase())).command((data.keySet().contains("player"))?UUID.fromString(data.getString("player")):null, data.getString("command"))) {
-                    client.sendPacket(new PacketCommandServer(0, "Sending Command", (data.keySet().contains("id")) ? data.getString("id") : null));
+                if (data.getString("server").equals("*")) {
+                    boolean sent = false;
+                    for (Server server : servers.values()) {
+                        if (server instanceof SubServer && ((SubServer) server).isRunning()) {
+                            if (((SubServer) server).command((data.keySet().contains("player"))?UUID.fromString(data.getString("player")):null, data.getString("command"))) {
+                                sent = true;
+                            }
+                        }
+                    }
+                    if (sent) {
+                        client.sendPacket(new PacketCommandServer(0, "Sending Command", (data.keySet().contains("id")) ? data.getString("id") : null));
+                    } else {
+                        client.sendPacket(new PacketCommandServer(1, "Couldn't send command", (data.keySet().contains("id")) ? data.getString("id") : null));
+                    }
                 } else {
-                    client.sendPacket(new PacketCommandServer(1, "Couldn't send command", (data.keySet().contains("id")) ? data.getString("id") : null));
+                    if (((SubServer) servers.get(data.getString("server").toLowerCase())).command((data.keySet().contains("player")) ? UUID.fromString(data.getString("player")) : null, data.getString("command"))) {
+                        client.sendPacket(new PacketCommandServer(0, "Sending Command", (data.keySet().contains("id")) ? data.getString("id") : null));
+                    } else {
+                        client.sendPacket(new PacketCommandServer(1, "Couldn't send command", (data.keySet().contains("id")) ? data.getString("id") : null));
+                    }
                 }
             }
         } catch (Throwable e) {

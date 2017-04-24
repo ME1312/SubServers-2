@@ -72,6 +72,7 @@ public class YAMLConfig {
      * @throws IOException
      */
     public void save() throws IOException {
+        if (!file.exists()) file.createNewFile();
         FileWriter writer = new FileWriter(file);
         yaml.dump(config.map, writer);
         writer.close();
