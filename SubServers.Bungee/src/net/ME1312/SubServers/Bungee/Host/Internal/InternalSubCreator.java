@@ -254,9 +254,9 @@ public class InternalSubCreator extends SubCreator {
 
     private void generateClient(File dir, String name, ServerType type) throws IOException {
         if (type == ServerType.SPIGOT) {
-            new UniversalFile(dir, "plugins:SubServers-Client-Bukkit").mkdirs();
+            new UniversalFile(dir, "plugins:SubServers-Client").mkdirs();
             Util.copyFromJar(SubPlugin.class.getClassLoader(), "net/ME1312/SubServers/Bungee/Library/Files/bukkit.jar", new UniversalFile(dir, "plugins:SubServers.Client.jar").getPath());
-            YAMLConfig config = new YAMLConfig(new UniversalFile(dir, "plugins:Subservers-Client-Bukkit:config.yml"));
+            YAMLConfig config = new YAMLConfig(new UniversalFile(dir, "plugins:Subservers-Client:config.yml"));
             YAMLSection settings = new YAMLSection();
             settings.set("Version", "2.11.2a+");
             settings.set("Ingame-Access", true);

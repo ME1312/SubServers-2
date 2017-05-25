@@ -29,7 +29,7 @@ public final class SubCommand extends Command implements TabExecutor {
     protected SubCommand(SubPlugin plugin, String command) {
         super(command);
         this.plugin = plugin;
-        this.label = "/" + command;
+        this.label = '/' + command;
     }
 
     /**

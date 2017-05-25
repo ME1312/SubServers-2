@@ -35,7 +35,16 @@ public final class ConsoleWindow implements SubLogFilter {
     private int findI = 0;
     private boolean open = false;
     private SubLogger logger;
+    private boolean[] kpressed = new boolean[65535];
     private KeyEventDispatcher keys = event -> {
+        switch (event.getID()) {
+            case KeyEvent.KEY_PRESSED:
+                kpressed[event.getKeyCode()] = true;
+                break;
+            case KeyEvent.KEY_RELEASED:
+                kpressed[event.getKeyCode()] = false;
+                break;
+        }
         if (window.isVisible() && window.isFocused()) {
             if (event.getID() == KeyEvent.KEY_PRESSED) switch (event.getKeyCode()) {
                 case KeyEvent.VK_UP:
@@ -55,7 +64,7 @@ public final class ConsoleWindow implements SubLogFilter {
                     break;
                 case KeyEvent.VK_ENTER:
                     if (find.isVisible() && !ifocus)
-                        find(true);
+                        find(kpressed[KeyEvent.VK_SHIFT] != Boolean.TRUE);
                     break;
                 case KeyEvent.VK_TAB:
                     if (!ifocus) input.requestFocusInWindow();

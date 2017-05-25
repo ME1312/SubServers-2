@@ -14,6 +14,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.io.*;
 import java.net.InetAddress;
 import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 
 /**
  * SubServers Client Plugin Class
@@ -25,7 +26,7 @@ public final class SubPlugin extends JavaPlugin {
 
     public UIHandler gui = null;
     public final Version version;
-    public final Version bversion = new Version(2);
+    public final Version bversion = null;
     public final SubAPI api = new SubAPI(this);
 
     public SubPlugin() {
@@ -41,6 +42,10 @@ public final class SubPlugin extends JavaPlugin {
         try {
             Bukkit.getLogger().info("SubServers > Loading SubServers v" + version.toString() + " Libraries... ");
             getDataFolder().mkdirs();
+            if (new UniversalFile(getDataFolder().getParentFile(), "SubServers-Client:config.yml").exists()) {
+                Files.move(new UniversalFile(getDataFolder().getParentFile(), "SubServers-Client:config.yml").toPath(), new UniversalFile(getDataFolder(), "config.yml").toPath(), StandardCopyOption.REPLACE_EXISTING);
+                Util.deleteDirectory(new UniversalFile(getDataFolder().getParentFile(), "SubServers-Client"));
+            }
             if (!(new UniversalFile(getDataFolder(), "config.yml").exists())) {
                 Util.copyFromJar(SubPlugin.class.getClassLoader(), "config.yml", new UniversalFile(getDataFolder(), "config.yml").getPath());
                 Bukkit.getLogger().info("SubServers > Created ~/plugins/SubServers/config.yml");
