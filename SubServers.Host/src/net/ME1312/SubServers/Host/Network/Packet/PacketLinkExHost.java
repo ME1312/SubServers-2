@@ -50,6 +50,7 @@ public class PacketLinkExHost implements PacketIn, PacketOut {
             host.api.executeEvent(new SubNetworkConnectEvent(host.subdata));
         } else {
             log.info.println("Could not link name with host: " + data.getString("m"));
+            host.stop(1);
         }
     }
 

@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10,"i8":10,"i9":10,"i10":10,"i11":10};
+var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10,"i8":10,"i9":10};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -138,12 +138,11 @@ implements <a href="../../../../../net/ME1312/SubServers/Bungee/Library/SubEvent
 <th class="colOne" scope="col">Constructor and Description</th>
 </tr>
 <tr class="altColor">
-<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Event/SubCreateEvent.html#SubCreateEvent-java.util.UUID-net.ME1312.SubServers.Bungee.Host.Host-java.lang.String-net.ME1312.SubServers.Bungee.Host.SubCreator.ServerType-net.ME1312.SubServers.Bungee.Library.Version.Version-int-int-">SubCreateEvent</a></span>(java.util.UUID&nbsp;player,
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Event/SubCreateEvent.html#SubCreateEvent-java.util.UUID-net.ME1312.SubServers.Bungee.Host.Host-java.lang.String-net.ME1312.SubServers.Bungee.Host.SubCreator.ServerTemplate-net.ME1312.SubServers.Bungee.Library.Version.Version-int-">SubCreateEvent</a></span>(java.util.UUID&nbsp;player,
               <a href="../../../../../net/ME1312/SubServers/Bungee/Host/Host.html" title="class in net.ME1312.SubServers.Bungee.Host">Host</a>&nbsp;host,
               java.lang.String&nbsp;name,
-              <a href="../../../../../net/ME1312/SubServers/Bungee/Host/SubCreator.ServerType.html" title="enum in net.ME1312.SubServers.Bungee.Host">SubCreator.ServerType</a>&nbsp;type,
+              <a href="../../../../../net/ME1312/SubServers/Bungee/Host/SubCreator.ServerTemplate.html" title="class in net.ME1312.SubServers.Bungee.Host">SubCreator.ServerTemplate</a>&nbsp;template,
               <a href="../../../../../net/ME1312/SubServers/Bungee/Library/Version/Version.html" title="class in net.ME1312.SubServers.Bungee.Library.Version">Version</a>&nbsp;version,
-              int&nbsp;memory,
               int&nbsp;port)</code>
 <div class="block">Server Create Event</div>
 </td>
@@ -170,66 +169,54 @@ implements <a href="../../../../../net/ME1312/SubServers/Bungee/Library/SubEvent
 </td>
 </tr>
 <tr id="i1" class="rowColor">
-<td class="colFirst"><code>int</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Event/SubCreateEvent.html#getMemory--">getMemory</a></span>()</code>
-<div class="block">Get the Server RAM Amount (in MB)</div>
-</td>
-</tr>
-<tr id="i2" class="altColor">
 <td class="colFirst"><code>java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Event/SubCreateEvent.html#getName--">getName</a></span>()</code>
 <div class="block">Get the name the SubServer will use</div>
 </td>
 </tr>
-<tr id="i3" class="rowColor">
+<tr id="i2" class="altColor">
 <td class="colFirst"><code>java.util.UUID</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Event/SubCreateEvent.html#getPlayer--">getPlayer</a></span>()</code>
 <div class="block">Gets the player that triggered the Event</div>
 </td>
 </tr>
-<tr id="i4" class="altColor">
+<tr id="i3" class="rowColor">
 <td class="colFirst"><code>int</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Event/SubCreateEvent.html#getPort--">getPort</a></span>()</code>
 <div class="block">Get the Port the Server will use</div>
 </td>
 </tr>
-<tr id="i5" class="rowColor">
-<td class="colFirst"><code><a href="../../../../../net/ME1312/SubServers/Bungee/Host/SubCreator.ServerType.html" title="enum in net.ME1312.SubServers.Bungee.Host">SubCreator.ServerType</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Event/SubCreateEvent.html#getType--">getType</a></span>()</code>
-<div class="block">Get the type of Server to create</div>
+<tr id="i4" class="altColor">
+<td class="colFirst"><code><a href="../../../../../net/ME1312/SubServers/Bungee/Host/SubCreator.ServerTemplate.html" title="class in net.ME1312.SubServers.Bungee.Host">SubCreator.ServerTemplate</a></code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Event/SubCreateEvent.html#getTemplate--">getTemplate</a></span>()</code>
+<div class="block">Get the Template to Use</div>
 </td>
 </tr>
-<tr id="i6" class="altColor">
+<tr id="i5" class="rowColor">
 <td class="colFirst"><code><a href="../../../../../net/ME1312/SubServers/Bungee/Library/Version/Version.html" title="class in net.ME1312.SubServers.Bungee.Library.Version">Version</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Event/SubCreateEvent.html#getVersion--">getVersion</a></span>()</code>
 <div class="block">Get the Version the Server will use</div>
 </td>
 </tr>
-<tr id="i7" class="rowColor">
+<tr id="i6" class="altColor">
 <td class="colFirst"><code>boolean</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Event/SubCreateEvent.html#isCancelled--">isCancelled</a></span>()</code>
 <div class="block">Gets the Cancelled Status</div>
 </td>
 </tr>
-<tr id="i8" class="altColor">
+<tr id="i7" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Event/SubCreateEvent.html#setCancelled-boolean-">setCancelled</a></span>(boolean&nbsp;value)</code>
 <div class="block">Sets the Cancelled Status</div>
 </td>
 </tr>
+<tr id="i8" class="altColor">
+<td class="colFirst"><code>void</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Event/SubCreateEvent.html#setTemplate-net.ME1312.SubServers.Bungee.Host.SubCreator.ServerTemplate-">setTemplate</a></span>(<a href="../../../../../net/ME1312/SubServers/Bungee/Host/SubCreator.ServerTemplate.html" title="class in net.ME1312.SubServers.Bungee.Host">SubCreator.ServerTemplate</a>&nbsp;value)</code>
+<div class="block">Set the Template to Use</div>
+</td>
+</tr>
 <tr id="i9" class="rowColor">
-<td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Event/SubCreateEvent.html#setMemory-int-">setMemory</a></span>(int&nbsp;value)</code>
-<div class="block">Set the Server RAM Amount (in MB)</div>
-</td>
-</tr>
-<tr id="i10" class="altColor">
-<td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Event/SubCreateEvent.html#setType-net.ME1312.SubServers.Bungee.Host.SubCreator.ServerType-">setType</a></span>(<a href="../../../../../net/ME1312/SubServers/Bungee/Host/SubCreator.ServerType.html" title="enum in net.ME1312.SubServers.Bungee.Host">SubCreator.ServerType</a>&nbsp;value)</code>
-<div class="block">Set the Type of Server to Create</div>
-</td>
-</tr>
-<tr id="i11" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Event/SubCreateEvent.html#setVersion-net.ME1312.SubServers.Bungee.Library.Version.Version-">setVersion</a></span>(<a href="../../../../../net/ME1312/SubServers/Bungee/Library/Version/Version.html" title="class in net.ME1312.SubServers.Bungee.Library.Version">Version</a>&nbsp;value)</code>
 <div class="block">Set the Version the Server will use</div>
@@ -264,7 +251,7 @@ implements <a href="../../../../../net/ME1312/SubServers/Bungee/Library/SubEvent
 <!--   -->
 </a>
 <h3>Constructor Detail</h3>
-<a name="SubCreateEvent-java.util.UUID-net.ME1312.SubServers.Bungee.Host.Host-java.lang.String-net.ME1312.SubServers.Bungee.Host.SubCreator.ServerType-net.ME1312.SubServers.Bungee.Library.Version.Version-int-int-">
+<a name="SubCreateEvent-java.util.UUID-net.ME1312.SubServers.Bungee.Host.Host-java.lang.String-net.ME1312.SubServers.Bungee.Host.SubCreator.ServerTemplate-net.ME1312.SubServers.Bungee.Library.Version.Version-int-">
 <!--   -->
 </a>
 <ul class="blockListLast">
@@ -273,9 +260,8 @@ implements <a href="../../../../../net/ME1312/SubServers/Bungee/Library/SubEvent
 <pre>public&nbsp;SubCreateEvent(java.util.UUID&nbsp;player,
                       <a href="../../../../../net/ME1312/SubServers/Bungee/Host/Host.html" title="class in net.ME1312.SubServers.Bungee.Host">Host</a>&nbsp;host,
                       java.lang.String&nbsp;name,
-                      <a href="../../../../../net/ME1312/SubServers/Bungee/Host/SubCreator.ServerType.html" title="enum in net.ME1312.SubServers.Bungee.Host">SubCreator.ServerType</a>&nbsp;type,
+                      <a href="../../../../../net/ME1312/SubServers/Bungee/Host/SubCreator.ServerTemplate.html" title="class in net.ME1312.SubServers.Bungee.Host">SubCreator.ServerTemplate</a>&nbsp;template,
                       <a href="../../../../../net/ME1312/SubServers/Bungee/Library/Version/Version.html" title="class in net.ME1312.SubServers.Bungee.Library.Version">Version</a>&nbsp;version,
-                      int&nbsp;memory,
                       int&nbsp;port)</pre>
 <div class="block">Server Create Event</div>
 <dl>
@@ -283,9 +269,8 @@ implements <a href="../../../../../net/ME1312/SubServers/Bungee/Library/SubEvent
 <dd><code>player</code> - Player Creating</dd>
 <dd><code>host</code> - Potential Host</dd>
 <dd><code>name</code> - Server Name</dd>
-<dd><code>type</code> - Server Type</dd>
+<dd><code>template</code> - Server Template</dd>
 <dd><code>version</code> - Server Version</dd>
-<dd><code>memory</code> - Server RAM Amount</dd>
 <dd><code>port</code> - Server Port Number</dd>
 </dl>
 </li>
@@ -326,28 +311,28 @@ implements <a href="../../../../../net/ME1312/SubServers/Bungee/Library/SubEvent
 </dl>
 </li>
 </ul>
-<a name="getType--">
+<a name="getTemplate--">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
-<h4>getType</h4>
-<pre>public&nbsp;<a href="../../../../../net/ME1312/SubServers/Bungee/Host/SubCreator.ServerType.html" title="enum in net.ME1312.SubServers.Bungee.Host">SubCreator.ServerType</a>&nbsp;getType()</pre>
-<div class="block">Get the type of Server to create</div>
+<h4>getTemplate</h4>
+<pre>public&nbsp;<a href="../../../../../net/ME1312/SubServers/Bungee/Host/SubCreator.ServerTemplate.html" title="class in net.ME1312.SubServers.Bungee.Host">SubCreator.ServerTemplate</a>&nbsp;getTemplate()</pre>
+<div class="block">Get the Template to Use</div>
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd>Server Type</dd>
+<dd>Server Template</dd>
 </dl>
 </li>
 </ul>
-<a name="setType-net.ME1312.SubServers.Bungee.Host.SubCreator.ServerType-">
+<a name="setTemplate-net.ME1312.SubServers.Bungee.Host.SubCreator.ServerTemplate-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
-<h4>setType</h4>
-<pre>public&nbsp;void&nbsp;setType(<a href="../../../../../net/ME1312/SubServers/Bungee/Host/SubCreator.ServerType.html" title="enum in net.ME1312.SubServers.Bungee.Host">SubCreator.ServerType</a>&nbsp;value)</pre>
-<div class="block">Set the Type of Server to Create</div>
+<h4>setTemplate</h4>
+<pre>public&nbsp;void&nbsp;setTemplate(<a href="../../../../../net/ME1312/SubServers/Bungee/Host/SubCreator.ServerTemplate.html" title="class in net.ME1312.SubServers.Bungee.Host">SubCreator.ServerTemplate</a>&nbsp;value)</pre>
+<div class="block">Set the Template to Use</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>value</code> - Value</dd>
@@ -376,34 +361,6 @@ implements <a href="../../../../../net/ME1312/SubServers/Bungee/Library/SubEvent
 <h4>setVersion</h4>
 <pre>public&nbsp;void&nbsp;setVersion(<a href="../../../../../net/ME1312/SubServers/Bungee/Library/Version/Version.html" title="class in net.ME1312.SubServers.Bungee.Library.Version">Version</a>&nbsp;value)</pre>
 <div class="block">Set the Version the Server will use</div>
-<dl>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>value</code> - Value</dd>
-</dl>
-</li>
-</ul>
-<a name="getMemory--">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>getMemory</h4>
-<pre>public&nbsp;int&nbsp;getMemory()</pre>
-<div class="block">Get the Server RAM Amount (in MB)</div>
-<dl>
-<dt><span class="returnLabel">Returns:</span></dt>
-<dd>RAM Amount</dd>
-</dl>
-</li>
-</ul>
-<a name="setMemory-int-">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>setMemory</h4>
-<pre>public&nbsp;void&nbsp;setMemory(int&nbsp;value)</pre>
-<div class="block">Set the Server RAM Amount (in MB)</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>value</code> - Value</dd>

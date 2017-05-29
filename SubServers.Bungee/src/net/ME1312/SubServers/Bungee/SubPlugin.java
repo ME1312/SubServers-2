@@ -80,34 +80,37 @@ public final class SubPlugin extends BungeeCord {
         if (!(new UniversalFile(dir, "lang.yml").exists())) {
             Util.copyFromJar(SubPlugin.class.getClassLoader(), "net/ME1312/SubServers/Bungee/Library/Files/lang.yml", new UniversalFile(dir, "lang.yml").getPath());
             System.out.println("SubServers > Created ~/SubServers/lang.yml");
-        } else if ((new Version((new YAMLConfig(new UniversalFile(dir, "lang.yml"))).get().getString("Version", "0")).compareTo(new Version("2.11.2a+"))) != 0) {
+        } else if ((new Version((new YAMLConfig(new UniversalFile(dir, "lang.yml"))).get().getString("Version", "0")).compareTo(new Version("2.11.2m+"))) != 0) {
             Files.move(new UniversalFile(dir, "lang.yml").toPath(), new UniversalFile(dir, "lang.old" + Math.round(Math.random() * 100000) + ".yml").toPath());
             Util.copyFromJar(SubPlugin.class.getClassLoader(), "net/ME1312/SubServers/Bungee/Library/Files/lang.yml", new UniversalFile(dir, "lang.yml").getPath());
             System.out.println("SubServers > Updated ~/SubServers/lang.yml");
         }
         lang = new YAMLConfig(new UniversalFile(dir, "lang.yml"));
 
-        if (!(new UniversalFile(dir, "build.sh").exists())) {
-            Util.copyFromJar(SubPlugin.class.getClassLoader(), "net/ME1312/SubServers/Bungee/Library/Files/build.sh", new UniversalFile(dir, "build.sh").getPath());
-            System.out.println("SubServers > Created ~/SubServers/build.sh");
-        } else {
-            String Version = "null";
-            BufferedReader brText = new BufferedReader(new FileReader(new UniversalFile(dir, "build.sh")));
-            try {
-                Version = brText.readLine().split("Version: ")[1];
-            } catch (NullPointerException e) {}
-            brText.close();
-
-            if (!Version.equalsIgnoreCase("2.11.2b+")) {
-                Files.move(new UniversalFile(dir, "build.sh").toPath(), new UniversalFile(dir, "build.old" + Math.round(Math.random() * 100000) + ".sh").toPath());
-                Util.copyFromJar(SubPlugin.class.getClassLoader(), "net/ME1312/SubServers/Bungee/Library/Files/build.sh", new UniversalFile(dir, "build.sh").getPath());
-                System.out.println("SubServers > Updated ~/SubServers/build.sh");
-            }
+        if (!(new UniversalFile(dir, "Templates").exists())) new UniversalFile(dir, "Templates").mkdirs();
+        if (!(new UniversalFile(dir, "Templates:Vanilla:template.yml").exists())) {
+            unzip(SubPlugin.class.getResourceAsStream("/net/ME1312/SubServers/Bungee/Library/Files/Templates/vanilla.zip"), new UniversalFile(dir, "Templates"));
+            System.out.println("SubServers > Created ~/SubServers/Templates/Vanilla");
+        } else if ((new Version((new YAMLConfig(new UniversalFile(dir, "Templates:Vanilla:template.yml"))).get().getString("Version", "0")).compareTo(new Version("2.11.2m+"))) != 0) {
+            Files.move(new UniversalFile(dir, "Templates:Vanilla").toPath(), new UniversalFile(dir, "Templates:Vanilla.old" + Math.round(Math.random() * 100000)).toPath());
+            unzip(SubPlugin.class.getResourceAsStream("/net/ME1312/SubServers/Bungee/Library/Files/Templates/vanilla.zip"), new UniversalFile(dir, "Templates"));
+            System.out.println("SubServers > Updated ~/SubServers/Templates/Vanilla");
         }
-
-        if (!(new UniversalFile(dir, "Templates").exists())) {
-            unzip(SubPlugin.class.getResourceAsStream("/net/ME1312/SubServers/Bungee/Library/Files/templates.zip"), dir);
-            System.out.println("SubServers > Created ~/SubServers/Templates");
+        if (!(new UniversalFile(dir, "Templates:Spigot:template.yml").exists())) {
+            unzip(SubPlugin.class.getResourceAsStream("/net/ME1312/SubServers/Bungee/Library/Files/Templates/spigot.zip"), new UniversalFile(dir, "Templates"));
+            System.out.println("SubServers > Created ~/SubServers/Templates/Spigot");
+        } else if ((new Version((new YAMLConfig(new UniversalFile(dir, "Templates:Spigot:template.yml"))).get().getString("Version", "0")).compareTo(new Version("2.11.2m+"))) != 0) {
+            Files.move(new UniversalFile(dir, "Templates:Vanilla").toPath(), new UniversalFile(dir, "Templates:Spigot.old" + Math.round(Math.random() * 100000)).toPath());
+            unzip(SubPlugin.class.getResourceAsStream("/net/ME1312/SubServers/Bungee/Library/Files/Templates/spigot.zip"), new UniversalFile(dir, "Templates"));
+            System.out.println("SubServers > Updated ~/SubServers/Templates/Spigot");
+        }
+        if (!(new UniversalFile(dir, "Templates:Sponge:template.yml").exists())) {
+            unzip(SubPlugin.class.getResourceAsStream("/net/ME1312/SubServers/Bungee/Library/Files/Templates/sponge.zip"), new UniversalFile(dir, "Templates"));
+            System.out.println("SubServers > Created ~/SubServers/Templates/Sponge");
+        } else if ((new Version((new YAMLConfig(new UniversalFile(dir, "Templates:Sponge:template.yml"))).get().getString("Version", "0")).compareTo(new Version("2.11.2m+"))) != 0) {
+            Files.move(new UniversalFile(dir, "Templates:Vanilla").toPath(), new UniversalFile(dir, "Templates:Sponge.old" + Math.round(Math.random() * 100000)).toPath());
+            unzip(SubPlugin.class.getResourceAsStream("/net/ME1312/SubServers/Bungee/Library/Files/Templates/sponge.zip"), new UniversalFile(dir, "Templates"));
+            System.out.println("SubServers > Updated ~/SubServers/Templates/Sponge");
         }
 
         if (new UniversalFile(dir, "Recently Deleted").exists()) {
@@ -139,7 +142,9 @@ public final class SubPlugin extends BungeeCord {
                         System.out.println("SubServers > Removed ~/SubServers/Recently Deleted/" + file.getName());
                     }
                 } catch (Exception e) {
+                    System.out.println("SubServers > Problem scanning ~/SubServers/Recently Deleted/" + file.getName());
                     e.printStackTrace();
+                    Files.delete(file.toPath());
                 }
             }
             if (f <= 0) {
@@ -192,6 +197,7 @@ public final class SubPlugin extends BungeeCord {
                             this, name, (Boolean) config.get().getSection("Hosts").getSection(name).getBoolean("Enabled"), InetAddress.getByName(config.get().getSection("Hosts").getSection(name).getRawString("Address")), config.get().getSection("Hosts").getSection(name).getRawString("Directory"),
                             config.get().getSection("Hosts").getSection(name).getRawString("Git-Bash"));
                     this.hosts.put(name.toLowerCase(), host);
+                    if (config.get().getSection("Hosts").getSection(name).getKeys().contains("Display")) host.setDisplayName(config.get().getSection("Hosts").getSection(name).getString("Display"));
                     SubDataServer.allowConnection(host.getAddress());
                     hosts++;
                 } catch (Exception e) {
@@ -207,6 +213,7 @@ public final class SubPlugin extends BungeeCord {
                     Server server = api.addServer(name, InetAddress.getByName(bungee.get().getSection("servers").getSection(name).getRawString("address").split(":")[0]),
                             Integer.parseInt(bungee.get().getSection("servers").getSection(name).getRawString("address").split(":")[1]), bungee.get().getSection("servers").getSection(name).getColoredString("motd", '&'),
                             bungee.get().getSection("servers").getSection(name).getBoolean("hidden", false), bungee.get().getSection("servers").getSection(name).getBoolean("restricted"));
+                    if (bungee.get().getSection("servers").getSection(name).getKeys().contains("display")) server.setDisplayName(bungee.get().getSection("servers").getSection(name).getString("display"));
                     SubDataServer.allowConnection(server.getAddress().getAddress());
                     servers++;
                 } catch (Exception e) {
@@ -227,6 +234,7 @@ public final class SubPlugin extends BungeeCord {
                             config.get().getSection("Servers").getSection(name).getInt("Port"), config.get().getSection("Servers").getSection(name).getColoredString("Motd", '&'), config.get().getSection("Servers").getSection(name).getBoolean("Log"),
                             config.get().getSection("Servers").getSection(name).getRawString("Directory"), new Executable(config.get().getSection("Servers").getSection(name).getRawString("Executable")), config.get().getSection("Servers").getSection(name).getRawString("Stop-Command"),
                             config.get().getSection("Servers").getSection(name).getBoolean("Run-On-Launch"), config.get().getSection("Servers").getSection(name).getBoolean("Auto-Restart"), config.get().getSection("Servers").getSection(name).getBoolean("Hidden"), config.get().getSection("Servers").getSection(name).getBoolean("Restricted"), false);
+                    if (config.get().getSection("Servers").getSection(name).getKeys().contains("Display")) server.setDisplayName(config.get().getSection("Servers").getSection(name).getString("Display"));
                     subservers++;
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -250,7 +258,7 @@ public final class SubPlugin extends BungeeCord {
                 }
             }
 
-            System.out.println("SubServers > " + ((plugins > 0)?plugins+" Plugin"+((plugins == 1)?"":"s")+", ":"") + hosts + " Host"+((hosts == 1)?"":"s")+", " + servers + " Server"+((servers == 1)?"":"s")+", and " + subservers + " SubServer"+((subservers == 1)?"":"s")+" loaded in " + (Calendar.getInstance().getTime().getTime() - begin) + "ms");
+            System.out.println("SubServers > " + ((plugins > 0)?plugins+" Plugin"+((plugins == 1)?"":"s")+", ":"") + hosts + " Host"+((hosts == 1)?"":"s")+", " + servers + " Server"+((servers == 1)?"":"s")+", and " + subservers + " SubServer"+((subservers == 1)?"":"s")+" loaded in " + TimeUnit.MILLISECONDS.toSeconds(Calendar.getInstance().getTime().getTime() - begin) + "s");
 
             super.startListeners();
         } catch (IOException e) {
@@ -348,6 +356,13 @@ public final class SubPlugin extends BungeeCord {
             ZipEntry ze;
             while ((ze = zis.getNextEntry()) != null) {
                 File newFile = new File(dir + File.separator + ze.getName());
+                if (newFile.exists()) {
+                    if (newFile.isDirectory()) {
+                        Util.deleteDirectory(newFile);
+                    } else {
+                        newFile.delete();
+                    }
+                }
                 if (ze.isDirectory()) {
                     newFile.mkdirs();
                     continue;

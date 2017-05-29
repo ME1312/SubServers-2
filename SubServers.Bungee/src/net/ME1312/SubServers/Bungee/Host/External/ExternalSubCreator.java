@@ -10,12 +10,16 @@ import net.ME1312.SubServers.Bungee.Library.Version.Version;
 import net.ME1312.SubServers.Bungee.Network.Packet.PacketExCreateServer;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.UUID;
 
 /**
  * External SubCreator Class
  */
 public class ExternalSubCreator extends SubCreator {
+    private HashMap<String, ServerTemplate> templates = new HashMap<String, ServerTemplate>();
     private ExternalHost host;
     private String gitBash;
     private ExternalSubLogger logger;
@@ -36,34 +40,43 @@ public class ExternalSubCreator extends SubCreator {
     }
 
     @Override
-    public boolean create(UUID player, String name, ServerType type, Version version, int memory, int port) {
-        if (Util.isNull(name, type, version, memory, port)) throw new NullPointerException();
+    public boolean create(UUID player, String name, ServerTemplate template, Version version, int port) {
+        if (Util.isNull(name, template, version, port)) throw new NullPointerException();
         if (!isBusy()) {
-            final SubCreateEvent event = new SubCreateEvent(player, host, name, type, version, memory, port);
+            final SubCreateEvent event = new SubCreateEvent(player, host, name, template, version, port);
             host.plugin.getPluginManager().callEvent(event);
             if (!event.isCancelled()) {
                 running = true;
                 logger.start();
-                host.queue(new PacketExCreateServer(name, type, version, memory, port, logger.getExternalAddress(), (JSONCallback) json -> {
+                host.queue(new PacketExCreateServer(name, template, version, port, logger.getExternalAddress(), (JSONCallback) json -> {
                     try {
                         if (json.getInt("r") == 0) {
                             System.out.println(host.getName() + "/Creator > Saving...");
                             if (host.plugin.exServers.keySet().contains(name.toLowerCase())) host.plugin.exServers.remove(name.toLowerCase());
-                            SubServer subserver = host.addSubServer(player, name, true, port, "Some SubServer", true, json.getJSONObject("c").getString("dir"), new Executable(json.getJSONObject("c").getString("exec")), "stop", false, false, false, false, false);
 
-                            YAMLSection server = new YAMLSection();
-                            server.set("Enabled", true);
-                            server.set("Host", host.getName());
-                            server.set("Port", port);
-                            server.set("Motd", "Some SubServer");
-                            server.set("Log", true);
-                            server.set("Directory", json.getJSONObject("c").getString("dir"));
-                            server.set("Executable", json.getJSONObject("c").getString("exec"));
-                            server.set("Stop-Command", "stop");
-                            server.set("Run-On-Launch", false);
-                            server.set("Auto-Restart", false);
-                            server.set("Hidden", false);
-                            server.set("Restricted", false);
+                            YAMLSection server = new YAMLSection(json.getJSONObject("c"));
+                            for (String option : server.getKeys()) {
+                                if (server.isString(option)) {
+                                    server.set(option, server.getRawString(option).replace("$name$", name).replace("$template$", template.getName()).replace("$type$", template.getType().toString())
+                                            .replace("$version$", version.toString().replace(" ", "@")).replace("$port$", Integer.toString(port)));
+                                }
+                            }
+
+                            if (!server.contains("Enabled")) server.set("Enabled", true);
+                            if (!server.contains("Host")) server.set("Host", host.getName());
+                            if (!server.contains("Port")) server.set("Port", port);
+                            if (!server.contains("Motd")) server.set("Motd", "Some SubServer");
+                            if (!server.contains("Log")) server.set("Log", true);
+                            if (!server.contains("Directory")) server.set("Directory", "." + File.separatorChar + name);
+                            if (!server.contains("Executable")) server.set("Executable", "java -Xmx1024M -jar Custom.jar");
+                            if (!server.contains("Stop-Command")) server.set("Stop-Command", "stop");
+                            if (!server.contains("Run-On-Launch")) server.set("Run-On-Launch", false);
+                            if (!server.contains("Auto-Restart")) server.set("Auto-Restart", false);
+                            if (!server.contains("Hidden")) server.set("Hidden", false);
+                            if (!server.contains("Restricted")) server.set("Restricted", false);
+
+                            SubServer subserver = host.addSubServer(player, name, server.getBoolean("Enabled"), port, server.getColoredString("Motd", '&'), server.getBoolean("Log"), server.getRawString("Directory"),
+                                    new Executable(server.getRawString("Executable")), server.getRawString("Stop-Command"), false, server.getBoolean("Auto-Restart"), server.getBoolean("Hidden"), server.getBoolean("Restricted"), false);
                             host.plugin.config.get().getSection("Servers").set(name, server);
                             host.plugin.config.save();
 
@@ -114,5 +127,16 @@ public class ExternalSubCreator extends SubCreator {
     @Override
     public boolean isBusy() {
         return running;
+    }
+
+    @Override
+    public Map<String, ServerTemplate> getTemplates() {
+        return new TreeMap<String, ServerTemplate>(templates);
+    }
+
+    @Override
+    public ServerTemplate getTemplate(String name) {
+        if (Util.isNull(name)) throw new NullPointerException();
+        return getTemplates().get(name.toLowerCase());
     }
 }

@@ -39,6 +39,7 @@ public class PacketLinkServer implements PacketIn, PacketOut {
             Bukkit.getPluginManager().callEvent(new SubNetworkConnectEvent(plugin.subdata));
         } else {
             Bukkit.getLogger().info("SubData > Could not link name with server: " + data.getString("m"));
+            plugin.onDisable();
         }
     }
 

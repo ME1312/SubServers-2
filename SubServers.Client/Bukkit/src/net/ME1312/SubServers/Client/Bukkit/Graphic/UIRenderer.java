@@ -327,7 +327,7 @@ public abstract class UIRenderer {
     public static class CreatorOptions extends Options {
         private String host;
         private String name = null;
-        private PacketCreateServer.ServerType type = null;
+        private String template = null;
         private Version version = null;
         private int memory = 1024;
         private int port = -1;
@@ -372,24 +372,24 @@ public abstract class UIRenderer {
         }
 
         /**
-         * Gets the ServerType
+         * Gets the Template
          *
-         * @return ServerType
+         * @return Template
          */
-        public PacketCreateServer.ServerType getType() {
-            return type;
+        public String getTemplate() {
+            return template;
         }
 
         /**
-         * Sets the ServerType
+         * Sets the Template
          *
          * @param value Value
          */
-        public void setType(PacketCreateServer.ServerType value) {
+        public void setTemplate(String value) {
             if (Util.isNull(value)) throw new NullPointerException();
-            final PacketCreateServer.ServerType type = this.type;
-            history.add(() -> this.type = type);
-            this.type = value;
+            final String template = this.template;
+            history.add(() -> this.template = template);
+            this.template = value;
         }
 
         /**

@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":10,"i1":6,"i2":6,"i3":10,"i4":6,"i5":6,"i6":10,"i7":6,"i8":6,"i9":6,"i10":6,"i11":6,"i12":6,"i13":6,"i14":6,"i15":6,"i16":6,"i17":6,"i18":6,"i19":6,"i20":10,"i21":6,"i22":10,"i23":6,"i24":10,"i25":6,"i26":6,"i27":6};
+var methods = {"i0":10,"i1":6,"i2":6,"i3":10,"i4":6,"i5":6,"i6":10,"i7":6,"i8":6,"i9":6,"i10":6,"i11":6,"i12":6,"i13":6,"i14":6,"i15":6,"i16":6,"i17":6,"i18":6,"i19":6,"i20":10,"i21":6,"i22":10,"i23":6,"i24":6,"i25":10,"i26":6,"i27":6,"i28":6};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],4:["t3","Abstract Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -338,24 +338,30 @@ extends <a href="../../../../../net/ME1312/SubServers/Bungee/Host/Server.html" t
 </td>
 </tr>
 <tr id="i24" class="altColor">
+<td class="colFirst"><code>abstract boolean</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/SubServer.html#templatify--">templatify</a></span>()</code>
+<div class="block">Templatify this SubServer</div>
+</td>
+</tr>
+<tr id="i25" class="rowColor">
 <td class="colFirst"><code>boolean</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/SubServer.html#terminate--">terminate</a></span>()</code>
 <div class="block">Terminates the Server</div>
 </td>
 </tr>
-<tr id="i25" class="rowColor">
+<tr id="i26" class="altColor">
 <td class="colFirst"><code>abstract boolean</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/SubServer.html#terminate-java.util.UUID-">terminate</a></span>(java.util.UUID&nbsp;player)</code>
 <div class="block">Terminates the Server</div>
 </td>
 </tr>
-<tr id="i26" class="altColor">
+<tr id="i27" class="rowColor">
 <td class="colFirst"><code>abstract void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/SubServer.html#waitFor--">waitFor</a></span>()</code>
 <div class="block">Waits for the Server to Stop</div>
 </td>
 </tr>
-<tr id="i27" class="rowColor">
+<tr id="i28" class="altColor">
 <td class="colFirst"><code>abstract boolean</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/SubServer.html#willAutoRestart--">willAutoRestart</a></span>()</code>
 <div class="block">If the Server will Auto Restart on unexpected shutdowns</div>
@@ -584,6 +590,20 @@ extends <a href="../../../../../net/ME1312/SubServers/Bungee/Host/Server.html" t
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>edit</code> - Edits</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>Success Status</dd>
+</dl>
+</li>
+</ul>
+<a name="templatify--">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>templatify</h4>
+<pre>public abstract&nbsp;boolean&nbsp;templatify()</pre>
+<div class="block">Templatify this SubServer</div>
+<dl>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>Success Status</dd>
 </dl>

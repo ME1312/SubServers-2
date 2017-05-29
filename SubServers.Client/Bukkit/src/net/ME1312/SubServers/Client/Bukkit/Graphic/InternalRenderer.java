@@ -1,5 +1,6 @@
 package net.ME1312.SubServers.Client.Bukkit.Graphic;
 
+import net.ME1312.SubServers.Client.Bukkit.Library.Container;
 import net.ME1312.SubServers.Client.Bukkit.Library.Util;
 import net.ME1312.SubServers.Client.Bukkit.Network.Packet.PacketDownloadHostInfo;
 import net.ME1312.SubServers.Client.Bukkit.Network.Packet.PacketDownloadServerInfo;
@@ -11,9 +12,12 @@ import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.SkullMeta;
 
 import java.text.DecimalFormat;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Internal GUI Renderer Class
@@ -60,6 +64,43 @@ public class InternalRenderer extends UIRenderer {
     public void back() {
         windowHistory.remove(windowHistory.size() - 1);
         reopen();
+    }
+
+    @SuppressWarnings("deprecation")
+    private ItemStack parseItem(String str) {
+        final Container<String> item = new Container<String>(str);
+        // int
+        Matcher matcher = Pattern.compile("(?i)^(\\d+)$").matcher(item.get());
+        if (matcher.find()) {
+            return new ItemStack(Integer.parseInt(matcher.group(1)));
+        }
+        // int:int
+        matcher.reset();
+        matcher = Pattern.compile("(?i)^(\\d+):(\\d+)$").matcher(item.get());
+        if (matcher.find()) {
+            return new ItemStack(Integer.parseInt(matcher.group(1)), 1, Short.parseShort(matcher.group(2)));
+        }
+        // minecraft:name
+        if (item.get().startsWith("minecraft:")) {
+            item.set(item.get().substring(10));
+        }
+        // bukkit name
+        if (!Util.isException(() -> Material.valueOf(item.get().toUpperCase()))) {
+            return new ItemStack(Material.valueOf(item.get().toUpperCase()));
+        }
+        // vault name
+        if (!Util.isException(() -> Class.forName("net.milkbowl.vault.item.Items"))) {
+            net.milkbowl.vault.item.ItemInfo info = net.milkbowl.vault.item.Items.itemByString(item.get());
+            if (info != null) {
+                return new ItemStack(info.getType(), 1, info.getSubTypeId());
+            }
+        }
+
+        ItemStack stack = new ItemStack(Material.SKULL_ITEM, 1, (short) 3);
+        SkullMeta meta = (SkullMeta) stack.getItemMeta();
+        meta.setOwner("MHF_Question");
+        stack.setItemMeta(meta);
+        return stack;
     }
 
     public void hostMenu(final int page) {
@@ -298,10 +339,12 @@ public class InternalRenderer extends UIRenderer {
 
     public void hostCreator(final CreatorOptions options) {
         setDownloading(ChatColor.stripColor(plugin.lang.getSection("Lang").getColoredString("Interface.Host-Creator.Title", '&').replace("$str$", options.getHost())));
+        final int lastPage = this.lastPage;
         lastUsedOptions = options;
         if (!options.init()) {
             windowHistory.add(() -> hostCreator(options));
             lastVistedObject = options.getHost();
+            this.lastPage = lastPage;
         }
 
         plugin.subdata.sendPacket(new PacketDownloadHostInfo(options.getHost(), json -> {
@@ -336,37 +379,9 @@ public class InternalRenderer extends UIRenderer {
                     blockMeta.setLore(Arrays.asList(ChatColor.GRAY + options.getName()));
                 }
                 block.setItemMeta(blockMeta);
-                inv.setItem(3, block);
-                inv.setItem(4, block);
-                inv.setItem(5, block);
-
-                if (options.getType() == null) {
-                    block = new ItemStack(Material.STAINED_GLASS_PANE, 1, (short) 14);
-                    blockMeta = block.getItemMeta();
-                    blockMeta.setDisplayName(ChatColor.RED + plugin.lang.getSection("Lang").getColoredString("Interface.Host-Creator.Edit-Type", '&'));
-                } else {
-                    block = new ItemStack(Material.STAINED_GLASS_PANE, 1, (short) 5);
-                    blockMeta = block.getItemMeta();
-                    blockMeta.setDisplayName(ChatColor.GREEN + plugin.lang.getSection("Lang").getColoredString("Interface.Host-Creator.Edit-Type", '&'));
-                    blockMeta.setLore(Arrays.asList(ChatColor.GRAY + options.getType().toString()));
-                }
-                block.setItemMeta(blockMeta);
                 inv.setItem(10, block);
                 inv.setItem(11, block);
-
-                if (options.getVersion() == null) {
-                    block = new ItemStack(Material.STAINED_GLASS_PANE, 1, (short) 14);
-                    blockMeta = block.getItemMeta();
-                    blockMeta.setDisplayName(ChatColor.RED + plugin.lang.getSection("Lang").getColoredString("Interface.Host-Creator.Edit-Version", '&'));
-                } else {
-                    block = new ItemStack(Material.STAINED_GLASS_PANE, 1, (short) 5);
-                    blockMeta = block.getItemMeta();
-                    blockMeta.setDisplayName(ChatColor.GREEN + plugin.lang.getSection("Lang").getColoredString("Interface.Host-Creator.Edit-Version", '&'));
-                    blockMeta.setLore(Arrays.asList(ChatColor.GRAY + "v" + options.getVersion().toString()));
-                }
-                block.setItemMeta(blockMeta);
-                inv.setItem(15, block);
-                inv.setItem(16, block);
+                inv.setItem(12, block);
 
                 if (options.getPort() <= 0) {
                     block = new ItemStack(Material.STAINED_GLASS_PANE, 1, (short) 14);
@@ -379,20 +394,37 @@ public class InternalRenderer extends UIRenderer {
                     blockMeta.setLore(Arrays.asList(ChatColor.GRAY.toString() + options.getPort()));
                 }
                 block.setItemMeta(blockMeta);
-                inv.setItem(28, block);
-                inv.setItem(29, block);
+                inv.setItem(14, block);
+                inv.setItem(15, block);
+                inv.setItem(16, block);
 
-                if (options.getMemory() < 256) {
+                if (options.getTemplate() == null) {
                     block = new ItemStack(Material.STAINED_GLASS_PANE, 1, (short) 14);
                     blockMeta = block.getItemMeta();
-                    blockMeta.setDisplayName(ChatColor.RED + plugin.lang.getSection("Lang").getColoredString("Interface.Host-Creator.Edit-RAM", '&'));
+                    blockMeta.setDisplayName(ChatColor.RED + plugin.lang.getSection("Lang").getColoredString("Interface.Host-Creator.Edit-Template", '&'));
                 } else {
                     block = new ItemStack(Material.STAINED_GLASS_PANE, 1, (short) 5);
                     blockMeta = block.getItemMeta();
-                    blockMeta.setDisplayName(ChatColor.GREEN + plugin.lang.getSection("Lang").getColoredString("Interface.Host-Creator.Edit-RAM", '&'));
-                    blockMeta.setLore(Arrays.asList(ChatColor.GRAY.toString() + options.getMemory() + "MB"));
+                    blockMeta.setDisplayName(ChatColor.GREEN + plugin.lang.getSection("Lang").getColoredString("Interface.Host-Creator.Edit-Template", '&'));
+                    blockMeta.setLore(Arrays.asList(ChatColor.GRAY + options.getTemplate()));
                 }
                 block.setItemMeta(blockMeta);
+                inv.setItem(28, block);
+                inv.setItem(29, block);
+                inv.setItem(30, block);
+
+                if (options.getVersion() == null) {
+                    block = new ItemStack(Material.STAINED_GLASS_PANE, 1, (short) 14);
+                    blockMeta = block.getItemMeta();
+                    blockMeta.setDisplayName(ChatColor.RED + plugin.lang.getSection("Lang").getColoredString("Interface.Host-Creator.Edit-Version", '&'));
+                } else {
+                    block = new ItemStack(Material.STAINED_GLASS_PANE, 1, (short) 5);
+                    blockMeta = block.getItemMeta();
+                    blockMeta.setDisplayName(ChatColor.GREEN + plugin.lang.getSection("Lang").getColoredString("Interface.Host-Creator.Edit-Version", '&'));
+                    blockMeta.setLore(Arrays.asList(ChatColor.GRAY + "v" + options.getVersion().toString()));
+                }
+                block.setItemMeta(blockMeta);
+                inv.setItem(32, block);
                 inv.setItem(33, block);
                 inv.setItem(34, block);
 
@@ -411,7 +443,7 @@ public class InternalRenderer extends UIRenderer {
                 inv.setItem(45, block);
                 inv.setItem(46, block);
 
-                if (options.getName() == null || options.getType() == null || options.getVersion() == null || options.getPort() <= 0 && options.getMemory() < 256) {
+                if (options.getName() == null || options.getTemplate() == null || options.getVersion() == null || options.getPort() <= 0 && options.getMemory() < 256) {
                     block = new ItemStack(Material.STAINED_GLASS_PANE, 1, (short) 7);
                     blockMeta = block.getItemMeta();
                     blockMeta.setDisplayName(ChatColor.GRAY + ChatColor.stripColor(plugin.lang.getSection("Lang").getColoredString("Interface.Host-Creator.Submit", '&')));
@@ -435,6 +467,118 @@ public class InternalRenderer extends UIRenderer {
                     block.setItemMeta(blockMeta);
                     inv.setItem(52, block);
                     inv.setItem(53, block);
+                }
+
+                Bukkit.getPlayer(player).openInventory(inv);
+                open = true;
+            }
+        }));
+    }
+
+    public void hostCreatorTemplates(final int page, final CreatorOptions options) {
+        setDownloading(ChatColor.stripColor(plugin.lang.getSection("Lang").getColoredString("Interface.Host-Creator.Edit-Template.Title", '&').replace("$str$", options.getHost())));
+        lastUsedOptions = options;
+        if (!options.init()) lastVistedObject = options.getHost();
+        plugin.subdata.sendPacket(new PacketDownloadHostInfo(options.getHost(), (json) -> {
+            if (!json.getBoolean("valid")|| !json.getJSONObject("host").getBoolean("enabled") || json.getJSONObject("host").getJSONObject("creator").getBoolean("busy")) {
+                lastUsedOptions = null;
+                if (hasHistory()) back();
+            } else {
+                setDownloading(null);
+                List<String> templates = new ArrayList<String>();
+                for (String template : json.getJSONObject("host").getJSONObject("creator").getJSONObject("templates").keySet()) {
+                    if (json.getJSONObject("host").getJSONObject("creator").getJSONObject("templates").getJSONObject(template).getBoolean("enabled")) templates.add(template);
+                }
+
+                ItemStack block;
+                ItemMeta blockMeta;
+                ItemStack div = new ItemStack(Material.STAINED_GLASS_PANE, 1, (short) 15);
+                ItemMeta divMeta = div.getItemMeta();
+                divMeta.setDisplayName(ChatColor.RESET.toString());
+                div.setItemMeta(divMeta);
+
+                int i = 0;
+                int min = ((page - 1) * 36);
+                int max = (min + 35);
+                int count = (templates.size() == 0) ? 27 : ((templates.size() - min - 1 >= max) ? 36 : templates.size() - min);
+                int area = (count % 9 == 0) ? count : (int) (Math.floor(count / 9) + 1) * 9;
+
+                Inventory inv = Bukkit.createInventory(null, 18 + area, plugin.lang.getSection("Lang").getColoredString("Interface.Host-Creator.Edit-Template.Title", '&').replace("$str$", json.getJSONObject("host").getString("display")));
+                block = new ItemStack(Material.STAINED_GLASS_PANE, 1, (short) 7);
+                block.setItemMeta(divMeta);
+                while (i < area) {
+                    inv.setItem(i, block);
+                    i++;
+                }
+                ItemStack adiv = block;
+                i = (int) ((count < 9) ? Math.floor((9 - count) / 2) : 0);
+
+                boolean even = (count & 1) == 0 && count < 9;
+                for (String template : templates) {
+                    if (templates.indexOf(template) >= min && templates.indexOf(template) <= max) {
+                        if (even && (i == 4 || i == 13 || i == 22 || i == 31)) inv.setItem(i++, adiv);
+
+                        block = parseItem(json.getJSONObject("host").getJSONObject("creator").getJSONObject("templates").getJSONObject(template).getString("icon"));
+                        blockMeta = block.getItemMeta();
+                        blockMeta.setDisplayName(ChatColor.YELLOW + json.getJSONObject("host").getJSONObject("creator").getJSONObject("templates").getJSONObject(template).getString("display"));
+                        LinkedList<String> lore = new LinkedList<String>();
+                        if (!template.equals(json.getJSONObject("host").getJSONObject("creator").getJSONObject("templates").getJSONObject(template).getString("display")))
+                            lore.add(ChatColor.GRAY + template);
+                        blockMeta.setLore(lore);
+                        block.setItemMeta(blockMeta);
+                        inv.setItem(i, block);
+
+                        count--;
+                        if (count < 9 && (i == 8 || i == 17 || i == 26)) {
+                            i += (int) Math.floor((9 - count) / 2) + 1;
+                            even = (count & 1) == 0;
+                        } else {
+                            i++;
+                        }
+                    }
+                }
+
+                if (templates.size() == 0) {
+                    block = new ItemStack(Material.STAINED_GLASS_PANE, 1, (short) 14);
+                    blockMeta = block.getItemMeta();
+                    blockMeta.setDisplayName(plugin.lang.getSection("Lang").getColoredString("Interface.Host-Creator.Edit-Template.No-Templates", '&'));
+                    block.setItemMeta(blockMeta);
+                    inv.setItem(12, block);
+                    inv.setItem(13, block);
+                    inv.setItem(14, block);
+                }
+
+                i = inv.getSize() - 18;
+                while (i < inv.getSize()) {
+                    inv.setItem(i, div);
+                    i++;
+                }
+                i = inv.getSize() - 9;
+
+                if (min != 0) {
+                    block = new ItemStack(Material.STAINED_GLASS_PANE, 1, (short) 4);
+                    blockMeta = block.getItemMeta();
+                    blockMeta.setDisplayName(plugin.lang.getSection("Lang").getColoredString("Interface.Generic.Back-Arrow", '&'));
+                    block.setItemMeta(blockMeta);
+                    inv.setItem(i++, block);
+                    inv.setItem(i++, block);
+                } else i += 2;
+                i++;
+                block = new ItemStack(Material.STAINED_GLASS_PANE, 1, (short) 14);
+                blockMeta = block.getItemMeta();
+                blockMeta.setDisplayName(plugin.lang.getSection("Lang").getColoredString("Interface.Generic.Back", '&'));
+                block.setItemMeta(blockMeta);
+                inv.setItem(i++, block);
+                inv.setItem(i++, block);
+                inv.setItem(i++, block);
+                i++;
+                if (templates.size() - 1 > max) {
+                    block = new ItemStack(Material.STAINED_GLASS_PANE, 1, (short) 4);
+                    blockMeta = block.getItemMeta();
+                    blockMeta.setDisplayName(plugin.lang.getSection("Lang").getColoredString("Interface.Generic.Next-Arrow", '&'));
+                    block.setItemMeta(blockMeta);
+                    inv.setItem(i++, block);
+                    inv.setItem(i, block);
                 }
 
                 Bukkit.getPlayer(player).openInventory(inv);

@@ -81,10 +81,10 @@ public class InternalSubServer extends SubServer {
             try {
                 JarFile jar = new JarFile(new UniversalFile(this.directory, "plugins:SubServers.Client.jar"));
                 YAMLSection plugin = new YAMLSection(Util.readAll(new InputStreamReader(jar.getInputStream(jar.getJarEntry("plugin.yml")))));
-                YAMLSection bplugin = new YAMLSection(Util.readAll(new InputStreamReader(SubPlugin.class.getResourceAsStream("/net/ME1312/SubServers/Bungee/Library/Files/bukkit.yml"))));
+                YAMLSection bplugin = new YAMLSection(Util.readAll(new InputStreamReader(SubPlugin.class.getResourceAsStream("/net/ME1312/SubServers/Bungee/Library/Files/Client/spigot.yml"))));
                 if (new Version(plugin.getString("version")).compareTo(new Version(bplugin.getString("version"))) < 0) {
                     new UniversalFile(this.directory, "plugins:SubServers.Client.jar").delete();
-                    Util.copyFromJar(SubPlugin.class.getClassLoader(), "net/ME1312/SubServers/Bungee/Library/Files/bukkit.jar", new UniversalFile(this.directory, "plugins:SubServers.Client.jar").getPath());
+                    Util.copyFromJar(SubPlugin.class.getClassLoader(), "net/ME1312/SubServers/Bungee/Library/Files/Client/spigot.jar", new UniversalFile(this.directory, "plugins:SubServers.Client.jar").getPath());
                 }
             } catch (Throwable e) {
                 System.out.println("Couldn't auto-update SubServers.Client.jar");
@@ -415,6 +415,12 @@ public class InternalSubServer extends SubServer {
         }
         if (!isRunning() && forward == null && state) start(player);
         return c;
+    }
+
+    @Override
+    public boolean templatify() {
+        // TODO
+        return false;
     }
 
     @Override

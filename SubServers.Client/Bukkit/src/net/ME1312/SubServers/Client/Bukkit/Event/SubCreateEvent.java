@@ -16,9 +16,8 @@ public class SubCreateEvent extends Event implements SubEvent {
     private UUID player;
     private String host;
     private String name;
-    private PacketCreateServer.ServerType type;
+    private String template;
     private Version version;
-    private int memory;
     private int port;
 
     /**
@@ -27,19 +26,17 @@ public class SubCreateEvent extends Event implements SubEvent {
      * @param player Player Creating
      * @param host Potential Host
      * @param name Server Name
-     * @param type Server Type
+     * @param template Server Type
      * @param version Server Version
-     * @param memory Server RAM Amount
      * @param port Server Port Number
      */
-    public SubCreateEvent(UUID player, String host, String name, PacketCreateServer.ServerType type, Version version, int memory, int port) {
-        if (Util.isNull(host, name, type, version, memory, port)) throw new NullPointerException();
+    public SubCreateEvent(UUID player, String host, String name, String template, Version version, int port) {
+        if (Util.isNull(host, name, template, version, port)) throw new NullPointerException();
         this.player = player;
         this.host = host;
         this.name = name;
-        this.type = type;
+        this.template = template;
         this.version = version;
-        this.memory = memory;
         this.port = port;
     }
 
@@ -62,21 +59,21 @@ public class SubCreateEvent extends Event implements SubEvent {
     }
 
     /**
-     * Get the type of Server to create
+     * Get the Template to Use
      *
-     * @return Server Type
+     * @return Server Template
      */
-    public PacketCreateServer.ServerType getType() {
-        return type;
+    public String getTemplate() {
+        return template;
     }
 
     /**
-     * Set the Type of Server to Create
+     * Set the Template to Use
      *
      * @param value Value
      */
-    public void setType(PacketCreateServer.ServerType value) {
-        this.type = value;
+    public void getTemplate(String value) {
+        this.template = value;
     }
 
     /**
@@ -95,24 +92,6 @@ public class SubCreateEvent extends Event implements SubEvent {
      */
     public void setVersion(Version value) {
         this.version = value;
-    }
-
-    /**
-     * Get the Server RAM Amount (in MB)
-     *
-     * @return RAM Amount
-     */
-    public int getMemory() {
-        return memory;
-    }
-
-    /**
-     * Set the Server RAM Amount (in MB)
-     *
-     * @param value Value
-     */
-    public void setMemory(int value) {
-        this.memory = value;
     }
 
     /**

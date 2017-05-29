@@ -58,13 +58,34 @@ public class Client {
     /**
      * Network Loop
      */
-    protected void loop() {
+    private void loop() {
         new Thread(() -> {
             try {
                 BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                 String input;
                 while ((input = in.readLine()) != null) {
-                    recievePacket(input);
+                    try {
+                        JSONObject json = new JSONObject(input);
+                        for (PacketIn packet : SubDataServer.decodePacket(json)) {
+                            if (authorized == null || packet instanceof PacketAuthorization) {
+                                try {
+                                    if (json.keySet().contains("f")) {
+                                        Client client = subdata.getClient(new InetSocketAddress(json.getString("f").split(":")[0], Integer.parseInt(json.getString("f").split(":")[1])));
+                                        json.remove("f");
+                                        client.writer.println(json);
+                                    } else {
+                                        packet.execute(Client.this, (json.keySet().contains("c"))?json.getJSONObject("c"):null);
+                                    }
+                                } catch (Throwable e) {
+                                    new InvocationTargetException(e, "Exception while executing PacketIn").printStackTrace();
+                                }
+                            } else sendPacket(new PacketAuthorization(-1, "Unauthorized"));
+                        }
+                    } catch (JSONException e) {
+                        new IllegalPacketException("Unknown Packet Format: " + input).printStackTrace();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
                 try {
                     subdata.removeClient(Client.this);
@@ -91,25 +112,6 @@ public class Client {
             System.out.println("SubData > " + socket.getRemoteSocketAddress().toString() + " logged in");
         }
         authorized = null;
-    }
-
-    protected void recievePacket(String raw) {
-        try {
-            JSONObject json = new JSONObject(raw);
-            for (PacketIn packet : SubDataServer.decodePacket(json)) {
-                if (authorized == null || packet instanceof PacketAuthorization) {
-                    try {
-                        packet.execute(Client.this, (json.keySet().contains("c")) ? json.getJSONObject("c") : null);
-                    } catch (Throwable e) {
-                        new InvocationTargetException(e, "Exception while executing PacketIn").printStackTrace();
-                    }
-                } else sendPacket(new PacketAuthorization(-1, "Unauthorized"));
-            }
-        } catch (IllegalPacketException e) {
-            e.printStackTrace();
-        } catch (JSONException e) {
-            new IllegalPacketException("Unknown Packet Format: " + raw).printStackTrace();
-        }
     }
 
     /**

@@ -10,6 +10,7 @@ import net.ME1312.SubServers.Bungee.Library.UniversalFile;
 import net.ME1312.SubServers.Bungee.Library.Util;
 import net.ME1312.SubServers.Bungee.Library.Version.Version;
 import net.ME1312.SubServers.Bungee.SubPlugin;
+import org.json.JSONObject;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -22,13 +23,13 @@ import java.io.*;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Internal SubCreator Class
  */
 public class InternalSubCreator extends SubCreator {
+    private HashMap<String, ServerTemplate> templates = new HashMap<String, ServerTemplate>();
     private InternalHost host;
     private String gitBash;
     private InternalSubLogger logger;
@@ -46,45 +47,35 @@ public class InternalSubCreator extends SubCreator {
         this.host = host;
         this.gitBash = gitBash;
         this.logger = new InternalSubLogger(null, this, host.getName() + "/Creator", new Container<Boolean>(false), null);
+
+        if (new UniversalFile(host.plugin.dir, "SubServers:Templates").exists()) for (File file : new UniversalFile(host.plugin.dir, "SubServers:Templates").listFiles()) {
+            try {
+                if (file.isDirectory()) {
+                    YAMLSection config = (new UniversalFile(file, "template.yml").exists())?new YAMLConfig(new UniversalFile(file, "template.yml")).get().getSection("Template", new YAMLSection()):new YAMLSection();
+                    ServerTemplate template = new ServerTemplate(file.getName(), config.getBoolean("Enabled", true), (config.contains("Icon"))?config.getRawString("Icon"):null, file, config.getSection("Build", new YAMLSection()), config.getSection("Settings", new YAMLSection()));
+                    templates.put(file.getName().toLowerCase(), template);
+                    if (config.getKeys().contains("Display")) template.setDisplayName(config.getString("Display"));
+                }
+            } catch (Exception e) {
+                System.out.println(host.getName() + "/Creator > Couldn't load template: " + file.getName());
+                e.printStackTrace();
+            }
+        }
     }
 
 
-    private void run(UUID player, String name, ServerType type, Version version, int memory, int port) {
-        Executable exec = null;
+    private void run(UUID player, String name, ServerTemplate template, Version version, int port) {
         UniversalFile dir = new UniversalFile(new File(host.getPath()), name);
         dir.mkdirs();
 
         System.out.println(host.getName() + "/Creator > Generating Server Files...");
-        if (type == ServerType.SPIGOT) {
-            exec = new Executable("java -Xmx" + memory + "M -Djline.terminal=jline.UnsupportedTerminal -Dcom.mojang.eula.agree=true -jar Spigot.jar");
+        try {
+            Util.copyDirectory(template.getDirectory(), dir);
+            new UniversalFile(dir, "template.yml").delete();
+            generateProperties(dir, port);
+            generateClient(dir, template.getType(), name);
 
-            try {
-                copyFolder(new UniversalFile(host.plugin.dir, "SubServers:Templates:Spigot"), dir);
-                generateProperties(dir, port);
-                generateClient(dir, name, type);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-        } else if (type == ServerType.VANILLA) {
-            exec = new Executable("java -Xmx" + memory + "M -jar Vanilla.jar nogui");
-
-            try {
-                copyFolder(new UniversalFile(host.plugin.dir, "SubServers:Templates:Vanilla"), dir);
-                generateEULA(dir);
-                generateProperties(dir, port);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        } else if (type == ServerType.SPONGE) {
-            try {
-                exec = new Executable("java -Xmx" + memory + "M -jar Forge.jar");
-
-                copyFolder(new UniversalFile(host.plugin.dir, "SubServers:Templates:Sponge"), dir);
-                generateEULA(dir);
-                generateProperties(dir, port);
-                generateClient(dir, name, type);
-
+            if (template.getType() == ServerType.SPONGE) {
                 System.out.println(host.getName() + "/Creator > Searching Versions...");
                 Document spongexml = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new InputSource(new StringReader(Util.readAll(new BufferedReader(new InputStreamReader(new URL("http://files.minecraftforge.net/maven/org/spongepowered/spongeforge/maven-metadata.xml").openStream(), Charset.forName("UTF-8")))))));
                 Document forgexml = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new InputSource(new StringReader(Util.readAll(new BufferedReader(new InputStreamReader(new URL("http://files.minecraftforge.net/maven/net/minecraftforge/forge/maven-metadata.xml").openStream(), Charset.forName("UTF-8")))))));
@@ -99,7 +90,8 @@ public class InternalSubCreator extends SubCreator {
                         }
                     }
                 }
-                if (spversion == null) throw new InvalidServerException("Cannot find sponge version for Minecraft " + version.toString());
+                if (spversion == null)
+                    throw new InvalidServerException("Cannot find sponge version for Minecraft " + version.toString());
                 System.out.println(host.getName() + "/Creator > Found \"spongeforge-" + spversion.toString() + '"');
 
                 NodeList mcfnodeList = forgexml.getElementsByTagName("version");
@@ -112,104 +104,100 @@ public class InternalSubCreator extends SubCreator {
                         }
                     }
                 }
-                if (mcfversion == null) throw new InvalidServerException("Cannot find forge version for Sponge " + spversion.toString());
+                if (mcfversion == null)
+                    throw new InvalidServerException("Cannot find forge version for Sponge " + spversion.toString());
                 System.out.println(host.getName() + "/Creator > Found \"forge-" + mcfversion.toString() + '"');
 
-                version = new Version(mcfversion.toString() + "::" + spversion.toString());
-            } catch (ParserConfigurationException | IOException | SAXException | NullPointerException e) {
+                version = new Version(mcfversion.toString() + " " + spversion.toString());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        boolean error = false;
+        if (template.getBuildOptions().getKeys().size() > 0) {
+            File gitBash = new File(this.gitBash, "bin" + File.separatorChar + "bash.exe");
+            if (!(System.getProperty("os.name").toLowerCase().indexOf("win") >= 0) && template.getBuildOptions().contains("Permission")) {
+                try {
+                    Process process = Runtime.getRuntime().exec("chmod " + template.getBuildOptions().getRawString("Permission") + ' ' + template.getBuildOptions().getRawString("Shell-Location"), null, dir);
+                    Thread.sleep(500);
+                    if (process.exitValue() != 0) {
+                        System.out.println(host.getName() + "/Creator > Couldn't set " + template.getBuildOptions().getRawString("Permission") + " permissions to " + template.getBuildOptions().getRawString("Shell-Location"));
+                    }
+                } catch (Exception e) {
+                    System.out.println(host.getName() + "/Creator > Couldn't set " + template.getBuildOptions().getRawString("Permission") + " permissions to " + template.getBuildOptions().getRawString("Shell-Location"));
+                    e.printStackTrace();
+                }
+            }
+
+            try {
+                System.out.println(host.getName() + "/Creator > Launching " + template.getBuildOptions().getRawString("Shell-Location"));
+                process = Runtime.getRuntime().exec((System.getProperty("os.name").toLowerCase().indexOf("win") >= 0)?"\"" + gitBash + "\" --login -i -c \"bash " + template.getBuildOptions().getRawString("Shell-Location") + ' ' + version.toString() + " " + System.getProperty("user.home").replace("\"", "\\\"") + "\"":("bash " + template.getBuildOptions().getRawString("Shell-Location") + ' ' + version.toString() + " " + System.getProperty("user.home")), null, dir);
+                logger.process = this.process;
+                logger.log.set(host.plugin.config.get().getSection("Settings").getBoolean("Log-Creator"));
+                logger.file = new File(dir, "SubCreator-" + template.getType().toString() + "-" + version.toString().replace(" ", "@") + ".log");
+                logger.start();
+
+                process.waitFor();
+                Thread.sleep(500);
+
+                if (process.exitValue() != 0) error = true;
+            } catch (Exception e) {
+                error = true;
                 e.printStackTrace();
             }
         }
-        try {
-            InputStream input = null;
-            OutputStream output = null;
+
+
+        if (!error) {
             try {
-                input = new FileInputStream(new UniversalFile(host.plugin.dir, "SubServers:build.sh"));
-                output = new FileOutputStream(new File(dir, "build.sh"));
-                byte[] buf = new byte[1024];
-                int bytesRead;
-                while ((bytesRead = input.read(buf)) > 0) {
-                    output.write(buf, 0, bytesRead);
-                }
-            } finally {
-                if (input != null)
-                    input.close();
-                if (output != null)
-                    output.close();
-            }
+                System.out.println(host.getName() + "/Creator > Saving...");
+                if (host.plugin.exServers.keySet().contains(name.toLowerCase())) host.plugin.exServers.remove(name.toLowerCase());
 
-            if (!(new File(dir, "build.sh").exists())) {
-                System.out.println(host.getName() + "/Creator > Problem copying build.sh");
-            } else {
-                File gitBash = new File(this.gitBash, "bin" + File.separatorChar + "bash.exe");
-                if (!(System.getProperty("os.name").toLowerCase().indexOf("win") >= 0)) {
-                    Process process = Runtime.getRuntime().exec("chmod +x build.sh", null, dir);
-                    try {
-                        process.waitFor();
-                        Thread.sleep(500);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    if (process.exitValue() != 0) {
-                        System.out.println(host.getName() + "/Creator > Problem Setting Executable Permissions.");
+                YAMLSection server = template.getConfigOptions().clone();
+                for (String option : server.getKeys()) {
+                    if (server.isString(option)) {
+                        server.set(option, server.getRawString(option).replace("$name$", name).replace("$template$", template.getName()).replace("$type$", template.getType().toString())
+                                .replace("$version$", version.toString().replace(" ", "@")).replace("$port$", Integer.toString(port)));
                     }
                 }
 
-                System.out.println(host.getName() + "/Creator > Launching build.sh");
-                this.process = Runtime.getRuntime().exec((System.getProperty("os.name").toLowerCase().indexOf("win") >= 0)?
-                        "\"" + gitBash + "\" --login -i -c \"bash build.sh " + version.toString() + " " + type.toString().toLowerCase() + "\""
-                        :("bash build.sh " + version.toString() + " " + type.toString().toLowerCase() + " " + System.getProperty("user.home")), null, dir);
-                logger.process = this.process;
-                logger.log.set(host.plugin.config.get().getSection("Settings").getBoolean("Log-Creator"));
-                logger.file = new File(dir, "SubCreator-" + type.toString() + "-" + version.toString().replace("::", "@") + ".log");
-                logger.start();
-                try {
-                    this.process.waitFor();
-                    Thread.sleep(500);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+                if (!server.contains("Enabled")) server.set("Enabled", true);
+                if (!server.contains("Host")) server.set("Host", host.getName());
+                if (!server.contains("Port")) server.set("Port", port);
+                if (!server.contains("Motd")) server.set("Motd", "Some SubServer");
+                if (!server.contains("Log")) server.set("Log", true);
+                if (!server.contains("Directory")) server.set("Directory", "." + File.separatorChar + name);
+                if (!server.contains("Executable")) server.set("Executable", "java -Xmx1024M -jar Custom.jar");
+                if (!server.contains("Stop-Command")) server.set("Stop-Command", "stop");
+                if (!server.contains("Run-On-Launch")) server.set("Run-On-Launch", false);
+                if (!server.contains("Auto-Restart")) server.set("Auto-Restart", false);
+                if (!server.contains("Hidden")) server.set("Hidden", false);
+                if (!server.contains("Restricted")) server.set("Restricted", false);
 
-                if (this.process.exitValue() == 0) {
-                    System.out.println(host.getName() + "/Creator > Saving...");
-                    if (host.plugin.exServers.keySet().contains(name.toLowerCase())) host.plugin.exServers.remove(name.toLowerCase());
-                    SubServer subserver = host.addSubServer(player, name, true, port, "Some SubServer", true, "." + File.separatorChar + name, exec, "stop", false, false, false, false, false);
+                SubServer subserver = host.addSubServer(player, name, server.getBoolean("Enabled"), port, server.getColoredString("Motd", '&'), server.getBoolean("Log"), server.getRawString("Directory"),
+                        new Executable(server.getRawString("Executable")), server.getRawString("Stop-Command"), false, server.getBoolean("Auto-Restart"), server.getBoolean("Hidden"), server.getBoolean("Restricted"), false);
+                host.plugin.config.get().getSection("Servers").set(name, server);
+                host.plugin.config.save();
 
-                    YAMLSection server = new YAMLSection();
-                    server.set("Enabled", true);
-                    server.set("Host", host.getName());
-                    server.set("Port", port);
-                    server.set("Motd", "Some SubServer");
-                    server.set("Log", true);
-                    server.set("Directory", "." + File.separatorChar + name);
-                    server.set("Executable", exec.toString());
-                    server.set("Stop-Command", "stop");
-                    server.set("Run-On-Launch", false);
-                    server.set("Auto-Restart", false);
-                    server.set("Hidden", false);
-                    server.set("Restricted", false);
-                    host.plugin.config.get().getSection("Servers").set(name, server);
-                    host.plugin.config.save();
-
-                    subserver.start(player);
-                } else {
-                    System.out.println(host.getName() + "/Creator > Couldn't build the server jar. See \"SubCreator-" + type.toString() + "-" + version.toString().replace("::", "@") + ".log\" for more details.");
-                }
+                subserver.start(player);
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-        } catch (IOException e) {
-            e.printStackTrace();
+        } else {
+            System.out.println(host.getName() + "/Creator > Couldn't build the server jar. See \"SubCreator-" + template.getType().toString() + "-" + version.toString().replace(" ", "@") + ".log\" for more details.");
         }
     }
 
     @Override
-    public boolean create(UUID player, String name, ServerType type, Version version, int memory, int port) {
-        if (Util.isNull(name, type, version, memory, port)) throw new NullPointerException();
-        if (!isBusy()) {
-            final SubCreateEvent event = new SubCreateEvent(player, host, name, type, version, memory, port);
+    public boolean create(UUID player, String name, ServerTemplate template, Version version, int port) {
+        if (Util.isNull(name, template, version, port)) throw new NullPointerException();
+        if (!isBusy() && template.isEnabled()) {
+            final SubCreateEvent event = new SubCreateEvent(player, host, name, template, version, port);
             host.plugin.getPluginManager().callEvent(event);
             if (!event.isCancelled()) {
                 (thread = new Thread(() -> {
-                        InternalSubCreator.this.run(player, name, event.getType(), event.getVersion(), event.getMemory(), port);
+                        InternalSubCreator.this.run(player, name, event.getTemplate(), event.getVersion(), port);
                     })).start();
                 return true;
             } else return false;
@@ -252,37 +240,39 @@ public class InternalSubCreator extends SubCreator {
         return thread != null && thread.isAlive();
     }
 
-    private void generateClient(File dir, String name, ServerType type) throws IOException {
-        if (type == ServerType.SPIGOT) {
-            new UniversalFile(dir, "plugins:SubServers-Client").mkdirs();
-            Util.copyFromJar(SubPlugin.class.getClassLoader(), "net/ME1312/SubServers/Bungee/Library/Files/bukkit.jar", new UniversalFile(dir, "plugins:SubServers.Client.jar").getPath());
-            YAMLConfig config = new YAMLConfig(new UniversalFile(dir, "plugins:Subservers-Client:config.yml"));
-            YAMLSection settings = new YAMLSection();
-            settings.set("Version", "2.11.2a+");
-            settings.set("Ingame-Access", true);
-            settings.set("Use-Title-Messages", true);
-            YAMLSection subdata = new YAMLSection();
-            subdata.set("Name", name);
-            subdata.set("Address", host.plugin.config.get().getSection("Settings").getSection("SubData").getRawString("Address", "127.0.0.1").replace("0.0.0.0", "127.0.0.1"));
-            subdata.set("Password", host.plugin.config.get().getSection("Settings").getSection("SubData").getRawString("Password", ""));
-            settings.set("SubData", subdata);
-            config.get().set("Settings", settings);
-            config.save();
-        } else if (type == ServerType.SPONGE) {
-            // TODO
-        }
+    @Override
+    public Map<String, ServerTemplate> getTemplates() {
+        return new TreeMap<String, ServerTemplate>(templates);
     }
-    private void generateEULA(File dir) throws FileNotFoundException, UnsupportedEncodingException {
-        PrintWriter writer = new PrintWriter(new File(dir, "eula.txt"), "UTF-8");
 
-        writer.println("#By changing the setting below to TRUE you are indicating your agreement to our EULA (https://account.mojang.com/documents/minecraft_eula).");
-        writer.println("#" + new SimpleDateFormat("EEE MMM d HH:mm:ss z yyyy").format(Calendar.getInstance().getTime()));
-        writer.println("eula=true");
+    @Override
+    public ServerTemplate getTemplate(String name) {
+        if (Util.isNull(name)) throw new NullPointerException();
+        return getTemplates().get(name.toLowerCase());
+    }
 
-        writer.close();
+    private void generateClient(File dir, ServerType type, String name) throws IOException {
+        if (new UniversalFile(dir, "subservers.client").exists()) {
+            if (type == ServerType.SPIGOT) {
+                if (!new UniversalFile(dir, "plugins").exists()) new UniversalFile(dir, "plugins").mkdirs();
+                Util.copyFromJar(SubPlugin.class.getClassLoader(), "net/ME1312/SubServers/Bungee/Library/Files/Client/spigot.jar", new UniversalFile(dir, "plugins:SubServers.Client.jar").getPath());
+            } else if (type == ServerType.SPONGE) {
+                // TODO
+                // if (!new UniversalFile(dir, "plugins").exists()) new UniversalFile(dir, "mods").mkdirs();
+                // Util.copyFromJar(SubPlugin.class.getClassLoader(), "net/ME1312/SubServers/Bungee/Library/Files/Client/sponge.jar", new UniversalFile(dir, "mods:SubServers.Client.jar").getPath());
+            }
+            JSONObject config = new JSONObject(Util.readAll(new FileReader(new UniversalFile(dir, "subservers.client"))));
+            FileWriter writer = new FileWriter(new UniversalFile(dir, "subservers.client"), false);
+            config.put("Name", name);
+            config.put("Address", host.plugin.config.get().getSection("Settings").getSection("SubData").getRawString("Address", "127.0.0.1").replace("0.0.0.0", "127.0.0.1"));
+            config.put("Password", host.plugin.config.get().getSection("Settings").getSection("SubData").getRawString("Password", ""));
+            config.write(writer);
+            writer.close();
+        }
     }
     private void generateProperties(File dir, int port) throws IOException {
         File file = new File(dir, "server.properties");
+        if (!file.exists()) file.createNewFile();
         String content = Util.readAll(new BufferedReader(new InputStreamReader(new FileInputStream(file)))).replace("server-port=", "server-port=" + port).replace("server-ip=", "server-ip=" + host.getAddress().toString().substring(1));
         file.delete();
         PrintWriter writer = new PrintWriter(file, "UTF-8");

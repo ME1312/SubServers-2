@@ -361,6 +361,12 @@ public class ExternalSubServer extends SubServer {
     }
 
     @Override
+    public boolean templatify() {
+        // TODO
+        return false;
+    }
+
+    @Override
     public void waitFor() throws InterruptedException {
         while (running) {
             Thread.sleep(250);

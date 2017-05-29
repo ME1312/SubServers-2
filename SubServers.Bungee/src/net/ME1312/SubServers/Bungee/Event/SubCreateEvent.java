@@ -18,9 +18,8 @@ public class SubCreateEvent extends Event implements SubEvent, Cancellable {
     private UUID player;
     private Host host;
     private String name;
-    private SubCreator.ServerType type;
+    private SubCreator.ServerTemplate template;
     private Version version;
-    private int memory;
     private int port;
 
     /**
@@ -29,19 +28,17 @@ public class SubCreateEvent extends Event implements SubEvent, Cancellable {
      * @param player Player Creating
      * @param host Potential Host
      * @param name Server Name
-     * @param type Server Type
+     * @param template Server Template
      * @param version Server Version
-     * @param memory Server RAM Amount
      * @param port Server Port Number
      */
-    public SubCreateEvent(UUID player, Host host, String name, SubCreator.ServerType type, Version version, int memory, int port) {
-        if (Util.isNull(host, name, type, version, memory, port)) throw new NullPointerException();
+    public SubCreateEvent(UUID player, Host host, String name, SubCreator.ServerTemplate template, Version version, int port) {
+        if (Util.isNull(host, name, template, version, port)) throw new NullPointerException();
         this.player = player;
         this.host = host;
         this.name = name;
-        this.type = type;
+        this.template = template;
         this.version = version;
-        this.memory = memory;
         this.port = port;
     }
 
@@ -64,21 +61,21 @@ public class SubCreateEvent extends Event implements SubEvent, Cancellable {
     }
 
     /**
-     * Get the type of Server to create
+     * Get the Template to Use
      *
-     * @return Server Type
+     * @return Server Template
      */
-    public SubCreator.ServerType getType() {
-        return type;
+    public SubCreator.ServerTemplate getTemplate() {
+        return template;
     }
 
     /**
-     * Set the Type of Server to Create
+     * Set the Template to Use
      *
      * @param value Value
      */
-    public void setType(SubCreator.ServerType value) {
-        this.type = value;
+    public void setTemplate(SubCreator.ServerTemplate value) {
+        this.template = value;
     }
 
     /**
@@ -97,24 +94,6 @@ public class SubCreateEvent extends Event implements SubEvent, Cancellable {
      */
     public void setVersion(Version value) {
         this.version = value;
-    }
-
-    /**
-     * Get the Server RAM Amount (in MB)
-     *
-     * @return RAM Amount
-     */
-    public int getMemory() {
-        return memory;
-    }
-
-    /**
-     * Set the Server RAM Amount (in MB)
-     *
-     * @param value Value
-     */
-    public void setMemory(int value) {
-        this.memory = value;
     }
 
     /**

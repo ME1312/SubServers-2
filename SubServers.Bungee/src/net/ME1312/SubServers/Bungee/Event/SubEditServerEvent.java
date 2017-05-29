@@ -23,10 +23,10 @@ public class SubEditServerEvent extends Event implements SubEvent, Cancellable {
      * Server Edit Event
      *
      * @param player Player Adding Server
-     * @param server Server Starting
+     * @param server Server to be Edited
      */
     public SubEditServerEvent(UUID player, Server server, NamedContainer<String, YAMLValue> edit) {
-        if (Util.isNull(server)) throw new NullPointerException();
+        if (Util.isNull(server, edit)) throw new NullPointerException();
         this.player = player;
         this.server = server;
         this.edit = edit;

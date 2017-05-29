@@ -142,19 +142,17 @@ public final class SubCommand extends Command implements TabExecutor {
                             sender.sendMessage("SubServers > There is no host with that name");
                         } else if (plugin.hosts.get(args[2].toLowerCase()).getCreator().isBusy()) {
                             sender.sendMessage("SubServers > The SubCreator instance on that host is already running");
-                        } else if (Util.isException(() -> SubCreator.ServerType.valueOf(args[3].toUpperCase()))) {
-                            sender.sendMessage("SubServers > There is no server type with that name");
+                        } else if (!plugin.hosts.get(args[2].toLowerCase()).getCreator().getTemplates().keySet().contains(args[3].toLowerCase()) || !plugin.hosts.get(args[2].toLowerCase()).getCreator().getTemplate(args[3]).isEnabled()) {
+                            sender.sendMessage("SubServers > There is no template with that name");
                         } else if (new Version("1.8").compareTo(new Version(args[4])) > 0) {
                             sender.sendMessage("SubServers > SubCreator cannot create servers before Minecraft 1.8");
                         } else if (Util.isException(() -> Integer.parseInt(args[5])) || Integer.parseInt(args[5]) <= 0 || Integer.parseInt(args[5]) > 65535) {
                             sender.sendMessage("SubServers > Invalid Port Number");
-                        } else if (args.length > 6 && (Util.isException(() -> Integer.parseInt(args[6])) || Integer.parseInt(args[6]) < 256)) {
-                            sender.sendMessage("SubServers > Invalid Ram Amount");
                         } else {
-                            plugin.hosts.get(args[2].toLowerCase()).getCreator().create(args[1], SubCreator.ServerType.valueOf(args[3].toUpperCase()), new Version(args[4]), (args.length > 6) ? Integer.parseInt(args[6]) : 1024, Integer.parseInt(args[5]));
+                            plugin.hosts.get(args[2].toLowerCase()).getCreator().create(args[1], plugin.hosts.get(args[2].toLowerCase()).getCreator().getTemplate(args[3]), new Version(args[4]), Integer.parseInt(args[5]));
                         }
                     } else {
-                        sender.sendMessage("SubServers > Usage: " + label + " " + args[0].toLowerCase() + " <Name> <Host> <Type> <Version> <Port> [RAM]");
+                        sender.sendMessage("SubServers > Usage: " + label + " " + args[0].toLowerCase() + " <Name> <Host> <Template> <Version> <Port>");
                     }
                 } else if (args[0].equalsIgnoreCase("del") || args[0].equalsIgnoreCase("delete")) {
                     if (args.length > 1) {
@@ -263,12 +261,17 @@ public final class SubCommand extends Command implements TabExecutor {
                     return list;
                 } else if (args.length == 4) {
                     List<String> list = new ArrayList<String>();
-                    if (last.length() == 0) {
-                        for (SubCreator.ServerType type : SubCreator.ServerType.values()) list.add(type.toString());
-                    } else {
-                        for (SubCreator.ServerType type : SubCreator.ServerType.values()) {
-                            if (type.toString().toLowerCase().startsWith(last)) list.add(type.toString());
+                    Map<String, Host> hosts = plugin.api.getHosts();
+                    if (hosts.keySet().contains(args[2].toLowerCase())) {
+                        if (last.length() == 0) {
+                            for (SubCreator.ServerTemplate template : hosts.get(args[2].toLowerCase()).getCreator().getTemplates().values()) list.add(template.toString());
+                        } else {
+                            for (SubCreator.ServerTemplate template : hosts.get(args[2].toLowerCase()).getCreator().getTemplates().values()) {
+                                if (template.toString().toLowerCase().startsWith(last)) list.add(template.toString());
+                            }
                         }
+                    } else {
+                        list.add("<Template>");
                     }
                     return list;
                 } else if (args.length == 5) {
@@ -278,10 +281,6 @@ public final class SubCommand extends Command implements TabExecutor {
                 } else if (args.length == 6) {
                     if (last.length() == 0) {
                         return Collections.singletonList("<Port>");
-                    }
-                } else if (args.length == 7) {
-                    if (last.length() == 0) {
-                        return Collections.singletonList("[RAM]");
                     }
                 }
                 return Collections.emptyList();
@@ -301,7 +300,7 @@ public final class SubCommand extends Command implements TabExecutor {
                 "   Stop Server: /sub stop <SubServer>",
                 "   Terminate Server: /sub kill <SubServer>",
                 "   Command Server: /sub cmd <SubServer> <Command> [Args...]",
-                "   Create Server: /sub create <Name> <Host> <Type> <Version> <Port> [RAM]",
+                "   Create Server: /sub create <Name> <Host> <Template> <Version> <Port>",
                 "   Remove Server: /sub delete <SubServer>",
                 "",
                 "   To see BungeeCord Supplied Commands, please visit:",

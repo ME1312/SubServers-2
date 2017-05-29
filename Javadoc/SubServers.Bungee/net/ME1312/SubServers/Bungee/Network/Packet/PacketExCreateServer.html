@@ -138,10 +138,9 @@ implements <a href="../../../../../../net/ME1312/SubServers/Bungee/Network/Packe
 </td>
 </tr>
 <tr class="rowColor">
-<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Bungee/Network/Packet/PacketExCreateServer.html#PacketExCreateServer-java.lang.String-net.ME1312.SubServers.Bungee.Host.SubCreator.ServerType-net.ME1312.SubServers.Bungee.Library.Version.Version-int-int-java.util.UUID-net.ME1312.SubServers.Bungee.Library.JSONCallback...-">PacketExCreateServer</a></span>(java.lang.String&nbsp;name,
-                    <a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubCreator.ServerType.html" title="enum in net.ME1312.SubServers.Bungee.Host">SubCreator.ServerType</a>&nbsp;type,
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Bungee/Network/Packet/PacketExCreateServer.html#PacketExCreateServer-java.lang.String-net.ME1312.SubServers.Bungee.Host.SubCreator.ServerTemplate-net.ME1312.SubServers.Bungee.Library.Version.Version-int-java.util.UUID-net.ME1312.SubServers.Bungee.Library.JSONCallback...-">PacketExCreateServer</a></span>(java.lang.String&nbsp;name,
+                    <a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubCreator.ServerTemplate.html" title="class in net.ME1312.SubServers.Bungee.Host">SubCreator.ServerTemplate</a>&nbsp;template,
                     <a href="../../../../../../net/ME1312/SubServers/Bungee/Library/Version/Version.html" title="class in net.ME1312.SubServers.Bungee.Library.Version">Version</a>&nbsp;version,
-                    int&nbsp;memory,
                     int&nbsp;port,
                     java.util.UUID&nbsp;log,
                     <a href="../../../../../../net/ME1312/SubServers/Bungee/Library/JSONCallback.html" title="interface in net.ME1312.SubServers.Bungee.Library">JSONCallback</a>...&nbsp;callback)</code>
@@ -214,16 +213,15 @@ implements <a href="../../../../../../net/ME1312/SubServers/Bungee/Network/Packe
 <div class="block">New PacketExCreateServer</div>
 </li>
 </ul>
-<a name="PacketExCreateServer-java.lang.String-net.ME1312.SubServers.Bungee.Host.SubCreator.ServerType-net.ME1312.SubServers.Bungee.Library.Version.Version-int-int-java.util.UUID-net.ME1312.SubServers.Bungee.Library.JSONCallback...-">
+<a name="PacketExCreateServer-java.lang.String-net.ME1312.SubServers.Bungee.Host.SubCreator.ServerTemplate-net.ME1312.SubServers.Bungee.Library.Version.Version-int-java.util.UUID-net.ME1312.SubServers.Bungee.Library.JSONCallback...-">
 <!--   -->
 </a>
 <ul class="blockListLast">
 <li class="blockList">
 <h4>PacketExCreateServer</h4>
 <pre>public&nbsp;PacketExCreateServer(java.lang.String&nbsp;name,
-                            <a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubCreator.ServerType.html" title="enum in net.ME1312.SubServers.Bungee.Host">SubCreator.ServerType</a>&nbsp;type,
+                            <a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubCreator.ServerTemplate.html" title="class in net.ME1312.SubServers.Bungee.Host">SubCreator.ServerTemplate</a>&nbsp;template,
                             <a href="../../../../../../net/ME1312/SubServers/Bungee/Library/Version/Version.html" title="class in net.ME1312.SubServers.Bungee.Library.Version">Version</a>&nbsp;version,
-                            int&nbsp;memory,
                             int&nbsp;port,
                             java.util.UUID&nbsp;log,
                             <a href="../../../../../../net/ME1312/SubServers/Bungee/Library/JSONCallback.html" title="interface in net.ME1312.SubServers.Bungee.Library">JSONCallback</a>...&nbsp;callback)</pre>
@@ -231,9 +229,8 @@ implements <a href="../../../../../../net/ME1312/SubServers/Bungee/Network/Packe
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>name</code> - Server Name</dd>
-<dd><code>type</code> - Server Type</dd>
+<dd><code>template</code> - Server Template</dd>
 <dd><code>version</code> - Server Version</dd>
-<dd><code>memory</code> - Server Memory Amount (in MB)</dd>
 <dd><code>port</code> - Server Port Number</dd>
 <dd><code>callback</code> - Callbacks</dd>
 </dl>

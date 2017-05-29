@@ -16,23 +16,12 @@ import java.util.UUID;
  */
 public class PacketCreateServer implements PacketIn, PacketOut {
     private static HashMap<String, JSONCallback[]> callbacks = new HashMap<String, JSONCallback[]>();
-    public enum ServerType {
-        SPIGOT,
-        VANILLA,
-        SPONGE,;
-
-        @Override
-        public String toString() {
-            return super.toString().substring(0, 1).toUpperCase()+super.toString().substring(1).toLowerCase();
-        }
-    }
     private UUID player;
     private String name;
     private String host;
-    private ServerType type;
+    private String template;
     private Version version;
     private int port;
-    private int ram;
     private String id;
 
     /**
@@ -46,21 +35,19 @@ public class PacketCreateServer implements PacketIn, PacketOut {
      * @param player Player Creating
      * @param name Server Name
      * @param host Host to use
-     * @param type Server Type
+     * @param template Server Template
      * @param version Server Version
      * @param port Server Port
-     * @param memory Server Memory
      * @param callback Callbacks
      */
-    public PacketCreateServer(UUID player, String name, String host, ServerType type, Version version, int port, int memory, JSONCallback... callback) {
-        if (Util.isNull(name, host, type, version, port, memory, callback)) throw new NullPointerException();
+    public PacketCreateServer(UUID player, String name, String host, String template, Version version, int port, JSONCallback... callback) {
+        if (Util.isNull(name, host, template, version, port, callback)) throw new NullPointerException();
         this.player = player;
         this.name = name;
         this.host = host;
-        this.type = type;
+        this.template = template;
         this.version = version;
         this.port = port;
-        this.ram = memory;
         this.id = Util.getNew(callbacks.keySet(), UUID::randomUUID).toString();
         callbacks.put(id, callback);
     }
@@ -77,10 +64,9 @@ public class PacketCreateServer implements PacketIn, PacketOut {
         this.player = player;
         this.name = options.getName();
         this.host = options.getHost();
-        this.type = options.getType();
+        this.template = options.getTemplate();
         this.version = options.getVersion();
         this.port = options.getPort();
-        this.ram = options.getMemory();
         this.id = Util.getNew(callbacks.keySet(), UUID::randomUUID).toString();
         callbacks.put(id, callback);
 
@@ -94,10 +80,9 @@ public class PacketCreateServer implements PacketIn, PacketOut {
         JSONObject creator = new JSONObject();
         creator.put("name", name);
         creator.put("host", host);
-        creator.put("type", type.toString());
+        creator.put("template", template);
         creator.put("version", version.toString());
         creator.put("port", port);
-        creator.put("ram", ram);
         json.put("creator", creator);
         return json;
     }

@@ -48,7 +48,7 @@ var activeTableTab = "activeTableTab";
 <div class="subNav">
 <ul class="navList">
 <li><a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Network/Packet/PacketCommandServer.html" title="class in net.ME1312.SubServers.Client.Bukkit.Network.Packet"><span class="typeNameLink">Prev&nbsp;Class</span></a></li>
-<li><a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Network/Packet/PacketCreateServer.ServerType.html" title="enum in net.ME1312.SubServers.Client.Bukkit.Network.Packet"><span class="typeNameLink">Next&nbsp;Class</span></a></li>
+<li><a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Network/Packet/PacketDownloadHostInfo.html" title="class in net.ME1312.SubServers.Client.Bukkit.Network.Packet"><span class="typeNameLink">Next&nbsp;Class</span></a></li>
 </ul>
 <ul class="navList">
 <li><a href="../../../../../../../index.html?net/ME1312/SubServers/Client/Bukkit/Network/Packet/PacketCreateServer.html" target="_top">Frames</a></li>
@@ -72,7 +72,7 @@ var activeTableTab = "activeTableTab";
 <div>
 <ul class="subNavList">
 <li>Summary:&nbsp;</li>
-<li><a href="#nested.class.summary">Nested</a>&nbsp;|&nbsp;</li>
+<li>Nested&nbsp;|&nbsp;</li>
 <li>Field&nbsp;|&nbsp;</li>
 <li><a href="#constructor.summary">Constr</a>&nbsp;|&nbsp;</li>
 <li><a href="#method.summary">Method</a></li>
@@ -121,25 +121,6 @@ implements <a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Net
 <div class="summary">
 <ul class="blockList">
 <li class="blockList">
-<!-- ======== NESTED CLASS SUMMARY ======== -->
-<ul class="blockList">
-<li class="blockList"><a name="nested.class.summary">
-<!--   -->
-</a>
-<h3>Nested Class Summary</h3>
-<table class="memberSummary" border="0" cellpadding="3" cellspacing="0" summary="Nested Class Summary table, listing nested classes, and an explanation">
-<caption><span>Nested Classes</span><span class="tabEnd">&nbsp;</span></caption>
-<tr>
-<th class="colFirst" scope="col">Modifier and Type</th>
-<th class="colLast" scope="col">Class and Description</th>
-</tr>
-<tr class="altColor">
-<td class="colFirst"><code>static class&nbsp;</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Network/Packet/PacketCreateServer.ServerType.html" title="enum in net.ME1312.SubServers.Client.Bukkit.Network.Packet">PacketCreateServer.ServerType</a></span></code>&nbsp;</td>
-</tr>
-</table>
-</li>
-</ul>
 <!-- ======== CONSTRUCTOR SUMMARY ======== -->
 <ul class="blockList">
 <li class="blockList"><a name="constructor.summary">
@@ -157,13 +138,12 @@ implements <a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Net
 </td>
 </tr>
 <tr class="rowColor">
-<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Network/Packet/PacketCreateServer.html#PacketCreateServer-java.util.UUID-java.lang.String-java.lang.String-net.ME1312.SubServers.Client.Bukkit.Network.Packet.PacketCreateServer.ServerType-net.ME1312.SubServers.Client.Bukkit.Library.Version.Version-int-int-net.ME1312.SubServers.Client.Bukkit.Library.JSONCallback...-">PacketCreateServer</a></span>(java.util.UUID&nbsp;player,
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Network/Packet/PacketCreateServer.html#PacketCreateServer-java.util.UUID-java.lang.String-java.lang.String-java.lang.String-net.ME1312.SubServers.Client.Bukkit.Library.Version.Version-int-net.ME1312.SubServers.Client.Bukkit.Library.JSONCallback...-">PacketCreateServer</a></span>(java.util.UUID&nbsp;player,
                   java.lang.String&nbsp;name,
                   java.lang.String&nbsp;host,
-                  <a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Network/Packet/PacketCreateServer.ServerType.html" title="enum in net.ME1312.SubServers.Client.Bukkit.Network.Packet">PacketCreateServer.ServerType</a>&nbsp;type,
+                  java.lang.String&nbsp;template,
                   <a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Version/Version.html" title="class in net.ME1312.SubServers.Client.Bukkit.Library.Version">Version</a>&nbsp;version,
                   int&nbsp;port,
-                  int&nbsp;memory,
                   <a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/JSONCallback.html" title="interface in net.ME1312.SubServers.Client.Bukkit.Library">JSONCallback</a>...&nbsp;callback)</code>
 <div class="block">New PacketCreateServer (Out)</div>
 </td>
@@ -240,7 +220,7 @@ implements <a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Net
 <div class="block">New PacketCreateServer (In)</div>
 </li>
 </ul>
-<a name="PacketCreateServer-java.util.UUID-java.lang.String-java.lang.String-net.ME1312.SubServers.Client.Bukkit.Network.Packet.PacketCreateServer.ServerType-net.ME1312.SubServers.Client.Bukkit.Library.Version.Version-int-int-net.ME1312.SubServers.Client.Bukkit.Library.JSONCallback...-">
+<a name="PacketCreateServer-java.util.UUID-java.lang.String-java.lang.String-java.lang.String-net.ME1312.SubServers.Client.Bukkit.Library.Version.Version-int-net.ME1312.SubServers.Client.Bukkit.Library.JSONCallback...-">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -249,10 +229,9 @@ implements <a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Net
 <pre>public&nbsp;PacketCreateServer(java.util.UUID&nbsp;player,
                           java.lang.String&nbsp;name,
                           java.lang.String&nbsp;host,
-                          <a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Network/Packet/PacketCreateServer.ServerType.html" title="enum in net.ME1312.SubServers.Client.Bukkit.Network.Packet">PacketCreateServer.ServerType</a>&nbsp;type,
+                          java.lang.String&nbsp;template,
                           <a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Version/Version.html" title="class in net.ME1312.SubServers.Client.Bukkit.Library.Version">Version</a>&nbsp;version,
                           int&nbsp;port,
-                          int&nbsp;memory,
                           <a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/JSONCallback.html" title="interface in net.ME1312.SubServers.Client.Bukkit.Library">JSONCallback</a>...&nbsp;callback)</pre>
 <div class="block">New PacketCreateServer (Out)</div>
 <dl>
@@ -260,10 +239,9 @@ implements <a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Net
 <dd><code>player</code> - Player Creating</dd>
 <dd><code>name</code> - Server Name</dd>
 <dd><code>host</code> - Host to use</dd>
-<dd><code>type</code> - Server Type</dd>
+<dd><code>template</code> - Server Template</dd>
 <dd><code>version</code> - Server Version</dd>
 <dd><code>port</code> - Server Port</dd>
-<dd><code>memory</code> - Server Memory</dd>
 <dd><code>callback</code> - Callbacks</dd>
 </dl>
 </li>
@@ -375,7 +353,7 @@ implements <a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Net
 <div class="subNav">
 <ul class="navList">
 <li><a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Network/Packet/PacketCommandServer.html" title="class in net.ME1312.SubServers.Client.Bukkit.Network.Packet"><span class="typeNameLink">Prev&nbsp;Class</span></a></li>
-<li><a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Network/Packet/PacketCreateServer.ServerType.html" title="enum in net.ME1312.SubServers.Client.Bukkit.Network.Packet"><span class="typeNameLink">Next&nbsp;Class</span></a></li>
+<li><a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Network/Packet/PacketDownloadHostInfo.html" title="class in net.ME1312.SubServers.Client.Bukkit.Network.Packet"><span class="typeNameLink">Next&nbsp;Class</span></a></li>
 </ul>
 <ul class="navList">
 <li><a href="../../../../../../../index.html?net/ME1312/SubServers/Client/Bukkit/Network/Packet/PacketCreateServer.html" target="_top">Frames</a></li>
@@ -399,7 +377,7 @@ implements <a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Net
 <div>
 <ul class="subNavList">
 <li>Summary:&nbsp;</li>
-<li><a href="#nested.class.summary">Nested</a>&nbsp;|&nbsp;</li>
+<li>Nested&nbsp;|&nbsp;</li>
 <li>Field&nbsp;|&nbsp;</li>
 <li><a href="#constructor.summary">Constr</a>&nbsp;|&nbsp;</li>
 <li><a href="#method.summary">Method</a></li>

@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10};
+var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10,"i8":10};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -132,7 +132,7 @@ extends <a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubCreator.
 <!--   -->
 </a>
 <h3>Nested classes/interfaces inherited from class&nbsp;net.ME1312.SubServers.Bungee.Host.<a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubCreator.html" title="class in net.ME1312.SubServers.Bungee.Host">SubCreator</a></h3>
-<code><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubCreator.ServerType.html" title="enum in net.ME1312.SubServers.Bungee.Host">SubCreator.ServerType</a></code></li>
+<code><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubCreator.ServerTemplate.html" title="class in net.ME1312.SubServers.Bungee.Host">SubCreator.ServerTemplate</a>, <a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubCreator.ServerType.html" title="enum in net.ME1312.SubServers.Bungee.Host">SubCreator.ServerType</a></code></li>
 </ul>
 </li>
 </ul>
@@ -170,11 +170,10 @@ extends <a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubCreator.
 </tr>
 <tr id="i0" class="altColor">
 <td class="colFirst"><code>boolean</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/External/ExternalSubCreator.html#create-java.util.UUID-java.lang.String-net.ME1312.SubServers.Bungee.Host.SubCreator.ServerType-net.ME1312.SubServers.Bungee.Library.Version.Version-int-int-">create</a></span>(java.util.UUID&nbsp;player,
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/External/ExternalSubCreator.html#create-java.util.UUID-java.lang.String-net.ME1312.SubServers.Bungee.Host.SubCreator.ServerTemplate-net.ME1312.SubServers.Bungee.Library.Version.Version-int-">create</a></span>(java.util.UUID&nbsp;player,
       java.lang.String&nbsp;name,
-      <a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubCreator.ServerType.html" title="enum in net.ME1312.SubServers.Bungee.Host">SubCreator.ServerType</a>&nbsp;type,
+      <a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubCreator.ServerTemplate.html" title="class in net.ME1312.SubServers.Bungee.Host">SubCreator.ServerTemplate</a>&nbsp;template,
       <a href="../../../../../../net/ME1312/SubServers/Bungee/Library/Version/Version.html" title="class in net.ME1312.SubServers.Bungee.Library.Version">Version</a>&nbsp;version,
-      int&nbsp;memory,
       int&nbsp;port)</code>
 <div class="block">Create a SubServer</div>
 </td>
@@ -198,18 +197,30 @@ extends <a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubCreator.
 </td>
 </tr>
 <tr id="i4" class="altColor">
+<td class="colFirst"><code><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubCreator.ServerTemplate.html" title="class in net.ME1312.SubServers.Bungee.Host">SubCreator.ServerTemplate</a></code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/External/ExternalSubCreator.html#getTemplate-java.lang.String-">getTemplate</a></span>(java.lang.String&nbsp;name)</code>
+<div class="block">Gets a SubCreator Template by name</div>
+</td>
+</tr>
+<tr id="i5" class="rowColor">
+<td class="colFirst"><code>java.util.Map&lt;java.lang.String,<a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubCreator.ServerTemplate.html" title="class in net.ME1312.SubServers.Bungee.Host">SubCreator.ServerTemplate</a>&gt;</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/External/ExternalSubCreator.html#getTemplates--">getTemplates</a></span>()</code>
+<div class="block">Gets the Templates that can be used in this SubCreator instance</div>
+</td>
+</tr>
+<tr id="i6" class="altColor">
 <td class="colFirst"><code>boolean</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/External/ExternalSubCreator.html#isBusy--">isBusy</a></span>()</code>
 <div class="block">Gets the status of SubCreator</div>
 </td>
 </tr>
-<tr id="i5" class="rowColor">
+<tr id="i7" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/External/ExternalSubCreator.html#terminate--">terminate</a></span>()</code>
 <div class="block">Terminate SubCreator</div>
 </td>
 </tr>
-<tr id="i6" class="altColor">
+<tr id="i8" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/External/ExternalSubCreator.html#waitFor--">waitFor</a></span>()</code>
 <div class="block">Wait for SubCreator to Finish</div>
@@ -221,7 +232,7 @@ extends <a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubCreator.
 <!--   -->
 </a>
 <h3>Methods inherited from class&nbsp;net.ME1312.SubServers.Bungee.Host.<a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubCreator.html" title="class in net.ME1312.SubServers.Bungee.Host">SubCreator</a></h3>
-<code><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubCreator.html#create-java.lang.String-net.ME1312.SubServers.Bungee.Host.SubCreator.ServerType-net.ME1312.SubServers.Bungee.Library.Version.Version-int-int-">create</a></code></li>
+<code><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubCreator.html#create-java.lang.String-net.ME1312.SubServers.Bungee.Host.SubCreator.ServerTemplate-net.ME1312.SubServers.Bungee.Library.Version.Version-int-">create</a></code></li>
 </ul>
 <ul class="blockList">
 <li class="blockList"><a name="methods.inherited.from.class.java.lang.Object">
@@ -268,7 +279,7 @@ extends <a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubCreator.
 <!--   -->
 </a>
 <h3>Method Detail</h3>
-<a name="create-java.util.UUID-java.lang.String-net.ME1312.SubServers.Bungee.Host.SubCreator.ServerType-net.ME1312.SubServers.Bungee.Library.Version.Version-int-int-">
+<a name="create-java.util.UUID-java.lang.String-net.ME1312.SubServers.Bungee.Host.SubCreator.ServerTemplate-net.ME1312.SubServers.Bungee.Library.Version.Version-int-">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -276,21 +287,19 @@ extends <a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubCreator.
 <h4>create</h4>
 <pre>public&nbsp;boolean&nbsp;create(java.util.UUID&nbsp;player,
                       java.lang.String&nbsp;name,
-                      <a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubCreator.ServerType.html" title="enum in net.ME1312.SubServers.Bungee.Host">SubCreator.ServerType</a>&nbsp;type,
+                      <a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubCreator.ServerTemplate.html" title="class in net.ME1312.SubServers.Bungee.Host">SubCreator.ServerTemplate</a>&nbsp;template,
                       <a href="../../../../../../net/ME1312/SubServers/Bungee/Library/Version/Version.html" title="class in net.ME1312.SubServers.Bungee.Library.Version">Version</a>&nbsp;version,
-                      int&nbsp;memory,
                       int&nbsp;port)</pre>
-<div class="block"><span class="descfrmTypeLabel">Description copied from class:&nbsp;<code><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubCreator.html#create-java.util.UUID-java.lang.String-net.ME1312.SubServers.Bungee.Host.SubCreator.ServerType-net.ME1312.SubServers.Bungee.Library.Version.Version-int-int-">SubCreator</a></code></span></div>
+<div class="block"><span class="descfrmTypeLabel">Description copied from class:&nbsp;<code><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubCreator.html#create-java.util.UUID-java.lang.String-net.ME1312.SubServers.Bungee.Host.SubCreator.ServerTemplate-net.ME1312.SubServers.Bungee.Library.Version.Version-int-">SubCreator</a></code></span></div>
 <div class="block">Create a SubServer</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubCreator.html#create-java.util.UUID-java.lang.String-net.ME1312.SubServers.Bungee.Host.SubCreator.ServerType-net.ME1312.SubServers.Bungee.Library.Version.Version-int-int-">create</a></code>&nbsp;in class&nbsp;<code><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubCreator.html" title="class in net.ME1312.SubServers.Bungee.Host">SubCreator</a></code></dd>
+<dd><code><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubCreator.html#create-java.util.UUID-java.lang.String-net.ME1312.SubServers.Bungee.Host.SubCreator.ServerTemplate-net.ME1312.SubServers.Bungee.Library.Version.Version-int-">create</a></code>&nbsp;in class&nbsp;<code><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubCreator.html" title="class in net.ME1312.SubServers.Bungee.Host">SubCreator</a></code></dd>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>player</code> - Player Creating</dd>
 <dd><code>name</code> - Server Name</dd>
-<dd><code>type</code> - Server Type</dd>
+<dd><code>template</code> - Server Template</dd>
 <dd><code>version</code> - Server Version</dd>
-<dd><code>memory</code> - Server Memory Amount (in MB)</dd>
 <dd><code>port</code> - Server Port Number</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>Success Status</dd>
@@ -383,7 +392,7 @@ extends <a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubCreator.
 <a name="isBusy--">
 <!--   -->
 </a>
-<ul class="blockListLast">
+<ul class="blockList">
 <li class="blockList">
 <h4>isBusy</h4>
 <pre>public&nbsp;boolean&nbsp;isBusy()</pre>
@@ -394,6 +403,42 @@ extends <a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubCreator.
 <dd><code><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubCreator.html#isBusy--">isBusy</a></code>&nbsp;in class&nbsp;<code><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubCreator.html" title="class in net.ME1312.SubServers.Bungee.Host">SubCreator</a></code></dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>SubCreator Status</dd>
+</dl>
+</li>
+</ul>
+<a name="getTemplates--">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getTemplates</h4>
+<pre>public&nbsp;java.util.Map&lt;java.lang.String,<a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubCreator.ServerTemplate.html" title="class in net.ME1312.SubServers.Bungee.Host">SubCreator.ServerTemplate</a>&gt;&nbsp;getTemplates()</pre>
+<div class="block"><span class="descfrmTypeLabel">Description copied from class:&nbsp;<code><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubCreator.html#getTemplates--">SubCreator</a></code></span></div>
+<div class="block">Gets the Templates that can be used in this SubCreator instance</div>
+<dl>
+<dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
+<dd><code><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubCreator.html#getTemplates--">getTemplates</a></code>&nbsp;in class&nbsp;<code><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubCreator.html" title="class in net.ME1312.SubServers.Bungee.Host">SubCreator</a></code></dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>Template Map</dd>
+</dl>
+</li>
+</ul>
+<a name="getTemplate-java.lang.String-">
+<!--   -->
+</a>
+<ul class="blockListLast">
+<li class="blockList">
+<h4>getTemplate</h4>
+<pre>public&nbsp;<a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubCreator.ServerTemplate.html" title="class in net.ME1312.SubServers.Bungee.Host">SubCreator.ServerTemplate</a>&nbsp;getTemplate(java.lang.String&nbsp;name)</pre>
+<div class="block"><span class="descfrmTypeLabel">Description copied from class:&nbsp;<code><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubCreator.html#getTemplate-java.lang.String-">SubCreator</a></code></span></div>
+<div class="block">Gets a SubCreator Template by name</div>
+<dl>
+<dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
+<dd><code><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubCreator.html#getTemplate-java.lang.String-">getTemplate</a></code>&nbsp;in class&nbsp;<code><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubCreator.html" title="class in net.ME1312.SubServers.Bungee.Host">SubCreator</a></code></dd>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>name</code> - Template Name</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>Template</dd>
 </dl>
 </li>
 </ul>

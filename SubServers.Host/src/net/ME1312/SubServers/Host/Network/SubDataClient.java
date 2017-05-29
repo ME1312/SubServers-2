@@ -17,6 +17,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketException;
 import java.util.*;
@@ -242,6 +243,27 @@ public final class SubDataClient {
     }
 
     /**
+     * Forward Packet to Server
+     *
+     * @param packet Packet to send
+     * @param location Where to send
+     */
+    public void forwardPacket(PacketOut packet, InetSocketAddress location) {
+        if (Util.isNull(packet)) throw new NullPointerException();
+        if (socket == null) {
+            queue.add(packet);
+        } else {
+            try {
+                JSONObject json = encodePacket(packet);
+                json.put("f", location.toString());
+                writer.println(json);
+            } catch (IllegalPacketException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /**
      * JSON Encode PacketOut
      *
      * @param packet PacketOut
@@ -309,7 +331,7 @@ public final class SubDataClient {
                             host.subdata = new SubDataClient(host, name, socket.getInetAddress(), socket.getPort());
                             timer.cancel();
                             while (queue.size() != 0) {
-                                sendPacket(queue.get(0));
+                                host.subdata.sendPacket(queue.get(0));
                                 queue.remove(0);
                             }
                         } catch (IOException e) {

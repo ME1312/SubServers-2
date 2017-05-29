@@ -78,7 +78,7 @@ public class InternalHandler implements UIHandler, Listener {
                         } else if (!item.equals(ChatColor.RESET.toString()) && !item.equals(plugin.lang.getSection("Lang").getColoredString("Interface.Host-Menu.No-Hosts", '&'))) {
                             player.closeInventory();
                             String obj;
-                            if (event.getCurrentItem().getItemMeta().getLore().size() > 0 && event.getCurrentItem().getItemMeta().getLore() != null && event.getCurrentItem().getItemMeta().getLore().get(0).startsWith(ChatColor.GRAY.toString())) {
+                            if (event.getCurrentItem().getItemMeta().getLore() != null && event.getCurrentItem().getItemMeta().getLore().size() > 0 && event.getCurrentItem().getItemMeta().getLore().get(0).startsWith(ChatColor.GRAY.toString())) {
                                 obj = ChatColor.stripColor(event.getCurrentItem().getItemMeta().getLore().get(0));
                             } else {
                                 obj = ChatColor.stripColor(item);
@@ -138,20 +138,9 @@ public class InternalHandler implements UIHandler, Listener {
                                     }));
                                 }
                             });
-                        } else if (ChatColor.stripColor(item).equals(ChatColor.stripColor(plugin.lang.getSection("Lang").getColoredString("Interface.Host-Creator.Edit-Type", '&')))) {
+                        } else if (ChatColor.stripColor(item).equals(ChatColor.stripColor(plugin.lang.getSection("Lang").getColoredString("Interface.Host-Creator.Edit-Template", '&')))) {
                             player.closeInventory();
-                            if (!gui.sendTitle(plugin.lang.getSection("Lang").getColoredString("Interface.Host-Creator.Edit-Type.Title", '&'), 4 * 20))
-                                player.sendMessage(plugin.lang.getSection("Lang").getColoredString("Interface.Host-Creator.Edit-Type.Message", '&'));
-                            input.put(player.getUniqueId(), m -> {
-                                if (Util.isException(() -> PacketCreateServer.ServerType.valueOf(m.getString("message").toUpperCase()))) {
-                                    if (!gui.sendTitle(plugin.lang.getSection("Lang").getColoredString("Interface.Host-Creator.Edit-Type.Invalid-Title", '&'), 4 * 20))
-                                        player.sendMessage(plugin.lang.getSection("Lang").getColoredString("Interface.Host-Creator.Edit-Type.Invalid", '&'));
-                                    Bukkit.getScheduler().runTaskLater(plugin, () -> gui.hostCreator((UIRenderer.CreatorOptions) gui.lastUsedOptions), 4 * 20);
-                                } else {
-                                    ((UIRenderer.CreatorOptions) gui.lastUsedOptions).setType(PacketCreateServer.ServerType.valueOf(m.getString("message").toUpperCase()));
-                                    gui.hostCreator((UIRenderer.CreatorOptions) gui.lastUsedOptions);
-                                }
-                            });
+                            gui.hostCreatorTemplates(1, (UIRenderer.CreatorOptions) gui.lastUsedOptions);
                         } else if (ChatColor.stripColor(item).equals(ChatColor.stripColor(plugin.lang.getSection("Lang").getColoredString("Interface.Host-Creator.Edit-Version", '&')))) {
                             player.closeInventory();
                             if (!gui.sendTitle(plugin.lang.getSection("Lang").getColoredString("Interface.Host-Creator.Edit-Version.Title", '&'), 4 * 20))
@@ -180,20 +169,32 @@ public class InternalHandler implements UIHandler, Listener {
                                     gui.hostCreator((UIRenderer.CreatorOptions) gui.lastUsedOptions);
                                 }
                             });
-                        } else if (ChatColor.stripColor(item).equals(ChatColor.stripColor(plugin.lang.getSection("Lang").getColoredString("Interface.Host-Creator.Edit-RAM", '&')))) {
+                        }
+                    }
+                } else if (event.getClickedInventory().getTitle().startsWith(plugin.lang.getSection("Lang").getColoredString("Interface.Host-Creator.Edit-Template.Title", '&').split("\\$str\\$")[0]) && // Host Creator Templates
+                        (plugin.lang.getSection("Lang").getColoredString("Interface.Host-Creator.Edit-Template.Title", '&').split("\\$str\\$").length == 1 ||
+                                event.getClickedInventory().getTitle().endsWith(plugin.lang.getSection("Lang").getColoredString("Interface.Host-Creator.Edit-Template.Title", '&').split("\\$str\\$")[1]))) {
+                    if (event.getCurrentItem() != null && event.getCurrentItem().getType() != Material.AIR && event.getCurrentItem().hasItemMeta()) {
+                        String item = event.getCurrentItem().getItemMeta().getDisplayName();
+                        if (item.equals(plugin.lang.getSection("Lang").getColoredString("Interface.Generic.Back-Arrow", '&'))) {
                             player.closeInventory();
-                            if (!gui.sendTitle(plugin.lang.getSection("Lang").getColoredString("Interface.Host-Creator.Edit-RAM.Title", '&'), 4 * 20))
-                                player.sendMessage(plugin.lang.getSection("Lang").getColoredString("Interface.Host-Creator.Edit-RAM.Message", '&'));
-                            input.put(player.getUniqueId(), m -> {
-                                if (Util.isException(() -> Integer.parseInt(m.getString("message"))) || Integer.parseInt(m.getString("message")) < 256) {
-                                    if (!gui.sendTitle(plugin.lang.getSection("Lang").getColoredString("Interface.Host-Creator.Edit-RAM.Invalid-Title", '&'), 4 * 20))
-                                        player.sendMessage(plugin.lang.getSection("Lang").getColoredString("Interface.Host-Creator.Edit-RAM.Invalid", '&'));
-                                    Bukkit.getScheduler().runTaskLater(plugin, () -> gui.hostCreator((UIRenderer.CreatorOptions) gui.lastUsedOptions), 4 * 20);
-                                } else {
-                                    ((UIRenderer.CreatorOptions) gui.lastUsedOptions).setMemory(Integer.valueOf(m.getString("message")));
-                                    gui.hostCreator((UIRenderer.CreatorOptions) gui.lastUsedOptions);
-                                }
-                            });
+                            gui.hostCreatorTemplates(gui.lastPage - 1, (UIRenderer.CreatorOptions) gui.lastUsedOptions);
+                        } else if (item.equals(plugin.lang.getSection("Lang").getColoredString("Interface.Generic.Next-Arrow", '&'))) {
+                            player.closeInventory();
+                            gui.hostCreatorTemplates(gui.lastPage + 1, (UIRenderer.CreatorOptions) gui.lastUsedOptions);
+                        } else if (item.equals(plugin.lang.getSection("Lang").getColoredString("Interface.Generic.Back", '&'))) {
+                            player.closeInventory();
+                            gui.hostCreator((UIRenderer.CreatorOptions) gui.lastUsedOptions);
+                        } else {
+                            player.closeInventory();
+                            String obj;
+                            if (event.getCurrentItem().getItemMeta().getLore() != null && event.getCurrentItem().getItemMeta().getLore().size() > 0 && event.getCurrentItem().getItemMeta().getLore().get(0).startsWith(ChatColor.GRAY.toString())) {
+                                obj = ChatColor.stripColor(event.getCurrentItem().getItemMeta().getLore().get(0));
+                            } else {
+                                obj = ChatColor.stripColor(item);
+                            }
+                            ((UIRenderer.CreatorOptions) gui.lastUsedOptions).setTemplate(obj);
+                            gui.hostCreator((UIRenderer.CreatorOptions) gui.lastUsedOptions);
                         }
                     }
                 } else if (event.getClickedInventory().getTitle().startsWith(plugin.lang.getSection("Lang").getColoredString("Interface.Host-Plugin.Title", '&').split("\\$str\\$")[0]) && // Host Plugin
@@ -253,7 +254,7 @@ public class InternalHandler implements UIHandler, Listener {
                         } else if (!item.equals(ChatColor.RESET.toString()) && !item.equals(plugin.lang.getSection("Lang").getColoredString("Interface.SubServer-Menu.No-SubServers", '&'))) {
                             player.closeInventory();
                             String obj;
-                            if (event.getCurrentItem().getItemMeta().getLore().size() > 0 && event.getCurrentItem().getItemMeta().getLore() != null && event.getCurrentItem().getItemMeta().getLore().get(0).startsWith(ChatColor.GRAY.toString())) {
+                            if (event.getCurrentItem().getItemMeta().getLore() != null && event.getCurrentItem().getItemMeta().getLore().size() > 0 && event.getCurrentItem().getItemMeta().getLore().get(0).startsWith(ChatColor.GRAY.toString())) {
                                 obj = ChatColor.stripColor(event.getCurrentItem().getItemMeta().getLore().get(0));
                             } else {
                                 obj = ChatColor.stripColor(item);

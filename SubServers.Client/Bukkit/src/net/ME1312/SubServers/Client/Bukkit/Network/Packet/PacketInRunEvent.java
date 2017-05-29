@@ -33,7 +33,7 @@ public class PacketInRunEvent implements PacketIn {
             @Override
             public void run(JSONObject json) {
                 Bukkit.getPluginManager().callEvent(new SubCreateEvent((json.keySet().contains("player"))?UUID.fromString(json.getString("player")):null, json.getString("host"), json.getString("name"),
-                        PacketCreateServer.ServerType.valueOf(json.getString("type").toUpperCase()), new Version(json.getString("version")), json.getInt("memory"), json.getInt("port")));
+                        json.getString("template"), new Version(json.getString("version")), json.getInt("port")));
                 callback("SubCreateEvent", this);
             }
         });

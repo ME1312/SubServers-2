@@ -215,7 +215,7 @@ public class InternalHost extends Host {
                         plugin.config.save();
                     }
                     if (!to.exists()) to.mkdirs();
-                    FileWriter writer = new FileWriter(new File(to, "info.json"));
+                    FileWriter writer = new FileWriter(new File(to, "info.json"), false);
                     json.write(writer);
                     writer.close();
                 } catch (Exception e) {

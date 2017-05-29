@@ -1,6 +1,7 @@
 package net.ME1312.SubServers.Bungee.Network.Packet;
 
 import net.ME1312.SubServers.Bungee.Host.Host;
+import net.ME1312.SubServers.Bungee.Host.SubCreator;
 import net.ME1312.SubServers.Bungee.Host.SubServer;
 import net.ME1312.SubServers.Bungee.Library.Version.Version;
 import net.ME1312.SubServers.Bungee.Network.Client;
@@ -58,7 +59,16 @@ public class PacketDownloadHostInfo implements PacketIn, PacketOut {
 
             JSONObject cinfo = new JSONObject();
             cinfo.put("busy", host.getCreator().isBusy());
-            cinfo.put("git-bash", host.getCreator().getBashDirectory());
+            JSONObject templates = new JSONObject();
+            for (SubCreator.ServerTemplate template : host.getCreator().getTemplates().values()) {
+                JSONObject tinfo = new JSONObject();
+                tinfo.put("enabled", template.isEnabled());
+                tinfo.put("display", template.getDisplayName());
+                tinfo.put("icon", template.getIcon());
+                tinfo.put("type", template.getType().toString());
+                templates.put(template.getName(), tinfo);
+            }
+            cinfo.put("templates", templates);
             info.put("creator", cinfo);
 
             JSONObject servers = new JSONObject();

@@ -334,14 +334,10 @@ public final class SubCommand implements CommandExecutor {
                     } else if (args[0].equalsIgnoreCase("create")) {
                         if (sender.hasPermission("subservers.host.create.*") || sender.hasPermission("subservers.host.create." + args[2].toLowerCase())) {
                             if (args.length > 5) {
-                                if (Util.isException(() -> PacketCreateServer.ServerType.valueOf(args[3].toUpperCase()))) {
-                                    sender.sendMessage(plugin.lang.getSection("Lang").getColoredString("Command.Creator.Invalid-Type", '&'));
-                                } else if (Util.isException(() -> Integer.parseInt(args[5]))) {
+                                if (Util.isException(() -> Integer.parseInt(args[5]))) {
                                     sender.sendMessage(plugin.lang.getSection("Lang").getColoredString("Command.Creator.Invalid-Port", '&'));
-                                } else if (args.length > 6 && Util.isException(() -> Integer.parseInt(args[6]))) {
-                                    sender.sendMessage(plugin.lang.getSection("Lang").getColoredString("Command.Creator.Invalid-Memory", '&'));
                                 } else {
-                                    plugin.subdata.sendPacket(new PacketCreateServer((sender instanceof Player)?((Player) sender).getUniqueId():null, args[1], args[2], PacketCreateServer.ServerType.valueOf(args[3].toUpperCase()), new Version(args[4]), Integer.parseInt(args[5]), (args.length > 6)?Integer.parseInt(args[6]):1024, json -> {
+                                    plugin.subdata.sendPacket(new PacketCreateServer((sender instanceof Player)?((Player) sender).getUniqueId():null, args[1], args[2], args[3], new Version(args[4]), Integer.parseInt(args[5]), json -> {
                                         switch (json.getInt("r")) {
                                             case 3:
                                                 sender.sendMessage(plugin.lang.getSection("Lang").getColoredString("Command.Creator.Exists", '&'));
@@ -353,16 +349,13 @@ public final class SubCommand implements CommandExecutor {
                                                 sender.sendMessage(plugin.lang.getSection("Lang").getColoredString("Command.Creator.Running", '&'));
                                                 break;
                                             case 6:
-                                                sender.sendMessage(plugin.lang.getSection("Lang").getColoredString("Command.Creator.Invalid-Type", '&'));
+                                                sender.sendMessage(plugin.lang.getSection("Lang").getColoredString("Command.Creator.Invalid-Template", '&'));
                                                 break;
                                             case 7:
                                                 sender.sendMessage(plugin.lang.getSection("Lang").getColoredString("Command.Creator.Invalid-Version", '&'));
                                                 break;
                                             case 8:
                                                 sender.sendMessage(plugin.lang.getSection("Lang").getColoredString("Command.Creator.Invalid-Port", '&'));
-                                                break;
-                                            case 9:
-                                                sender.sendMessage(plugin.lang.getSection("Lang").getColoredString("Command.Creator.Invalid-Memory", '&'));
                                                 break;
                                             case 0:
                                             case 1:
@@ -515,7 +508,7 @@ public final class SubCommand implements CommandExecutor {
                 plugin.lang.getSection("Lang").getColoredString("Command.Help.SubServer.Terminate", '&').replace("$str$", label.toLowerCase() + " kill <SubServer>"),
                 plugin.lang.getSection("Lang").getColoredString("Command.Help.SubServer.Command", '&').replace("$str$", label.toLowerCase() + " cmd <SubServer> <Command> [Args...]"),
                 plugin.lang.getSection("Lang").getColoredString("Command.Help.Server.Teleport", '&').replace("$str$", label.toLowerCase() + " tp <Server> [Player]"),
-                plugin.lang.getSection("Lang").getColoredString("Command.Help.Host.Create", '&').replace("$str$", label.toLowerCase() + " create <Name> <Host> <Type> <Version> <Port> [RAM]"),
+                plugin.lang.getSection("Lang").getColoredString("Command.Help.Host.Create", '&').replace("$str$", label.toLowerCase() + " create <Name> <Host> <Template> <Version> <Port>"),
         };
     }
 }

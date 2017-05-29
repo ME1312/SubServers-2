@@ -62,16 +62,15 @@ public class PacketCreateServer implements PacketIn, PacketOut {
                 client.sendPacket(new PacketCreateServer(4, "There is no Host with that name", (data.keySet().contains("id")) ? data.getString("id") : null));
             } else if (plugin.hosts.get(data.getJSONObject("creator").getString("host").toLowerCase()).getCreator().isBusy()) {
                 client.sendPacket(new PacketCreateServer(5, "The SubCreator instance on that host is already running", (data.keySet().contains("id")) ? data.getString("id") : null));
-            } else if (Util.isException(() -> SubCreator.ServerType.valueOf(data.getJSONObject("creator").getString("type").toUpperCase()))) {
-                client.sendPacket(new PacketCreateServer(6, "There is no server type with that name", (data.keySet().contains("id")) ? data.getString("id") : null));
+            } else if (!plugin.hosts.get(data.getJSONObject("creator").getString("host").toLowerCase()).getCreator().getTemplates().keySet().contains(data.getJSONObject("creator").getString("template").toLowerCase()) ||
+                    !plugin.hosts.get(data.getJSONObject("creator").getString("host").toLowerCase()).getCreator().getTemplate(data.getJSONObject("creator").getString("template")).isEnabled()) {
+                client.sendPacket(new PacketCreateServer(6, "There is no template with that name", (data.keySet().contains("id")) ? data.getString("id") : null));
             } else if (new Version("1.8").compareTo(new Version(data.getJSONObject("creator").getString("version"))) > 0) {
                 client.sendPacket(new PacketCreateServer(7, "SubCreator cannot create servers before Minecraft 1.8", (data.keySet().contains("id")) ? data.getString("id") : null));
             } else if (data.getJSONObject("creator").getInt("port") <= 0 || data.getJSONObject("creator").getInt("port") > 65535) {
                 client.sendPacket(new PacketCreateServer(8, "Invalid Port Number", (data.keySet().contains("id")) ? data.getString("id") : null));
-            } else if (data.getJSONObject("creator").getInt("ram") < 256) {
-                client.sendPacket(new PacketCreateServer(9, "Invalid Ram Amount", (data.keySet().contains("id")) ? data.getString("id") : null));
             } else {
-                if (plugin.hosts.get(data.getJSONObject("creator").getString("host").toLowerCase()).getCreator().create((data.keySet().contains("player"))?UUID.fromString(data.getString("player")):null, data.getJSONObject("creator").getString("name"), SubCreator.ServerType.valueOf(data.getJSONObject("creator").getString("type").toUpperCase()), new Version(data.getJSONObject("creator").getString("version")), data.getJSONObject("creator").getInt("ram"), data.getJSONObject("creator").getInt("port"))) {
+                if (plugin.hosts.get(data.getJSONObject("creator").getString("host").toLowerCase()).getCreator().create((data.keySet().contains("player"))?UUID.fromString(data.getString("player")):null, data.getJSONObject("creator").getString("name"), plugin.hosts.get(data.getJSONObject("creator").getString("host").toLowerCase()).getCreator().getTemplate(data.getJSONObject("creator").getString("template")), new Version(data.getJSONObject("creator").getString("version")), data.getJSONObject("creator").getInt("port"))) {
                     if (data.keySet().contains("wait") && data.getBoolean("wait")) {
                         new Thread(() -> {
                             try {

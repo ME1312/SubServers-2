@@ -18,10 +18,9 @@ import java.util.UUID;
 public class PacketExCreateServer implements PacketIn, PacketOut {
     private static HashMap<String, JSONCallback[]> callbacks = new HashMap<String, JSONCallback[]>();
     private String name;
-    private SubCreator.ServerType type;
+    private SubCreator.ServerTemplate template;
     private Version version;
     private int port;
-    private int ram;
     private UUID log;
     private String id = null;
 
@@ -34,19 +33,17 @@ public class PacketExCreateServer implements PacketIn, PacketOut {
      * New PacketExCreateServer (Out)
      *
      * @param name Server Name
-     * @param type Server Type
+     * @param template Server Template
      * @param version Server Version
-     * @param memory Server Memory Amount (in MB)
      * @param port Server Port Number
      * @param callback Callbacks
      */
-    public PacketExCreateServer(String name, SubCreator.ServerType type, Version version, int memory, int port, UUID log, JSONCallback... callback) {
-        if (Util.isNull(name, type, version, port, memory, log, callback)) throw new NullPointerException();
+    public PacketExCreateServer(String name, SubCreator.ServerTemplate template, Version version, int port, UUID log, JSONCallback... callback) {
+        if (Util.isNull(name, template, version, port, log, callback)) throw new NullPointerException();
         this.name = name;
-        this.type = type;
+        this.template = template;
         this.version = version;
         this.port = port;
-        this.ram = memory;
         this.log = log;
         this.id = Util.getNew(callbacks.keySet(), UUID::randomUUID).toString();
         callbacks.put(id, callback);
@@ -61,10 +58,9 @@ public class PacketExCreateServer implements PacketIn, PacketOut {
             json.put("id", id);
             JSONObject creator = new JSONObject();
             creator.put("name", name);
-            creator.put("type", type.toString());
+            creator.put("template", template.getName());
             creator.put("version", version.toString());
             creator.put("port", port);
-            creator.put("ram", ram);
             creator.put("log", log.toString());
             json.put("creator", creator);
             return json;
@@ -79,6 +75,6 @@ public class PacketExCreateServer implements PacketIn, PacketOut {
 
     @Override
     public Version getVersion() {
-        return new Version("2.11.0a");
+        return new Version("2.11.2m");
     }
 }

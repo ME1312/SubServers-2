@@ -10,6 +10,7 @@ import net.ME1312.SubServers.Client.Bukkit.Library.Version.Version;
 import net.ME1312.SubServers.Client.Bukkit.Network.SubDataClient;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.json.JSONObject;
 
 import java.io.*;
 import java.net.InetAddress;
@@ -26,7 +27,7 @@ public final class SubPlugin extends JavaPlugin {
 
     public UIHandler gui = null;
     public final Version version;
-    public final Version bversion = null;
+    public final Version bversion = new Version(1);
     public final SubAPI api = new SubAPI(this);
 
     public SubPlugin() {
@@ -56,6 +57,11 @@ public final class SubPlugin extends JavaPlugin {
                 Bukkit.getLogger().info("SubServers > Updated ~/plugins/SubServers/config.yml");
             }
             config = new YAMLConfig(new UniversalFile(getDataFolder(), "config.yml"));
+            if (new UniversalFile(new File(System.getProperty("user.dir")), "subservers.client").exists()) {
+                config.get().getSection("Settings").set("SubData", new JSONObject(Util.readAll(new FileReader(new UniversalFile(new File(System.getProperty("user.dir")), "subservers.client")))));
+                config.save();
+                new UniversalFile(new File(System.getProperty("user.dir")), "subservers.client").delete();
+            }
             subdata = new SubDataClient(this, config.get().getSection("Settings").getSection("SubData").getString("Name", "undefined"),
                     InetAddress.getByName(config.get().getSection("Settings").getSection("SubData").getString("Address", "127.0.0.1:4391").split(":")[0]),
                     Integer.parseInt(config.get().getSection("Settings").getSection("SubData").getString("Address", "127.0.0.1:4391").split(":")[1]));
@@ -83,5 +89,6 @@ public final class SubPlugin extends JavaPlugin {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        setEnabled(false);
     }
 }
