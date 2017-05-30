@@ -418,12 +418,6 @@ public class InternalSubServer extends SubServer {
     }
 
     @Override
-    public boolean templatify() {
-        // TODO
-        return false;
-    }
-
-    @Override
     public void waitFor() throws InterruptedException {
         while (thread != null && thread.isAlive()) {
             Thread.sleep(250);

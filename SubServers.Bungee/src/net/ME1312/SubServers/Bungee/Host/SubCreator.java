@@ -1,6 +1,7 @@
 package net.ME1312.SubServers.Bungee.Host;
 
 import net.ME1312.SubServers.Bungee.Library.Config.YAMLSection;
+import net.ME1312.SubServers.Bungee.Library.Exception.InvalidTemplateException;
 import net.ME1312.SubServers.Bungee.Library.Util;
 import net.ME1312.SubServers.Bungee.Library.Version.Version;
 
@@ -31,7 +32,8 @@ public abstract class SubCreator {
          * @param options Configuration Options
          */
         public ServerTemplate(String name, boolean enabled, String icon, File directory, YAMLSection build, YAMLSection options) {
-            Util.isNull(name, enabled, directory, build, options);
+            if (Util.isNull(name, enabled, directory, build, options)) throw new NullPointerException();
+            if (name.contains(" ")) throw new InvalidTemplateException("Template names cannot have spaces: " + name);
             this.name = name;
             this.enabled = enabled;
             this.icon = icon;

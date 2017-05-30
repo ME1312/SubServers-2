@@ -195,13 +195,6 @@ public abstract class SubServer extends Server {
     }
 
     /**
-     * Templatify this SubServer
-     *
-     * @return Success Status
-     */
-    public abstract boolean templatify();
-
-    /**
      * Waits for the Server to Stop
      *
      * @throws InterruptedException

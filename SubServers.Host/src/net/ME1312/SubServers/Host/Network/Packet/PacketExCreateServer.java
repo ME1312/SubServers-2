@@ -59,8 +59,8 @@ public class PacketExCreateServer implements PacketIn, PacketOut {
     @Override
     public void execute(JSONObject data) {
         try {
-            host.creator.create(data.getJSONObject("creator").getString("name"), SubCreator.ServerType.valueOf(data.getJSONObject("creator").getString("type").toUpperCase()), new Version(data.getJSONObject("creator").getString("version")),
-                    data.getJSONObject("creator").getInt("ram"), data.getJSONObject("creator").getInt("port"), UUID.fromString(data.getJSONObject("creator").getString("log")), (data.keySet().contains("id"))?data.getString("id"):null);
+            host.creator.create(data.getJSONObject("creator").getString("name"), host.templates.get(data.getJSONObject("creator").getString("template").toLowerCase()), new Version(data.getJSONObject("creator").getString("version")),
+                    data.getJSONObject("creator").getInt("port"), UUID.fromString(data.getJSONObject("creator").getString("log")), (data.keySet().contains("id"))?data.getString("id"):null);
         } catch (Throwable e) {
             host.subdata.sendPacket(new PacketExCreateServer(1, e.getClass().getCanonicalName() + ": " + e.getMessage(), null, (data.keySet().contains("id"))?data.getString("id"):null));
         }

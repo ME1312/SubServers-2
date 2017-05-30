@@ -71,7 +71,7 @@ public final class Launch {
             arguments.add("-Dsubservers.host.plugins=" + URLEncoder.encode(plugins, "UTF-8"));
         arguments.add("-cp");
         arguments.add(tmpdir.getPath());
-        arguments.add("net.ME1312.SubServers.Host.SubServers");
+        arguments.add("net.ME1312.SubServers.Host.ExHost");
         arguments.addAll(Arrays.asList(args));
         ProcessBuilder processBuilder = new ProcessBuilder(arguments);
         processBuilder.directory(new File(System.getProperty("user.dir")));

@@ -64,7 +64,6 @@ public final class SubDataServer {
         registerPacket(new PacketAuthorization(plugin), "Authorization");
         registerPacket(new PacketCommandServer(plugin), "SubCommandServer");
         registerPacket(new PacketCreateServer(plugin), "SubCreateServer");
-        registerPacket(new PacketDownloadBuildScript(plugin), "SubDownloadBuildScript");
         registerPacket(new PacketDownloadHostInfo(plugin), "SubDownloadHostInfo");
         registerPacket(new PacketDownloadLang(plugin), "SubDownloadLang");
         registerPacket(new PacketDownloadPlayerList(plugin), "SubDownloadPlayerList");
@@ -90,7 +89,6 @@ public final class SubDataServer {
         registerPacket(PacketAuthorization.class, "Authorization");
         registerPacket(PacketCommandServer.class, "SubCommandServer");
         registerPacket(PacketCreateServer.class, "SubCreateServer");
-        registerPacket(PacketDownloadBuildScript.class, "SubDownloadBuildScript");
         registerPacket(PacketDownloadHostInfo.class, "SubDownloadHostInfo");
         registerPacket(PacketDownloadLang.class, "SubDownloadLang");
         registerPacket(PacketDownloadPlayerList.class, "SubDownloadPlayerList");

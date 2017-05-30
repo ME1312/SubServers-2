@@ -64,7 +64,6 @@ public class PacketLinkExHost implements PacketIn, PacketOut {
                         ((ClientHandler) host).linkSubDataClient(client);
                         System.out.println("SubData > " + client.getAddress().toString() + " has been defined as Host: " + host.getName());
                         client.sendPacket(new PacketLinkExHost(0, "Definition Successful"));
-                        if (host instanceof ExternalHost) client.sendPacket(new PacketExConfigureHost(plugin, (ExternalHost) host));
                     } else {
                         client.sendPacket(new PacketLinkExHost(3, "Host already linked"));
                     }

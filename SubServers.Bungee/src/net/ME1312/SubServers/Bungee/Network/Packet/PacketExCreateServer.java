@@ -75,6 +75,6 @@ public class PacketExCreateServer implements PacketIn, PacketOut {
 
     @Override
     public Version getVersion() {
-        return new Version("2.11.2m");
+        return new Version("2.11.0a");
     }
 }

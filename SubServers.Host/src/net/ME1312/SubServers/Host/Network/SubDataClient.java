@@ -71,7 +71,6 @@ public final class SubDataClient {
         registerPacket(new PacketAuthorization(host), "Authorization");
         registerPacket(new PacketCommandServer(), "SubCommandServer");
         registerPacket(new PacketCreateServer(), "SubCreateServer");
-        registerPacket(new PacketDownloadBuildScript(), "SubDownloadBuildScript");
         registerPacket(new PacketDownloadHostInfo(), "SubDownloadHostInfo");
         registerPacket(new PacketDownloadLang(host), "SubDownloadLang");
         registerPacket(new PacketDownloadPlayerList(), "SubDownloadPlayerList");
@@ -94,7 +93,6 @@ public final class SubDataClient {
         registerPacket(PacketAuthorization.class, "Authorization");
         registerPacket(PacketCommandServer.class, "SubCommandServer");
         registerPacket(PacketCreateServer.class, "SubCreateServer");
-        registerPacket(PacketDownloadBuildScript.class, "SubDownloadBuildScript");
         registerPacket(PacketDownloadHostInfo.class, "SubDownloadHostInfo");
         registerPacket(PacketDownloadLang.class, "SubDownloadLang");
         registerPacket(PacketDownloadPlayerList.class, "SubDownloadPlayerList");

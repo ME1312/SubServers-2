@@ -96,11 +96,7 @@ public class InternalRenderer extends UIRenderer {
             }
         }
 
-        ItemStack stack = new ItemStack(Material.SKULL_ITEM, 1, (short) 3);
-        SkullMeta meta = (SkullMeta) stack.getItemMeta();
-        meta.setOwner("MHF_Question");
-        stack.setItemMeta(meta);
-        return stack;
+        return new ItemStack(Material.ENDER_CHEST);
     }
 
     public void hostMenu(final int page) {
@@ -124,7 +120,7 @@ public class InternalRenderer extends UIRenderer {
             int i = 0;
             int min = ((page - 1) * 36);
             int max = (min + 35);
-            int count = (hosts.size() == 0)?27:((hosts.size() - min - 1 >= max)?36:hosts.size() - min);
+            int count = (hosts.size() == 0)?27:((hosts.size() - min >= max)?36:hosts.size() - min);
             int area = (count % 9 == 0) ? count : (int) (Math.floor(count / 9) + 1) * 9;
 
             Inventory inv = Bukkit.createInventory(null, 18 + area, plugin.lang.getSection("Lang").getColoredString("Interface.Host-Menu.Title", '&'));
@@ -294,6 +290,7 @@ public class InternalRenderer extends UIRenderer {
                     blockMeta = block.getItemMeta();
                     blockMeta.setDisplayName(plugin.lang.getSection("Lang").getColoredString("Interface.Host-Admin.Plugins", '&'));
                 }
+                block.setItemMeta(blockMeta);
                 inv.setItem(27, block);
                 inv.setItem(28, block);
 
@@ -339,12 +336,10 @@ public class InternalRenderer extends UIRenderer {
 
     public void hostCreator(final CreatorOptions options) {
         setDownloading(ChatColor.stripColor(plugin.lang.getSection("Lang").getColoredString("Interface.Host-Creator.Title", '&').replace("$str$", options.getHost())));
-        final int lastPage = this.lastPage;
         lastUsedOptions = options;
         if (!options.init()) {
             windowHistory.add(() -> hostCreator(options));
             lastVistedObject = options.getHost();
-            this.lastPage = lastPage;
         }
 
         plugin.subdata.sendPacket(new PacketDownloadHostInfo(options.getHost(), json -> {
@@ -484,11 +479,13 @@ public class InternalRenderer extends UIRenderer {
                 lastUsedOptions = null;
                 if (hasHistory()) back();
             } else {
+                lastPage = page;
                 setDownloading(null);
                 List<String> templates = new ArrayList<String>();
                 for (String template : json.getJSONObject("host").getJSONObject("creator").getJSONObject("templates").keySet()) {
                     if (json.getJSONObject("host").getJSONObject("creator").getJSONObject("templates").getJSONObject(template).getBoolean("enabled")) templates.add(template);
                 }
+                Collections.sort(templates);
 
                 ItemStack block;
                 ItemMeta blockMeta;
@@ -500,8 +497,8 @@ public class InternalRenderer extends UIRenderer {
                 int i = 0;
                 int min = ((page - 1) * 36);
                 int max = (min + 35);
-                int count = (templates.size() == 0) ? 27 : ((templates.size() - min - 1 >= max) ? 36 : templates.size() - min);
-                int area = (count % 9 == 0) ? count : (int) (Math.floor(count / 9) + 1) * 9;
+                int count = (templates.size() == 0)?27:((templates.size() - min >= max)?36:templates.size() - min);
+                int area = (count % 9 == 0)?count: (int) (Math.floor(count / 9) + 1) * 9;
 
                 Inventory inv = Bukkit.createInventory(null, 18 + area, plugin.lang.getSection("Lang").getColoredString("Interface.Host-Creator.Edit-Template.Title", '&').replace("$str$", json.getJSONObject("host").getString("display")));
                 block = new ItemStack(Material.STAINED_GLASS_PANE, 1, (short) 7);
@@ -613,7 +610,7 @@ public class InternalRenderer extends UIRenderer {
                 int i = 0;
                 int min = ((page - 1) * 36);
                 int max = (min + 35);
-                int count = (renderers.size() == 0)?27:((renderers.size() - min - 1 >= max)?36:renderers.size() - min);
+                int count = (renderers.size() == 0)?27:((renderers.size() - min >= max)?36:renderers.size() - min);
                 int area = (count % 9 == 0) ? count : (int) (Math.floor(count / 9) + 1) * 9;
 
                 Inventory inv = Bukkit.createInventory(null, 18 + area, plugin.lang.getSection("Lang").getColoredString("Interface.Host-Plugin.Title", '&').replace("$str$", json.getJSONObject("host").getString("display")));
@@ -732,7 +729,7 @@ public class InternalRenderer extends UIRenderer {
             int i = 0;
             int min = ((page - 1) * 36);
             int max = (min + 35);
-            int count = (subservers.size() == 0)?27:((subservers.size() - min - 1 >= max)?36:subservers.size() - min);
+            int count = (subservers.size() == 0)?27:((subservers.size() - min >= max)?36:subservers.size() - min);
             int area = (count % 9 == 0) ? count : (int) (Math.floor(count / 9) + 1) * 9;
 
             Inventory inv = Bukkit.createInventory(null, 18 + area, (host == null)?plugin.lang.getSection("Lang").getColoredString("Interface.SubServer-Menu.Title", '&'):plugin.lang.getSection("Lang").getColoredString("Interface.Host-SubServer.Title", '&').replace("$str$", json.getJSONObject("hosts").getJSONObject(host).getString("display")));
@@ -1053,7 +1050,7 @@ public class InternalRenderer extends UIRenderer {
                 int i = 0;
                 int min = ((page - 1) * 36);
                 int max = (min + 35);
-                int count = (renderers.size() == 0)?27:((renderers.size() - min - 1 >= max)?36:renderers.size() - min);
+                int count = (renderers.size() == 0)?27:((renderers.size() - min >= max)?36:renderers.size() - min);
                 int area = (count % 9 == 0) ? count : (int) (Math.floor(count / 9) + 1) * 9;
 
                 Inventory inv = Bukkit.createInventory(null, 18 + area, plugin.lang.getSection("Lang").getColoredString("Interface.SubServer-Plugin.Title", '&').replace("$str$", json.getJSONObject("server").getString("display")));

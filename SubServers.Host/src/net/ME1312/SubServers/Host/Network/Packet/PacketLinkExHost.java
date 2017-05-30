@@ -45,6 +45,7 @@ public class PacketLinkExHost implements PacketIn, PacketOut {
     @Override
     public void execute(JSONObject data) {
         if (data.getInt("r") == 0) {
+            host.subdata.sendPacket(new PacketExConfigureHost(host));
             host.subdata.sendPacket(new PacketDownloadLang());
             host.subdata.sendPacket(new PacketOutExRequestQueue());
             host.api.executeEvent(new SubNetworkConnectEvent(host.subdata));

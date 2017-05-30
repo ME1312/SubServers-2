@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10,"i8":10,"i9":10};
+var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -133,12 +133,11 @@ extends <a href="../../../../../../net/ME1312/SubServers/Host/Library/Event/Even
 <th class="colOne" scope="col">Constructor and Description</th>
 </tr>
 <tr class="altColor">
-<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Host/API/Event/SubCreateEvent.html#SubCreateEvent-java.util.UUID-java.lang.String-java.lang.String-net.ME1312.SubServers.Host.Executable.SubCreator.ServerType-net.ME1312.SubServers.Host.Library.Version.Version-int-int-">SubCreateEvent</a></span>(java.util.UUID&nbsp;player,
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Host/API/Event/SubCreateEvent.html#SubCreateEvent-java.util.UUID-java.lang.String-java.lang.String-java.lang.String-net.ME1312.SubServers.Host.Library.Version.Version-int-">SubCreateEvent</a></span>(java.util.UUID&nbsp;player,
               java.lang.String&nbsp;host,
               java.lang.String&nbsp;name,
-              <a href="../../../../../../net/ME1312/SubServers/Host/Executable/SubCreator.ServerType.html" title="enum in net.ME1312.SubServers.Host.Executable">SubCreator.ServerType</a>&nbsp;type,
+              java.lang.String&nbsp;template,
               <a href="../../../../../../net/ME1312/SubServers/Host/Library/Version/Version.html" title="class in net.ME1312.SubServers.Host.Library.Version">Version</a>&nbsp;version,
-              int&nbsp;memory,
               int&nbsp;port)</code>
 <div class="block">Server Create Event</div>
 </td>
@@ -165,33 +164,33 @@ extends <a href="../../../../../../net/ME1312/SubServers/Host/Library/Event/Even
 </td>
 </tr>
 <tr id="i1" class="rowColor">
-<td class="colFirst"><code>int</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Host/API/Event/SubCreateEvent.html#getMemory--">getMemory</a></span>()</code>
-<div class="block">Get the Server RAM Amount (in MB)</div>
-</td>
-</tr>
-<tr id="i2" class="altColor">
 <td class="colFirst"><code>java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Host/API/Event/SubCreateEvent.html#getName--">getName</a></span>()</code>
 <div class="block">Get the name the SubServer will use</div>
 </td>
 </tr>
-<tr id="i3" class="rowColor">
+<tr id="i2" class="altColor">
 <td class="colFirst"><code>java.util.UUID</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Host/API/Event/SubCreateEvent.html#getPlayer--">getPlayer</a></span>()</code>
 <div class="block">Gets the player that triggered the Event</div>
 </td>
 </tr>
-<tr id="i4" class="altColor">
+<tr id="i3" class="rowColor">
 <td class="colFirst"><code>int</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Host/API/Event/SubCreateEvent.html#getPort--">getPort</a></span>()</code>
 <div class="block">Get the Port the Server will use</div>
 </td>
 </tr>
+<tr id="i4" class="altColor">
+<td class="colFirst"><code>java.lang.String</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Host/API/Event/SubCreateEvent.html#getTemplate--">getTemplate</a></span>()</code>
+<div class="block">Get the Template to Use</div>
+</td>
+</tr>
 <tr id="i5" class="rowColor">
-<td class="colFirst"><code><a href="../../../../../../net/ME1312/SubServers/Host/Executable/SubCreator.ServerType.html" title="enum in net.ME1312.SubServers.Host.Executable">SubCreator.ServerType</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Host/API/Event/SubCreateEvent.html#getType--">getType</a></span>()</code>
-<div class="block">Get the type of Server to create</div>
+<td class="colFirst"><code>void</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Host/API/Event/SubCreateEvent.html#getTemplate-java.lang.String-">getTemplate</a></span>(java.lang.String&nbsp;value)</code>
+<div class="block">Set the Template to Use</div>
 </td>
 </tr>
 <tr id="i6" class="altColor">
@@ -201,18 +200,6 @@ extends <a href="../../../../../../net/ME1312/SubServers/Host/Library/Event/Even
 </td>
 </tr>
 <tr id="i7" class="rowColor">
-<td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Host/API/Event/SubCreateEvent.html#setMemory-int-">setMemory</a></span>(int&nbsp;value)</code>
-<div class="block">Set the Server RAM Amount (in MB)</div>
-</td>
-</tr>
-<tr id="i8" class="altColor">
-<td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Host/API/Event/SubCreateEvent.html#setType-net.ME1312.SubServers.Host.Executable.SubCreator.ServerType-">setType</a></span>(<a href="../../../../../../net/ME1312/SubServers/Host/Executable/SubCreator.ServerType.html" title="enum in net.ME1312.SubServers.Host.Executable">SubCreator.ServerType</a>&nbsp;value)</code>
-<div class="block">Set the Type of Server to Create</div>
-</td>
-</tr>
-<tr id="i9" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Host/API/Event/SubCreateEvent.html#setVersion-net.ME1312.SubServers.Host.Library.Version.Version-">setVersion</a></span>(<a href="../../../../../../net/ME1312/SubServers/Host/Library/Version/Version.html" title="class in net.ME1312.SubServers.Host.Library.Version">Version</a>&nbsp;value)</code>
 <div class="block">Set the Version the Server will use</div>
@@ -247,7 +234,7 @@ extends <a href="../../../../../../net/ME1312/SubServers/Host/Library/Event/Even
 <!--   -->
 </a>
 <h3>Constructor Detail</h3>
-<a name="SubCreateEvent-java.util.UUID-java.lang.String-java.lang.String-net.ME1312.SubServers.Host.Executable.SubCreator.ServerType-net.ME1312.SubServers.Host.Library.Version.Version-int-int-">
+<a name="SubCreateEvent-java.util.UUID-java.lang.String-java.lang.String-java.lang.String-net.ME1312.SubServers.Host.Library.Version.Version-int-">
 <!--   -->
 </a>
 <ul class="blockListLast">
@@ -256,9 +243,8 @@ extends <a href="../../../../../../net/ME1312/SubServers/Host/Library/Event/Even
 <pre>public&nbsp;SubCreateEvent(java.util.UUID&nbsp;player,
                       java.lang.String&nbsp;host,
                       java.lang.String&nbsp;name,
-                      <a href="../../../../../../net/ME1312/SubServers/Host/Executable/SubCreator.ServerType.html" title="enum in net.ME1312.SubServers.Host.Executable">SubCreator.ServerType</a>&nbsp;type,
+                      java.lang.String&nbsp;template,
                       <a href="../../../../../../net/ME1312/SubServers/Host/Library/Version/Version.html" title="class in net.ME1312.SubServers.Host.Library.Version">Version</a>&nbsp;version,
-                      int&nbsp;memory,
                       int&nbsp;port)</pre>
 <div class="block">Server Create Event</div>
 <dl>
@@ -266,9 +252,8 @@ extends <a href="../../../../../../net/ME1312/SubServers/Host/Library/Event/Even
 <dd><code>player</code> - Player Creating</dd>
 <dd><code>host</code> - Potential Host</dd>
 <dd><code>name</code> - Server Name</dd>
-<dd><code>type</code> - Server Type</dd>
+<dd><code>template</code> - Server Template</dd>
 <dd><code>version</code> - Server Version</dd>
-<dd><code>memory</code> - Server RAM Amount</dd>
 <dd><code>port</code> - Server Port Number</dd>
 </dl>
 </li>
@@ -309,28 +294,28 @@ extends <a href="../../../../../../net/ME1312/SubServers/Host/Library/Event/Even
 </dl>
 </li>
 </ul>
-<a name="getType--">
+<a name="getTemplate--">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
-<h4>getType</h4>
-<pre>public&nbsp;<a href="../../../../../../net/ME1312/SubServers/Host/Executable/SubCreator.ServerType.html" title="enum in net.ME1312.SubServers.Host.Executable">SubCreator.ServerType</a>&nbsp;getType()</pre>
-<div class="block">Get the type of Server to create</div>
+<h4>getTemplate</h4>
+<pre>public&nbsp;java.lang.String&nbsp;getTemplate()</pre>
+<div class="block">Get the Template to Use</div>
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd>Server Type</dd>
+<dd>Server Template</dd>
 </dl>
 </li>
 </ul>
-<a name="setType-net.ME1312.SubServers.Host.Executable.SubCreator.ServerType-">
+<a name="getTemplate-java.lang.String-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
-<h4>setType</h4>
-<pre>public&nbsp;void&nbsp;setType(<a href="../../../../../../net/ME1312/SubServers/Host/Executable/SubCreator.ServerType.html" title="enum in net.ME1312.SubServers.Host.Executable">SubCreator.ServerType</a>&nbsp;value)</pre>
-<div class="block">Set the Type of Server to Create</div>
+<h4>getTemplate</h4>
+<pre>public&nbsp;void&nbsp;getTemplate(java.lang.String&nbsp;value)</pre>
+<div class="block">Set the Template to Use</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>value</code> - Value</dd>
@@ -359,34 +344,6 @@ extends <a href="../../../../../../net/ME1312/SubServers/Host/Library/Event/Even
 <h4>setVersion</h4>
 <pre>public&nbsp;void&nbsp;setVersion(<a href="../../../../../../net/ME1312/SubServers/Host/Library/Version/Version.html" title="class in net.ME1312.SubServers.Host.Library.Version">Version</a>&nbsp;value)</pre>
 <div class="block">Set the Version the Server will use</div>
-<dl>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>value</code> - Value</dd>
-</dl>
-</li>
-</ul>
-<a name="getMemory--">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>getMemory</h4>
-<pre>public&nbsp;int&nbsp;getMemory()</pre>
-<div class="block">Get the Server RAM Amount (in MB)</div>
-<dl>
-<dt><span class="returnLabel">Returns:</span></dt>
-<dd>RAM Amount</dd>
-</dl>
-</li>
-</ul>
-<a name="setMemory-int-">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>setMemory</h4>
-<pre>public&nbsp;void&nbsp;setMemory(int&nbsp;value)</pre>
-<div class="block">Set the Server RAM Amount (in MB)</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>value</code> - Value</dd>

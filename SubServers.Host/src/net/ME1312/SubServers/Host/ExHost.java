@@ -34,6 +34,7 @@ import java.util.zip.ZipInputStream;
  * SubServers.Host Main Class
  */
 public final class ExHost {
+    public HashMap<String, SubCreator.ServerTemplate> templates = new HashMap<String, SubCreator.ServerTemplate>();
     public HashMap<String, SubServer> servers = new HashMap<String, SubServer>();
     public SubCreator creator;
 
@@ -45,7 +46,7 @@ public final class ExHost {
     public SubDataClient subdata = null;
 
     public final Version version = new Version("2.11.2c");
-    public final Version bversion = new Version(1);
+    public final Version bversion = null;
     public final SubAPI api = new SubAPI(this);
 
     private boolean running;
@@ -76,9 +77,30 @@ public final class ExHost {
                 log.info.println("Updated ~/config.yml");
             }
 
-            if (!(new UniversalFile(dir, "Templates").exists())) {
-                unzip(ExHost.class.getResourceAsStream("/net/ME1312/SubServers/Host/Library/Files/templates.zip"), dir);
-                System.out.println("SubServers > Created ~/Templates");
+            if (!(new UniversalFile(dir, "Templates").exists())) new UniversalFile(dir, "Templates").mkdirs();
+            if (!(new UniversalFile(dir, "Templates:Vanilla:template.yml").exists())) {
+                unzip(SubPlugin.class.getResourceAsStream("/net/ME1312/SubServers/Host/Library/Files/Templates/vanilla.zip"), new UniversalFile(dir, "Templates"));
+                log.info.println("Created ~/SubServers/Templates/Vanilla");
+            } else if ((new Version((new YAMLConfig(new UniversalFile(dir, "Templates:Vanilla:template.yml"))).get().getString("Version", "0")).compareTo(new Version("2.11.2m+"))) != 0) {
+                Files.move(new UniversalFile(dir, "Templates:Vanilla").toPath(), new UniversalFile(dir, "Templates:Vanilla.old" + Math.round(Math.random() * 100000)).toPath());
+                unzip(SubPlugin.class.getResourceAsStream("/net/ME1312/SubServers/Host/Library/Files/Templates/vanilla.zip"), new UniversalFile(dir, "Templates"));
+                log.info.println("Updated ~/SubServers/Templates/Vanilla");
+            }
+            if (!(new UniversalFile(dir, "Templates:Spigot:template.yml").exists())) {
+                unzip(SubPlugin.class.getResourceAsStream("/net/ME1312/SubServers/Host/Library/Files/Templates/spigot.zip"), new UniversalFile(dir, "Templates"));
+                log.info.println("Created ~/SubServers/Templates/Spigot");
+            } else if ((new Version((new YAMLConfig(new UniversalFile(dir, "Templates:Spigot:template.yml"))).get().getString("Version", "0")).compareTo(new Version("2.11.2m+"))) != 0) {
+                Files.move(new UniversalFile(dir, "Templates:Vanilla").toPath(), new UniversalFile(dir, "Templates:Spigot.old" + Math.round(Math.random() * 100000)).toPath());
+                unzip(SubPlugin.class.getResourceAsStream("/net/ME1312/SubServers/Host/Library/Files/Templates/spigot.zip"), new UniversalFile(dir, "Templates"));
+                log.info.println("Updated ~/SubServers/Templates/Spigot");
+            }
+            if (!(new UniversalFile(dir, "Templates:Sponge:template.yml").exists())) {
+                unzip(SubPlugin.class.getResourceAsStream("/net/ME1312/SubServers/Host/Library/Files/Templates/sponge.zip"), new UniversalFile(dir, "Templates"));
+                log.info.println("Created ~/SubServers/Templates/Sponge");
+            } else if ((new Version((new YAMLConfig(new UniversalFile(dir, "Templates:Sponge:template.yml"))).get().getString("Version", "0")).compareTo(new Version("2.11.2m+"))) != 0) {
+                Files.move(new UniversalFile(dir, "Templates:Vanilla").toPath(), new UniversalFile(dir, "Templates:Sponge.old" + Math.round(Math.random() * 100000)).toPath());
+                unzip(SubPlugin.class.getResourceAsStream("/net/ME1312/SubServers/Host/Library/Files/Templates/sponge.zip"), new UniversalFile(dir, "Templates"));
+                log.info.println("Updated ~/SubServers/Templates/Sponge");
             }
 
             if (new UniversalFile(dir, "Recently Deleted").exists()) {
@@ -92,22 +114,22 @@ public final class ExHost {
                                     if (TimeUnit.MILLISECONDS.toDays(Calendar.getInstance().getTime().getTime() - json.getLong("Timestamp")) >= 7) {
                                         Util.deleteDirectory(file);
                                         f--;
-                                        log.info.println("SubServers > Removed ~/Recently Deleted/" + file.getName());
+                                        log.info.println("Removed ~/Recently Deleted/" + file.getName());
                                     }
                                 } else {
                                     Util.deleteDirectory(file);
                                     f--;
-                                    log.info.println("SubServers > Removed ~/Recently Deleted/" + file.getName());
+                                    log.info.println("Removed ~/Recently Deleted/" + file.getName());
                                 }
                             } else {
                                 Util.deleteDirectory(file);
                                 f--;
-                                log.info.println("SubServers > Removed ~/Recently Deleted/" + file.getName());
+                                log.info.println("Removed ~/Recently Deleted/" + file.getName());
                             }
                         } else {
                             Files.delete(file.toPath());
                             f--;
-                            log.info.println("SubServers > Removed ~/Recently Deleted/" + file.getName());
+                            log.info.println("Removed ~/Recently Deleted/" + file.getName());
                         }
                     } catch (Exception e) {
                         log.error.println(e);
@@ -123,6 +145,20 @@ public final class ExHost {
                     InetAddress.getByName(config.get().getSection("Settings").getSection("SubData").getString("Address", "127.0.0.1:4391").split(":")[0]),
                     Integer.parseInt(config.get().getSection("Settings").getSection("SubData").getString("Address", "127.0.0.1:4391").split(":")[1]));
             creator = new SubCreator(this);
+
+            if (new UniversalFile(dir, "Templates").exists()) for (File file : new UniversalFile(dir, "Templates").listFiles()) {
+                try {
+                    if (file.isDirectory()) {
+                        YAMLSection config = (new UniversalFile(file, "template.yml").exists())?new YAMLConfig(new UniversalFile(file, "template.yml")).get().getSection("Template", new YAMLSection()):new YAMLSection();
+                        SubCreator.ServerTemplate template = new SubCreator.ServerTemplate(file.getName(), config.getBoolean("Enabled", true), config.getRawString("Icon", "::NULL::"), file, config.getSection("Build", new YAMLSection()), config.getSection("Settings", new YAMLSection()));
+                        templates.put(file.getName().toLowerCase(), template);
+                        if (config.getKeys().contains("Display")) template.setDisplayName(config.getString("Display"));
+                    }
+                } catch (Exception e) {
+                    System.out.println("SubCreator > Couldn't load template: " + file.getName());
+                    e.printStackTrace();
+                }
+            }
 
             if (System.getProperty("subservers.host.plugins", "").length() > 0) {
                 long begin = Calendar.getInstance().getTime().getTime();

@@ -15,14 +15,11 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import java.io.*;
 import java.net.URL;
 import java.nio.charset.Charset;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -52,7 +49,7 @@ public class InternalSubCreator extends SubCreator {
             try {
                 if (file.isDirectory()) {
                     YAMLSection config = (new UniversalFile(file, "template.yml").exists())?new YAMLConfig(new UniversalFile(file, "template.yml")).get().getSection("Template", new YAMLSection()):new YAMLSection();
-                    ServerTemplate template = new ServerTemplate(file.getName(), config.getBoolean("Enabled", true), (config.contains("Icon"))?config.getRawString("Icon"):null, file, config.getSection("Build", new YAMLSection()), config.getSection("Settings", new YAMLSection()));
+                    ServerTemplate template = new ServerTemplate(file.getName(), config.getBoolean("Enabled", true), config.getRawString("Icon", "::NULL::"), file, config.getSection("Build", new YAMLSection()), config.getSection("Settings", new YAMLSection()));
                     templates.put(file.getName().toLowerCase(), template);
                     if (config.getKeys().contains("Display")) template.setDisplayName(config.getString("Display"));
                 }
@@ -63,7 +60,6 @@ public class InternalSubCreator extends SubCreator {
         }
     }
 
-
     private void run(UUID player, String name, ServerTemplate template, Version version, int port) {
         UniversalFile dir = new UniversalFile(new File(host.getPath()), name);
         dir.mkdirs();
@@ -71,7 +67,6 @@ public class InternalSubCreator extends SubCreator {
         System.out.println(host.getName() + "/Creator > Generating Server Files...");
         try {
             Util.copyDirectory(template.getDirectory(), dir);
-            new UniversalFile(dir, "template.yml").delete();
             generateProperties(dir, port);
             generateClient(dir, template.getType(), name);
 
@@ -132,7 +127,7 @@ public class InternalSubCreator extends SubCreator {
 
             try {
                 System.out.println(host.getName() + "/Creator > Launching " + template.getBuildOptions().getRawString("Shell-Location"));
-                process = Runtime.getRuntime().exec((System.getProperty("os.name").toLowerCase().indexOf("win") >= 0)?"\"" + gitBash + "\" --login -i -c \"bash " + template.getBuildOptions().getRawString("Shell-Location") + ' ' + version.toString() + " " + System.getProperty("user.home").replace("\"", "\\\"") + "\"":("bash " + template.getBuildOptions().getRawString("Shell-Location") + ' ' + version.toString() + " " + System.getProperty("user.home")), null, dir);
+                process = Runtime.getRuntime().exec((System.getProperty("os.name").toLowerCase().indexOf("win") >= 0)?"\"" + gitBash + "\" --login -i -c \"bash " + template.getBuildOptions().getRawString("Shell-Location") + ' ' + version.toString() + '\"':("bash " + template.getBuildOptions().getRawString("Shell-Location") + ' ' + version.toString() + " " + System.getProperty("user.home")), null, dir);
                 logger.process = this.process;
                 logger.log.set(host.plugin.config.get().getSection("Settings").getBoolean("Log-Creator"));
                 logger.file = new File(dir, "SubCreator-" + template.getType().toString() + "-" + version.toString().replace(" ", "@") + ".log");
@@ -148,7 +143,7 @@ public class InternalSubCreator extends SubCreator {
             }
         }
 
-
+        new UniversalFile(dir, "template.yml").delete();
         if (!error) {
             try {
                 System.out.println(host.getName() + "/Creator > Saving...");

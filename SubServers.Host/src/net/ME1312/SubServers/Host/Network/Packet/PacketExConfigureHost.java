@@ -1,5 +1,6 @@
 package net.ME1312.SubServers.Host.Network.Packet;
 
+import net.ME1312.SubServers.Host.Executable.SubCreator;
 import net.ME1312.SubServers.Host.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Host.Library.Log.Logger;
 import net.ME1312.SubServers.Host.Library.Version.Version;
@@ -33,7 +34,21 @@ public class PacketExConfigureHost implements PacketIn, PacketOut {
 
     @Override
     public JSONObject generate() {
-        return null;
+        JSONObject json = new JSONObject();
+        JSONObject templates = new JSONObject();
+        for (SubCreator.ServerTemplate template : host.templates.values()) {
+            JSONObject tinfo = new JSONObject();
+            tinfo.put("enabled", template.isEnabled());
+            tinfo.put("display", template.getDisplayName());
+            tinfo.put("icon", template.getIcon());
+            tinfo.put("type", template.getType().toString());
+            tinfo.put("dir", template.getDirectory().toString());
+            tinfo.put("build", template.getBuildOptions().toJSON());
+            tinfo.put("options", template.getConfigOptions().toJSON());
+            templates.put(template.getName(), tinfo);
+        }
+        json.put("templates", templates);
+        return json;
     }
 
     @Override
