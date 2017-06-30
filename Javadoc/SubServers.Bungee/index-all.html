@@ -112,6 +112,29 @@
 </dd>
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Host/Internal/InternalHost.html#addSubServer-java.util.UUID-java.lang.String-boolean-int-java.lang.String-boolean-java.lang.String-net.ME1312.SubServers.Bungee.Host.Executable-java.lang.String-boolean-boolean-boolean-boolean-boolean-">addSubServer(UUID, String, boolean, int, String, boolean, String, Executable, String, boolean, boolean, boolean, boolean, boolean)</a></span> - Method in class net.ME1312.SubServers.Bungee.Host.Internal.<a href="net/ME1312/SubServers/Bungee/Host/Internal/InternalHost.html" title="class in net.ME1312.SubServers.Bungee.Host.Internal">InternalHost</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="net/ME1312/SubServers/Bungee/Network/AES.html" title="class in net.ME1312.SubServers.Bungee.Network"><span class="typeNameLink">AES</span></a> - Class in <a href="net/ME1312/SubServers/Bungee/Network/package-summary.html">net.ME1312.SubServers.Bungee.Network</a></dt>
+<dd>
+<div class="block">A class to perform password-based AES encryption and decryption in CBC mode.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Network/AES.html#AES--">AES()</a></span> - Constructor for class net.ME1312.SubServers.Bungee.Network.<a href="net/ME1312/SubServers/Bungee/Network/AES.html" title="class in net.ME1312.SubServers.Bungee.Network">AES</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="net/ME1312/SubServers/Bungee/Network/AES.InvalidAESStreamException.html" title="class in net.ME1312.SubServers.Bungee.Network"><span class="typeNameLink">AES.InvalidAESStreamException</span></a> - Exception in <a href="net/ME1312/SubServers/Bungee/Network/package-summary.html">net.ME1312.SubServers.Bungee.Network</a></dt>
+<dd>
+<div class="block">Thrown if an attempt is made to decrypt an invalid AES stream.</div>
+</dd>
+<dt><a href="net/ME1312/SubServers/Bungee/Network/AES.InvalidKeyLengthException.html" title="class in net.ME1312.SubServers.Bungee.Network"><span class="typeNameLink">AES.InvalidKeyLengthException</span></a> - Exception in <a href="net/ME1312/SubServers/Bungee/Network/package-summary.html">net.ME1312.SubServers.Bungee.Network</a></dt>
+<dd>
+<div class="block">Thrown if an attempt is made to encrypt a stream with an invalid AES key length.</div>
+</dd>
+<dt><a href="net/ME1312/SubServers/Bungee/Network/AES.InvalidPasswordException.html" title="class in net.ME1312.SubServers.Bungee.Network"><span class="typeNameLink">AES.InvalidPasswordException</span></a> - Exception in <a href="net/ME1312/SubServers/Bungee/Network/package-summary.html">net.ME1312.SubServers.Bungee.Network</a></dt>
+<dd>
+<div class="block">Thrown if an attempt is made to decrypt a stream with an incorrect password.</div>
+</dd>
+<dt><a href="net/ME1312/SubServers/Bungee/Network/AES.StrongEncryptionNotAvailableException.html" title="class in net.ME1312.SubServers.Bungee.Network"><span class="typeNameLink">AES.StrongEncryptionNotAvailableException</span></a> - Exception in <a href="net/ME1312/SubServers/Bungee/Network/package-summary.html">net.ME1312.SubServers.Bungee.Network</a></dt>
+<dd>
+<div class="block">Thrown if 192- or 256-bit AES encryption or decryption is attempted,
+ but not available on the particular Java platform.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Network/SubDataServer.html#allowConnection-java.net.InetAddress-">allowConnection(InetAddress)</a></span> - Static method in class net.ME1312.SubServers.Bungee.Network.<a href="net/ME1312/SubServers/Bungee/Network/SubDataServer.html" title="class in net.ME1312.SubServers.Bungee.Network">SubDataServer</a></dt>
 <dd>
 <div class="block">Allow Connections from an Address</div>
@@ -315,6 +338,14 @@
 </a>
 <h2 class="title">D</h2>
 <dl>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Network/AES.html#decrypt-java.lang.String-java.io.InputStream-java.io.OutputStream-">decrypt(String, InputStream, OutputStream)</a></span> - Static method in class net.ME1312.SubServers.Bungee.Network.<a href="net/ME1312/SubServers/Bungee/Network/AES.html" title="class in net.ME1312.SubServers.Bungee.Network">AES</a></dt>
+<dd>
+<div class="block">Decrypts a stream of data that was encrypted by <a href="net/ME1312/SubServers/Bungee/Network/AES.html#encrypt-int-java.lang.String-java.io.InputStream-java.io.OutputStream-"><code>AES.encrypt(int, java.lang.String, java.io.InputStream, java.io.OutputStream)</code></a>.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Network/AES.html#decrypt-java.lang.String-byte:A-">decrypt(String, byte[])</a></span> - Static method in class net.ME1312.SubServers.Bungee.Network.<a href="net/ME1312/SubServers/Bungee/Network/AES.html" title="class in net.ME1312.SubServers.Bungee.Network">AES</a></dt>
+<dd>
+<div class="block">Decrypts a stream of data that was encrypted by <a href="net/ME1312/SubServers/Bungee/Network/AES.html#encrypt-int-java.lang.String-java.io.InputStream-java.io.OutputStream-"><code>AES.encrypt(int, java.lang.String, java.io.InputStream, java.io.OutputStream)</code></a>.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Library/Util.html#deleteDirectory-java.io.File-">deleteDirectory(File)</a></span> - Static method in class net.ME1312.SubServers.Bungee.Library.<a href="net/ME1312/SubServers/Bungee/Library/Util.html" title="class in net.ME1312.SubServers.Bungee.Library">Util</a></dt>
 <dd>
 <div class="block">Delete Directory</div>
@@ -341,6 +372,10 @@
 </dd>
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/SubPlugin.html#dir">dir</a></span> - Variable in class net.ME1312.SubServers.Bungee.<a href="net/ME1312/SubServers/Bungee/SubPlugin.html" title="class in net.ME1312.SubServers.Bungee">SubPlugin</a></dt>
 <dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Network/Client.html#disconnect--">disconnect()</a></span> - Method in class net.ME1312.SubServers.Bungee.Network.<a href="net/ME1312/SubServers/Bungee/Network/Client.html" title="class in net.ME1312.SubServers.Bungee.Network">Client</a></dt>
+<dd>
+<div class="block">Disconnects the Client (does not remove them from the server)</div>
+</dd>
 </dl>
 <a name="I:E">
 <!--   -->
@@ -370,6 +405,14 @@
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Host/SubServer.html#edit-net.ME1312.SubServers.Bungee.Library.Config.YAMLSection-">edit(YAMLSection)</a></span> - Method in class net.ME1312.SubServers.Bungee.Host.<a href="net/ME1312/SubServers/Bungee/Host/SubServer.html" title="class in net.ME1312.SubServers.Bungee.Host">SubServer</a></dt>
 <dd>
 <div class="block">Edits the Server</div>
+</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Network/AES.html#encrypt-int-java.lang.String-java.io.InputStream-java.io.OutputStream-">encrypt(int, String, InputStream, OutputStream)</a></span> - Static method in class net.ME1312.SubServers.Bungee.Network.<a href="net/ME1312/SubServers/Bungee/Network/AES.html" title="class in net.ME1312.SubServers.Bungee.Network">AES</a></dt>
+<dd>
+<div class="block">Encrypts a stream of data.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Network/AES.html#encrypt-int-java.lang.String-java.lang.String-">encrypt(int, String, String)</a></span> - Static method in class net.ME1312.SubServers.Bungee.Network.<a href="net/ME1312/SubServers/Bungee/Network/AES.html" title="class in net.ME1312.SubServers.Bungee.Network">AES</a></dt>
+<dd>
+<div class="block">Encrypts a stream of data.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Library/Version/Version.html#equals-net.ME1312.SubServers.Bungee.Library.Version.Version-">equals(Version)</a></span> - Method in class net.ME1312.SubServers.Bungee.Library.Version.<a href="net/ME1312/SubServers/Bungee/Library/Version/Version.html" title="class in net.ME1312.SubServers.Bungee.Library.Version">Version</a></dt>
 <dd>
@@ -669,7 +712,7 @@
 </dd>
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Network/SubDataServer.html#getClients--">getClients()</a></span> - Method in class net.ME1312.SubServers.Bungee.Network.<a href="net/ME1312/SubServers/Bungee/Network/SubDataServer.html" title="class in net.ME1312.SubServers.Bungee.Network">SubDataServer</a></dt>
 <dd>
-<div class="block">Grabs all the Clients from the Network</div>
+<div class="block">Grabs all the Clients on the Network</div>
 </dd>
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Library/Config/YAMLSection.html#getColoredString-java.lang.String-char-">getColoredString(String, char)</a></span> - Method in class net.ME1312.SubServers.Bungee.Library.Config.<a href="net/ME1312/SubServers/Bungee/Library/Config/YAMLSection.html" title="class in net.ME1312.SubServers.Bungee.Library.Config">YAMLSection</a></dt>
 <dd>
@@ -766,6 +809,10 @@
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Event/SubEditServerEvent.html#getEdit--">getEdit()</a></span> - Method in class net.ME1312.SubServers.Bungee.Event.<a href="net/ME1312/SubServers/Bungee/Event/SubEditServerEvent.html" title="class in net.ME1312.SubServers.Bungee.Event">SubEditServerEvent</a></dt>
 <dd>
 <div class="block">Gets the edit to be made</div>
+</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Network/SubDataServer.html#getEncryption--">getEncryption()</a></span> - Method in class net.ME1312.SubServers.Bungee.Network.<a href="net/ME1312/SubServers/Bungee/Network/SubDataServer.html" title="class in net.ME1312.SubServers.Bungee.Network">SubDataServer</a></dt>
+<dd>
+<div class="block">Gets the Server's Encryption method</div>
 </dd>
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Host/External/ExternalSubServer.html#getExecutable--">getExecutable()</a></span> - Method in class net.ME1312.SubServers.Bungee.Host.External.<a href="net/ME1312/SubServers/Bungee/Host/External/ExternalSubServer.html" title="class in net.ME1312.SubServers.Bungee.Host.External">ExternalSubServer</a></dt>
 <dd>&nbsp;</dd>
@@ -1205,11 +1252,11 @@
 <dd>
 <div class="block">Get a String List by Handle</div>
 </dd>
-<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Host/External/ExternalHost.html#getSubDataClient--">getSubDataClient()</a></span> - Method in class net.ME1312.SubServers.Bungee.Host.External.<a href="net/ME1312/SubServers/Bungee/Host/External/ExternalHost.html" title="class in net.ME1312.SubServers.Bungee.Host.External">ExternalHost</a></dt>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Host/External/ExternalHost.html#getSubData--">getSubData()</a></span> - Method in class net.ME1312.SubServers.Bungee.Host.External.<a href="net/ME1312/SubServers/Bungee/Host/External/ExternalHost.html" title="class in net.ME1312.SubServers.Bungee.Host.External">ExternalHost</a></dt>
 <dd>&nbsp;</dd>
-<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Host/Server.html#getSubDataClient--">getSubDataClient()</a></span> - Method in class net.ME1312.SubServers.Bungee.Host.<a href="net/ME1312/SubServers/Bungee/Host/Server.html" title="class in net.ME1312.SubServers.Bungee.Host">Server</a></dt>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Host/Server.html#getSubData--">getSubData()</a></span> - Method in class net.ME1312.SubServers.Bungee.Host.<a href="net/ME1312/SubServers/Bungee/Host/Server.html" title="class in net.ME1312.SubServers.Bungee.Host">Server</a></dt>
 <dd>&nbsp;</dd>
-<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Network/ClientHandler.html#getSubDataClient--">getSubDataClient()</a></span> - Method in interface net.ME1312.SubServers.Bungee.Network.<a href="net/ME1312/SubServers/Bungee/Network/ClientHandler.html" title="interface in net.ME1312.SubServers.Bungee.Network">ClientHandler</a></dt>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Network/ClientHandler.html#getSubData--">getSubData()</a></span> - Method in interface net.ME1312.SubServers.Bungee.Network.<a href="net/ME1312/SubServers/Bungee/Network/ClientHandler.html" title="interface in net.ME1312.SubServers.Bungee.Network">ClientHandler</a></dt>
 <dd>
 <div class="block">Gets the SubData Client</div>
 </dd>
@@ -1425,6 +1472,10 @@
 <dd>
 <div class="block">Creates an Internal SubServer</div>
 </dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Network/AES.InvalidAESStreamException.html#InvalidAESStreamException--">InvalidAESStreamException()</a></span> - Constructor for exception net.ME1312.SubServers.Bungee.Network.<a href="net/ME1312/SubServers/Bungee/Network/AES.InvalidAESStreamException.html" title="class in net.ME1312.SubServers.Bungee.Network">AES.InvalidAESStreamException</a></dt>
+<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Network/AES.InvalidAESStreamException.html#InvalidAESStreamException-java.lang.Exception-">InvalidAESStreamException(Exception)</a></span> - Constructor for exception net.ME1312.SubServers.Bungee.Network.<a href="net/ME1312/SubServers/Bungee/Network/AES.InvalidAESStreamException.html" title="class in net.ME1312.SubServers.Bungee.Network">AES.InvalidAESStreamException</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="net/ME1312/SubServers/Bungee/Library/Exception/InvalidDriverException.html" title="class in net.ME1312.SubServers.Bungee.Library.Exception"><span class="typeNameLink">InvalidDriverException</span></a> - Exception in <a href="net/ME1312/SubServers/Bungee/Library/Exception/package-summary.html">net.ME1312.SubServers.Bungee.Library.Exception</a></dt>
 <dd>
 <div class="block">Invalid Driver Exception</div>
@@ -1440,6 +1491,8 @@
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Library/Exception/InvalidHostException.html#InvalidHostException--">InvalidHostException()</a></span> - Constructor for exception net.ME1312.SubServers.Bungee.Library.Exception.<a href="net/ME1312/SubServers/Bungee/Library/Exception/InvalidHostException.html" title="class in net.ME1312.SubServers.Bungee.Library.Exception">InvalidHostException</a></dt>
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Library/Exception/InvalidHostException.html#InvalidHostException-java.lang.String-">InvalidHostException(String)</a></span> - Constructor for exception net.ME1312.SubServers.Bungee.Library.Exception.<a href="net/ME1312/SubServers/Bungee/Library/Exception/InvalidHostException.html" title="class in net.ME1312.SubServers.Bungee.Library.Exception">InvalidHostException</a></dt>
+<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Network/AES.InvalidPasswordException.html#InvalidPasswordException--">InvalidPasswordException()</a></span> - Constructor for exception net.ME1312.SubServers.Bungee.Network.<a href="net/ME1312/SubServers/Bungee/Network/AES.InvalidPasswordException.html" title="class in net.ME1312.SubServers.Bungee.Network">AES.InvalidPasswordException</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="net/ME1312/SubServers/Bungee/Library/Exception/InvalidServerException.html" title="class in net.ME1312.SubServers.Bungee.Library.Exception"><span class="typeNameLink">InvalidServerException</span></a> - Exception in <a href="net/ME1312/SubServers/Bungee/Library/Exception/package-summary.html">net.ME1312.SubServers.Bungee.Library.Exception</a></dt>
 <dd>
@@ -1673,14 +1726,6 @@
 </dd>
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Launch.html#Launch--">Launch()</a></span> - Constructor for class net.ME1312.SubServers.Bungee.<a href="net/ME1312/SubServers/Bungee/Launch.html" title="class in net.ME1312.SubServers.Bungee">Launch</a></dt>
 <dd>&nbsp;</dd>
-<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Host/External/ExternalHost.html#linkSubDataClient-net.ME1312.SubServers.Bungee.Network.Client-">linkSubDataClient(Client)</a></span> - Method in class net.ME1312.SubServers.Bungee.Host.External.<a href="net/ME1312/SubServers/Bungee/Host/External/ExternalHost.html" title="class in net.ME1312.SubServers.Bungee.Host.External">ExternalHost</a></dt>
-<dd>&nbsp;</dd>
-<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Host/Server.html#linkSubDataClient-net.ME1312.SubServers.Bungee.Network.Client-">linkSubDataClient(Client)</a></span> - Method in class net.ME1312.SubServers.Bungee.Host.<a href="net/ME1312/SubServers/Bungee/Host/Server.html" title="class in net.ME1312.SubServers.Bungee.Host">Server</a></dt>
-<dd>&nbsp;</dd>
-<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Network/ClientHandler.html#linkSubDataClient-net.ME1312.SubServers.Bungee.Network.Client-">linkSubDataClient(Client)</a></span> - Method in interface net.ME1312.SubServers.Bungee.Network.<a href="net/ME1312/SubServers/Bungee/Network/ClientHandler.html" title="interface in net.ME1312.SubServers.Bungee.Network">ClientHandler</a></dt>
-<dd>
-<div class="block">Link a SubData Client to this Object</div>
-</dd>
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Host/External/ExternalSubLogger.html#log-java.lang.String-">log(String)</a></span> - Method in class net.ME1312.SubServers.Bungee.Host.External.<a href="net/ME1312/SubServers/Bungee/Host/External/ExternalSubLogger.html" title="class in net.ME1312.SubServers.Bungee.Host.External">ExternalSubLogger</a></dt>
 <dd>
 <div class="block">Log a Message</div>
@@ -2303,8 +2348,7 @@
 </dd>
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Network/Client.html#setHandler-net.ME1312.SubServers.Bungee.Network.ClientHandler-">setHandler(ClientHandler)</a></span> - Method in class net.ME1312.SubServers.Bungee.Network.<a href="net/ME1312/SubServers/Bungee/Network/Client.html" title="class in net.ME1312.SubServers.Bungee.Network">Client</a></dt>
 <dd>
-<div class="block">Sets the Handler<br>
- <b>Warning:</b> This method should only be called by ClientHandler methods</div>
+<div class="block">Sets the Handler</div>
 </dd>
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Host/Server.html#setHidden-boolean-">setHidden(boolean)</a></span> - Method in class net.ME1312.SubServers.Bungee.Host.<a href="net/ME1312/SubServers/Bungee/Host/Server.html" title="class in net.ME1312.SubServers.Bungee.Host">Server</a></dt>
 <dd>
@@ -2341,6 +2385,14 @@
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Host/SubServer.html#setStopCommand-java.lang.String-">setStopCommand(String)</a></span> - Method in class net.ME1312.SubServers.Bungee.Host.<a href="net/ME1312/SubServers/Bungee/Host/SubServer.html" title="class in net.ME1312.SubServers.Bungee.Host">SubServer</a></dt>
 <dd>
 <div class="block">Set the Command that Stops the Server</div>
+</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Host/External/ExternalHost.html#setSubData-net.ME1312.SubServers.Bungee.Network.Client-">setSubData(Client)</a></span> - Method in class net.ME1312.SubServers.Bungee.Host.External.<a href="net/ME1312/SubServers/Bungee/Host/External/ExternalHost.html" title="class in net.ME1312.SubServers.Bungee.Host.External">ExternalHost</a></dt>
+<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Host/Server.html#setSubData-net.ME1312.SubServers.Bungee.Network.Client-">setSubData(Client)</a></span> - Method in class net.ME1312.SubServers.Bungee.Host.<a href="net/ME1312/SubServers/Bungee/Host/Server.html" title="class in net.ME1312.SubServers.Bungee.Host">Server</a></dt>
+<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Network/ClientHandler.html#setSubData-net.ME1312.SubServers.Bungee.Network.Client-">setSubData(Client)</a></span> - Method in interface net.ME1312.SubServers.Bungee.Network.<a href="net/ME1312/SubServers/Bungee/Network/ClientHandler.html" title="interface in net.ME1312.SubServers.Bungee.Network">ClientHandler</a></dt>
+<dd>
+<div class="block">Link a SubData Client to this Object</div>
 </dd>
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Event/SubCreateEvent.html#setTemplate-net.ME1312.SubServers.Bungee.Host.SubCreator.ServerTemplate-">setTemplate(SubCreator.ServerTemplate)</a></span> - Method in class net.ME1312.SubServers.Bungee.Event.<a href="net/ME1312/SubServers/Bungee/Event/SubCreateEvent.html" title="class in net.ME1312.SubServers.Bungee.Event">SubCreateEvent</a></dt>
 <dd>
@@ -2430,6 +2482,8 @@
 <dd>
 <div class="block">Reset all changes made by startListeners</div>
 </dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Network/AES.StrongEncryptionNotAvailableException.html#StrongEncryptionNotAvailableException-int-">StrongEncryptionNotAvailableException(int)</a></span> - Constructor for exception net.ME1312.SubServers.Bungee.Network.<a href="net/ME1312/SubServers/Bungee/Network/AES.StrongEncryptionNotAvailableException.html" title="class in net.ME1312.SubServers.Bungee.Network">AES.StrongEncryptionNotAvailableException</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="net/ME1312/SubServers/Bungee/Event/SubAddServerEvent.html" title="class in net.ME1312.SubServers.Bungee.Event"><span class="typeNameLink">SubAddServerEvent</span></a> - Class in <a href="net/ME1312/SubServers/Bungee/Event/package-summary.html">net.ME1312.SubServers.Bungee.Event</a></dt>
 <dd>
 <div class="block">Server Add Event</div>
@@ -2478,10 +2532,12 @@
 <dd>
 <div class="block">SubDataServer Class</div>
 </dd>
-<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Network/SubDataServer.html#SubDataServer-net.ME1312.SubServers.Bungee.SubPlugin-int-int-java.net.InetAddress-">SubDataServer(SubPlugin, int, int, InetAddress)</a></span> - Constructor for class net.ME1312.SubServers.Bungee.Network.<a href="net/ME1312/SubServers/Bungee/Network/SubDataServer.html" title="class in net.ME1312.SubServers.Bungee.Network">SubDataServer</a></dt>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Network/SubDataServer.html#SubDataServer-net.ME1312.SubServers.Bungee.SubPlugin-int-int-java.net.InetAddress-net.ME1312.SubServers.Bungee.Network.SubDataServer.Encryption-">SubDataServer(SubPlugin, int, int, InetAddress, SubDataServer.Encryption)</a></span> - Constructor for class net.ME1312.SubServers.Bungee.Network.<a href="net/ME1312/SubServers/Bungee/Network/SubDataServer.html" title="class in net.ME1312.SubServers.Bungee.Network">SubDataServer</a></dt>
 <dd>
 <div class="block">SubData Server Instance</div>
 </dd>
+<dt><a href="net/ME1312/SubServers/Bungee/Network/SubDataServer.Encryption.html" title="enum in net.ME1312.SubServers.Bungee.Network"><span class="typeNameLink">SubDataServer.Encryption</span></a> - Enum in <a href="net/ME1312/SubServers/Bungee/Network/package-summary.html">net.ME1312.SubServers.Bungee.Network</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="net/ME1312/SubServers/Bungee/Event/SubEditServerEvent.html" title="class in net.ME1312.SubServers.Bungee.Event"><span class="typeNameLink">SubEditServerEvent</span></a> - Class in <a href="net/ME1312/SubServers/Bungee/Event/package-summary.html">net.ME1312.SubServers.Bungee.Event</a></dt>
 <dd>
 <div class="block">Server Edit Event</div>
@@ -2702,12 +2758,21 @@
 <dd>
 <div class="block">Returns the enum constant of this type with the specified name.</div>
 </dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Network/SubDataServer.Encryption.html#valueOf-java.lang.String-">valueOf(String)</a></span> - Static method in enum net.ME1312.SubServers.Bungee.Network.<a href="net/ME1312/SubServers/Bungee/Network/SubDataServer.Encryption.html" title="enum in net.ME1312.SubServers.Bungee.Network">SubDataServer.Encryption</a></dt>
+<dd>
+<div class="block">Returns the enum constant of this type with the specified name.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Host/SubCreator.ServerType.html#values--">values()</a></span> - Static method in enum net.ME1312.SubServers.Bungee.Host.<a href="net/ME1312/SubServers/Bungee/Host/SubCreator.ServerType.html" title="enum in net.ME1312.SubServers.Bungee.Host">SubCreator.ServerType</a></dt>
 <dd>
 <div class="block">Returns an array containing the constants of this enum type, in
 the order they are declared.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketExUpdateServer.UpdateType.html#values--">values()</a></span> - Static method in enum net.ME1312.SubServers.Bungee.Network.Packet.<a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketExUpdateServer.UpdateType.html" title="enum in net.ME1312.SubServers.Bungee.Network.Packet">PacketExUpdateServer.UpdateType</a></dt>
+<dd>
+<div class="block">Returns an array containing the constants of this enum type, in
+the order they are declared.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Network/SubDataServer.Encryption.html#values--">values()</a></span> - Static method in enum net.ME1312.SubServers.Bungee.Network.<a href="net/ME1312/SubServers/Bungee/Network/SubDataServer.Encryption.html" title="enum in net.ME1312.SubServers.Bungee.Network">SubDataServer.Encryption</a></dt>
 <dd>
 <div class="block">Returns an array containing the constants of this enum type, in
 the order they are declared.</div>

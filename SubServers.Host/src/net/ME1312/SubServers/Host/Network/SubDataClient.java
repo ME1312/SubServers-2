@@ -34,8 +34,17 @@ public final class SubDataClient {
     private PrintWriter writer;
     private Socket socket;
     private String name;
+    private Encryption encryption;
     private ExHost host;
     private LinkedList<PacketOut> queue;
+
+    public enum Encryption {
+        NONE,
+        AES,
+        AES_128,
+        AES_192,
+        AES_256
+    }
 
     /**
      * SubServers Client Instance
@@ -45,12 +54,13 @@ public final class SubDataClient {
      * @param port Port
      * @throws IOException
      */
-    public SubDataClient(ExHost host, String name, InetAddress address, int port) throws IOException {
+    public SubDataClient(ExHost host, String name, InetAddress address, int port, Encryption encryption) throws IOException {
         if (Util.isNull(host, name, address, port)) throw new NullPointerException();
         socket = new Socket(address, port);
         this.host = host;
         this.name = name;
         this.writer = new PrintWriter(socket.getOutputStream(), true);
+        this.encryption = encryption;
         this.queue = new LinkedList<PacketOut>();
 
         if (!defaults) loadDefaults();
@@ -118,8 +128,19 @@ public final class SubDataClient {
                 BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                 String input;
                 while ((input = in.readLine()) != null) {
+                    String decoded = null;
                     try {
-                        JSONObject json = new JSONObject(input);
+                        switch (getEncryption()) {
+                            case AES:
+                            case AES_128:
+                            case AES_192:
+                            case AES_256:
+                                decoded = AES.decrypt(host.config.get().getSection("Settings").getSection("SubData").getRawString("Password"), Base64.getDecoder().decode(input)).get();
+                                break;
+                            default:
+                                decoded = input;
+                        }
+                        JSONObject json = new JSONObject(decoded);
                         for (PacketIn packet : decodePacket(json)) {
                             try {
                                 packet.execute((json.keySet().contains("c"))?json.getJSONObject("c"):null);
@@ -127,10 +148,10 @@ public final class SubDataClient {
                                 log.error.println(new InvocationTargetException(e, "Exception while executing PacketIn"));
                             }
                         }
-                    } catch (IllegalPacketException e) {
-                        log.error.println(e);
                     } catch (JSONException e) {
                         log.error.println(new IllegalPacketException("Unknown Packet Format: " + input));
+                    } catch (Exception e) {
+                        log.error.println(e);
                     }
                 }
                 try {
@@ -165,6 +186,15 @@ public final class SubDataClient {
      */
     public Socket getClient() {
         return socket;
+    }
+
+    /**
+     * Gets the Connection's Encryption method
+     *
+     * @return Encryption method
+     */
+    public Encryption getEncryption() {
+        return encryption;
     }
 
     /**
@@ -233,8 +263,21 @@ public final class SubDataClient {
             queue.add(packet);
         } else {
             try {
-                writer.println(encodePacket(packet));
-            } catch (IllegalPacketException e) {
+                switch (getEncryption()) {
+                    case AES:
+                    case AES_128:
+                        writer.println(Base64.getEncoder().encodeToString(AES.encrypt(128, host.config.get().getSection("Settings").getSection("SubData").getRawString("Password"), encodePacket(packet).toString())));
+                        break;
+                    case AES_192:
+                        writer.println(Base64.getEncoder().encodeToString(AES.encrypt(192, host.config.get().getSection("Settings").getSection("SubData").getRawString("Password"), encodePacket(packet).toString())));
+                        break;
+                    case AES_256:
+                        writer.println(Base64.getEncoder().encodeToString(AES.encrypt(256, host.config.get().getSection("Settings").getSection("SubData").getRawString("Password"), encodePacket(packet).toString())));
+                        break;
+                    default:
+                        writer.println(encodePacket(packet));
+                }
+            } catch (Exception e) {
                 log.error.println(e);
             }
         }
@@ -254,8 +297,21 @@ public final class SubDataClient {
             try {
                 JSONObject json = encodePacket(packet);
                 json.put("f", location.toString());
-                writer.println(json);
-            } catch (IllegalPacketException e) {
+                switch (getEncryption()) {
+                    case AES:
+                    case AES_128:
+                        writer.println(Base64.getEncoder().encodeToString(AES.encrypt(128, host.config.get().getSection("Settings").getSection("SubData").getRawString("Password"), json.toString())));
+                        break;
+                    case AES_192:
+                        writer.println(Base64.getEncoder().encodeToString(AES.encrypt(192, host.config.get().getSection("Settings").getSection("SubData").getRawString("Password"), json.toString())));
+                        break;
+                    case AES_256:
+                        writer.println(Base64.getEncoder().encodeToString(AES.encrypt(256, host.config.get().getSection("Settings").getSection("SubData").getRawString("Password"), json.toString())));
+                        break;
+                    default:
+                        writer.println(json.toString());
+                }
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
@@ -326,7 +382,7 @@ public final class SubDataClient {
                     @Override
                     public void run() {
                         try {
-                            host.subdata = new SubDataClient(host, name, socket.getInetAddress(), socket.getPort());
+                            host.subdata = new SubDataClient(host, name, socket.getInetAddress(), socket.getPort(), encryption);
                             timer.cancel();
                             while (queue.size() != 0) {
                                 host.subdata.sendPacket(queue.get(0));

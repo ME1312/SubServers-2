@@ -330,11 +330,12 @@ public class SubCreator {
                 // if (!new UniversalFile(dir, "plugins").exists()) new UniversalFile(dir, "mods").mkdirs();
                 // Util.copyFromJar(SubPlugin.class.getClassLoader(), "net/ME1312/SubServers/Host/Library/Files/Client/sponge.jar", new UniversalFile(dir, "mods:SubServers.Client.jar").getPath());
             }
-            JSONObject config = new JSONObject(Util.readAll(new FileReader(new UniversalFile(dir, "subservers.client"))));
+            JSONObject config = new JSONObject();
             FileWriter writer = new FileWriter(new UniversalFile(dir, "subservers.client"), false);
             config.put("Name", name);
             config.put("Address", host.config.get().getSection("Settings").getSection("SubData").getRawString("Address"));
             config.put("Password", host.config.get().getSection("Settings").getSection("SubData").getRawString("Password"));
+            config.put("Encryption", host.config.get().getSection("Settings").getSection("SubData").getRawString("Encryption", "NONE"));
             config.write(writer);
             writer.close();
         }

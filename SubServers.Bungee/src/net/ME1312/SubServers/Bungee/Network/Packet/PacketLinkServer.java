@@ -56,8 +56,8 @@ public class PacketLinkServer implements PacketIn, PacketOut {
             Map<String, Server> servers = plugin.api.getServers();
             if (servers.keySet().contains(data.getString("name").toLowerCase())) {
                 Server server = servers.get(data.getString("name").toLowerCase());
-                if (server.getSubDataClient() == null) {
-                    server.linkSubDataClient(client);
+                if (server.getSubData() == null) {
+                    client.setHandler(server);
                     System.out.println("SubData > " + client.getAddress().toString() + " has been defined as " + ((server instanceof SubServer) ? "SubServer" : "Server") + ": " + server.getName());
                     client.sendPacket(new PacketLinkServer(0, "Definition Successful"));
                     if (server instanceof SubServer && !((SubServer) server).isRunning()) client.sendPacket(new PacketOutReset("Rogue SubServer Detected"));

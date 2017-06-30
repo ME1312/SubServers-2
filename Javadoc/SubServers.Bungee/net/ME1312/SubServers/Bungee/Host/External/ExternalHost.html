@@ -235,7 +235,7 @@ implements <a href="../../../../../../net/ME1312/SubServers/Bungee/Network/Clien
 </tr>
 <tr id="i9" class="rowColor">
 <td class="colFirst"><code><a href="../../../../../../net/ME1312/SubServers/Bungee/Network/Client.html" title="class in net.ME1312.SubServers.Bungee.Network">Client</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/External/ExternalHost.html#getSubDataClient--">getSubDataClient</a></span>()</code>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/External/ExternalHost.html#getSubData--">getSubData</a></span>()</code>
 <div class="block">Gets the SubData Client</div>
 </td>
 </tr>
@@ -258,22 +258,22 @@ implements <a href="../../../../../../net/ME1312/SubServers/Bungee/Network/Clien
 </td>
 </tr>
 <tr id="i13" class="rowColor">
-<td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/External/ExternalHost.html#linkSubDataClient-net.ME1312.SubServers.Bungee.Network.Client-">linkSubDataClient</a></span>(<a href="../../../../../../net/ME1312/SubServers/Bungee/Network/Client.html" title="class in net.ME1312.SubServers.Bungee.Network">Client</a>&nbsp;client)</code>
-<div class="block">Link a SubData Client to this Object</div>
-</td>
-</tr>
-<tr id="i14" class="altColor">
 <td class="colFirst"><code>boolean</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/External/ExternalHost.html#removeSubServer-java.util.UUID-java.lang.String-">removeSubServer</a></span>(java.util.UUID&nbsp;player,
                java.lang.String&nbsp;name)</code>
 <div class="block">Removes a SubServer</div>
 </td>
 </tr>
-<tr id="i15" class="rowColor">
+<tr id="i14" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/External/ExternalHost.html#setEnabled-boolean-">setEnabled</a></span>(boolean&nbsp;value)</code>
 <div class="block">Set if this Host is Enabled</div>
+</td>
+</tr>
+<tr id="i15" class="rowColor">
+<td class="colFirst"><code>void</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/External/ExternalHost.html#setSubData-net.ME1312.SubServers.Bungee.Network.Client-">setSubData</a></span>(<a href="../../../../../../net/ME1312/SubServers/Bungee/Network/Client.html" title="class in net.ME1312.SubServers.Bungee.Network">Client</a>&nbsp;client)</code>
+<div class="block">Link a SubData Client to this Object</div>
 </td>
 </tr>
 </table>
@@ -337,37 +337,39 @@ implements <a href="../../../../../../net/ME1312/SubServers/Bungee/Network/Clien
 <!--   -->
 </a>
 <h3>Method Detail</h3>
-<a name="getSubDataClient--">
+<a name="getSubData--">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
-<h4>getSubDataClient</h4>
-<pre>public&nbsp;<a href="../../../../../../net/ME1312/SubServers/Bungee/Network/Client.html" title="class in net.ME1312.SubServers.Bungee.Network">Client</a>&nbsp;getSubDataClient()</pre>
-<div class="block"><span class="descfrmTypeLabel">Description copied from interface:&nbsp;<code><a href="../../../../../../net/ME1312/SubServers/Bungee/Network/ClientHandler.html#getSubDataClient--">ClientHandler</a></code></span></div>
+<h4>getSubData</h4>
+<pre>public&nbsp;<a href="../../../../../../net/ME1312/SubServers/Bungee/Network/Client.html" title="class in net.ME1312.SubServers.Bungee.Network">Client</a>&nbsp;getSubData()</pre>
+<div class="block"><span class="descfrmTypeLabel">Description copied from interface:&nbsp;<code><a href="../../../../../../net/ME1312/SubServers/Bungee/Network/ClientHandler.html#getSubData--">ClientHandler</a></code></span></div>
 <div class="block">Gets the SubData Client</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="../../../../../../net/ME1312/SubServers/Bungee/Network/ClientHandler.html#getSubDataClient--">getSubDataClient</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../../net/ME1312/SubServers/Bungee/Network/ClientHandler.html" title="interface in net.ME1312.SubServers.Bungee.Network">ClientHandler</a></code></dd>
+<dd><code><a href="../../../../../../net/ME1312/SubServers/Bungee/Network/ClientHandler.html#getSubData--">getSubData</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../../net/ME1312/SubServers/Bungee/Network/ClientHandler.html" title="interface in net.ME1312.SubServers.Bungee.Network">ClientHandler</a></code></dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>SubData Client (or null if not linked)</dd>
 </dl>
 </li>
 </ul>
-<a name="linkSubDataClient-net.ME1312.SubServers.Bungee.Network.Client-">
+<a name="setSubData-net.ME1312.SubServers.Bungee.Network.Client-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
-<h4>linkSubDataClient</h4>
-<pre>public&nbsp;void&nbsp;linkSubDataClient(<a href="../../../../../../net/ME1312/SubServers/Bungee/Network/Client.html" title="class in net.ME1312.SubServers.Bungee.Network">Client</a>&nbsp;client)</pre>
-<div class="block"><span class="descfrmTypeLabel">Description copied from interface:&nbsp;<code><a href="../../../../../../net/ME1312/SubServers/Bungee/Network/ClientHandler.html#linkSubDataClient-net.ME1312.SubServers.Bungee.Network.Client-">ClientHandler</a></code></span></div>
+<h4>setSubData</h4>
+<pre>public&nbsp;void&nbsp;setSubData(<a href="../../../../../../net/ME1312/SubServers/Bungee/Network/Client.html" title="class in net.ME1312.SubServers.Bungee.Network">Client</a>&nbsp;client)</pre>
+<div class="block"><span class="descfrmTypeLabel">Description copied from interface:&nbsp;<code><a href="../../../../../../net/ME1312/SubServers/Bungee/Network/ClientHandler.html#setSubData-net.ME1312.SubServers.Bungee.Network.Client-">ClientHandler</a></code></span></div>
 <div class="block">Link a SubData Client to this Object</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="../../../../../../net/ME1312/SubServers/Bungee/Network/ClientHandler.html#linkSubDataClient-net.ME1312.SubServers.Bungee.Network.Client-">linkSubDataClient</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../../net/ME1312/SubServers/Bungee/Network/ClientHandler.html" title="interface in net.ME1312.SubServers.Bungee.Network">ClientHandler</a></code></dd>
+<dd><code><a href="../../../../../../net/ME1312/SubServers/Bungee/Network/ClientHandler.html#setSubData-net.ME1312.SubServers.Bungee.Network.Client-">setSubData</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../../net/ME1312/SubServers/Bungee/Network/ClientHandler.html" title="interface in net.ME1312.SubServers.Bungee.Network">ClientHandler</a></code></dd>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>client</code> - Client to Link</dd>
+<dt><span class="seeLabel">See Also:</span></dt>
+<dd><a href="../../../../../../net/ME1312/SubServers/Bungee/Network/Client.html#setHandler-net.ME1312.SubServers.Bungee.Network.ClientHandler-"><code>Client.setHandler(ClientHandler)</code></a></dd>
 </dl>
 </li>
 </ul>

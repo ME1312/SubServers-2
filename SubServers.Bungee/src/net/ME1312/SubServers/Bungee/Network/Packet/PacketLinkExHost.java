@@ -1,9 +1,6 @@
 package net.ME1312.SubServers.Bungee.Network.Packet;
 
-import net.ME1312.SubServers.Bungee.Host.External.ExternalHost;
 import net.ME1312.SubServers.Bungee.Host.Host;
-import net.ME1312.SubServers.Bungee.Host.Server;
-import net.ME1312.SubServers.Bungee.Host.SubServer;
 import net.ME1312.SubServers.Bungee.Library.Util;
 import net.ME1312.SubServers.Bungee.Library.Version.Version;
 import net.ME1312.SubServers.Bungee.Network.Client;
@@ -60,8 +57,8 @@ public class PacketLinkExHost implements PacketIn, PacketOut {
             if (hosts.keySet().contains(data.getString("name").toLowerCase())) {
                 Host host = hosts.get(data.getString("name").toLowerCase());
                 if (host instanceof ClientHandler) {
-                    if (((ClientHandler) host).getSubDataClient() == null) {
-                        ((ClientHandler) host).linkSubDataClient(client);
+                    if (((ClientHandler) host).getSubData() == null) {
+                        client.setHandler((ClientHandler) host);
                         System.out.println("SubData > " + client.getAddress().toString() + " has been defined as Host: " + host.getName());
                         client.sendPacket(new PacketLinkExHost(0, "Definition Successful"));
                     } else {

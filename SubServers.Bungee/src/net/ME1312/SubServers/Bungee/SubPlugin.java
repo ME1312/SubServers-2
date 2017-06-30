@@ -184,8 +184,17 @@ public final class SubPlugin extends BungeeCord {
 
             config.reload();
             lang.reload();
+            SubDataServer.Encryption encryption = SubDataServer.Encryption.NONE;
+            if (config.get().getSection("Settings").getSection("SubData").getString("Password", "").length() == 0) {
+                System.out.println("SubData > Cannot encrypt connection without a password");
+            } else if (Util.isException(() -> SubDataServer.Encryption.valueOf(config.get().getSection("Settings").getSection("SubData").getRawString("Encryption", "NONE").replace('-', '_').replace(' ', '_').toUpperCase()))) {
+                System.out.println("SubData > Unknown encryption type: " + SubDataServer.Encryption.valueOf(config.get().getSection("Settings").getSection("SubData").getRawString("Encryption", "None")));
+            } else {
+                encryption = SubDataServer.Encryption.valueOf(config.get().getSection("Settings").getSection("SubData").getRawString("Encryption", "NONE").replace('-', '_').replace(' ', '_').toUpperCase());
+            }
             subdata = new SubDataServer(this, Integer.parseInt(config.get().getSection("Settings").getSection("SubData").getRawString("Address", "127.0.0.1:4391").split(":")[1]), 10,
-                    (config.get().getSection("Settings").getSection("SubData").getRawString("Address", "127.0.0.1:4391").split(":")[0].equals("0.0.0.0"))?null:InetAddress.getByName(config.get().getSection("Settings").getSection("SubData").getRawString("Address", "127.0.0.1:4391").split(":")[0]));
+                    (config.get().getSection("Settings").getSection("SubData").getRawString("Address", "127.0.0.1:4391").split(":")[0].equals("0.0.0.0"))?null:InetAddress.getByName(config.get().getSection("Settings").getSection("SubData").getRawString("Address", "127.0.0.1:4391").split(":")[0]),
+                    encryption);
             System.out.println("SubServers > SubData Direct Listening on /" + config.get().getSection("Settings").getSection("SubData").getRawString("Address", "127.0.0.1:4391"));
             loop();
 

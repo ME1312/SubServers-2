@@ -3,18 +3,15 @@ package net.ME1312.SubServers.Bungee.Network;
 import net.ME1312.SubServers.Bungee.Library.Exception.IllegalPacketException;
 import net.ME1312.SubServers.Bungee.Library.Util;
 import net.ME1312.SubServers.Bungee.Network.Packet.PacketAuthorization;
-import net.ME1312.SubServers.Bungee.SubPlugin;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketException;
+import java.util.Base64;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -27,7 +24,7 @@ public class Client {
     private ClientHandler handler;
     private PrintWriter writer;
     private Timer authorized;
-    protected SubDataServer subdata;
+    private SubDataServer subdata;
 
     /**
      * Network Client
@@ -41,7 +38,7 @@ public class Client {
         socket = client;
         writer = new PrintWriter(client.getOutputStream(), true);
         address = new InetSocketAddress(client.getInetAddress(), client.getPort());
-        authorized = new Timer("__subdata_auth_" + client.getRemoteSocketAddress().toString());
+        authorized = new Timer();
         authorized.schedule(new TimerTask() {
             @Override
             public void run() {
@@ -64,8 +61,19 @@ public class Client {
                 BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                 String input;
                 while ((input = in.readLine()) != null) {
+                    String decoded = null;
                     try {
-                        JSONObject json = new JSONObject(input);
+                        switch (subdata.getEncryption()) {
+                            case AES:
+                            case AES_128:
+                            case AES_192:
+                            case AES_256:
+                                decoded = AES.decrypt(subdata.plugin.config.get().getSection("Settings").getSection("SubData").getRawString("Password"), Base64.getDecoder().decode(input)).get();
+                                break;
+                            default:
+                                decoded = input;
+                        }
+                        JSONObject json = new JSONObject(decoded);
                         for (PacketIn packet : SubDataServer.decodePacket(json)) {
                             if (authorized == null || packet instanceof PacketAuthorization) {
                                 try {
@@ -82,7 +90,7 @@ public class Client {
                             } else sendPacket(new PacketAuthorization(-1, "Unauthorized"));
                         }
                     } catch (JSONException e) {
-                        new IllegalPacketException("Unknown Packet Format: " + input).printStackTrace();
+                        new IllegalPacketException("Unknown Packet Format: " + ((decoded == null)?input:decoded)).printStackTrace();
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -122,8 +130,21 @@ public class Client {
     public void sendPacket(PacketOut packet) {
         if (Util.isNull(packet)) throw new NullPointerException();
         try {
-            writer.println(SubDataServer.encodePacket(packet));
-        } catch (IllegalPacketException e) {
+            switch (subdata.getEncryption()) {
+                case AES:
+                case AES_128:
+                    writer.println(Base64.getEncoder().encodeToString(AES.encrypt(128, subdata.plugin.config.get().getSection("Settings").getSection("SubData").getRawString("Password"), SubDataServer.encodePacket(packet).toString())));
+                    break;
+                case AES_192:
+                    writer.println(Base64.getEncoder().encodeToString(AES.encrypt(192, subdata.plugin.config.get().getSection("Settings").getSection("SubData").getRawString("Password"), SubDataServer.encodePacket(packet).toString())));
+                    break;
+                case AES_256:
+                    writer.println(Base64.getEncoder().encodeToString(AES.encrypt(256, subdata.plugin.config.get().getSection("Settings").getSection("SubData").getRawString("Password"), SubDataServer.encodePacket(packet).toString())));
+                    break;
+                default:
+                    writer.println(SubDataServer.encodePacket(packet));
+            }
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -165,24 +186,24 @@ public class Client {
     }
 
     /**
-     * Sets the Handler<br>
-     * <b>Warning:</b> This method should only be called by ClientHandler methods
+     * Sets the Handler
      *
-     * @see ClientHandler
      * @param obj Handler
      */
     public void setHandler(ClientHandler obj) {
+        if (handler != null) handler.setSubData(null);
         handler = obj;
+        handler.setSubData(this);
     }
 
     /**
-     * Disconnects the Client
+     * Disconnects the Client (does not remove them from the server)
      *
      * @throws IOException
      */
-    protected void disconnect() throws IOException {
+    public void disconnect() throws IOException {
         if (!socket.isClosed()) getConnection().close();
-        if (handler != null) handler.linkSubDataClient(null);
+        if (handler != null) handler.setSubData(null);
         handler = null;
 
     }

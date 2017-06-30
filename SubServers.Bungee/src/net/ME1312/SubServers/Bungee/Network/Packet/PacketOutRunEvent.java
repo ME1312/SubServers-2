@@ -67,7 +67,7 @@ public class PacketOutRunEvent implements Listener, PacketOut {
         if (!event.isCancelled()) {
             JSONObject args = new JSONObject();
             args.put("player", ((event.getPlayer() == null)?null:event.getPlayer().toString()));
-            args.put("host", ((event.getHost() == null)?null:event.getHost()));
+            args.put("host", ((event.getHost() == null)?null:event.getHost().getName()));
             args.put("server", event.getServer().getName());
             plugin.subdata.broadcastPacket(new PacketOutRunEvent(event.getClass(), args));
         }
@@ -127,7 +127,7 @@ public class PacketOutRunEvent implements Listener, PacketOut {
         if (!event.isCancelled()) {
             JSONObject args = new JSONObject();
             args.put("player", ((event.getPlayer() == null)?null:event.getPlayer().toString()));
-            args.put("host", ((event.getHost() == null)?null:event.getHost()));
+            args.put("host", ((event.getHost() == null)?null:event.getHost().getName()));
             args.put("server", event.getServer().getName());
             plugin.subdata.broadcastPacket(new PacketOutRunEvent(event.getClass(), args));
         }

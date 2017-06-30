@@ -62,9 +62,17 @@ public final class SubPlugin extends JavaPlugin {
                 config.save();
                 new UniversalFile(new File(System.getProperty("user.dir")), "subservers.client").delete();
             }
+            SubDataClient.Encryption encryption = SubDataClient.Encryption.NONE;
+            if (config.get().getSection("Settings").getSection("SubData").getString("Password", "").length() == 0) {
+                System.out.println("SubData > Cannot encrypt connection without a password");
+            } else if (Util.isException(() -> SubDataClient.Encryption.valueOf(config.get().getSection("Settings").getSection("SubData").getRawString("Encryption", "NONE").replace('-', '_').replace(' ', '_').toUpperCase()))) {
+                System.out.println("SubData > Unknown encryption type: " + SubDataClient.Encryption.valueOf(config.get().getSection("Settings").getSection("SubData").getRawString("Encryption", "None")));
+            } else {
+                encryption = SubDataClient.Encryption.valueOf(config.get().getSection("Settings").getSection("SubData").getRawString("Encryption", "NONE").replace('-', '_').replace(' ', '_').toUpperCase());
+            }
             subdata = new SubDataClient(this, config.get().getSection("Settings").getSection("SubData").getString("Name", "undefined"),
                     InetAddress.getByName(config.get().getSection("Settings").getSection("SubData").getString("Address", "127.0.0.1:4391").split(":")[0]),
-                    Integer.parseInt(config.get().getSection("Settings").getSection("SubData").getString("Address", "127.0.0.1:4391").split(":")[1]));
+                    Integer.parseInt(config.get().getSection("Settings").getSection("SubData").getString("Address", "127.0.0.1:4391").split(":")[1]), encryption);
 
             if (config.get().getSection("Settings").getBoolean("Ingame-Access", true)) {
                 gui = new InternalHandler(this);

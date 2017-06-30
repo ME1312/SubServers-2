@@ -34,18 +34,13 @@ public class Server extends BungeeServerInfo implements ClientHandler, ExtraData
     }
 
     @Override
-    public Client getSubDataClient() {
+    public Client getSubData() {
         return client;
     }
 
     @Override
-    public void linkSubDataClient(Client client) {
-        if (this.client == null) {
-            client.setHandler(this);
-            this.client = client;
-        } else if (client == null) {
-            this.client = null;
-        } else throw new IllegalStateException("A SubData Client is already linked to Server: " + getName());
+    public void setSubData(Client client) {
+        this.client = client;
     }
 
     /**

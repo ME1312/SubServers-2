@@ -3,7 +3,8 @@ Settings:
   Log-Creator: true
   SubData:
     Address: '127.0.0.1:4391'
-    Password: ''
+    Password: 'default'
+    Encryption: 'AES'
     Allowed-Connections: []
 
 Hosts:

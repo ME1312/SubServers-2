@@ -9,12 +9,13 @@ public interface ClientHandler {
      *
      * @return SubData Client (or null if not linked)
      */
-    Client getSubDataClient();
+    Client getSubData();
 
     /**
      * Link a SubData Client to this Object
      *
+     * @see Client#setHandler(ClientHandler)
      * @param client Client to Link
      */
-    void linkSubDataClient(Client client);
+    void setSubData(Client client);
 }

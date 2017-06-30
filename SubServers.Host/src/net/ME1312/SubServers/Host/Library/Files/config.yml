@@ -6,3 +6,4 @@ Settings:
     Name: 'undefined'
     Address: '127.0.0.1:4391'
     Password: ''
+    Encryption: 'AES'

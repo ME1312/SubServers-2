@@ -63,18 +63,13 @@ public class ExternalHost extends Host implements ClientHandler {
     }
 
     @Override
-    public Client getSubDataClient() {
+    public Client getSubData() {
         return client.get();
     }
 
     @Override
-    public void linkSubDataClient(Client client) {
-        if (this.client.get() == null) {
-            client.setHandler(this);
-            this.client = new NamedContainer<Boolean, Client>(false, client);
-        } else if (client == null) {
-            this.client = new NamedContainer<Boolean, Client>(false, null);
-        } else throw new IllegalStateException("A SubData Client is already linked to Host: " + getName());
+    public void setSubData(Client client) {
+        this.client = new NamedContainer<Boolean, Client>(false, client);
     }
 
     protected void queue(PacketOut... packet) {

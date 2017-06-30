@@ -68,7 +68,7 @@ public class ExternalSubCreator extends SubCreator {
                             if (!server.contains("Motd")) server.set("Motd", "Some SubServer");
                             if (!server.contains("Log")) server.set("Log", true);
                             if (!server.contains("Directory")) server.set("Directory", "." + File.separatorChar + name);
-                            if (!server.contains("Executable")) server.set("Executable", "java -Xmx1024M -jar Custom.jar");
+                            if (!server.contains("Executable")) server.set("Executable", "java -Xmx1024M -jar " + template.getType().toString() + ".jar");
                             if (!server.contains("Stop-Command")) server.set("Stop-Command", "stop");
                             if (!server.contains("Run-On-Launch")) server.set("Run-On-Launch", false);
                             if (!server.contains("Auto-Restart")) server.set("Auto-Restart", false);
@@ -98,7 +98,7 @@ public class ExternalSubCreator extends SubCreator {
     @Override
     public void terminate() {
         if (running) {
-            host.getSubDataClient().sendPacket(new PacketExCreateServer());
+            host.getSubData().sendPacket(new PacketExCreateServer());
         }
     }
 

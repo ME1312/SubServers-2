@@ -24,7 +24,16 @@ public final class SubDataServer {
     private static boolean defaults = false;
     private HashMap<InetSocketAddress, Client> clients = new HashMap<InetSocketAddress, Client>();
     private ServerSocket server;
+    private Encryption encryption;
     protected SubPlugin plugin;
+
+    public enum Encryption {
+        NONE,
+        AES,
+        AES_128,
+        AES_192,
+        AES_256,
+    }
 
     /**
      * SubData Server Instance
@@ -35,7 +44,7 @@ public final class SubDataServer {
      * @param address Bind Address
      * @throws IOException
      */
-    public SubDataServer(SubPlugin plugin, int port, int backlog, InetAddress address) throws IOException {
+    public SubDataServer(SubPlugin plugin, int port, int backlog, InetAddress address, Encryption encryption) throws IOException {
         if (Util.isNull(plugin, port, backlog)) throw new NullPointerException();
         if (address == null) {
             server = new ServerSocket(port, backlog);
@@ -45,6 +54,7 @@ public final class SubDataServer {
             allowConnection(address);
         }
         this.plugin = plugin;
+        this.encryption = encryption;
 
         if (!defaults) loadDefaults();
     }
@@ -122,6 +132,15 @@ public final class SubDataServer {
     }
 
     /**
+     * Gets the Server's Encryption method
+     *
+     * @return Encryption method
+     */
+    public Encryption getEncryption() {
+        return encryption;
+    }
+
+    /**
      * Add a Client to the Network
      *
      * @param socket Client to add
@@ -164,7 +183,7 @@ public final class SubDataServer {
     }
 
     /**
-     * Grabs all the Clients from the Network
+     * Grabs all the Clients on the Network
      *
      * @return Client List
      */
@@ -213,8 +232,10 @@ public final class SubDataServer {
     public static void registerPacket(PacketIn packet, String handle) {
         if (Util.isNull(packet, handle)) throw new NullPointerException();
         List<PacketIn> list = (pIn.keySet().contains(handle))?pIn.get(handle):new ArrayList<PacketIn>();
-        if (!list.contains(packet)) list.add(packet);
-        pIn.put(handle, list);
+        if (!list.contains(packet)) {
+            list.add(packet);
+            pIn.put(handle, list);
+        }
     }
 
     /**
@@ -224,7 +245,17 @@ public final class SubDataServer {
      */
     public static void unregisterPacket(PacketIn packet) {
         if (Util.isNull(packet)) throw new NullPointerException();
-        for (String handle : pIn.keySet()) if (pIn.get(handle).contains(packet)) pIn.get(handle).remove(packet);
+        List<String> search = new ArrayList<String>();
+        search.addAll(pIn.keySet());
+        for (String handle : search) if (pIn.get(handle).contains(packet)) {
+            List<PacketIn> list = pIn.get(handle);
+            list.remove(packet);
+            if (list.isEmpty()) {
+                pIn.remove(handle);
+            } else {
+                pIn.put(handle, list);
+            }
+        }
     }
 
     /**
