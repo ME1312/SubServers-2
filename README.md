@@ -1,4 +1,4 @@
-![https://s30.postimg.org/fu575r281/Sub_Servers_Title.png](https://s30.postimg.org/fu575r281/Sub_Servers_Title.png)<br>
+![https://s3.postimg.org/dikyxlz5v/Sub_Banner.png](https://s3.postimg.org/dikyxlz5v/Sub_Banner.png)<br>
 SubServers 2 is a rewrite of SubServers, the Server Management Plugin.<br>
 > [http://www.spigotmc.org/resources/subservers-2.11264/](http://www.spigotmc.org/resources/subservers-2.11264/)<br>
 > [http://www.spigotmc.org/resources/subservers-host.38833/](http://www.spigotmc.org/resources/subservers-host.38833/)<br>
