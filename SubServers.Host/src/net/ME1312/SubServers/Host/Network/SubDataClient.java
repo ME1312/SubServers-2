@@ -375,7 +375,7 @@ public final class SubDataClient {
             if (!socket.isClosed()) socket.close();
             host.api.executeEvent(new SubNetworkDisconnectEvent());
             log.info.println("The SubData Connection was closed");
-            int reconnectDelay = host.config.get().getSection("Settings").getSection("SubData").getInt("Reconnect delay");
+            int reconnectDelay = host.config.get().getSection("Settings").getSection("SubData").getInt("Reconnect delay", 30);
             if (reconnect) {
                 log.info.println("Attempting to reconnect in 30 seconds");
                 Timer timer = new Timer();
