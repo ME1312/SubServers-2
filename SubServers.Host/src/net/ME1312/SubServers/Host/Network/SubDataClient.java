@@ -375,8 +375,9 @@ public final class SubDataClient {
             if (!socket.isClosed()) socket.close();
             host.api.executeEvent(new SubNetworkDisconnectEvent());
             log.info.println("The SubData Connection was closed");
+            int reconnectDelay = host.config.get().getSection("Settings").getSection("SubData").getInt("Reconnect delay", 30);
             if (reconnect) {
-                log.info.println("Attempting to reconnect in 30 seconds");
+                log.info.println("Attempting to reconnect in " + reconnectDelay + " seconds");
                 Timer timer = new Timer();
                 timer.scheduleAtFixedRate(new TimerTask() {
                     @Override
@@ -389,10 +390,10 @@ public final class SubDataClient {
                                 queue.remove(0);
                             }
                         } catch (IOException e) {
-                            log.warn.println("Connection was unsuccessful, retrying in 30 seconds");
+                            log.warn.println("Connection was unsuccessful, retrying in " + reconnectDelay + " seconds");
                         }
                     }
-                }, TimeUnit.SECONDS.toMillis(30), TimeUnit.SECONDS.toMillis(30));
+                }, TimeUnit.SECONDS.toMillis(reconnectDelay), TimeUnit.SECONDS.toMillis(reconnectDelay));
             }
             host.subdata = null;
         }
