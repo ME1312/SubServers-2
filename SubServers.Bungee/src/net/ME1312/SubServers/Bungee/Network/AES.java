@@ -16,14 +16,10 @@ import javax.crypto.spec.*;
  * A class to perform password-based AES encryption and decryption in CBC mode.
  * 128, 192, and 256-bit encryption are supported, provided that the latter two
  * are permitted by the Java runtime's jurisdiction policy files.
- * <br/>
- * The public interface for this class consists of the static methods
- * {@link #encrypt} and {@link #decrypt}, which encrypt and decrypt arbitrary
- * streams of data, respectively.
  *
  * @author dweymouth@gmail.com
  */
-public class AES {
+public final class AES {
 
     // AES specification
     private static final String CIPHER_SPEC = "AES/CBC/PKCS5Padding";

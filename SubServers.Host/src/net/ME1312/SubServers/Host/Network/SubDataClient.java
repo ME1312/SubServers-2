@@ -3,6 +3,7 @@ package net.ME1312.SubServers.Host.Network;
 import net.ME1312.SubServers.Host.API.Event.SubNetworkDisconnectEvent;
 import net.ME1312.SubServers.Host.Library.Exception.IllegalPacketException;
 import net.ME1312.SubServers.Host.Library.Log.Logger;
+import net.ME1312.SubServers.Host.Library.NamedContainer;
 import net.ME1312.SubServers.Host.Library.Util;
 import net.ME1312.SubServers.Host.Library.Version.Version;
 import net.ME1312.SubServers.Host.Network.Packet.*;
@@ -36,7 +37,7 @@ public final class SubDataClient {
     private String name;
     private Encryption encryption;
     private ExHost host;
-    private LinkedList<PacketOut> queue;
+    private LinkedList<NamedContainer<String, PacketOut>> queue;
 
     public enum Encryption {
         NONE,
@@ -50,18 +51,20 @@ public final class SubDataClient {
      * SubServers Client Instance
      *
      * @param host SubServers.Host
+     * @param name Name of Host
      * @param address Address
      * @param port Port
+     * @param encryption Encryption Type
      * @throws IOException
      */
     public SubDataClient(ExHost host, String name, InetAddress address, int port, Encryption encryption) throws IOException {
-        if (Util.isNull(host, name, address, port)) throw new NullPointerException();
+        if (Util.isNull(host, name, address, port, encryption)) throw new NullPointerException();
         socket = new Socket(address, port);
         this.host = host;
         this.name = name;
         this.writer = new PrintWriter(socket.getOutputStream(), true);
         this.encryption = encryption;
-        this.queue = new LinkedList<PacketOut>();
+        this.queue = new LinkedList<NamedContainer<String, PacketOut>>();
 
         if (!defaults) loadDefaults();
         loop();
@@ -83,6 +86,7 @@ public final class SubDataClient {
         registerPacket(new PacketCreateServer(), "SubCreateServer");
         registerPacket(new PacketDownloadHostInfo(), "SubDownloadHostInfo");
         registerPacket(new PacketDownloadLang(host), "SubDownloadLang");
+        registerPacket(new PacketDownloadNetworkList(), "SubDownloadNetworkList");
         registerPacket(new PacketDownloadPlayerList(), "SubDownloadPlayerList");
         registerPacket(new PacketDownloadServerInfo(), "SubDownloadServerInfo");
         registerPacket(new PacketDownloadServerList(), "SubDownloadServerList");
@@ -105,6 +109,7 @@ public final class SubDataClient {
         registerPacket(PacketCreateServer.class, "SubCreateServer");
         registerPacket(PacketDownloadHostInfo.class, "SubDownloadHostInfo");
         registerPacket(PacketDownloadLang.class, "SubDownloadLang");
+        registerPacket(PacketDownloadNetworkList.class, "SubDownloadNetworkList");
         registerPacket(PacketDownloadPlayerList.class, "SubDownloadPlayerList");
         registerPacket(PacketDownloadServerInfo.class, "SubDownloadServerInfo");
         registerPacket(PacketDownloadServerList.class, "SubDownloadServerList");
@@ -144,25 +149,27 @@ public final class SubDataClient {
                         for (PacketIn packet : decodePacket(json)) {
                             try {
                                 packet.execute((json.keySet().contains("c"))?json.getJSONObject("c"):null);
-                            } catch (Exception e) {
+                            } catch (Throwable e) {
                                 log.error.println(new InvocationTargetException(e, "Exception while executing PacketIn"));
                             }
                         }
                     } catch (JSONException e) {
-                        log.error.println(new IllegalPacketException("Unknown Packet Format: " + input));
-                    } catch (Exception e) {
+                        log.error.println(new IllegalPacketException("Unknown Packet Format: " + ((decoded == null || decoded.length() <= 0)?input:decoded)));
+                    } catch (IllegalPacketException e) {
                         log.error.println(e);
+                    } catch (Exception e) {
+                        log.error.println(new InvocationTargetException(e, "Exception while decoding packet"));
                     }
                 }
                 try {
-                    destroy(true);
+                    destroy(host.config.get().getSection("Settings").getSection("SubData").getInt("Reconnect", 30));
                 } catch (IOException e1) {
                     log.error.println(e1);
                 }
             } catch (Exception e) {
                 if (!(e instanceof SocketException)) log.error.println(e);
                 try {
-                    destroy(true);
+                    destroy(host.config.get().getSection("Settings").getSection("SubData").getInt("Reconnect", 30));
                 } catch (IOException e1) {
                     log.error.println(e1);
                 }
@@ -260,7 +267,7 @@ public final class SubDataClient {
     public void sendPacket(PacketOut packet) {
         if (Util.isNull(packet)) throw new NullPointerException();
         if (socket == null) {
-            queue.add(packet);
+            queue.add(new NamedContainer<>(null, packet));
         } else {
             try {
                 switch (getEncryption()) {
@@ -277,7 +284,7 @@ public final class SubDataClient {
                     default:
                         writer.println(encodePacket(packet));
                 }
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 log.error.println(e);
             }
         }
@@ -289,14 +296,14 @@ public final class SubDataClient {
      * @param packet Packet to send
      * @param location Where to send
      */
-    public void forwardPacket(PacketOut packet, InetSocketAddress location) {
+    public void forwardPacket(PacketOut packet, String location) {
         if (Util.isNull(packet)) throw new NullPointerException();
         if (socket == null) {
-            queue.add(packet);
+            queue.add(new NamedContainer<>(location, packet));
         } else {
             try {
                 JSONObject json = encodePacket(packet);
-                json.put("f", location.toString());
+                json.put("f", location);
                 switch (getEncryption()) {
                     case AES:
                     case AES_128:
@@ -311,8 +318,8 @@ public final class SubDataClient {
                     default:
                         writer.println(json.toString());
                 }
-            } catch (Exception e) {
-                e.printStackTrace();
+            } catch (Throwable e) {
+                log.error.println(e);
             }
         }
     }
@@ -324,16 +331,20 @@ public final class SubDataClient {
      * @return JSON Formatted Packet
      * @throws IllegalPacketException
      */
-    private static JSONObject encodePacket(PacketOut packet) throws IllegalPacketException {
+    private static JSONObject encodePacket(PacketOut packet) throws IllegalPacketException, InvocationTargetException {
         JSONObject json = new JSONObject();
 
         if (!pOut.keySet().contains(packet.getClass())) throw new IllegalPacketException("Unknown PacketOut Channel: " + packet.getClass().getCanonicalName());
         if (packet.getVersion().toString() == null) throw new NullPointerException("PacketOut Version cannot be null: " + packet.getClass().getCanonicalName());
 
-        JSONObject contents = packet.generate();
-        json.put("h", pOut.get(packet.getClass()));
-        json.put("v", packet.getVersion().toString());
-        if (contents != null) json.put("c", contents);
+        try {
+            JSONObject contents = packet.generate();
+            json.put("h", pOut.get(packet.getClass()));
+            json.put("v", packet.getVersion().toString());
+            if (contents != null) json.put("c", contents);
+        } catch (Throwable e) {
+            throw new InvocationTargetException(e, "Exception while encoding packet");
+        }
         return json;
     }
 
@@ -367,7 +378,7 @@ public final class SubDataClient {
      *
      * @throws IOException
      */
-    public void destroy(boolean reconnect) throws IOException {
+    public void destroy(int reconnect) throws IOException {
         if (Util.isNull(reconnect)) throw new NullPointerException();
         if (socket != null) {
             final Socket socket = this.socket;
@@ -375,8 +386,8 @@ public final class SubDataClient {
             if (!socket.isClosed()) socket.close();
             host.api.executeEvent(new SubNetworkDisconnectEvent());
             log.info.println("The SubData Connection was closed");
-            if (reconnect) {
-                log.info.println("Attempting to reconnect in 30 seconds");
+            if (reconnect > 0) {
+                log.info.println("Attempting to reconnect in " + reconnect + " seconds");
                 Timer timer = new Timer();
                 timer.scheduleAtFixedRate(new TimerTask() {
                     @Override
@@ -385,14 +396,18 @@ public final class SubDataClient {
                             host.subdata = new SubDataClient(host, name, socket.getInetAddress(), socket.getPort(), encryption);
                             timer.cancel();
                             while (queue.size() != 0) {
-                                host.subdata.sendPacket(queue.get(0));
+                                if (queue.get(0).name() != null) {
+                                    host.subdata.forwardPacket(queue.get(0).get(), queue.get(0).name());
+                                } else {
+                                    host.subdata.sendPacket(queue.get(0).get());
+                                }
                                 queue.remove(0);
                             }
                         } catch (IOException e) {
-                            log.warn.println("Connection was unsuccessful, retrying in 30 seconds");
+                            log.warn.println("Connection was unsuccessful, retrying in " + reconnect + " seconds");
                         }
                     }
-                }, TimeUnit.SECONDS.toMillis(30), TimeUnit.SECONDS.toMillis(30));
+                }, TimeUnit.SECONDS.toMillis(reconnect), TimeUnit.SECONDS.toMillis(reconnect));
             }
             host.subdata = null;
         }

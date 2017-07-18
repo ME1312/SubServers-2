@@ -3,6 +3,7 @@ package net.ME1312.SubServers.Bungee.Host;
 import net.ME1312.SubServers.Bungee.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Bungee.Library.Exception.InvalidServerException;
 import net.ME1312.SubServers.Bungee.Library.Util;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
 import org.json.JSONObject;
 
 import java.io.File;
@@ -319,4 +320,14 @@ public abstract class SubServer extends Server {
      * @param value Value
      */
     public abstract void setTemporary(boolean value);
+
+    @Override
+    public String toString() {
+        JSONObject sinfo = new JSONObject(super.toString());
+        sinfo.put("type", "SubServer");
+        sinfo.put("enabled", getHost().isEnabled() && isEnabled());
+        sinfo.put("running", isRunning());
+        sinfo.put("temp", isTemporary());
+        return sinfo.toString();
+    }
 }

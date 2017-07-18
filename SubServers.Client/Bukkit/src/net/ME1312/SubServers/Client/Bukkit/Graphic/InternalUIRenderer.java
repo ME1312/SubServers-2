@@ -22,7 +22,7 @@ import java.util.regex.Pattern;
 /**
  * Internal GUI Renderer Class
  */
-public class InternalRenderer extends UIRenderer {
+public class InternalUIRenderer extends UIRenderer {
     private List<Runnable> windowHistory = new LinkedList<Runnable>();
     protected Options lastUsedOptions = null;
     protected String lastVistedObject = null;
@@ -32,7 +32,7 @@ public class InternalRenderer extends UIRenderer {
     protected final UUID player;
     private SubPlugin plugin;
 
-    protected InternalRenderer(SubPlugin plugin, UUID player) {
+    protected InternalUIRenderer(SubPlugin plugin, UUID player) {
         super(plugin, player);
         this.plugin = plugin;
         this.player = player;

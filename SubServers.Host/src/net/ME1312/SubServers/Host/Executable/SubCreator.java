@@ -242,7 +242,7 @@ public class SubCreator {
         }
 
         boolean error = false;
-        if (template.getBuildOptions().getKeys().size() > 0) {
+        if (template.getBuildOptions().contains("Shell-Location")) {
             File gitBash = new File(host.host.getRawString("Git-Bash"), "bin" + File.separatorChar + "bash.exe");
             if (!(System.getProperty("os.name").toLowerCase().indexOf("win") >= 0) && template.getBuildOptions().contains("Permission")) {
                 try {
@@ -281,7 +281,7 @@ public class SubCreator {
 
         new UniversalFile(dir, "template.yml").delete();
         if (!error) {
-            host.subdata.sendPacket(new PacketExCreateServer(process.exitValue(), "Created Server Successfully", template.getConfigOptions().toJSON(), id));
+            host.subdata.sendPacket(new PacketExCreateServer(0, "Created Server Successfully", template.getConfigOptions().toJSON(), id));
         } else {
             logger.logger.info.println("Couldn't build the server jar. See \"SubCreator-" + template.getType().toString() + "-" + version.toString().replace(" ", "@") + ".log\" for more details.");
             host.subdata.sendPacket(new PacketOutExLogMessage(address, "Couldn't build the server jar. See \"SubCreator-" + template.getType().toString() + "-" + version.toString().replace(" ", "@") + ".log\" for more details."));
@@ -327,7 +327,7 @@ public class SubCreator {
                 Util.copyFromJar(ExHost.class.getClassLoader(), "net/ME1312/SubServers/Host/Library/Files/Client/spigot.jar", new UniversalFile(dir, "plugins:SubServers.Client.jar").getPath());
             } else if (type == ServerType.SPONGE) {
                 // TODO
-                // if (!new UniversalFile(dir, "plugins").exists()) new UniversalFile(dir, "mods").mkdirs();
+                // if (!new UniversalFile(dir, "mods").exists()) new UniversalFile(dir, "mods").mkdirs();
                 // Util.copyFromJar(SubPlugin.class.getClassLoader(), "net/ME1312/SubServers/Host/Library/Files/Client/sponge.jar", new UniversalFile(dir, "mods:SubServers.Client.jar").getPath());
             }
             JSONObject config = new JSONObject();

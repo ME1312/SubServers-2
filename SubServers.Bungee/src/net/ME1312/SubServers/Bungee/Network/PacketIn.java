@@ -13,7 +13,7 @@ public interface PacketIn {
      * @param client Client Accepting
      * @param data Incoming Data
      */
-    void execute(Client client, JSONObject data);
+    void execute(Client client, JSONObject data) throws Throwable;
 
     /**
      * Get Packet Version

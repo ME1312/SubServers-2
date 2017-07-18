@@ -6,6 +6,7 @@ import net.ME1312.SubServers.Bungee.Host.SubServer;
 import net.ME1312.SubServers.Bungee.Library.Util;
 import net.ME1312.SubServers.Bungee.Library.Version.Version;
 import net.ME1312.SubServers.Bungee.Network.Client;
+import net.ME1312.SubServers.Bungee.Network.ClientHandler;
 import net.ME1312.SubServers.Bungee.Network.PacketIn;
 import net.ME1312.SubServers.Bungee.Network.PacketOut;
 import net.ME1312.SubServers.Bungee.SubPlugin;
@@ -51,17 +52,7 @@ public class PacketDownloadServerList implements PacketIn, PacketOut {
         if (host == null || host.equals("")) {
             JSONObject exServers = new JSONObject();
             for (Server server : plugin.exServers.values()) {
-                JSONObject info = new JSONObject();
-                info.put("display", server.getDisplayName());
-                JSONObject players = new JSONObject();
-                for (ProxiedPlayer player : server.getPlayers()) {
-                    JSONObject pinfo = new JSONObject();
-                    pinfo.put("name", player.getName());
-                    pinfo.put("nick", player.getDisplayName());
-                    players.put(player.getUniqueId().toString(), pinfo);
-                }
-                info.put("players", players);
-                exServers.put(server.getName(), info);
+                exServers.put(server.getName(), new JSONObject(server.toString()));
             }
             json.put("servers", exServers);
         }
@@ -70,28 +61,7 @@ public class PacketDownloadServerList implements PacketIn, PacketOut {
             JSONObject hosts = new JSONObject();
             for (Host host : plugin.api.getHosts().values()) {
                 if (this.host == null || this.host.equalsIgnoreCase(host.getName())) {
-                    JSONObject hinfo = new JSONObject();
-                    hinfo.put("enabled", host.isEnabled());
-                    hinfo.put("display", host.getDisplayName());
-                    JSONObject servers = new JSONObject();
-                    for (SubServer server : host.getSubServers().values()) {
-                        JSONObject sinfo = new JSONObject();
-                        sinfo.put("enabled", server.isEnabled() && host.isEnabled());
-                        sinfo.put("display", server.getDisplayName());
-                        sinfo.put("running", server.isRunning());
-                        sinfo.put("temp", server.isTemporary());
-                        JSONObject players = new JSONObject();
-                        for (ProxiedPlayer player : server.getPlayers()) {
-                            JSONObject pinfo = new JSONObject();
-                            pinfo.put("name", player.getName());
-                            pinfo.put("nick", player.getDisplayName());
-                            players.put(player.getUniqueId().toString(), pinfo);
-                        }
-                        sinfo.put("players", players);
-                        servers.put(server.getName(), sinfo);
-                    }
-                    hinfo.put("servers", servers);
-                    hosts.put(host.getName(), hinfo);
+                    hosts.put(host.getName(), new JSONObject(host.toString()));
                 }
             }
             json.put("hosts", hosts);

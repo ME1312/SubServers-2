@@ -4,6 +4,7 @@ import net.ME1312.SubServers.Client.Bukkit.Event.*;
 import net.ME1312.SubServers.Client.Bukkit.Library.JSONCallback;
 import net.ME1312.SubServers.Client.Bukkit.Library.Version.Version;
 import net.ME1312.SubServers.Client.Bukkit.Network.PacketIn;
+import net.ME1312.SubServers.Client.Bukkit.SubPlugin;
 import org.bukkit.Bukkit;
 import org.json.JSONObject;
 
@@ -21,55 +22,69 @@ public class PacketInRunEvent implements PacketIn {
     /**
      * New PacketInRunEvent
      */
-    public PacketInRunEvent() {
+    public PacketInRunEvent(SubPlugin plugin) {
         callback("SubAddServerEvent", new JSONCallback() {
             @Override
             public void run(JSONObject json) {
-                Bukkit.getPluginManager().callEvent(new SubAddServerEvent((json.keySet().contains("player"))?UUID.fromString(json.getString("player")):null, json.getString("host"), json.getString("server")));
-                callback("SubAddServerEvent", this);
+                if (plugin.isEnabled()) {
+                    Bukkit.getPluginManager().callEvent(new SubAddServerEvent((json.keySet().contains("player")) ? UUID.fromString(json.getString("player")) : null, json.getString("host"), json.getString("server")));
+                    callback("SubAddServerEvent", this);
+                }
             }
         });
         callback("SubCreateEvent", new JSONCallback() {
             @Override
             public void run(JSONObject json) {
-                Bukkit.getPluginManager().callEvent(new SubCreateEvent((json.keySet().contains("player"))?UUID.fromString(json.getString("player")):null, json.getString("host"), json.getString("name"),
-                        json.getString("template"), new Version(json.getString("version")), json.getInt("port")));
-                callback("SubCreateEvent", this);
+                if (plugin.isEnabled()) {
+                    Bukkit.getPluginManager().callEvent(new SubCreateEvent((json.keySet().contains("player")) ? UUID.fromString(json.getString("player")) : null, json.getString("host"), json.getString("name"),
+                            json.getString("template"), new Version(json.getString("version")), json.getInt("port")));
+                    callback("SubCreateEvent", this);
+                }
             }
         });
         callback("SubSendCommandEvent", new JSONCallback() {
             @Override
             public void run(JSONObject json) {
-                Bukkit.getPluginManager().callEvent(new SubSendCommandEvent((json.keySet().contains("player"))?UUID.fromString(json.getString("player")):null, json.getString("server"), json.getString("command")));
-                callback("SubSendCommandEvent", this);
+                if (plugin.isEnabled()) {
+                    Bukkit.getPluginManager().callEvent(new SubSendCommandEvent((json.keySet().contains("player")) ? UUID.fromString(json.getString("player")) : null, json.getString("server"), json.getString("command")));
+                    callback("SubSendCommandEvent", this);
+                }
             }
         });
         callback("SubStartEvent", new JSONCallback() {
             @Override
             public void run(JSONObject json) {
-                Bukkit.getPluginManager().callEvent(new SubStartEvent((json.keySet().contains("player"))?UUID.fromString(json.getString("player")):null, json.getString("server")));
-                callback("SubStartEvent", this);
+                if (plugin.isEnabled()) {
+                    Bukkit.getPluginManager().callEvent(new SubStartEvent((json.keySet().contains("player")) ? UUID.fromString(json.getString("player")) : null, json.getString("server")));
+                    callback("SubStartEvent", this);
+                }
             }
         });
         callback("SubStopEvent", new JSONCallback() {
             @Override
             public void run(JSONObject json) {
-                Bukkit.getPluginManager().callEvent(new SubStopEvent((json.keySet().contains("player"))?UUID.fromString(json.getString("player")):null, json.getString("server"), json.getBoolean("force")));
-                callback("SubStopEvent", this);
+                if (plugin.isEnabled()) {
+                    Bukkit.getPluginManager().callEvent(new SubStopEvent((json.keySet().contains("player")) ? UUID.fromString(json.getString("player")) : null, json.getString("server"), json.getBoolean("force")));
+                    callback("SubStopEvent", this);
+                }
             }
         });
         callback("SubStoppedEvent", new JSONCallback() {
             @Override
             public void run(JSONObject json) {
-                Bukkit.getPluginManager().callEvent(new SubStoppedEvent(json.getString("server")));
-                callback("SubStoppedEvent", this);
+                if (plugin.isEnabled()) {
+                    Bukkit.getPluginManager().callEvent(new SubStoppedEvent(json.getString("server")));
+                    callback("SubStoppedEvent", this);
+                }
             }
         });
         callback("SubRemoveServerEvent", new JSONCallback() {
             @Override
             public void run(JSONObject json) {
-                Bukkit.getPluginManager().callEvent(new SubRemoveServerEvent((json.keySet().contains("player"))?UUID.fromString(json.getString("player")):null, json.getString("host"), json.getString("server")));
-                callback("SubRemoveServerEvent", this);
+                if (plugin.isEnabled()) {
+                    Bukkit.getPluginManager().callEvent(new SubRemoveServerEvent((json.keySet().contains("player")) ? UUID.fromString(json.getString("player")) : null, json.getString("host"), json.getString("server")));
+                    callback("SubRemoveServerEvent", this);
+                }
             }
         });
     }

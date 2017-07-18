@@ -1,6 +1,6 @@
 package net.ME1312.SubServers.Client.Bukkit;
 
-import net.ME1312.SubServers.Client.Bukkit.Graphic.InternalHandler;
+import net.ME1312.SubServers.Client.Bukkit.Graphic.InternalUIHandler;
 import net.ME1312.SubServers.Client.Bukkit.Graphic.UIHandler;
 import net.ME1312.SubServers.Client.Bukkit.Library.Config.YAMLConfig;
 import net.ME1312.SubServers.Client.Bukkit.Library.Config.YAMLSection;
@@ -27,7 +27,7 @@ public final class SubPlugin extends JavaPlugin {
 
     public UIHandler gui = null;
     public final Version version;
-    public final Version bversion = null;
+    public final Version bversion = new Version(1);
     public final SubAPI api = new SubAPI(this);
 
     public SubPlugin() {
@@ -75,7 +75,7 @@ public final class SubPlugin extends JavaPlugin {
                     Integer.parseInt(config.get().getSection("Settings").getSection("SubData").getString("Address", "127.0.0.1:4391").split(":")[1]), encryption);
 
             if (config.get().getSection("Settings").getBoolean("Ingame-Access", true)) {
-                gui = new InternalHandler(this);
+                gui = new InternalUIHandler(this);
                 SubCommand cmd = new SubCommand(this);
                 getCommand("subservers").setExecutor(cmd);
                 getCommand("subserver").setExecutor(cmd);
@@ -93,7 +93,7 @@ public final class SubPlugin extends JavaPlugin {
     @Override
     public void onDisable() {
         if (subdata != null) try {
-            subdata.destroy(false);
+            subdata.destroy(0);
         } catch (IOException e) {
             e.printStackTrace();
         }

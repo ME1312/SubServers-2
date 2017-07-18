@@ -7,7 +7,9 @@ import net.ME1312.SubServers.Bungee.Library.Exception.InvalidServerException;
 import net.ME1312.SubServers.Bungee.Library.ExtraDataHandler;
 import net.ME1312.SubServers.Bungee.Library.NamedContainer;
 import net.ME1312.SubServers.Bungee.Library.Util;
+import net.ME1312.SubServers.Bungee.Network.ClientHandler;
 import net.ME1312.SubServers.Bungee.SubPlugin;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
 import org.json.JSONObject;
 
 import java.net.InetAddress;
@@ -382,5 +384,22 @@ public abstract class Host implements ExtraDataHandler {
     public void removeExtra(String handle) {
         if (Util.isNull(handle)) throw new NullPointerException();
         extra.remove(handle);
+    }
+
+    @Override
+    public String toString() {
+        JSONObject hinfo = new JSONObject();
+        hinfo.put("type", "Host");
+        hinfo.put("name", getName());
+        hinfo.put("enabled", isEnabled());
+        hinfo.put("display", getDisplayName());
+        JSONObject servers = new JSONObject();
+        for (SubServer server : getSubServers().values()) {
+            servers.put(server.getName(), server.toString());
+        }
+        hinfo.put("servers", servers);
+        if (this instanceof ClientHandler && ((ClientHandler) this).getSubData() != null) hinfo.put("subdata", ((ClientHandler) this).getSubData().getAddress().toString());
+        hinfo.put("extra", getExtra().toJSON());
+        return hinfo.toString();
     }
 }

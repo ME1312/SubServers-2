@@ -12,7 +12,7 @@ public interface PacketOut {
      *
      * @return Packet Contents
      */
-    JSONObject generate();
+    JSONObject generate() throws Throwable;
 
     /**
      * Get Packet Version

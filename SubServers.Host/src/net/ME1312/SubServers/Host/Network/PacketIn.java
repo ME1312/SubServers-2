@@ -12,7 +12,7 @@ public interface PacketIn {
      *
      * @param data Incoming Data
      */
-    void execute(JSONObject data);
+    void execute(JSONObject data) throws Throwable;
 
     /**
      * Get Packet Version

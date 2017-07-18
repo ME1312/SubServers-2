@@ -74,25 +74,34 @@ public class Client {
                                 decoded = input;
                         }
                         JSONObject json = new JSONObject(decoded);
-                        for (PacketIn packet : SubDataServer.decodePacket(json)) {
-                            if (authorized == null || packet instanceof PacketAuthorization) {
+                        for (PacketIn packet : SubDataServer.decodePacket(this, json)) {
+                            boolean auth = authorized == null;
+                            if (auth || packet instanceof PacketAuthorization) {
                                 try {
                                     if (json.keySet().contains("f")) {
-                                        Client client = subdata.getClient(new InetSocketAddress(json.getString("f").split(":")[0], Integer.parseInt(json.getString("f").split(":")[1])));
-                                        json.remove("f");
-                                        client.writer.println(json);
+                                        Client client = subdata.getClient(json.getString("f"));
+                                        if (client != null) {
+                                            client.writer.println(input);
+                                        } else {
+                                            throw new IllegalPacketException(getAddress().toString() + ": Unknown Forward Address: " + json.getString("f"));
+                                        }
                                     } else {
                                         packet.execute(Client.this, (json.keySet().contains("c"))?json.getJSONObject("c"):null);
                                     }
                                 } catch (Throwable e) {
-                                    new InvocationTargetException(e, "Exception while executing PacketIn").printStackTrace();
+                                    new InvocationTargetException(e, getAddress().toString() + ": Exception while executing PacketIn").printStackTrace();
                                 }
-                            } else sendPacket(new PacketAuthorization(-1, "Unauthorized"));
+                            } else {
+                                sendPacket(new PacketAuthorization(-1, "Unauthorized"));
+                                throw new IllegalPacketException(getAddress().toString() + ": Unauthorized call to packet type: " + json.getJSONObject("h"));
+                            }
                         }
                     } catch (JSONException e) {
-                        new IllegalPacketException("Unknown Packet Format: " + ((decoded == null)?input:decoded)).printStackTrace();
-                    } catch (Exception e) {
+                        new IllegalPacketException(getAddress().toString() + ": Unknown Packet Format: " + ((decoded == null || decoded.length() <= 0)?input:decoded)).printStackTrace();
+                    } catch (IllegalPacketException e) {
                         e.printStackTrace();
+                    } catch (Exception e) {
+                        new InvocationTargetException(e, getAddress().toString() + ": Exception while decoding packet").printStackTrace();
                     }
                 }
                 try {
@@ -133,18 +142,18 @@ public class Client {
             switch (subdata.getEncryption()) {
                 case AES:
                 case AES_128:
-                    writer.println(Base64.getEncoder().encodeToString(AES.encrypt(128, subdata.plugin.config.get().getSection("Settings").getSection("SubData").getRawString("Password"), SubDataServer.encodePacket(packet).toString())));
+                    writer.println(Base64.getEncoder().encodeToString(AES.encrypt(128, subdata.plugin.config.get().getSection("Settings").getSection("SubData").getRawString("Password"), SubDataServer.encodePacket(this, packet).toString())));
                     break;
                 case AES_192:
-                    writer.println(Base64.getEncoder().encodeToString(AES.encrypt(192, subdata.plugin.config.get().getSection("Settings").getSection("SubData").getRawString("Password"), SubDataServer.encodePacket(packet).toString())));
+                    writer.println(Base64.getEncoder().encodeToString(AES.encrypt(192, subdata.plugin.config.get().getSection("Settings").getSection("SubData").getRawString("Password"), SubDataServer.encodePacket(this, packet).toString())));
                     break;
                 case AES_256:
-                    writer.println(Base64.getEncoder().encodeToString(AES.encrypt(256, subdata.plugin.config.get().getSection("Settings").getSection("SubData").getRawString("Password"), SubDataServer.encodePacket(packet).toString())));
+                    writer.println(Base64.getEncoder().encodeToString(AES.encrypt(256, subdata.plugin.config.get().getSection("Settings").getSection("SubData").getRawString("Password"), SubDataServer.encodePacket(this, packet).toString())));
                     break;
                 default:
-                    writer.println(SubDataServer.encodePacket(packet));
+                    writer.println(SubDataServer.encodePacket(this, packet));
             }
-        } catch (Exception e) {
+        } catch (Throwable e) {
             e.printStackTrace();
         }
     }

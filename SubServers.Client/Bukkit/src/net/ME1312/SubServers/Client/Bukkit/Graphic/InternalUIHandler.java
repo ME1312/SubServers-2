@@ -5,7 +5,6 @@ import net.ME1312.SubServers.Client.Bukkit.Library.JSONCallback;
 import net.ME1312.SubServers.Client.Bukkit.Library.Util;
 import net.ME1312.SubServers.Client.Bukkit.Library.Version.Version;
 import net.ME1312.SubServers.Client.Bukkit.Network.Packet.*;
-import net.ME1312.SubServers.Client.Bukkit.Network.SubDataClient;
 import net.ME1312.SubServers.Client.Bukkit.SubPlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -26,9 +25,9 @@ import java.util.UUID;
 /**
  * Internal GUI Listener
  */
-public class InternalHandler implements UIHandler, Listener {
+public class InternalUIHandler implements UIHandler, Listener {
     private HashMap<UUID, JSONCallback> input = new HashMap<UUID, JSONCallback>();
-    private HashMap<UUID, InternalRenderer> gui = new HashMap<UUID, InternalRenderer>();
+    private HashMap<UUID, InternalUIRenderer> gui = new HashMap<UUID, InternalUIRenderer>();
     private boolean enabled = true;
     private SubPlugin plugin;
 
@@ -37,14 +36,14 @@ public class InternalHandler implements UIHandler, Listener {
      *
      * @param plugin Event
      */
-    public InternalHandler(SubPlugin plugin) {
+    public InternalUIHandler(SubPlugin plugin) {
         if (Util.isNull(plugin)) throw new NullPointerException();
         this.plugin = plugin;
         Bukkit.getPluginManager().registerEvents(this, plugin);
     }
 
-    public InternalRenderer getRenderer(Player player) {
-        if (!gui.keySet().contains(player.getUniqueId())) gui.put(player.getUniqueId(), new InternalRenderer(plugin, player.getUniqueId()));
+    public InternalUIRenderer getRenderer(Player player) {
+        if (!gui.keySet().contains(player.getUniqueId())) gui.put(player.getUniqueId(), new InternalUIRenderer(plugin, player.getUniqueId()));
         return gui.get(player.getUniqueId());
     }
 
@@ -56,7 +55,7 @@ public class InternalHandler implements UIHandler, Listener {
     public void click(InventoryClickEvent event) {
         Player player = (Player) event.getWhoClicked();
         if (!event.isCancelled() && enabled && gui.keySet().contains(player.getUniqueId())) {
-            InternalRenderer gui = this.gui.get(player.getUniqueId());
+            InternalUIRenderer gui = this.gui.get(player.getUniqueId());
             if (gui.open && event.getClickedInventory() != null && event.getClickedInventory().getTitle() != null) {
                 if (plugin.subdata == null) {
                     new IllegalStateException("SubData is not connected").printStackTrace();
@@ -214,7 +213,7 @@ public class InternalHandler implements UIHandler, Listener {
                         } else {
                             player.closeInventory();
                             final Container<Renderer> plugin = new Container<Renderer>(null);
-                            for (Renderer renderer : InternalRenderer.hostPlugins.values()) {
+                            for (Renderer renderer : InternalUIRenderer.hostPlugins.values()) {
                                 if (item.equals(renderer.getIcon().getItemMeta().getDisplayName())) plugin.set(renderer);
                             }
                             if (plugin.get() == null) {
@@ -384,7 +383,7 @@ public class InternalHandler implements UIHandler, Listener {
                         } else {
                             player.closeInventory();
                             Container<Renderer> plugin = new Container<Renderer>(null);
-                            for (Renderer renderer : InternalRenderer.subserverPlugins.values()) {
+                            for (Renderer renderer : InternalUIRenderer.subserverPlugins.values()) {
                                 if (item.equals(renderer.getIcon().getItemMeta().getDisplayName())) plugin.set(renderer);
                             }
                             if (plugin.get() == null) {

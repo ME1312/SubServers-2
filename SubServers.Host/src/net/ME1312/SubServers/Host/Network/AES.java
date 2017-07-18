@@ -34,7 +34,7 @@ import java.util.Random;
  *
  * @author dweymouth@gmail.com
  */
-public class AES {
+public final class AES {
 
     // AES specification
     private static final String CIPHER_SPEC = "AES/CBC/PKCS5Padding";

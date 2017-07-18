@@ -110,7 +110,7 @@ public class InternalSubCreator extends SubCreator {
         }
 
         boolean error = false;
-        if (template.getBuildOptions().getKeys().size() > 0) {
+        if (template.getBuildOptions().contains("Shell-Location")) {
             File gitBash = new File(this.gitBash, "bin" + File.separatorChar + "bash.exe");
             if (!(System.getProperty("os.name").toLowerCase().indexOf("win") >= 0) && template.getBuildOptions().contains("Permission")) {
                 try {
@@ -253,7 +253,7 @@ public class InternalSubCreator extends SubCreator {
                 Util.copyFromJar(SubPlugin.class.getClassLoader(), "net/ME1312/SubServers/Bungee/Library/Files/Client/spigot.jar", new UniversalFile(dir, "plugins:SubServers.Client.jar").getPath());
             } else if (type == ServerType.SPONGE) {
                 // TODO
-                // if (!new UniversalFile(dir, "plugins").exists()) new UniversalFile(dir, "mods").mkdirs();
+                // if (!new UniversalFile(dir, "mods").exists()) new UniversalFile(dir, "mods").mkdirs();
                 // Util.copyFromJar(SubPlugin.class.getClassLoader(), "net/ME1312/SubServers/Bungee/Library/Files/Client/sponge.jar", new UniversalFile(dir, "mods:SubServers.Client.jar").getPath());
             }
             JSONObject config = new JSONObject();

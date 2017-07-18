@@ -68,7 +68,7 @@ public class PacketDownloadServerInfo implements PacketIn, PacketOut {
             info.put("restricted", server.isRestricted());
             info.put("hidden", server.isHidden());
             info.put("motd", server.getMotd());
-            info.put("subdata", server.getSubData() == null);
+            if (server.getSubData() != null) info.put("subdata", server.getSubData().getAddress().toString());
             info.put("extra", server.getExtra().toJSON());
 
             JSONObject players = new JSONObject();

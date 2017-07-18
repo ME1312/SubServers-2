@@ -3,6 +3,7 @@ package net.ME1312.SubServers.Client.Bukkit.Network;
 import net.ME1312.SubServers.Client.Bukkit.Event.SubNetworkDisconnectEvent;
 import net.ME1312.SubServers.Client.Bukkit.Library.Container;
 import net.ME1312.SubServers.Client.Bukkit.Library.Exception.IllegalPacketException;
+import net.ME1312.SubServers.Client.Bukkit.Library.NamedContainer;
 import net.ME1312.SubServers.Client.Bukkit.Library.Util;
 import net.ME1312.SubServers.Client.Bukkit.Library.Version.Version;
 import net.ME1312.SubServers.Client.Bukkit.Network.Packet.*;
@@ -31,7 +32,7 @@ public final class SubDataClient {
     private String name;
     private Encryption encryption;
     private SubPlugin plugin;
-    private LinkedList<PacketOut> queue;
+    private LinkedList<NamedContainer<String, PacketOut>> queue;
 
     public enum Encryption {
         NONE,
@@ -45,8 +46,10 @@ public final class SubDataClient {
      * SubServers Client Instance
      *
      * @param plugin SubPlugin
+     * @param name Server Name
      * @param address Address
      * @param port Port
+     * @param encryption Encryption Type
      * @throws IOException
      */
     public SubDataClient(SubPlugin plugin, String name, InetAddress address, int port, Encryption encryption) throws IOException {
@@ -56,7 +59,7 @@ public final class SubDataClient {
         this.name = name;
         this.writer = new PrintWriter(socket.getOutputStream(), true);
         this.encryption = encryption;
-        this.queue = new LinkedList<PacketOut>();
+        this.queue = new LinkedList<NamedContainer<String, PacketOut>>();
 
         if (!defaults) loadDefaults();
         loop();
@@ -72,10 +75,11 @@ public final class SubDataClient {
         registerPacket(new PacketCreateServer(), "SubCreateServer");
         registerPacket(new PacketDownloadHostInfo(), "SubDownloadHostInfo");
         registerPacket(new PacketDownloadLang(plugin), "SubDownloadLang");
+        registerPacket(new PacketDownloadNetworkList(), "SubDownloadNetworkList");
         registerPacket(new PacketDownloadPlayerList(), "SubDownloadPlayerList");
         registerPacket(new PacketDownloadServerInfo(), "SubDownloadServerInfo");
         registerPacket(new PacketDownloadServerList(), "SubDownloadServerList");
-        registerPacket(new PacketInRunEvent(), "SubRunEvent");
+        registerPacket(new PacketInRunEvent(plugin), "SubRunEvent");
         registerPacket(new PacketInReset(), "SubReset");
         registerPacket(new PacketLinkServer(plugin), "SubLinkServer");
         registerPacket(new PacketStartServer(), "SubStartServer");
@@ -87,6 +91,7 @@ public final class SubDataClient {
         registerPacket(PacketCreateServer.class, "SubCreateServer");
         registerPacket(PacketDownloadHostInfo.class, "SubDownloadHostInfo");
         registerPacket(PacketDownloadLang.class, "SubDownloadLang");
+        registerPacket(PacketDownloadNetworkList.class, "SubDownloadNetworkList");
         registerPacket(PacketDownloadPlayerList.class, "SubDownloadPlayerList");
         registerPacket(PacketDownloadServerInfo.class, "SubDownloadServerInfo");
         registerPacket(PacketDownloadServerList.class, "SubDownloadServerList");
@@ -116,27 +121,31 @@ public final class SubDataClient {
                         }
                         JSONObject json = new JSONObject(decoded);
                         for (PacketIn packet : decodePacket(json)) {
-                            try {
-                                Bukkit.getScheduler().runTask(plugin, () -> packet.execute((json.keySet().contains("c"))?json.getJSONObject("c"):null));
-                            } catch (Exception e) {
-                                new InvocationTargetException(e, "Exception while executing PacketIn").printStackTrace();
-                            }
+                            Bukkit.getScheduler().runTask(plugin, () -> {
+                                try {
+                                    packet.execute((json.keySet().contains("c")) ? json.getJSONObject("c") : null);
+                                } catch (Throwable e) {
+                                    new InvocationTargetException(e, "Exception while executing PacketIn").printStackTrace();
+                                }
+                            });
                         }
                     } catch (JSONException e) {
-                        new IllegalPacketException("Unknown Packet Format: " + ((decoded == null)?input:decoded)).printStackTrace();
-                    } catch (Exception e) {
+                        new IllegalPacketException("Unknown Packet Format: " + ((decoded == null || decoded.length() <= 0) ? input : decoded)).printStackTrace();
+                    } catch (IllegalPacketException e) {
                         e.printStackTrace();
+                    } catch (Exception e) {
+                        new InvocationTargetException(e, "Exception while decoding packet").printStackTrace();
                     }
                 }
                 try {
-                    destroy(true);
+                    destroy(plugin.config.get().getSection("Settings").getSection("SubData").getInt("Reconnect", 30));
                 } catch (IOException e1) {
                     e1.printStackTrace();
                 }
             } catch (Exception e) {
                 if (!(e instanceof SocketException)) e.printStackTrace();
                 try {
-                    destroy(true);
+                    destroy(plugin.config.get().getSection("Settings").getSection("SubData").getInt("Reconnect", 30));
                 } catch (IOException e1) {
                     e1.printStackTrace();
                 }
@@ -246,7 +255,7 @@ public final class SubDataClient {
     public void sendPacket(PacketOut packet) {
         if (Util.isNull(packet)) throw new NullPointerException();
         if (socket == null) {
-            queue.add(packet);
+            queue.add(new NamedContainer<>(null, packet));
         } else {
             try {
                 switch (getEncryption()) {
@@ -275,33 +284,29 @@ public final class SubDataClient {
      * @param packet Packet to send
      * @param location Where to send
      */
-    public void forwardPacket(PacketOut packet, InetSocketAddress location) {
+    public void forwardPacket(PacketOut packet, String location) {
         if (Util.isNull(packet)) throw new NullPointerException();
         if (socket == null) {
-            queue.add(packet);
+            queue.add(new NamedContainer<>(location, packet));
         } else {
             try {
                 JSONObject json = encodePacket(packet);
-                json.put("f", location.toString());
-                try {
-                    switch (getEncryption()) {
-                        case AES:
-                        case AES_128:
-                            writer.println(Base64.getEncoder().encodeToString(AES.encrypt(128, plugin.config.get().getSection("Settings").getSection("SubData").getRawString("Password"), json.toString())));
-                            break;
-                        case AES_192:
-                            writer.println(Base64.getEncoder().encodeToString(AES.encrypt(192, plugin.config.get().getSection("Settings").getSection("SubData").getRawString("Password"), json.toString())));
-                            break;
-                        case AES_256:
-                            writer.println(Base64.getEncoder().encodeToString(AES.encrypt(256, plugin.config.get().getSection("Settings").getSection("SubData").getRawString("Password"), json.toString())));
-                            break;
-                        default:
-                            writer.println(json.toString());
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
+                json.put("f", location);
+                switch (getEncryption()) {
+                    case AES:
+                    case AES_128:
+                        writer.println(Base64.getEncoder().encodeToString(AES.encrypt(128, plugin.config.get().getSection("Settings").getSection("SubData").getRawString("Password"), json.toString())));
+                        break;
+                    case AES_192:
+                        writer.println(Base64.getEncoder().encodeToString(AES.encrypt(192, plugin.config.get().getSection("Settings").getSection("SubData").getRawString("Password"), json.toString())));
+                        break;
+                    case AES_256:
+                        writer.println(Base64.getEncoder().encodeToString(AES.encrypt(256, plugin.config.get().getSection("Settings").getSection("SubData").getRawString("Password"), json.toString())));
+                        break;
+                    default:
+                        writer.println(json.toString());
                 }
-            } catch (IllegalPacketException e) {
+            } catch (Throwable e) {
                 e.printStackTrace();
             }
         }
@@ -314,17 +319,21 @@ public final class SubDataClient {
      * @return JSON Formatted Packet
      * @throws IllegalPacketException
      */
-    private static JSONObject encodePacket(PacketOut packet) throws IllegalPacketException {
+    private static JSONObject encodePacket(PacketOut packet) throws IllegalPacketException, InvocationTargetException {
         JSONObject json = new JSONObject();
 
         if (!pOut.keySet().contains(packet.getClass())) throw new IllegalPacketException("Unknown PacketOut Channel: " + packet.getClass().getCanonicalName());
         if (packet.getVersion().toString() == null) throw new NullPointerException("PacketOut Version cannot be null: " + packet.getClass().getCanonicalName());
 
-        JSONObject contents = packet.generate();
-        json.put("h", pOut.get(packet.getClass()));
-        json.put("v", packet.getVersion().toString());
-        if (contents != null) json.put("c", contents);
-        return json;
+        try {
+            JSONObject contents = packet.generate();
+            json.put("h", pOut.get(packet.getClass()));
+            json.put("v", packet.getVersion().toString());
+            if (contents != null) json.put("c", contents);
+            return json;
+        } catch (Throwable e) {
+            throw new InvocationTargetException(e, "Exception while encoding packet");
+        }
     }
 
     /**
@@ -356,7 +365,7 @@ public final class SubDataClient {
      *
      * @throws IOException
      */
-    public void destroy(boolean reconnect) throws IOException {
+    public void destroy(int reconnect) throws IOException {
         if (Util.isNull(reconnect)) throw new NullPointerException();
         if (socket != null) {
             final Socket socket = this.socket;
@@ -364,23 +373,28 @@ public final class SubDataClient {
             if (!socket.isClosed()) socket.close();
             Bukkit.getPluginManager().callEvent(new SubNetworkDisconnectEvent());
             Bukkit.getLogger().info("SubServers > The SubData Connection was closed");
-            if (reconnect) {
-                Bukkit.getLogger().info("SubServers > Attempting to reconnect in 10 seconds");
+            if (reconnect > 0) {
+
+                Bukkit.getLogger().info("SubServers > Attempting to reconnect in " + reconnect + " seconds");
                 Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, new Runnable() {
                     @Override
                     public void run() {
                         try {
                             plugin.subdata = new SubDataClient(plugin, name, socket.getInetAddress(), socket.getPort(), encryption);
                             while (queue.size() != 0) {
-                                plugin.subdata.sendPacket(queue.get(0));
+                                if (queue.get(0).name() != null) {
+                                    plugin.subdata.forwardPacket(queue.get(0).get(), queue.get(0).name());
+                                } else {
+                                    plugin.subdata.sendPacket(queue.get(0).get());
+                                }
                                 queue.remove(0);
                             }
                         } catch (IOException e) {
-                            Bukkit.getLogger().info("SubServers > Connection was unsuccessful, retrying in 10 seconds");
-                            Bukkit.getScheduler().runTaskLater(plugin, this, 30 * 20);
+                            Bukkit.getLogger().info("SubServers > Connection was unsuccessful, retrying in " + reconnect + " seconds");
+                            Bukkit.getScheduler().runTaskLater(plugin, this, reconnect * 20);
                         }
                     }
-                }, 30 * 20);
+                }, reconnect * 20);
             }
             plugin.subdata = null;
         }

@@ -25,6 +25,7 @@ import java.net.SocketException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.file.Files;
+import java.text.DecimalFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.zip.ZipEntry;
@@ -45,8 +46,8 @@ public final class ExHost {
     public YAMLSection lang = null;
     public SubDataClient subdata = null;
 
-    public final Version version = new Version("2.12a");
-    public final Version bversion = null;
+    public final Version version = new Version("2.12c");
+    public final Version bversion = new Version(1);
     public final SubAPI api = new SubAPI(this);
 
     private boolean running;
@@ -284,7 +285,7 @@ public final class ExHost {
                  * Enable Plugins
                  */
                 api.executeEvent(new SubEnableEvent(this));
-                log.info.println(i + " Plugin"+((i == 1)?"":"s") + " loaded in " + (Calendar.getInstance().getTime().getTime() - begin) + "ms");
+                log.info.println(i + " Plugin"+((i == 1)?"":"s") + " loaded in" + new DecimalFormat("0.000").format((Calendar.getInstance().getTime().getTime() - begin) / 1000D) + "s");
             }
 
             loadDefaults();
@@ -370,7 +371,7 @@ public final class ExHost {
         } catch (Exception e) {
             log.error.println(e);
         }
-        if (subdata != null) Util.isException(() -> subdata.destroy(false));
+        if (subdata != null) Util.isException(() -> subdata.destroy(0));
 
         Util.isException(FileLogger::end);
         System.exit(event.getExitCode());

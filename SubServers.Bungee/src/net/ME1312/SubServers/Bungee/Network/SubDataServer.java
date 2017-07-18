@@ -8,6 +8,7 @@ import net.ME1312.SubServers.Bungee.SubPlugin;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.net.*;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -18,11 +19,12 @@ import java.util.List;
  * SubDataServer Class
  */
 public final class SubDataServer {
+    protected static final int MAX_QUEUE = 64;
     private static HashMap<Class<? extends PacketOut>, String> pOut = new HashMap<Class<? extends PacketOut>, String>();
     private static HashMap<String, List<PacketIn>> pIn = new HashMap<String, List<PacketIn>>();
     private static List<InetAddress> allowedAddresses = new ArrayList<InetAddress>();
     private static boolean defaults = false;
-    private HashMap<InetSocketAddress, Client> clients = new HashMap<InetSocketAddress, Client>();
+    private HashMap<String, Client> clients = new HashMap<String, Client>();
     private ServerSocket server;
     private Encryption encryption;
     protected SubPlugin plugin;
@@ -40,17 +42,17 @@ public final class SubDataServer {
      *
      * @param plugin SubPlugin
      * @param port Port
-     * @param backlog Connection Queue
-     * @param address Bind Address
+     * @param address Bind
+     * @param encryption Encryption Type
      * @throws IOException
      */
-    public SubDataServer(SubPlugin plugin, int port, int backlog, InetAddress address, Encryption encryption) throws IOException {
-        if (Util.isNull(plugin, port, backlog)) throw new NullPointerException();
+    public SubDataServer(SubPlugin plugin, int port, InetAddress address, Encryption encryption) throws IOException {
+        if (Util.isNull(plugin, port, encryption, MAX_QUEUE)) throw new NullPointerException();
         if (address == null) {
-            server = new ServerSocket(port, backlog);
+            server = new ServerSocket(port, MAX_QUEUE);
             allowConnection(InetAddress.getByName("127.0.0.1"));
         } else {
-            server = new ServerSocket(port, backlog, address);
+            server = new ServerSocket(port, MAX_QUEUE, address);
             allowConnection(address);
         }
         this.plugin = plugin;
@@ -76,6 +78,7 @@ public final class SubDataServer {
         registerPacket(new PacketCreateServer(plugin), "SubCreateServer");
         registerPacket(new PacketDownloadHostInfo(plugin), "SubDownloadHostInfo");
         registerPacket(new PacketDownloadLang(plugin), "SubDownloadLang");
+        registerPacket(new PacketDownloadNetworkList(plugin), "SubDownloadNetworkList");
         registerPacket(new PacketDownloadPlayerList(plugin), "SubDownloadPlayerList");
         registerPacket(new PacketDownloadProxyInfo(plugin), "SubDownloadProxyInfo");
         registerPacket(new PacketDownloadServerInfo(plugin), "SubDownloadServerInfo");
@@ -101,6 +104,7 @@ public final class SubDataServer {
         registerPacket(PacketCreateServer.class, "SubCreateServer");
         registerPacket(PacketDownloadHostInfo.class, "SubDownloadHostInfo");
         registerPacket(PacketDownloadLang.class, "SubDownloadLang");
+        registerPacket(PacketDownloadNetworkList.class, "SubDownloadNetworkList");
         registerPacket(PacketDownloadPlayerList.class, "SubDownloadPlayerList");
         registerPacket(PacketDownloadProxyInfo.class, "SubDownloadProxyInfo");
         registerPacket(PacketDownloadServerInfo.class, "SubDownloadServerInfo");
@@ -151,7 +155,7 @@ public final class SubDataServer {
         if (allowedAddresses.contains(socket.getInetAddress())) {
             Client client = new Client(this, socket);
             System.out.println("SubData > " + client.getAddress().toString() + " has connected");
-            clients.put(client.getAddress(), client);
+            clients.put(client.getAddress().toString(), client);
             return client;
         } else {
             System.out.println("SubData > " + socket.getInetAddress().toString() + " attempted to connect, but isn't white-listed");
@@ -168,7 +172,7 @@ public final class SubDataServer {
      */
     public Client getClient(Socket socket) {
         if (Util.isNull(socket)) throw new NullPointerException();
-        return clients.get(new InetSocketAddress(socket.getInetAddress(), socket.getPort()));
+        return clients.get(new InetSocketAddress(socket.getInetAddress(), socket.getPort()).toString());
     }
 
     /**
@@ -178,6 +182,17 @@ public final class SubDataServer {
      * @return Client
      */
     public Client getClient(InetSocketAddress address) {
+        if (Util.isNull(address)) throw new NullPointerException();
+        return clients.get(address.toString());
+    }
+
+    /**
+     * Grabs a Client from the Network
+     *
+     * @param address Address to search
+     * @return Client
+     */
+    public Client getClient(String address) {
         if (Util.isNull(address)) throw new NullPointerException();
         return clients.get(address);
     }
@@ -200,8 +215,8 @@ public final class SubDataServer {
     public void removeClient(Client client) throws IOException {
         if (Util.isNull(client)) throw new NullPointerException();
         SocketAddress address = client.getAddress();
-        if (clients.keySet().contains(address)) {
-            clients.remove(address);
+        if (clients.keySet().contains(address.toString())) {
+            clients.remove(address.toString());
             client.disconnect();
             System.out.println("SubData > " + client.getAddress().toString() + " has disconnected");
         }
@@ -214,6 +229,22 @@ public final class SubDataServer {
      * @throws IOException
      */
     public void removeClient(InetSocketAddress address) throws IOException {
+        if (Util.isNull(address)) throw new NullPointerException();
+        Client client = clients.get(address.toString());
+        if (clients.keySet().contains(address.toString())) {
+            clients.remove(address.toString());
+            client.disconnect();
+            System.out.println("SubData > " + client.getAddress().toString() + " has disconnected");
+        }
+    }
+
+    /**
+     * Remove a Client from the Network
+     *
+     * @param address Address to Kick
+     * @throws IOException
+     */
+    public void removeClient(String address) throws IOException {
         if (Util.isNull(address)) throw new NullPointerException();
         Client client = clients.get(address);
         if (clients.keySet().contains(address)) {
@@ -330,17 +361,21 @@ public final class SubDataServer {
      * @return JSON Formatted Packet
      * @throws IllegalPacketException
      */
-    protected static JSONObject encodePacket(PacketOut packet) throws IllegalPacketException {
+    protected static JSONObject encodePacket(Client client, PacketOut packet) throws IllegalPacketException, InvocationTargetException {
         JSONObject json = new JSONObject();
 
-        if (!pOut.keySet().contains(packet.getClass())) throw new IllegalPacketException("Unknown PacketOut Channel: " + packet.getClass().getCanonicalName());
-        if (packet.getVersion().toString() == null) throw new NullPointerException("PacketOut getVersion() cannot be null: " + packet.getClass().getCanonicalName());
+        if (!pOut.keySet().contains(packet.getClass())) throw new IllegalPacketException(packet.getClass().getCanonicalName() + ": Unknown PacketOut Channel: " + packet.getClass().getCanonicalName());
+        if (packet.getVersion().toString() == null) throw new NullPointerException(packet.getClass().getCanonicalName() + ": PacketOut getVersion() cannot be null: " + packet.getClass().getCanonicalName());
 
-        JSONObject contents = packet.generate();
-        json.put("h", pOut.get(packet.getClass()));
-        json.put("v", packet.getVersion().toString());
-        if (contents != null) json.put("c", contents);
-        return json;
+        try {
+            JSONObject contents = packet.generate();
+            json.put("h", pOut.get(packet.getClass()));
+            json.put("v", packet.getVersion().toString());
+            if (contents != null) json.put("c", contents);
+            return json;
+        } catch (Throwable e) {
+            throw new InvocationTargetException(e, packet.getClass().getCanonicalName() + ": Exception while encoding packet");
+        }
     }
 
     /**
@@ -350,16 +385,16 @@ public final class SubDataServer {
      * @return PacketIn
      * @throws IllegalPacketException
      */
-    protected static List<PacketIn> decodePacket(JSONObject json) throws IllegalPacketException {
-        if (!json.keySet().contains("h") || !json.keySet().contains("v")) throw new IllegalPacketException("Unknown Packet Format: " + json.toString());
-        if (!pIn.keySet().contains(json.getString("h"))) throw new IllegalPacketException("Unknown PacketIn Channel: " + json.getString("h"));
+    protected static List<PacketIn> decodePacket(Client client, JSONObject json) throws IllegalPacketException {
+        if (!json.keySet().contains("h") || !json.keySet().contains("v")) throw new IllegalPacketException(client.getAddress().toString() + ": Unknown Packet Format: " + json.toString());
+        if (!pIn.keySet().contains(json.getString("h"))) throw new IllegalPacketException(client.getAddress().toString() + ": Unknown PacketIn Channel: " + json.getString("h"));
 
         List<PacketIn> list = new ArrayList<PacketIn>();
         for (PacketIn packet : pIn.get(json.getString("h"))) {
             if (new Version(json.getString("v")).equals(packet.getVersion())) {
                 list.add(packet);
             } else {
-                new IllegalPacketException("Packet Version Mismatch in " + json.getString("h") + ": " + json.getString("v") + " -> " + packet.getVersion().toString()).printStackTrace();
+                new IllegalPacketException(client.getAddress().toString() + ": Packet Version Mismatch in " + json.getString("h") + ": " + json.getString("v") + " =/= " + packet.getVersion().toString()).printStackTrace();
             }
         }
 

@@ -9,6 +9,7 @@ import net.ME1312.SubServers.Bungee.Network.Client;
 import net.ME1312.SubServers.Bungee.Network.ClientHandler;
 import net.md_5.bungee.BungeeServerInfo;
 import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
 import org.json.JSONObject;
 
 import java.net.InetSocketAddress;
@@ -151,5 +152,24 @@ public class Server extends BungeeServerInfo implements ClientHandler, ExtraData
     public void removeExtra(String handle) {
         if (Util.isNull(handle)) throw new NullPointerException();
         extra.remove(handle);
+    }
+
+    @Override
+    public String toString() {
+        JSONObject info = new JSONObject();
+        info.put("type", "Server");
+        info.put("name", getName());
+        info.put("display", getDisplayName());
+        JSONObject players = new JSONObject();
+        for (ProxiedPlayer player : getPlayers()) {
+            JSONObject pinfo = new JSONObject();
+            pinfo.put("name", player.getName());
+            pinfo.put("nick", player.getDisplayName());
+            players.put(player.getUniqueId().toString(), pinfo);
+        }
+        info.put("players", players);
+        if (getSubData() != null) info.put("subdata", getSubData().getAddress().toString());
+        info.put("extra", getExtra().toJSON());
+        return info.toString();
     }
 }

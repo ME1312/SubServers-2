@@ -5,6 +5,7 @@ import net.ME1312.SubServers.Bungee.Host.SubCreator;
 import net.ME1312.SubServers.Bungee.Host.SubServer;
 import net.ME1312.SubServers.Bungee.Library.Version.Version;
 import net.ME1312.SubServers.Bungee.Network.Client;
+import net.ME1312.SubServers.Bungee.Network.ClientHandler;
 import net.ME1312.SubServers.Bungee.Network.PacketIn;
 import net.ME1312.SubServers.Bungee.Network.PacketOut;
 
@@ -88,6 +89,7 @@ public class PacketDownloadHostInfo implements PacketIn, PacketOut {
                 servers.put(server.getName(), sinfo);
             }
             info.put("servers", servers);
+            if (host instanceof ClientHandler && ((ClientHandler) host).getSubData() != null) info.put("subdata", ((ClientHandler) host).getSubData().getAddress().toString());
             info.put("extra", host.getExtra().toJSON());
         } else json.put("valid", false);
 

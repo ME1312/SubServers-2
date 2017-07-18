@@ -172,14 +172,14 @@ extends java.lang.Object</pre>
 </tr>
 <tr id="i0" class="altColor">
 <td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Client/Bukkit/Network/SubDataClient.html#destroy-boolean-">destroy</a></span>(boolean&nbsp;reconnect)</code>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Client/Bukkit/Network/SubDataClient.html#destroy-int-">destroy</a></span>(int&nbsp;reconnect)</code>
 <div class="block">Drops All Connections and Stops the SubData Listener</div>
 </td>
 </tr>
 <tr id="i1" class="rowColor">
 <td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Client/Bukkit/Network/SubDataClient.html#forwardPacket-net.ME1312.SubServers.Client.Bukkit.Network.PacketOut-java.net.InetSocketAddress-">forwardPacket</a></span>(<a href="../../../../../../net/ME1312/SubServers/Client/Bukkit/Network/PacketOut.html" title="interface in net.ME1312.SubServers.Client.Bukkit.Network">PacketOut</a>&nbsp;packet,
-             java.net.InetSocketAddress&nbsp;location)</code>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Client/Bukkit/Network/SubDataClient.html#forwardPacket-net.ME1312.SubServers.Client.Bukkit.Network.PacketOut-java.lang.String-">forwardPacket</a></span>(<a href="../../../../../../net/ME1312/SubServers/Client/Bukkit/Network/PacketOut.html" title="interface in net.ME1312.SubServers.Client.Bukkit.Network">PacketOut</a>&nbsp;packet,
+             java.lang.String&nbsp;location)</code>
 <div class="block">Forward Packet to Client</div>
 </td>
 </tr>
@@ -277,8 +277,10 @@ extends java.lang.Object</pre>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>plugin</code> - SubPlugin</dd>
+<dd><code>name</code> - Server Name</dd>
 <dd><code>address</code> - Address</dd>
 <dd><code>port</code> - Port</dd>
+<dd><code>encryption</code> - Encryption Type</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
 <dd><code>java.io.IOException</code></dd>
 </dl>
@@ -424,14 +426,14 @@ extends java.lang.Object</pre>
 </dl>
 </li>
 </ul>
-<a name="forwardPacket-net.ME1312.SubServers.Client.Bukkit.Network.PacketOut-java.net.InetSocketAddress-">
+<a name="forwardPacket-net.ME1312.SubServers.Client.Bukkit.Network.PacketOut-java.lang.String-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>forwardPacket</h4>
 <pre>public&nbsp;void&nbsp;forwardPacket(<a href="../../../../../../net/ME1312/SubServers/Client/Bukkit/Network/PacketOut.html" title="interface in net.ME1312.SubServers.Client.Bukkit.Network">PacketOut</a>&nbsp;packet,
-                          java.net.InetSocketAddress&nbsp;location)</pre>
+                          java.lang.String&nbsp;location)</pre>
 <div class="block">Forward Packet to Client</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
@@ -440,13 +442,13 @@ extends java.lang.Object</pre>
 </dl>
 </li>
 </ul>
-<a name="destroy-boolean-">
+<a name="destroy-int-">
 <!--   -->
 </a>
 <ul class="blockListLast">
 <li class="blockList">
 <h4>destroy</h4>
-<pre>public&nbsp;void&nbsp;destroy(boolean&nbsp;reconnect)
+<pre>public&nbsp;void&nbsp;destroy(int&nbsp;reconnect)
              throws java.io.IOException</pre>
 <div class="block">Drops All Connections and Stops the SubData Listener</div>
 <dl>

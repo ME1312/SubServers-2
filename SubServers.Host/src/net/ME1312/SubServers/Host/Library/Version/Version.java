@@ -121,7 +121,7 @@ public class Version implements Serializable, Comparable<Version> {
                 number2 = tokenizer2.getNumber();
                 suffix2 = tokenizer2.getSuffix();
                 if (number2 != 0 || suffix2.length() != 0) {
-                    // Version one is longer than version two, and non-zero
+                    // Version two is longer than version one, and non-zero
                     return -1;
                 }
             }
