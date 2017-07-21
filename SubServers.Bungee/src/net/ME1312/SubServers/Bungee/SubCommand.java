@@ -71,6 +71,13 @@ public final class SubCommand extends Command implements TabExecutor {
                             sender.sendMessage("SubServers > That SubServer is not enabled");
                         } else if (((SubServer) servers.get(args[1].toLowerCase())).isRunning()) {
                             sender.sendMessage("SubServers > That SubServer is already running");
+                        } else if (((SubServer) servers.get(args[1].toLowerCase())).getCurrentIncompatibilities().size() != 0) {
+                            String list = "";
+                            for (SubServer server : ((SubServer) servers.get(args[1].toLowerCase())).getCurrentIncompatibilities()) {
+                                if (list.length() != 0) list += ", ";
+                                list += server.getName();
+                            }
+                            sender.sendMessages("That SubServer cannot start while these server(s) are running:", list);
                         } else {
                             ((SubServer) servers.get(args[1].toLowerCase())).start();
                         }

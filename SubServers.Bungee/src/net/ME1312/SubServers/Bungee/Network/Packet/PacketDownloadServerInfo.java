@@ -11,6 +11,9 @@ import net.ME1312.SubServers.Bungee.SubPlugin;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Download Server Info Packet
  */
@@ -60,6 +63,12 @@ public class PacketDownloadServerInfo implements PacketIn, PacketOut {
             info.put("stop-cmd", ((SubServer) server).getStopCommand());
             info.put("auto-run", plugin.config.get().getSection("Servers").getSection(server.getName()).getKeys().contains("Run-On-Launch") && plugin.config.get().getSection("Servers").getSection(server.getName()).getBoolean("Run-On-Launch"));
             info.put("auto-restart", ((SubServer) server).willAutoRestart());
+            List<String> incompatibleCurrent = new ArrayList<String>();
+            List<String> incompatible = new ArrayList<String>();
+            for (SubServer server : ((SubServer) this.server).getCurrentIncompatibilities()) incompatibleCurrent.add(server.getName());
+            for (SubServer server : ((SubServer) this.server).getIncompatibilities()) incompatible.add(server.getName());
+            info.put("incompatible", incompatibleCurrent);
+            info.put("incompatible-list", incompatible);
             info.put("temp", ((SubServer) server).isTemporary());
         } if (server != null) {
             info.put("name", server.getName());

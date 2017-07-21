@@ -17,7 +17,9 @@ import net.ME1312.SubServers.Bungee.SubPlugin;
 import org.json.JSONObject;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.UUID;
 import java.util.jar.JarFile;
 
@@ -145,7 +147,7 @@ public class InternalSubServer extends SubServer {
 
     @Override
     public boolean start(UUID player) {
-        if (isEnabled() && !(thread != null && thread.isAlive())) {
+        if (isEnabled() && !(thread != null && thread.isAlive()) && getCurrentIncompatibilities().size() == 0) {
             SubStartEvent event = new SubStartEvent(player, this);
             host.plugin.getPluginManager().callEvent(event);
             if (!event.isCancelled()) {

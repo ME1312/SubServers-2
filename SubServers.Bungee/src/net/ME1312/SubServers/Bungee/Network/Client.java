@@ -200,9 +200,9 @@ public class Client {
      * @param obj Handler
      */
     public void setHandler(ClientHandler obj) {
-        if (handler != null) handler.setSubData(null);
+        if (handler != null && handler.getSubData() != null && equals(handler.getSubData())) handler.setSubData(null);
         handler = obj;
-        handler.setSubData(this);
+        if (handler != null && (handler.getSubData() == null || !equals(handler.getSubData()))) handler.setSubData(this);
     }
 
     /**
@@ -212,8 +212,7 @@ public class Client {
      */
     public void disconnect() throws IOException {
         if (!socket.isClosed()) getConnection().close();
-        if (handler != null) handler.setSubData(null);
+        if (handler != null && handler.getSubData() != null && equals(handler.getSubData())) setHandler(null);
         handler = null;
-
     }
 }

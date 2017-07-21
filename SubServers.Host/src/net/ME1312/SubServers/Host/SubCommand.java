@@ -89,6 +89,9 @@ public class SubCommand {
                             case 6:
                                 host.log.message.println("That SubServer is already running");
                                 break;
+                            case 7:
+                                host.log.message.println("That SubServer cannot start while these server(s) are running:", json.getString("m").split(":\\s")[1]);
+                                break;
                             case 0:
                             case 1:
                                 host.log.message.println("Server was started successfully");

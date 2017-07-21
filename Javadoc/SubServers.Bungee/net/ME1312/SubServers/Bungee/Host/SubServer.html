@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":10,"i1":6,"i2":6,"i3":10,"i4":6,"i5":6,"i6":10,"i7":6,"i8":6,"i9":6,"i10":6,"i11":6,"i12":6,"i13":6,"i14":6,"i15":6,"i16":6,"i17":6,"i18":6,"i19":6,"i20":10,"i21":6,"i22":10,"i23":6,"i24":10,"i25":6,"i26":10,"i27":6,"i28":6};
+var methods = {"i0":10,"i1":6,"i2":6,"i3":10,"i4":6,"i5":10,"i6":6,"i7":10,"i8":6,"i9":10,"i10":6,"i11":6,"i12":6,"i13":10,"i14":6,"i15":6,"i16":6,"i17":6,"i18":6,"i19":6,"i20":6,"i21":6,"i22":6,"i23":10,"i24":6,"i25":10,"i26":6,"i27":10,"i28":6,"i29":10,"i30":10,"i31":6,"i32":6};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],4:["t3","Abstract Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -220,146 +220,170 @@ extends <a href="../../../../../net/ME1312/SubServers/Bungee/Host/Server.html" t
 <tr id="i4" class="altColor">
 <td class="colFirst"><code>abstract java.util.LinkedList&lt;<a href="../../../../../net/ME1312/SubServers/Bungee/Host/SubServer.LoggedCommand.html" title="class in net.ME1312.SubServers.Bungee.Host">SubServer.LoggedCommand</a>&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/SubServer.html#getCommandHistory--">getCommandHistory</a></span>()</code>
-<div class="block">Gets all the commands that were sent to this SubServer successfully</div>
+<div class="block">Gets all the commands that were sent to this Server successfully</div>
 </td>
 </tr>
 <tr id="i5" class="rowColor">
+<td class="colFirst"><code>java.util.List&lt;<a href="../../../../../net/ME1312/SubServers/Bungee/Host/SubServer.html" title="class in net.ME1312.SubServers.Bungee.Host">SubServer</a>&gt;</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/SubServer.html#getCurrentIncompatibilities--">getCurrentIncompatibilities</a></span>()</code>
+<div class="block">Get incompatibility issues this server currently has</div>
+</td>
+</tr>
+<tr id="i6" class="altColor">
 <td class="colFirst"><code>abstract <a href="../../../../../net/ME1312/SubServers/Bungee/Host/Executable.html" title="class in net.ME1312.SubServers.Bungee.Host">Executable</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/SubServer.html#getExecutable--">getExecutable</a></span>()</code>
 <div class="block">Get the Server's Executable String</div>
 </td>
 </tr>
-<tr id="i6" class="altColor">
+<tr id="i7" class="rowColor">
 <td class="colFirst"><code>java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/SubServer.html#getFullPath--">getFullPath</a></span>()</code>
 <div class="block">Get the Full Server Directory Path</div>
 </td>
 </tr>
-<tr id="i7" class="rowColor">
+<tr id="i8" class="altColor">
 <td class="colFirst"><code>abstract <a href="../../../../../net/ME1312/SubServers/Bungee/Host/Host.html" title="class in net.ME1312.SubServers.Bungee.Host">Host</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/SubServer.html#getHost--">getHost</a></span>()</code>
 <div class="block">Grabs the Host of the Server</div>
 </td>
 </tr>
-<tr id="i8" class="altColor">
+<tr id="i9" class="rowColor">
+<td class="colFirst"><code>java.util.List&lt;<a href="../../../../../net/ME1312/SubServers/Bungee/Host/SubServer.html" title="class in net.ME1312.SubServers.Bungee.Host">SubServer</a>&gt;</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/SubServer.html#getIncompatibilities--">getIncompatibilities</a></span>()</code>
+<div class="block">Get all listed incompatibilities for this Server</div>
+</td>
+</tr>
+<tr id="i10" class="altColor">
 <td class="colFirst"><code>abstract <a href="../../../../../net/ME1312/SubServers/Bungee/Host/SubLogger.html" title="class in net.ME1312.SubServers.Bungee.Host">SubLogger</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/SubServer.html#getLogger--">getLogger</a></span>()</code>
 <div class="block">Get Process Logger</div>
 </td>
 </tr>
-<tr id="i9" class="rowColor">
+<tr id="i11" class="rowColor">
 <td class="colFirst"><code>abstract java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/SubServer.html#getPath--">getPath</a></span>()</code>
 <div class="block">Get the Server Directory Path</div>
 </td>
 </tr>
-<tr id="i10" class="altColor">
+<tr id="i12" class="altColor">
 <td class="colFirst"><code>abstract java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/SubServer.html#getStopCommand--">getStopCommand</a></span>()</code>
 <div class="block">Grab the Command to Stop the Server</div>
 </td>
 </tr>
-<tr id="i11" class="rowColor">
+<tr id="i13" class="rowColor">
+<td class="colFirst"><code>boolean</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/SubServer.html#isCompatible-net.ME1312.SubServers.Bungee.Host.SubServer-">isCompatible</a></span>(<a href="../../../../../net/ME1312/SubServers/Bungee/Host/SubServer.html" title="class in net.ME1312.SubServers.Bungee.Host">SubServer</a>&nbsp;server)</code>
+<div class="block">Checks if a Server is compatible</div>
+</td>
+</tr>
+<tr id="i14" class="altColor">
 <td class="colFirst"><code>abstract boolean</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/SubServer.html#isEnabled--">isEnabled</a></span>()</code>
 <div class="block">If the Server is Enabled</div>
 </td>
 </tr>
-<tr id="i12" class="altColor">
+<tr id="i15" class="rowColor">
 <td class="colFirst"><code>abstract boolean</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/SubServer.html#isLogging--">isLogging</a></span>()</code>
 <div class="block">If the Server is Logging</div>
 </td>
 </tr>
-<tr id="i13" class="rowColor">
+<tr id="i16" class="altColor">
 <td class="colFirst"><code>abstract boolean</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/SubServer.html#isRunning--">isRunning</a></span>()</code>
 <div class="block">If the Server is Running</div>
 </td>
 </tr>
-<tr id="i14" class="altColor">
+<tr id="i17" class="rowColor">
 <td class="colFirst"><code>abstract boolean</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/SubServer.html#isTemporary--">isTemporary</a></span>()</code>
 <div class="block">If the Server is Temporary</div>
 </td>
 </tr>
-<tr id="i15" class="rowColor">
+<tr id="i18" class="altColor">
 <td class="colFirst"><code>abstract void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/SubServer.html#setAutoRestart-boolean-">setAutoRestart</a></span>(boolean&nbsp;value)</code>
 <div class="block">Set if the Server will Auto Restart on unexpected shutdowns</div>
 </td>
 </tr>
-<tr id="i16" class="altColor">
+<tr id="i19" class="rowColor">
 <td class="colFirst"><code>abstract void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/SubServer.html#setEnabled-boolean-">setEnabled</a></span>(boolean&nbsp;value)</code>
 <div class="block">Set if the Server is Enabled</div>
 </td>
 </tr>
-<tr id="i17" class="rowColor">
+<tr id="i20" class="altColor">
 <td class="colFirst"><code>abstract void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/SubServer.html#setLogging-boolean-">setLogging</a></span>(boolean&nbsp;value)</code>
 <div class="block">Set if the Server is Logging</div>
 </td>
 </tr>
-<tr id="i18" class="altColor">
+<tr id="i21" class="rowColor">
 <td class="colFirst"><code>abstract void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/SubServer.html#setStopCommand-java.lang.String-">setStopCommand</a></span>(java.lang.String&nbsp;value)</code>
 <div class="block">Set the Command that Stops the Server</div>
 </td>
 </tr>
-<tr id="i19" class="rowColor">
+<tr id="i22" class="altColor">
 <td class="colFirst"><code>abstract void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/SubServer.html#setTemporary-boolean-">setTemporary</a></span>(boolean&nbsp;value)</code>
 <div class="block">Set If the Server is Temporary (will start server if not running)</div>
 </td>
 </tr>
-<tr id="i20" class="altColor">
+<tr id="i23" class="rowColor">
 <td class="colFirst"><code>boolean</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/SubServer.html#start--">start</a></span>()</code>
 <div class="block">Starts the Server</div>
 </td>
 </tr>
-<tr id="i21" class="rowColor">
+<tr id="i24" class="altColor">
 <td class="colFirst"><code>abstract boolean</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/SubServer.html#start-java.util.UUID-">start</a></span>(java.util.UUID&nbsp;player)</code>
 <div class="block">Starts the Server</div>
 </td>
 </tr>
-<tr id="i22" class="altColor">
+<tr id="i25" class="rowColor">
 <td class="colFirst"><code>boolean</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/SubServer.html#stop--">stop</a></span>()</code>
 <div class="block">Stops the Server</div>
 </td>
 </tr>
-<tr id="i23" class="rowColor">
+<tr id="i26" class="altColor">
 <td class="colFirst"><code>abstract boolean</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/SubServer.html#stop-java.util.UUID-">stop</a></span>(java.util.UUID&nbsp;player)</code>
 <div class="block">Stops the Server</div>
 </td>
 </tr>
-<tr id="i24" class="altColor">
+<tr id="i27" class="rowColor">
 <td class="colFirst"><code>boolean</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/SubServer.html#terminate--">terminate</a></span>()</code>
 <div class="block">Terminates the Server</div>
 </td>
 </tr>
-<tr id="i25" class="rowColor">
+<tr id="i28" class="altColor">
 <td class="colFirst"><code>abstract boolean</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/SubServer.html#terminate-java.util.UUID-">terminate</a></span>(java.util.UUID&nbsp;player)</code>
 <div class="block">Terminates the Server</div>
 </td>
 </tr>
-<tr id="i26" class="altColor">
+<tr id="i29" class="rowColor">
+<td class="colFirst"><code>void</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/SubServer.html#toggleCompatibility-net.ME1312.SubServers.Bungee.Host.SubServer...-">toggleCompatibility</a></span>(<a href="../../../../../net/ME1312/SubServers/Bungee/Host/SubServer.html" title="class in net.ME1312.SubServers.Bungee.Host">SubServer</a>...&nbsp;server)</code>
+<div class="block">Toggles compatibility with other Servers</div>
+</td>
+</tr>
+<tr id="i30" class="altColor">
 <td class="colFirst"><code>java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/SubServer.html#toString--">toString</a></span>()</code>&nbsp;</td>
 </tr>
-<tr id="i27" class="rowColor">
+<tr id="i31" class="rowColor">
 <td class="colFirst"><code>abstract void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/SubServer.html#waitFor--">waitFor</a></span>()</code>
 <div class="block">Waits for the Server to Stop</div>
 </td>
 </tr>
-<tr id="i28" class="altColor">
+<tr id="i32" class="altColor">
 <td class="colFirst"><code>abstract boolean</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/SubServer.html#willAutoRestart--">willAutoRestart</a></span>()</code>
 <div class="block">If the Server will Auto Restart on unexpected shutdowns</div>
@@ -709,7 +733,7 @@ extends <a href="../../../../../net/ME1312/SubServers/Bungee/Host/Server.html" t
 <li class="blockList">
 <h4>getCommandHistory</h4>
 <pre>public abstract&nbsp;java.util.LinkedList&lt;<a href="../../../../../net/ME1312/SubServers/Bungee/Host/SubServer.LoggedCommand.html" title="class in net.ME1312.SubServers.Bungee.Host">SubServer.LoggedCommand</a>&gt;&nbsp;getCommandHistory()</pre>
-<div class="block">Gets all the commands that were sent to this SubServer successfully</div>
+<div class="block">Gets all the commands that were sent to this Server successfully</div>
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>Command History</dd>
@@ -811,6 +835,64 @@ extends <a href="../../../../../net/ME1312/SubServers/Bungee/Host/Server.html" t
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>value</code> - Value</dd>
+</dl>
+</li>
+</ul>
+<a name="toggleCompatibility-net.ME1312.SubServers.Bungee.Host.SubServer...-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>toggleCompatibility</h4>
+<pre>public&nbsp;void&nbsp;toggleCompatibility(<a href="../../../../../net/ME1312/SubServers/Bungee/Host/SubServer.html" title="class in net.ME1312.SubServers.Bungee.Host">SubServer</a>...&nbsp;server)</pre>
+<div class="block">Toggles compatibility with other Servers</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>server</code> - SubServers to toggle</dd>
+</dl>
+</li>
+</ul>
+<a name="isCompatible-net.ME1312.SubServers.Bungee.Host.SubServer-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>isCompatible</h4>
+<pre>public&nbsp;boolean&nbsp;isCompatible(<a href="../../../../../net/ME1312/SubServers/Bungee/Host/SubServer.html" title="class in net.ME1312.SubServers.Bungee.Host">SubServer</a>&nbsp;server)</pre>
+<div class="block">Checks if a Server is compatible</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>server</code> - Server to check</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>Compatible Status</dd>
+</dl>
+</li>
+</ul>
+<a name="getIncompatibilities--">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getIncompatibilities</h4>
+<pre>public&nbsp;java.util.List&lt;<a href="../../../../../net/ME1312/SubServers/Bungee/Host/SubServer.html" title="class in net.ME1312.SubServers.Bungee.Host">SubServer</a>&gt;&nbsp;getIncompatibilities()</pre>
+<div class="block">Get all listed incompatibilities for this Server</div>
+<dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>Incompatibility List</dd>
+</dl>
+</li>
+</ul>
+<a name="getCurrentIncompatibilities--">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getCurrentIncompatibilities</h4>
+<pre>public&nbsp;java.util.List&lt;<a href="../../../../../net/ME1312/SubServers/Bungee/Host/SubServer.html" title="class in net.ME1312.SubServers.Bungee.Host">SubServer</a>&gt;&nbsp;getCurrentIncompatibilities()</pre>
+<div class="block">Get incompatibility issues this server currently has</div>
+<dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>Current Incompatibility List</dd>
 </dl>
 </li>
 </ul>

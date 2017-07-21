@@ -28,4 +28,5 @@ Servers:
     Run-On-Launch: false
     Auto-Restart: false
     Restricted: false
+    Incompatible: []
     Hidden: false

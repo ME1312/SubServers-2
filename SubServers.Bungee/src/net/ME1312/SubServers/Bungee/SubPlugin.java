@@ -81,7 +81,7 @@ public final class SubPlugin extends BungeeCord {
         if (!(new UniversalFile(dir, "lang.yml").exists())) {
             Util.copyFromJar(SubPlugin.class.getClassLoader(), "net/ME1312/SubServers/Bungee/Library/Files/lang.yml", new UniversalFile(dir, "lang.yml").getPath());
             System.out.println("SubServers > Created ~/SubServers/lang.yml");
-        } else if ((new Version((new YAMLConfig(new UniversalFile(dir, "lang.yml"))).get().getString("Version", "0")).compareTo(new Version("2.11.2m+"))) != 0) {
+        } else if ((new Version((new YAMLConfig(new UniversalFile(dir, "lang.yml"))).get().getString("Version", "0")).compareTo(new Version("2.12b+"))) != 0) {
             Files.move(new UniversalFile(dir, "lang.yml").toPath(), new UniversalFile(dir, "lang.old" + Math.round(Math.random() * 100000) + ".yml").toPath());
             Util.copyFromJar(SubPlugin.class.getClassLoader(), "net/ME1312/SubServers/Bungee/Library/Files/lang.yml", new UniversalFile(dir, "lang.yml").getPath());
             System.out.println("SubServers > Updated ~/SubServers/lang.yml");
@@ -171,7 +171,6 @@ public final class SubPlugin extends BungeeCord {
             p++;
             legServers.put(name, new BungeeServerInfo(name, new InetSocketAddress(InetAddress.getByName(i + ".0.0.0"), p), "Some SubServer", false));
         }
-
     }
 
     /**
@@ -208,6 +207,7 @@ public final class SubPlugin extends BungeeCord {
                             config.get().getSection("Hosts").getSection(name).getRawString("Git-Bash"));
                     this.hosts.put(name.toLowerCase(), host);
                     if (config.get().getSection("Hosts").getSection(name).getKeys().contains("Display")) host.setDisplayName(config.get().getSection("Hosts").getSection(name).getString("Display"));
+                    if (config.get().getSection("Hosts").getSection(name).getKeys().contains("Extra")) for (String extra : config.get().getSection("Hosts").getSection(name).getSection("Extra").getKeys()) host.addExtra(extra, config.get().getSection("Hosts").getSection(name).getSection("Extra").getObject(extra));
                     SubDataServer.allowConnection(host.getAddress());
                     hosts++;
                 } catch (Exception e) {
@@ -224,6 +224,7 @@ public final class SubPlugin extends BungeeCord {
                             Integer.parseInt(bungee.get().getSection("servers").getSection(name).getRawString("address").split(":")[1]), bungee.get().getSection("servers").getSection(name).getColoredString("motd", '&'),
                             bungee.get().getSection("servers").getSection(name).getBoolean("hidden", false), bungee.get().getSection("servers").getSection(name).getBoolean("restricted"));
                     if (bungee.get().getSection("servers").getSection(name).getKeys().contains("display")) server.setDisplayName(bungee.get().getSection("servers").getSection(name).getString("display"));
+                    if (bungee.get().getSection("servers").getSection(name).getKeys().contains("extra")) for (String extra : config.get().getSection("servers").getSection(name).getSection("extra").getKeys()) server.addExtra(extra, config.get().getSection("servers").getSection(name).getSection("extra").getObject(extra));
                     SubDataServer.allowConnection(server.getAddress().getAddress());
                     servers++;
                 } catch (Exception e) {
@@ -245,9 +246,16 @@ public final class SubPlugin extends BungeeCord {
                             config.get().getSection("Servers").getSection(name).getRawString("Directory"), new Executable(config.get().getSection("Servers").getSection(name).getRawString("Executable")), config.get().getSection("Servers").getSection(name).getRawString("Stop-Command"),
                             config.get().getSection("Servers").getSection(name).getBoolean("Run-On-Launch"), config.get().getSection("Servers").getSection(name).getBoolean("Auto-Restart"), config.get().getSection("Servers").getSection(name).getBoolean("Hidden"), config.get().getSection("Servers").getSection(name).getBoolean("Restricted"), false);
                     if (config.get().getSection("Servers").getSection(name).getKeys().contains("Display")) server.setDisplayName(config.get().getSection("Servers").getSection(name).getString("Display"));
+                    if (config.get().getSection("Servers").getSection(name).getKeys().contains("Extra")) for (String extra : config.get().getSection("Servers").getSection(name).getSection("Extra").getKeys()) server.addExtra(extra, config.get().getSection("Servers").getSection(name).getSection("Extra").getObject(extra));
                     subservers++;
                 } catch (Exception e) {
                     e.printStackTrace();
+                }
+            }
+            for (SubServer server : api.getSubServers().values()) {
+                for (String name : config.get().getSection("Servers").getSection(server.getName()).getRawStringList("Incompatible", new ArrayList<>())) {
+                    SubServer other = api.getSubServer(name);
+                    if (other != null && server.isCompatible(other)) server.toggleCompatibility(other);
                 }
             }
             running = true;
@@ -298,8 +306,8 @@ public final class SubPlugin extends BungeeCord {
     public Map<String, ServerInfo> getServers() {
         HashMap<String, ServerInfo> servers = new HashMap<String, ServerInfo>();
         if (!running) {
-            servers.putAll(super.getServers());
             servers.putAll(legServers);
+            servers.putAll(super.getServers());
         } else {
             for (ServerInfo server : exServers.values()) servers.put(server.getName(), server);
             for (Host host : this.hosts.values()) {

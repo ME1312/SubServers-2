@@ -42,6 +42,7 @@ public class Server extends BungeeServerInfo implements ClientHandler, ExtraData
     @Override
     public void setSubData(Client client) {
         this.client = client;
+        if (client != null && (client.getHandler() == null || !equals(client.getHandler()))) client.setHandler(this);
     }
 
     /**

@@ -68,7 +68,14 @@ public class PacketStartServer implements PacketIn, PacketOut {
             } else if (!((SubServer) servers.get(data.getString("server").toLowerCase())).isEnabled()) {
                 client.sendPacket(new PacketStartServer(5, "That SubServer is not enabled", (data.keySet().contains("id"))?data.getString("id"):null));
             } else if (((SubServer) servers.get(data.getString("server").toLowerCase())).isRunning()) {
-                client.sendPacket(new PacketStartServer(6, "That SubServer is already running", (data.keySet().contains("id"))?data.getString("id"):null));
+                client.sendPacket(new PacketStartServer(6, "That SubServer is already running", (data.keySet().contains("id")) ? data.getString("id") : null));
+            } else if (((SubServer) servers.get(data.getString("server").toLowerCase())).getCurrentIncompatibilities().size() != 0) {
+                String list = "";
+                for (SubServer server : ((SubServer) servers.get(data.getString("server").toLowerCase())).getCurrentIncompatibilities()) {
+                    if (list.length() != 0) list += ", ";
+                    list += server.getName();
+                }
+                client.sendPacket(new PacketStartServer(7, "Cannot start SubServer while these servers are running: " + list, (data.keySet().contains("id")) ? data.getString("id") : null));
             } else {
                 if (((SubServer) servers.get(data.getString("server").toLowerCase())).start((data.keySet().contains("player"))?UUID.fromString(data.getString("player")):null)) {
                     client.sendPacket(new PacketStartServer(0, "Starting SubServer", (data.keySet().contains("id"))?data.getString("id"):null));

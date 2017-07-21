@@ -1,4 +1,4 @@
-Version: '2.11.2m+'
+Version: '2.12b+'
 Lang:
   'Bungee.Server.Current': '&6You are currently connected to $str$'
   'Bungee.Server.Available': '&6You may connect to the following servers at this time:'
@@ -35,6 +35,7 @@ Lang:
   'Command.Start.Invalid': '&cSubServers \u00BB That Server is not a SubServer'
   'Command.Start.Host-Disabled': '&cSubServers \u00BB That SubServer\u0027s Host is not enabled'
   'Command.Start.Server-Disabled': '&cSubServers \u00BB That SubServer is not enabled'
+  'Command.Start.Server-Incompatible': '&cSubServers \u00BB That SubServer cannot start while these server(s) are running: &4$str$'
   'Command.Start.Running': '&cSubServers \u00BB That SubServer is already running'
   'Command.Stop': '&aSubServers \u00BB Stopping SubServer'
   'Command.Stop.Unknown': '&cSubServers \u00BB There is no server with that name'
@@ -109,6 +110,7 @@ Lang:
   'Interface.SubServer-Menu.SubServer-External': '&7External Server'
   'Interface.SubServer-Menu.SubServer-Temporary': '&9Temporary'
   'Interface.SubServer-Menu.SubServer-Offline': '&6Offline'
+  'Interface.SubServer-Menu.SubServer-Incompatible': '&4Incompatible with $str$'
   'Interface.SubServer-Menu.SubServer-Disabled': '&4Disabled'
   'Interface.SubServer-Menu.No-SubServers': '&c&oThere are No SubServers'
   'Interface.SubServer-Menu.Host-Menu': '&b&lHost Menu'

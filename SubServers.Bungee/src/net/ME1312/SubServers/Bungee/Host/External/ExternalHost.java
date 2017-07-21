@@ -70,6 +70,7 @@ public class ExternalHost extends Host implements ClientHandler {
     @Override
     public void setSubData(Client client) {
         this.client = new NamedContainer<Boolean, Client>(false, client);
+        if (client != null && (client.getHandler() == null || !equals(client.getHandler()))) client.setHandler(this);
     }
 
     protected void queue(PacketOut... packet) {

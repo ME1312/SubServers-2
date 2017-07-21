@@ -123,7 +123,7 @@ public final class SubCommand implements CommandExecutor {
                                                 hoverm.add(hover);
                                             }
                                             hover = new net.md_5.bungee.api.chat.TextComponent(plugin.lang.getSection("Lang").getColoredString("Interface.SubServer-Menu.SubServer-Player-Count", '&').replace("$int$", new DecimalFormat("#,###").format(servers.get(server).getJSONObject("players").keySet().size())));
-                                        } else if (servers.get(server).getBoolean("enabled")) {
+                                        } else if (servers.get(server).getBoolean("enabled") && servers.get(server).getJSONArray("incompatible").length() == 0) {
                                             message.setColor(net.md_5.bungee.api.ChatColor.YELLOW);
                                             hover.setColor(net.md_5.bungee.api.ChatColor.YELLOW);
                                             hoverm.add(hover);
@@ -136,13 +136,24 @@ public final class SubCommand implements CommandExecutor {
                                         } else {
                                             message.setColor(net.md_5.bungee.api.ChatColor.RED);
                                             hover.setColor(net.md_5.bungee.api.ChatColor.RED);
-                                            hoverm.add(hover);
                                             if (!server.equals(servers.get(server).getString("display"))) {
+                                                hoverm.add(hover);
                                                 hover = new net.md_5.bungee.api.chat.TextComponent(server + '\n');
                                                 hover.setColor(net.md_5.bungee.api.ChatColor.GRAY);
-                                                hoverm.add(hover);
                                             }
-                                            hover = new net.md_5.bungee.api.chat.TextComponent(plugin.lang.getSection("Lang").getColoredString("Interface.SubServer-Menu.SubServer-Disabled", '&'));
+                                            if (servers.get(server).getJSONArray("incompatible").length() != 0) {
+                                                hoverm.add(hover);
+                                                String list = "";
+                                                for (int ii = 0; ii < servers.get(server).getJSONArray("incompatible").length(); ii++) {
+                                                    if (list.length() != 0) list += ", ";
+                                                    list += servers.get(server).getJSONArray("incompatible").getString(ii);
+                                                }
+                                                hover = new net.md_5.bungee.api.chat.TextComponent(plugin.lang.getSection("Lang").getColoredString("Interface.SubServer-Menu.SubServer-Incompatible", '&').replace("$str$", list));
+                                            }
+                                            if (!servers.get(server).getBoolean("enabled")) {
+                                                hoverm.add(hover);
+                                                hover = new net.md_5.bungee.api.chat.TextComponent(plugin.lang.getSection("Lang").getColoredString("Interface.SubServer-Menu.SubServer-Disabled", '&'));
+                                            }
                                         }
                                     }
                                     hoverm.add(hover);
@@ -214,6 +225,9 @@ public final class SubCommand implements CommandExecutor {
                                             break;
                                         case 6:
                                             sender.sendMessage(plugin.lang.getSection("Lang").getColoredString("Command.Start.Running", '&'));
+                                            break;
+                                        case 7:
+                                            sender.sendMessage(plugin.lang.getSection("Lang").getColoredString("Command.Start.Server-Incompatible", '&').replace("$str$", json.getString("m").split(":\\s")[1]));
                                             break;
                                         case 0:
                                         case 1:

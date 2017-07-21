@@ -121,7 +121,7 @@ public final class SubDataClient {
                         }
                         JSONObject json = new JSONObject(decoded);
                         for (PacketIn packet : decodePacket(json)) {
-                            Bukkit.getScheduler().runTask(plugin, () -> {
+                            if (plugin.isEnabled()) Bukkit.getScheduler().runTask(plugin, () -> {
                                 try {
                                     packet.execute((json.keySet().contains("c")) ? json.getJSONObject("c") : null);
                                 } catch (Throwable e) {

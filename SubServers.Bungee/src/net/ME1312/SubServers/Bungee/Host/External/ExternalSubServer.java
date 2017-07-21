@@ -69,7 +69,7 @@ public class ExternalSubServer extends SubServer {
 
     @Override
     public boolean start(UUID player) {
-        if (isEnabled() && !running) {
+        if (isEnabled() && !running && getCurrentIncompatibilities().size() == 0) {
             SubStartEvent event = new SubStartEvent(player, this);
             host.plugin.getPluginManager().callEvent(event);
             if (!event.isCancelled()) {

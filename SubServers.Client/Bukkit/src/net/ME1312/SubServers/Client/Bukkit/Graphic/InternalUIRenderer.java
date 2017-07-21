@@ -772,7 +772,7 @@ public class InternalUIRenderer extends UIRenderer {
                             lore.add(ChatColor.GRAY + subserver);
                         lore.add(plugin.lang.getSection("Lang").getColoredString("Interface.SubServer-Menu.SubServer-Player-Count", '&').replace("$int$", new DecimalFormat("#,###").format(json.getJSONObject("hosts").getJSONObject(hosts.get(subserver)).getJSONObject("servers").getJSONObject(subserver).getJSONObject("players").keySet().size())));
                         blockMeta.setLore(lore);
-                    } else if (json.getJSONObject("hosts").getJSONObject(hosts.get(subserver)).getJSONObject("servers").getJSONObject(subserver).getBoolean("enabled")) {
+                    } else if (json.getJSONObject("hosts").getJSONObject(hosts.get(subserver)).getJSONObject("servers").getJSONObject(subserver).getBoolean("enabled") && json.getJSONObject("hosts").getJSONObject(hosts.get(subserver)).getJSONObject("servers").getJSONObject(subserver).getJSONArray("incompatible").length() == 0) {
                         block = new ItemStack(Material.STAINED_GLASS_PANE, 1, offline);
                         blockMeta = block.getItemMeta();
                         blockMeta.setDisplayName(ChatColor.YELLOW + json.getJSONObject("hosts").getJSONObject(hosts.get(subserver)).getJSONObject("servers").getJSONObject(subserver).getString("display"));
@@ -788,7 +788,15 @@ public class InternalUIRenderer extends UIRenderer {
                         LinkedList<String> lore = new LinkedList<String>();
                         if (!subserver.equals(json.getJSONObject("hosts").getJSONObject(hosts.get(subserver)).getJSONObject("servers").getJSONObject(subserver).getString("display")))
                             lore.add(ChatColor.GRAY + subserver);
-                        lore.add(plugin.lang.getSection("Lang").getColoredString("Interface.SubServer-Menu.SubServer-Disabled", '&'));
+                        if (json.getJSONObject("hosts").getJSONObject(hosts.get(subserver)).getJSONObject("servers").getJSONObject(subserver).getJSONArray("incompatible").length() != 0) {
+                            String list = "";
+                            for (int ii = 0; ii < json.getJSONObject("hosts").getJSONObject(hosts.get(subserver)).getJSONObject("servers").getJSONObject(subserver).getJSONArray("incompatible").length(); ii++) {
+                                if (list.length() != 0) list += ", ";
+                                list += json.getJSONObject("hosts").getJSONObject(hosts.get(subserver)).getJSONObject("servers").getJSONObject(subserver).getJSONArray("incompatible").getString(ii);
+                            }
+                            lore.add(plugin.lang.getSection("Lang").getColoredString("Interface.SubServer-Menu.SubServer-Incompatible", '&').replace("$str$", list));
+                        }
+                        if (!json.getJSONObject("hosts").getJSONObject(hosts.get(subserver)).getJSONObject("servers").getJSONObject(subserver).getBoolean("enabled")) lore.add(plugin.lang.getSection("Lang").getColoredString("Interface.SubServer-Menu.SubServer-Disabled", '&'));
                         blockMeta.setLore(lore);
                     }
                     block.setItemMeta(blockMeta);
@@ -934,7 +942,7 @@ public class InternalUIRenderer extends UIRenderer {
                         blockMeta = block.getItemMeta();
                         blockMeta.setDisplayName(ChatColor.GRAY+ChatColor.stripColor(plugin.lang.getSection("Lang").getColoredString("Interface.SubServer-Admin.Start", '&')));
                         blockMeta.setLore(Arrays.asList(plugin.lang.getSection("Lang").getColoredString("Interface.Generic.Invalid-Permission", '&').replace("$str$", "subservers.subserver.start." + subserver.toLowerCase())));
-                    } else if (!json.getJSONObject("server").getBoolean("enabled")) {
+                    } else if (!json.getJSONObject("server").getBoolean("enabled") || json.getJSONObject("server").getJSONArray("incompatible").length() != 0) {
                         block = new ItemStack(Material.STAINED_GLASS_PANE, 1, (short) 7);
                         blockMeta = block.getItemMeta();
                         blockMeta.setDisplayName(ChatColor.GRAY+ChatColor.stripColor(plugin.lang.getSection("Lang").getColoredString("Interface.SubServer-Admin.Start", '&')));
@@ -984,7 +992,7 @@ public class InternalUIRenderer extends UIRenderer {
                         lore.add(ChatColor.GRAY + subserver);
                     lore.add(plugin.lang.getSection("Lang").getColoredString("Interface.SubServer-Menu.SubServer-Player-Count", '&').replace("$int$", new DecimalFormat("#,###").format(json.getJSONObject("server").getJSONObject("players").keySet().size())));
                     blockMeta.setLore(lore);
-                } else if (json.getJSONObject("server").getBoolean("enabled")) {
+                } else if (json.getJSONObject("server").getBoolean("enabled") && json.getJSONObject("server").getJSONArray("incompatible").length() == 0) {
                     block = new ItemStack(Material.STAINED_GLASS_PANE, 1, (short) 4);
                     blockMeta = block.getItemMeta();
                     blockMeta.setDisplayName(ChatColor.YELLOW + json.getJSONObject("server").getString("display"));
@@ -1000,7 +1008,15 @@ public class InternalUIRenderer extends UIRenderer {
                     LinkedList<String> lore = new LinkedList<String>();
                     if (!subserver.equals(json.getJSONObject("server").getString("display")))
                         lore.add(ChatColor.GRAY + subserver);
-                    lore.add(plugin.lang.getSection("Lang").getColoredString("Interface.SubServer-Menu.SubServer-Disabled", '&'));
+                    if (json.getJSONObject("server").getJSONArray("incompatible").length() != 0) {
+                        String list = "";
+                        for (int ii = 0; ii < json.getJSONObject("server").getJSONArray("incompatible").length(); ii++) {
+                            if (list.length() != 0) list += ", ";
+                            list += json.getJSONObject("server").getJSONArray("incompatible").getString(ii);
+                        }
+                        lore.add(plugin.lang.getSection("Lang").getColoredString("Interface.SubServer-Menu.SubServer-Incompatible", '&').replace("$str$", list));
+                    }
+                    if (!json.getJSONObject("server").getBoolean("enabled")) lore.add(plugin.lang.getSection("Lang").getColoredString("Interface.SubServer-Menu.SubServer-Disabled", '&'));
                     blockMeta.setLore(lore);
                 }
                 block.setItemMeta(blockMeta);

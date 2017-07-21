@@ -55,7 +55,7 @@ public final class Launch {
             } else {
                 System.out.println("");
                 System.out.println("*******************************************");
-                System.out.println("***  Warning: this build is Unofficial  ***");
+                System.out.println("***  Warning: this build is unofficial  ***");
                 System.out.println("***                                     ***");
                 System.out.println("*** Please report all issues to ME1312, ***");
                 System.out.println("***   NOT the Spigot Team. Thank You!   ***");
@@ -74,7 +74,7 @@ public final class Launch {
                         }
                     } else throw new Exception();
                 } catch (Exception e) {
-                    System.out.println("*** Problem checking BungeeCord Version ***");
+                    System.out.println("*** Problem checking BungeeCord version ***");
                     System.out.println("***  BungeeCord.jar could be outdated.  ***");
                     System.out.println("***                                     ***");
                     System.out.println("*** Errors may arise on older versions! ***");

@@ -2,21 +2,22 @@ package net.ME1312.SubServers.Bungee.Host;
 
 import net.ME1312.SubServers.Bungee.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Bungee.Library.Exception.InvalidServerException;
+import net.ME1312.SubServers.Bungee.Library.NamedContainer;
 import net.ME1312.SubServers.Bungee.Library.Util;
+import net.ME1312.SubServers.Bungee.SubAPI;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import org.json.JSONObject;
 
 import java.io.File;
 import java.net.InetSocketAddress;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * SubServer Layout Class
  */
 public abstract class SubServer extends Server {
+    private List<NamedContainer<String, String>> incompatibilities = new ArrayList<NamedContainer<String, String>>();
+
     /**
      * Command Storage Class
      */
@@ -250,7 +251,7 @@ public abstract class SubServer extends Server {
     public abstract SubLogger getLogger();
 
     /**
-     * Gets all the commands that were sent to this SubServer successfully
+     * Gets all the commands that were sent to this Server successfully
      *
      * @return Command History
      */
@@ -308,6 +309,70 @@ public abstract class SubServer extends Server {
     public abstract void setAutoRestart(boolean value);
 
     /**
+     * Toggles compatibility with other Servers
+     *
+     * @param server SubServers to toggle
+     */
+    public void toggleCompatibility(SubServer... server) {
+        for (SubServer s : server) {
+            if (!equals(s)) {
+                NamedContainer<String, String> info = new NamedContainer<String, String>(s.getHost().getName(), s.getName());
+                if (isCompatible(s)) {
+                    incompatibilities.add(info);
+                    if (s.isCompatible(this)) toggleCompatibility(this);
+                } else {
+                    incompatibilities.remove(info);
+                    if (!s.isCompatible(this)) toggleCompatibility(this);
+                }
+            }
+        }
+    }
+
+    /**
+     * Checks if a Server is compatible
+     *
+     * @param server Server to check
+     * @return Compatible Status
+     */
+    public boolean isCompatible(SubServer server) {
+        return !incompatibilities.contains(new NamedContainer<String, String>(server.getHost().getName(), server.getName()));
+    }
+
+    /**
+     * Get all listed incompatibilities for this Server
+     *
+     * @return Incompatibility List
+     */
+    public List<SubServer> getIncompatibilities() {
+        List<SubServer> servers = new ArrayList<SubServer>();
+        List<NamedContainer<String, String>> temp = new ArrayList<NamedContainer<String, String>>();
+        temp.addAll(incompatibilities);
+        for (NamedContainer<String, String> info : temp) {
+            try {
+                SubServer server = SubAPI.getInstance().getHost(info.name()).getSubServer(info.get());
+                if (server == null) throw new NullPointerException();
+                servers.add(server);
+            } catch (Throwable e) {
+                incompatibilities.remove(info);
+            }
+        }
+        return servers;
+    }
+
+    /**
+     * Get incompatibility issues this server currently has
+     *
+     * @return Current Incompatibility List
+     */
+    public List<SubServer> getCurrentIncompatibilities() {
+        List<SubServer> servers = new ArrayList<SubServer>();
+        for (SubServer server : getIncompatibilities()) {
+            if (server.isRunning()) servers.add(server);
+        }
+        return servers;
+    }
+
+    /**
      * If the Server is Temporary
      *
      * @return Temporary Status
@@ -327,6 +392,9 @@ public abstract class SubServer extends Server {
         sinfo.put("type", "SubServer");
         sinfo.put("enabled", getHost().isEnabled() && isEnabled());
         sinfo.put("running", isRunning());
+        List<String> incompatible = new ArrayList<String>();
+        for (SubServer server : getCurrentIncompatibilities()) incompatible.add(server.getName());
+        sinfo.put("incompatible", incompatible);
         sinfo.put("temp", isTemporary());
         return sinfo.toString();
     }
