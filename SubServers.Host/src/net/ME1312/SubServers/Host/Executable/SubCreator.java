@@ -4,6 +4,8 @@ import net.ME1312.SubServers.Host.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Host.Library.Container;
 import net.ME1312.SubServers.Host.Library.Exception.InvalidServerException;
 import net.ME1312.SubServers.Host.Library.Exception.InvalidTemplateException;
+import net.ME1312.SubServers.Host.Library.Exception.SubCreatorException;
+import net.ME1312.SubServers.Host.Library.NamedContainer;
 import net.ME1312.SubServers.Host.Library.UniversalFile;
 import net.ME1312.SubServers.Host.Library.Util;
 import net.ME1312.SubServers.Host.Library.Version.Version;
@@ -20,16 +22,14 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.*;
 import java.net.URL;
 import java.nio.charset.Charset;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Internal SubCreator Class
  */
 public class SubCreator {
     private ExHost host;
-    private SubLogger logger;
-    private Process process = null;
-    private Thread thread = null;
+    private TreeMap<String, NamedContainer<Thread, NamedContainer<SubLogger, Process>>> thread;
 
     public static class ServerTemplate {
         private String name;
@@ -185,22 +185,31 @@ public class SubCreator {
     public SubCreator(ExHost host) {
         if (Util.isNull(host)) throw new NullPointerException();
         this.host = host;
-        this.logger = new SubLogger(null, this, "SubCreator", null, new Container<Boolean>(false), null);
+        this.thread = new TreeMap<>();
     }
 
-    private void run(String name, ServerTemplate template, Version version, int port, UUID address, String id) {
-        UniversalFile dir = new UniversalFile(new File(host.host.getRawString("Directory")), name);
-        dir.mkdirs();
-
-        logger.logger.info.println("Generating Server Files...");
-        host.subdata.sendPacket(new PacketOutExLogMessage(address, "Generating Server Files..."));
+    private YAMLSection build(NamedContainer<SubLogger, Process> thread, File dir, String name, ServerTemplate template, Version version, UUID address, List<ServerTemplate> history) throws SubCreatorException {
+        YAMLSection server = new YAMLSection();
+        boolean error = false;
+        if (history.contains(template)) throw new IllegalStateException("Template Import loop detected");
+        history.add(template);
+        for (String other : template.getBuildOptions().getStringList("Import", new ArrayList<String>())) {
+            if (host.templates.keySet().contains(other.toLowerCase())) {
+                YAMLSection config = build(thread, dir, other, host.templates.get(other.toLowerCase()), version, address, history);
+                if (config == null) {
+                    throw new SubCreatorException();
+                } else {
+                    server.setAll(config);
+                }
+            }
+        }
+        server.setAll(template.getConfigOptions());
         try {
+            thread.name().logger.info.println("Loading Template: " + template.getDisplayName());
+            host.subdata.sendPacket(new PacketOutExLogMessage(address, "Loading Template: " + template.getDisplayName()));
             Util.copyDirectory(template.getDirectory(), dir);
-            generateProperties(dir, port);
-            generateClient(dir, template.getType(), name);
-
             if (template.getType() == ServerType.SPONGE) {
-                logger.logger.info.println("Searching Versions...");
+                thread.name().logger.info.println("Searching Versions...");
                 host.subdata.sendPacket(new PacketOutExLogMessage(address, "Searching Versions..."));
                 Document spongexml = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new InputSource(new StringReader(Util.readAll(new BufferedReader(new InputStreamReader(new URL("http://files.minecraftforge.net/maven/org/spongepowered/spongeforge/maven-metadata.xml").openStream(), Charset.forName("UTF-8")))))));
                 Document forgexml = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new InputSource(new StringReader(Util.readAll(new BufferedReader(new InputStreamReader(new URL("http://files.minecraftforge.net/maven/net/minecraftforge/forge/maven-metadata.xml").openStream(), Charset.forName("UTF-8")))))));
@@ -217,7 +226,7 @@ public class SubCreator {
                 }
                 if (spversion == null)
                     throw new InvalidServerException("Cannot find sponge version for Minecraft " + version.toString());
-                logger.logger.info.println("Found \"spongeforge-" + spversion.toString() + '"');
+                thread.name().logger.info.println("Found \"spongeforge-" + spversion.toString() + '"');
                 host.subdata.sendPacket(new PacketOutExLogMessage(address, "Found \"spongeforge-" + spversion.toString() + '"'));
 
                 NodeList mcfnodeList = forgexml.getElementsByTagName("version");
@@ -232,16 +241,15 @@ public class SubCreator {
                 }
                 if (mcfversion == null)
                     throw new InvalidServerException("Cannot find forge version for Sponge " + spversion.toString());
-                logger.logger.info.println("Found \"forge-" + mcfversion.toString() + '"');
+                thread.name().logger.info.println("Found \"forge-" + mcfversion.toString() + '"');
                 host.subdata.sendPacket(new PacketOutExLogMessage(address, "Found \"forge-" + mcfversion.toString() + '"'));
 
                 version = new Version(mcfversion.toString() + " " + spversion.toString());
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            thread.name().logger.error.println(e);
         }
 
-        boolean error = false;
         if (template.getBuildOptions().contains("Shell-Location")) {
             File gitBash = new File(host.host.getRawString("Git-Bash"), "bin" + File.separatorChar + "bash.exe");
             if (!(System.getProperty("os.name").toLowerCase().indexOf("win") >= 0) && template.getBuildOptions().contains("Permission")) {
@@ -249,75 +257,115 @@ public class SubCreator {
                     Process process = Runtime.getRuntime().exec("chmod " + template.getBuildOptions().getRawString("Permission") + ' ' + template.getBuildOptions().getRawString("Shell-Location"), null, dir);
                     Thread.sleep(500);
                     if (process.exitValue() != 0) {
-                        logger.logger.info.println("Couldn't set " + template.getBuildOptions().getRawString("Permission") + " permissions to " + template.getBuildOptions().getRawString("Shell-Location"));
+                        thread.name().logger.info.println("Couldn't set " + template.getBuildOptions().getRawString("Permission") + " permissions to " + template.getBuildOptions().getRawString("Shell-Location"));
                         host.subdata.sendPacket(new PacketOutExLogMessage(address, "Couldn't set " + template.getBuildOptions().getRawString("Permission") + " permissions to " + template.getBuildOptions().getRawString("Shell-Location")));
                     }
                 } catch (Exception e) {
-                    logger.logger.info.println("Couldn't set " + template.getBuildOptions().getRawString("Permission") + " permissions to " + template.getBuildOptions().getRawString("Shell-Location"));
+                    thread.name().logger.info.println("Couldn't set " + template.getBuildOptions().getRawString("Permission") + " permissions to " + template.getBuildOptions().getRawString("Shell-Location"));
                     host.subdata.sendPacket(new PacketOutExLogMessage(address, "Couldn't set " + template.getBuildOptions().getRawString("Permission") + " permissions to " + template.getBuildOptions().getRawString("Shell-Location")));
-                    e.printStackTrace();
+                    thread.name().logger.error.println(e);
                 }
             }
 
             try {
-                logger.logger.info.println("/Creator > Launching " + template.getBuildOptions().getRawString("Shell-Location"));
-                host.subdata.sendPacket(new PacketOutExLogMessage(address,"/Creator > Launching " + template.getBuildOptions().getRawString("Shell-Location")));
-                process = Runtime.getRuntime().exec((System.getProperty("os.name").toLowerCase().indexOf("win") >= 0)?"\"" + gitBash + "\" --login -i -c \"bash " + template.getBuildOptions().getRawString("Shell-Location") + ' ' + version.toString() + '\"':("bash " + template.getBuildOptions().getRawString("Shell-Location") + ' ' + version.toString() + " " + System.getProperty("user.home")), null, dir);
-                logger.process = this.process;
-                logger.log.set(true);
-                logger.address = address;
-                logger.file = new File(dir, "SubCreator-" + template.getType().toString() + "-" + version.toString().replace(" ", "@") + ".log");
-                logger.start();
+                thread.name().logger.info.println("Launching " + template.getBuildOptions().getRawString("Shell-Location"));
+                host.subdata.sendPacket(new PacketOutExLogMessage(address, "Launching " + template.getBuildOptions().getRawString("Shell-Location")));
+                thread.set(Runtime.getRuntime().exec((System.getProperty("os.name").toLowerCase().indexOf("win") >= 0)?"\"" + gitBash + "\" --login -i -c \"bash " + template.getBuildOptions().getRawString("Shell-Location") + ' ' + version.toString() + '\"':("bash " + template.getBuildOptions().getRawString("Shell-Location") + ' ' + version.toString() + " " + System.getProperty("user.home")), null, dir));
+                thread.name().file = new File(dir, "SubCreator-" + template.getName() + "-" + version.toString().replace(" ", "@") + ".log");
+                thread.name().process = thread.get();
+                thread.name().start();
 
-                process.waitFor();
+                thread.get().waitFor();
                 Thread.sleep(500);
 
-                if (process.exitValue() != 0) error = true;
+                if (thread.get().exitValue() != 0) error = true;
             } catch (Exception e) {
                 error = true;
-                e.printStackTrace();
+                thread.name().logger.error.println(e);
             }
         }
 
         new UniversalFile(dir, "template.yml").delete();
-        if (!error) {
+        if (error) throw new SubCreatorException();
+        return server;
+    }
+
+    private void run(String name, ServerTemplate template, Version version, int port, UUID address, String id) {
+        NamedContainer<SubLogger, Process> thread = this.thread.get(name.toLowerCase()).get();
+        UniversalFile dir = new UniversalFile(new File(host.host.getRawString("Directory")), name);
+        dir.mkdirs();
+        YAMLSection server;
+        try {
+            server = build(thread, dir, name, template, version, address, new LinkedList<>());
+            generateProperties(dir, port);
+            generateClient(dir, template.getType(), name);
+        } catch (SubCreatorException e) {
+            server = null;
+        } catch (Exception e) {
+            server = null;
+            thread.name().logger.error.println(e);
+        }
+
+        if (server != null) {
             host.subdata.sendPacket(new PacketExCreateServer(0, "Created Server Successfully", template.getConfigOptions().toJSON(), id));
         } else {
-            logger.logger.info.println("Couldn't build the server jar. See \"SubCreator-" + template.getType().toString() + "-" + version.toString().replace(" ", "@") + ".log\" for more details.");
-            host.subdata.sendPacket(new PacketOutExLogMessage(address, "Couldn't build the server jar. See \"SubCreator-" + template.getType().toString() + "-" + version.toString().replace(" ", "@") + ".log\" for more details."));
+            thread.name().logger.info.println("Couldn't build the server jar. Check the SubCreator logs for more detail.");
+            host.subdata.sendPacket(new PacketExCreateServer(-1, "Couldn't build the server jar. Check the SubCreator logs for more detail.", template.getConfigOptions().toJSON(), id));
         }
+        this.thread.remove(name.toLowerCase());
     }
 
     public boolean create(String name, ServerTemplate template, Version version, int port, UUID address, String id) {
         if (Util.isNull(name, template, version, port, address)) throw new NullPointerException();
-        if (!isBusy()) {
-            (thread = new Thread(() -> {
-                SubCreator.this.run(name, template, version, port, address, id);
-            })).start();
-            return true;
-        } else return false;
+        NamedContainer<Thread, NamedContainer<SubLogger, Process>> run = new NamedContainer<Thread, NamedContainer<SubLogger, Process>>(new Thread(() -> SubCreator.this.run(name, template, version, port, address, id)), new NamedContainer<SubLogger, Process>(new SubLogger(null, this, name + File.separator + "Creator", address, new Container<Boolean>(true), null), null));
+        this.thread.put(name.toLowerCase(), run);
+        run.name().start();
+        return true;
     }
 
     public void terminate() {
-        if (process != null && this.process.isAlive()) {
-            process.destroyForcibly();
-        } else if (thread != null && this.thread.isAlive()) {
-            thread.interrupt();
+        HashMap<String, NamedContainer<Thread, NamedContainer<SubLogger, Process>>> temp = new HashMap<String, NamedContainer<Thread, NamedContainer<SubLogger, Process>>>();
+        temp.putAll(thread);
+        for (String i : temp.keySet()) {
+            terminate(i);
+        }
+    }
+
+    public void terminate(String thread) {
+        if (this.thread.get(thread).get().get() != null && this.thread.get(thread).get().get().isAlive()) {
+            this.thread.get(thread).get().get().destroyForcibly();
+        }
+        if (this.thread.get(thread).name() != null && this.thread.get(thread).name().isAlive()) {
+            this.thread.get(thread).name().interrupt();
         }
     }
 
     public void waitFor() throws InterruptedException {
-        while (thread != null && thread.isAlive()) {
+        HashMap<String, NamedContainer<Thread, NamedContainer<SubLogger, Process>>> temp = new HashMap<String, NamedContainer<Thread, NamedContainer<SubLogger, Process>>>();
+        temp.putAll(thread);
+        for (String i : temp.keySet()) {
+            waitFor(i);
+        }
+    }
+
+    public void waitFor(String thread) throws InterruptedException {
+        while (this.thread.get(thread).name() != null && this.thread.get(thread).name().isAlive()) {
             Thread.sleep(250);
         }
     }
 
-    public SubLogger getLogger() {
-        return logger;
+    public List<SubLogger> getLogger() {
+        List<SubLogger> loggers = new ArrayList<SubLogger>();
+        HashMap<String, NamedContainer<Thread, NamedContainer<SubLogger, Process>>> temp = new HashMap<String, NamedContainer<Thread, NamedContainer<SubLogger, Process>>>();
+        temp.putAll(thread);
+        for (String i : temp.keySet()) {
+            loggers.add(getLogger(i));
+        }
+        return loggers;
     }
 
-    public boolean isBusy() {
-        return thread != null && thread.isAlive();
+    public SubLogger getLogger(String thread) {
+        return this.thread.get(thread).get().name();
     }
 
     private void generateClient(File dir, ServerType type, String name) throws IOException {
@@ -348,48 +396,5 @@ public class SubCreator {
         PrintWriter writer = new PrintWriter(file, "UTF-8");
         writer.write(content);
         writer.close();
-    }
-    private void copyFolder(File source, File destination) {
-        if (source.isDirectory()) {
-            if (!destination.exists()) {
-                destination.mkdirs();
-            }
-
-            String files[] = source.list();
-
-            for (String file : files) {
-                File srcFile = new File(source, file);
-                File destFile = new File(destination, file);
-
-                copyFolder(srcFile, destFile);
-            }
-        } else {
-            InputStream in = null;
-            OutputStream out = null;
-
-            try {
-                in = new FileInputStream(source);
-                out = new FileOutputStream(destination);
-
-                byte[] buffer = new byte[1024];
-
-                int length;
-                while ((length = in.read(buffer)) > 0) {
-                    out.write(buffer, 0, length);
-                }
-            } catch (Exception e) {
-                try {
-                    in.close();
-                } catch (IOException e1) {
-                    e1.printStackTrace();
-                }
-
-                try {
-                    out.close();
-                } catch (IOException e1) {
-                    e1.printStackTrace();
-                }
-            }
-        }
     }
 }

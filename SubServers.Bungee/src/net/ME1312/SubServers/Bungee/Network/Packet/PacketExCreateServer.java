@@ -27,7 +27,9 @@ public class PacketExCreateServer implements PacketIn, PacketOut {
     /**
      * New PacketExCreateServer
      */
-    public PacketExCreateServer() {}
+    public PacketExCreateServer(String name) {
+        this.name = name;
+    }
 
     /**
      * New PacketExCreateServer (Out)
@@ -36,6 +38,7 @@ public class PacketExCreateServer implements PacketIn, PacketOut {
      * @param template Server Template
      * @param version Server Version
      * @param port Server Port Number
+     * @param log Log Address
      * @param callback Callbacks
      */
     public PacketExCreateServer(String name, SubCreator.ServerTemplate template, Version version, int port, UUID log, JSONCallback... callback) {
@@ -52,7 +55,9 @@ public class PacketExCreateServer implements PacketIn, PacketOut {
     @Override
     public JSONObject generate() {
         if (id == null) {
-            return null;
+            JSONObject json = new JSONObject();
+            json.put("thread", name);
+            return json;
         } else {
             JSONObject json = new JSONObject();
             json.put("id", id);

@@ -80,6 +80,7 @@ public class PacketStopServer implements PacketIn, PacketOut {
             }
         } catch (Throwable e) {
             client.sendPacket(new PacketStopServer(2, e.getClass().getCanonicalName() + ": " + e.getMessage(), (data.keySet().contains("id"))?data.getString("id"):null));
+            e.printStackTrace();
         }
     }
 

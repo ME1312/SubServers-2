@@ -72,13 +72,13 @@ public class PacketListenLog implements PacketIn, PacketOut {
                         register(client, data.getString("id"), servers.get(data.getString("server").toLowerCase()).getLogger());
                     }
                 }
-            } else if (data.keySet().contains("host")) {
-                if (data.getString("host").length() == 0) {
+            } else if (data.keySet().contains("creator")) {
+                if (data.getString("creator").length() == 0) {
                     unregister(data.getString("id"));
                 } else {
                     Map<String, Host> hosts = plugin.api.getHosts();
-                    if (hosts.keySet().contains(data.getString("host").toLowerCase())) {
-                        register(client, data.getString("id"), hosts.get(data.getString("host").toLowerCase()).getCreator().getLogger());
+                    if (hosts.keySet().contains(data.getString("creator").toLowerCase())) {
+                        register(client, data.getString("id"), hosts.get(data.getString("creator").toLowerCase()).getCreator().getLogger(data.getString("name")));
                     }
                 }
             }

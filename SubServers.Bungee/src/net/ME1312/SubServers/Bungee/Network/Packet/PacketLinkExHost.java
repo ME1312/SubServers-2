@@ -72,6 +72,7 @@ public class PacketLinkExHost implements PacketIn, PacketOut {
             }
         } catch (Exception e) {
             client.sendPacket(new PacketLinkExHost(1, e.getClass().getCanonicalName() + ": " + e.getMessage()));
+            e.printStackTrace();
         }
     }
 

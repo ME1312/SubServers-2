@@ -56,12 +56,10 @@ public class PacketCreateServer implements PacketIn, PacketOut {
         try {
             if (data.getJSONObject("creator").getString("name").contains(" ")) {
                 client.sendPacket(new PacketCreateServer(3, "server names cannot have spaces", (data.keySet().contains("id")) ? data.getString("id") : null));
-            } else if (plugin.api.getSubServers().keySet().contains(data.getJSONObject("creator").getString("name").toLowerCase())) {
+            } else if (plugin.api.getSubServers().keySet().contains(data.getJSONObject("creator").getString("name").toLowerCase()) || SubCreator.isReserved(data.getJSONObject("creator").getString("name"))) {
                 client.sendPacket(new PacketCreateServer(3, "There is already a subserver with that name", (data.keySet().contains("id")) ? data.getString("id") : null));
             } else if (!plugin.hosts.keySet().contains(data.getJSONObject("creator").getString("host").toLowerCase())) {
                 client.sendPacket(new PacketCreateServer(4, "There is no Host with that name", (data.keySet().contains("id")) ? data.getString("id") : null));
-            } else if (plugin.hosts.get(data.getJSONObject("creator").getString("host").toLowerCase()).getCreator().isBusy()) {
-                client.sendPacket(new PacketCreateServer(5, "The SubCreator instance on that host is already running", (data.keySet().contains("id")) ? data.getString("id") : null));
             } else if (!plugin.hosts.get(data.getJSONObject("creator").getString("host").toLowerCase()).getCreator().getTemplates().keySet().contains(data.getJSONObject("creator").getString("template").toLowerCase()) ||
                     !plugin.hosts.get(data.getJSONObject("creator").getString("host").toLowerCase()).getCreator().getTemplate(data.getJSONObject("creator").getString("template")).isEnabled()) {
                 client.sendPacket(new PacketCreateServer(6, "There is no template with that name", (data.keySet().contains("id")) ? data.getString("id") : null));
@@ -90,6 +88,7 @@ public class PacketCreateServer implements PacketIn, PacketOut {
             }
         } catch (Throwable e) {
             client.sendPacket(new PacketCreateServer(2, e.getClass().getCanonicalName() + ": " + e.getMessage(), (data.keySet().contains("id")) ? data.getString("id") : null));
+            e.printStackTrace();
         }
     }
 

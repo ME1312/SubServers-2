@@ -4,8 +4,11 @@ import net.ME1312.SubServers.Bungee.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Bungee.Library.Exception.InvalidTemplateException;
 import net.ME1312.SubServers.Bungee.Library.Util;
 import net.ME1312.SubServers.Bungee.Library.Version.Version;
+import net.ME1312.SubServers.Bungee.SubAPI;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -185,16 +188,31 @@ public abstract class SubCreator {
     }
 
     /**
-     * Terminate SubCreator
+     * Terminate All SubCreator Instances on this host
      */
     public abstract void terminate();
 
     /**
-     * Wait for SubCreator to Finish
+     * Terminate a SubCreator Instance
+     *
+     * @param name Name of current creating server
+     */
+    public abstract void terminate(String name);
+
+    /**
+     * Wait for All SubCreator Instances to Finish
      *
      * @throws InterruptedException
      */
     public abstract void waitFor() throws InterruptedException;
+
+    /**
+     * Wait for SubCreator to Finish
+     *
+     * @param name Name of current creating server
+     * @throws InterruptedException
+     */
+    public abstract void waitFor(String name) throws InterruptedException;
 
     /**
      * Gets the host this creator belongs to
@@ -211,18 +229,51 @@ public abstract class SubCreator {
     public abstract String getBashDirectory();
 
     /**
-     * Gets the Logger for the creator
+     * Gets all loggers for All SubCreator Instances
      *
-     * @return
+     * @return SubCreator Loggers
      */
-    public abstract SubLogger getLogger();
+    public abstract List<SubLogger> getLogger();
 
     /**
-     * Gets the status of SubCreator
+     * Gets the Logger for a SubCreator Instance
      *
-     * @return SubCreator Status
+     * @param thread Thread ID
+     * @return SubCreator Logger
      */
-    public abstract boolean isBusy();
+    public abstract SubLogger getLogger(String thread);
+
+    /**
+     * Get a list of currently reserved Server names
+     *
+     * @return Reserved Names
+     */
+    public abstract List<String> getReservedNames();
+
+    /**
+     * Check if a name has been reserved
+     *
+     * @param name Name to check
+     * @return Reserved Status
+     */
+    public static boolean isReserved(String name) {
+        boolean reserved = false;
+        for (List<String> list : getAllReservedNames().values()) for (String reserve : list) {
+            if (reserve.equalsIgnoreCase(name)) reserved = true;
+        }
+        return reserved;
+    }
+
+    /**
+     * Get a list of all currently reserved Server names across all hosts
+     *
+     * @return All Reserved Names
+     */
+    public static Map<Host, List<String>> getAllReservedNames() {
+        HashMap<Host, List<String>> names = new HashMap<Host, List<String>>();
+        for (Host host : SubAPI.getInstance().getHosts().values()) names.put(host, host.getCreator().getReservedNames());
+        return names;
+    }
 
     /**
      * Gets the Templates that can be used in this SubCreator instance

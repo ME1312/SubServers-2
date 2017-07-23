@@ -1,14 +1,14 @@
 package net.ME1312.SubServers.Host.Library;
 
-import net.ME1312.SubServers.Host.SubAPI;
-
 import java.io.*;
 import java.util.*;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
+import java.util.zip.ZipOutputStream;
 
 /**
  * SubServers Utility Class
  */
-@SuppressWarnings("deprecation")
 public final class Util {
     private Util(){}
     public interface ExceptionRunnable {
@@ -106,7 +106,7 @@ public final class Util {
             resStreamOut.close();
             resStreamIn.close();
         } catch (Exception ex) {
-            SubAPI.getInstance().getInternals().log.error.println(ex);
+            ex.printStackTrace();
         }
     }
 
@@ -165,12 +165,15 @@ public final class Util {
                 copyDirectory(srcFile, destFile);
             }
         } else {
+            if (to.exists()) {
+                to.delete();
+            }
             InputStream in = null;
             OutputStream out = null;
 
             try {
                 in = new FileInputStream(from);
-                out = new FileOutputStream(to);
+                out = new FileOutputStream(to, false);
 
                 byte[] buffer = new byte[1024];
 
@@ -182,15 +185,89 @@ public final class Util {
                 try {
                     if (in != null) in.close();
                 } catch (IOException e1) {
-                    SubAPI.getInstance().getInternals().log.error.println(e1);
+                    e1.printStackTrace();
                 }
 
                 try {
                     if (out != null) out.close();
                 } catch (IOException e2) {
-                    SubAPI.getInstance().getInternals().log.error.println(e2);
+                    e2.printStackTrace();
                 }
             }
+        }
+    }
+
+    private static List<String> zipsearch(File origin, File file) {
+        List<String> list = new LinkedList<String>();
+        if (file.isFile()) {
+            list.add(file.getAbsoluteFile().toString().substring(origin.getAbsoluteFile().toString().length()+1, file.getAbsoluteFile().toString().length()));
+        }
+        if (file.isDirectory()) for (File next : file.listFiles()) {
+            list.addAll(zipsearch(origin, next));
+        }
+        return list;
+    }
+
+    public static void zip(File file, OutputStream zip) {
+        byte[] buffer = new byte[1024];
+
+        try{
+            ZipOutputStream zos = new ZipOutputStream(zip);
+
+            for(String next : zipsearch(file, file)){
+
+                ZipEntry ze= new ZipEntry(next);
+                zos.putNextEntry(ze);
+
+                FileInputStream in = new FileInputStream(file.getAbsolutePath() + File.separator + next);
+
+                int len;
+                while ((len = in.read(buffer)) > 0) {
+                    zos.write(buffer, 0, len);
+                }
+
+                in.close();
+            }
+
+            zos.closeEntry();
+            zos.close();
+        } catch(IOException ex){
+            ex.printStackTrace();
+        }
+    }
+
+    public static void unzip(InputStream zip, File dir) {
+        byte[] buffer = new byte[1024];
+        try{
+            ZipInputStream zis = new ZipInputStream(zip);
+            ZipEntry ze;
+            while ((ze = zis.getNextEntry()) != null) {
+                File newFile = new File(dir + File.separator + ze.getName());
+                if (newFile.exists()) {
+                    if (newFile.isDirectory()) {
+                        Util.deleteDirectory(newFile);
+                    } else {
+                        newFile.delete();
+                    }
+                }
+                if (ze.isDirectory()) {
+                    newFile.mkdirs();
+                    continue;
+                } else if (!newFile.getParentFile().exists()) {
+                    newFile.getParentFile().mkdirs();
+                }
+                FileOutputStream fos = new FileOutputStream(newFile);
+                int len;
+                while ((len = zis.read(buffer)) > 0) {
+                    fos.write(buffer, 0, len);
+                }
+
+                fos.close();
+            }
+            zis.closeEntry();
+            zis.close();
+        } catch(IOException ex) {
+            ex.printStackTrace();
         }
     }
 

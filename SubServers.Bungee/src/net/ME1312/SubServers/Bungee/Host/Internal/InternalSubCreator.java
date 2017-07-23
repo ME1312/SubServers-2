@@ -6,9 +6,12 @@ import net.ME1312.SubServers.Bungee.Library.Config.YAMLConfig;
 import net.ME1312.SubServers.Bungee.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Bungee.Library.Container;
 import net.ME1312.SubServers.Bungee.Library.Exception.InvalidServerException;
+import net.ME1312.SubServers.Bungee.Library.Exception.SubCreatorException;
+import net.ME1312.SubServers.Bungee.Library.NamedContainer;
 import net.ME1312.SubServers.Bungee.Library.UniversalFile;
 import net.ME1312.SubServers.Bungee.Library.Util;
 import net.ME1312.SubServers.Bungee.Library.Version.Version;
+import net.ME1312.SubServers.Bungee.SubAPI;
 import net.ME1312.SubServers.Bungee.SubPlugin;
 import org.json.JSONObject;
 import org.w3c.dom.Document;
@@ -21,6 +24,7 @@ import java.io.*;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.*;
+import java.util.logging.Logger;
 
 /**
  * Internal SubCreator Class
@@ -29,9 +33,7 @@ public class InternalSubCreator extends SubCreator {
     private HashMap<String, ServerTemplate> templates = new HashMap<String, ServerTemplate>();
     private InternalHost host;
     private String gitBash;
-    private InternalSubLogger logger;
-    private Process process = null;
-    private Thread thread = null;
+    private TreeMap<String, NamedContainer<Thread, NamedContainer<InternalSubLogger, Process>>> thread;
 
     /**
      * Creates an Internal SubCreator
@@ -43,7 +45,7 @@ public class InternalSubCreator extends SubCreator {
         if (Util.isNull(host, gitBash)) throw new NullPointerException();
         this.host = host;
         this.gitBash = gitBash;
-        this.logger = new InternalSubLogger(null, this, host.getName() + "/Creator", new Container<Boolean>(false), null);
+        this.thread = new TreeMap<String, NamedContainer<Thread, NamedContainer<InternalSubLogger, Process>>>();
 
         if (new UniversalFile(host.plugin.dir, "SubServers:Templates").exists()) for (File file : new UniversalFile(host.plugin.dir, "SubServers:Templates").listFiles()) {
             try {
@@ -60,18 +62,27 @@ public class InternalSubCreator extends SubCreator {
         }
     }
 
-    private void run(UUID player, String name, ServerTemplate template, Version version, int port) {
-        UniversalFile dir = new UniversalFile(new File(host.getPath()), name);
-        dir.mkdirs();
-
-        System.out.println(host.getName() + "/Creator > Generating Server Files...");
+    private YAMLSection build(NamedContainer<InternalSubLogger, Process> thread, File dir, String name, ServerTemplate template, Version version, List<ServerTemplate> history) throws SubCreatorException {
+        YAMLSection server = new YAMLSection();
+        boolean error = false;
+        if (history.contains(template)) throw new IllegalStateException("Template Import loop detected");
+        history.add(template);
+        for (String other : template.getBuildOptions().getStringList("Import", new ArrayList<String>())) {
+            if (templates.keySet().contains(other.toLowerCase())) {
+                YAMLSection config = build(thread, dir, other, templates.get(other.toLowerCase()), version, history);
+                if (config == null) {
+                    throw new SubCreatorException();
+                } else {
+                    server.setAll(config);
+                }
+            }
+        }
+        server.setAll(template.getConfigOptions());
         try {
+            System.out.println(name + "/Creator > Loading Template: " + template.getDisplayName());
             Util.copyDirectory(template.getDirectory(), dir);
-            generateProperties(dir, port);
-            generateClient(dir, template.getType(), name);
-
             if (template.getType() == ServerType.SPONGE) {
-                System.out.println(host.getName() + "/Creator > Searching Versions...");
+                System.out.println(name + "/Creator > Searching Versions...");
                 Document spongexml = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new InputSource(new StringReader(Util.readAll(new BufferedReader(new InputStreamReader(new URL("http://files.minecraftforge.net/maven/org/spongepowered/spongeforge/maven-metadata.xml").openStream(), Charset.forName("UTF-8")))))));
                 Document forgexml = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new InputSource(new StringReader(Util.readAll(new BufferedReader(new InputStreamReader(new URL("http://files.minecraftforge.net/maven/net/minecraftforge/forge/maven-metadata.xml").openStream(), Charset.forName("UTF-8")))))));
 
@@ -87,7 +98,7 @@ public class InternalSubCreator extends SubCreator {
                 }
                 if (spversion == null)
                     throw new InvalidServerException("Cannot find sponge version for Minecraft " + version.toString());
-                System.out.println(host.getName() + "/Creator > Found \"spongeforge-" + spversion.toString() + '"');
+                System.out.println(name + "/Creator > Found \"spongeforge-" + spversion.toString() + '"');
 
                 NodeList mcfnodeList = forgexml.getElementsByTagName("version");
                 Version mcfversion = null;
@@ -101,7 +112,7 @@ public class InternalSubCreator extends SubCreator {
                 }
                 if (mcfversion == null)
                     throw new InvalidServerException("Cannot find forge version for Sponge " + spversion.toString());
-                System.out.println(host.getName() + "/Creator > Found \"forge-" + mcfversion.toString() + '"');
+                System.out.println(name + "/Creator > Found \"forge-" + mcfversion.toString() + '"');
 
                 version = new Version(mcfversion.toString() + " " + spversion.toString());
             }
@@ -109,7 +120,6 @@ public class InternalSubCreator extends SubCreator {
             e.printStackTrace();
         }
 
-        boolean error = false;
         if (template.getBuildOptions().contains("Shell-Location")) {
             File gitBash = new File(this.gitBash, "bin" + File.separatorChar + "bash.exe");
             if (!(System.getProperty("os.name").toLowerCase().indexOf("win") >= 0) && template.getBuildOptions().contains("Permission")) {
@@ -117,26 +127,26 @@ public class InternalSubCreator extends SubCreator {
                     Process process = Runtime.getRuntime().exec("chmod " + template.getBuildOptions().getRawString("Permission") + ' ' + template.getBuildOptions().getRawString("Shell-Location"), null, dir);
                     Thread.sleep(500);
                     if (process.exitValue() != 0) {
-                        System.out.println(host.getName() + "/Creator > Couldn't set " + template.getBuildOptions().getRawString("Permission") + " permissions to " + template.getBuildOptions().getRawString("Shell-Location"));
+                        System.out.println(name + "/Creator > Couldn't set " + template.getBuildOptions().getRawString("Permission") + " permissions to " + template.getBuildOptions().getRawString("Shell-Location"));
                     }
                 } catch (Exception e) {
-                    System.out.println(host.getName() + "/Creator > Couldn't set " + template.getBuildOptions().getRawString("Permission") + " permissions to " + template.getBuildOptions().getRawString("Shell-Location"));
+                    System.out.println(name + "/Creator > Couldn't set " + template.getBuildOptions().getRawString("Permission") + " permissions to " + template.getBuildOptions().getRawString("Shell-Location"));
                     e.printStackTrace();
                 }
             }
 
             try {
-                System.out.println(host.getName() + "/Creator > Launching " + template.getBuildOptions().getRawString("Shell-Location"));
-                process = Runtime.getRuntime().exec((System.getProperty("os.name").toLowerCase().indexOf("win") >= 0)?"\"" + gitBash + "\" --login -i -c \"bash " + template.getBuildOptions().getRawString("Shell-Location") + ' ' + version.toString() + '\"':("bash " + template.getBuildOptions().getRawString("Shell-Location") + ' ' + version.toString() + " " + System.getProperty("user.home")), null, dir);
-                logger.process = this.process;
-                logger.log.set(host.plugin.config.get().getSection("Settings").getBoolean("Log-Creator"));
-                logger.file = new File(dir, "SubCreator-" + template.getType().toString() + "-" + version.toString().replace(" ", "@") + ".log");
-                logger.start();
+                System.out.println(name + "/Creator > Launching " + template.getBuildOptions().getRawString("Shell-Location"));
+                thread.set(Runtime.getRuntime().exec((System.getProperty("os.name").toLowerCase().indexOf("win") >= 0)?"\"" + gitBash + "\" --login -i -c \"bash " + template.getBuildOptions().getRawString("Shell-Location") + ' ' + version.toString() + '\"':("bash " + template.getBuildOptions().getRawString("Shell-Location") + ' ' + version.toString() + " " + System.getProperty("user.home")), null, dir));
+                thread.name().log.set(host.plugin.config.get().getSection("Settings").getBoolean("Log-Creator"));
+                thread.name().file = new File(dir, "SubCreator-" + template.getName() + "-" + version.toString().replace(" ", "@") + ".log");
+                thread.name().process = thread.get();
+                thread.name().start();
 
-                process.waitFor();
+                thread.get().waitFor();
                 Thread.sleep(500);
 
-                if (process.exitValue() != 0) error = true;
+                if (thread.get().exitValue() != 0) error = true;
             } catch (Exception e) {
                 error = true;
                 e.printStackTrace();
@@ -144,12 +154,31 @@ public class InternalSubCreator extends SubCreator {
         }
 
         new UniversalFile(dir, "template.yml").delete();
-        if (!error) {
+        if (error) throw new SubCreatorException();
+        return server;
+    }
+
+    private void run(UUID player, String name, ServerTemplate template, Version version, int port) {
+        NamedContainer<InternalSubLogger, Process> thread = this.thread.get(name.toLowerCase()).get();
+        UniversalFile dir = new UniversalFile(new File(host.getPath()), name);
+        dir.mkdirs();
+        YAMLSection server;
+        try {
+            server = build(thread, dir, name, template, version, new LinkedList<>());
+            generateProperties(dir, port);
+            generateClient(dir, template.getType(), name);
+        } catch (SubCreatorException e) {
+            server = null;
+        } catch (Exception e) {
+            server = null;
+            e.printStackTrace();
+        }
+
+        if (server != null) {
             try {
-                System.out.println(host.getName() + "/Creator > Saving...");
+                System.out.println(name + "/Creator > Saving...");
                 if (host.plugin.exServers.keySet().contains(name.toLowerCase())) host.plugin.exServers.remove(name.toLowerCase());
 
-                YAMLSection server = template.getConfigOptions().clone();
                 for (String option : server.getKeys()) {
                     if (server.isString(option)) {
                         server.set(option, server.getRawString(option).replace("$name$", name).replace("$template$", template.getName()).replace("$type$", template.getType().toString())
@@ -180,20 +209,21 @@ public class InternalSubCreator extends SubCreator {
                 e.printStackTrace();
             }
         } else {
-            System.out.println(host.getName() + "/Creator > Couldn't build the server jar. See \"SubCreator-" + template.getType().toString() + "-" + version.toString().replace(" ", "@") + ".log\" for more details.");
+            System.out.println(name + "/Creator > Couldn't build the server jar. Check the SubCreator logs for more detail.");
         }
+        this.thread.remove(name.toLowerCase());
     }
 
     @Override
     public boolean create(UUID player, String name, ServerTemplate template, Version version, int port) {
         if (Util.isNull(name, template, version, port)) throw new NullPointerException();
-        if (!isBusy() && template.isEnabled()) {
+        if (template.isEnabled() && !SubAPI.getInstance().getSubServers().keySet().contains(name.toLowerCase()) && !SubCreator.isReserved(name)) {
             final SubCreateEvent event = new SubCreateEvent(player, host, name, template, version, port);
             host.plugin.getPluginManager().callEvent(event);
             if (!event.isCancelled()) {
-                (thread = new Thread(() -> {
-                        InternalSubCreator.this.run(player, name, event.getTemplate(), event.getVersion(), port);
-                    })).start();
+                NamedContainer<Thread, NamedContainer<InternalSubLogger, Process>> thread = new NamedContainer<Thread, NamedContainer<InternalSubLogger, Process>>(new Thread(() -> InternalSubCreator.this.run(player, name, event.getTemplate(), event.getVersion(), port)), new NamedContainer<InternalSubLogger, Process>(new InternalSubLogger(null, this, name + "/Creator", new Container<Boolean>(false), null), null));
+                this.thread.put(name.toLowerCase(), thread);
+                thread.name().start();
                 return true;
             } else return false;
         } else return false;
@@ -201,16 +231,35 @@ public class InternalSubCreator extends SubCreator {
 
     @Override
     public void terminate() {
-        if (process != null && this.process.isAlive()) {
-            process.destroyForcibly();
-        } else if (thread != null && this.thread.isAlive()) {
-            thread.interrupt();
+        HashMap<String, NamedContainer<Thread, NamedContainer<InternalSubLogger, Process>>> temp = new HashMap<String, NamedContainer<Thread, NamedContainer<InternalSubLogger, Process>>>();
+        temp.putAll(thread);
+        for (String i : temp.keySet()) {
+            terminate(i);
+        }
+    }
+
+    @Override
+    public void terminate(String name) {
+        if (this.thread.get(name).get().get() != null && this.thread.get(name).get().get().isAlive()) {
+            this.thread.get(name).get().get().destroyForcibly();
+        }
+        if (this.thread.get(name).name() != null && this.thread.get(name).name().isAlive()) {
+            this.thread.get(name).name().interrupt();
         }
     }
 
     @Override
     public void waitFor() throws InterruptedException {
-        while (thread != null && thread.isAlive()) {
+        HashMap<String, NamedContainer<Thread, NamedContainer<InternalSubLogger, Process>>> temp = new HashMap<String, NamedContainer<Thread, NamedContainer<InternalSubLogger, Process>>>();
+        temp.putAll(thread);
+        for (String i : temp.keySet()) {
+            waitFor(i);
+        }
+    }
+
+    @Override
+    public void waitFor(String name) throws InterruptedException {
+        while (this.thread.get(name).name() != null && this.thread.get(name).name().isAlive()) {
             Thread.sleep(250);
         }
     }
@@ -226,13 +275,24 @@ public class InternalSubCreator extends SubCreator {
     }
 
     @Override
-    public SubLogger getLogger() {
-        return logger;
+    public List<SubLogger> getLogger() {
+        List<SubLogger> loggers = new ArrayList<SubLogger>();
+        HashMap<String, NamedContainer<Thread, NamedContainer<InternalSubLogger, Process>>> temp = new HashMap<String, NamedContainer<Thread, NamedContainer<InternalSubLogger, Process>>>();
+        temp.putAll(thread);
+        for (String i : temp.keySet()) {
+            loggers.add(getLogger(i));
+        }
+        return loggers;
     }
 
     @Override
-    public boolean isBusy() {
-        return thread != null && thread.isAlive();
+    public SubLogger getLogger(String thread) {
+        return this.thread.get(thread).get().name();
+    }
+
+    @Override
+    public List<String> getReservedNames() {
+        return new ArrayList<String>(thread.keySet());
     }
 
     @Override

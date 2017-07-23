@@ -78,7 +78,7 @@ public class PacketExAddServer implements PacketIn, PacketOut {
             }
         } catch (Throwable e) {
             host.subdata.sendPacket(new PacketExAddServer(1, e.getClass().getCanonicalName() + ": " + e.getMessage(), (data.keySet().contains("id"))?data.getString("id"):null));
-            e.printStackTrace();
+            host.log.error.println(e);
         }
     }
 

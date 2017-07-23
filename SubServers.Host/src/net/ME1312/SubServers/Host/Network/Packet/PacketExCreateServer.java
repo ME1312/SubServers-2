@@ -1,6 +1,5 @@
 package net.ME1312.SubServers.Host.Network.Packet;
 
-import net.ME1312.SubServers.Host.Executable.SubCreator;
 import net.ME1312.SubServers.Host.Library.Util;
 import net.ME1312.SubServers.Host.Library.Version.Version;
 import net.ME1312.SubServers.Host.Network.PacketIn;
@@ -62,7 +61,13 @@ public class PacketExCreateServer implements PacketIn, PacketOut {
             host.creator.create(data.getJSONObject("creator").getString("name"), host.templates.get(data.getJSONObject("creator").getString("template").toLowerCase()), new Version(data.getJSONObject("creator").getString("version")),
                     data.getJSONObject("creator").getInt("port"), UUID.fromString(data.getJSONObject("creator").getString("log")), (data.keySet().contains("id"))?data.getString("id"):null);
         } catch (Throwable e) {
+            if (data.keySet().contains("thread")) {
+                host.creator.terminate(data.getString("thread"));
+            } else {
+                host.creator.terminate();
+            }
             host.subdata.sendPacket(new PacketExCreateServer(1, e.getClass().getCanonicalName() + ": " + e.getMessage(), null, (data.keySet().contains("id"))?data.getString("id"):null));
+            host.log.error.println(e);
         }
     }
 

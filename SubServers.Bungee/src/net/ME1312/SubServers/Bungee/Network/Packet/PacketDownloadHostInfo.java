@@ -59,7 +59,6 @@ public class PacketDownloadHostInfo implements PacketIn, PacketOut {
             info.put("dir", host.getPath());
 
             JSONObject cinfo = new JSONObject();
-            cinfo.put("busy", host.getCreator().isBusy());
             JSONObject templates = new JSONObject();
             for (SubCreator.ServerTemplate template : host.getCreator().getTemplates().values()) {
                 JSONObject tinfo = new JSONObject();

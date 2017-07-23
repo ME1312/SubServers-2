@@ -252,11 +252,10 @@ public class InternalUIRenderer extends UIRenderer {
                     blockMeta = block.getItemMeta();
                     blockMeta.setDisplayName(ChatColor.GRAY+ChatColor.stripColor(plugin.lang.getSection("Lang").getColoredString("Interface.Host-Admin.Creator", '&')));
                     blockMeta.setLore(Arrays.asList(plugin.lang.getSection("Lang").getColoredString("Interface.Generic.Invalid-Permission", '&').replace("$str$", "subservers.host.create." + host.toLowerCase())));
-                } else if (!json.getJSONObject("host").getBoolean("enabled") || json.getJSONObject("host").getJSONObject("creator").getBoolean("busy")) {
+                } else if (!json.getJSONObject("host").getBoolean("enabled")) {
                     block = new ItemStack(Material.STAINED_GLASS_PANE, 1, (short) 7);
                     blockMeta = block.getItemMeta();
                     blockMeta.setDisplayName(ChatColor.GRAY+ChatColor.stripColor(plugin.lang.getSection("Lang").getColoredString("Interface.Host-Admin.Creator", '&')));
-                    blockMeta.setLore(Arrays.asList(plugin.lang.getSection("Lang").getColoredString("Interface.Host-Admin.Creator-Busy", '&')));
                 } else {
                     block = new ItemStack(Material.STAINED_GLASS_PANE, 1, (short) 4);
                     blockMeta = block.getItemMeta();
@@ -343,7 +342,7 @@ public class InternalUIRenderer extends UIRenderer {
         }
 
         plugin.subdata.sendPacket(new PacketDownloadHostInfo(options.getHost(), json -> {
-            if (!json.getBoolean("valid")|| !json.getJSONObject("host").getBoolean("enabled") || json.getJSONObject("host").getJSONObject("creator").getBoolean("busy")) {
+            if (!json.getBoolean("valid")|| !json.getJSONObject("host").getBoolean("enabled")) {
                 lastUsedOptions = null;
                 if (hasHistory()) back();
             } else {
@@ -475,7 +474,7 @@ public class InternalUIRenderer extends UIRenderer {
         lastUsedOptions = options;
         if (!options.init()) lastVistedObject = options.getHost();
         plugin.subdata.sendPacket(new PacketDownloadHostInfo(options.getHost(), (json) -> {
-            if (!json.getBoolean("valid")|| !json.getJSONObject("host").getBoolean("enabled") || json.getJSONObject("host").getJSONObject("creator").getBoolean("busy")) {
+            if (!json.getBoolean("valid")|| !json.getJSONObject("host").getBoolean("enabled")) {
                 lastUsedOptions = null;
                 if (hasHistory()) back();
             } else {

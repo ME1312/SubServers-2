@@ -138,13 +138,12 @@ implements <a href="../../../../../../net/ME1312/SubServers/Host/Network/PacketI
 </td>
 </tr>
 <tr class="rowColor">
-<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Host/Network/Packet/PacketCreateServer.html#PacketCreateServer-java.util.UUID-java.lang.String-java.lang.String-net.ME1312.SubServers.Host.Executable.SubCreator.ServerType-net.ME1312.SubServers.Host.Library.Version.Version-int-int-net.ME1312.SubServers.Host.Library.JSONCallback...-">PacketCreateServer</a></span>(java.util.UUID&nbsp;player,
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Host/Network/Packet/PacketCreateServer.html#PacketCreateServer-java.util.UUID-java.lang.String-java.lang.String-java.lang.String-net.ME1312.SubServers.Host.Library.Version.Version-int-net.ME1312.SubServers.Host.Library.JSONCallback...-">PacketCreateServer</a></span>(java.util.UUID&nbsp;player,
                   java.lang.String&nbsp;name,
                   java.lang.String&nbsp;host,
-                  <a href="../../../../../../net/ME1312/SubServers/Host/Executable/SubCreator.ServerType.html" title="enum in net.ME1312.SubServers.Host.Executable">SubCreator.ServerType</a>&nbsp;type,
+                  java.lang.String&nbsp;template,
                   <a href="../../../../../../net/ME1312/SubServers/Host/Library/Version/Version.html" title="class in net.ME1312.SubServers.Host.Library.Version">Version</a>&nbsp;version,
                   int&nbsp;port,
-                  int&nbsp;memory,
                   <a href="../../../../../../net/ME1312/SubServers/Host/Library/JSONCallback.html" title="interface in net.ME1312.SubServers.Host.Library">JSONCallback</a>...&nbsp;callback)</code>
 <div class="block">New PacketCreateServer (Out)</div>
 </td>
@@ -214,7 +213,7 @@ implements <a href="../../../../../../net/ME1312/SubServers/Host/Network/PacketI
 <div class="block">New PacketCreateServer (In)</div>
 </li>
 </ul>
-<a name="PacketCreateServer-java.util.UUID-java.lang.String-java.lang.String-net.ME1312.SubServers.Host.Executable.SubCreator.ServerType-net.ME1312.SubServers.Host.Library.Version.Version-int-int-net.ME1312.SubServers.Host.Library.JSONCallback...-">
+<a name="PacketCreateServer-java.util.UUID-java.lang.String-java.lang.String-java.lang.String-net.ME1312.SubServers.Host.Library.Version.Version-int-net.ME1312.SubServers.Host.Library.JSONCallback...-">
 <!--   -->
 </a>
 <ul class="blockListLast">
@@ -223,10 +222,9 @@ implements <a href="../../../../../../net/ME1312/SubServers/Host/Network/PacketI
 <pre>public&nbsp;PacketCreateServer(java.util.UUID&nbsp;player,
                           java.lang.String&nbsp;name,
                           java.lang.String&nbsp;host,
-                          <a href="../../../../../../net/ME1312/SubServers/Host/Executable/SubCreator.ServerType.html" title="enum in net.ME1312.SubServers.Host.Executable">SubCreator.ServerType</a>&nbsp;type,
+                          java.lang.String&nbsp;template,
                           <a href="../../../../../../net/ME1312/SubServers/Host/Library/Version/Version.html" title="class in net.ME1312.SubServers.Host.Library.Version">Version</a>&nbsp;version,
                           int&nbsp;port,
-                          int&nbsp;memory,
                           <a href="../../../../../../net/ME1312/SubServers/Host/Library/JSONCallback.html" title="interface in net.ME1312.SubServers.Host.Library">JSONCallback</a>...&nbsp;callback)</pre>
 <div class="block">New PacketCreateServer (Out)</div>
 <dl>
@@ -234,10 +232,9 @@ implements <a href="../../../../../../net/ME1312/SubServers/Host/Network/PacketI
 <dd><code>player</code> - Player Creating</dd>
 <dd><code>name</code> - Server Name</dd>
 <dd><code>host</code> - Host to use</dd>
-<dd><code>type</code> - Server Type</dd>
+<dd><code>template</code> - Server Template</dd>
 <dd><code>version</code> - Server Version</dd>
 <dd><code>port</code> - Server Port</dd>
-<dd><code>memory</code> - Server Memory</dd>
 <dd><code>callback</code> - Callbacks</dd>
 </dl>
 </li>

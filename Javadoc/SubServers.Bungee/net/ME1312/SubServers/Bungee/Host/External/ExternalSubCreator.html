@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10,"i8":10};
+var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10,"i8":10,"i9":10,"i10":10,"i11":10};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -191,38 +191,56 @@ extends <a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubCreator.
 </td>
 </tr>
 <tr id="i3" class="rowColor">
-<td class="colFirst"><code><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubLogger.html" title="class in net.ME1312.SubServers.Bungee.Host">SubLogger</a></code></td>
+<td class="colFirst"><code>java.util.List&lt;<a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubLogger.html" title="class in net.ME1312.SubServers.Bungee.Host">SubLogger</a>&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/External/ExternalSubCreator.html#getLogger--">getLogger</a></span>()</code>
-<div class="block">Gets the Logger for the creator</div>
+<div class="block">Gets all loggers for All SubCreator Instances</div>
 </td>
 </tr>
 <tr id="i4" class="altColor">
+<td class="colFirst"><code><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubLogger.html" title="class in net.ME1312.SubServers.Bungee.Host">SubLogger</a></code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/External/ExternalSubCreator.html#getLogger-java.lang.String-">getLogger</a></span>(java.lang.String&nbsp;thread)</code>
+<div class="block">Gets the Logger for a SubCreator Instance</div>
+</td>
+</tr>
+<tr id="i5" class="rowColor">
+<td class="colFirst"><code>java.util.List&lt;java.lang.String&gt;</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/External/ExternalSubCreator.html#getReservedNames--">getReservedNames</a></span>()</code>
+<div class="block">Get a list of currently reserved Server names</div>
+</td>
+</tr>
+<tr id="i6" class="altColor">
 <td class="colFirst"><code><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubCreator.ServerTemplate.html" title="class in net.ME1312.SubServers.Bungee.Host">SubCreator.ServerTemplate</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/External/ExternalSubCreator.html#getTemplate-java.lang.String-">getTemplate</a></span>(java.lang.String&nbsp;name)</code>
 <div class="block">Gets a SubCreator Template by name</div>
 </td>
 </tr>
-<tr id="i5" class="rowColor">
+<tr id="i7" class="rowColor">
 <td class="colFirst"><code>java.util.Map&lt;java.lang.String,<a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubCreator.ServerTemplate.html" title="class in net.ME1312.SubServers.Bungee.Host">SubCreator.ServerTemplate</a>&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/External/ExternalSubCreator.html#getTemplates--">getTemplates</a></span>()</code>
 <div class="block">Gets the Templates that can be used in this SubCreator instance</div>
 </td>
 </tr>
-<tr id="i6" class="altColor">
-<td class="colFirst"><code>boolean</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/External/ExternalSubCreator.html#isBusy--">isBusy</a></span>()</code>
-<div class="block">Gets the status of SubCreator</div>
-</td>
-</tr>
-<tr id="i7" class="rowColor">
-<td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/External/ExternalSubCreator.html#terminate--">terminate</a></span>()</code>
-<div class="block">Terminate SubCreator</div>
-</td>
-</tr>
 <tr id="i8" class="altColor">
 <td class="colFirst"><code>void</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/External/ExternalSubCreator.html#terminate--">terminate</a></span>()</code>
+<div class="block">Terminate All SubCreator Instances on this host</div>
+</td>
+</tr>
+<tr id="i9" class="rowColor">
+<td class="colFirst"><code>void</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/External/ExternalSubCreator.html#terminate-java.lang.String-">terminate</a></span>(java.lang.String&nbsp;name)</code>
+<div class="block">Terminate a SubCreator Instance</div>
+</td>
+</tr>
+<tr id="i10" class="altColor">
+<td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/External/ExternalSubCreator.html#waitFor--">waitFor</a></span>()</code>
+<div class="block">Wait for All SubCreator Instances to Finish</div>
+</td>
+</tr>
+<tr id="i11" class="rowColor">
+<td class="colFirst"><code>void</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/External/ExternalSubCreator.html#waitFor-java.lang.String-">waitFor</a></span>(java.lang.String&nbsp;name)</code>
 <div class="block">Wait for SubCreator to Finish</div>
 </td>
 </tr>
@@ -232,7 +250,7 @@ extends <a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubCreator.
 <!--   -->
 </a>
 <h3>Methods inherited from class&nbsp;net.ME1312.SubServers.Bungee.Host.<a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubCreator.html" title="class in net.ME1312.SubServers.Bungee.Host">SubCreator</a></h3>
-<code><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubCreator.html#create-java.lang.String-net.ME1312.SubServers.Bungee.Host.SubCreator.ServerTemplate-net.ME1312.SubServers.Bungee.Library.Version.Version-int-">create</a></code></li>
+<code><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubCreator.html#create-java.lang.String-net.ME1312.SubServers.Bungee.Host.SubCreator.ServerTemplate-net.ME1312.SubServers.Bungee.Library.Version.Version-int-">create</a>, <a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubCreator.html#getAllReservedNames--">getAllReservedNames</a>, <a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubCreator.html#isReserved-java.lang.String-">isReserved</a></code></li>
 </ul>
 <ul class="blockList">
 <li class="blockList"><a name="methods.inherited.from.class.java.lang.Object">
@@ -314,10 +332,27 @@ extends <a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubCreator.
 <h4>terminate</h4>
 <pre>public&nbsp;void&nbsp;terminate()</pre>
 <div class="block"><span class="descfrmTypeLabel">Description copied from class:&nbsp;<code><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubCreator.html#terminate--">SubCreator</a></code></span></div>
-<div class="block">Terminate SubCreator</div>
+<div class="block">Terminate All SubCreator Instances on this host</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
 <dd><code><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubCreator.html#terminate--">terminate</a></code>&nbsp;in class&nbsp;<code><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubCreator.html" title="class in net.ME1312.SubServers.Bungee.Host">SubCreator</a></code></dd>
+</dl>
+</li>
+</ul>
+<a name="terminate-java.lang.String-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>terminate</h4>
+<pre>public&nbsp;void&nbsp;terminate(java.lang.String&nbsp;name)</pre>
+<div class="block"><span class="descfrmTypeLabel">Description copied from class:&nbsp;<code><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubCreator.html#terminate-java.lang.String-">SubCreator</a></code></span></div>
+<div class="block">Terminate a SubCreator Instance</div>
+<dl>
+<dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
+<dd><code><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubCreator.html#terminate-java.lang.String-">terminate</a></code>&nbsp;in class&nbsp;<code><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubCreator.html" title="class in net.ME1312.SubServers.Bungee.Host">SubCreator</a></code></dd>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>name</code> - Name of current creating server</dd>
 </dl>
 </li>
 </ul>
@@ -330,10 +365,30 @@ extends <a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubCreator.
 <pre>public&nbsp;void&nbsp;waitFor()
              throws java.lang.InterruptedException</pre>
 <div class="block"><span class="descfrmTypeLabel">Description copied from class:&nbsp;<code><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubCreator.html#waitFor--">SubCreator</a></code></span></div>
-<div class="block">Wait for SubCreator to Finish</div>
+<div class="block">Wait for All SubCreator Instances to Finish</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
 <dd><code><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubCreator.html#waitFor--">waitFor</a></code>&nbsp;in class&nbsp;<code><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubCreator.html" title="class in net.ME1312.SubServers.Bungee.Host">SubCreator</a></code></dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code>java.lang.InterruptedException</code></dd>
+</dl>
+</li>
+</ul>
+<a name="waitFor-java.lang.String-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>waitFor</h4>
+<pre>public&nbsp;void&nbsp;waitFor(java.lang.String&nbsp;name)
+             throws java.lang.InterruptedException</pre>
+<div class="block"><span class="descfrmTypeLabel">Description copied from class:&nbsp;<code><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubCreator.html#waitFor-java.lang.String-">SubCreator</a></code></span></div>
+<div class="block">Wait for SubCreator to Finish</div>
+<dl>
+<dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
+<dd><code><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubCreator.html#waitFor-java.lang.String-">waitFor</a></code>&nbsp;in class&nbsp;<code><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubCreator.html" title="class in net.ME1312.SubServers.Bungee.Host">SubCreator</a></code></dd>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>name</code> - Name of current creating server</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
 <dd><code>java.lang.InterruptedException</code></dd>
 </dl>
@@ -379,30 +434,50 @@ extends <a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubCreator.
 <ul class="blockList">
 <li class="blockList">
 <h4>getLogger</h4>
-<pre>public&nbsp;<a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubLogger.html" title="class in net.ME1312.SubServers.Bungee.Host">SubLogger</a>&nbsp;getLogger()</pre>
+<pre>public&nbsp;java.util.List&lt;<a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubLogger.html" title="class in net.ME1312.SubServers.Bungee.Host">SubLogger</a>&gt;&nbsp;getLogger()</pre>
 <div class="block"><span class="descfrmTypeLabel">Description copied from class:&nbsp;<code><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubCreator.html#getLogger--">SubCreator</a></code></span></div>
-<div class="block">Gets the Logger for the creator</div>
+<div class="block">Gets all loggers for All SubCreator Instances</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
 <dd><code><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubCreator.html#getLogger--">getLogger</a></code>&nbsp;in class&nbsp;<code><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubCreator.html" title="class in net.ME1312.SubServers.Bungee.Host">SubCreator</a></code></dd>
 <dt><span class="returnLabel">Returns:</span></dt>
+<dd>SubCreator Loggers</dd>
 </dl>
 </li>
 </ul>
-<a name="isBusy--">
+<a name="getLogger-java.lang.String-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
-<h4>isBusy</h4>
-<pre>public&nbsp;boolean&nbsp;isBusy()</pre>
-<div class="block"><span class="descfrmTypeLabel">Description copied from class:&nbsp;<code><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubCreator.html#isBusy--">SubCreator</a></code></span></div>
-<div class="block">Gets the status of SubCreator</div>
+<h4>getLogger</h4>
+<pre>public&nbsp;<a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubLogger.html" title="class in net.ME1312.SubServers.Bungee.Host">SubLogger</a>&nbsp;getLogger(java.lang.String&nbsp;thread)</pre>
+<div class="block"><span class="descfrmTypeLabel">Description copied from class:&nbsp;<code><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubCreator.html#getLogger-java.lang.String-">SubCreator</a></code></span></div>
+<div class="block">Gets the Logger for a SubCreator Instance</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubCreator.html#isBusy--">isBusy</a></code>&nbsp;in class&nbsp;<code><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubCreator.html" title="class in net.ME1312.SubServers.Bungee.Host">SubCreator</a></code></dd>
+<dd><code><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubCreator.html#getLogger-java.lang.String-">getLogger</a></code>&nbsp;in class&nbsp;<code><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubCreator.html" title="class in net.ME1312.SubServers.Bungee.Host">SubCreator</a></code></dd>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>thread</code> - Thread ID</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd>SubCreator Status</dd>
+<dd>SubCreator Logger</dd>
+</dl>
+</li>
+</ul>
+<a name="getReservedNames--">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getReservedNames</h4>
+<pre>public&nbsp;java.util.List&lt;java.lang.String&gt;&nbsp;getReservedNames()</pre>
+<div class="block"><span class="descfrmTypeLabel">Description copied from class:&nbsp;<code><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubCreator.html#getReservedNames--">SubCreator</a></code></span></div>
+<div class="block">Get a list of currently reserved Server names</div>
+<dl>
+<dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
+<dd><code><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubCreator.html#getReservedNames--">getReservedNames</a></code>&nbsp;in class&nbsp;<code><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubCreator.html" title="class in net.ME1312.SubServers.Bungee.Host">SubCreator</a></code></dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>Reserved Names</dd>
 </dl>
 </li>
 </ul>

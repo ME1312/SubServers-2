@@ -90,27 +90,27 @@ public final class SubPlugin extends BungeeCord {
 
         if (!(new UniversalFile(dir, "Templates").exists())) new UniversalFile(dir, "Templates").mkdirs();
         if (!(new UniversalFile(dir, "Templates:Vanilla:template.yml").exists())) {
-            unzip(SubPlugin.class.getResourceAsStream("/net/ME1312/SubServers/Bungee/Library/Files/Templates/vanilla.zip"), new UniversalFile(dir, "Templates"));
+            Util.unzip(SubPlugin.class.getResourceAsStream("/net/ME1312/SubServers/Bungee/Library/Files/Templates/vanilla.zip"), new UniversalFile(dir, "Templates"));
             System.out.println("SubServers > Created ~/SubServers/Templates/Vanilla");
         } else if ((new Version((new YAMLConfig(new UniversalFile(dir, "Templates:Vanilla:template.yml"))).get().getString("Version", "0")).compareTo(new Version("2.11.2m+"))) != 0) {
             Files.move(new UniversalFile(dir, "Templates:Vanilla").toPath(), new UniversalFile(dir, "Templates:Vanilla.old" + Math.round(Math.random() * 100000)).toPath());
-            unzip(SubPlugin.class.getResourceAsStream("/net/ME1312/SubServers/Bungee/Library/Files/Templates/vanilla.zip"), new UniversalFile(dir, "Templates"));
+            Util.unzip(SubPlugin.class.getResourceAsStream("/net/ME1312/SubServers/Bungee/Library/Files/Templates/vanilla.zip"), new UniversalFile(dir, "Templates"));
             System.out.println("SubServers > Updated ~/SubServers/Templates/Vanilla");
         }
         if (!(new UniversalFile(dir, "Templates:Spigot:template.yml").exists())) {
-            unzip(SubPlugin.class.getResourceAsStream("/net/ME1312/SubServers/Bungee/Library/Files/Templates/spigot.zip"), new UniversalFile(dir, "Templates"));
+            Util.unzip(SubPlugin.class.getResourceAsStream("/net/ME1312/SubServers/Bungee/Library/Files/Templates/spigot.zip"), new UniversalFile(dir, "Templates"));
             System.out.println("SubServers > Created ~/SubServers/Templates/Spigot");
         } else if ((new Version((new YAMLConfig(new UniversalFile(dir, "Templates:Spigot:template.yml"))).get().getString("Version", "0")).compareTo(new Version("2.11.2m+"))) != 0) {
             Files.move(new UniversalFile(dir, "Templates:Vanilla").toPath(), new UniversalFile(dir, "Templates:Spigot.old" + Math.round(Math.random() * 100000)).toPath());
-            unzip(SubPlugin.class.getResourceAsStream("/net/ME1312/SubServers/Bungee/Library/Files/Templates/spigot.zip"), new UniversalFile(dir, "Templates"));
+            Util.unzip(SubPlugin.class.getResourceAsStream("/net/ME1312/SubServers/Bungee/Library/Files/Templates/spigot.zip"), new UniversalFile(dir, "Templates"));
             System.out.println("SubServers > Updated ~/SubServers/Templates/Spigot");
         }
         if (!(new UniversalFile(dir, "Templates:Sponge:template.yml").exists())) {
-            unzip(SubPlugin.class.getResourceAsStream("/net/ME1312/SubServers/Bungee/Library/Files/Templates/sponge.zip"), new UniversalFile(dir, "Templates"));
+            Util.unzip(SubPlugin.class.getResourceAsStream("/net/ME1312/SubServers/Bungee/Library/Files/Templates/sponge.zip"), new UniversalFile(dir, "Templates"));
             System.out.println("SubServers > Created ~/SubServers/Templates/Sponge");
         } else if ((new Version((new YAMLConfig(new UniversalFile(dir, "Templates:Sponge:template.yml"))).get().getString("Version", "0")).compareTo(new Version("2.11.2m+"))) != 0) {
             Files.move(new UniversalFile(dir, "Templates:Vanilla").toPath(), new UniversalFile(dir, "Templates:Sponge.old" + Math.round(Math.random() * 100000)).toPath());
-            unzip(SubPlugin.class.getResourceAsStream("/net/ME1312/SubServers/Bungee/Library/Files/Templates/sponge.zip"), new UniversalFile(dir, "Templates"));
+            Util.unzip(SubPlugin.class.getResourceAsStream("/net/ME1312/SubServers/Bungee/Library/Files/Templates/sponge.zip"), new UniversalFile(dir, "Templates"));
             System.out.println("SubServers > Updated ~/SubServers/Templates/Sponge");
         }
 
@@ -350,10 +350,8 @@ public final class SubPlugin extends BungeeCord {
                     this.hosts.get(host).removeSubServer(server);
                 }
                 subservers.clear();
-                if (this.hosts.get(host).getCreator().isBusy()) {
-                    this.hosts.get(host).getCreator().terminate();
-                    this.hosts.get(host).getCreator().waitFor();
-                }
+                this.hosts.get(host).getCreator().terminate();
+                this.hosts.get(host).getCreator().waitFor();
                 this.hosts.remove(host);
             }
             hosts.clear();
@@ -365,40 +363,5 @@ public final class SubPlugin extends BungeeCord {
         }
 
         super.stopListeners();
-    }
-
-    private void unzip(InputStream zip, File dir) {
-        byte[] buffer = new byte[1024];
-        try{
-            ZipInputStream zis = new ZipInputStream(zip);
-            ZipEntry ze;
-            while ((ze = zis.getNextEntry()) != null) {
-                File newFile = new File(dir + File.separator + ze.getName());
-                if (newFile.exists()) {
-                    if (newFile.isDirectory()) {
-                        Util.deleteDirectory(newFile);
-                    } else {
-                        newFile.delete();
-                    }
-                }
-                if (ze.isDirectory()) {
-                    newFile.mkdirs();
-                    continue;
-                } else if (!newFile.getParentFile().exists()) {
-                    newFile.getParentFile().mkdirs();
-                }
-                FileOutputStream fos = new FileOutputStream(newFile);
-                int len;
-                while ((len = zis.read(buffer)) > 0) {
-                    fos.write(buffer, 0, len);
-                }
-
-                fos.close();
-            }
-            zis.closeEntry();
-            zis.close();
-        } catch(IOException ex) {
-            ex.printStackTrace();
-        }
     }
 }

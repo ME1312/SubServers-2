@@ -69,6 +69,7 @@ public class PacketLinkServer implements PacketIn, PacketOut {
             }
         } catch (Exception e) {
             client.sendPacket(new PacketLinkServer(1, e.getClass().getCanonicalName() + ": " + e.getMessage()));
+            e.printStackTrace();
         }
     }
 

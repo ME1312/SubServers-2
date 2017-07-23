@@ -86,7 +86,7 @@ public final class SubDataServer {
         registerPacket(new PacketEditServer(plugin), "SubEditServer");
         registerPacket(new PacketExAddServer(), "SubExAddServer");
         registerPacket(new PacketExConfigureHost(plugin), "SubExConfigureHost");
-        registerPacket(new PacketExCreateServer(), "SubExCreateServer");
+        registerPacket(new PacketExCreateServer(null), "SubExCreateServer");
         registerPacket(new PacketExDeleteServer(), "SubExDeleteServer");
         registerPacket(new PacketExRemoveServer(), "SubExRemoveServer");
         registerPacket(new PacketExUpdateServer(plugin), "SubExUpdateServer");

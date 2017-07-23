@@ -359,9 +359,6 @@ public final class SubCommand implements CommandExecutor {
                                             case 4:
                                                 sender.sendMessage(plugin.lang.getSection("Lang").getColoredString("Command.Creator.Unknown-Host", '&'));
                                                 break;
-                                            case 5:
-                                                sender.sendMessage(plugin.lang.getSection("Lang").getColoredString("Command.Creator.Running", '&'));
-                                                break;
                                             case 6:
                                                 sender.sendMessage(plugin.lang.getSection("Lang").getColoredString("Command.Creator.Invalid-Template", '&'));
                                                 break;
@@ -376,7 +373,7 @@ public final class SubCommand implements CommandExecutor {
                                                 sender.sendMessage(plugin.lang.getSection("Lang").getColoredString("Command.Creator", '&'));
                                                 break;
                                             default:
-                                                Bukkit.getLogger().warning("SubData > PacketCreateServer(" + ((sender instanceof Player)?((Player) sender).getUniqueId().toString():"null") + ", " + args[1] + ", " + args[2] + ", " + args[3].toUpperCase() + ", " + args[4] + ", " + args[5] + ", " + ((args.length > 6)?args[6]:"1024") + ") responded with: " + json.getString("m"));
+                                                Bukkit.getLogger().warning("SubData > PacketCreateServer(" + ((sender instanceof Player)?((Player) sender).getUniqueId().toString():"null") + ", " + args[1] + ", " + args[2] + ", " + args[3] + ", " + args[4] + ", " + args[5] + ") responded with: " + json.getString("m"));
                                                 sender.sendMessage(plugin.lang.getSection("Lang").getColoredString("Command.Creator", '&'));
                                                 break;
                                         }

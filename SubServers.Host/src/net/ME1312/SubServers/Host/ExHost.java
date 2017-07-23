@@ -41,13 +41,14 @@ public final class ExHost {
 
     public Logger log;
     public final UniversalFile dir = new UniversalFile(new File(System.getProperty("user.dir")));
+    public final UniversalFile runtime;
     public YAMLConfig config;
     public YAMLSection host = null;
     public YAMLSection lang = null;
     public SubDataClient subdata = null;
 
     public final Version version = new Version("2.12c");
-    public final Version bversion = new Version(2);
+    public final Version bversion = new Version(3);
     public final SubAPI api = new SubAPI(this);
 
     private boolean running;
@@ -59,9 +60,10 @@ public final class ExHost {
      * @throws Exception
      */
     public static void main(String[] args) throws Exception {
-        new ExHost(args);
+        new ExHost(new File(URLDecoder.decode(System.getProperty("subservers.host.runtime"), "UTF-8")), args);
     }
-    private ExHost(String[] args) {
+    private ExHost(File runtime, String[] args) {
+        this.runtime = new UniversalFile(runtime);
         log = new Logger("SubServers");
         try {
             Logger.setup(System.out, System.err, dir);
@@ -77,32 +79,7 @@ public final class ExHost {
                 Util.copyFromJar(ExHost.class.getClassLoader(), "net/ME1312/SubServers/Host/Library/Files/config.yml", new UniversalFile(dir, "config.yml").getPath());
                 log.info.println("Updated ~/config.yml");
             }
-
-            if (!(new UniversalFile(dir, "Templates").exists())) new UniversalFile(dir, "Templates").mkdirs();
-            if (!(new UniversalFile(dir, "Templates:Vanilla:template.yml").exists())) {
-                unzip(SubPlugin.class.getResourceAsStream("/net/ME1312/SubServers/Host/Library/Files/Templates/vanilla.zip"), new UniversalFile(dir, "Templates"));
-                log.info.println("Created ~/SubServers/Templates/Vanilla");
-            } else if ((new Version((new YAMLConfig(new UniversalFile(dir, "Templates:Vanilla:template.yml"))).get().getString("Version", "0")).compareTo(new Version("2.11.2m+"))) != 0) {
-                Files.move(new UniversalFile(dir, "Templates:Vanilla").toPath(), new UniversalFile(dir, "Templates:Vanilla.old" + Math.round(Math.random() * 100000)).toPath());
-                unzip(SubPlugin.class.getResourceAsStream("/net/ME1312/SubServers/Host/Library/Files/Templates/vanilla.zip"), new UniversalFile(dir, "Templates"));
-                log.info.println("Updated ~/SubServers/Templates/Vanilla");
-            }
-            if (!(new UniversalFile(dir, "Templates:Spigot:template.yml").exists())) {
-                unzip(SubPlugin.class.getResourceAsStream("/net/ME1312/SubServers/Host/Library/Files/Templates/spigot.zip"), new UniversalFile(dir, "Templates"));
-                log.info.println("Created ~/SubServers/Templates/Spigot");
-            } else if ((new Version((new YAMLConfig(new UniversalFile(dir, "Templates:Spigot:template.yml"))).get().getString("Version", "0")).compareTo(new Version("2.11.2m+"))) != 0) {
-                Files.move(new UniversalFile(dir, "Templates:Vanilla").toPath(), new UniversalFile(dir, "Templates:Spigot.old" + Math.round(Math.random() * 100000)).toPath());
-                unzip(SubPlugin.class.getResourceAsStream("/net/ME1312/SubServers/Host/Library/Files/Templates/spigot.zip"), new UniversalFile(dir, "Templates"));
-                log.info.println("Updated ~/SubServers/Templates/Spigot");
-            }
-            if (!(new UniversalFile(dir, "Templates:Sponge:template.yml").exists())) {
-                unzip(SubPlugin.class.getResourceAsStream("/net/ME1312/SubServers/Host/Library/Files/Templates/sponge.zip"), new UniversalFile(dir, "Templates"));
-                log.info.println("Created ~/SubServers/Templates/Sponge");
-            } else if ((new Version((new YAMLConfig(new UniversalFile(dir, "Templates:Sponge:template.yml"))).get().getString("Version", "0")).compareTo(new Version("2.11.2m+"))) != 0) {
-                Files.move(new UniversalFile(dir, "Templates:Vanilla").toPath(), new UniversalFile(dir, "Templates:Sponge.old" + Math.round(Math.random() * 100000)).toPath());
-                unzip(SubPlugin.class.getResourceAsStream("/net/ME1312/SubServers/Host/Library/Files/Templates/sponge.zip"), new UniversalFile(dir, "Templates"));
-                log.info.println("Updated ~/SubServers/Templates/Sponge");
-            }
+            config = new YAMLConfig(new UniversalFile(dir, "config.yml"));
 
             if (new UniversalFile(dir, "Recently Deleted").exists()) {
                 int f = new UniversalFile(dir, "Recently Deleted").listFiles().length;
@@ -141,7 +118,6 @@ public final class ExHost {
                 }
             }
 
-            config = new YAMLConfig(new UniversalFile(dir, "config.yml"));
             SubDataClient.Encryption encryption = SubDataClient.Encryption.NONE;
             if (config.get().getSection("Settings").getSection("SubData").getString("Password", "").length() == 0) {
                 log.info.println("Cannot encrypt connection without a password");
@@ -154,20 +130,6 @@ public final class ExHost {
                     InetAddress.getByName(config.get().getSection("Settings").getSection("SubData").getString("Address", "127.0.0.1:4391").split(":")[0]),
                     Integer.parseInt(config.get().getSection("Settings").getSection("SubData").getString("Address", "127.0.0.1:4391").split(":")[1]), encryption);
             creator = new SubCreator(this);
-
-            if (new UniversalFile(dir, "Templates").exists()) for (File file : new UniversalFile(dir, "Templates").listFiles()) {
-                try {
-                    if (file.isDirectory()) {
-                        YAMLSection config = (new UniversalFile(file, "template.yml").exists())?new YAMLConfig(new UniversalFile(file, "template.yml")).get().getSection("Template", new YAMLSection()):new YAMLSection();
-                        SubCreator.ServerTemplate template = new SubCreator.ServerTemplate(file.getName(), config.getBoolean("Enabled", true), config.getRawString("Icon", "::NULL::"), file, config.getSection("Build", new YAMLSection()), config.getSection("Settings", new YAMLSection()));
-                        templates.put(file.getName().toLowerCase(), template);
-                        if (config.getKeys().contains("Display")) template.setDisplayName(config.getString("Display"));
-                    }
-                } catch (Exception e) {
-                    System.out.println("SubCreator > Couldn't load template: " + file.getName());
-                    e.printStackTrace();
-                }
-            }
 
             if (System.getProperty("subservers.host.plugins", "").length() > 0) {
                 long begin = Calendar.getInstance().getTime().getTime();
@@ -357,13 +319,11 @@ public final class ExHost {
         subservers.clear();
         servers.clear();
 
-        if (creator.isBusy()) {
-            creator.terminate();
-            try {
-                creator.waitFor();
-            } catch (Exception e) {
-                log.error.println(e);
-            }
+        creator.terminate();
+        try {
+            creator.waitFor();
+        } catch (Exception e) {
+            log.error.println(e);
         }
 
         try {

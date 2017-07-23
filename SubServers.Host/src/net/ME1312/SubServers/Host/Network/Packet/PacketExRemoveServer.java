@@ -69,11 +69,12 @@ public class PacketExRemoveServer implements PacketIn, PacketOut {
                 host.subdata.sendPacket(new PacketExRemoveServer(2, "That server is still running.", (data.keySet().contains("id"))?data.getString("id"):null));
             } else {
                 host.servers.remove(data.getString("server").toLowerCase());
-                log.info.println("Removed Server - " + data.getString("name"));
+                log.info.println("Removed Server - " + data.getString("server"));
                 host.subdata.sendPacket(new PacketExRemoveServer(0, "Server Removed Successfully", (data.keySet().contains("id"))?data.getString("id"):null));
             }
         } catch (Throwable e) {
             host.subdata.sendPacket(new PacketExRemoveServer(1, e.getClass().getCanonicalName() + ": " + e.getMessage(), (data.keySet().contains("id"))?data.getString("id"):null));
+            host.log.error.println(e);
         }
     }
 

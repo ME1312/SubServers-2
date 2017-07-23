@@ -251,14 +251,10 @@ public class SubCommand {
             @Override
             public void command(String handle, String[] args) {
                 if (args.length > 4) {
-                    if (Util.isException(() -> SubCreator.ServerType.valueOf(args[2].toUpperCase()))) {
-                        host.log.message.println("There is no server type with that name");
-                    } else if (Util.isException(() -> Integer.parseInt(args[4]))) {
+                    if (Util.isException(() -> Integer.parseInt(args[4]))) {
                         host.log.message.println("Invalid Port Number");
-                    } else if (args.length > 6 && Util.isException(() -> Integer.parseInt(args[5]))) {
-                        host.log.message.println("Invalid Ram Amount");
                     } else {
-                        host.subdata.sendPacket(new PacketCreateServer(null, args[0], args[1], SubCreator.ServerType.valueOf(args[2].toUpperCase()), new Version(args[3]), Integer.parseInt(args[4]), (args.length > 6)?Integer.parseInt(args[5]):1024, json -> {
+                        host.subdata.sendPacket(new PacketCreateServer(null, args[0], args[1],args[2], new Version(args[3]), Integer.parseInt(args[4]), json -> {
                             switch (json.getInt("r")) {
                                 case 3:
                                     host.log.message.println("There is already a SubServer with that name");
@@ -266,11 +262,8 @@ public class SubCommand {
                                 case 4:
                                     host.log.message.println("There is no host with that name");
                                     break;
-                                case 5:
-                                    host.log.message.println("The SubCreator instance on that host is already running");
-                                    break;
                                 case 6:
-                                    host.log.message.println("There is no server type with that name");
+                                    host.log.message.println("There is no template with that name");
                                     break;
                                 case 7:
                                     host.log.message.println("SubCreator cannot create servers before Minecraft 1.8");
@@ -278,26 +271,24 @@ public class SubCommand {
                                 case 8:
                                     host.log.message.println("Invalid Port Number");
                                     break;
-                                case 9:
-                                    host.log.message.println("Invalid Ram Amount");
-                                    break;
                                 case 0:
                                 case 1:
                                     host.log.message.println("Launching SubCreator...");
                                     break;
                                 default:
-                                    host.log.warn.println("PacketCreateServer(null, " + args[0] + ", " + args[1] + ", " + args[2].toUpperCase() + ", " + args[3] + ", " + args[4] + ", " + ((args.length > 5)?args[5]:"1024") + ") responded with: " + json.getString("m"));
+                                    host.log.warn.println("PacketCreateServer(null, " + args[0] + ", " + args[1] + ", " + args[2] + ", " + args[3] + ", " + args[4] + ") responded with: " + json.getString("m"));
                                     host.log.message.println("Launching SubCreator...");
                                     break;
                             }
                         }));
                     }
                 } else {
-                    host.log.message.println("Usage: " + handle + " <Name> <Host> <Type> <Version> <Port> [RAM]");
+                    host.log.message.println("Usage: " + handle + " <Name> <Host> <Template> <Version> <Port>");
                 }
             }
-        }.usage("<Name>", "<Host>", "<Type>", "<Version>", "<Port>", "[RAM]").description("Creates a SubServer").help(
+        }.usage("<Name>", "<Host>", "<Template>", "<Version>", "<Port>").description("Creates a SubServer").help(
                 "This command is used to create and launch a SubServer on the specified host via the network.",
+                "You may also create custom templates in ~/Templates.",
                 "",
                 "The <Name> argument is required, and should be the name of",
                 "the SubServer you want to create.",
@@ -318,8 +309,7 @@ public class SubCommand {
                 "the amount of RAM that the server will use after it has been created",
                 "",
                 "Examples:",
-                "  /create ExampleServer ExampleHost Spigot 1.11 25565",
-                "  /create ExampleServer ExampleHost Spigot 1.11 25565 1024"
+                "  /create ExampleServer ExampleHost Spigot 1.11 25565"
         ).register("create");
         new Command(null) {
             public void command(String handle, String[] args) {

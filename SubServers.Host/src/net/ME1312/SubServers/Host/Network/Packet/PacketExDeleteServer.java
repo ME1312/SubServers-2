@@ -108,6 +108,7 @@ public class PacketExDeleteServer implements PacketIn, PacketOut {
             }
         } catch (Throwable e) {
             host.subdata.sendPacket(new PacketExDeleteServer(1, e.getClass().getCanonicalName() + ": " + e.getMessage(), (data.keySet().contains("id"))?data.getString("id"):null));
+            host.log.error.println(e);
         }
     }
 

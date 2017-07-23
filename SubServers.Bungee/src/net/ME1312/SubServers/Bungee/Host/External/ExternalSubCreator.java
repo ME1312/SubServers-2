@@ -2,18 +2,18 @@ package net.ME1312.SubServers.Bungee.Host.External;
 
 import net.ME1312.SubServers.Bungee.Event.SubCreateEvent;
 import net.ME1312.SubServers.Bungee.Host.*;
+import net.ME1312.SubServers.Bungee.Library.Config.YAMLConfig;
 import net.ME1312.SubServers.Bungee.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Bungee.Library.Container;
 import net.ME1312.SubServers.Bungee.Library.JSONCallback;
+import net.ME1312.SubServers.Bungee.Library.UniversalFile;
 import net.ME1312.SubServers.Bungee.Library.Util;
 import net.ME1312.SubServers.Bungee.Library.Version.Version;
 import net.ME1312.SubServers.Bungee.Network.Packet.PacketExCreateServer;
+import net.ME1312.SubServers.Bungee.SubAPI;
 
 import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.TreeMap;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * External SubCreator Class
@@ -22,8 +22,7 @@ public class ExternalSubCreator extends SubCreator {
     private HashMap<String, ServerTemplate> templates = new HashMap<String, ServerTemplate>();
     private ExternalHost host;
     private String gitBash;
-    private ExternalSubLogger logger;
-    private boolean running;
+    private TreeMap<String, ExternalSubLogger> thread;
 
     /**
      * Creates an External SubCreator
@@ -35,24 +34,39 @@ public class ExternalSubCreator extends SubCreator {
         if (Util.isNull(host, gitBash)) throw new NullPointerException();
         this.host = host;
         this.gitBash = gitBash;
-        this.logger = new ExternalSubLogger(this, host.getName() + "/Creator", new Container<Boolean>(host.plugin.config.get().getSection("Settings").getBoolean("Log-Creator")), null);
-        this.running = false;
+        this.thread = new TreeMap<String, ExternalSubLogger>();
+
+        if (new UniversalFile(host.plugin.dir, "SubServers:Templates").exists()) for (File file : new UniversalFile(host.plugin.dir, "SubServers:Templates").listFiles()) {
+            try {
+                if (file.isDirectory()) {
+                    YAMLSection config = (new UniversalFile(file, "template.yml").exists())?new YAMLConfig(new UniversalFile(file, "template.yml")).get().getSection("Template", new YAMLSection()):new YAMLSection();
+                    ServerTemplate template = new ServerTemplate(file.getName(), config.getBoolean("Enabled", true), config.getRawString("Icon", "::NULL::"), file, config.getSection("Build", new YAMLSection()), config.getSection("Settings", new YAMLSection()));
+                    templates.put(file.getName().toLowerCase(), template);
+                    if (config.getKeys().contains("Display")) template.setDisplayName(config.getString("Display"));
+                }
+            } catch (Exception e) {
+                System.out.println(host.getName() + "/Creator > Couldn't load template: " + file.getName());
+                e.printStackTrace();
+            }
+        }
     }
 
     @Override
     public boolean create(UUID player, String name, ServerTemplate template, Version version, int port) {
         if (Util.isNull(name, template, version, port)) throw new NullPointerException();
-        if (!isBusy()) {
+        if (template.isEnabled() && !SubAPI.getInstance().getSubServers().keySet().contains(name.toLowerCase()) && !SubCreator.isReserved(name)) {
             final SubCreateEvent event = new SubCreateEvent(player, host, name, template, version, port);
             host.plugin.getPluginManager().callEvent(event);
             if (!event.isCancelled()) {
-                running = true;
+                ExternalSubLogger logger = new ExternalSubLogger(this, name + "/Creator", new Container<Boolean>(host.plugin.config.get().getSection("Settings").getBoolean("Log-Creator")), null);
+                thread.put(name.toLowerCase(), logger);
                 logger.start();
                 host.queue(new PacketExCreateServer(name, template, version, port, logger.getExternalAddress(), (JSONCallback) json -> {
                     try {
                         if (json.getInt("r") == 0) {
-                            System.out.println(host.getName() + "/Creator > Saving...");
-                            if (host.plugin.exServers.keySet().contains(name.toLowerCase())) host.plugin.exServers.remove(name.toLowerCase());
+                            System.out.println(name + "/Creator > Saving...");
+                            if (host.plugin.exServers.keySet().contains(name.toLowerCase()))
+                                host.plugin.exServers.remove(name.toLowerCase());
 
                             YAMLSection server = new YAMLSection(json.getJSONObject("c"));
                             for (String option : server.getKeys()) {
@@ -82,13 +96,13 @@ public class ExternalSubCreator extends SubCreator {
 
                             subserver.start(player);
                         } else {
-                            System.out.println(host.getName() + "/Creator > " + json.getString("m"));
+                            System.out.println(name + "/Creator > " + json.getString("m"));
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
                     logger.stop();
-                    running = false;
+                    this.thread.remove(name.toLowerCase());
                 }));
                 return true;
             } else return false;
@@ -97,14 +111,32 @@ public class ExternalSubCreator extends SubCreator {
 
     @Override
     public void terminate() {
-        if (running) {
-            host.getSubData().sendPacket(new PacketExCreateServer());
+        HashMap<String, ExternalSubLogger> thread = new HashMap<String, ExternalSubLogger>();
+        thread.putAll(this.thread);
+        for (String i : thread.keySet()) {
+            terminate(i);
+        }
+    }
+
+    @Override
+    public void terminate(String name) {
+        if (this.thread.keySet().contains(name)) {
+            host.getSubData().sendPacket(new PacketExCreateServer(name));
         }
     }
 
     @Override
     public void waitFor() throws InterruptedException {
-        while (running) {
+        HashMap<String, ExternalSubLogger> thread = new HashMap<String, ExternalSubLogger>();
+        thread.putAll(this.thread);
+        for (String i : thread.keySet()) {
+            waitFor(i);
+        }
+    }
+
+    @Override
+    public void waitFor(String name) throws InterruptedException {
+        while (this.thread.keySet().contains(name)) {
             Thread.sleep(250);
         }
     }
@@ -120,13 +152,18 @@ public class ExternalSubCreator extends SubCreator {
     }
 
     @Override
-    public SubLogger getLogger() {
-        return logger;
+    public List<SubLogger> getLogger() {
+        return new LinkedList<SubLogger>(thread.values());
     }
 
     @Override
-    public boolean isBusy() {
-        return running;
+    public SubLogger getLogger(String thread) {
+        return this.thread.get(thread);
+    }
+
+    @Override
+    public List<String> getReservedNames() {
+        return new ArrayList<String>(thread.keySet());
     }
 
     @Override

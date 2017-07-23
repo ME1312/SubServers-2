@@ -143,12 +143,10 @@ public final class SubCommand extends Command implements TabExecutor {
                     }
                 } else if (args[0].equalsIgnoreCase("create")) {
                     if (args.length > 5) {
-                        if (plugin.api.getSubServers().keySet().contains(args[1].toLowerCase())) {
+                        if (plugin.api.getSubServers().keySet().contains(args[1].toLowerCase()) || SubCreator.isReserved(args[1])) {
                             sender.sendMessage("SubServers > There is already a SubServer with that name");
                         } else if (!plugin.hosts.keySet().contains(args[2].toLowerCase())) {
                             sender.sendMessage("SubServers > There is no host with that name");
-                        } else if (plugin.hosts.get(args[2].toLowerCase()).getCreator().isBusy()) {
-                            sender.sendMessage("SubServers > The SubCreator instance on that host is already running");
                         } else if (!plugin.hosts.get(args[2].toLowerCase()).getCreator().getTemplates().keySet().contains(args[3].toLowerCase()) || !plugin.hosts.get(args[2].toLowerCase()).getCreator().getTemplate(args[3]).isEnabled()) {
                             sender.sendMessage("SubServers > There is no template with that name");
                         } else if (new Version("1.8").compareTo(new Version(args[4])) > 0) {
