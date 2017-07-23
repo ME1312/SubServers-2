@@ -92,7 +92,7 @@ public final class SubPlugin extends BungeeCord {
         if (!(new UniversalFile(dir, "Templates:Vanilla:template.yml").exists())) {
             Util.unzip(SubPlugin.class.getResourceAsStream("/net/ME1312/SubServers/Bungee/Library/Files/Templates/vanilla.zip"), new UniversalFile(dir, "Templates"));
             System.out.println("SubServers > Created ~/SubServers/Templates/Vanilla");
-        } else if ((new Version((new YAMLConfig(new UniversalFile(dir, "Templates:Vanilla:template.yml"))).get().getString("Version", "0")).compareTo(new Version("2.11.2m+"))) != 0) {
+        } else if ((new Version((new YAMLConfig(new UniversalFile(dir, "Templates:Vanilla:template.yml"))).get().getString("Version", "0")).compareTo(new Version("2.12b+"))) != 0) {
             Files.move(new UniversalFile(dir, "Templates:Vanilla").toPath(), new UniversalFile(dir, "Templates:Vanilla.old" + Math.round(Math.random() * 100000)).toPath());
             Util.unzip(SubPlugin.class.getResourceAsStream("/net/ME1312/SubServers/Bungee/Library/Files/Templates/vanilla.zip"), new UniversalFile(dir, "Templates"));
             System.out.println("SubServers > Updated ~/SubServers/Templates/Vanilla");

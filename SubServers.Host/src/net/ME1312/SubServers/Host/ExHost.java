@@ -48,7 +48,7 @@ public final class ExHost {
     public SubDataClient subdata = null;
 
     public final Version version = new Version("2.12c");
-    public final Version bversion = new Version(3);
+    public final Version bversion = null;
     public final SubAPI api = new SubAPI(this);
 
     private boolean running;

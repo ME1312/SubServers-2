@@ -27,7 +27,7 @@ public final class SubPlugin extends JavaPlugin {
 
     public UIHandler gui = null;
     public final Version version;
-    public final Version bversion = new Version(3);
+    public final Version bversion = null;
     public final SubAPI api = new SubAPI(this);
 
     public SubPlugin() {

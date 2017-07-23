@@ -208,7 +208,11 @@ public class SubCreator {
             thread.name().logger.info.println("Loading Template: " + template.getDisplayName());
             host.subdata.sendPacket(new PacketOutExLogMessage(address, "Loading Template: " + template.getDisplayName()));
             Util.copyDirectory(template.getDirectory(), dir);
-            if (template.getType() == ServerType.SPONGE) {
+            if (template.getType() == ServerType.VANILLA) {
+                String patch = "Patch";
+                if (version.compareTo(new Version("1.12")) >= 0) patch += "-v2";
+                version = new Version(version.toString() + " " + patch);
+            } else if (template.getType() == ServerType.SPONGE) {
                 thread.name().logger.info.println("Searching Versions...");
                 host.subdata.sendPacket(new PacketOutExLogMessage(address, "Searching Versions..."));
                 Document spongexml = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new InputSource(new StringReader(Util.readAll(new BufferedReader(new InputStreamReader(new URL("http://files.minecraftforge.net/maven/org/spongepowered/spongeforge/maven-metadata.xml").openStream(), Charset.forName("UTF-8")))))));

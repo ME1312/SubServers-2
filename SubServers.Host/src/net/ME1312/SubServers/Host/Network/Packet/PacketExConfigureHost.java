@@ -46,10 +46,10 @@ public class PacketExConfigureHost implements PacketIn, PacketOut {
     public void execute(JSONObject data) {
         host.host = new YAMLSection(data.getJSONObject("host"));
         UniversalFile templates = new UniversalFile(host.runtime, "net:ME1312:SubServers:Host:Library:Files:Templates");
-        templates.mkdirs();
         for (String name : data.getJSONObject("templates").keySet()) {
             try {
                 UniversalFile dir = new UniversalFile(templates, name);
+                dir.mkdirs();
                 Util.unzip(new ByteArrayInputStream(Base64.getDecoder().decode(data.getJSONObject("templates").getJSONObject(name).getString("files"))), dir);
                 SubCreator.ServerTemplate template = new SubCreator.ServerTemplate(name, data.getJSONObject("templates").getJSONObject(name).getBoolean("enabled"), data.getJSONObject("templates").getJSONObject(name).getString("icon"), dir,
                         new YAMLSection(data.getJSONObject("templates").getJSONObject(name).getJSONObject("build")), new YAMLSection(data.getJSONObject("templates").getJSONObject(name).getJSONObject("settings")));
