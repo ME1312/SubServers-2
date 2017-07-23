@@ -141,7 +141,7 @@ public class InternalSubCreator extends SubCreator {
 
             try {
                 System.out.println(name + "/Creator > Launching " + template.getBuildOptions().getRawString("Shell-Location"));
-                thread.set(Runtime.getRuntime().exec((System.getProperty("os.name").toLowerCase().indexOf("win") >= 0)?"\"" + gitBash + "\" --login -i -c \"bash " + template.getBuildOptions().getRawString("Shell-Location") + ' ' + version.toString() + '\"':("bash " + template.getBuildOptions().getRawString("Shell-Location") + ' ' + version.toString() + " " + System.getProperty("user.home")), null, dir));
+                thread.set(Runtime.getRuntime().exec((System.getProperty("os.name").toLowerCase().indexOf("win") >= 0) ? "\"" + gitBash + "\" --login -i -c \"bash " + template.getBuildOptions().getRawString("Shell-Location") + ' ' + version.toString() + '\"' : ("bash " + template.getBuildOptions().getRawString("Shell-Location") + ' ' + version.toString() + " " + System.getProperty("user.home")), null, dir));
                 thread.name().log.set(host.plugin.config.get().getSection("Settings").getBoolean("Log-Creator"));
                 thread.name().file = new File(dir, "SubCreator-" + template.getName() + "-" + version.toString().replace(" ", "@") + ".log");
                 thread.name().process = thread.get();
@@ -151,6 +151,8 @@ public class InternalSubCreator extends SubCreator {
                 Thread.sleep(500);
 
                 if (thread.get().exitValue() != 0) error = true;
+            } catch (InterruptedException e) {
+                error = true;
             } catch (Exception e) {
                 error = true;
                 e.printStackTrace();
@@ -244,11 +246,11 @@ public class InternalSubCreator extends SubCreator {
 
     @Override
     public void terminate(String name) {
-        if (this.thread.get(name).get().get() != null && this.thread.get(name).get().get().isAlive()) {
-            this.thread.get(name).get().get().destroyForcibly();
+        if (this.thread.get(name.toLowerCase()).get().get() != null && this.thread.get(name.toLowerCase()).get().get().isAlive()) {
+            this.thread.get(name.toLowerCase()).get().get().destroyForcibly();
         }
-        if (this.thread.get(name).name() != null && this.thread.get(name).name().isAlive()) {
-            this.thread.get(name).name().interrupt();
+        if (this.thread.get(name.toLowerCase()).name() != null && this.thread.get(name.toLowerCase()).name().isAlive()) {
+            this.thread.get(name.toLowerCase()).name().interrupt();
         }
     }
 
@@ -263,7 +265,7 @@ public class InternalSubCreator extends SubCreator {
 
     @Override
     public void waitFor(String name) throws InterruptedException {
-        while (this.thread.get(name).name() != null && this.thread.get(name).name().isAlive()) {
+        while (this.thread.get(name.toLowerCase()) != null && this.thread.get(name.toLowerCase()).name() != null && this.thread.get(name.toLowerCase()).name().isAlive()) {
             Thread.sleep(250);
         }
     }
@@ -290,8 +292,8 @@ public class InternalSubCreator extends SubCreator {
     }
 
     @Override
-    public SubLogger getLogger(String thread) {
-        return this.thread.get(thread).get().name();
+    public SubLogger getLogger(String name) {
+        return this.thread.get(name.toLowerCase()).get().name();
     }
 
     @Override

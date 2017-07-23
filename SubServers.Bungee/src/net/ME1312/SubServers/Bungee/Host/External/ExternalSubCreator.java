@@ -120,8 +120,8 @@ public class ExternalSubCreator extends SubCreator {
 
     @Override
     public void terminate(String name) {
-        if (this.thread.keySet().contains(name)) {
-            host.getSubData().sendPacket(new PacketExCreateServer(name));
+        if (this.thread.keySet().contains(name.toLowerCase())) {
+            host.getSubData().sendPacket(new PacketExCreateServer(name.toLowerCase()));
         }
     }
 
@@ -136,7 +136,7 @@ public class ExternalSubCreator extends SubCreator {
 
     @Override
     public void waitFor(String name) throws InterruptedException {
-        while (this.thread.keySet().contains(name)) {
+        while (this.thread.keySet().contains(name.toLowerCase())) {
             Thread.sleep(250);
         }
     }
@@ -157,8 +157,8 @@ public class ExternalSubCreator extends SubCreator {
     }
 
     @Override
-    public SubLogger getLogger(String thread) {
-        return this.thread.get(thread);
+    public SubLogger getLogger(String name) {
+        return this.thread.get(name.toLowerCase());
     }
 
     @Override

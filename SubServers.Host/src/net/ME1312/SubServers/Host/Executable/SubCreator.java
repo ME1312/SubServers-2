@@ -283,6 +283,8 @@ public class SubCreator {
                 Thread.sleep(500);
 
                 if (thread.get().exitValue() != 0) error = true;
+            } catch (InterruptedException e) {
+                error = true;
             } catch (Exception e) {
                 error = true;
                 thread.name().logger.error.println(e);

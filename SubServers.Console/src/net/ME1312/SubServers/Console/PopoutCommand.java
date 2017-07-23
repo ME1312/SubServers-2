@@ -99,17 +99,19 @@ public final class PopoutCommand {
                     Map<String, Host> hosts = plugin.getProxy().api.getHosts();
                     if (hosts.keySet().contains(args[0].toLowerCase())) {
                         boolean success = false;
-                        if (hosts.get(args[0].toLowerCase()).getCreator().isBusy()) {
+                        if (hosts.get(args[0].toLowerCase()).getCreator().getReservedNames().size() > 0) {
                             if (!plugin.cCurrent.keySet().contains(args[0].toLowerCase())) {
                                 SwingUtilities.invokeLater(() -> {
-                                    ConsoleWindow window = new ConsoleWindow(plugin, hosts.get(args[0].toLowerCase()).getCreator().getLogger());
-                                    plugin.cCurrent.put(args[0].toLowerCase(), window);
-                                    window.open();
+                                    for (String reserved : hosts.get(args[0].toLowerCase()).getCreator().getReservedNames()) {
+                                        ConsoleWindow window = new ConsoleWindow(plugin, hosts.get(args[0].toLowerCase()).getCreator().getLogger(reserved));
+                                        plugin.cCurrent.put(reserved.toLowerCase(), window);
+                                        window.open();
+                                    }
                                 });
                             } else {
                                 plugin.cCurrent.get(args[0].toLowerCase()).open();
                             }
-                            System.out.println("SubConsole > Opening Window...");
+                            System.out.println("SubConsole > Opening Windows...");
                             success = true;
                         }
 

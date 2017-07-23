@@ -64,9 +64,9 @@ public final class ConsolePlugin extends Plugin implements Listener {
     public void onServerCreate(SubCreateEvent event) {
         if (!event.isCancelled() && config.get().getStringList("Enabled-Creators").contains(event.getHost().getName().toLowerCase())) {
             if (!cCurrent.keySet().contains(event.getHost().getName().toLowerCase())) {
-                SwingUtilities.invokeLater(() -> cCurrent.put(event.getHost().getName().toLowerCase(), new ConsoleWindow(this, event.getHost().getCreator().getLogger())));
+                SwingUtilities.invokeLater(() -> cCurrent.put(event.getName().toLowerCase(), new ConsoleWindow(this, event.getHost().getCreator().getLogger(event.getName().toLowerCase()))));
             } else {
-                cCurrent.get(event.getHost().getName().toLowerCase()).clear();
+                cCurrent.get(event.getName().toLowerCase()).clear();
             }
         }
     }
