@@ -75,6 +75,8 @@ public class InternalSubCreator extends SubCreator {
                 } else {
                     server.setAll(config);
                 }
+            } else {
+                System.out.println(name + "/Creator > Skipping missing template: " + other);
             }
         }
         server.setAll(template.getConfigOptions());
@@ -248,9 +250,9 @@ public class InternalSubCreator extends SubCreator {
     public void terminate(String name) {
         if (this.thread.get(name.toLowerCase()).get().get() != null && this.thread.get(name.toLowerCase()).get().get().isAlive()) {
             this.thread.get(name.toLowerCase()).get().get().destroyForcibly();
-        }
-        if (this.thread.get(name.toLowerCase()).name() != null && this.thread.get(name.toLowerCase()).name().isAlive()) {
+        } else if (this.thread.get(name.toLowerCase()).name() != null && this.thread.get(name.toLowerCase()).name().isAlive()) {
             this.thread.get(name.toLowerCase()).name().interrupt();
+            this.thread.remove(name.toLowerCase());
         }
     }
 
@@ -265,7 +267,7 @@ public class InternalSubCreator extends SubCreator {
 
     @Override
     public void waitFor(String name) throws InterruptedException {
-        while (this.thread.get(name.toLowerCase()) != null && this.thread.get(name.toLowerCase()).name() != null && this.thread.get(name.toLowerCase()).name().isAlive()) {
+        while (this.thread.keySet().contains(name.toLowerCase()) && this.thread.get(name.toLowerCase()).name() != null && this.thread.get(name.toLowerCase()).name().isAlive()) {
             Thread.sleep(250);
         }
     }

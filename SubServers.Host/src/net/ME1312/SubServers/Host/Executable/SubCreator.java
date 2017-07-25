@@ -201,6 +201,9 @@ public class SubCreator {
                 } else {
                     server.setAll(config);
                 }
+            } else {
+                thread.name().logger.warn.println("Skipping missing template: " + other);
+                host.subdata.sendPacket(new PacketOutExLogMessage(address, "Skipping missing template: " + other));
             }
         }
         server.setAll(template.getConfigOptions());
@@ -337,12 +340,12 @@ public class SubCreator {
         }
     }
 
-    public void terminate(String thread) {
-        if (this.thread.get(thread).get().get() != null && this.thread.get(thread).get().get().isAlive()) {
-            this.thread.get(thread).get().get().destroyForcibly();
-        }
-        if (this.thread.get(thread).name() != null && this.thread.get(thread).name().isAlive()) {
-            this.thread.get(thread).name().interrupt();
+    public void terminate(String name) {
+        if (this.thread.get(name).get().get() != null && this.thread.get(name).get().get().isAlive()) {
+            this.thread.get(name).get().get().destroyForcibly();
+        } else if (this.thread.get(name).name() != null && this.thread.get(name).name().isAlive()) {
+            this.thread.get(name).name().interrupt();
+            this.thread.remove(name);
         }
     }
 
@@ -354,8 +357,8 @@ public class SubCreator {
         }
     }
 
-    public void waitFor(String thread) throws InterruptedException {
-        while (this.thread.get(thread).name() != null && this.thread.get(thread).name().isAlive()) {
+    public void waitFor(String name) throws InterruptedException {
+        while (this.thread.get(name).name() != null && this.thread.get(name).name().isAlive()) {
             Thread.sleep(250);
         }
     }
@@ -370,8 +373,8 @@ public class SubCreator {
         return loggers;
     }
 
-    public SubLogger getLogger(String thread) {
-        return this.thread.get(thread).get().name();
+    public SubLogger getLogger(String name) {
+        return this.thread.get(name).get().name();
     }
 
     private void generateClient(File dir, ServerType type, String name) throws IOException {

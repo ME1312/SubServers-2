@@ -165,9 +165,6 @@ public final class Util {
                 copyDirectory(srcFile, destFile);
             }
         } else {
-            if (to.exists()) {
-                to.delete();
-            }
             InputStream in = null;
             OutputStream out = null;
 

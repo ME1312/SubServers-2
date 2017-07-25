@@ -62,7 +62,7 @@ public class PacketExCreateServer implements PacketIn, PacketOut {
                     data.getJSONObject("creator").getInt("port"), UUID.fromString(data.getJSONObject("creator").getString("log")), (data.keySet().contains("id"))?data.getString("id"):null);
         } catch (Throwable e) {
             if (data.keySet().contains("thread")) {
-                host.creator.terminate(data.getString("thread"));
+                host.creator.terminate(data.getString("thread").toLowerCase());
             } else {
                 host.creator.terminate();
             }

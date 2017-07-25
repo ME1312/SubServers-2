@@ -122,6 +122,7 @@ public class ExternalSubCreator extends SubCreator {
     public void terminate(String name) {
         if (this.thread.keySet().contains(name.toLowerCase())) {
             host.getSubData().sendPacket(new PacketExCreateServer(name.toLowerCase()));
+            thread.remove(name.toLowerCase());
         }
     }
 
@@ -136,7 +137,7 @@ public class ExternalSubCreator extends SubCreator {
 
     @Override
     public void waitFor(String name) throws InterruptedException {
-        while (this.thread.keySet().contains(name.toLowerCase())) {
+        while (this.thread.keySet().contains(name.toLowerCase()) && host.client.get() != null) {
             Thread.sleep(250);
         }
     }

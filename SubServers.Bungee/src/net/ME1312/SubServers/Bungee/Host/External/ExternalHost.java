@@ -33,7 +33,7 @@ public class ExternalHost extends Host implements ClientHandler {
     private InetAddress address;
     private SubCreator creator;
     private String directory;
-    private NamedContainer<Boolean, Client> client;
+    protected NamedContainer<Boolean, Client> client;
     private LinkedList<PacketOut> queue;
     private boolean clean;
     protected SubPlugin plugin;

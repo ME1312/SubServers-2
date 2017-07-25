@@ -362,7 +362,7 @@ public class ExternalSubServer extends SubServer {
 
     @Override
     public void waitFor() throws InterruptedException {
-        while (running) {
+        while (running && host.client.get() != null) {
             Thread.sleep(250);
         }
     }
