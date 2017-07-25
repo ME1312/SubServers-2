@@ -46,6 +46,10 @@ public class PacketExConfigureHost implements PacketIn, PacketOut {
     @Override
     public void execute(JSONObject data) {
         host.host = new YAMLSection(data.getJSONObject("host"));
+        for (SubCreator.ServerTemplate template : host.templates.values()) {
+            Util.deleteDirectory(template.getDirectory());
+        }
+        host.templates.clear();
         UniversalFile templates = new UniversalFile(host.runtime, "net:ME1312:SubServers:Host:Library:Files:Templates");
         for (String name : data.getJSONObject("templates").keySet()) {
             try {

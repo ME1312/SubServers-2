@@ -1,17 +1,10 @@
 package net.ME1312.SubServers.Host.Network.Packet;
 
-
-import net.ME1312.SubServers.Host.Executable.SubCreator;
-import net.ME1312.SubServers.Host.Library.Config.YAMLConfig;
-import net.ME1312.SubServers.Host.Library.Config.YAMLSection;
-import net.ME1312.SubServers.Host.Library.UniversalFile;
-import net.ME1312.SubServers.Host.Library.Util;
 import net.ME1312.SubServers.Host.Library.Version.Version;
 import net.ME1312.SubServers.Host.Network.PacketIn;
 import net.ME1312.SubServers.Host.ExHost;
 import org.json.JSONObject;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,10 +41,6 @@ public class PacketInReset implements PacketIn {
             } catch (Exception e) {
                 host.log.error.println(e);
             }
-            for (SubCreator.ServerTemplate template : host.templates.values()) {
-                Util.deleteDirectory(template.getDirectory());
-            }
-            host.templates.clear();
         }
     }
 
