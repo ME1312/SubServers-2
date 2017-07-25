@@ -6,10 +6,7 @@ import javax.crypto.*;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
@@ -19,8 +16,6 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.InvalidParameterSpecException;
 import java.security.spec.KeySpec;
 import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Random;
 
 /**
@@ -194,16 +189,9 @@ public final class AES {
      * @throws IOException
      */
     public static byte[] encrypt(int keyLength, String password, String input) throws IOException, StrongEncryptionNotAvailableException, InvalidKeyLengthException {
-        List<Byte> list = new LinkedList<Byte>();
-        encrypt(keyLength, password, new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8)), new OutputStream() {
-            @Override
-            public void write(int b) throws IOException {
-                list.add((byte) b);
-            }
-        });
-        byte[] array = new byte[list.size()];
-        for(int i = 0; i < list.size(); i++) array[i] = list.get(i);
-        return array;
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        encrypt(keyLength, password, new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8)), bytes);
+        return bytes.toByteArray();
     }
 
     /**
@@ -296,16 +284,9 @@ public final class AES {
      * @throws IOException
      */
     public static NamedContainer<Integer, String> decrypt(String password, byte[] input) throws IOException, StrongEncryptionNotAvailableException, InvalidAESStreamException, InvalidPasswordException {
-        List<Byte> list = new LinkedList<Byte>();
-        int keyLength = decrypt(password, new ByteArrayInputStream(input), new OutputStream() {
-            @Override
-            public void write(int b) throws IOException {
-                list.add((byte) b);
-            }
-        });
-        byte[] array = new byte[list.size()];
-        for(int i = 0; i < list.size(); i++) array[i] = list.get(i);
-        return new NamedContainer<>(keyLength, new String(array, StandardCharsets.UTF_8));
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        int keyLength = decrypt(password, new ByteArrayInputStream(input), bytes);
+        return new NamedContainer<>(keyLength, new String(bytes.toByteArray(), StandardCharsets.UTF_8));
     }
 
     /**

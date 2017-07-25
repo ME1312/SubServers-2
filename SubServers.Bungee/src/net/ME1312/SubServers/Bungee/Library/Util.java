@@ -215,7 +215,6 @@ public final class Util {
             ZipOutputStream zos = new ZipOutputStream(zip);
 
             for(String next : zipsearch(file, file)){
-
                 ZipEntry ze= new ZipEntry(next);
                 zos.putNextEntry(ze);
 

@@ -111,7 +111,11 @@ var activeTableTab = "activeTableTab";
 extends java.lang.Object</pre>
 <div class="block">A class to perform password-based AES encryption and decryption in CBC mode.
  128, 192, and 256-bit encryption are supported, provided that the latter two
- are permitted by the Java runtime's jurisdiction policy files.</div>
+ are permitted by the Java runtime's jurisdiction policy files.
+ <br/>
+ The public interface for this class consists of the static methods
+ <a href="../../../../../net/ME1312/SubServers/Bungee/Network/AES.html#encrypt-int-java.lang.String-java.io.InputStream-java.io.OutputStream-"><code>encrypt(int, java.lang.String, java.io.InputStream, java.io.OutputStream)</code></a> and <a href="../../../../../net/ME1312/SubServers/Bungee/Network/AES.html#decrypt-java.lang.String-java.io.InputStream-java.io.OutputStream-"><code>decrypt(java.lang.String, java.io.InputStream, java.io.OutputStream)</code></a>, which encrypt and decrypt arbitrary
+ streams of data, respectively.</div>
 <dl>
 <dt><span class="simpleTagLabel">Author:</span></dt>
 <dd>dweymouth@gmail.com</dd>

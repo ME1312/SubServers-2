@@ -47,7 +47,7 @@ public final class ExHost {
     public YAMLSection lang = null;
     public SubDataClient subdata = null;
 
-    public final Version version = new Version("2.12c");
+    public final Version version = new Version("2.12d");
     public final Version bversion = null;
     public final SubAPI api = new SubAPI(this);
 

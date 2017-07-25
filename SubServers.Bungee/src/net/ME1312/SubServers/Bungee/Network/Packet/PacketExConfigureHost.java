@@ -12,11 +12,9 @@ import net.ME1312.SubServers.Bungee.Network.PacketOut;
 import net.ME1312.SubServers.Bungee.SubPlugin;
 import org.json.JSONObject;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 import java.lang.reflect.Field;
+import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.HashMap;
@@ -56,16 +54,9 @@ public class PacketExConfigureHost implements PacketIn, PacketOut {
                 tinfo.put("enabled", template.isEnabled());
                 tinfo.put("display", template.getDisplayName());
                 tinfo.put("icon", template.getIcon());
-                List<Byte> list = new LinkedList<Byte>();
-                Util.zip(template.getDirectory(), new OutputStream() {
-                    @Override
-                    public void write(int b) throws IOException {
-                        list.add((byte) b);
-                    }
-                });
-                byte[] array = new byte[list.size()];
-                for (int i = 0; i < list.size(); i++) array[i] = list.get(i);
-                tinfo.put("files", Base64.getEncoder().encodeToString(array));
+                ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+                Util.zip(template.getDirectory(), bytes);
+                tinfo.put("files", Base64.getEncoder().encodeToString(bytes.toByteArray()));
                 tinfo.put("build", template.getBuildOptions().toJSON());
                 tinfo.put("settings", template.getConfigOptions().toJSON());
                 templates.put(template.getName(), tinfo);

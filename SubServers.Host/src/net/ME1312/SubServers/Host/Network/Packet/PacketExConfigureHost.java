@@ -39,6 +39,7 @@ public class PacketExConfigureHost implements PacketIn, PacketOut {
 
     @Override
     public JSONObject generate() {
+        host.log.info.println("Downloading Host Settings...");
         return null;
     }
 
