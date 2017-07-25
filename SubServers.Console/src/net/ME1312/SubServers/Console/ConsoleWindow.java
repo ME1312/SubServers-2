@@ -3,13 +3,16 @@ package net.ME1312.SubServers.Console;
 import net.ME1312.SubServers.Bungee.Host.SubLogFilter;
 import net.ME1312.SubServers.Bungee.Host.SubLogger;
 import net.ME1312.SubServers.Bungee.Host.SubServer;
+import net.ME1312.SubServers.Bungee.Library.Util;
 import net.md_5.bungee.api.ProxyServer;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.text.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.List;
@@ -109,21 +112,21 @@ public final class ConsoleWindow implements SubLogFilter {
         item = new JMenuItem("Reset Text Size");
         item.addActionListener(event -> {
             log.setFont(log.getFont().deriveFont(12f));
-            SwingUtilities.invokeLater(this::hScroll);
+            hScroll();
         });
         menu.add(item);
         item = new JMenuItem("Bigger Text");
         item.setAccelerator(KeyStroke.getKeyStroke('=', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), true));
         item.addActionListener(event -> {
             log.setFont(log.getFont().deriveFont((float) log.getFont().getSize() + 2));
-            SwingUtilities.invokeLater(this::hScroll);
+            hScroll();
         });
         menu.add(item);
         item = new JMenuItem("Smaller Text");
         item.setAccelerator(KeyStroke.getKeyStroke('-', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), true));
         item.addActionListener(event -> {
             log.setFont(log.getFont().deriveFont((float) log.getFont().getSize() - 2));
-            SwingUtilities.invokeLater(this::hScroll);
+            hScroll();
         });
         menu.add(item);
         menu.addSeparator();
@@ -142,6 +145,7 @@ public final class ConsoleWindow implements SubLogFilter {
         window.setJMenuBar(jMenu);
         window.setContentPane(panel);
         window.pack();
+        Util.isException(() -> window.setIconImage(ImageIO.read(ConsolePlugin.class.getResourceAsStream("/SubServers.png"))));
         window.setTitle(logger.getName() + " \u2014 SubServers 2");
         window.setSize(1024, 576);
         Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize();
@@ -157,7 +161,7 @@ public final class ConsoleWindow implements SubLogFilter {
         });
         window.addComponentListener(new ComponentAdapter() {
             public void componentResized(ComponentEvent e) {
-                SwingUtilities.invokeLater(ConsoleWindow.this::hScroll);
+                hScroll();
             }
         });
         vScroll.setBorder(BorderFactory.createEmptyBorder());
@@ -342,7 +346,7 @@ public final class ConsoleWindow implements SubLogFilter {
             if (obj instanceof SubLogger.LogMessage) log(((SubLogger.LogMessage) obj).getDate(), ((SubLogger.LogMessage) obj).getLevel(), ((SubLogger.LogMessage) obj).getMessage());
             if (obj instanceof SubServer.LoggedCommand) log(((SubServer.LoggedCommand) obj).getDate(), '<' + ((((SubServer.LoggedCommand) obj).getSender() == null)?"CONSOLE":((ProxyServer.getInstance().getPlayer(((SubServer.LoggedCommand) obj).getSender()) == null)?((SubServer.LoggedCommand) obj).getSender().toString():ProxyServer.getInstance().getPlayer(((SubServer.LoggedCommand) obj).getSender()).getName())) + "> /" + ((SubServer.LoggedCommand) obj).getCommand());
         }
-        SwingUtilities.invokeLater(this::hScroll);
+        hScroll();
     }
 
     public SubLogger getLogger() {
@@ -366,7 +370,7 @@ public final class ConsoleWindow implements SubLogFilter {
 
     public void clear() {
         log.setText("\n");
-        SwingUtilities.invokeLater(this::hScroll);
+        hScroll();
     }
 
     @Override
@@ -374,13 +378,11 @@ public final class ConsoleWindow implements SubLogFilter {
         open();
     }
     public void open() {
-        SwingUtilities.invokeLater(() -> {
-            if (!open) {
-                window.setVisible(true);
-                this.open = true;
-            }
-            window.toFront();
-        });
+        if (!open) {
+            window.setVisible(true);
+            this.open = true;
+        }
+        window.toFront();
     }
 
     public boolean isOpen() {
@@ -393,18 +395,16 @@ public final class ConsoleWindow implements SubLogFilter {
         clear();
     }
     public void close() {
-        SwingUtilities.invokeLater(() -> {
-            if (open) {
-                this.open = false;
-                if (find.isVisible()) {
-                    find.setVisible(false);
-                    findI = 0;
-                    findO = 0;
-                }
-                window.setVisible(false);
-                plugin.onClose(this);
+        if (open) {
+            this.open = false;
+            if (find.isVisible()) {
+                find.setVisible(false);
+                findI = 0;
+                findO = 0;
             }
-        });
+            window.setVisible(false);
+            plugin.onClose(this);
+        }
     }
 
     public void destroy() {
@@ -614,13 +614,7 @@ public final class ConsoleWindow implements SubLogFilter {
         @Override
         public void adjustmentValueChanged(final AdjustmentEvent e)
         {
-            SwingUtilities.invokeLater(new Runnable()
-            {
-                public void run()
-                {
-                    checkScrollBar(e);
-                }
-            });
+            checkScrollBar(e);
         }
 
         /*
