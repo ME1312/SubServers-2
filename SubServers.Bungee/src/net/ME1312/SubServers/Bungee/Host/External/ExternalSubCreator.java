@@ -58,7 +58,7 @@ public class ExternalSubCreator extends SubCreator {
             final SubCreateEvent event = new SubCreateEvent(player, host, name, template, version, port);
             host.plugin.getPluginManager().callEvent(event);
             if (!event.isCancelled()) {
-                ExternalSubLogger logger = new ExternalSubLogger(this, name + "/Creator", new Container<Boolean>(host.plugin.config.get().getSection("Settings").getBoolean("Log-Creator")), null);
+                ExternalSubLogger logger = new ExternalSubLogger(this, name + File.separator + "Creator", new Container<Boolean>(host.plugin.config.get().getSection("Settings").getBoolean("Log-Creator")), null);
                 thread.put(name.toLowerCase(), logger);
                 logger.start();
                 host.queue(new PacketExCreateServer(name, template, version, port, logger.getExternalAddress(), (JSONCallback) json -> {

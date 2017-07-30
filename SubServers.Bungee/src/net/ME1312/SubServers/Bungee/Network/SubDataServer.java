@@ -63,7 +63,7 @@ public final class SubDataServer {
 
     private void loadDefaults() {
         defaults = true;
-        for (String s : plugin.config.get().getSection("Settings").getSection("SubData").getStringList("Allowed-Connections")) {
+        for (String s : plugin.config.get().getSection("Settings").getSection("SubData").getStringList("Allowed-Connections", new ArrayList<String>())) {
             try {
                 allowedAddresses.add(InetAddress.getByName(s));
             } catch (Exception e) {

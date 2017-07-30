@@ -229,7 +229,7 @@ public class InternalSubCreator extends SubCreator {
             final SubCreateEvent event = new SubCreateEvent(player, host, name, template, version, port);
             host.plugin.getPluginManager().callEvent(event);
             if (!event.isCancelled()) {
-                NamedContainer<Thread, NamedContainer<InternalSubLogger, Process>> thread = new NamedContainer<Thread, NamedContainer<InternalSubLogger, Process>>(new Thread(() -> InternalSubCreator.this.run(player, name, event.getTemplate(), event.getVersion(), port)), new NamedContainer<InternalSubLogger, Process>(new InternalSubLogger(null, this, name + "/Creator", new Container<Boolean>(false), null), null));
+                NamedContainer<Thread, NamedContainer<InternalSubLogger, Process>> thread = new NamedContainer<Thread, NamedContainer<InternalSubLogger, Process>>(new Thread(() -> InternalSubCreator.this.run(player, name, event.getTemplate(), event.getVersion(), port)), new NamedContainer<InternalSubLogger, Process>(new InternalSubLogger(null, this, name + File.separator + "Creator", new Container<Boolean>(false), null), null));
                 this.thread.put(name.toLowerCase(), thread);
                 thread.name().start();
                 return true;
