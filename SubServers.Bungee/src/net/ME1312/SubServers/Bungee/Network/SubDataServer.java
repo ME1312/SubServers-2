@@ -329,7 +329,9 @@ public final class SubDataServer {
      */
     public void broadcastPacket(PacketOut packet) {
         if (Util.isNull(packet)) throw new NullPointerException();
-        for (Client client : clients.values()) {
+        List<Client> clients = new ArrayList<Client>();
+        clients.addAll(getClients());
+        for (Client client : clients) {
             client.sendPacket(packet);
         }
     }

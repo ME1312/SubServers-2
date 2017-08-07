@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":9,"i6":9,"i7":9,"i8":10,"i9":9,"i10":9};
+var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":9,"i7":9,"i8":9,"i9":10,"i10":9,"i11":9};
 var tabs = {65535:["t0","All Methods"],1:["t1","Static Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -172,68 +172,74 @@ extends java.lang.Object</pre>
 </tr>
 <tr id="i0" class="altColor">
 <td class="colFirst"><code>void</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Host/Network/SubDataClient.html#broadcastPacket-net.ME1312.SubServers.Host.Network.PacketOut-">broadcastPacket</a></span>(<a href="../../../../../net/ME1312/SubServers/Host/Network/PacketOut.html" title="interface in net.ME1312.SubServers.Host.Network">PacketOut</a>&nbsp;packet)</code>
+<div class="block">Broadcast packet to all Clients</div>
+</td>
+</tr>
+<tr id="i1" class="rowColor">
+<td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Host/Network/SubDataClient.html#destroy-int-">destroy</a></span>(int&nbsp;reconnect)</code>
 <div class="block">Drops All Connections and Stops the SubData Listener</div>
 </td>
 </tr>
-<tr id="i1" class="rowColor">
+<tr id="i2" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Host/Network/SubDataClient.html#forwardPacket-net.ME1312.SubServers.Host.Network.PacketOut-java.lang.String-">forwardPacket</a></span>(<a href="../../../../../net/ME1312/SubServers/Host/Network/PacketOut.html" title="interface in net.ME1312.SubServers.Host.Network">PacketOut</a>&nbsp;packet,
              java.lang.String&nbsp;location)</code>
 <div class="block">Forward Packet to Server</div>
 </td>
 </tr>
-<tr id="i2" class="altColor">
+<tr id="i3" class="rowColor">
 <td class="colFirst"><code>java.net.Socket</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Host/Network/SubDataClient.html#getClient--">getClient</a></span>()</code>
 <div class="block">Gets the Server Socket</div>
 </td>
 </tr>
-<tr id="i3" class="rowColor">
+<tr id="i4" class="altColor">
 <td class="colFirst"><code><a href="../../../../../net/ME1312/SubServers/Host/Network/SubDataClient.Encryption.html" title="enum in net.ME1312.SubServers.Host.Network">SubDataClient.Encryption</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Host/Network/SubDataClient.html#getEncryption--">getEncryption</a></span>()</code>
 <div class="block">Gets the Connection's Encryption method</div>
 </td>
 </tr>
-<tr id="i4" class="altColor">
+<tr id="i5" class="rowColor">
 <td class="colFirst"><code>java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Host/Network/SubDataClient.html#getName--">getName</a></span>()</code>
 <div class="block">Gets the Assigned Host Name</div>
 </td>
 </tr>
-<tr id="i5" class="rowColor">
+<tr id="i6" class="altColor">
 <td class="colFirst"><code>static java.util.List&lt;? extends <a href="../../../../../net/ME1312/SubServers/Host/Network/PacketIn.html" title="interface in net.ME1312.SubServers.Host.Network">PacketIn</a>&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Host/Network/SubDataClient.html#getPacket-java.lang.String-">getPacket</a></span>(java.lang.String&nbsp;handle)</code>
 <div class="block">Grab PacketIn Instances via handle</div>
 </td>
 </tr>
-<tr id="i6" class="altColor">
+<tr id="i7" class="rowColor">
 <td class="colFirst"><code>static void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Host/Network/SubDataClient.html#registerPacket-java.lang.Class-java.lang.String-">registerPacket</a></span>(java.lang.Class&lt;? extends <a href="../../../../../net/ME1312/SubServers/Host/Network/PacketOut.html" title="interface in net.ME1312.SubServers.Host.Network">PacketOut</a>&gt;&nbsp;packet,
               java.lang.String&nbsp;handle)</code>
 <div class="block">Register PacketOut to the Network</div>
 </td>
 </tr>
-<tr id="i7" class="rowColor">
+<tr id="i8" class="altColor">
 <td class="colFirst"><code>static void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Host/Network/SubDataClient.html#registerPacket-net.ME1312.SubServers.Host.Network.PacketIn-java.lang.String-">registerPacket</a></span>(<a href="../../../../../net/ME1312/SubServers/Host/Network/PacketIn.html" title="interface in net.ME1312.SubServers.Host.Network">PacketIn</a>&nbsp;packet,
               java.lang.String&nbsp;handle)</code>
 <div class="block">Register PacketIn to the Network</div>
 </td>
 </tr>
-<tr id="i8" class="altColor">
+<tr id="i9" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Host/Network/SubDataClient.html#sendPacket-net.ME1312.SubServers.Host.Network.PacketOut-">sendPacket</a></span>(<a href="../../../../../net/ME1312/SubServers/Host/Network/PacketOut.html" title="interface in net.ME1312.SubServers.Host.Network">PacketOut</a>&nbsp;packet)</code>
 <div class="block">Send Packet to Client</div>
 </td>
 </tr>
-<tr id="i9" class="rowColor">
+<tr id="i10" class="altColor">
 <td class="colFirst"><code>static void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Host/Network/SubDataClient.html#unregisterPacket-java.lang.Class-">unregisterPacket</a></span>(java.lang.Class&lt;? extends <a href="../../../../../net/ME1312/SubServers/Host/Network/PacketOut.html" title="interface in net.ME1312.SubServers.Host.Network">PacketOut</a>&gt;&nbsp;packet)</code>
 <div class="block">Unregister PacketOut to the Network</div>
 </td>
 </tr>
-<tr id="i10" class="altColor">
+<tr id="i11" class="rowColor">
 <td class="colFirst"><code>static void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Host/Network/SubDataClient.html#unregisterPacket-net.ME1312.SubServers.Host.Network.PacketIn-">unregisterPacket</a></span>(<a href="../../../../../net/ME1312/SubServers/Host/Network/PacketIn.html" title="interface in net.ME1312.SubServers.Host.Network">PacketIn</a>&nbsp;packet)</code>
 <div class="block">Unregister PacketIn from the Network</div>
@@ -439,6 +445,20 @@ extends java.lang.Object</pre>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>packet</code> - Packet to send</dd>
 <dd><code>location</code> - Where to send</dd>
+</dl>
+</li>
+</ul>
+<a name="broadcastPacket-net.ME1312.SubServers.Host.Network.PacketOut-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>broadcastPacket</h4>
+<pre>public&nbsp;void&nbsp;broadcastPacket(<a href="../../../../../net/ME1312/SubServers/Host/Network/PacketOut.html" title="interface in net.ME1312.SubServers.Host.Network">PacketOut</a>&nbsp;packet)</pre>
+<div class="block">Broadcast packet to all Clients</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>packet</code> - Packet to send</dd>
 </dl>
 </li>
 </ul>

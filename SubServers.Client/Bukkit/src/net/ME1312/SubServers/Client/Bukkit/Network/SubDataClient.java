@@ -285,7 +285,7 @@ public final class SubDataClient {
      * @param location Where to send
      */
     public void forwardPacket(PacketOut packet, String location) {
-        if (Util.isNull(packet)) throw new NullPointerException();
+        if (Util.isNull(packet, location)) throw new NullPointerException();
         if (socket == null) {
             queue.add(new NamedContainer<>(location, packet));
         } else {
@@ -310,6 +310,15 @@ public final class SubDataClient {
                 e.printStackTrace();
             }
         }
+    }
+
+    /**
+     * Broadcast packet to all Clients
+     *
+     * @param packet Packet to send
+     */
+    public void broadcastPacket(PacketOut packet) {
+        forwardPacket(packet, "");
     }
 
     /**

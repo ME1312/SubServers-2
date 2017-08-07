@@ -11,9 +11,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketException;
-import java.util.Base64;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 
 /**
  * Network Client Class
@@ -79,11 +77,19 @@ public class Client {
                             if (auth || packet instanceof PacketAuthorization) {
                                 try {
                                     if (json.keySet().contains("f")) {
-                                        Client client = subdata.getClient(json.getString("f"));
-                                        if (client != null) {
-                                            client.writer.println(input);
+                                        if (json.getString("f").length() <= 0) {
+                                            List<Client> clients = new ArrayList<Client>();
+                                            clients.addAll(subdata.getClients());
+                                            for (Client client : clients) {
+                                                client.writer.println(input);
+                                            }
                                         } else {
-                                            throw new IllegalPacketException(getAddress().toString() + ": Unknown Forward Address: " + json.getString("f"));
+                                            Client client = subdata.getClient(json.getString("f"));
+                                            if (client != null) {
+                                                client.writer.println(input);
+                                            } else {
+                                                throw new IllegalPacketException(getAddress().toString() + ": Unknown Forward Address: " + json.getString("f"));
+                                            }
                                         }
                                     } else {
                                         packet.execute(Client.this, (json.keySet().contains("c"))?json.getJSONObject("c"):null);
