@@ -329,6 +329,8 @@
 </a>
 <h2 class="title">E</h2>
 <dl>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Library/Event/EventOrder.html#EARLY">EARLY</a></span> - Static variable in class net.ME1312.SubServers.Host.Library.Event.<a href="net/ME1312/SubServers/Host/Library/Event/EventOrder.html" title="class in net.ME1312.SubServers.Host.Library.Event">EventOrder</a></dt>
+<dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Network/AES.html#encrypt-int-java.lang.String-java.io.InputStream-java.io.OutputStream-">encrypt(int, String, InputStream, OutputStream)</a></span> - Static method in class net.ME1312.SubServers.Host.Network.<a href="net/ME1312/SubServers/Host/Network/AES.html" title="class in net.ME1312.SubServers.Host.Network">AES</a></dt>
 <dd>
 <div class="block">Encrypts a stream of data.</div>
@@ -360,10 +362,10 @@
 <div class="block">EventHandler Method Annotation<br>
  Methods annotated by this and registered in SubAPI will be run when the event is called</div>
 </dd>
-<dt><a href="net/ME1312/SubServers/Host/Library/Event/EventPriority.html" title="enum in net.ME1312.SubServers.Host.Library.Event"><span class="typeNameLink">EventPriority</span></a> - Enum in <a href="net/ME1312/SubServers/Host/Library/Event/package-summary.html">net.ME1312.SubServers.Host.Library.Event</a></dt>
+<dt><a href="net/ME1312/SubServers/Host/Library/Event/EventOrder.html" title="class in net.ME1312.SubServers.Host.Library.Event"><span class="typeNameLink">EventOrder</span></a> - Class in <a href="net/ME1312/SubServers/Host/Library/Event/package-summary.html">net.ME1312.SubServers.Host.Library.Event</a></dt>
 <dd>
-<div class="block">Event Priority Class<br>
- Events will be run Lowest to Highest</div>
+<div class="block">Event Order Defaults Class<br>
+ Events will be run from Short.MIN_VALUE to Short.MAX_VALUE</div>
 </dd>
 <dt><a href="net/ME1312/SubServers/Host/Executable/Executable.html" title="class in net.ME1312.SubServers.Host.Executable"><span class="typeNameLink">Executable</span></a> - Class in <a href="net/ME1312/SubServers/Host/Executable/package-summary.html">net.ME1312.SubServers.Host.Executable</a></dt>
 <dd>
@@ -445,6 +447,8 @@
 <dd>
 <div class="block">Log File Writer Class</div>
 </dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Library/Event/EventOrder.html#FIRST">FIRST</a></span> - Static variable in class net.ME1312.SubServers.Host.Library.Event.<a href="net/ME1312/SubServers/Host/Library/Event/EventOrder.html" title="class in net.ME1312.SubServers.Host.Library.Event">EventOrder</a></dt>
+<dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Network/SubDataClient.html#forwardPacket-net.ME1312.SubServers.Host.Network.PacketOut-java.lang.String-">forwardPacket(PacketOut, String)</a></span> - Method in class net.ME1312.SubServers.Host.Network.<a href="net/ME1312/SubServers/Host/Network/SubDataClient.html" title="class in net.ME1312.SubServers.Host.Network">SubDataClient</a></dt>
 <dd>
 <div class="block">Forward Packet to Server</div>
@@ -1289,6 +1293,10 @@
 <dl>
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/ExHost.html#lang">lang</a></span> - Variable in class net.ME1312.SubServers.Host.<a href="net/ME1312/SubServers/Host/ExHost.html" title="class in net.ME1312.SubServers.Host">ExHost</a></dt>
 <dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Library/Event/EventOrder.html#LAST">LAST</a></span> - Static variable in class net.ME1312.SubServers.Host.Library.Event.<a href="net/ME1312/SubServers/Host/Library/Event/EventOrder.html" title="class in net.ME1312.SubServers.Host.Library.Event">EventOrder</a></dt>
+<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Library/Event/EventOrder.html#LATE">LATE</a></span> - Static variable in class net.ME1312.SubServers.Host.Library.Event.<a href="net/ME1312/SubServers/Host/Library/Event/EventOrder.html" title="class in net.ME1312.SubServers.Host.Library.Event">EventOrder</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="net/ME1312/SubServers/Host/Launch.html" title="class in net.ME1312.SubServers.Host"><span class="typeNameLink">Launch</span></a> - Class in <a href="net/ME1312/SubServers/Host/package-summary.html">net.ME1312.SubServers.Host</a></dt>
 <dd>
 <div class="block">SubServers.Host Launcher Class</div>
@@ -1372,6 +1380,8 @@
 <dt><a href="net/ME1312/SubServers/Host/Network/package-summary.html">net.ME1312.SubServers.Host.Network</a> - package net.ME1312.SubServers.Host.Network</dt>
 <dd>&nbsp;</dd>
 <dt><a href="net/ME1312/SubServers/Host/Network/Packet/package-summary.html">net.ME1312.SubServers.Host.Network.Packet</a> - package net.ME1312.SubServers.Host.Network.Packet</dt>
+<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Library/Event/EventOrder.html#NORMAL">NORMAL</a></span> - Static variable in class net.ME1312.SubServers.Host.Library.Event.<a href="net/ME1312/SubServers/Host/Library/Event/EventOrder.html" title="class in net.ME1312.SubServers.Host.Library.Event">EventOrder</a></dt>
 <dd>&nbsp;</dd>
 </dl>
 <a name="I:P">
@@ -2162,10 +2172,6 @@
 <dd>
 <div class="block">Returns the enum constant of this type with the specified name.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Library/Event/EventPriority.html#valueOf-java.lang.String-">valueOf(String)</a></span> - Static method in enum net.ME1312.SubServers.Host.Library.Event.<a href="net/ME1312/SubServers/Host/Library/Event/EventPriority.html" title="enum in net.ME1312.SubServers.Host.Library.Event">EventPriority</a></dt>
-<dd>
-<div class="block">Returns the enum constant of this type with the specified name.</div>
-</dd>
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Network/Packet/PacketExUpdateServer.UpdateType.html#valueOf-java.lang.String-">valueOf(String)</a></span> - Static method in enum net.ME1312.SubServers.Host.Network.Packet.<a href="net/ME1312/SubServers/Host/Network/Packet/PacketExUpdateServer.UpdateType.html" title="enum in net.ME1312.SubServers.Host.Network.Packet">PacketExUpdateServer.UpdateType</a></dt>
 <dd>
 <div class="block">Returns the enum constant of this type with the specified name.</div>
@@ -2175,11 +2181,6 @@
 <div class="block">Returns the enum constant of this type with the specified name.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Executable/SubCreator.ServerType.html#values--">values()</a></span> - Static method in enum net.ME1312.SubServers.Host.Executable.<a href="net/ME1312/SubServers/Host/Executable/SubCreator.ServerType.html" title="enum in net.ME1312.SubServers.Host.Executable">SubCreator.ServerType</a></dt>
-<dd>
-<div class="block">Returns an array containing the constants of this enum type, in
-the order they are declared.</div>
-</dd>
-<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Library/Event/EventPriority.html#values--">values()</a></span> - Static method in enum net.ME1312.SubServers.Host.Library.Event.<a href="net/ME1312/SubServers/Host/Library/Event/EventPriority.html" title="enum in net.ME1312.SubServers.Host.Library.Event">EventPriority</a></dt>
 <dd>
 <div class="block">Returns an array containing the constants of this enum type, in
 the order they are declared.</div>
@@ -2209,6 +2210,10 @@ the order they are declared.</div>
 <div class="block">Creates a Version</div>
 </dd>
 <dt><a href="net/ME1312/SubServers/Host/Library/Version/VersionTokenizer.html" title="class in net.ME1312.SubServers.Host.Library.Version"><span class="typeNameLink">VersionTokenizer</span></a> - Class in <a href="net/ME1312/SubServers/Host/Library/Version/package-summary.html">net.ME1312.SubServers.Host.Library.Version</a></dt>
+<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Library/Event/EventOrder.html#VERY_EARLY">VERY_EARLY</a></span> - Static variable in class net.ME1312.SubServers.Host.Library.Event.<a href="net/ME1312/SubServers/Host/Library/Event/EventOrder.html" title="class in net.ME1312.SubServers.Host.Library.Event">EventOrder</a></dt>
+<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Library/Event/EventOrder.html#VERY_LATE">VERY_LATE</a></span> - Static variable in class net.ME1312.SubServers.Host.Library.Event.<a href="net/ME1312/SubServers/Host/Library/Event/EventOrder.html" title="class in net.ME1312.SubServers.Host.Library.Event">EventOrder</a></dt>
 <dd>&nbsp;</dd>
 </dl>
 <a name="I:W">

@@ -47,8 +47,8 @@ public final class ExHost {
     public YAMLSection lang = null;
     public SubDataClient subdata = null;
 
-    public final Version version = new Version("2.12d");
-    public final Version bversion = null;
+    public final Version version = new Version("2.12e");
+    public final Version bversion = new Version(1);
     public final SubAPI api = new SubAPI(this);
 
     private boolean running;
@@ -238,7 +238,7 @@ public final class ExHost {
                         plugins.remove(name);
                     }
                     if (progress == 0 && plugins.size() != 0) {
-                        log.error.println(new IllegalStateException("Couldn't load more plugins but there are " + plugins.size() + " more"));
+                        log.error.println(new IllegalStateException("Couldn't load more plugins yet " + plugins.size() + " remain unloaded"));
                         break;
                     }
                 }

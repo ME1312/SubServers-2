@@ -42,14 +42,14 @@ public abstract class Event {
         try {
             Field f = SubAPI.class.getDeclaredField("listeners");
             f.setAccessible(true);
-            HashMap<EventPriority, HashMap<Class<? extends Event>, HashMap<SubPluginInfo, HashMap<Object, List<Method>>>>> listeners = (HashMap<EventPriority, HashMap<Class<? extends Event>, HashMap<SubPluginInfo, HashMap<Object, List<Method>>>>>) f.get(getAPI());
+            TreeMap<Short, HashMap<Class<? extends Event>, HashMap<SubPluginInfo, HashMap<Object, List<Method>>>>> listeners = (TreeMap<Short, HashMap<Class<? extends Event>, HashMap<SubPluginInfo, HashMap<Object, List<Method>>>>>) f.get(getAPI());
             HashMap<SubPluginInfo, List<Method>> map = new LinkedHashMap<SubPluginInfo, List<Method>>();
             f.setAccessible(false);
-            for (EventPriority priority : listeners.keySet()) {
-                if (!listeners.get(priority).keySet().contains(getClass())) continue;
-                for (SubPluginInfo plugin : listeners.get(priority).get(getClass()).keySet()) {
-                    for (Object listener : listeners.get(priority).get(getClass()).get(plugin).keySet()) {
-                        for (Method method : listeners.get(priority).get(getClass()).get(plugin).get(listener)) {
+            for (Short order : listeners.keySet()) {
+                if (!listeners.get(order).keySet().contains(getClass())) continue;
+                for (SubPluginInfo plugin : listeners.get(order).get(getClass()).keySet()) {
+                    for (Object listener : listeners.get(order).get(getClass()).get(plugin).keySet()) {
+                        for (Method method : listeners.get(order).get(getClass()).get(plugin).get(listener)) {
                             List<Method> methods = (map.keySet().contains(plugin))?map.get(plugin):new LinkedList<Method>();
                             methods.add(method);
                             map.put(plugin, methods);

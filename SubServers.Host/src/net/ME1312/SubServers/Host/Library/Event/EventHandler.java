@@ -17,11 +17,12 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 public @interface EventHandler {
     /**
-     * The Priority of this Event
+     * Defines when this event should run
      *
-     * @return Event Priority
+     * @see EventOrder
+     * @return Event Order
      */
-    EventPriority priority() default EventPriority.NORMAL;
+    short order() default EventOrder.NORMAL;
 
     /**
      * If this Event should be run even if it's been cancelled
