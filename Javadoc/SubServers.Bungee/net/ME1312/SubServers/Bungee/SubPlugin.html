@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":10,"i1":10,"i2":10};
+var methods = {"i0":10,"i1":10,"i2":10,"i3":10};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -115,10 +115,15 @@ var activeTableTab = "activeTableTab";
 <div class="description">
 <ul class="blockList">
 <li class="blockList">
+<dl>
+<dt>All Implemented Interfaces:</dt>
+<dd>net.md_5.bungee.api.plugin.Listener</dd>
+</dl>
 <hr>
 <br>
 <pre>public final class <span class="typeNameLabel">SubPlugin</span>
-extends net.md_5.bungee.BungeeCord</pre>
+extends net.md_5.bungee.BungeeCord
+implements net.md_5.bungee.api.plugin.Listener</pre>
 <div class="block">Main Plugin Class</div>
 </li>
 </ul>
@@ -179,6 +184,10 @@ extends net.md_5.bungee.BungeeCord</pre>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Bungee/SubPlugin.html#subdata">subdata</a></span></code>&nbsp;</td>
 </tr>
 <tr class="altColor">
+<td class="colFirst"><code><a href="../../../../net/ME1312/SubServers/Bungee/Host/SubServer.html" title="class in net.ME1312.SubServers.Bungee.Host">SubServer</a></code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Bungee/SubPlugin.html#sudo">sudo</a></span></code>&nbsp;</td>
+</tr>
+<tr class="rowColor">
 <td class="colFirst"><code><a href="../../../../net/ME1312/SubServers/Bungee/Library/Version/Version.html" title="class in net.ME1312.SubServers.Bungee.Library.Version">Version</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Bungee/SubPlugin.html#version">version</a></span></code>&nbsp;</td>
 </tr>
@@ -212,11 +221,15 @@ extends net.md_5.bungee.BungeeCord</pre>
 </tr>
 <tr id="i1" class="rowColor">
 <td class="colFirst"><code>void</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Bungee/SubPlugin.html#resetSudo-net.ME1312.SubServers.Bungee.Event.SubStoppedEvent-">resetSudo</a></span>(<a href="../../../../net/ME1312/SubServers/Bungee/Event/SubStoppedEvent.html" title="class in net.ME1312.SubServers.Bungee.Event">SubStoppedEvent</a>&nbsp;e)</code>&nbsp;</td>
+</tr>
+<tr id="i2" class="altColor">
+<td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Bungee/SubPlugin.html#startListeners--">startListeners</a></span>()</code>
 <div class="block">Load Hosts, Servers, SubServers, and SubData Direct</div>
 </td>
 </tr>
-<tr id="i2" class="altColor">
+<tr id="i3" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Bungee/SubPlugin.html#stopListeners--">stopListeners</a></span>()</code>
 <div class="block">Reset all changes made by startListeners</div>
@@ -330,6 +343,15 @@ extends net.md_5.bungee.BungeeCord</pre>
 <pre>public&nbsp;<a href="../../../../net/ME1312/SubServers/Bungee/Network/SubDataServer.html" title="class in net.ME1312.SubServers.Bungee.Network">SubDataServer</a> subdata</pre>
 </li>
 </ul>
+<a name="sudo">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>sudo</h4>
+<pre>public&nbsp;<a href="../../../../net/ME1312/SubServers/Bungee/Host/SubServer.html" title="class in net.ME1312.SubServers.Bungee.Host">SubServer</a> sudo</pre>
+</li>
+</ul>
 <a name="version">
 <!--   -->
 </a>
@@ -400,7 +422,7 @@ extends net.md_5.bungee.BungeeCord</pre>
 <a name="stopListeners--">
 <!--   -->
 </a>
-<ul class="blockListLast">
+<ul class="blockList">
 <li class="blockList">
 <h4>stopListeners</h4>
 <pre>public&nbsp;void&nbsp;stopListeners()</pre>
@@ -411,6 +433,15 @@ extends net.md_5.bungee.BungeeCord</pre>
 <dt><span class="seeLabel">See Also:</span></dt>
 <dd><a href="../../../../net/ME1312/SubServers/Bungee/SubPlugin.html#startListeners--"><code>startListeners()</code></a></dd>
 </dl>
+</li>
+</ul>
+<a name="resetSudo-net.ME1312.SubServers.Bungee.Event.SubStoppedEvent-">
+<!--   -->
+</a>
+<ul class="blockListLast">
+<li class="blockList">
+<h4>resetSudo</h4>
+<pre>public&nbsp;void&nbsp;resetSudo(<a href="../../../../net/ME1312/SubServers/Bungee/Event/SubStoppedEvent.html" title="class in net.ME1312.SubServers.Bungee.Event">SubStoppedEvent</a>&nbsp;e)</pre>
 </li>
 </ul>
 </li>

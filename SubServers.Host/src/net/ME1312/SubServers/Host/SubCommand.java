@@ -71,6 +71,51 @@ public class SubCommand {
             @Override
             public void command(String handle, String[] args) {
                 if (args.length > 0) {
+                    host.subdata.sendPacket(new PacketDownloadServerInfo(args[0].toLowerCase(), json -> {
+                        switch (json.getString("type").toLowerCase()) {
+                            case "invalid":
+                                host.log.message.println("There is no server with that name");
+                                break;
+                            case "subserver":
+                                host.log.message.println("Info on " + json.getJSONObject("server").getString("display") + ':');
+                                if (!json.getJSONObject("server").getString("name").equals(json.getJSONObject("server").getString("display"))) host.log.message.println("  - Real Name: " + json.getJSONObject("server").getString("name"));
+                                host.log.message.println("  - Host: " + json.getJSONObject("server").getString("host"));
+                                host.log.message.println("  - Enabled: " + ((json.getJSONObject("server").getBoolean("enabled"))?"yes":"no"));
+                                if (json.getJSONObject("server").getBoolean("temp")) host.log.message.println("  - Temporary: yes");
+                                host.log.message.println("  - Running: " + ((json.getJSONObject("server").getBoolean("running"))?"yes":"no"));
+                                host.log.message.println("  - Logging: " + ((json.getJSONObject("server").getBoolean("log"))?"yes":"no"));
+                                host.log.message.println("  - Auto Restart: " + ((json.getJSONObject("server").getBoolean("auto-restart"))?"yes":"no"));
+                                host.log.message.println("  - Hidden: " + ((json.getJSONObject("server").getBoolean("hidden"))?"yes":"no"));
+                                if (json.getJSONObject("server").getJSONArray("incompatible-list").length() > 0) {
+                                    List<String> current = new ArrayList<String>();
+                                    for (int i = 0; i < json.getJSONObject("server").getJSONArray("incompatible").length(); i++) current.add(json.getJSONObject("server").getJSONArray("incompatible").getString(i).toLowerCase());
+                                    host.log.message.println("  - Incompatibilities:");
+                                    for (int i = 0; i < json.getJSONObject("server").getJSONArray("incompatible-list").length(); i++)
+                                        host.log.message.println("    - " + json.getJSONObject("server").getJSONArray("incompatible-list").getString(i) + ((current.contains(json.getJSONObject("server").getJSONArray("incompatible-list").getString(i).toLowerCase()))?"*":""));
+                                }
+                                break;
+                            default:
+                                host.log.message.println("That Server is not a SubServer");
+                        }
+                    }));
+                } else {
+                    host.log.message.println("Usage: " + handle + " <SubServer>");
+                }
+            }
+        }.description("Gets information about a SubServer").help(
+                "This command will print a list of information about",
+                "the specified SubServer.",
+                "",
+                "The <SubServer> argument is required, and should be the name of",
+                "the SubServer you want to obtain information about.",
+                "",
+                "Example:",
+                "  /info ExampleServer"
+        ).register("info", "status");
+        new Command(null) {
+            @Override
+            public void command(String handle, String[] args) {
+                if (args.length > 0) {
                     host.subdata.sendPacket(new PacketStartServer(null, args[0], json -> {
                         switch (json.getInt("r")) {
                             case 3:

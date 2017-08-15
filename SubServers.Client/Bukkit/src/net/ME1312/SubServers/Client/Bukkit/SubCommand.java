@@ -205,6 +205,39 @@ public final class SubCommand implements CommandExecutor {
                                 sender.sendMessage(new String[]{plugin.lang.getSection("Lang").getColoredString("Command.List.Host-Header", '&'), hostm, plugin.lang.getSection("Lang").getColoredString("Command.List.Server-Header", '&'), serverm});
                             }
                         }));
+                    } else if (args[0].equalsIgnoreCase("info") || args[0].equalsIgnoreCase("status")) {
+                        if (args.length > 1) {
+                            plugin.subdata.sendPacket(new PacketDownloadServerInfo(args[1].toLowerCase(), json -> {
+                                switch (json.getString("type").toLowerCase()) {
+                                    case "invalid":
+                                        sender.sendMessage(plugin.lang.getSection("Lang").getColoredString("Command.Info.Unknown", '&'));
+                                        break;
+                                    case "subserver":
+                                        sender.sendMessage(plugin.lang.getSection("Lang").getColoredString("Command.Info", '&').replace("$str$", json.getJSONObject("server").getString("display")));
+                                        if (!json.getJSONObject("server").getString("name").equals(json.getJSONObject("server").getString("display")))
+                                            sender.sendMessage("  " + plugin.lang.getSection("Lang").getColoredString("Command.Info.Format", '&').replace("$str$", "Real Name") + ChatColor.AQUA + json.getJSONObject("server").getString("name"));
+                                        sender.sendMessage("  " + plugin.lang.getSection("Lang").getColoredString("Command.Info.Format", '&').replace("$str$", "Host") + ChatColor.AQUA + json.getJSONObject("server").getString("host"));
+                                        sender.sendMessage("  " + plugin.lang.getSection("Lang").getColoredString("Command.Info.Format", '&').replace("$str$", "Enabled") + ((json.getJSONObject("server").getBoolean("enabled"))?ChatColor.GREEN+"yes":ChatColor.DARK_RED+"no"));
+                                        if (json.getJSONObject("server").getBoolean("temp")) sender.sendMessage("  " + plugin.lang.getSection("Lang").getColoredString("Command.Info.Format", '&').replace("$str$", "Temporary") + ChatColor.GREEN+"yes");
+                                        sender.sendMessage("  " + plugin.lang.getSection("Lang").getColoredString("Command.Info.Format", '&').replace("$str$", "Running") + ((json.getJSONObject("server").getBoolean("running"))?ChatColor.GREEN+"yes":ChatColor.DARK_RED+"no"));
+                                        sender.sendMessage("  " + plugin.lang.getSection("Lang").getColoredString("Command.Info.Format", '&').replace("$str$", "Logging") + ((json.getJSONObject("server").getBoolean("log"))?ChatColor.GREEN+"yes":ChatColor.DARK_RED+"no"));
+                                        sender.sendMessage("  " + plugin.lang.getSection("Lang").getColoredString("Command.Info.Format", '&').replace("$str$", "Auto Restart") + ((json.getJSONObject("server").getBoolean("auto-restart"))?ChatColor.GREEN+"yes":ChatColor.DARK_RED+"no"));
+                                        sender.sendMessage("  " + plugin.lang.getSection("Lang").getColoredString("Command.Info.Format", '&').replace("$str$", "Hidden") + ((json.getJSONObject("server").getBoolean("hidden"))?ChatColor.GREEN+"yes":ChatColor.DARK_RED+"no"));
+                                        if (json.getJSONObject("server").getJSONArray("incompatible-list").length() > 0) {
+                                            List<String> current = new ArrayList<String>();
+                                            for (int i = 0; i < json.getJSONObject("server").getJSONArray("incompatible").length(); i++) current.add(json.getJSONObject("server").getJSONArray("incompatible").getString(i).toLowerCase());
+                                            sender.sendMessage("  " + plugin.lang.getSection("Lang").getColoredString("Command.Info.Format", '&').replace("$str$", "Incompatibilities"));
+                                            for (int i = 0; i < json.getJSONObject("server").getJSONArray("incompatible-list").length(); i++)
+                                                sender.sendMessage("  " + plugin.lang.getSection("Lang").getColoredString("Command.Info.List", '&').replace("$str$", ((current.contains(json.getJSONObject("server").getJSONArray("incompatible-list").getString(i).toLowerCase()))?ChatColor.DARK_RED:ChatColor.RED) + json.getJSONObject("server").getJSONArray("incompatible-list").getString(i)));
+                                        }
+                                        break;
+                                    default:
+                                        sender.sendMessage(plugin.lang.getSection("Lang").getColoredString("Command.Start.Invalid", '&'));
+                                }
+                            }));
+                        } else {
+                            sender.sendMessage(plugin.lang.getSection("Lang").getColoredString("Command.Generic.Usage", '&').replace("$str$", label.toLowerCase() + " " + args[0].toLowerCase() + " <SubServer>"));
+                        }
                     } else if (args[0].equalsIgnoreCase("start")) {
                         if (sender.hasPermission("subservers.subserver.start.*") || sender.hasPermission("subservers.subserver.start." + args[1].toLowerCase())) {
                             if (args.length > 1) {
@@ -514,6 +547,7 @@ public final class SubCommand implements CommandExecutor {
                 plugin.lang.getSection("Lang").getColoredString("Command.Help.Help", '&').replace("$str$", label.toLowerCase() + " help"),
                 plugin.lang.getSection("Lang").getColoredString("Command.Help.List", '&').replace("$str$", label.toLowerCase() + " list"),
                 plugin.lang.getSection("Lang").getColoredString("Command.Help.Version", '&').replace("$str$", label.toLowerCase() + " version"),
+                plugin.lang.getSection("Lang").getColoredString("Command.Help.Info", '&').replace("$str$", label.toLowerCase() + " info <SubServer>"),
                 plugin.lang.getSection("Lang").getColoredString("Command.Help.SubServer.Start", '&').replace("$str$", label.toLowerCase() + " start <SubServer>"),
                 plugin.lang.getSection("Lang").getColoredString("Command.Help.SubServer.Stop", '&').replace("$str$", label.toLowerCase() + " stop <SubServer>"),
                 plugin.lang.getSection("Lang").getColoredString("Command.Help.SubServer.Terminate", '&').replace("$str$", label.toLowerCase() + " kill <SubServer>"),

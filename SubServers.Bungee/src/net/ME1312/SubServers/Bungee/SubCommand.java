@@ -48,16 +48,44 @@ public final class SubCommand extends Command implements TabExecutor {
                     sender.sendMessage("SubServers > SubServers.Bungee is running version " + plugin.version.toString() + ((plugin.bversion != null)?" BETA "+plugin.bversion.toString():""));
                 } else if (args[0].equalsIgnoreCase("list")) {
                     List<String> hosts = new ArrayList<String>();
-                    for (Host host : plugin.hosts.values())  {
-                        hosts.add(host.getDisplayName() + ((host.getName().equals(host.getDisplayName()))?"":" (" + host.getName() + ')'));
+                    for (Host host : plugin.hosts.values()) {
+                        hosts.add(host.getDisplayName() + ((host.getName().equals(host.getDisplayName())) ? "" : " (" + host.getName() + ')'));
                     }
                     List<String> servers = new ArrayList<String>();
                     for (Server server : plugin.api.getServers().values()) {
-                        servers.add(server.getDisplayName() + ((server.getName().equals(server.getDisplayName()))?"":" (" + server.getName() + ')'));
+                        servers.add(server.getDisplayName() + ((server.getName().equals(server.getDisplayName())) ? "" : " (" + server.getName() + ')'));
                     }
                     sender.sendMessages(
                             "SubServers > Host List:", hosts.toString().substring(1, hosts.toString().length() - 1),
                             "SubServers > Server List:", servers.toString().substring(1, servers.toString().length() - 1));
+                } else if (args[0].equalsIgnoreCase("info") || args[0].equalsIgnoreCase("status")) {
+                    if (args.length > 1) {
+                        Map<String, Server> servers = plugin.api.getServers();
+                        if (!servers.keySet().contains(args[1].toLowerCase())) {
+                            sender.sendMessage("SubServers > There is no server with that name");
+                        } else if (!(servers.get(args[1].toLowerCase()) instanceof SubServer)) {
+                            sender.sendMessage("SubServers > That Server is not a SubServer");
+                        } else {
+                            SubServer server = (SubServer) servers.get(args[1].toLowerCase());
+                            sender.sendMessage("SubServers > Info on " + server.getDisplayName() + ':');
+                            if (!server.getName().equals(server.getDisplayName())) sender.sendMessage("  - Real Name: " + server.getName());
+                            sender.sendMessage("  - Host: " + server.getHost().getDisplayName() + ((!server.getHost().getName().equals(server.getHost().getDisplayName()))?" ("+server.getHost().getName()+')':""));
+                            sender.sendMessage("  - Enabled: " + ((server.isEnabled())?"yes":"no"));
+                            if (server.isTemporary()) sender.sendMessage("  - Temporary: yes");
+                            sender.sendMessage("  - Running: " + ((server.isRunning())?"yes":"no"));
+                            sender.sendMessage("  - Logging: " + ((server.isLogging())?"yes":"no"));
+                            sender.sendMessage("  - Auto Restart: " + ((server.willAutoRestart())?"yes":"no"));
+                            sender.sendMessage("  - Hidden: " + ((server.isHidden())?"yes":"no"));
+                            if (server.getIncompatibilities().size() > 0) {
+                                List<SubServer> current = server.getCurrentIncompatibilities();
+                                sender.sendMessage("  - Incompatibilities:");
+                                for (SubServer other : server.getIncompatibilities()) sender.sendMessage("    - " + other.getDisplayName() + ((current.contains(other))?"*":"") + ((!other.getName().equals(other.getDisplayName()))?" ("+other.getName()+')':""));
+                            }
+
+                        }
+                    } else {
+                        sender.sendMessage("SubServers > Usage: " + label + " " + args[0].toLowerCase() + " <SubServer>");
+                    }
                 } else if (args[0].equalsIgnoreCase("start")) {
                     if (args.length > 1) {
                         Map<String, Server> servers = plugin.api.getServers();
@@ -141,6 +169,22 @@ public final class SubCommand extends Command implements TabExecutor {
                     } else {
                         sender.sendMessage("SubServers > Usage: " + label + " " + args[0].toLowerCase() + " <SubServer> <Command> [Args...]");
                     }
+                } else if (args[0].equalsIgnoreCase("sudo") || args[0].equalsIgnoreCase("screen")) {
+                    if (args[0].length() > 1) {
+                        Map<String, Server> servers = plugin.api.getServers();
+                        if (!args[1].equals("*") && !servers.keySet().contains(args[1].toLowerCase())) {
+                            sender.sendMessage("SubServers > There is no server with that name");
+                        } else if (!args[1].equals("*") && !(servers.get(args[1].toLowerCase()) instanceof SubServer)) {
+                            sender.sendMessage("SubServers > That Server is not a SubServer");
+                        } else if (!args[1].equals("*") && !((SubServer) servers.get(args[1].toLowerCase())).isRunning()) {
+                            sender.sendMessage("SubServers > That SubServer is not running");
+                        } else {
+                            plugin.sudo = (SubServer) servers.get(args[1].toLowerCase());
+                            System.out.println("SubServers > Now forwarding commands to " + plugin.sudo.getDisplayName() + ". Type \"exit\" to return.");
+                        }
+                    } else {
+                        sender.sendMessage("SubServers > Usage: " + label + " " + args[0].toLowerCase() + " <SubServer>");
+                    }
                 } else if (args[0].equalsIgnoreCase("create")) {
                     if (args.length > 5) {
                         if (plugin.api.getSubServers().keySet().contains(args[1].toLowerCase()) || SubCreator.isReserved(args[1])) {
@@ -202,7 +246,7 @@ public final class SubCommand extends Command implements TabExecutor {
     public Iterable<String> onTabComplete(CommandSender sender, String[] args) {
         String last = (args.length > 0)?args[args.length - 1].toLowerCase():"";
         if (args.length <= 1) {
-            List<String> cmds = Arrays.asList("help", "list", "version", "start", "stop", "kill", "terminate", "cmd", "command", "create");
+            List<String> cmds = Arrays.asList("help", "list", "info", "status", "version", "start", "stop", "kill", "terminate", "cmd", "command", "create");
             if (last.length() == 0) {
                 return cmds;
             } else {
@@ -213,7 +257,8 @@ public final class SubCommand extends Command implements TabExecutor {
                 return list;
             }
         } else {
-            if (args[0].equals("start") ||
+            if (args[0].equals("info") || args[0].equals("status") ||
+                    args[0].equals("start") ||
                     args[0].equals("stop") ||
                     args[0].equals("kill") || args[0].equals("terminate")) {
                 if (args.length == 2) {
@@ -301,14 +346,16 @@ public final class SubCommand extends Command implements TabExecutor {
                 "   Help: /sub help",
                 "   List: /sub list",
                 "   Version: /sub version",
+                "   Server Status: /sub info <SubServer>",
                 "   Start Server: /sub start <SubServer>",
                 "   Stop Server: /sub stop <SubServer>",
                 "   Terminate Server: /sub kill <SubServer>",
                 "   Command Server: /sub cmd <SubServer> <Command> [Args...]",
+                "   Sudo Server: /sub sudo <SubServer>",
                 "   Create Server: /sub create <Name> <Host> <Template> <Version> <Port>",
                 "   Remove Server: /sub delete <SubServer>",
                 "",
-                "   To see BungeeCord Supplied Commands, please visit:",
+                "   To see BungeeCord supplied commands, please visit:",
                 "   https://www.spigotmc.org/wiki/bungeecord-commands/"
         };
     }

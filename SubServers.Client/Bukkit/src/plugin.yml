@@ -1,6 +1,6 @@
 name: 'SubServers-Client-Bukkit'
 main: 'net.ME1312.SubServers.Client.Bukkit.SubPlugin'
-version: '2.12c'
+version: '2.12.1a'
 authors: [ME1312]
 softdepend: [Vault, TitleManager]
 website: 'http://www.ME1312.net/'

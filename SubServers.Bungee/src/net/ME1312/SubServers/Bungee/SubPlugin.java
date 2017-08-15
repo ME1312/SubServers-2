@@ -1,5 +1,6 @@
 package net.ME1312.SubServers.Bungee;
 
+import net.ME1312.SubServers.Bungee.Event.SubStoppedEvent;
 import net.ME1312.SubServers.Bungee.Host.Executable;
 import net.ME1312.SubServers.Bungee.Host.Server;
 import net.ME1312.SubServers.Bungee.Library.Config.YAMLConfig;
@@ -15,6 +16,8 @@ import net.ME1312.SubServers.Bungee.Network.SubDataServer;
 import net.md_5.bungee.BungeeCord;
 import net.md_5.bungee.BungeeServerInfo;
 import net.md_5.bungee.api.config.ServerInfo;
+import net.md_5.bungee.api.plugin.Listener;
+import net.md_5.bungee.event.EventHandler;
 import org.json.JSONObject;
 
 import java.io.*;
@@ -32,7 +35,7 @@ import java.util.zip.ZipInputStream;
 /**
  * Main Plugin Class
  */
-public final class SubPlugin extends BungeeCord {
+public final class SubPlugin extends BungeeCord implements Listener {
     protected final HashMap<String, Class<? extends Host>> hostDrivers = new HashMap<String, Class<? extends Host>>();
     public final HashMap<String, Host> hosts = new HashMap<String, Host>();
     public final HashMap<String, Server> exServers = new HashMap<String, Server>();
@@ -44,6 +47,7 @@ public final class SubPlugin extends BungeeCord {
     public YAMLConfig lang;
     public HashMap<String, String> exLang = new HashMap<String, String>();
     public SubDataServer subdata = null;
+    public SubServer sudo = null;
     public final Version version = new Version(SubPlugin.class.getPackage().getImplementationVersion());
     public final Version bversion = (SubPlugin.class.getPackage().getSpecificationVersion().equals("0"))?null:new Version(SubPlugin.class.getPackage().getSpecificationVersion());
 
@@ -81,7 +85,7 @@ public final class SubPlugin extends BungeeCord {
         if (!(new UniversalFile(dir, "lang.yml").exists())) {
             Util.copyFromJar(SubPlugin.class.getClassLoader(), "net/ME1312/SubServers/Bungee/Library/Files/lang.yml", new UniversalFile(dir, "lang.yml").getPath());
             System.out.println("SubServers > Created ~/SubServers/lang.yml");
-        } else if ((new Version((new YAMLConfig(new UniversalFile(dir, "lang.yml"))).get().getString("Version", "0")).compareTo(new Version("2.12b+"))) != 0) {
+        } else if ((new Version((new YAMLConfig(new UniversalFile(dir, "lang.yml"))).get().getString("Version", "0")).compareTo(new Version("2.12.1a+"))) != 0) {
             Files.move(new UniversalFile(dir, "lang.yml").toPath(), new UniversalFile(dir, "lang.old" + Math.round(Math.random() * 100000) + ".yml").toPath());
             Util.copyFromJar(SubPlugin.class.getClassLoader(), "net/ME1312/SubServers/Bungee/Library/Files/lang.yml", new UniversalFile(dir, "lang.yml").getPath());
             System.out.println("SubServers > Updated ~/SubServers/lang.yml");
@@ -159,6 +163,7 @@ public final class SubPlugin extends BungeeCord {
         hostDrivers.put("built-in", net.ME1312.SubServers.Bungee.Host.Internal.InternalHost.class);
         hostDrivers.put("network", net.ME1312.SubServers.Bungee.Host.External.ExternalHost.class);
 
+        getPluginManager().registerListener(null, this);
         getPluginManager().registerCommand(null, new SubCommand.BungeeServer(this, "server"));
         getPluginManager().registerCommand(null, new SubCommand.BungeeList(this, "glist"));
         getPluginManager().registerCommand(null, new SubCommand(this, "subservers"));
@@ -366,5 +371,13 @@ public final class SubPlugin extends BungeeCord {
         }
 
         super.stopListeners();
+    }
+
+    @EventHandler
+    public void resetSudo(SubStoppedEvent e) {
+        if (sudo == e.getServer()) {
+            sudo = null;
+            System.out.println("SubServers > Reverting to the BungeeCord Console");
+        }
     }
 }
