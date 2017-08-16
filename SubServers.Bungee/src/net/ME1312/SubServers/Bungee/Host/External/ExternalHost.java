@@ -55,9 +55,9 @@ public class ExternalHost extends Host implements ClientHandler {
         this.name = name;
         this.enabled = enabled;
         this.address = address;
+        this.client = new NamedContainer<Boolean, Client>(false, null);
         this.creator = new ExternalSubCreator(this, gitBash);
         this.directory = directory;
-        this.client = new NamedContainer<Boolean, Client>(false, null);
         this.queue = new LinkedList<PacketOut>();
         this.clean = false;
     }

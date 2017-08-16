@@ -8,6 +8,7 @@ import net.ME1312.SubServers.Bungee.Library.Exception.InvalidHostException;
 import net.ME1312.SubServers.Bungee.Library.Exception.InvalidServerException;
 import net.ME1312.SubServers.Bungee.Host.Host;
 import net.ME1312.SubServers.Bungee.Host.SubServer;
+import net.ME1312.SubServers.Bungee.Library.Metrics;
 import net.ME1312.SubServers.Bungee.Library.NamedContainer;
 import net.ME1312.SubServers.Bungee.Library.UniversalFile;
 import net.ME1312.SubServers.Bungee.Library.Util;
@@ -29,8 +30,6 @@ import java.nio.file.Files;
 import java.text.DecimalFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 
 /**
  * Main Plugin Class
@@ -170,15 +169,15 @@ public final class SubPlugin extends BungeeCord implements Listener {
         getPluginManager().registerCommand(null, new SubCommand(this, "subserver"));
         getPluginManager().registerCommand(null, new SubCommand(this, "sub"));
 
-        System.out.println("SubServers > Loading BungeeCord Libraries...");
-        int i = 1, p = 1;
+        new Metrics(this);
+
+        System.out.println("SubServers > Pre-Parsing Config...");
         for (String name : config.get().getSection("Servers").getKeys()) {
-            if (i >= 255) i = 0;
-            if (p >= 65535) p = 0;
-            i++;
-            p++;
-            legServers.put(name, new BungeeServerInfo(name, new InetSocketAddress(InetAddress.getByName(i + ".0.0.0"), p), "Some SubServer", false));
+            if (!config.get().getSection("Hosts").contains(config.get().getSection("Servers").getSection(name).getString("Host"))) throw new InvalidServerException("There is no host with this name: " + config.get().getSection("Servers").getSection(name).getString("Host"));
+            legServers.put(name, new BungeeServerInfo(name, new InetSocketAddress(InetAddress.getByName(config.get().getSection("Hosts").getSection(config.get().getSection("Servers").getSection(name).getString("Host")).getRawString("Address")), config.get().getSection("Servers").getSection(name).getInt("Port")), config.get().getSection("Servers").getSection(name).getColoredString("Motd", '&'), config.get().getSection("Servers").getSection(name).getBoolean("Restricted")));
         }
+
+        System.out.println("SubServers > Loading BungeeCord Libraries...");
     }
 
     /**
@@ -314,8 +313,8 @@ public final class SubPlugin extends BungeeCord implements Listener {
     public Map<String, ServerInfo> getServers() {
         HashMap<String, ServerInfo> servers = new HashMap<String, ServerInfo>();
         if (!running) {
-            servers.putAll(legServers);
             servers.putAll(super.getServers());
+            servers.putAll(legServers);
         } else {
             for (ServerInfo server : exServers.values()) servers.put(server.getName(), server);
             for (Host host : this.hosts.values()) {

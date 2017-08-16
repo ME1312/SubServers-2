@@ -11,7 +11,7 @@ import java.lang.annotation.Target;
  * EventHandler Method Annotation<br>
  * Methods annotated by this and registered in SubAPI will be run when the event is called
  *
- * @see net.ME1312.SubServers.Host.SubAPI#addListener(SubPluginInfo, Listener...)
+ * @see net.ME1312.SubServers.Host.SubAPI#addListener(SubPluginInfo, Object...)
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)

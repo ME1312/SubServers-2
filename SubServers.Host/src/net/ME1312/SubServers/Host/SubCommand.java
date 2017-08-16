@@ -102,7 +102,7 @@ public class SubCommand {
                     host.log.message.println("Usage: " + handle + " <SubServer>");
                 }
             }
-        }.description("Gets information about a SubServer").help(
+        }.usage("<SubServer>").description("Gets information about a SubServer").help(
                 "This command will print a list of information about",
                 "the specified SubServer.",
                 "",

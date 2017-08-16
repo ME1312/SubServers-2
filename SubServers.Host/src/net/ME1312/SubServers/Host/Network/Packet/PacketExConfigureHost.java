@@ -22,6 +22,7 @@ import java.util.Base64;
  */
 public class PacketExConfigureHost implements PacketIn, PacketOut {
     private ExHost host;
+    private boolean first = false;
     private Logger log = null;
 
     /**
@@ -40,6 +41,7 @@ public class PacketExConfigureHost implements PacketIn, PacketOut {
     @Override
     public JSONObject generate() {
         host.log.info.println("Downloading Host Settings...");
+        first = true;
         return null;
     }
 
@@ -65,7 +67,8 @@ public class PacketExConfigureHost implements PacketIn, PacketOut {
                 host.log.error.println(e);
             }
         }
-        log.info.println("Host Settings Downloaded");
+        log.info.println(((first)?"":"New ") + "Host Settings Downloaded");
+        first = false;
     }
 
     @Override

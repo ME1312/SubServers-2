@@ -289,4 +289,9 @@ public abstract class SubCreator {
      * @return Template
      */
     public abstract ServerTemplate getTemplate(String name);
+
+    /**
+     * Reload SubCreator
+     */
+    public abstract void reload();
 }

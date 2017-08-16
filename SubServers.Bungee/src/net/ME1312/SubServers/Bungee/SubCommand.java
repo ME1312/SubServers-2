@@ -46,6 +46,31 @@ public final class SubCommand extends Command implements TabExecutor {
                     sender.sendMessages(printHelp());
                 } else if (args[0].equalsIgnoreCase("version") || args[0].equalsIgnoreCase("ver")) {
                     sender.sendMessage("SubServers > SubServers.Bungee is running version " + plugin.version.toString() + ((plugin.bversion != null)?" BETA "+plugin.bversion.toString():""));
+                } else if (args[0].equalsIgnoreCase("reload")) {
+                    if (args.length > 1) {
+                        switch (args[1].toLowerCase()) {
+                            case "all":
+                            case "host":
+                            case "hosts":
+                            case "server":
+                            case "servers":
+                                plugin.getPluginManager().dispatchCommand(ConsoleCommandSender.getInstance(), "greload");
+                                break;
+                            case "creator":
+                            case "creators":
+                            case "template":
+                            case "templates":
+                                for (Host host : plugin.api.getHosts().values()) {
+                                    host.getCreator().reload();
+                                }
+                                sender.sendMessage("SubServers > SubCreator instances reloaded");
+                                break;
+                            default:
+                                sender.sendMessage("SubServers > Unknown reload type: " + args[1]);
+                        }
+                    } else {
+                        plugin.getPluginManager().dispatchCommand(ConsoleCommandSender.getInstance(), "greload");
+                    }
                 } else if (args[0].equalsIgnoreCase("list")) {
                     List<String> hosts = new ArrayList<String>();
                     for (Host host : plugin.hosts.values()) {
@@ -346,7 +371,8 @@ public final class SubCommand extends Command implements TabExecutor {
                 "   Help: /sub help",
                 "   List: /sub list",
                 "   Version: /sub version",
-                "   Server Status: /sub info <SubServer>",
+                "   Reload: /sub reload [servers|creator]",
+                "   Server Info: /sub info <SubServer>",
                 "   Start Server: /sub start <SubServer>",
                 "   Stop Server: /sub stop <SubServer>",
                 "   Terminate Server: /sub kill <SubServer>",

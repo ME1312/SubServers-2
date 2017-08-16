@@ -9,6 +9,7 @@ import net.ME1312.SubServers.Bungee.Library.JSONCallback;
 import net.ME1312.SubServers.Bungee.Library.UniversalFile;
 import net.ME1312.SubServers.Bungee.Library.Util;
 import net.ME1312.SubServers.Bungee.Library.Version.Version;
+import net.ME1312.SubServers.Bungee.Network.Packet.PacketExConfigureHost;
 import net.ME1312.SubServers.Bungee.Network.Packet.PacketExCreateServer;
 import net.ME1312.SubServers.Bungee.SubAPI;
 
@@ -35,7 +36,12 @@ public class ExternalSubCreator extends SubCreator {
         this.host = host;
         this.gitBash = gitBash;
         this.thread = new TreeMap<String, ExternalSubLogger>();
+        reload();
+    }
 
+    @Override
+    public void reload() {
+        templates.clear();
         if (new UniversalFile(host.plugin.dir, "SubServers:Templates").exists()) for (File file : new UniversalFile(host.plugin.dir, "SubServers:Templates").listFiles()) {
             try {
                 if (file.isDirectory()) {
@@ -49,6 +55,7 @@ public class ExternalSubCreator extends SubCreator {
                 e.printStackTrace();
             }
         }
+        if (host.client.name()) host.queue(new PacketExConfigureHost(host.plugin, host));
     }
 
     @Override

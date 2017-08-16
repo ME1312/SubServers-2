@@ -46,7 +46,12 @@ public class InternalSubCreator extends SubCreator {
         this.host = host;
         this.gitBash = gitBash;
         this.thread = new TreeMap<String, NamedContainer<Thread, NamedContainer<InternalSubLogger, Process>>>();
+        reload();
+    }
 
+    @Override
+    public void reload() {
+        templates.clear();
         if (new UniversalFile(host.plugin.dir, "SubServers:Templates").exists()) for (File file : new UniversalFile(host.plugin.dir, "SubServers:Templates").listFiles()) {
             try {
                 if (file.isDirectory()) {

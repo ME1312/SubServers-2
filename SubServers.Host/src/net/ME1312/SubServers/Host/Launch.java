@@ -7,13 +7,11 @@ import java.net.URLEncoder;
 import java.util.*;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import jline.TerminalFactory;
 import jline.console.ConsoleReader;
 import jline.console.CursorBuffer;
+import net.ME1312.SubServers.Host.Library.Util;
 import org.fusesource.jansi.AnsiConsole;
 import org.w3c.dom.NodeList;
 
@@ -39,14 +37,14 @@ public final class Launch {
         extractJar(getCodeSourceLocation(), tmpdir);
         System.out.println(">> Extracted ~/" + getCodeSourceLocation().getName());
         if (pldir.isDirectory() && pldir.listFiles().length > 0) {
-            for (File mod : Arrays.asList(pldir.listFiles())) {
+            for (File plugin : Arrays.asList(pldir.listFiles())) {
                 try {
                     boolean success = false;
-                    if (getFileExtension(mod.getName()).equalsIgnoreCase("zip")) {
-                        extractZip(mod, tmpdir);
+                    if (getFileExtension(plugin.getName()).equalsIgnoreCase("zip")) {
+                        Util.unzip(new FileInputStream(plugin), tmpdir);
                         success = true;
-                    } else if (getFileExtension(mod.getName()).equalsIgnoreCase("jar")) {
-                        extractJar(mod, tmpdir);
+                    } else if (getFileExtension(plugin.getName()).equalsIgnoreCase("jar")) {
+                        extractJar(plugin, tmpdir);
                         success = true;
                     }
                     if (new File(tmpdir, "package.xml").exists()) {
@@ -58,9 +56,9 @@ public final class Launch {
                         }
                         new File(tmpdir, "package.xml").delete();
                     }
-                    if (success) System.out.println(">> Extracted ~/plugins/" + mod.getName());
+                    if (success) System.out.println(">> Extracted ~/plugins/" + plugin.getName());
                 } catch (Exception e) {
-                    System.out.println(">> Couldn't extract ~/plugins/" + mod.getName());
+                    System.out.println(">> Couldn't extract ~/plugins/" + plugin.getName());
                     e.printStackTrace();
                 }
             }
@@ -138,8 +136,8 @@ public final class Launch {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        stashLine(console);
         AnsiConsole.systemUninstall();
-        System.out.println();
     }
 
     private static void extractJar(File jarFile, File dir) throws Exception {
@@ -168,43 +166,6 @@ public final class Launch {
             }
             fos.close();
             is.close();
-        }
-    }
-
-    private static void extractZip(File zipFile, File dir) {
-        byte[] buffer = new byte[1024];
-        try {
-            ZipInputStream zis = new ZipInputStream(new FileInputStream(zipFile));
-            ZipEntry entry = zis.getNextEntry();
-            ArrayList<ZipEntry> entries = new ArrayList<ZipEntry>();
-            while (entry != null) {
-                entries.add(entry);
-                entry = zis.getNextEntry();
-            }
-            for (ZipEntry ze : entries) {
-                int len;
-                File newFile = new File(dir, ze.getName());
-                if (newFile.exists()) {
-                    continue;
-                }
-                if (ze.isDirectory()) {
-                    newFile.mkdirs();
-                    continue;
-                }
-                if (!newFile.getParentFile().exists()) {
-                    newFile.getParentFile().mkdirs();
-                }
-                FileOutputStream fos = new FileOutputStream(newFile);
-                while ((len = zis.read(buffer)) > 0) {
-                    fos.write(buffer, 0, len);
-                }
-                fos.close();
-            }
-            zis.closeEntry();
-            zis.close();
-        }
-        catch (IOException ex) {
-            ex.printStackTrace();
         }
     }
 
