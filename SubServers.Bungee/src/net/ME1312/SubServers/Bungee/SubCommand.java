@@ -15,7 +15,17 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
 import net.md_5.bungee.api.plugin.TabExecutor;
 import net.md_5.bungee.command.ConsoleCommandSender;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
 
+import javax.xml.parsers.DocumentBuilderFactory;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.StringReader;
+import java.net.URL;
+import java.nio.charset.Charset;
 import java.util.*;
 
 /**
@@ -46,6 +56,31 @@ public final class SubCommand extends Command implements TabExecutor {
                     sender.sendMessages(printHelp());
                 } else if (args[0].equalsIgnoreCase("version") || args[0].equalsIgnoreCase("ver")) {
                     sender.sendMessage("SubServers > SubServers.Bungee is running version " + plugin.version.toString() + ((plugin.bversion != null)?" BETA "+plugin.bversion.toString():""));
+                    if (plugin.bversion == null) {
+                        new Thread(() -> {
+                            try {
+                                Document updxml = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new InputSource(new StringReader(Util.readAll(new BufferedReader(new InputStreamReader(new URL("http://src.me1312.net/maven/net/ME1312/SubServers/SubServers.Bungee/maven-metadata.xml").openStream(), Charset.forName("UTF-8")))))));
+
+                                NodeList updnodeList = updxml.getElementsByTagName("version");
+                                Version updversion = plugin.version;
+                                int updcount = -1;
+                                for (int i = 0; i < updnodeList.getLength(); i++) {
+                                    Node node = updnodeList.item(i);
+                                    if (node.getNodeType() == Node.ELEMENT_NODE) {
+                                        if (!node.getTextContent().startsWith("-") && new Version(node.getTextContent()).compareTo(updversion) >= 0) {
+                                            updversion = new Version(node.getTextContent());
+                                            updcount++;
+                                        }
+                                    }
+                                }
+                                if (updversion.equals(plugin.version)) {
+                                    sender.sendMessage("You are on the latest version.");
+                                } else {
+                                    sender.sendMessage("You are " + updcount + " version" + ((updcount == 1)?"":"s") + " behind.");
+                                }
+                            } catch (Exception e) {}
+                        }).start();
+                    }
                 } else if (args[0].equalsIgnoreCase("reload")) {
                     if (args.length > 1) {
                         switch (args[1].toLowerCase()) {
@@ -72,17 +107,44 @@ public final class SubCommand extends Command implements TabExecutor {
                         plugin.getPluginManager().dispatchCommand(ConsoleCommandSender.getInstance(), "greload");
                     }
                 } else if (args[0].equalsIgnoreCase("list")) {
-                    List<String> hosts = new ArrayList<String>();
-                    for (Host host : plugin.hosts.values()) {
-                        hosts.add(host.getDisplayName() + ((host.getName().equals(host.getDisplayName())) ? "" : " (" + host.getName() + ')'));
+                    sender.sendMessage("SubServers > Host/SubServer List:");
+                    String div = ChatColor.RESET + ", ";
+                    int i = 0;
+                    for (Host host : plugin.api.getHosts().values()) {
+                        String message = "";
+                        if (host.isEnabled()) {
+                            message += ChatColor.AQUA;
+                        } else {
+                            message += ChatColor.RED;
+                        }
+                        message += host.getDisplayName() + " (" + host.getAddress().toString() + ((host.getName().equals(host.getDisplayName()))?"":ChatColor.stripColor(div)+host.getName()) + ")" + ChatColor.RESET + ": ";
+                        for (SubServer subserver : host.getSubServers().values()) {
+                            if (i != 0) message += div;
+                            if (subserver.isTemporary()) {
+                                message += ChatColor.AQUA;
+                            } else if (subserver.isRunning()) {
+                                message += ChatColor.GREEN;
+                            } else if (subserver.isEnabled() && subserver.getCurrentIncompatibilities().size() == 0) {
+                                message += ChatColor.YELLOW;
+                            } else {
+                                message += ChatColor.RED;
+                            }
+                            message += subserver.getDisplayName() + " (" + subserver.getAddress().toString().split(":")[subserver.getAddress().toString().split(":").length - 1] + ((subserver.getName().equals(subserver.getDisplayName()))?"":ChatColor.stripColor(div)+subserver.getName()) + ")";
+                            i++;
+                        }
+                        sender.sendMessage(message);
+                        i = 0;
                     }
-                    List<String> servers = new ArrayList<String>();
+                    sender.sendMessage("SubServers > Server List:");
+                    String message = "";
                     for (Server server : plugin.api.getServers().values()) {
-                        servers.add(server.getDisplayName() + ((server.getName().equals(server.getDisplayName())) ? "" : " (" + server.getName() + ')'));
+                        if (!(server instanceof SubServer)) {
+                            if (i != 0) message += div;
+                            message += ChatColor.WHITE + server.getDisplayName() + " (" + server.getAddress().toString() + ((server.getName().equals(server.getDisplayName()))?"":ChatColor.stripColor(div)+server.getName()) + ")";
+                            i++;
+                        }
                     }
-                    sender.sendMessages(
-                            "SubServers > Host List:", hosts.toString().substring(1, hosts.toString().length() - 1),
-                            "SubServers > Server List:", servers.toString().substring(1, servers.toString().length() - 1));
+                    sender.sendMessage(message);
                 } else if (args[0].equalsIgnoreCase("info") || args[0].equalsIgnoreCase("status")) {
                     if (args.length > 1) {
                         Map<String, Server> servers = plugin.api.getServers();
@@ -99,6 +161,7 @@ public final class SubCommand extends Command implements TabExecutor {
                             if (server.isTemporary()) sender.sendMessage("  - Temporary: yes");
                             sender.sendMessage("  - Running: " + ((server.isRunning())?"yes":"no"));
                             sender.sendMessage("  - Logging: " + ((server.isLogging())?"yes":"no"));
+                            sender.sendMessage("  - Address: " + server.getAddress().toString());
                             sender.sendMessage("  - Auto Restart: " + ((server.willAutoRestart())?"yes":"no"));
                             sender.sendMessage("  - Hidden: " + ((server.isHidden())?"yes":"no"));
                             if (server.getIncompatibilities().size() > 0) {

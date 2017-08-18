@@ -11,7 +11,9 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 import jline.console.ConsoleReader;
 import jline.console.CursorBuffer;
+import net.ME1312.SubServers.Host.Library.TextColor;
 import net.ME1312.SubServers.Host.Library.Util;
+import org.fusesource.jansi.Ansi;
 import org.fusesource.jansi.AnsiConsole;
 import org.w3c.dom.NodeList;
 
@@ -85,8 +87,7 @@ public final class Launch {
     }
 
     private static void syncConsole(final Process process) throws Exception {
-        AnsiConsole.systemInstall();
-        ConsoleReader console = new ConsoleReader();
+        ConsoleReader console = new ConsoleReader(System.in, (System.getProperty("subservers.host.log.color", "true").equalsIgnoreCase("true"))?AnsiConsole.out:System.out);
         console.setExpandEvents(false);
         try {
             new Thread(() -> {
@@ -137,7 +138,6 @@ public final class Launch {
             e.printStackTrace();
         }
         stashLine(console);
-        AnsiConsole.systemUninstall();
     }
 
     private static void extractJar(File jarFile, File dir) throws Exception {
@@ -224,33 +224,33 @@ public final class Launch {
     }
 
     private enum ConsoleColor {
-        AQUA('b', "[0;36;1m"),
-        BLACK('0', "[0;30;22m"),
-        BLUE('9', "[0;34;1m"),
-        BOLD('l', "[21m"),
-        DARK_AQUA('3', "[0;36;22m"),
-        DARK_BLUE('1', "[0;34;22m"),
-        DARK_GRAY('8', "[0;30;1m"),
-        DARK_GREEN('2', "[0;32;22m"),
-        DARK_PURPLE('5', "[0;35;22m"),
-        DARK_RED('4', "[0;31;22m"),
-        GOLD('6', "[0;33;22m"),
-        GRAY('7', "[0;37;22m"),
-        GREEN('a', "[0;32;1m"),
-        ITALIC('o', "[3m"),
-        LIGHT_PURPLE('d', "[0;35;1m"),
-        MAGIC('k', "[5m"),
-        RED('c', "[0;31;1m"),
-        RESET('r', "[m"),
-        STRIKETHROUGH('m', "[9m"),
-        UNDERLINE('n', "[4m"),
-        WHITE('f', "[0;37;1m"),
-        YELLOW('e', "[0;33;1m");
+        AQUA(TextColor.AQUA, Ansi.ansi().a(Ansi.Attribute.RESET).fg(Ansi.Color.CYAN).bold().toString()),
+        BLACK(TextColor.BLACK, Ansi.ansi().a(Ansi.Attribute.RESET).fg(Ansi.Color.BLACK).boldOff().toString()),
+        BLUE(TextColor.BLUE, Ansi.ansi().a(Ansi.Attribute.RESET).fg(Ansi.Color.BLUE).bold().toString()),
+        BOLD(TextColor.BOLD, Ansi.ansi().a(Ansi.Attribute.UNDERLINE_DOUBLE).toString()),
+        DARK_AQUA(TextColor.DARK_AQUA, Ansi.ansi().a(Ansi.Attribute.RESET).fg(Ansi.Color.CYAN).boldOff().toString()),
+        DARK_BLUE(TextColor.DARK_BLUE, Ansi.ansi().a(Ansi.Attribute.RESET).fg(Ansi.Color.BLUE).boldOff().toString()),
+        DARK_GRAY(TextColor.DARK_GRAY, Ansi.ansi().a(Ansi.Attribute.RESET).fg(Ansi.Color.BLACK).bold().toString()),
+        DARK_GREEN(TextColor.DARK_GREEN, Ansi.ansi().a(Ansi.Attribute.RESET).fg(Ansi.Color.GREEN).boldOff().toString()),
+        DARK_PURPLE(TextColor.DARK_PURPLE, Ansi.ansi().a(Ansi.Attribute.RESET).fg(Ansi.Color.MAGENTA).boldOff().toString()),
+        DARK_RED(TextColor.DARK_RED, Ansi.ansi().a(Ansi.Attribute.RESET).fg(Ansi.Color.RED).boldOff().toString()),
+        GOLD(TextColor.GOLD, Ansi.ansi().a(Ansi.Attribute.RESET).fg(Ansi.Color.YELLOW).boldOff().toString()),
+        GRAY(TextColor.GRAY, Ansi.ansi().a(Ansi.Attribute.RESET).fg(Ansi.Color.WHITE).boldOff().toString()),
+        GREEN(TextColor.GREEN, Ansi.ansi().a(Ansi.Attribute.RESET).fg(Ansi.Color.GREEN).bold().toString()),
+        ITALIC(TextColor.ITALIC, Ansi.ansi().a(Ansi.Attribute.ITALIC).toString()),
+        LIGHT_PURPLE(TextColor.LIGHT_PURPLE, Ansi.ansi().a(Ansi.Attribute.RESET).fg(Ansi.Color.MAGENTA).bold().toString()),
+        MAGIC(TextColor.MAGIC, Ansi.ansi().a(Ansi.Attribute.BLINK_SLOW).toString()),
+        RED(TextColor.RED, Ansi.ansi().a(Ansi.Attribute.RESET).fg(Ansi.Color.RED).bold().toString()),
+        RESET(TextColor.RESET, Ansi.ansi().a(Ansi.Attribute.RESET).toString()),
+        STRIKETHROUGH(TextColor.STRIKETHROUGH, Ansi.ansi().a(Ansi.Attribute.STRIKETHROUGH_ON).toString()),
+        UNDERLINE(TextColor.UNDERLINE, Ansi.ansi().a(Ansi.Attribute.UNDERLINE).toString()),
+        WHITE(TextColor.WHITE, Ansi.ansi().a(Ansi.Attribute.RESET).fg(Ansi.Color.WHITE).bold().toString()),
+        YELLOW(TextColor.YELLOW, Ansi.ansi().a(Ansi.Attribute.RESET).fg(Ansi.Color.YELLOW).bold().toString());
 
-        private final Character color;
+        private final TextColor color;
         private final String value;
 
-        ConsoleColor(Character color, String value) {
+        ConsoleColor(TextColor color, String value) {
             this.color = color;
             this.value = value;
         }
@@ -261,11 +261,11 @@ public final class Launch {
         }
 
         public String getValue() {
-            return "\u00A7" + color;
+            return color.getValue();
         }
 
         public String getConsoleString() {
-            return "\u001B" + value;
+            return value;
         }
 
         public static String parseColor(String str) {

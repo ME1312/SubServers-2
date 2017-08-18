@@ -161,6 +161,7 @@ public class Server extends BungeeServerInfo implements ClientHandler, ExtraData
         info.put("type", "Server");
         info.put("name", getName());
         info.put("display", getDisplayName());
+        info.put("address", getAddress().toString());
         JSONObject players = new JSONObject();
         for (ProxiedPlayer player : getPlayers()) {
             JSONObject pinfo = new JSONObject();

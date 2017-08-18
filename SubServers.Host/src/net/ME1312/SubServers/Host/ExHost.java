@@ -17,13 +17,19 @@ import net.ME1312.SubServers.Host.Library.Util;
 import net.ME1312.SubServers.Host.Library.Version.Version;
 import net.ME1312.SubServers.Host.Network.SubDataClient;
 import org.json.JSONObject;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
 
+import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.text.DecimalFormat;
 import java.util.*;
@@ -47,7 +53,7 @@ public final class ExHost {
     public YAMLSection lang = null;
     public SubDataClient subdata = null;
 
-    public final Version version = new Version("2.12.1a");
+    public final Version version = new Version("2.12.1b");
     public final Version bversion = null;
     public final SubAPI api = new SubAPI(this);
 
@@ -251,8 +257,31 @@ public final class ExHost {
             }
 
             loadDefaults();
-
             running = true;
+
+            new Timer().schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    try {
+                        Document updxml = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new InputSource(new StringReader(Util.readAll(new BufferedReader(new InputStreamReader(new URL("http://src.me1312.net/maven/net/ME1312/SubServers/SubServers.Host/maven-metadata.xml").openStream(), Charset.forName("UTF-8")))))));
+
+                        NodeList updnodeList = updxml.getElementsByTagName("version");
+                        Version updversion = version;
+                        int updcount = -1;
+                        for (int i = 0; i < updnodeList.getLength(); i++) {
+                            Node node = updnodeList.item(i);
+                            if (node.getNodeType() == Node.ELEMENT_NODE) {
+                                if (!node.getTextContent().startsWith("-") && new Version(node.getTextContent()).compareTo(updversion) >= 0) {
+                                    updversion = new Version(node.getTextContent());
+                                    updcount++;
+                                }
+                            }
+                        }
+                        if (!updversion.equals(version)) log.info.println("SubServers.Host v" + updversion + " is available. You are " + updcount + " version" + ((updcount == 1)?"":"s") + " behind.");
+                    } catch (Exception e) {}
+                }
+            }, 0, TimeUnit.DAYS.toMillis(2));
+
             loop();
         } catch (SocketException e) {
             log.severe.println(e);

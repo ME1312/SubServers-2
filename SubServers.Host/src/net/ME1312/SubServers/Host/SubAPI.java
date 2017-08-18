@@ -13,6 +13,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 /**
  * SubAPI Class
@@ -159,7 +160,7 @@ public final class SubAPI {
      * @return Task ID
      */
     public UUID schedule(SubPluginInfo plugin, Runnable run) {
-        return schedule(plugin, run, -1L, -1L);
+        return schedule(plugin, run, -1L);
     }
 
     /**
@@ -184,13 +185,27 @@ public final class SubAPI {
      * @return Task ID
      */
     public UUID schedule(SubPluginInfo plugin, Runnable run, long delay, long repeat) {
-        if (Util.isNull(plugin, run, delay, repeat)) throw new NullPointerException();
+        return schedule(plugin, run, TimeUnit.MILLISECONDS, delay, repeat);
+    }
+
+    /**
+     * Schedule a task
+     *
+     * @param plugin Plugin Scheduling
+     * @param run What to Run
+     * @param unit TimeUnit to use
+     * @param delay Task Delay
+     * @param repeat Task Repeat Interval
+     * @return Task ID
+     */
+    public UUID schedule(SubPluginInfo plugin, Runnable run, TimeUnit unit, long delay, long repeat) {
+        if (Util.isNull(plugin, run, unit, delay, repeat)) throw new NullPointerException();
         return schedule(new SubTask(plugin) {
             @Override
             public void run() {
                 run.run();
             }
-        }.delay(delay).repeat(repeat));
+        }.delay(unit.toMillis(delay)).repeat(unit.toMillis(repeat)));
     }
 
     /**

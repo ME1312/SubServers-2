@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":9,"i6":42,"i7":10,"i8":10,"i9":10,"i10":10,"i11":10,"i12":10,"i13":10,"i14":10,"i15":10,"i16":10,"i17":10,"i18":10};
+var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":9,"i6":42,"i7":10,"i8":10,"i9":10,"i10":10,"i11":10,"i12":10,"i13":10,"i14":10,"i15":10,"i16":10,"i17":10,"i18":10,"i19":10};
 var tabs = {65535:["t0","All Methods"],1:["t1","Static Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"],32:["t6","Deprecated Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -248,6 +248,16 @@ extends java.lang.Object</pre>
 </tr>
 <tr id="i18" class="altColor">
 <td class="colFirst"><code>java.util.UUID</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Host/SubAPI.html#schedule-net.ME1312.SubServers.Host.API.SubPluginInfo-java.lang.Runnable-java.util.concurrent.TimeUnit-long-long-">schedule</a></span>(<a href="../../../../net/ME1312/SubServers/Host/API/SubPluginInfo.html" title="class in net.ME1312.SubServers.Host.API">SubPluginInfo</a>&nbsp;plugin,
+        java.lang.Runnable&nbsp;run,
+        java.util.concurrent.TimeUnit&nbsp;unit,
+        long&nbsp;delay,
+        long&nbsp;repeat)</code>
+<div class="block">Schedule a task</div>
+</td>
+</tr>
+<tr id="i19" class="rowColor">
+<td class="colFirst"><code>java.util.UUID</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Host/SubAPI.html#schedule-net.ME1312.SubServers.Host.API.SubTask-">schedule</a></span>(<a href="../../../../net/ME1312/SubServers/Host/API/SubTask.html" title="class in net.ME1312.SubServers.Host.API">SubTask</a>&nbsp;builder)</code>
 <div class="block">Schedule a task</div>
 </td>
@@ -447,6 +457,30 @@ public&nbsp;<a href="../../../../net/ME1312/SubServers/Host/ExHost.html" title="
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>plugin</code> - Plugin Scheduling</dd>
 <dd><code>run</code> - What to Run</dd>
+<dd><code>delay</code> - Task Delay</dd>
+<dd><code>repeat</code> - Task Repeat Interval</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>Task ID</dd>
+</dl>
+</li>
+</ul>
+<a name="schedule-net.ME1312.SubServers.Host.API.SubPluginInfo-java.lang.Runnable-java.util.concurrent.TimeUnit-long-long-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>schedule</h4>
+<pre>public&nbsp;java.util.UUID&nbsp;schedule(<a href="../../../../net/ME1312/SubServers/Host/API/SubPluginInfo.html" title="class in net.ME1312.SubServers.Host.API">SubPluginInfo</a>&nbsp;plugin,
+                               java.lang.Runnable&nbsp;run,
+                               java.util.concurrent.TimeUnit&nbsp;unit,
+                               long&nbsp;delay,
+                               long&nbsp;repeat)</pre>
+<div class="block">Schedule a task</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>plugin</code> - Plugin Scheduling</dd>
+<dd><code>run</code> - What to Run</dd>
+<dd><code>unit</code> - TimeUnit to use</dd>
 <dd><code>delay</code> - Task Delay</dd>
 <dd><code>repeat</code> - Task Repeat Interval</dd>
 <dt><span class="returnLabel">Returns:</span></dt>

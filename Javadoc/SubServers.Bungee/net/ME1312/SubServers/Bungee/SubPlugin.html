@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":10,"i1":10,"i2":10,"i3":10};
+var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -221,15 +221,19 @@ implements net.md_5.bungee.api.plugin.Listener</pre>
 </tr>
 <tr id="i1" class="rowColor">
 <td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Bungee/SubPlugin.html#resetSudo-net.ME1312.SubServers.Bungee.Event.SubStoppedEvent-">resetSudo</a></span>(<a href="../../../../net/ME1312/SubServers/Bungee/Event/SubStoppedEvent.html" title="class in net.ME1312.SubServers.Bungee.Event">SubStoppedEvent</a>&nbsp;e)</code>&nbsp;</td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Bungee/SubPlugin.html#reroute-net.md_5.bungee.api.event.ServerConnectEvent-">reroute</a></span>(net.md_5.bungee.api.event.ServerConnectEvent&nbsp;e)</code>&nbsp;</td>
 </tr>
 <tr id="i2" class="altColor">
+<td class="colFirst"><code>void</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Bungee/SubPlugin.html#resetSudo-net.ME1312.SubServers.Bungee.Event.SubStoppedEvent-">resetSudo</a></span>(<a href="../../../../net/ME1312/SubServers/Bungee/Event/SubStoppedEvent.html" title="class in net.ME1312.SubServers.Bungee.Event">SubStoppedEvent</a>&nbsp;e)</code>&nbsp;</td>
+</tr>
+<tr id="i3" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Bungee/SubPlugin.html#startListeners--">startListeners</a></span>()</code>
 <div class="block">Load Hosts, Servers, SubServers, and SubData Direct</div>
 </td>
 </tr>
-<tr id="i3" class="rowColor">
+<tr id="i4" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Bungee/SubPlugin.html#stopListeners--">stopListeners</a></span>()</code>
 <div class="block">Reset all changes made by startListeners</div>
@@ -433,6 +437,15 @@ implements net.md_5.bungee.api.plugin.Listener</pre>
 <dt><span class="seeLabel">See Also:</span></dt>
 <dd><a href="../../../../net/ME1312/SubServers/Bungee/SubPlugin.html#startListeners--"><code>startListeners()</code></a></dd>
 </dl>
+</li>
+</ul>
+<a name="reroute-net.md_5.bungee.api.event.ServerConnectEvent-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>reroute</h4>
+<pre>public&nbsp;void&nbsp;reroute(net.md_5.bungee.api.event.ServerConnectEvent&nbsp;e)</pre>
 </li>
 </ul>
 <a name="resetSudo-net.ME1312.SubServers.Bungee.Event.SubStoppedEvent-">

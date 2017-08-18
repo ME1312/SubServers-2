@@ -150,6 +150,7 @@ public class InternalUIRenderer extends UIRenderer {
                         if (!host.equals(json.getJSONObject("hosts").getJSONObject(host).getString("display")))
                             lore.add(ChatColor.GRAY + host);
                         lore.add(plugin.lang.getSection("Lang").getColoredString("Interface.Host-Menu.Host-Server-Count", '&').replace("$int$", new DecimalFormat("#,###").format(json.getJSONObject("hosts").getJSONObject(host).getJSONObject("servers").keySet().size())));
+                        lore.add(ChatColor.WHITE + json.getJSONObject("hosts").getJSONObject(host).getString("address"));
                         blockMeta.setLore(lore);
                     } else {
                         block = new ItemStack(Material.STAINED_GLASS_PANE, 1, disabled);
@@ -159,6 +160,7 @@ public class InternalUIRenderer extends UIRenderer {
                         if (!host.equals(json.getJSONObject("hosts").getJSONObject(host).getString("display")))
                             lore.add(ChatColor.GRAY + host);
                         lore.add(plugin.lang.getSection("Lang").getColoredString("Interface.Host-Menu.Host-Disabled", '&'));
+                        lore.add(ChatColor.WHITE + json.getJSONObject("hosts").getJSONObject(host).getString("address"));
                         blockMeta.setLore(lore);
                     }
                     block.setItemMeta(blockMeta);
@@ -301,6 +303,7 @@ public class InternalUIRenderer extends UIRenderer {
                     if (!host.equals(json.getJSONObject("host").getString("display")))
                         lore.add(ChatColor.GRAY + host);
                     lore.add(plugin.lang.getSection("Lang").getColoredString("Interface.Host-Menu.Host-Server-Count", '&').replace("$int$", new DecimalFormat("#,###").format(json.getJSONObject("host").getJSONObject("servers").keySet().size())));
+                    lore.add(ChatColor.WHITE + json.getJSONObject("host").getString("address"));
                     blockMeta.setLore(lore);
                 } else {
                     block = new ItemStack(Material.STAINED_GLASS_PANE, 1, (short) 14);
@@ -310,6 +313,7 @@ public class InternalUIRenderer extends UIRenderer {
                     if (!host.equals(json.getJSONObject("host").getString("display")))
                         lore.add(ChatColor.GRAY + host);
                     lore.add(plugin.lang.getSection("Lang").getColoredString("Interface.Host-Menu.Host-Disabled", '&'));
+                    lore.add(ChatColor.WHITE + json.getJSONObject("host").getString("address"));
                     blockMeta.setLore(lore);
                 }
                 block.setItemMeta(blockMeta);
@@ -761,6 +765,7 @@ public class InternalUIRenderer extends UIRenderer {
                             lore.add(ChatColor.GRAY + subserver);
                         lore.add(plugin.lang.getSection("Lang").getColoredString("Interface.SubServer-Menu.SubServer-Player-Count", '&').replace("$int$", new DecimalFormat("#,###").format(json.getJSONObject("hosts").getJSONObject(hosts.get(subserver)).getJSONObject("servers").getJSONObject(subserver).getJSONObject("players").keySet().size())));
                         lore.add(plugin.lang.getSection("Lang").getColoredString("Interface.SubServer-Menu.SubServer-Temporary", '&'));
+                        lore.add(ChatColor.WHITE + json.getJSONObject("hosts").getJSONObject(hosts.get(subserver)).getJSONObject("servers").getJSONObject(subserver).getString("address"));
                         blockMeta.setLore(lore);
                     } else if (json.getJSONObject("hosts").getJSONObject(hosts.get(subserver)).getJSONObject("servers").getJSONObject(subserver).getBoolean("running")) {
                         block = new ItemStack(Material.STAINED_GLASS_PANE, 1, online);
@@ -770,6 +775,7 @@ public class InternalUIRenderer extends UIRenderer {
                         if (!subserver.equals(json.getJSONObject("hosts").getJSONObject(hosts.get(subserver)).getJSONObject("servers").getJSONObject(subserver).getString("display")))
                             lore.add(ChatColor.GRAY + subserver);
                         lore.add(plugin.lang.getSection("Lang").getColoredString("Interface.SubServer-Menu.SubServer-Player-Count", '&').replace("$int$", new DecimalFormat("#,###").format(json.getJSONObject("hosts").getJSONObject(hosts.get(subserver)).getJSONObject("servers").getJSONObject(subserver).getJSONObject("players").keySet().size())));
+                        lore.add(ChatColor.WHITE + json.getJSONObject("hosts").getJSONObject(hosts.get(subserver)).getJSONObject("servers").getJSONObject(subserver).getString("address"));
                         blockMeta.setLore(lore);
                     } else if (json.getJSONObject("hosts").getJSONObject(hosts.get(subserver)).getJSONObject("servers").getJSONObject(subserver).getBoolean("enabled") && json.getJSONObject("hosts").getJSONObject(hosts.get(subserver)).getJSONObject("servers").getJSONObject(subserver).getJSONArray("incompatible").length() == 0) {
                         block = new ItemStack(Material.STAINED_GLASS_PANE, 1, offline);
@@ -779,6 +785,7 @@ public class InternalUIRenderer extends UIRenderer {
                         if (!subserver.equals(json.getJSONObject("hosts").getJSONObject(hosts.get(subserver)).getJSONObject("servers").getJSONObject(subserver).getString("display")))
                             lore.add(ChatColor.GRAY + subserver);
                         lore.add(plugin.lang.getSection("Lang").getColoredString("Interface.SubServer-Menu.SubServer-Offline", '&'));
+                        lore.add(ChatColor.WHITE + json.getJSONObject("hosts").getJSONObject(hosts.get(subserver)).getJSONObject("servers").getJSONObject(subserver).getString("address"));
                         blockMeta.setLore(lore);
                     } else {
                         block = new ItemStack(Material.STAINED_GLASS_PANE, 1, disabled);
@@ -796,6 +803,7 @@ public class InternalUIRenderer extends UIRenderer {
                             lore.add(plugin.lang.getSection("Lang").getColoredString("Interface.SubServer-Menu.SubServer-Incompatible", '&').replace("$str$", list));
                         }
                         if (!json.getJSONObject("hosts").getJSONObject(hosts.get(subserver)).getJSONObject("servers").getJSONObject(subserver).getBoolean("enabled")) lore.add(plugin.lang.getSection("Lang").getColoredString("Interface.SubServer-Menu.SubServer-Disabled", '&'));
+                        lore.add(ChatColor.WHITE + json.getJSONObject("hosts").getJSONObject(hosts.get(subserver)).getJSONObject("servers").getJSONObject(subserver).getString("address"));
                         blockMeta.setLore(lore);
                     }
                     block.setItemMeta(blockMeta);
@@ -981,6 +989,7 @@ public class InternalUIRenderer extends UIRenderer {
                         lore.add(ChatColor.GRAY + subserver);
                     lore.add(plugin.lang.getSection("Lang").getColoredString("Interface.SubServer-Menu.SubServer-Player-Count", '&').replace("$int$", new DecimalFormat("#,###").format(json.getJSONObject("server").getJSONObject("players").keySet().size())));
                     lore.add(plugin.lang.getSection("Lang").getColoredString("Interface.SubServer-Menu.SubServer-Temporary", '&'));
+                    lore.add(ChatColor.WHITE + json.getJSONObject("server").getString("address"));
                     blockMeta.setLore(lore);
                 } else if (json.getJSONObject("server").getBoolean("running")) {
                     block = new ItemStack(Material.STAINED_GLASS_PANE, 1, (short) 5);
@@ -990,6 +999,7 @@ public class InternalUIRenderer extends UIRenderer {
                     if (!subserver.equals(json.getJSONObject("server").getString("display")))
                         lore.add(ChatColor.GRAY + subserver);
                     lore.add(plugin.lang.getSection("Lang").getColoredString("Interface.SubServer-Menu.SubServer-Player-Count", '&').replace("$int$", new DecimalFormat("#,###").format(json.getJSONObject("server").getJSONObject("players").keySet().size())));
+                    lore.add(ChatColor.WHITE + json.getJSONObject("server").getString("address"));
                     blockMeta.setLore(lore);
                 } else if (json.getJSONObject("server").getBoolean("enabled") && json.getJSONObject("server").getJSONArray("incompatible").length() == 0) {
                     block = new ItemStack(Material.STAINED_GLASS_PANE, 1, (short) 4);
@@ -999,6 +1009,7 @@ public class InternalUIRenderer extends UIRenderer {
                     if (!subserver.equals(json.getJSONObject("server").getString("display")))
                         lore.add(ChatColor.GRAY + subserver);
                     lore.add(plugin.lang.getSection("Lang").getColoredString("Interface.SubServer-Menu.SubServer-Offline", '&'));
+                    lore.add(ChatColor.WHITE + json.getJSONObject("server").getString("address"));
                     blockMeta.setLore(lore);
                 } else {
                     block = new ItemStack(Material.STAINED_GLASS_PANE, 1, (short) 14);
@@ -1016,6 +1027,7 @@ public class InternalUIRenderer extends UIRenderer {
                         lore.add(plugin.lang.getSection("Lang").getColoredString("Interface.SubServer-Menu.SubServer-Incompatible", '&').replace("$str$", list));
                     }
                     if (!json.getJSONObject("server").getBoolean("enabled")) lore.add(plugin.lang.getSection("Lang").getColoredString("Interface.SubServer-Menu.SubServer-Disabled", '&'));
+                    lore.add(ChatColor.WHITE + json.getJSONObject("server").getString("address"));
                     blockMeta.setLore(lore);
                 }
                 block.setItemMeta(blockMeta);

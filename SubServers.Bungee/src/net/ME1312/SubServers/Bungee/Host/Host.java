@@ -393,6 +393,7 @@ public abstract class Host implements ExtraDataHandler {
         hinfo.put("name", getName());
         hinfo.put("enabled", isEnabled());
         hinfo.put("display", getDisplayName());
+        hinfo.put("address", getAddress().toString());
         JSONObject servers = new JSONObject();
         for (SubServer server : getSubServers().values()) {
             servers.put(server.getName(), new JSONObject(server.toString()));

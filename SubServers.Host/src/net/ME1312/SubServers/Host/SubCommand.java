@@ -3,10 +3,21 @@ package net.ME1312.SubServers.Host;
 import net.ME1312.SubServers.Host.API.Command;
 import net.ME1312.SubServers.Host.API.SubPluginInfo;
 import net.ME1312.SubServers.Host.Executable.SubCreator;
+import net.ME1312.SubServers.Host.Library.TextColor;
 import net.ME1312.SubServers.Host.Library.Util;
 import net.ME1312.SubServers.Host.Library.Version.Version;
 import net.ME1312.SubServers.Host.Network.Packet.*;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
 
+import javax.xml.parsers.DocumentBuilderFactory;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.StringReader;
+import java.net.URL;
+import java.nio.charset.Charset;
 import java.util.*;
 
 /**
@@ -23,6 +34,32 @@ public class SubCommand {
                             System.getProperty("os.name") + ' ' + System.getProperty("os.version") + ',',
                             "Java " + System.getProperty("java.version") + ',',
                             "SubServers.Host v" + host.version.toString() + ((host.bversion == null) ? "" : " BETA " + host.bversion.toString()));
+                    if (host.bversion == null) {
+                        new Thread(() -> {
+                            try {
+                                Document updxml = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new InputSource(new StringReader(Util.readAll(new BufferedReader(new InputStreamReader(new URL("http://src.me1312.net/maven/net/ME1312/SubServers/SubServers.Host/maven-metadata.xml").openStream(), Charset.forName("UTF-8")))))));
+
+                                NodeList updnodeList = updxml.getElementsByTagName("version");
+                                Version updversion = host.version;
+                                int updcount = -1;
+                                for (int i = 0; i < updnodeList.getLength(); i++) {
+                                    Node node = updnodeList.item(i);
+                                    if (node.getNodeType() == Node.ELEMENT_NODE) {
+                                        if (!node.getTextContent().startsWith("-") && new Version(node.getTextContent()).compareTo(updversion) >= 0) {
+                                            updversion = new Version(node.getTextContent());
+                                            updcount++;
+                                        }
+                                    }
+                                }
+                                if (updversion.equals(host.version)) {
+                                    host.log.message.println("You are on the latest version.");
+                                } else {
+                                    host.log.message.println("You are " + updcount + " version" + ((updcount == 1) ? "" : "s") + " behind.");
+                                }
+                            } catch (Exception e) {
+                            }
+                        }).start();
+                    }
                 } else if (host.api.plugins.get(args[0].toLowerCase()) != null) {
                     SubPluginInfo plugin = host.api.plugins.get(args[0].toLowerCase());
                     host.log.message.println(plugin.getName() + " v" + plugin.getVersion() + " by " + plugin.getAuthors().toString().substring(1, plugin.getAuthors().toString().length() - 1));
@@ -46,18 +83,43 @@ public class SubCommand {
             @Override
             public void command(String handle, String[] args) {
                 host.subdata.sendPacket(new PacketDownloadServerList(null, json -> {
-                    TreeSet<String> servers = new TreeSet<String>();
-                    TreeSet<String> hosts = new TreeSet<String>();
-                    for (String host : json.getJSONObject("hosts").keySet())  {
-                        hosts.add(host);
-                        for (String subserver : json.getJSONObject("hosts").getJSONObject(host).getJSONObject("servers").keySet()) {
-                            servers.add(subserver);
+                    host.log.message.println("Host/SubServer List:");
+                    ExHost h = host;
+                    String div = TextColor.RESET + ", ";
+                    int i = 0;
+                    for (String host : json.getJSONObject("hosts").keySet()) {
+                        String message = "";
+                        if (json.getJSONObject("hosts").getJSONObject(host).getBoolean("enabled")) {
+                            message += TextColor.AQUA;
+                        } else {
+                            message += TextColor.RED;
                         }
+                        message += json.getJSONObject("hosts").getJSONObject(host).getString("display") + " (" + json.getJSONObject("hosts").getJSONObject(host).getString("address") + ((host.equals(json.getJSONObject("hosts").getJSONObject(host).getString("display")))?"":TextColor.stripColor(div)+host) + ")" + TextColor.RESET + ": ";
+                        for (String subserver : json.getJSONObject("hosts").getJSONObject(host).getJSONObject("servers").keySet()) {
+                            if (i != 0) message += div;
+                            if (json.getJSONObject("hosts").getJSONObject(host).getJSONObject("servers").getJSONObject(subserver).getBoolean("temp")) {
+                                message += TextColor.AQUA;
+                            } else if (json.getJSONObject("hosts").getJSONObject(host).getJSONObject("servers").getJSONObject(subserver).getBoolean("running")) {
+                                message += TextColor.GREEN;
+                            } else if (json.getJSONObject("hosts").getJSONObject(host).getJSONObject("servers").getJSONObject(subserver).getBoolean("enabled") && json.getJSONObject("hosts").getJSONObject(host).getJSONObject("servers").getJSONObject(subserver).getJSONArray("incompatible").length() == 0) {
+                                message += TextColor.YELLOW;
+                            } else {
+                                message += TextColor.RED;
+                            }
+                            message += json.getJSONObject("hosts").getJSONObject(host).getJSONObject("servers").getJSONObject(subserver).getString("display") + " (" + json.getJSONObject("hosts").getJSONObject(host).getJSONObject("servers").getJSONObject(subserver).getString("address").split(":")[json.getJSONObject("hosts").getJSONObject(host).getJSONObject("servers").getJSONObject(subserver).getString("address").split(":").length - 1] + ((subserver.equals(json.getJSONObject("hosts").getJSONObject(host).getJSONObject("servers").getJSONObject(subserver).getString("display")))?"":TextColor.stripColor(div)+subserver) + ")";
+                            i++;
+                        }
+                        h.log.message.println(message);
+                        i = 0;
                     }
+                    host.log.message.println("Server List:");
+                    String message = "";
                     for (String server : json.getJSONObject("servers").keySet()) {
-                        servers.add(server);
+                        if (i != 0) message += div;
+                        message += TextColor.WHITE + json.getJSONObject("servers").getJSONObject(server).getString("display") + " (" + json.getJSONObject("servers").getJSONObject(server).getString("address") + ((server.equals(json.getJSONObject("servers").getJSONObject(server).getString("display")))?"":TextColor.stripColor(div)+server) + ")";
+                        i++;
                     }
-                    host.log.message.println("Host List:", hosts.toString().substring(1, hosts.toString().length() - 1), "Server List:", servers.toString().substring(1, servers.toString().length() - 1));
+                    host.log.message.println(message);
                 }));
             }
         }.description("Lists the available Hosts and Servers").help(
@@ -84,6 +146,7 @@ public class SubCommand {
                                 if (json.getJSONObject("server").getBoolean("temp")) host.log.message.println("  - Temporary: yes");
                                 host.log.message.println("  - Running: " + ((json.getJSONObject("server").getBoolean("running"))?"yes":"no"));
                                 host.log.message.println("  - Logging: " + ((json.getJSONObject("server").getBoolean("log"))?"yes":"no"));
+                                host.log.message.println("  - Address: " + json.getJSONObject("server").getString("address"));
                                 host.log.message.println("  - Auto Restart: " + ((json.getJSONObject("server").getBoolean("auto-restart"))?"yes":"no"));
                                 host.log.message.println("  - Hidden: " + ((json.getJSONObject("server").getBoolean("hidden"))?"yes":"no"));
                                 if (json.getJSONObject("server").getJSONArray("incompatible-list").length() > 0) {

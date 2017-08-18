@@ -36,7 +36,7 @@ public final class Launch {
             System.out.println("*******************************************");
             System.out.println("");
             System.exit(1);
-        } else {
+        } else if (System.getProperty("subservers.bungee.allow", "true").equalsIgnoreCase("true")) {
             Security.setProperty("networkaddress.cache.ttl", "30");
             Security.setProperty("networkaddress.cache.negative.ttl", "10");
             joptsimple.OptionParser parser = new joptsimple.OptionParser();
@@ -94,7 +94,7 @@ public final class Launch {
                             if (!plugin.getPluginManager().dispatchCommand(net.md_5.bungee.command.ConsoleCommandSender.class.cast(net.md_5.bungee.command.ConsoleCommandSender.class.getMethod("getInstance").invoke(null)), line)) {
                                 plugin.getConsole().sendMessage(net.md_5.bungee.api.ChatColor.RED + "Command not found");
                             }
-                        } else if (line.equals("exit")) {
+                        } else if (line.equalsIgnoreCase("exit")) {
                             plugin.sudo = null;
                             System.out.println("SubServers > Reverting to the BungeeCord Console");
                         } else {
@@ -103,6 +103,16 @@ public final class Launch {
                     }
                 }
             }
+        } else {
+            System.out.println("");
+            System.out.println("*******************************************");
+            System.out.println("*** SubServers code has been disallowed ***");
+            System.out.println("*** to work on this machine. Check with ***");
+            System.out.println("*** your provider for more information. ***");
+            System.out.println("*** Attempting re-launch as BungeeCord. ***");
+            System.out.println("*******************************************");
+            System.out.println("");
+            net.md_5.bungee.BungeeCordLauncher.class.getMethod("main", String[].class).invoke(null, (Object) args);
         }
     }
 }

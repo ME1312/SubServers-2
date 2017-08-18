@@ -12,7 +12,17 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.json.JSONObject;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
 
+import javax.xml.parsers.DocumentBuilderFactory;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.StringReader;
+import java.net.URL;
+import java.nio.charset.Charset;
 import java.text.DecimalFormat;
 import java.util.*;
 
@@ -38,24 +48,45 @@ public final class SubCommand implements CommandExecutor {
                     if (args[0].equalsIgnoreCase("help") || args[0].equalsIgnoreCase("?")) {
                         sender.sendMessage(printHelp(label));
                     } else if (args[0].equalsIgnoreCase("version") || args[0].equalsIgnoreCase("ver")) {
-                        sender.sendMessage(plugin.lang.getSection("Lang").getColoredString("Command.Version", '&').replace("$name$", "SubServers.Client").replace("$str$", plugin.version.toString() + ((plugin.bversion != null)?" BETA "+plugin.bversion.toString():"")));
+                        sender.sendMessage(plugin.lang.getSection("Lang").getColoredString("Command.Version", '&').replace("$name$", "SubServers.Client.Bukkit").replace("$str$", plugin.version.toString() + ((plugin.bversion != null)?" BETA "+plugin.bversion.toString():"")));
+                        if (plugin.bversion == null) {
+                            new Thread(() -> {
+                                try {
+                                    Document updxml = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new InputSource(new StringReader(Util.readAll(new BufferedReader(new InputStreamReader(new URL("http://src.me1312.net/maven/net/ME1312/SubServers/SubServers.Client.Bukkit/maven-metadata.xml").openStream(), Charset.forName("UTF-8")))))));
+
+                                    NodeList updnodeList = updxml.getElementsByTagName("version");
+                                    Version updversion = plugin.version;
+                                    int updcount = -1;
+                                    for (int i = 0; i < updnodeList.getLength(); i++) {
+                                        Node node = updnodeList.item(i);
+                                        if (node.getNodeType() == Node.ELEMENT_NODE) {
+                                            if (!node.getTextContent().startsWith("-") && new Version(node.getTextContent()).compareTo(updversion) >= 0) {
+                                                updversion = new Version(node.getTextContent());
+                                                updcount++;
+                                            }
+                                        }
+                                    }
+                                    if (updversion.equals(plugin.version)) {
+                                        sender.sendMessage(plugin.lang.getSection("Lang").getColoredString("Command.Version.Latest", '&'));
+                                    } else {
+                                        sender.sendMessage(plugin.lang.getSection("Lang").getColoredString("Command.Version.Outdated", '&').replace("$int$", Integer.toString(updcount)));
+                                    }
+                                } catch (Exception e) {}
+                            }).start();
+                        }
                     } else if (args[0].equalsIgnoreCase("list")) {
                         final String fLabel = label;
                         plugin.subdata.sendPacket(new PacketDownloadServerList(null, json -> {
                             int i = 0;
-                            TreeMap<String, JSONObject> servers = new TreeMap<String, JSONObject>();
                             Container<Boolean> spigot = new Container<Boolean>(false);
                             if (!Util.isException(() -> {
                                 if (Class.forName("org.spigotmc.SpigotConfig") != null) spigot.set(true);
                             }) && spigot.get() && sender instanceof Player) {
-                                net.md_5.bungee.api.chat.TextComponent hostm = new net.md_5.bungee.api.chat.TextComponent(ChatColor.RESET.toString());
-                                net.md_5.bungee.api.chat.TextComponent serverm = new net.md_5.bungee.api.chat.TextComponent(ChatColor.RESET.toString());
+                                sender.sendMessage(plugin.lang.getSection("Lang").getColoredString("Command.List.Host-Header", '&'));
                                 net.md_5.bungee.api.chat.TextComponent div = new net.md_5.bungee.api.chat.TextComponent(plugin.lang.getSection("Lang").getColoredString("Command.List.Divider", '&'));
-                                for (String server : json.getJSONObject("servers").keySet()) {
-                                    servers.put(server, json.getJSONObject("servers").getJSONObject(server));
-                                }
                                 for (String host : json.getJSONObject("hosts").keySet()) {
                                     List<net.md_5.bungee.api.chat.TextComponent> hoverm = new LinkedList<net.md_5.bungee.api.chat.TextComponent>();
+                                    net.md_5.bungee.api.chat.TextComponent msg = new net.md_5.bungee.api.chat.TextComponent(ChatColor.RESET.toString());
                                     net.md_5.bungee.api.chat.TextComponent message = new net.md_5.bungee.api.chat.TextComponent(json.getJSONObject("hosts").getJSONObject(host).getString("display"));
                                     net.md_5.bungee.api.chat.TextComponent hover = new net.md_5.bungee.api.chat.TextComponent(json.getJSONObject("hosts").getJSONObject(host).getString("display") + '\n');
                                     if (json.getJSONObject("hosts").getJSONObject(host).getBoolean("enabled")) {
@@ -68,6 +99,9 @@ public final class SubCommand implements CommandExecutor {
                                             hoverm.add(hover);
                                         }
                                         hover = new net.md_5.bungee.api.chat.TextComponent(plugin.lang.getSection("Lang").getColoredString("Interface.Host-Menu.Host-Server-Count", '&').replace("$int$", new DecimalFormat("#,###").format(json.getJSONObject("hosts").getJSONObject(host).getJSONObject("servers").keySet().size())));
+                                        hoverm.add(hover);
+                                        hover = new net.md_5.bungee.api.chat.TextComponent(json.getJSONObject("hosts").getJSONObject(host).getString("address"));
+                                        hover.setColor(net.md_5.bungee.api.ChatColor.WHITE);
                                     } else {
                                         message.setColor(net.md_5.bungee.api.ChatColor.RED);
                                         hover.setColor(net.md_5.bungee.api.ChatColor.RED);
@@ -78,131 +112,154 @@ public final class SubCommand implements CommandExecutor {
                                             hoverm.add(hover);
                                         }
                                         hover = new net.md_5.bungee.api.chat.TextComponent(plugin.lang.getSection("Lang").getColoredString("Interface.Host-Menu.Host-Disabled", '&'));
+                                        hoverm.add(hover);
+                                        hover = new net.md_5.bungee.api.chat.TextComponent(json.getJSONObject("hosts").getJSONObject(host).getString("address"));
+                                        hover.setColor(net.md_5.bungee.api.ChatColor.WHITE);
                                     }
                                     hoverm.add(hover);
-                                    if (i != 0) hostm.addExtra(div);
                                     message.setClickEvent(new net.md_5.bungee.api.chat.ClickEvent(net.md_5.bungee.api.chat.ClickEvent.Action.RUN_COMMAND, fLabel + " open Host/ " + host));
                                     message.setHoverEvent(new net.md_5.bungee.api.chat.HoverEvent(net.md_5.bungee.api.chat.HoverEvent.Action.SHOW_TEXT, hoverm.toArray(new net.md_5.bungee.api.chat.TextComponent[hoverm.size()])));
-                                    hostm.addExtra(message);
-                                    i++;
+                                    msg.addExtra(message);
+                                    msg.addExtra(new net.md_5.bungee.api.chat.TextComponent(ChatColor.GRAY + ": "));
+
                                     for (String subserver : json.getJSONObject("hosts").getJSONObject(host).getJSONObject("servers").keySet()) {
-                                        servers.put(subserver, json.getJSONObject("hosts").getJSONObject(host).getJSONObject("servers").getJSONObject(subserver));
-                                    }
-                                }
-                                i = 0;
-                                for (String server : servers.keySet()) {
-                                    List<net.md_5.bungee.api.chat.TextComponent> hoverm = new LinkedList<net.md_5.bungee.api.chat.TextComponent>();
-                                    net.md_5.bungee.api.chat.TextComponent message = new net.md_5.bungee.api.chat.TextComponent(servers.get(server).getString("display"));
-                                    net.md_5.bungee.api.chat.TextComponent hover = new net.md_5.bungee.api.chat.TextComponent(servers.get(server).getString("display") + '\n');
-                                    if (!servers.get(server).keySet().contains("enabled")) {
-                                        message.setColor(net.md_5.bungee.api.ChatColor.WHITE);
-                                        hover.setColor(net.md_5.bungee.api.ChatColor.WHITE);
-                                        hoverm.add(hover);
-                                        hover = new net.md_5.bungee.api.chat.TextComponent(plugin.lang.getSection("Lang").getColoredString("Interface.SubServer-Menu.SubServer-External", '&'));
-                                    } else {
-                                        message.setClickEvent(new net.md_5.bungee.api.chat.ClickEvent(net.md_5.bungee.api.chat.ClickEvent.Action.RUN_COMMAND, fLabel + " open SubServer/ " + server));
-                                        if (servers.get(server).getBoolean("temp")) {
+                                        hoverm = new LinkedList<net.md_5.bungee.api.chat.TextComponent>();
+                                        message = new net.md_5.bungee.api.chat.TextComponent(json.getJSONObject("hosts").getJSONObject(host).getJSONObject("servers").getJSONObject(subserver).getString("display"));
+                                        hover = new net.md_5.bungee.api.chat.TextComponent(json.getJSONObject("hosts").getJSONObject(host).getJSONObject("servers").getJSONObject(subserver).getString("display") + '\n');
+                                        message.setClickEvent(new net.md_5.bungee.api.chat.ClickEvent(net.md_5.bungee.api.chat.ClickEvent.Action.RUN_COMMAND, fLabel + " open SubServer/ " + subserver));
+                                        if (json.getJSONObject("hosts").getJSONObject(host).getJSONObject("servers").getJSONObject(subserver).getBoolean("temp")) {
                                             message.setColor(net.md_5.bungee.api.ChatColor.AQUA);
                                             hover.setColor(net.md_5.bungee.api.ChatColor.AQUA);
                                             hoverm.add(hover);
-                                            if (!server.equals(servers.get(server).getString("display"))) {
-                                                hover = new net.md_5.bungee.api.chat.TextComponent(server + '\n');
+                                            if (!subserver.equals(json.getJSONObject("hosts").getJSONObject(host).getJSONObject("servers").getJSONObject(subserver).getString("display"))) {
+                                                hover = new net.md_5.bungee.api.chat.TextComponent(subserver + '\n');
                                                 hover.setColor(net.md_5.bungee.api.ChatColor.GRAY);
                                                 hoverm.add(hover);
                                             }
-                                            hover = new net.md_5.bungee.api.chat.TextComponent(plugin.lang.getSection("Lang").getColoredString("Interface.SubServer-Menu.SubServer-Player-Count", '&').replace("$int$", new DecimalFormat("#,###").format(servers.get(server).getJSONObject("players").keySet().size())) + '\n');
+                                            hover = new net.md_5.bungee.api.chat.TextComponent(plugin.lang.getSection("Lang").getColoredString("Interface.SubServer-Menu.SubServer-Player-Count", '&').replace("$int$", new DecimalFormat("#,###").format(json.getJSONObject("hosts").getJSONObject(host).getJSONObject("servers").getJSONObject(subserver).getJSONObject("players").keySet().size())) + '\n');
                                             hoverm.add(hover);
                                             hover = new net.md_5.bungee.api.chat.TextComponent(plugin.lang.getSection("Lang").getColoredString("Interface.SubServer-Menu.SubServer-Temporary", '&'));
-                                        } else if (servers.get(server).getBoolean("running")) {
+                                            hoverm.add(hover);
+                                            hover = new net.md_5.bungee.api.chat.TextComponent('\n' + json.getJSONObject("hosts").getJSONObject(host).getJSONObject("servers").getJSONObject(subserver).getString("address"));
+                                            hover.setColor(net.md_5.bungee.api.ChatColor.WHITE);
+                                        } else if (json.getJSONObject("hosts").getJSONObject(host).getJSONObject("servers").getJSONObject(subserver).getBoolean("running")) {
                                             message.setColor(net.md_5.bungee.api.ChatColor.GREEN);
                                             hover.setColor(net.md_5.bungee.api.ChatColor.GREEN);
                                             hoverm.add(hover);
-                                            if (!server.equals(servers.get(server).getString("display"))) {
-                                                hover = new net.md_5.bungee.api.chat.TextComponent(server + '\n');
+                                            if (!subserver.equals(json.getJSONObject("hosts").getJSONObject(host).getJSONObject("servers").getJSONObject(subserver).getString("display"))) {
+                                                hover = new net.md_5.bungee.api.chat.TextComponent(subserver + '\n');
                                                 hover.setColor(net.md_5.bungee.api.ChatColor.GRAY);
                                                 hoverm.add(hover);
                                             }
-                                            hover = new net.md_5.bungee.api.chat.TextComponent(plugin.lang.getSection("Lang").getColoredString("Interface.SubServer-Menu.SubServer-Player-Count", '&').replace("$int$", new DecimalFormat("#,###").format(servers.get(server).getJSONObject("players").keySet().size())));
-                                        } else if (servers.get(server).getBoolean("enabled") && servers.get(server).getJSONArray("incompatible").length() == 0) {
+                                            hover = new net.md_5.bungee.api.chat.TextComponent(plugin.lang.getSection("Lang").getColoredString("Interface.SubServer-Menu.SubServer-Player-Count", '&').replace("$int$", new DecimalFormat("#,###").format(json.getJSONObject("hosts").getJSONObject(host).getJSONObject("servers").getJSONObject(subserver).getJSONObject("players").keySet().size())));
+                                            hoverm.add(hover);
+                                            hover = new net.md_5.bungee.api.chat.TextComponent('\n' + json.getJSONObject("hosts").getJSONObject(host).getJSONObject("servers").getJSONObject(subserver).getString("address"));
+                                            hover.setColor(net.md_5.bungee.api.ChatColor.WHITE);
+                                        } else if (json.getJSONObject("hosts").getJSONObject(host).getJSONObject("servers").getJSONObject(subserver).getBoolean("enabled") && json.getJSONObject("hosts").getJSONObject(host).getJSONObject("servers").getJSONObject(subserver).getJSONArray("incompatible").length() == 0) {
                                             message.setColor(net.md_5.bungee.api.ChatColor.YELLOW);
                                             hover.setColor(net.md_5.bungee.api.ChatColor.YELLOW);
                                             hoverm.add(hover);
-                                            if (!server.equals(servers.get(server).getString("display"))) {
-                                                hover = new net.md_5.bungee.api.chat.TextComponent(server + '\n');
+                                            if (!subserver.equals(json.getJSONObject("hosts").getJSONObject(host).getJSONObject("servers").getJSONObject(subserver).getString("display"))) {
+                                                hover = new net.md_5.bungee.api.chat.TextComponent(subserver + '\n');
                                                 hover.setColor(net.md_5.bungee.api.ChatColor.GRAY);
                                                 hoverm.add(hover);
                                             }
                                             hover = new net.md_5.bungee.api.chat.TextComponent(plugin.lang.getSection("Lang").getColoredString("Interface.SubServer-Menu.SubServer-Offline", '&'));
+                                            hoverm.add(hover);
+                                            hover = new net.md_5.bungee.api.chat.TextComponent('\n' + json.getJSONObject("hosts").getJSONObject(host).getJSONObject("servers").getJSONObject(subserver).getString("address"));
+                                            hover.setColor(net.md_5.bungee.api.ChatColor.WHITE);
                                         } else {
                                             message.setColor(net.md_5.bungee.api.ChatColor.RED);
                                             hover.setColor(net.md_5.bungee.api.ChatColor.RED);
-                                            if (!server.equals(servers.get(server).getString("display"))) {
+                                            if (!subserver.equals(json.getJSONObject("hosts").getJSONObject(host).getJSONObject("servers").getJSONObject(subserver).getString("display"))) {
                                                 hoverm.add(hover);
-                                                hover = new net.md_5.bungee.api.chat.TextComponent(server + '\n');
+                                                hover = new net.md_5.bungee.api.chat.TextComponent(subserver + '\n');
                                                 hover.setColor(net.md_5.bungee.api.ChatColor.GRAY);
                                             }
-                                            if (servers.get(server).getJSONArray("incompatible").length() != 0) {
+                                            if (json.getJSONObject("hosts").getJSONObject(host).getJSONObject("servers").getJSONObject(subserver).getJSONArray("incompatible").length() != 0) {
                                                 hoverm.add(hover);
                                                 String list = "";
-                                                for (int ii = 0; ii < servers.get(server).getJSONArray("incompatible").length(); ii++) {
+                                                for (int ii = 0; ii < json.getJSONObject("hosts").getJSONObject(host).getJSONObject("servers").getJSONObject(subserver).getJSONArray("incompatible").length(); ii++) {
                                                     if (list.length() != 0) list += ", ";
-                                                    list += servers.get(server).getJSONArray("incompatible").getString(ii);
+                                                    list += json.getJSONObject("hosts").getJSONObject(host).getJSONObject("servers").getJSONObject(subserver).getJSONArray("incompatible").getString(ii);
                                                 }
                                                 hover = new net.md_5.bungee.api.chat.TextComponent(plugin.lang.getSection("Lang").getColoredString("Interface.SubServer-Menu.SubServer-Incompatible", '&').replace("$str$", list));
                                             }
-                                            if (!servers.get(server).getBoolean("enabled")) {
+                                            if (!json.getJSONObject("hosts").getJSONObject(host).getJSONObject("servers").getJSONObject(subserver).getBoolean("enabled")) {
                                                 hoverm.add(hover);
                                                 hover = new net.md_5.bungee.api.chat.TextComponent(plugin.lang.getSection("Lang").getColoredString("Interface.SubServer-Menu.SubServer-Disabled", '&'));
                                             }
+                                            hoverm.add(hover);
+                                            hover = new net.md_5.bungee.api.chat.TextComponent('\n' + json.getJSONObject("hosts").getJSONObject(host).getJSONObject("servers").getJSONObject(subserver).getString("address"));
+                                            hover.setColor(net.md_5.bungee.api.ChatColor.WHITE);
                                         }
+                                        hoverm.add(hover);
+                                        message.setClickEvent(new net.md_5.bungee.api.chat.ClickEvent(net.md_5.bungee.api.chat.ClickEvent.Action.RUN_COMMAND, fLabel + " open SubServer/ " + subserver));
+                                        message.setHoverEvent(new net.md_5.bungee.api.chat.HoverEvent(net.md_5.bungee.api.chat.HoverEvent.Action.SHOW_TEXT, hoverm.toArray(new net.md_5.bungee.api.chat.TextComponent[hoverm.size()])));
+                                        if (i != 0) msg.addExtra(div);
+                                        msg.addExtra(message);
+                                        i++;
                                     }
+                                    ((Player) sender).spigot().sendMessage(msg);
+                                    i = 0;
+                                }
+                                sender.sendMessage(plugin.lang.getSection("Lang").getColoredString("Command.List.Server-Header", '&'));
+                                net.md_5.bungee.api.chat.TextComponent msg = new net.md_5.bungee.api.chat.TextComponent(ChatColor.RESET.toString());
+                                for (String server : json.getJSONObject("servers").keySet()) {
+                                    List<net.md_5.bungee.api.chat.TextComponent> hoverm = new LinkedList<net.md_5.bungee.api.chat.TextComponent>();
+                                    net.md_5.bungee.api.chat.TextComponent message = new net.md_5.bungee.api.chat.TextComponent(json.getJSONObject("servers").getJSONObject(server).getString("display"));
+                                    net.md_5.bungee.api.chat.TextComponent hover = new net.md_5.bungee.api.chat.TextComponent(json.getJSONObject("servers").getJSONObject(server).getString("display") + '\n');
+                                    message.setColor(net.md_5.bungee.api.ChatColor.WHITE);
+                                    hover.setColor(net.md_5.bungee.api.ChatColor.WHITE);
                                     hoverm.add(hover);
-                                    if (i != 0) serverm.addExtra(div);
+                                    hover = new net.md_5.bungee.api.chat.TextComponent(plugin.lang.getSection("Lang").getColoredString("Interface.SubServer-Menu.SubServer-External", '&'));
+                                    hoverm.add(hover);
+                                    hover = new net.md_5.bungee.api.chat.TextComponent('\n' + json.getJSONObject("servers").getJSONObject(server).getString("address"));
+                                    hover.setColor(net.md_5.bungee.api.ChatColor.WHITE);
+                                    hoverm.add(hover);
                                     message.setHoverEvent(new net.md_5.bungee.api.chat.HoverEvent(net.md_5.bungee.api.chat.HoverEvent.Action.SHOW_TEXT, hoverm.toArray(new net.md_5.bungee.api.chat.TextComponent[hoverm.size()])));
-                                    serverm.addExtra(message);
+                                    if (i != 0) msg.addExtra(div);
+                                    msg.addExtra(message);
                                     i++;
                                 }
-                                sender.sendMessage(plugin.lang.getSection("Lang").getColoredString("Command.List.Host-Header", '&'));
-                                ((Player) sender).spigot().sendMessage(hostm);
-                                sender.sendMessage(plugin.lang.getSection("Lang").getColoredString("Command.List.Server-Header", '&'));
-                                ((Player) sender).spigot().sendMessage(serverm);
+                                ((Player) sender).spigot().sendMessage(msg);
                             } else {
-                                String hostm = "";
-                                String serverm = "";
+                                sender.sendMessage(plugin.lang.getSection("Lang").getColoredString("Command.List.Host-Header", '&'));
                                 String div = plugin.lang.getSection("Lang").getColoredString("Command.List.Divider", '&');
 
-                                for (String server : json.getJSONObject("servers").keySet()) {
-                                    servers.put(server, json.getJSONObject("servers").getJSONObject(server));
-                                }
                                 for (String host : json.getJSONObject("hosts").keySet()) {
-                                    if (i != 0) hostm += div;
+                                    String message = "";
                                     if (json.getJSONObject("hosts").getJSONObject(host).getBoolean("enabled")) {
-                                        hostm += ChatColor.AQUA + json.getJSONObject("hosts").getJSONObject(host).getString("display") + ((host.equals(json.getJSONObject("hosts").getJSONObject(host).getString("display")))?"":" (" + host + ')');
+                                        message += ChatColor.AQUA;
                                     } else {
-                                        hostm += ChatColor.RED + json.getJSONObject("hosts").getJSONObject(host).getString("display") + ((host.equals(json.getJSONObject("hosts").getJSONObject(host).getString("display")))?"":" (" + host + ')');
+                                        message += ChatColor.RED;
                                     }
-                                    i++;
+                                    message += json.getJSONObject("hosts").getJSONObject(host).getString("display") + " (" + json.getJSONObject("hosts").getJSONObject(host).getString("address") + ((host.equals(json.getJSONObject("hosts").getJSONObject(host).getString("display")))?"":ChatColor.stripColor(div)+host) + ")" + ChatColor.GRAY + ": ";
                                     for (String subserver : json.getJSONObject("hosts").getJSONObject(host).getJSONObject("servers").keySet()) {
-                                        servers.put(subserver, json.getJSONObject("hosts").getJSONObject(host).getJSONObject("servers").getJSONObject(subserver));
+                                        if (i != 0) message += div;
+                                        if (json.getJSONObject("hosts").getJSONObject(host).getJSONObject("servers").getJSONObject(subserver).getBoolean("temp")) {
+                                            message += ChatColor.AQUA;
+                                        } else if (json.getJSONObject("hosts").getJSONObject(host).getJSONObject("servers").getJSONObject(subserver).getBoolean("running")) {
+                                            message += ChatColor.GREEN;
+                                        } else if (json.getJSONObject("hosts").getJSONObject(host).getJSONObject("servers").getJSONObject(subserver).getBoolean("enabled") && json.getJSONObject("hosts").getJSONObject(host).getJSONObject("servers").getJSONObject(subserver).getJSONArray("incompatible").length() == 0) {
+                                            message += ChatColor.YELLOW;
+                                        } else {
+                                            message += ChatColor.RED;
+                                        }
+                                        message += json.getJSONObject("hosts").getJSONObject(host).getJSONObject("servers").getJSONObject(subserver).getString("display") + " (" + json.getJSONObject("hosts").getJSONObject(host).getJSONObject("servers").getJSONObject(subserver).getString("address").split(":")[json.getJSONObject("hosts").getJSONObject(host).getJSONObject("servers").getJSONObject(subserver).getString("address").split(":").length - 1] + ((subserver.equals(json.getJSONObject("hosts").getJSONObject(host).getJSONObject("servers").getJSONObject(subserver).getString("display")))?"":ChatColor.stripColor(div)+subserver) + ")";
+                                        i++;
                                     }
+                                    sender.sendMessage(message);
+                                    i = 0;
                                 }
-                                i = 0;
-                                for (String server : servers.keySet()) {
-                                    if (i != 0) serverm += div;
-                                    if (!servers.get(server).keySet().contains("enabled")) {
-                                        serverm += ChatColor.WHITE + servers.get(server).getString("display") + ((server.equals(servers.get(server).getString("display")))?"":" (" + server + ')');
-                                    } else if (servers.get(server).getBoolean("temp")) {
-                                        serverm += ChatColor.AQUA + servers.get(server).getString("display") + ((server.equals(servers.get(server).getString("display")))?"":" (" + server + ')');
-                                    } else if (servers.get(server).getBoolean("running")) {
-                                        serverm += ChatColor.GREEN + servers.get(server).getString("display") + ((server.equals(servers.get(server).getString("display")))?"":" (" + server + ')');
-                                    } else if (servers.get(server).getBoolean("enabled")) {
-                                        serverm += ChatColor.YELLOW + servers.get(server).getString("display") + ((server.equals(servers.get(server).getString("display")))?"":" (" + server + ')');
-                                    } else {
-                                        serverm += ChatColor.RED + servers.get(server).getString("display") + ((server.equals(servers.get(server).getString("display")))?"":" (" + server + ')');
-                                    }
+                                sender.sendMessage(plugin.lang.getSection("Lang").getColoredString("Command.List.Server-Header", '&'));
+                                String message = "";
+                                for (String server : json.getJSONObject("servers").keySet()) {
+                                    if (i != 0) message += div;
+                                    message += ChatColor.WHITE + json.getJSONObject("servers").getJSONObject(server).getString("display") + " (" + json.getJSONObject("servers").getJSONObject(server).getString("address") + ((server.equals(json.getJSONObject("servers").getJSONObject(server).getString("display")))?"":ChatColor.stripColor(div)+server) + ")";
                                     i++;
                                 }
-                                sender.sendMessage(new String[]{plugin.lang.getSection("Lang").getColoredString("Command.List.Host-Header", '&'), hostm, plugin.lang.getSection("Lang").getColoredString("Command.List.Server-Header", '&'), serverm});
+                                sender.sendMessage(message);
                             }
                         }));
                     } else if (args[0].equalsIgnoreCase("info") || args[0].equalsIgnoreCase("status")) {
@@ -221,6 +278,7 @@ public final class SubCommand implements CommandExecutor {
                                         if (json.getJSONObject("server").getBoolean("temp")) sender.sendMessage("  " + plugin.lang.getSection("Lang").getColoredString("Command.Info.Format", '&').replace("$str$", "Temporary") + ChatColor.GREEN+"yes");
                                         sender.sendMessage("  " + plugin.lang.getSection("Lang").getColoredString("Command.Info.Format", '&').replace("$str$", "Running") + ((json.getJSONObject("server").getBoolean("running"))?ChatColor.GREEN+"yes":ChatColor.DARK_RED+"no"));
                                         sender.sendMessage("  " + plugin.lang.getSection("Lang").getColoredString("Command.Info.Format", '&').replace("$str$", "Logging") + ((json.getJSONObject("server").getBoolean("log"))?ChatColor.GREEN+"yes":ChatColor.DARK_RED+"no"));
+                                        sender.sendMessage("  " + plugin.lang.getSection("Lang").getColoredString("Command.Info.Format", '&').replace("$str$", "Address") + ChatColor.AQUA + json.getJSONObject("server").getString("address"));
                                         sender.sendMessage("  " + plugin.lang.getSection("Lang").getColoredString("Command.Info.Format", '&').replace("$str$", "Auto Restart") + ((json.getJSONObject("server").getBoolean("auto-restart"))?ChatColor.GREEN+"yes":ChatColor.DARK_RED+"no"));
                                         sender.sendMessage("  " + plugin.lang.getSection("Lang").getColoredString("Command.Info.Format", '&').replace("$str$", "Hidden") + ((json.getJSONObject("server").getBoolean("hidden"))?ChatColor.GREEN+"yes":ChatColor.DARK_RED+"no"));
                                         if (json.getJSONObject("server").getJSONArray("incompatible-list").length() > 0) {

@@ -97,7 +97,7 @@ public class ExternalHost extends Host implements ClientHandler {
 
     @Override
     public boolean isEnabled() {
-        return enabled && this.client != null;
+        return enabled && this.client.name();
     }
 
     @Override
