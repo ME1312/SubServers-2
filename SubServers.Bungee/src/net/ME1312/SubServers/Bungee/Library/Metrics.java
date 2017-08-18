@@ -2,6 +2,7 @@ package net.ME1312.SubServers.Bungee.Library;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import net.ME1312.SubServers.Bungee.SubPlugin;
 import net.md_5.bungee.config.Configuration;
 import net.md_5.bungee.config.ConfigurationProvider;
@@ -20,8 +21,10 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.zip.GZIPOutputStream;
 
 /**
@@ -129,6 +132,18 @@ public class Metrics {
         data.addProperty("pluginVersion", pluginVersion);
 
         JsonArray customCharts = new JsonArray();
+        customCharts.add(new SingleLineChart("managed_hosts", new Callable<Integer>() {
+            @Override
+            public Integer call() throws Exception {
+                return plugin.api.getHosts().size();
+            }
+        }).getRequestJsonObject(plugin.getLogger(), logFailedRequests));
+        customCharts.add(new SingleLineChart("subdata_connected", new Callable<Integer>() {
+            @Override
+            public Integer call() throws Exception {
+                return (plugin.subdata != null)?plugin.subdata.getClients().size():0;
+            }
+        }).getRequestJsonObject(plugin.getLogger(), logFailedRequests));
         data.add("customCharts", customCharts);
 
         return data;
@@ -365,5 +380,78 @@ public class Metrics {
         gzip.close();
         return outputStream.toByteArray();
     }
+    /**
+     * Represents a custom chart.
+     */
+    private static abstract class CustomChart {
 
+        // The id of the chart
+        private final String chartId;
+
+        /**
+         * Class constructor.
+         *
+         * @param chartId The id of the chart.
+         */
+        CustomChart(String chartId) {
+            if (chartId == null || chartId.isEmpty()) {
+                throw new IllegalArgumentException("ChartId cannot be null or empty!");
+            }
+            this.chartId = chartId;
+        }
+
+        JsonObject getRequestJsonObject(Logger logger, boolean logFailedRequests) {
+            JsonObject chart = new JsonObject();
+            chart.addProperty("chartId", chartId);
+            try {
+                JsonObject data = getChartData();
+                if (data == null) {
+                    // If the data is null we don't send the chart.
+                    return null;
+                }
+                chart.add("data", data);
+            } catch (Throwable t) {
+                if (logFailedRequests) {
+                    logger.log(Level.WARNING, "Failed to get data for custom chart with id " + chartId, t);
+                }
+                return null;
+            }
+            return chart;
+        }
+
+        protected abstract JsonObject getChartData() throws Exception;
+
+    }
+
+    /**
+     * Represents a custom single line chart.
+     */
+    private static class SingleLineChart extends CustomChart {
+
+        private final Callable<Integer> callable;
+
+        /**
+         * Class constructor.
+         *
+         * @param chartId The id of the chart.
+         * @param callable The callable which is used to request the chart data.
+         */
+        public SingleLineChart(String chartId, Callable<Integer> callable) {
+            super(chartId);
+            this.callable = callable;
+        }
+
+        @Override
+        protected JsonObject getChartData() throws Exception {
+            JsonObject data = new JsonObject();
+            int value = callable.call();
+            if (value == 0) {
+                // Null = skip the chart
+                return null;
+            }
+            data.addProperty("value", value);
+            return data;
+        }
+
+    }
 }
