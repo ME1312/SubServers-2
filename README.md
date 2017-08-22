@@ -2,6 +2,7 @@
 SubServers 2 is a rewrite of SubServers, the Server Management Plugin.<br>
 > [http://www.spigotmc.org/resources/subservers-2.11264/](http://www.spigotmc.org/resources/subservers-2.11264/)<br>
 > [http://www.spigotmc.org/resources/subservers-host.38833/](http://www.spigotmc.org/resources/subservers-host.38833/)<br>
+> [http://www.spigotmc.org/resources/subservers-sync.46124/](http://www.spigotmc.org/resources/subservers-sync.46124/)<br>
 > [http://www.spigotmc.org/resources/subservers-console.37341/](http://www.spigotmc.org/resources/subservers-console.37341/)<br>
 > [http://www.spigotmc.org/resources/subservers-client-bukkit.15506/](http://www.spigotmc.org/resources/subservers-client-bukkit.15506/)
 
@@ -14,4 +15,5 @@ These are some quick links for common resources of SubServers 2.
 ### Javadocs for Developers
 > [http://subservers.ME1312.net/Javadoc/SubServers.Bungee/](http://subservers.ME1312.net/Javadoc/SubServers.Bungee/)<br>
 > [http://subservers.ME1312.net/Javadoc/SubServers.Host/](http://subservers.ME1312.net/Javadoc/SubServers.Host/)<br>
+> [http://subservers.ME1312.net/Javadoc/SubServers.Sync/](http://subservers.ME1312.net/Javadoc/SubServers.Sync/)<br>
 > [http://subservers.ME1312.net/Javadoc/SubServers.Client.Bukkit/](http://subservers.ME1312.net/Javadoc/SubServers.Client.Bukkit/)
