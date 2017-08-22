@@ -48,8 +48,6 @@ crashlytics-build.properties
 /Artifacts/SubServers.Client.Sponge.jar
 /SubServers.Client/Sponge/
 /SubServers.Client/Windows/
-/Artifacts/SubServers.Sync.jar
-/SubServers.Sync/
 /Artifacts/SubServers.Web.jar
 /SubServers.Web/
 

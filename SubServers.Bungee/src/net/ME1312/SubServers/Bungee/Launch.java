@@ -36,7 +36,7 @@ public final class Launch {
             System.out.println("*******************************************");
             System.out.println("");
             System.exit(1);
-        } else if (System.getProperty("subservers.bungee.allow", "true").equalsIgnoreCase("true")) {
+        } else if (System.getProperty("RM.subservers", "true").equalsIgnoreCase("true")) {
             Security.setProperty("networkaddress.cache.ttl", "30");
             Security.setProperty("networkaddress.cache.negative.ttl", "10");
             joptsimple.OptionParser parser = new joptsimple.OptionParser();

@@ -151,9 +151,9 @@ public class ExternalHost extends Host implements ClientHandler {
             queue(new PacketExAddServer(name, enabled, log, directory, executable, stopcmd, (server.isRunning())?((ExternalSubLogger) server.getLogger()).getExternalAddress():null, json -> {
                 if (json.getInt("r") == 0) {
                     if (!((start || temporary) && !server.start()) && temporary) server.setTemporary(true);
-                    servers.put(name.toLowerCase(), server);
                 }
             }));
+            servers.put(name.toLowerCase(), server);
             return server;
         } else {
             return null;

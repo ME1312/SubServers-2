@@ -55,7 +55,7 @@ public class PacketDownloadHostInfo implements PacketIn, PacketOut {
             info.put("name", host.getName());
             info.put("display", host.getDisplayName());
             info.put("enabled", host.isEnabled());
-            info.put("address", host.getAddress().toString());
+            info.put("address", host.getAddress().getHostAddress());
             info.put("dir", host.getPath());
 
             JSONObject cinfo = new JSONObject();

@@ -104,7 +104,7 @@ public abstract class SubServer extends Server {
      * @throws InvalidServerException
      */
     public SubServer(Host host, String name, int port, String motd, boolean hidden, boolean restricted) throws InvalidServerException {
-        super(name, InetSocketAddress.createUnresolved(host.getAddress().getHostAddress(), port), motd, hidden, restricted);
+        super(name, new InetSocketAddress(host.getAddress().getHostAddress(), port), motd, hidden, restricted);
     }
 
     /**
@@ -392,6 +392,7 @@ public abstract class SubServer extends Server {
         sinfo.put("type", "SubServer");
         sinfo.put("enabled", getHost().isEnabled() && isEnabled());
         sinfo.put("running", isRunning());
+        sinfo.put("log", isLogging());
         List<String> incompatible = new ArrayList<String>();
         for (SubServer server : getCurrentIncompatibilities()) incompatible.add(server.getName());
         sinfo.put("incompatible", incompatible);

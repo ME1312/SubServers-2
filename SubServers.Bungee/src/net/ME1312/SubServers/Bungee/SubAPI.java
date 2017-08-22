@@ -1,15 +1,20 @@
 package net.ME1312.SubServers.Bungee;
 
+import net.ME1312.SubServers.Bungee.Event.SubAddHostEvent;
 import net.ME1312.SubServers.Bungee.Event.SubAddServerEvent;
+import net.ME1312.SubServers.Bungee.Event.SubRemoveHostEvent;
+import net.ME1312.SubServers.Bungee.Event.SubRemoveServerEvent;
 import net.ME1312.SubServers.Bungee.Host.Server;
 import net.ME1312.SubServers.Bungee.Host.Host;
 import net.ME1312.SubServers.Bungee.Host.SubServer;
+import net.ME1312.SubServers.Bungee.Library.Exception.InvalidHostException;
 import net.ME1312.SubServers.Bungee.Library.NamedContainer;
 import net.ME1312.SubServers.Bungee.Library.UniversalFile;
 import net.ME1312.SubServers.Bungee.Library.Util;
 import net.ME1312.SubServers.Bungee.Library.Version.Version;
 import net.ME1312.SubServers.Bungee.Network.SubDataServer;
 
+import java.lang.reflect.InvocationTargetException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.*;
@@ -67,6 +72,15 @@ public final class SubAPI {
     }
 
     /**
+     * Get a list of all available Host Drivers
+     *
+     * @return Host Driver handle list
+     */
+    public List<String> getHostDrivers() {
+        return new LinkedList<String>(plugin.hostDrivers.keySet());
+    }
+
+    /**
      * Adds a Driver for Hosts
      *
      * @param driver Driver to add
@@ -75,7 +89,7 @@ public final class SubAPI {
     public void addHostDriver(Class<? extends Host> driver, String handle) {
         if (Util.isNull(driver, handle)) throw new NullPointerException();
         if (plugin.hostDrivers.keySet().contains(handle.toLowerCase())) throw new IllegalStateException("Driver already exists: " + handle);
-        plugin.hostDrivers.put(handle, driver);
+        plugin.hostDrivers.put(handle.toLowerCase(), driver);
     }
 
     /**
@@ -99,6 +113,107 @@ public final class SubAPI {
     }
 
     /**
+     * Add a Host to the Network
+     *
+     * @param driver Driver to initiate
+     * @param name Name of the Host
+     * @param enabled Enabled Status
+     * @param address Address of the Host
+     * @param directory Directory of the Host
+     * @param gitBash Git Bash Directory
+     * @return The Host
+     * @throws NoSuchMethodException
+     * @throws IllegalAccessException
+     * @throws InvocationTargetException
+     * @throws InstantiationException
+     */
+    public Host addHost(String driver, String name, boolean enabled, InetAddress address, String directory, String gitBash) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
+        return addHost(null, driver, name, enabled, address, directory, gitBash);
+    }
+
+    /**
+     * Add a Host to the Network
+     *
+     * @param player Player who added
+     * @param driver Driver to initiate
+     * @param name Name of the Host
+     * @param enabled Enabled Status
+     * @param address Address of the Host
+     * @param directory Directory of the Host
+     * @param gitBash Git Bash Directory
+     * @return The Host
+     * @throws NoSuchMethodException
+     * @throws IllegalAccessException
+     * @throws InvocationTargetException
+     * @throws InstantiationException
+     */
+    public Host addHost(UUID player, String driver, String name, boolean enabled, InetAddress address, String directory, String gitBash) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
+        if (Util.isNull(driver, name, enabled, address, directory, gitBash)) throw new NullPointerException();
+        if (!getHostDrivers().contains(driver)) throw new InvalidHostException("Invalid Driver for host: " + name);
+        Host host = plugin.hostDrivers.get(driver.toLowerCase()).getConstructor(SubPlugin.class, String.class, Boolean.class, InetAddress.class, String.class, String.class).newInstance(plugin, name, (Boolean) enabled, address, directory, gitBash);
+        SubAddHostEvent event = new SubAddHostEvent(player, host);
+        plugin.getPluginManager().callEvent(event);
+        if (!event.isCancelled()) {
+            plugin.hosts.put(name.toLowerCase(), host);
+            return host;
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Remove a Host from the Network
+     *
+     * @param name Name of the Host
+     * @return Success Status
+     */
+    public boolean removeHost(String name) {
+        return removeHost(null, name);
+    }
+
+    /**
+     * Remove a Host from the Network
+     *
+     * @param player Player Removing
+     * @param name Name of the Host
+     * @return Success Status
+     */
+    public boolean removeHost(UUID player, String name) {
+        if (Util.isNull(name, getHost(name))) throw new NullPointerException();
+        SubRemoveHostEvent event = new SubRemoveHostEvent(player, getHost(name));
+        plugin.getPluginManager().callEvent(event);
+        if (event.isCancelled()) {
+            plugin.hosts.remove(name.toLowerCase());
+            return true;
+        } else return false;
+    }
+
+    /**
+     * Force Remove a Host from the Network
+     *
+     * @param name Name of the Host
+     * @return Success Status
+     */
+    public boolean forceRemoveHost(String name) {
+        return forceRemoveHost(null, name);
+    }
+
+    /**
+     * Force Remove a Host from the Network
+     *
+     * @param player Player Removing
+     * @param name Name of the Host
+     * @return Success Status
+     */
+    public boolean forceRemoveHost(UUID player, String name) {
+        if (Util.isNull(name, getHost(name))) throw new NullPointerException();
+        SubRemoveHostEvent event = new SubRemoveHostEvent(player, getHost(name));
+        plugin.getPluginManager().callEvent(event);
+        plugin.hosts.remove(name.toLowerCase());
+        return true;
+    }
+
+    /**
      * Gets the Servers (including SubServers)
      *
      * @return Server Map
@@ -110,6 +225,17 @@ public final class SubAPI {
             servers.putAll(host.getSubServers());
         }
         return servers;
+    }
+
+    /**
+     * Gets a Server
+     *
+     * @param name Server name
+     * @return a Server
+     */
+    public Server getServer(String name) {
+        if (Util.isNull(name)) throw new NullPointerException();
+        return getServers().get(name.toLowerCase());
     }
 
     /**
@@ -152,14 +278,55 @@ public final class SubAPI {
     }
 
     /**
-     * Gets a Server
+     * Remove a Server from the Network
      *
-     * @param name Server name
-     * @return a Server
+     * @param name Name of the Server
+     * @return Success Status
      */
-    public Server getServer(String name) {
-        if (Util.isNull(name)) throw new NullPointerException();
-        return getServers().get(name.toLowerCase());
+    public boolean removeServer(String name) {
+        return removeServer(null, name);
+    }
+
+    /**
+     * Remove a Server from the Network
+     *
+     * @param player Player Removing
+     * @param name Name of the Server
+     * @return Success Status
+     */
+    public boolean removeServer(UUID player, String name) {
+        if (Util.isNull(name, getServer(name))) throw new NullPointerException();
+        SubRemoveServerEvent event = new SubRemoveServerEvent(player, null, getServer(name));
+        plugin.getPluginManager().callEvent(event);
+        if (event.isCancelled()) {
+            plugin.exServers.remove(name.toLowerCase());
+            return true;
+        } else return false;
+    }
+
+    /**
+     * Force Remove a Server from the Network
+     *
+     * @param name Name of the Server
+     * @return Success Status
+     */
+    public boolean forceRemoveServer(String name) {
+        return forceRemoveServer(null, name);
+    }
+
+    /**
+     * Force Remove a Server from the Network
+     *
+     * @param player Player Removing
+     * @param name Name of the Server
+     * @return Success Status
+     */
+    public boolean forceRemoveServer(UUID player, String name) {
+        if (Util.isNull(name, getServer(name))) throw new NullPointerException();
+        SubRemoveServerEvent event = new SubRemoveServerEvent(player, null, getServer(name));
+        plugin.getPluginManager().callEvent(event);
+        plugin.exServers.remove(name.toLowerCase());
+        return true;
     }
 
     /**

@@ -50,7 +50,7 @@ public final class SubCommand implements CommandExecutor {
                     } else if (args[0].equalsIgnoreCase("version") || args[0].equalsIgnoreCase("ver")) {
                         sender.sendMessage(plugin.lang.getSection("Lang").getColoredString("Command.Version", '&').replace("$name$", "SubServers.Client.Bukkit").replace("$str$", plugin.version.toString() + ((plugin.bversion != null)?" BETA "+plugin.bversion.toString():"")));
                         if (plugin.bversion == null) {
-                            new Thread(() -> {
+                            Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
                                 try {
                                     Document updxml = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new InputSource(new StringReader(Util.readAll(new BufferedReader(new InputStreamReader(new URL("http://src.me1312.net/maven/net/ME1312/SubServers/SubServers.Client.Bukkit/maven-metadata.xml").openStream(), Charset.forName("UTF-8")))))));
 
@@ -72,7 +72,7 @@ public final class SubCommand implements CommandExecutor {
                                         sender.sendMessage(plugin.lang.getSection("Lang").getColoredString("Command.Version.Outdated", '&').replace("$int$", Integer.toString(updcount)));
                                     }
                                 } catch (Exception e) {}
-                            }).start();
+                            });
                         }
                     } else if (args[0].equalsIgnoreCase("list")) {
                         final String fLabel = label;
@@ -100,7 +100,7 @@ public final class SubCommand implements CommandExecutor {
                                         }
                                         hover = new net.md_5.bungee.api.chat.TextComponent(plugin.lang.getSection("Lang").getColoredString("Interface.Host-Menu.Host-Server-Count", '&').replace("$int$", new DecimalFormat("#,###").format(json.getJSONObject("hosts").getJSONObject(host).getJSONObject("servers").keySet().size())));
                                         hoverm.add(hover);
-                                        hover = new net.md_5.bungee.api.chat.TextComponent(json.getJSONObject("hosts").getJSONObject(host).getString("address"));
+                                        hover = new net.md_5.bungee.api.chat.TextComponent('\n' + json.getJSONObject("hosts").getJSONObject(host).getString("address"));
                                         hover.setColor(net.md_5.bungee.api.ChatColor.WHITE);
                                     } else {
                                         message.setColor(net.md_5.bungee.api.ChatColor.RED);
@@ -113,7 +113,7 @@ public final class SubCommand implements CommandExecutor {
                                         }
                                         hover = new net.md_5.bungee.api.chat.TextComponent(plugin.lang.getSection("Lang").getColoredString("Interface.Host-Menu.Host-Disabled", '&'));
                                         hoverm.add(hover);
-                                        hover = new net.md_5.bungee.api.chat.TextComponent(json.getJSONObject("hosts").getJSONObject(host).getString("address"));
+                                        hover = new net.md_5.bungee.api.chat.TextComponent('\n' + json.getJSONObject("hosts").getJSONObject(host).getString("address"));
                                         hover.setColor(net.md_5.bungee.api.ChatColor.WHITE);
                                     }
                                     hoverm.add(hover);

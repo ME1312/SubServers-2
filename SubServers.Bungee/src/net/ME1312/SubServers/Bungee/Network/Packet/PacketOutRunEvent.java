@@ -62,7 +62,17 @@ public class PacketOutRunEvent implements Listener, PacketOut {
         return new Version("2.11.0a");
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = Byte.MAX_VALUE)
+    public void event(SubAddHostEvent event) {
+        if (!event.isCancelled()) {
+            JSONObject args = new JSONObject();
+            args.put("player", ((event.getPlayer() == null)?null:event.getPlayer().toString()));
+            args.put("host", event.getHost().getName());
+            plugin.subdata.broadcastPacket(new PacketOutRunEvent(event.getClass(), args));
+        }
+    }
+
+    @EventHandler(priority = Byte.MAX_VALUE)
     public void event(SubAddServerEvent event) {
         if (!event.isCancelled()) {
             JSONObject args = new JSONObject();
@@ -72,7 +82,8 @@ public class PacketOutRunEvent implements Listener, PacketOut {
             plugin.subdata.broadcastPacket(new PacketOutRunEvent(event.getClass(), args));
         }
     }
-    @EventHandler(priority = EventPriority.HIGHEST)
+
+    @EventHandler(priority = Byte.MAX_VALUE)
     public void event(SubCreateEvent event) {
         if (!event.isCancelled()) {
             JSONObject args = new JSONObject();
@@ -85,7 +96,7 @@ public class PacketOutRunEvent implements Listener, PacketOut {
             plugin.subdata.broadcastPacket(new PacketOutRunEvent(event.getClass(), args));
         }
     }
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = Byte.MAX_VALUE)
     public void event(SubSendCommandEvent event) {
         if (!event.isCancelled()) {
             JSONObject args = new JSONObject();
@@ -95,7 +106,21 @@ public class PacketOutRunEvent implements Listener, PacketOut {
             plugin.subdata.broadcastPacket(new PacketOutRunEvent(event.getClass(), args));
         }
     }
-    @EventHandler(priority = EventPriority.HIGHEST)
+
+    @EventHandler(priority = Byte.MAX_VALUE)
+    public void event(SubEditServerEvent event) {
+        if (!event.isCancelled()) {
+            JSONObject args = new JSONObject();
+            args.put("player", ((event.getPlayer() == null)?null:event.getPlayer().toString()));
+            args.put("server", event.getServer().getName());
+            args.put("edit", event.getEdit().name());
+            args.put("value", event.getEdit().get().asObject());
+            args.put("perm", event.isPermanent());
+            plugin.subdata.broadcastPacket(new PacketOutRunEvent(event.getClass(), args));
+        }
+    }
+    
+    @EventHandler(priority = Byte.MAX_VALUE)
     public void event(SubStartEvent event) {
         if (!event.isCancelled()) {
             JSONObject args = new JSONObject();
@@ -104,7 +129,7 @@ public class PacketOutRunEvent implements Listener, PacketOut {
             plugin.subdata.broadcastPacket(new PacketOutRunEvent(event.getClass(), args));
         }
     }
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = Byte.MAX_VALUE)
     public void event(SubStopEvent event) {
         if (!event.isCancelled()) {
             JSONObject args = new JSONObject();
@@ -115,20 +140,30 @@ public class PacketOutRunEvent implements Listener, PacketOut {
 
         }
     }
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = Byte.MAX_VALUE)
     public void event(SubStoppedEvent event) {
         JSONObject args = new JSONObject();
         args.put("server", event.getServer().getName());
         plugin.subdata.broadcastPacket(new PacketOutRunEvent(event.getClass(), args));
 
     }
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = Byte.MAX_VALUE)
     public void event(SubRemoveServerEvent event) {
         if (!event.isCancelled()) {
             JSONObject args = new JSONObject();
             args.put("player", ((event.getPlayer() == null)?null:event.getPlayer().toString()));
             args.put("host", ((event.getHost() == null)?null:event.getHost().getName()));
             args.put("server", event.getServer().getName());
+            plugin.subdata.broadcastPacket(new PacketOutRunEvent(event.getClass(), args));
+        }
+    }
+
+    @EventHandler(priority = Byte.MAX_VALUE)
+    public void event(SubRemoveHostEvent event) {
+        if (!event.isCancelled()) {
+            JSONObject args = new JSONObject();
+            args.put("player", ((event.getPlayer() == null)?null:event.getPlayer().toString()));
+            args.put("host", event.getHost().getName());
             plugin.subdata.broadcastPacket(new PacketOutRunEvent(event.getClass(), args));
         }
     }

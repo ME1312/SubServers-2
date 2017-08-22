@@ -1,0 +1,6 @@
+Settings:
+  Version: '2.11.2a+'
+  SubData:
+    Address: '127.0.0.1:4391'
+    Password: 'default'
+    Encryption: 'AES'

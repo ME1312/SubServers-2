@@ -1,5 +1,6 @@
 package net.ME1312.SubServers.Host.Library.Config;
 
+import net.ME1312.SubServers.Host.Library.TextColor;
 import net.ME1312.SubServers.Host.Library.Util;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -171,7 +172,7 @@ public class YAMLSection {
      * @param value Value
      */
     public void set(String handle, Object value) {
-        if (Util.isNull(handle)) throw new NullPointerException();
+        if (Util.isNull(handle, value)) throw new NullPointerException();
         if (value instanceof Collection) {
             set(handle, (Collection<?>) value);
         } else {
@@ -181,6 +182,17 @@ public class YAMLSection {
                 this.up.set(this.handle, this);
             }
         }
+    }
+
+    /**
+     * Set Object into this YAML Section without overwriting existing value
+     *
+     * @param handle Handle
+     * @param value Value
+     */
+    public void safeSet(String handle, Object value) {
+        if (Util.isNull(handle)) throw new NullPointerException();
+        if (!contains(handle)) set(handle, value);
     }
 
     /**
@@ -201,6 +213,18 @@ public class YAMLSection {
         if (this.handle != null && this.up != null) {
             this.up.set(this.handle, this);
         }
+    }
+
+    /**
+     * Set Collection&lt;V&gt; into this YAML Section without overwriting existing value
+     *
+     * @param handle Handle
+     * @param list Value
+     * @param <V> Collection Type
+     */
+    public <V> void safeSet(String handle, Collection<V> list) {
+        if (Util.isNull(handle)) throw new NullPointerException();
+        if (!contains(handle)) set(handle, list);
     }
 
     /**
@@ -872,6 +896,71 @@ public class YAMLSection {
             List<String> values = new ArrayList<String>();
             for (String value : def) {
                 values.add(Util.unescapeJavaString(value));
+            }
+            return values;
+        }
+    }
+
+    /**
+     * Get a Colored String by Handle
+     *
+     * @param handle Handle
+     * @param color Color Char to parse
+     * @return Colored String
+     */
+    public String getColoredString(String handle, char color) {
+        if (Util.isNull(handle, color)) throw new NullPointerException();
+        return (map.get(handle) != null)? TextColor.parseColor(color, Util.unescapeJavaString((String) map.get(handle))):null;
+    }
+
+    /**
+     * Get a Colored String by Handle
+     *
+     * @param handle Handle
+     * @param def Default
+     * @param color Color Char to parse
+     * @return Colored String
+     */
+    public String getColoredString(String handle, String def, char color) {
+        if (Util.isNull(handle, color)) throw new NullPointerException();
+        return TextColor.parseColor(color, Util.unescapeJavaString((String) ((map.get(handle) != null) ? map.get(handle) : def)));
+    }
+    /**
+     * Get a Colored String List by Handle
+     *
+     * @param handle Handle
+     * @param color Color Char to parse
+     * @return Colored String List
+     */
+    public List<String> getColoredStringList(String handle, char color) {
+        if (Util.isNull(handle, color)) throw new NullPointerException();
+        if (map.get(handle) != null) {
+            List<String> values = new ArrayList<String>();
+            for (String value : (List<String>) map.get(handle)) {
+                values.add(TextColor.parseColor(color, Util.unescapeJavaString(value)));
+            }
+            return values;
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Get a Colored String List by Handle
+     *
+     * @param handle Handle
+     * @param def Default
+     * @param color Color Char to parse
+     * @return Colored String List
+     */
+    public List<String> getColoredStringList(String handle, List<String> def, char color) {
+        if (Util.isNull(handle, color)) throw new NullPointerException();
+        if (map.get(handle) != null) {
+            return getColoredStringList(handle, color);
+        } else {
+            List<String> values = new ArrayList<String>();
+            for (String value : def) {
+                values.add(TextColor.parseColor(color, Util.unescapeJavaString(value)));
             }
             return values;
         }

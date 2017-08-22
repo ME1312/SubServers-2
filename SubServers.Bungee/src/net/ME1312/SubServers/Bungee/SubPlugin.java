@@ -63,7 +63,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
     public final SubAPI api = new SubAPI(this);
 
     protected SubPlugin(PrintStream out) throws IOException {
-        System.out.println("SubServers > Loading SubServers v" + version.toString() + " Libraries... ");
+        System.out.println("SubServers > Loading SubServers.Bungee v" + version.toString() + " Libraries... ");
 
         this.out = out;
         if (!(new UniversalFile(dir, "config.yml").exists())) {
@@ -168,8 +168,8 @@ public final class SubPlugin extends BungeeCord implements Listener {
             }
         }
 
-        hostDrivers.put("built-in", net.ME1312.SubServers.Bungee.Host.Internal.InternalHost.class);
-        hostDrivers.put("network", net.ME1312.SubServers.Bungee.Host.External.ExternalHost.class);
+        api.addHostDriver(net.ME1312.SubServers.Bungee.Host.Internal.InternalHost.class, "built-in");
+        api.addHostDriver(net.ME1312.SubServers.Bungee.Host.External.ExternalHost.class, "network");
 
         getPluginManager().registerListener(null, this);
         getPluginManager().registerCommand(null, new SubCommand.BungeeServer(this, "server"));
@@ -212,7 +212,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
             subdata = new SubDataServer(this, Integer.parseInt(config.get().getSection("Settings").getSection("SubData").getRawString("Address", "127.0.0.1:4391").split(":")[1]),
                     (config.get().getSection("Settings").getSection("SubData").getRawString("Address", "127.0.0.1:4391").split(":")[0].equals("0.0.0.0"))?null:InetAddress.getByName(config.get().getSection("Settings").getSection("SubData").getRawString("Address", "127.0.0.1:4391").split(":")[0]),
                     encryption);
-            System.out.println("SubServers > SubData Direct Listening on /" + config.get().getSection("Settings").getSection("SubData").getRawString("Address", "127.0.0.1:4391"));
+            System.out.println("SubServers > SubData Direct Listening on " + subdata.getServer().getLocalSocketAddress().toString());
             loop();
 
             int hosts = 0;
@@ -220,13 +220,10 @@ public final class SubPlugin extends BungeeCord implements Listener {
             for (String name : config.get().getSection("Hosts").getKeys()) {
                 try {
                     if (!hostDrivers.keySet().contains(config.get().getSection("Hosts").getSection(name).getRawString("Driver").toLowerCase())) throw new InvalidHostException("Invalid Driver for host: " + name);
-                    Host host = hostDrivers.get(config.get().getSection("Hosts").getSection(name).getRawString("Driver").toLowerCase()).getConstructor(SubPlugin.class, String.class, Boolean.class, InetAddress.class, String.class, String.class).newInstance(
-                            this, name, (Boolean) config.get().getSection("Hosts").getSection(name).getBoolean("Enabled"), InetAddress.getByName(config.get().getSection("Hosts").getSection(name).getRawString("Address")), config.get().getSection("Hosts").getSection(name).getRawString("Directory"),
-                            config.get().getSection("Hosts").getSection(name).getRawString("Git-Bash"));
-                    this.hosts.put(name.toLowerCase(), host);
+                    Host host = api.addHost(config.get().getSection("Hosts").getSection(name).getRawString("Driver").toLowerCase(), name, config.get().getSection("Hosts").getSection(name).getBoolean("Enabled"), InetAddress.getByName(config.get().getSection("Hosts").getSection(name).getRawString("Address")),
+                            config.get().getSection("Hosts").getSection(name).getRawString("Directory"), config.get().getSection("Hosts").getSection(name).getRawString("Git-Bash"));
                     if (config.get().getSection("Hosts").getSection(name).getKeys().contains("Display")) host.setDisplayName(config.get().getSection("Hosts").getSection(name).getString("Display"));
                     if (config.get().getSection("Hosts").getSection(name).getKeys().contains("Extra")) for (String extra : config.get().getSection("Hosts").getSection(name).getSection("Extra").getKeys()) host.addExtra(extra, config.get().getSection("Hosts").getSection(name).getSection("Extra").getObject(extra));
-                    SubDataServer.allowConnection(host.getAddress());
                     hosts++;
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -243,7 +240,6 @@ public final class SubPlugin extends BungeeCord implements Listener {
                             bungee.get().getSection("servers").getSection(name).getBoolean("hidden", false), bungee.get().getSection("servers").getSection(name).getBoolean("restricted"));
                     if (bungee.get().getSection("servers").getSection(name).getKeys().contains("display")) server.setDisplayName(bungee.get().getSection("servers").getSection(name).getString("display"));
                     if (bungee.get().getSection("servers").getSection(name).getKeys().contains("extra")) for (String extra : config.get().getSection("servers").getSection(name).getSection("extra").getKeys()) server.addExtra(extra, config.get().getSection("servers").getSection(name).getSection("extra").getObject(extra));
-                    SubDataServer.allowConnection(server.getAddress().getAddress());
                     servers++;
                 } catch (Exception e) {
                     e.printStackTrace();

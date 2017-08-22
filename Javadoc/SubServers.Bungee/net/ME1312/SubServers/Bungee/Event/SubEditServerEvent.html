@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10};
+var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -48,7 +48,7 @@ var activeTableTab = "activeTableTab";
 <div class="subNav">
 <ul class="navList">
 <li><a href="../../../../../net/ME1312/SubServers/Bungee/Event/SubCreateEvent.html" title="class in net.ME1312.SubServers.Bungee.Event"><span class="typeNameLink">Prev&nbsp;Class</span></a></li>
-<li><a href="../../../../../net/ME1312/SubServers/Bungee/Event/SubRemoveServerEvent.html" title="class in net.ME1312.SubServers.Bungee.Event"><span class="typeNameLink">Next&nbsp;Class</span></a></li>
+<li><a href="../../../../../net/ME1312/SubServers/Bungee/Event/SubRemoveHostEvent.html" title="class in net.ME1312.SubServers.Bungee.Event"><span class="typeNameLink">Next&nbsp;Class</span></a></li>
 </ul>
 <ul class="navList">
 <li><a href="../../../../../index.html?net/ME1312/SubServers/Bungee/Event/SubEditServerEvent.html" target="_top">Frames</a></li>
@@ -138,9 +138,10 @@ implements <a href="../../../../../net/ME1312/SubServers/Bungee/Library/SubEvent
 <th class="colOne" scope="col">Constructor and Description</th>
 </tr>
 <tr class="altColor">
-<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Event/SubEditServerEvent.html#SubEditServerEvent-java.util.UUID-net.ME1312.SubServers.Bungee.Host.Server-net.ME1312.SubServers.Bungee.Library.NamedContainer-">SubEditServerEvent</a></span>(java.util.UUID&nbsp;player,
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Event/SubEditServerEvent.html#SubEditServerEvent-java.util.UUID-net.ME1312.SubServers.Bungee.Host.Server-net.ME1312.SubServers.Bungee.Library.NamedContainer-boolean-">SubEditServerEvent</a></span>(java.util.UUID&nbsp;player,
                   <a href="../../../../../net/ME1312/SubServers/Bungee/Host/Server.html" title="class in net.ME1312.SubServers.Bungee.Host">Server</a>&nbsp;server,
-                  <a href="../../../../../net/ME1312/SubServers/Bungee/Library/NamedContainer.html" title="class in net.ME1312.SubServers.Bungee.Library">NamedContainer</a>&lt;java.lang.String,<a href="../../../../../net/ME1312/SubServers/Bungee/Library/Config/YAMLValue.html" title="class in net.ME1312.SubServers.Bungee.Library.Config">YAMLValue</a>&gt;&nbsp;edit)</code>
+                  <a href="../../../../../net/ME1312/SubServers/Bungee/Library/NamedContainer.html" title="class in net.ME1312.SubServers.Bungee.Library">NamedContainer</a>&lt;java.lang.String,?&gt;&nbsp;edit,
+                  boolean&nbsp;permanent)</code>
 <div class="block">Server Edit Event</div>
 </td>
 </tr>
@@ -184,6 +185,12 @@ implements <a href="../../../../../net/ME1312/SubServers/Bungee/Library/SubEvent
 </td>
 </tr>
 <tr id="i4" class="altColor">
+<td class="colFirst"><code>boolean</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Event/SubEditServerEvent.html#isPermanent--">isPermanent</a></span>()</code>
+<div class="block">Gets if the edit is permanent</div>
+</td>
+</tr>
+<tr id="i5" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Event/SubEditServerEvent.html#setCancelled-boolean-">setCancelled</a></span>(boolean&nbsp;value)</code>
 <div class="block">Sets the Cancelled Status</div>
@@ -218,7 +225,7 @@ implements <a href="../../../../../net/ME1312/SubServers/Bungee/Library/SubEvent
 <!--   -->
 </a>
 <h3>Constructor Detail</h3>
-<a name="SubEditServerEvent-java.util.UUID-net.ME1312.SubServers.Bungee.Host.Server-net.ME1312.SubServers.Bungee.Library.NamedContainer-">
+<a name="SubEditServerEvent-java.util.UUID-net.ME1312.SubServers.Bungee.Host.Server-net.ME1312.SubServers.Bungee.Library.NamedContainer-boolean-">
 <!--   -->
 </a>
 <ul class="blockListLast">
@@ -226,12 +233,15 @@ implements <a href="../../../../../net/ME1312/SubServers/Bungee/Library/SubEvent
 <h4>SubEditServerEvent</h4>
 <pre>public&nbsp;SubEditServerEvent(java.util.UUID&nbsp;player,
                           <a href="../../../../../net/ME1312/SubServers/Bungee/Host/Server.html" title="class in net.ME1312.SubServers.Bungee.Host">Server</a>&nbsp;server,
-                          <a href="../../../../../net/ME1312/SubServers/Bungee/Library/NamedContainer.html" title="class in net.ME1312.SubServers.Bungee.Library">NamedContainer</a>&lt;java.lang.String,<a href="../../../../../net/ME1312/SubServers/Bungee/Library/Config/YAMLValue.html" title="class in net.ME1312.SubServers.Bungee.Library.Config">YAMLValue</a>&gt;&nbsp;edit)</pre>
+                          <a href="../../../../../net/ME1312/SubServers/Bungee/Library/NamedContainer.html" title="class in net.ME1312.SubServers.Bungee.Library">NamedContainer</a>&lt;java.lang.String,?&gt;&nbsp;edit,
+                          boolean&nbsp;permanent)</pre>
 <div class="block">Server Edit Event</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>player</code> - Player Adding Server</dd>
 <dd><code>server</code> - Server to be Edited</dd>
+<dd><code>edit</code> - Edit to make</dd>
+<dd><code>permanent</code> - If the change is permanent</dd>
 </dl>
 </li>
 </ul>
@@ -282,6 +292,20 @@ implements <a href="../../../../../net/ME1312/SubServers/Bungee/Library/SubEvent
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>Edit to be made</dd>
+</dl>
+</li>
+</ul>
+<a name="isPermanent--">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>isPermanent</h4>
+<pre>public&nbsp;boolean&nbsp;isPermanent()</pre>
+<div class="block">Gets if the edit is permanent</div>
+<dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>Permanent Status</dd>
 </dl>
 </li>
 </ul>
@@ -343,7 +367,7 @@ implements <a href="../../../../../net/ME1312/SubServers/Bungee/Library/SubEvent
 <div class="subNav">
 <ul class="navList">
 <li><a href="../../../../../net/ME1312/SubServers/Bungee/Event/SubCreateEvent.html" title="class in net.ME1312.SubServers.Bungee.Event"><span class="typeNameLink">Prev&nbsp;Class</span></a></li>
-<li><a href="../../../../../net/ME1312/SubServers/Bungee/Event/SubRemoveServerEvent.html" title="class in net.ME1312.SubServers.Bungee.Event"><span class="typeNameLink">Next&nbsp;Class</span></a></li>
+<li><a href="../../../../../net/ME1312/SubServers/Bungee/Event/SubRemoveHostEvent.html" title="class in net.ME1312.SubServers.Bungee.Event"><span class="typeNameLink">Next&nbsp;Class</span></a></li>
 </ul>
 <ul class="navList">
 <li><a href="../../../../../index.html?net/ME1312/SubServers/Bungee/Event/SubEditServerEvent.html" target="_top">Frames</a></li>

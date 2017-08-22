@@ -1,12 +1,15 @@
 package net.ME1312.SubServers.Bungee.Host;
 
+import net.ME1312.SubServers.Bungee.Event.SubEditServerEvent;
 import net.ME1312.SubServers.Bungee.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Bungee.Library.Config.YAMLValue;
 import net.ME1312.SubServers.Bungee.Library.Exception.InvalidServerException;
 import net.ME1312.SubServers.Bungee.Library.ExtraDataHandler;
+import net.ME1312.SubServers.Bungee.Library.NamedContainer;
 import net.ME1312.SubServers.Bungee.Library.Util;
 import net.ME1312.SubServers.Bungee.Network.Client;
 import net.ME1312.SubServers.Bungee.Network.ClientHandler;
+import net.ME1312.SubServers.Bungee.Network.SubDataServer;
 import net.md_5.bungee.BungeeServerInfo;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -29,6 +32,7 @@ public class Server extends BungeeServerInfo implements ClientHandler, ExtraData
         super(name, address, ChatColor.translateAlternateColorCodes('&', motd), restricted);
         if (Util.isNull(name, address, motd, hidden, restricted)) throw new NullPointerException();
         if (name.contains(" ")) throw new InvalidServerException("Server names cannot have spaces: " + name);
+        SubDataServer.allowConnection(getAddress().getAddress());
         this.motd = motd;
         this.restricted = restricted;
         this.hidden = hidden;
@@ -61,8 +65,10 @@ public class Server extends BungeeServerInfo implements ClientHandler, ExtraData
      */
     public void setDisplayName(String value) {
         if (value == null || value.length() == 0 || getName().equals(value)) {
+            new SubEditServerEvent(null, this, new NamedContainer<String, Object>("display", getName()), false);
             this.nick = null;
         } else {
+            new SubEditServerEvent(null, this, new NamedContainer<String, Object>("display", value), false);
             this.nick = value;
         }
     }
@@ -83,6 +89,7 @@ public class Server extends BungeeServerInfo implements ClientHandler, ExtraData
      */
     public void setHidden(boolean value) {
         if (Util.isNull(value)) throw new NullPointerException();
+        new SubEditServerEvent(null, this, new NamedContainer<String, Object>("hidden", value), false);
         this.hidden = value;
     }
 
@@ -103,6 +110,7 @@ public class Server extends BungeeServerInfo implements ClientHandler, ExtraData
      */
     public void setMotd(String value) {
         if (Util.isNull(value)) throw new NullPointerException();
+        new SubEditServerEvent(null, this, new NamedContainer<String, Object>("motd", value), false);
         this.motd = value;
     }
 
@@ -123,6 +131,7 @@ public class Server extends BungeeServerInfo implements ClientHandler, ExtraData
      */
     public void setRestricted(boolean value) {
         if (Util.isNull(value)) throw new NullPointerException();
+        new SubEditServerEvent(null, this, new NamedContainer<String, Object>("restricted", value), false);
         this.restricted = value;
     }
 
@@ -161,7 +170,10 @@ public class Server extends BungeeServerInfo implements ClientHandler, ExtraData
         info.put("type", "Server");
         info.put("name", getName());
         info.put("display", getDisplayName());
-        info.put("address", getAddress().toString());
+        info.put("address", getAddress().getAddress().getHostAddress() + ':' + getAddress().getPort());
+        info.put("motd", getMotd());
+        info.put("restricted", isRestricted());
+        info.put("hidden", isHidden());
         JSONObject players = new JSONObject();
         for (ProxiedPlayer player : getPlayers()) {
             JSONObject pinfo = new JSONObject();

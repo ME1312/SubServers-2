@@ -29,6 +29,16 @@ public final class Launch {
      * @throws Exception
      */
     public static void main(String[] args) throws Exception {
+        if (System.getProperty("RM.subservers", "true").equalsIgnoreCase("true")) {
+            launch(args);
+        } else {
+            System.out.println(">> SubServers code has been disallowed to work on this machine");
+            System.out.println(">> Check with your provider for more information");
+            System.exit(1);
+        }
+    }
+
+    private static void launch(String[] args) throws Exception {
         String plugins = "";
         File rtdir = new File(System.getProperty("user.dir"));
         File tmpdir = File.createTempFile("SubServers.Host.", ".jar");

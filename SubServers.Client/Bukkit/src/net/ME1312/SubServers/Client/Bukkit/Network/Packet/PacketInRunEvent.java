@@ -2,6 +2,7 @@ package net.ME1312.SubServers.Client.Bukkit.Network.Packet;
 
 import net.ME1312.SubServers.Client.Bukkit.Event.*;
 import net.ME1312.SubServers.Client.Bukkit.Library.JSONCallback;
+import net.ME1312.SubServers.Client.Bukkit.Library.NamedContainer;
 import net.ME1312.SubServers.Client.Bukkit.Library.Version.Version;
 import net.ME1312.SubServers.Client.Bukkit.Network.PacketIn;
 import net.ME1312.SubServers.Client.Bukkit.SubPlugin;
@@ -23,6 +24,15 @@ public class PacketInRunEvent implements PacketIn {
      * New PacketInRunEvent
      */
     public PacketInRunEvent(SubPlugin plugin) {
+        callback("SubAddHostEvent", new JSONCallback() {
+            @Override
+            public void run(JSONObject json) {
+                if (plugin.isEnabled()) {
+                    Bukkit.getPluginManager().callEvent(new SubAddHostEvent((json.keySet().contains("player")) ? UUID.fromString(json.getString("player")) : null, json.getString("host")));
+                    callback("SubAddHostEvent", this);
+                }
+            }
+        });
         callback("SubAddServerEvent", new JSONCallback() {
             @Override
             public void run(JSONObject json) {
@@ -48,6 +58,15 @@ public class PacketInRunEvent implements PacketIn {
                 if (plugin.isEnabled()) {
                     Bukkit.getPluginManager().callEvent(new SubSendCommandEvent((json.keySet().contains("player")) ? UUID.fromString(json.getString("player")) : null, json.getString("server"), json.getString("command")));
                     callback("SubSendCommandEvent", this);
+                }
+            }
+        });
+        callback("SubEditServerEvent", new JSONCallback() {
+            @Override
+            public void run(JSONObject json) {
+                if (plugin.isEnabled()) {
+                    Bukkit.getPluginManager().callEvent(new SubEditServerEvent((json.keySet().contains("player")) ? UUID.fromString(json.getString("player")) : null, json.getString("server"), new NamedContainer<String, Object>(json.getString("edit"), json.get("value")), json.getBoolean("perm")));
+                    callback("SubEditServerEvent", this);
                 }
             }
         });
@@ -84,6 +103,15 @@ public class PacketInRunEvent implements PacketIn {
                 if (plugin.isEnabled()) {
                     Bukkit.getPluginManager().callEvent(new SubRemoveServerEvent((json.keySet().contains("player")) ? UUID.fromString(json.getString("player")) : null, json.getString("host"), json.getString("server")));
                     callback("SubRemoveServerEvent", this);
+                }
+            }
+        });
+        callback("SubRemoveHostEvent", new JSONCallback() {
+            @Override
+            public void run(JSONObject json) {
+                if (plugin.isEnabled()) {
+                    Bukkit.getPluginManager().callEvent(new SubRemoveHostEvent((json.keySet().contains("player")) ? UUID.fromString(json.getString("player")) : null, json.getString("host")));
+                    callback("SubRemoveHostEvent", this);
                 }
             }
         });

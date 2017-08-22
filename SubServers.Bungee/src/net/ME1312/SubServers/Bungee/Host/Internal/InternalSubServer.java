@@ -1,14 +1,11 @@
 package net.ME1312.SubServers.Bungee.Host.Internal;
 
 import net.ME1312.SubServers.Bungee.Event.*;
-import net.ME1312.SubServers.Bungee.Host.Executable;
-import net.ME1312.SubServers.Bungee.Host.SubLogger;
+import net.ME1312.SubServers.Bungee.Host.*;
 import net.ME1312.SubServers.Bungee.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Bungee.Library.Config.YAMLValue;
 import net.ME1312.SubServers.Bungee.Library.Container;
 import net.ME1312.SubServers.Bungee.Library.Exception.InvalidServerException;
-import net.ME1312.SubServers.Bungee.Host.Host;
-import net.ME1312.SubServers.Bungee.Host.SubServer;
 import net.ME1312.SubServers.Bungee.Library.NamedContainer;
 import net.ME1312.SubServers.Bungee.Library.UniversalFile;
 import net.ME1312.SubServers.Bungee.Library.Util;
@@ -17,6 +14,7 @@ import net.ME1312.SubServers.Bungee.SubPlugin;
 import org.json.JSONObject;
 
 import java.io.*;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -225,7 +223,7 @@ public class InternalSubServer extends SubServer {
         for (String key : edit.getKeys()) {
             pending.remove(key);
             YAMLValue value = edit.get(key);
-            SubEditServerEvent event = new SubEditServerEvent(player, this, new NamedContainer<String, YAMLValue>(key, value));
+            SubEditServerEvent event = new SubEditServerEvent(player, this, new NamedContainer<String, YAMLValue>(key, value), true);
             host.plugin.getPluginManager().callEvent(event);
             if (!event.isCancelled()) {
                 try {
@@ -249,7 +247,15 @@ public class InternalSubServer extends SubServer {
                             break;
                         case "display":
                             if (value.isString()) {
-                                setDisplayName(value.asString());
+                                Field f = Server.class.getDeclaredField("nick");
+                                f.setAccessible(true);
+                                if (value == null || value.asString().length() == 0 || getName().equals(value)) {
+                                    f.set(this, null);
+                                } else {
+                                    f.set(this, value.asString());
+                                }
+                                f.setAccessible(false);
+                                logger.name = value.asString();
                                 if (this.host.plugin.config.get().getSection("Servers").getKeys().contains(getName())) {
                                     if (getName().equals(getDisplayName())) {
                                         this.host.plugin.config.get().getSection("Servers").getSection(getName()).remove("Display-Name");
@@ -263,7 +269,7 @@ public class InternalSubServer extends SubServer {
                             break;
                         case "enabled":
                             if (value.isBoolean()) {
-                                setEnabled(value.asBoolean());
+                                enabled = value.asBoolean();
                                 if (this.host.plugin.config.get().getSection("Servers").getKeys().contains(getName())) {
                                     this.host.plugin.config.get().getSection("Servers").getSection(getName()).set("Enabled", isEnabled());
                                     this.host.plugin.config.save();
@@ -303,7 +309,10 @@ public class InternalSubServer extends SubServer {
                             break;
                         case "motd":
                             if (value.isString()) {
-                                setMotd(value.asColoredString('&'));
+                                Field f = Server.class.getDeclaredField("motd");
+                                f.setAccessible(true);
+                                f.set(this, value.asColoredString('&'));
+                                f.setAccessible(false);
                                 if (this.host.plugin.config.get().getSection("Servers").getKeys().contains(getName())) {
                                     this.host.plugin.config.get().getSection("Servers").getSection(getName()).set("Motd", value.asString());
                                     this.host.plugin.config.save();
@@ -313,7 +322,7 @@ public class InternalSubServer extends SubServer {
                             break;
                         case "log":
                             if (value.isBoolean()) {
-                                setLogging(value.asBoolean());
+                                log.set(value.asBoolean());
                                 if (this.host.plugin.config.get().getSection("Servers").getKeys().contains(getName())) {
                                     this.host.plugin.config.get().getSection("Servers").getSection(getName()).set("Log", isLogging());
                                     this.host.plugin.config.save();
@@ -352,7 +361,7 @@ public class InternalSubServer extends SubServer {
                             break;
                         case "stop-cmd":
                             if (value.isString()) {
-                                setStopCommand(value.asRawString());
+                                stopcmd = value.asRawString();
                                 if (this.host.plugin.config.get().getSection("Servers").getKeys().contains(getName())) {
                                     this.host.plugin.config.get().getSection("Servers").getSection(getName()).set("Stop-Command", getStopCommand());
                                     this.host.plugin.config.save();
@@ -376,7 +385,7 @@ public class InternalSubServer extends SubServer {
                             break;
                         case "auto-restart":
                             if (value.isBoolean()) {
-                                setAutoRestart(value.asBoolean());
+                                restart = value.asBoolean();
                                 if (this.host.plugin.config.get().getSection("Servers").getKeys().contains(getName())) {
                                     this.host.plugin.config.get().getSection("Servers").getSection(getName()).set("Auto-Restart", willAutoRestart());
                                     this.host.plugin.config.save();
@@ -386,7 +395,10 @@ public class InternalSubServer extends SubServer {
                             break;
                         case "restricted":
                             if (value.isBoolean()) {
-                                setRestricted(value.asBoolean());
+                                Field f = Server.class.getDeclaredField("restricted");
+                                f.setAccessible(true);
+                                f.set(this, value.asBoolean());
+                                f.setAccessible(false);
                                 if (this.host.plugin.config.get().getSection("Servers").getKeys().contains(getName())) {
                                     this.host.plugin.config.get().getSection("Servers").getSection(getName()).set("Restricted", isRestricted());
                                     this.host.plugin.config.save();
@@ -396,7 +408,10 @@ public class InternalSubServer extends SubServer {
                             break;
                         case "hidden":
                             if (value.isBoolean()) {
-                                setHidden(value.asBoolean());
+                                Field f = Server.class.getDeclaredField("hidden");
+                                f.setAccessible(true);
+                                f.set(this, value.asBoolean());
+                                f.setAccessible(false);
                                 if (this.host.plugin.config.get().getSection("Servers").getKeys().contains(getName())) {
                                     this.host.plugin.config.get().getSection("Servers").getSection(getName()).set("Hidden", isHidden());
                                     this.host.plugin.config.save();
@@ -450,6 +465,7 @@ public class InternalSubServer extends SubServer {
     @Override
     public void setEnabled(boolean value) {
         if (Util.isNull(value)) throw new NullPointerException();
+        new SubEditServerEvent(null, this, new NamedContainer<String, Object>("enabled", value), false);
         enabled = value;
     }
 
@@ -461,6 +477,7 @@ public class InternalSubServer extends SubServer {
     @Override
     public void setLogging(boolean value) {
         if (Util.isNull(value)) throw new NullPointerException();
+        new SubEditServerEvent(null, this, new NamedContainer<String, Object>("log", value), false);
         log.set(value);
     }
 
@@ -492,6 +509,7 @@ public class InternalSubServer extends SubServer {
     @Override
     public void setStopCommand(String value) {
         if (Util.isNull(value)) throw new NullPointerException();
+        new SubEditServerEvent(null, this, new NamedContainer<String, Object>("stop-cmd", value), false);
         stopcmd = value;
     }
 
@@ -503,6 +521,7 @@ public class InternalSubServer extends SubServer {
     @Override
     public void setAutoRestart(boolean value) {
         if (Util.isNull(value)) throw new NullPointerException();
+        new SubEditServerEvent(null, this, new NamedContainer<String, Object>("auto-restart", value), false);
         restart = value;
     }
 
@@ -514,6 +533,7 @@ public class InternalSubServer extends SubServer {
     @Override
     public void setTemporary(boolean value) {
         if (Util.isNull(value)) throw new NullPointerException();
+        new SubEditServerEvent(null, this, new NamedContainer<String, Object>("temp", value), false);
         temporary = !(value && !isRunning() && !start()) && value;
     }
 }

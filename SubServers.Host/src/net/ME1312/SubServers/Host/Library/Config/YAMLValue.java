@@ -1,5 +1,6 @@
 package net.ME1312.SubServers.Host.Library.Config;
 
+import net.ME1312.SubServers.Host.Library.TextColor;
 import net.ME1312.SubServers.Host.Library.Util;
 import org.yaml.snakeyaml.Yaml;
 
@@ -200,6 +201,32 @@ public class YAMLValue {
         List<String> values = new ArrayList<String>();
         for (String value : (List<String>) obj) {
             values.add(Util.unescapeJavaString(value));
+        }
+        return values;
+    }
+
+    /**
+     * Get Object as Colored String
+     *
+     * @param color Color Char to parse
+     * @return Colored String
+     */
+    public String asColoredString(char color) {
+        if (Util.isNull(color)) throw new NullPointerException();
+        return TextColor.parseColor(color, Util.unescapeJavaString((String) obj));
+    }
+
+    /**
+     * Get Object as Colored String List
+     *
+     * @param color Color Char to parse
+     * @return Colored String List
+     */
+    public List<String> asColoredStringList(char color) {
+        if (Util.isNull(color)) throw new NullPointerException();
+        List<String> values = new ArrayList<String>();
+        for (String value : (List<String>) obj) {
+            values.add(TextColor.parseColor(color, Util.unescapeJavaString(value)));
         }
         return values;
     }

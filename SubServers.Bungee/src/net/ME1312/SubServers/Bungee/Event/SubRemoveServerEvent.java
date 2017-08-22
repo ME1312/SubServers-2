@@ -22,6 +22,7 @@ public class SubRemoveServerEvent extends Event implements SubEvent, Cancellable
      * Server Remove Event
      *
      * @param player Player Adding Server
+     * @param host Host of SubServer (or null for normal Server)
      * @param server Server Starting
      */
     public SubRemoveServerEvent(UUID player, Host host, Server server) {

@@ -117,7 +117,7 @@ public final class SubCommand extends Command implements TabExecutor {
                         } else {
                             message += ChatColor.RED;
                         }
-                        message += host.getDisplayName() + " (" + host.getAddress().toString() + ((host.getName().equals(host.getDisplayName()))?"":ChatColor.stripColor(div)+host.getName()) + ")" + ChatColor.RESET + ": ";
+                        message += host.getDisplayName() + " (" + host.getAddress().getHostAddress() + ((host.getName().equals(host.getDisplayName()))?"":ChatColor.stripColor(div)+host.getName()) + ")" + ChatColor.RESET + ": ";
                         for (SubServer subserver : host.getSubServers().values()) {
                             if (i != 0) message += div;
                             if (subserver.isTemporary()) {
@@ -129,7 +129,7 @@ public final class SubCommand extends Command implements TabExecutor {
                             } else {
                                 message += ChatColor.RED;
                             }
-                            message += subserver.getDisplayName() + " (" + subserver.getAddress().toString().split(":")[subserver.getAddress().toString().split(":").length - 1] + ((subserver.getName().equals(subserver.getDisplayName()))?"":ChatColor.stripColor(div)+subserver.getName()) + ")";
+                            message += subserver.getDisplayName() + " (" + subserver.getAddress().getPort() + ((subserver.getName().equals(subserver.getDisplayName()))?"":ChatColor.stripColor(div)+subserver.getName()) + ")";
                             i++;
                         }
                         sender.sendMessage(message);
@@ -140,7 +140,7 @@ public final class SubCommand extends Command implements TabExecutor {
                     for (Server server : plugin.api.getServers().values()) {
                         if (!(server instanceof SubServer)) {
                             if (i != 0) message += div;
-                            message += ChatColor.WHITE + server.getDisplayName() + " (" + server.getAddress().toString() + ((server.getName().equals(server.getDisplayName()))?"":ChatColor.stripColor(div)+server.getName()) + ")";
+                            message += ChatColor.WHITE + server.getDisplayName() + " (" + server.getAddress().getAddress().getHostAddress() + ':' + server.getAddress().getPort() + ((server.getName().equals(server.getDisplayName()))?"":ChatColor.stripColor(div)+server.getName()) + ")";
                             i++;
                         }
                     }
@@ -161,7 +161,7 @@ public final class SubCommand extends Command implements TabExecutor {
                             if (server.isTemporary()) sender.sendMessage("  - Temporary: yes");
                             sender.sendMessage("  - Running: " + ((server.isRunning())?"yes":"no"));
                             sender.sendMessage("  - Logging: " + ((server.isLogging())?"yes":"no"));
-                            sender.sendMessage("  - Address: " + server.getAddress().toString());
+                            sender.sendMessage("  - Address: " + server.getAddress().getAddress().getHostAddress() + ':' + server.getAddress().getPort());
                             sender.sendMessage("  - Auto Restart: " + ((server.willAutoRestart())?"yes":"no"));
                             sender.sendMessage("  - Hidden: " + ((server.isHidden())?"yes":"no"));
                             if (server.getIncompatibilities().size() > 0) {

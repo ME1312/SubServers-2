@@ -97,11 +97,9 @@ public class ExternalSubCreator extends SubCreator {
                             if (!server.contains("Restricted")) server.set("Restricted", false);
 
                             SubServer subserver = host.addSubServer(player, name, server.getBoolean("Enabled"), port, server.getColoredString("Motd", '&'), server.getBoolean("Log"), server.getRawString("Directory"),
-                                    new Executable(server.getRawString("Executable")), server.getRawString("Stop-Command"), false, server.getBoolean("Auto-Restart"), server.getBoolean("Hidden"), server.getBoolean("Restricted"), false);
+                                    new Executable(server.getRawString("Executable")), server.getRawString("Stop-Command"), true, server.getBoolean("Auto-Restart"), server.getBoolean("Hidden"), server.getBoolean("Restricted"), false);
                             host.plugin.config.get().getSection("Servers").set(name, server);
                             host.plugin.config.save();
-
-                            subserver.start(player);
                         } else {
                             System.out.println(name + "/Creator > " + json.getString("m"));
                         }

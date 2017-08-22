@@ -22,6 +22,7 @@ public class SubAddServerEvent extends Event implements SubEvent, Cancellable {
      * Server Add Event
      *
      * @param player Player Adding Server
+     * @param host Host of SubServer (or null for normal Server)
      * @param server Server Starting
      */
     public SubAddServerEvent(UUID player, Host host, Server server) {

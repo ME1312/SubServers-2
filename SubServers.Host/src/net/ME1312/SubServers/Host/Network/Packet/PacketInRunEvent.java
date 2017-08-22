@@ -3,6 +3,7 @@ package net.ME1312.SubServers.Host.Network.Packet;
 import net.ME1312.SubServers.Host.API.Event.*;
 import net.ME1312.SubServers.Host.Executable.SubCreator;
 import net.ME1312.SubServers.Host.Library.JSONCallback;
+import net.ME1312.SubServers.Host.Library.NamedContainer;
 import net.ME1312.SubServers.Host.Library.Version.Version;
 import net.ME1312.SubServers.Host.Network.PacketIn;
 import net.ME1312.SubServers.Host.SubAPI;
@@ -23,6 +24,13 @@ public class PacketInRunEvent implements PacketIn {
      * New PacketInRunEvent
      */
     public PacketInRunEvent() {
+        callback("SubAddHostEvent", new JSONCallback() {
+            @Override
+            public void run(JSONObject json) {
+                SubAPI.getInstance().executeEvent(new SubAddHostEvent((json.keySet().contains("player"))?UUID.fromString(json.getString("player")):null, json.getString("host")));
+                callback("SubAddHostEvent", this);
+            }
+        });
         callback("SubAddServerEvent", new JSONCallback() {
             @Override
             public void run(JSONObject json) {
@@ -43,6 +51,13 @@ public class PacketInRunEvent implements PacketIn {
             public void run(JSONObject json) {
                 SubAPI.getInstance().executeEvent(new SubSendCommandEvent((json.keySet().contains("player"))?UUID.fromString(json.getString("player")):null, json.getString("server"), json.getString("command")));
                 callback("SubSendCommandEvent", this);
+            }
+        });
+        callback("SubEditServerEvent", new JSONCallback() {
+            @Override
+            public void run(JSONObject json) {
+                SubAPI.getInstance().executeEvent(new SubEditServerEvent((json.keySet().contains("player")) ? UUID.fromString(json.getString("player")):null, json.getString("server"), new NamedContainer<String, Object>(json.getString("edit"), json.get("value")), json.getBoolean("perm")));
+                callback("SubEditServerEvent", this);
             }
         });
         callback("SubStartEvent", new JSONCallback() {
@@ -71,6 +86,13 @@ public class PacketInRunEvent implements PacketIn {
             public void run(JSONObject json) {
                 SubAPI.getInstance().executeEvent(new SubRemoveServerEvent((json.keySet().contains("player"))?UUID.fromString(json.getString("player")):null, json.getString("host"), json.getString("server")));
                 callback("SubRemoveServerEvent", this);
+            }
+        });
+        callback("SubRemoveHostEvent", new JSONCallback() {
+            @Override
+            public void run(JSONObject json) {
+                SubAPI.getInstance().executeEvent(new SubRemoveHostEvent((json.keySet().contains("player"))?UUID.fromString(json.getString("player")):null, json.getString("host")));
+                callback("SubRemoveHostEvent", this);
             }
         });
     }

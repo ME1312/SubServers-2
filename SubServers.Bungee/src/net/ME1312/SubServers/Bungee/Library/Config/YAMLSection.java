@@ -172,7 +172,7 @@ public class YAMLSection {
      * @param value Value
      */
     public void set(String handle, Object value) {
-        if (Util.isNull(handle)) throw new NullPointerException();
+        if (Util.isNull(handle, value)) throw new NullPointerException();
         if (value instanceof Collection) {
             set(handle, (Collection<?>) value);
         } else {
@@ -182,6 +182,17 @@ public class YAMLSection {
                 this.up.set(this.handle, this);
             }
         }
+    }
+
+    /**
+     * Set Object into this YAML Section without overwriting existing value
+     *
+     * @param handle Handle
+     * @param value Value
+     */
+    public void safeSet(String handle, Object value) {
+        if (Util.isNull(handle)) throw new NullPointerException();
+        if (!contains(handle)) set(handle, value);
     }
 
     /**
@@ -202,6 +213,18 @@ public class YAMLSection {
         if (this.handle != null && this.up != null) {
             this.up.set(this.handle, this);
         }
+    }
+
+    /**
+     * Set Collection&lt;V&gt; into this YAML Section without overwriting existing value
+     *
+     * @param handle Handle
+     * @param list Value
+     * @param <V> Collection Type
+     */
+    public <V> void safeSet(String handle, Collection<V> list) {
+        if (Util.isNull(handle)) throw new NullPointerException();
+        if (!contains(handle)) set(handle, list);
     }
 
     /**

@@ -8,6 +8,7 @@ import net.ME1312.SubServers.Bungee.Library.ExtraDataHandler;
 import net.ME1312.SubServers.Bungee.Library.NamedContainer;
 import net.ME1312.SubServers.Bungee.Library.Util;
 import net.ME1312.SubServers.Bungee.Network.ClientHandler;
+import net.ME1312.SubServers.Bungee.Network.SubDataServer;
 import net.ME1312.SubServers.Bungee.SubPlugin;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import org.json.JSONObject;
@@ -36,6 +37,7 @@ public abstract class Host implements ExtraDataHandler {
     public Host(SubPlugin plugin, String name, Boolean enabled, InetAddress address, String directory, String gitBash) {
         if (name.contains(" ")) throw new InvalidHostException("Host names cannot have spaces: " + name);
         if (name.equals("~")) nick = "Default";
+        SubDataServer.allowConnection(address);
     }
 
     /**
@@ -393,7 +395,7 @@ public abstract class Host implements ExtraDataHandler {
         hinfo.put("name", getName());
         hinfo.put("enabled", isEnabled());
         hinfo.put("display", getDisplayName());
-        hinfo.put("address", getAddress().toString());
+        hinfo.put("address", getAddress().getHostAddress());
         JSONObject servers = new JSONObject();
         for (SubServer server : getSubServers().values()) {
             servers.put(server.getName(), new JSONObject(server.toString()));

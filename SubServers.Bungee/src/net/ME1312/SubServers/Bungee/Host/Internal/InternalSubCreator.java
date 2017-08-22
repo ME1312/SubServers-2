@@ -213,11 +213,9 @@ public class InternalSubCreator extends SubCreator {
                 if (!server.contains("Restricted")) server.set("Restricted", false);
 
                 SubServer subserver = host.addSubServer(player, name, server.getBoolean("Enabled"), port, server.getColoredString("Motd", '&'), server.getBoolean("Log"), server.getRawString("Directory"),
-                        new Executable(server.getRawString("Executable")), server.getRawString("Stop-Command"), false, server.getBoolean("Auto-Restart"), server.getBoolean("Hidden"), server.getBoolean("Restricted"), false);
+                        new Executable(server.getRawString("Executable")), server.getRawString("Stop-Command"), true, server.getBoolean("Auto-Restart"), server.getBoolean("Hidden"), server.getBoolean("Restricted"), false);
                 host.plugin.config.get().getSection("Servers").set(name, server);
                 host.plugin.config.save();
-
-                subserver.start(player);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -342,7 +340,7 @@ public class InternalSubCreator extends SubCreator {
     private void generateProperties(File dir, int port) throws IOException {
         File file = new File(dir, "server.properties");
         if (!file.exists()) file.createNewFile();
-        String content = Util.readAll(new BufferedReader(new InputStreamReader(new FileInputStream(file)))).replace("server-port=", "server-port=" + port).replace("server-ip=", "server-ip=" + host.getAddress().toString().substring(1));
+        String content = Util.readAll(new BufferedReader(new InputStreamReader(new FileInputStream(file)))).replace("server-port=", "server-port=" + port).replace("server-ip=", "server-ip=" + host.getAddress().getHostAddress().substring(1));
         file.delete();
         PrintWriter writer = new PrintWriter(file, "UTF-8");
         writer.write(content);
