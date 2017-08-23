@@ -55,6 +55,7 @@ crashlytics-build.properties
 /Artifacts/-Maven/
 /Artifacts/-History/
 /Artifacts/-Icon/
+/Artifacts/SubServers.Patched.jar
 /Artifacts/SubServers.Test.jar
 /SubServers.Test/
 /build.ant
