@@ -10,6 +10,7 @@ import net.ME1312.SubServers.Bungee.Library.NamedContainer;
 import net.ME1312.SubServers.Bungee.Library.UniversalFile;
 import net.ME1312.SubServers.Bungee.Library.Util;
 import net.ME1312.SubServers.Bungee.Library.Version.Version;
+import net.ME1312.SubServers.Bungee.SubAPI;
 import net.ME1312.SubServers.Bungee.SubPlugin;
 import org.json.JSONObject;
 
@@ -215,6 +216,7 @@ public class InternalSubServer extends SubServer {
         } else return false;
     }
 
+    @SuppressWarnings("deprecation")
     public int edit(UUID player, YAMLSection edit) {
         int c = 0;
         boolean state = isRunning();
@@ -233,6 +235,10 @@ public class InternalSubServer extends SubServer {
                                 SubServer server = host.addSubServer(player, value.asRawString(), isEnabled(), getAddress().getPort(), getMotd(), isLogging(), getPath(), getExecutable(), getStopCommand(), false, willAutoRestart(), isHidden(), isRestricted(), isTemporary());
                                 if (server != null) {
                                     if (!getName().equals(getDisplayName())) server.setDisplayName(getDisplayName());
+                                    for (String group : getGroups()) {
+                                        removeGroup(group);
+                                        server.addGroup(group);
+                                    }
                                     for (String extra : getExtra().getKeys()) server.addExtra(extra, getExtra(extra));
                                     if (this.host.plugin.config.get().getSection("Servers").getKeys().contains(getName())) {
                                         YAMLSection config = this.host.plugin.config.get().getSection("Servers").getSection(getName());
@@ -277,11 +283,26 @@ public class InternalSubServer extends SubServer {
                                 c++;
                             }
                             break;
+                        case "group":
+                            if (value.isList()) {
+                                for (String group : getGroups()) removeGroup(group);
+                                for (String group : value.asStringList()) addGroup(group);
+                                if (this.host.plugin.config.get().getSection("Servers").getKeys().contains(getName())) {
+                                    this.host.plugin.config.get().getSection("Servers").getSection(getName()).set("Group", value.asStringList());
+                                    this.host.plugin.config.save();
+                                }
+                                c++;
+                            }
+                            break;
                         case "host":
                             if (value.isString() && host.removeSubServer(player, getName())) {
                                 SubServer server = this.host.plugin.api.getHost(value.asRawString()).addSubServer(player, getName(), isEnabled(), getAddress().getPort(), getMotd(), isLogging(), getPath(), getExecutable(), getStopCommand(), false, willAutoRestart(), isHidden(), isRestricted(), isTemporary());
                                 if (server != null) {
                                     if (!getName().equals(getDisplayName())) server.setDisplayName(getDisplayName());
+                                    for (String group : getGroups()) {
+                                        removeGroup(group);
+                                        server.addGroup(group);
+                                    }
                                     for (String extra : getExtra().getKeys()) server.addExtra(extra, getExtra(extra));
                                     if (this.host.plugin.config.get().getSection("Servers").getKeys().contains(getName())) {
                                         this.host.plugin.config.get().getSection("Servers").getSection(getName()).set("Host", server.getHost().getName());
@@ -297,6 +318,10 @@ public class InternalSubServer extends SubServer {
                                 SubServer server = host.addSubServer(player, getName(), isEnabled(), value.asInt(), getMotd(), isLogging(), getPath(), getExecutable(), getStopCommand(), false, willAutoRestart(), isHidden(), isRestricted(), isTemporary());
                                 if (server != null) {
                                     if (!getName().equals(getDisplayName())) server.setDisplayName(getDisplayName());
+                                    for (String group : getGroups()) {
+                                        removeGroup(group);
+                                        server.addGroup(group);
+                                    }
                                     for (String extra : getExtra().getKeys()) server.addExtra(extra, getExtra(extra));
                                     if (this.host.plugin.config.get().getSection("Servers").getKeys().contains(getName())) {
                                         this.host.plugin.config.get().getSection("Servers").getSection(getName()).set("Port", server.getAddress().getPort());

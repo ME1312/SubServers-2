@@ -11,7 +11,11 @@ import net.ME1312.SubServers.Bungee.Network.PacketIn;
 import net.ME1312.SubServers.Bungee.Network.PacketOut;
 import net.ME1312.SubServers.Bungee.SubPlugin;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
+import org.json.JSONArray;
 import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Download Server List Packet
@@ -19,6 +23,7 @@ import org.json.JSONObject;
 public class PacketDownloadServerList implements PacketIn, PacketOut {
     private SubPlugin plugin;
     private String host;
+    private String group;
     private String id;
 
     /**
@@ -36,12 +41,14 @@ public class PacketDownloadServerList implements PacketIn, PacketOut {
      *
      * @param plugin SubPlugin
      * @param host Host (or null for all)
+     * @param group Group (or null for all)
      * @param id Receiver ID
      */
-    public PacketDownloadServerList(SubPlugin plugin, String host, String id) {
+    public PacketDownloadServerList(SubPlugin plugin, String host, String group, String id) {
         if (Util.isNull(plugin)) throw new NullPointerException();
         this.plugin = plugin;
         this.host = host;
+        this.group = group;
         this.id = id;
     }
 
@@ -49,13 +56,12 @@ public class PacketDownloadServerList implements PacketIn, PacketOut {
     public JSONObject generate() {
         JSONObject json = new JSONObject();
         json.put("id", id);
-        if (host == null || host.equals("")) {
-            JSONObject exServers = new JSONObject();
-            for (Server server : plugin.exServers.values()) {
-                exServers.put(server.getName(), new JSONObject(server.toString()));
-            }
-            json.put("servers", exServers);
+
+        JSONObject exServers = new JSONObject();
+        for (Server server : plugin.exServers.values()) {
+            exServers.put(server.getName(), new JSONObject(server.toString()));
         }
+        json.put("servers", exServers);
 
         if (this.host == null || !this.host.equals("")) {
             JSONObject hosts = new JSONObject();
@@ -67,12 +73,25 @@ public class PacketDownloadServerList implements PacketIn, PacketOut {
             json.put("hosts", hosts);
         }
 
+        if (this.group == null || !this.group.equals("")) {
+            JSONObject groups = new JSONObject();
+            for (String group : plugin.api.getGroups().keySet()) {
+                if (this.group == null || this.group.equalsIgnoreCase(group)) {
+                    JSONObject servers = new JSONObject();
+                    for (Server server : plugin.api.getGroup(group)) {
+                        servers.put(server.getName(), new JSONObject(server.toString()));
+                    }
+                    groups.put(group, servers);
+                }
+            }
+            json.put("groups", groups);
+        }
         return json;
     }
 
     @Override
     public void execute(Client client, JSONObject data) {
-        client.sendPacket(new PacketDownloadServerList(plugin, (data.keySet().contains("host"))?data.getString("host"):null, (data.keySet().contains("id"))?data.getString("id"):null));
+        client.sendPacket(new PacketDownloadServerList(plugin, (data.keySet().contains("host"))?data.getString("host"):null, (data.keySet().contains("group"))?data.getString("group"):null, (data.keySet().contains("id"))?data.getString("id"):null));
     }
 
     @Override

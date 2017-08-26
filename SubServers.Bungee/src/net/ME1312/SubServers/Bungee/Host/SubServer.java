@@ -391,6 +391,7 @@ public abstract class SubServer extends Server {
         JSONObject sinfo = new JSONObject(super.toString());
         sinfo.put("type", "SubServer");
         sinfo.put("enabled", getHost().isEnabled() && isEnabled());
+        sinfo.put("host", getHost().getName());
         sinfo.put("running", isRunning());
         sinfo.put("log", isLogging());
         List<String> incompatible = new ArrayList<String>();

@@ -172,8 +172,10 @@ public class YAMLSection {
      * @param value Value
      */
     public void set(String handle, Object value) {
-        if (Util.isNull(handle, value)) throw new NullPointerException();
-        if (value instanceof Collection) {
+        if (Util.isNull(handle)) throw new NullPointerException();
+        if (value == null) {
+            remove(handle);
+        } else if (value instanceof Collection) {
             set(handle, (Collection<?>) value);
         } else {
             map.put(handle, convert(value));

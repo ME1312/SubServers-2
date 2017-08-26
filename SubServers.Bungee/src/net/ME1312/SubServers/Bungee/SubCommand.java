@@ -107,9 +107,37 @@ public final class SubCommand extends Command implements TabExecutor {
                         plugin.getPluginManager().dispatchCommand(ConsoleCommandSender.getInstance(), "greload");
                     }
                 } else if (args[0].equalsIgnoreCase("list")) {
-                    sender.sendMessage("SubServers > Host/SubServer List:");
                     String div = ChatColor.RESET + ", ";
                     int i = 0;
+                    sender.sendMessage("SubServers > Group/Server List:");
+                    for (String group : plugin.api.getGroups().keySet()) {
+                        String message = "";
+                        message += ChatColor.GOLD + group + ChatColor.RESET + ": ";
+                        List<String> names = new ArrayList<String>();
+                        Map<String, Server> servers = plugin.api.getServers();
+                        for (Server server : plugin.api.getGroup(group)) names.add(server.getName());
+                        Collections.sort(names);
+                        for (String name : names) {
+                            if (i != 0) message += div;
+                            Server server = servers.get(name.toLowerCase());
+                            if (!(servers.get(name.toLowerCase()) instanceof SubServer)) {
+                                message += ChatColor.WHITE;
+                            } else if (((SubServer) server).isTemporary()) {
+                                message += ChatColor.AQUA;
+                            } else if (((SubServer) server).isRunning()) {
+                                message += ChatColor.GREEN;
+                            } else if (((SubServer) server).isEnabled() && ((SubServer) server).getCurrentIncompatibilities().size() == 0) {
+                                message += ChatColor.YELLOW;
+                            } else {
+                                message += ChatColor.RED;
+                            }
+                            message += server.getDisplayName() + " (" + server.getAddress().getAddress().getHostAddress() + ':' + server.getAddress().getPort() + ((server.getName().equals(server.getDisplayName()))?"":ChatColor.stripColor(div)+server.getName()) + ")";
+                            i++;
+                        }
+                        sender.sendMessage(message);
+                        i = 0;
+                    }
+                    sender.sendMessage("SubServers > Host/SubServer List:");
                     for (Host host : plugin.api.getHosts().values()) {
                         String message = "";
                         if (host.isEnabled()) {
@@ -158,6 +186,10 @@ public final class SubCommand extends Command implements TabExecutor {
                             if (!server.getName().equals(server.getDisplayName())) sender.sendMessage("  - Real Name: " + server.getName());
                             sender.sendMessage("  - Host: " + server.getHost().getDisplayName() + ((!server.getHost().getName().equals(server.getHost().getDisplayName()))?" ("+server.getHost().getName()+')':""));
                             sender.sendMessage("  - Enabled: " + ((server.isEnabled())?"yes":"no"));
+                            if (server.getGroups().size() > 0) {
+                                sender.sendMessage("  - Groups:");
+                                for (String group : server.getGroups()) sender.sendMessage("    - " + group);
+                            }
                             if (server.isTemporary()) sender.sendMessage("  - Temporary: yes");
                             sender.sendMessage("  - Running: " + ((server.isRunning())?"yes":"no"));
                             sender.sendMessage("  - Logging: " + ((server.isLogging())?"yes":"no"));

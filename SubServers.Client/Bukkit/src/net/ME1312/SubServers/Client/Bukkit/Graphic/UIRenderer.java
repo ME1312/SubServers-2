@@ -265,12 +265,19 @@ public abstract class UIRenderer {
     public abstract void hostPlugin(int page, String host);
 
     /**
+     * Opens the Group Menu
+     *
+     * @param page Page Number (starting from page 1)
+     */
+    public abstract void groupMenu(int page);
+
+    /**
      * Opens the SubServer Menu
      *
      * @param page Page Number (starting from page 1)
      * @param host Host Name (or null to scan all hosts)
      */
-    public abstract void subserverMenu(int page, String host);
+    public abstract void serverMenu(int page, String host, String group);
 
     /**
      * Opens SubServer/&lt;name&gt;

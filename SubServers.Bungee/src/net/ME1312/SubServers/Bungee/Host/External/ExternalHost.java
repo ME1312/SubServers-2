@@ -171,7 +171,10 @@ public class ExternalHost extends Host implements ClientHandler {
                 getSubServer(name).waitFor();
             }
             queue(new PacketExRemoveServer(name, json -> {
-                if (json.getInt("r") == 0) servers.remove(name.toLowerCase());
+                if (json.getInt("r") == 0) {
+                    for (String group : getSubServer(name).getGroups()) getSubServer(name).removeGroup(group);
+                    servers.remove(name.toLowerCase());
+                }
             }));
             return true;
         } else return false;
@@ -186,7 +189,10 @@ public class ExternalHost extends Host implements ClientHandler {
             getSubServer(name).terminate();
         }
         queue(new PacketExRemoveServer(name, json -> {
-            if (json.getInt("r") == 0) servers.remove(name.toLowerCase());
+            if (json.getInt("r") == 0) {
+                for (String group : getSubServer(name).getGroups()) getSubServer(name).removeGroup(group);
+                servers.remove(name.toLowerCase());
+            }
         }));
         return true;
     }
@@ -220,6 +226,7 @@ public class ExternalHost extends Host implements ClientHandler {
             System.out.println("SubServers > Removing Files...");
             queue(new PacketExDeleteServer(server, info, json -> {
                 if (json.getInt("r") == 0) {
+                    for (String group : getSubServer(name).getGroups()) getSubServer(name).removeGroup(group);
                     servers.remove(server.toLowerCase());
                     System.out.println("SubServers > Done!");
                 } else {
@@ -257,6 +264,7 @@ public class ExternalHost extends Host implements ClientHandler {
         System.out.println("SubServers > Removing Files...");
         queue(new PacketExDeleteServer(server, info, json -> {
             if (json.getInt("r") == 0) {
+                for (String group : getSubServer(name).getGroups()) getSubServer(name).removeGroup(group);
                 servers.remove(server.toLowerCase());
                 System.out.println("SubServers > Done!");
             } else {

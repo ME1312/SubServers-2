@@ -33,7 +33,7 @@ public class SubEditServerEvent extends Event implements SubEvent {
         section.set(".", edit.get());
         this.player = player;
         this.server = server;
-        this.edit = new NamedContainer<String, YAMLValue>(edit.name(), section.get("."));
+        this.edit = new NamedContainer<String, YAMLValue>(edit.name(), section.contains(".")?section.get("."):null);
         this.perm = permanent;
     }
 

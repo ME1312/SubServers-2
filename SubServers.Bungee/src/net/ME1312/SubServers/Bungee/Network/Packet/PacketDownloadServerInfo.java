@@ -73,6 +73,7 @@ public class PacketDownloadServerInfo implements PacketIn, PacketOut {
         } if (server != null) {
             info.put("name", server.getName());
             info.put("display", server.getDisplayName());
+            info.put("group", server.getGroups());
             info.put("address", server.getAddress().getAddress().getHostAddress() + ':' + server.getAddress().getPort());
             info.put("restricted", server.isRestricted());
             info.put("hidden", server.isHidden());

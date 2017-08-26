@@ -27,9 +27,10 @@ public class PacketDownloadServerList implements PacketIn, PacketOut {
      * New PacketDownloadServerList (Out)
      *
      * @param host Host name (or null for all)
+     * @param group Group name (or null for all)
      * @param callback Callbacks
      */
-    public PacketDownloadServerList(String host, JSONCallback... callback) {
+    public PacketDownloadServerList(String host, String group, JSONCallback... callback) {
         if (Util.isNull((Object) callback)) throw new NullPointerException();
         this.host = host;
         this.id = Util.getNew(callbacks.keySet(), UUID::randomUUID).toString();

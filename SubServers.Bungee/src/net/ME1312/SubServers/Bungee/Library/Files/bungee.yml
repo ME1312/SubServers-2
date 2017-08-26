@@ -15,9 +15,12 @@ permissions:
 groups: {}
 servers:
   Lobby:
+    display: ''
+    group: []
     motd: '&1Just another BungeeCord - Forced Host'
     address: 127.0.0.1:25566
     restricted: false
+    hidden: false
 timeout: 30000
 listeners:
 - query_port: 25564

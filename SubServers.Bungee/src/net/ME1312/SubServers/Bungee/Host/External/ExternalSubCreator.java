@@ -84,7 +84,9 @@ public class ExternalSubCreator extends SubCreator {
                             }
 
                             if (!server.contains("Enabled")) server.set("Enabled", true);
+                            if (!server.contains("Display")) server.set("Display", "");
                             if (!server.contains("Host")) server.set("Host", host.getName());
+                            if (!server.contains("Group")) server.set("Group", "");
                             if (!server.contains("Port")) server.set("Port", port);
                             if (!server.contains("Motd")) server.set("Motd", "Some SubServer");
                             if (!server.contains("Log")) server.set("Log", true);
@@ -93,10 +95,11 @@ public class ExternalSubCreator extends SubCreator {
                             if (!server.contains("Stop-Command")) server.set("Stop-Command", "stop");
                             if (!server.contains("Run-On-Launch")) server.set("Run-On-Launch", false);
                             if (!server.contains("Auto-Restart")) server.set("Auto-Restart", false);
-                            if (!server.contains("Hidden")) server.set("Hidden", false);
                             if (!server.contains("Restricted")) server.set("Restricted", false);
+                            if (!server.contains("Incompatible")) server.set("Incompatible", new ArrayList<String>());
+                            if (!server.contains("Hidden")) server.set("Hidden", false);
 
-                            SubServer subserver = host.addSubServer(player, name, server.getBoolean("Enabled"), port, server.getColoredString("Motd", '&'), server.getBoolean("Log"), server.getRawString("Directory"),
+                            host.addSubServer(player, name, server.getBoolean("Enabled"), port, server.getColoredString("Motd", '&'), server.getBoolean("Log"), server.getRawString("Directory"),
                                     new Executable(server.getRawString("Executable")), server.getRawString("Stop-Command"), true, server.getBoolean("Auto-Restart"), server.getBoolean("Hidden"), server.getBoolean("Restricted"), false);
                             host.plugin.config.get().getSection("Servers").set(name, server);
                             host.plugin.config.save();

@@ -10,12 +10,17 @@ import net.ME1312.SubServers.Bungee.Library.Util;
 import net.ME1312.SubServers.Bungee.Network.Client;
 import net.ME1312.SubServers.Bungee.Network.ClientHandler;
 import net.ME1312.SubServers.Bungee.Network.SubDataServer;
+import net.ME1312.SubServers.Bungee.SubAPI;
 import net.md_5.bungee.BungeeServerInfo;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import org.json.JSONObject;
 
 import java.net.InetSocketAddress;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * Server Class
@@ -23,6 +28,7 @@ import java.net.InetSocketAddress;
 public class Server extends BungeeServerInfo implements ClientHandler, ExtraDataHandler {
     private YAMLSection extra = new YAMLSection();
     private Client client = null;
+    private List<String> groups = new ArrayList<String>();
     private String nick = null;
     private String motd;
     private boolean restricted;
@@ -125,6 +131,45 @@ public class Server extends BungeeServerInfo implements ClientHandler, ExtraData
     }
 
     /**
+     * Get this Server's Groups
+     *
+     * @return Group names
+     */
+    public List<String> getGroups() {
+       return groups;
+    }
+
+    /**
+     * Add this Server to a Group
+     *
+     * @param value Group name
+     */
+    @SuppressWarnings("deprecation")
+    public void addGroup(String value) {
+        if (Util.isNull(value)) throw new NullPointerException();
+        if (value.length() > 0 && !groups.contains(value)) {
+            List<Server> list = (SubAPI.getInstance().getInternals().groups.keySet().contains(value))?SubAPI.getInstance().getInternals().groups.get(value):new ArrayList<Server>();
+            list.add(this);
+            SubAPI.getInstance().getInternals().groups.put(value, list);
+            groups.add(value);
+        }
+    }
+
+    /**
+     * Remove this Server from a Group
+     *
+     * @param value value Group name
+     */
+    @SuppressWarnings("deprecation")
+    public void removeGroup(String value) {
+        if (Util.isNull(value)) throw new NullPointerException();
+        List<Server> list = SubAPI.getInstance().getInternals().groups.get(value);
+        list.remove(this);
+        SubAPI.getInstance().getInternals().groups.put(value, list);
+        groups.remove(value);
+    }
+
+    /**
      * Sets if the Server is Restricted
      *
      * @param value Value
@@ -169,6 +214,7 @@ public class Server extends BungeeServerInfo implements ClientHandler, ExtraData
         JSONObject info = new JSONObject();
         info.put("type", "Server");
         info.put("name", getName());
+        info.put("group", getGroups());
         info.put("display", getDisplayName());
         info.put("address", getAddress().getAddress().getHostAddress() + ':' + getAddress().getPort());
         info.put("motd", getMotd());

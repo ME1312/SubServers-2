@@ -122,6 +122,7 @@ public class InternalHost extends Host {
                 getSubServer(name).stop();
                 getSubServer(name).waitFor();
             }
+            for (String group : getSubServer(name).getGroups()) getSubServer(name).removeGroup(group);
             servers.remove(name.toLowerCase());
             return true;
         } else return false;
@@ -135,6 +136,7 @@ public class InternalHost extends Host {
         if (getSubServer(name).isRunning()) {
             getSubServer(name).terminate();
         }
+        for (String group : getSubServer(name).getGroups()) getSubServer(name).removeGroup(group);
         servers.remove(name.toLowerCase());
         return true;
     }

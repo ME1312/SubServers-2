@@ -83,10 +83,38 @@ public class SubCommand {
             @Override
             public void command(String handle, String[] args) {
                 host.subdata.sendPacket(new PacketDownloadServerList(null, json -> {
-                    host.log.message.println("Host/SubServer List:");
-                    ExHost h = host;
-                    String div = TextColor.RESET + ", ";
                     int i = 0;
+                    boolean sent = false;
+                    String div = TextColor.RESET + ", ";
+                    host.log.message.println("Group/Server List:");
+                    for (String group : json.getJSONObject("groups").keySet()) {
+                        String message = "";
+                        message += TextColor.GOLD + group + TextColor.RESET + ": ";
+                        for (String server : json.getJSONObject("groups").getJSONObject(group).keySet()) {
+                            if (i != 0) message += div;
+                            if (!json.getJSONObject("groups").getJSONObject(group).getJSONObject(server).keySet().contains("enabled")) {
+                                message += TextColor.WHITE;
+                            } else if (json.getJSONObject("groups").getJSONObject(group).getJSONObject(server).getBoolean("temp")) {
+                                message += TextColor.AQUA;
+                            } else if (json.getJSONObject("groups").getJSONObject(group).getJSONObject(server).getBoolean("running")) {
+                                message += TextColor.GREEN;
+                            } else if (json.getJSONObject("groups").getJSONObject(group).getJSONObject(server).getBoolean("enabled") && json.getJSONObject("groups").getJSONObject(group).getJSONObject(server).getJSONArray("incompatible").length() == 0) {
+                                message += TextColor.YELLOW;
+                            } else {
+                                message += TextColor.RED;
+                            }
+                            message += json.getJSONObject("groups").getJSONObject(group).getJSONObject(server).getString("display") + " (" + json.getJSONObject("groups").getJSONObject(group).getJSONObject(server).getString("address") + ((server.equals(json.getJSONObject("groups").getJSONObject(group).getJSONObject(server).getString("display")))?"":TextColor.stripColor(div)+server) + ")";
+                            i++;
+                        }
+                        if (i == 0) message += TextColor.RESET + "(none)";
+                        host.log.message.println(message);
+                        i = 0;
+                        sent = true;
+                    }
+                    if (!sent) host.log.message.println(TextColor.RESET + "(none)");
+                    sent = false;
+                    ExHost h = host;
+                    host.log.message.println("Host/SubServer List:");
                     for (String host : json.getJSONObject("hosts").keySet()) {
                         String message = "";
                         if (json.getJSONObject("hosts").getJSONObject(host).getBoolean("enabled")) {
@@ -109,9 +137,12 @@ public class SubCommand {
                             message += json.getJSONObject("hosts").getJSONObject(host).getJSONObject("servers").getJSONObject(subserver).getString("display") + " (" + json.getJSONObject("hosts").getJSONObject(host).getJSONObject("servers").getJSONObject(subserver).getString("address").split(":")[json.getJSONObject("hosts").getJSONObject(host).getJSONObject("servers").getJSONObject(subserver).getString("address").split(":").length - 1] + ((subserver.equals(json.getJSONObject("hosts").getJSONObject(host).getJSONObject("servers").getJSONObject(subserver).getString("display")))?"":TextColor.stripColor(div)+subserver) + ")";
                             i++;
                         }
+                        if (i == 0) message += TextColor.RESET + "(none)";
                         h.log.message.println(message);
                         i = 0;
+                        sent = true;
                     }
+                    if (!sent) host.log.message.println(TextColor.RESET + "(none)");
                     host.log.message.println("Server List:");
                     String message = "";
                     for (String server : json.getJSONObject("servers").keySet()) {
@@ -119,6 +150,7 @@ public class SubCommand {
                         message += TextColor.WHITE + json.getJSONObject("servers").getJSONObject(server).getString("display") + " (" + json.getJSONObject("servers").getJSONObject(server).getString("address") + ((server.equals(json.getJSONObject("servers").getJSONObject(server).getString("display")))?"":TextColor.stripColor(div)+server) + ")";
                         i++;
                     }
+                    if (i == 0) message += TextColor.RESET + "(none)";
                     host.log.message.println(message);
                 }));
             }
@@ -143,6 +175,12 @@ public class SubCommand {
                                 if (!json.getJSONObject("server").getString("name").equals(json.getJSONObject("server").getString("display"))) host.log.message.println("  - Real Name: " + json.getJSONObject("server").getString("name"));
                                 host.log.message.println("  - Host: " + json.getJSONObject("server").getString("host"));
                                 host.log.message.println("  - Enabled: " + ((json.getJSONObject("server").getBoolean("enabled"))?"yes":"no"));
+                                host.log.message.println("  - Group: " + ((json.getJSONObject("server").getString("group").length() > 0)?json.getJSONObject("server").getString("group"):"(none)"));
+                                if (json.getJSONObject("server").getJSONArray("group").length() > 0) {
+                                    host.log.message.println("  - Group:");
+                                    for (int i = 0; i < json.getJSONObject("server").getJSONArray("group").length(); i++)
+                                        host.log.message.println("    - " + json.getJSONObject("server").getJSONArray("group").getString(i));
+                                }
                                 if (json.getJSONObject("server").getBoolean("temp")) host.log.message.println("  - Temporary: yes");
                                 host.log.message.println("  - Running: " + ((json.getJSONObject("server").getBoolean("running"))?"yes":"no"));
                                 host.log.message.println("  - Logging: " + ((json.getJSONObject("server").getBoolean("log"))?"yes":"no"));

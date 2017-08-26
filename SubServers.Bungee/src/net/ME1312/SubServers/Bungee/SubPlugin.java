@@ -45,6 +45,7 @@ import java.util.concurrent.TimeUnit;
 public final class SubPlugin extends BungeeCord implements Listener {
     protected final HashMap<String, Class<? extends Host>> hostDrivers = new HashMap<String, Class<? extends Host>>();
     public final HashMap<String, Host> hosts = new HashMap<String, Host>();
+    public final HashMap<String, List<Server>> groups = new HashMap<String, List<Server>>();
     public final HashMap<String, Server> exServers = new HashMap<String, Server>();
     private final HashMap<String, ServerInfo> legServers = new HashMap<String, ServerInfo>();
 
@@ -93,7 +94,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
         if (!(new UniversalFile(dir, "lang.yml").exists())) {
             Util.copyFromJar(SubPlugin.class.getClassLoader(), "net/ME1312/SubServers/Bungee/Library/Files/lang.yml", new UniversalFile(dir, "lang.yml").getPath());
             System.out.println("SubServers > Created ~/SubServers/lang.yml");
-        } else if ((new Version((new YAMLConfig(new UniversalFile(dir, "lang.yml"))).get().getString("Version", "0")).compareTo(new Version("2.12.1c+"))) != 0) {
+        } else if ((new Version((new YAMLConfig(new UniversalFile(dir, "lang.yml"))).get().getString("Version", "0")).compareTo(new Version("2.12.1e+"))) != 0) {
             Files.move(new UniversalFile(dir, "lang.yml").toPath(), new UniversalFile(dir, "lang.old" + Math.round(Math.random() * 100000) + ".yml").toPath());
             Util.copyFromJar(SubPlugin.class.getClassLoader(), "net/ME1312/SubServers/Bungee/Library/Files/lang.yml", new UniversalFile(dir, "lang.yml").getPath());
             System.out.println("SubServers > Updated ~/SubServers/lang.yml");
@@ -222,7 +223,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
                     if (!hostDrivers.keySet().contains(config.get().getSection("Hosts").getSection(name).getRawString("Driver").toLowerCase())) throw new InvalidHostException("Invalid Driver for host: " + name);
                     Host host = api.addHost(config.get().getSection("Hosts").getSection(name).getRawString("Driver").toLowerCase(), name, config.get().getSection("Hosts").getSection(name).getBoolean("Enabled"), InetAddress.getByName(config.get().getSection("Hosts").getSection(name).getRawString("Address")),
                             config.get().getSection("Hosts").getSection(name).getRawString("Directory"), config.get().getSection("Hosts").getSection(name).getRawString("Git-Bash"));
-                    if (config.get().getSection("Hosts").getSection(name).getKeys().contains("Display")) host.setDisplayName(config.get().getSection("Hosts").getSection(name).getString("Display"));
+                    if (config.get().getSection("Hosts").getSection(name).getKeys().contains("Display") && config.get().getSection("Hosts").getSection(name).getString("Display").length() > 0) host.setDisplayName(config.get().getSection("Hosts").getSection(name).getString("Display"));
                     if (config.get().getSection("Hosts").getSection(name).getKeys().contains("Extra")) for (String extra : config.get().getSection("Hosts").getSection(name).getSection("Extra").getKeys()) host.addExtra(extra, config.get().getSection("Hosts").getSection(name).getSection("Extra").getObject(extra));
                     hosts++;
                 } catch (Exception e) {
@@ -238,7 +239,8 @@ public final class SubPlugin extends BungeeCord implements Listener {
                     Server server = api.addServer(name, InetAddress.getByName(bungee.get().getSection("servers").getSection(name).getRawString("address").split(":")[0]),
                             Integer.parseInt(bungee.get().getSection("servers").getSection(name).getRawString("address").split(":")[1]), bungee.get().getSection("servers").getSection(name).getColoredString("motd", '&'),
                             bungee.get().getSection("servers").getSection(name).getBoolean("hidden", false), bungee.get().getSection("servers").getSection(name).getBoolean("restricted"));
-                    if (bungee.get().getSection("servers").getSection(name).getKeys().contains("display")) server.setDisplayName(bungee.get().getSection("servers").getSection(name).getString("display"));
+                    if (bungee.get().getSection("servers").getSection(name).getKeys().contains("display") && bungee.get().getSection("servers").getSection(name).getString("display").length() > 0) server.setDisplayName(bungee.get().getSection("servers").getSection(name).getString("display"));
+                    if (bungee.get().getSection("servers").getSection(name).getKeys().contains("group")) for (String group : bungee.get().getSection("servers").getSection(name).getStringList("group")) server.addGroup(group);
                     if (bungee.get().getSection("servers").getSection(name).getKeys().contains("extra")) for (String extra : config.get().getSection("servers").getSection(name).getSection("extra").getKeys()) server.addExtra(extra, config.get().getSection("servers").getSection(name).getSection("extra").getObject(extra));
                     servers++;
                 } catch (Exception e) {
@@ -259,7 +261,8 @@ public final class SubPlugin extends BungeeCord implements Listener {
                             config.get().getSection("Servers").getSection(name).getInt("Port"), config.get().getSection("Servers").getSection(name).getColoredString("Motd", '&'), config.get().getSection("Servers").getSection(name).getBoolean("Log"),
                             config.get().getSection("Servers").getSection(name).getRawString("Directory"), new Executable(config.get().getSection("Servers").getSection(name).getRawString("Executable")), config.get().getSection("Servers").getSection(name).getRawString("Stop-Command"),
                             config.get().getSection("Servers").getSection(name).getBoolean("Run-On-Launch"), config.get().getSection("Servers").getSection(name).getBoolean("Auto-Restart"), config.get().getSection("Servers").getSection(name).getBoolean("Hidden"), config.get().getSection("Servers").getSection(name).getBoolean("Restricted"), false);
-                    if (config.get().getSection("Servers").getSection(name).getKeys().contains("Display")) server.setDisplayName(config.get().getSection("Servers").getSection(name).getString("Display"));
+                    if (config.get().getSection("Servers").getSection(name).getKeys().contains("Display") && config.get().getSection("Servers").getSection(name).getString("Display").length() > 0) server.setDisplayName(config.get().getSection("Servers").getSection(name).getString("Display"));
+                    if (config.get().getSection("Servers").getSection(name).getKeys().contains("Group")) for (String group : config.get().getSection("Servers").getSection(name).getStringList("Group")) server.addGroup(group);
                     if (config.get().getSection("Servers").getSection(name).getKeys().contains("Extra")) for (String extra : config.get().getSection("Servers").getSection(name).getSection("Extra").getKeys()) server.addExtra(extra, config.get().getSection("Servers").getSection(name).getSection("Extra").getObject(extra));
                     subservers++;
                 } catch (Exception e) {

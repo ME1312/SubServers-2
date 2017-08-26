@@ -214,6 +214,25 @@ public final class SubAPI {
     }
 
     /**
+     * Gets the Server Groups
+     *
+     * @return Group Map
+     */
+    public Map<String, List<Server>> getGroups() {
+        return new TreeMap<String, List<Server>>(plugin.groups);
+    }
+
+    /**
+     * Gets a Server Group
+     *
+     * @param name Group name
+     * @return a Server Group
+     */
+    public List<Server> getGroup(String name) {
+        return getGroups().get(name);
+    }
+
+    /**
      * Gets the Servers (including SubServers)
      *
      * @return Server Map

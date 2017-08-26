@@ -10,6 +10,7 @@ Settings:
 Hosts:
   '~':
     Enabled: true
+    Display: ''
     Driver: 'BUILT-IN'
     Address: '127.0.0.1'
     Directory: './'
@@ -18,7 +19,9 @@ Hosts:
 Servers:
   'Example':
     Enabled: false
+    Display: ''
     Host: '~'
+    Group: []
     Port: 25567
     Motd: '&aThis is a SubServer'
     Log: true
