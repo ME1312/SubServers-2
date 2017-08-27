@@ -21,8 +21,8 @@ import java.util.Base64;
  * External Host Configuration Packet
  */
 public class PacketExConfigureHost implements PacketIn, PacketOut {
+    private static boolean first = false;
     private ExHost host;
-    private boolean first = false;
     private Logger log = null;
 
     /**

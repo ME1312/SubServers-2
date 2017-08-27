@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10,"i8":10,"i9":10,"i10":10,"i11":10,"i12":10,"i13":10,"i14":10,"i15":10,"i16":10,"i17":10,"i18":10};
+var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10,"i8":10,"i9":10,"i10":10,"i11":10,"i12":10,"i13":10,"i14":10,"i15":10,"i16":10,"i17":10,"i18":10,"i19":10,"i20":10,"i21":10,"i22":10,"i23":10,"i24":10,"i25":10};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -98,12 +98,7 @@ var activeTableTab = "activeTableTab";
 <li>java.lang.Object</li>
 <li>
 <ul class="inheritance">
-<li>net.md_5.bungee.BungeeServerInfo</li>
-<li>
-<ul class="inheritance">
 <li>net.ME1312.SubServers.Bungee.Host.Server</li>
-</ul>
-</li>
 </ul>
 </li>
 </ul>
@@ -121,8 +116,8 @@ var activeTableTab = "activeTableTab";
 <hr>
 <br>
 <pre>public class <span class="typeNameLabel">Server</span>
-extends net.md_5.bungee.BungeeServerInfo
-implements <a href="../../../../../net/ME1312/SubServers/Bungee/Network/ClientHandler.html" title="interface in net.ME1312.SubServers.Bungee.Network">ClientHandler</a>, <a href="../../../../../net/ME1312/SubServers/Bungee/Library/ExtraDataHandler.html" title="interface in net.ME1312.SubServers.Bungee.Library">ExtraDataHandler</a></pre>
+extends java.lang.Object
+implements net.md_5.bungee.api.config.ServerInfo, <a href="../../../../../net/ME1312/SubServers/Bungee/Network/ClientHandler.html" title="interface in net.ME1312.SubServers.Bungee.Network">ClientHandler</a>, <a href="../../../../../net/ME1312/SubServers/Bungee/Library/ExtraDataHandler.html" title="interface in net.ME1312.SubServers.Bungee.Library">ExtraDataHandler</a></pre>
 <div class="block">Server Class</div>
 </li>
 </ul>
@@ -177,119 +172,155 @@ implements <a href="../../../../../net/ME1312/SubServers/Bungee/Network/ClientHa
 </td>
 </tr>
 <tr id="i2" class="altColor">
+<td class="colFirst"><code>boolean</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/Server.html#canAccess-net.md_5.bungee.api.CommandSender-">canAccess</a></span>(net.md_5.bungee.api.CommandSender&nbsp;sender)</code>
+<div class="block">Whether the Player can access this Server</div>
+</td>
+</tr>
+<tr id="i3" class="rowColor">
+<td class="colFirst"><code>java.net.InetSocketAddress</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/Server.html#getAddress--">getAddress</a></span>()</code>
+<div class="block">Get this Server's Address</div>
+</td>
+</tr>
+<tr id="i4" class="altColor">
 <td class="colFirst"><code>java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/Server.html#getDisplayName--">getDisplayName</a></span>()</code>
 <div class="block">Get the Display Name of this Server</div>
 </td>
 </tr>
-<tr id="i3" class="rowColor">
+<tr id="i5" class="rowColor">
 <td class="colFirst"><code><a href="../../../../../net/ME1312/SubServers/Bungee/Library/Config/YAMLSection.html" title="class in net.ME1312.SubServers.Bungee.Library.Config">YAMLSection</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/Server.html#getExtra--">getExtra</a></span>()</code>
 <div class="block">Get the extra value section</div>
 </td>
 </tr>
-<tr id="i4" class="altColor">
+<tr id="i6" class="altColor">
 <td class="colFirst"><code><a href="../../../../../net/ME1312/SubServers/Bungee/Library/Config/YAMLValue.html" title="class in net.ME1312.SubServers.Bungee.Library.Config">YAMLValue</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/Server.html#getExtra-java.lang.String-">getExtra</a></span>(java.lang.String&nbsp;handle)</code>
 <div class="block">Get an extra value</div>
 </td>
 </tr>
-<tr id="i5" class="rowColor">
+<tr id="i7" class="rowColor">
 <td class="colFirst"><code>java.util.List&lt;java.lang.String&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/Server.html#getGroups--">getGroups</a></span>()</code>
 <div class="block">Get this Server's Groups</div>
 </td>
 </tr>
-<tr id="i6" class="altColor">
+<tr id="i8" class="altColor">
 <td class="colFirst"><code>java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/Server.html#getMotd--">getMotd</a></span>()</code>
-<div class="block">Gets the MOTD of the Server</div>
+<div class="block">Get this Server's MOTD</div>
 </td>
 </tr>
-<tr id="i7" class="rowColor">
+<tr id="i9" class="rowColor">
+<td class="colFirst"><code>java.lang.String</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/Server.html#getName--">getName</a></span>()</code>
+<div class="block">Get this Server's Name</div>
+</td>
+</tr>
+<tr id="i10" class="altColor">
+<td class="colFirst"><code>java.util.Collection&lt;net.md_5.bungee.api.connection.ProxiedPlayer&gt;</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/Server.html#getPlayers--">getPlayers</a></span>()</code>
+<div class="block">Get the Players connected to this Server</div>
+</td>
+</tr>
+<tr id="i11" class="rowColor">
 <td class="colFirst"><code><a href="../../../../../net/ME1312/SubServers/Bungee/Network/Client.html" title="class in net.ME1312.SubServers.Bungee.Network">Client</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/Server.html#getSubData--">getSubData</a></span>()</code>
 <div class="block">Gets the SubData Client</div>
 </td>
 </tr>
-<tr id="i8" class="altColor">
+<tr id="i12" class="altColor">
 <td class="colFirst"><code>boolean</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/Server.html#hasExtra-java.lang.String-">hasExtra</a></span>(java.lang.String&nbsp;handle)</code>
 <div class="block">Determine if an extra value exists</div>
 </td>
 </tr>
-<tr id="i9" class="rowColor">
+<tr id="i13" class="rowColor">
 <td class="colFirst"><code>boolean</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/Server.html#isHidden--">isHidden</a></span>()</code>
-<div class="block">If the server is hidden from players</div>
+<div class="block">If the Server is hidden from players</div>
 </td>
 </tr>
-<tr id="i10" class="altColor">
+<tr id="i14" class="altColor">
 <td class="colFirst"><code>boolean</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/Server.html#isRestricted--">isRestricted</a></span>()</code>
-<div class="block">Gets if the Server is Restricted</div>
+<div class="block">Get the Server's Restricted Status</div>
 </td>
 </tr>
-<tr id="i11" class="rowColor">
+<tr id="i15" class="rowColor">
+<td class="colFirst"><code>void</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/Server.html#ping-net.md_5.bungee.api.Callback-">ping</a></span>(net.md_5.bungee.api.Callback&lt;net.md_5.bungee.api.ServerPing&gt;&nbsp;callback)</code>
+<div class="block">Ping the Server</div>
+</td>
+</tr>
+<tr id="i16" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/Server.html#removeExtra-java.lang.String-">removeExtra</a></span>(java.lang.String&nbsp;handle)</code>
 <div class="block">Remove an extra value from this Server</div>
 </td>
 </tr>
-<tr id="i12" class="altColor">
+<tr id="i17" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/Server.html#removeGroup-java.lang.String-">removeGroup</a></span>(java.lang.String&nbsp;value)</code>
 <div class="block">Remove this Server from a Group</div>
 </td>
 </tr>
-<tr id="i13" class="rowColor">
+<tr id="i18" class="altColor">
+<td class="colFirst"><code>void</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/Server.html#sendData-java.lang.String-byte:A-">sendData</a></span>(java.lang.String&nbsp;channel,
+        byte[]&nbsp;data)</code>
+<div class="block">Send PluginMessageChannel data to the Server</div>
+</td>
+</tr>
+<tr id="i19" class="rowColor">
+<td class="colFirst"><code>boolean</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/Server.html#sendData-java.lang.String-byte:A-boolean-">sendData</a></span>(java.lang.String&nbsp;channel,
+        byte[]&nbsp;data,
+        boolean&nbsp;queue)</code>
+<div class="block">Send PluginMessageChannel data to the Server</div>
+</td>
+</tr>
+<tr id="i20" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/Server.html#setDisplayName-java.lang.String-">setDisplayName</a></span>(java.lang.String&nbsp;value)</code>
 <div class="block">Sets the Display Name for this Server</div>
 </td>
 </tr>
-<tr id="i14" class="altColor">
+<tr id="i21" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/Server.html#setHidden-boolean-">setHidden</a></span>(boolean&nbsp;value)</code>
-<div class="block">Set if the server is hidden from players</div>
+<div class="block">Set if the Server is hidden from players</div>
 </td>
 </tr>
-<tr id="i15" class="rowColor">
+<tr id="i22" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/Server.html#setMotd-java.lang.String-">setMotd</a></span>(java.lang.String&nbsp;value)</code>
-<div class="block">Sets the MOTD of the Server</div>
+<div class="block">Set this Server's MOTD</div>
 </td>
 </tr>
-<tr id="i16" class="altColor">
+<tr id="i23" class="rowColor">
 <td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/Server.html#setRestricted-boolean-">setRestricted</a></span>(boolean&nbsp;value)</code>
-<div class="block">Sets if the Server is Restricted</div>
-</td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/Server.html#setRestricted-boolean-">setRestricted</a></span>(boolean&nbsp;value)</code>&nbsp;</td>
 </tr>
-<tr id="i17" class="rowColor">
+<tr id="i24" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/Server.html#setSubData-net.ME1312.SubServers.Bungee.Network.Client-">setSubData</a></span>(<a href="../../../../../net/ME1312/SubServers/Bungee/Network/Client.html" title="class in net.ME1312.SubServers.Bungee.Network">Client</a>&nbsp;client)</code>
 <div class="block">Link a SubData Client to this Object</div>
 </td>
 </tr>
-<tr id="i18" class="altColor">
+<tr id="i25" class="rowColor">
 <td class="colFirst"><code>java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/Server.html#toString--">toString</a></span>()</code>&nbsp;</td>
 </tr>
 </table>
 <ul class="blockList">
-<li class="blockList"><a name="methods.inherited.from.class.net.md_5.bungee.BungeeServerInfo">
-<!--   -->
-</a>
-<h3>Methods inherited from class&nbsp;net.md_5.bungee.BungeeServerInfo</h3>
-<code>addPlayer, canAccess, equals, getAddress, getName, getPacketQueue, getPlayers, hashCode, ping, ping, removePlayer, sendData, sendData</code></li>
-</ul>
-<ul class="blockList">
 <li class="blockList"><a name="methods.inherited.from.class.java.lang.Object">
 <!--   -->
 </a>
 <h3>Methods inherited from class&nbsp;java.lang.Object</h3>
-<code>getClass, notify, notifyAll, wait, wait, wait</code></li>
+<code>equals, getClass, hashCode, notify, notifyAll, wait, wait, wait</code></li>
 </ul>
 </li>
 </ul>
@@ -395,82 +426,6 @@ implements <a href="../../../../../net/ME1312/SubServers/Bungee/Network/ClientHa
 </dl>
 </li>
 </ul>
-<a name="isHidden--">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>isHidden</h4>
-<pre>public&nbsp;boolean&nbsp;isHidden()</pre>
-<div class="block">If the server is hidden from players</div>
-<dl>
-<dt><span class="returnLabel">Returns:</span></dt>
-<dd>Hidden Status</dd>
-</dl>
-</li>
-</ul>
-<a name="setHidden-boolean-">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>setHidden</h4>
-<pre>public&nbsp;void&nbsp;setHidden(boolean&nbsp;value)</pre>
-<div class="block">Set if the server is hidden from players</div>
-<dl>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>value</code> - Value</dd>
-</dl>
-</li>
-</ul>
-<a name="getMotd--">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>getMotd</h4>
-<pre>public&nbsp;java.lang.String&nbsp;getMotd()</pre>
-<div class="block">Gets the MOTD of the Server</div>
-<dl>
-<dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code>getMotd</code>&nbsp;in interface&nbsp;<code>net.md_5.bungee.api.config.ServerInfo</code></dd>
-<dt><span class="overrideSpecifyLabel">Overrides:</span></dt>
-<dd><code>getMotd</code>&nbsp;in class&nbsp;<code>net.md_5.bungee.BungeeServerInfo</code></dd>
-<dt><span class="returnLabel">Returns:</span></dt>
-<dd>Server MOTD</dd>
-</dl>
-</li>
-</ul>
-<a name="setMotd-java.lang.String-">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>setMotd</h4>
-<pre>public&nbsp;void&nbsp;setMotd(java.lang.String&nbsp;value)</pre>
-<div class="block">Sets the MOTD of the Server</div>
-<dl>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>value</code> - Value</dd>
-</dl>
-</li>
-</ul>
-<a name="isRestricted--">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>isRestricted</h4>
-<pre>public&nbsp;boolean&nbsp;isRestricted()</pre>
-<div class="block">Gets if the Server is Restricted</div>
-<dl>
-<dt><span class="overrideSpecifyLabel">Overrides:</span></dt>
-<dd><code>isRestricted</code>&nbsp;in class&nbsp;<code>net.md_5.bungee.BungeeServerInfo</code></dd>
-<dt><span class="returnLabel">Returns:</span></dt>
-<dd>Restricted Status</dd>
-</dl>
-</li>
-</ul>
 <a name="getGroups--">
 <!--   -->
 </a>
@@ -513,6 +468,200 @@ implements <a href="../../../../../net/ME1312/SubServers/Bungee/Network/ClientHa
 </dl>
 </li>
 </ul>
+<a name="isHidden--">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>isHidden</h4>
+<pre>public&nbsp;boolean&nbsp;isHidden()</pre>
+<div class="block">If the Server is hidden from players</div>
+<dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>Hidden Status</dd>
+</dl>
+</li>
+</ul>
+<a name="setHidden-boolean-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>setHidden</h4>
+<pre>public&nbsp;void&nbsp;setHidden(boolean&nbsp;value)</pre>
+<div class="block">Set if the Server is hidden from players</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>value</code> - Value</dd>
+</dl>
+</li>
+</ul>
+<a name="getName--">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getName</h4>
+<pre>public&nbsp;java.lang.String&nbsp;getName()</pre>
+<div class="block">Get this Server's Name</div>
+<dl>
+<dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
+<dd><code>getName</code>&nbsp;in interface&nbsp;<code>net.md_5.bungee.api.config.ServerInfo</code></dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>Server Name</dd>
+</dl>
+</li>
+</ul>
+<a name="getAddress--">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getAddress</h4>
+<pre>public&nbsp;java.net.InetSocketAddress&nbsp;getAddress()</pre>
+<div class="block">Get this Server's Address</div>
+<dl>
+<dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
+<dd><code>getAddress</code>&nbsp;in interface&nbsp;<code>net.md_5.bungee.api.config.ServerInfo</code></dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>Server Address</dd>
+</dl>
+</li>
+</ul>
+<a name="getPlayers--">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getPlayers</h4>
+<pre>public&nbsp;java.util.Collection&lt;net.md_5.bungee.api.connection.ProxiedPlayer&gt;&nbsp;getPlayers()</pre>
+<div class="block">Get the Players connected to this Server</div>
+<dl>
+<dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
+<dd><code>getPlayers</code>&nbsp;in interface&nbsp;<code>net.md_5.bungee.api.config.ServerInfo</code></dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>Player list</dd>
+</dl>
+</li>
+</ul>
+<a name="getMotd--">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getMotd</h4>
+<pre>public&nbsp;java.lang.String&nbsp;getMotd()</pre>
+<div class="block">Get this Server's MOTD</div>
+<dl>
+<dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
+<dd><code>getMotd</code>&nbsp;in interface&nbsp;<code>net.md_5.bungee.api.config.ServerInfo</code></dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>Server MOTD</dd>
+</dl>
+</li>
+</ul>
+<a name="setMotd-java.lang.String-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>setMotd</h4>
+<pre>public&nbsp;void&nbsp;setMotd(java.lang.String&nbsp;value)</pre>
+<div class="block">Set this Server's MOTD</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>value</code> - Value</dd>
+</dl>
+</li>
+</ul>
+<a name="canAccess-net.md_5.bungee.api.CommandSender-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>canAccess</h4>
+<pre>public&nbsp;boolean&nbsp;canAccess(net.md_5.bungee.api.CommandSender&nbsp;sender)</pre>
+<div class="block">Whether the Player can access this Server</div>
+<dl>
+<dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
+<dd><code>canAccess</code>&nbsp;in interface&nbsp;<code>net.md_5.bungee.api.config.ServerInfo</code></dd>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>sender</code> - Player</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>Player Access Status</dd>
+</dl>
+</li>
+</ul>
+<a name="sendData-java.lang.String-byte:A-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>sendData</h4>
+<pre>public&nbsp;void&nbsp;sendData(java.lang.String&nbsp;channel,
+                     byte[]&nbsp;data)</pre>
+<div class="block">Send PluginMessageChannel data to the Server</div>
+<dl>
+<dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
+<dd><code>sendData</code>&nbsp;in interface&nbsp;<code>net.md_5.bungee.api.config.ServerInfo</code></dd>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>channel</code> - Channel name</dd>
+<dd><code>data</code> - Data to send</dd>
+</dl>
+</li>
+</ul>
+<a name="sendData-java.lang.String-byte:A-boolean-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>sendData</h4>
+<pre>public&nbsp;boolean&nbsp;sendData(java.lang.String&nbsp;channel,
+                        byte[]&nbsp;data,
+                        boolean&nbsp;queue)</pre>
+<div class="block">Send PluginMessageChannel data to the Server</div>
+<dl>
+<dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
+<dd><code>sendData</code>&nbsp;in interface&nbsp;<code>net.md_5.bungee.api.config.ServerInfo</code></dd>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>channel</code> - Channel name</dd>
+<dd><code>data</code> - Data to send</dd>
+<dd><code>queue</code> - Queue message for later if cannot be sent immediately</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>If the message was sent immediately</dd>
+</dl>
+</li>
+</ul>
+<a name="ping-net.md_5.bungee.api.Callback-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>ping</h4>
+<pre>public&nbsp;void&nbsp;ping(net.md_5.bungee.api.Callback&lt;net.md_5.bungee.api.ServerPing&gt;&nbsp;callback)</pre>
+<div class="block">Ping the Server</div>
+<dl>
+<dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
+<dd><code>ping</code>&nbsp;in interface&nbsp;<code>net.md_5.bungee.api.config.ServerInfo</code></dd>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>callback</code> - Ping Callback</dd>
+</dl>
+</li>
+</ul>
+<a name="isRestricted--">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>isRestricted</h4>
+<pre>public&nbsp;boolean&nbsp;isRestricted()</pre>
+<div class="block">Get the Server's Restricted Status</div>
+<dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>Restricted Status</dd>
+</dl>
+</li>
+</ul>
 <a name="setRestricted-boolean-">
 <!--   -->
 </a>
@@ -520,11 +669,6 @@ implements <a href="../../../../../net/ME1312/SubServers/Bungee/Network/ClientHa
 <li class="blockList">
 <h4>setRestricted</h4>
 <pre>public&nbsp;void&nbsp;setRestricted(boolean&nbsp;value)</pre>
-<div class="block">Sets if the Server is Restricted</div>
-<dl>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>value</code> - Value</dd>
-</dl>
 </li>
 </ul>
 <a name="addExtra-java.lang.String-java.lang.Object-">
@@ -627,7 +771,7 @@ implements <a href="../../../../../net/ME1312/SubServers/Bungee/Network/ClientHa
 <pre>public&nbsp;java.lang.String&nbsp;toString()</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Overrides:</span></dt>
-<dd><code>toString</code>&nbsp;in class&nbsp;<code>net.md_5.bungee.BungeeServerInfo</code></dd>
+<dd><code>toString</code>&nbsp;in class&nbsp;<code>java.lang.Object</code></dd>
 </dl>
 </li>
 </ul>

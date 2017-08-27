@@ -11,37 +11,63 @@ import net.ME1312.SubServers.Bungee.Network.Client;
 import net.ME1312.SubServers.Bungee.Network.ClientHandler;
 import net.ME1312.SubServers.Bungee.Network.SubDataServer;
 import net.ME1312.SubServers.Bungee.SubAPI;
-import net.md_5.bungee.BungeeServerInfo;
+import net.md_5.bungee.api.Callback;
 import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.CommandSender;
+import net.md_5.bungee.api.ServerPing;
+import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import org.json.JSONObject;
 
 import java.net.InetSocketAddress;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 /**
  * Server Class
  */
-public class Server extends BungeeServerInfo implements ClientHandler, ExtraDataHandler {
+public class Server implements ServerInfo, ClientHandler, ExtraDataHandler {
     private YAMLSection extra = new YAMLSection();
     private Client client = null;
     private List<String> groups = new ArrayList<String>();
     private String nick = null;
-    private String motd;
-    private boolean restricted;
+    private ServerInfo info;
     private boolean hidden;
 
     public Server(String name, InetSocketAddress address, String motd, boolean hidden, boolean restricted) throws InvalidServerException {
-        super(name, address, ChatColor.translateAlternateColorCodes('&', motd), restricted);
         if (Util.isNull(name, address, motd, hidden, restricted)) throw new NullPointerException();
         if (name.contains(" ")) throw new InvalidServerException("Server names cannot have spaces: " + name);
         SubDataServer.allowConnection(getAddress().getAddress());
-        this.motd = motd;
-        this.restricted = restricted;
+        this.info = new ServerInfo(name, address, motd, restricted);
         this.hidden = hidden;
+    }
+
+    private static final class ServerInfo extends net.md_5.bungee.BungeeServerInfo {
+        private String motd;
+        private boolean restricted;
+
+        public ServerInfo(String name, InetSocketAddress address, String motd, boolean restricted) {
+            super(name, address, ChatColor.translateAlternateColorCodes('&', motd), restricted);
+            this.motd = motd;
+            this.restricted = restricted;
+        }
+
+        @Override
+        public String getMotd() {
+            return motd;
+        }
+
+        public void setMotd(String value) {
+            this.motd = value;
+        }
+
+        @Override
+        public boolean isRestricted() {
+            return restricted;
+        }
+
+        public void setRestricted(boolean value) {
+            this.restricted = value;
+        }
     }
 
     @Override
@@ -80,63 +106,12 @@ public class Server extends BungeeServerInfo implements ClientHandler, ExtraData
     }
 
     /**
-     * If the server is hidden from players
-     *
-     * @return Hidden Status
-     */
-    public boolean isHidden() {
-        return hidden;
-    }
-
-    /**
-     * Set if the server is hidden from players
-     *
-     * @param value Value
-     */
-    public void setHidden(boolean value) {
-        if (Util.isNull(value)) throw new NullPointerException();
-        new SubEditServerEvent(null, this, new NamedContainer<String, Object>("hidden", value), false);
-        this.hidden = value;
-    }
-
-    /**
-     * Gets the MOTD of the Server
-     *
-     * @return Server MOTD
-     */
-    @Override
-    public String getMotd() {
-        return motd;
-    }
-
-    /**
-     * Sets the MOTD of the Server
-     *
-     * @param value Value
-     */
-    public void setMotd(String value) {
-        if (Util.isNull(value)) throw new NullPointerException();
-        new SubEditServerEvent(null, this, new NamedContainer<String, Object>("motd", value), false);
-        this.motd = value;
-    }
-
-    /**
-     * Gets if the Server is Restricted
-     *
-     * @return Restricted Status
-     */
-    @Override
-    public boolean isRestricted() {
-        return restricted;
-    }
-
-    /**
      * Get this Server's Groups
      *
      * @return Group names
      */
     public List<String> getGroups() {
-       return groups;
+        return groups;
     }
 
     /**
@@ -170,14 +145,136 @@ public class Server extends BungeeServerInfo implements ClientHandler, ExtraData
     }
 
     /**
-     * Sets if the Server is Restricted
+     * If the Server is hidden from players
+     *
+     * @return Hidden Status
+     */
+    public boolean isHidden() {
+        return hidden;
+    }
+
+    /**
+     * Set if the Server is hidden from players
      *
      * @param value Value
      */
+    public void setHidden(boolean value) {
+        if (Util.isNull(value)) throw new NullPointerException();
+        new SubEditServerEvent(null, this, new NamedContainer<String, Object>("hidden", value), false);
+        this.hidden = value;
+    }
+
+    // Methods unrelated to SubServers
+
+    /**
+     * Get this Server's Name
+     *
+     * @return Server Name
+     */
+    @Override
+    public String getName() {
+        return info.getName();
+    }
+
+    /**
+     * Get this Server's Address
+     *
+     * @return Server Address
+     */
+    @Override
+    public InetSocketAddress getAddress() {
+        return info.getAddress();
+    }
+
+    /**
+     * Get the Players connected to this Server
+     *
+     * @return Player list
+     */
+    @Override
+    public Collection<ProxiedPlayer> getPlayers() {
+        return info.getPlayers();
+    }
+
+    /**
+     * Get this Server's MOTD
+     *
+     * @return Server MOTD
+     */
+    @Override
+    public String getMotd() {
+        return info.getMotd();
+    }
+
+    /**
+     * Set this Server's MOTD
+     *
+     * @param value Value
+     */
+    public void setMotd(String value) {
+        if (Util.isNull(value)) throw new NullPointerException();
+        new SubEditServerEvent(null, this, new NamedContainer<String, Object>("motd", value), false);
+        info.setMotd(value);
+    }
+
+    /**
+     * Whether the Player can access this Server
+     *
+     * @param sender Player
+     * @return Player Access Status
+     */
+    @Override
+    public boolean canAccess(CommandSender sender) {
+        return info.canAccess(sender);
+    }
+
+    /**
+     * Send PluginMessageChannel data to the Server
+     *
+     * @param channel Channel name
+     * @param data Data to send
+     */
+    @Override
+    public void sendData(String channel, byte[] data) {
+        info.sendData(channel, data);
+    }
+
+    /**
+     * Send PluginMessageChannel data to the Server
+     *
+     * @param channel Channel name
+     * @param data Data to send
+     * @param queue Queue message for later if cannot be sent immediately
+     * @return If the message was sent immediately
+     */
+    @Override
+    public boolean sendData(String channel, byte[] data, boolean queue) {
+        return info.sendData(channel, data, queue);
+    }
+
+    /**
+     * Ping the Server
+     *
+     * @param callback Ping Callback
+     */
+    @Override
+    public void ping(Callback<ServerPing> callback) {
+        info.ping(callback);
+    }
+
+    /**
+     * Get the Server's Restricted Status
+     *
+     * @return Restricted Status
+     */
+    public boolean isRestricted() {
+        return info.isRestricted();
+    }
+
     public void setRestricted(boolean value) {
         if (Util.isNull(value)) throw new NullPointerException();
         new SubEditServerEvent(null, this, new NamedContainer<String, Object>("restricted", value), false);
-        this.restricted = value;
+        info.setRestricted(value);
     }
 
     @Override

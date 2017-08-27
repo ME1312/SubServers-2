@@ -175,7 +175,6 @@ public class SubCommand {
                                 if (!json.getJSONObject("server").getString("name").equals(json.getJSONObject("server").getString("display"))) host.log.message.println("  - Real Name: " + json.getJSONObject("server").getString("name"));
                                 host.log.message.println("  - Host: " + json.getJSONObject("server").getString("host"));
                                 host.log.message.println("  - Enabled: " + ((json.getJSONObject("server").getBoolean("enabled"))?"yes":"no"));
-                                host.log.message.println("  - Group: " + ((json.getJSONObject("server").getString("group").length() > 0)?json.getJSONObject("server").getString("group"):"(none)"));
                                 if (json.getJSONObject("server").getJSONArray("group").length() > 0) {
                                     host.log.message.println("  - Group:");
                                     for (int i = 0; i < json.getJSONObject("server").getJSONArray("group").length(); i++)
