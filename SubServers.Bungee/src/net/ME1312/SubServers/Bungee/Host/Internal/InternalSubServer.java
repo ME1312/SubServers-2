@@ -25,7 +25,7 @@ import java.util.jar.JarFile;
 /**
  * Internal SubServer Class
  */
-public class InternalSubServer extends SubServer {
+public class InternalSubServer extends SubServerContainer {
     private InternalHost host;
     private boolean enabled;
     private Container<Boolean> log;
@@ -253,7 +253,7 @@ public class InternalSubServer extends SubServer {
                             break;
                         case "display":
                             if (value.isString()) {
-                                Field f = Server.class.getDeclaredField("nick");
+                                Field f = ServerContainer.class.getDeclaredField("nick");
                                 f.setAccessible(true);
                                 if (value == null || value.asString().length() == 0 || getName().equals(value)) {
                                     f.set(this, null);
@@ -334,7 +334,7 @@ public class InternalSubServer extends SubServer {
                             break;
                         case "motd":
                             if (value.isString()) {
-                                Field f = Server.class.getDeclaredField("motd");
+                                Field f = ServerContainer.class.getDeclaredField("motd");
                                 f.setAccessible(true);
                                 f.set(this, value.asColoredString('&'));
                                 f.setAccessible(false);
@@ -420,7 +420,7 @@ public class InternalSubServer extends SubServer {
                             break;
                         case "restricted":
                             if (value.isBoolean()) {
-                                Field f = Server.class.getDeclaredField("restricted");
+                                Field f = ServerContainer.class.getDeclaredField("restricted");
                                 f.setAccessible(true);
                                 f.set(this, value.asBoolean());
                                 f.setAccessible(false);
@@ -433,7 +433,7 @@ public class InternalSubServer extends SubServer {
                             break;
                         case "hidden":
                             if (value.isBoolean()) {
-                                Field f = Server.class.getDeclaredField("hidden");
+                                Field f = ServerContainer.class.getDeclaredField("hidden");
                                 f.setAccessible(true);
                                 f.set(this, value.asBoolean());
                                 f.setAccessible(false);

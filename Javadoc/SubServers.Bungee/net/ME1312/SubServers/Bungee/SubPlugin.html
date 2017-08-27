@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10};
+var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -164,11 +164,11 @@ implements net.md_5.bungee.api.plugin.Listener</pre>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Bungee/SubPlugin.html#exLang">exLang</a></span></code>&nbsp;</td>
 </tr>
 <tr class="rowColor">
-<td class="colFirst"><code>java.util.HashMap&lt;java.lang.String,<a href="../../../../net/ME1312/SubServers/Bungee/Host/Server.html" title="class in net.ME1312.SubServers.Bungee.Host">Server</a>&gt;</code></td>
+<td class="colFirst"><code>java.util.HashMap&lt;java.lang.String,<a href="../../../../net/ME1312/SubServers/Bungee/Host/Server.html" title="interface in net.ME1312.SubServers.Bungee.Host">Server</a>&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Bungee/SubPlugin.html#exServers">exServers</a></span></code>&nbsp;</td>
 </tr>
 <tr class="altColor">
-<td class="colFirst"><code>java.util.HashMap&lt;java.lang.String,java.util.List&lt;<a href="../../../../net/ME1312/SubServers/Bungee/Host/Server.html" title="class in net.ME1312.SubServers.Bungee.Host">Server</a>&gt;&gt;</code></td>
+<td class="colFirst"><code>java.util.HashMap&lt;java.lang.String,java.util.List&lt;<a href="../../../../net/ME1312/SubServers/Bungee/Host/Server.html" title="interface in net.ME1312.SubServers.Bungee.Host">Server</a>&gt;&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Bungee/SubPlugin.html#groups">groups</a></span></code>&nbsp;</td>
 </tr>
 <tr class="rowColor">
@@ -188,7 +188,7 @@ implements net.md_5.bungee.api.plugin.Listener</pre>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Bungee/SubPlugin.html#subdata">subdata</a></span></code>&nbsp;</td>
 </tr>
 <tr class="rowColor">
-<td class="colFirst"><code><a href="../../../../net/ME1312/SubServers/Bungee/Host/SubServer.html" title="class in net.ME1312.SubServers.Bungee.Host">SubServer</a></code></td>
+<td class="colFirst"><code><a href="../../../../net/ME1312/SubServers/Bungee/Host/SubServer.html" title="interface in net.ME1312.SubServers.Bungee.Host">SubServer</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Bungee/SubPlugin.html#sudo">sudo</a></span></code>&nbsp;</td>
 </tr>
 <tr class="altColor">
@@ -218,26 +218,32 @@ implements net.md_5.bungee.api.plugin.Listener</pre>
 <th class="colLast" scope="col">Method and Description</th>
 </tr>
 <tr id="i0" class="altColor">
+<td class="colFirst"><code>net.md_5.bungee.api.config.ServerInfo</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Bungee/SubPlugin.html#getServerInfo-java.lang.String-">getServerInfo</a></span>(java.lang.String&nbsp;name)</code>
+<div class="block">Emulate BungeeCord's getServerInfo()</div>
+</td>
+</tr>
+<tr id="i1" class="rowColor">
 <td class="colFirst"><code>java.util.Map&lt;java.lang.String,net.md_5.bungee.api.config.ServerInfo&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Bungee/SubPlugin.html#getServers--">getServers</a></span>()</code>
 <div class="block">Emulate BungeeCord's getServers()</div>
 </td>
 </tr>
-<tr id="i1" class="rowColor">
+<tr id="i2" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Bungee/SubPlugin.html#reroute-net.md_5.bungee.api.event.ServerConnectEvent-">reroute</a></span>(net.md_5.bungee.api.event.ServerConnectEvent&nbsp;e)</code>&nbsp;</td>
 </tr>
-<tr id="i2" class="altColor">
+<tr id="i3" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Bungee/SubPlugin.html#resetSudo-net.ME1312.SubServers.Bungee.Event.SubStoppedEvent-">resetSudo</a></span>(<a href="../../../../net/ME1312/SubServers/Bungee/Event/SubStoppedEvent.html" title="class in net.ME1312.SubServers.Bungee.Event">SubStoppedEvent</a>&nbsp;e)</code>&nbsp;</td>
 </tr>
-<tr id="i3" class="rowColor">
+<tr id="i4" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Bungee/SubPlugin.html#startListeners--">startListeners</a></span>()</code>
 <div class="block">Load Hosts, Servers, SubServers, and SubData Direct</div>
 </td>
 </tr>
-<tr id="i4" class="altColor">
+<tr id="i5" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Bungee/SubPlugin.html#stopListeners--">stopListeners</a></span>()</code>
 <div class="block">Reset all changes made by startListeners</div>
@@ -249,7 +255,7 @@ implements net.md_5.bungee.api.plugin.Listener</pre>
 <!--   -->
 </a>
 <h3>Methods inherited from class&nbsp;net.md_5.bungee.BungeeCord</h3>
-<code>addConnection, broadcast, broadcast, broadcast, broadcast, constructServerInfo, createTitle, getChannels, getConfig, getConfigurationAdapter, getConnectionThrottle, getConsole, getConsoleReader, getDisabledCommands, getGameVersion, getInstance, getLogger, getName, getOnlineCount, getPlayer, getPlayer, getPlayerByOfflineUUID, getPlayers, getPluginManager, getPluginsFolder, getProtocolVersion, getReconnectHandler, getScheduler, getServerInfo, getTranslation, getVersion, matchPlayer, registerChannel, registerChannels, removeConnection, setConfigurationAdapter, setReconnectHandler, start, stop, stop, unregisterChannel</code></li>
+<code>addConnection, broadcast, broadcast, broadcast, broadcast, constructServerInfo, createTitle, getChannels, getConfig, getConfigurationAdapter, getConnectionThrottle, getConsole, getConsoleReader, getDisabledCommands, getGameVersion, getInstance, getLogger, getName, getOnlineCount, getPlayer, getPlayer, getPlayerByOfflineUUID, getPlayers, getPluginManager, getPluginsFolder, getProtocolVersion, getReconnectHandler, getScheduler, getTranslation, getVersion, matchPlayer, registerChannel, registerChannels, removeConnection, setConfigurationAdapter, setReconnectHandler, start, stop, stop, unregisterChannel</code></li>
 </ul>
 <ul class="blockList">
 <li class="blockList"><a name="methods.inherited.from.class.net.md_5.bungee.api.ProxyServer">
@@ -294,7 +300,7 @@ implements net.md_5.bungee.api.plugin.Listener</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>groups</h4>
-<pre>public final&nbsp;java.util.HashMap&lt;java.lang.String,java.util.List&lt;<a href="../../../../net/ME1312/SubServers/Bungee/Host/Server.html" title="class in net.ME1312.SubServers.Bungee.Host">Server</a>&gt;&gt; groups</pre>
+<pre>public final&nbsp;java.util.HashMap&lt;java.lang.String,java.util.List&lt;<a href="../../../../net/ME1312/SubServers/Bungee/Host/Server.html" title="interface in net.ME1312.SubServers.Bungee.Host">Server</a>&gt;&gt; groups</pre>
 </li>
 </ul>
 <a name="exServers">
@@ -303,7 +309,7 @@ implements net.md_5.bungee.api.plugin.Listener</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>exServers</h4>
-<pre>public final&nbsp;java.util.HashMap&lt;java.lang.String,<a href="../../../../net/ME1312/SubServers/Bungee/Host/Server.html" title="class in net.ME1312.SubServers.Bungee.Host">Server</a>&gt; exServers</pre>
+<pre>public final&nbsp;java.util.HashMap&lt;java.lang.String,<a href="../../../../net/ME1312/SubServers/Bungee/Host/Server.html" title="interface in net.ME1312.SubServers.Bungee.Host">Server</a>&gt; exServers</pre>
 </li>
 </ul>
 <a name="out">
@@ -366,7 +372,7 @@ implements net.md_5.bungee.api.plugin.Listener</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>sudo</h4>
-<pre>public&nbsp;<a href="../../../../net/ME1312/SubServers/Bungee/Host/SubServer.html" title="class in net.ME1312.SubServers.Bungee.Host">SubServer</a> sudo</pre>
+<pre>public&nbsp;<a href="../../../../net/ME1312/SubServers/Bungee/Host/SubServer.html" title="interface in net.ME1312.SubServers.Bungee.Host">SubServer</a> sudo</pre>
 </li>
 </ul>
 <a name="version">
@@ -433,6 +439,26 @@ implements net.md_5.bungee.api.plugin.Listener</pre>
 <dd>Server Map</dd>
 <dt><span class="seeLabel">See Also:</span></dt>
 <dd><a href="../../../../net/ME1312/SubServers/Bungee/SubAPI.html#getServers--"><code>SubAPI.getServers()</code></a></dd>
+</dl>
+</li>
+</ul>
+<a name="getServerInfo-java.lang.String-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getServerInfo</h4>
+<pre>public&nbsp;net.md_5.bungee.api.config.ServerInfo&nbsp;getServerInfo(java.lang.String&nbsp;name)</pre>
+<div class="block">Emulate BungeeCord's getServerInfo()</div>
+<dl>
+<dt><span class="overrideSpecifyLabel">Overrides:</span></dt>
+<dd><code>getServerInfo</code>&nbsp;in class&nbsp;<code>net.md_5.bungee.BungeeCord</code></dd>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>name</code> - Server Name (Case Sensitive)</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>Server Info</dd>
+<dt><span class="seeLabel">See Also:</span></dt>
+<dd><a href="../../../../net/ME1312/SubServers/Bungee/SubAPI.html#getServer-java.lang.String-"><code>SubAPI.getServer(String)</code></a></dd>
 </dl>
 </li>
 </ul>

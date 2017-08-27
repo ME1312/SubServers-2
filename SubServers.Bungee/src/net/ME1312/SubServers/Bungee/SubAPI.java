@@ -6,6 +6,7 @@ import net.ME1312.SubServers.Bungee.Event.SubRemoveHostEvent;
 import net.ME1312.SubServers.Bungee.Event.SubRemoveServerEvent;
 import net.ME1312.SubServers.Bungee.Host.Server;
 import net.ME1312.SubServers.Bungee.Host.Host;
+import net.ME1312.SubServers.Bungee.Host.ServerContainer;
 import net.ME1312.SubServers.Bungee.Host.SubServer;
 import net.ME1312.SubServers.Bungee.Library.Exception.InvalidHostException;
 import net.ME1312.SubServers.Bungee.Library.NamedContainer;
@@ -285,7 +286,7 @@ public final class SubAPI {
      * @return The Server
      */
     public Server addServer(UUID player, String name, InetAddress ip, int port, String motd, boolean hidden, boolean restricted) {
-        Server server = new Server(name, new InetSocketAddress(ip, port), motd, hidden, restricted);
+        Server server = new ServerContainer(name, new InetSocketAddress(ip, port), motd, hidden, restricted);
         SubAddServerEvent event = new SubAddServerEvent(player, null, server);
         plugin.getPluginManager().callEvent(event);
         if (!event.isCancelled()) {

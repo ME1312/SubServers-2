@@ -366,6 +366,18 @@ public final class SubPlugin extends BungeeCord implements Listener {
     }
 
     /**
+     * Emulate BungeeCord's getServerInfo()
+     *
+     * @param name Server Name (Case Sensitive)
+     * @see SubAPI#getServer(String)
+     * @return Server Info
+     */
+    @Override
+    public ServerInfo getServerInfo(String name) {
+        return getServers().get(name);
+    }
+
+    /**
      * Reset all changes made by startListeners
      *
      * @see SubPlugin#startListeners()

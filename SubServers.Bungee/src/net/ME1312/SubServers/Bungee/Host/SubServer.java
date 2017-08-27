@@ -1,27 +1,18 @@
 package net.ME1312.SubServers.Bungee.Host;
 
 import net.ME1312.SubServers.Bungee.Library.Config.YAMLSection;
-import net.ME1312.SubServers.Bungee.Library.Exception.InvalidServerException;
-import net.ME1312.SubServers.Bungee.Library.NamedContainer;
 import net.ME1312.SubServers.Bungee.Library.Util;
-import net.ME1312.SubServers.Bungee.SubAPI;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
-import org.json.JSONObject;
 
-import java.io.File;
-import java.net.InetSocketAddress;
 import java.util.*;
 
 /**
- * SubServer Layout Class
+ * SubServer Interface
  */
-public abstract class SubServer extends Server {
-    private List<NamedContainer<String, String>> incompatibilities = new ArrayList<NamedContainer<String, String>>();
-
+public interface SubServer extends Server {
     /**
      * Command Storage Class
      */
-    public static class LoggedCommand {
+    class LoggedCommand {
         private Date date;
         private UUID sender;
         private String command;
@@ -94,35 +85,19 @@ public abstract class SubServer extends Server {
     }
 
     /**
-     * Creates a SubServer
-     *
-     * @param host Host
-     * @param name Server Name
-     * @param port Port Number
-     * @param motd Server MOTD
-     * @param restricted Players will need a permission to join if true
-     * @throws InvalidServerException
-     */
-    public SubServer(Host host, String name, int port, String motd, boolean hidden, boolean restricted) throws InvalidServerException {
-        super(name, new InetSocketAddress(host.getAddress().getHostAddress(), port), motd, hidden, restricted);
-    }
-
-    /**
      * Starts the Server
      *
      * @param player Player who Started
      * @return Success Status
      */
-    public abstract boolean start(UUID player);
+    boolean start(UUID player);
 
     /**
      * Starts the Server
      *
      * @return Success Status
      */
-    public boolean start() {
-        return start(null);
-    }
+    boolean start();
 
     /**
      * Stops the Server
@@ -130,16 +105,14 @@ public abstract class SubServer extends Server {
      * @param player Player who Stopped
      * @return Success Status
      */
-    public abstract boolean stop(UUID player);
+    boolean stop(UUID player);
 
     /**
      * Stops the Server
      *
      * @return Success Status
      */
-    public boolean stop() {
-        return stop(null);
-    }
+    boolean stop();
 
     /**
      * Terminates the Server
@@ -147,16 +120,14 @@ public abstract class SubServer extends Server {
      * @param player Player who Terminated
      * @return Success Status
      */
-    public abstract boolean terminate(UUID player);
+    boolean terminate(UUID player);
 
     /**
      * Terminates the Server
      *
      * @return Success Status
      */
-    public boolean terminate() {
-        return terminate(null);
-    }
+    boolean terminate();
 
     /**
      * Commands the Server
@@ -165,7 +136,7 @@ public abstract class SubServer extends Server {
      * @param command Command to Send
      * @return Success Status
      */
-    public abstract boolean command(UUID player, String command);
+    boolean command(UUID player, String command);
 
     /**
      * Commands the Server
@@ -173,9 +144,7 @@ public abstract class SubServer extends Server {
      * @param command Command to Send
      * @return Success Status
      */
-    public boolean command(String command) {
-        return command(null, command);
-    }
+    boolean command(String command);
 
     /**
      * Edits the Server
@@ -184,7 +153,7 @@ public abstract class SubServer extends Server {
      * @param edit Edits
      * @return Success Status
      */
-    public abstract int edit(UUID player, YAMLSection edit);
+    int edit(UUID player, YAMLSection edit);
 
     /**
      * Edits the Server
@@ -192,141 +161,124 @@ public abstract class SubServer extends Server {
      * @param edit Edits
      * @return Success Status
      */
-    public int edit(YAMLSection edit) {
-        return edit(null, edit);
-    }
+    int edit(YAMLSection edit);
 
     /**
      * Waits for the Server to Stop
      *
      * @throws InterruptedException
      */
-    public abstract void waitFor() throws InterruptedException;
+    void waitFor() throws InterruptedException;
 
     /**
      * If the Server is Running
      *
      * @return Running Status
      */
-    public abstract boolean isRunning();
+    boolean isRunning();
 
     /**
      * Grabs the Host of the Server
      *
      * @return The Host
      */
-    public abstract Host getHost();
+    Host getHost();
 
     /**
      * If the Server is Enabled
      *
      * @return Enabled Status
      */
-    public abstract boolean isEnabled();
+    boolean isEnabled();
 
     /**
      * Set if the Server is Enabled
      *
      * @param value Value
      */
-    public abstract void setEnabled(boolean value);
+    void setEnabled(boolean value);
 
     /**
      * If the Server is Logging
      *
      * @return Logging Status
      */
-    public abstract boolean isLogging();
+    boolean isLogging();
 
     /**
      * Set if the Server is Logging
      *
      * @param value Value
      */
-    public abstract void setLogging(boolean value);
+    void setLogging(boolean value);
 
     /**
      * Get Process Logger
      */
-    public abstract SubLogger getLogger();
+    SubLogger getLogger();
 
     /**
      * Gets all the commands that were sent to this Server successfully
      *
      * @return Command History
      */
-    public abstract LinkedList<LoggedCommand> getCommandHistory();
+    LinkedList<LoggedCommand> getCommandHistory();
 
     /**
      * Get the Server Directory Path
      *
      * @return Server Directory Path
      */
-    public abstract String getPath();
+    String getPath();
 
     /**
      * Get the Full Server Directory Path
      *
      * @return Full Server Directory Path
      */
-    public String getFullPath() {
-        return new File(getHost().getPath(), getPath()).getPath();
-    }
+    String getFullPath();
 
     /**
      * Get the Server's Executable String
      *
      * @return Executable String
      */
-    public abstract Executable getExecutable();
+    Executable getExecutable();
 
     /**
      * Grab the Command to Stop the Server
      *
      * @return Stop Command
      */
-    public abstract String getStopCommand();
+    String getStopCommand();
 
     /**
      * Set the Command that Stops the Server
      *
      * @param value Value
      */
-    public abstract void setStopCommand(String value);
+    void setStopCommand(String value);
 
     /**
      * If the Server will Auto Restart on unexpected shutdowns
      *
      * @return Auto Restart Status
      */
-    public abstract boolean willAutoRestart();
+    boolean willAutoRestart();
 
     /**
      * Set if the Server will Auto Restart on unexpected shutdowns
      *
      * @param value Value
      */
-    public abstract void setAutoRestart(boolean value);
+    void setAutoRestart(boolean value);
 
     /**
      * Toggles compatibility with other Servers
      *
      * @param server SubServers to toggle
      */
-    public void toggleCompatibility(SubServer... server) {
-        for (SubServer s : server) {
-            if (!equals(s)) {
-                NamedContainer<String, String> info = new NamedContainer<String, String>(s.getHost().getName(), s.getName());
-                if (isCompatible(s)) {
-                    incompatibilities.add(info);
-                    if (s.isCompatible(this)) toggleCompatibility(this);
-                } else {
-                    incompatibilities.remove(info);
-                    if (!s.isCompatible(this)) toggleCompatibility(this);
-                }
-            }
-        }
-    }
+    void toggleCompatibility(SubServer... server);
 
     /**
      * Checks if a Server is compatible
@@ -334,70 +286,33 @@ public abstract class SubServer extends Server {
      * @param server Server to check
      * @return Compatible Status
      */
-    public boolean isCompatible(SubServer server) {
-        return !incompatibilities.contains(new NamedContainer<String, String>(server.getHost().getName(), server.getName()));
-    }
+    boolean isCompatible(SubServer server);
 
     /**
      * Get all listed incompatibilities for this Server
      *
      * @return Incompatibility List
      */
-    public List<SubServer> getIncompatibilities() {
-        List<SubServer> servers = new ArrayList<SubServer>();
-        List<NamedContainer<String, String>> temp = new ArrayList<NamedContainer<String, String>>();
-        temp.addAll(incompatibilities);
-        for (NamedContainer<String, String> info : temp) {
-            try {
-                SubServer server = SubAPI.getInstance().getHost(info.name()).getSubServer(info.get());
-                if (server == null) throw new NullPointerException();
-                servers.add(server);
-            } catch (Throwable e) {
-                incompatibilities.remove(info);
-            }
-        }
-        return servers;
-    }
+    List<SubServer> getIncompatibilities() ;
 
     /**
      * Get incompatibility issues this server currently has
      *
      * @return Current Incompatibility List
      */
-    public List<SubServer> getCurrentIncompatibilities() {
-        List<SubServer> servers = new ArrayList<SubServer>();
-        for (SubServer server : getIncompatibilities()) {
-            if (server.isRunning()) servers.add(server);
-        }
-        return servers;
-    }
+    List<SubServer> getCurrentIncompatibilities();
 
     /**
      * If the Server is Temporary
      *
      * @return Temporary Status
      */
-    public abstract boolean isTemporary();
+    boolean isTemporary();
 
     /**
      * Set If the Server is Temporary (will start server if not running)
      *
      * @param value Value
      */
-    public abstract void setTemporary(boolean value);
-
-    @Override
-    public String toString() {
-        JSONObject sinfo = new JSONObject(super.toString());
-        sinfo.put("type", "SubServer");
-        sinfo.put("enabled", getHost().isEnabled() && isEnabled());
-        sinfo.put("host", getHost().getName());
-        sinfo.put("running", isRunning());
-        sinfo.put("log", isLogging());
-        List<String> incompatible = new ArrayList<String>();
-        for (SubServer server : getCurrentIncompatibilities()) incompatible.add(server.getName());
-        sinfo.put("incompatible", incompatible);
-        sinfo.put("temp", isTemporary());
-        return sinfo.toString();
-    }
+    void setTemporary(boolean value);
 }

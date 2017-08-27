@@ -19,7 +19,7 @@ import java.util.List;
  * SubDataServer Class
  */
 public final class SubDataServer {
-    protected static final int MAX_QUEUE = 64;
+    private static final int MAX_QUEUE = 64;
     private static HashMap<Class<? extends PacketOut>, String> pOut = new HashMap<Class<? extends PacketOut>, String>();
     private static HashMap<String, List<PacketIn>> pIn = new HashMap<String, List<PacketIn>>();
     private static List<InetAddress> allowedAddresses = new ArrayList<InetAddress>();
