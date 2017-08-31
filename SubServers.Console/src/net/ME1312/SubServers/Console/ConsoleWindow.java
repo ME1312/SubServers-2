@@ -10,22 +10,28 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.text.*;
+import javax.swing.text.html.HTMLDocument;
+import javax.swing.text.html.HTMLEditorKit;
+import javax.swing.text.html.StyleSheet;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.List;
 import java.util.logging.Level;
 
 public final class ConsoleWindow implements SubLogFilter {
+    private static String RESET_VALUE = "\n\u00A0\n\u00A0";
     private ConsolePlugin plugin;
     private JFrame window;
     private JPanel panel;
     private JTextField input;
     private boolean ifocus = false;
     private TextFieldPopup popup;
-    private JTextArea log;
+    private JTextPane log;
     private JScrollPane vScroll;
     private JScrollBar hScroll;
     private List<Integer> eScroll = new ArrayList<Integer>();
@@ -38,6 +44,25 @@ public final class ConsoleWindow implements SubLogFilter {
     private int findI = 0;
     private boolean open = false;
     private SubLogger logger;
+    private int fontSize = 12;
+    private AnsiHTMLColorStream stream = new AnsiHTMLColorStream(new OutputStream() {
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+
+        @Override
+        public void write(int b) throws IOException {
+            stream.write(b);
+            if (((char) b) == '\n') {
+                try {
+                    HTMLEditorKit kit = (HTMLEditorKit) log.getEditorKit();
+                    HTMLDocument doc = (HTMLDocument) log.getDocument();
+                    kit.insertHTML(doc, doc.getLength() - 2, new String(stream.toByteArray(), "UTF-8"), 0, 0, null);
+                } catch (BadLocationException e) {
+                    e.printStackTrace();
+                }
+                stream = new ByteArrayOutputStream();
+            }
+        }
+    });
     private boolean[] kpressed = new boolean[65535];
     private KeyEventDispatcher keys = event -> {
         switch (event.getID()) {
@@ -111,21 +136,27 @@ public final class ConsoleWindow implements SubLogFilter {
         menu.addSeparator();
         item = new JMenuItem("Reset Text Size");
         item.addActionListener(event -> {
-            log.setFont(log.getFont().deriveFont(12f));
+            HTMLDocument doc = (HTMLDocument) log.getDocument();
+            fontSize = 12;
+            doc.getStyleSheet().addRule("body {font-size: "+fontSize+";}\n");
             hScroll();
         });
         menu.add(item);
         item = new JMenuItem("Bigger Text");
         item.setAccelerator(KeyStroke.getKeyStroke('=', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), true));
         item.addActionListener(event -> {
-            log.setFont(log.getFont().deriveFont((float) log.getFont().getSize() + 2));
+            HTMLDocument doc = (HTMLDocument) log.getDocument();
+            fontSize += 2;
+            doc.getStyleSheet().addRule("body {font-size: "+fontSize+";}\n");
             hScroll();
         });
         menu.add(item);
         item = new JMenuItem("Smaller Text");
         item.setAccelerator(KeyStroke.getKeyStroke('-', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), true));
         item.addActionListener(event -> {
-            log.setFont(log.getFont().deriveFont((float) log.getFont().getSize() - 2));
+            HTMLDocument doc = (HTMLDocument) log.getDocument();
+            fontSize -= 2;
+            doc.getStyleSheet().addRule("body {font-size: "+fontSize+";}\n");
             hScroll();
         });
         menu.add(item);
@@ -137,7 +168,7 @@ public final class ConsoleWindow implements SubLogFilter {
         item = new JMenuItem("Reload Log");
         item.setAccelerator(KeyStroke.getKeyStroke('R', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), true));
         item.addActionListener(event -> {
-            log.setText("\n");
+            log.setText(RESET_VALUE);
             loadContent();
         });
         menu.add(item);
@@ -166,6 +197,11 @@ public final class ConsoleWindow implements SubLogFilter {
         });
         vScroll.setBorder(BorderFactory.createEmptyBorder());
         new SmartScroller(vScroll, SmartScroller.VERTICAL, SmartScroller.END);
+        log.setContentType("text/html");
+        log.setEditorKit(new HTMLEditorKit());
+        StyleSheet style = new StyleSheet();
+        style.addRule("body {color: #dcdcdc; font-family: courier; font-size: 12;}\n");
+        log.setDocument(new HTMLDocument(style));
         log.setBorder(BorderFactory.createLineBorder(new Color(40, 44, 45)));
         new TextFieldPopup(log, false);
         ((AbstractDocument) log.getDocument()).setDocumentFilter(new DocumentFilter() {
@@ -316,7 +352,7 @@ public final class ConsoleWindow implements SubLogFilter {
         }
 
         logger.registerFilter(this);
-        log.setText("\n");
+        log.setText(RESET_VALUE);
         loadContent();
         KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(keys);
         if (logger.isLogging() && !open) open();
@@ -354,7 +390,11 @@ public final class ConsoleWindow implements SubLogFilter {
     }
 
     public void log(Date date, String message) {
-        log.append(' ' + new SimpleDateFormat("hh:mm:ss").format(date) + ' ' + message + " \n");
+        try {
+            stream.write((' ' + new SimpleDateFormat("hh:mm:ss").format(date) + ' ' + message + " \n").getBytes("UTF-8"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
     public void log(String message) {
         log(Calendar.getInstance().getTime(), message);
@@ -369,7 +409,7 @@ public final class ConsoleWindow implements SubLogFilter {
     }
 
     public void clear() {
-        log.setText("\n");
+        log.setText(RESET_VALUE);
         hScroll();
     }
 

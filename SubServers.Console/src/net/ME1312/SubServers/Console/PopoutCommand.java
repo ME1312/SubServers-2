@@ -7,7 +7,6 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
 import net.md_5.bungee.command.ConsoleCommandSender;
 
-import javax.swing.*;
 import java.util.List;
 import java.util.Map;
 
@@ -32,11 +31,9 @@ public final class PopoutCommand {
                         boolean success = false;
                         if (servers.get(args[0].toLowerCase()).isRunning()) {
                             if (!plugin.sCurrent.keySet().contains(args[0].toLowerCase())) {
-                                SwingUtilities.invokeLater(() -> {
-                                    ConsoleWindow window = new ConsoleWindow(plugin, servers.get(args[0].toLowerCase()).getLogger());
-                                    plugin.sCurrent.put(args[0].toLowerCase(), window);
-                                    window.open();
-                                });
+                                ConsoleWindow window = new ConsoleWindow(plugin, servers.get(args[0].toLowerCase()).getLogger());
+                                plugin.sCurrent.put(args[0].toLowerCase(), window);
+                                window.open();
                             } else {
                                 plugin.sCurrent.get(args[0].toLowerCase()).open();
                             }
@@ -101,13 +98,11 @@ public final class PopoutCommand {
                         boolean success = false;
                         if (hosts.get(args[0].toLowerCase()).getCreator().getReservedNames().size() > 0) {
                             if (!plugin.cCurrent.keySet().contains(args[0].toLowerCase())) {
-                                SwingUtilities.invokeLater(() -> {
-                                    for (String reserved : hosts.get(args[0].toLowerCase()).getCreator().getReservedNames()) {
-                                        ConsoleWindow window = new ConsoleWindow(plugin, hosts.get(args[0].toLowerCase()).getCreator().getLogger(reserved));
-                                        plugin.cCurrent.put(reserved.toLowerCase(), window);
-                                        window.open();
-                                    }
-                                });
+                                for (String reserved : hosts.get(args[0].toLowerCase()).getCreator().getReservedNames()) {
+                                    ConsoleWindow window = new ConsoleWindow(plugin, hosts.get(args[0].toLowerCase()).getCreator().getLogger(reserved));
+                                    plugin.cCurrent.put(reserved.toLowerCase(), window);
+                                    window.open();
+                                }
                             } else {
                                 plugin.cCurrent.get(args[0].toLowerCase()).open();
                             }

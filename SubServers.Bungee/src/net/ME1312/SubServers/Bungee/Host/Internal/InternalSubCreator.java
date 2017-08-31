@@ -201,7 +201,7 @@ public class InternalSubCreator extends SubCreator {
                 if (!server.contains("Enabled")) server.set("Enabled", true);
                 if (!server.contains("Display")) server.set("Display", "");
                 if (!server.contains("Host")) server.set("Host", host.getName());
-                if (!server.contains("Group")) server.set("Group", "");
+                if (!server.contains("Group")) server.set("Group", new ArrayList<String>());
                 if (!server.contains("Port")) server.set("Port", port);
                 if (!server.contains("Motd")) server.set("Motd", "Some SubServer");
                 if (!server.contains("Log")) server.set("Log", true);
@@ -214,8 +214,11 @@ public class InternalSubCreator extends SubCreator {
                 if (!server.contains("Incompatible")) server.set("Incompatible", new ArrayList<String>());
                 if (!server.contains("Hidden")) server.set("Hidden", false);
 
-                host.addSubServer(player, name, server.getBoolean("Enabled"), port, server.getColoredString("Motd", '&'), server.getBoolean("Log"), server.getRawString("Directory"),
+                SubServer subserver = host.addSubServer(player, name, server.getBoolean("Enabled"), port, server.getColoredString("Motd", '&'), server.getBoolean("Log"), server.getRawString("Directory"),
                         new Executable(server.getRawString("Executable")), server.getRawString("Stop-Command"), true, server.getBoolean("Auto-Restart"), server.getBoolean("Hidden"), server.getBoolean("Restricted"), false);
+                if (server.getString("Display").length() > 0) subserver.setDisplayName(server.getString("Display"));
+                for (String group : server.getStringList("Group")) subserver.addGroup(group);
+                if (server.contains("Extra")) for (String extra : server.getSection("Extra").getKeys()) subserver.addExtra(extra, server.getObject(extra));
                 host.plugin.config.get().getSection("Servers").set(name, server);
                 host.plugin.config.save();
             } catch (Exception e) {
@@ -231,14 +234,19 @@ public class InternalSubCreator extends SubCreator {
     public boolean create(UUID player, String name, ServerTemplate template, Version version, int port) {
         if (Util.isNull(name, template, version, port)) throw new NullPointerException();
         if (template.isEnabled() && !SubAPI.getInstance().getSubServers().keySet().contains(name.toLowerCase()) && !SubCreator.isReserved(name)) {
+            NamedContainer<Thread, NamedContainer<InternalSubLogger, Process>> thread = new NamedContainer<Thread, NamedContainer<InternalSubLogger, Process>>(null, new NamedContainer<InternalSubLogger, Process>(new InternalSubLogger(null, this, name + File.separator + "Creator", new Container<Boolean>(false), null), null));
+            this.thread.put(name.toLowerCase(), thread);
+
             final SubCreateEvent event = new SubCreateEvent(player, host, name, template, version, port);
             host.plugin.getPluginManager().callEvent(event);
             if (!event.isCancelled()) {
-                NamedContainer<Thread, NamedContainer<InternalSubLogger, Process>> thread = new NamedContainer<Thread, NamedContainer<InternalSubLogger, Process>>(new Thread(() -> InternalSubCreator.this.run(player, name, event.getTemplate(), event.getVersion(), port)), new NamedContainer<InternalSubLogger, Process>(new InternalSubLogger(null, this, name + File.separator + "Creator", new Container<Boolean>(false), null), null));
-                this.thread.put(name.toLowerCase(), thread);
+                thread.rename(new Thread(() -> InternalSubCreator.this.run(player, name, event.getTemplate(), event.getVersion(), port)));
                 thread.name().start();
                 return true;
-            } else return false;
+            } else {
+                this.thread.remove(name.toLowerCase());
+                return false;
+            }
         } else return false;
     }
 

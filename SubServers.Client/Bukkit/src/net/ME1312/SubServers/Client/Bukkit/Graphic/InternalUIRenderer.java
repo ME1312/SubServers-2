@@ -22,10 +22,9 @@ import java.util.regex.Pattern;
  * Internal GUI Renderer Class
  */
 public class InternalUIRenderer extends UIRenderer {
+    private static int MAX_VISITED_OBJECTS = 2;
     private List<Runnable> windowHistory = new LinkedList<Runnable>();
-    protected Options lastUsedOptions = null;
-    protected int lastVisitedObjectPosition = 0;
-    protected String lastVisitedObject = null;
+    protected Object[] lastVisitedObjects = new Object[MAX_VISITED_OBJECTS];
     protected int lastPage = 1;
     protected Runnable lastMenu = null;
     protected boolean open = false;
@@ -103,7 +102,7 @@ public class InternalUIRenderer extends UIRenderer {
         setDownloading(ChatColor.stripColor(plugin.lang.getSection("Lang").getColoredString("Interface.Host-Menu.Title", '&')));
         plugin.subdata.sendPacket(new PacketDownloadServerList(null, null, (json) -> {
             setDownloading(null);
-            lastVisitedObject = null;
+            lastVisitedObjects[0] = null;
             lastPage = page;
             lastMenu = () -> hostMenu(1);
             windowHistory.add(() -> hostMenu(page));
@@ -232,7 +231,7 @@ public class InternalUIRenderer extends UIRenderer {
                 if (hasHistory()) back();
             } else {
                 setDownloading(null);
-                lastVisitedObject = host;
+                lastVisitedObjects[0] = host;
 
                 ItemStack block;
                 ItemMeta blockMeta;
@@ -339,15 +338,15 @@ public class InternalUIRenderer extends UIRenderer {
 
     public void hostCreator(final CreatorOptions options) {
         setDownloading(ChatColor.stripColor(plugin.lang.getSection("Lang").getColoredString("Interface.Host-Creator.Title", '&').replace("$str$", options.getHost())));
-        lastUsedOptions = options;
+        lastVisitedObjects[0] = options;
         if (!options.init()) {
             windowHistory.add(() -> hostCreator(options));
-            lastVisitedObject = options.getHost();
+            lastVisitedObjects[0] = options.getHost();
         }
 
         plugin.subdata.sendPacket(new PacketDownloadHostInfo(options.getHost(), json -> {
             if (!json.getBoolean("valid")|| !json.getJSONObject("host").getBoolean("enabled")) {
-                lastUsedOptions = null;
+                lastVisitedObjects[0] = null;
                 if (hasHistory()) back();
             } else {
                 setDownloading(null);
@@ -475,11 +474,11 @@ public class InternalUIRenderer extends UIRenderer {
 
     public void hostCreatorTemplates(final int page, final CreatorOptions options) {
         setDownloading(ChatColor.stripColor(plugin.lang.getSection("Lang").getColoredString("Interface.Host-Creator.Edit-Template.Title", '&').replace("$str$", options.getHost())));
-        lastUsedOptions = options;
-        if (!options.init()) lastVisitedObject = options.getHost();
+        lastVisitedObjects[0] = options;
+        if (!options.init()) lastVisitedObjects[0] = options.getHost();
         plugin.subdata.sendPacket(new PacketDownloadHostInfo(options.getHost(), (json) -> {
             if (!json.getBoolean("valid")|| !json.getJSONObject("host").getBoolean("enabled")) {
-                lastUsedOptions = null;
+                lastVisitedObjects[0] = null;
                 if (hasHistory()) back();
             } else {
                 lastPage = page;
@@ -595,7 +594,7 @@ public class InternalUIRenderer extends UIRenderer {
                 if (hasHistory()) back();
             } else {
                 setDownloading(null);
-                lastVisitedObject = host;
+                lastVisitedObjects[0] = host;
                 lastPage = page;
                 List<String> renderers = new ArrayList<String>();
                 for (String renderer : renderers) {
@@ -699,7 +698,7 @@ public class InternalUIRenderer extends UIRenderer {
         setDownloading(ChatColor.stripColor(plugin.lang.getSection("Lang").getColoredString("Interface.Group-Menu.Title", '&')));
         plugin.subdata.sendPacket(new PacketDownloadServerList(null, null, (json) -> {
             setDownloading(null);
-            lastVisitedObject = null;
+            lastVisitedObjects[0] = null;
             lastPage = page;
             lastMenu = () -> groupMenu(1);
             windowHistory.add(() -> groupMenu(page));
@@ -812,23 +811,18 @@ public class InternalUIRenderer extends UIRenderer {
 
             HashMap<String, String> hosts = new HashMap<String, String>();
             List<String> servers = new ArrayList<String>();
+            lastVisitedObjects[0] = host;
+            lastVisitedObjects[1] = group;
             if (host != null && json.getJSONObject("hosts").keySet().contains(host)) {
-                lastVisitedObject = host;
-                lastVisitedObjectPosition = 1;
                 for (String subserver : json.getJSONObject("hosts").getJSONObject(host).getJSONObject("servers").keySet()) {
                     hosts.put(subserver, host);
                     servers.add(subserver);
                 }
             } else if (group != null && json.getJSONObject("groups").keySet().contains(group)) {
-                lastVisitedObject = group;
-                lastVisitedObjectPosition = 2;
                 for (String server : json.getJSONObject("groups").getJSONObject(group).keySet()) {
                     hosts.put(server, (json.getJSONObject("groups").getJSONObject(group).getJSONObject(server).keySet().contains("host") && json.getJSONObject("hosts").keySet().contains(json.getJSONObject("groups").getJSONObject(group).getJSONObject(server).getString("host")))?json.getJSONObject("groups").getJSONObject(group).getJSONObject(server).getString("host"):null);
                     servers.add(server);
                 }
-            } else {
-                lastVisitedObject = null;
-                lastVisitedObjectPosition = 0;
                 lastMenu = () -> serverMenu(1, null, null);
                 for (String s : json.getJSONObject("servers").keySet()) {
                     hosts.put(s, null);
@@ -1012,7 +1006,7 @@ public class InternalUIRenderer extends UIRenderer {
                 if (hasHistory()) back();
             } else {
                 setDownloading(null);
-                lastVisitedObject = subserver;
+                lastVisitedObjects[0] = subserver;
                 ItemStack block;
                 ItemMeta blockMeta;
                 ItemStack div = new ItemStack(Material.STAINED_GLASS_PANE, 1, (short) 15);
@@ -1194,7 +1188,7 @@ public class InternalUIRenderer extends UIRenderer {
                 if (hasHistory()) back();
             } else {
                 setDownloading(null);
-                lastVisitedObject = subserver;
+                lastVisitedObjects[0] = subserver;
                 lastPage = page;
                 List<String> renderers = new ArrayList<String>();
                 for (String renderer : renderers) {

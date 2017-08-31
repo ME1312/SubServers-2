@@ -50,7 +50,7 @@
           <title-color color="-4473925"/>
         </border>
         <children>
-          <component id="71cb5" class="javax.swing.JTextArea" binding="log">
+          <component id="96e88" class="javax.swing.JTextPane" binding="log">
             <constraints/>
             <properties>
               <background color="-14144467"/>
@@ -61,11 +61,7 @@
               <enabled value="true"/>
               <font name="Courier" size="12"/>
               <foreground color="-1"/>
-              <lineWrap value="false"/>
             </properties>
-            <clientProperties>
-              <html.disable class="java.lang.Boolean" value="true"/>
-            </clientProperties>
           </component>
         </children>
       </scrollpane>
