@@ -1,6 +1,7 @@
 package net.ME1312.SubServers.Host.Network.Packet;
 
 import net.ME1312.SubServers.Host.Library.Log.Logger;
+import net.ME1312.SubServers.Host.Library.NamedContainer;
 import net.ME1312.SubServers.Host.Library.Util;
 import net.ME1312.SubServers.Host.Library.Version.Version;
 import net.ME1312.SubServers.Host.Network.PacketIn;
@@ -11,6 +12,7 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 
 /**
  * Authorization Packet
@@ -46,7 +48,12 @@ public final class PacketAuthorization implements PacketIn, PacketOut {
     public void execute(JSONObject data) {
         try {
             if (data.getInt("r") == 0) {
-                host.subdata.sendPacket(new PacketLinkExHost(host));
+                try {
+                    Method m = SubDataClient.class.getDeclaredMethod("sendPacket", NamedContainer.class);
+                    m.setAccessible(true);
+                    m.invoke(host.subdata, new NamedContainer<String, PacketOut>(null, new PacketLinkExHost(host)));
+                    m.setAccessible(false);
+                } catch (Exception e) {}
             } else {
                 log.info.println("SubServers > Could not authorize SubData connection: " + data.getString("m"));
                 host.subdata.destroy(0);

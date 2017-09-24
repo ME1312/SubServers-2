@@ -1,5 +1,6 @@
 package net.ME1312.SubServers.Host.Network;
 
+import net.ME1312.SubServers.Host.API.Event.SubNetworkConnectEvent;
 import net.ME1312.SubServers.Host.API.Event.SubNetworkDisconnectEvent;
 import net.ME1312.SubServers.Host.Library.Exception.IllegalPacketException;
 import net.ME1312.SubServers.Host.Library.Log.Logger;
@@ -33,7 +34,7 @@ public final class SubDataClient {
     private static boolean defaults = false;
     protected static Logger log;
     private PrintWriter writer;
-    private Socket socket;
+    private NamedContainer<Boolean, Socket> socket;
     private String name;
     private Encryption encryption;
     private ExHost host;
@@ -59,22 +60,29 @@ public final class SubDataClient {
      */
     public SubDataClient(ExHost host, String name, InetAddress address, int port, Encryption encryption) throws IOException {
         if (Util.isNull(host, name, address, port, encryption)) throw new NullPointerException();
-        socket = new Socket(address, port);
+        socket = new NamedContainer<>(false, new Socket(address, port));
         this.host = host;
         this.name = name;
-        this.writer = new PrintWriter(socket.getOutputStream(), true);
+        this.writer = new PrintWriter(socket.get().getOutputStream(), true);
         this.encryption = encryption;
         this.queue = new LinkedList<NamedContainer<String, PacketOut>>();
 
         if (!defaults) loadDefaults();
         loop();
 
-        new Timer().schedule(new TimerTask() {
-            @Override
-            public void run() {
-                sendPacket(new PacketAuthorization(host));
-            }
-        }, 500);
+        sendPacket(new NamedContainer<>(null, new PacketAuthorization(host)));
+    }
+
+    private void init() {
+        sendPacket(new PacketExConfigureHost(host));
+        sendPacket(new PacketDownloadLang());
+        sendPacket(new PacketOutExRequestQueue());
+        while (queue.size() != 0) {
+            sendPacket(queue.get(0));
+            queue.remove(0);
+        }
+        socket.rename(true);
+        host.api.executeEvent(new SubNetworkConnectEvent(host.subdata));
     }
 
     private void loadDefaults() {
@@ -130,7 +138,7 @@ public final class SubDataClient {
     private void loop() {
         new Thread(() -> {
             try {
-                BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                BufferedReader in = new BufferedReader(new InputStreamReader(socket.get().getInputStream()));
                 String input;
                 while ((input = in.readLine()) != null) {
                     String decoded = null;
@@ -192,7 +200,7 @@ public final class SubDataClient {
      * @return Server Socket
      */
     public Socket getClient() {
-        return socket;
+        return socket.get();
     }
 
     /**
@@ -266,30 +274,35 @@ public final class SubDataClient {
      */
     public void sendPacket(PacketOut packet) {
         if (Util.isNull(packet)) throw new NullPointerException();
-        if (socket == null) {
+        if (socket.get() == null || !socket.name()) {
             queue.add(new NamedContainer<>(null, packet));
         } else {
-            try {
-                switch (getEncryption()) {
-                    case AES:
-                    case AES_128:
-                        writer.println(Base64.getEncoder().encodeToString(AES.encrypt(128, host.config.get().getSection("Settings").getSection("SubData").getRawString("Password"), encodePacket(packet).toString())));
-                        break;
-                    case AES_192:
-                        writer.println(Base64.getEncoder().encodeToString(AES.encrypt(192, host.config.get().getSection("Settings").getSection("SubData").getRawString("Password"), encodePacket(packet).toString())));
-                        break;
-                    case AES_256:
-                        writer.println(Base64.getEncoder().encodeToString(AES.encrypt(256, host.config.get().getSection("Settings").getSection("SubData").getRawString("Password"), encodePacket(packet).toString())));
-                        break;
-                    default:
-                        writer.println(encodePacket(packet));
-                }
-            } catch (Throwable e) {
-                log.error.println(e);
-            }
+            sendPacket(new NamedContainer<>(null, packet));
         }
     }
 
+    private void sendPacket(NamedContainer<String, PacketOut> packet) {
+        try {
+            JSONObject json = encodePacket(packet.get());
+            if (packet.name() != null) json.put("f", packet.name());
+            switch (getEncryption()) {
+                case AES:
+                case AES_128:
+                    writer.println(Base64.getEncoder().encodeToString(AES.encrypt(128, host.config.get().getSection("Settings").getSection("SubData").getRawString("Password"), json.toString())));
+                    break;
+                case AES_192:
+                    writer.println(Base64.getEncoder().encodeToString(AES.encrypt(192, host.config.get().getSection("Settings").getSection("SubData").getRawString("Password"), json.toString())));
+                    break;
+                case AES_256:
+                    writer.println(Base64.getEncoder().encodeToString(AES.encrypt(256, host.config.get().getSection("Settings").getSection("SubData").getRawString("Password"), json.toString())));
+                    break;
+                default:
+                    writer.println(json.toString());
+            }
+        } catch (Throwable e) {
+            log.error.println(e);
+        }
+    }
     /**
      * Forward Packet to Server
      *
@@ -298,29 +311,10 @@ public final class SubDataClient {
      */
     public void forwardPacket(PacketOut packet, String location) {
         if (Util.isNull(packet, location)) throw new NullPointerException();
-        if (socket == null) {
+        if (socket == null || !socket.name()) {
             queue.add(new NamedContainer<>(location, packet));
         } else {
-            try {
-                JSONObject json = encodePacket(packet);
-                json.put("f", location);
-                switch (getEncryption()) {
-                    case AES:
-                    case AES_128:
-                        writer.println(Base64.getEncoder().encodeToString(AES.encrypt(128, host.config.get().getSection("Settings").getSection("SubData").getRawString("Password"), json.toString())));
-                        break;
-                    case AES_192:
-                        writer.println(Base64.getEncoder().encodeToString(AES.encrypt(192, host.config.get().getSection("Settings").getSection("SubData").getRawString("Password"), json.toString())));
-                        break;
-                    case AES_256:
-                        writer.println(Base64.getEncoder().encodeToString(AES.encrypt(256, host.config.get().getSection("Settings").getSection("SubData").getRawString("Password"), json.toString())));
-                        break;
-                    default:
-                        writer.println(json.toString());
-                }
-            } catch (Throwable e) {
-                log.error.println(e);
-            }
+            sendPacket(new NamedContainer<>(location, packet));
         }
     }
 
@@ -389,9 +383,9 @@ public final class SubDataClient {
      */
     public void destroy(int reconnect) throws IOException {
         if (Util.isNull(reconnect)) throw new NullPointerException();
-        if (socket != null) {
-            final Socket socket = this.socket;
-            this.socket = null;
+        if (socket.get() != null) {
+            final Socket socket = this.socket.get();
+            this.socket.set(null);
             if (!socket.isClosed()) socket.close();
             host.api.executeEvent(new SubNetworkDisconnectEvent());
             log.info.println("The SubData Connection was closed");

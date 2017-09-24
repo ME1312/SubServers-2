@@ -105,10 +105,10 @@ public class AnsiHTMLColorStream extends AnsiOutputStream {
     }
 
     protected void processSetForegroundColor(int color) throws IOException {
-        this.writeAttribute("span style=\"color: #" + ANSI_COLOR_MAP[color] + ";\"");
+        this.writeAttribute("span class=\"ansi\" style=\"color: #" + ANSI_COLOR_MAP[color] + ";\"");
     }
 
     protected void processSetBackgroundColor(int color) throws IOException {
-        this.writeAttribute("span style=\"background-color: #" + ANSI_COLOR_MAP[color] + ";\"");
+        this.writeAttribute("span class=\"ansi-background\" style=\"background-color: #" + ANSI_COLOR_MAP[color] + ";\"");
     }
 }

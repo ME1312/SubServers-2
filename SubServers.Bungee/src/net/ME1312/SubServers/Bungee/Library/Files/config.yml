@@ -14,7 +14,7 @@ Hosts:
     Driver: 'BUILT-IN'
     Address: '127.0.0.1'
     Directory: './'
-    Git-Bash: 'C:\Program Files\Git'
+    Git-Bash: '%ProgramFiles%\Git'
 
 Servers:
   'Example':

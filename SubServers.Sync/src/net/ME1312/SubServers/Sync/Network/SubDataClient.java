@@ -1,11 +1,14 @@
 package net.ME1312.SubServers.Sync.Network;
 
+import net.ME1312.SubServers.Sync.Event.SubNetworkConnectEvent;
 import net.ME1312.SubServers.Sync.Event.SubNetworkDisconnectEvent;
 import net.ME1312.SubServers.Sync.Library.Exception.IllegalPacketException;
 import net.ME1312.SubServers.Sync.Library.NamedContainer;
 import net.ME1312.SubServers.Sync.Library.Util;
 import net.ME1312.SubServers.Sync.Library.Version.Version;
 import net.ME1312.SubServers.Sync.Network.Packet.*;
+import net.ME1312.SubServers.Sync.Server.Server;
+import net.ME1312.SubServers.Sync.Server.SubServer;
 import net.ME1312.SubServers.Sync.SubPlugin;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -16,6 +19,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketException;
 import java.util.*;
@@ -29,7 +33,7 @@ public final class SubDataClient {
     private static HashMap<String, List<PacketIn>> pIn = new HashMap<String, List<PacketIn>>();
     private static boolean defaults = false;
     private PrintWriter writer;
-    private Socket socket;
+    private NamedContainer<Boolean, Socket> socket;
     private Encryption encryption;
     private SubPlugin plugin;
     private LinkedList<NamedContainer<String, PacketOut>> queue;
@@ -53,21 +57,44 @@ public final class SubDataClient {
      */
     public SubDataClient(SubPlugin plugin, InetAddress address, int port, Encryption encryption) throws IOException {
         if (Util.isNull(plugin, address, port)) throw new NullPointerException();
-        socket = new Socket(address, port);
+        socket = new NamedContainer<>(false, new Socket(address, port));
         this.plugin = plugin;
-        this.writer = new PrintWriter(socket.getOutputStream(), true);
+        this.writer = new PrintWriter(socket.get().getOutputStream(), true);
         this.encryption = encryption;
         this.queue = new LinkedList<NamedContainer<String, PacketOut>>();
 
         if (!defaults) loadDefaults();
         loop();
 
-        new Timer().schedule(new TimerTask() {
-            @Override
-            public void run() {
-                sendPacket(new PacketAuthorization(plugin));
+        sendPacket(new NamedContainer<>(null, new PacketAuthorization(plugin)));
+    }
+
+    private void init() {
+        plugin.subdata.sendPacket(new PacketDownloadLang(plugin));
+        plugin.subdata.sendPacket(new PacketDownloadServerList(null, json -> {
+            System.out.println("SubServers > Resetting Server Data");
+            plugin.servers.clear();
+            for (String host : json.getJSONObject("hosts").keySet()) {
+                for (String subserver : json.getJSONObject("hosts").getJSONObject(host).getJSONObject("servers").keySet()) {
+                    plugin.servers.put(subserver.toLowerCase(), new SubServer(subserver, json.getJSONObject("hosts").getJSONObject(host).getJSONObject("servers").getJSONObject(subserver).getString("display"),
+                            new InetSocketAddress(json.getJSONObject("hosts").getJSONObject(host).getJSONObject("servers").getJSONObject(subserver).getString("address").split(":")[0], Integer.parseInt(json.getJSONObject("hosts").getJSONObject(host).getJSONObject("servers").getJSONObject(subserver).getString("address").split(":")[1])),
+                            json.getJSONObject("hosts").getJSONObject(host).getJSONObject("servers").getJSONObject(subserver).getString("motd"), json.getJSONObject("hosts").getJSONObject(host).getJSONObject("servers").getJSONObject(subserver).getBoolean("hidden"),
+                            json.getJSONObject("hosts").getJSONObject(host).getJSONObject("servers").getJSONObject(subserver).getBoolean("restricted"), json.getJSONObject("hosts").getJSONObject(host).getJSONObject("servers").getJSONObject(subserver).getBoolean("running")));
+                    System.out.println("SubServers > Added SubServer: " + subserver);
+                }
             }
-        }, 500);
+            for (String server : json.getJSONObject("servers").keySet()) {
+                plugin.servers.put(server.toLowerCase(), new Server(server, json.getJSONObject("servers").getJSONObject(server).getString("display"), new InetSocketAddress(json.getJSONObject("servers").getJSONObject(server).getString("address").split(":")[0], Integer.parseInt(json.getJSONObject("servers").getJSONObject(server).getString("address").split(":")[1])),
+                        json.getJSONObject("servers").getJSONObject(server).getString("motd"), json.getJSONObject("servers").getJSONObject(server).getBoolean("hidden"), json.getJSONObject("servers").getJSONObject(server).getBoolean("restricted")));
+                System.out.println("SubServers > Added Server: " + server);
+            }
+        }));
+        while (queue.size() != 0) {
+            sendPacket(queue.get(0));
+            queue.remove(0);
+        }
+        socket.rename(true);
+        plugin.getPluginManager().callEvent(new SubNetworkConnectEvent(this));
     }
 
     private void loadDefaults() {
@@ -105,7 +132,7 @@ public final class SubDataClient {
     private void loop() {
         new Thread(() -> {
             try {
-                BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                BufferedReader in = new BufferedReader(new InputStreamReader(socket.get().getInputStream()));
                 String input;
                 while ((input = in.readLine()) != null) {
                     String decoded = null;
@@ -158,7 +185,7 @@ public final class SubDataClient {
      * @return Server Socket
      */
     public Socket getClient() {
-        return socket;
+        return socket.get();
     }
 
     /**
@@ -244,27 +271,33 @@ public final class SubDataClient {
      */
     public void sendPacket(PacketOut packet) {
         if (Util.isNull(packet)) throw new NullPointerException();
-        if (socket == null) {
+        if (socket.get() == null || !socket.name()) {
             queue.add(new NamedContainer<>(null, packet));
         } else {
-            try {
-                switch (getEncryption()) {
-                    case AES:
-                    case AES_128:
-                        writer.println(Base64.getEncoder().encodeToString(AES.encrypt(128, plugin.config.get().getSection("Settings").getSection("SubData").getRawString("Password"), encodePacket(packet).toString())));
-                        break;
-                    case AES_192:
-                        writer.println(Base64.getEncoder().encodeToString(AES.encrypt(192, plugin.config.get().getSection("Settings").getSection("SubData").getRawString("Password"), encodePacket(packet).toString())));
-                        break;
-                    case AES_256:
-                        writer.println(Base64.getEncoder().encodeToString(AES.encrypt(256, plugin.config.get().getSection("Settings").getSection("SubData").getRawString("Password"), encodePacket(packet).toString())));
-                        break;
-                    default:
-                        writer.println(encodePacket(packet));
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
+            sendPacket(new NamedContainer<>(null, packet));
+        }
+    }
+
+    private void sendPacket(NamedContainer<String, PacketOut> packet) {
+        try {
+            JSONObject json = encodePacket(packet.get());
+            if (packet.name() != null) json.put("f", packet.name());
+            switch (getEncryption()) {
+                case AES:
+                case AES_128:
+                    writer.println(Base64.getEncoder().encodeToString(AES.encrypt(128, plugin.config.get().getSection("Settings").getSection("SubData").getRawString("Password"), json.toString())));
+                    break;
+                case AES_192:
+                    writer.println(Base64.getEncoder().encodeToString(AES.encrypt(192, plugin.config.get().getSection("Settings").getSection("SubData").getRawString("Password"), json.toString())));
+                    break;
+                case AES_256:
+                    writer.println(Base64.getEncoder().encodeToString(AES.encrypt(256, plugin.config.get().getSection("Settings").getSection("SubData").getRawString("Password"), json.toString())));
+                    break;
+                default:
+                    writer.println(json.toString());
             }
+        } catch (Throwable e) {
+            e.printStackTrace();
         }
     }
 
@@ -276,29 +309,10 @@ public final class SubDataClient {
      */
     public void forwardPacket(PacketOut packet, String location) {
         if (Util.isNull(packet, location)) throw new NullPointerException();
-        if (socket == null) {
+        if (socket.get() == null || !socket.name()) {
             queue.add(new NamedContainer<>(location, packet));
         } else {
-            try {
-                JSONObject json = encodePacket(packet);
-                json.put("f", location);
-                switch (getEncryption()) {
-                    case AES:
-                    case AES_128:
-                        writer.println(Base64.getEncoder().encodeToString(AES.encrypt(128, plugin.config.get().getSection("Settings").getSection("SubData").getRawString("Password"), json.toString())));
-                        break;
-                    case AES_192:
-                        writer.println(Base64.getEncoder().encodeToString(AES.encrypt(192, plugin.config.get().getSection("Settings").getSection("SubData").getRawString("Password"), json.toString())));
-                        break;
-                    case AES_256:
-                        writer.println(Base64.getEncoder().encodeToString(AES.encrypt(256, plugin.config.get().getSection("Settings").getSection("SubData").getRawString("Password"), json.toString())));
-                        break;
-                    default:
-                        writer.println(json.toString());
-                }
-            } catch (Throwable e) {
-                e.printStackTrace();
-            }
+            sendPacket(new NamedContainer<>(null, packet));
         }
     }
 
@@ -366,9 +380,9 @@ public final class SubDataClient {
      */
     public void destroy(int reconnect) throws IOException {
         if (Util.isNull(reconnect)) throw new NullPointerException();
-        if (socket != null) {
-            final Socket socket = this.socket;
-            this.socket = null;
+        if (socket.get() != null) {
+            final Socket socket = this.socket.get();
+            this.socket.set(null);
             if (!socket.isClosed()) socket.close();
             plugin.getPluginManager().callEvent(new SubNetworkDisconnectEvent());
             System.out.println("SubServers > The SubData Connection was closed");

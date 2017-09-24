@@ -1,13 +1,15 @@
 package net.ME1312.SubServers.Client.Bukkit.Network.Packet;
 
-import net.ME1312.SubServers.Client.Bukkit.Event.SubNetworkConnectEvent;
 import net.ME1312.SubServers.Client.Bukkit.Library.Util;
 import net.ME1312.SubServers.Client.Bukkit.Library.Version.Version;
 import net.ME1312.SubServers.Client.Bukkit.Network.PacketIn;
 import net.ME1312.SubServers.Client.Bukkit.Network.PacketOut;
+import net.ME1312.SubServers.Client.Bukkit.Network.SubDataClient;
 import net.ME1312.SubServers.Client.Bukkit.SubPlugin;
 import org.bukkit.Bukkit;
 import org.json.JSONObject;
+
+import java.lang.reflect.Method;
 
 /**
  * Link Server Packet
@@ -35,8 +37,12 @@ public class PacketLinkServer implements PacketIn, PacketOut {
     @Override
     public void execute(JSONObject data) {
         if (data.getInt("r") == 0) {
-            plugin.subdata.sendPacket(new PacketDownloadLang());
-            Bukkit.getPluginManager().callEvent(new SubNetworkConnectEvent(plugin.subdata));
+            try {
+                Method m = SubDataClient.class.getDeclaredMethod("init");
+                m.setAccessible(true);
+                m.invoke(plugin.subdata);
+                m.setAccessible(false);
+            } catch (Exception e) {}
         } else {
             Bukkit.getLogger().info("SubData > Could not link name with server: " + data.getString("m"));
             plugin.onDisable();

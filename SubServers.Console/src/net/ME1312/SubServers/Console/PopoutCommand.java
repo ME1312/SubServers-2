@@ -57,6 +57,7 @@ public final class PopoutCommand {
                                     list.remove(args[0].toLowerCase());
                                     plugin.config.get().set("Enabled-Servers", list);
                                     if (plugin.sCurrent.keySet().contains(args[0].toLowerCase()) && !plugin.sCurrent.get(args[0].toLowerCase()).isOpen()) plugin.onClose(plugin.sCurrent.get(args[0].toLowerCase()));
+                                    plugin.config.save();
                                     if (!success) System.out.println("SubConsole > " + servers.get(args[0].toLowerCase()).getName() + " was removed from the enabled list");
                                     success = true;
                                 }
@@ -126,6 +127,7 @@ public final class PopoutCommand {
                                     list.remove(args[0].toLowerCase());
                                     plugin.config.get().set("Enabled-Creators", list);
                                     if (plugin.cCurrent.keySet().contains(args[0].toLowerCase()) && !plugin.cCurrent.get(args[0].toLowerCase()).isOpen()) plugin.onClose(plugin.cCurrent.get(args[0].toLowerCase()));
+                                    plugin.config.save();
                                     if (!success) System.out.println("SubConsole > " + hosts.get(args[0].toLowerCase()).getName() + "/Creator was removed from the enabled list");
                                     success = true;
                                 }

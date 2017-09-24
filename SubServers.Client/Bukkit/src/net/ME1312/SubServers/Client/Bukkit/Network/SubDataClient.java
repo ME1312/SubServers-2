@@ -1,5 +1,6 @@
 package net.ME1312.SubServers.Client.Bukkit.Network;
 
+import net.ME1312.SubServers.Client.Bukkit.Event.SubNetworkConnectEvent;
 import net.ME1312.SubServers.Client.Bukkit.Event.SubNetworkDisconnectEvent;
 import net.ME1312.SubServers.Client.Bukkit.Library.Container;
 import net.ME1312.SubServers.Client.Bukkit.Library.Exception.IllegalPacketException;
@@ -28,7 +29,7 @@ public final class SubDataClient {
     private static HashMap<String, List<PacketIn>> pIn = new HashMap<String, List<PacketIn>>();
     private static boolean defaults = false;
     private PrintWriter writer;
-    private Socket socket;
+    private NamedContainer<Boolean, Socket> socket;
     private String name;
     private Encryption encryption;
     private SubPlugin plugin;
@@ -54,17 +55,27 @@ public final class SubDataClient {
      */
     public SubDataClient(SubPlugin plugin, String name, InetAddress address, int port, Encryption encryption) throws IOException {
         if (Util.isNull(plugin, name, address, port)) throw new NullPointerException();
-        socket = new Socket(address, port);
+        socket = new NamedContainer<>(false, new Socket(address, port));
         this.plugin = plugin;
         this.name = name;
-        this.writer = new PrintWriter(socket.getOutputStream(), true);
+        this.writer = new PrintWriter(socket.get().getOutputStream(), true);
         this.encryption = encryption;
         this.queue = new LinkedList<NamedContainer<String, PacketOut>>();
 
         if (!defaults) loadDefaults();
         loop();
 
-        Bukkit.getScheduler().runTaskLater(plugin, () -> sendPacket(new PacketAuthorization(plugin)), 10);
+        sendPacket(new NamedContainer<>(null, new PacketAuthorization(plugin)));
+    }
+
+    private void init() {
+        sendPacket(new PacketDownloadLang());
+        while (queue.size() != 0) {
+            sendPacket(queue.get(0));
+            queue.remove(0);
+        }
+        socket.rename(true);
+        Bukkit.getPluginManager().callEvent(new SubNetworkConnectEvent(this));
     }
 
     private void loadDefaults() {
@@ -104,7 +115,7 @@ public final class SubDataClient {
     private void loop() {
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
             try {
-                BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                BufferedReader in = new BufferedReader(new InputStreamReader(socket.get().getInputStream()));
                 String input;
                 while ((input = in.readLine()) != null) {
                     String decoded = null;
@@ -168,7 +179,7 @@ public final class SubDataClient {
      * @return Server Socket
      */
     public Socket getClient() {
-        return socket;
+        return socket.get();
     }
 
     /**
@@ -254,27 +265,33 @@ public final class SubDataClient {
      */
     public void sendPacket(PacketOut packet) {
         if (Util.isNull(packet)) throw new NullPointerException();
-        if (socket == null) {
+        if (socket == null || !socket.name()) {
             queue.add(new NamedContainer<>(null, packet));
         } else {
-            try {
-                switch (getEncryption()) {
-                    case AES:
-                    case AES_128:
-                        writer.println(Base64.getEncoder().encodeToString(AES.encrypt(128, plugin.config.get().getSection("Settings").getSection("SubData").getRawString("Password"), encodePacket(packet).toString())));
-                        break;
-                    case AES_192:
-                        writer.println(Base64.getEncoder().encodeToString(AES.encrypt(192, plugin.config.get().getSection("Settings").getSection("SubData").getRawString("Password"), encodePacket(packet).toString())));
-                        break;
-                    case AES_256:
-                        writer.println(Base64.getEncoder().encodeToString(AES.encrypt(256, plugin.config.get().getSection("Settings").getSection("SubData").getRawString("Password"), encodePacket(packet).toString())));
-                        break;
-                    default:
-                        writer.println(encodePacket(packet));
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
+            sendPacket(new NamedContainer<>(null, packet));
+        }
+    }
+
+    private void sendPacket(NamedContainer<String, PacketOut> packet) {
+        try {
+            JSONObject json = encodePacket(packet.get());
+            if (packet.name() != null) json.put("f", packet.name());
+            switch (getEncryption()) {
+                case AES:
+                case AES_128:
+                    writer.println(Base64.getEncoder().encodeToString(AES.encrypt(128, plugin.config.get().getSection("Settings").getSection("SubData").getRawString("Password"), json.toString())));
+                    break;
+                case AES_192:
+                    writer.println(Base64.getEncoder().encodeToString(AES.encrypt(192, plugin.config.get().getSection("Settings").getSection("SubData").getRawString("Password"), json.toString())));
+                    break;
+                case AES_256:
+                    writer.println(Base64.getEncoder().encodeToString(AES.encrypt(256, plugin.config.get().getSection("Settings").getSection("SubData").getRawString("Password"), json.toString())));
+                    break;
+                default:
+                    writer.println(json.toString());
             }
+        } catch (Throwable e) {
+            e.printStackTrace();
         }
     }
 
@@ -286,29 +303,10 @@ public final class SubDataClient {
      */
     public void forwardPacket(PacketOut packet, String location) {
         if (Util.isNull(packet, location)) throw new NullPointerException();
-        if (socket == null) {
+        if (socket.get() == null || !socket.name()) {
             queue.add(new NamedContainer<>(location, packet));
         } else {
-            try {
-                JSONObject json = encodePacket(packet);
-                json.put("f", location);
-                switch (getEncryption()) {
-                    case AES:
-                    case AES_128:
-                        writer.println(Base64.getEncoder().encodeToString(AES.encrypt(128, plugin.config.get().getSection("Settings").getSection("SubData").getRawString("Password"), json.toString())));
-                        break;
-                    case AES_192:
-                        writer.println(Base64.getEncoder().encodeToString(AES.encrypt(192, plugin.config.get().getSection("Settings").getSection("SubData").getRawString("Password"), json.toString())));
-                        break;
-                    case AES_256:
-                        writer.println(Base64.getEncoder().encodeToString(AES.encrypt(256, plugin.config.get().getSection("Settings").getSection("SubData").getRawString("Password"), json.toString())));
-                        break;
-                    default:
-                        writer.println(json.toString());
-                }
-            } catch (Throwable e) {
-                e.printStackTrace();
-            }
+            sendPacket(new NamedContainer<>(location, packet));
         }
     }
 
@@ -376,9 +374,9 @@ public final class SubDataClient {
      */
     public void destroy(int reconnect) throws IOException {
         if (Util.isNull(reconnect)) throw new NullPointerException();
-        if (socket != null) {
-            final Socket socket = this.socket;
-            this.socket = null;
+        if (socket.get() != null) {
+            final Socket socket = this.socket.get();
+            this.socket.set(null);
             if (!socket.isClosed()) socket.close();
             Bukkit.getPluginManager().callEvent(new SubNetworkDisconnectEvent());
             Bukkit.getLogger().info("SubServers > The SubData Connection was closed");

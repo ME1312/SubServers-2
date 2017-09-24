@@ -1,10 +1,12 @@
 package net.ME1312.SubServers.Console;
 
+import net.ME1312.SubServers.Bungee.Host.SubCreator;
 import net.ME1312.SubServers.Bungee.Host.SubLogFilter;
 import net.ME1312.SubServers.Bungee.Host.SubLogger;
 import net.ME1312.SubServers.Bungee.Host.SubServer;
 import net.ME1312.SubServers.Bungee.Library.Util;
 import net.md_5.bungee.api.ProxyServer;
+import org.fusesource.jansi.AnsiOutputStream;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -45,7 +47,8 @@ public final class ConsoleWindow implements SubLogFilter {
     private boolean open = false;
     private SubLogger logger;
     private int fontSize = 12;
-    private AnsiHTMLColorStream stream = new AnsiHTMLColorStream(new OutputStream() {
+    private boolean ansi = true;
+    private AnsiOutputStream stream = new AnsiHTMLColorStream(new OutputStream() {
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
 
         @Override
@@ -110,15 +113,51 @@ public final class ConsoleWindow implements SubLogFilter {
         window = new JFrame();
 
         JMenuBar jMenu = new JMenuBar();
-        JMenu menu = new JMenu("View");
-        JMenuItem item = new JMenuItem("Scroll to Top");
-        item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_UP, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), true));
-        item.addActionListener(event -> vScroll.getVerticalScrollBar().setValue(0));
+        JMenu menu = new JMenu("\u00A0Log\u00A0");
+        JMenuItem item = new JMenuItem("Clear Screen");
+        item.setAccelerator(KeyStroke.getKeyStroke('L', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), true));
+        item.addActionListener(event -> clear());
         menu.add(item);
-        item = new JMenuItem("Scroll to Bottom");
-        item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), true));
-        item.addActionListener(event -> vScroll.getVerticalScrollBar().setValue(vScroll.getVerticalScrollBar().getMaximum() - vScroll.getVerticalScrollBar().getVisibleAmount()));
+        item = new JMenuItem("Reload Log");
+        item.setAccelerator(KeyStroke.getKeyStroke('R', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), true));
+        item.addActionListener(event -> {
+            log.setText(RESET_VALUE);
+            loadContent();
+        });
         menu.add(item);
+        if (logger.getHandler() instanceof SubServer || logger.getHandler() instanceof SubCreator) {
+            item = new JCheckBoxMenuItem("Auto Popout Log");
+            item.setSelected((logger.getHandler() instanceof SubServer && (plugin.config.get().getStringList("Enabled-Servers").contains(((SubServer) logger.getHandler()).getName().toLowerCase()))) || (logger.getHandler() instanceof SubCreator && (plugin.config.get().getStringList("Enabled-Creators").contains(((SubCreator) logger.getHandler()).getHost().getName().toLowerCase()))));
+            item.addActionListener(event -> {
+                try {
+                    if (logger.getHandler() instanceof SubServer) {
+                        List<String> list = plugin.config.get().getStringList("Enabled-Servers");
+                        if (((AbstractButton) event.getSource()).getModel().isSelected()) {
+                            list.add(((SubServer) logger.getHandler()).getName().toLowerCase());
+                        } else {
+                            list.remove(((SubServer) logger.getHandler()).getName().toLowerCase());
+                        }
+                        plugin.config.get().set("Enabled-Servers", list);
+                        plugin.config.save();
+                    } else if (logger.getHandler() instanceof SubCreator) {
+                        List<String> list = plugin.config.get().getStringList("Enabled-Servers");
+                        if (((AbstractButton) event.getSource()).getModel().isSelected()) {
+                            list.add(((SubCreator) logger.getHandler()).getHost().getName().toLowerCase());
+                        } else {
+                            list.remove(((SubCreator) logger.getHandler()).getHost().getName().toLowerCase());
+                        }
+                        plugin.config.get().set("Enabled-Servers", list);
+                        plugin.config.save();
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            });
+            menu.add(item);
+            jMenu.add(menu);
+        }
+
+        menu = new JMenu("\u00A0Search\u00A0");
         item = new JMenuItem("Find");
         item.setAccelerator(KeyStroke.getKeyStroke('F', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), true));
         item.addActionListener(event -> {
@@ -133,7 +172,48 @@ public final class ConsoleWindow implements SubLogFilter {
             }
         });
         menu.add(item);
+        item = new JMenuItem("Find Next");
+        item.addActionListener(event -> {
+            if (find.isVisible()) {
+                find(true);
+            } else {
+                find.setVisible(true);
+                findT.selectAll();
+                findT.requestFocusInWindow();
+            }
+        });
+        menu.add(item);
+        item = new JMenuItem("Find Previous");
+        item.addActionListener(event -> {
+            if (find.isVisible()) {
+                find(false);
+            } else {
+                find.setVisible(true);
+                findT.selectAll();
+                findT.requestFocusInWindow();
+            }
+        });
+        menu.add(item);
+        jMenu.add(menu);
+
+        menu = new JMenu("\u00A0View\u00A0");
+        item = new JMenuItem("Scroll to Top");
+        item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_UP, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), true));
+        item.addActionListener(event -> vScroll.getVerticalScrollBar().setValue(0));
+        menu.add(item);
+        item = new JMenuItem("Scroll to Bottom");
+        item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), true));
+        item.addActionListener(event -> vScroll.getVerticalScrollBar().setValue(vScroll.getVerticalScrollBar().getMaximum() - vScroll.getVerticalScrollBar().getVisibleAmount()));
+        menu.add(item);
         menu.addSeparator();
+        item = new JCheckBoxMenuItem("Show Text Colors");
+        item.setSelected(true);
+        item.addActionListener(event -> {
+            ansi = ((AbstractButton) event.getSource()).getModel().isSelected();
+            log.setText(RESET_VALUE);
+            loadContent();
+        });
+        menu.add(item);
         item = new JMenuItem("Reset Text Size");
         item.addActionListener(event -> {
             HTMLDocument doc = (HTMLDocument) log.getDocument();
@@ -160,19 +240,8 @@ public final class ConsoleWindow implements SubLogFilter {
             hScroll();
         });
         menu.add(item);
-        menu.addSeparator();
-        item = new JMenuItem("Clear Screen");
-        item.setAccelerator(KeyStroke.getKeyStroke('L', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), true));
-        item.addActionListener(event -> clear());
-        menu.add(item);
-        item = new JMenuItem("Reload Log");
-        item.setAccelerator(KeyStroke.getKeyStroke('R', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), true));
-        item.addActionListener(event -> {
-            log.setText(RESET_VALUE);
-            loadContent();
-        });
-        menu.add(item);
         jMenu.add(menu);
+
         window.setJMenuBar(jMenu);
         window.setContentPane(panel);
         window.pack();
@@ -391,7 +460,8 @@ public final class ConsoleWindow implements SubLogFilter {
 
     public void log(Date date, String message) {
         try {
-            stream.write((' ' + new SimpleDateFormat("hh:mm:ss").format(date) + ' ' + message + " \n").getBytes("UTF-8"));
+
+            stream.write(('\u00A0' + new SimpleDateFormat("hh:mm:ss").format(date) + ' ' + ((ansi)?message:message.replaceAll("\u001B\\[[;\\d]*m", "")) + "\u00A0\n").getBytes("UTF-8"));
         } catch (IOException e) {
             e.printStackTrace();
         }
