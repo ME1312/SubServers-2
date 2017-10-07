@@ -109,6 +109,7 @@ public final class SubCommand extends Command implements TabExecutor {
                 } else if (args[0].equalsIgnoreCase("list")) {
                     String div = ChatColor.RESET + ", ";
                     int i = 0;
+                    boolean sent = false;
                     sender.sendMessage("SubServers > Group/Server List:");
                     for (String group : plugin.api.getGroups().keySet()) {
                         String message = "";
@@ -134,9 +135,13 @@ public final class SubCommand extends Command implements TabExecutor {
                             message += server.getDisplayName() + " (" + server.getAddress().getAddress().getHostAddress() + ':' + server.getAddress().getPort() + ((server.getName().equals(server.getDisplayName()))?"":ChatColor.stripColor(div)+server.getName()) + ")";
                             i++;
                         }
+                        if (i == 0) message += ChatColor.RESET + "(none)";
                         sender.sendMessage(message);
                         i = 0;
+                        sent = true;
                     }
+                    if (!sent) sender.sendMessage(ChatColor.RESET + "(none)");
+                    sent = false;
                     sender.sendMessage("SubServers > Host/SubServer List:");
                     for (Host host : plugin.api.getHosts().values()) {
                         String message = "";
@@ -160,9 +165,12 @@ public final class SubCommand extends Command implements TabExecutor {
                             message += subserver.getDisplayName() + " (" + subserver.getAddress().getPort() + ((subserver.getName().equals(subserver.getDisplayName()))?"":ChatColor.stripColor(div)+subserver.getName()) + ")";
                             i++;
                         }
+                        if (i == 0) message += ChatColor.RESET + "(none)";
                         sender.sendMessage(message);
                         i = 0;
+                        sent = true;
                     }
+                    if (!sent) sender.sendMessage(ChatColor.RESET + "(none)");
                     sender.sendMessage("SubServers > Server List:");
                     String message = "";
                     for (Server server : plugin.api.getServers().values()) {
@@ -172,6 +180,7 @@ public final class SubCommand extends Command implements TabExecutor {
                             i++;
                         }
                     }
+                    if (i == 0) message += ChatColor.RESET + "(none)";
                     sender.sendMessage(message);
                 } else if (args[0].equalsIgnoreCase("info") || args[0].equalsIgnoreCase("status")) {
                     if (args.length > 1) {

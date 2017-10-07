@@ -128,7 +128,7 @@ public abstract class UIRenderer {
             Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, () -> {
                 if (tdownload != null) Bukkit.getPlayer(player).sendMessage(plugin.lang.getSection("Lang").getColoredString("Interface.Generic.Downloading", '&').replace("$str$", subtitle));
                 download = null;
-            }, 30L);
+            }, 50L);
         } if (subtitle != null && tdownload == null) {
             tdownload = new NamedContainer<String, Integer>(subtitle, 0);
             final Container<Integer> delay = new Container<Integer>(0);
