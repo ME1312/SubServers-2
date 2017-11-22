@@ -10,6 +10,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -34,7 +35,7 @@ public class YAMLConfig {
         this.file = file;
         this.yaml = new Yaml(getDumperOptions());
         if (file.exists()) {
-            this.config = new YAMLSection((Map<String, ?>) yaml.load(new FileInputStream(file)), null, null, yaml);
+            this.config = new YAMLSection((LinkedHashMap<String, ?>) yaml.loadAs(new FileInputStream(file), LinkedHashMap.class), null, null, yaml);
         } else {
             this.config = new YAMLSection(null, null, null, yaml);
         }
@@ -66,7 +67,11 @@ public class YAMLConfig {
      */
     @SuppressWarnings("unchecked")
     public void reload() throws IOException {
-        config = new YAMLSection((Map<String, Object>) yaml.load(new FileInputStream(file)), null, null, yaml);
+        if (file.exists()) {
+            this.config = new YAMLSection((LinkedHashMap<String, ?>) yaml.loadAs(new FileInputStream(file), LinkedHashMap.class), null, null, yaml);
+        } else {
+            this.config = new YAMLSection(null, null, null, yaml);
+        }
     }
 
     /**

@@ -338,11 +338,9 @@ public class InternalUIRenderer extends UIRenderer {
 
     public void hostCreator(final CreatorOptions options) {
         setDownloading(ChatColor.stripColor(plugin.lang.getSection("Lang").getColoredString("Interface.Host-Creator.Title", '&').replace("$str$", options.getHost())));
-        lastVisitedObjects[0] = options;
-        if (!options.init()) {
+        if (!options.init())
             windowHistory.add(() -> hostCreator(options));
-            lastVisitedObjects[0] = options.getHost();
-        }
+        lastVisitedObjects[0] = options;
 
         plugin.subdata.sendPacket(new PacketDownloadHostInfo(options.getHost(), json -> {
             if (!json.getBoolean("valid")|| !json.getJSONObject("host").getBoolean("enabled")) {

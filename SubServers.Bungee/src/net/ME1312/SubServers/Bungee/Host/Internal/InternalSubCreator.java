@@ -24,7 +24,6 @@ import java.io.*;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.*;
-import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 /**
@@ -62,7 +61,7 @@ public class InternalSubCreator extends SubCreator {
                     if (config.getKeys().contains("Display")) template.setDisplayName(config.getString("Display"));
                 }
             } catch (Exception e) {
-                System.out.println(host.getName() + "/Creator > Couldn't load template: " + file.getName());
+                System.out.println(host.getName() + File.separator + "Creator > Couldn't load template: " + file.getName());
                 e.printStackTrace();
             }
         }
@@ -82,19 +81,19 @@ public class InternalSubCreator extends SubCreator {
                     server.setAll(config);
                 }
             } else {
-                System.out.println(name + "/Creator > Skipping missing template: " + other);
+                System.out.println(name + File.separator + "Creator > Skipping missing template: " + other);
             }
         }
         server.setAll(template.getConfigOptions());
         try {
-            System.out.println(name + "/Creator > Loading Template: " + template.getDisplayName());
+            System.out.println(name + File.separator + "Creator > Loading Template: " + template.getDisplayName());
             Util.copyDirectory(template.getDirectory(), dir);
             if (template.getType() == ServerType.VANILLA) {
                 String patch = "Patch";
                 if (version.compareTo(new Version("1.12")) >= 0) patch += "-v2";
                 version = new Version(version.toString() + " " + patch);
             } else if (template.getType() == ServerType.SPONGE) {
-                System.out.println(name + "/Creator > Searching Versions...");
+                System.out.println(name + File.separator + "Creator > Searching Versions...");
                 Document spongexml = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new InputSource(new StringReader(Util.readAll(new BufferedReader(new InputStreamReader(new URL("http://files.minecraftforge.net/maven/org/spongepowered/spongeforge/maven-metadata.xml").openStream(), Charset.forName("UTF-8")))))));
                 Document forgexml = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new InputSource(new StringReader(Util.readAll(new BufferedReader(new InputStreamReader(new URL("http://files.minecraftforge.net/maven/net/minecraftforge/forge/maven-metadata.xml").openStream(), Charset.forName("UTF-8")))))));
 
@@ -110,7 +109,7 @@ public class InternalSubCreator extends SubCreator {
                 }
                 if (spversion == null)
                     throw new InvalidServerException("Cannot find sponge version for Minecraft " + version.toString());
-                System.out.println(name + "/Creator > Found \"spongeforge-" + spversion.toString() + '"');
+                System.out.println(name + File.separator + "Creator > Found \"spongeforge-" + spversion.toString() + '"');
 
                 NodeList mcfnodeList = forgexml.getElementsByTagName("version");
                 Version mcfversion = null;
@@ -124,7 +123,7 @@ public class InternalSubCreator extends SubCreator {
                 }
                 if (mcfversion == null)
                     throw new InvalidServerException("Cannot find forge version for Sponge " + spversion.toString());
-                System.out.println(name + "/Creator > Found \"forge-" + mcfversion.toString() + '"');
+                System.out.println(name + File.separator + "Creator > Found \"forge-" + mcfversion.toString() + '"');
 
                 version = new Version(mcfversion.toString() + " " + spversion.toString());
             }
@@ -139,16 +138,16 @@ public class InternalSubCreator extends SubCreator {
                     Process process = Runtime.getRuntime().exec("chmod " + template.getBuildOptions().getRawString("Permission") + ' ' + template.getBuildOptions().getRawString("Shell-Location"), null, dir);
                     Thread.sleep(500);
                     if (process.exitValue() != 0) {
-                        System.out.println(name + "/Creator > Couldn't set " + template.getBuildOptions().getRawString("Permission") + " permissions to " + template.getBuildOptions().getRawString("Shell-Location"));
+                        System.out.println(name + File.separator + "Creator > Couldn't set " + template.getBuildOptions().getRawString("Permission") + " permissions to " + template.getBuildOptions().getRawString("Shell-Location"));
                     }
                 } catch (Exception e) {
-                    System.out.println(name + "/Creator > Couldn't set " + template.getBuildOptions().getRawString("Permission") + " permissions to " + template.getBuildOptions().getRawString("Shell-Location"));
+                    System.out.println(name + File.separator + "Creator > Couldn't set " + template.getBuildOptions().getRawString("Permission") + " permissions to " + template.getBuildOptions().getRawString("Shell-Location"));
                     e.printStackTrace();
                 }
             }
 
             try {
-                System.out.println(name + "/Creator > Launching " + template.getBuildOptions().getRawString("Shell-Location"));
+                System.out.println(name + File.separator + "Creator > Launching " + template.getBuildOptions().getRawString("Shell-Location"));
                 thread.set(Runtime.getRuntime().exec((System.getProperty("os.name").toLowerCase().indexOf("win") >= 0) ? "cmd.exe /c \"\"" + gitBash + "\" --login -i -c \"bash " + template.getBuildOptions().getRawString("Shell-Location") + ' ' + version.toString() + "\"\"" : ("bash " + template.getBuildOptions().getRawString("Shell-Location") + ' ' + version.toString() + " " + System.getProperty("user.home")), null, dir));
                 thread.name().log.set(host.plugin.config.get().getSection("Settings").getBoolean("Log-Creator"));
                 thread.name().file = new File(dir, "SubCreator-" + template.getName() + "-" + version.toString().replace(" ", "@") + ".log");
@@ -176,44 +175,46 @@ public class InternalSubCreator extends SubCreator {
         NamedContainer<InternalSubLogger, Process> thread = this.thread.get(name.toLowerCase()).get();
         UniversalFile dir = new UniversalFile(new File(host.getPath()), name);
         dir.mkdirs();
-        YAMLSection server;
+        YAMLSection server = new YAMLSection();
+        YAMLSection config;
         try {
-            server = build(thread, dir, name, template, version, new LinkedList<>());
+            config = build(thread, dir, name, template, version, new LinkedList<>());
             generateProperties(dir, port);
             generateClient(dir, template.getType(), name);
         } catch (SubCreatorException e) {
-            server = null;
+            config = null;
         } catch (Exception e) {
-            server = null;
+            config = null;
             e.printStackTrace();
         }
 
-        if (server != null) {
+        if (config != null) {
             try {
-                System.out.println(name + "/Creator > Saving...");
+                System.out.println(name + File.separator + "Creator > Saving...");
                 if (host.plugin.exServers.keySet().contains(name.toLowerCase())) host.plugin.exServers.remove(name.toLowerCase());
 
-                for (String option : server.getKeys()) {
-                    if (server.isString(option)) {
-                        server.set(option, server.getRawString(option).replace("$name$", name).replace("$template$", template.getName()).replace("$type$", template.getType().toString())
+                for (String option : config.getKeys()) {
+                    if (config.isString(option)) {
+                        config.set(option, config.getRawString(option).replace("$name$", name).replace("$template$", template.getName()).replace("$type$", template.getType().toString())
                                 .replace("$version$", version.toString().replace(" ", "@")).replace("$port$", Integer.toString(port)));
                     }
                 }
-                if (!server.contains("Enabled")) server.set("Enabled", true);
-                if (!server.contains("Display")) server.set("Display", "");
-                if (!server.contains("Host")) server.set("Host", host.getName());
-                if (!server.contains("Group")) server.set("Group", new ArrayList<String>());
-                if (!server.contains("Port")) server.set("Port", port);
-                if (!server.contains("Motd")) server.set("Motd", "Some SubServer");
-                if (!server.contains("Log")) server.set("Log", true);
-                if (!server.contains("Directory")) server.set("Directory", "." + File.separatorChar + name);
-                if (!server.contains("Executable")) server.set("Executable", "java -Xmx1024M -jar " + template.getType().toString() + ".jar");
-                if (!server.contains("Stop-Command")) server.set("Stop-Command", "stop");
-                if (!server.contains("Run-On-Launch")) server.set("Run-On-Launch", false);
-                if (!server.contains("Auto-Restart")) server.set("Auto-Restart", false);
-                if (!server.contains("Restricted")) server.set("Restricted", false);
-                if (!server.contains("Incompatible")) server.set("Incompatible", new ArrayList<String>());
-                if (!server.contains("Hidden")) server.set("Hidden", false);
+                server.set("Enabled", true);
+                server.set("Display", "");
+                server.set("Host", host.getName());
+                server.set("Group", new ArrayList<String>());
+                server.set("Port", port);
+                server.set("Motd", "Some SubServer");
+                server.set("Log", true);
+                server.set("Directory", "." + File.separatorChar + name);
+                server.set("Executable", "java -Xmx1024M -jar " + template.getType().toString() + ".jar");
+                server.set("Stop-Command", "stop");
+                server.set("Run-On-Launch", false);
+                server.set("Auto-Restart", false);
+                server.set("Restricted", false);
+                server.set("Incompatible", new ArrayList<String>());
+                server.set("Hidden", false);
+                server.setAll(config);
 
                 SubServer subserver = host.addSubServer(player, name, server.getBoolean("Enabled"), port, server.getColoredString("Motd", '&'), server.getBoolean("Log"), server.getRawString("Directory"),
                         new Executable(server.getRawString("Executable")), server.getRawString("Stop-Command"), true, server.getBoolean("Auto-Restart"), server.getBoolean("Hidden"), server.getBoolean("Restricted"), false);
@@ -226,7 +227,7 @@ public class InternalSubCreator extends SubCreator {
                 e.printStackTrace();
             }
         } else {
-            System.out.println(name + "/Creator > Couldn't build the server jar. Check the SubCreator logs for more detail.");
+            System.out.println(name + File.separator + "Creator > Couldn't build the server jar. Check the SubCreator logs for more detail.");
         }
         this.thread.remove(name.toLowerCase());
     }

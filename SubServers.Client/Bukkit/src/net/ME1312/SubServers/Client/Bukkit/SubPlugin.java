@@ -11,11 +11,19 @@ import net.ME1312.SubServers.Client.Bukkit.Network.SubDataClient;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.json.JSONObject;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
 
+import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.*;
 import java.net.InetAddress;
+import java.net.URL;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.util.concurrent.TimeUnit;
 
 /**
  * SubServers Client Plugin Class
@@ -27,7 +35,7 @@ public final class SubPlugin extends JavaPlugin {
 
     public UIHandler gui = null;
     public final Version version;
-    public final Version bversion = new Version(1);
+    public final Version bversion = new Version(2);
     public final SubAPI api = new SubAPI(this);
 
     public SubPlugin() {
@@ -81,6 +89,26 @@ public final class SubPlugin extends JavaPlugin {
                 getCommand("subserver").setExecutor(cmd);
                 getCommand("sub").setExecutor(cmd);
             }
+
+            Bukkit.getScheduler().runTaskTimerAsynchronously(this, () -> {
+                try {
+                    Document updxml = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new InputSource(new StringReader(Util.readAll(new BufferedReader(new InputStreamReader(new URL("http://src.me1312.net/maven/net/ME1312/SubServers/SubServers.Client.Bukkit/maven-metadata.xml").openStream(), Charset.forName("UTF-8")))))));
+
+                    NodeList updnodeList = updxml.getElementsByTagName("version");
+                    Version updversion = version;
+                    int updcount = -1;
+                    for (int i = 0; i < updnodeList.getLength(); i++) {
+                        Node node = updnodeList.item(i);
+                        if (node.getNodeType() == Node.ELEMENT_NODE) {
+                            if (!node.getTextContent().startsWith("-") && new Version(node.getTextContent()).compareTo(updversion) >= 0) {
+                                updversion = new Version(node.getTextContent());
+                                updcount++;
+                            }
+                        }
+                    }
+                    if (!updversion.equals(version)) System.out.println("SubServers > SubServers.Client.Bukkit v" + updversion + " is available. You are " + updcount + " version" + ((updcount == 1)?"":"s") + " behind.");
+                } catch (Exception e) {}
+            }, 0, TimeUnit.DAYS.toSeconds(2) * 20);
         } catch (IOException e) {
             setEnabled(false);
             e.printStackTrace();

@@ -75,29 +75,31 @@ public class ExternalSubCreator extends SubCreator {
                             if (host.plugin.exServers.keySet().contains(name.toLowerCase()))
                                 host.plugin.exServers.remove(name.toLowerCase());
 
-                            YAMLSection server = new YAMLSection(json.getJSONObject("c"));
-                            for (String option : server.getKeys()) {
-                                if (server.isString(option)) {
-                                    server.set(option, server.getRawString(option).replace("$name$", name).replace("$template$", template.getName()).replace("$type$", template.getType().toString())
+                            YAMLSection server = new YAMLSection();
+                            YAMLSection config = new YAMLSection(json.getJSONObject("c"));
+                            for (String option : config.getKeys()) {
+                                if (config.isString(option)) {
+                                    config.set(option, config.getRawString(option).replace("$name$", name).replace("$template$", template.getName()).replace("$type$", template.getType().toString())
                                             .replace("$version$", version.toString().replace(" ", "@")).replace("$port$", Integer.toString(port)));
                                 }
                             }
 
-                            if (!server.contains("Enabled")) server.set("Enabled", true);
-                            if (!server.contains("Display")) server.set("Display", "");
-                            if (!server.contains("Host")) server.set("Host", host.getName());
-                            if (!server.contains("Group")) server.set("Group", new ArrayList<String>());
-                            if (!server.contains("Port")) server.set("Port", port);
-                            if (!server.contains("Motd")) server.set("Motd", "Some SubServer");
-                            if (!server.contains("Log")) server.set("Log", true);
-                            if (!server.contains("Directory")) server.set("Directory", "." + File.separatorChar + name);
-                            if (!server.contains("Executable")) server.set("Executable", "java -Xmx1024M -jar " + template.getType().toString() + ".jar");
-                            if (!server.contains("Stop-Command")) server.set("Stop-Command", "stop");
-                            if (!server.contains("Run-On-Launch")) server.set("Run-On-Launch", false);
-                            if (!server.contains("Auto-Restart")) server.set("Auto-Restart", false);
-                            if (!server.contains("Restricted")) server.set("Restricted", false);
-                            if (!server.contains("Incompatible")) server.set("Incompatible", new ArrayList<String>());
-                            if (!server.contains("Hidden")) server.set("Hidden", false);
+                            server.set("Enabled", true);
+                            server.set("Display", "");
+                            server.set("Host", host.getName());
+                            server.set("Group", new ArrayList<String>());
+                            server.set("Port", port);
+                            server.set("Motd", "Some SubServer");
+                            server.set("Log", true);
+                            server.set("Directory", "." + File.separatorChar + name);
+                            server.set("Executable", "java -Xmx1024M -jar " + template.getType().toString() + ".jar");
+                            server.set("Stop-Command", "stop");
+                            server.set("Run-On-Launch", false);
+                            server.set("Auto-Restart", false);
+                            server.set("Restricted", false);
+                            server.set("Incompatible", new ArrayList<String>());
+                            server.set("Hidden", false);
+                            server.setAll(config);
 
                             SubServer subserver = host.addSubServer(player, name, server.getBoolean("Enabled"), port, server.getColoredString("Motd", '&'), server.getBoolean("Log"), server.getRawString("Directory"),
                                     new Executable(server.getRawString("Executable")), server.getRawString("Stop-Command"), true, server.getBoolean("Auto-Restart"), server.getBoolean("Hidden"), server.getBoolean("Restricted"), false);

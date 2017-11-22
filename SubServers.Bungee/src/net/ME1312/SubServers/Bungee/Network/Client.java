@@ -11,6 +11,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketException;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 /**
@@ -69,7 +70,7 @@ public class Client {
                                 decoded = AES.decrypt(subdata.plugin.config.get().getSection("Settings").getSection("SubData").getRawString("Password"), Base64.getDecoder().decode(input)).get();
                                 break;
                             default:
-                                decoded = input;
+                                decoded = new String(Base64.getDecoder().decode(input), StandardCharsets.UTF_8);
                         }
                         JSONObject json = new JSONObject(decoded);
                         for (PacketIn packet : SubDataServer.decodePacket(this, json)) {
@@ -157,7 +158,7 @@ public class Client {
                     writer.println(Base64.getEncoder().encodeToString(AES.encrypt(256, subdata.plugin.config.get().getSection("Settings").getSection("SubData").getRawString("Password"), SubDataServer.encodePacket(this, packet).toString())));
                     break;
                 default:
-                    writer.println(SubDataServer.encodePacket(this, packet));
+                    writer.println(Base64.getEncoder().encodeToString(SubDataServer.encodePacket(this, packet).toString().getBytes(StandardCharsets.UTF_8)));
             }
         } catch (Throwable e) {
             e.printStackTrace();

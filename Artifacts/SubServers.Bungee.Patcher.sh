@@ -4,15 +4,9 @@
 #!/usr/bin/env bash
 if [ -z "$1" ]
   then
-    if [ -z "$2" ]
-      then
-        echo "SubServers Library Patcher: Combines BungeeCord and SubServers.Bungee/SubServers.Sync into one jar file"
-        echo "Usage: bash $0 <BungeeCord.jar> <SubServers.jar>"
-        exit 0
-    else
-        echo ERROR: No BungeeCord File Supplied
-        exit 1
-    fi
+	echo "SubServers Library Patcher: Combines BungeeCord and SubServers.Bungee/SubServers.Sync into one jar file"
+    echo "Usage: bash $0 <BungeeCord.jar> <SubServers.jar>"
+    exit 1
 fi
 if [ ! -f "$1" ]
   then
@@ -72,20 +66,16 @@ if [ $retvala -eq 0 ]
         if [ $retvalc -eq 0 ]
           then
             echo ">> Cleaning Up..."
-            rm -Rf ../../Buildtools
             exit 0;
         else
             echo ">> Error Recomiling Files"
-            rm -Rf ../../Buildtools
             exit 4
         fi
     else
-        echo ">> Error Decompiling $2 Files"
-        rm -Rf ../../Buildtools
+        echo ">> Error Decompiling $2"
         exit 3
     fi
 else
-    echo ">> Error Decompiling $1 Files"
-    rm -Rf ../../Buildtools
+    echo ">> Error Decompiling $1"
     exit 3
 fi

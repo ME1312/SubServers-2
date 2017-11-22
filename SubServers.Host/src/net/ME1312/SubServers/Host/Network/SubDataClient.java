@@ -22,6 +22,7 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketException;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -151,7 +152,7 @@ public final class SubDataClient {
                                 decoded = AES.decrypt(host.config.get().getSection("Settings").getSection("SubData").getRawString("Password"), Base64.getDecoder().decode(input)).get();
                                 break;
                             default:
-                                decoded = input;
+                                decoded = new String(Base64.getDecoder().decode(input), StandardCharsets.UTF_8);
                         }
                         JSONObject json = new JSONObject(decoded);
                         for (PacketIn packet : decodePacket(json)) {
@@ -220,9 +221,11 @@ public final class SubDataClient {
      */
     public static void registerPacket(PacketIn packet, String handle) {
         if (Util.isNull(packet, handle)) throw new NullPointerException();
-        List<PacketIn> list = (pIn.keySet().contains(handle))?pIn.get(handle):new ArrayList<PacketIn>();
-        if (!list.contains(packet)) list.add(packet);
-        pIn.put(handle, list);
+        List<PacketIn> list = (pIn.keySet().contains(handle.toLowerCase()))?pIn.get(handle.toLowerCase()):new ArrayList<PacketIn>();
+        if (!list.contains(packet)) {
+            list.add(packet);
+            pIn.put(handle.toLowerCase(), list);
+        }
     }
 
     /**
@@ -232,7 +235,17 @@ public final class SubDataClient {
      */
     public static void unregisterPacket(PacketIn packet) {
         if (Util.isNull(packet)) throw new NullPointerException();
-        for (String handle : pIn.keySet()) if (pIn.get(handle).contains(packet)) pIn.get(handle).remove(packet);
+        List<String> search = new ArrayList<String>();
+        search.addAll(pIn.keySet());
+        for (String handle : search) if (pIn.get(handle.toLowerCase()).contains(packet)) {
+            List<PacketIn> list = pIn.get(handle.toLowerCase());
+            list.remove(packet);
+            if (list.isEmpty()) {
+                pIn.remove(handle.toLowerCase());
+            } else {
+                pIn.put(handle.toLowerCase(), list);
+            }
+        }
     }
 
     /**
@@ -243,7 +256,7 @@ public final class SubDataClient {
      */
     public static void registerPacket(Class<? extends PacketOut> packet, String handle) {
         if (Util.isNull(packet, handle)) throw new NullPointerException();
-        pOut.put(packet, handle);
+        pOut.put(packet, handle.toLowerCase());
     }
 
     /**
@@ -264,7 +277,7 @@ public final class SubDataClient {
      */
     public static List<? extends PacketIn> getPacket(String handle) {
         if (Util.isNull(handle)) throw new NullPointerException();
-        return new ArrayList<PacketIn>(pIn.get(handle));
+        return new ArrayList<PacketIn>(pIn.get(handle.toLowerCase()));
     }
 
     /**
@@ -297,7 +310,7 @@ public final class SubDataClient {
                     writer.println(Base64.getEncoder().encodeToString(AES.encrypt(256, host.config.get().getSection("Settings").getSection("SubData").getRawString("Password"), json.toString())));
                     break;
                 default:
-                    writer.println(json.toString());
+                    writer.println(Base64.getEncoder().encodeToString(json.toString().getBytes(StandardCharsets.UTF_8)));
             }
         } catch (Throwable e) {
             log.error.println(e);

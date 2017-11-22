@@ -13,6 +13,8 @@ import net.ME1312.SubServers.Bungee.SubPlugin;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+
 /**
  * Download Host Info Packet
  */

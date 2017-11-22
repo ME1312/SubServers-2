@@ -10,7 +10,7 @@ Settings:
 Hosts:
   '~':
     Enabled: true
-    Display: ''
+    Display: 'Default'
     Driver: 'BUILT-IN'
     Address: '127.0.0.1'
     Directory: './'

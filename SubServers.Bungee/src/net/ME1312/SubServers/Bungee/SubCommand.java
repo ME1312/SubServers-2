@@ -299,7 +299,7 @@ public final class SubCommand extends Command implements TabExecutor {
                         sender.sendMessage("SubServers > Usage: " + label + " " + args[0].toLowerCase() + " <SubServer> <Command> [Args...]");
                     }
                 } else if (args[0].equalsIgnoreCase("sudo") || args[0].equalsIgnoreCase("screen")) {
-                    if (args[0].length() > 1) {
+                    if (args.length > 1) {
                         Map<String, Server> servers = plugin.api.getServers();
                         if (!args[1].equals("*") && !servers.keySet().contains(args[1].toLowerCase())) {
                             sender.sendMessage("SubServers > There is no server with that name");

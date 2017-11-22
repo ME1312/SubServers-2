@@ -5,15 +5,14 @@ import net.ME1312.SubServers.Bungee.Library.Config.YAMLValue;
 import net.ME1312.SubServers.Bungee.Library.Exception.InvalidHostException;
 import net.ME1312.SubServers.Bungee.Library.Exception.InvalidServerException;
 import net.ME1312.SubServers.Bungee.Library.ExtraDataHandler;
-import net.ME1312.SubServers.Bungee.Library.NamedContainer;
 import net.ME1312.SubServers.Bungee.Library.Util;
 import net.ME1312.SubServers.Bungee.Network.ClientHandler;
 import net.ME1312.SubServers.Bungee.Network.SubDataServer;
 import net.ME1312.SubServers.Bungee.SubPlugin;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
 import org.json.JSONObject;
 
 import java.net.InetAddress;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.UUID;
 
@@ -36,7 +35,6 @@ public abstract class Host implements ExtraDataHandler {
      */
     public Host(SubPlugin plugin, String name, Boolean enabled, InetAddress address, String directory, String gitBash) {
         if (name.contains(" ")) throw new InvalidHostException("Host names cannot have spaces: " + name);
-        if (name.equals("~")) nick = "Default";
         SubDataServer.allowConnection(address);
     }
 
@@ -396,6 +394,20 @@ public abstract class Host implements ExtraDataHandler {
         hinfo.put("enabled", isEnabled());
         hinfo.put("display", getDisplayName());
         hinfo.put("address", getAddress().getHostAddress());
+
+        JSONObject cinfo = new JSONObject();
+        JSONObject templates = new JSONObject();
+        for (SubCreator.ServerTemplate template : getCreator().getTemplates().values()) {
+            JSONObject tinfo = new JSONObject();
+            tinfo.put("enabled", template.isEnabled());
+            tinfo.put("display", template.getDisplayName());
+            tinfo.put("icon", template.getIcon());
+            tinfo.put("type", template.getType().toString());
+            templates.put(template.getName(), tinfo);
+        }
+        cinfo.put("templates", templates);
+        hinfo.put("creator", cinfo);
+
         JSONObject servers = new JSONObject();
         for (SubServer server : getSubServers().values()) {
             servers.put(server.getName(), new JSONObject(server.toString()));
