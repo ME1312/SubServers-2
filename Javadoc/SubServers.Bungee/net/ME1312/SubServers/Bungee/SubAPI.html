@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10,"i8":10,"i9":10,"i10":10,"i11":10,"i12":10,"i13":10,"i14":10,"i15":10,"i16":10,"i17":9,"i18":42,"i19":10,"i20":10,"i21":10,"i22":10,"i23":10,"i24":10,"i25":10,"i26":10,"i27":10,"i28":10,"i29":10,"i30":10,"i31":10,"i32":10,"i33":10};
+var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10,"i8":10,"i9":10,"i10":10,"i11":10,"i12":10,"i13":10,"i14":10,"i15":10,"i16":10,"i17":9,"i18":42,"i19":10,"i20":10,"i21":10,"i22":10,"i23":10,"i24":10,"i25":10,"i26":10,"i27":10,"i28":10,"i29":10,"i30":10,"i31":10,"i32":10,"i33":10,"i34":10};
 var tabs = {65535:["t0","All Methods"],1:["t1","Static Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"],32:["t6","Deprecated Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -229,13 +229,13 @@ extends java.lang.Object</pre>
 <tr id="i12" class="altColor">
 <td class="colFirst"><code>java.util.List&lt;<a href="../../../../net/ME1312/SubServers/Bungee/Host/Server.html" title="interface in net.ME1312.SubServers.Bungee.Host">Server</a>&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Bungee/SubAPI.html#getGroup-java.lang.String-">getGroup</a></span>(java.lang.String&nbsp;name)</code>
-<div class="block">Gets a Server Group</div>
+<div class="block">Gets a Server Group (Group names are case insensitive here)</div>
 </td>
 </tr>
 <tr id="i13" class="rowColor">
 <td class="colFirst"><code>java.util.Map&lt;java.lang.String,java.util.List&lt;<a href="../../../../net/ME1312/SubServers/Bungee/Host/Server.html" title="interface in net.ME1312.SubServers.Bungee.Host">Server</a>&gt;&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Bungee/SubAPI.html#getGroups--">getGroups</a></span>()</code>
-<div class="block">Gets the Server Groups</div>
+<div class="block">Gets the Server Groups (Group names are case sensitive here)</div>
 </td>
 </tr>
 <tr id="i14" class="altColor">
@@ -283,80 +283,86 @@ extends java.lang.Object</pre>
 </td>
 </tr>
 <tr id="i21" class="rowColor">
+<td class="colFirst"><code>java.util.Map&lt;java.lang.String,java.util.List&lt;<a href="../../../../net/ME1312/SubServers/Bungee/Host/Server.html" title="interface in net.ME1312.SubServers.Bungee.Host">Server</a>&gt;&gt;</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Bungee/SubAPI.html#getLowercaseGroups--">getLowercaseGroups</a></span>()</code>
+<div class="block">Gets the Server Groups (Group names are all lowercase here)</div>
+</td>
+</tr>
+<tr id="i22" class="altColor">
 <td class="colFirst"><code><a href="../../../../net/ME1312/SubServers/Bungee/Library/Version/Version.html" title="class in net.ME1312.SubServers.Bungee.Library.Version">Version</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Bungee/SubAPI.html#getProxyVersion--">getProxyVersion</a></span>()</code>
 <div class="block">Gets the BungeeCord Version</div>
 </td>
 </tr>
-<tr id="i22" class="altColor">
+<tr id="i23" class="rowColor">
 <td class="colFirst"><code><a href="../../../../net/ME1312/SubServers/Bungee/Library/UniversalFile.html" title="class in net.ME1312.SubServers.Bungee.Library">UniversalFile</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Bungee/SubAPI.html#getRuntimeDirectory--">getRuntimeDirectory</a></span>()</code>
 <div class="block">Gets the Runtime Directory</div>
 </td>
 </tr>
-<tr id="i23" class="rowColor">
+<tr id="i24" class="altColor">
 <td class="colFirst"><code><a href="../../../../net/ME1312/SubServers/Bungee/Host/Server.html" title="interface in net.ME1312.SubServers.Bungee.Host">Server</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Bungee/SubAPI.html#getServer-java.lang.String-">getServer</a></span>(java.lang.String&nbsp;name)</code>
 <div class="block">Gets a Server</div>
 </td>
 </tr>
-<tr id="i24" class="altColor">
+<tr id="i25" class="rowColor">
 <td class="colFirst"><code>java.util.Map&lt;java.lang.String,<a href="../../../../net/ME1312/SubServers/Bungee/Host/Server.html" title="interface in net.ME1312.SubServers.Bungee.Host">Server</a>&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Bungee/SubAPI.html#getServers--">getServers</a></span>()</code>
 <div class="block">Gets the Servers (including SubServers)</div>
 </td>
 </tr>
-<tr id="i25" class="rowColor">
+<tr id="i26" class="altColor">
 <td class="colFirst"><code><a href="../../../../net/ME1312/SubServers/Bungee/Network/SubDataServer.html" title="class in net.ME1312.SubServers.Bungee.Network">SubDataServer</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Bungee/SubAPI.html#getSubDataNetwork--">getSubDataNetwork</a></span>()</code>
 <div class="block">Gets the SubData Network Manager</div>
 </td>
 </tr>
-<tr id="i26" class="altColor">
+<tr id="i27" class="rowColor">
 <td class="colFirst"><code><a href="../../../../net/ME1312/SubServers/Bungee/Host/SubServer.html" title="interface in net.ME1312.SubServers.Bungee.Host">SubServer</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Bungee/SubAPI.html#getSubServer-java.lang.String-">getSubServer</a></span>(java.lang.String&nbsp;name)</code>
 <div class="block">Gets a SubServer</div>
 </td>
 </tr>
-<tr id="i27" class="rowColor">
+<tr id="i28" class="altColor">
 <td class="colFirst"><code>java.util.Map&lt;java.lang.String,<a href="../../../../net/ME1312/SubServers/Bungee/Host/SubServer.html" title="interface in net.ME1312.SubServers.Bungee.Host">SubServer</a>&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Bungee/SubAPI.html#getSubServers--">getSubServers</a></span>()</code>
 <div class="block">Gets the SubServers</div>
 </td>
 </tr>
-<tr id="i28" class="altColor">
+<tr id="i29" class="rowColor">
 <td class="colFirst"><code><a href="../../../../net/ME1312/SubServers/Bungee/Library/Version/Version.html" title="class in net.ME1312.SubServers.Bungee.Library.Version">Version</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Bungee/SubAPI.html#getWrapperVersion--">getWrapperVersion</a></span>()</code>
 <div class="block">Gets the SubServers Version</div>
 </td>
 </tr>
-<tr id="i29" class="rowColor">
+<tr id="i30" class="altColor">
 <td class="colFirst"><code>boolean</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Bungee/SubAPI.html#removeHost-java.lang.String-">removeHost</a></span>(java.lang.String&nbsp;name)</code>
 <div class="block">Remove a Host from the Network</div>
 </td>
 </tr>
-<tr id="i30" class="altColor">
+<tr id="i31" class="rowColor">
 <td class="colFirst"><code>boolean</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Bungee/SubAPI.html#removeHost-java.util.UUID-java.lang.String-">removeHost</a></span>(java.util.UUID&nbsp;player,
           java.lang.String&nbsp;name)</code>
 <div class="block">Remove a Host from the Network</div>
 </td>
 </tr>
-<tr id="i31" class="rowColor">
+<tr id="i32" class="altColor">
 <td class="colFirst"><code>boolean</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Bungee/SubAPI.html#removeServer-java.lang.String-">removeServer</a></span>(java.lang.String&nbsp;name)</code>
 <div class="block">Remove a Server from the Network</div>
 </td>
 </tr>
-<tr id="i32" class="altColor">
+<tr id="i33" class="rowColor">
 <td class="colFirst"><code>boolean</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Bungee/SubAPI.html#removeServer-java.util.UUID-java.lang.String-">removeServer</a></span>(java.util.UUID&nbsp;player,
             java.lang.String&nbsp;name)</code>
 <div class="block">Remove a Server from the Network</div>
 </td>
 </tr>
-<tr id="i33" class="rowColor">
+<tr id="i34" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Bungee/SubAPI.html#setLang-java.lang.String-java.lang.String-">setLang</a></span>(java.lang.String&nbsp;key,
        java.lang.String&nbsp;value)</code>
@@ -652,7 +658,21 @@ public&nbsp;<a href="../../../../net/ME1312/SubServers/Bungee/SubPlugin.html" ti
 <li class="blockList">
 <h4>getGroups</h4>
 <pre>public&nbsp;java.util.Map&lt;java.lang.String,java.util.List&lt;<a href="../../../../net/ME1312/SubServers/Bungee/Host/Server.html" title="interface in net.ME1312.SubServers.Bungee.Host">Server</a>&gt;&gt;&nbsp;getGroups()</pre>
-<div class="block">Gets the Server Groups</div>
+<div class="block">Gets the Server Groups (Group names are case sensitive here)</div>
+<dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>Group Map</dd>
+</dl>
+</li>
+</ul>
+<a name="getLowercaseGroups--">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getLowercaseGroups</h4>
+<pre>public&nbsp;java.util.Map&lt;java.lang.String,java.util.List&lt;<a href="../../../../net/ME1312/SubServers/Bungee/Host/Server.html" title="interface in net.ME1312.SubServers.Bungee.Host">Server</a>&gt;&gt;&nbsp;getLowercaseGroups()</pre>
+<div class="block">Gets the Server Groups (Group names are all lowercase here)</div>
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>Group Map</dd>
@@ -666,7 +686,7 @@ public&nbsp;<a href="../../../../net/ME1312/SubServers/Bungee/SubPlugin.html" ti
 <li class="blockList">
 <h4>getGroup</h4>
 <pre>public&nbsp;java.util.List&lt;<a href="../../../../net/ME1312/SubServers/Bungee/Host/Server.html" title="interface in net.ME1312.SubServers.Bungee.Host">Server</a>&gt;&nbsp;getGroup(java.lang.String&nbsp;name)</pre>
-<div class="block">Gets a Server Group</div>
+<div class="block">Gets a Server Group (Group names are case insensitive here)</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>name</code> - Group name</dd>

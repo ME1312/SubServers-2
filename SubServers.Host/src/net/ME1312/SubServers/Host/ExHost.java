@@ -26,7 +26,6 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.net.InetAddress;
-import java.net.SocketException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.charset.Charset;
@@ -57,7 +56,8 @@ public final class ExHost {
     public final Version bversion = new Version(2);
     public final SubAPI api = new SubAPI(this);
 
-    private boolean running;
+    private boolean running = false;
+    private boolean ready = false;
 
     /**
      * SubServers.Host Launch
@@ -123,7 +123,7 @@ public final class ExHost {
                     Files.delete(new UniversalFile(dir, "Recently Deleted").toPath());
                 }
             }
-
+            running = true;
             SubDataClient.Encryption encryption = SubDataClient.Encryption.NONE;
             if (config.get().getSection("Settings").getSection("SubData").getString("Password", "").length() == 0) {
                 log.info.println("Cannot encrypt connection without a password");
@@ -135,6 +135,12 @@ public final class ExHost {
             subdata = new SubDataClient(this, config.get().getSection("Settings").getSection("SubData").getString("Name", "undefined"),
                     InetAddress.getByName(config.get().getSection("Settings").getSection("SubData").getString("Address", "127.0.0.1:4391").split(":")[0]),
                     Integer.parseInt(config.get().getSection("Settings").getSection("SubData").getString("Address", "127.0.0.1:4391").split(":")[1]), encryption);
+            Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+                if (running) {
+                    log.warn.println("Received request from system to shutdown");
+                    forcequit(0);
+                }
+            }));
             creator = new SubCreator(this);
 
             if (System.getProperty("subservers.host.plugins", "").length() > 0) {
@@ -226,6 +232,7 @@ public final class ExHost {
                                 plugin.setEnabled(true);
                                 api.addListener(plugin, plugin.get());
                                 api.plugins.put(plugin.getName().toLowerCase(), plugin);
+                                api.plugins.put(plugin.getName().toLowerCase(), plugin);
                                 loaded.add(plugin.getName().toLowerCase());
                                 log.info.println("Loaded " + plugin.getName() + " v" + plugin.getVersion().toString() + " by " + plugin.getAuthors().toString().substring(1, plugin.getAuthors().toString().length() - 1));
                                 i++;
@@ -257,13 +264,12 @@ public final class ExHost {
             }
 
             loadDefaults();
-            running = true;
 
             new Timer().schedule(new TimerTask() {
                 @Override
                 public void run() {
                     try {
-                        Document updxml = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new InputSource(new StringReader(Util.readAll(new BufferedReader(new InputStreamReader(new URL("http://src.me1312.net/maven/net/ME1312/SubServers/SubServers.Host/maven-metadata.xml").openStream(), Charset.forName("UTF-8")))))));
+                        Document updxml = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new InputSource(new StringReader(Util.readAll(new BufferedReader(new InputStreamReader(new URL("https://src.me1312.net/maven/net/ME1312/SubServers/SubServers.Host/maven-metadata.xml").openStream(), Charset.forName("UTF-8")))))));
 
                         NodeList updnodeList = updxml.getElementsByTagName("version");
                         Version updversion = version;
@@ -283,18 +289,17 @@ public final class ExHost {
             }, 0, TimeUnit.DAYS.toMillis(2));
 
             loop();
-        } catch (SocketException e) {
-            log.severe.println(e);
         } catch (Exception e) {
             log.error.println(e);
+            forcequit(1);
         }
     }
 
     private void loop() {
         Scanner console = new Scanner(System.in);
-
-        while (running && console.hasNextLine()) {
-            if (!running) continue;
+        ready = true;
+        while (ready && console.hasNextLine()) {
+            if (!ready) continue;
             final String umsg = console.nextLine();
             final CommandPreProcessEvent event;
             api.executeEvent(event = new CommandPreProcessEvent(this, umsg));
@@ -305,7 +310,7 @@ public final class ExHost {
                     args.addAll(Arrays.asList(umsg.contains(" ") ? umsg.split(" ") : new String[]{umsg}));
                     args.remove(0);
 
-                    new Thread(() ->{
+                    new Thread(() -> {
                         try {
                             api.commands.get(cmd.toLowerCase()).command(cmd, args.toArray(new String[args.size()]));
                         } catch (Exception e) {
@@ -329,41 +334,50 @@ public final class ExHost {
      * @param exit Exit Code
      */
     public void stop(int exit) {
-        log.info.println("Shutting down...");
-        running = false;
-        SubDisableEvent event = new SubDisableEvent(this, exit);
-        api.executeEvent(event);
+        if (ready) {
+            log.info.println("Shutting down...");
+            SubDisableEvent event = new SubDisableEvent(this, exit);
+            api.executeEvent(event);
 
-        List<String> subservers = new ArrayList<String>();
-        subservers.addAll(servers.keySet());
+            forcequit(event.getExitCode());
+        }
+    } private void forcequit(int exit) {
+        if (ready) {
+            ready = false;
 
-        for (String server : subservers) {
-            servers.get(server).stop();
+            List<String> subservers = new ArrayList<String>();
+            subservers.addAll(servers.keySet());
+
+            for (String server : subservers) {
+                servers.get(server).stop();
+                try {
+                    servers.get(server).waitFor();
+                } catch (Exception e) {
+                    log.error.println(e);
+                }
+            }
+            servers.clear();
+
+            if (creator != null) {
+                creator.terminate();
+                try {
+                    creator.waitFor();
+                } catch (Exception e) {
+                    log.error.println(e);
+                }
+            }
+            running = false;
+
             try {
-                servers.get(server).waitFor();
+                Thread.sleep(500);
             } catch (Exception e) {
                 log.error.println(e);
             }
-        }
-        subservers.clear();
-        servers.clear();
+            if (subdata != null) Util.isException(() -> subdata.destroy(0));
 
-        creator.terminate();
-        try {
-            creator.waitFor();
-        } catch (Exception e) {
-            log.error.println(e);
+            Util.isException(FileLogger::end);
+            System.exit(exit);
         }
-
-        try {
-            Thread.sleep(500);
-        } catch (Exception e) {
-            log.error.println(e);
-        }
-        if (subdata != null) Util.isException(() -> subdata.destroy(0));
-
-        Util.isException(FileLogger::end);
-        System.exit(event.getExitCode());
     }
 
     private void unzip(InputStream zip, File dir) {

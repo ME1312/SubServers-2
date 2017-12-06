@@ -821,6 +821,7 @@ public class InternalUIRenderer extends UIRenderer {
                     hosts.put(server, (json.getJSONObject("groups").getJSONObject(group).getJSONObject(server).keySet().contains("host") && json.getJSONObject("hosts").keySet().contains(json.getJSONObject("groups").getJSONObject(group).getJSONObject(server).getString("host")))?json.getJSONObject("groups").getJSONObject(group).getJSONObject(server).getString("host"):null);
                     servers.add(server);
                 }
+            } else {
                 lastMenu = () -> serverMenu(1, null, null);
                 for (String s : json.getJSONObject("servers").keySet()) {
                     hosts.put(s, null);

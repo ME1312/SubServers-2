@@ -39,7 +39,6 @@ import java.util.concurrent.TimeUnit;
 public final class SubPlugin extends BungeeCord implements Listener {
     protected final HashMap<String, Class<? extends Host>> hostDrivers = new HashMap<String, Class<? extends Host>>();
     public final HashMap<String, Host> hosts = new HashMap<String, Host>();
-    public final HashMap<String, List<Server>> groups = new HashMap<String, List<Server>>();
     public final HashMap<String, Server> exServers = new HashMap<String, Server>();
     private final HashMap<String, ServerInfo> legServers = new HashMap<String, ServerInfo>();
 
@@ -244,6 +243,17 @@ public final class SubPlugin extends BungeeCord implements Listener {
 
             int subservers = 0;
             System.out.println("SubServers > Loading SubServers...");
+            if (!posted) Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+                if (!running) {
+                    System.out.println("SubServers > Received request from system to shutdown");
+                    try {
+                        resetHosts();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }));
+            running = true;
             for (String name : config.get().getSection("Servers").getKeys()) {
                 try {
                     if (!this.hosts.keySet().contains(config.get().getSection("Servers").getSection(name).getString("Host").toLowerCase())) throw new InvalidServerException("There is no host with this name: " + config.get().getSection("Servers").getSection(name).getString("Host"));
@@ -269,7 +279,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
                     if (other != null && server.isCompatible(other)) server.toggleCompatibility(other);
                 }
             }
-            running = true;
+            api.ready = true;
             legServers.clear();
 
             int plugins = 0;
@@ -288,88 +298,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
             }
 
             System.out.println("SubServers > " + ((plugins > 0)?plugins+" Plugin"+((plugins == 1)?"":"s")+", ":"") + hosts + " Host"+((hosts == 1)?"":"s")+", " + servers + " Server"+((servers == 1)?"":"s")+", and " + subservers + " SubServer"+((subservers == 1)?"":"s")+" loaded in " + new DecimalFormat("0.000").format((Calendar.getInstance().getTime().getTime() - begin) / 1000D) + "s");
-            /*
-            System.out.println(" ");
-            System.out.println("// Begin Internal SubCreator Template Argument Validator Tests //");
-            Container<String> str = new Container<String>("testString");
-            SubCreator.validate(((Host) api.getHosts().values().toArray()[0]).getCreator().getTemplate("Sponge"), "System", "toUppercase", str);
-            System.out.println("System.toUppercase: testString -> " + str.get());
-            str.set("testString");
-            SubCreator.validate(((Host) api.getHosts().values().toArray()[0]).getCreator().getTemplate("Sponge"), "System", "toLowercase", str);
-            System.out.println("System.toLowercase: testString -> " + str.get());
-            str.set("1.8");
-            SubCreator.validate(((Host) api.getHosts().values().toArray()[0]).getCreator().getTemplate("Sponge"), "System", "toServerVersion", str);
-            System.out.println("System.toServerVersion: 1.8 -> " + str.get());
-            str.set("1.10.2");
-            SubCreator.validate(((Host) api.getHosts().values().toArray()[0]).getCreator().getTemplate("Sponge"), "System", "toServerVersion", str);
-            System.out.println("System.toServerVersion: 1.10.2 -> " + str.get());
-            str.set("1.12.2");
-            SubCreator.validate(((Host) api.getHosts().values().toArray()[0]).getCreator().getTemplate("Sponge"), "System", "toServerVersion", str);
-            System.out.println("System.toServerVersion: 1.12.2 -> " + str.get());
-            str.set("1.8");
-            System.out.println("Integer: " + str.get() + " == 1.10.2 = " + ((SubCreator.validate(((Host) api.getHosts().values().toArray()[0]).getCreator().getTemplate("Sponge"), "Integer", "=1.10.2", str))?"TRUE":"FALSE"));
-            str.set("1.10.2");
-            System.out.println("Integer: " + str.get() + " == 1.10.2 = " + ((SubCreator.validate(((Host) api.getHosts().values().toArray()[0]).getCreator().getTemplate("Sponge"), "Integer", "==1.10.2", str))?"TRUE":"FALSE"));
-            str.set("1.8");
-            System.out.println("Integer: " + str.get() + " != 1.10.2 = " + ((SubCreator.validate(((Host) api.getHosts().values().toArray()[0]).getCreator().getTemplate("Sponge"), "Integer", "!1.10.2", str))?"TRUE":"FALSE"));
-            str.set("1.10.2");
-            System.out.println("Integer: " + str.get() + " != 1.10.2 = " + ((SubCreator.validate(((Host) api.getHosts().values().toArray()[0]).getCreator().getTemplate("Sponge"), "Integer", "!=1.10.2", str))?"TRUE":"FALSE"));
-            str.set("1.8");
-            System.out.println("Integer: " + str.get() + " < 1.10.2 = " + ((SubCreator.validate(((Host) api.getHosts().values().toArray()[0]).getCreator().getTemplate("Sponge"), "Integer", "<1.10.2", str))?"TRUE":"FALSE"));
-            str.set("1.10.2");
-            System.out.println("Integer: " + str.get() + " < 1.10.2 = " + ((SubCreator.validate(((Host) api.getHosts().values().toArray()[0]).getCreator().getTemplate("Sponge"), "Integer", "<1.10.2", str))?"TRUE":"FALSE"));
-            str.set("1.12.2");
-            System.out.println("Integer: " + str.get() + " < 1.10.2 = " + ((SubCreator.validate(((Host) api.getHosts().values().toArray()[0]).getCreator().getTemplate("Sponge"), "Integer", "<1.10.2", str))?"TRUE":"FALSE"));
-            str.set("1.8");
-            System.out.println("Integer: " + str.get() + " <= 1.10.2 = " + ((SubCreator.validate(((Host) api.getHosts().values().toArray()[0]).getCreator().getTemplate("Sponge"), "Integer", "<=1.10.2", str))?"TRUE":"FALSE"));
-            str.set("1.10.2");
-            System.out.println("Integer: " + str.get() + " <= 1.10.2 = " + ((SubCreator.validate(((Host) api.getHosts().values().toArray()[0]).getCreator().getTemplate("Sponge"), "Integer", "<=1.10.2", str))?"TRUE":"FALSE"));
-            str.set("1.12.2");
-            System.out.println("Integer: " + str.get() + " <= 1.10.2 = " + ((SubCreator.validate(((Host) api.getHosts().values().toArray()[0]).getCreator().getTemplate("Sponge"), "Integer", "<=1.10.2", str))?"TRUE":"FALSE"));
-            str.set("1.8");
-            System.out.println("Integer: " + str.get() + " > 1.10.2 = " + ((SubCreator.validate(((Host) api.getHosts().values().toArray()[0]).getCreator().getTemplate("Sponge"), "Integer", ">1.10.2", str))?"TRUE":"FALSE"));
-            str.set("1.10.2");
-            System.out.println("Integer: " + str.get() + " > 1.10.2 = " + ((SubCreator.validate(((Host) api.getHosts().values().toArray()[0]).getCreator().getTemplate("Sponge"), "Integer", ">1.10.2", str))?"TRUE":"FALSE"));
-            str.set("1.12.2");
-            System.out.println("Integer: " + str.get() + " > 1.10.2 = " + ((SubCreator.validate(((Host) api.getHosts().values().toArray()[0]).getCreator().getTemplate("Sponge"), "Integer", ">1.10.2", str))?"TRUE":"FALSE"));
-            str.set("1.8");
-            System.out.println("Integer: " + str.get() + " >= 1.10.2 = " + ((SubCreator.validate(((Host) api.getHosts().values().toArray()[0]).getCreator().getTemplate("Sponge"), "Integer", ">=1.10.2", str))?"TRUE":"FALSE"));
-            str.set("1.10.2");
-            System.out.println("Integer: " + str.get() + " >= 1.10.2 = " + ((SubCreator.validate(((Host) api.getHosts().values().toArray()[0]).getCreator().getTemplate("Sponge"), "Integer", ">=1.10.2", str))?"TRUE":"FALSE"));
-            str.set("1.12.2");
-            System.out.println("Integer: " + str.get() + " >= 1.10.2 = " + ((SubCreator.validate(((Host) api.getHosts().values().toArray()[0]).getCreator().getTemplate("Sponge"), "Integer", ">=1.10.2", str))?"TRUE":"FALSE"));
-            str.set("No Pizza Please");
-            System.out.println("RegEx: /No Pizza Please/ == " + str.get() + " = " + ((SubCreator.validate(((Host) api.getHosts().values().toArray()[0]).getCreator().getTemplate("Sponge"), "RegEx", "/No Pizza Please/", str))?"TRUE":"FALSE"));
-            str.set("No Pizza Please");
-            System.out.println("RegEx: /no pizza please/ == " + str.get() + " = " + ((SubCreator.validate(((Host) api.getHosts().values().toArray()[0]).getCreator().getTemplate("Sponge"), "RegEx", "/no pizza please/", str))?"TRUE":"FALSE"));
-            str.set("No Pizza Please");
-            System.out.println("RegEx: /nopizzaplease/ == " + str.get() + " = " + ((SubCreator.validate(((Host) api.getHosts().values().toArray()[0]).getCreator().getTemplate("Sponge"), "RegEx", "/nopizzaplease/", str))?"TRUE":"FALSE"));
-            str.set("No Pizza Please");
-            System.out.println("RegEx: /No Pizza Please/i == " + str.get() + " = " + ((SubCreator.validate(((Host) api.getHosts().values().toArray()[0]).getCreator().getTemplate("Sponge"), "RegEx", "/No Pizza Please/i", str))?"TRUE":"FALSE"));
-            str.set("No Pizza Please");
-            System.out.println("RegEx: /no pizza please/i == " + str.get() + " = " + ((SubCreator.validate(((Host) api.getHosts().values().toArray()[0]).getCreator().getTemplate("Sponge"), "RegEx", "/no pizza please/i", str))?"TRUE":"FALSE"));
-            str.set("No Pizza Please");
-            System.out.println("RegEx: /nopizzaplease/i == " + str.get() + " = " + ((SubCreator.validate(((Host) api.getHosts().values().toArray()[0]).getCreator().getTemplate("Sponge"), "RegEx", "/nopizzaplease/i", str))?"TRUE":"FALSE"));
-            str.set("No Pizza Please");
-            System.out.println("RegEx: /No Pizza Please/u == " + str.get() + " = " + ((SubCreator.validate(((Host) api.getHosts().values().toArray()[0]).getCreator().getTemplate("Sponge"), "RegEx", "/No Pizza Please/u", str))?"TRUE":"FALSE"));
-            str.set("No Pizza Please");
-            System.out.println("RegEx: /no pizza please/u == " + str.get() + " = " + ((SubCreator.validate(((Host) api.getHosts().values().toArray()[0]).getCreator().getTemplate("Sponge"), "RegEx", "/no pizza please/u", str))?"TRUE":"FALSE"));
-            str.set("No Pizza Please");
-            System.out.println("RegEx: /nopizzaplease/u == " + str.get() + " = " + ((SubCreator.validate(((Host) api.getHosts().values().toArray()[0]).getCreator().getTemplate("Sponge"), "RegEx", "/nopizzaplease/u", str))?"TRUE":"FALSE"));
-            str.set("No Pizza Please");
-            System.out.println("RegEx: /No Pizza Please/x == " + str.get() + " = " + ((SubCreator.validate(((Host) api.getHosts().values().toArray()[0]).getCreator().getTemplate("Sponge"), "RegEx", "/No Pizza Please/x", str))?"TRUE":"FALSE"));
-            str.set("No Pizza Please");
-            System.out.println("RegEx: /no pizza please/x == " + str.get() + " = " + ((SubCreator.validate(((Host) api.getHosts().values().toArray()[0]).getCreator().getTemplate("Sponge"), "RegEx", "/no pizza please/x", str))?"TRUE":"FALSE"));
-            str.set("No Pizza Please");
-            System.out.println("RegEx: /nopizzaplease/x == " + str.get() + " = " + ((SubCreator.validate(((Host) api.getHosts().values().toArray()[0]).getCreator().getTemplate("Sponge"), "RegEx", "/nopizzaplease/x", str))?"TRUE":"FALSE"));
-            str.set("No Pizza Please");
-            System.out.println("RegEx: /No Pizza Please/iux == " + str.get() + " = " + ((SubCreator.validate(((Host) api.getHosts().values().toArray()[0]).getCreator().getTemplate("Sponge"), "RegEx", "/No Pizza Please/iux", str))?"TRUE":"FALSE"));
-            str.set("No Pizza Please");
-            System.out.println("RegEx: /no pizza please/iux == " + str.get() + " = " + ((SubCreator.validate(((Host) api.getHosts().values().toArray()[0]).getCreator().getTemplate("Sponge"), "RegEx", "/no pizza please/iux", str))?"TRUE":"FALSE"));
-            str.set("No Pizza Please");
-            System.out.println("RegEx: /nopizzaplease/iux == " + str.get() + " = " + ((SubCreator.validate(((Host) api.getHosts().values().toArray()[0]).getCreator().getTemplate("Sponge"), "RegEx", "/nopizzaplease/iux", str))?"TRUE":"FALSE"));
-            System.out.println(" ");
-            */
+
             super.startListeners();
             if (!posted) {
                 post();
@@ -382,12 +311,11 @@ public final class SubPlugin extends BungeeCord implements Listener {
 
     private void post() {
         new Metrics(this);
-
         new Timer().schedule(new TimerTask() {
             @Override
             public void run() {
                 try {
-                    Document updxml = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new InputSource(new StringReader(Util.readAll(new BufferedReader(new InputStreamReader(new URL("http://src.me1312.net/maven/net/ME1312/SubServers/SubServers.Bungee/maven-metadata.xml").openStream(), Charset.forName("UTF-8")))))));
+                    Document updxml = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new InputSource(new StringReader(Util.readAll(new BufferedReader(new InputStreamReader(new URL("https://src.me1312.net/maven/net/ME1312/SubServers/SubServers.Bungee/maven-metadata.xml").openStream(), Charset.forName("UTF-8")))))));
 
                     NodeList updnodeList = updxml.getElementsByTagName("version");
                     Version updversion = version;
@@ -428,7 +356,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
     @Override
     public Map<String, ServerInfo> getServers() {
         HashMap<String, ServerInfo> servers = new HashMap<String, ServerInfo>();
-        if (!running) {
+        if (!api.ready) {
             servers.putAll(super.getServers());
             servers.putAll(legServers);
         } else {
@@ -472,25 +400,8 @@ public final class SubPlugin extends BungeeCord implements Listener {
                     }
                 }
             }
-            running = false;
-            System.out.println("SubServers > Resetting Hosts and Server Data");
-            List<String> hosts = new ArrayList<String>();
-            hosts.addAll(this.hosts.keySet());
 
-            for (String host : hosts) {
-                List<String> subservers = new ArrayList<String>();
-                subservers.addAll(this.hosts.get(host).getSubServers().keySet());
-
-                for (String server : subservers) {
-                    this.hosts.get(host).removeSubServer(server);
-                }
-                subservers.clear();
-                this.hosts.get(host).getCreator().terminate();
-                this.hosts.get(host).getCreator().waitFor();
-                this.hosts.remove(host);
-            }
-            hosts.clear();
-            exServers.clear();
+            resetHosts();
 
             subdata.destroy();
         } catch (Exception e) {
@@ -498,6 +409,27 @@ public final class SubPlugin extends BungeeCord implements Listener {
         }
 
         super.stopListeners();
+    } private void resetHosts() throws Exception {
+        api.ready = false;
+        System.out.println("SubServers > Resetting Hosts and Server Data");
+        List<String> hosts = new ArrayList<String>();
+        hosts.addAll(this.hosts.keySet());
+
+        for (String host : hosts) {
+            List<String> subservers = new ArrayList<String>();
+            subservers.addAll(this.hosts.get(host).getSubServers().keySet());
+
+            for (String server : subservers) {
+                this.hosts.get(host).removeSubServer(server);
+            }
+            subservers.clear();
+            this.hosts.get(host).getCreator().terminate();
+            this.hosts.get(host).getCreator().waitFor();
+            this.hosts.remove(host);
+        }
+        running = false;
+        this.hosts.clear();
+        exServers.clear();
     }
 
     @EventHandler(priority = Byte.MAX_VALUE)

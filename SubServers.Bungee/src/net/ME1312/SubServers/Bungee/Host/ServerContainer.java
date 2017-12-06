@@ -80,9 +80,6 @@ public class ServerContainer extends BungeeServerInfo implements Server {
     public void addGroup(String value) {
         if (Util.isNull(value)) throw new NullPointerException();
         if (value.length() > 0 && !groups.contains(value)) {
-            List<Server> list = (SubAPI.getInstance().getInternals().groups.keySet().contains(value))?SubAPI.getInstance().getInternals().groups.get(value):new ArrayList<Server>();
-            list.add(this);
-            SubAPI.getInstance().getInternals().groups.put(value, list);
             groups.add(value);
             Collections.sort(groups);
         }
@@ -92,9 +89,6 @@ public class ServerContainer extends BungeeServerInfo implements Server {
     @SuppressWarnings("deprecation")
     public void removeGroup(String value) {
         if (Util.isNull(value)) throw new NullPointerException();
-        List<Server> list = SubAPI.getInstance().getInternals().groups.get(value);
-        list.remove(this);
-        SubAPI.getInstance().getInternals().groups.put(value, list);
         groups.remove(value);
         Collections.sort(groups);
     }

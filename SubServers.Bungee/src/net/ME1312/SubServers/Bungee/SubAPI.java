@@ -25,8 +25,10 @@ import java.util.*;
  */
 public final class SubAPI {
     LinkedList<NamedContainer<Runnable, Runnable>> listeners = new LinkedList<NamedContainer<Runnable, Runnable>>();
+    boolean ready = false;
     private SubPlugin plugin;
     private static SubAPI api;
+
 
     protected SubAPI(SubPlugin plugin) {
         this.plugin = plugin;
@@ -215,22 +217,58 @@ public final class SubAPI {
     }
 
     /**
-     * Gets the Server Groups
+     * Gets the Server Groups (Group names are case sensitive here)
      *
      * @return Group Map
      */
     public Map<String, List<Server>> getGroups() {
-        return new TreeMap<String, List<Server>>(plugin.groups);
+        TreeMap<String, List<Server>> groups = new TreeMap<String, List<Server>>();
+        HashMap<String, String> conflitresolver = new HashMap<String, String>();
+        for (Server server : getServers().values()) {
+            for (String name : server.getGroups()) {
+                String group = name;
+                if (conflitresolver.keySet().contains(name.toLowerCase())) {
+                    group = conflitresolver.get(name.toLowerCase());
+                } else {
+                    conflitresolver.put(name.toLowerCase(), name);
+                }
+                List<Server> list = (groups.keySet().contains(group))?groups.get(group):new ArrayList<Server>();
+                list.add(server);
+                groups.put(group, list);
+            }
+        }
+        return groups;
     }
 
     /**
-     * Gets a Server Group
+     * Gets the Server Groups (Group names are all lowercase here)
+     *
+     * @return Group Map
+     */
+    public Map<String, List<Server>> getLowercaseGroups() {
+        Map<String, List<Server>> groups = getGroups();
+        TreeMap<String, List<Server>> lowercaseGroups = new TreeMap<String, List<Server>>();
+        for (String key : groups.keySet()) {
+            lowercaseGroups.put(key.toLowerCase(), groups.get(key));
+        }
+        return lowercaseGroups;
+    }
+
+    /**
+     * Gets a Server Group (Group names are case insensitive here)
      *
      * @param name Group name
      * @return a Server Group
      */
     public List<Server> getGroup(String name) {
-        return getGroups().get(name);
+        Map<String, List<Server>> groups = getGroups();
+        HashMap<String, String> insensitivity = new HashMap<String, String>();
+        for (String group : groups.keySet()) insensitivity.put(group.toLowerCase(), group);
+        if (insensitivity.keySet().contains(name.toLowerCase())) {
+            return groups.get(insensitivity.get(name.toLowerCase()));
+        } else {
+            return null;
+        }
     }
 
     /**

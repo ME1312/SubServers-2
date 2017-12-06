@@ -21,6 +21,8 @@ import org.w3c.dom.NodeList;
  * SubServers.Host Launcher Class
  */
 public final class Launch {
+    private static File dir = null;
+    private static Process process = null;
 
     /**
      * Prepare and launch SubServers.Host
@@ -41,32 +43,32 @@ public final class Launch {
     private static void launch(String[] args) throws Exception {
         String plugins = "";
         File rtdir = new File(System.getProperty("user.dir"));
-        File tmpdir = File.createTempFile("SubServers.Host.", ".jar");
         File pldir = new File(rtdir, "Plugins");
-        tmpdir.delete();
-        tmpdir.mkdir();
-        System.out.println(">> Created " + tmpdir.getPath().replace(File.separator, "/"));
-        extractJar(getCodeSourceLocation(), tmpdir);
+        dir = File.createTempFile("SubServers.Host.", ".jar");
+        dir.delete();
+        dir.mkdir();
+        System.out.println(">> Created " + dir.getPath().replace(File.separator, "/"));
+        extractJar(getCodeSourceLocation(), dir);
         System.out.println(">> Extracted ~/" + getCodeSourceLocation().getName());
         if (pldir.isDirectory() && pldir.listFiles().length > 0) {
             for (File plugin : Arrays.asList(pldir.listFiles())) {
                 try {
                     boolean success = false;
                     if (getFileExtension(plugin.getName()).equalsIgnoreCase("zip")) {
-                        Util.unzip(new FileInputStream(plugin), tmpdir);
+                        Util.unzip(new FileInputStream(plugin), dir);
                         success = true;
                     } else if (getFileExtension(plugin.getName()).equalsIgnoreCase("jar")) {
-                        extractJar(plugin, tmpdir);
+                        extractJar(plugin, dir);
                         success = true;
                     }
-                    if (new File(tmpdir, "package.xml").exists()) {
-                        NodeList xml = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new File(tmpdir, "package.xml")).getElementsByTagName("class");
+                    if (new File(dir, "package.xml").exists()) {
+                        NodeList xml = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new File(dir, "package.xml")).getElementsByTagName("class");
                         if (xml.getLength() > 0) {
                             for (int i = 0; i < xml.getLength(); i++) {
                                 plugins += ((plugins.length() == 0)?"":" ") + xml.item(i).getTextContent().replace(' ', '_');
                             }
                         }
-                        new File(tmpdir, "package.xml").delete();
+                        new File(dir, "package.xml").delete();
                     }
                     if (success) System.out.println(">> Extracted ~/plugins/" + plugin.getName());
                 } catch (Exception e) {
@@ -79,31 +81,47 @@ public final class Launch {
         String javaPath = String.valueOf(System.getProperty("java.home")) + File.separator + "bin" + File.separator + "java";
         arguments.add(javaPath);
         arguments.addAll(getVmArgs());
-        arguments.add("-Dsubservers.host.runtime=" + URLEncoder.encode(tmpdir.getPath(), "UTF-8"));
+        arguments.add("-Dsubservers.host.runtime=" + URLEncoder.encode(dir.getPath(), "UTF-8"));
         if (!plugins.equals(""))
             arguments.add("-Dsubservers.host.plugins=" + URLEncoder.encode(plugins, "UTF-8"));
         arguments.add("-cp");
-        arguments.add(tmpdir.getPath());
+        arguments.add(dir.getPath());
         arguments.add("net.ME1312.SubServers.Host.ExHost");
         arguments.addAll(Arrays.asList(args));
         ProcessBuilder processBuilder = new ProcessBuilder(arguments);
         processBuilder.directory(new File(System.getProperty("user.dir")));
         processBuilder.redirectErrorStream(true);
-        Process process = processBuilder.start();
-        syncConsole(process);
-        System.out.println(">> Cleaning up");
-        deleteDir(tmpdir);
-        System.exit(process.exitValue());
+        syncConsole(processBuilder.start());
+        Thread.sleep(250);
+        int code = process.exitValue();
+        process = null;
+        exit(code);
     }
 
-    private static void syncConsole(final Process process) throws Exception {
+    private static void syncConsole(Process process) throws Exception {
         ConsoleReader console = new ConsoleReader(System.in, (System.getProperty("subservers.host.log.color", "true").equalsIgnoreCase("true"))?AnsiConsole.out:System.out);
         console.setExpandEvents(false);
+        Launch.process = process;
         try {
             new Thread(() -> {
                 try {
                     String line;
                     BufferedWriter cmd = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
+                    Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+                        if (Launch.process != null && Launch.process.isAlive()) {
+                            try {
+                                stashLine(console);
+                                console.println(">> Received request from system to shutdown");
+                                unstashLine(console);
+                                console.flush();
+                                cmd.write("exit");
+                                cmd.newLine();
+                                cmd.flush();
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }));
                     while (process.isAlive() && (line = console.readLine(">")) != null) {
                         if (line.equals("")) continue;
                         cmd.write(line);
@@ -148,6 +166,12 @@ public final class Launch {
             e.printStackTrace();
         }
         stashLine(console);
+    }
+
+    private static void exit(int code) {
+        System.out.println(">> Cleaning up");
+        deleteDir(dir);
+        System.exit(code);
     }
 
     private static void extractJar(File jarFile, File dir) throws Exception {
