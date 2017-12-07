@@ -56,6 +56,7 @@ public class PacketDownloadServerInfo implements PacketIn, PacketOut {
         if (server != null && server instanceof SubServer) {
             info.put("host", ((SubServer) server).getHost().getName());
             info.put("enabled", ((SubServer) server).isEnabled() && ((SubServer) server).getHost().isEnabled());
+            info.put("editable", ((SubServer) server).isEditable());
             info.put("log", ((SubServer) server).isLogging());
             info.put("dir", ((SubServer) server).getPath());
             info.put("exec", ((SubServer) server).getExecutable());

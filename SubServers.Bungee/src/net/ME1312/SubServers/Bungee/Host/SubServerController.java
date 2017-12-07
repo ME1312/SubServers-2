@@ -99,6 +99,16 @@ public abstract class SubServerController {
             }
 
             @Override
+            public boolean isEditable() {
+                return SubServerController.this.isEditable();
+            }
+
+            @Override
+            public void setEditable(boolean value) {
+                SubServerController.this.setEditable(value);
+            }
+
+            @Override
             public boolean isLogging() {
                 return SubServerController.this.isLogging();
             }
@@ -294,6 +304,24 @@ public abstract class SubServerController {
     public abstract void setEnabled(boolean value);
 
     /**
+     * If the Server is accepting requests to edit()
+     *
+     * @see #edit(YAMLSection)
+     * @see #edit(UUID, YAMLSection)
+     * @return Edit Status
+     */
+    public abstract boolean isEditable();
+
+    /**
+     * Set if the Server should accept requests to edit()
+     *
+     * @param value Edit Status
+     * @see #edit(YAMLSection)
+     * @see #edit(UUID, YAMLSection)
+     */
+    public abstract void setEditable(boolean value);
+
+    /**
      * If the Server is Logging
      *
      * @return Logging Status
@@ -374,4 +402,9 @@ public abstract class SubServerController {
      * @param value Value
      */
     public abstract void setTemporary(boolean value);
+
+    @Override
+    public String toString() {
+        return control.toString();
+    }
 }

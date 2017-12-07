@@ -28,6 +28,7 @@ import java.util.jar.JarFile;
 public class InternalSubServer extends SubServerContainer {
     private InternalHost host;
     private boolean enabled;
+    private boolean editable;
     private Container<Boolean> log;
     private String dir;
     private File directory;
@@ -66,6 +67,7 @@ public class InternalSubServer extends SubServerContainer {
         if (Util.isNull(host, name, enabled, port, motd, log, directory, executable, stopcmd, start, restart, hidden, restricted, temporary)) throw new NullPointerException();
         this.host = host;
         this.enabled = enabled;
+        this.editable = false;
         this.log = new Container<Boolean>(log);
         this.dir = directory;
         this.directory = new File(host.getPath(), directory);
@@ -222,7 +224,7 @@ public class InternalSubServer extends SubServerContainer {
         boolean state = isRunning();
         SubServer forward = null;
         YAMLSection pending = edit.clone();
-        for (String key : edit.getKeys()) {
+        if (editable) for (String key : edit.getKeys()) {
             pending.remove(key);
             YAMLValue value = edit.get(key);
             SubEditServerEvent event = new SubEditServerEvent(player, this, new NamedContainer<String, YAMLValue>(key, value), true);
@@ -492,6 +494,16 @@ public class InternalSubServer extends SubServerContainer {
         if (Util.isNull(value)) throw new NullPointerException();
         new SubEditServerEvent(null, this, new NamedContainer<String, Object>("enabled", value), false);
         enabled = value;
+    }
+
+    @Override
+    public boolean isEditable() {
+        return editable;
+    }
+
+    @Override
+    public void setEditable(boolean value) {
+        editable = value;
     }
 
     @Override

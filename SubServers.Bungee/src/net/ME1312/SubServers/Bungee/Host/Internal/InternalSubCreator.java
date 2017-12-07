@@ -200,6 +200,7 @@ public class InternalSubCreator extends SubCreator {
                     }
                 }
                 server.set("Enabled", true);
+                //server.set("Editable", true);
                 server.set("Display", "");
                 server.set("Host", host.getName());
                 server.set("Group", new ArrayList<String>());

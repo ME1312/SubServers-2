@@ -142,6 +142,26 @@ public final class SubPlugin extends BungeeCord implements Listener {
     }
 
     /**
+     * Further override BungeeCord's signature when patched into the same jar
+     *
+     * @return Software Name
+     */
+    @Override
+    public String getName() {
+        return (new Version(super.getVersion()).equals(version))?"SubServers.Sync.Patch":super.getName();
+    }
+
+    /**
+     * Further override BungeeCord's signature when patched into the same jar
+     *
+     * @return Software Version
+     */
+    @Override
+    public String getVersion() {
+        return (new Version(super.getVersion()).equals(version))?version+((bversion != null)?"-BETA-"+bversion.toString():"")+"-PATCHED":super.getVersion();
+    }
+
+    /**
      * Emulate BungeeCord's getServers()
      *
      * @return Server Map
@@ -149,7 +169,9 @@ public final class SubPlugin extends BungeeCord implements Listener {
     @Override
     public Map<String, ServerInfo> getServers() {
         if (servers.size() > 0) {
-            return new TreeMap<String, ServerInfo>(servers);
+            HashMap<String, ServerInfo> servers = new HashMap<String, ServerInfo>();
+            for (ServerInfo server : this.servers.values()) servers.put(server.getName(), server);
+            return servers;
         } else {
             return super.getServers();
         }

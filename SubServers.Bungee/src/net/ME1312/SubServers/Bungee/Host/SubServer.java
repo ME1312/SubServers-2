@@ -199,6 +199,24 @@ public interface SubServer extends Server {
     void setEnabled(boolean value);
 
     /**
+     * If the Server is accepting requests to edit()
+     *
+     * @see #edit(YAMLSection)
+     * @see #edit(UUID, YAMLSection)
+     * @return Edit Status
+     */
+    boolean isEditable();
+
+    /**
+     * Set if the Server should accept requests to edit()
+     *
+     * @param value Edit Status
+     * @see #edit(YAMLSection)
+     * @see #edit(UUID, YAMLSection)
+     */
+    void setEditable(boolean value);
+
+    /**
      * If the Server is Logging
      *
      * @return Logging Status

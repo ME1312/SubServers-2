@@ -118,7 +118,7 @@ public class Metrics {
         JsonObject data = new JsonObject();
 
         String pluginName = "SubServers Sync";
-        String pluginVersion = plugin.version.toString();
+        String pluginVersion = plugin.version + ((plugin.bversion != null)?"/b"+plugin.bversion.toString():"");
 
         data.addProperty("pluginName", pluginName);
         data.addProperty("pluginVersion", pluginVersion);
@@ -153,7 +153,7 @@ public class Metrics {
         int playerAmount = plugin.getOnlineCount();
         playerAmount = playerAmount > 500 ? 500 : playerAmount;
         int onlineMode = plugin.getConfig().isOnlineMode() ? 1 : 0;
-        String bungeecordVersion = plugin.getVersion();
+        String bungeecordVersion = ((plugin.getName().equals("SubServers.Sync.Patch"))?"SYNC-":"")+plugin.getVersion();
         int managedServers = plugin.getServers().size();
 
         // OS/Java specific data

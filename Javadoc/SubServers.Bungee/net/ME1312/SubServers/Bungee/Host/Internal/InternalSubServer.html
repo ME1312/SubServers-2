@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10,"i8":10,"i9":10,"i10":10,"i11":10,"i12":10,"i13":10,"i14":10,"i15":10,"i16":10,"i17":10,"i18":10,"i19":10,"i20":10,"i21":10,"i22":10};
+var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10,"i8":10,"i9":10,"i10":10,"i11":10,"i12":10,"i13":10,"i14":10,"i15":10,"i16":10,"i17":10,"i18":10,"i19":10,"i20":10,"i21":10,"i22":10,"i23":10,"i24":10};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -246,89 +246,101 @@ extends <a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubServerCo
 </tr>
 <tr id="i8" class="altColor">
 <td class="colFirst"><code>boolean</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/Internal/InternalSubServer.html#isEditable--">isEditable</a></span>()</code>
+<div class="block">If the Server is accepting requests to edit()</div>
+</td>
+</tr>
+<tr id="i9" class="rowColor">
+<td class="colFirst"><code>boolean</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/Internal/InternalSubServer.html#isEnabled--">isEnabled</a></span>()</code>
 <div class="block">If the Server is Enabled</div>
 </td>
 </tr>
-<tr id="i9" class="rowColor">
+<tr id="i10" class="altColor">
 <td class="colFirst"><code>boolean</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/Internal/InternalSubServer.html#isLogging--">isLogging</a></span>()</code>
 <div class="block">If the Server is Logging</div>
 </td>
 </tr>
-<tr id="i10" class="altColor">
+<tr id="i11" class="rowColor">
 <td class="colFirst"><code>boolean</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/Internal/InternalSubServer.html#isRunning--">isRunning</a></span>()</code>
 <div class="block">If the Server is Running</div>
 </td>
 </tr>
-<tr id="i11" class="rowColor">
+<tr id="i12" class="altColor">
 <td class="colFirst"><code>boolean</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/Internal/InternalSubServer.html#isTemporary--">isTemporary</a></span>()</code>
 <div class="block">If the Server is Temporary</div>
 </td>
 </tr>
-<tr id="i12" class="altColor">
+<tr id="i13" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/Internal/InternalSubServer.html#setAutoRestart-boolean-">setAutoRestart</a></span>(boolean&nbsp;value)</code>
 <div class="block">Set if the Server will Auto Restart on unexpected shutdowns</div>
 </td>
 </tr>
-<tr id="i13" class="rowColor">
+<tr id="i14" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/Internal/InternalSubServer.html#setDisplayName-java.lang.String-">setDisplayName</a></span>(java.lang.String&nbsp;value)</code>
 <div class="block">Sets the Display Name for this Server</div>
 </td>
 </tr>
-<tr id="i14" class="altColor">
+<tr id="i15" class="rowColor">
+<td class="colFirst"><code>void</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/Internal/InternalSubServer.html#setEditable-boolean-">setEditable</a></span>(boolean&nbsp;value)</code>
+<div class="block">Set if the Server should accept requests to edit()</div>
+</td>
+</tr>
+<tr id="i16" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/Internal/InternalSubServer.html#setEnabled-boolean-">setEnabled</a></span>(boolean&nbsp;value)</code>
 <div class="block">Set if the Server is Enabled</div>
 </td>
 </tr>
-<tr id="i15" class="rowColor">
+<tr id="i17" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/Internal/InternalSubServer.html#setLogging-boolean-">setLogging</a></span>(boolean&nbsp;value)</code>
 <div class="block">Set if the Server is Logging</div>
 </td>
 </tr>
-<tr id="i16" class="altColor">
+<tr id="i18" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/Internal/InternalSubServer.html#setStopCommand-java.lang.String-">setStopCommand</a></span>(java.lang.String&nbsp;value)</code>
 <div class="block">Set the Command that Stops the Server</div>
 </td>
 </tr>
-<tr id="i17" class="rowColor">
+<tr id="i19" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/Internal/InternalSubServer.html#setTemporary-boolean-">setTemporary</a></span>(boolean&nbsp;value)</code>
 <div class="block">Set If the Server is Temporary (will start server if not running)</div>
 </td>
 </tr>
-<tr id="i18" class="altColor">
+<tr id="i20" class="altColor">
 <td class="colFirst"><code>boolean</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/Internal/InternalSubServer.html#start-java.util.UUID-">start</a></span>(java.util.UUID&nbsp;player)</code>
 <div class="block">Starts the Server</div>
 </td>
 </tr>
-<tr id="i19" class="rowColor">
+<tr id="i21" class="rowColor">
 <td class="colFirst"><code>boolean</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/Internal/InternalSubServer.html#stop-java.util.UUID-">stop</a></span>(java.util.UUID&nbsp;player)</code>
 <div class="block">Stops the Server</div>
 </td>
 </tr>
-<tr id="i20" class="altColor">
+<tr id="i22" class="altColor">
 <td class="colFirst"><code>boolean</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/Internal/InternalSubServer.html#terminate-java.util.UUID-">terminate</a></span>(java.util.UUID&nbsp;player)</code>
 <div class="block">Terminates the Server</div>
 </td>
 </tr>
-<tr id="i21" class="rowColor">
+<tr id="i23" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/Internal/InternalSubServer.html#waitFor--">waitFor</a></span>()</code>
 <div class="block">Waits for the Server to Stop</div>
 </td>
 </tr>
-<tr id="i22" class="altColor">
+<tr id="i24" class="altColor">
 <td class="colFirst"><code>boolean</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/Internal/InternalSubServer.html#willAutoRestart--">willAutoRestart</a></span>()</code>
 <div class="block">If the Server will Auto Restart on unexpected shutdowns</div>
@@ -637,6 +649,42 @@ extends <a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubServerCo
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>value</code> - Value</dd>
+</dl>
+</li>
+</ul>
+<a name="isEditable--">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>isEditable</h4>
+<pre>public&nbsp;boolean&nbsp;isEditable()</pre>
+<div class="block"><span class="descfrmTypeLabel">Description copied from interface:&nbsp;<code><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubServer.html#isEditable--">SubServer</a></code></span></div>
+<div class="block">If the Server is accepting requests to edit()</div>
+<dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>Edit Status</dd>
+<dt><span class="seeLabel">See Also:</span></dt>
+<dd><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubServer.html#edit-net.ME1312.SubServers.Bungee.Library.Config.YAMLSection-"><code>SubServer.edit(YAMLSection)</code></a>, 
+<a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubServer.html#edit-java.util.UUID-net.ME1312.SubServers.Bungee.Library.Config.YAMLSection-"><code>SubServer.edit(UUID, YAMLSection)</code></a></dd>
+</dl>
+</li>
+</ul>
+<a name="setEditable-boolean-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>setEditable</h4>
+<pre>public&nbsp;void&nbsp;setEditable(boolean&nbsp;value)</pre>
+<div class="block"><span class="descfrmTypeLabel">Description copied from interface:&nbsp;<code><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubServer.html#setEditable-boolean-">SubServer</a></code></span></div>
+<div class="block">Set if the Server should accept requests to edit()</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>value</code> - Edit Status</dd>
+<dt><span class="seeLabel">See Also:</span></dt>
+<dd><a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubServer.html#edit-net.ME1312.SubServers.Bungee.Library.Config.YAMLSection-"><code>SubServer.edit(YAMLSection)</code></a>, 
+<a href="../../../../../../net/ME1312/SubServers/Bungee/Host/SubServer.html#edit-java.util.UUID-net.ME1312.SubServers.Bungee.Library.Config.YAMLSection-"><code>SubServer.edit(UUID, YAMLSection)</code></a></dd>
 </dl>
 </li>
 </ul>

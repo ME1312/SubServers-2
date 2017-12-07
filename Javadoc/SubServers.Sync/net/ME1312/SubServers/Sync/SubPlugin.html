@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10,"i8":10};
+var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10,"i8":10,"i9":10,"i10":10};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -210,34 +210,46 @@ implements net.md_5.bungee.api.plugin.Listener</pre>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Sync/SubPlugin.html#edit-net.ME1312.SubServers.Sync.Event.SubEditServerEvent-">edit</a></span>(<a href="../../../../net/ME1312/SubServers/Sync/Event/SubEditServerEvent.html" title="class in net.ME1312.SubServers.Sync.Event">SubEditServerEvent</a>&nbsp;e)</code>&nbsp;</td>
 </tr>
 <tr id="i2" class="altColor">
+<td class="colFirst"><code>java.lang.String</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Sync/SubPlugin.html#getName--">getName</a></span>()</code>
+<div class="block">Further override BungeeCord's signature when patched into the same jar</div>
+</td>
+</tr>
+<tr id="i3" class="rowColor">
 <td class="colFirst"><code>java.util.Map&lt;java.lang.String,net.md_5.bungee.api.config.ServerInfo&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Sync/SubPlugin.html#getServers--">getServers</a></span>()</code>
 <div class="block">Emulate BungeeCord's getServers()</div>
 </td>
 </tr>
-<tr id="i3" class="rowColor">
-<td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Sync/SubPlugin.html#remove-net.ME1312.SubServers.Sync.Event.SubRemoveServerEvent-">remove</a></span>(<a href="../../../../net/ME1312/SubServers/Sync/Event/SubRemoveServerEvent.html" title="class in net.ME1312.SubServers.Sync.Event">SubRemoveServerEvent</a>&nbsp;e)</code>&nbsp;</td>
-</tr>
 <tr id="i4" class="altColor">
-<td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Sync/SubPlugin.html#reroute-net.md_5.bungee.api.event.ServerConnectEvent-">reroute</a></span>(net.md_5.bungee.api.event.ServerConnectEvent&nbsp;e)</code>&nbsp;</td>
+<td class="colFirst"><code>java.lang.String</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Sync/SubPlugin.html#getVersion--">getVersion</a></span>()</code>
+<div class="block">Further override BungeeCord's signature when patched into the same jar</div>
+</td>
 </tr>
 <tr id="i5" class="rowColor">
 <td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Sync/SubPlugin.html#start-net.ME1312.SubServers.Sync.Event.SubStartEvent-">start</a></span>(<a href="../../../../net/ME1312/SubServers/Sync/Event/SubStartEvent.html" title="class in net.ME1312.SubServers.Sync.Event">SubStartEvent</a>&nbsp;e)</code>&nbsp;</td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Sync/SubPlugin.html#remove-net.ME1312.SubServers.Sync.Event.SubRemoveServerEvent-">remove</a></span>(<a href="../../../../net/ME1312/SubServers/Sync/Event/SubRemoveServerEvent.html" title="class in net.ME1312.SubServers.Sync.Event">SubRemoveServerEvent</a>&nbsp;e)</code>&nbsp;</td>
 </tr>
 <tr id="i6" class="altColor">
+<td class="colFirst"><code>void</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Sync/SubPlugin.html#reroute-net.md_5.bungee.api.event.ServerConnectEvent-">reroute</a></span>(net.md_5.bungee.api.event.ServerConnectEvent&nbsp;e)</code>&nbsp;</td>
+</tr>
+<tr id="i7" class="rowColor">
+<td class="colFirst"><code>void</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Sync/SubPlugin.html#start-net.ME1312.SubServers.Sync.Event.SubStartEvent-">start</a></span>(<a href="../../../../net/ME1312/SubServers/Sync/Event/SubStartEvent.html" title="class in net.ME1312.SubServers.Sync.Event">SubStartEvent</a>&nbsp;e)</code>&nbsp;</td>
+</tr>
+<tr id="i8" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Sync/SubPlugin.html#startListeners--">startListeners</a></span>()</code>
 <div class="block">Load Hosts, Servers, SubServers, and SubData Direct</div>
 </td>
 </tr>
-<tr id="i7" class="rowColor">
+<tr id="i9" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Sync/SubPlugin.html#stop-net.ME1312.SubServers.Sync.Event.SubStoppedEvent-">stop</a></span>(<a href="../../../../net/ME1312/SubServers/Sync/Event/SubStoppedEvent.html" title="class in net.ME1312.SubServers.Sync.Event">SubStoppedEvent</a>&nbsp;e)</code>&nbsp;</td>
 </tr>
-<tr id="i8" class="altColor">
+<tr id="i10" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Sync/SubPlugin.html#stopListeners--">stopListeners</a></span>()</code>
 <div class="block">Reset all changes made by startListeners</div>
@@ -249,7 +261,7 @@ implements net.md_5.bungee.api.plugin.Listener</pre>
 <!--   -->
 </a>
 <h3>Methods inherited from class&nbsp;net.md_5.bungee.BungeeCord</h3>
-<code>addConnection, broadcast, broadcast, broadcast, broadcast, constructServerInfo, createTitle, getChannels, getConfig, getConfigurationAdapter, getConnectionThrottle, getConsole, getConsoleReader, getDisabledCommands, getGameVersion, getInstance, getLogger, getName, getOnlineCount, getPlayer, getPlayer, getPlayerByOfflineUUID, getPlayers, getPluginManager, getPluginsFolder, getProtocolVersion, getReconnectHandler, getScheduler, getServerInfo, getTranslation, getVersion, matchPlayer, registerChannel, registerChannels, removeConnection, setConfigurationAdapter, setReconnectHandler, start, stop, stop, unregisterChannel</code></li>
+<code>addConnection, broadcast, broadcast, broadcast, broadcast, constructServerInfo, createTitle, getChannels, getConfig, getConfigurationAdapter, getConnectionThrottle, getConsole, getConsoleReader, getDisabledCommands, getGameVersion, getInstance, getLogger, getOnlineCount, getPlayer, getPlayer, getPlayerByOfflineUUID, getPlayers, getPluginManager, getPluginsFolder, getProtocolVersion, getReconnectHandler, getScheduler, getServerInfo, getTranslation, matchPlayer, registerChannel, registerChannels, removeConnection, setConfigurationAdapter, setReconnectHandler, start, stop, stop, unregisterChannel</code></li>
 </ul>
 <ul class="blockList">
 <li class="blockList"><a name="methods.inherited.from.class.net.md_5.bungee.api.ProxyServer">
@@ -379,6 +391,38 @@ implements net.md_5.bungee.api.plugin.Listener</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Overrides:</span></dt>
 <dd><code>startListeners</code>&nbsp;in class&nbsp;<code>net.md_5.bungee.BungeeCord</code></dd>
+</dl>
+</li>
+</ul>
+<a name="getName--">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getName</h4>
+<pre>public&nbsp;java.lang.String&nbsp;getName()</pre>
+<div class="block">Further override BungeeCord's signature when patched into the same jar</div>
+<dl>
+<dt><span class="overrideSpecifyLabel">Overrides:</span></dt>
+<dd><code>getName</code>&nbsp;in class&nbsp;<code>net.md_5.bungee.BungeeCord</code></dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>Software Name</dd>
+</dl>
+</li>
+</ul>
+<a name="getVersion--">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getVersion</h4>
+<pre>public&nbsp;java.lang.String&nbsp;getVersion()</pre>
+<div class="block">Further override BungeeCord's signature when patched into the same jar</div>
+<dl>
+<dt><span class="overrideSpecifyLabel">Overrides:</span></dt>
+<dd><code>getVersion</code>&nbsp;in class&nbsp;<code>net.md_5.bungee.BungeeCord</code></dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>Software Version</dd>
 </dl>
 </li>
 </ul>

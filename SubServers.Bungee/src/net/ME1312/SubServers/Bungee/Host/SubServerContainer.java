@@ -114,6 +114,7 @@ public abstract class SubServerContainer extends ServerContainer implements SubS
         JSONObject sinfo = new JSONObject(super.toString());
         sinfo.put("type", "SubServer");
         sinfo.put("enabled", getHost().isEnabled() && isEnabled());
+        sinfo.put("editable", isEditable());
         sinfo.put("host", getHost().getName());
         sinfo.put("running", isRunning());
         sinfo.put("log", isLogging());

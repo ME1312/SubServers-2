@@ -265,6 +265,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
                             config.get().getSection("Servers").getSection(name).getInt("Port"), config.get().getSection("Servers").getSection(name).getColoredString("Motd", '&'), config.get().getSection("Servers").getSection(name).getBoolean("Log"),
                             config.get().getSection("Servers").getSection(name).getRawString("Directory"), new Executable(config.get().getSection("Servers").getSection(name).getRawString("Executable")), config.get().getSection("Servers").getSection(name).getRawString("Stop-Command"),
                             config.get().getSection("Servers").getSection(name).getBoolean("Run-On-Launch"), config.get().getSection("Servers").getSection(name).getBoolean("Auto-Restart"), config.get().getSection("Servers").getSection(name).getBoolean("Hidden"), config.get().getSection("Servers").getSection(name).getBoolean("Restricted"), false);
+                    //if (config.get().getSection("Servers").getSection(name).getKeys().contains("Editable")) server.setEditable(config.get().getSection("Servers").getSection(name).getBoolean("Editable"));
                     if (config.get().getSection("Servers").getSection(name).getKeys().contains("Display") && config.get().getSection("Servers").getSection(name).getString("Display").length() > 0) server.setDisplayName(config.get().getSection("Servers").getSection(name).getString("Display"));
                     if (config.get().getSection("Servers").getSection(name).getKeys().contains("Group")) for (String group : config.get().getSection("Servers").getSection(name).getStringList("Group")) server.addGroup(group);
                     if (config.get().getSection("Servers").getSection(name).getKeys().contains("Extra")) for (String extra : config.get().getSection("Servers").getSection(name).getSection("Extra").getKeys()) server.addExtra(extra, config.get().getSection("Servers").getSection(name).getSection("Extra").getObject(extra));
@@ -345,6 +346,26 @@ public final class SubPlugin extends BungeeCord implements Listener {
                 }
             }
         }).start();
+    }
+
+    /**
+     * Further override BungeeCord's signature when patched into the same jar
+     *
+     * @return Software Name
+     */
+    @Override
+    public String getName() {
+        return (new Version(super.getVersion()).equals(version))?"SubServers.Bungee.Patch":super.getName();
+    }
+
+    /**
+     * Further override BungeeCord's signature when patched into the same jar
+     *
+     * @return Software Version
+     */
+    @Override
+    public String getVersion() {
+        return (new Version(super.getVersion()).equals(version))?version+((bversion != null)?"-BETA-"+bversion.toString():"")+"-PATCHED":super.getVersion();
     }
 
     /**
