@@ -8,9 +8,14 @@ import net.ME1312.SubServers.Client.Bukkit.Network.Packet.PacketCreateServer;
 import net.ME1312.SubServers.Client.Bukkit.SubPlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * GUI Renderer Layout Class
@@ -19,7 +24,7 @@ public abstract class UIRenderer {
     protected static HashMap<String, Renderer> hostPlugins = new HashMap<String, Renderer>();
     protected static HashMap<String, Renderer> subserverPlugins = new HashMap<String, Renderer>();
     private NamedContainer<String, Integer> tdownload = null;
-    private BukkitTask download = null;
+    private int download = -1;
     private final UUID player;
     private SubPlugin plugin;
 
@@ -87,14 +92,14 @@ public abstract class UIRenderer {
      * Attempt to send a Title Message
      *
      * @param str Message
-     * @param fadein FadeIn Transition length
-     * @param stay How long the message should stay
-     * @param fadeout FadeOut Transition length
+     * @param fadein FadeIn Transition length (in ticks)
+     * @param stay How long the message should stay (in ticks)
+     * @param fadeout FadeOut Transition length (in ticks)
      * @return Success Status
      */
     public boolean sendTitle(String str, int fadein, int stay, int fadeout) {
         if (Util.isNull(str, fadein, stay, fadeout)) throw new NullPointerException();
-        if (Bukkit.getPluginManager().getPlugin("TitleManager") != null && plugin.config.get().getSection("Settings").getBoolean("Use-Title-Messages", true)) {
+        if (plugin.config.get().getSection("Settings").getBoolean("Use-Title-Messages", true)) {
             String line1, line2;
             if (!str.startsWith("\n") && str.contains("\n")) {
                 line1 = str.split("\\n")[0];
@@ -104,18 +109,25 @@ public abstract class UIRenderer {
                 line2 = ChatColor.RESET.toString();
             }
             try {
-                io.puharesource.mc.titlemanager.api.TitleObject obj = io.puharesource.mc.titlemanager.api.TitleObject.class.getConstructor(String.class, String.class).newInstance(line1, line2);
-                if (fadein >= 0) obj.setFadeIn(fadein);
-                if (stay >= 0) obj.setStay(stay);
-                if (fadeout >= 0) obj.setFadeOut(fadeout);
-                obj.send(Bukkit.getPlayer(player));
-                return true;
+                if (plugin.api.getGameVersion().compareTo(new Version("1.11")) >= 0) {
+                    if (ChatColor.stripColor(line1).length() == 0 && ChatColor.stripColor(line2).length() == 0) {
+                        Bukkit.getPlayer(player).resetTitle();
+                    } else {
+                        Bukkit.getPlayer(player).sendTitle(line1, line2, (fadein >= 0)?fadein:10, (stay >= 0)?stay:70, (fadeout >= 0)?fadeout:20);
+                    }
+                    return true;
+                } else if (Bukkit.getPluginManager().getPlugin("TitleManager") != null) {
+                    io.puharesource.mc.titlemanager.api.TitleObject obj = io.puharesource.mc.titlemanager.api.TitleObject.class.getConstructor(String.class, String.class).newInstance(line1, line2);
+                    if (fadein >= 0) obj.setFadeIn(fadein);
+                    if (stay >= 0) obj.setStay(stay);
+                    if (fadeout >= 0) obj.setFadeOut(fadeout);
+                    obj.send(Bukkit.getPlayer(player));
+                    return true;
+                } else return false;
             } catch (Throwable e) {
                 return false;
             }
-        } else {
-            return false;
-        }
+        } else return false;
     }
 
     /**
@@ -124,10 +136,11 @@ public abstract class UIRenderer {
      * @param subtitle Subtitle to display (or null to hide)
      */
     public void setDownloading(String subtitle) {
-        if (subtitle != null && !(Bukkit.getPluginManager().getPlugin("TitleManager") != null && plugin.config.get().getSection("Settings").getBoolean("Use-Title-Messages", true))) {
-            Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, () -> {
+        if (subtitle != null && !(plugin.config.get().getSection("Settings").getBoolean("Use-Title-Messages", true) && (plugin.api.getGameVersion().compareTo(new Version("1.11")) >= 0 || Bukkit.getPluginManager().getPlugin("TitleManager") != null))) {
+            if (download != -1) Bukkit.getScheduler().cancelTask(download);
+            download = Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, () -> {
                 if (tdownload != null) Bukkit.getPlayer(player).sendMessage(plugin.lang.getSection("Lang").getColoredString("Interface.Generic.Downloading", '&').replace("$str$", subtitle));
-                download = null;
+                download = -1;
             }, 50L);
         } if (subtitle != null && tdownload == null) {
             tdownload = new NamedContainer<String, Integer>(subtitle, 0);
@@ -169,11 +182,68 @@ public abstract class UIRenderer {
             if (tdownload != null) {
                 tdownload = null;
             }
-            if (download != null) {
-                download.cancel();
-                download = null;
+            if (download != -1) {
+                Bukkit.getScheduler().cancelTask(download);
+                download = -1;
             }
         }
+    }
+
+    /**
+     * Parse an ItemStack from a String
+     *
+     * @param str String to parse
+     * @return ItemStack
+     */
+    public ItemStack parseItem(String str) {
+        return parseItem(str, new ItemStack(Material.AIR));
+    }
+
+    /**
+     * Parse an ItemStack from a String
+     *
+     * @param str String to parse
+     * @param def Default to return if unable to parse
+     * @return ItemStack
+     */
+    public ItemStack parseItem(String str, ItemStack def) {
+        final Container<String> item = new Container<String>(str);
+        if (plugin.api.getGameVersion().compareTo(new Version("1.13")) < 0) {
+            try {
+                // int
+                Matcher matcher = Pattern.compile("(?i)^(\\d+)$").matcher(item.get());
+                if (matcher.find()) {
+                    return ItemStack.class.getConstructor(int.class, int.class).newInstance(Integer.parseInt(matcher.group(1)), 1);
+                }
+                // int:int
+                matcher.reset();
+                matcher = Pattern.compile("(?i)^(\\d+):(\\d+)$").matcher(item.get());
+                if (matcher.find()) {
+                    return ItemStack.class.getConstructor(int.class, int.class, short.class).newInstance(Integer.parseInt(matcher.group(1)), 1, Short.parseShort(matcher.group(2)));
+                }
+            } catch (Exception e) {
+                return def;
+            }
+        }
+        // minecraft:name
+        if (item.get().toLowerCase().startsWith("minecraft:")) {
+            item.set(item.get().substring(10));
+        }
+        // bukkit name
+        if (!Util.isException(() -> Material.valueOf(item.get().toUpperCase()))) {
+            return new ItemStack(Material.valueOf(item.get().toUpperCase()), 1);
+        }
+        // vault name
+        if (!Util.isException(() -> Class.forName("net.milkbowl.vault.item.Items"))) {
+            net.milkbowl.vault.item.ItemInfo info = net.milkbowl.vault.item.Items.itemByString(item.get());
+            if (info != null) {
+                ItemStack stack = info.toStack();
+                stack.setAmount(1);
+                return stack;
+            }
+        }
+
+        return def;
     }
 
     /**

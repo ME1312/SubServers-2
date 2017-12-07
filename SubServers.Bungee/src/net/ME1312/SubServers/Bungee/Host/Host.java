@@ -35,7 +35,7 @@ public abstract class Host implements ExtraDataHandler {
      */
     public Host(SubPlugin plugin, String name, Boolean enabled, InetAddress address, String directory, String gitBash) {
         if (name.contains(" ")) throw new InvalidHostException("Host names cannot have spaces: " + name);
-        SubDataServer.allowConnection(address);
+        SubDataServer.allowConnection(address.getHostAddress());
     }
 
     /**

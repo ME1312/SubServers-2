@@ -51,7 +51,6 @@ public class InternalUIHandler implements UIHandler, Listener {
         enabled = false;
     }
 
-    @SuppressWarnings("ConstantConditions")
     @EventHandler(priority = EventPriority.HIGHEST)
     public void click(InventoryClickEvent event) {
         Player player = (Player) event.getWhoClicked();

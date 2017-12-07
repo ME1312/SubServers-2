@@ -128,7 +128,7 @@ public final class SubAPI {
      */
     public Version getGameVersion() {
         try {
-            return new Version(Bukkit.getServer().getVersion().split("\\(MC\\: ")[1].split("\\)")[0]);
+            return new Version(Bukkit.getBukkitVersion().split("-")[0]);
         } catch (ArrayIndexOutOfBoundsException e) {
             return new Version(plugin.version.toString().substring(0, plugin.version.toString().length() - 1));
         }

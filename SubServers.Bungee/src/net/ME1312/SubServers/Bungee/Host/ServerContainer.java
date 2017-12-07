@@ -37,7 +37,7 @@ public class ServerContainer extends BungeeServerInfo implements Server {
         super(name, address, ChatColor.translateAlternateColorCodes('&', motd), restricted);
         if (Util.isNull(name, address, motd, hidden, restricted)) throw new NullPointerException();
         if (name.contains(" ")) throw new InvalidServerException("Server names cannot have spaces: " + name);
-        SubDataServer.allowConnection(getAddress().getAddress());
+        SubDataServer.allowConnection(getAddress().getAddress().getHostAddress());
         this.motd = motd;
         this.restricted = restricted;
         this.hidden = hidden;

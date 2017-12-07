@@ -14,6 +14,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * SubDataServer Class
@@ -22,7 +24,7 @@ public final class SubDataServer {
     private static int MAX_QUEUE = 64;
     private static HashMap<Class<? extends PacketOut>, String> pOut = new HashMap<Class<? extends PacketOut>, String>();
     private static HashMap<String, List<PacketIn>> pIn = new HashMap<String, List<PacketIn>>();
-    private static List<InetAddress> allowedAddresses = new ArrayList<InetAddress>();
+    private static List<String> allowedAddresses = new ArrayList<String>();
     private static boolean defaults = false;
     private HashMap<String, Client> clients = new HashMap<String, Client>();
     private ServerSocket server;
@@ -50,10 +52,10 @@ public final class SubDataServer {
         if (Util.isNull(plugin, port, encryption, MAX_QUEUE)) throw new NullPointerException();
         if (address == null) {
             server = new ServerSocket(port, MAX_QUEUE);
-            allowConnection(InetAddress.getByName("127.0.0.1"));
+            allowConnection("127.0.0.1");
         } else {
             server = new ServerSocket(port, MAX_QUEUE, address);
-            allowConnection(address);
+            allowConnection(address.getHostAddress());
         }
         this.plugin = plugin;
         this.encryption = encryption;
@@ -65,7 +67,7 @@ public final class SubDataServer {
         defaults = true;
         for (String s : plugin.config.get().getSection("Settings").getSection("SubData").getStringList("Allowed-Connections", new ArrayList<String>())) {
             try {
-                allowedAddresses.add(InetAddress.getByName(s));
+                allowedAddresses.add(s);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -152,7 +154,7 @@ public final class SubDataServer {
      */
     public Client addClient(Socket socket) throws IOException {
         if (Util.isNull(socket)) throw new NullPointerException();
-        if (allowedAddresses.contains(socket.getInetAddress())) {
+        if (checkConnection(socket.getInetAddress())) {
             Client client = new Client(this, socket);
             System.out.println("SubData > " + client.getAddress().toString() + " has connected");
             clients.put(client.getAddress().toString(), client);
@@ -341,9 +343,26 @@ public final class SubDataServer {
      *
      * @param address Address to allow
      */
-    public static void allowConnection(InetAddress address) {
+    public static void allowConnection(String address) {
         if (Util.isNull(address)) throw new NullPointerException();
         if (!allowedAddresses.contains(address)) allowedAddresses.add(address);
+    }
+
+    private boolean checkConnection(InetAddress address) {
+        boolean whitelisted = false;
+        Matcher regaddress = Pattern.compile("^(\\d{1,3}).(\\d{1,3}).(\\d{1,3}).(\\d{1,3})$").matcher(address.getHostAddress());
+        if (regaddress.find()) {
+            for (String allowed : allowedAddresses) if (!whitelisted) {
+                Matcher regallowed = Pattern.compile("^(\\d{1,3}|%).(\\d{1,3}|%).(\\d{1,3}|%).(\\d{1,3}|%)$").matcher(allowed);
+                if (regallowed.find() && (
+                        (regaddress.group(1).equals(regallowed.group(1)) || regallowed.group(1).equals("%")) &&
+                        (regaddress.group(2).equals(regallowed.group(2)) || regallowed.group(2).equals("%")) &&
+                        (regaddress.group(3).equals(regallowed.group(3)) || regallowed.group(3).equals("%")) &&
+                        (regaddress.group(4).equals(regallowed.group(4)) || regallowed.group(4).equals("%"))
+                        )) whitelisted = true;
+            }
+        }
+        return whitelisted;
     }
 
     /**
@@ -351,7 +370,7 @@ public final class SubDataServer {
      *
      * @param address Address to deny
      */
-    public static void denyConnection(InetAddress address) {
+    public static void denyConnection(String address) {
         if (Util.isNull(address)) throw new NullPointerException();
         allowedAddresses.remove(address);
     }
