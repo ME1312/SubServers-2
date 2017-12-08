@@ -99,7 +99,6 @@ public final class SubDataServer {
         registerPacket(new PacketListenLog(plugin), "SubListenLog");
         registerPacket(new PacketStartServer(plugin), "SubStartServer");
         registerPacket(new PacketStopServer(plugin), "SubStopServer");
-        registerPacket(new PacketTeleportPlayer(plugin), "SubTeleportPlayer");
 
         registerPacket(PacketAuthorization.class, "Authorization");
         registerPacket(PacketCommandServer.class, "SubCommandServer");
@@ -125,7 +124,6 @@ public final class SubDataServer {
         registerPacket(PacketOutReset.class, "SubReset");
         registerPacket(PacketStartServer.class, "SubStartServer");
         registerPacket(PacketStopServer.class, "SubStopServer");
-        registerPacket(PacketTeleportPlayer.class, "SubTeleportPlayer");
     }
 
     /**

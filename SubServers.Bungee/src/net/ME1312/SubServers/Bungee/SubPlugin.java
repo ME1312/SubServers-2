@@ -47,6 +47,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
     public YAMLConfig config;
     public YAMLConfig lang;
     public HashMap<String, String> exLang = new HashMap<String, String>();
+    public boolean redis = false;
     public SubDataServer subdata = null;
     public SubServer sudo = null;
     public final Version version = new Version(SubPlugin.class.getPackage().getImplementationVersion());
@@ -66,10 +67,6 @@ public final class SubPlugin extends BungeeCord implements Listener {
             tmp.get().set("stats", UUID.randomUUID().toString());
             tmp.save();
             System.out.println("SubServers > Created ~/config.yml");
-        }
-        if (!(new UniversalFile(dir, "modules.yml").exists())) {
-            Util.copyFromJar(SubPlugin.class.getClassLoader(), "net/ME1312/SubServers/Bungee/Library/Files/modules.yml", new UniversalFile(dir, "modules.yml").getPath());
-            System.out.println("SubServers > Created ~/modules.yml");
         }
         UniversalFile dir = new UniversalFile(this.dir, "SubServers");
         dir.mkdir();
@@ -166,11 +163,6 @@ public final class SubPlugin extends BungeeCord implements Listener {
         api.addHostDriver(net.ME1312.SubServers.Bungee.Host.External.ExternalHost.class, "network");
 
         getPluginManager().registerListener(null, this);
-        getPluginManager().registerCommand(null, new SubCommand.BungeeServer(this, "server"));
-        getPluginManager().registerCommand(null, new SubCommand.BungeeList(this, "glist"));
-        getPluginManager().registerCommand(null, new SubCommand(this, "subservers"));
-        getPluginManager().registerCommand(null, new SubCommand(this, "subserver"));
-        getPluginManager().registerCommand(null, new SubCommand(this, "sub"));
 
         System.out.println("SubServers > Pre-Parsing Config...");
         for (String name : config.get().getSection("Servers").getKeys()) {
@@ -311,6 +303,15 @@ public final class SubPlugin extends BungeeCord implements Listener {
     }
 
     private void post() {
+        if (getPluginManager().getPlugin("RedisBungee") != null) redis = true;
+        if (config.get().getSection("Settings").getBoolean("Override-Bungee-Commands", true)) {
+            getPluginManager().registerCommand(null, new SubCommand.BungeeServer(this, "server"));
+            getPluginManager().registerCommand(null, new SubCommand.BungeeList(this, "glist"));
+        }
+        getPluginManager().registerCommand(null, new SubCommand(this, "subservers"));
+        getPluginManager().registerCommand(null, new SubCommand(this, "subserver"));
+        getPluginManager().registerCommand(null, new SubCommand(this, "sub"));
+
         new Metrics(this);
         new Timer().schedule(new TimerTask() {
             @Override
@@ -346,6 +347,31 @@ public final class SubPlugin extends BungeeCord implements Listener {
                 }
             }
         }).start();
+    }
+
+    /**
+     * Reference a RedisBungee method via reflection
+     *
+     * @param method Method to reference
+     * @param args Method arguments
+     * @param <T> Class Type
+     * @return Method Response
+     */
+    @SuppressWarnings("unchecked")
+    public <T> Object redis(String method, NamedContainer<Class<T>, ? extends T>... args) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        if (redis) {
+            Object api = getPluginManager().getPlugin("RedisBungee").getClass().getMethod("getApi").invoke(null);
+            Class<?>[] classargs = new Class<?>[args.length];
+            Object[] objargs = new Object[args.length];
+            for (int i = 0; i < args.length; i++) {
+                classargs[i] = args[i].name();
+                objargs[i] = args[i].get();
+                if (!classargs[i].isInstance(objargs[i])) throw new ClassCastException(classargs[i].getCanonicalName() + " != " + objargs[i].getClass().getCanonicalName());
+            }
+            return api.getClass().getMethod(method, classargs).invoke(api, objargs);
+        } else {
+            throw new IllegalStateException("RedisBungee is not installed");
+        }
     }
 
     /**

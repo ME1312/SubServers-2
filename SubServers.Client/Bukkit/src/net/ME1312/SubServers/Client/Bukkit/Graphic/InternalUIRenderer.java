@@ -1098,7 +1098,7 @@ public class InternalUIRenderer extends UIRenderer {
                         lore.add(ChatColor.GRAY + subserver);
                     lore.add(plugin.lang.getSection("Lang").getColoredString("Interface.Server-Menu.Server-Player-Count", '&').replace("$int$", new DecimalFormat("#,###").format(json.getJSONObject("server").getJSONObject("players").keySet().size())));
                     lore.add(plugin.lang.getSection("Lang").getColoredString("Interface.Server-Menu.SubServer-Temporary", '&'));
-                    lore.add(ChatColor.WHITE + json.getJSONObject("server").getString("address"));
+                    lore.add(ChatColor.WHITE + ((plugin.config.get().getSection("Settings").getBoolean("Show-Addresses", false))?json.getJSONObject("server").getString("address"):json.getJSONObject("server").getString("address").split(":")[json.getJSONObject("server").getString("address").split(":").length - 1]));
                     blockMeta.setLore(lore);
                 } else if (json.getJSONObject("server").getBoolean("running")) {
                     block = createItem("STAINED_GLASS_PANE", "LIME_STAINED_GLASS_PANE", (short) 5);
@@ -1108,7 +1108,7 @@ public class InternalUIRenderer extends UIRenderer {
                     if (!subserver.equals(json.getJSONObject("server").getString("display")))
                         lore.add(ChatColor.GRAY + subserver);
                     lore.add(plugin.lang.getSection("Lang").getColoredString("Interface.Server-Menu.Server-Player-Count", '&').replace("$int$", new DecimalFormat("#,###").format(json.getJSONObject("server").getJSONObject("players").keySet().size())));
-                    lore.add(ChatColor.WHITE + json.getJSONObject("server").getString("address"));
+                    lore.add(ChatColor.WHITE + ((plugin.config.get().getSection("Settings").getBoolean("Show-Addresses", false))?json.getJSONObject("server").getString("address"):json.getJSONObject("server").getString("address").split(":")[json.getJSONObject("server").getString("address").split(":").length - 1]));
                     blockMeta.setLore(lore);
                 } else if (json.getJSONObject("server").getBoolean("enabled") && json.getJSONObject("server").getJSONArray("incompatible").length() == 0) {
                     block = createItem("STAINED_GLASS_PANE", "YELLOW_STAINED_GLASS_PANE", (short) 4);
@@ -1118,7 +1118,7 @@ public class InternalUIRenderer extends UIRenderer {
                     if (!subserver.equals(json.getJSONObject("server").getString("display")))
                         lore.add(ChatColor.GRAY + subserver);
                     lore.add(plugin.lang.getSection("Lang").getColoredString("Interface.Server-Menu.SubServer-Offline", '&'));
-                    lore.add(ChatColor.WHITE + json.getJSONObject("server").getString("address"));
+                    lore.add(ChatColor.WHITE + ((plugin.config.get().getSection("Settings").getBoolean("Show-Addresses", false))?json.getJSONObject("server").getString("address"):json.getJSONObject("server").getString("address").split(":")[json.getJSONObject("server").getString("address").split(":").length - 1]));
                     blockMeta.setLore(lore);
                 } else {
                     block = createItem("STAINED_GLASS_PANE", "RED_STAINED_GLASS_PANE", (short) 14);

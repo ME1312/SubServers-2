@@ -683,74 +683,6 @@ public final class SubCommand implements CommandExecutor {
                         } else {
                             sender.sendMessage(plugin.lang.getSection("Lang").getColoredString("Command.Generic.Invalid-Permission", '&').replace("$str$", "subservers.interface"));
                         }
-                    } else if (args[0].equalsIgnoreCase("tp") || args[0].equalsIgnoreCase("teleport")) {
-                        if (args.length > 2) {
-                            if (sender.hasPermission("subservers.server.teleport.*") || sender.hasPermission("subservers.server.teleport." + args[1].toLowerCase())) {
-                                if (sender.hasPermission("subservers.server.teleport-others")) {
-                                    plugin.subdata.sendPacket(new PacketDownloadPlayerList(players -> {
-                                        UUID uuid = null;
-                                        for (String id : players.getJSONObject("players").keySet()) {
-                                            if (players.getJSONObject("players").getJSONObject(id).getString("name").equalsIgnoreCase(args[2]))
-                                                uuid = UUID.fromString(id);
-                                        }
-                                        if (uuid == null) {
-                                            sender.sendMessage(plugin.lang.getSection("Lang").getColoredString("Command.Teleport.Offline", '&'));
-                                        } else {
-                                            final UUID player = uuid;
-                                            plugin.subdata.sendPacket(new PacketTeleportPlayer(player, args[1], json -> {
-                                                switch (json.getInt("r")) {
-                                                    case 2:
-                                                        sender.sendMessage(plugin.lang.getSection("Lang").getColoredString("Command.Teleport.Invalid", '&'));
-                                                        break;
-                                                    case 3:
-                                                        sender.sendMessage(plugin.lang.getSection("Lang").getColoredString("Command.Teleport.Offline", '&'));
-                                                        break;
-                                                    case 0:
-                                                    case 1:
-                                                        sender.sendMessage(plugin.lang.getSection("Lang").getColoredString("Command.Teleport", '&'));
-                                                        break;
-                                                    default:
-                                                        Bukkit.getLogger().warning("SubData > PacketTeleportPlayer(" + player.toString() + ", " + args[1] + ") responded with: " + json.getString("m"));
-                                                        sender.sendMessage(plugin.lang.getSection("Lang").getColoredString("Command.Teleport", '&'));
-                                                }
-                                            }));
-                                        }
-                                    }));
-                                } else {
-                                    sender.sendMessage(plugin.lang.getSection("Lang").getColoredString("Command.Generic.Invalid-Permission", '&').replace("$str$", "subservers.server.teleport-others"));
-                                }
-                            } else {
-                                sender.sendMessage(plugin.lang.getSection("Lang").getColoredString("Command.Generic.Invalid-Permission", '&').replace("$str$", "subservers.server.teleport." + args[1].toLowerCase()));
-                            }
-                        } else if (args.length > 1) {
-                            if (sender.hasPermission("subservers.server.teleport.*") || sender.hasPermission("subservers.server.teleport." + args[1].toLowerCase())) {
-                                if (sender instanceof Player) {
-                                    plugin.subdata.sendPacket(new PacketTeleportPlayer(((Player) sender).getUniqueId(), args[1], json -> {
-                                        switch (json.getInt("r")) {
-                                            case 2:
-                                                sender.sendMessage(plugin.lang.getSection("Lang").getColoredString("Command.Teleport.Invalid", '&'));
-                                                break;
-                                            case 3:
-                                                sender.sendMessage(plugin.lang.getSection("Lang").getColoredString("Command.Teleport.Offline", '&'));
-                                                break;
-                                            case 0:
-                                            case 1:
-                                                sender.sendMessage(plugin.lang.getSection("Lang").getColoredString("Command.Teleport", '&'));
-                                                break;
-                                            default:
-                                                Bukkit.getLogger().warning("SubData > PacketTeleportPlayer(" + ((Player) sender).getUniqueId().toString() + ", " + args[1] + ") responded with: " + json.getString("m"));
-                                                sender.sendMessage(plugin.lang.getSection("Lang").getColoredString("Command.Teleport", '&'));
-                                        }
-                                    }));
-                                } else {
-                                    sender.sendMessage(plugin.lang.getSection("Lang").getColoredString("Command.Generic.Player-Only", '&'));
-                                }
-                            } else {
-                                sender.sendMessage(plugin.lang.getSection("Lang").getColoredString("Command.Generic.Invalid-Permission", '&').replace("$str$", "subservers.server.teleport." + args[1].toLowerCase()));
-                            }
-                        } else {
-                            sender.sendMessage(plugin.lang.getSection("Lang").getColoredString("Command.Generic.Usage", '&').replace("$str$", label.toLowerCase() + " " + args[0].toLowerCase() + " <Server> [Player]"));
-                        }
                     } else {
                         sender.sendMessage(plugin.lang.getSection("Lang").getColoredString("Command.Generic.Invalid-Subcommand", '&').replace("$str$", args[0]));
                     }
@@ -781,7 +713,6 @@ public final class SubCommand implements CommandExecutor {
                 plugin.lang.getSection("Lang").getColoredString("Command.Help.SubServer.Stop", '&').replace("$str$", label.toLowerCase() + " stop <SubServer>"),
                 plugin.lang.getSection("Lang").getColoredString("Command.Help.SubServer.Terminate", '&').replace("$str$", label.toLowerCase() + " kill <SubServer>"),
                 plugin.lang.getSection("Lang").getColoredString("Command.Help.SubServer.Command", '&').replace("$str$", label.toLowerCase() + " cmd <SubServer> <Command> [Args...]"),
-                plugin.lang.getSection("Lang").getColoredString("Command.Help.Server.Teleport", '&').replace("$str$", label.toLowerCase() + " tp <Server> [Player]"),
                 plugin.lang.getSection("Lang").getColoredString("Command.Help.Host.Create", '&').replace("$str$", label.toLowerCase() + " create <Name> <Host> <Template> <Version> <Port>"),
         };
     }

@@ -110,7 +110,6 @@ public final class SubDataClient {
         registerPacket(new PacketLinkExHost(host), "SubLinkExHost");
         registerPacket(new PacketStartServer(), "SubStartServer");
         registerPacket(new PacketStopServer(), "SubStopServer");
-        registerPacket(new PacketTeleportPlayer(), "SubTeleportPlayer");
 
 
         registerPacket(PacketAuthorization.class, "Authorization");
@@ -133,7 +132,6 @@ public final class SubDataClient {
         registerPacket(PacketOutExRequestQueue.class, "SubExRequestQueue");
         registerPacket(PacketStartServer.class, "SubStartServer");
         registerPacket(PacketStopServer.class, "SubStopServer");
-        registerPacket(PacketTeleportPlayer.class, "SubTeleportPlayer");
     }
 
     private void loop() {

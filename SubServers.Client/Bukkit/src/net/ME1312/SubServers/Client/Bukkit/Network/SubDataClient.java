@@ -96,7 +96,6 @@ public final class SubDataClient {
         registerPacket(new PacketLinkServer(plugin), "SubLinkServer");
         registerPacket(new PacketStartServer(), "SubStartServer");
         registerPacket(new PacketStopServer(), "SubStopServer");
-        registerPacket(new PacketTeleportPlayer(), "SubTeleportPlayer");
 
         registerPacket(PacketAuthorization.class, "Authorization");
         registerPacket(PacketCommandServer.class, "SubCommandServer");
@@ -110,7 +109,6 @@ public final class SubDataClient {
         registerPacket(PacketLinkServer.class, "SubLinkServer");
         registerPacket(PacketStartServer.class, "SubStartServer");
         registerPacket(PacketStopServer.class, "SubStopServer");
-        registerPacket(PacketTeleportPlayer.class, "SubTeleportPlayer");
     }
 
     private void loop() {

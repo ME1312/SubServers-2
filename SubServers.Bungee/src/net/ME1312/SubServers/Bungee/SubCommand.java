@@ -4,6 +4,7 @@ import net.ME1312.SubServers.Bungee.Host.Host;
 import net.ME1312.SubServers.Bungee.Host.Server;
 import net.ME1312.SubServers.Bungee.Host.SubCreator;
 import net.ME1312.SubServers.Bungee.Host.SubServer;
+import net.ME1312.SubServers.Bungee.Library.NamedContainer;
 import net.ME1312.SubServers.Bungee.Library.Util;
 import net.ME1312.SubServers.Bungee.Library.Version.Version;
 import net.md_5.bungee.api.ChatColor;
@@ -24,6 +25,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.StringReader;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.*;
@@ -493,6 +495,7 @@ public final class SubCommand extends Command implements TabExecutor {
     /**
      * BungeeCord /server
      */
+    @SuppressWarnings("unchecked")
     public static final class BungeeServer extends Command implements TabExecutor {
         private SubPlugin plugin;
         protected BungeeServer(SubPlugin plugin, String command) {
@@ -525,7 +528,11 @@ public final class SubCommand extends Command implements TabExecutor {
                         if (!server.isHidden() && (!(server instanceof SubServer) || ((SubServer) server).isRunning())) {
                             if (i != 0) serverm.addExtra(div);
                             TextComponent message = new TextComponent(plugin.lang.get().getSection("Lang").getColoredString("Bungee.Server.List", '&').replace("$str$", server.getDisplayName()));
-                            message.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[]{new TextComponent(plugin.lang.get().getSection("Lang").getColoredString("Bungee.Server.Hover", '&').replace("$int$", Integer.toString(server.getPlayers().size())))}));
+                            try {
+                                message.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[]{new TextComponent(plugin.lang.get().getSection("Lang").getColoredString("Bungee.Server.Hover", '&').replace("$int$", Integer.toString((plugin.redis)?((Set<UUID>)plugin.redis("getPlayersOnServer", new NamedContainer<>(String.class, server.getName()))).size():server.getPlayers().size())))}));
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
                             message.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/server " + server.getName()));
                             serverm.addExtra(message);
                             i++;
@@ -570,6 +577,7 @@ public final class SubCommand extends Command implements TabExecutor {
     /**
      * BungeeCord /glist
      */
+    @SuppressWarnings("unchecked")
     public static final class BungeeList extends Command {
         private SubPlugin plugin;
         protected BungeeList(SubPlugin plugin, String command) {
@@ -589,13 +597,25 @@ public final class SubCommand extends Command implements TabExecutor {
             List<String> messages = new LinkedList<String>();
             int players = 0;
             for (Server server : plugin.api.getServers().values()) {
-                players += server.getPlayers().size();
+                List<String> playerlist = new ArrayList<String>();
+                if (plugin.redis) {
+                    try {
+                        for (UUID player : (Set<UUID>) plugin.redis("getPlayersOnServer", new NamedContainer<>(String.class, server.getName()))) playerlist.add((String) plugin.redis("getNameFromUuid", new NamedContainer<>(UUID.class, player)));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    for (ProxiedPlayer player : server.getPlayers()) playerlist.add(player.getName());
+                }
+                Collections.sort(playerlist);
+
+                players += playerlist.size();
                 if (!server.isHidden() && (!(server instanceof SubServer) || ((SubServer) server).isRunning())) {
                     int i = 0;
-                    String message = plugin.lang.get().getSection("Lang").getColoredString("Bungee.List.Format", '&').replace("$str$", server.getDisplayName()).replace("$int$", Integer.toString(server.getPlayers().size()));
-                    for (ProxiedPlayer player : server.getPlayers()) {
+                    String message = plugin.lang.get().getSection("Lang").getColoredString("Bungee.List.Format", '&').replace("$str$", server.getDisplayName()).replace("$int$", Integer.toString(playerlist.size()));
+                    for (String player : playerlist) {
                         if (i != 0) message += plugin.lang.get().getSection("Lang").getColoredString("Bungee.List.Divider", '&');
-                        message += plugin.lang.get().getSection("Lang").getColoredString("Bungee.List.List", '&').replace("$str$", player.getName());
+                        message += plugin.lang.get().getSection("Lang").getColoredString("Bungee.List.List", '&').replace("$str$", player);
                         i++;
                     }
                     messages.add(message);
