@@ -4,6 +4,7 @@ import net.ME1312.SubServers.Bungee.Event.SubStoppedEvent;
 import net.ME1312.SubServers.Bungee.Host.*;
 import net.ME1312.SubServers.Bungee.Library.*;
 import net.ME1312.SubServers.Bungee.Library.Config.YAMLConfig;
+import net.ME1312.SubServers.Bungee.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Bungee.Library.Exception.InvalidHostException;
 import net.ME1312.SubServers.Bungee.Library.Exception.InvalidServerException;
 import net.ME1312.SubServers.Bungee.Library.Version.Version;
@@ -44,18 +45,19 @@ public final class SubPlugin extends BungeeCord implements Listener {
 
     public final PrintStream out;
     public final UniversalFile dir = new UniversalFile(new File(System.getProperty("user.dir")));
+    private YAMLConfig bungeeconfig;
     public YAMLConfig config;
     public YAMLConfig lang;
     public HashMap<String, String> exLang = new HashMap<String, String>();
-    public boolean redis = false;
+    public final SubAPI api = new SubAPI(this);
     public SubDataServer subdata = null;
     public SubServer sudo = null;
     public final Version version = new Version(SubPlugin.class.getPackage().getImplementationVersion());
     public final Version bversion = (SubPlugin.class.getPackage().getSpecificationVersion().equals("0"))?null:new Version(SubPlugin.class.getPackage().getSpecificationVersion());
 
+    public boolean redis = false;
     private boolean running = false;
     private boolean posted = false;
-    public final SubAPI api = new SubAPI(this);
 
     protected SubPlugin(PrintStream out) throws IOException {
         System.out.println("SubServers > Loading SubServers.Bungee v" + version.toString() + " Libraries... ");
@@ -68,6 +70,8 @@ public final class SubPlugin extends BungeeCord implements Listener {
             tmp.save();
             System.out.println("SubServers > Created ~/config.yml");
         }
+        bungeeconfig = new YAMLConfig(new UniversalFile(dir, "config.yml"));
+
         UniversalFile dir = new UniversalFile(this.dir, "SubServers");
         dir.mkdir();
         if (!(new UniversalFile(dir, "config.yml").exists())) {
@@ -178,15 +182,44 @@ public final class SubPlugin extends BungeeCord implements Listener {
     }
 
     /**
-     * Load Hosts, Servers, SubServers, and SubData Direct
+     * Load SubServers before BungeeCord finishes
      */
     @Override
     public void startListeners() {
         try {
-            long begin = Calendar.getInstance().getTime().getTime();
+            reload();
 
-            config.reload();
-            lang.reload();
+            super.startListeners();
+            if (!posted) {
+                post();
+                posted = true;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Load data from the config (will attempt to merge with current configuration)
+     *
+     * @throws IOException
+     */
+    @SuppressWarnings("unchecked")
+    public void reload() throws IOException {
+        List<String> ukeys = new ArrayList<String>();
+        long begin = Calendar.getInstance().getTime().getTime();
+        boolean status = running;
+
+        YAMLSection prevconfig = config.get();
+        config.reload();
+        lang.reload();
+
+        if (subdata == null ||
+                !config.get().getSection("Settings").getSection("SubData").getRawString("Address", "127.0.0.1:4391").equals(prevconfig.getSection("Settings").getSection("SubData").getRawString("Address", "127.0.0.1:4391")) ||
+                !config.get().getSection("Settings").getSection("SubData").getRawString("Encryption", "NONE").equals(prevconfig.getSection("Settings").getSection("SubData").getRawString("Encryption", "NONE"))
+                ) {
+            if (subdata != null) subdata.destroy();
+
             SubDataServer.Encryption encryption = SubDataServer.Encryption.NONE;
             if (config.get().getSection("Settings").getSection("SubData").getString("Password", "").length() == 0) {
                 System.out.println("SubData > Cannot encrypt connection without a password");
@@ -200,106 +233,208 @@ public final class SubPlugin extends BungeeCord implements Listener {
                     encryption);
             System.out.println("SubServers > SubData Direct Listening on " + subdata.getServer().getLocalSocketAddress().toString());
             loop();
-
-            int hosts = 0;
-            System.out.println("SubServers > Loading Hosts...");
-            for (String name : config.get().getSection("Hosts").getKeys()) {
-                try {
-                    if (!hostDrivers.keySet().contains(config.get().getSection("Hosts").getSection(name).getRawString("Driver").toLowerCase())) throw new InvalidHostException("Invalid Driver for host: " + name);
-                    Host host = api.addHost(config.get().getSection("Hosts").getSection(name).getRawString("Driver").toLowerCase(), name, config.get().getSection("Hosts").getSection(name).getBoolean("Enabled"), InetAddress.getByName(config.get().getSection("Hosts").getSection(name).getRawString("Address")),
-                            config.get().getSection("Hosts").getSection(name).getRawString("Directory"), config.get().getSection("Hosts").getSection(name).getRawString("Git-Bash"));
-                    if (config.get().getSection("Hosts").getSection(name).getKeys().contains("Display") && config.get().getSection("Hosts").getSection(name).getString("Display").length() > 0) host.setDisplayName(config.get().getSection("Hosts").getSection(name).getString("Display"));
-                    if (config.get().getSection("Hosts").getSection(name).getKeys().contains("Extra")) for (String extra : config.get().getSection("Hosts").getSection(name).getSection("Extra").getKeys()) host.addExtra(extra, config.get().getSection("Hosts").getSection(name).getSection("Extra").getObject(extra));
-                    hosts++;
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+        } else System.out.println("SubServers > Reloading SubData Whitelist...");
+        for (String s : config.get().getSection("Settings").getSection("SubData").getStringList("Allowed-Connections", new ArrayList<String>())) {
+            try {
+                SubDataServer.allowConnection(s);
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-
-            int servers = 0;
-            System.out.println("SubServers > Loading Servers...");
-            YAMLConfig bungee = new YAMLConfig(new UniversalFile(dir, "config.yml"));
-            for (String name : bungee.get().getSection("servers").getKeys()) {
-                try {
-                    Server server = api.addServer(name, InetAddress.getByName(bungee.get().getSection("servers").getSection(name).getRawString("address").split(":")[0]),
-                            Integer.parseInt(bungee.get().getSection("servers").getSection(name).getRawString("address").split(":")[1]), bungee.get().getSection("servers").getSection(name).getColoredString("motd", '&'),
-                            bungee.get().getSection("servers").getSection(name).getBoolean("hidden", false), bungee.get().getSection("servers").getSection(name).getBoolean("restricted"));
-                    if (bungee.get().getSection("servers").getSection(name).getKeys().contains("display") && bungee.get().getSection("servers").getSection(name).getString("display").length() > 0) server.setDisplayName(bungee.get().getSection("servers").getSection(name).getString("display"));
-                    if (bungee.get().getSection("servers").getSection(name).getKeys().contains("group")) for (String group : bungee.get().getSection("servers").getSection(name).getStringList("group")) server.addGroup(group);
-                    if (bungee.get().getSection("servers").getSection(name).getKeys().contains("extra")) for (String extra : config.get().getSection("servers").getSection(name).getSection("extra").getKeys()) server.addExtra(extra, config.get().getSection("servers").getSection(name).getSection("extra").getObject(extra));
-                    servers++;
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-
-            int subservers = 0;
-            System.out.println("SubServers > Loading SubServers...");
-            if (!posted) Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-                if (!running) {
-                    System.out.println("SubServers > Received request from system to shutdown");
-                    try {
-                        resetHosts();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-            }));
-            running = true;
-            for (String name : config.get().getSection("Servers").getKeys()) {
-                try {
-                    if (!this.hosts.keySet().contains(config.get().getSection("Servers").getSection(name).getString("Host").toLowerCase())) throw new InvalidServerException("There is no host with this name: " + config.get().getSection("Servers").getSection(name).getString("Host"));
-                    if (exServers.keySet().contains(name.toLowerCase())) {
-                        exServers.remove(name.toLowerCase());
-                        servers--;
-                    }
-                    SubServer server = this.hosts.get(config.get().getSection("Servers").getSection(name).getString("Host").toLowerCase()).addSubServer(name, config.get().getSection("Servers").getSection(name).getBoolean("Enabled"),
-                            config.get().getSection("Servers").getSection(name).getInt("Port"), config.get().getSection("Servers").getSection(name).getColoredString("Motd", '&'), config.get().getSection("Servers").getSection(name).getBoolean("Log"),
-                            config.get().getSection("Servers").getSection(name).getRawString("Directory"), new Executable(config.get().getSection("Servers").getSection(name).getRawString("Executable")), config.get().getSection("Servers").getSection(name).getRawString("Stop-Command"),
-                            config.get().getSection("Servers").getSection(name).getBoolean("Run-On-Launch"), config.get().getSection("Servers").getSection(name).getBoolean("Auto-Restart"), config.get().getSection("Servers").getSection(name).getBoolean("Hidden"), config.get().getSection("Servers").getSection(name).getBoolean("Restricted"), false);
-                    //if (config.get().getSection("Servers").getSection(name).getKeys().contains("Editable")) server.setEditable(config.get().getSection("Servers").getSection(name).getBoolean("Editable"));
-                    if (config.get().getSection("Servers").getSection(name).getKeys().contains("Display") && config.get().getSection("Servers").getSection(name).getString("Display").length() > 0) server.setDisplayName(config.get().getSection("Servers").getSection(name).getString("Display"));
-                    if (config.get().getSection("Servers").getSection(name).getKeys().contains("Group")) for (String group : config.get().getSection("Servers").getSection(name).getStringList("Group")) server.addGroup(group);
-                    if (config.get().getSection("Servers").getSection(name).getKeys().contains("Extra")) for (String extra : config.get().getSection("Servers").getSection(name).getSection("Extra").getKeys()) server.addExtra(extra, config.get().getSection("Servers").getSection(name).getSection("Extra").getObject(extra));
-                    subservers++;
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-            for (SubServer server : api.getSubServers().values()) {
-                for (String name : config.get().getSection("Servers").getSection(server.getName()).getRawStringList("Incompatible", new ArrayList<>())) {
-                    SubServer other = api.getSubServer(name);
-                    if (other != null && server.isCompatible(other)) server.toggleCompatibility(other);
-                }
-            }
-            api.ready = true;
-            legServers.clear();
-
-            int plugins = 0;
-            if (api.listeners.size() > 0) {
-                System.out.println("SubServers > Loading SubAPI Plugins...");
-                for (NamedContainer<Runnable, Runnable> listener : api.listeners) {
-                    try {
-                        if (listener.name() != null) {
-                            listener.name().run();
-                            plugins++;
-                        }
-                    } catch (Throwable e) {
-                        new InvocationTargetException(e, "Problem enabling plugin").printStackTrace();
-                    }
-                }
-            }
-
-            System.out.println("SubServers > " + ((plugins > 0)?plugins+" Plugin"+((plugins == 1)?"":"s")+", ":"") + hosts + " Host"+((hosts == 1)?"":"s")+", " + servers + " Server"+((servers == 1)?"":"s")+", and " + subservers + " SubServer"+((subservers == 1)?"":"s")+" loaded in " + new DecimalFormat("0.000").format((Calendar.getInstance().getTime().getTime() - begin) / 1000D) + "s");
-
-            super.startListeners();
-            if (!posted) {
-                post();
-                posted = true;
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
         }
+
+        int hosts = 0;
+        System.out.println("SubServers > "+((status)?"Rel":"L")+"oading Hosts...");
+        for (String name : config.get().getSection("Hosts").getKeys()) {
+            if (!ukeys.contains(name.toLowerCase())) try {
+                if (!hostDrivers.keySet().contains(config.get().getSection("Hosts").getSection(name).getRawString("Driver").toLowerCase())) throw new InvalidHostException("Invalid Driver for host: " + name);
+                Host host = this.hosts.get(name.toLowerCase());
+                if (host == null ||
+                        config.get().getSection("Hosts").getSection(name).getBoolean("Enabled") !=host.isEnabled() ||
+                        !hostDrivers.get(config.get().getSection("Hosts").getSection(name).getRawString("Driver").toLowerCase()).equals(host.getClass()) ||
+                        !config.get().getSection("Hosts").getSection(name).getRawString("Address").equals(host.getAddress().getHostAddress()) ||
+                        !config.get().getSection("Hosts").getSection(name).getRawString("Directory").equals(host.getPath()) ||
+                        !config.get().getSection("Hosts").getSection(name).getRawString("Git-Bash").equals(host.getCreator().getBashDirectory())
+                        ) {
+                    if (host != null) api.forceRemoveHost(name);
+                    host = api.addHost(config.get().getSection("Hosts").getSection(name).getRawString("Driver").toLowerCase(), name, config.get().getSection("Hosts").getSection(name).getBoolean("Enabled"), InetAddress.getByName(config.get().getSection("Hosts").getSection(name).getRawString("Address")),
+                            config.get().getSection("Hosts").getSection(name).getRawString("Directory"), config.get().getSection("Hosts").getSection(name).getRawString("Git-Bash"));
+                }
+                if (config.get().getSection("Hosts").getSection(name).getKeys().contains("Display") && ((config.get().getSection("Hosts").getSection(name).getString("Display").length() == 0 && !host.getDisplayName().equals(host.getName())) || !config.get().getSection("Hosts").getSection(name).getString("Display").equals(host.getDisplayName())))
+                    host.setDisplayName(config.get().getSection("Hosts").getSection(name).getString("Display"));
+                if (config.get().getSection("Hosts").getSection(name).getKeys().contains("Extra"))
+                    for (String extra : config.get().getSection("Hosts").getSection(name).getSection("Extra").getKeys()) host.addExtra(extra, config.get().getSection("Hosts").getSection(name).getSection("Extra").getObject(extra));
+                ukeys.add(name.toLowerCase());
+                hosts++;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        ukeys.clear();
+
+        int servers = 0;
+        System.out.println("SubServers > "+((status)?"Rel":"L")+"oading Servers...");
+        bungeeconfig.reload();
+        for (String name : bungeeconfig.get().getSection("servers").getKeys()) {
+            if (!ukeys.contains(name.toLowerCase())) try {
+                Server server = api.getServer(name);
+                if (server == null || !(server instanceof SubServer)) {
+                    if (server == null ||
+                            bungeeconfig.get().getSection("servers").getSection(name).getRawString("address").equals(server.getAddress().getAddress().getHostAddress() + ':' + server.getAddress().getPort())
+                    ) {
+                        if (server != null) api.forceRemoveServer(name);
+                        server = api.addServer(name, InetAddress.getByName(bungeeconfig.get().getSection("servers").getSection(name).getRawString("address").split(":")[0]),
+                                Integer.parseInt(bungeeconfig.get().getSection("servers").getSection(name).getRawString("address").split(":")[1]), bungeeconfig.get().getSection("servers").getSection(name).getColoredString("motd", '&'),
+                                bungeeconfig.get().getSection("servers").getSection(name).getBoolean("hidden", false), bungeeconfig.get().getSection("servers").getSection(name).getBoolean("restricted"));
+                    } else {
+                        if (!bungeeconfig.get().getSection("servers").getSection(name).getColoredString("motd", '&').equals(server.getMotd()))
+                            server.setMotd(bungeeconfig.get().getSection("servers").getSection(name).getColoredString("motd", '&'));
+                        if (bungeeconfig.get().getSection("servers").getSection(name).getBoolean("hidden", false) != server.isHidden())
+                            server.setHidden(bungeeconfig.get().getSection("servers").getSection(name).getBoolean("hidden", false));
+                        if (bungeeconfig.get().getSection("servers").getSection(name).getBoolean("restricted") != server.isRestricted())
+                            server.setRestricted(bungeeconfig.get().getSection("servers").getSection(name).getBoolean("restricted"));
+                    }
+                    if (bungeeconfig.get().getSection("servers").getSection(name).getKeys().contains("display") && ((bungeeconfig.get().getSection("servers").getSection(name).getRawString("display").length() == 0 && !server.getDisplayName().equals(server.getName())) || !bungeeconfig.get().getSection("servers").getSection(name).getRawString("display").equals(server.getDisplayName())))
+                        server.setDisplayName(bungeeconfig.get().getSection("servers").getSection(name).getString("display"));
+                    if (bungeeconfig.get().getSection("servers").getSection(name).getKeys().contains("group")) {
+                        for (String group : server.getGroups()) server.removeGroup(group);
+                        for (String group : bungeeconfig.get().getSection("servers").getSection(name).getStringList("group")) server.addGroup(group);
+                    }
+                    if (bungeeconfig.get().getSection("servers").getSection(name).getKeys().contains("extra"))
+                        for (String extra : config.get().getSection("servers").getSection(name).getSection("extra").getKeys()) server.addExtra(extra, config.get().getSection("servers").getSection(name).getSection("extra").getObject(extra));
+                    ukeys.add(name.toLowerCase());
+                    servers++;
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        ukeys.clear();
+
+        int subservers = 0;
+        System.out.println("SubServers > "+((status)?"Rel":"L")+"oading SubServers...");
+        if (!posted) Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            if (!running) {
+                System.out.println("SubServers > Received request from system to shutdown");
+                try {
+                    shutdown();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }));
+        running = true;
+        for (String name : config.get().getSection("Servers").getKeys()) {
+            if (!ukeys.contains(name.toLowerCase())) try {
+                if (!this.hosts.keySet().contains(config.get().getSection("Servers").getSection(name).getString("Host").toLowerCase())) throw new InvalidServerException("There is no host with this name: " + config.get().getSection("Servers").getSection(name).getString("Host"));
+                if (exServers.keySet().contains(name.toLowerCase())) {
+                    exServers.remove(name.toLowerCase());
+                    servers--;
+                }
+                SubServer server = api.getSubServer(name);
+                if (server != null && server.isEditable()) { // Server can edit() (May be reset depending on change severity)
+                    YAMLSection edits = new YAMLSection();
+                    if (config.get().getSection("Servers").getSection(name).getBoolean("Enabled") != server.isEnabled())
+                        edits.set("enabled", config.get().getSection("Servers").getSection(name).getBoolean("Enabled"));
+                    if (config.get().getSection("Servers").getSection(name).getKeys().contains("Display") && ((config.get().getSection("Servers").getSection(name).getString("Display").length() == 0 && !server.getDisplayName().equals(server.getName())) || !config.get().getSection("Servers").getSection(name).getString("Display").equals(server.getDisplayName())))
+                        edits.set("display", config.get().getSection("Servers").getSection(name).getRawString("Display"));
+                    if (!config.get().getSection("Servers").getSection(name).getString("Host").equalsIgnoreCase(server.getHost().getName()))
+                        edits.set("host", config.get().getSection("Servers").getSection(name).getRawString("Host"));
+                    if (!config.get().getSection("Servers").getSection(name).getStringList("Group").equals(server.getGroups()))
+                        edits.set("group", config.get().getSection("Servers").getSection(name).getRawStringList("Group"));
+                    if (config.get().getSection("Servers").getSection(name).getInt("Port") != server.getAddress().getPort())
+                        edits.set("port", config.get().getSection("Servers").getSection(name).getInt("Port"));
+                    if (!config.get().getSection("Servers").getSection(name).getColoredString("Motd", '&').equals(server.getMotd()))
+                        edits.set("motd", config.get().getSection("Servers").getSection(name).getRawString("Motd"));
+                    if (config.get().getSection("Servers").getSection(name).getBoolean("Log") != server.isLogging())
+                        edits.set("log", config.get().getSection("Servers").getSection(name).getBoolean("Log"));
+                    if (!config.get().getSection("Servers").getSection(name).getRawString("Directory").equals(server.getPath()))
+                        edits.set("dir", config.get().getSection("Servers").getSection(name).getRawString("Directory"));
+                    if (!new Executable(config.get().getSection("Servers").getSection(name).getRawString("Executable")).toString().equals(server.getExecutable().toString()))
+                        edits.set("exec", config.get().getSection("Servers").getSection(name).getRawString("Executable"));
+                    if (!config.get().getSection("Servers").getSection(name).getRawString("Stop-Command").equals(server.getStopCommand()))
+                        edits.set("stop-cmd", config.get().getSection("Servers").getSection(name).getRawString("Stop-Command"));
+                    if (config.get().getSection("Servers").getSection(name).getBoolean("Auto-Restart") != server.willAutoRestart())
+                        edits.set("auto-restart", config.get().getSection("Servers").getSection(name).getBoolean("Auto-Restart"));
+                    if (config.get().getSection("Servers").getSection(name).getBoolean("Restricted") != server.isRestricted())
+                        edits.set("restricted", config.get().getSection("Servers").getSection(name).getBoolean("Restricted"));
+                    if (config.get().getSection("Servers").getSection(name).getBoolean("Hidden") != server.isHidden())
+                        edits.set("hidden", config.get().getSection("Servers").getSection(name).getBoolean("Hidden"));
+
+
+                    if (edits.getKeys().size() > 0) {
+                        server.edit(edits);
+                        server = api.getSubServer(name);
+                    }
+                } else { // Server cannot edit()
+                    if (server == null ||  // Server must be reset
+                            !config.get().getSection("Servers").getSection(name).getString("Host").equalsIgnoreCase(server.getHost().getName()) ||
+                            config.get().getSection("Servers").getSection(name).getInt("Port") != server.getAddress().getPort() ||
+                            !config.get().getSection("Servers").getSection(name).getRawString("Directory").equals(server.getPath()) ||
+                            !new Executable(config.get().getSection("Servers").getSection(name).getRawString("Executable")).toString().equals(server.getExecutable().toString())
+                            ) {
+                            if (server != null) server.getHost().forceRemoveSubServer(name);
+                            server = this.hosts.get(config.get().getSection("Servers").getSection(name).getString("Host").toLowerCase()).addSubServer(name, config.get().getSection("Servers").getSection(name).getBoolean("Enabled"),
+                                    config.get().getSection("Servers").getSection(name).getInt("Port"), config.get().getSection("Servers").getSection(name).getColoredString("Motd", '&'), config.get().getSection("Servers").getSection(name).getBoolean("Log"),
+                                    config.get().getSection("Servers").getSection(name).getRawString("Directory"), new Executable(config.get().getSection("Servers").getSection(name).getRawString("Executable")), config.get().getSection("Servers").getSection(name).getRawString("Stop-Command"),
+                                    config.get().getSection("Servers").getSection(name).getBoolean("Run-On-Launch"), config.get().getSection("Servers").getSection(name).getBoolean("Auto-Restart"), config.get().getSection("Servers").getSection(name).getBoolean("Hidden"), config.get().getSection("Servers").getSection(name).getBoolean("Restricted"), false);
+                    } else { // Server doesn't need to reset
+                        if (config.get().getSection("Servers").getSection(name).getBoolean("Enabled") != server.isEnabled())
+                            server.setEnabled(config.get().getSection("Servers").getSection(name).getBoolean("Enabled"));
+                        if (!config.get().getSection("Servers").getSection(name).getColoredString("Motd", '&').equals(server.getMotd()))
+                            server.setMotd(config.get().getSection("Servers").getSection(name).getColoredString("Motd", '&'));
+                        if (config.get().getSection("Servers").getSection(name).getBoolean("Log") != server.isLogging())
+                            server.setLogging(config.get().getSection("Servers").getSection(name).getBoolean("Log"));
+                        if (!config.get().getSection("Servers").getSection(name).getRawString("Stop-Command").equals(server.getStopCommand()))
+                            server.setStopCommand(config.get().getSection("Servers").getSection(name).getRawString("Stop-Command"));
+                        if (config.get().getSection("Servers").getSection(name).getBoolean("Auto-Restart") != server.willAutoRestart())
+                            server.setAutoRestart(config.get().getSection("Servers").getSection(name).getBoolean("Auto-Restart"));
+                        if (config.get().getSection("Servers").getSection(name).getBoolean("Restricted") != server.isRestricted())
+                            server.setRestricted(config.get().getSection("Servers").getSection(name).getBoolean("Restricted"));
+                        if (config.get().getSection("Servers").getSection(name).getBoolean("Hidden") != server.isHidden())
+                            server.setHidden(config.get().getSection("Servers").getSection(name).getBoolean("Hidden"));
+                    } // Apply these changes regardless of reset
+                    if (config.get().getSection("Servers").getSection(name).getKeys().contains("Display") && ((config.get().getSection("Servers").getSection(name).getString("Display").length() == 0 && !server.getDisplayName().equals(server.getName())) || !config.get().getSection("Servers").getSection(name).getString("Display").equals(server.getDisplayName())))
+                        server.setDisplayName(config.get().getSection("Servers").getSection(name).getString("Display"));
+                    if (config.get().getSection("Servers").getSection(name).getKeys().contains("Group")) {
+                        for (String group : server.getGroups()) server.removeGroup(group);
+                        for (String group : config.get().getSection("Servers").getSection(name).getStringList("Group")) server.addGroup(group);
+                    }
+                } // Apply these changes regardless of edit/reset
+                if (config.get().getSection("Servers").getSection(name).getBoolean("Editable", true) != server.isEditable()) server.setEditable(config.get().getSection("Servers").getSection(name).getBoolean("Editable", true));
+                if (config.get().getSection("Servers").getSection(name).getKeys().contains("Extra")) for (String extra : config.get().getSection("Servers").getSection(name).getSection("Extra").getKeys()) server.addExtra(extra, config.get().getSection("Servers").getSection(name).getSection("Extra").getObject(extra));
+                ukeys.add(name.toLowerCase());
+                subservers++;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        for (String name : ukeys) {
+            SubServer server = api.getSubServer(name);
+            for (String oname : config.get().getSection("Servers").getSection(server.getName()).getRawStringList("Incompatible", new ArrayList<>())) {
+                SubServer oserver = api.getSubServer(oname);
+                if (oserver != null && server.isCompatible(oserver)) server.toggleCompatibility(oserver);
+            }
+        }
+        ukeys.clear();
+        api.ready = true;
+        legServers.clear();
+
+        int plugins = 0;
+        if (api.listeners.size() > 0) {
+            System.out.println("SubServers > "+((posted)?"Rel":"L")+"oading SubAPI Plugins...");
+            for (NamedContainer<Runnable, Runnable> listener : api.listeners) {
+                try {
+                    if (listener.name() != null) {
+                        listener.name().run();
+                        plugins++;
+                    }
+                } catch (Throwable e) {
+                    new InvocationTargetException(e, "Problem enabling plugin").printStackTrace();
+                }
+            }
+        }
+
+        System.out.println("SubServers > " + ((plugins > 0)?plugins+" Plugin"+((plugins == 1)?"":"s")+", ":"") + hosts + " Host"+((hosts == 1)?"":"s")+", " + servers + " Server"+((servers == 1)?"":"s")+", and " + subservers + " SubServer"+((subservers == 1)?"":"s")+" "+((posted)?"re":"")+"loaded in " + new DecimalFormat("0.000").format((Calendar.getInstance().getTime().getTime() - begin) / 1000D) + "s");
     }
 
     private void post() {
@@ -448,7 +583,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
                 }
             }
 
-            resetHosts();
+            shutdown();
 
             subdata.destroy();
         } catch (Exception e) {
@@ -456,23 +591,14 @@ public final class SubPlugin extends BungeeCord implements Listener {
         }
 
         super.stopListeners();
-    } private void resetHosts() throws Exception {
+    } private void shutdown() throws Exception {
         api.ready = false;
         System.out.println("SubServers > Resetting Hosts and Server Data");
         List<String> hosts = new ArrayList<String>();
         hosts.addAll(this.hosts.keySet());
 
         for (String host : hosts) {
-            List<String> subservers = new ArrayList<String>();
-            subservers.addAll(this.hosts.get(host).getSubServers().keySet());
-
-            for (String server : subservers) {
-                this.hosts.get(host).removeSubServer(server);
-            }
-            subservers.clear();
-            this.hosts.get(host).getCreator().terminate();
-            this.hosts.get(host).getCreator().waitFor();
-            this.hosts.remove(host);
+            api.forceRemoveHost(host);
         }
         running = false;
         this.hosts.clear();

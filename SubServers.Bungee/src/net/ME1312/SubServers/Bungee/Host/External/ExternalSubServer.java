@@ -180,12 +180,6 @@ public class ExternalSubServer extends SubServerContainer {
                             if (value.isString() && host.removeSubServer(player, getName())) {
                                 SubServer server = host.addSubServer(player, value.asRawString(), isEnabled(), getAddress().getPort(), getMotd(), isLogging(), getPath(), getExecutable(), getStopCommand(), false, willAutoRestart(), isHidden(), isRestricted(), isTemporary());
                                 if (server != null) {
-                                    if (!getName().equals(getDisplayName())) server.setDisplayName(getDisplayName());
-                                    for (String group : getGroups()) {
-                                        removeGroup(group);
-                                        server.addGroup(group);
-                                    }
-                                    for (String extra : getExtra().getKeys()) server.addExtra(extra, getExtra(extra));
                                     if (this.host.plugin.config.get().getSection("Servers").getKeys().contains(getName())) {
                                         YAMLSection config = this.host.plugin.config.get().getSection("Servers").getSection(getName());
                                         this.host.plugin.config.get().getSection("Servers").remove(getName());
@@ -207,12 +201,12 @@ public class ExternalSubServer extends SubServerContainer {
                                     f.set(this, value.asString());
                                 }
                                 f.setAccessible(false);
-                                logger.name = value.asString();
+                                logger.name = getDisplayName();
                                 if (this.host.plugin.config.get().getSection("Servers").getKeys().contains(getName())) {
                                     if (getName().equals(getDisplayName())) {
-                                        this.host.plugin.config.get().getSection("Servers").getSection(getName()).remove("Display-Name");
+                                        this.host.plugin.config.get().getSection("Servers").getSection(getName()).remove("Display");
                                     } else {
-                                        this.host.plugin.config.get().getSection("Servers").getSection(getName()).set("Display-Name", getDisplayName());
+                                        this.host.plugin.config.get().getSection("Servers").getSection(getName()).set("Display", getDisplayName());
                                     }
                                     this.host.plugin.config.save();
                                 }
@@ -232,8 +226,10 @@ public class ExternalSubServer extends SubServerContainer {
                             break;
                         case "group":
                             if (value.isList()) {
-                                for (String group : getGroups()) removeGroup(group);
-                                for (String group : value.asStringList()) addGroup(group);
+                                Field f = ServerContainer.class.getDeclaredField("groups");
+                                f.setAccessible(true);
+                                f.set(this, value.asStringList());
+                                f.setAccessible(false);
                                 if (this.host.plugin.config.get().getSection("Servers").getKeys().contains(getName())) {
                                     this.host.plugin.config.get().getSection("Servers").getSection(getName()).set("Group", value.asStringList());
                                     this.host.plugin.config.save();
@@ -245,12 +241,6 @@ public class ExternalSubServer extends SubServerContainer {
                             if (value.isString() && host.removeSubServer(player, getName())) {
                                 SubServer server = this.host.plugin.api.getHost(value.asRawString()).addSubServer(player, getName(), isEnabled(), getAddress().getPort(), getMotd(), isLogging(), getPath(), getExecutable(), getStopCommand(), false, willAutoRestart(), isHidden(), isRestricted(), isTemporary());
                                 if (server != null) {
-                                    if (!getName().equals(getDisplayName())) server.setDisplayName(getDisplayName());
-                                    for (String group : getGroups()) {
-                                        removeGroup(group);
-                                        server.addGroup(group);
-                                    }
-                                    for (String extra : getExtra().getKeys()) server.addExtra(extra, getExtra(extra));
                                     if (this.host.plugin.config.get().getSection("Servers").getKeys().contains(getName())) {
                                         this.host.plugin.config.get().getSection("Servers").getSection(getName()).set("Host", server.getHost().getName());
                                         this.host.plugin.config.save();
@@ -264,12 +254,6 @@ public class ExternalSubServer extends SubServerContainer {
                             if (value.isInt() && host.removeSubServer(player, getName())) {
                                 SubServer server = host.addSubServer(player, getName(), isEnabled(), value.asInt(), getMotd(), isLogging(), getPath(), getExecutable(), getStopCommand(), false, willAutoRestart(), isHidden(), isRestricted(), isTemporary());
                                 if (server != null) {
-                                    if (!getName().equals(getDisplayName())) server.setDisplayName(getDisplayName());
-                                    for (String group : getGroups()) {
-                                        removeGroup(group);
-                                        server.addGroup(group);
-                                    }
-                                    for (String extra : getExtra().getKeys()) server.addExtra(extra, getExtra(extra));
                                     if (this.host.plugin.config.get().getSection("Servers").getKeys().contains(getName())) {
                                         this.host.plugin.config.get().getSection("Servers").getSection(getName()).set("Port", server.getAddress().getPort());
                                         this.host.plugin.config.save();
@@ -307,12 +291,6 @@ public class ExternalSubServer extends SubServerContainer {
                             if (value.isString()) {
                                 SubServer server = host.addSubServer(player, getName(), isEnabled(), getAddress().getPort(), getMotd(), isLogging(), value.asRawString(), getExecutable(), getStopCommand(), false, willAutoRestart(), isHidden(), isRestricted(), isTemporary());
                                 if (server != null) {
-                                    if (!getName().equals(getDisplayName())) server.setDisplayName(getDisplayName());
-                                    for (String group : getGroups()) {
-                                        removeGroup(group);
-                                        server.addGroup(group);
-                                    }
-                                    for (String extra : getExtra().getKeys()) server.addExtra(extra, getExtra(extra));
                                     if (this.host.plugin.config.get().getSection("Servers").getKeys().contains(getName())) {
                                         this.host.plugin.config.get().getSection("Servers").getSection(getName()).set("Directory", server.getPath());
                                         this.host.plugin.config.save();
@@ -326,12 +304,6 @@ public class ExternalSubServer extends SubServerContainer {
                             if (value.isString()) {
                                 SubServer server = host.addSubServer(player, getName(), isEnabled(), getAddress().getPort(), getMotd(), isLogging(), getPath(), new Executable(value.asRawString()), getStopCommand(), false, willAutoRestart(), isHidden(), isRestricted(), isTemporary());
                                 if (server != null) {
-                                    if (!getName().equals(getDisplayName())) server.setDisplayName(getDisplayName());
-                                    for (String group : getGroups()) {
-                                        removeGroup(group);
-                                        server.addGroup(group);
-                                    }
-                                    for (String extra : getExtra().getKeys()) server.addExtra(extra, getExtra(extra));
                                     if (this.host.plugin.config.get().getSection("Servers").getKeys().contains(getName())) {
                                         this.host.plugin.config.get().getSection("Servers").getSection(getName()).set("Executable", value.asRawString());
                                         this.host.plugin.config.save();
@@ -376,6 +348,19 @@ public class ExternalSubServer extends SubServerContainer {
                                 c++;
                             }
                             break;
+                        case "incompatible":
+                            if (value.isList()) {
+                                for (String oname : value.asStringList()) {
+                                    SubServer oserver = host.plugin.api.getSubServer(oname);
+                                    if (oserver != null && isCompatible(oserver)) toggleCompatibility(oserver);
+                                }
+                                if (this.host.plugin.config.get().getSection("Servers").getKeys().contains(getName())) {
+                                    this.host.plugin.config.get().getSection("Servers").getSection(getName()).set("Incompatible", value.asStringList());
+                                    this.host.plugin.config.save();
+                                }
+                                c++;
+                            }
+                            break;
                         case "restricted":
                             if (value.isBoolean()) {
                                 Field f = ServerContainer.class.getDeclaredField("restricted");
@@ -404,6 +389,20 @@ public class ExternalSubServer extends SubServerContainer {
                             break;
                     }
                     if (forward != null) {
+                        if (!getName().equals(getDisplayName())) forward.setDisplayName(getDisplayName());
+                        List<String> groups = new ArrayList<String>();
+                        groups.addAll(getGroups());
+                        for (String group : groups) {
+                            removeGroup(group);
+                            forward.addGroup(group);
+                        }
+                        for (SubServer server : getIncompatibilities()) {
+                            toggleCompatibility(server);
+                            forward.toggleCompatibility(server);
+                        }
+                        for (String extra : getExtra().getKeys()) forward.addExtra(extra, getExtra(extra));
+
+                        forward.setEditable(true);
                         if (state) pending.set("state", true);
                         c += forward.edit(player, pending);
                         break;

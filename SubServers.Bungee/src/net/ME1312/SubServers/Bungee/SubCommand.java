@@ -23,9 +23,9 @@ import org.xml.sax.InputSource;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.StringReader;
-import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.*;
@@ -87,11 +87,25 @@ public final class SubCommand extends Command implements TabExecutor {
                     if (args.length > 1) {
                         switch (args[1].toLowerCase()) {
                             case "all":
+                            case "system":
+                            case "bungee":
+                            case "network":
+                                plugin.getPluginManager().dispatchCommand(ConsoleCommandSender.getInstance(), "greload");
+                                break;
                             case "host":
                             case "hosts":
                             case "server":
                             case "servers":
-                                plugin.getPluginManager().dispatchCommand(ConsoleCommandSender.getInstance(), "greload");
+                            case "subserver":
+                            case "subservers":
+                            case "subdata":
+                            case "config":
+                            case "configs":
+                                try {
+                                    plugin.reload();
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
                                 break;
                             case "creator":
                             case "creators":
@@ -106,7 +120,11 @@ public final class SubCommand extends Command implements TabExecutor {
                                 sender.sendMessage("SubServers > Unknown reload type: " + args[1]);
                         }
                     } else {
-                        plugin.getPluginManager().dispatchCommand(ConsoleCommandSender.getInstance(), "greload");
+                        try {
+                            plugin.reload();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
                     }
                 } else if (args[0].equalsIgnoreCase("list")) {
                     String div = ChatColor.RESET + ", ";
@@ -477,7 +495,7 @@ public final class SubCommand extends Command implements TabExecutor {
                 "   Help: /sub help",
                 "   List: /sub list",
                 "   Version: /sub version",
-                "   Reload: /sub reload [servers|creator]",
+                "   Reload: /sub reload [all|configs|templates]",
                 "   Server Info: /sub info <SubServer>",
                 "   Start Server: /sub start <SubServer>",
                 "   Stop Server: /sub stop <SubServer>",

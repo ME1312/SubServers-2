@@ -186,8 +186,22 @@ public final class SubAPI {
         SubRemoveHostEvent event = new SubRemoveHostEvent(player, getHost(name));
         plugin.getPluginManager().callEvent(event);
         if (event.isCancelled()) {
-            plugin.hosts.remove(name.toLowerCase());
-            return true;
+            try {
+                List<String> subservers = new ArrayList<String>();
+                subservers.addAll(getHost(name).getSubServers().keySet());
+
+                for (String server : subservers) {
+                    getHost(name).removeSubServer(server);
+                }
+                subservers.clear();
+                getHost(name).getCreator().terminate();
+                getHost(name).getCreator().waitFor();
+                plugin.hosts.remove(name.toLowerCase());
+                return true;
+            } catch (Exception e) {
+                e.printStackTrace();
+                return false;
+            }
         } else return false;
     }
 
@@ -212,8 +226,22 @@ public final class SubAPI {
         if (Util.isNull(name, getHost(name))) throw new NullPointerException();
         SubRemoveHostEvent event = new SubRemoveHostEvent(player, getHost(name));
         plugin.getPluginManager().callEvent(event);
-        plugin.hosts.remove(name.toLowerCase());
-        return true;
+        try {
+            List<String> subservers = new ArrayList<String>();
+            subservers.addAll(getHost(name).getSubServers().keySet());
+
+            for (String server : subservers) {
+                getHost(name).removeSubServer(server);
+            }
+            subservers.clear();
+            getHost(name).getCreator().terminate();
+            getHost(name).getCreator().waitFor();
+            plugin.hosts.remove(name.toLowerCase());
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
     /**
@@ -261,14 +289,8 @@ public final class SubAPI {
      * @return a Server Group
      */
     public List<Server> getGroup(String name) {
-        Map<String, List<Server>> groups = getGroups();
-        HashMap<String, String> insensitivity = new HashMap<String, String>();
-        for (String group : groups.keySet()) insensitivity.put(group.toLowerCase(), group);
-        if (insensitivity.keySet().contains(name.toLowerCase())) {
-            return groups.get(insensitivity.get(name.toLowerCase()));
-        } else {
-            return null;
-        }
+        if (Util.isNull(name)) throw new NullPointerException();
+        return Util.getCaseInsensitively(getGroups(), name);
     }
 
     /**

@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":9,"i1":9,"i2":9,"i3":9,"i4":9,"i5":9,"i6":9,"i7":9,"i8":9,"i9":9};
+var methods = {"i0":9,"i1":9,"i2":9,"i3":9,"i4":9,"i5":9,"i6":9,"i7":9,"i8":9,"i9":9,"i10":9};
 var tabs = {65535:["t0","All Methods"],1:["t1","Static Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -181,37 +181,44 @@ extends java.lang.Object</pre>
 </tr>
 <tr id="i4" class="altColor">
 <td class="colFirst"><code>static &lt;V&gt;&nbsp;V</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Util.html#getCaseInsensitively-java.util.Map-java.lang.String-">getCaseInsensitively</a></span>(java.util.Map&lt;java.lang.String,V&gt;&nbsp;map,
+                    java.lang.String&nbsp;key)</code>
+<div class="block">Get an item from a map ignoring case</div>
+</td>
+</tr>
+<tr id="i5" class="rowColor">
+<td class="colFirst"><code>static &lt;V&gt;&nbsp;V</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Util.html#getNew-java.util.Collection-net.ME1312.SubServers.Client.Bukkit.Library.Util.ReturnRunnable-">getNew</a></span>(java.util.Collection&lt;? extends V&gt;&nbsp;existing,
       <a href="../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Util.ReturnRunnable.html" title="interface in net.ME1312.SubServers.Client.Bukkit.Library">Util.ReturnRunnable</a>&lt;V&gt;&nbsp;generator)</code>
 <div class="block">Gets a new Variable that doesn't match the existing Variables</div>
 </td>
 </tr>
-<tr id="i5" class="rowColor">
+<tr id="i6" class="altColor">
 <td class="colFirst"><code>static boolean</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Util.html#isException-net.ME1312.SubServers.Client.Bukkit.Library.Util.ExceptionRunnable-">isException</a></span>(<a href="../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Util.ExceptionRunnable.html" title="interface in net.ME1312.SubServers.Client.Bukkit.Library">Util.ExceptionRunnable</a>&nbsp;runnable)</code>
 <div class="block">Determines if an Exception will occur</div>
 </td>
 </tr>
-<tr id="i6" class="altColor">
+<tr id="i7" class="rowColor">
 <td class="colFirst"><code>static boolean</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Util.html#isNull-java.lang.Object...-">isNull</a></span>(java.lang.Object...&nbsp;values)</code>
 <div class="block">Checks values to make sure they're not null</div>
 </td>
 </tr>
-<tr id="i7" class="rowColor">
+<tr id="i8" class="altColor">
 <td class="colFirst"><code>static int</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Util.html#random-int-int-">random</a></span>(int&nbsp;min,
       int&nbsp;max)</code>
 <div class="block">Get a Random Integer</div>
 </td>
 </tr>
-<tr id="i8" class="altColor">
+<tr id="i9" class="rowColor">
 <td class="colFirst"><code>static java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Util.html#readAll-java.io.Reader-">readAll</a></span>(java.io.Reader&nbsp;rd)</code>
 <div class="block">Read Everything from Reader</div>
 </td>
 </tr>
-<tr id="i9" class="rowColor">
+<tr id="i10" class="altColor">
 <td class="colFirst"><code>static java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Util.html#unescapeJavaString-java.lang.String-">unescapeJavaString</a></span>(java.lang.String&nbsp;str)</code>
 <div class="block">Parse escapes in a Java String</div>
@@ -275,6 +282,26 @@ extends java.lang.Object</pre>
 <dd><code>value</code> - Value to search for</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>Search results</dd>
+</dl>
+</li>
+</ul>
+<a name="getCaseInsensitively-java.util.Map-java.lang.String-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getCaseInsensitively</h4>
+<pre>public static&nbsp;&lt;V&gt;&nbsp;V&nbsp;getCaseInsensitively(java.util.Map&lt;java.lang.String,V&gt;&nbsp;map,
+                                         java.lang.String&nbsp;key)</pre>
+<div class="block">Get an item from a map ignoring case</div>
+<dl>
+<dt><span class="paramLabel">Type Parameters:</span></dt>
+<dd><code>V</code> - Value</dd>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>map</code> - Map to search</dd>
+<dd><code>key</code> - Key to search with</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>Search Result</dd>
 </dl>
 </li>
 </ul>

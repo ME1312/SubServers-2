@@ -51,6 +51,24 @@ public final class Util {
     }
 
     /**
+     * Get an item from a map ignoring case
+     *
+     * @param map Map to search
+     * @param key Key to search with
+     * @param <V> Value
+     * @return Search Result
+     */
+    public static <V> V getCaseInsensitively(Map<String, V> map, String key) {
+        HashMap<String, String> insensitivity = new HashMap<String, String>();
+        for (String item : map.keySet()) insensitivity.put(item.toLowerCase(), item);
+        if (insensitivity.keySet().contains(key.toLowerCase())) {
+            return map.get(insensitivity.get(key.toLowerCase()));
+        } else {
+            return null;
+        }
+    }
+
+    /**
      * Gets a new Variable that doesn't match the existing Variables
      *
      * @param existing Existing Variables

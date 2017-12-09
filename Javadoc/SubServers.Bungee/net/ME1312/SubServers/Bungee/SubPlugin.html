@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10,"i8":10};
+var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10,"i8":10,"i9":10};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -250,19 +250,25 @@ implements net.md_5.bungee.api.plugin.Listener</pre>
 </tr>
 <tr id="i5" class="rowColor">
 <td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Bungee/SubPlugin.html#reroute-net.md_5.bungee.api.event.ServerConnectEvent-">reroute</a></span>(net.md_5.bungee.api.event.ServerConnectEvent&nbsp;e)</code>&nbsp;</td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Bungee/SubPlugin.html#reload--">reload</a></span>()</code>
+<div class="block">Load data from the config (will attempt to merge with current configuration)</div>
+</td>
 </tr>
 <tr id="i6" class="altColor">
 <td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Bungee/SubPlugin.html#resetSudo-net.ME1312.SubServers.Bungee.Event.SubStoppedEvent-">resetSudo</a></span>(<a href="../../../../net/ME1312/SubServers/Bungee/Event/SubStoppedEvent.html" title="class in net.ME1312.SubServers.Bungee.Event">SubStoppedEvent</a>&nbsp;e)</code>&nbsp;</td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Bungee/SubPlugin.html#reroute-net.md_5.bungee.api.event.ServerConnectEvent-">reroute</a></span>(net.md_5.bungee.api.event.ServerConnectEvent&nbsp;e)</code>&nbsp;</td>
 </tr>
 <tr id="i7" class="rowColor">
 <td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Bungee/SubPlugin.html#startListeners--">startListeners</a></span>()</code>
-<div class="block">Load Hosts, Servers, SubServers, and SubData Direct</div>
-</td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Bungee/SubPlugin.html#resetSudo-net.ME1312.SubServers.Bungee.Event.SubStoppedEvent-">resetSudo</a></span>(<a href="../../../../net/ME1312/SubServers/Bungee/Event/SubStoppedEvent.html" title="class in net.ME1312.SubServers.Bungee.Event">SubStoppedEvent</a>&nbsp;e)</code>&nbsp;</td>
 </tr>
 <tr id="i8" class="altColor">
+<td class="colFirst"><code>void</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Bungee/SubPlugin.html#startListeners--">startListeners</a></span>()</code>
+<div class="block">Load SubServers before BungeeCord finishes</div>
+</td>
+</tr>
+<tr id="i9" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Bungee/SubPlugin.html#stopListeners--">stopListeners</a></span>()</code>
 <div class="block">Reset all changes made by startListeners</div>
@@ -367,13 +373,13 @@ implements net.md_5.bungee.api.plugin.Listener</pre>
 <pre>public&nbsp;java.util.HashMap&lt;java.lang.String,java.lang.String&gt; exLang</pre>
 </li>
 </ul>
-<a name="redis">
+<a name="api">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
-<h4>redis</h4>
-<pre>public&nbsp;boolean redis</pre>
+<h4>api</h4>
+<pre>public final&nbsp;<a href="../../../../net/ME1312/SubServers/Bungee/SubAPI.html" title="class in net.ME1312.SubServers.Bungee">SubAPI</a> api</pre>
 </li>
 </ul>
 <a name="subdata">
@@ -412,13 +418,13 @@ implements net.md_5.bungee.api.plugin.Listener</pre>
 <pre>public final&nbsp;<a href="../../../../net/ME1312/SubServers/Bungee/Library/Version/Version.html" title="class in net.ME1312.SubServers.Bungee.Library.Version">Version</a> bversion</pre>
 </li>
 </ul>
-<a name="api">
+<a name="redis">
 <!--   -->
 </a>
 <ul class="blockListLast">
 <li class="blockList">
-<h4>api</h4>
-<pre>public final&nbsp;<a href="../../../../net/ME1312/SubServers/Bungee/SubAPI.html" title="class in net.ME1312.SubServers.Bungee">SubAPI</a> api</pre>
+<h4>redis</h4>
+<pre>public&nbsp;boolean redis</pre>
 </li>
 </ul>
 </li>
@@ -436,10 +442,25 @@ implements net.md_5.bungee.api.plugin.Listener</pre>
 <li class="blockList">
 <h4>startListeners</h4>
 <pre>public&nbsp;void&nbsp;startListeners()</pre>
-<div class="block">Load Hosts, Servers, SubServers, and SubData Direct</div>
+<div class="block">Load SubServers before BungeeCord finishes</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Overrides:</span></dt>
 <dd><code>startListeners</code>&nbsp;in class&nbsp;<code>net.md_5.bungee.BungeeCord</code></dd>
+</dl>
+</li>
+</ul>
+<a name="reload--">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>reload</h4>
+<pre>public&nbsp;void&nbsp;reload()
+            throws java.io.IOException</pre>
+<div class="block">Load data from the config (will attempt to merge with current configuration)</div>
+<dl>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code>java.io.IOException</code></dd>
 </dl>
 </li>
 </ul>
