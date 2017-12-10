@@ -3,6 +3,7 @@ package net.ME1312.SubServers.Bungee.Network.Packet;
 import net.ME1312.SubServers.Bungee.Host.Host;
 import net.ME1312.SubServers.Bungee.Host.SubCreator;
 import net.ME1312.SubServers.Bungee.Host.SubServer;
+import net.ME1312.SubServers.Bungee.Library.NamedContainer;
 import net.ME1312.SubServers.Bungee.Library.Version.Version;
 import net.ME1312.SubServers.Bungee.Network.Client;
 import net.ME1312.SubServers.Bungee.Network.ClientHandler;
@@ -14,6 +15,7 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.UUID;
 
 /**
  * Download Host Info Packet
@@ -80,11 +82,10 @@ public class PacketDownloadHostInfo implements PacketIn, PacketOut {
                 sinfo.put("running", server.isRunning());
                 sinfo.put("temp", server.isTemporary());
                 JSONObject players = new JSONObject();
-                for (ProxiedPlayer player : server.getPlayers()) {
+                for (NamedContainer<String, UUID> player : server.getGlobalPlayers()) {
                     JSONObject pinfo = new JSONObject();
-                    pinfo.put("name", player.getName());
-                    pinfo.put("nick", player.getDisplayName());
-                    players.put(player.getUniqueId().toString(), pinfo);
+                    pinfo.put("name", player.name());
+                    players.put(player.get().toString(), pinfo);
                 }
                 sinfo.put("players", players);
                 servers.put(server.getName(), sinfo);

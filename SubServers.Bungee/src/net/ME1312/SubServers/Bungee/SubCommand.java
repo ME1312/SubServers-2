@@ -513,7 +513,6 @@ public final class SubCommand extends Command implements TabExecutor {
     /**
      * BungeeCord /server
      */
-    @SuppressWarnings("unchecked")
     public static final class BungeeServer extends Command implements TabExecutor {
         private SubPlugin plugin;
         protected BungeeServer(SubPlugin plugin, String command) {
@@ -547,7 +546,7 @@ public final class SubCommand extends Command implements TabExecutor {
                             if (i != 0) serverm.addExtra(div);
                             TextComponent message = new TextComponent(plugin.lang.get().getSection("Lang").getColoredString("Bungee.Server.List", '&').replace("$str$", server.getDisplayName()));
                             try {
-                                message.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[]{new TextComponent(plugin.lang.get().getSection("Lang").getColoredString("Bungee.Server.Hover", '&').replace("$int$", Integer.toString((plugin.redis)?((Set<UUID>)plugin.redis("getPlayersOnServer", new NamedContainer<>(String.class, server.getName()))).size():server.getPlayers().size())))}));
+                                message.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[]{new TextComponent(plugin.lang.get().getSection("Lang").getColoredString("Bungee.Server.Hover", '&').replace("$int$", Integer.toString(server.getGlobalPlayers().size())))}));
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
@@ -595,7 +594,6 @@ public final class SubCommand extends Command implements TabExecutor {
     /**
      * BungeeCord /glist
      */
-    @SuppressWarnings("unchecked")
     public static final class BungeeList extends Command {
         private SubPlugin plugin;
         protected BungeeList(SubPlugin plugin, String command) {
@@ -616,15 +614,7 @@ public final class SubCommand extends Command implements TabExecutor {
             int players = 0;
             for (Server server : plugin.api.getServers().values()) {
                 List<String> playerlist = new ArrayList<String>();
-                if (plugin.redis) {
-                    try {
-                        for (UUID player : (Set<UUID>) plugin.redis("getPlayersOnServer", new NamedContainer<>(String.class, server.getName()))) playerlist.add((String) plugin.redis("getNameFromUuid", new NamedContainer<>(UUID.class, player)));
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                } else {
-                    for (ProxiedPlayer player : server.getPlayers()) playerlist.add(player.getName());
-                }
+                for (NamedContainer<String, UUID> player : server.getGlobalPlayers()) playerlist.add(player.name());
                 Collections.sort(playerlist);
 
                 players += playerlist.size();

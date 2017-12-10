@@ -1,10 +1,13 @@
 package net.ME1312.SubServers.Bungee.Host;
 
 import net.ME1312.SubServers.Bungee.Library.ExtraDataHandler;
+import net.ME1312.SubServers.Bungee.Library.NamedContainer;
 import net.ME1312.SubServers.Bungee.Network.ClientHandler;
 import net.md_5.bungee.api.config.ServerInfo;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Server Interface
@@ -45,6 +48,13 @@ public interface Server extends ServerInfo, ClientHandler, ExtraDataHandler {
      * @param value value Group name
      */
     void removeGroup(String value);
+
+    /**
+     * Get players on this server across all known proxies
+     *
+     * @return Player Collection
+     */
+    Collection<NamedContainer<String, UUID>> getGlobalPlayers();
 
     /**
      * If the server is hidden from players

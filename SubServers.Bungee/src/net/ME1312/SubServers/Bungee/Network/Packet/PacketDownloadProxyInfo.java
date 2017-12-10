@@ -51,7 +51,7 @@ public class PacketDownloadProxyInfo implements PacketIn, PacketOut {
         json.put("bungee", bungee);
         JSONObject minecraft = new JSONObject();
         minecraft.put("version", plugin.api.getGameVersion());
-        minecraft.put("players", plugin.getPlayers().size());
+        minecraft.put("players", plugin.api.getGlobalPlayers().size());
         json.put("minecraft", minecraft);
         JSONObject system = new JSONObject();
         JSONObject os = new JSONObject();

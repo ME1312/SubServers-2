@@ -14,6 +14,7 @@ import net.ME1312.SubServers.Bungee.Library.UniversalFile;
 import net.ME1312.SubServers.Bungee.Library.Util;
 import net.ME1312.SubServers.Bungee.Library.Version.Version;
 import net.ME1312.SubServers.Bungee.Network.SubDataServer;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 import java.lang.reflect.InvocationTargetException;
 import java.net.InetAddress;
@@ -431,6 +432,26 @@ public final class SubAPI {
     public SubServer getSubServer(String name) {
         if (Util.isNull(name)) throw new NullPointerException();
         return getSubServers().get(name.toLowerCase());
+    }
+
+    /**
+     * Get players on this network across all known proxies
+     *
+     * @return Player Collection
+     */
+    @SuppressWarnings("unchecked")
+    public Collection<NamedContainer<String, UUID>> getGlobalPlayers() {
+        List<NamedContainer<String, UUID>> players = new ArrayList<NamedContainer<String, UUID>>();
+        if (plugin.redis) {
+            try {
+                for (UUID player : (Set<UUID>) plugin.redis("getPlayersOnline")) players.add(new NamedContainer<>((String) plugin.redis("getNameFromUuid", new NamedContainer<>(UUID.class, player)), player));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else {
+            for (ProxiedPlayer player : plugin.getPlayers()) players.add(new NamedContainer<>(player.getName(), player.getUniqueId()));
+        }
+        return players;
     }
 
     /**

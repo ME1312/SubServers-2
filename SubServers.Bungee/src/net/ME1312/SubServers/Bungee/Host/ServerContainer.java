@@ -11,15 +11,14 @@ import net.ME1312.SubServers.Bungee.Network.Client;
 import net.ME1312.SubServers.Bungee.Network.ClientHandler;
 import net.ME1312.SubServers.Bungee.Network.SubDataServer;
 import net.ME1312.SubServers.Bungee.SubAPI;
+import net.ME1312.SubServers.Bungee.SubPlugin;
 import net.md_5.bungee.BungeeServerInfo;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import org.json.JSONObject;
 
 import java.net.InetSocketAddress;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 /**
  * Server Class
@@ -94,6 +93,23 @@ public class ServerContainer extends BungeeServerInfo implements Server {
         if (Util.isNull(value)) throw new NullPointerException();
         groups.remove(value);
         Collections.sort(groups);
+    }
+
+    @SuppressWarnings({"deprecation", "unchecked"})
+    @Override
+    public Collection<NamedContainer<String, UUID>> getGlobalPlayers() {
+        List<NamedContainer<String, UUID>> players = new ArrayList<NamedContainer<String, UUID>>();
+        SubPlugin plugin = SubAPI.getInstance().getInternals();
+        if (plugin.redis) {
+            try {
+                for (UUID player : (Set<UUID>) plugin.redis("getPlayersOnServer", new NamedContainer<>(String.class, getName()))) players.add(new NamedContainer<>((String) plugin.redis("getNameFromUuid", new NamedContainer<>(UUID.class, player)), player));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else {
+            for (ProxiedPlayer player : getPlayers()) players.add(new NamedContainer<>(player.getName(), player.getUniqueId()));
+        }
+        return players;
     }
 
     @Override
@@ -178,11 +194,10 @@ public class ServerContainer extends BungeeServerInfo implements Server {
         info.put("restricted", isRestricted());
         info.put("hidden", isHidden());
         JSONObject players = new JSONObject();
-        for (ProxiedPlayer player : getPlayers()) {
+        for (NamedContainer<String, UUID> player : getGlobalPlayers()) {
             JSONObject pinfo = new JSONObject();
-            pinfo.put("name", player.getName());
-            pinfo.put("nick", player.getDisplayName());
-            players.put(player.getUniqueId().toString(), pinfo);
+            pinfo.put("name", player.name());
+            players.put(player.get().toString(), pinfo);
         }
         info.put("players", players);
         if (getSubData() != null) info.put("subdata", getSubData().getAddress().toString());
