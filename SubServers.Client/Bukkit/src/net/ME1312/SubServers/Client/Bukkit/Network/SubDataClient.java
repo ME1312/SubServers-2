@@ -89,6 +89,7 @@ public final class SubDataClient {
         registerPacket(new PacketDownloadLang(plugin), "SubDownloadLang");
         registerPacket(new PacketDownloadNetworkList(), "SubDownloadNetworkList");
         registerPacket(new PacketDownloadPlayerList(), "SubDownloadPlayerList");
+        registerPacket(new PacketDownloadProxyInfo(), "SubDownloadProxyInfo");
         registerPacket(new PacketDownloadServerInfo(), "SubDownloadServerInfo");
         registerPacket(new PacketDownloadServerList(), "SubDownloadServerList");
         registerPacket(new PacketInRunEvent(plugin), "SubRunEvent");
@@ -104,6 +105,7 @@ public final class SubDataClient {
         registerPacket(PacketDownloadLang.class, "SubDownloadLang");
         registerPacket(PacketDownloadNetworkList.class, "SubDownloadNetworkList");
         registerPacket(PacketDownloadPlayerList.class, "SubDownloadPlayerList");
+        registerPacket(PacketDownloadProxyInfo.class, "SubDownloadProxyInfo");
         registerPacket(PacketDownloadServerInfo.class, "SubDownloadServerInfo");
         registerPacket(PacketDownloadServerList.class, "SubDownloadServerList");
         registerPacket(PacketLinkServer.class, "SubLinkServer");
@@ -402,7 +404,6 @@ public final class SubDataClient {
                     }
                 }, reconnect * 20);
             }
-            plugin.subdata = null;
         }
     }
 }

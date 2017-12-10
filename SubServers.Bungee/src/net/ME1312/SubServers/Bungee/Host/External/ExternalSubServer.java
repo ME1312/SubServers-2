@@ -252,6 +252,7 @@ public class ExternalSubServer extends SubServerContainer {
                             break;
                         case "port":
                             if (value.isInt() && host.removeSubServer(player, getName())) {
+                                waitFor(() -> host.getSubServer(getName()), null);
                                 SubServer server = host.addSubServer(player, getName(), isEnabled(), value.asInt(), getMotd(), isLogging(), getPath(), getExecutable(), getStopCommand(), false, willAutoRestart(), isHidden(), isRestricted(), isTemporary());
                                 if (server != null) {
                                     if (this.host.plugin.config.get().getSection("Servers").getKeys().contains(getName())) {
@@ -289,6 +290,7 @@ public class ExternalSubServer extends SubServerContainer {
                             break;
                         case "dir":
                             if (value.isString()) {
+                                waitFor(() -> host.getSubServer(getName()), null);
                                 SubServer server = host.addSubServer(player, getName(), isEnabled(), getAddress().getPort(), getMotd(), isLogging(), value.asRawString(), getExecutable(), getStopCommand(), false, willAutoRestart(), isHidden(), isRestricted(), isTemporary());
                                 if (server != null) {
                                     if (this.host.plugin.config.get().getSection("Servers").getKeys().contains(getName())) {
@@ -302,6 +304,7 @@ public class ExternalSubServer extends SubServerContainer {
                             break;
                         case "exec":
                             if (value.isString()) {
+                                waitFor(() -> host.getSubServer(getName()), null);
                                 SubServer server = host.addSubServer(player, getName(), isEnabled(), getAddress().getPort(), getMotd(), isLogging(), getPath(), new Executable(value.asRawString()), getStopCommand(), false, willAutoRestart(), isHidden(), isRestricted(), isTemporary());
                                 if (server != null) {
                                     if (this.host.plugin.config.get().getSection("Servers").getKeys().contains(getName())) {
@@ -414,6 +417,10 @@ public class ExternalSubServer extends SubServerContainer {
         }
         if (!isRunning() && forward == null && state) start(player);
         return c;
+    } private <V> void waitFor(Util.ReturnRunnable<V> method, V value) throws InterruptedException {
+        while (!((value == null && method.run() == null) || !method.run().equals(value))) {
+            Thread.sleep(250);
+        }
     }
 
     @Override

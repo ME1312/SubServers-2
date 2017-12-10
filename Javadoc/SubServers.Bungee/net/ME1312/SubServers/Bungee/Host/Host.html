@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":10,"i1":10,"i2":6,"i3":10,"i4":10,"i5":10,"i6":6,"i7":6,"i8":10,"i9":10,"i10":6,"i11":10,"i12":6,"i13":6,"i14":6,"i15":10,"i16":10,"i17":10,"i18":6,"i19":6,"i20":6,"i21":6,"i22":10,"i23":6,"i24":10,"i25":10,"i26":6,"i27":10,"i28":6,"i29":10,"i30":10,"i31":10,"i32":10,"i33":10,"i34":10,"i35":10};
+var methods = {"i0":10,"i1":10,"i2":6,"i3":10,"i4":10,"i5":10,"i6":6,"i7":6,"i8":10,"i9":10,"i10":6,"i11":10,"i12":6,"i13":6,"i14":6,"i15":10,"i16":10,"i17":10,"i18":6,"i19":6,"i20":10,"i21":6,"i22":6,"i23":10,"i24":6,"i25":10,"i26":10,"i27":6,"i28":10,"i29":6,"i30":10,"i31":10,"i32":10,"i33":10,"i34":10,"i35":10,"i36":10};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],4:["t3","Abstract Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -315,100 +315,106 @@ implements <a href="../../../../../net/ME1312/SubServers/Bungee/Library/ExtraDat
 </td>
 </tr>
 <tr id="i20" class="altColor">
+<td class="colFirst"><code>java.lang.String</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/Host.html#getSignature--">getSignature</a></span>()</code>
+<div class="block">Get the Signature of this Object</div>
+</td>
+</tr>
+<tr id="i21" class="rowColor">
 <td class="colFirst"><code>abstract <a href="../../../../../net/ME1312/SubServers/Bungee/Host/SubServer.html" title="interface in net.ME1312.SubServers.Bungee.Host">SubServer</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/Host.html#getSubServer-java.lang.String-">getSubServer</a></span>(java.lang.String&nbsp;name)</code>
 <div class="block">Gets a SubServer</div>
 </td>
 </tr>
-<tr id="i21" class="rowColor">
+<tr id="i22" class="altColor">
 <td class="colFirst"><code>abstract java.util.Map&lt;java.lang.String,? extends <a href="../../../../../net/ME1312/SubServers/Bungee/Host/SubServer.html" title="interface in net.ME1312.SubServers.Bungee.Host">SubServer</a>&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/Host.html#getSubServers--">getSubServers</a></span>()</code>
 <div class="block">Gets the SubServers on this Host</div>
 </td>
 </tr>
-<tr id="i22" class="altColor">
+<tr id="i23" class="rowColor">
 <td class="colFirst"><code>boolean</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/Host.html#hasExtra-java.lang.String-">hasExtra</a></span>(java.lang.String&nbsp;handle)</code>
 <div class="block">Determine if an extra value exists</div>
 </td>
 </tr>
-<tr id="i23" class="rowColor">
+<tr id="i24" class="altColor">
 <td class="colFirst"><code>abstract boolean</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/Host.html#isEnabled--">isEnabled</a></span>()</code>
 <div class="block">Is this Host Enabled?</div>
 </td>
 </tr>
-<tr id="i24" class="altColor">
+<tr id="i25" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/Host.html#removeExtra-java.lang.String-">removeExtra</a></span>(java.lang.String&nbsp;handle)</code>
 <div class="block">Remove an extra value from this Server</div>
 </td>
 </tr>
-<tr id="i25" class="rowColor">
+<tr id="i26" class="altColor">
 <td class="colFirst"><code>boolean</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/Host.html#removeSubServer-java.lang.String-">removeSubServer</a></span>(java.lang.String&nbsp;name)</code>
 <div class="block">Removes a SubServer</div>
 </td>
 </tr>
-<tr id="i26" class="altColor">
+<tr id="i27" class="rowColor">
 <td class="colFirst"><code>abstract boolean</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/Host.html#removeSubServer-java.util.UUID-java.lang.String-">removeSubServer</a></span>(java.util.UUID&nbsp;player,
                java.lang.String&nbsp;name)</code>
 <div class="block">Removes a SubServer</div>
 </td>
 </tr>
-<tr id="i27" class="rowColor">
+<tr id="i28" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/Host.html#setDisplayName-java.lang.String-">setDisplayName</a></span>(java.lang.String&nbsp;value)</code>
 <div class="block">Sets the Display Name for this Host</div>
 </td>
 </tr>
-<tr id="i28" class="altColor">
+<tr id="i29" class="rowColor">
 <td class="colFirst"><code>abstract void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/Host.html#setEnabled-boolean-">setEnabled</a></span>(boolean&nbsp;value)</code>
 <div class="block">Set if this Host is Enabled</div>
 </td>
 </tr>
-<tr id="i29" class="rowColor">
+<tr id="i30" class="altColor">
 <td class="colFirst"><code>int</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/Host.html#start-java.lang.String...-">start</a></span>(java.lang.String...&nbsp;servers)</code>
 <div class="block">Starts the Servers Specified</div>
 </td>
 </tr>
-<tr id="i30" class="altColor">
+<tr id="i31" class="rowColor">
 <td class="colFirst"><code>int</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/Host.html#start-java.util.UUID-java.lang.String...-">start</a></span>(java.util.UUID&nbsp;player,
      java.lang.String...&nbsp;servers)</code>
 <div class="block">Starts the Servers Specified</div>
 </td>
 </tr>
-<tr id="i31" class="rowColor">
+<tr id="i32" class="altColor">
 <td class="colFirst"><code>int</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/Host.html#stop-java.lang.String...-">stop</a></span>(java.lang.String...&nbsp;servers)</code>
 <div class="block">Stops the Servers Specified</div>
 </td>
 </tr>
-<tr id="i32" class="altColor">
+<tr id="i33" class="rowColor">
 <td class="colFirst"><code>int</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/Host.html#stop-java.util.UUID-java.lang.String...-">stop</a></span>(java.util.UUID&nbsp;player,
     java.lang.String...&nbsp;servers)</code>
 <div class="block">Stops the Servers Specified</div>
 </td>
 </tr>
-<tr id="i33" class="rowColor">
+<tr id="i34" class="altColor">
 <td class="colFirst"><code>int</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/Host.html#terminate-java.lang.String...-">terminate</a></span>(java.lang.String...&nbsp;servers)</code>
 <div class="block">Terminates the Servers Specified</div>
 </td>
 </tr>
-<tr id="i34" class="altColor">
+<tr id="i35" class="rowColor">
 <td class="colFirst"><code>int</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/Host.html#terminate-java.util.UUID-java.lang.String...-">terminate</a></span>(java.util.UUID&nbsp;player,
          java.lang.String...&nbsp;servers)</code>
 <div class="block">Terminates the Servers Specified</div>
 </td>
 </tr>
-<tr id="i35" class="rowColor">
+<tr id="i36" class="altColor">
 <td class="colFirst"><code>java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/Host.html#toString--">toString</a></span>()</code>&nbsp;</td>
 </tr>
@@ -1021,6 +1027,20 @@ implements <a href="../../../../../net/ME1312/SubServers/Bungee/Library/ExtraDat
 <dd>Success Status</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
 <dd><code>java.lang.InterruptedException</code></dd>
+</dl>
+</li>
+</ul>
+<a name="getSignature--">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getSignature</h4>
+<pre>public final&nbsp;java.lang.String&nbsp;getSignature()</pre>
+<div class="block">Get the Signature of this Object</div>
+<dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>Object Signature</dd>
 </dl>
 </li>
 </ul>

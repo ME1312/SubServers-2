@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10,"i8":10,"i9":10,"i10":10,"i11":10};
+var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10,"i8":10,"i9":10,"i10":10,"i11":10,"i12":10};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -164,22 +164,26 @@ implements net.md_5.bungee.api.plugin.Listener</pre>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Sync/SubPlugin.html#lang">lang</a></span></code>&nbsp;</td>
 </tr>
 <tr class="rowColor">
+<td class="colFirst"><code>long</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Sync/SubPlugin.html#lastReload">lastReload</a></span></code>&nbsp;</td>
+</tr>
+<tr class="altColor">
 <td class="colFirst"><code>java.io.PrintStream</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Sync/SubPlugin.html#out">out</a></span></code>&nbsp;</td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><code>boolean</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Sync/SubPlugin.html#redis">redis</a></span></code>&nbsp;</td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><code>java.util.Map&lt;java.lang.String,<a href="../../../../net/ME1312/SubServers/Sync/Server/Server.html" title="class in net.ME1312.SubServers.Sync.Server">Server</a>&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Sync/SubPlugin.html#servers">servers</a></span></code>&nbsp;</td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><code><a href="../../../../net/ME1312/SubServers/Sync/Network/SubDataClient.html" title="class in net.ME1312.SubServers.Sync.Network">SubDataClient</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Sync/SubPlugin.html#subdata">subdata</a></span></code>&nbsp;</td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><code><a href="../../../../net/ME1312/SubServers/Sync/Library/Version/Version.html" title="class in net.ME1312.SubServers.Sync.Library.Version">Version</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Sync/SubPlugin.html#version">version</a></span></code>&nbsp;</td>
 </tr>
@@ -232,35 +236,41 @@ implements net.md_5.bungee.api.plugin.Listener</pre>
 </td>
 </tr>
 <tr id="i5" class="rowColor">
+<td class="colFirst"><code>java.lang.Boolean</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Sync/SubPlugin.html#merge-java.lang.String-org.json.JSONObject-boolean-">merge</a></span>(java.lang.String&nbsp;name,
+     org.json.JSONObject&nbsp;json,
+     boolean&nbsp;isSubServer)</code>&nbsp;</td>
+</tr>
+<tr id="i6" class="altColor">
 <td class="colFirst"><code>&lt;T&gt;&nbsp;java.lang.Object</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Sync/SubPlugin.html#redis-java.lang.String-net.ME1312.SubServers.Sync.Library.NamedContainer...-">redis</a></span>(java.lang.String&nbsp;method,
      <a href="../../../../net/ME1312/SubServers/Sync/Library/NamedContainer.html" title="class in net.ME1312.SubServers.Sync.Library">NamedContainer</a>&lt;java.lang.Class&lt;T&gt;,? extends T&gt;...&nbsp;args)</code>
 <div class="block">Reference a RedisBungee method via reflection</div>
 </td>
 </tr>
-<tr id="i6" class="altColor">
+<tr id="i7" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Sync/SubPlugin.html#remove-net.ME1312.SubServers.Sync.Event.SubRemoveServerEvent-">remove</a></span>(<a href="../../../../net/ME1312/SubServers/Sync/Event/SubRemoveServerEvent.html" title="class in net.ME1312.SubServers.Sync.Event">SubRemoveServerEvent</a>&nbsp;e)</code>&nbsp;</td>
 </tr>
-<tr id="i7" class="rowColor">
+<tr id="i8" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Sync/SubPlugin.html#reroute-net.md_5.bungee.api.event.ServerConnectEvent-">reroute</a></span>(net.md_5.bungee.api.event.ServerConnectEvent&nbsp;e)</code>&nbsp;</td>
 </tr>
-<tr id="i8" class="altColor">
+<tr id="i9" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Sync/SubPlugin.html#start-net.ME1312.SubServers.Sync.Event.SubStartEvent-">start</a></span>(<a href="../../../../net/ME1312/SubServers/Sync/Event/SubStartEvent.html" title="class in net.ME1312.SubServers.Sync.Event">SubStartEvent</a>&nbsp;e)</code>&nbsp;</td>
 </tr>
-<tr id="i9" class="rowColor">
+<tr id="i10" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Sync/SubPlugin.html#startListeners--">startListeners</a></span>()</code>
 <div class="block">Load Hosts, Servers, SubServers, and SubData Direct</div>
 </td>
 </tr>
-<tr id="i10" class="altColor">
+<tr id="i11" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Sync/SubPlugin.html#stop-net.ME1312.SubServers.Sync.Event.SubStoppedEvent-">stop</a></span>(<a href="../../../../net/ME1312/SubServers/Sync/Event/SubStoppedEvent.html" title="class in net.ME1312.SubServers.Sync.Event">SubStoppedEvent</a>&nbsp;e)</code>&nbsp;</td>
 </tr>
-<tr id="i11" class="rowColor">
+<tr id="i12" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Sync/SubPlugin.html#stopListeners--">stopListeners</a></span>()</code>
 <div class="block">Reset all changes made by startListeners</div>
@@ -356,6 +366,15 @@ implements net.md_5.bungee.api.plugin.Listener</pre>
 <pre>public&nbsp;boolean redis</pre>
 </li>
 </ul>
+<a name="api">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>api</h4>
+<pre>public final&nbsp;<a href="../../../../net/ME1312/SubServers/Sync/SubAPI.html" title="class in net.ME1312.SubServers.Sync">SubAPI</a> api</pre>
+</li>
+</ul>
 <a name="subdata">
 <!--   -->
 </a>
@@ -383,13 +402,13 @@ implements net.md_5.bungee.api.plugin.Listener</pre>
 <pre>public final&nbsp;<a href="../../../../net/ME1312/SubServers/Sync/Library/Version/Version.html" title="class in net.ME1312.SubServers.Sync.Library.Version">Version</a> bversion</pre>
 </li>
 </ul>
-<a name="api">
+<a name="lastReload">
 <!--   -->
 </a>
 <ul class="blockListLast">
 <li class="blockList">
-<h4>api</h4>
-<pre>public final&nbsp;<a href="../../../../net/ME1312/SubServers/Sync/SubAPI.html" title="class in net.ME1312.SubServers.Sync">SubAPI</a> api</pre>
+<h4>lastReload</h4>
+<pre>public&nbsp;long lastReload</pre>
 </li>
 </ul>
 </li>
@@ -530,6 +549,17 @@ implements net.md_5.bungee.api.plugin.Listener</pre>
 <li class="blockList">
 <h4>start</h4>
 <pre>public&nbsp;void&nbsp;start(<a href="../../../../net/ME1312/SubServers/Sync/Event/SubStartEvent.html" title="class in net.ME1312.SubServers.Sync.Event">SubStartEvent</a>&nbsp;e)</pre>
+</li>
+</ul>
+<a name="merge-java.lang.String-org.json.JSONObject-boolean-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>merge</h4>
+<pre>public&nbsp;java.lang.Boolean&nbsp;merge(java.lang.String&nbsp;name,
+                               org.json.JSONObject&nbsp;json,
+                               boolean&nbsp;isSubServer)</pre>
 </li>
 </ul>
 <a name="edit-net.ME1312.SubServers.Sync.Event.SubEditServerEvent-">

@@ -21,6 +21,7 @@ import java.util.UUID;
  */
 public abstract class Host implements ExtraDataHandler {
     private YAMLSection extra = new YAMLSection();
+    private final String signature;
     private String nick = null;
 
     /**
@@ -35,6 +36,7 @@ public abstract class Host implements ExtraDataHandler {
      */
     public Host(SubPlugin plugin, String name, Boolean enabled, InetAddress address, String directory, String gitBash) {
         if (name.contains(" ")) throw new InvalidHostException("Host names cannot have spaces: " + name);
+        signature = plugin.signObject();
         SubDataServer.allowConnection(address.getHostAddress());
     }
 
@@ -357,6 +359,15 @@ public abstract class Host implements ExtraDataHandler {
      */
     public abstract boolean forceDeleteSubServer(UUID player, String name) throws InterruptedException;
 
+    /**
+     * Get the Signature of this Object
+     *
+     * @return Object Signature
+     */
+    public final String getSignature() {
+        return signature;
+    }
+
     @Override
     public void addExtra(String handle, Object value) {
         if (Util.isNull(handle, value)) throw new NullPointerException();
@@ -414,6 +425,7 @@ public abstract class Host implements ExtraDataHandler {
         }
         hinfo.put("servers", servers);
         if (this instanceof ClientHandler && ((ClientHandler) this).getSubData() != null) hinfo.put("subdata", ((ClientHandler) this).getSubData().getAddress().toString());
+        hinfo.put("signature", signature);
         hinfo.put("extra", getExtra().toJSON());
         return hinfo.toString();
     }

@@ -24,6 +24,7 @@ import org.xml.sax.InputSource;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
+import java.math.BigInteger;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketException;
@@ -56,8 +57,10 @@ public final class SubPlugin extends BungeeCord implements Listener {
     public final Version bversion = (SubPlugin.class.getPackage().getSpecificationVersion().equals("0"))?null:new Version(SubPlugin.class.getPackage().getSpecificationVersion());
 
     public boolean redis = false;
+    public long resetDate = 0;
     private boolean running = false;
     private boolean posted = false;
+    private BigInteger lastSignature = new BigInteger("-1");
 
     protected SubPlugin(PrintStream out) throws IOException {
         System.out.println("SubServers > Loading SubServers.Bungee v" + version.toString() + " Libraries... ");
@@ -208,13 +211,14 @@ public final class SubPlugin extends BungeeCord implements Listener {
     public void reload() throws IOException {
         List<String> ukeys = new ArrayList<String>();
         long begin = Calendar.getInstance().getTime().getTime();
-        boolean status = running;
+        boolean status;
+        if (!(status = running)) resetDate = begin;
 
         YAMLSection prevconfig = config.get();
         config.reload();
         lang.reload();
 
-        if (subdata == null ||
+        if (subdata == null || // SubData Server must be reset
                 !config.get().getSection("Settings").getSection("SubData").getRawString("Address", "127.0.0.1:4391").equals(prevconfig.getSection("Settings").getSection("SubData").getRawString("Address", "127.0.0.1:4391")) ||
                 !config.get().getSection("Settings").getSection("SubData").getRawString("Encryption", "NONE").equals(prevconfig.getSection("Settings").getSection("SubData").getRawString("Encryption", "NONE"))
                 ) {
@@ -233,7 +237,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
                     encryption);
             System.out.println("SubServers > SubData Direct Listening on " + subdata.getServer().getLocalSocketAddress().toString());
             loop();
-        } else System.out.println("SubServers > Reloading SubData Whitelist...");
+        } // Add new entries to Allowed-Connections
         for (String s : config.get().getSection("Settings").getSection("SubData").getStringList("Allowed-Connections", new ArrayList<String>())) {
             try {
                 SubDataServer.allowConnection(s);
@@ -248,8 +252,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
             if (!ukeys.contains(name.toLowerCase())) try {
                 if (!hostDrivers.keySet().contains(config.get().getSection("Hosts").getSection(name).getRawString("Driver").toLowerCase())) throw new InvalidHostException("Invalid Driver for host: " + name);
                 Host host = this.hosts.get(name.toLowerCase());
-                if (host == null ||
-                        config.get().getSection("Hosts").getSection(name).getBoolean("Enabled") !=host.isEnabled() ||
+                if (host == null || // Host must be reset
                         !hostDrivers.get(config.get().getSection("Hosts").getSection(name).getRawString("Driver").toLowerCase()).equals(host.getClass()) ||
                         !config.get().getSection("Hosts").getSection(name).getRawString("Address").equals(host.getAddress().getHostAddress()) ||
                         !config.get().getSection("Hosts").getSection(name).getRawString("Directory").equals(host.getPath()) ||
@@ -258,7 +261,10 @@ public final class SubPlugin extends BungeeCord implements Listener {
                     if (host != null) api.forceRemoveHost(name);
                     host = api.addHost(config.get().getSection("Hosts").getSection(name).getRawString("Driver").toLowerCase(), name, config.get().getSection("Hosts").getSection(name).getBoolean("Enabled"), InetAddress.getByName(config.get().getSection("Hosts").getSection(name).getRawString("Address")),
                             config.get().getSection("Hosts").getSection(name).getRawString("Directory"), config.get().getSection("Hosts").getSection(name).getRawString("Git-Bash"));
-                }
+                } else { // Host wasn't reset, so check for these changes
+                    if (config.get().getSection("Hosts").getSection(name).getBoolean("Enabled") != host.isEnabled())
+                        host.setEnabled(config.get().getSection("Hosts").getSection(name).getBoolean("Enabled"));
+                } // Check for other changes
                 if (config.get().getSection("Hosts").getSection(name).getKeys().contains("Display") && ((config.get().getSection("Hosts").getSection(name).getString("Display").length() == 0 && !host.getDisplayName().equals(host.getName())) || !config.get().getSection("Hosts").getSection(name).getString("Display").equals(host.getDisplayName())))
                     host.setDisplayName(config.get().getSection("Hosts").getSection(name).getString("Display"));
                 if (config.get().getSection("Hosts").getSection(name).getKeys().contains("Extra"))
@@ -278,21 +284,21 @@ public final class SubPlugin extends BungeeCord implements Listener {
             if (!ukeys.contains(name.toLowerCase())) try {
                 Server server = api.getServer(name);
                 if (server == null || !(server instanceof SubServer)) {
-                    if (server == null ||
+                    if (server == null || // Server must be reset
                             bungeeconfig.get().getSection("servers").getSection(name).getRawString("address").equals(server.getAddress().getAddress().getHostAddress() + ':' + server.getAddress().getPort())
                     ) {
                         if (server != null) api.forceRemoveServer(name);
                         server = api.addServer(name, InetAddress.getByName(bungeeconfig.get().getSection("servers").getSection(name).getRawString("address").split(":")[0]),
                                 Integer.parseInt(bungeeconfig.get().getSection("servers").getSection(name).getRawString("address").split(":")[1]), bungeeconfig.get().getSection("servers").getSection(name).getColoredString("motd", '&'),
                                 bungeeconfig.get().getSection("servers").getSection(name).getBoolean("hidden", false), bungeeconfig.get().getSection("servers").getSection(name).getBoolean("restricted"));
-                    } else {
+                    } else { // Server wasn't reset, so check for these changes
                         if (!bungeeconfig.get().getSection("servers").getSection(name).getColoredString("motd", '&').equals(server.getMotd()))
                             server.setMotd(bungeeconfig.get().getSection("servers").getSection(name).getColoredString("motd", '&'));
                         if (bungeeconfig.get().getSection("servers").getSection(name).getBoolean("hidden", false) != server.isHidden())
                             server.setHidden(bungeeconfig.get().getSection("servers").getSection(name).getBoolean("hidden", false));
                         if (bungeeconfig.get().getSection("servers").getSection(name).getBoolean("restricted") != server.isRestricted())
                             server.setRestricted(bungeeconfig.get().getSection("servers").getSection(name).getBoolean("restricted"));
-                    }
+                    } // Check for other changes
                     if (bungeeconfig.get().getSection("servers").getSection(name).getKeys().contains("display") && ((bungeeconfig.get().getSection("servers").getSection(name).getRawString("display").length() == 0 && !server.getDisplayName().equals(server.getName())) || !bungeeconfig.get().getSection("servers").getSection(name).getRawString("display").equals(server.getDisplayName())))
                         server.setDisplayName(bungeeconfig.get().getSection("servers").getSection(name).getString("display"));
                     if (bungeeconfig.get().getSection("servers").getSection(name).getKeys().contains("group")) {
@@ -485,6 +491,58 @@ public final class SubPlugin extends BungeeCord implements Listener {
     }
 
     /**
+     * Reset all changes made by startListeners
+     *
+     * @see SubPlugin#startListeners()
+     */
+    @Override
+    public void stopListeners() {
+        try {
+            legServers.clear();
+            legServers.putAll(getServers());
+            if (api.listeners.size() > 0) {
+                System.out.println("SubServers > Resetting SubAPI Plugins...");
+                for (NamedContainer<Runnable, Runnable> listener : api.listeners) {
+                    try {
+                        if (listener.get() != null) listener.get().run();
+                    } catch (Throwable e) {
+                        new InvocationTargetException(e, "Problem disabling plugin").printStackTrace();
+                    }
+                }
+            }
+
+            shutdown();
+
+            subdata.destroy();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        super.stopListeners();
+    } private void shutdown() throws Exception {
+        api.ready = false;
+        System.out.println("SubServers > Resetting Hosts and Server Data");
+        List<String> hosts = new ArrayList<String>();
+        hosts.addAll(this.hosts.keySet());
+
+        for (String host : hosts) {
+            api.forceRemoveHost(host);
+        }
+        running = false;
+        this.hosts.clear();
+        exServers.clear();
+    }
+
+    /**
+     * Returns a unique signature for use by signed objects
+     *
+     * @return Signature
+     */
+    public String signObject() {
+        return (lastSignature = lastSignature.add(BigInteger.ONE)).toString();
+    }
+
+    /**
      * Reference a RedisBungee method via reflection
      *
      * @param method Method to reference
@@ -560,49 +618,6 @@ public final class SubPlugin extends BungeeCord implements Listener {
     @Override
     public ServerInfo getServerInfo(String name) {
         return getServers().get(name);
-    }
-
-    /**
-     * Reset all changes made by startListeners
-     *
-     * @see SubPlugin#startListeners()
-     */
-    @Override
-    public void stopListeners() {
-        try {
-            legServers.clear();
-            legServers.putAll(getServers());
-            if (api.listeners.size() > 0) {
-                System.out.println("SubServers > Resetting SubAPI Plugins...");
-                for (NamedContainer<Runnable, Runnable> listener : api.listeners) {
-                    try {
-                        if (listener.get() != null) listener.get().run();
-                    } catch (Throwable e) {
-                        new InvocationTargetException(e, "Problem disabling plugin").printStackTrace();
-                    }
-                }
-            }
-
-            shutdown();
-
-            subdata.destroy();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        super.stopListeners();
-    } private void shutdown() throws Exception {
-        api.ready = false;
-        System.out.println("SubServers > Resetting Hosts and Server Data");
-        List<String> hosts = new ArrayList<String>();
-        hosts.addAll(this.hosts.keySet());
-
-        for (String host : hosts) {
-            api.forceRemoveHost(host);
-        }
-        running = false;
-        this.hosts.clear();
-        exServers.clear();
     }
 
     @EventHandler(priority = Byte.MAX_VALUE)

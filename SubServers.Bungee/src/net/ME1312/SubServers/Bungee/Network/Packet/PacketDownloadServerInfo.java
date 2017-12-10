@@ -1,6 +1,7 @@
 package net.ME1312.SubServers.Bungee.Network.Packet;
 
 import net.ME1312.SubServers.Bungee.Host.Server;
+import net.ME1312.SubServers.Bungee.Host.ServerContainer;
 import net.ME1312.SubServers.Bungee.Host.SubServer;
 import net.ME1312.SubServers.Bungee.Library.Util;
 import net.ME1312.SubServers.Bungee.Library.Version.Version;
@@ -80,6 +81,7 @@ public class PacketDownloadServerInfo implements PacketIn, PacketOut {
             info.put("hidden", server.isHidden());
             info.put("motd", server.getMotd());
             if (server.getSubData() != null) info.put("subdata", server.getSubData().getAddress().toString());
+            info.put("signature", server.getSignature());
             info.put("extra", server.getExtra().toJSON());
 
             JSONObject players = new JSONObject();

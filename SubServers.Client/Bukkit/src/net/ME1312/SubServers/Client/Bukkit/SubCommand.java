@@ -26,7 +26,7 @@ import java.nio.charset.Charset;
 import java.text.DecimalFormat;
 import java.util.*;
 
-public final class SubCommand implements CommandExecutor {
+public final class SubCommand implements CommandExecutor{
     private SubPlugin plugin;
 
     public SubCommand(SubPlugin plugin) {

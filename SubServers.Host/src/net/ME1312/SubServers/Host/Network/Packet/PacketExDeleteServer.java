@@ -102,7 +102,7 @@ public class PacketExDeleteServer implements PacketIn, PacketOut {
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-                    log.info.println("Deleted Server - " + data.getString("server"));
+                    log.info.println("Deleted SubServer: " + data.getString("server"));
                     host.subdata.sendPacket(new PacketExDeleteServer(0, "Server Deleted Successfully", (data.keySet().contains("id"))?data.getString("id"):null));
                 }).start();
             }

@@ -87,4 +87,11 @@ public interface Server extends ServerInfo, ClientHandler, ExtraDataHandler {
      * @param value Value
      */
     void setRestricted(boolean value);
+
+    /**
+     * Get the Signature of this Object
+     *
+     * @return Object Signature
+     */
+    String getSignature();
 }

@@ -72,24 +72,21 @@ public final class SubDataClient {
 
     private void init() {
         plugin.subdata.sendPacket(new PacketDownloadLang(plugin));
-        plugin.subdata.sendPacket(new PacketDownloadServerList(null, json -> {
-            System.out.println("SubServers > Resetting Server Data");
-            plugin.servers.clear();
+        plugin.subdata.sendPacket(new PacketDownloadProxyInfo(proxy -> plugin.subdata.sendPacket(new PacketDownloadServerList(null, json -> {
+            if (plugin.lastReload != proxy.getJSONObject("subservers").getLong("last-reload")) {
+                System.out.println("SubServers > Resetting Server Data");
+                plugin.servers.clear();
+                plugin.lastReload = proxy.getJSONObject("subservers").getLong("last-reload");
+            }
             for (String host : json.getJSONObject("hosts").keySet()) {
                 for (String subserver : json.getJSONObject("hosts").getJSONObject(host).getJSONObject("servers").keySet()) {
-                    plugin.servers.put(subserver.toLowerCase(), new SubServer(subserver, json.getJSONObject("hosts").getJSONObject(host).getJSONObject("servers").getJSONObject(subserver).getString("display"),
-                            new InetSocketAddress(json.getJSONObject("hosts").getJSONObject(host).getJSONObject("servers").getJSONObject(subserver).getString("address").split(":")[0], Integer.parseInt(json.getJSONObject("hosts").getJSONObject(host).getJSONObject("servers").getJSONObject(subserver).getString("address").split(":")[1])),
-                            json.getJSONObject("hosts").getJSONObject(host).getJSONObject("servers").getJSONObject(subserver).getString("motd"), json.getJSONObject("hosts").getJSONObject(host).getJSONObject("servers").getJSONObject(subserver).getBoolean("hidden"),
-                            json.getJSONObject("hosts").getJSONObject(host).getJSONObject("servers").getJSONObject(subserver).getBoolean("restricted"), json.getJSONObject("hosts").getJSONObject(host).getJSONObject("servers").getJSONObject(subserver).getBoolean("running")));
-                    System.out.println("SubServers > Added SubServer: " + subserver);
+                    plugin.merge(subserver, json.getJSONObject("hosts").getJSONObject(host).getJSONObject("servers").getJSONObject(subserver), true);
                 }
             }
             for (String server : json.getJSONObject("servers").keySet()) {
-                plugin.servers.put(server.toLowerCase(), new Server(server, json.getJSONObject("servers").getJSONObject(server).getString("display"), new InetSocketAddress(json.getJSONObject("servers").getJSONObject(server).getString("address").split(":")[0], Integer.parseInt(json.getJSONObject("servers").getJSONObject(server).getString("address").split(":")[1])),
-                        json.getJSONObject("servers").getJSONObject(server).getString("motd"), json.getJSONObject("servers").getJSONObject(server).getBoolean("hidden"), json.getJSONObject("servers").getJSONObject(server).getBoolean("restricted")));
-                System.out.println("SubServers > Added Server: " + server);
+                plugin.merge(server, json.getJSONObject("servers").getJSONObject(server), false);
             }
-        }));
+        }))));
         while (queue.size() != 0) {
             sendPacket(queue.get(0));
             queue.remove(0);
@@ -108,6 +105,7 @@ public final class SubDataClient {
         registerPacket(new PacketDownloadLang(plugin), "SubDownloadLang");
         registerPacket(new PacketDownloadNetworkList(), "SubDownloadNetworkList");
         registerPacket(new PacketDownloadPlayerList(), "SubDownloadPlayerList");
+        registerPacket(new PacketDownloadProxyInfo(), "SubDownloadProxyInfo");
         registerPacket(new PacketDownloadServerInfo(), "SubDownloadServerInfo");
         registerPacket(new PacketDownloadServerList(), "SubDownloadServerList");
         registerPacket(new PacketInRunEvent(), "SubRunEvent");
@@ -122,6 +120,7 @@ public final class SubDataClient {
         registerPacket(PacketDownloadLang.class, "SubDownloadLang");
         registerPacket(PacketDownloadNetworkList.class, "SubDownloadNetworkList");
         registerPacket(PacketDownloadPlayerList.class, "SubDownloadPlayerList");
+        registerPacket(PacketDownloadProxyInfo.class, "SubDownloadProxyInfo");
         registerPacket(PacketDownloadServerInfo.class, "SubDownloadServerInfo");
         registerPacket(PacketDownloadServerList.class, "SubDownloadServerList");
         registerPacket(PacketStartServer.class, "SubStartServer");
@@ -408,7 +407,6 @@ public final class SubDataClient {
                     }
                 }, TimeUnit.SECONDS.toMillis(reconnect), TimeUnit.SECONDS.toMillis(reconnect));
             }
-            plugin.subdata = null;
         }
     }
 }

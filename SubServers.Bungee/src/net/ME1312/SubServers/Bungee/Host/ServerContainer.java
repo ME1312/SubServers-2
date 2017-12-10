@@ -26,6 +26,7 @@ import java.util.List;
  */
 public class ServerContainer extends BungeeServerInfo implements Server {
     private YAMLSection extra = new YAMLSection();
+    private final String signature;
     private Client client = null;
     private List<String> groups = new ArrayList<String>();
     private String nick = null;
@@ -33,10 +34,12 @@ public class ServerContainer extends BungeeServerInfo implements Server {
     private boolean restricted;
     private boolean hidden;
 
+    @SuppressWarnings("deprecation")
     public ServerContainer(String name, InetSocketAddress address, String motd, boolean hidden, boolean restricted) throws InvalidServerException {
         super(name, address, ChatColor.translateAlternateColorCodes('&', motd), restricted);
         if (Util.isNull(name, address, motd, hidden, restricted)) throw new NullPointerException();
         if (name.contains(" ")) throw new InvalidServerException("Server names cannot have spaces: " + name);
+        signature = SubAPI.getInstance().getInternals().signObject();
         SubDataServer.allowConnection(getAddress().getAddress().getHostAddress());
         this.motd = motd;
         this.restricted = restricted;
@@ -130,6 +133,11 @@ public class ServerContainer extends BungeeServerInfo implements Server {
     }
 
     @Override
+    public final String getSignature() {
+        return signature;
+    }
+
+    @Override
     public void addExtra(String handle, Object value) {
         if (Util.isNull(handle, value)) throw new NullPointerException();
         extra.set(handle, value);
@@ -178,6 +186,7 @@ public class ServerContainer extends BungeeServerInfo implements Server {
         }
         info.put("players", players);
         if (getSubData() != null) info.put("subdata", getSubData().getAddress().toString());
+        info.put("signature", signature);
         info.put("extra", getExtra().toJSON());
         return info.toString();
     }

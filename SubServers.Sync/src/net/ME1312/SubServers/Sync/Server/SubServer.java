@@ -8,8 +8,8 @@ import java.net.InetSocketAddress;
 public class SubServer extends Server {
     private boolean running;
 
-    public SubServer(String name, String display, InetSocketAddress address, String motd, boolean hidden, boolean restricted, boolean running) {
-        super(name, display, address, motd, hidden, restricted);
+    public SubServer(String signature, String name, String display, InetSocketAddress address, String motd, boolean hidden, boolean restricted, boolean running) {
+        super(signature, name, display, address, motd, hidden, restricted);
         this.running = running;
     }
 

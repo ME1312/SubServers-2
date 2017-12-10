@@ -41,6 +41,7 @@ public class PacketDownloadProxyInfo implements PacketIn, PacketOut {
         JSONObject subservers = new JSONObject();
         subservers.put("version", plugin.version.toString());
         if (plugin.bversion != null) subservers.put("beta", plugin.bversion.toString());
+        subservers.put("last-reload", plugin.resetDate);
         subservers.put("hosts", plugin.api.getHosts().size());
         subservers.put("subservers", plugin.api.getSubServers().size());
         json.put("subservers", subservers);

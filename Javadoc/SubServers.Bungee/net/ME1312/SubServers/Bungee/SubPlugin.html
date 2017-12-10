@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10,"i8":10,"i9":10};
+var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10,"i8":10,"i9":10,"i10":10};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -184,14 +184,18 @@ implements net.md_5.bungee.api.plugin.Listener</pre>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Bungee/SubPlugin.html#redis">redis</a></span></code>&nbsp;</td>
 </tr>
 <tr class="altColor">
+<td class="colFirst"><code>long</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Bungee/SubPlugin.html#resetDate">resetDate</a></span></code>&nbsp;</td>
+</tr>
+<tr class="rowColor">
 <td class="colFirst"><code><a href="../../../../net/ME1312/SubServers/Bungee/Network/SubDataServer.html" title="class in net.ME1312.SubServers.Bungee.Network">SubDataServer</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Bungee/SubPlugin.html#subdata">subdata</a></span></code>&nbsp;</td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><code><a href="../../../../net/ME1312/SubServers/Bungee/Host/SubServer.html" title="interface in net.ME1312.SubServers.Bungee.Host">SubServer</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Bungee/SubPlugin.html#sudo">sudo</a></span></code>&nbsp;</td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><code><a href="../../../../net/ME1312/SubServers/Bungee/Library/Version/Version.html" title="class in net.ME1312.SubServers.Bungee.Library.Version">Version</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Bungee/SubPlugin.html#version">version</a></span></code>&nbsp;</td>
 </tr>
@@ -263,12 +267,18 @@ implements net.md_5.bungee.api.plugin.Listener</pre>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Bungee/SubPlugin.html#resetSudo-net.ME1312.SubServers.Bungee.Event.SubStoppedEvent-">resetSudo</a></span>(<a href="../../../../net/ME1312/SubServers/Bungee/Event/SubStoppedEvent.html" title="class in net.ME1312.SubServers.Bungee.Event">SubStoppedEvent</a>&nbsp;e)</code>&nbsp;</td>
 </tr>
 <tr id="i8" class="altColor">
+<td class="colFirst"><code>java.lang.String</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Bungee/SubPlugin.html#signObject--">signObject</a></span>()</code>
+<div class="block">Returns a unique signature for use by signed objects</div>
+</td>
+</tr>
+<tr id="i9" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Bungee/SubPlugin.html#startListeners--">startListeners</a></span>()</code>
 <div class="block">Load SubServers before BungeeCord finishes</div>
 </td>
 </tr>
-<tr id="i9" class="rowColor">
+<tr id="i10" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Bungee/SubPlugin.html#stopListeners--">stopListeners</a></span>()</code>
 <div class="block">Reset all changes made by startListeners</div>
@@ -421,10 +431,19 @@ implements net.md_5.bungee.api.plugin.Listener</pre>
 <a name="redis">
 <!--   -->
 </a>
-<ul class="blockListLast">
+<ul class="blockList">
 <li class="blockList">
 <h4>redis</h4>
 <pre>public&nbsp;boolean redis</pre>
+</li>
+</ul>
+<a name="resetDate">
+<!--   -->
+</a>
+<ul class="blockListLast">
+<li class="blockList">
+<h4>resetDate</h4>
+<pre>public&nbsp;long resetDate</pre>
 </li>
 </ul>
 </li>
@@ -461,6 +480,36 @@ implements net.md_5.bungee.api.plugin.Listener</pre>
 <dl>
 <dt><span class="throwsLabel">Throws:</span></dt>
 <dd><code>java.io.IOException</code></dd>
+</dl>
+</li>
+</ul>
+<a name="stopListeners--">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>stopListeners</h4>
+<pre>public&nbsp;void&nbsp;stopListeners()</pre>
+<div class="block">Reset all changes made by startListeners</div>
+<dl>
+<dt><span class="overrideSpecifyLabel">Overrides:</span></dt>
+<dd><code>stopListeners</code>&nbsp;in class&nbsp;<code>net.md_5.bungee.BungeeCord</code></dd>
+<dt><span class="seeLabel">See Also:</span></dt>
+<dd><a href="../../../../net/ME1312/SubServers/Bungee/SubPlugin.html#startListeners--"><code>startListeners()</code></a></dd>
+</dl>
+</li>
+</ul>
+<a name="signObject--">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>signObject</h4>
+<pre>public&nbsp;java.lang.String&nbsp;signObject()</pre>
+<div class="block">Returns a unique signature for use by signed objects</div>
+<dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>Signature</dd>
 </dl>
 </li>
 </ul>
@@ -558,22 +607,6 @@ implements net.md_5.bungee.api.plugin.Listener</pre>
 <dd>Server Info</dd>
 <dt><span class="seeLabel">See Also:</span></dt>
 <dd><a href="../../../../net/ME1312/SubServers/Bungee/SubAPI.html#getServer-java.lang.String-"><code>SubAPI.getServer(String)</code></a></dd>
-</dl>
-</li>
-</ul>
-<a name="stopListeners--">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>stopListeners</h4>
-<pre>public&nbsp;void&nbsp;stopListeners()</pre>
-<div class="block">Reset all changes made by startListeners</div>
-<dl>
-<dt><span class="overrideSpecifyLabel">Overrides:</span></dt>
-<dd><code>stopListeners</code>&nbsp;in class&nbsp;<code>net.md_5.bungee.BungeeCord</code></dd>
-<dt><span class="seeLabel">See Also:</span></dt>
-<dd><a href="../../../../net/ME1312/SubServers/Bungee/SubPlugin.html#startListeners--"><code>startListeners()</code></a></dd>
 </dl>
 </li>
 </ul>

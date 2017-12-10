@@ -91,6 +91,7 @@ public class PacketDownloadHostInfo implements PacketIn, PacketOut {
             }
             info.put("servers", servers);
             if (host instanceof ClientHandler && ((ClientHandler) host).getSubData() != null) info.put("subdata", ((ClientHandler) host).getSubData().getAddress().toString());
+            info.put("signature", host.getSignature());
             info.put("extra", host.getExtra().toJSON());
         } else json.put("valid", false);
 

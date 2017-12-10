@@ -17,6 +17,7 @@ import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.event.ServerConnectEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
+import org.json.JSONObject;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -44,11 +45,13 @@ public final class SubPlugin extends BungeeCord implements Listener {
     public YAMLConfig config;
     public YAMLSection lang = null;
     public boolean redis = false;
+    public final SubAPI api = new SubAPI(this);
     public SubDataClient subdata = null;
     public final Version version = new Version(SubPlugin.class.getPackage().getImplementationVersion());
     public final Version bversion = (SubPlugin.class.getPackage().getSpecificationVersion().equals("0"))?null:new Version(SubPlugin.class.getPackage().getSpecificationVersion());
 
-    public final SubAPI api = new SubAPI(this);
+
+    public long lastReload = -1;
     private boolean posted = false;
 
     protected SubPlugin(PrintStream out) throws IOException {
@@ -243,11 +246,11 @@ public final class SubPlugin extends BungeeCord implements Listener {
                     System.out.println("PacketDownloadServerInfo(" + e.getServer() + ") returned with an invalid response");
                     break;
                 case "subserver":
-                    servers.put(json.getJSONObject("server").getString("name").toLowerCase(), new SubServer(json.getJSONObject("server").getString("name"), json.getJSONObject("server").getString("display"), new InetSocketAddress(json.getJSONObject("server").getString("address").split(":")[0], Integer.parseInt(json.getJSONObject("server").getString("address").split(":")[1])), json.getJSONObject("server").getString("motd"), json.getJSONObject("server").getBoolean("hidden"), json.getJSONObject("server").getBoolean("restricted"), json.getJSONObject("server").getBoolean("running")));
+                    servers.put(json.getJSONObject("server").getString("name").toLowerCase(), new SubServer(json.getJSONObject("server").getString("signature"), json.getJSONObject("server").getString("name"), json.getJSONObject("server").getString("display"), new InetSocketAddress(json.getJSONObject("server").getString("address").split(":")[0], Integer.parseInt(json.getJSONObject("server").getString("address").split(":")[1])), json.getJSONObject("server").getString("motd"), json.getJSONObject("server").getBoolean("hidden"), json.getJSONObject("server").getBoolean("restricted"), json.getJSONObject("server").getBoolean("running")));
                     System.out.println("SubServers > Added SubServer: " + e.getServer());
                     break;
                 default:
-                    servers.put(json.getJSONObject("server").getString("name").toLowerCase(), new Server(json.getJSONObject("server").getString("name"), json.getJSONObject("server").getString("display"), new InetSocketAddress(json.getJSONObject("server").getString("address").split(":")[0], Integer.parseInt(json.getJSONObject("server").getString("address").split(":")[1])), json.getJSONObject("server").getString("motd"), json.getJSONObject("server").getBoolean("hidden"), json.getJSONObject("server").getBoolean("restricted")));
+                    servers.put(json.getJSONObject("server").getString("name").toLowerCase(), new Server(json.getJSONObject("server").getString("signature"), json.getJSONObject("server").getString("name"), json.getJSONObject("server").getString("display"), new InetSocketAddress(json.getJSONObject("server").getString("address").split(":")[0], Integer.parseInt(json.getJSONObject("server").getString("address").split(":")[1])), json.getJSONObject("server").getString("motd"), json.getJSONObject("server").getBoolean("hidden"), json.getJSONObject("server").getBoolean("restricted")));
                     System.out.println("SubServers > Added Server: " + e.getServer());
                     break;
             }
@@ -258,6 +261,41 @@ public final class SubPlugin extends BungeeCord implements Listener {
     public void start(SubStartEvent e) {
         if (servers.keySet().contains(e.getServer().toLowerCase()) && servers.get(e.getServer().toLowerCase()) instanceof SubServer)
             ((SubServer) servers.get(e.getServer().toLowerCase())).setRunning(true);
+    }
+
+    public Boolean merge(String name, JSONObject json, boolean isSubServer) {
+        Server server = api.getServer(name);
+        if (server == null || isSubServer || !(server instanceof SubServer)) {
+            if (server == null || !server.getSignature().equals(json.getString("signature"))) {
+                if (isSubServer) {
+                    servers.put(name.toLowerCase(), new SubServer(json.getString("signature"), name, json.getString("display"), new InetSocketAddress(json.getString("address").split(":")[0],
+                            Integer.parseInt(json.getString("address").split(":")[1])), json.getString("motd"), json.getBoolean("hidden"), json.getBoolean("restricted"), json.getBoolean("running")));
+                } else {
+                    servers.put(name.toLowerCase(), new Server(json.getString("signature"), name, json.getString("display"), new InetSocketAddress(json.getString("address").split(":")[0],
+                            Integer.parseInt(json.getString("address").split(":")[1])), json.getString("motd"), json.getBoolean("hidden"), json.getBoolean("restricted")));
+                }
+
+                System.out.println("SubServers > Added "+((isSubServer)?"Sub":"")+"Server: " + name);
+                return true;
+            } else {
+                if (isSubServer) {
+                    if (json.getBoolean("running") != ((SubServer) server).isRunning())
+                        ((SubServer) server).setRunning(json.getBoolean("running"));
+                }
+                if (!json.getString("motd").equals(server.getMotd()))
+                    server.setMotd(json.getString("motd"));
+                if (json.getBoolean("hidden") != server.isHidden())
+                    server.setHidden(json.getBoolean("hidden"));
+                if (json.getBoolean("restricted") != server.isRestricted())
+                    server.setRestricted(json.getBoolean("restricted"));
+                if (!json.getString("display").equals(server.getDisplayName()))
+                    server.setDisplayName(json.getString("display"));
+
+                System.out.println("SubServers > Re-added "+((isSubServer)?"Sub":"")+"Server: " + name);
+                return false;
+            }
+        }
+        return null;
     }
 
     @EventHandler(priority = Byte.MIN_VALUE)

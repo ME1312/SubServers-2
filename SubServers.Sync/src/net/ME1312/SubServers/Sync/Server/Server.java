@@ -10,14 +10,16 @@ import java.net.InetSocketAddress;
  * Server Class
  */
 public class Server extends BungeeServerInfo {
+    private final String signature;
     private String nick = null;
     private String motd;
     private boolean restricted;
     private boolean hidden;
 
-    public Server(String name, String display, InetSocketAddress address, String motd, boolean hidden, boolean restricted) {
+    public Server(String signature, String name, String display, InetSocketAddress address, String motd, boolean hidden, boolean restricted) {
         super(name, address, ChatColor.translateAlternateColorCodes('&', motd), restricted);
         if (Util.isNull(name, address, motd, hidden, restricted)) throw new NullPointerException();
+        this.signature = signature;
         this.motd = motd;
         this.restricted = restricted;
         this.hidden = hidden;
@@ -103,5 +105,14 @@ public class Server extends BungeeServerInfo {
     public void setRestricted(boolean value) {
         if (Util.isNull(value)) throw new NullPointerException();
         this.restricted = value;
+    }
+
+    /**
+     * Get the Signature of this Object
+     *
+     * @return Object Signature
+     */
+    public final String getSignature() {
+        return signature;
     }
 }
