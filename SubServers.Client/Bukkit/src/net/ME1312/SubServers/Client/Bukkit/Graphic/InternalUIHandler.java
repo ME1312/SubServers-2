@@ -74,6 +74,9 @@ public class InternalUIHandler implements UIHandler, Listener {
                         } else if (item.equals(plugin.lang.getSection("Lang").getColoredString("Interface.Host-Menu.Group-Menu", '&'))) {
                             player.closeInventory();
                             gui.groupMenu(1);
+                        } else if (item.equals(plugin.lang.getSection("Lang").getColoredString("Interface.Group-Menu.Server-Menu", '&'))) {
+                            player.closeInventory();
+                            gui.serverMenu(1, null, null);
                         } else if (!item.equals(ChatColor.RESET.toString()) && !item.equals(plugin.lang.getSection("Lang").getColoredString("Interface.Host-Menu.No-Hosts", '&'))) {
                             player.closeInventory();
                             String obj;

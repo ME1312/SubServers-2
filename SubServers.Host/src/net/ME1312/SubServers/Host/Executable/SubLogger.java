@@ -103,10 +103,10 @@ public class SubLogger {
                     }
 
                     // Log to NETWORK
-                    if (log.get()) SubAPI.getInstance().getSubDataNetwork().sendPacket(new PacketOutExLogMessage(address, line));
+                    if (log.get() && SubAPI.getInstance().getInternals().config.get().getSection("Settings").getBoolean("Network-Log", true)) SubAPI.getInstance().getSubDataNetwork().sendPacket(new PacketOutExLogMessage(address, line));
 
                     // Log to CONSOLE
-                    if (log.get() && SubAPI.getInstance().getInternals().config.get().getSection("Settings").getBoolean("Log")) level.println(msg);
+                    if (log.get() && SubAPI.getInstance().getInternals().config.get().getSection("Settings").getBoolean("Console-Log", true)) level.println(msg);
 
                     // Log to FILE
                     if (writer != null) {

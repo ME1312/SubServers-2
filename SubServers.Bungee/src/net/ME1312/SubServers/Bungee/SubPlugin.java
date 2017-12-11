@@ -426,8 +426,8 @@ public final class SubPlugin extends BungeeCord implements Listener {
         legServers.clear();
 
         int plugins = 0;
-        if (api.listeners.size() > 0) {
-            System.out.println("SubServers > "+((posted)?"Rel":"L")+"oading SubAPI Plugins...");
+        if (!status && api.listeners.size() > 0) {
+            System.out.println("SubServers > Loading SubAPI Plugins...");
             for (NamedContainer<Runnable, Runnable> listener : api.listeners) {
                 try {
                     if (listener.name() != null) {
@@ -440,7 +440,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
             }
         }
 
-        System.out.println("SubServers > " + ((plugins > 0)?plugins+" Plugin"+((plugins == 1)?"":"s")+", ":"") + hosts + " Host"+((hosts == 1)?"":"s")+", " + servers + " Server"+((servers == 1)?"":"s")+", and " + subservers + " SubServer"+((subservers == 1)?"":"s")+" "+((posted)?"re":"")+"loaded in " + new DecimalFormat("0.000").format((Calendar.getInstance().getTime().getTime() - begin) / 1000D) + "s");
+        System.out.println("SubServers > " + ((plugins > 0)?plugins+" Plugin"+((plugins == 1)?"":"s")+", ":"") + hosts + " Host"+((hosts == 1)?"":"s")+", " + servers + " Server"+((servers == 1)?"":"s")+", and " + subservers + " SubServer"+((subservers == 1)?"":"s")+" "+((status)?"re":"")+"loaded in " + new DecimalFormat("0.000").format((Calendar.getInstance().getTime().getTime() - begin) / 1000D) + "s");
     }
 
     private void post() {

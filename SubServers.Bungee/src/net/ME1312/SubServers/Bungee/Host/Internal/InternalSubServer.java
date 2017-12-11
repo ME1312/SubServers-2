@@ -463,7 +463,6 @@ public class InternalSubServer extends SubServerContainer {
                         c += forward.edit(player, pending);
                         break;
                     }
-
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

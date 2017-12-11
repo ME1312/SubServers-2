@@ -1,8 +1,6 @@
 package net.ME1312.SubServers.Client.Bukkit.Graphic;
 
-import net.ME1312.SubServers.Client.Bukkit.Library.Container;
 import net.ME1312.SubServers.Client.Bukkit.Library.NamedContainer;
-import net.ME1312.SubServers.Client.Bukkit.Library.Util;
 import net.ME1312.SubServers.Client.Bukkit.Library.Version.Version;
 import net.ME1312.SubServers.Client.Bukkit.Network.Packet.PacketDownloadHostInfo;
 import net.ME1312.SubServers.Client.Bukkit.Network.Packet.PacketDownloadServerInfo;
@@ -17,8 +15,6 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import java.text.DecimalFormat;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Internal GUI Renderer Class
@@ -182,9 +178,15 @@ public class InternalUIRenderer extends UIRenderer {
                 inv.setItem(i++, block);
             } else i += 2;
             i++;
-            block = createItem("STAINED_GLASS_PANE", "ORANGE_STAINED_GLASS_PANE", (short) 1);
-            blockMeta = block.getItemMeta();
-            blockMeta.setDisplayName(plugin.lang.getSection("Lang").getColoredString("Interface.Host-Menu.Group-Menu", '&'));
+            if (json.getJSONObject("groups").length() <= 0) {
+                block = createItem("STAINED_GLASS_PANE", "LIME_STAINED_GLASS_PANE", (short) 5);
+                blockMeta = block.getItemMeta();
+                blockMeta.setDisplayName(plugin.lang.getSection("Lang").getColoredString("Interface.Group-Menu.Server-Menu", '&'));
+            } else {
+                block = createItem("STAINED_GLASS_PANE", "ORANGE_STAINED_GLASS_PANE", (short) 1);
+                blockMeta = block.getItemMeta();
+                blockMeta.setDisplayName(plugin.lang.getSection("Lang").getColoredString("Interface.Host-Menu.Group-Menu", '&'));
+            }
             block.setItemMeta(blockMeta);
             inv.setItem(i++, block);
             inv.setItem(i++, block);
@@ -262,16 +264,14 @@ public class InternalUIRenderer extends UIRenderer {
                 inv.setItem(15, block);
                 inv.setItem(16, block);
 
-                if (!json.getJSONObject("host").getBoolean("enabled")) {
-                    block = createItem("STAINED_GLASS_PANE", "GRAY_STAINED_GLASS_PANE", (short) 7);
-                    blockMeta = block.getItemMeta();
-                    blockMeta.setDisplayName(ChatColor.GRAY+ChatColor.stripColor(plugin.lang.getSection("Lang").getColoredString("Interface.Host-Admin.Plugins", '&')));
+                if (!json.getJSONObject("host").getBoolean("enabled") || hostPlugins.size() <= 0) {
+                    block = div;
                 } else {
                     block = createItem("STAINED_GLASS_PANE", "BLUE_STAINED_GLASS_PANE", (short) 11);
                     blockMeta = block.getItemMeta();
                     blockMeta.setDisplayName(plugin.lang.getSection("Lang").getColoredString("Interface.Host-Admin.Plugins", '&'));
+                    block.setItemMeta(blockMeta);
                 }
-                block.setItemMeta(blockMeta);
                 inv.setItem(27, block);
                 inv.setItem(28, block);
 
@@ -577,7 +577,7 @@ public class InternalUIRenderer extends UIRenderer {
                 lastPage = page;
                 List<String> renderers = new ArrayList<String>();
                 for (String renderer : renderers) {
-                    if (subserverPlugins.get(renderer).isEnabled(json.getJSONObject("host"))) renderers.add(renderer);
+                    if (hostPlugins.get(renderer).isEnabled(json.getJSONObject("host"))) renderers.add(renderer);
                 }
                 Collections.sort(renderers);
 
@@ -1076,16 +1076,14 @@ public class InternalUIRenderer extends UIRenderer {
                     inv.setItem(14, block);
                 }
 
-                if (!json.getJSONObject("server").getBoolean("enabled")) {
-                    block = createItem("STAINED_GLASS_PANE", "GRAY_STAINED_GLASS_PANE", (short) 7);
-                    blockMeta = block.getItemMeta();
-                    blockMeta.setDisplayName(ChatColor.GRAY+ChatColor.stripColor(plugin.lang.getSection("Lang").getColoredString("Interface.SubServer-Admin.Plugins", '&')));
+                if (!json.getJSONObject("server").getBoolean("enabled") || subserverPlugins.size() <= 0) {
+                    block = div;
                 } else {
                     block = createItem("STAINED_GLASS_PANE", "BLUE_STAINED_GLASS_PANE", (short) 11);
                     blockMeta = block.getItemMeta();
                     blockMeta.setDisplayName(plugin.lang.getSection("Lang").getColoredString("Interface.SubServer-Admin.Plugins", '&'));
+                    block.setItemMeta(blockMeta);
                 }
-                block.setItemMeta(blockMeta);
                 inv.setItem(27, block);
                 inv.setItem(28, block);
 
