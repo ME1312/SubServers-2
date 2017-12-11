@@ -172,7 +172,9 @@ public class ExternalHost extends Host implements ClientHandler {
             }
             queue(new PacketExRemoveServer(name, json -> {
                 if (json.getInt("r") == 0) {
-                    for (String group : getSubServer(name).getGroups()) getSubServer(name).removeGroup(group);
+                    List<String> groups = new ArrayList<String>();
+                    groups.addAll(getSubServer(name).getGroups());
+                    for (String group : groups) getSubServer(name).removeGroup(group);
                     servers.remove(name.toLowerCase());
                 }
             }));
