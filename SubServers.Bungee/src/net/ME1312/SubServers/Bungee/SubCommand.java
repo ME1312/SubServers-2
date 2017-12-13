@@ -4,6 +4,7 @@ import net.ME1312.SubServers.Bungee.Host.Host;
 import net.ME1312.SubServers.Bungee.Host.Server;
 import net.ME1312.SubServers.Bungee.Host.SubCreator;
 import net.ME1312.SubServers.Bungee.Host.SubServer;
+import net.ME1312.SubServers.Bungee.Library.Compatibility.CommandX;
 import net.ME1312.SubServers.Bungee.Library.NamedContainer;
 import net.ME1312.SubServers.Bungee.Library.Util;
 import net.ME1312.SubServers.Bungee.Library.Version.Version;
@@ -14,7 +15,6 @@ import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
-import net.md_5.bungee.api.plugin.TabExecutor;
 import net.md_5.bungee.command.ConsoleCommandSender;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -34,11 +34,22 @@ import java.util.*;
  * Plugin Command Class
  */
 @SuppressWarnings("deprecation")
-public final class SubCommand extends Command implements TabExecutor {
+public final class SubCommand extends CommandX {
     private SubPlugin plugin;
     private String label;
 
-    protected SubCommand(SubPlugin plugin, String command) {
+    protected static NamedContainer<SubCommand, CommandX> newInstance(SubPlugin plugin, String command) {
+        NamedContainer<SubCommand, CommandX> cmd = new NamedContainer<>(new SubCommand(plugin, command), null);
+        if (plugin.api.getGameVersion().compareTo(new Version("1.13")) < 0) {
+            cmd.set(cmd.name());
+            return cmd;
+        } else {
+            cmd.set(new net.ME1312.SubServers.Bungee.Library.Compatibility.v1_13.CommandX(cmd.name()));
+            return cmd;
+        }
+    }
+
+    private SubCommand(SubPlugin plugin, String command) {
         super(command);
         this.plugin = plugin;
         this.label = '/' + command;
@@ -50,7 +61,6 @@ public final class SubCommand extends Command implements TabExecutor {
      * @param sender Sender
      * @param args Arguments
      */
-    @Override
     public void execute(CommandSender sender, String[] args) {
         if (sender instanceof ConsoleCommandSender) {
             if (args.length > 0) {
@@ -384,111 +394,6 @@ public final class SubCommand extends Command implements TabExecutor {
         }
     }
 
-    /**
-     * Tab complete for players
-     *
-     * @param sender Sender
-     * @param args Arguments
-     * @return Tab completes
-     */
-    @Override
-    public Iterable<String> onTabComplete(CommandSender sender, String[] args) {
-        String last = (args.length > 0)?args[args.length - 1].toLowerCase():"";
-        if (args.length <= 1) {
-            List<String> cmds = Arrays.asList("help", "list", "info", "status", "version", "start", "stop", "kill", "terminate", "cmd", "command", "create");
-            if (last.length() == 0) {
-                return cmds;
-            } else {
-                List<String> list = new ArrayList<String>();
-                for (String cmd : cmds) {
-                    if (cmd.startsWith(last)) list.add(cmd);
-                }
-                return list;
-            }
-        } else {
-            if (args[0].equals("info") || args[0].equals("status") ||
-                    args[0].equals("start") ||
-                    args[0].equals("stop") ||
-                    args[0].equals("kill") || args[0].equals("terminate")) {
-                if (args.length == 2) {
-                    List<String> list = new ArrayList<String>();
-                    if (last.length() == 0) {
-                        for (SubServer server : plugin.api.getSubServers().values()) list.add(server.getName());
-                    } else {
-                        for (SubServer server : plugin.api.getSubServers().values()) {
-                            if (server.getName().toLowerCase().startsWith(last)) list.add(server.getName());
-                        }
-                    }
-                    return list;
-                }
-                return Collections.emptyList();
-            } else if (args[0].equals("cmd") || args[0].equals("command")) {
-                if (args.length == 2) {
-                    List<String> list = new ArrayList<String>();
-                    if (last.length() == 0) {
-                        for (SubServer server : plugin.api.getSubServers().values()) list.add(server.getName());
-                    } else {
-                        for (SubServer server : plugin.api.getSubServers().values()) {
-                            if (server.getName().toLowerCase().startsWith(last)) list.add(server.getName());
-                        }
-                    }
-                    return list;
-                } else if (args.length == 3) {
-                    if (last.length() == 0) {
-                        return Collections.singletonList("<Command>");
-                    }
-                } else {
-                    if (last.length() == 0) {
-                        return Collections.singletonList("[Args...]");
-                    }
-                }
-                return Collections.emptyList();
-            } else if (args[0].equals("create")) {
-                if (args.length == 2) {
-                    if (last.length() == 0) {
-                        return Collections.singletonList("<Name>");
-                    }
-                } else if (args.length == 3) {
-                    List<String> list = new ArrayList<String>();
-                    if (last.length() == 0) {
-                        for (Host host : plugin.api.getHosts().values()) list.add(host.getName());
-                    } else {
-                        for (Host host : plugin.api.getHosts().values()) {
-                            if (host.getName().toLowerCase().startsWith(last)) list.add(host.getName());
-                        }
-                    }
-                    return list;
-                } else if (args.length == 4) {
-                    List<String> list = new ArrayList<String>();
-                    Map<String, Host> hosts = plugin.api.getHosts();
-                    if (hosts.keySet().contains(args[2].toLowerCase())) {
-                        if (last.length() == 0) {
-                            for (SubCreator.ServerTemplate template : hosts.get(args[2].toLowerCase()).getCreator().getTemplates().values()) list.add(template.toString());
-                        } else {
-                            for (SubCreator.ServerTemplate template : hosts.get(args[2].toLowerCase()).getCreator().getTemplates().values()) {
-                                if (template.toString().toLowerCase().startsWith(last)) list.add(template.toString());
-                            }
-                        }
-                    } else {
-                        list.add("<Template>");
-                    }
-                    return list;
-                } else if (args.length == 5) {
-                    if (last.length() == 0) {
-                        return Collections.singletonList("<Version>");
-                    }
-                } else if (args.length == 6) {
-                    if (last.length() == 0) {
-                        return Collections.singletonList("<Port>");
-                    }
-                }
-                return Collections.emptyList();
-            } else {
-                return Collections.emptyList();
-            }
-        }
-    }
-
     private String[] printHelp() {
         return new String[]{
                 "SubServers > Console Command Help:",
@@ -511,13 +416,136 @@ public final class SubCommand extends Command implements TabExecutor {
     }
 
     /**
+     * Suggest command arguments
+     *
+     * @param sender Sender
+     * @param args Arguments
+     * @return The validator's response and list of possible arguments
+     */
+    public NamedContainer<String, List<String>> suggestArguments(CommandSender sender, String[] args) {
+        String last = (args.length > 0)?args[args.length - 1].toLowerCase():"";
+        if (args.length <= 1) {
+            List<String> cmds = Arrays.asList("help", "list", "info", "status", "version", "start", "stop", "kill", "terminate", "cmd", "command", "create");
+            if (last.length() == 0) {
+                return new NamedContainer<>(null, cmds);
+            } else {
+                List<String> list = new ArrayList<String>();
+                for (String cmd : cmds) {
+                    if (cmd.startsWith(last)) list.add(last + cmd.substring(last.length()));
+                }
+                return new NamedContainer<>((list.size() <= 0)?plugin.lang.get().getSection("Lang").getColoredString("Command.Generic.Invalid-Subcommand", '&').replace("$str$", args[0]):null, list);
+            }
+        } else {
+            if (args[0].equals("info") || args[0].equals("status") ||
+                    args[0].equals("start") ||
+                    args[0].equals("stop") ||
+                    args[0].equals("kill") || args[0].equals("terminate")) {
+                    List<String> list = new ArrayList<String>();
+                if (args.length == 2) {
+                    if (last.length() == 0) {
+                        for (SubServer server : plugin.api.getSubServers().values()) list.add(server.getName());
+                    } else {
+                        for (SubServer server : plugin.api.getSubServers().values()) {
+                            if (server.getName().toLowerCase().startsWith(last))
+                                list.add(last + server.getName().substring(last.length()));
+                        }
+                    }
+                    return new NamedContainer<>((list.size() <= 0)?plugin.lang.get().getSection("Lang").getColoredString("Command.Generic.Unknown-SubServer", '&').replace("$str$", args[0]):null, list);
+                } else {
+                    return new NamedContainer<>(null, Collections.emptyList());
+                }
+            } else if (args[0].equals("cmd") || args[0].equals("command")) {
+                if (args.length == 2) {
+                    List<String> list = new ArrayList<String>();
+                    if (last.length() == 0) {
+                        for (SubServer server : plugin.api.getSubServers().values()) list.add(server.getName());
+                    } else {
+                        for (SubServer server : plugin.api.getSubServers().values()) {
+                            if (server.getName().toLowerCase().startsWith(last)) list.add(last + server.getName().substring(last.length()));
+                        }
+                    }
+                    return new NamedContainer<>((list.size() <= 0)?plugin.lang.get().getSection("Lang").getColoredString("Command.Generic.Unknown-SubServer", '&').replace("$str$", args[0]):null, list);
+                } else if (args.length == 3) {
+                    return new NamedContainer<>(null, Collections.singletonList("<Command>"));
+                } else {
+                    return new NamedContainer<>(null, Collections.singletonList("[Args...]"));
+                }
+            } else if (args[0].equals("create")) {
+                if (args.length == 2) {
+                    return new NamedContainer<>(null, Collections.singletonList("<Name>"));
+                } else if (args.length == 3) {
+                    List<String> list = new ArrayList<String>();
+                    if (last.length() == 0) {
+                        for (Host host : plugin.api.getHosts().values()) list.add(host.getName());
+                    } else {
+                        for (Host host : plugin.api.getHosts().values()) {
+                            if (host.getName().toLowerCase().startsWith(last)) list.add(last + host.getName().substring(last.length()));
+                        }
+                    }
+                    return new NamedContainer<>((list.size() <= 0)?plugin.lang.get().getSection("Lang").getColoredString("Command.Generic.Unknown-Host", '&').replace("$str$", args[0]):null, list);
+                } else if (args.length == 4) {
+                    List<String> list = new ArrayList<String>();
+                    Map<String, Host> hosts = plugin.api.getHosts();
+                    if (last.length() == 0) {
+                        for (SubCreator.ServerTemplate template : hosts.get(args[2].toLowerCase()).getCreator().getTemplates().values()) list.add(template.toString());
+                    } else {
+                        for (SubCreator.ServerTemplate template : hosts.get(args[2].toLowerCase()).getCreator().getTemplates().values()) {
+                            if (template.toString().toLowerCase().startsWith(last)) list.add(last + template.toString().substring(last.length()));
+                        }
+                    }
+                    return new NamedContainer<>((list.size() <= 0)?plugin.lang.get().getSection("Lang").getColoredString("Command.Creator.Invalid-Template", '&').replace("$str$", args[0]):null, list);
+                } else if (args.length == 5) {
+                    if (last.length() > 0) {
+                        if (new Version("1.8").compareTo(new Version(last)) > 0) {
+                            return new NamedContainer<>(plugin.lang.get().getSection("Lang").getColoredString("Command.Creator.Invalid-Version", '&'), Collections.emptyList());
+                        }
+                    }
+                    return new NamedContainer<>(null, Collections.singletonList("<Version>"));
+                } else if (args.length == 6) {
+                    if (last.length() > 0) {
+                        if (Util.isException(() -> Integer.parseInt(last)) || Integer.parseInt(last) <= 0 || Integer.parseInt(last) > 65535) {
+                            return new NamedContainer<>(plugin.lang.get().getSection("Lang").getColoredString("Command.Creator.Invalid-Port", '&'), Collections.emptyList());
+                        }
+                    }
+                    return new NamedContainer<>(null, Collections.singletonList("<Port>"));
+                } else {
+                    return new NamedContainer<>(null, Collections.emptyList());
+                }
+            } else {
+                return new NamedContainer<>(plugin.lang.get().getSection("Lang").getColoredString("Command.Generic.Invalid-Subcommand", '&').replace("$str$", args[0]), Collections.emptyList());
+            }
+        }
+    }
+
+    /**
      * BungeeCord /server
      */
-    public static final class BungeeServer extends Command implements TabExecutor {
+    public static final class BungeeServer extends net.ME1312.SubServers.Bungee.Library.Compatibility.CommandX {
         private SubPlugin plugin;
-        protected BungeeServer(SubPlugin plugin, String command) {
+        private BungeeServer(SubPlugin plugin, String command) {
             super(command, "bungeecord.command.server");
             this.plugin = plugin;
+        }
+
+        protected static NamedContainer<BungeeServer, CommandX> newInstance(SubPlugin plugin, String command) {
+            NamedContainer<BungeeServer, CommandX> cmd = new NamedContainer<>(new BungeeServer(plugin, command), null);
+            if (plugin.api.getGameVersion().compareTo(new Version("1.13")) < 0) {
+                cmd.set(cmd.name());
+                return cmd;
+            } else {
+                cmd.set(new net.ME1312.SubServers.Bungee.Library.Compatibility.v1_13.CommandX(new CommandX(command) {
+                    @Override
+                    public void execute(CommandSender sender, String[] args) {
+                        cmd.name().suggestArguments(sender, args);
+                    }
+
+                    @Override
+                    public NamedContainer<String, List<String>> suggestArguments(CommandSender sender, String[] args) {
+                        return cmd.name().suggestArguments(sender, args);
+                    }
+                }));
+                return cmd;
+            }
         }
 
         /**
@@ -566,27 +594,26 @@ public final class SubCommand extends Command implements TabExecutor {
         }
 
         /**
-         * Tab completer
+         * Suggest command arguments
          *
          * @param sender Sender
          * @param args Arguments
-         * @return Tab completes
+         * @return The validator's response and list of possible arguments
          */
-        @Override
-        public Iterable<String> onTabComplete(CommandSender sender, String[] args) {
+        public NamedContainer<String, List<String>> suggestArguments(CommandSender sender, String[] args) {
             if (args.length <= 1) {
                 String last = (args.length > 0)?args[args.length - 1].toLowerCase():"";
                 if (last.length() == 0) {
-                    return plugin.getServers().keySet();
+                    return new NamedContainer<>(null, new LinkedList<>(plugin.getServers().keySet()));
                 } else {
                     List<String> list = new ArrayList<String>();
                     for (String server : plugin.getServers().keySet()) {
                         if (server.toLowerCase().startsWith(last)) list.add(server);
                     }
-                    return list;
+                    return new NamedContainer<>((list.size() <= 0)?plugin.lang.get().getSection("Lang").getColoredString("Bungee.Server.Invalid", '&').replace("$str$", args[0]):null, list);
                 }
             } else {
-                return Collections.emptyList();
+                return new NamedContainer<>(null, Collections.emptyList());
             }
         }
     }

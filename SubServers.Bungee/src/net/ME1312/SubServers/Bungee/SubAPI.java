@@ -26,10 +26,11 @@ import java.util.*;
  */
 public final class SubAPI {
     LinkedList<NamedContainer<Runnable, Runnable>> listeners = new LinkedList<NamedContainer<Runnable, Runnable>>();
+    LinkedList<Runnable> reloadListeners = new LinkedList<Runnable>();
+    private HashMap<String, Object> knownSignatures = new HashMap<String, Object>();
     boolean ready = false;
     private SubPlugin plugin;
     private static SubAPI api;
-
 
     protected SubAPI(SubPlugin plugin) {
         this.plugin = plugin;
@@ -60,10 +61,22 @@ public final class SubAPI {
      * Adds a SubAPI Listener
      *
      * @param enable An Event that will be called when SubAPI is ready
-     * @param disable An Event that will be called before SubAPI is disabled
+     * @param disable An Event that will be called before SubAPI is disabled (your plugin should reset it's values in case this is a hard-reset instead of a shutdown)
      */
     public void addListener(Runnable enable, Runnable disable) {
-        listeners.add(new NamedContainer<Runnable, Runnable>(enable, disable));
+        if (!Util.isNull(enable, disable)) listeners.add(new NamedContainer<Runnable, Runnable>(enable, disable));
+    }
+
+    /**
+     * Adds a SubAPI Listener
+     *
+     * @param enable An Event that will be called when SubAPI is ready
+     * @param reload An Event that will be called after SubAPI is soft-reloaded
+     * @param disable An Event that will be called before SubAPI is disabled (your plugin should reset it's values in case this is a hard-reset instead of a shutdown)
+     */
+    public void addListener(Runnable enable, Runnable reload, Runnable disable) {
+        addListener(enable, disable);
+        if (reload != null) reloadListeners.add(reload);
     }
 
     /**
@@ -491,6 +504,53 @@ public final class SubAPI {
     }
 
     /**
+     * Get an Object Signature without linking the Signature to any object
+     *
+     * @return Anonymous Object Signature
+     */
+    public String signAnonymousObject() {
+        return plugin.getNewSignature();
+    }
+
+    /**
+     * Signs an Object
+     *
+     * @param object Object to Sign
+     * @return Object's Signature (or an empty string if the object was null)
+     */
+    public String signObject(Object object) {
+        if (object == null) {
+            return "";
+        } else {
+            String signature = signAnonymousObject();
+            knownSignatures.put(signature, object);
+            return signature;
+        }
+    }
+
+    /**
+     * Get an Object by it's Signature
+     *
+     * @param signature Object's Signature
+     * @param <R> Expected Object Type
+     * @return Object that is tied to this Signature (or null if the signature is unknown)
+     */
+    @SuppressWarnings("unchecked")
+    public <R> R getObjectBySignature(String signature) {
+        if (Util.isNull(signature)) throw new NullPointerException();
+        return (R) knownSignatures.get(signature);
+    }
+
+    /**
+     * Invalidate an Object Signature. This will remove the link between the Signature and the Object
+     *
+     * @param signature Object's Signature
+     */
+    public void invalidateObjectSignature(String signature) {
+        knownSignatures.remove(signature);
+    }
+
+    /**
      * Gets the Runtime Directory
      *
      * @return Directory
@@ -532,6 +592,19 @@ public final class SubAPI {
      * @return Minecraft Version
      */
     public Version getGameVersion() {
-        return new Version(plugin.getGameVersion());
+        if (System.getProperty("subservers.minecraft.version", "").length() > 0) {
+            return new Version(System.getProperty("subservers.minecraft.version"));
+        } else {
+            String raw = plugin.getGameVersion();
+            if (raw.contains(",")) {
+                String[] split = raw.split(",\\s*");
+                return new Version(split[split.length - 1]);
+            } else if (raw.contains("-")) {
+                String[] split = raw.split("\\s*-\\s*");
+                return new Version(split[split.length - 1]);
+            } else {
+                return new Version(plugin.getGameVersion());
+            }
+        }
     }
 }

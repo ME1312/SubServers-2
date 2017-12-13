@@ -33,12 +33,11 @@ public class ServerContainer extends BungeeServerInfo implements Server {
     private boolean restricted;
     private boolean hidden;
 
-    @SuppressWarnings("deprecation")
     public ServerContainer(String name, InetSocketAddress address, String motd, boolean hidden, boolean restricted) throws InvalidServerException {
         super(name, address, ChatColor.translateAlternateColorCodes('&', motd), restricted);
         if (Util.isNull(name, address, motd, hidden, restricted)) throw new NullPointerException();
         if (name.contains(" ")) throw new InvalidServerException("Server names cannot have spaces: " + name);
-        signature = SubAPI.getInstance().getInternals().signObject();
+        signature = SubAPI.getInstance().signAnonymousObject();
         SubDataServer.allowConnection(getAddress().getAddress().getHostAddress());
         this.motd = motd;
         this.restricted = restricted;

@@ -63,12 +63,12 @@ public class InternalUIRenderer extends UIRenderer {
         reopen();
     }
 
-    ItemStack createItem(String material, String newdata, short olddata) {
+    ItemStack createItem(String material, String name, short damage) {
         try {
             if (plugin.api.getGameVersion().compareTo(new Version("1.13")) < 0) {
-                return ItemStack.class.getConstructor(Material.class, int.class, short.class).newInstance(Material.valueOf(material), 1, olddata);
+                return ItemStack.class.getConstructor(Material.class, int.class, short.class).newInstance(Material.valueOf(material), 1, damage);
             } else {
-                return new ItemStack(Material.valueOf(newdata), 1);
+                return new ItemStack(Material.valueOf(name), 1);
             }
         } catch (Exception e) {
             return new ItemStack(Material.AIR);
@@ -181,7 +181,7 @@ public class InternalUIRenderer extends UIRenderer {
             if (json.getJSONObject("groups").length() <= 0) {
                 block = createItem("STAINED_GLASS_PANE", "LIME_STAINED_GLASS_PANE", (short) 5);
                 blockMeta = block.getItemMeta();
-                blockMeta.setDisplayName(plugin.lang.getSection("Lang").getColoredString("Interface.Group-Menu.Server-Menu", '&'));
+                blockMeta.setDisplayName(plugin.lang.getSection("Lang").getColoredString("Interface.Host-Menu.Server-Menu", '&'));
             } else {
                 block = createItem("STAINED_GLASS_PANE", "ORANGE_STAINED_GLASS_PANE", (short) 1);
                 blockMeta = block.getItemMeta();

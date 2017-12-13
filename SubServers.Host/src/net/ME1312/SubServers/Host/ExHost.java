@@ -73,7 +73,7 @@ public final class ExHost {
         log = new Logger("SubServers");
         try {
             Logger.setup(System.out, System.err, dir);
-            log.info.println("Loading SubServers.Host v" + version.toString() + " Libraries... ");
+            log.info.println("Loading SubServers.Host v" + version.toString() + " Libraries");
             dir.mkdirs();
             new File(dir, "Plugins").mkdir();
             if (!(new UniversalFile(dir, "config.yml").exists())) {

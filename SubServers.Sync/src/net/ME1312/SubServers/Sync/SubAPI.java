@@ -142,11 +142,24 @@ public final class SubAPI {
     }
 
     /**
-     * Gets the Recommended Minecraft Version
+     * Gets the Latest Supported Minecraft Version
      *
      * @return Minecraft Version
      */
     public Version getGameVersion() {
-        return new Version(plugin.getGameVersion());
+        if (System.getProperty("subservers.minecraft.version", "").length() > 0) {
+            return new Version(System.getProperty("subservers.minecraft.version"));
+        } else {
+            String raw = plugin.getGameVersion();
+            if (raw.contains(",")) {
+                String[] split = raw.split(",\\s*");
+                return new Version(split[split.length - 1]);
+            } else if (raw.contains("-")) {
+                String[] split = raw.split("\\s*-\\s*");
+                return new Version(split[split.length - 1]);
+            } else {
+                return new Version(plugin.getGameVersion());
+            }
+        }
     }
 }

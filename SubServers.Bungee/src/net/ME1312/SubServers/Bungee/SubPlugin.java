@@ -63,7 +63,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
     private BigInteger lastSignature = new BigInteger("-1");
 
     protected SubPlugin(PrintStream out) throws IOException {
-        System.out.println("SubServers > Loading SubServers.Bungee v" + version.toString() + " Libraries... ");
+        System.out.println("SubServers > Loading SubServers.Bungee v" + version.toString() + " Libraries (for Minecraft " + api.getGameVersion() + ")");
 
         this.out = out;
         if (!(new UniversalFile(dir, "config.yml").exists())) {
@@ -91,7 +91,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
         if (!(new UniversalFile(dir, "lang.yml").exists())) {
             Util.copyFromJar(SubPlugin.class.getClassLoader(), "net/ME1312/SubServers/Bungee/Library/Files/lang.yml", new UniversalFile(dir, "lang.yml").getPath());
             System.out.println("SubServers > Created ~/SubServers/lang.yml");
-        } else if ((new Version((new YAMLConfig(new UniversalFile(dir, "lang.yml"))).get().getString("Version", "0")).compareTo(new Version("2.12.1e+"))) != 0) {
+        } else if ((new Version((new YAMLConfig(new UniversalFile(dir, "lang.yml"))).get().getString("Version", "0")).compareTo(new Version("2.13a+"))) != 0) {
             Files.move(new UniversalFile(dir, "lang.yml").toPath(), new UniversalFile(dir, "lang.old" + Math.round(Math.random() * 100000) + ".yml").toPath());
             Util.copyFromJar(SubPlugin.class.getClassLoader(), "net/ME1312/SubServers/Bungee/Library/Files/lang.yml", new UniversalFile(dir, "lang.yml").getPath());
             System.out.println("SubServers > Updated ~/SubServers/lang.yml");
@@ -426,16 +426,27 @@ public final class SubPlugin extends BungeeCord implements Listener {
         legServers.clear();
 
         int plugins = 0;
-        if (!status && api.listeners.size() > 0) {
-            System.out.println("SubServers > Loading SubAPI Plugins...");
-            for (NamedContainer<Runnable, Runnable> listener : api.listeners) {
-                try {
-                    if (listener.name() != null) {
-                        listener.name().run();
+        List<?> listeners = (status)?api.reloadListeners:api.listeners;
+        if (listeners.size() > 0) {
+            System.out.println("SubServers > "+((status)?"Rel":"L")+"oading SubAPI Plugins...");
+            for (Object obj : listeners) {
+                if (status) {
+                    try {
+                        ((Runnable) obj).run();
                         plugins++;
+                    } catch (Throwable e) {
+                        new InvocationTargetException(e, "Problem enabling plugin").printStackTrace();
                     }
-                } catch (Throwable e) {
-                    new InvocationTargetException(e, "Problem enabling plugin").printStackTrace();
+                } else {
+                    NamedContainer<Runnable, Runnable> listener = (NamedContainer<Runnable, Runnable>) obj;
+                    try {
+                        if (listener.name() != null) {
+                            listener.name().run();
+                            plugins++;
+                        }
+                    } catch (Throwable e) {
+                        new InvocationTargetException(e, "Problem enabling plugin").printStackTrace();
+                    }
                 }
             }
         }
@@ -446,12 +457,12 @@ public final class SubPlugin extends BungeeCord implements Listener {
     private void post() {
         if (getPluginManager().getPlugin("RedisBungee") != null) redis = true;
         if (config.get().getSection("Settings").getBoolean("Override-Bungee-Commands", true)) {
-            getPluginManager().registerCommand(null, new SubCommand.BungeeServer(this, "server"));
+            getPluginManager().registerCommand(null, SubCommand.BungeeServer.newInstance(this, "server").get());
             getPluginManager().registerCommand(null, new SubCommand.BungeeList(this, "glist"));
         }
-        getPluginManager().registerCommand(null, new SubCommand(this, "subservers"));
-        getPluginManager().registerCommand(null, new SubCommand(this, "subserver"));
-        getPluginManager().registerCommand(null, new SubCommand(this, "sub"));
+        getPluginManager().registerCommand(null, SubCommand.newInstance(this, "subservers").get());
+        getPluginManager().registerCommand(null, SubCommand.newInstance(this, "subserver").get());
+        getPluginManager().registerCommand(null, SubCommand.newInstance(this, "sub").get());
 
         new Metrics(this);
         new Timer().schedule(new TimerTask() {
@@ -533,13 +544,19 @@ public final class SubPlugin extends BungeeCord implements Listener {
         exServers.clear();
     }
 
-    /**
-     * Returns a unique signature for use by signed objects
-     *
-     * @return Signature
-     */
-    public String signObject() {
-        return (lastSignature = lastSignature.add(BigInteger.ONE)).toString();
+    String getNewSignature() {
+        BigInteger number = (lastSignature = lastSignature.add(BigInteger.ONE));
+        final BigInteger BASE = BigInteger.valueOf(64);
+        final String DIGITS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz+/";
+
+        StringBuilder result = new StringBuilder();
+        while (number.compareTo(BigInteger.ZERO) == 1) { // number > 0
+            BigInteger[] divmod = number.divideAndRemainder(BASE);
+            number = divmod[0];
+            int digit = divmod[1].intValue();
+            result.insert(0, DIGITS.charAt(digit));
+        }
+        return (result.length() == 0) ? DIGITS.substring(0, 1) : result.toString();
     }
 
     /**

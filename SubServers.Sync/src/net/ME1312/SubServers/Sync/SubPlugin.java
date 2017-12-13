@@ -55,7 +55,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
     private boolean posted = false;
 
     protected SubPlugin(PrintStream out) throws IOException {
-        System.out.println("SubServers > Loading SubServers.Sync v" + version.toString() + " Libraries... ");
+        System.out.println("SubServers > Loading SubServers.Sync v" + version.toString() + " Libraries (for Minecraft " + api.getGameVersion() + ")");
 
         this.out = out;
         if (!(new UniversalFile(dir, "config.yml").exists())) {

@@ -101,7 +101,12 @@ var activeTableTab = "activeTableTab";
 <li>net.md_5.bungee.api.plugin.Command</li>
 <li>
 <ul class="inheritance">
+<li><a href="../../../../net/ME1312/SubServers/Bungee/Library/Compatibility/CommandX.html" title="class in net.ME1312.SubServers.Bungee.Library.Compatibility">net.ME1312.SubServers.Bungee.Library.Compatibility.CommandX</a></li>
+<li>
+<ul class="inheritance">
 <li>net.ME1312.SubServers.Bungee.SubCommand.BungeeServer</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -121,8 +126,7 @@ var activeTableTab = "activeTableTab";
 <hr>
 <br>
 <pre>public static final class <span class="typeNameLabel">SubCommand.BungeeServer</span>
-extends net.md_5.bungee.api.plugin.Command
-implements net.md_5.bungee.api.plugin.TabExecutor</pre>
+extends <a href="../../../../net/ME1312/SubServers/Bungee/Library/Compatibility/CommandX.html" title="class in net.ME1312.SubServers.Bungee.Library.Compatibility">CommandX</a></pre>
 <div class="block">BungeeCord /server</div>
 </li>
 </ul>
@@ -150,13 +154,20 @@ implements net.md_5.bungee.api.plugin.TabExecutor</pre>
 </td>
 </tr>
 <tr id="i1" class="rowColor">
-<td class="colFirst"><code>java.lang.Iterable&lt;java.lang.String&gt;</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Bungee/SubCommand.BungeeServer.html#onTabComplete-net.md_5.bungee.api.CommandSender-java.lang.String:A-">onTabComplete</a></span>(net.md_5.bungee.api.CommandSender&nbsp;sender,
-             java.lang.String[]&nbsp;args)</code>
-<div class="block">Tab completer</div>
+<td class="colFirst"><code><a href="../../../../net/ME1312/SubServers/Bungee/Library/NamedContainer.html" title="class in net.ME1312.SubServers.Bungee.Library">NamedContainer</a>&lt;java.lang.String,java.util.List&lt;java.lang.String&gt;&gt;</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Bungee/SubCommand.BungeeServer.html#suggestArguments-net.md_5.bungee.api.CommandSender-java.lang.String:A-">suggestArguments</a></span>(net.md_5.bungee.api.CommandSender&nbsp;sender,
+                java.lang.String[]&nbsp;args)</code>
+<div class="block">Suggest command arguments</div>
 </td>
 </tr>
 </table>
+<ul class="blockList">
+<li class="blockList"><a name="methods.inherited.from.class.net.ME1312.SubServers.Bungee.Library.Compatibility.CommandX">
+<!--   -->
+</a>
+<h3>Methods inherited from class&nbsp;net.ME1312.SubServers.Bungee.Library.Compatibility.<a href="../../../../net/ME1312/SubServers/Bungee/Library/Compatibility/CommandX.html" title="class in net.ME1312.SubServers.Bungee.Library.Compatibility">CommandX</a></h3>
+<code><a href="../../../../net/ME1312/SubServers/Bungee/Library/Compatibility/CommandX.html#onTabComplete-net.md_5.bungee.api.CommandSender-java.lang.String:A-">onTabComplete</a></code></li>
+</ul>
 <ul class="blockList">
 <li class="blockList"><a name="methods.inherited.from.class.net.md_5.bungee.api.plugin.Command">
 <!--   -->
@@ -203,23 +214,23 @@ implements net.md_5.bungee.api.plugin.TabExecutor</pre>
 </dl>
 </li>
 </ul>
-<a name="onTabComplete-net.md_5.bungee.api.CommandSender-java.lang.String:A-">
+<a name="suggestArguments-net.md_5.bungee.api.CommandSender-java.lang.String:A-">
 <!--   -->
 </a>
 <ul class="blockListLast">
 <li class="blockList">
-<h4>onTabComplete</h4>
-<pre>public&nbsp;java.lang.Iterable&lt;java.lang.String&gt;&nbsp;onTabComplete(net.md_5.bungee.api.CommandSender&nbsp;sender,
-                                                          java.lang.String[]&nbsp;args)</pre>
-<div class="block">Tab completer</div>
+<h4>suggestArguments</h4>
+<pre>public&nbsp;<a href="../../../../net/ME1312/SubServers/Bungee/Library/NamedContainer.html" title="class in net.ME1312.SubServers.Bungee.Library">NamedContainer</a>&lt;java.lang.String,java.util.List&lt;java.lang.String&gt;&gt;&nbsp;suggestArguments(net.md_5.bungee.api.CommandSender&nbsp;sender,
+                                                                                          java.lang.String[]&nbsp;args)</pre>
+<div class="block">Suggest command arguments</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code>onTabComplete</code>&nbsp;in interface&nbsp;<code>net.md_5.bungee.api.plugin.TabExecutor</code></dd>
+<dd><code><a href="../../../../net/ME1312/SubServers/Bungee/Library/Compatibility/CommandX.html#suggestArguments-net.md_5.bungee.api.CommandSender-java.lang.String:A-">suggestArguments</a></code>&nbsp;in class&nbsp;<code><a href="../../../../net/ME1312/SubServers/Bungee/Library/Compatibility/CommandX.html" title="class in net.ME1312.SubServers.Bungee.Library.Compatibility">CommandX</a></code></dd>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>sender</code> - Sender</dd>
 <dd><code>args</code> - Arguments</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd>Tab completes</dd>
+<dd>The validator's response and list of possible arguments</dd>
 </dl>
 </li>
 </ul>

@@ -127,10 +127,14 @@ public final class SubAPI {
      * @return Minecraft Version
      */
     public Version getGameVersion() {
-        try {
-            return new Version(Bukkit.getBukkitVersion().split("-")[0]);
-        } catch (ArrayIndexOutOfBoundsException e) {
-            return new Version(plugin.version.toString().substring(0, plugin.version.toString().length() - 1));
+        if (System.getProperty("subservers.minecraft.version", "").length() > 0) {
+            return new Version(System.getProperty("subservers.minecraft.version"));
+        } else {
+            try {
+                return new Version(Bukkit.getBukkitVersion().split("-")[0]);
+            } catch (ArrayIndexOutOfBoundsException e) {
+                return new Version(plugin.version.toString().substring(0, plugin.version.toString().length() - 1));
+            }
         }
     }
 }
