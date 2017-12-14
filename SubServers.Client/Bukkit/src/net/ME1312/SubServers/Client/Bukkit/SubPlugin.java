@@ -18,11 +18,13 @@ import org.xml.sax.InputSource;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.*;
+import java.lang.reflect.InvocationTargetException;
 import java.net.InetAddress;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -70,17 +72,8 @@ public final class SubPlugin extends JavaPlugin {
                 config.save();
                 new UniversalFile(new File(System.getProperty("user.dir")), "subservers.client").delete();
             }
-            SubDataClient.Encryption encryption = SubDataClient.Encryption.NONE;
-            if (config.get().getSection("Settings").getSection("SubData").getString("Password", "").length() == 0) {
-                System.out.println("SubData > Cannot encrypt connection without a password");
-            } else if (Util.isException(() -> SubDataClient.Encryption.valueOf(config.get().getSection("Settings").getSection("SubData").getRawString("Encryption", "NONE").replace('-', '_').replace(' ', '_').toUpperCase()))) {
-                System.out.println("SubData > Unknown encryption type: " + SubDataClient.Encryption.valueOf(config.get().getSection("Settings").getSection("SubData").getRawString("Encryption", "None")));
-            } else {
-                encryption = SubDataClient.Encryption.valueOf(config.get().getSection("Settings").getSection("SubData").getRawString("Encryption", "NONE").replace('-', '_').replace(' ', '_').toUpperCase());
-            }
-            subdata = new SubDataClient(this, config.get().getSection("Settings").getSection("SubData").getString("Name", "undefined"),
-                    InetAddress.getByName(config.get().getSection("Settings").getSection("SubData").getString("Address", "127.0.0.1:4391").split(":")[0]),
-                    Integer.parseInt(config.get().getSection("Settings").getSection("SubData").getString("Address", "127.0.0.1:4391").split(":")[1]), encryption);
+
+            reload(false);
 
             if (config.get().getSection("Settings").getBoolean("Ingame-Access", true)) {
                 gui = new InternalUIHandler(this);
@@ -112,6 +105,38 @@ public final class SubPlugin extends JavaPlugin {
         } catch (IOException e) {
             setEnabled(false);
             e.printStackTrace();
+        }
+    }
+
+    public void reload(boolean notifyPlugins) throws IOException {
+        if (subdata != null)
+            subdata.destroy(0);
+
+        config.reload();
+
+        SubDataClient.Encryption encryption = SubDataClient.Encryption.NONE;
+        if (config.get().getSection("Settings").getSection("SubData").getString("Password", "").length() == 0) {
+            System.out.println("SubData > Cannot encrypt connection without a password");
+        } else if (Util.isException(() -> SubDataClient.Encryption.valueOf(config.get().getSection("Settings").getSection("SubData").getRawString("Encryption", "NONE").replace('-', '_').replace(' ', '_').toUpperCase()))) {
+            System.out.println("SubData > Unknown encryption type: " + SubDataClient.Encryption.valueOf(config.get().getSection("Settings").getSection("SubData").getRawString("Encryption", "None")));
+        } else {
+            encryption = SubDataClient.Encryption.valueOf(config.get().getSection("Settings").getSection("SubData").getRawString("Encryption", "NONE").replace('-', '_').replace(' ', '_').toUpperCase());
+        }
+        subdata = new SubDataClient(this, config.get().getSection("Settings").getSection("SubData").getString("Name", "undefined"),
+                InetAddress.getByName(config.get().getSection("Settings").getSection("SubData").getString("Address", "127.0.0.1:4391").split(":")[0]),
+                Integer.parseInt(config.get().getSection("Settings").getSection("SubData").getString("Address", "127.0.0.1:4391").split(":")[1]), encryption);
+
+        if (notifyPlugins) {
+            List<Runnable> listeners = api.reloadListeners;
+            if (listeners.size() > 0) {
+                for (Object obj : listeners) {
+                    try {
+                        ((Runnable) obj).run();
+                    } catch (Throwable e) {
+                        new InvocationTargetException(e, "Problem reloading plugin").printStackTrace();
+                    }
+                }
+            }
         }
     }
 

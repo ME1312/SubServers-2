@@ -114,6 +114,7 @@ public final class SubDataServer {
         registerPacket(PacketLinkServer.class, "SubLinkServer");
         registerPacket(PacketListenLog.class, "SubListenLog");
         registerPacket(PacketOutRunEvent.class, "SubRunEvent");
+        registerPacket(PacketOutReload.class, "SubReload");
         registerPacket(PacketOutReset.class, "SubReset");
         registerPacket(PacketStartServer.class, "SubStartServer");
         registerPacket(PacketStopServer.class, "SubStopServer");

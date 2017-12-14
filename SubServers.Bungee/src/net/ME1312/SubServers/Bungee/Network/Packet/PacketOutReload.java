@@ -6,17 +6,17 @@ import net.ME1312.SubServers.Bungee.Network.PacketOut;
 import org.json.JSONObject;
 
 /**
- * Reset Packet
+ * Reload Packet
  */
-public class PacketOutReset implements PacketOut {
+public class PacketOutReload implements PacketOut {
     private String message;
 
     /**
-     * New PacketOutReset
+     * New PacketOutReload
      *
      * @param message Message
      */
-    public PacketOutReset(String message) {
+    public PacketOutReload(String message) {
         this.message = message;
     }
 

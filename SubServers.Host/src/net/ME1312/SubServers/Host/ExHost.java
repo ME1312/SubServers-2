@@ -3,6 +3,7 @@ package net.ME1312.SubServers.Host;
 import net.ME1312.SubServers.Host.API.Event.CommandPreProcessEvent;
 import net.ME1312.SubServers.Host.API.Event.SubDisableEvent;
 import net.ME1312.SubServers.Host.API.Event.SubEnableEvent;
+import net.ME1312.SubServers.Host.API.Event.SubReloadEvent;
 import net.ME1312.SubServers.Host.API.SubPluginInfo;
 import net.ME1312.SubServers.Host.API.SubPlugin;
 import net.ME1312.SubServers.Host.Executable.SubCreator;
@@ -293,6 +294,27 @@ public final class ExHost {
             log.error.println(e);
             forcequit(1);
         }
+    }
+
+    public void reload() throws IOException {
+        if (subdata != null)
+            subdata.destroy(0);
+
+        config.reload();
+
+        SubDataClient.Encryption encryption = SubDataClient.Encryption.NONE;
+        if (config.get().getSection("Settings").getSection("SubData").getString("Password", "").length() == 0) {
+            log.info.println("Cannot encrypt connection without a password");
+        } else if (Util.isException(() -> SubDataClient.Encryption.valueOf(config.get().getSection("Settings").getSection("SubData").getRawString("Encryption", "NONE").replace('-', '_').replace(' ', '_').toUpperCase()))) {
+            log.info.println("Unknown encryption type: " + SubDataClient.Encryption.valueOf(config.get().getSection("Settings").getSection("SubData").getRawString("Encryption", "None")));
+        } else {
+            encryption = SubDataClient.Encryption.valueOf(config.get().getSection("Settings").getSection("SubData").getRawString("Encryption", "NONE").replace('-', '_').replace(' ', '_').toUpperCase());
+        }
+        subdata = new SubDataClient(this, config.get().getSection("Settings").getSection("SubData").getString("Name", "undefined"),
+                InetAddress.getByName(config.get().getSection("Settings").getSection("SubData").getString("Address", "127.0.0.1:4391").split(":")[0]),
+                Integer.parseInt(config.get().getSection("Settings").getSection("SubData").getString("Address", "127.0.0.1:4391").split(":")[1]), encryption);
+
+        SubAPI.getInstance().executeEvent(new SubReloadEvent(this));
     }
 
     private void loop() {

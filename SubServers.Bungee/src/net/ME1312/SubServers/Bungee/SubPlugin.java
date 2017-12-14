@@ -8,6 +8,8 @@ import net.ME1312.SubServers.Bungee.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Bungee.Library.Exception.InvalidHostException;
 import net.ME1312.SubServers.Bungee.Library.Exception.InvalidServerException;
 import net.ME1312.SubServers.Bungee.Library.Version.Version;
+import net.ME1312.SubServers.Bungee.Network.ClientHandler;
+import net.ME1312.SubServers.Bungee.Network.Packet.PacketOutReload;
 import net.ME1312.SubServers.Bungee.Network.SubDataServer;
 import net.md_5.bungee.BungeeCord;
 import net.md_5.bungee.BungeeServerInfo;
@@ -269,6 +271,8 @@ public final class SubPlugin extends BungeeCord implements Listener {
                     host.setDisplayName(config.get().getSection("Hosts").getSection(name).getString("Display"));
                 if (config.get().getSection("Hosts").getSection(name).getKeys().contains("Extra"))
                     for (String extra : config.get().getSection("Hosts").getSection(name).getSection("Extra").getKeys()) host.addExtra(extra, config.get().getSection("Hosts").getSection(name).getSection("Extra").getObject(extra));
+                if (host instanceof ClientHandler && ((ClientHandler) host).getSubData() != null)
+                    ((ClientHandler) host).getSubData().sendPacket(new PacketOutReload(null));
                 ukeys.add(name.toLowerCase());
                 hosts++;
             } catch (Exception e) {
@@ -307,6 +311,8 @@ public final class SubPlugin extends BungeeCord implements Listener {
                     }
                     if (bungeeconfig.get().getSection("servers").getSection(name).getKeys().contains("extra"))
                         for (String extra : config.get().getSection("servers").getSection(name).getSection("extra").getKeys()) server.addExtra(extra, config.get().getSection("servers").getSection(name).getSection("extra").getObject(extra));
+                    if (server.getSubData() != null)
+                        server.getSubData().sendPacket(new PacketOutReload(null));
                     ukeys.add(name.toLowerCase());
                     servers++;
                 }
@@ -369,8 +375,11 @@ public final class SubPlugin extends BungeeCord implements Listener {
 
                     if (edits.getKeys().size() > 0) {
                         server.edit(edits);
+                        if (server == api.getSubServer(name) && server.getSubData() != null)
+                            server.getSubData().sendPacket(new PacketOutReload(null));
                         server = api.getSubServer(name);
-                    }
+                    } else if (server.getSubData() != null)
+                        server.getSubData().sendPacket(new PacketOutReload(null));
                 } else { // Server cannot edit()
                     if (server == null ||  // Server must be reset
                             !config.get().getSection("Servers").getSection(name).getString("Host").equalsIgnoreCase(server.getHost().getName()) ||
@@ -398,6 +407,8 @@ public final class SubPlugin extends BungeeCord implements Listener {
                             server.setRestricted(config.get().getSection("Servers").getSection(name).getBoolean("Restricted"));
                         if (config.get().getSection("Servers").getSection(name).getBoolean("Hidden") != server.isHidden())
                             server.setHidden(config.get().getSection("Servers").getSection(name).getBoolean("Hidden"));
+                        if (server.getSubData() != null)
+                            server.getSubData().sendPacket(new PacketOutReload(null));
                     } // Apply these changes regardless of reset
                     if (config.get().getSection("Servers").getSection(name).getKeys().contains("Display") && ((config.get().getSection("Servers").getSection(name).getString("Display").length() == 0 && !server.getDisplayName().equals(server.getName())) || !config.get().getSection("Servers").getSection(name).getString("Display").equals(server.getDisplayName())))
                         server.setDisplayName(config.get().getSection("Servers").getSection(name).getString("Display"));

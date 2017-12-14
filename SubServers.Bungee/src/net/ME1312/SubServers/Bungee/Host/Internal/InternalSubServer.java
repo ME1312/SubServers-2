@@ -347,7 +347,7 @@ public class InternalSubServer extends SubServerContainer {
                                     stop(player);
                                     waitFor();
                                 }
-                                dir = value.asString();
+                                dir = value.asRawString();
                                 directory = new File(getHost().getPath(), value.asRawString());
                                 if (this.host.plugin.config.get().getSection("Servers").getKeys().contains(getName())) {
                                     this.host.plugin.config.get().getSection("Servers").getSection(getName()).set("Directory", getPath());

@@ -7,12 +7,14 @@ import net.ME1312.SubServers.Client.Bukkit.Network.SubDataClient;
 import org.bukkit.Bukkit;
 
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
 
 /**
  * SubAPI Class
  */
 public final class SubAPI {
+    LinkedList<Runnable> reloadListeners = new LinkedList<Runnable>();
     private SubPlugin plugin;
     private static SubAPI api;
 
@@ -39,6 +41,15 @@ public final class SubAPI {
     @Deprecated
     public SubPlugin getInternals() {
         return plugin;
+    }
+
+    /**
+     * Adds a SubAPI Reload Listener
+     *
+     * @param reload An Event that will be called after SubAPI is soft-reloaded
+     */
+    public void addListener(Runnable reload) {
+        if (reload != null) reloadListeners.add(reload);
     }
 
     /**

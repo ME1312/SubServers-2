@@ -106,6 +106,7 @@ public final class SubDataClient {
         registerPacket(new PacketExDeleteServer(host), "SubExDeleteServer");
         registerPacket(new PacketExRemoveServer(host), "SubExRemoveServer");
         registerPacket(new PacketExUpdateServer(host), "SubExUpdateServer");
+        registerPacket(new PacketInReload(host), "SubReload");
         registerPacket(new PacketInReset(host), "SubReset");
         registerPacket(new PacketInRunEvent(), "SubRunEvent");
         registerPacket(new PacketLinkExHost(host), "SubLinkExHost");
