@@ -1,0 +1,317 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	</head>
+	<body>
+		<style>
+			* {
+				font-family: Avenir;
+			}
+			
+			html {
+				min-height: 100%;
+				position: relative;
+			}
+			
+			body {
+				background-color: #EEE;
+				width: 100%;
+				height: 100%;
+				margin: 0px !important;
+			}
+			
+			.app-version > span.short {
+				display: none;
+			}
+			
+			.page .page-title {
+				display: table;
+				vertical-align: middle;
+    			margin: 0.83em auto;
+				margin-bottom: 0px;
+				font-size: 1.5em;
+    			font-weight: bold;
+			}
+			
+			.page .page-subtitle {
+				display: block;
+    			margin: 0px;
+				margin-right: 12px;
+				font-size: 0.5em;
+				color: #777;
+    			font-weight: normal;
+				font-style: italic;
+				text-align: right;
+				text-decoration: none;
+			}
+			
+			.page a.page-subtitle:hover {
+				text-decoration: underline;
+			}
+			
+			.page .options {
+				display: flex;
+			}
+			
+			.page .options > .desktop-spacer {
+				flex-basis: 25%;
+			}
+			
+			.page .options > div-option {
+				padding: 25px;
+				flex-basis: 100%;
+				border-right: 2px solid #CCC;
+			}
+			
+			.page .options > div-option:last-of-type {
+				border-right: none;
+			}
+			
+			.page .options > div-option > form > input,
+			.page .options > div-option > form > button,
+			.page .options > div-option > form > a,
+			.page .options > div-option > button,
+			.page .options > div-option > a {
+				display: inline-block;
+				padding: 4px 12px;
+				text-decoration: none;
+    			text-transform: uppercase;
+    			border: none;
+    			-webkit-box-shadow: 1px 1px 4px rgba(0,0,0,0.4);
+    			box-shadow: 1px 1px 4px rgba(0,0,0,0.4);
+    			-webkit-transition: all 0.4s;
+    			-o-transition: all 0.4s;
+    			transition: all 0.4s;
+				font-size: 1.125em;
+			}
+			
+			.page .options > div-option > form > input {
+				padding-left: 0px;
+				padding-right: 0px;
+			}
+			
+			.page .options > .option-1 > a  {
+				color: #ffffff;
+    			background-color: #4caf50;
+    			border-color: transparent
+			}
+			
+			.page .options > .option-1 > a:hover  {
+    			background-color: #3d8b40;
+    			border-color: rgba(0,0,0,0);
+			}
+			
+			.page .options > .option-2 {
+				padding-top: 23px;
+			}
+			
+			.page .options > .option-2 > form {
+				display: inline-block;
+				border-bottom: 2px solid #CCC;
+				box-sizing: border-box;
+				font-size: 1.125em;
+			}
+			
+			.page .options > .option-2 > form > input {
+				background-color: transparent;
+				border: none;
+				height: 100%;
+				padding-top: 2px;
+				padding-bottom: 2px;
+				outline: none;
+				-webkit-box-shadow: none;
+				-moz-box-shadow: none;
+				box-shadow: none;
+				font-size: 1em;
+			}
+			
+			.page .options > .option-2 > form > input:focus {
+				outline: none;
+			}
+			
+			.page .options > .option-2 > button {
+				color: #fff;
+				background-color: #0d87e9;
+    			border-color: #2e6da4;
+				cursor:pointer;
+				font-size: 1em;
+			}
+			
+			.page .options > .option-2 > button:hover {
+    			background-color: #337ab7;
+			}
+			
+			.page .options > .option-3 > a {
+			    color: #fff;
+    			background-color: #f0ad4e;
+    			border-color: #eea236;
+			}
+			
+			.page .options > .option-3 > a:hover  {
+			    color: #fff;
+    			background-color: #ec971f;
+   				border-color: #d58512;
+			}
+			
+			.page .options > div-option > span {
+				color: #777;
+				font-size: 0.8em;
+			}
+			
+			.footer {
+				margin-bottom: 0px;
+				padding: 8px;
+				padding-top: 0px;
+				position: absolute;
+				bottom: 0px;
+				left: 0px;
+				right: 0px;
+			}
+			
+			.footer > div {
+				height: 32px;
+				float: right;
+			}
+			
+			.footer img {
+				height: 32px;
+				float: left;
+			}
+			
+			.footer > div > a {
+				padding-left: 8px;
+				padding-right: 8px;
+				vertical-align: middle;
+				line-height: 32px;
+				font-size: 14px;
+				color: #333;
+				text-decoration: none;
+			}
+			
+			.footer > div > a:hover,
+			.footer > div > a:active {
+				color: #555;
+				text-decoration: underline;
+			}
+			
+			@media only screen and (max-width:875px),
+				   only screen and (max-height:475px) {
+				.app-version > span.full {
+					display: none;
+			   	}
+				.app-version > span.short {
+					display: inline;
+				}
+			    .page .options {
+			    	display: inline-block;
+				}
+					   
+				.page .options > .desktop-spacer {
+					display: none;
+			   	}
+					   
+				.page .options > div-option {
+				   	display: block;
+					padding: 25px 0px;
+					margin: 0px 25px;
+					border-right: none;
+					border-bottom: 2px solid #CCC;
+				}
+					   
+				.page .options > div-option:last-of-type {
+					border-bottom: none;
+				}
+			}
+			
+			@font-face {
+    			font-family: Avenir;
+				src: url("https://raw.githubusercontent.com/ME1312/SubServers-2/master/SubServers.Bungee/Avenir-Book.ttf");
+			}
+		</style>
+		<div class="download"><center>
+			<div class="page">
+				<span class="page-title">You're about to download <span class="full-app-name">&lt;unknown&gt;</span><br><a class="page-subtitle" href="%commit_source%" target="_blank">from commit <span class="app-version">&lt;unknown&gt;</span></a></span><hr>
+				Thank you for downloading <span class="app-name">&lt;unknown&gt;</span>. Choose how you would like to get your file:<br><br>
+				<div class="options">
+					<div class="desktop-spacer"></div>
+					<div-option class="option-1">
+						<a href="%adfly_app_download%">Watch a quick ad</a>
+						<br><span>through adf.ly</span>
+						<p>It only takes 5 seconds to support the developer these days. Then we'll take you straight to your download.</p>
+					</div-option>
+					<div-option class="option-2">
+						<form id="option-2" action="https://www.paypal.com/cgi-bin/webscr" method="get" target="_blank"><!--
+							--><input type="hidden" name="cmd" value="_xclick" /><!--
+							--><input type="hidden" name="business" value="ECL5BPVRT5ANA" /><!--
+							--><input type="hidden" name="lc" value="US" /><!--
+							--><input type="hidden" name="item_name" value="Donation" /><!--
+						   -->$<input type="number" name="amount" min="1" value="15" max="9999" /><!--
+							--><input type="hidden" name="currency_code" value="USD" /><!--
+							--><input type="hidden" name="button_subtype" value="services" /><!--
+							--><input type="hidden" name="bn" value="PP%2dBuyNowBF%3abtn_buynowCC_LG%2egif%3aNonHosted" /><!--
+						--></form><button type="submit" form="option-2">Donate</button>
+						<br><span>and download after</span>
+						<p>I'd appreciate any donation, even if it's just a dollar.</p>
+					</div-option>
+					<div-option class="option-3">
+						<a download="%" href="%app_download%" draggable="true">Direct Download</a>
+						<br><span>SubServers is always free to use</span>
+						<p>You don't have to do that stuff to use SubServers, but it's always appreciated.</p>
+					</div-option>
+					<div class="desktop-spacer"></div>
+				</div>
+			</div>
+		</center></div>
+		<br>
+		<br>
+		<br>
+		<br>
+		<div class="footer">
+			<hr>
+			<a href="javascript:void(0)"><img src="https://src.ME1312.net/img/me1312.net.inverted.png" /></a>
+			<div><a href="https://github.com/ME1312/SubServers-2/tree/master/Artifacts" target="_blank">Download not working?</a></div>
+       	</div>
+        <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+        <script>
+			var hash = getHash();
+			function getHash() {
+				var hash = window.location.hash.substring(1);
+    			var params = {}
+    			hash.split('&').map(hk => {
+      				let temp = hk.split('='); 
+        			params[temp[0]] = temp[1] 
+    			});
+				return params;
+			}
+			if (hash.hasOwnProperty("app")) {
+				$('.full-app-name').html(hash.app)
+				$('.app-name').html(hash.app.replace(/^(.+?)\.([^.]*)$/, '$1'));
+				if (hash.hasOwnProperty("commit")) {
+					$('.app-version').html('<span class="full">' + hash.commit + '</span><span class="short">' + hash.commit.substring(0, 7) + '</span>');
+					$('a').each(function() {
+						var a = $(this);
+						if (a.attr('download') == '%')
+							a.attr('download', hash.app);
+						switch (a.attr("href").toLowerCase()) {
+							case "%adfly_app_download%":
+								a.attr("href", "https://adf.ly/18562515/raw.githubusercontent.com/ME1312/SubServers-2/" + hash.commit + "/Artifacts/" + hash.app);
+								break;
+							case "%app_download%":
+								a.attr("href", "https://raw.githubusercontent.com/ME1312/SubServers-2/" + hash.commit + "/Artifacts/" + hash.app);
+								break;
+							case "%commit_page%":
+								a.attr("href", "https://github.com/ME1312/SubServers-2/commit/" + hash.commit);
+								break;
+							case "%commit_source%":
+								a.attr("href", "https://github.com/ME1312/SubServers-2/tree/" + hash.commit);
+								break;
+						}
+					});
+					
+				}
+			}
+		</script>
+	</body>
+</html>

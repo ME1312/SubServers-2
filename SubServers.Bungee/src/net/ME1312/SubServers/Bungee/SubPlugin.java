@@ -64,6 +64,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
     private boolean posted = false;
     private BigInteger lastSignature = new BigInteger("-1");
 
+    @SuppressWarnings("unchecked")
     protected SubPlugin(PrintStream out) throws IOException {
         System.out.println("SubServers > Loading SubServers.Bungee v" + version.toString() + " Libraries (for Minecraft " + api.getGameVersion() + ")");
 
@@ -176,8 +177,8 @@ public final class SubPlugin extends BungeeCord implements Listener {
         System.out.println("SubServers > Pre-Parsing Config...");
         for (String name : config.get().getSection("Servers").getKeys()) {
             try {
-                if (!config.get().getSection("Hosts").contains(config.get().getSection("Servers").getSection(name).getString("Host"))) throw new InvalidServerException("There is no host with this name: " + config.get().getSection("Servers").getSection(name).getString("Host"));
-                legServers.put(name, new BungeeServerInfo(name, new InetSocketAddress(InetAddress.getByName(config.get().getSection("Hosts").getSection(config.get().getSection("Servers").getSection(name).getString("Host")).getRawString("Address")), config.get().getSection("Servers").getSection(name).getInt("Port")), config.get().getSection("Servers").getSection(name).getColoredString("Motd", '&'), config.get().getSection("Servers").getSection(name).getBoolean("Restricted")));
+                if (Util.getCaseInsensitively((Map<String, ?>) config.get().getObject("Hosts"), config.get().getSection("Servers").getSection(name).getString("Host")) == null) throw new InvalidServerException("There is no host with this name: " + config.get().getSection("Servers").getSection(name).getString("Host"));
+                legServers.put(name, new BungeeServerInfo(name, new InetSocketAddress(InetAddress.getByName((String) ((Map<String, ?>) Util.getCaseInsensitively((Map<String, ?>) config.get().getObject("Hosts"), config.get().getSection("Servers").getSection(name).getString("Host"))).get("Address")), config.get().getSection("Servers").getSection(name).getInt("Port")), config.get().getSection("Servers").getSection(name).getColoredString("Motd", '&'), config.get().getSection("Servers").getSection(name).getBoolean("Restricted")));
             } catch (Exception e) {
                 e.printStackTrace();
             }

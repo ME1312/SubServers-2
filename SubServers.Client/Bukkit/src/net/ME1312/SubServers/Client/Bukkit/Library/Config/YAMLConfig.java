@@ -6,12 +6,8 @@ import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.error.YAMLException;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.util.LinkedHashMap;
-import java.util.Map;
 
 /**
  * YAML Config Class
@@ -35,7 +31,9 @@ public class YAMLConfig {
         this.file = file;
         this.yaml = new Yaml(getDumperOptions());
         if (file.exists()) {
-            this.config = new YAMLSection((LinkedHashMap<String, ?>) yaml.loadAs(new FileInputStream(file), LinkedHashMap.class), null, null, yaml);
+            InputStream stream = new FileInputStream(file);
+            this.config = new YAMLSection((LinkedHashMap<String, ?>) yaml.loadAs(stream, LinkedHashMap.class), null, null, yaml);
+            stream.close();
         } else {
             this.config = new YAMLSection(null, null, null, yaml);
         }
@@ -68,7 +66,9 @@ public class YAMLConfig {
     @SuppressWarnings("unchecked")
     public void reload() throws IOException {
         if (file.exists()) {
-            this.config = new YAMLSection((LinkedHashMap<String, ?>) yaml.loadAs(new FileInputStream(file), LinkedHashMap.class), null, null, yaml);
+            InputStream stream = new FileInputStream(file);
+            this.config = new YAMLSection((LinkedHashMap<String, ?>) yaml.loadAs(stream, LinkedHashMap.class), null, null, yaml);
+            stream.close();
         } else {
             this.config = new YAMLSection(null, null, null, yaml);
         }

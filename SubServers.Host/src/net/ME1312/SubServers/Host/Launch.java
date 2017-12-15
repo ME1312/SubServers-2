@@ -55,7 +55,9 @@ public final class Launch {
                 try {
                     boolean success = false;
                     if (getFileExtension(plugin.getName()).equalsIgnoreCase("zip")) {
-                        Util.unzip(new FileInputStream(plugin), dir);
+                        InputStream stream = new FileInputStream(plugin);
+                        Util.unzip(stream, dir);
+                        stream.close();
                         success = true;
                     } else if (getFileExtension(plugin.getName()).equalsIgnoreCase("jar")) {
                         extractJar(plugin, dir);

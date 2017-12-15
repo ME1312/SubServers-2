@@ -63,7 +63,7 @@ public final class Util {
      */
     public static <V> V getCaseInsensitively(Map<String, V> map, String key) {
         HashMap<String, String> insensitivity = new HashMap<String, String>();
-        for (String item : map.keySet()) insensitivity.put(item.toLowerCase(), item);
+        for (String item : map.keySet()) if (!insensitivity.keySet().contains(item.toLowerCase())) insensitivity.put(item.toLowerCase(), item);
         if (insensitivity.keySet().contains(key.toLowerCase())) {
             return map.get(insensitivity.get(key.toLowerCase()));
         } else {
