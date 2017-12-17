@@ -167,14 +167,75 @@ public final class SubAPI {
     public Host addHost(UUID player, String driver, String name, boolean enabled, InetAddress address, String directory, String gitBash) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
         if (Util.isNull(driver, name, enabled, address, directory, gitBash)) throw new NullPointerException();
         if (!getHostDrivers().contains(driver)) throw new InvalidHostException("Invalid Driver for host: " + name);
-        Host host = plugin.hostDrivers.get(driver.toLowerCase()).getConstructor(SubPlugin.class, String.class, Boolean.class, InetAddress.class, String.class, String.class).newInstance(plugin, name, (Boolean) enabled, address, directory, gitBash);
+        return addHost(player, plugin.hostDrivers.get(driver.toLowerCase()), name, enabled, address, directory, gitBash);
+    }
+
+    /**
+     * Add a Host with a potentially unregistered driver to the Network
+     *
+     * @param driver Driver to initiate
+     * @param name Name of the Host
+     * @param enabled Enabled Status
+     * @param address Address of the Host
+     * @param directory Directory of the Host
+     * @param gitBash Git Bash Directory
+     * @return The Host
+     * @throws NoSuchMethodException
+     * @throws IllegalAccessException
+     * @throws InvocationTargetException
+     * @throws InstantiationException
+     */
+    public Host addHost(Class<? extends Host> driver, String name, boolean enabled, InetAddress address, String directory, String gitBash) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
+        return addHost(null, driver, name, enabled, address, directory, gitBash);
+    }
+
+    /**
+     * Add a Host with a potentially unregistered driver to the Network
+     *
+     * @param player Player who added
+     * @param driver Driver to initiate
+     * @param name Name of the Host
+     * @param enabled Enabled Status
+     * @param address Address of the Host
+     * @param directory Directory of the Host
+     * @param gitBash Git Bash Directory
+     * @return The Host
+     * @throws NoSuchMethodException
+     * @throws IllegalAccessException
+     * @throws InvocationTargetException
+     * @throws InstantiationException
+     */
+    public Host addHost(UUID player, Class<? extends Host> driver, String name, boolean enabled, InetAddress address, String directory, String gitBash) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
+        if (Util.isNull(driver, name, enabled, address, directory, gitBash)) throw new NullPointerException();
+        Host host;
+        return (addHost(player, host = driver.getConstructor(SubPlugin.class, String.class, Boolean.class, InetAddress.class, String.class, String.class).newInstance(plugin, name, (Boolean) enabled, address, directory, gitBash)))?host:null;
+    }
+
+    /**
+     * Add a Host with a potentially invalid/unregistered driver to the Network
+     *
+     * @param host Host to add
+     * @return Success status
+     */
+    public boolean addHost(Host host) {
+        return addHost(null, host);
+    }
+
+    /**
+     * Add a Host with a potentially invalid/unregistered driver to the Network
+     *
+     * @param player Player who added
+     * @param host Host to add
+     * @return Success status
+     */
+    public boolean addHost(UUID player, Host host) {
         SubAddHostEvent event = new SubAddHostEvent(player, host);
         plugin.getPluginManager().callEvent(event);
         if (!event.isCancelled()) {
-            plugin.hosts.put(name.toLowerCase(), host);
-            return host;
+            plugin.hosts.put(host.getName().toLowerCase(), host);
+            return true;
         } else {
-            return null;
+            return false;
         }
     }
 

@@ -104,6 +104,7 @@ public class ExternalSubCreator extends SubCreator {
 
                             SubServer subserver = host.addSubServer(player, name, server.getBoolean("Enabled"), port, server.getColoredString("Motd", '&'), server.getBoolean("Log"), server.getRawString("Directory"),
                                     new Executable(server.getRawString("Executable")), server.getRawString("Stop-Command"), true, server.getBoolean("Auto-Restart"), server.getBoolean("Hidden"), server.getBoolean("Restricted"), false);
+                            if (!server.getBoolean("Editable", true)) subserver.setEditable(true);
                             if (server.getString("Display").length() > 0) subserver.setDisplayName(server.getString("Display"));
                             for (String group : server.getStringList("Group")) subserver.addGroup(group);
                             if (server.contains("Extra")) for (String extra : server.getSection("Extra").getKeys()) subserver.addExtra(extra, server.getObject(extra));
