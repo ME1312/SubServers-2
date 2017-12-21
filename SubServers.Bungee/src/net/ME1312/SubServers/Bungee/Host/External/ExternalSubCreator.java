@@ -2,12 +2,9 @@ package net.ME1312.SubServers.Bungee.Host.External;
 
 import net.ME1312.SubServers.Bungee.Event.SubCreateEvent;
 import net.ME1312.SubServers.Bungee.Host.*;
+import net.ME1312.SubServers.Bungee.Library.*;
 import net.ME1312.SubServers.Bungee.Library.Config.YAMLConfig;
 import net.ME1312.SubServers.Bungee.Library.Config.YAMLSection;
-import net.ME1312.SubServers.Bungee.Library.Container;
-import net.ME1312.SubServers.Bungee.Library.JSONCallback;
-import net.ME1312.SubServers.Bungee.Library.UniversalFile;
-import net.ME1312.SubServers.Bungee.Library.Util;
 import net.ME1312.SubServers.Bungee.Library.Version.Version;
 import net.ME1312.SubServers.Bungee.Network.Packet.PacketExConfigureHost;
 import net.ME1312.SubServers.Bungee.Network.Packet.PacketExCreateServer;
@@ -19,6 +16,7 @@ import java.util.*;
 /**
  * External SubCreator Class
  */
+@SuppressWarnings("unchecked")
 public class ExternalSubCreator extends SubCreator {
     private HashMap<String, ServerTemplate> templates = new HashMap<String, ServerTemplate>();
     private ExternalHost host;
@@ -76,13 +74,8 @@ public class ExternalSubCreator extends SubCreator {
                                 host.plugin.exServers.remove(name.toLowerCase());
 
                             YAMLSection server = new YAMLSection();
-                            YAMLSection config = new YAMLSection(json.getJSONObject("c"));
-                            for (String option : config.getKeys()) {
-                                if (config.isString(option)) {
-                                    config.set(option, config.getRawString(option).replace("$name$", name).replace("$template$", template.getName()).replace("$type$", template.getType().toString())
-                                            .replace("$version$", version.toString().replace(" ", "@")).replace("$port$", Integer.toString(port)));
-                                }
-                            }
+                            YAMLSection config = new YAMLSection((Map<String, ?>) convert(new YAMLSection(json.getJSONObject("c")).get(), new NamedContainer<>("$player$", (player == null)?"":player.toString()), new NamedContainer<>("$name$", name),
+                                    new NamedContainer<>("$template$", template.getName()), new NamedContainer<>("$type$", template.getType().toString()), new NamedContainer<>("$version$", version.toString().replace(" ", "@")), new NamedContainer<>("$port$", Integer.toString(port))));
 
                             server.set("Enabled", true);
                             //server.set("Editable", true);
@@ -107,7 +100,8 @@ public class ExternalSubCreator extends SubCreator {
                             if (!server.getBoolean("Editable", true)) subserver.setEditable(true);
                             if (server.getString("Display").length() > 0) subserver.setDisplayName(server.getString("Display"));
                             for (String group : server.getStringList("Group")) subserver.addGroup(group);
-                            if (server.contains("Extra")) for (String extra : server.getSection("Extra").getKeys()) subserver.addExtra(extra, server.getObject(extra));
+                            if (server.contains("Extra")) for (String extra : server.getSection("Extra").getKeys())
+                                subserver.addExtra(extra, server.getSection("Extra").getObject(extra));
                             host.plugin.config.get().getSection("Servers").set(name, server);
                             host.plugin.config.save();
                         } else {
@@ -125,6 +119,28 @@ public class ExternalSubCreator extends SubCreator {
                 return false;
             }
         } else return false;
+    } private Object convert(Object value, NamedContainer<String, String>... replacements) {
+        if (value instanceof Map) {
+            List<String> list = new ArrayList<String>();
+            list.addAll(((Map<String, Object>) value).keySet());
+            for (String key : list) ((Map<String, Object>) value).put(key, convert(((Map<String, Object>) value).get(key), replacements));
+            return value;
+        } else if (value instanceof Collection) {
+            List<Object> list = new ArrayList<Object>();
+            for (Object val : (Collection<Object>) value) list.add(convert(val, replacements));
+            return list;
+        } else if (value.getClass().isArray()) {
+            List<Object> list = new ArrayList<Object>();
+            for (int i = 0; i < ((Object[]) value).length; i++) list.add(convert(((Object[]) value)[i], replacements));
+            return list;
+        } else if (value instanceof String) {
+            return replace((String) value, replacements);
+        } else {
+            return value;
+        }
+    } private String replace(String string, NamedContainer<String, String>... replacements) {
+        for (NamedContainer<String, String> replacement : replacements) string = string.replace(replacement.name(), replacement.get());
+        return string;
     }
 
     @Override

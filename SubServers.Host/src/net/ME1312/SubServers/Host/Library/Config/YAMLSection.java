@@ -16,7 +16,7 @@ import java.util.*;
  */
 @SuppressWarnings({"unchecked", "unused"})
 public class YAMLSection {
-    protected Map<String, Object> map;
+    protected LinkedHashMap<String, Object> map;
     protected String handle = null;
     protected YAMLSection up = null;
     private Yaml yaml;
@@ -25,7 +25,7 @@ public class YAMLSection {
      * Creates an empty YAML Section
      */
     public YAMLSection() {
-        this.map = new HashMap<>();
+        this.map = new LinkedHashMap<>();
         this.yaml = new Yaml(YAMLConfig.getDumperOptions());
     }
 
@@ -37,7 +37,7 @@ public class YAMLSection {
      */
     public YAMLSection(InputStream stream) throws YAMLException {
         if (Util.isNull(stream)) throw new NullPointerException();
-        this.map = (Map<String, Object>) (this.yaml = new Yaml(YAMLConfig.getDumperOptions())).load(stream);
+        this.map = (LinkedHashMap<String, Object>) (this.yaml = new Yaml(YAMLConfig.getDumperOptions())).loadAs(stream, LinkedHashMap.class);
     }
 
     /**
@@ -48,17 +48,7 @@ public class YAMLSection {
      */
     public YAMLSection(Reader reader) throws YAMLException {
         if (Util.isNull(reader)) throw new NullPointerException();
-        this.map = (Map<String, Object>) (this.yaml = new Yaml(YAMLConfig.getDumperOptions())).load(reader);
-    }
-
-    /**
-     * Creates a YAML Section from JSON Contents
-     *
-     * @param json JSON
-     */
-    public YAMLSection(JSONObject json) {
-        if (Util.isNull(json)) throw new NullPointerException();
-        this.map = (Map<String, Object>) (this.yaml = new Yaml(YAMLConfig.getDumperOptions())).load(json.toString(4));
+        this.map = (LinkedHashMap<String, Object>) (this.yaml = new Yaml(YAMLConfig.getDumperOptions())).loadAs(reader, LinkedHashMap.class);
     }
 
     /**
@@ -69,11 +59,34 @@ public class YAMLSection {
      */
     public YAMLSection(String str) throws YAMLException {
         if (Util.isNull(str)) throw new NullPointerException();
-        this.map = (Map<String, Object>) (this.yaml = new Yaml(YAMLConfig.getDumperOptions())).load(str);
+        this.map = (LinkedHashMap<String, Object>) (this.yaml = new Yaml(YAMLConfig.getDumperOptions())).loadAs(str, LinkedHashMap.class);
     }
-    
+
+    /**
+     * Creates a YAML Section from JSON Contents
+     *
+     * @param json JSON
+     */
+    public YAMLSection(JSONObject json) {
+        if (Util.isNull(json)) throw new NullPointerException();
+        this.map = (LinkedHashMap<String, Object>) (this.yaml = new Yaml(YAMLConfig.getDumperOptions())).loadAs(json.toString(4), LinkedHashMap.class);
+    }
+
+    /**
+     * Creates a YAML Section from Map Contents
+     *
+     * @param map Map
+     */
+    public YAMLSection(Map<String, ?> map) {
+        if (Util.isNull(map)) throw new NullPointerException();
+        this.map = new LinkedHashMap<>();
+        this.yaml = new Yaml(YAMLConfig.getDumperOptions());
+
+        setAll(map);
+    }
+
     protected YAMLSection(Map<String, ?> map, YAMLSection up, String handle, Yaml yaml) {
-        this.map = new HashMap<String, Object>();
+        this.map = new LinkedHashMap<String, Object>();
         this.yaml = yaml;
         this.handle = handle;
         this.up = up;
@@ -85,6 +98,18 @@ public class YAMLSection {
         }
     }
 
+
+    /**
+     * Get a copy of the original Object Map
+     *
+     * @return Object Map
+     */
+    public Map<String, ?> get() {
+        LinkedHashMap<String, Object> map = new LinkedHashMap<String, Object>();
+        map.putAll(this.map);
+        return map;
+    }
+
     /**
      * Get the Keys
      *
@@ -93,7 +118,6 @@ public class YAMLSection {
     public Set<String> getKeys() {
         return map.keySet();
     }
-
 
     /**
      * Get the Values
@@ -144,7 +168,12 @@ public class YAMLSection {
             value = new YAMLSection((JSONObject) value);
         }
 
-        if (value instanceof YAMLConfig) {
+        if (value instanceof Map) {
+            List<String> list = new ArrayList<String>();
+            list.addAll(((Map<String, Object>) value).keySet());
+            for (String key : list) ((Map<String, Object>) value).put(key, convert(((Map<String, Object>) value).get(key)));
+            return value;
+        } else if (value instanceof YAMLConfig) {
             ((YAMLConfig) value).get().up = this;
             ((YAMLConfig) value).get().handle = handle;
             return ((YAMLConfig) value).get().map;
@@ -156,10 +185,18 @@ public class YAMLSection {
             return ((YAMLValue) value).asObject();
         } else if (value instanceof JSONArray) {
             List<Object> list = new ArrayList<Object>();
-            for (int i=0; i < ((JSONArray) value).length(); i++) list.add(((JSONArray) value).getString(i));
+            for (int i = 0; i < ((JSONArray) value).length(); i++) list.add(convert(((JSONArray) value).get(i)));
+            return list;
+        } else if (value instanceof Collection) {
+            List<Object> list = new ArrayList<Object>();
+            for (Object val : (Collection<Object>) value) list.add(convert(val));
+            return list;
+        } else if (value.getClass().isArray()) {
+            List<Object> list = new ArrayList<Object>();
+            for (int i = 0; i < ((Object[]) value).length; i++) list.add(convert(((Object[]) value)[i]));
             return list;
         } else if (value instanceof UUID) {
-            return ((UUID) value).toString();
+            return value.toString();
         } else {
             return value;
         }
@@ -177,6 +214,8 @@ public class YAMLSection {
             remove(handle);
         } else if (value instanceof Collection) {
             set(handle, (Collection<?>) value);
+        } else if (value.getClass().isArray()) {
+            set(handle, (Object[]) value);
         } else {
             map.put(handle, convert(value));
 
@@ -266,16 +305,6 @@ public class YAMLSection {
     }
 
     /**
-     * Copy YAML Values to this YAML Section
-     *
-     * @param values YAMLSection to merge
-     */
-    public void setAll(YAMLSection values) {
-        if (Util.isNull(values)) throw new NullPointerException();
-        setAll(values.map);
-    }
-
-    /**
      * Set All Objects into this YAML Section without overwriting existing values
      *
      * @param values Map to set
@@ -285,6 +314,16 @@ public class YAMLSection {
         for (String value : values.keySet()) {
             safeSet(value, values.get(value));
         }
+    }
+
+    /**
+     * Copy YAML Values to this YAML Section
+     *
+     * @param values YAMLSection to merge
+     */
+    public void setAll(YAMLSection values) {
+        if (Util.isNull(values)) throw new NullPointerException();
+        setAll(values.map);
     }
 
     /**

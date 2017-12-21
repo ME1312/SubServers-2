@@ -29,6 +29,7 @@ import java.util.regex.Pattern;
 /**
  * Internal SubCreator Class
  */
+@SuppressWarnings("unchecked")
 public class InternalSubCreator extends SubCreator {
     private HashMap<String, ServerTemplate> templates = new HashMap<String, ServerTemplate>();
     private InternalHost host;
@@ -38,13 +39,13 @@ public class InternalSubCreator extends SubCreator {
     /**
      * Creates an Internal SubCreator
      *
-     * @param host Host
+     * @param host    Host
      * @param gitBash Git Bash
      */
     public InternalSubCreator(InternalHost host, String gitBash) {
         if (Util.isNull(host, gitBash)) throw new NullPointerException();
         this.host = host;
-        this.gitBash = (System.getenv("ProgramFiles(x86)") == null)?Pattern.compile("%(ProgramFiles)\\(x86\\)%", Pattern.CASE_INSENSITIVE).matcher(gitBash).replaceAll("%$1%"):gitBash;
+        this.gitBash = (System.getenv("ProgramFiles(x86)") == null) ? Pattern.compile("%(ProgramFiles)\\(x86\\)%", Pattern.CASE_INSENSITIVE).matcher(gitBash).replaceAll("%$1%") : gitBash;
         this.thread = new TreeMap<String, NamedContainer<Thread, NamedContainer<InternalSubLogger, Process>>>();
         reload();
     }
@@ -52,19 +53,20 @@ public class InternalSubCreator extends SubCreator {
     @Override
     public void reload() {
         templates.clear();
-        if (new UniversalFile(host.plugin.dir, "SubServers:Templates").exists()) for (File file : new UniversalFile(host.plugin.dir, "SubServers:Templates").listFiles()) {
-            try {
-                if (file.isDirectory()) {
-                    YAMLSection config = (new UniversalFile(file, "template.yml").exists())?new YAMLConfig(new UniversalFile(file, "template.yml")).get().getSection("Template", new YAMLSection()):new YAMLSection();
-                    ServerTemplate template = new ServerTemplate(file.getName(), config.getBoolean("Enabled", true), config.getRawString("Icon", "::NULL::"), file, config.getSection("Build", new YAMLSection()), config.getSection("Settings", new YAMLSection()));
-                    templates.put(file.getName().toLowerCase(), template);
-                    if (config.getKeys().contains("Display")) template.setDisplayName(config.getString("Display"));
+        if (new UniversalFile(host.plugin.dir, "SubServers:Templates").exists())
+            for (File file : new UniversalFile(host.plugin.dir, "SubServers:Templates").listFiles()) {
+                try {
+                    if (file.isDirectory()) {
+                        YAMLSection config = (new UniversalFile(file, "template.yml").exists()) ? new YAMLConfig(new UniversalFile(file, "template.yml")).get().getSection("Template", new YAMLSection()) : new YAMLSection();
+                        ServerTemplate template = new ServerTemplate(file.getName(), config.getBoolean("Enabled", true), config.getRawString("Icon", "::NULL::"), file, config.getSection("Build", new YAMLSection()), config.getSection("Settings", new YAMLSection()));
+                        templates.put(file.getName().toLowerCase(), template);
+                        if (config.getKeys().contains("Display")) template.setDisplayName(config.getString("Display"));
+                    }
+                } catch (Exception e) {
+                    System.out.println(host.getName() + File.separator + "Creator > Couldn't load template: " + file.getName());
+                    e.printStackTrace();
                 }
-            } catch (Exception e) {
-                System.out.println(host.getName() + File.separator + "Creator > Couldn't load template: " + file.getName());
-                e.printStackTrace();
             }
-        }
     }
 
     private YAMLSection build(NamedContainer<InternalSubLogger, Process> thread, File dir, String name, ServerTemplate template, Version version, List<ServerTemplate> history) throws SubCreatorException {
@@ -132,7 +134,7 @@ public class InternalSubCreator extends SubCreator {
         }
 
         if (template.getBuildOptions().contains("Shell-Location")) {
-            String gitBash = this.gitBash + ((this.gitBash.endsWith(File.separator))?"":File.separator) + "bin" + File.separatorChar + "bash.exe";
+            String gitBash = this.gitBash + ((this.gitBash.endsWith(File.separator)) ? "" : File.separator) + "bin" + File.separatorChar + "bash.exe";
             if (!(System.getProperty("os.name").toLowerCase().indexOf("win") >= 0) && template.getBuildOptions().contains("Permission")) {
                 try {
                     Process process = Runtime.getRuntime().exec("chmod " + template.getBuildOptions().getRawString("Permission") + ' ' + template.getBuildOptions().getRawString("Shell-Location"), null, dir);
@@ -191,14 +193,12 @@ public class InternalSubCreator extends SubCreator {
         if (config != null) {
             try {
                 System.out.println(name + File.separator + "Creator > Saving...");
-                if (host.plugin.exServers.keySet().contains(name.toLowerCase())) host.plugin.exServers.remove(name.toLowerCase());
+                if (host.plugin.exServers.keySet().contains(name.toLowerCase()))
+                    host.plugin.exServers.remove(name.toLowerCase());
 
-                for (String option : config.getKeys()) {
-                    if (config.isString(option)) {
-                        config.set(option, config.getRawString(option).replace("$name$", name).replace("$template$", template.getName()).replace("$type$", template.getType().toString())
-                                .replace("$version$", version.toString().replace(" ", "@")).replace("$port$", Integer.toString(port)));
-                    }
-                }
+                config = new YAMLSection((Map<String, ?>) convert(config.get(), new NamedContainer<>("$player$", (player == null)?"":player.toString()), new NamedContainer<>("$name$", name), new NamedContainer<>("$template$", template.getName()),
+                        new NamedContainer<>("$type$", template.getType().toString()), new NamedContainer<>("$version$", version.toString().replace(" ", "@")), new NamedContainer<>("$port$", Integer.toString(port))));
+
                 server.set("Enabled", true);
                 //server.set("Editable", true);
                 server.set("Display", "");
@@ -222,7 +222,8 @@ public class InternalSubCreator extends SubCreator {
                 if (!server.getBoolean("Editable", true)) subserver.setEditable(true);
                 if (server.getString("Display").length() > 0) subserver.setDisplayName(server.getString("Display"));
                 for (String group : server.getStringList("Group")) subserver.addGroup(group);
-                if (server.contains("Extra")) for (String extra : server.getSection("Extra").getKeys()) subserver.addExtra(extra, server.getObject(extra));
+                if (server.contains("Extra")) for (String extra : server.getSection("Extra").getKeys())
+                    subserver.addExtra(extra, server.getSection("Extra").getObject(extra));
                 host.plugin.config.get().getSection("Servers").set(name, server);
                 host.plugin.config.save();
             } catch (Exception e) {
@@ -232,12 +233,34 @@ public class InternalSubCreator extends SubCreator {
             System.out.println(name + File.separator + "Creator > Couldn't build the server jar. Check the SubCreator logs for more detail.");
         }
         this.thread.remove(name.toLowerCase());
+    } private Object convert(Object value, NamedContainer<String, String>... replacements) {
+        if (value instanceof Map) {
+            List<String> list = new ArrayList<String>();
+            list.addAll(((Map<String, Object>) value).keySet());
+            for (String key : list) ((Map<String, Object>) value).put(key, convert(((Map<String, Object>) value).get(key), replacements));
+            return value;
+        } else if (value instanceof Collection) {
+            List<Object> list = new ArrayList<Object>();
+            for (Object val : (Collection<Object>) value) list.add(convert(val, replacements));
+            return list;
+        } else if (value.getClass().isArray()) {
+            List<Object> list = new ArrayList<Object>();
+            for (int i = 0; i < ((Object[]) value).length; i++) list.add(convert(((Object[]) value)[i], replacements));
+            return list;
+        } else if (value instanceof String) {
+            return replace((String) value, replacements);
+        } else {
+            return value;
+        }
+    } private String replace(String string, NamedContainer<String, String>... replacements) {
+        for (NamedContainer<String, String> replacement : replacements) string = string.replace(replacement.name(), replacement.get());
+        return string;
     }
 
     @Override
     public boolean create(UUID player, String name, ServerTemplate template, Version version, int port) {
         if (Util.isNull(name, template, version, port)) throw new NullPointerException();
-        if (template.isEnabled() && !SubAPI.getInstance().getSubServers().keySet().contains(name.toLowerCase()) && !SubCreator.isReserved(name)) {
+        if (host.isEnabled() && template.isEnabled() && !SubAPI.getInstance().getSubServers().keySet().contains(name.toLowerCase()) && !SubCreator.isReserved(name)) {
             NamedContainer<Thread, NamedContainer<InternalSubLogger, Process>> thread = new NamedContainer<Thread, NamedContainer<InternalSubLogger, Process>>(null, new NamedContainer<InternalSubLogger, Process>(new InternalSubLogger(null, this, name + File.separator + "Creator", new Container<Boolean>(false), null), null));
             this.thread.put(name.toLowerCase(), thread);
 

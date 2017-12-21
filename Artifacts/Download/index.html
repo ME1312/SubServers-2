@@ -1,6 +1,7 @@
 <!doctype html>
 <html>
 	<head>
+		<title>Download SubServers</title>
 		<meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
 	</head>
@@ -304,8 +305,9 @@
 				return params;
 			}
 			if (hash.hasOwnProperty("app")) {
-				$('.full-app-name').html(hash.app)
+				$('.full-app-name').html(hash.app);
 				$('.app-name').html(hash.app.replace(/^(.+?)\.([^.]*)$/, '$1'));
+				document.title = "Download " + hash.app.replace(/^(.+?)\.([^.]*)$/, '$1');
 				if (hash.hasOwnProperty("commit")) {
 					$('.app-version').html(hash.commit.substring(0, 7) + '<span class="full">' + hash.commit.substring(7) + '</span>');
 					$('a').each(function() {
