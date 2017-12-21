@@ -252,7 +252,7 @@ public class ExternalSubServer extends SubServerContainer {
                             }
                             break;
                         case "port":
-                            if (value.isInt() && host.removeSubServer(player, getName())) {
+                            if (value.isNumber() && host.removeSubServer(player, getName())) {
                                 waitFor(() -> host.getSubServer(getName()), null);
                                 SubServer server = host.addSubServer(player, getName(), isEnabled(), value.asInt(), getMotd(), isLogging(), getPath(), getExecutable(), getStopCommand(), false, willAutoRestart(), isHidden(), isRestricted(), isTemporary());
                                 if (server != null) {

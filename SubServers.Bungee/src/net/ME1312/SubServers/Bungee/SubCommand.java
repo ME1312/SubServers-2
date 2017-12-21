@@ -40,13 +40,12 @@ public final class SubCommand extends CommandX {
 
     protected static NamedContainer<SubCommand, CommandX> newInstance(SubPlugin plugin, String command) {
         NamedContainer<SubCommand, CommandX> cmd = new NamedContainer<>(new SubCommand(plugin, command), null);
-        if (plugin.api.getGameVersion().compareTo(new Version("1.13")) < 0) {
-            cmd.set(cmd.name());
-            return cmd;
-        } else {
-            cmd.set(new net.ME1312.SubServers.Bungee.Library.Compatibility.v1_13.CommandX(cmd.name()));
-            return cmd;
+        CommandX now = cmd.name();
+        if (plugin.api.getGameVersion().compareTo(new Version("1.13")) >= 0) {
+            now = new net.ME1312.SubServers.Bungee.Library.Compatibility.v1_13.CommandX(cmd.name());
         }
+        cmd.set(now);
+        return cmd;
     }
 
     private SubCommand(SubPlugin plugin, String command) {
@@ -520,7 +519,7 @@ public final class SubCommand extends CommandX {
     /**
      * BungeeCord /server
      */
-    public static final class BungeeServer extends net.ME1312.SubServers.Bungee.Library.Compatibility.CommandX {
+    public static final class BungeeServer extends CommandX {
         private SubPlugin plugin;
         private BungeeServer(SubPlugin plugin, String command) {
             super(command, "bungeecord.command.server");
@@ -529,23 +528,12 @@ public final class SubCommand extends CommandX {
 
         protected static NamedContainer<BungeeServer, CommandX> newInstance(SubPlugin plugin, String command) {
             NamedContainer<BungeeServer, CommandX> cmd = new NamedContainer<>(new BungeeServer(plugin, command), null);
-            if (plugin.api.getGameVersion().compareTo(new Version("1.13")) < 0) {
-                cmd.set(cmd.name());
-                return cmd;
-            } else {
-                cmd.set(new net.ME1312.SubServers.Bungee.Library.Compatibility.v1_13.CommandX(new CommandX(command) {
-                    @Override
-                    public void execute(CommandSender sender, String[] args) {
-                        cmd.name().suggestArguments(sender, args);
-                    }
-
-                    @Override
-                    public NamedContainer<String, List<String>> suggestArguments(CommandSender sender, String[] args) {
-                        return cmd.name().suggestArguments(sender, args);
-                    }
-                }));
-                return cmd;
+            CommandX now = cmd.name();
+            if (plugin.api.getGameVersion().compareTo(new Version("1.13")) >= 0) {
+                now = new net.ME1312.SubServers.Bungee.Library.Compatibility.v1_13.CommandX(cmd.name());
             }
+            cmd.set(now);
+            return cmd;
         }
 
         /**

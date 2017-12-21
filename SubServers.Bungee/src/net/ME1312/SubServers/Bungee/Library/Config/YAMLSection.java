@@ -1,7 +1,6 @@
 package net.ME1312.SubServers.Bungee.Library.Config;
 
 import net.ME1312.SubServers.Bungee.Library.Util;
-import net.md_5.bungee.api.ChatColor;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.yaml.snakeyaml.Yaml;
@@ -91,11 +90,7 @@ public class YAMLSection {
         this.handle = handle;
         this.up = up;
 
-        if (map != null) {
-            for (String key : map.keySet()) {
-                this.map.put(key, map.get(key));
-            }
-        }
+        if (map != null) setAll(map);
     }
 
 
@@ -140,27 +135,6 @@ public class YAMLSection {
      */
     public boolean contains(String handle) {
         return map.keySet().contains(handle);
-    }
-
-    /**
-     * Remove an Object by Handle
-     *
-     * @param handle Handle
-     */
-    public void remove(String handle) {
-        if (Util.isNull(handle)) throw new NullPointerException();
-        map.remove(handle);
-
-        if (this.handle != null && this.up != null) {
-            this.up.set(this.handle, this);
-        }
-    }
-
-    /**
-     * Remove all Objects from this YAML Section
-     */
-    public void clear() {
-        map.clear();
     }
 
     private Object convert(Object value) {
@@ -337,12 +311,24 @@ public class YAMLSection {
     }
 
     /**
-     * Go up a level in the config (or null if this is the top layer)
+     * Remove an Object by Handle
      *
-     * @return Super Section
+     * @param handle Handle
      */
-    public YAMLSection superSection() {
-        return up;
+    public void remove(String handle) {
+        if (Util.isNull(handle)) throw new NullPointerException();
+        map.remove(handle);
+
+        if (this.handle != null && this.up != null) {
+            this.up.set(this.handle, this);
+        }
+    }
+
+    /**
+     * Remove all Objects from this YAML Section
+     */
+    public void clear() {
+        map.clear();
     }
 
     /**
@@ -354,18 +340,13 @@ public class YAMLSection {
         return new YAMLSection(map, null, null, yaml);
     }
 
-    @Override
-    public String toString() {
-        return yaml.dump(map);
-    }
-
     /**
-     * Convert to JSON
+     * Go up a level in the config (or null if this is the top layer)
      *
-     * @return JSON
+     * @return Super Section
      */
-    public JSONObject toJSON() {
-        return new JSONObject(map);
+    public YAMLSection superSection() {
+        return up;
     }
 
     /**
@@ -400,7 +381,7 @@ public class YAMLSection {
      */
     public YAMLValue get(String handle, YAMLValue def) {
         if (Util.isNull(handle)) throw new NullPointerException();
-        return (map.get(handle) != null) ? (new YAMLValue(map.get(handle), this, handle, yaml)) : def;
+        return new YAMLValue((map.get(handle) != null)?map.get(handle):def.asObject(), this, handle, yaml);
     }
 
     /**
@@ -433,13 +414,13 @@ public class YAMLSection {
         if (Util.isNull(handle)) throw new NullPointerException();
         if (map.get(handle) != null) {
             return getList(handle);
-        } else {
+        } else if (def != null) {
             List<YAMLValue> values = new ArrayList<YAMLValue>();
             for (Object value : def) {
                 values.add(new YAMLValue(value, null, null, yaml));
             }
             return values;
-        }
+        } else return null;
     }
 
     /**
@@ -453,13 +434,13 @@ public class YAMLSection {
         if (Util.isNull(handle)) throw new NullPointerException();
         if (map.get(handle) != null) {
             return getList(handle);
-        } else {
+        } else if (def != null) {
             List<YAMLValue> values = new ArrayList<YAMLValue>();
             for (YAMLValue value : def) {
-                values.add(value);
+                values.add(new YAMLValue(value.asObject(), null, null, yaml));
             }
             return values;
-        }
+        } else return null;
     }
 
     /**
@@ -469,8 +450,7 @@ public class YAMLSection {
      * @return Object
      */
     public Object getObject(String handle) {
-        if (Util.isNull(handle)) throw new NullPointerException();
-        return map.get(handle);
+        return get(handle).asObject();
     }
 
     /**
@@ -481,8 +461,7 @@ public class YAMLSection {
      * @return Object
      */
     public Object getObject(String handle, Object def) {
-        if (Util.isNull(handle)) throw new NullPointerException();
-        return (map.get(handle) != null)?map.get(handle):def;
+        return get(handle, def).asObject();
     }
 
     /**
@@ -492,8 +471,7 @@ public class YAMLSection {
      * @return Object List
      */
     public List<?> getObjectList(String handle) {
-        if (Util.isNull(handle)) throw new NullPointerException();
-        return (List<?>) map.get(handle);
+        return get(handle).asObjectList();
     }
 
     /**
@@ -504,8 +482,7 @@ public class YAMLSection {
      * @return Object List
      */
     public List<?> getObjectList(String handle, List<?> def) {
-        if (Util.isNull(handle)) throw new NullPointerException();
-        return (List<?>) ((map.get(handle) != null)?map.get(handle):def);
+        return get(handle, def).asObjectList();
     }
 
     /**
@@ -514,9 +491,8 @@ public class YAMLSection {
      * @param handle Handle
      * @return Boolean
      */
-    public boolean getBoolean(String handle) {
-        if (Util.isNull(handle)) throw new NullPointerException();
-        return (boolean) map.get(handle);
+    public Boolean getBoolean(String handle) {
+        return get(handle).asBoolean();
     }
 
     /**
@@ -526,9 +502,8 @@ public class YAMLSection {
      * @param def Default
      * @return Boolean
      */
-    public boolean getBoolean(String handle, boolean def) {
-        if (Util.isNull(handle)) throw new NullPointerException();
-        return (boolean) ((map.get(handle) != null)?map.get(handle):def);
+    public Boolean getBoolean(String handle, Boolean def) {
+        return get(handle, def).asBoolean();
     }
 
     /**
@@ -538,8 +513,7 @@ public class YAMLSection {
      * @return Boolean List
      */
     public List<Boolean> getBooleanList(String handle) {
-        if (Util.isNull(handle)) throw new NullPointerException();
-        return (List<Boolean>) map.get(handle);
+        return get(handle).asBooleanList();
     }
 
     /**
@@ -550,8 +524,7 @@ public class YAMLSection {
      * @return Boolean List
      */
     public List<Boolean> getBooleanList(String handle, List<Boolean> def) {
-        if (Util.isNull(handle)) throw new NullPointerException();
-        return (List<Boolean>) ((map.get(handle) != null)?map.get(handle):def);
+        return get(handle, def).asBooleanList();
     }
 
     /**
@@ -561,8 +534,7 @@ public class YAMLSection {
      * @return YAML Section
      */
     public YAMLSection getSection(String handle) {
-        if (Util.isNull(handle)) throw new NullPointerException();
-        return (map.get(handle) != null)?(new YAMLSection((Map<String, Object>) map.get(handle), this, handle, yaml)):null;
+        return get(handle).asSection();
     }
 
     /**
@@ -573,8 +545,7 @@ public class YAMLSection {
      * @return YAML Section
      */
     public YAMLSection getSection(String handle, Map<String, ?> def) {
-        if (Util.isNull(handle)) throw new NullPointerException();
-        return new YAMLSection((Map<String, Object>) ((map.get(handle) != null)?map.get(handle):def), this, handle, yaml);
+        return get(handle, def).asSection();
     }
 
     /**
@@ -586,7 +557,7 @@ public class YAMLSection {
      */
     public YAMLSection getSection(String handle, YAMLSection def) {
         if (Util.isNull(handle)) throw new NullPointerException();
-        return (map.get(handle) != null)?(new YAMLSection((Map<String, Object>) map.get(handle), this, handle, yaml)):def;
+        return (map.get(handle) != null)?get(handle).asSection():((def != null)?new YAMLSection(def.get(), this, handle, yaml):null);
     }
 
     /**
@@ -596,16 +567,7 @@ public class YAMLSection {
      * @return YAML Section List
      */
     public List<YAMLSection> getSectionList(String handle) {
-        if (Util.isNull(handle)) throw new NullPointerException();
-        if (map.get(handle) != null) {
-            List<YAMLSection> values = new ArrayList<YAMLSection>();
-            for (Map<String, ?> value : (List<? extends Map<String, ?>>) map.get(handle)) {
-                values.add(new YAMLSection(value, null, null, yaml));
-            }
-            return values;
-        } else {
-            return null;
-        }
+        return get(handle).asSectionList();
     }
 
     /**
@@ -616,16 +578,7 @@ public class YAMLSection {
      * @return YAML Section List
      */
     public List<YAMLSection> getSectionList(String handle, Collection<? extends Map<String, ?>> def) {
-        if (Util.isNull(handle)) throw new NullPointerException();
-        if (map.get(handle) != null) {
-            return getSectionList(handle);
-        } else {
-            List<YAMLSection> values = new ArrayList<YAMLSection>();
-            for (Map<String, ?> value : def) {
-                values.add(new YAMLSection(value, null, null, yaml));
-            }
-            return values;
-        }
+        return get(handle, def).asSectionList();
     }
 
     /**
@@ -638,14 +591,14 @@ public class YAMLSection {
     public List<YAMLSection> getSectionList(String handle, List<? extends YAMLSection> def) {
         if (Util.isNull(handle)) throw new NullPointerException();
         if (map.get(handle) != null) {
-            return getSectionList(handle);
-        } else {
+            return get(handle).asSectionList();
+        } else if (def != null) {
             List<YAMLSection> values = new ArrayList<YAMLSection>();
             for (YAMLSection value : def) {
-                values.add(value);
+                values.add(new YAMLSection(value.get(), null, null, yaml));
             }
             return values;
-        }
+        } else return null;
     }
 
     /**
@@ -654,9 +607,8 @@ public class YAMLSection {
      * @param handle Handle
      * @return Double
      */
-    public double getDouble(String handle) {
-        if (Util.isNull(handle)) throw new NullPointerException();
-        return (double) map.get(handle);
+    public Double getDouble(String handle) {
+        return get(handle).asDouble();
     }
 
     /**
@@ -666,9 +618,8 @@ public class YAMLSection {
      * @param def Default
      * @return Double
      */
-    public double getDouble(String handle, double def) {
-        if (Util.isNull(handle)) throw new NullPointerException();
-        return (double) ((map.get(handle) != null)?map.get(handle):def);
+    public Double getDouble(String handle, Double def) {
+        return get(handle, def).asDouble();
     }
 
     /**
@@ -678,8 +629,7 @@ public class YAMLSection {
      * @return Double List
      */
     public List<Double> getDoubleList(String handle) {
-        if (Util.isNull(handle)) throw new NullPointerException();
-        return (List<Double>) map.get(handle);
+        return get(handle).asDoubleList();
     }
 
     /**
@@ -690,8 +640,7 @@ public class YAMLSection {
      * @return Double List
      */
     public List<Double> getDoubleList(String handle, List<Double> def) {
-        if (Util.isNull(handle)) throw new NullPointerException();
-        return (List<Double>) ((map.get(handle) != null)?map.get(handle):def);
+        return get(handle, def).asDoubleList();
     }
 
     /**
@@ -700,9 +649,8 @@ public class YAMLSection {
      * @param handle Handle
      * @return Float
      */
-    public float getFloat(String handle) {
-        if (Util.isNull(handle)) throw new NullPointerException();
-        return (float) map.get(handle);
+    public Float getFloat(String handle) {
+        return get(handle).asFloat();
     }
 
     /**
@@ -712,9 +660,8 @@ public class YAMLSection {
      * @param def Default
      * @return Float
      */
-    public float getFloat(String handle, float def) {
-        if (Util.isNull(handle)) throw new NullPointerException();
-        return (float) ((map.get(handle) != null)?map.get(handle):def);
+    public Float getFloat(String handle, Float def) {
+        return get(handle, def).asFloat();
     }
 
     /**
@@ -724,8 +671,7 @@ public class YAMLSection {
      * @return Float List
      */
     public List<Float> getFloatList(String handle) {
-        if (Util.isNull(handle)) throw new NullPointerException();
-        return (List<Float>) map.get(handle);
+        return get(handle).asFloatList();
     }
 
     /**
@@ -735,9 +681,8 @@ public class YAMLSection {
      * @param def Default
      * @return Float List
      */
-    public List<Float> getFloatList(String handle, float def) {
-        if (Util.isNull(handle)) throw new NullPointerException();
-        return (List<Float>) ((map.get(handle) != null)?map.get(handle):def);
+    public List<Float> getFloatList(String handle, List<Float> def) {
+        return get(handle, def).asFloatList();
     }
 
     /**
@@ -746,9 +691,8 @@ public class YAMLSection {
      * @param handle Handle
      * @return Integer
      */
-    public int getInt(String handle) {
-        if (Util.isNull(handle)) throw new NullPointerException();
-        return (int) map.get(handle);
+    public Integer getInt(String handle) {
+        return get(handle).asInt();
     }
 
     /**
@@ -758,9 +702,8 @@ public class YAMLSection {
      * @param def Default
      * @return Integer
      */
-    public int getInt(String handle, int def) {
-        if (Util.isNull(handle)) throw new NullPointerException();
-        return (int) ((map.get(handle) != null)?map.get(handle):def);
+    public Integer getInt(String handle, Integer def) {
+        return get(handle, def).asInt();
     }
 
     /**
@@ -770,8 +713,7 @@ public class YAMLSection {
      * @return Integer List
      */
     public List<Integer> getIntList(String handle) {
-        if (Util.isNull(handle)) throw new NullPointerException();
-        return (List<Integer>) map.get(handle);
+        return get(handle).asIntList();
     }
 
     /**
@@ -782,8 +724,7 @@ public class YAMLSection {
      * @return Integer List
      */
     public List<Integer> getIntList(String handle, List<Integer> def) {
-        if (Util.isNull(handle)) throw new NullPointerException();
-        return (List<Integer>) ((map.get(handle) != null)?map.get(handle):def);
+        return get(handle, def).asIntList();
     }
 
     /**
@@ -792,9 +733,8 @@ public class YAMLSection {
      * @param handle Handle
      * @return Long
      */
-    public long getLong(String handle) {
-        if (Util.isNull(handle)) throw new NullPointerException();
-        return (long) map.get(handle);
+    public Long getLong(String handle) {
+        return get(handle).asLong();
     }
 
     /**
@@ -804,9 +744,8 @@ public class YAMLSection {
      * @param def Default
      * @return Long
      */
-    public long getLong(String handle, long def) {
-        if (Util.isNull(handle)) throw new NullPointerException();
-        return (long) ((map.get(handle) != null)?map.get(handle):def);
+    public Long getLong(String handle, Long def) {
+        return get(handle, def).asLong();
     }
 
     /**
@@ -816,8 +755,7 @@ public class YAMLSection {
      * @return Long List
      */
     public List<Long> getLongList(String handle) {
-        if (Util.isNull(handle)) throw new NullPointerException();
-        return (List<Long>) map.get(handle);
+        return get(handle).asLongList();
     }
 
     /**
@@ -828,8 +766,7 @@ public class YAMLSection {
      * @return Long List
      */
     public List<Long> getLongList(String handle, List<Long> def) {
-        if (Util.isNull(handle)) throw new NullPointerException();
-        return (List<Long>) ((map.get(handle) != null)?map.get(handle):def);
+        return get(handle).asLongList();
     }
 
     /**
@@ -838,9 +775,8 @@ public class YAMLSection {
      * @param handle Handle
      * @return Short
      */
-    public short getShort(String handle) {
-        if (Util.isNull(handle)) throw new NullPointerException();
-        return (short) map.get(handle);
+    public Short getShort(String handle) {
+        return get(handle).asShort();
     }
 
     /**
@@ -850,9 +786,8 @@ public class YAMLSection {
      * @param def Default
      * @return Short
      */
-    public short getShort(String handle, short def) {
-        if (Util.isNull(handle)) throw new NullPointerException();
-        return (short) ((map.get(handle) != null)?map.get(handle):def);
+    public Short getShort(String handle, Short def) {
+        return get(handle, def).asShort();
     }
 
     /**
@@ -862,8 +797,7 @@ public class YAMLSection {
      * @return Short List
      */
     public List<Short> getShortList(String handle) {
-        if (Util.isNull(handle)) throw new NullPointerException();
-        return (List<Short>) map.get(handle);
+        return get(handle).asShortList();
     }
 
     /**
@@ -874,8 +808,7 @@ public class YAMLSection {
      * @return Short List
      */
     public List<Short> getShortList(String handle, List<Short> def) {
-        if (Util.isNull(handle)) throw new NullPointerException();
-        return (List<Short>) ((map.get(handle) != null)?map.get(handle):def);
+        return get(handle).asShortList();
     }
 
     /**
@@ -885,8 +818,7 @@ public class YAMLSection {
      * @return Unparsed String
      */
     public String getRawString(String handle) {
-        if (Util.isNull(handle)) throw new NullPointerException();
-        return (String) map.get(handle);
+        return get(handle).asRawString();
     }
 
     /**
@@ -897,8 +829,7 @@ public class YAMLSection {
      * @return Unparsed String
      */
     public String getRawString(String handle, String def) {
-        if (Util.isNull(handle)) throw new NullPointerException();
-        return (String) ((map.get(handle) != null)?map.get(handle):def);
+        return get(handle, def).asRawString();
     }
 
     /**
@@ -908,8 +839,7 @@ public class YAMLSection {
      * @return Unparsed String List
      */
     public List<String> getRawStringList(String handle) {
-        if (Util.isNull(handle)) throw new NullPointerException();
-        return (List<String>) map.get(handle);
+        return get(handle).asRawStringList();
     }
 
     /**
@@ -920,8 +850,7 @@ public class YAMLSection {
      * @return Unparsed String List
      */
     public List<String> getRawStringList(String handle, List<String> def) {
-        if (Util.isNull(handle)) throw new NullPointerException();
-        return (List<String>) ((map.get(handle) != null)?map.get(handle):def);
+        return get(handle, def).asRawStringList();
     }
 
     /**
@@ -931,8 +860,7 @@ public class YAMLSection {
      * @return String
      */
     public String getString(String handle) {
-        if (Util.isNull(handle)) throw new NullPointerException();
-        return (map.get(handle) != null)?Util.unescapeJavaString((String) map.get(handle)):null;
+        return get(handle).asString();
     }
 
     /**
@@ -943,8 +871,7 @@ public class YAMLSection {
      * @return String
      */
     public String getString(String handle, String def) {
-        if (Util.isNull(handle)) throw new NullPointerException();
-        return Util.unescapeJavaString((String) ((map.get(handle) != null) ? map.get(handle) : def));
+        return get(handle, def).asString();
     }
 
     /**
@@ -954,16 +881,7 @@ public class YAMLSection {
      * @return String List
      */
     public List<String> getStringList(String handle) {
-        if (Util.isNull(handle)) throw new NullPointerException();
-        if (map.get(handle) != null) {
-            List<String> values = new ArrayList<String>();
-            for (String value : (List<String>) map.get(handle)) {
-                values.add(Util.unescapeJavaString(value));
-            }
-            return values;
-        } else {
-            return null;
-        }
+        return get(handle).asStringList();
     }
 
     /**
@@ -974,16 +892,7 @@ public class YAMLSection {
      * @return String List
      */
     public List<String> getStringList(String handle, List<String> def) {
-        if (Util.isNull(handle)) throw new NullPointerException();
-        if (map.get(handle) != null) {
-            return getStringList(handle);
-        } else {
-            List<String> values = new ArrayList<String>();
-            for (String value : def) {
-                values.add(Util.unescapeJavaString(value));
-            }
-            return values;
-        }
+        return get(handle, def).asStringList();
     }
 
     /**
@@ -994,8 +903,7 @@ public class YAMLSection {
      * @return Colored String
      */
     public String getColoredString(String handle, char color) {
-        if (Util.isNull(handle, color)) throw new NullPointerException();
-        return (map.get(handle) != null)? ChatColor.translateAlternateColorCodes(color, Util.unescapeJavaString((String) map.get(handle))):null;
+        return get(handle).asColoredString(color);
     }
 
     /**
@@ -1007,8 +915,7 @@ public class YAMLSection {
      * @return Colored String
      */
     public String getColoredString(String handle, String def, char color) {
-        if (Util.isNull(handle, color)) throw new NullPointerException();
-        return ChatColor.translateAlternateColorCodes(color, Util.unescapeJavaString((String) ((map.get(handle) != null) ? map.get(handle) : def)));
+        return get(handle, def).asColoredString(color);
     }
     /**
      * Get a Colored String List by Handle
@@ -1018,16 +925,7 @@ public class YAMLSection {
      * @return Colored String List
      */
     public List<String> getColoredStringList(String handle, char color) {
-        if (Util.isNull(handle, color)) throw new NullPointerException();
-        if (map.get(handle) != null) {
-            List<String> values = new ArrayList<String>();
-            for (String value : (List<String>) map.get(handle)) {
-                values.add(ChatColor.translateAlternateColorCodes(color, Util.unescapeJavaString(value)));
-            }
-            return values;
-        } else {
-            return null;
-        }
+        return get(handle).asColoredStringList(color);
     }
 
     /**
@@ -1039,16 +937,7 @@ public class YAMLSection {
      * @return Colored String List
      */
     public List<String> getColoredStringList(String handle, List<String> def, char color) {
-        if (Util.isNull(handle, color)) throw new NullPointerException();
-        if (map.get(handle) != null) {
-            return getColoredStringList(handle, color);
-        } else {
-            List<String> values = new ArrayList<String>();
-            for (String value : def) {
-                values.add(ChatColor.translateAlternateColorCodes(color, Util.unescapeJavaString(value)));
-            }
-            return values;
-        }
+        return get(handle, def).asColoredStringList(color);
     }
 
     /**
@@ -1058,8 +947,7 @@ public class YAMLSection {
      * @return UUID
      */
     public UUID getUUID(String handle) {
-        if (Util.isNull(handle)) throw new NullPointerException();
-        return (map.get(handle) != null)?UUID.fromString((String) map.get(handle)):null;
+        return get(handle).asUUID();
     }
 
     /**
@@ -1070,8 +958,7 @@ public class YAMLSection {
      * @return UUID
      */
     public UUID getUUID(String handle, UUID def) {
-        if (Util.isNull(handle)) throw new NullPointerException();
-        return UUID.fromString((String) ((map.get(handle) != null) ? map.get(handle) : def));
+        return get(handle, def).asUUID();
     }
 
     /**
@@ -1081,16 +968,7 @@ public class YAMLSection {
      * @return UUID List
      */
     public List<UUID> getUUIDList(String handle) {
-        if (Util.isNull(handle)) throw new NullPointerException();
-        if (map.get(handle) != null) {
-            List<UUID> values = new ArrayList<UUID>();
-            for (String value : (List<String>) map.get(handle)) {
-                values.add(UUID.fromString(value));
-            }
-            return values;
-        } else {
-            return null;
-        }
+        return get(handle).asUUIDList();
     }
 
     /**
@@ -1101,12 +979,17 @@ public class YAMLSection {
      * @return UUID List
      */
     public List<UUID> getUUIDList(String handle, List<UUID> def) {
-        if (Util.isNull(handle)) throw new NullPointerException();
-        if (map.get(handle) != null) {
-            return getUUIDList(handle);
-        } else {
-            return def;
-        }
+        return get(handle, def).asUUIDList();
+    }
+
+    /**
+     * Check if object is Null by Handle
+     *
+     * @param handle Handle
+     * @return Object Null Status
+     */
+    public boolean isNull(String handle) {
+        return get(handle).isNull();
     }
 
     /**
@@ -1116,8 +999,7 @@ public class YAMLSection {
      * @return Object Boolean Status
      */
     public boolean isBoolean(String handle) {
-        if (Util.isNull(handle)) throw new NullPointerException();
-        return (map.get(handle) instanceof Boolean);
+        return get(handle).isBoolean();
     }
 
     /**
@@ -1127,41 +1009,7 @@ public class YAMLSection {
      * @return Object YAML Section Status
      */
     public boolean isSection(String handle) {
-        if (Util.isNull(handle)) throw new NullPointerException();
-        return (map.get(handle) instanceof Map);
-    }
-
-    /**
-     * Check if object is a Double by Handle
-     *
-     * @param handle Handle
-     * @return Object Double Status
-     */
-    public boolean isDouble(String handle) {
-        if (Util.isNull(handle)) throw new NullPointerException();
-        return (map.get(handle) instanceof Double);
-    }
-
-    /**
-     * Check if object is a Float by Handle
-     *
-     * @param handle Handle
-     * @return Object Float Status
-     */
-    public boolean isFloat(String handle) {
-        if (Util.isNull(handle)) throw new NullPointerException();
-        return (map.get(handle) instanceof Float);
-    }
-
-    /**
-     * Check if object is an Integer by Handle
-     *
-     * @param handle Handle
-     * @return Object Integer Status
-     */
-    public boolean isInt(String handle) {
-        if (Util.isNull(handle)) throw new NullPointerException();
-        return (map.get(handle) instanceof Integer);
+        return get(handle).isSection();
     }
 
     /**
@@ -1171,19 +1019,17 @@ public class YAMLSection {
      * @return Object List Status
      */
     public boolean isList(String handle) {
-        if (Util.isNull(handle)) throw new NullPointerException();
-        return (map.get(handle) instanceof List);
+        return get(handle).isList();
     }
 
     /**
-     * Check if object is a Long by Handle
+     * Check if object is a Number by Handle
      *
      * @param handle Handle
-     * @return Object Long Status
+     * @return Number Status
      */
-    public boolean isLong(String handle) {
-        if (Util.isNull(handle)) throw new NullPointerException();
-        return (map.get(handle) instanceof Long);
+    public boolean isNumber(String handle) {
+        return get(handle).isNumber();
     }
 
     /**
@@ -1193,8 +1039,7 @@ public class YAMLSection {
      * @return Object String Status
      */
     public boolean isString(String handle) {
-        if (Util.isNull(handle)) throw new NullPointerException();
-        return (map.get(handle) instanceof String);
+        return get(handle).isString();
     }
 
     /**
@@ -1204,8 +1049,20 @@ public class YAMLSection {
      * @return Object UUID Status
      */
     public boolean isUUID(String handle) {
-        if (Util.isNull(handle)) throw new NullPointerException();
-        return (map.get(handle) instanceof String && !Util.isException(() -> UUID.fromString((String) map.get(handle))));
+        return get(handle).isUUID();
     }
 
+    @Override
+    public String toString() {
+        return yaml.dump(map);
+    }
+
+    /**
+     * Convert to JSON
+     *
+     * @return JSON
+     */
+    public JSONObject toJSON() {
+        return new JSONObject(map);
+    }
 }

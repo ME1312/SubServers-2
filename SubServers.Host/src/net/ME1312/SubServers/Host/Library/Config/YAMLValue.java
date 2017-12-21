@@ -58,8 +58,8 @@ public class YAMLValue {
      *
      * @return Boolean
      */
-    public boolean asBoolean() {
-        return (boolean) obj;
+    public Boolean asBoolean() {
+        return (Boolean) obj;
     }
 
     /**
@@ -77,7 +77,8 @@ public class YAMLValue {
      * @return YAML Section
      */
     public YAMLSection asSection() {
-        return new YAMLSection((Map<String, ?>) obj, up, label, yaml);
+        if (obj != null) return new YAMLSection((Map<String, ?>) obj, up, label, yaml);
+        else return null;
     }
 
     /**
@@ -86,11 +87,13 @@ public class YAMLValue {
      * @return YAML Section List
      */
     public List<YAMLSection> asSectionList() {
-        List<YAMLSection> values = new ArrayList<YAMLSection>();
-        for (Map<String, ?> value : (List<? extends Map<String, ?>>) obj) {
-            values.add(new YAMLSection(value, null, null, yaml));
-        }
-        return values;
+        if (obj != null) {
+            List<YAMLSection> values = new ArrayList<YAMLSection>();
+            for (Map<String, ?> value : (List<? extends Map<String, ?>>) obj) {
+                values.add(new YAMLSection(value, null, null, yaml));
+            }
+            return values;
+        } else return null;
     }
 
     /**
@@ -98,8 +101,8 @@ public class YAMLValue {
      *
      * @return Double
      */
-    public double asDouble() {
-        return (double) obj;
+    public Double asDouble() {
+        return (Double) obj;
     }
 
     /**
@@ -116,8 +119,8 @@ public class YAMLValue {
      *
      * @return Float
      */
-    public float asFloat() {
-        return (float) obj;
+    public Float asFloat() {
+        return (Float) obj;
     }
 
     /**
@@ -134,8 +137,8 @@ public class YAMLValue {
      *
      * @return Integer
      */
-    public int asInt() {
-        return (int) obj;
+    public Integer asInt() {
+        return (Integer) obj;
     }
 
     /**
@@ -152,8 +155,8 @@ public class YAMLValue {
      *
      * @return Long
      */
-    public long asLong() {
-        return (long) obj;
+    public Long asLong() {
+        return (Long) obj;
     }
 
     /**
@@ -163,6 +166,24 @@ public class YAMLValue {
      */
     public List<Long> asLongList() {
         return (List<Long>) obj;
+    }
+
+    /**
+     * Get a Short by Handle
+     *
+     * @return Short
+     */
+    public Short asShort() {
+        return (Short) obj;
+    }
+
+    /**
+     * Get a Short List by Handle
+     *
+     * @return Short List
+     */
+    public List<Short> asShortList() {
+        return (List<Short>) obj;
     }
 
     /**
@@ -189,7 +210,8 @@ public class YAMLValue {
      * @return String
      */
     public String asString() {
-        return Util.unescapeJavaString((String) obj);
+        if (obj != null) return Util.unescapeJavaString((String) obj);
+        else return null;
     }
 
     /**
@@ -198,11 +220,13 @@ public class YAMLValue {
      * @return String List
      */
     public List<String> asStringList() {
-        List<String> values = new ArrayList<String>();
-        for (String value : (List<String>) obj) {
-            values.add(Util.unescapeJavaString(value));
-        }
-        return values;
+        if (obj != null) {
+            List<String> values = new ArrayList<String>();
+            for (String value : (List<String>) obj) {
+                values.add(Util.unescapeJavaString(value));
+            }
+            return values;
+        } else return null;
     }
 
     /**
@@ -213,7 +237,8 @@ public class YAMLValue {
      */
     public String asColoredString(char color) {
         if (Util.isNull(color)) throw new NullPointerException();
-        return TextColor.parseColor(color, Util.unescapeJavaString((String) obj));
+        if (obj != null) return TextColor.parseColor(color, Util.unescapeJavaString((String) obj));
+        else return null;
     }
 
     /**
@@ -223,12 +248,14 @@ public class YAMLValue {
      * @return Colored String List
      */
     public List<String> asColoredStringList(char color) {
-        if (Util.isNull(color)) throw new NullPointerException();
-        List<String> values = new ArrayList<String>();
-        for (String value : (List<String>) obj) {
-            values.add(TextColor.parseColor(color, Util.unescapeJavaString(value)));
-        }
-        return values;
+        if (obj != null) {
+            if (Util.isNull(color)) throw new NullPointerException();
+            List<String> values = new ArrayList<String>();
+            for (String value : (List<String>) obj) {
+                values.add(TextColor.parseColor(color, Util.unescapeJavaString(value)));
+            }
+            return values;
+        } else return null;
     }
 
     /**
@@ -237,15 +264,33 @@ public class YAMLValue {
      * @return UUID
      */
     public UUID asUUID() {
-        return UUID.fromString((String) obj);
+        if (obj != null) return UUID.fromString((String) obj);
+        else return null;
     }
 
+    /**
+     * Get Object as UUID List
+     *
+     * @return UUID List
+     */
     public List<UUID> asUUIDList() {
-        List<UUID> values = new ArrayList<UUID>();
-        for (String value : (List<String>) obj) {
-            values.add(UUID.fromString(value));
-        }
-        return values;
+        if (obj != null) {
+            List<UUID> values = new ArrayList<UUID>();
+            for (String value : (List<String>) obj) {
+                values.add(UUID.fromString(value));
+            }
+            return values;
+        } else return null;
+    }
+
+
+    /**
+     * Check if object is Null
+     *
+     * @return Null Status
+     */
+    public boolean isNull() {
+        return obj == null;
     }
 
     /**
@@ -267,33 +312,6 @@ public class YAMLValue {
     }
 
     /**
-     * Check if object is a Double
-     *
-     * @return Double Status
-     */
-    public boolean isDouble() {
-        return (obj instanceof Double);
-    }
-
-    /**
-     * Check if object is a Float
-     *
-     * @return Float Status
-     */
-    public boolean isFloat() {
-        return (obj instanceof Float);
-    }
-
-    /**
-     * Check if object is an Integer
-     *
-     * @return Integer Status
-     */
-    public boolean isInt() {
-        return (obj instanceof Integer);
-    }
-
-    /**
      * Check if object is a List
      *
      * @return List Status
@@ -303,12 +321,12 @@ public class YAMLValue {
     }
 
     /**
-     * Check if object is a Long
+     * Check if object is a Number
      *
-     * @return Long Status
+     * @return Number Status
      */
-    public boolean isLong() {
-        return (obj instanceof Long);
+    public boolean isNumber() {
+        return (obj instanceof Number);
     }
 
     /**
@@ -331,6 +349,7 @@ public class YAMLValue {
 
     @Override
     public String toString() {
-        return obj.toString();
+        if (obj != null) return obj.toString();
+        else return "null";
     }
 }

@@ -316,16 +316,16 @@
 							a.attr('download', hash.app);
 						switch (a.attr("href").toLowerCase()) {
 							case "%adfly_app_download%":
-								a.attr("href", "https://adf.ly/18562515/https://raw.githubusercontent.com/ME1312/SubServers-2/" + hash.commit + "/Artifacts/" + hash.app);
+								a.attr("href", "https://adf.ly/18562515/https://raw.githubusercontent.com/ME1312/SubServers-2/" + hash.commit.toLowerCase() + "/Artifacts/" + hash.app);
 								break;
 							case "%app_download%":
-								a.attr("href", "https://raw.githubusercontent.com/ME1312/SubServers-2/" + hash.commit + "/Artifacts/" + hash.app);
+								a.attr("href", "https://raw.githubusercontent.com/ME1312/SubServers-2/" + hash.commit.toLowerCase() + "/Artifacts/" + hash.app);
 								break;
 							case "%commit_page%":
-								a.attr("href", "https://github.com/ME1312/SubServers-2/commit/" + hash.commit);
+								a.attr("href", "https://github.com/ME1312/SubServers-2/commit/" + hash.commit.toLowerCase());
 								break;
 							case "%commit_source%":
-								a.attr("href", "https://github.com/ME1312/SubServers-2/tree/" + hash.commit);
+								a.attr("href", "https://github.com/ME1312/SubServers-2/tree/" + hash.commit.toLowerCase());
 								break;
 						}
 					});
