@@ -59,25 +59,25 @@ public class InternalUIHandler implements UIHandler, Listener {
             if (gui.open && event.getClickedInventory() != null && event.getClickedInventory().getTitle() != null) {
                 if (plugin.subdata == null) {
                     new IllegalStateException("SubData is not connected").printStackTrace();
-                } else if (plugin.lang == null) {
+                } else if (Util.isException(() -> plugin.api.getLang())) {
                     new IllegalStateException("There are no lang options available at this time").printStackTrace();
-                } else if (event.getClickedInventory().getTitle().equals(plugin.lang.getSection("Lang").getColoredString("Interface.Host-Menu.Title", '&'))) { // Host Menu
+                } else if (event.getClickedInventory().getTitle().equals(plugin.api.getLang("SubServers", "Interface.Host-Menu.Title"))) { // Host Menu
                     if (event.getCurrentItem() != null && event.getCurrentItem().getType() != Material.AIR && event.getCurrentItem().hasItemMeta()) {
                         String item = event.getCurrentItem().getItemMeta().getDisplayName();
 
-                        if (item.equals(plugin.lang.getSection("Lang").getColoredString("Interface.Generic.Back-Arrow", '&'))) {
+                        if (item.equals(plugin.api.getLang("SubServers", "Interface.Generic.Back-Arrow"))) {
                             player.closeInventory();
                             gui.hostMenu(gui.lastPage - 1);
-                        } else if (item.equals(plugin.lang.getSection("Lang").getColoredString("Interface.Generic.Next-Arrow", '&'))) {
+                        } else if (item.equals(plugin.api.getLang("SubServers", "Interface.Generic.Next-Arrow"))) {
                             player.closeInventory();
                             gui.hostMenu(gui.lastPage + 1);
-                        } else if (item.equals(plugin.lang.getSection("Lang").getColoredString("Interface.Host-Menu.Group-Menu", '&'))) {
+                        } else if (item.equals(plugin.api.getLang("SubServers", "Interface.Host-Menu.Group-Menu"))) {
                             player.closeInventory();
                             gui.groupMenu(1);
-                        } else if (item.equals(plugin.lang.getSection("Lang").getColoredString("Interface.Host-Menu.Server-Menu", '&'))) {
+                        } else if (item.equals(plugin.api.getLang("SubServers", "Interface.Host-Menu.Server-Menu"))) {
                             player.closeInventory();
                             gui.serverMenu(1, null, null);
-                        } else if (!item.equals(ChatColor.RESET.toString()) && !item.equals(plugin.lang.getSection("Lang").getColoredString("Interface.Host-Menu.No-Hosts", '&'))) {
+                        } else if (!item.equals(ChatColor.RESET.toString()) && !item.equals(plugin.api.getLang("SubServers", "Interface.Host-Menu.No-Hosts"))) {
                             player.closeInventory();
                             String obj;
                             if (event.getCurrentItem().getItemMeta().getLore() != null && event.getCurrentItem().getItemMeta().getLore().size() > 0 && event.getCurrentItem().getItemMeta().getLore().get(0).startsWith(ChatColor.GRAY.toString())) {
@@ -88,39 +88,39 @@ public class InternalUIHandler implements UIHandler, Listener {
                             gui.hostAdmin(obj);
                         }
                     }
-                } else if (event.getClickedInventory().getTitle().startsWith(plugin.lang.getSection("Lang").getColoredString("Interface.Host-Creator.Title", '&').split("\\$str\\$")[0]) && // Host Creator
-                        (plugin.lang.getSection("Lang").getColoredString("Interface.Host-Creator.Title", '&').split("\\$str\\$").length == 1 ||
-                                event.getClickedInventory().getTitle().endsWith(plugin.lang.getSection("Lang").getColoredString("Interface.Host-Creator.Title", '&').split("\\$str\\$")[1]))) {
+                } else if (event.getClickedInventory().getTitle().startsWith(plugin.api.getLang("SubServers", "Interface.Host-Creator.Title").split("\\$str\\$")[0]) && // Host Creator
+                        (plugin.api.getLang("SubServers", "Interface.Host-Creator.Title").split("\\$str\\$").length == 1 ||
+                                event.getClickedInventory().getTitle().endsWith(plugin.api.getLang("SubServers", "Interface.Host-Creator.Title").split("\\$str\\$")[1]))) {
                     if (event.getCurrentItem() != null && event.getCurrentItem().getType() != Material.AIR && event.getCurrentItem().hasItemMeta()) {
                         String item = event.getCurrentItem().getItemMeta().getDisplayName();
-                        if (item.equals(plugin.lang.getSection("Lang").getColoredString("Interface.Generic.Back", '&'))) {
+                        if (item.equals(plugin.api.getLang("SubServers", "Interface.Generic.Back"))) {
                             player.closeInventory();
                             gui.back();
-                        } else if (item.equals(plugin.lang.getSection("Lang").getColoredString("Interface.Generic.Undo", '&'))) {
+                        } else if (item.equals(plugin.api.getLang("SubServers", "Interface.Generic.Undo"))) {
                             player.closeInventory();
                             ((UIRenderer.CreatorOptions) gui.lastVisitedObjects[0]).undo();
                             gui.hostCreator((UIRenderer.CreatorOptions) gui.lastVisitedObjects[0]);
-                        } else if (item.equals(plugin.lang.getSection("Lang").getColoredString("Interface.Host-Creator.Submit", '&'))) {
+                        } else if (item.equals(plugin.api.getLang("SubServers", "Interface.Host-Creator.Submit"))) {
                             if (player.hasPermission("subservers.host.create.*") || player.hasPermission("subservers.host.create." + ((UIRenderer.CreatorOptions) gui.lastVisitedObjects[0]).getHost().toLowerCase())) {
                                 player.closeInventory();
-                                gui.setDownloading(plugin.lang.getSection("Lang").getColoredString("Interface.Generic.Downloading.Response", '&'));
+                                gui.setDownloading(plugin.api.getLang("SubServers", "Interface.Generic.Downloading.Response"));
                                 plugin.subdata.sendPacket(new PacketCreateServer(player.getUniqueId(), ((UIRenderer.CreatorOptions) gui.lastVisitedObjects[0]), json -> {
                                     gui.back();
                                 }));
                             } else {
                                 gui.back();
                             }
-                        } else if (ChatColor.stripColor(item).equals(ChatColor.stripColor(plugin.lang.getSection("Lang").getColoredString("Interface.Host-Creator.Edit-Name", '&')))) {
+                        } else if (ChatColor.stripColor(item).equals(ChatColor.stripColor(plugin.api.getLang("SubServers", "Interface.Host-Creator.Edit-Name")))) {
                             player.closeInventory();
-                            if (!gui.sendTitle(plugin.lang.getSection("Lang").getColoredString("Interface.Host-Creator.Edit-Name.Title", '&'), 4 * 20))
-                                player.sendMessage(plugin.lang.getSection("Lang").getColoredString("Interface.Host-Creator.Edit-Name.Message", '&'));
+                            if (!gui.sendTitle(plugin.api.getLang("SubServers", "Interface.Host-Creator.Edit-Name.Title"), 4 * 20))
+                                player.sendMessage(plugin.api.getLang("SubServers", "Interface.Host-Creator.Edit-Name.Message"));
                             input.put(player.getUniqueId(), m -> {
                                 if (m.getString("message").contains(" ")) {
-                                    if (!gui.sendTitle(plugin.lang.getSection("Lang").getColoredString("Interface.Host-Creator.Edit-Name.Invalid-Title", '&'), 4 * 20))
-                                        player.sendMessage(plugin.lang.getSection("Lang").getColoredString("Interface.Host-Creator.Edit-Name.Invalid", '&'));
+                                    if (!gui.sendTitle(plugin.api.getLang("SubServers", "Interface.Host-Creator.Edit-Name.Invalid-Title"), 4 * 20))
+                                        player.sendMessage(plugin.api.getLang("SubServers", "Interface.Host-Creator.Edit-Name.Invalid"));
                                     Bukkit.getScheduler().runTaskLater(plugin, () -> gui.hostCreator((UIRenderer.CreatorOptions) gui.lastVisitedObjects[0]), 4 * 20);
                                 } else {
-                                    gui.setDownloading(plugin.lang.getSection("Lang").getColoredString("Interface.Generic.Downloading.Response", '&'));
+                                    gui.setDownloading(plugin.api.getLang("SubServers", "Interface.Generic.Downloading.Response"));
                                     plugin.subdata.sendPacket(new PacketDownloadServerList(null, null, json -> {
                                         boolean match = false;
                                         for (String tmphost : json.getJSONObject("hosts").keySet()) {
@@ -130,8 +130,8 @@ public class InternalUIHandler implements UIHandler, Listener {
                                         }
                                         if (match) {
                                             gui.setDownloading(null);
-                                            if (!gui.sendTitle(plugin.lang.getSection("Lang").getColoredString("Interface.Host-Creator.Edit-Name.Exists-Title", '&'), 4 * 20))
-                                                player.sendMessage(plugin.lang.getSection("Lang").getColoredString("Interface.Host-Creator.Edit-Name.Exists", '&'));
+                                            if (!gui.sendTitle(plugin.api.getLang("SubServers", "Interface.Host-Creator.Edit-Name.Exists-Title"), 4 * 20))
+                                                player.sendMessage(plugin.api.getLang("SubServers", "Interface.Host-Creator.Edit-Name.Exists"));
                                             Bukkit.getScheduler().runTaskLater(plugin, () -> gui.hostCreator((UIRenderer.CreatorOptions) gui.lastVisitedObjects[0]), 4 * 20);
                                         } else {
                                             ((UIRenderer.CreatorOptions) gui.lastVisitedObjects[0]).setName(m.getString("message"));
@@ -140,31 +140,31 @@ public class InternalUIHandler implements UIHandler, Listener {
                                     }));
                                 }
                             });
-                        } else if (ChatColor.stripColor(item).equals(ChatColor.stripColor(plugin.lang.getSection("Lang").getColoredString("Interface.Host-Creator.Edit-Template", '&')))) {
+                        } else if (ChatColor.stripColor(item).equals(ChatColor.stripColor(plugin.api.getLang("SubServers", "Interface.Host-Creator.Edit-Template")))) {
                             player.closeInventory();
                             gui.hostCreatorTemplates(1, (UIRenderer.CreatorOptions) gui.lastVisitedObjects[0]);
-                        } else if (ChatColor.stripColor(item).equals(ChatColor.stripColor(plugin.lang.getSection("Lang").getColoredString("Interface.Host-Creator.Edit-Version", '&')))) {
+                        } else if (ChatColor.stripColor(item).equals(ChatColor.stripColor(plugin.api.getLang("SubServers", "Interface.Host-Creator.Edit-Version")))) {
                             player.closeInventory();
-                            if (!gui.sendTitle(plugin.lang.getSection("Lang").getColoredString("Interface.Host-Creator.Edit-Version.Title", '&'), 4 * 20))
-                                player.sendMessage(plugin.lang.getSection("Lang").getColoredString("Interface.Host-Creator.Edit-Version.Message", '&'));
+                            if (!gui.sendTitle(plugin.api.getLang("SubServers", "Interface.Host-Creator.Edit-Version.Title"), 4 * 20))
+                                player.sendMessage(plugin.api.getLang("SubServers", "Interface.Host-Creator.Edit-Version.Message"));
                             input.put(player.getUniqueId(), m -> {
                                 if (new Version("1.8").compareTo(new Version(m.getString("message"))) > 0) {
-                                    if (!gui.sendTitle(plugin.lang.getSection("Lang").getColoredString("Interface.Host-Creator.Edit-Version.Unavailable-Title", '&'), 4 * 20))
-                                        player.sendMessage(plugin.lang.getSection("Lang").getColoredString("Interface.Host-Creator.Edit-Version.Unavailable", '&'));
+                                    if (!gui.sendTitle(plugin.api.getLang("SubServers", "Interface.Host-Creator.Edit-Version.Unavailable-Title"), 4 * 20))
+                                        player.sendMessage(plugin.api.getLang("SubServers", "Interface.Host-Creator.Edit-Version.Unavailable"));
                                     Bukkit.getScheduler().runTaskLater(plugin, () -> gui.hostCreator((UIRenderer.CreatorOptions) gui.lastVisitedObjects[0]), 4 * 20);
                                 } else {
                                     ((UIRenderer.CreatorOptions) gui.lastVisitedObjects[0]).setVersion(new Version(m.getString("message")));
                                     gui.hostCreator((UIRenderer.CreatorOptions) gui.lastVisitedObjects[0]);
                                 }
                             });
-                        } else if (ChatColor.stripColor(item).equals(ChatColor.stripColor(plugin.lang.getSection("Lang").getColoredString("Interface.Host-Creator.Edit-Port", '&')))) {
+                        } else if (ChatColor.stripColor(item).equals(ChatColor.stripColor(plugin.api.getLang("SubServers", "Interface.Host-Creator.Edit-Port")))) {
                             player.closeInventory();
-                            if (!gui.sendTitle(plugin.lang.getSection("Lang").getColoredString("Interface.Host-Creator.Edit-Port.Title", '&'), 4 * 20))
-                                player.sendMessage(plugin.lang.getSection("Lang").getColoredString("Interface.Host-Creator.Edit-Port.Message", '&'));
+                            if (!gui.sendTitle(plugin.api.getLang("SubServers", "Interface.Host-Creator.Edit-Port.Title"), 4 * 20))
+                                player.sendMessage(plugin.api.getLang("SubServers", "Interface.Host-Creator.Edit-Port.Message"));
                             input.put(player.getUniqueId(), m -> {
                                 if (Util.isException(() -> Integer.parseInt(m.getString("message"))) || Integer.parseInt(m.getString("message")) <= 0 || Integer.parseInt(m.getString("message")) > 65535) {
-                                    if (!gui.sendTitle(plugin.lang.getSection("Lang").getColoredString("Interface.Host-Creator.Edit-Port.Invalid-Title", '&'), 4 * 20))
-                                        player.sendMessage(plugin.lang.getSection("Lang").getColoredString("Interface.Host-Creator.Edit-Port.Invalid", '&'));
+                                    if (!gui.sendTitle(plugin.api.getLang("SubServers", "Interface.Host-Creator.Edit-Port.Invalid-Title"), 4 * 20))
+                                        player.sendMessage(plugin.api.getLang("SubServers", "Interface.Host-Creator.Edit-Port.Invalid"));
                                     Bukkit.getScheduler().runTaskLater(plugin, () -> gui.hostCreator((UIRenderer.CreatorOptions) gui.lastVisitedObjects[0]), 4 * 20);
                                 } else {
                                     ((UIRenderer.CreatorOptions) gui.lastVisitedObjects[0]).setPort(Integer.valueOf(m.getString("message")));
@@ -173,18 +173,18 @@ public class InternalUIHandler implements UIHandler, Listener {
                             });
                         }
                     }
-                } else if (event.getClickedInventory().getTitle().startsWith(plugin.lang.getSection("Lang").getColoredString("Interface.Host-Creator.Edit-Template.Title", '&').split("\\$str\\$")[0]) && // Host Creator Templates
-                        (plugin.lang.getSection("Lang").getColoredString("Interface.Host-Creator.Edit-Template.Title", '&').split("\\$str\\$").length == 1 ||
-                                event.getClickedInventory().getTitle().endsWith(plugin.lang.getSection("Lang").getColoredString("Interface.Host-Creator.Edit-Template.Title", '&').split("\\$str\\$")[1]))) {
+                } else if (event.getClickedInventory().getTitle().startsWith(plugin.api.getLang("SubServers", "Interface.Host-Creator.Edit-Template.Title").split("\\$str\\$")[0]) && // Host Creator Templates
+                        (plugin.api.getLang("SubServers", "Interface.Host-Creator.Edit-Template.Title").split("\\$str\\$").length == 1 ||
+                                event.getClickedInventory().getTitle().endsWith(plugin.api.getLang("SubServers", "Interface.Host-Creator.Edit-Template.Title").split("\\$str\\$")[1]))) {
                     if (event.getCurrentItem() != null && event.getCurrentItem().getType() != Material.AIR && event.getCurrentItem().hasItemMeta()) {
                         String item = event.getCurrentItem().getItemMeta().getDisplayName();
-                        if (item.equals(plugin.lang.getSection("Lang").getColoredString("Interface.Generic.Back-Arrow", '&'))) {
+                        if (item.equals(plugin.api.getLang("SubServers", "Interface.Generic.Back-Arrow"))) {
                             player.closeInventory();
                             gui.hostCreatorTemplates(gui.lastPage - 1, (UIRenderer.CreatorOptions) gui.lastVisitedObjects[0]);
-                        } else if (item.equals(plugin.lang.getSection("Lang").getColoredString("Interface.Generic.Next-Arrow", '&'))) {
+                        } else if (item.equals(plugin.api.getLang("SubServers", "Interface.Generic.Next-Arrow"))) {
                             player.closeInventory();
                             gui.hostCreatorTemplates(gui.lastPage + 1, (UIRenderer.CreatorOptions) gui.lastVisitedObjects[0]);
-                        } else if (item.equals(plugin.lang.getSection("Lang").getColoredString("Interface.Generic.Back", '&'))) {
+                        } else if (item.equals(plugin.api.getLang("SubServers", "Interface.Generic.Back"))) {
                             player.closeInventory();
                             gui.hostCreator((UIRenderer.CreatorOptions) gui.lastVisitedObjects[0]);
                         } else {
@@ -199,18 +199,18 @@ public class InternalUIHandler implements UIHandler, Listener {
                             gui.hostCreator((UIRenderer.CreatorOptions) gui.lastVisitedObjects[0]);
                         }
                     }
-                } else if (event.getClickedInventory().getTitle().startsWith(plugin.lang.getSection("Lang").getColoredString("Interface.Host-Plugin.Title", '&').split("\\$str\\$")[0]) && // Host Plugin
-                        (plugin.lang.getSection("Lang").getColoredString("Interface.Host-Plugin.Title", '&').split("\\$str\\$").length == 1 ||
-                                event.getClickedInventory().getTitle().endsWith(plugin.lang.getSection("Lang").getColoredString("Interface.Host-Plugin.Title", '&').split("\\$str\\$")[1]))) {
+                } else if (event.getClickedInventory().getTitle().startsWith(plugin.api.getLang("SubServers", "Interface.Host-Plugin.Title").split("\\$str\\$")[0]) && // Host Plugin
+                        (plugin.api.getLang("SubServers", "Interface.Host-Plugin.Title").split("\\$str\\$").length == 1 ||
+                                event.getClickedInventory().getTitle().endsWith(plugin.api.getLang("SubServers", "Interface.Host-Plugin.Title").split("\\$str\\$")[1]))) {
                     if (event.getCurrentItem() != null && event.getCurrentItem().getType() != Material.AIR && event.getCurrentItem().hasItemMeta()) {
                         String item = event.getCurrentItem().getItemMeta().getDisplayName();
-                        if (item.equals(plugin.lang.getSection("Lang").getColoredString("Interface.Generic.Back-Arrow", '&'))) {
+                        if (item.equals(plugin.api.getLang("SubServers", "Interface.Generic.Back-Arrow"))) {
                             player.closeInventory();
                             gui.hostPlugin(gui.lastPage - 1, ((String) gui.lastVisitedObjects[0]));
-                        } else if (item.equals(plugin.lang.getSection("Lang").getColoredString("Interface.Generic.Next-Arrow", '&'))) {
+                        } else if (item.equals(plugin.api.getLang("SubServers", "Interface.Generic.Next-Arrow"))) {
                             player.closeInventory();
                             gui.hostPlugin(gui.lastPage + 1, ((String) gui.lastVisitedObjects[0]));
-                        } else if (item.equals(plugin.lang.getSection("Lang").getColoredString("Interface.Generic.Back", '&'))) {
+                        } else if (item.equals(plugin.api.getLang("SubServers", "Interface.Generic.Back"))) {
                             player.closeInventory();
                             gui.back();
                         } else {
@@ -222,7 +222,7 @@ public class InternalUIHandler implements UIHandler, Listener {
                             if (plugin.get() == null) {
                                 gui.reopen();
                             } else {
-                                gui.setDownloading(ChatColor.stripColor(this.plugin.lang.getSection("Lang").getColoredString("Interface.Host-Plugin.Title", '&').replace("$str$", (String) gui.lastVisitedObjects[0])));
+                                gui.setDownloading(ChatColor.stripColor(this.plugin.api.getLang("SubServers", "Interface.Host-Plugin.Title").replace("$str$", (String) gui.lastVisitedObjects[0])));
                                 this.plugin.subdata.sendPacket(new PacketDownloadHostInfo((String) gui.lastVisitedObjects[0], (json) -> {
                                     if (json.getBoolean("valid")) {
                                         gui.setDownloading(null);
@@ -235,47 +235,47 @@ public class InternalUIHandler implements UIHandler, Listener {
                         }
                     }
 
-                } else if (event.getClickedInventory().getTitle().equals(plugin.lang.getSection("Lang").getColoredString("Interface.Group-Menu.Title", '&'))) { // Host Menu
+                } else if (event.getClickedInventory().getTitle().equals(plugin.api.getLang("SubServers", "Interface.Group-Menu.Title"))) { // Host Menu
                     if (event.getCurrentItem() != null && event.getCurrentItem().getType() != Material.AIR && event.getCurrentItem().hasItemMeta()) {
                         String item = event.getCurrentItem().getItemMeta().getDisplayName();
 
-                        if (item.equals(plugin.lang.getSection("Lang").getColoredString("Interface.Generic.Back-Arrow", '&'))) {
+                        if (item.equals(plugin.api.getLang("SubServers", "Interface.Generic.Back-Arrow"))) {
                             player.closeInventory();
                             gui.groupMenu(gui.lastPage - 1);
-                        } else if (item.equals(plugin.lang.getSection("Lang").getColoredString("Interface.Generic.Next-Arrow", '&'))) {
+                        } else if (item.equals(plugin.api.getLang("SubServers", "Interface.Generic.Next-Arrow"))) {
                             player.closeInventory();
                             gui.groupMenu(gui.lastPage + 1);
-                        } else if (item.equals(plugin.lang.getSection("Lang").getColoredString("Interface.Group-Menu.Server-Menu", '&'))) {
+                        } else if (item.equals(plugin.api.getLang("SubServers", "Interface.Group-Menu.Server-Menu"))) {
                             player.closeInventory();
                             gui.serverMenu(1, null, null);
-                        } else if (!item.equals(ChatColor.RESET.toString()) && !item.equals(plugin.lang.getSection("Lang").getColoredString("Interface.Group-Menu.No-Groups", '&'))) {
+                        } else if (!item.equals(ChatColor.RESET.toString()) && !item.equals(plugin.api.getLang("SubServers", "Interface.Group-Menu.No-Groups"))) {
                             player.closeInventory();
                             gui.serverMenu(1, null, ChatColor.stripColor(item));
                         }
                     }
-                } else if (event.getClickedInventory().getTitle().equals(plugin.lang.getSection("Lang").getColoredString("Interface.Server-Menu.Title", '&')) || // SubServer Menu
-                        event.getClickedInventory().getTitle().startsWith(plugin.lang.getSection("Lang").getColoredString("Interface.Host-SubServer.Title", '&').split("\\$str\\$")[0]) &&
-                                (plugin.lang.getSection("Lang").getColoredString("Interface.Host-SubServer.Title", '&').split("\\$str\\$").length == 1 ||
-                                        event.getClickedInventory().getTitle().endsWith(plugin.lang.getSection("Lang").getColoredString("Interface.Host-SubServer.Title", '&').split("\\$str\\$")[1])) ||
-                        event.getClickedInventory().getTitle().startsWith(plugin.lang.getSection("Lang").getColoredString("Interface.Group-SubServer.Title", '&').split("\\$str\\$")[0]) &&
-                                (plugin.lang.getSection("Lang").getColoredString("Interface.Group-SubServer.Title", '&').split("\\$str\\$").length == 1 ||
-                                        event.getClickedInventory().getTitle().endsWith(plugin.lang.getSection("Lang").getColoredString("Interface.Group-SubServer.Title", '&').split("\\$str\\$")[1]))) {
+                } else if (event.getClickedInventory().getTitle().equals(plugin.api.getLang("SubServers", "Interface.Server-Menu.Title")) || // SubServer Menu
+                        event.getClickedInventory().getTitle().startsWith(plugin.api.getLang("SubServers", "Interface.Host-SubServer.Title").split("\\$str\\$")[0]) &&
+                                (plugin.api.getLang("SubServers", "Interface.Host-SubServer.Title").split("\\$str\\$").length == 1 ||
+                                        event.getClickedInventory().getTitle().endsWith(plugin.api.getLang("SubServers", "Interface.Host-SubServer.Title").split("\\$str\\$")[1])) ||
+                        event.getClickedInventory().getTitle().startsWith(plugin.api.getLang("SubServers", "Interface.Group-SubServer.Title").split("\\$str\\$")[0]) &&
+                                (plugin.api.getLang("SubServers", "Interface.Group-SubServer.Title").split("\\$str\\$").length == 1 ||
+                                        event.getClickedInventory().getTitle().endsWith(plugin.api.getLang("SubServers", "Interface.Group-SubServer.Title").split("\\$str\\$")[1]))) {
                     if (event.getCurrentItem() != null && event.getCurrentItem().getType() != Material.AIR && event.getCurrentItem().hasItemMeta()) {
                         String item = event.getCurrentItem().getItemMeta().getDisplayName();
 
-                        if (item.equals(plugin.lang.getSection("Lang").getColoredString("Interface.Generic.Back-Arrow", '&'))) {
+                        if (item.equals(plugin.api.getLang("SubServers", "Interface.Generic.Back-Arrow"))) {
                             player.closeInventory();
                             gui.serverMenu(gui.lastPage - 1, (String) gui.lastVisitedObjects[0], (String) gui.lastVisitedObjects[1]);
-                        } else if (item.equals(plugin.lang.getSection("Lang").getColoredString("Interface.Generic.Next-Arrow", '&'))) {
+                        } else if (item.equals(plugin.api.getLang("SubServers", "Interface.Generic.Next-Arrow"))) {
                             player.closeInventory();
                             gui.serverMenu(gui.lastPage + 1, (String) gui.lastVisitedObjects[0], (String) gui.lastVisitedObjects[1]);
-                        } else if (item.equals(plugin.lang.getSection("Lang").getColoredString("Interface.Server-Menu.Host-Menu", '&'))) {
+                        } else if (item.equals(plugin.api.getLang("SubServers", "Interface.Server-Menu.Host-Menu"))) {
                             player.closeInventory();
                             gui.hostMenu(1);
-                        } else if (item.equals(plugin.lang.getSection("Lang").getColoredString("Interface.Generic.Back", '&'))) {
+                        } else if (item.equals(plugin.api.getLang("SubServers", "Interface.Generic.Back"))) {
                             player.closeInventory();
                             gui.back();
-                        } else if (!item.equals(ChatColor.RESET.toString()) && event.getCurrentItem().getDurability() != 0 && event.getCurrentItem().getDurability() != 8 && !item.equals(plugin.lang.getSection("Lang").getColoredString("Interface.Server-Menu.No-Servers", '&'))) {
+                        } else if (!item.equals(ChatColor.RESET.toString()) && event.getCurrentItem().getDurability() != 0 && event.getCurrentItem().getDurability() != 8 && !item.equals(plugin.api.getLang("SubServers", "Interface.Server-Menu.No-Servers"))) {
                             player.closeInventory();
                             String obj;
                             if (event.getCurrentItem().getItemMeta().getLore() != null && event.getCurrentItem().getItemMeta().getLore().size() > 0 && event.getCurrentItem().getItemMeta().getLore().get(0).startsWith(ChatColor.GRAY.toString())) {
@@ -286,50 +286,50 @@ public class InternalUIHandler implements UIHandler, Listener {
                             gui.subserverAdmin(obj);
                         }
                     }
-                } else if (event.getClickedInventory().getTitle().startsWith(plugin.lang.getSection("Lang").getColoredString("Interface.Host-Admin.Title", '&').split("\\$str\\$")[0]) && // Host Admin
-                        (plugin.lang.getSection("Lang").getColoredString("Interface.Host-Admin.Title", '&').split("\\$str\\$").length == 1 ||
-                                event.getClickedInventory().getTitle().endsWith(plugin.lang.getSection("Lang").getColoredString("Interface.Host-Admin.Title", '&').split("\\$str\\$")[1]))) {
+                } else if (event.getClickedInventory().getTitle().startsWith(plugin.api.getLang("SubServers", "Interface.Host-Admin.Title").split("\\$str\\$")[0]) && // Host Admin
+                        (plugin.api.getLang("SubServers", "Interface.Host-Admin.Title").split("\\$str\\$").length == 1 ||
+                                event.getClickedInventory().getTitle().endsWith(plugin.api.getLang("SubServers", "Interface.Host-Admin.Title").split("\\$str\\$")[1]))) {
                     if (event.getCurrentItem() != null && event.getCurrentItem().getType() != Material.AIR && event.getCurrentItem().hasItemMeta()) {
                         String item = event.getCurrentItem().getItemMeta().getDisplayName();
 
-                        if (item.equals(plugin.lang.getSection("Lang").getColoredString("Interface.Generic.Back", '&'))) {
+                        if (item.equals(plugin.api.getLang("SubServers", "Interface.Generic.Back"))) {
                             player.closeInventory();
                             gui.back();
-                        } else if (item.equals(plugin.lang.getSection("Lang").getColoredString("Interface.Host-Admin.Creator", '&'))) {
+                        } else if (item.equals(plugin.api.getLang("SubServers", "Interface.Host-Admin.Creator"))) {
                             player.closeInventory();
                             if (player.hasPermission("subservers.host.create.*") || player.hasPermission("subservers.host.create." + ((String) gui.lastVisitedObjects[0]).toLowerCase())) {
                                 gui.hostCreator(new UIRenderer.CreatorOptions((String) gui.lastVisitedObjects[0]));
                             } else gui.reopen();
-                        } else if (item.equals(plugin.lang.getSection("Lang").getColoredString("Interface.Host-Admin.SubServers", '&'))) {
+                        } else if (item.equals(plugin.api.getLang("SubServers", "Interface.Host-Admin.SubServers"))) {
                             player.closeInventory();
                             gui.serverMenu(1, (String) gui.lastVisitedObjects[0], null);
-                        } else if (item.equals(plugin.lang.getSection("Lang").getColoredString("Interface.Host-Admin.Plugins", '&'))) {
+                        } else if (item.equals(plugin.api.getLang("SubServers", "Interface.Host-Admin.Plugins"))) {
                             player.closeInventory();
                             gui.hostPlugin(1, (String) gui.lastVisitedObjects[0]);
                         }
                     }
-                } else if (event.getClickedInventory().getTitle().startsWith(plugin.lang.getSection("Lang").getColoredString("Interface.SubServer-Admin.Title", '&').split("\\$str\\$")[0]) && // SubServer Admin
-                        (plugin.lang.getSection("Lang").getColoredString("Interface.SubServer-Admin.Title", '&').split("\\$str\\$").length == 1 ||
-                                event.getClickedInventory().getTitle().endsWith(plugin.lang.getSection("Lang").getColoredString("Interface.SubServer-Admin.Title", '&').split("\\$str\\$")[1]))) {
+                } else if (event.getClickedInventory().getTitle().startsWith(plugin.api.getLang("SubServers", "Interface.SubServer-Admin.Title").split("\\$str\\$")[0]) && // SubServer Admin
+                        (plugin.api.getLang("SubServers", "Interface.SubServer-Admin.Title").split("\\$str\\$").length == 1 ||
+                                event.getClickedInventory().getTitle().endsWith(plugin.api.getLang("SubServers", "Interface.SubServer-Admin.Title").split("\\$str\\$")[1]))) {
                     if (event.getCurrentItem() != null && event.getCurrentItem().getType() != Material.AIR && event.getCurrentItem().hasItemMeta()) {
                         String item = event.getCurrentItem().getItemMeta().getDisplayName();
 
-                        if (item.equals(plugin.lang.getSection("Lang").getColoredString("Interface.Generic.Back", '&'))) {
+                        if (item.equals(plugin.api.getLang("SubServers", "Interface.Generic.Back"))) {
                             player.closeInventory();
                             gui.back();
-                        } else if (item.equals(plugin.lang.getSection("Lang").getColoredString("Interface.SubServer-Admin.Start", '&'))) {
+                        } else if (item.equals(plugin.api.getLang("SubServers", "Interface.SubServer-Admin.Start"))) {
                             player.closeInventory();
                             if (player.hasPermission("subservers.subserver.start.*") || player.hasPermission("subservers.subserver.start." + ((String) gui.lastVisitedObjects[0]).toLowerCase())) {
-                                gui.setDownloading(plugin.lang.getSection("Lang").getColoredString("Interface.Generic.Downloading.Response", '&'));
+                                gui.setDownloading(plugin.api.getLang("SubServers", "Interface.Generic.Downloading.Response"));
                                 plugin.subdata.sendPacket(new PacketStartServer(player.getUniqueId(), (String) gui.lastVisitedObjects[0], json -> {
-                                    gui.setDownloading(plugin.lang.getSection("Lang").getColoredString("Interface.SubServer-Admin.Start.Title", '&'));
+                                    gui.setDownloading(plugin.api.getLang("SubServers", "Interface.SubServer-Admin.Start.Title"));
                                     Bukkit.getScheduler().runTaskLater(plugin, gui::reopen, 30);
                                 }));
                             } else gui.reopen();
-                        } else if (item.equals(plugin.lang.getSection("Lang").getColoredString("Interface.SubServer-Admin.Stop", '&'))) {
+                        } else if (item.equals(plugin.api.getLang("SubServers", "Interface.SubServer-Admin.Stop"))) {
                             player.closeInventory();
                             if (player.hasPermission("subservers.subserver.stop.*") || player.hasPermission("subservers.subserver.stop." + ((String) gui.lastVisitedObjects[0]).toLowerCase())) {
-                                gui.setDownloading(plugin.lang.getSection("Lang").getColoredString("Interface.Generic.Downloading.Response", '&'));
+                                gui.setDownloading(plugin.api.getLang("SubServers", "Interface.Generic.Downloading.Response"));
                                 final Container<Boolean> listening = new Container<Boolean>(true);
                                 PacketInRunEvent.callback("SubStoppedEvent", new JSONCallback() {
                                     @Override
@@ -347,13 +347,13 @@ public class InternalUIHandler implements UIHandler, Listener {
                                     if (json.getInt("r") != 0) {
                                         gui.reopen();
                                         listening.set(false);
-                                    } else gui.setDownloading(plugin.lang.getSection("Lang").getColoredString("Interface.SubServer-Admin.Stop.Title", '&').replace("$str$", (String) gui.lastVisitedObjects[0]));
+                                    } else gui.setDownloading(plugin.api.getLang("SubServers", "Interface.SubServer-Admin.Stop.Title").replace("$str$", (String) gui.lastVisitedObjects[0]));
                                 }));
                             } else gui.reopen();
-                        } else if (item.equals(plugin.lang.getSection("Lang").getColoredString("Interface.SubServer-Admin.Terminate", '&'))) {
+                        } else if (item.equals(plugin.api.getLang("SubServers", "Interface.SubServer-Admin.Terminate"))) {
                             player.closeInventory();
                             if (player.hasPermission("subservers.subserver.terminate.*") || player.hasPermission("subservers.subserver.terminate." + ((String) gui.lastVisitedObjects[0]).toLowerCase())) {
-                                gui.setDownloading(plugin.lang.getSection("Lang").getColoredString("Interface.Generic.Downloading.Response", '&'));
+                                gui.setDownloading(plugin.api.getLang("SubServers", "Interface.Generic.Downloading.Response"));
                                 final Container<Boolean> listening = new Container<Boolean>(true);
                                 PacketInRunEvent.callback("SubStoppedEvent", new JSONCallback() {
                                     @Override
@@ -371,38 +371,38 @@ public class InternalUIHandler implements UIHandler, Listener {
                                     if (json.getInt("r") != 0) {
                                         gui.reopen();
                                         listening.set(false);
-                                    } else gui.setDownloading(plugin.lang.getSection("Lang").getColoredString("Interface.SubServer-Admin.Terminate.Title", '&').replace("$str$", (String) gui.lastVisitedObjects[0]));
+                                    } else gui.setDownloading(plugin.api.getLang("SubServers", "Interface.SubServer-Admin.Terminate.Title").replace("$str$", (String) gui.lastVisitedObjects[0]));
                                 }));
                             } else gui.reopen();
-                        } else if (item.equals(plugin.lang.getSection("Lang").getColoredString("Interface.SubServer-Admin.Command", '&'))) {
+                        } else if (item.equals(plugin.api.getLang("SubServers", "Interface.SubServer-Admin.Command"))) {
                             player.closeInventory();
                             if (player.hasPermission("subservers.subserver.command.*") || player.hasPermission("subservers.subserver.command." + ((String) gui.lastVisitedObjects[0]).toLowerCase())) {
-                                if (!gui.sendTitle(plugin.lang.getSection("Lang").getColoredString("Interface.SubServer-Admin.Command.Title", '&'), 4 * 20))
-                                    player.sendMessage(plugin.lang.getSection("Lang").getColoredString("Interface.SubServer-Admin.Command.Message", '&'));
+                                if (!gui.sendTitle(plugin.api.getLang("SubServers", "Interface.SubServer-Admin.Command.Title"), 4 * 20))
+                                    player.sendMessage(plugin.api.getLang("SubServers", "Interface.SubServer-Admin.Command.Message"));
                                 input.put(player.getUniqueId(), m -> {
-                                    gui.setDownloading(plugin.lang.getSection("Lang").getColoredString("Interface.Generic.Downloading.Response", '&'));
+                                    gui.setDownloading(plugin.api.getLang("SubServers", "Interface.Generic.Downloading.Response"));
                                     plugin.subdata.sendPacket(new PacketCommandServer(player.getUniqueId(), (String) gui.lastVisitedObjects[0], (m.getString("message").startsWith("/"))?m.getString("message").substring(1):m.getString("message"), json -> {
                                         gui.reopen();
                                     }));
                                 });
                             } else gui.reopen();
-                        } else if (item.equals(plugin.lang.getSection("Lang").getColoredString("Interface.SubServer-Admin.Plugins", '&'))) {
+                        } else if (item.equals(plugin.api.getLang("SubServers", "Interface.SubServer-Admin.Plugins"))) {
                             player.closeInventory();
                             gui.subserverPlugin(1, (String) gui.lastVisitedObjects[0]);
                         }
                     }
-                } else if (event.getClickedInventory().getTitle().startsWith(plugin.lang.getSection("Lang").getColoredString("Interface.SubServer-Plugin.Title", '&').split("\\$str\\$")[0]) && // SubServer Plugin
-                        (plugin.lang.getSection("Lang").getColoredString("Interface.SubServer-Plugin.Title", '&').split("\\$str\\$").length == 1 ||
-                                event.getClickedInventory().getTitle().endsWith(plugin.lang.getSection("Lang").getColoredString("Interface.SubServer-Plugin.Title", '&').split("\\$str\\$")[1]))) {
+                } else if (event.getClickedInventory().getTitle().startsWith(plugin.api.getLang("SubServers", "Interface.SubServer-Plugin.Title").split("\\$str\\$")[0]) && // SubServer Plugin
+                        (plugin.api.getLang("SubServers", "Interface.SubServer-Plugin.Title").split("\\$str\\$").length == 1 ||
+                                event.getClickedInventory().getTitle().endsWith(plugin.api.getLang("SubServers", "Interface.SubServer-Plugin.Title").split("\\$str\\$")[1]))) {
                     if (event.getCurrentItem() != null && event.getCurrentItem().getType() != Material.AIR && event.getCurrentItem().hasItemMeta()) {
                         String item = event.getCurrentItem().getItemMeta().getDisplayName();
-                        if (item.equals(plugin.lang.getSection("Lang").getColoredString("Interface.Generic.Back-Arrow", '&'))) {
+                        if (item.equals(plugin.api.getLang("SubServers", "Interface.Generic.Back-Arrow"))) {
                             player.closeInventory();
                             gui.subserverPlugin(gui.lastPage - 1, (String) gui.lastVisitedObjects[0]);
-                        } else if (item.equals(plugin.lang.getSection("Lang").getColoredString("Interface.Generic.Next-Arrow", '&'))) {
+                        } else if (item.equals(plugin.api.getLang("SubServers", "Interface.Generic.Next-Arrow"))) {
                             player.closeInventory();
                             gui.subserverPlugin(gui.lastPage + 1, (String) gui.lastVisitedObjects[0]);
-                        } else if (item.equals(plugin.lang.getSection("Lang").getColoredString("Interface.Generic.Back", '&'))) {
+                        } else if (item.equals(plugin.api.getLang("SubServers", "Interface.Generic.Back"))) {
                             player.closeInventory();
                             gui.back();
                         } else {
@@ -414,7 +414,7 @@ public class InternalUIHandler implements UIHandler, Listener {
                             if (plugin.get() == null) {
                                 gui.reopen();
                             } else {
-                                gui.setDownloading(ChatColor.stripColor(this.plugin.lang.getSection("Lang").getColoredString("Interface.SubServer-Plugin.Title", '&').replace("$str$", (String) gui.lastVisitedObjects[0])));
+                                gui.setDownloading(ChatColor.stripColor(this.plugin.api.getLang("SubServers", "Interface.SubServer-Plugin.Title").replace("$str$", (String) gui.lastVisitedObjects[0])));
                                 this.plugin.subdata.sendPacket(new PacketDownloadServerInfo((String) gui.lastVisitedObjects[0], json -> {
                                     if (json.getString("type").equals("subserver")) {
                                         gui.setDownloading(null);

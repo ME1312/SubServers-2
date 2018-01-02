@@ -135,7 +135,7 @@ public abstract class UIRenderer {
         if (subtitle != null && !(plugin.config.get().getSection("Settings").getBoolean("Use-Title-Messages", true) && (plugin.api.getGameVersion().compareTo(new Version("1.11")) >= 0 || Bukkit.getPluginManager().getPlugin("TitleManager") != null))) {
             if (download != -1) Bukkit.getScheduler().cancelTask(download);
             download = Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, () -> {
-                if (tdownload != null) Bukkit.getPlayer(player).sendMessage(plugin.lang.getSection("Lang").getColoredString("Interface.Generic.Downloading", '&').replace("$str$", subtitle));
+                if (tdownload != null) Bukkit.getPlayer(player).sendMessage(plugin.api.getLang("SubServers", "Interface.Generic.Downloading").replace("$str$", subtitle));
                 download = -1;
             }, 50L);
         } if (subtitle != null && tdownload == null) {
@@ -145,11 +145,11 @@ public abstract class UIRenderer {
                 @Override
                 public void run() {
                     if (tdownload != null) {
-                        String word = ChatColor.stripColor(plugin.lang.getSection("Lang").getColoredString("Interface.Generic.Downloading.Title", '&'));
+                        String word = ChatColor.stripColor(plugin.api.getLang("SubServers", "Interface.Generic.Downloading.Title"));
                         int i = 0;
                         int start = (tdownload.get() - 3 < 0)?0: tdownload.get()-3;
                         int end = (tdownload.get() >= word.length())?word.length(): tdownload.get();
-                        String str = plugin.lang.getSection("Lang").getColoredString((delay.get() > 7 && start == 0)?"Interface.Generic.Downloading.Title-Color-Alt":"Interface.Generic.Downloading.Title-Color", '&');
+                        String str = plugin.api.getLang("SubServers", (delay.get() > 7 && start == 0)?"Interface.Generic.Downloading.Title-Color-Alt":"Interface.Generic.Downloading.Title-Color");
                         delay.set(delay.get() + 1);
                         if (delay.get() > 7) tdownload.set(tdownload.get() + 1);
                         if (tdownload.get() >= word.length() + 3) {
@@ -159,12 +159,12 @@ public abstract class UIRenderer {
 
                         for (char c : word.toCharArray()) {
                             i++;
-                            if (i == start) str += plugin.lang.getSection("Lang").getColoredString("Interface.Generic.Downloading.Title-Color-Alt", '&');
+                            if (i == start) str += plugin.api.getLang("SubServers", "Interface.Generic.Downloading.Title-Color-Alt");
                             str += c;
-                            if (i == end) str += plugin.lang.getSection("Lang").getColoredString("Interface.Generic.Downloading.Title-Color", '&');
+                            if (i == end) str += plugin.api.getLang("SubServers", "Interface.Generic.Downloading.Title-Color");
                         }
 
-                        str += '\n' + plugin.lang.getSection("Lang").getColoredString("Interface.Generic.Downloading.Title-Color-Alt", '&') + tdownload.name();
+                        str += '\n' + plugin.api.getLang("SubServers", "Interface.Generic.Downloading.Title-Color-Alt") + tdownload.name();
                         sendTitle(str, 0, 10, 5);
                         Bukkit.getScheduler().runTaskLater(plugin, this, 1);
                     } else {

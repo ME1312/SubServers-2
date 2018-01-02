@@ -13,6 +13,7 @@ import net.ME1312.SubServers.Host.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Host.Library.Exception.IllegalPluginException;
 import net.ME1312.SubServers.Host.Library.Log.FileLogger;
 import net.ME1312.SubServers.Host.Library.Log.Logger;
+import net.ME1312.SubServers.Host.Library.NamedContainer;
 import net.ME1312.SubServers.Host.Library.UniversalFile;
 import net.ME1312.SubServers.Host.Library.Util;
 import net.ME1312.SubServers.Host.Library.Version.Version;
@@ -41,6 +42,7 @@ import java.util.zip.ZipInputStream;
  * SubServers.Host Main Class
  */
 public final class ExHost {
+    protected NamedContainer<Long, Map<String, Map<String, String>>> lang = null;
     public HashMap<String, SubCreator.ServerTemplate> templates = new HashMap<String, SubCreator.ServerTemplate>();
     public HashMap<String, SubServer> servers = new HashMap<String, SubServer>();
     public SubCreator creator;
@@ -50,7 +52,6 @@ public final class ExHost {
     public final UniversalFile runtime;
     public YAMLConfig config;
     public YAMLSection host = null;
-    public YAMLSection lang = null;
     public SubDataClient subdata = null;
 
     public final Version version = new Version("2.13a");

@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":10};
+var methods = {"i0":10,"i1":10};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -74,13 +74,13 @@ var activeTableTab = "activeTableTab";
 <li>Summary:&nbsp;</li>
 <li><a href="#nested.class.summary">Nested</a>&nbsp;|&nbsp;</li>
 <li>Field&nbsp;|&nbsp;</li>
-<li><a href="#constructor.summary">Constr</a>&nbsp;|&nbsp;</li>
+<li>Constr&nbsp;|&nbsp;</li>
 <li><a href="#method.summary">Method</a></li>
 </ul>
 <ul class="subNavList">
 <li>Detail:&nbsp;</li>
 <li>Field&nbsp;|&nbsp;</li>
-<li><a href="#constructor.detail">Constr</a>&nbsp;|&nbsp;</li>
+<li>Constr&nbsp;|&nbsp;</li>
 <li><a href="#method.detail">Method</a></li>
 </ul>
 </div>
@@ -101,7 +101,12 @@ var activeTableTab = "activeTableTab";
 <li>net.md_5.bungee.api.plugin.Command</li>
 <li>
 <ul class="inheritance">
+<li><a href="../../../../net/ME1312/SubServers/Sync/Library/Compatibility/CommandX.html" title="class in net.ME1312.SubServers.Sync.Library.Compatibility">net.ME1312.SubServers.Sync.Library.Compatibility.CommandX</a></li>
+<li>
+<ul class="inheritance">
 <li>net.ME1312.SubServers.Sync.SubCommand</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -110,10 +115,14 @@ var activeTableTab = "activeTableTab";
 <div class="description">
 <ul class="blockList">
 <li class="blockList">
+<dl>
+<dt>All Implemented Interfaces:</dt>
+<dd>net.md_5.bungee.api.plugin.TabExecutor</dd>
+</dl>
 <hr>
 <br>
 <pre>public final class <span class="typeNameLabel">SubCommand</span>
-extends net.md_5.bungee.api.plugin.Command</pre>
+extends <a href="../../../../net/ME1312/SubServers/Sync/Library/Compatibility/CommandX.html" title="class in net.ME1312.SubServers.Sync.Library.Compatibility">CommandX</a></pre>
 </li>
 </ul>
 </div>
@@ -147,24 +156,6 @@ extends net.md_5.bungee.api.plugin.Command</pre>
 </table>
 </li>
 </ul>
-<!-- ======== CONSTRUCTOR SUMMARY ======== -->
-<ul class="blockList">
-<li class="blockList"><a name="constructor.summary">
-<!--   -->
-</a>
-<h3>Constructor Summary</h3>
-<table class="memberSummary" border="0" cellpadding="3" cellspacing="0" summary="Constructor Summary table, listing constructors, and an explanation">
-<caption><span>Constructors</span><span class="tabEnd">&nbsp;</span></caption>
-<tr>
-<th class="colOne" scope="col">Constructor and Description</th>
-</tr>
-<tr class="altColor">
-<td class="colOne"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Sync/SubCommand.html#SubCommand-net.ME1312.SubServers.Sync.SubPlugin-java.lang.String-">SubCommand</a></span>(<a href="../../../../net/ME1312/SubServers/Sync/SubPlugin.html" title="class in net.ME1312.SubServers.Sync">SubPlugin</a>&nbsp;plugin,
-          java.lang.String&nbsp;label)</code>&nbsp;</td>
-</tr>
-</table>
-</li>
-</ul>
 <!-- ========== METHOD SUMMARY =========== -->
 <ul class="blockList">
 <li class="blockList"><a name="method.summary">
@@ -182,7 +173,21 @@ extends net.md_5.bungee.api.plugin.Command</pre>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Sync/SubCommand.html#execute-net.md_5.bungee.api.CommandSender-java.lang.String:A-">execute</a></span>(net.md_5.bungee.api.CommandSender&nbsp;sender,
        java.lang.String[]&nbsp;args)</code>&nbsp;</td>
 </tr>
+<tr id="i1" class="rowColor">
+<td class="colFirst"><code><a href="../../../../net/ME1312/SubServers/Sync/Library/NamedContainer.html" title="class in net.ME1312.SubServers.Sync.Library">NamedContainer</a>&lt;java.lang.String,java.util.List&lt;java.lang.String&gt;&gt;</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Sync/SubCommand.html#suggestArguments-net.md_5.bungee.api.CommandSender-java.lang.String:A-">suggestArguments</a></span>(net.md_5.bungee.api.CommandSender&nbsp;sender,
+                java.lang.String[]&nbsp;args)</code>
+<div class="block">Suggest command arguments</div>
+</td>
+</tr>
 </table>
+<ul class="blockList">
+<li class="blockList"><a name="methods.inherited.from.class.net.ME1312.SubServers.Sync.Library.Compatibility.CommandX">
+<!--   -->
+</a>
+<h3>Methods inherited from class&nbsp;net.ME1312.SubServers.Sync.Library.Compatibility.<a href="../../../../net/ME1312/SubServers/Sync/Library/Compatibility/CommandX.html" title="class in net.ME1312.SubServers.Sync.Library.Compatibility">CommandX</a></h3>
+<code><a href="../../../../net/ME1312/SubServers/Sync/Library/Compatibility/CommandX.html#onTabComplete-net.md_5.bungee.api.CommandSender-java.lang.String:A-">onTabComplete</a></code></li>
+</ul>
 <ul class="blockList">
 <li class="blockList"><a name="methods.inherited.from.class.net.md_5.bungee.api.plugin.Command">
 <!--   -->
@@ -205,24 +210,6 @@ extends net.md_5.bungee.api.plugin.Command</pre>
 <div class="details">
 <ul class="blockList">
 <li class="blockList">
-<!-- ========= CONSTRUCTOR DETAIL ======== -->
-<ul class="blockList">
-<li class="blockList"><a name="constructor.detail">
-<!--   -->
-</a>
-<h3>Constructor Detail</h3>
-<a name="SubCommand-net.ME1312.SubServers.Sync.SubPlugin-java.lang.String-">
-<!--   -->
-</a>
-<ul class="blockListLast">
-<li class="blockList">
-<h4>SubCommand</h4>
-<pre>public&nbsp;SubCommand(<a href="../../../../net/ME1312/SubServers/Sync/SubPlugin.html" title="class in net.ME1312.SubServers.Sync">SubPlugin</a>&nbsp;plugin,
-                  java.lang.String&nbsp;label)</pre>
-</li>
-</ul>
-</li>
-</ul>
 <!-- ============ METHOD DETAIL ========== -->
 <ul class="blockList">
 <li class="blockList"><a name="method.detail">
@@ -232,7 +219,7 @@ extends net.md_5.bungee.api.plugin.Command</pre>
 <a name="execute-net.md_5.bungee.api.CommandSender-java.lang.String:A-">
 <!--   -->
 </a>
-<ul class="blockListLast">
+<ul class="blockList">
 <li class="blockList">
 <h4>execute</h4>
 <pre>public&nbsp;void&nbsp;execute(net.md_5.bungee.api.CommandSender&nbsp;sender,
@@ -240,6 +227,26 @@ extends net.md_5.bungee.api.plugin.Command</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
 <dd><code>execute</code>&nbsp;in class&nbsp;<code>net.md_5.bungee.api.plugin.Command</code></dd>
+</dl>
+</li>
+</ul>
+<a name="suggestArguments-net.md_5.bungee.api.CommandSender-java.lang.String:A-">
+<!--   -->
+</a>
+<ul class="blockListLast">
+<li class="blockList">
+<h4>suggestArguments</h4>
+<pre>public&nbsp;<a href="../../../../net/ME1312/SubServers/Sync/Library/NamedContainer.html" title="class in net.ME1312.SubServers.Sync.Library">NamedContainer</a>&lt;java.lang.String,java.util.List&lt;java.lang.String&gt;&gt;&nbsp;suggestArguments(net.md_5.bungee.api.CommandSender&nbsp;sender,
+                                                                                          java.lang.String[]&nbsp;args)</pre>
+<div class="block">Suggest command arguments</div>
+<dl>
+<dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
+<dd><code><a href="../../../../net/ME1312/SubServers/Sync/Library/Compatibility/CommandX.html#suggestArguments-net.md_5.bungee.api.CommandSender-java.lang.String:A-">suggestArguments</a></code>&nbsp;in class&nbsp;<code><a href="../../../../net/ME1312/SubServers/Sync/Library/Compatibility/CommandX.html" title="class in net.ME1312.SubServers.Sync.Library.Compatibility">CommandX</a></code></dd>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>sender</code> - Sender</dd>
+<dd><code>args</code> - Arguments</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>The validator's response and list of possible arguments</dd>
 </dl>
 </li>
 </ul>
@@ -297,13 +304,13 @@ extends net.md_5.bungee.api.plugin.Command</pre>
 <li>Summary:&nbsp;</li>
 <li><a href="#nested.class.summary">Nested</a>&nbsp;|&nbsp;</li>
 <li>Field&nbsp;|&nbsp;</li>
-<li><a href="#constructor.summary">Constr</a>&nbsp;|&nbsp;</li>
+<li>Constr&nbsp;|&nbsp;</li>
 <li><a href="#method.summary">Method</a></li>
 </ul>
 <ul class="subNavList">
 <li>Detail:&nbsp;</li>
 <li>Field&nbsp;|&nbsp;</li>
-<li><a href="#constructor.detail">Constr</a>&nbsp;|&nbsp;</li>
+<li>Constr&nbsp;|&nbsp;</li>
 <li><a href="#method.detail">Method</a></li>
 </ul>
 </div>

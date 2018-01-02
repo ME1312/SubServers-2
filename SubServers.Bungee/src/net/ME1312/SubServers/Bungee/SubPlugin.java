@@ -41,6 +41,7 @@ import java.util.concurrent.TimeUnit;
  * Main Plugin Class
  */
 public final class SubPlugin extends BungeeCord implements Listener {
+    protected final LinkedHashMap<String, LinkedHashMap<String, String>> lang = new LinkedHashMap<String, LinkedHashMap<String, String>>();
     protected final HashMap<String, Class<? extends Host>> hostDrivers = new HashMap<String, Class<? extends Host>>();
     public final HashMap<String, Host> hosts = new HashMap<String, Host>();
     public final HashMap<String, Server> exServers = new HashMap<String, Server>();
@@ -48,10 +49,9 @@ public final class SubPlugin extends BungeeCord implements Listener {
 
     public final PrintStream out;
     public final UniversalFile dir = new UniversalFile(new File(System.getProperty("user.dir")));
-    private YAMLConfig bungeeconfig;
     public YAMLConfig config;
-    public YAMLConfig lang;
-    public HashMap<String, String> exLang = new HashMap<String, String>();
+    private YAMLConfig bungeeconfig;
+    public YAMLConfig langconfig;
     public final SubAPI api = new SubAPI(this);
     public SubDataServer subdata = null;
     public SubServer sudo = null;
@@ -99,7 +99,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
             Util.copyFromJar(SubPlugin.class.getClassLoader(), "net/ME1312/SubServers/Bungee/Library/Files/lang.yml", new UniversalFile(dir, "lang.yml").getPath());
             System.out.println("SubServers > Updated ~/SubServers/lang.yml");
         }
-        lang = new YAMLConfig(new UniversalFile(dir, "lang.yml"));
+        langconfig = new YAMLConfig(new UniversalFile(dir, "lang.yml"));
 
         if (!(new UniversalFile(dir, "Templates").exists())) {
             new UniversalFile(dir, "Templates").mkdirs();
@@ -177,8 +177,8 @@ public final class SubPlugin extends BungeeCord implements Listener {
         System.out.println("SubServers > Pre-Parsing Config...");
         for (String name : config.get().getSection("Servers").getKeys()) {
             try {
-                if (Util.getCaseInsensitively((Map<String, ?>) config.get().getObject("Hosts"), config.get().getSection("Servers").getSection(name).getString("Host")) == null) throw new InvalidServerException("There is no host with this name: " + config.get().getSection("Servers").getSection(name).getString("Host"));
-                legServers.put(name, new BungeeServerInfo(name, new InetSocketAddress(InetAddress.getByName((String) ((Map<String, ?>) Util.getCaseInsensitively((Map<String, ?>) config.get().getObject("Hosts"), config.get().getSection("Servers").getSection(name).getString("Host"))).get("Address")), config.get().getSection("Servers").getSection(name).getInt("Port")), config.get().getSection("Servers").getSection(name).getColoredString("Motd", '&'), config.get().getSection("Servers").getSection(name).getBoolean("Restricted")));
+                if (Util.getCaseInsensitively(config.get().getSection("Hosts").get(), config.get().getSection("Servers").getSection(name).getString("Host")) == null) throw new InvalidServerException("There is no host with this name: " + config.get().getSection("Servers").getSection(name).getString("Host"));
+                legServers.put(name, new BungeeServerInfo(name, new InetSocketAddress(InetAddress.getByName((String) ((Map<String, ?>) Util.getCaseInsensitively(config.get().getSection("Hosts").get(), config.get().getSection("Servers").getSection(name).getString("Host"))).get("Address")), config.get().getSection("Servers").getSection(name).getInt("Port")), config.get().getSection("Servers").getSection(name).getColoredString("Motd", '&'), config.get().getSection("Servers").getSection(name).getBoolean("Restricted")));
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -219,7 +219,9 @@ public final class SubPlugin extends BungeeCord implements Listener {
 
         YAMLSection prevconfig = config.get();
         config.reload();
-        lang.reload();
+        langconfig.reload();
+        for (String key : langconfig.get().getSection("Lang").getKeys())
+            api.setLang("SubServers", key, langconfig.get().getSection("Lang").getColoredString(key, '&'));
 
         if (subdata == null || // SubData Server must be reset
                 !config.get().getSection("Settings").getSection("SubData").getRawString("Address", "127.0.0.1:4391").equals(prevconfig.getSection("Settings").getSection("SubData").getRawString("Address", "127.0.0.1:4391")) ||

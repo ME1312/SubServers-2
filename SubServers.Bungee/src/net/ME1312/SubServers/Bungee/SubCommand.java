@@ -432,7 +432,7 @@ public final class SubCommand extends CommandX {
                 for (String cmd : cmds) {
                     if (cmd.startsWith(last)) list.add(last + cmd.substring(last.length()));
                 }
-                return new NamedContainer<>((list.size() <= 0)?plugin.lang.get().getSection("Lang").getColoredString("Command.Generic.Invalid-Subcommand", '&').replace("$str$", args[0]):null, list);
+                return new NamedContainer<>((list.size() <= 0)?plugin.api.getLang("SubServers", "Command.Generic.Invalid-Subcommand").replace("$str$", args[0]):null, list);
             }
         } else {
             if (args[0].equals("info") || args[0].equals("status") ||
@@ -449,7 +449,7 @@ public final class SubCommand extends CommandX {
                                 list.add(last + server.getName().substring(last.length()));
                         }
                     }
-                    return new NamedContainer<>((list.size() <= 0)?plugin.lang.get().getSection("Lang").getColoredString("Command.Generic.Unknown-SubServer", '&').replace("$str$", args[0]):null, list);
+                    return new NamedContainer<>((list.size() <= 0)?plugin.api.getLang("SubServers", "Command.Generic.Unknown-SubServer").replace("$str$", args[0]):null, list);
                 } else {
                     return new NamedContainer<>(null, Collections.emptyList());
                 }
@@ -463,7 +463,7 @@ public final class SubCommand extends CommandX {
                             if (server.getName().toLowerCase().startsWith(last)) list.add(last + server.getName().substring(last.length()));
                         }
                     }
-                    return new NamedContainer<>((list.size() <= 0)?plugin.lang.get().getSection("Lang").getColoredString("Command.Generic.Unknown-SubServer", '&').replace("$str$", args[0]):null, list);
+                    return new NamedContainer<>((list.size() <= 0)?plugin.api.getLang("SubServers", "Command.Generic.Unknown-SubServer").replace("$str$", args[0]):null, list);
                 } else if (args.length == 3) {
                     return new NamedContainer<>(null, Collections.singletonList("<Command>"));
                 } else {
@@ -481,29 +481,31 @@ public final class SubCommand extends CommandX {
                             if (host.getName().toLowerCase().startsWith(last)) list.add(last + host.getName().substring(last.length()));
                         }
                     }
-                    return new NamedContainer<>((list.size() <= 0)?plugin.lang.get().getSection("Lang").getColoredString("Command.Generic.Unknown-Host", '&').replace("$str$", args[0]):null, list);
+                    return new NamedContainer<>((list.size() <= 0)?plugin.api.getLang("SubServers", "Command.Generic.Unknown-Host").replace("$str$", args[0]):null, list);
                 } else if (args.length == 4) {
                     List<String> list = new ArrayList<String>();
                     Map<String, Host> hosts = plugin.api.getHosts();
-                    if (last.length() == 0) {
-                        for (SubCreator.ServerTemplate template : hosts.get(args[2].toLowerCase()).getCreator().getTemplates().values()) list.add(template.toString());
+                    if (!hosts.keySet().contains(args[2].toLowerCase())) {
+                        list.add("<Template>");
+                    } else if (last.length() == 0) {
+                        for (SubCreator.ServerTemplate template : hosts.get(args[2].toLowerCase()).getCreator().getTemplates().values()) list.add(template.getName());
                     } else {
                         for (SubCreator.ServerTemplate template : hosts.get(args[2].toLowerCase()).getCreator().getTemplates().values()) {
-                            if (template.toString().toLowerCase().startsWith(last)) list.add(last + template.toString().substring(last.length()));
+                            if (template.getName().toLowerCase().startsWith(last)) list.add(last + template.getName().substring(last.length()));
                         }
                     }
-                    return new NamedContainer<>((list.size() <= 0)?plugin.lang.get().getSection("Lang").getColoredString("Command.Creator.Invalid-Template", '&').replace("$str$", args[0]):null, list);
+                    return new NamedContainer<>((list.size() <= 0)?plugin.api.getLang("SubServers", "Command.Creator.Invalid-Template").replace("$str$", args[0]):null, list);
                 } else if (args.length == 5) {
                     if (last.length() > 0) {
                         if (new Version("1.8").compareTo(new Version(last)) > 0) {
-                            return new NamedContainer<>(plugin.lang.get().getSection("Lang").getColoredString("Command.Creator.Invalid-Version", '&'), Collections.emptyList());
+                            return new NamedContainer<>(plugin.api.getLang("SubServers", "Command.Creator.Invalid-Version"), Collections.emptyList());
                         }
                     }
                     return new NamedContainer<>(null, Collections.singletonList("<Version>"));
                 } else if (args.length == 6) {
                     if (last.length() > 0) {
                         if (Util.isException(() -> Integer.parseInt(last)) || Integer.parseInt(last) <= 0 || Integer.parseInt(last) > 65535) {
-                            return new NamedContainer<>(plugin.lang.get().getSection("Lang").getColoredString("Command.Creator.Invalid-Port", '&'), Collections.emptyList());
+                            return new NamedContainer<>(plugin.api.getLang("SubServers", "Command.Creator.Invalid-Port"), Collections.emptyList());
                         }
                     }
                     return new NamedContainer<>(null, Collections.singletonList("<Port>"));
@@ -511,7 +513,7 @@ public final class SubCommand extends CommandX {
                     return new NamedContainer<>(null, Collections.emptyList());
                 }
             } else {
-                return new NamedContainer<>(plugin.lang.get().getSection("Lang").getColoredString("Command.Generic.Invalid-Subcommand", '&').replace("$str$", args[0]), Collections.emptyList());
+                return new NamedContainer<>(plugin.api.getLang("SubServers", "Command.Generic.Invalid-Subcommand").replace("$str$", args[0]), Collections.emptyList());
             }
         }
     }
@@ -551,18 +553,18 @@ public final class SubCommand extends CommandX {
                     if (servers.keySet().contains(args[0].toLowerCase())) {
                         ((ProxiedPlayer) sender).connect(servers.get(args[0].toLowerCase()));
                     } else {
-                        sender.sendMessage(plugin.lang.get().getSection("Lang").getColoredString("Bungee.Server.Invalid", '&'));
+                        sender.sendMessage(plugin.api.getLang("SubServers", "Bungee.Server.Invalid"));
                     }
                 } else {
                     int i = 0;
                     TextComponent serverm = new TextComponent(ChatColor.RESET.toString());
-                    TextComponent div = new TextComponent(plugin.lang.get().getSection("Lang").getColoredString("Bungee.Server.Divider", '&'));
+                    TextComponent div = new TextComponent(plugin.api.getLang("SubServers", "Bungee.Server.Divider"));
                     for (Server server : plugin.api.getServers().values()) {
                         if (!server.isHidden() && (!(server instanceof SubServer) || ((SubServer) server).isRunning())) {
                             if (i != 0) serverm.addExtra(div);
-                            TextComponent message = new TextComponent(plugin.lang.get().getSection("Lang").getColoredString("Bungee.Server.List", '&').replace("$str$", server.getDisplayName()));
+                            TextComponent message = new TextComponent(plugin.api.getLang("SubServers", "Bungee.Server.List").replace("$str$", server.getDisplayName()));
                             try {
-                                message.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[]{new TextComponent(plugin.lang.get().getSection("Lang").getColoredString("Bungee.Server.Hover", '&').replace("$int$", Integer.toString(server.getGlobalPlayers().size())))}));
+                                message.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[]{new TextComponent(plugin.api.getLang("SubServers", "Bungee.Server.Hover").replace("$int$", Integer.toString(server.getGlobalPlayers().size())))}));
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
@@ -572,12 +574,12 @@ public final class SubCommand extends CommandX {
                         }
                     }
                     sender.sendMessages(
-                            plugin.lang.get().getSection("Lang").getColoredString("Bungee.Server.Current", '&').replace("$str$", ((ProxiedPlayer) sender).getServer().getInfo().getName()),
-                            plugin.lang.get().getSection("Lang").getColoredString("Bungee.Server.Available", '&'));
+                            plugin.api.getLang("SubServers", "Bungee.Server.Current").replace("$str$", ((ProxiedPlayer) sender).getServer().getInfo().getName()),
+                            plugin.api.getLang("SubServers", "Bungee.Server.Available"));
                     sender.sendMessage(serverm);
                 }
             } else {
-                sender.sendMessage(plugin.lang.get().getSection("Lang").getColoredString("Command.Generic.Player-Only", '&'));
+                sender.sendMessage(plugin.api.getLang("SubServers", "Command.Generic.Player-Only"));
             }
         }
 
@@ -598,7 +600,7 @@ public final class SubCommand extends CommandX {
                     for (String server : plugin.getServers().keySet()) {
                         if (server.toLowerCase().startsWith(last)) list.add(server);
                     }
-                    return new NamedContainer<>((list.size() <= 0)?plugin.lang.get().getSection("Lang").getColoredString("Bungee.Server.Invalid", '&').replace("$str$", args[0]):null, list);
+                    return new NamedContainer<>((list.size() <= 0)?plugin.api.getLang("SubServers", "Bungee.Server.Invalid").replace("$str$", args[0]):null, list);
                 }
             } else {
                 return new NamedContainer<>(null, Collections.emptyList());
@@ -635,17 +637,17 @@ public final class SubCommand extends CommandX {
                 players += playerlist.size();
                 if (!server.isHidden() && (!(server instanceof SubServer) || ((SubServer) server).isRunning())) {
                     int i = 0;
-                    String message = plugin.lang.get().getSection("Lang").getColoredString("Bungee.List.Format", '&').replace("$str$", server.getDisplayName()).replace("$int$", Integer.toString(playerlist.size()));
+                    String message = plugin.api.getLang("SubServers", "Bungee.List.Format").replace("$str$", server.getDisplayName()).replace("$int$", Integer.toString(playerlist.size()));
                     for (String player : playerlist) {
-                        if (i != 0) message += plugin.lang.get().getSection("Lang").getColoredString("Bungee.List.Divider", '&');
-                        message += plugin.lang.get().getSection("Lang").getColoredString("Bungee.List.List", '&').replace("$str$", player);
+                        if (i != 0) message += plugin.api.getLang("SubServers", "Bungee.List.Divider");
+                        message += plugin.api.getLang("SubServers", "Bungee.List.List").replace("$str$", player);
                         i++;
                     }
                     messages.add(message);
                 }
             }
             sender.sendMessages(messages.toArray(new String[messages.size()]));
-            sender.sendMessage(plugin.lang.get().getSection("Lang").getColoredString("Bungee.List.Total", '&').replace("$int$", Integer.toString(players)));
+            sender.sendMessage(plugin.api.getLang("SubServers", "Bungee.List.Total").replace("$int$", Integer.toString(players)));
         }
     }
 }

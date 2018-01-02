@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":10,"i1":10,"i2":10,"i3":9,"i4":42,"i5":10,"i6":10,"i7":10,"i8":10,"i9":10,"i10":10,"i11":10,"i12":10};
+var methods = {"i0":10,"i1":10,"i2":10,"i3":9,"i4":42,"i5":10,"i6":10,"i7":10,"i8":10,"i9":10,"i10":10,"i11":10,"i12":10,"i13":10};
 var tabs = {65535:["t0","All Methods"],1:["t1","Static Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"],32:["t6","Deprecated Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -162,48 +162,55 @@ extends java.lang.Object</pre>
 </td>
 </tr>
 <tr id="i5" class="rowColor">
-<td class="colFirst"><code>java.util.Map&lt;java.lang.String,java.lang.String&gt;</code></td>
+<td class="colFirst"><code>java.util.Map&lt;java.lang.String,java.util.Map&lt;java.lang.String,java.lang.String&gt;&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Sync/SubAPI.html#getLang--">getLang</a></span>()</code>
 <div class="block">Gets the SubServers Lang</div>
 </td>
 </tr>
 <tr id="i6" class="altColor">
-<td class="colFirst"><code>java.lang.String</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Sync/SubAPI.html#getLang-java.lang.String-">getLang</a></span>(java.lang.String&nbsp;key)</code>
-<div class="block">Gets a value from the SubServers Lang</div>
+<td class="colFirst"><code>java.util.Map&lt;java.lang.String,java.lang.String&gt;</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Sync/SubAPI.html#getLang-java.lang.String-">getLang</a></span>(java.lang.String&nbsp;channel)</code>
+<div class="block">Gets values from the SubServers Lang</div>
 </td>
 </tr>
 <tr id="i7" class="rowColor">
+<td class="colFirst"><code>java.lang.String</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Sync/SubAPI.html#getLang-java.lang.String-java.lang.String-">getLang</a></span>(java.lang.String&nbsp;channel,
+       java.lang.String&nbsp;key)</code>
+<div class="block">Gets a value from the SubServers Lang</div>
+</td>
+</tr>
+<tr id="i8" class="altColor">
 <td class="colFirst"><code><a href="../../../../net/ME1312/SubServers/Sync/Library/Version/Version.html" title="class in net.ME1312.SubServers.Sync.Library.Version">Version</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Sync/SubAPI.html#getProxyVersion--">getProxyVersion</a></span>()</code>
 <div class="block">Gets the BungeeCord Version</div>
 </td>
 </tr>
-<tr id="i8" class="altColor">
+<tr id="i9" class="rowColor">
 <td class="colFirst"><code><a href="../../../../net/ME1312/SubServers/Sync/Library/UniversalFile.html" title="class in net.ME1312.SubServers.Sync.Library">UniversalFile</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Sync/SubAPI.html#getRuntimeDirectory--">getRuntimeDirectory</a></span>()</code>
 <div class="block">Gets the Runtime Directory</div>
 </td>
 </tr>
-<tr id="i9" class="rowColor">
+<tr id="i10" class="altColor">
 <td class="colFirst"><code><a href="../../../../net/ME1312/SubServers/Sync/Server/Server.html" title="class in net.ME1312.SubServers.Sync.Server">Server</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Sync/SubAPI.html#getServer-java.lang.String-">getServer</a></span>(java.lang.String&nbsp;name)</code>
 <div class="block">Gets a Server</div>
 </td>
 </tr>
-<tr id="i10" class="altColor">
+<tr id="i11" class="rowColor">
 <td class="colFirst"><code>java.util.Map&lt;java.lang.String,<a href="../../../../net/ME1312/SubServers/Sync/Server/Server.html" title="class in net.ME1312.SubServers.Sync.Server">Server</a>&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Sync/SubAPI.html#getServers--">getServers</a></span>()</code>
 <div class="block">Gets the Servers (including SubServers)</div>
 </td>
 </tr>
-<tr id="i11" class="rowColor">
+<tr id="i12" class="altColor">
 <td class="colFirst"><code><a href="../../../../net/ME1312/SubServers/Sync/Network/SubDataClient.html" title="class in net.ME1312.SubServers.Sync.Network">SubDataClient</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Sync/SubAPI.html#getSubDataNetwork--">getSubDataNetwork</a></span>()</code>
 <div class="block">Gets the SubData Network Manager</div>
 </td>
 </tr>
-<tr id="i12" class="altColor">
+<tr id="i13" class="rowColor">
 <td class="colFirst"><code><a href="../../../../net/ME1312/SubServers/Sync/Library/Version/Version.html" title="class in net.ME1312.SubServers.Sync.Library.Version">Version</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Sync/SubAPI.html#getWrapperVersion--">getWrapperVersion</a></span>()</code>
 <div class="block">Gets the SubServers.Sync Version</div>
@@ -321,33 +328,51 @@ public&nbsp;<a href="../../../../net/ME1312/SubServers/Sync/SubPlugin.html" titl
 </dl>
 </li>
 </ul>
-<a name="getLang-java.lang.String-">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>getLang</h4>
-<pre>public&nbsp;java.lang.String&nbsp;getLang(java.lang.String&nbsp;key)</pre>
-<div class="block">Gets a value from the SubServers Lang</div>
-<dl>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>key</code> - Key</dd>
-<dt><span class="returnLabel">Returns:</span></dt>
-<dd>Lang Value</dd>
-</dl>
-</li>
-</ul>
 <a name="getLang--">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>getLang</h4>
-<pre>public&nbsp;java.util.Map&lt;java.lang.String,java.lang.String&gt;&nbsp;getLang()</pre>
+<pre>public&nbsp;java.util.Map&lt;java.lang.String,java.util.Map&lt;java.lang.String,java.lang.String&gt;&gt;&nbsp;getLang()</pre>
 <div class="block">Gets the SubServers Lang</div>
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>SubServers Lang</dd>
+</dl>
+</li>
+</ul>
+<a name="getLang-java.lang.String-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getLang</h4>
+<pre>public&nbsp;java.util.Map&lt;java.lang.String,java.lang.String&gt;&nbsp;getLang(java.lang.String&nbsp;channel)</pre>
+<div class="block">Gets values from the SubServers Lang</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>channel</code> - Lang Channel</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>Lang Values</dd>
+</dl>
+</li>
+</ul>
+<a name="getLang-java.lang.String-java.lang.String-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getLang</h4>
+<pre>public&nbsp;java.lang.String&nbsp;getLang(java.lang.String&nbsp;channel,
+                                java.lang.String&nbsp;key)</pre>
+<div class="block">Gets a value from the SubServers Lang</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>channel</code> - Lang Channel</dd>
+<dd><code>key</code> - Key</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>Lang Value</dd>
 </dl>
 </li>
 </ul>

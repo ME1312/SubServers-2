@@ -332,27 +332,36 @@ public final class SubAPI {
     }
 
     /**
-     * Gets a value from the SubServers Lang
-     *
-     * @param key Key
-     * @return Lang Value
-     */
-    public String getLang(String key) {
-        if (Util.isNull(key)) throw new NullPointerException();
-        return getLang().get(key);
-    }
-
-    /**
      * Gets the SubServers Lang
      *
      * @return SubServers Lang
      */
-    public Map<String, String> getLang() {
-        HashMap<String, String> lang = new HashMap<String, String>();
-        for (String key : host.lang.getSection("Lang").getKeys()) {
-            if (host.lang.getSection("Lang").isString(key)) lang.put(key, host.lang.getSection("Lang").getString(key));
-        }
-        return lang;
+    public Map<String, Map<String, String>> getLang() {
+        if (Util.isNull(host.lang, host.lang.get())) throw new NullPointerException();
+        return new LinkedHashMap<>(host.lang.get());
+    }
+
+    /**
+     * Gets values from the SubServers Lang
+     *
+     * @param channel Lang Channel
+     * @return Lang Values
+     */
+    public Map<String, String> getLang(String channel) {
+        if (Util.isNull(channel)) throw new NullPointerException();
+        return getLang().get(channel.toLowerCase());
+    }
+
+    /**
+     * Gets a value from the SubServers Lang
+     *
+     * @param channel Lang Channel
+     * @param key Key
+     * @return Lang Value
+     */
+    public String getLang(String channel, String key) {
+        if (Util.isNull(channel, key)) throw new NullPointerException();
+        return getLang(channel).get(key);
     }
 
     /**

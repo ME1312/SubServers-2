@@ -1,5 +1,6 @@
 package net.ME1312.SubServers.Sync;
 
+import net.ME1312.SubServers.Sync.Library.Compatibility.CommandX;
 import net.ME1312.SubServers.Sync.Library.NamedContainer;
 import net.ME1312.SubServers.Sync.Library.Util;
 import net.ME1312.SubServers.Sync.Library.Version.Version;
@@ -29,16 +30,28 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 @SuppressWarnings("deprecation")
-public final class SubCommand extends Command {
+public final class SubCommand extends CommandX {
+    private NamedContainer<Long, TreeMap<String, List<String>>> templateCache = new NamedContainer<Long, TreeMap<String, List<String>>>(0L, new TreeMap<String, List<String>>());
     private SubPlugin plugin;
     private String label;
 
-    public SubCommand(SubPlugin plugin, String label) {
-        super(label);
+    protected static NamedContainer<SubCommand, CommandX> newInstance(SubPlugin plugin, String command) {
+        NamedContainer<SubCommand, CommandX> cmd = new NamedContainer<>(new SubCommand(plugin, command), null);
+        CommandX now = cmd.name();
+        if (plugin.api.getGameVersion().compareTo(new Version("1.13")) >= 0) {
+            now = new net.ME1312.SubServers.Sync.Library.Compatibility.v1_13.CommandX(cmd.name());
+        }
+        cmd.set(now);
+        return cmd;
+    }
+
+    private SubCommand(SubPlugin plugin, String command) {
+        super(command);
         this.plugin = plugin;
-        this.label = '/' + label;
+        this.label = '/' + command;
     }
 
     @Override
@@ -81,7 +94,7 @@ public final class SubCommand extends Command {
                             }).start();
                         }
                     } else if (args[0].equalsIgnoreCase("list")) {
-                        plugin.subdata.sendPacket(new PacketDownloadServerList(null, json -> {
+                        plugin.subdata.sendPacket(new PacketDownloadServerList(null, null, json -> {
                             int i = 0;
                             boolean sent = false;
                             String div = ChatColor.RESET + ", ";
@@ -378,14 +391,146 @@ public final class SubCommand extends Command {
     }
 
     /**
+     * Suggest command arguments
+     *
+     * @param sender Sender
+     * @param args Arguments
+     * @return The validator's response and list of possible arguments
+     */
+    public NamedContainer<String, List<String>> suggestArguments(CommandSender sender, String[] args) {
+        String last = (args.length > 0)?args[args.length - 1].toLowerCase():"";
+        if (args.length <= 1) {
+            List<String> cmds = Arrays.asList("help", "list", "info", "status", "version", "start", "stop", "kill", "terminate", "cmd", "command", "create");
+            if (last.length() == 0) {
+                return new NamedContainer<>(null, cmds);
+            } else {
+                List<String> list = new ArrayList<String>();
+                for (String cmd : cmds) {
+                    if (cmd.startsWith(last)) list.add(last + cmd.substring(last.length()));
+                }
+                return new NamedContainer<>((list.size() <= 0)?plugin.api.getLang("SubServers", "Command.Generic.Invalid-Subcommand").replace("$str$", args[0]):null, list);
+            }
+        } else {
+            if (args[0].equals("info") || args[0].equals("status") ||
+                    args[0].equals("start") ||
+                    args[0].equals("stop") ||
+                    args[0].equals("kill") || args[0].equals("terminate")) {
+                List<String> list = new ArrayList<String>();
+                if (args.length == 2) {
+                    if (last.length() == 0) {
+                        for (Server server : plugin.api.getServers().values()) if (server instanceof SubServer) list.add(server.getName());
+                    } else {
+                        for (Server server : plugin.api.getServers().values()) {
+                            if (server instanceof SubServer && server.getName().toLowerCase().startsWith(last))
+                                list.add(last + server.getName().substring(last.length()));
+                        }
+                    }
+                    return new NamedContainer<>((list.size() <= 0)?plugin.api.getLang("SubServers", "Command.Generic.Unknown-SubServer").replace("$str$", args[0]):null, list);
+                } else {
+                    return new NamedContainer<>(null, Collections.emptyList());
+                }
+            } else if (args[0].equals("cmd") || args[0].equals("command")) {
+                if (args.length == 2) {
+                    List<String> list = new ArrayList<String>();
+                    if (last.length() == 0) {
+                        for (Server server : plugin.api.getServers().values()) if (server instanceof SubServer) list.add(server.getName());
+                    } else {
+                        for (Server server : plugin.api.getServers().values()) {
+                            if (server instanceof SubServer && server.getName().toLowerCase().startsWith(last)) list.add(last + server.getName().substring(last.length()));
+                        }
+                    }
+                    return new NamedContainer<>((list.size() <= 0)?plugin.api.getLang("SubServers", "Command.Generic.Unknown-SubServer").replace("$str$", args[0]):null, list);
+                } else if (args.length == 3) {
+                    return new NamedContainer<>(null, Collections.singletonList("<Command>"));
+                } else {
+                    return new NamedContainer<>(null, Collections.singletonList("[Args...]"));
+                }
+            } else if (args[0].equals("create")) {
+                if (args.length == 2) {
+                    return new NamedContainer<>(null, Collections.singletonList("<Name>"));
+                } else if (args.length == 3) {
+                    updateTemplateCache();
+                    List<String> list = new ArrayList<String>();
+                    if (templateCache.name() <= 0) {
+                        list.add("<Host>");
+                    } else if (last.length() == 0) {
+                        list.addAll(templateCache.get().keySet());
+                    } else {
+                        for (String host : templateCache.get().keySet()) {
+                            if (host.toLowerCase().startsWith(last)) list.add(last + host.substring(last.length()));
+                        }
+                    }
+                    return new NamedContainer<>((list.size() <= 0)?plugin.api.getLang("SubServers", "Command.Generic.Unknown-Host").replace("$str$", args[0]):null, list);
+                } else if (args.length == 4) {
+                    updateTemplateCache();
+                    List<String> list = new ArrayList<String>();
+                    if (templateCache.name() <= 0 || !templateCache.get().keySet().contains(args[2].toLowerCase())) {
+                        list.add("<Template>");
+                    } else if (last.length() == 0) {
+                        list.addAll(templateCache.get().get(args[2].toLowerCase()));
+                    } else {
+                         for (String template : templateCache.get().get(args[2].toLowerCase())) {
+                            if (template.toLowerCase().startsWith(last)) list.add(last + template.substring(last.length()));
+                        }
+                    }
+                    return new NamedContainer<>((list.size() <= 0)?plugin.api.getLang("SubServers", "Command.Creator.Invalid-Template").replace("$str$", args[0]):null, list);
+                } else if (args.length == 5) {
+                    if (last.length() > 0) {
+                        if (new Version("1.8").compareTo(new Version(last)) > 0) {
+                            return new NamedContainer<>(plugin.api.getLang("SubServers", "Command.Creator.Invalid-Version"), Collections.emptyList());
+                        }
+                    }
+                    return new NamedContainer<>(null, Collections.singletonList("<Version>"));
+                } else if (args.length == 6) {
+                    if (last.length() > 0) {
+                        if (Util.isException(() -> Integer.parseInt(last)) || Integer.parseInt(last) <= 0 || Integer.parseInt(last) > 65535) {
+                            return new NamedContainer<>(plugin.api.getLang("SubServers", "Command.Creator.Invalid-Port"), Collections.emptyList());
+                        }
+                    }
+                    return new NamedContainer<>(null, Collections.singletonList("<Port>"));
+                } else {
+                    return new NamedContainer<>(null, Collections.emptyList());
+                }
+            } else {
+                return new NamedContainer<>(plugin.api.getLang("SubServers", "Command.Generic.Invalid-Subcommand").replace("$str$", args[0]), Collections.emptyList());
+            }
+        }
+    }
+
+    private void updateTemplateCache() {
+        if (Calendar.getInstance().getTime().getTime() - templateCache.name() >= TimeUnit.MINUTES.toMillis(5)) {
+            plugin.subdata.sendPacket(new PacketDownloadServerList(null, null, (json) -> {
+                TreeMap<String, List<String>> hosts = new TreeMap<String, List<String>>();
+                for (String host : json.getJSONObject("hosts").keySet()) {
+                    List<String> templates = new ArrayList<String>();
+                    templates.addAll(json.getJSONObject("hosts").getJSONObject(host).getJSONObject("creator").getJSONObject("templates").keySet());
+                    hosts.put(host, templates);
+                }
+                templateCache.set(hosts);
+                templateCache.rename(Calendar.getInstance().getTime().getTime());
+            }));
+        }
+    }
+
+    /**
      * BungeeCord /server
      */
     @SuppressWarnings("unchecked")
-    public static final class BungeeServer extends Command implements TabExecutor {
+    public static final class BungeeServer extends CommandX {
         private SubPlugin plugin;
-        protected BungeeServer(SubPlugin plugin, String command) {
+        private BungeeServer(SubPlugin plugin, String command) {
             super(command, "bungeecord.command.server");
             this.plugin = plugin;
+        }
+
+        protected static NamedContainer<BungeeServer, CommandX> newInstance(SubPlugin plugin, String command) {
+            NamedContainer<BungeeServer, CommandX> cmd = new NamedContainer<>(new BungeeServer(plugin, command), null);
+            CommandX now = cmd.name();
+            if (plugin.api.getGameVersion().compareTo(new Version("1.13")) >= 0) {
+                now = new net.ME1312.SubServers.Sync.Library.Compatibility.v1_13.CommandX(cmd.name());
+            }
+            cmd.set(now);
+            return cmd;
         }
 
         /**
@@ -403,18 +548,18 @@ public final class SubCommand extends Command {
                     if (servers.keySet().contains(args[0].toLowerCase())) {
                         ((ProxiedPlayer) sender).connect(servers.get(args[0].toLowerCase()));
                     } else {
-                        sender.sendMessage(plugin.lang.getSection("Lang").getColoredString("Bungee.Server.Invalid", '&'));
+                        sender.sendMessage(plugin.api.getLang("SubServers", "Bungee.Server.Invalid"));
                     }
                 } else {
                     int i = 0;
                     TextComponent serverm = new TextComponent(ChatColor.RESET.toString());
-                    TextComponent div = new TextComponent(plugin.lang.getSection("Lang").getColoredString("Bungee.Server.Divider", '&'));
+                    TextComponent div = new TextComponent(plugin.api.getLang("SubServers", "Bungee.Server.Divider"));
                     for (Server server : plugin.api.getServers().values()) {
                         if (!server.isHidden() && (!(server instanceof SubServer) || ((SubServer) server).isRunning())) {
                             if (i != 0) serverm.addExtra(div);
-                            TextComponent message = new TextComponent(plugin.lang.getSection("Lang").getColoredString("Bungee.Server.List", '&').replace("$str$", server.getDisplayName()));
+                            TextComponent message = new TextComponent(plugin.api.getLang("SubServers", "Bungee.Server.List").replace("$str$", server.getDisplayName()));
                             try {
-                                message.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[]{new TextComponent(plugin.lang.getSection("Lang").getColoredString("Bungee.Server.Hover", '&').replace("$int$", Integer.toString((plugin.redis)?((Set<UUID>)plugin.redis("getPlayersOnServer", new NamedContainer<>(String.class, server.getName()))).size():server.getPlayers().size())))}));
+                                message.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[]{new TextComponent(plugin.api.getLang("SubServers", "Bungee.Server.Hover").replace("$int$", Integer.toString((plugin.redis)?((Set<UUID>)plugin.redis("getPlayersOnServer", new NamedContainer<>(String.class, server.getName()))).size():server.getPlayers().size())))}));
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
@@ -424,37 +569,36 @@ public final class SubCommand extends Command {
                         }
                     }
                     sender.sendMessages(
-                            plugin.lang.getSection("Lang").getColoredString("Bungee.Server.Current", '&').replace("$str$", ((ProxiedPlayer) sender).getServer().getInfo().getName()),
-                            plugin.lang.getSection("Lang").getColoredString("Bungee.Server.Available", '&'));
+                            plugin.api.getLang("SubServers", "Bungee.Server.Current").replace("$str$", ((ProxiedPlayer) sender).getServer().getInfo().getName()),
+                            plugin.api.getLang("SubServers", "Bungee.Server.Available"));
                     sender.sendMessage(serverm);
                 }
             } else {
-                sender.sendMessage(plugin.lang.getSection("Lang").getColoredString("Command.Generic.Player-Only", '&'));
+                sender.sendMessage(plugin.api.getLang("SubServers", "Command.Generic.Player-Only"));
             }
         }
 
         /**
-         * Tab completer
+         * Suggest command arguments
          *
          * @param sender Sender
          * @param args Arguments
-         * @return Tab completes
+         * @return The validator's response and list of possible arguments
          */
-        @Override
-        public Iterable<String> onTabComplete(CommandSender sender, String[] args) {
+        public NamedContainer<String, List<String>> suggestArguments(CommandSender sender, String[] args) {
             if (args.length <= 1) {
                 String last = (args.length > 0)?args[args.length - 1].toLowerCase():"";
                 if (last.length() == 0) {
-                    return plugin.getServers().keySet();
+                    return new NamedContainer<>(null, new LinkedList<>(plugin.getServers().keySet()));
                 } else {
                     List<String> list = new ArrayList<String>();
                     for (String server : plugin.getServers().keySet()) {
                         if (server.toLowerCase().startsWith(last)) list.add(server);
                     }
-                    return list;
+                    return new NamedContainer<>((list.size() <= 0)?plugin.api.getLang("SubServers", "Bungee.Server.Invalid").replace("$str$", args[0]):null, list);
                 }
             } else {
-                return Collections.emptyList();
+                return new NamedContainer<>(null, Collections.emptyList());
             }
         }
     }
@@ -497,17 +641,17 @@ public final class SubCommand extends Command {
                 players += playerlist.size();
                 if (!server.isHidden() && (!(server instanceof SubServer) || ((SubServer) server).isRunning())) {
                     int i = 0;
-                    String message = plugin.lang.getSection("Lang").getColoredString("Bungee.List.Format", '&').replace("$str$", server.getDisplayName()).replace("$int$", Integer.toString(playerlist.size()));
+                    String message = plugin.api.getLang("SubServers", "Bungee.List.Format").replace("$str$", server.getDisplayName()).replace("$int$", Integer.toString(playerlist.size()));
                     for (String player : playerlist) {
-                        if (i != 0) message += plugin.lang.getSection("Lang").getColoredString("Bungee.List.Divider", '&');
-                        message += plugin.lang.getSection("Lang").getColoredString("Bungee.List.List", '&').replace("$str$", player);
+                        if (i != 0) message += plugin.api.getLang("SubServers", "Bungee.List.Divider");
+                        message += plugin.api.getLang("SubServers", "Bungee.List.List").replace("$str$", player);
                         i++;
                     }
                     messages.add(message);
                 }
             }
             sender.sendMessages(messages.toArray(new String[messages.size()]));
-            sender.sendMessage(plugin.lang.getSection("Lang").getColoredString("Bungee.List.Total", '&').replace("$int$", Integer.toString(players)));
+            sender.sendMessage(plugin.api.getLang("SubServers", "Bungee.List.Total").replace("$int$", Integer.toString(players)));
         }
     }
 }

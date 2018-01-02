@@ -82,7 +82,7 @@ public class SubCommand {
         new Command(null) {
             @Override
             public void command(String handle, String[] args) {
-                host.subdata.sendPacket(new PacketDownloadServerList(null, json -> {
+                host.subdata.sendPacket(new PacketDownloadServerList(null, null, json -> {
                     int i = 0;
                     boolean sent = false;
                     String div = TextColor.RESET + ", ";

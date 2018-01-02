@@ -1,6 +1,8 @@
 net.ME1312.SubServers.Sync
 net.ME1312.SubServers.Sync.Event
 net.ME1312.SubServers.Sync.Library
+net.ME1312.SubServers.Sync.Library.Compatibility
+net.ME1312.SubServers.Sync.Library.Compatibility.v1_13
 net.ME1312.SubServers.Sync.Library.Config
 net.ME1312.SubServers.Sync.Library.Exception
 net.ME1312.SubServers.Sync.Library.Version

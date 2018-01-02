@@ -1,6 +1,7 @@
 package net.ME1312.SubServers.Sync.Network.Packet;
 
 import net.ME1312.SubServers.Sync.Library.Config.YAMLSection;
+import net.ME1312.SubServers.Sync.Library.NamedContainer;
 import net.ME1312.SubServers.Sync.Library.Util;
 import net.ME1312.SubServers.Sync.Library.Version.Version;
 import net.ME1312.SubServers.Sync.Network.PacketIn;
@@ -8,6 +9,7 @@ import net.ME1312.SubServers.Sync.Network.PacketOut;
 import net.ME1312.SubServers.Sync.SubPlugin;
 import org.json.JSONObject;
 
+import java.lang.reflect.Field;
 import java.util.Calendar;
 
 /**
@@ -38,9 +40,15 @@ public class PacketDownloadLang implements PacketIn, PacketOut {
 
     @Override
     public void execute(JSONObject data) {
-        data.put("Updated", Calendar.getInstance().getTime().getTime());
-        plugin.lang = new YAMLSection(data);
-        System.out.println("SubData > Lang Settings Downloaded");
+        try {
+            Field f = SubPlugin.class.getDeclaredField("lang");
+            f.setAccessible(true);
+            f.set(plugin, new NamedContainer<>(Calendar.getInstance().getTime().getTime(), new YAMLSection(data.getJSONObject("Lang")).get()));
+            f.setAccessible(false);
+            System.out.println("SubData > Lang Settings Downloaded");
+        } catch (IllegalAccessException | NoSuchFieldException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

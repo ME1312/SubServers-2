@@ -38,12 +38,12 @@ import java.util.concurrent.TimeUnit;
  * Main Plugin Class
  */
 public final class SubPlugin extends BungeeCord implements Listener {
+    protected NamedContainer<Long, Map<String, Map<String, String>>> lang = null;
     public final Map<String, Server> servers = new TreeMap<String, Server>();
 
     public final PrintStream out;
     public final UniversalFile dir = new UniversalFile(new File(System.getProperty("user.dir")));
     public YAMLConfig config;
-    public YAMLSection lang = null;
     public boolean redis = false;
     public final SubAPI api = new SubAPI(this);
     public SubDataClient subdata = null;
@@ -113,12 +113,12 @@ public final class SubPlugin extends BungeeCord implements Listener {
     private void post() {
         if (getPluginManager().getPlugin("RedisBungee") != null) redis = true;
         if (config.get().getSection("Settings").getBoolean("Override-Bungee-Commands", true)) {
-            getPluginManager().registerCommand(null, new SubCommand.BungeeServer(this, "server"));
+            getPluginManager().registerCommand(null, SubCommand.BungeeServer.newInstance(this, "server").get());
             getPluginManager().registerCommand(null, new SubCommand.BungeeList(this, "glist"));
         }
-        getPluginManager().registerCommand(null, new SubCommand(this, "subservers"));
-        getPluginManager().registerCommand(null, new SubCommand(this, "subserver"));
-        getPluginManager().registerCommand(null, new SubCommand(this, "sub"));
+        getPluginManager().registerCommand(null, SubCommand.newInstance(this, "subservers").get());
+        getPluginManager().registerCommand(null, SubCommand.newInstance(this, "subserver").get());
+        getPluginManager().registerCommand(null, SubCommand.newInstance(this, "sub").get());
 
         new Metrics(this);
         new Timer().schedule(new TimerTask() {

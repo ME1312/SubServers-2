@@ -200,25 +200,6 @@ public abstract class Host implements ExtraDataHandler {
     }
 
     /**
-     * Edits the Host
-     *
-     * @param player Player Editing
-     * @param edit Edits
-     * @return Success Status
-     */
-    public abstract int edit(UUID player, YAMLSection edit);
-
-    /**
-     * Edits the Host
-     *
-     * @param edit Edits
-     * @return Success Status
-     */
-    public int edit(YAMLSection edit) {
-        return edit(null, edit);
-    }
-
-    /**
      * Gets the SubCreator Instance for this Host
      *
      * @return SubCreator

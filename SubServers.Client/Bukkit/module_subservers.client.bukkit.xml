@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="module_subservers.client.bukkit" default="compile.module.subservers.client.bukkit">
+  <dirname property="module.subservers.client.bukkit.basedir" file="${ant.file.module_subservers.client.bukkit}"/>
+  
+  <property name="module.jdk.home.subservers.client.bukkit" value="${jdk.home.1.8}"/>
+  <property name="module.jdk.bin.subservers.client.bukkit" value="${jdk.bin.1.8}"/>
+  <property name="module.jdk.classpath.subservers.client.bukkit" value="jdk.classpath.1.8"/>
+  
+  <property name="compiler.args.subservers.client.bukkit" value="-encoding UTF-8 -source 1.8 -target 1.8 ${compiler.args}"/>
+  
+  <property name="subservers.client.bukkit.output.dir" value="${module.subservers.client.bukkit.basedir}/../../out/compile/production/SubServers.Client.Bukkit"/>
+  <property name="subservers.client.bukkit.testoutput.dir" value="${module.subservers.client.bukkit.basedir}/../../out/compile/test/SubServers.Client.Bukkit"/>
+  
+  <path id="subservers.client.bukkit.module.bootclasspath">
+    <!-- Paths to be included in compilation bootclasspath -->
+  </path>
+  
+  <path id="subservers.client.bukkit.module.production.classpath">
+    <path refid="${module.jdk.classpath.subservers.client.bukkit}"/>
+    <pathelement location="${basedir}/../~lib/spigot-1.11.jar"/>
+    <pathelement location="${basedir}/../~lib/json.jar"/>
+    <pathelement location="${basedir}/../~lib/TitleManager-1.5.11.jar"/>
+    <pathelement location="${basedir}/../~lib/Vault.jar"/>
+  </path>
+  
+  <path id="subservers.client.bukkit.runtime.production.module.classpath">
+    <pathelement location="${subservers.client.bukkit.output.dir}"/>
+    <pathelement location="${basedir}/../~lib/json.jar"/>
+  </path>
+  
+  <path id="subservers.client.bukkit.module.classpath">
+    <path refid="${module.jdk.classpath.subservers.client.bukkit}"/>
+    <pathelement location="${subservers.client.bukkit.output.dir}"/>
+    <pathelement location="${basedir}/../~lib/spigot-1.11.jar"/>
+    <pathelement location="${basedir}/../~lib/json.jar"/>
+    <pathelement location="${basedir}/../~lib/TitleManager-1.5.11.jar"/>
+    <pathelement location="${basedir}/../~lib/Vault.jar"/>
+  </path>
+  
+  <path id="subservers.client.bukkit.runtime.module.classpath">
+    <pathelement location="${subservers.client.bukkit.testoutput.dir}"/>
+    <pathelement location="${subservers.client.bukkit.output.dir}"/>
+    <pathelement location="${basedir}/../~lib/spigot-1.11.jar"/>
+    <pathelement location="${basedir}/../~lib/json.jar"/>
+    <pathelement location="${basedir}/../~lib/TitleManager-1.5.11.jar"/>
+    <pathelement location="${basedir}/../~lib/Vault.jar"/>
+  </path>
+  
+  
+  <patternset id="excluded.from.module.subservers.client.bukkit">
+    <patternset refid="ignored.files"/>
+  </patternset>
+  
+  <patternset id="excluded.from.compilation.subservers.client.bukkit">
+    <patternset refid="excluded.from.module.subservers.client.bukkit"/>
+  </patternset>
+  
+  <path id="subservers.client.bukkit.module.sourcepath">
+    <dirset dir="${module.subservers.client.bukkit.basedir}">
+      <include name="src"/>
+    </dirset>
+  </path>
+  
+  
+  <target name="compile.module.subservers.client.bukkit" depends="compile.module.subservers.client.bukkit.production,compile.module.subservers.client.bukkit.tests" description="Compile module SubServers.Client.Bukkit"/>
+  
+  <target name="compile.module.subservers.client.bukkit.production" depends="register.custom.compilers" description="Compile module SubServers.Client.Bukkit; production classes">
+    <mkdir dir="${subservers.client.bukkit.output.dir}"/>
+    <javac2 destdir="${subservers.client.bukkit.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.subservers.client.bukkit}/javac">
+      <compilerarg line="${compiler.args.subservers.client.bukkit}"/>
+      <bootclasspath refid="subservers.client.bukkit.module.bootclasspath"/>
+      <classpath refid="subservers.client.bukkit.module.production.classpath"/>
+      <src refid="subservers.client.bukkit.module.sourcepath"/>
+      <patternset refid="excluded.from.compilation.subservers.client.bukkit"/>
+    </javac2>
+    
+    <copy todir="${subservers.client.bukkit.output.dir}">
+      <fileset dir="${module.subservers.client.bukkit.basedir}/src">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+    </copy>
+  </target>
+  
+  <target name="compile.module.subservers.client.bukkit.tests" depends="register.custom.compilers,compile.module.subservers.client.bukkit.production" description="compile module SubServers.Client.Bukkit; test classes" unless="skip.tests"/>
+  
+  <target name="clean.module.subservers.client.bukkit" description="cleanup module">
+    <delete dir="${subservers.client.bukkit.output.dir}"/>
+    <delete dir="${subservers.client.bukkit.testoutput.dir}"/>
+  </target>
+</project>

@@ -121,11 +121,6 @@ public class ExternalHost extends Host implements ClientHandler {
     }
 
     @Override
-    public int edit(UUID player, YAMLSection edit) {
-        return 0; // TODO
-    }
-
-    @Override
     public SubCreator getCreator() {
         return creator;
     }

@@ -8,6 +8,7 @@ import net.ME1312.SubServers.Bungee.Host.Server;
 import net.ME1312.SubServers.Bungee.Host.Host;
 import net.ME1312.SubServers.Bungee.Host.ServerContainer;
 import net.ME1312.SubServers.Bungee.Host.SubServer;
+import net.ME1312.SubServers.Bungee.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Bungee.Library.Exception.InvalidHostException;
 import net.ME1312.SubServers.Bungee.Library.NamedContainer;
 import net.ME1312.SubServers.Bungee.Library.UniversalFile;
@@ -529,25 +530,17 @@ public final class SubAPI {
     }
 
     /**
-     * Adds to the Language Map
+     * Adds to the SubServers Lang
      *
+     * @param channel Lang Channel
      * @param key Key
      * @param value Lang Value
      */
-    public void setLang(String key, String value) {
-        if (Util.isNull(key, value)) throw new NullPointerException();
-        plugin.exLang.put(key, value);
-    }
-
-    /**
-     * Gets a value from the SubServers Lang
-     *
-     * @param key Key
-     * @return Lang Value
-     */
-    public String getLang(String key) {
-        if (Util.isNull(key)) throw new NullPointerException();
-        return getLang().get(key);
+    public void setLang(String channel, String key, String value) {
+        if (Util.isNull(channel, key, value)) throw new NullPointerException();
+        LinkedHashMap<String, String> map = (plugin.lang.keySet().contains(channel.toLowerCase()))?plugin.lang.get(channel.toLowerCase()):new LinkedHashMap<String, String>();
+        map.put(key, value);
+        plugin.lang.put(channel.toLowerCase(), map);
     }
 
     /**
@@ -555,13 +548,31 @@ public final class SubAPI {
      *
      * @return SubServers Lang
      */
-    public Map<String, String> getLang() {
-        HashMap<String, String> lang = new HashMap<String, String>();
-        for (String key : plugin.lang.get().getSection("Lang").getKeys()) {
-            if (plugin.lang.get().getSection("Lang").isString(key)) lang.put(key, plugin.lang.get().getSection("Lang").getString(key));
-        }
-        lang.putAll(plugin.exLang);
-        return lang;
+    public Map<String, Map<String, String>> getLang() {
+        return new LinkedHashMap<>(plugin.lang);
+    }
+
+    /**
+     * Gets values from the SubServers Lang
+     *
+     * @param channel Lang Channel
+     * @return Lang Value
+     */
+    public Map<String, String> getLang(String channel) {
+        if (Util.isNull(channel)) throw new NullPointerException();
+        return getLang().get(channel.toLowerCase());
+    }
+
+    /**
+     * Gets a value from the SubServers Lang
+     *
+     * @param channel Lang Channel
+     * @param key Key
+     * @return Lang Values
+     */
+    public String getLang(String channel, String key) {
+        if (Util.isNull(channel, key)) throw new NullPointerException();
+        return getLang(channel).get(key);
     }
 
     /**

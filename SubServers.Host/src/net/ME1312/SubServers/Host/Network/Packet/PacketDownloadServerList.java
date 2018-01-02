@@ -16,6 +16,7 @@ import java.util.UUID;
 public class PacketDownloadServerList implements PacketIn, PacketOut {
     private static HashMap<String, JSONCallback[]> callbacks = new HashMap<String, JSONCallback[]>();
     private String host;
+    private String group;
     private String id;
 
     /**
@@ -27,11 +28,13 @@ public class PacketDownloadServerList implements PacketIn, PacketOut {
      * New PacketDownloadServerList (Out)
      *
      * @param host Host name (or null for all)
+     * @param group Group name (or null for all)
      * @param callback Callbacks
      */
-    public PacketDownloadServerList(String host, JSONCallback... callback) {
+    public PacketDownloadServerList(String host, String group, JSONCallback... callback) {
         if (Util.isNull((Object) callback)) throw new NullPointerException();
         this.host = host;
+        this.group = group;
         this.id = Util.getNew(callbacks.keySet(), UUID::randomUUID).toString();
         callbacks.put(id, callback);
     }
@@ -41,6 +44,7 @@ public class PacketDownloadServerList implements PacketIn, PacketOut {
         JSONObject json = new JSONObject();
         json.put("id", id);
         if (host != null) json.put("host", host);
+        if (group != null) json.put("group", group);
         return json;
     }
 

@@ -1,6 +1,7 @@
 package net.ME1312.SubServers.Client.Bukkit.Network.Packet;
 
 import net.ME1312.SubServers.Client.Bukkit.Library.Config.YAMLSection;
+import net.ME1312.SubServers.Client.Bukkit.Library.NamedContainer;
 import net.ME1312.SubServers.Client.Bukkit.Library.Util;
 import net.ME1312.SubServers.Client.Bukkit.Library.Version.Version;
 import net.ME1312.SubServers.Client.Bukkit.Network.PacketIn;
@@ -9,6 +10,7 @@ import net.ME1312.SubServers.Client.Bukkit.SubPlugin;
 import org.bukkit.Bukkit;
 import org.json.JSONObject;
 
+import java.lang.reflect.Field;
 import java.util.Calendar;
 
 /**
@@ -19,11 +21,6 @@ public class PacketDownloadLang implements PacketIn, PacketOut {
 
     /**
      * New PacketDownloadLang (In)
-     */
-    public PacketDownloadLang() {}
-
-    /**
-     * New PacketDownloadLang (Out)
      *
      * @param plugin SubServers.Client
      */
@@ -32,6 +29,11 @@ public class PacketDownloadLang implements PacketIn, PacketOut {
         this.plugin = plugin;
     }
 
+    /**
+     * New PacketDownloadLang (Out)
+     */
+    public PacketDownloadLang() {}
+
     @Override
     public JSONObject generate() {
         return null;
@@ -39,9 +41,15 @@ public class PacketDownloadLang implements PacketIn, PacketOut {
 
     @Override
     public void execute(JSONObject data) {
-        data.put("Updated", Calendar.getInstance().getTime().getTime());
-        plugin.lang = new YAMLSection(data);
-        Bukkit.getLogger().info("SubData > Lang Settings Downloaded");
+        try {
+            Field f = SubPlugin.class.getDeclaredField("lang");
+            f.setAccessible(true);
+            f.set(plugin, new NamedContainer<>(Calendar.getInstance().getTime().getTime(), new YAMLSection(data.getJSONObject("Lang")).get()));
+            f.setAccessible(false);
+            Bukkit.getLogger().info("SubData > Lang Settings Downloaded");
+        } catch (IllegalAccessException | NoSuchFieldException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

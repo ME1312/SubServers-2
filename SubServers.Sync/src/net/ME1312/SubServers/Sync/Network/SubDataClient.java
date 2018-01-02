@@ -72,7 +72,7 @@ public final class SubDataClient {
 
     private void init() {
         plugin.subdata.sendPacket(new PacketDownloadLang(plugin));
-        plugin.subdata.sendPacket(new PacketDownloadProxyInfo(proxy -> plugin.subdata.sendPacket(new PacketDownloadServerList(null, json -> {
+        plugin.subdata.sendPacket(new PacketDownloadProxyInfo(proxy -> plugin.subdata.sendPacket(new PacketDownloadServerList(null, null, json -> {
             if (plugin.lastReload != proxy.getJSONObject("subservers").getLong("last-reload")) {
                 System.out.println("SubServers > Resetting Server Data");
                 plugin.servers.clear();

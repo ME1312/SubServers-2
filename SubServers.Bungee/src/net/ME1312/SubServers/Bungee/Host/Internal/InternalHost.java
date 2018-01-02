@@ -78,11 +78,6 @@ public class InternalHost extends Host {
     }
 
     @Override
-    public int edit(UUID player, YAMLSection edit) {
-        return 0; // TODO
-    }
-
-    @Override
     public SubCreator getCreator() {
         return creator;
     }

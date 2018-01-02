@@ -2,6 +2,7 @@ package net.ME1312.SubServers.Host.Network.Packet;
 
 import net.ME1312.SubServers.Host.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Host.Library.Log.Logger;
+import net.ME1312.SubServers.Host.Library.NamedContainer;
 import net.ME1312.SubServers.Host.Library.Util;
 import net.ME1312.SubServers.Host.Library.Version.Version;
 import net.ME1312.SubServers.Host.Network.PacketIn;
@@ -37,9 +38,15 @@ public class PacketDownloadLang implements PacketIn, PacketOut {
 
     @Override
     public void execute(JSONObject data) {
-        data.put("Updated", Calendar.getInstance().getTime().getTime());
-        host.lang = new YAMLSection(data);
-        log.info.println("Lang Settings Downloaded");
+        try {
+            Field f = ExHost.class.getDeclaredField("lang");
+            f.setAccessible(true);
+            f.set(host, new NamedContainer<>(Calendar.getInstance().getTime().getTime(), new YAMLSection(data.getJSONObject("Lang")).get()));
+            f.setAccessible(false);
+            log.info.println("Lang Settings Downloaded");
+        } catch (IllegalAccessException | NoSuchFieldException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

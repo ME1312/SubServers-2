@@ -4,6 +4,7 @@ import net.ME1312.SubServers.Client.Bukkit.Graphic.InternalUIHandler;
 import net.ME1312.SubServers.Client.Bukkit.Graphic.UIHandler;
 import net.ME1312.SubServers.Client.Bukkit.Library.Config.YAMLConfig;
 import net.ME1312.SubServers.Client.Bukkit.Library.Config.YAMLSection;
+import net.ME1312.SubServers.Client.Bukkit.Library.NamedContainer;
 import net.ME1312.SubServers.Client.Bukkit.Library.UniversalFile;
 import net.ME1312.SubServers.Client.Bukkit.Library.Util;
 import net.ME1312.SubServers.Client.Bukkit.Library.Version.Version;
@@ -25,14 +26,15 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
  * SubServers Client Plugin Class
  */
 public final class SubPlugin extends JavaPlugin {
+    protected NamedContainer<Long, Map<String, Map<String, String>>> lang = null;
     public YAMLConfig config;
-    public YAMLSection lang = null;
     public SubDataClient subdata = null;
 
     public UIHandler gui = null;
