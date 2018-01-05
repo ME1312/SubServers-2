@@ -8,6 +8,7 @@ import net.ME1312.SubServers.Client.Bukkit.Library.NamedContainer;
 import net.ME1312.SubServers.Client.Bukkit.Library.UniversalFile;
 import net.ME1312.SubServers.Client.Bukkit.Library.Util;
 import net.ME1312.SubServers.Client.Bukkit.Library.Version.Version;
+import net.ME1312.SubServers.Client.Bukkit.Network.Cipher;
 import net.ME1312.SubServers.Client.Bukkit.Network.SubDataClient;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -39,7 +40,7 @@ public final class SubPlugin extends JavaPlugin {
 
     public UIHandler gui = null;
     public final Version version;
-    public final Version bversion = new Version(1);
+    public final Version bversion = new Version(2);
     public final SubAPI api = new SubAPI(this);
 
     public SubPlugin() {
@@ -116,17 +117,19 @@ public final class SubPlugin extends JavaPlugin {
 
         config.reload();
 
-        SubDataClient.Encryption encryption = SubDataClient.Encryption.NONE;
-        if (config.get().getSection("Settings").getSection("SubData").getString("Password", "").length() == 0) {
-            System.out.println("SubData > Cannot encrypt connection without a password");
-        } else if (Util.isException(() -> SubDataClient.Encryption.valueOf(config.get().getSection("Settings").getSection("SubData").getRawString("Encryption", "NONE").replace('-', '_').replace(' ', '_').toUpperCase()))) {
-            System.out.println("SubData > Unknown encryption type: " + SubDataClient.Encryption.valueOf(config.get().getSection("Settings").getSection("SubData").getRawString("Encryption", "None")));
-        } else {
-            encryption = SubDataClient.Encryption.valueOf(config.get().getSection("Settings").getSection("SubData").getRawString("Encryption", "NONE").replace('-', '_').replace(' ', '_').toUpperCase());
+        Cipher cipher = null;
+        if (!config.get().getSection("Settings").getSection("SubData").getRawString("Encryption", "NONE").equalsIgnoreCase("NONE")) {
+            if (config.get().getSection("Settings").getSection("SubData").getString("Password", "").length() == 0) {
+                System.out.println("SubData > Cannot encrypt connection without a password");
+            } else if (!SubDataClient.getCiphers().keySet().contains(config.get().getSection("Settings").getSection("SubData").getRawString("Encryption").toLowerCase().replace('-', '_').replace(' ', '_'))) {
+                System.out.println("SubData > Unknown encryption type: " + config.get().getSection("Settings").getSection("SubData").getRawString("Encryption"));
+            } else {
+                cipher = SubDataClient.getCipher(config.get().getSection("Settings").getSection("SubData").getRawString("Encryption"));
+            }
         }
         subdata = new SubDataClient(this, config.get().getSection("Settings").getSection("SubData").getString("Name", "undefined"),
                 InetAddress.getByName(config.get().getSection("Settings").getSection("SubData").getString("Address", "127.0.0.1:4391").split(":")[0]),
-                Integer.parseInt(config.get().getSection("Settings").getSection("SubData").getString("Address", "127.0.0.1:4391").split(":")[1]), encryption);
+                Integer.parseInt(config.get().getSection("Settings").getSection("SubData").getString("Address", "127.0.0.1:4391").split(":")[1]), cipher);
 
         if (notifyPlugins) {
             List<Runnable> listeners = api.reloadListeners;

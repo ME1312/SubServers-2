@@ -9,4 +9,5 @@ net.ME1312.SubServers.Host.Library.Exception
 net.ME1312.SubServers.Host.Library.Log
 net.ME1312.SubServers.Host.Library.Version
 net.ME1312.SubServers.Host.Network
+net.ME1312.SubServers.Host.Network.Ciphers
 net.ME1312.SubServers.Host.Network.Packet

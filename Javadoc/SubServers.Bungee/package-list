@@ -10,4 +10,5 @@ net.ME1312.SubServers.Bungee.Library.Config
 net.ME1312.SubServers.Bungee.Library.Exception
 net.ME1312.SubServers.Bungee.Library.Version
 net.ME1312.SubServers.Bungee.Network
+net.ME1312.SubServers.Bungee.Network.Ciphers
 net.ME1312.SubServers.Bungee.Network.Packet

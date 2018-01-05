@@ -4,7 +4,7 @@
 #!/usr/bin/env bash
 if [ -z "$1" ]
   then
-	echo "SubServers Library Patcher: Combines BungeeCord and SubServers.Bungee/SubServers.Sync into one jar file"
+    echo "SubServers Library Patcher: Combines BungeeCord and SubServers.Bungee/SubServers.Sync into one jar file"
     echo "Usage: bash $0 <BungeeCord.jar> <SubServers.jar>"
     exit 1
 fi
@@ -39,6 +39,9 @@ if [ $retvala -eq 0 ]
     if [ -f "LICENSE" ]; then
         rm -Rf LICENSE
     fi
+    if [ -f "MODIFICATIONS" ]; then
+        mv -f MODIFICATIONS ../MODIFICATIONS
+    fi
     echo ">> Extracting $2..."
     mkdir ../Vanilla.jar
     cd ../Vanilla.jar
@@ -49,11 +52,16 @@ if [ $retvala -eq 0 ]
         yes | cp -rf . ../Modded.jar
         printf "\n " >> META-INF/MANIFEST.MF
         if [ -f "MODIFICATIONS" ]; then
-            mv -f MODIFICATIONS ../MODIFICATIONS
-        else
-            printf "# SubServers.Bungee.Patcher generated difference list (may be empty if git is not installed)\n#\n" > ../MODIFICATIONS
+            if [ -f "../MODIFICATIONS" ]; then
+                cat MODIFICATIONS >> ../MODIFICATIONS
+            else
+                mv -f MODIFICATIONS ../MODIFICATIONS
+            fi
         fi
         cd ../
+        if [ ! -f "MODIFICATIONS" ]; then
+            printf "# SubServers.Bungee.Patcher generated difference list (may be empty if git is not installed)\n#\n" > MODIFICATIONS
+        fi
         printf "@ `date`\n> git --no-pager diff --no-index --name-status BuildTools/Vanilla.jar BuildTools/Modded.jar\n" >> MODIFICATIONS
         git --no-pager diff --no-index --name-status Vanilla.jar Modded.jar | sed -e "s/\tVanilla.jar\//\t\//" -e "s/\tModded.jar\//\t\//" >> MODIFICATIONS
         mv -f MODIFICATIONS Modded.jar
@@ -66,6 +74,8 @@ if [ $retvala -eq 0 ]
         if [ $retvalc -eq 0 ]
           then
             echo ">> Cleaning Up..."
+            cd ../../
+            rm -Rf BuildTools
             exit 0;
         else
             echo ">> Error Recomiling Files"

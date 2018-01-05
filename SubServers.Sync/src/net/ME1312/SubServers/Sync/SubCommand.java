@@ -499,6 +499,7 @@ public final class SubCommand extends CommandX {
 
     private void updateTemplateCache() {
         if (Calendar.getInstance().getTime().getTime() - templateCache.name() >= TimeUnit.MINUTES.toMillis(5)) {
+            templateCache.rename(Calendar.getInstance().getTime().getTime());
             plugin.subdata.sendPacket(new PacketDownloadServerList(null, null, (json) -> {
                 TreeMap<String, List<String>> hosts = new TreeMap<String, List<String>>();
                 for (String host : json.getJSONObject("hosts").keySet()) {

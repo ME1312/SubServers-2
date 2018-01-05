@@ -80,6 +80,7 @@
 <li><a href="net/ME1312/SubServers/Sync/Library/Exception/package-tree.html">net.ME1312.SubServers.Sync.Library.Exception</a>, </li>
 <li><a href="net/ME1312/SubServers/Sync/Library/Version/package-tree.html">net.ME1312.SubServers.Sync.Library.Version</a>, </li>
 <li><a href="net/ME1312/SubServers/Sync/Network/package-tree.html">net.ME1312.SubServers.Sync.Network</a>, </li>
+<li><a href="net/ME1312/SubServers/Sync/Network/Ciphers/package-tree.html">net.ME1312.SubServers.Sync.Network.Ciphers</a>, </li>
 <li><a href="net/ME1312/SubServers/Sync/Network/Packet/package-tree.html">net.ME1312.SubServers.Sync.Network.Packet</a>, </li>
 <li><a href="net/ME1312/SubServers/Sync/Server/package-tree.html">net.ME1312.SubServers.Sync.Server</a></li>
 </ul>
@@ -89,7 +90,7 @@
 <ul>
 <li type="circle">java.lang.Object
 <ul>
-<li type="circle">net.ME1312.SubServers.Sync.Network.<a href="net/ME1312/SubServers/Sync/Network/AES.html" title="class in net.ME1312.SubServers.Sync.Network"><span class="typeNameLink">AES</span></a></li>
+<li type="circle">net.ME1312.SubServers.Sync.Network.Ciphers.<a href="net/ME1312/SubServers/Sync/Network/Ciphers/AES.html" title="class in net.ME1312.SubServers.Sync.Network.Ciphers"><span class="typeNameLink">AES</span></a> (implements net.ME1312.SubServers.Sync.Network.<a href="net/ME1312/SubServers/Sync/Network/Cipher.html" title="interface in net.ME1312.SubServers.Sync.Network">Cipher</a>)</li>
 <li type="circle">net.md_5.bungee.BungeeServerInfo (implements net.md_5.bungee.api.config.ServerInfo)
 <ul>
 <li type="circle">net.ME1312.SubServers.Sync.Server.<a href="net/ME1312/SubServers/Sync/Server/Server.html" title="class in net.ME1312.SubServers.Sync.Server"><span class="typeNameLink">Server</span></a>
@@ -168,10 +169,10 @@
 <ul>
 <li type="circle">java.lang.Exception
 <ul>
-<li type="circle">net.ME1312.SubServers.Sync.Network.<a href="net/ME1312/SubServers/Sync/Network/AES.InvalidAESStreamException.html" title="class in net.ME1312.SubServers.Sync.Network"><span class="typeNameLink">AES.InvalidAESStreamException</span></a></li>
-<li type="circle">net.ME1312.SubServers.Sync.Network.<a href="net/ME1312/SubServers/Sync/Network/AES.InvalidKeyLengthException.html" title="class in net.ME1312.SubServers.Sync.Network"><span class="typeNameLink">AES.InvalidKeyLengthException</span></a></li>
-<li type="circle">net.ME1312.SubServers.Sync.Network.<a href="net/ME1312/SubServers/Sync/Network/AES.InvalidPasswordException.html" title="class in net.ME1312.SubServers.Sync.Network"><span class="typeNameLink">AES.InvalidPasswordException</span></a></li>
-<li type="circle">net.ME1312.SubServers.Sync.Network.<a href="net/ME1312/SubServers/Sync/Network/AES.StrongEncryptionNotAvailableException.html" title="class in net.ME1312.SubServers.Sync.Network"><span class="typeNameLink">AES.StrongEncryptionNotAvailableException</span></a></li>
+<li type="circle">net.ME1312.SubServers.Sync.Network.Ciphers.<a href="net/ME1312/SubServers/Sync/Network/Ciphers/AES.InvalidAESStreamException.html" title="class in net.ME1312.SubServers.Sync.Network.Ciphers"><span class="typeNameLink">AES.InvalidAESStreamException</span></a></li>
+<li type="circle">net.ME1312.SubServers.Sync.Network.Ciphers.<a href="net/ME1312/SubServers/Sync/Network/Ciphers/AES.InvalidKeyLengthException.html" title="class in net.ME1312.SubServers.Sync.Network.Ciphers"><span class="typeNameLink">AES.InvalidKeyLengthException</span></a></li>
+<li type="circle">net.ME1312.SubServers.Sync.Network.Ciphers.<a href="net/ME1312/SubServers/Sync/Network/Ciphers/AES.InvalidPasswordException.html" title="class in net.ME1312.SubServers.Sync.Network.Ciphers"><span class="typeNameLink">AES.InvalidPasswordException</span></a></li>
+<li type="circle">net.ME1312.SubServers.Sync.Network.Ciphers.<a href="net/ME1312/SubServers/Sync/Network/Ciphers/AES.StrongEncryptionNotAvailableException.html" title="class in net.ME1312.SubServers.Sync.Network.Ciphers"><span class="typeNameLink">AES.StrongEncryptionNotAvailableException</span></a></li>
 <li type="circle">java.lang.RuntimeException
 <ul>
 <li type="circle">java.lang.IllegalStateException
@@ -195,6 +196,7 @@
 </ul>
 <h2 title="Interface Hierarchy">Interface Hierarchy</h2>
 <ul>
+<li type="circle">net.ME1312.SubServers.Sync.Network.<a href="net/ME1312/SubServers/Sync/Network/Cipher.html" title="interface in net.ME1312.SubServers.Sync.Network"><span class="typeNameLink">Cipher</span></a></li>
 <li type="circle">net.ME1312.SubServers.Sync.Library.<a href="net/ME1312/SubServers/Sync/Library/ExtraDataHandler.html" title="interface in net.ME1312.SubServers.Sync.Library"><span class="typeNameLink">ExtraDataHandler</span></a></li>
 <li type="circle">net.ME1312.SubServers.Sync.Library.<a href="net/ME1312/SubServers/Sync/Library/JSONCallback.html" title="interface in net.ME1312.SubServers.Sync.Library"><span class="typeNameLink">JSONCallback</span></a></li>
 <li type="circle">net.ME1312.SubServers.Sync.Network.<a href="net/ME1312/SubServers/Sync/Network/PacketIn.html" title="interface in net.ME1312.SubServers.Sync.Network"><span class="typeNameLink">PacketIn</span></a></li>
@@ -202,18 +204,6 @@
 <li type="circle">net.ME1312.SubServers.Sync.Library.<a href="net/ME1312/SubServers/Sync/Library/SubEvent.html" title="interface in net.ME1312.SubServers.Sync.Library"><span class="typeNameLink">SubEvent</span></a></li>
 <li type="circle">net.ME1312.SubServers.Sync.Library.<a href="net/ME1312/SubServers/Sync/Library/Util.ExceptionRunnable.html" title="interface in net.ME1312.SubServers.Sync.Library"><span class="typeNameLink">Util.ExceptionRunnable</span></a></li>
 <li type="circle">net.ME1312.SubServers.Sync.Library.<a href="net/ME1312/SubServers/Sync/Library/Util.ReturnRunnable.html" title="interface in net.ME1312.SubServers.Sync.Library"><span class="typeNameLink">Util.ReturnRunnable</span></a>&lt;R&gt;</li>
-</ul>
-<h2 title="Enum Hierarchy">Enum Hierarchy</h2>
-<ul>
-<li type="circle">java.lang.Object
-<ul>
-<li type="circle">java.lang.Enum&lt;E&gt; (implements java.lang.Comparable&lt;T&gt;, java.io.Serializable)
-<ul>
-<li type="circle">net.ME1312.SubServers.Sync.Network.<a href="net/ME1312/SubServers/Sync/Network/SubDataClient.Encryption.html" title="enum in net.ME1312.SubServers.Sync.Network"><span class="typeNameLink">SubDataClient.Encryption</span></a></li>
-</ul>
-</li>
-</ul>
-</li>
 </ul>
 </div>
 <!-- ======= START OF BOTTOM NAVBAR ====== -->

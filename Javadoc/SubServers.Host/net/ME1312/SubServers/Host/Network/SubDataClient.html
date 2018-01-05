@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":9,"i7":9,"i8":9,"i9":10,"i10":9,"i11":9};
+var methods = {"i0":9,"i1":10,"i2":10,"i3":10,"i4":10,"i5":9,"i6":9,"i7":10,"i8":10,"i9":9,"i10":9,"i11":9,"i12":10,"i13":9,"i14":9};
 var tabs = {65535:["t0","All Methods"],1:["t1","Static Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -48,7 +48,7 @@ var activeTableTab = "activeTableTab";
 <div class="subNav">
 <ul class="navList">
 <li><a href="../../../../../net/ME1312/SubServers/Host/Network/PacketOut.html" title="interface in net.ME1312.SubServers.Host.Network"><span class="typeNameLink">Prev&nbsp;Class</span></a></li>
-<li><a href="../../../../../net/ME1312/SubServers/Host/Network/SubDataClient.Encryption.html" title="enum in net.ME1312.SubServers.Host.Network"><span class="typeNameLink">Next&nbsp;Class</span></a></li>
+<li>Next&nbsp;Class</li>
 </ul>
 <ul class="navList">
 <li><a href="../../../../../index.html?net/ME1312/SubServers/Host/Network/SubDataClient.html" target="_top">Frames</a></li>
@@ -72,7 +72,7 @@ var activeTableTab = "activeTableTab";
 <div>
 <ul class="subNavList">
 <li>Summary:&nbsp;</li>
-<li><a href="#nested.class.summary">Nested</a>&nbsp;|&nbsp;</li>
+<li>Nested&nbsp;|&nbsp;</li>
 <li>Field&nbsp;|&nbsp;</li>
 <li><a href="#constructor.summary">Constr</a>&nbsp;|&nbsp;</li>
 <li><a href="#method.summary">Method</a></li>
@@ -116,25 +116,6 @@ extends java.lang.Object</pre>
 <div class="summary">
 <ul class="blockList">
 <li class="blockList">
-<!-- ======== NESTED CLASS SUMMARY ======== -->
-<ul class="blockList">
-<li class="blockList"><a name="nested.class.summary">
-<!--   -->
-</a>
-<h3>Nested Class Summary</h3>
-<table class="memberSummary" border="0" cellpadding="3" cellspacing="0" summary="Nested Class Summary table, listing nested classes, and an explanation">
-<caption><span>Nested Classes</span><span class="tabEnd">&nbsp;</span></caption>
-<tr>
-<th class="colFirst" scope="col">Modifier and Type</th>
-<th class="colLast" scope="col">Class and Description</th>
-</tr>
-<tr class="altColor">
-<td class="colFirst"><code>static class&nbsp;</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Host/Network/SubDataClient.Encryption.html" title="enum in net.ME1312.SubServers.Host.Network">SubDataClient.Encryption</a></span></code>&nbsp;</td>
-</tr>
-</table>
-</li>
-</ul>
 <!-- ======== CONSTRUCTOR SUMMARY ======== -->
 <ul class="blockList">
 <li class="blockList"><a name="constructor.summary">
@@ -147,11 +128,11 @@ extends java.lang.Object</pre>
 <th class="colOne" scope="col">Constructor and Description</th>
 </tr>
 <tr class="altColor">
-<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Host/Network/SubDataClient.html#SubDataClient-net.ME1312.SubServers.Host.ExHost-java.lang.String-java.net.InetAddress-int-net.ME1312.SubServers.Host.Network.SubDataClient.Encryption-">SubDataClient</a></span>(<a href="../../../../../net/ME1312/SubServers/Host/ExHost.html" title="class in net.ME1312.SubServers.Host">ExHost</a>&nbsp;host,
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Host/Network/SubDataClient.html#SubDataClient-net.ME1312.SubServers.Host.ExHost-java.lang.String-java.net.InetAddress-int-net.ME1312.SubServers.Host.Network.Cipher-">SubDataClient</a></span>(<a href="../../../../../net/ME1312/SubServers/Host/ExHost.html" title="class in net.ME1312.SubServers.Host">ExHost</a>&nbsp;host,
              java.lang.String&nbsp;name,
              java.net.InetAddress&nbsp;address,
              int&nbsp;port,
-             <a href="../../../../../net/ME1312/SubServers/Host/Network/SubDataClient.Encryption.html" title="enum in net.ME1312.SubServers.Host.Network">SubDataClient.Encryption</a>&nbsp;encryption)</code>
+             <a href="../../../../../net/ME1312/SubServers/Host/Network/Cipher.html" title="interface in net.ME1312.SubServers.Host.Network">Cipher</a>&nbsp;cipher)</code>
 <div class="block">SubServers Client Instance</div>
 </td>
 </tr>
@@ -171,75 +152,94 @@ extends java.lang.Object</pre>
 <th class="colLast" scope="col">Method and Description</th>
 </tr>
 <tr id="i0" class="altColor">
+<td class="colFirst"><code>static void</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Host/Network/SubDataClient.html#addCipher-java.lang.String-net.ME1312.SubServers.Host.Network.Cipher-">addCipher</a></span>(java.lang.String&nbsp;handle,
+         <a href="../../../../../net/ME1312/SubServers/Host/Network/Cipher.html" title="interface in net.ME1312.SubServers.Host.Network">Cipher</a>&nbsp;cipher)</code>
+<div class="block">Add a Cipher for use by SubData</div>
+</td>
+</tr>
+<tr id="i1" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Host/Network/SubDataClient.html#broadcastPacket-net.ME1312.SubServers.Host.Network.PacketOut-">broadcastPacket</a></span>(<a href="../../../../../net/ME1312/SubServers/Host/Network/PacketOut.html" title="interface in net.ME1312.SubServers.Host.Network">PacketOut</a>&nbsp;packet)</code>
 <div class="block">Broadcast packet to all Clients</div>
 </td>
 </tr>
-<tr id="i1" class="rowColor">
+<tr id="i2" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Host/Network/SubDataClient.html#destroy-int-">destroy</a></span>(int&nbsp;reconnect)</code>
 <div class="block">Drops All Connections and Stops the SubData Listener</div>
 </td>
 </tr>
-<tr id="i2" class="altColor">
+<tr id="i3" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Host/Network/SubDataClient.html#forwardPacket-net.ME1312.SubServers.Host.Network.PacketOut-java.lang.String-">forwardPacket</a></span>(<a href="../../../../../net/ME1312/SubServers/Host/Network/PacketOut.html" title="interface in net.ME1312.SubServers.Host.Network">PacketOut</a>&nbsp;packet,
              java.lang.String&nbsp;location)</code>
 <div class="block">Forward Packet to Server</div>
 </td>
 </tr>
-<tr id="i3" class="rowColor">
-<td class="colFirst"><code>java.net.Socket</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Host/Network/SubDataClient.html#getClient--">getClient</a></span>()</code>
-<div class="block">Gets the Server Socket</div>
-</td>
-</tr>
 <tr id="i4" class="altColor">
-<td class="colFirst"><code><a href="../../../../../net/ME1312/SubServers/Host/Network/SubDataClient.Encryption.html" title="enum in net.ME1312.SubServers.Host.Network">SubDataClient.Encryption</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Host/Network/SubDataClient.html#getEncryption--">getEncryption</a></span>()</code>
-<div class="block">Gets the Connection's Encryption method</div>
+<td class="colFirst"><code><a href="../../../../../net/ME1312/SubServers/Host/Network/Cipher.html" title="interface in net.ME1312.SubServers.Host.Network">Cipher</a></code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Host/Network/SubDataClient.html#getCipher--">getCipher</a></span>()</code>
+<div class="block">Gets the Client's Cipher</div>
 </td>
 </tr>
 <tr id="i5" class="rowColor">
+<td class="colFirst"><code>static <a href="../../../../../net/ME1312/SubServers/Host/Network/Cipher.html" title="interface in net.ME1312.SubServers.Host.Network">Cipher</a></code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Host/Network/SubDataClient.html#getCipher-java.lang.String-">getCipher</a></span>(java.lang.String&nbsp;handle)</code>
+<div class="block">Gets a Cipher by Handle</div>
+</td>
+</tr>
+<tr id="i6" class="altColor">
+<td class="colFirst"><code>static java.util.Map&lt;java.lang.String,<a href="../../../../../net/ME1312/SubServers/Host/Network/Cipher.html" title="interface in net.ME1312.SubServers.Host.Network">Cipher</a>&gt;</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Host/Network/SubDataClient.html#getCiphers--">getCiphers</a></span>()</code>
+<div class="block">Gets the Ciphers</div>
+</td>
+</tr>
+<tr id="i7" class="rowColor">
+<td class="colFirst"><code>java.net.Socket</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Host/Network/SubDataClient.html#getClient--">getClient</a></span>()</code>
+<div class="block">Gets the Client Socket</div>
+</td>
+</tr>
+<tr id="i8" class="altColor">
 <td class="colFirst"><code>java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Host/Network/SubDataClient.html#getName--">getName</a></span>()</code>
 <div class="block">Gets the Assigned Host Name</div>
 </td>
 </tr>
-<tr id="i6" class="altColor">
+<tr id="i9" class="rowColor">
 <td class="colFirst"><code>static java.util.List&lt;? extends <a href="../../../../../net/ME1312/SubServers/Host/Network/PacketIn.html" title="interface in net.ME1312.SubServers.Host.Network">PacketIn</a>&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Host/Network/SubDataClient.html#getPacket-java.lang.String-">getPacket</a></span>(java.lang.String&nbsp;handle)</code>
 <div class="block">Grab PacketIn Instances via handle</div>
 </td>
 </tr>
-<tr id="i7" class="rowColor">
+<tr id="i10" class="altColor">
 <td class="colFirst"><code>static void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Host/Network/SubDataClient.html#registerPacket-java.lang.Class-java.lang.String-">registerPacket</a></span>(java.lang.Class&lt;? extends <a href="../../../../../net/ME1312/SubServers/Host/Network/PacketOut.html" title="interface in net.ME1312.SubServers.Host.Network">PacketOut</a>&gt;&nbsp;packet,
               java.lang.String&nbsp;handle)</code>
 <div class="block">Register PacketOut to the Network</div>
 </td>
 </tr>
-<tr id="i8" class="altColor">
+<tr id="i11" class="rowColor">
 <td class="colFirst"><code>static void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Host/Network/SubDataClient.html#registerPacket-net.ME1312.SubServers.Host.Network.PacketIn-java.lang.String-">registerPacket</a></span>(<a href="../../../../../net/ME1312/SubServers/Host/Network/PacketIn.html" title="interface in net.ME1312.SubServers.Host.Network">PacketIn</a>&nbsp;packet,
               java.lang.String&nbsp;handle)</code>
 <div class="block">Register PacketIn to the Network</div>
 </td>
 </tr>
-<tr id="i9" class="rowColor">
+<tr id="i12" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Host/Network/SubDataClient.html#sendPacket-net.ME1312.SubServers.Host.Network.PacketOut-">sendPacket</a></span>(<a href="../../../../../net/ME1312/SubServers/Host/Network/PacketOut.html" title="interface in net.ME1312.SubServers.Host.Network">PacketOut</a>&nbsp;packet)</code>
 <div class="block">Send Packet to Client</div>
 </td>
 </tr>
-<tr id="i10" class="altColor">
+<tr id="i13" class="rowColor">
 <td class="colFirst"><code>static void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Host/Network/SubDataClient.html#unregisterPacket-java.lang.Class-">unregisterPacket</a></span>(java.lang.Class&lt;? extends <a href="../../../../../net/ME1312/SubServers/Host/Network/PacketOut.html" title="interface in net.ME1312.SubServers.Host.Network">PacketOut</a>&gt;&nbsp;packet)</code>
 <div class="block">Unregister PacketOut to the Network</div>
 </td>
 </tr>
-<tr id="i11" class="rowColor">
+<tr id="i14" class="altColor">
 <td class="colFirst"><code>static void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Host/Network/SubDataClient.html#unregisterPacket-net.ME1312.SubServers.Host.Network.PacketIn-">unregisterPacket</a></span>(<a href="../../../../../net/ME1312/SubServers/Host/Network/PacketIn.html" title="interface in net.ME1312.SubServers.Host.Network">PacketIn</a>&nbsp;packet)</code>
 <div class="block">Unregister PacketIn from the Network</div>
@@ -267,7 +267,7 @@ extends java.lang.Object</pre>
 <!--   -->
 </a>
 <h3>Constructor Detail</h3>
-<a name="SubDataClient-net.ME1312.SubServers.Host.ExHost-java.lang.String-java.net.InetAddress-int-net.ME1312.SubServers.Host.Network.SubDataClient.Encryption-">
+<a name="SubDataClient-net.ME1312.SubServers.Host.ExHost-java.lang.String-java.net.InetAddress-int-net.ME1312.SubServers.Host.Network.Cipher-">
 <!--   -->
 </a>
 <ul class="blockListLast">
@@ -277,7 +277,7 @@ extends java.lang.Object</pre>
                      java.lang.String&nbsp;name,
                      java.net.InetAddress&nbsp;address,
                      int&nbsp;port,
-                     <a href="../../../../../net/ME1312/SubServers/Host/Network/SubDataClient.Encryption.html" title="enum in net.ME1312.SubServers.Host.Network">SubDataClient.Encryption</a>&nbsp;encryption)
+                     <a href="../../../../../net/ME1312/SubServers/Host/Network/Cipher.html" title="interface in net.ME1312.SubServers.Host.Network">Cipher</a>&nbsp;cipher)
               throws java.io.IOException</pre>
 <div class="block">SubServers Client Instance</div>
 <dl>
@@ -286,7 +286,7 @@ extends java.lang.Object</pre>
 <dd><code>name</code> - Name of Host</dd>
 <dd><code>address</code> - Address</dd>
 <dd><code>port</code> - Port</dd>
-<dd><code>encryption</code> - Encryption Type</dd>
+<dd><code>cipher</code> - Cipher</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
 <dd><code>java.io.IOException</code></dd>
 </dl>
@@ -321,24 +321,70 @@ extends java.lang.Object</pre>
 <li class="blockList">
 <h4>getClient</h4>
 <pre>public&nbsp;java.net.Socket&nbsp;getClient()</pre>
-<div class="block">Gets the Server Socket</div>
+<div class="block">Gets the Client Socket</div>
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd>Server Socket</dd>
+<dd>Client Socket</dd>
 </dl>
 </li>
 </ul>
-<a name="getEncryption--">
+<a name="addCipher-java.lang.String-net.ME1312.SubServers.Host.Network.Cipher-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
-<h4>getEncryption</h4>
-<pre>public&nbsp;<a href="../../../../../net/ME1312/SubServers/Host/Network/SubDataClient.Encryption.html" title="enum in net.ME1312.SubServers.Host.Network">SubDataClient.Encryption</a>&nbsp;getEncryption()</pre>
-<div class="block">Gets the Connection's Encryption method</div>
+<h4>addCipher</h4>
+<pre>public static&nbsp;void&nbsp;addCipher(java.lang.String&nbsp;handle,
+                             <a href="../../../../../net/ME1312/SubServers/Host/Network/Cipher.html" title="interface in net.ME1312.SubServers.Host.Network">Cipher</a>&nbsp;cipher)</pre>
+<div class="block">Add a Cipher for use by SubData</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>cipher</code> - Cipher to Add</dd>
+<dd><code>handle</code> - Handle to Bind</dd>
+</dl>
+</li>
+</ul>
+<a name="getCiphers--">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getCiphers</h4>
+<pre>public static&nbsp;java.util.Map&lt;java.lang.String,<a href="../../../../../net/ME1312/SubServers/Host/Network/Cipher.html" title="interface in net.ME1312.SubServers.Host.Network">Cipher</a>&gt;&nbsp;getCiphers()</pre>
+<div class="block">Gets the Ciphers</div>
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd>Encryption method</dd>
+<dd>Cipher Map</dd>
+</dl>
+</li>
+</ul>
+<a name="getCipher--">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getCipher</h4>
+<pre>public&nbsp;<a href="../../../../../net/ME1312/SubServers/Host/Network/Cipher.html" title="interface in net.ME1312.SubServers.Host.Network">Cipher</a>&nbsp;getCipher()</pre>
+<div class="block">Gets the Client's Cipher</div>
+<dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>Cipher</dd>
+</dl>
+</li>
+</ul>
+<a name="getCipher-java.lang.String-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getCipher</h4>
+<pre>public static&nbsp;<a href="../../../../../net/ME1312/SubServers/Host/Network/Cipher.html" title="interface in net.ME1312.SubServers.Host.Network">Cipher</a>&nbsp;getCipher(java.lang.String&nbsp;handle)</pre>
+<div class="block">Gets a Cipher by Handle</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>handle</code> - Handle</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>Cipher</dd>
 </dl>
 </li>
 </ul>
@@ -505,7 +551,7 @@ extends java.lang.Object</pre>
 <div class="subNav">
 <ul class="navList">
 <li><a href="../../../../../net/ME1312/SubServers/Host/Network/PacketOut.html" title="interface in net.ME1312.SubServers.Host.Network"><span class="typeNameLink">Prev&nbsp;Class</span></a></li>
-<li><a href="../../../../../net/ME1312/SubServers/Host/Network/SubDataClient.Encryption.html" title="enum in net.ME1312.SubServers.Host.Network"><span class="typeNameLink">Next&nbsp;Class</span></a></li>
+<li>Next&nbsp;Class</li>
 </ul>
 <ul class="navList">
 <li><a href="../../../../../index.html?net/ME1312/SubServers/Host/Network/SubDataClient.html" target="_top">Frames</a></li>
@@ -529,7 +575,7 @@ extends java.lang.Object</pre>
 <div>
 <ul class="subNavList">
 <li>Summary:&nbsp;</li>
-<li><a href="#nested.class.summary">Nested</a>&nbsp;|&nbsp;</li>
+<li>Nested&nbsp;|&nbsp;</li>
 <li>Field&nbsp;|&nbsp;</li>
 <li><a href="#constructor.summary">Constr</a>&nbsp;|&nbsp;</li>
 <li><a href="#method.summary">Method</a></li>

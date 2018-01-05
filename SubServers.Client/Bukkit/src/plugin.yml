@@ -59,5 +59,5 @@ permissions:
             description: 'Grants Acces to Teleport Others to a Server'
             default: op
           subservers.server.teleport.*:
-            description: 'Grants Acces to Teleport to a Server'
+            description: 'Grants Access to Teleport to a Server'
             default: op

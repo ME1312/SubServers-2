@@ -7,6 +7,7 @@ import net.ME1312.SubServers.Client.Bukkit.Library.Exception.IllegalPacketExcept
 import net.ME1312.SubServers.Client.Bukkit.Library.NamedContainer;
 import net.ME1312.SubServers.Client.Bukkit.Library.Util;
 import net.ME1312.SubServers.Client.Bukkit.Library.Version.Version;
+import net.ME1312.SubServers.Client.Bukkit.Network.Ciphers.AES;
 import net.ME1312.SubServers.Client.Bukkit.Network.Packet.*;
 import net.ME1312.SubServers.Client.Bukkit.SubPlugin;
 import org.bukkit.Bukkit;
@@ -28,21 +29,14 @@ import java.util.*;
 public final class SubDataClient {
     private static HashMap<Class<? extends PacketOut>, String> pOut = new HashMap<Class<? extends PacketOut>, String>();
     private static HashMap<String, List<PacketIn>> pIn = new HashMap<String, List<PacketIn>>();
+    private static HashMap<String, Cipher> ciphers = new HashMap<String, Cipher>();
     private static boolean defaults = false;
     private PrintWriter writer;
     private NamedContainer<Boolean, Socket> socket;
     private String name;
-    private Encryption encryption;
+    private Cipher cipher;
     private SubPlugin plugin;
     private LinkedList<NamedContainer<String, PacketOut>> queue;
-
-    public enum Encryption {
-        NONE,
-        AES,
-        AES_128,
-        AES_192,
-        AES_256
-    }
 
     /**
      * SubServers Client Instance
@@ -51,17 +45,30 @@ public final class SubDataClient {
      * @param name Server Name
      * @param address Address
      * @param port Port
-     * @param encryption Encryption Type
+     * @param cipher Cipher
      * @throws IOException
      */
-    public SubDataClient(SubPlugin plugin, String name, InetAddress address, int port, Encryption encryption) throws IOException {
+    public SubDataClient(SubPlugin plugin, String name, InetAddress address, int port, Cipher cipher) throws IOException {
         if (Util.isNull(plugin, name, address, port)) throw new NullPointerException();
         socket = new NamedContainer<>(false, new Socket(address, port));
         this.plugin = plugin;
         this.name = name;
         this.writer = new PrintWriter(socket.get().getOutputStream(), true);
-        this.encryption = encryption;
         this.queue = new LinkedList<NamedContainer<String, PacketOut>>();
+        this.cipher = (cipher != null)?cipher:new Cipher() {
+            @Override
+            public String getName() {
+                return "NONE";
+            }
+            @Override
+            public byte[] encrypt(String key, JSONObject data) throws Exception {
+                return data.toString().getBytes(StandardCharsets.UTF_8);
+            }
+            @Override
+            public JSONObject decrypt(String key, byte[] data) throws Exception {
+                return new JSONObject(new String(data, StandardCharsets.UTF_8));
+            }
+        };
 
         if (!defaults) loadDefaults();
         loop();
@@ -79,7 +86,12 @@ public final class SubDataClient {
         Bukkit.getPluginManager().callEvent(new SubNetworkConnectEvent(this));
     }
 
-    private void loadDefaults() {
+    static {
+        addCipher("AES", new AES(128));
+        addCipher("AES_128", new AES(128));
+        addCipher("AES_192", new AES(192));
+        addCipher("AES_256", new AES(256));
+    } private void loadDefaults() {
         defaults = true;
 
         registerPacket(new PacketAuthorization(plugin), "Authorization");
@@ -120,19 +132,8 @@ public final class SubDataClient {
                 BufferedReader in = new BufferedReader(new InputStreamReader(socket.get().getInputStream()));
                 String input;
                 while ((input = in.readLine()) != null) {
-                    String decoded = null;
                     try {
-                        switch (getEncryption()) {
-                            case AES:
-                            case AES_128:
-                            case AES_192:
-                            case AES_256:
-                                decoded = AES.decrypt(plugin.config.get().getSection("Settings").getSection("SubData").getRawString("Password"), Base64.getDecoder().decode(input)).get();
-                                break;
-                            default:
-                                decoded = new String(Base64.getDecoder().decode(input), StandardCharsets.UTF_8);
-                        }
-                        JSONObject json = new JSONObject(decoded);
+                        JSONObject json = cipher.decrypt(plugin.config.get().getSection("Settings").getSection("SubData").getRawString("Password"), Base64.getDecoder().decode(input));
                         for (PacketIn packet : decodePacket(json)) {
                             if (plugin.isEnabled()) Bukkit.getScheduler().runTask(plugin, () -> {
                                 try {
@@ -143,7 +144,7 @@ public final class SubDataClient {
                             });
                         }
                     } catch (JSONException e) {
-                        new IllegalPacketException("Unknown Packet Format: " + ((decoded == null || decoded.length() <= 0) ? input : decoded)).printStackTrace();
+                        new IllegalPacketException("Unknown Packet Format: " + input).printStackTrace();
                     } catch (IllegalPacketException e) {
                         e.printStackTrace();
                     } catch (Exception e) {
@@ -176,21 +177,52 @@ public final class SubDataClient {
     }
 
     /**
-     * Gets the Server Socket
+     * Gets the Client Socket
      *
-     * @return Server Socket
+     * @return Client Socket
      */
     public Socket getClient() {
         return socket.get();
     }
 
     /**
-     * Gets the Connection's Encryption method
+     * Add a Cipher for use by SubData
      *
-     * @return Encryption method
+     * @param cipher Cipher to Add
+     * @param handle Handle to Bind
      */
-    public Encryption getEncryption() {
-        return encryption;
+    public static void addCipher(String handle, Cipher cipher) {
+        if (Util.isNull(cipher)) throw new NullPointerException();
+        if (!ciphers.keySet().contains(handle.toLowerCase().replace('-', '_').replace(' ', '_')))
+            ciphers.put(handle.toLowerCase().replace('-', '_').replace(' ', '_'), cipher);
+    }
+
+    /**
+     * Gets the Ciphers
+     *
+     * @return Cipher Map
+     */
+    public static Map<String, Cipher> getCiphers() {
+        return new TreeMap<>(ciphers);
+    }
+
+    /**
+     * Gets the Client's Cipher
+     *
+     * @return Cipher
+     */
+    public Cipher getCipher() {
+        return cipher;
+    }
+
+    /**
+     * Gets a Cipher by Handle
+     *
+     * @param handle Handle
+     * @return Cipher
+     */
+    public static Cipher getCipher(String handle) {
+        return getCiphers().get(handle.toLowerCase().replace('-', '_').replace(' ', '_'));
     }
 
     /**
@@ -278,20 +310,7 @@ public final class SubDataClient {
         try {
             JSONObject json = encodePacket(packet.get());
             if (packet.name() != null) json.put("f", packet.name());
-            switch (getEncryption()) {
-                case AES:
-                case AES_128:
-                    writer.println(Base64.getEncoder().encodeToString(AES.encrypt(128, plugin.config.get().getSection("Settings").getSection("SubData").getRawString("Password"), json.toString())));
-                    break;
-                case AES_192:
-                    writer.println(Base64.getEncoder().encodeToString(AES.encrypt(192, plugin.config.get().getSection("Settings").getSection("SubData").getRawString("Password"), json.toString())));
-                    break;
-                case AES_256:
-                    writer.println(Base64.getEncoder().encodeToString(AES.encrypt(256, plugin.config.get().getSection("Settings").getSection("SubData").getRawString("Password"), json.toString())));
-                    break;
-                default:
-                    writer.println(Base64.getEncoder().encodeToString(json.toString().getBytes(StandardCharsets.UTF_8)));
-            }
+            writer.println(Base64.getEncoder().encodeToString(cipher.encrypt(plugin.config.get().getSection("Settings").getSection("SubData").getRawString("Password"), json)));
         } catch (Throwable e) {
             e.printStackTrace();
         }
@@ -389,7 +408,7 @@ public final class SubDataClient {
                     @Override
                     public void run() {
                         try {
-                            plugin.subdata = new SubDataClient(plugin, name, socket.getInetAddress(), socket.getPort(), encryption);
+                            plugin.subdata = new SubDataClient(plugin, name, socket.getInetAddress(), socket.getPort(), cipher);
                             while (queue.size() != 0) {
                                 if (queue.get(0).name() != null) {
                                     plugin.subdata.forwardPacket(queue.get(0).get(), queue.get(0).name());

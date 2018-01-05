@@ -2,6 +2,7 @@ package net.ME1312.SubServers.Bungee.Network;
 
 import net.ME1312.SubServers.Bungee.Library.Exception.IllegalPacketException;
 import net.ME1312.SubServers.Bungee.Library.Util;
+import net.ME1312.SubServers.Bungee.Network.Ciphers.AES;
 import net.ME1312.SubServers.Bungee.Network.Packet.PacketAuthorization;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -60,19 +61,8 @@ public class Client {
                 BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                 String input;
                 while ((input = in.readLine()) != null) {
-                    String decoded = null;
                     try {
-                        switch (subdata.getEncryption()) {
-                            case AES:
-                            case AES_128:
-                            case AES_192:
-                            case AES_256:
-                                decoded = AES.decrypt(subdata.plugin.config.get().getSection("Settings").getSection("SubData").getRawString("Password"), Base64.getDecoder().decode(input)).get();
-                                break;
-                            default:
-                                decoded = new String(Base64.getDecoder().decode(input), StandardCharsets.UTF_8);
-                        }
-                        JSONObject json = new JSONObject(decoded);
+                        JSONObject json = subdata.getCipher().decrypt(subdata.plugin.config.get().getSection("Settings").getSection("SubData").getRawString("Password"), Base64.getDecoder().decode(input));
                         for (PacketIn packet : SubDataServer.decodePacket(this, json)) {
                             boolean auth = authorized == null;
                             if (auth || packet instanceof PacketAuthorization) {
@@ -104,7 +94,7 @@ public class Client {
                             }
                         }
                     } catch (JSONException e) {
-                        new IllegalPacketException(getAddress().toString() + ": Unknown Packet Format: " + ((decoded == null || decoded.length() <= 0)?input:decoded)).printStackTrace();
+                        new IllegalPacketException(getAddress().toString() + ": Unknown Packet Format: " + input).printStackTrace();
                     } catch (IllegalPacketException e) {
                         e.printStackTrace();
                     } catch (Exception e) {
@@ -146,20 +136,7 @@ public class Client {
     public void sendPacket(PacketOut packet) {
         if (Util.isNull(packet)) throw new NullPointerException();
         try {
-            switch (subdata.getEncryption()) {
-                case AES:
-                case AES_128:
-                    writer.println(Base64.getEncoder().encodeToString(AES.encrypt(128, subdata.plugin.config.get().getSection("Settings").getSection("SubData").getRawString("Password"), SubDataServer.encodePacket(this, packet).toString())));
-                    break;
-                case AES_192:
-                    writer.println(Base64.getEncoder().encodeToString(AES.encrypt(192, subdata.plugin.config.get().getSection("Settings").getSection("SubData").getRawString("Password"), SubDataServer.encodePacket(this, packet).toString())));
-                    break;
-                case AES_256:
-                    writer.println(Base64.getEncoder().encodeToString(AES.encrypt(256, subdata.plugin.config.get().getSection("Settings").getSection("SubData").getRawString("Password"), SubDataServer.encodePacket(this, packet).toString())));
-                    break;
-                default:
-                    writer.println(Base64.getEncoder().encodeToString(SubDataServer.encodePacket(this, packet).toString().getBytes(StandardCharsets.UTF_8)));
-            }
+            writer.println(Base64.getEncoder().encodeToString(subdata.getCipher().encrypt(subdata.plugin.config.get().getSection("Settings").getSection("SubData").getRawString("Password"), SubDataServer.encodePacket(this, packet))));
         } catch (Throwable e) {
             e.printStackTrace();
         }

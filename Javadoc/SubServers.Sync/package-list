@@ -7,5 +7,6 @@ net.ME1312.SubServers.Sync.Library.Config
 net.ME1312.SubServers.Sync.Library.Exception
 net.ME1312.SubServers.Sync.Library.Version
 net.ME1312.SubServers.Sync.Network
+net.ME1312.SubServers.Sync.Network.Ciphers
 net.ME1312.SubServers.Sync.Network.Packet
 net.ME1312.SubServers.Sync.Server

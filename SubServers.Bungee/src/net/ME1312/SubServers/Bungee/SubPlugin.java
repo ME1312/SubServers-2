@@ -8,6 +8,7 @@ import net.ME1312.SubServers.Bungee.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Bungee.Library.Exception.InvalidHostException;
 import net.ME1312.SubServers.Bungee.Library.Exception.InvalidServerException;
 import net.ME1312.SubServers.Bungee.Library.Version.Version;
+import net.ME1312.SubServers.Bungee.Network.Cipher;
 import net.ME1312.SubServers.Bungee.Network.ClientHandler;
 import net.ME1312.SubServers.Bungee.Network.Packet.PacketOutReload;
 import net.ME1312.SubServers.Bungee.Network.SubDataServer;
@@ -229,17 +230,19 @@ public final class SubPlugin extends BungeeCord implements Listener {
                 ) {
             if (subdata != null) subdata.destroy();
 
-            SubDataServer.Encryption encryption = SubDataServer.Encryption.NONE;
-            if (config.get().getSection("Settings").getSection("SubData").getString("Password", "").length() == 0) {
-                System.out.println("SubData > Cannot encrypt connection without a password");
-            } else if (Util.isException(() -> SubDataServer.Encryption.valueOf(config.get().getSection("Settings").getSection("SubData").getRawString("Encryption", "NONE").replace('-', '_').replace(' ', '_').toUpperCase()))) {
-                System.out.println("SubData > Unknown encryption type: " + SubDataServer.Encryption.valueOf(config.get().getSection("Settings").getSection("SubData").getRawString("Encryption", "None")));
-            } else {
-                encryption = SubDataServer.Encryption.valueOf(config.get().getSection("Settings").getSection("SubData").getRawString("Encryption", "NONE").replace('-', '_').replace(' ', '_').toUpperCase());
+            Cipher cipher = null;
+            if (!config.get().getSection("Settings").getSection("SubData").getRawString("Encryption", "NONE").equalsIgnoreCase("NONE")) {
+                if (config.get().getSection("Settings").getSection("SubData").getString("Password", "").length() == 0) {
+                    System.out.println("SubData > Cannot encrypt connection without a password");
+                } else if (!SubDataServer.getCiphers().keySet().contains(config.get().getSection("Settings").getSection("SubData").getRawString("Encryption").toLowerCase().replace('-', '_').replace(' ', '_'))) {
+                    System.out.println("SubData > Unknown encryption type: " + config.get().getSection("Settings").getSection("SubData").getRawString("Encryption"));
+                } else {
+                    cipher = SubDataServer.getCipher(config.get().getSection("Settings").getSection("SubData").getRawString("Encryption"));
+                }
             }
             subdata = new SubDataServer(this, Integer.parseInt(config.get().getSection("Settings").getSection("SubData").getRawString("Address", "127.0.0.1:4391").split(":")[1]),
                     (config.get().getSection("Settings").getSection("SubData").getRawString("Address", "127.0.0.1:4391").split(":")[0].equals("0.0.0.0"))?null:InetAddress.getByName(config.get().getSection("Settings").getSection("SubData").getRawString("Address", "127.0.0.1:4391").split(":")[0]),
-                    encryption);
+                    cipher);
             System.out.println("SubServers > SubData Direct Listening on " + subdata.getServer().getLocalSocketAddress().toString());
             loop();
         } // Add new entries to Allowed-Connections

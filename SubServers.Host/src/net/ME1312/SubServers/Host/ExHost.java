@@ -17,6 +17,7 @@ import net.ME1312.SubServers.Host.Library.NamedContainer;
 import net.ME1312.SubServers.Host.Library.UniversalFile;
 import net.ME1312.SubServers.Host.Library.Util;
 import net.ME1312.SubServers.Host.Library.Version.Version;
+import net.ME1312.SubServers.Host.Network.Cipher;
 import net.ME1312.SubServers.Host.Network.SubDataClient;
 import org.json.JSONObject;
 import org.w3c.dom.Document;
@@ -55,7 +56,7 @@ public final class ExHost {
     public SubDataClient subdata = null;
 
     public final Version version = new Version("2.13a");
-    public final Version bversion = new Version(1);
+    public final Version bversion = new Version(2);
     public final SubAPI api = new SubAPI(this);
 
     private boolean running = false;
@@ -126,17 +127,19 @@ public final class ExHost {
                 }
             }
             running = true;
-            SubDataClient.Encryption encryption = SubDataClient.Encryption.NONE;
-            if (config.get().getSection("Settings").getSection("SubData").getString("Password", "").length() == 0) {
-                log.info.println("Cannot encrypt connection without a password");
-            } else if (Util.isException(() -> SubDataClient.Encryption.valueOf(config.get().getSection("Settings").getSection("SubData").getRawString("Encryption", "NONE").replace('-', '_').replace(' ', '_').toUpperCase()))) {
-                log.info.println("Unknown encryption type: " + SubDataClient.Encryption.valueOf(config.get().getSection("Settings").getSection("SubData").getRawString("Encryption", "None")));
-            } else {
-                encryption = SubDataClient.Encryption.valueOf(config.get().getSection("Settings").getSection("SubData").getRawString("Encryption", "NONE").replace('-', '_').replace(' ', '_').toUpperCase());
+            Cipher cipher = null;
+            if (!config.get().getSection("Settings").getSection("SubData").getRawString("Encryption", "NONE").equalsIgnoreCase("NONE")) {
+                if (config.get().getSection("Settings").getSection("SubData").getString("Password", "").length() == 0) {
+                    log.info.println("Cannot encrypt connection without a password");
+                } else if (!SubDataClient.getCiphers().keySet().contains(config.get().getSection("Settings").getSection("SubData").getRawString("Encryption").toLowerCase().replace('-', '_').replace(' ', '_'))) {
+                    log.info.println("Unknown encryption type: " + config.get().getSection("Settings").getSection("SubData").getRawString("Encryption"));
+                } else {
+                    cipher = SubDataClient.getCipher(config.get().getSection("Settings").getSection("SubData").getRawString("Encryption"));
+                }
             }
             subdata = new SubDataClient(this, config.get().getSection("Settings").getSection("SubData").getString("Name", "undefined"),
                     InetAddress.getByName(config.get().getSection("Settings").getSection("SubData").getString("Address", "127.0.0.1:4391").split(":")[0]),
-                    Integer.parseInt(config.get().getSection("Settings").getSection("SubData").getString("Address", "127.0.0.1:4391").split(":")[1]), encryption);
+                    Integer.parseInt(config.get().getSection("Settings").getSection("SubData").getString("Address", "127.0.0.1:4391").split(":")[1]), cipher);
             Runtime.getRuntime().addShutdownHook(new Thread(() -> {
                 if (running) {
                     log.warn.println("Received request from system to shutdown");
@@ -303,17 +306,19 @@ public final class ExHost {
 
         config.reload();
 
-        SubDataClient.Encryption encryption = SubDataClient.Encryption.NONE;
-        if (config.get().getSection("Settings").getSection("SubData").getString("Password", "").length() == 0) {
-            log.info.println("Cannot encrypt connection without a password");
-        } else if (Util.isException(() -> SubDataClient.Encryption.valueOf(config.get().getSection("Settings").getSection("SubData").getRawString("Encryption", "NONE").replace('-', '_').replace(' ', '_').toUpperCase()))) {
-            log.info.println("Unknown encryption type: " + SubDataClient.Encryption.valueOf(config.get().getSection("Settings").getSection("SubData").getRawString("Encryption", "None")));
-        } else {
-            encryption = SubDataClient.Encryption.valueOf(config.get().getSection("Settings").getSection("SubData").getRawString("Encryption", "NONE").replace('-', '_').replace(' ', '_').toUpperCase());
+        Cipher cipher = null;
+        if (!config.get().getSection("Settings").getSection("SubData").getRawString("Encryption", "NONE").equalsIgnoreCase("NONE")) {
+            if (config.get().getSection("Settings").getSection("SubData").getString("Password", "").length() == 0) {
+                log.info.println("Cannot encrypt connection without a password");
+            } else if (!SubDataClient.getCiphers().keySet().contains(config.get().getSection("Settings").getSection("SubData").getRawString("Encryption").toLowerCase().replace('-', '_').replace(' ', '_'))) {
+                log.info.println("Unknown encryption type: " + config.get().getSection("Settings").getSection("SubData").getRawString("Encryption"));
+            } else {
+                cipher = SubDataClient.getCipher(config.get().getSection("Settings").getSection("SubData").getRawString("Encryption"));
+            }
         }
         subdata = new SubDataClient(this, config.get().getSection("Settings").getSection("SubData").getString("Name", "undefined"),
                 InetAddress.getByName(config.get().getSection("Settings").getSection("SubData").getString("Address", "127.0.0.1:4391").split(":")[0]),
-                Integer.parseInt(config.get().getSection("Settings").getSection("SubData").getString("Address", "127.0.0.1:4391").split(":")[1]), encryption);
+                Integer.parseInt(config.get().getSection("Settings").getSection("SubData").getString("Address", "127.0.0.1:4391").split(":")[1]), cipher);
 
         SubAPI.getInstance().executeEvent(new SubReloadEvent(this));
     }

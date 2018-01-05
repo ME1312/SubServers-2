@@ -3,6 +3,7 @@ package net.ME1312.SubServers.Bungee.Network;
 import net.ME1312.SubServers.Bungee.Library.Exception.IllegalPacketException;
 import net.ME1312.SubServers.Bungee.Library.Util;
 import net.ME1312.SubServers.Bungee.Library.Version.Version;
+import net.ME1312.SubServers.Bungee.Network.Ciphers.AES;
 import net.ME1312.SubServers.Bungee.Network.Packet.*;
 import net.ME1312.SubServers.Bungee.SubPlugin;
 import org.json.JSONObject;
@@ -10,10 +11,8 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -24,20 +23,13 @@ public final class SubDataServer {
     private static int MAX_QUEUE = 64;
     private static HashMap<Class<? extends PacketOut>, String> pOut = new HashMap<Class<? extends PacketOut>, String>();
     private static HashMap<String, List<PacketIn>> pIn = new HashMap<String, List<PacketIn>>();
+    private static HashMap<String, Cipher> ciphers = new HashMap<String, Cipher>();
     private static List<String> allowedAddresses = new ArrayList<String>();
     private static boolean defaults = false;
     private HashMap<String, Client> clients = new HashMap<String, Client>();
     private ServerSocket server;
-    private Encryption encryption;
+    private Cipher cipher;
     protected SubPlugin plugin;
-
-    public enum Encryption {
-        NONE,
-        AES,
-        AES_128,
-        AES_192,
-        AES_256,
-    }
 
     /**
      * SubData Server Instance
@@ -45,11 +37,11 @@ public final class SubDataServer {
      * @param plugin SubPlugin
      * @param port Port
      * @param address Bind
-     * @param encryption Encryption Type
+     * @param cipher Cipher (or null for none)
      * @throws IOException
      */
-    public SubDataServer(SubPlugin plugin, int port, InetAddress address, Encryption encryption) throws IOException {
-        if (Util.isNull(plugin, port, encryption, MAX_QUEUE)) throw new NullPointerException();
+    public SubDataServer(SubPlugin plugin, int port, InetAddress address, Cipher cipher) throws IOException {
+        if (Util.isNull(plugin, port, MAX_QUEUE)) throw new NullPointerException();
         if (address == null) {
             server = new ServerSocket(port, MAX_QUEUE);
             allowConnection("127.0.0.1");
@@ -58,12 +50,30 @@ public final class SubDataServer {
             allowConnection(address.getHostAddress());
         }
         this.plugin = plugin;
-        this.encryption = encryption;
+        this.cipher = (cipher != null)?cipher:new Cipher() {
+            @Override
+            public String getName() {
+                return "NONE";
+            }
+            @Override
+            public byte[] encrypt(String key, JSONObject data) throws Exception {
+                return data.toString().getBytes(StandardCharsets.UTF_8);
+            }
+            @Override
+            public JSONObject decrypt(String key, byte[] data) throws Exception {
+                return new JSONObject(new String(data, StandardCharsets.UTF_8));
+            }
+        };
 
         if (!defaults) loadDefaults();
     }
 
-    private void loadDefaults() {
+    static {
+        addCipher("AES", new AES(128));
+        addCipher("AES_128", new AES(128));
+        addCipher("AES_192", new AES(192));
+        addCipher("AES_256", new AES(256));
+    } private void loadDefaults() {
         defaults = true;
 
         plugin.getPluginManager().registerListener(null, new PacketOutRunEvent(plugin));
@@ -130,12 +140,43 @@ public final class SubDataServer {
     }
 
     /**
-     * Gets the Server's Encryption method
+     * Add a Cipher for use by SubData
      *
-     * @return Encryption method
+     * @param cipher Cipher to Add
+     * @param handle Handle to Bind
      */
-    public Encryption getEncryption() {
-        return encryption;
+    public static void addCipher(String handle, Cipher cipher) {
+        if (Util.isNull(cipher)) throw new NullPointerException();
+        if (!ciphers.keySet().contains(handle.toLowerCase().replace('-', '_').replace(' ', '_')))
+            ciphers.put(handle.toLowerCase().replace('-', '_').replace(' ', '_'), cipher);
+    }
+
+    /**
+     * Gets the Ciphers
+     *
+     * @return Cipher Map
+     */
+    public static Map<String, Cipher> getCiphers() {
+        return new TreeMap<>(ciphers);
+    }
+
+    /**
+     * Gets the Server's Cipher
+     *
+     * @return Cipher
+     */
+    public Cipher getCipher() {
+        return cipher;
+    }
+
+    /**
+     * Gets a Cipher by Handle
+     *
+     * @param handle Handle
+     * @return Cipher
+     */
+    public static Cipher getCipher(String handle) {
+        return getCiphers().get(handle.toLowerCase().replace('-', '_').replace(' ', '_'));
     }
 
     /**

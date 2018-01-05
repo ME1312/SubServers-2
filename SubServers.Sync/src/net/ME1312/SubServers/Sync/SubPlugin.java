@@ -8,6 +8,7 @@ import net.ME1312.SubServers.Sync.Library.NamedContainer;
 import net.ME1312.SubServers.Sync.Library.UniversalFile;
 import net.ME1312.SubServers.Sync.Library.Util;
 import net.ME1312.SubServers.Sync.Library.Version.Version;
+import net.ME1312.SubServers.Sync.Network.Cipher;
 import net.ME1312.SubServers.Sync.Network.Packet.PacketDownloadServerInfo;
 import net.ME1312.SubServers.Sync.Network.SubDataClient;
 import net.ME1312.SubServers.Sync.Server.Server;
@@ -90,15 +91,18 @@ public final class SubPlugin extends BungeeCord implements Listener {
     public void startListeners() {
         try {
             config.reload();
-            SubDataClient.Encryption encryption = SubDataClient.Encryption.NONE;
-            if (config.get().getSection("Settings").getSection("SubData").getString("Password", "").length() == 0) {
-                System.out.println("SubData > Cannot encrypt connection without a password");
-            } else if (Util.isException(() -> SubDataClient.Encryption.valueOf(config.get().getSection("Settings").getSection("SubData").getRawString("Encryption", "NONE").replace('-', '_').replace(' ', '_').toUpperCase()))) {
-                System.out.println("SubData > Unknown encryption type: " + SubDataClient.Encryption.valueOf(config.get().getSection("Settings").getSection("SubData").getRawString("Encryption", "None")));
-            } else {
-                encryption = SubDataClient.Encryption.valueOf(config.get().getSection("Settings").getSection("SubData").getRawString("Encryption", "NONE").replace('-', '_').replace(' ', '_').toUpperCase());
+
+            Cipher cipher = null;
+            if (!config.get().getSection("Settings").getSection("SubData").getRawString("Encryption", "NONE").equalsIgnoreCase("NONE")) {
+                if (config.get().getSection("Settings").getSection("SubData").getString("Password", "").length() == 0) {
+                    System.out.println("SubData > Cannot encrypt connection without a password");
+                } else if (!SubDataClient.getCiphers().keySet().contains(config.get().getSection("Settings").getSection("SubData").getRawString("Encryption").toLowerCase().replace('-', '_').replace(' ', '_'))) {
+                    System.out.println("SubData > Unknown encryption type: " + config.get().getSection("Settings").getSection("SubData").getRawString("Encryption"));
+                } else {
+                    cipher = SubDataClient.getCipher(config.get().getSection("Settings").getSection("SubData").getRawString("Encryption"));
+                }
             }
-            subdata = new SubDataClient(this, InetAddress.getByName(config.get().getSection("Settings").getSection("SubData").getRawString("Address", "127.0.0.1:4391").split(":")[0]), Integer.parseInt(config.get().getSection("Settings").getSection("SubData").getRawString("Address", "127.0.0.1:4391").split(":")[1]), encryption);
+            subdata = new SubDataClient(this, InetAddress.getByName(config.get().getSection("Settings").getSection("SubData").getRawString("Address", "127.0.0.1:4391").split(":")[0]), Integer.parseInt(config.get().getSection("Settings").getSection("SubData").getRawString("Address", "127.0.0.1:4391").split(":")[1]), cipher);
 
             super.startListeners();
             if (!posted) {
