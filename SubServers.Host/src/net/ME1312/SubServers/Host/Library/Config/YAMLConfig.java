@@ -87,6 +87,15 @@ public class YAMLConfig {
     }
 
     @Override
+    public boolean equals(Object object) {
+        if (object instanceof YAMLConfig) {
+            return get().equals(((YAMLConfig) object).get());
+        } else {
+            return super.equals(object);
+        }
+    }
+
+    @Override
     public String toString() {
         return yaml.dump(config.map);
     }

@@ -348,6 +348,19 @@ public class YAMLValue {
     }
 
     @Override
+    public boolean equals(Object object) {
+        if (obj == null) {
+            return object == null;
+        } else {
+            if (object instanceof YAMLValue) {
+                return obj.equals(((YAMLValue) object).obj);
+            } else {
+                return obj.equals(object);
+            }
+        }
+    }
+
+    @Override
     public String toString() {
         if (obj != null) return obj.toString();
         else return "null";

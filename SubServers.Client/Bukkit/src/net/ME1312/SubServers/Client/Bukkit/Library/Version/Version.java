@@ -17,7 +17,7 @@ public class Version implements Serializable, Comparable<Version> {
      * @param string Version String
      */
 	public Version(String string) {
-	    if (Util.isNull(string)) throw new NullPointerException();
+        if (Util.isNull(string)) throw new NullPointerException();
 		this.string = string;
 	}
 
@@ -43,6 +43,15 @@ public class Version implements Serializable, Comparable<Version> {
 	public String toString() {
 		return string;
 	}
+
+	@Override
+    public boolean equals(Object object) {
+        if (object instanceof Version) {
+            return equals((Version) object);
+        } else {
+            return super.equals(object);
+        }
+    }
 
     /**
      * See if Versions are Equal
@@ -140,7 +149,7 @@ public class Version implements Serializable, Comparable<Version> {
      * @param ver2 Version to Compare
      * @return
      */
-    public static boolean isEqual(Version ver1, Version ver2) {
+    public static boolean equals(Version ver1, Version ver2) {
         return compare(ver1, ver2) == 0;
     }
 

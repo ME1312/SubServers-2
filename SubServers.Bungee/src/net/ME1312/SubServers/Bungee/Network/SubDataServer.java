@@ -3,7 +3,7 @@ package net.ME1312.SubServers.Bungee.Network;
 import net.ME1312.SubServers.Bungee.Library.Exception.IllegalPacketException;
 import net.ME1312.SubServers.Bungee.Library.Util;
 import net.ME1312.SubServers.Bungee.Library.Version.Version;
-import net.ME1312.SubServers.Bungee.Network.Ciphers.AES;
+import net.ME1312.SubServers.Bungee.Network.Encryption.AES;
 import net.ME1312.SubServers.Bungee.Network.Packet.*;
 import net.ME1312.SubServers.Bungee.SubPlugin;
 import org.json.JSONObject;

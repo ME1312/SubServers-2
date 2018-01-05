@@ -2,7 +2,6 @@ package net.ME1312.SubServers.Bungee.Network;
 
 import net.ME1312.SubServers.Bungee.Library.Exception.IllegalPacketException;
 import net.ME1312.SubServers.Bungee.Library.Util;
-import net.ME1312.SubServers.Bungee.Network.Ciphers.AES;
 import net.ME1312.SubServers.Bungee.Network.Packet.PacketAuthorization;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -12,7 +11,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketException;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 /**

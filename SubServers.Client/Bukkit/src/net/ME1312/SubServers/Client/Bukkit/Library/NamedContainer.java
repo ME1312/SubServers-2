@@ -36,4 +36,17 @@ public class NamedContainer<T, V> extends Container<V> {
     public void rename(T name) {
         this.name = name;
     }
+
+    @Override
+    public boolean equals(Object object) {
+        if (object instanceof NamedContainer) {
+            if (name == null || ((NamedContainer) object).name() == null) {
+                return name == ((NamedContainer) object).name() && super.equals(object);
+            } else {
+                return name.equals(((NamedContainer) object).name()) && super.equals(object);
+            }
+        } else {
+            return super.equals(object);
+        }
+    }
 }

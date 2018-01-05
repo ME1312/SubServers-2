@@ -44,6 +44,15 @@ public class Version implements Serializable, Comparable<Version> {
 		return string;
 	}
 
+	@Override
+    public boolean equals(Object object) {
+        if (object instanceof Version) {
+            return equals((Version) object);
+        } else {
+            return super.equals(object);
+        }
+    }
+
     /**
      * See if Versions are Equal
      *
@@ -121,7 +130,7 @@ public class Version implements Serializable, Comparable<Version> {
                 number2 = tokenizer2.getNumber();
                 suffix2 = tokenizer2.getSuffix();
                 if (number2 != 0 || suffix2.length() != 0) {
-                    // Version two is longer than version one, and non-zero
+                    // Version one is longer than version two, and non-zero
                     return -1;
                 }
             }
@@ -140,7 +149,7 @@ public class Version implements Serializable, Comparable<Version> {
      * @param ver2 Version to Compare
      * @return
      */
-    public static boolean isEqual(Version ver1, Version ver2) {
+    public static boolean equals(Version ver1, Version ver2) {
         return compare(ver1, ver2) == 0;
     }
 

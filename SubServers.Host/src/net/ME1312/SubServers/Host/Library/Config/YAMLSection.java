@@ -1053,6 +1053,15 @@ public class YAMLSection {
     }
 
     @Override
+    public boolean equals(Object object) {
+        if (object instanceof YAMLSection) {
+            return map.equals(((YAMLSection) object).map);
+        } else {
+            return super.equals(object);
+        }
+    }
+
+    @Override
     public String toString() {
         return yaml.dump(map);
     }

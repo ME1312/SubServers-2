@@ -34,4 +34,17 @@ public class Container<V> {
     public void set(V value) {
         obj = value;
     }
+
+    @Override
+    public boolean equals(Object object) {
+        if (object instanceof Container) {
+            if (obj == null || ((Container) object).get() == null) {
+                return obj == ((Container) object).get();
+            } else {
+                return obj.equals(((Container) object).get());
+            }
+        } else {
+            return super.equals(object);
+        }
+    }
 }
