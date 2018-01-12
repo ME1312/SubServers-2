@@ -96,7 +96,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
             if (!config.get().getSection("Settings").getSection("SubData").getRawString("Encryption", "NONE").equalsIgnoreCase("NONE")) {
                 if (config.get().getSection("Settings").getSection("SubData").getString("Password", "").length() == 0) {
                     System.out.println("SubData > Cannot encrypt connection without a password");
-                } else if (!SubDataClient.getCiphers().keySet().contains(config.get().getSection("Settings").getSection("SubData").getRawString("Encryption").toLowerCase().replace('-', '_').replace(' ', '_'))) {
+                } else if (!SubDataClient.getCiphers().keySet().contains(config.get().getSection("Settings").getSection("SubData").getRawString("Encryption").toUpperCase().replace('-', '_').replace(' ', '_'))) {
                     System.out.println("SubData > Unknown encryption type: " + config.get().getSection("Settings").getSection("SubData").getRawString("Encryption"));
                 } else {
                     cipher = SubDataClient.getCipher(config.get().getSection("Settings").getSection("SubData").getRawString("Encryption"));
@@ -158,7 +158,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
      * @return Method Response
      */
     @SuppressWarnings("unchecked")
-    public <T> Object redis(String method, NamedContainer<Class<T>, ? extends T>... args) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+    public <T> Object redis(String method, NamedContainer<Class<?>, ?>... args) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         if (redis) {
             Object api = getPluginManager().getPlugin("RedisBungee").getClass().getMethod("getApi").invoke(null);
             Class<?>[] classargs = new Class<?>[args.length];
@@ -181,7 +181,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
      */
     @Override
     public String getName() {
-        return (new Version(super.getVersion()).equals(version))?"SubServers.Sync.Patch":super.getName();
+        return (new Version(super.getVersion()).equals(version))?"SubServers.Sync":super.getName();
     }
 
     /**

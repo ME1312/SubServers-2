@@ -6,17 +6,14 @@ import net.ME1312.SubServers.Client.Bukkit.Library.Version.Version;
 import net.ME1312.SubServers.Client.Bukkit.Network.SubDataClient;
 import org.bukkit.Bukkit;
 
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.Map;
+import java.util.*;
 
 /**
  * SubAPI Class
  */
 public final class SubAPI {
     LinkedList<Runnable> reloadListeners = new LinkedList<Runnable>();
-    private SubPlugin plugin;
+    private final SubPlugin plugin;
     private static SubAPI api;
 
     protected SubAPI(SubPlugin plugin) {
@@ -63,24 +60,23 @@ public final class SubAPI {
     }
 
     /**
-     * Gets the SubServers Lang
+     * Gets the current SubServers Lang Channels
      *
-     * @return SubServers Lang
+     * @return SubServers Lang Channel list
      */
-    public Map<String, Map<String, String>> getLang() {
-        if (Util.isNull(plugin.lang, plugin.lang.get())) throw new NullPointerException();
-        return new LinkedHashMap<>(plugin.lang.get());
+    public Collection<String> getLangChannels() {
+        return plugin.lang.get().keySet();
     }
 
     /**
      * Gets values from the SubServers Lang
      *
      * @param channel Lang Channel
-     * @return Lang Values
+     * @return Lang Value
      */
     public Map<String, String> getLang(String channel) {
         if (Util.isNull(channel)) throw new NullPointerException();
-        return getLang().get(channel.toLowerCase());
+        return new LinkedHashMap<>(plugin.lang.get().get(channel.toLowerCase()));
     }
 
     /**
@@ -88,7 +84,7 @@ public final class SubAPI {
      *
      * @param channel Lang Channel
      * @param key Key
-     * @return Lang Value
+     * @return Lang Values
      */
     public String getLang(String channel, String key) {
         if (Util.isNull(channel, key)) throw new NullPointerException();

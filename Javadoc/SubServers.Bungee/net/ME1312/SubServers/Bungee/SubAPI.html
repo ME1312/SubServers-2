@@ -321,22 +321,22 @@ extends java.lang.Object</pre>
 </td>
 </tr>
 <tr id="i25" class="rowColor">
-<td class="colFirst"><code>java.util.Map&lt;java.lang.String,java.util.Map&lt;java.lang.String,java.lang.String&gt;&gt;</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Bungee/SubAPI.html#getLang--">getLang</a></span>()</code>
-<div class="block">Gets the SubServers Lang</div>
-</td>
-</tr>
-<tr id="i26" class="altColor">
 <td class="colFirst"><code>java.util.Map&lt;java.lang.String,java.lang.String&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Bungee/SubAPI.html#getLang-java.lang.String-">getLang</a></span>(java.lang.String&nbsp;channel)</code>
 <div class="block">Gets values from the SubServers Lang</div>
 </td>
 </tr>
-<tr id="i27" class="rowColor">
+<tr id="i26" class="altColor">
 <td class="colFirst"><code>java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Bungee/SubAPI.html#getLang-java.lang.String-java.lang.String-">getLang</a></span>(java.lang.String&nbsp;channel,
        java.lang.String&nbsp;key)</code>
 <div class="block">Gets a value from the SubServers Lang</div>
+</td>
+</tr>
+<tr id="i27" class="rowColor">
+<td class="colFirst"><code>java.util.Collection&lt;java.lang.String&gt;</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Bungee/SubAPI.html#getLangChannels--">getLangChannels</a></span>()</code>
+<div class="block">Gets the current SubServers Lang Channels</div>
 </td>
 </tr>
 <tr id="i28" class="altColor">
@@ -551,20 +551,6 @@ public&nbsp;<a href="../../../../net/ME1312/SubServers/Bungee/SubPlugin.html" ti
 </dl>
 </li>
 </ul>
-<a name="getHostDrivers--">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>getHostDrivers</h4>
-<pre>public&nbsp;java.util.List&lt;java.lang.String&gt;&nbsp;getHostDrivers()</pre>
-<div class="block">Get a list of all available Host Drivers</div>
-<dl>
-<dt><span class="returnLabel">Returns:</span></dt>
-<dd>Host Driver handle list</dd>
-</dl>
-</li>
-</ul>
 <a name="addHostDriver-java.lang.Class-java.lang.String-">
 <!--   -->
 </a>
@@ -578,6 +564,20 @@ public&nbsp;<a href="../../../../net/ME1312/SubServers/Bungee/SubPlugin.html" ti
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>driver</code> - Driver to add</dd>
 <dd><code>handle</code> - Handle to Bind</dd>
+</dl>
+</li>
+</ul>
+<a name="getHostDrivers--">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getHostDrivers</h4>
+<pre>public&nbsp;java.util.List&lt;java.lang.String&gt;&nbsp;getHostDrivers()</pre>
+<div class="block">Get a list of all available Host Drivers</div>
+<dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>Host Driver handle list</dd>
 </dl>
 </li>
 </ul>
@@ -1115,17 +1115,17 @@ public&nbsp;<a href="../../../../net/ME1312/SubServers/Bungee/SubPlugin.html" ti
 </dl>
 </li>
 </ul>
-<a name="getLang--">
+<a name="getLangChannels--">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
-<h4>getLang</h4>
-<pre>public&nbsp;java.util.Map&lt;java.lang.String,java.util.Map&lt;java.lang.String,java.lang.String&gt;&gt;&nbsp;getLang()</pre>
-<div class="block">Gets the SubServers Lang</div>
+<h4>getLangChannels</h4>
+<pre>public&nbsp;java.util.Collection&lt;java.lang.String&gt;&nbsp;getLangChannels()</pre>
+<div class="block">Gets the current SubServers Lang Channels</div>
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd>SubServers Lang</dd>
+<dd>SubServers Lang Channel list</dd>
 </dl>
 </li>
 </ul>

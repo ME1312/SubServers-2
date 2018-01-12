@@ -23,7 +23,7 @@ public final class SubAPI {
     final HashMap<UUID, Timer> schedule = new HashMap<UUID, Timer>();
     final TreeMap<String, Command> commands = new TreeMap<String, Command>();
     final HashMap<String, SubPluginInfo> plugins = new LinkedHashMap<String, SubPluginInfo>();
-    private ExHost host;
+    private final ExHost host;
     private static SubAPI api;
 
     protected SubAPI(ExHost host) {
@@ -332,24 +332,23 @@ public final class SubAPI {
     }
 
     /**
-     * Gets the SubServers Lang
+     * Gets the current SubServers Lang Channels
      *
-     * @return SubServers Lang
+     * @return SubServers Lang Channel list
      */
-    public Map<String, Map<String, String>> getLang() {
-        if (Util.isNull(host.lang, host.lang.get())) throw new NullPointerException();
-        return new LinkedHashMap<>(host.lang.get());
+    public Collection<String> getLangChannels() {
+        return host.lang.get().keySet();
     }
 
     /**
      * Gets values from the SubServers Lang
      *
      * @param channel Lang Channel
-     * @return Lang Values
+     * @return Lang Value
      */
     public Map<String, String> getLang(String channel) {
         if (Util.isNull(channel)) throw new NullPointerException();
-        return getLang().get(channel.toLowerCase());
+        return new LinkedHashMap<>(host.lang.get().get(channel.toLowerCase()));
     }
 
     /**
@@ -357,7 +356,7 @@ public final class SubAPI {
      *
      * @param channel Lang Channel
      * @param key Key
-     * @return Lang Value
+     * @return Lang Values
      */
     public String getLang(String channel, String key) {
         if (Util.isNull(channel, key)) throw new NullPointerException();

@@ -8,7 +8,6 @@ import net.ME1312.SubServers.Bungee.Host.Server;
 import net.ME1312.SubServers.Bungee.Host.Host;
 import net.ME1312.SubServers.Bungee.Host.ServerContainer;
 import net.ME1312.SubServers.Bungee.Host.SubServer;
-import net.ME1312.SubServers.Bungee.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Bungee.Library.Exception.InvalidHostException;
 import net.ME1312.SubServers.Bungee.Library.NamedContainer;
 import net.ME1312.SubServers.Bungee.Library.UniversalFile;
@@ -28,9 +27,9 @@ import java.util.*;
 public final class SubAPI {
     LinkedList<NamedContainer<Runnable, Runnable>> listeners = new LinkedList<NamedContainer<Runnable, Runnable>>();
     LinkedList<Runnable> reloadListeners = new LinkedList<Runnable>();
-    private HashMap<String, Object> knownSignatures = new HashMap<String, Object>();
+    private static HashMap<String, Object> knownSignatures = new HashMap<String, Object>();
     boolean ready = false;
-    private SubPlugin plugin;
+    private final SubPlugin plugin;
     private static SubAPI api;
 
     protected SubAPI(SubPlugin plugin) {
@@ -90,15 +89,6 @@ public final class SubAPI {
     }
 
     /**
-     * Get a list of all available Host Drivers
-     *
-     * @return Host Driver handle list
-     */
-    public List<String> getHostDrivers() {
-        return new LinkedList<String>(plugin.hostDrivers.keySet());
-    }
-
-    /**
      * Adds a Driver for Hosts
      *
      * @param driver Driver to add
@@ -106,8 +96,17 @@ public final class SubAPI {
      */
     public void addHostDriver(Class<? extends Host> driver, String handle) {
         if (Util.isNull(driver, handle)) throw new NullPointerException();
-        if (plugin.hostDrivers.keySet().contains(handle.toLowerCase())) throw new IllegalStateException("Driver already exists: " + handle);
-        plugin.hostDrivers.put(handle.toLowerCase(), driver);
+        if (plugin.hostDrivers.keySet().contains(handle.toUpperCase().replace('-', '_').replace(' ', '_'))) throw new IllegalStateException("Driver already exists: " + handle);
+        plugin.hostDrivers.put(handle.toUpperCase().replace('-', '_').replace(' ', '_'), driver);
+    }
+
+    /**
+     * Get a list of all available Host Drivers
+     *
+     * @return Host Driver handle list
+     */
+    public List<String> getHostDrivers() {
+        return new LinkedList<String>(plugin.hostDrivers.keySet());
     }
 
     /**
@@ -167,8 +166,8 @@ public final class SubAPI {
      */
     public Host addHost(UUID player, String driver, String name, boolean enabled, InetAddress address, String directory, String gitBash) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
         if (Util.isNull(driver, name, enabled, address, directory, gitBash)) throw new NullPointerException();
-        if (!getHostDrivers().contains(driver)) throw new InvalidHostException("Invalid Driver for host: " + name);
-        return addHost(player, plugin.hostDrivers.get(driver.toLowerCase()), name, enabled, address, directory, gitBash);
+        if (!getHostDrivers().contains(driver.toUpperCase().replace('-', '_').replace(' ', '_'))) throw new InvalidHostException("Invalid Driver for host: " + name);
+        return addHost(player, plugin.hostDrivers.get(driver.toUpperCase().replace('-', '_').replace(' ', '_')), name, enabled, address, directory, gitBash);
     }
 
     /**
@@ -208,8 +207,8 @@ public final class SubAPI {
      */
     public Host addHost(UUID player, Class<? extends Host> driver, String name, boolean enabled, InetAddress address, String directory, String gitBash) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
         if (Util.isNull(driver, name, enabled, address, directory, gitBash)) throw new NullPointerException();
-        Host host;
-        return (addHost(player, host = driver.getConstructor(SubPlugin.class, String.class, Boolean.class, InetAddress.class, String.class, String.class).newInstance(plugin, name, (Boolean) enabled, address, directory, gitBash)))?host:null;
+        Host host = driver.getConstructor(SubPlugin.class, String.class, Boolean.class, InetAddress.class, String.class, String.class).newInstance(plugin, name, (Boolean) enabled, address, directory, gitBash);
+        return addHost(player, host)?host:null;
     }
 
     /**
@@ -544,12 +543,12 @@ public final class SubAPI {
     }
 
     /**
-     * Gets the SubServers Lang
+     * Gets the current SubServers Lang Channels
      *
-     * @return SubServers Lang
+     * @return SubServers Lang Channel list
      */
-    public Map<String, Map<String, String>> getLang() {
-        return new LinkedHashMap<>(plugin.lang);
+    public Collection<String> getLangChannels() {
+        return plugin.lang.keySet();
     }
 
     /**
@@ -560,7 +559,7 @@ public final class SubAPI {
      */
     public Map<String, String> getLang(String channel) {
         if (Util.isNull(channel)) throw new NullPointerException();
-        return getLang().get(channel.toLowerCase());
+        return new LinkedHashMap<>(plugin.lang.get(channel.toLowerCase()));
     }
 
     /**

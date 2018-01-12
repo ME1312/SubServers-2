@@ -12,6 +12,7 @@ import net.ME1312.SubServers.Bungee.Library.Util;
 import net.ME1312.SubServers.Bungee.Library.Version.Version;
 import net.ME1312.SubServers.Bungee.SubAPI;
 import net.ME1312.SubServers.Bungee.SubPlugin;
+import net.md_5.bungee.BungeeServerInfo;
 import org.json.JSONObject;
 
 import java.io.*;
@@ -320,7 +321,7 @@ public class InternalSubServer extends SubServerContainer {
                             break;
                         case "motd":
                             if (value.isString()) {
-                                Field f = ServerContainer.class.getDeclaredField("motd");
+                                Field f = BungeeServerInfo.class.getDeclaredField("motd");
                                 f.setAccessible(true);
                                 f.set(this, value.asColoredString('&'));
                                 f.setAccessible(false);
@@ -419,7 +420,7 @@ public class InternalSubServer extends SubServerContainer {
                             break;
                         case "restricted":
                             if (value.isBoolean()) {
-                                Field f = ServerContainer.class.getDeclaredField("restricted");
+                                Field f = BungeeServerInfo.class.getDeclaredField("restricted");
                                 f.setAccessible(true);
                                 f.set(this, value.asBoolean());
                                 f.setAccessible(false);

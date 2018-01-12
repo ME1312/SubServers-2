@@ -121,7 +121,7 @@ public final class SubPlugin extends JavaPlugin {
         if (!config.get().getSection("Settings").getSection("SubData").getRawString("Encryption", "NONE").equalsIgnoreCase("NONE")) {
             if (config.get().getSection("Settings").getSection("SubData").getString("Password", "").length() == 0) {
                 System.out.println("SubData > Cannot encrypt connection without a password");
-            } else if (!SubDataClient.getCiphers().keySet().contains(config.get().getSection("Settings").getSection("SubData").getRawString("Encryption").toLowerCase().replace('-', '_').replace(' ', '_'))) {
+            } else if (!SubDataClient.getCiphers().keySet().contains(config.get().getSection("Settings").getSection("SubData").getRawString("Encryption").toUpperCase().replace('-', '_').replace(' ', '_'))) {
                 System.out.println("SubData > Unknown encryption type: " + config.get().getSection("Settings").getSection("SubData").getRawString("Encryption"));
             } else {
                 cipher = SubDataClient.getCipher(config.get().getSection("Settings").getSection("SubData").getRawString("Encryption"));

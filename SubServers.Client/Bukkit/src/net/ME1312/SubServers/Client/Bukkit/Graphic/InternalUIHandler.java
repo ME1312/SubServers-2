@@ -59,7 +59,7 @@ public class InternalUIHandler implements UIHandler, Listener {
             if (gui.open && event.getClickedInventory() != null && event.getClickedInventory().getTitle() != null) {
                 if (plugin.subdata == null) {
                     new IllegalStateException("SubData is not connected").printStackTrace();
-                } else if (Util.isException(() -> plugin.api.getLang())) {
+                } else if (Util.isException(() -> plugin.api.getLangChannels())) {
                     new IllegalStateException("There are no lang options available at this time").printStackTrace();
                 } else if (event.getClickedInventory().getTitle().equals(plugin.api.getLang("SubServers", "Interface.Host-Menu.Title"))) { // Host Menu
                     if (event.getCurrentItem() != null && event.getCurrentItem().getType() != Material.AIR && event.getCurrentItem().hasItemMeta()) {

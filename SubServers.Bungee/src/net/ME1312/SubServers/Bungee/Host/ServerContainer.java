@@ -17,6 +17,7 @@ import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import org.json.JSONObject;
 
+import java.lang.reflect.Field;
 import java.net.InetSocketAddress;
 import java.util.*;
 
@@ -29,8 +30,6 @@ public class ServerContainer extends BungeeServerInfo implements Server {
     private Client client = null;
     private List<String> groups = new ArrayList<String>();
     private String nick = null;
-    private String motd;
-    private boolean restricted;
     private boolean hidden;
 
     public ServerContainer(String name, InetSocketAddress address, String motd, boolean hidden, boolean restricted) throws InvalidServerException {
@@ -39,8 +38,6 @@ public class ServerContainer extends BungeeServerInfo implements Server {
         if (name.contains(" ")) throw new InvalidServerException("Server names cannot have spaces: " + name);
         signature = SubAPI.getInstance().signAnonymousObject();
         SubDataServer.allowConnection(getAddress().getAddress().getHostAddress());
-        this.motd = motd;
-        this.restricted = restricted;
         this.hidden = hidden;
     }
 
@@ -123,28 +120,30 @@ public class ServerContainer extends BungeeServerInfo implements Server {
         this.hidden = value;
     }
 
-    @Override
-    public String getMotd() {
-        return motd;
-    }
-
-    @Override
     public void setMotd(String value) {
         if (Util.isNull(value)) throw new NullPointerException();
         new SubEditServerEvent(null, this, new NamedContainer<String, Object>("motd", value), false);
-        this.motd = value;
+        try {
+            Field f = BungeeServerInfo.class.getDeclaredField("motd");
+            f.setAccessible(true);
+            f.set(this, value);
+            f.setAccessible(false);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
-    @Override
-    public boolean isRestricted() {
-        return restricted;
-    }
-
-    @Override
     public void setRestricted(boolean value) {
         if (Util.isNull(value)) throw new NullPointerException();
         new SubEditServerEvent(null, this, new NamedContainer<String, Object>("restricted", value), false);
-        this.restricted = value;
+        try {
+            Field f = BungeeServerInfo.class.getDeclaredField("restricted");
+            f.setAccessible(true);
+            f.set(this, value);
+            f.setAccessible(false);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

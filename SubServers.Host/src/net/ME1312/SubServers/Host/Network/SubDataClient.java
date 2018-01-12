@@ -213,8 +213,8 @@ public final class SubDataClient {
      */
     public static void addCipher(String handle, Cipher cipher) {
         if (Util.isNull(cipher)) throw new NullPointerException();
-        if (!ciphers.keySet().contains(handle.toLowerCase().replace('-', '_').replace(' ', '_')))
-            ciphers.put(handle.toLowerCase().replace('-', '_').replace(' ', '_'), cipher);
+        if (ciphers.keySet().contains(handle.toUpperCase().replace('-', '_').replace(' ', '_'))) throw new IllegalStateException("Cipher already exists: " + handle);
+        ciphers.put(handle.toUpperCase().replace('-', '_').replace(' ', '_'), cipher);
     }
 
     /**
@@ -242,7 +242,7 @@ public final class SubDataClient {
      * @return Cipher
      */
     public static Cipher getCipher(String handle) {
-        return getCiphers().get(handle.toLowerCase().replace('-', '_').replace(' ', '_'));
+        return getCiphers().get(handle.toUpperCase().replace('-', '_').replace(' ', '_'));
     }
 
     /**

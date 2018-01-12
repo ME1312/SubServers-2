@@ -63,7 +63,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
     public long resetDate = 0;
     private boolean running = false;
     private boolean posted = false;
-    private BigInteger lastSignature = new BigInteger("-1");
+    private static BigInteger lastSignature = new BigInteger("-1");
 
     @SuppressWarnings("unchecked")
     protected SubPlugin(PrintStream out) throws IOException {
@@ -234,7 +234,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
             if (!config.get().getSection("Settings").getSection("SubData").getRawString("Encryption", "NONE").equalsIgnoreCase("NONE")) {
                 if (config.get().getSection("Settings").getSection("SubData").getString("Password", "").length() == 0) {
                     System.out.println("SubData > Cannot encrypt connection without a password");
-                } else if (!SubDataServer.getCiphers().keySet().contains(config.get().getSection("Settings").getSection("SubData").getRawString("Encryption").toLowerCase().replace('-', '_').replace(' ', '_'))) {
+                } else if (!SubDataServer.getCiphers().keySet().contains(config.get().getSection("Settings").getSection("SubData").getRawString("Encryption").toUpperCase().replace('-', '_').replace(' ', '_'))) {
                     System.out.println("SubData > Unknown encryption type: " + config.get().getSection("Settings").getSection("SubData").getRawString("Encryption"));
                 } else {
                     cipher = SubDataServer.getCipher(config.get().getSection("Settings").getSection("SubData").getRawString("Encryption"));
@@ -258,10 +258,10 @@ public final class SubPlugin extends BungeeCord implements Listener {
         System.out.println("SubServers > "+((status)?"Rel":"L")+"oading Hosts...");
         for (String name : config.get().getSection("Hosts").getKeys()) {
             if (!ukeys.contains(name.toLowerCase())) try {
-                if (!hostDrivers.keySet().contains(config.get().getSection("Hosts").getSection(name).getRawString("Driver").toLowerCase())) throw new InvalidHostException("Invalid Driver for host: " + name);
+                if (!hostDrivers.keySet().contains(config.get().getSection("Hosts").getSection(name).getRawString("Driver").toUpperCase().replace('-', '_').replace(' ', '_'))) throw new InvalidHostException("Invalid Driver for host: " + name);
                 Host host = this.hosts.get(name.toLowerCase());
                 if (host == null || // Host must be reset
-                        !hostDrivers.get(config.get().getSection("Hosts").getSection(name).getRawString("Driver").toLowerCase()).equals(host.getClass()) ||
+                        !hostDrivers.get(config.get().getSection("Hosts").getSection(name).getRawString("Driver").toUpperCase().replace('-', '_').replace(' ', '_')).equals(host.getClass()) ||
                         !config.get().getSection("Hosts").getSection(name).getRawString("Address").equals(host.getAddress().getHostAddress()) ||
                         !config.get().getSection("Hosts").getSection(name).getRawString("Directory").equals(host.getPath()) ||
                         !config.get().getSection("Hosts").getSection(name).getRawString("Git-Bash").equals(host.getCreator().getBashDirectory())
@@ -585,7 +585,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
      * @return Method Response
      */
     @SuppressWarnings("unchecked")
-    public <T> Object redis(String method, NamedContainer<Class<T>, ? extends T>... args) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+    public <T> Object redis(String method, NamedContainer<Class<?>, ?>... args) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         if (redis) {
             Object api = getPluginManager().getPlugin("RedisBungee").getClass().getMethod("getApi").invoke(null);
             Class<?>[] classargs = new Class<?>[args.length];
@@ -608,7 +608,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
      */
     @Override
     public String getName() {
-        return (new Version(super.getVersion()).equals(version))?"SubServers.Bungee.Patch":super.getName();
+        return (new Version(super.getVersion()).equals(version))?"SubServers.Bungee":super.getName();
     }
 
     /**

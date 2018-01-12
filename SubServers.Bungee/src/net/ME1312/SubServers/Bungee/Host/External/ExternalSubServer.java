@@ -10,6 +10,7 @@ import net.ME1312.SubServers.Bungee.Library.NamedContainer;
 import net.ME1312.SubServers.Bungee.Library.Util;
 import net.ME1312.SubServers.Bungee.Network.Packet.PacketExUpdateServer;
 import net.ME1312.SubServers.Bungee.SubAPI;
+import net.md_5.bungee.BungeeServerInfo;
 
 import java.io.File;
 import java.lang.reflect.Field;
@@ -267,7 +268,7 @@ public class ExternalSubServer extends SubServerContainer {
                             break;
                         case "motd":
                             if (value.isString()) {
-                                Field f = ServerContainer.class.getDeclaredField("motd");
+                                Field f = BungeeServerInfo.class.getDeclaredField("motd");
                                 f.setAccessible(true);
                                 f.set(this, value.asColoredString('&'));
                                 f.setAccessible(false);
@@ -367,7 +368,7 @@ public class ExternalSubServer extends SubServerContainer {
                             break;
                         case "restricted":
                             if (value.isBoolean()) {
-                                Field f = ServerContainer.class.getDeclaredField("restricted");
+                                Field f = BungeeServerInfo.class.getDeclaredField("restricted");
                                 f.setAccessible(true);
                                 f.set(this, value.asBoolean());
                                 f.setAccessible(false);

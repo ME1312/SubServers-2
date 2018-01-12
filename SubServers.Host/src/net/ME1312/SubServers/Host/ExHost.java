@@ -69,7 +69,13 @@ public final class ExHost {
      * @throws Exception
      */
     public static void main(String[] args) throws Exception {
-        new ExHost(new File(URLDecoder.decode(System.getProperty("subservers.host.runtime"), "UTF-8")), args);
+        if (System.getProperty("RM.subservers", "true").equalsIgnoreCase("true")) {
+            new ExHost(new File(URLDecoder.decode(System.getProperty("subservers.host.runtime"), "UTF-8")), args);
+        } else {
+            System.out.println(">> SubServers code has been disallowed to work on this machine");
+            System.out.println(">> Check with your provider for more information");
+            System.exit(1);
+        }
     }
     private ExHost(File runtime, String[] args) {
         this.runtime = new UniversalFile(runtime);
@@ -131,7 +137,7 @@ public final class ExHost {
             if (!config.get().getSection("Settings").getSection("SubData").getRawString("Encryption", "NONE").equalsIgnoreCase("NONE")) {
                 if (config.get().getSection("Settings").getSection("SubData").getString("Password", "").length() == 0) {
                     log.info.println("Cannot encrypt connection without a password");
-                } else if (!SubDataClient.getCiphers().keySet().contains(config.get().getSection("Settings").getSection("SubData").getRawString("Encryption").toLowerCase().replace('-', '_').replace(' ', '_'))) {
+                } else if (!SubDataClient.getCiphers().keySet().contains(config.get().getSection("Settings").getSection("SubData").getRawString("Encryption").toUpperCase().replace('-', '_').replace(' ', '_'))) {
                     log.info.println("Unknown encryption type: " + config.get().getSection("Settings").getSection("SubData").getRawString("Encryption"));
                 } else {
                     cipher = SubDataClient.getCipher(config.get().getSection("Settings").getSection("SubData").getRawString("Encryption"));
@@ -310,7 +316,7 @@ public final class ExHost {
         if (!config.get().getSection("Settings").getSection("SubData").getRawString("Encryption", "NONE").equalsIgnoreCase("NONE")) {
             if (config.get().getSection("Settings").getSection("SubData").getString("Password", "").length() == 0) {
                 log.info.println("Cannot encrypt connection without a password");
-            } else if (!SubDataClient.getCiphers().keySet().contains(config.get().getSection("Settings").getSection("SubData").getRawString("Encryption").toLowerCase().replace('-', '_').replace(' ', '_'))) {
+            } else if (!SubDataClient.getCiphers().keySet().contains(config.get().getSection("Settings").getSection("SubData").getRawString("Encryption").toUpperCase().replace('-', '_').replace(' ', '_'))) {
                 log.info.println("Unknown encryption type: " + config.get().getSection("Settings").getSection("SubData").getRawString("Encryption"));
             } else {
                 cipher = SubDataClient.getCipher(config.get().getSection("Settings").getSection("SubData").getRawString("Encryption"));

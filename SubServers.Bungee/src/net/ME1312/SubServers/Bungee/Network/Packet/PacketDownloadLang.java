@@ -7,6 +7,9 @@ import net.ME1312.SubServers.Bungee.Network.PacketOut;
 import net.ME1312.SubServers.Bungee.SubPlugin;
 import org.json.JSONObject;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Download Lang Packet
  */
@@ -38,7 +41,10 @@ public class PacketDownloadLang implements PacketIn, PacketOut {
     public JSONObject generate() {
         JSONObject json = new JSONObject();
         json.put("id", id);
-        json.put("Lang", plugin.api.getLang());
+        LinkedHashMap<String, Map<String, String>> full = new LinkedHashMap<>();
+        for (String channel : plugin.api.getLangChannels())
+            full.put(channel, plugin.api.getLang(channel));
+        json.put("Lang", full);
         return json;
     }
 
