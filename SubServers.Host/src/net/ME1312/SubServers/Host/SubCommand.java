@@ -175,6 +175,7 @@ public class SubCommand {
                                 if (!json.getJSONObject("server").getString("name").equals(json.getJSONObject("server").getString("display"))) host.log.message.println("  - Real Name: " + json.getJSONObject("server").getString("name"));
                                 host.log.message.println("  - Host: " + json.getJSONObject("server").getString("host"));
                                 host.log.message.println("  - Enabled: " + ((json.getJSONObject("server").getBoolean("enabled"))?"yes":"no"));
+                                host.log.message.println("  - Editable: " + ((json.getJSONObject("server").getBoolean("editable"))?"yes":"no"));
                                 if (json.getJSONObject("server").getJSONArray("group").length() > 0) {
                                     host.log.message.println("  - Group:");
                                     for (int i = 0; i < json.getJSONObject("server").getJSONArray("group").length(); i++)
@@ -193,6 +194,7 @@ public class SubCommand {
                                     for (int i = 0; i < json.getJSONObject("server").getJSONArray("incompatible-list").length(); i++)
                                         host.log.message.println("    - " + json.getJSONObject("server").getJSONArray("incompatible-list").getString(i) + ((current.contains(json.getJSONObject("server").getJSONArray("incompatible-list").getString(i).toLowerCase()))?"*":""));
                                 }
+                                host.log.message.println("  - Signature: " + json.getJSONObject("server").getString("signature"));
                                 break;
                             default:
                                 host.log.message.println("That Server is not a SubServer");

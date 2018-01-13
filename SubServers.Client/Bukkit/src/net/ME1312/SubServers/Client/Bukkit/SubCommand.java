@@ -426,6 +426,7 @@ public final class SubCommand implements CommandExecutor {
                                             sender.sendMessage("  " + plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Real Name") + ChatColor.AQUA + json.getJSONObject("server").getString("name"));
                                         sender.sendMessage("  " + plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Host") + ChatColor.AQUA + json.getJSONObject("server").getString("host"));
                                         sender.sendMessage("  " + plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Enabled") + ((json.getJSONObject("server").getBoolean("enabled"))?ChatColor.GREEN+"yes":ChatColor.DARK_RED+"no"));
+                                        sender.sendMessage("  " + plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Editable") + ((json.getJSONObject("server").getBoolean("editable"))?ChatColor.GREEN+"yes":ChatColor.DARK_RED+"no"));
                                         if (json.getJSONObject("server").getJSONArray("group").length() > 0) {
                                             sender.sendMessage("  " + plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Group"));
                                             for (int i = 0; i < json.getJSONObject("server").getJSONArray("group").length(); i++)
@@ -448,6 +449,7 @@ public final class SubCommand implements CommandExecutor {
                                             for (int i = 0; i < json.getJSONObject("server").getJSONArray("incompatible-list").length(); i++)
                                                 sender.sendMessage("  " + plugin.api.getLang("SubServers", "Command.Info.List").replace("$str$", ((current.contains(json.getJSONObject("server").getJSONArray("incompatible-list").getString(i).toLowerCase()))?ChatColor.DARK_RED:ChatColor.RED) + json.getJSONObject("server").getJSONArray("incompatible-list").getString(i)));
                                         }
+                                        sender.sendMessage("  " + plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Signature") + ChatColor.AQUA + json.getJSONObject("server").getString("signature"));
                                         break;
                                     default:
                                         sender.sendMessage(plugin.api.getLang("SubServers", "Command.Start.Invalid"));

@@ -563,11 +563,11 @@ public final class SubPlugin extends BungeeCord implements Listener {
 
     String getNewSignature() {
         BigInteger number = (lastSignature = lastSignature.add(BigInteger.ONE));
-        final BigInteger BASE = BigInteger.valueOf(64);
         final String DIGITS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz+/";
+        final BigInteger BASE = BigInteger.valueOf(DIGITS.length());
 
         StringBuilder result = new StringBuilder();
-        while (number.compareTo(BigInteger.ZERO) == 1) { // number > 0
+        while (number.compareTo(BigInteger.ZERO) > 0) { // number > 0
             BigInteger[] divmod = number.divideAndRemainder(BASE);
             number = divmod[0];
             int digit = divmod[1].intValue();

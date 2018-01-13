@@ -176,6 +176,7 @@ public final class SubCommand extends CommandX {
                                         if (!json.getJSONObject("server").getString("name").equals(json.getJSONObject("server").getString("display"))) sender.sendMessage("  - Real Name: " + json.getJSONObject("server").getString("name"));
                                         sender.sendMessage("  - Host: " + json.getJSONObject("server").getString("host"));
                                         sender.sendMessage("  - Enabled: " + ((json.getJSONObject("server").getBoolean("enabled"))?"yes":"no"));
+                                        sender.sendMessage("  - Editable: " + ((json.getJSONObject("server").getBoolean("editable"))?"yes":"no"));
                                         if (json.getJSONObject("server").getJSONArray("group").length() > 0) {
                                             sender.sendMessage("  - Group:");
                                             for (int i = 0; i < json.getJSONObject("server").getJSONArray("group").length(); i++)
@@ -194,6 +195,7 @@ public final class SubCommand extends CommandX {
                                             for (int i = 0; i < json.getJSONObject("server").getJSONArray("incompatible-list").length(); i++)
                                                 sender.sendMessage("    - " + json.getJSONObject("server").getJSONArray("incompatible-list").getString(i) + ((current.contains(json.getJSONObject("server").getJSONArray("incompatible-list").getString(i).toLowerCase()))?"*":""));
                                         }
+                                        sender.sendMessage("  - Signature: " + json.getJSONObject("server").getString("signature"));
                                         break;
                                     default:
                                         sender.sendMessage("SubSevrers > That Server is not a SubServer");

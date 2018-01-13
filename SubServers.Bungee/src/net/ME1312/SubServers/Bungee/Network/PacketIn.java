@@ -21,4 +21,14 @@ public interface PacketIn {
      * @return Packet Version
      */
     Version getVersion();
+
+    /**
+     * Check Compatibility with oncoming packet
+     *
+     * @param version Version of oncoming packet
+     * @return Compatibility Status
+     */
+    default boolean isCompatible(Version version) {
+        return getVersion().equals(version);
+    }
 }

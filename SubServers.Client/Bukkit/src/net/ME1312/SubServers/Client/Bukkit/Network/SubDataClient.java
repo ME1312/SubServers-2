@@ -376,7 +376,7 @@ public final class SubDataClient {
 
         List<PacketIn> list = new ArrayList<PacketIn>();
         for (PacketIn packet : pIn.get(json.getString("h"))) {
-            if (new Version(json.getString("v")).equals(packet.getVersion())) {
+            if (packet.isCompatible(new Version(json.getString("v")))) {
                 list.add(packet);
             } else {
                 new IllegalPacketException("Packet Version Mismatch in " + json.getString("h") + ": " + json.getString("v") + " -> " + packet.getVersion().toString()).printStackTrace();

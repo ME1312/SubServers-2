@@ -16,7 +16,7 @@ public class Server extends BungeeServerInfo {
     private boolean hidden;
 
     public Server(String signature, String name, String display, InetSocketAddress address, String motd, boolean hidden, boolean restricted) {
-        super(name, address, ChatColor.translateAlternateColorCodes('&', motd), restricted);
+        super(name, address, motd, restricted);
         if (Util.isNull(name, address, motd, hidden, restricted)) throw new NullPointerException();
         this.signature = signature;
         this.hidden = hidden;
