@@ -63,7 +63,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
     public long resetDate = 0;
     private boolean running = false;
     private boolean posted = false;
-    private static BigInteger lastSignature = new BigInteger("-1");
+    private static BigInteger lastSignature = BigInteger.valueOf(-1);
 
     @SuppressWarnings("unchecked")
     protected SubPlugin(PrintStream out) throws IOException {
@@ -563,7 +563,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
 
     String getNewSignature() {
         BigInteger number = (lastSignature = lastSignature.add(BigInteger.ONE));
-        final String DIGITS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz+/";
+        final String DIGITS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-_";
         final BigInteger BASE = BigInteger.valueOf(DIGITS.length());
 
         StringBuilder result = new StringBuilder();
@@ -581,11 +581,10 @@ public final class SubPlugin extends BungeeCord implements Listener {
      *
      * @param method Method to reference
      * @param args Method arguments
-     * @param <T> Class Type
      * @return Method Response
      */
     @SuppressWarnings("unchecked")
-    public <T> Object redis(String method, NamedContainer<Class<?>, ?>... args) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+    public Object redis(String method, NamedContainer<Class<?>, ?>... args) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         if (redis) {
             Object api = getPluginManager().getPlugin("RedisBungee").getClass().getMethod("getApi").invoke(null);
             Class<?>[] classargs = new Class<?>[args.length];
@@ -640,18 +639,6 @@ public final class SubPlugin extends BungeeCord implements Listener {
             }
         }
         return servers;
-    }
-
-    /**
-     * Emulate BungeeCord's getServerInfo()
-     *
-     * @param name Server Name (Case Sensitive)
-     * @see SubAPI#getServer(String)
-     * @return Server Info
-     */
-    @Override
-    public ServerInfo getServerInfo(String name) {
-        return getServers().get(name);
     }
 
     @EventHandler(priority = Byte.MAX_VALUE)

@@ -145,7 +145,7 @@ extends java.lang.Object</pre>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Host/Library/Log/Logger.html#severe">severe</a></span></code>&nbsp;</td>
 </tr>
 <tr class="altColor">
-<td class="colFirst"><code><a href="../../../../../../net/ME1312/SubServers/Host/Library/Log/LogStream.html" title="class in net.ME1312.SubServers.Host.Library.Log">LogStream</a></code></td>
+<td class="colFirst"><code><a href="../../../../../../net/ME1312/SubServers/Host/Library/Log/ErrorStream.html" title="class in net.ME1312.SubServers.Host.Library.Log">ErrorStream</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Host/Library/Log/Logger.html#warn">warn</a></span></code>&nbsp;</td>
 </tr>
 </table>
@@ -184,8 +184,9 @@ extends java.lang.Object</pre>
 </tr>
 <tr id="i0" class="altColor">
 <td class="colFirst"><code>static void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Host/Library/Log/Logger.html#setup-java.io.PrintStream-java.io.PrintStream-java.io.File-">setup</a></span>(java.io.PrintStream&nbsp;out,
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Host/Library/Log/Logger.html#setup-java.io.PrintStream-java.io.PrintStream-jline.console.ConsoleReader-java.io.File-">setup</a></span>(java.io.PrintStream&nbsp;out,
      java.io.PrintStream&nbsp;err,
+     jline.console.ConsoleReader&nbsp;in,
      java.io.File&nbsp;dir)</code>
 <div class="block">Setup the SubServers Log System</div>
 </td>
@@ -236,7 +237,7 @@ extends java.lang.Object</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>warn</h4>
-<pre>public final&nbsp;<a href="../../../../../../net/ME1312/SubServers/Host/Library/Log/LogStream.html" title="class in net.ME1312.SubServers.Host.Library.Log">LogStream</a> warn</pre>
+<pre>public final&nbsp;<a href="../../../../../../net/ME1312/SubServers/Host/Library/Log/ErrorStream.html" title="class in net.ME1312.SubServers.Host.Library.Log">ErrorStream</a> warn</pre>
 </li>
 </ul>
 <a name="error">
@@ -287,7 +288,7 @@ extends java.lang.Object</pre>
 <!--   -->
 </a>
 <h3>Method Detail</h3>
-<a name="setup-java.io.PrintStream-java.io.PrintStream-java.io.File-">
+<a name="setup-java.io.PrintStream-java.io.PrintStream-jline.console.ConsoleReader-java.io.File-">
 <!--   -->
 </a>
 <ul class="blockListLast">
@@ -295,6 +296,7 @@ extends java.lang.Object</pre>
 <h4>setup</h4>
 <pre>public static&nbsp;void&nbsp;setup(java.io.PrintStream&nbsp;out,
                          java.io.PrintStream&nbsp;err,
+                         jline.console.ConsoleReader&nbsp;in,
                          java.io.File&nbsp;dir)
                   throws java.io.IOException</pre>
 <div class="block">Setup the SubServers Log System</div>
@@ -302,6 +304,7 @@ extends java.lang.Object</pre>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>out</code> - System.out</dd>
 <dd><code>err</code> - System.err</dd>
+<dd><code>in</code> - jline.in</dd>
 <dd><code>dir</code> - Runtime Directory</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
 <dd><code>java.io.IOException</code></dd>

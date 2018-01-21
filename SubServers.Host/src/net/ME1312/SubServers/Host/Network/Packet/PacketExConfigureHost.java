@@ -52,7 +52,9 @@ public class PacketExConfigureHost implements PacketIn, PacketOut {
             Util.deleteDirectory(template.getDirectory());
         }
         host.templates.clear();
-        UniversalFile templates = new UniversalFile(host.runtime, "net:ME1312:SubServers:Host:Library:Files:Templates");
+        UniversalFile templates = new UniversalFile(host.dir, "Templates");
+        Util.deleteDirectory(templates);
+        templates.mkdirs();
         for (String name : data.getJSONObject("templates").keySet()) {
             try {
                 UniversalFile dir = new UniversalFile(templates, name);

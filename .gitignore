@@ -57,6 +57,7 @@ crashlytics-build.properties
 /Artifacts/-Icon/
 /Artifacts/SubServers.Patched.jar
 /Artifacts/SubServers.Test.jar
+/Artifacts/SubServers.Test.Maven.jar
 /SubServers.Test/
 /build.ant
 .DS_STORE

@@ -23,6 +23,7 @@ public final class SubAPI {
     final HashMap<UUID, Timer> schedule = new HashMap<UUID, Timer>();
     final TreeMap<String, Command> commands = new TreeMap<String, Command>();
     final HashMap<String, SubPluginInfo> plugins = new LinkedHashMap<String, SubPluginInfo>();
+    final List<String> knownClasses = new ArrayList<String>();
     private final ExHost host;
     private static SubAPI api;
 
@@ -232,7 +233,7 @@ public final class SubAPI {
         for (Object listener : listeners) {
             if (Util.isNull(plugin, listener)) throw new NullPointerException();
             for (Method method : Arrays.asList(listener.getClass().getMethods())) {
-                if (!method.isAnnotationPresent(EventHandler.class)) {
+                if (method.isAnnotationPresent(EventHandler.class)) {
                     if (method.getParameterTypes().length == 1) {
                         if (Event.class.isAssignableFrom(method.getParameterTypes()[0])) {
                             HashMap<Class<? extends Event>, HashMap<SubPluginInfo, HashMap<Object, List<Method>>>> events = (this.listeners.keySet().contains(method.getAnnotation(EventHandler.class).order()))?this.listeners.get(method.getAnnotation(EventHandler.class).order()):new LinkedHashMap<Class<? extends Event>, HashMap<SubPluginInfo, HashMap<Object, List<Method>>>>();
@@ -247,7 +248,7 @@ public final class SubAPI {
                         } else {
                             this.host.log.error.println(
                                     "Cannot register EventHandler in class \"" + listener.getClass().getCanonicalName() + "\" using method \"" + method.getName() + "\":",
-                                    "\"" + method.getParameterTypes()[0].getCanonicalName() + "\" is not an  Event");
+                                    "\"" + method.getParameterTypes()[0].getCanonicalName() + "\" is not an Event");
                         }
                     } else {
                         this.host.log.error.println(
@@ -293,7 +294,7 @@ public final class SubAPI {
     public void executeEvent(Event event) {
         if (Util.isNull(event)) throw new NullPointerException();
         for (Short order : listeners.keySet()) {
-            if (!listeners.get(order).keySet().contains(event.getClass())) {
+            if (listeners.get(order).keySet().contains(event.getClass())) {
                 for (SubPluginInfo plugin : listeners.get(order).get(event.getClass()).keySet()) {
                     try {
                         Field pf = Event.class.getDeclaredField("plugin");
@@ -305,7 +306,7 @@ public final class SubAPI {
                     }
                     for (Object listener : listeners.get(order).get(event.getClass()).get(plugin).keySet()) {
                         for (Method method : listeners.get(order).get(event.getClass()).get(plugin).get(listener)) {
-                            if (event instanceof Cancellable && ((Cancellable) event).isCancelled() && !method.getAnnotation(EventHandler.class).override()) {
+                            if (!(event instanceof Cancellable) || !((Cancellable) event).isCancelled() || method.getAnnotation(EventHandler.class).override()) {
                                 try {
                                     method.invoke(listener, event);
                                 } catch (InvocationTargetException e) {

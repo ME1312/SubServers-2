@@ -389,14 +389,8 @@ public abstract class Host implements ExtraDataHandler {
 
         JSONObject cinfo = new JSONObject();
         JSONObject templates = new JSONObject();
-        for (SubCreator.ServerTemplate template : getCreator().getTemplates().values()) {
-            JSONObject tinfo = new JSONObject();
-            tinfo.put("enabled", template.isEnabled());
-            tinfo.put("display", template.getDisplayName());
-            tinfo.put("icon", template.getIcon());
-            tinfo.put("type", template.getType().toString());
-            templates.put(template.getName(), tinfo);
-        }
+        for (SubCreator.ServerTemplate template : getCreator().getTemplates().values())
+            templates.put(template.getName(), new JSONObject(template.toString()));
         cinfo.put("templates", templates);
         hinfo.put("creator", cinfo);
 

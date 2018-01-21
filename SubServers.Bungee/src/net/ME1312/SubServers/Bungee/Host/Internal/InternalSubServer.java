@@ -90,6 +90,7 @@ public class InternalSubServer extends SubServerContainer {
                     new UniversalFile(this.directory, "plugins:SubServers.Client.jar").delete();
                     Util.copyFromJar(SubPlugin.class.getClassLoader(), "net/ME1312/SubServers/Bungee/Library/Files/Client/spigot.jar", new UniversalFile(this.directory, "plugins:SubServers.Client.jar").getPath());
                 }
+                jar.close();
             } catch (Throwable e) {
                 System.out.println("Couldn't auto-update SubServers.Client.jar");
                 e.printStackTrace();

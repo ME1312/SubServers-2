@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10,"i8":10,"i9":10};
+var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10,"i8":10};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -224,51 +224,45 @@ implements net.md_5.bungee.api.plugin.Listener</pre>
 </td>
 </tr>
 <tr id="i1" class="rowColor">
-<td class="colFirst"><code>net.md_5.bungee.api.config.ServerInfo</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Bungee/SubPlugin.html#getServerInfo-java.lang.String-">getServerInfo</a></span>(java.lang.String&nbsp;name)</code>
-<div class="block">Emulate BungeeCord's getServerInfo()</div>
-</td>
-</tr>
-<tr id="i2" class="altColor">
 <td class="colFirst"><code>java.util.Map&lt;java.lang.String,net.md_5.bungee.api.config.ServerInfo&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Bungee/SubPlugin.html#getServers--">getServers</a></span>()</code>
 <div class="block">Emulate BungeeCord's getServers()</div>
 </td>
 </tr>
-<tr id="i3" class="rowColor">
+<tr id="i2" class="altColor">
 <td class="colFirst"><code>java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Bungee/SubPlugin.html#getVersion--">getVersion</a></span>()</code>
 <div class="block">Further override BungeeCord's signature when patched into the same jar</div>
 </td>
 </tr>
-<tr id="i4" class="altColor">
-<td class="colFirst"><code>&lt;T&gt;&nbsp;java.lang.Object</code></td>
+<tr id="i3" class="rowColor">
+<td class="colFirst"><code>java.lang.Object</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Bungee/SubPlugin.html#redis-java.lang.String-net.ME1312.SubServers.Bungee.Library.NamedContainer...-">redis</a></span>(java.lang.String&nbsp;method,
      <a href="../../../../net/ME1312/SubServers/Bungee/Library/NamedContainer.html" title="class in net.ME1312.SubServers.Bungee.Library">NamedContainer</a>&lt;java.lang.Class&lt;?&gt;,?&gt;...&nbsp;args)</code>
 <div class="block">Reference a RedisBungee method via reflection</div>
 </td>
 </tr>
-<tr id="i5" class="rowColor">
+<tr id="i4" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Bungee/SubPlugin.html#reload--">reload</a></span>()</code>
 <div class="block">Load data from the config (will attempt to merge with current configuration)</div>
 </td>
 </tr>
-<tr id="i6" class="altColor">
+<tr id="i5" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Bungee/SubPlugin.html#reroute-net.md_5.bungee.api.event.ServerConnectEvent-">reroute</a></span>(net.md_5.bungee.api.event.ServerConnectEvent&nbsp;e)</code>&nbsp;</td>
 </tr>
-<tr id="i7" class="rowColor">
+<tr id="i6" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Bungee/SubPlugin.html#resetSudo-net.ME1312.SubServers.Bungee.Event.SubStoppedEvent-">resetSudo</a></span>(<a href="../../../../net/ME1312/SubServers/Bungee/Event/SubStoppedEvent.html" title="class in net.ME1312.SubServers.Bungee.Event">SubStoppedEvent</a>&nbsp;e)</code>&nbsp;</td>
 </tr>
-<tr id="i8" class="altColor">
+<tr id="i7" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Bungee/SubPlugin.html#startListeners--">startListeners</a></span>()</code>
 <div class="block">Load SubServers before BungeeCord finishes</div>
 </td>
 </tr>
-<tr id="i9" class="rowColor">
+<tr id="i8" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Bungee/SubPlugin.html#stopListeners--">stopListeners</a></span>()</code>
 <div class="block">Reset all changes made by startListeners</div>
@@ -280,7 +274,7 @@ implements net.md_5.bungee.api.plugin.Listener</pre>
 <!--   -->
 </a>
 <h3>Methods inherited from class&nbsp;net.md_5.bungee.BungeeCord</h3>
-<code>addConnection, broadcast, broadcast, broadcast, broadcast, constructServerInfo, createTitle, getChannels, getConfig, getConfigurationAdapter, getConnectionThrottle, getConsole, getConsoleReader, getDisabledCommands, getGameVersion, getInstance, getLogger, getOnlineCount, getPlayer, getPlayer, getPlayerByOfflineUUID, getPlayers, getPluginManager, getPluginsFolder, getProtocolVersion, getReconnectHandler, getScheduler, getTranslation, matchPlayer, registerChannel, registerChannels, removeConnection, setConfigurationAdapter, setReconnectHandler, start, stop, stop, unregisterChannel</code></li>
+<code>addConnection, broadcast, broadcast, broadcast, broadcast, constructServerInfo, createTitle, getChannels, getConfig, getConfigurationAdapter, getConnectionThrottle, getConsole, getConsoleReader, getDisabledCommands, getGameVersion, getInstance, getLogger, getOnlineCount, getPlayer, getPlayer, getPlayerByOfflineUUID, getPlayers, getPluginManager, getPluginsFolder, getProtocolVersion, getReconnectHandler, getScheduler, getServerInfo, getTranslation, matchPlayer, registerChannel, registerChannels, removeConnection, setConfigurationAdapter, setReconnectHandler, start, stop, stop, unregisterChannel</code></li>
 </ul>
 <ul class="blockList">
 <li class="blockList"><a name="methods.inherited.from.class.net.md_5.bungee.api.ProxyServer">
@@ -486,15 +480,13 @@ implements net.md_5.bungee.api.plugin.Listener</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>redis</h4>
-<pre>public&nbsp;&lt;T&gt;&nbsp;java.lang.Object&nbsp;redis(java.lang.String&nbsp;method,
-                                  <a href="../../../../net/ME1312/SubServers/Bungee/Library/NamedContainer.html" title="class in net.ME1312.SubServers.Bungee.Library">NamedContainer</a>&lt;java.lang.Class&lt;?&gt;,?&gt;...&nbsp;args)
-                           throws java.lang.NoSuchMethodException,
-                                  java.lang.reflect.InvocationTargetException,
-                                  java.lang.IllegalAccessException</pre>
+<pre>public&nbsp;java.lang.Object&nbsp;redis(java.lang.String&nbsp;method,
+                              <a href="../../../../net/ME1312/SubServers/Bungee/Library/NamedContainer.html" title="class in net.ME1312.SubServers.Bungee.Library">NamedContainer</a>&lt;java.lang.Class&lt;?&gt;,?&gt;...&nbsp;args)
+                       throws java.lang.NoSuchMethodException,
+                              java.lang.reflect.InvocationTargetException,
+                              java.lang.IllegalAccessException</pre>
 <div class="block">Reference a RedisBungee method via reflection</div>
 <dl>
-<dt><span class="paramLabel">Type Parameters:</span></dt>
-<dd><code>T</code> - Class Type</dd>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>method</code> - Method to reference</dd>
 <dd><code>args</code> - Method arguments</dd>
@@ -554,26 +546,6 @@ implements net.md_5.bungee.api.plugin.Listener</pre>
 <dd>Server Map</dd>
 <dt><span class="seeLabel">See Also:</span></dt>
 <dd><a href="../../../../net/ME1312/SubServers/Bungee/SubAPI.html#getServers--"><code>SubAPI.getServers()</code></a></dd>
-</dl>
-</li>
-</ul>
-<a name="getServerInfo-java.lang.String-">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>getServerInfo</h4>
-<pre>public&nbsp;net.md_5.bungee.api.config.ServerInfo&nbsp;getServerInfo(java.lang.String&nbsp;name)</pre>
-<div class="block">Emulate BungeeCord's getServerInfo()</div>
-<dl>
-<dt><span class="overrideSpecifyLabel">Overrides:</span></dt>
-<dd><code>getServerInfo</code>&nbsp;in class&nbsp;<code>net.md_5.bungee.BungeeCord</code></dd>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>name</code> - Server Name (Case Sensitive)</dd>
-<dt><span class="returnLabel">Returns:</span></dt>
-<dd>Server Info</dd>
-<dt><span class="seeLabel">See Also:</span></dt>
-<dd><a href="../../../../net/ME1312/SubServers/Bungee/SubAPI.html#getServer-java.lang.String-"><code>SubAPI.getServer(String)</code></a></dd>
 </dl>
 </li>
 </ul>

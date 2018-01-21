@@ -435,7 +435,7 @@ public class SubCommand {
             }
         }.usage("<Name>", "<Host>", "<Template>", "<Version>", "<Port>").description("Creates a SubServer").help(
                 "This command is used to create and launch a SubServer on the specified host via the network.",
-                "You may also create custom templates in ~/Templates.",
+                "Templates are downloaded from SubServers.Bungee to ~/Templates.",
                 "",
                 "The <Name> argument is required, and should be the name of",
                 "the SubServer you want to create.",
@@ -443,8 +443,8 @@ public class SubCommand {
                 "The <Host> argument is required, and should be the name of",
                 "the host you want to the server to run on.",
                 "",
-                "The <Type> argument is required, and should be the name of",
-                "the type of server you want to create.",
+                "The <Template> argument is required, and should be the name of",
+                "the template you want to create your server with.",
                 "",
                 "The <Version> argument is required, and should be a version",
                 "string of the type of server that you want to create",

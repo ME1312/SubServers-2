@@ -16,6 +16,8 @@ public class LogStream {
     private String name;
     private Container<PrintStream> stream;
     private boolean first = true;
+    protected long writing = 0;
+    protected Thread threadwriting = null;
 
     protected LogStream(String prefix, String name, Container<PrintStream> stream) {
         this.prefix = prefix;
@@ -33,7 +35,14 @@ public class LogStream {
      * @param obj Object
      */
     public void print(Object obj) {
-        print(obj.toString());
+        sync();
+        writing++;
+        if (obj == null) {
+            for (char c : "null".toCharArray()) write(c);
+        } else {
+            for (char c : obj.toString().toCharArray()) write(c);
+        }
+        writing--;
     }
 
     /**
@@ -42,7 +51,14 @@ public class LogStream {
      * @param str String
      */
     public void print(String str) {
-        print(str.toCharArray());
+        sync();
+        writing++;
+        if (str == null) {
+            for (char c : "null".toCharArray()) write(c);
+        } else {
+            for (char c : str.toCharArray()) write(c);
+        }
+        writing--;
     }
 
     /**
@@ -51,7 +67,10 @@ public class LogStream {
      * @param str Character Array
      */
     public void print(char[] str) {
-        for (char c : str) print(c);
+        sync();
+        writing++;
+        for (char c : str) write(c);
+        writing--;
     }
 
     /**
@@ -60,13 +79,46 @@ public class LogStream {
      * @param c Character
      */
     public void print(char c) {
+        sync();
+        writing++;
+        write(c);
+        writing--;
+    }
+
+    /**
+     * Write to the PrintStream
+     *
+     * @param c Character
+     */
+    protected void write(char c) {
+        threadwriting = Thread.currentThread();
         if (last != this) {
-            if (last != null && !last.first) last.print('\n');
+            if (last != null) {
+                stall();
+                if (!last.first) last.print('\n');
+            }
             LogStream.last = this;
+            first = true;
         }
         if (first) stream.get().print(prefix());
         stream.get().print(c);
         first = c == '\n';
+    }
+
+    protected void sync() {
+        try {
+            while (threadwriting != null && threadwriting != Thread.currentThread() && writing > 0) {
+                Thread.sleep(125);
+            }
+        } catch (Exception e) {}
+    }
+
+    private void stall() {
+        try {
+            while (last != null && last != this && last.writing > 0) {
+                Thread.sleep(125);
+            }
+        } catch (Exception e) {}
     }
 
     /**
@@ -75,10 +127,17 @@ public class LogStream {
      * @param obj Objects
      */
     public void println(Object... obj) {
+        sync();
+        writing++;
         for (Object OBJ : obj) {
-            print(OBJ);
-            print('\n');
+            if (OBJ == null) {
+                for (char c : "null".toCharArray()) write(c);
+            } else {
+                for (char c : OBJ.toString().toCharArray()) write(c);
+            }
+            write('\n');
         }
+        writing--;
     }
 
     /**
@@ -87,10 +146,17 @@ public class LogStream {
      * @param str Objects
      */
     public void println(String... str) {
+        sync();
+        writing++;
         for (String STR : str) {
-            print(STR);
-            print('\n');
+            if (STR == null) {
+                for (char c : "null".toCharArray()) write(c);
+            } else {
+                for (char c : STR.toCharArray()) write(c);
+            }
+            write('\n');
         }
+        writing--;
     }
 
     /**
@@ -99,10 +165,13 @@ public class LogStream {
      * @param str Character Arrays
      */
     public void println(char[]... str) {
+        sync();
+        writing++;
         for (char[] STR : str) {
-            print(STR);
-            print('\n');
+            for (char c : STR) write(c);
+            write('\n');
         }
+        writing--;
     }
 
     /**
@@ -111,9 +180,12 @@ public class LogStream {
      * @param c Characters
      */
     public void println(char... c) {
+        sync();
+        writing++;
         for (char C : c) {
-            print(C);
-            print('\n');
+            write(C);
+            write('\n');
         }
+        writing--;
     }
 }

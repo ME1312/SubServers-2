@@ -7,6 +7,7 @@ import net.ME1312.SubServers.Bungee.Library.Exception.InvalidTemplateException;
 import net.ME1312.SubServers.Bungee.Library.Util;
 import net.ME1312.SubServers.Bungee.Library.Version.Version;
 import net.ME1312.SubServers.Bungee.SubAPI;
+import org.json.JSONObject;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -134,7 +135,6 @@ public abstract class SubCreator {
             return directory;
         }
 
-
         /**
          * Get the Type of this Template
          *
@@ -160,6 +160,16 @@ public abstract class SubCreator {
          */
         public YAMLSection getConfigOptions() {
             return options;
+        }
+
+        @Override
+        public String toString() {
+            JSONObject tinfo = new JSONObject();
+            tinfo.put("enabled", isEnabled());
+            tinfo.put("display", getDisplayName());
+            tinfo.put("icon", getIcon());
+            tinfo.put("type", getType().toString());
+            return tinfo.toString();
         }
     }
     public enum ServerType {

@@ -90,7 +90,7 @@ public class PacketOutRunEvent implements Listener, PacketOut {
             args.put("player", ((event.getPlayer() == null)?null:event.getPlayer().toString()));
             args.put("host", event.getHost().getName());
             args.put("name", event.getName());
-            args.put("template", event.getTemplate().toString());
+            args.put("template", event.getTemplate().getName());
             args.put("version", event.getVersion().toString());
             args.put("port", event.getPort());
             plugin.subdata.broadcastPacket(new PacketOutRunEvent(event.getClass(), args));

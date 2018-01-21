@@ -84,7 +84,7 @@ Lang:
   'Interface.Host-Menu.Host-Server-Count': '&9$int$ Server(s)'
   'Interface.Host-Menu.No-Hosts': '&c&oThere are No Hosts'
   'Interface.Host-Menu.Group-Menu': '&6&lView Servers by Group'
-  'Interface.Host-Menu.SubServer-Menu': '&a&lView Servers'
+  'Interface.Host-Menu.Server-Menu': '&a&lView Servers'
   'Interface.Host-Admin.Title': 'Host/$str$'
   'Interface.Host-Admin.Creator': '&eCreate a SubServer'
   'Interface.Host-Admin.SubServers': '&aView SubServers'

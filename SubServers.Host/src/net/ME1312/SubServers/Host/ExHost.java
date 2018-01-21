@@ -1,5 +1,6 @@
 package net.ME1312.SubServers.Host;
 
+import jline.console.ConsoleReader;
 import net.ME1312.SubServers.Host.API.Event.CommandPreProcessEvent;
 import net.ME1312.SubServers.Host.API.Event.SubDisableEvent;
 import net.ME1312.SubServers.Host.API.Event.SubEnableEvent;
@@ -13,12 +14,14 @@ import net.ME1312.SubServers.Host.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Host.Library.Exception.IllegalPluginException;
 import net.ME1312.SubServers.Host.Library.Log.FileLogger;
 import net.ME1312.SubServers.Host.Library.Log.Logger;
+import net.ME1312.SubServers.Host.Library.PluginClassLoader;
 import net.ME1312.SubServers.Host.Library.NamedContainer;
 import net.ME1312.SubServers.Host.Library.UniversalFile;
 import net.ME1312.SubServers.Host.Library.Util;
 import net.ME1312.SubServers.Host.Library.Version.Version;
 import net.ME1312.SubServers.Host.Network.Cipher;
 import net.ME1312.SubServers.Host.Network.SubDataClient;
+import org.fusesource.jansi.AnsiConsole;
 import org.json.JSONObject;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -30,14 +33,14 @@ import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.net.InetAddress;
 import java.net.URL;
-import java.net.URLDecoder;
+import java.net.URLClassLoader;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.text.DecimalFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 
 /**
  * SubServers.Host Main Class
@@ -50,7 +53,6 @@ public final class ExHost {
 
     public Logger log;
     public final UniversalFile dir = new UniversalFile(new File(System.getProperty("user.dir")));
-    public final UniversalFile runtime;
     public YAMLConfig config;
     public YAMLSection host = null;
     public SubDataClient subdata = null;
@@ -59,6 +61,7 @@ public final class ExHost {
     public final Version bversion = new Version(2);
     public final SubAPI api = new SubAPI(this);
 
+    private ConsoleReader jline;
     private boolean running = false;
     private boolean ready = false;
 
@@ -70,18 +73,34 @@ public final class ExHost {
      */
     public static void main(String[] args) throws Exception {
         if (System.getProperty("RM.subservers", "true").equalsIgnoreCase("true")) {
-            new ExHost(new File(URLDecoder.decode(System.getProperty("subservers.host.runtime"), "UTF-8")), args);
+            new ExHost(args);
         } else {
             System.out.println(">> SubServers code has been disallowed to work on this machine");
             System.out.println(">> Check with your provider for more information");
             System.exit(1);
         }
     }
-    private ExHost(File runtime, String[] args) {
-        this.runtime = new UniversalFile(runtime);
+
+    private ExHost(String[] args) {
+        try {
+            JarFile jarFile = new JarFile(new File(ExHost.class.getProtectionDomain().getCodeSource().getLocation().toURI()));
+            Enumeration<JarEntry> entries = jarFile.entries();
+
+            boolean isplugin = false;
+            while (entries.hasMoreElements()) {
+                JarEntry entry = entries.nextElement();
+                if (!entry.isDirectory() && entry.getName().endsWith(".class")) {
+                    api.knownClasses.add(entry.getName().substring(0, entry.getName().length() - 6).replace('/', '.'));
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         log = new Logger("SubServers");
         try {
-            Logger.setup(System.out, System.err, dir);
+            jline = new ConsoleReader(System.in, AnsiConsole.out());
+            Logger.setup(AnsiConsole.out(), AnsiConsole.err(), jline, dir);
             log.info.println("Loading SubServers.Host v" + version.toString() + " Libraries");
             dir.mkdirs();
             new File(dir, "Plugins").mkdir();
@@ -95,6 +114,11 @@ public final class ExHost {
                 log.info.println("Updated ~/config.yml");
             }
             config = new YAMLConfig(new UniversalFile(dir, "config.yml"));
+
+            if (!(new UniversalFile(dir, "Templates").exists())) {
+                new UniversalFile(dir, "Templates").mkdir();
+                log.info.println("Created ~/Templates/");
+            }
 
             if (new UniversalFile(dir, "Recently Deleted").exists()) {
                 int f = new UniversalFile(dir, "Recently Deleted").listFiles().length;
@@ -154,49 +178,152 @@ public final class ExHost {
             }));
             creator = new SubCreator(this);
 
-            if (System.getProperty("subservers.host.plugins", "").length() > 0) {
+            UniversalFile pldir = new UniversalFile(dir, "Plugins");
+            if (pldir.exists() && pldir.listFiles().length > 0) {
                 long begin = Calendar.getInstance().getTime().getTime();
-                long i = 0;
                 log.info.println("Loading SubAPI Plugins...");
 
                 /*
-                 * Decode Plugin List Variable
+                 * Find Jars
                  */
-                String decoded = URLDecoder.decode(System.getProperty("subservers.host.plugins"), "UTF-8");
-                List<String> classes = new LinkedList<String>();
-                HashMap<String, SubPluginInfo> plugins = new LinkedHashMap<String, SubPluginInfo>();
-                if (!decoded.contains(" ")) {
-                    classes.add(decoded);
-                } else {
-                    classes.addAll(Arrays.asList(decoded.split(" ")));
+                LinkedList<URL> jars = new LinkedList<URL>();
+                for (File file : pldir.listFiles()) {
+                    if (file.getName().endsWith(".jar")) {
+                        jars.add(file.toURI().toURL());
+                    }
                 }
 
                 /*
-                 * Load Main Classes & Plugin Descriptions
+                 * Find & Pre-Load Main Classes
+                 * (Unordered)
                  */
-                for (String main : classes) {
-                    try {
-                        Class<?> clazz = Class.forName(main);
-                        if (!clazz.isAnnotationPresent(SubPlugin.class)) throw new ClassCastException("Cannot find plugin descriptor");
-
-                        Object obj = clazz.getConstructor().newInstance();
+                URLClassLoader superloader = new URLClassLoader(jars.toArray(new URL[jars.size()]), this.getClass().getClassLoader());
+                LinkedHashMap<String, NamedContainer<LinkedList<String>, LinkedHashMap<String, String>>> classes = new LinkedHashMap<String, NamedContainer<LinkedList<String>, LinkedHashMap<String, String>>>();
+                for (File file : pldir.listFiles()) {
+                    if (file.getName().endsWith(".jar")) {
                         try {
-                            SubPluginInfo plugin = new SubPluginInfo(this, obj, clazz.getAnnotation(SubPlugin.class).name(), new Version(clazz.getAnnotation(SubPlugin.class).version()),
-                                    Arrays.asList(clazz.getAnnotation(SubPlugin.class).authors()), (clazz.getAnnotation(SubPlugin.class).description().length() > 0)?clazz.getAnnotation(SubPlugin.class).description():null,
-                                    (clazz.getAnnotation(SubPlugin.class).website().length() > 0)?new URL(clazz.getAnnotation(SubPlugin.class).website()):null, Arrays.asList(clazz.getAnnotation(SubPlugin.class).loadBefore()),
-                                    Arrays.asList(clazz.getAnnotation(SubPlugin.class).dependencies()), Arrays.asList(clazz.getAnnotation(SubPlugin.class).softDependencies()));
-                            if (plugins.keySet().contains(plugin.getName().toLowerCase())) log.warn.println("Duplicate plugin: " + plugin.getName().toLowerCase());
-                            plugin.addExtra("subservers.plugin.loadafter", new ArrayList<String>());
-                            plugins.put(plugin.getName().toLowerCase(), plugin);
+                            JarFile jar = new JarFile(file);
+                            Enumeration<JarEntry> entries = jar.entries();
+                            LinkedList<String> mains = new LinkedList<String>();
+                            List<String> contents = new ArrayList<String>();
+
+                            if (jar.getJarEntry("package.xml") != null) {
+                                try {
+                                    NodeList xml = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(jar.getInputStream(jar.getJarEntry("package.xml"))).getElementsByTagName("class");
+                                    if (xml.getLength() > 0) {
+                                        for (int i = 0; i < xml.getLength(); i++) {
+                                            mains.add(xml.item(i).getTextContent());
+                                        }
+                                    }
+                                } catch (Exception e) {
+                                    log.error.println(new IllegalPluginException(e, "Couldn't load package.xml for " + file.getName()));
+                                }
+                            } else {
+                                log.error.println(new IllegalPluginException(new FileNotFoundException(), "Couldn't find package.xml for " + file.getName()));
+                            }
+
+                            boolean isplugin = false;
+                            while (entries.hasMoreElements()) {
+                                JarEntry entry = entries.nextElement();
+                                if (!entry.isDirectory() && entry.getName().endsWith(".class")) {
+                                    String cname = entry.getName().substring(0, entry.getName().length() - 6).replace('/', '.');
+                                    contents.add(cname);
+                                    if (mains.contains(cname)) {
+                                        try {
+                                            Class<?> clazz = superloader.loadClass(cname);
+                                            if (clazz.isAnnotationPresent(SubPlugin.class)) {
+                                                NamedContainer<LinkedList<String>, LinkedHashMap<String, String>> jarmap = (classes.keySet().contains(file.getName()))?classes.get(file.getName()):new NamedContainer<LinkedList<String>, LinkedHashMap<String, String>>(new LinkedList<String>(), new LinkedHashMap<>());
+                                                for (String dependancy : clazz.getAnnotation(SubPlugin.class).dependencies()) jarmap.name().add(dependancy);
+                                                for (String dependancy : clazz.getAnnotation(SubPlugin.class).softDependencies()) jarmap.name().add(dependancy);
+                                                jarmap.get().put(clazz.getAnnotation(SubPlugin.class).name(), cname);
+                                                classes.put(file.getName(), jarmap);
+                                                isplugin = true;
+                                                mains.remove(cname);
+                                            } else {
+                                                log.error.println(new IllegalPluginException(new ClassCastException(), "Main class isn't annotated as a SubPlugin: " + cname));
+                                            }
+                                        } catch (Throwable e) {
+                                            log.error.println(new IllegalPluginException(e, "Couldn't load main class: " + cname));
+                                        }
+                                    }
+                                }
+                            }
+
+                            for (String main : mains) {
+                                log.error.println(new IllegalPluginException(new ClassNotFoundException(), "Couldn't find main class: " + main));
+                            }
+
+                            if (isplugin) api.knownClasses.addAll(contents);
+                            jar.close();
                         } catch (Throwable e) {
-                            log.error.println(new IllegalPluginException(e, "Cannot load plugin descriptor for main class: " + main));
+                            log.error.println(new InvocationTargetException(e, "Problem searching plugin jar: " + file.getName()));
                         }
-                    } catch (ClassCastException e) {
-                        log.error.println(new IllegalPluginException(e, "Main class isn't annotated as a SubPlugin: " + main));
-                    } catch (InvocationTargetException e) {
-                        log.error.println(new IllegalPluginException(e.getTargetException(), "Uncaught exception occurred while loading main class: " + main));
-                    } catch (Throwable e) {
-                        log.error.println(new IllegalPluginException(e, "Cannot load main class: " + main));
+                    }
+                }
+                superloader.close();
+
+                /*
+                 * Load Main Classes & Plugin Descriptions
+                 * (Ordered by Known Dependencies)
+                 */
+                int progress = 1;
+                HashMap<String, PluginClassLoader> loaders = new HashMap<String, PluginClassLoader>();
+                HashMap<String, SubPluginInfo> plugins = new LinkedHashMap<String, SubPluginInfo>();
+                while (classes.size() > 0) {
+                    LinkedHashMap<String, LinkedList<String>> loaded = new LinkedHashMap<String, LinkedList<String>>();
+                    for (String jar : classes.keySet()) {
+                        LinkedList<String> loadedlist = new LinkedList<String>();
+                        if (!loaders.keySet().contains(jar)) loaders.put(jar, new PluginClassLoader(this.getClass().getClassLoader(), new File(pldir, jar).toURI().toURL()));
+                        for (String name : classes.get(jar).get().keySet()) {
+                            boolean load = true;
+                            for (String depend : classes.get(jar).name()) {
+                                if (!plugins.keySet().contains(depend.toLowerCase())) {
+                                    load = progress <= 0;
+                                }
+                            }
+
+                            if (load) {
+                                String main = classes.get(jar).get().get(name);
+                                try {
+                                    Class<?> clazz = loaders.get(jar).loadClass(main);
+                                    if (!clazz.isAnnotationPresent(SubPlugin.class))
+                                        throw new ClassCastException("Cannot find plugin descriptor");
+
+                                    Object obj = clazz.getConstructor().newInstance();
+                                    try {
+                                        SubPluginInfo plugin = new SubPluginInfo(this, obj, clazz.getAnnotation(SubPlugin.class).name(), new Version(clazz.getAnnotation(SubPlugin.class).version()),
+                                                Arrays.asList(clazz.getAnnotation(SubPlugin.class).authors()), (clazz.getAnnotation(SubPlugin.class).description().length() > 0) ? clazz.getAnnotation(SubPlugin.class).description() : null,
+                                                (clazz.getAnnotation(SubPlugin.class).website().length() > 0) ? new URL(clazz.getAnnotation(SubPlugin.class).website()) : null, Arrays.asList(clazz.getAnnotation(SubPlugin.class).loadBefore()),
+                                                Arrays.asList(clazz.getAnnotation(SubPlugin.class).dependencies()), Arrays.asList(clazz.getAnnotation(SubPlugin.class).softDependencies()));
+                                        if (plugins.keySet().contains(plugin.getName().toLowerCase()))
+                                            log.warn.println("Duplicate plugin: " + plugin.getName().toLowerCase());
+                                        plugin.addExtra("subservers.plugin.loadafter", new ArrayList<String>());
+                                        plugins.put(plugin.getName().toLowerCase(), plugin);
+                                    } catch (Throwable e) {
+                                        log.error.println(new IllegalPluginException(e, "Cannot load plugin descriptor for main class: " + main));
+                                    }
+                                } catch(ClassCastException e) {
+                                    log.error.println(new IllegalPluginException(e, "Main class isn't annotated as a SubPlugin: " + main));
+                                } catch(InvocationTargetException e) {
+                                    log.error.println(new IllegalPluginException(e.getTargetException(), "Uncaught exception occurred while loading main class: " + main));
+                                } catch(Throwable e) {
+                                    log.error.println(new IllegalPluginException(e, "Couldn't load main class: " + main));
+                                }
+                                loadedlist.add(name);
+                            }
+                        }
+                        if (loadedlist.size() > 0) loaded.put(jar, loadedlist);
+                    }
+                    progress = 0;
+                    for (String jar : loaded.keySet()) {
+                        NamedContainer<LinkedList<String>, LinkedHashMap<String, String>> jarmap = classes.get(jar);
+                        progress++;
+                        for (String main : loaded.get(jar)) jarmap.get().remove(main);
+                        if (jarmap.get().size() > 0) {
+                            classes.put(jar, jarmap);
+                        } else {
+                            classes.remove(jar);
+                        }
                     }
                 }
 
@@ -215,7 +342,9 @@ public final class ExHost {
 
                 /*
                  * Register Plugins
+                 * (Ordered by LoadBefore & Dependencies)
                  */
+                int i = 0;
                 while (plugins.size() > 0) {
                     List<String> loaded = new ArrayList<String>();
                     for (SubPluginInfo plugin : plugins.values()) {
@@ -256,7 +385,7 @@ public final class ExHost {
                             loaded.add(plugin.getName().toLowerCase());
                         }
                     }
-                    int progress = 0;
+                    progress = 0;
                     for (String name : loaded) {
                         progress++;
                         plugins.remove(name);
@@ -271,7 +400,7 @@ public final class ExHost {
                  * Enable Plugins
                  */
                 api.executeEvent(new SubEnableEvent(this));
-                log.info.println(i + " Plugin"+((i == 1)?"":"s") + " loaded in" + new DecimalFormat("0.000").format((Calendar.getInstance().getTime().getTime() - begin) / 1000D) + "s");
+                log.info.println(i + " Plugin"+((i == 1)?"":"s") + " loaded in " + new DecimalFormat("0.000").format((Calendar.getInstance().getTime().getTime() - begin) / 1000D) + "s");
             }
 
             loadDefaults();
@@ -329,12 +458,11 @@ public final class ExHost {
         SubAPI.getInstance().executeEvent(new SubReloadEvent(this));
     }
 
-    private void loop() {
-        Scanner console = new Scanner(System.in);
+    private void loop() throws Exception {
+        String umsg;
         ready = true;
-        while (ready && console.hasNextLine()) {
-            if (!ready) continue;
-            final String umsg = console.nextLine();
+        while (ready && (umsg = jline.readLine(">")) != null) {
+            if (!ready || umsg.equals("")) continue;
             final CommandPreProcessEvent event;
             api.executeEvent(event = new CommandPreProcessEvent(this, umsg));
             if (!event.isCancelled()) {
@@ -343,17 +471,15 @@ public final class ExHost {
                     ArrayList<String> args = new ArrayList<String>();
                     args.addAll(Arrays.asList(umsg.contains(" ") ? umsg.split(" ") : new String[]{umsg}));
                     args.remove(0);
-
-                    new Thread(() -> {
-                        try {
-                            api.commands.get(cmd.toLowerCase()).command(cmd, args.toArray(new String[args.size()]));
-                        } catch (Exception e) {
-                            log.error.println(new InvocationTargetException(e, "Uncaught exception while running command"));
-                        }
-                    }).start();
+                    try {
+                        api.commands.get(cmd.toLowerCase()).command(cmd, args.toArray(new String[args.size()]));
+                    } catch (Exception e) {
+                        log.error.println(new InvocationTargetException(e, "Uncaught exception while running command"));
+                    }
                 } else {
                     log.message.println("Unknown Command - " + umsg);
                 }
+                jline.getOutput().write("\b \b");
             }
         }
     }
@@ -411,34 +537,6 @@ public final class ExHost {
 
             Util.isException(FileLogger::end);
             System.exit(exit);
-        }
-    }
-
-    private void unzip(InputStream zip, File dir) {
-        byte[] buffer = new byte[1024];
-        try{
-            ZipInputStream zis = new ZipInputStream(zip);
-            ZipEntry ze;
-            while ((ze = zis.getNextEntry()) != null) {
-                File newFile = new File(dir + File.separator + ze.getName());
-                if (ze.isDirectory()) {
-                    newFile.mkdirs();
-                    continue;
-                } else if (!newFile.getParentFile().exists()) {
-                    newFile.getParentFile().mkdirs();
-                }
-                FileOutputStream fos = new FileOutputStream(newFile);
-                int len;
-                while ((len = zis.read(buffer)) > 0) {
-                    fos.write(buffer, 0, len);
-                }
-
-                fos.close();
-            }
-            zis.closeEntry();
-            zis.close();
-        } catch(IOException ex) {
-            ex.printStackTrace();
         }
     }
 }

@@ -224,6 +224,7 @@ public final class SubCommand extends CommandX {
                             if (!server.getName().equals(server.getDisplayName())) sender.sendMessage("  - Real Name: " + server.getName());
                             sender.sendMessage("  - Host: " + server.getHost().getDisplayName() + ((!server.getHost().getName().equals(server.getHost().getDisplayName()))?" ("+server.getHost().getName()+')':""));
                             sender.sendMessage("  - Enabled: " + ((server.isEnabled())?"yes":"no"));
+                            sender.sendMessage("  - Editable: " + ((server.isEditable())?"yes":"no"));
                             if (server.getGroups().size() > 0) {
                                 sender.sendMessage("  - Groups:");
                                 for (String group : server.getGroups()) sender.sendMessage("    - " + group);
@@ -239,6 +240,7 @@ public final class SubCommand extends CommandX {
                                 sender.sendMessage("  - Incompatibilities:");
                                 for (SubServer other : server.getIncompatibilities()) sender.sendMessage("    - " + other.getDisplayName() + ((current.contains(other))?"*":"") + ((!other.getName().equals(other.getDisplayName()))?" ("+other.getName()+')':""));
                             }
+                            sender.sendMessage("  - Signature: " + server.getSignature());
 
                         }
                     } else {
