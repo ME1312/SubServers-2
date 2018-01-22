@@ -98,33 +98,35 @@ public final class SubCommand extends CommandX {
                             int i = 0;
                             boolean sent = false;
                             String div = ChatColor.RESET + ", ";
-                            sender.sendMessage("SubServers > Group/Server List:");
-                            for (String group : json.getJSONObject("groups").keySet()) {
-                                String message = "";
-                                message += ChatColor.GOLD + group + ChatColor.RESET + ": ";
-                                for (String server : json.getJSONObject("groups").getJSONObject(group).keySet()) {
-                                    if (i != 0) message += div;
-                                    if (!json.getJSONObject("groups").getJSONObject(group).getJSONObject(server).keySet().contains("enabled")) {
-                                        message += ChatColor.WHITE;
-                                    } else if (json.getJSONObject("groups").getJSONObject(group).getJSONObject(server).getBoolean("temp")) {
-                                        message += ChatColor.AQUA;
-                                    } else if (json.getJSONObject("groups").getJSONObject(group).getJSONObject(server).getBoolean("running")) {
-                                        message += ChatColor.GREEN;
-                                    } else if (json.getJSONObject("groups").getJSONObject(group).getJSONObject(server).getBoolean("enabled") && json.getJSONObject("groups").getJSONObject(group).getJSONObject(server).getJSONArray("incompatible").length() == 0) {
-                                        message += ChatColor.YELLOW;
-                                    } else {
-                                        message += ChatColor.RED;
+                            if (json.getJSONObject("groups").length() > 0) {
+                                sender.sendMessage("SubServers > Group/Server List:");
+                                for (String group : json.getJSONObject("groups").keySet()) {
+                                    String message = "";
+                                    message += ChatColor.GOLD + group + ChatColor.RESET + ": ";
+                                    for (String server : json.getJSONObject("groups").getJSONObject(group).keySet()) {
+                                        if (i != 0) message += div;
+                                        if (!json.getJSONObject("groups").getJSONObject(group).getJSONObject(server).keySet().contains("enabled")) {
+                                            message += ChatColor.WHITE;
+                                        } else if (json.getJSONObject("groups").getJSONObject(group).getJSONObject(server).getBoolean("temp")) {
+                                            message += ChatColor.AQUA;
+                                        } else if (json.getJSONObject("groups").getJSONObject(group).getJSONObject(server).getBoolean("running")) {
+                                            message += ChatColor.GREEN;
+                                        } else if (json.getJSONObject("groups").getJSONObject(group).getJSONObject(server).getBoolean("enabled") && json.getJSONObject("groups").getJSONObject(group).getJSONObject(server).getJSONArray("incompatible").length() == 0) {
+                                            message += ChatColor.YELLOW;
+                                        } else {
+                                            message += ChatColor.RED;
+                                        }
+                                        message += json.getJSONObject("groups").getJSONObject(group).getJSONObject(server).getString("display") + " (" + json.getJSONObject("groups").getJSONObject(group).getJSONObject(server).getString("address") + ((server.equals(json.getJSONObject("groups").getJSONObject(group).getJSONObject(server).getString("display"))) ? "" : ChatColor.stripColor(div) + server) + ")";
+                                        i++;
                                     }
-                                    message += json.getJSONObject("groups").getJSONObject(group).getJSONObject(server).getString("display") + " (" + json.getJSONObject("groups").getJSONObject(group).getJSONObject(server).getString("address") + ((server.equals(json.getJSONObject("groups").getJSONObject(group).getJSONObject(server).getString("display")))?"":ChatColor.stripColor(div)+server) + ")";
-                                    i++;
+                                    if (i == 0) message += ChatColor.RESET + "(none)";
+                                    sender.sendMessage(message);
+                                    i = 0;
+                                    sent = true;
                                 }
-                                if (i == 0) message += ChatColor.RESET + "(none)";
-                                sender.sendMessage(message);
-                                i = 0;
-                                sent = true;
+                                if (!sent) sender.sendMessage(ChatColor.RESET + "(none)");
+                                sent = false;
                             }
-                            if (!sent) sender.sendMessage(ChatColor.RESET + "(none)");
-                            sent = false;
                             sender.sendMessage("SubServers > Host/SubServer List:");
                             for (String host : json.getJSONObject("hosts").keySet()) {
                                 String message = "";

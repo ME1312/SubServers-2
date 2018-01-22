@@ -16,8 +16,8 @@ public class LogStream {
     private String name;
     private Container<PrintStream> stream;
     private boolean first = true;
+    private Thread threadwriting = null;
     protected long writing = 0;
-    protected Thread threadwriting = null;
 
     protected LogStream(String prefix, String name, Container<PrintStream> stream) {
         this.prefix = prefix;
@@ -105,17 +105,17 @@ public class LogStream {
         first = c == '\n';
     }
 
-    protected void sync() {
+    private void stall() {
         try {
-            while (threadwriting != null && threadwriting != Thread.currentThread() && writing > 0) {
+            while (last != null && last != this && last.writing > 0) {
                 Thread.sleep(125);
             }
         } catch (Exception e) {}
     }
 
-    private void stall() {
+    protected void sync() {
         try {
-            while (last != null && last != this && last.writing > 0) {
+            while (threadwriting != null && threadwriting != Thread.currentThread() && writing > 0) {
                 Thread.sleep(125);
             }
         } catch (Exception e) {}

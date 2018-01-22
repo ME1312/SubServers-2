@@ -229,7 +229,7 @@ public final class SubAPI {
      * @param listeners Listeners
      */
     @SuppressWarnings("unchecked")
-    void addListener(SubPluginInfo plugin, Object... listeners) {
+    public void addListener(SubPluginInfo plugin, Object... listeners) {
         for (Object listener : listeners) {
             if (Util.isNull(plugin, listener)) throw new NullPointerException();
             for (Method method : Arrays.asList(listener.getClass().getMethods())) {
@@ -246,14 +246,16 @@ public final class SubAPI {
                             events.put((Class<Event>) method.getParameterTypes()[0], plugins);
                             this.listeners.put(method.getAnnotation(EventHandler.class).order(), events);
                         } else {
-                            this.host.log.error.println(
-                                    "Cannot register EventHandler in class \"" + listener.getClass().getCanonicalName() + "\" using method \"" + method.getName() + "\":",
+                            plugin.getLogger().error.println(
+                                    "Cannot register listener \"" + listener.getClass().getCanonicalName() + '.' + method.getName() + "(" + method.getParameterTypes()[0].getCanonicalName() + ")\":",
                                     "\"" + method.getParameterTypes()[0].getCanonicalName() + "\" is not an Event");
                         }
                     } else {
-                        this.host.log.error.println(
-                                "Cannot register EventHandler in class \"" + listener.getClass().getCanonicalName() + "\" using method \"" + method.getName() + "\":",
-                                ((method.getParameterTypes().length > 0) ? "Too many" : "No") + " parameters for SubEvent to execute");
+                        LinkedList<String> args = new LinkedList<String>();
+                        for (Class<?> clazz : method.getParameterTypes()) args.add(clazz.getCanonicalName());
+                        plugin.getLogger().error.println(
+                                "Cannot register listener \"" + listener.getClass().getCanonicalName() + '.' + method.getName() + "(" + args.toString().substring(1, args.toString().length() - 1) + ")\":",
+                                ((method.getParameterTypes().length > 0) ? "Too many" : "No") + " parameters for method to be executed");
                     }
                 }
             }
@@ -310,11 +312,11 @@ public final class SubAPI {
                                 try {
                                     method.invoke(listener, event);
                                 } catch (InvocationTargetException e) {
-                                    this.host.log.error.println("Event \"" + method.getName() + "(" + event.getClass().getTypeName() + ")\" in class \"" + listener.getClass().getCanonicalName() + "\" had an unhandled exception:");
-                                    this.host.log.error.println(e.getTargetException());
+                                    plugin.getLogger().error.println("Event listener \"" + listener.getClass().getCanonicalName() + '.' + method.getName() + "(" + event.getClass().getTypeName() + ")\" had an unhandled exception:");
+                                    plugin.getLogger().error.println(e.getTargetException());
                                 } catch (IllegalAccessException e) {
-                                    this.host.log.error.println("Cannot access method \"" + method.getName() + "\" in class \"" + listener.getClass().getCanonicalName() + "\"");
-                                    this.host.log.error.println(e);
+                                    plugin.getLogger().error.println("Cannot access method \"" + listener.getClass().getCanonicalName() + '.' + method.getName() + "(" + event.getClass().getTypeName() + ")\"");
+                                    plugin.getLogger().error.println(e);
                                 }
                             }
                         }

@@ -197,16 +197,19 @@ public class SubPluginInfo implements ExtraDataHandler {
 
     @Override
     public void addExtra(String handle, Object value) {
+        if (Util.isNull(handle, value)) throw new NullPointerException();
         extra.set(handle, value);
     }
 
     @Override
     public boolean hasExtra(String handle) {
+        if (Util.isNull(handle)) throw new NullPointerException();
         return extra.getKeys().contains(handle);
     }
 
     @Override
     public YAMLValue getExtra(String handle) {
+        if (Util.isNull(handle)) throw new NullPointerException();
         return extra.get(handle);
     }
 
@@ -217,6 +220,7 @@ public class SubPluginInfo implements ExtraDataHandler {
 
     @Override
     public void removeExtra(String handle) {
+        if (Util.isNull(handle)) throw new NullPointerException();
         extra.remove(handle);
     }
 }

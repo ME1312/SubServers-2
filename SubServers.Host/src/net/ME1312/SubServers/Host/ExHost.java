@@ -58,7 +58,7 @@ public final class ExHost {
     public SubDataClient subdata = null;
 
     public final Version version = new Version("2.13a");
-    public final Version bversion = new Version(2);
+    public final Version bversion = new Version(3);
     public final SubAPI api = new SubAPI(this);
 
     private ConsoleReader jline;
@@ -178,23 +178,22 @@ public final class ExHost {
             }));
             creator = new SubCreator(this);
 
+            /*
+             * Find Jars
+             */
             UniversalFile pldir = new UniversalFile(dir, "Plugins");
-            if (pldir.exists() && pldir.listFiles().length > 0) {
+            LinkedList<URL> jars = new LinkedList<URL>();
+            if (pldir.exists() && pldir.isDirectory()) for (File file : pldir.listFiles()) {
+                if (file.getName().endsWith(".jar")) {
+                    jars.add(file.toURI().toURL());
+                }
+            }
+            if (jars.size() > 0) {
                 long begin = Calendar.getInstance().getTime().getTime();
                 log.info.println("Loading SubAPI Plugins...");
 
                 /*
-                 * Find Jars
-                 */
-                LinkedList<URL> jars = new LinkedList<URL>();
-                for (File file : pldir.listFiles()) {
-                    if (file.getName().endsWith(".jar")) {
-                        jars.add(file.toURI().toURL());
-                    }
-                }
-
-                /*
-                 * Find & Pre-Load Main Classes
+                 * Load Jars & Find Main Classes
                  * (Unordered)
                  */
                 URLClassLoader superloader = new URLClassLoader(jars.toArray(new URL[jars.size()]), this.getClass().getClassLoader());
@@ -218,8 +217,6 @@ public final class ExHost {
                                 } catch (Exception e) {
                                     log.error.println(new IllegalPluginException(e, "Couldn't load package.xml for " + file.getName()));
                                 }
-                            } else {
-                                log.error.println(new IllegalPluginException(new FileNotFoundException(), "Couldn't find package.xml for " + file.getName()));
                             }
 
                             boolean isplugin = false;
@@ -229,31 +226,35 @@ public final class ExHost {
                                     String cname = entry.getName().substring(0, entry.getName().length() - 6).replace('/', '.');
                                     contents.add(cname);
                                     if (mains.contains(cname)) {
+                                        mains.remove(cname);
                                         try {
                                             Class<?> clazz = superloader.loadClass(cname);
-                                            if (clazz.isAnnotationPresent(SubPlugin.class)) {
-                                                NamedContainer<LinkedList<String>, LinkedHashMap<String, String>> jarmap = (classes.keySet().contains(file.getName()))?classes.get(file.getName()):new NamedContainer<LinkedList<String>, LinkedHashMap<String, String>>(new LinkedList<String>(), new LinkedHashMap<>());
-                                                for (String dependancy : clazz.getAnnotation(SubPlugin.class).dependencies()) jarmap.name().add(dependancy);
-                                                for (String dependancy : clazz.getAnnotation(SubPlugin.class).softDependencies()) jarmap.name().add(dependancy);
-                                                jarmap.get().put(clazz.getAnnotation(SubPlugin.class).name(), cname);
-                                                classes.put(file.getName(), jarmap);
-                                                isplugin = true;
-                                                mains.remove(cname);
-                                            } else {
-                                                log.error.println(new IllegalPluginException(new ClassCastException(), "Main class isn't annotated as a SubPlugin: " + cname));
-                                            }
+                                            if (!clazz.isAnnotationPresent(SubPlugin.class))
+                                                throw new ClassCastException("Cannot find plugin descriptor");
+
+                                            NamedContainer<LinkedList<String>, LinkedHashMap<String, String>> jarmap = (classes.keySet().contains(file.getName()))?classes.get(file.getName()):new NamedContainer<LinkedList<String>, LinkedHashMap<String, String>>(new LinkedList<String>(), new LinkedHashMap<>());
+                                            for (String dependancy : clazz.getAnnotation(SubPlugin.class).dependencies()) jarmap.name().add(dependancy);
+                                            for (String dependancy : clazz.getAnnotation(SubPlugin.class).softDependencies()) jarmap.name().add(dependancy);
+                                            jarmap.get().put(clazz.getAnnotation(SubPlugin.class).name(), cname);
+                                            classes.put(file.getName(), jarmap);
+                                            isplugin = true;
+                                        } catch (ClassCastException e) {
+                                            log.error.println(new IllegalPluginException(e, "Main class isn't annotated as a SubPlugin: " + cname));
                                         } catch (Throwable e) {
                                             log.error.println(new IllegalPluginException(e, "Couldn't load main class: " + cname));
                                         }
                                     }
                                 }
                             }
-
                             for (String main : mains) {
                                 log.error.println(new IllegalPluginException(new ClassNotFoundException(), "Couldn't find main class: " + main));
                             }
 
-                            if (isplugin) api.knownClasses.addAll(contents);
+                            if (!isplugin) {
+                                new PluginClassLoader(this.getClass().getClassLoader(), file.toURI().toURL());
+                                log.info.println("Loaded Library: " + file.getName());
+                            }
+                            api.knownClasses.addAll(contents);
                             jar.close();
                         } catch (Throwable e) {
                             log.error.println(new InvocationTargetException(e, "Problem searching plugin jar: " + file.getName()));
@@ -292,21 +293,21 @@ public final class ExHost {
                                     Object obj = clazz.getConstructor().newInstance();
                                     try {
                                         SubPluginInfo plugin = new SubPluginInfo(this, obj, clazz.getAnnotation(SubPlugin.class).name(), new Version(clazz.getAnnotation(SubPlugin.class).version()),
-                                                Arrays.asList(clazz.getAnnotation(SubPlugin.class).authors()), (clazz.getAnnotation(SubPlugin.class).description().length() > 0) ? clazz.getAnnotation(SubPlugin.class).description() : null,
-                                                (clazz.getAnnotation(SubPlugin.class).website().length() > 0) ? new URL(clazz.getAnnotation(SubPlugin.class).website()) : null, Arrays.asList(clazz.getAnnotation(SubPlugin.class).loadBefore()),
+                                                Arrays.asList(clazz.getAnnotation(SubPlugin.class).authors()), (clazz.getAnnotation(SubPlugin.class).description().length() > 0)?clazz.getAnnotation(SubPlugin.class).description():null,
+                                                (clazz.getAnnotation(SubPlugin.class).website().length() > 0)?new URL(clazz.getAnnotation(SubPlugin.class).website()):null, Arrays.asList(clazz.getAnnotation(SubPlugin.class).loadBefore()),
                                                 Arrays.asList(clazz.getAnnotation(SubPlugin.class).dependencies()), Arrays.asList(clazz.getAnnotation(SubPlugin.class).softDependencies()));
                                         if (plugins.keySet().contains(plugin.getName().toLowerCase()))
                                             log.warn.println("Duplicate plugin: " + plugin.getName().toLowerCase());
                                         plugin.addExtra("subservers.plugin.loadafter", new ArrayList<String>());
                                         plugins.put(plugin.getName().toLowerCase(), plugin);
                                     } catch (Throwable e) {
-                                        log.error.println(new IllegalPluginException(e, "Cannot load plugin descriptor for main class: " + main));
+                                        log.error.println(new IllegalPluginException(e, "Couldn't load plugin descriptor for main class: " + main));
                                     }
-                                } catch(ClassCastException e) {
+                                } catch (ClassCastException e) {
                                     log.error.println(new IllegalPluginException(e, "Main class isn't annotated as a SubPlugin: " + main));
-                                } catch(InvocationTargetException e) {
+                                } catch (InvocationTargetException e) {
                                     log.error.println(new IllegalPluginException(e.getTargetException(), "Uncaught exception occurred while loading main class: " + main));
-                                } catch(Throwable e) {
+                                } catch (Throwable e) {
                                     log.error.println(new IllegalPluginException(e, "Couldn't load main class: " + main));
                                 }
                                 loadedlist.add(name);

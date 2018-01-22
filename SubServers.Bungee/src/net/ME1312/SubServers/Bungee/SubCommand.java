@@ -140,37 +140,39 @@ public final class SubCommand extends CommandX {
                     int i = 0;
                     boolean sent = false;
                     sender.sendMessage("SubServers > Group/Server List:");
-                    for (String group : plugin.api.getGroups().keySet()) {
-                        String message = "";
-                        message += ChatColor.GOLD + group + ChatColor.RESET + ": ";
-                        List<String> names = new ArrayList<String>();
-                        Map<String, Server> servers = plugin.api.getServers();
-                        for (Server server : plugin.api.getGroup(group)) names.add(server.getName());
-                        Collections.sort(names);
-                        for (String name : names) {
-                            if (i != 0) message += div;
-                            Server server = servers.get(name.toLowerCase());
-                            if (!(servers.get(name.toLowerCase()) instanceof SubServer)) {
-                                message += ChatColor.WHITE;
-                            } else if (((SubServer) server).isTemporary()) {
-                                message += ChatColor.AQUA;
-                            } else if (((SubServer) server).isRunning()) {
-                                message += ChatColor.GREEN;
-                            } else if (((SubServer) server).isEnabled() && ((SubServer) server).getCurrentIncompatibilities().size() == 0) {
-                                message += ChatColor.YELLOW;
-                            } else {
-                                message += ChatColor.RED;
+                    if (plugin.api.getGroups().keySet().size() > 0) {
+                        for (String group : plugin.api.getGroups().keySet()) {
+                            String message = "";
+                            message += ChatColor.GOLD + group + ChatColor.RESET + ": ";
+                            List<String> names = new ArrayList<String>();
+                            Map<String, Server> servers = plugin.api.getServers();
+                            for (Server server : plugin.api.getGroup(group)) names.add(server.getName());
+                            Collections.sort(names);
+                            for (String name : names) {
+                                if (i != 0) message += div;
+                                Server server = servers.get(name.toLowerCase());
+                                if (!(servers.get(name.toLowerCase()) instanceof SubServer)) {
+                                    message += ChatColor.WHITE;
+                                } else if (((SubServer) server).isTemporary()) {
+                                    message += ChatColor.AQUA;
+                                } else if (((SubServer) server).isRunning()) {
+                                    message += ChatColor.GREEN;
+                                } else if (((SubServer) server).isEnabled() && ((SubServer) server).getCurrentIncompatibilities().size() == 0) {
+                                    message += ChatColor.YELLOW;
+                                } else {
+                                    message += ChatColor.RED;
+                                }
+                                message += server.getDisplayName() + " (" + server.getAddress().getAddress().getHostAddress() + ':' + server.getAddress().getPort() + ((server.getName().equals(server.getDisplayName())) ? "" : ChatColor.stripColor(div) + server.getName()) + ")";
+                                i++;
                             }
-                            message += server.getDisplayName() + " (" + server.getAddress().getAddress().getHostAddress() + ':' + server.getAddress().getPort() + ((server.getName().equals(server.getDisplayName()))?"":ChatColor.stripColor(div)+server.getName()) + ")";
-                            i++;
+                            if (i == 0) message += ChatColor.RESET + "(none)";
+                            sender.sendMessage(message);
+                            i = 0;
+                            sent = true;
                         }
-                        if (i == 0) message += ChatColor.RESET + "(none)";
-                        sender.sendMessage(message);
-                        i = 0;
-                        sent = true;
+                        if (!sent) sender.sendMessage(ChatColor.RESET + "(none)");
+                        sent = false;
                     }
-                    if (!sent) sender.sendMessage(ChatColor.RESET + "(none)");
-                    sent = false;
                     sender.sendMessage("SubServers > Host/SubServer List:");
                     for (Host host : plugin.api.getHosts().values()) {
                         String message = "";

@@ -10,7 +10,7 @@ import java.util.concurrent.CopyOnWriteArraySet;
  * Plugin ClassLoader Class
  */
 public class PluginClassLoader extends URLClassLoader {
-    private static final Set<PluginClassLoader> allLoaders = new CopyOnWriteArraySet<PluginClassLoader>();
+    private static final Set<PluginClassLoader> loaders = new CopyOnWriteArraySet<PluginClassLoader>();
 
     /**
      * Load Classes from URLs
@@ -19,7 +19,7 @@ public class PluginClassLoader extends URLClassLoader {
      */
     public PluginClassLoader(URL[] urls) {
         super(urls);
-        allLoaders.add(this);
+        loaders.add(this);
     }
 
     /**
@@ -30,7 +30,7 @@ public class PluginClassLoader extends URLClassLoader {
      */
     public PluginClassLoader(ClassLoader parent, URL... urls) {
         super(urls, parent);
-        allLoaders.add(this);
+        loaders.add(this);
     }
 
     protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
@@ -42,7 +42,7 @@ public class PluginClassLoader extends URLClassLoader {
             return super.loadClass(name, resolve);
         } catch (ClassNotFoundException e) {
             if (check) {
-                Iterator i = allLoaders.iterator();
+                Iterator i = loaders.iterator();
 
                 while (true) {
                     PluginClassLoader loader;
