@@ -4,10 +4,7 @@ import net.ME1312.SubServers.Bungee.Event.SubAddHostEvent;
 import net.ME1312.SubServers.Bungee.Event.SubAddServerEvent;
 import net.ME1312.SubServers.Bungee.Event.SubRemoveHostEvent;
 import net.ME1312.SubServers.Bungee.Event.SubRemoveServerEvent;
-import net.ME1312.SubServers.Bungee.Host.Server;
-import net.ME1312.SubServers.Bungee.Host.Host;
-import net.ME1312.SubServers.Bungee.Host.ServerContainer;
-import net.ME1312.SubServers.Bungee.Host.SubServer;
+import net.ME1312.SubServers.Bungee.Host.*;
 import net.ME1312.SubServers.Bungee.Library.Exception.InvalidHostException;
 import net.ME1312.SubServers.Bungee.Library.NamedContainer;
 import net.ME1312.SubServers.Bungee.Library.UniversalFile;
@@ -506,6 +503,26 @@ public final class SubAPI {
     public SubServer getSubServer(String name) {
         if (Util.isNull(name)) throw new NullPointerException();
         return getSubServers().get(name.toLowerCase());
+    }
+
+    /**
+     * Gets the known Proxies
+     *
+     * @return Proxy Map
+     */
+    public Map<String, Proxy> getProxies() {
+        return new TreeMap<String, Proxy>(plugin.proxies);
+    }
+
+    /**
+     * Gets a Proxy
+     *
+     * @param name Proxy name
+     * @return a Proxy
+     */
+    public Proxy getProxy(String name) {
+        if (Util.isNull(name)) throw new NullPointerException();
+        return getProxies().get(name.toLowerCase());
     }
 
     /**

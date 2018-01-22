@@ -34,6 +34,7 @@ public final class SubDataClient {
     private static boolean defaults = false;
     private PrintWriter writer;
     private NamedContainer<Boolean, Socket> socket;
+    private String name = null;
     private Cipher cipher;
     private SubPlugin plugin;
     private LinkedList<NamedContainer<String, PacketOut>> queue;
@@ -47,10 +48,11 @@ public final class SubDataClient {
      * @param cipher Cipher
      * @throws IOException
      */
-    public SubDataClient(SubPlugin plugin, InetAddress address, int port, Cipher cipher) throws IOException {
+    public SubDataClient(SubPlugin plugin, String name, InetAddress address, int port, Cipher cipher) throws IOException {
         if (Util.isNull(plugin, address, port)) throw new NullPointerException();
         socket = new NamedContainer<>(false, new Socket(address, port));
         this.plugin = plugin;
+        this.name = name;
         this.writer = new PrintWriter(socket.get().getOutputStream(), true);
         this.cipher = (cipher != null)?cipher:new Cipher() {
             @Override
@@ -76,6 +78,7 @@ public final class SubDataClient {
 
     private void init() {
         plugin.subdata.sendPacket(new PacketDownloadLang(plugin));
+        plugin.subdata.sendPacket(new PacketLinkProxy(plugin));
         plugin.subdata.sendPacket(new PacketDownloadProxyInfo(proxy -> plugin.subdata.sendPacket(new PacketDownloadServerList(null, null, json -> {
             if (plugin.lastReload != proxy.getJSONObject("subservers").getLong("last-reload")) {
                 System.out.println("SubServers > Resetting Server Data");
@@ -119,6 +122,7 @@ public final class SubDataClient {
         registerPacket(new PacketDownloadServerList(), "SubDownloadServerList");
         registerPacket(new PacketInRunEvent(), "SubRunEvent");
         registerPacket(new PacketInReset(), "SubReset");
+        registerPacket(new PacketLinkProxy(plugin), "SubLinkProxy");
         registerPacket(new PacketStartServer(), "SubStartServer");
         registerPacket(new PacketStopServer(), "SubStopServer");
 
@@ -132,6 +136,7 @@ public final class SubDataClient {
         registerPacket(PacketDownloadProxyInfo.class, "SubDownloadProxyInfo");
         registerPacket(PacketDownloadServerInfo.class, "SubDownloadServerInfo");
         registerPacket(PacketDownloadServerList.class, "SubDownloadServerList");
+        registerPacket(PacketLinkProxy.class, "SubLinkProxy");
         registerPacket(PacketStartServer.class, "SubStartServer");
         registerPacket(PacketStopServer.class, "SubStopServer");
     }
@@ -173,6 +178,25 @@ public final class SubDataClient {
                 }
             }
         }).start();
+    }
+
+    /**
+     * Gets the Assigned Proxy Name
+     *
+     * @return Host Name
+     */
+    public String getName() {
+        if (name != null) {
+            return name;
+        } else if (plugin.redis) {
+            try {
+                return (String) plugin.redis("getServerId");
+            } catch (Exception e) {
+                return null;
+            }
+        } else {
+            return null;
+        }
     }
 
     /**
@@ -407,7 +431,7 @@ public final class SubDataClient {
                     @Override
                     public void run() {
                         try {
-                            plugin.subdata = new SubDataClient(plugin, socket.getInetAddress(), socket.getPort(), cipher);
+                            plugin.subdata = new SubDataClient(plugin, name, socket.getInetAddress(), socket.getPort(), cipher);
                             timer.cancel();
                             while (queue.size() != 0) {
                                 if (queue.get(0).name() != null) {

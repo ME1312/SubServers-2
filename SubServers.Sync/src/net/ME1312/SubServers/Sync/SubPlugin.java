@@ -90,6 +90,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
     @Override
     public void startListeners() {
         try {
+            redis = getPluginManager().getPlugin("RedisBungee") != null;
             config.reload();
 
             Cipher cipher = null;
@@ -102,7 +103,9 @@ public final class SubPlugin extends BungeeCord implements Listener {
                     cipher = SubDataClient.getCipher(config.get().getSection("Settings").getSection("SubData").getRawString("Encryption"));
                 }
             }
-            subdata = new SubDataClient(this, InetAddress.getByName(config.get().getSection("Settings").getSection("SubData").getRawString("Address", "127.0.0.1:4391").split(":")[0]), Integer.parseInt(config.get().getSection("Settings").getSection("SubData").getRawString("Address", "127.0.0.1:4391").split(":")[1]), cipher);
+            subdata = new SubDataClient(this, config.get().getSection("Settings").getSection("SubData").getString("Name", null),
+                    InetAddress.getByName(config.get().getSection("Settings").getSection("SubData").getRawString("Address", "127.0.0.1:4391").split(":")[0]),
+                    Integer.parseInt(config.get().getSection("Settings").getSection("SubData").getRawString("Address", "127.0.0.1:4391").split(":")[1]), cipher);
 
             super.startListeners();
             if (!posted) {
@@ -115,7 +118,6 @@ public final class SubPlugin extends BungeeCord implements Listener {
     }
 
     private void post() {
-        if (getPluginManager().getPlugin("RedisBungee") != null) redis = true;
         if (config.get().getSection("Settings").getBoolean("Override-Bungee-Commands", true)) {
             getPluginManager().registerCommand(null, SubCommand.BungeeServer.newInstance(this, "server").get());
             getPluginManager().registerCommand(null, new SubCommand.BungeeList(this, "glist"));

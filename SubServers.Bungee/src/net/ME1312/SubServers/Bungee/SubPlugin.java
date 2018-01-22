@@ -44,6 +44,7 @@ import java.util.concurrent.TimeUnit;
 public final class SubPlugin extends BungeeCord implements Listener {
     protected final LinkedHashMap<String, LinkedHashMap<String, String>> lang = new LinkedHashMap<String, LinkedHashMap<String, String>>();
     protected final HashMap<String, Class<? extends Host>> hostDrivers = new HashMap<String, Class<? extends Host>>();
+    public final HashMap<String, Proxy> proxies = new HashMap<String, Proxy>();
     public final HashMap<String, Host> hosts = new HashMap<String, Host>();
     public final HashMap<String, Server> exServers = new HashMap<String, Server>();
     private final HashMap<String, ServerInfo> legServers = new HashMap<String, ServerInfo>();
@@ -194,6 +195,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
     @Override
     public void startListeners() {
         try {
+            redis = getPluginManager().getPlugin("RedisBungee") != null;
             reload();
 
             super.startListeners();
@@ -472,7 +474,6 @@ public final class SubPlugin extends BungeeCord implements Listener {
     }
 
     private void post() {
-        if (getPluginManager().getPlugin("RedisBungee") != null) redis = true;
         if (config.get().getSection("Settings").getBoolean("Override-Bungee-Commands", true)) {
             getPluginManager().registerCommand(null, SubCommand.BungeeServer.newInstance(this, "server").get());
             getPluginManager().registerCommand(null, new SubCommand.BungeeList(this, "glist"));
