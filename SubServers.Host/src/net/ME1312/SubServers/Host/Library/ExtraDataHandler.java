@@ -8,7 +8,7 @@ import net.ME1312.SubServers.Host.Library.Config.YAMLValue;
  */
 public interface ExtraDataHandler {
     /**
-     * Add an extra value to this Server
+     * Add an extra value to this Object
      *
      * @param handle Handle
      * @param value Value
@@ -39,7 +39,7 @@ public interface ExtraDataHandler {
     YAMLSection getExtra();
 
     /**
-     * Remove an extra value from this Server
+     * Remove an extra value from this Object
      *
      * @param handle Handle
      */

@@ -9,6 +9,7 @@ import net.ME1312.SubServers.Client.Bukkit.SubPlugin;
 import org.bukkit.Bukkit;
 import org.json.JSONObject;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
 /**
@@ -31,6 +32,7 @@ public class PacketLinkServer implements PacketIn, PacketOut {
     public JSONObject generate() {
         JSONObject json = new JSONObject();
         json.put("name", plugin.subdata.getName());
+        json.put("port", Bukkit.getServer().getPort());
         return json;
     }
 
@@ -38,12 +40,24 @@ public class PacketLinkServer implements PacketIn, PacketOut {
     public void execute(JSONObject data) {
         if (data.getInt("r") == 0) {
             try {
+                if (data.keySet().contains("n")) {
+                    Field f = SubDataClient.class.getDeclaredField("name");
+                    f.setAccessible(true);
+                    f.set(plugin.subdata, data.getString("n"));
+                    f.setAccessible(false);
+                }
                 Method m = SubDataClient.class.getDeclaredMethod("init");
                 m.setAccessible(true);
                 m.invoke(plugin.subdata);
                 m.setAccessible(false);
             } catch (Exception e) {}
         } else {
+            try {
+                if (data.getInt("r") == 2) {
+                    plugin.config.get().getSection("Settings").getSection("SubData").set("Name", "undefined");
+                    plugin.config.save();
+                }
+            } catch (Exception e) {}
             Bukkit.getLogger().info("SubData > Could not link name with server: " + data.getString("m"));
             plugin.onDisable();
         }

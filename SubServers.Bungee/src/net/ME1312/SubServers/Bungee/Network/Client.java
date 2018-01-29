@@ -23,6 +23,7 @@ public class Client {
     private PrintWriter writer;
     private Timer authorized;
     private SubDataServer subdata;
+    boolean closed;
 
     /**
      * Network Client
@@ -33,6 +34,7 @@ public class Client {
     public Client(SubDataServer subdata, Socket client) throws IOException {
         if (Util.isNull(subdata, client)) throw new NullPointerException();
         this.subdata = subdata;
+        closed = false;
         socket = client;
         writer = new PrintWriter(client.getOutputStream(), true);
         address = new InetSocketAddress(client.getInetAddress(), client.getPort());
@@ -150,6 +152,15 @@ public class Client {
     }
 
     /**
+     * Get if the connection has been closed
+     *
+     * @return Closed Stauts
+     */
+    public boolean isClosed() {
+        return closed && socket.isClosed();
+    }
+
+    /**
      * Get Remote Address
      *
      * @return Address
@@ -188,7 +199,7 @@ public class Client {
     }
 
     /**
-     * Disconnects the Client (does not remove them from the server)
+     * Disconnects the Client
      *
      * @throws IOException
      */
@@ -196,5 +207,7 @@ public class Client {
         if (!socket.isClosed()) getConnection().close();
         if (handler != null && handler.getSubData() != null && equals(handler.getSubData())) setHandler(null);
         handler = null;
+        closed = true;
+        if (subdata.getClients().contains(this)) subdata.removeClient(this);
     }
 }

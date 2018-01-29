@@ -137,15 +137,15 @@ public class ExternalHost extends Host implements ClientHandler {
     }
 
     @Override
-    public SubServer addSubServer(UUID player, String name, boolean enabled, int port, String motd, boolean log, String directory, Executable executable, String stopcmd, boolean start, boolean restart, boolean hidden, boolean restricted, boolean temporary) throws InvalidServerException {
+    public SubServer addSubServer(UUID player, String name, boolean enabled, int port, String motd, boolean log, String directory, Executable executable, String stopcmd, boolean hidden, boolean restricted, boolean temporary) throws InvalidServerException {
         if (plugin.api.getServers().keySet().contains(name.toLowerCase())) throw new InvalidServerException("A Server already exists with this name!");
-        SubServer server = new ExternalSubServer(this, name, enabled, port, motd, log, directory, executable, stopcmd, restart, hidden, restricted);
+        SubServer server = new ExternalSubServer(this, name, enabled, port, motd, log, directory, executable, stopcmd, hidden, restricted);
         SubAddServerEvent event = new SubAddServerEvent(player, this, server);
         plugin.getPluginManager().callEvent(event);
         if (!event.isCancelled()) {
             queue(new PacketExAddServer(name, enabled, log, directory, executable, stopcmd, (server.isRunning())?((ExternalSubLogger) server.getLogger()).getExternalAddress():null, json -> {
                 if (json.getInt("r") == 0) {
-                    if (!((start || temporary) && !server.start()) && temporary) server.setTemporary(true);
+                    if (temporary && server.start()) server.setTemporary(true);
                 }
             }));
             servers.put(name.toLowerCase(), server);

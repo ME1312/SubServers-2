@@ -165,12 +165,12 @@ implements <a href="../../../../../net/ME1312/SubServers/Bungee/Library/ExtraDat
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/Host.html#addExtra-java.lang.String-java.lang.Object-">addExtra</a></span>(java.lang.String&nbsp;handle,
         java.lang.Object&nbsp;value)</code>
-<div class="block">Add an extra value to this Server</div>
+<div class="block">Add an extra value to this Object</div>
 </td>
 </tr>
 <tr id="i1" class="rowColor">
 <td class="colFirst"><code><a href="../../../../../net/ME1312/SubServers/Bungee/Host/SubServer.html" title="interface in net.ME1312.SubServers.Bungee.Host">SubServer</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/Host.html#addSubServer-java.lang.String-boolean-int-java.lang.String-boolean-java.lang.String-net.ME1312.SubServers.Bungee.Host.Executable-java.lang.String-boolean-boolean-boolean-boolean-boolean-">addSubServer</a></span>(java.lang.String&nbsp;name,
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/Host.html#addSubServer-java.lang.String-boolean-int-java.lang.String-boolean-java.lang.String-net.ME1312.SubServers.Bungee.Host.Executable-java.lang.String-boolean-boolean-boolean-">addSubServer</a></span>(java.lang.String&nbsp;name,
             boolean&nbsp;enabled,
             int&nbsp;port,
             java.lang.String&nbsp;motd,
@@ -178,8 +178,6 @@ implements <a href="../../../../../net/ME1312/SubServers/Bungee/Library/ExtraDat
             java.lang.String&nbsp;directory,
             <a href="../../../../../net/ME1312/SubServers/Bungee/Host/Executable.html" title="class in net.ME1312.SubServers.Bungee.Host">Executable</a>&nbsp;executable,
             java.lang.String&nbsp;stopcmd,
-            boolean&nbsp;start,
-            boolean&nbsp;restart,
             boolean&nbsp;hidden,
             boolean&nbsp;restricted,
             boolean&nbsp;temporary)</code>
@@ -188,7 +186,7 @@ implements <a href="../../../../../net/ME1312/SubServers/Bungee/Library/ExtraDat
 </tr>
 <tr id="i2" class="altColor">
 <td class="colFirst"><code>abstract <a href="../../../../../net/ME1312/SubServers/Bungee/Host/SubServer.html" title="interface in net.ME1312.SubServers.Bungee.Host">SubServer</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/Host.html#addSubServer-java.util.UUID-java.lang.String-boolean-int-java.lang.String-boolean-java.lang.String-net.ME1312.SubServers.Bungee.Host.Executable-java.lang.String-boolean-boolean-boolean-boolean-boolean-">addSubServer</a></span>(java.util.UUID&nbsp;player,
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/Host.html#addSubServer-java.util.UUID-java.lang.String-boolean-int-java.lang.String-boolean-java.lang.String-net.ME1312.SubServers.Bungee.Host.Executable-java.lang.String-boolean-boolean-boolean-">addSubServer</a></span>(java.util.UUID&nbsp;player,
             java.lang.String&nbsp;name,
             boolean&nbsp;enabled,
             int&nbsp;port,
@@ -197,8 +195,6 @@ implements <a href="../../../../../net/ME1312/SubServers/Bungee/Library/ExtraDat
             java.lang.String&nbsp;directory,
             <a href="../../../../../net/ME1312/SubServers/Bungee/Host/Executable.html" title="class in net.ME1312.SubServers.Bungee.Host">Executable</a>&nbsp;executable,
             java.lang.String&nbsp;stopcmd,
-            boolean&nbsp;start,
-            boolean&nbsp;restart,
             boolean&nbsp;hidden,
             boolean&nbsp;restricted,
             boolean&nbsp;temporary)</code>
@@ -334,7 +330,7 @@ implements <a href="../../../../../net/ME1312/SubServers/Bungee/Library/ExtraDat
 <tr id="i23" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Host/Host.html#removeExtra-java.lang.String-">removeExtra</a></span>(java.lang.String&nbsp;handle)</code>
-<div class="block">Remove an extra value from this Server</div>
+<div class="block">Remove an extra value from this Object</div>
 </td>
 </tr>
 <tr id="i24" class="altColor">
@@ -741,7 +737,7 @@ implements <a href="../../../../../net/ME1312/SubServers/Bungee/Library/ExtraDat
 </dl>
 </li>
 </ul>
-<a name="addSubServer-java.util.UUID-java.lang.String-boolean-int-java.lang.String-boolean-java.lang.String-net.ME1312.SubServers.Bungee.Host.Executable-java.lang.String-boolean-boolean-boolean-boolean-boolean-">
+<a name="addSubServer-java.util.UUID-java.lang.String-boolean-int-java.lang.String-boolean-java.lang.String-net.ME1312.SubServers.Bungee.Host.Executable-java.lang.String-boolean-boolean-boolean-">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -756,8 +752,6 @@ implements <a href="../../../../../net/ME1312/SubServers/Bungee/Library/ExtraDat
                                        java.lang.String&nbsp;directory,
                                        <a href="../../../../../net/ME1312/SubServers/Bungee/Host/Executable.html" title="class in net.ME1312.SubServers.Bungee.Host">Executable</a>&nbsp;executable,
                                        java.lang.String&nbsp;stopcmd,
-                                       boolean&nbsp;start,
-                                       boolean&nbsp;restart,
                                        boolean&nbsp;hidden,
                                        boolean&nbsp;restricted,
                                        boolean&nbsp;temporary)
@@ -774,7 +768,6 @@ implements <a href="../../../../../net/ME1312/SubServers/Bungee/Library/ExtraDat
 <dd><code>directory</code> - Directory</dd>
 <dd><code>executable</code> - Executable</dd>
 <dd><code>stopcmd</code> - Command to Stop the Server</dd>
-<dd><code>restart</code> - Auto Restart Status</dd>
 <dd><code>hidden</code> - if the server should be hidden from players</dd>
 <dd><code>restricted</code> - Players will need a permission to join if true</dd>
 <dd><code>temporary</code> - Temporary Status</dd>
@@ -785,7 +778,7 @@ implements <a href="../../../../../net/ME1312/SubServers/Bungee/Library/ExtraDat
 </dl>
 </li>
 </ul>
-<a name="addSubServer-java.lang.String-boolean-int-java.lang.String-boolean-java.lang.String-net.ME1312.SubServers.Bungee.Host.Executable-java.lang.String-boolean-boolean-boolean-boolean-boolean-">
+<a name="addSubServer-java.lang.String-boolean-int-java.lang.String-boolean-java.lang.String-net.ME1312.SubServers.Bungee.Host.Executable-java.lang.String-boolean-boolean-boolean-">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -799,8 +792,6 @@ implements <a href="../../../../../net/ME1312/SubServers/Bungee/Library/ExtraDat
                               java.lang.String&nbsp;directory,
                               <a href="../../../../../net/ME1312/SubServers/Bungee/Host/Executable.html" title="class in net.ME1312.SubServers.Bungee.Host">Executable</a>&nbsp;executable,
                               java.lang.String&nbsp;stopcmd,
-                              boolean&nbsp;start,
-                              boolean&nbsp;restart,
                               boolean&nbsp;hidden,
                               boolean&nbsp;restricted,
                               boolean&nbsp;temporary)
@@ -816,7 +807,6 @@ implements <a href="../../../../../net/ME1312/SubServers/Bungee/Library/ExtraDat
 <dd><code>directory</code> - Directory</dd>
 <dd><code>executable</code> - Executable</dd>
 <dd><code>stopcmd</code> - Command to Stop the Server</dd>
-<dd><code>restart</code> - Auto Restart Status</dd>
 <dd><code>hidden</code> - if the server should be hidden from players</dd>
 <dd><code>restricted</code> - Players will need a permission to join if true</dd>
 <dd><code>temporary</code> - Temporary Status</dd>
@@ -1006,7 +996,7 @@ implements <a href="../../../../../net/ME1312/SubServers/Bungee/Library/ExtraDat
 <pre>public&nbsp;void&nbsp;addExtra(java.lang.String&nbsp;handle,
                      java.lang.Object&nbsp;value)</pre>
 <div class="block"><span class="descfrmTypeLabel">Description copied from interface:&nbsp;<code><a href="../../../../../net/ME1312/SubServers/Bungee/Library/ExtraDataHandler.html#addExtra-java.lang.String-java.lang.Object-">ExtraDataHandler</a></code></span></div>
-<div class="block">Add an extra value to this Server</div>
+<div class="block">Add an extra value to this Object</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
 <dd><code><a href="../../../../../net/ME1312/SubServers/Bungee/Library/ExtraDataHandler.html#addExtra-java.lang.String-java.lang.Object-">addExtra</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../net/ME1312/SubServers/Bungee/Library/ExtraDataHandler.html" title="interface in net.ME1312.SubServers.Bungee.Library">ExtraDataHandler</a></code></dd>
@@ -1079,7 +1069,7 @@ implements <a href="../../../../../net/ME1312/SubServers/Bungee/Library/ExtraDat
 <h4>removeExtra</h4>
 <pre>public&nbsp;void&nbsp;removeExtra(java.lang.String&nbsp;handle)</pre>
 <div class="block"><span class="descfrmTypeLabel">Description copied from interface:&nbsp;<code><a href="../../../../../net/ME1312/SubServers/Bungee/Library/ExtraDataHandler.html#removeExtra-java.lang.String-">ExtraDataHandler</a></code></span></div>
-<div class="block">Remove an extra value from this Server</div>
+<div class="block">Remove an extra value from this Object</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
 <dd><code><a href="../../../../../net/ME1312/SubServers/Bungee/Library/ExtraDataHandler.html#removeExtra-java.lang.String-">removeExtra</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../net/ME1312/SubServers/Bungee/Library/ExtraDataHandler.html" title="interface in net.ME1312.SubServers.Bungee.Library">ExtraDataHandler</a></code></dd>

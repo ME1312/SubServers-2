@@ -61,15 +61,11 @@ public class PacketLinkProxy implements PacketIn, PacketOut {
     public void execute(Client client, JSONObject data) {
         try {
             Map<String, Proxy> proxies = plugin.api.getProxies();
-            if (!data.keySet().contains("name") || !proxies.keySet().contains(data.getString("name"))) {
-                Proxy proxy = new Proxy((data.keySet().contains("name"))?data.getString("name"):Util.getNew(proxies.keySet(), () -> UUID.randomUUID().toString()));
-                plugin.proxies.put(proxy.getName().toLowerCase(), proxy);
-                client.setHandler(proxy);
-                System.out.println("SubData > " + client.getAddress().toString() + " has been defined as Proxy: " + proxy.getName());
-                client.sendPacket(new PacketLinkProxy(proxy.getName(), 0, "Definition Successful"));
-            } else {
-                client.sendPacket(new PacketLinkProxy(null, 3, "Proxy already linked"));
-            }
+            Proxy proxy = new Proxy((data.keySet().contains("name") && !proxies.keySet().contains(data.getString("name").toLowerCase()))?data.getString("name"):Util.getNew(proxies.keySet(), () -> UUID.randomUUID().toString()));
+            plugin.proxies.put(proxy.getName().toLowerCase(), proxy);
+            client.setHandler(proxy);
+            System.out.println("SubData > " + client.getAddress().toString() + " has been defined as Proxy: " + proxy.getName());
+            client.sendPacket(new PacketLinkProxy(proxy.getName(), 0, "Definition Successful"));
         } catch (Exception e) {
             client.sendPacket(new PacketLinkProxy(null, 1, e.getClass().getCanonicalName() + ": " + e.getMessage()));
             e.printStackTrace();

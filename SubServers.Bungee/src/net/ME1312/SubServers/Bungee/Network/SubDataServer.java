@@ -254,7 +254,7 @@ public final class SubDataServer {
         SocketAddress address = client.getAddress();
         if (clients.keySet().contains(address.toString())) {
             clients.remove(address.toString());
-            client.disconnect();
+            if (!client.closed) client.disconnect();
             System.out.println("SubData > " + client.getAddress().toString() + " has disconnected");
         }
     }

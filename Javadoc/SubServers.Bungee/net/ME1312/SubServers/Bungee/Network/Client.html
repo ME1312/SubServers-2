@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10};
+var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10,"i8":10};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -157,7 +157,7 @@ extends java.lang.Object</pre>
 <tr id="i1" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Network/Client.html#disconnect--">disconnect</a></span>()</code>
-<div class="block">Disconnects the Client (does not remove them from the server)</div>
+<div class="block">Disconnects the Client</div>
 </td>
 </tr>
 <tr id="i2" class="altColor">
@@ -185,12 +185,18 @@ extends java.lang.Object</pre>
 </td>
 </tr>
 <tr id="i6" class="altColor">
+<td class="colFirst"><code>boolean</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Network/Client.html#isClosed--">isClosed</a></span>()</code>
+<div class="block">Get if the connection has been closed</div>
+</td>
+</tr>
+<tr id="i7" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Network/Client.html#sendPacket-net.ME1312.SubServers.Bungee.Network.PacketOut-">sendPacket</a></span>(<a href="../../../../../net/ME1312/SubServers/Bungee/Network/PacketOut.html" title="interface in net.ME1312.SubServers.Bungee.Network">PacketOut</a>&nbsp;packet)</code>
 <div class="block">Send Packet to Client</div>
 </td>
 </tr>
-<tr id="i7" class="rowColor">
+<tr id="i8" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Bungee/Network/Client.html#setHandler-net.ME1312.SubServers.Bungee.Network.ClientHandler-">setHandler</a></span>(<a href="../../../../../net/ME1312/SubServers/Bungee/Network/ClientHandler.html" title="interface in net.ME1312.SubServers.Bungee.Network">ClientHandler</a>&nbsp;obj)</code>
 <div class="block">Sets the Handler</div>
@@ -283,6 +289,20 @@ extends java.lang.Object</pre>
 </dl>
 </li>
 </ul>
+<a name="isClosed--">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>isClosed</h4>
+<pre>public&nbsp;boolean&nbsp;isClosed()</pre>
+<div class="block">Get if the connection has been closed</div>
+<dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>Closed Stauts</dd>
+</dl>
+</li>
+</ul>
 <a name="getAddress--">
 <!--   -->
 </a>
@@ -347,7 +367,7 @@ extends java.lang.Object</pre>
 <h4>disconnect</h4>
 <pre>public&nbsp;void&nbsp;disconnect()
                 throws java.io.IOException</pre>
-<div class="block">Disconnects the Client (does not remove them from the server)</div>
+<div class="block">Disconnects the Client</div>
 <dl>
 <dt><span class="throwsLabel">Throws:</span></dt>
 <dd><code>java.io.IOException</code></dd>

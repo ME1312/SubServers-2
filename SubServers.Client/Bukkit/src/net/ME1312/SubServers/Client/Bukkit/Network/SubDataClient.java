@@ -47,7 +47,7 @@ public final class SubDataClient {
      * @throws IOException
      */
     public SubDataClient(SubPlugin plugin, String name, InetAddress address, int port, Cipher cipher) throws IOException {
-        if (Util.isNull(plugin, name, address, port)) throw new NullPointerException();
+        if (Util.isNull(plugin, address, port)) throw new NullPointerException();
         socket = new NamedContainer<>(false, new Socket(address, port));
         this.plugin = plugin;
         this.name = name;

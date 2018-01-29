@@ -233,14 +233,13 @@ public abstract class Host implements ExtraDataHandler {
      * @param directory Directory
      * @param executable Executable
      * @param stopcmd Command to Stop the Server
-     * @param restart Auto Restart Status
      * @param hidden if the server should be hidden from players
      * @param restricted Players will need a permission to join if true
      * @param temporary Temporary Status
      * @return The SubServer
      * @throws InvalidServerException
      */
-    public abstract SubServer addSubServer(UUID player, String name, boolean enabled, int port, String motd, boolean log, String directory, Executable executable, String stopcmd, boolean start, boolean restart, boolean hidden, boolean restricted, boolean temporary) throws InvalidServerException;
+    public abstract SubServer addSubServer(UUID player, String name, boolean enabled, int port, String motd, boolean log, String directory, Executable executable, String stopcmd, boolean hidden, boolean restricted, boolean temporary) throws InvalidServerException;
 
     /**
      * Adds a SubServer
@@ -253,15 +252,14 @@ public abstract class Host implements ExtraDataHandler {
      * @param directory Directory
      * @param executable Executable
      * @param stopcmd Command to Stop the Server
-     * @param restart Auto Restart Status
      * @param hidden if the server should be hidden from players
      * @param restricted Players will need a permission to join if true
      * @param temporary Temporary Status
      * @return The SubServer
      * @throws InvalidServerException
      */
-    public SubServer addSubServer(String name, boolean enabled, int port, String motd, boolean log, String directory, Executable executable, String stopcmd, boolean start, boolean restart, boolean hidden, boolean restricted, boolean temporary) throws InvalidServerException {
-        return addSubServer(null, name, enabled, port, motd, log, directory, executable, stopcmd, start, restart, hidden, restricted, temporary);
+    public SubServer addSubServer(String name, boolean enabled, int port, String motd, boolean log, String directory, Executable executable, String stopcmd, boolean hidden, boolean restricted, boolean temporary) throws InvalidServerException {
+        return addSubServer(null, name, enabled, port, motd, log, directory, executable, stopcmd, hidden, restricted, temporary);
     }
 
     /**

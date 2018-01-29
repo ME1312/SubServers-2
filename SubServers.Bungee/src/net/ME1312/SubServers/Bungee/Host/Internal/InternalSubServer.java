@@ -56,16 +56,14 @@ public class InternalSubServer extends SubServerContainer {
      * @param directory Directory
      * @param executable Executable String
      * @param stopcmd Stop Command
-     * @param start Auto-Start
-     * @param restart Auto-Restart
      * @param hidden Hidden Status
      * @param restricted Restricted Status
      * @param temporary Temporary Status
      * @throws InvalidServerException
      */
-    public InternalSubServer(InternalHost host, String name, boolean enabled, int port, String motd, boolean log, String directory, Executable executable, String stopcmd, boolean start, boolean restart, boolean hidden, boolean restricted, boolean temporary) throws InvalidServerException {
+    public InternalSubServer(InternalHost host, String name, boolean enabled, int port, String motd, boolean log, String directory, Executable executable, String stopcmd, boolean hidden, boolean restricted, boolean temporary) throws InvalidServerException {
         super(host, name, port, motd, hidden, restricted);
-        if (Util.isNull(host, name, enabled, port, motd, log, directory, executable, stopcmd, start, restart, hidden, restricted, temporary)) throw new NullPointerException();
+        if (Util.isNull(host, name, enabled, port, motd, log, directory, executable, stopcmd, hidden, restricted, temporary)) throw new NullPointerException();
         this.host = host;
         this.enabled = enabled;
         this.editable = false;
@@ -79,7 +77,7 @@ public class InternalSubServer extends SubServerContainer {
         this.logger = new InternalSubLogger(null, this, getName(), this.log, null);
         this.thread = null;
         this.command = null;
-        this.restart = restart;
+        this.restart = false;
 
         if (new UniversalFile(this.directory, "plugins:SubServers.Client.jar").exists()) {
             try {
@@ -96,7 +94,7 @@ public class InternalSubServer extends SubServerContainer {
                 e.printStackTrace();
             }
         }
-        this.temporary = !((start || temporary) && !start()) && temporary;
+        this.temporary = temporary && start();
     }
 
     private void run() {
@@ -236,7 +234,7 @@ public class InternalSubServer extends SubServerContainer {
                     switch (key) {
                         case "name":
                             if (value.isString() && host.removeSubServer(player, getName())) {
-                                SubServer server = host.addSubServer(player, value.asRawString(), isEnabled(), getAddress().getPort(), getMotd(), isLogging(), getPath(), getExecutable(), getStopCommand(), false, willAutoRestart(), isHidden(), isRestricted(), isTemporary());
+                                SubServer server = host.addSubServer(player, value.asRawString(), isEnabled(), getAddress().getPort(), getMotd(), isLogging(), getPath(), getExecutable(), getStopCommand(), isHidden(), isRestricted(), isTemporary());
                                 if (server != null) {
                                     if (this.host.plugin.config.get().getSection("Servers").getKeys().contains(getName())) {
                                         YAMLSection config = this.host.plugin.config.get().getSection("Servers").getSection(getName());
@@ -296,7 +294,7 @@ public class InternalSubServer extends SubServerContainer {
                             break;
                         case "host":
                             if (value.isString() && host.removeSubServer(player, getName())) {
-                                SubServer server = this.host.plugin.api.getHost(value.asRawString()).addSubServer(player, getName(), isEnabled(), getAddress().getPort(), getMotd(), isLogging(), getPath(), getExecutable(), getStopCommand(), false, willAutoRestart(), isHidden(), isRestricted(), isTemporary());
+                                SubServer server = this.host.plugin.api.getHost(value.asRawString()).addSubServer(player, getName(), isEnabled(), getAddress().getPort(), getMotd(), isLogging(), getPath(), getExecutable(), getStopCommand(), isHidden(), isRestricted(), isTemporary());
                                 if (server != null) {
                                     if (this.host.plugin.config.get().getSection("Servers").getKeys().contains(getName())) {
                                         this.host.plugin.config.get().getSection("Servers").getSection(getName()).set("Host", server.getHost().getName());
@@ -309,7 +307,7 @@ public class InternalSubServer extends SubServerContainer {
                             break;
                         case "port":
                             if (value.isNumber() && host.removeSubServer(player, getName())) {
-                                SubServer server = host.addSubServer(player, getName(), isEnabled(), value.asInt(), getMotd(), isLogging(), getPath(), getExecutable(), getStopCommand(), false, willAutoRestart(), isHidden(), isRestricted(), isTemporary());
+                                SubServer server = host.addSubServer(player, getName(), isEnabled(), value.asInt(), getMotd(), isLogging(), getPath(), getExecutable(), getStopCommand(), isHidden(), isRestricted(), isTemporary());
                                 if (server != null) {
                                     if (this.host.plugin.config.get().getSection("Servers").getKeys().contains(getName())) {
                                         this.host.plugin.config.get().getSection("Servers").getSection(getName()).set("Port", server.getAddress().getPort());
@@ -447,6 +445,7 @@ public class InternalSubServer extends SubServerContainer {
                             break;
                     }
                     if (forward != null) {
+                        if (willAutoRestart()) forward.setAutoRestart(true);
                         if (!getName().equals(getDisplayName())) forward.setDisplayName(getDisplayName());
                         List<String> groups = new ArrayList<String>();
                         groups.addAll(getGroups());

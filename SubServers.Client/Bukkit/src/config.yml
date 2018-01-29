@@ -4,7 +4,6 @@ Settings:
   Show-Addresses: false
   Use-Title-Messages: true
   SubData:
-    Name: 'undefined'
     Address: '127.0.0.1:4391'
     Password: 'default'
     Encryption: 'AES'

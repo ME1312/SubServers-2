@@ -37,12 +37,18 @@ public class PacketLinkProxy implements PacketIn, PacketOut {
     public void execute(JSONObject data) {
         if (data.getInt("r") == 0) {
             if (data.keySet().contains("n")) try {
-                Field m = SubDataClient.class.getDeclaredField("name");
-                m.setAccessible(true);
-                m.set(plugin.subdata, data.getString("n"));
-                m.setAccessible(false);
+                Field f = SubDataClient.class.getDeclaredField("name");
+                f.setAccessible(true);
+                f.set(plugin.subdata, data.getString("n"));
+                f.setAccessible(false);
             } catch (Exception e) {}
         } else {
+            try {
+                if (data.getInt("r") == 2) {
+                    plugin.config.get().getSection("Settings").getSection("SubData").set("Name", "undefined");
+                    plugin.config.save();
+                }
+            } catch (Exception e) {}
             System.out.println("SubData > Could not link name with server: " + data.getString("m"));
         }
     }

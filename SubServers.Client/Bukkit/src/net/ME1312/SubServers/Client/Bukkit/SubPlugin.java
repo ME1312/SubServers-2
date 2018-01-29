@@ -71,8 +71,10 @@ public final class SubPlugin extends JavaPlugin {
             }
             config = new YAMLConfig(new UniversalFile(getDataFolder(), "config.yml"));
             if (new UniversalFile(new File(System.getProperty("user.dir")), "subservers.client").exists()) {
-                config.get().getSection("Settings").set("SubData", new JSONObject(Util.readAll(new FileReader(new UniversalFile(new File(System.getProperty("user.dir")), "subservers.client")))));
+                FileReader reader = new FileReader(new UniversalFile(new File(System.getProperty("user.dir")), "subservers.client"));
+                config.get().getSection("Settings").set("SubData", new JSONObject(Util.readAll(reader)));
                 config.save();
+                reader.close();
                 new UniversalFile(new File(System.getProperty("user.dir")), "subservers.client").delete();
             }
 
@@ -127,7 +129,7 @@ public final class SubPlugin extends JavaPlugin {
                 cipher = SubDataClient.getCipher(config.get().getSection("Settings").getSection("SubData").getRawString("Encryption"));
             }
         }
-        subdata = new SubDataClient(this, config.get().getSection("Settings").getSection("SubData").getString("Name", "undefined"),
+        subdata = new SubDataClient(this, config.get().getSection("Settings").getSection("SubData").getString("Name", null),
                 InetAddress.getByName(config.get().getSection("Settings").getSection("SubData").getString("Address", "127.0.0.1:4391").split(":")[0]),
                 Integer.parseInt(config.get().getSection("Settings").getSection("SubData").getString("Address", "127.0.0.1:4391").split(":")[1]), cipher);
 
