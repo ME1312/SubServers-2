@@ -2,7 +2,6 @@ package net.ME1312.SubServers.Bungee.Network.Packet;
 
 import net.ME1312.SubServers.Bungee.Host.Server;
 import net.ME1312.SubServers.Bungee.Host.SubServer;
-import net.ME1312.SubServers.Bungee.Library.Exception.InvalidServerException;
 import net.ME1312.SubServers.Bungee.Library.Util;
 import net.ME1312.SubServers.Bungee.Library.Version.Version;
 import net.ME1312.SubServers.Bungee.Network.Client;
@@ -12,7 +11,6 @@ import net.ME1312.SubServers.Bungee.SubPlugin;
 import org.json.JSONObject;
 
 import java.net.InetSocketAddress;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -67,9 +65,9 @@ public class PacketLinkServer implements PacketIn, PacketOut {
             } else if ((server = searchIP(new InetSocketAddress(client.getAddress().getAddress(), data.getInt("port")))) != null) {
                 link(client, server);
             } else if (data.keySet().contains("name")) {
-                client.sendPacket(new PacketLinkServer(null, 2, "There is no server with that name"));
+                client.sendPacket(new PacketLinkServer(null, 2, "There is no server with name: " + data.getString("name")));
             } else {
-                client.sendPacket(new PacketLinkServer(null, 2, "Could not find server with address: " + client.getAddress().getAddress().getHostAddress() + ':' + data.getInt("port")));
+                client.sendPacket(new PacketLinkServer(null, 2, "There is no server with address: " + client.getAddress().getAddress().getHostAddress() + ':' + data.getInt("port")));
             }
         } catch (Exception e) {
             client.sendPacket(new PacketLinkServer(null, 1, e.getClass().getCanonicalName() + ": " + e.getMessage()));
@@ -92,7 +90,7 @@ public class PacketLinkServer implements PacketIn, PacketOut {
         Server server = null;
         for (Server s : plugin.api.getServers().values()) {
             if (s.getAddress().equals(address)) {
-                if (server != null) throw new InvalidServerException("Multiple servers match address: " + address.getAddress().getHostAddress() + ':' + address.getPort());
+                if (server != null) throw new IllegalStateException("Multiple servers match address: " + address.getAddress().getHostAddress() + ':' + address.getPort());
                 server = s;
             }
         }

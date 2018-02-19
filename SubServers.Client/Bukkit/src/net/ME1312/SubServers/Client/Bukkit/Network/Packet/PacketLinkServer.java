@@ -54,8 +54,10 @@ public class PacketLinkServer implements PacketIn, PacketOut {
         } else {
             try {
                 if (data.getInt("r") == 2) {
-                    plugin.config.get().getSection("Settings").getSection("SubData").set("Name", "undefined");
-                    plugin.config.save();
+                    if (!plugin.config.get().getSection("Settings").getSection("SubData").contains("Name")) {
+                        plugin.config.get().getSection("Settings").getSection("SubData").set("Name", "undefined");
+                        plugin.config.save();
+                    }
                 }
             } catch (Exception e) {}
             Bukkit.getLogger().info("SubData > Could not link name with server: " + data.getString("m"));

@@ -205,8 +205,10 @@ public class Client {
      */
     public void disconnect() throws IOException {
         if (!socket.isClosed()) getConnection().close();
-        if (handler != null && handler.getSubData() != null && equals(handler.getSubData())) setHandler(null);
-        handler = null;
+        if (handler != null) {
+            setHandler(null);
+            handler = null;
+        }
         closed = true;
         if (subdata.getClients().contains(this)) subdata.removeClient(this);
     }

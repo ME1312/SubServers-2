@@ -10,7 +10,8 @@ import java.util.concurrent.CopyOnWriteArraySet;
  * Plugin ClassLoader Class
  */
 public class PluginClassLoader extends URLClassLoader {
-    private static final Set<PluginClassLoader> loaders = new CopyOnWriteArraySet<PluginClassLoader>();
+    private static Set<PluginClassLoader> loaders = new CopyOnWriteArraySet<PluginClassLoader>();
+    private Class<?> defaultClass = null;
 
     /**
      * Load Classes from URLs
@@ -33,6 +34,26 @@ public class PluginClassLoader extends URLClassLoader {
         loaders.add(this);
     }
 
+    public void setDefaultClass(Class<?> clazz) {
+        this.defaultClass = clazz;
+    }
+
+    public Class<?> getDefaultClass() throws ClassNotFoundException {
+        if (defaultClass == null) {
+            throw new ClassNotFoundException();
+        } else {
+            return defaultClass;
+        }
+    }
+
+    private Class<?> getDefaultClass(String name) throws ClassNotFoundException {
+        try {
+            return getDefaultClass();
+        } catch (ClassNotFoundException e) {
+            throw new ClassNotFoundException(name);
+        }
+    }
+
     protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
         return this.loadClass(name, resolve, true);
     }
@@ -40,7 +61,7 @@ public class PluginClassLoader extends URLClassLoader {
     private Class<?> loadClass(String name, boolean resolve, boolean check) throws ClassNotFoundException {
         try {
             return super.loadClass(name, resolve);
-        } catch (ClassNotFoundException e) {
+        } catch (NoClassDefFoundError | ClassNotFoundException e) {
             if (check) {
                 Iterator i = loaders.iterator();
 
@@ -48,17 +69,17 @@ public class PluginClassLoader extends URLClassLoader {
                     PluginClassLoader loader;
                     do {
                         if (!i.hasNext()) {
-                            throw new ClassNotFoundException(name);
+                            return getDefaultClass(name);
                         }
                         loader = (PluginClassLoader) i.next();
                     } while (loader == this);
 
                     try {
                         return loader.loadClass(name, resolve, false);
-                    } catch (ClassNotFoundException ex) {}
+                    } catch (NoClassDefFoundError | ClassNotFoundException ex) {}
                 }
             } else {
-                throw new ClassNotFoundException(name);
+                return getDefaultClass(name);
             }
         }
     }

@@ -68,7 +68,7 @@ public class PacketLinkExHost implements PacketIn, PacketOut {
                     client.sendPacket(new PacketLinkExHost(4, "That host does not support a network interface"));
                 }
             } else {
-                client.sendPacket(new PacketLinkExHost(2, "There is no host with that name"));
+                client.sendPacket(new PacketLinkExHost(2, "There is no host with name: " + data.getString("name")));
             }
         } catch (Exception e) {
             client.sendPacket(new PacketLinkExHost(1, e.getClass().getCanonicalName() + ": " + e.getMessage()));

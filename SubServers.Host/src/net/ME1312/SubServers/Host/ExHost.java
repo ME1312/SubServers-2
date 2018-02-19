@@ -182,13 +182,11 @@ public final class ExHost {
              * Find Jars
              */
             UniversalFile pldir = new UniversalFile(dir, "Plugins");
-            LinkedList<URL> jars = new LinkedList<URL>();
+            LinkedList<File> pljars = new LinkedList<File>();
             if (pldir.exists() && pldir.isDirectory()) for (File file : pldir.listFiles()) {
-                if (file.getName().endsWith(".jar")) {
-                    jars.add(file.toURI().toURL());
-                }
+                if (file.getName().endsWith(".jar")) pljars.add(file);
             }
-            if (jars.size() > 0) {
+            if (pljars.size() > 0) {
                 long begin = Calendar.getInstance().getTime().getTime();
                 log.info.println("Loading SubAPI Plugins...");
 
@@ -196,97 +194,71 @@ public final class ExHost {
                  * Load Jars & Find Main Classes
                  * (Unordered)
                  */
-                URLClassLoader superloader = new URLClassLoader(jars.toArray(new URL[jars.size()]), this.getClass().getClassLoader());
-                LinkedHashMap<String, NamedContainer<LinkedList<String>, LinkedHashMap<String, String>>> classes = new LinkedHashMap<String, NamedContainer<LinkedList<String>, LinkedHashMap<String, String>>>();
-                for (File file : pldir.listFiles()) {
-                    if (file.getName().endsWith(".jar")) {
-                        try {
-                            JarFile jar = new JarFile(file);
-                            Enumeration<JarEntry> entries = jar.entries();
-                            LinkedList<String> mains = new LinkedList<String>();
-                            List<String> contents = new ArrayList<String>();
+                LinkedHashMap<PluginClassLoader, NamedContainer<LinkedList<String>, LinkedHashMap<String, String>>> classes = new LinkedHashMap<PluginClassLoader, NamedContainer<LinkedList<String>, LinkedHashMap<String, String>>>();
+                for (File file : pljars) {
+                    try {
+                        JarFile jar = new JarFile(file);
+                        Enumeration<JarEntry> entries = jar.entries();
+                        PluginClassLoader loader = new PluginClassLoader(this.getClass().getClassLoader(), file.toURI().toURL());
+                        List<String> contents = new ArrayList<String>();
 
-                            if (jar.getJarEntry("package.xml") != null) {
+                        boolean isplugin = false;
+                        loader.setDefaultClass(ClassNotFoundException.class);
+                        while (entries.hasMoreElements()) {
+                            JarEntry entry = entries.nextElement();
+                            if (!entry.isDirectory() && entry.getName().endsWith(".class")) {
+                                String cname = entry.getName().substring(0, entry.getName().length() - 6).replace('/', '.');
+                                contents.add(cname);
                                 try {
-                                    NodeList xml = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(jar.getInputStream(jar.getJarEntry("package.xml"))).getElementsByTagName("class");
-                                    if (xml.getLength() > 0) {
-                                        for (int i = 0; i < xml.getLength(); i++) {
-                                            mains.add(xml.item(i).getTextContent());
-                                        }
+                                    Class<?> clazz = loader.loadClass(cname);
+                                    if (clazz.isAnnotationPresent(SubPlugin.class)) {
+                                        NamedContainer<LinkedList<String>, LinkedHashMap<String, String>> jarmap = (classes.keySet().contains(loader))?classes.get(loader):new NamedContainer<LinkedList<String>, LinkedHashMap<String, String>>(new LinkedList<String>(), new LinkedHashMap<>());
+                                        for (String dependancy : clazz.getAnnotation(SubPlugin.class).dependencies()) jarmap.name().add(dependancy);
+                                        for (String dependancy : clazz.getAnnotation(SubPlugin.class).softDependencies()) jarmap.name().add(dependancy);
+                                        jarmap.get().put(clazz.getAnnotation(SubPlugin.class).name(), cname);
+                                        classes.put(loader, jarmap);
+                                        isplugin = true;
                                     }
-                                } catch (Exception e) {
-                                    log.error.println(new IllegalPluginException(e, "Couldn't load package.xml for " + file.getName()));
+                                } catch (Throwable e) {
+                                    log.error.println(new IllegalPluginException(e, "Couldn't load class: " + cname));
                                 }
                             }
-
-                            boolean isplugin = false;
-                            while (entries.hasMoreElements()) {
-                                JarEntry entry = entries.nextElement();
-                                if (!entry.isDirectory() && entry.getName().endsWith(".class")) {
-                                    String cname = entry.getName().substring(0, entry.getName().length() - 6).replace('/', '.');
-                                    contents.add(cname);
-                                    if (mains.contains(cname)) {
-                                        mains.remove(cname);
-                                        try {
-                                            Class<?> clazz = superloader.loadClass(cname);
-                                            if (!clazz.isAnnotationPresent(SubPlugin.class))
-                                                throw new ClassCastException("Cannot find plugin descriptor");
-
-                                            NamedContainer<LinkedList<String>, LinkedHashMap<String, String>> jarmap = (classes.keySet().contains(file.getName()))?classes.get(file.getName()):new NamedContainer<LinkedList<String>, LinkedHashMap<String, String>>(new LinkedList<String>(), new LinkedHashMap<>());
-                                            for (String dependancy : clazz.getAnnotation(SubPlugin.class).dependencies()) jarmap.name().add(dependancy);
-                                            for (String dependancy : clazz.getAnnotation(SubPlugin.class).softDependencies()) jarmap.name().add(dependancy);
-                                            jarmap.get().put(clazz.getAnnotation(SubPlugin.class).name(), cname);
-                                            classes.put(file.getName(), jarmap);
-                                            isplugin = true;
-                                        } catch (ClassCastException e) {
-                                            log.error.println(new IllegalPluginException(e, "Main class isn't annotated as a SubPlugin: " + cname));
-                                        } catch (Throwable e) {
-                                            log.error.println(new IllegalPluginException(e, "Couldn't load main class: " + cname));
-                                        }
-                                    }
-                                }
-                            }
-                            for (String main : mains) {
-                                log.error.println(new IllegalPluginException(new ClassNotFoundException(), "Couldn't find main class: " + main));
-                            }
-
-                            if (!isplugin) {
-                                new PluginClassLoader(this.getClass().getClassLoader(), file.toURI().toURL());
-                                log.info.println("Loaded Library: " + file.getName());
-                            }
-                            api.knownClasses.addAll(contents);
-                            jar.close();
-                        } catch (Throwable e) {
-                            log.error.println(new InvocationTargetException(e, "Problem searching plugin jar: " + file.getName()));
                         }
+                        loader.setDefaultClass(null);
+
+                        if (!isplugin) {
+                            new PluginClassLoader(this.getClass().getClassLoader(), file.toURI().toURL());
+                            log.info.println("Loaded Library: " + file.getName());
+                        }
+                        api.knownClasses.addAll(contents);
+                        jar.close();
+                    } catch (Throwable e) {
+                        log.error.println(new InvocationTargetException(e, "Problem searching plugin jar: " + file.getName()));
                     }
                 }
-                superloader.close();
 
                 /*
                  * Load Main Classes & Plugin Descriptions
                  * (Ordered by Known Dependencies)
                  */
                 int progress = 1;
-                HashMap<String, PluginClassLoader> loaders = new HashMap<String, PluginClassLoader>();
                 HashMap<String, SubPluginInfo> plugins = new LinkedHashMap<String, SubPluginInfo>();
                 while (classes.size() > 0) {
-                    LinkedHashMap<String, LinkedList<String>> loaded = new LinkedHashMap<String, LinkedList<String>>();
-                    for (String jar : classes.keySet()) {
+                    LinkedHashMap<PluginClassLoader, LinkedList<String>> loaded = new LinkedHashMap<PluginClassLoader, LinkedList<String>>();
+                    for (PluginClassLoader loader : classes.keySet()) {
                         LinkedList<String> loadedlist = new LinkedList<String>();
-                        if (!loaders.keySet().contains(jar)) loaders.put(jar, new PluginClassLoader(this.getClass().getClassLoader(), new File(pldir, jar).toURI().toURL()));
-                        for (String name : classes.get(jar).get().keySet()) {
+                        for (String name : classes.get(loader).get().keySet()) {
                             boolean load = true;
-                            for (String depend : classes.get(jar).name()) {
+                            for (String depend : classes.get(loader).name()) {
                                 if (!plugins.keySet().contains(depend.toLowerCase())) {
                                     load = progress <= 0;
                                 }
                             }
 
                             if (load) {
-                                String main = classes.get(jar).get().get(name);
+                                String main = classes.get(loader).get().get(name);
                                 try {
-                                    Class<?> clazz = loaders.get(jar).loadClass(main);
+                                    Class<?> clazz = loader.loadClass(main);
                                     if (!clazz.isAnnotationPresent(SubPlugin.class))
                                         throw new ClassCastException("Cannot find plugin descriptor");
 
@@ -313,17 +285,17 @@ public final class ExHost {
                                 loadedlist.add(name);
                             }
                         }
-                        if (loadedlist.size() > 0) loaded.put(jar, loadedlist);
+                        if (loadedlist.size() > 0) loaded.put(loader, loadedlist);
                     }
                     progress = 0;
-                    for (String jar : loaded.keySet()) {
-                        NamedContainer<LinkedList<String>, LinkedHashMap<String, String>> jarmap = classes.get(jar);
+                    for (PluginClassLoader loader : loaded.keySet()) {
+                        NamedContainer<LinkedList<String>, LinkedHashMap<String, String>> jarmap = classes.get(loader);
                         progress++;
-                        for (String main : loaded.get(jar)) jarmap.get().remove(main);
+                        for (String main : loaded.get(loader)) jarmap.get().remove(main);
                         if (jarmap.get().size() > 0) {
-                            classes.put(jar, jarmap);
+                            classes.put(loader, jarmap);
                         } else {
-                            classes.remove(jar);
+                            classes.remove(loader);
                         }
                     }
                 }
