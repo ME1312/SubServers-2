@@ -151,7 +151,8 @@ public class InternalHost extends Host {
                             else to.delete();
                         }
                         to.mkdirs();
-                        Files.move(from, to);
+                        Util.copyDirectory(from, to);
+                        Util.deleteDirectory(from);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -195,7 +196,8 @@ public class InternalHost extends Host {
                             else to.delete();
                         }
                         to.mkdirs();
-                        Files.move(from, to);
+                        Util.copyDirectory(from, to);
+                        Util.deleteDirectory(from);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();

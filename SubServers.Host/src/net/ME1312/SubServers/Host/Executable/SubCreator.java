@@ -402,7 +402,9 @@ public class SubCreator {
     private void generateProperties(File dir, int port) throws IOException {
         File file = new File(dir, "server.properties");
         if (!file.exists()) file.createNewFile();
-        String content = Util.readAll(new BufferedReader(new InputStreamReader(new FileInputStream(file)))).replace("server-port=", "server-port=" + port).replace("server-ip=", "server-ip=" + host.config.get().getSection("Settings").getRawString("Server-Bind"));
+        FileInputStream is = new FileInputStream(file);
+        String content = Util.readAll(new BufferedReader(new InputStreamReader(is))).replace("server-port=", "server-port=" + port).replace("server-ip=", "server-ip=" + host.config.get().getSection("Settings").getRawString("Server-Bind"));
+        is.close();
         file.delete();
         PrintWriter writer = new PrintWriter(file, "UTF-8");
         writer.write(content);

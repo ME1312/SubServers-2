@@ -126,7 +126,8 @@ public final class ExHost {
                     try {
                         if (file.isDirectory()) {
                             if (new UniversalFile(dir, "Recently Deleted:" + file.getName() + ":info.json").exists()) {
-                                JSONObject json = new JSONObject(Util.readAll(new FileReader(new UniversalFile(dir, "Recently Deleted:" + file.getName() + ":info.json"))));
+                                FileReader reader = new FileReader(new UniversalFile(dir, "Recently Deleted:" + file.getName() + ":info.json"));
+                                JSONObject json = new JSONObject(Util.readAll(reader));
                                 if (json.keySet().contains("Timestamp")) {
                                     if (TimeUnit.MILLISECONDS.toDays(Calendar.getInstance().getTime().getTime() - json.getLong("Timestamp")) >= 7) {
                                         Util.deleteDirectory(file);

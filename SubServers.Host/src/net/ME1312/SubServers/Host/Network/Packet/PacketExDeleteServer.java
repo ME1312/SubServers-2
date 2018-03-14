@@ -87,7 +87,8 @@ public class PacketExDeleteServer implements PacketIn, PacketOut {
                                 else to.delete();
                             }
                             to.mkdirs();
-                            move(from, to);
+                            Util.copyDirectory(from, to);
+                            Util.deleteDirectory(from);
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -115,19 +116,5 @@ public class PacketExDeleteServer implements PacketIn, PacketOut {
     @Override
     public Version getVersion() {
         return new Version("2.11.0a");
-    }
-
-    public void move(File from, File to) {
-        if (from.isDirectory()) {
-            to.mkdir();
-            for (File file : from.listFiles()) move(file, new File(to, file.getName()));
-            from.delete();
-        } else {
-            try {
-                Files.move(from.toPath(), to.toPath());
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
     }
 }

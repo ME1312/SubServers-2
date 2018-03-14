@@ -128,10 +128,10 @@ public class Version implements Serializable, Comparable<Version> {
     /*
      * The internal toString() method
      * new Version(new Version("1.0.0"), VersionType.PRE_ALPHA, "7") would return:
-     * 5 1.0.0 0 7 9
+     * 5 1.0.0 0 7
      */
     private String toInternalString() {
-        String str = type.id + ' ' + string + ' ' + '9';
+        String str = type.id + ' ' + string;
         if (parent != null) str = parent.toInternalString()+' '+str;
         return str;
     }

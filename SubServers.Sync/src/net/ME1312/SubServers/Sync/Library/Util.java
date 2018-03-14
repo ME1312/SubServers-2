@@ -193,6 +193,9 @@ public final class Util {
                 while ((length = in.read(buffer)) > 0) {
                     out.write(buffer, 0, length);
                 }
+
+                in.close();
+                out.close();
             } catch (Exception e) {
                 try {
                     if (in != null) in.close();
