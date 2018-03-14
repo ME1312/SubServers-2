@@ -125,17 +125,6 @@ public class Version implements Serializable, Comparable<Version> {
         this.string = string;
     }
 
-    /*
-     * The internal toString() method
-     * new Version(new Version("1.0.0"), VersionType.PRE_ALPHA, "7") would return:
-     * 5 1.0.0 0 7
-     */
-    private String toInternalString() {
-        String str = type.id + ' ' + string;
-        if (parent != null) str = parent.toInternalString()+' '+str;
-        return str;
-    }
-
     /**
      * The default toString() method<br>
      * <br>
@@ -223,14 +212,27 @@ public class Version implements Serializable, Comparable<Version> {
      * @param version The version to compare to
      */
     public int compareTo(Version version) {
-        String version1 = toInternalString();
-        String version2 = version.toInternalString();
+        // Compare parent versions first
+        if (this.parent != null || version.parent != null) {
+            int parent = ((this.parent == null)?this:this.parent).compareTo((version.parent == null)?version:version.parent);
+            if (parent != 0) return parent;
+        }
 
-        VersionTokenizer tokenizer1 = new VersionTokenizer(version1);
-        VersionTokenizer tokenizer2 = new VersionTokenizer(version2);
+        if (this.parent != null && version.parent == null) {
+            // Version one has a parent version and version two does not, making version two the official version
+            return -1;
+        }
 
-        int number1 = 0, number2 = 0;
-        String suffix1 = "", suffix2 = "";
+        if (this.parent == null && version.parent != null) {
+            // Version one does not have a parent version and version two does, making version one the official version
+            return 1;
+        }
+
+        VersionTokenizer tokenizer1 = new VersionTokenizer(string);
+        VersionTokenizer tokenizer2 = new VersionTokenizer(version.string);
+
+        int number1, number2;
+        String suffix1, suffix2;
 
         while (tokenizer1.MoveNext()) {
             if (!tokenizer2.MoveNext()) {
@@ -313,71 +315,6 @@ public class Version implements Serializable, Comparable<Version> {
      * @param ver2 Version to Compare
      */
     public static int compare(Version ver1, Version ver2) {
-        String version1 = ver1.toInternalString();
-        String version2 = ver2.toInternalString();
-
-        VersionTokenizer tokenizer1 = new VersionTokenizer(version1);
-        VersionTokenizer tokenizer2 = new VersionTokenizer(version2);
-
-        int number1 = 0, number2 = 0;
-        String suffix1 = "", suffix2 = "";
-
-        while (tokenizer1.MoveNext()) {
-            if (!tokenizer2.MoveNext()) {
-                do {
-                    number1 = tokenizer1.getNumber();
-                    suffix1 = tokenizer1.getSuffix();
-                    if (number1 != 0 || suffix1.length() != 0) {
-                        // Version one is longer than number two, and non-zero
-                        return 1;
-                    }
-                }
-                while (tokenizer1.MoveNext());
-
-                // Version one is longer than version two, but zero
-                return 0;
-            }
-
-            number1 = tokenizer1.getNumber();
-            suffix1 = tokenizer1.getSuffix();
-            number2 = tokenizer2.getNumber();
-            suffix2 = tokenizer2.getSuffix();
-
-            if (number1 < number2) {
-                // Number one is less than number two
-                return -1;
-            }
-            if (number1 > number2) {
-                // Number one is greater than number two
-                return 1;
-            }
-
-            boolean empty1 = suffix1.length() == 0;
-            boolean empty2 = suffix2.length() == 0;
-
-            if (empty1 && empty2) continue; // No suffixes
-            if (empty1) return 1; // First suffix is empty (1.2 > 1.2b)
-            if (empty2) return -1; // Second suffix is empty (1.2a < 1.2)
-
-            // Lexical comparison of suffixes
-            int result = suffix1.compareTo(suffix2);
-            if (result != 0) return result;
-
-        }
-        if (tokenizer2.MoveNext()) {
-            do {
-                number2 = tokenizer2.getNumber();
-                suffix2 = tokenizer2.getSuffix();
-                if (number2 != 0 || suffix2.length() != 0) {
-                    // Version one is longer than version two, and non-zero
-                    return -1;
-                }
-            }
-            while (tokenizer2.MoveNext());
-
-            // Version two is longer than version one, but zero
-            return 0;
-        }
-        return 0;
+        return ver1.compareTo(ver2);
     }
 }

@@ -40,17 +40,17 @@ public class SubCommand {
 
                             NodeList updnodeList = updxml.getElementsByTagName("version");
                             Version updversion = host.version;
-                            int updcount = -1;
+                            int updcount = 0;
                             for (int i = 0; i < updnodeList.getLength(); i++) {
                                 Node node = updnodeList.item(i);
                                 if (node.getNodeType() == Node.ELEMENT_NODE) {
-                                    if (!node.getTextContent().startsWith("-") && new Version(node.getTextContent()).compareTo(updversion) >= 0) {
+                                    if (!node.getTextContent().startsWith("-") && !node.getTextContent().equals(host.version.toString()) && new Version(node.getTextContent()).compareTo(updversion) > 0) {
                                         updversion = new Version(node.getTextContent());
                                         updcount++;
                                     }
                                 }
                             }
-                            if (updversion.equals(host.version)) {
+                            if (updcount == 0) {
                                 host.log.message.println("You are on the latest version.");
                             } else {
                                 host.log.message.println("You are " + updcount + " version" + ((updcount == 1) ? "" : "s") + " behind.");

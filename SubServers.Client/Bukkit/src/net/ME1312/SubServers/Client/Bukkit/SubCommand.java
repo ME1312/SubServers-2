@@ -55,17 +55,17 @@ public final class SubCommand implements CommandExecutor {
 
                                 NodeList updnodeList = updxml.getElementsByTagName("version");
                                 Version updversion = plugin.version;
-                                int updcount = -1;
+                                int updcount = 0;
                                 for (int i = 0; i < updnodeList.getLength(); i++) {
                                     Node node = updnodeList.item(i);
                                     if (node.getNodeType() == Node.ELEMENT_NODE) {
-                                        if (!node.getTextContent().startsWith("-") && new Version(node.getTextContent()).compareTo(updversion) >= 0) {
+                                        if (!node.getTextContent().startsWith("-") && !node.getTextContent().equals(plugin.version.toString()) && new Version(node.getTextContent()).compareTo(updversion) > 0) {
                                             updversion = new Version(node.getTextContent());
                                             updcount++;
                                         }
                                     }
                                 }
-                                if (updversion.equals(plugin.version)) {
+                                if (updcount == 0) {
                                     sender.sendMessage(plugin.api.getLang("SubServers", "Command.Version.Latest"));
                                 } else {
                                     sender.sendMessage(plugin.api.getLang("SubServers", "Command.Version.Outdated").replace("$int$", Integer.toString(updcount)));
