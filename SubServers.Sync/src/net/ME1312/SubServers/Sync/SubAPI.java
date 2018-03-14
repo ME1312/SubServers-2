@@ -123,15 +123,6 @@ public final class SubAPI {
     }
 
     /**
-     * Gets the SubServers.Sync Beta Version
-     *
-     * @return SubServers.Sync Beta Version (or null if this is a release version)
-     */
-    public Version getBetaVersion() {
-        return plugin.bversion;
-    }
-
-    /**
      * Gets the SubServers.Sync Version
      *
      * @return SubServers.Sync Version

@@ -9,7 +9,27 @@ import java.io.Serializable;
  */
 @SuppressWarnings("serial")
 public class Version implements Serializable, Comparable<Version> {
-	private String string;
+    private final Version parent;
+    private final VersionType type;
+	private final String string;
+
+	public enum VersionType {
+	    PRE_ALPHA(0, "pa", "pre-alpha"),
+        ALPHA(1, "a", "alpha"),
+        PREVIEW(2, "pb", "preview"),
+        PRE_BETA(2, "pb", "pre-beta"),
+        BETA(3, "b", "beta"),
+        PRE_RELEASE(4, "pr", "pre-release"),
+        RELEASE(5, "r", "release");
+
+	    private final int id;
+	    private final String shortname, longname;
+        VersionType(int id, String shortname, String longname) {
+	        this.id = id;
+	        this.shortname = shortname;
+	        this.longname = longname;
+        }
+    }
 
     /**
      * Creates a Version
@@ -17,17 +37,83 @@ public class Version implements Serializable, Comparable<Version> {
      * @param string Version String
      */
 	public Version(String string) {
-        if (Util.isNull(string)) throw new NullPointerException();
-		this.string = string;
+	    this(VersionType.RELEASE, string);
 	}
 
+    /**
+     * Creates a Version
+     *
+     * @param type Version Type
+     * @param string Version String
+     */
+	public Version(VersionType type, String string) {
+	    this(null, type, string);
+    }
+
+    /**
+     * Creates a Version (Prepending the parent)
+     *
+     * @param parent Parent Version
+     * @param string Version String
+     */
+    public Version(Version parent, String string) {
+        this(parent, VersionType.RELEASE, string);
+    }
+
+    /**
+     * Creates a Version (Prepending the parent)
+     *
+     * @param parent Parent Version
+     * @param type Version Type
+     * @param string Version String
+     */
+    public Version(Version parent, VersionType type, String string) {
+        if (Util.isNull(string, type)) throw new NullPointerException();
+        this.parent = parent;
+        this.type = type;
+        this.string = string;
+    }
 
     /**
      * Creates a Version
      *
      * @param ints Version Numbers (Will be separated with dots)
      */
-    public Version(Integer... ints) {
+    public Version(int... ints) {
+        this(VersionType.RELEASE, ints);
+    }
+
+    /**
+     * Creates a Version
+     *
+     * @param type Version Type
+     * @param ints Version Numbers (Will be separated with dots)
+     */
+    public Version(VersionType type, int... ints) {
+        this(null, type, ints);
+    }
+
+    /**
+     * Creates a Version (Prepending the parent)
+     *
+     * @param parent Parent Version
+     * @param ints Version Numbers (Will be separated with dots)
+     */
+    public Version(Version parent, int... ints) {
+        this(parent, VersionType.RELEASE, ints);
+    }
+
+    /**
+     * Creates a Version (Prepending the parent)
+     *
+     * @param parent Parent Version
+     * @param type Version Type
+     * @param ints Version Numbers (Will be separated with dots)
+     */
+    public Version(Version parent, VersionType type, int... ints) {
+        if (Util.isNull(type)) throw new NullPointerException();
+        this.parent = parent;
+        this.type = type;
         String string = Integer.toString(ints[0]);
         int i = 0;
         if (ints.length != 1) {
@@ -38,11 +124,74 @@ public class Version implements Serializable, Comparable<Version> {
         }
         this.string = string;
     }
-	
+
+    /*
+     * The internal toString() method
+     * new Version(new Version("1.0.0"), VersionType.PRE_ALPHA, "7") would return:
+     * 5 1.0.0 0 7 9
+     */
+    private String toInternalString() {
+        String str = type.id + ' ' + string + ' ' + '9';
+        if (parent != null) str = parent.toInternalString()+' '+str;
+        return str;
+    }
+
+    /**
+     * The default toString() method<br>
+     * <br>
+     * <b>new Version(new Version("1.0.0"), VersionType.PRE_ALPHA, "7")</b> would return:<br>
+     * <b>1.0.0/pa7</b>
+     *
+     * @return Version as a String
+     */
 	@Override
 	public String toString() {
-		return string;
+        String str = (parent == null)?"":parent.toString()+'/'+type.shortname;
+        str += string;
+        return str;
 	}
+
+    /**
+     * The full toString() method<br>
+     * <br>
+     * <b>new Version(new Version("1.0.0"), VersionType.PRE_ALPHA, "7")</b> would return:<br>
+     * <b>r1.0.0/pa7</b>
+     *
+     * @return Version as a String
+     */
+    public String toFullString() {
+        String str = type.shortname + string;
+        if (parent != null) str = parent.toFullString()+'/'+str;
+        return str;
+    }
+
+    /**
+     * The extended toString() method<br>
+     * <br>
+     * <b>new Version(new Version("1.0.0"), VersionType.PRE_ALPHA, "7")</b> would return:<br>
+     * <b>1.0.0 pre-alpha 7</b>
+     *
+     * @return Version as a String
+     */
+    public String toExtendedString() {
+        String str = (parent == null)?"":parent.toExtendedString()+' '+type.longname+' ';
+        str += string;
+        return str;
+    }
+
+    /**
+     * The full extended toString() method<br>
+     * <br>
+     * <b>new Version(new Version("1.0.0"), VersionType.PRE_ALPHA, "7")</b> would return:<br>
+     * <b>release 1.0.0 pre-alpha 7</b>
+     *
+     * @return Version as a String
+     */
+    public String toFullExtendedString() {
+        String str = type.longname + ' ' + string;
+        if (parent != null) str = parent.toFullExtendedString()+' '+str;
+        return str;
+    }
 
 	@Override
     public boolean equals(Object object) {
@@ -74,8 +223,8 @@ public class Version implements Serializable, Comparable<Version> {
      * @param version The version to compare to
      */
     public int compareTo(Version version) {
-        String version1 = this.string;
-        String version2 = version.toString();
+        String version1 = toInternalString();
+        String version2 = version.toInternalString();
 
         VersionTokenizer tokenizer1 = new VersionTokenizer(version1);
         VersionTokenizer tokenizer2 = new VersionTokenizer(version2);
@@ -164,8 +313,8 @@ public class Version implements Serializable, Comparable<Version> {
      * @param ver2 Version to Compare
      */
     public static int compare(Version ver1, Version ver2) {
-        String version1 = ver1.toString();
-        String version2 = ver2.toString();
+        String version1 = ver1.toInternalString();
+        String version2 = ver2.toInternalString();
 
         VersionTokenizer tokenizer1 = new VersionTokenizer(version1);
         VersionTokenizer tokenizer2 = new VersionTokenizer(version2);

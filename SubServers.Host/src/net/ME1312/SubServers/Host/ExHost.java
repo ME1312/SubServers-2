@@ -57,8 +57,8 @@ public final class ExHost {
     public YAMLSection host = null;
     public SubDataClient subdata = null;
 
-    public final Version version = new Version("2.13a");
-    public final Version bversion = new Version(3);
+    //public final Version version = new Version("2.13a");
+    public final Version version = new Version(new Version("2.13a"), Version.VersionType.PRE_RELEASE, 1);
     public final SubAPI api = new SubAPI(this);
 
     private ConsoleReader jline;
@@ -202,8 +202,8 @@ public final class ExHost {
                         PluginClassLoader loader = new PluginClassLoader(this.getClass().getClassLoader(), file.toURI().toURL());
                         List<String> contents = new ArrayList<String>();
 
-                        boolean isplugin = false;
                         loader.setDefaultClass(ClassNotFoundException.class);
+                        boolean isplugin = false;
                         while (entries.hasMoreElements()) {
                             JarEntry entry = entries.nextElement();
                             if (!entry.isDirectory() && entry.getName().endsWith(".class")) {

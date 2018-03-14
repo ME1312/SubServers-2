@@ -33,33 +33,31 @@ public class SubCommand {
                     host.log.message.println(
                             System.getProperty("os.name") + ' ' + System.getProperty("os.version") + ',',
                             "Java " + System.getProperty("java.version") + ',',
-                            "SubServers.Host v" + host.version.toString() + ((host.bversion == null) ? "" : " BETA " + host.bversion.toString()));
-                    if (host.bversion == null) {
-                        new Thread(() -> {
-                            try {
-                                Document updxml = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new InputSource(new StringReader(Util.readAll(new BufferedReader(new InputStreamReader(new URL("https://src.me1312.net/maven/net/ME1312/SubServers/SubServers.Host/maven-metadata.xml").openStream(), Charset.forName("UTF-8")))))));
+                            "SubServers.Host v" + host.version.toExtendedString());
+                    new Thread(() -> {
+                        try {
+                            Document updxml = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new InputSource(new StringReader(Util.readAll(new BufferedReader(new InputStreamReader(new URL("https://src.me1312.net/maven/net/ME1312/SubServers/SubServers.Host/maven-metadata.xml").openStream(), Charset.forName("UTF-8")))))));
 
-                                NodeList updnodeList = updxml.getElementsByTagName("version");
-                                Version updversion = host.version;
-                                int updcount = -1;
-                                for (int i = 0; i < updnodeList.getLength(); i++) {
-                                    Node node = updnodeList.item(i);
-                                    if (node.getNodeType() == Node.ELEMENT_NODE) {
-                                        if (!node.getTextContent().startsWith("-") && new Version(node.getTextContent()).compareTo(updversion) >= 0) {
-                                            updversion = new Version(node.getTextContent());
-                                            updcount++;
-                                        }
+                            NodeList updnodeList = updxml.getElementsByTagName("version");
+                            Version updversion = host.version;
+                            int updcount = -1;
+                            for (int i = 0; i < updnodeList.getLength(); i++) {
+                                Node node = updnodeList.item(i);
+                                if (node.getNodeType() == Node.ELEMENT_NODE) {
+                                    if (!node.getTextContent().startsWith("-") && new Version(node.getTextContent()).compareTo(updversion) >= 0) {
+                                        updversion = new Version(node.getTextContent());
+                                        updcount++;
                                     }
                                 }
-                                if (updversion.equals(host.version)) {
-                                    host.log.message.println("You are on the latest version.");
-                                } else {
-                                    host.log.message.println("You are " + updcount + " version" + ((updcount == 1) ? "" : "s") + " behind.");
-                                }
-                            } catch (Exception e) {
                             }
-                        }).start();
-                    }
+                            if (updversion.equals(host.version)) {
+                                host.log.message.println("You are on the latest version.");
+                            } else {
+                                host.log.message.println("You are " + updcount + " version" + ((updcount == 1) ? "" : "s") + " behind.");
+                            }
+                        } catch (Exception e) {
+                        }
+                    }).start();
                 } else if (host.api.plugins.get(args[0].toLowerCase()) != null) {
                     SubPluginInfo plugin = host.api.plugins.get(args[0].toLowerCase());
                     host.log.message.println(plugin.getName() + " v" + plugin.getVersion() + " by " + plugin.getAuthors().toString().substring(1, plugin.getAuthors().toString().length() - 1));

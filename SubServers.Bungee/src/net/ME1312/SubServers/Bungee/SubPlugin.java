@@ -57,8 +57,8 @@ public final class SubPlugin extends BungeeCord implements Listener {
     public final SubAPI api = new SubAPI(this);
     public SubDataServer subdata = null;
     public SubServer sudo = null;
-    public final Version version = new Version(SubPlugin.class.getPackage().getImplementationVersion());
-    public final Version bversion = (SubPlugin.class.getPackage().getSpecificationVersion().equals("0"))?null:new Version(SubPlugin.class.getPackage().getSpecificationVersion());
+    //public static final Version version = new Version("2.13a");
+    public static final Version version = new Version(new Version("2.13a"), Version.VersionType.PRE_RELEASE, 1);
 
     public boolean redis = false;
     public long resetDate = 0;
@@ -613,7 +613,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
      */
     @Override
     public String getName() {
-        return (new Version(super.getVersion()).equals(version))?"SubServers.Bungee":super.getName();
+        return (super.getVersion()).equals("SubServers.Bungee")?"SubServers.Bungee":super.getName();
     }
 
     /**
@@ -623,7 +623,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
      */
     @Override
     public String getVersion() {
-        return (new Version(super.getVersion()).equals(version))?version+((bversion != null)?"-BETA-"+bversion.toString():"")+"-PATCHED":super.getVersion();
+        return (super.getVersion().equals("SubServers.Bungee"))?version.toExtendedString().replace(' ', '-'):super.getVersion();
     }
 
     /**

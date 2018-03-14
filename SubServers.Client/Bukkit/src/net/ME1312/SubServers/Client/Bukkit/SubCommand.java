@@ -48,32 +48,30 @@ public final class SubCommand implements CommandExecutor {
                     if (args[0].equalsIgnoreCase("help") || args[0].equalsIgnoreCase("?")) {
                         sender.sendMessage(printHelp(label));
                     } else if (args[0].equalsIgnoreCase("version") || args[0].equalsIgnoreCase("ver")) {
-                        sender.sendMessage(plugin.api.getLang("SubServers", "Command.Version").replace("$name$", "SubServers.Client.Bukkit").replace("$str$", plugin.version.toString() + ((plugin.bversion != null)?" BETA "+plugin.bversion.toString():"")));
-                        if (plugin.bversion == null) {
-                            Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
-                                try {
-                                    Document updxml = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new InputSource(new StringReader(Util.readAll(new BufferedReader(new InputStreamReader(new URL("https://src.me1312.net/maven/net/ME1312/SubServers/SubServers.Client.Bukkit/maven-metadata.xml").openStream(), Charset.forName("UTF-8")))))));
+                        sender.sendMessage(plugin.api.getLang("SubServers", "Command.Version").replace("$name$", "SubServers.Client.Bukkit").replace("$str$", plugin.version.toExtendedString()));
+                        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+                            try {
+                                Document updxml = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new InputSource(new StringReader(Util.readAll(new BufferedReader(new InputStreamReader(new URL("https://src.me1312.net/maven/net/ME1312/SubServers/SubServers.Client.Bukkit/maven-metadata.xml").openStream(), Charset.forName("UTF-8")))))));
 
-                                    NodeList updnodeList = updxml.getElementsByTagName("version");
-                                    Version updversion = plugin.version;
-                                    int updcount = -1;
-                                    for (int i = 0; i < updnodeList.getLength(); i++) {
-                                        Node node = updnodeList.item(i);
-                                        if (node.getNodeType() == Node.ELEMENT_NODE) {
-                                            if (!node.getTextContent().startsWith("-") && new Version(node.getTextContent()).compareTo(updversion) >= 0) {
-                                                updversion = new Version(node.getTextContent());
-                                                updcount++;
-                                            }
+                                NodeList updnodeList = updxml.getElementsByTagName("version");
+                                Version updversion = plugin.version;
+                                int updcount = -1;
+                                for (int i = 0; i < updnodeList.getLength(); i++) {
+                                    Node node = updnodeList.item(i);
+                                    if (node.getNodeType() == Node.ELEMENT_NODE) {
+                                        if (!node.getTextContent().startsWith("-") && new Version(node.getTextContent()).compareTo(updversion) >= 0) {
+                                            updversion = new Version(node.getTextContent());
+                                            updcount++;
                                         }
                                     }
-                                    if (updversion.equals(plugin.version)) {
-                                        sender.sendMessage(plugin.api.getLang("SubServers", "Command.Version.Latest"));
-                                    } else {
-                                        sender.sendMessage(plugin.api.getLang("SubServers", "Command.Version.Outdated").replace("$int$", Integer.toString(updcount)));
-                                    }
-                                } catch (Exception e) {}
-                            });
-                        }
+                                }
+                                if (updversion.equals(plugin.version)) {
+                                    sender.sendMessage(plugin.api.getLang("SubServers", "Command.Version.Latest"));
+                                } else {
+                                    sender.sendMessage(plugin.api.getLang("SubServers", "Command.Version.Outdated").replace("$int$", Integer.toString(updcount)));
+                                }
+                            } catch (Exception e) {}
+                        });
                     } else if (args[0].equalsIgnoreCase("list")) {
                         final String fLabel = label;
                         plugin.subdata.sendPacket(new PacketDownloadServerList(null, null, json -> {

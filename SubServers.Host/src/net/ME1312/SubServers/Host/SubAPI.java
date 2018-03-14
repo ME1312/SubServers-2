@@ -376,15 +376,6 @@ public final class SubAPI {
     }
 
     /**
-     * Gets the SubServers Beta Version
-     *
-     * @return SubServers Beta Version (or null if this is a release version)
-     */
-    public Version getBetaVersion() {
-        return host.bversion;
-    }
-
-    /**
      * Gets the SubServers Version
      *
      * @return SubServers Version

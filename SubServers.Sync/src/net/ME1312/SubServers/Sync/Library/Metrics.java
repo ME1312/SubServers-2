@@ -118,7 +118,7 @@ public class Metrics {
         JsonObject data = new JsonObject();
 
         String pluginName = "SubServers Sync";
-        String pluginVersion = plugin.version + ((plugin.bversion != null)?"/b"+plugin.bversion.toString():"");
+        String pluginVersion = plugin.version.toString();
 
         data.addProperty("pluginName", pluginName);
         data.addProperty("pluginVersion", pluginVersion);

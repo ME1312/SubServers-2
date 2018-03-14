@@ -66,32 +66,30 @@ public final class SubCommand extends CommandX {
                 if (args[0].equalsIgnoreCase("help") || args[0].equalsIgnoreCase("?")) {
                     sender.sendMessages(printHelp());
                 } else if (args[0].equalsIgnoreCase("version") || args[0].equalsIgnoreCase("ver")) {
-                    sender.sendMessage("SubServers > SubServers.Bungee is running version " + plugin.version.toString() + ((plugin.bversion != null)?" BETA "+plugin.bversion.toString():""));
-                    if (plugin.bversion == null) {
-                        new Thread(() -> {
-                            try {
-                                Document updxml = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new InputSource(new StringReader(Util.readAll(new BufferedReader(new InputStreamReader(new URL("https://src.me1312.net/maven/net/ME1312/SubServers/SubServers.Bungee/maven-metadata.xml").openStream(), Charset.forName("UTF-8")))))));
+                    sender.sendMessage("SubServers > SubServers.Bungee is running version " + plugin.version.toExtendedString());
+                    new Thread(() -> {
+                        try {
+                            Document updxml = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new InputSource(new StringReader(Util.readAll(new BufferedReader(new InputStreamReader(new URL("https://src.me1312.net/maven/net/ME1312/SubServers/SubServers.Bungee/maven-metadata.xml").openStream(), Charset.forName("UTF-8")))))));
 
-                                NodeList updnodeList = updxml.getElementsByTagName("version");
-                                Version updversion = plugin.version;
-                                int updcount = -1;
-                                for (int i = 0; i < updnodeList.getLength(); i++) {
-                                    Node node = updnodeList.item(i);
-                                    if (node.getNodeType() == Node.ELEMENT_NODE) {
-                                        if (!node.getTextContent().startsWith("-") && new Version(node.getTextContent()).compareTo(updversion) >= 0) {
-                                            updversion = new Version(node.getTextContent());
-                                            updcount++;
-                                        }
+                            NodeList updnodeList = updxml.getElementsByTagName("version");
+                            Version updversion = plugin.version;
+                            int updcount = -1;
+                            for (int i = 0; i < updnodeList.getLength(); i++) {
+                                Node node = updnodeList.item(i);
+                                if (node.getNodeType() == Node.ELEMENT_NODE) {
+                                    if (!node.getTextContent().startsWith("-") && new Version(node.getTextContent()).compareTo(updversion) >= 0) {
+                                        updversion = new Version(node.getTextContent());
+                                        updcount++;
                                     }
                                 }
-                                if (updversion.equals(plugin.version)) {
-                                    sender.sendMessage("You are on the latest version.");
-                                } else {
-                                    sender.sendMessage("You are " + updcount + " version" + ((updcount == 1)?"":"s") + " behind.");
-                                }
-                            } catch (Exception e) {}
-                        }).start();
-                    }
+                            }
+                            if (updversion.equals(plugin.version)) {
+                                sender.sendMessage("You are on the latest version.");
+                            } else {
+                                sender.sendMessage("You are " + updcount + " version" + ((updcount == 1)?"":"s") + " behind.");
+                            }
+                        } catch (Exception e) {}
+                    }).start();
                 } else if (args[0].equalsIgnoreCase("reload")) {
                     if (args.length > 1) {
                         switch (args[1].toLowerCase()) {

@@ -34,10 +34,22 @@ public class PluginClassLoader extends URLClassLoader {
         loaders.add(this);
     }
 
+    /**
+     * Set the Default Class to load when no class is found
+     *
+     * @param clazz Class
+     */
     public void setDefaultClass(Class<?> clazz) {
-        this.defaultClass = clazz;
+        defaultClass = clazz;
     }
 
+
+    /**
+     * Get the Default Class to load when no class is found
+     *
+     * @throws ClassNotFoundException when no Default Class is set
+     * @return Default Class
+     */
     public Class<?> getDefaultClass() throws ClassNotFoundException {
         if (defaultClass == null) {
             throw new ClassNotFoundException();
@@ -79,7 +91,7 @@ public class PluginClassLoader extends URLClassLoader {
                     } catch (NoClassDefFoundError | ClassNotFoundException ex) {}
                 }
             } else {
-                return getDefaultClass(name);
+                throw new ClassNotFoundException(name);
             }
         }
     }

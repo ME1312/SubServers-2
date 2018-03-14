@@ -40,12 +40,12 @@ public final class SubPlugin extends JavaPlugin {
 
     public UIHandler gui = null;
     public final Version version;
-    public final Version bversion = new Version(2);
     public final SubAPI api = new SubAPI(this);
 
     public SubPlugin() {
         super();
-        version = new Version(getDescription().getVersion());
+        //version = new Version(getDescription().getVersion());
+        version = new Version(new Version(getDescription().getVersion()), Version.VersionType.PRE_RELEASE, 1);
     }
 
     /**

@@ -174,11 +174,15 @@ extends java.net.URLClassLoader</pre>
 </tr>
 <tr id="i0" class="altColor">
 <td class="colFirst"><code>java.lang.Class&lt;?&gt;</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Host/Library/PluginClassLoader.html#getDefaultClass--">getDefaultClass</a></span>()</code>&nbsp;</td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Host/Library/PluginClassLoader.html#getDefaultClass--">getDefaultClass</a></span>()</code>
+<div class="block">Get the Default Class to load when no class is found</div>
+</td>
 </tr>
 <tr id="i1" class="rowColor">
 <td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Host/Library/PluginClassLoader.html#setDefaultClass-java.lang.Class-">setDefaultClass</a></span>(java.lang.Class&lt;?&gt;&nbsp;clazz)</code>&nbsp;</td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Host/Library/PluginClassLoader.html#setDefaultClass-java.lang.Class-">setDefaultClass</a></span>(java.lang.Class&lt;?&gt;&nbsp;clazz)</code>
+<div class="block">Set the Default Class to load when no class is found</div>
+</td>
 </tr>
 </table>
 <ul class="blockList">
@@ -261,6 +265,11 @@ extends java.net.URLClassLoader</pre>
 <li class="blockList">
 <h4>setDefaultClass</h4>
 <pre>public&nbsp;void&nbsp;setDefaultClass(java.lang.Class&lt;?&gt;&nbsp;clazz)</pre>
+<div class="block">Set the Default Class to load when no class is found</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>clazz</code> - Class</dd>
+</dl>
 </li>
 </ul>
 <a name="getDefaultClass--">
@@ -271,9 +280,12 @@ extends java.net.URLClassLoader</pre>
 <h4>getDefaultClass</h4>
 <pre>public&nbsp;java.lang.Class&lt;?&gt;&nbsp;getDefaultClass()
                                    throws java.lang.ClassNotFoundException</pre>
+<div class="block">Get the Default Class to load when no class is found</div>
 <dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>Default Class</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
-<dd><code>java.lang.ClassNotFoundException</code></dd>
+<dd><code>java.lang.ClassNotFoundException</code> - when no Default Class is set</dd>
 </dl>
 </li>
 </ul>

@@ -231,8 +231,6 @@
 <dd>
 <div class="block">Broadcast packet to all Clients</div>
 </dd>
-<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Client/Bukkit/SubPlugin.html#bversion">bversion</a></span> - Variable in class net.ME1312.SubServers.Client.Bukkit.<a href="net/ME1312/SubServers/Client/Bukkit/SubPlugin.html" title="class in net.ME1312.SubServers.Client.Bukkit">SubPlugin</a></dt>
-<dd>&nbsp;</dd>
 </dl>
 <a name="I:C">
 <!--   -->
@@ -490,10 +488,6 @@
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Client/Bukkit/Library/Util.html#getBackwards-java.util.Map-V-">getBackwards(Map&lt;K, V&gt;, V)</a></span> - Static method in class net.ME1312.SubServers.Client.Bukkit.Library.<a href="net/ME1312/SubServers/Client/Bukkit/Library/Util.html" title="class in net.ME1312.SubServers.Client.Bukkit.Library">Util</a></dt>
 <dd>
 <div class="block">Get keys by value from map</div>
-</dd>
-<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Client/Bukkit/SubAPI.html#getBetaVersion--">getBetaVersion()</a></span> - Method in class net.ME1312.SubServers.Client.Bukkit.<a href="net/ME1312/SubServers/Client/Bukkit/SubAPI.html" title="class in net.ME1312.SubServers.Client.Bukkit">SubAPI</a></dt>
-<dd>
-<div class="block">Gets the SubServers Beta Version</div>
 </dd>
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Client/Bukkit/Library/Config/YAMLSection.html#getBoolean-java.lang.String-">getBoolean(String)</a></span> - Method in class net.ME1312.SubServers.Client.Bukkit.Library.Config.<a href="net/ME1312/SubServers/Client/Bukkit/Library/Config/YAMLSection.html" title="class in net.ME1312.SubServers.Client.Bukkit.Library.Config">YAMLSection</a></dt>
 <dd>
@@ -1813,6 +1807,27 @@
 </a>
 <h2 class="title">T</h2>
 <dl>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Client/Bukkit/Library/Version/Version.html#toExtendedString--">toExtendedString()</a></span> - Method in class net.ME1312.SubServers.Client.Bukkit.Library.Version.<a href="net/ME1312/SubServers/Client/Bukkit/Library/Version/Version.html" title="class in net.ME1312.SubServers.Client.Bukkit.Library.Version">Version</a></dt>
+<dd>
+<div class="block">The extended toString() method<br>
+ <br>
+ <b>new Version(new Version("1.0.0"), VersionType.PRE_ALPHA, "7")</b> would return:<br>
+ <b>1.0.0 pre-alpha 7</b></div>
+</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Client/Bukkit/Library/Version/Version.html#toFullExtendedString--">toFullExtendedString()</a></span> - Method in class net.ME1312.SubServers.Client.Bukkit.Library.Version.<a href="net/ME1312/SubServers/Client/Bukkit/Library/Version/Version.html" title="class in net.ME1312.SubServers.Client.Bukkit.Library.Version">Version</a></dt>
+<dd>
+<div class="block">The full extended toString() method<br>
+ <br>
+ <b>new Version(new Version("1.0.0"), VersionType.PRE_ALPHA, "7")</b> would return:<br>
+ <b>release 1.0.0 pre-alpha 7</b></div>
+</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Client/Bukkit/Library/Version/Version.html#toFullString--">toFullString()</a></span> - Method in class net.ME1312.SubServers.Client.Bukkit.Library.Version.<a href="net/ME1312/SubServers/Client/Bukkit/Library/Version/Version.html" title="class in net.ME1312.SubServers.Client.Bukkit.Library.Version">Version</a></dt>
+<dd>
+<div class="block">The full toString() method<br>
+ <br>
+ <b>new Version(new Version("1.0.0"), VersionType.PRE_ALPHA, "7")</b> would return:<br>
+ <b>r1.0.0/pa7</b></div>
+</dd>
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Client/Bukkit/Library/Config/YAMLConfig.html#toJSON--">toJSON()</a></span> - Method in class net.ME1312.SubServers.Client.Bukkit.Library.Config.<a href="net/ME1312/SubServers/Client/Bukkit/Library/Config/YAMLConfig.html" title="class in net.ME1312.SubServers.Client.Bukkit.Library.Config">YAMLConfig</a></dt>
 <dd>
 <div class="block">Converts Config Contents to JSON</div>
@@ -1828,7 +1843,12 @@
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Client/Bukkit/Library/Config/YAMLValue.html#toString--">toString()</a></span> - Method in class net.ME1312.SubServers.Client.Bukkit.Library.Config.<a href="net/ME1312/SubServers/Client/Bukkit/Library/Config/YAMLValue.html" title="class in net.ME1312.SubServers.Client.Bukkit.Library.Config">YAMLValue</a></dt>
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Client/Bukkit/Library/Version/Version.html#toString--">toString()</a></span> - Method in class net.ME1312.SubServers.Client.Bukkit.Library.Version.<a href="net/ME1312/SubServers/Client/Bukkit/Library/Version/Version.html" title="class in net.ME1312.SubServers.Client.Bukkit.Library.Version">Version</a></dt>
-<dd>&nbsp;</dd>
+<dd>
+<div class="block">The default toString() method<br>
+ <br>
+ <b>new Version(new Version("1.0.0"), VersionType.PRE_ALPHA, "7")</b> would return:<br>
+ <b>1.0.0/pa7</b></div>
+</dd>
 </dl>
 <a name="I:U">
 <!--   -->
@@ -1909,6 +1929,15 @@
 </a>
 <h2 class="title">V</h2>
 <dl>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Client/Bukkit/Library/Version/Version.VersionType.html#valueOf-java.lang.String-">valueOf(String)</a></span> - Static method in enum net.ME1312.SubServers.Client.Bukkit.Library.Version.<a href="net/ME1312/SubServers/Client/Bukkit/Library/Version/Version.VersionType.html" title="enum in net.ME1312.SubServers.Client.Bukkit.Library.Version">Version.VersionType</a></dt>
+<dd>
+<div class="block">Returns the enum constant of this type with the specified name.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Client/Bukkit/Library/Version/Version.VersionType.html#values--">values()</a></span> - Static method in enum net.ME1312.SubServers.Client.Bukkit.Library.Version.<a href="net/ME1312/SubServers/Client/Bukkit/Library/Version/Version.VersionType.html" title="enum in net.ME1312.SubServers.Client.Bukkit.Library.Version">Version.VersionType</a></dt>
+<dd>
+<div class="block">Returns an array containing the constants of this enum type, in
+the order they are declared.</div>
+</dd>
 <dt><a href="net/ME1312/SubServers/Client/Bukkit/Library/Version/Version.html" title="class in net.ME1312.SubServers.Client.Bukkit.Library.Version"><span class="typeNameLink">Version</span></a> - Class in <a href="net/ME1312/SubServers/Client/Bukkit/Library/Version/package-summary.html">net.ME1312.SubServers.Client.Bukkit.Library.Version</a></dt>
 <dd>
 <div class="block">Version Class</div>
@@ -1917,11 +1946,37 @@
 <dd>
 <div class="block">Creates a Version</div>
 </dd>
-<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Client/Bukkit/Library/Version/Version.html#Version-java.lang.Integer...-">Version(Integer...)</a></span> - Constructor for class net.ME1312.SubServers.Client.Bukkit.Library.Version.<a href="net/ME1312/SubServers/Client/Bukkit/Library/Version/Version.html" title="class in net.ME1312.SubServers.Client.Bukkit.Library.Version">Version</a></dt>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Client/Bukkit/Library/Version/Version.html#Version-net.ME1312.SubServers.Client.Bukkit.Library.Version.Version.VersionType-java.lang.String-">Version(Version.VersionType, String)</a></span> - Constructor for class net.ME1312.SubServers.Client.Bukkit.Library.Version.<a href="net/ME1312/SubServers/Client/Bukkit/Library/Version/Version.html" title="class in net.ME1312.SubServers.Client.Bukkit.Library.Version">Version</a></dt>
 <dd>
 <div class="block">Creates a Version</div>
 </dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Client/Bukkit/Library/Version/Version.html#Version-net.ME1312.SubServers.Client.Bukkit.Library.Version.Version-java.lang.String-">Version(Version, String)</a></span> - Constructor for class net.ME1312.SubServers.Client.Bukkit.Library.Version.<a href="net/ME1312/SubServers/Client/Bukkit/Library/Version/Version.html" title="class in net.ME1312.SubServers.Client.Bukkit.Library.Version">Version</a></dt>
+<dd>
+<div class="block">Creates a Version (Prepending the parent)</div>
+</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Client/Bukkit/Library/Version/Version.html#Version-net.ME1312.SubServers.Client.Bukkit.Library.Version.Version-net.ME1312.SubServers.Client.Bukkit.Library.Version.Version.VersionType-java.lang.String-">Version(Version, Version.VersionType, String)</a></span> - Constructor for class net.ME1312.SubServers.Client.Bukkit.Library.Version.<a href="net/ME1312/SubServers/Client/Bukkit/Library/Version/Version.html" title="class in net.ME1312.SubServers.Client.Bukkit.Library.Version">Version</a></dt>
+<dd>
+<div class="block">Creates a Version (Prepending the parent)</div>
+</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Client/Bukkit/Library/Version/Version.html#Version-int...-">Version(int...)</a></span> - Constructor for class net.ME1312.SubServers.Client.Bukkit.Library.Version.<a href="net/ME1312/SubServers/Client/Bukkit/Library/Version/Version.html" title="class in net.ME1312.SubServers.Client.Bukkit.Library.Version">Version</a></dt>
+<dd>
+<div class="block">Creates a Version</div>
+</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Client/Bukkit/Library/Version/Version.html#Version-net.ME1312.SubServers.Client.Bukkit.Library.Version.Version.VersionType-int...-">Version(Version.VersionType, int...)</a></span> - Constructor for class net.ME1312.SubServers.Client.Bukkit.Library.Version.<a href="net/ME1312/SubServers/Client/Bukkit/Library/Version/Version.html" title="class in net.ME1312.SubServers.Client.Bukkit.Library.Version">Version</a></dt>
+<dd>
+<div class="block">Creates a Version</div>
+</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Client/Bukkit/Library/Version/Version.html#Version-net.ME1312.SubServers.Client.Bukkit.Library.Version.Version-int...-">Version(Version, int...)</a></span> - Constructor for class net.ME1312.SubServers.Client.Bukkit.Library.Version.<a href="net/ME1312/SubServers/Client/Bukkit/Library/Version/Version.html" title="class in net.ME1312.SubServers.Client.Bukkit.Library.Version">Version</a></dt>
+<dd>
+<div class="block">Creates a Version (Prepending the parent)</div>
+</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Client/Bukkit/Library/Version/Version.html#Version-net.ME1312.SubServers.Client.Bukkit.Library.Version.Version-net.ME1312.SubServers.Client.Bukkit.Library.Version.Version.VersionType-int...-">Version(Version, Version.VersionType, int...)</a></span> - Constructor for class net.ME1312.SubServers.Client.Bukkit.Library.Version.<a href="net/ME1312/SubServers/Client/Bukkit/Library/Version/Version.html" title="class in net.ME1312.SubServers.Client.Bukkit.Library.Version">Version</a></dt>
+<dd>
+<div class="block">Creates a Version (Prepending the parent)</div>
+</dd>
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Client/Bukkit/SubPlugin.html#version">version</a></span> - Variable in class net.ME1312.SubServers.Client.Bukkit.<a href="net/ME1312/SubServers/Client/Bukkit/SubPlugin.html" title="class in net.ME1312.SubServers.Client.Bukkit">SubPlugin</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="net/ME1312/SubServers/Client/Bukkit/Library/Version/Version.VersionType.html" title="enum in net.ME1312.SubServers.Client.Bukkit.Library.Version"><span class="typeNameLink">Version.VersionType</span></a> - Enum in <a href="net/ME1312/SubServers/Client/Bukkit/Library/Version/package-summary.html">net.ME1312.SubServers.Client.Bukkit.Library.Version</a></dt>
 <dd>&nbsp;</dd>
 </dl>
 <a name="I:Y">

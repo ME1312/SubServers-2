@@ -231,8 +231,6 @@
 <dd>
 <div class="block">Broadcast packet to all Clients</div>
 </dd>
-<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/ExHost.html#bversion">bversion</a></span> - Variable in class net.ME1312.SubServers.Host.<a href="net/ME1312/SubServers/Host/ExHost.html" title="class in net.ME1312.SubServers.Host">ExHost</a></dt>
-<dd>&nbsp;</dd>
 </dl>
 <a name="I:C">
 <!--   -->
@@ -627,10 +625,6 @@
 <dd>
 <div class="block">Get keys by value from map</div>
 </dd>
-<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/SubAPI.html#getBetaVersion--">getBetaVersion()</a></span> - Method in class net.ME1312.SubServers.Host.<a href="net/ME1312/SubServers/Host/SubAPI.html" title="class in net.ME1312.SubServers.Host">SubAPI</a></dt>
-<dd>
-<div class="block">Gets the SubServers Beta Version</div>
-</dd>
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Library/Config/YAMLSection.html#getBoolean-java.lang.String-">getBoolean(String)</a></span> - Method in class net.ME1312.SubServers.Host.Library.Config.<a href="net/ME1312/SubServers/Host/Library/Config/YAMLSection.html" title="class in net.ME1312.SubServers.Host.Library.Config">YAMLSection</a></dt>
 <dd>
 <div class="block">Get a Boolean by Handle</div>
@@ -704,7 +698,9 @@
 <div class="block">Gets this Plugin's data folder</div>
 </dd>
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Library/PluginClassLoader.html#getDefaultClass--">getDefaultClass()</a></span> - Method in class net.ME1312.SubServers.Host.Library.<a href="net/ME1312/SubServers/Host/Library/PluginClassLoader.html" title="class in net.ME1312.SubServers.Host.Library">PluginClassLoader</a></dt>
-<dd>&nbsp;</dd>
+<dd>
+<div class="block">Get the Default Class to load when no class is found</div>
+</dd>
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Library/Config/YAMLValue.html#getDefiningSection--">getDefiningSection()</a></span> - Method in class net.ME1312.SubServers.Host.Library.Config.<a href="net/ME1312/SubServers/Host/Library/Config/YAMLValue.html" title="class in net.ME1312.SubServers.Host.Library.Config">YAMLValue</a></dt>
 <dd>
 <div class="block">Get the YAML Section this Object was defined in</div>
@@ -2000,7 +1996,9 @@
 <div class="block">Sets the Command to be Sent</div>
 </dd>
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Library/PluginClassLoader.html#setDefaultClass-java.lang.Class-">setDefaultClass(Class&lt;?&gt;)</a></span> - Method in class net.ME1312.SubServers.Host.Library.<a href="net/ME1312/SubServers/Host/Library/PluginClassLoader.html" title="class in net.ME1312.SubServers.Host.Library">PluginClassLoader</a></dt>
-<dd>&nbsp;</dd>
+<dd>
+<div class="block">Set the Default Class to load when no class is found</div>
+</dd>
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Executable/SubCreator.ServerTemplate.html#setDisplayName-java.lang.String-">setDisplayName(String)</a></span> - Method in class net.ME1312.SubServers.Host.Executable.<a href="net/ME1312/SubServers/Host/Executable/SubCreator.ServerTemplate.html" title="class in net.ME1312.SubServers.Host.Executable">SubCreator.ServerTemplate</a></dt>
 <dd>
 <div class="block">Sets the Display Name for this Template</div>
@@ -2290,9 +2288,30 @@
 <dd>
 <div class="block">Color Code Converter Enum</div>
 </dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Library/Version/Version.html#toExtendedString--">toExtendedString()</a></span> - Method in class net.ME1312.SubServers.Host.Library.Version.<a href="net/ME1312/SubServers/Host/Library/Version/Version.html" title="class in net.ME1312.SubServers.Host.Library.Version">Version</a></dt>
+<dd>
+<div class="block">The extended toString() method<br>
+ <br>
+ <b>new Version(new Version("1.0.0"), VersionType.PRE_ALPHA, "7")</b> would return:<br>
+ <b>1.0.0 pre-alpha 7</b></div>
+</dd>
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Executable/Executable.html#toFile--">toFile()</a></span> - Method in class net.ME1312.SubServers.Host.Executable.<a href="net/ME1312/SubServers/Host/Executable/Executable.html" title="class in net.ME1312.SubServers.Host.Executable">Executable</a></dt>
 <dd>
 <div class="block">Get Executable File</div>
+</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Library/Version/Version.html#toFullExtendedString--">toFullExtendedString()</a></span> - Method in class net.ME1312.SubServers.Host.Library.Version.<a href="net/ME1312/SubServers/Host/Library/Version/Version.html" title="class in net.ME1312.SubServers.Host.Library.Version">Version</a></dt>
+<dd>
+<div class="block">The full extended toString() method<br>
+ <br>
+ <b>new Version(new Version("1.0.0"), VersionType.PRE_ALPHA, "7")</b> would return:<br>
+ <b>release 1.0.0 pre-alpha 7</b></div>
+</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Library/Version/Version.html#toFullString--">toFullString()</a></span> - Method in class net.ME1312.SubServers.Host.Library.Version.<a href="net/ME1312/SubServers/Host/Library/Version/Version.html" title="class in net.ME1312.SubServers.Host.Library.Version">Version</a></dt>
+<dd>
+<div class="block">The full toString() method<br>
+ <br>
+ <b>new Version(new Version("1.0.0"), VersionType.PRE_ALPHA, "7")</b> would return:<br>
+ <b>r1.0.0/pa7</b></div>
 </dd>
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Library/Config/YAMLConfig.html#toJSON--">toJSON()</a></span> - Method in class net.ME1312.SubServers.Host.Library.Config.<a href="net/ME1312/SubServers/Host/Library/Config/YAMLConfig.html" title="class in net.ME1312.SubServers.Host.Library.Config">YAMLConfig</a></dt>
 <dd>
@@ -2317,7 +2336,12 @@
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Library/TextColor.html#toString--">toString()</a></span> - Method in enum net.ME1312.SubServers.Host.Library.<a href="net/ME1312/SubServers/Host/Library/TextColor.html" title="enum in net.ME1312.SubServers.Host.Library">TextColor</a></dt>
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Library/Version/Version.html#toString--">toString()</a></span> - Method in class net.ME1312.SubServers.Host.Library.Version.<a href="net/ME1312/SubServers/Host/Library/Version/Version.html" title="class in net.ME1312.SubServers.Host.Library.Version">Version</a></dt>
-<dd>&nbsp;</dd>
+<dd>
+<div class="block">The default toString() method<br>
+ <br>
+ <b>new Version(new Version("1.0.0"), VersionType.PRE_ALPHA, "7")</b> would return:<br>
+ <b>1.0.0/pa7</b></div>
+</dd>
 </dl>
 <a name="I:U">
 <!--   -->
@@ -2392,6 +2416,10 @@
 <dd>
 <div class="block">Returns the enum constant of this type with the specified name.</div>
 </dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Library/Version/Version.VersionType.html#valueOf-java.lang.String-">valueOf(String)</a></span> - Static method in enum net.ME1312.SubServers.Host.Library.Version.<a href="net/ME1312/SubServers/Host/Library/Version/Version.VersionType.html" title="enum in net.ME1312.SubServers.Host.Library.Version">Version.VersionType</a></dt>
+<dd>
+<div class="block">Returns the enum constant of this type with the specified name.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Network/Packet/PacketExUpdateServer.UpdateType.html#valueOf-java.lang.String-">valueOf(String)</a></span> - Static method in enum net.ME1312.SubServers.Host.Network.Packet.<a href="net/ME1312/SubServers/Host/Network/Packet/PacketExUpdateServer.UpdateType.html" title="enum in net.ME1312.SubServers.Host.Network.Packet">PacketExUpdateServer.UpdateType</a></dt>
 <dd>
 <div class="block">Returns the enum constant of this type with the specified name.</div>
@@ -2402,6 +2430,11 @@
 the order they are declared.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Library/TextColor.html#values--">values()</a></span> - Static method in enum net.ME1312.SubServers.Host.Library.<a href="net/ME1312/SubServers/Host/Library/TextColor.html" title="enum in net.ME1312.SubServers.Host.Library">TextColor</a></dt>
+<dd>
+<div class="block">Returns an array containing the constants of this enum type, in
+the order they are declared.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Library/Version/Version.VersionType.html#values--">values()</a></span> - Static method in enum net.ME1312.SubServers.Host.Library.Version.<a href="net/ME1312/SubServers/Host/Library/Version/Version.VersionType.html" title="enum in net.ME1312.SubServers.Host.Library.Version">Version.VersionType</a></dt>
 <dd>
 <div class="block">Returns an array containing the constants of this enum type, in
 the order they are declared.</div>
@@ -2421,10 +2454,36 @@ the order they are declared.</div>
 <dd>
 <div class="block">Creates a Version</div>
 </dd>
-<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Library/Version/Version.html#Version-java.lang.Integer...-">Version(Integer...)</a></span> - Constructor for class net.ME1312.SubServers.Host.Library.Version.<a href="net/ME1312/SubServers/Host/Library/Version/Version.html" title="class in net.ME1312.SubServers.Host.Library.Version">Version</a></dt>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Library/Version/Version.html#Version-net.ME1312.SubServers.Host.Library.Version.Version.VersionType-java.lang.String-">Version(Version.VersionType, String)</a></span> - Constructor for class net.ME1312.SubServers.Host.Library.Version.<a href="net/ME1312/SubServers/Host/Library/Version/Version.html" title="class in net.ME1312.SubServers.Host.Library.Version">Version</a></dt>
 <dd>
 <div class="block">Creates a Version</div>
 </dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Library/Version/Version.html#Version-net.ME1312.SubServers.Host.Library.Version.Version-java.lang.String-">Version(Version, String)</a></span> - Constructor for class net.ME1312.SubServers.Host.Library.Version.<a href="net/ME1312/SubServers/Host/Library/Version/Version.html" title="class in net.ME1312.SubServers.Host.Library.Version">Version</a></dt>
+<dd>
+<div class="block">Creates a Version (Prepending the parent)</div>
+</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Library/Version/Version.html#Version-net.ME1312.SubServers.Host.Library.Version.Version-net.ME1312.SubServers.Host.Library.Version.Version.VersionType-java.lang.String-">Version(Version, Version.VersionType, String)</a></span> - Constructor for class net.ME1312.SubServers.Host.Library.Version.<a href="net/ME1312/SubServers/Host/Library/Version/Version.html" title="class in net.ME1312.SubServers.Host.Library.Version">Version</a></dt>
+<dd>
+<div class="block">Creates a Version (Prepending the parent)</div>
+</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Library/Version/Version.html#Version-int...-">Version(int...)</a></span> - Constructor for class net.ME1312.SubServers.Host.Library.Version.<a href="net/ME1312/SubServers/Host/Library/Version/Version.html" title="class in net.ME1312.SubServers.Host.Library.Version">Version</a></dt>
+<dd>
+<div class="block">Creates a Version</div>
+</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Library/Version/Version.html#Version-net.ME1312.SubServers.Host.Library.Version.Version.VersionType-int...-">Version(Version.VersionType, int...)</a></span> - Constructor for class net.ME1312.SubServers.Host.Library.Version.<a href="net/ME1312/SubServers/Host/Library/Version/Version.html" title="class in net.ME1312.SubServers.Host.Library.Version">Version</a></dt>
+<dd>
+<div class="block">Creates a Version</div>
+</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Library/Version/Version.html#Version-net.ME1312.SubServers.Host.Library.Version.Version-int...-">Version(Version, int...)</a></span> - Constructor for class net.ME1312.SubServers.Host.Library.Version.<a href="net/ME1312/SubServers/Host/Library/Version/Version.html" title="class in net.ME1312.SubServers.Host.Library.Version">Version</a></dt>
+<dd>
+<div class="block">Creates a Version (Prepending the parent)</div>
+</dd>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Library/Version/Version.html#Version-net.ME1312.SubServers.Host.Library.Version.Version-net.ME1312.SubServers.Host.Library.Version.Version.VersionType-int...-">Version(Version, Version.VersionType, int...)</a></span> - Constructor for class net.ME1312.SubServers.Host.Library.Version.<a href="net/ME1312/SubServers/Host/Library/Version/Version.html" title="class in net.ME1312.SubServers.Host.Library.Version">Version</a></dt>
+<dd>
+<div class="block">Creates a Version (Prepending the parent)</div>
+</dd>
+<dt><a href="net/ME1312/SubServers/Host/Library/Version/Version.VersionType.html" title="enum in net.ME1312.SubServers.Host.Library.Version"><span class="typeNameLink">Version.VersionType</span></a> - Enum in <a href="net/ME1312/SubServers/Host/Library/Version/package-summary.html">net.ME1312.SubServers.Host.Library.Version</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="net/ME1312/SubServers/Host/Library/Version/VersionTokenizer.html" title="class in net.ME1312.SubServers.Host.Library.Version"><span class="typeNameLink">VersionTokenizer</span></a> - Class in <a href="net/ME1312/SubServers/Host/Library/Version/package-summary.html">net.ME1312.SubServers.Host.Library.Version</a></dt>
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Host/Library/Event/EventOrder.html#VERY_EARLY">VERY_EARLY</a></span> - Static variable in class net.ME1312.SubServers.Host.Library.Event.<a href="net/ME1312/SubServers/Host/Library/Event/EventOrder.html" title="class in net.ME1312.SubServers.Host.Library.Event">EventOrder</a></dt>
