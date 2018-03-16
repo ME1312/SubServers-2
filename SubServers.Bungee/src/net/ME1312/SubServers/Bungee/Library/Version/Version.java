@@ -18,14 +18,18 @@ public class Version implements Serializable, Comparable<Version> {
 	private final String string;
 
 	public enum VersionType {
-	    PRE_ALPHA(0, "pa", "pre-alpha"),
-        ALPHA(1, "a", "alpha"),
-        PREVIEW(2, "pb", "preview"),
-        PRE_BETA(2, "pb", "pre-beta"),
-        BETA(3, "b", "beta"),
-        PRE_RELEASE(4, "pr", "pre-release"),
-        RELEASE(5, "r", "release");
-
+        PRE_ALPHA(-5, "pa", "pre-alpha"),
+        ALPHA(-4, "a", "alpha"),
+        PREVIEW(-3, "pv", "preview"),
+        PRE_BETA(-3, "pb", "pre-beta"),
+        BETA(-2, "b", "beta"),
+        PRE_RELEASE(-1, "pr", "pre-release"),
+        RELEASE(0, "r", "release"),
+        REVISION(0, "rv", "revision"),
+        VERSION(0, "v", "version"),
+        UPDATE(0, "u", "update"),
+        PATCH(0, "p", "patch"),
+        ;
 	    private final short stageid;
 	    private final String shortname, longname;
         VersionType(int stageid, String shortname, String longname) {
@@ -40,9 +44,9 @@ public class Version implements Serializable, Comparable<Version> {
      *
      * @param string Version String
      */
-	public Version(String string) {
-	    this(VersionType.RELEASE, string);
-	}
+    public Version(String string) {
+        this(VersionType.RELEASE, string);
+    }
 
     /**
      * Creates a Version
@@ -50,12 +54,12 @@ public class Version implements Serializable, Comparable<Version> {
      * @param type Version Type
      * @param string Version String
      */
-	public Version(VersionType type, String string) {
-	    this(null, type, string);
+    public Version(VersionType type, String string) {
+        this(null, type, string);
     }
 
     /**
-     * Creates a Version (Prepending the parent)
+     * Creates a Version (Appending the parent)
      *
      * @param parent Parent Version
      * @param string Version String
@@ -65,7 +69,7 @@ public class Version implements Serializable, Comparable<Version> {
     }
 
     /**
-     * Creates a Version (Prepending the parent)
+     * Creates a Version (Appending the parent)
      *
      * @param parent Parent Version
      * @param type Version Type
@@ -98,7 +102,7 @@ public class Version implements Serializable, Comparable<Version> {
     }
 
     /**
-     * Creates a Version (Prepending the parent)
+     * Creates a Version (Appending the parent)
      *
      * @param parent Parent Version
      * @param ints Version Numbers (Will be separated with dots)
@@ -108,7 +112,7 @@ public class Version implements Serializable, Comparable<Version> {
     }
 
     /**
-     * Creates a Version (Prepending the parent)
+     * Creates a Version (Appending the parent)
      *
      * @param parent Parent Version
      * @param type Version Type
@@ -133,10 +137,11 @@ public class Version implements Serializable, Comparable<Version> {
      * Parse a Version from a string
      *
      * @param string String to parse
-     * @see #toFullString() for a valid string value
+     * @see #toFullString() <b>#toFullString()</b> returns a valid string
+     * @see #toFullString() <b>#toString()</b> returns a valid string
      */
     public static Version fromString(String string) {
-        Matcher regex = Pattern.compile("(p?[abr])?([^/]+)").matcher(string);
+        Matcher regex = Pattern.compile("(rv|(?:p?[abrv])|[pu])?([^/]+)", Pattern.CASE_INSENSITIVE).matcher(string);
         Version current = null;
         while (regex.find()) {
             try {
@@ -148,6 +153,9 @@ public class Version implements Serializable, Comparable<Version> {
                     case "a":
                         type = VersionType.ALPHA;
                         break;
+                    case "pv":
+                        type = VersionType.PREVIEW;
+                        break;
                     case "pb":
                         type = VersionType.PRE_BETA;
                         break;
@@ -156,6 +164,18 @@ public class Version implements Serializable, Comparable<Version> {
                         break;
                     case "pr":
                         type = VersionType.PRE_RELEASE;
+                        break;
+                    case "rv":
+                        type = VersionType.REVISION;
+                        break;
+                    case "v":
+                        type = VersionType.VERSION;
+                        break;
+                    case "u":
+                        type = VersionType.UPDATE;
+                        break;
+                    case "p":
+                        type = VersionType.PATCH;
                         break;
                 }
                 current = new Version(current, type, regex.group(2));
@@ -168,23 +188,25 @@ public class Version implements Serializable, Comparable<Version> {
     /**
      * The default toString() method<br>
      * <br>
-     * <b>new Version(new Version("1.0.0"), VersionType.PRE_ALPHA, "7")</b> would return:<br>
-     * <b>1.0.0/pa7</b>
+     * <b style="font-family: consolas">new Version(new Version("1.0.0"), VersionType.PRE_ALPHA, "7")</b> would return:<br>
+     * <b style="font-family: consolas">1.0.0/pa7</b>
      *
      * @return Version as a String
      */
-	@Override
-	public String toString() {
-        String str = (parent == null)?"":parent.toString()+'/'+type.shortname;
-        str += string;
-        return str;
-	}
+    @Override
+    public String toString() {
+        if (parent != null || type == VersionType.RELEASE) {
+            String str = (parent == null)?"":parent.toString() + '/' + type.shortname;
+            str += string;
+            return str;
+        } else return toFullString();
+    }
 
     /**
      * The full toString() method<br>
      * <br>
-     * <b>new Version(new Version("1.0.0"), VersionType.PRE_ALPHA, "7")</b> would return:<br>
-     * <b>r1.0.0/pa7</b>
+     * <b style="font-family: consolas">new Version(new Version("1.0.0"), VersionType.PRE_ALPHA, "7")</b> would return:<br>
+     * <b style="font-family: consolas">r1.0.0/pa7</b>
      *
      * @return Version as a String
      */
@@ -197,22 +219,24 @@ public class Version implements Serializable, Comparable<Version> {
     /**
      * The extended toString() method<br>
      * <br>
-     * <b>new Version(new Version("1.0.0"), VersionType.PRE_ALPHA, "7")</b> would return:<br>
-     * <b>1.0.0 pre-alpha 7</b>
+     * <b style="font-family: consolas">new Version(new Version("1.0.0"), VersionType.PRE_ALPHA, "7")</b> would return:<br>
+     * <b style="font-family: consolas">1.0.0 pre-alpha 7</b>
      *
      * @return Version as a String
      */
     public String toExtendedString() {
-        String str = (parent == null)?"":parent.toExtendedString()+' '+type.longname+' ';
-        str += string;
-        return str;
+        if (parent != null || type == VersionType.RELEASE) {
+            String str = (parent == null)?"":parent.toExtendedString() + ' ' + type.longname + ' ';
+            str += string;
+            return str;
+        } else return toFullExtendedString();
     }
 
     /**
      * The full extended toString() method<br>
      * <br>
-     * <b>new Version(new Version("1.0.0"), VersionType.PRE_ALPHA, "7")</b> would return:<br>
-     * <b>release 1.0.0 pre-alpha 7</b>
+     * <b style="font-family: consolas">new Version(new Version("1.0.0"), VersionType.PRE_ALPHA, "7")</b> would return:<br>
+     * <b style="font-family: consolas">release 1.0.0 pre-alpha 7</b>
      *
      * @return Version as a String
      */
@@ -234,7 +258,7 @@ public class Version implements Serializable, Comparable<Version> {
     /**
      * See if Versions are Equal
      *
-     * @param version Version to Compare
+     * @param version Version to Compare to
      * @return
      */
     public boolean equals(Version version) {
@@ -249,7 +273,7 @@ public class Version implements Serializable, Comparable<Version> {
      *
      * Compare Versions
      *
-     * @param version The version to compare to
+     * @param version Version to Compare to
      */
     public int compareTo(Version version) {
         return compare(this, version);
@@ -277,29 +301,48 @@ public class Version implements Serializable, Comparable<Version> {
      * @param ver2 Version to Compare
      */
     public static int compare(Version ver1, Version ver2) {
-        LinkedList<Version> stack1 = new LinkedList<Version>(), stack2 = new LinkedList<Version>();
-        if (ver1 != null) {
+        if (ver1 == null && ver2 == null) {
+            // Both versions are null
+            return 0;
+        }
+
+        if (ver1 == null) {
+            // Version one is null
+            return -1;
+        }
+
+        if (ver2 == null) {
+            // Version two is null
+            return 1;
+        }
+
+        LinkedList<Version> stack1 = new LinkedList<Version>();
+        stack1.add(ver1);
+        while (ver1.parent != null) {
+            ver1 = ver1.parent;
             stack1.add(ver1);
-            while (ver1.parent != null) {
-                ver1 = ver1.parent;
-                stack1.add(ver1);
-            }
-            Collections.reverse(stack1);
         }
-        if (ver2 != null) {
+        Collections.reverse(stack1);
+
+        LinkedList<Version> stack2 = new LinkedList<Version>();
+        stack2.add(ver2);
+        while (ver2.parent != null) {
+            ver2 = ver2.parent;
             stack2.add(ver2);
-            while (ver2.parent != null) {
-                ver2 = ver2.parent;
-                stack2.add(ver2);
-            }
-            Collections.reverse(stack2);
         }
+        Collections.reverse(stack2);
 
         int id;
         for (id = 0; id < stack1.size(); id++) {
             if (id >= stack2.size()) {
-                // Version one still has children when version two does not, making version two the official version
-                return -1;
+                // Version one still has children when version two does not...
+                if (stack1.get(id).type.stageid < 0) {
+                    // ...making version two the official version
+                    return -1;
+                } else {
+                    // ...however the direct child of version one has a stageid higher than or equal to a release
+                    return 1;
+                }
             }
 
             int result = stack1.get(id).compare(stack2.get(id));
@@ -309,8 +352,14 @@ public class Version implements Serializable, Comparable<Version> {
             }
         }
         if (id < stack2.size()) {
-            // Version one does not children when version two still does, making version one the official version
-            return 1;
+            // Version one does not children when version two still does...
+            if (stack2.get(id).type.stageid < 0) {
+                // ...making version one the official version
+                return 1;
+            } else {
+                // ...however the direct child of version two has a stageid higher than or equal to a release
+                return -1;
+            }
         }
         return 0;
     }

@@ -180,27 +180,27 @@ implements java.io.Serializable, java.lang.Comparable&lt;<a href="../../../../..
 <tr class="altColor">
 <td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Bungee/Library/Version/Version.html#Version-net.ME1312.SubServers.Bungee.Library.Version.Version-int...-">Version</a></span>(<a href="../../../../../../net/ME1312/SubServers/Bungee/Library/Version/Version.html" title="class in net.ME1312.SubServers.Bungee.Library.Version">Version</a>&nbsp;parent,
        int...&nbsp;ints)</code>
-<div class="block">Creates a Version (Prepending the parent)</div>
+<div class="block">Creates a Version (Appending the parent)</div>
 </td>
 </tr>
 <tr class="rowColor">
 <td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Bungee/Library/Version/Version.html#Version-net.ME1312.SubServers.Bungee.Library.Version.Version-java.lang.String-">Version</a></span>(<a href="../../../../../../net/ME1312/SubServers/Bungee/Library/Version/Version.html" title="class in net.ME1312.SubServers.Bungee.Library.Version">Version</a>&nbsp;parent,
        java.lang.String&nbsp;string)</code>
-<div class="block">Creates a Version (Prepending the parent)</div>
+<div class="block">Creates a Version (Appending the parent)</div>
 </td>
 </tr>
 <tr class="altColor">
 <td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Bungee/Library/Version/Version.html#Version-net.ME1312.SubServers.Bungee.Library.Version.Version-net.ME1312.SubServers.Bungee.Library.Version.Version.VersionType-int...-">Version</a></span>(<a href="../../../../../../net/ME1312/SubServers/Bungee/Library/Version/Version.html" title="class in net.ME1312.SubServers.Bungee.Library.Version">Version</a>&nbsp;parent,
        <a href="../../../../../../net/ME1312/SubServers/Bungee/Library/Version/Version.VersionType.html" title="enum in net.ME1312.SubServers.Bungee.Library.Version">Version.VersionType</a>&nbsp;type,
        int...&nbsp;ints)</code>
-<div class="block">Creates a Version (Prepending the parent)</div>
+<div class="block">Creates a Version (Appending the parent)</div>
 </td>
 </tr>
 <tr class="rowColor">
 <td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Bungee/Library/Version/Version.html#Version-net.ME1312.SubServers.Bungee.Library.Version.Version-net.ME1312.SubServers.Bungee.Library.Version.Version.VersionType-java.lang.String-">Version</a></span>(<a href="../../../../../../net/ME1312/SubServers/Bungee/Library/Version/Version.html" title="class in net.ME1312.SubServers.Bungee.Library.Version">Version</a>&nbsp;parent,
        <a href="../../../../../../net/ME1312/SubServers/Bungee/Library/Version/Version.VersionType.html" title="enum in net.ME1312.SubServers.Bungee.Library.Version">Version.VersionType</a>&nbsp;type,
        java.lang.String&nbsp;string)</code>
-<div class="block">Creates a Version (Prepending the parent)</div>
+<div class="block">Creates a Version (Appending the parent)</div>
 </td>
 </tr>
 </table>
@@ -259,8 +259,8 @@ implements java.io.Serializable, java.lang.Comparable&lt;<a href="../../../../..
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Bungee/Library/Version/Version.html#toExtendedString--">toExtendedString</a></span>()</code>
 <div class="block">The extended toString() method<br>
  <br>
- <b>new Version(new Version("1.0.0"), VersionType.PRE_ALPHA, "7")</b> would return:<br>
- <b>1.0.0 pre-alpha 7</b></div>
+ <b style="font-family: consolas">new Version(new Version("1.0.0"), VersionType.PRE_ALPHA, "7")</b> would return:<br>
+ <b style="font-family: consolas">1.0.0 pre-alpha 7</b></div>
 </td>
 </tr>
 <tr id="i7" class="rowColor">
@@ -268,8 +268,8 @@ implements java.io.Serializable, java.lang.Comparable&lt;<a href="../../../../..
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Bungee/Library/Version/Version.html#toFullExtendedString--">toFullExtendedString</a></span>()</code>
 <div class="block">The full extended toString() method<br>
  <br>
- <b>new Version(new Version("1.0.0"), VersionType.PRE_ALPHA, "7")</b> would return:<br>
- <b>release 1.0.0 pre-alpha 7</b></div>
+ <b style="font-family: consolas">new Version(new Version("1.0.0"), VersionType.PRE_ALPHA, "7")</b> would return:<br>
+ <b style="font-family: consolas">release 1.0.0 pre-alpha 7</b></div>
 </td>
 </tr>
 <tr id="i8" class="altColor">
@@ -277,8 +277,8 @@ implements java.io.Serializable, java.lang.Comparable&lt;<a href="../../../../..
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Bungee/Library/Version/Version.html#toFullString--">toFullString</a></span>()</code>
 <div class="block">The full toString() method<br>
  <br>
- <b>new Version(new Version("1.0.0"), VersionType.PRE_ALPHA, "7")</b> would return:<br>
- <b>r1.0.0/pa7</b></div>
+ <b style="font-family: consolas">new Version(new Version("1.0.0"), VersionType.PRE_ALPHA, "7")</b> would return:<br>
+ <b style="font-family: consolas">r1.0.0/pa7</b></div>
 </td>
 </tr>
 <tr id="i9" class="rowColor">
@@ -286,8 +286,8 @@ implements java.io.Serializable, java.lang.Comparable&lt;<a href="../../../../..
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Bungee/Library/Version/Version.html#toString--">toString</a></span>()</code>
 <div class="block">The default toString() method<br>
  <br>
- <b>new Version(new Version("1.0.0"), VersionType.PRE_ALPHA, "7")</b> would return:<br>
- <b>1.0.0/pa7</b></div>
+ <b style="font-family: consolas">new Version(new Version("1.0.0"), VersionType.PRE_ALPHA, "7")</b> would return:<br>
+ <b style="font-family: consolas">1.0.0/pa7</b></div>
 </td>
 </tr>
 </table>
@@ -350,7 +350,7 @@ implements java.io.Serializable, java.lang.Comparable&lt;<a href="../../../../..
 <h4>Version</h4>
 <pre>public&nbsp;Version(<a href="../../../../../../net/ME1312/SubServers/Bungee/Library/Version/Version.html" title="class in net.ME1312.SubServers.Bungee.Library.Version">Version</a>&nbsp;parent,
                java.lang.String&nbsp;string)</pre>
-<div class="block">Creates a Version (Prepending the parent)</div>
+<div class="block">Creates a Version (Appending the parent)</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>parent</code> - Parent Version</dd>
@@ -367,7 +367,7 @@ implements java.io.Serializable, java.lang.Comparable&lt;<a href="../../../../..
 <pre>public&nbsp;Version(<a href="../../../../../../net/ME1312/SubServers/Bungee/Library/Version/Version.html" title="class in net.ME1312.SubServers.Bungee.Library.Version">Version</a>&nbsp;parent,
                <a href="../../../../../../net/ME1312/SubServers/Bungee/Library/Version/Version.VersionType.html" title="enum in net.ME1312.SubServers.Bungee.Library.Version">Version.VersionType</a>&nbsp;type,
                java.lang.String&nbsp;string)</pre>
-<div class="block">Creates a Version (Prepending the parent)</div>
+<div class="block">Creates a Version (Appending the parent)</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>parent</code> - Parent Version</dd>
@@ -414,7 +414,7 @@ implements java.io.Serializable, java.lang.Comparable&lt;<a href="../../../../..
 <h4>Version</h4>
 <pre>public&nbsp;Version(<a href="../../../../../../net/ME1312/SubServers/Bungee/Library/Version/Version.html" title="class in net.ME1312.SubServers.Bungee.Library.Version">Version</a>&nbsp;parent,
                int...&nbsp;ints)</pre>
-<div class="block">Creates a Version (Prepending the parent)</div>
+<div class="block">Creates a Version (Appending the parent)</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>parent</code> - Parent Version</dd>
@@ -431,7 +431,7 @@ implements java.io.Serializable, java.lang.Comparable&lt;<a href="../../../../..
 <pre>public&nbsp;Version(<a href="../../../../../../net/ME1312/SubServers/Bungee/Library/Version/Version.html" title="class in net.ME1312.SubServers.Bungee.Library.Version">Version</a>&nbsp;parent,
                <a href="../../../../../../net/ME1312/SubServers/Bungee/Library/Version/Version.VersionType.html" title="enum in net.ME1312.SubServers.Bungee.Library.Version">Version.VersionType</a>&nbsp;type,
                int...&nbsp;ints)</pre>
-<div class="block">Creates a Version (Prepending the parent)</div>
+<div class="block">Creates a Version (Appending the parent)</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>parent</code> - Parent Version</dd>
@@ -460,7 +460,8 @@ implements java.io.Serializable, java.lang.Comparable&lt;<a href="../../../../..
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>string</code> - String to parse</dd>
 <dt><span class="seeLabel">See Also:</span></dt>
-<dd><a href="../../../../../../net/ME1312/SubServers/Bungee/Library/Version/Version.html#toFullString--"><code>for a valid string value</code></a></dd>
+<dd><a href="../../../../../../net/ME1312/SubServers/Bungee/Library/Version/Version.html#toFullString--"><code><b>#toFullString()</b> returns a valid string</code></a>, 
+<a href="../../../../../../net/ME1312/SubServers/Bungee/Library/Version/Version.html#toFullString--"><code><b>#toString()</b> returns a valid string</code></a></dd>
 </dl>
 </li>
 </ul>
@@ -473,8 +474,8 @@ implements java.io.Serializable, java.lang.Comparable&lt;<a href="../../../../..
 <pre>public&nbsp;java.lang.String&nbsp;toString()</pre>
 <div class="block">The default toString() method<br>
  <br>
- <b>new Version(new Version("1.0.0"), VersionType.PRE_ALPHA, "7")</b> would return:<br>
- <b>1.0.0/pa7</b></div>
+ <b style="font-family: consolas">new Version(new Version("1.0.0"), VersionType.PRE_ALPHA, "7")</b> would return:<br>
+ <b style="font-family: consolas">1.0.0/pa7</b></div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Overrides:</span></dt>
 <dd><code>toString</code>&nbsp;in class&nbsp;<code>java.lang.Object</code></dd>
@@ -492,8 +493,8 @@ implements java.io.Serializable, java.lang.Comparable&lt;<a href="../../../../..
 <pre>public&nbsp;java.lang.String&nbsp;toFullString()</pre>
 <div class="block">The full toString() method<br>
  <br>
- <b>new Version(new Version("1.0.0"), VersionType.PRE_ALPHA, "7")</b> would return:<br>
- <b>r1.0.0/pa7</b></div>
+ <b style="font-family: consolas">new Version(new Version("1.0.0"), VersionType.PRE_ALPHA, "7")</b> would return:<br>
+ <b style="font-family: consolas">r1.0.0/pa7</b></div>
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>Version as a String</dd>
@@ -509,8 +510,8 @@ implements java.io.Serializable, java.lang.Comparable&lt;<a href="../../../../..
 <pre>public&nbsp;java.lang.String&nbsp;toExtendedString()</pre>
 <div class="block">The extended toString() method<br>
  <br>
- <b>new Version(new Version("1.0.0"), VersionType.PRE_ALPHA, "7")</b> would return:<br>
- <b>1.0.0 pre-alpha 7</b></div>
+ <b style="font-family: consolas">new Version(new Version("1.0.0"), VersionType.PRE_ALPHA, "7")</b> would return:<br>
+ <b style="font-family: consolas">1.0.0 pre-alpha 7</b></div>
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>Version as a String</dd>
@@ -526,8 +527,8 @@ implements java.io.Serializable, java.lang.Comparable&lt;<a href="../../../../..
 <pre>public&nbsp;java.lang.String&nbsp;toFullExtendedString()</pre>
 <div class="block">The full extended toString() method<br>
  <br>
- <b>new Version(new Version("1.0.0"), VersionType.PRE_ALPHA, "7")</b> would return:<br>
- <b>release 1.0.0 pre-alpha 7</b></div>
+ <b style="font-family: consolas">new Version(new Version("1.0.0"), VersionType.PRE_ALPHA, "7")</b> would return:<br>
+ <b style="font-family: consolas">release 1.0.0 pre-alpha 7</b></div>
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>Version as a String</dd>
@@ -557,7 +558,7 @@ implements java.io.Serializable, java.lang.Comparable&lt;<a href="../../../../..
 <div class="block">See if Versions are Equal</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>version</code> - Version to Compare</dd>
+<dd><code>version</code> - Version to Compare to</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 </dl>
 </li>
@@ -574,7 +575,7 @@ implements java.io.Serializable, java.lang.Comparable&lt;<a href="../../../../..
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
 <dd><code>compareTo</code>&nbsp;in interface&nbsp;<code>java.lang.Comparable&lt;<a href="../../../../../../net/ME1312/SubServers/Bungee/Library/Version/Version.html" title="class in net.ME1312.SubServers.Bungee.Library.Version">Version</a>&gt;</code></dd>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>version</code> - The version to compare to</dd>
+<dd><code>version</code> - Version to Compare to</dd>
 </dl>
 </li>
 </ul>
