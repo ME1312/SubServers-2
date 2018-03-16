@@ -3,6 +3,10 @@ package net.ME1312.SubServers.Client.Bukkit.Library.Version;
 import net.ME1312.SubServers.Client.Bukkit.Library.Util;
 
 import java.io.Serializable;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Version Class
@@ -11,10 +15,10 @@ import java.io.Serializable;
 public class Version implements Serializable, Comparable<Version> {
     private final Version parent;
     private final VersionType type;
-	private final String string;
+    private final String string;
 
-	public enum VersionType {
-	    PRE_ALPHA(0, "pa", "pre-alpha"),
+    public enum VersionType {
+        PRE_ALPHA(0, "pa", "pre-alpha"),
         ALPHA(1, "a", "alpha"),
         PREVIEW(2, "pb", "preview"),
         PRE_BETA(2, "pb", "pre-beta"),
@@ -22,12 +26,12 @@ public class Version implements Serializable, Comparable<Version> {
         PRE_RELEASE(4, "pr", "pre-release"),
         RELEASE(5, "r", "release");
 
-	    private final int id;
-	    private final String shortname, longname;
-        VersionType(int id, String shortname, String longname) {
-	        this.id = id;
-	        this.shortname = shortname;
-	        this.longname = longname;
+        private final short stageid;
+        private final String shortname, longname;
+        VersionType(int stageid, String shortname, String longname) {
+            this.stageid = (short) stageid;
+            this.shortname = shortname;
+            this.longname = longname;
         }
     }
 
@@ -36,9 +40,9 @@ public class Version implements Serializable, Comparable<Version> {
      *
      * @param string Version String
      */
-	public Version(String string) {
-	    this(VersionType.RELEASE, string);
-	}
+    public Version(String string) {
+        this(VersionType.RELEASE, string);
+    }
 
     /**
      * Creates a Version
@@ -46,8 +50,8 @@ public class Version implements Serializable, Comparable<Version> {
      * @param type Version Type
      * @param string Version String
      */
-	public Version(VersionType type, String string) {
-	    this(null, type, string);
+    public Version(VersionType type, String string) {
+        this(null, type, string);
     }
 
     /**
@@ -123,6 +127,42 @@ public class Version implements Serializable, Comparable<Version> {
             } while ((i + 1) != ints.length);
         }
         this.string = string;
+    }
+
+    /**
+     * Parse a Version from a string
+     *
+     * @param string String to parse
+     * @see #toFullString() for a valid string value
+     */
+    public static Version fromString(String string) {
+        Matcher regex = Pattern.compile("(p?[abr])?([^/]+)").matcher(string);
+        Version current = null;
+        while (regex.find()) {
+            try {
+                VersionType type = VersionType.RELEASE;
+                if (regex.group(1) != null) switch (regex.group(1).toLowerCase()) {
+                    case "pa":
+                        type = VersionType.PRE_ALPHA;
+                        break;
+                    case "a":
+                        type = VersionType.ALPHA;
+                        break;
+                    case "pb":
+                        type = VersionType.PRE_BETA;
+                        break;
+                    case "b":
+                        type = VersionType.BETA;
+                        break;
+                    case "pr":
+                        type = VersionType.PRE_RELEASE;
+                        break;
+                }
+                current = new Version(current, type, regex.group(2));
+            } catch (Throwable e) {}
+        }
+        if (current == null) throw new IllegalArgumentException("Could not find version in string: " + string);
+        return current;
     }
 
     /**
@@ -212,20 +252,81 @@ public class Version implements Serializable, Comparable<Version> {
      * @param version The version to compare to
      */
     public int compareTo(Version version) {
-        // Compare parent versions first
-        if (this.parent != null || version.parent != null) {
-            int parent = ((this.parent == null)?this:this.parent).compareTo((version.parent == null)?version:version.parent);
-            if (parent != 0) return parent;
+        return compare(this, version);
+    }
+
+    /**
+     * See if Versions are Equal
+     *
+     * @param ver1 Version to Compare
+     * @param ver2 Version to Compare
+     * @return
+     */
+    public static boolean equals(Version ver1, Version ver2) {
+        return compare(ver1, ver2) == 0;
+    }
+
+    /*
+     * Returns 1 if Greater than
+     * Returns 0 if Equal
+     * Returns -1 if Less than
+     *//**
+     * Compare Versions
+     *
+     * @param ver1 Version to Compare
+     * @param ver2 Version to Compare
+     */
+    public static int compare(Version ver1, Version ver2) {
+        LinkedList<Version> stack1 = new LinkedList<Version>(), stack2 = new LinkedList<Version>();
+        if (ver1 != null) {
+            stack1.add(ver1);
+            while (ver1.parent != null) {
+                ver1 = ver1.parent;
+                stack1.add(ver1);
+            }
+            Collections.reverse(stack1);
+        }
+        if (ver2 != null) {
+            stack2.add(ver2);
+            while (ver2.parent != null) {
+                ver2 = ver2.parent;
+                stack2.add(ver2);
+            }
+            Collections.reverse(stack2);
         }
 
-        if (this.parent != null && version.parent == null) {
-            // Version one has a parent version and version two does not, making version two the official version
-            return -1;
-        }
+        int id;
+        for (id = 0; id < stack1.size(); id++) {
+            if (id >= stack2.size()) {
+                // Version one still has children when version two does not, making version two the official version
+                return -1;
+            }
 
-        if (this.parent == null && version.parent != null) {
-            // Version one does not have a parent version and version two does, making version one the official version
+            int result = stack1.get(id).compare(stack2.get(id));
+            if (result != 0) {
+                // Versions are not the same, return the result
+                return result;
+            }
+        }
+        if (id < stack2.size()) {
+            // Version one does not children when version two still does, making version one the official version
             return 1;
+        }
+        return 0;
+    }
+
+    /*
+     * Compares versions ignoring parent/child relationships
+     */
+    private int compare(Version version) {
+        if (this.type.stageid > version.type.stageid) {
+            // Version one has a type of a later stage than version two
+            return 1;
+        }
+
+        if (this.type.stageid < version.type.stageid) {
+            // Version one has a type of an earlier stage than version two
+            return -1;
         }
 
         VersionTokenizer tokenizer1 = new VersionTokenizer(string);
@@ -291,30 +392,5 @@ public class Version implements Serializable, Comparable<Version> {
             return 0;
         }
         return 0;
-    }
-
-    /**
-     * See if Versions are Equal
-     *
-     * @param ver1 Version to Compare
-     * @param ver2 Version to Compare
-     * @return
-     */
-    public static boolean equals(Version ver1, Version ver2) {
-        return compare(ver1, ver2) == 0;
-    }
-
-    /*
-     * Returns 1 if Greater than
-     * Returns 0 if Equal
-     * Returns -1 if Less than
-     *//**
-     * Compare Versions
-     *
-     * @param ver1 Version to Compare
-     * @param ver2 Version to Compare
-     */
-    public static int compare(Version ver1, Version ver2) {
-        return ver1.compareTo(ver2);
     }
 }

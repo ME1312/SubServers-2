@@ -44,8 +44,8 @@ public class SubCommand {
                             for (int i = 0; i < updnodeList.getLength(); i++) {
                                 Node node = updnodeList.item(i);
                                 if (node.getNodeType() == Node.ELEMENT_NODE) {
-                                    if (!node.getTextContent().startsWith("-") && !node.getTextContent().equals(host.version.toString()) && new Version(node.getTextContent()).compareTo(updversion) > 0) {
-                                        updversion = new Version(node.getTextContent());
+                                    if (!node.getTextContent().startsWith("-") && !node.getTextContent().equals(host.version.toString()) && Version.fromString(node.getTextContent()).compareTo(updversion) > 0) {
+                                        updversion = Version.fromString(node.getTextContent());
                                         updcount++;
                                     }
                                 }
@@ -53,7 +53,7 @@ public class SubCommand {
                             if (updcount == 0) {
                                 host.log.message.println("You are on the latest version.");
                             } else {
-                                host.log.message.println("You are " + updcount + " version" + ((updcount == 1) ? "" : "s") + " behind.");
+                                host.log.message.println("SubServers.Host v" + updversion + " is available. You are " + updcount + " version" + ((updcount == 1)?"":"s") + " behind.");
                             }
                         } catch (Exception e) {
                         }

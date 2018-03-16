@@ -77,8 +77,8 @@ public final class SubCommand extends CommandX {
                             for (int i = 0; i < updnodeList.getLength(); i++) {
                                 Node node = updnodeList.item(i);
                                 if (node.getNodeType() == Node.ELEMENT_NODE) {
-                                    if (!node.getTextContent().startsWith("-") && !node.getTextContent().equals(plugin.version.toString()) && new Version(node.getTextContent()).compareTo(updversion) > 0) {
-                                        updversion = new Version(node.getTextContent());
+                                    if (!node.getTextContent().startsWith("-") && !node.getTextContent().equals(plugin.version.toString()) && Version.fromString(node.getTextContent()).compareTo(updversion) > 0) {
+                                        updversion = Version.fromString(node.getTextContent());
                                         updcount++;
                                     }
                                 }
@@ -86,7 +86,7 @@ public final class SubCommand extends CommandX {
                             if (updcount == 0) {
                                 sender.sendMessage("You are on the latest version.");
                             } else {
-                                sender.sendMessage("You are " + updcount + " version" + ((updcount == 1)?"":"s") + " behind.");
+                                sender.sendMessage("SubServers.Bungee v" + updversion + " is available. You are " + updcount + " version" + ((updcount == 1)?"":"s") + " behind.");
                             }
                         } catch (Exception e) {}
                     }).start();

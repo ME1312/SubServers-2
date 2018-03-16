@@ -49,7 +49,8 @@ public final class SubPlugin extends BungeeCord implements Listener {
     public final SubAPI api = new SubAPI(this);
     public SubDataClient subdata = null;
     //public static final Version version = new Version("2.13a");
-    public static final Version version = new Version(new Version("2.13a"), Version.VersionType.PRE_RELEASE, 1);
+    //public static final Version version = new Version(new Version("2.13a"), Version.VersionType.BETA, 1); // TODO Beta Version Setting
+    public static final Version version = new Version(new Version(new Version("2.13a"), Version.VersionType.PRE_RELEASE, 2), Version.VersionType.BETA, 1); // TODO Beta Version Setting
 
 
     public long lastReload = -1;
@@ -139,8 +140,8 @@ public final class SubPlugin extends BungeeCord implements Listener {
                     for (int i = 0; i < updnodeList.getLength(); i++) {
                         Node node = updnodeList.item(i);
                         if (node.getNodeType() == Node.ELEMENT_NODE) {
-                            if (!node.getTextContent().startsWith("-") && !node.getTextContent().equals(version.toString()) && new Version(node.getTextContent()).compareTo(updversion) > 0) {
-                                updversion = new Version(node.getTextContent());
+                            if (!node.getTextContent().startsWith("-") && !node.getTextContent().equals(version.toString()) && Version.fromString(node.getTextContent()).compareTo(updversion) > 0) {
+                                updversion = Version.fromString(node.getTextContent());
                                 updcount++;
                             }
                         }

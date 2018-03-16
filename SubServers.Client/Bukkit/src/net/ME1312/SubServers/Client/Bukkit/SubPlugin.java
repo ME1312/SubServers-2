@@ -45,7 +45,8 @@ public final class SubPlugin extends JavaPlugin {
     public SubPlugin() {
         super();
         //version = new Version(getDescription().getVersion());
-        version = new Version(new Version(getDescription().getVersion()), Version.VersionType.PRE_RELEASE, 1);
+        //version = new Version(new Version(getDescription().getVersion()), Version.VersionType.BETA, 1); // TODO Beta Version Setting
+        version = new Version(new Version(new Version(getDescription().getVersion()), Version.VersionType.PRE_RELEASE, 2), Version.VersionType.BETA, 1); // TODO Beta Version Setting
     }
 
     /**
@@ -98,8 +99,8 @@ public final class SubPlugin extends JavaPlugin {
                     for (int i = 0; i < updnodeList.getLength(); i++) {
                         Node node = updnodeList.item(i);
                         if (node.getNodeType() == Node.ELEMENT_NODE) {
-                            if (!node.getTextContent().startsWith("-") && !node.getTextContent().equals(version.toString()) && new Version(node.getTextContent()).compareTo(updversion) > 0) {
-                                updversion = new Version(node.getTextContent());
+                            if (!node.getTextContent().startsWith("-") && !node.getTextContent().equals(version.toString()) && Version.fromString(node.getTextContent()).compareTo(updversion) > 0) {
+                                updversion = Version.fromString(node.getTextContent());
                                 updcount++;
                             }
                         }

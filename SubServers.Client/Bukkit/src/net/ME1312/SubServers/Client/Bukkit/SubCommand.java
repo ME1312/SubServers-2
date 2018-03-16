@@ -59,8 +59,8 @@ public final class SubCommand implements CommandExecutor {
                                 for (int i = 0; i < updnodeList.getLength(); i++) {
                                     Node node = updnodeList.item(i);
                                     if (node.getNodeType() == Node.ELEMENT_NODE) {
-                                        if (!node.getTextContent().startsWith("-") && !node.getTextContent().equals(plugin.version.toString()) && new Version(node.getTextContent()).compareTo(updversion) > 0) {
-                                            updversion = new Version(node.getTextContent());
+                                        if (!node.getTextContent().startsWith("-") && !node.getTextContent().equals(plugin.version.toString()) && Version.fromString(node.getTextContent()).compareTo(updversion) > 0) {
+                                            updversion = Version.fromString(node.getTextContent());
                                             updcount++;
                                         }
                                     }
@@ -68,7 +68,7 @@ public final class SubCommand implements CommandExecutor {
                                 if (updcount == 0) {
                                     sender.sendMessage(plugin.api.getLang("SubServers", "Command.Version.Latest"));
                                 } else {
-                                    sender.sendMessage(plugin.api.getLang("SubServers", "Command.Version.Outdated").replace("$int$", Integer.toString(updcount)));
+                                    sender.sendMessage(plugin.api.getLang("SubServers", "Command.Version.Outdated").replace("$name$", "SubServers.Client.Bukkit").replace("$str$", updversion.toString()).replace("$int$", Integer.toString(updcount)));
                                 }
                             } catch (Exception e) {}
                         });
