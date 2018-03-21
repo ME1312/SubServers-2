@@ -52,7 +52,6 @@ public final class Launch {
                 System.out.println("BungeeCord " + net.md_5.bungee.Bootstrap.class.getPackage().getImplementationVersion() + ",");
                 System.out.println("SubServers.Bungee v" + SubPlugin.version.toExtendedString());
                 System.out.println("");
-
             } else {
                 System.out.println("");
                 System.out.println("*******************************************");

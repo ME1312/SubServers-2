@@ -2,12 +2,12 @@ package net.ME1312.SubServers.Sync;
 
 import net.ME1312.SubServers.Sync.Event.*;
 import net.ME1312.SubServers.Sync.Library.Config.YAMLConfig;
-import net.ME1312.SubServers.Sync.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Sync.Library.Metrics;
 import net.ME1312.SubServers.Sync.Library.NamedContainer;
 import net.ME1312.SubServers.Sync.Library.UniversalFile;
 import net.ME1312.SubServers.Sync.Library.Util;
 import net.ME1312.SubServers.Sync.Library.Version.Version;
+import net.ME1312.SubServers.Sync.Library.Version.VersionType;
 import net.ME1312.SubServers.Sync.Network.Cipher;
 import net.ME1312.SubServers.Sync.Network.Packet.PacketDownloadServerInfo;
 import net.ME1312.SubServers.Sync.Network.SubDataClient;
@@ -50,7 +50,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
     public SubDataClient subdata = null;
     //public static final Version version = new Version("2.13a");
     //public static final Version version = new Version(new Version("2.13a"), Version.VersionType.BETA, 1); // TODO Beta Version Setting
-    public static final Version version = new Version(new Version(new Version("2.13a"), Version.VersionType.PRE_RELEASE, 2), Version.VersionType.BETA, 2); // TODO Beta Version Setting
+    public static final Version version = new Version(new Version(new Version("2.13a"), VersionType.PRE_RELEASE, 2), VersionType.BETA, 3); // TODO Beta Version Setting
 
 
     public long lastReload = -1;

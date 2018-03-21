@@ -185,12 +185,13 @@ public class ServerContainer extends BungeeServerInfo implements Server {
         JSONObject info = new JSONObject();
         info.put("type", "Server");
         info.put("name", getName());
-        info.put("group", getGroups());
         info.put("display", getDisplayName());
+        info.put("group", getGroups());
         info.put("address", getAddress().getAddress().getHostAddress() + ':' + getAddress().getPort());
         info.put("motd", getMotd());
         info.put("restricted", isRestricted());
         info.put("hidden", isHidden());
+        if (getSubData() != null) info.put("subdata", getSubData().getAddress().toString());
         JSONObject players = new JSONObject();
         for (NamedContainer<String, UUID> player : getGlobalPlayers()) {
             JSONObject pinfo = new JSONObject();

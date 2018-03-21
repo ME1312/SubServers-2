@@ -109,18 +109,27 @@ public abstract class SubServerContainer extends ServerContainer implements SubS
         return servers;
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public String toString() {
         JSONObject sinfo = new JSONObject(super.toString());
         sinfo.put("type", "SubServer");
-        sinfo.put("enabled", getHost().isEnabled() && isEnabled());
-        sinfo.put("editable", isEditable());
         sinfo.put("host", getHost().getName());
-        sinfo.put("running", isRunning());
+        sinfo.put("enabled", isEnabled() && getHost().isEnabled());
+        sinfo.put("editable", isEditable());
         sinfo.put("log", isLogging());
+        sinfo.put("dir", getPath());
+        sinfo.put("exec", getExecutable());
+        sinfo.put("running", isRunning());
+        sinfo.put("stop-cmd", getStopCommand());
+        sinfo.put("auto-run", SubAPI.getInstance().getInternals().config.get().getSection("Servers").getSection(getName()).getKeys().contains("Run-On-Launch") && SubAPI.getInstance().getInternals().config.get().getSection("Servers").getSection(getName()).getBoolean("Run-On-Launch"));
+        sinfo.put("auto-restart", willAutoRestart());
+        List<String> incompatibleCurrent = new ArrayList<String>();
         List<String> incompatible = new ArrayList<String>();
-        for (SubServer server : getCurrentIncompatibilities()) incompatible.add(server.getName());
-        sinfo.put("incompatible", incompatible);
+        for (SubServer server : getCurrentIncompatibilities()) incompatibleCurrent.add(server.getName());
+        for (SubServer server : getIncompatibilities()) incompatible.add(server.getName());
+        sinfo.put("incompatible", incompatibleCurrent);
+        sinfo.put("incompatible-list", incompatible);
         sinfo.put("temp", isTemporary());
         return sinfo.toString();
     }

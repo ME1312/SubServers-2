@@ -8,6 +8,7 @@ import net.ME1312.SubServers.Bungee.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Bungee.Library.Exception.InvalidHostException;
 import net.ME1312.SubServers.Bungee.Library.Exception.InvalidServerException;
 import net.ME1312.SubServers.Bungee.Library.Version.Version;
+import net.ME1312.SubServers.Bungee.Library.Version.VersionType;
 import net.ME1312.SubServers.Bungee.Network.Cipher;
 import net.ME1312.SubServers.Bungee.Network.ClientHandler;
 import net.ME1312.SubServers.Bungee.Network.Packet.PacketOutReload;
@@ -59,7 +60,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
     public SubServer sudo = null;
     //public static final Version version = new Version("2.13a");
     //public static final Version version = new Version(new Version("2.13a"), Version.VersionType.BETA, 1); // TODO Beta Version Setting
-    public static final Version version = new Version(new Version(new Version("2.13a"), Version.VersionType.PRE_RELEASE, 2), Version.VersionType.BETA, 2); // TODO Beta Version Setting
+    public static final Version version = new Version(new Version(new Version("2.13a"), VersionType.PRE_RELEASE, 2), VersionType.BETA, 3); // TODO Beta Version Setting
 
     public boolean redis = false;
     public long resetDate = 0;

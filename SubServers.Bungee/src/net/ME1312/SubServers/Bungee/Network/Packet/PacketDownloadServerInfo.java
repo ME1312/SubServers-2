@@ -56,43 +56,9 @@ public class PacketDownloadServerInfo implements PacketIn, PacketOut {
         json.put("type", (server == null)?"invalid":((server instanceof SubServer)?"subserver":"server"));
         JSONObject info = new JSONObject();
 
-        if (server != null && server instanceof SubServer) {
-            info.put("host", ((SubServer) server).getHost().getName());
-            info.put("enabled", ((SubServer) server).isEnabled() && ((SubServer) server).getHost().isEnabled());
-            info.put("editable", ((SubServer) server).isEditable());
-            info.put("log", ((SubServer) server).isLogging());
-            info.put("dir", ((SubServer) server).getPath());
-            info.put("exec", ((SubServer) server).getExecutable());
-            info.put("running", ((SubServer) server).isRunning());
-            info.put("stop-cmd", ((SubServer) server).getStopCommand());
-            info.put("auto-run", plugin.config.get().getSection("Servers").getSection(server.getName()).getKeys().contains("Run-On-Launch") && plugin.config.get().getSection("Servers").getSection(server.getName()).getBoolean("Run-On-Launch"));
-            info.put("auto-restart", ((SubServer) server).willAutoRestart());
-            List<String> incompatibleCurrent = new ArrayList<String>();
-            List<String> incompatible = new ArrayList<String>();
-            for (SubServer server : ((SubServer) this.server).getCurrentIncompatibilities()) incompatibleCurrent.add(server.getName());
-            for (SubServer server : ((SubServer) this.server).getIncompatibilities()) incompatible.add(server.getName());
-            info.put("incompatible", incompatibleCurrent);
-            info.put("incompatible-list", incompatible);
-            info.put("temp", ((SubServer) server).isTemporary());
-        } if (server != null) {
-            info.put("name", server.getName());
-            info.put("display", server.getDisplayName());
-            info.put("group", server.getGroups());
-            info.put("address", server.getAddress().getAddress().getHostAddress() + ':' + server.getAddress().getPort());
-            info.put("restricted", server.isRestricted());
-            info.put("hidden", server.isHidden());
-            info.put("motd", server.getMotd());
-            if (server.getSubData() != null) info.put("subdata", server.getSubData().getAddress().toString());
-            info.put("signature", server.getSignature());
-            info.put("extra", server.getExtra().toJSON());
-
-            JSONObject players = new JSONObject();
-            for (NamedContainer<String, UUID> player : server.getGlobalPlayers()) {
-                JSONObject pinfo = new JSONObject();
-                pinfo.put("name", player.name());
-                players.put(player.get().toString(), pinfo);
-            }
-            info.put("players", players);
+        if (server != null) {
+            info = new JSONObject(server.toString());
+            info.remove("type");
         }
 
         json.put("server", info);

@@ -1,30 +1,18 @@
-package net.ME1312.SubServers.Bungee.Library;
+package net.ME1312.SubServers.Host.Library;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
-import net.ME1312.SubServers.Bungee.SubPlugin;
-import net.md_5.bungee.config.Configuration;
-import net.md_5.bungee.config.ConfigurationProvider;
-import net.md_5.bungee.config.YamlConfiguration;
+import net.ME1312.SubServers.Host.ExHost;
+import net.ME1312.SubServers.Host.Library.Config.YAMLConfig;
+import net.ME1312.SubServers.Host.Library.Config.YAMLSection;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import javax.net.ssl.HttpsURLConnection;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.nio.file.Path;
 import java.util.*;
-import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.zip.GZIPOutputStream;
 
 /**
@@ -52,10 +40,10 @@ public class Metrics {
     public static final int B_STATS_VERSION = 1;
 
     // The url to which the data is sent
-    private static final String URL = "https://bStats.org/submitData/bungeecord";
+    private static final String URL = "https://bStats.org/submitData/other";
 
-    // The plugin
-    private final SubPlugin plugin;
+    // The host
+    private final ExHost host;
 
     // Is bStats enabled on this server?
     private boolean enabled;
@@ -69,14 +57,14 @@ public class Metrics {
     // A list with all known metrics class objects including this one
     private static final List<Object> knownMetricsInstances = new ArrayList<>();
 
-    public Metrics(SubPlugin plugin) {
-        this.plugin = plugin;
+    public Metrics(ExHost host) {
+        this.host = host;
 
         try {
             loadConfig();
         } catch (IOException e) {
             // Failed to load configuration
-            plugin.getLogger().log(Level.WARNING, "Failed to load bStats config!", e);
+            host.log.warn.println("Failed to load bStats config!", e);
             return;
         }
 
@@ -100,7 +88,7 @@ public class Metrics {
                 usedMetricsClass.getMethod("linkMetrics", Object.class).invoke(null,this);
             } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
                 if (logFailedRequests) {
-                    plugin.getLogger().log(Level.WARNING, "Failed to link to first metrics class " + usedMetricsClass.getName() + "!", e);
+                    host.log.warn.println("Failed to link to first metrics class " + usedMetricsClass.getName() + "!", e);
                 }
             }
         }
@@ -122,29 +110,17 @@ public class Metrics {
      *
      * @return The plugin specific data.
      */
-    public JsonObject getPluginData() {
-        JsonObject data = new JsonObject();
+    public JSONObject getPluginData() {
+        JSONObject data = new JSONObject();
 
-        String pluginName = "SubServers 2";
-        String pluginVersion = plugin.version.toString();
+        String pluginName = "SubServers Host";
+        String pluginVersion = host.version.toString();
 
-        data.addProperty("pluginName", pluginName);
-        data.addProperty("pluginVersion", pluginVersion);
+        data.put("pluginName", pluginName);
+        data.put("pluginVersion", pluginVersion);
 
-        JsonArray customCharts = new JsonArray();
-        customCharts.add(new SingleLineChart("managed_hosts", new Callable<Integer>() {
-            @Override
-            public Integer call() throws Exception {
-                return plugin.api.getHosts().size();
-            }
-        }).getRequestJsonObject(plugin.getLogger(), logFailedRequests));
-        customCharts.add(new SingleLineChart("subdata_connected", new Callable<Integer>() {
-            @Override
-            public Integer call() throws Exception {
-                return (plugin.subdata != null)?plugin.subdata.getClients().size():0;
-            }
-        }).getRequestJsonObject(plugin.getLogger(), logFailedRequests));
-        data.add("customCharts", customCharts);
+        JSONArray customCharts = new JSONArray();
+        data.put("customCharts", customCharts);
 
         return data;
     }
@@ -168,14 +144,7 @@ public class Metrics {
      *
      * @return The server specific data.
      */
-    private JsonObject getServerData() {
-        // Minecraft specific data
-        int playerAmount = plugin.getOnlineCount();
-        playerAmount = playerAmount > 500 ? 500 : playerAmount;
-        int onlineMode = plugin.getConfig().isOnlineMode() ? 1 : 0;
-        String bungeecordVersion = plugin.getVersion();
-        int managedServers = plugin.getServers().size();
-
+    private JSONObject getServerData() {
         // OS/Java specific data
         String javaVersion = System.getProperty("java.version");
         String osName = System.getProperty("os.name");
@@ -183,20 +152,15 @@ public class Metrics {
         String osVersion = System.getProperty("os.version");
         int coreCount = Runtime.getRuntime().availableProcessors();
 
-        JsonObject data = new JsonObject();
+        JSONObject data = new JSONObject();
 
-        data.addProperty("serverUUID", serverUUID);
+        data.put("serverUUID", serverUUID);
 
-        data.addProperty("playerAmount", playerAmount);
-        data.addProperty("managedServers", managedServers);
-        data.addProperty("onlineMode", onlineMode);
-        data.addProperty("bungeecordVersion", bungeecordVersion);
-
-        data.addProperty("javaVersion", javaVersion);
-        data.addProperty("osName", osName);
-        data.addProperty("osArch", osArch);
-        data.addProperty("osVersion", osVersion);
-        data.addProperty("coreCount", coreCount);
+        data.put("javaVersion", javaVersion);
+        data.put("osName", osName);
+        data.put("osArch", osArch);
+        data.put("osVersion", osVersion);
+        data.put("coreCount", coreCount);
 
         return data;
     }
@@ -205,20 +169,20 @@ public class Metrics {
      * Collects the data and sends it afterwards.
      */
     private void submitData() {
-        final JsonObject data = getServerData();
+        final JSONObject data = getServerData();
 
-        final JsonArray pluginData = new JsonArray();
+        final JSONArray pluginData = new JSONArray();
         // Search for all other bStats Metrics classes to get their plugin data
         for (Object metrics : knownMetricsInstances) {
             try {
                 Object plugin = metrics.getClass().getMethod("getPluginData").invoke(metrics);
-                if (plugin instanceof JsonObject) {
-                    pluginData.add((JsonObject) plugin);
+                if (plugin instanceof JSONObject) {
+                    pluginData.put(plugin);
                 }
             } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException ignored) { }
         }
 
-        data.add("plugins", pluginData);
+        data.put("plugins", pluginData);
 
         try {
             // Send the data
@@ -226,7 +190,7 @@ public class Metrics {
         } catch (Exception e) {
             // Something went wrong! :(
             if (logFailedRequests) {
-                plugin.getLogger().log(Level.WARNING, "Could not submit plugin stats!", e);
+                host.log.warn.println("Could not submit plugin stats!", e);
             }
         }
     }
@@ -237,7 +201,7 @@ public class Metrics {
      * @throws IOException If something did not work :(
      */
     private void loadConfig() throws IOException {
-        Path configPath = new File(plugin.dir, "plugins").toPath().resolve("bStats");
+        Path configPath = new File(host.dir, "plugins").toPath().resolve("bStats");
         configPath.toFile().mkdirs();
         File configFile = new File(configPath.toFile(), "config.yml");
         if (!configFile.exists()) {
@@ -251,7 +215,7 @@ public class Metrics {
                     "logFailedRequests: false");
         }
 
-        Configuration configuration = ConfigurationProvider.getProvider(YamlConfiguration.class).load(configFile);
+        YAMLSection configuration = new YAMLConfig(configFile).get();
 
         // Load configuration
         enabled = configuration.getBoolean("enabled", true);
@@ -265,7 +229,7 @@ public class Metrics {
      * @return The first bStats metrics class.
      */
     private Class<?> getFirstBStatsClass() {
-        Path configPath = new File(plugin.dir, "plugins").toPath().resolve("bStats");
+        Path configPath = new File(host.dir, "plugins").toPath().resolve("bStats");
         configPath.toFile().mkdirs();
         File tempFile = new File(configPath.toFile(), "temp.txt");
 
@@ -281,7 +245,7 @@ public class Metrics {
             return getClass();
         } catch (IOException e) {
             if (logFailedRequests) {
-                plugin.getLogger().log(Level.WARNING, "Failed to get first bStats class!", e);
+                host.log.warn.println("Failed to get first bStats class!", e);
             }
             return null;
         }
@@ -334,7 +298,7 @@ public class Metrics {
      * @param data The data to send.
      * @throws Exception If the request failed.
      */
-    private static void sendData(JsonObject data) throws Exception {
+    private static void sendData(JSONObject data) throws Exception {
         if (data == null) {
             throw new IllegalArgumentException("Data cannot be null");
         }
@@ -379,79 +343,5 @@ public class Metrics {
         gzip.write(str.getBytes("UTF-8"));
         gzip.close();
         return outputStream.toByteArray();
-    }
-    /**
-     * Represents a custom chart.
-     */
-    private static abstract class CustomChart {
-
-        // The id of the chart
-        private final String chartId;
-
-        /**
-         * Class constructor.
-         *
-         * @param chartId The id of the chart.
-         */
-        CustomChart(String chartId) {
-            if (chartId == null || chartId.isEmpty()) {
-                throw new IllegalArgumentException("ChartId cannot be null or empty!");
-            }
-            this.chartId = chartId;
-        }
-
-        JsonObject getRequestJsonObject(Logger logger, boolean logFailedRequests) {
-            JsonObject chart = new JsonObject();
-            chart.addProperty("chartId", chartId);
-            try {
-                JsonObject data = getChartData();
-                if (data == null) {
-                    // If the data is null we don't send the chart.
-                    return null;
-                }
-                chart.add("data", data);
-            } catch (Throwable t) {
-                if (logFailedRequests) {
-                    logger.log(Level.WARNING, "Failed to get data for custom chart with id " + chartId, t);
-                }
-                return null;
-            }
-            return chart;
-        }
-
-        protected abstract JsonObject getChartData() throws Exception;
-
-    }
-
-    /**
-     * Represents a custom single line chart.
-     */
-    private static class SingleLineChart extends CustomChart {
-
-        private final Callable<Integer> callable;
-
-        /**
-         * Class constructor.
-         *
-         * @param chartId The id of the chart.
-         * @param callable The callable which is used to request the chart data.
-         */
-        public SingleLineChart(String chartId, Callable<Integer> callable) {
-            super(chartId);
-            this.callable = callable;
-        }
-
-        @Override
-        protected JsonObject getChartData() throws Exception {
-            JsonObject data = new JsonObject();
-            int value = callable.call();
-            if (value == 0) {
-                // Null = skip the chart
-                return null;
-            }
-            data.addProperty("value", value);
-            return data;
-        }
-
     }
 }

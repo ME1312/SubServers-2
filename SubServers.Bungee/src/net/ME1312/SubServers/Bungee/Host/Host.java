@@ -381,9 +381,10 @@ public abstract class Host implements ExtraDataHandler {
         JSONObject hinfo = new JSONObject();
         hinfo.put("type", "Host");
         hinfo.put("name", getName());
-        hinfo.put("enabled", isEnabled());
         hinfo.put("display", getDisplayName());
+        hinfo.put("enabled", isEnabled());
         hinfo.put("address", getAddress().getHostAddress());
+        hinfo.put("dir", getPath());
 
         JSONObject cinfo = new JSONObject();
         JSONObject templates = new JSONObject();

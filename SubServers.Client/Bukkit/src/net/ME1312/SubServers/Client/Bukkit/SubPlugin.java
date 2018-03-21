@@ -3,11 +3,12 @@ package net.ME1312.SubServers.Client.Bukkit;
 import net.ME1312.SubServers.Client.Bukkit.Graphic.InternalUIHandler;
 import net.ME1312.SubServers.Client.Bukkit.Graphic.UIHandler;
 import net.ME1312.SubServers.Client.Bukkit.Library.Config.YAMLConfig;
-import net.ME1312.SubServers.Client.Bukkit.Library.Config.YAMLSection;
+import net.ME1312.SubServers.Client.Bukkit.Library.Metrics;
 import net.ME1312.SubServers.Client.Bukkit.Library.NamedContainer;
 import net.ME1312.SubServers.Client.Bukkit.Library.UniversalFile;
 import net.ME1312.SubServers.Client.Bukkit.Library.Util;
 import net.ME1312.SubServers.Client.Bukkit.Library.Version.Version;
+import net.ME1312.SubServers.Client.Bukkit.Library.Version.VersionType;
 import net.ME1312.SubServers.Client.Bukkit.Network.Cipher;
 import net.ME1312.SubServers.Client.Bukkit.Network.SubDataClient;
 import org.bukkit.Bukkit;
@@ -46,7 +47,7 @@ public final class SubPlugin extends JavaPlugin {
         super();
         //version = new Version(getDescription().getVersion());
         //version = new Version(new Version(getDescription().getVersion()), Version.VersionType.BETA, 1); // TODO Beta Version Setting
-        version = new Version(new Version(new Version(getDescription().getVersion()), Version.VersionType.PRE_RELEASE, 2), Version.VersionType.BETA, 2); // TODO Beta Version Setting
+        version = new Version(new Version(new Version(getDescription().getVersion()), VersionType.PRE_RELEASE, 2), VersionType.BETA, 3); // TODO Beta Version Setting
     }
 
     /**
@@ -89,6 +90,7 @@ public final class SubPlugin extends JavaPlugin {
                 getCommand("sub").setExecutor(cmd);
             }
 
+            new Metrics(this);
             Bukkit.getScheduler().runTaskTimerAsynchronously(this, () -> {
                 try {
                     Document updxml = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new InputSource(new StringReader(Util.readAll(new BufferedReader(new InputStreamReader(new URL("https://src.me1312.net/maven/net/ME1312/SubServers/SubServers.Client.Bukkit/maven-metadata.xml").openStream(), Charset.forName("UTF-8")))))));

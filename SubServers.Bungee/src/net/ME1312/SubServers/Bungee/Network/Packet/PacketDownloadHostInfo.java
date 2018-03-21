@@ -55,39 +55,8 @@ public class PacketDownloadHostInfo implements PacketIn, PacketOut {
 
         if (host != null) {
             json.put("valid", true);
-
-            info.put("name", host.getName());
-            info.put("display", host.getDisplayName());
-            info.put("enabled", host.isEnabled());
-            info.put("address", host.getAddress().getHostAddress());
-            info.put("dir", host.getPath());
-
-            JSONObject cinfo = new JSONObject();
-            JSONObject templates = new JSONObject();
-            for (SubCreator.ServerTemplate template : host.getCreator().getTemplates().values())
-                templates.put(template.getName(), new JSONObject(template.toString()));
-            cinfo.put("templates", templates);
-            info.put("creator", cinfo);
-
-            JSONObject servers = new JSONObject();
-            for (SubServer server : host.getSubServers().values()) {
-                JSONObject sinfo = new JSONObject();
-                sinfo.put("enabled", server.isEnabled());
-                sinfo.put("running", server.isRunning());
-                sinfo.put("temp", server.isTemporary());
-                JSONObject players = new JSONObject();
-                for (NamedContainer<String, UUID> player : server.getGlobalPlayers()) {
-                    JSONObject pinfo = new JSONObject();
-                    pinfo.put("name", player.name());
-                    players.put(player.get().toString(), pinfo);
-                }
-                sinfo.put("players", players);
-                servers.put(server.getName(), sinfo);
-            }
-            info.put("servers", servers);
-            if (host instanceof ClientHandler && ((ClientHandler) host).getSubData() != null) info.put("subdata", ((ClientHandler) host).getSubData().getAddress().toString());
-            info.put("signature", host.getSignature());
-            info.put("extra", host.getExtra().toJSON());
+            info = new JSONObject(host.toString());
+            info.remove("type");
         } else json.put("valid", false);
 
         json.put("host", info);

@@ -1,10 +1,7 @@
 package net.ME1312.SubServers.Host;
 
 import jline.console.ConsoleReader;
-import net.ME1312.SubServers.Host.API.Event.CommandPreProcessEvent;
-import net.ME1312.SubServers.Host.API.Event.SubDisableEvent;
-import net.ME1312.SubServers.Host.API.Event.SubEnableEvent;
-import net.ME1312.SubServers.Host.API.Event.SubReloadEvent;
+import net.ME1312.SubServers.Host.API.Event.*;
 import net.ME1312.SubServers.Host.API.SubPluginInfo;
 import net.ME1312.SubServers.Host.API.SubPlugin;
 import net.ME1312.SubServers.Host.Executable.SubCreator;
@@ -19,6 +16,7 @@ import net.ME1312.SubServers.Host.Library.NamedContainer;
 import net.ME1312.SubServers.Host.Library.UniversalFile;
 import net.ME1312.SubServers.Host.Library.Util;
 import net.ME1312.SubServers.Host.Library.Version.Version;
+import net.ME1312.SubServers.Host.Library.Version.VersionType;
 import net.ME1312.SubServers.Host.Network.Cipher;
 import net.ME1312.SubServers.Host.Network.SubDataClient;
 import org.fusesource.jansi.AnsiConsole;
@@ -33,7 +31,6 @@ import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.net.InetAddress;
 import java.net.URL;
-import java.net.URLClassLoader;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.text.DecimalFormat;
@@ -59,7 +56,7 @@ public final class ExHost {
 
     //public final Version version = new Version("2.13a");
     //public final Version version = new Version(new Version("2.13a"), Version.VersionType.BETA, 1); // TODO Beta Version Setting
-    public final Version version = new Version(new Version(new Version("2.13a"), Version.VersionType.PRE_RELEASE, 2), Version.VersionType.BETA, 2); // TODO Beta Version Setting
+    public final Version version = new Version(new Version(new Version("2.13a"), VersionType.PRE_RELEASE, 2), VersionType.BETA, 3); // TODO Beta Version Setting
     public final SubAPI api = new SubAPI(this);
 
     private ConsoleReader jline;
@@ -158,27 +155,6 @@ public final class ExHost {
                     Files.delete(new UniversalFile(dir, "Recently Deleted").toPath());
                 }
             }
-            running = true;
-            Cipher cipher = null;
-            if (!config.get().getSection("Settings").getSection("SubData").getRawString("Encryption", "NONE").equalsIgnoreCase("NONE")) {
-                if (config.get().getSection("Settings").getSection("SubData").getString("Password", "").length() == 0) {
-                    log.info.println("Cannot encrypt connection without a password");
-                } else if (!SubDataClient.getCiphers().keySet().contains(config.get().getSection("Settings").getSection("SubData").getRawString("Encryption").toUpperCase().replace('-', '_').replace(' ', '_'))) {
-                    log.info.println("Unknown encryption type: " + config.get().getSection("Settings").getSection("SubData").getRawString("Encryption"));
-                } else {
-                    cipher = SubDataClient.getCipher(config.get().getSection("Settings").getSection("SubData").getRawString("Encryption"));
-                }
-            }
-            subdata = new SubDataClient(this, config.get().getSection("Settings").getSection("SubData").getString("Name", "undefined"),
-                    InetAddress.getByName(config.get().getSection("Settings").getSection("SubData").getString("Address", "127.0.0.1:4391").split(":")[0]),
-                    Integer.parseInt(config.get().getSection("Settings").getSection("SubData").getString("Address", "127.0.0.1:4391").split(":")[1]), cipher);
-            Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-                if (running) {
-                    log.warn.println("Received request from system to shutdown");
-                    forcequit(0);
-                }
-            }));
-            creator = new SubCreator(this);
 
             /*
              * Find Jars
@@ -377,6 +353,28 @@ public final class ExHost {
                 api.executeEvent(new SubEnableEvent(this));
                 log.info.println(i + " Plugin"+((i == 1)?"":"s") + " loaded in " + new DecimalFormat("0.000").format((Calendar.getInstance().getTime().getTime() - begin) / 1000D) + "s");
             }
+
+            running = true;
+            Cipher cipher = null;
+            if (!config.get().getSection("Settings").getSection("SubData").getRawString("Encryption", "NONE").equalsIgnoreCase("NONE")) {
+                if (config.get().getSection("Settings").getSection("SubData").getString("Password", "").length() == 0) {
+                    log.info.println("Cannot encrypt connection without a password");
+                } else if (!SubDataClient.getCiphers().keySet().contains(config.get().getSection("Settings").getSection("SubData").getRawString("Encryption").toUpperCase().replace('-', '_').replace(' ', '_'))) {
+                    log.info.println("Unknown encryption type: " + config.get().getSection("Settings").getSection("SubData").getRawString("Encryption"));
+                } else {
+                    cipher = SubDataClient.getCipher(config.get().getSection("Settings").getSection("SubData").getRawString("Encryption"));
+                }
+            }
+            subdata = new SubDataClient(this, config.get().getSection("Settings").getSection("SubData").getString("Name", "undefined"),
+                    InetAddress.getByName(config.get().getSection("Settings").getSection("SubData").getString("Address", "127.0.0.1:4391").split(":")[0]),
+                    Integer.parseInt(config.get().getSection("Settings").getSection("SubData").getString("Address", "127.0.0.1:4391").split(":")[1]), cipher);
+            Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+                if (running) {
+                    log.warn.println("Received request from system to shutdown");
+                    forcequit(0);
+                }
+            }));
+            creator = new SubCreator(this);
 
             loadDefaults();
 

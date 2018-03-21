@@ -3,6 +3,7 @@ package net.ME1312.SubServers.Host.Executable;
 import net.ME1312.SubServers.Host.Library.Container;
 import net.ME1312.SubServers.Host.Library.Log.LogStream;
 import net.ME1312.SubServers.Host.Library.Log.Logger;
+import net.ME1312.SubServers.Host.Library.TextColor;
 import net.ME1312.SubServers.Host.Network.Packet.PacketOutExLogMessage;
 import net.ME1312.SubServers.Host.SubAPI;
 
@@ -106,7 +107,7 @@ public class SubLogger {
                     if (log.get() && SubAPI.getInstance().getInternals().config.get().getSection("Settings").getBoolean("Network-Log", true)) SubAPI.getInstance().getSubDataNetwork().sendPacket(new PacketOutExLogMessage(address, line));
 
                     // Log to CONSOLE
-                    if (log.get() && SubAPI.getInstance().getInternals().config.get().getSection("Settings").getBoolean("Console-Log", true)) level.println(msg);
+                    if (log.get() && SubAPI.getInstance().getInternals().config.get().getSection("Settings").getBoolean("Console-Log", true)) level.println(TextColor.convertColor(msg));
 
                     // Log to FILE
                     if (writer != null) {

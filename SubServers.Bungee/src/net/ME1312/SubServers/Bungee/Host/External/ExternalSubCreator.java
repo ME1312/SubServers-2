@@ -105,6 +105,8 @@ public class ExternalSubCreator extends SubCreator {
                                 subserver.addExtra(extra, server.getSection("Extra").getObject(extra));
                             host.plugin.config.get().getSection("Servers").set(name, server);
                             host.plugin.config.save();
+                            if (template.getBuildOptions().getBoolean("Run-On-Finish", true))
+                                subserver.start();
                         } else {
                             System.out.println(name + "/Creator > " + json.getString("m"));
                         }
