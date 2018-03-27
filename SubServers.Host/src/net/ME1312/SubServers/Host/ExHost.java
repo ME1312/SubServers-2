@@ -6,15 +6,12 @@ import net.ME1312.SubServers.Host.API.SubPluginInfo;
 import net.ME1312.SubServers.Host.API.SubPlugin;
 import net.ME1312.SubServers.Host.Executable.SubCreator;
 import net.ME1312.SubServers.Host.Executable.SubServer;
+import net.ME1312.SubServers.Host.Library.*;
 import net.ME1312.SubServers.Host.Library.Config.YAMLConfig;
 import net.ME1312.SubServers.Host.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Host.Library.Exception.IllegalPluginException;
 import net.ME1312.SubServers.Host.Library.Log.FileLogger;
 import net.ME1312.SubServers.Host.Library.Log.Logger;
-import net.ME1312.SubServers.Host.Library.PluginClassLoader;
-import net.ME1312.SubServers.Host.Library.NamedContainer;
-import net.ME1312.SubServers.Host.Library.UniversalFile;
-import net.ME1312.SubServers.Host.Library.Util;
 import net.ME1312.SubServers.Host.Library.Version.Version;
 import net.ME1312.SubServers.Host.Library.Version.VersionType;
 import net.ME1312.SubServers.Host.Network.Cipher;
@@ -56,7 +53,7 @@ public final class ExHost {
 
     //public final Version version = new Version("2.13a");
     //public final Version version = new Version(new Version("2.13a"), Version.VersionType.BETA, 1); // TODO Beta Version Setting
-    public final Version version = new Version(new Version(new Version("2.13a"), VersionType.PRE_RELEASE, 2), VersionType.BETA, 3); // TODO Beta Version Setting
+    public final Version version = new Version(new Version(new Version("2.13a"), VersionType.PRE_RELEASE, 2), VersionType.BETA, 4); // TODO Beta Version Setting
     public final SubAPI api = new SubAPI(this);
 
     private ConsoleReader jline;
@@ -126,6 +123,7 @@ public final class ExHost {
                             if (new UniversalFile(dir, "Recently Deleted:" + file.getName() + ":info.json").exists()) {
                                 FileReader reader = new FileReader(new UniversalFile(dir, "Recently Deleted:" + file.getName() + ":info.json"));
                                 JSONObject json = new JSONObject(Util.readAll(reader));
+                                reader.close();
                                 if (json.keySet().contains("Timestamp")) {
                                     if (TimeUnit.MILLISECONDS.toDays(Calendar.getInstance().getTime().getTime() - json.getLong("Timestamp")) >= 7) {
                                         Util.deleteDirectory(file);
@@ -378,6 +376,7 @@ public final class ExHost {
 
             loadDefaults();
 
+            new Metrics(this);
             new Timer().schedule(new TimerTask() {
                 @Override
                 public void run() {

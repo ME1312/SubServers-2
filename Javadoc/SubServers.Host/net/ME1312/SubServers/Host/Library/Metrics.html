@@ -17,12 +17,6 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":10,"i1":9};
-var tabs = {65535:["t0","All Methods"],1:["t1","Static Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
-var altColor = "altColor";
-var rowColor = "rowColor";
-var tableTab = "tableTab";
-var activeTableTab = "activeTableTab";
 </script>
 <noscript>
 <div>JavaScript is disabled on your browser.</div>
@@ -48,7 +42,7 @@ var activeTableTab = "activeTableTab";
 <div class="subNav">
 <ul class="navList">
 <li><a href="../../../../../net/ME1312/SubServers/Host/Library/JSONCallback.html" title="interface in net.ME1312.SubServers.Host.Library"><span class="typeNameLink">Prev&nbsp;Class</span></a></li>
-<li><a href="../../../../../net/ME1312/SubServers/Host/Library/NamedContainer.html" title="class in net.ME1312.SubServers.Host.Library"><span class="typeNameLink">Next&nbsp;Class</span></a></li>
+<li><a href="../../../../../net/ME1312/SubServers/Host/Library/Metrics.CustomChart.html" title="class in net.ME1312.SubServers.Host.Library"><span class="typeNameLink">Next&nbsp;Class</span></a></li>
 </ul>
 <ul class="navList">
 <li><a href="../../../../../index.html?net/ME1312/SubServers/Host/Library/Metrics.html" target="_top">Frames</a></li>
@@ -72,16 +66,16 @@ var activeTableTab = "activeTableTab";
 <div>
 <ul class="subNavList">
 <li>Summary:&nbsp;</li>
-<li>Nested&nbsp;|&nbsp;</li>
+<li><a href="#nested.class.summary">Nested</a>&nbsp;|&nbsp;</li>
 <li><a href="#field.summary">Field</a>&nbsp;|&nbsp;</li>
 <li><a href="#constructor.summary">Constr</a>&nbsp;|&nbsp;</li>
-<li><a href="#method.summary">Method</a></li>
+<li><a href="#methods.inherited.from.class.java.lang.Object">Method</a></li>
 </ul>
 <ul class="subNavList">
 <li>Detail:&nbsp;</li>
 <li><a href="#field.detail">Field</a>&nbsp;|&nbsp;</li>
 <li><a href="#constructor.detail">Constr</a>&nbsp;|&nbsp;</li>
-<li><a href="#method.detail">Method</a></li>
+<li>Method</li>
 </ul>
 </div>
 <a name="skip.navbar.top">
@@ -118,6 +112,45 @@ extends java.lang.Object</pre>
 <div class="summary">
 <ul class="blockList">
 <li class="blockList">
+<!-- ======== NESTED CLASS SUMMARY ======== -->
+<ul class="blockList">
+<li class="blockList"><a name="nested.class.summary">
+<!--   -->
+</a>
+<h3>Nested Class Summary</h3>
+<table class="memberSummary" border="0" cellpadding="3" cellspacing="0" summary="Nested Class Summary table, listing nested classes, and an explanation">
+<caption><span>Nested Classes</span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colFirst" scope="col">Modifier and Type</th>
+<th class="colLast" scope="col">Class and Description</th>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code>static class&nbsp;</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Host/Library/Metrics.CustomChart.html" title="class in net.ME1312.SubServers.Host.Library">Metrics.CustomChart</a></span></code>
+<div class="block">Represents a custom chart.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code>static class&nbsp;</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Host/Library/Metrics.DrilldownPie.html" title="class in net.ME1312.SubServers.Host.Library">Metrics.DrilldownPie</a></span></code>
+<div class="block">Represents a custom drilldown pie.</div>
+</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code>static class&nbsp;</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Host/Library/Metrics.SimplePie.html" title="class in net.ME1312.SubServers.Host.Library">Metrics.SimplePie</a></span></code>
+<div class="block">Represents a custom simple pie.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code>static class&nbsp;</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Host/Library/Metrics.SingleLineChart.html" title="class in net.ME1312.SubServers.Host.Library">Metrics.SingleLineChart</a></span></code>
+<div class="block">Represents a custom single line chart.</div>
+</td>
+</tr>
+</table>
+</li>
+</ul>
 <!-- =========== FIELD SUMMARY =========== -->
 <ul class="blockList">
 <li class="blockList"><a name="field.summary">
@@ -149,7 +182,9 @@ extends java.lang.Object</pre>
 <th class="colOne" scope="col">Constructor and Description</th>
 </tr>
 <tr class="altColor">
-<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Host/Library/Metrics.html#Metrics-net.ME1312.SubServers.Host.ExHost-">Metrics</a></span>(<a href="../../../../../net/ME1312/SubServers/Host/ExHost.html" title="class in net.ME1312.SubServers.Host">ExHost</a>&nbsp;host)</code>&nbsp;</td>
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Host/Library/Metrics.html#Metrics-net.ME1312.SubServers.Host.ExHost-">Metrics</a></span>(<a href="../../../../../net/ME1312/SubServers/Host/ExHost.html" title="class in net.ME1312.SubServers.Host">ExHost</a>&nbsp;host)</code>
+<div class="block">Class constructor.</div>
+</td>
 </tr>
 </table>
 </li>
@@ -160,25 +195,6 @@ extends java.lang.Object</pre>
 <!--   -->
 </a>
 <h3>Method Summary</h3>
-<table class="memberSummary" border="0" cellpadding="3" cellspacing="0" summary="Method Summary table, listing methods, and an explanation">
-<caption><span id="t0" class="activeTableTab"><span>All Methods</span><span class="tabEnd">&nbsp;</span></span><span id="t1" class="tableTab"><span><a href="javascript:show(1);">Static Methods</a></span><span class="tabEnd">&nbsp;</span></span><span id="t2" class="tableTab"><span><a href="javascript:show(2);">Instance Methods</a></span><span class="tabEnd">&nbsp;</span></span><span id="t4" class="tableTab"><span><a href="javascript:show(8);">Concrete Methods</a></span><span class="tabEnd">&nbsp;</span></span></caption>
-<tr>
-<th class="colFirst" scope="col">Modifier and Type</th>
-<th class="colLast" scope="col">Method and Description</th>
-</tr>
-<tr id="i0" class="altColor">
-<td class="colFirst"><code>org.json.JSONObject</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Host/Library/Metrics.html#getPluginData--">getPluginData</a></span>()</code>
-<div class="block">Gets the plugin specific data.</div>
-</td>
-</tr>
-<tr id="i1" class="rowColor">
-<td class="colFirst"><code>static void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Host/Library/Metrics.html#linkMetrics-java.lang.Object-">linkMetrics</a></span>(java.lang.Object&nbsp;metrics)</code>
-<div class="block">Links an other metrics class with this class.</div>
-</td>
-</tr>
-</table>
 <ul class="blockList">
 <li class="blockList"><a name="methods.inherited.from.class.java.lang.Object">
 <!--   -->
@@ -228,43 +244,10 @@ extends java.lang.Object</pre>
 <li class="blockList">
 <h4>Metrics</h4>
 <pre>public&nbsp;Metrics(<a href="../../../../../net/ME1312/SubServers/Host/ExHost.html" title="class in net.ME1312.SubServers.Host">ExHost</a>&nbsp;host)</pre>
-</li>
-</ul>
-</li>
-</ul>
-<!-- ============ METHOD DETAIL ========== -->
-<ul class="blockList">
-<li class="blockList"><a name="method.detail">
-<!--   -->
-</a>
-<h3>Method Detail</h3>
-<a name="linkMetrics-java.lang.Object-">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>linkMetrics</h4>
-<pre>public static&nbsp;void&nbsp;linkMetrics(java.lang.Object&nbsp;metrics)</pre>
-<div class="block">Links an other metrics class with this class.
- This method is called using Reflection.</div>
+<div class="block">Class constructor.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>metrics</code> - An object of the metrics class to link.</dd>
-</dl>
-</li>
-</ul>
-<a name="getPluginData--">
-<!--   -->
-</a>
-<ul class="blockListLast">
-<li class="blockList">
-<h4>getPluginData</h4>
-<pre>public&nbsp;org.json.JSONObject&nbsp;getPluginData()</pre>
-<div class="block">Gets the plugin specific data.
- This method is called using Reflection.</div>
-<dl>
-<dt><span class="returnLabel">Returns:</span></dt>
-<dd>The plugin specific data.</dd>
+<dd><code>host</code> - SubServers.Host</dd>
 </dl>
 </li>
 </ul>
@@ -296,7 +279,7 @@ extends java.lang.Object</pre>
 <div class="subNav">
 <ul class="navList">
 <li><a href="../../../../../net/ME1312/SubServers/Host/Library/JSONCallback.html" title="interface in net.ME1312.SubServers.Host.Library"><span class="typeNameLink">Prev&nbsp;Class</span></a></li>
-<li><a href="../../../../../net/ME1312/SubServers/Host/Library/NamedContainer.html" title="class in net.ME1312.SubServers.Host.Library"><span class="typeNameLink">Next&nbsp;Class</span></a></li>
+<li><a href="../../../../../net/ME1312/SubServers/Host/Library/Metrics.CustomChart.html" title="class in net.ME1312.SubServers.Host.Library"><span class="typeNameLink">Next&nbsp;Class</span></a></li>
 </ul>
 <ul class="navList">
 <li><a href="../../../../../index.html?net/ME1312/SubServers/Host/Library/Metrics.html" target="_top">Frames</a></li>
@@ -320,16 +303,16 @@ extends java.lang.Object</pre>
 <div>
 <ul class="subNavList">
 <li>Summary:&nbsp;</li>
-<li>Nested&nbsp;|&nbsp;</li>
+<li><a href="#nested.class.summary">Nested</a>&nbsp;|&nbsp;</li>
 <li><a href="#field.summary">Field</a>&nbsp;|&nbsp;</li>
 <li><a href="#constructor.summary">Constr</a>&nbsp;|&nbsp;</li>
-<li><a href="#method.summary">Method</a></li>
+<li><a href="#methods.inherited.from.class.java.lang.Object">Method</a></li>
 </ul>
 <ul class="subNavList">
 <li>Detail:&nbsp;</li>
 <li><a href="#field.detail">Field</a>&nbsp;|&nbsp;</li>
 <li><a href="#constructor.detail">Constr</a>&nbsp;|&nbsp;</li>
-<li><a href="#method.detail">Method</a></li>
+<li>Method</li>
 </ul>
 </div>
 <a name="skip.navbar.bottom">
