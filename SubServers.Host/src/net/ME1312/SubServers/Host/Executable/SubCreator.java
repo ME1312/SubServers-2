@@ -263,8 +263,14 @@ public class SubCreator {
         }
 
         if (template.getBuildOptions().contains("Shell-Location")) {
-            String git = (System.getenv("ProgramFiles(x86)") == null)?Pattern.compile("%(ProgramFiles)\\(x86\\)%", Pattern.CASE_INSENSITIVE).matcher(host.host.getRawString("Git-Bash")).replaceAll("%$1%"):host.host.getRawString("Git-Bash");
-            String gitBash = git + ((git.endsWith(File.separator))?"":File.separator) + "bin" + File.separatorChar + "bash.exe";
+            String gitBash = host.host.getRawString("Git-Bash") + ((host.host.getRawString("Git-Bash").endsWith(File.separator)) ? "" : File.separator) + "bin" + File.separatorChar + "bash.exe";
+            File cache;
+            if (template.getBuildOptions().getBoolean("Use-Cache", true)) {
+                cache = new UniversalFile(host.dir, "Cache:Templates:" + template.getName());
+                cache.mkdirs();
+            } else {
+                cache = null;
+            }
             if (!(System.getProperty("os.name").toLowerCase().indexOf("win") >= 0) && template.getBuildOptions().contains("Permission")) {
                 try {
                     Process process = Runtime.getRuntime().exec("chmod " + template.getBuildOptions().getRawString("Permission") + ' ' + template.getBuildOptions().getRawString("Shell-Location"), null, dir);
@@ -283,7 +289,7 @@ public class SubCreator {
             try {
                 thread.name().logger.info.println("Launching " + template.getBuildOptions().getRawString("Shell-Location"));
                 host.subdata.sendPacket(new PacketOutExLogMessage(address, "Launching " + template.getBuildOptions().getRawString("Shell-Location")));
-                thread.set(Runtime.getRuntime().exec((System.getProperty("os.name").toLowerCase().indexOf("win") >= 0)?"cmd.exe /c \"\"" + gitBash + "\" --login -i -c \"bash " + template.getBuildOptions().getRawString("Shell-Location") + ' ' + version.toString() + "\"\"":("bash " + template.getBuildOptions().getRawString("Shell-Location") + ' ' + version.toString() + " " + System.getProperty("user.home")), null, dir));
+                thread.set(Runtime.getRuntime().exec((System.getProperty("os.name").toLowerCase().indexOf("win") >= 0)?"cmd.exe /c \"\"" + gitBash + "\" --login -i -c \"bash " + template.getBuildOptions().getRawString("Shell-Location") + ' ' + version.toString() + " \"" + ((cache == null)?':':cache.toString().replace('\\', '/')) + "\"\"\"":("bash " + template.getBuildOptions().getRawString("Shell-Location") + ' ' + version.toString() + " \"" + ((cache == null)?':':cache.toString()) + '\"'), null, dir));
                 thread.name().file = new File(dir, "SubCreator-" + template.getName() + "-" + version.toString().replace(" ", "@") + ".log");
                 thread.name().process = thread.get();
                 thread.name().start();
@@ -297,6 +303,14 @@ public class SubCreator {
             } catch (Exception e) {
                 error = true;
                 thread.name().logger.error.println(e);
+            }
+
+            if (cache != null) {
+                if (cache.isDirectory() && cache.listFiles().length == 0) cache.delete();
+                cache = new UniversalFile(host.dir, "Cache:Templates");
+                if (cache.isDirectory() && cache.listFiles().length == 0) cache.delete();
+                cache = new UniversalFile(host.dir, "Cache");
+                if (cache.isDirectory() && cache.listFiles().length == 0) cache.delete();
             }
         }
 

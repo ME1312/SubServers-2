@@ -139,6 +139,13 @@ public class InternalSubCreator extends SubCreator {
 
         if (template.getBuildOptions().contains("Shell-Location")) {
             String gitBash = this.gitBash + ((this.gitBash.endsWith(File.separator)) ? "" : File.separator) + "bin" + File.separatorChar + "bash.exe";
+            File cache;
+            if (template.getBuildOptions().getBoolean("Use-Cache", true)) {
+                cache = new UniversalFile(host.plugin.dir, "SubServers:Cache:Templates:" + template.getName());
+                cache.mkdirs();
+            } else {
+                cache = null;
+            }
             if (!(System.getProperty("os.name").toLowerCase().indexOf("win") >= 0) && template.getBuildOptions().contains("Permission")) {
                 try {
                     Process process = Runtime.getRuntime().exec("chmod " + template.getBuildOptions().getRawString("Permission") + ' ' + template.getBuildOptions().getRawString("Shell-Location"), null, dir);
@@ -154,7 +161,7 @@ public class InternalSubCreator extends SubCreator {
 
             try {
                 System.out.println(name + File.separator + "Creator > Launching " + template.getBuildOptions().getRawString("Shell-Location"));
-                thread.set(Runtime.getRuntime().exec((System.getProperty("os.name").toLowerCase().indexOf("win") >= 0) ? "cmd.exe /c \"\"" + gitBash + "\" --login -i -c \"bash " + template.getBuildOptions().getRawString("Shell-Location") + ' ' + version.toString() + "\"\"" : ("bash " + template.getBuildOptions().getRawString("Shell-Location") + ' ' + version.toString() + " " + System.getProperty("user.home")), null, dir));
+                thread.set(Runtime.getRuntime().exec((System.getProperty("os.name").toLowerCase().indexOf("win") >= 0)?"cmd.exe /c \"\"" + gitBash + "\" --login -i -c \"bash " + template.getBuildOptions().getRawString("Shell-Location") + ' ' + version.toString() + " \"" + ((cache == null)?':':cache.toString().replace('\\', '/')) + "\"\"\"":("bash " + template.getBuildOptions().getRawString("Shell-Location") + ' ' + version.toString() + " \"" + ((cache == null)?':':cache.toString()) + '\"'), null, dir));
                 thread.name().log.set(host.plugin.config.get().getSection("Settings").getBoolean("Log-Creator"));
                 thread.name().file = new File(dir, "SubCreator-" + template.getName() + "-" + version.toString().replace(" ", "@") + ".log");
                 thread.name().process = thread.get();
@@ -169,6 +176,14 @@ public class InternalSubCreator extends SubCreator {
             } catch (Exception e) {
                 error = true;
                 e.printStackTrace();
+            }
+
+            if (cache != null) {
+                if (cache.isDirectory() && cache.listFiles().length == 0) cache.delete();
+                cache = new UniversalFile(host.plugin.dir, "SubServers:Cache:Templates");
+                if (cache.isDirectory() && cache.listFiles().length == 0) cache.delete();
+                cache = new UniversalFile(host.plugin.dir, "SubServers:Cache");
+                if (cache.isDirectory() && cache.listFiles().length == 0) cache.delete();
             }
         }
 

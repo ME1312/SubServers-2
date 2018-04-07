@@ -60,7 +60,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
     public SubServer sudo = null;
     //public static final Version version = new Version("2.13a");
     //public static final Version version = new Version(new Version("2.13a"), Version.VersionType.BETA, 1); // TODO Beta Version Setting
-    public static final Version version = new Version(new Version(new Version("2.13a"), VersionType.PRE_RELEASE, 2), VersionType.BETA, 6); // TODO Beta Version Setting
+    public static final Version version = new Version(new Version(new Version("2.13a"), VersionType.PRE_RELEASE, 2), VersionType.BETA, 7); // TODO Beta Version Setting
 
     public boolean redis = false;
     public long resetDate = 0;
@@ -122,12 +122,12 @@ public final class SubPlugin extends BungeeCord implements Listener {
                 Util.unzip(SubPlugin.class.getResourceAsStream("/net/ME1312/SubServers/Bungee/Library/Files/Templates/vanilla.zip"), new UniversalFile(dir, "Templates"));
                 System.out.println("SubServers > Updated ~/SubServers/Templates/Vanilla");
             }
-            if (new UniversalFile(dir, "Templates:Spigot:template.yml").exists() && (new Version((new YAMLConfig(new UniversalFile(dir, "Templates:Spigot:template.yml"))).get().getString("Version", "0")).compareTo(new Version("2.11.2m+"))) != 0) {
+            if (new UniversalFile(dir, "Templates:Spigot:template.yml").exists() && (new Version((new YAMLConfig(new UniversalFile(dir, "Templates:Spigot:template.yml"))).get().getString("Version", "0")).compareTo(new Version("2.13a+"))) != 0) {
                 Files.move(new UniversalFile(dir, "Templates:Vanilla").toPath(), new UniversalFile(dir, "Templates:Spigot.old" + Math.round(Math.random() * 100000)).toPath());
                 Util.unzip(SubPlugin.class.getResourceAsStream("/net/ME1312/SubServers/Bungee/Library/Files/Templates/spigot.zip"), new UniversalFile(dir, "Templates"));
                 System.out.println("SubServers > Updated ~/SubServers/Templates/Spigot");
             }
-            if (new UniversalFile(dir, "Templates:Sponge:template.yml").exists() && (new Version((new YAMLConfig(new UniversalFile(dir, "Templates:Sponge:template.yml"))).get().getString("Version", "0")).compareTo(new Version("2.11.2m+"))) != 0) {
+            if (new UniversalFile(dir, "Templates:Sponge:template.yml").exists() && (new Version((new YAMLConfig(new UniversalFile(dir, "Templates:Sponge:template.yml"))).get().getString("Version", "0")).compareTo(new Version("2.13a+"))) != 0) {
                 Files.move(new UniversalFile(dir, "Templates:Vanilla").toPath(), new UniversalFile(dir, "Templates:Sponge.old" + Math.round(Math.random() * 100000)).toPath());
                 Util.unzip(SubPlugin.class.getResourceAsStream("/net/ME1312/SubServers/Bungee/Library/Files/Templates/sponge.zip"), new UniversalFile(dir, "Templates"));
                 System.out.println("SubServers > Updated ~/SubServers/Templates/Sponge");
