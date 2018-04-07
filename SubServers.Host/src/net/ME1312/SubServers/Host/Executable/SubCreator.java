@@ -289,7 +289,7 @@ public class SubCreator {
             try {
                 thread.name().logger.info.println("Launching " + template.getBuildOptions().getRawString("Shell-Location"));
                 host.subdata.sendPacket(new PacketOutExLogMessage(address, "Launching " + template.getBuildOptions().getRawString("Shell-Location")));
-                thread.set(Runtime.getRuntime().exec((System.getProperty("os.name").toLowerCase().indexOf("win") >= 0)?"cmd.exe /c \"\"" + gitBash + "\" --login -i -c \"bash " + template.getBuildOptions().getRawString("Shell-Location") + ' ' + version.toString() + " \"" + ((cache == null)?':':cache.toString().replace('\\', '/')) + "\"\"\"":("bash " + template.getBuildOptions().getRawString("Shell-Location") + ' ' + version.toString() + " \"" + ((cache == null)?':':cache.toString()) + '\"'), null, dir));
+                thread.set(Runtime.getRuntime().exec((System.getProperty("os.name").toLowerCase().indexOf("win") >= 0)?"cmd.exe /c \"\"" + gitBash + "\" --login -i -c \"bash " + template.getBuildOptions().getRawString("Shell-Location") + ' ' + version.toString() + ' ' + ((cache == null)?':':cache.toString().replace('\\', '/').replace(" ", "\\ ")) + "\"\"":("bash " + template.getBuildOptions().getRawString("Shell-Location") + ' ' + version.toString() + ' ' + ((cache == null)?':':cache.toString().replace(" ", "\\ "))), null, dir));
                 thread.name().file = new File(dir, "SubCreator-" + template.getName() + "-" + version.toString().replace(" ", "@") + ".log");
                 thread.name().process = thread.get();
                 thread.name().start();

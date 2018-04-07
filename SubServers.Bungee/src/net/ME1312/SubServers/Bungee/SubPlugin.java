@@ -60,7 +60,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
     public SubServer sudo = null;
     //public static final Version version = new Version("2.13a");
     //public static final Version version = new Version(new Version("2.13a"), Version.VersionType.BETA, 1); // TODO Beta Version Setting
-    public static final Version version = new Version(new Version(new Version("2.13a"), VersionType.PRE_RELEASE, 2), VersionType.BETA, 7); // TODO Beta Version Setting
+    public static final Version version = new Version(new Version(new Version("2.13a"), VersionType.PRE_RELEASE, 2), VersionType.BETA, 8); // TODO Beta Version Setting
 
     public boolean redis = false;
     public long resetDate = 0;
