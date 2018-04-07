@@ -1,0 +1,4 @@
+name: SubServers-Bungee
+main: net.ME1312.SubServers.Bungee.Library.Compatibility.Plugin
+version: x.x.xx
+author: ME1312

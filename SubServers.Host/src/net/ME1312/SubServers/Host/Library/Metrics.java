@@ -80,21 +80,28 @@ public class Metrics {
             charts.add(new SingleLineChart("plugins", () -> host.api.getPlugins().size()));
             charts.add(new SimplePie("pluginVersion", host.version::toString));
             charts.add(new DrilldownPie("os", () -> {
+                String id = System.getProperty("os.name").toLowerCase(Locale.ENGLISH);
                 String name = System.getProperty("os.name");
                 String version = System.getProperty("os.version");
                 Map<String, Map<String, Integer>> map = new HashMap<String, Map<String, Integer>>();
                 Map<String, Integer> imap = new HashMap<String, Integer>();
 
-                if (name.toLowerCase().startsWith("windows")) {
+                if (id.contains("mac") || id.contains("darwin")) {
+                    imap.put("Mac OS " + version, 1);
+                    map.put("Mac OS", imap);
+                } else if (id.contains("win")) {
                     imap.put(name, 1);
-                    if (name.toLowerCase().contains("server")) {
+                    if (id.contains("server")) {
                         map.put("Windows Server", imap);
                     } else {
                         map.put("Windows", imap);
                     }
-                } else if (name.toLowerCase().startsWith("mac") || name.toLowerCase().startsWith("darwin")) {
-                    imap.put("Mac OS " + version, 1);
-                    map.put("Mac OS", imap);
+                } else if (id.contains("bsd")) {
+                    imap.put(name + ' ' + version, 1);
+                    map.put("BSD", imap);
+                } else if (id.contains("nux")) {
+                    imap.put(version, 1);
+                    map.put("Linux", imap);
                 } else {
                     imap.put(name + ' ' + version, 1);
                     map.put(name, imap);
