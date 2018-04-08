@@ -11,7 +11,6 @@ public enum VersionType {
     REVISION(0, "rv", "revision"),
     VERSION(0, "v", "version"),
     UPDATE(0, "u", "update"),
-    PATCH(0, "p", "patch"),
     ;
     final short stageid;
     final String shortname, longname;

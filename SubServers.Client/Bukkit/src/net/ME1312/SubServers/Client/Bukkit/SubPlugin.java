@@ -46,8 +46,8 @@ public final class SubPlugin extends JavaPlugin {
     public SubPlugin() {
         super();
         //version = new Version(getDescription().getVersion());
-        //version = new Version(new Version(getDescription().getVersion()), Version.VersionType.BETA, 1); // TODO Beta Version Setting
-        version = new Version(new Version(new Version(getDescription().getVersion()), VersionType.PRE_RELEASE, 2), VersionType.BETA, 8); // TODO Beta Version Setting
+        version = new Version(new Version(getDescription().getVersion()), VersionType.PRE_RELEASE, 2); // TODO Beta Version Setting
+        //version = new Version(new Version(new Version(getDescription().getVersion()), VersionType.PRE_RELEASE, 2), VersionType.BETA, 8); // TODO Beta Version Setting
     }
 
     /**
