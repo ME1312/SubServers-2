@@ -18,6 +18,10 @@
             <id>md_5-repo</id>
             <url>http://repo.md-5.net/content/repositories/snapshots/</url>
         </repository>
+        <repository>
+            <id>me1312-repo</id>
+            <url>https://src.me1312.net/maven</url>
+        </repository>
     </repositories>
 
     <dependencies>
@@ -28,11 +32,10 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <!-- Unfortunately, there is no maven artifact for BungeeCord's internals. You will have to add BungeeCord.jar as a dependency yourself. -->
-            <groupId>net.md-5</groupId>
-            <artifactId>bungeecord-api</artifactId>
+            <groupId>net.md_5</groupId>
+            <artifactId>bungeecord-internal</artifactId>
             <version>1.8-SNAPSHOT</version>
-            <scope>runtime</scope>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.imaginarycode.minecraft</groupId>
@@ -43,6 +46,7 @@
     </dependencies>
 
     <build>
+        <sourceDirectory>src</sourceDirectory>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
