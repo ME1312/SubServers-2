@@ -28,7 +28,12 @@ bld/
 [Oo]bj/
 [Ll]og/
 
-## Plugin-specific files:
+## Maven
+/SubServers.Bungee/target/
+/SubServers.Client/Bukkit/target/
+/SubServers.Console/target/
+/SubServers.Host/target/
+/SubServers.Sync/target/
 
 # IntelliJ
 /out/
