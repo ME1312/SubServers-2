@@ -93,9 +93,9 @@ public class InternalSubCreator extends SubCreator {
             if (template.getType() == ServerType.VANILLA) {
                 String commit;
                 if (version.compareTo(new Version("1.12")) >= 0) {
-                    commit = "b8f7aa8b3988e164b04911cc47b54b4cc8a554a1";
+                    commit = "6c29bc48854f75fae6e8c16bbbdb47bd53a8e082";
                 } else {
-                    commit = "df9797496a7c148aaeec73a13cda521275b12db8";
+                    commit = "339144e5cc406c3bc71aed66b636cbb348932eb0";
                 }
                 version = new Version(version.toString() + " " + commit);
             } else if (template.getType() == ServerType.SPONGE) {
