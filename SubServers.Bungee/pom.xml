@@ -28,7 +28,7 @@
         <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
-            <version>LATEST</version>
+            <version>20180130</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
@@ -46,6 +46,7 @@
     </dependencies>
 
     <build>
+        <directory>../out/compile/target/SubServers.Bungee</directory>
         <sourceDirectory>src</sourceDirectory>
         <plugins>
             <plugin>

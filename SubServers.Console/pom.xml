@@ -32,6 +32,7 @@
     </dependencies>
 
     <build>
+        <directory>../out/compile/target/SubServers.Console</directory>
         <sourceDirectory>src</sourceDirectory>
         <plugins>
             <plugin>

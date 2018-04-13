@@ -25,18 +25,19 @@
         <dependency>
             <groupId>org.yaml</groupId>
             <artifactId>snakeyaml</artifactId>
-            <version>LATEST</version>
+            <version>1.20</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
-            <version>LATEST</version>
+            <version>20180130</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>
 
     <build>
+        <directory>../out/compile/target/SubServers.Host</directory>
         <sourceDirectory>src</sourceDirectory>
         <plugins>
             <plugin>
