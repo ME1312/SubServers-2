@@ -1,14 +1,13 @@
 package net.ME1312.SubServers.Bungee.Network.Packet;
 
 import net.ME1312.SubServers.Bungee.Host.Executable;
-import net.ME1312.SubServers.Bungee.Host.SubCreator;
-import net.ME1312.SubServers.Bungee.Library.JSONCallback;
+import net.ME1312.SubServers.Bungee.Library.Config.YAMLSection;
+import net.ME1312.SubServers.Bungee.Library.Callback;
 import net.ME1312.SubServers.Bungee.Library.Util;
 import net.ME1312.SubServers.Bungee.Library.Version.Version;
 import net.ME1312.SubServers.Bungee.Network.Client;
 import net.ME1312.SubServers.Bungee.Network.PacketIn;
 import net.ME1312.SubServers.Bungee.Network.PacketOut;
-import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.UUID;
@@ -17,7 +16,7 @@ import java.util.UUID;
  * Add Server External Host Packet
  */
 public class PacketExAddServer implements PacketIn, PacketOut {
-    private static HashMap<String, JSONCallback[]> callbacks = new HashMap<String, JSONCallback[]>();
+    private static HashMap<String, Callback<YAMLSection>[]> callbacks = new HashMap<String, Callback<YAMLSection>[]>();
     private String name;
     private boolean enabled;
     private boolean log;
@@ -41,7 +40,8 @@ public class PacketExAddServer implements PacketIn, PacketOut {
      * @param directory Directory
      * @param executable Executable
      */
-    public PacketExAddServer(String name, boolean enabled, boolean log, String directory, Executable executable, String stopcmd, UUID running, JSONCallback... callback) {
+    @SafeVarargs
+    public PacketExAddServer(String name, boolean enabled, boolean log, String directory, Executable executable, String stopcmd, UUID running, Callback<YAMLSection>... callback) {
         if (Util.isNull(name, enabled, log, directory, executable, callback)) throw new NullPointerException();
         this.name = name;
         this.enabled = enabled;
@@ -55,25 +55,25 @@ public class PacketExAddServer implements PacketIn, PacketOut {
     }
 
     @Override
-    public JSONObject generate() {
-        JSONObject json = new JSONObject();
-        json.put("id", id);
-        JSONObject server = new JSONObject();
-        server.put("name", name);
-        server.put("enabled", enabled);
-        server.put("log", log);
-        server.put("dir", directory);
-        server.put("exec", executable.toString());
-        server.put("stopcmd", stopcmd);
-        if (running != null) server.put("running", running.toString());
-        json.put("server", server);
-        return json;
+    public YAMLSection generate() {
+        YAMLSection data = new YAMLSection();
+        data.set("id", id);
+        YAMLSection server = new YAMLSection();
+        server.set("name", name);
+        server.set("enabled", enabled);
+        server.set("log", log);
+        server.set("dir", directory);
+        server.set("exec", executable.toString());
+        server.set("stopcmd", stopcmd);
+        if (running != null) server.set("running", running.toString());
+        data.set("server", server);
+        return data;
     }
 
     @Override
-    public void execute(Client client, JSONObject data) {
-        for (JSONCallback callback : callbacks.get(data.getString("id"))) callback.run(data);
-        callbacks.remove(data.getString("id"));
+    public void execute(Client client, YAMLSection data) {
+        for (Callback<YAMLSection> callback : callbacks.get(data.getRawString("id"))) callback.run(data);
+        callbacks.remove(data.getRawString("id"));
     }
 
     @Override

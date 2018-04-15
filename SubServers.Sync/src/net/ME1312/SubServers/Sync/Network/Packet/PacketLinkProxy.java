@@ -1,12 +1,12 @@
 package net.ME1312.SubServers.Sync.Network.Packet;
 
+import net.ME1312.SubServers.Sync.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Sync.Library.Util;
 import net.ME1312.SubServers.Sync.Library.Version.Version;
 import net.ME1312.SubServers.Sync.Network.PacketIn;
 import net.ME1312.SubServers.Sync.Network.PacketOut;
 import net.ME1312.SubServers.Sync.Network.SubDataClient;
 import net.ME1312.SubServers.Sync.SubPlugin;
-import org.json.JSONObject;
 
 import java.lang.reflect.Field;
 
@@ -27,19 +27,19 @@ public class PacketLinkProxy implements PacketIn, PacketOut {
     }
 
     @Override
-    public JSONObject generate() {
-        JSONObject json = new JSONObject();
-        json.put("name", plugin.subdata.getName());
-        return json;
+    public YAMLSection generate() {
+        YAMLSection data = new YAMLSection();
+        data.set("name", plugin.subdata.getName());
+        return data;
     }
 
     @Override
-    public void execute(JSONObject data) {
+    public void execute(YAMLSection data) {
         if (data.getInt("r") == 0) {
-            if (data.keySet().contains("n")) try {
+            if (data.contains("n")) try {
                 Field f = SubDataClient.class.getDeclaredField("name");
                 f.setAccessible(true);
-                f.set(plugin.subdata, data.getString("n"));
+                f.set(plugin.subdata, data.getRawString("n"));
                 f.setAccessible(false);
             } catch (Exception e) {}
         } else {
@@ -51,7 +51,7 @@ public class PacketLinkProxy implements PacketIn, PacketOut {
                     }
                 }
             } catch (Exception e) {}
-            System.out.println("SubData > Could not link name with server: " + data.getString("m"));
+            System.out.println("SubData > Could not link name with server: " + data.getRawString("m"));
         }
     }
 

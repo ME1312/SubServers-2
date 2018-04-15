@@ -1,12 +1,12 @@
 package net.ME1312.SubServers.Bungee.Network.Packet;
 
+import net.ME1312.SubServers.Bungee.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Bungee.Library.Util;
 import net.ME1312.SubServers.Bungee.Library.Version.Version;
 import net.ME1312.SubServers.Bungee.Network.Client;
 import net.ME1312.SubServers.Bungee.Network.PacketIn;
 import net.ME1312.SubServers.Bungee.Network.PacketOut;
 import net.ME1312.SubServers.Bungee.SubPlugin;
-import org.json.JSONObject;
 
 /**
  * Authorization Packet
@@ -39,17 +39,17 @@ public final class PacketAuthorization implements PacketIn, PacketOut {
     }
 
     @Override
-    public JSONObject generate() {
-        JSONObject json = new JSONObject();
-        json.put("r", response);
-        json.put("m", message);
-        return json;
+    public YAMLSection generate() {
+        YAMLSection data = new YAMLSection();
+        data.set("r", response);
+        data.set("m", message);
+        return data;
     }
 
     @Override
-    public void execute(Client client, JSONObject data) {
+    public void execute(Client client, YAMLSection data) {
         try {
-            if (data.getString("password").equals(plugin.config.get().getSection("Settings").getSection("SubData").getRawString("Password"))) {
+            if (data.getRawString("password").equals(plugin.config.get().getSection("Settings").getSection("SubData").getRawString("Password"))) {
                 client.authorize();
                 client.sendPacket(new PacketAuthorization(0, "Successfully Logged in"));
             } else {

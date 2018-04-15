@@ -1,5 +1,6 @@
 package net.ME1312.SubServers.Bungee.Host;
 
+import com.google.gson.Gson;
 import net.ME1312.SubServers.Bungee.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Bungee.Library.Config.YAMLValue;
 import net.ME1312.SubServers.Bungee.Library.Exception.InvalidHostException;
@@ -9,10 +10,8 @@ import net.ME1312.SubServers.Bungee.Library.Util;
 import net.ME1312.SubServers.Bungee.Network.ClientHandler;
 import net.ME1312.SubServers.Bungee.Network.SubDataServer;
 import net.ME1312.SubServers.Bungee.SubPlugin;
-import org.json.JSONObject;
 
 import java.net.InetAddress;
-import java.util.ArrayList;
 import java.util.Map;
 import java.util.UUID;
 
@@ -377,30 +376,31 @@ public abstract class Host implements ExtraDataHandler {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public String toString() {
-        JSONObject hinfo = new JSONObject();
-        hinfo.put("type", "Host");
-        hinfo.put("name", getName());
-        hinfo.put("display", getDisplayName());
-        hinfo.put("enabled", isEnabled());
-        hinfo.put("address", getAddress().getHostAddress());
-        hinfo.put("dir", getPath());
+        YAMLSection hinfo = new YAMLSection();
+        hinfo.set("type", "Host");
+        hinfo.set("name", getName());
+        hinfo.set("display", getDisplayName());
+        hinfo.set("enabled", isEnabled());
+        hinfo.set("address", getAddress().getHostAddress());
+        hinfo.set("dir", getPath());
 
-        JSONObject cinfo = new JSONObject();
-        JSONObject templates = new JSONObject();
+        YAMLSection cinfo = new YAMLSection();
+        YAMLSection templates = new YAMLSection();
         for (SubCreator.ServerTemplate template : getCreator().getTemplates().values())
-            templates.put(template.getName(), new JSONObject(template.toString()));
-        cinfo.put("templates", templates);
-        hinfo.put("creator", cinfo);
+            templates.set(template.getName(), new YAMLSection(new Gson().fromJson(template.toString(), Map.class)));
+        cinfo.set("templates", templates);
+        hinfo.set("creator", cinfo);
 
-        JSONObject servers = new JSONObject();
+        YAMLSection servers = new YAMLSection();
         for (SubServer server : getSubServers().values()) {
-            servers.put(server.getName(), new JSONObject(server.toString()));
+            servers.set(server.getName(), new YAMLSection(new Gson().fromJson(server.toString(), Map.class)));
         }
-        hinfo.put("servers", servers);
-        if (this instanceof ClientHandler && ((ClientHandler) this).getSubData() != null) hinfo.put("subdata", ((ClientHandler) this).getSubData().getAddress().toString());
-        hinfo.put("signature", signature);
-        hinfo.put("extra", getExtra().toJSON());
-        return hinfo.toString();
+        hinfo.set("servers", servers);
+        if (this instanceof ClientHandler && ((ClientHandler) this).getSubData() != null) hinfo.set("subdata", ((ClientHandler) this).getSubData().getAddress().toString());
+        hinfo.set("signature", signature);
+        hinfo.set("extra", getExtra().toJSON());
+        return hinfo.toJSON();
     }
 }

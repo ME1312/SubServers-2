@@ -1,11 +1,11 @@
 package net.ME1312.SubServers.Host.Network.Packet;
 
 import net.ME1312.SubServers.Host.Executable.SubServer;
+import net.ME1312.SubServers.Host.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Host.Library.Version.Version;
 import net.ME1312.SubServers.Host.Network.PacketIn;
 import net.ME1312.SubServers.Host.Network.PacketOut;
 import net.ME1312.SubServers.Host.ExHost;
-import org.json.JSONObject;
 
 import java.util.Arrays;
 import java.util.UUID;
@@ -68,27 +68,27 @@ public class PacketExUpdateServer implements PacketIn, PacketOut {
     }
 
     @Override
-    public JSONObject generate() {
-        JSONObject json = new JSONObject();
-        json.put("server", server.getName());
-        json.put("type", type.getValue());
-        json.put("args", Arrays.asList(args));
-        return json;
+    public YAMLSection generate() {
+        YAMLSection data = new YAMLSection();
+        data.set("server", server.getName());
+        data.set("type", type.getValue());
+        data.set("args", Arrays.asList(args));
+        return data;
     }
 
     @Override
-    public void execute(JSONObject data) {
+    public void execute(YAMLSection data) {
         try {
             SubServer server = host.servers.get(data.getString("server").toLowerCase());
             switch (data.getInt("type")) {
                 case 0:
-                    server.setEnabled(data.getJSONArray("args").getBoolean(0));
+                    server.setEnabled(data.getList("args").get(0).asBoolean());
                     break;
                 case 1:
-                    server.start(UUID.fromString(data.getJSONArray("args").getString(0)));
+                    server.start(UUID.fromString(data.getList("args").get(0).asRawString()));
                     break;
                 case 2:
-                    server.command(data.getJSONArray("args").getString(0));
+                    server.command(data.getList("args").get(0).asRawString());
                     break;
                 case 3:
                     server.stop();
@@ -97,10 +97,10 @@ public class PacketExUpdateServer implements PacketIn, PacketOut {
                     server.terminate();
                     break;
                 case 5:
-                    server.setLogging(data.getJSONArray("args").getBoolean(0));
+                    server.setLogging(data.getList("args").get(0).asBoolean());
                     break;
                 case 6:
-                    server.setStopCommand(data.getJSONArray("args").getString(0));
+                    server.setStopCommand(data.getList("args").get(0).asRawString());
                     break;
             }
         } catch (Exception e) {

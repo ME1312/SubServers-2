@@ -336,10 +336,10 @@ public class SubCreator {
         }
 
         if (server != null) {
-            host.subdata.sendPacket(new PacketExCreateServer(0, "Created Server Successfully", template.getConfigOptions().toJSON(), id));
+            host.subdata.sendPacket(new PacketExCreateServer(0, "Created Server Successfully", template.getConfigOptions(), id));
         } else {
             thread.name().logger.info.println("Couldn't build the server jar. Check the SubCreator logs for more detail.");
-            host.subdata.sendPacket(new PacketExCreateServer(-1, "Couldn't build the server jar. Check the SubCreator logs for more detail.", template.getConfigOptions().toJSON(), id));
+            host.subdata.sendPacket(new PacketExCreateServer(-1, "Couldn't build the server jar. Check the SubCreator logs for more detail.", template.getConfigOptions(), id));
         }
         this.thread.remove(name.toLowerCase());
     }

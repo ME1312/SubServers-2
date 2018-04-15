@@ -1,5 +1,6 @@
 package net.ME1312.SubServers.Bungee;
 
+import com.google.gson.Gson;
 import net.ME1312.SubServers.Bungee.Event.SubStoppedEvent;
 import net.ME1312.SubServers.Bungee.Host.*;
 import net.ME1312.SubServers.Bungee.Library.*;
@@ -19,7 +20,6 @@ import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.event.ServerConnectEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
-import org.json.JSONObject;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -60,7 +60,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
     public SubServer sudo = null;
     //public static final Version version = new Version("2.13a");
     //public static final Version version = new Version(new Version("2.13a"), VersionType.BETA, 1); // TODO Beta Version Setting
-    public static final Version version = new Version(new Version(new Version("2.13a"), VersionType.PRE_RELEASE, 3), VersionType.BETA, 1); // TODO Beta Version Setting
+    public static final Version version = new Version(new Version(new Version("2.13a"), VersionType.PRE_RELEASE, 3), VersionType.BETA, 2); // TODO Beta Version Setting
 
     public boolean redis = false;
     public long resetDate = 0;
@@ -141,10 +141,10 @@ public final class SubPlugin extends BungeeCord implements Listener {
                     if (file.isDirectory()) {
                         if (new UniversalFile(dir, "Recently Deleted:" + file.getName() + ":info.json").exists()) {
                             FileReader reader = new FileReader(new UniversalFile(dir, "Recently Deleted:" + file.getName() + ":info.json"));
-                            JSONObject json = new JSONObject(Util.readAll(reader));
+                            YAMLSection info = new YAMLSection(new Gson().fromJson(Util.readAll(reader), Map.class));
                             reader.close();
-                            if (json.keySet().contains("Timestamp")) {
-                                if (TimeUnit.MILLISECONDS.toDays(Calendar.getInstance().getTime().getTime() - json.getLong("Timestamp")) >= 7) {
+                            if (info.contains("Timestamp")) {
+                                if (TimeUnit.MILLISECONDS.toDays(Calendar.getInstance().getTime().getTime() - info.getLong("Timestamp")) >= 7) {
                                     Util.deleteDirectory(file);
                                     f--;
                                     System.out.println("SubServers > Removed ~/SubServers/Recently Deleted/" + file.getName());

@@ -138,14 +138,14 @@ implements <a href="../../../../../../net/ME1312/SubServers/Bungee/Network/Packe
 </td>
 </tr>
 <tr class="rowColor">
-<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Bungee/Network/Packet/PacketExAddServer.html#PacketExAddServer-java.lang.String-boolean-boolean-java.lang.String-net.ME1312.SubServers.Bungee.Host.Executable-java.lang.String-java.util.UUID-net.ME1312.SubServers.Bungee.Library.JSONCallback...-">PacketExAddServer</a></span>(java.lang.String&nbsp;name,
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Bungee/Network/Packet/PacketExAddServer.html#PacketExAddServer-java.lang.String-boolean-boolean-java.lang.String-net.ME1312.SubServers.Bungee.Host.Executable-java.lang.String-java.util.UUID-net.ME1312.SubServers.Bungee.Library.Callback...-">PacketExAddServer</a></span>(java.lang.String&nbsp;name,
                  boolean&nbsp;enabled,
                  boolean&nbsp;log,
                  java.lang.String&nbsp;directory,
                  <a href="../../../../../../net/ME1312/SubServers/Bungee/Host/Executable.html" title="class in net.ME1312.SubServers.Bungee.Host">Executable</a>&nbsp;executable,
                  java.lang.String&nbsp;stopcmd,
                  java.util.UUID&nbsp;running,
-                 <a href="../../../../../../net/ME1312/SubServers/Bungee/Library/JSONCallback.html" title="interface in net.ME1312.SubServers.Bungee.Library">JSONCallback</a>...&nbsp;callback)</code>
+                 <a href="../../../../../../net/ME1312/SubServers/Bungee/Library/Callback.html" title="interface in net.ME1312.SubServers.Bungee.Library">Callback</a>&lt;<a href="../../../../../../net/ME1312/SubServers/Bungee/Library/Config/YAMLSection.html" title="class in net.ME1312.SubServers.Bungee.Library.Config">YAMLSection</a>&gt;...&nbsp;callback)</code>
 <div class="block">New PacketExAddServer (Out)</div>
 </td>
 </tr>
@@ -166,15 +166,15 @@ implements <a href="../../../../../../net/ME1312/SubServers/Bungee/Network/Packe
 </tr>
 <tr id="i0" class="altColor">
 <td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Bungee/Network/Packet/PacketExAddServer.html#execute-net.ME1312.SubServers.Bungee.Network.Client-org.json.JSONObject-">execute</a></span>(<a href="../../../../../../net/ME1312/SubServers/Bungee/Network/Client.html" title="class in net.ME1312.SubServers.Bungee.Network">Client</a>&nbsp;client,
-       org.json.JSONObject&nbsp;data)</code>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Bungee/Network/Packet/PacketExAddServer.html#execute-net.ME1312.SubServers.Bungee.Network.Client-net.ME1312.SubServers.Bungee.Library.Config.YAMLSection-">execute</a></span>(<a href="../../../../../../net/ME1312/SubServers/Bungee/Network/Client.html" title="class in net.ME1312.SubServers.Bungee.Network">Client</a>&nbsp;client,
+       <a href="../../../../../../net/ME1312/SubServers/Bungee/Library/Config/YAMLSection.html" title="class in net.ME1312.SubServers.Bungee.Library.Config">YAMLSection</a>&nbsp;data)</code>
 <div class="block">Execute Incoming Packet</div>
 </td>
 </tr>
 <tr id="i1" class="rowColor">
-<td class="colFirst"><code>org.json.JSONObject</code></td>
+<td class="colFirst"><code><a href="../../../../../../net/ME1312/SubServers/Bungee/Library/Config/YAMLSection.html" title="class in net.ME1312.SubServers.Bungee.Library.Config">YAMLSection</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Bungee/Network/Packet/PacketExAddServer.html#generate--">generate</a></span>()</code>
-<div class="block">Generate JSON Packet Contents</div>
+<div class="block">Generate Packet Contents</div>
 </td>
 </tr>
 <tr id="i2" class="altColor">
@@ -222,20 +222,21 @@ implements <a href="../../../../../../net/ME1312/SubServers/Bungee/Network/Packe
 <div class="block">New PacketExAddServer (In)</div>
 </li>
 </ul>
-<a name="PacketExAddServer-java.lang.String-boolean-boolean-java.lang.String-net.ME1312.SubServers.Bungee.Host.Executable-java.lang.String-java.util.UUID-net.ME1312.SubServers.Bungee.Library.JSONCallback...-">
+<a name="PacketExAddServer-java.lang.String-boolean-boolean-java.lang.String-net.ME1312.SubServers.Bungee.Host.Executable-java.lang.String-java.util.UUID-net.ME1312.SubServers.Bungee.Library.Callback...-">
 <!--   -->
 </a>
 <ul class="blockListLast">
 <li class="blockList">
 <h4>PacketExAddServer</h4>
-<pre>public&nbsp;PacketExAddServer(java.lang.String&nbsp;name,
-                         boolean&nbsp;enabled,
-                         boolean&nbsp;log,
-                         java.lang.String&nbsp;directory,
-                         <a href="../../../../../../net/ME1312/SubServers/Bungee/Host/Executable.html" title="class in net.ME1312.SubServers.Bungee.Host">Executable</a>&nbsp;executable,
-                         java.lang.String&nbsp;stopcmd,
-                         java.util.UUID&nbsp;running,
-                         <a href="../../../../../../net/ME1312/SubServers/Bungee/Library/JSONCallback.html" title="interface in net.ME1312.SubServers.Bungee.Library">JSONCallback</a>...&nbsp;callback)</pre>
+<pre>@SafeVarargs
+public&nbsp;PacketExAddServer(java.lang.String&nbsp;name,
+                                       boolean&nbsp;enabled,
+                                       boolean&nbsp;log,
+                                       java.lang.String&nbsp;directory,
+                                       <a href="../../../../../../net/ME1312/SubServers/Bungee/Host/Executable.html" title="class in net.ME1312.SubServers.Bungee.Host">Executable</a>&nbsp;executable,
+                                       java.lang.String&nbsp;stopcmd,
+                                       java.util.UUID&nbsp;running,
+                                       <a href="../../../../../../net/ME1312/SubServers/Bungee/Library/Callback.html" title="interface in net.ME1312.SubServers.Bungee.Library">Callback</a>&lt;<a href="../../../../../../net/ME1312/SubServers/Bungee/Library/Config/YAMLSection.html" title="class in net.ME1312.SubServers.Bungee.Library.Config">YAMLSection</a>&gt;...&nbsp;callback)</pre>
 <div class="block">New PacketExAddServer (Out)</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
@@ -261,9 +262,9 @@ implements <a href="../../../../../../net/ME1312/SubServers/Bungee/Network/Packe
 <ul class="blockList">
 <li class="blockList">
 <h4>generate</h4>
-<pre>public&nbsp;org.json.JSONObject&nbsp;generate()</pre>
+<pre>public&nbsp;<a href="../../../../../../net/ME1312/SubServers/Bungee/Library/Config/YAMLSection.html" title="class in net.ME1312.SubServers.Bungee.Library.Config">YAMLSection</a>&nbsp;generate()</pre>
 <div class="block"><span class="descfrmTypeLabel">Description copied from interface:&nbsp;<code><a href="../../../../../../net/ME1312/SubServers/Bungee/Network/PacketOut.html#generate--">PacketOut</a></code></span></div>
-<div class="block">Generate JSON Packet Contents</div>
+<div class="block">Generate Packet Contents</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
 <dd><code><a href="../../../../../../net/ME1312/SubServers/Bungee/Network/PacketOut.html#generate--">generate</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../../net/ME1312/SubServers/Bungee/Network/PacketOut.html" title="interface in net.ME1312.SubServers.Bungee.Network">PacketOut</a></code></dd>
@@ -272,19 +273,19 @@ implements <a href="../../../../../../net/ME1312/SubServers/Bungee/Network/Packe
 </dl>
 </li>
 </ul>
-<a name="execute-net.ME1312.SubServers.Bungee.Network.Client-org.json.JSONObject-">
+<a name="execute-net.ME1312.SubServers.Bungee.Network.Client-net.ME1312.SubServers.Bungee.Library.Config.YAMLSection-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>execute</h4>
 <pre>public&nbsp;void&nbsp;execute(<a href="../../../../../../net/ME1312/SubServers/Bungee/Network/Client.html" title="class in net.ME1312.SubServers.Bungee.Network">Client</a>&nbsp;client,
-                    org.json.JSONObject&nbsp;data)</pre>
-<div class="block"><span class="descfrmTypeLabel">Description copied from interface:&nbsp;<code><a href="../../../../../../net/ME1312/SubServers/Bungee/Network/PacketIn.html#execute-net.ME1312.SubServers.Bungee.Network.Client-org.json.JSONObject-">PacketIn</a></code></span></div>
+                    <a href="../../../../../../net/ME1312/SubServers/Bungee/Library/Config/YAMLSection.html" title="class in net.ME1312.SubServers.Bungee.Library.Config">YAMLSection</a>&nbsp;data)</pre>
+<div class="block"><span class="descfrmTypeLabel">Description copied from interface:&nbsp;<code><a href="../../../../../../net/ME1312/SubServers/Bungee/Network/PacketIn.html#execute-net.ME1312.SubServers.Bungee.Network.Client-net.ME1312.SubServers.Bungee.Library.Config.YAMLSection-">PacketIn</a></code></span></div>
 <div class="block">Execute Incoming Packet</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="../../../../../../net/ME1312/SubServers/Bungee/Network/PacketIn.html#execute-net.ME1312.SubServers.Bungee.Network.Client-org.json.JSONObject-">execute</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../../net/ME1312/SubServers/Bungee/Network/PacketIn.html" title="interface in net.ME1312.SubServers.Bungee.Network">PacketIn</a></code></dd>
+<dd><code><a href="../../../../../../net/ME1312/SubServers/Bungee/Network/PacketIn.html#execute-net.ME1312.SubServers.Bungee.Network.Client-net.ME1312.SubServers.Bungee.Library.Config.YAMLSection-">execute</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../../net/ME1312/SubServers/Bungee/Network/PacketIn.html" title="interface in net.ME1312.SubServers.Bungee.Network">PacketIn</a></code></dd>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>client</code> - Client Accepting</dd>
 <dd><code>data</code> - Incoming Data</dd>

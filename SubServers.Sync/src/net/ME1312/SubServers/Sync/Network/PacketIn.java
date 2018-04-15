@@ -1,7 +1,7 @@
 package net.ME1312.SubServers.Sync.Network;
 
+import net.ME1312.SubServers.Sync.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Sync.Library.Version.Version;
-import org.json.JSONObject;
 
 /**
  * PacketIn Layout Class
@@ -12,7 +12,7 @@ public interface PacketIn {
      *
      * @param data Incoming Data
      */
-    void execute(JSONObject data) throws Throwable;
+    void execute(YAMLSection data) throws Throwable;
 
     /**
      * Get Packet Version

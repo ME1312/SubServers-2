@@ -1,5 +1,6 @@
 package net.ME1312.SubServers.Client.Bukkit.Network.Packet;
 
+import net.ME1312.SubServers.Client.Bukkit.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Client.Bukkit.Library.NamedContainer;
 import net.ME1312.SubServers.Client.Bukkit.Library.Util;
 import net.ME1312.SubServers.Client.Bukkit.Library.Version.Version;
@@ -8,7 +9,6 @@ import net.ME1312.SubServers.Client.Bukkit.Network.PacketOut;
 import net.ME1312.SubServers.Client.Bukkit.Network.SubDataClient;
 import net.ME1312.SubServers.Client.Bukkit.SubPlugin;
 import org.bukkit.Bukkit;
-import org.json.JSONObject;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
@@ -22,14 +22,14 @@ public final class PacketAuthorization implements PacketIn, PacketOut {
     }
 
     @Override
-    public JSONObject generate() {
-        JSONObject json = new JSONObject();
-        json.put("password", plugin.config.get().getSection("Settings").getSection("SubData").getString("Password"));
+    public YAMLSection generate() {
+        YAMLSection json = new YAMLSection();
+        json.set("password", plugin.config.get().getSection("Settings").getSection("SubData").getString("Password"));
         return json;
     }
 
     @Override
-    public void execute(JSONObject data) {
+    public void execute(YAMLSection data) {
         try {
             if (data.getInt("r") == 0) {
                 try {
@@ -39,7 +39,7 @@ public final class PacketAuthorization implements PacketIn, PacketOut {
                     m.setAccessible(false);
                 } catch (Exception e) {}
             } else {
-                Bukkit.getLogger().info("SubServers > Could not authorize SubData connection: " + data.getString("m"));
+                Bukkit.getLogger().info("SubServers > Could not authorize SubData connection: " + data.getRawString("m"));
                 plugin.subdata.destroy(0);
             }
         } catch (IOException e) {

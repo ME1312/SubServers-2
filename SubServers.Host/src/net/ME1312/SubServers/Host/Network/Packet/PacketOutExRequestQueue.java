@@ -1,8 +1,8 @@
 package net.ME1312.SubServers.Host.Network.Packet;
 
+import net.ME1312.SubServers.Host.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Host.Library.Version.Version;
 import net.ME1312.SubServers.Host.Network.PacketOut;
-import org.json.JSONObject;
 
 /**
  * Queue Request Packet
@@ -16,7 +16,7 @@ public class PacketOutExRequestQueue implements PacketOut {
     }
 
     @Override
-    public JSONObject generate() {
+    public YAMLSection generate() {
         return null;
     }
 

@@ -1,21 +1,17 @@
 package net.ME1312.SubServers.Bungee.Network.Packet;
 
+import com.google.gson.Gson;
 import net.ME1312.SubServers.Bungee.Host.Host;
 import net.ME1312.SubServers.Bungee.Host.Server;
-import net.ME1312.SubServers.Bungee.Host.SubServer;
+import net.ME1312.SubServers.Bungee.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Bungee.Library.Util;
 import net.ME1312.SubServers.Bungee.Library.Version.Version;
 import net.ME1312.SubServers.Bungee.Network.Client;
-import net.ME1312.SubServers.Bungee.Network.ClientHandler;
 import net.ME1312.SubServers.Bungee.Network.PacketIn;
 import net.ME1312.SubServers.Bungee.Network.PacketOut;
 import net.ME1312.SubServers.Bungee.SubPlugin;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
-import org.json.JSONArray;
-import org.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Map;
 
 /**
  * Download Server List Packet
@@ -52,46 +48,47 @@ public class PacketDownloadServerList implements PacketIn, PacketOut {
         this.id = id;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public JSONObject generate() {
-        JSONObject json = new JSONObject();
-        json.put("id", id);
+    public YAMLSection generate() {
+        YAMLSection data = new YAMLSection();
+        data.set("id", id);
 
-        JSONObject exServers = new JSONObject();
+        YAMLSection exServers = new YAMLSection();
         for (Server server : plugin.exServers.values()) {
-            exServers.put(server.getName(), new JSONObject(server.toString()));
+            exServers.set(server.getName(), new YAMLSection(new Gson().fromJson(server.toString(), Map.class)));
         }
-        json.put("servers", exServers);
+        data.set("servers", exServers);
 
         if (this.host == null || !this.host.equals("")) {
-            JSONObject hosts = new JSONObject();
+            YAMLSection hosts = new YAMLSection();
             for (Host host : plugin.api.getHosts().values()) {
                 if (this.host == null || this.host.equalsIgnoreCase(host.getName())) {
-                    hosts.put(host.getName(), new JSONObject(host.toString()));
+                    hosts.set(host.getName(), new YAMLSection(new Gson().fromJson(host.toString(), Map.class)));
                 }
             }
-            json.put("hosts", hosts);
+            data.set("hosts", hosts);
         }
 
         if (this.group == null || !this.group.equals("")) {
-            JSONObject groups = new JSONObject();
+            YAMLSection groups = new YAMLSection();
             for (String group : plugin.api.getGroups().keySet()) {
                 if (this.group == null || this.group.equalsIgnoreCase(group)) {
-                    JSONObject servers = new JSONObject();
+                    YAMLSection servers = new YAMLSection();
                     for (Server server : plugin.api.getGroup(group)) {
-                        servers.put(server.getName(), new JSONObject(server.toString()));
+                        servers.set(server.getName(), new YAMLSection(new Gson().fromJson(server.toString(), Map.class)));
                     }
-                    groups.put(group, servers);
+                    groups.set(group, servers);
                 }
             }
-            json.put("groups", groups);
+            data.set("groups", groups);
         }
-        return json;
+        return data;
     }
 
     @Override
-    public void execute(Client client, JSONObject data) {
-        client.sendPacket(new PacketDownloadServerList(plugin, (data.keySet().contains("host"))?data.getString("host"):null, (data.keySet().contains("group"))?data.getString("group"):null, (data.keySet().contains("id"))?data.getString("id"):null));
+    public void execute(Client client, YAMLSection data) {
+        client.sendPacket(new PacketDownloadServerList(plugin, (data.contains("host"))?data.getRawString("host"):null, (data.contains("group"))?data.getRawString("group"):null, (data.contains("id"))?data.getRawString("id"):null));
     }
 
     @Override

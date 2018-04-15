@@ -2,14 +2,13 @@ package net.ME1312.SubServers.Bungee.Network.Packet;
 
 import net.ME1312.SubServers.Bungee.Host.External.ExternalSubServer;
 import net.ME1312.SubServers.Bungee.Host.SubServer;
+import net.ME1312.SubServers.Bungee.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Bungee.Library.Version.Version;
 import net.ME1312.SubServers.Bungee.Network.Client;
 import net.ME1312.SubServers.Bungee.Network.PacketIn;
 import net.ME1312.SubServers.Bungee.Network.PacketOut;
 import net.ME1312.SubServers.Bungee.SubPlugin;
-import org.json.JSONObject;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 
@@ -78,18 +77,18 @@ public class PacketExUpdateServer implements PacketIn, PacketOut {
     }
 
     @Override
-    public JSONObject generate() {
-        JSONObject json = new JSONObject();
-        json.put("server", server.getName());
-        json.put("type", type.getValue());
-        json.put("args", Arrays.asList(args));
-        return json;
+    public YAMLSection generate() {
+        YAMLSection data = new YAMLSection();
+        data.set("server", server.getName());
+        data.set("type", type.getValue());
+        data.set("args", Arrays.asList(args));
+        return data;
     }
 
     @Override
-    public void execute(Client client, JSONObject data) {
+    public void execute(Client client, YAMLSection data) {
         try {
-            ExternalSubServer server = (ExternalSubServer) plugin.api.getSubServer(data.getString("server"));
+            ExternalSubServer server = (ExternalSubServer) plugin.api.getSubServer(data.getRawString("server"));
             switch (data.getInt("type")) {
                 case 1:
                     Method falsestart = ExternalSubServer.class.getDeclaredMethod("falsestart");
@@ -100,7 +99,7 @@ public class PacketExUpdateServer implements PacketIn, PacketOut {
                 case 2:
                     Method stopped = ExternalSubServer.class.getDeclaredMethod("stopped", Boolean.class);
                     stopped.setAccessible(true);
-                    stopped.invoke(server, data.getJSONArray("args").getBoolean(1));
+                    stopped.invoke(server, data.getList("args").get(1).asBoolean());
                     stopped.setAccessible(false);
                     break;
             }

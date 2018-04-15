@@ -1,11 +1,11 @@
 package net.ME1312.SubServers.Sync.Network.Packet;
 
-import net.ME1312.SubServers.Sync.Library.JSONCallback;
+import net.ME1312.SubServers.Sync.Library.Callback;
+import net.ME1312.SubServers.Sync.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Sync.Library.Util;
 import net.ME1312.SubServers.Sync.Library.Version.Version;
 import net.ME1312.SubServers.Sync.Network.PacketIn;
 import net.ME1312.SubServers.Sync.Network.PacketOut;
-import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.UUID;
@@ -14,7 +14,7 @@ import java.util.UUID;
  * Download Server List Packet
  */
 public class PacketDownloadServerList implements PacketIn, PacketOut {
-    private static HashMap<String, JSONCallback[]> callbacks = new HashMap<String, JSONCallback[]>();
+    private static HashMap<String, Callback<YAMLSection>[]> callbacks = new HashMap<String, Callback<YAMLSection>[]>();
     private String host;
     private String group;
     private String id;
@@ -31,7 +31,8 @@ public class PacketDownloadServerList implements PacketIn, PacketOut {
      * @param group Group name (or null for all)
      * @param callback Callbacks
      */
-    public PacketDownloadServerList(String host, String group, JSONCallback... callback) {
+    @SafeVarargs
+    public PacketDownloadServerList(String host, String group, Callback<YAMLSection>... callback) {
         if (Util.isNull((Object) callback)) throw new NullPointerException();
         this.host = host;
         this.group = group;
@@ -40,18 +41,18 @@ public class PacketDownloadServerList implements PacketIn, PacketOut {
     }
 
     @Override
-    public JSONObject generate() {
-        JSONObject json = new JSONObject();
-        json.put("id", id);
-        if (host != null) json.put("host", host);
-        if (group != null) json.put("group", group);
+    public YAMLSection generate() {
+        YAMLSection json = new YAMLSection();
+        json.set("id", id);
+        if (host != null) json.set("host", host);
+        if (group != null) json.set("group", group);
         return json;
     }
 
     @Override
-    public void execute(JSONObject data) {
-        for (JSONCallback callback : callbacks.get(data.getString("id"))) callback.run(data);
-        callbacks.remove(data.getString("id"));
+    public void execute(YAMLSection data) {
+        for (Callback<YAMLSection> callback : callbacks.get(data.getRawString("id"))) callback.run(data);
+        callbacks.remove(data.getRawString("id"));
     }
 
     @Override

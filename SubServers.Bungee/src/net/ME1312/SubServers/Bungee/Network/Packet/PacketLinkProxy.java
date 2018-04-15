@@ -1,16 +1,13 @@
 package net.ME1312.SubServers.Bungee.Network.Packet;
 
 import net.ME1312.SubServers.Bungee.Host.Proxy;
-import net.ME1312.SubServers.Bungee.Host.Server;
-import net.ME1312.SubServers.Bungee.Host.SubServer;
+import net.ME1312.SubServers.Bungee.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Bungee.Library.Util;
 import net.ME1312.SubServers.Bungee.Library.Version.Version;
 import net.ME1312.SubServers.Bungee.Network.Client;
 import net.ME1312.SubServers.Bungee.Network.PacketIn;
 import net.ME1312.SubServers.Bungee.Network.PacketOut;
-import net.ME1312.SubServers.Bungee.SubAPI;
 import net.ME1312.SubServers.Bungee.SubPlugin;
-import org.json.JSONObject;
 
 import java.util.Map;
 import java.util.UUID;
@@ -49,19 +46,19 @@ public class PacketLinkProxy implements PacketIn, PacketOut {
     }
 
     @Override
-    public JSONObject generate() {
-        JSONObject json = new JSONObject();
-        json.put("n", name);
-        json.put("r", response);
-        json.put("m", message);
+    public YAMLSection generate() {
+        YAMLSection json = new YAMLSection();
+        json.set("n", name);
+        json.set("r", response);
+        json.set("m", message);
         return json;
     }
 
     @Override
-    public void execute(Client client, JSONObject data) {
+    public void execute(Client client, YAMLSection data) {
         try {
             Map<String, Proxy> proxies = plugin.api.getProxies();
-            Proxy proxy = new Proxy((data.keySet().contains("name") && !proxies.keySet().contains(data.getString("name").toLowerCase()))?data.getString("name"):Util.getNew(proxies.keySet(), () -> UUID.randomUUID().toString()));
+            Proxy proxy = new Proxy((data.contains("name") && !proxies.keySet().contains(data.getRawString("name").toLowerCase()))?data.getRawString("name"):Util.getNew(proxies.keySet(), () -> UUID.randomUUID().toString()));
             plugin.proxies.put(proxy.getName().toLowerCase(), proxy);
             client.setHandler(proxy);
             System.out.println("SubData > " + client.getAddress().toString() + " has been defined as Proxy: " + proxy.getName());

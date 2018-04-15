@@ -2,6 +2,7 @@ package net.ME1312.SubServers.Host.Network;
 
 import net.ME1312.SubServers.Host.API.Event.SubNetworkConnectEvent;
 import net.ME1312.SubServers.Host.API.Event.SubNetworkDisconnectEvent;
+import net.ME1312.SubServers.Host.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Host.Library.Exception.IllegalPacketException;
 import net.ME1312.SubServers.Host.Library.Log.Logger;
 import net.ME1312.SubServers.Host.Library.NamedContainer;
@@ -13,6 +14,7 @@ import net.ME1312.SubServers.Host.SubAPI;
 import net.ME1312.SubServers.Host.ExHost;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.yaml.snakeyaml.error.YAMLException;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -65,12 +67,12 @@ public final class SubDataClient {
                 return "NONE";
             }
             @Override
-            public byte[] encrypt(String key, JSONObject data) throws Exception {
-                return data.toString().getBytes(StandardCharsets.UTF_8);
+            public byte[] encrypt(String key, YAMLSection data) throws Exception {
+                return data.toJSON().toString().getBytes(StandardCharsets.UTF_8);
             }
             @Override
-            public JSONObject decrypt(String key, byte[] data) throws Exception {
-                return new JSONObject(new String(data, StandardCharsets.UTF_8));
+            public YAMLSection decrypt(String key, byte[] data) throws Exception {
+                return new YAMLSection(new JSONObject(new String(data, StandardCharsets.UTF_8)));
             }
         };
 
@@ -155,15 +157,15 @@ public final class SubDataClient {
                 String input;
                 while ((input = in.readLine()) != null) {
                     try {
-                        JSONObject json = cipher.decrypt(host.config.get().getSection("Settings").getSection("SubData").getRawString("Password"), Base64.getDecoder().decode(input));
-                        for (PacketIn packet : decodePacket(json)) {
+                        YAMLSection data = cipher.decrypt(host.config.get().getSection("Settings").getSection("SubData").getRawString("Password"), Base64.getDecoder().decode(input));
+                        for (PacketIn packet : decodePacket(data)) {
                             try {
-                                packet.execute((json.keySet().contains("c"))?json.getJSONObject("c"):null);
+                                packet.execute((data.contains("c"))?data.getSection("c"):null);
                             } catch (Throwable e) {
                                 log.error.println(new InvocationTargetException(e, "Exception while executing PacketIn"));
                             }
                         }
-                    } catch (JSONException e) {
+                    } catch (JSONException | YAMLException e) {
                         log.error.println(new IllegalPacketException("Unknown Packet Format: " + input));
                     } catch (IllegalPacketException e) {
                         log.error.println(e);
@@ -328,9 +330,9 @@ public final class SubDataClient {
 
     private void sendPacket(NamedContainer<String, PacketOut> packet) {
         try {
-            JSONObject json = encodePacket(packet.get());
-            if (packet.name() != null) json.put("f", packet.name());
-            writer.println(Base64.getEncoder().encodeToString(cipher.encrypt(host.config.get().getSection("Settings").getSection("SubData").getRawString("Password"), json)));
+            YAMLSection data = encodePacket(packet.get());
+            if (packet.name() != null) data.set("f", packet.name());
+            writer.println(Base64.getEncoder().encodeToString(cipher.encrypt(host.config.get().getSection("Settings").getSection("SubData").getRawString("Password"), data)));
         } catch (Throwable e) {
             log.error.println(e);
         }
@@ -360,23 +362,23 @@ public final class SubDataClient {
     }
 
     /**
-     * JSON Encode PacketOut
+     * Encode PacketOut
      *
      * @param packet PacketOut
      * @return JSON Formatted Packet
      * @throws IllegalPacketException
      */
-    private static JSONObject encodePacket(PacketOut packet) throws IllegalPacketException, InvocationTargetException {
-        JSONObject json = new JSONObject();
+    private static YAMLSection encodePacket(PacketOut packet) throws IllegalPacketException, InvocationTargetException {
+        YAMLSection json = new YAMLSection();
 
         if (!pOut.keySet().contains(packet.getClass())) throw new IllegalPacketException("Unknown PacketOut Channel: " + packet.getClass().getCanonicalName());
         if (packet.getVersion().toString() == null) throw new NullPointerException("PacketOut Version cannot be null: " + packet.getClass().getCanonicalName());
 
         try {
-            JSONObject contents = packet.generate();
-            json.put("h", pOut.get(packet.getClass()));
-            json.put("v", packet.getVersion().toString());
-            if (contents != null) json.put("c", contents);
+            YAMLSection contents = packet.generate();
+            json.set("h", pOut.get(packet.getClass()));
+            json.set("v", packet.getVersion().toString());
+            if (contents != null) json.set("c", contents);
         } catch (Throwable e) {
             throw new InvocationTargetException(e, "Exception while encoding packet");
         }
@@ -384,24 +386,24 @@ public final class SubDataClient {
     }
 
     /**
-     * JSON Decode PacketIn
+     * Decode PacketIn
      *
-     * @param json JSON to Decode
+     * @param data Data to Decode
      * @return PacketIn
      * @throws IllegalPacketException
      * @throws InvocationTargetException
      */
     @SuppressWarnings("deprecation")
-    private static List<PacketIn> decodePacket(JSONObject json) throws IllegalPacketException, InvocationTargetException {
-        if (!json.keySet().contains("h") || !json.keySet().contains("v")) throw new IllegalPacketException("Unknown Packet Format: " + json.toString());
-        if (!pIn.keySet().contains(json.getString("h"))) throw new IllegalPacketException("Unknown PacketIn Channel: " + json.getString("h"));
+    private static List<PacketIn> decodePacket(YAMLSection data) throws IllegalPacketException, InvocationTargetException {
+        if (!data.contains("h") || !data.contains("v")) throw new IllegalPacketException("Unknown Packet Format: " + data.toString());
+        if (!pIn.keySet().contains(data.getRawString("h"))) throw new IllegalPacketException("Unknown PacketIn Channel: " + data.getRawString("h"));
 
         List<PacketIn> list = new ArrayList<PacketIn>();
-        for (PacketIn packet : pIn.get(json.getString("h"))) {
-            if (packet.isCompatible(new Version(json.getString("v")))) {
+        for (PacketIn packet : pIn.get(data.getRawString("h"))) {
+            if (packet.isCompatible(new Version(data.getRawString("v")))) {
                 list.add(packet);
             } else {
-                SubAPI.getInstance().getInternals().log.error.println(new IllegalPacketException("Packet Version Mismatch in " + json.getString("h") + ": " + json.getString("v") + " -> " + packet.getVersion().toString()));
+                SubAPI.getInstance().getInternals().log.error.println(new IllegalPacketException("Packet Version Mismatch in " + data.getRawString("h") + ": " + data.getRawString("v") + " -> " + packet.getVersion().toString()));
             }
         }
 

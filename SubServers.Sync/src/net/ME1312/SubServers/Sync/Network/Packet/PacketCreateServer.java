@@ -1,11 +1,11 @@
 package net.ME1312.SubServers.Sync.Network.Packet;
 
-import net.ME1312.SubServers.Sync.Library.JSONCallback;
+import net.ME1312.SubServers.Sync.Library.Callback;
+import net.ME1312.SubServers.Sync.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Sync.Library.Util;
 import net.ME1312.SubServers.Sync.Library.Version.Version;
 import net.ME1312.SubServers.Sync.Network.PacketIn;
 import net.ME1312.SubServers.Sync.Network.PacketOut;
-import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.UUID;
@@ -14,7 +14,7 @@ import java.util.UUID;
  * Create Server Packet
  */
 public class PacketCreateServer implements PacketIn, PacketOut {
-    private static HashMap<String, JSONCallback[]> callbacks = new HashMap<String, JSONCallback[]>();
+    private static HashMap<String, Callback<YAMLSection>[]> callbacks = new HashMap<String, Callback<YAMLSection>[]>();
     private UUID player;
     private String name;
     private String host;
@@ -39,7 +39,8 @@ public class PacketCreateServer implements PacketIn, PacketOut {
      * @param port Server Port
      * @param callback Callbacks
      */
-    public PacketCreateServer(UUID player, String name, String host, String template, Version version, int port, JSONCallback... callback) {
+    @SafeVarargs
+    public PacketCreateServer(UUID player, String name, String host, String template, Version version, int port, Callback<YAMLSection>... callback) {
         if (Util.isNull(name, host, template, version, port, callback)) throw new NullPointerException();
         this.player = player;
         this.name = name;
@@ -52,24 +53,24 @@ public class PacketCreateServer implements PacketIn, PacketOut {
     }
 
     @Override
-    public JSONObject generate() {
-        JSONObject json = new JSONObject();
-        json.put("id", id);
-        if (player != null) json.put("player", player.toString());
-        JSONObject creator = new JSONObject();
-        creator.put("name", name);
-        creator.put("host", host);
-        creator.put("template", template);
-        creator.put("version", version.toString());
-        creator.put("port", port);
-        json.put("creator", creator);
-        return json;
+    public YAMLSection generate() {
+        YAMLSection data = new YAMLSection();
+        data.set("id", id);
+        if (player != null) data.set("player", player.toString());
+        YAMLSection creator = new YAMLSection();
+        creator.set("name", name);
+        creator.set("host", host);
+        creator.set("template", template);
+        creator.set("version", version.toString());
+        creator.set("port", port);
+        data.set("creator", creator);
+        return data;
     }
 
     @Override
-    public void execute(JSONObject data) {
-        for (JSONCallback callback : callbacks.get(data.getString("id"))) callback.run(data);
-        callbacks.remove(data.getString("id"));
+    public void execute(YAMLSection data) {
+        for (Callback<YAMLSection> callback : callbacks.get(data.getRawString("id"))) callback.run(data);
+        callbacks.remove(data.getRawString("id"));
     }
 
     @Override

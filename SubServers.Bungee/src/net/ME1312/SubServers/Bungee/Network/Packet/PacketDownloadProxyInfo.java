@@ -1,11 +1,11 @@
 package net.ME1312.SubServers.Bungee.Network.Packet;
 
+import net.ME1312.SubServers.Bungee.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Bungee.Library.Version.Version;
 import net.ME1312.SubServers.Bungee.Network.Client;
 import net.ME1312.SubServers.Bungee.Network.PacketIn;
 import net.ME1312.SubServers.Bungee.Network.PacketOut;
 import net.ME1312.SubServers.Bungee.SubPlugin;
-import org.json.JSONObject;
 
 /**
  * Download Proxy Info Packet
@@ -35,38 +35,38 @@ public class PacketDownloadProxyInfo implements PacketIn, PacketOut {
     }
 
     @Override
-    public JSONObject generate() {
-        JSONObject json = new JSONObject();
-        if (id != null) json.put("id", id);
-        JSONObject subservers = new JSONObject();
-        subservers.put("version", plugin.version.toString());
-        subservers.put("last-reload", plugin.resetDate);
-        subservers.put("hosts", plugin.api.getHosts().size());
-        subservers.put("subservers", plugin.api.getSubServers().size());
-        json.put("subservers", subservers);
-        JSONObject bungee = new JSONObject();
-        bungee.put("version", plugin.api.getProxyVersion());
-        bungee.put("servers", plugin.api.getServers().size());
-        json.put("bungee", bungee);
-        JSONObject minecraft = new JSONObject();
-        minecraft.put("version", plugin.api.getGameVersion());
-        minecraft.put("players", plugin.api.getGlobalPlayers().size());
-        json.put("minecraft", minecraft);
-        JSONObject system = new JSONObject();
-        JSONObject os = new JSONObject();
-        os.put("name", System.getProperty("os.name"));
-        os.put("version", System.getProperty("os.version"));
-        system.put("os", os);
-        JSONObject java = new JSONObject();
-        java.put("version",  System.getProperty("java.version"));
-        system.put("java", java);
-        json.put("system", system);
-        return json;
+    public YAMLSection generate() {
+        YAMLSection data = new YAMLSection();
+        if (id != null) data.set("id", id);
+        YAMLSection subservers = new YAMLSection();
+        subservers.set("version", plugin.version.toString());
+        subservers.set("last-reload", plugin.resetDate);
+        subservers.set("hosts", plugin.api.getHosts().size());
+        subservers.set("subservers", plugin.api.getSubServers().size());
+        data.set("subservers", subservers);
+        YAMLSection bungee = new YAMLSection();
+        bungee.set("version", plugin.api.getProxyVersion());
+        bungee.set("servers", plugin.api.getServers().size());
+        data.set("bungee", bungee);
+        YAMLSection minecraft = new YAMLSection();
+        minecraft.set("version", plugin.api.getGameVersion());
+        minecraft.set("players", plugin.api.getGlobalPlayers().size());
+        data.set("minecraft", minecraft);
+        YAMLSection system = new YAMLSection();
+        YAMLSection os = new YAMLSection();
+        os.set("name", System.getProperty("os.name"));
+        os.set("version", System.getProperty("os.version"));
+        system.set("os", os);
+        YAMLSection java = new YAMLSection();
+        java.set("version",  System.getProperty("java.version"));
+        system.set("java", java);
+        data.set("system", system);
+        return data;
     }
 
     @Override
-    public void execute(Client client, JSONObject data) {
-        client.sendPacket(new PacketDownloadProxyInfo(plugin, (data != null && data.keySet().contains("id"))?data.getString("id"):null));
+    public void execute(Client client, YAMLSection data) {
+        client.sendPacket(new PacketDownloadProxyInfo(plugin, (data != null && data.contains("id"))?data.getRawString("id"):null));
     }
 
     @Override

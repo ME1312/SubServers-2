@@ -1,5 +1,6 @@
 package net.ME1312.SubServers.Host.Network.Encryption;
 
+import net.ME1312.SubServers.Host.Library.Config.YAMLSection;
 import org.json.JSONObject;
 
 import javax.crypto.*;
@@ -16,6 +17,7 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.InvalidParameterSpecException;
 import java.security.spec.KeySpec;
 import java.util.Arrays;
+import java.util.Map;
 import java.util.Random;
 
 /**
@@ -172,15 +174,15 @@ public final class AES implements net.ME1312.SubServers.Host.Network.Cipher {
     }
 
     /**
-     * This method calls to {@link #encrypt(int, String, InputStream, OutputStream)}, simplified for the {@link net.ME1312.SubServers.Bungee.Network.Cipher} interface.
+     * This method calls to {@link #encrypt(int, String, InputStream, OutputStream)}, simplified for the {@link net.ME1312.SubServers.Host.Network.Cipher} interface.
      *
      * @param key Key to Encrypt Data with
      * @param data Data to Encrypt
      * @return Encrypted Data Array
      */
-    public byte[] encrypt(String key, JSONObject data) throws Exception {
+    public byte[] encrypt(String key, YAMLSection data) throws Exception {
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-        encrypt(keyLength, key, new ByteArrayInputStream(data.toString().getBytes(StandardCharsets.UTF_8)), bytes);
+        encrypt(keyLength, key, new ByteArrayInputStream(data.toJSON().toString().getBytes(StandardCharsets.UTF_8)), bytes);
         return bytes.toByteArray();
     }
 
@@ -262,16 +264,17 @@ public final class AES implements net.ME1312.SubServers.Host.Network.Cipher {
     }
 
     /**
-     * This method calls to {@link #decrypt(String, InputStream, OutputStream)}), simplified for the {@link net.ME1312.SubServers.Bungee.Network.Cipher} interface.
+     * This method calls to {@link #decrypt(String, InputStream, OutputStream)}), simplified for the {@link net.ME1312.SubServers.Host.Network.Cipher} interface.
      *
      * @param key Key to Decrypt Data with
      * @param data Encrypted Data Array
      * @return JSON Data
      */
-    public JSONObject decrypt(String key, byte[] data) throws Exception {
+    @SuppressWarnings("unchecked")
+    public YAMLSection decrypt(String key, byte[] data) throws Exception {
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         decrypt(key, new ByteArrayInputStream(data), bytes);
-        return new JSONObject(new String(bytes.toByteArray(), StandardCharsets.UTF_8));
+        return new YAMLSection(new JSONObject(new String(bytes.toByteArray(), StandardCharsets.UTF_8)));
     }
 
     /**

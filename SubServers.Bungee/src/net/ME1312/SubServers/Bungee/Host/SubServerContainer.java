@@ -1,12 +1,10 @@
 package net.ME1312.SubServers.Bungee.Host;
 
+import com.google.gson.Gson;
 import net.ME1312.SubServers.Bungee.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Bungee.Library.Exception.InvalidServerException;
 import net.ME1312.SubServers.Bungee.Library.NamedContainer;
-import net.ME1312.SubServers.Bungee.Library.Util;
 import net.ME1312.SubServers.Bungee.SubAPI;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
-import org.json.JSONObject;
 
 import java.io.File;
 import java.net.InetSocketAddress;
@@ -109,28 +107,28 @@ public abstract class SubServerContainer extends ServerContainer implements SubS
         return servers;
     }
 
-    @SuppressWarnings("deprecation")
+    @SuppressWarnings({"deprecation", "unchecked"})
     @Override
     public String toString() {
-        JSONObject sinfo = new JSONObject(super.toString());
-        sinfo.put("type", "SubServer");
-        sinfo.put("host", getHost().getName());
-        sinfo.put("enabled", isEnabled() && getHost().isEnabled());
-        sinfo.put("editable", isEditable());
-        sinfo.put("log", isLogging());
-        sinfo.put("dir", getPath());
-        sinfo.put("exec", getExecutable());
-        sinfo.put("running", isRunning());
-        sinfo.put("stop-cmd", getStopCommand());
-        sinfo.put("auto-run", SubAPI.getInstance().getInternals().config.get().getSection("Servers").getSection(getName()).getKeys().contains("Run-On-Launch") && SubAPI.getInstance().getInternals().config.get().getSection("Servers").getSection(getName()).getBoolean("Run-On-Launch"));
-        sinfo.put("auto-restart", willAutoRestart());
+        YAMLSection sinfo = new YAMLSection(new Gson().fromJson(super.toString(), Map.class));
+        sinfo.set("type", "SubServer");
+        sinfo.set("host", getHost().getName());
+        sinfo.set("enabled", isEnabled() && getHost().isEnabled());
+        sinfo.set("editable", isEditable());
+        sinfo.set("log", isLogging());
+        sinfo.set("dir", getPath());
+        sinfo.set("exec", getExecutable());
+        sinfo.set("running", isRunning());
+        sinfo.set("stop-cmd", getStopCommand());
+        sinfo.set("auto-run", SubAPI.getInstance().getInternals().config.get().getSection("Servers").getSection(getName()).getKeys().contains("Run-On-Launch") && SubAPI.getInstance().getInternals().config.get().getSection("Servers").getSection(getName()).getBoolean("Run-On-Launch"));
+        sinfo.set("auto-restart", willAutoRestart());
         List<String> incompatibleCurrent = new ArrayList<String>();
         List<String> incompatible = new ArrayList<String>();
         for (SubServer server : getCurrentIncompatibilities()) incompatibleCurrent.add(server.getName());
         for (SubServer server : getIncompatibilities()) incompatible.add(server.getName());
-        sinfo.put("incompatible", incompatibleCurrent);
-        sinfo.put("incompatible-list", incompatible);
-        sinfo.put("temp", isTemporary());
-        return sinfo.toString();
+        sinfo.set("incompatible", incompatibleCurrent);
+        sinfo.set("incompatible-list", incompatible);
+        sinfo.set("temp", isTemporary());
+        return sinfo.toJSON();
     }
 }

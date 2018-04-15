@@ -1,5 +1,6 @@
 package net.ME1312.SubServers.Host.Network.Packet;
 
+import net.ME1312.SubServers.Host.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Host.Library.Log.Logger;
 import net.ME1312.SubServers.Host.Library.Util;
 import net.ME1312.SubServers.Host.Library.Version.Version;
@@ -7,7 +8,6 @@ import net.ME1312.SubServers.Host.Network.PacketIn;
 import net.ME1312.SubServers.Host.Network.PacketOut;
 import net.ME1312.SubServers.Host.Network.SubDataClient;
 import net.ME1312.SubServers.Host.ExHost;
-import org.json.JSONObject;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -36,14 +36,14 @@ public class PacketLinkExHost implements PacketIn, PacketOut {
     }
 
     @Override
-    public JSONObject generate() {
-        JSONObject json = new JSONObject();
-        json.put("name", host.subdata.getName());
-        return json;
+    public YAMLSection generate() {
+        YAMLSection data = new YAMLSection();
+        data.set("name", host.subdata.getName());
+        return data;
     }
 
     @Override
-    public void execute(JSONObject data) {
+    public void execute(YAMLSection data) {
         if (data.getInt("r") == 0) {
             try {
                 Method m = SubDataClient.class.getDeclaredMethod("init");
@@ -52,7 +52,7 @@ public class PacketLinkExHost implements PacketIn, PacketOut {
                 m.setAccessible(false);
             } catch (Exception e) {}
         } else {
-            log.info.println("Could not link name with host: " + data.getString("m"));
+            log.info.println("Could not link name with host: " + data.getRawString("m"));
             host.stop(1);
         }
     }

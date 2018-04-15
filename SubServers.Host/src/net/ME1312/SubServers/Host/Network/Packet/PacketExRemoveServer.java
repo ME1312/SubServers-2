@@ -1,5 +1,6 @@
 package net.ME1312.SubServers.Host.Network.Packet;
 
+import net.ME1312.SubServers.Host.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Host.Library.Log.Logger;
 import net.ME1312.SubServers.Host.Library.Util;
 import net.ME1312.SubServers.Host.Library.Version.Version;
@@ -7,7 +8,6 @@ import net.ME1312.SubServers.Host.Network.PacketIn;
 import net.ME1312.SubServers.Host.Network.PacketOut;
 import net.ME1312.SubServers.Host.Network.SubDataClient;
 import net.ME1312.SubServers.Host.ExHost;
-import org.json.JSONObject;
 
 import java.lang.reflect.Field;
 
@@ -52,28 +52,28 @@ public class PacketExRemoveServer implements PacketIn, PacketOut {
     }
 
     @Override
-    public JSONObject generate() {
-        JSONObject json = new JSONObject();
-        json.put("id", id);
-        json.put("r", response);
-        json.put("m", message);
-        return json;
+    public YAMLSection generate() {
+        YAMLSection data = new YAMLSection();
+        data.set("id", id);
+        data.set("r", response);
+        data.set("m", message);
+        return data;
     }
 
     @Override
-    public void execute(JSONObject data) {
+    public void execute(YAMLSection data) {
         try {
-            if (!host.servers.keySet().contains(data.getString("server").toLowerCase())) {
-                host.subdata.sendPacket(new PacketExRemoveServer(0, "Server Didn't Exist", (data.keySet().contains("id"))?data.getString("id"):null));
-            } else if (host.servers.get(data.getString("server").toLowerCase()).isRunning()) {
-                host.subdata.sendPacket(new PacketExRemoveServer(2, "That server is still running.", (data.keySet().contains("id"))?data.getString("id"):null));
+            if (!host.servers.keySet().contains(data.getRawString("server").toLowerCase())) {
+                host.subdata.sendPacket(new PacketExRemoveServer(0, "Server Didn't Exist", (data.contains("id"))?data.getRawString("id"):null));
+            } else if (host.servers.get(data.getRawString("server").toLowerCase()).isRunning()) {
+                host.subdata.sendPacket(new PacketExRemoveServer(2, "That server is still running.", (data.contains("id"))?data.getRawString("id"):null));
             } else {
-                host.servers.remove(data.getString("server").toLowerCase());
-                log.info.println("Removed SubServer: " + data.getString("server"));
-                host.subdata.sendPacket(new PacketExRemoveServer(0, "Server Removed Successfully", (data.keySet().contains("id"))?data.getString("id"):null));
+                host.servers.remove(data.getRawString("server").toLowerCase());
+                log.info.println("Removed SubServer: " + data.getRawString("server"));
+                host.subdata.sendPacket(new PacketExRemoveServer(0, "Server Removed Successfully", (data.contains("id"))?data.getRawString("id"):null));
             }
         } catch (Throwable e) {
-            host.subdata.sendPacket(new PacketExRemoveServer(1, e.getClass().getCanonicalName() + ": " + e.getMessage(), (data.keySet().contains("id"))?data.getString("id"):null));
+            host.subdata.sendPacket(new PacketExRemoveServer(1, e.getClass().getCanonicalName() + ": " + e.getMessage(), (data.contains("id"))?data.getRawString("id"):null));
             host.log.error.println(e);
         }
     }

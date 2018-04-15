@@ -2,13 +2,13 @@ package net.ME1312.SubServers.Bungee.Network.Packet;
 
 import net.ME1312.SubServers.Bungee.Host.Server;
 import net.ME1312.SubServers.Bungee.Host.SubServer;
+import net.ME1312.SubServers.Bungee.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Bungee.Library.Util;
 import net.ME1312.SubServers.Bungee.Library.Version.Version;
 import net.ME1312.SubServers.Bungee.Network.Client;
 import net.ME1312.SubServers.Bungee.Network.PacketIn;
 import net.ME1312.SubServers.Bungee.Network.PacketOut;
 import net.ME1312.SubServers.Bungee.SubPlugin;
-import org.json.JSONObject;
 
 import java.util.Map;
 import java.util.UUID;
@@ -47,39 +47,39 @@ public class PacketStopServer implements PacketIn, PacketOut {
     }
 
     @Override
-    public JSONObject generate() {
-        JSONObject json = new JSONObject();
-        json.put("id", id);
-        json.put("r", response);
-        json.put("m", message);
+    public YAMLSection generate() {
+        YAMLSection json = new YAMLSection();
+        json.set("id", id);
+        json.set("r", response);
+        json.set("m", message);
         return json;
     }
 
     @Override
-    public void execute(Client client, JSONObject data) {
+    public void execute(Client client, YAMLSection data) {
         try {
             Map<String, Server> servers = plugin.api.getServers();
-            if (!servers.keySet().contains(data.getString("server").toLowerCase())) {
-                client.sendPacket(new PacketStopServer(3, "There is no server with that name", (data.keySet().contains("id"))?data.getString("id"):null));
-            } else if (!(servers.get(data.getString("server").toLowerCase()) instanceof SubServer)) {
-                client.sendPacket(new PacketStopServer(4, "That Server is not a SubServer", (data.keySet().contains("id"))?data.getString("id"):null));
-            } else if (!((SubServer) servers.get(data.getString("server").toLowerCase())).isRunning()) {
-                client.sendPacket(new PacketStopServer(5, "That SubServer is not running", (data.keySet().contains("id"))?data.getString("id"):null));
-            } else if (data.keySet().contains("force") && data.getBoolean("force")) {
-                if (((SubServer) servers.get(data.getString("server").toLowerCase())).terminate((data.keySet().contains("player"))?UUID.fromString(data.getString("player")):null)) {
-                    client.sendPacket(new PacketStopServer(0, "Terminating SubServer", (data.keySet().contains("id"))?data.getString("id"):null));
+            if (!servers.keySet().contains(data.getRawString("server").toLowerCase())) {
+                client.sendPacket(new PacketStopServer(3, "There is no server with that name", (data.contains("id"))?data.getRawString("id"):null));
+            } else if (!(servers.get(data.getRawString("server").toLowerCase()) instanceof SubServer)) {
+                client.sendPacket(new PacketStopServer(4, "That Server is not a SubServer", (data.contains("id"))?data.getRawString("id"):null));
+            } else if (!((SubServer) servers.get(data.getRawString("server").toLowerCase())).isRunning()) {
+                client.sendPacket(new PacketStopServer(5, "That SubServer is not running", (data.contains("id"))?data.getRawString("id"):null));
+            } else if (data.contains("force") && data.getBoolean("force")) {
+                if (((SubServer) servers.get(data.getRawString("server").toLowerCase())).terminate((data.contains("player"))?UUID.fromString(data.getRawString("player")):null)) {
+                    client.sendPacket(new PacketStopServer(0, "Terminating SubServer", (data.contains("id"))?data.getRawString("id"):null));
                 } else {
-                    client.sendPacket(new PacketStopServer(1, "Couldn't terminate SubServer", (data.keySet().contains("id"))?data.getString("id"):null));
+                    client.sendPacket(new PacketStopServer(1, "Couldn't terminate SubServer", (data.contains("id"))?data.getRawString("id"):null));
                 }
             } else {
-                if (((SubServer) servers.get(data.getString("server").toLowerCase())).stop((data.keySet().contains("player"))?UUID.fromString(data.getString("player")):null)) {
-                    client.sendPacket(new PacketStopServer(0, "Stopping SubServer", (data.keySet().contains("id"))?data.getString("id"):null));
+                if (((SubServer) servers.get(data.getRawString("server").toLowerCase())).stop((data.contains("player"))?UUID.fromString(data.getRawString("player")):null)) {
+                    client.sendPacket(new PacketStopServer(0, "Stopping SubServer", (data.contains("id"))?data.getRawString("id"):null));
                 } else {
-                    client.sendPacket(new PacketStopServer(1, "Couldn't stop SubServer", (data.keySet().contains("id"))?data.getString("id"):null));
+                    client.sendPacket(new PacketStopServer(1, "Couldn't stop SubServer", (data.contains("id"))?data.getRawString("id"):null));
                 }
             }
         } catch (Throwable e) {
-            client.sendPacket(new PacketStopServer(2, e.getClass().getCanonicalName() + ": " + e.getMessage(), (data.keySet().contains("id"))?data.getString("id"):null));
+            client.sendPacket(new PacketStopServer(2, e.getClass().getCanonicalName() + ": " + e.getMessage(), (data.contains("id"))?data.getRawString("id"):null));
             e.printStackTrace();
         }
     }

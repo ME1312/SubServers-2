@@ -4,18 +4,14 @@ import net.ME1312.SubServers.Bungee.Event.SubEditServerEvent;
 import net.ME1312.SubServers.Bungee.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Bungee.Library.Config.YAMLValue;
 import net.ME1312.SubServers.Bungee.Library.Exception.InvalidServerException;
-import net.ME1312.SubServers.Bungee.Library.ExtraDataHandler;
 import net.ME1312.SubServers.Bungee.Library.NamedContainer;
 import net.ME1312.SubServers.Bungee.Library.Util;
 import net.ME1312.SubServers.Bungee.Network.Client;
-import net.ME1312.SubServers.Bungee.Network.ClientHandler;
 import net.ME1312.SubServers.Bungee.Network.SubDataServer;
 import net.ME1312.SubServers.Bungee.SubAPI;
 import net.ME1312.SubServers.Bungee.SubPlugin;
 import net.md_5.bungee.BungeeServerInfo;
-import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
-import org.json.JSONObject;
 
 import java.lang.reflect.Field;
 import java.net.InetSocketAddress;
@@ -182,26 +178,26 @@ public class ServerContainer extends BungeeServerInfo implements Server {
 
     @Override
     public String toString() {
-        JSONObject info = new JSONObject();
-        info.put("type", "Server");
-        info.put("name", getName());
-        info.put("display", getDisplayName());
-        info.put("group", getGroups());
-        info.put("address", getAddress().getAddress().getHostAddress() + ':' + getAddress().getPort());
-        info.put("motd", getMotd());
-        info.put("restricted", isRestricted());
-        info.put("hidden", isHidden());
-        if (getSubData() != null) info.put("subdata", getSubData().getAddress().toString());
-        JSONObject players = new JSONObject();
+        YAMLSection info = new YAMLSection();
+        info.set("type", "Server");
+        info.set("name", getName());
+        info.set("display", getDisplayName());
+        info.set("group", getGroups());
+        info.set("address", getAddress().getAddress().getHostAddress() + ':' + getAddress().getPort());
+        info.set("motd", getMotd());
+        info.set("restricted", isRestricted());
+        info.set("hidden", isHidden());
+        if (getSubData() != null) info.set("subdata", getSubData().getAddress().toString());
+        YAMLSection players = new YAMLSection();
         for (NamedContainer<String, UUID> player : getGlobalPlayers()) {
-            JSONObject pinfo = new JSONObject();
-            pinfo.put("name", player.name());
-            players.put(player.get().toString(), pinfo);
+            YAMLSection pinfo = new YAMLSection();
+            pinfo.set("name", player.name());
+            players.set(player.get().toString(), pinfo);
         }
-        info.put("players", players);
-        if (getSubData() != null) info.put("subdata", getSubData().getAddress().toString());
-        info.put("signature", signature);
-        info.put("extra", getExtra().toJSON());
-        return info.toString();
+        info.set("players", players);
+        if (getSubData() != null) info.set("subdata", getSubData().getAddress().toString());
+        info.set("signature", signature);
+        info.set("extra", getExtra().toJSON());
+        return info.toJSON();
     }
 }

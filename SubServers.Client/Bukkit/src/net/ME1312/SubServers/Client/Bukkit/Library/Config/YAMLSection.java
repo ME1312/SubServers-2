@@ -1,8 +1,7 @@
 package net.ME1312.SubServers.Client.Bukkit.Library.Config;
 
+import com.google.gson.Gson;
 import net.ME1312.SubServers.Client.Bukkit.Library.Util;
-import org.json.JSONArray;
-import org.json.JSONObject;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.error.YAMLException;
 
@@ -59,16 +58,6 @@ public class YAMLSection {
     public YAMLSection(String str) throws YAMLException {
         if (Util.isNull(str)) throw new NullPointerException();
         this.map = (LinkedHashMap<String, Object>) (this.yaml = new Yaml(YAMLConfig.getDumperOptions())).loadAs(str, LinkedHashMap.class);
-    }
-
-    /**
-     * Creates a YAML Section from JSON Contents
-     *
-     * @param json JSON
-     */
-    public YAMLSection(JSONObject json) {
-        if (Util.isNull(json)) throw new NullPointerException();
-        this.map = (LinkedHashMap<String, Object>) (this.yaml = new Yaml(YAMLConfig.getDumperOptions())).loadAs(json.toString(4), LinkedHashMap.class);
     }
 
     /**
@@ -138,10 +127,6 @@ public class YAMLSection {
     }
 
     private Object convert(Object value) {
-        if (value instanceof JSONObject) {
-            value = new YAMLSection((JSONObject) value);
-        }
-
         if (value instanceof Map) {
             List<String> list = new ArrayList<String>();
             list.addAll(((Map<String, Object>) value).keySet());
@@ -157,10 +142,6 @@ public class YAMLSection {
             return ((YAMLSection) value).map;
         } else if (value instanceof YAMLValue) {
             return ((YAMLValue) value).asObject();
-        } else if (value instanceof JSONArray) {
-            List<Object> list = new ArrayList<Object>();
-            for (int i = 0; i < ((JSONArray) value).length(); i++) list.add(convert(((JSONArray) value).get(i)));
-            return list;
         } else if (value instanceof Collection) {
             List<Object> list = new ArrayList<Object>();
             for (Object val : (Collection<Object>) value) list.add(convert(val));
@@ -1071,7 +1052,7 @@ public class YAMLSection {
      *
      * @return JSON
      */
-    public JSONObject toJSON() {
-        return new JSONObject(map);
+    public String toJSON() {
+        return new Gson().toJson(get(), Map.class);
     }
 }

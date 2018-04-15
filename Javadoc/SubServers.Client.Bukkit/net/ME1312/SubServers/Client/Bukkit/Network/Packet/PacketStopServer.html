@@ -135,10 +135,10 @@ implements <a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Net
 <td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Network/Packet/PacketStopServer.html#PacketStopServer--">PacketStopServer</a></span>()</code>&nbsp;</td>
 </tr>
 <tr class="rowColor">
-<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Network/Packet/PacketStopServer.html#PacketStopServer-java.util.UUID-java.lang.String-boolean-net.ME1312.SubServers.Client.Bukkit.Library.JSONCallback...-">PacketStopServer</a></span>(java.util.UUID&nbsp;player,
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Network/Packet/PacketStopServer.html#PacketStopServer-java.util.UUID-java.lang.String-boolean-net.ME1312.SubServers.Client.Bukkit.Library.Callback...-">PacketStopServer</a></span>(java.util.UUID&nbsp;player,
                 java.lang.String&nbsp;server,
                 boolean&nbsp;force,
-                <a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/JSONCallback.html" title="interface in net.ME1312.SubServers.Client.Bukkit.Library">JSONCallback</a>...&nbsp;callback)</code>&nbsp;</td>
+                <a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Callback.html" title="interface in net.ME1312.SubServers.Client.Bukkit.Library">Callback</a>&lt;<a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Config/YAMLSection.html" title="class in net.ME1312.SubServers.Client.Bukkit.Library.Config">YAMLSection</a>&gt;...&nbsp;callback)</code>&nbsp;</td>
 </tr>
 </table>
 </li>
@@ -157,12 +157,12 @@ implements <a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Net
 </tr>
 <tr id="i0" class="altColor">
 <td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Network/Packet/PacketStopServer.html#execute-org.json.JSONObject-">execute</a></span>(org.json.JSONObject&nbsp;data)</code>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Network/Packet/PacketStopServer.html#execute-net.ME1312.SubServers.Client.Bukkit.Library.Config.YAMLSection-">execute</a></span>(<a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Config/YAMLSection.html" title="class in net.ME1312.SubServers.Client.Bukkit.Library.Config">YAMLSection</a>&nbsp;data)</code>
 <div class="block">Execute Incoming Packet</div>
 </td>
 </tr>
 <tr id="i1" class="rowColor">
-<td class="colFirst"><code>org.json.JSONObject</code></td>
+<td class="colFirst"><code><a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Config/YAMLSection.html" title="class in net.ME1312.SubServers.Client.Bukkit.Library.Config">YAMLSection</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Network/Packet/PacketStopServer.html#generate--">generate</a></span>()</code>
 <div class="block">Generate JSON Packet Contents</div>
 </td>
@@ -211,16 +211,17 @@ implements <a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Net
 <pre>public&nbsp;PacketStopServer()</pre>
 </li>
 </ul>
-<a name="PacketStopServer-java.util.UUID-java.lang.String-boolean-net.ME1312.SubServers.Client.Bukkit.Library.JSONCallback...-">
+<a name="PacketStopServer-java.util.UUID-java.lang.String-boolean-net.ME1312.SubServers.Client.Bukkit.Library.Callback...-">
 <!--   -->
 </a>
 <ul class="blockListLast">
 <li class="blockList">
 <h4>PacketStopServer</h4>
-<pre>public&nbsp;PacketStopServer(java.util.UUID&nbsp;player,
-                        java.lang.String&nbsp;server,
-                        boolean&nbsp;force,
-                        <a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/JSONCallback.html" title="interface in net.ME1312.SubServers.Client.Bukkit.Library">JSONCallback</a>...&nbsp;callback)</pre>
+<pre>@SafeVarargs
+public&nbsp;PacketStopServer(java.util.UUID&nbsp;player,
+                                      java.lang.String&nbsp;server,
+                                      boolean&nbsp;force,
+                                      <a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Callback.html" title="interface in net.ME1312.SubServers.Client.Bukkit.Library">Callback</a>&lt;<a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Config/YAMLSection.html" title="class in net.ME1312.SubServers.Client.Bukkit.Library.Config">YAMLSection</a>&gt;...&nbsp;callback)</pre>
 </li>
 </ul>
 </li>
@@ -237,7 +238,7 @@ implements <a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Net
 <ul class="blockList">
 <li class="blockList">
 <h4>generate</h4>
-<pre>public&nbsp;org.json.JSONObject&nbsp;generate()</pre>
+<pre>public&nbsp;<a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Config/YAMLSection.html" title="class in net.ME1312.SubServers.Client.Bukkit.Library.Config">YAMLSection</a>&nbsp;generate()</pre>
 <div class="block"><span class="descfrmTypeLabel">Description copied from interface:&nbsp;<code><a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Network/PacketOut.html#generate--">PacketOut</a></code></span></div>
 <div class="block">Generate JSON Packet Contents</div>
 <dl>
@@ -248,18 +249,18 @@ implements <a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Net
 </dl>
 </li>
 </ul>
-<a name="execute-org.json.JSONObject-">
+<a name="execute-net.ME1312.SubServers.Client.Bukkit.Library.Config.YAMLSection-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>execute</h4>
-<pre>public&nbsp;void&nbsp;execute(org.json.JSONObject&nbsp;data)</pre>
-<div class="block"><span class="descfrmTypeLabel">Description copied from interface:&nbsp;<code><a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Network/PacketIn.html#execute-org.json.JSONObject-">PacketIn</a></code></span></div>
+<pre>public&nbsp;void&nbsp;execute(<a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Library/Config/YAMLSection.html" title="class in net.ME1312.SubServers.Client.Bukkit.Library.Config">YAMLSection</a>&nbsp;data)</pre>
+<div class="block"><span class="descfrmTypeLabel">Description copied from interface:&nbsp;<code><a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Network/PacketIn.html#execute-net.ME1312.SubServers.Client.Bukkit.Library.Config.YAMLSection-">PacketIn</a></code></span></div>
 <div class="block">Execute Incoming Packet</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Network/PacketIn.html#execute-org.json.JSONObject-">execute</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Network/PacketIn.html" title="interface in net.ME1312.SubServers.Client.Bukkit.Network">PacketIn</a></code></dd>
+<dd><code><a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Network/PacketIn.html#execute-net.ME1312.SubServers.Client.Bukkit.Library.Config.YAMLSection-">execute</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Network/PacketIn.html" title="interface in net.ME1312.SubServers.Client.Bukkit.Network">PacketIn</a></code></dd>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>data</code> - Incoming Data</dd>
 </dl>

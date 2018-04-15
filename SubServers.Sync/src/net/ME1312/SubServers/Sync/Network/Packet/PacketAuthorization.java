@@ -1,19 +1,15 @@
 package net.ME1312.SubServers.Sync.Network.Packet;
 
+import net.ME1312.SubServers.Sync.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Sync.Library.Util;
 import net.ME1312.SubServers.Sync.Library.Version.Version;
 import net.ME1312.SubServers.Sync.Network.PacketIn;
 import net.ME1312.SubServers.Sync.Network.PacketOut;
 import net.ME1312.SubServers.Sync.Network.SubDataClient;
-import net.ME1312.SubServers.Sync.Server.Server;
-import net.ME1312.SubServers.Sync.Server.SubServer;
 import net.ME1312.SubServers.Sync.SubPlugin;
-
-import org.json.JSONObject;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
-import java.net.InetSocketAddress;
 
 public final class PacketAuthorization implements PacketIn, PacketOut {
     private SubPlugin plugin;
@@ -24,14 +20,14 @@ public final class PacketAuthorization implements PacketIn, PacketOut {
     }
 
     @Override
-    public JSONObject generate() {
-        JSONObject json = new JSONObject();
-        json.put("password", plugin.config.get().getSection("Settings").getSection("SubData").getString("Password"));
-        return json;
+    public YAMLSection generate() {
+        YAMLSection data = new YAMLSection();
+        data.set("password", plugin.config.get().getSection("Settings").getSection("SubData").getString("Password"));
+        return data;
     }
 
     @Override
-    public void execute(JSONObject data) {
+    public void execute(YAMLSection data) {
         try {
             if (data.getInt("r") == 0) {
                 try {
@@ -41,7 +37,7 @@ public final class PacketAuthorization implements PacketIn, PacketOut {
                     m.setAccessible(false);
                 } catch (Exception e) {}
             } else {
-                System.out.println("SubServers > Could not authorize SubData connection: " + data.getString("m"));
+                System.out.println("SubServers > Could not authorize SubData connection: " + data.getRawString("m"));
                 plugin.subdata.destroy(0);
             }
         } catch (IOException e) {

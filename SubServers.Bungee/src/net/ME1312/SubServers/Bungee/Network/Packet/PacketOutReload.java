@@ -1,9 +1,8 @@
 package net.ME1312.SubServers.Bungee.Network.Packet;
 
-import net.ME1312.SubServers.Bungee.Library.Util;
+import net.ME1312.SubServers.Bungee.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Bungee.Library.Version.Version;
 import net.ME1312.SubServers.Bungee.Network.PacketOut;
-import org.json.JSONObject;
 
 /**
  * Reload Packet
@@ -21,13 +20,13 @@ public class PacketOutReload implements PacketOut {
     }
 
     @Override
-    public JSONObject generate() {
+    public YAMLSection generate() {
         if (message == null) {
             return null;
         } else {
-            JSONObject json = new JSONObject();
-            json.put("m", message);
-            return json;
+            YAMLSection data = new YAMLSection();
+            data.set("m", message);
+            return data;
         }
     }
 

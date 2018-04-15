@@ -8,7 +8,6 @@ import net.ME1312.SubServers.Client.Bukkit.Network.PacketIn;
 import net.ME1312.SubServers.Client.Bukkit.Network.PacketOut;
 import net.ME1312.SubServers.Client.Bukkit.SubPlugin;
 import org.bukkit.Bukkit;
-import org.json.JSONObject;
 
 import java.lang.reflect.Field;
 import java.util.Calendar;
@@ -35,16 +34,16 @@ public class PacketDownloadLang implements PacketIn, PacketOut {
     public PacketDownloadLang() {}
 
     @Override
-    public JSONObject generate() {
+    public YAMLSection generate() {
         return null;
     }
 
     @Override
-    public void execute(JSONObject data) {
+    public void execute(YAMLSection data) {
         try {
             Field f = SubPlugin.class.getDeclaredField("lang");
             f.setAccessible(true);
-            f.set(plugin, new NamedContainer<>(Calendar.getInstance().getTime().getTime(), new YAMLSection(data.getJSONObject("Lang")).get()));
+            f.set(plugin, new NamedContainer<>(Calendar.getInstance().getTime().getTime(), data.getSection("Lang").get()));
             f.setAccessible(false);
             Bukkit.getLogger().info("SubData > Lang Settings Downloaded");
         } catch (IllegalAccessException | NoSuchFieldException e) {

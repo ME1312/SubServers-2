@@ -2,7 +2,6 @@ package net.ME1312.SubServers.Host;
 
 import net.ME1312.SubServers.Host.API.Command;
 import net.ME1312.SubServers.Host.API.SubPluginInfo;
-import net.ME1312.SubServers.Host.Executable.SubCreator;
 import net.ME1312.SubServers.Host.Library.TextColor;
 import net.ME1312.SubServers.Host.Library.Util;
 import net.ME1312.SubServers.Host.Library.Version.Version;
@@ -80,29 +79,29 @@ public class SubCommand {
         new Command(null) {
             @Override
             public void command(String handle, String[] args) {
-                host.subdata.sendPacket(new PacketDownloadServerList(null, null, json -> {
+                host.subdata.sendPacket(new PacketDownloadServerList(null, null, data -> {
                     int i = 0;
                     boolean sent = false;
                     String div = TextColor.RESET + ", ";
-                    if (json.getJSONObject("groups").length() > 0) {
+                    if (data.getSection("groups").getKeys().size() > 0) {
                         host.log.message.println("Group/Server List:");
-                        for (String group : json.getJSONObject("groups").keySet()) {
+                        for (String group : data.getSection("groups").getKeys()) {
                             String message = "";
                             message += TextColor.GOLD + group + TextColor.RESET + ": ";
-                            for (String server : json.getJSONObject("groups").getJSONObject(group).keySet()) {
+                            for (String server : data.getSection("groups").getSection(group).getKeys()) {
                                 if (i != 0) message += div;
-                                if (!json.getJSONObject("groups").getJSONObject(group).getJSONObject(server).keySet().contains("enabled")) {
+                                if (!data.getSection("groups").getSection(group).getSection(server).contains("enabled")) {
                                     message += TextColor.WHITE;
-                                } else if (json.getJSONObject("groups").getJSONObject(group).getJSONObject(server).getBoolean("temp")) {
+                                } else if (data.getSection("groups").getSection(group).getSection(server).getBoolean("temp")) {
                                     message += TextColor.AQUA;
-                                } else if (json.getJSONObject("groups").getJSONObject(group).getJSONObject(server).getBoolean("running")) {
+                                } else if (data.getSection("groups").getSection(group).getSection(server).getBoolean("running")) {
                                     message += TextColor.GREEN;
-                                } else if (json.getJSONObject("groups").getJSONObject(group).getJSONObject(server).getBoolean("enabled") && json.getJSONObject("groups").getJSONObject(group).getJSONObject(server).getJSONArray("incompatible").length() == 0) {
+                                } else if (data.getSection("groups").getSection(group).getSection(server).getBoolean("enabled") && data.getSection("groups").getSection(group).getSection(server).getList("incompatible").size() == 0) {
                                     message += TextColor.YELLOW;
                                 } else {
                                     message += TextColor.RED;
                                 }
-                                message += json.getJSONObject("groups").getJSONObject(group).getJSONObject(server).getString("display") + " (" + json.getJSONObject("groups").getJSONObject(group).getJSONObject(server).getString("address") + ((server.equals(json.getJSONObject("groups").getJSONObject(group).getJSONObject(server).getString("display"))) ? "" : TextColor.stripColor(div) + server) + ")";
+                                message += data.getSection("groups").getSection(group).getSection(server).getRawString("display") + " (" + data.getSection("groups").getSection(group).getSection(server).getRawString("address") + ((server.equals(data.getSection("groups").getSection(group).getSection(server).getRawString("display"))) ? "" : TextColor.stripColor(div) + server) + ")";
                                 i++;
                             }
                             if (i == 0) message += TextColor.RESET + "(none)";
@@ -115,26 +114,26 @@ public class SubCommand {
                     }
                     ExHost h = host;
                     host.log.message.println("Host/SubServer List:");
-                    for (String host : json.getJSONObject("hosts").keySet()) {
+                    for (String host : data.getSection("hosts").getKeys()) {
                         String message = "";
-                        if (json.getJSONObject("hosts").getJSONObject(host).getBoolean("enabled")) {
+                        if (data.getSection("hosts").getSection(host).getBoolean("enabled")) {
                             message += TextColor.AQUA;
                         } else {
                             message += TextColor.RED;
                         }
-                        message += json.getJSONObject("hosts").getJSONObject(host).getString("display") + " (" + json.getJSONObject("hosts").getJSONObject(host).getString("address") + ((host.equals(json.getJSONObject("hosts").getJSONObject(host).getString("display")))?"":TextColor.stripColor(div)+host) + ")" + TextColor.RESET + ": ";
-                        for (String subserver : json.getJSONObject("hosts").getJSONObject(host).getJSONObject("servers").keySet()) {
+                        message += data.getSection("hosts").getSection(host).getRawString("display") + " (" + data.getSection("hosts").getSection(host).getRawString("address") + ((host.equals(data.getSection("hosts").getSection(host).getRawString("display")))?"":TextColor.stripColor(div)+host) + ")" + TextColor.RESET + ": ";
+                        for (String subserver : data.getSection("hosts").getSection(host).getSection("servers").getKeys()) {
                             if (i != 0) message += div;
-                            if (json.getJSONObject("hosts").getJSONObject(host).getJSONObject("servers").getJSONObject(subserver).getBoolean("temp")) {
+                            if (data.getSection("hosts").getSection(host).getSection("servers").getSection(subserver).getBoolean("temp")) {
                                 message += TextColor.AQUA;
-                            } else if (json.getJSONObject("hosts").getJSONObject(host).getJSONObject("servers").getJSONObject(subserver).getBoolean("running")) {
+                            } else if (data.getSection("hosts").getSection(host).getSection("servers").getSection(subserver).getBoolean("running")) {
                                 message += TextColor.GREEN;
-                            } else if (json.getJSONObject("hosts").getJSONObject(host).getJSONObject("servers").getJSONObject(subserver).getBoolean("enabled") && json.getJSONObject("hosts").getJSONObject(host).getJSONObject("servers").getJSONObject(subserver).getJSONArray("incompatible").length() == 0) {
+                            } else if (data.getSection("hosts").getSection(host).getSection("servers").getSection(subserver).getBoolean("enabled") && data.getSection("hosts").getSection(host).getSection("servers").getSection(subserver).getList("incompatible").size() == 0) {
                                 message += TextColor.YELLOW;
                             } else {
                                 message += TextColor.RED;
                             }
-                            message += json.getJSONObject("hosts").getJSONObject(host).getJSONObject("servers").getJSONObject(subserver).getString("display") + " (" + json.getJSONObject("hosts").getJSONObject(host).getJSONObject("servers").getJSONObject(subserver).getString("address").split(":")[json.getJSONObject("hosts").getJSONObject(host).getJSONObject("servers").getJSONObject(subserver).getString("address").split(":").length - 1] + ((subserver.equals(json.getJSONObject("hosts").getJSONObject(host).getJSONObject("servers").getJSONObject(subserver).getString("display")))?"":TextColor.stripColor(div)+subserver) + ")";
+                            message += data.getSection("hosts").getSection(host).getSection("servers").getSection(subserver).getRawString("display") + " (" + data.getSection("hosts").getSection(host).getSection("servers").getSection(subserver).getRawString("address").split(":")[data.getSection("hosts").getSection(host).getSection("servers").getSection(subserver).getRawString("address").split(":").length - 1] + ((subserver.equals(data.getSection("hosts").getSection(host).getSection("servers").getSection(subserver).getRawString("display")))?"":TextColor.stripColor(div)+subserver) + ")";
                             i++;
                         }
                         if (i == 0) message += TextColor.RESET + "(none)";
@@ -145,9 +144,9 @@ public class SubCommand {
                     if (!sent) host.log.message.println(TextColor.RESET + "(none)");
                     host.log.message.println("Server List:");
                     String message = "";
-                    for (String server : json.getJSONObject("servers").keySet()) {
+                    for (String server : data.getSection("servers").getKeys()) {
                         if (i != 0) message += div;
-                        message += TextColor.WHITE + json.getJSONObject("servers").getJSONObject(server).getString("display") + " (" + json.getJSONObject("servers").getJSONObject(server).getString("address") + ((server.equals(json.getJSONObject("servers").getJSONObject(server).getString("display")))?"":TextColor.stripColor(div)+server) + ")";
+                        message += TextColor.WHITE + data.getSection("servers").getSection(server).getRawString("display") + " (" + data.getSection("servers").getSection(server).getRawString("address") + ((server.equals(data.getSection("servers").getSection(server).getRawString("display")))?"":TextColor.stripColor(div)+server) + ")";
                         i++;
                     }
                     if (i == 0) message += TextColor.RESET + "(none)";
@@ -165,36 +164,36 @@ public class SubCommand {
             @Override
             public void command(String handle, String[] args) {
                 if (args.length > 0) {
-                    host.subdata.sendPacket(new PacketDownloadServerInfo(args[0].toLowerCase(), json -> {
-                        switch (json.getString("type").toLowerCase()) {
+                    host.subdata.sendPacket(new PacketDownloadServerInfo(args[0].toLowerCase(), data -> {
+                        switch (data.getRawString("type").toLowerCase()) {
                             case "invalid":
                                 host.log.message.println("There is no server with that name");
                                 break;
                             case "subserver":
-                                host.log.message.println("Info on " + json.getJSONObject("server").getString("display") + ':');
-                                if (!json.getJSONObject("server").getString("name").equals(json.getJSONObject("server").getString("display"))) host.log.message.println("  - Real Name: " + json.getJSONObject("server").getString("name"));
-                                host.log.message.println("  - Host: " + json.getJSONObject("server").getString("host"));
-                                host.log.message.println("  - Enabled: " + ((json.getJSONObject("server").getBoolean("enabled"))?"yes":"no"));
-                                host.log.message.println("  - Editable: " + ((json.getJSONObject("server").getBoolean("editable"))?"yes":"no"));
-                                if (json.getJSONObject("server").getJSONArray("group").length() > 0) {
+                                host.log.message.println("Info on " + data.getSection("server").getRawString("display") + ':');
+                                if (!data.getSection("server").getRawString("name").equals(data.getSection("server").getRawString("display"))) host.log.message.println("  - Real Name: " + data.getSection("server").getRawString("name"));
+                                host.log.message.println("  - Host: " + data.getSection("server").getRawString("host"));
+                                host.log.message.println("  - Enabled: " + ((data.getSection("server").getBoolean("enabled"))?"yes":"no"));
+                                host.log.message.println("  - Editable: " + ((data.getSection("server").getBoolean("editable"))?"yes":"no"));
+                                if (data.getSection("server").getList("group").size() > 0) {
                                     host.log.message.println("  - Group:");
-                                    for (int i = 0; i < json.getJSONObject("server").getJSONArray("group").length(); i++)
-                                        host.log.message.println("    - " + json.getJSONObject("server").getJSONArray("group").getString(i));
+                                    for (int i = 0; i < data.getSection("server").getList("group").size(); i++)
+                                        host.log.message.println("    - " + data.getSection("server").getList("group").get(i).asRawString());
                                 }
-                                if (json.getJSONObject("server").getBoolean("temp")) host.log.message.println("  - Temporary: yes");
-                                host.log.message.println("  - Running: " + ((json.getJSONObject("server").getBoolean("running"))?"yes":"no"));
-                                host.log.message.println("  - Logging: " + ((json.getJSONObject("server").getBoolean("log"))?"yes":"no"));
-                                host.log.message.println("  - Address: " + json.getJSONObject("server").getString("address"));
-                                host.log.message.println("  - Auto Restart: " + ((json.getJSONObject("server").getBoolean("auto-restart"))?"yes":"no"));
-                                host.log.message.println("  - Hidden: " + ((json.getJSONObject("server").getBoolean("hidden"))?"yes":"no"));
-                                if (json.getJSONObject("server").getJSONArray("incompatible-list").length() > 0) {
+                                if (data.getSection("server").getBoolean("temp")) host.log.message.println("  - Temporary: yes");
+                                host.log.message.println("  - Running: " + ((data.getSection("server").getBoolean("running"))?"yes":"no"));
+                                host.log.message.println("  - Logging: " + ((data.getSection("server").getBoolean("log"))?"yes":"no"));
+                                host.log.message.println("  - Address: " + data.getSection("server").getRawString("address"));
+                                host.log.message.println("  - Auto Restart: " + ((data.getSection("server").getBoolean("auto-restart"))?"yes":"no"));
+                                host.log.message.println("  - Hidden: " + ((data.getSection("server").getBoolean("hidden"))?"yes":"no"));
+                                if (data.getSection("server").getList("incompatible-list").size() > 0) {
                                     List<String> current = new ArrayList<String>();
-                                    for (int i = 0; i < json.getJSONObject("server").getJSONArray("incompatible").length(); i++) current.add(json.getJSONObject("server").getJSONArray("incompatible").getString(i).toLowerCase());
+                                    for (int i = 0; i < data.getSection("server").getList("incompatible").size(); i++) current.add(data.getSection("server").getList("incompatible").get(i).asRawString().toLowerCase());
                                     host.log.message.println("  - Incompatibilities:");
-                                    for (int i = 0; i < json.getJSONObject("server").getJSONArray("incompatible-list").length(); i++)
-                                        host.log.message.println("    - " + json.getJSONObject("server").getJSONArray("incompatible-list").getString(i) + ((current.contains(json.getJSONObject("server").getJSONArray("incompatible-list").getString(i).toLowerCase()))?"*":""));
+                                    for (int i = 0; i < data.getSection("server").getList("incompatible-list").size(); i++)
+                                        host.log.message.println("    - " + data.getSection("server").getList("incompatible-list").get(i).asRawString() + ((current.contains(data.getSection("server").getList("incompatible-list").get(i).asRawString().toLowerCase()))?"*":""));
                                 }
-                                host.log.message.println("  - Signature: " + json.getJSONObject("server").getString("signature"));
+                                host.log.message.println("  - Signature: " + data.getSection("server").getRawString("signature"));
                                 break;
                             default:
                                 host.log.message.println("That Server is not a SubServer");
@@ -218,8 +217,8 @@ public class SubCommand {
             @Override
             public void command(String handle, String[] args) {
                 if (args.length > 0) {
-                    host.subdata.sendPacket(new PacketStartServer(null, args[0], json -> {
-                        switch (json.getInt("r")) {
+                    host.subdata.sendPacket(new PacketStartServer(null, args[0], data -> {
+                        switch (data.getInt("r")) {
                             case 3:
                                 host.log.message.println("There is no server with that name");
                                 break;
@@ -227,7 +226,7 @@ public class SubCommand {
                                 host.log.message.println("That Server is not a SubServer");
                                 break;
                             case 5:
-                                if (json.getString("m").contains("Host")) {
+                                if (data.getRawString("m").contains("Host")) {
                                     host.log.message.println("That SubServer's Host is not enabled");
                                 } else {
                                     host.log.message.println("That SubServer is not enabled");
@@ -237,14 +236,14 @@ public class SubCommand {
                                 host.log.message.println("That SubServer is already running");
                                 break;
                             case 7:
-                                host.log.message.println("That SubServer cannot start while these server(s) are running:", json.getString("m").split(":\\s")[1]);
+                                host.log.message.println("That SubServer cannot start while these server(s) are running:", data.getRawString("m").split(":\\s")[1]);
                                 break;
                             case 0:
                             case 1:
                                 host.log.message.println("Server was started successfully");
                                 break;
                             default:
-                                host.log.warn.println("PacketStartServer(null, " + args[0] + ") responded with: " + json.getString("m"));
+                                host.log.warn.println("PacketStartServer(null, " + args[0] + ") responded with: " + data.getRawString("m"));
                                 host.log.message.println("Server was started successfully");
                                 break;
                         }
@@ -267,8 +266,8 @@ public class SubCommand {
             @Override
             public void command(String handle, String[] args) {
                 if (args.length > 0) {
-                    host.subdata.sendPacket(new PacketStopServer(null, args[0], false, json -> {
-                        switch (json.getInt("r")) {
+                    host.subdata.sendPacket(new PacketStopServer(null, args[0], false, data -> {
+                        switch (data.getInt("r")) {
                             case 3:
                                 host.log.message.println("There is no server with that name");
                                 break;
@@ -283,7 +282,7 @@ public class SubCommand {
                                 host.log.message.println("Server was stopped successfully");
                                 break;
                             default:
-                                host.log.warn.println("PacketStopServer(null, " + args[0] + ", false) responded with: " + json.getString("m"));
+                                host.log.warn.println("PacketStopServer(null, " + args[0] + ", false) responded with: " + data.getRawString("m"));
                                 host.log.message.println("Server was stopped successfully");
                                 break;
                         }
@@ -307,8 +306,8 @@ public class SubCommand {
             @Override
             public void command(String handle, String[] args) {
                 if (args.length > 0) {
-                    host.subdata.sendPacket(new PacketStopServer(null, args[0], true, json -> {
-                        switch (json.getInt("r")) {
+                    host.subdata.sendPacket(new PacketStopServer(null, args[0], true, data -> {
+                        switch (data.getInt("r")) {
                             case 3:
                                 host.log.message.println("There is no server with that name");
                                 break;
@@ -323,7 +322,7 @@ public class SubCommand {
                                 host.log.message.println("Server was terminated successfully");
                                 break;
                             default:
-                                host.log.warn.println("PacketStopServer(null, " + args[0] + ", true) responded with: " + json.getString("m"));
+                                host.log.warn.println("PacketStopServer(null, " + args[0] + ", true) responded with: " + data.getRawString("m"));
                                 host.log.message.println("Server was terminated successfully");
                                 break;
                         }
@@ -356,8 +355,8 @@ public class SubCommand {
                         } while ((i + 1) != args.length);
                     }
                     final String cmd = str;
-                    host.subdata.sendPacket(new PacketCommandServer(null, args[0], cmd, json -> {
-                        switch (json.getInt("r")) {
+                    host.subdata.sendPacket(new PacketCommandServer(null, args[0], cmd, data -> {
+                        switch (data.getInt("r")) {
                             case 3:
                                 host.log.message.println("There is no server with that name");
                                 break;
@@ -372,7 +371,7 @@ public class SubCommand {
                                 host.log.message.println("Command was sent successfully");
                                 break;
                             default:
-                                host.log.warn.println("PacketCommandServer(null, " + args[0] + ", /" + cmd + ") responded with: " + json.getString("m"));
+                                host.log.warn.println("PacketCommandServer(null, " + args[0] + ", /" + cmd + ") responded with: " + data.getRawString("m"));
                                 host.log.message.println("Command was sent successfully");
                                 break;
                         }
@@ -401,8 +400,8 @@ public class SubCommand {
                     if (Util.isException(() -> Integer.parseInt(args[4]))) {
                         host.log.message.println("Invalid Port Number");
                     } else {
-                        host.subdata.sendPacket(new PacketCreateServer(null, args[0], args[1],args[2], new Version(args[3]), Integer.parseInt(args[4]), json -> {
-                            switch (json.getInt("r")) {
+                        host.subdata.sendPacket(new PacketCreateServer(null, args[0], args[1],args[2], new Version(args[3]), Integer.parseInt(args[4]), data -> {
+                            switch (data.getInt("r")) {
                                 case 3:
                                     host.log.message.println("There is already a SubServer with that name");
                                     break;
@@ -423,7 +422,7 @@ public class SubCommand {
                                     host.log.message.println("Launching SubCreator...");
                                     break;
                                 default:
-                                    host.log.warn.println("PacketCreateServer(null, " + args[0] + ", " + args[1] + ", " + args[2] + ", " + args[3] + ", " + args[4] + ") responded with: " + json.getString("m"));
+                                    host.log.warn.println("PacketCreateServer(null, " + args[0] + ", " + args[1] + ", " + args[2] + ", " + args[3] + ", " + args[4] + ") responded with: " + data.getRawString("m"));
                                     host.log.message.println("Launching SubCreator...");
                                     break;
                             }

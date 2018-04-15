@@ -1,9 +1,9 @@
 package net.ME1312.SubServers.Client.Bukkit.Network.Packet;
 
+import net.ME1312.SubServers.Client.Bukkit.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Client.Bukkit.Library.Version.Version;
 import net.ME1312.SubServers.Client.Bukkit.Network.PacketIn;
 import org.bukkit.Bukkit;
-import org.json.JSONObject;
 
 /**
  * Reset Packet
@@ -11,8 +11,8 @@ import org.json.JSONObject;
 public class PacketInReset implements PacketIn {
 
     @Override
-    public void execute(JSONObject data) {
-        if (data != null && data.keySet().contains("m")) Bukkit.getLogger().warning("SubData > Received request for a server shutdown: " + data.getString("m"));
+    public void execute(YAMLSection data) {
+        if (data != null && data.contains("m")) Bukkit.getLogger().warning("SubData > Received request for a server shutdown: " + data.getString("m"));
         else Bukkit.getLogger().warning("SubData > Received request for a server shutdown");
         Bukkit.shutdown();
     }

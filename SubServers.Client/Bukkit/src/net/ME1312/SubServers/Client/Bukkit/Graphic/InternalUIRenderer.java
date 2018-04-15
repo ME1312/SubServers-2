@@ -84,7 +84,7 @@ public class InternalUIRenderer extends UIRenderer {
             lastMenu = () -> hostMenu(1);
             windowHistory.add(() -> hostMenu(page));
             List<String> hosts = new ArrayList<String>();
-            hosts.addAll(json.getJSONObject("hosts").keySet());
+            hosts.addAll(json.getSection("hosts").getKeys());
 
             ItemStack block;
             ItemMeta blockMeta;
@@ -118,25 +118,25 @@ public class InternalUIRenderer extends UIRenderer {
                     enabled = (((i & 1) == 0) ? new NamedContainer<>("BLUE_STAINED_GLASS_PANE", (short) 3) : new NamedContainer<>("LIGHT_BLUE_STAINED_GLASS_PANE", (short) 11));
                     disabled = (((i & 1) == 0) ? new NamedContainer<>("MAGENTA_STAINED_GLASS_PANE", (short) 2) : new NamedContainer<>("RED_STAINED_GLASS_PANE", (short) 14));
 
-                    if (json.getJSONObject("hosts").getJSONObject(host).getBoolean("enabled")) {
+                    if (json.getSection("hosts").getSection(host).getBoolean("enabled")) {
                         block = createItem("STAINED_GLASS_PANE", enabled.name(), enabled.get());
                         blockMeta = block.getItemMeta();
-                        blockMeta.setDisplayName(ChatColor.AQUA + json.getJSONObject("hosts").getJSONObject(host).getString("display"));
+                        blockMeta.setDisplayName(ChatColor.AQUA + json.getSection("hosts").getSection(host).getString("display"));
                         LinkedList<String> lore = new LinkedList<String>();
-                        if (!host.equals(json.getJSONObject("hosts").getJSONObject(host).getString("display")))
+                        if (!host.equals(json.getSection("hosts").getSection(host).getString("display")))
                             lore.add(ChatColor.GRAY + host);
-                        lore.add(plugin.api.getLang("SubServers", "Interface.Host-Menu.Host-Server-Count").replace("$int$", new DecimalFormat("#,###").format(json.getJSONObject("hosts").getJSONObject(host).getJSONObject("servers").keySet().size())));
-                        if (plugin.config.get().getSection("Settings").getBoolean("Show-Addresses", false)) lore.add(ChatColor.WHITE + json.getJSONObject("hosts").getJSONObject(host).getString("address"));
+                        lore.add(plugin.api.getLang("SubServers", "Interface.Host-Menu.Host-Server-Count").replace("$int$", new DecimalFormat("#,###").format(json.getSection("hosts").getSection(host).getSection("servers").getKeys().size())));
+                        if (plugin.config.get().getSection("Settings").getBoolean("Show-Addresses", false)) lore.add(ChatColor.WHITE + json.getSection("hosts").getSection(host).getString("address"));
                         blockMeta.setLore(lore);
                     } else {
                         block = createItem("STAINED_GLASS_PANE", disabled.name(), disabled.get());
                         blockMeta = block.getItemMeta();
-                        blockMeta.setDisplayName(ChatColor.RED + json.getJSONObject("hosts").getJSONObject(host).getString("display"));
+                        blockMeta.setDisplayName(ChatColor.RED + json.getSection("hosts").getSection(host).getString("display"));
                         LinkedList<String> lore = new LinkedList<String>();
-                        if (!host.equals(json.getJSONObject("hosts").getJSONObject(host).getString("display")))
+                        if (!host.equals(json.getSection("hosts").getSection(host).getString("display")))
                             lore.add(ChatColor.GRAY + host);
                         lore.add(plugin.api.getLang("SubServers", "Interface.Host-Menu.Host-Disabled"));
-                        if (plugin.config.get().getSection("Settings").getBoolean("Show-Addresses", false)) lore.add(ChatColor.WHITE + json.getJSONObject("hosts").getJSONObject(host).getString("address"));
+                        if (plugin.config.get().getSection("Settings").getBoolean("Show-Addresses", false)) lore.add(ChatColor.WHITE + json.getSection("hosts").getSection(host).getString("address"));
                         blockMeta.setLore(lore);
                     }
                     block.setItemMeta(blockMeta);
@@ -178,7 +178,7 @@ public class InternalUIRenderer extends UIRenderer {
                 inv.setItem(i++, block);
             } else i += 2;
             i++;
-            if (json.getJSONObject("groups").length() <= 0) {
+            if (json.getSection("groups").getKeys().size() <= 0) {
                 block = createItem("STAINED_GLASS_PANE", "LIME_STAINED_GLASS_PANE", (short) 5);
                 blockMeta = block.getItemMeta();
                 blockMeta.setDisplayName(plugin.api.getLang("SubServers", "Interface.Host-Menu.Server-Menu"));
@@ -223,7 +223,7 @@ public class InternalUIRenderer extends UIRenderer {
                 divMeta.setDisplayName(ChatColor.RESET.toString());
                 div.setItemMeta(divMeta);
 
-                Inventory inv = Bukkit.createInventory(null, 36, plugin.api.getLang("SubServers", "Interface.Host-Admin.Title").replace("$str$", json.getJSONObject("host").getString("display")));
+                Inventory inv = Bukkit.createInventory(null, 36, plugin.api.getLang("SubServers", "Interface.Host-Admin.Title").replace("$str$", json.getSection("host").getString("display")));
 
                 int i = 0;
                 while (i < inv.getSize()) {
@@ -236,7 +236,7 @@ public class InternalUIRenderer extends UIRenderer {
                     blockMeta = block.getItemMeta();
                     blockMeta.setDisplayName(ChatColor.GRAY+ChatColor.stripColor(plugin.api.getLang("SubServers", "Interface.Host-Admin.Creator")));
                     blockMeta.setLore(Arrays.asList(plugin.api.getLang("SubServers", "Interface.Generic.Invalid-Permission").replace("$str$", "subservers.host.create." + host.toLowerCase())));
-                } else if (!json.getJSONObject("host").getBoolean("enabled")) {
+                } else if (!json.getSection("host").getBoolean("enabled")) {
                     block = createItem("STAINED_GLASS_PANE", "GRAY_STAINED_GLASS_PANE", (short) 7);
                     blockMeta = block.getItemMeta();
                     blockMeta.setDisplayName(ChatColor.GRAY+ChatColor.stripColor(plugin.api.getLang("SubServers", "Interface.Host-Admin.Creator")));
@@ -264,7 +264,7 @@ public class InternalUIRenderer extends UIRenderer {
                 inv.setItem(15, block);
                 inv.setItem(16, block);
 
-                if (!json.getJSONObject("host").getBoolean("enabled") || hostPlugins.size() <= 0) {
+                if (!json.getSection("host").getBoolean("enabled") || hostPlugins.size() <= 0) {
                     block = div;
                 } else {
                     block = createItem("STAINED_GLASS_PANE", "BLUE_STAINED_GLASS_PANE", (short) 11);
@@ -275,25 +275,25 @@ public class InternalUIRenderer extends UIRenderer {
                 inv.setItem(27, block);
                 inv.setItem(28, block);
 
-                if (json.getJSONObject("host").getBoolean("enabled")) {
+                if (json.getSection("host").getBoolean("enabled")) {
                     block = createItem("STAINED_GLASS_PANE", "BLUE_STAINED_GLASS_PANE", (short) 11);
                     blockMeta = block.getItemMeta();
-                    blockMeta.setDisplayName(ChatColor.AQUA + json.getJSONObject("host").getString("display"));
+                    blockMeta.setDisplayName(ChatColor.AQUA + json.getSection("host").getString("display"));
                     LinkedList<String> lore = new LinkedList<String>();
-                    if (!host.equals(json.getJSONObject("host").getString("display")))
+                    if (!host.equals(json.getSection("host").getString("display")))
                         lore.add(ChatColor.GRAY + host);
-                    lore.add(plugin.api.getLang("SubServers", "Interface.Host-Menu.Host-Server-Count").replace("$int$", new DecimalFormat("#,###").format(json.getJSONObject("host").getJSONObject("servers").keySet().size())));
-                    if (plugin.config.get().getSection("Settings").getBoolean("Show-Addresses", false)) lore.add(ChatColor.WHITE + json.getJSONObject("host").getString("address"));
+                    lore.add(plugin.api.getLang("SubServers", "Interface.Host-Menu.Host-Server-Count").replace("$int$", new DecimalFormat("#,###").format(json.getSection("host").getSection("servers").getKeys().size())));
+                    if (plugin.config.get().getSection("Settings").getBoolean("Show-Addresses", false)) lore.add(ChatColor.WHITE + json.getSection("host").getString("address"));
                     blockMeta.setLore(lore);
                 } else {
                     block = createItem("STAINED_GLASS_PANE", "RED_STAINED_GLASS_PANE", (short) 14);
                     blockMeta = block.getItemMeta();
-                    blockMeta.setDisplayName(ChatColor.RED + json.getJSONObject("host").getString("display"));
+                    blockMeta.setDisplayName(ChatColor.RED + json.getSection("host").getString("display"));
                     LinkedList<String> lore = new LinkedList<String>();
-                    if (!host.equals(json.getJSONObject("host").getString("display")))
+                    if (!host.equals(json.getSection("host").getString("display")))
                         lore.add(ChatColor.GRAY + host);
                     lore.add(plugin.api.getLang("SubServers", "Interface.Host-Menu.Host-Disabled"));
-                    if (plugin.config.get().getSection("Settings").getBoolean("Show-Addresses", false)) lore.add(ChatColor.WHITE + json.getJSONObject("host").getString("address"));
+                    if (plugin.config.get().getSection("Settings").getBoolean("Show-Addresses", false)) lore.add(ChatColor.WHITE + json.getSection("host").getString("address"));
                     blockMeta.setLore(lore);
                 }
                 block.setItemMeta(blockMeta);
@@ -324,7 +324,7 @@ public class InternalUIRenderer extends UIRenderer {
         lastVisitedObjects[0] = options;
 
         plugin.subdata.sendPacket(new PacketDownloadHostInfo(options.getHost(), json -> {
-            if (!json.getBoolean("valid")|| !json.getJSONObject("host").getBoolean("enabled")) {
+            if (!json.getBoolean("valid")|| !json.getSection("host").getBoolean("enabled")) {
                 lastVisitedObjects[0] = null;
                 if (hasHistory()) back();
             } else {
@@ -336,7 +336,7 @@ public class InternalUIRenderer extends UIRenderer {
                 divMeta.setDisplayName(ChatColor.RESET.toString());
                 div.setItemMeta(divMeta);
 
-                Inventory inv = Bukkit.createInventory(null, 54, plugin.api.getLang("SubServers", "Interface.Host-Creator.Title").replace("$str$", json.getJSONObject("host").getString("display")));
+                Inventory inv = Bukkit.createInventory(null, 54, plugin.api.getLang("SubServers", "Interface.Host-Creator.Title").replace("$str$", json.getSection("host").getString("display")));
 
                 int i = 0;
                 while (i < inv.getSize()) {
@@ -456,15 +456,15 @@ public class InternalUIRenderer extends UIRenderer {
         lastVisitedObjects[0] = options;
         if (!options.init()) lastVisitedObjects[0] = options.getHost();
         plugin.subdata.sendPacket(new PacketDownloadHostInfo(options.getHost(), (json) -> {
-            if (!json.getBoolean("valid")|| !json.getJSONObject("host").getBoolean("enabled")) {
+            if (!json.getBoolean("valid")|| !json.getSection("host").getBoolean("enabled")) {
                 lastVisitedObjects[0] = null;
                 if (hasHistory()) back();
             } else {
                 lastPage = page;
                 setDownloading(null);
                 List<String> templates = new ArrayList<String>();
-                for (String template : json.getJSONObject("host").getJSONObject("creator").getJSONObject("templates").keySet()) {
-                    if (json.getJSONObject("host").getJSONObject("creator").getJSONObject("templates").getJSONObject(template).getBoolean("enabled")) templates.add(template);
+                for (String template : json.getSection("host").getSection("creator").getSection("templates").getKeys()) {
+                    if (json.getSection("host").getSection("creator").getSection("templates").getSection(template).getBoolean("enabled")) templates.add(template);
                 }
                 Collections.sort(templates);
 
@@ -481,7 +481,7 @@ public class InternalUIRenderer extends UIRenderer {
                 int count = (templates.size() == 0)?27:((templates.size() - min >= max)?36:templates.size() - min);
                 int area = (count % 9 == 0)?count: (int) (Math.floor(count / 9) + 1) * 9;
 
-                Inventory inv = Bukkit.createInventory(null, 18 + area, plugin.api.getLang("SubServers", "Interface.Host-Creator.Edit-Template.Title").replace("$str$", json.getJSONObject("host").getString("display")));
+                Inventory inv = Bukkit.createInventory(null, 18 + area, plugin.api.getLang("SubServers", "Interface.Host-Creator.Edit-Template.Title").replace("$str$", json.getSection("host").getString("display")));
                 block = createItem("STAINED_GLASS_PANE", "GRAY_STAINED_GLASS_PANE", (short) 7);
                 block.setItemMeta(divMeta);
                 while (i < area) {
@@ -496,11 +496,11 @@ public class InternalUIRenderer extends UIRenderer {
                     if (templates.indexOf(template) >= min && templates.indexOf(template) <= max) {
                         if (even && (i == 4 || i == 13 || i == 22 || i == 31)) inv.setItem(i++, adiv);
 
-                        block = parseItem(json.getJSONObject("host").getJSONObject("creator").getJSONObject("templates").getJSONObject(template).getString("icon"), new ItemStack(Material.ENDER_CHEST));
+                        block = parseItem(json.getSection("host").getSection("creator").getSection("templates").getSection(template).getString("icon"), new ItemStack(Material.ENDER_CHEST));
                         blockMeta = block.getItemMeta();
-                        blockMeta.setDisplayName(ChatColor.YELLOW + json.getJSONObject("host").getJSONObject("creator").getJSONObject("templates").getJSONObject(template).getString("display"));
+                        blockMeta.setDisplayName(ChatColor.YELLOW + json.getSection("host").getSection("creator").getSection("templates").getSection(template).getString("display"));
                         LinkedList<String> lore = new LinkedList<String>();
-                        if (!template.equals(json.getJSONObject("host").getJSONObject("creator").getJSONObject("templates").getJSONObject(template).getString("display")))
+                        if (!template.equals(json.getSection("host").getSection("creator").getSection("templates").getSection(template).getString("display")))
                             lore.add(ChatColor.GRAY + template);
                         blockMeta.setLore(lore);
                         block.setItemMeta(blockMeta);
@@ -577,7 +577,7 @@ public class InternalUIRenderer extends UIRenderer {
                 lastPage = page;
                 List<String> renderers = new ArrayList<String>();
                 for (String renderer : renderers) {
-                    if (hostPlugins.get(renderer).isEnabled(json.getJSONObject("host"))) renderers.add(renderer);
+                    if (hostPlugins.get(renderer).isEnabled(json.getSection("host"))) renderers.add(renderer);
                 }
                 Collections.sort(renderers);
 
@@ -594,7 +594,7 @@ public class InternalUIRenderer extends UIRenderer {
                 int count = (renderers.size() == 0)?27:((renderers.size() - min >= max)?36:renderers.size() - min);
                 int area = (count % 9 == 0) ? count : (int) (Math.floor(count / 9) + 1) * 9;
 
-                Inventory inv = Bukkit.createInventory(null, 18 + area, plugin.api.getLang("SubServers", "Interface.Host-Plugin.Title").replace("$str$", json.getJSONObject("host").getString("display")));
+                Inventory inv = Bukkit.createInventory(null, 18 + area, plugin.api.getLang("SubServers", "Interface.Host-Plugin.Title").replace("$str$", json.getSection("host").getString("display")));
                 block = createItem("STAINED_GLASS_PANE", "GRAY_STAINED_GLASS_PANE", (short) 7);
                 block.setItemMeta(divMeta);
                 while (i < area) {
@@ -682,7 +682,7 @@ public class InternalUIRenderer extends UIRenderer {
             lastMenu = () -> groupMenu(1);
             windowHistory.add(() -> groupMenu(page));
             List<String> groups = new ArrayList<String>();
-            groups.addAll(json.getJSONObject("groups").keySet());
+            groups.addAll(json.getSection("groups").getKeys());
 
             ItemStack block;
             ItemMeta blockMeta;
@@ -719,7 +719,7 @@ public class InternalUIRenderer extends UIRenderer {
                     blockMeta = block.getItemMeta();
                     blockMeta.setDisplayName(ChatColor.GOLD + group);
                     LinkedList<String> lore = new LinkedList<String>();
-                    lore.add(plugin.api.getLang("SubServers", "Interface.Group-Menu.Group-Server-Count").replace("$int$", new DecimalFormat("#,###").format(json.getJSONObject("groups").getJSONObject(group).keySet().size())));
+                    lore.add(plugin.api.getLang("SubServers", "Interface.Group-Menu.Group-Server-Count").replace("$int$", new DecimalFormat("#,###").format(json.getSection("groups").getSection(group).getKeys().size())));
                     blockMeta.setLore(lore);
                     block.setItemMeta(blockMeta);
                     inv.setItem(i, block);
@@ -792,24 +792,24 @@ public class InternalUIRenderer extends UIRenderer {
             List<String> servers = new ArrayList<String>();
             lastVisitedObjects[0] = host;
             lastVisitedObjects[1] = group;
-            if (host != null && json.getJSONObject("hosts").keySet().contains(host)) {
-                for (String subserver : json.getJSONObject("hosts").getJSONObject(host).getJSONObject("servers").keySet()) {
+            if (host != null && json.getSection("hosts").getKeys().contains(host)) {
+                for (String subserver : json.getSection("hosts").getSection(host).getSection("servers").getKeys()) {
                     hosts.put(subserver, host);
                     servers.add(subserver);
                 }
-            } else if (group != null && json.getJSONObject("groups").keySet().contains(group)) {
-                for (String server : json.getJSONObject("groups").getJSONObject(group).keySet()) {
-                    hosts.put(server, (json.getJSONObject("groups").getJSONObject(group).getJSONObject(server).keySet().contains("host") && json.getJSONObject("hosts").keySet().contains(json.getJSONObject("groups").getJSONObject(group).getJSONObject(server).getString("host")))?json.getJSONObject("groups").getJSONObject(group).getJSONObject(server).getString("host"):null);
+            } else if (group != null && json.getSection("groups").getKeys().contains(group)) {
+                for (String server : json.getSection("groups").getSection(group).getKeys()) {
+                    hosts.put(server, (json.getSection("groups").getSection(group).getSection(server).getKeys().contains("host") && json.getSection("hosts").getKeys().contains(json.getSection("groups").getSection(group).getSection(server).getString("host")))?json.getSection("groups").getSection(group).getSection(server).getString("host"):null);
                     servers.add(server);
                 }
             } else {
                 lastMenu = () -> serverMenu(1, null, null);
-                for (String s : json.getJSONObject("servers").keySet()) {
+                for (String s : json.getSection("servers").getKeys()) {
                     hosts.put(s, null);
                     servers.add(s);
                 }
-                for (String h : json.getJSONObject("hosts").keySet()) {
-                    for (String ss : json.getJSONObject("hosts").getJSONObject(h).getJSONObject("servers").keySet()) {
+                for (String h : json.getSection("hosts").getKeys()) {
+                    for (String ss : json.getSection("hosts").getSection(h).getSection("servers").getKeys()) {
                         hosts.put(ss, h);
                         servers.add(ss);
                     }
@@ -831,7 +831,7 @@ public class InternalUIRenderer extends UIRenderer {
             int count = (servers.size() == 0)?27:((servers.size() - min >= max)?36:servers.size() - min);
             int area = (count % 9 == 0) ? count : (int) (Math.floor(count / 9) + 1) * 9;
 
-            Inventory inv = Bukkit.createInventory(null, 18 + area, (host == null)?((group == null)?plugin.api.getLang("SubServers", "Interface.Server-Menu.Title"):plugin.api.getLang("SubServers", "Interface.Group-SubServer.Title").replace("$str$", group)):plugin.api.getLang("SubServers", "Interface.Host-SubServer.Title").replace("$str$", json.getJSONObject("hosts").getJSONObject(host).getString("display")));
+            Inventory inv = Bukkit.createInventory(null, 18 + area, (host == null)?((group == null)?plugin.api.getLang("SubServers", "Interface.Server-Menu.Title"):plugin.api.getLang("SubServers", "Interface.Group-SubServer.Title").replace("$str$", group)):plugin.api.getLang("SubServers", "Interface.Host-SubServer.Title").replace("$str$", json.getSection("hosts").getSection(host).getString("display")));
             block = createItem("STAINED_GLASS_PANE", "GRAY_STAINED_GLASS_PANE", (short) 7);
             block.setItemMeta(divMeta);
             while (i < area) {
@@ -856,63 +856,63 @@ public class InternalUIRenderer extends UIRenderer {
                     if (hosts.get(server) == null) {
                         block = createItem("STAINED_GLASS_PANE", external.name(), external.get());
                         blockMeta = block.getItemMeta();
-                        blockMeta.setDisplayName(ChatColor.AQUA + json.getJSONObject("servers").getJSONObject(server).getString("display"));
+                        blockMeta.setDisplayName(ChatColor.AQUA + json.getSection("servers").getSection(server).getString("display"));
                         LinkedList<String> lore = new LinkedList<String>();
-                        if (!server.equals(json.getJSONObject("servers").getJSONObject(server).getString("display")))
+                        if (!server.equals(json.getSection("servers").getSection(server).getString("display")))
                             lore.add(ChatColor.GRAY + server);
-                        lore.add(plugin.api.getLang("SubServers", "Interface.Server-Menu.Server-Player-Count").replace("$int$", new DecimalFormat("#,###").format(json.getJSONObject("servers").getJSONObject(server).getJSONObject("players").keySet().size())));
+                        lore.add(plugin.api.getLang("SubServers", "Interface.Server-Menu.Server-Player-Count").replace("$int$", new DecimalFormat("#,###").format(json.getSection("servers").getSection(server).getSection("players").getKeys().size())));
                         lore.add(plugin.api.getLang("SubServers", "Interface.Server-Menu.Server-External"));
                         lore.add(plugin.api.getLang("SubServers", "Interface.Server-Menu.SubServer-Invalid"));
-                        lore.add(ChatColor.WHITE + ((plugin.config.get().getSection("Settings").getBoolean("Show-Addresses", false))?json.getJSONObject("servers").getJSONObject(server).getString("address"):json.getJSONObject("servers").getJSONObject(server).getString("address").split(":")[json.getJSONObject("servers").getJSONObject(server).getString("address").split(":").length - 1]));
+                        lore.add(ChatColor.WHITE + ((plugin.config.get().getSection("Settings").getBoolean("Show-Addresses", false))?json.getSection("servers").getSection(server).getString("address"):json.getSection("servers").getSection(server).getString("address").split(":")[json.getSection("servers").getSection(server).getString("address").split(":").length - 1]));
                         blockMeta.setLore(lore);
-                    } else if (json.getJSONObject("hosts").getJSONObject(hosts.get(server)).getJSONObject("servers").getJSONObject(server).getBoolean("temp")) {
+                    } else if (json.getSection("hosts").getSection(hosts.get(server)).getSection("servers").getSection(server).getBoolean("temp")) {
                         block = createItem("STAINED_GLASS_PANE", temp.name(), temp.get());
                         blockMeta = block.getItemMeta();
-                        blockMeta.setDisplayName(ChatColor.AQUA + json.getJSONObject("hosts").getJSONObject(hosts.get(server)).getJSONObject("servers").getJSONObject(server).getString("display"));
+                        blockMeta.setDisplayName(ChatColor.AQUA + json.getSection("hosts").getSection(hosts.get(server)).getSection("servers").getSection(server).getString("display"));
                         LinkedList<String> lore = new LinkedList<String>();
-                        if (!server.equals(json.getJSONObject("hosts").getJSONObject(hosts.get(server)).getJSONObject("servers").getJSONObject(server).getString("display")))
+                        if (!server.equals(json.getSection("hosts").getSection(hosts.get(server)).getSection("servers").getSection(server).getString("display")))
                             lore.add(ChatColor.GRAY + server);
-                        lore.add(plugin.api.getLang("SubServers", "Interface.Server-Menu.Server-Player-Count").replace("$int$", new DecimalFormat("#,###").format(json.getJSONObject("hosts").getJSONObject(hosts.get(server)).getJSONObject("servers").getJSONObject(server).getJSONObject("players").keySet().size())));
+                        lore.add(plugin.api.getLang("SubServers", "Interface.Server-Menu.Server-Player-Count").replace("$int$", new DecimalFormat("#,###").format(json.getSection("hosts").getSection(hosts.get(server)).getSection("servers").getSection(server).getSection("players").getKeys().size())));
                         lore.add(plugin.api.getLang("SubServers", "Interface.Server-Menu.SubServer-Temporary"));
-                        lore.add(ChatColor.WHITE + ((plugin.config.get().getSection("Settings").getBoolean("Show-Addresses", false))?json.getJSONObject("hosts").getJSONObject(hosts.get(server)).getJSONObject("servers").getJSONObject(server).getString("address"):json.getJSONObject("hosts").getJSONObject(hosts.get(server)).getJSONObject("servers").getJSONObject(server).getString("address").split(":")[json.getJSONObject("hosts").getJSONObject(hosts.get(server)).getJSONObject("servers").getJSONObject(server).getString("address").split(":").length - 1]));
+                        lore.add(ChatColor.WHITE + ((plugin.config.get().getSection("Settings").getBoolean("Show-Addresses", false))?json.getSection("hosts").getSection(hosts.get(server)).getSection("servers").getSection(server).getString("address"):json.getSection("hosts").getSection(hosts.get(server)).getSection("servers").getSection(server).getString("address").split(":")[json.getSection("hosts").getSection(hosts.get(server)).getSection("servers").getSection(server).getString("address").split(":").length - 1]));
                         blockMeta.setLore(lore);
-                    } else if (json.getJSONObject("hosts").getJSONObject(hosts.get(server)).getJSONObject("servers").getJSONObject(server).getBoolean("running")) {
+                    } else if (json.getSection("hosts").getSection(hosts.get(server)).getSection("servers").getSection(server).getBoolean("running")) {
                         block = createItem("STAINED_GLASS_PANE", online.name(), online.get());
                         blockMeta = block.getItemMeta();
-                        blockMeta.setDisplayName(ChatColor.GREEN + json.getJSONObject("hosts").getJSONObject(hosts.get(server)).getJSONObject("servers").getJSONObject(server).getString("display"));
+                        blockMeta.setDisplayName(ChatColor.GREEN + json.getSection("hosts").getSection(hosts.get(server)).getSection("servers").getSection(server).getString("display"));
                         LinkedList<String> lore = new LinkedList<String>();
-                        if (!server.equals(json.getJSONObject("hosts").getJSONObject(hosts.get(server)).getJSONObject("servers").getJSONObject(server).getString("display")))
+                        if (!server.equals(json.getSection("hosts").getSection(hosts.get(server)).getSection("servers").getSection(server).getString("display")))
                             lore.add(ChatColor.GRAY + server);
-                        lore.add(plugin.api.getLang("SubServers", "Interface.Server-Menu.Server-Player-Count").replace("$int$", new DecimalFormat("#,###").format(json.getJSONObject("hosts").getJSONObject(hosts.get(server)).getJSONObject("servers").getJSONObject(server).getJSONObject("players").keySet().size())));
-                        lore.add(ChatColor.WHITE + ((plugin.config.get().getSection("Settings").getBoolean("Show-Addresses", false))?json.getJSONObject("hosts").getJSONObject(hosts.get(server)).getJSONObject("servers").getJSONObject(server).getString("address"):json.getJSONObject("hosts").getJSONObject(hosts.get(server)).getJSONObject("servers").getJSONObject(server).getString("address").split(":")[json.getJSONObject("hosts").getJSONObject(hosts.get(server)).getJSONObject("servers").getJSONObject(server).getString("address").split(":").length - 1]));
+                        lore.add(plugin.api.getLang("SubServers", "Interface.Server-Menu.Server-Player-Count").replace("$int$", new DecimalFormat("#,###").format(json.getSection("hosts").getSection(hosts.get(server)).getSection("servers").getSection(server).getSection("players").getKeys().size())));
+                        lore.add(ChatColor.WHITE + ((plugin.config.get().getSection("Settings").getBoolean("Show-Addresses", false))?json.getSection("hosts").getSection(hosts.get(server)).getSection("servers").getSection(server).getString("address"):json.getSection("hosts").getSection(hosts.get(server)).getSection("servers").getSection(server).getString("address").split(":")[json.getSection("hosts").getSection(hosts.get(server)).getSection("servers").getSection(server).getString("address").split(":").length - 1]));
                         blockMeta.setLore(lore);
-                    } else if (json.getJSONObject("hosts").getJSONObject(hosts.get(server)).getJSONObject("servers").getJSONObject(server).getBoolean("enabled") && json.getJSONObject("hosts").getJSONObject(hosts.get(server)).getJSONObject("servers").getJSONObject(server).getJSONArray("incompatible").length() == 0) {
+                    } else if (json.getSection("hosts").getSection(hosts.get(server)).getSection("servers").getSection(server).getBoolean("enabled") && json.getSection("hosts").getSection(hosts.get(server)).getSection("servers").getSection(server).getList("incompatible").size() == 0) {
                         block = createItem("STAINED_GLASS_PANE", offline.name(), offline.get());
                         blockMeta = block.getItemMeta();
-                        blockMeta.setDisplayName(ChatColor.YELLOW + json.getJSONObject("hosts").getJSONObject(hosts.get(server)).getJSONObject("servers").getJSONObject(server).getString("display"));
+                        blockMeta.setDisplayName(ChatColor.YELLOW + json.getSection("hosts").getSection(hosts.get(server)).getSection("servers").getSection(server).getString("display"));
                         LinkedList<String> lore = new LinkedList<String>();
-                        if (!server.equals(json.getJSONObject("hosts").getJSONObject(hosts.get(server)).getJSONObject("servers").getJSONObject(server).getString("display")))
+                        if (!server.equals(json.getSection("hosts").getSection(hosts.get(server)).getSection("servers").getSection(server).getString("display")))
                             lore.add(ChatColor.GRAY + server);
                         lore.add(plugin.api.getLang("SubServers", "Interface.Server-Menu.SubServer-Offline"));
-                        lore.add(ChatColor.WHITE + ((plugin.config.get().getSection("Settings").getBoolean("Show-Addresses", false))?json.getJSONObject("hosts").getJSONObject(hosts.get(server)).getJSONObject("servers").getJSONObject(server).getString("address"):json.getJSONObject("hosts").getJSONObject(hosts.get(server)).getJSONObject("servers").getJSONObject(server).getString("address").split(":")[json.getJSONObject("hosts").getJSONObject(hosts.get(server)).getJSONObject("servers").getJSONObject(server).getString("address").split(":").length - 1]));
+                        lore.add(ChatColor.WHITE + ((plugin.config.get().getSection("Settings").getBoolean("Show-Addresses", false))?json.getSection("hosts").getSection(hosts.get(server)).getSection("servers").getSection(server).getString("address"):json.getSection("hosts").getSection(hosts.get(server)).getSection("servers").getSection(server).getString("address").split(":")[json.getSection("hosts").getSection(hosts.get(server)).getSection("servers").getSection(server).getString("address").split(":").length - 1]));
                         blockMeta.setLore(lore);
                     } else {
                         block = createItem("STAINED_GLASS_PANE", disabled.name(), disabled.get());
                         blockMeta = block.getItemMeta();
-                        blockMeta.setDisplayName(ChatColor.RED + json.getJSONObject("hosts").getJSONObject(hosts.get(server)).getJSONObject("servers").getJSONObject(server).getString("display"));
+                        blockMeta.setDisplayName(ChatColor.RED + json.getSection("hosts").getSection(hosts.get(server)).getSection("servers").getSection(server).getString("display"));
                         LinkedList<String> lore = new LinkedList<String>();
-                        if (!server.equals(json.getJSONObject("hosts").getJSONObject(hosts.get(server)).getJSONObject("servers").getJSONObject(server).getString("display")))
+                        if (!server.equals(json.getSection("hosts").getSection(hosts.get(server)).getSection("servers").getSection(server).getString("display")))
                             lore.add(ChatColor.GRAY + server);
-                        if (json.getJSONObject("hosts").getJSONObject(hosts.get(server)).getJSONObject("servers").getJSONObject(server).getJSONArray("incompatible").length() != 0) {
+                        if (json.getSection("hosts").getSection(hosts.get(server)).getSection("servers").getSection(server).getList("incompatible").size() != 0) {
                             String list = "";
-                            for (int ii = 0; ii < json.getJSONObject("hosts").getJSONObject(hosts.get(server)).getJSONObject("servers").getJSONObject(server).getJSONArray("incompatible").length(); ii++) {
+                            for (int ii = 0; ii < json.getSection("hosts").getSection(hosts.get(server)).getSection("servers").getSection(server).getList("incompatible").size(); ii++) {
                                 if (list.length() != 0) list += ", ";
-                                list += json.getJSONObject("hosts").getJSONObject(hosts.get(server)).getJSONObject("servers").getJSONObject(server).getJSONArray("incompatible").getString(ii);
+                                list += json.getSection("hosts").getSection(hosts.get(server)).getSection("servers").getSection(server).getList("incompatible").get(ii).asString();
                             }
                             lore.add(plugin.api.getLang("SubServers", "Interface.Server-Menu.SubServer-Incompatible").replace("$str$", list));
                         }
-                        if (!json.getJSONObject("hosts").getJSONObject(hosts.get(server)).getJSONObject("servers").getJSONObject(server).getBoolean("enabled")) lore.add(plugin.api.getLang("SubServers", "Interface.Server-Menu.SubServer-Disabled"));
-                        lore.add(ChatColor.WHITE + ((plugin.config.get().getSection("Settings").getBoolean("Show-Addresses", false))?json.getJSONObject("hosts").getJSONObject(hosts.get(server)).getJSONObject("servers").getJSONObject(server).getString("address"):json.getJSONObject("hosts").getJSONObject(hosts.get(server)).getJSONObject("servers").getJSONObject(server).getString("address").split(":")[json.getJSONObject("hosts").getJSONObject(hosts.get(server)).getJSONObject("servers").getJSONObject(server).getString("address").split(":").length - 1]));
+                        if (!json.getSection("hosts").getSection(hosts.get(server)).getSection("servers").getSection(server).getBoolean("enabled")) lore.add(plugin.api.getLang("SubServers", "Interface.Server-Menu.SubServer-Disabled"));
+                        lore.add(ChatColor.WHITE + ((plugin.config.get().getSection("Settings").getBoolean("Show-Addresses", false))?json.getSection("hosts").getSection(hosts.get(server)).getSection("servers").getSection(server).getString("address"):json.getSection("hosts").getSection(hosts.get(server)).getSection("servers").getSection(server).getString("address").split(":")[json.getSection("hosts").getSection(hosts.get(server)).getSection("servers").getSection(server).getString("address").split(":").length - 1]));
                         blockMeta.setLore(lore);
                     }
                     block.setItemMeta(blockMeta);
@@ -994,7 +994,7 @@ public class InternalUIRenderer extends UIRenderer {
                 divMeta.setDisplayName(ChatColor.RESET.toString());
                 div.setItemMeta(divMeta);
 
-                Inventory inv = Bukkit.createInventory(null, 36, plugin.api.getLang("SubServers", "Interface.SubServer-Admin.Title").replace("$str$", json.getJSONObject("server").getString("display")));
+                Inventory inv = Bukkit.createInventory(null, 36, plugin.api.getLang("SubServers", "Interface.SubServer-Admin.Title").replace("$str$", json.getSection("server").getString("display")));
 
                 int i = 0;
                 while (i < inv.getSize()) {
@@ -1003,7 +1003,7 @@ public class InternalUIRenderer extends UIRenderer {
                 }
                 i = 0;
 
-                if (json.getJSONObject("server").getBoolean("running")) {
+                if (json.getSection("server").getBoolean("running")) {
                     if (!(Bukkit.getPlayer(player).hasPermission("subservers.subserver.terminate.*") || Bukkit.getPlayer(player).hasPermission("subservers.subserver.terminate." + subserver.toLowerCase()))) {
                         block = createItem("STAINED_GLASS_PANE", "GRAY_STAINED_GLASS_PANE", (short) 7);
                         blockMeta = block.getItemMeta();
@@ -1058,7 +1058,7 @@ public class InternalUIRenderer extends UIRenderer {
                         blockMeta = block.getItemMeta();
                         blockMeta.setDisplayName(ChatColor.GRAY+ChatColor.stripColor(plugin.api.getLang("SubServers", "Interface.SubServer-Admin.Start")));
                         blockMeta.setLore(Arrays.asList(plugin.api.getLang("SubServers", "Interface.Generic.Invalid-Permission").replace("$str$", "subservers.subserver.start." + subserver.toLowerCase())));
-                    } else if (!json.getJSONObject("server").getBoolean("enabled") || json.getJSONObject("server").getJSONArray("incompatible").length() != 0) {
+                    } else if (!json.getSection("server").getBoolean("enabled") || json.getSection("server").getList("incompatible").size() != 0) {
                         block = createItem("STAINED_GLASS_PANE", "GRAY_STAINED_GLASS_PANE", (short) 7);
                         blockMeta = block.getItemMeta();
                         blockMeta.setDisplayName(ChatColor.GRAY+ChatColor.stripColor(plugin.api.getLang("SubServers", "Interface.SubServer-Admin.Start")));
@@ -1076,7 +1076,7 @@ public class InternalUIRenderer extends UIRenderer {
                     inv.setItem(14, block);
                 }
 
-                if (!json.getJSONObject("server").getBoolean("enabled") || subserverPlugins.size() <= 0) {
+                if (!json.getSection("server").getBoolean("enabled") || subserverPlugins.size() <= 0) {
                     block = div;
                 } else {
                     block = createItem("STAINED_GLASS_PANE", "BLUE_STAINED_GLASS_PANE", (short) 11);
@@ -1087,54 +1087,54 @@ public class InternalUIRenderer extends UIRenderer {
                 inv.setItem(27, block);
                 inv.setItem(28, block);
 
-                if (json.getJSONObject("server").getBoolean("temp")) {
+                if (json.getSection("server").getBoolean("temp")) {
                     block = createItem("STAINED_GLASS_PANE", "BLUE_STAINED_GLASS_PANE", (short) 11);
                     blockMeta = block.getItemMeta();
-                    blockMeta.setDisplayName(ChatColor.AQUA + json.getJSONObject("server").getString("display"));
+                    blockMeta.setDisplayName(ChatColor.AQUA + json.getSection("server").getString("display"));
                     LinkedList<String> lore = new LinkedList<String>();
-                    if (!subserver.equals(json.getJSONObject("server").getString("display")))
+                    if (!subserver.equals(json.getSection("server").getString("display")))
                         lore.add(ChatColor.GRAY + subserver);
-                    lore.add(plugin.api.getLang("SubServers", "Interface.Server-Menu.Server-Player-Count").replace("$int$", new DecimalFormat("#,###").format(json.getJSONObject("server").getJSONObject("players").keySet().size())));
+                    lore.add(plugin.api.getLang("SubServers", "Interface.Server-Menu.Server-Player-Count").replace("$int$", new DecimalFormat("#,###").format(json.getSection("server").getSection("players").getKeys().size())));
                     lore.add(plugin.api.getLang("SubServers", "Interface.Server-Menu.SubServer-Temporary"));
-                    lore.add(ChatColor.WHITE + ((plugin.config.get().getSection("Settings").getBoolean("Show-Addresses", false))?json.getJSONObject("server").getString("address"):json.getJSONObject("server").getString("address").split(":")[json.getJSONObject("server").getString("address").split(":").length - 1]));
+                    lore.add(ChatColor.WHITE + ((plugin.config.get().getSection("Settings").getBoolean("Show-Addresses", false))?json.getSection("server").getString("address"):json.getSection("server").getString("address").split(":")[json.getSection("server").getString("address").split(":").length - 1]));
                     blockMeta.setLore(lore);
-                } else if (json.getJSONObject("server").getBoolean("running")) {
+                } else if (json.getSection("server").getBoolean("running")) {
                     block = createItem("STAINED_GLASS_PANE", "LIME_STAINED_GLASS_PANE", (short) 5);
                     blockMeta = block.getItemMeta();
-                    blockMeta.setDisplayName(ChatColor.GREEN + json.getJSONObject("server").getString("display"));
+                    blockMeta.setDisplayName(ChatColor.GREEN + json.getSection("server").getString("display"));
                     LinkedList<String> lore = new LinkedList<String>();
-                    if (!subserver.equals(json.getJSONObject("server").getString("display")))
+                    if (!subserver.equals(json.getSection("server").getString("display")))
                         lore.add(ChatColor.GRAY + subserver);
-                    lore.add(plugin.api.getLang("SubServers", "Interface.Server-Menu.Server-Player-Count").replace("$int$", new DecimalFormat("#,###").format(json.getJSONObject("server").getJSONObject("players").keySet().size())));
-                    lore.add(ChatColor.WHITE + ((plugin.config.get().getSection("Settings").getBoolean("Show-Addresses", false))?json.getJSONObject("server").getString("address"):json.getJSONObject("server").getString("address").split(":")[json.getJSONObject("server").getString("address").split(":").length - 1]));
+                    lore.add(plugin.api.getLang("SubServers", "Interface.Server-Menu.Server-Player-Count").replace("$int$", new DecimalFormat("#,###").format(json.getSection("server").getSection("players").getKeys().size())));
+                    lore.add(ChatColor.WHITE + ((plugin.config.get().getSection("Settings").getBoolean("Show-Addresses", false))?json.getSection("server").getString("address"):json.getSection("server").getString("address").split(":")[json.getSection("server").getString("address").split(":").length - 1]));
                     blockMeta.setLore(lore);
-                } else if (json.getJSONObject("server").getBoolean("enabled") && json.getJSONObject("server").getJSONArray("incompatible").length() == 0) {
+                } else if (json.getSection("server").getBoolean("enabled") && json.getSection("server").getList("incompatible").size() == 0) {
                     block = createItem("STAINED_GLASS_PANE", "YELLOW_STAINED_GLASS_PANE", (short) 4);
                     blockMeta = block.getItemMeta();
-                    blockMeta.setDisplayName(ChatColor.YELLOW + json.getJSONObject("server").getString("display"));
+                    blockMeta.setDisplayName(ChatColor.YELLOW + json.getSection("server").getString("display"));
                     LinkedList<String> lore = new LinkedList<String>();
-                    if (!subserver.equals(json.getJSONObject("server").getString("display")))
+                    if (!subserver.equals(json.getSection("server").getString("display")))
                         lore.add(ChatColor.GRAY + subserver);
                     lore.add(plugin.api.getLang("SubServers", "Interface.Server-Menu.SubServer-Offline"));
-                    lore.add(ChatColor.WHITE + ((plugin.config.get().getSection("Settings").getBoolean("Show-Addresses", false))?json.getJSONObject("server").getString("address"):json.getJSONObject("server").getString("address").split(":")[json.getJSONObject("server").getString("address").split(":").length - 1]));
+                    lore.add(ChatColor.WHITE + ((plugin.config.get().getSection("Settings").getBoolean("Show-Addresses", false))?json.getSection("server").getString("address"):json.getSection("server").getString("address").split(":")[json.getSection("server").getString("address").split(":").length - 1]));
                     blockMeta.setLore(lore);
                 } else {
                     block = createItem("STAINED_GLASS_PANE", "RED_STAINED_GLASS_PANE", (short) 14);
                     blockMeta = block.getItemMeta();
-                    blockMeta.setDisplayName(ChatColor.RED + json.getJSONObject("server").getString("display"));
+                    blockMeta.setDisplayName(ChatColor.RED + json.getSection("server").getString("display"));
                     LinkedList<String> lore = new LinkedList<String>();
-                    if (!subserver.equals(json.getJSONObject("server").getString("display")))
+                    if (!subserver.equals(json.getSection("server").getString("display")))
                         lore.add(ChatColor.GRAY + subserver);
-                    if (json.getJSONObject("server").getJSONArray("incompatible").length() != 0) {
+                    if (json.getSection("server").getList("incompatible").size() != 0) {
                         String list = "";
-                        for (int ii = 0; ii < json.getJSONObject("server").getJSONArray("incompatible").length(); ii++) {
+                        for (int ii = 0; ii < json.getSection("server").getList("incompatible").size(); ii++) {
                             if (list.length() != 0) list += ", ";
-                            list += json.getJSONObject("server").getJSONArray("incompatible").getString(ii);
+                            list += json.getSection("server").getList("incompatible").get(ii).asString();
                         }
                         lore.add(plugin.api.getLang("SubServers", "Interface.Server-Menu.SubServer-Incompatible").replace("$str$", list));
                     }
-                    if (!json.getJSONObject("server").getBoolean("enabled")) lore.add(plugin.api.getLang("SubServers", "Interface.Server-Menu.SubServer-Disabled"));
-                    lore.add(ChatColor.WHITE + ((plugin.config.get().getSection("Settings").getBoolean("Show-Addresses", false))?json.getJSONObject("server").getString("address"):json.getJSONObject("server").getString("address").split(":")[json.getJSONObject("server").getString("address").split(":").length - 1]));
+                    if (!json.getSection("server").getBoolean("enabled")) lore.add(plugin.api.getLang("SubServers", "Interface.Server-Menu.SubServer-Disabled"));
+                    lore.add(ChatColor.WHITE + ((plugin.config.get().getSection("Settings").getBoolean("Show-Addresses", false))?json.getSection("server").getString("address"):json.getSection("server").getString("address").split(":")[json.getSection("server").getString("address").split(":").length - 1]));
                     blockMeta.setLore(lore);
                 }
                 block.setItemMeta(blockMeta);
@@ -1170,7 +1170,7 @@ public class InternalUIRenderer extends UIRenderer {
                 lastPage = page;
                 List<String> renderers = new ArrayList<String>();
                 for (String renderer : renderers) {
-                    if (subserverPlugins.get(renderer).isEnabled(json.getJSONObject("server"))) renderers.add(renderer);
+                    if (subserverPlugins.get(renderer).isEnabled(json.getSection("server"))) renderers.add(renderer);
                 }
                 Collections.sort(renderers);
 
@@ -1187,7 +1187,7 @@ public class InternalUIRenderer extends UIRenderer {
                 int count = (renderers.size() == 0)?27:((renderers.size() - min >= max)?36:renderers.size() - min);
                 int area = (count % 9 == 0) ? count : (int) (Math.floor(count / 9) + 1) * 9;
 
-                Inventory inv = Bukkit.createInventory(null, 18 + area, plugin.api.getLang("SubServers", "Interface.SubServer-Plugin.Title").replace("$str$", json.getJSONObject("server").getString("display")));
+                Inventory inv = Bukkit.createInventory(null, 18 + area, plugin.api.getLang("SubServers", "Interface.SubServer-Plugin.Title").replace("$str$", json.getSection("server").getString("display")));
                 block = createItem("STAINED_GLASS_PANE", "GRAY_STAINED_GLASS_PANE", (short) 7);
                 block.setItemMeta(divMeta);
                 while (i < area) {

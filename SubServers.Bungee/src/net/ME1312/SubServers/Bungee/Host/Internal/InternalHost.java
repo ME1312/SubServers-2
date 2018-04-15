@@ -1,6 +1,5 @@
 package net.ME1312.SubServers.Bungee.Host.Internal;
 
-import com.google.common.io.Files;
 import net.ME1312.SubServers.Bungee.Event.SubAddServerEvent;
 import net.ME1312.SubServers.Bungee.Event.SubRemoveServerEvent;
 import net.ME1312.SubServers.Bungee.Host.Executable;
@@ -12,7 +11,6 @@ import net.ME1312.SubServers.Bungee.Host.SubServer;
 import net.ME1312.SubServers.Bungee.Library.UniversalFile;
 import net.ME1312.SubServers.Bungee.Library.Util;
 import net.ME1312.SubServers.Bungee.SubPlugin;
-import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -159,9 +157,9 @@ public class InternalHost extends Host {
                 }
 
                 System.out.println("SubServers > Saving...");
-                JSONObject json = (plugin.config.get().getSection("Servers").getKeys().contains(server))?plugin.config.get().getSection("Servers").getSection(server).toJSON():new JSONObject();
-                json.put("Name", server);
-                json.put("Timestamp", Calendar.getInstance().getTime().getTime());
+                YAMLSection info = (plugin.config.get().getSection("Servers").getKeys().contains(server))?plugin.config.get().getSection("Servers").getSection(server).clone():new YAMLSection();
+                info.set("Name", server);
+                info.set("Timestamp", Calendar.getInstance().getTime().getTime());
                 try {
                     if (plugin.config.get().getSection("Servers").getKeys().contains(server)) {
                         plugin.config.get().getSection("Servers").remove(server);
@@ -169,7 +167,7 @@ public class InternalHost extends Host {
                     }
                     if (!to.exists()) to.mkdirs();
                     FileWriter writer = new FileWriter(new File(to, "info.json"));
-                    json.write(writer);
+                    writer.write(info.toJSON());
                     writer.close();
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -204,9 +202,9 @@ public class InternalHost extends Host {
                 }
 
                 System.out.println("SubServers > Saving...");
-                JSONObject json = (plugin.config.get().getSection("Servers").getKeys().contains(server))?plugin.config.get().getSection("Servers").getSection(server).toJSON():new JSONObject();
-                json.put("Name", server);
-                json.put("Timestamp", Calendar.getInstance().getTime().getTime());
+                YAMLSection info = (plugin.config.get().getSection("Servers").getKeys().contains(server))?plugin.config.get().getSection("Servers").getSection(server).clone():new YAMLSection();
+                info.set("Name", server);
+                info.set("Timestamp", Calendar.getInstance().getTime().getTime());
                 try {
                     if (plugin.config.get().getSection("Servers").getKeys().contains(server)) {
                         plugin.config.get().getSection("Servers").remove(server);
@@ -214,7 +212,7 @@ public class InternalHost extends Host {
                     }
                     if (!to.exists()) to.mkdirs();
                     FileWriter writer = new FileWriter(new File(to, "info.json"), false);
-                    json.write(writer);
+                    writer.write(info.toJSON());
                     writer.close();
                 } catch (Exception e) {
                     e.printStackTrace();

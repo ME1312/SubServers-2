@@ -1,5 +1,6 @@
 package net.ME1312.SubServers.Client.Bukkit.Network.Packet;
 
+import net.ME1312.SubServers.Client.Bukkit.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Client.Bukkit.Library.Util;
 import net.ME1312.SubServers.Client.Bukkit.Library.Version.Version;
 import net.ME1312.SubServers.Client.Bukkit.Network.PacketIn;
@@ -7,7 +8,6 @@ import net.ME1312.SubServers.Client.Bukkit.Network.PacketOut;
 import net.ME1312.SubServers.Client.Bukkit.Network.SubDataClient;
 import net.ME1312.SubServers.Client.Bukkit.SubPlugin;
 import org.bukkit.Bukkit;
-import org.json.JSONObject;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -29,21 +29,21 @@ public class PacketLinkServer implements PacketIn, PacketOut {
     }
 
     @Override
-    public JSONObject generate() {
-        JSONObject json = new JSONObject();
-        json.put("name", plugin.subdata.getName());
-        json.put("port", Bukkit.getServer().getPort());
+    public YAMLSection generate() {
+        YAMLSection json = new YAMLSection();
+        json.set("name", plugin.subdata.getName());
+        json.set("port", Bukkit.getServer().getPort());
         return json;
     }
 
     @Override
-    public void execute(JSONObject data) {
+    public void execute(YAMLSection data) {
         if (data.getInt("r") == 0) {
             try {
-                if (data.keySet().contains("n")) {
+                if (data.contains("n")) {
                     Field f = SubDataClient.class.getDeclaredField("name");
                     f.setAccessible(true);
-                    f.set(plugin.subdata, data.getString("n"));
+                    f.set(plugin.subdata, data.getRawString("n"));
                     f.setAccessible(false);
                 }
                 Method m = SubDataClient.class.getDeclaredMethod("init");
@@ -60,7 +60,7 @@ public class PacketLinkServer implements PacketIn, PacketOut {
                     }
                 }
             } catch (Exception e) {}
-            Bukkit.getLogger().info("SubData > Could not link name with server: " + data.getString("m"));
+            Bukkit.getLogger().info("SubData > Could not link name with server: " + data.getRawString("m"));
             plugin.onDisable();
         }
     }

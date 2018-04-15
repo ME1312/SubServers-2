@@ -1,8 +1,10 @@
 package net.ME1312.SubServers.Client.Bukkit;
 
+import com.google.gson.Gson;
 import net.ME1312.SubServers.Client.Bukkit.Graphic.InternalUIHandler;
 import net.ME1312.SubServers.Client.Bukkit.Graphic.UIHandler;
 import net.ME1312.SubServers.Client.Bukkit.Library.Config.YAMLConfig;
+import net.ME1312.SubServers.Client.Bukkit.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Client.Bukkit.Library.Metrics;
 import net.ME1312.SubServers.Client.Bukkit.Library.NamedContainer;
 import net.ME1312.SubServers.Client.Bukkit.Library.UniversalFile;
@@ -13,7 +15,6 @@ import net.ME1312.SubServers.Client.Bukkit.Network.Cipher;
 import net.ME1312.SubServers.Client.Bukkit.Network.SubDataClient;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.json.JSONObject;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -47,13 +48,14 @@ public final class SubPlugin extends JavaPlugin {
         super();
         //version = new Version(getDescription().getVersion());
         //version = new Version(new Version(getDescription().getVersion()), VersionType.BETA, 1); // TODO Beta Version Setting
-        version = new Version(new Version(new Version(getDescription().getVersion()), VersionType.PRE_RELEASE, 3), VersionType.BETA, 1); // TODO Beta Version Setting
+        version = new Version(new Version(new Version(getDescription().getVersion()), VersionType.PRE_RELEASE, 3), VersionType.BETA, 2); // TODO Beta Version Setting
     }
 
     /**
      * Enable Plugin
      */
     @Override
+    @SuppressWarnings("unchecked")
     public void onEnable() {
         try {
             Bukkit.getLogger().info("SubServers > Loading SubServers.Client.Bukkit v" + version.toString() + " Libraries (for Minecraft " + api.getGameVersion() + ")");
@@ -74,7 +76,7 @@ public final class SubPlugin extends JavaPlugin {
             config = new YAMLConfig(new UniversalFile(getDataFolder(), "config.yml"));
             if (new UniversalFile(new File(System.getProperty("user.dir")), "subservers.client").exists()) {
                 FileReader reader = new FileReader(new UniversalFile(new File(System.getProperty("user.dir")), "subservers.client"));
-                config.get().getSection("Settings").set("SubData", new JSONObject(Util.readAll(reader)));
+                config.get().getSection("Settings").set("SubData", new YAMLSection(new Gson().fromJson(Util.readAll(reader), Map.class)));
                 config.save();
                 reader.close();
                 new UniversalFile(new File(System.getProperty("user.dir")), "subservers.client").delete();

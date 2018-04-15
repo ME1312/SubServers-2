@@ -1,10 +1,11 @@
 package net.ME1312.SubServers.Bungee.Network;
 
+import com.google.gson.JsonParseException;
+import net.ME1312.SubServers.Bungee.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Bungee.Library.Exception.IllegalPacketException;
 import net.ME1312.SubServers.Bungee.Library.Util;
 import net.ME1312.SubServers.Bungee.Network.Packet.PacketAuthorization;
-import org.json.JSONException;
-import org.json.JSONObject;
+import org.yaml.snakeyaml.error.YAMLException;
 
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
@@ -62,38 +63,38 @@ public class Client {
                 String input;
                 while ((input = in.readLine()) != null) {
                     try {
-                        JSONObject json = subdata.getCipher().decrypt(subdata.plugin.config.get().getSection("Settings").getSection("SubData").getRawString("Password"), Base64.getDecoder().decode(input));
-                        for (PacketIn packet : SubDataServer.decodePacket(this, json)) {
+                        YAMLSection data = subdata.getCipher().decrypt(subdata.plugin.config.get().getSection("Settings").getSection("SubData").getRawString("Password"), Base64.getDecoder().decode(input));
+                        for (PacketIn packet : SubDataServer.decodePacket(this, data)) {
                             boolean auth = authorized == null;
                             if (auth || packet instanceof PacketAuthorization) {
                                 try {
-                                    if (json.keySet().contains("f")) {
-                                        if (json.getString("f").length() <= 0) {
+                                    if (data.contains("f")) {
+                                        if (data.getString("f").length() <= 0) {
                                             List<Client> clients = new ArrayList<Client>();
                                             clients.addAll(subdata.getClients());
                                             for (Client client : clients) {
                                                 client.writer.println(input);
                                             }
                                         } else {
-                                            Client client = subdata.getClient(json.getString("f"));
+                                            Client client = subdata.getClient(data.getString("f"));
                                             if (client != null) {
                                                 client.writer.println(input);
                                             } else {
-                                                throw new IllegalPacketException(getAddress().toString() + ": Unknown Forward Address: " + json.getString("f"));
+                                                throw new IllegalPacketException(getAddress().toString() + ": Unknown Forward Address: " + data.getString("f"));
                                             }
                                         }
                                     } else {
-                                        packet.execute(Client.this, (json.keySet().contains("c"))?json.getJSONObject("c"):null);
+                                        packet.execute(Client.this, (data.contains("c"))?data.getSection("c"):null);
                                     }
                                 } catch (Throwable e) {
                                     new InvocationTargetException(e, getAddress().toString() + ": Exception while executing PacketIn").printStackTrace();
                                 }
                             } else {
                                 sendPacket(new PacketAuthorization(-1, "Unauthorized"));
-                                throw new IllegalPacketException(getAddress().toString() + ": Unauthorized call to packet type: " + json.getJSONObject("h"));
+                                throw new IllegalPacketException(getAddress().toString() + ": Unauthorized call to packet type: " + data.getSection("h"));
                             }
                         }
-                    } catch (JSONException e) {
+                    } catch (JsonParseException | YAMLException e) {
                         new IllegalPacketException(getAddress().toString() + ": Unknown Packet Format: " + input).printStackTrace();
                     } catch (IllegalPacketException e) {
                         e.printStackTrace();

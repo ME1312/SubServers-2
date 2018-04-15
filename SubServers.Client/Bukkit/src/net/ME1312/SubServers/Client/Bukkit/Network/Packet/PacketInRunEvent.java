@@ -1,13 +1,13 @@
 package net.ME1312.SubServers.Client.Bukkit.Network.Packet;
 
 import net.ME1312.SubServers.Client.Bukkit.Event.*;
-import net.ME1312.SubServers.Client.Bukkit.Library.JSONCallback;
+import net.ME1312.SubServers.Client.Bukkit.Library.Callback;
+import net.ME1312.SubServers.Client.Bukkit.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Client.Bukkit.Library.NamedContainer;
 import net.ME1312.SubServers.Client.Bukkit.Library.Version.Version;
 import net.ME1312.SubServers.Client.Bukkit.Network.PacketIn;
 import net.ME1312.SubServers.Client.Bukkit.SubPlugin;
 import org.bukkit.Bukkit;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -18,99 +18,99 @@ import java.util.UUID;
  * Run Event Packet
  */
 public class PacketInRunEvent implements PacketIn {
-    private static HashMap<String, List<JSONCallback>> callbacks = new HashMap<String, List<JSONCallback>>();
+    private static HashMap<String, List<Callback<YAMLSection>>> callbacks = new HashMap<String, List<Callback<YAMLSection>>>();
 
     /**
      * New PacketInRunEvent
      */
     public PacketInRunEvent(SubPlugin plugin) {
-        callback("SubAddHostEvent", new JSONCallback() {
+        callback("SubAddHostEvent", new Callback<YAMLSection>() {
             @Override
-            public void run(JSONObject json) {
+            public void run(YAMLSection data) {
                 if (plugin.isEnabled()) {
-                    Bukkit.getPluginManager().callEvent(new SubAddHostEvent((json.keySet().contains("player")) ? UUID.fromString(json.getString("player")) : null, json.getString("host")));
+                    Bukkit.getPluginManager().callEvent(new SubAddHostEvent((data.contains("player")) ? UUID.fromString(data.getString("player")) : null, data.getString("host")));
                     callback("SubAddHostEvent", this);
                 }
             }
         });
-        callback("SubAddServerEvent", new JSONCallback() {
+        callback("SubAddServerEvent", new Callback<YAMLSection>() {
             @Override
-            public void run(JSONObject json) {
+            public void run(YAMLSection data) {
                 if (plugin.isEnabled()) {
-                    Bukkit.getPluginManager().callEvent(new SubAddServerEvent((json.keySet().contains("player")) ? UUID.fromString(json.getString("player")) : null, json.getString("host"), json.getString("server")));
+                    Bukkit.getPluginManager().callEvent(new SubAddServerEvent((data.contains("player")) ? UUID.fromString(data.getString("player")) : null, data.getString("host"), data.getString("server")));
                     callback("SubAddServerEvent", this);
                 }
             }
         });
-        callback("SubCreateEvent", new JSONCallback() {
+        callback("SubCreateEvent", new Callback<YAMLSection>() {
             @Override
-            public void run(JSONObject json) {
+            public void run(YAMLSection data) {
                 if (plugin.isEnabled()) {
-                    Bukkit.getPluginManager().callEvent(new SubCreateEvent((json.keySet().contains("player")) ? UUID.fromString(json.getString("player")) : null, json.getString("host"), json.getString("name"),
-                            json.getString("template"), new Version(json.getString("version")), json.getInt("port")));
+                    Bukkit.getPluginManager().callEvent(new SubCreateEvent((data.contains("player")) ? UUID.fromString(data.getString("player")) : null, data.getString("host"), data.getString("name"),
+                            data.getString("template"), new Version(data.getString("version")), data.getInt("port")));
                     callback("SubCreateEvent", this);
                 }
             }
         });
-        callback("SubSendCommandEvent", new JSONCallback() {
+        callback("SubSendCommandEvent", new Callback<YAMLSection>() {
             @Override
-            public void run(JSONObject json) {
+            public void run(YAMLSection data) {
                 if (plugin.isEnabled()) {
-                    Bukkit.getPluginManager().callEvent(new SubSendCommandEvent((json.keySet().contains("player")) ? UUID.fromString(json.getString("player")) : null, json.getString("server"), json.getString("command")));
+                    Bukkit.getPluginManager().callEvent(new SubSendCommandEvent((data.contains("player")) ? UUID.fromString(data.getString("player")) : null, data.getString("server"), data.getString("command")));
                     callback("SubSendCommandEvent", this);
                 }
             }
         });
-        callback("SubEditServerEvent", new JSONCallback() {
+        callback("SubEditServerEvent", new Callback<YAMLSection>() {
             @Override
-            public void run(JSONObject json) {
+            public void run(YAMLSection data) {
                 if (plugin.isEnabled()) {
-                    Bukkit.getPluginManager().callEvent(new SubEditServerEvent((json.keySet().contains("player")) ? UUID.fromString(json.getString("player")) : null, json.getString("server"), new NamedContainer<String, Object>(json.getString("edit"), json.get("value")), json.getBoolean("perm")));
+                    Bukkit.getPluginManager().callEvent(new SubEditServerEvent((data.contains("player")) ? UUID.fromString(data.getString("player")) : null, data.getString("server"), new NamedContainer<String, Object>(data.getString("edit"), data.get("value")), data.getBoolean("perm")));
                     callback("SubEditServerEvent", this);
                 }
             }
         });
-        callback("SubStartEvent", new JSONCallback() {
+        callback("SubStartEvent", new Callback<YAMLSection>() {
             @Override
-            public void run(JSONObject json) {
+            public void run(YAMLSection data) {
                 if (plugin.isEnabled()) {
-                    Bukkit.getPluginManager().callEvent(new SubStartEvent((json.keySet().contains("player")) ? UUID.fromString(json.getString("player")) : null, json.getString("server")));
+                    Bukkit.getPluginManager().callEvent(new SubStartEvent((data.contains("player")) ? UUID.fromString(data.getString("player")) : null, data.getString("server")));
                     callback("SubStartEvent", this);
                 }
             }
         });
-        callback("SubStopEvent", new JSONCallback() {
+        callback("SubStopEvent", new Callback<YAMLSection>() {
             @Override
-            public void run(JSONObject json) {
+            public void run(YAMLSection data) {
                 if (plugin.isEnabled()) {
-                    Bukkit.getPluginManager().callEvent(new SubStopEvent((json.keySet().contains("player")) ? UUID.fromString(json.getString("player")) : null, json.getString("server"), json.getBoolean("force")));
+                    Bukkit.getPluginManager().callEvent(new SubStopEvent((data.contains("player")) ? UUID.fromString(data.getString("player")) : null, data.getString("server"), data.getBoolean("force")));
                     callback("SubStopEvent", this);
                 }
             }
         });
-        callback("SubStoppedEvent", new JSONCallback() {
+        callback("SubStoppedEvent", new Callback<YAMLSection>() {
             @Override
-            public void run(JSONObject json) {
+            public void run(YAMLSection data) {
                 if (plugin.isEnabled()) {
-                    Bukkit.getPluginManager().callEvent(new SubStoppedEvent(json.getString("server")));
+                    Bukkit.getPluginManager().callEvent(new SubStoppedEvent(data.getString("server")));
                     callback("SubStoppedEvent", this);
                 }
             }
         });
-        callback("SubRemoveServerEvent", new JSONCallback() {
+        callback("SubRemoveServerEvent", new Callback<YAMLSection>() {
             @Override
-            public void run(JSONObject json) {
+            public void run(YAMLSection data) {
                 if (plugin.isEnabled()) {
-                    Bukkit.getPluginManager().callEvent(new SubRemoveServerEvent((json.keySet().contains("player")) ? UUID.fromString(json.getString("player")) : null, json.getString("host"), json.getString("server")));
+                    Bukkit.getPluginManager().callEvent(new SubRemoveServerEvent((data.contains("player")) ? UUID.fromString(data.getString("player")) : null, data.getString("host"), data.getString("server")));
                     callback("SubRemoveServerEvent", this);
                 }
             }
         });
-        callback("SubRemoveHostEvent", new JSONCallback() {
+        callback("SubRemoveHostEvent", new Callback<YAMLSection>() {
             @Override
-            public void run(JSONObject json) {
+            public void run(YAMLSection data) {
                 if (plugin.isEnabled()) {
-                    Bukkit.getPluginManager().callEvent(new SubRemoveHostEvent((json.keySet().contains("player")) ? UUID.fromString(json.getString("player")) : null, json.getString("host")));
+                    Bukkit.getPluginManager().callEvent(new SubRemoveHostEvent((data.contains("player")) ? UUID.fromString(data.getString("player")) : null, data.getString("host")));
                     callback("SubRemoveHostEvent", this);
                 }
             }
@@ -118,12 +118,12 @@ public class PacketInRunEvent implements PacketIn {
     }
 
     @Override
-    public void execute(JSONObject data) {
+    public void execute(YAMLSection data) {
         if (callbacks.keySet().contains(data.getString("type"))) {
-            List<JSONCallback> callbacks = PacketInRunEvent.callbacks.get(data.getString("type"));
+            List<Callback<YAMLSection>> callbacks = PacketInRunEvent.callbacks.get(data.getString("type"));
             PacketInRunEvent.callbacks.remove(data.getString("type"));
-            for (JSONCallback callback : callbacks) {
-                callback.run(data.getJSONObject("args"));
+            for (Callback callback : callbacks) {
+                callback.run(data.getSection("args"));
             }
         }
     }
@@ -133,8 +133,8 @@ public class PacketInRunEvent implements PacketIn {
         return new Version("2.11.0a");
     }
 
-    public static void callback(String event, JSONCallback callback) {
-        List<JSONCallback> callbacks = (PacketInRunEvent.callbacks.keySet().contains(event))?PacketInRunEvent.callbacks.get(event):new ArrayList<JSONCallback>();
+    public static void callback(String event, Callback<YAMLSection> callback) {
+        List<Callback<YAMLSection>> callbacks = (PacketInRunEvent.callbacks.keySet().contains(event))?PacketInRunEvent.callbacks.get(event):new ArrayList<Callback<YAMLSection>>();
         callbacks.add(callback);
         PacketInRunEvent.callbacks.put(event, callbacks);
     }

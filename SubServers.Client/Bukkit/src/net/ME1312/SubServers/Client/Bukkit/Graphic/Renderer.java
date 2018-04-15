@@ -1,8 +1,8 @@
 package net.ME1312.SubServers.Client.Bukkit.Graphic;
 
+import net.ME1312.SubServers.Client.Bukkit.Library.Config.YAMLSection;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.json.JSONObject;
 
 /**
  * GUI Renderer Layout Class
@@ -15,7 +15,7 @@ public interface Renderer {
      * @param player Player Opening
      * @param object JSON Representation of an Object
      */
-    void open(Player player, JSONObject object);
+    void open(Player player, YAMLSection object);
 
     /**
      * Get Renderer Icon
@@ -30,5 +30,5 @@ public interface Renderer {
      * @param object JSON Representation of an Object
      * @return Enabled Status
      */
-    boolean isEnabled(JSONObject object);
+    boolean isEnabled(YAMLSection object);
 }

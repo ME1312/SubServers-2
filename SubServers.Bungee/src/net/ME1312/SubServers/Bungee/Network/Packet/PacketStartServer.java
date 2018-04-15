@@ -2,13 +2,13 @@ package net.ME1312.SubServers.Bungee.Network.Packet;
 
 import net.ME1312.SubServers.Bungee.Host.Server;
 import net.ME1312.SubServers.Bungee.Host.SubServer;
+import net.ME1312.SubServers.Bungee.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Bungee.Library.Util;
 import net.ME1312.SubServers.Bungee.Library.Version.Version;
 import net.ME1312.SubServers.Bungee.Network.Client;
 import net.ME1312.SubServers.Bungee.Network.PacketIn;
 import net.ME1312.SubServers.Bungee.Network.PacketOut;
 import net.ME1312.SubServers.Bungee.SubPlugin;
-import org.json.JSONObject;
 
 import java.util.Map;
 import java.util.UUID;
@@ -47,44 +47,44 @@ public class PacketStartServer implements PacketIn, PacketOut {
     }
 
     @Override
-    public JSONObject generate() {
-        JSONObject json = new JSONObject();
-        json.put("id", id);
-        json.put("r", response);
-        json.put("m", message);
+    public YAMLSection generate() {
+        YAMLSection json = new YAMLSection();
+        json.set("id", id);
+        json.set("r", response);
+        json.set("m", message);
         return json;
     }
 
     @Override
-    public void execute(Client client, JSONObject data) {
+    public void execute(Client client, YAMLSection data) {
         try {
             Map<String, Server> servers = plugin.api.getServers();
-            if (!servers.keySet().contains(data.getString("server").toLowerCase())) {
-                client.sendPacket(new PacketStartServer(3, "There is no server with that name", (data.keySet().contains("id"))?data.getString("id"):null));
-            } else if (!(servers.get(data.getString("server").toLowerCase()) instanceof SubServer)) {
-                client.sendPacket(new PacketStartServer(4, "That Server is not a SubServer", (data.keySet().contains("id"))?data.getString("id"):null));
-            } else if (!((SubServer) servers.get(data.getString("server").toLowerCase())).getHost().isEnabled()) {
-                client.sendPacket(new PacketStartServer(5, "That SubServer's Host is not enabled", (data.keySet().contains("id"))?data.getString("id"):null));
-            } else if (!((SubServer) servers.get(data.getString("server").toLowerCase())).isEnabled()) {
-                client.sendPacket(new PacketStartServer(5, "That SubServer is not enabled", (data.keySet().contains("id"))?data.getString("id"):null));
-            } else if (((SubServer) servers.get(data.getString("server").toLowerCase())).isRunning()) {
-                client.sendPacket(new PacketStartServer(6, "That SubServer is already running", (data.keySet().contains("id")) ? data.getString("id") : null));
-            } else if (((SubServer) servers.get(data.getString("server").toLowerCase())).getCurrentIncompatibilities().size() != 0) {
+            if (!servers.keySet().contains(data.getRawString("server").toLowerCase())) {
+                client.sendPacket(new PacketStartServer(3, "There is no server with that name", (data.contains("id"))?data.getRawString("id"):null));
+            } else if (!(servers.get(data.getRawString("server").toLowerCase()) instanceof SubServer)) {
+                client.sendPacket(new PacketStartServer(4, "That Server is not a SubServer", (data.contains("id"))?data.getRawString("id"):null));
+            } else if (!((SubServer) servers.get(data.getRawString("server").toLowerCase())).getHost().isEnabled()) {
+                client.sendPacket(new PacketStartServer(5, "That SubServer's Host is not enabled", (data.contains("id"))?data.getRawString("id"):null));
+            } else if (!((SubServer) servers.get(data.getRawString("server").toLowerCase())).isEnabled()) {
+                client.sendPacket(new PacketStartServer(5, "That SubServer is not enabled", (data.contains("id"))?data.getRawString("id"):null));
+            } else if (((SubServer) servers.get(data.getRawString("server").toLowerCase())).isRunning()) {
+                client.sendPacket(new PacketStartServer(6, "That SubServer is already running", (data.contains("id")) ? data.getRawString("id") : null));
+            } else if (((SubServer) servers.get(data.getRawString("server").toLowerCase())).getCurrentIncompatibilities().size() != 0) {
                 String list = "";
-                for (SubServer server : ((SubServer) servers.get(data.getString("server").toLowerCase())).getCurrentIncompatibilities()) {
+                for (SubServer server : ((SubServer) servers.get(data.getRawString("server").toLowerCase())).getCurrentIncompatibilities()) {
                     if (list.length() != 0) list += ", ";
                     list += server.getName();
                 }
-                client.sendPacket(new PacketStartServer(7, "Cannot start SubServer while these servers are running: " + list, (data.keySet().contains("id")) ? data.getString("id") : null));
+                client.sendPacket(new PacketStartServer(7, "Cannot start SubServer while these servers are running: " + list, (data.contains("id")) ? data.getRawString("id") : null));
             } else {
-                if (((SubServer) servers.get(data.getString("server").toLowerCase())).start((data.keySet().contains("player"))?UUID.fromString(data.getString("player")):null)) {
-                    client.sendPacket(new PacketStartServer(0, "Starting SubServer", (data.keySet().contains("id"))?data.getString("id"):null));
+                if (((SubServer) servers.get(data.getRawString("server").toLowerCase())).start((data.contains("player"))?UUID.fromString(data.getRawString("player")):null)) {
+                    client.sendPacket(new PacketStartServer(0, "Starting SubServer", (data.contains("id"))?data.getRawString("id"):null));
                 } else {
-                    client.sendPacket(new PacketStartServer(1, "Couldn't start SubServer", (data.keySet().contains("id"))?data.getString("id"):null));
+                    client.sendPacket(new PacketStartServer(1, "Couldn't start SubServer", (data.contains("id"))?data.getRawString("id"):null));
                 }
             }
         } catch (Throwable e) {
-            client.sendPacket(new PacketStartServer(2, e.getClass().getCanonicalName() + ": " + e.getMessage(), (data.keySet().contains("id"))?data.getString("id"):null));
+            client.sendPacket(new PacketStartServer(2, e.getClass().getCanonicalName() + ": " + e.getMessage(), (data.contains("id"))?data.getRawString("id"):null));
             e.printStackTrace();
         }
     }

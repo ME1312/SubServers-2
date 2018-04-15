@@ -1,8 +1,8 @@
 package net.ME1312.SubServers.Host.Network.Packet;
 
+import net.ME1312.SubServers.Host.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Host.Library.Version.Version;
 import net.ME1312.SubServers.Host.Network.PacketOut;
-import org.json.JSONObject;
 
 import java.util.UUID;
 
@@ -22,11 +22,11 @@ public class PacketOutExLogMessage implements PacketOut {
     }
 
     @Override
-    public JSONObject generate() {
-        JSONObject json = new JSONObject();
-        json.put("h", address.toString());
-        json.put("m", line);
-        return json;
+    public YAMLSection generate() {
+        YAMLSection data = new YAMLSection();
+        data.set("h", address.toString());
+        data.set("m", line);
+        return data;
     }
 
     @Override

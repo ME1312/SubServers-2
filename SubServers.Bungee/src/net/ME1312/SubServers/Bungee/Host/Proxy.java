@@ -9,7 +9,6 @@ import net.ME1312.SubServers.Bungee.Network.Client;
 import net.ME1312.SubServers.Bungee.Network.ClientHandler;
 import net.ME1312.SubServers.Bungee.SubAPI;
 import net.ME1312.SubServers.Bungee.SubPlugin;
-import org.json.JSONObject;
 
 import java.util.*;
 
@@ -134,20 +133,20 @@ public class Proxy implements ClientHandler, ExtraDataHandler {
 
     @Override
     public String toString() {
-        JSONObject info = new JSONObject();
-        info.put("type", "Proxy");
-        info.put("name", getName());
-        info.put("display", getDisplayName());
-        JSONObject players = new JSONObject();
+        YAMLSection info = new YAMLSection();
+        info.set("type", "Proxy");
+        info.set("name", getName());
+        info.set("display", getDisplayName());
+        YAMLSection players = new YAMLSection();
         for (NamedContainer<String, UUID> player : getPlayers()) {
-            JSONObject pinfo = new JSONObject();
-            pinfo.put("name", player.name());
-            players.put(player.get().toString(), pinfo);
+            YAMLSection pinfo = new YAMLSection();
+            pinfo.set("name", player.name());
+            players.set(player.get().toString(), pinfo);
         }
-        info.put("players", players);
-        if (getSubData() != null) info.put("subdata", getSubData().getAddress().toString());
-        info.put("signature", signature);
-        info.put("extra", getExtra().toJSON());
-        return info.toString();
+        info.set("players", players);
+        if (getSubData() != null) info.set("subdata", getSubData().getAddress().toString());
+        info.set("signature", signature);
+        info.set("extra", getExtra().toJSON());
+        return info.toJSON();
     }
 }

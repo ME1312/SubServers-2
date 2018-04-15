@@ -1,22 +1,20 @@
 package net.ME1312.SubServers.Client.Bukkit.Network.Packet;
 
-import net.ME1312.SubServers.Client.Bukkit.Library.JSONCallback;
+import net.ME1312.SubServers.Client.Bukkit.Library.Callback;
+import net.ME1312.SubServers.Client.Bukkit.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Client.Bukkit.Library.Util;
 import net.ME1312.SubServers.Client.Bukkit.Library.Version.Version;
 import net.ME1312.SubServers.Client.Bukkit.Network.PacketIn;
 import net.ME1312.SubServers.Client.Bukkit.Network.PacketOut;
-import org.json.JSONObject;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.UUID;
 
 /**
  * Download Player List Packet
  */
 public class PacketDownloadPlayerList implements PacketIn, PacketOut {
-    private static HashMap<String, JSONCallback[]> callbacks = new HashMap<String, JSONCallback[]>();
+    private static HashMap<String, Callback<YAMLSection>[]> callbacks = new HashMap<String, Callback<YAMLSection>[]>();
     private String id;
 
     /**
@@ -29,16 +27,16 @@ public class PacketDownloadPlayerList implements PacketIn, PacketOut {
      *
      * @param callback Callbacks
      */
-    public PacketDownloadPlayerList(JSONCallback... callback) {
+    public PacketDownloadPlayerList(Callback... callback) {
         if (Util.isNull((Object) callback)) throw new NullPointerException();
         this.id = Util.getNew(callbacks.keySet(), UUID::randomUUID).toString();
         callbacks.put(id, callback);
     }
     @Override
-    public JSONObject generate() {
+    public YAMLSection generate() {
         if (id != null) {
-            JSONObject json = new JSONObject();
-            json.put("id", id);
+            YAMLSection json = new YAMLSection();
+            json.set("id", id);
             return json;
         } else {
             return null;
@@ -46,9 +44,9 @@ public class PacketDownloadPlayerList implements PacketIn, PacketOut {
     }
 
     @Override
-    public void execute(JSONObject data) {
-        for (JSONCallback callback : callbacks.get(data.getString("id"))) callback.run(data);
-        callbacks.remove(data.getString("id"));
+    public void execute(YAMLSection data) {
+        for (Callback<YAMLSection> callback : callbacks.get(data.getRawString("id"))) callback.run(data);
+        callbacks.remove(data.getRawString("id"));
     }
 
     @Override

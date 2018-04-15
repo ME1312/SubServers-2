@@ -1,13 +1,11 @@
 package net.ME1312.SubServers.Host.Network.Packet;
 
 import net.ME1312.SubServers.Host.ExHost;
+import net.ME1312.SubServers.Host.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Host.Library.Version.Version;
 import net.ME1312.SubServers.Host.Network.PacketIn;
-import org.json.JSONObject;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Reload Packet
@@ -20,7 +18,7 @@ public class PacketInReload implements PacketIn {
     }
 
     @Override
-    public void execute(JSONObject data) {
+    public void execute(YAMLSection data) {
         try {
             host.reload();
         } catch (IOException e) {

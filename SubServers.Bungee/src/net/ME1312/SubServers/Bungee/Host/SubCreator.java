@@ -1,29 +1,13 @@
 package net.ME1312.SubServers.Bungee.Host;
 
 import net.ME1312.SubServers.Bungee.Library.Config.YAMLSection;
-import net.ME1312.SubServers.Bungee.Library.Container;
-import net.ME1312.SubServers.Bungee.Library.Exception.InvalidServerException;
 import net.ME1312.SubServers.Bungee.Library.Exception.InvalidTemplateException;
 import net.ME1312.SubServers.Bungee.Library.Util;
 import net.ME1312.SubServers.Bungee.Library.Version.Version;
 import net.ME1312.SubServers.Bungee.SubAPI;
-import org.json.JSONObject;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
 
-import javax.xml.parsers.DocumentBuilderFactory;
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.InputStreamReader;
-import java.io.StringReader;
-import java.lang.reflect.InvocationTargetException;
-import java.net.URL;
-import java.nio.charset.Charset;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * SubCreator Layout Class
@@ -164,12 +148,12 @@ public abstract class SubCreator {
 
         @Override
         public String toString() {
-            JSONObject tinfo = new JSONObject();
-            tinfo.put("enabled", isEnabled());
-            tinfo.put("display", getDisplayName());
-            tinfo.put("icon", getIcon());
-            tinfo.put("type", getType().toString());
-            return tinfo.toString();
+            YAMLSection tinfo = new YAMLSection();
+            tinfo.set("enabled", isEnabled());
+            tinfo.set("display", getDisplayName());
+            tinfo.set("icon", getIcon());
+            tinfo.set("type", getType().toString());
+            return tinfo.toJSON();
         }
     }
     public enum ServerType {

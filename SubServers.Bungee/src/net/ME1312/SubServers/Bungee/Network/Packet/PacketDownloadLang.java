@@ -1,11 +1,11 @@
 package net.ME1312.SubServers.Bungee.Network.Packet;
 
+import net.ME1312.SubServers.Bungee.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Bungee.Library.Version.Version;
 import net.ME1312.SubServers.Bungee.Network.Client;
 import net.ME1312.SubServers.Bungee.Network.PacketIn;
 import net.ME1312.SubServers.Bungee.Network.PacketOut;
 import net.ME1312.SubServers.Bungee.SubPlugin;
-import org.json.JSONObject;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -38,19 +38,19 @@ public class PacketDownloadLang implements PacketIn, PacketOut {
     }
 
     @Override
-    public JSONObject generate() {
-        JSONObject json = new JSONObject();
-        json.put("id", id);
+    public YAMLSection generate() {
+        YAMLSection data = new YAMLSection();
+        data.set("id", id);
         LinkedHashMap<String, Map<String, String>> full = new LinkedHashMap<>();
         for (String channel : plugin.api.getLangChannels())
             full.put(channel, plugin.api.getLang(channel));
-        json.put("Lang", full);
-        return json;
+        data.set("Lang", full);
+        return data;
     }
 
     @Override
-    public void execute(Client client, JSONObject data) {
-        client.sendPacket(new PacketDownloadLang(plugin, (data != null && data.keySet().contains("id"))?data.getString("id"):null));
+    public void execute(Client client, YAMLSection data) {
+        client.sendPacket(new PacketDownloadLang(plugin, (data != null && data.contains("id"))?data.getRawString("id"):null));
     }
 
     @Override

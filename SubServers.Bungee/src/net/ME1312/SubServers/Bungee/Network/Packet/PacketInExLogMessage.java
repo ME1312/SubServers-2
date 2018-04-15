@@ -1,11 +1,11 @@
 package net.ME1312.SubServers.Bungee.Network.Packet;
 
 import net.ME1312.SubServers.Bungee.Host.External.ExternalSubLogger;
+import net.ME1312.SubServers.Bungee.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Bungee.Library.Util;
 import net.ME1312.SubServers.Bungee.Library.Version.Version;
 import net.ME1312.SubServers.Bungee.Network.Client;
 import net.ME1312.SubServers.Bungee.Network.PacketIn;
-import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.UUID;
@@ -22,10 +22,10 @@ public class PacketInExLogMessage implements PacketIn {
     public PacketInExLogMessage() {}
 
     @Override
-    public void execute(Client client, JSONObject data) {
+    public void execute(Client client, YAMLSection data) {
         try {
-            if (data.keySet().contains("h") && data.keySet().contains("m") && data.getString("m").length() != 0 && loggers.keySet().contains(UUID.fromString(data.getString("h")))) {
-                loggers.get(UUID.fromString(data.getString("h"))).log(data.getString("m"));
+            if (data.contains("h") && data.contains("m") && data.getRawString("m").length() != 0 && loggers.keySet().contains(UUID.fromString(data.getRawString("h")))) {
+                loggers.get(UUID.fromString(data.getRawString("h"))).log(data.getRawString("m"));
             }
         } catch (Exception e) {
             e.printStackTrace();

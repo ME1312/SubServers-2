@@ -1,6 +1,6 @@
 package net.ME1312.SubServers.Bungee.Network;
 
-import org.json.JSONObject;
+import net.ME1312.SubServers.Bungee.Library.Config.YAMLSection;
 
 /**
  * SubData Cipher Layout Class
@@ -20,7 +20,7 @@ public interface Cipher {
      * @param data Data to Encrypt
      * @return Encrypted Data Array
      */
-    byte[] encrypt(String key, JSONObject data) throws Exception;
+    byte[] encrypt(String key, YAMLSection data) throws Exception;
 
     /**
      * Decrypt Encrypted JSON Data
@@ -29,5 +29,5 @@ public interface Cipher {
      * @param data Encrypted Data Array
      * @return JSON Data
      */
-    JSONObject decrypt(String key, byte[] data) throws Exception;
+    YAMLSection decrypt(String key, byte[] data) throws Exception;
 }

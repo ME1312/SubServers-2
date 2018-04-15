@@ -1,7 +1,10 @@
 package net.ME1312.SubServers.Sync.Network;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonParseException;
 import net.ME1312.SubServers.Sync.Event.SubNetworkConnectEvent;
 import net.ME1312.SubServers.Sync.Event.SubNetworkDisconnectEvent;
+import net.ME1312.SubServers.Sync.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Sync.Library.Exception.IllegalPacketException;
 import net.ME1312.SubServers.Sync.Library.NamedContainer;
 import net.ME1312.SubServers.Sync.Library.Util;
@@ -9,8 +12,7 @@ import net.ME1312.SubServers.Sync.Library.Version.Version;
 import net.ME1312.SubServers.Sync.Network.Encryption.AES;
 import net.ME1312.SubServers.Sync.Network.Packet.*;
 import net.ME1312.SubServers.Sync.SubPlugin;
-import org.json.JSONException;
-import org.json.JSONObject;
+import org.yaml.snakeyaml.error.YAMLException;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -60,12 +62,13 @@ public final class SubDataClient {
                 return "NONE";
             }
             @Override
-            public byte[] encrypt(String key, JSONObject data) throws Exception {
-                return data.toString().getBytes(StandardCharsets.UTF_8);
+            public byte[] encrypt(String key, YAMLSection data) {
+                return data.toJSON().getBytes(StandardCharsets.UTF_8);
             }
             @Override
-            public JSONObject decrypt(String key, byte[] data) throws Exception {
-                return new JSONObject(new String(data, StandardCharsets.UTF_8));
+            @SuppressWarnings("unchecked")
+            public YAMLSection decrypt(String key, byte[] data) {
+                return new YAMLSection(new Gson().fromJson(new String(data, StandardCharsets.UTF_8), Map.class));
             }
         };
         this.queue = new LinkedList<NamedContainer<String, PacketOut>>();
@@ -79,19 +82,19 @@ public final class SubDataClient {
     private void init() {
         plugin.subdata.sendPacket(new PacketDownloadLang(plugin));
         plugin.subdata.sendPacket(new PacketLinkProxy(plugin));
-        plugin.subdata.sendPacket(new PacketDownloadProxyInfo(proxy -> plugin.subdata.sendPacket(new PacketDownloadServerList(null, null, json -> {
-            if (plugin.lastReload != proxy.getJSONObject("subservers").getLong("last-reload")) {
+        plugin.subdata.sendPacket(new PacketDownloadProxyInfo(proxy -> plugin.subdata.sendPacket(new PacketDownloadServerList(null, null, data -> {
+            if (plugin.lastReload != proxy.getSection("subservers").getLong("last-reload")) {
                 System.out.println("SubServers > Resetting Server Data");
                 plugin.servers.clear();
-                plugin.lastReload = proxy.getJSONObject("subservers").getLong("last-reload");
+                plugin.lastReload = proxy.getSection("subservers").getLong("last-reload");
             }
-            for (String host : json.getJSONObject("hosts").keySet()) {
-                for (String subserver : json.getJSONObject("hosts").getJSONObject(host).getJSONObject("servers").keySet()) {
-                    plugin.merge(subserver, json.getJSONObject("hosts").getJSONObject(host).getJSONObject("servers").getJSONObject(subserver), true);
+            for (String host : data.getSection("hosts").getKeys()) {
+                for (String subserver : data.getSection("hosts").getSection(host).getSection("servers").getKeys()) {
+                    plugin.merge(subserver, data.getSection("hosts").getSection(host).getSection("servers").getSection(subserver), true);
                 }
             }
-            for (String server : json.getJSONObject("servers").keySet()) {
-                plugin.merge(server, json.getJSONObject("servers").getJSONObject(server), false);
+            for (String server : data.getSection("servers").getKeys()) {
+                plugin.merge(server, data.getSection("servers").getSection(server), false);
             }
         }))));
         while (queue.size() != 0) {
@@ -148,15 +151,15 @@ public final class SubDataClient {
                 String input;
                 while ((input = in.readLine()) != null) {
                     try {
-                        JSONObject json = cipher.decrypt(plugin.config.get().getSection("Settings").getSection("SubData").getRawString("Password"), Base64.getDecoder().decode(input));
-                        for (PacketIn packet : decodePacket(json)) {
+                        YAMLSection data = cipher.decrypt(plugin.config.get().getSection("Settings").getSection("SubData").getRawString("Password"), Base64.getDecoder().decode(input));
+                        for (PacketIn packet : decodePacket(data)) {
                             try {
-                                packet.execute((json.keySet().contains("c")) ? json.getJSONObject("c") : null);
+                                packet.execute((data.contains("c")) ? data.getSection("c") : null);
                             } catch (Throwable e) {
                                 new InvocationTargetException(e, "Exception while executing PacketIn").printStackTrace();
                             }
                         }
-                    } catch (JSONException e) {
+                    } catch (JsonParseException | YAMLException e) {
                         new IllegalPacketException("Unknown Packet Format: " + input).printStackTrace();
                     } catch (IllegalPacketException e) {
                         e.printStackTrace();
@@ -185,6 +188,7 @@ public final class SubDataClient {
      *
      * @return Host Name
      */
+    @SuppressWarnings("unchecked")
     public String getName() {
         if (name != null) {
             return name;
@@ -331,9 +335,9 @@ public final class SubDataClient {
 
     private void sendPacket(NamedContainer<String, PacketOut> packet) {
         try {
-            JSONObject json = encodePacket(packet.get());
-            if (packet.name() != null) json.put("f", packet.name());
-            writer.println(Base64.getEncoder().encodeToString(cipher.encrypt(plugin.config.get().getSection("Settings").getSection("SubData").getRawString("Password"), json)));
+            YAMLSection data = encodePacket(packet.get());
+            if (packet.name() != null) data.set("f", packet.name());
+            writer.println(Base64.getEncoder().encodeToString(cipher.encrypt(plugin.config.get().getSection("Settings").getSection("SubData").getRawString("Password"), data)));
         } catch (Throwable e) {
             e.printStackTrace();
         }
@@ -364,23 +368,23 @@ public final class SubDataClient {
     }
 
     /**
-     * JSON Encode PacketOut
+     * Encode PacketOut
      *
      * @param packet PacketOut
      * @return JSON Formatted Packet
      * @throws IllegalPacketException
      */
-    private static JSONObject encodePacket(PacketOut packet) throws IllegalPacketException, InvocationTargetException {
-        JSONObject json = new JSONObject();
+    private static YAMLSection encodePacket(PacketOut packet) throws IllegalPacketException, InvocationTargetException {
+        YAMLSection json = new YAMLSection();
 
         if (!pOut.keySet().contains(packet.getClass())) throw new IllegalPacketException("Unknown PacketOut Channel: " + packet.getClass().getCanonicalName());
         if (packet.getVersion().toString() == null) throw new NullPointerException("PacketOut Version cannot be null: " + packet.getClass().getCanonicalName());
 
         try {
-            JSONObject contents = packet.generate();
-            json.put("h", pOut.get(packet.getClass()));
-            json.put("v", packet.getVersion().toString());
-            if (contents != null) json.put("c", contents);
+            YAMLSection contents = packet.generate();
+            json.set("h", pOut.get(packet.getClass()));
+            json.set("v", packet.getVersion().toString());
+            if (contents != null) json.set("c", contents);
             return json;
         } catch (Throwable e) {
             throw new InvocationTargetException(e, "Exception while encoding packet");
@@ -388,23 +392,23 @@ public final class SubDataClient {
     }
 
     /**
-     * JSON Decode PacketIn
+     * Decode PacketIn
      *
-     * @param json JSON to Decode
+     * @param data Data to Decode
      * @return PacketIn
      * @throws IllegalPacketException
      * @throws InvocationTargetException
      */
-    private static List<PacketIn> decodePacket(JSONObject json) throws IllegalPacketException, InvocationTargetException {
-        if (!json.keySet().contains("h") || !json.keySet().contains("v")) throw new IllegalPacketException("Unknown Packet Format: " + json.toString());
-        if (!pIn.keySet().contains(json.getString("h"))) throw new IllegalPacketException("Unknown PacketIn Channel: " + json.getString("h"));
+    private static List<PacketIn> decodePacket(YAMLSection data) throws IllegalPacketException, InvocationTargetException {
+        if (!data.contains("h") || !data.contains("v")) throw new IllegalPacketException("Unknown Packet Format: " + data.toString());
+        if (!pIn.keySet().contains(data.getRawString("h"))) throw new IllegalPacketException("Unknown PacketIn Channel: " + data.getRawString("h"));
 
         List<PacketIn> list = new ArrayList<PacketIn>();
-        for (PacketIn packet : pIn.get(json.getString("h"))) {
-            if (packet.isCompatible(new Version(json.getString("v")))) {
+        for (PacketIn packet : pIn.get(data.getRawString("h"))) {
+            if (packet.isCompatible(new Version(data.getRawString("v")))) {
                 list.add(packet);
             } else {
-                new IllegalPacketException("Packet Version Mismatch in " + json.getString("h") + ": " + json.getString("v") + " -> " + packet.getVersion().toString()).printStackTrace();
+                new IllegalPacketException("Packet Version Mismatch in " + data.getRawString("h") + ": " + data.getRawString("v") + " -> " + packet.getVersion().toString()).printStackTrace();
             }
         }
 

@@ -138,9 +138,9 @@ implements <a href="../../../../../../net/ME1312/SubServers/Host/Network/PacketI
 </td>
 </tr>
 <tr class="rowColor">
-<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Host/Network/Packet/PacketDownloadServerList.html#PacketDownloadServerList-java.lang.String-java.lang.String-net.ME1312.SubServers.Host.Library.JSONCallback...-">PacketDownloadServerList</a></span>(java.lang.String&nbsp;host,
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Host/Network/Packet/PacketDownloadServerList.html#PacketDownloadServerList-java.lang.String-java.lang.String-net.ME1312.SubServers.Host.Library.Callback...-">PacketDownloadServerList</a></span>(java.lang.String&nbsp;host,
                         java.lang.String&nbsp;group,
-                        <a href="../../../../../../net/ME1312/SubServers/Host/Library/JSONCallback.html" title="interface in net.ME1312.SubServers.Host.Library">JSONCallback</a>...&nbsp;callback)</code>
+                        <a href="../../../../../../net/ME1312/SubServers/Host/Library/Callback.html" title="interface in net.ME1312.SubServers.Host.Library">Callback</a>&lt;<a href="../../../../../../net/ME1312/SubServers/Host/Library/Config/YAMLSection.html" title="class in net.ME1312.SubServers.Host.Library.Config">YAMLSection</a>&gt;...&nbsp;callback)</code>
 <div class="block">New PacketDownloadServerList (Out)</div>
 </td>
 </tr>
@@ -161,12 +161,12 @@ implements <a href="../../../../../../net/ME1312/SubServers/Host/Network/PacketI
 </tr>
 <tr id="i0" class="altColor">
 <td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Host/Network/Packet/PacketDownloadServerList.html#execute-org.json.JSONObject-">execute</a></span>(org.json.JSONObject&nbsp;data)</code>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Host/Network/Packet/PacketDownloadServerList.html#execute-net.ME1312.SubServers.Host.Library.Config.YAMLSection-">execute</a></span>(<a href="../../../../../../net/ME1312/SubServers/Host/Library/Config/YAMLSection.html" title="class in net.ME1312.SubServers.Host.Library.Config">YAMLSection</a>&nbsp;data)</code>
 <div class="block">Execute Incoming Packet</div>
 </td>
 </tr>
 <tr id="i1" class="rowColor">
-<td class="colFirst"><code>org.json.JSONObject</code></td>
+<td class="colFirst"><code><a href="../../../../../../net/ME1312/SubServers/Host/Library/Config/YAMLSection.html" title="class in net.ME1312.SubServers.Host.Library.Config">YAMLSection</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Host/Network/Packet/PacketDownloadServerList.html#generate--">generate</a></span>()</code>
 <div class="block">Generate JSON Packet Contents</div>
 </td>
@@ -216,15 +216,16 @@ implements <a href="../../../../../../net/ME1312/SubServers/Host/Network/PacketI
 <div class="block">New PacketDownloadServerList (In)</div>
 </li>
 </ul>
-<a name="PacketDownloadServerList-java.lang.String-java.lang.String-net.ME1312.SubServers.Host.Library.JSONCallback...-">
+<a name="PacketDownloadServerList-java.lang.String-java.lang.String-net.ME1312.SubServers.Host.Library.Callback...-">
 <!--   -->
 </a>
 <ul class="blockListLast">
 <li class="blockList">
 <h4>PacketDownloadServerList</h4>
-<pre>public&nbsp;PacketDownloadServerList(java.lang.String&nbsp;host,
-                                java.lang.String&nbsp;group,
-                                <a href="../../../../../../net/ME1312/SubServers/Host/Library/JSONCallback.html" title="interface in net.ME1312.SubServers.Host.Library">JSONCallback</a>...&nbsp;callback)</pre>
+<pre>@SafeVarargs
+public&nbsp;PacketDownloadServerList(java.lang.String&nbsp;host,
+                                              java.lang.String&nbsp;group,
+                                              <a href="../../../../../../net/ME1312/SubServers/Host/Library/Callback.html" title="interface in net.ME1312.SubServers.Host.Library">Callback</a>&lt;<a href="../../../../../../net/ME1312/SubServers/Host/Library/Config/YAMLSection.html" title="class in net.ME1312.SubServers.Host.Library.Config">YAMLSection</a>&gt;...&nbsp;callback)</pre>
 <div class="block">New PacketDownloadServerList (Out)</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
@@ -248,7 +249,7 @@ implements <a href="../../../../../../net/ME1312/SubServers/Host/Network/PacketI
 <ul class="blockList">
 <li class="blockList">
 <h4>generate</h4>
-<pre>public&nbsp;org.json.JSONObject&nbsp;generate()</pre>
+<pre>public&nbsp;<a href="../../../../../../net/ME1312/SubServers/Host/Library/Config/YAMLSection.html" title="class in net.ME1312.SubServers.Host.Library.Config">YAMLSection</a>&nbsp;generate()</pre>
 <div class="block"><span class="descfrmTypeLabel">Description copied from interface:&nbsp;<code><a href="../../../../../../net/ME1312/SubServers/Host/Network/PacketOut.html#generate--">PacketOut</a></code></span></div>
 <div class="block">Generate JSON Packet Contents</div>
 <dl>
@@ -259,18 +260,18 @@ implements <a href="../../../../../../net/ME1312/SubServers/Host/Network/PacketI
 </dl>
 </li>
 </ul>
-<a name="execute-org.json.JSONObject-">
+<a name="execute-net.ME1312.SubServers.Host.Library.Config.YAMLSection-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>execute</h4>
-<pre>public&nbsp;void&nbsp;execute(org.json.JSONObject&nbsp;data)</pre>
-<div class="block"><span class="descfrmTypeLabel">Description copied from interface:&nbsp;<code><a href="../../../../../../net/ME1312/SubServers/Host/Network/PacketIn.html#execute-org.json.JSONObject-">PacketIn</a></code></span></div>
+<pre>public&nbsp;void&nbsp;execute(<a href="../../../../../../net/ME1312/SubServers/Host/Library/Config/YAMLSection.html" title="class in net.ME1312.SubServers.Host.Library.Config">YAMLSection</a>&nbsp;data)</pre>
+<div class="block"><span class="descfrmTypeLabel">Description copied from interface:&nbsp;<code><a href="../../../../../../net/ME1312/SubServers/Host/Network/PacketIn.html#execute-net.ME1312.SubServers.Host.Library.Config.YAMLSection-">PacketIn</a></code></span></div>
 <div class="block">Execute Incoming Packet</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="../../../../../../net/ME1312/SubServers/Host/Network/PacketIn.html#execute-org.json.JSONObject-">execute</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../../net/ME1312/SubServers/Host/Network/PacketIn.html" title="interface in net.ME1312.SubServers.Host.Network">PacketIn</a></code></dd>
+<dd><code><a href="../../../../../../net/ME1312/SubServers/Host/Network/PacketIn.html#execute-net.ME1312.SubServers.Host.Library.Config.YAMLSection-">execute</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../../net/ME1312/SubServers/Host/Network/PacketIn.html" title="interface in net.ME1312.SubServers.Host.Network">PacketIn</a></code></dd>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>data</code> - Incoming Data</dd>
 </dl>

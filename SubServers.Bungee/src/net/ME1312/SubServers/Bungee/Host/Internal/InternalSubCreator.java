@@ -13,7 +13,6 @@ import net.ME1312.SubServers.Bungee.Library.Util;
 import net.ME1312.SubServers.Bungee.Library.Version.Version;
 import net.ME1312.SubServers.Bungee.SubAPI;
 import net.ME1312.SubServers.Bungee.SubPlugin;
-import org.json.JSONObject;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -386,13 +385,13 @@ public class InternalSubCreator extends SubCreator {
                 // if (!new UniversalFile(dir, "mods").exists()) new UniversalFile(dir, "mods").mkdirs();
                 // Util.copyFromJar(SubPlugin.class.getClassLoader(), "net/ME1312/SubServers/Bungee/Library/Files/Client/sponge.jar", new UniversalFile(dir, "mods:SubServers.Client.jar").getPath());
             }
-            JSONObject config = new JSONObject();
+            YAMLSection config = new YAMLSection();
             FileWriter writer = new FileWriter(new UniversalFile(dir, "subservers.client"), false);
-            config.put("Name", name);
-            config.put("Address", host.plugin.config.get().getSection("Settings").getSection("SubData").getRawString("Address", "127.0.0.1").replace("0.0.0.0", "127.0.0.1"));
-            config.put("Password", host.plugin.config.get().getSection("Settings").getSection("SubData").getRawString("Password", ""));
-            config.put("Encryption", host.plugin.config.get().getSection("Settings").getSection("SubData").getRawString("Encryption", "NONE"));
-            config.write(writer);
+            config.set("Name", name);
+            config.set("Address", host.plugin.config.get().getSection("Settings").getSection("SubData").getRawString("Address", "127.0.0.1").replace("0.0.0.0", "127.0.0.1"));
+            config.set("Password", host.plugin.config.get().getSection("Settings").getSection("SubData").getRawString("Password", ""));
+            config.set("Encryption", host.plugin.config.get().getSection("Settings").getSection("SubData").getRawString("Encryption", "NONE"));
+            writer.write(config.toJSON());
             writer.close();
         }
     }

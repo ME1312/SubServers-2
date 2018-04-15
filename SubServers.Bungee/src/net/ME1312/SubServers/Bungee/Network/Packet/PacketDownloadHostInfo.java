@@ -1,21 +1,13 @@
 package net.ME1312.SubServers.Bungee.Network.Packet;
 
 import net.ME1312.SubServers.Bungee.Host.Host;
-import net.ME1312.SubServers.Bungee.Host.SubCreator;
-import net.ME1312.SubServers.Bungee.Host.SubServer;
-import net.ME1312.SubServers.Bungee.Library.NamedContainer;
+import net.ME1312.SubServers.Bungee.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Bungee.Library.Version.Version;
 import net.ME1312.SubServers.Bungee.Network.Client;
-import net.ME1312.SubServers.Bungee.Network.ClientHandler;
 import net.ME1312.SubServers.Bungee.Network.PacketIn;
 import net.ME1312.SubServers.Bungee.Network.PacketOut;
 
 import net.ME1312.SubServers.Bungee.SubPlugin;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
-import org.json.JSONObject;
-
-import java.util.ArrayList;
-import java.util.UUID;
 
 /**
  * Download Host Info Packet
@@ -48,24 +40,24 @@ public class PacketDownloadHostInfo implements PacketIn, PacketOut {
     }
 
     @Override
-    public JSONObject generate() {
-        JSONObject json = new JSONObject();
-        json.put("id", id);
-        JSONObject info = new JSONObject();
+    public YAMLSection generate() {
+        YAMLSection data = new YAMLSection();
+        data.set("id", id);
+        YAMLSection info = new YAMLSection();
 
         if (host != null) {
-            json.put("valid", true);
-            info = new JSONObject(host.toString());
+            data.set("valid", true);
+            info = new YAMLSection(host.toString());
             info.remove("type");
-        } else json.put("valid", false);
+        } else data.set("valid", false);
 
-        json.put("host", info);
-        return json;
+        data.set("host", info);
+        return data;
     }
 
     @Override
-    public void execute(Client client, JSONObject data) {
-        client.sendPacket(new PacketDownloadHostInfo(plugin, plugin.api.getHost(data.getString("host")), (data.keySet().contains("id"))?data.getString("id"):null));
+    public void execute(Client client, YAMLSection data) {
+        client.sendPacket(new PacketDownloadHostInfo(plugin, plugin.api.getHost(data.getRawString("host")), (data.contains("id"))?data.getRawString("id"):null));
     }
 
     @Override

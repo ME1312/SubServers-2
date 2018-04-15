@@ -2,13 +2,13 @@ package net.ME1312.SubServers.Bungee.Network.Packet;
 
 import net.ME1312.SubServers.Bungee.Host.Server;
 import net.ME1312.SubServers.Bungee.Host.SubServer;
+import net.ME1312.SubServers.Bungee.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Bungee.Library.Util;
 import net.ME1312.SubServers.Bungee.Library.Version.Version;
 import net.ME1312.SubServers.Bungee.Network.Client;
 import net.ME1312.SubServers.Bungee.Network.PacketIn;
 import net.ME1312.SubServers.Bungee.Network.PacketOut;
 import net.ME1312.SubServers.Bungee.SubPlugin;
-import org.json.JSONObject;
 
 import java.util.Map;
 import java.util.UUID;
@@ -47,49 +47,49 @@ public class PacketCommandServer implements PacketIn, PacketOut {
     }
 
     @Override
-    public JSONObject generate() {
-        JSONObject json = new JSONObject();
-        json.put("id", id);
-        json.put("r", response);
-        json.put("m", message);
-        return json;
+    public YAMLSection generate() {
+        YAMLSection data = new YAMLSection();
+        data.set("id", id);
+        data.set("r", response);
+        data.set("m", message);
+        return data;
     }
 
     @Override
-    public void execute(Client client, JSONObject data) {
+    public void execute(Client client, YAMLSection data) {
         try {
             Map<String, Server> servers = plugin.api.getServers();
-            if (!data.getString("server").equals("*") && !servers.keySet().contains(data.getString("server").toLowerCase())) {
-                client.sendPacket(new PacketCommandServer(3, "There is no server with that name", (data.keySet().contains("id")) ? data.getString("id") : null));
-            } else if (!data.getString("server").equals("*") && !(servers.get(data.getString("server").toLowerCase()) instanceof SubServer)) {
-                client.sendPacket(new PacketCommandServer(4, "That Server is not a SubServer", (data.keySet().contains("id")) ? data.getString("id") : null));
-            } else if (!data.getString("server").equals("*") && !((SubServer) servers.get(data.getString("server").toLowerCase())).isRunning()) {
-                client.sendPacket(new PacketCommandServer(5, "That SubServer is not running", (data.keySet().contains("id")) ? data.getString("id") : null));
+            if (!data.getRawString("server").equals("*") && !servers.keySet().contains(data.getRawString("server").toLowerCase())) {
+                client.sendPacket(new PacketCommandServer(3, "There is no server with that name", (data.contains("id")) ? data.getRawString("id") : null));
+            } else if (!data.getRawString("server").equals("*") && !(servers.get(data.getRawString("server").toLowerCase()) instanceof SubServer)) {
+                client.sendPacket(new PacketCommandServer(4, "That Server is not a SubServer", (data.contains("id")) ? data.getRawString("id") : null));
+            } else if (!data.getRawString("server").equals("*") && !((SubServer) servers.get(data.getRawString("server").toLowerCase())).isRunning()) {
+                client.sendPacket(new PacketCommandServer(5, "That SubServer is not running", (data.contains("id")) ? data.getRawString("id") : null));
             } else {
-                if (data.getString("server").equals("*")) {
+                if (data.getRawString("server").equals("*")) {
                     boolean sent = false;
                     for (Server server : servers.values()) {
                         if (server instanceof SubServer && ((SubServer) server).isRunning()) {
-                            if (((SubServer) server).command((data.keySet().contains("player"))?UUID.fromString(data.getString("player")):null, data.getString("command"))) {
+                            if (((SubServer) server).command((data.contains("player"))?UUID.fromString(data.getRawString("player")):null, data.getRawString("command"))) {
                                 sent = true;
                             }
                         }
                     }
                     if (sent) {
-                        client.sendPacket(new PacketCommandServer(0, "Sending Command", (data.keySet().contains("id")) ? data.getString("id") : null));
+                        client.sendPacket(new PacketCommandServer(0, "Sending Command", (data.contains("id")) ? data.getRawString("id") : null));
                     } else {
-                        client.sendPacket(new PacketCommandServer(1, "Couldn't send command", (data.keySet().contains("id")) ? data.getString("id") : null));
+                        client.sendPacket(new PacketCommandServer(1, "Couldn't send command", (data.contains("id")) ? data.getRawString("id") : null));
                     }
                 } else {
-                    if (((SubServer) servers.get(data.getString("server").toLowerCase())).command((data.keySet().contains("player")) ? UUID.fromString(data.getString("player")) : null, data.getString("command"))) {
-                        client.sendPacket(new PacketCommandServer(0, "Sending Command", (data.keySet().contains("id")) ? data.getString("id") : null));
+                    if (((SubServer) servers.get(data.getRawString("server").toLowerCase())).command((data.contains("player")) ? UUID.fromString(data.getRawString("player")) : null, data.getRawString("command"))) {
+                        client.sendPacket(new PacketCommandServer(0, "Sending Command", (data.contains("id")) ? data.getRawString("id") : null));
                     } else {
-                        client.sendPacket(new PacketCommandServer(1, "Couldn't send command", (data.keySet().contains("id")) ? data.getString("id") : null));
+                        client.sendPacket(new PacketCommandServer(1, "Couldn't send command", (data.contains("id")) ? data.getRawString("id") : null));
                     }
                 }
             }
         } catch (Throwable e) {
-            client.sendPacket(new PacketCommandServer(2, e.getClass().getCanonicalName() + ": " + e.getMessage(), (data.keySet().contains("id")) ? data.getString("id") : null));
+            client.sendPacket(new PacketCommandServer(2, e.getClass().getCanonicalName() + ": " + e.getMessage(), (data.contains("id")) ? data.getRawString("id") : null));
             e.printStackTrace();
         }
     }

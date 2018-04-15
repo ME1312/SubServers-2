@@ -1,11 +1,11 @@
 package net.ME1312.SubServers.Sync.Network.Packet;
 
-import net.ME1312.SubServers.Sync.Library.JSONCallback;
+import net.ME1312.SubServers.Sync.Library.Callback;
+import net.ME1312.SubServers.Sync.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Sync.Library.Util;
 import net.ME1312.SubServers.Sync.Library.Version.Version;
 import net.ME1312.SubServers.Sync.Network.PacketIn;
 import net.ME1312.SubServers.Sync.Network.PacketOut;
-import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.UUID;
@@ -14,7 +14,7 @@ import java.util.UUID;
  * Download Server Info Packet
  */
 public class PacketDownloadServerInfo implements PacketIn, PacketOut {
-    private static HashMap<String, JSONCallback[]> callbacks = new HashMap<String, JSONCallback[]>();
+    private static HashMap<String, Callback<YAMLSection>[]> callbacks = new HashMap<String, Callback<YAMLSection>[]>();
     private String server;
     private String id;
 
@@ -29,7 +29,8 @@ public class PacketDownloadServerInfo implements PacketIn, PacketOut {
      * @param server Server name
      * @param callback Callbacks
      */
-    public PacketDownloadServerInfo(String server, JSONCallback... callback) {
+    @SafeVarargs
+    public PacketDownloadServerInfo(String server, Callback<YAMLSection>... callback) {
         if (Util.isNull(server, callback)) throw new NullPointerException();
         this.server = server;
         this.id = Util.getNew(callbacks.keySet(), UUID::randomUUID).toString();
@@ -37,17 +38,17 @@ public class PacketDownloadServerInfo implements PacketIn, PacketOut {
     }
 
     @Override
-    public JSONObject generate() {
-        JSONObject json = new JSONObject();
-        json.put("id", id);
-        json.put("server", server);
+    public YAMLSection generate() {
+        YAMLSection json = new YAMLSection();
+        json.set("id", id);
+        json.set("server", server);
         return json;
     }
 
     @Override
-    public void execute(JSONObject data) {
-        for (JSONCallback callback : callbacks.get(data.getString("id"))) callback.run(data);
-        callbacks.remove(data.getString("id"));
+    public void execute(YAMLSection data) {
+        for (Callback<YAMLSection> callback : callbacks.get(data.getRawString("id"))) callback.run(data);
+        callbacks.remove(data.getRawString("id"));
     }
 
     @Override

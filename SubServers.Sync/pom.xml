@@ -7,7 +7,7 @@
     <groupId>net.ME1312.SubServers</groupId>
     <artifactId>SubServers.Sync</artifactId>
     <version>-SNAPSHOT</version>
-    <packaging>pom</packaging>
+    <packaging>jar</packaging>
 
     <repositories>
         <repository>
@@ -26,12 +26,6 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.json</groupId>
-            <artifactId>json</artifactId>
-            <version>20180130</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
             <groupId>net.md_5</groupId>
             <artifactId>bungeecord-internal</artifactId>
             <version>1.8-SNAPSHOT</version>
@@ -48,6 +42,14 @@
     <build>
         <directory>../out/compile/target/SubServers.Sync</directory>
         <sourceDirectory>src</sourceDirectory>
+        <resources>
+            <resource>
+                <directory>src</directory>
+                <excludes>
+                    <exclude>**/*.java</exclude>
+                </excludes>
+            </resource>
+        </resources>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -59,15 +61,5 @@
                 </configuration>
             </plugin>
         </plugins>
-        <resources>
-            <resource>
-                <directory>src</directory>
-                <excludes>
-                    <exclude>**/*.java</exclude>
-                </excludes>
-            </resource>
-        </resources>
     </build>
-
-    
 </project>

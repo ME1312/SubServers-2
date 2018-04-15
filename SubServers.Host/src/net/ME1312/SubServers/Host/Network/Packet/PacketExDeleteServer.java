@@ -1,6 +1,7 @@
 package net.ME1312.SubServers.Host.Network.Packet;
 
 import net.ME1312.SubServers.Host.Executable.SubServer;
+import net.ME1312.SubServers.Host.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Host.Library.Log.Logger;
 import net.ME1312.SubServers.Host.Library.UniversalFile;
 import net.ME1312.SubServers.Host.Library.Util;
@@ -9,13 +10,10 @@ import net.ME1312.SubServers.Host.Network.PacketIn;
 import net.ME1312.SubServers.Host.Network.PacketOut;
 import net.ME1312.SubServers.Host.Network.SubDataClient;
 import net.ME1312.SubServers.Host.ExHost;
-import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileWriter;
-import java.io.IOException;
 import java.lang.reflect.Field;
-import java.nio.file.Files;
 
 /**
  * Create Server Packet
@@ -58,24 +56,24 @@ public class PacketExDeleteServer implements PacketIn, PacketOut {
     }
 
     @Override
-    public JSONObject generate() {
-        JSONObject json = new JSONObject();
-        json.put("id", id);
-        json.put("r", response);
-        json.put("m", message);
-        return json;
+    public YAMLSection generate() {
+        YAMLSection data = new YAMLSection();
+        data.set("id", id);
+        data.set("r", response);
+        data.set("m", message);
+        return data;
     }
 
     @Override
-    public void execute(JSONObject data) {
+    public void execute(YAMLSection data) {
         try {
-            if (!host.servers.keySet().contains(data.getString("server").toLowerCase())) {
-                host.subdata.sendPacket(new PacketExDeleteServer(0, "Server Didn't Exist", (data.keySet().contains("id"))?data.getString("id"):null));
-            } else if (host.servers.get(data.getString("server").toLowerCase()).isRunning()) {
-                host.subdata.sendPacket(new PacketExDeleteServer(2, "That server is still running.", (data.keySet().contains("id"))?data.getString("id"):null));
+            if (!host.servers.keySet().contains(data.getRawString("server").toLowerCase())) {
+                host.subdata.sendPacket(new PacketExDeleteServer(0, "Server Didn't Exist", (data.contains("id"))?data.getRawString("id"):null));
+            } else if (host.servers.get(data.getRawString("server").toLowerCase()).isRunning()) {
+                host.subdata.sendPacket(new PacketExDeleteServer(2, "That server is still running.", (data.contains("id"))?data.getRawString("id"):null));
             } else {
-                SubServer server = host.servers.get(data.getString("server").toLowerCase());
-                host.servers.remove(data.getString("server").toLowerCase());
+                SubServer server = host.servers.get(data.getRawString("server").toLowerCase());
+                host.servers.remove(data.getRawString("server").toLowerCase());
                 new Thread(() -> {
                     UniversalFile to = new UniversalFile(host.dir, "Recently Deleted:" + server.getName().toLowerCase());
                     try {
@@ -98,17 +96,17 @@ public class PacketExDeleteServer implements PacketIn, PacketOut {
                     try {
                         if (!to.exists()) to.mkdirs();
                         FileWriter writer = new FileWriter(new File(to, "info.json"));
-                        data.getJSONObject("info").write(writer);
+                        data.getSection("info").toJSON().write(writer);
                         writer.close();
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-                    log.info.println("Deleted SubServer: " + data.getString("server"));
-                    host.subdata.sendPacket(new PacketExDeleteServer(0, "Server Deleted Successfully", (data.keySet().contains("id"))?data.getString("id"):null));
+                    log.info.println("Deleted SubServer: " + data.getRawString("server"));
+                    host.subdata.sendPacket(new PacketExDeleteServer(0, "Server Deleted Successfully", (data.contains("id"))?data.getRawString("id"):null));
                 }).start();
             }
         } catch (Throwable e) {
-            host.subdata.sendPacket(new PacketExDeleteServer(1, e.getClass().getCanonicalName() + ": " + e.getMessage(), (data.keySet().contains("id"))?data.getString("id"):null));
+            host.subdata.sendPacket(new PacketExDeleteServer(1, e.getClass().getCanonicalName() + ": " + e.getMessage(), (data.contains("id"))?data.getRawString("id"):null));
             host.log.error.println(e);
         }
     }

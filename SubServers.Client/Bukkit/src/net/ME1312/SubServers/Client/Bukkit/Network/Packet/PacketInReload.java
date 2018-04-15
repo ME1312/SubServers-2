@@ -1,10 +1,10 @@
 package net.ME1312.SubServers.Client.Bukkit.Network.Packet;
 
+import net.ME1312.SubServers.Client.Bukkit.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Client.Bukkit.Library.Version.Version;
 import net.ME1312.SubServers.Client.Bukkit.Network.PacketIn;
 import net.ME1312.SubServers.Client.Bukkit.SubPlugin;
 import org.bukkit.Bukkit;
-import org.json.JSONObject;
 
 /**
  * Reload Packet
@@ -22,8 +22,8 @@ public class PacketInReload implements PacketIn {
     }
 
     @Override
-    public void execute(JSONObject data) {
-        if (data != null && data.keySet().contains("m")) Bukkit.getLogger().warning("SubData > Received request for a plugin reload: " + data.getString("m"));
+    public void execute(YAMLSection data) {
+        if (data != null && data.contains("m")) Bukkit.getLogger().warning("SubData > Received request for a plugin reload: " + data.getString("m"));
         else Bukkit.getLogger().warning("SubData > Received request for a plugin reload");
         try {
             plugin.reload(true);

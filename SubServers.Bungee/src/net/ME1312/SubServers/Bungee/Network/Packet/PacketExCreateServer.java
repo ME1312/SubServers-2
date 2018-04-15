@@ -1,13 +1,13 @@
 package net.ME1312.SubServers.Bungee.Network.Packet;
 
 import net.ME1312.SubServers.Bungee.Host.SubCreator;
-import net.ME1312.SubServers.Bungee.Library.JSONCallback;
+import net.ME1312.SubServers.Bungee.Library.Callback;
+import net.ME1312.SubServers.Bungee.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Bungee.Library.Util;
 import net.ME1312.SubServers.Bungee.Library.Version.Version;
 import net.ME1312.SubServers.Bungee.Network.Client;
 import net.ME1312.SubServers.Bungee.Network.PacketIn;
 import net.ME1312.SubServers.Bungee.Network.PacketOut;
-import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.UUID;
@@ -16,7 +16,7 @@ import java.util.UUID;
  * Create Server External Host Packet
  */
 public class PacketExCreateServer implements PacketIn, PacketOut {
-    private static HashMap<String, JSONCallback[]> callbacks = new HashMap<String, JSONCallback[]>();
+    private static HashMap<String, Callback<YAMLSection>[]> callbacks = new HashMap<String, Callback<YAMLSection>[]>();
     private String name;
     private SubCreator.ServerTemplate template;
     private Version version;
@@ -41,7 +41,8 @@ public class PacketExCreateServer implements PacketIn, PacketOut {
      * @param log Log Address
      * @param callback Callbacks
      */
-    public PacketExCreateServer(String name, SubCreator.ServerTemplate template, Version version, int port, UUID log, JSONCallback... callback) {
+    @SafeVarargs
+    public PacketExCreateServer(String name, SubCreator.ServerTemplate template, Version version, int port, UUID log, Callback<YAMLSection>... callback) {
         if (Util.isNull(name, template, version, port, log, callback)) throw new NullPointerException();
         this.name = name;
         this.template = template;
@@ -53,29 +54,29 @@ public class PacketExCreateServer implements PacketIn, PacketOut {
     }
 
     @Override
-    public JSONObject generate() {
+    public YAMLSection generate() {
         if (id == null) {
-            JSONObject json = new JSONObject();
-            json.put("thread", name);
-            return json;
+            YAMLSection data = new YAMLSection();
+            data.set("thread", name);
+            return data;
         } else {
-            JSONObject json = new JSONObject();
-            json.put("id", id);
-            JSONObject creator = new JSONObject();
-            creator.put("name", name);
-            creator.put("template", template.getName());
-            creator.put("version", version.toString());
-            creator.put("port", port);
-            creator.put("log", log.toString());
-            json.put("creator", creator);
-            return json;
+            YAMLSection data = new YAMLSection();
+            data.set("id", id);
+            YAMLSection creator = new YAMLSection();
+            creator.set("name", name);
+            creator.set("template", template.getName());
+            creator.set("version", version.toString());
+            creator.set("port", port);
+            creator.set("log", log.toString());
+            data.set("creator", creator);
+            return data;
         }
     }
 
     @Override
-    public void execute(Client client, JSONObject data) {
-        for (JSONCallback callback : callbacks.get(data.getString("id"))) callback.run(data);
-        callbacks.remove(data.getString("id"));
+    public void execute(Client client, YAMLSection data) {
+        for (Callback<YAMLSection> callback : callbacks.get(data.getRawString("id"))) callback.run(data);
+        callbacks.remove(data.getRawString("id"));
     }
 
     @Override

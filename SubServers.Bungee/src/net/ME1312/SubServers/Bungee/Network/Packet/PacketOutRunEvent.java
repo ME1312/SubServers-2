@@ -1,30 +1,21 @@
 package net.ME1312.SubServers.Bungee.Network.Packet;
 
 import net.ME1312.SubServers.Bungee.Event.*;
-import net.ME1312.SubServers.Bungee.Host.Host;
-import net.ME1312.SubServers.Bungee.Host.Server;
+import net.ME1312.SubServers.Bungee.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Bungee.Library.SubEvent;
 import net.ME1312.SubServers.Bungee.Library.Util;
 import net.ME1312.SubServers.Bungee.Library.Version.Version;
-import net.ME1312.SubServers.Bungee.Network.ClientHandler;
 import net.ME1312.SubServers.Bungee.Network.PacketOut;
 import net.ME1312.SubServers.Bungee.SubPlugin;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
-import net.md_5.bungee.event.EventPriority;
-import org.json.JSONObject;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Event Send Packet
  */
 public class PacketOutRunEvent implements Listener, PacketOut {
     private SubPlugin plugin;
-    private JSONObject args;
+    private YAMLSection args;
     private String type;
 
     /**
@@ -43,17 +34,17 @@ public class PacketOutRunEvent implements Listener, PacketOut {
      * @param event Event to be run
      * @param args Arguments
      */
-    public PacketOutRunEvent(Class<? extends SubEvent> event, JSONObject args) {
+    public PacketOutRunEvent(Class<? extends SubEvent> event, YAMLSection args) {
         if (Util.isNull(event, args)) throw new NullPointerException();
         this.type = event.getSimpleName();
         this.args = args;
     }
 
     @Override
-    public JSONObject generate() {
-        JSONObject json = new JSONObject();
-        json.put("type", type);
-        json.put("args", args);
+    public YAMLSection generate() {
+        YAMLSection json = new YAMLSection();
+        json.set("type", type);
+        json.set("args", args);
         return json;
     }
 
@@ -65,9 +56,9 @@ public class PacketOutRunEvent implements Listener, PacketOut {
     @EventHandler(priority = Byte.MAX_VALUE)
     public void event(SubAddHostEvent event) {
         if (!event.isCancelled()) {
-            JSONObject args = new JSONObject();
-            args.put("player", ((event.getPlayer() == null)?null:event.getPlayer().toString()));
-            args.put("host", event.getHost().getName());
+            YAMLSection args = new YAMLSection();
+            args.set("player", ((event.getPlayer() == null)?null:event.getPlayer().toString()));
+            args.set("host", event.getHost().getName());
             plugin.subdata.broadcastPacket(new PacketOutRunEvent(event.getClass(), args));
         }
     }
@@ -75,10 +66,10 @@ public class PacketOutRunEvent implements Listener, PacketOut {
     @EventHandler(priority = Byte.MAX_VALUE)
     public void event(SubAddServerEvent event) {
         if (!event.isCancelled()) {
-            JSONObject args = new JSONObject();
-            args.put("player", ((event.getPlayer() == null)?null:event.getPlayer().toString()));
-            args.put("host", ((event.getHost() == null)?null:event.getHost().getName()));
-            args.put("server", event.getServer().getName());
+            YAMLSection args = new YAMLSection();
+            args.set("player", ((event.getPlayer() == null)?null:event.getPlayer().toString()));
+            args.set("host", ((event.getHost() == null)?null:event.getHost().getName()));
+            args.set("server", event.getServer().getName());
             plugin.subdata.broadcastPacket(new PacketOutRunEvent(event.getClass(), args));
         }
     }
@@ -86,23 +77,23 @@ public class PacketOutRunEvent implements Listener, PacketOut {
     @EventHandler(priority = Byte.MAX_VALUE)
     public void event(SubCreateEvent event) {
         if (!event.isCancelled()) {
-            JSONObject args = new JSONObject();
-            args.put("player", ((event.getPlayer() == null)?null:event.getPlayer().toString()));
-            args.put("host", event.getHost().getName());
-            args.put("name", event.getName());
-            args.put("template", event.getTemplate().getName());
-            args.put("version", event.getVersion().toString());
-            args.put("port", event.getPort());
+            YAMLSection args = new YAMLSection();
+            args.set("player", ((event.getPlayer() == null)?null:event.getPlayer().toString()));
+            args.set("host", event.getHost().getName());
+            args.set("name", event.getName());
+            args.set("template", event.getTemplate().getName());
+            args.set("version", event.getVersion().toString());
+            args.set("port", event.getPort());
             plugin.subdata.broadcastPacket(new PacketOutRunEvent(event.getClass(), args));
         }
     }
     @EventHandler(priority = Byte.MAX_VALUE)
     public void event(SubSendCommandEvent event) {
         if (!event.isCancelled()) {
-            JSONObject args = new JSONObject();
-            args.put("player", ((event.getPlayer() == null)?null:event.getPlayer().toString()));
-            args.put("server", event.getServer().getName());
-            args.put("command", event.getCommand());
+            YAMLSection args = new YAMLSection();
+            args.set("player", ((event.getPlayer() == null)?null:event.getPlayer().toString()));
+            args.set("server", event.getServer().getName());
+            args.set("command", event.getCommand());
             plugin.subdata.broadcastPacket(new PacketOutRunEvent(event.getClass(), args));
         }
     }
@@ -110,12 +101,12 @@ public class PacketOutRunEvent implements Listener, PacketOut {
     @EventHandler(priority = Byte.MAX_VALUE)
     public void event(SubEditServerEvent event) {
         if (!event.isCancelled()) {
-            JSONObject args = new JSONObject();
-            args.put("player", ((event.getPlayer() == null)?null:event.getPlayer().toString()));
-            args.put("server", event.getServer().getName());
-            args.put("edit", event.getEdit().name());
-            args.put("value", event.getEdit().get().asObject());
-            args.put("perm", event.isPermanent());
+            YAMLSection args = new YAMLSection();
+            args.set("player", ((event.getPlayer() == null)?null:event.getPlayer().toString()));
+            args.set("server", event.getServer().getName());
+            args.set("edit", event.getEdit().name());
+            args.set("value", event.getEdit().get().asObject());
+            args.set("perm", event.isPermanent());
             plugin.subdata.broadcastPacket(new PacketOutRunEvent(event.getClass(), args));
         }
     }
@@ -123,37 +114,37 @@ public class PacketOutRunEvent implements Listener, PacketOut {
     @EventHandler(priority = Byte.MAX_VALUE)
     public void event(SubStartEvent event) {
         if (!event.isCancelled()) {
-            JSONObject args = new JSONObject();
-            args.put("player", ((event.getPlayer() == null)?null:event.getPlayer().toString()));
-            args.put("server", event.getServer().getName());
+            YAMLSection args = new YAMLSection();
+            args.set("player", ((event.getPlayer() == null)?null:event.getPlayer().toString()));
+            args.set("server", event.getServer().getName());
             plugin.subdata.broadcastPacket(new PacketOutRunEvent(event.getClass(), args));
         }
     }
     @EventHandler(priority = Byte.MAX_VALUE)
     public void event(SubStopEvent event) {
         if (!event.isCancelled()) {
-            JSONObject args = new JSONObject();
-            args.put("player", ((event.getPlayer() == null)?null:event.getPlayer().toString()));
-            args.put("server", event.getServer().getName());
-            args.put("force", event.isForced());
+            YAMLSection args = new YAMLSection();
+            args.set("player", ((event.getPlayer() == null)?null:event.getPlayer().toString()));
+            args.set("server", event.getServer().getName());
+            args.set("force", event.isForced());
             plugin.subdata.broadcastPacket(new PacketOutRunEvent(event.getClass(), args));
 
         }
     }
     @EventHandler(priority = Byte.MAX_VALUE)
     public void event(SubStoppedEvent event) {
-        JSONObject args = new JSONObject();
-        args.put("server", event.getServer().getName());
+        YAMLSection args = new YAMLSection();
+        args.set("server", event.getServer().getName());
         plugin.subdata.broadcastPacket(new PacketOutRunEvent(event.getClass(), args));
 
     }
     @EventHandler(priority = Byte.MAX_VALUE)
     public void event(SubRemoveServerEvent event) {
         if (!event.isCancelled()) {
-            JSONObject args = new JSONObject();
-            args.put("player", ((event.getPlayer() == null)?null:event.getPlayer().toString()));
-            args.put("host", ((event.getHost() == null)?null:event.getHost().getName()));
-            args.put("server", event.getServer().getName());
+            YAMLSection args = new YAMLSection();
+            args.set("player", ((event.getPlayer() == null)?null:event.getPlayer().toString()));
+            args.set("host", ((event.getHost() == null)?null:event.getHost().getName()));
+            args.set("server", event.getServer().getName());
             plugin.subdata.broadcastPacket(new PacketOutRunEvent(event.getClass(), args));
         }
     }
@@ -161,9 +152,9 @@ public class PacketOutRunEvent implements Listener, PacketOut {
     @EventHandler(priority = Byte.MAX_VALUE)
     public void event(SubRemoveHostEvent event) {
         if (!event.isCancelled()) {
-            JSONObject args = new JSONObject();
-            args.put("player", ((event.getPlayer() == null)?null:event.getPlayer().toString()));
-            args.put("host", event.getHost().getName());
+            YAMLSection args = new YAMLSection();
+            args.set("player", ((event.getPlayer() == null)?null:event.getPlayer().toString()));
+            args.set("host", event.getHost().getName());
             plugin.subdata.broadcastPacket(new PacketOutRunEvent(event.getClass(), args));
         }
     }

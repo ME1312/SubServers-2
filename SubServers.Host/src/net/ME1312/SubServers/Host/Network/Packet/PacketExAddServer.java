@@ -2,6 +2,7 @@ package net.ME1312.SubServers.Host.Network.Packet;
 
 import net.ME1312.SubServers.Host.Executable.Executable;
 import net.ME1312.SubServers.Host.Executable.SubServer;
+import net.ME1312.SubServers.Host.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Host.Library.Log.Logger;
 import net.ME1312.SubServers.Host.Library.Util;
 import net.ME1312.SubServers.Host.Library.Version.Version;
@@ -9,7 +10,6 @@ import net.ME1312.SubServers.Host.Network.PacketIn;
 import net.ME1312.SubServers.Host.Network.PacketOut;
 import net.ME1312.SubServers.Host.Network.SubDataClient;
 import net.ME1312.SubServers.Host.ExHost;
-import org.json.JSONObject;
 
 import java.lang.reflect.Field;
 import java.util.UUID;
@@ -55,29 +55,29 @@ public class PacketExAddServer implements PacketIn, PacketOut {
     }
 
     @Override
-    public JSONObject generate() {
-        JSONObject json = new JSONObject();
-        json.put("id", id);
-        json.put("r", response);
-        json.put("m", message);
-        return json;
+    public YAMLSection generate() {
+        YAMLSection data = new YAMLSection();
+        data.set("id", id);
+        data.set("r", response);
+        data.set("m", message);
+        return data;
     }
 
     @Override
-    public void execute(JSONObject data) {
+    public void execute(YAMLSection data) {
         try {
-            if (host.servers.keySet().contains(data.getJSONObject("server").getString("name").toLowerCase())) {
-                host.subdata.sendPacket(new PacketExAddServer(0, "Server Already Added", (data.keySet().contains("id"))?data.getString("id"):null));
+            if (host.servers.keySet().contains(data.getSection("server").getRawString("name").toLowerCase())) {
+                host.subdata.sendPacket(new PacketExAddServer(0, "Server Already Added", (data.contains("id"))?data.getRawString("id"):null));
             } else {
-                SubServer server = new SubServer(host, data.getJSONObject("server").getString("name"), data.getJSONObject("server").getBoolean("enabled"), data.getJSONObject("server").getBoolean("log"),
-                        data.getJSONObject("server").getString("dir"), new Executable(data.getJSONObject("server").getString("exec")), data.getJSONObject("server").getString("stopcmd"));
-                host.servers.put(data.getJSONObject("server").getString("name").toLowerCase(), server);
-                log.info.println("Added SubServer: " + data.getJSONObject("server").getString("name"));
-                if (data.getJSONObject("server").keySet().contains("running")) server.start(UUID.fromString(data.getJSONObject("server").getString("running")));
-                host.subdata.sendPacket(new PacketExAddServer(0, "Server Added Successfully", (data.keySet().contains("id"))?data.getString("id"):null));
+                SubServer server = new SubServer(host, data.getSection("server").getRawString("name"), data.getSection("server").getBoolean("enabled"), data.getSection("server").getBoolean("log"),
+                        data.getSection("server").getRawString("dir"), new Executable(data.getSection("server").getRawString("exec")), data.getSection("server").getRawString("stopcmd"));
+                host.servers.put(data.getSection("server").getRawString("name").toLowerCase(), server);
+                log.info.println("Added SubServer: " + data.getSection("server").getRawString("name"));
+                if (data.getSection("server").contains("running")) server.start(UUID.fromString(data.getSection("server").getRawString("running")));
+                host.subdata.sendPacket(new PacketExAddServer(0, "Server Added Successfully", (data.contains("id"))?data.getRawString("id"):null));
             }
         } catch (Throwable e) {
-            host.subdata.sendPacket(new PacketExAddServer(1, e.getClass().getCanonicalName() + ": " + e.getMessage(), (data.keySet().contains("id"))?data.getString("id"):null));
+            host.subdata.sendPacket(new PacketExAddServer(1, e.getClass().getCanonicalName() + ": " + e.getMessage(), (data.contains("id"))?data.getRawString("id"):null));
             host.log.error.println(e);
         }
     }

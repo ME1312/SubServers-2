@@ -2,13 +2,13 @@ package net.ME1312.SubServers.Bungee.Network.Packet;
 
 import net.ME1312.SubServers.Bungee.Host.Server;
 import net.ME1312.SubServers.Bungee.Host.SubServer;
+import net.ME1312.SubServers.Bungee.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Bungee.Library.Util;
 import net.ME1312.SubServers.Bungee.Library.Version.Version;
 import net.ME1312.SubServers.Bungee.Network.Client;
 import net.ME1312.SubServers.Bungee.Network.PacketIn;
 import net.ME1312.SubServers.Bungee.Network.PacketOut;
 import net.ME1312.SubServers.Bungee.SubPlugin;
-import org.json.JSONObject;
 
 import java.net.InetSocketAddress;
 import java.util.Map;
@@ -47,25 +47,25 @@ public class PacketLinkServer implements PacketIn, PacketOut {
     }
 
     @Override
-    public JSONObject generate() {
-        JSONObject json = new JSONObject();
-        json.put("n", name);
-        json.put("r", response);
-        json.put("m", message);
-        return json;
+    public YAMLSection generate() {
+        YAMLSection data = new YAMLSection();
+        data.set("n", name);
+        data.set("r", response);
+        data.set("m", message);
+        return data;
     }
 
     @Override
-    public void execute(Client client, JSONObject data) {
+    public void execute(Client client, YAMLSection data) {
         try {
             Map<String, Server> servers = plugin.api.getServers();
             Server server;
-            if (data.keySet().contains("name") && servers.keySet().contains(data.getString("name").toLowerCase())) {
-                link(client, servers.get(data.getString("name").toLowerCase()));
+            if (data.contains("name") && servers.keySet().contains(data.getRawString("name").toLowerCase())) {
+                link(client, servers.get(data.getRawString("name").toLowerCase()));
             } else if ((server = searchIP(new InetSocketAddress(client.getAddress().getAddress(), data.getInt("port")))) != null) {
                 link(client, server);
-            } else if (data.keySet().contains("name")) {
-                client.sendPacket(new PacketLinkServer(null, 2, "There is no server with name: " + data.getString("name")));
+            } else if (data.contains("name")) {
+                client.sendPacket(new PacketLinkServer(null, 2, "There is no server with name: " + data.getRawString("name")));
             } else {
                 client.sendPacket(new PacketLinkServer(null, 2, "There is no server with address: " + client.getAddress().getAddress().getHostAddress() + ':' + data.getInt("port")));
             }

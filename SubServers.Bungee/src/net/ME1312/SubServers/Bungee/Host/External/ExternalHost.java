@@ -6,6 +6,7 @@ import net.ME1312.SubServers.Bungee.Host.Executable;
 import net.ME1312.SubServers.Bungee.Host.Host;
 import net.ME1312.SubServers.Bungee.Host.SubCreator;
 import net.ME1312.SubServers.Bungee.Host.SubServer;
+import net.ME1312.SubServers.Bungee.Library.Callback;
 import net.ME1312.SubServers.Bungee.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Bungee.Library.Exception.InvalidServerException;
 import net.ME1312.SubServers.Bungee.Library.NamedContainer;
@@ -18,7 +19,6 @@ import net.ME1312.SubServers.Bungee.Network.Packet.PacketExRemoveServer;
 import net.ME1312.SubServers.Bungee.Network.Packet.PacketOutReset;
 import net.ME1312.SubServers.Bungee.Network.PacketOut;
 import net.ME1312.SubServers.Bungee.SubPlugin;
-import org.json.JSONObject;
 
 import java.net.InetAddress;
 import java.util.*;
@@ -143,8 +143,8 @@ public class ExternalHost extends Host implements ClientHandler {
         SubAddServerEvent event = new SubAddServerEvent(player, this, server);
         plugin.getPluginManager().callEvent(event);
         if (!event.isCancelled()) {
-            queue(new PacketExAddServer(name, enabled, log, directory, executable, stopcmd, (server.isRunning())?((ExternalSubLogger) server.getLogger()).getExternalAddress():null, json -> {
-                if (json.getInt("r") == 0) {
+            queue(new PacketExAddServer(name, enabled, log, directory, executable, stopcmd, (server.isRunning())?((ExternalSubLogger) server.getLogger()).getExternalAddress():null, data -> {
+                if (data.getInt("r") == 0) {
                     if (temporary && server.start()) server.setTemporary(true);
                 }
             }));
@@ -165,8 +165,8 @@ public class ExternalHost extends Host implements ClientHandler {
                 getSubServer(name).stop();
                 getSubServer(name).waitFor();
             }
-            queue(new PacketExRemoveServer(name, json -> {
-                if (json.getInt("r") == 0) {
+            queue(new PacketExRemoveServer(name, data -> {
+                if (data.getInt("r") == 0) {
                     List<String> groups = new ArrayList<String>();
                     groups.addAll(getSubServer(name).getGroups());
                     for (String group : groups) getSubServer(name).removeGroup(group);
@@ -185,8 +185,8 @@ public class ExternalHost extends Host implements ClientHandler {
         if (getSubServer(name).isRunning()) {
             getSubServer(name).terminate();
         }
-        queue(new PacketExRemoveServer(name, json -> {
-            if (json.getInt("r") == 0) {
+        queue(new PacketExRemoveServer(name, data -> {
+            if (data.getInt("r") == 0) {
                 for (String group : getSubServer(name).getGroups()) getSubServer(name).removeGroup(group);
                 servers.remove(name.toLowerCase());
             }
@@ -208,9 +208,9 @@ public class ExternalHost extends Host implements ClientHandler {
             }
 
             System.out.println("SubServers > Saving...");
-            JSONObject info = (plugin.config.get().getSection("Servers").getKeys().contains(server))?plugin.config.get().getSection("Servers").getSection(server).toJSON():new JSONObject();
-            info.put("Name", server);
-            info.put("Timestamp", Calendar.getInstance().getTime().getTime());
+            YAMLSection info = (plugin.config.get().getSection("Servers").getKeys().contains(server))?plugin.config.get().getSection("Servers").getSection(server).clone():new YAMLSection();
+            info.set("Name", server);
+            info.set("Timestamp", Calendar.getInstance().getTime().getTime());
             try {
                 if (plugin.config.get().getSection("Servers").getKeys().contains(server)) {
                     plugin.config.get().getSection("Servers").remove(server);
@@ -221,8 +221,8 @@ public class ExternalHost extends Host implements ClientHandler {
             }
 
             System.out.println("SubServers > Removing Files...");
-            queue(new PacketExDeleteServer(server, info, json -> {
-                if (json.getInt("r") == 0) {
+            queue(new PacketExDeleteServer(server, info, data -> {
+                if (data.getInt("r") == 0) {
                     for (String group : getSubServer(name).getGroups()) getSubServer(name).removeGroup(group);
                     servers.remove(server.toLowerCase());
                     System.out.println("SubServers > Done!");
@@ -246,9 +246,9 @@ public class ExternalHost extends Host implements ClientHandler {
         }
 
         System.out.println("SubServers > Saving...");
-        JSONObject info = (plugin.config.get().getSection("Servers").getKeys().contains(server))?plugin.config.get().getSection("Servers").getSection(server).toJSON():new JSONObject();
-        info.put("Name", server);
-        info.put("Timestamp", Calendar.getInstance().getTime().getTime());
+        YAMLSection info = (plugin.config.get().getSection("Servers").getKeys().contains(server))?plugin.config.get().getSection("Servers").getSection(server).clone():new YAMLSection();
+        info.set("Name", server);
+        info.set("Timestamp", Calendar.getInstance().getTime().getTime());
         try {
             if (plugin.config.get().getSection("Servers").getKeys().contains(server)) {
                 plugin.config.get().getSection("Servers").remove(server);
@@ -259,8 +259,8 @@ public class ExternalHost extends Host implements ClientHandler {
         }
 
         System.out.println("SubServers > Removing Files...");
-        queue(new PacketExDeleteServer(server, info, json -> {
-            if (json.getInt("r") == 0) {
+        queue(new PacketExDeleteServer(server, info, data -> {
+            if (data.getInt("r") == 0) {
                 for (String group : getSubServer(name).getGroups()) getSubServer(name).removeGroup(group);
                 servers.remove(server.toLowerCase());
                 System.out.println("SubServers > Done!");

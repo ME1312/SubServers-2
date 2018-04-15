@@ -67,7 +67,7 @@
 <!--   -->
 </a></div>
 <!-- ========= END OF TOP NAVBAR ========= -->
-<div class="contentContainer"><a href="#I:A">A</a>&nbsp;<a href="#I:B">B</a>&nbsp;<a href="#I:C">C</a>&nbsp;<a href="#I:D">D</a>&nbsp;<a href="#I:E">E</a>&nbsp;<a href="#I:F">F</a>&nbsp;<a href="#I:G">G</a>&nbsp;<a href="#I:H">H</a>&nbsp;<a href="#I:I">I</a>&nbsp;<a href="#I:J">J</a>&nbsp;<a href="#I:L">L</a>&nbsp;<a href="#I:M">M</a>&nbsp;<a href="#I:N">N</a>&nbsp;<a href="#I:O">O</a>&nbsp;<a href="#I:P">P</a>&nbsp;<a href="#I:R">R</a>&nbsp;<a href="#I:S">S</a>&nbsp;<a href="#I:T">T</a>&nbsp;<a href="#I:U">U</a>&nbsp;<a href="#I:V">V</a>&nbsp;<a href="#I:W">W</a>&nbsp;<a href="#I:Y">Y</a>&nbsp;<a href="#I:Z">Z</a>&nbsp;<a name="I:A">
+<div class="contentContainer"><a href="#I:A">A</a>&nbsp;<a href="#I:B">B</a>&nbsp;<a href="#I:C">C</a>&nbsp;<a href="#I:D">D</a>&nbsp;<a href="#I:E">E</a>&nbsp;<a href="#I:F">F</a>&nbsp;<a href="#I:G">G</a>&nbsp;<a href="#I:H">H</a>&nbsp;<a href="#I:I">I</a>&nbsp;<a href="#I:L">L</a>&nbsp;<a href="#I:M">M</a>&nbsp;<a href="#I:N">N</a>&nbsp;<a href="#I:O">O</a>&nbsp;<a href="#I:P">P</a>&nbsp;<a href="#I:R">R</a>&nbsp;<a href="#I:S">S</a>&nbsp;<a href="#I:T">T</a>&nbsp;<a href="#I:U">U</a>&nbsp;<a href="#I:V">V</a>&nbsp;<a href="#I:W">W</a>&nbsp;<a href="#I:Y">Y</a>&nbsp;<a href="#I:Z">Z</a>&nbsp;<a name="I:A">
 <!--   -->
 </a>
 <h2 class="title">A</h2>
@@ -302,6 +302,10 @@
 </a>
 <h2 class="title">C</h2>
 <dl>
+<dt><a href="net/ME1312/SubServers/Bungee/Library/Callback.html" title="interface in net.ME1312.SubServers.Bungee.Library"><span class="typeNameLink">Callback</span></a>&lt;<a href="net/ME1312/SubServers/Bungee/Library/Callback.html" title="type parameter in Callback">T</a>&gt; - Interface in <a href="net/ME1312/SubServers/Bungee/Library/package-summary.html">net.ME1312.SubServers.Bungee.Library</a></dt>
+<dd>
+<div class="block">Callback Class</div>
+</dd>
 <dt><a href="net/ME1312/SubServers/Bungee/Network/Cipher.html" title="interface in net.ME1312.SubServers.Bungee.Network"><span class="typeNameLink">Cipher</span></a> - Interface in <a href="net/ME1312/SubServers/Bungee/Network/package-summary.html">net.ME1312.SubServers.Bungee.Network</a></dt>
 <dd>
 <div class="block">SubData Cipher Layout Class</div>
@@ -496,7 +500,7 @@
 <dd>
 <div class="block">Edits the Server</div>
 </dd>
-<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Network/Cipher.html#encrypt-java.lang.String-org.json.JSONObject-">encrypt(String, JSONObject)</a></span> - Method in interface net.ME1312.SubServers.Bungee.Network.<a href="net/ME1312/SubServers/Bungee/Network/Cipher.html" title="interface in net.ME1312.SubServers.Bungee.Network">Cipher</a></dt>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Network/Cipher.html#encrypt-java.lang.String-net.ME1312.SubServers.Bungee.Library.Config.YAMLSection-">encrypt(String, YAMLSection)</a></span> - Method in interface net.ME1312.SubServers.Bungee.Network.<a href="net/ME1312/SubServers/Bungee/Network/Cipher.html" title="interface in net.ME1312.SubServers.Bungee.Network">Cipher</a></dt>
 <dd>
 <div class="block">Encrypt JSON Data</div>
 </dd>
@@ -504,7 +508,7 @@
 <dd>
 <div class="block">Encrypts a stream of data.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Network/Encryption/AES.html#encrypt-java.lang.String-org.json.JSONObject-">encrypt(String, JSONObject)</a></span> - Method in class net.ME1312.SubServers.Bungee.Network.Encryption.<a href="net/ME1312/SubServers/Bungee/Network/Encryption/AES.html" title="class in net.ME1312.SubServers.Bungee.Network.Encryption">AES</a></dt>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Network/Encryption/AES.html#encrypt-java.lang.String-net.ME1312.SubServers.Bungee.Library.Config.YAMLSection-">encrypt(String, YAMLSection)</a></span> - Method in class net.ME1312.SubServers.Bungee.Network.Encryption.<a href="net/ME1312/SubServers/Bungee/Network/Encryption/AES.html" title="class in net.ME1312.SubServers.Bungee.Network.Encryption">AES</a></dt>
 <dd>
 <div class="block">This method calls to <a href="net/ME1312/SubServers/Bungee/Network/Encryption/AES.html#encrypt-int-java.lang.String-java.io.InputStream-java.io.OutputStream-"><code>AES.encrypt(int, String, InputStream, OutputStream)</code></a>, simplified for the <a href="net/ME1312/SubServers/Bungee/Network/Cipher.html" title="interface in net.ME1312.SubServers.Bungee.Network"><code>Cipher</code></a> interface.</div>
 </dd>
@@ -564,57 +568,57 @@
 <dd>
 <div class="block">Override BungeeCord Method for the previously used one</div>
 </dd>
-<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketAuthorization.html#execute-net.ME1312.SubServers.Bungee.Network.Client-org.json.JSONObject-">execute(Client, JSONObject)</a></span> - Method in class net.ME1312.SubServers.Bungee.Network.Packet.<a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketAuthorization.html" title="class in net.ME1312.SubServers.Bungee.Network.Packet">PacketAuthorization</a></dt>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketAuthorization.html#execute-net.ME1312.SubServers.Bungee.Network.Client-net.ME1312.SubServers.Bungee.Library.Config.YAMLSection-">execute(Client, YAMLSection)</a></span> - Method in class net.ME1312.SubServers.Bungee.Network.Packet.<a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketAuthorization.html" title="class in net.ME1312.SubServers.Bungee.Network.Packet">PacketAuthorization</a></dt>
 <dd>&nbsp;</dd>
-<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketCommandServer.html#execute-net.ME1312.SubServers.Bungee.Network.Client-org.json.JSONObject-">execute(Client, JSONObject)</a></span> - Method in class net.ME1312.SubServers.Bungee.Network.Packet.<a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketCommandServer.html" title="class in net.ME1312.SubServers.Bungee.Network.Packet">PacketCommandServer</a></dt>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketCommandServer.html#execute-net.ME1312.SubServers.Bungee.Network.Client-net.ME1312.SubServers.Bungee.Library.Config.YAMLSection-">execute(Client, YAMLSection)</a></span> - Method in class net.ME1312.SubServers.Bungee.Network.Packet.<a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketCommandServer.html" title="class in net.ME1312.SubServers.Bungee.Network.Packet">PacketCommandServer</a></dt>
 <dd>&nbsp;</dd>
-<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketCreateServer.html#execute-net.ME1312.SubServers.Bungee.Network.Client-org.json.JSONObject-">execute(Client, JSONObject)</a></span> - Method in class net.ME1312.SubServers.Bungee.Network.Packet.<a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketCreateServer.html" title="class in net.ME1312.SubServers.Bungee.Network.Packet">PacketCreateServer</a></dt>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketCreateServer.html#execute-net.ME1312.SubServers.Bungee.Network.Client-net.ME1312.SubServers.Bungee.Library.Config.YAMLSection-">execute(Client, YAMLSection)</a></span> - Method in class net.ME1312.SubServers.Bungee.Network.Packet.<a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketCreateServer.html" title="class in net.ME1312.SubServers.Bungee.Network.Packet">PacketCreateServer</a></dt>
 <dd>&nbsp;</dd>
-<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketDownloadHostInfo.html#execute-net.ME1312.SubServers.Bungee.Network.Client-org.json.JSONObject-">execute(Client, JSONObject)</a></span> - Method in class net.ME1312.SubServers.Bungee.Network.Packet.<a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketDownloadHostInfo.html" title="class in net.ME1312.SubServers.Bungee.Network.Packet">PacketDownloadHostInfo</a></dt>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketDownloadHostInfo.html#execute-net.ME1312.SubServers.Bungee.Network.Client-net.ME1312.SubServers.Bungee.Library.Config.YAMLSection-">execute(Client, YAMLSection)</a></span> - Method in class net.ME1312.SubServers.Bungee.Network.Packet.<a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketDownloadHostInfo.html" title="class in net.ME1312.SubServers.Bungee.Network.Packet">PacketDownloadHostInfo</a></dt>
 <dd>&nbsp;</dd>
-<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketDownloadLang.html#execute-net.ME1312.SubServers.Bungee.Network.Client-org.json.JSONObject-">execute(Client, JSONObject)</a></span> - Method in class net.ME1312.SubServers.Bungee.Network.Packet.<a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketDownloadLang.html" title="class in net.ME1312.SubServers.Bungee.Network.Packet">PacketDownloadLang</a></dt>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketDownloadLang.html#execute-net.ME1312.SubServers.Bungee.Network.Client-net.ME1312.SubServers.Bungee.Library.Config.YAMLSection-">execute(Client, YAMLSection)</a></span> - Method in class net.ME1312.SubServers.Bungee.Network.Packet.<a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketDownloadLang.html" title="class in net.ME1312.SubServers.Bungee.Network.Packet">PacketDownloadLang</a></dt>
 <dd>&nbsp;</dd>
-<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketDownloadNetworkList.html#execute-net.ME1312.SubServers.Bungee.Network.Client-org.json.JSONObject-">execute(Client, JSONObject)</a></span> - Method in class net.ME1312.SubServers.Bungee.Network.Packet.<a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketDownloadNetworkList.html" title="class in net.ME1312.SubServers.Bungee.Network.Packet">PacketDownloadNetworkList</a></dt>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketDownloadNetworkList.html#execute-net.ME1312.SubServers.Bungee.Network.Client-net.ME1312.SubServers.Bungee.Library.Config.YAMLSection-">execute(Client, YAMLSection)</a></span> - Method in class net.ME1312.SubServers.Bungee.Network.Packet.<a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketDownloadNetworkList.html" title="class in net.ME1312.SubServers.Bungee.Network.Packet">PacketDownloadNetworkList</a></dt>
 <dd>&nbsp;</dd>
-<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketDownloadPlayerList.html#execute-net.ME1312.SubServers.Bungee.Network.Client-org.json.JSONObject-">execute(Client, JSONObject)</a></span> - Method in class net.ME1312.SubServers.Bungee.Network.Packet.<a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketDownloadPlayerList.html" title="class in net.ME1312.SubServers.Bungee.Network.Packet">PacketDownloadPlayerList</a></dt>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketDownloadPlayerList.html#execute-net.ME1312.SubServers.Bungee.Network.Client-net.ME1312.SubServers.Bungee.Library.Config.YAMLSection-">execute(Client, YAMLSection)</a></span> - Method in class net.ME1312.SubServers.Bungee.Network.Packet.<a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketDownloadPlayerList.html" title="class in net.ME1312.SubServers.Bungee.Network.Packet">PacketDownloadPlayerList</a></dt>
 <dd>&nbsp;</dd>
-<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketDownloadProxyInfo.html#execute-net.ME1312.SubServers.Bungee.Network.Client-org.json.JSONObject-">execute(Client, JSONObject)</a></span> - Method in class net.ME1312.SubServers.Bungee.Network.Packet.<a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketDownloadProxyInfo.html" title="class in net.ME1312.SubServers.Bungee.Network.Packet">PacketDownloadProxyInfo</a></dt>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketDownloadProxyInfo.html#execute-net.ME1312.SubServers.Bungee.Network.Client-net.ME1312.SubServers.Bungee.Library.Config.YAMLSection-">execute(Client, YAMLSection)</a></span> - Method in class net.ME1312.SubServers.Bungee.Network.Packet.<a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketDownloadProxyInfo.html" title="class in net.ME1312.SubServers.Bungee.Network.Packet">PacketDownloadProxyInfo</a></dt>
 <dd>&nbsp;</dd>
-<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketDownloadServerInfo.html#execute-net.ME1312.SubServers.Bungee.Network.Client-org.json.JSONObject-">execute(Client, JSONObject)</a></span> - Method in class net.ME1312.SubServers.Bungee.Network.Packet.<a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketDownloadServerInfo.html" title="class in net.ME1312.SubServers.Bungee.Network.Packet">PacketDownloadServerInfo</a></dt>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketDownloadServerInfo.html#execute-net.ME1312.SubServers.Bungee.Network.Client-net.ME1312.SubServers.Bungee.Library.Config.YAMLSection-">execute(Client, YAMLSection)</a></span> - Method in class net.ME1312.SubServers.Bungee.Network.Packet.<a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketDownloadServerInfo.html" title="class in net.ME1312.SubServers.Bungee.Network.Packet">PacketDownloadServerInfo</a></dt>
 <dd>&nbsp;</dd>
-<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketDownloadServerList.html#execute-net.ME1312.SubServers.Bungee.Network.Client-org.json.JSONObject-">execute(Client, JSONObject)</a></span> - Method in class net.ME1312.SubServers.Bungee.Network.Packet.<a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketDownloadServerList.html" title="class in net.ME1312.SubServers.Bungee.Network.Packet">PacketDownloadServerList</a></dt>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketDownloadServerList.html#execute-net.ME1312.SubServers.Bungee.Network.Client-net.ME1312.SubServers.Bungee.Library.Config.YAMLSection-">execute(Client, YAMLSection)</a></span> - Method in class net.ME1312.SubServers.Bungee.Network.Packet.<a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketDownloadServerList.html" title="class in net.ME1312.SubServers.Bungee.Network.Packet">PacketDownloadServerList</a></dt>
 <dd>&nbsp;</dd>
-<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketEditServer.html#execute-net.ME1312.SubServers.Bungee.Network.Client-org.json.JSONObject-">execute(Client, JSONObject)</a></span> - Method in class net.ME1312.SubServers.Bungee.Network.Packet.<a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketEditServer.html" title="class in net.ME1312.SubServers.Bungee.Network.Packet">PacketEditServer</a></dt>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketEditServer.html#execute-net.ME1312.SubServers.Bungee.Network.Client-net.ME1312.SubServers.Bungee.Library.Config.YAMLSection-">execute(Client, YAMLSection)</a></span> - Method in class net.ME1312.SubServers.Bungee.Network.Packet.<a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketEditServer.html" title="class in net.ME1312.SubServers.Bungee.Network.Packet">PacketEditServer</a></dt>
 <dd>&nbsp;</dd>
-<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketExAddServer.html#execute-net.ME1312.SubServers.Bungee.Network.Client-org.json.JSONObject-">execute(Client, JSONObject)</a></span> - Method in class net.ME1312.SubServers.Bungee.Network.Packet.<a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketExAddServer.html" title="class in net.ME1312.SubServers.Bungee.Network.Packet">PacketExAddServer</a></dt>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketExAddServer.html#execute-net.ME1312.SubServers.Bungee.Network.Client-net.ME1312.SubServers.Bungee.Library.Config.YAMLSection-">execute(Client, YAMLSection)</a></span> - Method in class net.ME1312.SubServers.Bungee.Network.Packet.<a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketExAddServer.html" title="class in net.ME1312.SubServers.Bungee.Network.Packet">PacketExAddServer</a></dt>
 <dd>&nbsp;</dd>
-<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketExConfigureHost.html#execute-net.ME1312.SubServers.Bungee.Network.Client-org.json.JSONObject-">execute(Client, JSONObject)</a></span> - Method in class net.ME1312.SubServers.Bungee.Network.Packet.<a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketExConfigureHost.html" title="class in net.ME1312.SubServers.Bungee.Network.Packet">PacketExConfigureHost</a></dt>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketExConfigureHost.html#execute-net.ME1312.SubServers.Bungee.Network.Client-net.ME1312.SubServers.Bungee.Library.Config.YAMLSection-">execute(Client, YAMLSection)</a></span> - Method in class net.ME1312.SubServers.Bungee.Network.Packet.<a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketExConfigureHost.html" title="class in net.ME1312.SubServers.Bungee.Network.Packet">PacketExConfigureHost</a></dt>
 <dd>&nbsp;</dd>
-<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketExCreateServer.html#execute-net.ME1312.SubServers.Bungee.Network.Client-org.json.JSONObject-">execute(Client, JSONObject)</a></span> - Method in class net.ME1312.SubServers.Bungee.Network.Packet.<a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketExCreateServer.html" title="class in net.ME1312.SubServers.Bungee.Network.Packet">PacketExCreateServer</a></dt>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketExCreateServer.html#execute-net.ME1312.SubServers.Bungee.Network.Client-net.ME1312.SubServers.Bungee.Library.Config.YAMLSection-">execute(Client, YAMLSection)</a></span> - Method in class net.ME1312.SubServers.Bungee.Network.Packet.<a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketExCreateServer.html" title="class in net.ME1312.SubServers.Bungee.Network.Packet">PacketExCreateServer</a></dt>
 <dd>&nbsp;</dd>
-<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketExDeleteServer.html#execute-net.ME1312.SubServers.Bungee.Network.Client-org.json.JSONObject-">execute(Client, JSONObject)</a></span> - Method in class net.ME1312.SubServers.Bungee.Network.Packet.<a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketExDeleteServer.html" title="class in net.ME1312.SubServers.Bungee.Network.Packet">PacketExDeleteServer</a></dt>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketExDeleteServer.html#execute-net.ME1312.SubServers.Bungee.Network.Client-net.ME1312.SubServers.Bungee.Library.Config.YAMLSection-">execute(Client, YAMLSection)</a></span> - Method in class net.ME1312.SubServers.Bungee.Network.Packet.<a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketExDeleteServer.html" title="class in net.ME1312.SubServers.Bungee.Network.Packet">PacketExDeleteServer</a></dt>
 <dd>&nbsp;</dd>
-<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketExRemoveServer.html#execute-net.ME1312.SubServers.Bungee.Network.Client-org.json.JSONObject-">execute(Client, JSONObject)</a></span> - Method in class net.ME1312.SubServers.Bungee.Network.Packet.<a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketExRemoveServer.html" title="class in net.ME1312.SubServers.Bungee.Network.Packet">PacketExRemoveServer</a></dt>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketExRemoveServer.html#execute-net.ME1312.SubServers.Bungee.Network.Client-net.ME1312.SubServers.Bungee.Library.Config.YAMLSection-">execute(Client, YAMLSection)</a></span> - Method in class net.ME1312.SubServers.Bungee.Network.Packet.<a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketExRemoveServer.html" title="class in net.ME1312.SubServers.Bungee.Network.Packet">PacketExRemoveServer</a></dt>
 <dd>&nbsp;</dd>
-<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketExUpdateServer.html#execute-net.ME1312.SubServers.Bungee.Network.Client-org.json.JSONObject-">execute(Client, JSONObject)</a></span> - Method in class net.ME1312.SubServers.Bungee.Network.Packet.<a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketExUpdateServer.html" title="class in net.ME1312.SubServers.Bungee.Network.Packet">PacketExUpdateServer</a></dt>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketExUpdateServer.html#execute-net.ME1312.SubServers.Bungee.Network.Client-net.ME1312.SubServers.Bungee.Library.Config.YAMLSection-">execute(Client, YAMLSection)</a></span> - Method in class net.ME1312.SubServers.Bungee.Network.Packet.<a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketExUpdateServer.html" title="class in net.ME1312.SubServers.Bungee.Network.Packet">PacketExUpdateServer</a></dt>
 <dd>&nbsp;</dd>
-<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketInExLogMessage.html#execute-net.ME1312.SubServers.Bungee.Network.Client-org.json.JSONObject-">execute(Client, JSONObject)</a></span> - Method in class net.ME1312.SubServers.Bungee.Network.Packet.<a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketInExLogMessage.html" title="class in net.ME1312.SubServers.Bungee.Network.Packet">PacketInExLogMessage</a></dt>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketInExLogMessage.html#execute-net.ME1312.SubServers.Bungee.Network.Client-net.ME1312.SubServers.Bungee.Library.Config.YAMLSection-">execute(Client, YAMLSection)</a></span> - Method in class net.ME1312.SubServers.Bungee.Network.Packet.<a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketInExLogMessage.html" title="class in net.ME1312.SubServers.Bungee.Network.Packet">PacketInExLogMessage</a></dt>
 <dd>&nbsp;</dd>
-<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketInExRequestQueue.html#execute-net.ME1312.SubServers.Bungee.Network.Client-org.json.JSONObject-">execute(Client, JSONObject)</a></span> - Method in class net.ME1312.SubServers.Bungee.Network.Packet.<a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketInExRequestQueue.html" title="class in net.ME1312.SubServers.Bungee.Network.Packet">PacketInExRequestQueue</a></dt>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketInExRequestQueue.html#execute-net.ME1312.SubServers.Bungee.Network.Client-net.ME1312.SubServers.Bungee.Library.Config.YAMLSection-">execute(Client, YAMLSection)</a></span> - Method in class net.ME1312.SubServers.Bungee.Network.Packet.<a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketInExRequestQueue.html" title="class in net.ME1312.SubServers.Bungee.Network.Packet">PacketInExRequestQueue</a></dt>
 <dd>&nbsp;</dd>
-<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketLinkExHost.html#execute-net.ME1312.SubServers.Bungee.Network.Client-org.json.JSONObject-">execute(Client, JSONObject)</a></span> - Method in class net.ME1312.SubServers.Bungee.Network.Packet.<a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketLinkExHost.html" title="class in net.ME1312.SubServers.Bungee.Network.Packet">PacketLinkExHost</a></dt>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketLinkExHost.html#execute-net.ME1312.SubServers.Bungee.Network.Client-net.ME1312.SubServers.Bungee.Library.Config.YAMLSection-">execute(Client, YAMLSection)</a></span> - Method in class net.ME1312.SubServers.Bungee.Network.Packet.<a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketLinkExHost.html" title="class in net.ME1312.SubServers.Bungee.Network.Packet">PacketLinkExHost</a></dt>
 <dd>&nbsp;</dd>
-<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketLinkProxy.html#execute-net.ME1312.SubServers.Bungee.Network.Client-org.json.JSONObject-">execute(Client, JSONObject)</a></span> - Method in class net.ME1312.SubServers.Bungee.Network.Packet.<a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketLinkProxy.html" title="class in net.ME1312.SubServers.Bungee.Network.Packet">PacketLinkProxy</a></dt>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketLinkProxy.html#execute-net.ME1312.SubServers.Bungee.Network.Client-net.ME1312.SubServers.Bungee.Library.Config.YAMLSection-">execute(Client, YAMLSection)</a></span> - Method in class net.ME1312.SubServers.Bungee.Network.Packet.<a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketLinkProxy.html" title="class in net.ME1312.SubServers.Bungee.Network.Packet">PacketLinkProxy</a></dt>
 <dd>&nbsp;</dd>
-<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketLinkServer.html#execute-net.ME1312.SubServers.Bungee.Network.Client-org.json.JSONObject-">execute(Client, JSONObject)</a></span> - Method in class net.ME1312.SubServers.Bungee.Network.Packet.<a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketLinkServer.html" title="class in net.ME1312.SubServers.Bungee.Network.Packet">PacketLinkServer</a></dt>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketLinkServer.html#execute-net.ME1312.SubServers.Bungee.Network.Client-net.ME1312.SubServers.Bungee.Library.Config.YAMLSection-">execute(Client, YAMLSection)</a></span> - Method in class net.ME1312.SubServers.Bungee.Network.Packet.<a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketLinkServer.html" title="class in net.ME1312.SubServers.Bungee.Network.Packet">PacketLinkServer</a></dt>
 <dd>&nbsp;</dd>
-<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketListenLog.html#execute-net.ME1312.SubServers.Bungee.Network.Client-org.json.JSONObject-">execute(Client, JSONObject)</a></span> - Method in class net.ME1312.SubServers.Bungee.Network.Packet.<a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketListenLog.html" title="class in net.ME1312.SubServers.Bungee.Network.Packet">PacketListenLog</a></dt>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketListenLog.html#execute-net.ME1312.SubServers.Bungee.Network.Client-net.ME1312.SubServers.Bungee.Library.Config.YAMLSection-">execute(Client, YAMLSection)</a></span> - Method in class net.ME1312.SubServers.Bungee.Network.Packet.<a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketListenLog.html" title="class in net.ME1312.SubServers.Bungee.Network.Packet">PacketListenLog</a></dt>
 <dd>&nbsp;</dd>
-<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketStartServer.html#execute-net.ME1312.SubServers.Bungee.Network.Client-org.json.JSONObject-">execute(Client, JSONObject)</a></span> - Method in class net.ME1312.SubServers.Bungee.Network.Packet.<a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketStartServer.html" title="class in net.ME1312.SubServers.Bungee.Network.Packet">PacketStartServer</a></dt>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketStartServer.html#execute-net.ME1312.SubServers.Bungee.Network.Client-net.ME1312.SubServers.Bungee.Library.Config.YAMLSection-">execute(Client, YAMLSection)</a></span> - Method in class net.ME1312.SubServers.Bungee.Network.Packet.<a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketStartServer.html" title="class in net.ME1312.SubServers.Bungee.Network.Packet">PacketStartServer</a></dt>
 <dd>&nbsp;</dd>
-<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketStopServer.html#execute-net.ME1312.SubServers.Bungee.Network.Client-org.json.JSONObject-">execute(Client, JSONObject)</a></span> - Method in class net.ME1312.SubServers.Bungee.Network.Packet.<a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketStopServer.html" title="class in net.ME1312.SubServers.Bungee.Network.Packet">PacketStopServer</a></dt>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketStopServer.html#execute-net.ME1312.SubServers.Bungee.Network.Client-net.ME1312.SubServers.Bungee.Library.Config.YAMLSection-">execute(Client, YAMLSection)</a></span> - Method in class net.ME1312.SubServers.Bungee.Network.Packet.<a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketStopServer.html" title="class in net.ME1312.SubServers.Bungee.Network.Packet">PacketStopServer</a></dt>
 <dd>&nbsp;</dd>
-<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Network/PacketIn.html#execute-net.ME1312.SubServers.Bungee.Network.Client-org.json.JSONObject-">execute(Client, JSONObject)</a></span> - Method in interface net.ME1312.SubServers.Bungee.Network.<a href="net/ME1312/SubServers/Bungee/Network/PacketIn.html" title="interface in net.ME1312.SubServers.Bungee.Network">PacketIn</a></dt>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Network/PacketIn.html#execute-net.ME1312.SubServers.Bungee.Network.Client-net.ME1312.SubServers.Bungee.Library.Config.YAMLSection-">execute(Client, YAMLSection)</a></span> - Method in interface net.ME1312.SubServers.Bungee.Network.<a href="net/ME1312/SubServers/Bungee/Network/PacketIn.html" title="interface in net.ME1312.SubServers.Bungee.Network">PacketIn</a></dt>
 <dd>
 <div class="block">Execute Incoming Packet</div>
 </dd>
@@ -774,7 +778,7 @@
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Network/PacketOut.html#generate--">generate()</a></span> - Method in interface net.ME1312.SubServers.Bungee.Network.<a href="net/ME1312/SubServers/Bungee/Network/PacketOut.html" title="interface in net.ME1312.SubServers.Bungee.Network">PacketOut</a></dt>
 <dd>
-<div class="block">Generate JSON Packet Contents</div>
+<div class="block">Generate Packet Contents</div>
 </dd>
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Host/SubServerController.html#get--">get()</a></span> - Method in class net.ME1312.SubServers.Bungee.Host.<a href="net/ME1312/SubServers/Bungee/Host/SubServerController.html" title="class in net.ME1312.SubServers.Bungee.Host">SubServerController</a></dt>
 <dd>
@@ -2083,16 +2087,6 @@
 <div class="block">Check if object is a UUID</div>
 </dd>
 </dl>
-<a name="I:J">
-<!--   -->
-</a>
-<h2 class="title">J</h2>
-<dl>
-<dt><a href="net/ME1312/SubServers/Bungee/Library/JSONCallback.html" title="interface in net.ME1312.SubServers.Bungee.Library"><span class="typeNameLink">JSONCallback</span></a> - Interface in <a href="net/ME1312/SubServers/Bungee/Library/package-summary.html">net.ME1312.SubServers.Bungee.Library</a></dt>
-<dd>
-<div class="block">JSON Callback Class</div>
-</dd>
-</dl>
 <a name="I:L">
 <!--   -->
 </a>
@@ -2364,7 +2358,7 @@
 <dd>
 <div class="block">New PacketExAddServer (In)</div>
 </dd>
-<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketExAddServer.html#PacketExAddServer-java.lang.String-boolean-boolean-java.lang.String-net.ME1312.SubServers.Bungee.Host.Executable-java.lang.String-java.util.UUID-net.ME1312.SubServers.Bungee.Library.JSONCallback...-">PacketExAddServer(String, boolean, boolean, String, Executable, String, UUID, JSONCallback...)</a></span> - Constructor for class net.ME1312.SubServers.Bungee.Network.Packet.<a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketExAddServer.html" title="class in net.ME1312.SubServers.Bungee.Network.Packet">PacketExAddServer</a></dt>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketExAddServer.html#PacketExAddServer-java.lang.String-boolean-boolean-java.lang.String-net.ME1312.SubServers.Bungee.Host.Executable-java.lang.String-java.util.UUID-net.ME1312.SubServers.Bungee.Library.Callback...-">PacketExAddServer(String, boolean, boolean, String, Executable, String, UUID, Callback&lt;YAMLSection&gt;...)</a></span> - Constructor for class net.ME1312.SubServers.Bungee.Network.Packet.<a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketExAddServer.html" title="class in net.ME1312.SubServers.Bungee.Network.Packet">PacketExAddServer</a></dt>
 <dd>
 <div class="block">New PacketExAddServer (Out)</div>
 </dd>
@@ -2388,7 +2382,7 @@
 <dd>
 <div class="block">New PacketExCreateServer</div>
 </dd>
-<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketExCreateServer.html#PacketExCreateServer-java.lang.String-net.ME1312.SubServers.Bungee.Host.SubCreator.ServerTemplate-net.ME1312.SubServers.Bungee.Library.Version.Version-int-java.util.UUID-net.ME1312.SubServers.Bungee.Library.JSONCallback...-">PacketExCreateServer(String, SubCreator.ServerTemplate, Version, int, UUID, JSONCallback...)</a></span> - Constructor for class net.ME1312.SubServers.Bungee.Network.Packet.<a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketExCreateServer.html" title="class in net.ME1312.SubServers.Bungee.Network.Packet">PacketExCreateServer</a></dt>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketExCreateServer.html#PacketExCreateServer-java.lang.String-net.ME1312.SubServers.Bungee.Host.SubCreator.ServerTemplate-net.ME1312.SubServers.Bungee.Library.Version.Version-int-java.util.UUID-net.ME1312.SubServers.Bungee.Library.Callback...-">PacketExCreateServer(String, SubCreator.ServerTemplate, Version, int, UUID, Callback&lt;YAMLSection&gt;...)</a></span> - Constructor for class net.ME1312.SubServers.Bungee.Network.Packet.<a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketExCreateServer.html" title="class in net.ME1312.SubServers.Bungee.Network.Packet">PacketExCreateServer</a></dt>
 <dd>
 <div class="block">New PacketExCreateServer (Out)</div>
 </dd>
@@ -2400,7 +2394,7 @@
 <dd>
 <div class="block">New PacketExDeleteServer</div>
 </dd>
-<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketExDeleteServer.html#PacketExDeleteServer-java.lang.String-org.json.JSONObject-net.ME1312.SubServers.Bungee.Library.JSONCallback...-">PacketExDeleteServer(String, JSONObject, JSONCallback...)</a></span> - Constructor for class net.ME1312.SubServers.Bungee.Network.Packet.<a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketExDeleteServer.html" title="class in net.ME1312.SubServers.Bungee.Network.Packet">PacketExDeleteServer</a></dt>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketExDeleteServer.html#PacketExDeleteServer-java.lang.String-net.ME1312.SubServers.Bungee.Library.Config.YAMLSection-net.ME1312.SubServers.Bungee.Library.Callback...-">PacketExDeleteServer(String, YAMLSection, Callback&lt;YAMLSection&gt;...)</a></span> - Constructor for class net.ME1312.SubServers.Bungee.Network.Packet.<a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketExDeleteServer.html" title="class in net.ME1312.SubServers.Bungee.Network.Packet">PacketExDeleteServer</a></dt>
 <dd>
 <div class="block">New PacketExDeleteServer (Out)</div>
 </dd>
@@ -2412,7 +2406,7 @@
 <dd>
 <div class="block">New PacketExRemoveServer (In)</div>
 </dd>
-<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketExRemoveServer.html#PacketExRemoveServer-java.lang.String-net.ME1312.SubServers.Bungee.Library.JSONCallback...-">PacketExRemoveServer(String, JSONCallback...)</a></span> - Constructor for class net.ME1312.SubServers.Bungee.Network.Packet.<a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketExRemoveServer.html" title="class in net.ME1312.SubServers.Bungee.Network.Packet">PacketExRemoveServer</a></dt>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketExRemoveServer.html#PacketExRemoveServer-java.lang.String-net.ME1312.SubServers.Bungee.Library.Callback...-">PacketExRemoveServer(String, Callback&lt;YAMLSection&gt;...)</a></span> - Constructor for class net.ME1312.SubServers.Bungee.Network.Packet.<a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketExRemoveServer.html" title="class in net.ME1312.SubServers.Bungee.Network.Packet">PacketExRemoveServer</a></dt>
 <dd>
 <div class="block">New PacketExRemoveServer (Out)</div>
 </dd>
@@ -2526,7 +2520,7 @@
 <dd>
 <div class="block">New PacketOutRunEvent (Registerer)</div>
 </dd>
-<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketOutRunEvent.html#PacketOutRunEvent-java.lang.Class-org.json.JSONObject-">PacketOutRunEvent(Class&lt;? extends SubEvent&gt;, JSONObject)</a></span> - Constructor for class net.ME1312.SubServers.Bungee.Network.Packet.<a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketOutRunEvent.html" title="class in net.ME1312.SubServers.Bungee.Network.Packet">PacketOutRunEvent</a></dt>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketOutRunEvent.html#PacketOutRunEvent-java.lang.Class-net.ME1312.SubServers.Bungee.Library.Config.YAMLSection-">PacketOutRunEvent(Class&lt;? extends SubEvent&gt;, YAMLSection)</a></span> - Constructor for class net.ME1312.SubServers.Bungee.Network.Packet.<a href="net/ME1312/SubServers/Bungee/Network/Packet/PacketOutRunEvent.html" title="class in net.ME1312.SubServers.Bungee.Network.Packet">PacketOutRunEvent</a></dt>
 <dd>
 <div class="block">New PacketOutRunEvent (Out)</div>
 </dd>
@@ -2692,7 +2686,7 @@
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/SubPlugin.html#resetSudo-net.ME1312.SubServers.Bungee.Event.SubStoppedEvent-">resetSudo(SubStoppedEvent)</a></span> - Method in class net.ME1312.SubServers.Bungee.<a href="net/ME1312/SubServers/Bungee/SubPlugin.html" title="class in net.ME1312.SubServers.Bungee">SubPlugin</a></dt>
 <dd>&nbsp;</dd>
-<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Library/JSONCallback.html#run-org.json.JSONObject-">run(JSONObject)</a></span> - Method in interface net.ME1312.SubServers.Bungee.Library.<a href="net/ME1312/SubServers/Bungee/Library/JSONCallback.html" title="interface in net.ME1312.SubServers.Bungee.Library">JSONCallback</a></dt>
+<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Library/Callback.html#run-T-">run(T)</a></span> - Method in interface net.ME1312.SubServers.Bungee.Library.<a href="net/ME1312/SubServers/Bungee/Library/Callback.html" title="interface in net.ME1312.SubServers.Bungee.Library">Callback</a></dt>
 <dd>
 <div class="block">Run the Callback</div>
 </dd>
@@ -3603,10 +3597,6 @@ the order they are declared.</div>
 <dd>
 <div class="block">Creates a YAML Section from String</div>
 </dd>
-<dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Library/Config/YAMLSection.html#YAMLSection-org.json.JSONObject-">YAMLSection(JSONObject)</a></span> - Constructor for class net.ME1312.SubServers.Bungee.Library.Config.<a href="net/ME1312/SubServers/Bungee/Library/Config/YAMLSection.html" title="class in net.ME1312.SubServers.Bungee.Library.Config">YAMLSection</a></dt>
-<dd>
-<div class="block">Creates a YAML Section from JSON Contents</div>
-</dd>
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Library/Config/YAMLSection.html#YAMLSection-java.util.Map-">YAMLSection(Map&lt;String, ?&gt;)</a></span> - Constructor for class net.ME1312.SubServers.Bungee.Library.Config.<a href="net/ME1312/SubServers/Bungee/Library/Config/YAMLSection.html" title="class in net.ME1312.SubServers.Bungee.Library.Config">YAMLSection</a></dt>
 <dd>
 <div class="block">Creates a YAML Section from Map Contents</div>
@@ -3624,7 +3614,7 @@ the order they are declared.</div>
 <dt><span class="memberNameLink"><a href="net/ME1312/SubServers/Bungee/Library/Util.html#zip-java.io.File-java.io.OutputStream-">zip(File, OutputStream)</a></span> - Static method in class net.ME1312.SubServers.Bungee.Library.<a href="net/ME1312/SubServers/Bungee/Library/Util.html" title="class in net.ME1312.SubServers.Bungee.Library">Util</a></dt>
 <dd>&nbsp;</dd>
 </dl>
-<a href="#I:A">A</a>&nbsp;<a href="#I:B">B</a>&nbsp;<a href="#I:C">C</a>&nbsp;<a href="#I:D">D</a>&nbsp;<a href="#I:E">E</a>&nbsp;<a href="#I:F">F</a>&nbsp;<a href="#I:G">G</a>&nbsp;<a href="#I:H">H</a>&nbsp;<a href="#I:I">I</a>&nbsp;<a href="#I:J">J</a>&nbsp;<a href="#I:L">L</a>&nbsp;<a href="#I:M">M</a>&nbsp;<a href="#I:N">N</a>&nbsp;<a href="#I:O">O</a>&nbsp;<a href="#I:P">P</a>&nbsp;<a href="#I:R">R</a>&nbsp;<a href="#I:S">S</a>&nbsp;<a href="#I:T">T</a>&nbsp;<a href="#I:U">U</a>&nbsp;<a href="#I:V">V</a>&nbsp;<a href="#I:W">W</a>&nbsp;<a href="#I:Y">Y</a>&nbsp;<a href="#I:Z">Z</a>&nbsp;</div>
+<a href="#I:A">A</a>&nbsp;<a href="#I:B">B</a>&nbsp;<a href="#I:C">C</a>&nbsp;<a href="#I:D">D</a>&nbsp;<a href="#I:E">E</a>&nbsp;<a href="#I:F">F</a>&nbsp;<a href="#I:G">G</a>&nbsp;<a href="#I:H">H</a>&nbsp;<a href="#I:I">I</a>&nbsp;<a href="#I:L">L</a>&nbsp;<a href="#I:M">M</a>&nbsp;<a href="#I:N">N</a>&nbsp;<a href="#I:O">O</a>&nbsp;<a href="#I:P">P</a>&nbsp;<a href="#I:R">R</a>&nbsp;<a href="#I:S">S</a>&nbsp;<a href="#I:T">T</a>&nbsp;<a href="#I:U">U</a>&nbsp;<a href="#I:V">V</a>&nbsp;<a href="#I:W">W</a>&nbsp;<a href="#I:Y">Y</a>&nbsp;<a href="#I:Z">Z</a>&nbsp;</div>
 <!-- ======= START OF BOTTOM NAVBAR ====== -->
 <div class="bottomNav"><a name="navbar.bottom">
 <!--   -->

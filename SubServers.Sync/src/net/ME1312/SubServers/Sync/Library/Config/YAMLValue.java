@@ -102,7 +102,7 @@ public class YAMLValue {
      * @return Double
      */
     public Double asDouble() {
-        return (Double) obj;
+        return ((Number) obj).doubleValue();
     }
 
     /**
@@ -120,7 +120,7 @@ public class YAMLValue {
      * @return Float
      */
     public Float asFloat() {
-        return (Float) obj;
+        return ((Number) obj).floatValue();
     }
 
     /**
@@ -138,7 +138,7 @@ public class YAMLValue {
      * @return Integer
      */
     public Integer asInt() {
-        return (Integer) obj;
+        return ((Number) obj).intValue();
     }
 
     /**
@@ -156,7 +156,7 @@ public class YAMLValue {
      * @return Long
      */
     public Long asLong() {
-        return (Long) obj;
+        return ((Number) obj).longValue();
     }
 
     /**
@@ -174,7 +174,7 @@ public class YAMLValue {
      * @return Short
      */
     public Short asShort() {
-        return (Short) obj;
+        return ((Number) obj).shortValue();
     }
 
     /**

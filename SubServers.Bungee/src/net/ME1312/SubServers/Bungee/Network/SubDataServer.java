@@ -1,12 +1,14 @@
 package net.ME1312.SubServers.Bungee.Network;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import net.ME1312.SubServers.Bungee.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Bungee.Library.Exception.IllegalPacketException;
 import net.ME1312.SubServers.Bungee.Library.Util;
 import net.ME1312.SubServers.Bungee.Library.Version.Version;
 import net.ME1312.SubServers.Bungee.Network.Encryption.AES;
 import net.ME1312.SubServers.Bungee.Network.Packet.*;
 import net.ME1312.SubServers.Bungee.SubPlugin;
-import org.json.JSONObject;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -56,12 +58,13 @@ public final class SubDataServer {
                 return "NONE";
             }
             @Override
-            public byte[] encrypt(String key, JSONObject data) throws Exception {
-                return data.toString().getBytes(StandardCharsets.UTF_8);
+            public byte[] encrypt(String key, YAMLSection data) {
+                return data.toJSON().getBytes(StandardCharsets.UTF_8);
             }
             @Override
-            public JSONObject decrypt(String key, byte[] data) throws Exception {
-                return new JSONObject(new String(data, StandardCharsets.UTF_8));
+            @SuppressWarnings("unchecked")
+            public YAMLSection decrypt(String key, byte[] data) {
+                return new YAMLSection(new Gson().fromJson(new String(data, StandardCharsets.UTF_8), Map.class));
             }
         };
 
@@ -411,46 +414,46 @@ public final class SubDataServer {
     }
 
     /**
-     * JSON Encode PacketOut
+     * Encode PacketOut
      *
      * @param packet PacketOut
      * @return JSON Formatted Packet
      * @throws IllegalPacketException
      */
-    protected static JSONObject encodePacket(Client client, PacketOut packet) throws IllegalPacketException, InvocationTargetException {
-        JSONObject json = new JSONObject();
+    protected static YAMLSection encodePacket(Client client, PacketOut packet) throws IllegalPacketException, InvocationTargetException {
+        YAMLSection section = new YAMLSection();
 
         if (!pOut.keySet().contains(packet.getClass())) throw new IllegalPacketException(packet.getClass().getCanonicalName() + ": Unknown PacketOut Channel: " + packet.getClass().getCanonicalName());
         if (packet.getVersion().toString() == null) throw new NullPointerException(packet.getClass().getCanonicalName() + ": PacketOut getVersion() cannot be null: " + packet.getClass().getCanonicalName());
 
         try {
-            JSONObject contents = packet.generate();
-            json.put("h", pOut.get(packet.getClass()));
-            json.put("v", packet.getVersion().toString());
-            if (contents != null) json.put("c", contents);
-            return json;
+            YAMLSection contents = packet.generate();
+            section.set("h", pOut.get(packet.getClass()));
+            section.set("v", packet.getVersion().toString());
+            if (contents != null) section.set("c", contents);
+            return section;
         } catch (Throwable e) {
             throw new InvocationTargetException(e, packet.getClass().getCanonicalName() + ": Exception while encoding packet");
         }
     }
 
     /**
-     * JSON Decode PacketIn
+     * Decode PacketIn
      *
-     * @param json JSON to Decode
+     * @param data Data to Decode
      * @return PacketIn
      * @throws IllegalPacketException
      */
-    protected static List<PacketIn> decodePacket(Client client, JSONObject json) throws IllegalPacketException {
-        if (!json.keySet().contains("h") || !json.keySet().contains("v")) throw new IllegalPacketException(client.getAddress().toString() + ": Unknown Packet Format: " + json.toString());
-        if (!pIn.keySet().contains(json.getString("h"))) throw new IllegalPacketException(client.getAddress().toString() + ": Unknown PacketIn Channel: " + json.getString("h"));
+    protected static List<PacketIn> decodePacket(Client client, YAMLSection data) throws IllegalPacketException {
+        if (!data.contains("h") || !data.contains("v")) throw new IllegalPacketException(client.getAddress().toString() + ": Unknown Packet Format: " + data.toString());
+        if (!pIn.keySet().contains(data.getRawString("h"))) throw new IllegalPacketException(client.getAddress().toString() + ": Unknown PacketIn Channel: " + data.getRawString("h"));
 
         List<PacketIn> list = new ArrayList<PacketIn>();
-        for (PacketIn packet : pIn.get(json.getString("h"))) {
-            if (packet.isCompatible(new Version(json.getString("v")))) {
+        for (PacketIn packet : pIn.get(data.getRawString("h"))) {
+            if (packet.isCompatible(new Version(data.getRawString("v")))) {
                 list.add(packet);
             } else {
-                new IllegalPacketException(client.getAddress().toString() + ": Packet Version Mismatch in " + json.getString("h") + ": " + json.getString("v") + " =/= " + packet.getVersion().toString()).printStackTrace();
+                new IllegalPacketException(client.getAddress().toString() + ": Packet Version Mismatch in " + data.getRawString("h") + ": " + data.getRawString("v") + " =/= " + packet.getVersion().toString()).printStackTrace();
             }
         }
 

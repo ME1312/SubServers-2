@@ -1,13 +1,16 @@
 package net.ME1312.SubServers.Bungee.Network.Packet;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonParseException;
+import net.ME1312.SubServers.Bungee.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Bungee.Library.Util;
 import net.ME1312.SubServers.Bungee.Library.Version.Version;
 import net.ME1312.SubServers.Bungee.Network.Client;
 import net.ME1312.SubServers.Bungee.Network.PacketIn;
 import net.ME1312.SubServers.Bungee.Network.PacketOut;
 import net.ME1312.SubServers.Bungee.SubPlugin;
-import org.json.JSONException;
-import org.json.JSONObject;
+
+import java.util.Map;
 
 /**
  * Download Network List Packet
@@ -38,25 +41,26 @@ public class PacketDownloadNetworkList implements PacketIn, PacketOut {
         this.id = id;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public JSONObject generate() {
-        JSONObject json = new JSONObject();
-        json.put("id", id);
-        JSONObject clients = new JSONObject();
+    public YAMLSection generate() {
+        YAMLSection json = new YAMLSection();
+        json.set("id", id);
+        YAMLSection clients = new YAMLSection();
         for (Client client : plugin.subdata.getClients()) {
             try {
-                clients.put(client.getAddress().toString(), new JSONObject(client.getHandler().toString()));
-            } catch (JSONException | NullPointerException e) {
-                clients.put(client.getAddress().toString(), new JSONObject());
+                clients.set(client.getAddress().toString(), new YAMLSection(new Gson().fromJson(client.getHandler().toString(), Map.class)));
+            } catch (JsonParseException | NullPointerException e) {
+                clients.set(client.getAddress().toString(), new YAMLSection());
             }
         }
-        json.put("clients", clients);
+        json.set("clients", clients);
         return json;
     }
 
     @Override
-    public void execute(Client client, JSONObject data) {
-        client.sendPacket(new PacketDownloadNetworkList(plugin, (data.keySet().contains("id"))?data.getString("id"):null));
+    public void execute(Client client, YAMLSection data) {
+        client.sendPacket(new PacketDownloadNetworkList(plugin, (data.contains("id"))?data.getRawString("id"):null));
     }
 
     @Override

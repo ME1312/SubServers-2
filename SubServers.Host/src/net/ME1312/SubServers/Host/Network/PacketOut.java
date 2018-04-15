@@ -1,7 +1,7 @@
 package net.ME1312.SubServers.Host.Network;
 
+import net.ME1312.SubServers.Host.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Host.Library.Version.Version;
-import org.json.JSONObject;
 
 /**
  * PacketOut Layout Class
@@ -12,7 +12,7 @@ public interface PacketOut {
      *
      * @return Packet Contents
      */
-    JSONObject generate() throws Throwable;
+    YAMLSection generate() throws Throwable;
 
     /**
      * Get Packet Version

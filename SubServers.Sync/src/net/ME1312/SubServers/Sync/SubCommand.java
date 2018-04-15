@@ -92,29 +92,29 @@ public final class SubCommand extends CommandX {
                             }
                         }).start();
                     } else if (args[0].equalsIgnoreCase("list")) {
-                        plugin.subdata.sendPacket(new PacketDownloadServerList(null, null, json -> {
+                        plugin.subdata.sendPacket(new PacketDownloadServerList(null, null, data -> {
                             int i = 0;
                             boolean sent = false;
                             String div = ChatColor.RESET + ", ";
-                            if (json.getJSONObject("groups").length() > 0) {
+                            if (data.getSection("groups").getKeys().size() > 0) {
                                 sender.sendMessage("SubServers > Group/Server List:");
-                                for (String group : json.getJSONObject("groups").keySet()) {
+                                for (String group : data.getSection("groups").getKeys()) {
                                     String message = "";
                                     message += ChatColor.GOLD + group + ChatColor.RESET + ": ";
-                                    for (String server : json.getJSONObject("groups").getJSONObject(group).keySet()) {
+                                    for (String server : data.getSection("groups").getSection(group).getKeys()) {
                                         if (i != 0) message += div;
-                                        if (!json.getJSONObject("groups").getJSONObject(group).getJSONObject(server).keySet().contains("enabled")) {
+                                        if (!data.getSection("groups").getSection(group).getSection(server).contains("enabled")) {
                                             message += ChatColor.WHITE;
-                                        } else if (json.getJSONObject("groups").getJSONObject(group).getJSONObject(server).getBoolean("temp")) {
+                                        } else if (data.getSection("groups").getSection(group).getSection(server).getBoolean("temp")) {
                                             message += ChatColor.AQUA;
-                                        } else if (json.getJSONObject("groups").getJSONObject(group).getJSONObject(server).getBoolean("running")) {
+                                        } else if (data.getSection("groups").getSection(group).getSection(server).getBoolean("running")) {
                                             message += ChatColor.GREEN;
-                                        } else if (json.getJSONObject("groups").getJSONObject(group).getJSONObject(server).getBoolean("enabled") && json.getJSONObject("groups").getJSONObject(group).getJSONObject(server).getJSONArray("incompatible").length() == 0) {
+                                        } else if (data.getSection("groups").getSection(group).getSection(server).getBoolean("enabled") && data.getSection("groups").getSection(group).getSection(server).getList("incompatible").size() == 0) {
                                             message += ChatColor.YELLOW;
                                         } else {
                                             message += ChatColor.RED;
                                         }
-                                        message += json.getJSONObject("groups").getJSONObject(group).getJSONObject(server).getString("display") + " (" + json.getJSONObject("groups").getJSONObject(group).getJSONObject(server).getString("address") + ((server.equals(json.getJSONObject("groups").getJSONObject(group).getJSONObject(server).getString("display"))) ? "" : ChatColor.stripColor(div) + server) + ")";
+                                        message += data.getSection("groups").getSection(group).getSection(server).getRawString("display") + " (" + data.getSection("groups").getSection(group).getSection(server).getRawString("address") + ((server.equals(data.getSection("groups").getSection(group).getSection(server).getRawString("display"))) ? "" : ChatColor.stripColor(div) + server) + ")";
                                         i++;
                                     }
                                     if (i == 0) message += ChatColor.RESET + "(none)";
@@ -126,26 +126,26 @@ public final class SubCommand extends CommandX {
                                 sent = false;
                             }
                             sender.sendMessage("SubServers > Host/SubServer List:");
-                            for (String host : json.getJSONObject("hosts").keySet()) {
+                            for (String host : data.getSection("hosts").getKeys()) {
                                 String message = "";
-                                if (json.getJSONObject("hosts").getJSONObject(host).getBoolean("enabled")) {
+                                if (data.getSection("hosts").getSection(host).getBoolean("enabled")) {
                                     message += ChatColor.AQUA;
                                 } else {
                                     message += ChatColor.RED;
                                 }
-                                message += json.getJSONObject("hosts").getJSONObject(host).getString("display") + " (" + json.getJSONObject("hosts").getJSONObject(host).getString("address") + ((host.equals(json.getJSONObject("hosts").getJSONObject(host).getString("display"))) ? "" : ChatColor.stripColor(div) + host) + ")" + ChatColor.RESET + ": ";
-                                for (String subserver : json.getJSONObject("hosts").getJSONObject(host).getJSONObject("servers").keySet()) {
+                                message += data.getSection("hosts").getSection(host).getRawString("display") + " (" + data.getSection("hosts").getSection(host).getRawString("address") + ((host.equals(data.getSection("hosts").getSection(host).getRawString("display"))) ? "" : ChatColor.stripColor(div) + host) + ")" + ChatColor.RESET + ": ";
+                                for (String subserver : data.getSection("hosts").getSection(host).getSection("servers").getKeys()) {
                                     if (i != 0) message += div;
-                                    if (json.getJSONObject("hosts").getJSONObject(host).getJSONObject("servers").getJSONObject(subserver).getBoolean("temp")) {
+                                    if (data.getSection("hosts").getSection(host).getSection("servers").getSection(subserver).getBoolean("temp")) {
                                         message += ChatColor.AQUA;
-                                    } else if (json.getJSONObject("hosts").getJSONObject(host).getJSONObject("servers").getJSONObject(subserver).getBoolean("running")) {
+                                    } else if (data.getSection("hosts").getSection(host).getSection("servers").getSection(subserver).getBoolean("running")) {
                                         message += ChatColor.GREEN;
-                                    } else if (json.getJSONObject("hosts").getJSONObject(host).getJSONObject("servers").getJSONObject(subserver).getBoolean("enabled") && json.getJSONObject("hosts").getJSONObject(host).getJSONObject("servers").getJSONObject(subserver).getJSONArray("incompatible").length() == 0) {
+                                    } else if (data.getSection("hosts").getSection(host).getSection("servers").getSection(subserver).getBoolean("enabled") && data.getSection("hosts").getSection(host).getSection("servers").getSection(subserver).getList("incompatible").size() == 0) {
                                         message += ChatColor.YELLOW;
                                     } else {
                                         message += ChatColor.RED;
                                     }
-                                    message += json.getJSONObject("hosts").getJSONObject(host).getJSONObject("servers").getJSONObject(subserver).getString("display") + " (" + json.getJSONObject("hosts").getJSONObject(host).getJSONObject("servers").getJSONObject(subserver).getString("address").split(":")[json.getJSONObject("hosts").getJSONObject(host).getJSONObject("servers").getJSONObject(subserver).getString("address").split(":").length - 1] + ((subserver.equals(json.getJSONObject("hosts").getJSONObject(host).getJSONObject("servers").getJSONObject(subserver).getString("display"))) ? "" : ChatColor.stripColor(div) + subserver) + ")";
+                                    message += data.getSection("hosts").getSection(host).getSection("servers").getSection(subserver).getRawString("display") + " (" + data.getSection("hosts").getSection(host).getSection("servers").getSection(subserver).getRawString("address").split(":")[data.getSection("hosts").getSection(host).getSection("servers").getSection(subserver).getRawString("address").split(":").length - 1] + ((subserver.equals(data.getSection("hosts").getSection(host).getSection("servers").getSection(subserver).getRawString("display"))) ? "" : ChatColor.stripColor(div) + subserver) + ")";
                                     i++;
                                 }
                                 if (i == 0) message += ChatColor.RESET + "(none)";
@@ -156,9 +156,9 @@ public final class SubCommand extends CommandX {
                             if (!sent) sender.sendMessage(ChatColor.RESET + "(none)");
                             sender.sendMessage("SubServers > Server List:");
                             String message = "";
-                            for (String server : json.getJSONObject("servers").keySet()) {
+                            for (String server : data.getSection("servers").getKeys()) {
                                 if (i != 0) message += div;
-                                message += ChatColor.WHITE + json.getJSONObject("servers").getJSONObject(server).getString("display") + " (" + json.getJSONObject("servers").getJSONObject(server).getString("address") + ((server.equals(json.getJSONObject("servers").getJSONObject(server).getString("display"))) ? "" : ChatColor.stripColor(div) + server) + ")";
+                                message += ChatColor.WHITE + data.getSection("servers").getSection(server).getRawString("display") + " (" + data.getSection("servers").getSection(server).getRawString("address") + ((server.equals(data.getSection("servers").getSection(server).getRawString("display"))) ? "" : ChatColor.stripColor(div) + server) + ")";
                                 i++;
                             }
                             if (i == 0) message += ChatColor.RESET + "(none)";
@@ -166,36 +166,36 @@ public final class SubCommand extends CommandX {
                         }));
                     } else if (args[0].equalsIgnoreCase("info") || args[0].equalsIgnoreCase("status")) {
                         if (args.length > 1) {
-                            plugin.subdata.sendPacket(new PacketDownloadServerInfo(args[1].toLowerCase(), json -> {
-                                switch (json.getString("type").toLowerCase()) {
+                            plugin.subdata.sendPacket(new PacketDownloadServerInfo(args[1].toLowerCase(), data -> {
+                                switch (data.getRawString("type").toLowerCase()) {
                                     case "invalid":
                                         sender.sendMessage("SubServers > There is no server with that name");
                                         break;
                                     case "subserver":
-                                        sender.sendMessage("SubServers > Info on " + json.getJSONObject("server").getString("display") + ':');
-                                        if (!json.getJSONObject("server").getString("name").equals(json.getJSONObject("server").getString("display"))) sender.sendMessage("  - Real Name: " + json.getJSONObject("server").getString("name"));
-                                        sender.sendMessage("  - Host: " + json.getJSONObject("server").getString("host"));
-                                        sender.sendMessage("  - Enabled: " + ((json.getJSONObject("server").getBoolean("enabled"))?"yes":"no"));
-                                        sender.sendMessage("  - Editable: " + ((json.getJSONObject("server").getBoolean("editable"))?"yes":"no"));
-                                        if (json.getJSONObject("server").getJSONArray("group").length() > 0) {
+                                        sender.sendMessage("SubServers > Info on " + data.getSection("server").getRawString("display") + ':');
+                                        if (!data.getSection("server").getRawString("name").equals(data.getSection("server").getRawString("display"))) sender.sendMessage("  - Real Name: " + data.getSection("server").getRawString("name"));
+                                        sender.sendMessage("  - Host: " + data.getSection("server").getRawString("host"));
+                                        sender.sendMessage("  - Enabled: " + ((data.getSection("server").getBoolean("enabled"))?"yes":"no"));
+                                        sender.sendMessage("  - Editable: " + ((data.getSection("server").getBoolean("editable"))?"yes":"no"));
+                                        if (data.getSection("server").getList("group").size() > 0) {
                                             sender.sendMessage("  - Group:");
-                                            for (int i = 0; i < json.getJSONObject("server").getJSONArray("group").length(); i++)
-                                                sender.sendMessage("    - " + json.getJSONObject("server").getJSONArray("group").getString(i));
+                                            for (int i = 0; i < data.getSection("server").getList("group").size(); i++)
+                                                sender.sendMessage("    - " + data.getSection("server").getList("group").get(i).asRawString());
                                         }
-                                        if (json.getJSONObject("server").getBoolean("temp")) sender.sendMessage("  - Temporary: yes");
-                                        sender.sendMessage("  - Running: " + ((json.getJSONObject("server").getBoolean("running"))?"yes":"no"));
-                                        sender.sendMessage("  - Logging: " + ((json.getJSONObject("server").getBoolean("log"))?"yes":"no"));
-                                        sender.sendMessage("  - Address: " + json.getJSONObject("server").getString("address"));
-                                        sender.sendMessage("  - Auto Restart: " + ((json.getJSONObject("server").getBoolean("auto-restart"))?"yes":"no"));
-                                        sender.sendMessage("  - Hidden: " + ((json.getJSONObject("server").getBoolean("hidden"))?"yes":"no"));
-                                        if (json.getJSONObject("server").getJSONArray("incompatible-list").length() > 0) {
+                                        if (data.getSection("server").getBoolean("temp")) sender.sendMessage("  - Temporary: yes");
+                                        sender.sendMessage("  - Running: " + ((data.getSection("server").getBoolean("running"))?"yes":"no"));
+                                        sender.sendMessage("  - Logging: " + ((data.getSection("server").getBoolean("log"))?"yes":"no"));
+                                        sender.sendMessage("  - Address: " + data.getSection("server").getRawString("address"));
+                                        sender.sendMessage("  - Auto Restart: " + ((data.getSection("server").getBoolean("auto-restart"))?"yes":"no"));
+                                        sender.sendMessage("  - Hidden: " + ((data.getSection("server").getBoolean("hidden"))?"yes":"no"));
+                                        if (data.getSection("server").getList("incompatible-list").size() > 0) {
                                             List<String> current = new ArrayList<String>();
-                                            for (int i = 0; i < json.getJSONObject("server").getJSONArray("incompatible").length(); i++) current.add(json.getJSONObject("server").getJSONArray("incompatible").getString(i).toLowerCase());
+                                            for (int i = 0; i < data.getSection("server").getList("incompatible").size(); i++) current.add(data.getSection("server").getList("incompatible").get(i).asRawString().toLowerCase());
                                             sender.sendMessage("  - Incompatibilities:");
-                                            for (int i = 0; i < json.getJSONObject("server").getJSONArray("incompatible-list").length(); i++)
-                                                sender.sendMessage("    - " + json.getJSONObject("server").getJSONArray("incompatible-list").getString(i) + ((current.contains(json.getJSONObject("server").getJSONArray("incompatible-list").getString(i).toLowerCase()))?"*":""));
+                                            for (int i = 0; i < data.getSection("server").getList("incompatible-list").size(); i++)
+                                                sender.sendMessage("    - " + data.getSection("server").getList("incompatible-list").get(i).asRawString() + ((current.contains(data.getSection("server").getList("incompatible-list").get(i).asRawString().toLowerCase()))?"*":""));
                                         }
-                                        sender.sendMessage("  - Signature: " + json.getJSONObject("server").getString("signature"));
+                                        sender.sendMessage("  - Signature: " + data.getSection("server").getRawString("signature"));
                                         break;
                                     default:
                                         sender.sendMessage("SubSevrers > That Server is not a SubServer");
@@ -206,8 +206,8 @@ public final class SubCommand extends CommandX {
                         }
                     } else if (args[0].equalsIgnoreCase("start")) {
                         if (args.length > 1) {
-                            plugin.subdata.sendPacket(new PacketStartServer(null, args[1], json -> {
-                                switch (json.getInt("r")) {
+                            plugin.subdata.sendPacket(new PacketStartServer(null, args[1], data -> {
+                                switch (data.getInt("r")) {
                                     case 3:
                                         sender.sendMessage("SubServers > There is no server with that name");
                                         break;
@@ -215,7 +215,7 @@ public final class SubCommand extends CommandX {
                                         sender.sendMessage("SubServers > That Server is not a SubServer");
                                         break;
                                     case 5:
-                                        if (json.getString("m").contains("Host")) {
+                                        if (data.getRawString("m").contains("Host")) {
                                             sender.sendMessage("SubServers > That SubServer's Host is not enabled");
                                         } else {
                                             sender.sendMessage("SubServers > That SubServer is not enabled");
@@ -229,7 +229,7 @@ public final class SubCommand extends CommandX {
                                         sender.sendMessage("SubServers > Server was started successfully");
                                         break;
                                     default:
-                                        System.out.println("PacketStartServer(null, " + args[1] + ") responded with: " + json.getString("m"));
+                                        System.out.println("PacketStartServer(null, " + args[1] + ") responded with: " + data.getRawString("m"));
                                         sender.sendMessage("SubServers > Server was started successfully");
                                         break;
                                 }
@@ -239,8 +239,8 @@ public final class SubCommand extends CommandX {
                         }
                     } else if (args[0].equalsIgnoreCase("stop")) {
                         if (args.length > 1) {
-                            plugin.subdata.sendPacket(new PacketStopServer(null, args[1], false, json -> {
-                                switch (json.getInt("r")) {
+                            plugin.subdata.sendPacket(new PacketStopServer(null, args[1], false, data -> {
+                                switch (data.getInt("r")) {
                                     case 3:
                                         sender.sendMessage("SubServers > There is no server with that name");
                                         break;
@@ -255,7 +255,7 @@ public final class SubCommand extends CommandX {
                                         sender.sendMessage("SubServers > Server was stopped successfully");
                                         break;
                                     default:
-                                        System.out.println("PacketStopServer(null, " + args[1] + ", false) responded with: " + json.getString("m"));
+                                        System.out.println("PacketStopServer(null, " + args[1] + ", false) responded with: " + data.getRawString("m"));
                                         sender.sendMessage("SubServers > Server was stopped successfully");
                                         break;
                                 }
@@ -265,8 +265,8 @@ public final class SubCommand extends CommandX {
                         }
                     } else if (args[0].equalsIgnoreCase("kill") || args[0].equalsIgnoreCase("terminate")) {
                         if (args.length > 1) {
-                            plugin.subdata.sendPacket(new PacketStopServer(null, args[1], true, json -> {
-                                switch (json.getInt("r")) {
+                            plugin.subdata.sendPacket(new PacketStopServer(null, args[1], true, data -> {
+                                switch (data.getInt("r")) {
                                     case 3:
                                         sender.sendMessage("SubServers > There is no server with that name");
                                         break;
@@ -281,7 +281,7 @@ public final class SubCommand extends CommandX {
                                         sender.sendMessage("SubServers > Server was terminated successfully");
                                         break;
                                     default:
-                                        System.out.println("PacketStopServer(null, " + args[1] + ", true) responded with: " + json.getString("m"));
+                                        System.out.println("PacketStopServer(null, " + args[1] + ", true) responded with: " + data.getRawString("m"));
                                         sender.sendMessage("SubServers > Server was terminated successfully");
                                         break;
                                 }
@@ -300,8 +300,8 @@ public final class SubCommand extends CommandX {
                                 } while ((i + 1) != args.length);
                             }
                             final String cmd = str;
-                            plugin.subdata.sendPacket(new PacketCommandServer(null, args[1], cmd, json -> {
-                                switch (json.getInt("r")) {
+                            plugin.subdata.sendPacket(new PacketCommandServer(null, args[1], cmd, data -> {
+                                switch (data.getInt("r")) {
                                     case 3:
                                         sender.sendMessage("SubServers > There is no server with that name");
                                         break;
@@ -316,7 +316,7 @@ public final class SubCommand extends CommandX {
                                         sender.sendMessage("SubServers > Command was sent successfully");
                                         break;
                                     default:
-                                        System.out.println("PacketCommandServer(null, " + args[1] + ", /" + cmd + ") responded with: " + json.getString("m"));
+                                        System.out.println("PacketCommandServer(null, " + args[1] + ", /" + cmd + ") responded with: " + data.getRawString("m"));
                                         sender.sendMessage("SubServers > Command was sent successfully");
                                         break;
                                 }
@@ -329,8 +329,8 @@ public final class SubCommand extends CommandX {
                             if (Util.isException(() -> Integer.parseInt(args[5]))) {
                                 sender.sendMessage("Invalid Port Number");
                             } else {
-                                plugin.subdata.sendPacket(new PacketCreateServer(null, args[1], args[2],args[3], new Version(args[4]), Integer.parseInt(args[5]), json -> {
-                                    switch (json.getInt("r")) {
+                                plugin.subdata.sendPacket(new PacketCreateServer(null, args[1], args[2],args[3], new Version(args[4]), Integer.parseInt(args[5]), data -> {
+                                    switch (data.getInt("r")) {
                                         case 3:
                                             sender.sendMessage("SubServers > There is already a SubServer with that name");
                                             break;
@@ -351,7 +351,7 @@ public final class SubCommand extends CommandX {
                                             sender.sendMessage("SubServers > Launching SubCreator...");
                                             break;
                                         default:
-                                            System.out.println("PacketCreateServer(null, " + args[1] + ", " + args[2] + ", " + args[3] + ", " + args[4] + ", " + args[5] + ") responded with: " + json.getString("m"));
+                                            System.out.println("PacketCreateServer(null, " + args[1] + ", " + args[2] + ", " + args[3] + ", " + args[4] + ", " + args[5] + ") responded with: " + data.getRawString("m"));
                                             sender.sendMessage("SubServers > Launching SubCreator...");
                                             break;
                                     }
@@ -471,7 +471,7 @@ public final class SubCommand extends CommandX {
                     } else if (last.length() == 0) {
                         list.addAll(templateCache.get().get(args[2].toLowerCase()));
                     } else {
-                         for (String template : templateCache.get().get(args[2].toLowerCase())) {
+                        for (String template : templateCache.get().get(args[2].toLowerCase())) {
                             if (template.toLowerCase().startsWith(last)) list.add(last + template.substring(last.length()));
                         }
                     }
@@ -504,15 +504,16 @@ public final class SubCommand extends CommandX {
             templateCache.rename(Calendar.getInstance().getTime().getTime());
             plugin.subdata.sendPacket(new PacketDownloadServerList(null, null, (json) -> {
                 TreeMap<String, List<String>> hosts = new TreeMap<String, List<String>>();
-                for (String host : json.getJSONObject("hosts").keySet()) {
+                for (String host : json.getSection("hosts").getKeys()) {
                     List<String> templates = new ArrayList<String>();
-                    templates.addAll(json.getJSONObject("hosts").getJSONObject(host).getJSONObject("creator").getJSONObject("templates").keySet());
+                    templates.addAll(json.getSection("hosts").getSection(host).getSection("creator").getSection("templates").getKeys());
                     hosts.put(host, templates);
                 }
                 templateCache.set(hosts);
                 templateCache.rename(Calendar.getInstance().getTime().getTime());
             }));
         }
+
     }
 
     /**

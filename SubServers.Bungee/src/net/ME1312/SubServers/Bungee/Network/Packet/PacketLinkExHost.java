@@ -1,6 +1,7 @@
 package net.ME1312.SubServers.Bungee.Network.Packet;
 
 import net.ME1312.SubServers.Bungee.Host.Host;
+import net.ME1312.SubServers.Bungee.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Bungee.Library.Util;
 import net.ME1312.SubServers.Bungee.Library.Version.Version;
 import net.ME1312.SubServers.Bungee.Network.Client;
@@ -8,7 +9,6 @@ import net.ME1312.SubServers.Bungee.Network.ClientHandler;
 import net.ME1312.SubServers.Bungee.Network.PacketIn;
 import net.ME1312.SubServers.Bungee.Network.PacketOut;
 import net.ME1312.SubServers.Bungee.SubPlugin;
-import org.json.JSONObject;
 
 import java.util.Map;
 
@@ -43,19 +43,19 @@ public class PacketLinkExHost implements PacketIn, PacketOut {
     }
 
     @Override
-    public JSONObject generate() {
-        JSONObject json = new JSONObject();
-        json.put("r", response);
-        json.put("m", message);
-        return json;
+    public YAMLSection generate() {
+        YAMLSection data = new YAMLSection();
+        data.set("r", response);
+        data.set("m", message);
+        return data;
     }
 
     @Override
-    public void execute(Client client, JSONObject data) {
+    public void execute(Client client, YAMLSection data) {
         try {
             Map<String, Host> hosts = plugin.api.getHosts();
-            if (hosts.keySet().contains(data.getString("name").toLowerCase())) {
-                Host host = hosts.get(data.getString("name").toLowerCase());
+            if (hosts.keySet().contains(data.getRawString("name").toLowerCase())) {
+                Host host = hosts.get(data.getRawString("name").toLowerCase());
                 if (host instanceof ClientHandler) {
                     if (((ClientHandler) host).getSubData() == null) {
                         client.setHandler((ClientHandler) host);
@@ -68,7 +68,7 @@ public class PacketLinkExHost implements PacketIn, PacketOut {
                     client.sendPacket(new PacketLinkExHost(4, "That host does not support a network interface"));
                 }
             } else {
-                client.sendPacket(new PacketLinkExHost(2, "There is no host with name: " + data.getString("name")));
+                client.sendPacket(new PacketLinkExHost(2, "There is no host with name: " + data.getRawString("name")));
             }
         } catch (Exception e) {
             client.sendPacket(new PacketLinkExHost(1, e.getClass().getCanonicalName() + ": " + e.getMessage()));

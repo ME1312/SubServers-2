@@ -66,15 +66,15 @@ public class ExternalSubCreator extends SubCreator {
             host.plugin.getPluginManager().callEvent(event);
             if (!event.isCancelled()) {
                 logger.start();
-                host.queue(new PacketExCreateServer(name, template, version, port, logger.getExternalAddress(), (JSONCallback) json -> {
+                host.queue(new PacketExCreateServer(name, template, version, port, logger.getExternalAddress(), data -> {
                     try {
-                        if (json.getInt("r") == 0) {
+                        if (data.getInt("r") == 0) {
                             System.out.println(name + "/Creator > Saving...");
                             if (host.plugin.exServers.keySet().contains(name.toLowerCase()))
                                 host.plugin.exServers.remove(name.toLowerCase());
 
                             YAMLSection server = new YAMLSection();
-                            YAMLSection config = new YAMLSection((Map<String, ?>) convert(new YAMLSection(json.getJSONObject("c")).get(), new NamedContainer<>("$player$", (player == null)?"":player.toString()), new NamedContainer<>("$name$", name),
+                            YAMLSection config = new YAMLSection((Map<String, ?>) convert(data.getSection("c").get(), new NamedContainer<>("$player$", (player == null)?"":player.toString()), new NamedContainer<>("$name$", name),
                                     new NamedContainer<>("$template$", template.getName()), new NamedContainer<>("$type$", template.getType().toString()), new NamedContainer<>("$version$", version.toString().replace(" ", "@")), new NamedContainer<>("$port$", Integer.toString(port))));
 
                             server.set("Enabled", true);
@@ -108,7 +108,7 @@ public class ExternalSubCreator extends SubCreator {
                             if (template.getBuildOptions().getBoolean("Run-On-Finish", true))
                                 subserver.start();
                         } else {
-                            System.out.println(name + "/Creator > " + json.getString("m"));
+                            System.out.println(name + "/Creator > " + data.getString("m"));
                         }
                     } catch (Exception e) {
                         e.printStackTrace();

@@ -1,5 +1,6 @@
 package net.ME1312.SubServers.Bungee.Network.Packet;
 
+import net.ME1312.SubServers.Bungee.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Bungee.Library.NamedContainer;
 import net.ME1312.SubServers.Bungee.Library.Util;
 import net.ME1312.SubServers.Bungee.Library.Version.Version;
@@ -8,8 +9,6 @@ import net.ME1312.SubServers.Bungee.Network.PacketIn;
 import net.ME1312.SubServers.Bungee.Network.PacketOut;
 import net.ME1312.SubServers.Bungee.SubPlugin;
 import net.md_5.bungee.api.config.ServerInfo;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
-import org.json.JSONObject;
 
 import java.util.UUID;
 
@@ -44,31 +43,31 @@ public class PacketDownloadPlayerList implements PacketIn, PacketOut {
 
     @Override
     @SuppressWarnings("unchecked")
-    public JSONObject generate() {
-        JSONObject json = new JSONObject();
-        json.put("id", id);
-        JSONObject players = new JSONObject();
+    public YAMLSection generate() {
+        YAMLSection data = new YAMLSection();
+        data.set("id", id);
+        YAMLSection players = new YAMLSection();
         for (NamedContainer<String, UUID> player : plugin.api.getGlobalPlayers()) {
-            JSONObject pinfo = new JSONObject();
-            pinfo.put("name", player.get());
+            YAMLSection pinfo = new YAMLSection();
+            pinfo.set("name", player.get());
             if (plugin.redis) {
                 try {
-                    pinfo.put("server", ((ServerInfo) plugin.redis("getServerFor", new NamedContainer<>(UUID.class, player.get()))).getName());
+                    pinfo.set("server", ((ServerInfo) plugin.redis("getServerFor", new NamedContainer<>(UUID.class, player.get()))).getName());
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             } else {
-                pinfo.put("server", plugin.getPlayer(player.get()).getServer().getInfo().getName());
+                pinfo.set("server", plugin.getPlayer(player.get()).getServer().getInfo().getName());
             }
-            players.put(player.get().toString(), pinfo);
+            players.set(player.get().toString(), pinfo);
         }
-        json.put("players", players);
-        return json;
+        data.set("players", players);
+        return data;
     }
 
     @Override
-    public void execute(Client client, JSONObject data) {
-        client.sendPacket(new PacketDownloadPlayerList(plugin, (data != null && data.keySet().contains("id"))?data.getString("id"):null));
+    public void execute(Client client, YAMLSection data) {
+        client.sendPacket(new PacketDownloadPlayerList(plugin, (data != null && data.contains("id"))?data.getRawString("id"):null));
     }
 
     @Override

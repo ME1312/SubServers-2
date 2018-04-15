@@ -1,7 +1,8 @@
 package net.ME1312.SubServers.Client.Bukkit.Graphic;
 
+import net.ME1312.SubServers.Client.Bukkit.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Client.Bukkit.Library.Container;
-import net.ME1312.SubServers.Client.Bukkit.Library.JSONCallback;
+import net.ME1312.SubServers.Client.Bukkit.Library.Callback;
 import net.ME1312.SubServers.Client.Bukkit.Library.Util;
 import net.ME1312.SubServers.Client.Bukkit.Library.Version.Version;
 import net.ME1312.SubServers.Client.Bukkit.Network.Packet.*;
@@ -17,7 +18,6 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.UUID;
@@ -26,7 +26,7 @@ import java.util.UUID;
  * Internal GUI Listener
  */
 public class InternalUIHandler implements UIHandler, Listener {
-    private HashMap<UUID, JSONCallback> input = new HashMap<UUID, JSONCallback>();
+    private HashMap<UUID, Callback<YAMLSection>> input = new HashMap<UUID, Callback<YAMLSection>>();
     private HashMap<UUID, InternalUIRenderer> gui = new HashMap<UUID, InternalUIRenderer>();
     private boolean enabled = true;
     private SubPlugin plugin;
@@ -104,7 +104,7 @@ public class InternalUIHandler implements UIHandler, Listener {
                             if (player.hasPermission("subservers.host.create.*") || player.hasPermission("subservers.host.create." + ((UIRenderer.CreatorOptions) gui.lastVisitedObjects[0]).getHost().toLowerCase())) {
                                 player.closeInventory();
                                 gui.setDownloading(plugin.api.getLang("SubServers", "Interface.Generic.Downloading.Response"));
-                                plugin.subdata.sendPacket(new PacketCreateServer(player.getUniqueId(), ((UIRenderer.CreatorOptions) gui.lastVisitedObjects[0]), json -> {
+                                plugin.subdata.sendPacket(new PacketCreateServer(player.getUniqueId(), ((UIRenderer.CreatorOptions) gui.lastVisitedObjects[0]), data -> {
                                     gui.back();
                                 }));
                             } else {
@@ -121,10 +121,10 @@ public class InternalUIHandler implements UIHandler, Listener {
                                     Bukkit.getScheduler().runTaskLater(plugin, () -> gui.hostCreator((UIRenderer.CreatorOptions) gui.lastVisitedObjects[0]), 4 * 20);
                                 } else {
                                     gui.setDownloading(plugin.api.getLang("SubServers", "Interface.Generic.Downloading.Response"));
-                                    plugin.subdata.sendPacket(new PacketDownloadServerList(null, null, json -> {
+                                    plugin.subdata.sendPacket(new PacketDownloadServerList(null, null, data -> {
                                         boolean match = false;
-                                        for (String tmphost : json.getJSONObject("hosts").keySet()) {
-                                            for (String tmpsubserver : json.getJSONObject("hosts").getJSONObject(tmphost).getJSONObject("servers").keySet()) {
+                                        for (String tmphost : data.getSection("hosts").getKeys()) {
+                                            for (String tmpsubserver : data.getSection("hosts").getSection(tmphost).getSection("servers").getKeys()) {
                                                 if (tmpsubserver.equalsIgnoreCase(m.getString("message"))) match = true;
                                             }
                                         }
@@ -226,7 +226,7 @@ public class InternalUIHandler implements UIHandler, Listener {
                                 this.plugin.subdata.sendPacket(new PacketDownloadHostInfo((String) gui.lastVisitedObjects[0], (json) -> {
                                     if (json.getBoolean("valid")) {
                                         gui.setDownloading(null);
-                                        plugin.get().open(player, json.getJSONObject("host"));
+                                        plugin.get().open(player, json.getSection("host"));
                                     } else {
                                         gui.back();
                                     }
@@ -321,7 +321,7 @@ public class InternalUIHandler implements UIHandler, Listener {
                             player.closeInventory();
                             if (player.hasPermission("subservers.subserver.start.*") || player.hasPermission("subservers.subserver.start." + ((String) gui.lastVisitedObjects[0]).toLowerCase())) {
                                 gui.setDownloading(plugin.api.getLang("SubServers", "Interface.Generic.Downloading.Response"));
-                                plugin.subdata.sendPacket(new PacketStartServer(player.getUniqueId(), (String) gui.lastVisitedObjects[0], json -> {
+                                plugin.subdata.sendPacket(new PacketStartServer(player.getUniqueId(), (String) gui.lastVisitedObjects[0], data -> {
                                     gui.setDownloading(plugin.api.getLang("SubServers", "Interface.SubServer-Admin.Start.Title"));
                                     Bukkit.getScheduler().runTaskLater(plugin, gui::reopen, 30);
                                 }));
@@ -331,9 +331,9 @@ public class InternalUIHandler implements UIHandler, Listener {
                             if (player.hasPermission("subservers.subserver.stop.*") || player.hasPermission("subservers.subserver.stop." + ((String) gui.lastVisitedObjects[0]).toLowerCase())) {
                                 gui.setDownloading(plugin.api.getLang("SubServers", "Interface.Generic.Downloading.Response"));
                                 final Container<Boolean> listening = new Container<Boolean>(true);
-                                PacketInRunEvent.callback("SubStoppedEvent", new JSONCallback() {
+                                PacketInRunEvent.callback("SubStoppedEvent", new Callback<YAMLSection>() {
                                     @Override
-                                    public void run(JSONObject json) {
+                                    public void run(YAMLSection json) {
                                         try {
                                             if (listening.get()) if (!json.getString("server").equalsIgnoreCase((String) gui.lastVisitedObjects[0])) {
                                                 PacketInRunEvent.callback("SubStoppedEvent", this);
@@ -343,8 +343,8 @@ public class InternalUIHandler implements UIHandler, Listener {
                                         } catch (Exception e) {}
                                     }
                                 });
-                                plugin.subdata.sendPacket(new PacketStopServer(player.getUniqueId(), (String) gui.lastVisitedObjects[0], false, json -> {
-                                    if (json.getInt("r") != 0) {
+                                plugin.subdata.sendPacket(new PacketStopServer(player.getUniqueId(), (String) gui.lastVisitedObjects[0], false, data -> {
+                                    if (data.getInt("r") != 0) {
                                         gui.reopen();
                                         listening.set(false);
                                     } else gui.setDownloading(plugin.api.getLang("SubServers", "Interface.SubServer-Admin.Stop.Title").replace("$str$", (String) gui.lastVisitedObjects[0]));
@@ -355,9 +355,9 @@ public class InternalUIHandler implements UIHandler, Listener {
                             if (player.hasPermission("subservers.subserver.terminate.*") || player.hasPermission("subservers.subserver.terminate." + ((String) gui.lastVisitedObjects[0]).toLowerCase())) {
                                 gui.setDownloading(plugin.api.getLang("SubServers", "Interface.Generic.Downloading.Response"));
                                 final Container<Boolean> listening = new Container<Boolean>(true);
-                                PacketInRunEvent.callback("SubStoppedEvent", new JSONCallback() {
+                                PacketInRunEvent.callback("SubStoppedEvent", new Callback<YAMLSection>() {
                                     @Override
-                                    public void run(JSONObject json) {
+                                    public void run(YAMLSection json) {
                                         try {
                                             if (listening.get()) if (!json.getString("server").equalsIgnoreCase((String) gui.lastVisitedObjects[0])) {
                                                 PacketInRunEvent.callback("SubStoppedEvent", this);
@@ -367,8 +367,8 @@ public class InternalUIHandler implements UIHandler, Listener {
                                         } catch (Exception e) {}
                                     }
                                 });
-                                plugin.subdata.sendPacket(new PacketStopServer(player.getUniqueId(), (String) gui.lastVisitedObjects[0], false, json -> {
-                                    if (json.getInt("r") != 0) {
+                                plugin.subdata.sendPacket(new PacketStopServer(player.getUniqueId(), (String) gui.lastVisitedObjects[0], false, data -> {
+                                    if (data.getInt("r") != 0) {
                                         gui.reopen();
                                         listening.set(false);
                                     } else gui.setDownloading(plugin.api.getLang("SubServers", "Interface.SubServer-Admin.Terminate.Title").replace("$str$", (String) gui.lastVisitedObjects[0]));
@@ -381,7 +381,7 @@ public class InternalUIHandler implements UIHandler, Listener {
                                     player.sendMessage(plugin.api.getLang("SubServers", "Interface.SubServer-Admin.Command.Message"));
                                 input.put(player.getUniqueId(), m -> {
                                     gui.setDownloading(plugin.api.getLang("SubServers", "Interface.Generic.Downloading.Response"));
-                                    plugin.subdata.sendPacket(new PacketCommandServer(player.getUniqueId(), (String) gui.lastVisitedObjects[0], (m.getString("message").startsWith("/"))?m.getString("message").substring(1):m.getString("message"), json -> {
+                                    plugin.subdata.sendPacket(new PacketCommandServer(player.getUniqueId(), (String) gui.lastVisitedObjects[0], (m.getString("message").startsWith("/"))?m.getString("message").substring(1):m.getString("message"), data -> {
                                         gui.reopen();
                                     }));
                                 });
@@ -415,10 +415,10 @@ public class InternalUIHandler implements UIHandler, Listener {
                                 gui.reopen();
                             } else {
                                 gui.setDownloading(ChatColor.stripColor(this.plugin.api.getLang("SubServers", "Interface.SubServer-Plugin.Title").replace("$str$", (String) gui.lastVisitedObjects[0])));
-                                this.plugin.subdata.sendPacket(new PacketDownloadServerInfo((String) gui.lastVisitedObjects[0], json -> {
-                                    if (json.getString("type").equals("subserver")) {
+                                this.plugin.subdata.sendPacket(new PacketDownloadServerInfo((String) gui.lastVisitedObjects[0], data -> {
+                                    if (data.getString("type").equals("subserver")) {
                                         gui.setDownloading(null);
-                                        plugin.get().open(player, json.getJSONObject("server"));
+                                        plugin.get().open(player, data.getSection("server"));
                                     } else {
                                         gui.back();
                                     }
@@ -441,9 +441,9 @@ public class InternalUIHandler implements UIHandler, Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void input(org.bukkit.event.player.PlayerChatEvent event) {
         if (!event.isCancelled() && enabled && input.keySet().contains(event.getPlayer().getUniqueId())) {
-            JSONObject json = new JSONObject();
-            json.put("message", event.getMessage());
-            input.get(event.getPlayer().getUniqueId()).run(json);
+            YAMLSection data = new YAMLSection();
+            data.set("message", event.getMessage());
+            input.get(event.getPlayer().getUniqueId()).run(data);
             input.remove(event.getPlayer().getUniqueId());
             event.setCancelled(true);
         }
@@ -457,9 +457,9 @@ public class InternalUIHandler implements UIHandler, Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void input(PlayerCommandPreprocessEvent event) {
         if (!event.isCancelled() && enabled && input.keySet().contains(event.getPlayer().getUniqueId())) {
-            JSONObject json = new JSONObject();
-            json.put("message", event.getMessage());
-            input.get(event.getPlayer().getUniqueId()).run(json);
+            YAMLSection data = new YAMLSection();
+            data.set("message", event.getMessage());
+            input.get(event.getPlayer().getUniqueId()).run(data);
             input.remove(event.getPlayer().getUniqueId());
             event.setCancelled(true);
         }

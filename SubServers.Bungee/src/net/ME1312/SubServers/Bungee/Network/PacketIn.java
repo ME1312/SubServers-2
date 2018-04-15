@@ -1,7 +1,7 @@
 package net.ME1312.SubServers.Bungee.Network;
 
+import net.ME1312.SubServers.Bungee.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Bungee.Library.Version.Version;
-import org.json.JSONObject;
 
 /**
  * PacketIn Layout Class
@@ -13,7 +13,7 @@ public interface PacketIn {
      * @param client Client Accepting
      * @param data Incoming Data
      */
-    void execute(Client client, JSONObject data) throws Throwable;
+    void execute(Client client, YAMLSection data) throws Throwable;
 
     /**
      * Get Packet Version

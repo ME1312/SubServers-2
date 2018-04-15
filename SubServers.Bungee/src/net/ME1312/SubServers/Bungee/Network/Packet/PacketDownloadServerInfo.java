@@ -1,21 +1,17 @@
 package net.ME1312.SubServers.Bungee.Network.Packet;
 
+import com.google.gson.Gson;
 import net.ME1312.SubServers.Bungee.Host.Server;
-import net.ME1312.SubServers.Bungee.Host.ServerContainer;
 import net.ME1312.SubServers.Bungee.Host.SubServer;
-import net.ME1312.SubServers.Bungee.Library.NamedContainer;
+import net.ME1312.SubServers.Bungee.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Bungee.Library.Util;
 import net.ME1312.SubServers.Bungee.Library.Version.Version;
 import net.ME1312.SubServers.Bungee.Network.Client;
 import net.ME1312.SubServers.Bungee.Network.PacketIn;
 import net.ME1312.SubServers.Bungee.Network.PacketOut;
 import net.ME1312.SubServers.Bungee.SubPlugin;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
-import org.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.Map;
 
 /**
  * Download Server Info Packet
@@ -50,24 +46,25 @@ public class PacketDownloadServerInfo implements PacketIn, PacketOut {
     }
 
     @Override
-    public JSONObject generate() {
-        JSONObject json = new JSONObject();
-        json.put("id", id);
-        json.put("type", (server == null)?"invalid":((server instanceof SubServer)?"subserver":"server"));
-        JSONObject info = new JSONObject();
+    @SuppressWarnings("unchecked")
+    public YAMLSection generate() {
+        YAMLSection json = new YAMLSection();
+        json.set("id", id);
+        json.set("type", (server == null)?"invalid":((server instanceof SubServer)?"subserver":"server"));
+        YAMLSection info = new YAMLSection();
 
         if (server != null) {
-            info = new JSONObject(server.toString());
+            info = new YAMLSection(new Gson().fromJson(server.toString(), Map.class));
             info.remove("type");
         }
 
-        json.put("server", info);
+        json.set("server", info);
         return json;
     }
 
     @Override
-    public void execute(Client client, JSONObject data) {
-        client.sendPacket(new PacketDownloadServerInfo(plugin, plugin.api.getServer(data.getString("server")), (data.keySet().contains("id"))?data.getString("id"):null));
+    public void execute(Client client, YAMLSection data) {
+        client.sendPacket(new PacketDownloadServerInfo(plugin, plugin.api.getServer(data.getRawString("server")), (data.contains("id"))?data.getRawString("id"):null));
     }
 
     @Override

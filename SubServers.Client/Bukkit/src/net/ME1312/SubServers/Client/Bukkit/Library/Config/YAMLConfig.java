@@ -1,7 +1,6 @@
 package net.ME1312.SubServers.Client.Bukkit.Library.Config;
 
 import net.ME1312.SubServers.Client.Bukkit.Library.Util;
-import org.json.JSONObject;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.error.YAMLException;
@@ -105,8 +104,8 @@ public class YAMLConfig {
      *
      * @return JSON Formatted Config Contents
      */
-    public JSONObject toJSON() {
-        return new JSONObject(config.map);
+    public String toJSON() {
+        return get().toJSON();
     }
 
     protected static DumperOptions getDumperOptions() {
