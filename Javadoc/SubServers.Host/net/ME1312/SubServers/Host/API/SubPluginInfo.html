@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10,"i8":10,"i9":10,"i10":10,"i11":10,"i12":10,"i13":10,"i14":10,"i15":10,"i16":10,"i17":10,"i18":10};
+var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10,"i8":10,"i9":10,"i10":10,"i11":10,"i12":10,"i13":10,"i14":10,"i15":10,"i16":10,"i17":10,"i18":10,"i19":10};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -221,60 +221,66 @@ implements <a href="../../../../../net/ME1312/SubServers/Host/Library/ExtraDataH
 </td>
 </tr>
 <tr id="i9" class="rowColor">
+<td class="colFirst"><code>java.lang.ClassLoader</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Host/API/SubPluginInfo.html#getLoader--">getLoader</a></span>()</code>
+<div class="block">Get the Plugin's ClassLoader</div>
+</td>
+</tr>
+<tr id="i10" class="altColor">
 <td class="colFirst"><code><a href="../../../../../net/ME1312/SubServers/Host/Library/Log/Logger.html" title="class in net.ME1312.SubServers.Host.Library.Log">Logger</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Host/API/SubPluginInfo.html#getLogger--">getLogger</a></span>()</code>
 <div class="block">Gets the default Logger for this Plugin</div>
 </td>
 </tr>
-<tr id="i10" class="altColor">
+<tr id="i11" class="rowColor">
 <td class="colFirst"><code>java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Host/API/SubPluginInfo.html#getName--">getName</a></span>()</code>
 <div class="block">Get Plugin's Name</div>
 </td>
 </tr>
-<tr id="i11" class="rowColor">
+<tr id="i12" class="altColor">
 <td class="colFirst"><code>java.util.List&lt;java.lang.String&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Host/API/SubPluginInfo.html#getSoftDependancies--">getSoftDependancies</a></span>()</code>
 <div class="block">Gets the Soft Dependencies List</div>
 </td>
 </tr>
-<tr id="i12" class="altColor">
+<tr id="i13" class="rowColor">
 <td class="colFirst"><code><a href="../../../../../net/ME1312/SubServers/Host/Library/Version/Version.html" title="class in net.ME1312.SubServers.Host.Library.Version">Version</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Host/API/SubPluginInfo.html#getVersion--">getVersion</a></span>()</code>
 <div class="block">Get Plugin's Version</div>
 </td>
 </tr>
-<tr id="i13" class="rowColor">
+<tr id="i14" class="altColor">
 <td class="colFirst"><code>java.net.URL</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Host/API/SubPluginInfo.html#getWebsite--">getWebsite</a></span>()</code>
 <div class="block">Get Authors' Website</div>
 </td>
 </tr>
-<tr id="i14" class="altColor">
+<tr id="i15" class="rowColor">
 <td class="colFirst"><code>boolean</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Host/API/SubPluginInfo.html#hasExtra-java.lang.String-">hasExtra</a></span>(java.lang.String&nbsp;handle)</code>
 <div class="block">Determine if an extra value exists</div>
 </td>
 </tr>
-<tr id="i15" class="rowColor">
+<tr id="i16" class="altColor">
 <td class="colFirst"><code>boolean</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Host/API/SubPluginInfo.html#isEnabled--">isEnabled</a></span>()</code>
 <div class="block">Sets the Plugin's Enabled Status</div>
 </td>
 </tr>
-<tr id="i16" class="altColor">
+<tr id="i17" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Host/API/SubPluginInfo.html#removeExtra-java.lang.String-">removeExtra</a></span>(java.lang.String&nbsp;handle)</code>
 <div class="block">Remove an extra value from this Object</div>
 </td>
 </tr>
-<tr id="i17" class="rowColor">
+<tr id="i18" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Host/API/SubPluginInfo.html#setEnabled-boolean-">setEnabled</a></span>(boolean&nbsp;value)</code>
 <div class="block">Sets if the Plugin is Enabled</div>
 </td>
 </tr>
-<tr id="i18" class="altColor">
+<tr id="i19" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Host/API/SubPluginInfo.html#setLogger-net.ME1312.SubServers.Host.Library.Log.Logger-">setLogger</a></span>(<a href="../../../../../net/ME1312/SubServers/Host/Library/Log/Logger.html" title="class in net.ME1312.SubServers.Host.Library.Log">Logger</a>&nbsp;value)</code>
 <div class="block">Replace this Plugin's Logger with a custom one</div>
@@ -342,6 +348,20 @@ implements <a href="../../../../../net/ME1312/SubServers/Host/Library/ExtraDataH
 <!--   -->
 </a>
 <h3>Method Detail</h3>
+<a name="getLoader--">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getLoader</h4>
+<pre>public&nbsp;java.lang.ClassLoader&nbsp;getLoader()</pre>
+<div class="block">Get the Plugin's ClassLoader</div>
+<dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>Plugin ClassLoader</dd>
+</dl>
+</li>
+</ul>
 <a name="get--">
 <!--   -->
 </a>

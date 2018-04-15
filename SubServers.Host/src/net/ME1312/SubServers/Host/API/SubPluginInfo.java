@@ -67,6 +67,15 @@ public class SubPluginInfo implements ExtraDataHandler {
     }
 
     /**
+     * Get the Plugin's ClassLoader
+     *
+     * @return Plugin ClassLoader
+     */
+    public ClassLoader getLoader() {
+        return plugin.getClass().getClassLoader();
+    }
+
+    /**
      * Get Plugin Object
      *
      * @return Plugin Object
