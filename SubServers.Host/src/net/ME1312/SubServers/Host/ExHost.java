@@ -507,6 +507,8 @@ public final class ExHost {
             }
             if (subdata != null) Util.isException(() -> subdata.destroy(0));
 
+            if (new File(dir, "Templates").exists()) Util.deleteDirectory(new File(dir, "Templates"));
+
             Util.isException(FileLogger::end);
             System.exit(exit);
         }

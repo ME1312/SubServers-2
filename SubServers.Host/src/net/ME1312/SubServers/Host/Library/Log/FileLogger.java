@@ -19,7 +19,7 @@ public final class FileLogger extends OutputStream {
         this.origin = origin;
         if (file == null) {
             new File(dir, "Logs").mkdirs();
-            file = new FileWriter(new File(dir, "Logs" + File.separator + "SubServers #" + (new File(dir, "Logs").list().length + 1) + " (" + new SimpleDateFormat("MM-dd-yyyy").format(Calendar.getInstance().getTime()) + ").log"));
+            file = new FileWriter(new File(dir, "Logs" + File.separator + "SubServers.Host #" + (new File(dir, "Logs").list().length + 1) + " (" + new SimpleDateFormat("MM-dd-yyyy").format(Calendar.getInstance().getTime()) + ").log"));
         }
     }
 

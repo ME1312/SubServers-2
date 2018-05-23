@@ -141,7 +141,12 @@ public final class SubAPI {
             try {
                 return new Version(Bukkit.getBukkitVersion().split("-")[0]);
             } catch (ArrayIndexOutOfBoundsException e) {
-                return new Version(plugin.version.toString().substring(0, plugin.version.toString().length() - 1));
+                if (System.getProperty("subservers.minecraft.version.unknown", "false").equalsIgnoreCase("false")) {
+                    System.setProperty("subservers.minecraft.version.unknown", "true");
+                    System.out.println("Could not determine this server's game version; Now using 1.x.x as a placeholder.");
+                    System.out.println("Use this launch argument to specify what version this server serves: -Dsubservers.minecraft.version=1.x.x");
+                }
+                return new Version("1.x.x");
             }
         }
     }

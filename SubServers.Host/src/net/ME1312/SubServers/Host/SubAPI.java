@@ -89,7 +89,7 @@ public final class SubAPI {
      */
     public void addCommand(Command command, String... handles) {
         for (String handle : handles) {
-            commands.put(handle, command);
+            commands.put(handle.toLowerCase(), command);
         }
     }
 

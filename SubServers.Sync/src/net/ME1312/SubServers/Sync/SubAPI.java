@@ -150,7 +150,14 @@ public final class SubAPI {
             return new Version(System.getProperty("subservers.minecraft.version"));
         } else {
             String raw = plugin.getGameVersion();
-            if (raw.contains(",")) {
+            if (raw == null) {
+                if (System.getProperty("subservers.minecraft.version.unknown", "false").equalsIgnoreCase("false")) {
+                    System.setProperty("subservers.minecraft.version.unknown", "true");
+                    System.out.println("Could not determine compatible Minecraft version(s); Now using 1.x.x as a placeholder.");
+                    System.out.println("Use this launch argument to specify a compatible Minecraft version: -Dsubservers.minecraft.version=1.x.x");
+                }
+                return new Version("1.x.x");
+            } else if (raw.contains(",")) {
                 String[] split = raw.split(",\\s*");
                 return new Version(split[split.length - 1]);
             } else if (raw.contains("-")) {
