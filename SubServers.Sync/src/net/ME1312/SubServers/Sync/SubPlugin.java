@@ -50,14 +50,14 @@ public final class SubPlugin extends BungeeCord implements Listener {
     public SubDataClient subdata = null;
     //public static final Version version = new Version("2.13a");
     //public static final Version version = new Version(new Version("2.13a"), VersionType.BETA, 1); // TODO Beta Version Setting
-    public static final Version version = new Version(new Version(new Version("2.13a"), VersionType.PRE_RELEASE, 3), VersionType.BETA, 2); // TODO Beta Version Setting
+    public static final Version version = new Version(new Version(new Version("2.13a"), VersionType.PRE_RELEASE, 3), VersionType.BETA, 3); // TODO Beta Version Setting
 
 
     public long lastReload = -1;
     private boolean posted = false;
 
     protected SubPlugin(PrintStream out) throws IOException {
-        System.out.println("SubServers > Loading SubServers.Sync v" + version.toString() + " Libraries (for Minecraft " + api.getGameVersion() + ")");
+        System.out.println("SubServers > Loading SubServers.Sync v" + version.toString() + " Libraries (for Minecraft " + api.getGameVersion()[api.getGameVersion().length - 1] + ")");
 
         this.out = out;
         if (!(new UniversalFile(dir, "config.yml").exists())) {

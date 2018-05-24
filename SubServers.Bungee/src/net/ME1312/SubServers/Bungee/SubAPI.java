@@ -5,6 +5,7 @@ import net.ME1312.SubServers.Bungee.Event.SubAddServerEvent;
 import net.ME1312.SubServers.Bungee.Event.SubRemoveHostEvent;
 import net.ME1312.SubServers.Bungee.Event.SubRemoveServerEvent;
 import net.ME1312.SubServers.Bungee.Host.*;
+import net.ME1312.SubServers.Bungee.Library.Container;
 import net.ME1312.SubServers.Bungee.Library.Exception.InvalidHostException;
 import net.ME1312.SubServers.Bungee.Library.NamedContainer;
 import net.ME1312.SubServers.Bungee.Library.UniversalFile;
@@ -12,6 +13,7 @@ import net.ME1312.SubServers.Bungee.Library.Util;
 import net.ME1312.SubServers.Bungee.Library.Version.Version;
 import net.ME1312.SubServers.Bungee.Network.SubDataServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
+import net.md_5.bungee.protocol.ProtocolConstants;
 
 import java.lang.reflect.InvocationTargetException;
 import java.net.InetAddress;
@@ -666,31 +668,36 @@ public final class SubAPI {
     }
 
     /**
-     * Gets the Recommended Minecraft Version
+     * Get an array of compatible Minecraft Versions
      *
-     * @return Minecraft Version
+     * @return Minecraft Versions
      */
-    public Version getGameVersion() {
-        if (System.getProperty("subservers.minecraft.version", "").length() > 0) {
-            return new Version(System.getProperty("subservers.minecraft.version"));
-        } else {
-            String raw = plugin.getGameVersion();
-            if (raw == null) {
-                if (System.getProperty("subservers.minecraft.version.unknown", "false").equalsIgnoreCase("false")) {
-                    System.setProperty("subservers.minecraft.version.unknown", "true");
-                    System.out.println("Could not determine compatible Minecraft version(s); Now using 1.x.x as a placeholder.");
-                    System.out.println("Use this launch argument to specify a compatible Minecraft version: -Dsubservers.minecraft.version=1.x.x");
+    public Version[] getGameVersion() {
+        if (GAME_VERSION == null) {
+            Container<Boolean> valid = new Container<Boolean>(false);
+            if (System.getProperty("subservers.minecraft.version", "").length() > 0) {
+                return new Version[]{new Version(System.getProperty("subservers.minecraft.version"))};
+            } else if (!Util.isException(() -> valid.set(ProtocolConstants.SUPPORTED_VERSIONS != null)) && valid.get()) {
+                List<Version> versions = new LinkedList<Version>();
+                for (String version : ProtocolConstants.SUPPORTED_VERSIONS) versions.add(new Version(version));
+                Collections.sort(versions);
+                return versions.toArray(new Version[versions.size()]);
+            } else if (!Util.isException(() -> valid.set(plugin.getGameVersion() != null)) && valid.get()) {
+                String raw = plugin.getGameVersion();
+                if (raw.contains("-") || raw.contains(",")) {
+                    List<Version> versions = new LinkedList<Version>();
+                    for (String version : raw.split("(?:\\s*-|,)\\s*")) versions.add(new Version(version));
+                    Collections.sort(versions);
+                    return versions.toArray(new Version[versions.size()]);
+                } else {
+                    return new Version[]{new Version(plugin.getGameVersion())};
                 }
-                return new Version("1.x.x");
-            } else if (raw.contains(",")) {
-                String[] split = raw.split(",\\s*");
-                return new Version(split[split.length - 1]);
-            } else if (raw.contains("-")) {
-                String[] split = raw.split("\\s*-\\s*");
-                return new Version(split[split.length - 1]);
             } else {
-                return new Version(plugin.getGameVersion());
+                plugin.getLogger().warning("Could not determine compatible Minecraft version(s); Now using 1.x.x as a placeholder.");
+                plugin.getLogger().warning("Use this launch argument to specify a compatible Minecraft version: -Dsubservers.minecraft.version=1.x.x");
+                return new Version[]{new Version("1.x.x")};
             }
-        }
+        } else return GAME_VERSION;
     }
+    private Version[] GAME_VERSION = getGameVersion();
 }

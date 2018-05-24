@@ -7,6 +7,8 @@ import net.ME1312.SubServers.Bungee.Network.PacketIn;
 import net.ME1312.SubServers.Bungee.Network.PacketOut;
 import net.ME1312.SubServers.Bungee.SubPlugin;
 
+import java.util.Arrays;
+
 /**
  * Download Proxy Info Packet
  */
@@ -49,7 +51,7 @@ public class PacketDownloadProxyInfo implements PacketIn, PacketOut {
         bungee.set("servers", plugin.api.getServers().size());
         data.set("bungee", bungee);
         YAMLSection minecraft = new YAMLSection();
-        minecraft.set("version", plugin.api.getGameVersion());
+        minecraft.set("version", Arrays.asList(plugin.api.getGameVersion()));
         minecraft.set("players", plugin.api.getGlobalPlayers().size());
         data.set("minecraft", minecraft);
         YAMLSection system = new YAMLSection();

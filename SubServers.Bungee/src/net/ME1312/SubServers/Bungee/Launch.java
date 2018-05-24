@@ -89,17 +89,21 @@ public final class Launch {
 
                 if (!options.has("noconsole")) {
                     String line;
-                    while (plugin.isRunning && (line = plugin.getConsoleReader().readLine(">")) != null) {
-                        if (plugin.sudo == null) {
-                            if (!plugin.getPluginManager().dispatchCommand(net.md_5.bungee.command.ConsoleCommandSender.class.cast(net.md_5.bungee.command.ConsoleCommandSender.class.getMethod("getInstance").invoke(null)), line)) {
-                                plugin.getConsole().sendMessage(net.md_5.bungee.api.ChatColor.RED + "Command not found");
+                    try {
+                        while (plugin.isRunning && (line = plugin.getConsoleReader().readLine(">")) != null) {
+                            if (plugin.sudo == null) {
+                                if (!plugin.getPluginManager().dispatchCommand(net.md_5.bungee.command.ConsoleCommandSender.class.cast(net.md_5.bungee.command.ConsoleCommandSender.class.getMethod("getInstance").invoke(null)), line)) {
+                                    plugin.getConsole().sendMessage(net.md_5.bungee.api.ChatColor.RED + "Command not found");
+                                }
+                            } else if (line.equalsIgnoreCase("exit")) {
+                                plugin.sudo = null;
+                                System.out.println("SubServers > Reverting to the BungeeCord Console");
+                            } else {
+                                plugin.sudo.command(line);
                             }
-                        } else if (line.equalsIgnoreCase("exit")) {
-                            plugin.sudo = null;
-                            System.out.println("SubServers > Reverting to the BungeeCord Console");
-                        } else {
-                            plugin.sudo.command(line);
                         }
+                    } catch (NoSuchMethodError | NoSuchMethodException e) {
+                        plugin.getLogger().warning("Standard BungeeCord console not found; Console commands now disabled.");
                     }
                 }
             }

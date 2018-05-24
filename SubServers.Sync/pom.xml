@@ -28,7 +28,7 @@
         <dependency>
             <groupId>net.md_5</groupId>
             <artifactId>bungeecord-internal</artifactId>
-            <version>1.8-SNAPSHOT</version>
+            <version>1.9-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
