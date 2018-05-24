@@ -41,6 +41,8 @@ if [ $retvala -eq 0 ]
     fi
     if [ -f "META-INF/MANIFEST.MF" ]; then
         cat META-INF/MANIFEST.MF | sed -e "/^\s*$/d" -e "/^Main-Class:.*$/d" -e "/^Implementation-Title:.*$/d" -e "/^Build-Jdk:.*$/d" -e "/^Created-By:.*$/d" -e "/^Built-By:.*$/d" > ../MANIFEST.MF
+    else
+        printf "Manifest-Version: 1.0\n" > ../MANIFEST.MF
     fi
     if [ -f "MODIFICATIONS" ]; then
         mv -f MODIFICATIONS ../MODIFICATIONS
@@ -54,7 +56,7 @@ if [ $retvala -eq 0 ]
         echo ">> Writing Changes..."
         if [ -f "META-INF/MANIFEST.MF" ]
           then
-            cat META-INF/MANIFEST.MF | sed -e "/^\s*$/d" -e "/^Manifest-Version:.*$/d" -e "/^Class-Path:.*$/d" >> ../MANIFEST.MF
+            cat META-INF/MANIFEST.MF | sed -e "/^\s*$/d" -e "/^Manifest-Version:.*$/d" -e "/^Class-Path:.*$/d" -e "/^Build-Jdk:.*$/d" -e "/^Created-By:.*$/d" -e "/^Built-By:.*$/d" >> ../MANIFEST.MF
         else
             if [ ! -d "META-INF" ]; then
                 mkdir META-INF
@@ -78,7 +80,7 @@ if [ $retvala -eq 0 ]
         if [ -f "../../SubServers.Patched.jar" ]; then
             rm -Rf ../../SubServers.Patched.jar
         fi
-        jar cvfm ../../SubServers.Patched.jar ../MANIFEST.MF .; retvalc=$?;
+        jar cvfm ../../SubServers.Patched.jar META-INF/MANIFEST.MF .; retvalc=$?;
         if [ $retvalc -eq 0 ]
           then
             echo ">> Cleaning Up..."
