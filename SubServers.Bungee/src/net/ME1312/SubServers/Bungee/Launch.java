@@ -24,7 +24,6 @@ public final class Launch {
         System.setProperty("apple.laf.useScreenMenuBar", "true");
 
         Container<Boolean> bungee = new Container<Boolean>(false);
-        Container<Boolean> waterfall = new Container<Boolean>(false);
         if (Util.isException(() -> bungee.set(Class.forName("net.md_5.bungee.BungeeCord") != null)) && !bungee.get()) {
             System.out.println("");
             System.out.println("*******************************************");
@@ -38,6 +37,8 @@ public final class Launch {
         } else if (System.getProperty("RM.subservers", "true").equalsIgnoreCase("true")) {
             Security.setProperty("networkaddress.cache.ttl", "30");
             Security.setProperty("networkaddress.cache.negative.ttl", "10");
+            final boolean patched = net.md_5.bungee.BungeeCord.class.getPackage().getImplementationTitle() != null && net.md_5.bungee.BungeeCord.class.getPackage().getImplementationTitle().equals("SubServers.Bungee");
+
             joptsimple.OptionParser parser = new joptsimple.OptionParser();
             parser.allowsUnrecognizedOptions();
             parser.accepts("v");
@@ -48,7 +49,7 @@ public final class Launch {
                 System.out.println("");
                 System.out.println(System.getProperty("os.name") + " " + System.getProperty("os.version") + ",");
                 System.out.println("Java " + System.getProperty("java.version") + ",");
-                System.out.println("BungeeCord " + net.md_5.bungee.Bootstrap.class.getPackage().getImplementationVersion() + ",");
+                System.out.println("BungeeCord" + ((patched)?" (Patched) ":" ") + net.md_5.bungee.Bootstrap.class.getPackage().getImplementationVersion() + ",");
                 System.out.println("SubServers.Bungee v" + SubPlugin.version.toExtendedString());
                 System.out.println("");
             } else {
@@ -59,13 +60,13 @@ public final class Launch {
                 System.out.println("*** Please report all issues to ME1312, ***");
                 System.out.println("***   NOT the Spigot Team. Thank You!   ***");
                 System.out.println("*******************************************");
-                if (net.md_5.bungee.BungeeCord.class.getPackage().getImplementationVersion() == null || net.md_5.bungee.BungeeCord.class.getPackage().getImplementationVersion().equals("SubServers.Sync")) try {
+                try {
                     if (net.md_5.bungee.BungeeCord.class.getPackage().getSpecificationVersion() != null) {
                         Date date = (new SimpleDateFormat("yyyyMMdd")).parse(net.md_5.bungee.BungeeCord.class.getPackage().getSpecificationVersion());
                         Calendar line = Calendar.getInstance();
                         line.add(3, -4);
                         if (date.before(line.getTime())) {
-                            System.out.println("*** Warning: BungeeCord.jar is outdated ***");
+                            System.out.println("***   Warning: BungeeCord is outdated   ***");
                             System.out.println("***  Please download a new build from:  ***");
                             System.out.println("***  http://ci.md-5.net/job/BungeeCord  ***");
                             System.out.println("*** Errors may arise on older versions! ***");
@@ -74,24 +75,22 @@ public final class Launch {
                     } else throw new Exception();
                 } catch (Exception e) {
                     System.out.println("*** Problem checking BungeeCord version ***");
-                    System.out.println("***  BungeeCord.jar could be outdated.  ***");
+                    System.out.println("***    BungeeCord could be outdated.    ***");
                     System.out.println("***                                     ***");
                     System.out.println("*** Errors may arise on older versions! ***");
                     System.out.println("*******************************************");
                 }
                 System.out.println("");
 
-                Util.isException(() -> waterfall.set(Class.forName("io.github.waterfallmc.waterfall.console.WaterfallConsole") != null));
-
-                SubPlugin plugin = new SubPlugin(System.out);
+                SubPlugin plugin = new SubPlugin(System.out, patched);
                 net.md_5.bungee.api.ProxyServer.class.getMethod("setInstance", net.md_5.bungee.api.ProxyServer.class).invoke(null, plugin);
-                plugin.getLogger().info("Enabled BungeeCord version " + plugin.getVersion());
+                plugin.getLogger().info("Enabled " + plugin.getBungeeName() + " version " + plugin.getVersion());
                 plugin.start();
 
                 if (!options.has("noconsole")) {
                     try {
-                        if (waterfall.get()) {
-                            plugin.canSudo = false;
+                        Container<Boolean> proprietary = new Container<Boolean>(false);
+                        if (!Util.isException(() -> proprietary.set(Class.forName("io.github.waterfallmc.waterfall.console.WaterfallConsole") != null)) && proprietary.get()) {
                             Class.forName("io.github.waterfallmc.waterfall.console.WaterfallConsole").getMethod("readCommands").invoke(null);
                         } else {
                             String line;

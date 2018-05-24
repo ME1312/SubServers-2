@@ -60,17 +60,19 @@ public final class SubPlugin extends BungeeCord implements Listener {
     public SubServer sudo = null;
     //public static final Version version = new Version("2.13a");
     //public static final Version version = new Version(new Version("2.13a"), VersionType.BETA, 1); // TODO Beta Version Setting
-    public static final Version version = new Version(new Version(new Version("2.13a"), VersionType.PRE_RELEASE, 3), VersionType.BETA, 4); // TODO Beta Version Setting
+    public static final Version version = new Version(new Version(new Version("2.13a"), VersionType.PRE_RELEASE, 3), VersionType.BETA, 5); // TODO Beta Version Setting
 
     public boolean redis = false;
     public boolean canSudo = true;
+    public final boolean isPatched;
     public long resetDate = 0;
     private boolean running = false;
     private boolean posted = false;
     private static BigInteger lastSignature = BigInteger.valueOf(-1);
 
     @SuppressWarnings("unchecked")
-    protected SubPlugin(PrintStream out) throws IOException {
+    protected SubPlugin(PrintStream out, boolean isPatched) throws IOException {
+        this.isPatched = isPatched;
         System.out.println("SubServers > Loading SubServers.Bungee v" + version.toString() + " Libraries (for Minecraft " + api.getGameVersion()[api.getGameVersion().length - 1] + ")");
 
         this.out = out;
@@ -618,17 +620,16 @@ public final class SubPlugin extends BungeeCord implements Listener {
      */
     @Override
     public String getName() {
-        return (super.getVersion()).equals("SubServers.Bungee")?"SubServers.Bungee":super.getName();
+        return (isPatched)?"SubServers.Bungee":super.getName();
     }
 
     /**
-     * Further override BungeeCord's signature when patched into the same jar
+     * Get the name from BungeeCord's original signature (for determining which fork is being used)
      *
-     * @return Software Version
+     * @return BungeeCord Software Name
      */
-    @Override
-    public String getVersion() {
-        return (super.getVersion().equals("SubServers.Bungee"))?version.toString():super.getVersion();
+    public String getBungeeName() {
+        return super.getName();
     }
 
     /**

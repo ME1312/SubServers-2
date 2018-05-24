@@ -50,13 +50,14 @@ public final class SubPlugin extends BungeeCord implements Listener {
     public SubDataClient subdata = null;
     //public static final Version version = new Version("2.13a");
     //public static final Version version = new Version(new Version("2.13a"), VersionType.BETA, 1); // TODO Beta Version Setting
-    public static final Version version = new Version(new Version(new Version("2.13a"), VersionType.PRE_RELEASE, 3), VersionType.BETA, 4); // TODO Beta Version Setting
+    public static final Version version = new Version(new Version(new Version("2.13a"), VersionType.PRE_RELEASE, 3), VersionType.BETA, 5); // TODO Beta Version Setting
 
-
+    public final boolean isPatched;
     public long lastReload = -1;
     private boolean posted = false;
 
-    protected SubPlugin(PrintStream out) throws IOException {
+    protected SubPlugin(PrintStream out, boolean isPatched) throws IOException {
+        this.isPatched = isPatched;
         System.out.println("SubServers > Loading SubServers.Sync v" + version.toString() + " Libraries (for Minecraft " + api.getGameVersion()[api.getGameVersion().length - 1] + ")");
 
         this.out = out;
@@ -184,17 +185,16 @@ public final class SubPlugin extends BungeeCord implements Listener {
      */
     @Override
     public String getName() {
-        return (super.getVersion()).equals("SubServers.Sync")?"SubServers.Sync":super.getName();
+        return (isPatched)?"SubServers.Sync":super.getName();
     }
 
     /**
-     * Further override BungeeCord's signature when patched into the same jar
+     * Get the name from BungeeCord's original signature (for determining which fork is being used)
      *
-     * @return Software Version
+     * @return BungeeCord Software Name
      */
-    @Override
-    public String getVersion() {
-        return (super.getVersion().equals("SubServers.Sync"))?version.toString():super.getVersion();
+    public String getBungeeName() {
+        return super.getName();
     }
 
     /**

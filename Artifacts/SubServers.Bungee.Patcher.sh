@@ -39,6 +39,9 @@ if [ $retvala -eq 0 ]
     if [ -f "LICENSE" ]; then
         rm -Rf LICENSE
     fi
+    if [ -f "META-INF/MANIFEST.MF" ]; then
+        cat META-INF/MANIFEST.MF | sed -e "/^\s*$/d" -e "/^Main-Class:.*$/d" -e "/^Implementation-Title:.*$/d" -e "/^Build-Jdk:.*$/d" -e "/^Created-By:.*$/d" -e "/^Built-By:.*$/d" > ../MANIFEST.MF
+    fi
     if [ -f "MODIFICATIONS" ]; then
         mv -f MODIFICATIONS ../MODIFICATIONS
     fi
@@ -49,28 +52,33 @@ if [ $retvala -eq 0 ]
     if [ $retvalb -eq 0 ]
       then
         echo ">> Writing Changes..."
-        yes | cp -rf . ../Modded.jar
-        printf "\n " >> META-INF/MANIFEST.MF
-        if [ -f "MODIFICATIONS" ]; then
-            if [ -f "../MODIFICATIONS" ]; then
-                cat MODIFICATIONS >> ../MODIFICATIONS
-            else
-                mv -f MODIFICATIONS ../MODIFICATIONS
+        if [ -f "META-INF/MANIFEST.MF" ]
+          then
+            cat META-INF/MANIFEST.MF | sed -e "/^\s*$/d" -e "/^Manifest-Version:.*$/d" -e "/^Class-Path:.*$/d" >> ../MANIFEST.MF
+        else
+            if [ ! -d "META-INF" ]; then
+                mkdir META-INF
             fi
         fi
+        if [ -f "MODIFICATIONS" ]; then
+            cat MODIFICATIONS >> ../MODIFICATIONS
+        fi
+        yes | cp -rf . ../Modded.jar
         cd ../
+        printf "Built-By: SubServers.Bungee.Patcher\n" >> MANIFEST.MF
+        cp -f MANIFEST.MF Modded.jar/META-INF
         if [ ! -f "MODIFICATIONS" ]; then
             printf "# SubServers.Bungee.Patcher generated difference list (may be empty if git is not installed)\n#\n" > MODIFICATIONS
         fi
         printf "@ `date`\n> git --no-pager diff --no-index --name-status BuildTools/Vanilla.jar BuildTools/Modded.jar\n" >> MODIFICATIONS
         git --no-pager diff --no-index --name-status Vanilla.jar Modded.jar | sed -e "s/\tVanilla.jar\//\t\//" -e "s/\tModded.jar\//\t\//" >> MODIFICATIONS
-        mv -f MODIFICATIONS Modded.jar
+        cp -f MODIFICATIONS Modded.jar
         cd Modded.jar
         echo ">> Recompiling..."
         if [ -f "../../SubServers.Patched.jar" ]; then
             rm -Rf ../../SubServers.Patched.jar
         fi
-        jar cvfm ../../SubServers.Patched.jar META-INF/MANIFEST.MF .; retvalc=$?;
+        jar cvfm ../../SubServers.Patched.jar ../MANIFEST.MF .; retvalc=$?;
         if [ $retvalc -eq 0 ]
           then
             echo ">> Cleaning Up..."
