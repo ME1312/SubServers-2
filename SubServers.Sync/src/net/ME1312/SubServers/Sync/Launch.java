@@ -23,10 +23,9 @@ public final class Launch {
     public static void main(String[] args) throws Exception {
         System.setProperty("apple.laf.useScreenMenuBar", "true");
 
-        final Container<Boolean> bungee = new Container<Boolean>(false);
-        if (Util.isException(() -> {
-            if (Class.forName("net.md_5.bungee.BungeeCord") != null) bungee.set(true);
-        }) && !bungee.get()) {
+        Container<Boolean> bungee = new Container<Boolean>(false);
+        Container<Boolean> waterfall = new Container<Boolean>(false);
+        if (Util.isException(() -> bungee.set(Class.forName("net.md_5.bungee.BungeeCord") != null)) && !bungee.get()) {
             System.out.println("");
             System.out.println("*******************************************");
             System.out.println("*** Error: BungeeCord.jar Doesn't Exist ***");
@@ -60,7 +59,7 @@ public final class Launch {
                 System.out.println("*** Please report all issues to ME1312, ***");
                 System.out.println("***   NOT the Spigot Team. Thank You!   ***");
                 System.out.println("*******************************************");
-                try {
+                if (net.md_5.bungee.BungeeCord.class.getPackage().getImplementationVersion() == null || net.md_5.bungee.BungeeCord.class.getPackage().getImplementationVersion().equals("SubServers.Sync")) try {
                     if (net.md_5.bungee.BungeeCord.class.getPackage().getSpecificationVersion() != null) {
                         Date date = (new SimpleDateFormat("yyyyMMdd")).parse(net.md_5.bungee.BungeeCord.class.getPackage().getSpecificationVersion());
                         Calendar line = Calendar.getInstance();
@@ -82,6 +81,8 @@ public final class Launch {
                 }
                 System.out.println("");
 
+                Util.isException(() -> waterfall.set(Class.forName("io.github.waterfallmc.waterfall.console.WaterfallConsole") != null));
+
                 SubPlugin plugin = new SubPlugin(System.out);
                 net.md_5.bungee.api.ProxyServer.class.getMethod("setInstance", net.md_5.bungee.api.ProxyServer.class).invoke(null, plugin);
                 plugin.getLogger().info("Enabled BungeeCord version " + plugin.getVersion());
@@ -89,14 +90,18 @@ public final class Launch {
 
                 if (!options.has("noconsole")) {
                     try {
-                        String line;
-                        while (plugin.isRunning && (line = plugin.getConsoleReader().readLine(">")) != null) {
-                            if (!plugin.getPluginManager().dispatchCommand(net.md_5.bungee.command.ConsoleCommandSender.class.cast(net.md_5.bungee.command.ConsoleCommandSender.class.getMethod("getInstance").invoke(null)), line)) {
-                                plugin.getConsole().sendMessage(net.md_5.bungee.api.ChatColor.RED + "Command not found");
+                        if (waterfall.get()) {
+                            Class.forName("io.github.waterfallmc.waterfall.console.WaterfallConsole").getMethod("readCommands").invoke(null);
+                        } else {
+                            String line;
+                            while (plugin.isRunning && (line = plugin.getConsoleReader().readLine(">")) != null) {
+                                if (!plugin.getPluginManager().dispatchCommand(net.md_5.bungee.command.ConsoleCommandSender.class.cast(net.md_5.bungee.command.ConsoleCommandSender.class.getMethod("getInstance").invoke(null)), line)) {
+                                    plugin.getConsole().sendMessage(net.md_5.bungee.api.ChatColor.RED + "Command not found");
+                                }
                             }
                         }
                     } catch (NoSuchMethodError | NoSuchMethodException e) {
-                        plugin.getLogger().warning("Standard BungeeCord console not found; Console commands now disabled.");
+                        plugin.getLogger().warning("Standard BungeeCord console not found; Console commands may now be disabled.");
                     }
                 }
             }

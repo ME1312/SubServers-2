@@ -330,20 +330,24 @@ public final class SubCommand extends CommandX {
                         sender.sendMessage("SubServers > Usage: " + label + " " + args[0].toLowerCase() + " <SubServer> <Command> [Args...]");
                     }
                 } else if (args[0].equalsIgnoreCase("sudo") || args[0].equalsIgnoreCase("screen")) {
-                    if (args.length > 1) {
-                        Map<String, Server> servers = plugin.api.getServers();
-                        if (!args[1].equals("*") && !servers.keySet().contains(args[1].toLowerCase())) {
-                            sender.sendMessage("SubServers > There is no server with that name");
-                        } else if (!args[1].equals("*") && !(servers.get(args[1].toLowerCase()) instanceof SubServer)) {
-                            sender.sendMessage("SubServers > That Server is not a SubServer");
-                        } else if (!args[1].equals("*") && !((SubServer) servers.get(args[1].toLowerCase())).isRunning()) {
-                            sender.sendMessage("SubServers > That SubServer is not running");
+                    if (plugin.canSudo) {
+                        if (args.length > 1) {
+                            Map<String, Server> servers = plugin.api.getServers();
+                            if (!args[1].equals("*") && !servers.keySet().contains(args[1].toLowerCase())) {
+                                sender.sendMessage("SubServers > There is no server with that name");
+                            } else if (!args[1].equals("*") && !(servers.get(args[1].toLowerCase()) instanceof SubServer)) {
+                                sender.sendMessage("SubServers > That Server is not a SubServer");
+                            } else if (!args[1].equals("*") && !((SubServer) servers.get(args[1].toLowerCase())).isRunning()) {
+                                sender.sendMessage("SubServers > That SubServer is not running");
+                            } else {
+                                plugin.sudo = (SubServer) servers.get(args[1].toLowerCase());
+                                System.out.println("SubServers > Now forwarding commands to " + plugin.sudo.getDisplayName() + ". Type \"exit\" to return.");
+                            }
                         } else {
-                            plugin.sudo = (SubServer) servers.get(args[1].toLowerCase());
-                            System.out.println("SubServers > Now forwarding commands to " + plugin.sudo.getDisplayName() + ". Type \"exit\" to return.");
+                            sender.sendMessage("SubServers > Usage: " + label + " " + args[0].toLowerCase() + " <SubServer>");
                         }
                     } else {
-                        sender.sendMessage("SubServers > Usage: " + label + " " + args[0].toLowerCase() + " <SubServer>");
+                        sender.sendMessage("SubServers > The BungeeCord library provided does not support console sudo.");
                     }
                 } else if (args[0].equalsIgnoreCase("create")) {
                     if (args.length > 5) {

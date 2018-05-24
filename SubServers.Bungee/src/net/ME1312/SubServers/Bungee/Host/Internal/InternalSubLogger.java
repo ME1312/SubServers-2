@@ -108,7 +108,7 @@ public class InternalSubLogger extends SubLogger {
                     }
 
                     // Filter Message
-                    boolean allow = log.get() && (SubAPI.getInstance().getInternals().sudo == null || SubAPI.getInstance().getInternals().sudo == getHandler());
+                    boolean allow = log.get() && (!SubAPI.getInstance().getInternals().canSudo || SubAPI.getInstance().getInternals().sudo == null || SubAPI.getInstance().getInternals().sudo == getHandler());
                     List<SubLogFilter> filters = new ArrayList<SubLogFilter>();
                     filters.addAll(this.filters);
                     for (SubLogFilter filter : filters)
