@@ -119,7 +119,7 @@ public class Version implements Serializable, Comparable<Version> {
      * @see #toFullString() <b>#toString()</b> returns a valid string
      */
     public static Version fromString(String string) {
-        Matcher regex = Pattern.compile("(rv|(?:p?[abrv])|[u])?([^/]+)", Pattern.CASE_INSENSITIVE).matcher(string);
+        Matcher regex = Pattern.compile("(rv|s|(?:p?[abrv])|[u])?([^/]+)", Pattern.CASE_INSENSITIVE).matcher(string);
         Version current = null;
         while (regex.find()) {
             try {
@@ -139,6 +139,9 @@ public class Version implements Serializable, Comparable<Version> {
                         break;
                     case "b":
                         type = VersionType.BETA;
+                        break;
+                    case "s":
+                        type = VersionType.SNAPSHOT;
                         break;
                     case "pr":
                         type = VersionType.PRE_RELEASE;

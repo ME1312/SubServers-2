@@ -333,11 +333,11 @@ public final class SubCommand extends CommandX {
                     if (plugin.canSudo) {
                         if (args.length > 1) {
                             Map<String, Server> servers = plugin.api.getServers();
-                            if (!args[1].equals("*") && !servers.keySet().contains(args[1].toLowerCase())) {
+                            if (!servers.keySet().contains(args[1].toLowerCase())) {
                                 sender.sendMessage("SubServers > There is no server with that name");
-                            } else if (!args[1].equals("*") && !(servers.get(args[1].toLowerCase()) instanceof SubServer)) {
+                            } else if (!(servers.get(args[1].toLowerCase()) instanceof SubServer)) {
                                 sender.sendMessage("SubServers > That Server is not a SubServer");
-                            } else if (!args[1].equals("*") && !((SubServer) servers.get(args[1].toLowerCase())).isRunning()) {
+                            } else if (!((SubServer) servers.get(args[1].toLowerCase())).isRunning()) {
                                 sender.sendMessage("SubServers > That SubServer is not running");
                             } else {
                                 plugin.sudo = (SubServer) servers.get(args[1].toLowerCase());

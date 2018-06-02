@@ -30,7 +30,7 @@ echo ">> Extracting $1..."
 mkdir BuildTools
 mkdir BuildTools/Modded.jar
 cd BuildTools/Modded.jar
-jar xvf ../../$1; retvala=$?;
+jar xvf "../../$1"; retvala=$?;
 if [ $retvala -eq 0 ]
   then
     if [ -f "LICENSE.txt" ]; then
@@ -40,7 +40,7 @@ if [ $retvala -eq 0 ]
         rm -Rf LICENSE
     fi
     if [ -f "META-INF/MANIFEST.MF" ]; then
-        cat META-INF/MANIFEST.MF | sed -e "/^\s*$/d" -e "/^Main-Class:.*$/d" -e "/^Implementation-Title:.*$/d" -e "/^Build-Jdk:.*$/d" -e "/^Created-By:.*$/d" -e "/^Built-By:.*$/d" > ../MANIFEST.MF
+        cat META-INF/MANIFEST.MF | sed -e "/^\s*$/d" -e "/^Main-Class:.*$/d" -e "/^Implementation-Title:.*$/d" -e "/^Specification-Title:.*$/d" -e "/^Build-Jdk:.*$/d" -e "/^Created-By:.*$/d" -e "/^Built-By:.*$/d" > ../MANIFEST.MF
     else
         printf "Manifest-Version: 1.0\n" > ../MANIFEST.MF
     fi
@@ -50,7 +50,7 @@ if [ $retvala -eq 0 ]
     echo ">> Extracting $2..."
     mkdir ../Vanilla.jar
     cd ../Vanilla.jar
-    jar xvf ../../$2; retvalb=$?;
+    jar xvf "../../$2"; retvalb=$?;
     if [ $retvalb -eq 0 ]
       then
         echo ">> Writing Changes..."
@@ -69,6 +69,9 @@ if [ $retvala -eq 0 ]
         cd ../
         printf "Built-By: SubServers.Bungee.Patcher\n" >> MANIFEST.MF
         cp -f MANIFEST.MF Modded.jar/META-INF
+        if [ -f "Modded.jar/bungee.yml" ]; then
+            rm -Rf Modded.jar/bungee.yml
+        fi
         if [ ! -f "MODIFICATIONS" ]; then
             printf "# SubServers.Bungee.Patcher generated difference list (may be empty if git is not installed)\n#\n" > MODIFICATIONS
         fi

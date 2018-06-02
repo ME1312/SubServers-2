@@ -1,11 +1,12 @@
 package net.ME1312.SubServers.Host.Library.Version;
 
 public enum VersionType {
-    PRE_ALPHA(-5, "pa", "pre-alpha"),
-    ALPHA(-4, "a", "alpha"),
-    PREVIEW(-3, "pv", "preview"),
-    PRE_BETA(-3, "pb", "pre-beta"),
-    BETA(-2, "b", "beta"),
+    PRE_ALPHA(-6, "pa", "pre-alpha"),
+    ALPHA(-5, "a", "alpha"),
+    PREVIEW(-4, "pv", "preview"),
+    PRE_BETA(-4, "pb", "pre-beta"),
+    BETA(-3, "b", "beta"),
+    SNAPSHOT(-2, "s", "snapshot"),
     PRE_RELEASE(-1, "pr", "pre-release"),
     RELEASE(0, "r", "release"),
     REVISION(0, "rv", "revision"),

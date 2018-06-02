@@ -51,10 +51,11 @@ public final class ExHost {
     public YAMLSection host = null;
     public SubDataClient subdata = null;
 
+    public final SubAPI api = new SubAPI(this);
     //public final Version version = new Version("2.13a");
     //public final Version version = new Version(new Version("2.13a"), VersionType.BETA, 1); // TODO Beta Version Setting
-    public final Version version = new Version(new Version("2.13a"), VersionType.PRE_RELEASE, 3); // TODO Beta Version Setting
-    public final SubAPI api = new SubAPI(this);
+    public final Version version = new Version(new Version(new Version("2.13a"), VersionType.PRE_RELEASE, 4), VersionType.SNAPSHOT,
+            (ExHost.class.getPackage().getSpecificationTitle() == null)?"0":ExHost.class.getPackage().getSpecificationTitle()); // TODO Beta Version Setting */
 
     private ConsoleReader jline;
     private boolean running = false;
