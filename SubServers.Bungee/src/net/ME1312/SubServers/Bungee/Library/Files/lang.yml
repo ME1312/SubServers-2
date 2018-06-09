@@ -30,7 +30,7 @@ Lang:
   'Command.Help.SubServer.Stop': '   &7Stop Server:&f $str$'
   'Command.Help.SubServer.Terminate': '   &7Terminate Server:&f $str$'
   'Command.Help.SubServer.Command': '   &7Command Server:&f $str$'
-  'Command.Version': '&7SubServers &8&l\u00BB&7 $name$ is running version &f$str$'
+  'Command.Version': '&7SubServers &8&l\u00BB&7 These are the platforms and versions that are running &f$str$&7:'
   'Command.Version.Outdated': '&7$name$ &f$str$ &7is available. You are $int$ version(s) behind.'
   'Command.Version.Latest': '&7You are on the latest version.'
   'Command.List.Group-Header': '&7SubServers &8&l\u00BB&7 Group/Server List:'

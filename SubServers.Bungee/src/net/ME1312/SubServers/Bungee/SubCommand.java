@@ -66,7 +66,12 @@ public final class SubCommand extends CommandX {
                 if (args[0].equalsIgnoreCase("help") || args[0].equalsIgnoreCase("?")) {
                     sender.sendMessages(printHelp());
                 } else if (args[0].equalsIgnoreCase("version") || args[0].equalsIgnoreCase("ver")) {
-                    sender.sendMessage("SubServers > SubServers.Bungee is running version " + plugin.version.toExtendedString());
+                    sender.sendMessage("SubServers > These are the platforms and versions that are running SubServers.Bungee:");
+                    sender.sendMessage("  " + System.getProperty("os.name") + ' ' + System.getProperty("os.version") + ',');
+                    sender.sendMessage("  Java " + System.getProperty("java.version") + ',');
+                    sender.sendMessage("  " + plugin.getBungeeName() + ((plugin.isPatched)?" [Patched] ":" ") + net.md_5.bungee.Bootstrap.class.getPackage().getImplementationVersion() + ',');
+                    sender.sendMessage("  SubServers.Bungee v" + SubPlugin.version.toExtendedString());
+                    sender.sendMessage("");
                     new Thread(() -> {
                         try {
                             Document updxml = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new InputSource(new StringReader(Util.readAll(new BufferedReader(new InputStreamReader(new URL("https://src.me1312.net/maven/net/ME1312/SubServers/SubServers.Bungee/maven-metadata.xml").openStream(), Charset.forName("UTF-8")))))));

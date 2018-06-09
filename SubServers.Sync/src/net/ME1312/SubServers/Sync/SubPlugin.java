@@ -48,10 +48,8 @@ public final class SubPlugin extends BungeeCord implements Listener {
     public boolean redis = false;
     public final SubAPI api = new SubAPI(this);
     public SubDataClient subdata = null;
-    //public static final Version version = new Version("2.13a");
-    //public static final Version version = new Version(new Version("2.13a"), VersionType.BETA, 1); // TODO Beta Version Setting
-    public static final Version version = new Version(new Version(new Version("2.13a"), VersionType.PRE_RELEASE, 4), VersionType.SNAPSHOT,
-            (SubPlugin.class.getPackage().getSpecificationTitle() == null)?"0":SubPlugin.class.getPackage().getSpecificationTitle()); // TODO Beta Version Setting */
+    //public static final Version version = Version.fromString("2.13a/pr4");
+    public static final Version version = new Version(Version.fromString("2.13a/pr4"), VersionType.SNAPSHOT, (SubPlugin.class.getPackage().getSpecificationTitle() == null)?"?":SubPlugin.class.getPackage().getSpecificationTitle()); // TODO Snapshot Version
 
     public final boolean isPatched;
     public long lastReload = -1;
@@ -159,11 +157,10 @@ public final class SubPlugin extends BungeeCord implements Listener {
      *
      * @param method Method to reference
      * @param args Method arguments
-     * @param <T> Class Type
      * @return Method Response
      */
     @SuppressWarnings("unchecked")
-    public <T> Object redis(String method, NamedContainer<Class<?>, ?>... args) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+    public Object redis(String method, NamedContainer<Class<?>, ?>... args) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         if (redis) {
             Object api = getPluginManager().getPlugin("RedisBungee").getClass().getMethod("getApi").invoke(null);
             Class<?>[] classargs = new Class<?>[args.length];

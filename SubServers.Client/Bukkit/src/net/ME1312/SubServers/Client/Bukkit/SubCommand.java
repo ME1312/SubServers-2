@@ -48,7 +48,12 @@ public final class SubCommand implements CommandExecutor {
                     if (args[0].equalsIgnoreCase("help") || args[0].equalsIgnoreCase("?")) {
                         sender.sendMessage(printHelp(label));
                     } else if (args[0].equalsIgnoreCase("version") || args[0].equalsIgnoreCase("ver")) {
-                        sender.sendMessage(plugin.api.getLang("SubServers", "Command.Version").replace("$name$", "SubServers.Client.Bukkit").replace("$str$", plugin.version.toExtendedString()));
+                        sender.sendMessage(plugin.api.getLang("SubServers", "Command.Version").replace("$str$", "SubServers.Client.Bukkit"));
+                        sender.sendMessage(ChatColor.WHITE + "  " + System.getProperty("os.name") + ' ' + System.getProperty("os.version") + ChatColor.RESET + ',');
+                        sender.sendMessage(ChatColor.WHITE + "  Java " + System.getProperty("java.version") + ChatColor.RESET + ',');
+                        sender.sendMessage(ChatColor.WHITE + "  " + Bukkit.getName() + ' ' + Bukkit.getVersion() + ChatColor.RESET + ',');
+                        sender.sendMessage(ChatColor.WHITE + "  SubServers.Client.Bukkit v" + plugin.version.toExtendedString());
+                        sender.sendMessage("");
                         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
                             try {
                                 Document updxml = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new InputSource(new StringReader(Util.readAll(new BufferedReader(new InputStreamReader(new URL("https://src.me1312.net/maven/net/ME1312/SubServers/SubServers.Client.Bukkit/maven-metadata.xml").openStream(), Charset.forName("UTF-8")))))));

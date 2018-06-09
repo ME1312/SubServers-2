@@ -52,10 +52,8 @@ public final class ExHost {
     public SubDataClient subdata = null;
 
     public final SubAPI api = new SubAPI(this);
-    //public final Version version = new Version("2.13a");
-    //public final Version version = new Version(new Version("2.13a"), VersionType.BETA, 1); // TODO Beta Version Setting
-    public final Version version = new Version(new Version(new Version("2.13a"), VersionType.PRE_RELEASE, 4), VersionType.SNAPSHOT,
-            (ExHost.class.getPackage().getSpecificationTitle() == null)?"0":ExHost.class.getPackage().getSpecificationTitle()); // TODO Beta Version Setting */
+    //public static final Version version = Version.fromString("2.13a/pr4");
+    public static final Version version = new Version(Version.fromString("2.13a/pr4"), VersionType.SNAPSHOT, (ExHost.class.getPackage().getSpecificationTitle() == null)?"?":ExHost.class.getPackage().getSpecificationTitle()); // TODO Snapshot Version
 
     private ConsoleReader jline;
     private boolean running = false;
@@ -69,7 +67,21 @@ public final class ExHost {
      */
     public static void main(String[] args) throws Exception {
         if (System.getProperty("RM.subservers", "true").equalsIgnoreCase("true")) {
-            new ExHost(args);
+            joptsimple.OptionParser parser = new joptsimple.OptionParser();
+            parser.allowsUnrecognizedOptions();
+            parser.accepts("v");
+            parser.accepts("version");
+            parser.accepts("noconsole");
+            joptsimple.OptionSet options = parser.parse(args);
+            if(options.has("version") || options.has("v")) {
+                System.out.println("");
+                System.out.println(System.getProperty("os.name") + " " + System.getProperty("os.version") + ',');
+                System.out.println("Java " + System.getProperty("java.version") + ",");
+                System.out.println("SubServers.Host v" + version.toExtendedString());
+                System.out.println("");
+            } else {
+                new ExHost(options);
+            }
         } else {
             System.out.println(">> SubServers code has been disallowed to work on this machine");
             System.out.println(">> Check with your provider for more information");
@@ -77,7 +89,7 @@ public final class ExHost {
         }
     }
 
-    private ExHost(String[] args) {
+    private ExHost(joptsimple.OptionSet options) {
         try {
             JarFile jarFile = new JarFile(new File(ExHost.class.getProtectionDomain().getCodeSource().getLocation().toURI()));
             Enumeration<JarEntry> entries = jarFile.entries();
@@ -401,7 +413,9 @@ public final class ExHost {
                 }
             }, 0, TimeUnit.DAYS.toMillis(2));
 
-            loop();
+            if (!options.has("noconsole")) {
+                loop();
+            }
         } catch (Exception e) {
             log.error.println(e);
             forcequit(1);

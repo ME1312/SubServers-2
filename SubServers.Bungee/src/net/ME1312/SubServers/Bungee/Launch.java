@@ -47,10 +47,10 @@ public final class Launch {
             joptsimple.OptionSet options = parser.parse(args);
             if(options.has("version") || options.has("v")) {
                 System.out.println("");
-                System.out.println(System.getProperty("os.name") + " " + System.getProperty("os.version") + ",");
+                System.out.println(System.getProperty("os.name") + " " + System.getProperty("os.version") + ',');
                 System.out.println("Java " + System.getProperty("java.version") + ",");
-                System.out.println("BungeeCord" + ((patched)?" (Patched) ":" ") + net.md_5.bungee.Bootstrap.class.getPackage().getImplementationVersion() + ",");
-                System.out.println("SubServers.Bungee v" + SubPlugin.version.toExtendedString());
+                System.out.println("BungeeCord" + ((patched)?" [Patched] ":" ") + net.md_5.bungee.Bootstrap.class.getPackage().getImplementationVersion() + ',');
+                System.out.println("SubServers.Sync v" + SubPlugin.version.toExtendedString());
                 System.out.println("");
             } else {
                 System.out.println("");

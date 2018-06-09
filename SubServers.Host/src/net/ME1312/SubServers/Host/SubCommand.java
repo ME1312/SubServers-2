@@ -30,9 +30,11 @@ public class SubCommand {
             public void command(String handle, String[] args) {
                 if (args.length == 0) {
                     host.log.message.println(
-                            System.getProperty("os.name") + ' ' + System.getProperty("os.version") + ',',
-                            "Java " + System.getProperty("java.version") + ',',
-                            "SubServers.Host v" + host.version.toExtendedString());
+                            "These are the platforms and versions that are running SubServers.Host:",
+                            "  " + System.getProperty("os.name") + ' ' + System.getProperty("os.version") + ',',
+                            "  Java " + System.getProperty("java.version") + ',',
+                            "  SubServers.Host v" + host.version.toExtendedString(),
+                            "");
                     new Thread(() -> {
                         try {
                             Document updxml = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new InputSource(new StringReader(Util.readAll(new BufferedReader(new InputStreamReader(new URL("https://src.me1312.net/maven/net/ME1312/SubServers/SubServers.Host/maven-metadata.xml").openStream(), Charset.forName("UTF-8")))))));
