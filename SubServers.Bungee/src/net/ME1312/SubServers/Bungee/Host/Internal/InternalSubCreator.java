@@ -89,15 +89,7 @@ public class InternalSubCreator extends SubCreator {
         try {
             System.out.println(name + File.separator + "Creator > Loading Template: " + template.getDisplayName());
             Util.copyDirectory(template.getDirectory(), dir);
-            if (template.getType() == ServerType.VANILLA) {
-                String branch;
-                if (version.compareTo(new Version("1.12")) >= 0) {
-                    branch = "1.12";
-                } else {
-                    branch = "1.7.10";
-                }
-                version = new Version(version.toString() + " " + branch);
-            } else if (template.getType() == ServerType.SPONGE) {
+            if (template.getType() == ServerType.SPONGE) {
                 System.out.println(name + File.separator + "Creator > Searching Versions...");
                 Document spongexml = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new InputSource(new StringReader(Util.readAll(new BufferedReader(new InputStreamReader(new URL("http://files.minecraftforge.net/maven/org/spongepowered/spongeforge/maven-metadata.xml").openStream(), Charset.forName("UTF-8")))))));
                 Document forgexml = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new InputSource(new StringReader(Util.readAll(new BufferedReader(new InputStreamReader(new URL("http://files.minecraftforge.net/maven/net/minecraftforge/forge/maven-metadata.xml").openStream(), Charset.forName("UTF-8")))))));

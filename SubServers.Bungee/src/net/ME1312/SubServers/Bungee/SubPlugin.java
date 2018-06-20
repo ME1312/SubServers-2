@@ -119,7 +119,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
             Util.unzip(SubPlugin.class.getResourceAsStream("/net/ME1312/SubServers/Bungee/Library/Files/Templates/sponge.zip"), new UniversalFile(dir, "Templates"));
             System.out.println("SubServers > Created ~/SubServers/Templates/Sponge");
         } else {
-            if (new UniversalFile(dir, "Templates:Vanilla:template.yml").exists() && (new Version((new YAMLConfig(new UniversalFile(dir, "Templates:Vanilla:template.yml"))).get().getString("Version", "0")).compareTo(new Version("2.13b+"))) != 0) {
+            if (new UniversalFile(dir, "Templates:Vanilla:template.yml").exists() && (new Version((new YAMLConfig(new UniversalFile(dir, "Templates:Vanilla:template.yml"))).get().getString("Version", "0")).compareTo(new Version("2.13a/pr4+"))) != 0) {
                 Files.move(new UniversalFile(dir, "Templates:Vanilla").toPath(), new UniversalFile(dir, "Templates:Vanilla.old" + Math.round(Math.random() * 100000)).toPath());
                 Util.unzip(SubPlugin.class.getResourceAsStream("/net/ME1312/SubServers/Bungee/Library/Files/Templates/vanilla.zip"), new UniversalFile(dir, "Templates"));
                 System.out.println("SubServers > Updated ~/SubServers/Templates/Vanilla");
