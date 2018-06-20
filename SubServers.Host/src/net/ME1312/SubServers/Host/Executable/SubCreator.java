@@ -213,13 +213,13 @@ public class SubCreator {
             host.subdata.sendPacket(new PacketOutExLogMessage(address, "Loading Template: " + template.getDisplayName()));
             Util.copyDirectory(template.getDirectory(), dir);
             if (template.getType() == ServerType.VANILLA) {
-                String commit;
+                String branch;
                 if (version.compareTo(new Version("1.12")) >= 0) {
-                    commit = "6c29bc48854f75fae6e8c16bbbdb47bd53a8e082";
+                    branch = "1.12";
                 } else {
-                    commit = "339144e5cc406c3bc71aed66b636cbb348932eb0";
+                    branch = "1.7.10";
                 }
-                version = new Version(version.toString() + " " + commit);
+                version = new Version(version.toString() + " " + branch);
             } else if (template.getType() == ServerType.SPONGE) {
                 thread.name().logger.info.println("Searching Versions...");
                 host.subdata.sendPacket(new PacketOutExLogMessage(address, "Searching Versions..."));
