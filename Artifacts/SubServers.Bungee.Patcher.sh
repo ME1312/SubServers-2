@@ -23,15 +23,15 @@ if [ ! -f "$2" ]
     echo ERROR: Cannot find $2
     exit 2
 fi
-if [ -d "Buildtools" ]; then
-    rm -Rf Buildtools
+if [ -d "SubServers.Patcher" ]; then
+    rm -Rf SubServers.Patcher
 fi
 echo ">> Extracting $1..."
-mkdir BuildTools
-mkdir BuildTools/Modded.jar
-cd BuildTools/Modded.jar
-jar xvf "../../$1"; retvala=$?;
-if [ $retvala -eq 0 ]
+mkdir SubServers.Patcher
+mkdir SubServers.Patcher/Patched.jar
+cd SubServers.Patcher/Patched.jar
+jar xvf "../../$1"; __RETURN=$?;
+if [ $__RETURN -eq 0 ]
   then
     if [ -f "LICENSE.txt" ]; then
         rm -Rf LICENSE.txt
@@ -48,10 +48,10 @@ if [ $retvala -eq 0 ]
         mv -f MODIFICATIONS ../MODIFICATIONS
     fi
     echo ">> Extracting $2..."
-    mkdir ../Vanilla.jar
-    cd ../Vanilla.jar
-    jar xvf "../../$2"; retvalb=$?;
-    if [ $retvalb -eq 0 ]
+    mkdir ../Original.jar
+    cd ../Original.jar
+    jar xvf "../../$2"; __RETURN=$?;
+    if [ $__RETURN -eq 0 ]
       then
         echo ">> Writing Changes..."
         if [ -f "META-INF/MANIFEST.MF" ]
@@ -65,30 +65,30 @@ if [ $retvala -eq 0 ]
         if [ -f "MODIFICATIONS" ]; then
             cat MODIFICATIONS >> ../MODIFICATIONS
         fi
-        yes | cp -rf . ../Modded.jar
+        yes | cp -rf . ../Patched.jar
         cd ../
         printf "Built-By: SubServers.Bungee.Patcher\n" >> MANIFEST.MF
-        cp -f MANIFEST.MF Modded.jar/META-INF
-        if [ -f "Modded.jar/bungee.yml" ]; then
-            rm -Rf Modded.jar/bungee.yml
+        cp -f MANIFEST.MF Patched.jar/META-INF
+        if [ -f "Patched.jar/bungee.yml" ]; then
+            rm -Rf Patched.jar/bungee.yml
         fi
         if [ ! -f "MODIFICATIONS" ]; then
             printf "# SubServers.Bungee.Patcher generated difference list (may be empty if git is not installed)\n#\n" > MODIFICATIONS
         fi
-        printf "@ `date`\n> git --no-pager diff --no-index --name-status BuildTools/Vanilla.jar BuildTools/Modded.jar\n" >> MODIFICATIONS
-        git --no-pager diff --no-index --name-status Vanilla.jar Modded.jar | sed -e "s/\tVanilla.jar\//\t\//" -e "s/\tModded.jar\//\t\//" >> MODIFICATIONS
-        cp -f MODIFICATIONS Modded.jar
-        cd Modded.jar
+        printf "@ `date`\n> git --no-pager diff --no-index --name-status SubServers.Patcher/Original.jar SubServers.Patcher/Patched.jar\n" >> MODIFICATIONS
+        git --no-pager diff --no-index --name-status Original.jar Patched.jar | sed -e "s/\tOriginal.jar\//\t\//" -e "s/\tPatched.jar\//\t\//" >> MODIFICATIONS
+        cp -f MODIFICATIONS Patched.jar
+        cd Patched.jar
         echo ">> Recompiling..."
         if [ -f "../../SubServers.Patched.jar" ]; then
             rm -Rf ../../SubServers.Patched.jar
         fi
-        jar cvfm ../../SubServers.Patched.jar META-INF/MANIFEST.MF .; retvalc=$?;
-        if [ $retvalc -eq 0 ]
+        jar cvfm ../../SubServers.Patched.jar META-INF/MANIFEST.MF .; __RETURN=$?;
+        if [ $__RETURN -eq 0 ]
           then
             echo ">> Cleaning Up..."
             cd ../../
-            rm -Rf BuildTools
+            rm -Rf SubServers.Patcher
             exit 0;
         else
             echo ">> Error Recomiling Files"
