@@ -7,13 +7,13 @@ website: 'http://www.ME1312.net/'
 commands:
   subservers:
     description: 'The SubServers Command'
-    usage: /subservers help
+    usage: 'An exception may have occurred while running this command'
   subserver:
     description: 'The SubServers Command'
-    usage: /subserver help
+    usage: 'An exception may have occurred while running this command'
   sub:
     description: 'The SubServers Command'
-    usage: /sub help
+    usage: 'An exception may have occurred while running this command'
 permissions:
   subservers.*:
     description: 'Grants Access to to Everything in SubServers.Client'

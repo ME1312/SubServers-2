@@ -35,6 +35,8 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * SubServers.Host Main Class
@@ -253,7 +255,7 @@ public final class ExHost {
 
                                     Object obj = clazz.getConstructor().newInstance();
                                     try {
-                                        SubPluginInfo plugin = new SubPluginInfo(this, obj, clazz.getAnnotation(SubPlugin.class).name(), new Version(clazz.getAnnotation(SubPlugin.class).version()),
+                                        SubPluginInfo plugin = new SubPluginInfo(this, obj, clazz.getAnnotation(SubPlugin.class).name(), Version.fromString(clazz.getAnnotation(SubPlugin.class).version()),
                                                 Arrays.asList(clazz.getAnnotation(SubPlugin.class).authors()), (clazz.getAnnotation(SubPlugin.class).description().length() > 0)?clazz.getAnnotation(SubPlugin.class).description():null,
                                                 (clazz.getAnnotation(SubPlugin.class).website().length() > 0)?new URL(clazz.getAnnotation(SubPlugin.class).website()):null, Arrays.asList(clazz.getAnnotation(SubPlugin.class).loadBefore()),
                                                 Arrays.asList(clazz.getAnnotation(SubPlugin.class).dependencies()), Arrays.asList(clazz.getAnnotation(SubPlugin.class).softDependencies()));
@@ -336,7 +338,18 @@ public final class ExHost {
                                 api.plugins.put(plugin.getName().toLowerCase(), plugin);
                                 api.plugins.put(plugin.getName().toLowerCase(), plugin);
                                 loaded.add(plugin.getName().toLowerCase());
-                                log.info.println("Loaded " + plugin.getName() + " v" + plugin.getVersion().toString() + " by " + plugin.getAuthors().toString().substring(1, plugin.getAuthors().toString().length() - 1));
+                                String a = "";
+                                int ai = 0;
+                                for (String author : plugin.getAuthors()) {
+                                    ai++;
+                                    if (ai > 1) {
+                                        if (plugin.getAuthors().size() > 2) a += ", ";
+                                        else if (plugin.getAuthors().size() == 2) a += ' ';
+                                        if (ai == plugin.getAuthors().size()) a += "and ";
+                                    }
+                                    a += author;
+                                }
+                                log.info.println("Loaded " + plugin.getName() + " v" + plugin.getVersion().toString() + " by " + a);
                                 i++;
                             } catch (Throwable e) {
                                 plugin.setEnabled(false);
@@ -446,29 +459,111 @@ public final class ExHost {
     }
 
     private void loop() throws Exception {
-        String umsg;
+        String line;
         ready = true;
-        while (ready && (umsg = jline.readLine(">")) != null) {
-            if (!ready || umsg.equals("")) continue;
+        while (ready && (line = jline.readLine(">")) != null) {
+            if (!ready || line.replaceAll("\\s", "").length() == 0) continue;
             final CommandPreProcessEvent event;
-            api.executeEvent(event = new CommandPreProcessEvent(this, umsg));
+            api.executeEvent(event = new CommandPreProcessEvent(this, line));
             if (!event.isCancelled()) {
-                final String cmd = (umsg.startsWith("/"))?((umsg.contains(" ")?umsg.split(" "):new String[]{umsg})[0].substring(1)):((umsg.contains(" ")?umsg.split(" "):new String[]{umsg})[0]);
-                if (api.commands.keySet().contains(cmd.toLowerCase())) {
-                    ArrayList<String> args = new ArrayList<String>();
-                    args.addAll(Arrays.asList(umsg.contains(" ") ? umsg.split(" ") : new String[]{umsg}));
+                LinkedList<String> args = new LinkedList<String>();
+                Matcher parser = Pattern.compile("(?:^|\\s+)(\"(?:\\\\\"|[^\"])+\"?|(?:\\\\\\s|[^\\s])+)").matcher(line);
+                while (parser.find()) {
+                    String arg = parser.group(1);
+                    if (arg.startsWith("\"")) arg = arg.substring(1, arg.length() - ((arg.endsWith("\""))?1:0));
+                    arg = unescapeCommand(arg);
+                    args.add(arg);
+                }
+                String cmd = args.get(0);
+                args.remove(0);
+                if (cmd.startsWith("/")) cmd = cmd.substring(1);
+                if (args.size() >= 1 &&
+                       ((cmd.equalsIgnoreCase("sub") && !api.commands.keySet().contains("sub")) ||
+                        (cmd.equalsIgnoreCase("subserver") && !api.commands.keySet().contains("subserver")) ||
+                        (cmd.equalsIgnoreCase("subservers") && !api.commands.keySet().contains("subservers")))) {
+                    cmd = args.get(0);
                     args.remove(0);
+                }
+
+                if (api.commands.keySet().contains(cmd.toLowerCase())) {
                     try {
                         api.commands.get(cmd.toLowerCase()).command(cmd, args.toArray(new String[args.size()]));
                     } catch (Exception e) {
                         log.error.println(new InvocationTargetException(e, "Uncaught exception while running command"));
                     }
                 } else {
-                    log.message.println("Unknown Command - " + umsg);
+                    String s = cmd.replace("\\", "\\\\").replace("\n", "\\n").replace("\"", "\\\"").replace(" ", "\\ ");
+                    for (String arg : args) {
+                        s += ' ' + arg.replace("\\", "\\\\").replace("\n", "\\n").replace("\"", "\\\"").replace(" ", "\\ ");
+                    }
+                    log.message.println("Unknown Command - " + s);
                 }
                 jline.getOutput().write("\b \b");
             }
         }
+    }
+    /**
+     * Parse escapes in a command
+     *
+     * @param str String
+     * @return Unescaped String
+     */
+    private String unescapeCommand(String str) {
+        StringBuilder sb = new StringBuilder(str.length());
+
+        for (int i = 0; i < str.length(); i++) {
+            char ch = str.charAt(i);
+            if (ch == '\\') {
+                char nextChar = (i == str.length() - 1) ? '\\' : str
+                        .charAt(i + 1);
+                // Octal escape?
+                if (nextChar >= '0' && nextChar <= '7') {
+                    String code = "" + nextChar;
+                    i++;
+                    if ((i < str.length() - 1) && str.charAt(i + 1) >= '0'
+                            && str.charAt(i + 1) <= '7') {
+                        code += str.charAt(i + 1);
+                        i++;
+                        if ((i < str.length() - 1) && str.charAt(i + 1) >= '0'
+                                && str.charAt(i + 1) <= '7') {
+                            code += str.charAt(i + 1);
+                            i++;
+                        }
+                    }
+                    sb.append((char) Integer.parseInt(code, 8));
+                    continue;
+                }
+                switch (nextChar) {
+                    case '\\':
+                        ch = '\\';
+                        break;
+                    case 'n':
+                        ch = '\n';
+                        break;
+                    case '\"':
+                        ch = '\"';
+                        break;
+                    case ' ':
+                        ch = ' ';
+                        break;
+                    // Hex Unicode: u????
+                    case 'u':
+                        if (i >= str.length() - 5) {
+                            ch = 'u';
+                            break;
+                        }
+                        int code = Integer.parseInt(
+                                "" + str.charAt(i + 2) + str.charAt(i + 3)
+                                        + str.charAt(i + 4) + str.charAt(i + 5), 16);
+                        sb.append(Character.toChars(code));
+                        i += 5;
+                        continue;
+                }
+                i++;
+            }
+            sb.append(ch);
+        }
+        return sb.toString();
     }
 
     private void loadDefaults() {

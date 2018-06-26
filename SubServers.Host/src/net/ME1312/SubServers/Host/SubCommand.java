@@ -28,42 +28,66 @@ public class SubCommand {
         new Command(null) {
             @Override
             public void command(String handle, String[] args) {
-                if (args.length == 0) {
+                if (args.length == 0 || host.api.plugins.get(args[0].toLowerCase()) != null) {
                     host.log.message.println(
-                            "These are the platforms and versions that are running SubServers.Host:",
+                            "These are the platforms and versions that are running " + ((args.length == 0)?"SubServers.Host":host.api.plugins.get(args[0].toLowerCase()).getName()) +":",
                             "  " + System.getProperty("os.name") + ' ' + System.getProperty("os.version") + ',',
                             "  Java " + System.getProperty("java.version") + ',',
-                            "  SubServers.Host v" + host.version.toExtendedString(),
-                            "");
-                    new Thread(() -> {
-                        try {
-                            Document updxml = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new InputSource(new StringReader(Util.readAll(new BufferedReader(new InputStreamReader(new URL("https://src.me1312.net/maven/net/ME1312/SubServers/SubServers.Host/maven-metadata.xml").openStream(), Charset.forName("UTF-8")))))));
+                            "  SubServers.Host v" + host.version.toExtendedString() + ((args.length == 0)?"":","));
+                    if (args.length == 0) {
+                        host.log.message.println("");
+                        new Thread(() -> {
+                            try {
+                                Document updxml = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new InputSource(new StringReader(Util.readAll(new BufferedReader(new InputStreamReader(new URL("https://src.me1312.net/maven/net/ME1312/SubServers/SubServers.Host/maven-metadata.xml").openStream(), Charset.forName("UTF-8")))))));
 
-                            NodeList updnodeList = updxml.getElementsByTagName("version");
-                            Version updversion = host.version;
-                            int updcount = 0;
-                            for (int i = 0; i < updnodeList.getLength(); i++) {
-                                Node node = updnodeList.item(i);
-                                if (node.getNodeType() == Node.ELEMENT_NODE) {
-                                    if (!node.getTextContent().startsWith("-") && !node.getTextContent().equals(host.version.toString()) && Version.fromString(node.getTextContent()).compareTo(updversion) > 0) {
-                                        updversion = Version.fromString(node.getTextContent());
-                                        updcount++;
+                                NodeList updnodeList = updxml.getElementsByTagName("version");
+                                Version updversion = host.version;
+                                int updcount = 0;
+                                for (int i = 0; i < updnodeList.getLength(); i++) {
+                                    Node node = updnodeList.item(i);
+                                    if (node.getNodeType() == Node.ELEMENT_NODE) {
+                                        if (!node.getTextContent().startsWith("-") && !node.getTextContent().equals(host.version.toString()) && Version.fromString(node.getTextContent()).compareTo(updversion) > 0) {
+                                            updversion = Version.fromString(node.getTextContent());
+                                            updcount++;
+                                        }
                                     }
                                 }
+                                if (updcount == 0) {
+                                    host.log.message.println("You are on the latest version.");
+                                } else {
+                                    host.log.message.println("SubServers.Host v" + updversion + " is available. You are " + updcount + " version" + ((updcount == 1)?"":"s") + " behind.");
+                                }
+                            } catch (Exception e) {}
+                        }).start();
+                    } else {
+                        SubPluginInfo plugin = host.api.plugins.get(args[0].toLowerCase());
+                        String title = "  " + plugin.getName() + " v" + plugin.getVersion().toExtendedString();
+                        String subtitle = "    by ";
+                        int i = 0;
+                        for (String author : plugin.getAuthors()) {
+                            i++;
+                            if (i > 1) {
+                                if (plugin.getAuthors().size() > 2) subtitle += ", ";
+                                else if (plugin.getAuthors().size() == 2) subtitle += ' ';
+                                if (i == plugin.getAuthors().size()) subtitle += "and ";
                             }
-                            if (updcount == 0) {
-                                host.log.message.println("You are on the latest version.");
-                            } else {
-                                host.log.message.println("SubServers.Host v" + updversion + " is available. You are " + updcount + " version" + ((updcount == 1)?"":"s") + " behind.");
-                            }
-                        } catch (Exception e) {
+                            subtitle += author;
                         }
-                    }).start();
-                } else if (host.api.plugins.get(args[0].toLowerCase()) != null) {
-                    SubPluginInfo plugin = host.api.plugins.get(args[0].toLowerCase());
-                    host.log.message.println(plugin.getName() + " v" + plugin.getVersion() + " by " + plugin.getAuthors().toString().substring(1, plugin.getAuthors().toString().length() - 1));
-                    if (plugin.getWebsite() != null) host.log.message.println(plugin.getWebsite().toString());
-                    if (plugin.getDescription() != null) host.log.message.println("", plugin.getDescription());
+                        if (plugin.getWebsite() != null) {
+                            if (title.length() > subtitle.length() + 5 + plugin.getWebsite().toString().length()) {
+                                i = subtitle.length();
+                                while (i < title.length() - plugin.getWebsite().toString().length() - 2) {
+                                    i++;
+                                    subtitle += ' ';
+                                }
+                            } else {
+                                subtitle += " - ";
+                            }
+                            subtitle += plugin.getWebsite().toString();
+                        }
+                        host.log.message.println(title, subtitle);
+                        if (plugin.getDescription() != null) host.log.message.println("", plugin.getDescription());
+                    }
                 } else {
                     host.log.message.println("There is no plugin with that name");
                 }
@@ -202,7 +226,7 @@ public class SubCommand {
                         }
                     }));
                 } else {
-                    host.log.message.println("Usage: " + handle + " <SubServer>");
+                    host.log.message.println("Usage: /" + handle + " <SubServer>");
                 }
             }
         }.usage("<SubServer>").description("Gets information about a SubServer").help(
@@ -251,7 +275,7 @@ public class SubCommand {
                         }
                     }));
                 } else {
-                    host.log.message.println("Usage: " + handle + " <SubServer>");
+                    host.log.message.println("Usage: /" + handle + " <SubServer>");
                 }
             }
         }.usage("<SubServer>").description("Starts a SubServer").help(
@@ -290,7 +314,7 @@ public class SubCommand {
                         }
                     }));
                 } else {
-                    host.log.message.println("Usage: " + handle + " <SubServer>");
+                    host.log.message.println("Usage: /" + handle + " <SubServer>");
                 }
             }
         }.usage("<SubServer>").description("Stops a SubServer").help(
@@ -330,7 +354,7 @@ public class SubCommand {
                         }
                     }));
                 } else {
-                    host.log.message.println("Usage: " + handle + " <SubServer>");
+                    host.log.message.println("Usage: /" + handle + " <SubServer>");
                 }
             }
         }.usage("<SubServer>").description("Terminates a SubServer").help(
@@ -379,7 +403,7 @@ public class SubCommand {
                         }
                     }));
                 } else {
-                    host.log.message.println("Usage: " + handle + " <SubServer> <Command> [Args...]");
+                    host.log.message.println("Usage: /" + handle + " <SubServer> <Command> [Args...]");
                 }
             }
         }.usage("<SubServer>", "<Command>", "[Args...]").description("Sends a Command to a SubServer").help(
@@ -431,7 +455,7 @@ public class SubCommand {
                         }));
                     }
                 } else {
-                    host.log.message.println("Usage: " + handle + " <Name> <Host> <Template> <Version> <Port>");
+                    host.log.message.println("Usage: /" + handle + " <Name> <Host> <Template> <Version> <Port>");
                 }
             }
         }.usage("<Name>", "<Host>", "<Template>", "<Version>", "<Port>").description("Creates a SubServer").help(
