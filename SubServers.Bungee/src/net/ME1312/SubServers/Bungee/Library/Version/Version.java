@@ -123,7 +123,7 @@ public class Version implements Serializable, Comparable<Version> {
         Version current = null;
         while (regex.find()) {
             try {
-                VersionType type = VersionType.RELEASE;
+                VersionType type = VersionType.VERSION;
                 if (regex.group(1) != null) switch (regex.group(1).toLowerCase()) {
                     case "pa":
                         type = VersionType.PRE_ALPHA;
@@ -146,11 +146,11 @@ public class Version implements Serializable, Comparable<Version> {
                     case "pr":
                         type = VersionType.PRE_RELEASE;
                         break;
+                    case "r":
+                        type = VersionType.RELEASE;
+                        break;
                     case "rv":
                         type = VersionType.REVISION;
-                        break;
-                    case "v":
-                        type = VersionType.VERSION;
                         break;
                     case "u":
                         type = VersionType.UPDATE;
@@ -173,11 +173,7 @@ public class Version implements Serializable, Comparable<Version> {
      */
     @Override
     public String toString() {
-        if (parent != null || type == VersionType.RELEASE) {
-            String str = (parent == null)?"":parent.toString() + '/' + type.shortname;
-            str += string;
-            return str;
-        } else return toFullString();
+        return ((parent == null)?"":parent.toString()+'/'+type.shortname) + string;
     }
 
     /**
@@ -189,9 +185,7 @@ public class Version implements Serializable, Comparable<Version> {
      * @return Version as a String
      */
     public String toFullString() {
-        String str = type.shortname + string;
-        if (parent != null) str = parent.toFullString()+'/'+str;
-        return str;
+        return ((parent == null)?"":parent.toFullString()+'/') + type.shortname + string;
     }
 
     /**
@@ -203,11 +197,7 @@ public class Version implements Serializable, Comparable<Version> {
      * @return Version as a String
      */
     public String toExtendedString() {
-        if (parent != null || type == VersionType.RELEASE) {
-            String str = (parent == null)?"":parent.toExtendedString() + ' ' + type.longname + ' ';
-            str += string;
-            return str;
-        } else return toFullExtendedString();
+        return ((parent == null)?"":parent.toExtendedString()+' '+type.longname+' ') + string;
     }
 
     /**
@@ -219,9 +209,7 @@ public class Version implements Serializable, Comparable<Version> {
      * @return Version as a String
      */
     public String toFullExtendedString() {
-        String str = type.longname + ' ' + string;
-        if (parent != null) str = parent.toFullExtendedString()+' '+str;
-        return str;
+        return ((parent == null)?"":parent.toFullExtendedString()+' ') + type.longname + ' ' + string;
     }
 
 	@Override

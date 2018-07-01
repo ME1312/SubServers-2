@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":9,"i6":42,"i7":10,"i8":10,"i9":10,"i10":10,"i11":10,"i12":10,"i13":10,"i14":10,"i15":10,"i16":10,"i17":10,"i18":10,"i19":10,"i20":10};
+var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10,"i8":10,"i9":10,"i10":9,"i11":42,"i12":10,"i13":10,"i14":10,"i15":10,"i16":10,"i17":10,"i18":10,"i19":10,"i20":10,"i21":10,"i22":10,"i23":10,"i24":10,"i25":10,"i26":10,"i27":10,"i28":10,"i29":10,"i30":10,"i31":10,"i32":10};
 var tabs = {65535:["t0","All Methods"],1:["t1","Static Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"],32:["t6","Deprecated Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -161,12 +161,44 @@ extends java.lang.Object</pre>
 </td>
 </tr>
 <tr id="i5" class="rowColor">
+<td class="colFirst"><code>void</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Host/SubAPI.html#getGlobalPlayers-net.ME1312.SubServers.Host.Library.Callback-">getGlobalPlayers</a></span>(<a href="../../../../net/ME1312/SubServers/Host/Library/Callback.html" title="interface in net.ME1312.SubServers.Host.Library">Callback</a>&lt;java.util.Collection&lt;<a href="../../../../net/ME1312/SubServers/Host/Library/NamedContainer.html" title="class in net.ME1312.SubServers.Host.Library">NamedContainer</a>&lt;java.lang.String,java.util.UUID&gt;&gt;&gt;&nbsp;callback)</code>
+<div class="block">Get players on this network across all known proxies</div>
+</td>
+</tr>
+<tr id="i6" class="altColor">
+<td class="colFirst"><code>void</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Host/SubAPI.html#getGroup-java.lang.String-net.ME1312.SubServers.Host.Library.Callback-">getGroup</a></span>(java.lang.String&nbsp;name,
+        <a href="../../../../net/ME1312/SubServers/Host/Library/Callback.html" title="interface in net.ME1312.SubServers.Host.Library">Callback</a>&lt;java.util.List&lt;<a href="../../../../net/ME1312/SubServers/Host/Network/API/Server.html" title="class in net.ME1312.SubServers.Host.Network.API">Server</a>&gt;&gt;&nbsp;callback)</code>
+<div class="block">Gets a Server Group (Group names are case insensitive here)</div>
+</td>
+</tr>
+<tr id="i7" class="rowColor">
+<td class="colFirst"><code>void</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Host/SubAPI.html#getGroups-net.ME1312.SubServers.Host.Library.Callback-">getGroups</a></span>(<a href="../../../../net/ME1312/SubServers/Host/Library/Callback.html" title="interface in net.ME1312.SubServers.Host.Library">Callback</a>&lt;java.util.Map&lt;java.lang.String,java.util.List&lt;<a href="../../../../net/ME1312/SubServers/Host/Network/API/Server.html" title="class in net.ME1312.SubServers.Host.Network.API">Server</a>&gt;&gt;&gt;&nbsp;callback)</code>
+<div class="block">Gets the Server Groups (Group names are case sensitive here)</div>
+</td>
+</tr>
+<tr id="i8" class="altColor">
+<td class="colFirst"><code>void</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Host/SubAPI.html#getHost-java.lang.String-net.ME1312.SubServers.Host.Library.Callback-">getHost</a></span>(java.lang.String&nbsp;name,
+       <a href="../../../../net/ME1312/SubServers/Host/Library/Callback.html" title="interface in net.ME1312.SubServers.Host.Library">Callback</a>&lt;<a href="../../../../net/ME1312/SubServers/Host/Network/API/Host.html" title="class in net.ME1312.SubServers.Host.Network.API">Host</a>&gt;&nbsp;callback)</code>
+<div class="block">Gets a Host</div>
+</td>
+</tr>
+<tr id="i9" class="rowColor">
+<td class="colFirst"><code>void</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Host/SubAPI.html#getHosts-net.ME1312.SubServers.Host.Library.Callback-">getHosts</a></span>(<a href="../../../../net/ME1312/SubServers/Host/Library/Callback.html" title="interface in net.ME1312.SubServers.Host.Library">Callback</a>&lt;java.util.Map&lt;java.lang.String,<a href="../../../../net/ME1312/SubServers/Host/Network/API/Host.html" title="class in net.ME1312.SubServers.Host.Network.API">Host</a>&gt;&gt;&nbsp;callback)</code>
+<div class="block">Gets the Hosts</div>
+</td>
+</tr>
+<tr id="i10" class="altColor">
 <td class="colFirst"><code>static <a href="../../../../net/ME1312/SubServers/Host/SubAPI.html" title="class in net.ME1312.SubServers.Host">SubAPI</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Host/SubAPI.html#getInstance--">getInstance</a></span>()</code>
 <div class="block">Gets the SubAPI Methods</div>
 </td>
 </tr>
-<tr id="i6" class="altColor">
+<tr id="i11" class="rowColor">
 <td class="colFirst"><code><a href="../../../../net/ME1312/SubServers/Host/ExHost.html" title="class in net.ME1312.SubServers.Host">ExHost</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Host/SubAPI.html#getInternals--">getInternals</a></span>()</code>
 <div class="block"><span class="deprecatedLabel">Deprecated.</span>&nbsp;
@@ -174,70 +206,115 @@ extends java.lang.Object</pre>
 </div>
 </td>
 </tr>
-<tr id="i7" class="rowColor">
+<tr id="i12" class="altColor">
 <td class="colFirst"><code>java.util.Map&lt;java.lang.String,java.lang.String&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Host/SubAPI.html#getLang-java.lang.String-">getLang</a></span>(java.lang.String&nbsp;channel)</code>
 <div class="block">Gets values from the SubServers Lang</div>
 </td>
 </tr>
-<tr id="i8" class="altColor">
+<tr id="i13" class="rowColor">
 <td class="colFirst"><code>java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Host/SubAPI.html#getLang-java.lang.String-java.lang.String-">getLang</a></span>(java.lang.String&nbsp;channel,
        java.lang.String&nbsp;key)</code>
 <div class="block">Gets a value from the SubServers Lang</div>
 </td>
 </tr>
-<tr id="i9" class="rowColor">
+<tr id="i14" class="altColor">
 <td class="colFirst"><code>java.util.Collection&lt;java.lang.String&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Host/SubAPI.html#getLangChannels--">getLangChannels</a></span>()</code>
 <div class="block">Gets the current SubServers Lang Channels</div>
 </td>
 </tr>
-<tr id="i10" class="altColor">
+<tr id="i15" class="rowColor">
+<td class="colFirst"><code>void</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Host/SubAPI.html#getLowercaseGroups-net.ME1312.SubServers.Host.Library.Callback-">getLowercaseGroups</a></span>(<a href="../../../../net/ME1312/SubServers/Host/Library/Callback.html" title="interface in net.ME1312.SubServers.Host.Library">Callback</a>&lt;java.util.Map&lt;java.lang.String,java.util.List&lt;<a href="../../../../net/ME1312/SubServers/Host/Network/API/Server.html" title="class in net.ME1312.SubServers.Host.Network.API">Server</a>&gt;&gt;&gt;&nbsp;callback)</code>
+<div class="block">Gets the Server Groups (Group names are all lowercase here)</div>
+</td>
+</tr>
+<tr id="i16" class="altColor">
 <td class="colFirst"><code><a href="../../../../net/ME1312/SubServers/Host/API/SubPluginInfo.html" title="class in net.ME1312.SubServers.Host.API">SubPluginInfo</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Host/SubAPI.html#getPlugin-java.lang.String-">getPlugin</a></span>(java.lang.String&nbsp;plugin)</code>
 <div class="block">Gets a Plugin</div>
 </td>
 </tr>
-<tr id="i11" class="rowColor">
+<tr id="i17" class="rowColor">
 <td class="colFirst"><code>java.util.Map&lt;java.lang.String,<a href="../../../../net/ME1312/SubServers/Host/API/SubPluginInfo.html" title="class in net.ME1312.SubServers.Host.API">SubPluginInfo</a>&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Host/SubAPI.html#getPlugins--">getPlugins</a></span>()</code>
 <div class="block">Get a map of the Plugins</div>
 </td>
 </tr>
-<tr id="i12" class="altColor">
+<tr id="i18" class="altColor">
+<td class="colFirst"><code>void</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Host/SubAPI.html#getProxies-net.ME1312.SubServers.Host.Library.Callback-">getProxies</a></span>(<a href="../../../../net/ME1312/SubServers/Host/Library/Callback.html" title="interface in net.ME1312.SubServers.Host.Library">Callback</a>&lt;java.util.Map&lt;java.lang.String,<a href="../../../../net/ME1312/SubServers/Host/Network/API/Proxy.html" title="class in net.ME1312.SubServers.Host.Network.API">Proxy</a>&gt;&gt;&nbsp;callback)</code>
+<div class="block">Gets the known Proxies</div>
+</td>
+</tr>
+<tr id="i19" class="rowColor">
+<td class="colFirst"><code>void</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Host/SubAPI.html#getProxy-java.lang.String-net.ME1312.SubServers.Host.Library.Callback-">getProxy</a></span>(java.lang.String&nbsp;name,
+        <a href="../../../../net/ME1312/SubServers/Host/Library/Callback.html" title="interface in net.ME1312.SubServers.Host.Library">Callback</a>&lt;<a href="../../../../net/ME1312/SubServers/Host/Network/API/Proxy.html" title="class in net.ME1312.SubServers.Host.Network.API">Proxy</a>&gt;&nbsp;callback)</code>
+<div class="block">Gets a Proxy</div>
+</td>
+</tr>
+<tr id="i20" class="altColor">
 <td class="colFirst"><code><a href="../../../../net/ME1312/SubServers/Host/Library/UniversalFile.html" title="class in net.ME1312.SubServers.Host.Library">UniversalFile</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Host/SubAPI.html#getRuntimeDirectory--">getRuntimeDirectory</a></span>()</code>
 <div class="block">Gets the Runtime Directory</div>
 </td>
 </tr>
-<tr id="i13" class="rowColor">
+<tr id="i21" class="rowColor">
+<td class="colFirst"><code>void</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Host/SubAPI.html#getServer-java.lang.String-net.ME1312.SubServers.Host.Library.Callback-">getServer</a></span>(java.lang.String&nbsp;name,
+         <a href="../../../../net/ME1312/SubServers/Host/Library/Callback.html" title="interface in net.ME1312.SubServers.Host.Library">Callback</a>&lt;<a href="../../../../net/ME1312/SubServers/Host/Network/API/Server.html" title="class in net.ME1312.SubServers.Host.Network.API">Server</a>&gt;&nbsp;callback)</code>
+<div class="block">Gets a Server</div>
+</td>
+</tr>
+<tr id="i22" class="altColor">
+<td class="colFirst"><code>void</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Host/SubAPI.html#getServers-net.ME1312.SubServers.Host.Library.Callback-">getServers</a></span>(<a href="../../../../net/ME1312/SubServers/Host/Library/Callback.html" title="interface in net.ME1312.SubServers.Host.Library">Callback</a>&lt;java.util.Map&lt;java.lang.String,<a href="../../../../net/ME1312/SubServers/Host/Network/API/Server.html" title="class in net.ME1312.SubServers.Host.Network.API">Server</a>&gt;&gt;&nbsp;callback)</code>
+<div class="block">Gets the Servers (including SubServers)</div>
+</td>
+</tr>
+<tr id="i23" class="rowColor">
 <td class="colFirst"><code><a href="../../../../net/ME1312/SubServers/Host/Network/SubDataClient.html" title="class in net.ME1312.SubServers.Host.Network">SubDataClient</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Host/SubAPI.html#getSubDataNetwork--">getSubDataNetwork</a></span>()</code>
 <div class="block">Gets the SubData Network Manager</div>
 </td>
 </tr>
-<tr id="i14" class="altColor">
+<tr id="i24" class="altColor">
+<td class="colFirst"><code>void</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Host/SubAPI.html#getSubServer-java.lang.String-net.ME1312.SubServers.Host.Library.Callback-">getSubServer</a></span>(java.lang.String&nbsp;name,
+            <a href="../../../../net/ME1312/SubServers/Host/Library/Callback.html" title="interface in net.ME1312.SubServers.Host.Library">Callback</a>&lt;<a href="../../../../net/ME1312/SubServers/Host/Network/API/SubServer.html" title="class in net.ME1312.SubServers.Host.Network.API">SubServer</a>&gt;&nbsp;callback)</code>
+<div class="block">Gets a SubServer</div>
+</td>
+</tr>
+<tr id="i25" class="rowColor">
+<td class="colFirst"><code>void</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Host/SubAPI.html#getSubServers-net.ME1312.SubServers.Host.Library.Callback-">getSubServers</a></span>(<a href="../../../../net/ME1312/SubServers/Host/Library/Callback.html" title="interface in net.ME1312.SubServers.Host.Library">Callback</a>&lt;java.util.Map&lt;java.lang.String,<a href="../../../../net/ME1312/SubServers/Host/Network/API/SubServer.html" title="class in net.ME1312.SubServers.Host.Network.API">SubServer</a>&gt;&gt;&nbsp;callback)</code>
+<div class="block">Gets the SubServers</div>
+</td>
+</tr>
+<tr id="i26" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Host/SubAPI.html#removeCommand-java.lang.String...-">removeCommand</a></span>(java.lang.String...&nbsp;handles)</code>
 <div class="block">Unregisters a Command</div>
 </td>
 </tr>
-<tr id="i15" class="rowColor">
+<tr id="i27" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Host/SubAPI.html#removeListener-net.ME1312.SubServers.Host.API.SubPluginInfo-java.lang.Object...-">removeListener</a></span>(<a href="../../../../net/ME1312/SubServers/Host/API/SubPluginInfo.html" title="class in net.ME1312.SubServers.Host.API">SubPluginInfo</a>&nbsp;plugin,
               java.lang.Object...&nbsp;listeners)</code>
 <div class="block">Unregister SubEvent Listeners</div>
 </td>
 </tr>
-<tr id="i16" class="altColor">
+<tr id="i28" class="altColor">
 <td class="colFirst"><code>java.util.UUID</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Host/SubAPI.html#schedule-net.ME1312.SubServers.Host.API.SubPluginInfo-java.lang.Runnable-">schedule</a></span>(<a href="../../../../net/ME1312/SubServers/Host/API/SubPluginInfo.html" title="class in net.ME1312.SubServers.Host.API">SubPluginInfo</a>&nbsp;plugin,
         java.lang.Runnable&nbsp;run)</code>
 <div class="block">Schedule a task</div>
 </td>
 </tr>
-<tr id="i17" class="rowColor">
+<tr id="i29" class="rowColor">
 <td class="colFirst"><code>java.util.UUID</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Host/SubAPI.html#schedule-net.ME1312.SubServers.Host.API.SubPluginInfo-java.lang.Runnable-long-">schedule</a></span>(<a href="../../../../net/ME1312/SubServers/Host/API/SubPluginInfo.html" title="class in net.ME1312.SubServers.Host.API">SubPluginInfo</a>&nbsp;plugin,
         java.lang.Runnable&nbsp;run,
@@ -245,7 +322,7 @@ extends java.lang.Object</pre>
 <div class="block">Schedule a task</div>
 </td>
 </tr>
-<tr id="i18" class="altColor">
+<tr id="i30" class="altColor">
 <td class="colFirst"><code>java.util.UUID</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Host/SubAPI.html#schedule-net.ME1312.SubServers.Host.API.SubPluginInfo-java.lang.Runnable-long-long-">schedule</a></span>(<a href="../../../../net/ME1312/SubServers/Host/API/SubPluginInfo.html" title="class in net.ME1312.SubServers.Host.API">SubPluginInfo</a>&nbsp;plugin,
         java.lang.Runnable&nbsp;run,
@@ -254,7 +331,7 @@ extends java.lang.Object</pre>
 <div class="block">Schedule a task</div>
 </td>
 </tr>
-<tr id="i19" class="rowColor">
+<tr id="i31" class="rowColor">
 <td class="colFirst"><code>java.util.UUID</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Host/SubAPI.html#schedule-net.ME1312.SubServers.Host.API.SubPluginInfo-java.lang.Runnable-java.util.concurrent.TimeUnit-long-long-">schedule</a></span>(<a href="../../../../net/ME1312/SubServers/Host/API/SubPluginInfo.html" title="class in net.ME1312.SubServers.Host.API">SubPluginInfo</a>&nbsp;plugin,
         java.lang.Runnable&nbsp;run,
@@ -264,7 +341,7 @@ extends java.lang.Object</pre>
 <div class="block">Schedule a task</div>
 </td>
 </tr>
-<tr id="i20" class="altColor">
+<tr id="i32" class="altColor">
 <td class="colFirst"><code>java.util.UUID</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Host/SubAPI.html#schedule-net.ME1312.SubServers.Host.API.SubTask-">schedule</a></span>(<a href="../../../../net/ME1312/SubServers/Host/API/SubTask.html" title="class in net.ME1312.SubServers.Host.API">SubTask</a>&nbsp;builder)</code>
 <div class="block">Schedule a task</div>
@@ -319,6 +396,179 @@ public&nbsp;<a href="../../../../net/ME1312/SubServers/Host/ExHost.html" title="
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>SubServers.Host Internals</dd>
+</dl>
+</li>
+</ul>
+<a name="getHosts-net.ME1312.SubServers.Host.Library.Callback-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getHosts</h4>
+<pre>public&nbsp;void&nbsp;getHosts(<a href="../../../../net/ME1312/SubServers/Host/Library/Callback.html" title="interface in net.ME1312.SubServers.Host.Library">Callback</a>&lt;java.util.Map&lt;java.lang.String,<a href="../../../../net/ME1312/SubServers/Host/Network/API/Host.html" title="class in net.ME1312.SubServers.Host.Network.API">Host</a>&gt;&gt;&nbsp;callback)</pre>
+<div class="block">Gets the Hosts</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>callback</code> - Host Map</dd>
+</dl>
+</li>
+</ul>
+<a name="getHost-java.lang.String-net.ME1312.SubServers.Host.Library.Callback-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getHost</h4>
+<pre>public&nbsp;void&nbsp;getHost(java.lang.String&nbsp;name,
+                    <a href="../../../../net/ME1312/SubServers/Host/Library/Callback.html" title="interface in net.ME1312.SubServers.Host.Library">Callback</a>&lt;<a href="../../../../net/ME1312/SubServers/Host/Network/API/Host.html" title="class in net.ME1312.SubServers.Host.Network.API">Host</a>&gt;&nbsp;callback)</pre>
+<div class="block">Gets a Host</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>name</code> - Host name</dd>
+<dd><code>callback</code> - a Host</dd>
+</dl>
+</li>
+</ul>
+<a name="getGroups-net.ME1312.SubServers.Host.Library.Callback-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getGroups</h4>
+<pre>public&nbsp;void&nbsp;getGroups(<a href="../../../../net/ME1312/SubServers/Host/Library/Callback.html" title="interface in net.ME1312.SubServers.Host.Library">Callback</a>&lt;java.util.Map&lt;java.lang.String,java.util.List&lt;<a href="../../../../net/ME1312/SubServers/Host/Network/API/Server.html" title="class in net.ME1312.SubServers.Host.Network.API">Server</a>&gt;&gt;&gt;&nbsp;callback)</pre>
+<div class="block">Gets the Server Groups (Group names are case sensitive here)</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>callback</code> - Group Map</dd>
+</dl>
+</li>
+</ul>
+<a name="getLowercaseGroups-net.ME1312.SubServers.Host.Library.Callback-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getLowercaseGroups</h4>
+<pre>public&nbsp;void&nbsp;getLowercaseGroups(<a href="../../../../net/ME1312/SubServers/Host/Library/Callback.html" title="interface in net.ME1312.SubServers.Host.Library">Callback</a>&lt;java.util.Map&lt;java.lang.String,java.util.List&lt;<a href="../../../../net/ME1312/SubServers/Host/Network/API/Server.html" title="class in net.ME1312.SubServers.Host.Network.API">Server</a>&gt;&gt;&gt;&nbsp;callback)</pre>
+<div class="block">Gets the Server Groups (Group names are all lowercase here)</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>callback</code> - Group Map</dd>
+</dl>
+</li>
+</ul>
+<a name="getGroup-java.lang.String-net.ME1312.SubServers.Host.Library.Callback-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getGroup</h4>
+<pre>public&nbsp;void&nbsp;getGroup(java.lang.String&nbsp;name,
+                     <a href="../../../../net/ME1312/SubServers/Host/Library/Callback.html" title="interface in net.ME1312.SubServers.Host.Library">Callback</a>&lt;java.util.List&lt;<a href="../../../../net/ME1312/SubServers/Host/Network/API/Server.html" title="class in net.ME1312.SubServers.Host.Network.API">Server</a>&gt;&gt;&nbsp;callback)</pre>
+<div class="block">Gets a Server Group (Group names are case insensitive here)</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>name</code> - Group name</dd>
+<dd><code>callback</code> - a Server Group</dd>
+</dl>
+</li>
+</ul>
+<a name="getServers-net.ME1312.SubServers.Host.Library.Callback-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getServers</h4>
+<pre>public&nbsp;void&nbsp;getServers(<a href="../../../../net/ME1312/SubServers/Host/Library/Callback.html" title="interface in net.ME1312.SubServers.Host.Library">Callback</a>&lt;java.util.Map&lt;java.lang.String,<a href="../../../../net/ME1312/SubServers/Host/Network/API/Server.html" title="class in net.ME1312.SubServers.Host.Network.API">Server</a>&gt;&gt;&nbsp;callback)</pre>
+<div class="block">Gets the Servers (including SubServers)</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>callback</code> - Server Map</dd>
+</dl>
+</li>
+</ul>
+<a name="getServer-java.lang.String-net.ME1312.SubServers.Host.Library.Callback-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getServer</h4>
+<pre>public&nbsp;void&nbsp;getServer(java.lang.String&nbsp;name,
+                      <a href="../../../../net/ME1312/SubServers/Host/Library/Callback.html" title="interface in net.ME1312.SubServers.Host.Library">Callback</a>&lt;<a href="../../../../net/ME1312/SubServers/Host/Network/API/Server.html" title="class in net.ME1312.SubServers.Host.Network.API">Server</a>&gt;&nbsp;callback)</pre>
+<div class="block">Gets a Server</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>name</code> - Server name</dd>
+<dd><code>callback</code> - a Server</dd>
+</dl>
+</li>
+</ul>
+<a name="getSubServers-net.ME1312.SubServers.Host.Library.Callback-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getSubServers</h4>
+<pre>public&nbsp;void&nbsp;getSubServers(<a href="../../../../net/ME1312/SubServers/Host/Library/Callback.html" title="interface in net.ME1312.SubServers.Host.Library">Callback</a>&lt;java.util.Map&lt;java.lang.String,<a href="../../../../net/ME1312/SubServers/Host/Network/API/SubServer.html" title="class in net.ME1312.SubServers.Host.Network.API">SubServer</a>&gt;&gt;&nbsp;callback)</pre>
+<div class="block">Gets the SubServers</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>callback</code> - SubServer Map</dd>
+</dl>
+</li>
+</ul>
+<a name="getSubServer-java.lang.String-net.ME1312.SubServers.Host.Library.Callback-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getSubServer</h4>
+<pre>public&nbsp;void&nbsp;getSubServer(java.lang.String&nbsp;name,
+                         <a href="../../../../net/ME1312/SubServers/Host/Library/Callback.html" title="interface in net.ME1312.SubServers.Host.Library">Callback</a>&lt;<a href="../../../../net/ME1312/SubServers/Host/Network/API/SubServer.html" title="class in net.ME1312.SubServers.Host.Network.API">SubServer</a>&gt;&nbsp;callback)</pre>
+<div class="block">Gets a SubServer</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>name</code> - SubServer name</dd>
+<dd><code>callback</code> - a SubServer</dd>
+</dl>
+</li>
+</ul>
+<a name="getProxies-net.ME1312.SubServers.Host.Library.Callback-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getProxies</h4>
+<pre>public&nbsp;void&nbsp;getProxies(<a href="../../../../net/ME1312/SubServers/Host/Library/Callback.html" title="interface in net.ME1312.SubServers.Host.Library">Callback</a>&lt;java.util.Map&lt;java.lang.String,<a href="../../../../net/ME1312/SubServers/Host/Network/API/Proxy.html" title="class in net.ME1312.SubServers.Host.Network.API">Proxy</a>&gt;&gt;&nbsp;callback)</pre>
+<div class="block">Gets the known Proxies</div>
+</li>
+</ul>
+<a name="getProxy-java.lang.String-net.ME1312.SubServers.Host.Library.Callback-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getProxy</h4>
+<pre>public&nbsp;void&nbsp;getProxy(java.lang.String&nbsp;name,
+                     <a href="../../../../net/ME1312/SubServers/Host/Library/Callback.html" title="interface in net.ME1312.SubServers.Host.Library">Callback</a>&lt;<a href="../../../../net/ME1312/SubServers/Host/Network/API/Proxy.html" title="class in net.ME1312.SubServers.Host.Network.API">Proxy</a>&gt;&nbsp;callback)</pre>
+<div class="block">Gets a Proxy</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>name</code> - Proxy name</dd>
+</dl>
+</li>
+</ul>
+<a name="getGlobalPlayers-net.ME1312.SubServers.Host.Library.Callback-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getGlobalPlayers</h4>
+<pre>public&nbsp;void&nbsp;getGlobalPlayers(<a href="../../../../net/ME1312/SubServers/Host/Library/Callback.html" title="interface in net.ME1312.SubServers.Host.Library">Callback</a>&lt;java.util.Collection&lt;<a href="../../../../net/ME1312/SubServers/Host/Library/NamedContainer.html" title="class in net.ME1312.SubServers.Host.Library">NamedContainer</a>&lt;java.lang.String,java.util.UUID&gt;&gt;&gt;&nbsp;callback)</pre>
+<div class="block">Get players on this network across all known proxies</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>callback</code> - Player Collection</dd>
 </dl>
 </li>
 </ul>

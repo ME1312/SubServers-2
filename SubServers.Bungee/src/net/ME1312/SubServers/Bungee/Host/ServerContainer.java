@@ -197,7 +197,7 @@ public class ServerContainer extends BungeeServerInfo implements Server {
         info.set("players", players);
         if (getSubData() != null) info.set("subdata", getSubData().getAddress().toString());
         info.set("signature", signature);
-        info.set("extra", getExtra().toJSON());
+        info.set("extra", getExtra());
         return info.toJSON();
     }
 }

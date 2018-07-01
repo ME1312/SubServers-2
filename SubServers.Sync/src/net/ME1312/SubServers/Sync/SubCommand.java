@@ -425,9 +425,9 @@ public final class SubCommand extends CommandX {
                 List<String> list = new ArrayList<String>();
                 if (args.length == 2) {
                     if (last.length() == 0) {
-                        for (Server server : plugin.api.getServers().values()) if (server instanceof SubServer) list.add(server.getName());
+                        for (Server server : plugin.servers.values()) if (server instanceof SubServer) list.add(server.getName());
                     } else {
-                        for (Server server : plugin.api.getServers().values()) {
+                        for (Server server : plugin.servers.values()) {
                             if (server instanceof SubServer && server.getName().toLowerCase().startsWith(last))
                                 list.add(last + server.getName().substring(last.length()));
                         }
@@ -440,9 +440,9 @@ public final class SubCommand extends CommandX {
                 if (args.length == 2) {
                     List<String> list = new ArrayList<String>();
                     if (last.length() == 0) {
-                        for (Server server : plugin.api.getServers().values()) if (server instanceof SubServer) list.add(server.getName());
+                        for (Server server : plugin.servers.values()) if (server instanceof SubServer) list.add(server.getName());
                     } else {
-                        for (Server server : plugin.api.getServers().values()) {
+                        for (Server server : plugin.servers.values()) {
                             if (server instanceof SubServer && server.getName().toLowerCase().startsWith(last)) list.add(last + server.getName().substring(last.length()));
                         }
                     }
@@ -553,7 +553,7 @@ public final class SubCommand extends CommandX {
         public void execute(CommandSender sender, String[] args) {
             if (sender instanceof ProxiedPlayer) {
                 if (args.length > 0) {
-                    Map<String, Server> servers = plugin.api.getServers();
+                    Map<String, Server> servers = plugin.servers;
                     if (servers.keySet().contains(args[0].toLowerCase())) {
                         ((ProxiedPlayer) sender).connect(servers.get(args[0].toLowerCase()));
                     } else {
@@ -563,7 +563,7 @@ public final class SubCommand extends CommandX {
                     int i = 0;
                     TextComponent serverm = new TextComponent(ChatColor.RESET.toString());
                     TextComponent div = new TextComponent(plugin.api.getLang("SubServers", "Bungee.Server.Divider"));
-                    for (Server server : plugin.api.getServers().values()) {
+                    for (Server server : plugin.servers.values()) {
                         if (!server.isHidden() && (!(server instanceof SubServer) || ((SubServer) server).isRunning())) {
                             if (i != 0) serverm.addExtra(div);
                             TextComponent message = new TextComponent(plugin.api.getLang("SubServers", "Bungee.Server.List").replace("$str$", server.getDisplayName()));
@@ -634,7 +634,7 @@ public final class SubCommand extends CommandX {
         public void execute(CommandSender sender, String[] args) {
             List<String> messages = new LinkedList<String>();
             int players = 0;
-            for (Server server : plugin.api.getServers().values()) {
+            for (Server server : plugin.servers.values()) {
                 List<String> playerlist = new ArrayList<String>();
                 if (plugin.redis) {
                     try {

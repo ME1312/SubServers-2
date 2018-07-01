@@ -400,7 +400,7 @@ public abstract class Host implements ExtraDataHandler {
         hinfo.set("servers", servers);
         if (this instanceof ClientHandler && ((ClientHandler) this).getSubData() != null) hinfo.set("subdata", ((ClientHandler) this).getSubData().getAddress().toString());
         hinfo.set("signature", signature);
-        hinfo.set("extra", getExtra().toJSON());
+        hinfo.set("extra", getExtra());
         return hinfo.toJSON();
     }
 }

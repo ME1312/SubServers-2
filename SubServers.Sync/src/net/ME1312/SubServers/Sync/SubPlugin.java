@@ -232,7 +232,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
 
     @EventHandler(priority = Byte.MAX_VALUE)
     public void reroute(ServerConnectEvent e) {
-        Map<String, ServerInfo> servers = new TreeMap<String, ServerInfo>(api.getServers());
+        Map<String, ServerInfo> servers = new TreeMap<String, ServerInfo>(this.servers);
         if (servers.keySet().contains(e.getTarget().getName().toLowerCase()) && e.getTarget() != servers.get(e.getTarget().getName().toLowerCase())) {
             e.setTarget(servers.get(e.getTarget().getName().toLowerCase()));
         } else {
@@ -269,7 +269,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
     }
 
     public Boolean merge(String name, YAMLSection data, boolean isSubServer) {
-        Server server = api.getServer(name);
+        Server server = servers.get(name.toLowerCase());
         if (server == null || isSubServer || !(server instanceof SubServer)) {
             if (server == null || !server.getSignature().equals(data.getRawString("signature"))) {
                 if (isSubServer) {

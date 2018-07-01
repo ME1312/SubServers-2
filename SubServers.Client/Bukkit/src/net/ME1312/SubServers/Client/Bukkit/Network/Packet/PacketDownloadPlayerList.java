@@ -27,7 +27,7 @@ public class PacketDownloadPlayerList implements PacketIn, PacketOut {
      *
      * @param callback Callbacks
      */
-    public PacketDownloadPlayerList(Callback... callback) {
+    public PacketDownloadPlayerList(Callback<YAMLSection>... callback) {
         if (Util.isNull((Object) callback)) throw new NullPointerException();
         this.id = Util.getNew(callbacks.keySet(), UUID::randomUUID).toString();
         callbacks.put(id, callback);

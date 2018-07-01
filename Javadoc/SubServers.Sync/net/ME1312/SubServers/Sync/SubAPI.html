@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":10,"i1":10,"i2":9,"i3":42,"i4":10,"i5":10,"i6":10,"i7":10,"i8":10,"i9":10,"i10":10,"i11":10,"i12":10};
+var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":9,"i8":42,"i9":10,"i10":10,"i11":10,"i12":10,"i13":10,"i14":10,"i15":10,"i16":10,"i17":10,"i18":10,"i19":10,"i20":10,"i21":10,"i22":10};
 var tabs = {65535:["t0","All Methods"],1:["t1","Static Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"],32:["t6","Deprecated Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -142,12 +142,44 @@ extends java.lang.Object</pre>
 </td>
 </tr>
 <tr id="i2" class="altColor">
+<td class="colFirst"><code>void</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Sync/SubAPI.html#getGlobalPlayers-net.ME1312.SubServers.Sync.Library.Callback-">getGlobalPlayers</a></span>(<a href="../../../../net/ME1312/SubServers/Sync/Library/Callback.html" title="interface in net.ME1312.SubServers.Sync.Library">Callback</a>&lt;java.util.Collection&lt;<a href="../../../../net/ME1312/SubServers/Sync/Library/NamedContainer.html" title="class in net.ME1312.SubServers.Sync.Library">NamedContainer</a>&lt;java.lang.String,java.util.UUID&gt;&gt;&gt;&nbsp;callback)</code>
+<div class="block">Get players on this network across all known proxies</div>
+</td>
+</tr>
+<tr id="i3" class="rowColor">
+<td class="colFirst"><code>void</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Sync/SubAPI.html#getGroup-java.lang.String-net.ME1312.SubServers.Sync.Library.Callback-">getGroup</a></span>(java.lang.String&nbsp;name,
+        <a href="../../../../net/ME1312/SubServers/Sync/Library/Callback.html" title="interface in net.ME1312.SubServers.Sync.Library">Callback</a>&lt;java.util.List&lt;<a href="../../../../net/ME1312/SubServers/Sync/Network/API/Server.html" title="class in net.ME1312.SubServers.Sync.Network.API">Server</a>&gt;&gt;&nbsp;callback)</code>
+<div class="block">Gets a Server Group (Group names are case insensitive here)</div>
+</td>
+</tr>
+<tr id="i4" class="altColor">
+<td class="colFirst"><code>void</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Sync/SubAPI.html#getGroups-net.ME1312.SubServers.Sync.Library.Callback-">getGroups</a></span>(<a href="../../../../net/ME1312/SubServers/Sync/Library/Callback.html" title="interface in net.ME1312.SubServers.Sync.Library">Callback</a>&lt;java.util.Map&lt;java.lang.String,java.util.List&lt;<a href="../../../../net/ME1312/SubServers/Sync/Network/API/Server.html" title="class in net.ME1312.SubServers.Sync.Network.API">Server</a>&gt;&gt;&gt;&nbsp;callback)</code>
+<div class="block">Gets the Server Groups (Group names are case sensitive here)</div>
+</td>
+</tr>
+<tr id="i5" class="rowColor">
+<td class="colFirst"><code>void</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Sync/SubAPI.html#getHost-java.lang.String-net.ME1312.SubServers.Sync.Library.Callback-">getHost</a></span>(java.lang.String&nbsp;name,
+       <a href="../../../../net/ME1312/SubServers/Sync/Library/Callback.html" title="interface in net.ME1312.SubServers.Sync.Library">Callback</a>&lt;<a href="../../../../net/ME1312/SubServers/Sync/Network/API/Host.html" title="class in net.ME1312.SubServers.Sync.Network.API">Host</a>&gt;&nbsp;callback)</code>
+<div class="block">Gets a Host</div>
+</td>
+</tr>
+<tr id="i6" class="altColor">
+<td class="colFirst"><code>void</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Sync/SubAPI.html#getHosts-net.ME1312.SubServers.Sync.Library.Callback-">getHosts</a></span>(<a href="../../../../net/ME1312/SubServers/Sync/Library/Callback.html" title="interface in net.ME1312.SubServers.Sync.Library">Callback</a>&lt;java.util.Map&lt;java.lang.String,<a href="../../../../net/ME1312/SubServers/Sync/Network/API/Host.html" title="class in net.ME1312.SubServers.Sync.Network.API">Host</a>&gt;&gt;&nbsp;callback)</code>
+<div class="block">Gets the Hosts</div>
+</td>
+</tr>
+<tr id="i7" class="rowColor">
 <td class="colFirst"><code>static <a href="../../../../net/ME1312/SubServers/Sync/SubAPI.html" title="class in net.ME1312.SubServers.Sync">SubAPI</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Sync/SubAPI.html#getInstance--">getInstance</a></span>()</code>
 <div class="block">Gets the SubAPI Methods</div>
 </td>
 </tr>
-<tr id="i3" class="rowColor">
+<tr id="i8" class="altColor">
 <td class="colFirst"><code><a href="../../../../net/ME1312/SubServers/Sync/SubPlugin.html" title="class in net.ME1312.SubServers.Sync">SubPlugin</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Sync/SubAPI.html#getInternals--">getInternals</a></span>()</code>
 <div class="block"><span class="deprecatedLabel">Deprecated.</span>&nbsp;
@@ -155,56 +187,89 @@ extends java.lang.Object</pre>
 </div>
 </td>
 </tr>
-<tr id="i4" class="altColor">
+<tr id="i9" class="rowColor">
 <td class="colFirst"><code>java.util.Map&lt;java.lang.String,java.lang.String&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Sync/SubAPI.html#getLang-java.lang.String-">getLang</a></span>(java.lang.String&nbsp;channel)</code>
 <div class="block">Gets values from the SubServers Lang</div>
 </td>
 </tr>
-<tr id="i5" class="rowColor">
+<tr id="i10" class="altColor">
 <td class="colFirst"><code>java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Sync/SubAPI.html#getLang-java.lang.String-java.lang.String-">getLang</a></span>(java.lang.String&nbsp;channel,
        java.lang.String&nbsp;key)</code>
 <div class="block">Gets a value from the SubServers Lang</div>
 </td>
 </tr>
-<tr id="i6" class="altColor">
+<tr id="i11" class="rowColor">
 <td class="colFirst"><code>java.util.Collection&lt;java.lang.String&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Sync/SubAPI.html#getLangChannels--">getLangChannels</a></span>()</code>
 <div class="block">Gets the current SubServers Lang Channels</div>
 </td>
 </tr>
-<tr id="i7" class="rowColor">
+<tr id="i12" class="altColor">
+<td class="colFirst"><code>void</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Sync/SubAPI.html#getLowercaseGroups-net.ME1312.SubServers.Sync.Library.Callback-">getLowercaseGroups</a></span>(<a href="../../../../net/ME1312/SubServers/Sync/Library/Callback.html" title="interface in net.ME1312.SubServers.Sync.Library">Callback</a>&lt;java.util.Map&lt;java.lang.String,java.util.List&lt;<a href="../../../../net/ME1312/SubServers/Sync/Network/API/Server.html" title="class in net.ME1312.SubServers.Sync.Network.API">Server</a>&gt;&gt;&gt;&nbsp;callback)</code>
+<div class="block">Gets the Server Groups (Group names are all lowercase here)</div>
+</td>
+</tr>
+<tr id="i13" class="rowColor">
+<td class="colFirst"><code>void</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Sync/SubAPI.html#getProxies-net.ME1312.SubServers.Sync.Library.Callback-">getProxies</a></span>(<a href="../../../../net/ME1312/SubServers/Sync/Library/Callback.html" title="interface in net.ME1312.SubServers.Sync.Library">Callback</a>&lt;java.util.Map&lt;java.lang.String,<a href="../../../../net/ME1312/SubServers/Sync/Network/API/Proxy.html" title="class in net.ME1312.SubServers.Sync.Network.API">Proxy</a>&gt;&gt;&nbsp;callback)</code>
+<div class="block">Gets the known Proxies</div>
+</td>
+</tr>
+<tr id="i14" class="altColor">
+<td class="colFirst"><code>void</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Sync/SubAPI.html#getProxy-java.lang.String-net.ME1312.SubServers.Sync.Library.Callback-">getProxy</a></span>(java.lang.String&nbsp;name,
+        <a href="../../../../net/ME1312/SubServers/Sync/Library/Callback.html" title="interface in net.ME1312.SubServers.Sync.Library">Callback</a>&lt;<a href="../../../../net/ME1312/SubServers/Sync/Network/API/Proxy.html" title="class in net.ME1312.SubServers.Sync.Network.API">Proxy</a>&gt;&nbsp;callback)</code>
+<div class="block">Gets a Proxy</div>
+</td>
+</tr>
+<tr id="i15" class="rowColor">
 <td class="colFirst"><code><a href="../../../../net/ME1312/SubServers/Sync/Library/Version/Version.html" title="class in net.ME1312.SubServers.Sync.Library.Version">Version</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Sync/SubAPI.html#getProxyVersion--">getProxyVersion</a></span>()</code>
 <div class="block">Gets the BungeeCord Version</div>
 </td>
 </tr>
-<tr id="i8" class="altColor">
+<tr id="i16" class="altColor">
 <td class="colFirst"><code><a href="../../../../net/ME1312/SubServers/Sync/Library/UniversalFile.html" title="class in net.ME1312.SubServers.Sync.Library">UniversalFile</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Sync/SubAPI.html#getRuntimeDirectory--">getRuntimeDirectory</a></span>()</code>
 <div class="block">Gets the Runtime Directory</div>
 </td>
 </tr>
-<tr id="i9" class="rowColor">
-<td class="colFirst"><code><a href="../../../../net/ME1312/SubServers/Sync/Server/Server.html" title="class in net.ME1312.SubServers.Sync.Server">Server</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Sync/SubAPI.html#getServer-java.lang.String-">getServer</a></span>(java.lang.String&nbsp;name)</code>
+<tr id="i17" class="rowColor">
+<td class="colFirst"><code>void</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Sync/SubAPI.html#getServer-java.lang.String-net.ME1312.SubServers.Sync.Library.Callback-">getServer</a></span>(java.lang.String&nbsp;name,
+         <a href="../../../../net/ME1312/SubServers/Sync/Library/Callback.html" title="interface in net.ME1312.SubServers.Sync.Library">Callback</a>&lt;<a href="../../../../net/ME1312/SubServers/Sync/Network/API/Server.html" title="class in net.ME1312.SubServers.Sync.Network.API">Server</a>&gt;&nbsp;callback)</code>
 <div class="block">Gets a Server</div>
 </td>
 </tr>
-<tr id="i10" class="altColor">
-<td class="colFirst"><code>java.util.Map&lt;java.lang.String,<a href="../../../../net/ME1312/SubServers/Sync/Server/Server.html" title="class in net.ME1312.SubServers.Sync.Server">Server</a>&gt;</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Sync/SubAPI.html#getServers--">getServers</a></span>()</code>
+<tr id="i18" class="altColor">
+<td class="colFirst"><code>void</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Sync/SubAPI.html#getServers-net.ME1312.SubServers.Sync.Library.Callback-">getServers</a></span>(<a href="../../../../net/ME1312/SubServers/Sync/Library/Callback.html" title="interface in net.ME1312.SubServers.Sync.Library">Callback</a>&lt;java.util.Map&lt;java.lang.String,<a href="../../../../net/ME1312/SubServers/Sync/Network/API/Server.html" title="class in net.ME1312.SubServers.Sync.Network.API">Server</a>&gt;&gt;&nbsp;callback)</code>
 <div class="block">Gets the Servers (including SubServers)</div>
 </td>
 </tr>
-<tr id="i11" class="rowColor">
+<tr id="i19" class="rowColor">
 <td class="colFirst"><code><a href="../../../../net/ME1312/SubServers/Sync/Network/SubDataClient.html" title="class in net.ME1312.SubServers.Sync.Network">SubDataClient</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Sync/SubAPI.html#getSubDataNetwork--">getSubDataNetwork</a></span>()</code>
 <div class="block">Gets the SubData Network Manager</div>
 </td>
 </tr>
-<tr id="i12" class="altColor">
+<tr id="i20" class="altColor">
+<td class="colFirst"><code>void</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Sync/SubAPI.html#getSubServer-java.lang.String-net.ME1312.SubServers.Sync.Library.Callback-">getSubServer</a></span>(java.lang.String&nbsp;name,
+            <a href="../../../../net/ME1312/SubServers/Sync/Library/Callback.html" title="interface in net.ME1312.SubServers.Sync.Library">Callback</a>&lt;<a href="../../../../net/ME1312/SubServers/Sync/Network/API/SubServer.html" title="class in net.ME1312.SubServers.Sync.Network.API">SubServer</a>&gt;&nbsp;callback)</code>
+<div class="block">Gets a SubServer</div>
+</td>
+</tr>
+<tr id="i21" class="rowColor">
+<td class="colFirst"><code>void</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Sync/SubAPI.html#getSubServers-net.ME1312.SubServers.Sync.Library.Callback-">getSubServers</a></span>(<a href="../../../../net/ME1312/SubServers/Sync/Library/Callback.html" title="interface in net.ME1312.SubServers.Sync.Library">Callback</a>&lt;java.util.Map&lt;java.lang.String,<a href="../../../../net/ME1312/SubServers/Sync/Network/API/SubServer.html" title="class in net.ME1312.SubServers.Sync.Network.API">SubServer</a>&gt;&gt;&nbsp;callback)</code>
+<div class="block">Gets the SubServers</div>
+</td>
+</tr>
+<tr id="i22" class="altColor">
 <td class="colFirst"><code><a href="../../../../net/ME1312/SubServers/Sync/Library/Version/Version.html" title="class in net.ME1312.SubServers.Sync.Library.Version">Version</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/ME1312/SubServers/Sync/SubAPI.html#getWrapperVersion--">getWrapperVersion</a></span>()</code>
 <div class="block">Gets the SubServers.Sync Version</div>
@@ -278,6 +343,179 @@ public&nbsp;<a href="../../../../net/ME1312/SubServers/Sync/SubPlugin.html" titl
 </dl>
 </li>
 </ul>
+<a name="getHosts-net.ME1312.SubServers.Sync.Library.Callback-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getHosts</h4>
+<pre>public&nbsp;void&nbsp;getHosts(<a href="../../../../net/ME1312/SubServers/Sync/Library/Callback.html" title="interface in net.ME1312.SubServers.Sync.Library">Callback</a>&lt;java.util.Map&lt;java.lang.String,<a href="../../../../net/ME1312/SubServers/Sync/Network/API/Host.html" title="class in net.ME1312.SubServers.Sync.Network.API">Host</a>&gt;&gt;&nbsp;callback)</pre>
+<div class="block">Gets the Hosts</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>callback</code> - Host Map</dd>
+</dl>
+</li>
+</ul>
+<a name="getHost-java.lang.String-net.ME1312.SubServers.Sync.Library.Callback-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getHost</h4>
+<pre>public&nbsp;void&nbsp;getHost(java.lang.String&nbsp;name,
+                    <a href="../../../../net/ME1312/SubServers/Sync/Library/Callback.html" title="interface in net.ME1312.SubServers.Sync.Library">Callback</a>&lt;<a href="../../../../net/ME1312/SubServers/Sync/Network/API/Host.html" title="class in net.ME1312.SubServers.Sync.Network.API">Host</a>&gt;&nbsp;callback)</pre>
+<div class="block">Gets a Host</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>name</code> - Host name</dd>
+<dd><code>callback</code> - a Host</dd>
+</dl>
+</li>
+</ul>
+<a name="getGroups-net.ME1312.SubServers.Sync.Library.Callback-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getGroups</h4>
+<pre>public&nbsp;void&nbsp;getGroups(<a href="../../../../net/ME1312/SubServers/Sync/Library/Callback.html" title="interface in net.ME1312.SubServers.Sync.Library">Callback</a>&lt;java.util.Map&lt;java.lang.String,java.util.List&lt;<a href="../../../../net/ME1312/SubServers/Sync/Network/API/Server.html" title="class in net.ME1312.SubServers.Sync.Network.API">Server</a>&gt;&gt;&gt;&nbsp;callback)</pre>
+<div class="block">Gets the Server Groups (Group names are case sensitive here)</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>callback</code> - Group Map</dd>
+</dl>
+</li>
+</ul>
+<a name="getLowercaseGroups-net.ME1312.SubServers.Sync.Library.Callback-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getLowercaseGroups</h4>
+<pre>public&nbsp;void&nbsp;getLowercaseGroups(<a href="../../../../net/ME1312/SubServers/Sync/Library/Callback.html" title="interface in net.ME1312.SubServers.Sync.Library">Callback</a>&lt;java.util.Map&lt;java.lang.String,java.util.List&lt;<a href="../../../../net/ME1312/SubServers/Sync/Network/API/Server.html" title="class in net.ME1312.SubServers.Sync.Network.API">Server</a>&gt;&gt;&gt;&nbsp;callback)</pre>
+<div class="block">Gets the Server Groups (Group names are all lowercase here)</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>callback</code> - Group Map</dd>
+</dl>
+</li>
+</ul>
+<a name="getGroup-java.lang.String-net.ME1312.SubServers.Sync.Library.Callback-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getGroup</h4>
+<pre>public&nbsp;void&nbsp;getGroup(java.lang.String&nbsp;name,
+                     <a href="../../../../net/ME1312/SubServers/Sync/Library/Callback.html" title="interface in net.ME1312.SubServers.Sync.Library">Callback</a>&lt;java.util.List&lt;<a href="../../../../net/ME1312/SubServers/Sync/Network/API/Server.html" title="class in net.ME1312.SubServers.Sync.Network.API">Server</a>&gt;&gt;&nbsp;callback)</pre>
+<div class="block">Gets a Server Group (Group names are case insensitive here)</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>name</code> - Group name</dd>
+<dd><code>callback</code> - a Server Group</dd>
+</dl>
+</li>
+</ul>
+<a name="getServers-net.ME1312.SubServers.Sync.Library.Callback-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getServers</h4>
+<pre>public&nbsp;void&nbsp;getServers(<a href="../../../../net/ME1312/SubServers/Sync/Library/Callback.html" title="interface in net.ME1312.SubServers.Sync.Library">Callback</a>&lt;java.util.Map&lt;java.lang.String,<a href="../../../../net/ME1312/SubServers/Sync/Network/API/Server.html" title="class in net.ME1312.SubServers.Sync.Network.API">Server</a>&gt;&gt;&nbsp;callback)</pre>
+<div class="block">Gets the Servers (including SubServers)</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>callback</code> - Server Map</dd>
+</dl>
+</li>
+</ul>
+<a name="getServer-java.lang.String-net.ME1312.SubServers.Sync.Library.Callback-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getServer</h4>
+<pre>public&nbsp;void&nbsp;getServer(java.lang.String&nbsp;name,
+                      <a href="../../../../net/ME1312/SubServers/Sync/Library/Callback.html" title="interface in net.ME1312.SubServers.Sync.Library">Callback</a>&lt;<a href="../../../../net/ME1312/SubServers/Sync/Network/API/Server.html" title="class in net.ME1312.SubServers.Sync.Network.API">Server</a>&gt;&nbsp;callback)</pre>
+<div class="block">Gets a Server</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>name</code> - Server name</dd>
+<dd><code>callback</code> - a Server</dd>
+</dl>
+</li>
+</ul>
+<a name="getSubServers-net.ME1312.SubServers.Sync.Library.Callback-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getSubServers</h4>
+<pre>public&nbsp;void&nbsp;getSubServers(<a href="../../../../net/ME1312/SubServers/Sync/Library/Callback.html" title="interface in net.ME1312.SubServers.Sync.Library">Callback</a>&lt;java.util.Map&lt;java.lang.String,<a href="../../../../net/ME1312/SubServers/Sync/Network/API/SubServer.html" title="class in net.ME1312.SubServers.Sync.Network.API">SubServer</a>&gt;&gt;&nbsp;callback)</pre>
+<div class="block">Gets the SubServers</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>callback</code> - SubServer Map</dd>
+</dl>
+</li>
+</ul>
+<a name="getSubServer-java.lang.String-net.ME1312.SubServers.Sync.Library.Callback-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getSubServer</h4>
+<pre>public&nbsp;void&nbsp;getSubServer(java.lang.String&nbsp;name,
+                         <a href="../../../../net/ME1312/SubServers/Sync/Library/Callback.html" title="interface in net.ME1312.SubServers.Sync.Library">Callback</a>&lt;<a href="../../../../net/ME1312/SubServers/Sync/Network/API/SubServer.html" title="class in net.ME1312.SubServers.Sync.Network.API">SubServer</a>&gt;&nbsp;callback)</pre>
+<div class="block">Gets a SubServer</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>name</code> - SubServer name</dd>
+<dd><code>callback</code> - a SubServer</dd>
+</dl>
+</li>
+</ul>
+<a name="getProxies-net.ME1312.SubServers.Sync.Library.Callback-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getProxies</h4>
+<pre>public&nbsp;void&nbsp;getProxies(<a href="../../../../net/ME1312/SubServers/Sync/Library/Callback.html" title="interface in net.ME1312.SubServers.Sync.Library">Callback</a>&lt;java.util.Map&lt;java.lang.String,<a href="../../../../net/ME1312/SubServers/Sync/Network/API/Proxy.html" title="class in net.ME1312.SubServers.Sync.Network.API">Proxy</a>&gt;&gt;&nbsp;callback)</pre>
+<div class="block">Gets the known Proxies</div>
+</li>
+</ul>
+<a name="getProxy-java.lang.String-net.ME1312.SubServers.Sync.Library.Callback-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getProxy</h4>
+<pre>public&nbsp;void&nbsp;getProxy(java.lang.String&nbsp;name,
+                     <a href="../../../../net/ME1312/SubServers/Sync/Library/Callback.html" title="interface in net.ME1312.SubServers.Sync.Library">Callback</a>&lt;<a href="../../../../net/ME1312/SubServers/Sync/Network/API/Proxy.html" title="class in net.ME1312.SubServers.Sync.Network.API">Proxy</a>&gt;&nbsp;callback)</pre>
+<div class="block">Gets a Proxy</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>name</code> - Proxy name</dd>
+</dl>
+</li>
+</ul>
+<a name="getGlobalPlayers-net.ME1312.SubServers.Sync.Library.Callback-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getGlobalPlayers</h4>
+<pre>public&nbsp;void&nbsp;getGlobalPlayers(<a href="../../../../net/ME1312/SubServers/Sync/Library/Callback.html" title="interface in net.ME1312.SubServers.Sync.Library">Callback</a>&lt;java.util.Collection&lt;<a href="../../../../net/ME1312/SubServers/Sync/Library/NamedContainer.html" title="class in net.ME1312.SubServers.Sync.Library">NamedContainer</a>&lt;java.lang.String,java.util.UUID&gt;&gt;&gt;&nbsp;callback)</pre>
+<div class="block">Get players on this network across all known proxies</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>callback</code> - Player Collection</dd>
+</dl>
+</li>
+</ul>
 <a name="getSubDataNetwork--">
 <!--   -->
 </a>
@@ -289,36 +527,6 @@ public&nbsp;<a href="../../../../net/ME1312/SubServers/Sync/SubPlugin.html" titl
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>SubData Network Manager</dd>
-</dl>
-</li>
-</ul>
-<a name="getServers--">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>getServers</h4>
-<pre>public&nbsp;java.util.Map&lt;java.lang.String,<a href="../../../../net/ME1312/SubServers/Sync/Server/Server.html" title="class in net.ME1312.SubServers.Sync.Server">Server</a>&gt;&nbsp;getServers()</pre>
-<div class="block">Gets the Servers (including SubServers)</div>
-<dl>
-<dt><span class="returnLabel">Returns:</span></dt>
-<dd>Server Map</dd>
-</dl>
-</li>
-</ul>
-<a name="getServer-java.lang.String-">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>getServer</h4>
-<pre>public&nbsp;<a href="../../../../net/ME1312/SubServers/Sync/Server/Server.html" title="class in net.ME1312.SubServers.Sync.Server">Server</a>&nbsp;getServer(java.lang.String&nbsp;name)</pre>
-<div class="block">Gets a Server</div>
-<dl>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>name</code> - Server name</dd>
-<dt><span class="returnLabel">Returns:</span></dt>
-<dd>a Server</dd>
 </dl>
 </li>
 </ul>

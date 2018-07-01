@@ -146,7 +146,7 @@ public class Proxy implements ClientHandler, ExtraDataHandler {
         info.set("players", players);
         if (getSubData() != null) info.set("subdata", getSubData().getAddress().toString());
         info.set("signature", signature);
-        info.set("extra", getExtra().toJSON());
+        info.set("extra", getExtra());
         return info.toJSON();
     }
 }

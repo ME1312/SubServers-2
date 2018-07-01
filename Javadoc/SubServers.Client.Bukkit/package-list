@@ -6,5 +6,6 @@ net.ME1312.SubServers.Client.Bukkit.Library.Config
 net.ME1312.SubServers.Client.Bukkit.Library.Exception
 net.ME1312.SubServers.Client.Bukkit.Library.Version
 net.ME1312.SubServers.Client.Bukkit.Network
+net.ME1312.SubServers.Client.Bukkit.Network.API
 net.ME1312.SubServers.Client.Bukkit.Network.Encryption
 net.ME1312.SubServers.Client.Bukkit.Network.Packet
