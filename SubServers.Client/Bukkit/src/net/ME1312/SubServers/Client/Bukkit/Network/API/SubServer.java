@@ -30,7 +30,7 @@ public class SubServer extends Server {
      * @param host Host
      * @param raw JSON representation of the Server
      */
-    public SubServer(Host host, YAMLSection raw) {
+    SubServer(Host host, YAMLSection raw) {
         super(raw);
         this.host = host;
     }

@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10,"i8":10,"i9":10,"i10":10,"i11":10,"i12":10};
+var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10,"i8":10,"i9":10,"i10":10,"i11":10,"i12":10,"i13":10};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -197,30 +197,36 @@ extends java.lang.Object</pre>
 </td>
 </tr>
 <tr id="i8" class="altColor">
+<td class="colFirst"><code>java.lang.String</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Network/API/Server.html#getSubData--">getSubData</a></span>()</code>
+<div class="block">Gets the SubData Client Address</div>
+</td>
+</tr>
+<tr id="i9" class="rowColor">
 <td class="colFirst"><code>long</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Network/API/Server.html#getTimestamp--">getTimestamp</a></span>()</code>
 <div class="block">Get the Timestamp for when the data was last refreshed</div>
 </td>
 </tr>
-<tr id="i9" class="rowColor">
+<tr id="i10" class="altColor">
 <td class="colFirst"><code>boolean</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Network/API/Server.html#isHidden--">isHidden</a></span>()</code>
 <div class="block">If the server is hidden from players</div>
 </td>
 </tr>
-<tr id="i10" class="altColor">
+<tr id="i11" class="rowColor">
 <td class="colFirst"><code>boolean</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Network/API/Server.html#isRestricted--">isRestricted</a></span>()</code>
 <div class="block">Gets if the Server is Restricted</div>
 </td>
 </tr>
-<tr id="i11" class="rowColor">
+<tr id="i12" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Network/API/Server.html#refresh--">refresh</a></span>()</code>
 <div class="block">Download a new copy of the data from SubData</div>
 </td>
 </tr>
-<tr id="i12" class="altColor">
+<tr id="i13" class="rowColor">
 <td class="colFirst"><code>java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../net/ME1312/SubServers/Client/Bukkit/Network/API/Server.html#toString--">toString</a></span>()</code>&nbsp;</td>
 </tr>
@@ -289,6 +295,20 @@ extends java.lang.Object</pre>
 <h4>refresh</h4>
 <pre>public&nbsp;void&nbsp;refresh()</pre>
 <div class="block">Download a new copy of the data from SubData</div>
+</li>
+</ul>
+<a name="getSubData--">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getSubData</h4>
+<pre>public&nbsp;java.lang.String&nbsp;getSubData()</pre>
+<div class="block">Gets the SubData Client Address</div>
+<dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>SubData Client Address (or null if not linked)</dd>
+</dl>
 </li>
 </ul>
 <a name="getName--">

@@ -40,6 +40,15 @@ public class Server {
     }
 
     /**
+     * Gets the SubData Client Address
+     *
+     * @return SubData Client Address (or null if not linked)
+     */
+    public String getSubData() {
+        return raw.getRawString("subdata", null);
+    }
+
+    /**
      * Get the Name of this Server
      *
      * @return Server Name

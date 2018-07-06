@@ -49,6 +49,14 @@ public class Host {
         SubAPI.getInstance().getSubDataNetwork().sendPacket(new PacketDownloadServerList(name, null, data -> load(data.getSection("hosts").getSection(name))));
     }
 
+    /**
+     * Gets the SubData Client Address
+     *
+     * @return SubData Client Address (or null if unlinked/unsupported)
+     */
+    public String getSubData() {
+        return raw.getRawString("subdata", null);
+    }
 
     /**
      * Is this Host Enabled?
@@ -70,15 +78,6 @@ public class Host {
         } catch (UnknownHostException e) {
             throw new IllegalStateException("Invalid address response from raw data key: address");
         }
-    }
-
-    /**
-     * Gets the SubData Client Address
-     *
-     * @return SubData Client Address (or null if unlinked/unsupported)
-     */
-    public String getSubData() {
-        return raw.getRawString("subdata", null);
     }
 
     /**
