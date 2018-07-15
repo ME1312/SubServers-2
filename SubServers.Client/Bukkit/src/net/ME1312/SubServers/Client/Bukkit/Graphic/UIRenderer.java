@@ -224,11 +224,28 @@ public abstract class UIRenderer {
         // minecraft:name
         if (item.get().toLowerCase().startsWith("minecraft:")) {
             item.set(item.get().substring(10));
+        } else
+
+        // bukkit:name
+        if (item.get().toLowerCase().startsWith("bukkit:")) {
+            item.set(item.get().substring(7));
+
+            if (!Util.isException(() -> Material.valueOf(item.get().toUpperCase()))) {
+                return new ItemStack(Material.valueOf(item.get().toUpperCase()), 1);
+            }
         }
-        // bukkit name
-        if (!Util.isException(() -> Material.valueOf(item.get().toUpperCase()))) {
-            return new ItemStack(Material.valueOf(item.get().toUpperCase()), 1);
-        }
+
+        // material name
+        if (plugin.api.getGameVersion().compareTo(new Version("1.13")) < 0) {
+            if (!Util.isException(() -> Material.valueOf(item.get().toUpperCase()))) {
+                return new ItemStack(Material.valueOf(item.get().toUpperCase()), 1);
+            }
+        } else try {
+            if (Material.class.getMethod("getMaterial", String.class, boolean.class).invoke(null, item.get().toUpperCase(), false) != null) {
+                return new ItemStack((Material) Material.class.getMethod("getMaterial", String.class, boolean.class).invoke(null, item.get().toUpperCase(), false), 1);
+            }
+        } catch (Exception e) {}
+
         // vault name
         if (!Util.isException(() -> Class.forName("net.milkbowl.vault.item.Items"))) {
             net.milkbowl.vault.item.ItemInfo info = net.milkbowl.vault.item.Items.itemByString(item.get());

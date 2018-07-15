@@ -46,8 +46,8 @@ public final class SubPlugin extends JavaPlugin {
 
     public SubPlugin() {
         super();
-        version = Version.fromString(getDescription().getVersion());
-        //version = new Version(Version.fromString(getDescription().getVersion()), VersionType.SNAPSHOT, (SubPlugin.class.getPackage().getSpecificationTitle() == null)?"?":SubPlugin.class.getPackage().getSpecificationTitle()); // TODO Snapshot Version
+        //version = Version.fromString(getDescription().getVersion());
+        version = new Version(Version.fromString(getDescription().getVersion()), VersionType.SNAPSHOT, (SubPlugin.class.getPackage().getSpecificationTitle() == null)?"?":SubPlugin.class.getPackage().getSpecificationTitle()); // TODO Snapshot Version
     }
 
     /**
