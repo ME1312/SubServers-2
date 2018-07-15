@@ -41,9 +41,9 @@ public final class SubCommand extends CommandX {
     protected static NamedContainer<SubCommand, CommandX> newInstance(SubPlugin plugin, String command) {
         NamedContainer<SubCommand, CommandX> cmd = new NamedContainer<>(new SubCommand(plugin, command), null);
         CommandX now = cmd.name();
-        if (plugin.api.getGameVersion()[plugin.api.getGameVersion().length - 1].compareTo(new Version("1.13")) >= 0) {
-            now = new net.ME1312.SubServers.Sync.Library.Compatibility.v1_13.CommandX(cmd.name());
-        }
+        //if (plugin.api.getGameVersion()[plugin.api.getGameVersion().length - 1].compareTo(new Version("1.13")) >= 0) { // TODO Future Command Validator API?
+        //    now = new net.ME1312.SubServers.Sync.Library.Compatibility.v1_13.CommandX(cmd.name());
+        //}
         cmd.set(now);
         return cmd;
     }
@@ -535,9 +535,9 @@ public final class SubCommand extends CommandX {
         protected static NamedContainer<BungeeServer, CommandX> newInstance(SubPlugin plugin, String command) {
             NamedContainer<BungeeServer, CommandX> cmd = new NamedContainer<>(new BungeeServer(plugin, command), null);
             CommandX now = cmd.name();
-            if (plugin.api.getGameVersion()[plugin.api.getGameVersion().length - 1].compareTo(new Version("1.13")) >= 0) {
-                now = new net.ME1312.SubServers.Sync.Library.Compatibility.v1_13.CommandX(cmd.name());
-            }
+            //if (plugin.api.getGameVersion()[plugin.api.getGameVersion().length - 1].compareTo(new Version("1.13")) >= 0) { // TODO Future Command Validator API?
+            //    now = new net.ME1312.SubServers.Sync.Library.Compatibility.v1_13.CommandX(cmd.name());
+            //}
             cmd.set(now);
             return cmd;
         }

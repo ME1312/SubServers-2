@@ -54,8 +54,8 @@ public final class ExHost {
     public SubDataClient subdata = null;
 
     public final SubAPI api = new SubAPI(this);
-    //public static final Version version = Version.fromString("2.13a/pr4");
-    public static final Version version = new Version(Version.fromString("2.13a/pr4"), VersionType.SNAPSHOT, (ExHost.class.getPackage().getSpecificationTitle() == null)?"?":ExHost.class.getPackage().getSpecificationTitle()); // TODO Snapshot Version
+    public static final Version version = Version.fromString("2.13a/pr4");
+    //public static final Version version = new Version(Version.fromString("2.13a/pr5"), VersionType.SNAPSHOT, (ExHost.class.getPackage().getSpecificationTitle() == null)?"?":ExHost.class.getPackage().getSpecificationTitle()); // TODO Snapshot Version
 
     private ConsoleReader jline;
     private boolean running = false;

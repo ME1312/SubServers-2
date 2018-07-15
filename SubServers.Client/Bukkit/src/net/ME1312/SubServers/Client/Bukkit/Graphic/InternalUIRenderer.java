@@ -68,9 +68,10 @@ public class InternalUIRenderer extends UIRenderer {
             if (plugin.api.getGameVersion().compareTo(new Version("1.13")) < 0) {
                 return ItemStack.class.getConstructor(Material.class, int.class, short.class).newInstance(Material.valueOf(material), 1, damage);
             } else {
-                return new ItemStack(Material.valueOf(name), 1);
+                return new ItemStack((Material) Material.class.getMethod("getMaterial", String.class, boolean.class).invoke(null, name, false), 1);
             }
         } catch (Exception e) {
+            e.printStackTrace();
             return new ItemStack(Material.AIR);
         }
     }
