@@ -72,7 +72,7 @@ public class InternalUIRenderer extends UIRenderer {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            return new ItemStack(Material.AIR);
+            return null;
         }
     }
 
