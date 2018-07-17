@@ -20,11 +20,4 @@ public interface UIHandler {
      */
     void disable();
 
-    /**
-     * Click Listener
-     *
-     * @param event Event
-     */
-    void click(InventoryClickEvent event);
-
 }

@@ -25,6 +25,7 @@ import org.xml.sax.InputSource;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.*;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.net.InetAddress;
 import java.net.URL;
@@ -54,8 +55,8 @@ public final class ExHost {
     public SubDataClient subdata = null;
 
     public final SubAPI api = new SubAPI(this);
-    //public static final Version version = Version.fromString("2.13a/pr4");
-    public static final Version version = new Version(Version.fromString("2.13a/pr5"), VersionType.SNAPSHOT, (ExHost.class.getPackage().getSpecificationTitle() == null)?"?":ExHost.class.getPackage().getSpecificationTitle()); // TODO Snapshot Version
+    //public static final Version version = Version.fromString("2.13a/pr5");
+    public static final Version version = new Version(Version.fromString("2.13a/pr5"), VersionType.SNAPSHOT, (ExHost.class.getPackage().getSpecificationTitle() == null)?"undefined":ExHost.class.getPackage().getSpecificationTitle()); // TODO Snapshot Version
 
     private ConsoleReader jline;
     private boolean running = false;
@@ -76,10 +77,18 @@ public final class ExHost {
             parser.accepts("noconsole");
             joptsimple.OptionSet options = parser.parse(args);
             if(options.has("version") || options.has("v")) {
+                boolean build = false;
+                try {
+                    Field f = Version.class.getDeclaredField("type");
+                    f.setAccessible(true);
+                    build = f.get(version) != VersionType.SNAPSHOT && ExHost.class.getPackage().getSpecificationTitle() != null;
+                    f.setAccessible(false);
+                } catch (Exception e) {}
+
                 System.out.println("");
                 System.out.println(System.getProperty("os.name") + " " + System.getProperty("os.version") + ',');
                 System.out.println("Java " + System.getProperty("java.version") + ",");
-                System.out.println("SubServers.Host v" + version.toExtendedString());
+                System.out.println("SubServers.Host v" + version.toExtendedString() + ((build)?" [" + ExHost.class.getPackage().getSpecificationTitle() + ']':""));
                 System.out.println("");
             } else {
                 new ExHost(options);

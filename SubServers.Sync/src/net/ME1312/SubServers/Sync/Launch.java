@@ -2,7 +2,10 @@ package net.ME1312.SubServers.Sync;
 
 import net.ME1312.SubServers.Sync.Library.Container;
 import net.ME1312.SubServers.Sync.Library.Util;
+import net.ME1312.SubServers.Sync.Library.Version.Version;
+import net.ME1312.SubServers.Sync.Library.Version.VersionType;
 
+import java.lang.reflect.Field;
 import java.security.Security;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -46,11 +49,19 @@ public final class Launch {
             parser.accepts("noconsole");
             joptsimple.OptionSet options = parser.parse(args);
             if(options.has("version") || options.has("v")) {
+                boolean build = false;
+                try {
+                    Field f = Version.class.getDeclaredField("type");
+                    f.setAccessible(true);
+                    build = f.get(SubPlugin.version) != VersionType.SNAPSHOT && SubPlugin.class.getPackage().getSpecificationTitle() != null;
+                    f.setAccessible(false);
+                } catch (Exception e) {}
+
                 System.out.println("");
                 System.out.println(System.getProperty("os.name") + " " + System.getProperty("os.version") + ',');
                 System.out.println("Java " + System.getProperty("java.version") + ",");
                 System.out.println("BungeeCord" + ((patched)?" [Patched] ":" ") + net.md_5.bungee.Bootstrap.class.getPackage().getImplementationVersion() + ',');
-                System.out.println("SubServers.Sync v" + SubPlugin.version.toExtendedString());
+                System.out.println("SubServers.Sync v" + SubPlugin.version.toExtendedString() + ((build)?" [" + SubPlugin.class.getPackage().getSpecificationTitle() + ']':""));
                 System.out.println("");
             } else {
                 System.out.println("");

@@ -13,7 +13,7 @@ public interface Renderer {
      * Open the GUI
      *
      * @param player Player Opening
-     * @param object JSON Representation of an Object
+     * @param object Raw Representation of an Object
      */
     void open(Player player, YAMLSection object);
 
@@ -27,7 +27,7 @@ public interface Renderer {
     /**
      * Check if this Renderer is enabled for this Object
      *
-     * @param object JSON Representation of an Object
+     * @param object Raw Representation of an Object
      * @return Enabled Status
      */
     boolean isEnabled(YAMLSection object);

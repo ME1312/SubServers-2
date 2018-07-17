@@ -1,3 +1,3 @@
 Manifest-Version: 1.0
-Implementation-Title: SubServers.Client.Bukkit
+Implementation-Title: SubServers.Client
 Specification-Title: 18w29bf

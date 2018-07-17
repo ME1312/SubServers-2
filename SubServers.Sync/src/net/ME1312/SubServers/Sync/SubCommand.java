@@ -4,6 +4,7 @@ import net.ME1312.SubServers.Sync.Library.Compatibility.CommandX;
 import net.ME1312.SubServers.Sync.Library.NamedContainer;
 import net.ME1312.SubServers.Sync.Library.Util;
 import net.ME1312.SubServers.Sync.Library.Version.Version;
+import net.ME1312.SubServers.Sync.Library.Version.VersionType;
 import net.ME1312.SubServers.Sync.Network.Packet.*;
 import net.ME1312.SubServers.Sync.Server.Server;
 import net.ME1312.SubServers.Sync.Server.SubServer;
@@ -26,6 +27,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.StringReader;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.nio.charset.Charset;
@@ -66,11 +68,19 @@ public final class SubCommand extends CommandX {
                     if (args[0].equalsIgnoreCase("help") || args[0].equalsIgnoreCase("?")) {
                         sender.sendMessages(printHelp());
                     } else if (args[0].equalsIgnoreCase("version") || args[0].equalsIgnoreCase("ver")) {
+                        boolean build = false;
+                        try {
+                            Field f = Version.class.getDeclaredField("type");
+                            f.setAccessible(true);
+                            build = f.get(plugin.version) != VersionType.SNAPSHOT && SubPlugin.class.getPackage().getSpecificationTitle() != null;
+                            f.setAccessible(false);
+                        } catch (Exception e) {}
+
                         sender.sendMessage("SubServers > These are the platforms and versions that are running SubServers.Sync:");
                         sender.sendMessage("  " + System.getProperty("os.name") + ' ' + System.getProperty("os.version") + ',');
                         sender.sendMessage("  Java " + System.getProperty("java.version") + ',');
                         sender.sendMessage("  " + plugin.getBungeeName() + ((plugin.isPatched)?" [Patched] ":" ") + net.md_5.bungee.Bootstrap.class.getPackage().getImplementationVersion() + ',');
-                        sender.sendMessage("  SubServers.Sync v" + SubPlugin.version.toExtendedString());
+                        sender.sendMessage("  SubServers.Sync v" + SubPlugin.version.toExtendedString() + ((build)?" [" + SubPlugin.class.getPackage().getSpecificationTitle() + ']':""));
                         sender.sendMessage("");
                         new Thread(() -> {
                             try {

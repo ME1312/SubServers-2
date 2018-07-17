@@ -5,6 +5,7 @@ import net.ME1312.SubServers.Host.API.SubPluginInfo;
 import net.ME1312.SubServers.Host.Library.TextColor;
 import net.ME1312.SubServers.Host.Library.Util;
 import net.ME1312.SubServers.Host.Library.Version.Version;
+import net.ME1312.SubServers.Host.Library.Version.VersionType;
 import net.ME1312.SubServers.Host.Network.Packet.*;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -15,6 +16,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.StringReader;
+import java.lang.reflect.Field;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.*;
@@ -29,11 +31,19 @@ public class SubCommand {
             @Override
             public void command(String handle, String[] args) {
                 if (args.length == 0 || host.api.plugins.get(args[0].toLowerCase()) != null) {
+                    boolean build = false;
+                    try {
+                        Field f = Version.class.getDeclaredField("type");
+                        f.setAccessible(true);
+                        build = f.get(host.version) != VersionType.SNAPSHOT && ExHost.class.getPackage().getSpecificationTitle() != null;
+                        f.setAccessible(false);
+                    } catch (Exception e) {}
+
                     host.log.message.println(
                             "These are the platforms and versions that are running " + ((args.length == 0)?"SubServers.Host":host.api.plugins.get(args[0].toLowerCase()).getName()) +":",
                             "  " + System.getProperty("os.name") + ' ' + System.getProperty("os.version") + ',',
                             "  Java " + System.getProperty("java.version") + ',',
-                            "  SubServers.Host v" + host.version.toExtendedString() + ((args.length == 0)?"":","));
+                            "  SubServers.Host v" + host.version.toExtendedString() + ((build)?" [" + ExHost.class.getPackage().getSpecificationTitle() + ']':"") + ((args.length == 0)?"":","));
                     if (args.length == 0) {
                         host.log.message.println("");
                         new Thread(() -> {

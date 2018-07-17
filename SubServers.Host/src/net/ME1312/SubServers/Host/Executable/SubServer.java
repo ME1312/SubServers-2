@@ -13,6 +13,8 @@ import java.io.*;
 import java.util.LinkedList;
 import java.util.UUID;
 import java.util.jar.JarFile;
+import java.util.jar.JarInputStream;
+import java.util.jar.Manifest;
 
 /**
  * Internal SubServer Class
@@ -63,16 +65,19 @@ public class SubServer {
 
         if (new UniversalFile(this.directory, "plugins:SubServers.Client.jar").exists()) {
             try {
-                JarFile jar = new JarFile(new UniversalFile(this.directory, "plugins:SubServers.Client.jar"));
-                YAMLSection plugin = new YAMLSection(Util.readAll(new InputStreamReader(jar.getInputStream(jar.getJarEntry("plugin.yml")))));
-                YAMLSection bplugin = new YAMLSection(Util.readAll(new InputStreamReader(ExHost.class.getResourceAsStream("/net/ME1312/SubServers/Host/Library/Files/Client/spigot.yml"))));
-                if (new Version(plugin.getString("version")).compareTo(new Version(bplugin.getString("version"))) < 0) {
-                    new UniversalFile(this.directory, "plugins:SubServers.Client.jar").delete();
-                    Util.copyFromJar(ExHost.class.getClassLoader(), "net/ME1312/SubServers/Host/Library/Files/Client/spigot.jar", new UniversalFile(this.directory, "plugins:SubServers.Client.jar").getPath());
+                JarInputStream updated = new JarInputStream(ExHost.class.getResourceAsStream("/net/ME1312/SubServers/Host/Library/Files/client.jar"));
+                JarFile existing = new JarFile(new UniversalFile(this.directory, "plugins:SubServers.Client.jar"));
+
+                if (existing.getManifest().getMainAttributes().getValue("Implementation-Title") != null && existing.getManifest().getMainAttributes().getValue("Implementation-Title").startsWith("SubServers.Client") && existing.getManifest().getMainAttributes().getValue("Specification-Title") != null) {
+                    if (new Version(existing.getManifest().getMainAttributes().getValue("Specification-Title")).compareTo(new Version(updated.getManifest().getMainAttributes().getValue("Specification-Title"))) < 0) {
+                        new UniversalFile(this.directory, "plugins:SubServers.Client.jar").delete();
+                        Util.copyFromJar(ExHost.class.getClassLoader(), "net/ME1312/SubServers/Host/Library/Files/client.jar", new UniversalFile(this.directory, "plugins:SubServers.Client.jar").getPath());
+                    }
                 }
-                jar.close();
+                existing.close();
+                updated.close();
             } catch (Throwable e) {
-                host.log.info.println("Couldn't auto-update SubServers.Client.jar");
+                host.log.info.println("Couldn't auto-update SubServers.Client.jar for " + name);
                 host.log.error.println(e);
             }
         }
