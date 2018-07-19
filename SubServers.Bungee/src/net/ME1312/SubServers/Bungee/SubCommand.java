@@ -80,7 +80,7 @@ public final class SubCommand extends CommandX {
                     sender.sendMessage("  " + System.getProperty("os.name") + ' ' + System.getProperty("os.version") + ',');
                     sender.sendMessage("  Java " + System.getProperty("java.version") + ',');
                     sender.sendMessage("  " + plugin.getBungeeName() + ((plugin.isPatched)?" [Patched] ":" ") + net.md_5.bungee.Bootstrap.class.getPackage().getImplementationVersion() + ',');
-                    sender.sendMessage("  SubServers.Bungee v" + SubPlugin.version.toExtendedString() + ((build)?" [" + SubPlugin.class.getPackage().getSpecificationTitle() + ']':""));
+                    sender.sendMessage("  SubServers.Bungee v" + SubPlugin.version.toExtendedString() + ((build)?" (" + SubPlugin.class.getPackage().getSpecificationTitle() + ')':""));
                     sender.sendMessage("");
                     new Thread(() -> {
                         try {

@@ -62,7 +62,7 @@ public final class SubCommand implements CommandExecutor {
                         sender.sendMessage(ChatColor.WHITE + "  " + System.getProperty("os.name") + ' ' + System.getProperty("os.version") + ChatColor.RESET + ',');
                         sender.sendMessage(ChatColor.WHITE + "  Java " + System.getProperty("java.version") + ChatColor.RESET + ',');
                         sender.sendMessage(ChatColor.WHITE + "  " + Bukkit.getName() + ' ' + Bukkit.getVersion() + ChatColor.RESET + ',');
-                        sender.sendMessage(ChatColor.WHITE + "  SubServers.Client.Bukkit v" + plugin.version.toExtendedString() + ((build)?" [" + SubPlugin.class.getPackage().getSpecificationTitle() + ']':""));
+                        sender.sendMessage(ChatColor.WHITE + "  SubServers.Client.Bukkit v" + plugin.version.toExtendedString() + ((build)?" (" + SubPlugin.class.getPackage().getSpecificationTitle() + ')':""));
                         sender.sendMessage("");
                         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
                             try {

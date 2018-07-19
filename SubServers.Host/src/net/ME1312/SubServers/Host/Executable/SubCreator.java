@@ -229,7 +229,7 @@ public class SubCreator {
                     }
                 }
                 if (spversion == null)
-                    throw new InvalidServerException("Cannot find sponge version for Minecraft " + version.toString());
+                    throw new InvalidServerException("Cannot find Sponge version for Minecraft " + version.toString());
                 thread.name().logger.info.println("Found \"spongeforge-" + spversion.toString() + '"');
                 host.subdata.sendPacket(new PacketOutExLogMessage(address, "Found \"spongeforge-" + spversion.toString() + '"'));
 
@@ -244,7 +244,7 @@ public class SubCreator {
                     }
                 }
                 if (mcfversion == null)
-                    throw new InvalidServerException("Cannot find forge version for Sponge " + spversion.toString());
+                    throw new InvalidServerException("Cannot find Forge version for Sponge " + spversion.toString());
                 thread.name().logger.info.println("Found \"forge-" + mcfversion.toString() + '"');
                 host.subdata.sendPacket(new PacketOutExLogMessage(address, "Found \"forge-" + mcfversion.toString() + '"'));
 

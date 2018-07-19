@@ -105,7 +105,7 @@ public class InternalSubCreator extends SubCreator {
                     }
                 }
                 if (spversion == null)
-                    throw new InvalidServerException("Cannot find sponge version for Minecraft " + version.toString());
+                    throw new InvalidServerException("Cannot find Sponge version for Minecraft " + version.toString());
                 System.out.println(name + File.separator + "Creator > Found \"spongeforge-" + spversion.toString() + '"');
 
                 NodeList mcfnodeList = forgexml.getElementsByTagName("version");
@@ -119,7 +119,7 @@ public class InternalSubCreator extends SubCreator {
                     }
                 }
                 if (mcfversion == null)
-                    throw new InvalidServerException("Cannot find forge version for Sponge " + spversion.toString());
+                    throw new InvalidServerException("Cannot find Forge version for Sponge " + spversion.toString());
                 System.out.println(name + File.separator + "Creator > Found \"forge-" + mcfversion.toString() + '"');
 
                 version = new Version(mcfversion.toString() + " " + spversion.toString());

@@ -43,7 +43,7 @@
         <properties>
           <foreground color="-14144467"/>
           <horizontalScrollBarPolicy value="31"/>
-          <verticalScrollBarPolicy value="22"/>
+          <verticalScrollBarPolicy value="20"/>
         </properties>
         <border type="none">
           <font/>

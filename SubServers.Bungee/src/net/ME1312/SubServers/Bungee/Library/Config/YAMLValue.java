@@ -189,7 +189,8 @@ public class YAMLValue {
      * @return Unparsed String
      */
     public String asRawString() {
-        return (String) obj;
+        if (obj != null) return obj.toString();
+        else return null;
     }
 
     /**
@@ -198,7 +199,13 @@ public class YAMLValue {
      * @return Unparsed String List
      */
     public List<String> asRawStringList() {
-        return (List<String>) obj;
+        if (obj != null) {
+            List<String> values = new ArrayList<String>();
+            for (Object value : (List<?>) obj) {
+                values.add(value.toString());
+            }
+            return values;
+        } else return null;
     }
 
     /**
@@ -207,7 +214,7 @@ public class YAMLValue {
      * @return String
      */
     public String asString() {
-        if (obj != null) return Util.unescapeJavaString((String) obj);
+        if (obj != null) return Util.unescapeJavaString(asRawString());
         else return null;
     }
 
@@ -219,7 +226,7 @@ public class YAMLValue {
     public List<String> asStringList() {
         if (obj != null) {
             List<String> values = new ArrayList<String>();
-            for (String value : (List<String>) obj) {
+            for (String value : asRawStringList()) {
                 values.add(Util.unescapeJavaString(value));
             }
             return values;
@@ -234,7 +241,7 @@ public class YAMLValue {
      */
     public String asColoredString(char color) {
         if (Util.isNull(color)) throw new NullPointerException();
-        if (obj != null) return ChatColor.translateAlternateColorCodes(color, Util.unescapeJavaString((String) obj));
+        if (obj != null) return ChatColor.translateAlternateColorCodes(color, asString());
         else return null;
     }
 
@@ -248,8 +255,8 @@ public class YAMLValue {
         if (obj != null) {
             if (Util.isNull(color)) throw new NullPointerException();
             List<String> values = new ArrayList<String>();
-            for (String value : (List<String>) obj) {
-                values.add(ChatColor.translateAlternateColorCodes(color, Util.unescapeJavaString(value)));
+            for (String value : asStringList()) {
+                values.add(ChatColor.translateAlternateColorCodes(color, value));
             }
             return values;
         } else return null;

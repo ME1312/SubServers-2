@@ -88,7 +88,7 @@ public final class ExHost {
                 System.out.println("");
                 System.out.println(System.getProperty("os.name") + " " + System.getProperty("os.version") + ',');
                 System.out.println("Java " + System.getProperty("java.version") + ",");
-                System.out.println("SubServers.Host v" + version.toExtendedString() + ((build)?" [" + ExHost.class.getPackage().getSpecificationTitle() + ']':""));
+                System.out.println("SubServers.Host v" + version.toExtendedString() + ((build)?" (" + ExHost.class.getPackage().getSpecificationTitle() + ')':""));
                 System.out.println("");
             } else {
                 new ExHost(options);

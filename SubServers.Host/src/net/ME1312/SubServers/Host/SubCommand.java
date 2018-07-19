@@ -43,7 +43,7 @@ public class SubCommand {
                             "These are the platforms and versions that are running " + ((args.length == 0)?"SubServers.Host":host.api.plugins.get(args[0].toLowerCase()).getName()) +":",
                             "  " + System.getProperty("os.name") + ' ' + System.getProperty("os.version") + ',',
                             "  Java " + System.getProperty("java.version") + ',',
-                            "  SubServers.Host v" + host.version.toExtendedString() + ((build)?" [" + ExHost.class.getPackage().getSpecificationTitle() + ']':"") + ((args.length == 0)?"":","));
+                            "  SubServers.Host v" + host.version.toExtendedString() + ((build)?" (" + ExHost.class.getPackage().getSpecificationTitle() + ')':"") + ((args.length == 0)?"":","));
                     if (args.length == 0) {
                         host.log.message.println("");
                         new Thread(() -> {

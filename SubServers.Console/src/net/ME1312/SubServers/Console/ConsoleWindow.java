@@ -59,6 +59,7 @@ public final class ConsoleWindow implements SubLogFilter {
                     HTMLEditorKit kit = (HTMLEditorKit) log.getEditorKit();
                     HTMLDocument doc = (HTMLDocument) log.getDocument();
                     kit.insertHTML(doc, doc.getLength() - 2, new String(stream.toByteArray(), "UTF-8"), 0, 0, null);
+                    hScroll();
                 } catch (BadLocationException e) {
                     e.printStackTrace();
                 }
@@ -265,6 +266,7 @@ public final class ConsoleWindow implements SubLogFilter {
             }
         });
         vScroll.setBorder(BorderFactory.createEmptyBorder());
+        hScroll.setVisible(false);
         new SmartScroller(vScroll, SmartScroller.VERTICAL, SmartScroller.END);
         log.setContentType("text/html");
         log.setEditorKit(new HTMLEditorKit());
@@ -417,7 +419,7 @@ public final class ConsoleWindow implements SubLogFilter {
         } else {
             input.setVisible(false);
             hScroll.setVisible(false);
-            vScroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
+            vScroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         }
 
         logger.registerFilter(this);
@@ -430,6 +432,7 @@ public final class ConsoleWindow implements SubLogFilter {
         hScroll.setMaximum(vScroll.getHorizontalScrollBar().getMaximum());
         hScroll.setMinimum(vScroll.getHorizontalScrollBar().getMinimum());
         hScroll.setVisibleAmount(vScroll.getHorizontalScrollBar().getVisibleAmount());
+        hScroll.setVisible(input.isVisible() && hScroll.getVisibleAmount() < hScroll.getMaximum());
     }
 
     private void loadContent() {
@@ -460,7 +463,6 @@ public final class ConsoleWindow implements SubLogFilter {
 
     public void log(Date date, String message) {
         try {
-
             stream.write(('\u00A0' + new SimpleDateFormat("hh:mm:ss").format(date) + ' ' + ((ansi)?message:message.replaceAll("\u001B\\[[;\\d]*m", "")) + "\u00A0\n").getBytes("UTF-8"));
         } catch (IOException e) {
             e.printStackTrace();

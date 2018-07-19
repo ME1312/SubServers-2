@@ -61,7 +61,7 @@ public final class Launch {
                 System.out.println(System.getProperty("os.name") + " " + System.getProperty("os.version") + ',');
                 System.out.println("Java " + System.getProperty("java.version") + ",");
                 System.out.println("BungeeCord" + ((patched)?" [Patched] ":" ") + net.md_5.bungee.Bootstrap.class.getPackage().getImplementationVersion() + ',');
-                System.out.println("SubServers.Sync v" + SubPlugin.version.toExtendedString() + ((build)?" [" + SubPlugin.class.getPackage().getSpecificationTitle() + ']':""));
+                System.out.println("SubServers.Sync v" + SubPlugin.version.toExtendedString() + ((build)?" (" + SubPlugin.class.getPackage().getSpecificationTitle() + ')':""));
                 System.out.println("");
             } else {
                 System.out.println("");

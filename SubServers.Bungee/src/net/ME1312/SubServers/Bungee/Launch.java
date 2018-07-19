@@ -61,7 +61,7 @@ public final class Launch {
                 System.out.println(System.getProperty("os.name") + " " + System.getProperty("os.version") + ',');
                 System.out.println("Java " + System.getProperty("java.version") + ",");
                 System.out.println("BungeeCord" + ((patched)?" [Patched] ":" ") + net.md_5.bungee.Bootstrap.class.getPackage().getImplementationVersion() + ',');
-                System.out.println("SubServers.Bungee v" + SubPlugin.version.toExtendedString() + ((build)?" [" + SubPlugin.class.getPackage().getSpecificationTitle() + ']':""));
+                System.out.println("SubServers.Bungee v" + SubPlugin.version.toExtendedString() + ((build)?" (" + SubPlugin.class.getPackage().getSpecificationTitle() + ')':""));
                 System.out.println("");
             } else {
                 System.out.println("");
@@ -104,6 +104,7 @@ public final class Launch {
                         if (!Util.isException(() -> proprietary.set(Class.forName("io.github.waterfallmc.waterfall.console.WaterfallConsole") != null)) && proprietary.get()) {
                             Class.forName("io.github.waterfallmc.waterfall.console.WaterfallConsole").getMethod("readCommands").invoke(null);
                         } else {
+                            plugin.canSudo = true;
                             String line;
                             while (plugin.isRunning && (line = plugin.getConsoleReader().readLine(">")) != null) {
                                 if (plugin.sudo == null) {
