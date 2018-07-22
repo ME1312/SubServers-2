@@ -33,6 +33,7 @@ public final class SubAPI {
 
     protected SubAPI(SubPlugin plugin) {
         this.plugin = plugin;
+        GAME_VERSION = getGameVersion();
         api = this;
     }
 
@@ -699,5 +700,5 @@ public final class SubAPI {
             }
         } else return GAME_VERSION;
     }
-    private Version[] GAME_VERSION = getGameVersion();
+    private final Version[] GAME_VERSION;
 }
