@@ -122,7 +122,7 @@ public class SubCommand {
                     if (data.getSection("groups").getKeys().size() > 0) {
                         host.log.message.println("Group/Server List:");
                         for (String group : data.getSection("groups").getKeys()) {
-                            String message = "";
+                            String message = "  ";
                             message += TextColor.GOLD + group + TextColor.RESET + ": ";
                             for (String server : data.getSection("groups").getSection(group).getKeys()) {
                                 if (i != 0) message += div;
@@ -151,7 +151,7 @@ public class SubCommand {
                     ExHost h = host;
                     host.log.message.println("Host/SubServer List:");
                     for (String host : data.getSection("hosts").getKeys()) {
-                        String message = "";
+                        String message = "  ";
                         if (data.getSection("hosts").getSection(host).getBoolean("enabled")) {
                             message += TextColor.AQUA;
                         } else {
@@ -179,7 +179,7 @@ public class SubCommand {
                     }
                     if (!sent) host.log.message.println(TextColor.RESET + "(none)");
                     host.log.message.println("Server List:");
-                    String message = "";
+                    String message = "  ";
                     for (String server : data.getSection("servers").getKeys()) {
                         if (i != 0) message += div;
                         message += TextColor.WHITE + data.getSection("servers").getSection(server).getRawString("display") + " (" + data.getSection("servers").getSection(server).getRawString("address") + ((server.equals(data.getSection("servers").getSection(server).getRawString("display")))?"":TextColor.stripColor(div)+server) + ")";
@@ -486,9 +486,6 @@ public class SubCommand {
                 "",
                 "The <Port> argument is required, and should be the port number",
                 "that you want the server to listen on after it has been created.",
-                "",
-                "If the [RAM] argument is provided, it will allocate in megabytes",
-                "the amount of RAM that the server will use after it has been created",
                 "",
                 "Examples:",
                 "  /create ExampleServer ExampleHost Spigot 1.11 25565"

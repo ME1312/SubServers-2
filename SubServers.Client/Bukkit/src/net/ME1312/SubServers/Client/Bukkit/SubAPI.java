@@ -340,8 +340,7 @@ public final class SubAPI {
      * @param graphics Graphics Handler
      */
     public void setGraphicHandler(UIHandler graphics) {
-        if (Util.isNull(graphics)) throw new NullPointerException();
-        plugin.gui.disable();
+        if (plugin.gui != null) plugin.gui.disable();
         plugin.gui = graphics;
     }
 

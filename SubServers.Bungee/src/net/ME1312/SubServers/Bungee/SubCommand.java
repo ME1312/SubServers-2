@@ -152,10 +152,10 @@ public final class SubCommand extends CommandX {
                     String div = ChatColor.RESET + ", ";
                     int i = 0;
                     boolean sent = false;
-                    sender.sendMessage("SubServers > Group/Server List:");
                     if (plugin.api.getGroups().keySet().size() > 0) {
+                        sender.sendMessage("SubServers > Group/Server List:");
                         for (String group : plugin.api.getGroups().keySet()) {
-                            String message = "";
+                            String message = "  ";
                             message += ChatColor.GOLD + group + ChatColor.RESET + ": ";
                             List<String> names = new ArrayList<String>();
                             Map<String, Server> servers = plugin.api.getServers();
@@ -170,7 +170,7 @@ public final class SubCommand extends CommandX {
                                     message += ChatColor.AQUA;
                                 } else if (((SubServer) server).isRunning()) {
                                     message += ChatColor.GREEN;
-                                } else if (((SubServer) server).isEnabled() && ((SubServer) server).getCurrentIncompatibilities().size() == 0) {
+                                } else if (((SubServer) server).getHost().isEnabled() && ((SubServer) server).isEnabled() && ((SubServer) server).getCurrentIncompatibilities().size() == 0) {
                                     message += ChatColor.YELLOW;
                                 } else {
                                     message += ChatColor.RED;
@@ -188,7 +188,7 @@ public final class SubCommand extends CommandX {
                     }
                     sender.sendMessage("SubServers > Host/SubServer List:");
                     for (Host host : plugin.api.getHosts().values()) {
-                        String message = "";
+                        String message = "  ";
                         if (host.isEnabled()) {
                             message += ChatColor.AQUA;
                         } else {
@@ -201,7 +201,7 @@ public final class SubCommand extends CommandX {
                                 message += ChatColor.AQUA;
                             } else if (subserver.isRunning()) {
                                 message += ChatColor.GREEN;
-                            } else if (subserver.isEnabled() && subserver.getCurrentIncompatibilities().size() == 0) {
+                            } else if (subserver.getHost().isEnabled() && subserver.isEnabled() && subserver.getCurrentIncompatibilities().size() == 0) {
                                 message += ChatColor.YELLOW;
                             } else {
                                 message += ChatColor.RED;
@@ -216,7 +216,7 @@ public final class SubCommand extends CommandX {
                     }
                     if (!sent) sender.sendMessage(ChatColor.RESET + "(none)");
                     sender.sendMessage("SubServers > Server List:");
-                    String message = "";
+                    String message = "  ";
                     for (Server server : plugin.api.getServers().values()) {
                         if (!(server instanceof SubServer)) {
                             if (i != 0) message += div;

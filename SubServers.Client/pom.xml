@@ -9,5 +9,6 @@
 
     <modules>
         <module>Bukkit</module>
+        <module>Sponge</module>
     </modules>
 </project>

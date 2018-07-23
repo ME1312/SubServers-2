@@ -80,6 +80,23 @@ public class SubServer {
                 host.log.info.println("Couldn't auto-update SubServers.Client.jar for " + name);
                 host.log.error.println(e);
             }
+        } else if (new UniversalFile(this.directory, "mods:SubServers.Client.jar").exists()) {
+            try {
+                JarInputStream updated = new JarInputStream(ExHost.class.getResourceAsStream("/net/ME1312/SubServers/Host/Library/Files/client.jar"));
+                JarFile existing = new JarFile(new UniversalFile(this.directory, "mods:SubServers.Client.jar"));
+
+                if (existing.getManifest().getMainAttributes().getValue("Implementation-Title") != null && existing.getManifest().getMainAttributes().getValue("Implementation-Title").startsWith("SubServers.Client") && existing.getManifest().getMainAttributes().getValue("Specification-Title") != null) {
+                    if (new Version(existing.getManifest().getMainAttributes().getValue("Specification-Title")).compareTo(new Version(updated.getManifest().getMainAttributes().getValue("Specification-Title"))) < 0) {
+                        new UniversalFile(this.directory, "mods:SubServers.Client.jar").delete();
+                        Util.copyFromJar(ExHost.class.getClassLoader(), "net/ME1312/SubServers/Host/Library/Files/client.jar", new UniversalFile(this.directory, "mods:SubServers.Client.jar").getPath());
+                    }
+                }
+                existing.close();
+                updated.close();
+            } catch (Throwable e) {
+                host.log.info.println("Couldn't auto-update SubServers.Client.jar for " + name);
+                host.log.error.println(e);
+            }
         }
     }
 

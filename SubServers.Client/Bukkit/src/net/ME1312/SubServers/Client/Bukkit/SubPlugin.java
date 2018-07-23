@@ -108,11 +108,10 @@ public final class SubPlugin extends JavaPlugin {
                             }
                         }
                     }
-                    if (updcount > 0) System.out.println("SubServers > SubServers.Client.Bukkit v" + updversion + " is available. You are " + updcount + " version" + ((updcount == 1)?"":"s") + " behind.");
+                    if (updcount > 0) Bukkit.getLogger().info("SubServers > SubServers.Client.Bukkit v" + updversion + " is available. You are " + updcount + " version" + ((updcount == 1)?"":"s") + " behind.");
                 } catch (Exception e) {}
             }, 0, TimeUnit.DAYS.toSeconds(2) * 20);
         } catch (IOException e) {
-            setEnabled(false);
             e.printStackTrace();
         }
     }
@@ -126,9 +125,9 @@ public final class SubPlugin extends JavaPlugin {
         Cipher cipher = null;
         if (!config.get().getSection("Settings").getSection("SubData").getRawString("Encryption", "NONE").equalsIgnoreCase("NONE")) {
             if (config.get().getSection("Settings").getSection("SubData").getString("Password", "").length() == 0) {
-                System.out.println("SubData > Cannot encrypt connection without a password");
+                Bukkit.getLogger().info("SubData > Cannot encrypt connection without a password");
             } else if (!SubDataClient.getCiphers().keySet().contains(config.get().getSection("Settings").getSection("SubData").getRawString("Encryption").toUpperCase().replace('-', '_').replace(' ', '_'))) {
-                System.out.println("SubData > Unknown encryption type: " + config.get().getSection("Settings").getSection("SubData").getRawString("Encryption"));
+                Bukkit.getLogger().info("SubData > Unknown encryption type: " + config.get().getSection("Settings").getSection("SubData").getRawString("Encryption"));
             } else {
                 cipher = SubDataClient.getCipher(config.get().getSection("Settings").getSection("SubData").getRawString("Encryption"));
             }

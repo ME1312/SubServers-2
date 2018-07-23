@@ -55,7 +55,7 @@ public final class PacketAuthorization implements PacketIn, PacketOut {
                     m.setAccessible(false);
                 } catch (Exception e) {}
             } else {
-                log.info.println("SubServers > Could not authorize SubData connection: " + data.getRawString("m"));
+                log.info.println("Could not authorize SubData connection: " + data.getRawString("m"));
                 host.subdata.destroy(0);
             }
         } catch (IOException e) {

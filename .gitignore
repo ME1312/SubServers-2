@@ -43,8 +43,6 @@ crashlytics.properties
 crashlytics-build.properties
 
 # Hide Unfinished Project Files
-/Artifacts/SubServers.Client.Sponge.jar
-/SubServers.Client/Sponge/
 /SubServers.Client/Windows/
 /Artifacts/SubServers.Web.jar
 /SubServers.Web/

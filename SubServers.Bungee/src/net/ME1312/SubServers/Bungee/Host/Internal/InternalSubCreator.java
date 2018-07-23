@@ -38,7 +38,7 @@ public class InternalSubCreator extends SubCreator {
     /**
      * Creates an Internal SubCreator
      *
-     * @param host    Host
+     * @param host Host
      * @param gitBash Git Bash
      */
     public InternalSubCreator(InternalHost host, String gitBash) {
@@ -373,9 +373,8 @@ public class InternalSubCreator extends SubCreator {
                 if (!new UniversalFile(dir, "plugins").exists()) new UniversalFile(dir, "plugins").mkdirs();
                 Util.copyFromJar(SubPlugin.class.getClassLoader(), "net/ME1312/SubServers/Bungee/Library/Files/client.jar", new UniversalFile(dir, "plugins:SubServers.Client.jar").getPath());
             } else if (type == ServerType.SPONGE) {
-                // TODO
-                // if (!new UniversalFile(dir, "mods").exists()) new UniversalFile(dir, "mods").mkdirs();
-                // Util.copyFromJar(SubPlugin.class.getClassLoader(), "net/ME1312/SubServers/Bungee/Library/Files/client.jar", new UniversalFile(dir, "mods:SubServers.Client.jar").getPath());
+                if (!new UniversalFile(dir, "mods").exists()) new UniversalFile(dir, "mods").mkdirs();
+                Util.copyFromJar(SubPlugin.class.getClassLoader(), "net/ME1312/SubServers/Bungee/Library/Files/client.jar", new UniversalFile(dir, "mods:SubServers.Client.jar").getPath());
             }
             YAMLSection config = new YAMLSection();
             FileWriter writer = new FileWriter(new UniversalFile(dir, "subservers.client"), false);

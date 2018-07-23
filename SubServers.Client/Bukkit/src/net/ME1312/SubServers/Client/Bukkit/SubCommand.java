@@ -101,7 +101,7 @@ public final class SubCommand implements CommandExecutor {
                                     sender.sendMessage(plugin.api.getLang("SubServers", "Command.List.Group-Header"));
                                     for (String group : data.getSection("groups").getKeys()) {
                                         List<net.md_5.bungee.api.chat.TextComponent> hoverm = new LinkedList<net.md_5.bungee.api.chat.TextComponent>();
-                                        net.md_5.bungee.api.chat.TextComponent msg = new net.md_5.bungee.api.chat.TextComponent(ChatColor.RESET.toString());
+                                        net.md_5.bungee.api.chat.TextComponent msg = new net.md_5.bungee.api.chat.TextComponent("  ");
                                         net.md_5.bungee.api.chat.TextComponent message = new net.md_5.bungee.api.chat.TextComponent(group);
                                         net.md_5.bungee.api.chat.TextComponent hover = new net.md_5.bungee.api.chat.TextComponent(group + '\n');
                                         message.setColor(net.md_5.bungee.api.ChatColor.GOLD);
@@ -167,7 +167,7 @@ public final class SubCommand implements CommandExecutor {
                                                             if (list.length() != 0) list += ", ";
                                                             list += data.getSection("groups").getSection(group).getSection(server).getList("incompatible").get(ii).asString();
                                                         }
-                                                        hover = new net.md_5.bungee.api.chat.TextComponent(plugin.api.getLang("SubServers", "Interface.Server-Menu.SubServer-Incompatible").replace("$str$", list));
+                                                        hover = new net.md_5.bungee.api.chat.TextComponent(plugin.api.getLang("SubServers", "Interface.Server-Menu.SubServer-Incompatible").replace("$str$", list) + ((data.getSection("groups").getSection(group).getSection(server).getBoolean("enabled"))?"":"\n"));
                                                     }
                                                     if (!data.getSection("groups").getSection(group).getSection(server).getBoolean("enabled")) {
                                                         hoverm.add(hover);
@@ -207,13 +207,13 @@ public final class SubCommand implements CommandExecutor {
                                         i = 0;
                                         sent = true;
                                     }
-                                    if (!sent) sender.sendMessage(plugin.api.getLang("SubServers", "Command.List.Empty"));
+                                    if (!sent) sender.sendMessage("  " + plugin.api.getLang("SubServers", "Command.List.Empty"));
                                     sent = false;
                                 }
                                 sender.sendMessage(plugin.api.getLang("SubServers", "Command.List.Host-Header"));
                                 for (String host : data.getSection("hosts").getKeys()) {
                                     List<net.md_5.bungee.api.chat.TextComponent> hoverm = new LinkedList<net.md_5.bungee.api.chat.TextComponent>();
-                                    net.md_5.bungee.api.chat.TextComponent msg = new net.md_5.bungee.api.chat.TextComponent(ChatColor.RESET.toString());
+                                    net.md_5.bungee.api.chat.TextComponent msg = new net.md_5.bungee.api.chat.TextComponent("  ");
                                     net.md_5.bungee.api.chat.TextComponent message = new net.md_5.bungee.api.chat.TextComponent(data.getSection("hosts").getSection(host).getString("display"));
                                     net.md_5.bungee.api.chat.TextComponent hover = new net.md_5.bungee.api.chat.TextComponent(data.getSection("hosts").getSection(host).getString("display") + '\n');
                                     if (data.getSection("hosts").getSection(host).getBoolean("enabled")) {
@@ -300,7 +300,7 @@ public final class SubCommand implements CommandExecutor {
                                                     if (list.length() != 0) list += ", ";
                                                     list += data.getSection("hosts").getSection(host).getSection("servers").getSection(subserver).getList("incompatible").get(ii).asString();
                                                 }
-                                                hover = new net.md_5.bungee.api.chat.TextComponent(plugin.api.getLang("SubServers", "Interface.Server-Menu.SubServer-Incompatible").replace("$str$", list));
+                                                hover = new net.md_5.bungee.api.chat.TextComponent(plugin.api.getLang("SubServers", "Interface.Server-Menu.SubServer-Incompatible").replace("$str$", list) + ((data.getSection("hosts").getSection(host).getSection("servers").getSection(subserver).getBoolean("enabled"))?"":"\n"));
                                             }
                                             if (!data.getSection("hosts").getSection(host).getSection("servers").getSection(subserver).getBoolean("enabled")) {
                                                 hoverm.add(hover);
@@ -326,9 +326,9 @@ public final class SubCommand implements CommandExecutor {
                                     i = 0;
                                     sent = true;
                                 }
-                                if (!sent) sender.sendMessage(plugin.api.getLang("SubServers", "Command.List.Empty"));
+                                if (!sent) sender.sendMessage("  " + plugin.api.getLang("SubServers", "Command.List.Empty"));
                                 sender.sendMessage(plugin.api.getLang("SubServers", "Command.List.Server-Header"));
-                                net.md_5.bungee.api.chat.TextComponent msg = new net.md_5.bungee.api.chat.TextComponent(ChatColor.RESET.toString());
+                                net.md_5.bungee.api.chat.TextComponent msg = new net.md_5.bungee.api.chat.TextComponent("  ");
                                 for (String server : data.getSection("servers").getKeys()) {
                                     List<net.md_5.bungee.api.chat.TextComponent> hoverm = new LinkedList<net.md_5.bungee.api.chat.TextComponent>();
                                     net.md_5.bungee.api.chat.TextComponent message = new net.md_5.bungee.api.chat.TextComponent(data.getSection("servers").getSection(server).getString("display"));
@@ -350,14 +350,14 @@ public final class SubCommand implements CommandExecutor {
                                     msg.addExtra(message);
                                     i++;
                                 }
-                                if (i == 0) sender.sendMessage(plugin.api.getLang("SubServers", "Command.List.Empty"));
+                                if (i == 0) sender.sendMessage("  " + plugin.api.getLang("SubServers", "Command.List.Empty"));
                                 ((Player) sender).spigot().sendMessage(msg);
                             } else {
                                 sender.sendMessage(plugin.api.getLang("SubServers", "Command.List.Group-Header"));
                                 String div = plugin.api.getLang("SubServers", "Command.List.Divider");
 
                                 for (String group : data.getSection("groups").getKeys()) {
-                                    String message = "";
+                                    String message = "  ";
                                     message += ChatColor.GOLD + group + plugin.api.getLang("SubServers", "Command.List.Header");
                                     for (String server : data.getSection("groups").getSection(group).getKeys()) {
                                         if (i != 0) message += div;
@@ -380,11 +380,11 @@ public final class SubCommand implements CommandExecutor {
                                     i = 0;
                                     sent = true;
                                 }
-                                if (!sent) sender.sendMessage(plugin.api.getLang("SubServers", "Command.List.Empty"));
+                                if (!sent) sender.sendMessage("  " + plugin.api.getLang("SubServers", "Command.List.Empty"));
                                 sent = false;
                                 sender.sendMessage(plugin.api.getLang("SubServers", "Command.List.Host-Header"));
                                 for (String host : data.getSection("hosts").getKeys()) {
-                                    String message = "";
+                                    String message = "  ";
                                     if (data.getSection("hosts").getSection(host).getBoolean("enabled")) {
                                         message += ChatColor.AQUA;
                                     } else {
@@ -416,15 +416,15 @@ public final class SubCommand implements CommandExecutor {
                                     i = 0;
                                     sent = true;
                                 }
-                                if (!sent) sender.sendMessage(plugin.api.getLang("SubServers", "Command.List.Empty"));
+                                if (!sent) sender.sendMessage("  " + plugin.api.getLang("SubServers", "Command.List.Empty"));
                                 sender.sendMessage(plugin.api.getLang("SubServers", "Command.List.Server-Header"));
-                                String message = "";
+                                String message = "  ";
                                 for (String server : data.getSection("servers").getKeys()) {
                                     if (i != 0) message += div;
                                     message += ChatColor.WHITE + data.getSection("servers").getSection(server).getString("display") + " (" + ((plugin.config.get().getSection("Settings").getBoolean("Show-Addresses", false))?data.getSection("servers").getSection(server).getString("address"):data.getSection("servers").getSection(server).getString("address").split(":")[data.getSection("servers").getSection(server).getString("address").split(":").length - 1]) + ((server.equals(data.getSection("servers").getSection(server).getString("display")))?"":ChatColor.stripColor(div)+server) + ")";
                                     i++;
                                 }
-                                if (i == 0) sender.sendMessage(plugin.api.getLang("SubServers", "Command.List.Empty"));
+                                if (i == 0) sender.sendMessage("  " + plugin.api.getLang("SubServers", "Command.List.Empty"));
                                 sender.sendMessage(message);
                             }
                         }));
@@ -467,15 +467,15 @@ public final class SubCommand implements CommandExecutor {
                                         sender.sendMessage("  " + plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Signature") + ChatColor.AQUA + data.getSection("server").getString("signature"));
                                         break;
                                     default:
-                                        sender.sendMessage(plugin.api.getLang("SubServers", "Command.Start.Invalid"));
+                                        sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Invalid"));
                                 }
                             }));
                         } else {
                             sender.sendMessage(plugin.api.getLang("SubServers", "Command.Generic.Usage").replace("$str$", label.toLowerCase() + " " + args[0].toLowerCase() + " <SubServer>"));
                         }
                     } else if (args[0].equalsIgnoreCase("start")) {
-                        if (sender.hasPermission("subservers.subserver.start.*") || sender.hasPermission("subservers.subserver.start." + args[1].toLowerCase())) {
-                            if (args.length > 1) {
+                        if (args.length > 1) {
+                            if (sender.hasPermission("subservers.subserver.start.*") || sender.hasPermission("subservers.subserver.start." + args[1].toLowerCase())) {
                                 plugin.subdata.sendPacket(new PacketStartServer((sender instanceof Player)?((Player) sender).getUniqueId():null, args[1], data -> {
                                     switch (data.getInt("r")) {
                                         case 3:
@@ -508,15 +508,14 @@ public final class SubCommand implements CommandExecutor {
                                     }
                                 }));
                             } else {
-                                sender.sendMessage(plugin.api.getLang("SubServers", "Command.Generic.Usage").replace("$str$", label.toLowerCase() + " " + args[0].toLowerCase() + " <SubServer>"));
+                                sender.sendMessage(plugin.api.getLang("SubServers", "Command.Generic.Invalid-Permission").replace("$str$", "subservers.subserver.start." + args[1].toLowerCase()));
                             }
                         } else {
-                            sender.sendMessage(plugin.api.getLang("SubServers", "Command.Generic.Invalid-Permission").replace("$str$", "subservers.subserver.start." + args[1].toLowerCase()));
+                            sender.sendMessage(plugin.api.getLang("SubServers", "Command.Generic.Usage").replace("$str$", label.toLowerCase() + " " + args[0].toLowerCase() + " <SubServer>"));
                         }
-
                     } else if (args[0].equalsIgnoreCase("stop")) {
-                        if (sender.hasPermission("subservers.subserver.stop.*") || sender.hasPermission("subservers.subserver.stop." + args[1].toLowerCase())) {
-                            if (args.length > 1) {
+                        if (args.length > 1) {
+                            if (sender.hasPermission("subservers.subserver.stop.*") || sender.hasPermission("subservers.subserver.stop." + args[1].toLowerCase())) {
                                 plugin.subdata.sendPacket(new PacketStopServer((sender instanceof Player)?((Player) sender).getUniqueId():null, args[1], false, data -> {
                                     switch (data.getInt("r")) {
                                         case 3:
@@ -539,14 +538,14 @@ public final class SubCommand implements CommandExecutor {
                                     }
                                 }));
                             } else {
-                                sender.sendMessage(plugin.api.getLang("SubServers", "Command.Generic.Usage").replace("$str$", label.toLowerCase() + " " + args[0].toLowerCase() + " <SubServer>"));
+                                sender.sendMessage(plugin.api.getLang("SubServers", "Command.Generic.Invalid-Permission").replace("$str$", "subservers.subserver.stop." + args[1].toLowerCase()));
                             }
                         } else {
-                            sender.sendMessage(plugin.api.getLang("SubServers", "Command.Generic.Invalid-Permission").replace("$str$", "subservers.subserver.stop." + args[1].toLowerCase()));
+                            sender.sendMessage(plugin.api.getLang("SubServers", "Command.Generic.Usage").replace("$str$", label.toLowerCase() + " " + args[0].toLowerCase() + " <SubServer>"));
                         }
                     } else if (args[0].equalsIgnoreCase("kill") || args[0].equalsIgnoreCase("terminate")) {
-                        if (sender.hasPermission("subservers.subserver.terminate.*") || sender.hasPermission("subservers.subserver.terminate." + args[1].toLowerCase())) {
-                            if (args.length > 1) {
+                        if (args.length > 1) {
+                            if (sender.hasPermission("subservers.subserver.terminate.*") || sender.hasPermission("subservers.subserver.terminate." + args[1].toLowerCase())) {
                                 plugin.subdata.sendPacket(new PacketStopServer((sender instanceof Player)?((Player) sender).getUniqueId():null, args[1], true, data -> {
                                     switch (data.getInt("r")) {
                                         case 3:
@@ -569,14 +568,14 @@ public final class SubCommand implements CommandExecutor {
                                     }
                                 }));
                             } else {
-                                sender.sendMessage(plugin.api.getLang("SubServers", "Command.Generic.Usage").replace("$str$", label.toLowerCase() + " " + args[0].toLowerCase() + " <SubServer>"));
+                                sender.sendMessage(plugin.api.getLang("SubServers", "Command.Generic.Invalid-Permission").replace("$str$", "subservers.subserver.terminate." + args[1].toLowerCase()));
                             }
                         } else {
-                            sender.sendMessage(plugin.api.getLang("SubServers", "Command.Generic.Invalid-Permission").replace("$str$", "subservers.subserver.terminate." + args[1].toLowerCase()));
+                            sender.sendMessage(plugin.api.getLang("SubServers", "Command.Generic.Usage").replace("$str$", label.toLowerCase() + " " + args[0].toLowerCase() + " <SubServer>"));
                         }
                     } else if (args[0].equalsIgnoreCase("cmd") || args[0].equalsIgnoreCase("command")) {
-                        if (sender.hasPermission("subservers.subserver.command.*") || sender.hasPermission("subservers.subserver.command." + args[1].toLowerCase())) {
-                            if (args.length > 2) {
+                        if (args.length > 2) {
+                            if (sender.hasPermission("subservers.subserver.command.*") || sender.hasPermission("subservers.subserver.command." + args[1].toLowerCase())) {
                                 int i = 2;
                                 String str = args[2];
                                 if (args.length > 3) {
@@ -608,14 +607,14 @@ public final class SubCommand implements CommandExecutor {
                                     }
                                 }));
                             } else {
-                                sender.sendMessage(plugin.api.getLang("SubServers", "Command.Generic.Usage").replace("$str$", label.toLowerCase() + " " + args[0].toLowerCase() + " <SubServer> <Command> [Args...]"));
+                                sender.sendMessage(plugin.api.getLang("SubServers", "Command.Generic.Invalid-Permission").replace("$str$", "subservers.subserver.command." + args[1].toLowerCase()));
                             }
                         } else {
-                            sender.sendMessage(plugin.api.getLang("SubServers", "Command.Generic.Invalid-Permission").replace("$str$", "subservers.subserver.command." + args[1].toLowerCase()));
+                            sender.sendMessage(plugin.api.getLang("SubServers", "Command.Generic.Usage").replace("$str$", label.toLowerCase() + " " + args[0].toLowerCase() + " <SubServer> <Command> [Args...]"));
                         }
                     } else if (args[0].equalsIgnoreCase("create")) {
-                        if (sender.hasPermission("subservers.host.create.*") || sender.hasPermission("subservers.host.create." + args[2].toLowerCase())) {
-                            if (args.length > 5) {
+                        if (args.length > 5) {
+                            if (sender.hasPermission("subservers.host.create.*") || sender.hasPermission("subservers.host.create." + args[2].toLowerCase())) {
                                 if (Util.isException(() -> Integer.parseInt(args[5]))) {
                                     sender.sendMessage(plugin.api.getLang("SubServers", "Command.Creator.Invalid-Port"));
                                 } else {
@@ -648,63 +647,65 @@ public final class SubCommand implements CommandExecutor {
                                     }));
                                 }
                             } else {
-                                sender.sendMessage(plugin.api.getLang("SubServers", "Command.Generic.Usage").replace("$str$", label.toLowerCase() + " " + args[0].toLowerCase() + " <Name> <Host> <Type> <Version> <Port> [RAM]"));
+                                sender.sendMessage(plugin.api.getLang("SubServers", "Command.Generic.Invalid-Permission").replace("$str$", "subservers.host.create." + args[2].toLowerCase()));
                             }
                         } else {
-                            sender.sendMessage(plugin.api.getLang("SubServers", "Command.Generic.Invalid-Permission").replace("$str$", "subservers.host.create." + args[2].toLowerCase()));
+                            sender.sendMessage(plugin.api.getLang("SubServers", "Command.Generic.Usage").replace("$str$", label.toLowerCase() + " " + args[0].toLowerCase() + " <Name> <Host> <Template> <Version> <Port>"));
                         }
                     } else if ((args[0].equalsIgnoreCase("view") || args[0].equalsIgnoreCase("open")) && sender instanceof Player) {
-                        if (sender.hasPermission("subservers.interface")) {
-                            try {
-                                plugin.gui.getRenderer((Player) sender).clearHistory();
-                                switch (args[1].toLowerCase()) {
-                                    case "host":
-                                        if (args.length > 2) plugin.gui.getRenderer((Player) sender).hostMenu(Integer.parseInt(args[2]));
-                                        else plugin.gui.getRenderer((Player) sender).hostMenu(1);
-                                        break;
-                                    case "host/":
-                                        plugin.gui.getRenderer((Player) sender).hostAdmin(args[2]);
-                                        break;
-                                    case "host/creator":
-                                        if (sender.hasPermission("subservers.host.create.*") || sender.hasPermission("subservers.host.create." + args[2].toLowerCase())) plugin.gui.getRenderer((Player) sender).hostCreator(new UIRenderer.CreatorOptions(args[2]));
-                                        else throw new IllegalStateException("Player does not meet the requirements to render this page");
-                                        break;
-                                    case "host/plugin":
-                                        if (args.length > 3) plugin.gui.getRenderer((Player) sender).hostPlugin(Integer.parseInt(args[3]), args[2]);
-                                        else plugin.gui.getRenderer((Player) sender).hostPlugin(1, args[2]);
-                                        break;
-                                    case "group":
-                                        if (args.length > 2) plugin.gui.getRenderer((Player) sender).groupMenu(Integer.parseInt(args[2]));
-                                        else plugin.gui.getRenderer((Player) sender).groupMenu(1);
-                                        break;
-                                    case "server":
-                                        if (args.length > 4) plugin.gui.getRenderer((Player) sender).serverMenu(Integer.parseInt(args[2]), args[4], null);
-                                        else if (args.length > 3) plugin.gui.getRenderer((Player) sender).serverMenu(Integer.parseInt(args[2]), null, args[3]);
-                                        else if (args.length > 2) plugin.gui.getRenderer((Player) sender).serverMenu(Integer.parseInt(args[2]), null, null);
-                                        else plugin.gui.getRenderer((Player) sender).serverMenu(1, null, null);
-                                        break;
-                                    case "subserver/":
-                                        plugin.gui.getRenderer((Player) sender).subserverAdmin(args[2]);
-                                        break;
-                                    case "subserver/plugin":
-                                        if (args.length > 3) plugin.gui.getRenderer((Player) sender).subserverPlugin(Integer.parseInt(args[3]), args[2]);
-                                        else plugin.gui.getRenderer((Player) sender).subserverPlugin(1, args[2]);
-                                        break;
+                        if (plugin.gui != null) {
+                            if (sender.hasPermission("subservers.interface")) {
+                                try {
+                                    plugin.gui.getRenderer((Player) sender).clearHistory();
+                                    switch (args[1].toLowerCase()) {
+                                        case "host":
+                                            if (args.length > 2) plugin.gui.getRenderer((Player) sender).hostMenu(Integer.parseInt(args[2]));
+                                            else plugin.gui.getRenderer((Player) sender).hostMenu(1);
+                                            break;
+                                        case "host/":
+                                            plugin.gui.getRenderer((Player) sender).hostAdmin(args[2]);
+                                            break;
+                                        case "host/creator":
+                                            if (sender.hasPermission("subservers.host.create.*") || sender.hasPermission("subservers.host.create." + args[2].toLowerCase())) plugin.gui.getRenderer((Player) sender).hostCreator(new UIRenderer.CreatorOptions(args[2]));
+                                            else throw new IllegalStateException("Player does not meet the requirements to render this page");
+                                            break;
+                                        case "host/plugin":
+                                            if (args.length > 3) plugin.gui.getRenderer((Player) sender).hostPlugin(Integer.parseInt(args[3]), args[2]);
+                                            else plugin.gui.getRenderer((Player) sender).hostPlugin(1, args[2]);
+                                            break;
+                                        case "group":
+                                            if (args.length > 2) plugin.gui.getRenderer((Player) sender).groupMenu(Integer.parseInt(args[2]));
+                                            else plugin.gui.getRenderer((Player) sender).groupMenu(1);
+                                            break;
+                                        case "server":
+                                            if (args.length > 4) plugin.gui.getRenderer((Player) sender).serverMenu(Integer.parseInt(args[2]), args[4], null);
+                                            else if (args.length > 3) plugin.gui.getRenderer((Player) sender).serverMenu(Integer.parseInt(args[2]), null, args[3]);
+                                            else if (args.length > 2) plugin.gui.getRenderer((Player) sender).serverMenu(Integer.parseInt(args[2]), null, null);
+                                            else plugin.gui.getRenderer((Player) sender).serverMenu(1, null, null);
+                                            break;
+                                        case "subserver/":
+                                            plugin.gui.getRenderer((Player) sender).subserverAdmin(args[2]);
+                                            break;
+                                        case "subserver/plugin":
+                                            if (args.length > 3) plugin.gui.getRenderer((Player) sender).subserverPlugin(Integer.parseInt(args[3]), args[2]);
+                                            else plugin.gui.getRenderer((Player) sender).subserverPlugin(1, args[2]);
+                                            break;
+                                    }
+                                } catch (Throwable e) {
+                                    List<String> list = new LinkedList<String>();
+                                    list.addAll(Arrays.asList(args));
+                                    list.remove(0);
+                                    new InvocationTargetException(e, "Could not render page with arguments: " + list.toString()).printStackTrace();
                                 }
-                            } catch (Throwable e) {
-                                List<String> list = new LinkedList<String>();
-                                list.addAll(Arrays.asList(args));
-                                list.remove(0);
-                                new InvocationTargetException(e, "Could not render page with arguments: " + list.toString()).printStackTrace();
+                            } else {
+                                sender.sendMessage(plugin.api.getLang("SubServers", "Command.Generic.Invalid-Permission").replace("$str$", "subservers.interface"));
                             }
-                        } else {
-                            sender.sendMessage(plugin.api.getLang("SubServers", "Command.Generic.Invalid-Permission").replace("$str$", "subservers.interface"));
                         }
                     } else {
                         sender.sendMessage(plugin.api.getLang("SubServers", "Command.Generic.Invalid-Subcommand").replace("$str$", args[0]));
                     }
                 } else {
-                    if (sender.hasPermission("subservers.interface") && sender instanceof Player) {
+                    if (sender.hasPermission("subservers.interface") && sender instanceof Player && plugin.gui != null) {
                         plugin.gui.getRenderer((Player) sender).newUI();
                     } else {
                         sender.sendMessage(printHelp(label));

@@ -95,6 +95,23 @@ public class InternalSubServer extends SubServerContainer {
                 System.out.println("Couldn't auto-update SubServers.Client.jar for " + name);
                 e.printStackTrace();
             }
+        } else if (new UniversalFile(this.directory, "mods:SubServers.Client.jar").exists()) {
+            try {
+                JarInputStream updated = new JarInputStream(SubPlugin.class.getResourceAsStream("/net/ME1312/SubServers/Bungee/Library/Files/client.jar"));
+                JarFile existing = new JarFile(new UniversalFile(this.directory, "mods:SubServers.Client.jar"));
+
+                if (existing.getManifest().getMainAttributes().getValue("Implementation-Title") != null && existing.getManifest().getMainAttributes().getValue("Implementation-Title").startsWith("SubServers.Client") && existing.getManifest().getMainAttributes().getValue("Specification-Title") != null) {
+                    if (new Version(existing.getManifest().getMainAttributes().getValue("Specification-Title")).compareTo(new Version(updated.getManifest().getMainAttributes().getValue("Specification-Title"))) < 0) {
+                        new UniversalFile(this.directory, "mods:SubServers.Client.jar").delete();
+                        Util.copyFromJar(SubPlugin.class.getClassLoader(), "net/ME1312/SubServers/Bungee/Library/Files/client.jar", new UniversalFile(this.directory, "mods:SubServers.Client.jar").getPath());
+                    }
+                }
+                existing.close();
+                updated.close();
+            } catch (Throwable e) {
+                System.out.println("Couldn't auto-update SubServers.Client.jar for " + name);
+                e.printStackTrace();
+            }
         }
         this.temporary = temporary && start();
     }

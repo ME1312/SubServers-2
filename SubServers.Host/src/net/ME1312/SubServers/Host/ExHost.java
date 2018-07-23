@@ -48,8 +48,8 @@ public final class ExHost {
     public HashMap<String, SubServer> servers = new HashMap<String, SubServer>();
     public SubCreator creator;
 
-    public Logger log;
     public final UniversalFile dir = new UniversalFile(new File(System.getProperty("user.dir")));
+    public Logger log;
     public YAMLConfig config;
     public YAMLSection host = null;
     public SubDataClient subdata = null;

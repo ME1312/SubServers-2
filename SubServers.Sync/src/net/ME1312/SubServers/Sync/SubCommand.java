@@ -114,7 +114,7 @@ public final class SubCommand extends CommandX {
                             if (data.getSection("groups").getKeys().size() > 0) {
                                 sender.sendMessage("SubServers > Group/Server List:");
                                 for (String group : data.getSection("groups").getKeys()) {
-                                    String message = "";
+                                    String message = "  ";
                                     message += ChatColor.GOLD + group + ChatColor.RESET + ": ";
                                     for (String server : data.getSection("groups").getSection(group).getKeys()) {
                                         if (i != 0) message += div;
@@ -142,7 +142,7 @@ public final class SubCommand extends CommandX {
                             }
                             sender.sendMessage("SubServers > Host/SubServer List:");
                             for (String host : data.getSection("hosts").getKeys()) {
-                                String message = "";
+                                String message = "  ";
                                 if (data.getSection("hosts").getSection(host).getBoolean("enabled")) {
                                     message += ChatColor.AQUA;
                                 } else {
@@ -170,7 +170,7 @@ public final class SubCommand extends CommandX {
                             }
                             if (!sent) sender.sendMessage(ChatColor.RESET + "(none)");
                             sender.sendMessage("SubServers > Server List:");
-                            String message = "";
+                            String message = "  ";
                             for (String server : data.getSection("servers").getKeys()) {
                                 if (i != 0) message += div;
                                 message += ChatColor.WHITE + data.getSection("servers").getSection(server).getRawString("display") + " (" + data.getSection("servers").getSection(server).getRawString("address") + ((server.equals(data.getSection("servers").getSection(server).getRawString("display"))) ? "" : ChatColor.stripColor(div) + server) + ")";
@@ -373,7 +373,7 @@ public final class SubCommand extends CommandX {
                                 }));
                             }
                         } else {
-                            sender.sendMessage("Usage: " + label + " <Name> <Host> <Type> <Version> <Port> [RAM]");
+                            sender.sendMessage("Usage: " + label + " <Name> <Host> <Template> <Version> <Port>");
                         }
                     } else {
                         sender.sendMessage("SubServers > Unknown sub-command: " + args[0]);
