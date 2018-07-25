@@ -428,7 +428,7 @@ public final class SubCommand extends CommandX {
                 "   Command Server: /sub cmd <SubServer> <Command> [Args...]",
                 "   Sudo Server: /sub sudo <SubServer>",
                 "   Create Server: /sub create <Name> <Host> <Template> <Version> <Port>",
-                "   Remove Server: /sub delete <SubServer>",
+                "   Delete Server: /sub delete <SubServer>",
                 "",
                 "   To see BungeeCord supplied commands, please visit:",
                 "   https://www.spigotmc.org/wiki/bungeecord-commands/"
