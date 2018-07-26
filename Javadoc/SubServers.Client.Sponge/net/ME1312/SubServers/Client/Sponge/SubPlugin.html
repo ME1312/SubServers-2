@@ -141,7 +141,7 @@ extends java.lang.Object</pre>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Client/Sponge/SubPlugin.html#dir">dir</a></span></code>&nbsp;</td>
 </tr>
 <tr class="rowColor">
-<td class="colFirst"><code>Game</code></td>
+<td class="colFirst"><code>org.spongepowered.api.Game</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Client/Sponge/SubPlugin.html#game">game</a></span></code>&nbsp;</td>
 </tr>
 <tr class="altColor">
@@ -149,11 +149,11 @@ extends java.lang.Object</pre>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Client/Sponge/SubPlugin.html#gui">gui</a></span></code>&nbsp;</td>
 </tr>
 <tr class="rowColor">
-<td class="colFirst"><code>Logger</code></td>
+<td class="colFirst"><code>org.slf4j.Logger</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Client/Sponge/SubPlugin.html#logger">logger</a></span></code>&nbsp;</td>
 </tr>
 <tr class="altColor">
-<td class="colFirst"><code>PluginContainer</code></td>
+<td class="colFirst"><code>org.spongepowered.api.plugin.PluginContainer</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Client/Sponge/SubPlugin.html#plugin">plugin</a></span></code>&nbsp;</td>
 </tr>
 <tr class="rowColor">
@@ -198,13 +198,13 @@ extends java.lang.Object</pre>
 </tr>
 <tr id="i0" class="altColor">
 <td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Client/Sponge/SubPlugin.html#disable-GameStoppingEvent-">disable</a></span>(GameStoppingEvent&nbsp;event)</code>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Client/Sponge/SubPlugin.html#disable-org.spongepowered.api.event.game.state.GameStoppingEvent-">disable</a></span>(org.spongepowered.api.event.game.state.GameStoppingEvent&nbsp;event)</code>
 <div class="block">Disable Plugin</div>
 </td>
 </tr>
 <tr id="i1" class="rowColor">
 <td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Client/Sponge/SubPlugin.html#enable-GameInitializationEvent-">enable</a></span>(GameInitializationEvent&nbsp;event)</code>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Client/Sponge/SubPlugin.html#enable-org.spongepowered.api.event.game.state.GameInitializationEvent-">enable</a></span>(org.spongepowered.api.event.game.state.GameInitializationEvent&nbsp;event)</code>
 <div class="block">Enable Plugin</div>
 </td>
 </tr>
@@ -214,7 +214,7 @@ extends java.lang.Object</pre>
 </tr>
 <tr id="i3" class="rowColor">
 <td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Client/Sponge/SubPlugin.html#setup-GamePreInitializationEvent-">setup</a></span>(GamePreInitializationEvent&nbsp;event)</code>&nbsp;</td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Client/Sponge/SubPlugin.html#setup-org.spongepowered.api.event.game.state.GamePreInitializationEvent-">setup</a></span>(org.spongepowered.api.event.game.state.GamePreInitializationEvent&nbsp;event)</code>&nbsp;</td>
 </tr>
 </table>
 <ul class="blockList">
@@ -262,7 +262,8 @@ extends java.lang.Object</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>dir</h4>
-<pre>public&nbsp;java.io.File dir</pre>
+<pre>@Inject
+public&nbsp;java.io.File dir</pre>
 </li>
 </ul>
 <a name="logger">
@@ -271,7 +272,7 @@ extends java.lang.Object</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>logger</h4>
-<pre>public&nbsp;Logger logger</pre>
+<pre>public&nbsp;org.slf4j.Logger logger</pre>
 </li>
 </ul>
 <a name="gui">
@@ -307,7 +308,8 @@ extends java.lang.Object</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>plugin</h4>
-<pre>public&nbsp;PluginContainer plugin</pre>
+<pre>@Inject
+public&nbsp;org.spongepowered.api.plugin.PluginContainer plugin</pre>
 </li>
 </ul>
 <a name="game">
@@ -316,7 +318,8 @@ extends java.lang.Object</pre>
 <ul class="blockListLast">
 <li class="blockList">
 <h4>game</h4>
-<pre>public&nbsp;Game game</pre>
+<pre>@Inject
+public&nbsp;org.spongepowered.api.Game game</pre>
 </li>
 </ul>
 </li>
@@ -344,22 +347,22 @@ extends java.lang.Object</pre>
 <!--   -->
 </a>
 <h3>Method Detail</h3>
-<a name="setup-GamePreInitializationEvent-">
+<a name="setup-org.spongepowered.api.event.game.state.GamePreInitializationEvent-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>setup</h4>
-<pre>public&nbsp;void&nbsp;setup(GamePreInitializationEvent&nbsp;event)</pre>
+<pre>public&nbsp;void&nbsp;setup(org.spongepowered.api.event.game.state.GamePreInitializationEvent&nbsp;event)</pre>
 </li>
 </ul>
-<a name="enable-GameInitializationEvent-">
+<a name="enable-org.spongepowered.api.event.game.state.GameInitializationEvent-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>enable</h4>
-<pre>public&nbsp;void&nbsp;enable(GameInitializationEvent&nbsp;event)</pre>
+<pre>public&nbsp;void&nbsp;enable(org.spongepowered.api.event.game.state.GameInitializationEvent&nbsp;event)</pre>
 <div class="block">Enable Plugin</div>
 </li>
 </ul>
@@ -377,13 +380,13 @@ extends java.lang.Object</pre>
 </dl>
 </li>
 </ul>
-<a name="disable-GameStoppingEvent-">
+<a name="disable-org.spongepowered.api.event.game.state.GameStoppingEvent-">
 <!--   -->
 </a>
 <ul class="blockListLast">
 <li class="blockList">
 <h4>disable</h4>
-<pre>public&nbsp;void&nbsp;disable(GameStoppingEvent&nbsp;event)</pre>
+<pre>public&nbsp;void&nbsp;disable(org.spongepowered.api.event.game.state.GameStoppingEvent&nbsp;event)</pre>
 <div class="block">Disable Plugin</div>
 </li>
 </ul>

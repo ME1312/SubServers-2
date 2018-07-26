@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":10,"i1":10,"i2":10};
+var methods = {"i0":10,"i1":10};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -105,10 +105,15 @@ var activeTableTab = "activeTableTab";
 <div class="description">
 <ul class="blockList">
 <li class="blockList">
+<dl>
+<dt>All Implemented Interfaces:</dt>
+<dd>org.spongepowered.api.command.spec.CommandExecutor</dd>
+</dl>
 <hr>
 <br>
 <pre>public final class <span class="typeNameLabel">SubCommand</span>
-extends java.lang.Object</pre>
+extends java.lang.Object
+implements org.spongepowered.api.command.spec.CommandExecutor</pre>
 </li>
 </ul>
 </div>
@@ -200,17 +205,15 @@ extends java.lang.Object</pre>
 <th class="colLast" scope="col">Method and Description</th>
 </tr>
 <tr id="i0" class="altColor">
-<td class="colFirst"><code>boolean</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Client/Sponge/SubCommand.html#canRun-CommandSource-">canRun</a></span>(CommandSource&nbsp;sender)</code>&nbsp;</td>
+<td class="colFirst"><code>org.spongepowered.api.command.CommandResult</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Client/Sponge/SubCommand.html#execute-org.spongepowered.api.command.CommandSource-org.spongepowered.api.command.args.CommandContext-">execute</a></span>(org.spongepowered.api.command.CommandSource&nbsp;sender,
+       org.spongepowered.api.command.args.CommandContext&nbsp;args)</code>&nbsp;</td>
 </tr>
 <tr id="i1" class="rowColor">
-<td class="colFirst"><code>CommandResult</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Client/Sponge/SubCommand.html#execute-CommandSource-CommandContext-">execute</a></span>(CommandSource&nbsp;sender,
-       CommandContext&nbsp;args)</code>&nbsp;</td>
-</tr>
-<tr id="i2" class="altColor">
-<td class="colFirst"><code>CommandSpec</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Client/Sponge/SubCommand.html#spec--">spec</a></span>()</code>&nbsp;</td>
+<td class="colFirst"><code>org.spongepowered.api.command.spec.CommandSpec</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/ME1312/SubServers/Client/Sponge/SubCommand.html#spec--">spec</a></span>()</code>
+<div class="block">Generate CommandSpec for this command</div>
+</td>
 </tr>
 </table>
 <ul class="blockList">
@@ -257,30 +260,28 @@ extends java.lang.Object</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>spec</h4>
-<pre>public&nbsp;CommandSpec&nbsp;spec()</pre>
+<pre>public&nbsp;org.spongepowered.api.command.spec.CommandSpec&nbsp;spec()</pre>
+<div class="block">Generate CommandSpec for this command</div>
+<dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>CommandSpec</dd>
+</dl>
 </li>
 </ul>
-<a name="canRun-CommandSource-">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>canRun</h4>
-<pre>public&nbsp;boolean&nbsp;canRun(CommandSource&nbsp;sender)</pre>
-</li>
-</ul>
-<a name="execute-CommandSource-CommandContext-">
+<a name="execute-org.spongepowered.api.command.CommandSource-org.spongepowered.api.command.args.CommandContext-">
 <!--   -->
 </a>
 <ul class="blockListLast">
 <li class="blockList">
 <h4>execute</h4>
-<pre>public&nbsp;CommandResult&nbsp;execute(CommandSource&nbsp;sender,
-                             CommandContext&nbsp;args)
-                      throws CommandException</pre>
+<pre>public&nbsp;org.spongepowered.api.command.CommandResult&nbsp;execute(org.spongepowered.api.command.CommandSource&nbsp;sender,
+                                                           org.spongepowered.api.command.args.CommandContext&nbsp;args)
+                                                    throws org.spongepowered.api.command.CommandException</pre>
 <dl>
+<dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
+<dd><code>execute</code>&nbsp;in interface&nbsp;<code>org.spongepowered.api.command.spec.CommandExecutor</code></dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
-<dd><code>CommandException</code></dd>
+<dd><code>org.spongepowered.api.command.CommandException</code></dd>
 </dl>
 </li>
 </ul>

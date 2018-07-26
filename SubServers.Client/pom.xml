@@ -4,10 +4,11 @@
 
     <groupId>net.ME1312.SubServers</groupId>
     <artifactId>SubServers.Client</artifactId>
-    <version>-SNAPSHOT</version>
+    <version>-PLACEHOLDER</version>
     <packaging>pom</packaging>
 
     <modules>
+        <module>Combo</module>
         <module>Bukkit</module>
         <module>Sponge</module>
     </modules>

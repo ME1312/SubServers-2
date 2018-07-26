@@ -4,7 +4,7 @@
 
     <groupId>net.ME1312.SubServers</groupId>
     <artifactId>SubServers</artifactId>
-    <version>-SNAPSHOT</version>
+    <version>-PLACEHOLDER</version>
     <packaging>pom</packaging>
 
     <modules>

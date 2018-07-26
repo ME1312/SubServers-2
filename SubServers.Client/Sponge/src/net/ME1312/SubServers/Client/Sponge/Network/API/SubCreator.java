@@ -99,6 +99,7 @@ public class SubCreator {
     public enum ServerType {
         SPIGOT,
         VANILLA,
+        FORGE,
         SPONGE,
         CUSTOM;
 

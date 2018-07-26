@@ -107,13 +107,13 @@ var activeTableTab = "activeTableTab";
 <li class="blockList">
 <dl>
 <dt>All Implemented Interfaces:</dt>
-<dd><a href="../../../../../../net/ME1312/SubServers/Client/Bukkit/Graphic/UIHandler.html" title="interface in net.ME1312.SubServers.Client.Bukkit.Graphic">UIHandler</a></dd>
+<dd><a href="../../../../../../net/ME1312/SubServers/Client/Bukkit/Graphic/UIHandler.html" title="interface in net.ME1312.SubServers.Client.Bukkit.Graphic">UIHandler</a>, org.bukkit.event.Listener</dd>
 </dl>
 <hr>
 <br>
 <pre>public class <span class="typeNameLabel">InternalUIHandler</span>
 extends java.lang.Object
-implements <a href="../../../../../../net/ME1312/SubServers/Client/Bukkit/Graphic/UIHandler.html" title="interface in net.ME1312.SubServers.Client.Bukkit.Graphic">UIHandler</a></pre>
+implements <a href="../../../../../../net/ME1312/SubServers/Client/Bukkit/Graphic/UIHandler.html" title="interface in net.ME1312.SubServers.Client.Bukkit.Graphic">UIHandler</a>, org.bukkit.event.Listener</pre>
 <div class="block">Internal GUI Listener</div>
 </li>
 </ul>
@@ -154,17 +154,17 @@ implements <a href="../../../../../../net/ME1312/SubServers/Client/Bukkit/Graphi
 </tr>
 <tr id="i0" class="altColor">
 <td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Client/Bukkit/Graphic/InternalUIHandler.html#clean-PlayerQuitEvent-">clean</a></span>(PlayerQuitEvent&nbsp;event)</code>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Client/Bukkit/Graphic/InternalUIHandler.html#clean-org.bukkit.event.player.PlayerQuitEvent-">clean</a></span>(org.bukkit.event.player.PlayerQuitEvent&nbsp;event)</code>
 <div class="block">Clean Renderers</div>
 </td>
 </tr>
 <tr id="i1" class="rowColor">
 <td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Client/Bukkit/Graphic/InternalUIHandler.html#click-InventoryClickEvent-">click</a></span>(InventoryClickEvent&nbsp;event)</code>&nbsp;</td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Client/Bukkit/Graphic/InternalUIHandler.html#click-org.bukkit.event.inventory.InventoryClickEvent-">click</a></span>(org.bukkit.event.inventory.InventoryClickEvent&nbsp;event)</code>&nbsp;</td>
 </tr>
 <tr id="i2" class="altColor">
 <td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Client/Bukkit/Graphic/InternalUIHandler.html#close-InventoryCloseEvent-">close</a></span>(InventoryCloseEvent&nbsp;event)</code>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Client/Bukkit/Graphic/InternalUIHandler.html#close-org.bukkit.event.inventory.InventoryCloseEvent-">close</a></span>(org.bukkit.event.inventory.InventoryCloseEvent&nbsp;event)</code>
 <div class="block">GUI Close Listener</div>
 </td>
 </tr>
@@ -176,7 +176,7 @@ implements <a href="../../../../../../net/ME1312/SubServers/Client/Bukkit/Graphi
 </tr>
 <tr id="i4" class="altColor">
 <td class="colFirst"><code><a href="../../../../../../net/ME1312/SubServers/Client/Bukkit/Graphic/InternalUIRenderer.html" title="class in net.ME1312.SubServers.Client.Bukkit.Graphic">InternalUIRenderer</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Client/Bukkit/Graphic/InternalUIHandler.html#getRenderer-Player-">getRenderer</a></span>(Player&nbsp;player)</code>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Client/Bukkit/Graphic/InternalUIHandler.html#getRenderer-org.bukkit.entity.Player-">getRenderer</a></span>(org.bukkit.entity.Player&nbsp;player)</code>
 <div class="block">Grabs the current Renderer for the player</div>
 </td>
 </tr>
@@ -188,7 +188,7 @@ implements <a href="../../../../../../net/ME1312/SubServers/Client/Bukkit/Graphi
 </tr>
 <tr id="i6" class="altColor">
 <td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Client/Bukkit/Graphic/InternalUIHandler.html#input-PlayerCommandPreprocessEvent-">input</a></span>(PlayerCommandPreprocessEvent&nbsp;event)</code>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../net/ME1312/SubServers/Client/Bukkit/Graphic/InternalUIHandler.html#input-org.bukkit.event.player.PlayerCommandPreprocessEvent-">input</a></span>(org.bukkit.event.player.PlayerCommandPreprocessEvent&nbsp;event)</code>
 <div class="block">Input Listener</div>
 </td>
 </tr>
@@ -236,18 +236,18 @@ implements <a href="../../../../../../net/ME1312/SubServers/Client/Bukkit/Graphi
 <!--   -->
 </a>
 <h3>Method Detail</h3>
-<a name="getRenderer-Player-">
+<a name="getRenderer-org.bukkit.entity.Player-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>getRenderer</h4>
-<pre>public&nbsp;<a href="../../../../../../net/ME1312/SubServers/Client/Bukkit/Graphic/InternalUIRenderer.html" title="class in net.ME1312.SubServers.Client.Bukkit.Graphic">InternalUIRenderer</a>&nbsp;getRenderer(Player&nbsp;player)</pre>
-<div class="block"><span class="descfrmTypeLabel">Description copied from interface:&nbsp;<code><a href="../../../../../../net/ME1312/SubServers/Client/Bukkit/Graphic/UIHandler.html#getRenderer-Player-">UIHandler</a></code></span></div>
+<pre>public&nbsp;<a href="../../../../../../net/ME1312/SubServers/Client/Bukkit/Graphic/InternalUIRenderer.html" title="class in net.ME1312.SubServers.Client.Bukkit.Graphic">InternalUIRenderer</a>&nbsp;getRenderer(org.bukkit.entity.Player&nbsp;player)</pre>
+<div class="block"><span class="descfrmTypeLabel">Description copied from interface:&nbsp;<code><a href="../../../../../../net/ME1312/SubServers/Client/Bukkit/Graphic/UIHandler.html#getRenderer-org.bukkit.entity.Player-">UIHandler</a></code></span></div>
 <div class="block">Grabs the current Renderer for the player</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="../../../../../../net/ME1312/SubServers/Client/Bukkit/Graphic/UIHandler.html#getRenderer-Player-">getRenderer</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../../net/ME1312/SubServers/Client/Bukkit/Graphic/UIHandler.html" title="interface in net.ME1312.SubServers.Client.Bukkit.Graphic">UIHandler</a></code></dd>
+<dd><code><a href="../../../../../../net/ME1312/SubServers/Client/Bukkit/Graphic/UIHandler.html#getRenderer-org.bukkit.entity.Player-">getRenderer</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../../net/ME1312/SubServers/Client/Bukkit/Graphic/UIHandler.html" title="interface in net.ME1312.SubServers.Client.Bukkit.Graphic">UIHandler</a></code></dd>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>player</code> - Player</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
@@ -270,13 +270,13 @@ implements <a href="../../../../../../net/ME1312/SubServers/Client/Bukkit/Graphi
 </dl>
 </li>
 </ul>
-<a name="click-InventoryClickEvent-">
+<a name="click-org.bukkit.event.inventory.InventoryClickEvent-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>click</h4>
-<pre>public&nbsp;void&nbsp;click(InventoryClickEvent&nbsp;event)</pre>
+<pre>public&nbsp;void&nbsp;click(org.bukkit.event.inventory.InventoryClickEvent&nbsp;event)</pre>
 </li>
 </ul>
 <a name="input-org.bukkit.event.player.PlayerChatEvent-">
@@ -293,13 +293,13 @@ implements <a href="../../../../../../net/ME1312/SubServers/Client/Bukkit/Graphi
 </dl>
 </li>
 </ul>
-<a name="input-PlayerCommandPreprocessEvent-">
+<a name="input-org.bukkit.event.player.PlayerCommandPreprocessEvent-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>input</h4>
-<pre>public&nbsp;void&nbsp;input(PlayerCommandPreprocessEvent&nbsp;event)</pre>
+<pre>public&nbsp;void&nbsp;input(org.bukkit.event.player.PlayerCommandPreprocessEvent&nbsp;event)</pre>
 <div class="block">Input Listener</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
@@ -307,13 +307,13 @@ implements <a href="../../../../../../net/ME1312/SubServers/Client/Bukkit/Graphi
 </dl>
 </li>
 </ul>
-<a name="close-InventoryCloseEvent-">
+<a name="close-org.bukkit.event.inventory.InventoryCloseEvent-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>close</h4>
-<pre>public&nbsp;void&nbsp;close(InventoryCloseEvent&nbsp;event)</pre>
+<pre>public&nbsp;void&nbsp;close(org.bukkit.event.inventory.InventoryCloseEvent&nbsp;event)</pre>
 <div class="block">GUI Close Listener</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
@@ -321,13 +321,13 @@ implements <a href="../../../../../../net/ME1312/SubServers/Client/Bukkit/Graphi
 </dl>
 </li>
 </ul>
-<a name="clean-PlayerQuitEvent-">
+<a name="clean-org.bukkit.event.player.PlayerQuitEvent-">
 <!--   -->
 </a>
 <ul class="blockListLast">
 <li class="blockList">
 <h4>clean</h4>
-<pre>public&nbsp;void&nbsp;clean(PlayerQuitEvent&nbsp;event)</pre>
+<pre>public&nbsp;void&nbsp;clean(org.bukkit.event.player.PlayerQuitEvent&nbsp;event)</pre>
 <div class="block">Clean Renderers</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>

@@ -169,6 +169,7 @@ public class SubCreator {
     public enum ServerType {
         SPIGOT,
         VANILLA,
+        FORGE,
         SPONGE,
         CUSTOM;
 
@@ -212,11 +213,10 @@ public class SubCreator {
             thread.name().logger.info.println("Loading Template: " + template.getDisplayName());
             host.subdata.sendPacket(new PacketOutExLogMessage(address, "Loading Template: " + template.getDisplayName()));
             Util.copyDirectory(template.getDirectory(), dir);
-            if (template.getType() == ServerType.SPONGE) {
+            if (template.getType() == ServerType.FORGE || template.getType() == ServerType.SPONGE) {
                 thread.name().logger.info.println("Searching Versions...");
                 host.subdata.sendPacket(new PacketOutExLogMessage(address, "Searching Versions..."));
-                Document spongexml = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new InputSource(new StringReader(Util.readAll(new BufferedReader(new InputStreamReader(new URL("http://files.minecraftforge.net/maven/org/spongepowered/spongeforge/maven-metadata.xml").openStream(), Charset.forName("UTF-8")))))));
-                Document forgexml = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new InputSource(new StringReader(Util.readAll(new BufferedReader(new InputStreamReader(new URL("http://files.minecraftforge.net/maven/net/minecraftforge/forge/maven-metadata.xml").openStream(), Charset.forName("UTF-8")))))));
+                Document spongexml = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new InputSource(new StringReader(Util.readAll(new BufferedReader(new InputStreamReader(new URL("https://repo.spongepowered.org/maven/org/spongepowered/sponge" + ((template.getType() == ServerType.FORGE)?"forge":"vanilla") + "/maven-metadata.xml").openStream(), Charset.forName("UTF-8")))))));
 
                 NodeList spnodeList = spongexml.getElementsByTagName("version");
                 Version spversion = null;
@@ -230,25 +230,29 @@ public class SubCreator {
                 }
                 if (spversion == null)
                     throw new InvalidServerException("Cannot find Sponge version for Minecraft " + version.toString());
-                thread.name().logger.info.println("Found \"spongeforge-" + spversion.toString() + '"');
-                host.subdata.sendPacket(new PacketOutExLogMessage(address, "Found \"spongeforge-" + spversion.toString() + '"'));
+                thread.name().logger.info.println("Found \"sponge" + ((template.getType() == ServerType.FORGE)?"forge":"vanilla") + "-" + spversion.toString() + '"');
+                host.subdata.sendPacket(new PacketOutExLogMessage(address, "Found \"sponge" + ((template.getType() == ServerType.FORGE)?"forge":"vanilla") + "-" + spversion.toString() + '"'));
 
-                NodeList mcfnodeList = forgexml.getElementsByTagName("version");
-                Version mcfversion = null;
-                for (int i = 0; i < mcfnodeList.getLength(); i++) {
-                    Node node = mcfnodeList.item(i);
-                    if (node.getNodeType() == Node.ELEMENT_NODE) {
-                        if (node.getTextContent().contains(spversion.toString().split("\\-")[1]) && (mcfversion == null || new Version(node.getTextContent()).compareTo(mcfversion) >= 0)) {
-                            mcfversion = new Version(node.getTextContent());
+                if (template.getType() == ServerType.FORGE) {
+                    Document forgexml = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new InputSource(new StringReader(Util.readAll(new BufferedReader(new InputStreamReader(new URL("http://files.minecraftforge.net/maven/net/minecraftforge/forge/maven-metadata.xml").openStream(), Charset.forName("UTF-8")))))));
+
+                    NodeList mcfnodeList = forgexml.getElementsByTagName("version");
+                    Version mcfversion = null;
+                    for (int i = 0; i < mcfnodeList.getLength(); i++) {
+                        Node node = mcfnodeList.item(i);
+                        if (node.getNodeType() == Node.ELEMENT_NODE) {
+                            if (node.getTextContent().contains(spversion.toString().split("\\-")[1]) && (mcfversion == null || new Version(node.getTextContent()).compareTo(mcfversion) >= 0)) {
+                                mcfversion = new Version(node.getTextContent());
+                            }
                         }
                     }
-                }
-                if (mcfversion == null)
-                    throw new InvalidServerException("Cannot find Forge version for Sponge " + spversion.toString());
-                thread.name().logger.info.println("Found \"forge-" + mcfversion.toString() + '"');
-                host.subdata.sendPacket(new PacketOutExLogMessage(address, "Found \"forge-" + mcfversion.toString() + '"'));
+                    if (mcfversion == null)
+                        throw new InvalidServerException("Cannot find Forge version for Sponge " + spversion.toString());
+                    thread.name().logger.info.println("Found \"forge-" + mcfversion.toString() + '"');
+                    host.subdata.sendPacket(new PacketOutExLogMessage(address, "Found \"forge-" + mcfversion.toString() + '"'));
 
-                version = new Version(mcfversion.toString() + " " + spversion.toString());
+                    version = new Version(mcfversion.toString() + " " + spversion.toString());
+                } else version = new Version(spversion.toString());
             }
         } catch (Exception e) {
             thread.name().logger.error.println(e);
@@ -394,7 +398,7 @@ public class SubCreator {
             if (type == ServerType.SPIGOT) {
                 if (!new UniversalFile(dir, "plugins").exists()) new UniversalFile(dir, "plugins").mkdirs();
                 Util.copyFromJar(ExHost.class.getClassLoader(), "net/ME1312/SubServers/Host/Library/Files/client.jar", new UniversalFile(dir, "plugins:SubServers.Client.jar").getPath());
-            } else if (type == ServerType.SPONGE) {
+            } else if (type == ServerType.FORGE || type == ServerType.SPONGE) {
                 if (!new UniversalFile(dir, "mods").exists()) new UniversalFile(dir, "mods").mkdirs();
                 Util.copyFromJar(ExHost.class.getClassLoader(), "net/ME1312/SubServers/Host/Library/Files/client.jar", new UniversalFile(dir, "mods:SubServers.Client.jar").getPath());
             }

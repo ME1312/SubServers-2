@@ -6,7 +6,7 @@
 
     <groupId>net.ME1312.SubServers</groupId>
     <artifactId>SubServers.Host</artifactId>
-    <version>-SNAPSHOT</version>
+    <version>-PLACEHOLDER</version>
     <packaging>jar</packaging>
 
     <dependencies>
@@ -62,6 +62,73 @@
                     <source>1.8</source>
                     <target>1.8</target>
                 </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>maven-invoker-plugin</artifactId>
+                <version>3.1.0</version>
+                <configuration>
+                    <cloneProjectsTo>${project.build.directory}/invoker-work/SubServers.Client/Combo</cloneProjectsTo>
+                    <postBuildHookScript>verify</postBuildHookScript>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <javaHome>${java.home}</javaHome>
+                            <pom>../SubServers.Client/Combo/pom.xml</pom>
+                            <goals>
+                                <goal>package</goal>
+                            </goals>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <tasks>
+                                <mkdir dir="${project.build.directory}" />
+                                <copy file="${basedir}/../LICENSE" todir="${project.build.directory}/classes" />
+                                <copy file="${project.build.directory}/invoker-work/Artifacts/SubServers.Client.jar" tofile="${project.build.directory}/classes/net/ME1312/SubServers/Host/Library/Files/client.jar" />
+                            </tasks>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>2.2-beta-5</version>
+                <configuration>
+                    <finalName>SubServers.Host</finalName>
+                    <outputDirectory>../Artifacts</outputDirectory>
+                    <archive>
+                        <manifestFile>src/META-INF/MANIFEST.MF</manifestFile>
+                    </archive>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                    <appendAssemblyId>false</appendAssemblyId>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>make-assembly</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

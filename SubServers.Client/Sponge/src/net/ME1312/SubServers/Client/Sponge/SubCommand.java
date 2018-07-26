@@ -5,6 +5,7 @@ import net.ME1312.SubServers.Client.Sponge.Library.Util;
 import net.ME1312.SubServers.Client.Sponge.Library.Version.Version;
 import net.ME1312.SubServers.Client.Sponge.Library.Version.VersionType;
 import net.ME1312.SubServers.Client.Sponge.Network.Packet.*;
+import org.spongepowered.api.Platform;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
@@ -14,6 +15,7 @@ import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
@@ -39,6 +41,12 @@ public final class SubCommand implements CommandExecutor {
     public SubCommand(SubPlugin plugin) {
         this.plugin = plugin;
     }
+
+    /**
+     * Generate CommandSpec for this command
+     *
+     * @return CommandSpec
+     */
     public CommandSpec spec() {
         SubCommand root = new SubCommand(plugin);
         return CommandSpec.builder()
@@ -98,7 +106,7 @@ public final class SubCommand implements CommandExecutor {
                 .build();
     }
 
-    public boolean canRun(CommandSource sender) {
+    private boolean canRun(CommandSource sender) {
         if (plugin.subdata == null) {
             new IllegalStateException("SubData is not connected").printStackTrace();
             return false;
@@ -146,6 +154,7 @@ public final class SubCommand implements CommandExecutor {
         public CommandResult execute(CommandSource sender, CommandContext args) throws CommandException {
             if (canRun(sender)) {
                 boolean build = false;
+                String platform = "Sponge";
                 try {
                     Field f = Version.class.getDeclaredField("type");
                     f.setAccessible(true);
