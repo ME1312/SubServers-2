@@ -251,7 +251,7 @@
 		</style>
 		<div class="download"><center>
 			<div class="page">
-				<span class="page-title">You're about to download <span class="full-app-name">&lt;unknown&gt;</span><br><a class="page-subtitle" href="%commit_source%" target="_blank" draggable="false">from commit <span class="app-version">&lt;unknown&gt;</span></a></span><hr style="margin: 0.5em 8px;">
+				<span class="page-title">You're about to download <span class="full-app-name">&lt;unknown&gt;</span><br><a class="page-subtitle" href="%commit_source%" target="_blank" draggable="false">from <span class="app-version">&lt;unknown&gt;</span></a></span><hr style="margin: 0.5em 8px;">
 				Thank you for downloading <span class="app-name">&lt;unknown&gt;</span>. Choose how you would like to get your file:<br><br>
 				<div class="options">
 					<div class="desktop-spacer"></div>
@@ -309,17 +309,29 @@
 				$('.app-name').html(hash.app.replace(/^(.+?)\.([^.]*)$/, '$1'));
 				document.title = "Download " + hash.app.replace(/^(.+?)\.([^.]*)$/, '$1');
 				if (hash.hasOwnProperty("commit")) {
-					$('.app-version').html(hash.commit.substring(0, 7) + '<span class="full">' + hash.commit.substring(7) + '</span>');
+					if (hash.hasOwnProperty("build")) {
+						$('.app-version').html('build ' + hash.build + '</span>');
+					} else {
+						$('.app-version').html('commit ' + hash.commit.substring(0, 7) + '<span class="full">' + hash.commit.substring(7) + '</span>');
+					}
 					$('a').each(function() {
 						var a = $(this);
 						if (a.attr('download') == '%')
 							a.attr('download', hash.app);
 						switch (a.attr("href").toLowerCase()) {
 							case "%adfly_app_download%":
-								a.attr("href", "https://adf.ly/18562515/https://raw.githubusercontent.com/ME1312/SubServers-2/" + hash.commit.toLowerCase() + "/Artifacts/" + hash.app);
+								if (hash.hasOwnProperty("build")) {
+									a.attr("href", "https://adf.ly/18562515/https://src.me1312.net/maven/net/ME1312/SubServers/" + hash.app.replace(/^(.+?)\.([^.]*)$/, '$1') + "/" + hash.build + "/" + hash.app.replace(/^(.+?)\.([^.]*)$/, '$1') + "-" + hash.build + ".jar");
+								} else {
+									a.attr("href", "https://adf.ly/18562515/https://raw.githubusercontent.com/ME1312/SubServers-2/" + hash.commit.toLowerCase() + "/Artifacts/" + hash.app);
+								}
 								break;
 							case "%app_download%":
-								a.attr("href", "https://raw.githubusercontent.com/ME1312/SubServers-2/" + hash.commit.toLowerCase() + "/Artifacts/" + hash.app);
+								if (hash.hasOwnProperty("build")) {
+									a.attr("href", "https://src.me1312.net/maven/net/ME1312/SubServers/" + hash.app.replace(/^(.+?)\.([^.]*)$/, '$1') + "/" + hash.build + "/" + hash.app.replace(/^(.+?)\.([^.]*)$/, '$1') + "-" + hash.build + ".jar");
+								} else {
+									a.attr("href", "https://raw.githubusercontent.com/ME1312/SubServers-2/" + hash.commit.toLowerCase() + "/Artifacts/" + hash.app);
+								}
 								break;
 							case "%commit_page%":
 								a.attr("href", "https://github.com/ME1312/SubServers-2/commit/" + hash.commit.toLowerCase());
