@@ -61,29 +61,6 @@
                 </configuration>
             </plugin>
             <plugin>
-                <artifactId>maven-invoker-plugin</artifactId>
-                <version>3.1.0</version>
-                <configuration>
-                    <cloneProjectsTo>${project.build.directory}/invoker-work/SubServers.Client/Combo</cloneProjectsTo>
-                    <postBuildHookScript>verify</postBuildHookScript>
-                </configuration>
-                <executions>
-                    <execution>
-                        <phase>generate-resources</phase>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                        <configuration>
-                            <javaHome>${java.home}</javaHome>
-                            <pom>../SubServers.Client/Combo/pom.xml</pom>
-                            <goals>
-                                <goal>package</goal>
-                            </goals>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-antrun-plugin</artifactId>
                 <executions>
@@ -96,7 +73,7 @@
                             <tasks>
                                 <mkdir dir="${project.build.directory}" />
                                 <copy file="${basedir}/../LICENSE" todir="${project.build.directory}/classes" />
-                                <copy file="${project.build.directory}/invoker-work/Artifacts/SubServers.Client.jar" tofile="${project.build.directory}/classes/net/ME1312/SubServers/Bungee/Library/Files/client.jar" />
+                                <copy file="${basedir}/../Artifacts/SubServers.Client.jar" tofile="${project.build.directory}/classes/net/ME1312/SubServers/Bungee/Library/Files/client.jar" />
                             </tasks>
                         </configuration>
                     </execution>
