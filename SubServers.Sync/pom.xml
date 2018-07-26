@@ -103,6 +103,28 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.0.0</version>
+                <executions>
+                    <execution>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>javadoc</goal>
+                        </goals>
+                        <configuration>
+                            <windowtitle>SubServers.Sync Javadoc</windowtitle>
+                            <doctitle>SubServers.Sync Javadoc</doctitle>
+                            <show>public</show>
+                            <destDir>./</destDir>
+                            <outputDirectory>${basedir}/../Javadoc/SubServers.Sync</outputDirectory>
+                            <reportOutputDirectory>${basedir}/../Javadoc/SubServers.Sync</reportOutputDirectory>
+                            <additionalOptions>-Xdoclint:none</additionalOptions>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 </project>

@@ -110,6 +110,28 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.0.0</version>
+                <executions>
+                    <execution>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>javadoc</goal>
+                        </goals>
+                        <configuration>
+                            <windowtitle>SubServers.Client.Bukkit Javadoc</windowtitle>
+                            <doctitle>SubServers.Client.Bukkit Javadoc</doctitle>
+                            <show>public</show>
+                            <destDir>./</destDir>
+                            <outputDirectory>${basedir}/../../Javadoc/SubServers.Client.Bukkit</outputDirectory>
+                            <reportOutputDirectory>${basedir}/../../Javadoc/SubServers.Client.Bukkit</reportOutputDirectory>
+                            <additionalOptions>-Xdoclint:none</additionalOptions>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 </project>

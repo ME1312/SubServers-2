@@ -90,6 +90,27 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.0.0</version>
+                <executions>
+                    <execution>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>javadoc</goal>
+                        </goals>
+                        <configuration>
+                            <windowtitle>SubServers.Client.Sponge Javadoc</windowtitle>
+                            <doctitle>SubServers.Client.Sponge Javadoc</doctitle>
+                            <destDir>./</destDir>
+                            <outputDirectory>${basedir}/../../Javadoc/SubServers.Client.Sponge</outputDirectory>
+                            <reportOutputDirectory>${basedir}/../../Javadoc/SubServers.Client.Sponge</reportOutputDirectory>
+                            <additionalOptions>-Xdoclint:none</additionalOptions>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 </project>

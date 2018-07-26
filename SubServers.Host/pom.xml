@@ -130,6 +130,28 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.0.0</version>
+                <executions>
+                    <execution>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>javadoc</goal>
+                        </goals>
+                        <configuration>
+                            <windowtitle>SubServers.Host Javadoc</windowtitle>
+                            <doctitle>SubServers.Host Javadoc</doctitle>
+                            <show>public</show>
+                            <destDir>./</destDir>
+                            <outputDirectory>${basedir}/../Javadoc/SubServers.Host</outputDirectory>
+                            <reportOutputDirectory>${basedir}/../Javadoc/SubServers.Host</reportOutputDirectory>
+                            <additionalOptions>-Xdoclint:none</additionalOptions>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 </project>
