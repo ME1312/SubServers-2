@@ -16,10 +16,12 @@ These are some quick links for common resources of SubServers 2.
 > [http://subservers.ME1312.net/Javadoc/SubServers.Bungee/](http://subservers.ME1312.net/Javadoc/SubServers.Bungee/)<br>
 > [http://subservers.ME1312.net/Javadoc/SubServers.Host/](http://subservers.ME1312.net/Javadoc/SubServers.Host/)<br>
 > [http://subservers.ME1312.net/Javadoc/SubServers.Sync/](http://subservers.ME1312.net/Javadoc/SubServers.Sync/)<br>
-> [http://subservers.ME1312.net/Javadoc/SubServers.Client.Bukkit/](http://subservers.ME1312.net/Javadoc/SubServers.Client.Bukkit/)
+> [http://subservers.ME1312.net/Javadoc/SubServers.Client.Bukkit/](http://subservers.ME1312.net/Javadoc/SubServers.Client.Bukkit/)<br>
+> [http://subservers.ME1312.net/Javadoc/SubServers.Client.Sponge/](http://subservers.ME1312.net/Javadoc/SubServers.Client.Sponge/)
 
 ### Stats for nerds
 > [https://bstats.org/plugin/bungeecord/SubServers_Bungee](https://bstats.org/plugin/bungeecord/SubServers%202)<br>
 > [https://bstats.org/plugin/other/SubServers_Host](https://bstats.org/plugin/other/SubServers%20Host)<br>
 > [https://bstats.org/plugin/bungeecord/SubServers_Sync](https://bstats.org/plugin/bungeecord/SubServers%20Sync)<br>
-> [https://bstats.org/plugin/bukkit/SubServers_Client](https://bstats.org/plugin/bukkit/SubServers%20Client)
+> [https://bstats.org/plugin/bukkit/SubServers_Client](https://bstats.org/plugin/bukkit/SubServers%20Client)<br>
+> [https://bstats.org/plugin/sponge/SubServers_Client](https://bstats.org/plugin/sponge/SubServers%20Client)
