@@ -12,12 +12,15 @@ These are some quick links for common resources of SubServers 2.
 ### How to Install
 [https://github.com/ME1312/SubServers-2/wiki/Install](https://github.com/ME1312/SubServers-2/wiki/Install)
 
+### Snapshot Downloads
+[https://src.me1312.net/jenkins/job/SubServers Platform](https://src.me1312.net/jenkins/job/SubServers%20Platform)
+
 ### Javadocs for Developers
-> [http://subservers.ME1312.net/Javadoc/SubServers.Bungee/](http://subservers.ME1312.net/Javadoc/SubServers.Bungee/)<br>
-> [http://subservers.ME1312.net/Javadoc/SubServers.Host/](http://subservers.ME1312.net/Javadoc/SubServers.Host/)<br>
-> [http://subservers.ME1312.net/Javadoc/SubServers.Sync/](http://subservers.ME1312.net/Javadoc/SubServers.Sync/)<br>
-> [http://subservers.ME1312.net/Javadoc/SubServers.Client.Bukkit/](http://subservers.ME1312.net/Javadoc/SubServers.Client.Bukkit/)<br>
-> [http://subservers.ME1312.net/Javadoc/SubServers.Client.Sponge/](http://subservers.ME1312.net/Javadoc/SubServers.Client.Sponge/)
+> [https://src.me1312.net/jenkins/job/SubServers Platform/javadoc/SubServers.Bungee/](https://src.me1312.net/jenkins/job/SubServers%20Platform/javadoc/SubServers.Bungee/)<br>
+> [https://src.me1312.net/jenkins/job/SubServers Platform/javadoc/SubServers.Host/](https://src.me1312.net/jenkins/job/SubServers%20Platform/javadoc/SubServers.Host/)<br>
+> [https://src.me1312.net/jenkins/job/SubServers Platform/javadoc/SubServers.Sync/](https://src.me1312.net/jenkins/job/SubServers%20Platform/javadoc/SubServers.Sync/)<br>
+> [https://src.me1312.net/jenkins/job/SubServers Platform/javadoc/SubServers.Client.Bukkit/](https://src.me1312.net/jenkins/job/SubServers%20Platform/javadoc/SubServers.Client.Bukkit/)<br>
+> [https://src.me1312.net/jenkins/job/SubServers Platform/javadoc/SubServers.Client.Sponge/](https://src.me1312.net/jenkins/job/SubServers%20Platform/javadoc/SubServers.Client.Sponge/)
 
 ### Stats for nerds
 > [https://bstats.org/plugin/bungeecord/SubServers_Bungee](https://bstats.org/plugin/bungeecord/SubServers%202)<br>
