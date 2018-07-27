@@ -1,6 +1,8 @@
 package net.ME1312.SubServers.Client.Bukkit;
 
+import com.google.gson.Gson;
 import net.ME1312.SubServers.Client.Bukkit.Graphic.UIRenderer;
+import net.ME1312.SubServers.Client.Bukkit.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Client.Bukkit.Library.Container;
 import net.ME1312.SubServers.Client.Bukkit.Library.Util;
 import net.ME1312.SubServers.Client.Bukkit.Library.Version.Version;
@@ -35,6 +37,7 @@ public final class SubCommand implements CommandExecutor {
         this.plugin = plugin;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         label = "/" + label;
@@ -66,18 +69,15 @@ public final class SubCommand implements CommandExecutor {
                         sender.sendMessage("");
                         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
                             try {
-                                Document updxml = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new InputSource(new StringReader(Util.readAll(new BufferedReader(new InputStreamReader(new URL("https://src.me1312.net/maven/net/ME1312/SubServers/SubServers.Client.Bukkit/maven-metadata.xml").openStream(), Charset.forName("UTF-8")))))));
+                                YAMLSection tags = new YAMLSection(new Gson().fromJson("{\"tags\":" + Util.readAll(new BufferedReader(new InputStreamReader(new URL("https://api.github.com/repos/ME1312/SubServers-2/git/refs/tags").openStream(), Charset.forName("UTF-8")))) + '}', Map.class));
 
-                                NodeList updnodeList = updxml.getElementsByTagName("version");
                                 Version updversion = plugin.version;
                                 int updcount = 0;
-                                for (int i = 0; i < updnodeList.getLength(); i++) {
-                                    Node node = updnodeList.item(i);
-                                    if (node.getNodeType() == Node.ELEMENT_NODE) {
-                                        if (!node.getTextContent().startsWith("-") && !node.getTextContent().equals(plugin.version.toString()) && Version.fromString(node.getTextContent()).compareTo(updversion) > 0) {
-                                            updversion = Version.fromString(node.getTextContent());
-                                            updcount++;
-                                        }
+                                for (YAMLSection tag : tags.getSectionList("tags")) {
+                                    Version version = Version.fromString(tag.getString("ref").substring(10));
+                                    if (!version.equals(version) && version.compareTo(updversion) > 0) {
+                                        updversion = version;
+                                        updcount++;
                                     }
                                 }
                                 if (updcount == 0) {

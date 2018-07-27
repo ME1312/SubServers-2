@@ -59,7 +59,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
     public SubDataServer subdata = null;
     public SubServer sudo = null;
     //public static final Version version = Version.fromString("2.13a/pr5");
-    public static final Version version = new Version(Version.fromString("2.13a/pr5"), VersionType.SNAPSHOT, (SubPlugin.class.getPackage().getSpecificationTitle() == null)?"undefined":SubPlugin.class.getPackage().getSpecificationTitle()); // TODO Snapshot Version
+    public static final Version version = new Version(Version.fromString("2.13a/pr5"), VersionType.SNAPSHOT, (SubPlugin.class.getPackage().getSpecificationTitle() == null)?"custom":SubPlugin.class.getPackage().getSpecificationTitle()); // TODO Snapshot Version
 
     public boolean redis = false;
     public boolean canSudo = false;
@@ -503,21 +503,19 @@ public final class SubPlugin extends BungeeCord implements Listener {
 
         new Metrics(this);
         new Timer().schedule(new TimerTask() {
+            @SuppressWarnings("unchecked")
             @Override
             public void run() {
                 try {
-                    Document updxml = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new InputSource(new StringReader(Util.readAll(new BufferedReader(new InputStreamReader(new URL("https://src.me1312.net/maven/net/ME1312/SubServers/SubServers.Bungee/maven-metadata.xml").openStream(), Charset.forName("UTF-8")))))));
+                    YAMLSection tags = new YAMLSection(new Gson().fromJson("{\"tags\":" + Util.readAll(new BufferedReader(new InputStreamReader(new URL("https://api.github.com/repos/ME1312/SubServers-2/git/refs/tags").openStream(), Charset.forName("UTF-8")))) + '}', Map.class));
 
-                    NodeList updnodeList = updxml.getElementsByTagName("version");
                     Version updversion = version;
                     int updcount = 0;
-                    for (int i = 0; i < updnodeList.getLength(); i++) {
-                        Node node = updnodeList.item(i);
-                        if (node.getNodeType() == Node.ELEMENT_NODE) {
-                            if (!node.getTextContent().startsWith("-") && !node.getTextContent().equals(version.toString()) && Version.fromString(node.getTextContent()).compareTo(updversion) > 0) {
-                                updversion = Version.fromString(node.getTextContent());
-                                updcount++;
-                            }
+                    for (YAMLSection tag : tags.getSectionList("tags")) {
+                        Version version = Version.fromString(tag.getString("ref").substring(10));
+                        if (!version.equals(version) && version.compareTo(updversion) > 0) {
+                            updversion = version;
+                            updcount++;
                         }
                     }
                     if (updcount > 0) System.out.println("SubServers > SubServers.Bungee v" + updversion + " is available. You are " + updcount + " version" + ((updcount == 1)?"":"s") + " behind.");

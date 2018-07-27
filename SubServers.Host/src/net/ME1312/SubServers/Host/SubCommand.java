@@ -2,11 +2,13 @@ package net.ME1312.SubServers.Host;
 
 import net.ME1312.SubServers.Host.API.Command;
 import net.ME1312.SubServers.Host.API.SubPluginInfo;
+import net.ME1312.SubServers.Host.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Host.Library.TextColor;
 import net.ME1312.SubServers.Host.Library.Util;
 import net.ME1312.SubServers.Host.Library.Version.Version;
 import net.ME1312.SubServers.Host.Library.Version.VersionType;
 import net.ME1312.SubServers.Host.Network.Packet.*;
+import org.json.JSONObject;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -48,18 +50,15 @@ public class SubCommand {
                         host.log.message.println("");
                         new Thread(() -> {
                             try {
-                                Document updxml = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new InputSource(new StringReader(Util.readAll(new BufferedReader(new InputStreamReader(new URL("https://src.me1312.net/maven/net/ME1312/SubServers/SubServers.Host/maven-metadata.xml").openStream(), Charset.forName("UTF-8")))))));
+                                YAMLSection tags = new YAMLSection(new JSONObject("{\"tags\":" + Util.readAll(new BufferedReader(new InputStreamReader(new URL("https://api.github.com/repos/ME1312/SubServers-2/git/refs/tags").openStream(), Charset.forName("UTF-8")))) + '}'));
 
-                                NodeList updnodeList = updxml.getElementsByTagName("version");
                                 Version updversion = host.version;
                                 int updcount = 0;
-                                for (int i = 0; i < updnodeList.getLength(); i++) {
-                                    Node node = updnodeList.item(i);
-                                    if (node.getNodeType() == Node.ELEMENT_NODE) {
-                                        if (!node.getTextContent().startsWith("-") && !node.getTextContent().equals(host.version.toString()) && Version.fromString(node.getTextContent()).compareTo(updversion) > 0) {
-                                            updversion = Version.fromString(node.getTextContent());
-                                            updcount++;
-                                        }
+                                for (YAMLSection tag : tags.getSectionList("tags")) {
+                                    Version version = Version.fromString(tag.getString("ref").substring(10));
+                                    if (!version.equals(version) && version.compareTo(updversion) > 0) {
+                                        updversion = version;
+                                        updcount++;
                                     }
                                 }
                                 if (updcount == 0) {
