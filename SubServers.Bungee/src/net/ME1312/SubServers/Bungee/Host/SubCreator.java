@@ -150,6 +150,7 @@ public abstract class SubCreator {
         public String toString() {
             YAMLSection tinfo = new YAMLSection();
             tinfo.set("enabled", isEnabled());
+            tinfo.set("name", getName());
             tinfo.set("display", getDisplayName());
             tinfo.set("icon", getIcon());
             tinfo.set("type", getType().toString());

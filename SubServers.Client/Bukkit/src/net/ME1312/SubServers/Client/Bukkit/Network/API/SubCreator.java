@@ -37,7 +37,7 @@ public class SubCreator {
         private YAMLSection raw;
         private ServerType type;
 
-        private ServerTemplate(YAMLSection raw) {
+        public ServerTemplate(YAMLSection raw) {
             this.raw = raw;
             this.type = (Util.isException(() -> ServerType.valueOf(raw.getRawString("type").toUpperCase())))?ServerType.valueOf(raw.getRawString("type").toUpperCase()):ServerType.CUSTOM;
         }
@@ -91,6 +91,7 @@ public class SubCreator {
         public String toString() {
             YAMLSection tinfo = new YAMLSection();
             tinfo.set("enabled", isEnabled());
+            tinfo.set("name", getName());
             tinfo.set("display", getDisplayName());
             tinfo.set("icon", getIcon());
             tinfo.set("type", getType().toString());

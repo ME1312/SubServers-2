@@ -92,10 +92,7 @@ public final class SubCommand implements CommandExecutor {
                         plugin.subdata.sendPacket(new PacketDownloadServerList(null, null, data -> {
                             int i = 0;
                             boolean sent = false;
-                            Container<Boolean> spigot = new Container<Boolean>(false);
-                            if (!Util.isException(() -> {
-                                if (Class.forName("org.spigotmc.SpigotConfig") != null) spigot.set(true);
-                            }) && spigot.get() && sender instanceof Player) {
+                            if (!Util.getDespiteException(() -> Class.forName("org.spigotmc.SpigotConfig") != null, false) && sender instanceof Player) {
                                 net.md_5.bungee.api.chat.TextComponent div = new net.md_5.bungee.api.chat.TextComponent(plugin.api.getLang("SubServers", "Command.List.Divider"));
                                 if (data.getSection("groups").getKeys().size() > 0) {
                                     sender.sendMessage(plugin.api.getLang("SubServers", "Command.List.Group-Header"));

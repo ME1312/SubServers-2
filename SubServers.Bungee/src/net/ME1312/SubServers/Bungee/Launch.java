@@ -26,8 +26,7 @@ public final class Launch {
     public static void main(String[] args) throws Exception {
         System.setProperty("apple.laf.useScreenMenuBar", "true");
 
-        Container<Boolean> bungee = new Container<Boolean>(false);
-        if (Util.isException(() -> bungee.set(Class.forName("net.md_5.bungee.BungeeCord") != null)) && !bungee.get()) {
+        if (Util.getDespiteException(() -> Class.forName("net.md_5.bungee.BungeeCord") != null, false)) {
             System.out.println("");
             System.out.println("*******************************************");
             System.out.println("*** Error: BungeeCord.jar Doesn't Exist ***");
@@ -100,8 +99,7 @@ public final class Launch {
 
                 if (!options.has("noconsole")) {
                     try {
-                        Container<Boolean> proprietary = new Container<Boolean>(false);
-                        if (!Util.isException(() -> proprietary.set(Class.forName("io.github.waterfallmc.waterfall.console.WaterfallConsole") != null)) && proprietary.get()) {
+                        if (!Util.getDespiteException(() -> Class.forName("io.github.waterfallmc.waterfall.console.WaterfallConsole") != null, false)) {
                             Class.forName("io.github.waterfallmc.waterfall.console.WaterfallConsole").getMethod("readCommands").invoke(null);
                         } else {
                             plugin.canSudo = true;

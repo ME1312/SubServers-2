@@ -8,7 +8,10 @@ import java.util.*;
  */
 public final class Util {
     private Util(){}
-    public interface ExceptionRunnable {
+    public interface ExceptionReturnRunnable<R> {
+        R run() throws Throwable;
+    }
+    public interface ExceptionRunnable<R> {
         void run() throws Throwable;
     }
     public interface ReturnRunnable<R> {
@@ -122,6 +125,22 @@ public final class Util {
             resStreamIn.close();
         } catch (Exception ex) {
             ex.printStackTrace();
+        }
+    }
+
+    /**
+     * Get a variable from a method which may throw an exception
+     *
+     * @param runnable Runnable
+     * @param def Default value when an exception is thrown
+     * @param <R> Variable Type
+     * @return Returns value or default depending on if an exception is thrown
+     */
+    public static <R> R getDespiteException(ExceptionReturnRunnable<R> runnable, R def) {
+        try {
+            return runnable.run();
+        } catch (Throwable e) {
+            return def;
         }
     }
 

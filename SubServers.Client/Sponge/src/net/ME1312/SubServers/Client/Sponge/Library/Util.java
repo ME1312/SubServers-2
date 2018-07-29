@@ -8,6 +8,9 @@ import java.util.*;
  */
 public final class Util {
     private Util(){}
+    public interface ExceptionReturnRunnable<R> {
+        R run() throws Throwable;
+    }
     public interface ExceptionRunnable {
         void run() throws Throwable;
     }
@@ -126,6 +129,22 @@ public final class Util {
     }
 
     /**
+     * Get a variable from a method which may throw an exception
+     *
+     * @param runnable Runnable
+     * @param def Default value when an exception is thrown
+     * @param <R> Variable Type
+     * @return Returns value or default depending on if an exception is thrown
+     */
+    public static <R> R getDespiteException(ExceptionReturnRunnable<R> runnable, R def) {
+        try {
+            return runnable.run();
+        } catch (Throwable e) {
+            return def;
+        }
+    }
+
+    /**
      * Determines if an Exception will occur
      *
      * @param runnable Runnable
@@ -139,8 +158,6 @@ public final class Util {
             return true;
         }
     }
-
-
 
     /**
      * Delete a Directory

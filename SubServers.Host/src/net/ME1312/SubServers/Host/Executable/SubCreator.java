@@ -9,6 +9,7 @@ import net.ME1312.SubServers.Host.Library.NamedContainer;
 import net.ME1312.SubServers.Host.Library.UniversalFile;
 import net.ME1312.SubServers.Host.Library.Util;
 import net.ME1312.SubServers.Host.Library.Version.Version;
+import net.ME1312.SubServers.Host.Network.API.SubCreator.ServerType;
 import net.ME1312.SubServers.Host.Network.Packet.PacketExCreateServer;
 import net.ME1312.SubServers.Host.Network.Packet.PacketOutExLogMessage;
 import net.ME1312.SubServers.Host.ExHost;
@@ -23,7 +24,6 @@ import java.io.*;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.*;
-import java.util.regex.Pattern;
 
 /**
  * Internal SubCreator Class
@@ -32,7 +32,7 @@ public class SubCreator {
     private ExHost host;
     private TreeMap<String, NamedContainer<Thread, NamedContainer<SubLogger, Process>>> thread;
 
-    public static class ServerTemplate {
+    public static class ServerTemplate extends net.ME1312.SubServers.Host.Network.API.SubCreator.ServerTemplate {
         private String name;
         private String nick = null;
         private boolean enabled;
@@ -51,7 +51,7 @@ public class SubCreator {
          * @param options Configuration Options
          */
         public ServerTemplate(String name, boolean enabled, String icon, File directory, YAMLSection build, YAMLSection options) {
-            if (Util.isNull(name, enabled, directory, build, options)) throw new NullPointerException();
+            super(toRaw(name, enabled, icon, directory, build, options));
             if (name.contains(" ")) throw new InvalidTemplateException("Template names cannot have spaces: " + name);
             this.name = name;
             this.enabled = enabled;
@@ -165,17 +165,16 @@ public class SubCreator {
         public YAMLSection getConfigOptions() {
             return options;
         }
-    }
-    public enum ServerType {
-        SPIGOT,
-        VANILLA,
-        FORGE,
-        SPONGE,
-        CUSTOM;
 
-        @Override
-        public String toString() {
-            return super.toString().substring(0, 1).toUpperCase()+super.toString().substring(1).toLowerCase();
+        private static YAMLSection toRaw(String name, boolean enabled, String icon, File directory, YAMLSection build, YAMLSection options) {
+            if (Util.isNull(name, enabled, directory, build, options)) throw new NullPointerException();
+            YAMLSection tinfo = new YAMLSection();
+            tinfo.set("enabled", enabled);
+            tinfo.set("name", name);
+            tinfo.set("display", name);
+            tinfo.set("icon", icon);
+            tinfo.set("type", (build.contains("Server-Type"))?ServerType.valueOf(build.getRawString("Server-Type").toUpperCase()):ServerType.CUSTOM);
+            return tinfo;
         }
     }
 
