@@ -49,8 +49,8 @@ public final class SubPlugin extends BungeeCord implements Listener {
     public boolean redis = false;
     public final SubAPI api = new SubAPI(this);
     public SubDataClient subdata = null;
-    public static final Version version = Version.fromString("2.13a");
-    //public static final Version version = new Version(Version.fromString("2.13a"), VersionType.SNAPSHOT, (SubPlugin.class.getPackage().getSpecificationTitle() == null)?"custom":SubPlugin.class.getPackage().getSpecificationTitle()); // TODO Snapshot Version
+    //public static final Version version = Version.fromString("2.13b");
+    public static final Version version = new Version(Version.fromString("2.13b"), VersionType.SNAPSHOT, (SubPlugin.class.getPackage().getSpecificationTitle() == null)?"custom":SubPlugin.class.getPackage().getSpecificationTitle()); // TODO Snapshot Version
 
     public final boolean isPatched;
     public long lastReload = -1;
@@ -140,7 +140,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
                     int updcount = 0;
                     for (YAMLSection tag : tags.getSectionList("tags")) {
                         Version version = Version.fromString(tag.getString("ref").substring(10));
-                        if (!version.equals(version) && version.compareTo(updversion) > 0) {
+                        if (version.compareTo(updversion) > 0) {
                             updversion = version;
                             updcount++;
                         }

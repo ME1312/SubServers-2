@@ -179,7 +179,7 @@ public final class SubCommand implements CommandExecutor {
                         int updcount = 0;
                         for (YAMLSection tag : tags.getSectionList("tags")) {
                             Version version = Version.fromString(tag.getString("ref").substring(10));
-                            if (!version.equals(version) && version.compareTo(updversion) > 0) {
+                            if (version.compareTo(updversion) > 0) {
                                 updversion = version;
                                 updcount++;
                             }

@@ -46,8 +46,8 @@ public final class SubPlugin extends JavaPlugin {
 
     public SubPlugin() {
         super();
-        version = Version.fromString(getDescription().getVersion());
-        //version = new Version(Version.fromString(getDescription().getVersion()), VersionType.SNAPSHOT, (SubPlugin.class.getPackage().getSpecificationTitle() == null)?"custom":SubPlugin.class.getPackage().getSpecificationTitle()); // TODO Snapshot Version
+        //version = Version.fromString(getDescription().getVersion());
+        version = new Version(Version.fromString(getDescription().getVersion()), VersionType.SNAPSHOT, (SubPlugin.class.getPackage().getSpecificationTitle() == null)?"custom":SubPlugin.class.getPackage().getSpecificationTitle()); // TODO Snapshot Version
     }
 
     /**
@@ -100,7 +100,7 @@ public final class SubPlugin extends JavaPlugin {
                     int updcount = 0;
                     for (YAMLSection tag : tags.getSectionList("tags")) {
                         Version version = Version.fromString(tag.getString("ref").substring(10));
-                        if (!version.equals(version) && version.compareTo(updversion) > 0) {
+                        if (version.compareTo(updversion) > 0) {
                             updversion = version;
                             updcount++;
                         }

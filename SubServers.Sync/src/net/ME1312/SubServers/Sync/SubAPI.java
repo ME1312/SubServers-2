@@ -359,12 +359,12 @@ public final class SubAPI {
         if (GAME_VERSION == null) {
             if (System.getProperty("subservers.minecraft.version", "").length() > 0) {
                 return new Version[]{new Version(System.getProperty("subservers.minecraft.version"))};
-            } else if (!Util.getDespiteException(() -> ProtocolConstants.SUPPORTED_VERSIONS != null, false)) {
+            } else if (Util.getDespiteException(() -> ProtocolConstants.SUPPORTED_VERSIONS != null, false)) {
                 List<Version> versions = new LinkedList<Version>();
                 for (String version : ProtocolConstants.SUPPORTED_VERSIONS) versions.add(new Version(version));
                 Collections.sort(versions);
                 return versions.toArray(new Version[versions.size()]);
-            } else if (!Util.getDespiteException(() -> plugin.getGameVersion() != null, false)) {
+            } else if (Util.getDespiteException(() -> plugin.getGameVersion() != null, false)) {
                 String raw = plugin.getGameVersion();
                 if (raw.contains("-") || raw.contains(",")) {
                     List<Version> versions = new LinkedList<Version>();

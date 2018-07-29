@@ -75,7 +75,7 @@ public final class SubCommand implements CommandExecutor {
                                 int updcount = 0;
                                 for (YAMLSection tag : tags.getSectionList("tags")) {
                                     Version version = Version.fromString(tag.getString("ref").substring(10));
-                                    if (!version.equals(version) && version.compareTo(updversion) > 0) {
+                                    if (version.compareTo(updversion) > 0) {
                                         updversion = version;
                                         updcount++;
                                     }
@@ -92,7 +92,7 @@ public final class SubCommand implements CommandExecutor {
                         plugin.subdata.sendPacket(new PacketDownloadServerList(null, null, data -> {
                             int i = 0;
                             boolean sent = false;
-                            if (!Util.getDespiteException(() -> Class.forName("org.spigotmc.SpigotConfig") != null, false) && sender instanceof Player) {
+                            if (Util.getDespiteException(() -> Class.forName("org.spigotmc.SpigotConfig") != null, false) && sender instanceof Player) {
                                 net.md_5.bungee.api.chat.TextComponent div = new net.md_5.bungee.api.chat.TextComponent(plugin.api.getLang("SubServers", "Command.List.Divider"));
                                 if (data.getSection("groups").getKeys().size() > 0) {
                                     sender.sendMessage(plugin.api.getLang("SubServers", "Command.List.Group-Header"));

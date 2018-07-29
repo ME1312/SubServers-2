@@ -26,7 +26,7 @@ public final class Launch {
     public static void main(String[] args) throws Exception {
         System.setProperty("apple.laf.useScreenMenuBar", "true");
 
-        if (Util.getDespiteException(() -> Class.forName("net.md_5.bungee.BungeeCord") != null, false)) {
+        if (Util.getDespiteException(() -> Class.forName("net.md_5.bungee.BungeeCord") == null, true)) {
             System.out.println("");
             System.out.println("*******************************************");
             System.out.println("*** Error: BungeeCord.jar Doesn't Exist ***");
@@ -99,7 +99,7 @@ public final class Launch {
 
                 if (!options.has("noconsole")) {
                     try {
-                        if (!Util.getDespiteException(() -> Class.forName("io.github.waterfallmc.waterfall.console.WaterfallConsole") != null, false)) {
+                        if (Util.getDespiteException(() -> Class.forName("io.github.waterfallmc.waterfall.console.WaterfallConsole") != null, false)) {
                             Class.forName("io.github.waterfallmc.waterfall.console.WaterfallConsole").getMethod("readCommands").invoke(null);
                         } else {
                             String line;

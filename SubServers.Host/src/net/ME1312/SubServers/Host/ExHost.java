@@ -55,8 +55,8 @@ public final class ExHost {
     public SubDataClient subdata = null;
 
     public final SubAPI api = new SubAPI(this);
-    public static final Version version = Version.fromString("2.13a");
-    //public static final Version version = new Version(Version.fromString("2.13a"), VersionType.SNAPSHOT, (ExHost.class.getPackage().getSpecificationTitle() == null)?"custom":ExHost.class.getPackage().getSpecificationTitle()); // TODO Snapshot Version
+    //public static final Version version = Version.fromString("2.13b");
+    public static final Version version = new Version(Version.fromString("2.13b"), VersionType.SNAPSHOT, (ExHost.class.getPackage().getSpecificationTitle() == null)?"custom":ExHost.class.getPackage().getSpecificationTitle()); // TODO Snapshot Version
 
     private ConsoleReader jline;
     private boolean running = false;
@@ -422,7 +422,7 @@ public final class ExHost {
                         int updcount = 0;
                         for (YAMLSection tag : tags.getSectionList("tags")) {
                             Version version = Version.fromString(tag.getString("ref").substring(10));
-                            if (!version.equals(version) && version.compareTo(updversion) > 0) {
+                            if (version.compareTo(updversion) > 0) {
                                 updversion = version;
                                 updcount++;
                             }

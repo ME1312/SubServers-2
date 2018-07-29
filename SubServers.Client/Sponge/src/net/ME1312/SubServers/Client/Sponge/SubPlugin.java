@@ -44,7 +44,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * SubServers Client Plugin Class
  */
-@Plugin(id = "subservers-client-sponge", name = "SubServers-Client-Sponge", authors = "ME1312", version = "2.13a", url = "https://github.com/ME1312/SubServers-2", description = "Access your SubServers from Anywhere")
+@Plugin(id = "subservers-client-sponge", name = "SubServers-Client-Sponge", authors = "ME1312", version = "2.13b", url = "https://github.com/ME1312/SubServers-2", description = "Access your SubServers from Anywhere")
 public final class SubPlugin {
     protected NamedContainer<Long, Map<String, Map<String, String>>> lang = null;
     public YAMLConfig config;
@@ -62,8 +62,8 @@ public final class SubPlugin {
     @Listener
     public void setup(GamePreInitializationEvent event) {
         if (plugin.getVersion().isPresent()) {
-            version = Version.fromString(plugin.getVersion().get());
-            //version = new Version(Version.fromString(plugin.getVersion().get()), VersionType.SNAPSHOT, (SubPlugin.class.getPackage().getSpecificationTitle() == null)?"custom":SubPlugin.class.getPackage().getSpecificationTitle()); // TODO Snapshot Version
+            //version = Version.fromString(plugin.getVersion().get());
+            version = new Version(Version.fromString(plugin.getVersion().get()), VersionType.SNAPSHOT, (SubPlugin.class.getPackage().getSpecificationTitle() == null)?"custom":SubPlugin.class.getPackage().getSpecificationTitle()); // TODO Snapshot Version
         } else version = new Version("Custom");
     }
 
@@ -115,7 +115,7 @@ public final class SubPlugin {
                     int updcount = 0;
                     for (YAMLSection tag : tags.getSectionList("tags")) {
                         Version version = Version.fromString(tag.getString("ref").substring(10));
-                        if (!version.equals(version) && version.compareTo(updversion) > 0) {
+                        if (version.compareTo(updversion) > 0) {
                             updversion = version;
                             updcount++;
                         }
