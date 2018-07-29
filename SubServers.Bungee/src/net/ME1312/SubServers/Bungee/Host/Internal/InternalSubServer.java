@@ -58,11 +58,12 @@ public class InternalSubServer extends SubServerContainer {
      * @param stopcmd Stop Command
      * @param hidden Hidden Status
      * @param restricted Restricted Status
+     * @param temporary Temporary Status
      * @throws InvalidServerException
      */
-    public InternalSubServer(InternalHost host, String name, boolean enabled, int port, String motd, boolean log, String directory, Executable executable, String stopcmd, boolean hidden, boolean restricted) throws InvalidServerException {
+    public InternalSubServer(InternalHost host, String name, boolean enabled, int port, String motd, boolean log, String directory, Executable executable, String stopcmd, boolean hidden, boolean restricted, boolean temporary) throws InvalidServerException {
         super(host, name, port, motd, hidden, restricted);
-        if (Util.isNull(host, name, enabled, port, motd, log, directory, executable, stopcmd, hidden, restricted)) throw new NullPointerException();
+        if (Util.isNull(host, name, enabled, port, motd, log, directory, executable, stopcmd, hidden, restricted, temporary)) throw new NullPointerException();
         this.host = host;
         this.enabled = enabled;
         this.editable = false;
@@ -115,7 +116,7 @@ public class InternalSubServer extends SubServerContainer {
                 e.printStackTrace();
             }
         }
-        this.temporary = false;
+        this.temporary = temporary && start();
         this.lock = false;
     }
 
