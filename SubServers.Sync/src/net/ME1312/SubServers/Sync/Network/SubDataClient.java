@@ -260,7 +260,7 @@ public final class SubDataClient {
      * @param handle Handle to Bind
      */
     public static void registerPacket(PacketIn packet, String channel, String handle) {
-        if (Util.isNull(packet, handle)) throw new NullPointerException();
+        if (Util.isNull(packet, channel, handle)) throw new NullPointerException();
         HashMap<String, List<PacketIn>> map = (pIn.keySet().contains(channel.toLowerCase()))?pIn.get(channel.toLowerCase()):new HashMap<String, List<PacketIn>>();
         List<PacketIn> list = (map.keySet().contains(handle))?map.get(handle):new ArrayList<PacketIn>();
         if (!list.contains(packet)) {
@@ -277,7 +277,7 @@ public final class SubDataClient {
      * @param packet PacketIn to unregister
      */
     public static void unregisterPacket(String channel, PacketIn packet) {
-        if (Util.isNull(packet)) throw new NullPointerException();
+        if (Util.isNull(channel, packet)) throw new NullPointerException();
         if (pIn.keySet().contains(channel.toLowerCase())) {
             List<String> search = new ArrayList<String>();
             search.addAll(pIn.get(channel.toLowerCase()).keySet());
@@ -302,7 +302,7 @@ public final class SubDataClient {
      * @param handle Handle to bind
      */
     public static void registerPacket(Class<? extends PacketOut> packet, String channel, String handle) {
-        if (Util.isNull(packet, handle)) throw new NullPointerException();
+        if (Util.isNull(packet, channel, handle)) throw new NullPointerException();
         pOut.put(packet, new NamedContainer<String, String>(channel.toLowerCase(), handle));
     }
 
@@ -313,7 +313,7 @@ public final class SubDataClient {
      * @param packet PacketOut to unregister
      */
     public static void unregisterPacket(String channel, Class<? extends PacketOut> packet) {
-        if (Util.isNull(packet)) throw new NullPointerException();
+        if (Util.isNull(channel, packet)) throw new NullPointerException();
         if (pOut.keySet().contains(packet) && pOut.get(packet).name().equalsIgnoreCase(channel)) pOut.remove(packet);
     }
 
@@ -325,7 +325,7 @@ public final class SubDataClient {
      * @return PacketIn
      */
     public static List<? extends PacketIn> getPacket(String channel, String handle) {
-        if (Util.isNull(handle)) throw new NullPointerException();
+        if (Util.isNull(channel, handle)) throw new NullPointerException();
         return new ArrayList<PacketIn>(pIn.get(channel.toLowerCase()).get(handle));
     }
 

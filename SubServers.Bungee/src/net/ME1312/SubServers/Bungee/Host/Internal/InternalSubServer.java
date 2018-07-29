@@ -42,6 +42,7 @@ public class InternalSubServer extends SubServerContainer {
     private boolean restart;
     private boolean allowrestart;
     private boolean temporary;
+    private boolean lock;
 
     /**
      * Creates an Internal SubServer
@@ -57,12 +58,11 @@ public class InternalSubServer extends SubServerContainer {
      * @param stopcmd Stop Command
      * @param hidden Hidden Status
      * @param restricted Restricted Status
-     * @param temporary Temporary Status
      * @throws InvalidServerException
      */
-    public InternalSubServer(InternalHost host, String name, boolean enabled, int port, String motd, boolean log, String directory, Executable executable, String stopcmd, boolean hidden, boolean restricted, boolean temporary) throws InvalidServerException {
+    public InternalSubServer(InternalHost host, String name, boolean enabled, int port, String motd, boolean log, String directory, Executable executable, String stopcmd, boolean hidden, boolean restricted) throws InvalidServerException {
         super(host, name, port, motd, hidden, restricted);
-        if (Util.isNull(host, name, enabled, port, motd, log, directory, executable, stopcmd, hidden, restricted, temporary)) throw new NullPointerException();
+        if (Util.isNull(host, name, enabled, port, motd, log, directory, executable, stopcmd, hidden, restricted)) throw new NullPointerException();
         this.host = host;
         this.enabled = enabled;
         this.editable = false;
@@ -115,7 +115,8 @@ public class InternalSubServer extends SubServerContainer {
                 e.printStackTrace();
             }
         }
-        this.temporary = temporary && start();
+        this.temporary = false;
+        this.lock = false;
     }
 
     private void run() {
@@ -169,9 +170,11 @@ public class InternalSubServer extends SubServerContainer {
 
     @Override
     public boolean start(UUID player) {
-        if (isEnabled() && !(thread != null && thread.isAlive()) && getCurrentIncompatibilities().size() == 0) {
+        if (!lock && isEnabled() && !(thread != null && thread.isAlive()) && getCurrentIncompatibilities().size() == 0) {
+            lock = true;
             SubStartEvent event = new SubStartEvent(player, this);
             host.plugin.getPluginManager().callEvent(event);
+            lock = false;
             if (!event.isCancelled()) {
                 (thread = new Thread(this::run)).start();
                 return true;

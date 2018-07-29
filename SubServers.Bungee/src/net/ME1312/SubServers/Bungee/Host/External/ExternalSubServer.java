@@ -35,6 +35,7 @@ public class ExternalSubServer extends SubServerContainer {
     private boolean restart;
     private boolean temporary;
     private boolean running;
+    private boolean lock;
 
     /**
      * Creates an External SubServer
@@ -68,13 +69,16 @@ public class ExternalSubServer extends SubServerContainer {
 
         this.running = false;
         this.temporary = false;
+        this.lock = false;
     }
 
     @Override
     public boolean start(UUID player) {
-        if (isEnabled() && !running && getCurrentIncompatibilities().size() == 0) {
+        if (!lock && isEnabled() && !running && getCurrentIncompatibilities().size() == 0) {
+            lock = true;
             SubStartEvent event = new SubStartEvent(player, this);
             host.plugin.getPluginManager().callEvent(event);
+            lock = false;
             if (!event.isCancelled()) {
                 System.out.println("SubServers > Now starting " + getName());
                 running = true;
