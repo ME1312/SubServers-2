@@ -353,6 +353,15 @@ public final class SubAPI {
     }
 
     /**
+     * Gets the SubServers Build Signature
+     *
+     * @return SubServers Build Signature (or null if unsigned)
+     */
+    public Version getPluginBuild() {
+        return (SubPlugin.class.getPackage().getSpecificationTitle() != null)?new Version(SubPlugin.class.getPackage().getSpecificationTitle()):null;
+    }
+
+    /**
      * Gets the Server Version
      *
      * @return Server Version

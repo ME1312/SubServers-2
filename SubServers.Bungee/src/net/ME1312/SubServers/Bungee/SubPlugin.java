@@ -58,8 +58,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
     public final SubAPI api = new SubAPI(this);
     public SubDataServer subdata = null;
     public SubServer sudo = null;
-    //public static final Version version = Version.fromString("2.13b");
-    public static final Version version = new Version(Version.fromString("2.13b"), VersionType.SNAPSHOT, (SubPlugin.class.getPackage().getSpecificationTitle() == null)?"custom":SubPlugin.class.getPackage().getSpecificationTitle()); // TODO Snapshot Version
+    public static final Version version = Version.fromString("2.13b");
 
     public boolean redis = false;
     public boolean canSudo = false;

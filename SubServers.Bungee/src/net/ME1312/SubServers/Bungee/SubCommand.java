@@ -71,28 +71,22 @@ public final class SubCommand extends CommandX {
                 if (args[0].equalsIgnoreCase("help") || args[0].equalsIgnoreCase("?")) {
                     sender.sendMessages(printHelp());
                 } else if (args[0].equalsIgnoreCase("version") || args[0].equalsIgnoreCase("ver")) {
-                    boolean build = false;
-                    try {
-                        Field f = Version.class.getDeclaredField("type");
-                        f.setAccessible(true);
-                        build = f.get(plugin.version) != VersionType.SNAPSHOT && SubPlugin.class.getPackage().getSpecificationTitle() != null;
-                        f.setAccessible(false);
-                    } catch (Exception e) {}
-
                     sender.sendMessage("SubServers > These are the platforms and versions that are running SubServers.Bungee:");
                     sender.sendMessage("  " + System.getProperty("os.name") + ' ' + System.getProperty("os.version") + ',');
                     sender.sendMessage("  Java " + System.getProperty("java.version") + ',');
                     sender.sendMessage("  " + plugin.getBungeeName() + ((plugin.isPatched)?" [Patched] ":" ") + net.md_5.bungee.Bootstrap.class.getPackage().getImplementationVersion() + ',');
-                    sender.sendMessage("  SubServers.Bungee v" + SubPlugin.version.toExtendedString() + ((build)?" (" + SubPlugin.class.getPackage().getSpecificationTitle() + ')':""));
+                    sender.sendMessage("  SubServers.Bungee v" + SubPlugin.version.toExtendedString() + ((plugin.api.getWrapperBuild() != null)?" (" + plugin.api.getWrapperBuild() + ')':""));
                     sender.sendMessage("");
                     new Thread(() -> {
                         try {
                             YAMLSection tags = new YAMLSection(new Gson().fromJson("{\"tags\":" + Util.readAll(new BufferedReader(new InputStreamReader(new URL("https://api.github.com/repos/ME1312/SubServers-2/git/refs/tags").openStream(), Charset.forName("UTF-8")))) + '}', Map.class));
+                            List<Version> versions = new LinkedList<Version>();
 
                             Version updversion = plugin.version;
                             int updcount = 0;
-                            for (YAMLSection tag : tags.getSectionList("tags")) {
-                                Version version = Version.fromString(tag.getString("ref").substring(10));
+                            for (YAMLSection tag : tags.getSectionList("tags")) versions.add(Version.fromString(tag.getString("ref").substring(10)));
+                            Collections.sort(versions);
+                            for (Version version : versions) {
                                 if (version.compareTo(updversion) > 0) {
                                     updversion = version;
                                     updcount++;

@@ -32,8 +32,8 @@ import java.util.concurrent.TimeUnit;
  * SubData Direct Client Class
  */
 public final class SubDataClient {
-    private static HashMap<Class<? extends PacketOut>, String> pOut = new HashMap<Class<? extends PacketOut>, String>();
-    private static HashMap<String, List<PacketIn>> pIn = new HashMap<String, List<PacketIn>>();
+    private static HashMap<Class<? extends PacketOut>, NamedContainer<String, String>> pOut = new HashMap<Class<? extends PacketOut>, NamedContainer<String, String>>();
+    private static HashMap<String, HashMap<String, List<PacketIn>>> pIn = new HashMap<String, HashMap<String, List<PacketIn>>>();
     private static HashMap<String, Cipher> ciphers = new HashMap<String, Cipher>();
     private static boolean defaults = false;
     protected static Logger log;
@@ -103,51 +103,51 @@ public final class SubDataClient {
         defaults = true;
         log = new Logger("SubData");
 
-        registerPacket(new PacketAuthorization(host), "Authorization");
-        registerPacket(new PacketCommandServer(), "SubCommandServer");
-        registerPacket(new PacketCreateServer(), "SubCreateServer");
-        registerPacket(new PacketDownloadHostInfo(), "SubDownloadHostInfo");
-        registerPacket(new PacketDownloadLang(host), "SubDownloadLang");
-        registerPacket(new PacketDownloadNetworkList(), "SubDownloadNetworkList");
-        registerPacket(new PacketDownloadPlayerList(), "SubDownloadPlayerList");
-        registerPacket(new PacketDownloadProxyInfo(), "SubDownloadProxyInfo");
-        registerPacket(new PacketDownloadServerInfo(), "SubDownloadServerInfo");
-        registerPacket(new PacketDownloadServerList(), "SubDownloadServerList");
-        registerPacket(new PacketExAddServer(host), "SubExAddServer");
-        registerPacket(new PacketExConfigureHost(host), "SubExConfigureHost");
-        registerPacket(new PacketExCreateServer(host), "SubExCreateServer");
-        registerPacket(new PacketExDeleteServer(host), "SubExDeleteServer");
-        registerPacket(new PacketExRemoveServer(host), "SubExRemoveServer");
-        registerPacket(new PacketExUpdateServer(host), "SubExUpdateServer");
-        registerPacket(new PacketInReload(host), "SubReload");
-        registerPacket(new PacketInReset(host), "SubReset");
-        registerPacket(new PacketInRunEvent(), "SubRunEvent");
-        registerPacket(new PacketLinkExHost(host), "SubLinkExHost");
-        registerPacket(new PacketStartServer(), "SubStartServer");
-        registerPacket(new PacketStopServer(), "SubStopServer");
+        registerPacket(new PacketAuthorization(host), "SubData", "Authorization");
+        registerPacket(new PacketCommandServer(), "SubServers", "CommandServer");
+        registerPacket(new PacketCreateServer(), "SubServers", "CreateServer");
+        registerPacket(new PacketDownloadHostInfo(), "SubServers", "DownloadHostInfo");
+        registerPacket(new PacketDownloadLang(host), "SubServers", "DownloadLang");
+        registerPacket(new PacketDownloadNetworkList(), "SubServers", "DownloadNetworkList");
+        registerPacket(new PacketDownloadPlayerList(), "SubServers", "DownloadPlayerList");
+        registerPacket(new PacketDownloadProxyInfo(), "SubServers", "DownloadProxyInfo");
+        registerPacket(new PacketDownloadServerInfo(), "SubServers", "DownloadServerInfo");
+        registerPacket(new PacketDownloadServerList(), "SubServers", "DownloadServerList");
+        registerPacket(new PacketExAddServer(host), "SubServers", "ExAddServer");
+        registerPacket(new PacketExConfigureHost(host), "SubServers", "ExConfigureHost");
+        registerPacket(new PacketExCreateServer(host), "SubServers", "ExCreateServer");
+        registerPacket(new PacketExDeleteServer(host), "SubServers", "ExDeleteServer");
+        registerPacket(new PacketExRemoveServer(host), "SubServers", "ExRemoveServer");
+        registerPacket(new PacketExUpdateServer(host), "SubServers", "ExUpdateServer");
+        registerPacket(new PacketInReload(host), "SubServers", "Reload");
+        registerPacket(new PacketInReset(host), "SubServers", "Reset");
+        registerPacket(new PacketInRunEvent(), "SubServers", "RunEvent");
+        registerPacket(new PacketLinkExHost(host), "SubServers", "LinkExHost");
+        registerPacket(new PacketStartServer(), "SubServers", "StartServer");
+        registerPacket(new PacketStopServer(), "SubServers", "StopServer");
 
 
-        registerPacket(PacketAuthorization.class, "Authorization");
-        registerPacket(PacketCommandServer.class, "SubCommandServer");
-        registerPacket(PacketCreateServer.class, "SubCreateServer");
-        registerPacket(PacketDownloadHostInfo.class, "SubDownloadHostInfo");
-        registerPacket(PacketDownloadLang.class, "SubDownloadLang");
-        registerPacket(PacketDownloadNetworkList.class, "SubDownloadNetworkList");
-        registerPacket(PacketDownloadPlayerList.class, "SubDownloadPlayerList");
-        registerPacket(PacketDownloadProxyInfo.class, "SubDownloadProxyInfo");
-        registerPacket(PacketDownloadServerInfo.class, "SubDownloadServerInfo");
-        registerPacket(PacketDownloadServerList.class, "SubDownloadServerList");
-        registerPacket(PacketExAddServer.class, "SubExAddServer");
-        registerPacket(PacketExConfigureHost.class, "SubExConfigureHost");
-        registerPacket(PacketExCreateServer.class, "SubExCreateServer");
-        registerPacket(PacketExDeleteServer.class, "SubExDeleteServer");
-        registerPacket(PacketExRemoveServer.class, "SubExRemoveServer");
-        registerPacket(PacketExUpdateServer.class, "SubExUpdateServer");
-        registerPacket(PacketLinkExHost.class, "SubLinkExHost");
-        registerPacket(PacketOutExLogMessage.class, "SubExLogMessage");
-        registerPacket(PacketOutExRequestQueue.class, "SubExRequestQueue");
-        registerPacket(PacketStartServer.class, "SubStartServer");
-        registerPacket(PacketStopServer.class, "SubStopServer");
+        registerPacket(PacketAuthorization.class, "SubData", "Authorization");
+        registerPacket(PacketCommandServer.class, "SubServers", "CommandServer");
+        registerPacket(PacketCreateServer.class, "SubServers", "CreateServer");
+        registerPacket(PacketDownloadHostInfo.class, "SubServers", "DownloadHostInfo");
+        registerPacket(PacketDownloadLang.class, "SubServers", "DownloadLang");
+        registerPacket(PacketDownloadNetworkList.class, "SubServers", "DownloadNetworkList");
+        registerPacket(PacketDownloadPlayerList.class, "SubServers", "DownloadPlayerList");
+        registerPacket(PacketDownloadProxyInfo.class, "SubServers", "DownloadProxyInfo");
+        registerPacket(PacketDownloadServerInfo.class, "SubServers", "DownloadServerInfo");
+        registerPacket(PacketDownloadServerList.class, "SubServers", "DownloadServerList");
+        registerPacket(PacketExAddServer.class, "SubServers", "ExAddServer");
+        registerPacket(PacketExConfigureHost.class, "SubServers", "ExConfigureHost");
+        registerPacket(PacketExCreateServer.class, "SubServers", "ExCreateServer");
+        registerPacket(PacketExDeleteServer.class, "SubServers", "ExDeleteServer");
+        registerPacket(PacketExRemoveServer.class, "SubServers", "ExRemoveServer");
+        registerPacket(PacketExUpdateServer.class, "SubServers", "ExUpdateServer");
+        registerPacket(PacketLinkExHost.class, "SubServers", "LinkExHost");
+        registerPacket(PacketOutExLogMessage.class, "SubServers", "ExLogMessage");
+        registerPacket(PacketOutExRequestQueue.class, "SubServers", "ExRequestQueue");
+        registerPacket(PacketStartServer.class, "SubServers", "StartServer");
+        registerPacket(PacketStopServer.class, "SubServers", "StopServer");
     }
 
     private void loop() {
@@ -251,33 +251,40 @@ public final class SubDataClient {
      * Register PacketIn to the Network
      *
      * @param packet PacketIn to register
+     * @param channel Packet Channel
      * @param handle Handle to Bind
      */
-    public static void registerPacket(PacketIn packet, String handle) {
+    public static void registerPacket(PacketIn packet, String channel, String handle) {
         if (Util.isNull(packet, handle)) throw new NullPointerException();
-        List<PacketIn> list = (pIn.keySet().contains(handle.toLowerCase()))?pIn.get(handle.toLowerCase()):new ArrayList<PacketIn>();
+        HashMap<String, List<PacketIn>> map = (pIn.keySet().contains(channel.toLowerCase()))?pIn.get(channel.toLowerCase()):new HashMap<String, List<PacketIn>>();
+        List<PacketIn> list = (map.keySet().contains(handle))?map.get(handle):new ArrayList<PacketIn>();
         if (!list.contains(packet)) {
             list.add(packet);
-            pIn.put(handle.toLowerCase(), list);
+            map.put(handle, list);
+            pIn.put(channel.toLowerCase(), map);
         }
     }
 
     /**
      * Unregister PacketIn from the Network
      *
+     * @param channel Packet Channel
      * @param packet PacketIn to unregister
      */
-    public static void unregisterPacket(PacketIn packet) {
+    public static void unregisterPacket(String channel, PacketIn packet) {
         if (Util.isNull(packet)) throw new NullPointerException();
-        List<String> search = new ArrayList<String>();
-        search.addAll(pIn.keySet());
-        for (String handle : search) if (pIn.get(handle.toLowerCase()).contains(packet)) {
-            List<PacketIn> list = pIn.get(handle.toLowerCase());
-            list.remove(packet);
-            if (list.isEmpty()) {
-                pIn.remove(handle.toLowerCase());
-            } else {
-                pIn.put(handle.toLowerCase(), list);
+        if (pIn.keySet().contains(channel.toLowerCase())) {
+            List<String> search = new ArrayList<String>();
+            search.addAll(pIn.get(channel.toLowerCase()).keySet());
+            for (String handle : search) if (pIn.get(channel.toLowerCase()).get(handle).contains(packet)) {
+                List<PacketIn> list = pIn.get(channel.toLowerCase()).get(handle);
+                list.remove(packet);
+                if (list.isEmpty()) {
+                    pIn.get(channel.toLowerCase()).remove(handle);
+                    if (pIn.get(channel.toLowerCase()).isEmpty()) pIn.remove(channel.toLowerCase());
+                } else {
+                    pIn.get(channel.toLowerCase()).put(handle, list);
+                }
             }
         }
     }
@@ -286,32 +293,35 @@ public final class SubDataClient {
      * Register PacketOut to the Network
      *
      * @param packet PacketOut to register
+     * @param channel Packet Channel
      * @param handle Handle to bind
      */
-    public static void registerPacket(Class<? extends PacketOut> packet, String handle) {
+    public static void registerPacket(Class<? extends PacketOut> packet, String channel, String handle) {
         if (Util.isNull(packet, handle)) throw new NullPointerException();
-        pOut.put(packet, handle.toLowerCase());
+        pOut.put(packet, new NamedContainer<String, String>(channel.toLowerCase(), handle));
     }
 
     /**
      * Unregister PacketOut to the Network
      *
+     * @param channel Packet Channel
      * @param packet PacketOut to unregister
      */
-    public static void unregisterPacket(Class<? extends PacketOut> packet) {
+    public static void unregisterPacket(String channel, Class<? extends PacketOut> packet) {
         if (Util.isNull(packet)) throw new NullPointerException();
-        pOut.remove(packet);
+        if (pOut.keySet().contains(packet) && pOut.get(packet).name().equalsIgnoreCase(channel)) pOut.remove(packet);
     }
 
     /**
      * Grab PacketIn Instances via handle
      *
+     * @param channel Packet Channel
      * @param handle Handle
      * @return PacketIn
      */
-    public static List<? extends PacketIn> getPacket(String handle) {
+    public static List<? extends PacketIn> getPacket(String channel, String handle) {
         if (Util.isNull(handle)) throw new NullPointerException();
-        return new ArrayList<PacketIn>(pIn.get(handle.toLowerCase()));
+        return new ArrayList<PacketIn>(pIn.get(channel.toLowerCase()).get(handle));
     }
 
     /**
@@ -376,7 +386,8 @@ public final class SubDataClient {
 
         try {
             YAMLSection contents = packet.generate();
-            json.set("h", pOut.get(packet.getClass()));
+            json.set("n", pOut.get(packet.getClass()).name());
+            json.set("h", pOut.get(packet.getClass()).get());
             json.set("v", packet.getVersion().toString());
             if (contents != null) json.set("c", contents);
         } catch (Throwable e) {
@@ -395,11 +406,11 @@ public final class SubDataClient {
      */
     @SuppressWarnings("deprecation")
     private static List<PacketIn> decodePacket(YAMLSection data) throws IllegalPacketException, InvocationTargetException {
-        if (!data.contains("h") || !data.contains("v")) throw new IllegalPacketException("Unknown Packet Format: " + data.toString());
-        if (!pIn.keySet().contains(data.getRawString("h"))) throw new IllegalPacketException("Unknown PacketIn Channel: " + data.getRawString("h"));
+        if (!data.contains("n") || !data.contains("h") || !data.contains("v")) throw new IllegalPacketException("Unknown Packet Format: " + data.toString());
+        if (!pIn.keySet().contains(data.getRawString("n")) || !pIn.get(data.getRawString("n")).keySet().contains(data.getRawString("h"))) throw new IllegalPacketException("Unknown PacketIn Channel: " + data.getRawString("n") + ':' + data.getRawString("h"));
 
         List<PacketIn> list = new ArrayList<PacketIn>();
-        for (PacketIn packet : pIn.get(data.getRawString("h"))) {
+        for (PacketIn packet : pIn.get(data.getRawString("n")).get(data.getRawString("h"))) {
             if (packet.isCompatible(new Version(data.getRawString("v")))) {
                 list.add(packet);
             } else {

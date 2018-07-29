@@ -33,29 +33,23 @@ public class SubCommand {
             @Override
             public void command(String handle, String[] args) {
                 if (args.length == 0 || host.api.plugins.get(args[0].toLowerCase()) != null) {
-                    boolean build = false;
-                    try {
-                        Field f = Version.class.getDeclaredField("type");
-                        f.setAccessible(true);
-                        build = f.get(host.version) != VersionType.SNAPSHOT && ExHost.class.getPackage().getSpecificationTitle() != null;
-                        f.setAccessible(false);
-                    } catch (Exception e) {}
-
                     host.log.message.println(
                             "These are the platforms and versions that are running " + ((args.length == 0)?"SubServers.Host":host.api.plugins.get(args[0].toLowerCase()).getName()) +":",
                             "  " + System.getProperty("os.name") + ' ' + System.getProperty("os.version") + ',',
                             "  Java " + System.getProperty("java.version") + ',',
-                            "  SubServers.Host v" + host.version.toExtendedString() + ((build)?" (" + ExHost.class.getPackage().getSpecificationTitle() + ')':"") + ((args.length == 0)?"":","));
+                            "  SubServers.Host v" + host.version.toExtendedString() + ((host.api.getAppBuild() != null)?" (" + host.api.getAppBuild() + ')':""));
                     if (args.length == 0) {
                         host.log.message.println("");
                         new Thread(() -> {
                             try {
                                 YAMLSection tags = new YAMLSection(new JSONObject("{\"tags\":" + Util.readAll(new BufferedReader(new InputStreamReader(new URL("https://api.github.com/repos/ME1312/SubServers-2/git/refs/tags").openStream(), Charset.forName("UTF-8")))) + '}'));
+                                List<Version> versions = new LinkedList<Version>();
 
                                 Version updversion = host.version;
                                 int updcount = 0;
-                                for (YAMLSection tag : tags.getSectionList("tags")) {
-                                    Version version = Version.fromString(tag.getString("ref").substring(10));
+                                for (YAMLSection tag : tags.getSectionList("tags")) versions.add(Version.fromString(tag.getString("ref").substring(10)));
+                                Collections.sort(versions);
+                                for (Version version : versions) {
                                     if (version.compareTo(updversion) > 0) {
                                         updversion = version;
                                         updcount++;

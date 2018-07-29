@@ -37,6 +37,8 @@ import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -62,8 +64,7 @@ public final class SubPlugin {
     @Listener
     public void setup(GamePreInitializationEvent event) {
         if (plugin.getVersion().isPresent()) {
-            //version = Version.fromString(plugin.getVersion().get());
-            version = new Version(Version.fromString(plugin.getVersion().get()), VersionType.SNAPSHOT, (SubPlugin.class.getPackage().getSpecificationTitle() == null)?"custom":SubPlugin.class.getPackage().getSpecificationTitle()); // TODO Snapshot Version
+            version = Version.fromString(plugin.getVersion().get());
         } else version = new Version("Custom");
     }
 
@@ -110,11 +111,13 @@ public final class SubPlugin {
             game.getScheduler().createTaskBuilder().async().execute(() -> {
                 try {
                     YAMLSection tags = new YAMLSection(new Gson().fromJson("{\"tags\":" + Util.readAll(new BufferedReader(new InputStreamReader(new URL("https://api.github.com/repos/ME1312/SubServers-2/git/refs/tags").openStream(), Charset.forName("UTF-8")))) + '}', Map.class));
+                    List<Version> versions = new LinkedList<Version>();
 
                     Version updversion = version;
                     int updcount = 0;
-                    for (YAMLSection tag : tags.getSectionList("tags")) {
-                        Version version = Version.fromString(tag.getString("ref").substring(10));
+                    for (YAMLSection tag : tags.getSectionList("tags")) versions.add(Version.fromString(tag.getString("ref").substring(10)));
+                    Collections.sort(versions);
+                    for (Version version : versions) {
                         if (version.compareTo(updversion) > 0) {
                             updversion = version;
                             updcount++;

@@ -1,4 +1,3 @@
 Manifest-Version: 1.0
 Main-Class: net.ME1312.SubServers.Host.ExHost
 Implementation-Title: SubServers.Host
-Specification-Title: 18w30bb

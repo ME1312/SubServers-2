@@ -615,4 +615,13 @@ public final class SubAPI {
     public Version getAppVersion() {
         return host.version;
     }
+
+    /**
+     * Gets the SubServers Build Signature
+     *
+     * @return SubServers Build Signature (or null if unsigned)
+     */
+    public Version getAppBuild() {
+        return (ExHost.class.getPackage().getSpecificationTitle() != null)?new Version(ExHost.class.getPackage().getSpecificationTitle()):null;
+    }
 }

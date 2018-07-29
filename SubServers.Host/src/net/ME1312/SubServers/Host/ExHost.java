@@ -55,8 +55,7 @@ public final class ExHost {
     public SubDataClient subdata = null;
 
     public final SubAPI api = new SubAPI(this);
-    //public static final Version version = Version.fromString("2.13b");
-    public static final Version version = new Version(Version.fromString("2.13b"), VersionType.SNAPSHOT, (ExHost.class.getPackage().getSpecificationTitle() == null)?"custom":ExHost.class.getPackage().getSpecificationTitle()); // TODO Snapshot Version
+    public static final Version version = Version.fromString("2.13b");
 
     private ConsoleReader jline;
     private boolean running = false;
@@ -417,11 +416,13 @@ public final class ExHost {
                 public void run() {
                     try {
                         YAMLSection tags = new YAMLSection(new JSONObject("{\"tags\":" + Util.readAll(new BufferedReader(new InputStreamReader(new URL("https://api.github.com/repos/ME1312/SubServers-2/git/refs/tags").openStream(), Charset.forName("UTF-8")))) + '}'));
+                        List<Version> versions = new LinkedList<Version>();
 
                         Version updversion = version;
                         int updcount = 0;
-                        for (YAMLSection tag : tags.getSectionList("tags")) {
-                            Version version = Version.fromString(tag.getString("ref").substring(10));
+                        for (YAMLSection tag : tags.getSectionList("tags")) versions.add(Version.fromString(tag.getString("ref").substring(10)));
+                        Collections.sort(versions);
+                        for (Version version : versions) {
                             if (version.compareTo(updversion) > 0) {
                                 updversion = version;
                                 updcount++;

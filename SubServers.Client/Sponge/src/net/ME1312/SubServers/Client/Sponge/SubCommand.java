@@ -156,29 +156,22 @@ public final class SubCommand implements CommandExecutor {
         @SuppressWarnings("unchecked")
         public CommandResult execute(CommandSource sender, CommandContext args) throws CommandException {
             if (canRun(sender)) {
-                boolean build = false;
-                String platform = "Sponge";
-                try {
-                    Field f = Version.class.getDeclaredField("type");
-                    f.setAccessible(true);
-                    build = f.get(plugin.version) != VersionType.SNAPSHOT && SubPlugin.class.getPackage().getSpecificationTitle() != null;
-                    f.setAccessible(false);
-                } catch (Exception e) {}
-
                 sender.sendMessage(Text.of(plugin.api.getLang("SubServers", "Command.Version").replace("$str$", "SubServers.Client.Sponge")));
                 sender.sendMessage(Text.builder("  " + System.getProperty("os.name") + ' ' + System.getProperty("os.version")).color(TextColors.WHITE).append(Text.of(",")).build());
                 sender.sendMessage(Text.builder("  Java " + System.getProperty("java.version")).color(TextColors.WHITE).append(Text.of(",")).build());
                 sender.sendMessage(Text.builder("  " + Sponge.getPlatform().getImplementation().getName() + ' ' + Sponge.getPlatform().getImplementation().getVersion().get()).color(TextColors.WHITE).append(Text.of(",")).build());
-                sender.sendMessage(Text.builder("  SubServers.Client.Sponge v" + plugin.version.toExtendedString() + ((build)?" (" + SubPlugin.class.getPackage().getSpecificationTitle() + ')':"")).color(TextColors.WHITE).build());
+                sender.sendMessage(Text.builder("  SubServers.Client.Sponge v" + plugin.version.toExtendedString() + ((plugin.api.getPluginBuild() != null)?" (" + plugin.api.getPluginBuild() + ')':"")).color(TextColors.WHITE).build());
                 sender.sendMessage(Text.EMPTY);
                 plugin.game.getScheduler().createTaskBuilder().async().execute(() -> {
                     try {
                         YAMLSection tags = new YAMLSection(new Gson().fromJson("{\"tags\":" + Util.readAll(new BufferedReader(new InputStreamReader(new URL("https://api.github.com/repos/ME1312/SubServers-2/git/refs/tags").openStream(), Charset.forName("UTF-8")))) + '}', Map.class));
+                        List<Version> versions = new LinkedList<Version>();
 
                         Version updversion = plugin.version;
                         int updcount = 0;
-                        for (YAMLSection tag : tags.getSectionList("tags")) {
-                            Version version = Version.fromString(tag.getString("ref").substring(10));
+                        for (YAMLSection tag : tags.getSectionList("tags")) versions.add(Version.fromString(tag.getString("ref").substring(10)));
+                        Collections.sort(versions);
+                        for (Version version : versions) {
                             if (version.compareTo(updversion) > 0) {
                                 updversion = version;
                                 updcount++;
