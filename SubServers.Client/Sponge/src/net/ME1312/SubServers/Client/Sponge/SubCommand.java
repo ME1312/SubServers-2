@@ -156,10 +156,14 @@ public final class SubCommand implements CommandExecutor {
         @SuppressWarnings("unchecked")
         public CommandResult execute(CommandSource sender, CommandContext args) throws CommandException {
             if (canRun(sender)) {
+                PluginContainer container = null;
+                if (container == null) container = Util.getDespiteException(() -> (PluginContainer) Platform.class.getMethod("getContainer", Class.forName("org.spongepowered.api.Platform$Component")).invoke(Sponge.getPlatform(), Enum.valueOf((Class<Enum>) Class.forName("org.spongepowered.api.Platform$Component"), "IMPLEMENTATION")), null);
+                if (container == null) container = Util.getDespiteException(() -> (PluginContainer) Platform.class.getMethod("getImplementation").invoke(Sponge.getPlatform()), null);
+
                 sender.sendMessage(Text.of(plugin.api.getLang("SubServers", "Command.Version").replace("$str$", "SubServers.Client.Sponge")));
                 sender.sendMessage(Text.builder("  " + System.getProperty("os.name") + ' ' + System.getProperty("os.version")).color(TextColors.WHITE).append(Text.of(",")).build());
                 sender.sendMessage(Text.builder("  Java " + System.getProperty("java.version")).color(TextColors.WHITE).append(Text.of(",")).build());
-                sender.sendMessage(Text.builder("  " + Sponge.getPlatform().getImplementation().getName() + ' ' + Sponge.getPlatform().getImplementation().getVersion().get()).color(TextColors.WHITE).append(Text.of(",")).build());
+                sender.sendMessage(Text.builder("  " + container.getName() + ' ' + container.getVersion().get()).color(TextColors.WHITE).append(Text.of(",")).build());
                 sender.sendMessage(Text.builder("  SubServers.Client.Sponge v" + plugin.version.toExtendedString() + ((plugin.api.getPluginBuild() != null)?" (" + plugin.api.getPluginBuild() + ')':"")).color(TextColors.WHITE).build());
                 sender.sendMessage(Text.EMPTY);
                 plugin.game.getScheduler().createTaskBuilder().async().execute(() -> {
@@ -183,7 +187,7 @@ public final class SubCommand implements CommandExecutor {
                             sender.sendMessage(Text.of(plugin.api.getLang("SubServers", "Command.Version.Outdated").replace("$name$", "SubServers.Client.Sponge").replace("$str$", updversion.toString()).replace("$int$", Integer.toString(updcount))));
                         }
                     } catch (Exception e) {}
-                });
+                }).submit(plugin);
                 return CommandResult.builder().successCount(1).build();
             } else {
                 sender.sendMessage(Text.of(plugin.api.getLang("SubServers", "Command.Generic.Invalid-Permission").replace("$str$", "subservers.command")));

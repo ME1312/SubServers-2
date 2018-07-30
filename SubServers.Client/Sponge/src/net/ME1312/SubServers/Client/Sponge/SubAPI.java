@@ -13,6 +13,9 @@ import net.ME1312.SubServers.Client.Sponge.Network.Packet.PacketDownloadNetworkL
 import net.ME1312.SubServers.Client.Sponge.Network.Packet.PacketDownloadPlayerList;
 import net.ME1312.SubServers.Client.Sponge.Network.Packet.PacketDownloadServerList;
 import net.ME1312.SubServers.Client.Sponge.Network.SubDataClient;
+import org.spongepowered.api.Platform;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.plugin.PluginContainer;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
@@ -367,7 +370,10 @@ public final class SubAPI {
      * @return Server Version
      */
     public Version getServerVersion() {
-        return new Version(plugin.game.getPlatform().getImplementation().getVersion().get());
+        PluginContainer container = null;
+        if (container == null) container = Util.getDespiteException(() -> (PluginContainer) Platform.class.getMethod("getContainer", Class.forName("org.spongepowered.api.Platform$Component")).invoke(Sponge.getPlatform(), Enum.valueOf((Class<Enum>) Class.forName("org.spongepowered.api.Platform$Component"), "IMPLEMENTATION")), null);
+        if (container == null) container = Util.getDespiteException(() -> (PluginContainer) Platform.class.getMethod("getImplementation").invoke(Sponge.getPlatform()), null);
+        return (container == null || !container.getVersion().isPresent())?null:new Version(container.getVersion().get());
     }
 
     /**

@@ -197,7 +197,7 @@ public class Metrics {
         playerAmount = playerAmount > 200 ? 200 : playerAmount;
         int onlineMode = Sponge.getServer().getOnlineMode() ? 1 : 0;
         String minecraftVersion = Sponge.getGame().getPlatform().getMinecraftVersion().getName();
-        String spongeImplementation = Sponge.getPlatform().getImplementation().getName();
+        String spongeImplementation = plugin.api.getServerVersion() + "";
 
         // OS/Java specific data
         String javaVersion = System.getProperty("java.version");

@@ -63,9 +63,11 @@ public class SubSendCommandEvent extends AbstractEvent implements SubEvent {
     /**
      * Gets the cause of this Event
      *
+     * @deprecated Use simplified methods where available
      * @return The player who triggered this event under the key: player
      */
     @Override
+    @Deprecated
     public Cause getCause() {
         return Cause.builder().named("player", player).build();
     }

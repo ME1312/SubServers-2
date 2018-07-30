@@ -21,9 +21,11 @@ public class SubNetworkConnectEvent extends AbstractEvent implements SubEvent {
     /**
      * Gets the cause of this Event
      *
+     * @deprecated Use simplified methods where available
      * @return An empty cause list
      */
     @Override
+    @Deprecated
     public Cause getCause() {
         return Cause.builder().build();
     }
