@@ -1,29 +1,22 @@
 package net.ME1312.SubServers.Client.Bukkit;
 
-import com.google.gson.Gson;
 import net.ME1312.SubServers.Client.Bukkit.Graphic.UIRenderer;
 import net.ME1312.SubServers.Client.Bukkit.Library.Config.YAMLSection;
-import net.ME1312.SubServers.Client.Bukkit.Library.Container;
 import net.ME1312.SubServers.Client.Bukkit.Library.Util;
 import net.ME1312.SubServers.Client.Bukkit.Library.Version.Version;
-import net.ME1312.SubServers.Client.Bukkit.Library.Version.VersionType;
 import net.ME1312.SubServers.Client.Bukkit.Network.Packet.*;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.HoverEvent;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
 
-import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.io.StringReader;
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.nio.charset.Charset;
@@ -61,7 +54,7 @@ public final class SubCommand implements CommandExecutor {
                         sender.sendMessage("");
                         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
                             try {
-                                YAMLSection tags = new YAMLSection(new Gson().fromJson("{\"tags\":" + Util.readAll(new BufferedReader(new InputStreamReader(new URL("https://api.github.com/repos/ME1312/SubServers-2/git/refs/tags").openStream(), Charset.forName("UTF-8")))) + '}', Map.class));
+                                YAMLSection tags = new YAMLSection(plugin.parseJSON("{\"tags\":" + Util.readAll(new BufferedReader(new InputStreamReader(new URL("https://api.github.com/repos/ME1312/SubServers-2/git/refs/tags").openStream(), Charset.forName("UTF-8")))) + '}'));
                                 List<Version> versions = new LinkedList<Version>();
 
                                 Version updversion = plugin.version;
@@ -86,69 +79,69 @@ public final class SubCommand implements CommandExecutor {
                         plugin.subdata.sendPacket(new PacketDownloadServerList(null, null, data -> {
                             int i = 0;
                             boolean sent = false;
-                            if (Util.getDespiteException(() -> Class.forName("org.spigotmc.SpigotConfig") != null, false) && sender instanceof Player) {
-                                net.md_5.bungee.api.chat.TextComponent div = new net.md_5.bungee.api.chat.TextComponent(plugin.api.getLang("SubServers", "Command.List.Divider"));
+                            if (sender instanceof Player) {
+                                TextComponent div = new TextComponent(plugin.api.getLang("SubServers", "Command.List.Divider"));
                                 if (data.getSection("groups").getKeys().size() > 0) {
                                     sender.sendMessage(plugin.api.getLang("SubServers", "Command.List.Group-Header"));
                                     for (String group : data.getSection("groups").getKeys()) {
-                                        List<net.md_5.bungee.api.chat.TextComponent> hoverm = new LinkedList<net.md_5.bungee.api.chat.TextComponent>();
-                                        net.md_5.bungee.api.chat.TextComponent msg = new net.md_5.bungee.api.chat.TextComponent("  ");
-                                        net.md_5.bungee.api.chat.TextComponent message = new net.md_5.bungee.api.chat.TextComponent(group);
-                                        net.md_5.bungee.api.chat.TextComponent hover = new net.md_5.bungee.api.chat.TextComponent(group + '\n');
+                                        List<TextComponent> hoverm = new LinkedList<TextComponent>();
+                                        TextComponent msg = new TextComponent("  ");
+                                        TextComponent message = new TextComponent(group);
+                                        TextComponent hover = new TextComponent(group + '\n');
                                         message.setColor(net.md_5.bungee.api.ChatColor.GOLD);
                                         hover.setColor(net.md_5.bungee.api.ChatColor.GOLD);
                                         hoverm.add(hover);
-                                        hover = new net.md_5.bungee.api.chat.TextComponent(plugin.api.getLang("SubServers", "Interface.Group-Menu.Group-Server-Count").replace("$int$", new DecimalFormat("#,###").format(data.getSection("groups").getSection(group).getKeys().size())));
+                                        hover = new TextComponent(plugin.api.getLang("SubServers", "Interface.Group-Menu.Group-Server-Count").replace("$int$", new DecimalFormat("#,###").format(data.getSection("groups").getSection(group).getKeys().size())));
                                         hoverm.add(hover);
-                                        message.setClickEvent(new net.md_5.bungee.api.chat.ClickEvent(net.md_5.bungee.api.chat.ClickEvent.Action.RUN_COMMAND, fLabel + " open Server 1 " + group));
-                                        message.setHoverEvent(new net.md_5.bungee.api.chat.HoverEvent(net.md_5.bungee.api.chat.HoverEvent.Action.SHOW_TEXT, hoverm.toArray(new net.md_5.bungee.api.chat.TextComponent[hoverm.size()])));
+                                        message.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, fLabel + " open Server 1 " + group));
+                                        message.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, hoverm.toArray(new TextComponent[hoverm.size()])));
                                         msg.addExtra(message);
-                                        msg.addExtra(new net.md_5.bungee.api.chat.TextComponent(plugin.api.getLang("SubServers", "Command.List.Header")));
+                                        msg.addExtra(new TextComponent(plugin.api.getLang("SubServers", "Command.List.Header")));
 
                                         for (String server : data.getSection("groups").getSection(group).getKeys()) {
-                                            hoverm = new LinkedList<net.md_5.bungee.api.chat.TextComponent>();
-                                            message = new net.md_5.bungee.api.chat.TextComponent(data.getSection("groups").getSection(group).getSection(server).getString("display"));
-                                            hover = new net.md_5.bungee.api.chat.TextComponent(data.getSection("groups").getSection(group).getSection(server).getString("display") + '\n');
+                                            hoverm = new LinkedList<TextComponent>();
+                                            message = new TextComponent(data.getSection("groups").getSection(group).getSection(server).getString("display"));
+                                            hover = new TextComponent(data.getSection("groups").getSection(group).getSection(server).getString("display") + '\n');
                                             if (data.getSection("groups").getSection(group).getSection(server).getKeys().contains("enabled")) {
-                                                message.setClickEvent(new net.md_5.bungee.api.chat.ClickEvent(net.md_5.bungee.api.chat.ClickEvent.Action.RUN_COMMAND, fLabel + " open SubServer/ " + server));
+                                                message.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, fLabel + " open SubServer/ " + server));
                                                 if (data.getSection("groups").getSection(group).getSection(server).getBoolean("temp")) {
                                                     message.setColor(net.md_5.bungee.api.ChatColor.AQUA);
                                                     hover.setColor(net.md_5.bungee.api.ChatColor.AQUA);
                                                     hoverm.add(hover);
                                                     if (!server.equals(data.getSection("groups").getSection(group).getSection(server).getString("display"))) {
-                                                        hover = new net.md_5.bungee.api.chat.TextComponent(server + '\n');
+                                                        hover = new TextComponent(server + '\n');
                                                         hover.setColor(net.md_5.bungee.api.ChatColor.GRAY);
                                                         hoverm.add(hover);
                                                     }
-                                                    hover = new net.md_5.bungee.api.chat.TextComponent(plugin.api.getLang("SubServers", "Interface.Server-Menu.Server-Player-Count").replace("$int$", new DecimalFormat("#,###").format(data.getSection("groups").getSection(group).getSection(server).getSection("players").getKeys().size())) + '\n');
+                                                    hover = new TextComponent(plugin.api.getLang("SubServers", "Interface.Server-Menu.Server-Player-Count").replace("$int$", new DecimalFormat("#,###").format(data.getSection("groups").getSection(group).getSection(server).getSection("players").getKeys().size())) + '\n');
                                                     hoverm.add(hover);
-                                                    hover = new net.md_5.bungee.api.chat.TextComponent(plugin.api.getLang("SubServers", "Interface.Server-Menu.SubServer-Temporary"));
+                                                    hover = new TextComponent(plugin.api.getLang("SubServers", "Interface.Server-Menu.SubServer-Temporary"));
                                                 } else if (data.getSection("groups").getSection(group).getSection(server).getBoolean("running")) {
                                                     message.setColor(net.md_5.bungee.api.ChatColor.GREEN);
                                                     hover.setColor(net.md_5.bungee.api.ChatColor.GREEN);
                                                     hoverm.add(hover);
                                                     if (!server.equals(data.getSection("groups").getSection(group).getSection(server).getString("display"))) {
-                                                        hover = new net.md_5.bungee.api.chat.TextComponent(server + '\n');
+                                                        hover = new TextComponent(server + '\n');
                                                         hover.setColor(net.md_5.bungee.api.ChatColor.GRAY);
                                                         hoverm.add(hover);
                                                     }
-                                                    hover = new net.md_5.bungee.api.chat.TextComponent(plugin.api.getLang("SubServers", "Interface.Server-Menu.Server-Player-Count").replace("$int$", new DecimalFormat("#,###").format(data.getSection("groups").getSection(group).getSection(server).getSection("players").getKeys().size())));
+                                                    hover = new TextComponent(plugin.api.getLang("SubServers", "Interface.Server-Menu.Server-Player-Count").replace("$int$", new DecimalFormat("#,###").format(data.getSection("groups").getSection(group).getSection(server).getSection("players").getKeys().size())));
                                                 } else if (data.getSection("groups").getSection(group).getSection(server).getBoolean("enabled") && data.getSection("groups").getSection(group).getSection(server).getList("incompatible").size() == 0) {
                                                     message.setColor(net.md_5.bungee.api.ChatColor.YELLOW);
                                                     hover.setColor(net.md_5.bungee.api.ChatColor.YELLOW);
                                                     hoverm.add(hover);
                                                     if (!server.equals(data.getSection("groups").getSection(group).getSection(server).getString("display"))) {
-                                                        hover = new net.md_5.bungee.api.chat.TextComponent(server + '\n');
+                                                        hover = new TextComponent(server + '\n');
                                                         hover.setColor(net.md_5.bungee.api.ChatColor.GRAY);
                                                         hoverm.add(hover);
                                                     }
-                                                    hover = new net.md_5.bungee.api.chat.TextComponent(plugin.api.getLang("SubServers", "Interface.Server-Menu.SubServer-Offline"));
+                                                    hover = new TextComponent(plugin.api.getLang("SubServers", "Interface.Server-Menu.SubServer-Offline"));
                                                 } else {
                                                     message.setColor(net.md_5.bungee.api.ChatColor.RED);
                                                     hover.setColor(net.md_5.bungee.api.ChatColor.RED);
                                                     if (!server.equals(data.getSection("groups").getSection(group).getSection(server).getString("display"))) {
                                                         hoverm.add(hover);
-                                                        hover = new net.md_5.bungee.api.chat.TextComponent(server + '\n');
+                                                        hover = new TextComponent(server + '\n');
                                                         hover.setColor(net.md_5.bungee.api.ChatColor.GRAY);
                                                     }
                                                     if (data.getSection("groups").getSection(group).getSection(server).getList("incompatible").size() != 0) {
@@ -158,42 +151,42 @@ public final class SubCommand implements CommandExecutor {
                                                             if (list.length() != 0) list += ", ";
                                                             list += data.getSection("groups").getSection(group).getSection(server).getList("incompatible").get(ii).asString();
                                                         }
-                                                        hover = new net.md_5.bungee.api.chat.TextComponent(plugin.api.getLang("SubServers", "Interface.Server-Menu.SubServer-Incompatible").replace("$str$", list) + ((data.getSection("groups").getSection(group).getSection(server).getBoolean("enabled"))?"":"\n"));
+                                                        hover = new TextComponent(plugin.api.getLang("SubServers", "Interface.Server-Menu.SubServer-Incompatible").replace("$str$", list) + ((data.getSection("groups").getSection(group).getSection(server).getBoolean("enabled"))?"":"\n"));
                                                     }
                                                     if (!data.getSection("groups").getSection(group).getSection(server).getBoolean("enabled")) {
                                                         hoverm.add(hover);
-                                                        hover = new net.md_5.bungee.api.chat.TextComponent(plugin.api.getLang("SubServers", "Interface.Server-Menu.SubServer-Disabled"));
+                                                        hover = new TextComponent(plugin.api.getLang("SubServers", "Interface.Server-Menu.SubServer-Disabled"));
                                                     }
                                                 }
                                                 hoverm.add(hover);
                                                 if (plugin.config.get().getSection("Settings").getBoolean("Show-Addresses", false)) {
-                                                    hover = new net.md_5.bungee.api.chat.TextComponent('\n' + data.getSection("groups").getSection(group).getSection(server).getString("address"));
+                                                    hover = new TextComponent('\n' + data.getSection("groups").getSection(group).getSection(server).getString("address"));
                                                 } else {
-                                                    hover = new net.md_5.bungee.api.chat.TextComponent('\n' + data.getSection("groups").getSection(group).getSection(server).getString("address").split(":")[data.getSection("groups").getSection(group).getSection(server).getString("address").split(":").length - 1]);
+                                                    hover = new TextComponent('\n' + data.getSection("groups").getSection(group).getSection(server).getString("address").split(":")[data.getSection("groups").getSection(group).getSection(server).getString("address").split(":").length - 1]);
                                                 }
                                                 hover.setColor(net.md_5.bungee.api.ChatColor.WHITE);
                                                 hoverm.add(hover);
-                                                message.setClickEvent(new net.md_5.bungee.api.chat.ClickEvent(net.md_5.bungee.api.chat.ClickEvent.Action.RUN_COMMAND, fLabel + " open SubServer/ " + server));
+                                                message.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, fLabel + " open SubServer/ " + server));
                                             } else {
                                                 message.setColor(net.md_5.bungee.api.ChatColor.WHITE);
                                                 hover.setColor(net.md_5.bungee.api.ChatColor.WHITE);
                                                 hoverm.add(hover);
-                                                hover = new net.md_5.bungee.api.chat.TextComponent(plugin.api.getLang("SubServers", "Interface.Server-Menu.Server-External"));
+                                                hover = new TextComponent(plugin.api.getLang("SubServers", "Interface.Server-Menu.Server-External"));
                                                 hoverm.add(hover);
                                                 if (plugin.config.get().getSection("Settings").getBoolean("Show-Addresses", false)) {
-                                                    hover = new net.md_5.bungee.api.chat.TextComponent('\n' + data.getSection("servers").getSection(server).getString("address"));
+                                                    hover = new TextComponent('\n' + data.getSection("servers").getSection(server).getString("address"));
                                                 } else {
-                                                    hover = new net.md_5.bungee.api.chat.TextComponent('\n' + data.getSection("servers").getSection(server).getString("address").split(":")[data.getSection("servers").getSection(server).getString("address").split(":").length - 1]);
+                                                    hover = new TextComponent('\n' + data.getSection("servers").getSection(server).getString("address").split(":")[data.getSection("servers").getSection(server).getString("address").split(":").length - 1]);
                                                 }
                                                 hover.setColor(net.md_5.bungee.api.ChatColor.WHITE);
                                                 hoverm.add(hover);
                                             }
-                                            message.setHoverEvent(new net.md_5.bungee.api.chat.HoverEvent(net.md_5.bungee.api.chat.HoverEvent.Action.SHOW_TEXT, hoverm.toArray(new net.md_5.bungee.api.chat.TextComponent[hoverm.size()])));
+                                            message.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, hoverm.toArray(new TextComponent[hoverm.size()])));
                                             if (i != 0) msg.addExtra(div);
                                             msg.addExtra(message);
                                             i++;
                                         }
-                                        if (i == 0) msg.addExtra(new net.md_5.bungee.api.chat.TextComponent(plugin.api.getLang("SubServers", "Command.List.Empty")));
+                                        if (i == 0) msg.addExtra(new TextComponent(plugin.api.getLang("SubServers", "Command.List.Empty")));
                                         ((Player) sender).spigot().sendMessage(msg);
                                         i = 0;
                                         sent = true;
@@ -203,85 +196,85 @@ public final class SubCommand implements CommandExecutor {
                                 }
                                 sender.sendMessage(plugin.api.getLang("SubServers", "Command.List.Host-Header"));
                                 for (String host : data.getSection("hosts").getKeys()) {
-                                    List<net.md_5.bungee.api.chat.TextComponent> hoverm = new LinkedList<net.md_5.bungee.api.chat.TextComponent>();
-                                    net.md_5.bungee.api.chat.TextComponent msg = new net.md_5.bungee.api.chat.TextComponent("  ");
-                                    net.md_5.bungee.api.chat.TextComponent message = new net.md_5.bungee.api.chat.TextComponent(data.getSection("hosts").getSection(host).getString("display"));
-                                    net.md_5.bungee.api.chat.TextComponent hover = new net.md_5.bungee.api.chat.TextComponent(data.getSection("hosts").getSection(host).getString("display") + '\n');
+                                    List<TextComponent> hoverm = new LinkedList<TextComponent>();
+                                    TextComponent msg = new TextComponent("  ");
+                                    TextComponent message = new TextComponent(data.getSection("hosts").getSection(host).getString("display"));
+                                    TextComponent hover = new TextComponent(data.getSection("hosts").getSection(host).getString("display") + '\n');
                                     if (data.getSection("hosts").getSection(host).getBoolean("enabled")) {
                                         message.setColor(net.md_5.bungee.api.ChatColor.AQUA);
                                         hover.setColor(net.md_5.bungee.api.ChatColor.AQUA);
                                         hoverm.add(hover);
                                         if (!host.equals(data.getSection("hosts").getSection(host).getString("display"))) {
-                                            hover = new net.md_5.bungee.api.chat.TextComponent(host + '\n');
+                                            hover = new TextComponent(host + '\n');
                                             hover.setColor(net.md_5.bungee.api.ChatColor.GRAY);
                                             hoverm.add(hover);
                                         }
-                                        hover = new net.md_5.bungee.api.chat.TextComponent(plugin.api.getLang("SubServers", "Interface.Host-Menu.Host-Server-Count").replace("$int$", new DecimalFormat("#,###").format(data.getSection("hosts").getSection(host).getSection("servers").getKeys().size())));
+                                        hover = new TextComponent(plugin.api.getLang("SubServers", "Interface.Host-Menu.Host-Server-Count").replace("$int$", new DecimalFormat("#,###").format(data.getSection("hosts").getSection(host).getSection("servers").getKeys().size())));
                                     } else {
                                         message.setColor(net.md_5.bungee.api.ChatColor.RED);
                                         hover.setColor(net.md_5.bungee.api.ChatColor.RED);
                                         hoverm.add(hover);
                                         if (!host.equals(data.getSection("hosts").getSection(host).getString("display"))) {
-                                            hover = new net.md_5.bungee.api.chat.TextComponent(host + '\n');
+                                            hover = new TextComponent(host + '\n');
                                             hover.setColor(net.md_5.bungee.api.ChatColor.GRAY);
                                             hoverm.add(hover);
                                         }
-                                        hover = new net.md_5.bungee.api.chat.TextComponent(plugin.api.getLang("SubServers", "Interface.Host-Menu.Host-Disabled"));
+                                        hover = new TextComponent(plugin.api.getLang("SubServers", "Interface.Host-Menu.Host-Disabled"));
                                     }
                                     if (plugin.config.get().getSection("Settings").getBoolean("Show-Addresses", false)) {
                                         hoverm.add(hover);
-                                        hover = new net.md_5.bungee.api.chat.TextComponent('\n' + data.getSection("hosts").getSection(host).getString("address"));
+                                        hover = new TextComponent('\n' + data.getSection("hosts").getSection(host).getString("address"));
                                         hover.setColor(net.md_5.bungee.api.ChatColor.WHITE);
                                     }
                                     hoverm.add(hover);
-                                    message.setClickEvent(new net.md_5.bungee.api.chat.ClickEvent(net.md_5.bungee.api.chat.ClickEvent.Action.RUN_COMMAND, fLabel + " open Host/ " + host));
-                                    message.setHoverEvent(new net.md_5.bungee.api.chat.HoverEvent(net.md_5.bungee.api.chat.HoverEvent.Action.SHOW_TEXT, hoverm.toArray(new net.md_5.bungee.api.chat.TextComponent[hoverm.size()])));
+                                    message.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, fLabel + " open Host/ " + host));
+                                    message.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, hoverm.toArray(new TextComponent[hoverm.size()])));
                                     msg.addExtra(message);
-                                    msg.addExtra(new net.md_5.bungee.api.chat.TextComponent(plugin.api.getLang("SubServers", "Command.List.Header")));
+                                    msg.addExtra(new TextComponent(plugin.api.getLang("SubServers", "Command.List.Header")));
 
                                     for (String subserver : data.getSection("hosts").getSection(host).getSection("servers").getKeys()) {
-                                        hoverm = new LinkedList<net.md_5.bungee.api.chat.TextComponent>();
-                                        message = new net.md_5.bungee.api.chat.TextComponent(data.getSection("hosts").getSection(host).getSection("servers").getSection(subserver).getString("display"));
-                                        hover = new net.md_5.bungee.api.chat.TextComponent(data.getSection("hosts").getSection(host).getSection("servers").getSection(subserver).getString("display") + '\n');
-                                        message.setClickEvent(new net.md_5.bungee.api.chat.ClickEvent(net.md_5.bungee.api.chat.ClickEvent.Action.RUN_COMMAND, fLabel + " open SubServer/ " + subserver));
+                                        hoverm = new LinkedList<TextComponent>();
+                                        message = new TextComponent(data.getSection("hosts").getSection(host).getSection("servers").getSection(subserver).getString("display"));
+                                        hover = new TextComponent(data.getSection("hosts").getSection(host).getSection("servers").getSection(subserver).getString("display") + '\n');
+                                        message.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, fLabel + " open SubServer/ " + subserver));
                                         if (data.getSection("hosts").getSection(host).getSection("servers").getSection(subserver).getBoolean("temp")) {
                                             message.setColor(net.md_5.bungee.api.ChatColor.AQUA);
                                             hover.setColor(net.md_5.bungee.api.ChatColor.AQUA);
                                             hoverm.add(hover);
                                             if (!subserver.equals(data.getSection("hosts").getSection(host).getSection("servers").getSection(subserver).getString("display"))) {
-                                                hover = new net.md_5.bungee.api.chat.TextComponent(subserver + '\n');
+                                                hover = new TextComponent(subserver + '\n');
                                                 hover.setColor(net.md_5.bungee.api.ChatColor.GRAY);
                                                 hoverm.add(hover);
                                             }
-                                            hover = new net.md_5.bungee.api.chat.TextComponent(plugin.api.getLang("SubServers", "Interface.Server-Menu.Server-Player-Count").replace("$int$", new DecimalFormat("#,###").format(data.getSection("hosts").getSection(host).getSection("servers").getSection(subserver).getSection("players").getKeys().size())) + '\n');
+                                            hover = new TextComponent(plugin.api.getLang("SubServers", "Interface.Server-Menu.Server-Player-Count").replace("$int$", new DecimalFormat("#,###").format(data.getSection("hosts").getSection(host).getSection("servers").getSection(subserver).getSection("players").getKeys().size())) + '\n');
                                             hoverm.add(hover);
-                                            hover = new net.md_5.bungee.api.chat.TextComponent(plugin.api.getLang("SubServers", "Interface.Server-Menu.SubServer-Temporary"));
+                                            hover = new TextComponent(plugin.api.getLang("SubServers", "Interface.Server-Menu.SubServer-Temporary"));
                                         } else if (data.getSection("hosts").getSection(host).getSection("servers").getSection(subserver).getBoolean("running")) {
                                             message.setColor(net.md_5.bungee.api.ChatColor.GREEN);
                                             hover.setColor(net.md_5.bungee.api.ChatColor.GREEN);
                                             hoverm.add(hover);
                                             if (!subserver.equals(data.getSection("hosts").getSection(host).getSection("servers").getSection(subserver).getString("display"))) {
-                                                hover = new net.md_5.bungee.api.chat.TextComponent(subserver + '\n');
+                                                hover = new TextComponent(subserver + '\n');
                                                 hover.setColor(net.md_5.bungee.api.ChatColor.GRAY);
                                                 hoverm.add(hover);
                                             }
-                                            hover = new net.md_5.bungee.api.chat.TextComponent(plugin.api.getLang("SubServers", "Interface.Server-Menu.Server-Player-Count").replace("$int$", new DecimalFormat("#,###").format(data.getSection("hosts").getSection(host).getSection("servers").getSection(subserver).getSection("players").getKeys().size())));
+                                            hover = new TextComponent(plugin.api.getLang("SubServers", "Interface.Server-Menu.Server-Player-Count").replace("$int$", new DecimalFormat("#,###").format(data.getSection("hosts").getSection(host).getSection("servers").getSection(subserver).getSection("players").getKeys().size())));
                                         } else if (data.getSection("hosts").getSection(host).getSection("servers").getSection(subserver).getBoolean("enabled") && data.getSection("hosts").getSection(host).getSection("servers").getSection(subserver).getList("incompatible").size() == 0) {
                                             message.setColor(net.md_5.bungee.api.ChatColor.YELLOW);
                                             hover.setColor(net.md_5.bungee.api.ChatColor.YELLOW);
                                             hoverm.add(hover);
                                             if (!subserver.equals(data.getSection("hosts").getSection(host).getSection("servers").getSection(subserver).getString("display"))) {
-                                                hover = new net.md_5.bungee.api.chat.TextComponent(subserver + '\n');
+                                                hover = new TextComponent(subserver + '\n');
                                                 hover.setColor(net.md_5.bungee.api.ChatColor.GRAY);
                                                 hoverm.add(hover);
                                             }
-                                            hover = new net.md_5.bungee.api.chat.TextComponent(plugin.api.getLang("SubServers", "Interface.Server-Menu.SubServer-Offline"));
+                                            hover = new TextComponent(plugin.api.getLang("SubServers", "Interface.Server-Menu.SubServer-Offline"));
                                         } else {
                                             message.setColor(net.md_5.bungee.api.ChatColor.RED);
                                             hover.setColor(net.md_5.bungee.api.ChatColor.RED);
                                             if (!subserver.equals(data.getSection("hosts").getSection(host).getSection("servers").getSection(subserver).getString("display"))) {
                                                 hoverm.add(hover);
-                                                hover = new net.md_5.bungee.api.chat.TextComponent(subserver + '\n');
+                                                hover = new TextComponent(subserver + '\n');
                                                 hover.setColor(net.md_5.bungee.api.ChatColor.GRAY);
                                             }
                                             if (data.getSection("hosts").getSection(host).getSection("servers").getSection(subserver).getList("incompatible").size() != 0) {
@@ -291,52 +284,52 @@ public final class SubCommand implements CommandExecutor {
                                                     if (list.length() != 0) list += ", ";
                                                     list += data.getSection("hosts").getSection(host).getSection("servers").getSection(subserver).getList("incompatible").get(ii).asString();
                                                 }
-                                                hover = new net.md_5.bungee.api.chat.TextComponent(plugin.api.getLang("SubServers", "Interface.Server-Menu.SubServer-Incompatible").replace("$str$", list) + ((data.getSection("hosts").getSection(host).getSection("servers").getSection(subserver).getBoolean("enabled"))?"":"\n"));
+                                                hover = new TextComponent(plugin.api.getLang("SubServers", "Interface.Server-Menu.SubServer-Incompatible").replace("$str$", list) + ((data.getSection("hosts").getSection(host).getSection("servers").getSection(subserver).getBoolean("enabled"))?"":"\n"));
                                             }
                                             if (!data.getSection("hosts").getSection(host).getSection("servers").getSection(subserver).getBoolean("enabled")) {
                                                 hoverm.add(hover);
-                                                hover = new net.md_5.bungee.api.chat.TextComponent(plugin.api.getLang("SubServers", "Interface.Server-Menu.SubServer-Disabled"));
+                                                hover = new TextComponent(plugin.api.getLang("SubServers", "Interface.Server-Menu.SubServer-Disabled"));
                                             }
                                         }
                                         hoverm.add(hover);
                                         if (plugin.config.get().getSection("Settings").getBoolean("Show-Addresses", false)) {
-                                            hover = new net.md_5.bungee.api.chat.TextComponent('\n' + data.getSection("hosts").getSection(host).getSection("servers").getSection(subserver).getString("address"));
+                                            hover = new TextComponent('\n' + data.getSection("hosts").getSection(host).getSection("servers").getSection(subserver).getString("address"));
                                         } else {
-                                            hover = new net.md_5.bungee.api.chat.TextComponent('\n' + data.getSection("hosts").getSection(host).getSection("servers").getSection(subserver).getString("address").split(":")[data.getSection("hosts").getSection(host).getSection("servers").getSection(subserver).getString("address").split(":").length - 1]);
+                                            hover = new TextComponent('\n' + data.getSection("hosts").getSection(host).getSection("servers").getSection(subserver).getString("address").split(":")[data.getSection("hosts").getSection(host).getSection("servers").getSection(subserver).getString("address").split(":").length - 1]);
                                         }
                                         hover.setColor(net.md_5.bungee.api.ChatColor.WHITE);
                                         hoverm.add(hover);
-                                        message.setClickEvent(new net.md_5.bungee.api.chat.ClickEvent(net.md_5.bungee.api.chat.ClickEvent.Action.RUN_COMMAND, fLabel + " open SubServer/ " + subserver));
-                                        message.setHoverEvent(new net.md_5.bungee.api.chat.HoverEvent(net.md_5.bungee.api.chat.HoverEvent.Action.SHOW_TEXT, hoverm.toArray(new net.md_5.bungee.api.chat.TextComponent[hoverm.size()])));
+                                        message.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, fLabel + " open SubServer/ " + subserver));
+                                        message.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, hoverm.toArray(new TextComponent[hoverm.size()])));
                                         if (i != 0) msg.addExtra(div);
                                         msg.addExtra(message);
                                         i++;
                                     }
-                                    if (i == 0) msg.addExtra(new net.md_5.bungee.api.chat.TextComponent(plugin.api.getLang("SubServers", "Command.List.Empty")));
+                                    if (i == 0) msg.addExtra(new TextComponent(plugin.api.getLang("SubServers", "Command.List.Empty")));
                                     ((Player) sender).spigot().sendMessage(msg);
                                     i = 0;
                                     sent = true;
                                 }
                                 if (!sent) sender.sendMessage("  " + plugin.api.getLang("SubServers", "Command.List.Empty"));
                                 sender.sendMessage(plugin.api.getLang("SubServers", "Command.List.Server-Header"));
-                                net.md_5.bungee.api.chat.TextComponent msg = new net.md_5.bungee.api.chat.TextComponent("  ");
+                                TextComponent msg = new TextComponent("  ");
                                 for (String server : data.getSection("servers").getKeys()) {
-                                    List<net.md_5.bungee.api.chat.TextComponent> hoverm = new LinkedList<net.md_5.bungee.api.chat.TextComponent>();
-                                    net.md_5.bungee.api.chat.TextComponent message = new net.md_5.bungee.api.chat.TextComponent(data.getSection("servers").getSection(server).getString("display"));
-                                    net.md_5.bungee.api.chat.TextComponent hover = new net.md_5.bungee.api.chat.TextComponent(data.getSection("servers").getSection(server).getString("display") + '\n');
+                                    List<TextComponent> hoverm = new LinkedList<TextComponent>();
+                                    TextComponent message = new TextComponent(data.getSection("servers").getSection(server).getString("display"));
+                                    TextComponent hover = new TextComponent(data.getSection("servers").getSection(server).getString("display") + '\n');
                                     message.setColor(net.md_5.bungee.api.ChatColor.WHITE);
                                     hover.setColor(net.md_5.bungee.api.ChatColor.WHITE);
                                     hoverm.add(hover);
-                                    hover = new net.md_5.bungee.api.chat.TextComponent(plugin.api.getLang("SubServers", "Interface.Server-Menu.Server-External"));
+                                    hover = new TextComponent(plugin.api.getLang("SubServers", "Interface.Server-Menu.Server-External"));
                                     hoverm.add(hover);
                                     if (plugin.config.get().getSection("Settings").getBoolean("Show-Addresses", false)) {
-                                        hover = new net.md_5.bungee.api.chat.TextComponent('\n' + data.getSection("servers").getSection(server).getString("address"));
+                                        hover = new TextComponent('\n' + data.getSection("servers").getSection(server).getString("address"));
                                     } else {
-                                        hover = new net.md_5.bungee.api.chat.TextComponent('\n' + data.getSection("servers").getSection(server).getString("address").split(":")[data.getSection("servers").getSection(server).getString("address").split(":").length - 1]);
+                                        hover = new TextComponent('\n' + data.getSection("servers").getSection(server).getString("address").split(":")[data.getSection("servers").getSection(server).getString("address").split(":").length - 1]);
                                     }
                                     hover.setColor(net.md_5.bungee.api.ChatColor.WHITE);
                                     hoverm.add(hover);
-                                    message.setHoverEvent(new net.md_5.bungee.api.chat.HoverEvent(net.md_5.bungee.api.chat.HoverEvent.Action.SHOW_TEXT, hoverm.toArray(new net.md_5.bungee.api.chat.TextComponent[hoverm.size()])));
+                                    message.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, hoverm.toArray(new TextComponent[hoverm.size()])));
                                     if (i != 0) msg.addExtra(div);
                                     msg.addExtra(message);
                                     i++;

@@ -1,7 +1,7 @@
 package net.ME1312.SubServers.Client.Bukkit.Network.Encryption;
 
-import com.google.gson.Gson;
 import net.ME1312.SubServers.Client.Bukkit.Library.Config.YAMLSection;
+import net.ME1312.SubServers.Client.Bukkit.SubAPI;
 
 import javax.crypto.*;
 import javax.crypto.spec.IvParameterSpec;
@@ -270,11 +270,11 @@ public final class AES implements net.ME1312.SubServers.Client.Bukkit.Network.Ci
      * @param data Encrypted Data Array
      * @return JSON Data
      */
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings("deprecation")
     public YAMLSection decrypt(String key, byte[] data) throws Exception {
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         decrypt(key, new ByteArrayInputStream(data), bytes);
-        return new YAMLSection(new Gson().fromJson(new String(bytes.toByteArray(), StandardCharsets.UTF_8), Map.class));
+        return new YAMLSection(SubAPI.getInstance().getInternals().parseJSON(new String(bytes.toByteArray(), StandardCharsets.UTF_8)));
     }
 
     /**

@@ -1,12 +1,12 @@
 package net.ME1312.SubServers.Client.Bukkit.Library.Config;
 
-import com.google.gson.Gson;
 import net.ME1312.SubServers.Client.Bukkit.Library.Util;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.error.YAMLException;
 
 import java.io.InputStream;
 import java.io.Reader;
+import java.lang.reflect.Type;
 import java.util.*;
 
 /**
@@ -1053,6 +1053,13 @@ public class YAMLSection {
      * @return JSON
      */
     public String toJSON() {
-        return new Gson().toJson(get(), Map.class);
+        try {
+            Class<?> gson = Class.forName(((Util.getDespiteException(() -> Class.forName("com.google.gson.Gson") != null, false)?"":"org.bukkit.craftbukkit.libs.")) + "com.google.gson.Gson");
+            //Class<?> gson = com.google.gson.Gson.class;
+            return (String) gson.getMethod("toJson", Object.class, Type.class).invoke(gson.newInstance(), get(), Map.class);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "{}";
+        }
     }
 }

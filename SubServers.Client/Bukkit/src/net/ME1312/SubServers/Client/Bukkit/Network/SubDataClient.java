@@ -1,7 +1,5 @@
 package net.ME1312.SubServers.Client.Bukkit.Network;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonParseException;
 import net.ME1312.SubServers.Client.Bukkit.Event.SubNetworkConnectEvent;
 import net.ME1312.SubServers.Client.Bukkit.Event.SubNetworkDisconnectEvent;
 import net.ME1312.SubServers.Client.Bukkit.Library.Config.YAMLSection;
@@ -66,8 +64,8 @@ public final class SubDataClient {
             }
             @Override
             @SuppressWarnings("unchecked")
-            public YAMLSection decrypt(String key, byte[] data) {
-                return new YAMLSection(new Gson().fromJson(new String(data, StandardCharsets.UTF_8), Map.class));
+            public YAMLSection decrypt(String key, byte[] data) throws Exception {
+                return new YAMLSection(plugin.parseJSON(new String(data, StandardCharsets.UTF_8)));
             }
         };
 
@@ -144,12 +142,16 @@ public final class SubDataClient {
                                 }
                             });
                         }
-                    } catch (JsonParseException | YAMLException e) {
-                        new IllegalPacketException("Unknown Packet Format: " + input).printStackTrace();
                     } catch (IllegalPacketException e) {
                         e.printStackTrace();
                     } catch (Exception e) {
-                        new InvocationTargetException(e, "Exception while decoding packet").printStackTrace();
+                        Class<?> gsone = Class.forName(((Util.getDespiteException(() -> Class.forName("com.google.gson.JsonParseException") != null, false)?"":"org.bukkit.craftbukkit.libs.")) + "com.google.gson.JsonParseException");
+                        //Class<?> gsone = com.google.gson.JsonParseException.class;
+                        if (e instanceof YAMLException || gsone.isInstance(e)) {
+                            new IllegalPacketException("Unknown Packet Format: " + input).printStackTrace();
+                        } else {
+                            new InvocationTargetException(e, "Exception while decoding packet").printStackTrace();
+                        }
                     }
                 }
                 try {

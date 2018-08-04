@@ -1,6 +1,5 @@
 package net.ME1312.SubServers.Client.Bukkit;
 
-import com.google.gson.Gson;
 import net.ME1312.SubServers.Client.Bukkit.Graphic.InternalUIHandler;
 import net.ME1312.SubServers.Client.Bukkit.Graphic.UIHandler;
 import net.ME1312.SubServers.Client.Bukkit.Library.Config.YAMLConfig;
@@ -10,17 +9,11 @@ import net.ME1312.SubServers.Client.Bukkit.Library.NamedContainer;
 import net.ME1312.SubServers.Client.Bukkit.Library.UniversalFile;
 import net.ME1312.SubServers.Client.Bukkit.Library.Util;
 import net.ME1312.SubServers.Client.Bukkit.Library.Version.Version;
-import net.ME1312.SubServers.Client.Bukkit.Library.Version.VersionType;
 import net.ME1312.SubServers.Client.Bukkit.Network.Cipher;
 import net.ME1312.SubServers.Client.Bukkit.Network.SubDataClient;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
 
-import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.net.InetAddress;
@@ -76,7 +69,7 @@ public final class SubPlugin extends JavaPlugin {
             config = new YAMLConfig(new UniversalFile(getDataFolder(), "config.yml"));
             if (new UniversalFile(new File(System.getProperty("user.dir")), "subservers.client").exists()) {
                 FileReader reader = new FileReader(new UniversalFile(new File(System.getProperty("user.dir")), "subservers.client"));
-                config.get().getSection("Settings").set("SubData", new YAMLSection(new Gson().fromJson(Util.readAll(reader), Map.class)));
+                config.get().getSection("Settings").set("SubData", new YAMLSection(parseJSON(Util.readAll(reader))));
                 config.save();
                 reader.close();
                 new UniversalFile(new File(System.getProperty("user.dir")), "subservers.client").delete();
@@ -95,7 +88,7 @@ public final class SubPlugin extends JavaPlugin {
             new Metrics(this);
             Bukkit.getScheduler().runTaskTimerAsynchronously(this, () -> {
                 try {
-                    YAMLSection tags = new YAMLSection(new Gson().fromJson("{\"tags\":" + Util.readAll(new BufferedReader(new InputStreamReader(new URL("https://api.github.com/repos/ME1312/SubServers-2/git/refs/tags").openStream(), Charset.forName("UTF-8")))) + '}', Map.class));
+                    YAMLSection tags = new YAMLSection(parseJSON("{\"tags\":" + Util.readAll(new BufferedReader(new InputStreamReader(new URL("https://api.github.com/repos/ME1312/SubServers-2/git/refs/tags").openStream(), Charset.forName("UTF-8")))) + '}'));
                     List<Version> versions = new LinkedList<Version>();
 
                     Version updversion = version;
@@ -111,7 +104,7 @@ public final class SubPlugin extends JavaPlugin {
                     if (updcount > 0) Bukkit.getLogger().info("SubServers > SubServers.Client.Bukkit v" + updversion + " is available. You are " + updcount + " version" + ((updcount == 1)?"":"s") + " behind.");
                 } catch (Exception e) {}
             }, 0, TimeUnit.DAYS.toSeconds(2) * 20);
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -161,5 +154,23 @@ public final class SubPlugin extends JavaPlugin {
             e.printStackTrace();
         }
         setEnabled(false);
+    }
+
+    /**
+     * Use reflection to access Gson for parsing
+     *
+     * @param json JSON to parse
+     * @return JSON as a map
+     * @throws NoSuchMethodException
+     * @throws IllegalAccessException
+     * @throws InvocationTargetException
+     * @throws InstantiationException
+     * @throws ClassNotFoundException
+     */
+    @SuppressWarnings("unchecked")
+    public Map<String, ?> parseJSON(String json) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException, ClassNotFoundException {
+        Class<?> gson = Class.forName(((Util.getDespiteException(() -> Class.forName("com.google.gson.Gson") != null, false)?"":"org.bukkit.craftbukkit.libs.")) + "com.google.gson.Gson");
+        //Class<?> gson = com.google.gson.Gson.class;
+        return (Map<String, ?>) gson.getMethod("fromJson", String.class, Class.class).invoke(gson.newInstance(), json, Map.class);
     }
 }
