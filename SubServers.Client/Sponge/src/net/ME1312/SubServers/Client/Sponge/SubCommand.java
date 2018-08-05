@@ -395,7 +395,7 @@ public final class SubCommand implements CommandExecutor {
                         i++;
                     }
                     if (i == 0) sender.sendMessage(Text.of("  " + plugin.api.getLang("SubServers", "Command.List.Empty")));
-                    else sender.sendMessage(Text.builder("  (master)").append(msg.build()).build());
+                    else sender.sendMessage(Text.builder("  ").append(msg.build()).build());
                     if (data.getSection("proxies").getKeys().size() > 0) {
                         sender.sendMessage(Text.of(plugin.api.getLang("SubServers", "Command.List.Proxy-Header")));
                         msg = Text.builder();
@@ -415,7 +415,7 @@ public final class SubCommand implements CommandExecutor {
                             message.onHover(TextActions.showText(hover.build()));
                             msg.append(div, message.build());
                         }
-                        sender.sendMessage(Text.builder("  ").append(msg.build()).build());
+                        sender.sendMessage(Text.builder("  (master)").color(TextColors.GRAY).append(msg.build()).build());
                     }
                 }));
                 return CommandResult.builder().successCount(1).build();
