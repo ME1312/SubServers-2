@@ -7,14 +7,14 @@ import net.md_5.bungee.api.plugin.Event;
 import java.util.UUID;
 
 /**
- * Remove Server Event
+ * Remove Host Event
  */
 public class SubRemoveHostEvent extends Event implements SubEvent {
     private UUID player;
     private String host;
 
     /**
-     * Server Remove Event
+     * Host Remove Event
      *
      * @param player Player Adding Host
      * @param host Server Starting

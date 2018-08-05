@@ -1,33 +1,33 @@
 package net.ME1312.SubServers.Client.Sponge.Event;
 
+
 import net.ME1312.SubServers.Client.Sponge.Library.SubEvent;
 import net.ME1312.SubServers.Client.Sponge.Library.Util;
-import net.ME1312.SubServers.Client.Sponge.Network.SubDataClient;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.impl.AbstractEvent;
 
 /**
- * SubData Network Connect Event
+ * Proxy Add Event
  */
-public class SubNetworkConnectEvent extends AbstractEvent implements SubEvent {
-    private SubDataClient network;
+public class SubAddProxyEvent extends AbstractEvent implements SubEvent {
+    private String proxy;
 
     /**
-     * SubData Network Connect Event
-     */
-    public SubNetworkConnectEvent(SubDataClient network) {
-        if (Util.isNull(network)) throw new NullPointerException();
-        this.network = network;
-    }
-
-    /**
-     * Get the SubData network
+     * Proxy Add Event
      *
-     * @return SubData Network
+     * @param proxy Host Being Added
      */
-    public SubDataClient getNetwork() {
-        return network;
+    public SubAddProxyEvent(String proxy) {
+        if (Util.isNull(proxy)) throw new NullPointerException();
+        this.proxy = proxy;
     }
+
+    /**
+     * Gets the Proxy to be Added
+     *
+     * @return The Proxy to be Added
+     */
+    public String getProxy() { return proxy; }
 
     /**
      * Gets the cause of this Event

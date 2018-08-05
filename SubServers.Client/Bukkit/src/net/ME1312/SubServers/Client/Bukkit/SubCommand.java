@@ -4,6 +4,7 @@ import net.ME1312.SubServers.Client.Bukkit.Graphic.UIRenderer;
 import net.ME1312.SubServers.Client.Bukkit.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Client.Bukkit.Library.Util;
 import net.ME1312.SubServers.Client.Bukkit.Library.Version.Version;
+import net.ME1312.SubServers.Client.Bukkit.Network.API.Proxy;
 import net.ME1312.SubServers.Client.Bukkit.Network.Packet.*;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -71,11 +72,11 @@ public final class SubCommand implements CommandExecutor {
                             } catch (Exception e) {}
                         });
                     } else if (args[0].equalsIgnoreCase("list")) {
-                        final String fLabel = label;
-                        plugin.subdata.sendPacket(new PacketDownloadServerList(null, null, data -> {
-                            if (Util.getDespiteException(() -> Class.forName("net.md_5.bungee.api.chat.BaseComponent") != null, false) && sender instanceof Player) {
-                                new net.ME1312.SubServers.Client.Bukkit.Library.Compatibility.BungeeChat(plugin).listCommand(sender, fLabel, data);
-                            } else {
+                        if (Util.getDespiteException(() -> Class.forName("net.md_5.bungee.api.chat.BaseComponent") != null, false) && sender instanceof Player) {
+                            new net.ME1312.SubServers.Client.Bukkit.Library.Compatibility.BungeeChat(plugin).listCommand(sender, label);
+                        } else {
+                            final String fLabel = label;
+                            plugin.subdata.sendPacket(new PacketDownloadServerList(null, null, data -> {
                                 int i = 0;
                                 boolean sent = false;
                                 sender.sendMessage(plugin.api.getLang("SubServers", "Command.List.Group-Header"));
@@ -150,9 +151,17 @@ public final class SubCommand implements CommandExecutor {
                                     i++;
                                 }
                                 if (i == 0) sender.sendMessage("  " + plugin.api.getLang("SubServers", "Command.List.Empty"));
-                                sender.sendMessage(message);
-                            }
-                        }));
+                                else sender.sendMessage(message);
+                                if (data.getSection("proxies").getKeys().size() > 0) {
+                                    sender.sendMessage(plugin.api.getLang("SubServers", "Command.List.Proxy-Header"));
+                                    message = "  (master)";
+                                    for (String proxy : data.getSection("proxies").getKeys()) {
+                                        message += div + ((data.getSection("proxies").getSection(proxy).getKeys().contains("subdata"))?ChatColor.AQUA:ChatColor.WHITE) + data.getSection("proxies").getSection(proxy).getString("display") + ((proxy.equals(data.getSection("proxies").getSection(proxy).getString("display")))?"":" ("+proxy+')');
+                                    }
+                                    sender.sendMessage(message);
+                                }
+                            }));
+                        }
                     } else if (args[0].equalsIgnoreCase("info") || args[0].equalsIgnoreCase("status")) {
                         if (args.length > 1) {
                             plugin.subdata.sendPacket(new PacketDownloadServerInfo(args[1].toLowerCase(), data -> {

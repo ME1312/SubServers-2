@@ -1,21 +1,32 @@
 package net.ME1312.SubServers.Client.Bukkit.Event;
 
 import net.ME1312.SubServers.Client.Bukkit.Library.SubEvent;
+import net.ME1312.SubServers.Client.Bukkit.Library.Util;
 import net.ME1312.SubServers.Client.Bukkit.Network.SubDataClient;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
 /**
- * SubData Network Disconnect Event
+ * SubData Network Connect Event
  */
 public class SubNetworkConnectEvent extends Event implements SubEvent {
     private SubDataClient network;
 
     /**
-     * SubData Network Disconnect Event
+     * SubData Network Connect Event
      */
     public SubNetworkConnectEvent(SubDataClient network) {
+        if (Util.isNull(network)) throw new NullPointerException();
         this.network = network;
+    }
+
+    /**
+     * Get the SubData network
+     *
+     * @return SubData Network
+     */
+    public SubDataClient getNetwork() {
+        return network;
     }
 
     @Override

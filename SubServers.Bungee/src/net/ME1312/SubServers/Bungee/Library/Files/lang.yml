@@ -1,4 +1,4 @@
-Version: '2.13a+'
+Version: '2.13b+'
 Lang:
   'Bungee.Server.Current': '&6You are currently connected to $str$'
   'Bungee.Server.Available': '&6You may connect to the following servers at this time:'
@@ -36,6 +36,7 @@ Lang:
   'Command.List.Group-Header': '&7SubServers &8&l\u00BB&7 Group/Server List:'
   'Command.List.Host-Header': '&7SubServers &8&l\u00BB&7 Host/SubServer List:'
   'Command.List.Server-Header': '&7SubServers &8&l\u00BB&7 Server List:'
+  'Command.List.Proxy-Header': '&7SubServers &8&l\u00BB&7 Proxy List:'
   'Command.List.Header': '&7: '
   'Command.List.Divider': '&7, '
   'Command.List.Empty': '&7(none)'

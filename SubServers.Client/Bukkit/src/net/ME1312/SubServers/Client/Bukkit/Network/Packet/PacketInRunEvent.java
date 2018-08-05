@@ -33,6 +33,15 @@ public class PacketInRunEvent implements PacketIn {
                 }
             }
         });
+        callback("SubAddProxyEvent", new Callback<YAMLSection>() {
+            @Override
+            public void run(YAMLSection data) {
+                if (plugin.isEnabled()) {
+                    Bukkit.getPluginManager().callEvent(new SubAddProxyEvent(data.getString("proxy")));
+                    callback("SubAddProxyEvent", this);
+                }
+            }
+        });
         callback("SubAddServerEvent", new Callback<YAMLSection>() {
             @Override
             public void run(YAMLSection data) {
@@ -103,6 +112,15 @@ public class PacketInRunEvent implements PacketIn {
                 if (plugin.isEnabled()) {
                     Bukkit.getPluginManager().callEvent(new SubRemoveServerEvent((data.contains("player")) ? UUID.fromString(data.getString("player")) : null, data.getString("host"), data.getString("server")));
                     callback("SubRemoveServerEvent", this);
+                }
+            }
+        });
+        callback("SubRemoveProxyEvent", new Callback<YAMLSection>() {
+            @Override
+            public void run(YAMLSection data) {
+                if (plugin.isEnabled()) {
+                    Bukkit.getPluginManager().callEvent(new SubAddProxyEvent(data.getString("proxy")));
+                    callback("SubRemoveProxyEvent", this);
                 }
             }
         });

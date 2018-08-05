@@ -54,6 +54,13 @@ public class PacketOutRunEvent implements Listener, PacketOut {
     }
 
     @EventHandler(priority = Byte.MAX_VALUE)
+    public void event(SubAddProxyEvent event) {
+        YAMLSection args = new YAMLSection();
+        args.set("proxy", event.getProxy().getName());
+        plugin.subdata.broadcastPacket(new PacketOutRunEvent(event.getClass(), args));
+    }
+
+    @EventHandler(priority = Byte.MAX_VALUE)
     public void event(SubAddHostEvent event) {
         if (!event.isCancelled()) {
             YAMLSection args = new YAMLSection();
@@ -157,5 +164,12 @@ public class PacketOutRunEvent implements Listener, PacketOut {
             args.set("host", event.getHost().getName());
             plugin.subdata.broadcastPacket(new PacketOutRunEvent(event.getClass(), args));
         }
+    }
+
+    @EventHandler(priority = Byte.MAX_VALUE)
+    public void event(SubRemoveProxyEvent event) {
+        YAMLSection args = new YAMLSection();
+        args.set("proxy", event.getProxy().getName());
+        plugin.subdata.broadcastPacket(new PacketOutRunEvent(event.getClass(), args));
     }
 }

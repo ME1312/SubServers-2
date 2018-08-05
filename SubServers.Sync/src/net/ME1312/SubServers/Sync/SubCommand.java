@@ -6,6 +6,7 @@ import net.ME1312.SubServers.Sync.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Sync.Library.NamedContainer;
 import net.ME1312.SubServers.Sync.Library.Util;
 import net.ME1312.SubServers.Sync.Library.Version.Version;
+import net.ME1312.SubServers.Sync.Network.API.Proxy;
 import net.ME1312.SubServers.Sync.Network.Packet.*;
 import net.ME1312.SubServers.Sync.Server.Server;
 import net.ME1312.SubServers.Sync.Server.SubServer;
@@ -161,6 +162,14 @@ public final class SubCommand extends CommandX {
                             }
                             if (i == 0) message += ChatColor.RESET + "(none)";
                             sender.sendMessage(message);
+                            if (data.getSection("proxies").getKeys().size() > 0) {
+                                sender.sendMessage("SubServers > Proxy List:");
+                                message = "  (master)";
+                                for (String proxy : data.getSection("proxies").getKeys()) {
+                                    message += div + ((data.getSection("proxies").getSection(proxy).getKeys().contains("subdata"))?ChatColor.AQUA:ChatColor.WHITE) + data.getSection("proxies").getSection(proxy).getString("display") + ((proxy.equals(data.getSection("proxies").getSection(proxy).getString("display")))?"":" ("+proxy+')');
+                                }
+                                sender.sendMessage(message);
+                            }
                         }));
                     } else if (args[0].equalsIgnoreCase("info") || args[0].equalsIgnoreCase("status")) {
                         if (args.length > 1) {

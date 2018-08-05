@@ -43,13 +43,14 @@ public class PacketDownloadProxyInfo implements PacketIn, PacketOut {
         YAMLSection data = new YAMLSection();
         if (id != null) data.set("id", id);
         YAMLSection subservers = new YAMLSection();
-        subservers.set("version", plugin.version.toString());
+        subservers.set("version", plugin.api.getWrapperVersion().toString());
+        if (plugin.api.getWrapperBuild() != null) subservers.set("build", plugin.api.getWrapperBuild().toString());
         subservers.set("last-reload", plugin.resetDate);
         subservers.set("hosts", plugin.api.getHosts().size());
         subservers.set("subservers", plugin.api.getSubServers().size());
         data.set("subservers", subservers);
         YAMLSection bungee = new YAMLSection();
-        bungee.set("version", plugin.api.getProxyVersion());
+        bungee.set("version", plugin.api.getProxyVersion().toString());
         bungee.set("disabled-cmds", plugin.getConfig().getDisabledCommands());
         bungee.set("player-limit", plugin.getConfig().getPlayerLimit());
         bungee.set("servers", plugin.api.getServers().size());
@@ -60,14 +61,14 @@ public class PacketDownloadProxyInfo implements PacketIn, PacketOut {
             listener.set("motd", info.getMotd());
             listener.set("priorities", info.getServerPriority());
             listener.set("player-limit", info.getMaxPlayers());
-            listener.set("tab-list", info.getTabListType());
-            listener.set("tab-list-size", info.getTabListSize());
             listeners.add(listener);
         }
         bungee.set("listeners", listeners);
         data.set("bungee", bungee);
         YAMLSection minecraft = new YAMLSection();
-        minecraft.set("version", Arrays.asList(plugin.api.getGameVersion()));
+        LinkedList<String> mcversions = new LinkedList<String>();
+        for (Version version : plugin.api.getGameVersion()) mcversions.add(version.toString());
+        minecraft.set("version", mcversions);
         minecraft.set("players", plugin.api.getGlobalPlayers().size());
         data.set("minecraft", minecraft);
         YAMLSection system = new YAMLSection();

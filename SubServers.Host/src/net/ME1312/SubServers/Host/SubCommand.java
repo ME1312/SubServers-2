@@ -6,6 +6,7 @@ import net.ME1312.SubServers.Host.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Host.Library.TextColor;
 import net.ME1312.SubServers.Host.Library.Util;
 import net.ME1312.SubServers.Host.Library.Version.Version;
+import net.ME1312.SubServers.Host.Network.API.Proxy;
 import net.ME1312.SubServers.Host.Network.Packet.*;
 import org.json.JSONObject;
 
@@ -91,7 +92,7 @@ public class SubCommand {
                 "This command will print what OS you're running, your OS version,",
                 "your Java version, and the SubServers.Host version.",
                 "",
-                "If the [plugin] option is provided, it will print information about the specified plugin instead.",
+                "If the [plugin] option is provided, it will print information about the specified plugin as well.",
                 "",
                 "Examples:",
                 "  /version",
@@ -172,6 +173,14 @@ public class SubCommand {
                     }
                     if (i == 0) message += TextColor.RESET + "(none)";
                     host.log.message.println(message);
+                    if (data.getSection("proxies").getKeys().size() > 0) {
+                        host.log.message.println("Proxy List:");
+                        message = "  (master)";
+                        for (String proxy : data.getSection("proxies").getKeys()) {
+                            message += div + ((data.getSection("proxies").getSection(proxy).getKeys().contains("subdata"))?TextColor.AQUA:TextColor.WHITE) + data.getSection("proxies").getSection(proxy).getString("display") + ((proxy.equals(data.getSection("proxies").getSection(proxy).getString("display")))?"":" ("+proxy+')');
+                        }
+                        host.log.message.println(message);
+                    }
                 }));
             }
         }.description("Lists the available Hosts and Servers").help(

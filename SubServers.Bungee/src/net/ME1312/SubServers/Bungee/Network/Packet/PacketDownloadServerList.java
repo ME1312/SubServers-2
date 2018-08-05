@@ -2,6 +2,7 @@ package net.ME1312.SubServers.Bungee.Network.Packet;
 
 import com.google.gson.Gson;
 import net.ME1312.SubServers.Bungee.Host.Host;
+import net.ME1312.SubServers.Bungee.Host.Proxy;
 import net.ME1312.SubServers.Bungee.Host.Server;
 import net.ME1312.SubServers.Bungee.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Bungee.Library.Util;
@@ -53,6 +54,12 @@ public class PacketDownloadServerList implements PacketIn, PacketOut {
     public YAMLSection generate() {
         YAMLSection data = new YAMLSection();
         data.set("id", id);
+
+        YAMLSection proxies = new YAMLSection();
+        for (Proxy proxy : plugin.proxies.values()) {
+            proxies.set(proxy.getName(), new YAMLSection(new Gson().fromJson(proxy.toString(), Map.class)));
+        }
+        data.set("proxies", proxies);
 
         YAMLSection exServers = new YAMLSection();
         for (Server server : plugin.exServers.values()) {

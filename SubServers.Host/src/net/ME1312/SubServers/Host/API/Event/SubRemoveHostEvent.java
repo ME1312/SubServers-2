@@ -6,14 +6,14 @@ import net.ME1312.SubServers.Host.Library.Util;
 import java.util.UUID;
 
 /**
- * Remove Server Event
+ * Remove Host Event
  */
 public class SubRemoveHostEvent extends Event {
     private UUID player;
     private String host;
 
     /**
-     * Server Remove Event
+     * Server Host Event
      *
      * @param player Player Adding Host
      * @param host Server Starting

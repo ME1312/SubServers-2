@@ -5,6 +5,7 @@ import net.ME1312.SubServers.Client.Sponge.Graphic.UIRenderer;
 import net.ME1312.SubServers.Client.Sponge.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Client.Sponge.Library.Util;
 import net.ME1312.SubServers.Client.Sponge.Library.Version.Version;
+import net.ME1312.SubServers.Client.Sponge.Network.API.Proxy;
 import net.ME1312.SubServers.Client.Sponge.Network.Packet.*;
 import org.spongepowered.api.Platform;
 import org.spongepowered.api.Sponge;
@@ -379,6 +380,9 @@ public final class SubCommand implements CommandExecutor {
                         Text.Builder hover = Text.builder(data.getSection("servers").getSection(server).getString("display") + '\n');
                         message.color(TextColors.WHITE);
                         hover.color(TextColors.WHITE);
+                        if (!server.equals(data.getSection("servers").getSection(server).getString("display"))) {
+                            hover.append(Text.builder(server + '\n').color(TextColors.GRAY).build());
+                        }
                         hover.append(Text.of(plugin.api.getLang("SubServers", "Interface.Server-Menu.Server-External")));
                         if (plugin.config.get().getSection("Settings").getBoolean("Show-Addresses", false)) {
                             hover.append(Text.builder('\n' + data.getSection("servers").getSection(server).getString("address")).color(TextColors.WHITE).build());
@@ -391,7 +395,28 @@ public final class SubCommand implements CommandExecutor {
                         i++;
                     }
                     if (i == 0) sender.sendMessage(Text.of("  " + plugin.api.getLang("SubServers", "Command.List.Empty")));
-                    sender.sendMessage(Text.builder("  ").append(msg.build()).build());
+                    else sender.sendMessage(Text.builder("  (master)").append(msg.build()).build());
+                    if (data.getSection("proxies").getKeys().size() > 0) {
+                        sender.sendMessage(Text.of(plugin.api.getLang("SubServers", "Command.List.Proxy-Header")));
+                        msg = Text.builder();
+                        for (String proxy : data.getSection("proxies").getKeys()) {
+                            Text.Builder message = Text.builder(data.getSection("proxies").getSection(proxy).getString("display"));
+                            Text.Builder hover = Text.builder(data.getSection("proxies").getSection(proxy).getString("display"));
+                            if (data.getSection("proxies").getSection(proxy).getKeys().contains("subdata")) {
+                                message.color(TextColors.AQUA);
+                                hover.color(TextColors.AQUA);
+                            } else {
+                                message.color(TextColors.WHITE);
+                                hover.color(TextColors.WHITE);
+                            }
+                            if (!proxy.equals(data.getSection("proxies").getSection(proxy).getString("display"))) {
+                                hover.append(Text.builder('\n' + proxy).color(TextColors.GRAY).build());
+                            }
+                            message.onHover(TextActions.showText(hover.build()));
+                            msg.append(div, message.build());
+                        }
+                        sender.sendMessage(Text.builder("  ").append(msg.build()).build());
+                    }
                 }));
                 return CommandResult.builder().successCount(1).build();
             } else {

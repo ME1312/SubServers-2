@@ -95,9 +95,7 @@ public class ServerContainer extends BungeeServerInfo implements Server {
         if (plugin.redis) {
             try {
                 for (UUID player : (Set<UUID>) plugin.redis("getPlayersOnServer", new NamedContainer<>(String.class, getName()))) players.add(new NamedContainer<>((String) plugin.redis("getNameFromUuid", new NamedContainer<>(UUID.class, player)), player));
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            } catch (Exception e) {}
         } else {
             for (ProxiedPlayer player : getPlayers()) players.add(new NamedContainer<>(player.getName(), player.getUniqueId()));
         }

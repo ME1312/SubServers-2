@@ -30,6 +30,13 @@ public class PacketInRunEvent implements PacketIn {
                 callback("SubAddHostEvent", this);
             }
         });
+        callback("SubAddProxyEvent", new Callback<YAMLSection>() {
+            @Override
+            public void run(YAMLSection data) {
+                SubAPI.getInstance().executeEvent(new SubAddProxyEvent(data.getRawString("proxy")));
+                callback("SubAddProxyEvent", this);
+            }
+        });
         callback("SubAddServerEvent", new Callback<YAMLSection>() {
             @Override
             public void run(YAMLSection data) {
@@ -85,6 +92,13 @@ public class PacketInRunEvent implements PacketIn {
             public void run(YAMLSection data) {
                 SubAPI.getInstance().executeEvent(new SubRemoveServerEvent((data.contains("player"))?UUID.fromString(data.getRawString("player")):null, data.getRawString("host"), data.getRawString("server")));
                 callback("SubRemoveServerEvent", this);
+            }
+        });
+        callback("SubRemoveProxyEvent", new Callback<YAMLSection>() {
+            @Override
+            public void run(YAMLSection data) {
+                SubAPI.getInstance().executeEvent(new SubAddProxyEvent(data.getRawString("proxy")));
+                callback("SubRemoveProxyEvent", this);
             }
         });
         callback("SubRemoveHostEvent", new Callback<YAMLSection>() {

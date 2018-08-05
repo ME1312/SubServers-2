@@ -230,12 +230,10 @@ public final class SubAPI {
     public void getProxies(Callback<Map<String, Proxy>> callback) {
         if (Util.isNull(callback)) throw new NullPointerException();
         StackTraceElement[] origin = new Exception().getStackTrace();
-        plugin.subdata.sendPacket(new PacketDownloadNetworkList(data -> {
+        plugin.subdata.sendPacket(new PacketDownloadServerList(null, null, data -> {
             TreeMap<String, Proxy> proxies = new TreeMap<String, Proxy>();
-            for (String client : data.getSection("clients").getKeys()) {
-                if (data.getSection("clients").getSection(client).getKeys().size() > 0 && data.getSection("clients").getSection(client).getRawString("type", "").equals("Proxy")) {
-                    proxies.put(data.getSection("clients").getSection(client).getRawString("name").toLowerCase(), new Proxy(data.getSection("clients").getSection(client)));
-                }
+            for (String proxy : data.getSection("proxies").getKeys()) {
+                proxies.put(proxy.toLowerCase(), new Proxy(data.getSection("proxies").getSection(proxy)));
             }
 
             try {

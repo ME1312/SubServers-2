@@ -1,5 +1,6 @@
 package net.ME1312.SubServers.Bungee.Host;
 
+import net.ME1312.SubServers.Bungee.Event.SubRemoveProxyEvent;
 import net.ME1312.SubServers.Bungee.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Bungee.Library.Config.YAMLValue;
 import net.ME1312.SubServers.Bungee.Library.ExtraDataHandler;
@@ -9,6 +10,7 @@ import net.ME1312.SubServers.Bungee.Network.Client;
 import net.ME1312.SubServers.Bungee.Network.ClientHandler;
 import net.ME1312.SubServers.Bungee.SubAPI;
 import net.ME1312.SubServers.Bungee.SubPlugin;
+import net.md_5.bungee.api.ProxyServer;
 
 import java.util.*;
 
@@ -18,12 +20,17 @@ import java.util.*;
 public class Proxy implements ClientHandler, ExtraDataHandler {
     private YAMLSection extra = new YAMLSection();
     private final String signature;
+    private boolean persistent = true;
     private Client client = null;
     private String nick = null;
     private final String name;
 
+    @SuppressWarnings("deprecation")
     public Proxy(String name) throws IllegalArgumentException {
-        if (Util.isNull(name)) throw new NullPointerException();
+        if (name == null) {
+            name = Util.getNew(SubAPI.getInstance().getInternals().proxies.keySet(), () -> UUID.randomUUID().toString());
+            persistent = false;
+        }
         if (name.contains(" ")) throw new IllegalArgumentException("Proxy names cannot have spaces: " + name);
         this.name = name;
         this.signature = SubAPI.getInstance().signAnonymousObject();
@@ -38,7 +45,10 @@ public class Proxy implements ClientHandler, ExtraDataHandler {
     @SuppressWarnings("deprecation")
     public void setSubData(Client client) {
         this.client = client;
-        if (client == null) SubAPI.getInstance().getInternals().proxies.remove(getName().toLowerCase());
+        if (client == null && !persistent) {
+            ProxyServer.getInstance().getPluginManager().callEvent(new SubRemoveProxyEvent(this));
+            SubAPI.getInstance().getInternals().proxies.remove(getName().toLowerCase());
+        }
         if (client != null && (client.getHandler() == null || !equals(client.getHandler()))) client.setHandler(this);
     }
 
@@ -86,9 +96,7 @@ public class Proxy implements ClientHandler, ExtraDataHandler {
             try {
                 for (UUID player : (Set<UUID>) plugin.redis("getPlayersOnProxy", new NamedContainer<>(String.class, getName())))
                     players.add(new NamedContainer<>((String) plugin.redis("getNameFromUuid", new NamedContainer<>(UUID.class, player)), player));
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            } catch (Exception e) {}
         }
         return players;
     }

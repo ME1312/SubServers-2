@@ -1,5 +1,6 @@
 package net.ME1312.SubServers.Bungee.Network.Packet;
 
+import net.ME1312.SubServers.Bungee.Event.SubAddProxyEvent;
 import net.ME1312.SubServers.Bungee.Host.Proxy;
 import net.ME1312.SubServers.Bungee.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Bungee.Library.Util;
@@ -58,8 +59,15 @@ public class PacketLinkProxy implements PacketIn, PacketOut {
     public void execute(Client client, YAMLSection data) {
         try {
             Map<String, Proxy> proxies = plugin.api.getProxies();
-            Proxy proxy = new Proxy((data.contains("name") && !proxies.keySet().contains(data.getRawString("name").toLowerCase()))?data.getRawString("name"):Util.getNew(proxies.keySet(), () -> UUID.randomUUID().toString()));
-            plugin.proxies.put(proxy.getName().toLowerCase(), proxy);
+            Proxy proxy;
+            if (data.contains("name") && proxies.keySet().contains(data.getRawString("name").toLowerCase()) && proxies.get(data.getRawString("name").toLowerCase()).getSubData() == null) {
+                proxy = proxies.get(data.getRawString("name").toLowerCase());
+            } else {
+                proxy = new Proxy((data.contains("name") && !proxies.keySet().contains(data.getRawString("name").toLowerCase()))?data.getRawString("name"):null);
+                plugin.getPluginManager().callEvent(new SubAddProxyEvent(proxy));
+                plugin.proxies.put(proxy.getName().toLowerCase(), proxy);
+            }
+
             client.setHandler(proxy);
             System.out.println("SubData > " + client.getAddress().toString() + " has been defined as Proxy: " + proxy.getName());
             client.sendPacket(new PacketLinkProxy(proxy.getName(), 0, "Definition Successful"));

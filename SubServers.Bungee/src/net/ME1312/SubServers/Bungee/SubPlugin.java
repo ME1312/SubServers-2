@@ -1,6 +1,8 @@
 package net.ME1312.SubServers.Bungee;
 
 import com.google.gson.Gson;
+import net.ME1312.SubServers.Bungee.Event.SubAddProxyEvent;
+import net.ME1312.SubServers.Bungee.Event.SubRemoveProxyEvent;
 import net.ME1312.SubServers.Bungee.Event.SubStoppedEvent;
 import net.ME1312.SubServers.Bungee.Host.*;
 import net.ME1312.SubServers.Bungee.Library.*;
@@ -99,7 +101,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
         if (!(new UniversalFile(dir, "lang.yml").exists())) {
             Util.copyFromJar(SubPlugin.class.getClassLoader(), "net/ME1312/SubServers/Bungee/Library/Files/lang.yml", new UniversalFile(dir, "lang.yml").getPath());
             System.out.println("SubServers > Created ~/SubServers/lang.yml");
-        } else if ((new Version((new YAMLConfig(new UniversalFile(dir, "lang.yml"))).get().getString("Version", "0")).compareTo(new Version("2.13a+"))) != 0) {
+        } else if ((new Version((new YAMLConfig(new UniversalFile(dir, "lang.yml"))).get().getString("Version", "0")).compareTo(new Version("2.13b+"))) != 0) {
             Files.move(new UniversalFile(dir, "lang.yml").toPath(), new UniversalFile(dir, "lang.old" + Math.round(Math.random() * 100000) + ".yml").toPath());
             Util.copyFromJar(SubPlugin.class.getClassLoader(), "net/ME1312/SubServers/Bungee/Library/Files/lang.yml", new UniversalFile(dir, "lang.yml").getPath());
             System.out.println("SubServers > Updated ~/SubServers/lang.yml");
@@ -268,6 +270,30 @@ public final class SubPlugin extends BungeeCord implements Listener {
                 e.printStackTrace();
             }
         }
+        int proxies = 1;
+        if (redis) {
+            System.out.println("SubServers > "+((status)?"Rel":"L")+"oading Proxies...");
+            try {
+                String master = (String) redis("getServerId");
+                for (String name : (List<String>) redis("getAllServers")) {
+                    if (!ukeys.contains(name.toLowerCase()) && !master.equals(name)) try {
+                        Proxy proxy = this.proxies.get(name.toLowerCase());
+                        if (proxy == null) {
+                            proxy = new Proxy(name);
+                            getPluginManager().callEvent(new SubAddProxyEvent(proxy));
+                            this.proxies.put(name.toLowerCase(), proxy);
+                        }
+                        ukeys.add(name.toLowerCase());
+                        proxies++;
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        ukeys.clear();
 
         int hosts = 0;
         System.out.println("SubServers > "+((status)?"Rel":"L")+"oading Hosts...");
@@ -488,7 +514,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
             }
         }
 
-        System.out.println("SubServers > " + ((plugins > 0)?plugins+" Plugin"+((plugins == 1)?"":"s")+", ":"") + hosts + " Host"+((hosts == 1)?"":"s")+", " + servers + " Server"+((servers == 1)?"":"s")+", and " + subservers + " SubServer"+((subservers == 1)?"":"s")+" "+((status)?"re":"")+"loaded in " + new DecimalFormat("0.000").format((Calendar.getInstance().getTime().getTime() - begin) / 1000D) + "s");
+        System.out.println("SubServers > " + ((plugins > 0)?plugins+" Plugin"+((plugins == 1)?"":"s")+", ":"") + ((proxies > 1)?proxies+" Proxies, ":"") + hosts + " Host"+((hosts == 1)?"":"s")+", " + servers + " Server"+((servers == 1)?"":"s")+", and " + subservers + " SubServer"+((subservers == 1)?"":"s")+" "+((status)?"re":"")+"loaded in " + new DecimalFormat("0.000").format((Calendar.getInstance().getTime().getTime() - begin) / 1000D) + "s");
     }
 
     private void post() {
@@ -578,6 +604,11 @@ public final class SubPlugin extends BungeeCord implements Listener {
         running = false;
         this.hosts.clear();
         exServers.clear();
+
+        for (String proxy : proxies.keySet()) {
+            getPluginManager().callEvent(new SubRemoveProxyEvent(proxies.get(proxy)));
+        }
+        proxies.clear();
     }
 
     String getNewSignature() {

@@ -8,14 +8,14 @@ import org.spongepowered.api.event.impl.AbstractEvent;
 import java.util.UUID;
 
 /**
- * Remove Server Event
+ * Remove Host Event
  */
 public class SubRemoveHostEvent extends AbstractEvent implements SubEvent {
     private UUID player;
     private String host;
 
     /**
-     * Server Remove Event
+     * Host Remove Event
      *
      * @param player Player Adding Host
      * @param host Server Starting

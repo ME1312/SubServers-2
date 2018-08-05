@@ -10,7 +10,7 @@ import net.md_5.bungee.api.plugin.Event;
 import java.util.UUID;
 
 /**
- * Server Remove Event
+ * Host Remove Event
  */
 public class SubRemoveHostEvent extends Event implements SubEvent, Cancellable {
     private boolean cancelled = false;
@@ -18,7 +18,7 @@ public class SubRemoveHostEvent extends Event implements SubEvent, Cancellable {
     private Host host;
 
     /**
-     * Server Remove Event
+     * Host Remove Event
      *
      * @param player Player Adding Server
      * @param host Host to be added

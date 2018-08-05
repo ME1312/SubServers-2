@@ -2,6 +2,8 @@ package net.ME1312.SubServers.Bungee.Network;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import net.ME1312.SubServers.Bungee.Event.SubNetworkConnectEvent;
+import net.ME1312.SubServers.Bungee.Event.SubNetworkDisconnectEvent;
 import net.ME1312.SubServers.Bungee.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Bungee.Library.Exception.IllegalPacketException;
 import net.ME1312.SubServers.Bungee.Library.NamedContainer;
@@ -213,7 +215,7 @@ public final class SubDataServer {
      */
     public Client getClient(Socket socket) {
         if (Util.isNull(socket)) throw new NullPointerException();
-        return clients.get(new InetSocketAddress(socket.getInetAddress(), socket.getPort()).toString());
+        return getClient(new InetSocketAddress(socket.getInetAddress(), socket.getPort()));
     }
 
     /**
@@ -224,7 +226,7 @@ public final class SubDataServer {
      */
     public Client getClient(InetSocketAddress address) {
         if (Util.isNull(address)) throw new NullPointerException();
-        return clients.get(address.toString());
+        return getClient(address.toString());
     }
 
     /**
@@ -255,12 +257,7 @@ public final class SubDataServer {
      */
     public void removeClient(Client client) throws IOException {
         if (Util.isNull(client)) throw new NullPointerException();
-        SocketAddress address = client.getAddress();
-        if (clients.keySet().contains(address.toString())) {
-            clients.remove(address.toString());
-            if (!client.closed) client.disconnect();
-            System.out.println("SubData > " + client.getAddress().toString() + " has disconnected");
-        }
+        removeClient(client.getAddress());
     }
 
     /**
@@ -271,12 +268,7 @@ public final class SubDataServer {
      */
     public void removeClient(InetSocketAddress address) throws IOException {
         if (Util.isNull(address)) throw new NullPointerException();
-        Client client = clients.get(address.toString());
-        if (clients.keySet().contains(address.toString())) {
-            clients.remove(address.toString());
-            client.disconnect();
-            System.out.println("SubData > " + client.getAddress().toString() + " has disconnected");
-        }
+        removeClient(address.toString());
     }
 
     /**
@@ -287,8 +279,9 @@ public final class SubDataServer {
      */
     public void removeClient(String address) throws IOException {
         if (Util.isNull(address)) throw new NullPointerException();
-        Client client = clients.get(address);
         if (clients.keySet().contains(address)) {
+            Client client = clients.get(address);
+            plugin.getPluginManager().callEvent(new SubNetworkDisconnectEvent(this, client));
             clients.remove(address);
             client.disconnect();
             System.out.println("SubData > " + client.getAddress().toString() + " has disconnected");
@@ -411,7 +404,10 @@ public final class SubDataServer {
                         )) whitelisted = true;
             }
         }
-        return whitelisted;
+        SubNetworkConnectEvent event = new SubNetworkConnectEvent(this, address);
+        event.setCancelled(!whitelisted);
+        plugin.getPluginManager().callEvent(event);
+        return !event.isCancelled();
     }
 
     /**

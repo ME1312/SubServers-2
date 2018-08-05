@@ -1,10 +1,7 @@
 package net.ME1312.SubServers.Bungee;
 
 import com.google.gson.Gson;
-import net.ME1312.SubServers.Bungee.Host.Host;
-import net.ME1312.SubServers.Bungee.Host.Server;
-import net.ME1312.SubServers.Bungee.Host.SubCreator;
-import net.ME1312.SubServers.Bungee.Host.SubServer;
+import net.ME1312.SubServers.Bungee.Host.*;
 import net.ME1312.SubServers.Bungee.Library.Compatibility.CommandX;
 import net.ME1312.SubServers.Bungee.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Bungee.Library.NamedContainer;
@@ -212,6 +209,14 @@ public final class SubCommand extends CommandX {
                     }
                     if (i == 0) message += ChatColor.RESET + "(none)";
                     sender.sendMessage(message);
+                    if (plugin.api.getProxies().keySet().size() > 0) {
+                        sender.sendMessage("SubServers > Proxy List:");
+                        message = "  (master)";
+                        for (Proxy proxy : plugin.api.getProxies().values()) {
+                            message += div + ((proxy.getSubData() != null)?ChatColor.AQUA:ChatColor.WHITE) + proxy.getDisplayName() + ((proxy.getName().equals(proxy.getDisplayName()))?"":" ("+proxy.getName()+')');
+                        }
+                        sender.sendMessage(message);
+                    }
                 } else if (args[0].equalsIgnoreCase("info") || args[0].equalsIgnoreCase("status")) {
                     if (args.length > 1) {
                         Map<String, Server> servers = plugin.api.getServers();

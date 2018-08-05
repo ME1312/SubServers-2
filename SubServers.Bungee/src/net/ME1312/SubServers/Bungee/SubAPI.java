@@ -539,9 +539,7 @@ public final class SubAPI {
         if (plugin.redis) {
             try {
                 for (UUID player : (Set<UUID>) plugin.redis("getPlayersOnline")) players.add(new NamedContainer<>((String) plugin.redis("getNameFromUuid", new NamedContainer<>(UUID.class, player)), player));
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            } catch (Exception e) {}
         } else {
             for (ProxiedPlayer player : plugin.getPlayers()) players.add(new NamedContainer<>(player.getName(), player.getUniqueId()));
         }

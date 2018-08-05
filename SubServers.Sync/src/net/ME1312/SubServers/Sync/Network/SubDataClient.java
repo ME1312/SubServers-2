@@ -99,15 +99,11 @@ public final class SubDataClient {
                     if (plugin.config.get().getSection("Sync", new YAMLSection()).getBoolean("MOTD", false)) updateField(ListenerInfo.class.getDeclaredField("motd"), listeners.get(i), proxy.getSection("bungee").getSectionList("listeners").get(i).getRawString("motd"));
                     if (plugin.config.get().getSection("Sync", new YAMLSection()).getBoolean("Player-Limit", false)) updateField(ListenerInfo.class.getDeclaredField("maxPlayers"), listeners.get(i), proxy.getSection("bungee").getSectionList("listeners").get(i).getInt("player-limit"));
                     if (plugin.config.get().getSection("Sync", new YAMLSection()).getBoolean("Server-Priorities", true)) updateField(ListenerInfo.class.getDeclaredField("serverPriority"), listeners.get(i), proxy.getSection("bungee").getSectionList("listeners").get(i).getRawStringList("priorities"));
-                    if (plugin.config.get().getSection("Sync", new YAMLSection()).getBoolean("Tab-List", false)) {
-                        updateField(ListenerInfo.class.getDeclaredField("tabListType"), listeners.get(i), proxy.getSection("bungee").getSectionList("listeners").get(i).getRawString("tab-list"));
-                        updateField(ListenerInfo.class.getDeclaredField("tabListSize"), listeners.get(i), proxy.getSection("bungee").getSectionList("listeners").get(i).getInt("tab-list-size"));
-                    }
                 }
                 if (plugin.config.get().getSection("Sync", new YAMLSection()).getBoolean("Disabled-Commands", false)) updateField(Configuration.class.getDeclaredField("disabledCommands"), plugin.getConfig(), proxy.getSection("bungee").getRawStringList("disabled-cmds"));
                 if (plugin.config.get().getSection("Sync", new YAMLSection()).getBoolean("Player-Limit", false)) updateField(Configuration.class.getDeclaredField("playerLimit"), plugin.getConfig(), proxy.getSection("bungee").getInt("player-limit"));
             } catch (Exception e) {
-                System.out.println("SubServers > Problem syncing BungeeCord config");
+                System.out.println("SubServers > Problem syncing BungeeCord configuration options");
                 e.printStackTrace();
             }
             for (String host : data.getSection("hosts").getKeys()) {
