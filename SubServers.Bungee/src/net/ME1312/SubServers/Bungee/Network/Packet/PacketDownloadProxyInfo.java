@@ -6,8 +6,10 @@ import net.ME1312.SubServers.Bungee.Network.Client;
 import net.ME1312.SubServers.Bungee.Network.PacketIn;
 import net.ME1312.SubServers.Bungee.Network.PacketOut;
 import net.ME1312.SubServers.Bungee.SubPlugin;
+import net.md_5.bungee.api.config.ListenerInfo;
 
 import java.util.Arrays;
+import java.util.LinkedList;
 
 /**
  * Download Proxy Info Packet
@@ -48,7 +50,21 @@ public class PacketDownloadProxyInfo implements PacketIn, PacketOut {
         data.set("subservers", subservers);
         YAMLSection bungee = new YAMLSection();
         bungee.set("version", plugin.api.getProxyVersion());
+        bungee.set("disabled-cmds", plugin.getConfig().getDisabledCommands());
+        bungee.set("player-limit", plugin.getConfig().getPlayerLimit());
         bungee.set("servers", plugin.api.getServers().size());
+        LinkedList<YAMLSection> listeners = new LinkedList<YAMLSection>();
+        for (ListenerInfo info : plugin.getConfig().getListeners()) {
+            YAMLSection listener = new YAMLSection();
+            listener.set("forced-hosts", info.getForcedHosts());
+            listener.set("motd", info.getMotd());
+            listener.set("priorities", info.getServerPriority());
+            listener.set("player-limit", info.getMaxPlayers());
+            listener.set("tab-list", info.getTabListType());
+            listener.set("tab-list-size", info.getTabListSize());
+            listeners.add(listener);
+        }
+        bungee.set("listeners", listeners);
         data.set("bungee", bungee);
         YAMLSection minecraft = new YAMLSection();
         minecraft.set("version", Arrays.asList(plugin.api.getGameVersion()));

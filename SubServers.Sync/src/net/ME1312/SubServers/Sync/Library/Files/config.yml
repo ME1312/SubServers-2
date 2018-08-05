@@ -5,3 +5,11 @@ Settings:
     Address: '127.0.0.1:4391'
     Password: 'default'
     Encryption: 'AES'
+
+Sync:
+  Disabled-Commands: false
+  Forced-Hosts: true
+  MOTD: false
+  Player-Limit: false
+  Server-Priorities: true
+  Tab-List: false
