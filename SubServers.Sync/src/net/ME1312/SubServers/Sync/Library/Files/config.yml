@@ -9,6 +9,6 @@ Settings:
 Sync:
   Disabled-Commands: false
   Forced-Hosts: true
-  MOTD: false
+  Motd: false
   Player-Limit: false
   Server-Priorities: true

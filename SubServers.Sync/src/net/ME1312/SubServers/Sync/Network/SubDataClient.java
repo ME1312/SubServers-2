@@ -96,7 +96,7 @@ public final class SubDataClient {
                 LinkedList<ListenerInfo> listeners = new LinkedList<ListenerInfo>(plugin.getConfig().getListeners());
                 for (int i = 0; i < proxy.getSection("bungee").getSectionList("listeners").size(); i++) if (i < listeners.size()) {
                     if (plugin.config.get().getSection("Sync", new YAMLSection()).getBoolean("Forced-Hosts", true)) updateField(ListenerInfo.class.getDeclaredField("forcedHosts"), listeners.get(i), proxy.getSection("bungee").getSectionList("listeners").get(i).getSection("forced-hosts").get());
-                    if (plugin.config.get().getSection("Sync", new YAMLSection()).getBoolean("MOTD", false)) updateField(ListenerInfo.class.getDeclaredField("motd"), listeners.get(i), proxy.getSection("bungee").getSectionList("listeners").get(i).getRawString("motd"));
+                    if (plugin.config.get().getSection("Sync", new YAMLSection()).getBoolean("Motd", false)) updateField(ListenerInfo.class.getDeclaredField("motd"), listeners.get(i), proxy.getSection("bungee").getSectionList("listeners").get(i).getRawString("motd"));
                     if (plugin.config.get().getSection("Sync", new YAMLSection()).getBoolean("Player-Limit", false)) updateField(ListenerInfo.class.getDeclaredField("maxPlayers"), listeners.get(i), proxy.getSection("bungee").getSectionList("listeners").get(i).getInt("player-limit"));
                     if (plugin.config.get().getSection("Sync", new YAMLSection()).getBoolean("Server-Priorities", true)) updateField(ListenerInfo.class.getDeclaredField("serverPriority"), listeners.get(i), proxy.getSection("bungee").getSectionList("listeners").get(i).getRawStringList("priorities"));
                 }
