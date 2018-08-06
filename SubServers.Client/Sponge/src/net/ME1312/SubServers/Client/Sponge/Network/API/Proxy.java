@@ -81,11 +81,19 @@ public class Proxy {
     }
 
     /**
+     * Test if the proxy is connected to RedisBungee's server
+     *
+     * @return Redis Status
+     */
+    public boolean isRedis() {
+        return raw.getBoolean("redis");
+    }
+
+    /**
      * Get the players on this proxy (via RedisBungee)
      *
      * @return Player Collection
      */
-    @SuppressWarnings({"deprecation", "unchecked"})
     public Collection<NamedContainer<String, UUID>> getPlayers() {
         List<NamedContainer<String, UUID>> players = new ArrayList<NamedContainer<String, UUID>>();
         for (String id : raw.getSection("players").getKeys()) {

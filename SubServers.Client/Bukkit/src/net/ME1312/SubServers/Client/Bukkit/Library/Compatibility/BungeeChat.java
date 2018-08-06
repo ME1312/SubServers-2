@@ -289,25 +289,68 @@ public class BungeeChat {
             else ((Player) sender).spigot().sendMessage(msg);
             if (data.getSection("proxies").getKeys().size() > 0) {
                 sender.sendMessage(plugin.api.getLang("SubServers", "Command.List.Proxy-Header"));
-                msg = new TextComponent("  (master)");
-                msg.setColor(ChatColor.GRAY);
+                msg = new TextComponent("  ");
+                List<TextComponent> hoverm = new LinkedList<TextComponent>();
+                TextComponent message = new TextComponent("(master)");
+                TextComponent hover = new TextComponent("(master)");
+                message.setColor(ChatColor.GRAY);
+                hover.setColor(ChatColor.GRAY);
+                hoverm.add(hover);
+                if (data.getKeys().contains("master-proxy")) {
+                    hover = new TextComponent('\n' + data.getRawString("master-proxy"));
+                    hover.setColor(ChatColor.GRAY);
+                    hoverm.add(hover);
+                }
+                hover = new TextComponent('\n' + plugin.api.getLang("SubServers", "Interface.Proxy-Menu.Proxy-Master"));
+                hoverm.add(hover);
+                message.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, hoverm.toArray(new TextComponent[hoverm.size()])));
+                msg.addExtra(message);
                 for (String proxy : data.getSection("proxies").getKeys()) {
-                    List<TextComponent> hoverm = new LinkedList<TextComponent>();
-                    TextComponent message = new TextComponent(data.getSection("proxies").getSection(proxy).getString("display"));
-                    TextComponent hover = new TextComponent(data.getSection("proxies").getSection(proxy).getString("display"));
-                    if (data.getSection("proxies").getSection(proxy).getKeys().contains("subdata")) {
+                    hoverm = new LinkedList<TextComponent>();
+                    message = new TextComponent(data.getSection("proxies").getSection(proxy).getString("display"));
+                    hover = new TextComponent(data.getSection("proxies").getSection(proxy).getString("display"));
+                    if (data.getSection("proxies").getSection(proxy).getKeys().contains("subdata") && data.getSection("proxies").getSection(proxy).getBoolean("redis")) {
+                        message.setColor(ChatColor.GREEN);
+                        hover.setColor(ChatColor.GREEN);
+                        if (!proxy.equals(data.getSection("proxies").getSection(proxy).getString("display"))) {
+                            hoverm.add(hover);
+                            hover = new TextComponent('\n' + proxy);
+                            hover.setColor(ChatColor.GRAY);
+                        }
+                    } else if (data.getSection("proxies").getSection(proxy).getKeys().contains("subdata")) {
                         message.setColor(ChatColor.AQUA);
                         hover.setColor(ChatColor.AQUA);
-                    } else {
+                        if (!proxy.equals(data.getSection("proxies").getSection(proxy).getString("display"))) {
+                            hoverm.add(hover);
+                            hover = new TextComponent('\n' + proxy);
+                            hover.setColor(ChatColor.GRAY);
+                        }
+                        if (data.getKeys().contains("master-proxy")) {
+                            hoverm.add(hover);
+                            hover = new TextComponent('\n' + plugin.api.getLang("SubServers", "Interface.Proxy-Menu.Proxy-SubData"));
+                        }
+                    } else if (data.getSection("proxies").getSection(proxy).getBoolean("redis")) {
                         message.setColor(ChatColor.WHITE);
                         hover.setColor(ChatColor.WHITE);
+                        hoverm.add(hover);
+                        if (!proxy.equals(data.getSection("proxies").getSection(proxy).getString("display"))) {
+                            hover = new TextComponent('\n' + proxy);
+                            hover.setColor(ChatColor.GRAY);
+                            hoverm.add(hover);
+                        }
+                        hover = new TextComponent('\n' + plugin.api.getLang("SubServers", "Interface.Proxy-Menu.Proxy-Redis"));
+                    } else {
+                        message.setColor(ChatColor.RED);
+                        hover.setColor(ChatColor.RED);
+                        hoverm.add(hover);
+                        if (!proxy.equals(data.getSection("proxies").getSection(proxy).getString("display"))) {
+                            hover = new TextComponent('\n' + proxy);
+                            hover.setColor(ChatColor.GRAY);
+                            hoverm.add(hover);
+                        }
+                        hover = new TextComponent('\n' + plugin.api.getLang("SubServers", "Interface.Proxy-Menu.Proxy-Disconnected"));
                     }
                     hoverm.add(hover);
-                    if (!proxy.equals(data.getSection("proxies").getSection(proxy).getString("display"))) {
-                        hover = new TextComponent('\n' + proxy);
-                        hover.setColor(ChatColor.GRAY);
-                        hoverm.add(hover);
-                    }
                     message.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, hoverm.toArray(new TextComponent[hoverm.size()])));
                     msg.addExtra(div);
                     msg.addExtra(message);

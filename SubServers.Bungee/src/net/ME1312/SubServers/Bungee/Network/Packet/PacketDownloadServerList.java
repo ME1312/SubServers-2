@@ -60,6 +60,7 @@ public class PacketDownloadServerList implements PacketIn, PacketOut {
             proxies.set(proxy.getName(), new YAMLSection(new Gson().fromJson(proxy.toString(), Map.class)));
         }
         data.set("proxies", proxies);
+        if (plugin.redis) data.set("master-proxy", Util.getDespiteException(() -> plugin.redis("getServerId"), null));
 
         YAMLSection exServers = new YAMLSection();
         for (Server server : plugin.exServers.values()) {

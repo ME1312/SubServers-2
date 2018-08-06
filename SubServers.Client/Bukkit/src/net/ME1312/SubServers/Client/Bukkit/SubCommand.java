@@ -156,7 +156,17 @@ public final class SubCommand implements CommandExecutor {
                                     sender.sendMessage(plugin.api.getLang("SubServers", "Command.List.Proxy-Header"));
                                     message = "  (master)";
                                     for (String proxy : data.getSection("proxies").getKeys()) {
-                                        message += div + ((data.getSection("proxies").getSection(proxy).getKeys().contains("subdata"))?ChatColor.AQUA:ChatColor.WHITE) + data.getSection("proxies").getSection(proxy).getString("display") + ((proxy.equals(data.getSection("proxies").getSection(proxy).getString("display")))?"":" ("+proxy+')');
+                                        message += div;
+                                        if (data.getSection("proxies").getSection(proxy).getKeys().contains("subdata") && data.getSection("proxies").getSection(proxy).getBoolean("redis")) {
+                                            message += ChatColor.GREEN;
+                                        } else if (data.getSection("proxies").getSection(proxy).getKeys().contains("subdata")) {
+                                            message += ChatColor.AQUA;
+                                        } else if (data.getSection("proxies").getSection(proxy).getBoolean("redis")) {
+                                            message += ChatColor.WHITE;
+                                        } else {
+                                            message += ChatColor.RED;
+                                        }
+                                        message += data.getSection("proxies").getSection(proxy).getString("display") + ((proxy.equals(data.getSection("proxies").getSection(proxy).getString("display")))?"":" ("+proxy+')');
                                     }
                                     sender.sendMessage(message);
                                 }

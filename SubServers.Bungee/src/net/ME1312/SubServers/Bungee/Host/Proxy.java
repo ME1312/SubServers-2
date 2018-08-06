@@ -84,6 +84,17 @@ public class Proxy implements ClientHandler, ExtraDataHandler {
     }
 
     /**
+     * Test if the proxy is connected to RedisBungee's server
+     *
+     * @return Redis Status
+     */
+    @SuppressWarnings({"deprecation", "unchecked"})
+    public boolean isRedis() {
+        SubPlugin plugin = SubAPI.getInstance().getInternals();
+        return plugin.redis && Util.getDespiteException(() -> plugin.redis("getPlayersOnProxy", new NamedContainer<>(String.class, getName())) != null, false);
+    }
+
+    /**
      * Get the players on this proxy (via RedisBungee)
      *
      * @return Player Collection
@@ -152,6 +163,7 @@ public class Proxy implements ClientHandler, ExtraDataHandler {
             players.set(player.get().toString(), pinfo);
         }
         info.set("players", players);
+        info.set("redis", isRedis());
         if (getSubData() != null) info.set("subdata", getSubData().getAddress().toString());
         info.set("signature", signature);
         info.set("extra", getExtra());

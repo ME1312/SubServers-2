@@ -177,7 +177,17 @@ public class SubCommand {
                         host.log.message.println("Proxy List:");
                         message = "  (master)";
                         for (String proxy : data.getSection("proxies").getKeys()) {
-                            message += div + ((data.getSection("proxies").getSection(proxy).getKeys().contains("subdata"))?TextColor.AQUA:TextColor.WHITE) + data.getSection("proxies").getSection(proxy).getString("display") + ((proxy.equals(data.getSection("proxies").getSection(proxy).getString("display")))?"":" ("+proxy+')');
+                            message += div;
+                            if (data.getSection("proxies").getSection(proxy).getKeys().contains("subdata") && data.getSection("proxies").getSection(proxy).getBoolean("redis")) {
+                                message += TextColor.GREEN;
+                            } else if (data.getSection("proxies").getSection(proxy).getKeys().contains("subdata")) {
+                                message += TextColor.AQUA;
+                            } else if (data.getSection("proxies").getSection(proxy).getBoolean("redis")) {
+                                message += TextColor.WHITE;
+                            } else {
+                                message += TextColor.RED;
+                            }
+                            message += data.getSection("proxies").getSection(proxy).getString("display") + ((proxy.equals(data.getSection("proxies").getSection(proxy).getString("display")))?"":" ("+proxy+')');
                         }
                         host.log.message.println(message);
                     }

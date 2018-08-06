@@ -399,23 +399,53 @@ public final class SubCommand implements CommandExecutor {
                     if (data.getSection("proxies").getKeys().size() > 0) {
                         sender.sendMessage(Text.of(plugin.api.getLang("SubServers", "Command.List.Proxy-Header")));
                         msg = Text.builder();
+                        Text.Builder message = Text.builder("(master)");
+                        Text.Builder hover = Text.builder("(master)");
+                        message.color(TextColors.GRAY);
+                        hover.color(TextColors.GRAY);
+                        if (data.getKeys().contains("master-proxy")) {
+                            hover.append(Text.builder('\n' + data.getRawString("master-proxy")).color(TextColors.GRAY).build());
+                        }
+                        hover.append(Text.of('\n' + plugin.api.getLang("SubServers", "Interface.Proxy-Menu.Proxy-Master")));
+                        message.onHover(TextActions.showText(hover.build()));
+                        msg.append(message.build());
                         for (String proxy : data.getSection("proxies").getKeys()) {
-                            Text.Builder message = Text.builder(data.getSection("proxies").getSection(proxy).getString("display"));
-                            Text.Builder hover = Text.builder(data.getSection("proxies").getSection(proxy).getString("display"));
-                            if (data.getSection("proxies").getSection(proxy).getKeys().contains("subdata")) {
+                            message = Text.builder(data.getSection("proxies").getSection(proxy).getString("display"));
+                            hover = Text.builder(data.getSection("proxies").getSection(proxy).getString("display"));
+                            if (data.getSection("proxies").getSection(proxy).getKeys().contains("subdata") && data.getSection("proxies").getSection(proxy).getBoolean("redis")) {
+                                message.color(TextColors.GREEN);
+                                hover.color(TextColors.GREEN);
+                                if (!proxy.equals(data.getSection("proxies").getSection(proxy).getString("display"))) {
+                                    hover.append(Text.builder('\n' + proxy).color(TextColors.GRAY).build());
+                                }
+                            } else if (data.getSection("proxies").getSection(proxy).getKeys().contains("subdata")) {
                                 message.color(TextColors.AQUA);
                                 hover.color(TextColors.AQUA);
-                            } else {
+                                if (!proxy.equals(data.getSection("proxies").getSection(proxy).getString("display"))) {
+                                    hover.append(Text.builder('\n' + proxy).color(TextColors.GRAY).build());
+                                }
+                                if (data.getKeys().contains("master-proxy")) {
+                                    hover.append(Text.of('\n' + plugin.api.getLang("SubServers", "Interface.Proxy-Menu.Proxy-SubData")));
+                                }
+                            } else if (data.getSection("proxies").getSection(proxy).getBoolean("redis")) {
                                 message.color(TextColors.WHITE);
                                 hover.color(TextColors.WHITE);
-                            }
-                            if (!proxy.equals(data.getSection("proxies").getSection(proxy).getString("display"))) {
-                                hover.append(Text.builder('\n' + proxy).color(TextColors.GRAY).build());
+                                if (!proxy.equals(data.getSection("proxies").getSection(proxy).getString("display"))) {
+                                    hover.append(Text.builder('\n' + proxy).color(TextColors.GRAY).build());
+                                }
+                                hover.append(Text.of('\n' + plugin.api.getLang("SubServers", "Interface.Proxy-Menu.Proxy-Redis")));
+                            } else {
+                                message.color(TextColors.RED);
+                                hover.color(TextColors.RED);
+                                if (!proxy.equals(data.getSection("proxies").getSection(proxy).getString("display"))) {
+                                    hover.append(Text.builder('\n' + proxy).color(TextColors.GRAY).build());
+                                }
+                                hover.append(Text.of('\n' + plugin.api.getLang("SubServers", "Interface.Proxy-Menu.Proxy-Disconnected")));
                             }
                             message.onHover(TextActions.showText(hover.build()));
                             msg.append(div, message.build());
                         }
-                        sender.sendMessage(Text.builder("  (master)").color(TextColors.GRAY).append(msg.build()).build());
+                        sender.sendMessage(Text.builder("  ").append(msg.build()).build());
                     }
                 }));
                 return CommandResult.builder().successCount(1).build();

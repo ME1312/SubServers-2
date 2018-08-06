@@ -213,7 +213,17 @@ public final class SubCommand extends CommandX {
                         sender.sendMessage("SubServers > Proxy List:");
                         message = "  (master)";
                         for (Proxy proxy : plugin.api.getProxies().values()) {
-                            message += div + ((proxy.getSubData() != null)?ChatColor.AQUA:ChatColor.WHITE) + proxy.getDisplayName() + ((proxy.getName().equals(proxy.getDisplayName()))?"":" ("+proxy.getName()+')');
+                            message += div;
+                            if (proxy.getSubData() != null && proxy.isRedis()) {
+                                message += ChatColor.GREEN;
+                            } else if (proxy.getSubData() != null) {
+                                message += ChatColor.AQUA;
+                            } else if (proxy.isRedis()) {
+                                message += ChatColor.WHITE;
+                            } else {
+                                message += ChatColor.RED;
+                            }
+                            message += proxy.getDisplayName() + ((proxy.getName().equals(proxy.getDisplayName()))?"":" ("+proxy.getName()+')');
                         }
                         sender.sendMessage(message);
                     }
