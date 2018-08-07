@@ -11,6 +11,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 
 import java.io.BufferedReader;
@@ -33,10 +34,10 @@ public final class SubCommand implements CommandExecutor {
         label = "/" + label;
         if (plugin.subdata == null) {
             new IllegalStateException("SubData is not connected").printStackTrace();
-            return false;
+            if (!(sender instanceof ConsoleCommandSender)) sender.sendMessage(ChatColor.RED + "An exception has occurred while running this command");
         } else if (plugin.lang == null) {
             new IllegalStateException("There are no lang options available at this time").printStackTrace();
-            return false;
+            if (!(sender instanceof ConsoleCommandSender)) sender.sendMessage(ChatColor.RED + "An exception has occurred while running this command");
         } else {
             if (sender.hasPermission("subservers.command")) {
                 if (args.length > 0) {
@@ -460,8 +461,8 @@ public final class SubCommand implements CommandExecutor {
             } else {
                 sender.sendMessage(plugin.api.getLang("SubServers", "Command.Generic.Invalid-Permission").replace("$str$", "subservers.command"));
             }
-            return true;
         }
+        return true;
     }
 
     private String[] printHelp(String label) {

@@ -100,13 +100,11 @@ public final class SubCommand implements CommandExecutor {
                 .build();
     }
 
-    private boolean canRun(CommandSource sender) {
+    private boolean canRun(CommandSource sender) throws CommandException {
         if (plugin.subdata == null) {
-            new IllegalStateException("SubData is not connected").printStackTrace();
-            return false;
+            throw new CommandException(Text.builder("An exception has occurred while running this command").color(TextColors.RED).build(), new IllegalStateException("SubData is not connected"), false);
         } else if (plugin.lang == null) {
-            new IllegalStateException("There are no lang options available at this time").printStackTrace();
-            return false;
+            throw new CommandException(Text.builder("An exception has occurred while running this command").color(TextColors.RED).build(), new IllegalStateException("There are no lang options available at this time"), false);
         } else {
             return sender.hasPermission("subservers.command");
         }
