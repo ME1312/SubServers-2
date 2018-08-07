@@ -272,11 +272,13 @@ public final class SubPlugin extends BungeeCord implements Listener {
         }
         int proxies = 1;
         if (redis) {
-            System.out.println("SubServers > "+((status)?"Rel":"L")+"oading Proxies...");
             try {
+                boolean first = true;
                 String master = (String) redis("getServerId");
                 for (String name : (List<String>) redis("getAllServers")) {
                     if (!ukeys.contains(name.toLowerCase()) && !master.equals(name)) try {
+                        if (first) System.out.println("SubServers > "+((status)?"Rel":"L")+"oading Proxies...");
+                        first = false;
                         Proxy proxy = this.proxies.get(name.toLowerCase());
                         if (proxy == null) {
                             proxy = new Proxy(name);
@@ -395,7 +397,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
                     YAMLSection edits = new YAMLSection();
                     if (config.get().getSection("Servers").getSection(name).getBoolean("Enabled") != server.isEnabled())
                         edits.set("enabled", config.get().getSection("Servers").getSection(name).getBoolean("Enabled"));
-                    if (config.get().getSection("Servers").getSection(name).getKeys().contains("Display") && ((config.get().getSection("Servers").getSection(name).getString("Display").length() == 0 && !server.getDisplayName().equals(server.getName())) || !config.get().getSection("Servers").getSection(name).getString("Display").equals(server.getDisplayName())))
+                    if (config.get().getSection("Servers").getSection(name).getKeys().contains("Display") && ((config.get().getSection("Servers").getSection(name).getRawString("Display").length() == 0 && !server.getDisplayName().equals(server.getName())) || !config.get().getSection("Servers").getSection(name).getRawString("Display").equals(server.getDisplayName())))
                         edits.set("display", config.get().getSection("Servers").getSection(name).getRawString("Display"));
                     if (!config.get().getSection("Servers").getSection(name).getString("Host").equalsIgnoreCase(server.getHost().getName()))
                         edits.set("host", config.get().getSection("Servers").getSection(name).getRawString("Host"));
@@ -460,8 +462,8 @@ public final class SubPlugin extends BungeeCord implements Listener {
                         server.setAutoRestart(config.get().getSection("Servers").getSection(name).getBoolean("Auto-Restart"));
                     if (!status && config.get().getSection("Servers").getSection(name).getBoolean("Run-On-Launch"))
                         autorun.add(name.toLowerCase());
-                    if (config.get().getSection("Servers").getSection(name).getKeys().contains("Display") && ((config.get().getSection("Servers").getSection(name).getString("Display").length() == 0 && !server.getDisplayName().equals(server.getName())) || !config.get().getSection("Servers").getSection(name).getString("Display").equals(server.getDisplayName())))
-                        server.setDisplayName(config.get().getSection("Servers").getSection(name).getString("Display"));
+                    if (config.get().getSection("Servers").getSection(name).getKeys().contains("Display") && ((config.get().getSection("Servers").getSection(name).getRawString("Display").length() == 0 && !server.getDisplayName().equals(server.getName())) || !config.get().getSection("Servers").getSection(name).getRawString("Display").equals(server.getDisplayName())))
+                        server.setDisplayName(config.get().getSection("Servers").getSection(name).getRawString("Display"));
                     if (config.get().getSection("Servers").getSection(name).getKeys().contains("Group")) {
                         for (String group : server.getGroups()) server.removeGroup(group);
                         for (String group : config.get().getSection("Servers").getSection(name).getStringList("Group")) server.addGroup(group);

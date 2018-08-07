@@ -857,12 +857,12 @@ public class InternalUIRenderer extends UIRenderer {
                     if (hosts.get(server) == null) {
                         block = createItem("STAINED_GLASS_PANE", external.name(), external.get());
                         blockMeta = block.getItemMeta();
-                        blockMeta.setDisplayName(ChatColor.AQUA + json.getSection("servers").getSection(server).getString("display"));
+                        blockMeta.setDisplayName(ChatColor.WHITE + json.getSection("servers").getSection(server).getString("display"));
                         LinkedList<String> lore = new LinkedList<String>();
                         if (!server.equals(json.getSection("servers").getSection(server).getString("display")))
                             lore.add(ChatColor.GRAY + server);
-                        lore.add(plugin.api.getLang("SubServers", "Interface.Server-Menu.Server-Player-Count").replace("$int$", new DecimalFormat("#,###").format(json.getSection("servers").getSection(server).getSection("players").getKeys().size())));
                         lore.add(plugin.api.getLang("SubServers", "Interface.Server-Menu.Server-External"));
+                        lore.add(plugin.api.getLang("SubServers", "Interface.Server-Menu.Server-Player-Count").replace("$int$", new DecimalFormat("#,###").format(json.getSection("servers").getSection(server).getSection("players").getKeys().size())));
                         lore.add(plugin.api.getLang("SubServers", "Interface.Server-Menu.SubServer-Invalid"));
                         lore.add(ChatColor.WHITE + ((plugin.config.get().getSection("Settings").getBoolean("Show-Addresses", false))?json.getSection("servers").getSection(server).getString("address"):json.getSection("servers").getSection(server).getString("address").split(":")[json.getSection("servers").getSection(server).getString("address").split(":").length - 1]));
                         blockMeta.setLore(lore);
@@ -873,8 +873,8 @@ public class InternalUIRenderer extends UIRenderer {
                         LinkedList<String> lore = new LinkedList<String>();
                         if (!server.equals(json.getSection("hosts").getSection(hosts.get(server)).getSection("servers").getSection(server).getString("display")))
                             lore.add(ChatColor.GRAY + server);
-                        lore.add(plugin.api.getLang("SubServers", "Interface.Server-Menu.Server-Player-Count").replace("$int$", new DecimalFormat("#,###").format(json.getSection("hosts").getSection(hosts.get(server)).getSection("servers").getSection(server).getSection("players").getKeys().size())));
                         lore.add(plugin.api.getLang("SubServers", "Interface.Server-Menu.SubServer-Temporary"));
+                        lore.add(plugin.api.getLang("SubServers", "Interface.Server-Menu.Server-Player-Count").replace("$int$", new DecimalFormat("#,###").format(json.getSection("hosts").getSection(hosts.get(server)).getSection("servers").getSection(server).getSection("players").getKeys().size())));
                         lore.add(ChatColor.WHITE + ((plugin.config.get().getSection("Settings").getBoolean("Show-Addresses", false))?json.getSection("hosts").getSection(hosts.get(server)).getSection("servers").getSection(server).getString("address"):json.getSection("hosts").getSection(hosts.get(server)).getSection("servers").getSection(server).getString("address").split(":")[json.getSection("hosts").getSection(hosts.get(server)).getSection("servers").getSection(server).getString("address").split(":").length - 1]));
                         blockMeta.setLore(lore);
                     } else if (json.getSection("hosts").getSection(hosts.get(server)).getSection("servers").getSection(server).getBoolean("running")) {
@@ -1095,8 +1095,8 @@ public class InternalUIRenderer extends UIRenderer {
                     LinkedList<String> lore = new LinkedList<String>();
                     if (!subserver.equals(json.getSection("server").getString("display")))
                         lore.add(ChatColor.GRAY + subserver);
-                    lore.add(plugin.api.getLang("SubServers", "Interface.Server-Menu.Server-Player-Count").replace("$int$", new DecimalFormat("#,###").format(json.getSection("server").getSection("players").getKeys().size())));
                     lore.add(plugin.api.getLang("SubServers", "Interface.Server-Menu.SubServer-Temporary"));
+                    lore.add(plugin.api.getLang("SubServers", "Interface.Server-Menu.Server-Player-Count").replace("$int$", new DecimalFormat("#,###").format(json.getSection("server").getSection("players").getKeys().size())));
                     lore.add(ChatColor.WHITE + ((plugin.config.get().getSection("Settings").getBoolean("Show-Addresses", false))?json.getSection("server").getString("address"):json.getSection("server").getString("address").split(":")[json.getSection("server").getString("address").split(":").length - 1]));
                     blockMeta.setLore(lore);
                 } else if (json.getSection("server").getBoolean("running")) {

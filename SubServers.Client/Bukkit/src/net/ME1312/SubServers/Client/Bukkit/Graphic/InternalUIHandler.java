@@ -275,7 +275,7 @@ public class InternalUIHandler implements UIHandler, Listener {
                         } else if (item.equals(plugin.api.getLang("SubServers", "Interface.Generic.Back"))) {
                             player.closeInventory();
                             gui.back();
-                        } else if (!item.equals(ChatColor.RESET.toString()) && !item.equals(plugin.api.getLang("SubServers", "Interface.Server-Menu.No-Servers"))) {
+                        } else if (!item.equals(ChatColor.RESET.toString()) && !item.startsWith(ChatColor.WHITE.toString()) && !item.equals(plugin.api.getLang("SubServers", "Interface.Server-Menu.No-Servers"))) {
                             player.closeInventory();
                             String obj;
                             if (event.getCurrentItem().getItemMeta().getLore() != null && event.getCurrentItem().getItemMeta().getLore().size() > 0 && event.getCurrentItem().getItemMeta().getLore().get(0).startsWith(ChatColor.GRAY.toString())) {

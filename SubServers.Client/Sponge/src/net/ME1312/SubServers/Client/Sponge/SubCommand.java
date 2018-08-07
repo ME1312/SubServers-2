@@ -207,7 +207,7 @@ public final class SubCommand implements CommandExecutor {
                             for (String server : data.getSection("groups").getSection(group).getKeys()) {
                                 Text.Builder message = Text.builder(data.getSection("groups").getSection(group).getSection(server).getString("display"));
                                 Text.Builder hover = Text.builder(data.getSection("groups").getSection(group).getSection(server).getString("display") + '\n');
-                                if (data.getSection("groups").getSection(group).getSection(server).getKeys().contains("enabled")) {
+                                if (data.getSection("groups").getSection(group).getSection(server).getKeys().contains("host")) {
                                     message.onClick(TextActions.runCommand("/subservers open SubServer/ " + server));
                                     if (data.getSection("groups").getSection(group).getSection(server).getBoolean("temp")) {
                                         message.color(TextColors.AQUA);
@@ -216,8 +216,8 @@ public final class SubCommand implements CommandExecutor {
                                             hover.append(Text.builder(server + '\n').color(TextColors.GRAY).build());
                                         }
                                         hover.append(
-                                                Text.of(plugin.api.getLang("SubServers", "Interface.Server-Menu.Server-Player-Count").replace("$int$", new DecimalFormat("#,###").format(data.getSection("groups").getSection(group).getSection(server).getSection("players").getKeys().size())) + '\n'),
-                                                Text.of(plugin.api.getLang("SubServers", "Interface.Server-Menu.SubServer-Temporary"))
+                                                Text.of(plugin.api.getLang("SubServers", "Interface.Server-Menu.SubServer-Temporary") + '\n'),
+                                                Text.of(plugin.api.getLang("SubServers", "Interface.Server-Menu.Server-Player-Count").replace("$int$", new DecimalFormat("#,###").format(data.getSection("groups").getSection(group).getSection(server).getSection("players").getKeys().size())))
                                         );
                                     } else if (data.getSection("groups").getSection(group).getSection(server).getBoolean("running")) {
                                         message.color(TextColors.GREEN);
@@ -264,11 +264,14 @@ public final class SubCommand implements CommandExecutor {
                                 } else {
                                     message.color(TextColors.WHITE);
                                     hover.color(TextColors.WHITE);
-                                    hover.append(Text.of(plugin.api.getLang("SubServers", "Interface.Server-Menu.Server-External")));
+                                    hover.append(
+                                            Text.of(plugin.api.getLang("SubServers", "Interface.Server-Menu.Server-External") + '\n'),
+                                            Text.of(plugin.api.getLang("SubServers", "Interface.Server-Menu.Server-Player-Count").replace("$int$", new DecimalFormat("#,###").format(data.getSection("groups").getSection(group).getSection(server).getSection("players").getKeys().size())))
+                                    );
                                     if (plugin.config.get().getSection("Settings").getBoolean("Show-Addresses", false)) {
-                                        hover.append(Text.builder('\n' + data.getSection("servers").getSection(server).getString("address")).color(TextColors.WHITE).build());
+                                        hover.append(Text.builder('\n' + data.getSection("groups").getSection(group).getSection(server).getString("address")).color(TextColors.WHITE).build());
                                     } else {
-                                        hover.append(Text.builder('\n' + data.getSection("servers").getSection(server).getString("address").split(":")[data.getSection("servers").getSection(server).getString("address").split(":").length - 1]).color(TextColors.WHITE).build());
+                                        hover.append(Text.builder('\n' + data.getSection("groups").getSection(group).getSection(server).getString("address").split(":")[data.getSection("groups").getSection(group).getSection(server).getString("address").split(":").length - 1]).color(TextColors.WHITE).build());
                                     }
                                 }
                                 message.onHover(TextActions.showText(hover.build()));
@@ -321,8 +324,8 @@ public final class SubCommand implements CommandExecutor {
                                     hover.append(Text.builder(subserver + '\n').color(TextColors.GRAY).build());
                                 }
                                 hover.append(
-                                        Text.of(plugin.api.getLang("SubServers", "Interface.Server-Menu.Server-Player-Count").replace("$int$", new DecimalFormat("#,###").format(data.getSection("hosts").getSection(host).getSection("servers").getSection(subserver).getSection("players").getKeys().size())) + '\n'),
-                                        Text.of(plugin.api.getLang("SubServers", "Interface.Server-Menu.SubServer-Temporary"))
+                                        Text.of(plugin.api.getLang("SubServers", "Interface.Server-Menu.SubServer-Temporary") + '\n'),
+                                        Text.of(plugin.api.getLang("SubServers", "Interface.Server-Menu.Server-Player-Count").replace("$int$", new DecimalFormat("#,###").format(data.getSection("hosts").getSection(host).getSection("servers").getSection(subserver).getSection("players").getKeys().size())))
                                 );
                             } else if (data.getSection("hosts").getSection(host).getSection("servers").getSection(subserver).getBoolean("running")) {
                                 message.color(TextColors.GREEN);
@@ -383,7 +386,9 @@ public final class SubCommand implements CommandExecutor {
                         if (!server.equals(data.getSection("servers").getSection(server).getString("display"))) {
                             hover.append(Text.builder(server + '\n').color(TextColors.GRAY).build());
                         }
-                        hover.append(Text.of(plugin.api.getLang("SubServers", "Interface.Server-Menu.Server-External")));
+                        hover.append(
+                                Text.of(plugin.api.getLang("SubServers", "Interface.Server-Menu.Server-External") + '\n'),
+                                Text.of(plugin.api.getLang("SubServers", "Interface.Server-Menu.Server-Player-Count").replace("$int$", new DecimalFormat("#,###").format(data.getSection("servers").getSection(server).getSection("players").getKeys().size()))));
                         if (plugin.config.get().getSection("Settings").getBoolean("Show-Addresses", false)) {
                             hover.append(Text.builder('\n' + data.getSection("servers").getSection(server).getString("address")).color(TextColors.WHITE).build());
                         } else {

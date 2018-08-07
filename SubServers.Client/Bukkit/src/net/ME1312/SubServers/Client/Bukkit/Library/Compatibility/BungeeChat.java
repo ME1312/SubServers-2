@@ -48,7 +48,7 @@ public class BungeeChat {
                         hoverm = new LinkedList<TextComponent>();
                         message = new TextComponent(data.getSection("groups").getSection(group).getSection(server).getString("display"));
                         hover = new TextComponent(data.getSection("groups").getSection(group).getSection(server).getString("display") + '\n');
-                        if (data.getSection("groups").getSection(group).getSection(server).getKeys().contains("enabled")) {
+                        if (data.getSection("groups").getSection(group).getSection(server).getKeys().contains("host")) {
                             message.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, label + " open SubServer/ " + server));
                             if (data.getSection("groups").getSection(group).getSection(server).getBoolean("temp")) {
                                 message.setColor(ChatColor.AQUA);
@@ -59,9 +59,9 @@ public class BungeeChat {
                                     hover.setColor(ChatColor.GRAY);
                                     hoverm.add(hover);
                                 }
-                                hover = new TextComponent(plugin.api.getLang("SubServers", "Interface.Server-Menu.Server-Player-Count").replace("$int$", new DecimalFormat("#,###").format(data.getSection("groups").getSection(group).getSection(server).getSection("players").getKeys().size())) + '\n');
+                                hover = new TextComponent(plugin.api.getLang("SubServers", "Interface.Server-Menu.SubServer-Temporary") + '\n');
                                 hoverm.add(hover);
-                                hover = new TextComponent(plugin.api.getLang("SubServers", "Interface.Server-Menu.SubServer-Temporary"));
+                                hover = new TextComponent(plugin.api.getLang("SubServers", "Interface.Server-Menu.Server-Player-Count").replace("$int$", new DecimalFormat("#,###").format(data.getSection("groups").getSection(group).getSection(server).getSection("players").getKeys().size())));
                             } else if (data.getSection("groups").getSection(group).getSection(server).getBoolean("running")) {
                                 message.setColor(ChatColor.GREEN);
                                 hover.setColor(ChatColor.GREEN);
@@ -119,10 +119,12 @@ public class BungeeChat {
                             hoverm.add(hover);
                             hover = new TextComponent(plugin.api.getLang("SubServers", "Interface.Server-Menu.Server-External"));
                             hoverm.add(hover);
+                            hover = new TextComponent(plugin.api.getLang("SubServers", "Interface.Server-Menu.Server-Player-Count").replace("$int$", new DecimalFormat("#,###").format(data.getSection("groups").getSection(group).getSection(server).getSection("players").getKeys().size())) + '\n');
+                            hoverm.add(hover);
                             if (plugin.config.get().getSection("Settings").getBoolean("Show-Addresses", false)) {
-                                hover = new TextComponent('\n' + data.getSection("servers").getSection(server).getString("address"));
+                                hover = new TextComponent('\n' + data.getSection("groups").getSection(group).getSection(server).getString("address"));
                             } else {
-                                hover = new TextComponent('\n' + data.getSection("servers").getSection(server).getString("address").split(":")[data.getSection("servers").getSection(server).getString("address").split(":").length - 1]);
+                                hover = new TextComponent('\n' + data.getSection("groups").getSection(group).getSection(server).getString("address").split(":")[data.getSection("groups").getSection(group).getSection(server).getString("address").split(":").length - 1]);
                             }
                             hover.setColor(ChatColor.WHITE);
                             hoverm.add(hover);
@@ -192,9 +194,9 @@ public class BungeeChat {
                             hover.setColor(ChatColor.GRAY);
                             hoverm.add(hover);
                         }
-                        hover = new TextComponent(plugin.api.getLang("SubServers", "Interface.Server-Menu.Server-Player-Count").replace("$int$", new DecimalFormat("#,###").format(data.getSection("hosts").getSection(host).getSection("servers").getSection(subserver).getSection("players").getKeys().size())) + '\n');
+                        hover = new TextComponent(plugin.api.getLang("SubServers", "Interface.Server-Menu.SubServer-Temporary") + '\n');
                         hoverm.add(hover);
-                        hover = new TextComponent(plugin.api.getLang("SubServers", "Interface.Server-Menu.SubServer-Temporary"));
+                        hover = new TextComponent(plugin.api.getLang("SubServers", "Interface.Server-Menu.Server-Player-Count").replace("$int$", new DecimalFormat("#,###").format(data.getSection("hosts").getSection(host).getSection("servers").getSection(subserver).getSection("players").getKeys().size())));
                     } else if (data.getSection("hosts").getSection(host).getSection("servers").getSection(subserver).getBoolean("running")) {
                         message.setColor(ChatColor.GREEN);
                         hover.setColor(ChatColor.GREEN);
@@ -271,7 +273,9 @@ public class BungeeChat {
                     hover.setColor(ChatColor.GRAY);
                     hoverm.add(hover);
                 }
-                hover = new TextComponent(plugin.api.getLang("SubServers", "Interface.Server-Menu.Server-External"));
+                hover = new TextComponent(plugin.api.getLang("SubServers", "Interface.Server-Menu.Server-External") + '\n');
+                hoverm.add(hover);
+                hover = new TextComponent(plugin.api.getLang("SubServers", "Interface.Server-Menu.Server-Player-Count").replace("$int$", new DecimalFormat("#,###").format(data.getSection("servers").getSection(server).getSection("players").getKeys().size())));
                 hoverm.add(hover);
                 if (plugin.config.get().getSection("Settings").getBoolean("Show-Addresses", false)) {
                     hover = new TextComponent('\n' + data.getSection("servers").getSection(server).getString("address"));

@@ -102,7 +102,7 @@ public final class SubCommand extends CommandX {
                                     message += ChatColor.GOLD + group + ChatColor.RESET + ": ";
                                     for (String server : data.getSection("groups").getSection(group).getKeys()) {
                                         if (i != 0) message += div;
-                                        if (!data.getSection("groups").getSection(group).getSection(server).contains("enabled")) {
+                                        if (!data.getSection("groups").getSection(group).getSection(server).contains("host")) {
                                             message += ChatColor.WHITE;
                                         } else if (data.getSection("groups").getSection(group).getSection(server).getBoolean("temp")) {
                                             message += ChatColor.AQUA;
