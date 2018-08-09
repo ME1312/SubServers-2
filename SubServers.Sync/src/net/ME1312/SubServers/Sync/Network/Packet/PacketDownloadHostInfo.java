@@ -26,12 +26,12 @@ public class PacketDownloadHostInfo implements PacketIn, PacketOut {
     /**
      * New PacketDownloadHostInfo (Out)
      *
-     * @param host Host Name
+     * @param host Host name (or null for all)
      * @param callback Callbacks
      */
     @SafeVarargs
     public PacketDownloadHostInfo(String host, Callback<YAMLSection>... callback) {
-        if (Util.isNull(host, callback)) throw new NullPointerException();
+        if (Util.isNull((Object) callback)) throw new NullPointerException();
         this.host = host;
         this.id = Util.getNew(callbacks.keySet(), UUID::randomUUID).toString();
         callbacks.put(id, callback);
@@ -39,10 +39,10 @@ public class PacketDownloadHostInfo implements PacketIn, PacketOut {
 
     @Override
     public YAMLSection generate() {
-        YAMLSection data = new YAMLSection();
-        data.set("id", id);
-        data.set("host", host);
-        return data;
+        YAMLSection json = new YAMLSection();
+        json.set("id", id);
+        json.set("host", host);
+        return json;
     }
 
     @Override
@@ -53,6 +53,6 @@ public class PacketDownloadHostInfo implements PacketIn, PacketOut {
 
     @Override
     public Version getVersion() {
-        return new Version("2.11.0a");
+        return new Version("2.13b");
     }
 }

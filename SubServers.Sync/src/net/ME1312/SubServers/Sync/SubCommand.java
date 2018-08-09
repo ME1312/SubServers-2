@@ -6,10 +6,11 @@ import net.ME1312.SubServers.Sync.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Sync.Library.NamedContainer;
 import net.ME1312.SubServers.Sync.Library.Util;
 import net.ME1312.SubServers.Sync.Library.Version.Version;
+import net.ME1312.SubServers.Sync.Network.API.Host;
 import net.ME1312.SubServers.Sync.Network.API.Proxy;
+import net.ME1312.SubServers.Sync.Network.API.Server;
+import net.ME1312.SubServers.Sync.Network.API.SubServer;
 import net.ME1312.SubServers.Sync.Network.Packet.*;
-import net.ME1312.SubServers.Sync.Server.Server;
-import net.ME1312.SubServers.Sync.Server.SubServer;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -91,29 +92,29 @@ public final class SubCommand extends CommandX {
                             }
                         }).start();
                     } else if (args[0].equalsIgnoreCase("list")) {
-                        plugin.subdata.sendPacket(new PacketDownloadServerList(null, null, data -> {
+                        plugin.api.getGroups(groups -> plugin.api.getHosts(hosts -> plugin.api.getServers(servers -> plugin.api.getMasterProxy(proxymaster -> plugin.api.getProxies(proxies -> {
                             int i = 0;
                             boolean sent = false;
                             String div = ChatColor.RESET + ", ";
-                            if (data.getSection("groups").getKeys().size() > 0) {
-                                sender.sendMessage("SubServers > Group/Server List:");
-                                for (String group : data.getSection("groups").getKeys()) {
+                            if (groups.keySet().size() > 0) {
+                                sender.sendMessage("Group/Server List:");
+                                for (String group : groups.keySet()) {
                                     String message = "  ";
                                     message += ChatColor.GOLD + group + ChatColor.RESET + ": ";
-                                    for (String server : data.getSection("groups").getSection(group).getKeys()) {
+                                    for (Server server : groups.get(group)) {
                                         if (i != 0) message += div;
-                                        if (!data.getSection("groups").getSection(group).getSection(server).contains("host")) {
+                                        if (!(server instanceof SubServer)) {
                                             message += ChatColor.WHITE;
-                                        } else if (data.getSection("groups").getSection(group).getSection(server).getBoolean("temp")) {
+                                        } else if (((SubServer) server).isTemporary()) {
                                             message += ChatColor.AQUA;
-                                        } else if (data.getSection("groups").getSection(group).getSection(server).getBoolean("running")) {
+                                        } else if (((SubServer) server).isRunning()) {
                                             message += ChatColor.GREEN;
-                                        } else if (data.getSection("groups").getSection(group).getSection(server).getBoolean("enabled") && data.getSection("groups").getSection(group).getSection(server).getList("incompatible").size() == 0) {
+                                        } else if (((SubServer) server).isEnabled() && ((SubServer) server).getCurrentIncompatibilities().size() == 0) {
                                             message += ChatColor.YELLOW;
                                         } else {
                                             message += ChatColor.RED;
                                         }
-                                        message += data.getSection("groups").getSection(group).getSection(server).getRawString("display") + " (" + data.getSection("groups").getSection(group).getSection(server).getRawString("address") + ((server.equals(data.getSection("groups").getSection(group).getSection(server).getRawString("display"))) ? "" : ChatColor.stripColor(div) + server) + ")";
+                                        message += server.getDisplayName() + " (" + server.getAddress().getAddress().getHostAddress()+':'+server.getAddress().getPort() + ((server.getName().equals(server.getDisplayName())) ? "" : ChatColor.stripColor(div) + server.getName()) + ")";
                                         i++;
                                     }
                                     if (i == 0) message += ChatColor.RESET + "(none)";
@@ -124,27 +125,27 @@ public final class SubCommand extends CommandX {
                                 if (!sent) sender.sendMessage(ChatColor.RESET + "(none)");
                                 sent = false;
                             }
-                            sender.sendMessage("SubServers > Host/SubServer List:");
-                            for (String host : data.getSection("hosts").getKeys()) {
+                            sender.sendMessage("Host/SubServer List:");
+                            for (Host host : hosts.values()) {
                                 String message = "  ";
-                                if (data.getSection("hosts").getSection(host).getBoolean("enabled")) {
+                                if (host.isEnabled()) {
                                     message += ChatColor.AQUA;
                                 } else {
                                     message += ChatColor.RED;
                                 }
-                                message += data.getSection("hosts").getSection(host).getRawString("display") + " (" + data.getSection("hosts").getSection(host).getRawString("address") + ((host.equals(data.getSection("hosts").getSection(host).getRawString("display"))) ? "" : ChatColor.stripColor(div) + host) + ")" + ChatColor.RESET + ": ";
-                                for (String subserver : data.getSection("hosts").getSection(host).getSection("servers").getKeys()) {
+                                message += host.getDisplayName() + " (" + host.getAddress().getHostAddress() + ((host.getName().equals(host.getDisplayName()))?"":ChatColor.stripColor(div)+host.getName()) + ")" + ChatColor.RESET + ": ";
+                                for (SubServer subserver : host.getSubServers().values()) {
                                     if (i != 0) message += div;
-                                    if (data.getSection("hosts").getSection(host).getSection("servers").getSection(subserver).getBoolean("temp")) {
+                                    if (subserver.isTemporary()) {
                                         message += ChatColor.AQUA;
-                                    } else if (data.getSection("hosts").getSection(host).getSection("servers").getSection(subserver).getBoolean("running")) {
+                                    } else if (subserver.isRunning()) {
                                         message += ChatColor.GREEN;
-                                    } else if (data.getSection("hosts").getSection(host).getSection("servers").getSection(subserver).getBoolean("enabled") && data.getSection("hosts").getSection(host).getSection("servers").getSection(subserver).getList("incompatible").size() == 0) {
+                                    } else if (subserver.isEnabled() && subserver.getCurrentIncompatibilities().size() == 0) {
                                         message += ChatColor.YELLOW;
                                     } else {
                                         message += ChatColor.RED;
                                     }
-                                    message += data.getSection("hosts").getSection(host).getSection("servers").getSection(subserver).getRawString("display") + " (" + data.getSection("hosts").getSection(host).getSection("servers").getSection(subserver).getRawString("address").split(":")[data.getSection("hosts").getSection(host).getSection("servers").getSection(subserver).getRawString("address").split(":").length - 1] + ((subserver.equals(data.getSection("hosts").getSection(host).getSection("servers").getSection(subserver).getRawString("display"))) ? "" : ChatColor.stripColor(div) + subserver) + ")";
+                                    message += subserver.getDisplayName() + " (" + subserver.getAddress().getPort() + ((subserver.getName().equals(subserver.getDisplayName()))?"":ChatColor.stripColor(div)+subserver.getName()) + ")";
                                     i++;
                                 }
                                 if (i == 0) message += ChatColor.RESET + "(none)";
@@ -153,34 +154,34 @@ public final class SubCommand extends CommandX {
                                 sent = true;
                             }
                             if (!sent) sender.sendMessage(ChatColor.RESET + "(none)");
-                            sender.sendMessage("SubServers > Server List:");
+                            sender.sendMessage("Server List:");
                             String message = "  ";
-                            for (String server : data.getSection("servers").getKeys()) {
+                            for (Server server : servers.values()) if (!(server instanceof SubServer)) {
                                 if (i != 0) message += div;
-                                message += ChatColor.WHITE + data.getSection("servers").getSection(server).getRawString("display") + " (" + data.getSection("servers").getSection(server).getRawString("address") + ((server.equals(data.getSection("servers").getSection(server).getRawString("display"))) ? "" : ChatColor.stripColor(div) + server) + ")";
+                                message += ChatColor.WHITE + server.getDisplayName() + " (" + server.getAddress().getAddress().getHostAddress()+':'+server.getAddress().getPort() + ((server.getName().equals(server.getDisplayName()))?"":ChatColor.stripColor(div)+server.getName()) + ")";
                                 i++;
                             }
                             if (i == 0) message += ChatColor.RESET + "(none)";
                             sender.sendMessage(message);
-                            if (data.getSection("proxies").getKeys().size() > 0) {
-                                sender.sendMessage("SubServers > Proxy List:");
+                            if (proxies.keySet().size() > 0) {
+                                sender.sendMessage("Proxy List:");
                                 message = "  (master)";
-                                for (String proxy : data.getSection("proxies").getKeys()) {
+                                for (Proxy proxy : proxies.values()) {
                                     message += div;
-                                    if (data.getSection("proxies").getSection(proxy).getKeys().contains("subdata") && data.getSection("proxies").getSection(proxy).getBoolean("redis")) {
+                                    if (proxy.getSubData() != null && proxy.isRedis()) {
                                         message += ChatColor.GREEN;
-                                    } else if (data.getSection("proxies").getSection(proxy).getKeys().contains("subdata")) {
+                                    } else if (proxy.getSubData() != null) {
                                         message += ChatColor.AQUA;
-                                    } else if (data.getSection("proxies").getSection(proxy).getBoolean("redis")) {
+                                    } else if (proxy.isRedis()) {
                                         message += ChatColor.WHITE;
                                     } else {
                                         message += ChatColor.RED;
                                     }
-                                    message += data.getSection("proxies").getSection(proxy).getString("display") + ((proxy.equals(data.getSection("proxies").getSection(proxy).getString("display")))?"":" ("+proxy+')');
+                                    message += proxy.getDisplayName() + ((proxy.getName().equals(proxy.getDisplayName()))?"":" ("+proxy.getName()+')');
                                 }
                                 sender.sendMessage(message);
                             }
-                        }));
+                        })))));
                     } else if (args[0].equalsIgnoreCase("info") || args[0].equalsIgnoreCase("status")) {
                         if (args.length > 1) {
                             plugin.subdata.sendPacket(new PacketDownloadServerInfo(args[1].toLowerCase(), data -> {
@@ -232,14 +233,16 @@ public final class SubCommand extends CommandX {
                                         sender.sendMessage("SubServers > That Server is not a SubServer");
                                         break;
                                     case 5:
-                                        if (data.getRawString("m").contains("Host")) {
-                                            sender.sendMessage("SubServers > That SubServer's Host is not enabled");
-                                        } else {
-                                            sender.sendMessage("SubServers > That SubServer is not enabled");
-                                        }
+                                        sender.sendMessage("SubServers > That SubServer's Host is not enabled");
                                         break;
                                     case 6:
+                                        sender.sendMessage("SubServers > That SubServer is not enabled");
+                                        break;
+                                    case 7:
                                         sender.sendMessage("SubServers > That SubServer is already running");
+                                        break;
+                                    case 8:
+                                        sender.sendMessages("That SubServer cannot start while these server(s) are running:", data.getRawString("m").split(":\\s")[1]);
                                         break;
                                     case 0:
                                     case 1:
@@ -349,9 +352,10 @@ public final class SubCommand extends CommandX {
                                 plugin.subdata.sendPacket(new PacketCreateServer(null, args[1], args[2],args[3], new Version(args[4]), Integer.parseInt(args[5]), data -> {
                                     switch (data.getInt("r")) {
                                         case 3:
+                                        case 4:
                                             sender.sendMessage("SubServers > There is already a SubServer with that name");
                                             break;
-                                        case 4:
+                                        case 5:
                                             sender.sendMessage("SubServers > There is no host with that name");
                                             break;
                                         case 6:
@@ -437,10 +441,10 @@ public final class SubCommand extends CommandX {
                 List<String> list = new ArrayList<String>();
                 if (args.length == 2) {
                     if (last.length() == 0) {
-                        for (Server server : plugin.servers.values()) if (server instanceof SubServer) list.add(server.getName());
+                        for (net.ME1312.SubServers.Sync.Server.Server server : plugin.servers.values()) if (server instanceof net.ME1312.SubServers.Sync.Server.SubServer) list.add(server.getName());
                     } else {
-                        for (Server server : plugin.servers.values()) {
-                            if (server instanceof SubServer && server.getName().toLowerCase().startsWith(last))
+                        for (net.ME1312.SubServers.Sync.Server.Server server : plugin.servers.values()) {
+                            if (server instanceof net.ME1312.SubServers.Sync.Server.SubServer && server.getName().toLowerCase().startsWith(last))
                                 list.add(last + server.getName().substring(last.length()));
                         }
                     }
@@ -452,10 +456,10 @@ public final class SubCommand extends CommandX {
                 if (args.length == 2) {
                     List<String> list = new ArrayList<String>();
                     if (last.length() == 0) {
-                        for (Server server : plugin.servers.values()) if (server instanceof SubServer) list.add(server.getName());
+                        for (net.ME1312.SubServers.Sync.Server.Server server : plugin.servers.values()) if (server instanceof net.ME1312.SubServers.Sync.Server.SubServer) list.add(server.getName());
                     } else {
-                        for (Server server : plugin.servers.values()) {
-                            if (server instanceof SubServer && server.getName().toLowerCase().startsWith(last)) list.add(last + server.getName().substring(last.length()));
+                        for (net.ME1312.SubServers.Sync.Server.Server server : plugin.servers.values()) {
+                            if (server instanceof net.ME1312.SubServers.Sync.Server.SubServer && server.getName().toLowerCase().startsWith(last)) list.add(last + server.getName().substring(last.length()));
                         }
                     }
                     return new NamedContainer<>((list.size() <= 0)?plugin.api.getLang("SubServers", "Command.Generic.Unknown-SubServer").replace("$str$", args[0]):null, list);
@@ -519,16 +523,16 @@ public final class SubCommand extends CommandX {
     private void updateTemplateCache() {
         if (Calendar.getInstance().getTime().getTime() - templateCache.name() >= TimeUnit.MINUTES.toMillis(5)) {
             templateCache.rename(Calendar.getInstance().getTime().getTime());
-            plugin.subdata.sendPacket(new PacketDownloadServerList(null, null, (json) -> {
-                TreeMap<String, List<String>> hosts = new TreeMap<String, List<String>>();
-                for (String host : json.getSection("hosts").getKeys()) {
+            plugin.api.getHosts(hosts -> {
+                TreeMap<String, List<String>> cache = new TreeMap<String, List<String>>();
+                for (Host host : hosts.values()) {
                     List<String> templates = new ArrayList<String>();
-                    templates.addAll(json.getSection("hosts").getSection(host).getSection("creator").getSection("templates").getKeys());
-                    hosts.put(host, templates);
+                    templates.addAll(host.getCreator().getTemplates().keySet());
+                    cache.put(host.getName().toLowerCase(), templates);
                 }
-                templateCache.set(hosts);
+                templateCache.set(cache);
                 templateCache.rename(Calendar.getInstance().getTime().getTime());
-            }));
+            });
         }
 
     }
@@ -565,7 +569,7 @@ public final class SubCommand extends CommandX {
         public void execute(CommandSender sender, String[] args) {
             if (sender instanceof ProxiedPlayer) {
                 if (args.length > 0) {
-                    Map<String, Server> servers = plugin.servers;
+                    Map<String, net.ME1312.SubServers.Sync.Server.Server> servers = plugin.servers;
                     if (servers.keySet().contains(args[0].toLowerCase())) {
                         ((ProxiedPlayer) sender).connect(servers.get(args[0].toLowerCase()));
                     } else {
@@ -575,8 +579,8 @@ public final class SubCommand extends CommandX {
                     int i = 0;
                     TextComponent serverm = new TextComponent(ChatColor.RESET.toString());
                     TextComponent div = new TextComponent(plugin.api.getLang("SubServers", "Bungee.Server.Divider"));
-                    for (Server server : plugin.servers.values()) {
-                        if (!server.isHidden() && (!(server instanceof SubServer) || ((SubServer) server).isRunning())) {
+                    for (net.ME1312.SubServers.Sync.Server.Server server : plugin.servers.values()) {
+                        if (!server.isHidden() && (!(server instanceof net.ME1312.SubServers.Sync.Server.SubServer) || ((net.ME1312.SubServers.Sync.Server.SubServer) server).isRunning())) {
                             if (i != 0) serverm.addExtra(div);
                             TextComponent message = new TextComponent(plugin.api.getLang("SubServers", "Bungee.Server.List").replace("$str$", server.getDisplayName()));
                             try {
@@ -646,7 +650,7 @@ public final class SubCommand extends CommandX {
         public void execute(CommandSender sender, String[] args) {
             List<String> messages = new LinkedList<String>();
             int players = 0;
-            for (Server server : plugin.servers.values()) {
+            for (net.ME1312.SubServers.Sync.Server.Server server : plugin.servers.values()) {
                 List<String> playerlist = new ArrayList<String>();
                 if (plugin.redis) {
                     try {
@@ -660,7 +664,7 @@ public final class SubCommand extends CommandX {
                 Collections.sort(playerlist);
 
                 players += playerlist.size();
-                if (!server.isHidden() && (!(server instanceof SubServer) || ((SubServer) server).isRunning())) {
+                if (!server.isHidden() && (!(server instanceof net.ME1312.SubServers.Sync.Server.SubServer) || ((net.ME1312.SubServers.Sync.Server.SubServer) server).isRunning())) {
                     int i = 0;
                     String message = plugin.api.getLang("SubServers", "Bungee.List.Format").replace("$str$", server.getDisplayName()).replace("$int$", Integer.toString(playerlist.size()));
                     for (String player : playerlist) {

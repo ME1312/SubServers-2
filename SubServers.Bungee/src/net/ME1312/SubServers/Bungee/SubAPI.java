@@ -529,6 +529,15 @@ public final class SubAPI {
     }
 
     /**
+     * Get the Master Proxy redis container (null if unavailable)
+     *
+     * @return Master Proxy
+     */
+    public Proxy getMasterProxy() {
+        return plugin.redis;
+    }
+
+    /**
      * Get players on this network across all known proxies
      *
      * @return Player Collection
@@ -536,7 +545,7 @@ public final class SubAPI {
     @SuppressWarnings("unchecked")
     public Collection<NamedContainer<String, UUID>> getGlobalPlayers() {
         List<NamedContainer<String, UUID>> players = new ArrayList<NamedContainer<String, UUID>>();
-        if (plugin.redis) {
+        if (plugin.redis != null) {
             try {
                 for (UUID player : (Set<UUID>) plugin.redis("getPlayersOnline")) players.add(new NamedContainer<>((String) plugin.redis("getNameFromUuid", new NamedContainer<>(UUID.class, player)), player));
             } catch (Exception e) {}

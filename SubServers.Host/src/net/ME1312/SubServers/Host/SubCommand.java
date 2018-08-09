@@ -6,7 +6,10 @@ import net.ME1312.SubServers.Host.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Host.Library.TextColor;
 import net.ME1312.SubServers.Host.Library.Util;
 import net.ME1312.SubServers.Host.Library.Version.Version;
+import net.ME1312.SubServers.Host.Network.API.Host;
 import net.ME1312.SubServers.Host.Network.API.Proxy;
+import net.ME1312.SubServers.Host.Network.API.Server;
+import net.ME1312.SubServers.Host.Network.API.SubServer;
 import net.ME1312.SubServers.Host.Network.Packet.*;
 import org.json.JSONObject;
 
@@ -101,29 +104,29 @@ public class SubCommand {
         new Command(null) {
             @Override
             public void command(String handle, String[] args) {
-                host.subdata.sendPacket(new PacketDownloadServerList(null, null, data -> {
+                host.api.getGroups(groups -> host.api.getHosts(hosts -> host.api.getServers(servers -> host.api.getMasterProxy(proxymaster -> host.api.getProxies(proxies -> {
                     int i = 0;
                     boolean sent = false;
                     String div = TextColor.RESET + ", ";
-                    if (data.getSection("groups").getKeys().size() > 0) {
+                    if (groups.keySet().size() > 0) {
                         host.log.message.println("Group/Server List:");
-                        for (String group : data.getSection("groups").getKeys()) {
+                        for (String group : groups.keySet()) {
                             String message = "  ";
                             message += TextColor.GOLD + group + TextColor.RESET + ": ";
-                            for (String server : data.getSection("groups").getSection(group).getKeys()) {
+                            for (Server server : groups.get(group)) {
                                 if (i != 0) message += div;
-                                if (!data.getSection("groups").getSection(group).getSection(server).contains("host")) {
+                                if (!(server instanceof SubServer)) {
                                     message += TextColor.WHITE;
-                                } else if (data.getSection("groups").getSection(group).getSection(server).getBoolean("temp")) {
+                                } else if (((SubServer) server).isTemporary()) {
                                     message += TextColor.AQUA;
-                                } else if (data.getSection("groups").getSection(group).getSection(server).getBoolean("running")) {
+                                } else if (((SubServer) server).isRunning()) {
                                     message += TextColor.GREEN;
-                                } else if (data.getSection("groups").getSection(group).getSection(server).getBoolean("enabled") && data.getSection("groups").getSection(group).getSection(server).getList("incompatible").size() == 0) {
+                                } else if (((SubServer) server).isEnabled() && ((SubServer) server).getCurrentIncompatibilities().size() == 0) {
                                     message += TextColor.YELLOW;
                                 } else {
                                     message += TextColor.RED;
                                 }
-                                message += data.getSection("groups").getSection(group).getSection(server).getRawString("display") + " (" + data.getSection("groups").getSection(group).getSection(server).getRawString("address") + ((server.equals(data.getSection("groups").getSection(group).getSection(server).getRawString("display"))) ? "" : TextColor.stripColor(div) + server) + ")";
+                                message += server.getDisplayName() + " (" + server.getAddress().getAddress().getHostAddress()+':'+server.getAddress().getPort() + ((server.getName().equals(server.getDisplayName())) ? "" : TextColor.stripColor(div) + server.getName()) + ")";
                                 i++;
                             }
                             if (i == 0) message += TextColor.RESET + "(none)";
@@ -136,26 +139,26 @@ public class SubCommand {
                     }
                     ExHost h = host;
                     host.log.message.println("Host/SubServer List:");
-                    for (String host : data.getSection("hosts").getKeys()) {
+                    for (Host host : hosts.values()) {
                         String message = "  ";
-                        if (data.getSection("hosts").getSection(host).getBoolean("enabled")) {
+                        if (host.isEnabled()) {
                             message += TextColor.AQUA;
                         } else {
                             message += TextColor.RED;
                         }
-                        message += data.getSection("hosts").getSection(host).getRawString("display") + " (" + data.getSection("hosts").getSection(host).getRawString("address") + ((host.equals(data.getSection("hosts").getSection(host).getRawString("display")))?"":TextColor.stripColor(div)+host) + ")" + TextColor.RESET + ": ";
-                        for (String subserver : data.getSection("hosts").getSection(host).getSection("servers").getKeys()) {
+                        message += host.getDisplayName() + " (" + host.getAddress().getHostAddress() + ((host.getName().equals(host.getDisplayName()))?"":TextColor.stripColor(div)+host.getName()) + ")" + TextColor.RESET + ": ";
+                        for (SubServer subserver : host.getSubServers().values()) {
                             if (i != 0) message += div;
-                            if (data.getSection("hosts").getSection(host).getSection("servers").getSection(subserver).getBoolean("temp")) {
+                            if (subserver.isTemporary()) {
                                 message += TextColor.AQUA;
-                            } else if (data.getSection("hosts").getSection(host).getSection("servers").getSection(subserver).getBoolean("running")) {
+                            } else if (subserver.isRunning()) {
                                 message += TextColor.GREEN;
-                            } else if (data.getSection("hosts").getSection(host).getSection("servers").getSection(subserver).getBoolean("enabled") && data.getSection("hosts").getSection(host).getSection("servers").getSection(subserver).getList("incompatible").size() == 0) {
+                            } else if (subserver.isEnabled() && subserver.getCurrentIncompatibilities().size() == 0) {
                                 message += TextColor.YELLOW;
                             } else {
                                 message += TextColor.RED;
                             }
-                            message += data.getSection("hosts").getSection(host).getSection("servers").getSection(subserver).getRawString("display") + " (" + data.getSection("hosts").getSection(host).getSection("servers").getSection(subserver).getRawString("address").split(":")[data.getSection("hosts").getSection(host).getSection("servers").getSection(subserver).getRawString("address").split(":").length - 1] + ((subserver.equals(data.getSection("hosts").getSection(host).getSection("servers").getSection(subserver).getRawString("display")))?"":TextColor.stripColor(div)+subserver) + ")";
+                            message += subserver.getDisplayName() + " (" + subserver.getAddress().getPort() + ((subserver.getName().equals(subserver.getDisplayName()))?"":TextColor.stripColor(div)+subserver.getName()) + ")";
                             i++;
                         }
                         if (i == 0) message += TextColor.RESET + "(none)";
@@ -166,32 +169,32 @@ public class SubCommand {
                     if (!sent) host.log.message.println(TextColor.RESET + "(none)");
                     host.log.message.println("Server List:");
                     String message = "  ";
-                    for (String server : data.getSection("servers").getKeys()) {
+                    for (Server server : servers.values()) if (!(server instanceof SubServer)) {
                         if (i != 0) message += div;
-                        message += TextColor.WHITE + data.getSection("servers").getSection(server).getRawString("display") + " (" + data.getSection("servers").getSection(server).getRawString("address") + ((server.equals(data.getSection("servers").getSection(server).getRawString("display")))?"":TextColor.stripColor(div)+server) + ")";
+                        message += TextColor.WHITE + server.getDisplayName() + " (" + server.getAddress().getAddress().getHostAddress()+':'+server.getAddress().getPort() + ((server.getName().equals(server.getDisplayName()))?"":TextColor.stripColor(div)+server.getName()) + ")";
                         i++;
                     }
                     if (i == 0) message += TextColor.RESET + "(none)";
                     host.log.message.println(message);
-                    if (data.getSection("proxies").getKeys().size() > 0) {
+                    if (proxies.keySet().size() > 0) {
                         host.log.message.println("Proxy List:");
                         message = "  (master)";
-                        for (String proxy : data.getSection("proxies").getKeys()) {
+                        for (Proxy proxy : proxies.values()) {
                             message += div;
-                            if (data.getSection("proxies").getSection(proxy).getKeys().contains("subdata") && data.getSection("proxies").getSection(proxy).getBoolean("redis")) {
+                            if (proxy.getSubData() != null && proxy.isRedis()) {
                                 message += TextColor.GREEN;
-                            } else if (data.getSection("proxies").getSection(proxy).getKeys().contains("subdata")) {
+                            } else if (proxy.getSubData() != null) {
                                 message += TextColor.AQUA;
-                            } else if (data.getSection("proxies").getSection(proxy).getBoolean("redis")) {
+                            } else if (proxy.isRedis()) {
                                 message += TextColor.WHITE;
                             } else {
                                 message += TextColor.RED;
                             }
-                            message += data.getSection("proxies").getSection(proxy).getString("display") + ((proxy.equals(data.getSection("proxies").getSection(proxy).getString("display")))?"":" ("+proxy+')');
+                            message += proxy.getDisplayName() + ((proxy.getName().equals(proxy.getDisplayName()))?"":" ("+proxy.getName()+')');
                         }
                         host.log.message.println(message);
                     }
-                }));
+                })))));
             }
         }.description("Lists the available Hosts and Servers").help(
                 "This command will print a list of the available Hosts and Servers.",
@@ -204,41 +207,43 @@ public class SubCommand {
             @Override
             public void command(String handle, String[] args) {
                 if (args.length > 0) {
-                    host.subdata.sendPacket(new PacketDownloadServerInfo(args[0].toLowerCase(), data -> {
-                        switch (data.getRawString("type").toLowerCase()) {
-                            case "invalid":
-                                host.log.message.println("There is no server with that name");
-                                break;
-                            case "subserver":
-                                host.log.message.println("Info on " + data.getSection("server").getRawString("display") + ':');
-                                if (!data.getSection("server").getRawString("name").equals(data.getSection("server").getRawString("display"))) host.log.message.println("  - Real Name: " + data.getSection("server").getRawString("name"));
-                                host.log.message.println("  - Host: " + data.getSection("server").getRawString("host"));
-                                host.log.message.println("  - Enabled: " + ((data.getSection("server").getBoolean("enabled"))?"yes":"no"));
-                                host.log.message.println("  - Editable: " + ((data.getSection("server").getBoolean("editable"))?"yes":"no"));
-                                if (data.getSection("server").getList("group").size() > 0) {
-                                    host.log.message.println("  - Group:");
-                                    for (int i = 0; i < data.getSection("server").getList("group").size(); i++)
-                                        host.log.message.println("    - " + data.getSection("server").getList("group").get(i).asRawString());
+                    host.api.getServer(args[0], server -> {
+                        ExHost h = host;
+                        if (server == null) {
+                            h.log.message.println("There is no server with that name");
+                        } else if (!(server instanceof SubServer)) {
+                            h.log.message.println("That Server is not a SubServer");
+                        } else ((SubServer) server).getHost(host -> {
+                            if (host == null) {
+                                h.log.message.println("That Server is not a SubServer");
+                            } else {
+                                h.log.message.println("Info on " + server.getDisplayName() + ':');
+                                if (!server.getName().equals(server.getDisplayName())) h.log.message.println("  - Real Name: " + server.getName());
+                                h.log.message.println("  - Host: " + host.getName());
+                                h.log.message.println("  - Enabled: " + ((((SubServer) server).isEnabled())?"yes":"no"));
+                                h.log.message.println("  - Editable: " + ((((SubServer) server).isEditable())?"yes":"no"));
+                                if (server.getGroups().size() > 0) {
+                                    h.log.message.println("  - Group:");
+                                    for (String group : server.getGroups())
+                                        h.log.message.println("    - " + group);
                                 }
-                                if (data.getSection("server").getBoolean("temp")) host.log.message.println("  - Temporary: yes");
-                                host.log.message.println("  - Running: " + ((data.getSection("server").getBoolean("running"))?"yes":"no"));
-                                host.log.message.println("  - Logging: " + ((data.getSection("server").getBoolean("log"))?"yes":"no"));
-                                host.log.message.println("  - Address: " + data.getSection("server").getRawString("address"));
-                                host.log.message.println("  - Auto Restart: " + ((data.getSection("server").getBoolean("auto-restart"))?"yes":"no"));
-                                host.log.message.println("  - Hidden: " + ((data.getSection("server").getBoolean("hidden"))?"yes":"no"));
-                                if (data.getSection("server").getList("incompatible-list").size() > 0) {
+                                if (((SubServer) server).isTemporary()) h.log.message.println("  - Temporary: yes");
+                                h.log.message.println("  - Running: " + ((((SubServer) server).isRunning())?"yes":"no"));
+                                h.log.message.println("  - Logging: " + ((((SubServer) server).isLogging())?"yes":"no"));
+                                h.log.message.println("  - Address: " + server.getAddress().getAddress().getHostAddress()+':'+server.getAddress().getPort());
+                                h.log.message.println("  - Auto Restart: " + ((((SubServer) server).willAutoRestart())?"yes":"no"));
+                                h.log.message.println("  - Hidden: " + ((server.isHidden())?"yes":"no"));
+                                if (((SubServer) server).getIncompatibilities().size() > 0) {
                                     List<String> current = new ArrayList<String>();
-                                    for (int i = 0; i < data.getSection("server").getList("incompatible").size(); i++) current.add(data.getSection("server").getList("incompatible").get(i).asRawString().toLowerCase());
-                                    host.log.message.println("  - Incompatibilities:");
-                                    for (int i = 0; i < data.getSection("server").getList("incompatible-list").size(); i++)
-                                        host.log.message.println("    - " + data.getSection("server").getList("incompatible-list").get(i).asRawString() + ((current.contains(data.getSection("server").getList("incompatible-list").get(i).asRawString().toLowerCase()))?"*":""));
+                                    for (String other : ((SubServer) server).getCurrentIncompatibilities()) current.add(other.toLowerCase());
+                                    h.log.message.println("  - Incompatibilities:");
+                                    for (String other : ((SubServer) server).getIncompatibilities())
+                                        h.log.message.println("    - " + other + ((current.contains(other))?"*":""));
                                 }
-                                host.log.message.println("  - Signature: " + data.getSection("server").getRawString("signature"));
-                                break;
-                            default:
-                                host.log.message.println("That Server is not a SubServer");
-                        }
-                    }));
+                                h.log.message.println("  - Signature: " + server.getSignature());
+                            }
+                        });
+                    });
                 } else {
                     host.log.message.println("Usage: /" + handle + " <SubServer>");
                 }
@@ -266,16 +271,15 @@ public class SubCommand {
                                 host.log.message.println("That Server is not a SubServer");
                                 break;
                             case 5:
-                                if (data.getRawString("m").contains("Host")) {
-                                    host.log.message.println("That SubServer's Host is not enabled");
-                                } else {
-                                    host.log.message.println("That SubServer is not enabled");
-                                }
+                                host.log.message.println("That SubServer's Host is not enabled");
                                 break;
                             case 6:
-                                host.log.message.println("That SubServer is already running");
+                                host.log.message.println("That SubServer is not enabled");
                                 break;
                             case 7:
+                                host.log.message.println("That SubServer is already running");
+                                break;
+                            case 8:
                                 host.log.message.println("That SubServer cannot start while these server(s) are running:", data.getRawString("m").split(":\\s")[1]);
                                 break;
                             case 0:
@@ -440,12 +444,14 @@ public class SubCommand {
                     if (Util.isException(() -> Integer.parseInt(args[4]))) {
                         host.log.message.println("Invalid Port Number");
                     } else {
-                        host.subdata.sendPacket(new PacketCreateServer(null, args[0], args[1],args[2], new Version(args[3]), Integer.parseInt(args[4]), data -> {
+                        host.subdata.sendPacket(new PacketCreateServer(null, args[0], args[1], args[2], new Version(args[3]), Integer.parseInt(args[4]), data -> {
                             switch (data.getInt("r")) {
                                 case 3:
+                                    host.log.message.println("Server names cannot use spaces");
+                                case 4:
                                     host.log.message.println("There is already a SubServer with that name");
                                     break;
-                                case 4:
+                                case 5:
                                     host.log.message.println("There is no host with that name");
                                     break;
                                 case 6:

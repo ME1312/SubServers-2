@@ -1,21 +1,20 @@
 package net.ME1312.SubServers.Client.Bukkit.Graphic;
 
-import net.ME1312.SubServers.Client.Bukkit.Library.Config.YAMLSection;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 /**
  * GUI Renderer Layout Class
  */
-public interface Renderer {
+public interface Renderer<T> {
 
     /**
      * Open the GUI
      *
      * @param player Player Opening
-     * @param object Raw Representation of an Object
+     * @param object Object passed
      */
-    void open(Player player, YAMLSection object);
+    void open(Player player, T object);
 
     /**
      * Get Renderer Icon
@@ -27,8 +26,8 @@ public interface Renderer {
     /**
      * Check if this Renderer is enabled for this Object
      *
-     * @param object Raw Representation of an Object
+     * @param object Object passed
      * @return Enabled Status
      */
-    boolean isEnabled(YAMLSection object);
+    boolean isEnabled(T object);
 }

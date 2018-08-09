@@ -50,7 +50,7 @@ public class PacketDownloadPlayerList implements PacketIn, PacketOut {
         for (NamedContainer<String, UUID> player : plugin.api.getGlobalPlayers()) {
             YAMLSection pinfo = new YAMLSection();
             pinfo.set("name", player.get());
-            if (plugin.redis) {
+            if (plugin.redis != null) {
                 try {
                     pinfo.set("server", ((ServerInfo) plugin.redis("getServerFor", new NamedContainer<>(UUID.class, player.get()))).getName());
                 } catch (Exception e) {

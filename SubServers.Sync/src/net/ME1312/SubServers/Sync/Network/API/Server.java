@@ -2,7 +2,7 @@ package net.ME1312.SubServers.Sync.Network.API;
 
 import net.ME1312.SubServers.Sync.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Sync.Library.NamedContainer;
-import net.ME1312.SubServers.Sync.Network.Packet.PacketDownloadServerList;
+import net.ME1312.SubServers.Sync.Network.Packet.PacketDownloadServerInfo;
 import net.ME1312.SubServers.Sync.SubAPI;
 
 import java.net.InetSocketAddress;
@@ -36,7 +36,7 @@ public class Server {
      */
     public void refresh() {
         String name = getName();
-        SubAPI.getInstance().getSubDataNetwork().sendPacket(new PacketDownloadServerList(null, null, data -> load(data.getSection("servers").getSection(name))));
+        SubAPI.getInstance().getSubDataNetwork().sendPacket(new PacketDownloadServerInfo(name, data -> load(data.getSection("servers").getSection(name))));
     }
 
     /**

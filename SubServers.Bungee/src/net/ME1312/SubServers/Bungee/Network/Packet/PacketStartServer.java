@@ -66,16 +66,16 @@ public class PacketStartServer implements PacketIn, PacketOut {
             } else if (!((SubServer) servers.get(data.getRawString("server").toLowerCase())).getHost().isEnabled()) {
                 client.sendPacket(new PacketStartServer(5, "That SubServer's Host is not enabled", (data.contains("id"))?data.getRawString("id"):null));
             } else if (!((SubServer) servers.get(data.getRawString("server").toLowerCase())).isEnabled()) {
-                client.sendPacket(new PacketStartServer(5, "That SubServer is not enabled", (data.contains("id"))?data.getRawString("id"):null));
+                client.sendPacket(new PacketStartServer(6, "That SubServer is not enabled", (data.contains("id"))?data.getRawString("id"):null));
             } else if (((SubServer) servers.get(data.getRawString("server").toLowerCase())).isRunning()) {
-                client.sendPacket(new PacketStartServer(6, "That SubServer is already running", (data.contains("id")) ? data.getRawString("id") : null));
+                client.sendPacket(new PacketStartServer(7, "That SubServer is already running", (data.contains("id")) ? data.getRawString("id") : null));
             } else if (((SubServer) servers.get(data.getRawString("server").toLowerCase())).getCurrentIncompatibilities().size() != 0) {
                 String list = "";
                 for (SubServer server : ((SubServer) servers.get(data.getRawString("server").toLowerCase())).getCurrentIncompatibilities()) {
                     if (list.length() != 0) list += ", ";
                     list += server.getName();
                 }
-                client.sendPacket(new PacketStartServer(7, "Cannot start SubServer while these servers are running: " + list, (data.contains("id")) ? data.getRawString("id") : null));
+                client.sendPacket(new PacketStartServer(8, "Cannot start SubServer while these servers are running: " + list, (data.contains("id")) ? data.getRawString("id") : null));
             } else {
                 if (((SubServer) servers.get(data.getRawString("server").toLowerCase())).start((data.contains("player"))?UUID.fromString(data.getRawString("player")):null)) {
                     client.sendPacket(new PacketStartServer(0, "Starting SubServer", (data.contains("id"))?data.getRawString("id"):null));
@@ -91,6 +91,6 @@ public class PacketStartServer implements PacketIn, PacketOut {
 
     @Override
     public Version getVersion() {
-        return new Version("2.11.0a");
+        return new Version("2.13b");
     }
 }

@@ -4,7 +4,7 @@ import net.ME1312.SubServers.Host.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Host.Library.Config.YAMLValue;
 import net.ME1312.SubServers.Host.Library.NamedContainer;
 import net.ME1312.SubServers.Host.Library.Util;
-import net.ME1312.SubServers.Host.Network.Packet.PacketDownloadNetworkList;
+import net.ME1312.SubServers.Host.Network.Packet.PacketDownloadProxyInfo;
 import net.ME1312.SubServers.Host.SubAPI;
 
 import java.util.*;
@@ -37,20 +37,7 @@ public class Proxy {
      */
     public void refresh() {
         String name = getName();
-        SubAPI.getInstance().getSubDataNetwork().sendPacket(new PacketDownloadNetworkList(data -> {
-            YAMLSection raw = null;
-            for (String client : data.getSection("clients").getKeys()) {
-                if (data.getSection("clients").getSection(client).getKeys().size() > 0 && data.getSection("clients").getSection(client).getRawString("type", "").equals("Proxy")) {
-                    if (data.getSection("clients").getSection(client).getRawString("name").equals(name)) {
-                        raw = data.getSection("clients").getSection(client);
-                        load(raw);
-                        break;
-                    }
-                }
-            }
-
-            if (raw == null) throw new IllegalStateException("Could not find proxy with name: " + name);
-        }));
+        SubAPI.getInstance().getSubDataNetwork().sendPacket(new PacketDownloadProxyInfo(name, data -> load(data.getSection("proxies").getSection(name))));
     }
 
     /**

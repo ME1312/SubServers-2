@@ -1,8 +1,9 @@
 package net.ME1312.SubServers.Client.Bukkit.Library.Compatibility;
 
-import net.ME1312.SubServers.Client.Bukkit.Library.Config.YAMLSection;
+import net.ME1312.SubServers.Client.Bukkit.Network.API.Host;
 import net.ME1312.SubServers.Client.Bukkit.Network.API.Proxy;
-import net.ME1312.SubServers.Client.Bukkit.Network.Packet.PacketDownloadServerList;
+import net.ME1312.SubServers.Client.Bukkit.Network.API.Server;
+import net.ME1312.SubServers.Client.Bukkit.Network.API.SubServer;
 import net.ME1312.SubServers.Client.Bukkit.SubPlugin;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -23,13 +24,13 @@ public class BungeeChat {
     }
 
     public void listCommand(CommandSender sender, String label) {
-        plugin.subdata.sendPacket(new PacketDownloadServerList(null, null, data -> {
+        plugin.api.getGroups(groups -> plugin.api.getHosts(hosts -> plugin.api.getServers(servers -> plugin.api.getMasterProxy(proxymaster -> plugin.api.getProxies(proxies -> {
             int i = 0;
             boolean sent = false;
             TextComponent div = new TextComponent(plugin.api.getLang("SubServers", "Command.List.Divider"));
-            if (data.getSection("groups").getKeys().size() > 0) {
+            if (groups.keySet().size() > 0) {
                 sender.sendMessage(plugin.api.getLang("SubServers", "Command.List.Group-Header"));
-                for (String group : data.getSection("groups").getKeys()) {
+                for (String group : groups.keySet()) {
                     List<TextComponent> hoverm = new LinkedList<TextComponent>();
                     TextComponent msg = new TextComponent("  ");
                     TextComponent message = new TextComponent(group);
@@ -37,47 +38,46 @@ public class BungeeChat {
                     message.setColor(ChatColor.GOLD);
                     hover.setColor(ChatColor.GOLD);
                     hoverm.add(hover);
-                    hover = new TextComponent(plugin.api.getLang("SubServers", "Interface.Group-Menu.Group-Server-Count").replace("$int$", new DecimalFormat("#,###").format(data.getSection("groups").getSection(group).getKeys().size())));
+                    hover = new TextComponent(plugin.api.getLang("SubServers", "Interface.Group-Menu.Group-Server-Count").replace("$int$", new DecimalFormat("#,###").format(groups.get(group).size())));
                     hoverm.add(hover);
                     message.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, label + " open Server 1 " + group));
                     message.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, hoverm.toArray(new TextComponent[hoverm.size()])));
                     msg.addExtra(message);
                     msg.addExtra(new TextComponent(plugin.api.getLang("SubServers", "Command.List.Header")));
 
-                    for (String server : data.getSection("groups").getSection(group).getKeys()) {
+                    for (Server server : groups.get(group)) {
                         hoverm = new LinkedList<TextComponent>();
-                        message = new TextComponent(data.getSection("groups").getSection(group).getSection(server).getString("display"));
-                        hover = new TextComponent(data.getSection("groups").getSection(group).getSection(server).getString("display") + '\n');
-                        if (data.getSection("groups").getSection(group).getSection(server).getKeys().contains("host")) {
-                            message.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, label + " open SubServer/ " + server));
-                            if (data.getSection("groups").getSection(group).getSection(server).getBoolean("temp")) {
+                        message = new TextComponent(server.getDisplayName());
+                        hover = new TextComponent(server.getDisplayName() + '\n');
+                        if (server instanceof SubServer) {
+                            if (((SubServer) server).isTemporary()) {
                                 message.setColor(ChatColor.AQUA);
                                 hover.setColor(ChatColor.AQUA);
                                 hoverm.add(hover);
-                                if (!server.equals(data.getSection("groups").getSection(group).getSection(server).getString("display"))) {
-                                    hover = new TextComponent(server + '\n');
+                                if (!server.getName().equals(server.getDisplayName())) {
+                                    hover = new TextComponent(server.getName() + '\n');
                                     hover.setColor(ChatColor.GRAY);
                                     hoverm.add(hover);
                                 }
                                 hover = new TextComponent(plugin.api.getLang("SubServers", "Interface.Server-Menu.SubServer-Temporary") + '\n');
                                 hoverm.add(hover);
-                                hover = new TextComponent(plugin.api.getLang("SubServers", "Interface.Server-Menu.Server-Player-Count").replace("$int$", new DecimalFormat("#,###").format(data.getSection("groups").getSection(group).getSection(server).getSection("players").getKeys().size())));
-                            } else if (data.getSection("groups").getSection(group).getSection(server).getBoolean("running")) {
+                                hover = new TextComponent(plugin.api.getLang("SubServers", "Interface.Server-Menu.Server-Player-Count").replace("$int$", new DecimalFormat("#,###").format(server.getPlayers().size())));
+                            } else if (((SubServer) server).isRunning()) {
                                 message.setColor(ChatColor.GREEN);
                                 hover.setColor(ChatColor.GREEN);
                                 hoverm.add(hover);
-                                if (!server.equals(data.getSection("groups").getSection(group).getSection(server).getString("display"))) {
-                                    hover = new TextComponent(server + '\n');
+                                if (!server.getName().equals(server.getDisplayName())) {
+                                    hover = new TextComponent(server.getDisplayName() + '\n');
                                     hover.setColor(ChatColor.GRAY);
                                     hoverm.add(hover);
                                 }
-                                hover = new TextComponent(plugin.api.getLang("SubServers", "Interface.Server-Menu.Server-Player-Count").replace("$int$", new DecimalFormat("#,###").format(data.getSection("groups").getSection(group).getSection(server).getSection("players").getKeys().size())));
-                            } else if (data.getSection("groups").getSection(group).getSection(server).getBoolean("enabled") && data.getSection("groups").getSection(group).getSection(server).getList("incompatible").size() == 0) {
+                                hover = new TextComponent(plugin.api.getLang("SubServers", "Interface.Server-Menu.Server-Player-Count").replace("$int$", new DecimalFormat("#,###").format(server.getPlayers().size())));
+                            } else if (((SubServer) server).isEnabled() && ((SubServer) server).getCurrentIncompatibilities().size() == 0) {
                                 message.setColor(ChatColor.YELLOW);
                                 hover.setColor(ChatColor.YELLOW);
                                 hoverm.add(hover);
-                                if (!server.equals(data.getSection("groups").getSection(group).getSection(server).getString("display"))) {
-                                    hover = new TextComponent(server + '\n');
+                                if (!server.getName().equals(server.getDisplayName())) {
+                                    hover = new TextComponent(server.getName() + '\n');
                                     hover.setColor(ChatColor.GRAY);
                                     hoverm.add(hover);
                                 }
@@ -85,30 +85,30 @@ public class BungeeChat {
                             } else {
                                 message.setColor(ChatColor.RED);
                                 hover.setColor(ChatColor.RED);
-                                if (!server.equals(data.getSection("groups").getSection(group).getSection(server).getString("display"))) {
+                                if (!server.getName().equals(server.getDisplayName())) {
                                     hoverm.add(hover);
-                                    hover = new TextComponent(server + '\n');
+                                    hover = new TextComponent(server.getName() + '\n');
                                     hover.setColor(ChatColor.GRAY);
                                 }
-                                if (data.getSection("groups").getSection(group).getSection(server).getList("incompatible").size() != 0) {
+                                if (((SubServer) server).getCurrentIncompatibilities().size() != 0) {
                                     hoverm.add(hover);
                                     String list = "";
-                                    for (int ii = 0; ii < data.getSection("groups").getSection(group).getSection(server).getList("incompatible").size(); ii++) {
+                                    for (String other : ((SubServer) server).getCurrentIncompatibilities()) {
                                         if (list.length() != 0) list += ", ";
-                                        list += data.getSection("groups").getSection(group).getSection(server).getList("incompatible").get(ii).asString();
+                                        list += other;
                                     }
-                                    hover = new TextComponent(plugin.api.getLang("SubServers", "Interface.Server-Menu.SubServer-Incompatible").replace("$str$", list) + ((data.getSection("groups").getSection(group).getSection(server).getBoolean("enabled")) ? "" : "\n"));
+                                    hover = new TextComponent(plugin.api.getLang("SubServers", "Interface.Server-Menu.SubServer-Incompatible").replace("$str$", list) + ((((SubServer) server).isEnabled())?"":"\n"));
                                 }
-                                if (!data.getSection("groups").getSection(group).getSection(server).getBoolean("enabled")) {
+                                if (!((SubServer) server).isEnabled()) {
                                     hoverm.add(hover);
                                     hover = new TextComponent(plugin.api.getLang("SubServers", "Interface.Server-Menu.SubServer-Disabled"));
                                 }
                             }
                             hoverm.add(hover);
                             if (plugin.config.get().getSection("Settings").getBoolean("Show-Addresses", false)) {
-                                hover = new TextComponent('\n' + data.getSection("groups").getSection(group).getSection(server).getString("address"));
+                                hover = new TextComponent('\n' + server.getAddress().getAddress().getHostAddress() + ':' + server.getAddress().getPort());
                             } else {
-                                hover = new TextComponent('\n' + data.getSection("groups").getSection(group).getSection(server).getString("address").split(":")[data.getSection("groups").getSection(group).getSection(server).getString("address").split(":").length - 1]);
+                                hover = new TextComponent("\n" + server.getAddress().getPort());
                             }
                             hover.setColor(ChatColor.WHITE);
                             hoverm.add(hover);
@@ -116,15 +116,20 @@ public class BungeeChat {
                         } else {
                             message.setColor(ChatColor.WHITE);
                             hover.setColor(ChatColor.WHITE);
+                            if (!server.getName().equals(server.getDisplayName())) {
+                                hoverm.add(hover);
+                                hover = new TextComponent(server.getName() + '\n');
+                                hover.setColor(ChatColor.GRAY);
+                            }
                             hoverm.add(hover);
                             hover = new TextComponent(plugin.api.getLang("SubServers", "Interface.Server-Menu.Server-External"));
                             hoverm.add(hover);
-                            hover = new TextComponent(plugin.api.getLang("SubServers", "Interface.Server-Menu.Server-Player-Count").replace("$int$", new DecimalFormat("#,###").format(data.getSection("groups").getSection(group).getSection(server).getSection("players").getKeys().size())) + '\n');
+                            hover = new TextComponent(plugin.api.getLang("SubServers", "Interface.Server-Menu.Server-Player-Count").replace("$int$", new DecimalFormat("#,###").format(server.getPlayers().size())) + '\n');
                             hoverm.add(hover);
                             if (plugin.config.get().getSection("Settings").getBoolean("Show-Addresses", false)) {
-                                hover = new TextComponent('\n' + data.getSection("groups").getSection(group).getSection(server).getString("address"));
+                                hover = new TextComponent('\n' + server.getAddress().getAddress().getHostAddress() + ':' + server.getAddress().getPort());
                             } else {
-                                hover = new TextComponent('\n' + data.getSection("groups").getSection(group).getSection(server).getString("address").split(":")[data.getSection("groups").getSection(group).getSection(server).getString("address").split(":").length - 1]);
+                                hover = new TextComponent("\n" + server.getAddress().getPort());
                             }
                             hover.setColor(ChatColor.WHITE);
                             hoverm.add(hover);
@@ -143,27 +148,27 @@ public class BungeeChat {
                 sent = false;
             }
             sender.sendMessage(plugin.api.getLang("SubServers", "Command.List.Host-Header"));
-            for (String host : data.getSection("hosts").getKeys()) {
+            for (Host host : hosts.values()) {
                 List<TextComponent> hoverm = new LinkedList<TextComponent>();
                 TextComponent msg = new TextComponent("  ");
-                TextComponent message = new TextComponent(data.getSection("hosts").getSection(host).getString("display"));
-                TextComponent hover = new TextComponent(data.getSection("hosts").getSection(host).getString("display") + '\n');
-                if (data.getSection("hosts").getSection(host).getBoolean("enabled")) {
+                TextComponent message = new TextComponent(host.getDisplayName());
+                TextComponent hover = new TextComponent(host.getDisplayName() + '\n');
+                if (host.isEnabled()) {
                     message.setColor(ChatColor.AQUA);
                     hover.setColor(ChatColor.AQUA);
                     hoverm.add(hover);
-                    if (!host.equals(data.getSection("hosts").getSection(host).getString("display"))) {
-                        hover = new TextComponent(host + '\n');
+                    if (!host.getName().equals(host.getDisplayName())) {
+                        hover = new TextComponent(host.getName() + '\n');
                         hover.setColor(ChatColor.GRAY);
                         hoverm.add(hover);
                     }
-                    hover = new TextComponent(plugin.api.getLang("SubServers", "Interface.Host-Menu.Host-Server-Count").replace("$int$", new DecimalFormat("#,###").format(data.getSection("hosts").getSection(host).getSection("servers").getKeys().size())));
+                    hover = new TextComponent(plugin.api.getLang("SubServers", "Interface.Host-Menu.Host-Server-Count").replace("$int$", new DecimalFormat("#,###").format(host.getSubServers().keySet().size())));
                 } else {
                     message.setColor(ChatColor.RED);
                     hover.setColor(ChatColor.RED);
                     hoverm.add(hover);
-                    if (!host.equals(data.getSection("hosts").getSection(host).getString("display"))) {
-                        hover = new TextComponent(host + '\n');
+                    if (!host.getName().equals(host.getDisplayName())) {
+                        hover = new TextComponent(host.getName() + '\n');
                         hover.setColor(ChatColor.GRAY);
                         hoverm.add(hover);
                     }
@@ -171,48 +176,48 @@ public class BungeeChat {
                 }
                 if (plugin.config.get().getSection("Settings").getBoolean("Show-Addresses", false)) {
                     hoverm.add(hover);
-                    hover = new TextComponent('\n' + data.getSection("hosts").getSection(host).getString("address"));
+                    hover = new TextComponent('\n' + host.getAddress().getHostAddress());
                     hover.setColor(ChatColor.WHITE);
                 }
                 hoverm.add(hover);
-                message.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, label + " open Host/ " + host));
+                message.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, label + " open Host/ " + host.getName()));
                 message.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, hoverm.toArray(new TextComponent[hoverm.size()])));
                 msg.addExtra(message);
                 msg.addExtra(new TextComponent(plugin.api.getLang("SubServers", "Command.List.Header")));
 
-                for (String subserver : data.getSection("hosts").getSection(host).getSection("servers").getKeys()) {
+                for (SubServer subserver : host.getSubServers().values()) {
                     hoverm = new LinkedList<TextComponent>();
-                    message = new TextComponent(data.getSection("hosts").getSection(host).getSection("servers").getSection(subserver).getString("display"));
-                    hover = new TextComponent(data.getSection("hosts").getSection(host).getSection("servers").getSection(subserver).getString("display") + '\n');
+                    message = new TextComponent(subserver.getDisplayName());
+                    hover = new TextComponent(subserver.getDisplayName() + '\n');
                     message.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, label + " open SubServer/ " + subserver));
-                    if (data.getSection("hosts").getSection(host).getSection("servers").getSection(subserver).getBoolean("temp")) {
+                    if (subserver.isTemporary()) {
                         message.setColor(ChatColor.AQUA);
                         hover.setColor(ChatColor.AQUA);
                         hoverm.add(hover);
-                        if (!subserver.equals(data.getSection("hosts").getSection(host).getSection("servers").getSection(subserver).getString("display"))) {
-                            hover = new TextComponent(subserver + '\n');
+                        if (!subserver.getName().equals(subserver.getDisplayName())) {
+                            hover = new TextComponent(subserver.getName() + '\n');
                             hover.setColor(ChatColor.GRAY);
                             hoverm.add(hover);
                         }
                         hover = new TextComponent(plugin.api.getLang("SubServers", "Interface.Server-Menu.SubServer-Temporary") + '\n');
                         hoverm.add(hover);
-                        hover = new TextComponent(plugin.api.getLang("SubServers", "Interface.Server-Menu.Server-Player-Count").replace("$int$", new DecimalFormat("#,###").format(data.getSection("hosts").getSection(host).getSection("servers").getSection(subserver).getSection("players").getKeys().size())));
-                    } else if (data.getSection("hosts").getSection(host).getSection("servers").getSection(subserver).getBoolean("running")) {
+                        hover = new TextComponent(plugin.api.getLang("SubServers", "Interface.Server-Menu.Server-Player-Count").replace("$int$", new DecimalFormat("#,###").format(subserver.getPlayers().size())));
+                    } else if (subserver.isEnabled()) {
                         message.setColor(ChatColor.GREEN);
                         hover.setColor(ChatColor.GREEN);
                         hoverm.add(hover);
-                        if (!subserver.equals(data.getSection("hosts").getSection(host).getSection("servers").getSection(subserver).getString("display"))) {
-                            hover = new TextComponent(subserver + '\n');
+                        if (!subserver.getName().equals(subserver.getDisplayName())) {
+                            hover = new TextComponent(subserver.getName() + '\n');
                             hover.setColor(ChatColor.GRAY);
                             hoverm.add(hover);
                         }
-                        hover = new TextComponent(plugin.api.getLang("SubServers", "Interface.Server-Menu.Server-Player-Count").replace("$int$", new DecimalFormat("#,###").format(data.getSection("hosts").getSection(host).getSection("servers").getSection(subserver).getSection("players").getKeys().size())));
-                    } else if (data.getSection("hosts").getSection(host).getSection("servers").getSection(subserver).getBoolean("enabled") && data.getSection("hosts").getSection(host).getSection("servers").getSection(subserver).getList("incompatible").size() == 0) {
+                        hover = new TextComponent(plugin.api.getLang("SubServers", "Interface.Server-Menu.Server-Player-Count").replace("$int$", new DecimalFormat("#,###").format(subserver.getPlayers().size())));
+                    } else if (subserver.isEnabled() && subserver.getCurrentIncompatibilities().size() == 0) {
                         message.setColor(ChatColor.YELLOW);
                         hover.setColor(ChatColor.YELLOW);
                         hoverm.add(hover);
-                        if (!subserver.equals(data.getSection("hosts").getSection(host).getSection("servers").getSection(subserver).getString("display"))) {
-                            hover = new TextComponent(subserver + '\n');
+                        if (!subserver.getName().equals(subserver.getDisplayName())) {
+                            hover = new TextComponent(subserver.getName() + '\n');
                             hover.setColor(ChatColor.GRAY);
                             hoverm.add(hover);
                         }
@@ -220,34 +225,34 @@ public class BungeeChat {
                     } else {
                         message.setColor(ChatColor.RED);
                         hover.setColor(ChatColor.RED);
-                        if (!subserver.equals(data.getSection("hosts").getSection(host).getSection("servers").getSection(subserver).getString("display"))) {
+                        if (!subserver.getName().equals(subserver.getDisplayName())) {
                             hoverm.add(hover);
-                            hover = new TextComponent(subserver + '\n');
+                            hover = new TextComponent(subserver.getName() + '\n');
                             hover.setColor(ChatColor.GRAY);
                         }
-                        if (data.getSection("hosts").getSection(host).getSection("servers").getSection(subserver).getList("incompatible").size() != 0) {
+                        if (subserver.getCurrentIncompatibilities().size() != 0) {
                             hoverm.add(hover);
                             String list = "";
-                            for (int ii = 0; ii < data.getSection("hosts").getSection(host).getSection("servers").getSection(subserver).getList("incompatible").size(); ii++) {
+                            for (String other : subserver.getCurrentIncompatibilities()) {
                                 if (list.length() != 0) list += ", ";
-                                list += data.getSection("hosts").getSection(host).getSection("servers").getSection(subserver).getList("incompatible").get(ii).asString();
+                                list += other;
                             }
-                            hover = new TextComponent(plugin.api.getLang("SubServers", "Interface.Server-Menu.SubServer-Incompatible").replace("$str$", list) + ((data.getSection("hosts").getSection(host).getSection("servers").getSection(subserver).getBoolean("enabled")) ? "" : "\n"));
+                            hover = new TextComponent(plugin.api.getLang("SubServers", "Interface.Server-Menu.SubServer-Incompatible").replace("$str$", list) + ((subserver.isEnabled())?"":"\n"));
                         }
-                        if (!data.getSection("hosts").getSection(host).getSection("servers").getSection(subserver).getBoolean("enabled")) {
+                        if (!subserver.isEnabled()) {
                             hoverm.add(hover);
                             hover = new TextComponent(plugin.api.getLang("SubServers", "Interface.Server-Menu.SubServer-Disabled"));
                         }
                     }
                     hoverm.add(hover);
                     if (plugin.config.get().getSection("Settings").getBoolean("Show-Addresses", false)) {
-                        hover = new TextComponent('\n' + data.getSection("hosts").getSection(host).getSection("servers").getSection(subserver).getString("address"));
+                        hover = new TextComponent('\n' + subserver.getAddress().getAddress().getHostAddress()+':'+subserver.getAddress().getPort());
                     } else {
-                        hover = new TextComponent('\n' + data.getSection("hosts").getSection(host).getSection("servers").getSection(subserver).getString("address").split(":")[data.getSection("hosts").getSection(host).getSection("servers").getSection(subserver).getString("address").split(":").length - 1]);
+                        hover = new TextComponent("\n" + subserver.getAddress().getPort());
                     }
                     hover.setColor(ChatColor.WHITE);
                     hoverm.add(hover);
-                    message.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, label + " open SubServer/ " + subserver));
+                    message.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, label + " open SubServer/ " + subserver.getName()));
                     message.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, hoverm.toArray(new TextComponent[hoverm.size()])));
                     if (i != 0) msg.addExtra(div);
                     msg.addExtra(message);
@@ -261,26 +266,26 @@ public class BungeeChat {
             if (!sent) sender.sendMessage("  " + plugin.api.getLang("SubServers", "Command.List.Empty"));
             sender.sendMessage(plugin.api.getLang("SubServers", "Command.List.Server-Header"));
             TextComponent msg = new TextComponent("  ");
-            for (String server : data.getSection("servers").getKeys()) {
+            for (Server server : servers.values()) if (!(server instanceof SubServer)) {
                 List<TextComponent> hoverm = new LinkedList<TextComponent>();
-                TextComponent message = new TextComponent(data.getSection("servers").getSection(server).getString("display"));
-                TextComponent hover = new TextComponent(data.getSection("servers").getSection(server).getString("display") + '\n');
+                TextComponent message = new TextComponent(server.getDisplayName());
+                TextComponent hover = new TextComponent(server.getDisplayName() + '\n');
                 message.setColor(ChatColor.WHITE);
                 hover.setColor(ChatColor.WHITE);
                 hoverm.add(hover);
-                if (!server.equals(data.getSection("servers").getSection(server).getString("display"))) {
-                    hover = new TextComponent(server + '\n');
+                if (!server.getName().equals(server.getDisplayName())) {
+                    hover = new TextComponent(server.getName() + '\n');
                     hover.setColor(ChatColor.GRAY);
                     hoverm.add(hover);
                 }
                 hover = new TextComponent(plugin.api.getLang("SubServers", "Interface.Server-Menu.Server-External") + '\n');
                 hoverm.add(hover);
-                hover = new TextComponent(plugin.api.getLang("SubServers", "Interface.Server-Menu.Server-Player-Count").replace("$int$", new DecimalFormat("#,###").format(data.getSection("servers").getSection(server).getSection("players").getKeys().size())));
+                hover = new TextComponent(plugin.api.getLang("SubServers", "Interface.Server-Menu.Server-Player-Count").replace("$int$", new DecimalFormat("#,###").format(server.getPlayers().size())));
                 hoverm.add(hover);
                 if (plugin.config.get().getSection("Settings").getBoolean("Show-Addresses", false)) {
-                    hover = new TextComponent('\n' + data.getSection("servers").getSection(server).getString("address"));
+                    hover = new TextComponent('\n' + server.getAddress().getAddress().getHostAddress()+':'+server.getAddress().getPort());
                 } else {
-                    hover = new TextComponent('\n' + data.getSection("servers").getSection(server).getString("address").split(":")[data.getSection("servers").getSection(server).getString("address").split(":").length - 1]);
+                    hover = new TextComponent("\n" + server.getAddress().getPort());
                 }
                 hover.setColor(ChatColor.WHITE);
                 hoverm.add(hover);
@@ -291,7 +296,7 @@ public class BungeeChat {
             }
             if (i == 0) sender.sendMessage("  " + plugin.api.getLang("SubServers", "Command.List.Empty"));
             else ((Player) sender).spigot().sendMessage(msg);
-            if (data.getSection("proxies").getKeys().size() > 0) {
+            if (proxies.keySet().size() > 0) {
                 sender.sendMessage(plugin.api.getLang("SubServers", "Command.List.Proxy-Header"));
                 msg = new TextComponent("  ");
                 List<TextComponent> hoverm = new LinkedList<TextComponent>();
@@ -300,55 +305,64 @@ public class BungeeChat {
                 message.setColor(ChatColor.GRAY);
                 hover.setColor(ChatColor.GRAY);
                 hoverm.add(hover);
-                if (data.getKeys().contains("master-proxy")) {
-                    hover = new TextComponent('\n' + data.getRawString("master-proxy"));
+                if (proxymaster != null) {
+                    hover = new TextComponent('\n' + proxymaster.getName());
                     hover.setColor(ChatColor.GRAY);
                     hoverm.add(hover);
+                    hover = new TextComponent('\n' + plugin.api.getLang("SubServers", "Interface.Proxy-Menu.Proxy-Master"));
+                    hoverm.add(hover);
+                    hover = new TextComponent('\n' + plugin.api.getLang("SubServers", "Interface.Proxy-Menu.Proxy-Player-Count").replace("$int$", new DecimalFormat("#,###").format(proxymaster.getPlayers().size())));
+                    hoverm.add(hover);
+                } else {
+                    hover = new TextComponent('\n' + plugin.api.getLang("SubServers", "Interface.Proxy-Menu.Proxy-Master"));
+                    hoverm.add(hover);
                 }
-                hover = new TextComponent('\n' + plugin.api.getLang("SubServers", "Interface.Proxy-Menu.Proxy-Master"));
-                hoverm.add(hover);
                 message.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, hoverm.toArray(new TextComponent[hoverm.size()])));
                 msg.addExtra(message);
-                for (String proxy : data.getSection("proxies").getKeys()) {
+                for (Proxy proxy : proxies.values()) {
                     hoverm = new LinkedList<TextComponent>();
-                    message = new TextComponent(data.getSection("proxies").getSection(proxy).getString("display"));
-                    hover = new TextComponent(data.getSection("proxies").getSection(proxy).getString("display"));
-                    if (data.getSection("proxies").getSection(proxy).getKeys().contains("subdata") && data.getSection("proxies").getSection(proxy).getBoolean("redis")) {
+                    message = new TextComponent(proxy.getDisplayName());
+                    hover = new TextComponent(proxy.getDisplayName());
+                    if (proxy.getSubData() != null && proxy.isRedis()) {
                         message.setColor(ChatColor.GREEN);
                         hover.setColor(ChatColor.GREEN);
-                        if (!proxy.equals(data.getSection("proxies").getSection(proxy).getString("display"))) {
+                        if (!proxy.getName().equals(proxy.getDisplayName())) {
                             hoverm.add(hover);
-                            hover = new TextComponent('\n' + proxy);
+                            hover = new TextComponent('\n' + proxy.getName());
                             hover.setColor(ChatColor.GRAY);
                         }
-                    } else if (data.getSection("proxies").getSection(proxy).getKeys().contains("subdata")) {
+                        hoverm.add(hover);
+                        hover = new TextComponent('\n' + plugin.api.getLang("SubServers", "Interface.Proxy-Menu.Proxy-Player-Count").replace("$int$", new DecimalFormat("#,###").format(proxy.getPlayers().size())));
+                    } else if (proxy.getSubData() != null) {
                         message.setColor(ChatColor.AQUA);
                         hover.setColor(ChatColor.AQUA);
-                        if (!proxy.equals(data.getSection("proxies").getSection(proxy).getString("display"))) {
+                        if (!proxy.getName().equals(proxy.getDisplayName())) {
                             hoverm.add(hover);
-                            hover = new TextComponent('\n' + proxy);
+                            hover = new TextComponent('\n' + proxy.getName());
                             hover.setColor(ChatColor.GRAY);
                         }
-                        if (data.getKeys().contains("master-proxy")) {
+                        if (proxymaster != null) {
                             hoverm.add(hover);
                             hover = new TextComponent('\n' + plugin.api.getLang("SubServers", "Interface.Proxy-Menu.Proxy-SubData"));
                         }
-                    } else if (data.getSection("proxies").getSection(proxy).getBoolean("redis")) {
+                    } else if (proxy.isRedis()) {
                         message.setColor(ChatColor.WHITE);
                         hover.setColor(ChatColor.WHITE);
                         hoverm.add(hover);
-                        if (!proxy.equals(data.getSection("proxies").getSection(proxy).getString("display"))) {
-                            hover = new TextComponent('\n' + proxy);
+                        if (!proxy.getName().equals(proxy.getDisplayName())) {
+                            hover = new TextComponent('\n' + proxy.getName());
                             hover.setColor(ChatColor.GRAY);
                             hoverm.add(hover);
                         }
                         hover = new TextComponent('\n' + plugin.api.getLang("SubServers", "Interface.Proxy-Menu.Proxy-Redis"));
+                        hoverm.add(hover);
+                        hover = new TextComponent('\n' + plugin.api.getLang("SubServers", "Interface.Proxy-Menu.Proxy-Player-Count").replace("$int$", new DecimalFormat("#,###").format(proxy.getPlayers().size())));
                     } else {
                         message.setColor(ChatColor.RED);
                         hover.setColor(ChatColor.RED);
                         hoverm.add(hover);
-                        if (!proxy.equals(data.getSection("proxies").getSection(proxy).getString("display"))) {
-                            hover = new TextComponent('\n' + proxy);
+                        if (!proxy.getName().equals(proxy.getDisplayName())) {
+                            hover = new TextComponent('\n' + proxy.getName());
                             hover.setColor(ChatColor.GRAY);
                             hoverm.add(hover);
                         }
@@ -361,6 +375,6 @@ public class BungeeChat {
                 }
                 ((Player) sender).spigot().sendMessage(msg);
             }
-        }));
+        })))));
     }
 }

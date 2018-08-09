@@ -3,10 +3,7 @@ package net.ME1312.SubServers.Client.Bukkit.Network.API;
 import net.ME1312.SubServers.Client.Bukkit.Library.Callback;
 import net.ME1312.SubServers.Client.Bukkit.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Client.Bukkit.Library.Util;
-import net.ME1312.SubServers.Client.Bukkit.Network.Packet.PacketCommandServer;
-import net.ME1312.SubServers.Client.Bukkit.Network.Packet.PacketDownloadServerList;
-import net.ME1312.SubServers.Client.Bukkit.Network.Packet.PacketStartServer;
-import net.ME1312.SubServers.Client.Bukkit.Network.Packet.PacketStopServer;
+import net.ME1312.SubServers.Client.Bukkit.Network.Packet.*;
 import net.ME1312.SubServers.Client.Bukkit.SubAPI;
 
 import java.lang.reflect.InvocationTargetException;
@@ -38,15 +35,6 @@ public class SubServer extends Server {
     @Override
     public boolean equals(Object obj) {
         return obj instanceof SubServer && super.equals(obj);
-    }
-
-    /**
-     * Download a new copy of the data from SubData
-     */
-    @Override
-    public void refresh() {
-        String name = getName();
-        SubAPI.getInstance().getSubDataNetwork().sendPacket(new PacketDownloadServerList(raw.getRawString("host"), null, data -> load(data.getSection("hosts").getSection(raw.getRawString("host")).getSection("servers").getSection(name))));
     }
 
     /**
@@ -261,11 +249,11 @@ public class SubServer extends Server {
             }
         };
 
-        if (host == null) {
-            SubAPI.getInstance().getSubDataNetwork().sendPacket(new PacketDownloadServerList(raw.getRawString("host"), null, data -> {
-                host = new Host(data.getSection("hosts").getSection(raw.getRawString("host")));
+        if (host == null || !host.getName().equalsIgnoreCase(raw.getRawString("host"))) {
+            SubAPI.getInstance().getHost(raw.getRawString("host"), host -> {
+                this.host = host;
                 run.run();
-            }));
+            });
         } else {
             run.run();
         }

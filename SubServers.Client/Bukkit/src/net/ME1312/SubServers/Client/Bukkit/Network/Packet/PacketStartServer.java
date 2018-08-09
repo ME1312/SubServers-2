@@ -57,6 +57,6 @@ public class PacketStartServer implements PacketIn, PacketOut {
 
     @Override
     public Version getVersion() {
-        return new Version("2.11.0a");
+        return new Version("2.13b");
     }
 }

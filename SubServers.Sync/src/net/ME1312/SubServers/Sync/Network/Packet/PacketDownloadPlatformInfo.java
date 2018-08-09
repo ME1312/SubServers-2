@@ -11,42 +11,29 @@ import java.util.HashMap;
 import java.util.UUID;
 
 /**
- * Download Server List Packet
+ * Download Proxy Info Packet
  */
-public class PacketDownloadServerList implements PacketIn, PacketOut {
+public class PacketDownloadPlatformInfo implements PacketIn, PacketOut {
     private static HashMap<String, Callback<YAMLSection>[]> callbacks = new HashMap<String, Callback<YAMLSection>[]>();
-    private String host;
-    private String group;
     private String id;
 
     /**
-     * New PacketDownloadServerList (In)
-     */
-    public PacketDownloadServerList() {}
-
-    /**
-     * New PacketDownloadServerList (Out)
+     * New PacketDownloadPlatformInfo
      *
-     * @param host Host name (or null for all)
-     * @param group Group name (or null for all)
      * @param callback Callbacks
      */
     @SafeVarargs
-    public PacketDownloadServerList(String host, String group, Callback<YAMLSection>... callback) {
+    public PacketDownloadPlatformInfo(Callback<YAMLSection>... callback) {
         if (Util.isNull((Object) callback)) throw new NullPointerException();
-        this.host = host;
-        this.group = group;
         this.id = Util.getNew(callbacks.keySet(), UUID::randomUUID).toString();
         callbacks.put(id, callback);
     }
 
     @Override
     public YAMLSection generate() {
-        YAMLSection json = new YAMLSection();
-        json.set("id", id);
-        if (host != null) json.set("host", host);
-        if (group != null) json.set("group", group);
-        return json;
+        YAMLSection data = new YAMLSection();
+        data.set("id", id);
+        return data;
     }
 
     @Override

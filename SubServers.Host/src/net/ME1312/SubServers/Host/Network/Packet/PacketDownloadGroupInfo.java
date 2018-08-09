@@ -11,28 +11,28 @@ import java.util.HashMap;
 import java.util.UUID;
 
 /**
- * Download Host Info Packet
+ * Download Group Info Packet
  */
-public class PacketDownloadHostInfo implements PacketIn, PacketOut {
+public class PacketDownloadGroupInfo implements PacketIn, PacketOut {
     private static HashMap<String, Callback<YAMLSection>[]> callbacks = new HashMap<String, Callback<YAMLSection>[]>();
-    private String host;
+    private String group;
     private String id;
 
     /**
-     * New PacketDownloadHostInfo (In)
+     * New PacketDownloadGroupInfo (In)
      */
-    public PacketDownloadHostInfo() {}
+    public PacketDownloadGroupInfo() {}
 
     /**
-     * New PacketDownloadHostInfo (Out)
+     * New PacketDownloadGroupInfo (Out)
      *
-     * @param host Host name (or null for all)
+     * @param group Group name (or null for all)
      * @param callback Callbacks
      */
     @SafeVarargs
-    public PacketDownloadHostInfo(String host, Callback<YAMLSection>... callback) {
+    public PacketDownloadGroupInfo(String group, Callback<YAMLSection>... callback) {
         if (Util.isNull((Object) callback)) throw new NullPointerException();
-        this.host = host;
+        this.group = group;
         this.id = Util.getNew(callbacks.keySet(), UUID::randomUUID).toString();
         callbacks.put(id, callback);
     }
@@ -41,7 +41,7 @@ public class PacketDownloadHostInfo implements PacketIn, PacketOut {
     public YAMLSection generate() {
         YAMLSection json = new YAMLSection();
         json.set("id", id);
-        json.set("host", host);
+        json.set("group", group);
         return json;
     }
 

@@ -92,7 +92,7 @@ public class ServerContainer extends BungeeServerInfo implements Server {
     public Collection<NamedContainer<String, UUID>> getGlobalPlayers() {
         List<NamedContainer<String, UUID>> players = new ArrayList<NamedContainer<String, UUID>>();
         SubPlugin plugin = SubAPI.getInstance().getInternals();
-        if (plugin.redis) {
+        if (plugin.redis != null) {
             try {
                 for (UUID player : (Set<UUID>) plugin.redis("getPlayersOnServer", new NamedContainer<>(String.class, getName()))) players.add(new NamedContainer<>((String) plugin.redis("getNameFromUuid", new NamedContainer<>(UUID.class, player)), player));
             } catch (Exception e) {}

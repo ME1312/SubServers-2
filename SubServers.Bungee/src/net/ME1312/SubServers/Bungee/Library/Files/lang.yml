@@ -80,6 +80,7 @@ Lang:
   'Interface.Generic.Downloading.Title-Color-Alt': '&3'
   'Interface.Generic.Downloading.Response': '&eWaiting for response'
   'Interface.Generic.Invalid-Permission': '&4You need &n$str$'
+  'Interface.Proxy-Menu.Proxy-Player-Count': '&2$int$ Player(s) Online'
   'Interface.Proxy-Menu.Proxy-Master': '&8Master Proxy'
   'Interface.Proxy-Menu.Proxy-SubData': '&9SubData Only'
   'Interface.Proxy-Menu.Proxy-Redis': '&7Redis Only'

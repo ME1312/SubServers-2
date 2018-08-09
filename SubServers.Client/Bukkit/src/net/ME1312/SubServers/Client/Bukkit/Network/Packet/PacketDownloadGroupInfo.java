@@ -11,30 +11,27 @@ import java.util.HashMap;
 import java.util.UUID;
 
 /**
- * Download Server List Packet
+ * Download Group Info Packet
  */
-public class PacketDownloadServerList implements PacketIn, PacketOut {
+public class PacketDownloadGroupInfo implements PacketIn, PacketOut {
     private static HashMap<String, Callback<YAMLSection>[]> callbacks = new HashMap<String, Callback<YAMLSection>[]>();
-    private String host;
     private String group;
     private String id;
 
     /**
-     * New PacketDownloadServerList (In)
+     * New PacketDownloadGroupInfo (In)
      */
-    public PacketDownloadServerList() {}
+    public PacketDownloadGroupInfo() {}
 
     /**
-     * New PacketDownloadServerList (Out)
+     * New PacketDownloadGroupInfo (Out)
      *
-     * @param host Host name (or null for all)
      * @param group Group name (or null for all)
      * @param callback Callbacks
      */
     @SafeVarargs
-    public PacketDownloadServerList(String host, String group, Callback<YAMLSection>... callback) {
+    public PacketDownloadGroupInfo(String group, Callback<YAMLSection>... callback) {
         if (Util.isNull((Object) callback)) throw new NullPointerException();
-        this.host = host;
         this.group = group;
         this.id = Util.getNew(callbacks.keySet(), UUID::randomUUID).toString();
         callbacks.put(id, callback);
@@ -42,11 +39,10 @@ public class PacketDownloadServerList implements PacketIn, PacketOut {
 
     @Override
     public YAMLSection generate() {
-        YAMLSection data = new YAMLSection();
-        data.set("id", id);
-        if (host != null) data.set("host", host);
-        if (group != null) data.set("group", group);
-        return data;
+        YAMLSection json = new YAMLSection();
+        json.set("id", id);
+        json.set("group", group);
+        return json;
     }
 
     @Override
@@ -57,6 +53,6 @@ public class PacketDownloadServerList implements PacketIn, PacketOut {
 
     @Override
     public Version getVersion() {
-        return new Version("2.11.0a");
+        return new Version("2.13b");
     }
 }

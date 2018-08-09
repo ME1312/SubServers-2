@@ -15,25 +15,34 @@ import java.util.UUID;
  */
 public class PacketDownloadProxyInfo implements PacketIn, PacketOut {
     private static HashMap<String, Callback<YAMLSection>[]> callbacks = new HashMap<String, Callback<YAMLSection>[]>();
+    private String proxy;
     private String id;
 
     /**
-     * New PacketDownloadProxyInfo
+     * New PacketDownloadProxyInfo (In)
+     */
+    public PacketDownloadProxyInfo() {}
+
+    /**
+     * New PacketDownloadProxyInfo (Out)
      *
+     * @param proxy Proxy name (or null for all)
      * @param callback Callbacks
      */
     @SafeVarargs
-    public PacketDownloadProxyInfo(Callback<YAMLSection>... callback) {
+    public PacketDownloadProxyInfo(String proxy, Callback<YAMLSection>... callback) {
         if (Util.isNull((Object) callback)) throw new NullPointerException();
+        this.proxy = proxy;
         this.id = Util.getNew(callbacks.keySet(), UUID::randomUUID).toString();
         callbacks.put(id, callback);
     }
 
     @Override
     public YAMLSection generate() {
-        YAMLSection data = new YAMLSection();
-        data.set("id", id);
-        return data;
+        YAMLSection json = new YAMLSection();
+        json.set("id", id);
+        json.set("proxy", proxy);
+        return json;
     }
 
     @Override
@@ -44,6 +53,6 @@ public class PacketDownloadProxyInfo implements PacketIn, PacketOut {
 
     @Override
     public Version getVersion() {
-        return new Version("2.11.0a");
+        return new Version("2.13b");
     }
 }

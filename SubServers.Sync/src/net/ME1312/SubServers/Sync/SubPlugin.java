@@ -245,21 +245,19 @@ public final class SubPlugin extends BungeeCord implements Listener {
 
     @EventHandler(priority = Byte.MIN_VALUE)
     public void add(SubAddServerEvent e) {
-        subdata.sendPacket(new PacketDownloadServerInfo(e.getServer(), data -> {
-            switch (data.getRawString("type").toLowerCase()) {
-                case "invalid":
-                    System.out.println("PacketDownloadServerInfo(" + e.getServer() + ") returned with an invalid response");
-                    break;
-                case "subserver":
-                    servers.put(data.getSection("server").getRawString("name").toLowerCase(), new SubServer(data.getSection("server").getRawString("signature"), data.getSection("server").getRawString("name"), data.getSection("server").getRawString("display"), new InetSocketAddress(data.getSection("server").getRawString("address").split(":")[0], Integer.parseInt(data.getSection("server").getRawString("address").split(":")[1])), data.getSection("server").getRawString("motd"), data.getSection("server").getBoolean("hidden"), data.getSection("server").getBoolean("restricted"), data.getSection("server").getBoolean("running")));
+        api.getServer(e.getServer(), server -> {
+            if (server != null) {
+                if (server instanceof net.ME1312.SubServers.Sync.Network.API.SubServer) {
+                    servers.put(server.getName().toLowerCase(), new SubServer(server.getSignature(), server.getName(), server.getDisplayName(), server.getAddress(),
+                            server.getMotd(), server.isHidden(), server.isRestricted(), ((net.ME1312.SubServers.Sync.Network.API.SubServer) server).isRunning()));
                     System.out.println("SubServers > Added SubServer: " + e.getServer());
-                    break;
-                default:
-                    servers.put(data.getSection("server").getRawString("name").toLowerCase(), new Server(data.getSection("server").getRawString("signature"), data.getSection("server").getRawString("name"), data.getSection("server").getRawString("display"), new InetSocketAddress(data.getSection("server").getRawString("address").split(":")[0], Integer.parseInt(data.getSection("server").getRawString("address").split(":")[1])), data.getSection("server").getRawString("motd"), data.getSection("server").getBoolean("hidden"), data.getSection("server").getBoolean("restricted")));
+                } else {
+                    servers.put(server.getName().toLowerCase(), new Server(server.getSignature(), server.getName(), server.getDisplayName(), server.getAddress(),
+                            server.getMotd(), server.isHidden(), server.isRestricted()));
                     System.out.println("SubServers > Added Server: " + e.getServer());
-                    break;
-            }
-        }));
+                }
+            } else System.out.println("PacketDownloadServerInfo(" + e.getServer() + ") returned with an invalid response");
+        });
     }
 
     @EventHandler(priority = Byte.MIN_VALUE)
@@ -268,35 +266,35 @@ public final class SubPlugin extends BungeeCord implements Listener {
             ((SubServer) servers.get(e.getServer().toLowerCase())).setRunning(true);
     }
 
-    public Boolean merge(String name, YAMLSection data, boolean isSubServer) {
-        Server server = servers.get(name.toLowerCase());
-        if (server == null || isSubServer || !(server instanceof SubServer)) {
-            if (server == null || !server.getSignature().equals(data.getRawString("signature"))) {
-                if (isSubServer) {
-                    servers.put(name.toLowerCase(), new SubServer(data.getRawString("signature"), name, data.getRawString("display"), new InetSocketAddress(data.getRawString("address").split(":")[0],
-                            Integer.parseInt(data.getRawString("address").split(":")[1])), data.getRawString("motd"), data.getBoolean("hidden"), data.getBoolean("restricted"), data.getBoolean("running")));
+    public Boolean merge(net.ME1312.SubServers.Sync.Network.API.Server server) {
+        Server current = servers.get(server.getName().toLowerCase());
+        if (current == null || server instanceof net.ME1312.SubServers.Sync.Network.API.SubServer || !(current instanceof SubServer)) {
+            if (current == null || !current.getSignature().equals(server.getSignature())) {
+                if (server instanceof net.ME1312.SubServers.Sync.Network.API.SubServer) {
+                    servers.put(server.getName().toLowerCase(), new SubServer(server.getSignature(), server.getName(), server.getDisplayName(), server.getAddress(),
+                            server.getMotd(), server.isHidden(), server.isRestricted(), ((net.ME1312.SubServers.Sync.Network.API.SubServer) server).isRunning()));
                 } else {
-                    servers.put(name.toLowerCase(), new Server(data.getRawString("signature"), name, data.getRawString("display"), new InetSocketAddress(data.getRawString("address").split(":")[0],
-                            Integer.parseInt(data.getRawString("address").split(":")[1])), data.getRawString("motd"), data.getBoolean("hidden"), data.getBoolean("restricted")));
+                    servers.put(server.getName().toLowerCase(), new Server(server.getSignature(), server.getName(), server.getDisplayName(), server.getAddress(),
+                            server.getMotd(), server.isHidden(), server.isRestricted()));
                 }
 
-                System.out.println("SubServers > Added "+((isSubServer)?"Sub":"")+"Server: " + name);
+                System.out.println("SubServers > Added "+((server instanceof net.ME1312.SubServers.Sync.Network.API.SubServer)?"Sub":"")+"Server: " + server.getName());
                 return true;
             } else {
-                if (isSubServer) {
-                    if (data.getBoolean("running") != ((SubServer) server).isRunning())
-                        ((SubServer) server).setRunning(data.getBoolean("running"));
+                if (server instanceof net.ME1312.SubServers.Sync.Network.API.SubServer) {
+                    if (((net.ME1312.SubServers.Sync.Network.API.SubServer) server).isRunning() != ((SubServer) current).isRunning())
+                        ((SubServer) current).setRunning(((net.ME1312.SubServers.Sync.Network.API.SubServer) server).isRunning());
                 }
-                if (!data.getRawString("motd").equals(server.getMotd()))
-                    server.setMotd(data.getRawString("motd"));
-                if (data.getBoolean("hidden") != server.isHidden())
-                    server.setHidden(data.getBoolean("hidden"));
-                if (data.getBoolean("restricted") != server.isRestricted())
-                    server.setRestricted(data.getBoolean("restricted"));
-                if (!data.getRawString("display").equals(server.getDisplayName()))
-                    server.setDisplayName(data.getRawString("display"));
+                if (!server.getMotd().equals(current.getMotd()))
+                    current.setMotd(server.getMotd());
+                if (server.isHidden() != current.isHidden())
+                    current.setHidden(server.isHidden());
+                if (server.isRestricted() != current.isRestricted())
+                    current.setRestricted(server.isRestricted());
+                if (!server.getDisplayName().equals(current.getDisplayName()))
+                    current.setDisplayName(server.getDisplayName());
 
-                System.out.println("SubServers > Re-added "+((isSubServer)?"Sub":"")+"Server: " + name);
+                System.out.println("SubServers > Re-added "+((server instanceof net.ME1312.SubServers.Sync.Network.API.SubServer)?"Sub":"")+"Server: " + server.getName());
                 return false;
             }
         }

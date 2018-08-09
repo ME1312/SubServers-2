@@ -91,7 +91,7 @@ public class Proxy implements ClientHandler, ExtraDataHandler {
     @SuppressWarnings({"deprecation", "unchecked"})
     public boolean isRedis() {
         SubPlugin plugin = SubAPI.getInstance().getInternals();
-        return plugin.redis && Util.getDespiteException(() -> plugin.redis("getPlayersOnProxy", new NamedContainer<>(String.class, getName())) != null, false);
+        return plugin.redis != null && Util.getDespiteException(() -> plugin.redis("getPlayersOnProxy", new NamedContainer<>(String.class, getName())) != null, false);
     }
 
     /**
@@ -103,7 +103,7 @@ public class Proxy implements ClientHandler, ExtraDataHandler {
     public Collection<NamedContainer<String, UUID>> getPlayers() {
         List<NamedContainer<String, UUID>> players = new ArrayList<NamedContainer<String, UUID>>();
         SubPlugin plugin = SubAPI.getInstance().getInternals();
-        if (plugin.redis) {
+        if (plugin.redis != null) {
             try {
                 for (UUID player : (Set<UUID>) plugin.redis("getPlayersOnProxy", new NamedContainer<>(String.class, getName())))
                     players.add(new NamedContainer<>((String) plugin.redis("getNameFromUuid", new NamedContainer<>(UUID.class, player)), player));

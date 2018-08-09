@@ -11,38 +11,28 @@ import java.util.HashMap;
 import java.util.UUID;
 
 /**
- * Download Server Info Packet
+ * Download Proxy Info Packet
  */
-public class PacketDownloadServerInfo implements PacketIn, PacketOut {
+public class PacketDownloadPlatformInfo implements PacketIn, PacketOut {
     private static HashMap<String, Callback<YAMLSection>[]> callbacks = new HashMap<String, Callback<YAMLSection>[]>();
-    private String server;
     private String id;
-
     /**
-     * New PacketDownloadServerInfo (In)
-     */
-    public PacketDownloadServerInfo() {}
-
-    /**
-     * New PacketDownloadServerInfo (Out)
+     * New PacketDownloadPlatformInfo
      *
-     * @param server Server name (or null for all)
      * @param callback Callbacks
      */
     @SafeVarargs
-    public PacketDownloadServerInfo(String server, Callback<YAMLSection>... callback) {
+    public PacketDownloadPlatformInfo(Callback<YAMLSection>... callback) {
         if (Util.isNull((Object) callback)) throw new NullPointerException();
-        this.server = server;
         this.id = Util.getNew(callbacks.keySet(), UUID::randomUUID).toString();
         callbacks.put(id, callback);
     }
 
     @Override
     public YAMLSection generate() {
-        YAMLSection json = new YAMLSection();
-        json.set("id", id);
-        json.set("server", server);
-        return json;
+        YAMLSection data = new YAMLSection();
+        data.set("id", id);
+        return data;
     }
 
     @Override
@@ -53,6 +43,6 @@ public class PacketDownloadServerInfo implements PacketIn, PacketOut {
 
     @Override
     public Version getVersion() {
-        return new Version("2.13b");
+        return new Version("2.11.0a");
     }
 }

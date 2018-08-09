@@ -54,11 +54,11 @@ public class PacketCreateServer implements PacketIn, PacketOut {
     public void execute(Client client, YAMLSection data) {
         try {
             if (data.getSection("creator").getString("name").contains(" ")) {
-                client.sendPacket(new PacketCreateServer(3, "server names cannot have spaces", (data.contains("id")) ? data.getRawString("id") : null));
+                client.sendPacket(new PacketCreateServer(3, "Server names cannot have spaces", (data.contains("id")) ? data.getRawString("id") : null));
             } else if (plugin.api.getSubServers().keySet().contains(data.getSection("creator").getString("name").toLowerCase()) || SubCreator.isReserved(data.getSection("creator").getString("name"))) {
-                client.sendPacket(new PacketCreateServer(3, "There is already a subserver with that name", (data.contains("id")) ? data.getRawString("id") : null));
+                client.sendPacket(new PacketCreateServer(4, "There is already a subserver with that name", (data.contains("id")) ? data.getRawString("id") : null));
             } else if (!plugin.hosts.keySet().contains(data.getSection("creator").getString("host").toLowerCase())) {
-                client.sendPacket(new PacketCreateServer(4, "There is no Host with that name", (data.contains("id")) ? data.getRawString("id") : null));
+                client.sendPacket(new PacketCreateServer(5, "There is no Host with that name", (data.contains("id")) ? data.getRawString("id") : null));
             } else if (!plugin.hosts.get(data.getSection("creator").getString("host").toLowerCase()).getCreator().getTemplates().keySet().contains(data.getSection("creator").getString("template").toLowerCase()) ||
                     !plugin.hosts.get(data.getSection("creator").getString("host").toLowerCase()).getCreator().getTemplate(data.getSection("creator").getString("template")).isEnabled()) {
                 client.sendPacket(new PacketCreateServer(6, "There is no template with that name", (data.contains("id")) ? data.getRawString("id") : null));
@@ -93,6 +93,6 @@ public class PacketCreateServer implements PacketIn, PacketOut {
 
     @Override
     public Version getVersion() {
-        return new Version("2.11.0a");
+        return new Version("2.13b");
     }
 }

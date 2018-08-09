@@ -1,7 +1,6 @@
 package net.ME1312.SubServers.Bungee.Network;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 import net.ME1312.SubServers.Bungee.Event.SubNetworkConnectEvent;
 import net.ME1312.SubServers.Bungee.Event.SubNetworkDisconnectEvent;
 import net.ME1312.SubServers.Bungee.Library.Config.YAMLSection;
@@ -87,13 +86,14 @@ public final class SubDataServer {
         registerPacket(new PacketAuthorization(plugin), "SubData", "Authorization");
         registerPacket(new PacketCommandServer(plugin), "SubServers", "CommandServer");
         registerPacket(new PacketCreateServer(plugin), "SubServers", "CreateServer");
+        registerPacket(new PacketDownloadGroupInfo(plugin), "SubServers", "DownloadGroupInfo");
         registerPacket(new PacketDownloadHostInfo(plugin), "SubServers", "DownloadHostInfo");
         registerPacket(new PacketDownloadLang(plugin), "SubServers", "DownloadLang");
         registerPacket(new PacketDownloadNetworkList(plugin), "SubServers", "DownloadNetworkList");
+        registerPacket(new PacketDownloadPlatformInfo(plugin), "SubServers", "DownloadPlatformInfo");
         registerPacket(new PacketDownloadPlayerList(plugin), "SubServers", "DownloadPlayerList");
         registerPacket(new PacketDownloadProxyInfo(plugin), "SubServers", "DownloadProxyInfo");
         registerPacket(new PacketDownloadServerInfo(plugin), "SubServers", "DownloadServerInfo");
-        registerPacket(new PacketDownloadServerList(plugin), "SubServers", "DownloadServerList");
         registerPacket(new PacketEditServer(plugin), "SubServers", "EditServer");
         registerPacket(new PacketExAddServer(), "SubServers", "ExAddServer");
         registerPacket(new PacketExConfigureHost(plugin), "SubServers", "ExConfigureHost");
@@ -113,13 +113,14 @@ public final class SubDataServer {
         registerPacket(PacketAuthorization.class, "SubData", "Authorization");
         registerPacket(PacketCommandServer.class, "SubServers", "CommandServer");
         registerPacket(PacketCreateServer.class, "SubServers", "CreateServer");
+        registerPacket(PacketDownloadGroupInfo.class, "SubServers", "DownloadGroupInfo");
         registerPacket(PacketDownloadHostInfo.class, "SubServers", "DownloadHostInfo");
         registerPacket(PacketDownloadLang.class, "SubServers", "DownloadLang");
         registerPacket(PacketDownloadNetworkList.class, "SubServers", "DownloadNetworkList");
+        registerPacket(PacketDownloadPlatformInfo.class, "SubServers", "DownloadPlatformInfo");
         registerPacket(PacketDownloadPlayerList.class, "SubServers", "DownloadPlayerList");
         registerPacket(PacketDownloadProxyInfo.class, "SubServers", "DownloadProxyInfo");
         registerPacket(PacketDownloadServerInfo.class, "SubServers", "DownloadServerInfo");
-        registerPacket(PacketDownloadServerList.class, "SubServers", "DownloadServerList");
         registerPacket(PacketEditServer.class, "SubServers", "EditServer");
         registerPacket(PacketExAddServer.class, "SubServers", "ExAddServer");
         registerPacket(PacketExConfigureHost.class, "SubServers", "ExConfigureHost");

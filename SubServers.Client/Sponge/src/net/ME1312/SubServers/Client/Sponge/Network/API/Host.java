@@ -3,7 +3,7 @@ package net.ME1312.SubServers.Client.Sponge.Network.API;
 import net.ME1312.SubServers.Client.Sponge.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Client.Sponge.Library.Config.YAMLValue;
 import net.ME1312.SubServers.Client.Sponge.Library.Util;
-import net.ME1312.SubServers.Client.Sponge.Network.Packet.PacketDownloadServerList;
+import net.ME1312.SubServers.Client.Sponge.Network.Packet.PacketDownloadHostInfo;
 import net.ME1312.SubServers.Client.Sponge.SubAPI;
 
 import java.net.InetAddress;
@@ -46,7 +46,7 @@ public class Host {
      */
     public void refresh() {
         String name = getName();
-        SubAPI.getInstance().getSubDataNetwork().sendPacket(new PacketDownloadServerList(name, null, data -> load(data.getSection("hosts").getSection(name))));
+        SubAPI.getInstance().getSubDataNetwork().sendPacket(new PacketDownloadHostInfo(name, data -> load(data.getSection("hosts").getSection(name))));
     }
 
     /**

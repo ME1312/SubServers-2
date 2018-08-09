@@ -62,7 +62,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
     public SubServer sudo = null;
     public static final Version version = Version.fromString("2.13b");
 
-    public boolean redis = false;
+    public Proxy redis = null;
     public boolean canSudo = false;
     public final boolean isPatched;
     public long resetDate = 0;
@@ -208,9 +208,10 @@ public final class SubPlugin extends BungeeCord implements Listener {
      * Load SubServers before BungeeCord finishes
      */
     @Override
+    @SuppressWarnings("unchecked")
     public void startListeners() {
         try {
-            redis = getPluginManager().getPlugin("RedisBungee") != null;
+            if (getPluginManager().getPlugin("RedisBungee") != null) redis = Util.getDespiteException(() -> new Proxy((String) redis("getServerId")), null);
             reload();
 
             super.startListeners();
@@ -271,10 +272,12 @@ public final class SubPlugin extends BungeeCord implements Listener {
             }
         }
         int proxies = 1;
-        if (redis) {
+        if (redis != null) {
             try {
                 boolean first = true;
                 String master = (String) redis("getServerId");
+                if (!master.equals(redis.getName())) redis = new Proxy(master);
+                if (!redis.getDisplayName().equals("(master)")) redis.setDisplayName("(master)");
                 for (String name : (List<String>) redis("getAllServers")) {
                     if (!ukeys.contains(name.toLowerCase()) && !master.equals(name)) try {
                         if (first) System.out.println("SubServers > "+((status)?"Rel":"L")+"oading Proxies...");
@@ -637,7 +640,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
      */
     @SuppressWarnings("unchecked")
     public Object redis(String method, NamedContainer<Class<?>, ?>... args) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-        if (redis) {
+        if (getPluginManager().getPlugin("RedisBungee") != null) {
             Object api = getPluginManager().getPlugin("RedisBungee").getClass().getMethod("getApi").invoke(null);
             Class<?>[] classargs = new Class<?>[args.length];
             Object[] objargs = new Object[args.length];

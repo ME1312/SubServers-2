@@ -3,6 +3,8 @@ import net.ME1312.SubServers.Client.Bukkit.Library.Container;
 import net.ME1312.SubServers.Client.Bukkit.Library.NamedContainer;
 import net.ME1312.SubServers.Client.Bukkit.Library.Util;
 import net.ME1312.SubServers.Client.Bukkit.Library.Version.Version;
+import net.ME1312.SubServers.Client.Bukkit.Network.API.Host;
+import net.ME1312.SubServers.Client.Bukkit.Network.API.SubServer;
 import net.ME1312.SubServers.Client.Bukkit.SubPlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -17,8 +19,8 @@ import java.util.regex.Pattern;
  * GUI Renderer Layout Class
  */
 public abstract class UIRenderer {
-    protected static HashMap<String, Renderer> hostPlugins = new HashMap<String, Renderer>();
-    protected static HashMap<String, Renderer> subserverPlugins = new HashMap<String, Renderer>();
+    protected static HashMap<String, Renderer<Host>> hostPlugins = new HashMap<String, Renderer<Host>>();
+    protected static HashMap<String, Renderer<SubServer>> subserverPlugins = new HashMap<String, Renderer<SubServer>>();
     private NamedContainer<String, Integer> tdownload = null;
     private int download = -1;
     private final UUID player;
@@ -265,7 +267,7 @@ public abstract class UIRenderer {
      * @param handle Handle to bind
      * @param renderer Renderer
      */
-    public static void addHostPlugin(String handle, Renderer renderer) {
+    public static void addHostPlugin(String handle, Renderer<Host> renderer) {
         if (Util.isNull(handle, renderer)) throw new NullPointerException();
         hostPlugins.put(handle, renderer);
     }
@@ -295,7 +297,7 @@ public abstract class UIRenderer {
      * @param handle Handle to bind
      * @param renderer Renderer
      */
-    public static void addSubServerPlugin(String handle, Renderer renderer) {
+    public static void addSubServerPlugin(String handle, Renderer<SubServer> renderer) {
         if (Util.isNull(handle, renderer)) throw new NullPointerException();
         subserverPlugins.put(handle, renderer);
     }

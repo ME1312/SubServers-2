@@ -15,34 +15,36 @@ import net.ME1312.SubServers.Bungee.SubPlugin;
 import java.util.Map;
 
 /**
- * Download Server Info Packet
+ * Download Group Info Packet
  */
-public class PacketDownloadServerInfo implements PacketIn, PacketOut {
+public class PacketDownloadGroupInfo implements PacketIn, PacketOut {
     private SubPlugin plugin;
-    private String server;
+    private String host;
+    private String group;
     private String id;
 
     /**
-     * New PacketDownloadServerInfo (In)
+     * New PacketDownloadGroupInfo (In)
      *
      * @param plugin SubPlugin
      */
-    public PacketDownloadServerInfo(SubPlugin plugin) {
+    public PacketDownloadGroupInfo(SubPlugin plugin) {
         if (Util.isNull(plugin)) throw new NullPointerException();
         this.plugin = plugin;
     }
 
     /**
-     * New PacketDownloadServerInfo (Out)
+     * New PacketDownloadGroupInfo (Out)
      *
      * @param plugin SubPlugin
-     * @param server Server (or null for all)
+     * @param group Group (or null for all)
      * @param id Receiver ID
      */
-    public PacketDownloadServerInfo(SubPlugin plugin, String server, String id) {
+    public PacketDownloadGroupInfo(SubPlugin plugin, String group, String id) {
         if (Util.isNull(plugin)) throw new NullPointerException();
         this.plugin = plugin;
-        this.server = server;
+        this.host = host;
+        this.group = group;
         this.id = id;
     }
 
@@ -52,19 +54,23 @@ public class PacketDownloadServerInfo implements PacketIn, PacketOut {
         YAMLSection data = new YAMLSection();
         data.set("id", id);
 
-        YAMLSection exServers = new YAMLSection();
-        for (Server server : plugin.api.getServers().values()) {
-            if (this.server == null || this.server.length() <= 0 || this.server.equalsIgnoreCase(server.getName())) {
-                exServers.set(server.getName(), new YAMLSection(new Gson().fromJson(server.toString(), Map.class)));
+        YAMLSection groups = new YAMLSection();
+        for (String group : plugin.api.getGroups().keySet()) {
+            if (this.group == null || this.group.length() <= 0 || this.group.equalsIgnoreCase(group)) {
+                YAMLSection servers = new YAMLSection();
+                for (Server server : plugin.api.getGroup(group)) {
+                    servers.set(server.getName(), new YAMLSection(new Gson().fromJson(server.toString(), Map.class)));
+                }
+                groups.set(group, servers);
             }
         }
-        data.set("servers", exServers);
+        data.set("groups", groups);
         return data;
     }
 
     @Override
     public void execute(Client client, YAMLSection data) {
-        client.sendPacket(new PacketDownloadServerInfo(plugin, (data.contains("server"))?data.getRawString("server"):null, (data.contains("id"))?data.getRawString("id"):null));
+        client.sendPacket(new PacketDownloadGroupInfo(plugin, (data.contains("group"))?data.getRawString("group"):null, (data.contains("id"))?data.getRawString("id"):null));
     }
 
     @Override

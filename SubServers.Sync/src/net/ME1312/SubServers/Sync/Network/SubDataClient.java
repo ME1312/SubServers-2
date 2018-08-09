@@ -9,6 +9,7 @@ import net.ME1312.SubServers.Sync.Library.Exception.IllegalPacketException;
 import net.ME1312.SubServers.Sync.Library.NamedContainer;
 import net.ME1312.SubServers.Sync.Library.Util;
 import net.ME1312.SubServers.Sync.Library.Version.Version;
+import net.ME1312.SubServers.Sync.Network.API.Server;
 import net.ME1312.SubServers.Sync.Network.Encryption.AES;
 import net.ME1312.SubServers.Sync.Network.Packet.*;
 import net.ME1312.SubServers.Sync.SubPlugin;
@@ -22,7 +23,6 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Modifier;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.SocketException;
@@ -86,35 +86,30 @@ public final class SubDataClient {
     private void init() {
         plugin.subdata.sendPacket(new PacketDownloadLang(plugin));
         plugin.subdata.sendPacket(new PacketLinkProxy(plugin));
-        plugin.subdata.sendPacket(new PacketDownloadProxyInfo(proxy -> plugin.subdata.sendPacket(new PacketDownloadServerList(null, null, data -> {
-            if (plugin.lastReload != proxy.getSection("subservers").getLong("last-reload")) {
+        plugin.subdata.sendPacket(new PacketDownloadPlatformInfo(platform -> plugin.api.getServers(servers -> {
+            if (plugin.lastReload != platform.getSection("subservers").getLong("last-reload")) {
                 System.out.println("SubServers > Resetting Server Data");
                 plugin.servers.clear();
-                plugin.lastReload = proxy.getSection("subservers").getLong("last-reload");
+                plugin.lastReload = platform.getSection("subservers").getLong("last-reload");
             }
             try {
                 LinkedList<ListenerInfo> listeners = new LinkedList<ListenerInfo>(plugin.getConfig().getListeners());
-                for (int i = 0; i < proxy.getSection("bungee").getSectionList("listeners").size(); i++) if (i < listeners.size()) {
-                    if (plugin.config.get().getSection("Sync", new YAMLSection()).getBoolean("Forced-Hosts", true)) updateField(ListenerInfo.class.getDeclaredField("forcedHosts"), listeners.get(i), proxy.getSection("bungee").getSectionList("listeners").get(i).getSection("forced-hosts").get());
-                    if (plugin.config.get().getSection("Sync", new YAMLSection()).getBoolean("Motd", false)) updateField(ListenerInfo.class.getDeclaredField("motd"), listeners.get(i), proxy.getSection("bungee").getSectionList("listeners").get(i).getRawString("motd"));
-                    if (plugin.config.get().getSection("Sync", new YAMLSection()).getBoolean("Player-Limit", false)) updateField(ListenerInfo.class.getDeclaredField("maxPlayers"), listeners.get(i), proxy.getSection("bungee").getSectionList("listeners").get(i).getInt("player-limit"));
-                    if (plugin.config.get().getSection("Sync", new YAMLSection()).getBoolean("Server-Priorities", true)) updateField(ListenerInfo.class.getDeclaredField("serverPriority"), listeners.get(i), proxy.getSection("bungee").getSectionList("listeners").get(i).getRawStringList("priorities"));
+                for (int i = 0; i < platform.getSection("bungee").getSectionList("listeners").size(); i++) if (i < listeners.size()) {
+                    if (plugin.config.get().getSection("Sync", new YAMLSection()).getBoolean("Forced-Hosts", true)) updateField(ListenerInfo.class.getDeclaredField("forcedHosts"), listeners.get(i), platform.getSection("bungee").getSectionList("listeners").get(i).getSection("forced-hosts").get());
+                    if (plugin.config.get().getSection("Sync", new YAMLSection()).getBoolean("Motd", false)) updateField(ListenerInfo.class.getDeclaredField("motd"), listeners.get(i), platform.getSection("bungee").getSectionList("listeners").get(i).getRawString("motd"));
+                    if (plugin.config.get().getSection("Sync", new YAMLSection()).getBoolean("Player-Limit", false)) updateField(ListenerInfo.class.getDeclaredField("maxPlayers"), listeners.get(i), platform.getSection("bungee").getSectionList("listeners").get(i).getInt("player-limit"));
+                    if (plugin.config.get().getSection("Sync", new YAMLSection()).getBoolean("Server-Priorities", true)) updateField(ListenerInfo.class.getDeclaredField("serverPriority"), listeners.get(i), platform.getSection("bungee").getSectionList("listeners").get(i).getRawStringList("priorities"));
                 }
-                if (plugin.config.get().getSection("Sync", new YAMLSection()).getBoolean("Disabled-Commands", false)) updateField(Configuration.class.getDeclaredField("disabledCommands"), plugin.getConfig(), proxy.getSection("bungee").getRawStringList("disabled-cmds"));
-                if (plugin.config.get().getSection("Sync", new YAMLSection()).getBoolean("Player-Limit", false)) updateField(Configuration.class.getDeclaredField("playerLimit"), plugin.getConfig(), proxy.getSection("bungee").getInt("player-limit"));
+                if (plugin.config.get().getSection("Sync", new YAMLSection()).getBoolean("Disabled-Commands", false)) updateField(Configuration.class.getDeclaredField("disabledCommands"), plugin.getConfig(), platform.getSection("bungee").getRawStringList("disabled-cmds"));
+                if (plugin.config.get().getSection("Sync", new YAMLSection()).getBoolean("Player-Limit", false)) updateField(Configuration.class.getDeclaredField("playerLimit"), plugin.getConfig(), platform.getSection("bungee").getInt("player-limit"));
             } catch (Exception e) {
                 System.out.println("SubServers > Problem syncing BungeeCord configuration options");
                 e.printStackTrace();
             }
-            for (String host : data.getSection("hosts").getKeys()) {
-                for (String subserver : data.getSection("hosts").getSection(host).getSection("servers").getKeys()) {
-                    plugin.merge(subserver, data.getSection("hosts").getSection(host).getSection("servers").getSection(subserver), true);
-                }
+            for (Server server : servers.values()) {
+                plugin.merge(server);
             }
-            for (String server : data.getSection("servers").getKeys()) {
-                plugin.merge(server, data.getSection("servers").getSection(server), false);
-            }
-        }))));
+        })));
         while (queue.size() != 0) {
             sendPacket(queue.get(0));
             queue.remove(0);
@@ -138,13 +133,14 @@ public final class SubDataClient {
         registerPacket(new PacketAuthorization(plugin), "SubData", "Authorization");
         registerPacket(new PacketCommandServer(), "SubServers", "CommandServer");
         registerPacket(new PacketCreateServer(), "SubServers", "CreateServer");
+        registerPacket(new PacketDownloadGroupInfo(), "SubServers", "DownloadGroupInfo");
         registerPacket(new PacketDownloadHostInfo(), "SubServers", "DownloadHostInfo");
         registerPacket(new PacketDownloadLang(plugin), "SubServers", "DownloadLang");
         registerPacket(new PacketDownloadNetworkList(), "SubServers", "DownloadNetworkList");
+        registerPacket(new PacketDownloadPlatformInfo(), "SubServers", "DownloadPlatformInfo");
         registerPacket(new PacketDownloadPlayerList(), "SubServers", "DownloadPlayerList");
         registerPacket(new PacketDownloadProxyInfo(), "SubServers", "DownloadProxyInfo");
         registerPacket(new PacketDownloadServerInfo(), "SubServers", "DownloadServerInfo");
-        registerPacket(new PacketDownloadServerList(), "SubServers", "DownloadServerList");
         registerPacket(new PacketInRunEvent(), "SubServers", "RunEvent");
         registerPacket(new PacketInReset(), "SubServers", "Reset");
         registerPacket(new PacketLinkProxy(plugin), "SubServers", "LinkProxy");
@@ -154,13 +150,14 @@ public final class SubDataClient {
         registerPacket(PacketAuthorization.class, "SubData", "Authorization");
         registerPacket(PacketCommandServer.class, "SubServers", "CommandServer");
         registerPacket(PacketCreateServer.class, "SubServers", "CreateServer");
+        registerPacket(PacketDownloadGroupInfo.class, "SubServers", "DownloadGroupInfo");
         registerPacket(PacketDownloadHostInfo.class, "SubServers", "DownloadHostInfo");
         registerPacket(PacketDownloadLang.class, "SubServers", "DownloadLang");
         registerPacket(PacketDownloadNetworkList.class, "SubServers", "DownloadNetworkList");
+        registerPacket(PacketDownloadPlatformInfo.class, "SubServers", "DownloadPlatformInfo");
         registerPacket(PacketDownloadPlayerList.class, "SubServers", "DownloadPlayerList");
         registerPacket(PacketDownloadProxyInfo.class, "SubServers", "DownloadProxyInfo");
         registerPacket(PacketDownloadServerInfo.class, "SubServers", "DownloadServerInfo");
-        registerPacket(PacketDownloadServerList.class, "SubServers", "DownloadServerList");
         registerPacket(PacketLinkProxy.class, "SubServers", "LinkProxy");
         registerPacket(PacketStartServer.class, "SubServers", "StartServer");
         registerPacket(PacketStopServer.class, "SubServers", "StopServer");

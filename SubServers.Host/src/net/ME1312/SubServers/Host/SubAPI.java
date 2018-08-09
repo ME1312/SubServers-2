@@ -13,9 +13,7 @@ import net.ME1312.SubServers.Host.Network.API.Host;
 import net.ME1312.SubServers.Host.Network.API.Proxy;
 import net.ME1312.SubServers.Host.Network.API.Server;
 import net.ME1312.SubServers.Host.Network.API.SubServer;
-import net.ME1312.SubServers.Host.Network.Packet.PacketDownloadNetworkList;
-import net.ME1312.SubServers.Host.Network.Packet.PacketDownloadPlayerList;
-import net.ME1312.SubServers.Host.Network.Packet.PacketDownloadServerList;
+import net.ME1312.SubServers.Host.Network.Packet.*;
 import net.ME1312.SubServers.Host.Network.SubDataClient;
 
 import java.lang.reflect.Field;
@@ -69,7 +67,7 @@ public final class SubAPI {
     public void getHosts(Callback<Map<String, Host>> callback) {
         if (Util.isNull(callback)) throw new NullPointerException();
         StackTraceElement[] origin = new Exception().getStackTrace();
-        host.subdata.sendPacket(new PacketDownloadServerList(null, null, data -> {
+        host.subdata.sendPacket(new PacketDownloadHostInfo(null, data -> {
             TreeMap<String, Host> hosts = new TreeMap<String, Host>();
             for (String host : data.getSection("hosts").getKeys()) {
                 hosts.put(host.toLowerCase(), new Host(data.getSection("hosts").getSection(host)));
@@ -80,7 +78,7 @@ public final class SubAPI {
             } catch (Throwable e) {
                 Throwable ew = new InvocationTargetException(e);
                 ew.setStackTrace(origin);
-                ew.printStackTrace();
+                host.log.error.println(ew);
             }
         }));
     }
@@ -93,7 +91,21 @@ public final class SubAPI {
      */
     public void getHost(String name, Callback<Host> callback) {
         if (Util.isNull(name, callback)) throw new NullPointerException();
-        getHosts(hosts -> callback.run(hosts.get(name.toLowerCase())));
+        StackTraceElement[] origin = new Exception().getStackTrace();
+        host.subdata.sendPacket(new PacketDownloadHostInfo(name, data -> {
+            Host host = null;
+            if (data.getSection("hosts").getKeys().size() > 0) {
+                host = new Host(data.getSection("hosts").getSection(new LinkedList<String>(data.getSection("hosts").getKeys()).getFirst()));
+            }
+
+            try {
+                callback.run(host);
+            } catch (Throwable e) {
+                Throwable ew = new InvocationTargetException(e);
+                ew.setStackTrace(origin);
+                this.host.log.error.println(ew);
+            }
+        }));
     }
 
     /**
@@ -104,7 +116,7 @@ public final class SubAPI {
     public void getGroups(Callback<Map<String, List<Server>>> callback) {
         if (Util.isNull(callback)) throw new NullPointerException();
         StackTraceElement[] origin = new Exception().getStackTrace();
-        host.subdata.sendPacket(new PacketDownloadServerList(null, null, data -> {
+        host.subdata.sendPacket(new PacketDownloadGroupInfo(null, data -> {
             TreeMap<String, List<Server>> groups = new TreeMap<String, List<Server>>();
             for (String group : data.getSection("groups").getKeys()) {
                 ArrayList<Server> servers = new ArrayList<Server>();
@@ -123,7 +135,7 @@ public final class SubAPI {
             } catch (Throwable e) {
                 Throwable ew = new InvocationTargetException(e);
                 ew.setStackTrace(origin);
-                ew.printStackTrace();
+                host.log.error.println(ew);
             }
         }));
     }
@@ -152,7 +164,29 @@ public final class SubAPI {
      */
     public void getGroup(String name, Callback<List<Server>> callback) {
         if (Util.isNull(name, callback)) throw new NullPointerException();
-        getLowercaseGroups(groups -> callback.run(groups.get(name.toLowerCase())));
+        StackTraceElement[] origin = new Exception().getStackTrace();
+        host.subdata.sendPacket(new PacketDownloadGroupInfo(name, data -> {
+            List<Server> servers = null;
+            if (data.getSection("groups").getKeys().size() > 0) {
+                String key = new LinkedList<String>(data.getSection("groups").getKeys()).getFirst();
+                servers = new ArrayList<Server>();
+                for (String server : data.getSection("groups").getSection(key).getKeys()) {
+                    if (data.getSection("groups").getSection(key).getSection(server).getRawString("type", "Server").equals("SubServer")) {
+                        servers.add(new SubServer(data.getSection("groups").getSection(key).getSection(server)));
+                    } else {
+                        servers.add(new Server(data.getSection("groups").getSection(key).getSection(server)));
+                    }
+                }
+            }
+
+            try {
+                callback.run(servers);
+            } catch (Throwable e) {
+                Throwable ew = new InvocationTargetException(e);
+                ew.setStackTrace(origin);
+                host.log.error.println(ew);
+            }
+        }));
     }
 
     /**
@@ -163,14 +197,13 @@ public final class SubAPI {
     public void getServers(Callback<Map<String, Server>> callback) {
         if (Util.isNull(callback)) throw new NullPointerException();
         StackTraceElement[] origin = new Exception().getStackTrace();
-        host.subdata.sendPacket(new PacketDownloadServerList(null, null, data -> {
+        host.subdata.sendPacket(new PacketDownloadServerInfo(null, data -> {
             TreeMap<String, Server> servers = new TreeMap<String, Server>();
             for (String server : data.getSection("servers").getKeys()) {
-                servers.put(server.toLowerCase(), new Server(data.getSection("servers").getSection(server)));
-            }
-            for (String host : data.getSection("hosts").getKeys()) {
-                for (String subserver : data.getSection("hosts").getSection(host).getSection("servers").getKeys()) {
-                    servers.put(subserver.toLowerCase(), new SubServer(data.getSection("hosts").getSection(host).getSection("servers").getSection(subserver)));
+                if (data.getSection("servers").getSection(server).getRawString("type", "Server").equals("SubServer")) {
+                    servers.put(server.toLowerCase(), new SubServer(data.getSection("servers").getSection(server)));
+                } else {
+                    servers.put(server.toLowerCase(), new Server(data.getSection("servers").getSection(server)));
                 }
             }
 
@@ -179,7 +212,7 @@ public final class SubAPI {
             } catch (Throwable e) {
                 Throwable ew = new InvocationTargetException(e);
                 ew.setStackTrace(origin);
-                ew.printStackTrace();
+                host.log.error.println(ew);
             }
         }));
     }
@@ -192,7 +225,26 @@ public final class SubAPI {
      */
     public void getServer(String name, Callback<Server> callback) {
         if (Util.isNull(name, callback)) throw new NullPointerException();
-        getServers(servers -> callback.run(servers.get(name.toLowerCase())));
+        StackTraceElement[] origin = new Exception().getStackTrace();
+        host.subdata.sendPacket(new PacketDownloadServerInfo(name, data -> {
+            Server server = null;
+            if (data.getSection("servers").getKeys().size() > 0) {
+                String key = new LinkedList<String>(data.getSection("servers").getKeys()).getFirst();
+                if (data.getSection("servers").getSection(key).getRawString("type", "Server").equals("SubServer")) {
+                    server = new SubServer(data.getSection("servers").getSection(key));
+                } else {
+                    server = new Server(data.getSection("servers").getSection(key));
+                }
+            }
+
+            try {
+                callback.run(server);
+            } catch (Throwable e) {
+                Throwable ew = new InvocationTargetException(e);
+                ew.setStackTrace(origin);
+                host.log.error.println(ew);
+            }
+        }));
     }
 
     /**
@@ -219,23 +271,21 @@ public final class SubAPI {
      */
     public void getSubServer(String name, Callback<SubServer> callback) {
         if (Util.isNull(name, callback)) throw new NullPointerException();
-        getSubServers(subservers -> callback.run(subservers.get(name.toLowerCase())));
+        getServer(name, server -> callback.run((server instanceof SubServer)?(SubServer) server:null));
     }
 
     /**
      * Gets the known Proxies
      *
-     * @return Proxy Map
+     * @param callback Proxy Map
      */
     public void getProxies(Callback<Map<String, Proxy>> callback) {
         if (Util.isNull(callback)) throw new NullPointerException();
         StackTraceElement[] origin = new Exception().getStackTrace();
-        host.subdata.sendPacket(new PacketDownloadNetworkList(data -> {
+        host.subdata.sendPacket(new PacketDownloadProxyInfo(null, data -> {
             TreeMap<String, Proxy> proxies = new TreeMap<String, Proxy>();
-            for (String client : data.getSection("clients").getKeys()) {
-                if (data.getSection("clients").getSection(client).getKeys().size() > 0 && data.getSection("clients").getSection(client).getRawString("type", "").equals("Proxy")) {
-                    proxies.put(data.getSection("clients").getSection(client).getRawString("name").toLowerCase(), new Proxy(data.getSection("clients").getSection(client)));
-                }
+            for (String proxy : data.getSection("proxies").getKeys()) {
+                proxies.put(proxy.toLowerCase(), new Proxy(data.getSection("proxies").getSection(proxy)));
             }
 
             try {
@@ -243,7 +293,7 @@ public final class SubAPI {
             } catch (Throwable e) {
                 Throwable ew = new InvocationTargetException(e);
                 ew.setStackTrace(origin);
-                ew.printStackTrace();
+                host.log.error.println(ew);
             }
         }));
     }
@@ -252,11 +302,49 @@ public final class SubAPI {
      * Gets a Proxy
      *
      * @param name Proxy name
-     * @return a Proxy
+     * @param callback a Proxy
      */
     public void getProxy(String name, Callback<Proxy> callback) {
         if (Util.isNull(name, callback)) throw new NullPointerException();
-        getProxies(proxies -> callback.run(proxies.get(name.toLowerCase())));
+        StackTraceElement[] origin = new Exception().getStackTrace();
+        host.subdata.sendPacket(new PacketDownloadProxyInfo(name, data -> {
+            Proxy proxy = null;
+            if (data.getSection("proxies").getKeys().size() > 0) {
+                proxy = new Proxy(data.getSection("proxies").getSection(new LinkedList<String>(data.getSection("proxies").getKeys()).getFirst()));
+            }
+
+            try {
+                callback.run(proxy);
+            } catch (Throwable e) {
+                Throwable ew = new InvocationTargetException(e);
+                ew.setStackTrace(origin);
+                host.log.error.println(ew);
+            }
+        }));
+    }
+
+    /**
+     * Get the Master Proxy redis container (null if unavailable)
+     *
+     * @param callback Master Proxy
+     */
+    public void getMasterProxy(Callback<Proxy> callback) {
+        if (Util.isNull(callback)) throw new NullPointerException();
+        StackTraceElement[] origin = new Exception().getStackTrace();
+        host.subdata.sendPacket(new PacketDownloadProxyInfo("", data -> {
+            Proxy proxy = null;
+            if (data.getKeys().contains("master")) {
+                proxy = new Proxy(data.getSection("master"));
+            }
+
+            try {
+                callback.run(proxy);
+            } catch (Throwable e) {
+                Throwable ew = new InvocationTargetException(e);
+                ew.setStackTrace(origin);
+                host.log.error.println(ew);
+            }
+        }));
     }
 
     /**
@@ -279,7 +367,7 @@ public final class SubAPI {
             } catch (Throwable e) {
                 Throwable ew = new InvocationTargetException(e);
                 ew.setStackTrace(origin);
-                ew.printStackTrace();
+                host.log.error.println(ew);
             }
         }));
     }
