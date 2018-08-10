@@ -4,10 +4,7 @@ import net.ME1312.SubServers.Client.Bukkit.Graphic.UIRenderer;
 import net.ME1312.SubServers.Client.Bukkit.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Client.Bukkit.Library.Util;
 import net.ME1312.SubServers.Client.Bukkit.Library.Version.Version;
-import net.ME1312.SubServers.Client.Bukkit.Network.API.Host;
-import net.ME1312.SubServers.Client.Bukkit.Network.API.Proxy;
-import net.ME1312.SubServers.Client.Bukkit.Network.API.Server;
-import net.ME1312.SubServers.Client.Bukkit.Network.API.SubServer;
+import net.ME1312.SubServers.Client.Bukkit.Network.API.*;
 import net.ME1312.SubServers.Client.Bukkit.Network.Packet.*;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -180,49 +177,127 @@ public final class SubCommand implements CommandExecutor {
                         }
                     } else if (args[0].equalsIgnoreCase("info") || args[0].equalsIgnoreCase("status")) {
                         if (args.length > 1) {
-                            plugin.api.getServer(args[1], subserver -> {
-                                if (subserver == null) {
-                                    sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Unknown"));
-                                } else if (!(subserver instanceof SubServer)) {
-                                    sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Invalid"));
-                                } else ((SubServer) subserver).getHost(host -> {
-                                    if (host == null) {
-                                        sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Invalid"));
-                                    } else {
-                                        sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info").replace("$str$", subserver.getDisplayName()));
-                                        if (!subserver.getName().equals(subserver.getDisplayName()))
-                                            sender.sendMessage("  " + plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Real Name") + ChatColor.AQUA + subserver.getName());
-                                        sender.sendMessage("  " + plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Host") + ChatColor.AQUA + host.getName());
-                                        sender.sendMessage("  " + plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Enabled") + ((((SubServer) subserver).isEnabled())?ChatColor.GREEN+"yes":ChatColor.DARK_RED+"no"));
-                                        sender.sendMessage("  " + plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Editable") + ((((SubServer) subserver).isEditable())?ChatColor.GREEN+"yes":ChatColor.DARK_RED+"no"));
-                                        if (subserver.getGroups().size() > 0) {
-                                            sender.sendMessage("  " + plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Group"));
-                                            for (String group : subserver.getGroups())
-                                                sender.sendMessage("  " + plugin.api.getLang("SubServers", "Command.Info.List").replace("$str$", ChatColor.GOLD + group));
-                                        }
-                                        if (((SubServer) subserver).isTemporary()) sender.sendMessage("  " + plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Temporary") + ChatColor.GREEN+"yes");
-                                        sender.sendMessage("  " + plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Running") + ((((SubServer) subserver).isRunning())?ChatColor.GREEN+"yes":ChatColor.DARK_RED+"no"));
-                                        sender.sendMessage("  " + plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Logging") + ((((SubServer) subserver).isLogging())?ChatColor.GREEN+"yes":ChatColor.DARK_RED+"no"));
-                                        if (plugin.config.get().getSection("Settings").getBoolean("Show-Addresses", false)) {
-                                            sender.sendMessage("  " + plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Address") + ChatColor.AQUA + subserver.getAddress().getAddress().getHostAddress());
-                                        } else {
-                                            sender.sendMessage("  " + plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Port") + ChatColor.AQUA + subserver.getAddress().getPort());
-                                        }
-                                        sender.sendMessage("  " + plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Auto Restart") + ((((SubServer) subserver).willAutoRestart())?ChatColor.GREEN+"yes":ChatColor.DARK_RED+"no"));
-                                        sender.sendMessage("  " + plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Hidden") + ((subserver.isHidden())?ChatColor.GREEN+"yes":ChatColor.DARK_RED+"no"));
-                                        if (((SubServer) subserver).getIncompatibilities().size() > 0) {
-                                            List<String> current = new ArrayList<String>();
-                                            for (String other : ((SubServer) subserver).getCurrentIncompatibilities()) current.add(other.toLowerCase());
-                                            sender.sendMessage("  " + plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Incompatibilities"));
-                                            for (String other : ((SubServer) subserver).getIncompatibilities())
-                                                sender.sendMessage("  " + plugin.api.getLang("SubServers", "Command.Info.List").replace("$str$", ((current.contains(other.toLowerCase()))?ChatColor.DARK_RED:ChatColor.RED) + other));
-                                        }
-                                        sender.sendMessage("  " + plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Signature") + ChatColor.AQUA + subserver.getSignature());
+                            String type = (args.length > 2)?args[1]:null;
+                            String name = args[(type != null)?2:1];
+
+                            Runnable getServer = () -> plugin.api.getServer(name, server -> {
+                                if (server != null) {
+                                    sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info").replace("$str$", ((server instanceof SubServer)?"Sub":"") + "Server") + ChatColor.WHITE + server.getDisplayName());
+                                    if (!server.getName().equals(server.getDisplayName())) sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "System Name") + ChatColor.WHITE  + server.getName());
+                                    if (server instanceof SubServer) {
+                                        sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Enabled") + ((((SubServer) server).isEnabled())?ChatColor.GREEN+"yes":ChatColor.RED+"no"));
+                                        if (!((SubServer) server).isEditable()) sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Editable") + ChatColor.RED + "no");
+                                        sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Host") + ChatColor.WHITE  + ((SubServer) server).getHost());
                                     }
-                                });
+                                    if (server.getGroups().size() > 0) sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Group" + ((server.getGroups().size() > 1)?"s":"")) + ((server.getGroups().size() > 1)?"":ChatColor.WHITE + server.getGroups().get(0)));
+                                    if (server.getGroups().size() > 1) for (String group : server.getGroups()) sender.sendMessage("    " + plugin.api.getLang("SubServers", "Command.Info.List") + ChatColor.WHITE + group);
+                                    if (plugin.config.get().getSection("Settings").getBoolean("Show-Addresses", false)) sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Address") + ChatColor.WHITE + server.getAddress().getAddress().getHostAddress()+':'+server.getAddress().getPort());
+                                    else sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Port") + ChatColor.AQUA.toString() + server.getAddress().getPort());
+                                    if (server instanceof SubServer) sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Running") + ((((SubServer) server).isRunning())?ChatColor.GREEN+"yes":ChatColor.RED+"no"));
+                                    if (!(server instanceof SubServer) || ((SubServer) server).isRunning()) {
+                                        sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Connected") + ((server.getSubData() != null)?ChatColor.GREEN+"yes":ChatColor.RED+"no"));
+                                        sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Players") + ChatColor.AQUA + server.getPlayers().size() + " online");
+                                    }
+                                    sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "MOTD") + ChatColor.WHITE + ChatColor.stripColor(server.getMotd()));
+                                    sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Signature") + ChatColor.AQUA + server.getSignature());
+                                    if (server instanceof SubServer) {
+                                        sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Logging") + ((((SubServer) server).isLogging())?ChatColor.GREEN+"yes":ChatColor.RED+"no"));
+                                        if (((SubServer) server).isTemporary()) sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Temporary") + ChatColor.GREEN + "yes");
+                                        else sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Auto Restart") + ((((SubServer) server).willAutoRestart())?ChatColor.GREEN+"enabled":ChatColor.RED+"disabled"));
+                                    }
+                                    sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Restricted") + ((server.isRestricted())?ChatColor.GREEN+"yes":ChatColor.RED+"no"));
+                                    if (server instanceof SubServer && ((SubServer) server).getIncompatibilities().size() > 0) {
+                                        List<String> current = new ArrayList<String>();
+                                        for (String other : ((SubServer) server).getCurrentIncompatibilities()) current.add(other.toLowerCase());
+                                        sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Incompatibilities"));
+                                        for (String other : ((SubServer) server).getIncompatibilities()) sender.sendMessage("    " + plugin.api.getLang("SubServers", "Command.Info.List") + ((current.contains(other.toLowerCase()))?ChatColor.WHITE:ChatColor.GRAY) + other);
+                                    }
+                                    sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Hidden") + ((server.isHidden())?ChatColor.GREEN+"yes":ChatColor.RED+"no"));
+                                } else {
+                                    if (type == null) {
+                                        sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Unknown"));
+                                    } else {
+                                        sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Unknown-Server"));
+                                    }
+                                }
                             });
+                            Runnable getGroup = () -> plugin.api.getGroup(name, group -> {
+                                if (group != null) {
+                                    sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info").replace("$str$", "Group") + ChatColor.WHITE + name);
+                                    sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Servers") + ((group.size() <= 0)?ChatColor.GRAY + "(none)":ChatColor.AQUA.toString() + group.size()));
+                                    for (Server server : group) sender.sendMessage("    " + plugin.api.getLang("SubServers", "Command.Info.List") + ChatColor.WHITE + server.getDisplayName() + ((server.getName().equals(server.getDisplayName()))?"":" ("+server.getName()+')'));
+                                } else {
+                                    if (type == null) {
+                                        getServer.run();
+                                    } else {
+                                        sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Unknown-Group"));
+                                    }
+                                }
+                            });
+                            Runnable getHost = () -> plugin.api.getHost(name, host -> {
+                                if (host != null) {
+                                    sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info").replace("$str$", "Host") + ChatColor.WHITE + host.getDisplayName());
+                                    if (!host.getName().equals(host.getDisplayName())) sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "System Name") + ChatColor.WHITE  + host.getName());
+                                    sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Enabled") + ((host.isEnabled())?ChatColor.GREEN+"yes":ChatColor.RED+"no"));
+                                    if (plugin.config.get().getSection("Settings").getBoolean("Show-Addresses", false)) sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Address") + ChatColor.WHITE + host.getAddress().getHostAddress());
+                                    if (host.getSubData() != null) sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Connected") + ChatColor.GREEN + "yes");
+                                    sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "SubServers") + ((host.getSubServers().keySet().size() <= 0)?ChatColor.GRAY + "(none)":ChatColor.AQUA.toString() + host.getSubServers().keySet().size()));
+                                    for (SubServer subserver : host.getSubServers().values()) sender.sendMessage("    " + plugin.api.getLang("SubServers", "Command.Info.List") + ((subserver.isEnabled())?ChatColor.WHITE:ChatColor.GRAY) + subserver.getDisplayName() + ((subserver.getName().equals(subserver.getDisplayName()))?"":" ("+subserver.getName()+')'));
+                                    sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Templates") + ((host.getCreator().getTemplates().keySet().size() <= 0)?ChatColor.GRAY + "(none)":ChatColor.AQUA.toString() + host.getCreator().getTemplates().keySet().size()));
+                                    for (SubCreator.ServerTemplate template : host.getCreator().getTemplates().values()) sender.sendMessage("    " + plugin.api.getLang("SubServers", "Command.Info.List") + ((template.isEnabled())?ChatColor.WHITE:ChatColor.GRAY) + template.getDisplayName() + ((template.getName().equals(template.getDisplayName()))?"":" ("+template.getName()+')'));
+                                    sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Signature") + ChatColor.AQUA + host.getSignature());
+                                } else {
+                                    if (type == null) {
+                                        getGroup.run();
+                                    } else {
+                                        sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Unknown-Host"));
+                                    }
+                                }
+                            });
+                            Runnable getProxy = () -> plugin.api.getProxy(name, proxy -> {
+                                if (proxy != null) {
+                                    sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info").replace("$str$", "Proxy") + ChatColor.WHITE + proxy.getDisplayName());
+                                    if (!proxy.getName().equals(proxy.getDisplayName())) sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "System Name") + ChatColor.WHITE  + proxy.getName());
+                                    sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Connected") + ((proxy.getSubData() != null)?ChatColor.GREEN+"yes":ChatColor.RED+"no"));
+                                    sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Redis")  + ((proxy.isRedis())?ChatColor.GREEN:ChatColor.RED+"un") + "available");
+                                    if (proxy.isRedis()) sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Players") + ChatColor.AQUA + proxy.getPlayers().size() + " online");
+                                    sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Signature") + ChatColor.AQUA + proxy.getSignature());
+                                } else {
+                                    if (type == null) {
+                                        getHost.run();
+                                    } else {
+                                        sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Unknown-Proxy"));
+                                    }
+                                }
+                            });
+
+                            if (type == null) {
+                                getProxy.run();
+                            } else {
+                                switch (type.toLowerCase()) {
+                                    case "p":
+                                    case "proxy":
+                                        getProxy.run();
+                                        break;
+                                    case "h":
+                                    case "host":
+                                        getHost.run();
+                                        break;
+                                    case "g":
+                                    case "group":
+                                        getGroup.run();
+                                        break;
+                                    case "s":
+                                    case "server":
+                                    case "subserver":
+                                        getServer.run();
+                                        break;
+                                    default:
+                                        sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Unknown-Type"));
+                                }
+                            }
                         } else {
-                            sender.sendMessage(plugin.api.getLang("SubServers", "Command.Generic.Usage").replace("$str$", label.toLowerCase() + " " + args[0].toLowerCase() + " <SubServer>"));
+                            sender.sendMessage(plugin.api.getLang("SubServers", "Command.Generic.Usage").replace("$str$", label.toLowerCase() + " " + args[0].toLowerCase() + " [proxy|host|group|server] <Name>"));
                         }
                     } else if (args[0].equalsIgnoreCase("start")) {
                         if (args.length > 1) {
@@ -477,7 +552,7 @@ public final class SubCommand implements CommandExecutor {
                 plugin.api.getLang("SubServers", "Command.Help.Help").replace("$str$", label.toLowerCase() + " help"),
                 plugin.api.getLang("SubServers", "Command.Help.List").replace("$str$", label.toLowerCase() + " list"),
                 plugin.api.getLang("SubServers", "Command.Help.Version").replace("$str$", label.toLowerCase() + " version"),
-                plugin.api.getLang("SubServers", "Command.Help.Info").replace("$str$", label.toLowerCase() + " info <SubServer>"),
+                plugin.api.getLang("SubServers", "Command.Help.Info").replace("$str$", label.toLowerCase() + " info [proxy|host|group|server] <Name>"),
                 plugin.api.getLang("SubServers", "Command.Help.SubServer.Start").replace("$str$", label.toLowerCase() + " start <SubServer>"),
                 plugin.api.getLang("SubServers", "Command.Help.SubServer.Stop").replace("$str$", label.toLowerCase() + " stop <SubServer>"),
                 plugin.api.getLang("SubServers", "Command.Help.SubServer.Terminate").replace("$str$", label.toLowerCase() + " kill <SubServer>"),

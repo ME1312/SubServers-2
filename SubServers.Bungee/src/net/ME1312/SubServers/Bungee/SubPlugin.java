@@ -377,7 +377,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
         int subservers = 0;
         System.out.println("SubServers > "+((status)?"Rel":"L")+"oading SubServers...");
         if (!posted) Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            if (!running) {
+            if (running) {
                 System.out.println("SubServers > Received request from system to shutdown");
                 try {
                     shutdown();

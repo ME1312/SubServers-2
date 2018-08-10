@@ -141,6 +141,15 @@ public class Server {
         return timestamp;
     }
 
+    /**
+     * Get the raw representation of the Server
+     *
+     * @return Raw Server
+     */
+    public YAMLSection getRaw() {
+        return raw.clone();
+    }
+
     @Override
     @SuppressWarnings("unchecked")
     public String toString() {

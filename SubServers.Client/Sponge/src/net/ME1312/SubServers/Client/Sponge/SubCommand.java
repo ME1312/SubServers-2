@@ -2,13 +2,11 @@ package net.ME1312.SubServers.Client.Sponge;
 
 import com.google.gson.Gson;
 import net.ME1312.SubServers.Client.Sponge.Graphic.UIRenderer;
+import net.ME1312.SubServers.Client.Sponge.Library.ChatColor;
 import net.ME1312.SubServers.Client.Sponge.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Client.Sponge.Library.Util;
 import net.ME1312.SubServers.Client.Sponge.Library.Version.Version;
-import net.ME1312.SubServers.Client.Sponge.Network.API.Host;
-import net.ME1312.SubServers.Client.Sponge.Network.API.Proxy;
-import net.ME1312.SubServers.Client.Sponge.Network.API.Server;
-import net.ME1312.SubServers.Client.Sponge.Network.API.SubServer;
+import net.ME1312.SubServers.Client.Sponge.Network.API.*;
 import net.ME1312.SubServers.Client.Sponge.Network.Packet.*;
 import org.spongepowered.api.Platform;
 import org.spongepowered.api.Sponge;
@@ -68,7 +66,7 @@ public final class SubCommand implements CommandExecutor {
                 .child(CommandSpec.builder()
                         .description(Text.of("The SubServers Command - Info"))
                         .executor(new INFO())
-                        .arguments(GenericArguments.optional(GenericArguments.string(Text.of("SubServer"))), GenericArguments.optional(GenericArguments.remainingJoinedStrings(Text.of("extra"))))
+                        .arguments(GenericArguments.optional(GenericArguments.string(Text.of("Type"))), GenericArguments.optional(GenericArguments.string(Text.of("Name"))), GenericArguments.optional(GenericArguments.remainingJoinedStrings(Text.of("extra"))))
                         .build(), "info", "status")
                 .child(CommandSpec.builder()
                         .description(Text.of("The SubServers Command - Start"))
@@ -117,7 +115,7 @@ public final class SubCommand implements CommandExecutor {
         if (canRun(sender)) {
             Optional<String> subcommand = args.getOne(Text.of("subcommand"));
             if (subcommand.isPresent()) {
-                sender.sendMessage(Text.of(plugin.api.getLang("SubServers", "Command.Generic.Invalid-Subcommand").replace("$str$", subcommand.get())));
+                sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Generic.Invalid-Subcommand").replace("$str$", subcommand.get())));
                 return CommandResult.builder().successCount(0).build();
             } else {
                 if (sender.hasPermission("subservers.interface") && sender instanceof Player && plugin.gui != null) {
@@ -128,7 +126,7 @@ public final class SubCommand implements CommandExecutor {
                 return CommandResult.builder().successCount(1).build();
             }
         } else {
-            sender.sendMessage(Text.of(plugin.api.getLang("SubServers", "Command.Generic.Invalid-Permission").replace("$str$", "subservers.command")));
+            sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Generic.Invalid-Permission").replace("$str$", "subservers.command")));
             return CommandResult.builder().successCount(0).build();
         }
     }
@@ -139,7 +137,7 @@ public final class SubCommand implements CommandExecutor {
                 sender.sendMessages(printHelp());
                 return CommandResult.builder().successCount(1).build();
             } else {
-                sender.sendMessage(Text.of(plugin.api.getLang("SubServers", "Command.Generic.Invalid-Permission").replace("$str$", "subservers.command")));
+                sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Generic.Invalid-Permission").replace("$str$", "subservers.command")));
                 return CommandResult.builder().successCount(0).build();
             }
         }
@@ -153,7 +151,7 @@ public final class SubCommand implements CommandExecutor {
                 if (container == null) container = Util.getDespiteException(() -> (PluginContainer) Platform.class.getMethod("getContainer", Class.forName("org.spongepowered.api.Platform$Component")).invoke(Sponge.getPlatform(), Enum.valueOf((Class<Enum>) Class.forName("org.spongepowered.api.Platform$Component"), "IMPLEMENTATION")), null);
                 if (container == null) container = Util.getDespiteException(() -> (PluginContainer) Platform.class.getMethod("getImplementation").invoke(Sponge.getPlatform()), null);
 
-                sender.sendMessage(Text.of(plugin.api.getLang("SubServers", "Command.Version").replace("$str$", "SubServers.Client.Sponge")));
+                sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Version").replace("$str$", "SubServers.Client.Sponge")));
                 sender.sendMessage(Text.builder("  " + System.getProperty("os.name") + ' ' + System.getProperty("os.version")).color(TextColors.WHITE).append(Text.of(",")).build());
                 sender.sendMessage(Text.builder("  Java " + System.getProperty("java.version")).color(TextColors.WHITE).append(Text.of(",")).build());
                 sender.sendMessage(Text.builder("  " + container.getName() + ' ' + container.getVersion().get()).color(TextColors.WHITE).append(Text.of(",")).build());
@@ -175,15 +173,15 @@ public final class SubCommand implements CommandExecutor {
                             }
                         }
                         if (updcount == 0) {
-                            sender.sendMessage(Text.of(plugin.api.getLang("SubServers", "Command.Version.Latest")));
+                            sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Version.Latest")));
                         } else {
-                            sender.sendMessage(Text.of(plugin.api.getLang("SubServers", "Command.Version.Outdated").replace("$name$", "SubServers.Client.Sponge").replace("$str$", updversion.toString()).replace("$int$", Integer.toString(updcount))));
+                            sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Version.Outdated").replace("$name$", "SubServers.Client.Sponge").replace("$str$", updversion.toString()).replace("$int$", Integer.toString(updcount))));
                         }
                     } catch (Exception e) {}
                 }).submit(plugin);
                 return CommandResult.builder().successCount(1).build();
             } else {
-                sender.sendMessage(Text.of(plugin.api.getLang("SubServers", "Command.Generic.Invalid-Permission").replace("$str$", "subservers.command")));
+                sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Generic.Invalid-Permission").replace("$str$", "subservers.command")));
                 return CommandResult.builder().successCount(0).build();
             }
         }
@@ -195,15 +193,15 @@ public final class SubCommand implements CommandExecutor {
                 plugin.api.getGroups(groups -> plugin.api.getHosts(hosts -> plugin.api.getServers(servers -> plugin.api.getMasterProxy(proxymaster -> plugin.api.getProxies(proxies -> {
                     int i = 0;
                     boolean sent = false;
-                    Text div = Text.of(plugin.api.getLang("SubServers", "Command.List.Divider"));
+                    Text div = ChatColor.convertColor(plugin.api.getLang("SubServers","Command.List.Divider"));
                     if (groups.keySet().size() > 0) {
-                        sender.sendMessage(Text.of(plugin.api.getLang("SubServers", "Command.List.Group-Header")));
+                        sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.List.Group-Header")));
                         for (String group : groups.keySet()) {
                             Text.Builder msg = Text.builder(group).color(TextColors.GOLD).onHover(TextActions.showText(
                                     Text.builder(group + '\n').color(TextColors.GOLD).append(
-                                            Text.of(plugin.api.getLang("SubServers", "Interface.Group-Menu.Group-Server-Count").replace("$int$", new DecimalFormat("#,###").format(groups.get(group).size())))
+                                            ChatColor.convertColor(plugin.api.getLang("SubServers","Interface.Group-Menu.Group-Server-Count").replace("$int$", new DecimalFormat("#,###").format(groups.get(group).size())))
                                     ).build())
-                            ).onClick(TextActions.runCommand("/subservers open Server 1 " + group)).append(Text.of(plugin.api.getLang("SubServers", "Command.List.Header")));
+                            ).onClick(TextActions.runCommand("/subservers open Server 1 " + group)).append(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.List.Header")));
 
                             for (Server server : groups.get(group)) {
                                 Text.Builder message = Text.builder(server.getDisplayName());
@@ -217,8 +215,8 @@ public final class SubCommand implements CommandExecutor {
                                             hover.append(Text.builder(server.getName() + '\n').color(TextColors.GRAY).build());
                                         }
                                         hover.append(
-                                                Text.of(plugin.api.getLang("SubServers", "Interface.Server-Menu.SubServer-Temporary") + '\n'),
-                                                Text.of(plugin.api.getLang("SubServers", "Interface.Server-Menu.Server-Player-Count").replace("$int$", new DecimalFormat("#,###").format(server.getPlayers().size())))
+                                                ChatColor.convertColor(plugin.api.getLang("SubServers","Interface.Server-Menu.SubServer-Temporary") + '\n'),
+                                                ChatColor.convertColor(plugin.api.getLang("SubServers","Interface.Server-Menu.Server-Player-Count").replace("$int$", new DecimalFormat("#,###").format(server.getPlayers().size())))
                                         );
                                     } else if (((SubServer) server).isRunning()) {
                                         message.color(TextColors.GREEN);
@@ -227,7 +225,7 @@ public final class SubCommand implements CommandExecutor {
                                             hover.append(Text.builder(server.getName() + '\n').color(TextColors.GRAY).build());
                                         }
                                         hover.append(
-                                                Text.of(plugin.api.getLang("SubServers", "Interface.Server-Menu.Server-Player-Count").replace("$int$", new DecimalFormat("#,###").format(server.getPlayers().size())) + '\n')
+                                                ChatColor.convertColor(plugin.api.getLang("SubServers","Interface.Server-Menu.Server-Player-Count").replace("$int$", new DecimalFormat("#,###").format(server.getPlayers().size())) + '\n')
                                         );
                                     } else if (((SubServer) server).isEnabled() && ((SubServer) server).getCurrentIncompatibilities().size() == 0) {
                                         message.color(TextColors.YELLOW);
@@ -236,7 +234,7 @@ public final class SubCommand implements CommandExecutor {
                                             hover.append(Text.builder(server.getName() + '\n').color(TextColors.GRAY).build());
                                         }
                                         hover.append(
-                                            Text.of(plugin.api.getLang("SubServers", "Interface.Server-Menu.SubServer-Offline"))
+                                            ChatColor.convertColor(plugin.api.getLang("SubServers","Interface.Server-Menu.SubServer-Offline"))
                                         );
                                     } else {
                                         message.color(TextColors.RED);
@@ -250,10 +248,10 @@ public final class SubCommand implements CommandExecutor {
                                                 if (list.length() != 0) list += ", ";
                                                 list += other;
                                             }
-                                            hover.append(Text.of(plugin.api.getLang("SubServers", "Interface.Server-Menu.SubServer-Incompatible").replace("$str$", list) + ((((SubServer) server).isEnabled())?"":"\n")));
+                                            hover.append(ChatColor.convertColor(plugin.api.getLang("SubServers","Interface.Server-Menu.SubServer-Incompatible").replace("$str$", list) + ((((SubServer) server).isEnabled())?"":"\n")));
                                         }
                                         if (!((SubServer) server).isEnabled()) {
-                                            hover.append(Text.of(plugin.api.getLang("SubServers", "Interface.Server-Menu.SubServer-Disabled")));
+                                            hover.append(ChatColor.convertColor(plugin.api.getLang("SubServers","Interface.Server-Menu.SubServer-Disabled")));
                                         }
                                     }
                                     if (plugin.config.get().getSection("Settings").getBoolean("Show-Addresses", false)) {
@@ -269,8 +267,8 @@ public final class SubCommand implements CommandExecutor {
                                         hover.append(Text.builder(server.getName() + '\n').color(TextColors.GRAY).build());
                                     }
                                     hover.append(
-                                            Text.of(plugin.api.getLang("SubServers", "Interface.Server-Menu.Server-External") + '\n'),
-                                            Text.of(plugin.api.getLang("SubServers", "Interface.Server-Menu.Server-Player-Count").replace("$int$", new DecimalFormat("#,###").format(server.getPlayers().size())))
+                                            ChatColor.convertColor(plugin.api.getLang("SubServers","Interface.Server-Menu.Server-External") + '\n'),
+                                            ChatColor.convertColor(plugin.api.getLang("SubServers","Interface.Server-Menu.Server-Player-Count").replace("$int$", new DecimalFormat("#,###").format(server.getPlayers().size())))
                                     );
                                     if (plugin.config.get().getSection("Settings").getBoolean("Show-Addresses", false)) {
                                         hover.append(Text.builder('\n' + server.getAddress().getAddress().getHostAddress()+':'+server.getAddress().getPort()).color(TextColors.WHITE).build());
@@ -283,15 +281,15 @@ public final class SubCommand implements CommandExecutor {
                                 msg.append(message.build());
                                 i++;
                             }
-                            if (i == 0) msg.append(Text.of(plugin.api.getLang("SubServers", "Command.List.Empty")));
+                            if (i == 0) msg.append(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.List.Empty")));
                             sender.sendMessages(Text.builder("  ").append(msg.build()).build());
                             i = 0;
                             sent = true;
                         }
-                        if (!sent) sender.sendMessage(Text.of("  " + plugin.api.getLang("SubServers", "Command.List.Empty")));
+                        if (!sent) sender.sendMessage(ChatColor.convertColor("  " + plugin.api.getLang("SubServers", "Command.List.Empty")));
                         sent = false;
                     }
-                    sender.sendMessage(Text.of(plugin.api.getLang("SubServers", "Command.List.Host-Header")));
+                    sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.List.Host-Header")));
                     for (Host host : hosts.values()) {
                         Text.Builder msg = Text.builder(host.getDisplayName());
                         Text.Builder hover = Text.builder(host.getDisplayName() + '\n');
@@ -301,21 +299,21 @@ public final class SubCommand implements CommandExecutor {
                             if (!host.getName().equals(host.getDisplayName())) {
                                 hover.append(Text.builder(host.getName() + '\n').color(TextColors.GRAY).build());
                             }
-                            hover.append(Text.of(plugin.api.getLang("SubServers", "Interface.Host-Menu.Host-Server-Count").replace("$int$", new DecimalFormat("#,###").format(host.getSubServers().keySet().size()))));
+                            hover.append(ChatColor.convertColor(plugin.api.getLang("SubServers","Interface.Host-Menu.Host-Server-Count").replace("$int$", new DecimalFormat("#,###").format(host.getSubServers().keySet().size()))));
                         } else {
                             msg.color(TextColors.RED);
                             hover.color(TextColors.RED);
                             if (!host.getName().equals(host.getDisplayName())) {
                                 hover.append(Text.builder(host.getName() + '\n').color(TextColors.GRAY).build());
                             }
-                            hover.append(Text.of(plugin.api.getLang("SubServers", "Interface.Host-Menu.Host-Disabled")));
+                            hover.append(ChatColor.convertColor(plugin.api.getLang("SubServers","Interface.Host-Menu.Host-Disabled")));
                         }
                         if (plugin.config.get().getSection("Settings").getBoolean("Show-Addresses", false)) {
                             hover.append(Text.builder('\n' + host.getAddress().getHostAddress()).color(TextColors.WHITE).build());
                         }
                         msg.onClick(TextActions.runCommand("/subservers open Host/ " + host.getName()));
                         msg.onHover(TextActions.showText(hover.build()));
-                        msg.append(Text.of(plugin.api.getLang("SubServers", "Command.List.Header")));
+                        msg.append(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.List.Header")));
 
                         for (SubServer subserver : host.getSubServers().values()) {
                             Text.Builder message = Text.builder(subserver.getDisplayName());
@@ -327,8 +325,8 @@ public final class SubCommand implements CommandExecutor {
                                     hover.append(Text.builder(subserver.getName() + '\n').color(TextColors.GRAY).build());
                                 }
                                 hover.append(
-                                        Text.of(plugin.api.getLang("SubServers", "Interface.Server-Menu.SubServer-Temporary") + '\n'),
-                                        Text.of(plugin.api.getLang("SubServers", "Interface.Server-Menu.Server-Player-Count").replace("$int$", new DecimalFormat("#,###").format(subserver.getPlayers().size())))
+                                        ChatColor.convertColor(plugin.api.getLang("SubServers","Interface.Server-Menu.SubServer-Temporary") + '\n'),
+                                        ChatColor.convertColor(plugin.api.getLang("SubServers","Interface.Server-Menu.Server-Player-Count").replace("$int$", new DecimalFormat("#,###").format(subserver.getPlayers().size())))
                                 );
                             } else if (subserver.isRunning()) {
                                 message.color(TextColors.GREEN);
@@ -336,14 +334,14 @@ public final class SubCommand implements CommandExecutor {
                                 if (!subserver.getName().equals(subserver.getDisplayName())) {
                                     hover.append(Text.builder(subserver.getName() + '\n').color(TextColors.GRAY).build());
                                 }
-                                hover.append(Text.of(plugin.api.getLang("SubServers", "Interface.Server-Menu.Server-Player-Count").replace("$int$", new DecimalFormat("#,###").format(subserver.getPlayers().size()))));
+                                hover.append(ChatColor.convertColor(plugin.api.getLang("SubServers","Interface.Server-Menu.Server-Player-Count").replace("$int$", new DecimalFormat("#,###").format(subserver.getPlayers().size()))));
                             } else if (subserver.isEnabled() && subserver.getCurrentIncompatibilities().size() == 0) {
                                 message.color(TextColors.YELLOW);
                                 hover.color(TextColors.YELLOW);
                                 if (!subserver.getName().equals(subserver.getDisplayName())) {
                                     hover.append(Text.builder(subserver.getName() + '\n').color(TextColors.GRAY).build());
                                 }
-                                hover.append(Text.of(plugin.api.getLang("SubServers", "Interface.Server-Menu.SubServer-Offline")));
+                                hover.append(ChatColor.convertColor(plugin.api.getLang("SubServers","Interface.Server-Menu.SubServer-Offline")));
                             } else {
                                 message.color(TextColors.RED);
                                 hover.color(TextColors.RED);
@@ -356,10 +354,10 @@ public final class SubCommand implements CommandExecutor {
                                         if (list.length() != 0) list += ", ";
                                         list += other;
                                     }
-                                    hover.append(Text.of(plugin.api.getLang("SubServers", "Interface.Server-Menu.SubServer-Incompatible").replace("$str$", list) + ((subserver.isEnabled())?"":"\n")));
+                                    hover.append(ChatColor.convertColor(plugin.api.getLang("SubServers","Interface.Server-Menu.SubServer-Incompatible").replace("$str$", list) + ((subserver.isEnabled())?"":"\n")));
                                 }
                                 if (!subserver.isEnabled()) {
-                                    hover.append(Text.of(plugin.api.getLang("SubServers", "Interface.Server-Menu.SubServer-Disabled")));
+                                    hover.append(ChatColor.convertColor(plugin.api.getLang("SubServers","Interface.Server-Menu.SubServer-Disabled")));
                                 }
                             }
                             if (plugin.config.get().getSection("Settings").getBoolean("Show-Addresses", false)) {
@@ -373,13 +371,13 @@ public final class SubCommand implements CommandExecutor {
                             msg.append(message.build());
                             i++;
                         }
-                        if (i == 0) msg.append(Text.of(plugin.api.getLang("SubServers", "Command.List.Empty")));
+                        if (i == 0) msg.append(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.List.Empty")));
                         sender.sendMessage(Text.builder("  ").append(msg.build()).build());
                         i = 0;
                         sent = true;
                     }
-                    if (!sent) sender.sendMessage(Text.of("  " + plugin.api.getLang("SubServers", "Command.List.Empty")));
-                    sender.sendMessage(Text.of(plugin.api.getLang("SubServers", "Command.List.Server-Header")));
+                    if (!sent) sender.sendMessage(ChatColor.convertColor("  " + plugin.api.getLang("SubServers", "Command.List.Empty")));
+                    sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.List.Server-Header")));
                     Text.Builder msg = Text.builder();
                     for (Server server : servers.values()) if (!(server instanceof SubServer)) {
                         Text.Builder message = Text.builder(server.getDisplayName());
@@ -390,8 +388,8 @@ public final class SubCommand implements CommandExecutor {
                             hover.append(Text.builder(server.getName() + '\n').color(TextColors.GRAY).build());
                         }
                         hover.append(
-                                Text.of(plugin.api.getLang("SubServers", "Interface.Server-Menu.Server-External") + '\n'),
-                                Text.of(plugin.api.getLang("SubServers", "Interface.Server-Menu.Server-Player-Count").replace("$int$", new DecimalFormat("#,###").format(server.getPlayers().size()))));
+                                ChatColor.convertColor(plugin.api.getLang("SubServers","Interface.Server-Menu.Server-External") + '\n'),
+                                ChatColor.convertColor(plugin.api.getLang("SubServers","Interface.Server-Menu.Server-Player-Count").replace("$int$", new DecimalFormat("#,###").format(server.getPlayers().size()))));
                         if (plugin.config.get().getSection("Settings").getBoolean("Show-Addresses", false)) {
                             hover.append(Text.builder('\n' + server.getAddress().getAddress().getHostAddress()+':'+server.getAddress().getPort()).color(TextColors.WHITE).build());
                         } else {
@@ -402,10 +400,10 @@ public final class SubCommand implements CommandExecutor {
                         msg.append(message.build());
                         i++;
                     }
-                    if (i == 0) sender.sendMessage(Text.of("  " + plugin.api.getLang("SubServers", "Command.List.Empty")));
+                    if (i == 0) sender.sendMessage(ChatColor.convertColor("  " + plugin.api.getLang("SubServers", "Command.List.Empty")));
                     else sender.sendMessage(Text.builder("  ").append(msg.build()).build());
                     if (proxies.keySet().size() > 0) {
-                        sender.sendMessage(Text.of(plugin.api.getLang("SubServers", "Command.List.Proxy-Header")));
+                        sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.List.Proxy-Header")));
                         msg = Text.builder();
                         Text.Builder message = Text.builder("(master)");
                         Text.Builder hover = Text.builder("(master)");
@@ -414,10 +412,10 @@ public final class SubCommand implements CommandExecutor {
                         if (proxymaster != null) {
                             hover.append(
                                     Text.builder('\n' + proxymaster.getName()).color(TextColors.GRAY).build(),
-                                    Text.of('\n' + plugin.api.getLang("SubServers", "Interface.Proxy-Menu.Proxy-Master")),
-                                    Text.of('\n' + plugin.api.getLang("SubServers", "Interface.Proxy-Menu.Proxy-Player-Count").replace("$int$", new DecimalFormat("#,###").format(proxymaster.getPlayers().size())))
+                                    ChatColor.convertColor('\n' + plugin.api.getLang("SubServers", "Interface.Proxy-Menu.Proxy-Master")),
+                                    ChatColor.convertColor('\n' + plugin.api.getLang("SubServers", "Interface.Proxy-Menu.Proxy-Player-Count").replace("$int$", new DecimalFormat("#,###").format(proxymaster.getPlayers().size())))
                             );
-                        } else hover.append(Text.of('\n' + plugin.api.getLang("SubServers", "Interface.Proxy-Menu.Proxy-Master")));
+                        } else hover.append(ChatColor.convertColor('\n' + plugin.api.getLang("SubServers", "Interface.Proxy-Menu.Proxy-Master")));
                         message.onHover(TextActions.showText(hover.build()));
                         msg.append(message.build());
                         for (Proxy proxy : proxies.values()) {
@@ -429,7 +427,7 @@ public final class SubCommand implements CommandExecutor {
                                 if (!proxy.getName().equals(proxy.getDisplayName())) {
                                     hover.append(Text.builder('\n' + proxy.getName()).color(TextColors.GRAY).build());
                                 }
-                                hover.append(Text.of('\n' + plugin.api.getLang("SubServers", "Interface.Proxy-Menu.Proxy-Player-Count").replace("$int$", new DecimalFormat("#,###").format(proxy.getPlayers().size()))));
+                                hover.append(ChatColor.convertColor('\n' + plugin.api.getLang("SubServers", "Interface.Proxy-Menu.Proxy-Player-Count").replace("$int$", new DecimalFormat("#,###").format(proxy.getPlayers().size()))));
                             } else if (proxy.getSubData() != null) {
                                 message.color(TextColors.AQUA);
                                 hover.color(TextColors.AQUA);
@@ -437,7 +435,7 @@ public final class SubCommand implements CommandExecutor {
                                     hover.append(Text.builder('\n' + proxy.getName()).color(TextColors.GRAY).build());
                                 }
                                 if (proxymaster != null) {
-                                    hover.append(Text.of('\n' + plugin.api.getLang("SubServers", "Interface.Proxy-Menu.Proxy-SubData")));
+                                    hover.append(ChatColor.convertColor('\n' + plugin.api.getLang("SubServers", "Interface.Proxy-Menu.Proxy-SubData")));
                                 }
                             } else if (proxy.isRedis()) {
                                 message.color(TextColors.WHITE);
@@ -446,8 +444,8 @@ public final class SubCommand implements CommandExecutor {
                                     hover.append(Text.builder('\n' + proxy.getName()).color(TextColors.GRAY).build());
                                 }
                                 hover.append(
-                                        Text.of('\n' + plugin.api.getLang("SubServers", "Interface.Proxy-Menu.Proxy-Redis")),
-                                        Text.of('\n' + plugin.api.getLang("SubServers", "Interface.Proxy-Menu.Proxy-Player-Count").replace("$int$", new DecimalFormat("#,###").format(proxy.getPlayers().size())))
+                                        ChatColor.convertColor('\n' + plugin.api.getLang("SubServers", "Interface.Proxy-Menu.Proxy-Redis")),
+                                        ChatColor.convertColor('\n' + plugin.api.getLang("SubServers", "Interface.Proxy-Menu.Proxy-Player-Count").replace("$int$", new DecimalFormat("#,###").format(proxy.getPlayers().size())))
                                 );
                             } else {
                                 message.color(TextColors.RED);
@@ -455,7 +453,7 @@ public final class SubCommand implements CommandExecutor {
                                 if (!proxy.getName().equals(proxy.getDisplayName())) {
                                     hover.append(Text.builder('\n' + proxy.getName()).color(TextColors.GRAY).build());
                                 }
-                                hover.append(Text.of('\n' + plugin.api.getLang("SubServers", "Interface.Proxy-Menu.Proxy-Disconnected")));
+                                hover.append(ChatColor.convertColor('\n' + plugin.api.getLang("SubServers", "Interface.Proxy-Menu.Proxy-Disconnected")));
                             }
                             message.onHover(TextActions.showText(hover.build()));
                             msg.append(div, message.build());
@@ -465,7 +463,7 @@ public final class SubCommand implements CommandExecutor {
                 })))));
                 return CommandResult.builder().successCount(1).build();
             } else {
-                sender.sendMessage(Text.of(plugin.api.getLang("SubServers", "Command.Generic.Invalid-Permission").replace("$str$", "subservers.command")));
+                sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Generic.Invalid-Permission").replace("$str$", "subservers.command")));
                 return CommandResult.builder().successCount(0).build();
             }
         }
@@ -474,55 +472,141 @@ public final class SubCommand implements CommandExecutor {
     public final class INFO implements CommandExecutor {
         public CommandResult execute(CommandSource sender, CommandContext args) throws CommandException {
             if (canRun(sender)) {
-                Optional<String> subserver = args.getOne(Text.of("SubServer"));
-                if (subserver.isPresent()) {
-                    plugin.api.getServer(subserver.get(), server -> {
-                        if (server == null) {
-                            sender.sendMessage(Text.of(plugin.api.getLang("SubServers", "Command.Info.Unknown")));
-                        } else if (!(server instanceof SubServer)) {
-                            sender.sendMessage(Text.of(plugin.api.getLang("SubServers", "Command.Info.Invalid")));
-                        } else ((SubServer) server).getHost(host -> {
-                            if (host == null) {
-                                sender.sendMessage(Text.of(plugin.api.getLang("SubServers", "Command.Info.Invalid")));
-                            } else {
-                                sender.sendMessage(Text.of(plugin.api.getLang("SubServers", "Command.Info").replace("$str$", server.getDisplayName())));
-                                if (!server.getName().equals(server.getDisplayName()))
-                                    sender.sendMessage(Text.builder("  " + plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Real Name")).append(Text.builder(server.getName()).color(TextColors.AQUA).build()).build());
-                                sender.sendMessage(Text.builder("  " + plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Host")).append(Text.builder(host.getName()).color(TextColors.AQUA).build()).build());
-                                sender.sendMessage(Text.builder("  " + plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Enabled")).append(Text.builder((((SubServer) server).isEnabled())?"yes":"no").color((((SubServer) server).isEnabled())?TextColors.GREEN:TextColors.DARK_RED).build()).build());
-                                sender.sendMessage(Text.builder("  " + plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Editable")).append(Text.builder((((SubServer) server).isEditable())?"yes":"no").color((((SubServer) server).isEditable())?TextColors.GREEN:TextColors.DARK_RED).build()).build());
-                                if (server.getGroups().size() > 0) {
-                                    sender.sendMessage(Text.of("  " + plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Group")));
-                                    for (String group : server.getGroups())
-                                        sender.sendMessage(Text.of("  " + plugin.api.getLang("SubServers", "Command.Info.List").replace("$str$", "\u00A76" + group)));
-                                }
-                                if (((SubServer) server).isTemporary()) sender.sendMessage(Text.builder("  " + plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Temporary")).append(Text.builder("yes").color(TextColors.GREEN).build()).build());
-                                sender.sendMessage(Text.builder("  " + plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Running")).append(Text.builder((((SubServer) server).isRunning())?"yes":"no").color((((SubServer) server).isRunning())?TextColors.GREEN:TextColors.DARK_RED).build()).build());
-                                sender.sendMessage(Text.builder("  " + plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Logging")).append(Text.builder((((SubServer) server).isLogging())?"yes":"no").color((((SubServer) server).isLogging())?TextColors.GREEN:TextColors.DARK_RED).build()).build());
-                                if (plugin.config.get().getSection("Settings").getBoolean("Show-Addresses", false)) {
-                                    sender.sendMessage(Text.builder("  " + plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Address")).append(Text.builder(server.getAddress().getAddress().getHostAddress()+':'+server.getAddress().getPort()).color(TextColors.AQUA).build()).build());
-                                } else {
-                                    sender.sendMessage(Text.builder("  " + plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Port")).append(Text.builder(Integer.toString(server.getAddress().getPort())).color(TextColors.AQUA).build()).build());
-                                }
-                                sender.sendMessage(Text.builder("  " + plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Auto Restart")).append(Text.builder((((SubServer) server).willAutoRestart())?"yes":"no").color((((SubServer) server).willAutoRestart())?TextColors.GREEN:TextColors.DARK_RED).build()).build());
-                                sender.sendMessage(Text.builder("  " + plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Hidden")).append(Text.builder((server.isHidden())?"yes":"no").color((server.isHidden())?TextColors.GREEN:TextColors.DARK_RED).build()).build());
-                                if (((SubServer) server).getIncompatibilities().size() > 0) {
-                                    List<String> current = new ArrayList<String>();
-                                    for (String other : ((SubServer) server).getCurrentIncompatibilities()) current.add(other.toLowerCase());
-                                    sender.sendMessage(Text.of("  " + plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Incompatibilities")));
-                                    for (String other : ((SubServer) server).getIncompatibilities())
-                                        sender.sendMessage(Text.of("  " + plugin.api.getLang("SubServers", "Command.Info.List").replace("$str$", '\u00A7' + ((current.contains(other.toLowerCase()))?'4':'c') + other)));
-                                }
+                Optional<String> t = args.getOne(Text.of("Type"));
+                Optional<String> n = args.getOne(Text.of("Name"));
+                if (!n.isPresent()) {
+                    Optional<String> tmp = n;
+                    n = t;
+                    t = tmp;
+                }
+
+                if (n.isPresent()) {
+                    String type = (t.isPresent())?t.get():null;
+                    String name = n.get();
+
+                    Runnable getServer = () -> plugin.api.getServer(name, server -> {
+                        if (server != null) {
+                            sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", "Command.Info").replace("$str$", ((server instanceof SubServer)?"Sub":"") + "Server")).toBuilder().append(Text.builder(server.getDisplayName()).color(TextColors.WHITE).build()).build());
+                            if (!server.getName().equals(server.getDisplayName())) sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "System Name")).toBuilder().append(Text.builder(server.getName()).color(TextColors.WHITE).build()).build());
+                            if (server instanceof SubServer) {
+                                sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Enabled")).toBuilder().append(Text.builder((((SubServer) server).isEnabled())?"yes":"no").color((((SubServer) server).isEnabled())?TextColors.GREEN:TextColors.RED).build()).build());
+                                if (!((SubServer) server).isEditable()) sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Editable")).toBuilder().append(Text.builder("no").color(TextColors.RED).build()).build());
+                                sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Host")).toBuilder().append(Text.builder(((SubServer) server).getHost()).color(TextColors.WHITE ).build()).build());
                             }
-                        });
+                            if (server.getGroups().size() > 0) sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Group" + ((server.getGroups().size() > 1)?"s":""))).toBuilder().append(Text.builder((server.getGroups().size() > 1)?"":server.getGroups().get(0)).color(TextColors.WHITE).build()).build());
+                            if (server.getGroups().size() > 1) for (String group : server.getGroups()) sender.sendMessage(ChatColor.convertColor("    " + plugin.api.getLang("SubServers", "Command.Info.List")).toBuilder().append(Text.builder(group).color(TextColors.WHITE).build()).build());
+                            if (plugin.config.get().getSection("Settings").getBoolean("Show-Addresses", false)) sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Address")).toBuilder().append(Text.builder(server.getAddress().getAddress().getHostAddress()+':'+server.getAddress().getPort()).color(TextColors.WHITE).build()).build());
+                            else sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Port")).toBuilder().append(Text.builder(Integer.toString(server.getAddress().getPort())).color(TextColors.AQUA).build()).build());
+                            if (server instanceof SubServer) sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Running")).toBuilder().append(Text.builder((((SubServer) server).isRunning())?"yes":"no").color((((SubServer) server).isRunning())?TextColors.GREEN:TextColors.RED).build()).build());
+                            if (!(server instanceof SubServer) || ((SubServer) server).isRunning()) {
+                                sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Connected")).toBuilder().append(Text.builder((server.getSubData() != null)?"yes":"no").color((server.getSubData() != null)?TextColors.GREEN:TextColors.RED).build()).build());
+                                sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Players")).toBuilder().append(Text.builder(server.getPlayers().size() + " online").color(TextColors.AQUA).build()).build());
+                            }
+                            sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "MOTD")).toBuilder().append(Text.builder(server.getMotd().replaceAll("\\u00A7[0-9a-fA-Fk-oK-ORr]", "")).color(TextColors.WHITE).build()).build());
+                            sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Signature")).toBuilder().append(Text.builder(server.getSignature()).color(TextColors.AQUA).build()).build());
+                            if (server instanceof SubServer) {
+                                sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Logging")).toBuilder().append(Text.builder((((SubServer) server).isLogging())?"yes":"no").color((((SubServer) server).isLogging())?TextColors.GREEN:TextColors.RED).build()).build());
+                                if (((SubServer) server).isTemporary()) sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Temporary")).toBuilder().append(Text.builder("yes").color(TextColors.GREEN).build()).build());
+                                else sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Auto Restart")).toBuilder().append(Text.builder((((SubServer) server).willAutoRestart())?"enabled":"disabled").color((((SubServer) server).willAutoRestart())?TextColors.GREEN:TextColors.RED).build()).build());
+                            }
+                            sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Restricted")).toBuilder().append(Text.builder((server.isRestricted())?"yes":"no").color((server.isRestricted())?TextColors.GREEN:TextColors.RED).build()).build());
+                            if (server instanceof SubServer && ((SubServer) server).getIncompatibilities().size() > 0) {
+                                List<String> current = new ArrayList<String>();
+                                for (String other : ((SubServer) server).getCurrentIncompatibilities()) current.add(other.toLowerCase());
+                                sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Info.Format").replace("$str$", "Incompatibilities")));
+                                for (String other : ((SubServer) server).getIncompatibilities()) sender.sendMessage(ChatColor.convertColor("    " + plugin.api.getLang("SubServers", "Command.Info.List")).toBuilder().append(Text.builder(other).color((current.contains(other.toLowerCase()))?TextColors.WHITE:TextColors.GRAY).build()).build());
+                            }
+                            sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Hidden")).toBuilder().append(Text.builder((server.isHidden())?"yes":"no").color((server.isHidden())?TextColors.GREEN:TextColors.RED).build()).build());
+                        } else {
+                            if (type == null) {
+                                sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Info.Unknown")));
+                            } else {
+                                sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Info.Unknown-Server")));
+                            }
+                        }
                     });
+                    Runnable getGroup = () -> plugin.api.getGroup(name, group -> {
+                        if (group != null) {
+                            sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", "Command.Info").replace("$str$", "Group")).toBuilder().append(Text.builder(name).color(TextColors.WHITE).build()).build());
+                            sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Servers")).toBuilder().append(Text.builder((group.size() <= 0)?"(none)":Integer.toString(group.size())).color((group.size() <= 0)?TextColors.GRAY:TextColors.AQUA).build()).build());
+                            for (Server server : group) sender.sendMessage(ChatColor.convertColor("    " + plugin.api.getLang("SubServers", "Command.Info.List")).toBuilder().append(Text.builder(server.getDisplayName() + ((server.getName().equals(server.getDisplayName()))?"":" ("+server.getName()+')')).color(TextColors.WHITE).build()).build());
+                        } else {
+                            if (type == null) {
+                                getServer.run();
+                            } else {
+                                sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Info.Unknown-Group")));
+                            }
+                        }
+                    });
+                    Runnable getHost = () -> plugin.api.getHost(name, host -> {
+                        if (host != null) {
+                            sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", "Command.Info").replace("$str$", "Host")).toBuilder().append(Text.builder(host.getDisplayName()).color(TextColors.WHITE).build()).build());
+                            if (!host.getName().equals(host.getDisplayName())) sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "System Name")).toBuilder().append(Text.builder(host.getName()).color(TextColors.WHITE).build()).build());
+                            sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Enabled")).toBuilder().append(Text.builder((host.isEnabled())?"yes":"no").color((host.isEnabled())?TextColors.GREEN:TextColors.RED).build()).build());
+                            if (plugin.config.get().getSection("Settings").getBoolean("Show-Addresses", false)) sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Address")).toBuilder().append(Text.builder(host.getAddress().getHostAddress()).color(TextColors.WHITE).build()).build());
+                            if (host.getSubData() != null) sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Connected")).toBuilder().append(Text.builder("yes").color(TextColors.GREEN).build()).build());
+                            sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "SubServers")).toBuilder().append(Text.builder((host.getSubServers().keySet().size() <= 0)?"(none)":Integer.toString(host.getSubServers().keySet().size())).color((host.getSubServers().keySet().size() <= 0)?TextColors.GRAY:TextColors.AQUA).build()).build());
+                            for (SubServer subserver : host.getSubServers().values()) sender.sendMessage(ChatColor.convertColor("    " + plugin.api.getLang("SubServers", "Command.Info.List")).toBuilder().append(Text.builder(subserver.getDisplayName() + ((subserver.getName().equals(subserver.getDisplayName()))?"":" ("+subserver.getName()+')')).color((subserver.isEnabled())?TextColors.WHITE:TextColors.GRAY).build()).build());
+                            sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Templates")).toBuilder().append(Text.builder((host.getCreator().getTemplates().keySet().size() <= 0)?"(none)":Integer.toString(host.getCreator().getTemplates().keySet().size())).color((host.getCreator().getTemplates().keySet().size() <= 0)?TextColors.GRAY:TextColors.AQUA).build()).build());
+                            for (SubCreator.ServerTemplate template : host.getCreator().getTemplates().values()) sender.sendMessage(ChatColor.convertColor("    " + plugin.api.getLang("SubServers", "Command.Info.List")).toBuilder().append(Text.builder(template.getDisplayName() + ((template.getName().equals(template.getDisplayName()))?"":" ("+template.getName()+')')).color((template.isEnabled())?TextColors.WHITE:TextColors.GRAY).build()).build());
+                            sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Signature")).toBuilder().append(Text.builder(host.getSignature()).color(TextColors.AQUA).build()).build());
+                        } else {
+                            if (type == null) {
+                                getGroup.run();
+                            } else {
+                                sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Info.Unknown-Host")));
+                            }
+                        }
+                    });
+                    Runnable getProxy = () -> plugin.api.getProxy(name, proxy -> {
+                        if (proxy != null) {
+                            sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", "Command.Info").replace("$str$", "Proxy")).toBuilder().append(Text.builder(proxy.getDisplayName()).color(TextColors.WHITE).build()).build());
+                            if (!proxy.getName().equals(proxy.getDisplayName())) sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "System Name")).toBuilder().append(Text.builder(proxy.getName()).color(TextColors.WHITE ).build()).build());
+                            sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Connected")).toBuilder().append(Text.builder((proxy.getSubData() != null)?"yes":"no").color((proxy.getSubData() != null)?TextColors.GREEN:TextColors.RED).build()).build());
+                            sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Redis") ).toBuilder().append(Text.builder(((proxy.isRedis())?"":"un") + "available").color((proxy.isRedis())?TextColors.GREEN:TextColors.RED).build()).build());
+                            if (proxy.isRedis()) sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Players")).toBuilder().append(Text.builder(proxy.getPlayers().size() + " online").color(TextColors.AQUA).build()).build());
+                            sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Signature")).toBuilder().append(Text.builder(proxy.getSignature()).color(TextColors.AQUA).build()).build());
+                        } else {
+                            if (type == null) {
+                                getHost.run();
+                            } else {
+                                sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Info.Unknown-Proxy")));
+                            }
+                        }
+                    });
+
+                    if (type == null) {
+                        getProxy.run();
+                    } else {
+                        switch (type.toLowerCase()) {
+                            case "p":
+                            case "proxy":
+                                getProxy.run();
+                                break;
+                            case "h":
+                            case "host":
+                                getHost.run();
+                                break;
+                            case "g":
+                            case "group":
+                                getGroup.run();
+                                break;
+                            case "s":
+                            case "server":
+                            case "subserver":
+                                getServer.run();
+                                break;
+                            default:
+                                sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Info.Unknown-Type")));
+                        }
+                    }
                     return CommandResult.builder().successCount(1).build();
                 } else {
-                    sender.sendMessage(Text.of(plugin.api.getLang("SubServers", "Command.Generic.Usage").replace("$str$", "/sub info <SubServer>")));
+                    sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Generic.Usage").replace("$str$", "/sub info [proxy|host|group|server] <Name>")));
                     return CommandResult.builder().successCount(0).build();
                 }
             } else {
-                sender.sendMessage(Text.of(plugin.api.getLang("SubServers", "Command.Generic.Invalid-Permission").replace("$str$", "subservers.command")));
+                sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Generic.Invalid-Permission").replace("$str$", "subservers.command")));
                 return CommandResult.builder().successCount(0).build();
             }
         }
@@ -537,44 +621,44 @@ public final class SubCommand implements CommandExecutor {
                         plugin.subdata.sendPacket(new PacketStartServer((sender instanceof Player)?((Player) sender).getUniqueId():null, subserver.get(), data -> {
                             switch (data.getInt("r")) {
                                 case 3:
-                                    sender.sendMessage(Text.of(plugin.api.getLang("SubServers", "Command.Start.Unknown")));
+                                    sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Start.Unknown")));
                                     break;
                                 case 4:
-                                    sender.sendMessage(Text.of(plugin.api.getLang("SubServers", "Command.Start.Invalid")));
+                                    sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Start.Invalid")));
                                     break;
                                 case 5:
-                                    sender.sendMessage(Text.of(plugin.api.getLang("SubServers", "Command.Start.Host-Disabled")));
+                                    sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Start.Host-Disabled")));
                                     break;
                                 case 6:
-                                    sender.sendMessage(Text.of(plugin.api.getLang("SubServers", "Command.Start.Server-Disabled")));
+                                    sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Start.Server-Disabled")));
                                     break;
                                 case 7:
-                                    sender.sendMessage(Text.of(plugin.api.getLang("SubServers", "Command.Start.Running")));
+                                    sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Start.Running")));
                                     break;
                                 case 8:
-                                    sender.sendMessage(Text.of(plugin.api.getLang("SubServers", "Command.Start.Server-Incompatible").replace("$str$", data.getString("m").split(":\\s")[1])));
+                                    sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Start.Server-Incompatible").replace("$str$", data.getString("m").split(":\\s")[1])));
                                     break;
                                 case 0:
                                 case 1:
-                                    sender.sendMessage(Text.of(plugin.api.getLang("SubServers", "Command.Start")));
+                                    sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Start")));
                                     break;
                                 default:
                                     plugin.logger.warn("PacketStartServer(" + ((sender instanceof Player)?((Player) sender).getUniqueId().toString():"null") + ", " + subserver.get() + ") responded with: " + data.getString("m"));
-                                    sender.sendMessage(Text.of(plugin.api.getLang("SubServers", "Command.Start")));
+                                    sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Start")));
                                     break;
                             }
                         }));
                         return CommandResult.builder().successCount(1).build();
                     } else {
-                        sender.sendMessage(Text.of(plugin.api.getLang("SubServers", "Command.Generic.Invalid-Permission").replace("$str$", "subservers.subserver.start." + subserver.get().toLowerCase())));
+                        sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Generic.Invalid-Permission").replace("$str$", "subservers.subserver.start." + subserver.get().toLowerCase())));
                         return CommandResult.builder().successCount(0).build();
                     }
                 } else {
-                    sender.sendMessage(Text.of(plugin.api.getLang("SubServers", "Command.Generic.Usage").replace("$str$", "/sub start <SubServer>")));
+                    sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Generic.Usage").replace("$str$", "/sub start <SubServer>")));
                     return CommandResult.builder().successCount(0).build();
                 }
             } else {
-                sender.sendMessage(Text.of(Text.of(plugin.api.getLang("SubServers", "Command.Generic.Invalid-Permission").replace("$str$", "subservers.command"))));
+                sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Generic.Invalid-Permission").replace("$str$", "subservers.command")));
                 return CommandResult.builder().successCount(0).build();
             }
         }
@@ -589,35 +673,35 @@ public final class SubCommand implements CommandExecutor {
                         plugin.subdata.sendPacket(new PacketStopServer((sender instanceof Player) ? ((Player) sender).getUniqueId():null, subserver.get(), false, data -> {
                             switch (data.getInt("r")) {
                                 case 3:
-                                    sender.sendMessage(Text.of(plugin.api.getLang("SubServers", "Command.Stop.Unknown")));
+                                    sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Stop.Unknown")));
                                     break;
                                 case 4:
-                                    sender.sendMessage(Text.of(plugin.api.getLang("SubServers", "Command.Stop.Invalid")));
+                                    sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Stop.Invalid")));
                                     break;
                                 case 5:
-                                    sender.sendMessage(Text.of(plugin.api.getLang("SubServers", "Command.Stop.Not-Running")));
+                                    sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Stop.Not-Running")));
                                     break;
                                 case 0:
                                 case 1:
-                                    sender.sendMessage(Text.of(plugin.api.getLang("SubServers", "Command.Stop")));
+                                    sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Stop")));
                                     break;
                                 default:
                                     plugin.logger.warn("PacketStopServer(" + ((sender instanceof Player)?((Player) sender).getUniqueId().toString():"null") + ", " + subserver.get() + ", false) responded with: " + data.getString("m"));
-                                    sender.sendMessage(Text.of(plugin.api.getLang("SubServers", "Command.Stop")));
+                                    sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Stop")));
                                     break;
                             }
                         }));
                         return CommandResult.builder().successCount(1).build();
                     } else {
-                        sender.sendMessage(Text.of(plugin.api.getLang("SubServers", "Command.Generic.Invalid-Permission").replace("$str$", "subservers.subserver.stop." + subserver.get().toLowerCase())));
+                        sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Generic.Invalid-Permission").replace("$str$", "subservers.subserver.stop." + subserver.get().toLowerCase())));
                         return CommandResult.builder().successCount(0).build();
                     }
                 } else {
-                    sender.sendMessage(Text.of(plugin.api.getLang("SubServers", "Command.Generic.Usage").replace("$str$", "/sub stop <SubServer>")));
+                    sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Generic.Usage").replace("$str$", "/sub stop <SubServer>")));
                     return CommandResult.builder().successCount(0).build();
                 }
             } else {
-                sender.sendMessage(Text.of(Text.of(plugin.api.getLang("SubServers", "Command.Generic.Invalid-Permission").replace("$str$", "subservers.command"))));
+                sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Generic.Invalid-Permission").replace("$str$", "subservers.command")));
                 return CommandResult.builder().successCount(0).build();
             }
         }
@@ -632,35 +716,35 @@ public final class SubCommand implements CommandExecutor {
                         plugin.subdata.sendPacket(new PacketStopServer((sender instanceof Player)?((Player) sender).getUniqueId():null, subserver.get(), true, data -> {
                             switch (data.getInt("r")) {
                                 case 3:
-                                    sender.sendMessage(Text.of(plugin.api.getLang("SubServers", "Command.Terminate.Unknown")));
+                                    sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Terminate.Unknown")));
                                     break;
                                 case 4:
-                                    sender.sendMessage(Text.of(plugin.api.getLang("SubServers", "Command.Terminate.Invalid")));
+                                    sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Terminate.Invalid")));
                                     break;
                                 case 5:
-                                    sender.sendMessage(Text.of(plugin.api.getLang("SubServers", "Command.Terminate.Not-Running")));
+                                    sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Terminate.Not-Running")));
                                     break;
                                 case 0:
                                 case 1:
-                                    sender.sendMessage(Text.of(plugin.api.getLang("SubServers", "Command.Terminate")));
+                                    sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Terminate")));
                                     break;
                                 default:
                                     plugin.logger.warn("PacketStopServer(" + ((sender instanceof Player)?((Player) sender).getUniqueId().toString():"null") + ", " + subserver.get() + ", true) responded with: " + data.getString("m"));
-                                    sender.sendMessage(Text.of(plugin.api.getLang("SubServers", "Command.Terminate")));
+                                    sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Terminate")));
                                     break;
                             }
                         }));
                         return CommandResult.builder().successCount(1).build();
                     } else {
-                        sender.sendMessage(Text.of(plugin.api.getLang("SubServers", "Command.Generic.Invalid-Permission").replace("$str$", "subservers.subserver.terminate." + subserver.get().toLowerCase())));
+                        sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Generic.Invalid-Permission").replace("$str$", "subservers.subserver.terminate." + subserver.get().toLowerCase())));
                         return CommandResult.builder().successCount(0).build();
                     }
                 } else {
-                    sender.sendMessage(Text.of(plugin.api.getLang("SubServers", "Command.Generic.Usage").replace("$str$", "/sub terminate <SubServer>")));
+                    sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Generic.Usage").replace("$str$", "/sub terminate <SubServer>")));
                     return CommandResult.builder().successCount(0).build();
                 }
             } else {
-                sender.sendMessage(Text.of(Text.of(plugin.api.getLang("SubServers", "Command.Generic.Invalid-Permission").replace("$str$", "subservers.command"))));
+                sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Generic.Invalid-Permission").replace("$str$", "subservers.command")));
                 return CommandResult.builder().successCount(0).build();
             }
         }
@@ -676,35 +760,35 @@ public final class SubCommand implements CommandExecutor {
                         plugin.subdata.sendPacket(new PacketCommandServer((sender instanceof Player)?((Player) sender).getUniqueId():null, subserver.get(), command.get(), data -> {
                             switch (data.getInt("r")) {
                                 case 3:
-                                    sender.sendMessage(Text.of(plugin.api.getLang("SubServers", "Command.Command.Unknown")));
+                                    sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Command.Unknown")));
                                     break;
                                 case 4:
-                                    sender.sendMessage(Text.of(plugin.api.getLang("SubServers", "Command.Command.Invalid")));
+                                    sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Command.Invalid")));
                                     break;
                                 case 5:
-                                    sender.sendMessage(Text.of(plugin.api.getLang("SubServers", "Command.Command.Not-Running")));
+                                    sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Command.Not-Running")));
                                     break;
                                 case 0:
                                 case 1:
-                                    sender.sendMessage(Text.of(plugin.api.getLang("SubServers", "Command.Command")));
+                                    sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Command")));
                                     break;
                                 default:
                                     plugin.logger.warn("PacketCommandServer(" + ((sender instanceof Player)?((Player) sender).getUniqueId().toString():"null") + ", " + subserver.get() + ", /" + command.get() + ") responded with: " + data.getString("m"));
-                                    sender.sendMessage(Text.of(plugin.api.getLang("SubServers", "Command.Command")));
+                                    sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Command")));
                                     break;
                             }
                         }));
                         return CommandResult.builder().successCount(1).build();
                     } else {
-                        sender.sendMessage(Text.of(plugin.api.getLang("SubServers", "Command.Generic.Invalid-Permission").replace("$str$", "subservers.subserver.command." + subserver.get().toLowerCase())));
+                        sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Generic.Invalid-Permission").replace("$str$", "subservers.subserver.command." + subserver.get().toLowerCase())));
                         return CommandResult.builder().successCount(0).build();
                     }
                 } else {
-                    sender.sendMessage(Text.of(plugin.api.getLang("SubServers", "Command.Generic.Usage").replace("$str$", "/sub command <SubServer> <Command> [Args...]")));
+                    sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Generic.Usage").replace("$str$", "/sub command <SubServer> <Command> [Args...]")));
                     return CommandResult.builder().successCount(0).build();
                 }
             } else {
-                sender.sendMessage(Text.of(Text.of(plugin.api.getLang("SubServers", "Command.Generic.Invalid-Permission").replace("$str$", "subservers.command"))));
+                sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Generic.Invalid-Permission").replace("$str$", "subservers.command")));
                 return CommandResult.builder().successCount(0).build();
             }
         }
@@ -721,49 +805,49 @@ public final class SubCommand implements CommandExecutor {
                 if (name.isPresent() && host.isPresent() && template.isPresent() && version.isPresent() && port.isPresent()) {
                     if (sender.hasPermission("subservers.host.create." + host.get().toLowerCase())) {
                         if (Util.isException(() -> Integer.parseInt(port.get()))) {
-                            sender.sendMessage(Text.of(plugin.api.getLang("SubServers", "Command.Creator.Invalid-Port")));
+                            sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Creator.Invalid-Port")));
                             return CommandResult.builder().successCount(0).build();
                         } else {
                             plugin.subdata.sendPacket(new PacketCreateServer((sender instanceof Player)?((Player) sender).getUniqueId():null, name.get(), host.get(), template.get(), new Version(version.get()), Integer.parseInt(port.get()), data -> {
                                 switch (data.getInt("r")) {
                                     case 3:
                                     case 4:
-                                        sender.sendMessage(Text.of(plugin.api.getLang("SubServers", "Command.Creator.Exists")));
+                                        sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Creator.Exists")));
                                         break;
                                     case 5:
-                                        sender.sendMessage(Text.of(plugin.api.getLang("SubServers", "Command.Creator.Unknown-Host")));
+                                        sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Creator.Unknown-Host")));
                                         break;
                                     case 6:
-                                        sender.sendMessage(Text.of(plugin.api.getLang("SubServers", "Command.Creator.Invalid-Template")));
+                                        sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Creator.Invalid-Template")));
                                         break;
                                     case 7:
-                                        sender.sendMessage(Text.of(plugin.api.getLang("SubServers", "Command.Creator.Invalid-Version")));
+                                        sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Creator.Invalid-Version")));
                                         break;
                                     case 8:
-                                        sender.sendMessage(Text.of(plugin.api.getLang("SubServers", "Command.Creator.Invalid-Port")));
+                                        sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Creator.Invalid-Port")));
                                         break;
                                     case 0:
                                     case 1:
-                                        sender.sendMessage(Text.of(plugin.api.getLang("SubServers", "Command.Creator")));
+                                        sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Creator")));
                                         break;
                                     default:
                                         plugin.logger.warn("PacketCreateServer(" + ((sender instanceof Player)?((Player) sender).getUniqueId().toString():"null") + ", " + name.get() + ", " + host.get() + ", " + template.get() + ", " + version.get() + ", " + port.get() + ") responded with: " + data.getString("m"));
-                                        sender.sendMessage(Text.of(plugin.api.getLang("SubServers", "Command.Creator")));
+                                        sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Creator")));
                                         break;
                                 }
                             }));
                             return CommandResult.builder().successCount(1).build();
                         }
                     } else {
-                        sender.sendMessage(Text.of(plugin.api.getLang("SubServers", "Command.Generic.Invalid-Permission").replace("$str$", "subservers.host.create." + host.get().toLowerCase())));
+                        sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Generic.Invalid-Permission").replace("$str$", "subservers.host.create." + host.get().toLowerCase())));
                         return CommandResult.builder().successCount(0).build();
                     }
                 } else {
-                    sender.sendMessage(Text.of(plugin.api.getLang("SubServers", "Command.Generic.Usage").replace("$str$", "/sub create <Name> <Host> <Template> <Version> <Port>")));
+                    sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Generic.Usage").replace("$str$", "/sub create <Name> <Host> <Template> <Version> <Port>")));
                     return CommandResult.builder().successCount(0).build();
                 }
             } else {
-                sender.sendMessage(Text.of(Text.of(plugin.api.getLang("SubServers", "Command.Generic.Invalid-Permission").replace("$str$", "subservers.command"))));
+                sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Generic.Invalid-Permission").replace("$str$", "subservers.command")));
                 return CommandResult.builder().successCount(0).build();
             }
         }
@@ -821,12 +905,12 @@ public final class SubCommand implements CommandExecutor {
                             return CommandResult.builder().successCount(0).build();
                         }
                     } else {
-                        sender.sendMessage(Text.of(plugin.api.getLang("SubServers", "Command.Generic.Invalid-Permission").replace("$str$", "subservers.interface")));
+                        sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Generic.Invalid-Permission").replace("$str$", "subservers.interface")));
                         return CommandResult.builder().successCount(0).build();
                     }
                 } else return CommandResult.builder().successCount(0).build();
             } else {
-                sender.sendMessage(Text.of(Text.of(plugin.api.getLang("SubServers", "Command.Generic.Invalid-Permission").replace("$str$", "subservers.command"))));
+                sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Generic.Invalid-Permission").replace("$str$", "subservers.command")));
                 return CommandResult.builder().successCount(0).build();
             }
         }
@@ -834,16 +918,16 @@ public final class SubCommand implements CommandExecutor {
 
     private Text[] printHelp() {
         return new Text[]{
-                Text.of(plugin.api.getLang("SubServers", "Command.Help.Header")),
-                Text.of(plugin.api.getLang("SubServers", "Command.Help.Help").replace("$str$", "/sub help")),
-                Text.of(plugin.api.getLang("SubServers", "Command.Help.List").replace("$str$", "/sub list")),
-                Text.of(plugin.api.getLang("SubServers", "Command.Help.Version").replace("$str$", "/sub version")),
-                Text.of(plugin.api.getLang("SubServers", "Command.Help.Info").replace("$str$", "/sub info <SubServer>")),
-                Text.of(plugin.api.getLang("SubServers", "Command.Help.SubServer.Start").replace("$str$", "/sub start <SubServer>")),
-                Text.of(plugin.api.getLang("SubServers", "Command.Help.SubServer.Stop").replace("$str$", "/sub stop <SubServer>")),
-                Text.of(plugin.api.getLang("SubServers", "Command.Help.SubServer.Terminate").replace("$str$", "/sub kill <SubServer>")),
-                Text.of(plugin.api.getLang("SubServers", "Command.Help.SubServer.Command").replace("$str$", "/sub cmd <SubServer> <Command> [Args...]")),
-                Text.of(plugin.api.getLang("SubServers", "Command.Help.Host.Create").replace("$str$", "/sub create <Name> <Host> <Template> <Version> <Port>")),
+                ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Help.Header")),
+                ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Help.Help").replace("$str$", "/sub help")),
+                ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Help.List").replace("$str$", "/sub list")),
+                ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Help.Version").replace("$str$", "/sub version")),
+                ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Help.Info").replace("$str$", "/sub info [proxy|host|group|server] <Name>")),
+                ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Help.SubServer.Start").replace("$str$", "/sub start <SubServer>")),
+                ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Help.SubServer.Stop").replace("$str$", "/sub stop <SubServer>")),
+                ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Help.SubServer.Terminate").replace("$str$", "/sub kill <SubServer>")),
+                ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Help.SubServer.Command").replace("$str$", "/sub cmd <SubServer> <Command> [Args...]")),
+                ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Help.Host.Create").replace("$str$", "/sub create <Name> <Host> <Template> <Version> <Port>")),
         };
     }
 }

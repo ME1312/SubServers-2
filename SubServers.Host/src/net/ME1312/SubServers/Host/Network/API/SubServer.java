@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.UUID;
 
 public class SubServer extends Server {
+    private List<SubServer> incompatibilities = null;
     private Host host = null;
 
     /**
@@ -40,6 +41,13 @@ public class SubServer extends Server {
     @Override
     public boolean equals(Object obj) {
         return obj instanceof SubServer && super.equals(obj);
+    }
+
+    @Override
+    public void refresh() {
+        host = null;
+        incompatibilities = null;
+        super.refresh();
     }
 
     /**
@@ -239,6 +247,15 @@ public class SubServer extends Server {
     /**
      * Grabs the Host of the Server
      *
+     * @return The Host Name
+     */
+    public String getHost() {
+        return raw.getRawString("host");
+    }
+
+    /**
+     * Grabs the Host of the Server
+     *
      * @param callback The Host
      */
     public void getHost(Callback<Host> callback) {
@@ -351,12 +368,64 @@ public class SubServer extends Server {
     }
 
     /**
+     * Get all listed incompatibilities for this Server
+     *
+     * @param callback Incompatibility List
+     */
+    public void getIncompatibilities(Callback<List<SubServer>> callback) {
+        if (Util.isNull(callback)) throw new NullPointerException();
+        StackTraceElement[] origin = new Exception().getStackTrace();
+        Runnable run = () -> {
+            try {
+                callback.run(incompatibilities);
+            } catch (Throwable e) {
+                Throwable ew = new InvocationTargetException(e);
+                ew.setStackTrace(origin);
+                ew.printStackTrace();
+            }
+        };
+
+        if (incompatibilities == null) {
+            LinkedList<String> incompatableNames = new LinkedList<String>();
+            for (String subserver : raw.getRawStringList("incompatible-list")) incompatableNames.add(subserver.toLowerCase());
+            SubAPI.getInstance().getSubServers(subservers -> {
+                LinkedList<SubServer> incompatibilities = new LinkedList<SubServer>();
+                for (SubServer subserver : subservers.values())
+                    if (incompatableNames.contains(subserver.getName().toLowerCase()))
+                        incompatibilities.add(subserver);
+                this.incompatibilities = incompatibilities;
+                run.run();
+            });
+        } else {
+            run.run();
+        }
+    }
+
+    /**
      * Get incompatibility issues this server currently has
      *
      * @return Current Incompatibility List
      */
     public List<String> getCurrentIncompatibilities() {
         return new LinkedList<String>(raw.getRawStringList("incompatible"));
+    }
+
+    /**
+     * Get incompatibility issues this server currently has
+     *
+     * @param callback Current Incompatibility List
+     */
+    public void getCurrentIncompatibilities(Callback<List<SubServer>> callback) {
+        getIncompatibilities(incompatibilities -> {
+            LinkedList<String> incompatableNames = new LinkedList<String>();
+            for (String subserver : raw.getRawStringList("incompatible")) incompatableNames.add(subserver.toLowerCase());
+
+            LinkedList<SubServer> current = new LinkedList<SubServer>();
+            for (SubServer subserver : incompatibilities)
+                if (incompatableNames.contains(subserver.getName().toLowerCase()))
+                    current.add(subserver);
+            callback.run(current);
+        });
     }
 
     /**

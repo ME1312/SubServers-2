@@ -1,5 +1,6 @@
 package net.ME1312.SubServers.Client.Sponge.Library.Config;
 
+import net.ME1312.SubServers.Client.Sponge.Library.ChatColor;
 import net.ME1312.SubServers.Client.Sponge.Library.Util;
 import org.yaml.snakeyaml.Yaml;
 
@@ -244,7 +245,7 @@ public class YAMLValue {
      */
     public String asColoredString(char color) {
         if (Util.isNull(color)) throw new NullPointerException();
-        if (obj != null) return asString().replaceAll(Pattern.quote(new String(new char[]{color})) + "([0-9A-Fa-fK-Ok-oRr])", "\u00A7$1");
+        if (obj != null) return ChatColor.parseColor(color, asString());
         else return null;
     }
 
@@ -259,7 +260,7 @@ public class YAMLValue {
             if (Util.isNull(color)) throw new NullPointerException();
             List<String> values = new ArrayList<String>();
             for (String value : asStringList()) {
-                values.add(value.replaceAll(Pattern.quote(new String(new char[]{color})) + "([0-9A-Fa-fK-Ok-oRr])", "\u00A7$1"));
+                values.add(ChatColor.parseColor(color, value));
             }
             return values;
         } else return null;

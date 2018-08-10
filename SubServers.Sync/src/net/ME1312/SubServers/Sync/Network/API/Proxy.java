@@ -138,6 +138,15 @@ public class Proxy {
         return raw.getSection("extra").clone();
     }
 
+    /**
+     * Get the raw representation of the Proxy
+     *
+     * @return Raw Proxy
+     */
+    public YAMLSection getRaw() {
+        return raw.clone();
+    }
+
     @Override
     @SuppressWarnings("unchecked")
     public String toString() {

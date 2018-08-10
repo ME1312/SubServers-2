@@ -196,11 +196,16 @@ public class SubCreator {
         history.add(template);
         for (String other : template.getBuildOptions().getStringList("Import", new ArrayList<String>())) {
             if (host.templates.keySet().contains(other.toLowerCase())) {
-                YAMLSection config = build(thread, dir, other, host.templates.get(other.toLowerCase()), version, address, history);
-                if (config == null) {
-                    throw new SubCreatorException();
+                if (host.templates.get(other.toLowerCase()).isEnabled()) {
+                    YAMLSection config = build(thread, dir, other, host.templates.get(other.toLowerCase()), version, address, history);
+                    if (config == null) {
+                        throw new SubCreatorException();
+                    } else {
+                        server.setAll(config);
+                    }
                 } else {
-                    server.setAll(config);
+                    thread.name().logger.warn.println("Skipping disabled template: " + other);
+                    host.subdata.sendPacket(new PacketOutExLogMessage(address, "Skipping disabled template: " + other));
                 }
             } else {
                 thread.name().logger.warn.println("Skipping missing template: " + other);

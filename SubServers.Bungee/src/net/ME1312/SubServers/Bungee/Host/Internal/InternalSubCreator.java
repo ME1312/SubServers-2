@@ -75,11 +75,15 @@ public class InternalSubCreator extends SubCreator {
         history.add(template);
         for (String other : template.getBuildOptions().getStringList("Import", new ArrayList<String>())) {
             if (templates.keySet().contains(other.toLowerCase())) {
-                YAMLSection config = build(thread, dir, other, templates.get(other.toLowerCase()), version, history);
-                if (config == null) {
-                    throw new SubCreatorException();
+                if (templates.get(other.toLowerCase()).isEnabled()) {
+                    YAMLSection config = build(thread, dir, other, templates.get(other.toLowerCase()), version, history);
+                    if (config == null) {
+                        throw new SubCreatorException();
+                    } else {
+                        server.setAll(config);
+                    }
                 } else {
-                    server.setAll(config);
+                    System.out.println(name + File.separator + "Creator > Skipping disabled template: " + other);
                 }
             } else {
                 System.out.println(name + File.separator + "Creator > Skipping missing template: " + other);
@@ -232,7 +236,7 @@ public class InternalSubCreator extends SubCreator {
 
                 SubServer subserver = host.addSubServer(player, name, server.getBoolean("Enabled"), port, server.getColoredString("Motd", '&'), server.getBoolean("Log"), server.getRawString("Directory"),
                         new Executable(server.getRawString("Executable")), server.getRawString("Stop-Command"), server.getBoolean("Hidden"), server.getBoolean("Restricted"), false);
-                if (!server.getBoolean("Editable", true)) subserver.setEditable(true);
+                if (server.getBoolean("Editable", true)) subserver.setEditable(true);
                 if (server.getBoolean("Auto-Restart")) subserver.setAutoRestart(true);
                 if (server.getString("Display").length() > 0) subserver.setDisplayName(server.getString("Display"));
                 for (String group : server.getStringList("Group")) subserver.addGroup(group);

@@ -400,7 +400,7 @@ public class InternalUIRenderer extends UIRenderer {
                     block = createItem("STAINED_GLASS_PANE", "LIME_STAINED_GLASS_PANE", (short) 5);
                     blockMeta = block.getItemMeta();
                     blockMeta.setDisplayName(ChatColor.GREEN + plugin.api.getLang("SubServers", "Interface.Host-Creator.Edit-Version"));
-                    blockMeta.setLore(Arrays.asList(ChatColor.GRAY + "v" + options.getVersion().toString()));
+                    blockMeta.setLore(Arrays.asList(ChatColor.GRAY + "Minecraft " + options.getVersion().toString()));
                 }
                 block.setItemMeta(blockMeta);
                 inv.setItem(32, block);

@@ -6,10 +6,7 @@ import net.ME1312.SubServers.Host.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Host.Library.TextColor;
 import net.ME1312.SubServers.Host.Library.Util;
 import net.ME1312.SubServers.Host.Library.Version.Version;
-import net.ME1312.SubServers.Host.Network.API.Host;
-import net.ME1312.SubServers.Host.Network.API.Proxy;
-import net.ME1312.SubServers.Host.Network.API.Server;
-import net.ME1312.SubServers.Host.Network.API.SubServer;
+import net.ME1312.SubServers.Host.Network.API.*;
 import net.ME1312.SubServers.Host.Network.Packet.*;
 import org.json.JSONObject;
 
@@ -207,56 +204,142 @@ public class SubCommand {
             @Override
             public void command(String handle, String[] args) {
                 if (args.length > 0) {
-                    host.api.getServer(args[0], server -> {
-                        ExHost h = host;
-                        if (server == null) {
-                            h.log.message.println("There is no server with that name");
-                        } else if (!(server instanceof SubServer)) {
-                            h.log.message.println("That Server is not a SubServer");
-                        } else ((SubServer) server).getHost(host -> {
-                            if (host == null) {
-                                h.log.message.println("That Server is not a SubServer");
-                            } else {
-                                h.log.message.println("Info on " + server.getDisplayName() + ':');
-                                if (!server.getName().equals(server.getDisplayName())) h.log.message.println("  - Real Name: " + server.getName());
-                                h.log.message.println("  - Host: " + host.getName());
-                                h.log.message.println("  - Enabled: " + ((((SubServer) server).isEnabled())?"yes":"no"));
-                                h.log.message.println("  - Editable: " + ((((SubServer) server).isEditable())?"yes":"no"));
-                                if (server.getGroups().size() > 0) {
-                                    h.log.message.println("  - Group:");
-                                    for (String group : server.getGroups())
-                                        h.log.message.println("    - " + group);
-                                }
-                                if (((SubServer) server).isTemporary()) h.log.message.println("  - Temporary: yes");
-                                h.log.message.println("  - Running: " + ((((SubServer) server).isRunning())?"yes":"no"));
-                                h.log.message.println("  - Logging: " + ((((SubServer) server).isLogging())?"yes":"no"));
-                                h.log.message.println("  - Address: " + server.getAddress().getAddress().getHostAddress()+':'+server.getAddress().getPort());
-                                h.log.message.println("  - Auto Restart: " + ((((SubServer) server).willAutoRestart())?"yes":"no"));
-                                h.log.message.println("  - Hidden: " + ((server.isHidden())?"yes":"no"));
-                                if (((SubServer) server).getIncompatibilities().size() > 0) {
-                                    List<String> current = new ArrayList<String>();
-                                    for (String other : ((SubServer) server).getCurrentIncompatibilities()) current.add(other.toLowerCase());
-                                    h.log.message.println("  - Incompatibilities:");
-                                    for (String other : ((SubServer) server).getIncompatibilities())
-                                        h.log.message.println("    - " + other + ((current.contains(other))?"*":""));
-                                }
-                                h.log.message.println("  - Signature: " + server.getSignature());
+                    String type = (args.length > 1)?args[0]:null;
+                    String name = args[(type != null)?1:0];
+
+                    Runnable getServer = () -> host.api.getServer(name, server -> {
+                        if (server != null) {
+                            host.log.message.println("SubServers > Info on " + ((server instanceof SubServer)?"Sub":"") + "Server: " + TextColor.WHITE + server.getDisplayName());
+                            if (!server.getName().equals(server.getDisplayName())) host.log.message.println(" -> System Name: " + TextColor.WHITE  + server.getName());
+                            if (server instanceof SubServer) {
+                                host.log.message.println(" -> Enabled: " + ((((SubServer) server).isEnabled())?TextColor.GREEN+"yes":TextColor.RED+"no"));
+                                if (!((SubServer) server).isEditable()) host.log.message.println(" -> Editable: " + TextColor.RED + "no");
+                                host.log.message.println(" -> Host: " + TextColor.WHITE  + ((SubServer) server).getHost());
                             }
-                        });
+                            if (server.getGroups().size() > 0) host.log.message.println(" -> Group" + ((server.getGroups().size() > 1)?"s:":": " + TextColor.WHITE + server.getGroups().get(0)));
+                            if (server.getGroups().size() > 1) for (String group : server.getGroups()) host.log.message.println("      - " + TextColor.WHITE + group);
+                            host.log.message.println(" -> Address: " + TextColor.WHITE + server.getAddress().getAddress().getHostAddress()+':'+server.getAddress().getPort());
+                            if (server instanceof SubServer) host.log.message.println(" -> Running: " + ((((SubServer) server).isRunning())?TextColor.GREEN+"yes":TextColor.RED+"no"));
+                            if (!(server instanceof SubServer) || ((SubServer) server).isRunning()) {
+                                host.log.message.println(" -> Connected: " + ((server.getSubData() != null)?TextColor.GREEN+"yes":TextColor.RED+"no"));
+                                host.log.message.println(" -> Players: " + TextColor.AQUA + server.getPlayers().size() + " online");
+                            }
+                            host.log.message.println(" -> MOTD: " + TextColor.WHITE + TextColor.stripColor(server.getMotd()));
+                            host.log.message.println(" -> Signature: " + TextColor.AQUA + server.getSignature());
+                            if (server instanceof SubServer) {
+                                host.log.message.println(" -> Logging: " + ((((SubServer) server).isLogging())?TextColor.GREEN+"yes":TextColor.RED+"no"));
+                                if (((SubServer) server).isTemporary()) host.log.message.println(" -> Temporary: " + TextColor.GREEN + "yes");
+                                else host.log.message.println(" -> Auto Restart: " + ((((SubServer) server).willAutoRestart())?TextColor.GREEN+"enabled":TextColor.RED+"disabled"));
+                            }
+                            host.log.message.println(" -> Restricted: " + ((server.isRestricted())?TextColor.GREEN+"yes":TextColor.RED+"no"));
+                            if (server instanceof SubServer && ((SubServer) server).getIncompatibilities().size() > 0) {
+                                List<String> current = new ArrayList<String>();
+                                for (String other : ((SubServer) server).getCurrentIncompatibilities()) current.add(other.toLowerCase());
+                                host.log.message.println(" -> Incompatibilities:");
+                                for (String other : ((SubServer) server).getIncompatibilities()) host.log.message.println("      - " + ((current.contains(other.toLowerCase()))?TextColor.WHITE:TextColor.GRAY) + other);
+                            }
+                            host.log.message.println(" -> Hidden: " + ((server.isHidden())?TextColor.GREEN+"yes":TextColor.RED+"no"));
+                        } else {
+                            if (type == null) {
+                                host.log.message.println("SubServers > There is no object with that name");
+                            } else {
+                                host.log.message.println("SubServers > There is no server with that name");
+                            }
+                        }
                     });
+                    Runnable getGroup = () -> host.api.getGroup(name, group -> {
+                        if (group != null) {
+                            host.log.message.println("SubServers > Info on Group: " + TextColor.WHITE + name);
+                            host.log.message.println(" -> Servers: " + ((group.size() <= 0)?TextColor.GRAY + "(none)":TextColor.AQUA.toString() + group.size()));
+                            for (Server server : group) host.log.message.println("      - " + TextColor.WHITE + server.getDisplayName() + ((server.getName().equals(server.getDisplayName()))?"":" ("+server.getName()+')'));
+                        } else {
+                            if (type == null) {
+                                getServer.run();
+                            } else {
+                                host.log.message.println("SubServers > There is no group with that name");
+                            }
+                        }
+                    });
+                    ExHost h = host;
+                    Runnable getHost = () -> host.api.getHost(name, host -> {
+                        if (host != null) {
+                            h.log.message.println("SubServers > Info on Host: " + TextColor.WHITE + host.getDisplayName());
+                            if (!host.getName().equals(host.getDisplayName())) h.log.message.println(" -> System Name: " + TextColor.WHITE  + host.getName());
+                            h.log.message.println(" -> Enabled: " + ((host.isEnabled())?TextColor.GREEN+"yes":TextColor.RED+"no"));
+                            h.log.message.println(" -> Address: " + TextColor.WHITE + host.getAddress().getHostAddress());
+                            if (host.getSubData() != null) h.log.message.println(" -> Connected: " + TextColor.GREEN + "yes");
+                            h.log.message.println(" -> SubServers: " + ((host.getSubServers().keySet().size() <= 0)?TextColor.GRAY + "(none)":TextColor.AQUA.toString() + host.getSubServers().keySet().size()));
+                            for (SubServer subserver : host.getSubServers().values()) h.log.message.println("      - " + ((subserver.isEnabled())?TextColor.WHITE:TextColor.GRAY) + subserver.getDisplayName() + ((subserver.getName().equals(subserver.getDisplayName()))?"":" ("+subserver.getName()+')'));
+                            h.log.message.println(" -> Templates: " + ((host.getCreator().getTemplates().keySet().size() <= 0)?TextColor.GRAY + "(none)":TextColor.AQUA.toString() + host.getCreator().getTemplates().keySet().size()));
+                            for (SubCreator.ServerTemplate template : host.getCreator().getTemplates().values()) h.log.message.println("      - " + ((template.isEnabled())?TextColor.WHITE:TextColor.GRAY) + template.getDisplayName() + ((template.getName().equals(template.getDisplayName()))?"":" ("+template.getName()+')'));
+                            h.log.message.println(" -> Signature: " + TextColor.AQUA + host.getSignature());
+                        } else {
+                            if (type == null) {
+                                getGroup.run();
+                            } else {
+                                h.log.message.println("SubServers > There is no host with that name");
+                            }
+                        }
+                    });
+                    Runnable getProxy = () -> host.api.getProxy(name, proxy -> {
+                        if (proxy != null) {
+                            host.log.message.println("SubServers > Info on Proxy: " + TextColor.WHITE + proxy.getDisplayName());
+                            if (!proxy.getName().equals(proxy.getDisplayName())) host.log.message.println(" -> System Name: " + TextColor.WHITE  + proxy.getName());
+                            host.log.message.println(" -> Connected: " + ((proxy.getSubData() != null)?TextColor.GREEN+"yes":TextColor.RED+"no"));
+                            host.log.message.println(" -> Redis: "  + ((proxy.isRedis())?TextColor.GREEN:TextColor.RED+"un") + "available");
+                            if (proxy.isRedis()) host.log.message.println(" -> Players: " + TextColor.AQUA + proxy.getPlayers().size() + " online");
+                            host.log.message.println(" -> Signature: " + TextColor.AQUA + proxy.getSignature());
+                        } else {
+                            if (type == null) {
+                                getHost.run();
+                            } else {
+                                host.log.message.println("SubServers > There is no proxy with that name");
+                            }
+                        }
+                    });
+
+                    if (type == null) {
+                        getProxy.run();
+                    } else {
+                        switch (type.toLowerCase()) {
+                            case "p":
+                            case "proxy":
+                                getProxy.run();
+                                break;
+                            case "h":
+                            case "host":
+                                getHost.run();
+                                break;
+                            case "g":
+                            case "group":
+                                getGroup.run();
+                                break;
+                            case "s":
+                            case "server":
+                            case "subserver":
+                                getServer.run();
+                                break;
+                            default:
+                                host.log.message.println("SubServers > There is no object type with that name");
+                        }
+                    }
                 } else {
-                    host.log.message.println("Usage: /" + handle + " <SubServer>");
+                    host.log.message.println("SubServers > Usage: " + handle + " " + args[1].toLowerCase() + " [proxy|host|group|server] <Name>");
                 }
             }
-        }.usage("<SubServer>").description("Gets information about a SubServer").help(
+        }.usage("[proxy|host|group|server]", "<Name>").description("Gets information about an Object").help(
                 "This command will print a list of information about",
-                "the specified SubServer.",
+                "the specified Object.",
                 "",
-                "The <SubServer> argument is required, and should be the name of",
-                "the SubServer you want to obtain information about.",
+                "If the [proxy|host|group|server] option is provided,",
+                "it will only include objects of the type specified in the search.",
                 "",
-                "Example:",
-                "  /info ExampleServer"
+                "The <Name> argument is required, and should be the name of",
+                "the Object you want to obtain information about.",
+                "",
+                "Examples:",
+                "  /info ExampleServer",
+                "  /info server ExampleServer"
         ).register("info", "status");
         new Command(null) {
             @Override

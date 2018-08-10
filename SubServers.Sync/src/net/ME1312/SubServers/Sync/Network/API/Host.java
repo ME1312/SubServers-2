@@ -272,6 +272,15 @@ public class Host {
         return raw.getSection("extra").clone();
     }
 
+    /**
+     * Get the raw representation of the Host
+     *
+     * @return Raw Host
+     */
+    public YAMLSection getRaw() {
+        return raw.clone();
+    }
+
     @Override
     @SuppressWarnings("unchecked")
     public String toString() {
