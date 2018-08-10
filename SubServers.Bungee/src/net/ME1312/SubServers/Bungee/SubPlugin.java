@@ -323,8 +323,6 @@ public final class SubPlugin extends BungeeCord implements Listener {
                     host.setDisplayName(config.get().getSection("Hosts").getSection(name).getString("Display"));
                 if (config.get().getSection("Hosts").getSection(name).getKeys().contains("Extra"))
                     for (String extra : config.get().getSection("Hosts").getSection(name).getSection("Extra").getKeys()) host.addExtra(extra, config.get().getSection("Hosts").getSection(name).getSection("Extra").getObject(extra));
-                if (host instanceof ClientHandler && ((ClientHandler) host).getSubData() != null)
-                    ((ClientHandler) host).getSubData().sendPacket(new PacketOutReload(null));
                 ukeys.add(name.toLowerCase());
                 hosts++;
             } catch (Exception e) {
@@ -428,11 +426,8 @@ public final class SubPlugin extends BungeeCord implements Listener {
 
                     if (edits.getKeys().size() > 0) {
                         server.edit(edits);
-                        if (server == api.getSubServer(name) && server.getSubData() != null)
-                            server.getSubData().sendPacket(new PacketOutReload(null));
                         server = api.getSubServer(name);
-                    } else if (server.getSubData() != null)
-                        server.getSubData().sendPacket(new PacketOutReload(null));
+                    }
                 } else { // Server cannot edit()
                     if (server == null ||  // Server must be reset
                             !config.get().getSection("Servers").getSection(name).getString("Host").equalsIgnoreCase(server.getHost().getName()) ||
@@ -458,8 +453,6 @@ public final class SubPlugin extends BungeeCord implements Listener {
                             server.setRestricted(config.get().getSection("Servers").getSection(name).getBoolean("Restricted"));
                         if (config.get().getSection("Servers").getSection(name).getBoolean("Hidden") != server.isHidden())
                             server.setHidden(config.get().getSection("Servers").getSection(name).getBoolean("Hidden"));
-                        if (server.getSubData() != null)
-                            server.getSubData().sendPacket(new PacketOutReload(null));
                     } // Apply these changes regardless of reset
                     if (config.get().getSection("Servers").getSection(name).getBoolean("Auto-Restart") != server.willAutoRestart())
                         server.setAutoRestart(config.get().getSection("Servers").getSection(name).getBoolean("Auto-Restart"));
@@ -517,6 +510,11 @@ public final class SubPlugin extends BungeeCord implements Listener {
                     }
                 }
             }
+        }
+
+        if (status) {
+            for (Host host : api.getHosts().values()) if (host instanceof ClientHandler && ((ClientHandler) host).getSubData() != null) ((ClientHandler) host).getSubData().sendPacket(new PacketOutReload(null));
+            for (Server server : api.getServers().values()) if (server.getSubData() != null) server.getSubData().sendPacket(new PacketOutReload(null));
         }
 
         System.out.println("SubServers > " + ((plugins > 0)?plugins+" Plugin"+((plugins == 1)?"":"s")+", ":"") + ((proxies > 1)?proxies+" Proxies, ":"") + hosts + " Host"+((hosts == 1)?"":"s")+", " + servers + " Server"+((servers == 1)?"":"s")+", and " + subservers + " SubServer"+((subservers == 1)?"":"s")+" "+((status)?"re":"")+"loaded in " + new DecimalFormat("0.000").format((Calendar.getInstance().getTime().getTime() - begin) / 1000D) + "s");

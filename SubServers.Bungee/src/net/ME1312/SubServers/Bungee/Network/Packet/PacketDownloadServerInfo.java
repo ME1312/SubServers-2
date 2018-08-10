@@ -52,13 +52,13 @@ public class PacketDownloadServerInfo implements PacketIn, PacketOut {
         YAMLSection data = new YAMLSection();
         data.set("id", id);
 
-        YAMLSection exServers = new YAMLSection();
+        YAMLSection servers = new YAMLSection();
         for (Server server : plugin.api.getServers().values()) {
             if (this.server == null || this.server.length() <= 0 || this.server.equalsIgnoreCase(server.getName())) {
-                exServers.set(server.getName(), new YAMLSection(new Gson().fromJson(server.toString(), Map.class)));
+                servers.set(server.getName(), new YAMLSection(new Gson().fromJson(server.toString(), Map.class)));
             }
         }
-        data.set("servers", exServers);
+        data.set("servers", servers);
         return data;
     }
 

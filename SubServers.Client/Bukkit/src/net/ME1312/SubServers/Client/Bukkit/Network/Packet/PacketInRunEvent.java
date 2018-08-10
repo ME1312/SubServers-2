@@ -46,7 +46,7 @@ public class PacketInRunEvent implements PacketIn {
             @Override
             public void run(YAMLSection data) {
                 if (plugin.isEnabled()) {
-                    Bukkit.getPluginManager().callEvent(new SubAddServerEvent((data.contains("player")) ? UUID.fromString(data.getString("player")) : null, data.getString("host"), data.getString("server")));
+                    Bukkit.getPluginManager().callEvent(new SubAddServerEvent((data.contains("player")) ? UUID.fromString(data.getString("player")) : null, (data.contains("host"))?data.getRawString("host"):null, data.getString("server")));
                     callback("SubAddServerEvent", this);
                 }
             }
@@ -110,7 +110,7 @@ public class PacketInRunEvent implements PacketIn {
             @Override
             public void run(YAMLSection data) {
                 if (plugin.isEnabled()) {
-                    Bukkit.getPluginManager().callEvent(new SubRemoveServerEvent((data.contains("player")) ? UUID.fromString(data.getString("player")) : null, data.getString("host"), data.getString("server")));
+                    Bukkit.getPluginManager().callEvent(new SubRemoveServerEvent((data.contains("player")) ? UUID.fromString(data.getString("player")) : null, (data.contains("host"))?data.getRawString("host"):null, data.getString("server")));
                     callback("SubRemoveServerEvent", this);
                 }
             }
