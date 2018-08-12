@@ -1,21 +1,30 @@
 package net.ME1312.SubServers.Client.Sponge.Graphic;
+
+import net.ME1312.SubServers.Client.Sponge.Library.ChatColor;
+import net.ME1312.SubServers.Client.Sponge.Library.Container;
 import net.ME1312.SubServers.Client.Sponge.Library.NamedContainer;
 import net.ME1312.SubServers.Client.Sponge.Library.Util;
 import net.ME1312.SubServers.Client.Sponge.Library.Version.Version;
 import net.ME1312.SubServers.Client.Sponge.Network.API.Host;
 import net.ME1312.SubServers.Client.Sponge.Network.API.SubServer;
 import net.ME1312.SubServers.Client.Sponge.SubPlugin;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.item.ItemType;
+import org.spongepowered.api.item.ItemTypes;
+import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.text.title.Title;
 
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 /**
  * GUI Renderer Layout Class
  */
 public abstract class UIRenderer {
-    protected static HashMap<String, Renderer<Host>> hostPlugins = new HashMap<String, Renderer<Host>>();
-    protected static HashMap<String, Renderer<SubServer>> subserverPlugins = new HashMap<String, Renderer<SubServer>>();
+    protected static HashMap<String, PluginRenderer<Host>> hostPlugins = new HashMap<String, PluginRenderer<Host>>();
+    protected static HashMap<String, PluginRenderer<SubServer>> subserverPlugins = new HashMap<String, PluginRenderer<SubServer>>();
     private NamedContainer<String, Integer> tdownload = null;
-    private int download = -1;
+    private UUID download = null;
     private final UUID player;
     private SubPlugin plugin;
 
@@ -58,7 +67,155 @@ public abstract class UIRenderer {
      */
     public abstract void back();
 
-    // TODO Re-Add GUI API Methods that belong here
+    /**
+     * Attempt to send a Title Message
+     *
+     * @param str Message
+     * @return Success Status
+     */
+    public boolean sendTitle(String str) {
+        return sendTitle(str, -1);
+    }
+
+    /**
+     * Attempt to send a Title Message
+     *
+     * @param str Message
+     * @param stay How long the message should stay
+     * @return Success Status
+     */
+    public boolean sendTitle(String str, int stay) {
+        return sendTitle(str, -1, stay, -1);
+    }
+
+    /**
+     * Attempt to send a Title Message
+     *
+     * @param str Message
+     * @param fadein FadeIn Transition length (in ticks)
+     * @param stay How long the message should stay (in ticks)
+     * @param fadeout FadeOut Transition length (in ticks)
+     * @return Success Status
+     */
+    public boolean sendTitle(String str, int fadein, int stay, int fadeout) {
+        if (Util.isNull(str, fadein, stay, fadeout)) throw new NullPointerException();
+        if (plugin.config.get().getSection("Settings").getBoolean("Use-Title-Messages", true)) {
+            String line1, line2;
+            if (!str.startsWith("\n") && str.contains("\n")) {
+                line1 = str.split("\\n")[0];
+                line2 = str.split("\\n")[1];
+            } else {
+                line1 = str.replace("\n", "");
+                line2 = ChatColor.RESET.toString();
+            }
+            try {
+                if (ChatColor.stripColor(line1).length() == 0 && ChatColor.stripColor(line2).length() == 0) {
+                    Sponge.getServer().getPlayer(player).get().resetTitle();
+                } else {
+                    Sponge.getServer().getPlayer(player).get().sendTitle(Title.builder().title(ChatColor.convertColor(line1)).subtitle(ChatColor.convertColor(line2)).fadeIn((fadein >= 0)?fadein:10).stay((stay >= 0)?stay:70).fadeOut((fadeout >= 0)?fadeout:20).build());
+                }
+                return true;
+            } catch (Throwable e) {
+                return false;
+            }
+        } else return false;
+    }
+
+    /**
+     * Shows/Hides the Downloading Title Message
+     *
+     * @param subtitle Subtitle to display (or null to hide)
+     */
+    public void setDownloading(String subtitle) {
+        if (subtitle != null && !plugin.config.get().getSection("Settings").getBoolean("Use-Title-Messages", true)) {
+            if (download != null && Sponge.getScheduler().getTaskById(download).isPresent()) Sponge.getScheduler().getTaskById(download).get().cancel();
+            download = Sponge.getScheduler().createTaskBuilder().execute(() -> {
+                if (tdownload != null) Sponge.getServer().getPlayer(player).get().sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", "Interface.Generic.Downloading").replace("$str$", subtitle)));
+                download = null;
+            }).delay(2500, TimeUnit.MILLISECONDS).submit(plugin).getUniqueId();
+        } if (subtitle != null && tdownload == null) {
+            tdownload = new NamedContainer<String, Integer>(subtitle, 0);
+            final Container<Integer> delay = new Container<Integer>(0);
+            Sponge.getScheduler().createTaskBuilder().execute(new Runnable() {
+                @Override
+                public void run() {
+                    if (tdownload != null) {
+                        String word = ChatColor.stripColor(plugin.api.getLang("SubServers", "Interface.Generic.Downloading.Title"));
+                        int i = 0;
+                        int start = (tdownload.get() - 3 < 0)?0: tdownload.get()-3;
+                        int end = (tdownload.get() >= word.length())?word.length(): tdownload.get();
+                        String str = plugin.api.getLang("SubServers", (delay.get() > 7 && start == 0)?"Interface.Generic.Downloading.Title-Color-Alt":"Interface.Generic.Downloading.Title-Color");
+                        delay.set(delay.get() + 1);
+                        if (delay.get() > 7) tdownload.set(tdownload.get() + 1);
+                        if (tdownload.get() >= word.length() + 3) {
+                            tdownload.set(0);
+                            delay.set(0);
+                        }
+
+                        for (char c : word.toCharArray()) {
+                            i++;
+                            if (i == start) str += plugin.api.getLang("SubServers", "Interface.Generic.Downloading.Title-Color-Alt");
+                            str += c;
+                            if (i == end) str += plugin.api.getLang("SubServers", "Interface.Generic.Downloading.Title-Color");
+                        }
+
+                        str += '\n' + plugin.api.getLang("SubServers", "Interface.Generic.Downloading.Title-Color-Alt") + tdownload.name();
+                        sendTitle(str, 0, 10, 5);
+                        Sponge.getScheduler().createTaskBuilder().execute(this).delay(50, TimeUnit.MILLISECONDS).submit(plugin);
+                    } else {
+                        sendTitle(ChatColor.RESET.toString(), 0, 1, 0);
+                    }
+                }
+            }).submit(plugin);
+        } else if (subtitle != null) {
+            tdownload.rename(subtitle);
+        } else {
+            if (tdownload != null) {
+                tdownload = null;
+            }
+            if (download != null) {
+                if (Sponge.getScheduler().getTaskById(download).isPresent()) Sponge.getScheduler().getTaskById(download).get().cancel();
+                download = null;
+            }
+        }
+    }
+
+    /**
+     * Parse an ItemStack from a String
+     *
+     * @param str String to parse
+     * @return ItemStack
+     */
+    public ItemStack parseItem(String str) {
+        return parseItem(str, ItemStack.builder().itemType(ItemTypes.NONE).quantity(1).build());
+    }
+
+    /**
+     * Parse an ItemStack from a String
+     *
+     * @param str String to parse
+     * @param def Default to return if unable to parse
+     * @return ItemStack
+     */
+    public ItemStack parseItem(String str, ItemStack def) {
+        final Container<String> item = new Container<String>(str);
+        // minecraft:name
+        if (item.get().toLowerCase().startsWith("minecraft:")) {
+            item.set(item.get().substring(10));
+        } else
+
+            // bukkit:name (ignored on sponge)
+            if (item.get().toLowerCase().startsWith("bukkit:")) {
+                item.set(item.get().substring(7));
+            }
+
+        // material name
+        if (!Util.isException(() -> ItemTypes.class.getDeclaredField(item.get().toUpperCase()).get(null))) {
+            return ItemStack.builder().itemType((ItemType) Util.getDespiteException(() -> ItemTypes.class.getDeclaredField(item.get().toUpperCase()).get(null), null)).quantity(1).build();
+        }
+
+        return def;
+    }
 
     /**
      * Add Host Plugin
@@ -66,7 +223,7 @@ public abstract class UIRenderer {
      * @param handle Handle to bind
      * @param renderer Renderer
      */
-    public static void addHostPlugin(String handle, Renderer<Host> renderer) {
+    public static void addHostPlugin(String handle, PluginRenderer<Host> renderer) {
         if (Util.isNull(handle, renderer)) throw new NullPointerException();
         hostPlugins.put(handle, renderer);
     }
@@ -76,8 +233,8 @@ public abstract class UIRenderer {
      *
      * @return Host Plugins
      */
-    public static Map<String, Renderer<Host>> getHostPlugins() {
-        return new HashMap<String, Renderer<Host>>(hostPlugins);
+    public static Map<String, PluginRenderer<Host>> getHostPlugins() {
+        return new HashMap<String, PluginRenderer<Host>>(hostPlugins);
     }
 
     /**
@@ -96,7 +253,7 @@ public abstract class UIRenderer {
      * @param handle Handle to bind
      * @param renderer Renderer
      */
-    public static void addSubServerPlugin(String handle, Renderer<SubServer> renderer) {
+    public static void addSubServerPlugin(String handle, PluginRenderer<SubServer> renderer) {
         if (Util.isNull(handle, renderer)) throw new NullPointerException();
         subserverPlugins.put(handle, renderer);
     }
@@ -106,8 +263,8 @@ public abstract class UIRenderer {
      *
      * @return SubServer Plugins
      */
-    public static Map<String, Renderer<SubServer>> getSubServerPlugins() {
-        return new HashMap<String, Renderer<SubServer>>(subserverPlugins);
+    public static Map<String, PluginRenderer<SubServer>> getSubServerPlugins() {
+        return new HashMap<String, PluginRenderer<SubServer>>(subserverPlugins);
     }
 
     /**

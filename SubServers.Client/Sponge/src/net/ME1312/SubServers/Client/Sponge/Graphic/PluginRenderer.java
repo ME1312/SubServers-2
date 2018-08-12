@@ -4,9 +4,9 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.inventory.ItemStack;
 
 /**
- * GUI Renderer Layout Class
+ * Plugin GUI Renderer Layout Class
  */
-public interface Renderer<T> {
+public interface PluginRenderer<T> {
 
     /**
      * Open the GUI

@@ -4,9 +4,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 /**
- * GUI Renderer Layout Class
+ * Plugin GUI Renderer Layout Class
  */
-public interface Renderer<T> {
+public interface PluginRenderer<T> {
 
     /**
      * Open the GUI

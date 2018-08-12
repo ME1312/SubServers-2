@@ -19,9 +19,9 @@ import java.text.DecimalFormat;
 import java.util.*;
 
 /**
- * Internal GUI Renderer Class
+ * Default GUI Renderer Class
  */
-public class InternalUIRenderer extends UIRenderer {
+public class DefaultUIRenderer extends UIRenderer {
     private static int MAX_VISITED_OBJECTS = 2;
     private List<Runnable> windowHistory = new LinkedList<Runnable>();
     protected Object[] lastVisitedObjects = new Object[MAX_VISITED_OBJECTS];
@@ -31,7 +31,7 @@ public class InternalUIRenderer extends UIRenderer {
     protected final UUID player;
     private SubPlugin plugin;
 
-    protected InternalUIRenderer(SubPlugin plugin, UUID player) {
+    protected DefaultUIRenderer(SubPlugin plugin, UUID player) {
         super(plugin, player);
         this.plugin = plugin;
         this.player = player;

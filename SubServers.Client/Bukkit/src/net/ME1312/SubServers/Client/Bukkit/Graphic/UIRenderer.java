@@ -1,4 +1,5 @@
 package net.ME1312.SubServers.Client.Bukkit.Graphic;
+
 import net.ME1312.SubServers.Client.Bukkit.Library.Container;
 import net.ME1312.SubServers.Client.Bukkit.Library.NamedContainer;
 import net.ME1312.SubServers.Client.Bukkit.Library.Util;
@@ -19,8 +20,8 @@ import java.util.regex.Pattern;
  * GUI Renderer Layout Class
  */
 public abstract class UIRenderer {
-    protected static HashMap<String, Renderer<Host>> hostPlugins = new HashMap<String, Renderer<Host>>();
-    protected static HashMap<String, Renderer<SubServer>> subserverPlugins = new HashMap<String, Renderer<SubServer>>();
+    protected static HashMap<String, PluginRenderer<Host>> hostPlugins = new HashMap<String, PluginRenderer<Host>>();
+    protected static HashMap<String, PluginRenderer<SubServer>> subserverPlugins = new HashMap<String, PluginRenderer<SubServer>>();
     private NamedContainer<String, Integer> tdownload = null;
     private int download = -1;
     private final UUID player;
@@ -267,7 +268,7 @@ public abstract class UIRenderer {
      * @param handle Handle to bind
      * @param renderer Renderer
      */
-    public static void addHostPlugin(String handle, Renderer<Host> renderer) {
+    public static void addHostPlugin(String handle, PluginRenderer<Host> renderer) {
         if (Util.isNull(handle, renderer)) throw new NullPointerException();
         hostPlugins.put(handle, renderer);
     }
@@ -277,8 +278,8 @@ public abstract class UIRenderer {
      *
      * @return Host Plugins
      */
-    public static Map<String, Renderer> getHostPlugins() {
-        return new HashMap<String, Renderer>(hostPlugins);
+    public static Map<String, PluginRenderer> getHostPlugins() {
+        return new HashMap<String, PluginRenderer>(hostPlugins);
     }
 
     /**
@@ -297,7 +298,7 @@ public abstract class UIRenderer {
      * @param handle Handle to bind
      * @param renderer Renderer
      */
-    public static void addSubServerPlugin(String handle, Renderer<SubServer> renderer) {
+    public static void addSubServerPlugin(String handle, PluginRenderer<SubServer> renderer) {
         if (Util.isNull(handle, renderer)) throw new NullPointerException();
         subserverPlugins.put(handle, renderer);
     }
@@ -307,8 +308,8 @@ public abstract class UIRenderer {
      *
      * @return SubServer Plugins
      */
-    public static Map<String, Renderer> getSubServerPlugins() {
-        return new HashMap<String, Renderer>(subserverPlugins);
+    public static Map<String, PluginRenderer> getSubServerPlugins() {
+        return new HashMap<String, PluginRenderer>(subserverPlugins);
     }
 
     /**

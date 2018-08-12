@@ -1,6 +1,6 @@
 package net.ME1312.SubServers.Client.Bukkit;
 
-import net.ME1312.SubServers.Client.Bukkit.Graphic.InternalUIHandler;
+import net.ME1312.SubServers.Client.Bukkit.Graphic.DefaultUIHandler;
 import net.ME1312.SubServers.Client.Bukkit.Graphic.UIHandler;
 import net.ME1312.SubServers.Client.Bukkit.Library.Config.YAMLConfig;
 import net.ME1312.SubServers.Client.Bukkit.Library.Config.YAMLSection;
@@ -78,7 +78,7 @@ public final class SubPlugin extends JavaPlugin {
             reload(false);
 
             if (config.get().getSection("Settings").getBoolean("Ingame-Access", true)) {
-                gui = new InternalUIHandler(this);
+                gui = new DefaultUIHandler(this);
                 SubCommand cmd = new SubCommand(this);
                 getCommand("subservers").setExecutor(cmd);
                 getCommand("subserver").setExecutor(cmd);

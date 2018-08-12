@@ -225,7 +225,7 @@ public final class SubCommand implements CommandExecutor {
                                             hover.append(Text.builder(server.getName() + '\n').color(TextColors.GRAY).build());
                                         }
                                         hover.append(
-                                                ChatColor.convertColor(plugin.api.getLang("SubServers","Interface.Server-Menu.Server-Player-Count").replace("$int$", new DecimalFormat("#,###").format(server.getPlayers().size())) + '\n')
+                                                ChatColor.convertColor(plugin.api.getLang("SubServers","Interface.Server-Menu.Server-Player-Count").replace("$int$", new DecimalFormat("#,###").format(server.getPlayers().size())))
                                         );
                                     } else if (((SubServer) server).isEnabled() && ((SubServer) server).getCurrentIncompatibilities().size() == 0) {
                                         message.color(TextColors.YELLOW);

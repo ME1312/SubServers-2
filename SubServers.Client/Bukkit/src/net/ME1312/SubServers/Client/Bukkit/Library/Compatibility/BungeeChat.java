@@ -112,7 +112,7 @@ public class BungeeChat {
                             }
                             hover.setColor(ChatColor.WHITE);
                             hoverm.add(hover);
-                            message.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, label + " open SubServer/ " + server));
+                            message.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, label + " open SubServer/ " + server.getName()));
                         } else {
                             message.setColor(ChatColor.WHITE);
                             hover.setColor(ChatColor.WHITE);
@@ -122,9 +122,9 @@ public class BungeeChat {
                                 hover.setColor(ChatColor.GRAY);
                             }
                             hoverm.add(hover);
-                            hover = new TextComponent(plugin.api.getLang("SubServers", "Interface.Server-Menu.Server-External"));
+                            hover = new TextComponent(plugin.api.getLang("SubServers", "Interface.Server-Menu.Server-External") + '\n');
                             hoverm.add(hover);
-                            hover = new TextComponent(plugin.api.getLang("SubServers", "Interface.Server-Menu.Server-Player-Count").replace("$int$", new DecimalFormat("#,###").format(server.getPlayers().size())) + '\n');
+                            hover = new TextComponent(plugin.api.getLang("SubServers", "Interface.Server-Menu.Server-Player-Count").replace("$int$", new DecimalFormat("#,###").format(server.getPlayers().size())));
                             hoverm.add(hover);
                             if (plugin.config.get().getSection("Settings").getBoolean("Show-Addresses", false)) {
                                 hover = new TextComponent('\n' + server.getAddress().getAddress().getHostAddress() + ':' + server.getAddress().getPort());
