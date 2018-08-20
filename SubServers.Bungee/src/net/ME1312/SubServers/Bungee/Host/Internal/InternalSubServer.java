@@ -149,6 +149,8 @@ public class InternalSubServer extends SubServerContainer {
 
         if (isTemporary()) {
             try {
+                if (host.plugin.config.get().getSection("Servers").getKeys().contains(getName()))
+                    host.plugin.config.get().getSection("Servers").remove(getName());
                 host.removeSubServer(getName());
             } catch (InterruptedException e) {
                 e.printStackTrace();
