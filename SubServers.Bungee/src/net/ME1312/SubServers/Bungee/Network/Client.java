@@ -1,10 +1,14 @@
 package net.ME1312.SubServers.Bungee.Network;
 
-import com.google.gson.JsonParseException;
 import net.ME1312.SubServers.Bungee.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Bungee.Library.Exception.IllegalPacketException;
 import net.ME1312.SubServers.Bungee.Library.Util;
 import net.ME1312.SubServers.Bungee.Network.Packet.PacketAuthorization;
+import org.msgpack.core.MessageInsufficientBufferException;
+import org.msgpack.core.MessagePack;
+import org.msgpack.core.MessagePacker;
+import org.msgpack.core.MessageUnpacker;
+import org.msgpack.value.Value;
 import org.yaml.snakeyaml.error.YAMLException;
 
 import java.io.*;
@@ -21,7 +25,7 @@ public class Client {
     private Socket socket;
     private InetSocketAddress address;
     private ClientHandler handler;
-    private PrintWriter writer;
+    private MessagePacker out;
     private Timer authorized;
     private SubDataServer subdata;
     boolean closed;
@@ -37,7 +41,7 @@ public class Client {
         this.subdata = subdata;
         closed = false;
         socket = client;
-        writer = new PrintWriter(client.getOutputStream(), true);
+        out = MessagePack.newDefaultPacker(client.getOutputStream());
         address = new InetSocketAddress(client.getInetAddress(), client.getPort());
         authorized = new Timer();
         authorized.schedule(new TimerTask() {
@@ -59,11 +63,11 @@ public class Client {
     private void loop() {
         new Thread(() -> {
             try {
-                BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                String input;
-                while ((input = in.readLine()) != null) {
+                MessageUnpacker in = MessagePack.newDefaultUnpacker(socket.getInputStream());
+                Value input;
+                while ((input = in.unpackValue()) != null) {
                     try {
-                        YAMLSection data = subdata.getCipher().decrypt(subdata.plugin.config.get().getSection("Settings").getSection("SubData").getRawString("Password"), Base64.getDecoder().decode(input));
+                        YAMLSection data = subdata.getCipher().decrypt(subdata.plugin.config.get().getSection("Settings").getSection("SubData").getRawString("Password"), input);
                         for (PacketIn packet : SubDataServer.decodePacket(this, data)) {
                             boolean auth = authorized == null;
                             if (auth || packet instanceof PacketAuthorization) {
@@ -73,18 +77,18 @@ public class Client {
                                             List<Client> clients = new ArrayList<Client>();
                                             clients.addAll(subdata.getClients());
                                             for (Client client : clients) {
-                                                client.writer.println(input);
+                                                client.out.packValue(input);
                                             }
                                         } else {
                                             Client client = subdata.getClient(data.getString("f"));
                                             if (client != null) {
-                                                client.writer.println(input);
+                                                client.out.packValue(input);
                                             } else {
                                                 throw new IllegalPacketException(getAddress().toString() + ": Unknown Forward Address: " + data.getString("f"));
                                             }
                                         }
                                     } else {
-                                        packet.execute(Client.this, (data.contains("c"))?data.getSection("c"):null);
+                                        packet.execute(Client.this, (data.contains("c")) ? data.getSection("c") : null);
                                     }
                                 } catch (Throwable e) {
                                     new InvocationTargetException(e, getAddress().toString() + ": Exception while executing PacketIn").printStackTrace();
@@ -94,7 +98,7 @@ public class Client {
                                 throw new IllegalPacketException(getAddress().toString() + ": Unauthorized call to packet type: " + data.getSection("h"));
                             }
                         }
-                    } catch (JsonParseException | YAMLException e) {
+                    } catch (YAMLException e) { // TODO
                         new IllegalPacketException(getAddress().toString() + ": Unknown Packet Format: " + input).printStackTrace();
                     } catch (IllegalPacketException e) {
                         e.printStackTrace();
@@ -108,7 +112,7 @@ public class Client {
                     e1.printStackTrace();
                 }
             } catch (Exception e) {
-                if (!(e instanceof SocketException)) e.printStackTrace();
+                if (!(e instanceof SocketException || e instanceof MessageInsufficientBufferException)) e.printStackTrace();
                 try {
                     subdata.removeClient(Client.this);
                 } catch (IOException e1) {
@@ -137,7 +141,8 @@ public class Client {
     public void sendPacket(PacketOut packet) {
         if (Util.isNull(packet)) throw new NullPointerException();
         try {
-            writer.println(Base64.getEncoder().encodeToString(subdata.getCipher().encrypt(subdata.plugin.config.get().getSection("Settings").getSection("SubData").getRawString("Password"), SubDataServer.encodePacket(this, packet))));
+            out.packValue(subdata.getCipher().encrypt(subdata.plugin.config.get().getSection("Settings").getSection("SubData").getRawString("Password"), SubDataServer.encodePacket(this, packet)));
+            out.flush();
         } catch (Throwable e) {
             e.printStackTrace();
         }

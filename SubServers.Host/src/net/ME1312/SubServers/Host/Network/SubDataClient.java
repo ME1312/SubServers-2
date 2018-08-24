@@ -14,6 +14,11 @@ import net.ME1312.SubServers.Host.SubAPI;
 import net.ME1312.SubServers.Host.ExHost;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.msgpack.core.MessageInsufficientBufferException;
+import org.msgpack.core.MessagePack;
+import org.msgpack.core.MessagePacker;
+import org.msgpack.core.MessageUnpacker;
+import org.msgpack.value.Value;
 import org.yaml.snakeyaml.error.YAMLException;
 
 import java.io.BufferedReader;
@@ -37,7 +42,7 @@ public final class SubDataClient {
     private static HashMap<String, Cipher> ciphers = new HashMap<String, Cipher>();
     private static boolean defaults = false;
     protected static Logger log;
-    private PrintWriter writer;
+    private MessagePacker out;
     private NamedContainer<Boolean, Socket> socket;
     private String name;
     private Cipher cipher;
@@ -59,7 +64,7 @@ public final class SubDataClient {
         socket = new NamedContainer<>(false, new Socket(address, port));
         this.host = host;
         this.name = name;
-        this.writer = new PrintWriter(socket.get().getOutputStream(), true);
+        this.out = MessagePack.newDefaultPacker(socket.get().getOutputStream());
         this.queue = new LinkedList<NamedContainer<String, PacketOut>>();
         this.cipher = (cipher != null)?cipher:new Cipher() {
             @Override
@@ -67,12 +72,13 @@ public final class SubDataClient {
                 return "NONE";
             }
             @Override
-            public byte[] encrypt(String key, YAMLSection data) throws Exception {
-                return data.toJSON().toString().getBytes(StandardCharsets.UTF_8);
+            public Value encrypt(String key, YAMLSection data) {
+                return data.msgPack();
             }
             @Override
-            public YAMLSection decrypt(String key, byte[] data) throws Exception {
-                return new YAMLSection(new JSONObject(new String(data, StandardCharsets.UTF_8)));
+            @SuppressWarnings("unchecked")
+            public YAMLSection decrypt(String key, Value data) {
+                return new YAMLSection(data.asMapValue());
             }
         };
 
@@ -155,11 +161,11 @@ public final class SubDataClient {
     private void loop() {
         new Thread(() -> {
             try {
-                BufferedReader in = new BufferedReader(new InputStreamReader(socket.get().getInputStream()));
-                String input;
-                while ((input = in.readLine()) != null) {
+                MessageUnpacker in = MessagePack.newDefaultUnpacker(socket.get().getInputStream());
+                Value input;
+                while ((input = in.unpackValue()) != null) {
                     try {
-                        YAMLSection data = cipher.decrypt(host.config.get().getSection("Settings").getSection("SubData").getRawString("Password"), Base64.getDecoder().decode(input));
+                        YAMLSection data = cipher.decrypt(host.config.get().getSection("Settings").getSection("SubData").getRawString("Password"), input);
                         for (PacketIn packet : decodePacket(data)) {
                             try {
                                 packet.execute((data.contains("c"))?data.getSection("c"):null);
@@ -181,7 +187,7 @@ public final class SubDataClient {
                     log.error.println(e1);
                 }
             } catch (Exception e) {
-                if (!(e instanceof SocketException)) log.error.println(e);
+                if (!(e instanceof SocketException || e instanceof MessageInsufficientBufferException)) log.error.println(e);
                 try {
                     destroy(host.config.get().getSection("Settings").getSection("SubData").getInt("Reconnect", 30));
                 } catch (IOException e1) {
@@ -344,7 +350,8 @@ public final class SubDataClient {
         try {
             YAMLSection data = encodePacket(packet.get());
             if (packet.name() != null) data.set("f", packet.name());
-            writer.println(Base64.getEncoder().encodeToString(cipher.encrypt(host.config.get().getSection("Settings").getSection("SubData").getRawString("Password"), data)));
+            out.packValue(getCipher().encrypt(host.config.get().getSection("Settings").getSection("SubData").getRawString("Password"), data));
+            out.flush();
         } catch (Throwable e) {
             log.error.println(e);
         }

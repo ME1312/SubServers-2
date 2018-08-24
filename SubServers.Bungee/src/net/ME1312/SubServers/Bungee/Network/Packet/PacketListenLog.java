@@ -53,7 +53,7 @@ public class PacketListenLog implements PacketIn, PacketOut {
     @Override
     public YAMLSection generate() {
         YAMLSection add = new YAMLSection();
-        add.set("id", id);
+        if (id != null) add.set("id", id);
         LinkedList<String> lines = new LinkedList<String>();
         for (SubLogger.LogMessage line : this.lines) lines.add(new SimpleDateFormat("hh:mm:ss").format(line.getDate()) + " [" + line.getLevel().getLocalizedName() + "] " + line.getMessage());
         add.set("lines", lines);

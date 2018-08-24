@@ -45,7 +45,7 @@ public class PacketDownloadPlayerList implements PacketIn, PacketOut {
     @SuppressWarnings("unchecked")
     public YAMLSection generate() {
         YAMLSection data = new YAMLSection();
-        data.set("id", id);
+        if (id != null) data.set("id", id);
         YAMLSection players = new YAMLSection();
         for (NamedContainer<String, UUID> player : plugin.api.getGlobalPlayers()) {
             YAMLSection pinfo = new YAMLSection();

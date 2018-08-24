@@ -2,6 +2,10 @@ package net.ME1312.SubServers.Sync.Network.Encryption;
 
 import com.google.gson.Gson;
 import net.ME1312.SubServers.Sync.Library.Config.YAMLSection;
+import org.msgpack.core.MessagePack;
+import org.msgpack.core.MessagePacker;
+import org.msgpack.value.Value;
+import org.msgpack.value.ValueFactory;
 
 import javax.crypto.*;
 import javax.crypto.spec.IvParameterSpec;
@@ -180,10 +184,15 @@ public final class AES implements net.ME1312.SubServers.Sync.Network.Cipher {
      * @param data Data to Encrypt
      * @return Encrypted Data Array
      */
-    public byte[] encrypt(String key, YAMLSection data) throws Exception {
-        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-        encrypt(keyLength, key, new ByteArrayInputStream(data.toJSON().getBytes(StandardCharsets.UTF_8)), bytes);
-        return bytes.toByteArray();
+    public Value encrypt(String key, YAMLSection data) throws Exception {
+        ByteArrayOutputStream unencrypted = new ByteArrayOutputStream();
+        MessagePacker packer = MessagePack.newDefaultPacker(unencrypted);
+        packer.packValue(data.msgPack());
+        packer.close();
+
+        ByteArrayOutputStream encrypted = new ByteArrayOutputStream();
+        encrypt(keyLength, key, new ByteArrayInputStream(unencrypted.toByteArray()), encrypted);
+        return ValueFactory.newBinary(encrypted.toByteArray());
     }
 
     public String getName() {
@@ -271,10 +280,10 @@ public final class AES implements net.ME1312.SubServers.Sync.Network.Cipher {
      * @return JSON Data
      */
     @SuppressWarnings("unchecked")
-    public YAMLSection decrypt(String key, byte[] data) throws Exception {
+    public YAMLSection decrypt(String key, Value data) throws Exception {
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-        decrypt(key, new ByteArrayInputStream(data), bytes);
-        return new YAMLSection(new Gson().fromJson(new String(bytes.toByteArray(), StandardCharsets.UTF_8), Map.class));
+        decrypt(key, new ByteArrayInputStream(data.asBinaryValue().asByteArray()), bytes);
+        return new YAMLSection(MessagePack.newDefaultUnpacker(bytes.toByteArray()).unpackValue().asMapValue());
     }
 
     /**

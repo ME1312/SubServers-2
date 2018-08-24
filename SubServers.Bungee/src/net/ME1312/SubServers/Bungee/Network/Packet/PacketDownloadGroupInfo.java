@@ -52,7 +52,7 @@ public class PacketDownloadGroupInfo implements PacketIn, PacketOut {
     @Override
     public YAMLSection generate() {
         YAMLSection data = new YAMLSection();
-        data.set("id", id);
+        if (id != null) data.set("id", id);
 
         YAMLSection groups = new YAMLSection();
         for (String group : plugin.api.getGroups().keySet()) {

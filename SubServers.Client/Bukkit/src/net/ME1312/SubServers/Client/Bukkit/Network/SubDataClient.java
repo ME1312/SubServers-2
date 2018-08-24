@@ -11,6 +11,11 @@ import net.ME1312.SubServers.Client.Bukkit.Network.Encryption.AES;
 import net.ME1312.SubServers.Client.Bukkit.Network.Packet.*;
 import net.ME1312.SubServers.Client.Bukkit.SubPlugin;
 import org.bukkit.Bukkit;
+import org.msgpack.core.MessageInsufficientBufferException;
+import org.msgpack.core.MessagePack;
+import org.msgpack.core.MessagePacker;
+import org.msgpack.core.MessageUnpacker;
+import org.msgpack.value.Value;
 import org.yaml.snakeyaml.error.YAMLException;
 
 import java.io.*;
@@ -29,7 +34,7 @@ public final class SubDataClient {
     private static HashMap<String, HashMap<String, List<PacketIn>>> pIn = new HashMap<String, HashMap<String, List<PacketIn>>>();
     private static HashMap<String, Cipher> ciphers = new HashMap<String, Cipher>();
     private static boolean defaults = false;
-    private PrintWriter writer;
+    private MessagePacker out;
     private NamedContainer<Boolean, Socket> socket;
     private String name;
     private Cipher cipher;
@@ -51,7 +56,7 @@ public final class SubDataClient {
         socket = new NamedContainer<>(false, new Socket(address, port));
         this.plugin = plugin;
         this.name = name;
-        this.writer = new PrintWriter(socket.get().getOutputStream(), true);
+        this.out = MessagePack.newDefaultPacker(socket.get().getOutputStream());
         this.queue = new LinkedList<NamedContainer<String, PacketOut>>();
         this.cipher = (cipher != null)?cipher:new Cipher() {
             @Override
@@ -59,13 +64,13 @@ public final class SubDataClient {
                 return "NONE";
             }
             @Override
-            public byte[] encrypt(String key, YAMLSection data) {
-                return data.toJSON().getBytes(StandardCharsets.UTF_8);
+            public Value encrypt(String key, YAMLSection data) {
+                return data.msgPack();
             }
             @Override
             @SuppressWarnings("unchecked")
-            public YAMLSection decrypt(String key, byte[] data) throws Exception {
-                return new YAMLSection(plugin.parseJSON(new String(data, StandardCharsets.UTF_8)));
+            public YAMLSection decrypt(String key, Value data) {
+                return new YAMLSection(data.asMapValue());
             }
         };
 
@@ -130,11 +135,11 @@ public final class SubDataClient {
     private void loop() {
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
             try {
-                BufferedReader in = new BufferedReader(new InputStreamReader(socket.get().getInputStream()));
-                String input;
-                while ((input = in.readLine()) != null) {
+                MessageUnpacker in = MessagePack.newDefaultUnpacker(socket.get().getInputStream());
+                Value input;
+                while ((input = in.unpackValue()) != null) {
                     try {
-                        YAMLSection data = cipher.decrypt(plugin.config.get().getSection("Settings").getSection("SubData").getRawString("Password"), Base64.getDecoder().decode(input));
+                        YAMLSection data = cipher.decrypt(plugin.config.get().getSection("Settings").getSection("SubData").getRawString("Password"), input);
                         for (PacketIn packet : decodePacket(data)) {
                             if (plugin.isEnabled()) Bukkit.getScheduler().runTask(plugin, () -> {
                                 try {
@@ -144,16 +149,12 @@ public final class SubDataClient {
                                 }
                             });
                         }
+                    } catch (YAMLException e) {
+                        new IllegalPacketException("Unknown Packet Format: " + input).printStackTrace();
                     } catch (IllegalPacketException e) {
                         e.printStackTrace();
                     } catch (Exception e) {
-                        Class<?> gsone = Class.forName(((Util.getDespiteException(() -> Class.forName("com.google.gson.JsonParseException") != null, false)?"":"org.bukkit.craftbukkit.libs.")) + "com.google.gson.JsonParseException");
-                        //Class<?> gsone = com.google.gson.JsonParseException.class;
-                        if (e instanceof YAMLException || gsone.isInstance(e)) {
-                            new IllegalPacketException("Unknown Packet Format: " + input).printStackTrace();
-                        } else {
-                            new InvocationTargetException(e, "Exception while decoding packet").printStackTrace();
-                        }
+                        new InvocationTargetException(e, "Exception while decoding packet").printStackTrace();
                     }
                 }
                 try {
@@ -162,7 +163,7 @@ public final class SubDataClient {
                     e1.printStackTrace();
                 }
             } catch (Exception e) {
-                if (!(e instanceof SocketException)) e.printStackTrace();
+                if (!(e instanceof SocketException || e instanceof MessageInsufficientBufferException)) e.printStackTrace();
                 try {
                     destroy(plugin.config.get().getSection("Settings").getSection("SubData").getInt("Reconnect", 30));
                 } catch (IOException e1) {
@@ -325,7 +326,8 @@ public final class SubDataClient {
         try {
             YAMLSection data = encodePacket(packet.get());
             if (packet.name() != null) data.set("f", packet.name());
-            writer.println(Base64.getEncoder().encodeToString(cipher.encrypt(plugin.config.get().getSection("Settings").getSection("SubData").getRawString("Password"), data)));
+            out.packValue(getCipher().encrypt(plugin.config.get().getSection("Settings").getSection("SubData").getRawString("Password"), data));
+            out.flush();
         } catch (Throwable e) {
             e.printStackTrace();
         }

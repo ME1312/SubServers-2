@@ -48,7 +48,7 @@ public class PacketDownloadHostInfo implements PacketIn, PacketOut {
     @Override
     public YAMLSection generate() {
         YAMLSection data = new YAMLSection();
-        data.set("id", id);
+        if (id != null) data.set("id", id);
 
         YAMLSection hosts = new YAMLSection();
         for (Host host : plugin.api.getHosts().values()) {

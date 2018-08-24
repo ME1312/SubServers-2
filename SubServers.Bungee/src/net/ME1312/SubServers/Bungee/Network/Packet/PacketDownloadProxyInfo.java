@@ -50,7 +50,7 @@ public class PacketDownloadProxyInfo implements PacketIn, PacketOut {
     @Override
     public YAMLSection generate() {
         YAMLSection data = new YAMLSection();
-        data.set("id", id);
+        if (id != null) data.set("id", id);
 
         YAMLSection proxies = new YAMLSection();
         for (Proxy proxy : plugin.api.getProxies().values()) {

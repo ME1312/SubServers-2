@@ -41,7 +41,7 @@ public class PacketExRemoveServer implements PacketIn, PacketOut {
     @Override
     public YAMLSection generate() {
         YAMLSection data = new YAMLSection();
-        data.set("id", id);
+        if (id != null) data.set("id", id);
         data.set("server", name);
         return data;
     }

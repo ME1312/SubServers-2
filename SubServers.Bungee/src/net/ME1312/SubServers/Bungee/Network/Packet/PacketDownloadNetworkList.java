@@ -45,7 +45,7 @@ public class PacketDownloadNetworkList implements PacketIn, PacketOut {
     @Override
     public YAMLSection generate() {
         YAMLSection json = new YAMLSection();
-        json.set("id", id);
+        if (id != null) json.set("id", id);
         YAMLSection clients = new YAMLSection();
         for (Client client : plugin.subdata.getClients()) {
             try {

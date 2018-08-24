@@ -2,6 +2,9 @@ package net.ME1312.SubServers.Bungee.Library.Config;
 
 import com.google.gson.Gson;
 import net.ME1312.SubServers.Bungee.Library.Util;
+import org.msgpack.value.MapValue;
+import org.msgpack.value.Value;
+import org.msgpack.value.ValueFactory;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.error.YAMLException;
 
@@ -73,6 +76,28 @@ public class YAMLSection {
         setAll(map);
     }
 
+    /**
+     * Creates a YAML Section from Message Pack Contents
+     *
+     * @param msgpack MessagePack Map
+     */
+    public YAMLSection(MapValue msgpack) {
+        if (Util.isNull(msgpack)) throw new NullPointerException();
+        this.map = new LinkedHashMap<>();
+        this.yaml = new Yaml(YAMLConfig.getDumperOptions());
+
+        boolean warned = false;
+        Map<Value, Value> map = msgpack.map();
+        for (Value key : map.keySet()) {
+            if (key.isStringValue()) {
+                set(key.asStringValue().asString(), map.get(key));
+            } else if (!warned) {
+                new IllegalStateException("MessagePack contains non-string key(s)").printStackTrace();
+                warned = true;
+            }
+        }
+    }
+
     protected YAMLSection(Map<String, ?> map, YAMLSection up, String handle, Yaml yaml) {
         this.map = new LinkedHashMap<String, Object>();
         this.yaml = yaml;
@@ -127,8 +152,43 @@ public class YAMLSection {
     }
 
     private Object convert(Object value) {
+        if (value instanceof Value) {
+            if (((Value) value).isNilValue()) {
+                value = null;
+            } else if (((Value) value).isMapValue()) {
+                value = new YAMLSection(((Value) value).asMapValue());
+            } else if (((Value) value).isArrayValue()) {
+                value = ((Value) value).asArrayValue().list();
+            } else if (((Value) value).isBinaryValue()) {
+                value = ((Value) value).asBinaryValue().asByteArray();
+            } else if (((Value) value).isBooleanValue()) {
+                value = ((Value) value).asBooleanValue().getBoolean();
+            } else if (((Value) value).isFloatValue()) {
+                if (((Value) value).asFloatValue().toDouble() == (double)(float) ((Value) value).asFloatValue().toDouble()) {
+                    value = ((Value) value).asFloatValue().toFloat();
+                } else {
+                    value = ((Value) value).asFloatValue().toDouble();
+                }
+            } else if (((Value) value).isIntegerValue()) {
+                if (((Value) value).asIntegerValue().isInByteRange()) {
+                    value = ((Value) value).asIntegerValue().asByte();
+                } else if (((Value) value).asIntegerValue().isInShortRange()) {
+                    value = ((Value) value).asIntegerValue().asShort();
+                } else if (((Value) value).asIntegerValue().isInIntRange()) {
+                    value = ((Value) value).asIntegerValue().asInt();
+                } else if (((Value) value).asIntegerValue().isInLongRange()) {
+                    value = ((Value) value).asIntegerValue().asLong();
+                } else {
+                    value = ((Value) value).asIntegerValue().asBigInteger();
+                }
+            } else if (((Value) value).isStringValue()) {
+                value = ((Value) value).asStringValue().asString();
+            }
+        }
 
-        if (value instanceof Map) {
+        if (value == null) {
+            return null;
+        } else if (value instanceof Map) {
             List<String> list = new ArrayList<String>();
             list.addAll(((Map<String, Object>) value).keySet());
             for (String key : list) ((Map<String, Object>) value).put(key, convert(((Map<String, Object>) value).get(key)));
@@ -166,18 +226,10 @@ public class YAMLSection {
      */
     public void set(String handle, Object value) {
         if (Util.isNull(handle)) throw new NullPointerException();
-        if (value == null) {
-            remove(handle);
-        } else if (value instanceof Collection) {
-            set(handle, (Collection<?>) value);
-        } else if (value.getClass().isArray()) {
-            set(handle, (Object[]) value);
-        } else {
-            map.put(handle, convert(value));
+        map.put(handle, convert(value));
 
-            if (this.handle != null && this.up != null) {
-                this.up.set(this.handle, this);
-            }
+        if (this.handle != null && this.up != null) {
+            this.up.set(this.handle, this);
         }
     }
 
@@ -190,62 +242,6 @@ public class YAMLSection {
     public void safeSet(String handle, Object value) {
         if (Util.isNull(handle)) throw new NullPointerException();
         if (!contains(handle)) set(handle, value);
-    }
-
-    /**
-     * Set V[] into this YAML Section
-     *
-     * @param handle Handle
-     * @param array Value
-     * @param <V> Array Type
-     */
-    public <V> void set(String handle, V[] array) {
-        if (Util.isNull(handle, array)) throw new NullPointerException();
-        List<Object> values = new LinkedList<Object>();
-        for (V value : array) {
-            values.add(convert(value));
-        }
-        map.put(handle, values);
-
-        if (this.handle != null && this.up != null) {
-            this.up.set(this.handle, this);
-        }
-    }
-
-    /**
-     * Set V[] into this YAML Section without overwriting existing value
-     *
-     * @param handle Handle
-     * @param array Value
-     * @param <V> Array Type
-     */
-    public <V> void safeSet(String handle, V[] array) {
-        if (Util.isNull(handle)) throw new NullPointerException();
-        if (!contains(handle)) set(handle, array);
-    }
-
-    /**
-     * Set Collection&lt;V&gt; into this YAML Section
-     *
-     * @param handle Handle
-     * @param list Value
-     * @param <V> Collection Type
-     */
-    public <V> void set(String handle, Collection<V> list) {
-        if (Util.isNull(handle, list)) throw new NullPointerException();
-        set(handle, list.toArray());
-    }
-
-    /**
-     * Set Collection&lt;V&gt; into this YAML Section without overwriting existing value
-     *
-     * @param handle Handle
-     * @param list Value
-     * @param <V> Collection Type
-     */
-    public <V> void safeSet(String handle, Collection<V> list) {
-        if (Util.isNull(handle)) throw new NullPointerException();
-        if (!contains(handle)) set(handle, list);
     }
 
     /**
@@ -1055,5 +1051,48 @@ public class YAMLSection {
      */
     public String toJSON() {
         return new Gson().toJson(get(), Map.class);
+    }
+
+    private Value msgPack(Object value) {
+        if (value == null) {
+            return ValueFactory.newNil();
+        } else if (value instanceof Value) {
+            return (Value) value;
+        } else if (value instanceof Map) {
+            ValueFactory.MapBuilder map = ValueFactory.newMapBuilder();
+            for (String key : ((Map<String, ?>) value).keySet()) {
+                Value v = msgPack(((Map<String, ?>) value).get(key));
+                if (v != null) map.put(ValueFactory.newString(key), v);
+            }
+            return map.build();
+        } else if (value instanceof Collection) {
+            LinkedList<Value> values = new LinkedList<Value>();
+            for (Object object : (Collection<?>) value) {
+                Value v = msgPack(object);
+                if (v != null) values.add(v);
+            }
+            return ValueFactory.newArray(values);
+        } else if (value instanceof Boolean) {
+            return ValueFactory.newBoolean((boolean) value);
+        } else if (value instanceof Number) {
+            if (((Number) value).doubleValue() == (double)(int) ((Number) value).doubleValue()) {
+                return ValueFactory.newInteger(((Number) value).longValue());
+            } else {
+                return ValueFactory.newFloat(((Number) value).doubleValue());
+            }
+        } else if (value instanceof String) {
+            return ValueFactory.newString((String) value);
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Convert to a MessagePack Map
+     *
+     * @return MessagePack Map
+     */
+    public MapValue msgPack() {
+        return (MapValue) msgPack(get());
     }
 }

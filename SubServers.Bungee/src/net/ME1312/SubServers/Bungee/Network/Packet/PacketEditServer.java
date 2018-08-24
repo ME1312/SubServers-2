@@ -46,7 +46,7 @@ public class PacketEditServer implements PacketIn, PacketOut {
     @Override
     public YAMLSection generate() {
         YAMLSection json = new YAMLSection();
-        json.set("id", id);
+        if (id != null) json.set("id", id);
         json.set("r", response);
         return json;
     }

@@ -49,7 +49,7 @@ public class PacketCommandServer implements PacketIn, PacketOut {
     @Override
     public YAMLSection generate() {
         YAMLSection data = new YAMLSection();
-        data.set("id", id);
+        if (id != null) data.set("id", id);
         data.set("r", response);
         data.set("m", message);
         return data;

@@ -41,7 +41,7 @@ public class PacketDownloadGroupInfo implements PacketIn, PacketOut {
     public YAMLSection generate() {
         YAMLSection json = new YAMLSection();
         json.set("id", id);
-        json.set("group", group);
+        if (group != null) json.set("group", group);
         return json;
     }
 

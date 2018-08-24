@@ -41,7 +41,7 @@ public class PacketDownloadServerInfo implements PacketIn, PacketOut {
     public YAMLSection generate() {
         YAMLSection json = new YAMLSection();
         json.set("id", id);
-        json.set("server", server);
+        if (server != null) json.set("server", server);
         return json;
     }
 

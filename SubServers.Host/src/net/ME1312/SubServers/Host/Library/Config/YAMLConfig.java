@@ -100,15 +100,6 @@ public class YAMLConfig {
         return yaml.dump(config.map);
     }
 
-    /**
-     * Converts Config Contents to JSON
-     *
-     * @return JSON Formatted Config Contents
-     */
-    public JSONObject toJSON() {
-        return new JSONObject(config.map);
-    }
-
     protected static DumperOptions getDumperOptions() {
         DumperOptions options = new DumperOptions();
         options.setAllowUnicode(true);

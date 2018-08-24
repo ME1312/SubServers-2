@@ -41,7 +41,7 @@ public class PacketDownloadProxyInfo implements PacketIn, PacketOut {
     public YAMLSection generate() {
         YAMLSection json = new YAMLSection();
         json.set("id", id);
-        json.set("proxy", proxy);
+        if (proxy != null) json.set("proxy", proxy);
         return json;
     }
 

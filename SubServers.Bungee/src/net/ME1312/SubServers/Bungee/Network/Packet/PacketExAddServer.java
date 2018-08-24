@@ -57,7 +57,7 @@ public class PacketExAddServer implements PacketIn, PacketOut {
     @Override
     public YAMLSection generate() {
         YAMLSection data = new YAMLSection();
-        data.set("id", id);
+        if (id != null) data.set("id", id);
         YAMLSection server = new YAMLSection();
         server.set("name", name);
         server.set("enabled", enabled);

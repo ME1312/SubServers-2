@@ -40,7 +40,7 @@ public class PacketDownloadLang implements PacketIn, PacketOut {
     @Override
     public YAMLSection generate() {
         YAMLSection data = new YAMLSection();
-        data.set("id", id);
+        if (id != null) data.set("id", id);
         LinkedHashMap<String, Map<String, String>> full = new LinkedHashMap<>();
         for (String channel : plugin.api.getLangChannels())
             full.put(channel, plugin.api.getLang(channel));

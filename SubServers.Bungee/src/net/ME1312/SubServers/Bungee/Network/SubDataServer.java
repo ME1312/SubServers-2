@@ -11,6 +11,9 @@ import net.ME1312.SubServers.Bungee.Library.Version.Version;
 import net.ME1312.SubServers.Bungee.Network.Encryption.AES;
 import net.ME1312.SubServers.Bungee.Network.Packet.*;
 import net.ME1312.SubServers.Bungee.SubPlugin;
+import org.msgpack.core.MessagePack;
+import org.msgpack.value.Value;
+import org.msgpack.value.ValueFactory;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -60,13 +63,13 @@ public final class SubDataServer {
                 return "NONE";
             }
             @Override
-            public byte[] encrypt(String key, YAMLSection data) {
-                return data.toJSON().getBytes(StandardCharsets.UTF_8);
+            public Value encrypt(String key, YAMLSection data) {
+                return data.msgPack();
             }
             @Override
             @SuppressWarnings("unchecked")
-            public YAMLSection decrypt(String key, byte[] data) {
-                return new YAMLSection(new Gson().fromJson(new String(data, StandardCharsets.UTF_8), Map.class));
+            public YAMLSection decrypt(String key, Value data) {
+                return new YAMLSection(data.asMapValue());
             }
         };
 

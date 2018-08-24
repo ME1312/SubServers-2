@@ -50,7 +50,7 @@ public class PacketDownloadServerInfo implements PacketIn, PacketOut {
     @Override
     public YAMLSection generate() {
         YAMLSection data = new YAMLSection();
-        data.set("id", id);
+        if (id != null) data.set("id", id);
 
         YAMLSection servers = new YAMLSection();
         for (Server server : plugin.api.getServers().values()) {

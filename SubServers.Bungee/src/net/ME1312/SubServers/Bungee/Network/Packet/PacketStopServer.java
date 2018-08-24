@@ -49,7 +49,7 @@ public class PacketStopServer implements PacketIn, PacketOut {
     @Override
     public YAMLSection generate() {
         YAMLSection json = new YAMLSection();
-        json.set("id", id);
+        if (id != null) json.set("id", id);
         json.set("r", response);
         json.set("m", message);
         return json;
