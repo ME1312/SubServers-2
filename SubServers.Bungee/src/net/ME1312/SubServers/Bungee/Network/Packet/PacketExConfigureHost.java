@@ -9,9 +9,9 @@ import net.ME1312.SubServers.Bungee.Network.Client;
 import net.ME1312.SubServers.Bungee.Network.PacketIn;
 import net.ME1312.SubServers.Bungee.Network.PacketOut;
 import net.ME1312.SubServers.Bungee.SubPlugin;
+import org.msgpack.value.ValueFactory;
 
 import java.io.*;
-import java.util.Base64;
 
 /**
  * External Host Configuration Packet
@@ -48,7 +48,7 @@ public class PacketExConfigureHost implements PacketIn, PacketOut {
                 tinfo.set("icon", template.getIcon());
                 ByteArrayOutputStream bytes = new ByteArrayOutputStream();
                 Util.zip(template.getDirectory(), bytes);
-                tinfo.set("files", Base64.getEncoder().encodeToString(bytes.toByteArray()));
+                tinfo.set("files", ValueFactory.newBinary(bytes.toByteArray(), true));
                 tinfo.set("build", template.getBuildOptions().clone());
                 tinfo.set("settings", template.getConfigOptions().clone());
                 templates.set(template.getName(), tinfo);

@@ -10,10 +10,10 @@ import net.ME1312.SubServers.Host.Network.PacketIn;
 import net.ME1312.SubServers.Host.Network.PacketOut;
 import net.ME1312.SubServers.Host.Network.SubDataClient;
 import net.ME1312.SubServers.Host.ExHost;
+import org.msgpack.value.Value;
 
 import java.io.ByteArrayInputStream;
 import java.lang.reflect.Field;
-import java.util.Base64;
 
 /**
  * External Host Configuration Packet
@@ -57,7 +57,7 @@ public class PacketExConfigureHost implements PacketIn, PacketOut {
             try {
                 UniversalFile dir = new UniversalFile(templates, name);
                 dir.mkdirs();
-                Util.unzip(new ByteArrayInputStream(Base64.getDecoder().decode(data.getSection("templates").getSection(name).getRawString("files"))), dir);
+                Util.unzip(new ByteArrayInputStream(((Value) data.getSection("templates").getSection(name).getObject("files")).asBinaryValue().asByteArray()), dir);
                 SubCreator.ServerTemplate template = new SubCreator.ServerTemplate(name, data.getSection("templates").getSection(name).getBoolean("enabled"), data.getSection("templates").getSection(name).getRawString("icon"), dir,
                         data.getSection("templates").getSection(name).getSection("build").clone(), data.getSection("templates").getSection(name).getSection("settings").clone());
                 host.templates.put(name.toLowerCase(), template);

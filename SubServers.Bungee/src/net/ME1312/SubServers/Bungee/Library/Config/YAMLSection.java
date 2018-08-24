@@ -159,8 +159,6 @@ public class YAMLSection {
                 value = new YAMLSection(((Value) value).asMapValue());
             } else if (((Value) value).isArrayValue()) {
                 value = ((Value) value).asArrayValue().list();
-            } else if (((Value) value).isBinaryValue()) {
-                value = ((Value) value).asBinaryValue().asByteArray();
             } else if (((Value) value).isBooleanValue()) {
                 value = ((Value) value).asBooleanValue().getBoolean();
             } else if (((Value) value).isFloatValue()) {

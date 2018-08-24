@@ -192,7 +192,7 @@ public final class AES implements net.ME1312.SubServers.Host.Network.Cipher {
 
         ByteArrayOutputStream encrypted = new ByteArrayOutputStream();
         encrypt(keyLength, key, new ByteArrayInputStream(unencrypted.toByteArray()), encrypted);
-        return ValueFactory.newBinary(encrypted.toByteArray());
+        return ValueFactory.newBinary(encrypted.toByteArray(), true);
     }
 
     public String getName() {
