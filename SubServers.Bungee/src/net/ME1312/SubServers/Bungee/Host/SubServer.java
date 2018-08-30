@@ -9,6 +9,22 @@ import java.util.*;
  * SubServer Interface
  */
 public interface SubServer extends Server {
+
+    /**
+     * SubServer Stop Action Class
+     */
+    enum StopAction {
+        NONE,
+        RESTART,
+        REMOVE_SERVER,
+        DELETE_SERVER;
+
+        @Override
+        public String toString() {
+            return super.toString().substring(0, 1).toUpperCase()+super.toString().substring(1).toLowerCase().replace('_', ' ');
+        }
+    }
+
     /**
      * Command Storage Class
      */
@@ -153,7 +169,9 @@ public interface SubServer extends Server {
      * @param edit Edits
      * @return Success Status
      */
-    int edit(UUID player, YAMLSection edit);
+    default int edit(UUID player, YAMLSection edit) {
+        return -1;
+    }
 
     /**
      * Edits the Server
@@ -161,7 +179,9 @@ public interface SubServer extends Server {
      * @param edit Edits
      * @return Success Status
      */
-    int edit(YAMLSection edit);
+    default int edit(YAMLSection edit) {
+        return -1;
+    }
 
     /**
      * Waits for the Server to Stop
@@ -205,16 +225,9 @@ public interface SubServer extends Server {
      * @see #edit(UUID, YAMLSection)
      * @return Edit Status
      */
-    boolean isEditable();
-
-    /**
-     * Set if the Server should accept requests to edit()
-     *
-     * @param value Edit Status
-     * @see #edit(YAMLSection)
-     * @see #edit(UUID, YAMLSection)
-     */
-    void setEditable(boolean value);
+    default boolean isEditable() {
+        return edit(new YAMLSection()) >= 0;
+    }
 
     /**
      * If the Server is Logging
@@ -278,18 +291,18 @@ public interface SubServer extends Server {
     void setStopCommand(String value);
 
     /**
-     * If the Server will Auto Restart on unexpected shutdowns
+     * Get the action the Server will take when it stops
      *
-     * @return Auto Restart Status
+     * @return Stop Action
      */
-    boolean willAutoRestart();
+    StopAction getStopAction();
 
     /**
-     * Set if the Server will Auto Restart on unexpected shutdowns
+     * Set the action the Server will take when it stops
      *
-     * @param value Value
+     * @param action Stop Action
      */
-    void setAutoRestart(boolean value);
+    void setStopAction(StopAction action);
 
     /**
      * Toggles compatibility with other Servers
@@ -311,7 +324,7 @@ public interface SubServer extends Server {
      *
      * @return Incompatibility List
      */
-    List<SubServer> getIncompatibilities() ;
+    List<SubServer> getIncompatibilities();
 
     /**
      * Get incompatibility issues this server currently has
@@ -319,18 +332,4 @@ public interface SubServer extends Server {
      * @return Current Incompatibility List
      */
     List<SubServer> getCurrentIncompatibilities();
-
-    /**
-     * If the Server is Temporary
-     *
-     * @return Temporary Status
-     */
-    boolean isTemporary();
-
-    /**
-     * Set If the Server is Temporary (will start server if not running)
-     *
-     * @param value Value
-     */
-    void setTemporary(boolean value);
 }

@@ -416,8 +416,9 @@ public final class SubPlugin extends BungeeCord implements Listener {
                         edits.set("exec", config.get().getSection("Servers").getSection(name).getRawString("Executable"));
                     if (!config.get().getSection("Servers").getSection(name).getRawString("Stop-Command").equals(server.getStopCommand()))
                         edits.set("stop-cmd", config.get().getSection("Servers").getSection(name).getRawString("Stop-Command"));
-                    if (config.get().getSection("Servers").getSection(name).getBoolean("Auto-Restart") != server.willAutoRestart())
-                        edits.set("auto-restart", config.get().getSection("Servers").getSection(name).getBoolean("Auto-Restart"));
+                    SubServer.StopAction action = Util.getDespiteException(() -> SubServer.StopAction.valueOf(config.get().getSection("Servers").getSection(name).getRawString("Stop-Action", "NONE").toUpperCase().replace('-', '_').replace(' ', '_')), null);
+                    if (action != null && action != server.getStopAction())
+                        edits.set("stop-action", action.toString());
                     if (config.get().getSection("Servers").getSection(name).getBoolean("Restricted") != server.isRestricted())
                         edits.set("restricted", config.get().getSection("Servers").getSection(name).getBoolean("Restricted"));
                     if (config.get().getSection("Servers").getSection(name).getBoolean("Hidden") != server.isHidden())
@@ -439,7 +440,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
                             server = this.hosts.get(config.get().getSection("Servers").getSection(name).getString("Host").toLowerCase()).addSubServer(name, config.get().getSection("Servers").getSection(name).getBoolean("Enabled"),
                                     config.get().getSection("Servers").getSection(name).getInt("Port"), config.get().getSection("Servers").getSection(name).getColoredString("Motd", '&'), config.get().getSection("Servers").getSection(name).getBoolean("Log"),
                                     config.get().getSection("Servers").getSection(name).getRawString("Directory"), new Executable(config.get().getSection("Servers").getSection(name).getRawString("Executable")), config.get().getSection("Servers").getSection(name).getRawString("Stop-Command"),
-                                    config.get().getSection("Servers").getSection(name).getBoolean("Hidden"), config.get().getSection("Servers").getSection(name).getBoolean("Restricted"), false);
+                                    config.get().getSection("Servers").getSection(name).getBoolean("Hidden"), config.get().getSection("Servers").getSection(name).getBoolean("Restricted"));
                     } else { // Server doesn't need to reset
                         if (config.get().getSection("Servers").getSection(name).getBoolean("Enabled") != server.isEnabled())
                             server.setEnabled(config.get().getSection("Servers").getSection(name).getBoolean("Enabled"));
@@ -454,8 +455,9 @@ public final class SubPlugin extends BungeeCord implements Listener {
                         if (config.get().getSection("Servers").getSection(name).getBoolean("Hidden") != server.isHidden())
                             server.setHidden(config.get().getSection("Servers").getSection(name).getBoolean("Hidden"));
                     } // Apply these changes regardless of reset
-                    if (config.get().getSection("Servers").getSection(name).getBoolean("Auto-Restart") != server.willAutoRestart())
-                        server.setAutoRestart(config.get().getSection("Servers").getSection(name).getBoolean("Auto-Restart"));
+                    SubServer.StopAction action = Util.getDespiteException(() -> SubServer.StopAction.valueOf(config.get().getSection("Servers").getSection(name).getRawString("Stop-Action", "NONE").toUpperCase().replace('-', '_').replace(' ', '_')), null);
+                    if (action != null && action != server.getStopAction())
+                        server.setStopAction(action);
                     if (!status && config.get().getSection("Servers").getSection(name).getBoolean("Run-On-Launch"))
                         autorun.add(name.toLowerCase());
                     if (config.get().getSection("Servers").getSection(name).getKeys().contains("Display") && ((config.get().getSection("Servers").getSection(name).getRawString("Display").length() == 0 && !server.getDisplayName().equals(server.getName())) || !config.get().getSection("Servers").getSection(name).getRawString("Display").equals(server.getDisplayName())))
@@ -465,7 +467,6 @@ public final class SubPlugin extends BungeeCord implements Listener {
                         for (String group : config.get().getSection("Servers").getSection(name).getStringList("Group")) server.addGroup(group);
                     }
                 } // Apply these changes regardless of edit/reset
-                if (config.get().getSection("Servers").getSection(name).getBoolean("Editable", true) != server.isEditable()) server.setEditable(config.get().getSection("Servers").getSection(name).getBoolean("Editable", true));
                 if (config.get().getSection("Servers").getSection(name).getKeys().contains("Extra")) for (String extra : config.get().getSection("Servers").getSection(name).getSection("Extra").getKeys()) server.addExtra(extra, config.get().getSection("Servers").getSection(name).getSection("Extra").getObject(extra));
                 ukeys.add(name.toLowerCase());
                 subservers++;
@@ -660,7 +661,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
      */
     @Override
     public String getName() {
-        return (isPatched)?"SubServers.Bungee":super.getName();
+        return (isPatched)?"SubServers Platform":super.getName();
     }
 
     /**

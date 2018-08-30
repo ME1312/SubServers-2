@@ -13,6 +13,7 @@ import net.ME1312.SubServers.Bungee.SubAPI;
 import net.md_5.bungee.BungeeServerInfo;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -25,15 +26,13 @@ import java.util.UUID;
 public class ExternalSubServer extends SubServerContainer {
     private ExternalHost host;
     private boolean enabled;
-    private boolean editable;
     private Container<Boolean> log;
     private String dir;
     protected Executable exec;
     private String stopcmd;
+    private StopAction stopaction;
     private LinkedList<LoggedCommand> history;
     private ExternalSubLogger logger;
-    private boolean restart;
-    private boolean temporary;
     private boolean running;
     private boolean lock;
 
@@ -55,20 +54,18 @@ public class ExternalSubServer extends SubServerContainer {
      */
     public ExternalSubServer(ExternalHost host, String name, boolean enabled, int port, String motd, boolean log, String directory, Executable executable, String stopcmd, boolean hidden, boolean restricted) throws InvalidServerException {
         super(host, name, port, motd, hidden, restricted);
-        if (Util.isNull(host, name, enabled, port, motd, log, stopcmd, restart, hidden, restricted)) throw new NullPointerException();
+        if (Util.isNull(host, name, enabled, port, motd, log, stopcmd, hidden, restricted)) throw new NullPointerException();
         this.host = host;
         this.enabled = enabled;
-        this.editable = false;
         this.log = new Container<Boolean>(log);
         this.dir = directory;
         this.exec = executable;
         this.stopcmd = stopcmd;
+        this.stopaction = StopAction.NONE;
         this.history = new LinkedList<LoggedCommand>();
         this.logger = new ExternalSubLogger(this, getName(), this.log, null);
-        this.restart = false;
 
         this.running = false;
-        this.temporary = false;
         this.lock = false;
     }
 
@@ -89,7 +86,7 @@ public class ExternalSubServer extends SubServerContainer {
         } else return false;
     }
     private void falsestart() {
-        System.out.println("SubServers > Couldn't start " + getName() + " \u2014 See the " + host.getName() + " console for more details");
+        System.out.println("SubServers > Couldn't start " + getName() + " - See the " + host.getName() + " console for more details");
         running = false;
         logger.stop();
     }
@@ -114,16 +111,26 @@ public class ExternalSubServer extends SubServerContainer {
         history.clear();
         running = false;
 
-        if (isTemporary()) {
+        if (stopaction == StopAction.REMOVE_SERVER || stopaction == StopAction.DELETE_SERVER) {
             try {
-                if (host.plugin.config.get().getSection("Servers").getKeys().contains(getName()))
-                    host.plugin.config.get().getSection("Servers").remove(getName());
-                host.removeSubServer(getName());
+                if (stopaction == StopAction.DELETE_SERVER) {
+                    host.deleteSubServer(getName());
+                } else {
+                    try {
+                        if (host.plugin.config.get().getSection("Servers").getKeys().contains(getName())) {
+                            host.plugin.config.get().getSection("Servers").remove(getName());
+                            host.plugin.config.save();
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    host.removeSubServer(getName());
+                }
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-        } else {
-            if (willAutoRestart() && allowrestart) {
+        } else if (stopaction == StopAction.RESTART) {
+            if (allowrestart) {
                 new Thread(() -> {
                     try {
                         Thread.sleep(250);
@@ -174,7 +181,7 @@ public class ExternalSubServer extends SubServerContainer {
         boolean state = isRunning();
         SubServer forward = null;
         YAMLSection pending = edit.clone();
-        if (editable) for (String key : edit.getKeys()) {
+        for (String key : edit.getKeys()) {
             pending.remove(key);
             YAMLValue value = edit.get(key);
             SubEditServerEvent event = new SubEditServerEvent(player, this, new NamedContainer<String, YAMLValue>(key, value), true);
@@ -184,7 +191,7 @@ public class ExternalSubServer extends SubServerContainer {
                     switch (key) {
                         case "name":
                             if (value.isString() && host.removeSubServer(player, getName())) {
-                                SubServer server = host.addSubServer(player, value.asRawString(), isEnabled(), getAddress().getPort(), getMotd(), isLogging(), getPath(), getExecutable(), getStopCommand(), isHidden(), isRestricted(), isTemporary());
+                                SubServer server = host.addSubServer(player, value.asRawString(), isEnabled(), getAddress().getPort(), getMotd(), isLogging(), getPath(), getExecutable(), getStopCommand(), isHidden(), isRestricted());
                                 if (server != null) {
                                     if (this.host.plugin.config.get().getSection("Servers").getKeys().contains(getName())) {
                                         YAMLSection config = this.host.plugin.config.get().getSection("Servers").getSection(getName());
@@ -246,7 +253,7 @@ public class ExternalSubServer extends SubServerContainer {
                         case "host":
                             if (value.isString() && host.removeSubServer(player, getName())) {
                                 waitFor(() -> host.getSubServer(getName()), null);
-                                SubServer server = this.host.plugin.api.getHost(value.asRawString()).addSubServer(player, getName(), isEnabled(), getAddress().getPort(), getMotd(), isLogging(), getPath(), getExecutable(), getStopCommand(), isHidden(), isRestricted(), isTemporary());
+                                SubServer server = this.host.plugin.api.getHost(value.asRawString()).addSubServer(player, getName(), isEnabled(), getAddress().getPort(), getMotd(), isLogging(), getPath(), getExecutable(), getStopCommand(), isHidden(), isRestricted());
                                 if (server != null) {
                                     if (this.host.plugin.config.get().getSection("Servers").getKeys().contains(getName())) {
                                         this.host.plugin.config.get().getSection("Servers").getSection(getName()).set("Host", server.getHost().getName());
@@ -260,7 +267,7 @@ public class ExternalSubServer extends SubServerContainer {
                         case "port":
                             if (value.isNumber() && host.removeSubServer(player, getName())) {
                                 waitFor(() -> host.getSubServer(getName()), null);
-                                SubServer server = host.addSubServer(player, getName(), isEnabled(), value.asInt(), getMotd(), isLogging(), getPath(), getExecutable(), getStopCommand(), isHidden(), isRestricted(), isTemporary());
+                                SubServer server = host.addSubServer(player, getName(), isEnabled(), value.asInt(), getMotd(), isLogging(), getPath(), getExecutable(), getStopCommand(), isHidden(), isRestricted());
                                 if (server != null) {
                                     if (this.host.plugin.config.get().getSection("Servers").getKeys().contains(getName())) {
                                         this.host.plugin.config.get().getSection("Servers").getSection(getName()).set("Port", server.getAddress().getPort());
@@ -298,7 +305,7 @@ public class ExternalSubServer extends SubServerContainer {
                         case "dir":
                             if (value.isString() && host.removeSubServer(player, getName())) {
                                 waitFor(() -> host.getSubServer(getName()), null);
-                                SubServer server = host.addSubServer(player, getName(), isEnabled(), getAddress().getPort(), getMotd(), isLogging(), value.asRawString(), getExecutable(), getStopCommand(), isHidden(), isRestricted(), isTemporary());
+                                SubServer server = host.addSubServer(player, getName(), isEnabled(), getAddress().getPort(), getMotd(), isLogging(), value.asRawString(), getExecutable(), getStopCommand(), isHidden(), isRestricted());
                                 if (server != null) {
                                     if (this.host.plugin.config.get().getSection("Servers").getKeys().contains(getName())) {
                                         this.host.plugin.config.get().getSection("Servers").getSection(getName()).set("Directory", server.getPath());
@@ -312,7 +319,7 @@ public class ExternalSubServer extends SubServerContainer {
                         case "exec":
                             if (value.isString() && host.removeSubServer(player, getName())) {
                                 waitFor(() -> host.getSubServer(getName()), null);
-                                SubServer server = host.addSubServer(player, getName(), isEnabled(), getAddress().getPort(), getMotd(), isLogging(), getPath(), new Executable(value.asRawString()), getStopCommand(), isHidden(), isRestricted(), isTemporary());
+                                SubServer server = host.addSubServer(player, getName(), isEnabled(), getAddress().getPort(), getMotd(), isLogging(), getPath(), new Executable(value.asRawString()), getStopCommand(), isHidden(), isRestricted());
                                 if (server != null) {
                                     if (this.host.plugin.config.get().getSection("Servers").getKeys().contains(getName())) {
                                         this.host.plugin.config.get().getSection("Servers").getSection(getName()).set("Executable", value.asRawString());
@@ -339,20 +346,23 @@ public class ExternalSubServer extends SubServerContainer {
                                 c++;
                             }
                             break;
+                        case "stop-action":
+                            if (value.isString()) {
+                                StopAction action = Util.getDespiteException(() -> StopAction.valueOf(value.asRawString().toUpperCase().replace('-', '_').replace(' ', '_')), null);
+                                if (action != null) {
+                                    stopaction = action;
+                                    if (this.host.plugin.config.get().getSection("Servers").getKeys().contains(getName())) {
+                                        this.host.plugin.config.get().getSection("Servers").getSection(getName()).set("Stop-Action", getStopAction().toString());
+                                        this.host.plugin.config.save();
+                                    }
+                                    c++;
+                                }
+                            }
+                            break;
                         case "auto-run":
                             if (value.isBoolean()) {
                                 if (this.host.plugin.config.get().getSection("Servers").getKeys().contains(getName())) {
                                     this.host.plugin.config.get().getSection("Servers").getSection(getName()).set("Run-On-Launch", value.asBoolean());
-                                    this.host.plugin.config.save();
-                                }
-                                c++;
-                            }
-                            break;
-                        case "auto-restart":
-                            if (value.isBoolean()) {
-                                restart = value.asBoolean();
-                                if (this.host.plugin.config.get().getSection("Servers").getKeys().contains(getName())) {
-                                    this.host.plugin.config.get().getSection("Servers").getSection(getName()).set("Auto-Restart", willAutoRestart());
                                     this.host.plugin.config.save();
                                 }
                                 c++;
@@ -399,7 +409,7 @@ public class ExternalSubServer extends SubServerContainer {
                             break;
                     }
                     if (forward != null) {
-                        if (willAutoRestart()) forward.setAutoRestart(true);
+                        forward.setStopAction(getStopAction());
                         if (!getName().equals(getDisplayName())) forward.setDisplayName(getDisplayName());
                         List<String> groups = new ArrayList<String>();
                         groups.addAll(getGroups());
@@ -413,7 +423,6 @@ public class ExternalSubServer extends SubServerContainer {
                         }
                         for (String extra : getExtra().getKeys()) forward.addExtra(extra, getExtra(extra));
 
-                        forward.setEditable(true);
                         if (state) pending.set("state", true);
                         c += forward.edit(player, pending);
                         break;
@@ -447,7 +456,7 @@ public class ExternalSubServer extends SubServerContainer {
     public void setDisplayName(String value) {
         super.setDisplayName(value);
         logger.name = getDisplayName();
-        new SubEditServerEvent(null, this, new NamedContainer<String, Object>("display", value), false);
+        host.plugin.getPluginManager().callEvent(new SubEditServerEvent(null, this, new NamedContainer<String, Object>("display", value), false));
     }
 
     @Override
@@ -463,19 +472,9 @@ public class ExternalSubServer extends SubServerContainer {
     @Override
     public void setEnabled(boolean value) {
         if (Util.isNull(value)) throw new NullPointerException();
-        new SubEditServerEvent(null, this, new NamedContainer<String, Object>("enabled", value), false);
+        host.plugin.getPluginManager().callEvent(new SubEditServerEvent(null, this, new NamedContainer<String, Object>("enabled", value), false));
         if (enabled != value) host.queue(new PacketExUpdateServer(this, PacketExUpdateServer.UpdateType.SET_ENABLED, (Boolean) value));
         enabled = value;
-    }
-
-    @Override
-    public boolean isEditable() {
-        return editable;
-    }
-
-    @Override
-    public void setEditable(boolean value) {
-        editable = value;
     }
 
     @Override
@@ -486,7 +485,7 @@ public class ExternalSubServer extends SubServerContainer {
     @Override
     public void setLogging(boolean value) {
         if (Util.isNull(value)) throw new NullPointerException();
-        new SubEditServerEvent(null, this, new NamedContainer<String, Object>("log", value), false);
+        host.plugin.getPluginManager().callEvent(new SubEditServerEvent(null, this, new NamedContainer<String, Object>("log", value), false));
         if (log.get() != value) host.queue(new PacketExUpdateServer(this, PacketExUpdateServer.UpdateType.SET_LOGGING, (Boolean) value));
         log.set(value);
     }
@@ -519,32 +518,20 @@ public class ExternalSubServer extends SubServerContainer {
     @Override
     public void setStopCommand(String value) {
         if (Util.isNull(value)) throw new NullPointerException();
-        new SubEditServerEvent(null, this, new NamedContainer<String, Object>("stop-cmd", value), false);
+        host.plugin.getPluginManager().callEvent(new SubEditServerEvent(null, this, new NamedContainer<String, Object>("stop-cmd", value), false));
         if (!stopcmd.equals(value)) host.queue(new PacketExUpdateServer(this, PacketExUpdateServer.UpdateType.SET_STOP_COMMAND, value));
         stopcmd = value;
     }
 
     @Override
-    public boolean willAutoRestart() {
-        return restart;
+    public StopAction getStopAction() {
+        return stopaction;
     }
 
     @Override
-    public void setAutoRestart(boolean value) {
-        if (Util.isNull(value)) throw new NullPointerException();
-        new SubEditServerEvent(null, this, new NamedContainer<String, Object>("auto-restart", value), false);
-        restart = value;
-    }
-
-    @Override
-    public boolean isTemporary() {
-        return temporary;
-    }
-
-    @Override
-    public void setTemporary(boolean value) {
-        if (Util.isNull(value)) throw new NullPointerException();
-        new SubEditServerEvent(null, this, new NamedContainer<String, Object>("temp", value), false);
-        this.temporary = !(value && !isRunning() && !start()) && value;
+    public void setStopAction(StopAction action) {
+        if (Util.isNull(action)) throw new NullPointerException();
+        host.plugin.getPluginManager().callEvent(new SubEditServerEvent(null, this, new NamedContainer<String, Object>("stop-action", action), false));
+        stopaction = action;
     }
 }

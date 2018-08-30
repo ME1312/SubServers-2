@@ -2,14 +2,11 @@ package net.ME1312.SubServers.Bungee.Host.Internal;
 
 import net.ME1312.SubServers.Bungee.Event.SubCreateEvent;
 import net.ME1312.SubServers.Bungee.Host.*;
+import net.ME1312.SubServers.Bungee.Library.*;
 import net.ME1312.SubServers.Bungee.Library.Config.YAMLConfig;
 import net.ME1312.SubServers.Bungee.Library.Config.YAMLSection;
-import net.ME1312.SubServers.Bungee.Library.Container;
 import net.ME1312.SubServers.Bungee.Library.Exception.InvalidServerException;
 import net.ME1312.SubServers.Bungee.Library.Exception.SubCreatorException;
-import net.ME1312.SubServers.Bungee.Library.NamedContainer;
-import net.ME1312.SubServers.Bungee.Library.UniversalFile;
-import net.ME1312.SubServers.Bungee.Library.Util;
 import net.ME1312.SubServers.Bungee.Library.Version.Version;
 import net.ME1312.SubServers.Bungee.SubAPI;
 import net.ME1312.SubServers.Bungee.SubPlugin;
@@ -20,6 +17,7 @@ import org.xml.sax.InputSource;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.*;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.*;
@@ -190,7 +188,7 @@ public class InternalSubCreator extends SubCreator {
         return server;
     }
 
-    private void run(UUID player, String name, ServerTemplate template, Version version, int port) {
+    private SubServer run(UUID player, String name, ServerTemplate template, Version version, int port) {
         NamedContainer<InternalSubLogger, Process> thread = this.thread.get(name.toLowerCase()).get();
         UniversalFile dir = new UniversalFile(new File(host.getPath()), name);
         dir.mkdirs();
@@ -217,7 +215,6 @@ public class InternalSubCreator extends SubCreator {
                         new NamedContainer<>("$type$", template.getType().toString()), new NamedContainer<>("$version$", version.toString().replace(" ", "@")), new NamedContainer<>("$port$", Integer.toString(port))));
 
                 server.set("Enabled", true);
-                //server.set("Editable", true);
                 server.set("Display", "");
                 server.set("Host", host.getName());
                 server.set("Group", new ArrayList<String>());
@@ -227,25 +224,28 @@ public class InternalSubCreator extends SubCreator {
                 server.set("Directory", "." + File.separatorChar + name);
                 server.set("Executable", "java -Xmx1024M -jar " + template.getType().toString() + ".jar");
                 server.set("Stop-Command", "stop");
+                server.set("Stop-Action", "NONE");
                 server.set("Run-On-Launch", false);
-                server.set("Auto-Restart", false);
                 server.set("Restricted", false);
                 server.set("Incompatible", new ArrayList<String>());
                 server.set("Hidden", false);
                 server.setAll(config);
 
                 SubServer subserver = host.addSubServer(player, name, server.getBoolean("Enabled"), port, server.getColoredString("Motd", '&'), server.getBoolean("Log"), server.getRawString("Directory"),
-                        new Executable(server.getRawString("Executable")), server.getRawString("Stop-Command"), server.getBoolean("Hidden"), server.getBoolean("Restricted"), false);
-                if (server.getBoolean("Editable", true)) subserver.setEditable(true);
-                if (server.getBoolean("Auto-Restart")) subserver.setAutoRestart(true);
+                        new Executable(server.getRawString("Executable")), server.getRawString("Stop-Command"), server.getBoolean("Hidden"), server.getBoolean("Restricted"));
                 if (server.getString("Display").length() > 0) subserver.setDisplayName(server.getString("Display"));
                 for (String group : server.getStringList("Group")) subserver.addGroup(group);
+                SubServer.StopAction action = Util.getDespiteException(() -> SubServer.StopAction.valueOf(server.getRawString("Stop-Action").toUpperCase().replace('-', '_').replace(' ', '_')), null);
+                if (action != null) subserver.setStopAction(action);
                 if (server.contains("Extra")) for (String extra : server.getSection("Extra").getKeys())
                     subserver.addExtra(extra, server.getSection("Extra").getObject(extra));
                 host.plugin.config.get().getSection("Servers").set(name, server);
                 host.plugin.config.save();
                 if (template.getBuildOptions().getBoolean("Run-On-Finish", true))
                     subserver.start();
+
+                this.thread.remove(name.toLowerCase());
+                return subserver;
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -253,6 +253,7 @@ public class InternalSubCreator extends SubCreator {
             System.out.println(name + File.separator + "Creator > Couldn't build the server jar. Check the SubCreator logs for more detail.");
         }
         this.thread.remove(name.toLowerCase());
+        return null;
     } private Object convert(Object value, NamedContainer<String, String>... replacements) {
         if (value instanceof Map) {
             List<String> list = new ArrayList<String>();
@@ -278,16 +279,27 @@ public class InternalSubCreator extends SubCreator {
     }
 
     @Override
-    public boolean create(UUID player, String name, ServerTemplate template, Version version, int port) {
+    public boolean create(UUID player, String name, ServerTemplate template, Version version, int port, Callback<SubServer> callback) {
         if (Util.isNull(name, template, version, port)) throw new NullPointerException();
-        if (host.isEnabled() && template.isEnabled() && !SubAPI.getInstance().getSubServers().keySet().contains(name.toLowerCase()) && !SubCreator.isReserved(name)) {
+        if (host.isAvailable() && host.isEnabled() && template.isEnabled() && !SubAPI.getInstance().getSubServers().keySet().contains(name.toLowerCase()) && !SubCreator.isReserved(name)) {
+            StackTraceElement[] origin = new Exception().getStackTrace();
             NamedContainer<Thread, NamedContainer<InternalSubLogger, Process>> thread = new NamedContainer<Thread, NamedContainer<InternalSubLogger, Process>>(null, new NamedContainer<InternalSubLogger, Process>(new InternalSubLogger(null, this, name + File.separator + "Creator", new Container<Boolean>(false), null), null));
             this.thread.put(name.toLowerCase(), thread);
 
             final SubCreateEvent event = new SubCreateEvent(player, host, name, template, version, port);
             host.plugin.getPluginManager().callEvent(event);
             if (!event.isCancelled()) {
-                thread.rename(new Thread(() -> InternalSubCreator.this.run(player, name, event.getTemplate(), event.getVersion(), port)));
+                thread.rename(new Thread(() -> {
+                    SubServer server = InternalSubCreator.this.run(player, name, event.getTemplate(), event.getVersion(), port);
+
+                    if (callback != null && server != null) try {
+                        callback.run(server);
+                    } catch (Throwable e) {
+                        Throwable ew = new InvocationTargetException(e);
+                        ew.setStackTrace(origin);
+                        ew.printStackTrace();
+                    }
+                }));
                 thread.name().start();
                 return true;
             } else {

@@ -29,8 +29,8 @@ Servers:
     Directory: './Example'
     Executable: 'java -Djline.terminal=jline.UnsupportedTerminal -jar Spigot.jar'
     Stop-Command: 'stop'
+    Stop-Action: 'NONE'
     Run-On-Launch: false
-    Auto-Restart: false
     Restricted: false
     Incompatible: []
     Hidden: false

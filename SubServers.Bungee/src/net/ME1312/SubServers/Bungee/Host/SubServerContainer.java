@@ -113,22 +113,21 @@ public abstract class SubServerContainer extends ServerContainer implements SubS
         YAMLSection sinfo = new YAMLSection(new Gson().fromJson(super.toString(), Map.class));
         sinfo.set("type", "SubServer");
         sinfo.set("host", getHost().getName());
-        sinfo.set("enabled", isEnabled() && getHost().isEnabled());
+        sinfo.set("enabled", isEnabled());
         sinfo.set("editable", isEditable());
         sinfo.set("log", isLogging());
         sinfo.set("dir", getPath());
         sinfo.set("exec", getExecutable());
         sinfo.set("running", isRunning());
         sinfo.set("stop-cmd", getStopCommand());
+        sinfo.set("stop-action", getStopAction().toString());
         sinfo.set("auto-run", SubAPI.getInstance().getInternals().config.get().getSection("Servers").getSection(getName()).getKeys().contains("Run-On-Launch") && SubAPI.getInstance().getInternals().config.get().getSection("Servers").getSection(getName()).getBoolean("Run-On-Launch"));
-        sinfo.set("auto-restart", willAutoRestart());
         List<String> incompatibleCurrent = new ArrayList<String>();
         List<String> incompatible = new ArrayList<String>();
         for (SubServer server : getCurrentIncompatibilities()) incompatibleCurrent.add(server.getName());
         for (SubServer server : getIncompatibilities()) incompatible.add(server.getName());
         sinfo.set("incompatible", incompatibleCurrent);
         sinfo.set("incompatible-list", incompatible);
-        sinfo.set("temp", isTemporary());
         return sinfo.toJSON();
     }
 }

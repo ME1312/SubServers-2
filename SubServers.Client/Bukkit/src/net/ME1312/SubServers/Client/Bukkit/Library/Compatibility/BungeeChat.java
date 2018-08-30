@@ -50,25 +50,19 @@ public class BungeeChat {
                         message = new TextComponent(server.getDisplayName());
                         hover = new TextComponent(server.getDisplayName() + '\n');
                         if (server instanceof SubServer) {
-                            if (((SubServer) server).isTemporary()) {
-                                message.setColor(ChatColor.AQUA);
-                                hover.setColor(ChatColor.AQUA);
-                                hoverm.add(hover);
-                                if (!server.getName().equals(server.getDisplayName())) {
-                                    hover = new TextComponent(server.getName() + '\n');
-                                    hover.setColor(ChatColor.GRAY);
-                                    hoverm.add(hover);
-                                }
-                                hover = new TextComponent(plugin.api.getLang("SubServers", "Interface.Server-Menu.SubServer-Temporary") + '\n');
-                                hoverm.add(hover);
-                                hover = new TextComponent(plugin.api.getLang("SubServers", "Interface.Server-Menu.Server-Player-Count").replace("$int$", new DecimalFormat("#,###").format(server.getPlayers().size())));
-                            } else if (((SubServer) server).isRunning()) {
+                            if (((SubServer) server).isRunning()) {
                                 message.setColor(ChatColor.GREEN);
                                 hover.setColor(ChatColor.GREEN);
                                 hoverm.add(hover);
                                 if (!server.getName().equals(server.getDisplayName())) {
                                     hover = new TextComponent(server.getDisplayName() + '\n');
                                     hover.setColor(ChatColor.GRAY);
+                                    hoverm.add(hover);
+                                }
+                                if (((SubServer) server).getStopAction() == SubServer.StopAction.REMOVE_SERVER || ((SubServer) server).getStopAction() == SubServer.StopAction.DELETE_SERVER) {
+                                    message.setColor(ChatColor.AQUA);
+                                    hover.setColor(ChatColor.AQUA);
+                                    hover = new TextComponent(plugin.api.getLang("SubServers", "Interface.Server-Menu.SubServer-Temporary") + '\n');
                                     hoverm.add(hover);
                                 }
                                 hover = new TextComponent(plugin.api.getLang("SubServers", "Interface.Server-Menu.Server-Player-Count").replace("$int$", new DecimalFormat("#,###").format(server.getPlayers().size())));
@@ -153,7 +147,7 @@ public class BungeeChat {
                 TextComponent msg = new TextComponent("  ");
                 TextComponent message = new TextComponent(host.getDisplayName());
                 TextComponent hover = new TextComponent(host.getDisplayName() + '\n');
-                if (host.isEnabled()) {
+                if (host.isAvailable() && host.isEnabled()) {
                     message.setColor(ChatColor.AQUA);
                     hover.setColor(ChatColor.AQUA);
                     hoverm.add(hover);
@@ -172,7 +166,7 @@ public class BungeeChat {
                         hover.setColor(ChatColor.GRAY);
                         hoverm.add(hover);
                     }
-                    hover = new TextComponent(plugin.api.getLang("SubServers", "Interface.Host-Menu.Host-Disabled"));
+                    hover = new TextComponent(plugin.api.getLang("SubServers", (!host.isAvailable())?"Interface.Host-Menu.Host-Unavailable":"Interface.Host-Menu.Host-Disabled"));
                 }
                 if (plugin.config.get().getSection("Settings").getBoolean("Show-Addresses", false)) {
                     hoverm.add(hover);
@@ -190,25 +184,19 @@ public class BungeeChat {
                     message = new TextComponent(subserver.getDisplayName());
                     hover = new TextComponent(subserver.getDisplayName() + '\n');
                     message.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, label + " open SubServer/ " + subserver));
-                    if (subserver.isTemporary()) {
-                        message.setColor(ChatColor.AQUA);
-                        hover.setColor(ChatColor.AQUA);
-                        hoverm.add(hover);
-                        if (!subserver.getName().equals(subserver.getDisplayName())) {
-                            hover = new TextComponent(subserver.getName() + '\n');
-                            hover.setColor(ChatColor.GRAY);
-                            hoverm.add(hover);
-                        }
-                        hover = new TextComponent(plugin.api.getLang("SubServers", "Interface.Server-Menu.SubServer-Temporary") + '\n');
-                        hoverm.add(hover);
-                        hover = new TextComponent(plugin.api.getLang("SubServers", "Interface.Server-Menu.Server-Player-Count").replace("$int$", new DecimalFormat("#,###").format(subserver.getPlayers().size())));
-                    } else if (subserver.isEnabled()) {
+                    if (subserver.isRunning()) {
                         message.setColor(ChatColor.GREEN);
                         hover.setColor(ChatColor.GREEN);
                         hoverm.add(hover);
                         if (!subserver.getName().equals(subserver.getDisplayName())) {
                             hover = new TextComponent(subserver.getName() + '\n');
                             hover.setColor(ChatColor.GRAY);
+                            hoverm.add(hover);
+                        }
+                        if (subserver.getStopAction() == SubServer.StopAction.REMOVE_SERVER || subserver.getStopAction() == SubServer.StopAction.DELETE_SERVER) {
+                            message.setColor(ChatColor.AQUA);
+                            hover.setColor(ChatColor.AQUA);
+                            hover = new TextComponent(plugin.api.getLang("SubServers", "Interface.Server-Menu.SubServer-Temporary") + '\n');
                             hoverm.add(hover);
                         }
                         hover = new TextComponent(plugin.api.getLang("SubServers", "Interface.Server-Menu.Server-Player-Count").replace("$int$", new DecimalFormat("#,###").format(subserver.getPlayers().size())));

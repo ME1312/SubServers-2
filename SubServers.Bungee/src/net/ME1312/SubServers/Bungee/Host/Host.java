@@ -40,6 +40,15 @@ public abstract class Host implements ExtraDataHandler {
     }
 
     /**
+     * Is this Host Available?
+     *
+     * @return Availability Status
+     */
+    public boolean isAvailable() {
+        return true;
+    }
+
+    /**
      * Is this Host Enabled?
      *
      * @return Enabled Status
@@ -234,11 +243,10 @@ public abstract class Host implements ExtraDataHandler {
      * @param stopcmd Command to Stop the Server
      * @param hidden if the server should be hidden from players
      * @param restricted Players will need a permission to join if true
-     * @param temporary Temporary Status
      * @return The SubServer
      * @throws InvalidServerException
      */
-    public abstract SubServer addSubServer(UUID player, String name, boolean enabled, int port, String motd, boolean log, String directory, Executable executable, String stopcmd, boolean hidden, boolean restricted, boolean temporary) throws InvalidServerException;
+    public abstract SubServer addSubServer(UUID player, String name, boolean enabled, int port, String motd, boolean log, String directory, Executable executable, String stopcmd, boolean hidden, boolean restricted) throws InvalidServerException;
 
     /**
      * Adds a SubServer
@@ -253,12 +261,11 @@ public abstract class Host implements ExtraDataHandler {
      * @param stopcmd Command to Stop the Server
      * @param hidden if the server should be hidden from players
      * @param restricted Players will need a permission to join if true
-     * @param temporary Temporary Status
      * @return The SubServer
      * @throws InvalidServerException
      */
-    public SubServer addSubServer(String name, boolean enabled, int port, String motd, boolean log, String directory, Executable executable, String stopcmd, boolean hidden, boolean restricted, boolean temporary) throws InvalidServerException {
-        return addSubServer(null, name, enabled, port, motd, log, directory, executable, stopcmd, hidden, restricted, temporary);
+    public SubServer addSubServer(String name, boolean enabled, int port, String motd, boolean log, String directory, Executable executable, String stopcmd, boolean hidden, boolean restricted) throws InvalidServerException {
+        return addSubServer(null, name, enabled, port, motd, log, directory, executable, stopcmd, hidden, restricted);
     }
 
     /**
@@ -382,6 +389,7 @@ public abstract class Host implements ExtraDataHandler {
         hinfo.set("type", "Host");
         hinfo.set("name", getName());
         hinfo.set("display", getDisplayName());
+        hinfo.set("available", isAvailable());
         hinfo.set("enabled", isEnabled());
         hinfo.set("address", getAddress().getHostAddress());
         hinfo.set("dir", getPath());

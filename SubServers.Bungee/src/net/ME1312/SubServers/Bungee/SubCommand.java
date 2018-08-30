@@ -92,6 +92,7 @@ public final class SubCommand extends CommandX {
                 } else if (args[0].equalsIgnoreCase("reload")) {
                     if (args.length > 1) {
                         switch (args[1].toLowerCase()) {
+                            case "*":
                             case "all":
                             case "system":
                             case "bungee":
@@ -150,11 +151,13 @@ public final class SubCommand extends CommandX {
                                 Server server = servers.get(name.toLowerCase());
                                 if (!(servers.get(name.toLowerCase()) instanceof SubServer)) {
                                     message += ChatColor.WHITE;
-                                } else if (((SubServer) server).isTemporary()) {
-                                    message += ChatColor.AQUA;
                                 } else if (((SubServer) server).isRunning()) {
-                                    message += ChatColor.GREEN;
-                                } else if (((SubServer) server).getHost().isEnabled() && ((SubServer) server).isEnabled() && ((SubServer) server).getCurrentIncompatibilities().size() == 0) {
+                                    if (((SubServer) server).getStopAction() == SubServer.StopAction.REMOVE_SERVER || ((SubServer) server).getStopAction() == SubServer.StopAction.DELETE_SERVER) {
+                                        message += ChatColor.AQUA;
+                                    } else {
+                                        message += ChatColor.GREEN;
+                                    }
+                                } else if (((SubServer) server).getHost().isAvailable() && ((SubServer) server).getHost().isEnabled() && ((SubServer) server).isEnabled() && ((SubServer) server).getCurrentIncompatibilities().size() == 0) {
                                     message += ChatColor.YELLOW;
                                 } else {
                                     message += ChatColor.RED;
@@ -173,7 +176,7 @@ public final class SubCommand extends CommandX {
                     sender.sendMessage("SubServers > Host/SubServer List:");
                     for (Host host : plugin.api.getHosts().values()) {
                         String message = "  ";
-                        if (host.isEnabled()) {
+                        if (host.isAvailable() && host.isEnabled()) {
                             message += ChatColor.AQUA;
                         } else {
                             message += ChatColor.RED;
@@ -181,10 +184,12 @@ public final class SubCommand extends CommandX {
                         message += host.getDisplayName() + " (" + host.getAddress().getHostAddress() + ((host.getName().equals(host.getDisplayName()))?"":ChatColor.stripColor(div)+host.getName()) + ")" + ChatColor.RESET + ": ";
                         for (SubServer subserver : host.getSubServers().values()) {
                             if (i != 0) message += div;
-                            if (subserver.isTemporary()) {
-                                message += ChatColor.AQUA;
-                            } else if (subserver.isRunning()) {
-                                message += ChatColor.GREEN;
+                            if (subserver.isRunning()) {
+                                if (subserver.getStopAction() == SubServer.StopAction.REMOVE_SERVER || subserver.getStopAction() == SubServer.StopAction.DELETE_SERVER) {
+                                    message += ChatColor.AQUA;
+                                } else {
+                                    message += ChatColor.GREEN;
+                                }
                             } else if (subserver.getHost().isEnabled() && subserver.isEnabled() && subserver.getCurrentIncompatibilities().size() == 0) {
                                 message += ChatColor.YELLOW;
                             } else {
@@ -252,12 +257,9 @@ public final class SubCommand extends CommandX {
                                     sender.sendMessage(" -> Players: " + ChatColor.AQUA + server.getPlayers().size() + " online");
                                 }
                                 sender.sendMessage(" -> MOTD: " + ChatColor.WHITE + ChatColor.stripColor(server.getMotd()));
+                                if (server instanceof SubServer && ((SubServer) server).getStopAction() != SubServer.StopAction.NONE) sender.sendMessage(" -> Stop Action: " + ChatColor.WHITE + ((SubServer) server).getStopAction().toString());
                                 sender.sendMessage(" -> Signature: " + ChatColor.AQUA + server.getSignature());
-                                if (server instanceof SubServer) {
-                                    sender.sendMessage(" -> Logging: " + ((((SubServer) server).isLogging())?ChatColor.GREEN+"yes":ChatColor.RED+"no"));
-                                    if (((SubServer) server).isTemporary()) sender.sendMessage(" -> Temporary: " + ChatColor.GREEN + "yes");
-                                    else sender.sendMessage(" -> Auto Restart: " + ((((SubServer) server).willAutoRestart())?ChatColor.GREEN+"enabled":ChatColor.RED+"disabled"));
-                                }
+                                if (server instanceof SubServer) sender.sendMessage(" -> Logging: " + ((((SubServer) server).isLogging())?ChatColor.GREEN+"yes":ChatColor.RED+"no"));
                                 sender.sendMessage(" -> Restricted: " + ((server.isRestricted())?ChatColor.GREEN+"yes":ChatColor.RED+"no"));
                                 if (server instanceof SubServer && ((SubServer) server).getIncompatibilities().size() > 0) {
                                     List<String> current = new ArrayList<String>();
@@ -293,6 +295,7 @@ public final class SubCommand extends CommandX {
                             if (host != null) {
                                 sender.sendMessage("SubServers > Info on Host: " + ChatColor.WHITE + host.getDisplayName());
                                 if (!host.getName().equals(host.getDisplayName())) sender.sendMessage(" -> System Name: " + ChatColor.WHITE  + host.getName());
+                                sender.sendMessage(" -> Available: " + ((host.isAvailable())?ChatColor.GREEN+"yes":ChatColor.RED+"no"));
                                 sender.sendMessage(" -> Enabled: " + ((host.isEnabled())?ChatColor.GREEN+"yes":ChatColor.RED+"no"));
                                 sender.sendMessage(" -> Address: " + ChatColor.WHITE + host.getAddress().getHostAddress());
                                 if (host instanceof ClientHandler && ((ClientHandler) host).getSubData() != null) sender.sendMessage(" -> Connected: " + ChatColor.GREEN + "yes");
@@ -362,6 +365,8 @@ public final class SubCommand extends CommandX {
                             sender.sendMessage("SubServers > There is no server with that name");
                         } else if (!(servers.get(args[1].toLowerCase()) instanceof SubServer)) {
                             sender.sendMessage("SubServers > That Server is not a SubServer");
+                        } else if (!((SubServer) servers.get(args[1].toLowerCase())).getHost().isAvailable()) {
+                            sender.sendMessage("SubServers > That SubServer's Host is not available");
                         } else if (!((SubServer) servers.get(args[1].toLowerCase())).getHost().isEnabled()) {
                             sender.sendMessage("SubServers > That SubServer's Host is not enabled");
                         } else if (!((SubServer) servers.get(args[1].toLowerCase())).isEnabled()) {
@@ -464,8 +469,14 @@ public final class SubCommand extends CommandX {
                             sender.sendMessage("SubServers > There is already a SubServer with that name");
                         } else if (!plugin.hosts.keySet().contains(args[2].toLowerCase())) {
                             sender.sendMessage("SubServers > There is no host with that name");
-                        } else if (!plugin.hosts.get(args[2].toLowerCase()).getCreator().getTemplates().keySet().contains(args[3].toLowerCase()) || !plugin.hosts.get(args[2].toLowerCase()).getCreator().getTemplate(args[3]).isEnabled()) {
+                        } else if (!plugin.hosts.get(args[2].toLowerCase()).isAvailable()) {
+                            sender.sendMessage("SubServers > That Host is not available");
+                        } else if (!plugin.hosts.get(args[2].toLowerCase()).isEnabled()) {
+                            sender.sendMessage("SubServers > That Host is not enabled");
+                        } else if (!plugin.hosts.get(args[2].toLowerCase()).getCreator().getTemplates().keySet().contains(args[3].toLowerCase())) {
                             sender.sendMessage("SubServers > There is no template with that name");
+                        } else if (!plugin.hosts.get(args[2].toLowerCase()).getCreator().getTemplate(args[3]).isEnabled()) {
+                            sender.sendMessage("SubServers > That Template is not enabled");
                         } else if (new Version("1.8").compareTo(new Version(args[4])) > 0) {
                             sender.sendMessage("SubServers > SubCreator cannot create servers before Minecraft 1.8");
                         } else if (Util.isException(() -> Integer.parseInt(args[5])) || Integer.parseInt(args[5]) <= 0 || Integer.parseInt(args[5]) > 65535) {

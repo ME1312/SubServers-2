@@ -11,6 +11,7 @@ import net.ME1312.SubServers.Bungee.Network.Packet.PacketExCreateServer;
 import net.ME1312.SubServers.Bungee.SubAPI;
 
 import java.io.File;
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 /**
@@ -57,9 +58,10 @@ public class ExternalSubCreator extends SubCreator {
     }
 
     @Override
-    public boolean create(UUID player, String name, ServerTemplate template, Version version, int port) {
+    public boolean create(UUID player, String name, ServerTemplate template, Version version, int port, Callback<SubServer> callback) {
         if (Util.isNull(name, template, version, port)) throw new NullPointerException();
-        if (template.isEnabled() && !SubAPI.getInstance().getSubServers().keySet().contains(name.toLowerCase()) && !SubCreator.isReserved(name)) {
+        if (host.isAvailable() && host.isEnabled() && template.isEnabled() && !SubAPI.getInstance().getSubServers().keySet().contains(name.toLowerCase()) && !SubCreator.isReserved(name)) {
+            StackTraceElement[] origin = new Exception().getStackTrace();
             ExternalSubLogger logger = new ExternalSubLogger(this, name + File.separator + "Creator", new Container<Boolean>(host.plugin.config.get().getSection("Settings").getBoolean("Log-Creator")), null);
             thread.put(name.toLowerCase(), logger);
             final SubCreateEvent event = new SubCreateEvent(player, host, name, template, version, port);
@@ -78,7 +80,6 @@ public class ExternalSubCreator extends SubCreator {
                                     new NamedContainer<>("$template$", template.getName()), new NamedContainer<>("$type$", template.getType().toString()), new NamedContainer<>("$version$", version.toString().replace(" ", "@")), new NamedContainer<>("$port$", Integer.toString(port))));
 
                             server.set("Enabled", true);
-                            //server.set("Editable", true);
                             server.set("Display", "");
                             server.set("Host", host.getName());
                             server.set("Group", new ArrayList<String>());
@@ -88,25 +89,33 @@ public class ExternalSubCreator extends SubCreator {
                             server.set("Directory", "." + File.separatorChar + name);
                             server.set("Executable", "java -Xmx1024M -jar " + template.getType().toString() + ".jar");
                             server.set("Stop-Command", "stop");
+                            server.set("Stop-Action", "NONE");
                             server.set("Run-On-Launch", false);
-                            server.set("Auto-Restart", false);
                             server.set("Restricted", false);
                             server.set("Incompatible", new ArrayList<String>());
                             server.set("Hidden", false);
                             server.setAll(config);
 
                             SubServer subserver = host.addSubServer(player, name, server.getBoolean("Enabled"), port, server.getColoredString("Motd", '&'), server.getBoolean("Log"), server.getRawString("Directory"),
-                                    new Executable(server.getRawString("Executable")), server.getRawString("Stop-Command"), server.getBoolean("Hidden"), server.getBoolean("Restricted"), false);
-                            if (server.getBoolean("Editable", true)) subserver.setEditable(true);
-                            if (server.getBoolean("Auto-Restart")) subserver.setAutoRestart(true);
+                                    new Executable(server.getRawString("Executable")), server.getRawString("Stop-Command"), server.getBoolean("Hidden"), server.getBoolean("Restricted"));
                             if (server.getString("Display").length() > 0) subserver.setDisplayName(server.getString("Display"));
                             for (String group : server.getStringList("Group")) subserver.addGroup(group);
+                            SubServer.StopAction action = Util.getDespiteException(() -> SubServer.StopAction.valueOf(server.getRawString("Stop-Action").toUpperCase().replace('-', '_').replace(' ', '_')), null);
+                            if (action != null) subserver.setStopAction(action);
                             if (server.contains("Extra")) for (String extra : server.getSection("Extra").getKeys())
                                 subserver.addExtra(extra, server.getSection("Extra").getObject(extra));
                             host.plugin.config.get().getSection("Servers").set(name, server);
                             host.plugin.config.save();
                             if (template.getBuildOptions().getBoolean("Run-On-Finish", true))
                                 subserver.start();
+
+                            if (callback != null) try {
+                                callback.run(subserver);
+                            } catch (Throwable e) {
+                                Throwable ew = new InvocationTargetException(e);
+                                ew.setStackTrace(origin);
+                                ew.printStackTrace();
+                            }
                         } else {
                             System.out.println(name + "/Creator > " + data.getString("m"));
                         }

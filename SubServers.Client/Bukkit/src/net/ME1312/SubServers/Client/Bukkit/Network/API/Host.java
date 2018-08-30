@@ -59,6 +59,15 @@ public class Host {
     }
 
     /**
+     * Is this Host Available?
+     *
+     * @return Availability Status
+     */
+    public boolean isAvailable() {
+        return raw.getBoolean("available");
+    }
+
+    /**
      * Is this Host Enabled?
      *
      * @return Enabled Status

@@ -173,7 +173,7 @@ public class Metrics {
         int playerAmount = plugin.getOnlineCount();
         playerAmount = playerAmount > 500 ? 500 : playerAmount;
         int onlineMode = plugin.getConfig().isOnlineMode() ? 1 : 0;
-        String bungeecordVersion = (plugin.getName().equals("SubServers.Bungee"))?"SubServers-Bungee-Patched":plugin.getVersion();
+        String bungeecordVersion = (plugin.getName().equals("SubServers Platform"))?"SubServers-Bungee-Patched":plugin.getVersion();
         int managedServers = plugin.getServers().size();
 
         // OS/Java specific data

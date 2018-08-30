@@ -57,11 +57,11 @@ public class SubStopEvent extends AbstractEvent implements SubEvent {
      * Gets the cause of this Event
      *
      * @deprecated Use simplified methods where available
-     * @return The player who triggered this event under the key: player
+     * @return The player UUID who triggered this event
      */
     @Override
     @Deprecated
     public Cause getCause() {
-        return Cause.builder().named("player", player).build();
+        return Cause.builder().append(player).build(getContext());
     }
 }

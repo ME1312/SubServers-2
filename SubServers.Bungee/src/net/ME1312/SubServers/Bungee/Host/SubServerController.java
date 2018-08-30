@@ -9,7 +9,7 @@ import java.util.*;
  * API-Safe SubServer Layout Class
  */
 public abstract class SubServerController {
-    private final net.ME1312.SubServers.Bungee.Host.SubServerContainer control;
+    private final SubServerContainer control;
 
     /**
      * Creates a SubServer
@@ -99,16 +99,6 @@ public abstract class SubServerController {
             }
 
             @Override
-            public boolean isEditable() {
-                return SubServerController.this.isEditable();
-            }
-
-            @Override
-            public void setEditable(boolean value) {
-                SubServerController.this.setEditable(value);
-            }
-
-            @Override
             public boolean isLogging() {
                 return SubServerController.this.isLogging();
             }
@@ -149,23 +139,13 @@ public abstract class SubServerController {
             }
 
             @Override
-            public boolean willAutoRestart() {
-                return SubServerController.this.willAutoRestart();
+            public StopAction getStopAction() {
+                return SubServerController.this.getStopAction();
             }
 
             @Override
-            public void setAutoRestart(boolean value) {
-                SubServerController.this.setAutoRestart(value);
-            }
-
-            @Override
-            public boolean isTemporary() {
-                return SubServerController.this.isTemporary();
-            }
-
-            @Override
-            public void setTemporary(boolean value) {
-                SubServerController.this.setTemporary(value);
+            public void setStopAction(StopAction action) {
+                SubServerController.this.setStopAction(action);
             }
         };
     }
@@ -256,7 +236,9 @@ public abstract class SubServerController {
      * @param edit Edits
      * @return Success Status
      */
-    public abstract int edit(UUID player, YAMLSection edit);
+    public int edit(UUID player, YAMLSection edit) {
+        return -1;
+    }
 
     /**
      * Edits the Server
@@ -265,7 +247,7 @@ public abstract class SubServerController {
      * @return Success Status
      */
     public int edit(YAMLSection edit) {
-        return edit(null, edit);
+        return -1;
     }
 
     /**
@@ -302,24 +284,6 @@ public abstract class SubServerController {
      * @param value Value
      */
     public abstract void setEnabled(boolean value);
-
-    /**
-     * If the Server is accepting requests to edit()
-     *
-     * @see #edit(YAMLSection)
-     * @see #edit(UUID, YAMLSection)
-     * @return Edit Status
-     */
-    public abstract boolean isEditable();
-
-    /**
-     * Set if the Server should accept requests to edit()
-     *
-     * @param value Edit Status
-     * @see #edit(YAMLSection)
-     * @see #edit(UUID, YAMLSection)
-     */
-    public abstract void setEditable(boolean value);
 
     /**
      * If the Server is Logging
@@ -376,32 +340,18 @@ public abstract class SubServerController {
     public abstract void setStopCommand(String value);
 
     /**
-     * If the Server will Auto Restart on unexpected shutdowns
+     * Get the action the Server will take when it stops
      *
-     * @return Auto Restart Status
+     * @return Stop Action
      */
-    public abstract boolean willAutoRestart();
+    public abstract SubServer.StopAction getStopAction();
 
     /**
-     * Set if the Server will Auto Restart on unexpected shutdowns
+     * Set the action the Server will take when it stops
      *
-     * @param value Value
+     * @param action Stop Action
      */
-    public abstract void setAutoRestart(boolean value);
-
-    /**
-     * If the Server is Temporary
-     *
-     * @return Temporary Status
-     */
-    public abstract boolean isTemporary();
-
-    /**
-     * Set If the Server is Temporary (will start server if not running)
-     *
-     * @param value Value
-     */
-    public abstract void setTemporary(boolean value);
+    public abstract void setStopAction(SubServer.StopAction action);
 
     @Override
     public String toString() {

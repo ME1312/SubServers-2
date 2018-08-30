@@ -183,7 +183,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
      */
     @Override
     public String getName() {
-        return (isPatched)?"SubServers.Sync":super.getName();
+        return (isPatched)?"SubServers Platform":super.getName();
     }
 
     /**

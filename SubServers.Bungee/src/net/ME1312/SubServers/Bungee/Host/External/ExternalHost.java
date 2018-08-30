@@ -96,8 +96,13 @@ public class ExternalHost extends Host implements ClientHandler {
     }
 
     @Override
+    public boolean isAvailable() {
+        return this.client.name();
+    }
+
+    @Override
     public boolean isEnabled() {
-        return enabled && this.client.name();
+        return enabled;
     }
 
     @Override
@@ -137,17 +142,13 @@ public class ExternalHost extends Host implements ClientHandler {
     }
 
     @Override
-    public SubServer addSubServer(UUID player, String name, boolean enabled, int port, String motd, boolean log, String directory, Executable executable, String stopcmd, boolean hidden, boolean restricted, boolean temporary) throws InvalidServerException {
+    public SubServer addSubServer(UUID player, String name, boolean enabled, int port, String motd, boolean log, String directory, Executable executable, String stopcmd, boolean hidden, boolean restricted) throws InvalidServerException {
         if (plugin.api.getServers().keySet().contains(name.toLowerCase())) throw new InvalidServerException("A Server already exists with this name!");
         SubServer server = new ExternalSubServer(this, name, enabled, port, motd, log, directory, executable, stopcmd, hidden, restricted);
         SubAddServerEvent event = new SubAddServerEvent(player, this, server);
         plugin.getPluginManager().callEvent(event);
         if (!event.isCancelled()) {
-            queue(new PacketExAddServer(name, enabled, log, directory, executable, stopcmd, (server.isRunning())?((ExternalSubLogger) server.getLogger()).getExternalAddress():null, data -> {
-                if (data.getInt("r") == 0) {
-                    if (temporary && server.start()) server.setTemporary(true);
-                }
-            }));
+            queue(new PacketExAddServer(name, enabled, log, directory, executable, stopcmd, (server.isRunning())?((ExternalSubLogger) server.getLogger()).getExternalAddress():null));
             servers.put(name.toLowerCase(), server);
             return server;
         } else {
@@ -158,19 +159,18 @@ public class ExternalHost extends Host implements ClientHandler {
     @Override
     public boolean removeSubServer(UUID player, String name) throws InterruptedException {
         if (Util.isNull(name)) throw new NullPointerException();
-        SubRemoveServerEvent event = new SubRemoveServerEvent(player, this, getSubServer(name));
+        String server = servers.get(name.toLowerCase()).getName();
+
+        SubRemoveServerEvent event = new SubRemoveServerEvent(player, this, getSubServer(server));
         plugin.getPluginManager().callEvent(event);
         if (!event.isCancelled()) {
-            if (getSubServer(name).isRunning()) {
-                getSubServer(name).stop();
-                getSubServer(name).waitFor();
+            if (getSubServer(server).isRunning()) {
+                getSubServer(server).stop();
+                getSubServer(server).waitFor();
             }
-            queue(new PacketExRemoveServer(name, data -> {
+            queue(new PacketExRemoveServer(server, data -> {
                 if (data.getInt("r") == 0) {
-                    List<String> groups = new ArrayList<String>();
-                    groups.addAll(getSubServer(name).getGroups());
-                    for (String group : groups) getSubServer(name).removeGroup(group);
-                    servers.remove(name.toLowerCase());
+                    servers.remove(server.toLowerCase());
                 }
             }));
             return true;
@@ -180,15 +180,16 @@ public class ExternalHost extends Host implements ClientHandler {
     @Override
     public boolean forceRemoveSubServer(UUID player, String name) {
         if (Util.isNull(name)) throw new NullPointerException();
-        SubRemoveServerEvent event = new SubRemoveServerEvent(player, this, getSubServer(name));
+        String server = servers.get(name.toLowerCase()).getName();
+
+        SubRemoveServerEvent event = new SubRemoveServerEvent(player, this, getSubServer(server));
         plugin.getPluginManager().callEvent(event);
-        if (getSubServer(name).isRunning()) {
-            getSubServer(name).terminate();
+        if (getSubServer(server).isRunning()) {
+            getSubServer(server).terminate();
         }
-        queue(new PacketExRemoveServer(name, data -> {
+        queue(new PacketExRemoveServer(server, data -> {
             if (data.getInt("r") == 0) {
-                for (String group : getSubServer(name).getGroups()) getSubServer(name).removeGroup(group);
-                servers.remove(name.toLowerCase());
+                servers.remove(server.toLowerCase());
             }
         }));
         return true;
@@ -223,11 +224,10 @@ public class ExternalHost extends Host implements ClientHandler {
             System.out.println("SubServers > Removing Files...");
             queue(new PacketExDeleteServer(server, info, data -> {
                 if (data.getInt("r") == 0) {
-                    for (String group : getSubServer(name).getGroups()) getSubServer(name).removeGroup(group);
                     servers.remove(server.toLowerCase());
-                    System.out.println("SubServers > Done!");
+                    System.out.println("SubServers > Deleted SubServer: " + server);
                 } else {
-                    System.out.println("SubServers > Couldn't remove server from memory. See " + getName() + " console for more details");
+                    System.out.println("SubServers > Couldn't remove " + server + " from memory. See " + getName() + " console for more details");
                 }
             }));
             return true;
@@ -261,11 +261,11 @@ public class ExternalHost extends Host implements ClientHandler {
         System.out.println("SubServers > Removing Files...");
         queue(new PacketExDeleteServer(server, info, data -> {
             if (data.getInt("r") == 0) {
-                for (String group : getSubServer(name).getGroups()) getSubServer(name).removeGroup(group);
+                for (String group : getSubServer(server).getGroups()) getSubServer(server).removeGroup(group);
                 servers.remove(server.toLowerCase());
-                System.out.println("SubServers > Done!");
+                System.out.println("SubServers > Deleted SubServer: " + server);
             } else {
-                System.out.println("SubServers > Couldn't remove server from memory. See " + getName() + " console for more details");
+                System.out.println("SubServers > Couldn't remove " + server + " from memory. See " + getName() + " console for more details");
             }
         }));
         return true;

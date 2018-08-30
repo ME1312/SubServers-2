@@ -1,5 +1,6 @@
 package net.ME1312.SubServers.Bungee.Host;
 
+import net.ME1312.SubServers.Bungee.Library.Callback;
 import net.ME1312.SubServers.Bungee.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Bungee.Library.Exception.InvalidTemplateException;
 import net.ME1312.SubServers.Bungee.Library.Util;
@@ -170,148 +171,17 @@ public abstract class SubCreator {
         }
     }
 
-    public SubCreator() {
-        /*
-        if (!defaults) {
-            defaults = true;
-            addValidator("System", (template, match, string) -> {
-                boolean validated;
-                switch (match.toLowerCase()) {
-                    case "touppercase":
-                        string.set(string.get().toUpperCase());
-                        validated = true;
-                        break;
-                    case "tolowercase":
-                        string.set(string.get().toLowerCase());
-                        validated = true;
-                        break;
-                    case "toserverversion":
-                        try {
-                            Version version = new Version(string.get());
-                            if (template.getType() == ServerType.VANILLA) {
-                                String patch = "Patch";
-                                if (version.compareTo(new Version("1.12")) >= 0) patch += "-v2";
-                                version = new Version(version.toString() + " " + patch);
-                            } else if (template.getType() == ServerType.SPONGE) {
-                                Document spongexml = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new InputSource(new StringReader(Util.readAll(new BufferedReader(new InputStreamReader(new URL("http://files.minecraftforge.net/maven/org/spongepowered/spongeforge/maven-metadata.xml").openStream(), Charset.forName("UTF-8")))))));
-                                Document forgexml = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new InputSource(new StringReader(Util.readAll(new BufferedReader(new InputStreamReader(new URL("http://files.minecraftforge.net/maven/net/minecraftforge/forge/maven-metadata.xml").openStream(), Charset.forName("UTF-8")))))));
-
-                                NodeList spnodeList = spongexml.getElementsByTagName("version");
-                                Version spversion = null;
-                                for (int i = 0; i < spnodeList.getLength(); i++) {
-                                    Node node = spnodeList.item(i);
-                                    if (node.getNodeType() == Node.ELEMENT_NODE) {
-                                        if (node.getTextContent().startsWith(version.toString() + '-') && (spversion == null || new Version(node.getTextContent()).compareTo(spversion) >= 0)) {
-                                            spversion = new Version(node.getTextContent());
-                                        }
-                                    }
-                                }
-                                if (spversion == null)
-                                    throw new InvalidServerException("Cannot find sponge version for Minecraft " + version.toString());
-
-                                NodeList mcfnodeList = forgexml.getElementsByTagName("version");
-                                Version mcfversion = null;
-                                for (int i = 0; i < mcfnodeList.getLength(); i++) {
-                                    Node node = mcfnodeList.item(i);
-                                    if (node.getNodeType() == Node.ELEMENT_NODE) {
-                                        if (node.getTextContent().contains(spversion.toString().split("\\-")[1]) && (mcfversion == null || new Version(node.getTextContent()).compareTo(mcfversion) >= 0)) {
-                                            mcfversion = new Version(node.getTextContent());
-                                        }
-                                    }
-                                }
-                                if (mcfversion == null)
-                                    throw new InvalidServerException("Cannot find forge version for Sponge " + spversion.toString());
-
-                                version = new Version(mcfversion.toString() + " " + spversion.toString());
-                            }
-                            string.set(version.toString());
-                            validated = true;
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                            validated = false;
-                        }
-                        break;
-                    default:
-                        validated = false;
-                }
-                return validated;
-            });
-            addValidator("Integer", (template, match, string) -> {
-                Matcher matcher = Pattern.compile("^([!<>=][=]?)(.*)$").matcher(match);
-                String comparator = "";
-                String other = "";
-                while (matcher.find()) {
-                    comparator = matcher.group(1).toUpperCase();
-                    other = matcher.group(2);
-                }
-
-                boolean validated;
-                switch (comparator) {
-                    case "=":
-                    case "==":
-                        validated = string.get().equals(other);
-                        break;
-                    case "!":
-                    case "!=":
-                        validated = !string.get().equals(other);
-                        break;
-                    case "<":
-                        validated = new Version(string.get()).compareTo(new Version(other)) < 0;
-                        break;
-                    case "<=":
-                        validated = new Version(string.get()).compareTo(new Version(other)) <= 0;
-                        break;
-                    case ">":
-                        validated = new Version(string.get()).compareTo(new Version(other)) > 0;
-                        break;
-                    case ">=":
-                        validated = new Version(string.get()).compareTo(new Version(other)) >= 0;
-                        break;
-                    default:
-                        validated = false;
-                }
-                return validated;
-            });
-            addValidator("RegEx", (template, match, string) -> {
-                Matcher matcher = Pattern.compile("^/(.*)/([iux]*)$").matcher(match);
-                String pattern = "";
-                char[] flags = new char[0];
-                while (matcher.find()) {
-                    pattern = matcher.group(1);
-                    if (matcher.groupCount() >= 2)
-                        flags = matcher.group(2).toCharArray();
-                }
-
-                int byteflags = 0x00;
-                for (char flag : flags) {
-                    switch (flag) {
-                        case 'i':
-                            byteflags |= Pattern.CASE_INSENSITIVE;
-                            break;
-                        case 'u':
-                            byteflags |= Pattern.UNICODE_CASE;
-                            break;
-                        case 'x':
-                            byteflags |= Pattern.COMMENTS;
-                            break;
-                    }
-                }
-
-                if (byteflags == 0x00) {
-                    matcher = Pattern.compile(pattern).matcher(match);
-                } else {
-                    matcher = Pattern.compile(pattern, byteflags).matcher(match);
-                }
-                boolean validated = false;
-                while (matcher.find()) {
-                    string.set(matcher.group());
-                    validated = true;
-                }
-                return validated;
-            });
-        }
-        */
-    }
+    /**
+     * Create a SubServer
+     *
+     * @param player Player Creating
+     * @param name Server Name
+     * @param template Server Template
+     * @param version Server Version
+     * @param port Server Port Number
+     * @return Success Status
+     */
+    public abstract boolean create(UUID player, String name, ServerTemplate template, Version version, int port, Callback<SubServer> callback);
 
     /**
      * Create a SubServer
@@ -323,7 +193,22 @@ public abstract class SubCreator {
      * @param port Server Port Number
      * @return Success Status
      */
-    public abstract boolean create(UUID player, String name, ServerTemplate template, Version version, int port);
+    public boolean create(UUID player, String name, ServerTemplate template, Version version, int port) {
+        return create(player, name, template, version, port, null);
+    }
+
+    /**
+     * Create a SubServer
+     *
+     * @param name Server Name
+     * @param template Server Template
+     * @param version Server Version
+     * @param port Server Port Number
+     * @return Success Status
+     */
+    public boolean create(String name, ServerTemplate template, Version version, int port, Callback<SubServer> callback) {
+        return create(null, name, template, version, port, callback);
+    }
 
     /**
      * Create a SubServer

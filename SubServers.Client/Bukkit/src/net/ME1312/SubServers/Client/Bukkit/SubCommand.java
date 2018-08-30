@@ -91,10 +91,12 @@ public final class SubCommand implements CommandExecutor {
                                             if (i != 0) message += div;
                                             if (!(server instanceof SubServer)) {
                                                 message += ChatColor.WHITE;
-                                            } else if (((SubServer) server).isTemporary()) {
-                                                message += ChatColor.AQUA;
                                             } else if (((SubServer) server).isRunning()) {
-                                                message += ChatColor.GREEN;
+                                                if (((SubServer) server).getStopAction() == SubServer.StopAction.REMOVE_SERVER || ((SubServer) server).getStopAction() == SubServer.StopAction.DELETE_SERVER) {
+                                                    message += ChatColor.AQUA;
+                                                } else {
+                                                    message += ChatColor.GREEN;
+                                                }
                                             } else if (((SubServer) server).isEnabled() && ((SubServer) server).getCurrentIncompatibilities().size() == 0) {
                                                 message += ChatColor.YELLOW;
                                             } else {
@@ -114,7 +116,7 @@ public final class SubCommand implements CommandExecutor {
                                 sender.sendMessage(plugin.api.getLang("SubServers", "Command.List.Host-Header"));
                                 for (Host host : hosts.values()) {
                                     String message = "  ";
-                                    if (host.isEnabled()) {
+                                    if (host.isAvailable() && host.isEnabled()) {
                                         message += ChatColor.AQUA;
                                     } else {
                                         message += ChatColor.RED;
@@ -128,10 +130,12 @@ public final class SubCommand implements CommandExecutor {
                                     message += plugin.api.getLang("SubServers", "Command.List.Header");
                                     for (SubServer subserver : host.getSubServers().values()) {
                                         if (i != 0) message += div;
-                                        if (subserver.isTemporary()) {
-                                            message += ChatColor.AQUA;
-                                        } else if (subserver.isRunning()) {
-                                            message += ChatColor.GREEN;
+                                        if (subserver.isRunning()) {
+                                            if (subserver.getStopAction() == SubServer.StopAction.REMOVE_SERVER || subserver.getStopAction() == SubServer.StopAction.DELETE_SERVER) {
+                                                message += ChatColor.AQUA;
+                                            } else {
+                                                message += ChatColor.GREEN;
+                                            }
                                         } else if (subserver.isEnabled() && subserver.getCurrentIncompatibilities().size() == 0) {
                                             message += ChatColor.YELLOW;
                                         } else {
@@ -199,12 +203,9 @@ public final class SubCommand implements CommandExecutor {
                                         sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Players") + ChatColor.AQUA + server.getPlayers().size() + " online");
                                     }
                                     sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "MOTD") + ChatColor.WHITE + ChatColor.stripColor(server.getMotd()));
+                                    if (server instanceof SubServer && ((SubServer) server).getStopAction() != SubServer.StopAction.NONE) sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Stop Action") + ChatColor.WHITE + ((SubServer) server).getStopAction().toString());
                                     sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Signature") + ChatColor.AQUA + server.getSignature());
-                                    if (server instanceof SubServer) {
-                                        sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Logging") + ((((SubServer) server).isLogging())?ChatColor.GREEN+"yes":ChatColor.RED+"no"));
-                                        if (((SubServer) server).isTemporary()) sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Temporary") + ChatColor.GREEN + "yes");
-                                        else sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Auto Restart") + ((((SubServer) server).willAutoRestart())?ChatColor.GREEN+"enabled":ChatColor.RED+"disabled"));
-                                    }
+                                    if (server instanceof SubServer) sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Logging") + ((((SubServer) server).isLogging())?ChatColor.GREEN+"yes":ChatColor.RED+"no"));
                                     sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Restricted") + ((server.isRestricted())?ChatColor.GREEN+"yes":ChatColor.RED+"no"));
                                     if (server instanceof SubServer && ((SubServer) server).getIncompatibilities().size() > 0) {
                                         List<String> current = new ArrayList<String>();
@@ -238,6 +239,7 @@ public final class SubCommand implements CommandExecutor {
                                 if (host != null) {
                                     sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info").replace("$str$", "Host") + ChatColor.WHITE + host.getDisplayName());
                                     if (!host.getName().equals(host.getDisplayName())) sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "System Name") + ChatColor.WHITE  + host.getName());
+                                    sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Available") + ((host.isAvailable())?ChatColor.GREEN+"yes":ChatColor.RED+"no"));
                                     sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Enabled") + ((host.isEnabled())?ChatColor.GREEN+"yes":ChatColor.RED+"no"));
                                     if (plugin.config.get().getSection("Settings").getBoolean("Show-Addresses", false)) sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Address") + ChatColor.WHITE + host.getAddress().getHostAddress());
                                     if (host.getSubData() != null) sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Connected") + ChatColor.GREEN + "yes");
@@ -311,15 +313,18 @@ public final class SubCommand implements CommandExecutor {
                                             sender.sendMessage(plugin.api.getLang("SubServers", "Command.Start.Invalid"));
                                             break;
                                         case 5:
-                                            sender.sendMessage(plugin.api.getLang("SubServers", "Command.Start.Host-Disabled"));
+                                            sender.sendMessage(plugin.api.getLang("SubServers", "Command.Start.Host-Unavailable"));
                                             break;
                                         case 6:
-                                            sender.sendMessage(plugin.api.getLang("SubServers", "Command.Start.Server-Disabled"));
+                                            sender.sendMessage(plugin.api.getLang("SubServers", "Command.Start.Host-Disabled"));
                                             break;
                                         case 7:
-                                            sender.sendMessage(plugin.api.getLang("SubServers", "Command.Start.Running"));
+                                            sender.sendMessage(plugin.api.getLang("SubServers", "Command.Start.Server-Disabled"));
                                             break;
                                         case 8:
+                                            sender.sendMessage(plugin.api.getLang("SubServers", "Command.Start.Running"));
+                                            break;
+                                        case 9:
                                             sender.sendMessage(plugin.api.getLang("SubServers", "Command.Start.Server-Incompatible").replace("$str$", data.getString("m").split(":\\s")[1]));
                                             break;
                                         case 0:
@@ -453,12 +458,21 @@ public final class SubCommand implements CommandExecutor {
                                                 sender.sendMessage(plugin.api.getLang("SubServers", "Command.Creator.Unknown-Host"));
                                                 break;
                                             case 6:
-                                                sender.sendMessage(plugin.api.getLang("SubServers", "Command.Creator.Invalid-Template"));
+                                                sender.sendMessage(plugin.api.getLang("SubServers", "Command.Start.Host-Unavailable"));
                                                 break;
                                             case 7:
-                                                sender.sendMessage(plugin.api.getLang("SubServers", "Command.Creator.Invalid-Version"));
+                                                sender.sendMessage(plugin.api.getLang("SubServers", "Command.Start.Host-Disabled"));
                                                 break;
                                             case 8:
+                                                sender.sendMessage(plugin.api.getLang("SubServers", "Command.Creator.Unknown-Template"));
+                                                break;
+                                            case 9:
+                                                sender.sendMessage(plugin.api.getLang("SubServers", "Command.Creator.Template-Disabled"));
+                                                break;
+                                            case 10:
+                                                sender.sendMessage(plugin.api.getLang("SubServers", "Command.Creator.Invalid-Version"));
+                                                break;
+                                            case 11:
                                                 sender.sendMessage(plugin.api.getLang("SubServers", "Command.Creator.Invalid-Port"));
                                                 break;
                                             case 0:

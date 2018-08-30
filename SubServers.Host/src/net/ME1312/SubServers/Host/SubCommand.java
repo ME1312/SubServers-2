@@ -114,10 +114,12 @@ public class SubCommand {
                                 if (i != 0) message += div;
                                 if (!(server instanceof SubServer)) {
                                     message += TextColor.WHITE;
-                                } else if (((SubServer) server).isTemporary()) {
-                                    message += TextColor.AQUA;
                                 } else if (((SubServer) server).isRunning()) {
-                                    message += TextColor.GREEN;
+                                    if (((SubServer) server).getStopAction() == SubServer.StopAction.REMOVE_SERVER || ((SubServer) server).getStopAction() == SubServer.StopAction.DELETE_SERVER) {
+                                        message += TextColor.AQUA;
+                                    } else {
+                                        message += TextColor.GREEN;
+                                    }
                                 } else if (((SubServer) server).isEnabled() && ((SubServer) server).getCurrentIncompatibilities().size() == 0) {
                                     message += TextColor.YELLOW;
                                 } else {
@@ -138,7 +140,7 @@ public class SubCommand {
                     host.log.message.println("Host/SubServer List:");
                     for (Host host : hosts.values()) {
                         String message = "  ";
-                        if (host.isEnabled()) {
+                        if (host.isAvailable() && host.isEnabled()) {
                             message += TextColor.AQUA;
                         } else {
                             message += TextColor.RED;
@@ -146,10 +148,12 @@ public class SubCommand {
                         message += host.getDisplayName() + " (" + host.getAddress().getHostAddress() + ((host.getName().equals(host.getDisplayName()))?"":TextColor.stripColor(div)+host.getName()) + ")" + TextColor.RESET + ": ";
                         for (SubServer subserver : host.getSubServers().values()) {
                             if (i != 0) message += div;
-                            if (subserver.isTemporary()) {
-                                message += TextColor.AQUA;
-                            } else if (subserver.isRunning()) {
-                                message += TextColor.GREEN;
+                            if (subserver.isRunning()) {
+                                if (subserver.getStopAction() == SubServer.StopAction.REMOVE_SERVER || subserver.getStopAction() == SubServer.StopAction.DELETE_SERVER) {
+                                    message += TextColor.AQUA;
+                                } else {
+                                    message += TextColor.GREEN;
+                                }
                             } else if (subserver.isEnabled() && subserver.getCurrentIncompatibilities().size() == 0) {
                                 message += TextColor.YELLOW;
                             } else {
@@ -225,12 +229,9 @@ public class SubCommand {
                                 host.log.message.println(" -> Players: " + TextColor.AQUA + server.getPlayers().size() + " online");
                             }
                             host.log.message.println(" -> MOTD: " + TextColor.WHITE + TextColor.stripColor(server.getMotd()));
+                            if (server instanceof SubServer && ((SubServer) server).getStopAction() != SubServer.StopAction.NONE) host.log.message.println(" -> Stop Action: " + TextColor.WHITE + ((SubServer) server).getStopAction().toString());
                             host.log.message.println(" -> Signature: " + TextColor.AQUA + server.getSignature());
-                            if (server instanceof SubServer) {
-                                host.log.message.println(" -> Logging: " + ((((SubServer) server).isLogging())?TextColor.GREEN+"yes":TextColor.RED+"no"));
-                                if (((SubServer) server).isTemporary()) host.log.message.println(" -> Temporary: " + TextColor.GREEN + "yes");
-                                else host.log.message.println(" -> Auto Restart: " + ((((SubServer) server).willAutoRestart())?TextColor.GREEN+"enabled":TextColor.RED+"disabled"));
-                            }
+                            if (server instanceof SubServer) host.log.message.println(" -> Logging: " + ((((SubServer) server).isLogging())?TextColor.GREEN+"yes":TextColor.RED+"no"));
                             host.log.message.println(" -> Restricted: " + ((server.isRestricted())?TextColor.GREEN+"yes":TextColor.RED+"no"));
                             if (server instanceof SubServer && ((SubServer) server).getIncompatibilities().size() > 0) {
                                 List<String> current = new ArrayList<String>();
@@ -265,6 +266,7 @@ public class SubCommand {
                         if (host != null) {
                             h.log.message.println("SubServers > Info on Host: " + TextColor.WHITE + host.getDisplayName());
                             if (!host.getName().equals(host.getDisplayName())) h.log.message.println(" -> System Name: " + TextColor.WHITE  + host.getName());
+                            h.log.message.println(" -> Available: " + ((host.isAvailable())?TextColor.GREEN+"yes":TextColor.RED+"no"));
                             h.log.message.println(" -> Enabled: " + ((host.isEnabled())?TextColor.GREEN+"yes":TextColor.RED+"no"));
                             h.log.message.println(" -> Address: " + TextColor.WHITE + host.getAddress().getHostAddress());
                             if (host.getSubData() != null) h.log.message.println(" -> Connected: " + TextColor.GREEN + "yes");
@@ -354,15 +356,18 @@ public class SubCommand {
                                 host.log.message.println("That Server is not a SubServer");
                                 break;
                             case 5:
-                                host.log.message.println("That SubServer's Host is not enabled");
+                                host.log.message.println("That SubServer's Host is not available");
                                 break;
                             case 6:
-                                host.log.message.println("That SubServer is not enabled");
+                                host.log.message.println("That SubServer's Host is not enabled");
                                 break;
                             case 7:
-                                host.log.message.println("That SubServer is already running");
+                                host.log.message.println("That SubServer is not enabled");
                                 break;
                             case 8:
+                                host.log.message.println("That SubServer is already running");
+                                break;
+                            case 9:
                                 host.log.message.println("That SubServer cannot start while these server(s) are running:", data.getRawString("m").split(":\\s")[1]);
                                 break;
                             case 0:
@@ -538,12 +543,21 @@ public class SubCommand {
                                     host.log.message.println("There is no host with that name");
                                     break;
                                 case 6:
-                                    host.log.message.println("There is no template with that name");
+                                    host.log.message.println("That Host is not available");
                                     break;
                                 case 7:
-                                    host.log.message.println("SubCreator cannot create servers before Minecraft 1.8");
+                                    host.log.message.println("That Host is not enabled");
                                     break;
                                 case 8:
+                                    host.log.message.println("There is no template with that name");
+                                    break;
+                                case 9:
+                                    host.log.message.println("That Template is not enabled");
+                                    break;
+                                case 10:
+                                    host.log.message.println("SubCreator cannot create servers before Minecraft 1.8");
+                                    break;
+                                case 11:
                                     host.log.message.println("Invalid Port Number");
                                     break;
                                 case 0:

@@ -97,7 +97,6 @@ public final class SubDataServer {
         registerPacket(new PacketDownloadPlayerList(plugin), "SubServers", "DownloadPlayerList");
         registerPacket(new PacketDownloadProxyInfo(plugin), "SubServers", "DownloadProxyInfo");
         registerPacket(new PacketDownloadServerInfo(plugin), "SubServers", "DownloadServerInfo");
-        registerPacket(new PacketEditServer(plugin), "SubServers", "EditServer");
         registerPacket(new PacketExAddServer(), "SubServers", "ExAddServer");
         registerPacket(new PacketExConfigureHost(plugin), "SubServers", "ExConfigureHost");
         registerPacket(new PacketExCreateServer(null), "SubServers", "ExCreateServer");
@@ -109,7 +108,6 @@ public final class SubDataServer {
         registerPacket(new PacketLinkExHost(plugin), "SubServers", "LinkExHost");
         registerPacket(new PacketLinkProxy(plugin), "SubServers", "LinkProxy");
         registerPacket(new PacketLinkServer(plugin), "SubServers", "LinkServer");
-        registerPacket(new PacketListenLog(plugin), "SubServers", "ListenLog");
         registerPacket(new PacketStartServer(plugin), "SubServers", "StartServer");
         registerPacket(new PacketStopServer(plugin), "SubServers", "StopServer");
 
@@ -124,7 +122,6 @@ public final class SubDataServer {
         registerPacket(PacketDownloadPlayerList.class, "SubServers", "DownloadPlayerList");
         registerPacket(PacketDownloadProxyInfo.class, "SubServers", "DownloadProxyInfo");
         registerPacket(PacketDownloadServerInfo.class, "SubServers", "DownloadServerInfo");
-        registerPacket(PacketEditServer.class, "SubServers", "EditServer");
         registerPacket(PacketExAddServer.class, "SubServers", "ExAddServer");
         registerPacket(PacketExConfigureHost.class, "SubServers", "ExConfigureHost");
         registerPacket(PacketExCreateServer.class, "SubServers", "ExCreateServer");
@@ -134,7 +131,6 @@ public final class SubDataServer {
         registerPacket(PacketLinkExHost.class, "SubServers", "LinkExHost");
         registerPacket(PacketLinkProxy.class, "SubServers", "LinkProxy");
         registerPacket(PacketLinkServer.class, "SubServers", "LinkServer");
-        registerPacket(PacketListenLog.class, "SubServers", "ListenLog");
         registerPacket(PacketOutRunEvent.class, "SubServers", "RunEvent");
         registerPacket(PacketOutReload.class, "SubServers", "Reload");
         registerPacket(PacketOutReset.class, "SubServers", "Reset");

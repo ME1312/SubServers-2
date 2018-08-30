@@ -1,6 +1,7 @@
 package net.ME1312.SubServers.Bungee.Network.Packet;
 
 import net.ME1312.SubServers.Bungee.Host.SubCreator;
+import net.ME1312.SubServers.Bungee.Host.SubServer;
 import net.ME1312.SubServers.Bungee.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Bungee.Library.Version.Version;
 import net.ME1312.SubServers.Bungee.Network.Client;
@@ -59,13 +60,18 @@ public class PacketCreateServer implements PacketIn, PacketOut {
                 client.sendPacket(new PacketCreateServer(4, "There is already a subserver with that name", (data.contains("id")) ? data.getRawString("id") : null));
             } else if (!plugin.hosts.keySet().contains(data.getSection("creator").getString("host").toLowerCase())) {
                 client.sendPacket(new PacketCreateServer(5, "There is no Host with that name", (data.contains("id")) ? data.getRawString("id") : null));
-            } else if (!plugin.hosts.get(data.getSection("creator").getString("host").toLowerCase()).getCreator().getTemplates().keySet().contains(data.getSection("creator").getString("template").toLowerCase()) ||
-                    !plugin.hosts.get(data.getSection("creator").getString("host").toLowerCase()).getCreator().getTemplate(data.getSection("creator").getString("template")).isEnabled()) {
-                client.sendPacket(new PacketCreateServer(6, "There is no template with that name", (data.contains("id")) ? data.getRawString("id") : null));
+            } else if (!plugin.hosts.get(data.getSection("creator").getString("host").toLowerCase()).isAvailable()) {
+                client.sendPacket(new PacketStartServer(6, "That SubServer's Host is not available", (data.contains("id"))?data.getRawString("id"):null));
+            } else if (!plugin.hosts.get(data.getSection("creator").getString("host").toLowerCase()).isEnabled()) {
+                client.sendPacket(new PacketStartServer(7, "That SubServer's Host is not enabled", (data.contains("id"))?data.getRawString("id"):null));
+            } else if (!plugin.hosts.get(data.getSection("creator").getString("host").toLowerCase()).getCreator().getTemplates().keySet().contains(data.getSection("creator").getString("template").toLowerCase())) {
+                client.sendPacket(new PacketCreateServer(8, "There is no template with that name", (data.contains("id")) ? data.getRawString("id") : null));
+            } else if (!plugin.hosts.get(data.getSection("creator").getString("host").toLowerCase()).getCreator().getTemplate(data.getSection("creator").getString("template")).isEnabled()) {
+                client.sendPacket(new PacketCreateServer(8, "That Template is not enabled", (data.contains("id")) ? data.getRawString("id") : null));
             } else if (new Version("1.8").compareTo(new Version(data.getSection("creator").getString("version"))) > 0) {
-                client.sendPacket(new PacketCreateServer(7, "SubCreator cannot create servers before Minecraft 1.8", (data.contains("id")) ? data.getRawString("id") : null));
+                client.sendPacket(new PacketCreateServer(10, "SubCreator cannot create servers before Minecraft 1.8", (data.contains("id")) ? data.getRawString("id") : null));
             } else if (data.getSection("creator").getInt("port") <= 0 || data.getSection("creator").getInt("port") > 65535) {
-                client.sendPacket(new PacketCreateServer(8, "Invalid Port Number", (data.contains("id")) ? data.getRawString("id") : null));
+                client.sendPacket(new PacketCreateServer(11, "Invalid Port Number", (data.contains("id")) ? data.getRawString("id") : null));
             } else {
                 if (plugin.hosts.get(data.getSection("creator").getString("host").toLowerCase()).getCreator().create((data.contains("player"))?UUID.fromString(data.getRawString("player")):null, data.getSection("creator").getString("name"), plugin.hosts.get(data.getSection("creator").getString("host").toLowerCase()).getCreator().getTemplate(data.getSection("creator").getString("template")), new Version(data.getSection("creator").getString("version")), data.getSection("creator").getInt("port"))) {
                     if (data.contains("wait") && data.getBoolean("wait")) {

@@ -334,7 +334,7 @@ public class DefaultUIHandler implements UIHandler, Listener {
                                             if (listening.get()) if (!json.getString("server").equalsIgnoreCase((String) gui.lastVisitedObjects[0])) {
                                                 PacketInRunEvent.callback("SubStoppedEvent", this);
                                             } else {
-                                                gui.reopen();
+                                                Bukkit.getScheduler().runTaskLater(plugin, gui::reopen, 5);
                                             }
                                         } catch (Exception e) {}
                                     }

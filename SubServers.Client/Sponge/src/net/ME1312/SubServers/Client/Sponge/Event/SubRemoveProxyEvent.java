@@ -37,6 +37,6 @@ public class SubRemoveProxyEvent extends AbstractEvent implements SubEvent {
     @Override
     @Deprecated
     public Cause getCause() {
-        return Cause.builder().build();
+        return Cause.builder().build(getContext());
     }
 }

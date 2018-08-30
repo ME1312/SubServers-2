@@ -14,6 +14,21 @@ public class SubServer extends Server {
     private Host host = null;
 
     /**
+     * SubServer Stop Action Class
+     */
+    public enum StopAction {
+        NONE,
+        RESTART,
+        REMOVE_SERVER,
+        DELETE_SERVER;
+
+        @Override
+        public String toString() {
+            return super.toString().substring(0, 1).toUpperCase()+super.toString().substring(1).toLowerCase().replace('_', ' ');
+        }
+    }
+
+    /**
      * Create an API representation of a Server
      *
      * @param raw JSON representation of the Server
@@ -331,12 +346,12 @@ public class SubServer extends Server {
     }
 
     /**
-     * If the Server will Auto Restart on unexpected shutdowns
+     * Get the action the Server will take when it stops
      *
-     * @return Auto Restart Status
+     * @return Stop Action
      */
-    public boolean willAutoRestart() {
-        return raw.getBoolean("auto-restart");
+    public StopAction getStopAction() {
+        return Util.getDespiteException(() -> StopAction.valueOf(raw.getRawString("stop-action").toUpperCase().replace('-', '_').replace(' ', '_')), null);
     }
 
     /**
@@ -421,14 +436,5 @@ public class SubServer extends Server {
                     current.add(subserver);
             callback.run(current);
         });
-    }
-
-    /**
-     * If the Server is Temporary
-     *
-     * @return Temporary Status
-     */
-    public boolean isTemporary() {
-        return raw.getBoolean("temp");
     }
 }

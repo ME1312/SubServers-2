@@ -92,9 +92,9 @@ public class InternalHost extends Host {
     }
 
     @Override
-    public SubServer addSubServer(UUID player, String name, boolean enabled, int port, String motd, boolean log, String directory, Executable executable, String stopcmd, boolean hidden, boolean restricted, boolean temporary) throws InvalidServerException {
+    public SubServer addSubServer(UUID player, String name, boolean enabled, int port, String motd, boolean log, String directory, Executable executable, String stopcmd, boolean hidden, boolean restricted) throws InvalidServerException {
         if (plugin.api.getServers().keySet().contains(name.toLowerCase())) throw new InvalidServerException("A Server already exists with this name!");
-        SubServer server = new InternalSubServer(this, name, enabled, port, motd, log, directory, executable, stopcmd, hidden, restricted, temporary);
+        SubServer server = new InternalSubServer(this, name, enabled, port, motd, log, directory, executable, stopcmd, hidden, restricted);
         SubAddServerEvent event = new SubAddServerEvent(player, this, server);
         plugin.getPluginManager().callEvent(event);
         if (!event.isCancelled()) {
@@ -108,15 +108,15 @@ public class InternalHost extends Host {
     @Override
     public boolean removeSubServer(UUID player, String name) throws InterruptedException {
         if (Util.isNull(name)) throw new NullPointerException();
-        SubRemoveServerEvent event = new SubRemoveServerEvent(player, this, getSubServer(name));
+        String server = servers.get(name.toLowerCase()).getName();
+        SubRemoveServerEvent event = new SubRemoveServerEvent(player, this, getSubServer(server));
         plugin.getPluginManager().callEvent(event);
         if (!event.isCancelled()) {
-            if (getSubServer(name).isRunning()) {
-                getSubServer(name).stop();
-                getSubServer(name).waitFor();
+            if (getSubServer(server).isRunning()) {
+                getSubServer(server).stop();
+                getSubServer(server).waitFor();
             }
-
-            servers.remove(name.toLowerCase());
+            servers.remove(server.toLowerCase());
             return true;
         } else return false;
     }
@@ -124,12 +124,13 @@ public class InternalHost extends Host {
     @Override
     public boolean forceRemoveSubServer(UUID player, String name) {
         if (Util.isNull(name)) throw new NullPointerException();
-        SubRemoveServerEvent event = new SubRemoveServerEvent(player, this, getSubServer(name));
+        String server = servers.get(name.toLowerCase()).getName();
+        SubRemoveServerEvent event = new SubRemoveServerEvent(player, this, getSubServer(server));
         plugin.getPluginManager().callEvent(event);
-        if (getSubServer(name).isRunning()) {
-            getSubServer(name).terminate();
+        if (getSubServer(server).isRunning()) {
+            getSubServer(server).terminate();
         }
-        servers.remove(name.toLowerCase());
+        servers.remove(server.toLowerCase());
         return true;
     }
 
@@ -172,7 +173,7 @@ public class InternalHost extends Host {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                System.out.println("SubServers > Done!");
+                System.out.println("SubServers > Deleted SubServer: " + server);
             }).start();
             return true;
         } else return false;
@@ -217,7 +218,7 @@ public class InternalHost extends Host {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                System.out.println("SubServers > Done!");
+                System.out.println("SubServers > Deleted SubServer: " + server);
             }).start();
             return true;
         } else return false;

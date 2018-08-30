@@ -54,12 +54,13 @@ public class ServerContainer extends BungeeServerInfo implements Server {
     }
 
     @Override
+    @SuppressWarnings("deprecation")
     public void setDisplayName(String value) {
         if (value == null || value.length() == 0 || getName().equals(value)) {
-            new SubEditServerEvent(null, this, new NamedContainer<String, Object>("display", getName()), false);
+            SubAPI.getInstance().getInternals().getPluginManager().callEvent(new SubEditServerEvent(null, this, new NamedContainer<String, Object>("display", getName()), false));
             this.nick = null;
         } else {
-            new SubEditServerEvent(null, this, new NamedContainer<String, Object>("display", value), false);
+            SubAPI.getInstance().getInternals().getPluginManager().callEvent(new SubEditServerEvent(null, this, new NamedContainer<String, Object>("display", value), false));
             this.nick = value;
         }
     }
@@ -108,15 +109,17 @@ public class ServerContainer extends BungeeServerInfo implements Server {
     }
 
     @Override
+    @SuppressWarnings("deprecation")
     public void setHidden(boolean value) {
         if (Util.isNull(value)) throw new NullPointerException();
-        new SubEditServerEvent(null, this, new NamedContainer<String, Object>("hidden", value), false);
+        SubAPI.getInstance().getInternals().getPluginManager().callEvent(new SubEditServerEvent(null, this, new NamedContainer<String, Object>("hidden", value), false));
         this.hidden = value;
     }
 
+    @SuppressWarnings("deprecation")
     public void setMotd(String value) {
         if (Util.isNull(value)) throw new NullPointerException();
-        new SubEditServerEvent(null, this, new NamedContainer<String, Object>("motd", value), false);
+        SubAPI.getInstance().getInternals().getPluginManager().callEvent(new SubEditServerEvent(null, this, new NamedContainer<String, Object>("motd", value), false));
         try {
             Field f = BungeeServerInfo.class.getDeclaredField("motd");
             f.setAccessible(true);
@@ -127,9 +130,10 @@ public class ServerContainer extends BungeeServerInfo implements Server {
         }
     }
 
+    @SuppressWarnings("deprecation")
     public void setRestricted(boolean value) {
         if (Util.isNull(value)) throw new NullPointerException();
-        new SubEditServerEvent(null, this, new NamedContainer<String, Object>("restricted", value), false);
+        SubAPI.getInstance().getInternals().getPluginManager().callEvent(new SubEditServerEvent(null, this, new NamedContainer<String, Object>("restricted", value), false));
         try {
             Field f = BungeeServerInfo.class.getDeclaredField("restricted");
             f.setAccessible(true);
