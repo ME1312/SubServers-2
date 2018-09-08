@@ -1,14 +1,15 @@
 package net.ME1312.SubServers.Host.Executable;
 
-import net.ME1312.SubServers.Host.Library.Config.YAMLSection;
-import net.ME1312.SubServers.Host.Library.Container;
+import net.ME1312.Galaxi.Engine.GalaxiEngine;
+import net.ME1312.Galaxi.Library.Config.YAMLSection;
+import net.ME1312.Galaxi.Library.Container;
+import net.ME1312.Galaxi.Library.NamedContainer;
+import net.ME1312.Galaxi.Library.UniversalFile;
+import net.ME1312.Galaxi.Library.Util;
+import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubServers.Host.Library.Exception.InvalidServerException;
 import net.ME1312.SubServers.Host.Library.Exception.InvalidTemplateException;
 import net.ME1312.SubServers.Host.Library.Exception.SubCreatorException;
-import net.ME1312.SubServers.Host.Library.NamedContainer;
-import net.ME1312.SubServers.Host.Library.UniversalFile;
-import net.ME1312.SubServers.Host.Library.Util;
-import net.ME1312.SubServers.Host.Library.Version.Version;
 import net.ME1312.SubServers.Host.Network.API.SubCreator.ServerType;
 import net.ME1312.SubServers.Host.Network.Packet.PacketExCreateServer;
 import net.ME1312.SubServers.Host.Network.Packet.PacketOutExLogMessage;
@@ -266,7 +267,7 @@ public class SubCreator {
             String gitBash = host.host.getRawString("Git-Bash") + ((host.host.getRawString("Git-Bash").endsWith(File.separator)) ? "" : File.separator) + "bin" + File.separatorChar + "bash.exe";
             File cache;
             if (template.getBuildOptions().getBoolean("Use-Cache", true)) {
-                cache = new UniversalFile(host.dir, "Cache:Templates:" + template.getName());
+                cache = new UniversalFile(GalaxiEngine.getInstance().getRuntimeDirectory(), "Cache:Templates:" + template.getName());
                 cache.mkdirs();
             } else {
                 cache = null;
@@ -307,9 +308,9 @@ public class SubCreator {
 
             if (cache != null) {
                 if (cache.isDirectory() && cache.listFiles().length == 0) cache.delete();
-                cache = new UniversalFile(host.dir, "Cache:Templates");
+                cache = new UniversalFile(GalaxiEngine.getInstance().getRuntimeDirectory(), "Cache:Templates");
                 if (cache.isDirectory() && cache.listFiles().length == 0) cache.delete();
-                cache = new UniversalFile(host.dir, "Cache");
+                cache = new UniversalFile(GalaxiEngine.getInstance().getRuntimeDirectory(), "Cache");
                 if (cache.isDirectory() && cache.listFiles().length == 0) cache.delete();
             }
         }

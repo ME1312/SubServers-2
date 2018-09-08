@@ -1,9 +1,10 @@
 package net.ME1312.SubServers.Host.Network.Packet;
 
-import net.ME1312.SubServers.Host.Library.Config.YAMLSection;
-import net.ME1312.SubServers.Host.Library.Log.Logger;
-import net.ME1312.SubServers.Host.Library.Util;
-import net.ME1312.SubServers.Host.Library.Version.Version;
+import net.ME1312.Galaxi.Engine.GalaxiEngine;
+import net.ME1312.Galaxi.Library.Config.YAMLSection;
+import net.ME1312.Galaxi.Library.Log.Logger;
+import net.ME1312.Galaxi.Library.Util;
+import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubServers.Host.Network.PacketIn;
 import net.ME1312.SubServers.Host.Network.PacketOut;
 import net.ME1312.SubServers.Host.Network.SubDataClient;
@@ -53,7 +54,7 @@ public class PacketLinkExHost implements PacketIn, PacketOut {
             } catch (Exception e) {}
         } else {
             log.info.println("Could not link name with host: " + data.getRawString("m"));
-            host.stop(1);
+            GalaxiEngine.getInstance().stop();
         }
     }
 

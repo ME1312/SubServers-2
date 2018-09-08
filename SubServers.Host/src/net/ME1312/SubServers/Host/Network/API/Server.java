@@ -1,7 +1,7 @@
 package net.ME1312.SubServers.Host.Network.API;
 
-import net.ME1312.SubServers.Host.Library.Config.YAMLSection;
-import net.ME1312.SubServers.Host.Library.NamedContainer;
+import net.ME1312.Galaxi.Library.Config.YAMLSection;
+import net.ME1312.Galaxi.Library.NamedContainer;
 import net.ME1312.SubServers.Host.Network.Packet.PacketDownloadServerInfo;
 import net.ME1312.SubServers.Host.SubAPI;
 

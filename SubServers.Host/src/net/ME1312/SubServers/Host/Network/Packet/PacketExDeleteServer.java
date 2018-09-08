@@ -1,11 +1,12 @@
 package net.ME1312.SubServers.Host.Network.Packet;
 
+import net.ME1312.Galaxi.Engine.GalaxiEngine;
+import net.ME1312.Galaxi.Library.Config.YAMLSection;
+import net.ME1312.Galaxi.Library.Log.Logger;
+import net.ME1312.Galaxi.Library.UniversalFile;
+import net.ME1312.Galaxi.Library.Util;
+import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubServers.Host.Executable.SubServer;
-import net.ME1312.SubServers.Host.Library.Config.YAMLSection;
-import net.ME1312.SubServers.Host.Library.Log.Logger;
-import net.ME1312.SubServers.Host.Library.UniversalFile;
-import net.ME1312.SubServers.Host.Library.Util;
-import net.ME1312.SubServers.Host.Library.Version.Version;
 import net.ME1312.SubServers.Host.Network.PacketIn;
 import net.ME1312.SubServers.Host.Network.PacketOut;
 import net.ME1312.SubServers.Host.Network.SubDataClient;
@@ -75,7 +76,7 @@ public class PacketExDeleteServer implements PacketIn, PacketOut {
                 SubServer server = host.servers.get(data.getRawString("server").toLowerCase());
                 host.servers.remove(data.getRawString("server").toLowerCase());
                 new Thread(() -> {
-                    UniversalFile to = new UniversalFile(host.dir, "Recently Deleted:" + server.getName().toLowerCase());
+                    UniversalFile to = new UniversalFile(GalaxiEngine.getInstance().getRuntimeDirectory(), "Recently Deleted:" + server.getName().toLowerCase());
                     try {
                         File from = new File(host.host.getRawString("Directory"), server.getDirectory());
                         if (from.exists()) {

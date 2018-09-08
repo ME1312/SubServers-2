@@ -1,6 +1,7 @@
 package net.ME1312.SubServers.Host.Network.Encryption;
 
-import net.ME1312.SubServers.Host.Library.Config.YAMLSection;
+import net.ME1312.Galaxi.Library.Config.YAMLSection;
+import net.ME1312.SubServers.Host.Network.SubDataClient;
 import org.json.JSONObject;
 import org.msgpack.core.MessagePack;
 import org.msgpack.core.MessagePacker;
@@ -187,7 +188,7 @@ public final class AES implements net.ME1312.SubServers.Host.Network.Cipher {
     public Value encrypt(String key, YAMLSection data) throws Exception {
         ByteArrayOutputStream unencrypted = new ByteArrayOutputStream();
         MessagePacker packer = MessagePack.newDefaultPacker(unencrypted);
-        packer.packValue(data.msgPack());
+        packer.packValue(SubDataClient.convert(data));
         packer.close();
 
         ByteArrayOutputStream encrypted = new ByteArrayOutputStream();
@@ -283,7 +284,7 @@ public final class AES implements net.ME1312.SubServers.Host.Network.Cipher {
     public YAMLSection decrypt(String key, Value data) throws Exception {
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         decrypt(key, new ByteArrayInputStream(data.asBinaryValue().asByteArray()), bytes);
-        return new YAMLSection(MessagePack.newDefaultUnpacker(bytes.toByteArray()).unpackValue().asMapValue());
+        return SubDataClient.convert(MessagePack.newDefaultUnpacker(bytes.toByteArray()).unpackValue().asMapValue());
     }
 
     /**

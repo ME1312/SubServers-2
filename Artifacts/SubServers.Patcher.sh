@@ -1,11 +1,23 @@
-# SubServers Library Patcher: Combines BungeeCord and SubServers.Bungee/SubServers.Sync into one jar file
-# Usage: "bash SubServers.Bungee.Patcher.sh <BungeeCord.jar> <SubServers.jar>"
+# SubServers Library Patcher
+#
+# Can be used to combine the following into one jar file:
+#  -> BungeeCord and SubServers.Bungee
+#  -> BungeeCord and SubServers.Sync
+#  -> GalaxiEngine and SubServers.Host
+#
+# Usage: "bash SubServers.Bungee.Patcher.sh <Platform.jar> <SubServers.jar>"
 #
 #!/usr/bin/env bash
 if [ -z "$1" ]
   then
-    echo "SubServers Library Patcher: Combines BungeeCord and SubServers.Bungee/SubServers.Sync into one jar file"
-    echo "Usage: bash $0 <BungeeCord.jar> <SubServers.jar>"
+    echo "SubServers Library Patcher"
+	echo ""
+	echo "Can be used to combine the following into one jar file:"
+	echo " -> BungeeCord and SubServers.Bungee"
+	echo " -> BungeeCord and SubServers.Sync"
+	echo " -> GalaxiEngine and SubServers.Host"
+	echo ""
+    echo "Usage: bash $0 <Platform.jar> <SubServers.jar>"
     exit 1
 fi
 if [ ! -f "$1" ]

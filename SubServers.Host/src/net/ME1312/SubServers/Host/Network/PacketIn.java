@@ -1,7 +1,7 @@
 package net.ME1312.SubServers.Host.Network;
 
-import net.ME1312.SubServers.Host.Library.Config.YAMLSection;
-import net.ME1312.SubServers.Host.Library.Version.Version;
+import net.ME1312.Galaxi.Library.Config.YAMLSection;
+import net.ME1312.Galaxi.Library.Version.Version;
 
 /**
  * PacketIn Layout Class

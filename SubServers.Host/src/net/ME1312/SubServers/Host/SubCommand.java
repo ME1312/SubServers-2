@@ -1,19 +1,13 @@
 package net.ME1312.SubServers.Host;
 
-import net.ME1312.SubServers.Host.API.Command;
-import net.ME1312.SubServers.Host.API.SubPluginInfo;
-import net.ME1312.SubServers.Host.Library.Config.YAMLSection;
+import net.ME1312.Galaxi.Engine.GalaxiEngine;
+import net.ME1312.Galaxi.Library.Util;
+import net.ME1312.Galaxi.Library.Version.Version;
+import net.ME1312.Galaxi.Plugin.Command;
 import net.ME1312.SubServers.Host.Library.TextColor;
-import net.ME1312.SubServers.Host.Library.Util;
-import net.ME1312.SubServers.Host.Library.Version.Version;
 import net.ME1312.SubServers.Host.Network.API.*;
 import net.ME1312.SubServers.Host.Network.Packet.*;
-import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.nio.charset.Charset;
 import java.util.*;
 
 /**
@@ -22,83 +16,29 @@ import java.util.*;
 public class SubCommand {
     private SubCommand() {}
     protected static void load(ExHost host) {
-        new Command(null) {
+        new Command(host.info) {
             @Override
             public void command(String handle, String[] args) {
-                if (args.length == 0 || host.api.plugins.get(args[0].toLowerCase()) != null) {
-                    host.log.message.println(
-                            "These are the platforms and versions that are running " + ((args.length == 0)?"SubServers.Host":host.api.plugins.get(args[0].toLowerCase()).getName()) +":",
-                            "  " + System.getProperty("os.name") + ' ' + System.getProperty("os.version") + ',',
-                            "  Java " + System.getProperty("java.version") + ',',
-                            "  SubServers.Host v" + host.version.toExtendedString() + ((host.api.getAppBuild() != null)?" (" + host.api.getAppBuild() + ')':""));
-                    if (args.length == 0) {
-                        host.log.message.println("");
-                        new Thread(() -> {
-                            try {
-                                YAMLSection tags = new YAMLSection(new JSONObject("{\"tags\":" + Util.readAll(new BufferedReader(new InputStreamReader(new URL("https://api.github.com/repos/ME1312/SubServers-2/git/refs/tags").openStream(), Charset.forName("UTF-8")))) + '}'));
-                                List<Version> versions = new LinkedList<Version>();
-
-                                Version updversion = host.version;
-                                int updcount = 0;
-                                for (YAMLSection tag : tags.getSectionList("tags")) versions.add(Version.fromString(tag.getString("ref").substring(10)));
-                                Collections.sort(versions);
-                                for (Version version : versions) {
-                                    if (version.compareTo(updversion) > 0) {
-                                        updversion = version;
-                                        updcount++;
-                                    }
-                                }
-                                if (updcount == 0) {
-                                    host.log.message.println("You are on the latest version.");
-                                } else {
-                                    host.log.message.println("SubServers.Host v" + updversion + " is available. You are " + updcount + " version" + ((updcount == 1)?"":"s") + " behind.");
-                                }
-                            } catch (Exception e) {}
-                        }).start();
-                    } else {
-                        SubPluginInfo plugin = host.api.plugins.get(args[0].toLowerCase());
-                        String title = "  " + plugin.getName() + " v" + plugin.getVersion().toExtendedString();
-                        String subtitle = "    by ";
-                        int i = 0;
-                        for (String author : plugin.getAuthors()) {
+                if (args.length > 0) {
+                    int i = 0;
+                    String str = args[0];
+                    if (args.length > 1) {
+                        do {
                             i++;
-                            if (i > 1) {
-                                if (plugin.getAuthors().size() > 2) subtitle += ", ";
-                                else if (plugin.getAuthors().size() == 2) subtitle += ' ';
-                                if (i == plugin.getAuthors().size()) subtitle += "and ";
-                            }
-                            subtitle += author;
-                        }
-                        if (plugin.getWebsite() != null) {
-                            if (title.length() > subtitle.length() + 5 + plugin.getWebsite().toString().length()) {
-                                i = subtitle.length();
-                                while (i < title.length() - plugin.getWebsite().toString().length() - 2) {
-                                    i++;
-                                    subtitle += ' ';
-                                }
-                            } else {
-                                subtitle += " - ";
-                            }
-                            subtitle += plugin.getWebsite().toString();
-                        }
-                        host.log.message.println(title, subtitle);
-                        if (plugin.getDescription() != null) host.log.message.println("", plugin.getDescription());
+                            str = str + " " + args[i].replace(" ", "\\ ");
+                        } while ((i + 1) != args.length);
                     }
-                } else {
-                    host.log.message.println("There is no plugin with that name");
+                    GalaxiEngine.getInstance().getConsoleReader().runCommand(str);
                 }
             }
-        }.usage("[plugin]").description("Gets the version of the System and SubServers or the specified Plugin").help(
-                "This command will print what OS you're running, your OS version,",
-                "your Java version, and the SubServers.Host version.",
-                "",
-                "If the [plugin] option is provided, it will print information about the specified plugin as well.",
+        }.usage("<Command>", "[Args...]").description("An alias for commands").help(
+                "This command is an alias for all registered commands for ease of use.",
                 "",
                 "Examples:",
-                "  /version",
-                "  /version ExamplePlugin"
-        ).register("ver", "version");
-        new Command(null) {
+                "  /sub help -> /help",
+                "  /sub version ExamplePlugin -> /version ExamplePlugin"
+        ).register("sub", "subserver", "subservers");
+        new Command(host.info) {
             @Override
             public void command(String handle, String[] args) {
                 host.api.getGroups(groups -> host.api.getHosts(hosts -> host.api.getServers(servers -> host.api.getMasterProxy(proxymaster -> host.api.getProxies(proxies -> {
@@ -204,7 +144,7 @@ public class SubCommand {
                 "Example:",
                 "  /list"
         ).register("list");
-        new Command(null) {
+        new Command(host.info) {
             @Override
             public void command(String handle, String[] args) {
                 if (args.length > 0) {
@@ -343,7 +283,7 @@ public class SubCommand {
                 "  /info ExampleServer",
                 "  /info server ExampleServer"
         ).register("info", "status");
-        new Command(null) {
+        new Command(host.info) {
             @Override
             public void command(String handle, String[] args) {
                 if (args.length > 0) {
@@ -394,7 +334,7 @@ public class SubCommand {
                 "Example:",
                 "  /start ExampleServer"
         ).register("start");
-        new Command(null) {
+        new Command(host.info) {
             @Override
             public void command(String handle, String[] args) {
                 if (args.length > 0) {
@@ -434,7 +374,7 @@ public class SubCommand {
                 "Example:",
                 "  /stop ExampleServer"
         ).register("stop");
-        new Command(null) {
+        new Command(host.info) {
             @Override
             public void command(String handle, String[] args) {
                 if (args.length > 0) {
@@ -474,7 +414,7 @@ public class SubCommand {
                 "Example:",
                 "  /kill ExampleServer"
         ).register("kill", "terminate");
-        new Command(null) {
+        new Command(host.info) {
             @Override
             public void command(String handle, String[] args) {
                 if (args.length > 1) {
@@ -525,7 +465,7 @@ public class SubCommand {
                 "  /cmd ExampleServer help",
                 "  /cmd ExampleServer say Hello World!"
         ).register("cmd", "command");
-        new Command(null) {
+        new Command(host.info) {
             @Override
             public void command(String handle, String[] args) {
                 if (args.length > 4) {
@@ -597,83 +537,5 @@ public class SubCommand {
                 "Examples:",
                 "  /create ExampleServer ExampleHost Spigot 1.11 25565"
         ).register("create");
-        new Command(null) {
-            public void command(String handle, String[] args) {
-                HashMap<String, String> commands = new LinkedHashMap<String, String>();
-                HashMap<Command, String> handles = new LinkedHashMap<Command, String>();
-
-                int length = 0;
-                for(String command : host.api.commands.keySet()) {
-                    String formatted = "/ ";
-                    Command cmd = host.api.commands.get(command);
-                    String alias = (handles.keySet().contains(cmd))?handles.get(cmd):null;
-
-                    if (alias != null) formatted = commands.get(alias);
-                    if (cmd.usage().length == 0 || alias != null) {
-                        formatted = formatted.replaceFirst("\\s", ((alias != null)?"|":"") + command + ' ');
-                    } else {
-                        String usage = "";
-                        for (String str : cmd.usage()) usage += ((usage.length() == 0)?"":" ") + str;
-                        formatted = formatted.replaceFirst("\\s", command + ' ' + usage + ' ');
-                    }
-                    if(formatted.length() > length) {
-                        length = formatted.length();
-                    }
-
-                    if (alias == null) {
-                        commands.put(command, formatted);
-                        handles.put(cmd, command);
-                    } else {
-                        commands.put(alias, formatted);
-                    }
-                }
-
-                if (args.length == 0) {
-                    host.log.message.println("SubServers.Host Command List:");
-                    for (String command : commands.keySet()) {
-                        String formatted = commands.get(command);
-                        Command cmd = host.api.commands.get(command);
-
-                        while (formatted.length() < length) {
-                            formatted += ' ';
-                        }
-                        formatted += ((cmd.description() == null || cmd.description().length() == 0)?"  ":"- "+cmd.description());
-
-                        host.log.message.println(formatted);
-                    }
-                } else if (host.api.commands.keySet().contains((args[0].startsWith("/"))?args[0].toLowerCase().substring(1):args[0].toLowerCase())) {
-                    Command cmd = host.api.commands.get((args[0].startsWith("/"))?args[0].toLowerCase().substring(1):args[0].toLowerCase());
-                    String formatted = commands.get(Util.getBackwards(host.api.commands, cmd).get(0));
-                    host.log.message.println(formatted.substring(0, formatted.length() - 1));
-                    for (String line : cmd.help()) {
-                        host.log.message.println("  " + line);
-                    }
-                } else {
-                    host.log.message.println("There is no command with that name");
-                }
-            }
-        }.usage("[command]").description("Prints a list of the commands and/or their descriptions").help(
-                "This command will print a list of all currently registered commands and aliases,",
-                "along with their usage and a short description.",
-                "",
-                "If the [command] option is provided, it will print that command, it's aliases,",
-                "it's usage, and an extended description like the one you see here instead.",
-                "",
-                "Examples:",
-                "  /help",
-                "  /help end"
-        ).register("help", "?");
-        new Command(null) {
-            @Override
-            public void command(String handle, String[] args) {
-                host.stop(0);
-            }
-        }.description("Stops this SubServers instance").help(
-                "This command will shutdown this instance of SubServers.Host,",
-                "SubServers running on this host, and any plugins currently running via SubAPI.",
-                "",
-                "Example:",
-                "  /exit"
-        ).register("exit", "end");
     }
 }

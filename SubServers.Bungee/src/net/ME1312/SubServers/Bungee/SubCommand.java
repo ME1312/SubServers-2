@@ -525,7 +525,7 @@ public final class SubCommand extends CommandX {
                 "   Help: /sub help",
                 "   List: /sub list",
                 "   Version: /sub version",
-                "   Reload: /sub reload [all|configs|templates]",
+                "   Reload: /sub reload [all|config|templates]",
                 "   Info: /sub info [proxy|host|group|server] <Name>",
                 "   Start Server: /sub start <SubServer>",
                 "   Stop Server: /sub stop <SubServer>",

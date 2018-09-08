@@ -1,11 +1,12 @@
 package net.ME1312.SubServers.Host.Network.Packet;
 
+import net.ME1312.Galaxi.Engine.GalaxiEngine;
+import net.ME1312.Galaxi.Library.Config.YAMLSection;
+import net.ME1312.Galaxi.Library.Log.Logger;
+import net.ME1312.Galaxi.Library.UniversalFile;
+import net.ME1312.Galaxi.Library.Util;
+import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubServers.Host.Executable.SubCreator;
-import net.ME1312.SubServers.Host.Library.Config.YAMLSection;
-import net.ME1312.SubServers.Host.Library.Log.Logger;
-import net.ME1312.SubServers.Host.Library.UniversalFile;
-import net.ME1312.SubServers.Host.Library.Util;
-import net.ME1312.SubServers.Host.Library.Version.Version;
 import net.ME1312.SubServers.Host.Network.PacketIn;
 import net.ME1312.SubServers.Host.Network.PacketOut;
 import net.ME1312.SubServers.Host.Network.SubDataClient;
@@ -50,7 +51,7 @@ public class PacketExConfigureHost implements PacketIn, PacketOut {
             Util.deleteDirectory(template.getDirectory());
         }
         host.templates.clear();
-        UniversalFile templates = new UniversalFile(host.dir, "Templates");
+        UniversalFile templates = new UniversalFile(GalaxiEngine.getInstance().getRuntimeDirectory(), "Templates");
         Util.deleteDirectory(templates);
         templates.mkdirs();
         for (String name : data.getSection("templates").getKeys()) {

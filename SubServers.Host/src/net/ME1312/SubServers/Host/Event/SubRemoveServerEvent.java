@@ -1,25 +1,25 @@
-package net.ME1312.SubServers.Host.API.Event;
+package net.ME1312.SubServers.Host.Event;
 
-import net.ME1312.SubServers.Host.Library.Event.Event;
-import net.ME1312.SubServers.Host.Library.Util;
+import net.ME1312.Galaxi.Library.Event.Event;
+import net.ME1312.Galaxi.Library.Util;
 
 import java.util.UUID;
 
 /**
- * Add Server Event
+ * Remove Server Event
  */
-public class SubAddServerEvent extends Event {
+public class SubRemoveServerEvent extends Event {
     private UUID player;
     private String host;
     private String server;
 
     /**
-     * Server Add Event
+     * Server Remove Event
      *
      * @param player Player Adding Server
      * @param server Server Starting
      */
-    public SubAddServerEvent(UUID player, String host, String server) {
+    public SubRemoveServerEvent(UUID player, String host, String server) {
         if (Util.isNull(server)) throw new NullPointerException();
         this.player = player;
         this.host = host;
@@ -27,9 +27,9 @@ public class SubAddServerEvent extends Event {
     }
 
     /**
-     * Gets the Server to be Added
+     * Gets the Server to be Removed
      *
-     * @return The Server to be Added
+     * @return The Server to be Removed
      */
     public String getServer() { return server; }
 

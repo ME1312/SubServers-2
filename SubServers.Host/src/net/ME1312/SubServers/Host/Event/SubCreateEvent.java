@@ -1,8 +1,8 @@
-package net.ME1312.SubServers.Host.API.Event;
+package net.ME1312.SubServers.Host.Event;
 
-import net.ME1312.SubServers.Host.Library.Event.Event;
-import net.ME1312.SubServers.Host.Library.Util;
-import net.ME1312.SubServers.Host.Library.Version.Version;
+import net.ME1312.Galaxi.Library.Event.Event;
+import net.ME1312.Galaxi.Library.Util;
+import net.ME1312.Galaxi.Library.Version.Version;
 
 import java.util.UUID;
 

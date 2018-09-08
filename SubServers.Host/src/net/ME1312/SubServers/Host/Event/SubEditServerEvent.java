@@ -1,10 +1,10 @@
-package net.ME1312.SubServers.Host.API.Event;
+package net.ME1312.SubServers.Host.Event;
 
-import net.ME1312.SubServers.Host.Library.Config.YAMLSection;
-import net.ME1312.SubServers.Host.Library.Config.YAMLValue;
-import net.ME1312.SubServers.Host.Library.Event.Event;
-import net.ME1312.SubServers.Host.Library.NamedContainer;
-import net.ME1312.SubServers.Host.Library.Util;
+import net.ME1312.Galaxi.Library.Config.YAMLSection;
+import net.ME1312.Galaxi.Library.Config.YAMLValue;
+import net.ME1312.Galaxi.Library.Event.Event;
+import net.ME1312.Galaxi.Library.NamedContainer;
+import net.ME1312.Galaxi.Library.Util;
 
 import java.util.UUID;
 

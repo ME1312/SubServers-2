@@ -1,9 +1,9 @@
 package net.ME1312.SubServers.Host.Network.Packet;
 
-import net.ME1312.SubServers.Host.Library.Callback;
-import net.ME1312.SubServers.Host.Library.Config.YAMLSection;
-import net.ME1312.SubServers.Host.Library.Util;
-import net.ME1312.SubServers.Host.Library.Version.Version;
+import net.ME1312.Galaxi.Library.Callback;
+import net.ME1312.Galaxi.Library.Config.YAMLSection;
+import net.ME1312.Galaxi.Library.Util;
+import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubServers.Host.Network.PacketIn;
 import net.ME1312.SubServers.Host.Network.PacketOut;
 

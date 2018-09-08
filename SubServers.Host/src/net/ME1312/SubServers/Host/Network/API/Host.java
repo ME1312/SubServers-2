@@ -1,8 +1,8 @@
 package net.ME1312.SubServers.Host.Network.API;
 
-import net.ME1312.SubServers.Host.Library.Config.YAMLSection;
-import net.ME1312.SubServers.Host.Library.Config.YAMLValue;
-import net.ME1312.SubServers.Host.Library.Util;
+import net.ME1312.Galaxi.Library.Config.YAMLSection;
+import net.ME1312.Galaxi.Library.Config.YAMLValue;
+import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubServers.Host.Network.Packet.PacketDownloadHostInfo;
 import net.ME1312.SubServers.Host.SubAPI;
 

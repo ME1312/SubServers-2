@@ -1,6 +1,6 @@
 package net.ME1312.SubServers.Host.Executable;
 
-import net.ME1312.SubServers.Host.Library.Util;
+import net.ME1312.Galaxi.Library.Util;
 
 import java.io.File;
 import java.io.Serializable;

@@ -1,9 +1,10 @@
 package net.ME1312.SubServers.Host.Library;
 
+import net.ME1312.Galaxi.Engine.GalaxiEngine;
+import net.ME1312.Galaxi.Library.Config.YAMLConfig;
+import net.ME1312.Galaxi.Library.Config.YAMLSection;
+import net.ME1312.Galaxi.Library.Log.Logger;
 import net.ME1312.SubServers.Host.ExHost;
-import net.ME1312.SubServers.Host.Library.Config.YAMLConfig;
-import net.ME1312.SubServers.Host.Library.Config.YAMLSection;
-import net.ME1312.SubServers.Host.Library.Log.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -51,7 +52,7 @@ public class Metrics {
      */
     public Metrics(ExHost host) {
         boolean enabled = true;
-        File configPath = new File(new File(host.dir, "plugins"), "bStats");
+        File configPath = new File(new File(GalaxiEngine.getInstance().getRuntimeDirectory(), "plugins"), "bStats");
         configPath.mkdirs();
         File configFile = new File(configPath, "config.yml");
         try {
@@ -77,8 +78,9 @@ public class Metrics {
             // Load charts
             charts.add(new SingleLineChart("servers", () -> 1));
             charts.add(new SingleLineChart("hosted_servers", () -> host.servers.size()));
-            charts.add(new SingleLineChart("plugins", () -> host.api.getPlugins().size()));
-            charts.add(new SimplePie("pluginVersion", host.version::toString));
+            charts.add(new SingleLineChart("plugins", () -> host.engine.getPluginManager().getPlugins().size()));
+            charts.add(new SimplePie("engineVersion", () -> host.engine.getEngineInfo().getVersion().toString()));
+            charts.add(new SimplePie("pluginVersion", () -> host.info.getVersion().toString()));
             charts.add(new DrilldownPie("os", () -> {
                 String id = System.getProperty("os.name").toLowerCase(Locale.ENGLISH);
                 String name = System.getProperty("os.name");

@@ -1,8 +1,8 @@
 package net.ME1312.SubServers.Host.Executable;
 
-import net.ME1312.SubServers.Host.Library.Container;
-import net.ME1312.SubServers.Host.Library.Log.LogStream;
-import net.ME1312.SubServers.Host.Library.Log.Logger;
+import net.ME1312.Galaxi.Library.Container;
+import net.ME1312.Galaxi.Library.Log.LogStream;
+import net.ME1312.Galaxi.Library.Log.Logger;
 import net.ME1312.SubServers.Host.Library.TextColor;
 import net.ME1312.SubServers.Host.Network.Packet.PacketOutExLogMessage;
 import net.ME1312.SubServers.Host.SubAPI;

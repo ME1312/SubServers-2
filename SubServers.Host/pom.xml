@@ -9,41 +9,24 @@
     <version>-PLACEHOLDER</version>
     <packaging>jar</packaging>
 
+    <repositories>
+        <repository>
+            <id>me1312-repo</id>
+            <url>https://src.me1312.net/maven</url>
+        </repository>
+    </repositories>
+
     <dependencies>
         <dependency>
-            <groupId>jline</groupId>
-            <artifactId>jline</artifactId>
-            <version>2.12</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.fusesource.jansi</groupId>
-            <artifactId>jansi</artifactId>
-            <version>1.16</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>net.sf.jopt-simple</groupId>
-            <artifactId>jopt-simple</artifactId>
-            <version>5.0.4</version>
-            <scope>compile</scope>
+            <groupId>net.ME1312.Galaxi</groupId>
+            <artifactId>GalaxiEngine</artifactId>
+            <version>18w36d</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.msgpack</groupId>
             <artifactId>msgpack-core</artifactId>
             <version>0.8.16</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.json</groupId>
-            <artifactId>json</artifactId>
-            <version>20180130</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.yaml</groupId>
-            <artifactId>snakeyaml</artifactId>
-            <version>1.20</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>

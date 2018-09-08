@@ -1,6 +1,6 @@
 package net.ME1312.SubServers.Host.Network;
 
-import net.ME1312.SubServers.Host.Library.Config.YAMLSection;
+import net.ME1312.Galaxi.Library.Config.YAMLSection;
 import org.msgpack.value.Value;
 
 /**

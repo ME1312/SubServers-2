@@ -1,35 +1,33 @@
 package net.ME1312.SubServers.Host.Network;
 
-import net.ME1312.SubServers.Host.API.Event.SubNetworkConnectEvent;
-import net.ME1312.SubServers.Host.API.Event.SubNetworkDisconnectEvent;
-import net.ME1312.SubServers.Host.Library.Config.YAMLSection;
+import net.ME1312.Galaxi.Engine.GalaxiEngine;
+import net.ME1312.Galaxi.Library.Config.YAMLSection;
+import net.ME1312.Galaxi.Library.Log.Logger;
+import net.ME1312.Galaxi.Library.NamedContainer;
+import net.ME1312.Galaxi.Library.Util;
+import net.ME1312.Galaxi.Library.Version.Version;
+import net.ME1312.SubServers.Host.Event.SubNetworkConnectEvent;
+import net.ME1312.SubServers.Host.Event.SubNetworkDisconnectEvent;
 import net.ME1312.SubServers.Host.Library.Exception.IllegalPacketException;
-import net.ME1312.SubServers.Host.Library.Log.Logger;
-import net.ME1312.SubServers.Host.Library.NamedContainer;
-import net.ME1312.SubServers.Host.Library.Util;
-import net.ME1312.SubServers.Host.Library.Version.Version;
 import net.ME1312.SubServers.Host.Network.Encryption.AES;
 import net.ME1312.SubServers.Host.Network.Packet.*;
 import net.ME1312.SubServers.Host.SubAPI;
 import net.ME1312.SubServers.Host.ExHost;
 import org.json.JSONException;
-import org.json.JSONObject;
 import org.msgpack.core.MessageInsufficientBufferException;
 import org.msgpack.core.MessagePack;
 import org.msgpack.core.MessagePacker;
 import org.msgpack.core.MessageUnpacker;
+import org.msgpack.value.MapValue;
 import org.msgpack.value.Value;
+import org.msgpack.value.ValueFactory;
 import org.yaml.snakeyaml.error.YAMLException;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.SocketException;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -73,12 +71,12 @@ public final class SubDataClient {
             }
             @Override
             public Value encrypt(String key, YAMLSection data) {
-                return data.msgPack();
+                return convert(data);
             }
             @Override
             @SuppressWarnings("unchecked")
             public YAMLSection decrypt(String key, Value data) {
-                return new YAMLSection(data.asMapValue());
+                return convert(data.asMapValue());
             }
         };
 
@@ -97,7 +95,7 @@ public final class SubDataClient {
             queue.remove(0);
         }
         socket.rename(true);
-        host.api.executeEvent(new SubNetworkConnectEvent(host.subdata));
+        GalaxiEngine.getInstance().getPluginManager().executeEvent(new SubNetworkConnectEvent(host.subdata));
     }
 
     static {
@@ -381,6 +379,109 @@ public final class SubDataClient {
     }
 
     /**
+     * Convert a YAMLSection to a MessagePack Map
+     *
+     * @param config YAMLSection
+     * @return MessagePack Map
+     */
+    public static MapValue convert(YAMLSection config) {
+        return (MapValue) msgPack(config.get());
+    }
+    @SuppressWarnings("unchecked")
+    private static Value msgPack(Object value) {
+        if (value == null) {
+            return ValueFactory.newNil();
+        } else if (value instanceof Value) {
+            return (Value) value;
+        } else if (value instanceof Map) {
+            ValueFactory.MapBuilder map = ValueFactory.newMapBuilder();
+            for (String key : ((Map<String, ?>) value).keySet()) {
+                Value v = msgPack(((Map<String, ?>) value).get(key));
+                if (v != null) map.put(ValueFactory.newString(key), v);
+            }
+            return map.build();
+        } else if (value instanceof Collection) {
+            LinkedList<Value> values = new LinkedList<Value>();
+            for (Object object : (Collection<?>) value) {
+                Value v = msgPack(object);
+                if (v != null) values.add(v);
+            }
+            return ValueFactory.newArray(values);
+        } else if (value instanceof Boolean) {
+            return ValueFactory.newBoolean((boolean) value);
+        } else if (value instanceof Number) {
+            if (((Number) value).doubleValue() == (double)(int) ((Number) value).doubleValue()) {
+                return ValueFactory.newInteger(((Number) value).longValue());
+            } else {
+                return ValueFactory.newFloat(((Number) value).doubleValue());
+            }
+        } else if (value instanceof String) {
+            return ValueFactory.newString((String) value);
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Convert a MessagePack Map to a YAMLSection
+     *
+     * @param msgpack MessagePack Map
+     * @return YAMLSection
+     */
+    @SuppressWarnings("unchecked")
+    public static YAMLSection convert(MapValue msgpack) {
+        YAMLSection section = new YAMLSection();
+
+        boolean warned = false;
+        Map<Value, Value> map = msgpack.map();
+        for (Value key : map.keySet()) {
+            if (key.isStringValue()) {
+                section.set(key.asStringValue().asString(), simplify(map.get(key)));
+            } else if (!warned) {
+                new IllegalStateException("MessagePack contains non-string key(s)").printStackTrace();
+                warned = true;
+            }
+        }
+
+        return section;
+    }
+    private static Object simplify(Value value) {
+        Object simple = value;
+        if (value.isNilValue()) {
+            simple = null;
+        } else if (value.isMapValue()) {
+            Map<Value, Value> map = value.asMapValue().map();
+            simple = convert(value.asMapValue());
+        } else if (value.isArrayValue()) {
+            simple = value.asArrayValue().list();
+        } else if (value.isBooleanValue()) {
+            simple = value.asBooleanValue().getBoolean();
+        } else if (value.isFloatValue()) {
+            if (value.asFloatValue().toDouble() == (double)(float) value.asFloatValue().toDouble()) {
+                simple = value.asFloatValue().toFloat();
+            } else {
+                simple = value.asFloatValue().toDouble();
+            }
+        } else if (value.isIntegerValue()) {
+            if (value.asIntegerValue().isInByteRange()) {
+                simple = value.asIntegerValue().asByte();
+            } else if (value.asIntegerValue().isInShortRange()) {
+                simple = value.asIntegerValue().asShort();
+            } else if (value.asIntegerValue().isInIntRange()) {
+                simple = value.asIntegerValue().asInt();
+            } else if (value.asIntegerValue().isInLongRange()) {
+                simple = value.asIntegerValue().asLong();
+            } else {
+                simple = value.asIntegerValue().asBigInteger();
+            }
+        } else if (value.isStringValue()) {
+            simple = value.asStringValue().asString();
+        }
+
+        return simple;
+    }
+
+    /**
      * Encode PacketOut
      *
      * @param packet PacketOut
@@ -441,7 +542,7 @@ public final class SubDataClient {
             final Socket socket = this.socket.get();
             this.socket.set(null);
             if (!socket.isClosed()) socket.close();
-            host.api.executeEvent(new SubNetworkDisconnectEvent());
+            GalaxiEngine.getInstance().getPluginManager().executeEvent(new SubNetworkDisconnectEvent());
             log.info.println("The SubData Connection was closed");
             if (reconnect > 0) {
                 log.info.println("Attempting to reconnect in " + reconnect + " seconds");
