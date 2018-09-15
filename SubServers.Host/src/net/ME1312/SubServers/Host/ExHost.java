@@ -189,7 +189,7 @@ public final class ExHost {
             loadDefaults();
 
             new Metrics(this);
-            engine.setUpdateChecker(() -> {
+            info.setUpdateChecker(() -> {
                 try {
                     YAMLSection tags = new YAMLSection(new JSONObject("{\"tags\":" + Util.readAll(new BufferedReader(new InputStreamReader(new URL("https://api.github.com/repos/ME1312/SubServers-2/git/refs/tags").openStream(), Charset.forName("UTF-8")))) + '}'));
                     List<Version> versions = new LinkedList<Version>();

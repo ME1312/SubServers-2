@@ -36,7 +36,7 @@ public final class Launch {
             System.out.println("*******************************************");
             System.out.println("");
             System.exit(1);
-        } else if (System.getProperty("RM.subservers", "true").equalsIgnoreCase("true")) {
+        } else {
             Security.setProperty("networkaddress.cache.ttl", "30");
             Security.setProperty("networkaddress.cache.negative.ttl", "10");
             final boolean patched = net.md_5.bungee.BungeeCord.class.getPackage().getImplementationTitle() != null && net.md_5.bungee.BungeeCord.class.getPackage().getImplementationTitle().equals("SubServers.Bungee");
@@ -123,16 +123,6 @@ public final class Launch {
                     }
                 }
             }
-        } else {
-            System.out.println("");
-            System.out.println("*******************************************");
-            System.out.println("*** SubServers code has been disallowed ***");
-            System.out.println("*** to work on this machine. Check with ***");
-            System.out.println("*** your provider for more information. ***");
-            System.out.println("*** Attempting re-launch as BungeeCord. ***");
-            System.out.println("*******************************************");
-            System.out.println("");
-            net.md_5.bungee.BungeeCordLauncher.class.getMethod("main", String[].class).invoke(null, (Object) args);
         }
     }
 }

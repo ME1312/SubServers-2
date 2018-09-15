@@ -21,6 +21,7 @@ import java.util.*;
  * Internal Host Class
  */
 public class InternalHost extends Host {
+    public static final boolean DRM_ALLOW = System.getProperty("RM.subservers", "true").equalsIgnoreCase("true");
     private HashMap<String, SubServer> servers = new HashMap<String, SubServer>();
     private String name;
     private boolean enabled;
@@ -41,6 +42,7 @@ public class InternalHost extends Host {
      */
     public InternalHost(SubPlugin plugin, String name, Boolean enabled, InetAddress address, String directory, String gitBash) {
         super(plugin, name, enabled, address, directory, gitBash);
+        if (!DRM_ALLOW) throw new IllegalStateException("SubServers' hosting capabilities have been disabled by your provider");
         if (Util.isNull(plugin, name, enabled, address, directory, gitBash)) throw new NullPointerException();
         this.plugin = plugin;
         this.name = name;
