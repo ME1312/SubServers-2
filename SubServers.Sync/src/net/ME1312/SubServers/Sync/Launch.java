@@ -101,6 +101,9 @@ public final class Launch {
                     try {
                         if (Util.getDespiteException(() -> Class.forName("io.github.waterfallmc.waterfall.console.WaterfallConsole") != null, false)) {
                             Class.forName("io.github.waterfallmc.waterfall.console.WaterfallConsole").getMethod("readCommands").invoke(null);
+                        } else if (Util.getDespiteException(() -> Class.forName("io.github.waterfallmc.waterfall.console.WaterfallConsole").getMethod("start") != null, false)) {
+                            Class console = Class.forName("io.github.waterfallmc.waterfall.console.WaterfallConsole");
+                            console.getMethod("start").invoke(console.getConstructor().newInstance());
                         } else {
                             String line;
                             while (plugin.isRunning && (line = plugin.getConsoleReader().readLine(">")) != null) {

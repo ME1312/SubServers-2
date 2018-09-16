@@ -99,8 +99,11 @@ public final class Launch {
 
                 if (!options.has("noconsole")) {
                     try {
-                        if (Util.getDespiteException(() -> Class.forName("io.github.waterfallmc.waterfall.console.WaterfallConsole") != null, false)) {
+                        if (Util.getDespiteException(() -> Class.forName("io.github.waterfallmc.waterfall.console.WaterfallConsole").getMethod("readCommands") != null, false)) {
                             Class.forName("io.github.waterfallmc.waterfall.console.WaterfallConsole").getMethod("readCommands").invoke(null);
+                        } else if (Util.getDespiteException(() -> Class.forName("io.github.waterfallmc.waterfall.console.WaterfallConsole").getMethod("start") != null, false)) {
+                            Class console = Class.forName("io.github.waterfallmc.waterfall.console.WaterfallConsole");
+                            console.getMethod("start").invoke(console.getConstructor().newInstance());
                         } else {
                             plugin.canSudo = true;
                             String line;
