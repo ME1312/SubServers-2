@@ -1,0 +1,10 @@
+Version: '2.13a/rv2+'
+Template:
+  Enabled: true
+  Icon: 'lava_bucket'
+  Build:
+    Server-Type: 'Spigot'
+    Shell-Location: 'build.sh'
+    Permission: '+x'
+  Settings:
+    Executable: 'java -Xmx1024M  -Dorg.bukkit.craftbukkit.libs.jline.terminal=unix -Djansi.passthrough=true -jar Spigot.jar'

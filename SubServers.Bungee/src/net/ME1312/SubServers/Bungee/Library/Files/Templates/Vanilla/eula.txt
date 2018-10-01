@@ -1,0 +1,2 @@
+#By using SubCreator to create your server you have indicated your agreement to the Minecraft EULA (https://account.mojang.com/documents/minecraft_eula).
+eula=true

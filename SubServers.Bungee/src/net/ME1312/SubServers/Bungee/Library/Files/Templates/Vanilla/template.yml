@@ -1,0 +1,10 @@
+Version: '2.13a/rv3+'
+Template:
+  Enabled: true
+  Icon: 'bukkit:grass'
+  Build:
+    Server-Type: 'Vanilla'
+    Shell-Location: 'build.sh'
+    Permission: '+x'
+  Settings:
+    Executable: 'java -Xmx1024M -jar Vanilla.jar nogui'

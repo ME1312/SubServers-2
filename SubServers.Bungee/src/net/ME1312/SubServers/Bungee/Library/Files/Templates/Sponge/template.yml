@@ -1,0 +1,11 @@
+Version: '2.13a/rv3+'
+Template:
+  Enabled: true
+  Icon: 'sponge'
+  Build:
+    Server-Type: 'Sponge'
+    Use-Cache: false
+    Shell-Location: 'build.sh'
+    Permission: '+x'
+  Settings:
+    Executable: 'java -Xmx1024M -jar Sponge.jar'
