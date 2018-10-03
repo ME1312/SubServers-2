@@ -1,5 +1,6 @@
-Version: '2.13b+'
+Version: '2.13.1a+'
 Lang:
+  'Bungee.Feature.Return': '&6Returning to $str$: &r$msg$'
   'Bungee.Server.Current': '&6You are currently connected to $str$'
   'Bungee.Server.Available': '&6You may connect to the following servers at this time:'
   'Bungee.Server.List': '&6$str$'

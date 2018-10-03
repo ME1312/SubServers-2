@@ -9,10 +9,6 @@
     <version>-PLACEHOLDER</version>
     <packaging>jar</packaging>
 
-    <properties>
-        <galaxi.version>18w37b</galaxi.version>
-    </properties>
-
     <repositories>
         <repository>
             <id>me1312-repo</id>
@@ -23,16 +19,9 @@
     <dependencies>
         <dependency>
             <groupId>net.ME1312.Galaxi</groupId>
-            <artifactId>GalaxiAPI</artifactId>
-            <version>${galaxi.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>net.ME1312.Galaxi</groupId>
             <artifactId>GalaxiEngine</artifactId>
-            <version>${galaxi.version}</version>
+            <version>18w40a</version>
             <scope>compile</scope>
-            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>org.msgpack</groupId>
@@ -125,10 +114,6 @@
                             <outputDirectory>${basedir}/../Javadoc/SubServers.Host</outputDirectory>
                             <reportOutputDirectory>${basedir}/../Javadoc/SubServers.Host</reportOutputDirectory>
                             <additionalOptions>-Xdoclint:none</additionalOptions>
-                            <includeDependencySources>true</includeDependencySources>
-                            <dependencySourceIncludes>
-                                <dependencySourceInclude>net.ME1312.Galaxi:GalaxiAPI:*</dependencySourceInclude>
-                            </dependencySourceIncludes>
                         </configuration>
                     </execution>
                 </executions>

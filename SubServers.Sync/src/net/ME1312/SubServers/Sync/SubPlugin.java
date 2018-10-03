@@ -18,6 +18,7 @@ import net.ME1312.SubServers.Sync.Server.SubServer;
 import net.md_5.bungee.BungeeCord;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.event.ServerConnectEvent;
+import net.md_5.bungee.api.event.ServerKickEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
 import org.w3c.dom.Document;
@@ -239,6 +240,27 @@ public final class SubPlugin extends BungeeCord implements Listener {
             servers = getServers();
             if (servers.keySet().contains(e.getTarget().getName()) && e.getTarget() != servers.get(e.getTarget().getName())) {
                 e.setTarget(servers.get(e.getTarget().getName()));
+            }
+        }
+    }
+
+    @SuppressWarnings("deprecation")
+    @EventHandler(priority = Byte.MAX_VALUE)
+    public void fallback(ServerKickEvent e) {
+        if (e.getPlayer().getPendingConnection().getListener().isForceDefault()) {
+            int i = 0;
+            ServerInfo from = e.getKickedFrom();
+            ServerInfo to = null;
+            while (to == null || from == to) {
+                if (e.getPlayer().getPendingConnection().getListener().getServerPriority().size() > i) {
+                    to = getServerInfo(e.getPlayer().getPendingConnection().getListener().getServerPriority().get(i));
+                } else break;
+                i++;
+            }
+            if (to != null && from != to) {
+                e.setCancelServer(to);
+                e.setCancelled(true);
+                e.getPlayer().sendMessage(api.getLang("SubServers", "Bungee.Feature.Return").replace("$str$", (to instanceof Server)?((Server) to).getDisplayName():to.getName()).replace("$msg$", e.getKickReason()));
             }
         }
     }
