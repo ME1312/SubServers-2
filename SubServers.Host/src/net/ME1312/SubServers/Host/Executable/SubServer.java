@@ -22,6 +22,7 @@ public class SubServer {
     private ExHost host;
     private String name;
     private boolean enabled;
+    private int port;
     private Container<Boolean> log;
     private String dir;
     private File directory;
@@ -46,11 +47,12 @@ public class SubServer {
      * @param stopcmd Stop Command
      * @throws InvalidServerException
      */
-    public SubServer(ExHost host, String name, boolean enabled, boolean log, String directory, Executable executable, String stopcmd) throws InvalidServerException {
+    public SubServer(ExHost host, String name, boolean enabled, int port, boolean log, String directory, Executable executable, String stopcmd) throws InvalidServerException {
         if (Util.isNull(host, name, enabled, log, directory, executable)) throw new NullPointerException();
         this.host = host;
         this.name = name;
         this.enabled = enabled;
+        this.port = port;
         this.log = new Container<Boolean>(log);
         this.dir = directory;
         this.directory = new File(host.host.getRawString("Directory"), directory);
@@ -235,6 +237,15 @@ public class SubServer {
     public void setEnabled(boolean value) {
         if (Util.isNull(value)) throw new NullPointerException();
         enabled = value;
+    }
+
+    /**
+     * Get the Port of the Server
+     *
+     * @return Server Port Number
+     */
+    public int getPort() {
+        return port;
     }
 
     /**

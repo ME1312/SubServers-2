@@ -1,5 +1,6 @@
 package net.ME1312.SubServers.Host.Network.Packet;
 
+import com.dosse.upnp.UPnP;
 import net.ME1312.Galaxi.Library.Config.YAMLSection;
 import net.ME1312.Galaxi.Library.Log.Logger;
 import net.ME1312.Galaxi.Library.Util;
@@ -68,6 +69,8 @@ public class PacketExRemoveServer implements PacketIn, PacketOut {
             } else if (host.servers.get(data.getRawString("server").toLowerCase()).isRunning()) {
                 host.subdata.sendPacket(new PacketExRemoveServer(2, "That server is still running.", (data.contains("id"))?data.getRawString("id"):null));
             } else {
+                if (UPnP.isUPnPAvailable() && UPnP.isMappedTCP(host.servers.get(data.getRawString("server").toLowerCase()).getPort()))
+                    UPnP.closePortTCP(host.servers.get(data.getRawString("server").toLowerCase()).getPort());
                 host.servers.remove(data.getRawString("server").toLowerCase());
                 log.info.println("Removed SubServer: " + data.getRawString("server"));
                 host.subdata.sendPacket(new PacketExRemoveServer(0, "Server Removed Successfully", (data.contains("id"))?data.getRawString("id"):null));

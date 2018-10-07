@@ -1,5 +1,6 @@
 package net.ME1312.SubServers.Bungee.Host.Internal;
 
+import com.dosse.upnp.UPnP;
 import net.ME1312.SubServers.Bungee.Event.SubAddServerEvent;
 import net.ME1312.SubServers.Bungee.Event.SubRemoveServerEvent;
 import net.ME1312.SubServers.Bungee.Host.Executable;
@@ -101,6 +102,7 @@ public class InternalHost extends Host {
         plugin.getPluginManager().callEvent(event);
         if (!event.isCancelled()) {
             servers.put(name.toLowerCase(), server);
+            if (UPnP.isUPnPAvailable() && plugin.config.get().getSection("Settings").getSection("UPnP", new YAMLSection()).getBoolean("Forward-Servers", false)) UPnP.openPortTCP(port);
             return server;
         } else {
             return null;
@@ -118,6 +120,8 @@ public class InternalHost extends Host {
                 getSubServer(server).stop();
                 getSubServer(server).waitFor();
             }
+            if (UPnP.isUPnPAvailable() && UPnP.isMappedTCP(getSubServer(server).getAddress().getPort()))
+                UPnP.closePortTCP(getSubServer(server).getAddress().getPort());
             servers.remove(server.toLowerCase());
             return true;
         } else return false;
@@ -132,6 +136,8 @@ public class InternalHost extends Host {
         if (getSubServer(server).isRunning()) {
             getSubServer(server).terminate();
         }
+        if (UPnP.isUPnPAvailable() && UPnP.isMappedTCP(getSubServer(server).getAddress().getPort()))
+            UPnP.closePortTCP(getSubServer(server).getAddress().getPort());
         servers.remove(server.toLowerCase());
         return true;
     }

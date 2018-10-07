@@ -1,5 +1,6 @@
 package net.ME1312.SubServers.Host.Network.Packet;
 
+import com.dosse.upnp.UPnP;
 import net.ME1312.Galaxi.Engine.GalaxiEngine;
 import net.ME1312.Galaxi.Library.Config.YAMLSection;
 import net.ME1312.Galaxi.Library.Log.Logger;
@@ -102,6 +103,7 @@ public class PacketExDeleteServer implements PacketIn, PacketOut {
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
+                    if (UPnP.isUPnPAvailable() && UPnP.isMappedTCP(server.getPort())) UPnP.closePortTCP(server.getPort());
                     log.info.println("Deleted SubServer: " + data.getRawString("server"));
                     host.subdata.sendPacket(new PacketExDeleteServer(0, "Server Deleted Successfully", (data.contains("id"))?data.getRawString("id"):null));
                 }).start();

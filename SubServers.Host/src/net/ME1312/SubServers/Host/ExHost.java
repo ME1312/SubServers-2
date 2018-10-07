@@ -1,5 +1,6 @@
 package net.ME1312.SubServers.Host;
 
+import com.dosse.upnp.UPnP;
 import net.ME1312.Galaxi.Engine.GalaxiEngine;
 import net.ME1312.Galaxi.Library.Config.YAMLConfig;
 import net.ME1312.Galaxi.Library.Config.YAMLSection;
@@ -32,7 +33,7 @@ import java.util.jar.Manifest;
 /**
  * SubServers.Host Main Class
  */
-@Plugin(name = "SubServers.Host", version = "2.13.1a", authors = "ME1312", description = "Host SubServers from other Machines", website = "https://github.com/ME1312/SubServers-2")
+@Plugin(name = "SubServers.Host", version = "2.13.1b", authors = "ME1312", description = "Host SubServers from other Machines", website = "https://github.com/ME1312/SubServers-2")
 public final class ExHost {
     protected NamedContainer<Long, Map<String, Map<String, String>>> lang = null;
     public HashMap<String, SubCreator.ServerTemplate> templates = new HashMap<String, SubCreator.ServerTemplate>();
@@ -209,6 +210,10 @@ public final class ExHost {
             });
 
             engine.start(this::stop);
+
+            if (!UPnP.isUPnPAvailable()) {
+                log.warn.println("UPnP is currently unavailable; Ports may not be automatically forwarded on this device");
+            }
         } catch (Exception e) {
             log.error.println(e);
             stop();
@@ -256,6 +261,7 @@ public final class ExHost {
                 } catch (Exception e) {
                     log.error.println(e);
                 }
+                if (UPnP.isUPnPAvailable() && UPnP.isMappedTCP(servers.get(server).getPort())) UPnP.closePortTCP(servers.get(server).getPort());
             }
             servers.clear();
 

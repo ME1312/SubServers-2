@@ -1,6 +1,8 @@
 Settings:
   Version: '2.11.2a+'
   Override-Bungee-Commands: true
+  UPnP:
+    Forward-Proxy: true
   SubData:
     Address: '127.0.0.1:4391'
     Password: 'default'

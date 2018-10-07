@@ -1,5 +1,6 @@
 package net.ME1312.SubServers.Host.Network.Packet;
 
+import com.dosse.upnp.UPnP;
 import net.ME1312.Galaxi.Library.Config.YAMLSection;
 import net.ME1312.Galaxi.Library.Log.Logger;
 import net.ME1312.Galaxi.Library.Util;
@@ -69,9 +70,10 @@ public class PacketExAddServer implements PacketIn, PacketOut {
             if (host.servers.keySet().contains(data.getSection("server").getRawString("name").toLowerCase())) {
                 host.subdata.sendPacket(new PacketExAddServer(0, "Server Already Added", (data.contains("id"))?data.getRawString("id"):null));
             } else {
-                SubServer server = new SubServer(host, data.getSection("server").getRawString("name"), data.getSection("server").getBoolean("enabled"), data.getSection("server").getBoolean("log"),
+                SubServer server = new SubServer(host, data.getSection("server").getRawString("name"), data.getSection("server").getBoolean("enabled"), data.getSection("server").getInt("port"), data.getSection("server").getBoolean("log"),
                         data.getSection("server").getRawString("dir"), new Executable(data.getSection("server").getRawString("exec")), data.getSection("server").getRawString("stopcmd"));
                 host.servers.put(data.getSection("server").getRawString("name").toLowerCase(), server);
+                if (UPnP.isUPnPAvailable() && host.config.get().getSection("Settings").getSection("UPnP", new YAMLSection()).getBoolean("Forward-Servers", false)) UPnP.openPortTCP(server.getPort());
                 log.info.println("Added SubServer: " + data.getSection("server").getRawString("name"));
                 if (data.getSection("server").contains("running")) server.start(UUID.fromString(data.getSection("server").getRawString("running")));
                 host.subdata.sendPacket(new PacketExAddServer(0, "Server Added Successfully", (data.contains("id"))?data.getRawString("id"):null));
@@ -84,6 +86,6 @@ public class PacketExAddServer implements PacketIn, PacketOut {
 
     @Override
     public Version getVersion() {
-        return new Version("2.11.0a");
+        return new Version("2.13.1b");
     }
 }

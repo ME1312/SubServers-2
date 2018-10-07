@@ -1,5 +1,6 @@
 package net.ME1312.SubServers.Bungee;
 
+import com.dosse.upnp.UPnP;
 import com.google.gson.Gson;
 import net.ME1312.SubServers.Bungee.Event.SubAddProxyEvent;
 import net.ME1312.SubServers.Bungee.Event.SubRemoveProxyEvent;
@@ -11,24 +12,19 @@ import net.ME1312.SubServers.Bungee.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Bungee.Library.Exception.InvalidHostException;
 import net.ME1312.SubServers.Bungee.Library.Exception.InvalidServerException;
 import net.ME1312.SubServers.Bungee.Library.Version.Version;
-import net.ME1312.SubServers.Bungee.Library.Version.VersionType;
 import net.ME1312.SubServers.Bungee.Network.Cipher;
 import net.ME1312.SubServers.Bungee.Network.ClientHandler;
 import net.ME1312.SubServers.Bungee.Network.Packet.PacketOutReload;
 import net.ME1312.SubServers.Bungee.Network.SubDataServer;
 import net.md_5.bungee.BungeeCord;
 import net.md_5.bungee.BungeeServerInfo;
+import net.md_5.bungee.api.config.ListenerInfo;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.event.ServerConnectEvent;
 import net.md_5.bungee.api.event.ServerKickEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
 
-import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.math.BigInteger;
@@ -61,7 +57,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
     public final SubAPI api = new SubAPI(this);
     public SubDataServer subdata = null;
     public SubServer sudo = null;
-    public static final Version version = Version.fromString("2.13.1a");
+    public static final Version version = Version.fromString("2.13.1b");
 
     public Proxy redis = null;
     public boolean canSudo = false;
@@ -519,6 +515,13 @@ public final class SubPlugin extends BungeeCord implements Listener {
             for (Server server : api.getServers().values()) if (server.getSubData() != null) server.getSubData().sendPacket(new PacketOutReload(null));
         }
 
+        if (UPnP.isUPnPAvailable()) {
+            if (config.get().getSection("Settings").getSection("UPnP", new YAMLSection()).getBoolean("Forward-Proxy", true)) for (ListenerInfo listener : getConfig().getListeners()) {
+                UPnP.openPortTCP(listener.getHost().getPort());
+            }
+        } else {
+            getLogger().warning("UPnP is currently unavailable; Ports may not be automatically forwarded on this device");
+        }
         System.out.println("SubServers > " + ((plugins > 0)?plugins+" Plugin"+((plugins == 1)?"":"s")+", ":"") + ((proxies > 1)?proxies+" Proxies, ":"") + hosts + " Host"+((hosts == 1)?"":"s")+", " + servers + " Server"+((servers == 1)?"":"s")+", and " + subservers + " SubServer"+((subservers == 1)?"":"s")+" "+((status)?"re":"")+"loaded in " + new DecimalFormat("0.000").format((Calendar.getInstance().getTime().getTime() - begin) / 1000D) + "s");
     }
 
@@ -592,6 +595,10 @@ public final class SubPlugin extends BungeeCord implements Listener {
             shutdown();
 
             subdata.destroy();
+
+            for (ListenerInfo listener : getConfig().getListeners()) {
+                if (UPnP.isUPnPAvailable() && UPnP.isMappedTCP(listener.getHost().getPort())) UPnP.closePortTCP(listener.getHost().getPort());
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -614,6 +621,10 @@ public final class SubPlugin extends BungeeCord implements Listener {
             getPluginManager().callEvent(new SubRemoveProxyEvent(proxies.get(proxy)));
         }
         proxies.clear();
+
+        for (ListenerInfo listener : getConfig().getListeners()) {
+            if (UPnP.isUPnPAvailable() && UPnP.isMappedTCP(listener.getHost().getPort())) UPnP.closePortTCP(listener.getHost().getPort());
+        }
     }
 
     String getNewSignature() {
@@ -709,7 +720,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
     }
 
     @SuppressWarnings("deprecation")
-    @EventHandler(priority = Byte.MAX_VALUE)
+    @EventHandler(priority = Byte.MIN_VALUE)
     public void fallback(ServerKickEvent e) {
         if (e.getPlayer().getPendingConnection().getListener().isForceDefault()) {
             int i = 0;

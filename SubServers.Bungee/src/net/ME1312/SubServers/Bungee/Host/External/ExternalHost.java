@@ -86,7 +86,7 @@ public class ExternalHost extends Host implements ClientHandler {
             clean = true;
         }
         for (SubServer server : servers.values()) {
-            client.get().sendPacket(new PacketExAddServer(server.getName(), server.isEnabled(), server.isLogging(), server.getPath(), ((ExternalSubServer) server).exec, server.getStopCommand(), (server.isRunning())?((ExternalSubLogger) server.getLogger()).getExternalAddress():null));
+            client.get().sendPacket(new PacketExAddServer(server.getName(), server.isEnabled(), server.getAddress().getPort(), server.isLogging(), server.getPath(), ((ExternalSubServer) server).exec, server.getStopCommand(), (server.isRunning())?((ExternalSubLogger) server.getLogger()).getExternalAddress():null));
         }
         while (queue.size() != 0) {
             client.get().sendPacket(queue.get(0));
@@ -148,7 +148,7 @@ public class ExternalHost extends Host implements ClientHandler {
         SubAddServerEvent event = new SubAddServerEvent(player, this, server);
         plugin.getPluginManager().callEvent(event);
         if (!event.isCancelled()) {
-            queue(new PacketExAddServer(name, enabled, log, directory, executable, stopcmd, (server.isRunning())?((ExternalSubLogger) server.getLogger()).getExternalAddress():null));
+            queue(new PacketExAddServer(name, enabled, port, log, directory, executable, stopcmd, (server.isRunning())?((ExternalSubLogger) server.getLogger()).getExternalAddress():null));
             servers.put(name.toLowerCase(), server);
             return server;
         } else {

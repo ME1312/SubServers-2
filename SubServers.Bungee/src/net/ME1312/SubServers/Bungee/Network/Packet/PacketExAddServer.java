@@ -19,6 +19,7 @@ public class PacketExAddServer implements PacketIn, PacketOut {
     private static HashMap<String, Callback<YAMLSection>[]> callbacks = new HashMap<String, Callback<YAMLSection>[]>();
     private String name;
     private boolean enabled;
+    private int port;
     private boolean log;
     private String directory;
     private Executable executable;
@@ -41,10 +42,11 @@ public class PacketExAddServer implements PacketIn, PacketOut {
      * @param executable Executable
      */
     @SafeVarargs
-    public PacketExAddServer(String name, boolean enabled, boolean log, String directory, Executable executable, String stopcmd, UUID running, Callback<YAMLSection>... callback) {
+    public PacketExAddServer(String name, boolean enabled, int port, boolean log, String directory, Executable executable, String stopcmd, UUID running, Callback<YAMLSection>... callback) {
         if (Util.isNull(name, enabled, log, directory, executable, callback)) throw new NullPointerException();
         this.name = name;
         this.enabled = enabled;
+        this.port = port;
         this.log = log;
         this.directory = directory;
         this.executable = executable;
@@ -61,6 +63,7 @@ public class PacketExAddServer implements PacketIn, PacketOut {
         YAMLSection server = new YAMLSection();
         server.set("name", name);
         server.set("enabled", enabled);
+        server.set("port", port);
         server.set("log", log);
         server.set("dir", directory);
         server.set("exec", executable.toString());
@@ -78,6 +81,6 @@ public class PacketExAddServer implements PacketIn, PacketOut {
 
     @Override
     public Version getVersion() {
-        return new Version("2.11.0a");
+        return new Version("2.13.1b");
     }
 }

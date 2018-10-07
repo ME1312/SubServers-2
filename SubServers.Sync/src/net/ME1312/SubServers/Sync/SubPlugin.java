@@ -1,5 +1,6 @@
 package net.ME1312.SubServers.Sync;
 
+import com.dosse.upnp.UPnP;
 import com.google.gson.Gson;
 import net.ME1312.SubServers.Sync.Event.*;
 import net.ME1312.SubServers.Sync.Library.Config.YAMLConfig;
@@ -16,6 +17,7 @@ import net.ME1312.SubServers.Sync.Network.SubDataClient;
 import net.ME1312.SubServers.Sync.Server.Server;
 import net.ME1312.SubServers.Sync.Server.SubServer;
 import net.md_5.bungee.BungeeCord;
+import net.md_5.bungee.api.config.ListenerInfo;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.event.ServerConnectEvent;
 import net.md_5.bungee.api.event.ServerKickEvent;
@@ -50,7 +52,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
     public boolean redis = false;
     public final SubAPI api = new SubAPI(this);
     public SubDataClient subdata = null;
-    public static final Version version = Version.fromString("2.13.1a");
+    public static final Version version = Version.fromString("2.13.1b");
 
     public final boolean isPatched;
     public long lastReload = -1;
@@ -110,6 +112,15 @@ public final class SubPlugin extends BungeeCord implements Listener {
                     Integer.parseInt(config.get().getSection("Settings").getSection("SubData").getRawString("Address", "127.0.0.1:4391").split(":")[1]), cipher);
 
             super.startListeners();
+
+            if (UPnP.isUPnPAvailable()) {
+                if (config.get().getSection("Settings").getSection("UPnP", new YAMLSection()).getBoolean("Forward-Proxy", true)) for (ListenerInfo listener : getConfig().getListeners()) {
+                    UPnP.openPortTCP(listener.getHost().getPort());
+                }
+            } else {
+                getLogger().warning("UPnP is currently unavailable; Ports may not be automatically forwarded on this device");
+            }
+
             if (!posted) {
                 posted = true;
                 post();
@@ -224,6 +235,10 @@ public final class SubPlugin extends BungeeCord implements Listener {
             servers.clear();
 
             subdata.destroy(0);
+
+            for (ListenerInfo listener : getConfig().getListeners()) {
+                if (UPnP.isUPnPAvailable() && UPnP.isMappedTCP(listener.getHost().getPort())) UPnP.closePortTCP(listener.getHost().getPort());
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -245,7 +260,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
     }
 
     @SuppressWarnings("deprecation")
-    @EventHandler(priority = Byte.MAX_VALUE)
+    @EventHandler(priority = Byte.MIN_VALUE)
     public void fallback(ServerKickEvent e) {
         if (e.getPlayer().getPendingConnection().getListener().isForceDefault()) {
             int i = 0;

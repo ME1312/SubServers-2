@@ -2,6 +2,10 @@ Settings:
   Version: '2.11.2a+'
   Log-Creator: true
   Override-Bungee-Commands: true
+  UPnP:
+    Forward-Proxy: true
+    Forward-SubData: false
+    Forward-Servers: false
   SubData:
     Address: '127.0.0.1:4391'
     Password: 'default'

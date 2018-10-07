@@ -1,5 +1,6 @@
 package net.ME1312.SubServers.Bungee.Network;
 
+import com.dosse.upnp.UPnP;
 import com.google.gson.Gson;
 import net.ME1312.SubServers.Bungee.Event.SubNetworkConnectEvent;
 import net.ME1312.SubServers.Bungee.Event.SubNetworkDisconnectEvent;
@@ -56,6 +57,7 @@ public final class SubDataServer {
             server = new ServerSocket(port, MAX_QUEUE, address);
             allowConnection(address.getHostAddress());
         }
+        if (UPnP.isUPnPAvailable() && plugin.config.get().getSection("Settings").getSection("UPnP", new YAMLSection()).getBoolean("Forward-SubData", false)) UPnP.openPortTCP(port);
         this.plugin = plugin;
         this.cipher = (cipher != null)?cipher:new Cipher() {
             @Override
@@ -478,6 +480,7 @@ public final class SubDataServer {
             removeClient((Client) clients.values().toArray()[0]);
         }
         server.close();
+        if (UPnP.isUPnPAvailable() && UPnP.isMappedTCP(server.getLocalPort())) UPnP.closePortTCP(server.getLocalPort());
         System.out.println("SubServers > The SubData Listener has been closed");
         plugin.subdata = null;
     }

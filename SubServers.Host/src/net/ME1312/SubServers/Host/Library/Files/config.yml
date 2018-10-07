@@ -3,6 +3,8 @@ Settings:
   Console-Log: true
   Network-Log: true
   Server-Bind: '127.0.0.1'
+  UPnP:
+    Forward-Servers: false
   SubData:
     Name: 'undefined'
     Address: '127.0.0.1:4391'
