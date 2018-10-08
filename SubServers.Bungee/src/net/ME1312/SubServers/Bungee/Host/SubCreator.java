@@ -8,6 +8,8 @@ import net.ME1312.SubServers.Bungee.Library.Version.Version;
 import net.ME1312.SubServers.Bungee.SubAPI;
 
 import java.io.File;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.util.*;
 
 /**
@@ -178,10 +180,10 @@ public abstract class SubCreator {
      * @param name Server Name
      * @param template Server Template
      * @param version Server Version
-     * @param port Server Port Number
+     * @param port Server Port Number (null to auto-select)
      * @return Success Status
      */
-    public abstract boolean create(UUID player, String name, ServerTemplate template, Version version, int port, Callback<SubServer> callback);
+    public abstract boolean create(UUID player, String name, ServerTemplate template, Version version, Integer port, Callback<SubServer> callback);
 
     /**
      * Create a SubServer
@@ -190,10 +192,10 @@ public abstract class SubCreator {
      * @param name Server Name
      * @param template Server Template
      * @param version Server Version
-     * @param port Server Port Number
+     * @param port Server Port Number (null to auto-select)
      * @return Success Status
      */
-    public boolean create(UUID player, String name, ServerTemplate template, Version version, int port) {
+    public boolean create(UUID player, String name, ServerTemplate template, Version version, Integer port) {
         return create(player, name, template, version, port, null);
     }
 
@@ -203,10 +205,10 @@ public abstract class SubCreator {
      * @param name Server Name
      * @param template Server Template
      * @param version Server Version
-     * @param port Server Port Number
+     * @param port Server Port Number (null to auto-select)
      * @return Success Status
      */
-    public boolean create(String name, ServerTemplate template, Version version, int port, Callback<SubServer> callback) {
+    public boolean create(String name, ServerTemplate template, Version version, Integer port, Callback<SubServer> callback) {
         return create(null, name, template, version, port, callback);
     }
 
@@ -216,10 +218,10 @@ public abstract class SubCreator {
      * @param name Server Name
      * @param template Server Template
      * @param version Server Version
-     * @param port Server Port Number
+     * @param port Server Port Number (null to auto-select)
      * @return Success Status
      */
-    public boolean create(String name, ServerTemplate template, Version version, int port) {
+    public boolean create(String name, ServerTemplate template, Version version, Integer port) {
         return create(null, name, template, version, port);
     }
 
@@ -269,7 +271,7 @@ public abstract class SubCreator {
      *
      * @return SubCreator Loggers
      */
-    public abstract List<SubLogger> getLogger();
+    public abstract List<SubLogger> getLoggers();
 
     /**
      * Gets the Logger for a SubCreator Instance
@@ -288,6 +290,13 @@ public abstract class SubCreator {
     public abstract List<String> getReservedNames();
 
     /**
+     * Get a list of currently reserved Server ports
+     *
+     * @return Reserved Ports
+     */
+    public abstract List<Integer> getReservedPorts();
+
+    /**
      * Check if a name has been reserved
      *
      * @param name Name to check
@@ -302,6 +311,20 @@ public abstract class SubCreator {
     }
 
     /**
+     * Check if an address has been reserved
+     *
+     * @param address Address to check
+     * @return Reserved Status
+     */
+    public static boolean isReserved(InetSocketAddress address) {
+        boolean reserved = false;
+        for (InetSocketAddress list : getAllReservedAddresses()) {
+            if (list.equals(address)) reserved = true;
+        }
+        return reserved;
+    }
+
+    /**
      * Get a list of all currently reserved Server names across all hosts
      *
      * @return All Reserved Names
@@ -310,6 +333,22 @@ public abstract class SubCreator {
         HashMap<Host, List<String>> names = new HashMap<Host, List<String>>();
         for (Host host : SubAPI.getInstance().getHosts().values()) names.put(host, host.getCreator().getReservedNames());
         return names;
+    }
+
+    /**
+     * Get a list of all currently reserved Server names across all hosts
+     *
+     * @return All Reserved Names
+     */
+    public static List<InetSocketAddress> getAllReservedAddresses() {
+        List<InetSocketAddress> addresses = new ArrayList<InetSocketAddress>();
+        for (Server server : SubAPI.getInstance().getSubServers().values()) {
+            addresses.add(server.getAddress());
+        }
+        for (Host host : SubAPI.getInstance().getHosts().values())
+            for (int port : host.getCreator().getReservedPorts())
+                addresses.add(new InetSocketAddress(host.getAddress(), port));
+        return addresses;
     }
 
     /**

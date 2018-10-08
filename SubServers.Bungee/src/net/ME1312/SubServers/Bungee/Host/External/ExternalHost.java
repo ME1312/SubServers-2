@@ -33,6 +33,7 @@ public class ExternalHost extends Host implements ClientHandler {
     private InetAddress address;
     private SubCreator creator;
     private String directory;
+    protected NamedContainer<Integer, Integer> range;
     protected NamedContainer<Boolean, Client> client;
     private LinkedList<PacketOut> queue;
     private boolean clean;
@@ -48,8 +49,8 @@ public class ExternalHost extends Host implements ClientHandler {
      * @param directory Directory
      * @param gitBash Git Bash Location
      */
-    public ExternalHost(SubPlugin plugin, String name, Boolean enabled, InetAddress address, String directory, String gitBash) {
-        super(plugin, name, enabled, address, directory, gitBash);
+    public ExternalHost(SubPlugin plugin, String name, Boolean enabled, InetAddress address, String directory, NamedContainer<Integer, Integer> range, String gitBash) {
+        super(plugin, name, enabled, address, directory, range, gitBash);
         if (Util.isNull(plugin, name, enabled, address, directory, gitBash)) throw new NullPointerException();
         this.plugin = plugin;
         this.name = name;
@@ -58,6 +59,7 @@ public class ExternalHost extends Host implements ClientHandler {
         this.client = new NamedContainer<Boolean, Client>(false, null);
         this.creator = new ExternalSubCreator(this, gitBash);
         this.directory = directory;
+        this.range = range;
         this.queue = new LinkedList<PacketOut>();
         this.clean = false;
     }

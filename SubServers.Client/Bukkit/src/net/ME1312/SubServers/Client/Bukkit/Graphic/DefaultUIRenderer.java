@@ -364,16 +364,10 @@ public class DefaultUIRenderer extends UIRenderer {
                 inv.setItem(11, block);
                 inv.setItem(12, block);
 
-                if (options.getPort() <= 0) {
-                    block = createItem("STAINED_GLASS_PANE", "RED_STAINED_GLASS_PANE", (short) 14);
-                    blockMeta = block.getItemMeta();
-                    blockMeta.setDisplayName(ChatColor.RED + plugin.api.getLang("SubServers", "Interface.Host-Creator.Edit-Port"));
-                } else {
-                    block = createItem("STAINED_GLASS_PANE", "LIME_STAINED_GLASS_PANE", (short) 5);
-                    blockMeta = block.getItemMeta();
-                    blockMeta.setDisplayName(ChatColor.GREEN + plugin.api.getLang("SubServers", "Interface.Host-Creator.Edit-Port"));
-                    blockMeta.setLore(Arrays.asList(ChatColor.GRAY.toString() + options.getPort()));
-                }
+                block = createItem("STAINED_GLASS_PANE", "LIME_STAINED_GLASS_PANE", (short) 5);
+                blockMeta = block.getItemMeta();
+                blockMeta.setDisplayName(ChatColor.GREEN + plugin.api.getLang("SubServers", "Interface.Host-Creator.Edit-Port"));
+                blockMeta.setLore(Arrays.asList(ChatColor.GRAY.toString() + ((options.getPort() == null)?"Auto Select":options.getPort())));
                 block.setItemMeta(blockMeta);
                 inv.setItem(14, block);
                 inv.setItem(15, block);
@@ -424,7 +418,7 @@ public class DefaultUIRenderer extends UIRenderer {
                 inv.setItem(45, block);
                 inv.setItem(46, block);
 
-                if (options.getName() == null || options.getTemplate() == null || options.getVersion() == null || options.getPort() <= 0 && options.getMemory() < 256) {
+                if (options.getName() == null || options.getTemplate() == null || options.getVersion() == null) {
                     block = createItem("STAINED_GLASS_PANE", "GRAY_STAINED_GLASS_PANE", (short) 7);
                     blockMeta = block.getItemMeta();
                     blockMeta.setDisplayName(ChatColor.GRAY + ChatColor.stripColor(plugin.api.getLang("SubServers", "Interface.Host-Creator.Submit")));

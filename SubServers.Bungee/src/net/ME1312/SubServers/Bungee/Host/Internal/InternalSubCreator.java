@@ -18,6 +18,7 @@ import org.xml.sax.InputSource;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
+import java.net.InetSocketAddress;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.*;
@@ -31,7 +32,239 @@ public class InternalSubCreator extends SubCreator {
     private HashMap<String, ServerTemplate> templates = new HashMap<String, ServerTemplate>();
     private InternalHost host;
     private String gitBash;
-    private TreeMap<String, NamedContainer<Thread, NamedContainer<InternalSubLogger, Process>>> thread;
+    private TreeMap<String, CreatorTask> thread;
+
+    private class CreatorTask extends Thread {
+        private final UUID player;
+        private final String name;
+        private final ServerTemplate template;
+        private final Version version;
+        private final int port;
+        private final InternalSubLogger log;
+        private final Callback<SubServer> callback;
+        private Process process;
+
+        private CreatorTask(UUID player, String name, ServerTemplate template, Version version, int port, Callback<SubServer> callback) {
+            this.player = player;
+            this.name = name;
+            this.template = template;
+            this.version = version;
+            this.port = port;
+            this.log = new InternalSubLogger(null, this, name + File.separator + "Creator", new Container<Boolean>(false), null);
+            this.callback = callback;
+        }
+
+        private YAMLSection build(File dir, ServerTemplate template, List<ServerTemplate> history) throws SubCreatorException {
+            YAMLSection server = new YAMLSection();
+            Version version = this.version;
+            boolean error = false;
+            if (history.contains(template)) throw new IllegalStateException("Template Import loop detected");
+            history.add(template);
+            for (String other : template.getBuildOptions().getStringList("Import", new ArrayList<String>())) {
+                if (templates.keySet().contains(other.toLowerCase())) {
+                    if (templates.get(other.toLowerCase()).isEnabled()) {
+                        YAMLSection config = build(dir, templates.get(other.toLowerCase()), history);
+                        if (config == null) {
+                            throw new SubCreatorException();
+                        } else {
+                            server.setAll(config);
+                        }
+                    } else {
+                        System.out.println(name + File.separator + "Creator > Skipping disabled template: " + other);
+                    }
+                } else {
+                    System.out.println(name + File.separator + "Creator > Skipping missing template: " + other);
+                }
+            }
+            server.setAll(template.getConfigOptions());
+            try {
+                System.out.println(name + File.separator + "Creator > Loading Template: " + template.getDisplayName());
+                Util.copyDirectory(template.getDirectory(), dir);
+                if (template.getType() == ServerType.FORGE || template.getType() == ServerType.SPONGE) {
+                    System.out.println(name + File.separator + "Creator > Searching Versions...");
+                    Document spongexml = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new InputSource(new StringReader(Util.readAll(new BufferedReader(new InputStreamReader(new URL("https://repo.spongepowered.org/maven/org/spongepowered/sponge" + ((template.getType() == ServerType.FORGE)?"forge":"vanilla") + "/maven-metadata.xml").openStream(), Charset.forName("UTF-8")))))));
+
+                    NodeList spnodeList = spongexml.getElementsByTagName("version");
+                    Version spversion = null;
+                    for (int i = 0; i < spnodeList.getLength(); i++) {
+                        Node node = spnodeList.item(i);
+                        if (node.getNodeType() == Node.ELEMENT_NODE) {
+                            if (node.getTextContent().startsWith(version.toString() + '-') && (spversion == null || new Version(node.getTextContent()).compareTo(spversion) >= 0)) {
+                                spversion = new Version(node.getTextContent());
+                            }
+                        }
+                    }
+                    if (spversion == null)
+                        throw new InvalidServerException("Cannot find Sponge version for Minecraft " + version.toString());
+                    System.out.println(name + File.separator + "Creator > Found \"sponge" + ((template.getType() == ServerType.FORGE)?"forge":"vanilla") + "-" + spversion.toString() + '"');
+
+                    if (template.getType() == ServerType.FORGE) {
+                        Document forgexml = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new InputSource(new StringReader(Util.readAll(new BufferedReader(new InputStreamReader(new URL("http://files.minecraftforge.net/maven/net/minecraftforge/forge/maven-metadata.xml").openStream(), Charset.forName("UTF-8")))))));
+
+                        NodeList mcfnodeList = forgexml.getElementsByTagName("version");
+                        Version mcfversion = null;
+                        for (int i = 0; i < mcfnodeList.getLength(); i++) {
+                            Node node = mcfnodeList.item(i);
+                            if (node.getNodeType() == Node.ELEMENT_NODE) {
+                                if (node.getTextContent().contains(spversion.toString().split("\\-")[1]) && (mcfversion == null || new Version(node.getTextContent()).compareTo(mcfversion) >= 0)) {
+                                    mcfversion = new Version(node.getTextContent());
+                                }
+                            }
+                        }
+                        if (mcfversion == null)
+                            throw new InvalidServerException("Cannot find Forge version for Sponge " + spversion.toString());
+                        System.out.println(name + File.separator + "Creator > Found \"forge-" + mcfversion.toString() + '"');
+
+                        version = new Version(mcfversion.toString() + " " + spversion.toString());
+                    } else version = new Version(spversion.toString());
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            if (template.getBuildOptions().contains("Shell-Location")) {
+                String gitBash = InternalSubCreator.this.gitBash + ((InternalSubCreator.this.gitBash.endsWith(File.separator)) ? "" : File.separator) + "bin" + File.separatorChar + "bash.exe";
+                File cache;
+                if (template.getBuildOptions().getBoolean("Use-Cache", true)) {
+                    cache = new UniversalFile(host.plugin.dir, "SubServers:Cache:Templates:" + template.getName());
+                    cache.mkdirs();
+                } else {
+                    cache = null;
+                }
+                if (!(System.getProperty("os.name").toLowerCase().indexOf("win") >= 0) && template.getBuildOptions().contains("Permission")) {
+                    try {
+                        Process process = Runtime.getRuntime().exec("chmod " + template.getBuildOptions().getRawString("Permission") + ' ' + template.getBuildOptions().getRawString("Shell-Location"), null, dir);
+                        Thread.sleep(500);
+                        if (process.exitValue() != 0) {
+                            System.out.println(name + File.separator + "Creator > Couldn't set " + template.getBuildOptions().getRawString("Permission") + " permissions to " + template.getBuildOptions().getRawString("Shell-Location"));
+                        }
+                    } catch (Exception e) {
+                        System.out.println(name + File.separator + "Creator > Couldn't set " + template.getBuildOptions().getRawString("Permission") + " permissions to " + template.getBuildOptions().getRawString("Shell-Location"));
+                        e.printStackTrace();
+                    }
+                }
+
+                try {
+                    System.out.println(name + File.separator + "Creator > Launching " + template.getBuildOptions().getRawString("Shell-Location"));
+                    process = Runtime.getRuntime().exec((System.getProperty("os.name").toLowerCase().indexOf("win") >= 0)?"cmd.exe /c \"\"" + gitBash + "\" --login -i -c \"bash " + template.getBuildOptions().getRawString("Shell-Location") + ' ' + version.toString() + ' ' + ((cache == null)?':':cache.toString().replace('\\', '/').replace(" ", "\\ ")) + "\"\"":("bash " + template.getBuildOptions().getRawString("Shell-Location") + ' ' + version.toString() + ' ' + ((cache == null)?':':cache.toString().replace(" ", "\\ "))), null, dir);
+                    log.log.set(host.plugin.config.get().getSection("Settings").getBoolean("Log-Creator"));
+                    log.file = new File(dir, "SubCreator-" + template.getName() + "-" + version.toString().replace(" ", "@") + ".log");
+                    log.process = process;
+                    log.start();
+
+                    process.waitFor();
+                    Thread.sleep(500);
+
+                    if (process.exitValue() != 0) error = true;
+                } catch (InterruptedException e) {
+                    error = true;
+                } catch (Exception e) {
+                    error = true;
+                    e.printStackTrace();
+                }
+
+                if (cache != null) {
+                    if (cache.isDirectory() && cache.listFiles().length == 0) cache.delete();
+                    cache = new UniversalFile(host.plugin.dir, "SubServers:Cache:Templates");
+                    if (cache.isDirectory() && cache.listFiles().length == 0) cache.delete();
+                    cache = new UniversalFile(host.plugin.dir, "SubServers:Cache");
+                    if (cache.isDirectory() && cache.listFiles().length == 0) cache.delete();
+                }
+            }
+
+            new UniversalFile(dir, "template.yml").delete();
+            if (error) throw new SubCreatorException();
+            return server;
+        }
+
+        public void run() {
+            UniversalFile dir = new UniversalFile(new File(host.getPath()), name);
+            dir.mkdirs();
+            YAMLSection server = new YAMLSection();
+            YAMLSection config;
+            try {
+                config = build(dir, template, new LinkedList<>());
+                generateProperties(dir, port);
+                generateClient(dir, template.getType(), name);
+            } catch (SubCreatorException e) {
+                config = null;
+            } catch (Exception e) {
+                config = null;
+                e.printStackTrace();
+            }
+
+            if (config != null) {
+                try {
+                    System.out.println(name + File.separator + "Creator > Saving...");
+                    if (host.plugin.exServers.keySet().contains(name.toLowerCase()))
+                        host.plugin.exServers.remove(name.toLowerCase());
+
+                    config = new YAMLSection((Map<String, ?>) convert(config.get(), new NamedContainer<>("$player$", (player == null)?"":player.toString()), new NamedContainer<>("$name$", name), new NamedContainer<>("$template$", template.getName()),
+                            new NamedContainer<>("$type$", template.getType().toString()), new NamedContainer<>("$version$", version.toString().replace(" ", "@")), new NamedContainer<>("$port$", Integer.toString(port))));
+
+                    server.set("Enabled", true);
+                    server.set("Display", "");
+                    server.set("Host", host.getName());
+                    server.set("Group", new ArrayList<String>());
+                    server.set("Port", port);
+                    server.set("Motd", "Some SubServer");
+                    server.set("Log", true);
+                    server.set("Directory", "." + File.separatorChar + name);
+                    server.set("Executable", "java -Xmx1024M -jar " + template.getType().toString() + ".jar");
+                    server.set("Stop-Command", "stop");
+                    server.set("Stop-Action", "NONE");
+                    server.set("Run-On-Launch", false);
+                    server.set("Restricted", false);
+                    server.set("Incompatible", new ArrayList<String>());
+                    server.set("Hidden", false);
+                    server.setAll(config);
+
+                    SubServer subserver = host.addSubServer(player, name, server.getBoolean("Enabled"), port, server.getColoredString("Motd", '&'), server.getBoolean("Log"), server.getRawString("Directory"),
+                            new Executable(server.getRawString("Executable")), server.getRawString("Stop-Command"), server.getBoolean("Hidden"), server.getBoolean("Restricted"));
+                    if (server.getString("Display").length() > 0) subserver.setDisplayName(server.getString("Display"));
+                    for (String group : server.getStringList("Group")) subserver.addGroup(group);
+                    SubServer.StopAction action = Util.getDespiteException(() -> SubServer.StopAction.valueOf(server.getRawString("Stop-Action").toUpperCase().replace('-', '_').replace(' ', '_')), null);
+                    if (action != null) subserver.setStopAction(action);
+                    if (server.contains("Extra")) for (String extra : server.getSection("Extra").getKeys())
+                        subserver.addExtra(extra, server.getSection("Extra").getObject(extra));
+                    host.plugin.config.get().getSection("Servers").set(name, server);
+                    host.plugin.config.save();
+                    if (template.getBuildOptions().getBoolean("Run-On-Finish", true))
+                        subserver.start();
+
+                    InternalSubCreator.this.thread.remove(name.toLowerCase());
+                    callback.run(subserver);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            } else {
+                System.out.println(name + File.separator + "Creator > Couldn't build the server jar. Check the SubCreator logs for more detail.");
+            }
+            InternalSubCreator.this.thread.remove(name.toLowerCase());
+        } private Object convert(Object value, NamedContainer<String, String>... replacements) {
+            if (value instanceof Map) {
+                List<String> list = new ArrayList<String>();
+                list.addAll(((Map<String, Object>) value).keySet());
+                for (String key : list) ((Map<String, Object>) value).put(key, convert(((Map<String, Object>) value).get(key), replacements));
+                return value;
+            } else if (value instanceof Collection) {
+                List<Object> list = new ArrayList<Object>();
+                for (Object val : (Collection<Object>) value) list.add(convert(val, replacements));
+                return list;
+            } else if (value.getClass().isArray()) {
+                List<Object> list = new ArrayList<Object>();
+                for (int i = 0; i < ((Object[]) value).length; i++) list.add(convert(((Object[]) value)[i], replacements));
+                return list;
+            } else if (value instanceof String) {
+                return replace((String) value, replacements);
+            } else {
+                return value;
+            }
+        } private String replace(String string, NamedContainer<String, String>... replacements) {
+            for (NamedContainer<String, String> replacement : replacements) string = string.replace(replacement.name(), replacement.get());
+            return string;
+        }
+    }
 
     /**
      * Creates an Internal SubCreator
@@ -42,8 +275,8 @@ public class InternalSubCreator extends SubCreator {
     public InternalSubCreator(InternalHost host, String gitBash) {
         if (Util.isNull(host, gitBash)) throw new NullPointerException();
         this.host = host;
-        this.gitBash = (System.getenv("ProgramFiles(x86)") == null) ? Pattern.compile("%(ProgramFiles)\\(x86\\)%", Pattern.CASE_INSENSITIVE).matcher(gitBash).replaceAll("%$1%") : gitBash;
-        this.thread = new TreeMap<String, NamedContainer<Thread, NamedContainer<InternalSubLogger, Process>>>();
+        this.gitBash = (System.getenv("ProgramFiles(x86)") == null)?Pattern.compile("%(ProgramFiles)\\(x86\\)%", Pattern.CASE_INSENSITIVE).matcher(gitBash).replaceAll("%$1%"):gitBash;
+        this.thread = new TreeMap<String, CreatorTask>();
         reload();
     }
 
@@ -66,232 +299,26 @@ public class InternalSubCreator extends SubCreator {
             }
     }
 
-    private YAMLSection build(NamedContainer<InternalSubLogger, Process> thread, File dir, String name, ServerTemplate template, Version version, List<ServerTemplate> history) throws SubCreatorException {
-        YAMLSection server = new YAMLSection();
-        boolean error = false;
-        if (history.contains(template)) throw new IllegalStateException("Template Import loop detected");
-        history.add(template);
-        for (String other : template.getBuildOptions().getStringList("Import", new ArrayList<String>())) {
-            if (templates.keySet().contains(other.toLowerCase())) {
-                if (templates.get(other.toLowerCase()).isEnabled()) {
-                    YAMLSection config = build(thread, dir, other, templates.get(other.toLowerCase()), version, history);
-                    if (config == null) {
-                        throw new SubCreatorException();
-                    } else {
-                        server.setAll(config);
-                    }
-                } else {
-                    System.out.println(name + File.separator + "Creator > Skipping disabled template: " + other);
-                }
-            } else {
-                System.out.println(name + File.separator + "Creator > Skipping missing template: " + other);
-            }
-        }
-        server.setAll(template.getConfigOptions());
-        try {
-            System.out.println(name + File.separator + "Creator > Loading Template: " + template.getDisplayName());
-            Util.copyDirectory(template.getDirectory(), dir);
-            if (template.getType() == ServerType.FORGE || template.getType() == ServerType.SPONGE) {
-                System.out.println(name + File.separator + "Creator > Searching Versions...");
-                Document spongexml = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new InputSource(new StringReader(Util.readAll(new BufferedReader(new InputStreamReader(new URL("https://repo.spongepowered.org/maven/org/spongepowered/sponge" + ((template.getType() == ServerType.FORGE)?"forge":"vanilla") + "/maven-metadata.xml").openStream(), Charset.forName("UTF-8")))))));
-
-                NodeList spnodeList = spongexml.getElementsByTagName("version");
-                Version spversion = null;
-                for (int i = 0; i < spnodeList.getLength(); i++) {
-                    Node node = spnodeList.item(i);
-                    if (node.getNodeType() == Node.ELEMENT_NODE) {
-                        if (node.getTextContent().startsWith(version.toString() + '-') && (spversion == null || new Version(node.getTextContent()).compareTo(spversion) >= 0)) {
-                            spversion = new Version(node.getTextContent());
-                        }
-                    }
-                }
-                if (spversion == null)
-                    throw new InvalidServerException("Cannot find Sponge version for Minecraft " + version.toString());
-                System.out.println(name + File.separator + "Creator > Found \"sponge" + ((template.getType() == ServerType.FORGE)?"forge":"vanilla") + "-" + spversion.toString() + '"');
-
-                if (template.getType() == ServerType.FORGE) {
-                    Document forgexml = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new InputSource(new StringReader(Util.readAll(new BufferedReader(new InputStreamReader(new URL("http://files.minecraftforge.net/maven/net/minecraftforge/forge/maven-metadata.xml").openStream(), Charset.forName("UTF-8")))))));
-
-                    NodeList mcfnodeList = forgexml.getElementsByTagName("version");
-                    Version mcfversion = null;
-                    for (int i = 0; i < mcfnodeList.getLength(); i++) {
-                        Node node = mcfnodeList.item(i);
-                        if (node.getNodeType() == Node.ELEMENT_NODE) {
-                            if (node.getTextContent().contains(spversion.toString().split("\\-")[1]) && (mcfversion == null || new Version(node.getTextContent()).compareTo(mcfversion) >= 0)) {
-                                mcfversion = new Version(node.getTextContent());
-                            }
-                        }
-                    }
-                    if (mcfversion == null)
-                        throw new InvalidServerException("Cannot find Forge version for Sponge " + spversion.toString());
-                    System.out.println(name + File.separator + "Creator > Found \"forge-" + mcfversion.toString() + '"');
-
-                    version = new Version(mcfversion.toString() + " " + spversion.toString());
-                } else version = new Version(spversion.toString());
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        if (template.getBuildOptions().contains("Shell-Location")) {
-            String gitBash = this.gitBash + ((this.gitBash.endsWith(File.separator)) ? "" : File.separator) + "bin" + File.separatorChar + "bash.exe";
-            File cache;
-            if (template.getBuildOptions().getBoolean("Use-Cache", true)) {
-                cache = new UniversalFile(host.plugin.dir, "SubServers:Cache:Templates:" + template.getName());
-                cache.mkdirs();
-            } else {
-                cache = null;
-            }
-            if (!(System.getProperty("os.name").toLowerCase().indexOf("win") >= 0) && template.getBuildOptions().contains("Permission")) {
-                try {
-                    Process process = Runtime.getRuntime().exec("chmod " + template.getBuildOptions().getRawString("Permission") + ' ' + template.getBuildOptions().getRawString("Shell-Location"), null, dir);
-                    Thread.sleep(500);
-                    if (process.exitValue() != 0) {
-                        System.out.println(name + File.separator + "Creator > Couldn't set " + template.getBuildOptions().getRawString("Permission") + " permissions to " + template.getBuildOptions().getRawString("Shell-Location"));
-                    }
-                } catch (Exception e) {
-                    System.out.println(name + File.separator + "Creator > Couldn't set " + template.getBuildOptions().getRawString("Permission") + " permissions to " + template.getBuildOptions().getRawString("Shell-Location"));
-                    e.printStackTrace();
-                }
-            }
-
-            try {
-                System.out.println(name + File.separator + "Creator > Launching " + template.getBuildOptions().getRawString("Shell-Location"));
-                thread.set(Runtime.getRuntime().exec((System.getProperty("os.name").toLowerCase().indexOf("win") >= 0)?"cmd.exe /c \"\"" + gitBash + "\" --login -i -c \"bash " + template.getBuildOptions().getRawString("Shell-Location") + ' ' + version.toString() + ' ' + ((cache == null)?':':cache.toString().replace('\\', '/').replace(" ", "\\ ")) + "\"\"":("bash " + template.getBuildOptions().getRawString("Shell-Location") + ' ' + version.toString() + ' ' + ((cache == null)?':':cache.toString().replace(" ", "\\ "))), null, dir));
-                thread.name().log.set(host.plugin.config.get().getSection("Settings").getBoolean("Log-Creator"));
-                thread.name().file = new File(dir, "SubCreator-" + template.getName() + "-" + version.toString().replace(" ", "@") + ".log");
-                thread.name().process = thread.get();
-                thread.name().start();
-
-                thread.get().waitFor();
-                Thread.sleep(500);
-
-                if (thread.get().exitValue() != 0) error = true;
-            } catch (InterruptedException e) {
-                error = true;
-            } catch (Exception e) {
-                error = true;
-                e.printStackTrace();
-            }
-
-            if (cache != null) {
-                if (cache.isDirectory() && cache.listFiles().length == 0) cache.delete();
-                cache = new UniversalFile(host.plugin.dir, "SubServers:Cache:Templates");
-                if (cache.isDirectory() && cache.listFiles().length == 0) cache.delete();
-                cache = new UniversalFile(host.plugin.dir, "SubServers:Cache");
-                if (cache.isDirectory() && cache.listFiles().length == 0) cache.delete();
-            }
-        }
-
-        new UniversalFile(dir, "template.yml").delete();
-        if (error) throw new SubCreatorException();
-        return server;
-    }
-
-    private SubServer run(UUID player, String name, ServerTemplate template, Version version, int port) {
-        NamedContainer<InternalSubLogger, Process> thread = this.thread.get(name.toLowerCase()).get();
-        UniversalFile dir = new UniversalFile(new File(host.getPath()), name);
-        dir.mkdirs();
-        YAMLSection server = new YAMLSection();
-        YAMLSection config;
-        try {
-            config = build(thread, dir, name, template, version, new LinkedList<>());
-            generateProperties(dir, port);
-            generateClient(dir, template.getType(), name);
-        } catch (SubCreatorException e) {
-            config = null;
-        } catch (Exception e) {
-            config = null;
-            e.printStackTrace();
-        }
-
-        if (config != null) {
-            try {
-                System.out.println(name + File.separator + "Creator > Saving...");
-                if (host.plugin.exServers.keySet().contains(name.toLowerCase()))
-                    host.plugin.exServers.remove(name.toLowerCase());
-
-                config = new YAMLSection((Map<String, ?>) convert(config.get(), new NamedContainer<>("$player$", (player == null)?"":player.toString()), new NamedContainer<>("$name$", name), new NamedContainer<>("$template$", template.getName()),
-                        new NamedContainer<>("$type$", template.getType().toString()), new NamedContainer<>("$version$", version.toString().replace(" ", "@")), new NamedContainer<>("$port$", Integer.toString(port))));
-
-                server.set("Enabled", true);
-                server.set("Display", "");
-                server.set("Host", host.getName());
-                server.set("Group", new ArrayList<String>());
-                server.set("Port", port);
-                server.set("Motd", "Some SubServer");
-                server.set("Log", true);
-                server.set("Directory", "." + File.separatorChar + name);
-                server.set("Executable", "java -Xmx1024M -jar " + template.getType().toString() + ".jar");
-                server.set("Stop-Command", "stop");
-                server.set("Stop-Action", "NONE");
-                server.set("Run-On-Launch", false);
-                server.set("Restricted", false);
-                server.set("Incompatible", new ArrayList<String>());
-                server.set("Hidden", false);
-                server.setAll(config);
-
-                SubServer subserver = host.addSubServer(player, name, server.getBoolean("Enabled"), port, server.getColoredString("Motd", '&'), server.getBoolean("Log"), server.getRawString("Directory"),
-                        new Executable(server.getRawString("Executable")), server.getRawString("Stop-Command"), server.getBoolean("Hidden"), server.getBoolean("Restricted"));
-                if (server.getString("Display").length() > 0) subserver.setDisplayName(server.getString("Display"));
-                for (String group : server.getStringList("Group")) subserver.addGroup(group);
-                SubServer.StopAction action = Util.getDespiteException(() -> SubServer.StopAction.valueOf(server.getRawString("Stop-Action").toUpperCase().replace('-', '_').replace(' ', '_')), null);
-                if (action != null) subserver.setStopAction(action);
-                if (server.contains("Extra")) for (String extra : server.getSection("Extra").getKeys())
-                    subserver.addExtra(extra, server.getSection("Extra").getObject(extra));
-                host.plugin.config.get().getSection("Servers").set(name, server);
-                host.plugin.config.save();
-                if (template.getBuildOptions().getBoolean("Run-On-Finish", true))
-                    subserver.start();
-
-                this.thread.remove(name.toLowerCase());
-                return subserver;
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        } else {
-            System.out.println(name + File.separator + "Creator > Couldn't build the server jar. Check the SubCreator logs for more detail.");
-        }
-        this.thread.remove(name.toLowerCase());
-        return null;
-    } private Object convert(Object value, NamedContainer<String, String>... replacements) {
-        if (value instanceof Map) {
-            List<String> list = new ArrayList<String>();
-            list.addAll(((Map<String, Object>) value).keySet());
-            for (String key : list) ((Map<String, Object>) value).put(key, convert(((Map<String, Object>) value).get(key), replacements));
-            return value;
-        } else if (value instanceof Collection) {
-            List<Object> list = new ArrayList<Object>();
-            for (Object val : (Collection<Object>) value) list.add(convert(val, replacements));
-            return list;
-        } else if (value.getClass().isArray()) {
-            List<Object> list = new ArrayList<Object>();
-            for (int i = 0; i < ((Object[]) value).length; i++) list.add(convert(((Object[]) value)[i], replacements));
-            return list;
-        } else if (value instanceof String) {
-            return replace((String) value, replacements);
-        } else {
-            return value;
-        }
-    } private String replace(String string, NamedContainer<String, String>... replacements) {
-        for (NamedContainer<String, String> replacement : replacements) string = string.replace(replacement.name(), replacement.get());
-        return string;
-    }
-
+    @SuppressWarnings("deprecation")
     @Override
-    public boolean create(UUID player, String name, ServerTemplate template, Version version, int port, Callback<SubServer> callback) {
-        if (Util.isNull(name, template, version, port)) throw new NullPointerException();
+    public boolean create(UUID player, String name, ServerTemplate template, Version version, Integer port, Callback<SubServer> callback) {
+        if (Util.isNull(name, template, version)) throw new NullPointerException();
         if (host.isAvailable() && host.isEnabled() && template.isEnabled() && !SubAPI.getInstance().getSubServers().keySet().contains(name.toLowerCase()) && !SubCreator.isReserved(name)) {
             StackTraceElement[] origin = new Exception().getStackTrace();
-            NamedContainer<Thread, NamedContainer<InternalSubLogger, Process>> thread = new NamedContainer<Thread, NamedContainer<InternalSubLogger, Process>>(null, new NamedContainer<InternalSubLogger, Process>(new InternalSubLogger(null, this, name + File.separator + "Creator", new Container<Boolean>(false), null), null));
-            this.thread.put(name.toLowerCase(), thread);
+
+            if (port == null) {
+                Container<Integer> i = new Container<Integer>(host.range.name() - 1);
+                port = Util.getNew(getAllReservedAddresses(), () -> {
+                    i.set(i.get() + 1);
+                    if (i.get() > host.range.get()) throw new IllegalStateException("There are no more ports available between " + host.range.name() + " and " + host.range.get());
+                    return new InetSocketAddress(host.getAddress(), i.get());
+                }).getPort();
+            }
 
             final SubCreateEvent event = new SubCreateEvent(player, host, name, template, version, port);
             host.plugin.getPluginManager().callEvent(event);
             if (!event.isCancelled()) {
-                thread.rename(new Thread(() -> {
-                    SubServer server = InternalSubCreator.this.run(player, name, event.getTemplate(), event.getVersion(), port);
-
+                CreatorTask task = new CreatorTask(player, name, template, version, port, server -> {
                     if (callback != null && server != null) try {
                         callback.run(server);
                     } catch (Throwable e) {
@@ -299,8 +326,9 @@ public class InternalSubCreator extends SubCreator {
                         ew.setStackTrace(origin);
                         ew.printStackTrace();
                     }
-                }));
-                thread.name().start();
+                });
+                this.thread.put(name.toLowerCase(), task);
+                task.start();
                 return true;
             } else {
                 this.thread.remove(name.toLowerCase());
@@ -311,7 +339,7 @@ public class InternalSubCreator extends SubCreator {
 
     @Override
     public void terminate() {
-        HashMap<String, NamedContainer<Thread, NamedContainer<InternalSubLogger, Process>>> temp = new HashMap<String, NamedContainer<Thread, NamedContainer<InternalSubLogger, Process>>>();
+        HashMap<String, CreatorTask> temp = new HashMap<String, CreatorTask>();
         temp.putAll(thread);
         for (String i : temp.keySet()) {
             terminate(i);
@@ -320,17 +348,19 @@ public class InternalSubCreator extends SubCreator {
 
     @Override
     public void terminate(String name) {
-        if (this.thread.get(name.toLowerCase()).get().get() != null && this.thread.get(name.toLowerCase()).get().get().isAlive()) {
-            this.thread.get(name.toLowerCase()).get().get().destroyForcibly();
-        } else if (this.thread.get(name.toLowerCase()).name() != null && this.thread.get(name.toLowerCase()).name().isAlive()) {
-            this.thread.get(name.toLowerCase()).name().interrupt();
-            this.thread.remove(name.toLowerCase());
+        if (this.thread.keySet().contains(name.toLowerCase())) {
+            if (this.thread.get(name.toLowerCase()).process != null && this.thread.get(name.toLowerCase()).process.isAlive()) {
+                this.thread.get(name.toLowerCase()).process.destroyForcibly();
+            } else if (this.thread.get(name.toLowerCase()).isAlive()) {
+                this.thread.get(name.toLowerCase()).interrupt();
+                this.thread.remove(name.toLowerCase());
+            }
         }
     }
 
     @Override
     public void waitFor() throws InterruptedException {
-        HashMap<String, NamedContainer<Thread, NamedContainer<InternalSubLogger, Process>>> temp = new HashMap<String, NamedContainer<Thread, NamedContainer<InternalSubLogger, Process>>>();
+        HashMap<String, CreatorTask> temp = new HashMap<String, CreatorTask>();
         temp.putAll(thread);
         for (String i : temp.keySet()) {
             waitFor(i);
@@ -339,7 +369,7 @@ public class InternalSubCreator extends SubCreator {
 
     @Override
     public void waitFor(String name) throws InterruptedException {
-        while (this.thread.keySet().contains(name.toLowerCase()) && this.thread.get(name.toLowerCase()).name() != null && this.thread.get(name.toLowerCase()).name().isAlive()) {
+        while (this.thread.keySet().contains(name.toLowerCase()) && this.thread.get(name.toLowerCase()).isAlive()) {
             Thread.sleep(250);
         }
     }
@@ -355,9 +385,9 @@ public class InternalSubCreator extends SubCreator {
     }
 
     @Override
-    public List<SubLogger> getLogger() {
+    public List<SubLogger> getLoggers() {
         List<SubLogger> loggers = new ArrayList<SubLogger>();
-        HashMap<String, NamedContainer<Thread, NamedContainer<InternalSubLogger, Process>>> temp = new HashMap<String, NamedContainer<Thread, NamedContainer<InternalSubLogger, Process>>>();
+        HashMap<String, CreatorTask> temp = new HashMap<String, CreatorTask>();
         temp.putAll(thread);
         for (String i : temp.keySet()) {
             loggers.add(getLogger(i));
@@ -367,12 +397,19 @@ public class InternalSubCreator extends SubCreator {
 
     @Override
     public SubLogger getLogger(String name) {
-        return this.thread.get(name.toLowerCase()).get().name();
+        return this.thread.get(name.toLowerCase()).log;
     }
 
     @Override
     public List<String> getReservedNames() {
         return new ArrayList<String>(thread.keySet());
+    }
+
+    @Override
+    public List<Integer> getReservedPorts() {
+        List<Integer> ports = new ArrayList<Integer>();
+        for (CreatorTask task : thread.values()) ports.add(task.port);
+        return ports;
     }
 
     @Override

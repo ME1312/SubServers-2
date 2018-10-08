@@ -21,7 +21,7 @@ public class PacketCreateServer implements PacketIn, PacketOut {
     private String host;
     private String template;
     private Version version;
-    private int port;
+    private Integer port;
     private String id;
 
     /**
@@ -41,8 +41,8 @@ public class PacketCreateServer implements PacketIn, PacketOut {
      * @param callback Callbacks
      */
     @SafeVarargs
-    public PacketCreateServer(UUID player, String name, String host, String template, Version version, int port, Callback<YAMLSection>... callback) {
-        if (Util.isNull(name, host, template, version, port, callback)) throw new NullPointerException();
+    public PacketCreateServer(UUID player, String name, String host, String template, Version version, Integer port, Callback<YAMLSection>... callback) {
+        if (Util.isNull(name, host, template, version, callback)) throw new NullPointerException();
         this.player = player;
         this.name = name;
         this.host = host;
@@ -84,7 +84,7 @@ public class PacketCreateServer implements PacketIn, PacketOut {
         creator.set("host", host);
         creator.set("template", template);
         creator.set("version", version.toString());
-        creator.set("port", port);
+        if (port != null) creator.set("port", port);
         data.set("creator", creator);
         return data;
     }

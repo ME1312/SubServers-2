@@ -468,11 +468,11 @@ public class SubCommand {
         new Command(host.info) {
             @Override
             public void command(String handle, String[] args) {
-                if (args.length > 4) {
-                    if (Util.isException(() -> Integer.parseInt(args[4]))) {
+                if (args.length > 3) {
+                    if (args.length > 4 && Util.isException(() -> Integer.parseInt(args[4]))) {
                         host.log.message.println("Invalid Port Number");
                     } else {
-                        host.subdata.sendPacket(new PacketCreateServer(null, args[0], args[1], args[2], new Version(args[3]), Integer.parseInt(args[4]), data -> {
+                        host.subdata.sendPacket(new PacketCreateServer(null, args[0], args[1], args[2], new Version(args[3]), (args.length > 4)?Integer.parseInt(args[4]):null, data -> {
                             switch (data.getInt("r")) {
                                 case 3:
                                     host.log.message.println("Server names cannot use spaces");
@@ -505,7 +505,7 @@ public class SubCommand {
                                     host.log.message.println("Launching SubCreator...");
                                     break;
                                 default:
-                                    host.log.warn.println("PacketCreateServer(null, " + args[0] + ", " + args[1] + ", " + args[2] + ", " + args[3] + ", " + args[4] + ") responded with: " + data.getRawString("m"));
+                                    host.log.warn.println("PacketCreateServer(null, " + args[0] + ", " + args[1] + ", " + args[2] + ", " + args[3] + ", " + ((args.length > 4)?args[4]:"null") + ") responded with: " + data.getRawString("m"));
                                     host.log.message.println("Launching SubCreator...");
                                     break;
                             }
@@ -515,7 +515,7 @@ public class SubCommand {
                     host.log.message.println("Usage: /" + handle + " <Name> <Host> <Template> <Version> <Port>");
                 }
             }
-        }.usage("<Name>", "<Host>", "<Template>", "<Version>", "<Port>").description("Creates a SubServer").help(
+        }.usage("<Name>", "<Host>", "<Template>", "<Version>", "[Port]").description("Creates a SubServer").help(
                 "This command is used to create and launch a SubServer on the specified host via the network.",
                 "Templates are downloaded from SubServers.Bungee to ~/Templates.",
                 "",
@@ -531,11 +531,12 @@ public class SubCommand {
                 "The <Version> argument is required, and should be a version",
                 "string of the type of server that you want to create",
                 "",
-                "The <Port> argument is required, and should be the port number",
-                "that you want the server to listen on after it has been created.",
+                "When the <Port> argument is provided, it will set the port number",
+                "the server will listen on after it has been created.",
                 "",
                 "Examples:",
-                "  /create ExampleServer ExampleHost Spigot 1.11 25565"
+                "  /create ExampleServer ExampleHost Spigot 1.13.1",
+                "  /create ExampleServer ExampleHost Spigot 1.13.1 25565"
         ).register("create");
     }
 }

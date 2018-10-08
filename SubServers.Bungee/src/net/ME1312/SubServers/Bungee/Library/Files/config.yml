@@ -18,6 +18,7 @@ Hosts:
     Display: 'Default'
     Driver: 'BUILT-IN'
     Address: '127.0.0.1'
+    Port-Range: '25500-25559'
     Directory: './SubServers/Servers'
     Git-Bash: '%ProgramFiles%\Git'
 

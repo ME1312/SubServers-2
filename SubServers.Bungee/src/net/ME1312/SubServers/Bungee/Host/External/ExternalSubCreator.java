@@ -2,6 +2,7 @@ package net.ME1312.SubServers.Bungee.Host.External;
 
 import net.ME1312.SubServers.Bungee.Event.SubCreateEvent;
 import net.ME1312.SubServers.Bungee.Host.*;
+import net.ME1312.SubServers.Bungee.Host.Internal.InternalSubCreator;
 import net.ME1312.SubServers.Bungee.Library.*;
 import net.ME1312.SubServers.Bungee.Library.Config.YAMLConfig;
 import net.ME1312.SubServers.Bungee.Library.Config.YAMLSection;
@@ -12,6 +13,7 @@ import net.ME1312.SubServers.Bungee.SubAPI;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
+import java.net.InetSocketAddress;
 import java.util.*;
 
 /**
@@ -22,7 +24,7 @@ public class ExternalSubCreator extends SubCreator {
     private HashMap<String, ServerTemplate> templates = new HashMap<String, ServerTemplate>();
     private ExternalHost host;
     private String gitBash;
-    private TreeMap<String, ExternalSubLogger> thread;
+    private TreeMap<String, NamedContainer<Integer, ExternalSubLogger>> thread;
 
     /**
      * Creates an External SubCreator
@@ -34,7 +36,7 @@ public class ExternalSubCreator extends SubCreator {
         if (Util.isNull(host, gitBash)) throw new NullPointerException();
         this.host = host;
         this.gitBash = gitBash;
-        this.thread = new TreeMap<String, ExternalSubLogger>();
+        this.thread = new TreeMap<String, NamedContainer<Integer, ExternalSubLogger>>();
         reload();
     }
 
@@ -58,12 +60,23 @@ public class ExternalSubCreator extends SubCreator {
     }
 
     @Override
-    public boolean create(UUID player, String name, ServerTemplate template, Version version, int port, Callback<SubServer> callback) {
-        if (Util.isNull(name, template, version, port)) throw new NullPointerException();
+    public boolean create(UUID player, String name, ServerTemplate template, Version version, Integer port, Callback<SubServer> callback) {
+        if (Util.isNull(name, template, version)) throw new NullPointerException();
         if (host.isAvailable() && host.isEnabled() && template.isEnabled() && !SubAPI.getInstance().getSubServers().keySet().contains(name.toLowerCase()) && !SubCreator.isReserved(name)) {
             StackTraceElement[] origin = new Exception().getStackTrace();
+
+            if (port == null) {
+                Container<Integer> i = new Container<Integer>(host.range.name() - 1);
+                port = Util.getNew(getAllReservedAddresses(), () -> {
+                    i.set(i.get() + 1);
+                    if (i.get() > host.range.get()) throw new IllegalStateException("There are no more ports available between " + host.range.name() + " and " + host.range.get());
+                    return new InetSocketAddress(host.getAddress(), i.get());
+                }).getPort();
+            }
             ExternalSubLogger logger = new ExternalSubLogger(this, name + File.separator + "Creator", new Container<Boolean>(host.plugin.config.get().getSection("Settings").getBoolean("Log-Creator")), null);
-            thread.put(name.toLowerCase(), logger);
+            thread.put(name.toLowerCase(), new NamedContainer<>(port, logger));
+
+            final int fport = port;
             final SubCreateEvent event = new SubCreateEvent(player, host, name, template, version, port);
             host.plugin.getPluginManager().callEvent(event);
             if (!event.isCancelled()) {
@@ -77,13 +90,13 @@ public class ExternalSubCreator extends SubCreator {
 
                             YAMLSection server = new YAMLSection();
                             YAMLSection config = new YAMLSection((Map<String, ?>) convert(data.getSection("c").get(), new NamedContainer<>("$player$", (player == null)?"":player.toString()), new NamedContainer<>("$name$", name),
-                                    new NamedContainer<>("$template$", template.getName()), new NamedContainer<>("$type$", template.getType().toString()), new NamedContainer<>("$version$", version.toString().replace(" ", "@")), new NamedContainer<>("$port$", Integer.toString(port))));
+                                    new NamedContainer<>("$template$", template.getName()), new NamedContainer<>("$type$", template.getType().toString()), new NamedContainer<>("$version$", version.toString().replace(" ", "@")), new NamedContainer<>("$port$", Integer.toString(fport))));
 
                             server.set("Enabled", true);
                             server.set("Display", "");
                             server.set("Host", host.getName());
                             server.set("Group", new ArrayList<String>());
-                            server.set("Port", port);
+                            server.set("Port", fport);
                             server.set("Motd", "Some SubServer");
                             server.set("Log", true);
                             server.set("Directory", "." + File.separatorChar + name);
@@ -96,7 +109,7 @@ public class ExternalSubCreator extends SubCreator {
                             server.set("Hidden", false);
                             server.setAll(config);
 
-                            SubServer subserver = host.addSubServer(player, name, server.getBoolean("Enabled"), port, server.getColoredString("Motd", '&'), server.getBoolean("Log"), server.getRawString("Directory"),
+                            SubServer subserver = host.addSubServer(player, name, server.getBoolean("Enabled"), fport, server.getColoredString("Motd", '&'), server.getBoolean("Log"), server.getRawString("Directory"),
                                     new Executable(server.getRawString("Executable")), server.getRawString("Stop-Command"), server.getBoolean("Hidden"), server.getBoolean("Restricted"));
                             if (server.getString("Display").length() > 0) subserver.setDisplayName(server.getString("Display"));
                             for (String group : server.getStringList("Group")) subserver.addGroup(group);
@@ -157,7 +170,7 @@ public class ExternalSubCreator extends SubCreator {
 
     @Override
     public void terminate() {
-        HashMap<String, ExternalSubLogger> thread = new HashMap<String, ExternalSubLogger>();
+        HashMap<String, NamedContainer<Integer, ExternalSubLogger>> thread = new HashMap<String, NamedContainer<Integer, ExternalSubLogger>>();
         thread.putAll(this.thread);
         for (String i : thread.keySet()) {
             terminate(i);
@@ -174,7 +187,7 @@ public class ExternalSubCreator extends SubCreator {
 
     @Override
     public void waitFor() throws InterruptedException {
-        HashMap<String, ExternalSubLogger> thread = new HashMap<String, ExternalSubLogger>();
+        HashMap<String, NamedContainer<Integer, ExternalSubLogger>> thread = new HashMap<String, NamedContainer<Integer, ExternalSubLogger>>();
         thread.putAll(this.thread);
         for (String i : thread.keySet()) {
             waitFor(i);
@@ -199,18 +212,31 @@ public class ExternalSubCreator extends SubCreator {
     }
 
     @Override
-    public List<SubLogger> getLogger() {
-        return new LinkedList<SubLogger>(thread.values());
+    public List<SubLogger> getLoggers() {
+        List<SubLogger> loggers = new ArrayList<SubLogger>();
+        HashMap<String, NamedContainer<Integer, ExternalSubLogger>> temp = new HashMap<String, NamedContainer<Integer, ExternalSubLogger>>();
+        temp.putAll(thread);
+        for (String i : temp.keySet()) {
+            loggers.add(getLogger(i));
+        }
+        return loggers;
     }
 
     @Override
     public SubLogger getLogger(String name) {
-        return this.thread.get(name.toLowerCase());
+        return this.thread.get(name.toLowerCase()).get();
     }
 
     @Override
     public List<String> getReservedNames() {
         return new ArrayList<String>(thread.keySet());
+    }
+
+    @Override
+    public List<Integer> getReservedPorts() {
+        List<Integer> ports = new ArrayList<Integer>();
+        for (NamedContainer<Integer, ExternalSubLogger> task : thread.values()) ports.add(task.name());
+        return ports;
     }
 
     @Override

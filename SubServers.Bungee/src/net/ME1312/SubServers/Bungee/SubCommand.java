@@ -464,7 +464,7 @@ public final class SubCommand extends CommandX {
                         sender.sendMessage("SubServers > The BungeeCord library provided does not support console sudo.");
                     }
                 } else if (args[0].equalsIgnoreCase("create")) {
-                    if (args.length > 5) {
+                    if (args.length > 4) {
                         if (plugin.api.getSubServers().keySet().contains(args[1].toLowerCase()) || SubCreator.isReserved(args[1])) {
                             sender.sendMessage("SubServers > There is already a SubServer with that name");
                         } else if (!plugin.hosts.keySet().contains(args[2].toLowerCase())) {
@@ -479,13 +479,13 @@ public final class SubCommand extends CommandX {
                             sender.sendMessage("SubServers > That Template is not enabled");
                         } else if (new Version("1.8").compareTo(new Version(args[4])) > 0) {
                             sender.sendMessage("SubServers > SubCreator cannot create servers before Minecraft 1.8");
-                        } else if (Util.isException(() -> Integer.parseInt(args[5])) || Integer.parseInt(args[5]) <= 0 || Integer.parseInt(args[5]) > 65535) {
+                        } else if (args.length > 5 && (Util.isException(() -> Integer.parseInt(args[5])) || Integer.parseInt(args[5]) <= 0 || Integer.parseInt(args[5]) > 65535)) {
                             sender.sendMessage("SubServers > Invalid Port Number");
                         } else {
-                            plugin.hosts.get(args[2].toLowerCase()).getCreator().create(args[1], plugin.hosts.get(args[2].toLowerCase()).getCreator().getTemplate(args[3]), new Version(args[4]), Integer.parseInt(args[5]));
+                            plugin.hosts.get(args[2].toLowerCase()).getCreator().create(args[1], plugin.hosts.get(args[2].toLowerCase()).getCreator().getTemplate(args[3]), new Version(args[4]), (args.length > 5)?Integer.parseInt(args[5]):null);
                         }
                     } else {
-                        sender.sendMessage("SubServers > Usage: " + label + " " + args[0].toLowerCase() + " <Name> <Host> <Template> <Version> <Port>");
+                        sender.sendMessage("SubServers > Usage: " + label + " " + args[0].toLowerCase() + " <Name> <Host> <Template> <Version> [Port]");
                     }
                 } else if (args[0].equalsIgnoreCase("del") || args[0].equalsIgnoreCase("delete")) {
                     if (args.length > 1) {
@@ -532,7 +532,7 @@ public final class SubCommand extends CommandX {
                 "   Terminate Server: /sub kill <SubServer>",
                 "   Command Server: /sub cmd <SubServer> <Command> [Args...]",
                 "   Sudo Server: /sub sudo <SubServer>",
-                "   Create Server: /sub create <Name> <Host> <Template> <Version> <Port>",
+                "   Create Server: /sub create <Name> <Host> <Template> <Version> [Port]",
                 "   Remove Server: /sub delete <SubServer>",
                 "",
                 "   To see BungeeCord supplied commands, please visit:",

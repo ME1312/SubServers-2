@@ -377,8 +377,7 @@ public abstract class UIRenderer {
         private String name = null;
         private String template = null;
         private Version version = null;
-        private int memory = 1024;
-        private int port = -1;
+        private Integer port = null;
 
         /**
          * Grabs a raw CreatorOptions instance
@@ -462,41 +461,20 @@ public abstract class UIRenderer {
         }
 
         /**
-         * Gets the RAM Amount for the Server
-         *
-         * @return Server RAM Amount (in MB)
-         */
-        public int getMemory() {
-            return memory;
-        }
-
-        /**
-         * Sets the RAM AMount for the Server
-         *
-         * @param value Value (in MB)
-         */
-        public void setMemory(int value) {
-            if (Util.isNull(value)) throw new NullPointerException();
-            final int memory = this.memory;
-            history.add(() -> this.memory = memory);
-            this.memory = value;
-        }
-
-        /**
          * Gets the Port Number for the Server
          *
-         * @return Server Port Number
+         * @return Server Port Number (null for auto-select)
          */
-        public int getPort() {
+        public Integer getPort() {
             return port;
         }
 
         /**
          * Sets the Port Number for the Server
          *
-         * @param value Value
+         * @param value Value (null for auto-select)
          */
-        public void setPort(int value) {
+        public void setPort(Integer value) {
             if (Util.isNull(value)) throw new NullPointerException();
             final int port = this.port;
             history.add(() -> this.port = port);

@@ -794,13 +794,13 @@ public final class SubCommand implements CommandExecutor {
                 Optional<String> template = args.getOne(Text.of("Template"));
                 Optional<String> version = args.getOne(Text.of("Version"));
                 Optional<String> port = args.getOne(Text.of("Port"));
-                if (name.isPresent() && host.isPresent() && template.isPresent() && version.isPresent() && port.isPresent()) {
+                if (name.isPresent() && host.isPresent() && template.isPresent() && version.isPresent()) {
                     if (sender.hasPermission("subservers.host.create." + host.get().toLowerCase())) {
-                        if (Util.isException(() -> Integer.parseInt(port.get()))) {
+                        if (port.isPresent() && Util.isException(() -> Integer.parseInt(port.get()))) {
                             sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Creator.Invalid-Port")));
                             return CommandResult.builder().successCount(0).build();
                         } else {
-                            plugin.subdata.sendPacket(new PacketCreateServer((sender instanceof Player)?((Player) sender).getUniqueId():null, name.get(), host.get(), template.get(), new Version(version.get()), Integer.parseInt(port.get()), data -> {
+                            plugin.subdata.sendPacket(new PacketCreateServer((sender instanceof Player)?((Player) sender).getUniqueId():null, name.get(), host.get(), template.get(), new Version(version.get()), (port.isPresent())?Integer.parseInt(port.get()):null, data -> {
                                 switch (data.getInt("r")) {
                                     case 3:
                                     case 4:
@@ -832,7 +832,7 @@ public final class SubCommand implements CommandExecutor {
                                         sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Creator")));
                                         break;
                                     default:
-                                        plugin.logger.warn("PacketCreateServer(" + ((sender instanceof Player)?((Player) sender).getUniqueId().toString():"null") + ", " + name.get() + ", " + host.get() + ", " + template.get() + ", " + version.get() + ", " + port.get() + ") responded with: " + data.getString("m"));
+                                        plugin.logger.warn("PacketCreateServer(" + ((sender instanceof Player)?((Player) sender).getUniqueId().toString():"null") + ", " + name.get() + ", " + host.get() + ", " + template.get() + ", " + version.get() + ", " + (port.orElse("null")) + ") responded with: " + data.getString("m"));
                                         sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Creator")));
                                         break;
                                 }

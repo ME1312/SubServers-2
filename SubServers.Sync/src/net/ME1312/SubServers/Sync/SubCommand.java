@@ -428,11 +428,11 @@ public final class SubCommand extends CommandX {
                         sender.sendMessage("Usage: " + label + " <SubServer> <Command> [Args...]");
                     }
                 } else if (args[0].equalsIgnoreCase("create")) {
-                    if (args.length > 5) {
-                        if (Util.isException(() -> Integer.parseInt(args[5]))) {
+                    if (args.length > 4) {
+                        if (args.length > 5 && Util.isException(() -> Integer.parseInt(args[5]))) {
                             sender.sendMessage("Invalid Port Number");
                         } else {
-                            plugin.subdata.sendPacket(new PacketCreateServer(null, args[1], args[2],args[3], new Version(args[4]), Integer.parseInt(args[5]), data -> {
+                            plugin.subdata.sendPacket(new PacketCreateServer(null, args[1], args[2],args[3], new Version(args[4]), (args.length > 5)?Integer.parseInt(args[5]):null, data -> {
                                 switch (data.getInt("r")) {
                                     case 3:
                                     case 4:
@@ -464,7 +464,7 @@ public final class SubCommand extends CommandX {
                                         sender.sendMessage("SubServers > Launching SubCreator...");
                                         break;
                                     default:
-                                        System.out.println("PacketCreateServer(null, " + args[1] + ", " + args[2] + ", " + args[3] + ", " + args[4] + ", " + args[5] + ") responded with: " + data.getRawString("m"));
+                                        System.out.println("PacketCreateServer(null, " + args[1] + ", " + args[2] + ", " + args[3] + ", " + args[4] + ", " + ((args.length > 5)?args[5]:"null") + ") responded with: " + data.getRawString("m"));
                                         sender.sendMessage("SubServers > Launching SubCreator...");
                                         break;
                                 }

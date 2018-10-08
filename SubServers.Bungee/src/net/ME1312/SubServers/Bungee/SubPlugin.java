@@ -211,7 +211,16 @@ public final class SubPlugin extends BungeeCord implements Listener {
             if (getPluginManager().getPlugin("RedisBungee") != null) redis = Util.getDespiteException(() -> new Proxy((String) redis("getServerId")), null);
             reload();
 
+            if (UPnP.isUPnPAvailable()) {
+                if (config.get().getSection("Settings").getSection("UPnP", new YAMLSection()).getBoolean("Forward-Proxy", true)) for (ListenerInfo listener : getConfig().getListeners()) {
+                    UPnP.openPortTCP(listener.getHost().getPort());
+                }
+            } else {
+                getLogger().warning("UPnP is currently unavailable; Ports may not be automatically forwarded on this device");
+            }
+
             super.startListeners();
+
             if (!posted) {
                 post();
                 posted = true;
@@ -307,11 +316,12 @@ public final class SubPlugin extends BungeeCord implements Listener {
                         !hostDrivers.get(config.get().getSection("Hosts").getSection(name).getRawString("Driver").toUpperCase().replace('-', '_').replace(' ', '_')).equals(host.getClass()) ||
                         !config.get().getSection("Hosts").getSection(name).getRawString("Address").equals(host.getAddress().getHostAddress()) ||
                         !config.get().getSection("Hosts").getSection(name).getRawString("Directory").equals(host.getPath()) ||
+                        !config.get().getSection("Hosts").getSection(name).getRawString("Port-Range", "25500-25559").equals(prevconfig.getSection("Hosts", new YAMLSection()).getSection(name, new YAMLSection()).getRawString("Port-Range", "25500-25559")) ||
                         !config.get().getSection("Hosts").getSection(name).getRawString("Git-Bash").equals(host.getCreator().getBashDirectory())
                         ) {
                     if (host != null) api.forceRemoveHost(name);
-                    host = api.addHost(config.get().getSection("Hosts").getSection(name).getRawString("Driver").toLowerCase(), name, config.get().getSection("Hosts").getSection(name).getBoolean("Enabled"), InetAddress.getByName(config.get().getSection("Hosts").getSection(name).getRawString("Address")),
-                            config.get().getSection("Hosts").getSection(name).getRawString("Directory"), config.get().getSection("Hosts").getSection(name).getRawString("Git-Bash"));
+                    host = api.addHost(config.get().getSection("Hosts").getSection(name).getRawString("Driver").toLowerCase(), name, config.get().getSection("Hosts").getSection(name).getBoolean("Enabled"), InetAddress.getByName(config.get().getSection("Hosts").getSection(name).getRawString("Address")), config.get().getSection("Hosts").getSection(name).getRawString("Directory"),
+                            new NamedContainer<>(Integer.parseInt(config.get().getSection("Hosts").getSection(name).getRawString("Port-Range", "25500-25559").split("-")[0]), Integer.parseInt(config.get().getSection("Hosts").getSection(name).getRawString("Port-Range", "25500-25559").split("-")[1])), config.get().getSection("Hosts").getSection(name).getRawString("Git-Bash"));
                 } else { // Host wasn't reset, so check for these changes
                     if (config.get().getSection("Hosts").getSection(name).getBoolean("Enabled") != host.isEnabled())
                         host.setEnabled(config.get().getSection("Hosts").getSection(name).getBoolean("Enabled"));
@@ -515,13 +525,6 @@ public final class SubPlugin extends BungeeCord implements Listener {
             for (Server server : api.getServers().values()) if (server.getSubData() != null) server.getSubData().sendPacket(new PacketOutReload(null));
         }
 
-        if (UPnP.isUPnPAvailable()) {
-            if (config.get().getSection("Settings").getSection("UPnP", new YAMLSection()).getBoolean("Forward-Proxy", true)) for (ListenerInfo listener : getConfig().getListeners()) {
-                UPnP.openPortTCP(listener.getHost().getPort());
-            }
-        } else {
-            getLogger().warning("UPnP is currently unavailable; Ports may not be automatically forwarded on this device");
-        }
         System.out.println("SubServers > " + ((plugins > 0)?plugins+" Plugin"+((plugins == 1)?"":"s")+", ":"") + ((proxies > 1)?proxies+" Proxies, ":"") + hosts + " Host"+((hosts == 1)?"":"s")+", " + servers + " Server"+((servers == 1)?"":"s")+", and " + subservers + " SubServer"+((subservers == 1)?"":"s")+" "+((status)?"re":"")+"loaded in " + new DecimalFormat("0.000").format((Calendar.getInstance().getTime().getTime() - begin) / 1000D) + "s");
     }
 

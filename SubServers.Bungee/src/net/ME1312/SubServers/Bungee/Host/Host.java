@@ -6,6 +6,7 @@ import net.ME1312.SubServers.Bungee.Library.Config.YAMLValue;
 import net.ME1312.SubServers.Bungee.Library.Exception.InvalidHostException;
 import net.ME1312.SubServers.Bungee.Library.Exception.InvalidServerException;
 import net.ME1312.SubServers.Bungee.Library.ExtraDataHandler;
+import net.ME1312.SubServers.Bungee.Library.NamedContainer;
 import net.ME1312.SubServers.Bungee.Library.Util;
 import net.ME1312.SubServers.Bungee.Network.ClientHandler;
 import net.ME1312.SubServers.Bungee.Network.SubDataServer;
@@ -31,9 +32,10 @@ public abstract class Host implements ExtraDataHandler {
      * @param enabled If your host is Enabled
      * @param address The address of your Host
      * @param directory The runtime directory of your Host
+     * @param range The range of ports to auto-select from
      * @param gitBash The Git Bash directory
      */
-    public Host(SubPlugin plugin, String name, Boolean enabled, InetAddress address, String directory, String gitBash) {
+    public Host(SubPlugin plugin, String name, Boolean enabled, InetAddress address, String directory, NamedContainer<Integer, Integer> range, String gitBash) {
         if (name.contains(" ")) throw new InvalidHostException("Host names cannot have spaces: " + name);
         signature = plugin.api.signAnonymousObject();
         SubDataServer.allowConnection(address.getHostAddress());

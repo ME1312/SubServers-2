@@ -137,6 +137,7 @@ public final class SubAPI {
      * @param enabled Enabled Status
      * @param address Address of the Host
      * @param directory Directory of the Host
+     * @param range The range of ports to auto-select from
      * @param gitBash Git Bash Directory
      * @return The Host
      * @throws NoSuchMethodException
@@ -144,8 +145,8 @@ public final class SubAPI {
      * @throws InvocationTargetException
      * @throws InstantiationException
      */
-    public Host addHost(String driver, String name, boolean enabled, InetAddress address, String directory, String gitBash) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
-        return addHost(null, driver, name, enabled, address, directory, gitBash);
+    public Host addHost(String driver, String name, boolean enabled, InetAddress address, String directory, NamedContainer<Integer, Integer> range, String gitBash) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
+        return addHost(null, driver, name, enabled, address, directory, range, gitBash);
     }
 
     /**
@@ -157,6 +158,7 @@ public final class SubAPI {
      * @param enabled Enabled Status
      * @param address Address of the Host
      * @param directory Directory of the Host
+     * @param range The range of ports to auto-select from
      * @param gitBash Git Bash Directory
      * @return The Host
      * @throws NoSuchMethodException
@@ -164,11 +166,11 @@ public final class SubAPI {
      * @throws InvocationTargetException
      * @throws InstantiationException
      */
-    public Host addHost(UUID player, String driver, String name, boolean enabled, InetAddress address, String directory, String gitBash) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
-        if (Util.isNull(driver, name, enabled, address, directory, gitBash)) throw new NullPointerException();
+    public Host addHost(UUID player, String driver, String name, boolean enabled, InetAddress address, String directory, NamedContainer<Integer, Integer> range, String gitBash) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
+        if (Util.isNull(driver, name, enabled, address, directory, range, gitBash)) throw new NullPointerException();
         if (!getHostDrivers().contains(driver.toUpperCase().replace('-', '_').replace(' ', '_'))) throw new InvalidHostException("Invalid Driver for host: " + name);
-        return addHost(player, plugin.hostDrivers.get(driver.toUpperCase().replace('-', '_').replace(' ', '_')), name, enabled, address, directory, gitBash);
-    }
+        return addHost(player, plugin.hostDrivers.get(driver.toUpperCase().replace('-', '_').replace(' ', '_')), name, enabled, address, directory, range, gitBash);
+}
 
     /**
      * Add a Host with a potentially unregistered driver to the Network
@@ -178,6 +180,7 @@ public final class SubAPI {
      * @param enabled Enabled Status
      * @param address Address of the Host
      * @param directory Directory of the Host
+     * @param range The range of ports to auto-select from
      * @param gitBash Git Bash Directory
      * @return The Host
      * @throws NoSuchMethodException
@@ -185,8 +188,8 @@ public final class SubAPI {
      * @throws InvocationTargetException
      * @throws InstantiationException
      */
-    public Host addHost(Class<? extends Host> driver, String name, boolean enabled, InetAddress address, String directory, String gitBash) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
-        return addHost(null, driver, name, enabled, address, directory, gitBash);
+    public Host addHost(Class<? extends Host> driver, String name, boolean enabled, InetAddress address, String directory, NamedContainer<Integer, Integer> range, String gitBash) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
+        return addHost(null, driver, name, enabled, address, directory, range, gitBash);
     }
 
     /**
@@ -198,6 +201,7 @@ public final class SubAPI {
      * @param enabled Enabled Status
      * @param address Address of the Host
      * @param directory Directory of the Host
+     * @param range The range of ports to auto-select from
      * @param gitBash Git Bash Directory
      * @return The Host
      * @throws NoSuchMethodException
@@ -205,9 +209,9 @@ public final class SubAPI {
      * @throws InvocationTargetException
      * @throws InstantiationException
      */
-    public Host addHost(UUID player, Class<? extends Host> driver, String name, boolean enabled, InetAddress address, String directory, String gitBash) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
-        if (Util.isNull(driver, name, enabled, address, directory, gitBash)) throw new NullPointerException();
-        Host host = driver.getConstructor(SubPlugin.class, String.class, Boolean.class, InetAddress.class, String.class, String.class).newInstance(plugin, name, (Boolean) enabled, address, directory, gitBash);
+    public Host addHost(UUID player, Class<? extends Host> driver, String name, boolean enabled, InetAddress address, String directory, NamedContainer<Integer, Integer> range, String gitBash) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
+        if (Util.isNull(driver, name, enabled, address, directory, range, gitBash)) throw new NullPointerException();
+        Host host = driver.getConstructor(SubPlugin.class, String.class, Boolean.class, InetAddress.class, String.class, NamedContainer.class, String.class).newInstance(plugin, name, (Boolean) enabled, address, directory, range, gitBash);
         return addHost(player, host)?host:null;
     }
 

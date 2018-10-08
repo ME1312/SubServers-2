@@ -70,10 +70,10 @@ public class PacketCreateServer implements PacketIn, PacketOut {
                 client.sendPacket(new PacketCreateServer(8, "That Template is not enabled", (data.contains("id")) ? data.getRawString("id") : null));
             } else if (new Version("1.8").compareTo(new Version(data.getSection("creator").getString("version"))) > 0) {
                 client.sendPacket(new PacketCreateServer(10, "SubCreator cannot create servers before Minecraft 1.8", (data.contains("id")) ? data.getRawString("id") : null));
-            } else if (data.getSection("creator").getInt("port") <= 0 || data.getSection("creator").getInt("port") > 65535) {
+            } else if (data.getSection("creator").contains("port") && (data.getSection("creator").getInt("port") <= 0 || data.getSection("creator").getInt("port") > 65535)) {
                 client.sendPacket(new PacketCreateServer(11, "Invalid Port Number", (data.contains("id")) ? data.getRawString("id") : null));
             } else {
-                if (plugin.hosts.get(data.getSection("creator").getString("host").toLowerCase()).getCreator().create((data.contains("player"))?UUID.fromString(data.getRawString("player")):null, data.getSection("creator").getString("name"), plugin.hosts.get(data.getSection("creator").getString("host").toLowerCase()).getCreator().getTemplate(data.getSection("creator").getString("template")), new Version(data.getSection("creator").getString("version")), data.getSection("creator").getInt("port"))) {
+                if (plugin.hosts.get(data.getSection("creator").getString("host").toLowerCase()).getCreator().create((data.contains("player"))?UUID.fromString(data.getRawString("player")):null, data.getSection("creator").getString("name"), plugin.hosts.get(data.getSection("creator").getString("host").toLowerCase()).getCreator().getTemplate(data.getSection("creator").getString("template")), new Version(data.getSection("creator").getString("version")), (data.getSection("creator").contains("port"))?data.getSection("creator").getInt("port"):null)) {
                     if (data.contains("wait") && data.getBoolean("wait")) {
                         new Thread(() -> {
                             try {

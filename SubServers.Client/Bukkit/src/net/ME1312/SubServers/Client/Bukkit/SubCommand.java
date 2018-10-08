@@ -443,12 +443,12 @@ public final class SubCommand implements CommandExecutor {
                             sender.sendMessage(plugin.api.getLang("SubServers", "Command.Generic.Usage").replace("$str$", label.toLowerCase() + " " + args[0].toLowerCase() + " <SubServer> <Command> [Args...]"));
                         }
                     } else if (args[0].equalsIgnoreCase("create")) {
-                        if (args.length > 5) {
+                        if (args.length > 4) {
                             if (sender.hasPermission("subservers.host.create.*") || sender.hasPermission("subservers.host.create." + args[2].toLowerCase())) {
-                                if (Util.isException(() -> Integer.parseInt(args[5]))) {
+                                if (args.length > 5 && Util.isException(() -> Integer.parseInt(args[5]))) {
                                     sender.sendMessage(plugin.api.getLang("SubServers", "Command.Creator.Invalid-Port"));
                                 } else {
-                                    plugin.subdata.sendPacket(new PacketCreateServer((sender instanceof Player)?((Player) sender).getUniqueId():null, args[1], args[2], args[3], new Version(args[4]), Integer.parseInt(args[5]), data -> {
+                                    plugin.subdata.sendPacket(new PacketCreateServer((sender instanceof Player)?((Player) sender).getUniqueId():null, args[1], args[2], args[3], new Version(args[4]), (args.length > 5)?Integer.parseInt(args[5]):null, data -> {
                                         switch (data.getInt("r")) {
                                             case 3:
                                             case 4:
@@ -480,7 +480,7 @@ public final class SubCommand implements CommandExecutor {
                                                 sender.sendMessage(plugin.api.getLang("SubServers", "Command.Creator"));
                                                 break;
                                             default:
-                                                Bukkit.getLogger().warning("SubData > PacketCreateServer(" + ((sender instanceof Player)?((Player) sender).getUniqueId().toString():"null") + ", " + args[1] + ", " + args[2] + ", " + args[3] + ", " + args[4] + ", " + args[5] + ") responded with: " + data.getString("m"));
+                                                Bukkit.getLogger().warning("SubData > PacketCreateServer(" + ((sender instanceof Player)?((Player) sender).getUniqueId().toString():"null") + ", " + args[1] + ", " + args[2] + ", " + args[3] + ", " + args[4] + ", " + ((args.length > 5)?args[5]:"null") + ") responded with: " + data.getString("m"));
                                                 sender.sendMessage(plugin.api.getLang("SubServers", "Command.Creator"));
                                                 break;
                                         }
@@ -571,7 +571,7 @@ public final class SubCommand implements CommandExecutor {
                 plugin.api.getLang("SubServers", "Command.Help.SubServer.Stop").replace("$str$", label.toLowerCase() + " stop <SubServer>"),
                 plugin.api.getLang("SubServers", "Command.Help.SubServer.Terminate").replace("$str$", label.toLowerCase() + " kill <SubServer>"),
                 plugin.api.getLang("SubServers", "Command.Help.SubServer.Command").replace("$str$", label.toLowerCase() + " cmd <SubServer> <Command> [Args...]"),
-                plugin.api.getLang("SubServers", "Command.Help.Host.Create").replace("$str$", label.toLowerCase() + " create <Name> <Host> <Template> <Version> <Port>"),
+                plugin.api.getLang("SubServers", "Command.Help.Host.Create").replace("$str$", label.toLowerCase() + " create <Name> <Host> <Template> <Version> [Port]"),
         };
     }
 }

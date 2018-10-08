@@ -9,6 +9,7 @@ import net.ME1312.SubServers.Bungee.Library.Exception.InvalidServerException;
 import net.ME1312.SubServers.Bungee.Host.Host;
 import net.ME1312.SubServers.Bungee.Host.SubCreator;
 import net.ME1312.SubServers.Bungee.Host.SubServer;
+import net.ME1312.SubServers.Bungee.Library.NamedContainer;
 import net.ME1312.SubServers.Bungee.Library.UniversalFile;
 import net.ME1312.SubServers.Bungee.Library.Util;
 import net.ME1312.SubServers.Bungee.SubPlugin;
@@ -29,6 +30,7 @@ public class InternalHost extends Host {
     private InetAddress address;
     private SubCreator creator;
     private String directory;
+    protected NamedContainer<Integer, Integer> range;
     protected SubPlugin plugin;
 
     /**
@@ -41,8 +43,8 @@ public class InternalHost extends Host {
      * @param directory Directory
      * @param gitBash Git Bash Location
      */
-    public InternalHost(SubPlugin plugin, String name, Boolean enabled, InetAddress address, String directory, String gitBash) {
-        super(plugin, name, enabled, address, directory, gitBash);
+    public InternalHost(SubPlugin plugin, String name, Boolean enabled, InetAddress address, String directory, NamedContainer<Integer, Integer> range, String gitBash) {
+        super(plugin, name, enabled, address, directory, range, gitBash);
         if (!DRM_ALLOW) throw new IllegalStateException("SubServers' hosting capabilities have been disabled by your provider");
         if (Util.isNull(plugin, name, enabled, address, directory, gitBash)) throw new NullPointerException();
         this.plugin = plugin;
@@ -51,6 +53,7 @@ public class InternalHost extends Host {
         this.address = address;
         this.creator = new InternalSubCreator(this, gitBash);
         this.directory = directory;
+        this.range = range;
     }
 
     @Override
