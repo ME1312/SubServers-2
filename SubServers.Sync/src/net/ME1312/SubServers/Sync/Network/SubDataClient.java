@@ -146,7 +146,7 @@ public final class SubDataClient {
         registerPacket(new PacketDownloadPlayerList(), "SubServers", "DownloadPlayerList");
         registerPacket(new PacketDownloadProxyInfo(), "SubServers", "DownloadProxyInfo");
         registerPacket(new PacketDownloadServerInfo(), "SubServers", "DownloadServerInfo");
-        registerPacket(new PacketInRunEvent(), "SubServers", "RunEvent");
+        registerPacket(new PacketInRunEvent(plugin), "SubServers", "RunEvent");
         registerPacket(new PacketInReset(), "SubServers", "Reset");
         registerPacket(new PacketLinkProxy(plugin), "SubServers", "LinkProxy");
         registerPacket(new PacketStartServer(), "SubServers", "StartServer");

@@ -1,12 +1,15 @@
 package net.ME1312.SubServers.Bungee.Host;
 
 import net.ME1312.SubServers.Bungee.Event.SubEditServerEvent;
+import net.ME1312.SubServers.Bungee.Event.SubNetworkConnectEvent;
+import net.ME1312.SubServers.Bungee.Event.SubNetworkDisconnectEvent;
 import net.ME1312.SubServers.Bungee.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Bungee.Library.Config.YAMLValue;
 import net.ME1312.SubServers.Bungee.Library.Exception.InvalidServerException;
 import net.ME1312.SubServers.Bungee.Library.NamedContainer;
 import net.ME1312.SubServers.Bungee.Library.Util;
 import net.ME1312.SubServers.Bungee.Network.Client;
+import net.ME1312.SubServers.Bungee.Network.Packet.PacketOutRunEvent;
 import net.ME1312.SubServers.Bungee.Network.SubDataServer;
 import net.ME1312.SubServers.Bungee.SubAPI;
 import net.ME1312.SubServers.Bungee.SubPlugin;
@@ -45,6 +48,12 @@ public class ServerContainer extends BungeeServerInfo implements Server {
     @Override
     public void setSubData(Client client) {
         this.client = client;
+        for (Proxy proxy : SubAPI.getInstance().getProxies().values()) if (proxy.getSubData() != null) {
+            YAMLSection args = new YAMLSection();
+            args.set("server", getName());
+            if (client != null) args.set("address", client.getAddress().toString());
+            proxy.getSubData().sendPacket(new PacketOutRunEvent((client != null)?SubNetworkConnectEvent.class:SubNetworkDisconnectEvent.class, args));
+        }
         if (client != null && (client.getHandler() == null || !equals(client.getHandler()))) client.setHandler(this);
     }
 

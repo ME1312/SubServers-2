@@ -1,4 +1,4 @@
-# SubCreator Sponge Build Script
+# SubCreator Sponge Forge Script
 # Usage: "bash build.sh <forge version> <sponge version>"
 #
 #!/usr/bin/env bash

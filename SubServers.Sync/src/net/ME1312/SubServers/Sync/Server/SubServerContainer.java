@@ -5,11 +5,11 @@ import java.net.InetSocketAddress;
 /**
  * SubServer Class
  */
-public class SubServer extends Server {
+public class SubServerContainer extends ServerContainer {
     private boolean running;
 
-    public SubServer(String signature, String name, String display, InetSocketAddress address, String motd, boolean hidden, boolean restricted, boolean running) {
-        super(signature, name, display, address, motd, hidden, restricted);
+    public SubServerContainer(String signature, String name, String display, InetSocketAddress address, String subdata, String motd, boolean hidden, boolean restricted, boolean running) {
+        super(signature, name, display, address, subdata, motd, hidden, restricted);
         this.running = running;
     }
 

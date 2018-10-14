@@ -35,7 +35,7 @@ listeners:
   max_players: 1
   tab_size: 60
   ping_passthrough: false
-  force_default_server: false
+  force_default_server: true
 player_limit: -1
 online_mode: true
 log_commands: false

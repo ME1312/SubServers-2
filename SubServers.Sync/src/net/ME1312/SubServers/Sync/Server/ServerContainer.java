@@ -10,17 +10,37 @@ import java.net.InetSocketAddress;
 /**
  * Server Class
  */
-public class Server extends BungeeServerInfo {
+public class ServerContainer extends BungeeServerInfo {
     private final String signature;
     private String nick = null;
+    private String subdata;
     private boolean hidden;
 
-    public Server(String signature, String name, String display, InetSocketAddress address, String motd, boolean hidden, boolean restricted) {
+    public ServerContainer(String signature, String name, String display, InetSocketAddress address, String subdata, String motd, boolean hidden, boolean restricted) {
         super(name, address, motd, restricted);
         if (Util.isNull(name, address, motd, hidden, restricted)) throw new NullPointerException();
         this.signature = signature;
+        this.subdata = subdata;
         this.hidden = hidden;
         setDisplayName(display);
+    }
+
+    /**
+     * Gets the SubData Client Address
+     *
+     * @return SubData Client Address (or null if not linked)
+     */
+    public String getSubData() {
+        return subdata;
+    }
+
+    /**
+     * Sets the SubData Client Address
+     *
+     * @param subdata SubData Client Address (null represents not linked)
+     */
+    public void setSubData(String subdata) {
+        this.subdata = subdata;
     }
 
     /**

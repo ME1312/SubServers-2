@@ -6,6 +6,7 @@ import net.ME1312.SubServers.Sync.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Sync.Library.NamedContainer;
 import net.ME1312.SubServers.Sync.Library.Version.Version;
 import net.ME1312.SubServers.Sync.Network.PacketIn;
+import net.ME1312.SubServers.Sync.SubPlugin;
 import net.md_5.bungee.api.ProxyServer;
 
 import java.util.ArrayList;
@@ -22,7 +23,7 @@ public class PacketInRunEvent implements PacketIn {
     /**
      * New PacketInRunEvent
      */
-    public PacketInRunEvent() {
+    public PacketInRunEvent(SubPlugin plugin) {
         callback("SubAddHostEvent", new Callback<YAMLSection>() {
             @Override
             public void run(YAMLSection data) {
@@ -71,6 +72,20 @@ public class PacketInRunEvent implements PacketIn {
             public void run(YAMLSection data) {
                 ProxyServer.getInstance().getPluginManager().callEvent(new SubStartEvent((data.contains("player"))?UUID.fromString(data.getRawString("player")):null, data.getRawString("server")));
                 callback("SubStartEvent", this);
+            }
+        });
+        callback("SubNetworkConnectEvent", new Callback<YAMLSection>() {
+            @Override
+            public void run(YAMLSection data) {
+                plugin.connect(plugin.servers.get(data.getRawString("server").toLowerCase()), data.getRawString("address"));
+                callback("SubNetworkConnectEvent", this);
+            }
+        });
+        callback("SubNetworkDisconnectEvent", new Callback<YAMLSection>() {
+            @Override
+            public void run(YAMLSection data) {
+                plugin.disconnect(plugin.servers.get(data.getRawString("server").toLowerCase()));
+                callback("SubNetworkDisconnectEvent", this);
             }
         });
         callback("SubStopEvent", new Callback<YAMLSection>() {

@@ -10,12 +10,10 @@ import net.ME1312.SubServers.Sync.Library.NamedContainer;
 import net.ME1312.SubServers.Sync.Library.UniversalFile;
 import net.ME1312.SubServers.Sync.Library.Util;
 import net.ME1312.SubServers.Sync.Library.Version.Version;
-import net.ME1312.SubServers.Sync.Library.Version.VersionType;
 import net.ME1312.SubServers.Sync.Network.Cipher;
-import net.ME1312.SubServers.Sync.Network.Packet.PacketDownloadServerInfo;
 import net.ME1312.SubServers.Sync.Network.SubDataClient;
-import net.ME1312.SubServers.Sync.Server.Server;
-import net.ME1312.SubServers.Sync.Server.SubServer;
+import net.ME1312.SubServers.Sync.Server.ServerContainer;
+import net.ME1312.SubServers.Sync.Server.SubServerContainer;
 import net.md_5.bungee.BungeeCord;
 import net.md_5.bungee.api.config.ListenerInfo;
 import net.md_5.bungee.api.config.ServerInfo;
@@ -23,16 +21,10 @@ import net.md_5.bungee.api.event.ServerConnectEvent;
 import net.md_5.bungee.api.event.ServerKickEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
 
-import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.net.InetAddress;
-import java.net.InetSocketAddress;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
@@ -44,7 +36,7 @@ import java.util.concurrent.TimeUnit;
  */
 public final class SubPlugin extends BungeeCord implements Listener {
     protected NamedContainer<Long, Map<String, Map<String, String>>> lang = null;
-    public final Map<String, Server> servers = new TreeMap<String, Server>();
+    public final Map<String, ServerContainer> servers = new TreeMap<String, ServerContainer>();
 
     public final PrintStream out;
     public final UniversalFile dir = new UniversalFile(new File(System.getProperty("user.dir")));
@@ -263,19 +255,47 @@ public final class SubPlugin extends BungeeCord implements Listener {
     @EventHandler(priority = Byte.MIN_VALUE)
     public void fallback(ServerKickEvent e) {
         if (e.getPlayer().getPendingConnection().getListener().isForceDefault()) {
-            int i = 0;
-            ServerInfo from = e.getKickedFrom();
-            ServerInfo to = null;
-            while (to == null || from == to) {
-                if (e.getPlayer().getPendingConnection().getListener().getServerPriority().size() > i) {
-                    to = getServerInfo(e.getPlayer().getPendingConnection().getListener().getServerPriority().get(i));
-                } else break;
-                i++;
+            ServerInfo next = null;
+            for (String name : e.getPlayer().getPendingConnection().getListener().getServerPriority()) {
+                if (!e.getKickedFrom().getName().equalsIgnoreCase(name)) {
+                    ServerInfo server = getServerInfo(name);
+                    if (server != null) {
+                        if (next == null) {
+                            next = server;
+                        } else {
+                            int current = 0;
+                            if (next instanceof ServerContainer) {
+                                if (!((ServerContainer) next).isHidden()) current++;
+                                if (!((ServerContainer) next).isRestricted()) current++;
+                                if (((ServerContainer) next).getSubData() != null) current++;
+
+                                if (next instanceof SubServerContainer) {
+                                    if (((SubServerContainer) next).isRunning()) current++;
+                                }
+                            }
+
+                            int proposed = 0;
+                            if (server instanceof ServerContainer) {
+                                if (!((ServerContainer) server).isHidden()) proposed++;
+                                if (!((ServerContainer) server).isRestricted()) proposed++;
+                                if (((ServerContainer) server).getSubData() != null) proposed++;
+
+                                if (server instanceof SubServerContainer) {
+                                    if (((SubServerContainer) server).isRunning()) proposed++;
+                                }
+                            }
+
+                            if (proposed > current)
+                                next = server;
+                        }
+                    }
+                }
             }
-            if (to != null && from != to) {
-                e.setCancelServer(to);
+
+            if (next != null) {
+                e.setCancelServer(next);
                 e.setCancelled(true);
-                e.getPlayer().sendMessage(api.getLang("SubServers", "Bungee.Feature.Return").replace("$str$", (to instanceof Server)?((Server) to).getDisplayName():to.getName()).replace("$msg$", e.getKickReason()));
+                e.getPlayer().sendMessage(api.getLang("SubServers", "Bungee.Feature.Return").replace("$str$", (next instanceof ServerContainer)?((ServerContainer) next).getDisplayName():next.getName()).replace("$msg$", e.getKickReason()));
             }
         }
     }
@@ -285,42 +305,36 @@ public final class SubPlugin extends BungeeCord implements Listener {
         api.getServer(e.getServer(), server -> {
             if (server != null) {
                 if (server instanceof net.ME1312.SubServers.Sync.Network.API.SubServer) {
-                    servers.put(server.getName().toLowerCase(), new SubServer(server.getSignature(), server.getName(), server.getDisplayName(), server.getAddress(),
-                            server.getMotd(), server.isHidden(), server.isRestricted(), ((net.ME1312.SubServers.Sync.Network.API.SubServer) server).isRunning()));
+                    servers.put(server.getName().toLowerCase(), new SubServerContainer(server.getSignature(), server.getName(), server.getDisplayName(), server.getAddress(),
+                            server.getSubData(), server.getMotd(), server.isHidden(), server.isRestricted(), ((net.ME1312.SubServers.Sync.Network.API.SubServer) server).isRunning()));
                     System.out.println("SubServers > Added SubServer: " + e.getServer());
                 } else {
-                    servers.put(server.getName().toLowerCase(), new Server(server.getSignature(), server.getName(), server.getDisplayName(), server.getAddress(),
-                            server.getMotd(), server.isHidden(), server.isRestricted()));
+                    servers.put(server.getName().toLowerCase(), new ServerContainer(server.getSignature(), server.getName(), server.getDisplayName(), server.getAddress(),
+                            server.getSubData(), server.getMotd(), server.isHidden(), server.isRestricted()));
                     System.out.println("SubServers > Added Server: " + e.getServer());
                 }
             } else System.out.println("PacketDownloadServerInfo(" + e.getServer() + ") returned with an invalid response");
         });
     }
 
-    @EventHandler(priority = Byte.MIN_VALUE)
-    public void start(SubStartEvent e) {
-        if (servers.keySet().contains(e.getServer().toLowerCase()) && servers.get(e.getServer().toLowerCase()) instanceof SubServer)
-            ((SubServer) servers.get(e.getServer().toLowerCase())).setRunning(true);
-    }
-
     public Boolean merge(net.ME1312.SubServers.Sync.Network.API.Server server) {
-        Server current = servers.get(server.getName().toLowerCase());
-        if (current == null || server instanceof net.ME1312.SubServers.Sync.Network.API.SubServer || !(current instanceof SubServer)) {
+        ServerContainer current = servers.get(server.getName().toLowerCase());
+        if (current == null || server instanceof net.ME1312.SubServers.Sync.Network.API.SubServer || !(current instanceof SubServerContainer)) {
             if (current == null || !current.getSignature().equals(server.getSignature())) {
                 if (server instanceof net.ME1312.SubServers.Sync.Network.API.SubServer) {
-                    servers.put(server.getName().toLowerCase(), new SubServer(server.getSignature(), server.getName(), server.getDisplayName(), server.getAddress(),
-                            server.getMotd(), server.isHidden(), server.isRestricted(), ((net.ME1312.SubServers.Sync.Network.API.SubServer) server).isRunning()));
+                    servers.put(server.getName().toLowerCase(), new SubServerContainer(server.getSignature(), server.getName(), server.getDisplayName(), server.getAddress(),
+                            server.getSubData(), server.getMotd(), server.isHidden(), server.isRestricted(), ((net.ME1312.SubServers.Sync.Network.API.SubServer) server).isRunning()));
                 } else {
-                    servers.put(server.getName().toLowerCase(), new Server(server.getSignature(), server.getName(), server.getDisplayName(), server.getAddress(),
-                            server.getMotd(), server.isHidden(), server.isRestricted()));
+                    servers.put(server.getName().toLowerCase(), new ServerContainer(server.getSignature(), server.getName(), server.getDisplayName(), server.getAddress(),
+                            server.getSubData(), server.getMotd(), server.isHidden(), server.isRestricted()));
                 }
 
                 System.out.println("SubServers > Added "+((server instanceof net.ME1312.SubServers.Sync.Network.API.SubServer)?"Sub":"")+"Server: " + server.getName());
                 return true;
             } else {
                 if (server instanceof net.ME1312.SubServers.Sync.Network.API.SubServer) {
-                    if (((net.ME1312.SubServers.Sync.Network.API.SubServer) server).isRunning() != ((SubServer) current).isRunning())
-                        ((SubServer) current).setRunning(((net.ME1312.SubServers.Sync.Network.API.SubServer) server).isRunning());
+                    if (((net.ME1312.SubServers.Sync.Network.API.SubServer) server).isRunning() != ((SubServerContainer) current).isRunning())
+                        ((SubServerContainer) current).setRunning(((net.ME1312.SubServers.Sync.Network.API.SubServer) server).isRunning());
                 }
                 if (!server.getMotd().equals(current.getMotd()))
                     current.setMotd(server.getMotd());
@@ -341,7 +355,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
     @EventHandler(priority = Byte.MIN_VALUE)
     public void edit(SubEditServerEvent e) {
         if (servers.keySet().contains(e.getServer().toLowerCase())) {
-            Server server = servers.get(e.getServer().toLowerCase());
+            ServerContainer server = servers.get(e.getServer().toLowerCase());
             switch (e.getEdit().name().toLowerCase()) {
                 case "display":
                     server.setDisplayName(e.getEdit().get().asString());
@@ -360,9 +374,25 @@ public final class SubPlugin extends BungeeCord implements Listener {
     }
 
     @EventHandler(priority = Byte.MIN_VALUE)
+    public void start(SubStartEvent e) {
+        if (servers.keySet().contains(e.getServer().toLowerCase()) && servers.get(e.getServer().toLowerCase()) instanceof SubServerContainer)
+            ((SubServerContainer) servers.get(e.getServer().toLowerCase())).setRunning(true);
+    }
+
+    public void connect(ServerContainer server, String address) {
+        System.out.println("SubServers > Networked Server: " + server.getName());
+        server.setSubData(address);
+    }
+
+    public void disconnect(ServerContainer server) {
+        System.out.println("SubServers > Unnetworked Server: " + server.getName());
+        server.setSubData(null);
+    }
+
+    @EventHandler(priority = Byte.MIN_VALUE)
     public void stop(SubStoppedEvent e) {
-        if (servers.keySet().contains(e.getServer().toLowerCase()) && servers.get(e.getServer().toLowerCase()) instanceof SubServer)
-            ((SubServer) servers.get(e.getServer().toLowerCase())).setRunning(false);
+        if (servers.keySet().contains(e.getServer().toLowerCase()) && servers.get(e.getServer().toLowerCase()) instanceof SubServerContainer)
+            ((SubServerContainer) servers.get(e.getServer().toLowerCase())).setRunning(false);
     }
 
     @EventHandler(priority = Byte.MIN_VALUE)
