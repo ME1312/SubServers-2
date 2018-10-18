@@ -101,9 +101,9 @@ public class YAMLConfig {
 
     protected static DumperOptions getDumperOptions() {
         DumperOptions options = new DumperOptions();
-        options.setAllowUnicode(true);
+        options.setAllowUnicode(false);
         options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
-        options.setIndent(4);
+        options.setIndent(2);
 
         return options;
     }

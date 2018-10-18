@@ -38,7 +38,7 @@ public class BungeeChat {
                     message.setColor(ChatColor.GOLD);
                     hover.setColor(ChatColor.GOLD);
                     hoverm.add(hover);
-                    hover = new TextComponent(plugin.api.getLang("SubServers", "Interface.Group-Menu.Group-Server-Count").replace("$int$", new DecimalFormat("#,###").format(groups.get(group).size())));
+                    hover = new TextComponent(plugin.api.getLang("SubServers", "Interface.Group-Menu.Group-Server-Count").replace("$int$", new DecimalFormat("#,###").format(groups.get(group).size())) + ChatColor.RESET);
                     hoverm.add(hover);
                     message.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, label + " open Server 1 " + group));
                     message.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, hoverm.toArray(new TextComponent[hoverm.size()])));
@@ -65,7 +65,7 @@ public class BungeeChat {
                                     hover = new TextComponent(plugin.api.getLang("SubServers", "Interface.Server-Menu.SubServer-Temporary") + '\n');
                                     hoverm.add(hover);
                                 }
-                                hover = new TextComponent(plugin.api.getLang("SubServers", "Interface.Server-Menu.Server-Player-Count").replace("$int$", new DecimalFormat("#,###").format(server.getPlayers().size())));
+                                hover = new TextComponent(plugin.api.getLang("SubServers", "Interface.Server-Menu.Server-Player-Count").replace("$int$", new DecimalFormat("#,###").format(server.getPlayers().size())) + ChatColor.RESET);
                             } else if (((SubServer) server).isEnabled() && ((SubServer) server).getCurrentIncompatibilities().size() == 0) {
                                 message.setColor(ChatColor.YELLOW);
                                 hover.setColor(ChatColor.YELLOW);
@@ -118,7 +118,7 @@ public class BungeeChat {
                             hoverm.add(hover);
                             hover = new TextComponent(plugin.api.getLang("SubServers", "Interface.Server-Menu.Server-External") + '\n');
                             hoverm.add(hover);
-                            hover = new TextComponent(plugin.api.getLang("SubServers", "Interface.Server-Menu.Server-Player-Count").replace("$int$", new DecimalFormat("#,###").format(server.getPlayers().size())));
+                            hover = new TextComponent(plugin.api.getLang("SubServers", "Interface.Server-Menu.Server-Player-Count").replace("$int$", new DecimalFormat("#,###").format(server.getPlayers().size())) + ChatColor.RESET);
                             hoverm.add(hover);
                             if (plugin.config.get().getSection("Settings").getBoolean("Show-Addresses", false)) {
                                 hover = new TextComponent('\n' + server.getAddress().getAddress().getHostAddress() + ':' + server.getAddress().getPort());
@@ -156,7 +156,7 @@ public class BungeeChat {
                         hover.setColor(ChatColor.GRAY);
                         hoverm.add(hover);
                     }
-                    hover = new TextComponent(plugin.api.getLang("SubServers", "Interface.Host-Menu.Host-Server-Count").replace("$int$", new DecimalFormat("#,###").format(host.getSubServers().keySet().size())));
+                    hover = new TextComponent(plugin.api.getLang("SubServers", "Interface.Host-Menu.Host-Server-Count").replace("$int$", new DecimalFormat("#,###").format(host.getSubServers().keySet().size())) + ChatColor.RESET);
                 } else {
                     message.setColor(ChatColor.RED);
                     hover.setColor(ChatColor.RED);
@@ -199,7 +199,7 @@ public class BungeeChat {
                             hover = new TextComponent(plugin.api.getLang("SubServers", "Interface.Server-Menu.SubServer-Temporary") + '\n');
                             hoverm.add(hover);
                         }
-                        hover = new TextComponent(plugin.api.getLang("SubServers", "Interface.Server-Menu.Server-Player-Count").replace("$int$", new DecimalFormat("#,###").format(subserver.getPlayers().size())));
+                        hover = new TextComponent(plugin.api.getLang("SubServers", "Interface.Server-Menu.Server-Player-Count").replace("$int$", new DecimalFormat("#,###").format(subserver.getPlayers().size())) + ChatColor.RESET);
                     } else if (subserver.isEnabled() && subserver.getCurrentIncompatibilities().size() == 0) {
                         message.setColor(ChatColor.YELLOW);
                         hover.setColor(ChatColor.YELLOW);
@@ -268,7 +268,7 @@ public class BungeeChat {
                 }
                 hover = new TextComponent(plugin.api.getLang("SubServers", "Interface.Server-Menu.Server-External") + '\n');
                 hoverm.add(hover);
-                hover = new TextComponent(plugin.api.getLang("SubServers", "Interface.Server-Menu.Server-Player-Count").replace("$int$", new DecimalFormat("#,###").format(server.getPlayers().size())));
+                hover = new TextComponent(plugin.api.getLang("SubServers", "Interface.Server-Menu.Server-Player-Count").replace("$int$", new DecimalFormat("#,###").format(server.getPlayers().size())) + ChatColor.RESET);
                 hoverm.add(hover);
                 if (plugin.config.get().getSection("Settings").getBoolean("Show-Addresses", false)) {
                     hover = new TextComponent('\n' + server.getAddress().getAddress().getHostAddress()+':'+server.getAddress().getPort());
@@ -299,7 +299,7 @@ public class BungeeChat {
                     hoverm.add(hover);
                     hover = new TextComponent('\n' + plugin.api.getLang("SubServers", "Interface.Proxy-Menu.Proxy-Master"));
                     hoverm.add(hover);
-                    hover = new TextComponent('\n' + plugin.api.getLang("SubServers", "Interface.Proxy-Menu.Proxy-Player-Count").replace("$int$", new DecimalFormat("#,###").format(proxymaster.getPlayers().size())));
+                    hover = new TextComponent('\n' + plugin.api.getLang("SubServers", "Interface.Proxy-Menu.Proxy-Player-Count").replace("$int$", new DecimalFormat("#,###").format(proxymaster.getPlayers().size())) + ChatColor.RESET);
                     hoverm.add(hover);
                 } else {
                     hover = new TextComponent('\n' + plugin.api.getLang("SubServers", "Interface.Proxy-Menu.Proxy-Master"));
