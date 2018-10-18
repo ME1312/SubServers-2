@@ -61,9 +61,36 @@ public final class SubCommand extends CommandX {
                 if (args[0].equalsIgnoreCase("help") || args[0].equalsIgnoreCase("?")) {
                     sender.sendMessages(printHelp());
                 } else if (args[0].equalsIgnoreCase("version") || args[0].equalsIgnoreCase("ver")) {
-                    sender.sendMessage("SubServers > These are the platforms and versions that are running SubServers.Bungee:");
-                    sender.sendMessage("  " + System.getProperty("os.name") + ' ' + System.getProperty("os.version") + ',');
-                    sender.sendMessage("  Java " + System.getProperty("java.version") + ',');
+                    String osarch;
+                    if (System.getProperty("os.name").toLowerCase().startsWith("windows")) {
+                        String arch = System.getenv("PROCESSOR_ARCHITECTURE");
+                        String wow64Arch = System.getenv("PROCESSOR_ARCHITEW6432");
+
+                        osarch = arch != null && arch.endsWith("64") || wow64Arch != null && wow64Arch.endsWith("64")?"x64":"x86";
+                    } else if (System.getProperty("os.arch").endsWith("86")) {
+                        osarch = "x86";
+                    } else if (System.getProperty("os.arch").endsWith("64")) {
+                        osarch = "x64";
+                    } else {
+                        osarch = System.getProperty("os.arch");
+                    }
+
+                    String javaarch = null;
+                    switch (System.getProperty("sun.arch.data.model")) {
+                        case "32":
+                            javaarch = "x86";
+                            break;
+                        case "64":
+                            javaarch = "x64";
+                            break;
+                        default:
+                            if (!System.getProperty("sun.arch.data.model").equalsIgnoreCase("unknown"))
+                                javaarch = System.getProperty("sun.arch.data.model");
+                    }
+
+                    sender.sendMessage("SubServers > These are the platforms and versions that are running SubServers.Sync:");
+                    sender.sendMessage("  " + System.getProperty("os.name") + ((!System.getProperty("os.name").toLowerCase().startsWith("windows"))?' ' + System.getProperty("os.version"):"") + ((osarch != null)?" [" + osarch + ']':"") + ',');
+                    sender.sendMessage("  Java " + System.getProperty("java.version") + ((javaarch != null)?" [" + javaarch + ']':"") + ',');
                     sender.sendMessage("  " + plugin.getBungeeName() + ((plugin.isPatched)?" [Patched] ":" ") + net.md_5.bungee.Bootstrap.class.getPackage().getImplementationVersion() + ',');
                     sender.sendMessage("  SubServers.Bungee v" + SubPlugin.version.toExtendedString() + ((plugin.api.getWrapperBuild() != null)?" (" + plugin.api.getWrapperBuild() + ')':""));
                     sender.sendMessage("");
@@ -356,7 +383,7 @@ public final class SubCommand extends CommandX {
                             }
                         }
                     } else {
-                        sender.sendMessage("SubServers > Usage: " + label + " " + args[1].toLowerCase() + " [proxy|host|group|server] <Name>");
+                        sender.sendMessage("SubServers > Usage: " + label + " " + args[0].toLowerCase() + " [proxy|host|group|server] <Name>");
                     }
                 } else if (args[0].equalsIgnoreCase("start")) {
                     if (args.length > 1) {

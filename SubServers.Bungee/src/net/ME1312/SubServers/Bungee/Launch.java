@@ -48,19 +48,38 @@ public final class Launch {
             parser.accepts("noconsole");
             joptsimple.OptionSet options = parser.parse(args);
             if(options.has("version") || options.has("v")) {
-                boolean build = false;
-                try {
-                    Field f = Version.class.getDeclaredField("type");
-                    f.setAccessible(true);
-                    build = f.get(SubPlugin.version) != VersionType.SNAPSHOT && SubPlugin.class.getPackage().getSpecificationTitle() != null;
-                    f.setAccessible(false);
-                } catch (Exception e) {}
+                String osarch;
+                if (System.getProperty("os.name").toLowerCase().startsWith("windows")) {
+                    String arch = System.getenv("PROCESSOR_ARCHITECTURE");
+                    String wow64Arch = System.getenv("PROCESSOR_ARCHITEW6432");
+
+                    osarch = arch != null && arch.endsWith("64") || wow64Arch != null && wow64Arch.endsWith("64")?"x64":"x86";
+                } else if (System.getProperty("os.arch").endsWith("86")) {
+                    osarch = "x86";
+                } else if (System.getProperty("os.arch").endsWith("64")) {
+                    osarch = "x64";
+                } else {
+                    osarch = System.getProperty("os.arch");
+                }
+
+                String javaarch = null;
+                switch (System.getProperty("sun.arch.data.model")) {
+                    case "32":
+                        javaarch = "x86";
+                        break;
+                    case "64":
+                        javaarch = "x64";
+                        break;
+                    default:
+                        if (!System.getProperty("sun.arch.data.model").equalsIgnoreCase("unknown"))
+                            javaarch = System.getProperty("sun.arch.data.model");
+                }
 
                 System.out.println("");
-                System.out.println(System.getProperty("os.name") + " " + System.getProperty("os.version") + ',');
-                System.out.println("Java " + System.getProperty("java.version") + ",");
+                System.out.println(System.getProperty("os.name") + ((!System.getProperty("os.name").toLowerCase().startsWith("windows"))?' ' + System.getProperty("os.version"):"") + ((osarch != null)?" [" + osarch + ']':"") + ',');
+                System.out.println("Java " + System.getProperty("java.version") + ((javaarch != null)?" [" + javaarch + ']':"") + ',');
                 System.out.println("BungeeCord" + ((patched)?" [Patched] ":" ") + net.md_5.bungee.Bootstrap.class.getPackage().getImplementationVersion() + ',');
-                System.out.println("SubServers.Bungee v" + SubPlugin.version.toExtendedString() + ((build)?" (" + SubPlugin.class.getPackage().getSpecificationTitle() + ')':""));
+                System.out.println("SubServers.Bungee v" + SubPlugin.version.toExtendedString() + ((SubPlugin.class.getPackage().getSpecificationTitle() != null)?" (" + SubPlugin.class.getPackage().getSpecificationTitle() + ')':""));
                 System.out.println("");
             } else {
                 System.out.println("");

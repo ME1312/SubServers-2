@@ -266,7 +266,7 @@ public class SubCommand {
                         }
                     }
                 } else {
-                    host.log.message.println("SubServers > Usage: " + handle + " " + args[1].toLowerCase() + " [proxy|host|group|server] <Name>");
+                    host.log.message.println("SubServers > Usage: /" + handle + " [proxy|host|group|server] <Name>");
                 }
             }
         }.usage("[proxy|host|group|server]", "<Name>").description("Gets information about an Object").help(

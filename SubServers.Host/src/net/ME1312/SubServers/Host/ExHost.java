@@ -66,11 +66,37 @@ public final class ExHost {
             parser.accepts("noconsole");
             joptsimple.OptionSet options = parser.parse(args);
             if(options.has("version") || options.has("v")) {
+                String osarch;
+                if (System.getProperty("os.name").toLowerCase().startsWith("windows")) {
+                    String arch = System.getenv("PROCESSOR_ARCHITECTURE");
+                    String wow64Arch = System.getenv("PROCESSOR_ARCHITEW6432");
+
+                    osarch = arch != null && arch.endsWith("64") || wow64Arch != null && wow64Arch.endsWith("64")?"x64":"x86";
+                } else if (System.getProperty("os.arch").endsWith("86")) {
+                    osarch = "x86";
+                } else if (System.getProperty("os.arch").endsWith("64")) {
+                    osarch = "x64";
+                } else {
+                    osarch = System.getProperty("os.arch");
+                }
+
+                String javaarch = null;
+                switch (System.getProperty("sun.arch.data.model")) {
+                    case "32":
+                        javaarch = "x86";
+                        break;
+                    case "64":
+                        javaarch = "x64";
+                        break;
+                    default:
+                        if (!System.getProperty("sun.arch.data.model").equalsIgnoreCase("unknown"))
+                            javaarch = System.getProperty("sun.arch.data.model");
+                }
+
                 Version galaxi = Version.fromString(GalaxiEngine.class.getAnnotation(Plugin.class).version());
                 Version subservers = Version.fromString(ExHost.class.getAnnotation(Plugin.class).version());
                 Version galaxibuild = null;
                 Version subserversbuild = null;
-
                 try {
                     Manifest manifest = new Manifest(GalaxiEngine.class.getResourceAsStream("/META-INF/GalaxiEngine.MF"));
                     if (manifest.getMainAttributes().getValue("Implementation-Version") != null && manifest.getMainAttributes().getValue("Implementation-Version").length() > 0)
@@ -84,8 +110,8 @@ public final class ExHost {
                 } catch (Exception e) {}
 
                 System.out.println("");
-                System.out.println(System.getProperty("os.name") + " " + System.getProperty("os.version") + ',');
-                System.out.println("Java " + System.getProperty("java.version") + ",");
+                System.out.println(System.getProperty("os.name") + ((!System.getProperty("os.name").toLowerCase().startsWith("windows"))?' ' + System.getProperty("os.version"):"") + ((osarch != null)?" [" + osarch + ']':"") + ',');
+                System.out.println("Java " + System.getProperty("java.version") + ((javaarch != null)?" [" + javaarch + ']':"") + ',');
                 System.out.println(GalaxiEngine.class.getAnnotation(Plugin.class).name() + " v" + galaxi.toExtendedString() + ((galaxibuild != null)?" (" + galaxibuild + ')':"")
                         + ((GalaxiEngine.class.getProtectionDomain().getCodeSource().getLocation().equals(ExHost.class.getProtectionDomain().getCodeSource().getLocation()))?" [Patched]":"") + ',');
                 System.out.println(ExHost.class.getAnnotation(Plugin.class).name() + " v" + subservers.toExtendedString() + ((subserversbuild != null)?" (" + subserversbuild + ')':""));

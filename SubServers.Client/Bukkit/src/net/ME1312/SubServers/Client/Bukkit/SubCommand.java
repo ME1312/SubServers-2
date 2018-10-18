@@ -44,9 +44,35 @@ public final class SubCommand implements CommandExecutor {
                     if (args[0].equalsIgnoreCase("help") || args[0].equalsIgnoreCase("?")) {
                         sender.sendMessage(printHelp(label));
                     } else if (args[0].equalsIgnoreCase("version") || args[0].equalsIgnoreCase("ver")) {
+                        String osarch;
+                        if (System.getProperty("os.name").toLowerCase().startsWith("windows")) {
+                            String arch = System.getenv("PROCESSOR_ARCHITECTURE");
+                            String wow64Arch = System.getenv("PROCESSOR_ARCHITEW6432");
+
+                            osarch = arch != null && arch.endsWith("64") || wow64Arch != null && wow64Arch.endsWith("64")?"x64":"x86";
+                        } else if (System.getProperty("os.arch").endsWith("86")) {
+                            osarch = "x86";
+                        } else if (System.getProperty("os.arch").endsWith("64")) {
+                            osarch = "x64";
+                        } else {
+                            osarch = System.getProperty("os.arch");
+                        }
+
+                        String javaarch = null;
+                        switch (System.getProperty("sun.arch.data.model")) {
+                            case "32":
+                                javaarch = "x86";
+                                break;
+                            case "64":
+                                javaarch = "x64";
+                                break;
+                            default:
+                                if (!System.getProperty("sun.arch.data.model").equalsIgnoreCase("unknown"))
+                                    javaarch = System.getProperty("sun.arch.data.model");
+                        }
                         sender.sendMessage(plugin.api.getLang("SubServers", "Command.Version").replace("$str$", "SubServers.Client.Bukkit"));
-                        sender.sendMessage(ChatColor.WHITE + "  " + System.getProperty("os.name") + ' ' + System.getProperty("os.version") + ChatColor.RESET + ',');
-                        sender.sendMessage(ChatColor.WHITE + "  Java " + System.getProperty("java.version") + ChatColor.RESET + ',');
+                        sender.sendMessage(ChatColor.WHITE + "  " + System.getProperty("os.name") + ((!System.getProperty("os.name").toLowerCase().startsWith("windows"))?' ' + System.getProperty("os.version"):"") + ((osarch != null)?" [" + osarch + ']':"") + ChatColor.RESET + ',');
+                        sender.sendMessage(ChatColor.WHITE + "  Java " + System.getProperty("java.version") + ((javaarch != null)?" [" + javaarch + ']':"") + ChatColor.RESET + ',');
                         sender.sendMessage(ChatColor.WHITE + "  " + Bukkit.getName() + ' ' + Bukkit.getVersion() + ChatColor.RESET + ',');
                         sender.sendMessage(ChatColor.WHITE + "  SubServers.Client.Bukkit v" + plugin.version.toExtendedString() + ((plugin.api.getPluginBuild() != null)?" (" + plugin.api.getPluginBuild() + ')':""));
                         sender.sendMessage("");

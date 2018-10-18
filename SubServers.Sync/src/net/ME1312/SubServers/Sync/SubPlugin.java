@@ -380,12 +380,10 @@ public final class SubPlugin extends BungeeCord implements Listener {
     }
 
     public void connect(ServerContainer server, String address) {
-        System.out.println("SubServers > Networked Server: " + server.getName());
         server.setSubData(address);
     }
 
     public void disconnect(ServerContainer server) {
-        System.out.println("SubServers > Unnetworked Server: " + server.getName());
         server.setSubData(null);
     }
 
