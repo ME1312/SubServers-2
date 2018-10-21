@@ -6,6 +6,7 @@ import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.Galaxi.Plugin.Command.Command;
 import net.ME1312.Galaxi.Plugin.Command.CommandSender;
+import net.ME1312.Galaxi.Plugin.Command.CompletionHandler;
 import net.ME1312.SubServers.Host.Library.TextColor;
 import net.ME1312.SubServers.Host.Network.API.*;
 import net.ME1312.SubServers.Host.Network.Packet.*;
@@ -36,18 +37,18 @@ public class SubCommand {
                 }
             }
         }.autocomplete((sender, handle, args) -> {
+            String last = (args.length > 0)?args[args.length - 1].toLowerCase():"";
+            TreeMap<String, Command> commands;
+            try {
+                Field f = PluginManager.class.getDeclaredField("commands");
+                f.setAccessible(true);
+                commands = (TreeMap<String, Command>) f.get(GalaxiEngine.getInstance().getPluginManager());
+                f.setAccessible(false);
+            } catch (Exception e) {
+                e.printStackTrace();
+                commands = new TreeMap<String, Command>();
+            }
             if (args.length <= 1) {
-                String last = (args.length > 0)?args[args.length - 1].toLowerCase():"";
-                TreeMap<String, Command> commands;
-                try {
-                    Field f = PluginManager.class.getDeclaredField("commands");
-                    f.setAccessible(true);
-                    commands = (TreeMap<String, Command>) f.get(GalaxiEngine.getInstance().getPluginManager());
-                    f.setAccessible(false);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    commands = new TreeMap<String, Command>();
-                }
                 if (last.length() == 0) {
                     return commands.keySet().toArray(new String[0]);
                 } else {
@@ -57,6 +58,14 @@ public class SubCommand {
                     }
                     return list.toArray(new String[0]);
                 }
+            } else if (commands.keySet().contains(args[0].toLowerCase())) {
+                CompletionHandler autocompletor = commands.get(args[0].toLowerCase()).autocomplete();
+                if (autocompletor != null) {
+                    LinkedList<String> arguments = new LinkedList<String>();
+                    arguments.addAll(Arrays.asList(args));
+                    arguments.removeFirst();
+                    return autocompletor.complete(sender, args[0], arguments.toArray(new String[0]));
+                } else return new String[0];
             } else {
                 return new String[0];
             }
