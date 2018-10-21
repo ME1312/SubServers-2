@@ -1,13 +1,16 @@
 package net.ME1312.SubServers.Host;
 
 import net.ME1312.Galaxi.Engine.GalaxiEngine;
+import net.ME1312.Galaxi.Engine.PluginManager;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
-import net.ME1312.Galaxi.Plugin.Command;
+import net.ME1312.Galaxi.Plugin.Command.Command;
+import net.ME1312.Galaxi.Plugin.Command.CommandSender;
 import net.ME1312.SubServers.Host.Library.TextColor;
 import net.ME1312.SubServers.Host.Network.API.*;
 import net.ME1312.SubServers.Host.Network.Packet.*;
 
+import java.lang.reflect.Field;
 import java.util.*;
 
 /**
@@ -15,10 +18,11 @@ import java.util.*;
  */
 public class SubCommand {
     private SubCommand() {}
+    @SuppressWarnings("unchecked")
     protected static void load(ExHost host) {
         new Command(host.info) {
             @Override
-            public void command(String handle, String[] args) {
+            public void command(CommandSender sender, String handle, String[] args) {
                 if (args.length > 0) {
                     int i = 0;
                     String str = args[0];
@@ -28,10 +32,35 @@ public class SubCommand {
                             str = str + " " + args[i].replace(" ", "\\ ");
                         } while ((i + 1) != args.length);
                     }
-                    GalaxiEngine.getInstance().getConsoleReader().runCommand(str);
+                    GalaxiEngine.getInstance().getConsoleReader().runCommand(sender, str);
                 }
             }
-        }.usage("<Command>", "[Args...]").description("An alias for commands").help(
+        }.autocomplete((sender, handle, args) -> {
+            if (args.length <= 1) {
+                String last = (args.length > 0)?args[args.length - 1].toLowerCase():"";
+                TreeMap<String, Command> commands;
+                try {
+                    Field f = PluginManager.class.getDeclaredField("commands");
+                    f.setAccessible(true);
+                    commands = (TreeMap<String, Command>) f.get(GalaxiEngine.getInstance().getPluginManager());
+                    f.setAccessible(false);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    commands = new TreeMap<String, Command>();
+                }
+                if (last.length() == 0) {
+                    return commands.keySet().toArray(new String[0]);
+                } else {
+                    List<String> list = new ArrayList<String>();
+                    for (String command : commands.keySet()) {
+                        if (command.toLowerCase().startsWith(last)) list.add(command);
+                    }
+                    return list.toArray(new String[0]);
+                }
+            } else {
+                return new String[0];
+            }
+        }).usage("<Command>", "[Args...]").description("An alias for commands").help(
                 "This command is an alias for all registered commands for ease of use.",
                 "",
                 "Examples:",
@@ -40,7 +69,7 @@ public class SubCommand {
         ).register("sub", "subserver", "subservers");
         new Command(host.info) {
             @Override
-            public void command(String handle, String[] args) {
+            public void command(CommandSender sender, String handle, String[] args) {
                 host.api.getGroups(groups -> host.api.getHosts(hosts -> host.api.getServers(servers -> host.api.getMasterProxy(proxymaster -> host.api.getProxies(proxies -> {
                     int i = 0;
                     boolean sent = false;
@@ -146,7 +175,7 @@ public class SubCommand {
         ).register("list");
         new Command(host.info) {
             @Override
-            public void command(String handle, String[] args) {
+            public void command(CommandSender sender, String handle, String[] args) {
                 if (args.length > 0) {
                     String type = (args.length > 1)?args[0]:null;
                     String name = args[(type != null)?1:0];
@@ -285,7 +314,7 @@ public class SubCommand {
         ).register("info", "status");
         new Command(host.info) {
             @Override
-            public void command(String handle, String[] args) {
+            public void command(CommandSender sender, String handle, String[] args) {
                 if (args.length > 0) {
                     host.subdata.sendPacket(new PacketStartServer(null, args[0], data -> {
                         switch (data.getInt("r")) {
@@ -336,7 +365,7 @@ public class SubCommand {
         ).register("start");
         new Command(host.info) {
             @Override
-            public void command(String handle, String[] args) {
+            public void command(CommandSender sender, String handle, String[] args) {
                 if (args.length > 0) {
                     host.subdata.sendPacket(new PacketStopServer(null, args[0], false, data -> {
                         switch (data.getInt("r")) {
@@ -376,7 +405,7 @@ public class SubCommand {
         ).register("stop");
         new Command(host.info) {
             @Override
-            public void command(String handle, String[] args) {
+            public void command(CommandSender sender, String handle, String[] args) {
                 if (args.length > 0) {
                     host.subdata.sendPacket(new PacketStopServer(null, args[0], true, data -> {
                         switch (data.getInt("r")) {
@@ -416,7 +445,7 @@ public class SubCommand {
         ).register("kill", "terminate");
         new Command(host.info) {
             @Override
-            public void command(String handle, String[] args) {
+            public void command(CommandSender sender, String handle, String[] args) {
                 if (args.length > 1) {
                     int i = 1;
                     String str = args[1];
@@ -467,7 +496,7 @@ public class SubCommand {
         ).register("cmd", "command");
         new Command(host.info) {
             @Override
-            public void command(String handle, String[] args) {
+            public void command(CommandSender sender, String handle, String[] args) {
                 if (args.length > 3) {
                     if (args.length > 4 && Util.isException(() -> Integer.parseInt(args[4]))) {
                         host.log.message.println("Invalid Port Number");

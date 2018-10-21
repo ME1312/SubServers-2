@@ -255,47 +255,32 @@ public final class SubPlugin extends BungeeCord implements Listener {
     @EventHandler(priority = Byte.MIN_VALUE)
     public void fallback(ServerKickEvent e) {
         if (e.getPlayer().getPendingConnection().getListener().isForceDefault()) {
-            ServerInfo next = null;
+            NamedContainer<Integer, ServerInfo> next = null;
             for (String name : e.getPlayer().getPendingConnection().getListener().getServerPriority()) {
                 if (!e.getKickedFrom().getName().equalsIgnoreCase(name)) {
                     ServerInfo server = getServerInfo(name);
                     if (server != null) {
-                        if (next == null) {
-                            next = server;
-                        } else {
-                            int current = 0;
-                            if (next instanceof ServerContainer) {
-                                if (!((ServerContainer) next).isHidden()) current++;
-                                if (!((ServerContainer) next).isRestricted()) current++;
-                                if (((ServerContainer) next).getSubData() != null) current++;
+                        int confidence = 0;
+                        if (server instanceof ServerContainer) {
+                            if (!((ServerContainer) server).isHidden()) confidence++;
+                            if (!((ServerContainer) server).isRestricted()) confidence++;
+                            if (((ServerContainer) server).getSubData() != null) confidence++;
 
-                                if (next instanceof SubServerContainer) {
-                                    if (((SubServerContainer) next).isRunning()) current++;
-                                }
-                            }
-
-                            int proposed = 0;
-                            if (server instanceof ServerContainer) {
-                                if (!((ServerContainer) server).isHidden()) proposed++;
-                                if (!((ServerContainer) server).isRestricted()) proposed++;
-                                if (((ServerContainer) server).getSubData() != null) proposed++;
-
-                                if (server instanceof SubServerContainer) {
-                                    if (((SubServerContainer) server).isRunning()) proposed++;
-                                }
-                            }
-
-                            if (proposed > current)
-                                next = server;
+                            if (server instanceof SubServerContainer) {
+                                if (((SubServerContainer) server).isRunning()) confidence++;
+                            } else confidence++;
                         }
+
+                        if (next == null || confidence > next.name())
+                            next = new NamedContainer<Integer, ServerInfo>(confidence, server);
                     }
                 }
             }
 
             if (next != null) {
-                e.setCancelServer(next);
+                e.setCancelServer(next.get());
                 e.setCancelled(true);
-                e.getPlayer().sendMessage(api.getLang("SubServers", "Bungee.Feature.Return").replace("$str$", (next instanceof ServerContainer)?((ServerContainer) next).getDisplayName():next.getName()).replace("$msg$", e.getKickReason()));
+                e.getPlayer().sendMessage(api.getLang("SubServers", "Bungee.Feature.Return").replace("$str$", (next.get() instanceof ServerContainer)?((ServerContainer) next.get()).getDisplayName():next.get().getName()).replace("$msg$", e.getKickReason()));
             }
         }
     }
