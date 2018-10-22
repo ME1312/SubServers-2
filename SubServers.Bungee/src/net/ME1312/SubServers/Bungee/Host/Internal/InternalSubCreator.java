@@ -1,5 +1,6 @@
 package net.ME1312.SubServers.Bungee.Host.Internal;
 
+import com.google.gson.Gson;
 import net.ME1312.SubServers.Bungee.Event.SubCreateEvent;
 import net.ME1312.SubServers.Bungee.Host.*;
 import net.ME1312.SubServers.Bungee.Library.*;
@@ -82,16 +83,14 @@ public class InternalSubCreator extends SubCreator {
                 Util.copyDirectory(template.getDirectory(), dir);
                 if (template.getType() == ServerType.FORGE || template.getType() == ServerType.SPONGE) {
                     System.out.println(name + File.separator + "Creator > Searching Versions...");
-                    Document spongexml = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new InputSource(new StringReader(Util.readAll(new BufferedReader(new InputStreamReader(new URL("https://repo.spongepowered.org/maven/org/spongepowered/sponge" + ((template.getType() == ServerType.FORGE)?"forge":"vanilla") + "/maven-metadata.xml").openStream(), Charset.forName("UTF-8")))))));
+                    YAMLSection spversionmanifest = new YAMLSection(new Gson().fromJson("{\"versions\":" + Util.readAll(new BufferedReader(new InputStreamReader(new URL("https://dl-api.spongepowered.org/v1/org.spongepowered/sponge" + ((template.getType() == ServerType.FORGE)?"forge":"vanilla") + "/downloads?type=stable&minecraft=" + version).openStream(), Charset.forName("UTF-8")))) + '}', Map.class));
 
-                    NodeList spnodeList = spongexml.getElementsByTagName("version");
+                    YAMLSection spprofile = null;
                     Version spversion = null;
-                    for (int i = 0; i < spnodeList.getLength(); i++) {
-                        Node node = spnodeList.item(i);
-                        if (node.getNodeType() == Node.ELEMENT_NODE) {
-                            if (node.getTextContent().startsWith(version.toString() + '-') && (spversion == null || new Version(node.getTextContent()).compareTo(spversion) >= 0)) {
-                                spversion = new Version(node.getTextContent());
-                            }
+                    for (YAMLSection profile : spversionmanifest.getSectionList("versions")) {
+                        if (profile.getSection("dependencies").getRawString("minecraft").equalsIgnoreCase(version.toString()) && (spversion == null || new Version(profile.getRawString("version")).compareTo(spversion) >= 0)) {
+                            spprofile = profile;
+                            spversion = new Version(profile.getRawString("version"));
                         }
                     }
                     if (spversion == null)
@@ -99,20 +98,7 @@ public class InternalSubCreator extends SubCreator {
                     System.out.println(name + File.separator + "Creator > Found \"sponge" + ((template.getType() == ServerType.FORGE)?"forge":"vanilla") + "-" + spversion.toString() + '"');
 
                     if (template.getType() == ServerType.FORGE) {
-                        Document forgexml = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new InputSource(new StringReader(Util.readAll(new BufferedReader(new InputStreamReader(new URL("http://files.minecraftforge.net/maven/net/minecraftforge/forge/maven-metadata.xml").openStream(), Charset.forName("UTF-8")))))));
-
-                        NodeList mcfnodeList = forgexml.getElementsByTagName("version");
-                        Version mcfversion = null;
-                        for (int i = 0; i < mcfnodeList.getLength(); i++) {
-                            Node node = mcfnodeList.item(i);
-                            if (node.getNodeType() == Node.ELEMENT_NODE) {
-                                if (node.getTextContent().contains(spversion.toString().split("\\-")[1]) && (mcfversion == null || new Version(node.getTextContent()).compareTo(mcfversion) >= 0)) {
-                                    mcfversion = new Version(node.getTextContent());
-                                }
-                            }
-                        }
-                        if (mcfversion == null)
-                            throw new InvalidServerException("Cannot find Forge version for Sponge " + spversion.toString());
+                        Version mcfversion = new Version(spprofile.getSection("dependencies").getRawString("minecraft") + '-' + spprofile.getSection("dependencies").getRawString("forge"));
                         System.out.println(name + File.separator + "Creator > Found \"forge-" + mcfversion.toString() + '"');
 
                         version = new Version(mcfversion.toString() + " " + spversion.toString());
