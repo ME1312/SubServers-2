@@ -27,7 +27,17 @@ public final class ConsolePlugin extends Plugin implements Listener {
 
     @Override
     public void onEnable() {
-        SubAPI.getInstance().addListener(this::enable, this::disable);
+        SubAPI.getInstance().addListener(new Runnable() {
+            @Override
+            public void run() {
+                enable();
+            }
+        }, new Runnable() {
+            @Override
+            public void run() {
+                disable();
+            }
+        });
     }
 
     public void enable() {

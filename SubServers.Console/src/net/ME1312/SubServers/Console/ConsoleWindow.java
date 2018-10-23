@@ -11,6 +11,8 @@ import org.fusesource.jansi.AnsiOutputStream;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.border.Border;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.text.*;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
@@ -68,46 +70,49 @@ public final class ConsoleWindow implements SubLogFilter {
         }
     });
     private boolean[] kpressed = new boolean[65535];
-    private KeyEventDispatcher keys = event -> {
-        switch (event.getID()) {
-            case KeyEvent.KEY_PRESSED:
-                kpressed[event.getKeyCode()] = true;
-                break;
-            case KeyEvent.KEY_RELEASED:
-                kpressed[event.getKeyCode()] = false;
-                break;
-        }
-        if (window.isVisible() && window.isFocused()) {
-            if (event.getID() == KeyEvent.KEY_PRESSED) switch (event.getKeyCode()) {
-                case KeyEvent.VK_UP:
-                    if (ifocus)
-                        popup.prev(input);
+    private KeyEventDispatcher keys = new KeyEventDispatcher() {
+        @Override
+        public boolean dispatchKeyEvent(KeyEvent event) {
+            switch (event.getID()) {
+                case KeyEvent.KEY_PRESSED:
+                    kpressed[event.getKeyCode()] = true;
                     break;
-                case KeyEvent.VK_DOWN:
-                    if (ifocus)
-                        popup.next(input);
-                    break;
-                case KeyEvent.VK_ESCAPE:
-                    if (find.isVisible()) {
-                        find.setVisible(false);
-                        findI = 0;
-                        findO = 0;
-                    }
-                    break;
-                case KeyEvent.VK_ENTER:
-                    if (find.isVisible() && !ifocus)
-                        find(kpressed[KeyEvent.VK_SHIFT] != Boolean.TRUE);
-                    break;
-                case KeyEvent.VK_TAB:
-                    if (!ifocus) input.requestFocusInWindow();
+                case KeyEvent.KEY_RELEASED:
+                    kpressed[event.getKeyCode()] = false;
                     break;
             }
+            if (window.isVisible() && window.isFocused()) {
+                if (event.getID() == KeyEvent.KEY_PRESSED) switch (event.getKeyCode()) {
+                    case KeyEvent.VK_UP:
+                        if (ifocus)
+                            popup.prev(input);
+                        break;
+                    case KeyEvent.VK_DOWN:
+                        if (ifocus)
+                            popup.next(input);
+                        break;
+                    case KeyEvent.VK_ESCAPE:
+                        if (find.isVisible()) {
+                            find.setVisible(false);
+                            findI = 0;
+                            findO = 0;
+                        }
+                        break;
+                    case KeyEvent.VK_ENTER:
+                        if (find.isVisible() && !ifocus)
+                            ConsoleWindow.this.find(kpressed[KeyEvent.VK_SHIFT] != Boolean.TRUE);
+                        break;
+                    case KeyEvent.VK_TAB:
+                        if (!ifocus) input.requestFocusInWindow();
+                        break;
+                }
 
+            }
+            return false;
         }
-        return false;
     };
 
-    public ConsoleWindow(ConsolePlugin plugin, SubLogger logger) {
+    public ConsoleWindow(final ConsolePlugin plugin, final SubLogger logger) {
         this.plugin = plugin;
         this.logger = logger;
 
@@ -117,41 +122,52 @@ public final class ConsoleWindow implements SubLogFilter {
         JMenu menu = new JMenu("\u00A0Log\u00A0");
         JMenuItem item = new JMenuItem("Clear Screen");
         item.setAccelerator(KeyStroke.getKeyStroke('L', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), true));
-        item.addActionListener(event -> clear());
+        item.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent event) {
+                ConsoleWindow.this.clear();
+            }
+        });
         menu.add(item);
         item = new JMenuItem("Reload Log");
         item.setAccelerator(KeyStroke.getKeyStroke('R', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), true));
-        item.addActionListener(event -> {
-            log.setText(RESET_VALUE);
-            loadContent();
+        item.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent event) {
+                log.setText(RESET_VALUE);
+                ConsoleWindow.this.loadContent();
+            }
         });
         menu.add(item);
         if (logger.getHandler() instanceof SubServer || logger.getHandler() instanceof SubCreator) {
             item = new JCheckBoxMenuItem("Auto Popout Log");
             item.setSelected((logger.getHandler() instanceof SubServer && (plugin.config.get().getStringList("Enabled-Servers").contains(((SubServer) logger.getHandler()).getName().toLowerCase()))) || (logger.getHandler() instanceof SubCreator && (plugin.config.get().getStringList("Enabled-Creators").contains(((SubCreator) logger.getHandler()).getHost().getName().toLowerCase()))));
-            item.addActionListener(event -> {
-                try {
-                    if (logger.getHandler() instanceof SubServer) {
-                        List<String> list = plugin.config.get().getStringList("Enabled-Servers");
-                        if (((AbstractButton) event.getSource()).getModel().isSelected()) {
-                            list.add(((SubServer) logger.getHandler()).getName().toLowerCase());
-                        } else {
-                            list.remove(((SubServer) logger.getHandler()).getName().toLowerCase());
+            item.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent event) {
+                    try {
+                        if (logger.getHandler() instanceof SubServer) {
+                            List<String> list = plugin.config.get().getStringList("Enabled-Servers");
+                            if (((AbstractButton) event.getSource()).getModel().isSelected()) {
+                                list.add(((SubServer) logger.getHandler()).getName().toLowerCase());
+                            } else {
+                                list.remove(((SubServer) logger.getHandler()).getName().toLowerCase());
+                            }
+                            plugin.config.get().set("Enabled-Servers", list);
+                            plugin.config.save();
+                        } else if (logger.getHandler() instanceof SubCreator) {
+                            List<String> list = plugin.config.get().getStringList("Enabled-Servers");
+                            if (((AbstractButton) event.getSource()).getModel().isSelected()) {
+                                list.add(((SubCreator) logger.getHandler()).getHost().getName().toLowerCase());
+                            } else {
+                                list.remove(((SubCreator) logger.getHandler()).getHost().getName().toLowerCase());
+                            }
+                            plugin.config.get().set("Enabled-Servers", list);
+                            plugin.config.save();
                         }
-                        plugin.config.get().set("Enabled-Servers", list);
-                        plugin.config.save();
-                    } else if (logger.getHandler() instanceof SubCreator) {
-                        List<String> list = plugin.config.get().getStringList("Enabled-Servers");
-                        if (((AbstractButton) event.getSource()).getModel().isSelected()) {
-                            list.add(((SubCreator) logger.getHandler()).getHost().getName().toLowerCase());
-                        } else {
-                            list.remove(((SubCreator) logger.getHandler()).getHost().getName().toLowerCase());
-                        }
-                        plugin.config.get().set("Enabled-Servers", list);
-                        plugin.config.save();
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
-                } catch (Exception e) {
-                    e.printStackTrace();
                 }
             });
             menu.add(item);
@@ -161,37 +177,46 @@ public final class ConsoleWindow implements SubLogFilter {
         menu = new JMenu("\u00A0Search\u00A0");
         item = new JMenuItem("Find");
         item.setAccelerator(KeyStroke.getKeyStroke('F', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), true));
-        item.addActionListener(event -> {
-            if (find.isVisible()) {
-                find.setVisible(false);
-                findI = 0;
-                findO = 0;
-            } else {
-                find.setVisible(true);
-                findT.selectAll();
-                findT.requestFocusInWindow();
+        item.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent event) {
+                if (find.isVisible()) {
+                    find.setVisible(false);
+                    findI = 0;
+                    findO = 0;
+                } else {
+                    find.setVisible(true);
+                    findT.selectAll();
+                    findT.requestFocusInWindow();
+                }
             }
         });
         menu.add(item);
         item = new JMenuItem("Find Next");
-        item.addActionListener(event -> {
-            if (find.isVisible()) {
-                find(true);
-            } else {
-                find.setVisible(true);
-                findT.selectAll();
-                findT.requestFocusInWindow();
+        item.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent event) {
+                if (find.isVisible()) {
+                    ConsoleWindow.this.find(true);
+                } else {
+                    find.setVisible(true);
+                    findT.selectAll();
+                    findT.requestFocusInWindow();
+                }
             }
         });
         menu.add(item);
         item = new JMenuItem("Find Previous");
-        item.addActionListener(event -> {
-            if (find.isVisible()) {
-                find(false);
-            } else {
-                find.setVisible(true);
-                findT.selectAll();
-                findT.requestFocusInWindow();
+        item.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent event) {
+                if (find.isVisible()) {
+                    ConsoleWindow.this.find(false);
+                } else {
+                    find.setVisible(true);
+                    findT.selectAll();
+                    findT.requestFocusInWindow();
+                }
             }
         });
         menu.add(item);
@@ -200,45 +225,67 @@ public final class ConsoleWindow implements SubLogFilter {
         menu = new JMenu("\u00A0View\u00A0");
         item = new JMenuItem("Scroll to Top");
         item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_UP, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), true));
-        item.addActionListener(event -> vScroll.getVerticalScrollBar().setValue(0));
+        item.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent event) {
+                vScroll.getVerticalScrollBar().setValue(0);
+            }
+        });
         menu.add(item);
         item = new JMenuItem("Scroll to Bottom");
         item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), true));
-        item.addActionListener(event -> vScroll.getVerticalScrollBar().setValue(vScroll.getVerticalScrollBar().getMaximum() - vScroll.getVerticalScrollBar().getVisibleAmount()));
+        item.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent event) {
+                vScroll.getVerticalScrollBar().setValue(vScroll.getVerticalScrollBar().getMaximum() - vScroll.getVerticalScrollBar().getVisibleAmount());
+            }
+        });
         menu.add(item);
         menu.addSeparator();
         item = new JCheckBoxMenuItem("Show Text Colors");
         item.setSelected(true);
-        item.addActionListener(event -> {
-            ansi = ((AbstractButton) event.getSource()).getModel().isSelected();
-            log.setText(RESET_VALUE);
-            loadContent();
+        item.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent event) {
+                ansi = ((AbstractButton) event.getSource()).getModel().isSelected();
+                log.setText(RESET_VALUE);
+                ConsoleWindow.this.loadContent();
+            }
         });
         menu.add(item);
         item = new JMenuItem("Reset Text Size");
-        item.addActionListener(event -> {
-            HTMLDocument doc = (HTMLDocument) log.getDocument();
-            fontSize = 12;
-            doc.getStyleSheet().addRule("body {font-size: "+fontSize+";}\n");
-            hScroll();
+        item.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent event) {
+                HTMLDocument doc = (HTMLDocument) log.getDocument();
+                fontSize = 12;
+                doc.getStyleSheet().addRule("body {font-size: " + fontSize + ";}\n");
+                ConsoleWindow.this.hScroll();
+            }
         });
         menu.add(item);
         item = new JMenuItem("Bigger Text");
         item.setAccelerator(KeyStroke.getKeyStroke('=', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), true));
-        item.addActionListener(event -> {
-            HTMLDocument doc = (HTMLDocument) log.getDocument();
-            fontSize += 2;
-            doc.getStyleSheet().addRule("body {font-size: "+fontSize+";}\n");
-            hScroll();
+        item.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent event) {
+                HTMLDocument doc = (HTMLDocument) log.getDocument();
+                fontSize += 2;
+                doc.getStyleSheet().addRule("body {font-size: " + fontSize + ";}\n");
+                ConsoleWindow.this.hScroll();
+            }
         });
         menu.add(item);
         item = new JMenuItem("Smaller Text");
         item.setAccelerator(KeyStroke.getKeyStroke('-', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), true));
-        item.addActionListener(event -> {
-            HTMLDocument doc = (HTMLDocument) log.getDocument();
-            fontSize -= 2;
-            doc.getStyleSheet().addRule("body {font-size: "+fontSize+";}\n");
-            hScroll();
+        item.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent event) {
+                HTMLDocument doc = (HTMLDocument) log.getDocument();
+                fontSize -= 2;
+                doc.getStyleSheet().addRule("body {font-size: " + fontSize + ";}\n");
+                ConsoleWindow.this.hScroll();
+            }
         });
         menu.add(item);
         jMenu.add(menu);
@@ -246,7 +293,12 @@ public final class ConsoleWindow implements SubLogFilter {
         window.setJMenuBar(jMenu);
         window.setContentPane(panel);
         window.pack();
-        Util.isException(() -> window.setIconImage(ImageIO.read(ConsolePlugin.class.getResourceAsStream("/SubServers.png"))));
+        Util.isException(new Util.ExceptionRunnable() {
+            @Override
+            public void run() throws Throwable {
+                window.setIconImage(ImageIO.read(ConsolePlugin.class.getResourceAsStream("/SubServers.png")));
+            }
+        });
         window.setTitle(logger.getName() + " \u2014 SubServers 2");
         window.setSize(1024, 576);
         Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize();
@@ -298,13 +350,16 @@ public final class ConsoleWindow implements SubLogFilter {
 
         popup = new TextFieldPopup(input, true);
         input.setBorder(BorderFactory.createLineBorder(new Color(40, 44, 45), 4));
-        input.addActionListener((ActionEvent event) -> {
-            if (logger.getHandler() instanceof SubServer && input.getText().length() > 0 && !input.getText().equals(">")) {
-                if (((SubServer) logger.getHandler()).command((input.getText().startsWith(">")) ? input.getText().substring(1) : input.getText())) {
-                    popup.commands.add((input.getText().startsWith(">")) ? input.getText().substring(1) : input.getText());
-                    popup.current = 0;
-                    popup.last = true;
-                    input.setText("");
+        input.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent event) {
+                if (logger.getHandler() instanceof SubServer && input.getText().length() > 0 && !input.getText().equals(">")) {
+                    if (((SubServer) logger.getHandler()).command((input.getText().startsWith(">")) ? input.getText().substring(1) : input.getText())) {
+                        popup.commands.add((input.getText().startsWith(">")) ? input.getText().substring(1) : input.getText());
+                        popup.current = 0;
+                        popup.last = true;
+                        input.setText("");
+                    }
                 }
             }
         });
@@ -349,20 +404,26 @@ public final class ConsoleWindow implements SubLogFilter {
             }
         });
 
-        vScroll.getHorizontalScrollBar().addAdjustmentListener(event -> {
-            if (!eScroll.contains(event.getValue())) {
-                eScroll.add(event.getValue());
-                hScroll.setValue(event.getValue());
-            } else {
-                eScroll.remove((Object) event.getValue());
+        vScroll.getHorizontalScrollBar().addAdjustmentListener(new AdjustmentListener() {
+            @Override
+            public void adjustmentValueChanged(AdjustmentEvent event) {
+                if (!eScroll.contains(event.getValue())) {
+                    eScroll.add(event.getValue());
+                    hScroll.setValue(event.getValue());
+                } else {
+                    eScroll.remove((Object) event.getValue());
+                }
             }
         });
-        hScroll.addAdjustmentListener(event -> {
-            if (!eScroll.contains(event.getValue())) {
-                eScroll.add(event.getValue());
-                vScroll.getHorizontalScrollBar().setValue(event.getValue());
-            } else {
-                eScroll.remove((Object) event.getValue());
+        hScroll.addAdjustmentListener(new AdjustmentListener() {
+            @Override
+            public void adjustmentValueChanged(AdjustmentEvent event) {
+                if (!eScroll.contains(event.getValue())) {
+                    eScroll.add(event.getValue());
+                    vScroll.getHorizontalScrollBar().setValue(event.getValue());
+                } else {
+                    eScroll.remove((Object) event.getValue());
+                }
             }
         });
 
@@ -390,27 +451,49 @@ public final class ConsoleWindow implements SubLogFilter {
                 findO = 0;
             }
         });
-        findP.addChangeListener(e -> {
-            if (findP.getModel().isPressed()) findP.setBackground(new Color(40, 44, 45));
-            else findP.setBackground(new Color(69, 73, 74));
+        findP.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                if (findP.getModel().isPressed()) findP.setBackground(new Color(40, 44, 45));
+                else findP.setBackground(new Color(69, 73, 74));
+            }
         });
         findP.setBorder(new ButtonBorder(40, 44, 45, 4));
-        findP.addActionListener(event -> find(false));
-        findN.addChangeListener(e -> {
-            if (findN.getModel().isPressed()) findN.setBackground(new Color(40, 44, 45));
-            else findN.setBackground(new Color(69, 73, 74));
+        findP.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent event) {
+                ConsoleWindow.this.find(false);
+            }
+        });
+        findN.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                if (findN.getModel().isPressed()) findN.setBackground(new Color(40, 44, 45));
+                else findN.setBackground(new Color(69, 73, 74));
+            }
         });
         findN.setBorder(new ButtonBorder(40, 44, 45, 4));
-        findN.addActionListener(event -> find(true));
-        findD.addChangeListener(e -> {
-            if (findD.getModel().isPressed()) findD.setBackground(new Color(40, 44, 45));
-            else findD.setBackground(new Color(69, 73, 74));
+        findN.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent event) {
+                ConsoleWindow.this.find(true);
+            }
+        });
+        findD.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                if (findD.getModel().isPressed()) findD.setBackground(new Color(40, 44, 45));
+                else findD.setBackground(new Color(69, 73, 74));
+            }
         });
         findD.setBorder(new ButtonBorder(40, 44, 45, 4));
-        findD.addActionListener(event -> {
-            find.setVisible(false);
-            findI = 0;
-            findO = 0;
+        findD.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent event) {
+                find.setVisible(false);
+                findI = 0;
+                findO = 0;
+            }
         });
 
 
@@ -439,16 +522,20 @@ public final class ConsoleWindow implements SubLogFilter {
         LinkedList<Object> list = new LinkedList<Object>();
         list.addAll(logger.getMessageHistory());
         if (logger.getHandler() instanceof SubServer) list.addAll(((SubServer) logger.getHandler()).getCommandHistory());
-        list.sort((A, B) -> {
-            Date a = null, b = null;
 
-            if (A instanceof SubLogger.LogMessage) a = ((SubLogger.LogMessage) A).getDate();
-            if (A instanceof SubServer.LoggedCommand) a = ((SubServer.LoggedCommand) A).getDate();
+        Collections.sort(list, new Comparator<Object>() {
+            @Override
+            public int compare(Object A, Object B) {
+                Date a = null, b = null;
 
-            if (B instanceof SubLogger.LogMessage) b = ((SubLogger.LogMessage) B).getDate();
-            if (B instanceof SubServer.LoggedCommand) b = ((SubServer.LoggedCommand) B).getDate();
+                if (A instanceof SubLogger.LogMessage) a = ((SubLogger.LogMessage) A).getDate();
+                if (A instanceof SubServer.LoggedCommand) a = ((SubServer.LoggedCommand) A).getDate();
 
-            return (a == null || b == null)?0:a.compareTo(b);
+                if (B instanceof SubLogger.LogMessage) b = ((SubLogger.LogMessage) B).getDate();
+                if (B instanceof SubServer.LoggedCommand) b = ((SubServer.LoggedCommand) B).getDate();
+
+                return (a == null || b == null) ? 0 : a.compareTo(b);
+            }
         });
         for (Object obj : list) {
             if (obj instanceof SubLogger.LogMessage) log(((SubLogger.LogMessage) obj).getDate(), ((SubLogger.LogMessage) obj).getLevel(), ((SubLogger.LogMessage) obj).getMessage());
@@ -536,7 +623,13 @@ public final class ConsoleWindow implements SubLogFilter {
             try {
                 boolean found = false;
 
-                if (findI + findLength >= document.getLength()) findI = 1;
+                if (findI < 0 || findI + findLength >= document.getLength()) {
+                    if (direction) {
+                        findI = 1;
+                    } else {
+                        findI = document.getLength() - findLength;
+                    }
+                }
 
                 while (findLength <= document.getLength()) {
                     String match = document.getText(findI, findLength).toLowerCase();
@@ -560,7 +653,7 @@ public final class ConsoleWindow implements SubLogFilter {
                 }
 
             } catch (BadLocationException e) {
-                findI = log.getText().length() - 1;
+                findI = -2;
                 JOptionPane.showMessageDialog(window,
                         ((findO > 0)?"There are no more results\nSearch again to start from the " + ((direction)?"top":"bottom"):"Couldn't find \"" + findT.getText() + "\""),
                         "Find",
