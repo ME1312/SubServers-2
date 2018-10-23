@@ -44,7 +44,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
     public boolean redis = false;
     public final SubAPI api = new SubAPI(this);
     public SubDataClient subdata = null;
-    public static final Version version = Version.fromString("2.13.1b");
+    public static final Version version = Version.fromString("2.13.2a");
 
     public final boolean isPatched;
     public long lastReload = -1;
