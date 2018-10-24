@@ -59,12 +59,12 @@ public final class SubPlugin extends JavaPlugin {
             }
             if (!(new UniversalFile(getDataFolder(), "config.yml").exists())) {
                 Util.copyFromJar(SubPlugin.class.getClassLoader(), "config.yml", new UniversalFile(getDataFolder(), "config.yml").getPath());
-                Bukkit.getLogger().info("SubServers > Created ~/plugins/SubServers/config.yml");
+                Bukkit.getLogger().info("SubServers > Created ~/plugins/SubServers-Client-Bukkit/config.yml");
             } else if ((new Version((new YAMLConfig(new UniversalFile(getDataFolder(), "config.yml"))).get().getSection("Settings").getString("Version", "0")).compareTo(new Version("2.11.2a+"))) != 0) {
                 Files.move(new UniversalFile(getDataFolder(), "config.yml").toPath(), new UniversalFile(getDataFolder(), "config.old" + Math.round(Math.random() * 100000) + ".yml").toPath());
 
                 Util.copyFromJar(SubPlugin.class.getClassLoader(), "config.yml", new UniversalFile(getDataFolder(), "config.yml").getPath());
-                Bukkit.getLogger().info("SubServers > Updated ~/plugins/SubServers/config.yml");
+                Bukkit.getLogger().info("SubServers > Updated ~/plugins/SubServers-Client-Bukkit/config.yml");
             }
             config = new YAMLConfig(new UniversalFile(getDataFolder(), "config.yml"));
             if (new UniversalFile(new File(System.getProperty("user.dir")), "subservers.client").exists()) {

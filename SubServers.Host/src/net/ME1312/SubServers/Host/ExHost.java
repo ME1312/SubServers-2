@@ -132,6 +132,7 @@ public final class ExHost {
         try {
             info = PluginInfo.getPluginInfo(this);
             info.setLogger(log);
+            info.setIcon(ExHost.class.getResourceAsStream("/net/ME1312/SubServers/Host/Library/Files/icon.png"));
             engine = GalaxiEngine.init(info);
             log.info.println("Loading SubServers.Host v" + info.getVersion().toString() + " Libraries");
             if (!(new UniversalFile(engine.getRuntimeDirectory(), "config.yml").exists())) {
@@ -242,7 +243,7 @@ public final class ExHost {
             }
         } catch (Exception e) {
             log.error.println(e);
-            stop();
+            engine.stop();
         }
     }
 

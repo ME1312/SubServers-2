@@ -1,5 +1,6 @@
 package net.ME1312.SubServers.Host.Executable;
 
+import net.ME1312.Galaxi.Library.Config.YAMLSection;
 import net.ME1312.Galaxi.Library.Container;
 import net.ME1312.Galaxi.Library.Log.LogStream;
 import net.ME1312.Galaxi.Library.Log.Logger;
@@ -104,10 +105,11 @@ public class SubLogger {
                     }
 
                     // Log to NETWORK
-                    if (log.get() && SubAPI.getInstance().getInternals().config.get().getSection("Settings").getBoolean("Network-Log", true)) SubAPI.getInstance().getSubDataNetwork().sendPacket(new PacketOutExLogMessage(address, line));
+                    YAMLSection yaml = SubAPI.getInstance().getInternals().config.get().getSection("Settings");
+                    if (log.get() && yaml.getBoolean("Network-Log", true)) SubAPI.getInstance().getSubDataNetwork().sendPacket(new PacketOutExLogMessage(address, line));
 
                     // Log to CONSOLE
-                    if (log.get() && SubAPI.getInstance().getInternals().config.get().getSection("Settings").getBoolean("Console-Log", true)) level.println(TextColor.convertColor(msg));
+                    if (log.get() && yaml.getBoolean("Console-Log", true)) level.println(TextColor.convertColor(msg));
 
                     // Log to FILE
                     if (writer != null) {

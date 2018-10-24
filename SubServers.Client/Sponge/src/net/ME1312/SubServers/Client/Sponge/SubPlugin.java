@@ -84,12 +84,12 @@ public final class SubPlugin {
             }
             if (!(new UniversalFile(dir, "config.yml").exists())) {
                 Util.copyFromJar(SubPlugin.class.getClassLoader(), "config.yml", new UniversalFile(dir, "config.yml").getPath());
-                logger.info("Created ~/plugins/SubServers/config.yml");
+                logger.info("Created ~/config/subservers-client-sponge/config.yml");
             } else if ((new Version((new YAMLConfig(new UniversalFile(dir, "config.yml"))).get().getSection("Settings").getString("Version", "0")).compareTo(new Version("2.11.2a+"))) != 0) {
                 Files.move(new UniversalFile(dir, "config.yml").toPath(), new UniversalFile(dir, "config.old" + Math.round(Math.random() * 100000) + ".yml").toPath());
 
                 Util.copyFromJar(SubPlugin.class.getClassLoader(), "config.yml", new UniversalFile(dir, "config.yml").getPath());
-                logger.info("Updated ~/plugins/SubServers/config.yml");
+                logger.info("Updated ~/config/subservers-client-sponge/config.yml");
             }
             config = new YAMLConfig(new UniversalFile(dir, "config.yml"));
             if (new UniversalFile(new File(System.getProperty("user.dir")), "subservers.client").exists()) {

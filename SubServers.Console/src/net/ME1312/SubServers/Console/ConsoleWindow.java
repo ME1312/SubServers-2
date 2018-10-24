@@ -356,8 +356,6 @@ public final class ConsoleWindow implements SubLogFilter {
                 if (logger.getHandler() instanceof SubServer && input.getText().length() > 0 && !input.getText().equals(">")) {
                     if (((SubServer) logger.getHandler()).command((input.getText().startsWith(">")) ? input.getText().substring(1) : input.getText())) {
                         popup.commands.add((input.getText().startsWith(">")) ? input.getText().substring(1) : input.getText());
-                        popup.current = 0;
-                        popup.last = true;
                         input.setText("");
                     }
                 }
@@ -376,9 +374,21 @@ public final class ConsoleWindow implements SubLogFilter {
             public void replace(FilterBypass fb, int offset, int length, String text, AttributeSet attrs) throws BadLocationException {
                 if (offset < 1) {
                     length = Math.max(0, length - 1);
-                    offset = 1;
+                    offset = input.getDocument().getLength();
+                    input.setCaretPosition(offset);
                 }
-                super.replace(fb, offset, length, text, attrs);
+
+                if (popup.history == Boolean.TRUE) {
+                    popup.history = null;
+                } else if (popup.history == null) {
+                    popup.history = false;
+                }
+
+                try {
+                    super.replace(fb, offset, length, text, attrs);
+                } catch (BadLocationException e) {
+                    super.replace(fb, 1, length, text, attrs);
+                }
             }
 
             @Override
@@ -664,8 +674,9 @@ public final class ConsoleWindow implements SubLogFilter {
 
     private class TextFieldPopup extends JPanel {
         protected LinkedList<String> commands = new LinkedList<String>();
-        protected int current = 0;
-        protected boolean last = true;
+        protected Boolean history = false;
+        protected int hpos = -1;
+        protected String hcache = "";
 
         public TextFieldPopup(JTextComponent field, boolean command) {
             JPopupMenu menu = new JPopupMenu();
@@ -738,11 +749,17 @@ public final class ConsoleWindow implements SubLogFilter {
             if (field.isEditable()) {
                 LinkedList<String> list = new LinkedList<String>(commands);
                 Collections.reverse(list);
-                if (current > 0) {
-                    if (last && current != 1) current--;
-                    last = false;
-                    field.setText(list.get(--current));
-                } else field.setText("");
+                if (history == Boolean.FALSE) {
+                    hcache = (field.getText().startsWith(">"))?field.getText().substring(1):field.getText();
+                    hpos = -1;
+                } else {
+                    hpos--;
+                    if (hpos < -1) hpos = -1;
+                }
+                if (hpos >= 0) {
+                    history = true;
+                    field.setText(list.get(hpos));
+                } else field.setText(hcache);
                 field.setCaretPosition(field.getText().length());
             }
         }
@@ -751,11 +768,16 @@ public final class ConsoleWindow implements SubLogFilter {
             if (field.isEditable()) {
                 LinkedList<String> list = new LinkedList<String>(commands);
                 Collections.reverse(list);
-                if (list.size() > current) {
-                    if (!last) current++;
-                    last = true;
-                    field.setText(list.get(current++));
-                    field.setCaretPosition(field.getText().length());
+                if (history == Boolean.FALSE) {
+                    hcache = (field.getText().startsWith(">"))?field.getText().substring(1):field.getText();
+                    hpos = 0;
+                } else {
+                    hpos++;
+                }
+                if (hpos >= list.size()) hpos = list.size() - 1;
+                if (hpos >= 0) {
+                    history = true;
+                    field.setText(list.get(hpos));
                 }
             }
         }
