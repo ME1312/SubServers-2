@@ -11,6 +11,7 @@ import java.util.List;
 public class AnsiHTMLColorStream extends AnsiOutputStream {
     private boolean concealOn = false;
     private static final String[] ANSI_COLOR_MAP = new String[]{"000000", "cd0000", "25bc24", "e1e100", "0000ee", "cd00cd", "00e1e1", "ffffff"};
+    private static final byte[] BYTES_NBSP = "&nbsp;".getBytes();
     private static final byte[] BYTES_QUOT = "&quot;".getBytes();
     private static final byte[] BYTES_AMP = "&amp;".getBytes();
     private static final byte[] BYTES_LT = "&lt;".getBytes();
@@ -46,24 +47,31 @@ public class AnsiHTMLColorStream extends AnsiOutputStream {
         this.closingAttributes.clear();
     }
 
+    private boolean nbsp = true;
     public void write(int data) throws IOException {
-        switch(data) {
-            case 34:
-                this.out.write(BYTES_QUOT);
-                break;
-            case 38:
-                this.out.write(BYTES_AMP);
-                break;
-            case 60:
-                this.out.write(BYTES_LT);
-                break;
-            case 62:
-                this.out.write(BYTES_GT);
-                break;
-            default:
-                super.write(data);
+        if (data == 32) {
+            if (nbsp) this.out.write(BYTES_NBSP);
+            else super.write(data);
+            nbsp = !nbsp;
+        } else {
+            nbsp = false;
+            switch(data) {
+                case 34:
+                    this.out.write(BYTES_QUOT);
+                    break;
+                case 38:
+                    this.out.write(BYTES_AMP);
+                    break;
+                case 60:
+                    this.out.write(BYTES_LT);
+                    break;
+                case 62:
+                    this.out.write(BYTES_GT);
+                    break;
+                default:
+                    super.write(data);
+            }
         }
-
     }
 
     public void writeLine(byte[] buf, int offset, int len) throws IOException {

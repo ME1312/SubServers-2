@@ -738,7 +738,7 @@ public final class SubCommand extends CommandX {
     }
 
     private void updateCache() {
-        if (Calendar.getInstance().getTime().getTime() - cacheDate >= TimeUnit.MINUTES.toMillis(5)) {
+        if (Calendar.getInstance().getTime().getTime() - cacheDate >= TimeUnit.MINUTES.toMillis(1)) {
             cacheDate = Calendar.getInstance().getTime().getTime();
             plugin.api.getProxies(proxies -> {
                 proxyCache = new LinkedList<String>(proxies.keySet());
