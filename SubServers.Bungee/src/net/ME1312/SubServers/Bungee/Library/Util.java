@@ -328,29 +328,29 @@ public final class Util {
      * @return Unescaped String
      */
     public static String unescapeJavaString(String str) {
-
         StringBuilder sb = new StringBuilder(str.length());
 
         for (int i = 0; i < str.length(); i++) {
-            char ch = str.charAt(i);
+            int ch = str.codePointAt(i);
             if (ch == '\\') {
-                char nextChar = (i == str.length() - 1) ? '\\' : str
-                        .charAt(i + 1);
+                int nextChar = (i == str.length() - 1) ? '\\' : str
+                        .codePointAt(i + 1);
                 // Octal escape?
                 if (nextChar >= '0' && nextChar <= '7') {
-                    String code = "" + nextChar;
+                    StringBuilder code = new StringBuilder();
+                    code.appendCodePoint(nextChar);
                     i++;
-                    if ((i < str.length() - 1) && str.charAt(i + 1) >= '0'
-                            && str.charAt(i + 1) <= '7') {
-                        code += str.charAt(i + 1);
+                    if ((i < str.length() - 1) && str.codePointAt(i + 1) >= '0'
+                            && str.codePointAt(i + 1) <= '7') {
+                        code.appendCodePoint(str.codePointAt(i + 1));
                         i++;
-                        if ((i < str.length() - 1) && str.charAt(i + 1) >= '0'
-                                && str.charAt(i + 1) <= '7') {
-                            code += str.charAt(i + 1);
+                        if ((i < str.length() - 1) && str.codePointAt(i + 1) >= '0'
+                                && str.codePointAt(i + 1) <= '7') {
+                            code.appendCodePoint(str.codePointAt(i + 1));
                             i++;
                         }
                     }
-                    sb.append((char) Integer.parseInt(code, 8));
+                    sb.append((char) Integer.parseInt(code.toString(), 8));
                     continue;
                 }
                 switch (nextChar) {
@@ -378,22 +378,45 @@ public final class Util {
                     case '\'':
                         ch = '\'';
                         break;
-                    // Hex Unicode: u????
+                    // Hex Unicode Char: u????
+                    // Hex Unicode Codepoint: u{??????}
                     case 'u':
-                        if (i >= str.length() - 5) {
+                        try {
+                            if (i >= str.length() - 4) throw new IllegalStateException();
+                            StringBuilder escape = new StringBuilder();
+                            int offset = 2;
+
+                            if (str.codePointAt(i + 2) != '{') {
+                                if (i >= str.length() - 5) throw new IllegalStateException();
+                                while (offset <= 5) {
+                                    Integer.toString(str.codePointAt(i + offset), 16);
+                                    escape.appendCodePoint(str.codePointAt(i + offset));
+                                    offset++;
+                                }
+                                offset--;
+                            } else {
+                                offset++;
+                                while (str.codePointAt(i + offset) != '}') {
+                                    Integer.toString(str.codePointAt(i + offset), 16);
+                                    escape.appendCodePoint(str.codePointAt(i + offset));
+                                    offset++;
+                                }
+                            }
+                            sb.append(new String(new int[]{
+                                    Integer.parseInt(escape.toString(), 16)
+                            }, 0, 1));
+
+                            i += offset;
+                            continue;
+                        } catch (Throwable e){
+                            sb.append('\\');
                             ch = 'u';
                             break;
                         }
-                        int code = Integer.parseInt(
-                                "" + str.charAt(i + 2) + str.charAt(i + 3)
-                                        + str.charAt(i + 4) + str.charAt(i + 5), 16);
-                        sb.append(Character.toChars(code));
-                        i += 5;
-                        continue;
                 }
                 i++;
             }
-            sb.append(ch);
+            sb.appendCodePoint(ch);
         }
         return sb.toString();
     }
