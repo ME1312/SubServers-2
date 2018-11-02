@@ -138,7 +138,7 @@ public class InternalSubLogger extends SubLogger {
                 out = null;
             }
 
-            destroy();
+            stop();
         }
     }
 

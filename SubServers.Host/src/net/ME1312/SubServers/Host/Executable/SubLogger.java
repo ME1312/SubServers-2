@@ -71,6 +71,7 @@ public class SubLogger {
     @SuppressWarnings("deprecation")
     private void start(InputStream in, boolean isErr) {
         try {
+            YAMLSection yaml = SubAPI.getInstance().getInternals().config.get().getSection("Settings");
             BufferedReader br = new BufferedReader(new InputStreamReader(in));
             String line;
             while ((line = br.readLine()) != null) {
@@ -105,7 +106,6 @@ public class SubLogger {
                     }
 
                     // Log to NETWORK
-                    YAMLSection yaml = SubAPI.getInstance().getInternals().config.get().getSection("Settings");
                     if (log.get() && yaml.getBoolean("Network-Log", true)) SubAPI.getInstance().getSubDataNetwork().sendPacket(new PacketOutExLogMessage(address, line));
 
                     // Log to CONSOLE
@@ -125,7 +125,7 @@ public class SubLogger {
                 out = null;
             }
 
-            destroy();
+            stop();
         }
     }
 

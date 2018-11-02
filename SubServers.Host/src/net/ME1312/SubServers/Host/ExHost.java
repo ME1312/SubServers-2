@@ -132,6 +132,7 @@ public final class ExHost {
         try {
             info = PluginInfo.getPluginInfo(this);
             info.setLogger(log);
+            if (ExHost.class.getPackage().getSpecificationTitle() != null) info.setSignature(new Version(ExHost.class.getPackage().getSpecificationTitle()));
             info.setIcon(ExHost.class.getResourceAsStream("/net/ME1312/SubServers/Host/Library/Files/icon.png"));
             engine = GalaxiEngine.init(info);
             log.info.println("Loading SubServers.Host v" + info.getVersion().toString() + " Libraries");
