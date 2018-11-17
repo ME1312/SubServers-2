@@ -88,7 +88,7 @@ public final class SubCommand extends CommandX {
                                 javaarch = System.getProperty("sun.arch.data.model");
                     }
 
-                    sender.sendMessage("SubServers > These are the platforms and versions that are running SubServers.Sync:");
+                    sender.sendMessage("SubServers > These are the platforms and versions that are running SubServers.Bungee:");
                     sender.sendMessage("  " + System.getProperty("os.name") + ((!System.getProperty("os.name").toLowerCase().startsWith("windows"))?' ' + System.getProperty("os.version"):"") + ((osarch != null)?" [" + osarch + ']':"") + ',');
                     sender.sendMessage("  Java " + System.getProperty("java.version") + ((javaarch != null)?" [" + javaarch + ']':"") + ',');
                     sender.sendMessage("  " + plugin.getBungeeName() + ((plugin.isPatched)?" [Patched] ":" ") + net.md_5.bungee.Bootstrap.class.getPackage().getImplementationVersion() + ',');

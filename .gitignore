@@ -33,6 +33,7 @@ crashlytics-build.properties
 # Hide Unfinished Project Files
 /SubServers.Client/Windows/
 /Artifacts/SubServers.Web.jar
+/SubServers.Velocity/
 /SubServers.Web/
 
 # Hide Others

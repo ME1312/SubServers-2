@@ -78,14 +78,11 @@
                                 <mkdir dir="${project.build.directory}" />
                                 <copy file="${basedir}/../LICENSE" todir="${project.build.directory}/classes" />
                                 <copy file="${basedir}/../Artifacts/SubServers.Client.jar" tofile="${project.build.directory}/classes/net/ME1312/SubServers/Bungee/Library/Files/client.jar" />
-                                <zip basedir="${project.build.directory}/classes/net/ME1312/SubServers/Bungee/Library/Files/Templates" destfile="${project.build.directory}/classes/net/ME1312/SubServers/Bungee/Library/Files/Templates/forge.zip" includes="Forge/*" />
-                                <delete dir="${project.build.directory}/classes/net/ME1312/SubServers/Bungee/Library/Files/Templates/Forge" />
-                                <zip basedir="${project.build.directory}/classes/net/ME1312/SubServers/Bungee/Library/Files/Templates" destfile="${project.build.directory}/classes/net/ME1312/SubServers/Bungee/Library/Files/Templates/spigot.zip" includes="Spigot/*" />
-                                <delete dir="${project.build.directory}/classes/net/ME1312/SubServers/Bungee/Library/Files/Templates/Spigot" />
-                                <zip basedir="${project.build.directory}/classes/net/ME1312/SubServers/Bungee/Library/Files/Templates" destfile="${project.build.directory}/classes/net/ME1312/SubServers/Bungee/Library/Files/Templates/sponge.zip" includes="Sponge/*" />
-                                <delete dir="${project.build.directory}/classes/net/ME1312/SubServers/Bungee/Library/Files/Templates/Sponge" />
-                                <zip basedir="${project.build.directory}/classes/net/ME1312/SubServers/Bungee/Library/Files/Templates" destfile="${project.build.directory}/classes/net/ME1312/SubServers/Bungee/Library/Files/Templates/vanilla.zip" includes="Vanilla/*" />
-                                <delete dir="${project.build.directory}/classes/net/ME1312/SubServers/Bungee/Library/Files/Templates/Vanilla" />
+                                <mkdir dir="${project.build.directory}/classes/net/ME1312/SubServers/Bungee/Library/Files/Templates" />
+                                <zip basedir="${basedir}/../SubServers.Creator/src" destfile="${project.build.directory}/classes/net/ME1312/SubServers/Bungee/Library/Files/Templates/forge.zip" includes="Forge/*" />
+                                <zip basedir="${basedir}/../SubServers.Creator/src" destfile="${project.build.directory}/classes/net/ME1312/SubServers/Bungee/Library/Files/Templates/spigot.zip" includes="Spigot/*" />
+                                <zip basedir="${basedir}/../SubServers.Creator/src" destfile="${project.build.directory}/classes/net/ME1312/SubServers/Bungee/Library/Files/Templates/sponge.zip" includes="Sponge/*" />
+                                <zip basedir="${basedir}/../SubServers.Creator/src" destfile="${project.build.directory}/classes/net/ME1312/SubServers/Bungee/Library/Files/Templates/vanilla.zip" includes="Vanilla/*" />
                             </tasks>
                         </configuration>
                     </execution>

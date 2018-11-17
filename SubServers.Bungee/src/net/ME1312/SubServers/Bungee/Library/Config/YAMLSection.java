@@ -333,7 +333,7 @@ public class YAMLSection {
      */
     public YAMLValue get(String handle) {
         if (Util.isNull(handle)) throw new NullPointerException();
-        return (map.get(handle) != null)?(new YAMLValue(map.get(handle), this, handle, yaml)):null;
+        return new YAMLValue(map.get(handle), this, handle, yaml);
     }
 
     /**
