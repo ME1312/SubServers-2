@@ -38,7 +38,8 @@ public class PacketLinkServer implements PacketIn, PacketOut {
     @Override
     public YAMLSection generate() {
         YAMLSection json = new YAMLSection();
-        json.set("name", plugin.subdata.getName());
+        if (plugin.subdata.getName() != null) json.set("name", plugin.subdata.getName());
+        if (plugin.game.getServer().getBoundAddress().isPresent()) json.set("port", plugin.game.getServer().getBoundAddress().get());
         return json;
     }
 
