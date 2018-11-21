@@ -805,7 +805,7 @@ public final class SubCommand extends CommandX {
                     TextComponent serverm = new TextComponent(ChatColor.RESET.toString());
                     TextComponent div = new TextComponent(plugin.api.getLang("SubServers", "Bungee.Server.Divider"));
                     for (ServerContainer server : plugin.servers.values()) {
-                        if (!server.isHidden() && (!(server instanceof SubServerContainer) || ((SubServerContainer) server).isRunning())) {
+                        if (!server.isHidden() && server.canAccess(sender) && (!(server instanceof SubServerContainer) || ((SubServerContainer) server).isRunning())) {
                             if (i != 0) serverm.addExtra(div);
                             TextComponent message = new TextComponent(plugin.api.getLang("SubServers", "Bungee.Server.List").replace("$str$", server.getDisplayName()));
                             try {

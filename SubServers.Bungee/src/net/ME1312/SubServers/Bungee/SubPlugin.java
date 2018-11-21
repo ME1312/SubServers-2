@@ -709,6 +709,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
         return servers;
     }
 
+    @SuppressWarnings("deprecation")
     @EventHandler(priority = Byte.MAX_VALUE)
     public void reroute(ServerConnectEvent e) {
         Map<String, ServerInfo> servers = new TreeMap<String, ServerInfo>(api.getServers());
@@ -719,6 +720,11 @@ public final class SubPlugin extends BungeeCord implements Listener {
             if (servers.keySet().contains(e.getTarget().getName()) && e.getTarget() != servers.get(e.getTarget().getName())) {
                 e.setTarget(servers.get(e.getTarget().getName()));
             }
+        }
+
+        if (!e.getTarget().canAccess(e.getPlayer())) {
+            e.setCancelled(true);
+            e.getPlayer().sendMessage(getTranslation("no_server_permission"));
         }
     }
 
