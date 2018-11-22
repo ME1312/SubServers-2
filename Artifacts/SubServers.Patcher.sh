@@ -5,7 +5,7 @@
 #  -> BungeeCord and SubServers.Sync
 #  -> GalaxiEngine and SubServers.Host
 #
-# Usage: "bash SubServers.Bungee.Patcher.sh <Platform.jar> <SubServers.jar>"
+# Usage: "bash SubServers.Patcher.sh <Platform.jar> <SubServers.jar>"
 #
 #!/usr/bin/env bash
 if [ -z "$1" ]
