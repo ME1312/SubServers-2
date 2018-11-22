@@ -434,7 +434,7 @@ public class DefaultUIHandler implements UIHandler, Listener {
      * @param event Event
      */
     @SuppressWarnings("deprecation")
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.LOWEST)
     public void input(org.bukkit.event.player.PlayerChatEvent event) {
         if (!event.isCancelled() && enabled && input.keySet().contains(event.getPlayer().getUniqueId())) {
             YAMLSection data = new YAMLSection();
@@ -450,7 +450,7 @@ public class DefaultUIHandler implements UIHandler, Listener {
      *
      * @param event Event
      */
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.LOWEST)
     public void input(PlayerCommandPreprocessEvent event) {
         if (!event.isCancelled() && enabled && input.keySet().contains(event.getPlayer().getUniqueId())) {
             YAMLSection data = new YAMLSection();
