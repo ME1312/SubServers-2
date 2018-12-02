@@ -244,7 +244,7 @@ public final class ExHost {
             }
         } catch (Exception e) {
             log.error.println(e);
-            engine.stop();
+            engine.stop(1);
         }
     }
 

@@ -253,7 +253,8 @@ public final class SubPlugin extends BungeeCord implements Listener {
 
         if (!e.getTarget().canAccess(e.getPlayer())) {
             e.setCancelled(true);
-            e.getPlayer().sendMessage(getTranslation("no_server_permission"));
+            if (e.getPlayer().getServer() != null) e.getPlayer().sendMessage(getTranslation("no_server_permission"));
+            else e.getPlayer().disconnect(getTranslation("no_server_permission"));
         }
     }
 
