@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>net.ME1312.SubServers</groupId>
-    <artifactId>SubServers.Client.Combo</artifactId>
+    <artifactId>SubServers.Client.Universal</artifactId>
     <version>-PLACEHOLDER</version>
     <packaging>jar</packaging>
 

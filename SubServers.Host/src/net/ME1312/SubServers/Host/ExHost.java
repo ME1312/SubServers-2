@@ -2,6 +2,8 @@ package net.ME1312.SubServers.Host;
 
 import com.dosse.upnp.UPnP;
 import net.ME1312.Galaxi.Engine.GalaxiEngine;
+import net.ME1312.Galaxi.Engine.GalaxiOption;
+import net.ME1312.Galaxi.Event.GalaxiReloadEvent;
 import net.ME1312.Galaxi.Library.Config.YAMLConfig;
 import net.ME1312.Galaxi.Library.Config.YAMLSection;
 import net.ME1312.Galaxi.Library.Log.Logger;
@@ -12,7 +14,6 @@ import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.Galaxi.Library.Version.VersionType;
 import net.ME1312.Galaxi.Plugin.Plugin;
 import net.ME1312.Galaxi.Plugin.PluginInfo;
-import net.ME1312.SubServers.Host.Event.SubReloadEvent;
 import net.ME1312.SubServers.Host.Executable.SubCreator;
 import net.ME1312.SubServers.Host.Executable.SubServer;
 import net.ME1312.SubServers.Host.Library.*;
@@ -268,7 +269,7 @@ public final class ExHost {
                 InetAddress.getByName(config.get().getSection("Settings").getSection("SubData").getString("Address", "127.0.0.1:4391").split(":")[0]),
                 Integer.parseInt(config.get().getSection("Settings").getSection("SubData").getString("Address", "127.0.0.1:4391").split(":")[1]), cipher);
 
-        engine.getPluginManager().executeEvent(new SubReloadEvent(this));
+        engine.getPluginManager().executeEvent(new GalaxiReloadEvent(engine));
     }
 
     private void loadDefaults() {

@@ -8,8 +8,8 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>Combo</module>
         <module>Bukkit</module>
         <module>Sponge</module>
+        <module>Universal</module>
     </modules>
 </project>
