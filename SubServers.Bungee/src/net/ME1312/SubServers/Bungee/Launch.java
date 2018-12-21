@@ -22,7 +22,7 @@ public final class Launch {
      * @param args Launch Arguments
      * @throws Exception
      */
-    @SuppressWarnings("deprecation")
+    @SuppressWarnings({"deprecation", "unchecked"})
     public static void main(String[] args) throws Exception {
         System.setProperty("apple.laf.useScreenMenuBar", "true");
 
@@ -140,7 +140,6 @@ public final class Launch {
                             }
                         }
                     } catch (NoSuchMethodError | NoSuchMethodException e) {
-                        plugin.canSudo = false;
                         plugin.getLogger().warning("Standard BungeeCord console not found; Console commands may now be disabled.");
                     }
                 }
