@@ -135,7 +135,6 @@ public final class ConsoleWindow implements SubLogFilter {
             @Override
             public void actionPerformed(ActionEvent event) {
                 log.setText(RESET_VALUE);
-                ConsoleWindow.this.loadContent();
             }
         });
         menu.add(item);
@@ -249,7 +248,6 @@ public final class ConsoleWindow implements SubLogFilter {
             public void actionPerformed(ActionEvent event) {
                 ansi = ((AbstractButton) event.getSource()).getModel().isSelected();
                 log.setText(RESET_VALUE);
-                ConsoleWindow.this.loadContent();
             }
         });
         menu.add(item);
@@ -517,7 +515,6 @@ public final class ConsoleWindow implements SubLogFilter {
 
         logger.registerFilter(this);
         log.setText(RESET_VALUE);
-        loadContent();
         KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(keys);
         if (logger.isLogging() && !open) open();
     }
@@ -526,32 +523,6 @@ public final class ConsoleWindow implements SubLogFilter {
         hScroll.setMinimum(vScroll.getHorizontalScrollBar().getMinimum());
         hScroll.setVisibleAmount(vScroll.getHorizontalScrollBar().getVisibleAmount());
         hScroll.setVisible(input.isVisible() && hScroll.getVisibleAmount() < hScroll.getMaximum());
-    }
-
-    private void loadContent() {
-        LinkedList<Object> list = new LinkedList<Object>();
-        list.addAll(logger.getMessageHistory());
-        if (logger.getHandler() instanceof SubServer) list.addAll(((SubServer) logger.getHandler()).getCommandHistory());
-
-        Collections.sort(list, new Comparator<Object>() {
-            @Override
-            public int compare(Object A, Object B) {
-                Date a = null, b = null;
-
-                if (A instanceof SubLogger.LogMessage) a = ((SubLogger.LogMessage) A).getDate();
-                if (A instanceof SubServer.LoggedCommand) a = ((SubServer.LoggedCommand) A).getDate();
-
-                if (B instanceof SubLogger.LogMessage) b = ((SubLogger.LogMessage) B).getDate();
-                if (B instanceof SubServer.LoggedCommand) b = ((SubServer.LoggedCommand) B).getDate();
-
-                return (a == null || b == null) ? 0 : a.compareTo(b);
-            }
-        });
-        for (Object obj : list) {
-            if (obj instanceof SubLogger.LogMessage) log(((SubLogger.LogMessage) obj).getDate(), ((SubLogger.LogMessage) obj).getLevel(), ((SubLogger.LogMessage) obj).getMessage());
-            if (obj instanceof SubServer.LoggedCommand) log(((SubServer.LoggedCommand) obj).getDate(), '<' + ((((SubServer.LoggedCommand) obj).getSender() == null)?"CONSOLE":((ProxyServer.getInstance().getPlayer(((SubServer.LoggedCommand) obj).getSender()) == null)?((SubServer.LoggedCommand) obj).getSender().toString():ProxyServer.getInstance().getPlayer(((SubServer.LoggedCommand) obj).getSender()).getName())) + "> /" + ((SubServer.LoggedCommand) obj).getCommand());
-        }
-        hScroll();
     }
 
     public SubLogger getLogger() {

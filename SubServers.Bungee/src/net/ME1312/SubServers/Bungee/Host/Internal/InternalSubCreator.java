@@ -109,7 +109,7 @@ public class InternalSubCreator extends SubCreator {
             }
 
             if (template.getBuildOptions().contains("Shell-Location")) {
-                String gitBash = InternalSubCreator.this.gitBash + ((InternalSubCreator.this.gitBash.endsWith(File.separator)) ? "" : File.separator) + "bin" + File.separatorChar + "bash.exe";
+                String gitBash = InternalSubCreator.this.gitBash + ((InternalSubCreator.this.gitBash.endsWith(File.separator)) ? "" : File.separator) + "bin" + File.separatorChar + "sh.exe";
                 File cache;
                 if (template.getBuildOptions().getBoolean("Use-Cache", true)) {
                     cache = new UniversalFile(host.plugin.dir, "SubServers:Cache:Templates:" + template.getName());

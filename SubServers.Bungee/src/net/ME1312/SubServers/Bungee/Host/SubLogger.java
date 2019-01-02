@@ -11,81 +11,6 @@ import java.util.logging.Level;
  * SubLogger Layout Class
  */
 public abstract class SubLogger {
-    /**
-     * Log Message Storage Class
-     */
-    public static class LogMessage {
-        private Date date;
-        private Level level;
-        private String message;
-
-        /**
-         * Store a Message
-         *
-         * @param message Message
-         */
-        public LogMessage(String message) {
-            if (Util.isNull(message)) throw new NullPointerException();
-            this.date = Calendar.getInstance().getTime();
-            this.level = Level.INFO;
-            this.message = message;
-        }
-
-        /**
-         * Store a Message
-         *
-         * @param level Log Level
-         * @param message Message
-         */
-        public LogMessage(Level level, String message) {
-            if (Util.isNull(level, message)) throw new NullPointerException();
-            this.date = Calendar.getInstance().getTime();
-            this.level = level;
-            this.message = message;
-        }
-
-        /**
-         * Store a Message
-         *
-         * @param date Date
-         * @param level Log Level
-         * @param message Message
-         */
-        public LogMessage(Date date, Level level, String message) {
-            if (Util.isNull(date, level, message)) throw new NullPointerException();
-            this.date = date;
-            this.level = level;
-            this.message = message;
-        }
-
-        /**
-         * Get the date this message was logged
-         *
-         * @return Date
-         */
-        public Date getDate() {
-            return date;
-        }
-
-        /**
-         * Get the level this message was logged on
-         *
-         * @return Log Level
-         */
-        public Level getLevel() {
-            return level;
-        }
-
-        /**
-         * Get the message
-         *
-         * @return Message
-         */
-        public String getMessage() {
-            return message;
-        }
-    }
-
 
     /**
      * Gets the Name of the task logging
@@ -117,13 +42,6 @@ public abstract class SubLogger {
      * @return Logging Status
      */
     public abstract boolean isLogging();
-
-    /**
-     * Gets a list of all the messages logged by this logger
-     *
-     * @return Log Messages (named by log level)
-     */
-    public abstract List<LogMessage> getMessageHistory();
 
     /**
      * Register Filter

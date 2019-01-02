@@ -30,7 +30,6 @@ public class ExternalSubLogger extends SubLogger {
     protected String name;
     protected Container<Boolean> log;
     private List<SubLogFilter> filters = new ArrayList<SubLogFilter>();
-    private List<LogMessage> messages = new LinkedList<LogMessage>();
     protected File file;
     private PrintWriter writer = null;
     private boolean started = false;
@@ -130,9 +129,6 @@ public class ExternalSubLogger extends SubLogger {
             // Log to CONSOLE
             if (allow) ProxyServer.getInstance().getLogger().log(level, name + " > " + msg);
 
-            // Log to MEMORY
-            messages.add(new LogMessage(level, msg));
-
             // Log to FILE
             if (writer != null) {
                 writer.println(line);
@@ -166,7 +162,6 @@ public class ExternalSubLogger extends SubLogger {
             } catch (Throwable e) {
                 new InvocationTargetException(e, "Exception while running SubLogger Event").printStackTrace();
             }
-            messages.clear();
             if (writer != null) {
                 PrintWriter writer = this.writer;
                 this.writer = null;
@@ -192,10 +187,5 @@ public class ExternalSubLogger extends SubLogger {
     @Override
     public boolean isLogging() {
         return log.get();
-    }
-
-    @Override
-    public List<LogMessage> getMessageHistory() {
-        return new LinkedList<LogMessage>(messages);
     }
 }
