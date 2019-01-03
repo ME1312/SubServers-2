@@ -125,6 +125,9 @@ public class InternalSubLogger extends SubLogger {
                         writer.println(line);
                         writer.flush();
                     }
+
+                    gc++;
+                    gc();
                 }
             }
         } catch (IOException e) {} finally {

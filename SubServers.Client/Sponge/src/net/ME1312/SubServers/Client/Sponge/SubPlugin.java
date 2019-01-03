@@ -46,7 +46,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * SubServers Client Plugin Class
  */
-@Plugin(id = "subservers-client-sponge", name = "SubServers-Client-Sponge", authors = "ME1312", version = "2.13.2b", url = "https://github.com/ME1312/SubServers-2", description = "Access your SubServers from Anywhere")
+@Plugin(id = "subservers-client-sponge", name = "SubServers-Client-Sponge", authors = "ME1312", version = "2.13.2c", url = "https://github.com/ME1312/SubServers-2", description = "Access your SubServers from Anywhere")
 public final class SubPlugin {
     protected NamedContainer<Long, Map<String, Map<String, String>>> lang = null;
     public YAMLConfig config;

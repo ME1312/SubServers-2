@@ -17,6 +17,7 @@ import java.util.regex.Pattern;
  * Internal Process Logger Class
  */
 public class SubLogger {
+    public static final int MAX_GC = Integer.getInteger("subservers.logging.max_gc", 4096);
     protected Process process;
     private Object handle;
     protected final Logger logger;
@@ -47,6 +48,17 @@ public class SubLogger {
         this.address = address;
         this.log = log;
         this.file = file;
+    }
+
+    private static boolean gc_running = false;
+    private static int gc = 0;
+    private static void gc() {
+        if (!gc_running && MAX_GC > 0 && gc >= MAX_GC) {
+            gc_running = true;
+            System.gc();
+            gc = 0;
+            gc_running = false;
+        }
     }
 
     /**
@@ -116,6 +128,9 @@ public class SubLogger {
                         writer.println(line);
                         writer.flush();
                     }
+
+                    gc++;
+                    gc();
                 }
             }
         } catch (IOException e) {} finally {

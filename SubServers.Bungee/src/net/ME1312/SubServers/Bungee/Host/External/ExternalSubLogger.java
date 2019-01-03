@@ -134,6 +134,9 @@ public class ExternalSubLogger extends SubLogger {
                 writer.println(line);
                 writer.flush();
             }
+
+            gc++;
+            gc();
         }
     }
 

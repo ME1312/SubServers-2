@@ -34,7 +34,7 @@ import java.util.jar.Manifest;
 /**
  * SubServers.Host Main Class
  */
-@Plugin(name = "SubServers.Host", version = "2.13.2b", authors = "ME1312", description = "Host SubServers from other Machines", website = "https://github.com/ME1312/SubServers-2")
+@Plugin(name = "SubServers.Host", version = "2.13.2c", authors = "ME1312", description = "Host SubServers from other Machines", website = "https://github.com/ME1312/SubServers-2")
 public final class ExHost {
     protected NamedContainer<Long, Map<String, Map<String, String>>> lang = null;
     public HashMap<String, SubCreator.ServerTemplate> templates = new HashMap<String, SubCreator.ServerTemplate>();

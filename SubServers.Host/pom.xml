@@ -20,7 +20,7 @@
         <dependency>
             <groupId>net.ME1312.Galaxi</groupId>
             <artifactId>GalaxiEngine</artifactId>
-            <version>18w51a</version>
+            <version>19w01a</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
