@@ -17,13 +17,13 @@ public class Executable {
      */
     public static String[] parse(String gitbash, String exec) {
         String[] cmd;
-        if (System.getProperty("os.name").toLowerCase().indexOf("win") >= 0) {
+        if (System.getProperty("os.name").toLowerCase().startsWith("windows")) {
             if (gitbash != null && (exec.startsWith("bash ") || exec.startsWith("sh ")))
-                exec = "\"" + gitbash + ((gitbash.endsWith(File.separator))?"":File.separator) + "bin" + File.separatorChar + "sh.exe\" -lic \"" +
+                exec = "\"" + gitbash + ((gitbash.endsWith(File.separator))?"":File.separator) + "bin" + File.separatorChar + "sh.exe\" -lc \"" +
                         exec.replace("\\", "/\\").replace("\"", "\\\"").replace("^", "^^").replace("%", "^%").replace("&", "^&").replace("<", "^<").replace(">", "^>").replace("|", "^|") + "\"";
             cmd = new String[]{"cmd.exe", "/q", "/c", '"'+exec+'"'};
         } else {
-            cmd = new String[]{"sh", "-lic", exec};
+            cmd = new String[]{"sh", "-lc", exec};
         }
         return cmd;
     }

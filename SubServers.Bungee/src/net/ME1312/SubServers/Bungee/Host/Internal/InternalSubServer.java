@@ -15,6 +15,7 @@ import net.md_5.bungee.BungeeServerInfo;
 
 import java.io.*;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -220,6 +221,11 @@ public class InternalSubServer extends SubServerContainer {
             host.plugin.getPluginManager().callEvent(event);
             if (!event.isCancelled()) {
                 allowrestart = false;
+                if (process != null && process.isAlive() && System.getProperty("os.name").toLowerCase().startsWith("windows")) try {
+                    Process terminator = Runtime.getRuntime().exec(new String[]{"taskkill", "/T", "/F", "/PID", Long.toString((long) Process.class.getDeclaredMethod("pid").invoke(process))});
+                    terminator.waitFor();
+                    if (terminator.exitValue() != 0) throw new IllegalStateException("taskkill exited with code " + terminator.exitValue());
+                } catch (Exception e) {}
                 if (process != null && process.isAlive()) process.destroyForcibly();
                 return true;
             } else return false;
