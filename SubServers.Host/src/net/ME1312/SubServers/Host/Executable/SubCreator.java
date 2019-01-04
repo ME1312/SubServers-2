@@ -259,7 +259,6 @@ public class SubCreator {
             }
 
             if (template.getBuildOptions().contains("Shell-Location")) {
-                String gitBash = host.host.getRawString("Git-Bash") + ((host.host.getRawString("Git-Bash").endsWith(File.separator)) ? "" : File.separator) + "bin" + File.separatorChar + "sh.exe";
                 File cache;
                 if (template.getBuildOptions().getBoolean("Use-Cache", true)) {
                     cache = new UniversalFile(GalaxiEngine.getInstance().getRuntimeDirectory(), "Cache:Templates:" + template.getName());
@@ -267,7 +266,12 @@ public class SubCreator {
                 } else {
                     cache = null;
                 }
-                if (!(System.getProperty("os.name").toLowerCase().indexOf("win") >= 0) && template.getBuildOptions().contains("Permission")) {
+
+                String command = "bash " + template.getBuildOptions().getRawString("Shell-Location") + ' ' + version.toString() + ((cache == null)?"":" \""+cache.toString().replace(File.separatorChar, '/')+'\"');
+                if (System.getProperty("os.name").toLowerCase().indexOf("win") >= 0) {
+                    String bash = host.host.getRawString("Git-Bash") + ((host.host.getRawString("Git-Bash").endsWith(File.separator))?"":File.separator) + "bin" + File.separatorChar + "sh.exe";
+                    command = "cmd.exe /c \"\"" + bash + "\" --login -i -c \"" + command.replace("\"", "\\\"") + "\"\"";
+                } else if (template.getBuildOptions().contains("Permission")) {
                     try {
                         Process process = Runtime.getRuntime().exec("chmod " + template.getBuildOptions().getRawString("Permission") + ' ' + template.getBuildOptions().getRawString("Shell-Location"), null, dir);
                         Thread.sleep(500);
@@ -285,7 +289,7 @@ public class SubCreator {
                 try {
                     log.logger.info.println("Launching " + template.getBuildOptions().getRawString("Shell-Location"));
                     host.subdata.sendPacket(new PacketOutExLogMessage(address, "Launching " + template.getBuildOptions().getRawString("Shell-Location")));
-                    process = Runtime.getRuntime().exec((System.getProperty("os.name").toLowerCase().indexOf("win") >= 0)?"cmd.exe /c \"\"" + gitBash + "\" --login -i -c \"bash " + template.getBuildOptions().getRawString("Shell-Location") + ' ' + version.toString() + ' ' + ((cache == null)?':':cache.toString().replace('\\', '/').replace(" ", "\\ ")) + "\"\"":("bash " + template.getBuildOptions().getRawString("Shell-Location") + ' ' + version.toString() + ' ' + ((cache == null)?':':cache.toString().replace(" ", "\\ "))), null, dir);
+                    process = Runtime.getRuntime().exec(command, null, dir);
                     log.file = new File(dir, "SubCreator-" + template.getName() + "-" + version.toString().replace(" ", "@") + ".log");
                     log.process = process;
                     log.start();

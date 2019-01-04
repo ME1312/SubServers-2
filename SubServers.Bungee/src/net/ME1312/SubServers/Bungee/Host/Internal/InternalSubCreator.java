@@ -109,7 +109,6 @@ public class InternalSubCreator extends SubCreator {
             }
 
             if (template.getBuildOptions().contains("Shell-Location")) {
-                String gitBash = InternalSubCreator.this.gitBash + ((InternalSubCreator.this.gitBash.endsWith(File.separator)) ? "" : File.separator) + "bin" + File.separatorChar + "sh.exe";
                 File cache;
                 if (template.getBuildOptions().getBoolean("Use-Cache", true)) {
                     cache = new UniversalFile(host.plugin.dir, "SubServers:Cache:Templates:" + template.getName());
@@ -117,7 +116,12 @@ public class InternalSubCreator extends SubCreator {
                 } else {
                     cache = null;
                 }
-                if (!(System.getProperty("os.name").toLowerCase().indexOf("win") >= 0) && template.getBuildOptions().contains("Permission")) {
+
+                String command = "bash " + template.getBuildOptions().getRawString("Shell-Location") + ' ' + version.toString() + ((cache == null)?"":" \""+cache.toString().replace(File.separatorChar, '/')+'\"');
+                if (System.getProperty("os.name").toLowerCase().indexOf("win") >= 0) {
+                    String bash = InternalSubCreator.this.gitBash + ((InternalSubCreator.this.gitBash.endsWith(File.separator))?"":File.separator) + "bin" + File.separatorChar + "sh.exe";
+                    command = "cmd.exe /c \"\"" + bash + "\" --login -i -c \"" + command.replace("\"", "\\\"") + "\"\"";
+                } else if (template.getBuildOptions().contains("Permission")) {
                     try {
                         Process process = Runtime.getRuntime().exec("chmod " + template.getBuildOptions().getRawString("Permission") + ' ' + template.getBuildOptions().getRawString("Shell-Location"), null, dir);
                         Thread.sleep(500);
@@ -132,7 +136,7 @@ public class InternalSubCreator extends SubCreator {
 
                 try {
                     System.out.println(name + File.separator + "Creator > Launching " + template.getBuildOptions().getRawString("Shell-Location"));
-                    process = Runtime.getRuntime().exec((System.getProperty("os.name").toLowerCase().indexOf("win") >= 0)?"cmd.exe /c \"\"" + gitBash + "\" --login -i -c \"bash " + template.getBuildOptions().getRawString("Shell-Location") + ' ' + version.toString() + ' ' + ((cache == null)?':':cache.toString().replace('\\', '/').replace(" ", "\\ ")) + "\"\"":("bash " + template.getBuildOptions().getRawString("Shell-Location") + ' ' + version.toString() + ' ' + ((cache == null)?':':cache.toString().replace(" ", "\\ "))), null, dir);
+                    process = Runtime.getRuntime().exec(command, null, dir);
                     log.log.set(host.plugin.config.get().getSection("Settings").getBoolean("Log-Creator"));
                     log.file = new File(dir, "SubCreator-" + template.getName() + "-" + version.toString().replace(" ", "@") + ".log");
                     log.process = process;
