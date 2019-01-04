@@ -1,6 +1,5 @@
 package net.ME1312.SubServers.Bungee.Network.Packet;
 
-import net.ME1312.SubServers.Bungee.Host.Executable;
 import net.ME1312.SubServers.Bungee.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Bungee.Library.Callback;
 import net.ME1312.SubServers.Bungee.Library.Util;
@@ -22,7 +21,7 @@ public class PacketExAddServer implements PacketIn, PacketOut {
     private int port;
     private boolean log;
     private String directory;
-    private Executable executable;
+    private String executable;
     private String stopcmd;
     private UUID running;
     private String id;
@@ -42,7 +41,7 @@ public class PacketExAddServer implements PacketIn, PacketOut {
      * @param executable Executable
      */
     @SafeVarargs
-    public PacketExAddServer(String name, boolean enabled, int port, boolean log, String directory, Executable executable, String stopcmd, UUID running, Callback<YAMLSection>... callback) {
+    public PacketExAddServer(String name, boolean enabled, int port, boolean log, String directory, String executable, String stopcmd, UUID running, Callback<YAMLSection>... callback) {
         if (Util.isNull(name, enabled, log, directory, executable, callback)) throw new NullPointerException();
         this.name = name;
         this.enabled = enabled;
@@ -66,7 +65,7 @@ public class PacketExAddServer implements PacketIn, PacketOut {
         server.set("port", port);
         server.set("log", log);
         server.set("dir", directory);
-        server.set("exec", executable.toString());
+        server.set("exec", executable);
         server.set("stopcmd", stopcmd);
         if (running != null) server.set("running", running.toString());
         data.set("server", server);

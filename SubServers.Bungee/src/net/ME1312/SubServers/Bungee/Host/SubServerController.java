@@ -124,7 +124,7 @@ public abstract class SubServerController {
             }
 
             @Override
-            public Executable getExecutable() {
+            public String getExecutable() {
                 return SubServerController.this.getExecutable();
             }
 
@@ -323,7 +323,7 @@ public abstract class SubServerController {
      *
      * @return Executable String
      */
-    public abstract Executable getExecutable();
+    public abstract String getExecutable();
 
     /**
      * Grab the Command to Stop the Server

@@ -1,75 +1,30 @@
 package net.ME1312.SubServers.Bungee.Host;
 
-import net.ME1312.SubServers.Bungee.Library.Util;
-
 import java.io.File;
-import java.io.Serializable;
 
 /**
- * Executable Variable Class
+ * Executable String Handler Class
  */
-@SuppressWarnings("serial")
-public class Executable implements Serializable {
-    private boolean isFile;
-    private File File;
-    private String Str;
+public class Executable {
+    private Executable() {}
+
     /**
-     * New Executable
+     * Format a command to be executed
      *
-     * @param exe Executable String or File Path
+     * @param gitbash Git Bash location (optional)
+     * @param exec Executable String
+     * @return
      */
-    public Executable(String exe) {
-        if (Util.isNull(exe)) throw new NullPointerException();
-        if (new File(exe).exists()) {
-            isFile = true;
-            File = new File(exe);
-            Str = exe;
+    public static String[] parse(String gitbash, String exec) {
+        String[] cmd;
+        if (System.getProperty("os.name").toLowerCase().indexOf("win") >= 0) {
+            if (gitbash != null && (exec.startsWith("bash ") || exec.startsWith("sh ")))
+                exec = "\"" + gitbash + ((gitbash.endsWith(File.separator))?"":File.separator) + "bin" + File.separatorChar + "sh.exe\" -lic \"" +
+                        exec.replace("\\", "/\\").replace("\"", "\\\"").replace("^", "^^").replace("%", "^%").replace("&", "^&").replace("<", "^<").replace(">", "^>").replace("|", "^|") + "\"";
+            cmd = new String[]{"cmd.exe", "/q", "/c", '"'+exec+'"'};
         } else {
-            isFile = false;
-            File = null;
-            Str = exe;
+            cmd = new String[]{"sh", "-lic", exec};
         }
+        return cmd;
     }
-
-    /**
-     * New Executable
-     *
-     * @param path File Path
-     */
-    public Executable(File path) {
-        if (Util.isNull(path)) throw new NullPointerException();
-        isFile = true;
-        File = path;
-        Str = path.toString();
-    }
-
-    @Override
-    public String toString() {
-        String String;
-        if (isFile) {
-            String = File.toString();
-        } else {
-            String = Str;
-        }
-        return String;
-    }
-
-    /**
-     * Check if the Executable String is a file
-     *
-     * @return File Status
-     */
-    public boolean isFile() {
-        return isFile;
-    }
-
-    /**
-     * Get Executable File
-     *
-     * @return File or Null if Executable isn't a file
-     */
-    public File toFile() {
-        return File;
-    }
-
 }

@@ -26,7 +26,7 @@ public class SubServer {
     private Container<Boolean> log;
     private String dir;
     private File directory;
-    private Executable executable;
+    private String executable;
     private Process process;
     private SubLogger logger;
     private Thread thread;
@@ -47,7 +47,7 @@ public class SubServer {
      * @param stopcmd Stop Command
      * @throws InvalidServerException
      */
-    public SubServer(ExHost host, String name, boolean enabled, int port, boolean log, String directory, Executable executable, String stopcmd) throws InvalidServerException {
+    public SubServer(ExHost host, String name, boolean enabled, int port, boolean log, String directory, String executable, String stopcmd) throws InvalidServerException {
         if (Util.isNull(host, name, enabled, log, directory, executable)) throw new NullPointerException();
         this.host = host;
         this.name = name;
@@ -107,7 +107,7 @@ public class SubServer {
         boolean falsestart = true;
         allowrestart = true;
         try {
-            process = Runtime.getRuntime().exec(executable.toString(), null, directory);
+            process = Runtime.getRuntime().exec(Executable.parse(host.host.getRawString("Git-Bash"), executable), null, directory);
             falsestart = false;
             host.log.info.println("Now starting " + name);
             logger.process = process;

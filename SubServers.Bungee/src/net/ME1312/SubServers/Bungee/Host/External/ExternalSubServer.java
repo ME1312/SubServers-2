@@ -28,7 +28,7 @@ public class ExternalSubServer extends SubServerContainer {
     private boolean enabled;
     private Container<Boolean> log;
     private String dir;
-    protected Executable exec;
+    protected String exec;
     private String stopcmd;
     private StopAction stopaction;
     private LinkedList<LoggedCommand> history;
@@ -52,7 +52,7 @@ public class ExternalSubServer extends SubServerContainer {
      * @param restricted Restricted Status
      * @throws InvalidServerException
      */
-    public ExternalSubServer(ExternalHost host, String name, boolean enabled, int port, String motd, boolean log, String directory, Executable executable, String stopcmd, boolean hidden, boolean restricted) throws InvalidServerException {
+    public ExternalSubServer(ExternalHost host, String name, boolean enabled, int port, String motd, boolean log, String directory, String executable, String stopcmd, boolean hidden, boolean restricted) throws InvalidServerException {
         super(host, name, port, motd, hidden, restricted);
         if (Util.isNull(host, name, enabled, port, motd, log, stopcmd, hidden, restricted)) throw new NullPointerException();
         this.host = host;
@@ -319,7 +319,7 @@ public class ExternalSubServer extends SubServerContainer {
                         case "exec":
                             if (value.isString() && host.removeSubServer(player, getName())) {
                                 waitFor(() -> host.getSubServer(getName()), null);
-                                SubServer server = host.addSubServer(player, getName(), isEnabled(), getAddress().getPort(), getMotd(), isLogging(), getPath(), new Executable(value.asRawString()), getStopCommand(), isHidden(), isRestricted());
+                                SubServer server = host.addSubServer(player, getName(), isEnabled(), getAddress().getPort(), getMotd(), isLogging(), getPath(), value.asRawString(), getStopCommand(), isHidden(), isRestricted());
                                 if (server != null) {
                                     if (this.host.plugin.config.get().getSection("Servers").getKeys().contains(getName())) {
                                         this.host.plugin.config.get().getSection("Servers").getSection(getName()).set("Executable", value.asRawString());
@@ -506,7 +506,7 @@ public class ExternalSubServer extends SubServerContainer {
     }
 
     @Override
-    public Executable getExecutable() {
+    public String getExecutable() {
         return exec;
     }
 

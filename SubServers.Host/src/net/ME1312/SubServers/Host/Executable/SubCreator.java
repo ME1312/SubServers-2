@@ -202,6 +202,7 @@ public class SubCreator {
         private YAMLSection build(File dir, ServerTemplate template, List<ServerTemplate> history) throws SubCreatorException {
             YAMLSection server = new YAMLSection();
             Version version = this.version;
+            List<String> args = new LinkedList<String>();
             boolean error = false;
             if (history.contains(template)) throw new IllegalStateException("Template Import loop detected");
             history.add(template);
@@ -228,31 +229,37 @@ public class SubCreator {
                 log.logger.info.println("Loading Template: " + template.getDisplayName());
                 host.subdata.sendPacket(new PacketOutExLogMessage(address, "Loading Template: " + template.getDisplayName()));
                 Util.copyDirectory(template.getDirectory(), dir);
-                if (template.getType() == ServerType.FORGE || template.getType() == ServerType.SPONGE) {
-                    log.logger.info.println("Searching Versions...");
-                    host.subdata.sendPacket(new PacketOutExLogMessage(address, "Searching Versions..."));
-                    YAMLSection spversionmanifest = new YAMLSection(new JSONObject("{\"versions\":" + Util.readAll(new BufferedReader(new InputStreamReader(new URL("https://dl-api.spongepowered.org/v1/org.spongepowered/sponge" + ((template.getType() == ServerType.FORGE)?"forge":"vanilla") + "/downloads?type=stable&minecraft=" + version).openStream(), Charset.forName("UTF-8")))) + '}'));
+                switch (template.getType()) {
+                    case SPONGE:
+                    case FORGE:
+                        log.logger.info.println("Searching Versions...");
+                        host.subdata.sendPacket(new PacketOutExLogMessage(address, "Searching Versions..."));
+                        YAMLSection spversionmanifest = new YAMLSection(new JSONObject("{\"versions\":" + Util.readAll(new BufferedReader(new InputStreamReader(new URL("https://dl-api.spongepowered.org/v1/org.spongepowered/sponge" + ((template.getType() == ServerType.FORGE)?"forge":"vanilla") + "/downloads?type=stable&minecraft=" + version).openStream(), Charset.forName("UTF-8")))) + '}'));
 
-                    YAMLSection spprofile = null;
-                    Version spversion = null;
-                    for (YAMLSection profile : spversionmanifest.getSectionList("versions")) {
-                        if (profile.getSection("dependencies").getRawString("minecraft").equalsIgnoreCase(version.toString()) && (spversion == null || new Version(profile.getRawString("version")).compareTo(spversion) >= 0)) {
-                            spprofile = profile;
-                            spversion = new Version(profile.getRawString("version"));
+                        YAMLSection spprofile = null;
+                        Version spversion = null;
+                        for (YAMLSection profile : spversionmanifest.getSectionList("versions")) {
+                            if (profile.getSection("dependencies").getRawString("minecraft").equalsIgnoreCase(version.toString()) && (spversion == null || new Version(profile.getRawString("version")).compareTo(spversion) >= 0)) {
+                                spprofile = profile;
+                                spversion = new Version(profile.getRawString("version"));
+                            }
                         }
-                    }
-                    if (spversion == null)
-                        throw new InvalidServerException("Cannot find Sponge version for Minecraft " + version.toString());
-                    log.logger.info.println("Found \"sponge" + ((template.getType() == ServerType.FORGE)?"forge":"vanilla") + "-" + spversion.toString() + '"');
-                    host.subdata.sendPacket(new PacketOutExLogMessage(address, "Found \"sponge" + ((template.getType() == ServerType.FORGE)?"forge":"vanilla") + "-" + spversion.toString() + '"'));
+                        if (spversion == null)
+                            throw new InvalidServerException("Cannot find Sponge version for Minecraft " + version.toString());
+                        log.logger.info.println("Found \"sponge" + ((template.getType() == ServerType.FORGE)?"forge":"vanilla") + "-" + spversion.toString() + '"');
+                        host.subdata.sendPacket(new PacketOutExLogMessage(address, "Found \"sponge" + ((template.getType() == ServerType.FORGE)?"forge":"vanilla") + "-" + spversion.toString() + '"'));
 
-                    if (template.getType() == ServerType.FORGE) {
-                        Version mcfversion = new Version(spprofile.getSection("dependencies").getRawString("minecraft") + '-' + spprofile.getSection("dependencies").getRawString("forge"));
-                        log.logger.info.println("Found \"forge-" + mcfversion.toString() + '"');
-                        host.subdata.sendPacket(new PacketOutExLogMessage(address, "Found \"forge-" + mcfversion.toString() + '"'));
+                        if (template.getType() == ServerType.FORGE) {
+                            Version mcfversion = new Version(spprofile.getSection("dependencies").getRawString("minecraft") + '-' + spprofile.getSection("dependencies").getRawString("forge"));
+                            log.logger.info.println("Found \"forge-" + mcfversion.toString() + '"');
+                            host.subdata.sendPacket(new PacketOutExLogMessage(address, "Found \"forge-" + mcfversion.toString() + '"'));
 
-                        version = new Version(mcfversion.toString() + " " + spversion.toString());
-                    } else version = new Version(spversion.toString());
+                            args.add(mcfversion.toString());
+                        }
+                        args.add(spversion.toString());
+                        break;
+                    default:
+                        args.add(version.toString());
                 }
             } catch (Exception e) {
                 log.logger.error.println(e);
@@ -263,15 +270,15 @@ public class SubCreator {
                 if (template.getBuildOptions().getBoolean("Use-Cache", true)) {
                     cache = new UniversalFile(GalaxiEngine.getInstance().getRuntimeDirectory(), "Cache:Templates:" + template.getName());
                     cache.mkdirs();
+                    args.add("\"" + cache.toString().replace(File.separatorChar, '/') + '\"');
                 } else {
                     cache = null;
                 }
 
-                String command = "bash " + template.getBuildOptions().getRawString("Shell-Location") + ' ' + version.toString() + ((cache == null)?"":" \""+cache.toString().replace(File.separatorChar, '/')+'\"');
-                if (System.getProperty("os.name").toLowerCase().indexOf("win") >= 0) {
-                    String bash = host.host.getRawString("Git-Bash") + ((host.host.getRawString("Git-Bash").endsWith(File.separator))?"":File.separator) + "bin" + File.separatorChar + "sh.exe";
-                    command = "cmd.exe /c \"\"" + bash + "\" --login -i -c \"" + command.replace("\"", "\\\"") + "\"\"";
-                } else if (template.getBuildOptions().contains("Permission")) {
+                String command = "bash \"" + template.getBuildOptions().getRawString("Shell-Location") + '\"';
+                for (String arg : args) command += ' ' + arg;
+
+                if (System.getProperty("os.name").toLowerCase().indexOf("win") < 0 && template.getBuildOptions().contains("Permission")) {
                     try {
                         Process process = Runtime.getRuntime().exec("chmod " + template.getBuildOptions().getRawString("Permission") + ' ' + template.getBuildOptions().getRawString("Shell-Location"), null, dir);
                         Thread.sleep(500);
@@ -289,7 +296,7 @@ public class SubCreator {
                 try {
                     log.logger.info.println("Launching " + template.getBuildOptions().getRawString("Shell-Location"));
                     host.subdata.sendPacket(new PacketOutExLogMessage(address, "Launching " + template.getBuildOptions().getRawString("Shell-Location")));
-                    process = Runtime.getRuntime().exec(command, null, dir);
+                    process = Runtime.getRuntime().exec(Executable.parse(host.host.getRawString("Git-Bash"), command), null, dir);
                     log.file = new File(dir, "SubCreator-" + template.getName() + "-" + version.toString().replace(" ", "@") + ".log");
                     log.process = process;
                     log.start();

@@ -31,7 +31,7 @@ public class InternalSubServer extends SubServerContainer {
     private Container<Boolean> log;
     private String dir;
     private File directory;
-    private Executable executable;
+    private String executable;
     private String stopcmd;
     private StopAction stopaction;
     private LinkedList<LoggedCommand> history;
@@ -58,7 +58,7 @@ public class InternalSubServer extends SubServerContainer {
      * @param restricted Restricted Status
      * @throws InvalidServerException
      */
-    public InternalSubServer(InternalHost host, String name, boolean enabled, int port, String motd, boolean log, String directory, Executable executable, String stopcmd, boolean hidden, boolean restricted) throws InvalidServerException {
+    public InternalSubServer(InternalHost host, String name, boolean enabled, int port, String motd, boolean log, String directory, String executable, String stopcmd, boolean hidden, boolean restricted) throws InvalidServerException {
         super(host, name, port, motd, hidden, restricted);
         if (Util.isNull(host, name, enabled, port, motd, log, directory, executable, stopcmd, hidden, restricted)) throw new NullPointerException();
         this.host = host;
@@ -118,7 +118,7 @@ public class InternalSubServer extends SubServerContainer {
     private void run() {
         allowrestart = true;
         try {
-            process = Runtime.getRuntime().exec(executable.toString(), null, directory);
+            process = Runtime.getRuntime().exec(Executable.parse(host.getCreator().getBashDirectory(), executable), null, directory);
             System.out.println("SubServers > Now starting " + getName());
             logger.process = process;
             logger.start();
@@ -394,7 +394,7 @@ public class InternalSubServer extends SubServerContainer {
                                     stop(player);
                                     waitFor();
                                 }
-                                executable = new Executable(value.asRawString());
+                                executable = value.asRawString();
                                 if (this.host.plugin.config.get().getSection("Servers").getKeys().contains(getName())) {
                                     this.host.plugin.config.get().getSection("Servers").getSection(getName()).set("Executable", value.asRawString());
                                     this.host.plugin.config.save();
@@ -570,7 +570,7 @@ public class InternalSubServer extends SubServerContainer {
     }
 
     @Override
-    public Executable getExecutable() {
+    public String getExecutable() {
         return executable;
     }
 

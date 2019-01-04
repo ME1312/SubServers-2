@@ -274,7 +274,7 @@ public interface SubServer extends Server {
      *
      * @return Executable String
      */
-    Executable getExecutable();
+    String getExecutable();
 
     /**
      * Grab the Command to Stop the Server

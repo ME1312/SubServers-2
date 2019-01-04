@@ -419,7 +419,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
                         edits.set("log", config.get().getSection("Servers").getSection(name).getBoolean("Log"));
                     if (!config.get().getSection("Servers").getSection(name).getRawString("Directory").equals(server.getPath()))
                         edits.set("dir", config.get().getSection("Servers").getSection(name).getRawString("Directory"));
-                    if (!new Executable(config.get().getSection("Servers").getSection(name).getRawString("Executable")).toString().equals(server.getExecutable().toString()))
+                    if (!config.get().getSection("Servers").getSection(name).getRawString("Executable").equals(server.getExecutable()))
                         edits.set("exec", config.get().getSection("Servers").getSection(name).getRawString("Executable"));
                     if (!config.get().getSection("Servers").getSection(name).getRawString("Stop-Command").equals(server.getStopCommand()))
                         edits.set("stop-cmd", config.get().getSection("Servers").getSection(name).getRawString("Stop-Command"));
@@ -441,12 +441,12 @@ public final class SubPlugin extends BungeeCord implements Listener {
                             !config.get().getSection("Servers").getSection(name).getString("Host").equalsIgnoreCase(server.getHost().getName()) ||
                             config.get().getSection("Servers").getSection(name).getInt("Port") != server.getAddress().getPort() ||
                             !config.get().getSection("Servers").getSection(name).getRawString("Directory").equals(server.getPath()) ||
-                            !new Executable(config.get().getSection("Servers").getSection(name).getRawString("Executable")).toString().equals(server.getExecutable().toString())
+                            !config.get().getSection("Servers").getSection(name).getRawString("Executable").equals(server.getExecutable())
                             ) {
                             if (server != null) server.getHost().forceRemoveSubServer(name);
                             server = this.hosts.get(config.get().getSection("Servers").getSection(name).getString("Host").toLowerCase()).addSubServer(name, config.get().getSection("Servers").getSection(name).getBoolean("Enabled"),
                                     config.get().getSection("Servers").getSection(name).getInt("Port"), config.get().getSection("Servers").getSection(name).getColoredString("Motd", '&'), config.get().getSection("Servers").getSection(name).getBoolean("Log"),
-                                    config.get().getSection("Servers").getSection(name).getRawString("Directory"), new Executable(config.get().getSection("Servers").getSection(name).getRawString("Executable")), config.get().getSection("Servers").getSection(name).getRawString("Stop-Command"),
+                                    config.get().getSection("Servers").getSection(name).getRawString("Directory"), config.get().getSection("Servers").getSection(name).getRawString("Executable"), config.get().getSection("Servers").getSection(name).getRawString("Stop-Command"),
                                     config.get().getSection("Servers").getSection(name).getBoolean("Hidden"), config.get().getSection("Servers").getSection(name).getBoolean("Restricted"));
                     } else { // Server doesn't need to reset
                         if (config.get().getSection("Servers").getSection(name).getBoolean("Enabled") != server.isEnabled())

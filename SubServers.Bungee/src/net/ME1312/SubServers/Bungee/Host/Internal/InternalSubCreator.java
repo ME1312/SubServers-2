@@ -58,6 +58,7 @@ public class InternalSubCreator extends SubCreator {
         private YAMLSection build(File dir, ServerTemplate template, List<ServerTemplate> history) throws SubCreatorException {
             YAMLSection server = new YAMLSection();
             Version version = this.version;
+            List<String> args = new LinkedList<String>();
             boolean error = false;
             if (history.contains(template)) throw new IllegalStateException("Template Import loop detected");
             history.add(template);
@@ -81,28 +82,34 @@ public class InternalSubCreator extends SubCreator {
             try {
                 System.out.println(name + File.separator + "Creator > Loading Template: " + template.getDisplayName());
                 Util.copyDirectory(template.getDirectory(), dir);
-                if (template.getType() == ServerType.FORGE || template.getType() == ServerType.SPONGE) {
-                    System.out.println(name + File.separator + "Creator > Searching Versions...");
-                    YAMLSection spversionmanifest = new YAMLSection(new Gson().fromJson("{\"versions\":" + Util.readAll(new BufferedReader(new InputStreamReader(new URL("https://dl-api.spongepowered.org/v1/org.spongepowered/sponge" + ((template.getType() == ServerType.FORGE)?"forge":"vanilla") + "/downloads?type=stable&minecraft=" + version).openStream(), Charset.forName("UTF-8")))) + '}', Map.class));
+                switch (template.getType()) {
+                    case SPONGE:
+                    case FORGE:
+                        System.out.println(name + File.separator + "Creator > Searching Versions...");
+                        YAMLSection spversionmanifest = new YAMLSection(new Gson().fromJson("{\"versions\":" + Util.readAll(new BufferedReader(new InputStreamReader(new URL("https://dl-api.spongepowered.org/v1/org.spongepowered/sponge" + ((template.getType() == ServerType.FORGE)?"forge":"vanilla") + "/downloads?type=stable&minecraft=" + version).openStream(), Charset.forName("UTF-8")))) + '}', Map.class));
 
-                    YAMLSection spprofile = null;
-                    Version spversion = null;
-                    for (YAMLSection profile : spversionmanifest.getSectionList("versions")) {
-                        if (profile.getSection("dependencies").getRawString("minecraft").equalsIgnoreCase(version.toString()) && (spversion == null || new Version(profile.getRawString("version")).compareTo(spversion) >= 0)) {
-                            spprofile = profile;
-                            spversion = new Version(profile.getRawString("version"));
+                        YAMLSection spprofile = null;
+                        Version spversion = null;
+                        for (YAMLSection profile : spversionmanifest.getSectionList("versions")) {
+                            if (profile.getSection("dependencies").getRawString("minecraft").equalsIgnoreCase(version.toString()) && (spversion == null || new Version(profile.getRawString("version")).compareTo(spversion) >= 0)) {
+                                spprofile = profile;
+                                spversion = new Version(profile.getRawString("version"));
+                            }
                         }
-                    }
-                    if (spversion == null)
-                        throw new InvalidServerException("Cannot find Sponge version for Minecraft " + version.toString());
-                    System.out.println(name + File.separator + "Creator > Found \"sponge" + ((template.getType() == ServerType.FORGE)?"forge":"vanilla") + "-" + spversion.toString() + '"');
+                        if (spversion == null)
+                            throw new InvalidServerException("Cannot find Sponge version for Minecraft " + version.toString());
+                        System.out.println(name + File.separator + "Creator > Found \"sponge" + ((template.getType() == ServerType.FORGE)?"forge":"vanilla") + "-" + spversion.toString() + '"');
 
-                    if (template.getType() == ServerType.FORGE) {
-                        Version mcfversion = new Version(spprofile.getSection("dependencies").getRawString("minecraft") + '-' + spprofile.getSection("dependencies").getRawString("forge"));
-                        System.out.println(name + File.separator + "Creator > Found \"forge-" + mcfversion.toString() + '"');
+                        if (template.getType() == ServerType.FORGE) {
+                            Version mcfversion = new Version(spprofile.getSection("dependencies").getRawString("minecraft") + '-' + spprofile.getSection("dependencies").getRawString("forge"));
+                            System.out.println(name + File.separator + "Creator > Found \"forge-" + mcfversion.toString() + '"');
 
-                        version = new Version(mcfversion.toString() + " " + spversion.toString());
-                    } else version = new Version(spversion.toString());
+                            args.add(mcfversion.toString());
+                        }
+                        args.add(spversion.toString());
+                        break;
+                    default:
+                        args.add(version.toString());
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -113,15 +120,15 @@ public class InternalSubCreator extends SubCreator {
                 if (template.getBuildOptions().getBoolean("Use-Cache", true)) {
                     cache = new UniversalFile(host.plugin.dir, "SubServers:Cache:Templates:" + template.getName());
                     cache.mkdirs();
+                    args.add('\"' + cache.toString().replace(File.separatorChar, '/') + '\"');
                 } else {
                     cache = null;
                 }
 
-                String command = "bash " + template.getBuildOptions().getRawString("Shell-Location") + ' ' + version.toString() + ((cache == null)?"":" \""+cache.toString().replace(File.separatorChar, '/')+'\"');
-                if (System.getProperty("os.name").toLowerCase().indexOf("win") >= 0) {
-                    String bash = InternalSubCreator.this.gitBash + ((InternalSubCreator.this.gitBash.endsWith(File.separator))?"":File.separator) + "bin" + File.separatorChar + "sh.exe";
-                    command = "cmd.exe /c \"\"" + bash + "\" --login -i -c \"" + command.replace("\"", "\\\"") + "\"\"";
-                } else if (template.getBuildOptions().contains("Permission")) {
+                String command = "bash \"" + template.getBuildOptions().getRawString("Shell-Location") + '\"';
+                for (String arg : args) command += ' ' + arg;
+
+                if (System.getProperty("os.name").toLowerCase().indexOf("win") < 0 && template.getBuildOptions().contains("Permission")) {
                     try {
                         Process process = Runtime.getRuntime().exec("chmod " + template.getBuildOptions().getRawString("Permission") + ' ' + template.getBuildOptions().getRawString("Shell-Location"), null, dir);
                         Thread.sleep(500);
@@ -136,7 +143,7 @@ public class InternalSubCreator extends SubCreator {
 
                 try {
                     System.out.println(name + File.separator + "Creator > Launching " + template.getBuildOptions().getRawString("Shell-Location"));
-                    process = Runtime.getRuntime().exec(command, null, dir);
+                    process = Runtime.getRuntime().exec(Executable.parse(gitBash, command), null, dir);
                     log.log.set(host.plugin.config.get().getSection("Settings").getBoolean("Log-Creator"));
                     log.file = new File(dir, "SubCreator-" + template.getName() + "-" + version.toString().replace(" ", "@") + ".log");
                     log.process = process;
@@ -210,7 +217,7 @@ public class InternalSubCreator extends SubCreator {
                     server.setAll(config);
 
                     SubServer subserver = host.addSubServer(player, name, server.getBoolean("Enabled"), port, server.getColoredString("Motd", '&'), server.getBoolean("Log"), server.getRawString("Directory"),
-                            new Executable(server.getRawString("Executable")), server.getRawString("Stop-Command"), server.getBoolean("Hidden"), server.getBoolean("Restricted"));
+                            server.getRawString("Executable"), server.getRawString("Stop-Command"), server.getBoolean("Hidden"), server.getBoolean("Restricted"));
                     if (server.getString("Display").length() > 0) subserver.setDisplayName(server.getString("Display"));
                     for (String group : server.getStringList("Group")) subserver.addGroup(group);
                     SubServer.StopAction action = Util.getDespiteException(() -> SubServer.StopAction.valueOf(server.getRawString("Stop-Action").toUpperCase().replace('-', '_').replace(' ', '_')), null);
@@ -266,6 +273,7 @@ public class InternalSubCreator extends SubCreator {
         if (Util.isNull(host, gitBash)) throw new NullPointerException();
         this.host = host;
         this.gitBash = (System.getenv("ProgramFiles(x86)") == null)?Pattern.compile("%(ProgramFiles)\\(x86\\)%", Pattern.CASE_INSENSITIVE).matcher(gitBash).replaceAll("%$1%"):gitBash;
+        if (this.gitBash.endsWith(File.pathSeparator)) this.gitBash = this.gitBash.substring(0, this.gitBash.length() - 1);
         this.thread = new TreeMap<String, CreatorTask>();
         reload();
     }

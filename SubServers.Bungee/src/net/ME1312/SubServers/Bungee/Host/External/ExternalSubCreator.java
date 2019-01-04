@@ -110,7 +110,7 @@ public class ExternalSubCreator extends SubCreator {
                             server.setAll(config);
 
                             SubServer subserver = host.addSubServer(player, name, server.getBoolean("Enabled"), fport, server.getColoredString("Motd", '&'), server.getBoolean("Log"), server.getRawString("Directory"),
-                                    new Executable(server.getRawString("Executable")), server.getRawString("Stop-Command"), server.getBoolean("Hidden"), server.getBoolean("Restricted"));
+                                    server.getRawString("Executable"), server.getRawString("Stop-Command"), server.getBoolean("Hidden"), server.getBoolean("Restricted"));
                             if (server.getString("Display").length() > 0) subserver.setDisplayName(server.getString("Display"));
                             for (String group : server.getStringList("Group")) subserver.addGroup(group);
                             SubServer.StopAction action = Util.getDespiteException(() -> SubServer.StopAction.valueOf(server.getRawString("Stop-Action").toUpperCase().replace('-', '_').replace(' ', '_')), null);

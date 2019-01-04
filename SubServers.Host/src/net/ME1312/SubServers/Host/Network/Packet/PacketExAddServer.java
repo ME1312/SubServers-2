@@ -5,7 +5,6 @@ import net.ME1312.Galaxi.Library.Config.YAMLSection;
 import net.ME1312.Galaxi.Library.Log.Logger;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
-import net.ME1312.SubServers.Host.Executable.Executable;
 import net.ME1312.SubServers.Host.Executable.SubServer;
 import net.ME1312.SubServers.Host.Network.PacketIn;
 import net.ME1312.SubServers.Host.Network.PacketOut;
@@ -71,7 +70,7 @@ public class PacketExAddServer implements PacketIn, PacketOut {
                 host.subdata.sendPacket(new PacketExAddServer(0, "Server Already Added", (data.contains("id"))?data.getRawString("id"):null));
             } else {
                 SubServer server = new SubServer(host, data.getSection("server").getRawString("name"), data.getSection("server").getBoolean("enabled"), data.getSection("server").getInt("port"), data.getSection("server").getBoolean("log"),
-                        data.getSection("server").getRawString("dir"), new Executable(data.getSection("server").getRawString("exec")), data.getSection("server").getRawString("stopcmd"));
+                        data.getSection("server").getRawString("dir"), data.getSection("server").getRawString("exec"), data.getSection("server").getRawString("stopcmd"));
                 host.servers.put(data.getSection("server").getRawString("name").toLowerCase(), server);
                 if (UPnP.isUPnPAvailable() && host.config.get().getSection("Settings").getSection("UPnP", new YAMLSection()).getBoolean("Forward-Servers", false)) UPnP.openPortTCP(server.getPort());
                 log.info.println("Added SubServer: " + data.getSection("server").getRawString("name"));

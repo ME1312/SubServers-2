@@ -3,7 +3,6 @@ package net.ME1312.SubServers.Bungee.Host.Internal;
 import com.dosse.upnp.UPnP;
 import net.ME1312.SubServers.Bungee.Event.SubAddServerEvent;
 import net.ME1312.SubServers.Bungee.Event.SubRemoveServerEvent;
-import net.ME1312.SubServers.Bungee.Host.Executable;
 import net.ME1312.SubServers.Bungee.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Bungee.Library.Exception.InvalidServerException;
 import net.ME1312.SubServers.Bungee.Host.Host;
@@ -98,7 +97,7 @@ public class InternalHost extends Host {
     }
 
     @Override
-    public SubServer addSubServer(UUID player, String name, boolean enabled, int port, String motd, boolean log, String directory, Executable executable, String stopcmd, boolean hidden, boolean restricted) throws InvalidServerException {
+    public SubServer addSubServer(UUID player, String name, boolean enabled, int port, String motd, boolean log, String directory, String executable, String stopcmd, boolean hidden, boolean restricted) throws InvalidServerException {
         if (plugin.api.getServers().keySet().contains(name.toLowerCase())) throw new InvalidServerException("A Server already exists with this name!");
         SubServer server = new InternalSubServer(this, name, enabled, port, motd, log, directory, executable, stopcmd, hidden, restricted);
         SubAddServerEvent event = new SubAddServerEvent(player, this, server);
