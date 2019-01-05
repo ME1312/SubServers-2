@@ -7,6 +7,7 @@ import net.ME1312.SubServers.Bungee.Library.Version.Version;
 import net.ME1312.SubServers.Bungee.Network.Client;
 import net.ME1312.SubServers.Bungee.Network.PacketIn;
 
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -25,7 +26,10 @@ public class PacketInExLogMessage implements PacketIn {
     public void execute(Client client, YAMLSection data) {
         try {
             if (data.contains("h") && data.contains("m") && data.getRawString("m").length() != 0 && loggers.keySet().contains(UUID.fromString(data.getRawString("h")))) {
-                loggers.get(UUID.fromString(data.getRawString("h"))).log(data.getRawString("m"));
+                Method m = ExternalSubLogger.class.getDeclaredMethod("log", String.class);
+                m.setAccessible(true);
+                m.invoke(loggers.get(UUID.fromString(data.getRawString("h"))), data.getRawString("m"));
+                m.setAccessible(false);
             }
         } catch (Exception e) {
             e.printStackTrace();

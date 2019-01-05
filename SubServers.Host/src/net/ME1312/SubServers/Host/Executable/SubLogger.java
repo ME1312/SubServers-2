@@ -17,7 +17,6 @@ import java.util.regex.Pattern;
  * Internal Process Logger Class
  */
 public class SubLogger {
-    public static final int MAX_GC = Integer.getInteger("subservers.logging.max_gc", 4096);
     protected Process process;
     private Object handle;
     protected final Logger logger;
@@ -50,17 +49,6 @@ public class SubLogger {
         this.file = file;
     }
 
-    private static boolean gc_running = false;
-    private static int gc = 0;
-    private static void gc() {
-        if (!gc_running && MAX_GC > 0 && gc >= MAX_GC) {
-            gc_running = true;
-            System.gc();
-            gc = 0;
-            gc_running = false;
-        }
-    }
-
     /**
      * Start Logger
      */
@@ -83,55 +71,12 @@ public class SubLogger {
     @SuppressWarnings("deprecation")
     private void start(InputStream in, boolean isErr) {
         try {
-            YAMLSection yaml = SubAPI.getInstance().getInternals().config.get().getSection("Settings");
+            boolean network = SubAPI.getInstance().getInternals().config.get().getSection("Settings").getBoolean("Network-Log", true),
+                    console = SubAPI.getInstance().getInternals().config.get().getSection("Settings").getBoolean("Console-Log", true);
             BufferedReader br = new BufferedReader(new InputStreamReader(in));
             String line;
             while ((line = br.readLine()) != null) {
-                if (!line.startsWith(">")) {
-                    String msg = line;
-                    LogStream level;
-
-                    // REGEX Formatting
-                    String type = "";
-                    Matcher matcher = Pattern.compile("^((?:\\s*\\[?([0-9]{2}:[0-9]{2}:[0-9]{2})]?)?[\\s\\/\\\\\\|]*(?:\\[|\\[.*\\/)?(MESSAGE|INFO|WARNING|WARN|ERROR|ERR|SEVERE)\\]?:?(?:\\s*>)?\\s*)").matcher(msg.replaceAll("\u001B\\[[;\\d]*m", ""));
-                    while (matcher.find()) {
-                        type = matcher.group(3).toUpperCase();
-                    }
-
-                    msg = msg.replaceAll("^((?:\\s*\\[?([0-9]{2}:[0-9]{2}:[0-9]{2})]?)?[\\s\\/\\\\\\|]*(?:\\[|\\[.*\\/)?(MESSAGE|INFO|WARNING|WARN|ERROR|ERR|SEVERE)\\]?:?(?:\\s*>)?\\s*)", "");
-
-                    // Determine LOG LEVEL
-                    switch (type) {
-                        case "WARNING":
-                        case "WARN":
-                            level = logger.warn;
-                            break;
-                        case "SEVERE":
-                            level = logger.severe;
-                            break;
-                        case "ERROR":
-                        case "ERR":
-                            level = logger.error;
-                            break;
-                        default:
-                            level = logger.info;
-                    }
-
-                    // Log to NETWORK
-                    if (log.get() && yaml.getBoolean("Network-Log", true)) SubAPI.getInstance().getSubDataNetwork().sendPacket(new PacketOutExLogMessage(address, line));
-
-                    // Log to CONSOLE
-                    if (log.get() && yaml.getBoolean("Console-Log", true)) level.println(TextColor.convertColor(msg));
-
-                    // Log to FILE
-                    if (writer != null) {
-                        writer.println(line);
-                        writer.flush();
-                    }
-
-                    gc++;
-                    gc();
-                }
+                log(line, network, console);
             }
         } catch (IOException e) {} finally {
             if (isErr) {
@@ -141,6 +86,51 @@ public class SubLogger {
             }
 
             stop();
+        }
+    }
+
+    private void log(String line, boolean network, boolean console) {
+        if (!line.startsWith(">")) {
+            String msg = line;
+            LogStream level;
+
+            // REGEX Formatting
+            String type = "";
+            Matcher matcher = Pattern.compile("^((?:\\s*\\[?([0-9]{2}:[0-9]{2}:[0-9]{2})]?)?[\\s\\/\\\\\\|]*(?:\\[|\\[.*\\/)?(MESSAGE|INFO|WARNING|WARN|ERROR|ERR|SEVERE)\\]?:?(?:\\s*>)?\\s*)").matcher(msg.replaceAll("\u001B\\[[;\\d]*m", ""));
+            while (matcher.find()) {
+                type = matcher.group(3).toUpperCase();
+            }
+
+            msg = msg.replaceAll("^((?:\\s*\\[?([0-9]{2}:[0-9]{2}:[0-9]{2})]?)?[\\s\\/\\\\\\|]*(?:\\[|\\[.*\\/)?(MESSAGE|INFO|WARNING|WARN|ERROR|ERR|SEVERE)\\]?:?(?:\\s*>)?\\s*)", "");
+
+            // Determine LOG LEVEL
+            switch (type) {
+                case "WARNING":
+                case "WARN":
+                    level = logger.warn;
+                    break;
+                case "SEVERE":
+                    level = logger.severe;
+                    break;
+                case "ERROR":
+                case "ERR":
+                    level = logger.error;
+                    break;
+                default:
+                    level = logger.info;
+            }
+
+            // Log to NETWORK
+            if (log.get() && network) SubAPI.getInstance().getSubDataNetwork().sendPacket(new PacketOutExLogMessage(address, line));
+
+            // Log to CONSOLE
+            if (log.get() && console) level.println(TextColor.convertColor(msg));
+
+            // Log to FILE
+            if (writer != null) {
+                writer.println(line);
+                writer.flush();
+            }
         }
     }
 

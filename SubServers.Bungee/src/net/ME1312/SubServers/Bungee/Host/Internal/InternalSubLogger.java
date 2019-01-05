@@ -78,57 +78,7 @@ public class InternalSubLogger extends SubLogger {
             BufferedReader br = new BufferedReader(new InputStreamReader(in));
             String line;
             while ((line = br.readLine()) != null) {
-                if (!line.startsWith(">")) {
-                    String msg = line;
-                    Level level;
-
-                    // REGEX Formatting
-                    String type = "";
-                    Matcher matcher = Pattern.compile("^((?:\\s*\\[?([0-9]{2}:[0-9]{2}:[0-9]{2})]?)?[\\s\\/\\\\\\|]*(?:\\[|\\[.*\\/)?(MESSAGE|INFO|WARNING|WARN|ERROR|ERR|SEVERE)\\]?:?(?:\\s*>)?\\s*)").matcher(msg.replaceAll("\u001B\\[[;\\d]*m", ""));
-                    while (matcher.find()) {
-                        type = matcher.group(3).toUpperCase();
-                    }
-
-                    msg = msg.replaceAll("^((?:\\s*\\[?([0-9]{2}:[0-9]{2}:[0-9]{2})]?)?[\\s\\/\\\\\\|]*(?:\\[|\\[.*\\/)?(MESSAGE|INFO|WARNING|WARN|ERROR|ERR|SEVERE)\\]?:?(?:\\s*>)?\\s*)", "");
-
-                    // Determine LOG LEVEL
-                    switch (type) {
-                        case "WARNING":
-                        case "WARN":
-                            level = Level.WARNING;
-                            break;
-                        case "SEVERE":
-                        case "ERROR":
-                        case "ERR":
-                            level = Level.SEVERE;
-                            break;
-                        default:
-                            level = Level.INFO;
-                    }
-
-                    // Filter Message
-                    boolean allow = log.get() && (!SubAPI.getInstance().getInternals().canSudo || SubAPI.getInstance().getInternals().sudo == null || SubAPI.getInstance().getInternals().sudo == getHandler());
-                    List<SubLogFilter> filters = new ArrayList<SubLogFilter>();
-                    filters.addAll(this.filters);
-                    for (SubLogFilter filter : filters)
-                        try {
-                            allow = (filter.log(level, msg) && allow);
-                        } catch (Throwable e) {
-                            new InvocationTargetException(e, "Exception while running SubLogger Event").printStackTrace();
-                        }
-
-                    // Log to CONSOLE
-                    if (allow) ProxyServer.getInstance().getLogger().log(level, name + " > " + msg);
-
-                    // Log to FILE
-                    if (writer != null) {
-                        writer.println(line);
-                        writer.flush();
-                    }
-
-                    gc++;
-                    gc();
-                }
+                log(line);
             }
         } catch (IOException e) {} finally {
             if (isErr) {
@@ -138,6 +88,57 @@ public class InternalSubLogger extends SubLogger {
             }
 
             stop();
+        }
+    }
+
+    private void log(String line) {
+        if (!line.startsWith(">")) {
+            String msg = line;
+            Level level;
+
+            // REGEX Formatting
+            String type = "";
+            Matcher matcher = Pattern.compile("^((?:\\s*\\[?([0-9]{2}:[0-9]{2}:[0-9]{2})]?)?[\\s\\/\\\\\\|]*(?:\\[|\\[.*\\/)?(MESSAGE|INFO|WARNING|WARN|ERROR|ERR|SEVERE)\\]?:?(?:\\s*>)?\\s*)").matcher(msg.replaceAll("\u001B\\[[;\\d]*m", ""));
+            while (matcher.find()) {
+                type = matcher.group(3).toUpperCase();
+            }
+
+            msg = msg.replaceAll("^((?:\\s*\\[?([0-9]{2}:[0-9]{2}:[0-9]{2})]?)?[\\s\\/\\\\\\|]*(?:\\[|\\[.*\\/)?(MESSAGE|INFO|WARNING|WARN|ERROR|ERR|SEVERE)\\]?:?(?:\\s*>)?\\s*)", "");
+
+            // Determine LOG LEVEL
+            switch (type) {
+                case "WARNING":
+                case "WARN":
+                    level = Level.WARNING;
+                    break;
+                case "SEVERE":
+                case "ERROR":
+                case "ERR":
+                    level = Level.SEVERE;
+                    break;
+                default:
+                    level = Level.INFO;
+            }
+
+            // Filter Message
+            boolean allow = log.get() && (!SubAPI.getInstance().getInternals().canSudo || SubAPI.getInstance().getInternals().sudo == null || SubAPI.getInstance().getInternals().sudo == getHandler());
+            List<SubLogFilter> filters = new ArrayList<SubLogFilter>();
+            filters.addAll(this.filters);
+            for (SubLogFilter filter : filters)
+                try {
+                    allow = (filter.log(level, msg) && allow);
+                } catch (Throwable e) {
+                    new InvocationTargetException(e, "Exception while running SubLogger Event").printStackTrace();
+                }
+
+            // Log to CONSOLE
+            if (allow) ProxyServer.getInstance().getLogger().log(level, name + " > " + msg);
+
+            // Log to FILE
+            if (writer != null) {
+                writer.println(line);
+                writer.flush();
+            }
         }
     }
 

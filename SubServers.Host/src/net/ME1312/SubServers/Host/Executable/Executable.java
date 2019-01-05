@@ -19,8 +19,8 @@ public class Executable {
         String[] cmd;
         if (System.getProperty("os.name").toLowerCase().startsWith("windows")) {
             if (gitbash != null && (exec.startsWith("bash ") || exec.startsWith("sh ")))
-                exec = "\"" + gitbash + ((gitbash.endsWith(File.separator))?"":File.separator) + "bin" + File.separatorChar + "sh.exe\" -lc \"" +
-                        exec.replace("\\", "/\\").replace("\"", "\\\"").replace("^", "^^").replace("%", "^%").replace("&", "^&").replace("<", "^<").replace(">", "^>").replace("|", "^|") + "\"";
+                exec = '"' + gitbash + ((gitbash.endsWith(File.separator))?"":File.separator) + "bin" + File.separatorChar + "sh.exe\" -lc \"" +
+                        exec.replace("\\", "/\\").replace("\"", "\\\"").replace("^", "^^").replace("%", "^%").replace("&", "^&").replace("<", "^<").replace(">", "^>").replace("|", "^|") + '"';
             cmd = new String[]{"cmd.exe", "/q", "/c", '"'+exec+'"'};
         } else {
             cmd = new String[]{"sh", "-lc", exec};

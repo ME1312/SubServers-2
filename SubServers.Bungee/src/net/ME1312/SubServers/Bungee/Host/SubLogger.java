@@ -4,17 +4,6 @@ package net.ME1312.SubServers.Bungee.Host;
  * SubLogger Layout Class
  */
 public abstract class SubLogger {
-    public static final int MAX_GC = Integer.getInteger("subservers.logging.max_gc", 4096);
-    private static boolean gc_running = false;
-    protected static int gc = 0;
-    protected static void gc() {
-        if (!gc_running && MAX_GC > 0 && gc >= MAX_GC) {
-            gc_running = true;
-            System.gc();
-            gc = 0;
-            gc_running = false;
-        }
-    }
 
     /**
      * Gets the Name of the task logging

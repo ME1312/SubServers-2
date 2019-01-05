@@ -71,22 +71,8 @@ public class ExternalSubLogger extends SubLogger {
         }
     }
 
-    /**
-     * Get the External Logger Address
-     *
-     * @return External Address
-     */
-    public UUID getExternalAddress() {
-        return id;
-    }
-
-    /**
-     * Log a Message
-     *
-     * @param line Message
-     */
     @SuppressWarnings("deprecation")
-    public void log(String line) {
+    private void log(String line) {
         if (started) {
             String msg = line;
             Level level;
@@ -134,10 +120,16 @@ public class ExternalSubLogger extends SubLogger {
                 writer.println(line);
                 writer.flush();
             }
-
-            gc++;
-            gc();
         }
+    }
+
+    /**
+     * Get the External Logger Address
+     *
+     * @return External Address
+     */
+    public UUID getExternalAddress() {
+        return id;
     }
 
     @Override
