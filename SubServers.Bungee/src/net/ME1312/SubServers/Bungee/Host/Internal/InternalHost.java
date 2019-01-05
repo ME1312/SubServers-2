@@ -1,6 +1,7 @@
 package net.ME1312.SubServers.Bungee.Host.Internal;
 
 import com.dosse.upnp.UPnP;
+import com.google.common.collect.Range;
 import net.ME1312.SubServers.Bungee.Event.SubAddServerEvent;
 import net.ME1312.SubServers.Bungee.Event.SubRemoveServerEvent;
 import net.ME1312.SubServers.Bungee.Library.Config.YAMLSection;
@@ -8,7 +9,6 @@ import net.ME1312.SubServers.Bungee.Library.Exception.InvalidServerException;
 import net.ME1312.SubServers.Bungee.Host.Host;
 import net.ME1312.SubServers.Bungee.Host.SubCreator;
 import net.ME1312.SubServers.Bungee.Host.SubServer;
-import net.ME1312.SubServers.Bungee.Library.NamedContainer;
 import net.ME1312.SubServers.Bungee.Library.UniversalFile;
 import net.ME1312.SubServers.Bungee.Library.Util;
 import net.ME1312.SubServers.Bungee.SubPlugin;
@@ -29,30 +29,29 @@ public class InternalHost extends Host {
     private InetAddress address;
     private SubCreator creator;
     private String directory;
-    protected NamedContainer<Integer, Integer> range;
     protected SubPlugin plugin;
 
     /**
      * Creates an Internal Host
      *
-     * @param plugin Plugin
-     * @param name Name
-     * @param enabled Enabled Status
-     * @param address Address
-     * @param directory Directory
-     * @param gitBash Git Bash Location
+     * @param plugin SubServers Internals
+     * @param name The Name of your Host
+     * @param ports The range of ports to auto-select from
+     * @param log Whether apps like SubCreator should log to console (does not apply to servers)
+     * @param enabled If your host is Enabled
+     * @param address The address of your Host
+     * @param directory The runtime directory of your Host
+     * @param gitBash The Git Bash directory
      */
-    public InternalHost(SubPlugin plugin, String name, Boolean enabled, InetAddress address, String directory, NamedContainer<Integer, Integer> range, String gitBash) {
-        super(plugin, name, enabled, address, directory, range, gitBash);
+    public InternalHost(SubPlugin plugin, String name, boolean enabled, Range<Integer> ports, boolean log, InetAddress address, String directory, String gitBash) {
+        super(plugin, name, enabled, ports, log, address, directory, gitBash);
         if (!DRM_ALLOW) throw new IllegalStateException("SubServers' hosting capabilities have been disabled by your provider");
-        if (Util.isNull(plugin, name, enabled, address, directory, gitBash)) throw new NullPointerException();
         this.plugin = plugin;
         this.name = name;
         this.enabled = enabled;
         this.address = address;
-        this.creator = new InternalSubCreator(this, gitBash);
+        this.creator = new InternalSubCreator(this, ports, log, gitBash);
         this.directory = directory;
-        this.range = range;
     }
 
     @Override

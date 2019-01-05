@@ -1,5 +1,6 @@
 package net.ME1312.SubServers.Bungee.Host;
 
+import com.google.common.collect.Range;
 import com.google.gson.Gson;
 import net.ME1312.SubServers.Bungee.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Bungee.Library.Config.YAMLValue;
@@ -29,14 +30,17 @@ public abstract class Host implements ExtraDataHandler {
      *
      * @param plugin SubServers Internals
      * @param name The Name of your Host
+     * @param ports The range of ports to auto-select from
+     * @param log Whether apps like SubCreator should log to console (does not apply to servers)
      * @param enabled If your host is Enabled
      * @param address The address of your Host
      * @param directory The runtime directory of your Host
-     * @param range The range of ports to auto-select from
      * @param gitBash The Git Bash directory
      */
-    public Host(SubPlugin plugin, String name, Boolean enabled, InetAddress address, String directory, NamedContainer<Integer, Integer> range, String gitBash) {
+    public Host(SubPlugin plugin, String name, boolean enabled, Range<Integer> ports, boolean log, InetAddress address, String directory, String gitBash) {
         if (name.contains(" ")) throw new InvalidHostException("Host names cannot have spaces: " + name);
+        if (!ports.hasLowerBound() || !ports.hasUpperBound()) throw new InvalidHostException("Port range is not bound");
+        if (Util.isNull(plugin, name, enabled, ports, log, address, directory, gitBash)) throw new NullPointerException();
         signature = plugin.api.signAnonymousObject();
         SubDataServer.allowConnection(address.getHostAddress());
     }

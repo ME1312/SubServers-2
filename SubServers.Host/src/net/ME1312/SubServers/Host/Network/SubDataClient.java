@@ -162,22 +162,7 @@ public final class SubDataClient {
                 MessageUnpacker in = MessagePack.newDefaultUnpacker(socket.get().getInputStream());
                 Value input;
                 while ((input = in.unpackValue()) != null) {
-                    try {
-                        YAMLSection data = cipher.decrypt(host.config.get().getSection("Settings").getSection("SubData").getRawString("Password"), input);
-                        for (PacketIn packet : decodePacket(data)) {
-                            try {
-                                packet.execute((data.contains("c"))?data.getSection("c"):null);
-                            } catch (Throwable e) {
-                                log.error.println(new InvocationTargetException(e, "Exception while executing PacketIn"));
-                            }
-                        }
-                    } catch (JSONException | YAMLException e) {
-                        log.error.println(new IllegalPacketException("Unknown Packet Format: " + input));
-                    } catch (IllegalPacketException e) {
-                        log.error.println(e);
-                    } catch (Exception e) {
-                        log.error.println(new InvocationTargetException(e, "Exception while decoding packet"));
-                    }
+                    recieve(input);
                 }
                 try {
                     destroy(host.config.get().getSection("Settings").getSection("SubData").getInt("Reconnect", 30));
@@ -193,6 +178,25 @@ public final class SubDataClient {
                 }
             }
         }).start();
+    }
+
+    private void recieve(Value input) {
+        try {
+            YAMLSection data = cipher.decrypt(host.config.get().getSection("Settings").getSection("SubData").getRawString("Password"), input);
+            for (PacketIn packet : decodePacket(data)) {
+                try {
+                    packet.execute((data.contains("c"))?data.getSection("c"):null);
+                } catch (Throwable e) {
+                    log.error.println(new InvocationTargetException(e, "Exception while executing PacketIn"));
+                }
+            }
+        } catch (JSONException | YAMLException e) {
+            log.error.println(new IllegalPacketException("Unknown Packet Format: " + input));
+        } catch (IllegalPacketException e) {
+            log.error.println(e);
+        } catch (Exception e) {
+            log.error.println(new InvocationTargetException(e, "Exception while decoding packet"));
+        }
     }
 
     /**

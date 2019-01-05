@@ -1,6 +1,7 @@
 package net.ME1312.SubServers.Bungee;
 
 import com.dosse.upnp.UPnP;
+import com.google.common.collect.Range;
 import com.google.gson.Gson;
 import net.ME1312.SubServers.Bungee.Event.SubAddProxyEvent;
 import net.ME1312.SubServers.Bungee.Event.SubRemoveProxyEvent;
@@ -316,15 +317,20 @@ public final class SubPlugin extends BungeeCord implements Listener {
                         !hostDrivers.get(config.get().getSection("Hosts").getSection(name).getRawString("Driver").toUpperCase().replace('-', '_').replace(' ', '_')).equals(host.getClass()) ||
                         !config.get().getSection("Hosts").getSection(name).getRawString("Address").equals(host.getAddress().getHostAddress()) ||
                         !config.get().getSection("Hosts").getSection(name).getRawString("Directory").equals(host.getPath()) ||
-                        !config.get().getSection("Hosts").getSection(name).getRawString("Port-Range", "25500-25559").equals(prevconfig.getSection("Hosts", new YAMLSection()).getSection(name, new YAMLSection()).getRawString("Port-Range", "25500-25559")) ||
                         !config.get().getSection("Hosts").getSection(name).getRawString("Git-Bash").equals(host.getCreator().getBashDirectory())
                         ) {
                     if (host != null) api.forceRemoveHost(name);
-                    host = api.addHost(config.get().getSection("Hosts").getSection(name).getRawString("Driver").toLowerCase(), name, config.get().getSection("Hosts").getSection(name).getBoolean("Enabled"), InetAddress.getByName(config.get().getSection("Hosts").getSection(name).getRawString("Address")), config.get().getSection("Hosts").getSection(name).getRawString("Directory"),
-                            new NamedContainer<>(Integer.parseInt(config.get().getSection("Hosts").getSection(name).getRawString("Port-Range", "25500-25559").split("-")[0]), Integer.parseInt(config.get().getSection("Hosts").getSection(name).getRawString("Port-Range", "25500-25559").split("-")[1])), config.get().getSection("Hosts").getSection(name).getRawString("Git-Bash"));
+                    host = api.addHost(config.get().getSection("Hosts").getSection(name).getRawString("Driver").toLowerCase(), name, config.get().getSection("Hosts").getSection(name).getBoolean("Enabled"),
+                            Range.closed(Integer.parseInt(config.get().getSection("Hosts").getSection(name).getRawString("Port-Range", "25500-25559").split("-")[0]), Integer.parseInt(config.get().getSection("Hosts").getSection(name).getRawString("Port-Range", "25500-25559").split("-")[1])),
+                            config.get().getSection("Hosts").getSection(name).getBoolean("Log-Creator", true), InetAddress.getByName(config.get().getSection("Hosts").getSection(name).getRawString("Address")),
+                            config.get().getSection("Hosts").getSection(name).getRawString("Directory"), config.get().getSection("Hosts").getSection(name).getRawString("Git-Bash"));
                 } else { // Host wasn't reset, so check for these changes
                     if (config.get().getSection("Hosts").getSection(name).getBoolean("Enabled") != host.isEnabled())
                         host.setEnabled(config.get().getSection("Hosts").getSection(name).getBoolean("Enabled"));
+                    if (!config.get().getSection("Hosts").getSection(name).getRawString("Port-Range", "25500-25559").equals(prevconfig.getSection("Hosts", new YAMLSection()).getSection(name, new YAMLSection()).getRawString("Port-Range", "25500-25559")))
+                        host.getCreator().setPortRange(Range.closed(Integer.parseInt(config.get().getSection("Hosts").getSection(name).getRawString("Port-Range", "25500-25559").split("-")[0]), Integer.parseInt(config.get().getSection("Hosts").getSection(name).getRawString("Port-Range", "25500-25559").split("-")[1])));
+                    if (config.get().getSection("Hosts").getSection(name).getBoolean("Log-Creator", true) != host.getCreator().isLogging())
+                        host.getCreator().setLogging(config.get().getSection("Hosts").getSection(name).getBoolean("Log-Creator", true));
                 } // Check for other changes
                 if (config.get().getSection("Hosts").getSection(name).getKeys().contains("Display") && ((config.get().getSection("Hosts").getSection(name).getString("Display").length() == 0 && !host.getDisplayName().equals(host.getName())) || !config.get().getSection("Hosts").getSection(name).getString("Display").equals(host.getDisplayName())))
                     host.setDisplayName(config.get().getSection("Hosts").getSection(name).getString("Display"));

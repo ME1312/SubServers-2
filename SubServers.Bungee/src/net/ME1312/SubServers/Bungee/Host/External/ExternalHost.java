@@ -1,5 +1,6 @@
 package net.ME1312.SubServers.Bungee.Host.External;
 
+import com.google.common.collect.Range;
 import net.ME1312.SubServers.Bungee.Event.SubAddServerEvent;
 import net.ME1312.SubServers.Bungee.Event.SubRemoveServerEvent;
 import net.ME1312.SubServers.Bungee.Host.Host;
@@ -32,7 +33,6 @@ public class ExternalHost extends Host implements ClientHandler {
     private InetAddress address;
     private SubCreator creator;
     private String directory;
-    protected NamedContainer<Integer, Integer> range;
     protected NamedContainer<Boolean, Client> client;
     private LinkedList<PacketOut> queue;
     private boolean clean;
@@ -41,24 +41,24 @@ public class ExternalHost extends Host implements ClientHandler {
     /**
      * Creates an External Host
      *
-     * @param plugin Plugin
-     * @param name Name
-     * @param enabled Enabled Status
-     * @param address Address
-     * @param directory Directory
-     * @param gitBash Git Bash Location
+     * @param plugin SubServers Internals
+     * @param name The Name of your Host
+     * @param ports The range of ports to auto-select from
+     * @param log Whether apps like SubCreator should log to console (does not apply to servers)
+     * @param enabled If your host is Enabled
+     * @param address The address of your Host
+     * @param directory The runtime directory of your Host
+     * @param gitBash The Git Bash directory
      */
-    public ExternalHost(SubPlugin plugin, String name, Boolean enabled, InetAddress address, String directory, NamedContainer<Integer, Integer> range, String gitBash) {
-        super(plugin, name, enabled, address, directory, range, gitBash);
-        if (Util.isNull(plugin, name, enabled, address, directory, gitBash)) throw new NullPointerException();
+    public ExternalHost(SubPlugin plugin, String name, boolean enabled, Range<Integer> ports, boolean log, InetAddress address, String directory, String gitBash) {
+        super(plugin, name, enabled, ports, log, address, directory, gitBash);
         this.plugin = plugin;
         this.name = name;
         this.enabled = enabled;
         this.address = address;
         this.client = new NamedContainer<Boolean, Client>(false, null);
-        this.creator = new ExternalSubCreator(this, gitBash);
+        this.creator = new ExternalSubCreator(this, ports, log, gitBash);
         this.directory = directory;
-        this.range = range;
         this.queue = new LinkedList<PacketOut>();
         this.clean = false;
     }

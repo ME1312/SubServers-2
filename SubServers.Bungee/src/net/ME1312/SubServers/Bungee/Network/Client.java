@@ -66,45 +66,7 @@ public class Client {
                 MessageUnpacker in = MessagePack.newDefaultUnpacker(socket.getInputStream());
                 Value input;
                 while ((input = in.unpackValue()) != null) {
-                    try {
-                        YAMLSection data = subdata.getCipher().decrypt(subdata.plugin.config.get().getSection("Settings").getSection("SubData").getRawString("Password"), input);
-                        for (PacketIn packet : SubDataServer.decodePacket(this, data)) {
-                            boolean auth = authorized == null;
-                            if (auth || packet instanceof PacketAuthorization) {
-                                try {
-                                    if (data.contains("f")) {
-                                        if (data.getString("f").length() <= 0) {
-                                            List<Client> clients = new ArrayList<Client>();
-                                            clients.addAll(subdata.getClients());
-                                            for (Client client : clients) {
-                                                client.out.packValue(input);
-                                            }
-                                        } else {
-                                            Client client = subdata.getClient(data.getString("f"));
-                                            if (client != null) {
-                                                client.out.packValue(input);
-                                            } else {
-                                                throw new IllegalPacketException(getAddress().toString() + ": Unknown Forward Address: " + data.getString("f"));
-                                            }
-                                        }
-                                    } else {
-                                        packet.execute(Client.this, (data.contains("c")) ? data.getSection("c") : null);
-                                    }
-                                } catch (Throwable e) {
-                                    new InvocationTargetException(e, getAddress().toString() + ": Exception while executing PacketIn").printStackTrace();
-                                }
-                            } else {
-                                sendPacket(new PacketAuthorization(-1, "Unauthorized"));
-                                throw new IllegalPacketException(getAddress().toString() + ": Unauthorized call to packet type: " + data.getSection("h"));
-                            }
-                        }
-                    } catch (YAMLException e) { // TODO
-                        new IllegalPacketException(getAddress().toString() + ": Unknown Packet Format: " + input).printStackTrace();
-                    } catch (IllegalPacketException e) {
-                        e.printStackTrace();
-                    } catch (Exception e) {
-                        new InvocationTargetException(e, getAddress().toString() + ": Exception while decoding packet").printStackTrace();
-                    }
+                    recievePacket(input);
                 }
                 try {
                     subdata.removeClient(Client.this);
@@ -122,15 +84,46 @@ public class Client {
         }).start();
     }
 
-    /**
-     * Authorize Connection
-     */
-    public void authorize() {
-        if (authorized != null) {
-            authorized.cancel();
-            System.out.println("SubData > " + socket.getRemoteSocketAddress().toString() + " logged in");
+    private void recievePacket(Value input) {
+        try {
+            YAMLSection data = subdata.getCipher().decrypt(subdata.plugin.config.get().getSection("Settings").getSection("SubData").getRawString("Password"), input);
+            for (PacketIn packet : SubDataServer.decodePacket(this, data)) {
+                boolean auth = authorized == null;
+                if (auth || packet instanceof PacketAuthorization) {
+                    try {
+                        if (data.contains("f")) {
+                            if (data.getString("f").length() <= 0) {
+                                List<Client> clients = new ArrayList<Client>();
+                                clients.addAll(subdata.getClients());
+                                for (Client client : clients) {
+                                    client.out.packValue(input);
+                                }
+                            } else {
+                                Client client = subdata.getClient(data.getString("f"));
+                                if (client != null) {
+                                    client.out.packValue(input);
+                                } else {
+                                    throw new IllegalPacketException(getAddress().toString() + ": Unknown Forward Address: " + data.getString("f"));
+                                }
+                            }
+                        } else {
+                            packet.execute(Client.this, (data.contains("c")) ? data.getSection("c") : null);
+                        }
+                    } catch (Throwable e) {
+                        new InvocationTargetException(e, getAddress().toString() + ": Exception while executing PacketIn").printStackTrace();
+                    }
+                } else {
+                    sendPacket(new PacketAuthorization(-1, "Unauthorized"));
+                    throw new IllegalPacketException(getAddress().toString() + ": Unauthorized call to packet type: " + data.getSection("h"));
+                }
+            }
+        } catch (YAMLException e) { // TODO
+            new IllegalPacketException(getAddress().toString() + ": Unknown Packet Format: " + input).printStackTrace();
+        } catch (IllegalPacketException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            new InvocationTargetException(e, getAddress().toString() + ": Exception while decoding packet").printStackTrace();
         }
-        authorized = null;
     }
 
     /**
@@ -146,6 +139,17 @@ public class Client {
         } catch (Throwable e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Authorize Connection
+     */
+    public void authorize() {
+        if (authorized != null) {
+            authorized.cancel();
+            System.out.println("SubData > " + socket.getRemoteSocketAddress().toString() + " logged in");
+        }
+        authorized = null;
     }
 
     /**

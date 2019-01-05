@@ -1,11 +1,13 @@
 package net.ME1312.SubServers.Bungee.Host.External;
 
+import com.google.common.collect.Range;
 import net.ME1312.SubServers.Bungee.Event.SubCreateEvent;
 import net.ME1312.SubServers.Bungee.Host.*;
 import net.ME1312.SubServers.Bungee.Host.Internal.InternalSubCreator;
 import net.ME1312.SubServers.Bungee.Library.*;
 import net.ME1312.SubServers.Bungee.Library.Config.YAMLConfig;
 import net.ME1312.SubServers.Bungee.Library.Config.YAMLSection;
+import net.ME1312.SubServers.Bungee.Library.Exception.InvalidHostException;
 import net.ME1312.SubServers.Bungee.Library.Version.Version;
 import net.ME1312.SubServers.Bungee.Network.Packet.PacketExConfigureHost;
 import net.ME1312.SubServers.Bungee.Network.Packet.PacketExCreateServer;
@@ -23,6 +25,8 @@ import java.util.*;
 public class ExternalSubCreator extends SubCreator {
     private HashMap<String, ServerTemplate> templates = new HashMap<String, ServerTemplate>();
     private ExternalHost host;
+    private Range<Integer> ports;
+    private Container<Boolean> log;
     private String gitBash;
     private TreeMap<String, NamedContainer<Integer, ExternalSubLogger>> thread;
 
@@ -30,11 +34,16 @@ public class ExternalSubCreator extends SubCreator {
      * Creates an External SubCreator
      *
      * @param host Host
-     * @param gitBash Git Bash
+     * @param ports The range of ports to auto-select from
+     * @param log Whether SubCreator should log to console
+     * @param gitBash The Git Bash directory
      */
-    public ExternalSubCreator(ExternalHost host, String gitBash) {
-        if (Util.isNull(host, gitBash)) throw new NullPointerException();
+    public ExternalSubCreator(ExternalHost host, Range<Integer> ports, boolean log, String gitBash) {
+        if (!ports.hasLowerBound() || !ports.hasUpperBound()) throw new IllegalArgumentException("Port range is not bound");
+        if (Util.isNull(host, ports, log, gitBash)) throw new NullPointerException();
         this.host = host;
+        this.ports = ports;
+        this.log = new Container<Boolean>(log);
         this.gitBash = gitBash;
         this.thread = new TreeMap<String, NamedContainer<Integer, ExternalSubLogger>>();
         reload();
@@ -66,14 +75,16 @@ public class ExternalSubCreator extends SubCreator {
             StackTraceElement[] origin = new Exception().getStackTrace();
 
             if (port == null) {
-                Container<Integer> i = new Container<Integer>(host.range.name() - 1);
+                Container<Integer> i = new Container<Integer>(ports.lowerEndpoint() - 1);
                 port = Util.getNew(getAllReservedAddresses(), () -> {
-                    i.set(i.get() + 1);
-                    if (i.get() > host.range.get()) throw new IllegalStateException("There are no more ports available between " + host.range.name() + " and " + host.range.get());
+                    do {
+                        i.set(i.get() + 1);
+                        if (i.get() > ports.upperEndpoint()) throw new IllegalStateException("There are no more ports available in range: " + ports.toString());
+                    } while (!ports.contains(i.get()));
                     return new InetSocketAddress(host.getAddress(), i.get());
                 }).getPort();
             }
-            ExternalSubLogger logger = new ExternalSubLogger(this, name + File.separator + "Creator", new Container<Boolean>(host.plugin.config.get().getSection("Settings").getBoolean("Log-Creator")), null);
+            ExternalSubLogger logger = new ExternalSubLogger(this, name + File.separator + "Creator", log, null);
             thread.put(name.toLowerCase(), new NamedContainer<>(port, logger));
 
             final int fport = port;
@@ -207,6 +218,17 @@ public class ExternalSubCreator extends SubCreator {
     }
 
     @Override
+    public Range getPortRange() {
+        return ports;
+    }
+
+    @Override
+    public void setPortRange(Range<Integer> value) {
+        if (!value.hasLowerBound() || !value.hasUpperBound()) throw new IllegalArgumentException("Port range is not bound");
+        ports = value;
+    }
+
+    @Override
     public String getBashDirectory() {
         return gitBash;
     }
@@ -225,6 +247,17 @@ public class ExternalSubCreator extends SubCreator {
     @Override
     public SubLogger getLogger(String name) {
         return this.thread.get(name.toLowerCase()).get();
+    }
+
+    @Override
+    public boolean isLogging() {
+        return log.get();
+    }
+
+    @Override
+    public void setLogging(boolean value) {
+        if (Util.isNull(value)) throw new NullPointerException();
+        log.set(value);
     }
 
     @Override

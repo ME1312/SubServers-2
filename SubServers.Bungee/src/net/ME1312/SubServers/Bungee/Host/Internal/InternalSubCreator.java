@@ -1,5 +1,6 @@
 package net.ME1312.SubServers.Bungee.Host.Internal;
 
+import com.google.common.collect.Range;
 import com.google.gson.Gson;
 import net.ME1312.SubServers.Bungee.Event.SubCreateEvent;
 import net.ME1312.SubServers.Bungee.Host.*;
@@ -32,6 +33,8 @@ import java.util.regex.Pattern;
 public class InternalSubCreator extends SubCreator {
     private HashMap<String, ServerTemplate> templates = new HashMap<String, ServerTemplate>();
     private InternalHost host;
+    private Range<Integer> ports;
+    private Container<Boolean> log;
     private String gitBash;
     private TreeMap<String, CreatorTask> thread;
 
@@ -51,7 +54,7 @@ public class InternalSubCreator extends SubCreator {
             this.template = template;
             this.version = version;
             this.port = port;
-            this.log = new InternalSubLogger(null, this, name + File.separator + "Creator", new Container<Boolean>(false), null);
+            this.log = new InternalSubLogger(null, this, name + File.separator + "Creator", InternalSubCreator.this.log, null);
             this.callback = callback;
         }
 
@@ -144,8 +147,7 @@ public class InternalSubCreator extends SubCreator {
                 try {
                     System.out.println(name + File.separator + "Creator > Launching " + template.getBuildOptions().getRawString("Shell-Location"));
                     process = Runtime.getRuntime().exec(Executable.parse(gitBash, command), null, dir);
-                    log.log.set(host.plugin.config.get().getSection("Settings").getBoolean("Log-Creator"));
-                    log.file = new File(dir, "SubCreator-" + template.getName() + "-" + version.toString().replace(" ", "@") + ".log");
+                    log.file = new File(dir, "SubCreator-" + template.getName() + "-" + version.toString() + ".log");
                     log.process = process;
                     log.start();
 
@@ -267,11 +269,16 @@ public class InternalSubCreator extends SubCreator {
      * Creates an Internal SubCreator
      *
      * @param host Host
-     * @param gitBash Git Bash
+     * @param ports The range of ports to auto-select from
+     * @param log Whether SubCreator should log to console
+     * @param gitBash The Git Bash directory
      */
-    public InternalSubCreator(InternalHost host, String gitBash) {
-        if (Util.isNull(host, gitBash)) throw new NullPointerException();
+    public InternalSubCreator(InternalHost host, Range<Integer> ports, boolean log, String gitBash) {
+        if (!ports.hasLowerBound() || !ports.hasUpperBound()) throw new IllegalArgumentException("Port range is not bound");
+        if (Util.isNull(host, ports, log, gitBash)) throw new NullPointerException();
         this.host = host;
+        this.ports = ports;
+        this.log = new Container<Boolean>(log);
         this.gitBash = (System.getenv("ProgramFiles(x86)") == null)?Pattern.compile("%(ProgramFiles)\\(x86\\)%", Pattern.CASE_INSENSITIVE).matcher(gitBash).replaceAll("%$1%"):gitBash;
         if (this.gitBash.endsWith(File.pathSeparator)) this.gitBash = this.gitBash.substring(0, this.gitBash.length() - 1);
         this.thread = new TreeMap<String, CreatorTask>();
@@ -305,10 +312,12 @@ public class InternalSubCreator extends SubCreator {
             StackTraceElement[] origin = new Exception().getStackTrace();
 
             if (port == null) {
-                Container<Integer> i = new Container<Integer>(host.range.name() - 1);
+                Container<Integer> i = new Container<Integer>(ports.lowerEndpoint() - 1);
                 port = Util.getNew(getAllReservedAddresses(), () -> {
-                    i.set(i.get() + 1);
-                    if (i.get() > host.range.get()) throw new IllegalStateException("There are no more ports available between " + host.range.name() + " and " + host.range.get());
+                    do {
+                        i.set(i.get() + 1);
+                        if (i.get() > ports.upperEndpoint()) throw new IllegalStateException("There are no more ports available in range: " + ports.toString());
+                    } while (!ports.contains(i.get()));
                     return new InetSocketAddress(host.getAddress(), i.get());
                 }).getPort();
             }
@@ -389,6 +398,17 @@ public class InternalSubCreator extends SubCreator {
     }
 
     @Override
+    public Range getPortRange() {
+        return ports;
+    }
+
+    @Override
+    public void setPortRange(Range<Integer> value) {
+        if (!value.hasLowerBound() || !value.hasUpperBound()) throw new IllegalArgumentException("Port range is not bound");
+        ports = value;
+    }
+
+    @Override
     public String getBashDirectory() {
         return gitBash;
     }
@@ -407,6 +427,17 @@ public class InternalSubCreator extends SubCreator {
     @Override
     public SubLogger getLogger(String name) {
         return this.thread.get(name.toLowerCase()).log;
+    }
+
+    @Override
+    public boolean isLogging() {
+        return log.get();
+    }
+
+    @Override
+    public void setLogging(boolean value) {
+        if (Util.isNull(value)) throw new NullPointerException();
+        log.set(value);
     }
 
     @Override

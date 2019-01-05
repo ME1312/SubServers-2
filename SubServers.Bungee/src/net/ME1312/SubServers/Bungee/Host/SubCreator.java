@@ -1,5 +1,6 @@
 package net.ME1312.SubServers.Bungee.Host;
 
+import com.google.common.collect.Range;
 import net.ME1312.SubServers.Bungee.Library.Callback;
 import net.ME1312.SubServers.Bungee.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Bungee.Library.Exception.InvalidTemplateException;
@@ -260,6 +261,20 @@ public abstract class SubCreator {
     public abstract Host getHost();
 
     /**
+     * Get the range of available port numbers
+     *
+     * @return Port Range
+     */
+    public abstract Range getPortRange();
+
+    /**
+     * Get the range of available port numbers
+     *
+     * @param value Value
+     */
+    public abstract void setPortRange(Range<Integer> value);
+
+    /**
      * Gets the Git Bash install directory
      *
      * @return Git Bash Directory
@@ -280,6 +295,20 @@ public abstract class SubCreator {
      * @return SubCreator Logger
      */
     public abstract SubLogger getLogger(String thread);
+
+    /**
+     * If the Creator is Logging to console
+     *
+     * @return Logging Status
+     */
+    public abstract boolean isLogging();
+
+    /**
+     * Set if the Creator is Logging
+     *
+     * @param value Value
+     */
+    public abstract void setLogging(boolean value);
 
 
     /**

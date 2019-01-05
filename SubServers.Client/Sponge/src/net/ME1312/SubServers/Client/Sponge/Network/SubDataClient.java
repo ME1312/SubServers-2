@@ -142,24 +142,7 @@ public final class SubDataClient {
                 MessageUnpacker in = MessagePack.newDefaultUnpacker(socket.get().getInputStream());
                 Value input;
                 while ((input = in.unpackValue()) != null) {
-                    try {
-                        YAMLSection data = getCipher().decrypt(plugin.config.get().getSection("Settings").getSection("SubData").getRawString("Password"), input);
-                        for (PacketIn packet : decodePacket(data)) {
-                            Sponge.getScheduler().createTaskBuilder().execute(() -> {
-                                try {
-                                    packet.execute((data.contains("c")) ? data.getSection("c") : null);
-                                } catch (Throwable e) {
-                                    new InvocationTargetException(e, "Exception while executing PacketIn").printStackTrace();
-                                }
-                            }).submit(plugin);
-                        }
-                    } catch (YAMLException e) {
-                        new IllegalPacketException("Unknown Packet Format: " + input).printStackTrace();
-                    } catch (IllegalPacketException e) {
-                        e.printStackTrace();
-                    } catch (Exception e) {
-                        new InvocationTargetException(e, "Exception while decoding packet").printStackTrace();
-                    }
+                    recieve(input);
                 }
                 try {
                     destroy(plugin.config.get().getSection("Settings").getSection("SubData").getInt("Reconnect", 30));
@@ -175,6 +158,27 @@ public final class SubDataClient {
                 }
             }
         }).submit(plugin);
+    }
+
+    private void recieve(Value input) {
+        try {
+            YAMLSection data = getCipher().decrypt(plugin.config.get().getSection("Settings").getSection("SubData").getRawString("Password"), input);
+            for (PacketIn packet : decodePacket(data)) {
+                Sponge.getScheduler().createTaskBuilder().execute(() -> {
+                    try {
+                        packet.execute((data.contains("c")) ? data.getSection("c") : null);
+                    } catch (Throwable e) {
+                        new InvocationTargetException(e, "Exception while executing PacketIn").printStackTrace();
+                    }
+                }).submit(plugin);
+            }
+        } catch (YAMLException e) {
+            new IllegalPacketException("Unknown Packet Format: " + input).printStackTrace();
+        } catch (IllegalPacketException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            new InvocationTargetException(e, "Exception while decoding packet").printStackTrace();
+        }
     }
 
     /**

@@ -1,6 +1,5 @@
 Settings:
   Version: '2.11.2a+'
-  Log-Creator: true
   Override-Bungee-Commands: true
   UPnP:
     Forward-Proxy: true
@@ -21,6 +20,7 @@ Hosts:
     Port-Range: '25500-25559'
     Directory: './SubServers/Servers'
     Git-Bash: '%ProgramFiles%\Git'
+    Log-Creator: true
 
 Servers:
   'Example':

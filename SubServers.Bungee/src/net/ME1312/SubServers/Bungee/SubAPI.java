@@ -1,5 +1,6 @@
 package net.ME1312.SubServers.Bungee;
 
+import com.google.common.collect.Range;
 import net.ME1312.SubServers.Bungee.Event.SubAddHostEvent;
 import net.ME1312.SubServers.Bungee.Event.SubAddServerEvent;
 import net.ME1312.SubServers.Bungee.Event.SubRemoveHostEvent;
@@ -133,20 +134,21 @@ public final class SubAPI {
      * Add a Host to the Network
      *
      * @param driver Driver to initiate
-     * @param name Name of the Host
-     * @param enabled Enabled Status
-     * @param address Address of the Host
-     * @param directory Directory of the Host
-     * @param range The range of ports to auto-select from
-     * @param gitBash Git Bash Directory
+     * @param name The Name of your Host
+     * @param ports The range of ports to auto-select from
+     * @param log Whether apps like SubCreator should log to console (does not apply to servers)
+     * @param enabled If your host is Enabled
+     * @param address The address of your Host
+     * @param directory The runtime directory of your Host
+     * @param gitBash The Git Bash directory
      * @return The Host
      * @throws NoSuchMethodException
      * @throws IllegalAccessException
      * @throws InvocationTargetException
      * @throws InstantiationException
      */
-    public Host addHost(String driver, String name, boolean enabled, InetAddress address, String directory, NamedContainer<Integer, Integer> range, String gitBash) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
-        return addHost(null, driver, name, enabled, address, directory, range, gitBash);
+    public Host addHost(String driver, String name, boolean enabled, Range<Integer> ports, boolean log, InetAddress address, String directory, String gitBash) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
+        return addHost(null, driver, name, enabled, ports, log, address, directory, gitBash);
     }
 
     /**
@@ -154,42 +156,44 @@ public final class SubAPI {
      *
      * @param player Player who added
      * @param driver Driver to initiate
-     * @param name Name of the Host
-     * @param enabled Enabled Status
-     * @param address Address of the Host
-     * @param directory Directory of the Host
-     * @param range The range of ports to auto-select from
-     * @param gitBash Git Bash Directory
+     * @param name The Name of your Host
+     * @param ports The range of ports to auto-select from
+     * @param log Whether apps like SubCreator should log to console (does not apply to servers)
+     * @param enabled If your host is Enabled
+     * @param address The address of your Host
+     * @param directory The runtime directory of your Host
+     * @param gitBash The Git Bash directory
      * @return The Host
      * @throws NoSuchMethodException
      * @throws IllegalAccessException
      * @throws InvocationTargetException
      * @throws InstantiationException
      */
-    public Host addHost(UUID player, String driver, String name, boolean enabled, InetAddress address, String directory, NamedContainer<Integer, Integer> range, String gitBash) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
-        if (Util.isNull(driver, name, enabled, address, directory, range, gitBash)) throw new NullPointerException();
+    public Host addHost(UUID player, String driver, String name, boolean enabled, Range<Integer> ports, boolean log, InetAddress address, String directory, String gitBash) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
+        if (Util.isNull(driver, name, enabled, ports, log, address, directory, gitBash)) throw new NullPointerException();
         if (!getHostDrivers().contains(driver.toUpperCase().replace('-', '_').replace(' ', '_'))) throw new InvalidHostException("Invalid Driver for host: " + name);
-        return addHost(player, plugin.hostDrivers.get(driver.toUpperCase().replace('-', '_').replace(' ', '_')), name, enabled, address, directory, range, gitBash);
+        return addHost(player, plugin.hostDrivers.get(driver.toUpperCase().replace('-', '_').replace(' ', '_')), name, enabled, ports, log, address, directory, gitBash);
 }
 
     /**
      * Add a Host with a potentially unregistered driver to the Network
      *
      * @param driver Driver to initiate
-     * @param name Name of the Host
-     * @param enabled Enabled Status
-     * @param address Address of the Host
-     * @param directory Directory of the Host
-     * @param range The range of ports to auto-select from
-     * @param gitBash Git Bash Directory
+     * @param name The Name of your Host
+     * @param ports The range of ports to auto-select from
+     * @param log Whether apps like SubCreator should log to console (does not apply to servers)
+     * @param enabled If your host is Enabled
+     * @param address The address of your Host
+     * @param directory The runtime directory of your Host
+     * @param gitBash The Git Bash directory
      * @return The Host
      * @throws NoSuchMethodException
      * @throws IllegalAccessException
      * @throws InvocationTargetException
      * @throws InstantiationException
      */
-    public Host addHost(Class<? extends Host> driver, String name, boolean enabled, InetAddress address, String directory, NamedContainer<Integer, Integer> range, String gitBash) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
-        return addHost(null, driver, name, enabled, address, directory, range, gitBash);
+    public Host addHost(Class<? extends Host> driver, String name, boolean enabled, Range<Integer> ports, boolean log, InetAddress address, String directory, String gitBash) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
+        return addHost(null, driver, name, enabled, ports, log, address, directory, gitBash);
     }
 
     /**
@@ -197,21 +201,22 @@ public final class SubAPI {
      *
      * @param player Player who added
      * @param driver Driver to initiate
-     * @param name Name of the Host
-     * @param enabled Enabled Status
-     * @param address Address of the Host
-     * @param directory Directory of the Host
-     * @param range The range of ports to auto-select from
-     * @param gitBash Git Bash Directory
+     * @param name The Name of your Host
+     * @param ports The range of ports to auto-select from
+     * @param log Whether apps like SubCreator should log to console (does not apply to servers)
+     * @param enabled If your host is Enabled
+     * @param address The address of your Host
+     * @param directory The runtime directory of your Host
+     * @param gitBash The Git Bash directory
      * @return The Host
      * @throws NoSuchMethodException
      * @throws IllegalAccessException
      * @throws InvocationTargetException
      * @throws InstantiationException
      */
-    public Host addHost(UUID player, Class<? extends Host> driver, String name, boolean enabled, InetAddress address, String directory, NamedContainer<Integer, Integer> range, String gitBash) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
-        if (Util.isNull(driver, name, enabled, address, directory, range, gitBash)) throw new NullPointerException();
-        Host host = driver.getConstructor(SubPlugin.class, String.class, Boolean.class, InetAddress.class, String.class, NamedContainer.class, String.class).newInstance(plugin, name, (Boolean) enabled, address, directory, range, gitBash);
+    public Host addHost(UUID player, Class<? extends Host> driver, String name, boolean enabled, Range<Integer> ports, boolean log, InetAddress address, String directory, String gitBash) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
+        if (Util.isNull(driver, name, enabled, ports, log, address, directory, gitBash)) throw new NullPointerException();
+        Host host = driver.getConstructor(SubPlugin.class, String.class, boolean.class, Range.class, boolean.class, InetAddress.class, String.class, String.class).newInstance(plugin, name, enabled, ports, log, address, directory, gitBash);
         return addHost(player, host)?host:null;
     }
 
