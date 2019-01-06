@@ -151,7 +151,7 @@ public final class SubCommand implements CommandExecutor {
                                     if (plugin.config.get().getSection("Settings").getBoolean("Show-Addresses", false)) {
                                         message += " (" + host.getAddress() + ((host.getName().equals(host.getDisplayName()))?"":ChatColor.stripColor(div)+host.getName()) + ")";
                                     } else if (!host.getName().equals(host.getDisplayName())) {
-                                        message += " (" + host + ")";
+                                        message += " (" + host.getName() + ")";
                                     }
                                     message += plugin.api.getLang("SubServers", "Command.List.Header");
                                     for (SubServer subserver : host.getSubServers().values()) {

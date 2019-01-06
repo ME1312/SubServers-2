@@ -5,8 +5,6 @@ import net.ME1312.SubServers.Bungee.Host.SubLogFilter;
 import net.ME1312.SubServers.Bungee.Host.SubLogger;
 import net.ME1312.SubServers.Bungee.Host.SubServer;
 import net.ME1312.SubServers.Bungee.Library.Util;
-import net.md_5.bungee.api.ProxyServer;
-import org.fusesource.jansi.AnsiOutputStream;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -19,16 +17,15 @@ import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.html.StyleSheet;
 import java.awt.*;
 import java.awt.event.*;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.List;
 import java.util.logging.Level;
 
 public final class ConsoleWindow implements SubLogFilter {
-    private static String RESET_VALUE = "\n\u00A0\n\u00A0";
+    private static final int MAX_SCROLLBACK = (Integer.getInteger("subservers.console.max_scrollback", 15000) >= 128)?Integer.getInteger("subservers.console.max_scrollback", 15000):15000;
+    private static final String RESET_VALUE = "\n\u00A0\n\u00A0";
     private ConsolePlugin plugin;
     private JFrame window;
     private JPanel panel;
@@ -49,24 +46,49 @@ public final class ConsoleWindow implements SubLogFilter {
     private boolean open = false;
     private SubLogger logger;
     private int fontSize = 12;
-    private boolean ansi = true;
-    private AnsiOutputStream stream = new AnsiHTMLColorStream(new OutputStream() {
-        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+    private File file = null;
+    private FileOutputStream filewriter = null;
+    private ByteArrayOutputStream scache = new ByteArrayOutputStream();
+    private AnsiUIOutputStream stream = AnsiUIOutputStream.wrap(new OutputStream() {
+
+        private int countLines(String str) {
+            int count = 0;
+            for (int i = 0; i < str.length(); i++) if (str.charAt(i) == '\n') count++;
+            return count;
+        }
 
         @Override
         public void write(int b) throws IOException {
-            stream.write(b);
-            if (((char) b) == '\n') {
+            scache.write(b);
+            if (b == '\n') {
                 try {
+                    int lines;
+                    String content;
+                    while (log.getSelectionStart() == log.getSelectionEnd() && (lines = countLines(content = log.getDocument().getText(0, log.getDocument().getLength()))) > MAX_SCROLLBACK) {
+                        int lineBreak = 1;
+                        for (lines -= MAX_SCROLLBACK; lines > 0; lines--) lineBreak = content.indexOf('\n', lineBreak + 1);
+                        if (lineBreak >= 2) {
+                            log.getDocument().remove(2, lineBreak);
+                        } else break;
+                    }
+                } catch (Exception e) {} try {
                     HTMLEditorKit kit = (HTMLEditorKit) log.getEditorKit();
                     HTMLDocument doc = (HTMLDocument) log.getDocument();
-                    kit.insertHTML(doc, doc.getLength() - 2, new String(stream.toByteArray(), "UTF-8"), 0, 0, null);
-                    hScroll();
-                } catch (BadLocationException e) {
-                    e.printStackTrace();
-                }
-                stream = new ByteArrayOutputStream();
+                    kit.insertHTML(doc, doc.getLength() - 2, new String(scache.toByteArray(), "UTF-8"), 0, 0, null);
+                    EventQueue.invokeLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            hScroll();
+                        }
+                    });
+                } catch (Exception e) {}
+                scache = new ByteArrayOutputStream();
             }
+        }
+    }, new HTMLogger.HTMConstructor<AnsiUIOutputStream>() {
+        @Override
+        public AnsiUIOutputStream construct(OutputStream raw, OutputStream wrapped) {
+            return new AnsiUIOutputStream(raw, wrapped);
         }
     });
     private boolean[] kpressed = new boolean[65535];
@@ -116,6 +138,14 @@ public final class ConsoleWindow implements SubLogFilter {
         this.plugin = plugin;
         this.logger = logger;
 
+        try {
+            file = File.createTempFile("SubServers.Console.", ".log");
+            file.deleteOnExit();
+            filewriter = new FileOutputStream(file, false);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         window = new JFrame();
 
         JMenuBar jMenu = new JMenuBar();
@@ -135,6 +165,7 @@ public final class ConsoleWindow implements SubLogFilter {
             @Override
             public void actionPerformed(ActionEvent event) {
                 log.setText(RESET_VALUE);
+                ConsoleWindow.this.loadContent();
             }
         });
         menu.add(item);
@@ -241,13 +272,14 @@ public final class ConsoleWindow implements SubLogFilter {
         });
         menu.add(item);
         menu.addSeparator();
-        item = new JCheckBoxMenuItem("Show Text Colors");
+        item = new JCheckBoxMenuItem("Use ANSI Formatting");
         item.setSelected(true);
         item.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent event) {
-                ansi = ((AbstractButton) event.getSource()).getModel().isSelected();
+                stream.ansi(((AbstractButton) event.getSource()).getModel().isSelected());
                 log.setText(RESET_VALUE);
+                ConsoleWindow.this.loadContent();
             }
         });
         menu.add(item);
@@ -321,7 +353,16 @@ public final class ConsoleWindow implements SubLogFilter {
         log.setContentType("text/html");
         log.setEditorKit(new HTMLEditorKit());
         StyleSheet style = new StyleSheet();
-        style.addRule("body {color: #dcdcdc; font-family: courier; font-size: 12;}\n");
+        String font;
+        try {
+            Font f = Font.createFont(Font.TRUETYPE_FONT, ConsoleWindow.class.getResourceAsStream("/net/ME1312/SubServers/Console/ConsoleFont.ttf"));
+            GraphicsEnvironment.getLocalGraphicsEnvironment().registerFont(f);
+            font = f.getFontName();
+            input.setFont(f.deriveFont(14f));
+        } catch (Exception e) {
+            font = "Courier";
+        }
+        style.addRule("body {color: #dcdcdc; font-family: " + font + "; font-size: 12;}\n");
         log.setDocument(new HTMLDocument(style));
         log.setBorder(BorderFactory.createLineBorder(new Color(40, 44, 45)));
         new TextFieldPopup(log, false);
@@ -515,6 +556,7 @@ public final class ConsoleWindow implements SubLogFilter {
 
         logger.registerFilter(this);
         log.setText(RESET_VALUE);
+        loadContent();
         KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(keys);
         if (logger.isLogging() && !open) open();
     }
@@ -531,7 +573,9 @@ public final class ConsoleWindow implements SubLogFilter {
 
     public void log(Date date, String message) {
         try {
-            stream.write(('\u00A0' + new SimpleDateFormat("hh:mm:ss").format(date) + ' ' + ((ansi)?message:message.replaceAll("\u001B\\[[;\\d]*m", "")) + "\u00A0\n").getBytes("UTF-8"));
+            byte[] msg = ('\u00A0' + new SimpleDateFormat("hh:mm:ss").format(date) + ' ' + message + "\u00A0\n").getBytes("UTF-8");
+            filewriter.write(msg);
+            stream.write(msg);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -569,10 +613,33 @@ public final class ConsoleWindow implements SubLogFilter {
         return open;
     }
 
+    private void loadContent() {
+        if (file != null) {
+            try (FileInputStream reader = new FileInputStream(file)) {
+                int b;
+                while ((b = reader.read()) != -1) {
+                    stream.write(b);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            hScroll();
+        }
+    }
+
     @Override
     public void stop() {
         close();
         clear();
+        if (filewriter != null) try {
+            filewriter.close();
+        } catch (Exception e) {}
+        if (file != null) try {
+            filewriter = new FileOutputStream(file, false);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
     public void close() {
         if (open) {
@@ -590,6 +657,10 @@ public final class ConsoleWindow implements SubLogFilter {
     public void destroy() {
         close();
         logger.unregisterFilter(this);
+        if (filewriter != null) try {
+            filewriter.close();
+        } catch (Exception e) {}
+        if (file != null) file.delete();
         KeyboardFocusManager.getCurrentKeyboardFocusManager().removeKeyEventDispatcher(keys);
     }
 
@@ -751,6 +822,51 @@ public final class ConsoleWindow implements SubLogFilter {
                     field.setText(list.get(hpos));
                 }
             }
+        }
+    }
+    private class AnsiUIOutputStream extends HTMLogger {
+        public AnsiUIOutputStream(OutputStream raw, OutputStream wrapped) {
+            super(raw, wrapped);
+        }
+
+        public void ansi(boolean value) {
+            ansi = value;
+        }
+
+        @Override
+        protected void processChangeWindowTitle(String label) {
+            window.setTitle(logger.getName() + " \u2014 SubServers 2" + ((label.length() <= 0)?"":" \u2014 " + label));
+        }
+
+        @Override
+        protected void processEraseLine(int mode) throws IOException {
+            processDeleteLine(1);
+        }
+
+        @Override
+        protected void processEraseScreen(int mode) throws IOException {
+            if (ansi) log.setText(RESET_VALUE);
+        }
+
+        @Override
+        protected void processDeleteLine(int amount) throws IOException {
+            if (ansi) try {
+                String content = log.getDocument().getText(0, log.getDocument().getLength());
+                while (amount > 0) {
+                    int lastLineBreak = content.lastIndexOf('\n');
+                    int length = log.getDocument().getLength() - lastLineBreak - 2;
+                    if (lastLineBreak >= 0 && length > 0) {
+                        log.getDocument().remove(lastLineBreak, length);
+                    }
+                    amount--;
+                }
+            } catch (Exception e) {}
+        }
+
+        @Override
+        public void close() throws IOException {
+            open = false;
+            super.close();
         }
     }
     private class SmartScroller implements AdjustmentListener {

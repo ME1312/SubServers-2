@@ -323,19 +323,20 @@ public class InternalSubCreator extends SubCreator {
                 }).getPort();
             }
 
+            CreatorTask task = new CreatorTask(player, name, template, version, port, server -> {
+                if (callback != null && server != null) try {
+                    callback.run(server);
+                } catch (Throwable e) {
+                    Throwable ew = new InvocationTargetException(e);
+                    ew.setStackTrace(origin);
+                    ew.printStackTrace();
+                }
+            });
+            this.thread.put(name.toLowerCase(), task);
+
             final SubCreateEvent event = new SubCreateEvent(player, host, name, template, version, port);
             host.plugin.getPluginManager().callEvent(event);
             if (!event.isCancelled()) {
-                CreatorTask task = new CreatorTask(player, name, template, version, port, server -> {
-                    if (callback != null && server != null) try {
-                        callback.run(server);
-                    } catch (Throwable e) {
-                        Throwable ew = new InvocationTargetException(e);
-                        ew.setStackTrace(origin);
-                        ew.printStackTrace();
-                    }
-                });
-                this.thread.put(name.toLowerCase(), task);
                 task.start();
                 return true;
             } else {
