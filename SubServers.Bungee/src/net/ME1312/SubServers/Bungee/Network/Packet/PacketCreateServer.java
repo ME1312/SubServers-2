@@ -82,7 +82,7 @@ public class PacketCreateServer implements PacketIn, PacketOut {
                             } catch (InterruptedException e) {
                                 e.printStackTrace();
                             }
-                        }).start();
+                        }, "SubServers.Bungee::SubData_SubCreator_Handler(" + client.getAddress().toString() + ')').start();
                     } else {
                         client.sendPacket(new PacketCreateServer(0, "Creating SubServer", (data.contains("id")) ? data.getRawString("id") : null));
                     }

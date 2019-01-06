@@ -5,6 +5,7 @@ import net.ME1312.Galaxi.Library.Config.YAMLConfig;
 import net.ME1312.Galaxi.Library.Config.YAMLSection;
 import net.ME1312.Galaxi.Library.Log.Logger;
 import net.ME1312.SubServers.Host.ExHost;
+import net.ME1312.SubServers.Host.SubAPI;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -144,7 +145,7 @@ public class Metrics {
      * Starts the Scheduler which submits our data every 30 minutes.
      */
     private void startSubmitting() {
-        final Timer timer = new Timer(true);
+        final Timer timer = new Timer(SubAPI.getInstance().getAppInfo().getName() + "::Metrics_Uploader", true);
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {

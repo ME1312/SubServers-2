@@ -396,7 +396,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
                     e.printStackTrace();
                 }
             }
-        }));
+        }, "SubServers.Bungee::System_Shutdown"));
         running = true;
         List<String> autorun = new LinkedList<String>();
         for (String name : config.get().getSection("Servers").getKeys()) {
@@ -544,7 +544,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
         getPluginManager().registerCommand(null, SubCommand.newInstance(this, "sub").get());
 
         new Metrics(this);
-        new Timer().schedule(new TimerTask() {
+        new Timer("SubServers.Bungee::Routine_Update_Check").schedule(new TimerTask() {
             @SuppressWarnings("unchecked")
             @Override
             public void run() {
@@ -577,7 +577,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
                     if (!(e instanceof SocketException)) e.printStackTrace();
                 }
             }
-        }).start();
+        }, "SubServers.Bungee::SubData_Connection_Listener").start();
     }
 
     /**

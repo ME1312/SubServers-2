@@ -4,6 +4,7 @@ import com.dosse.upnp.UPnP;
 import net.ME1312.Galaxi.Engine.GalaxiEngine;
 import net.ME1312.Galaxi.Engine.GalaxiOption;
 import net.ME1312.Galaxi.Event.GalaxiReloadEvent;
+import net.ME1312.Galaxi.Galaxi;
 import net.ME1312.Galaxi.Library.Config.YAMLConfig;
 import net.ME1312.Galaxi.Library.Config.YAMLSection;
 import net.ME1312.Galaxi.Library.Log.Logger;
@@ -213,7 +214,7 @@ public final class ExHost {
                     log.warn.println("Received request from system to shutdown");
                     engine.stop();
                 }
-            }));
+            }, SubAPI.getInstance().getAppInfo().getName() + "::System_Shutdown"));
             creator = new SubCreator(this);
 
             loadDefaults();

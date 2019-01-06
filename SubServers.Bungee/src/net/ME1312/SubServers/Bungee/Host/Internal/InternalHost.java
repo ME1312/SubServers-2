@@ -183,7 +183,7 @@ public class InternalHost extends Host {
                     e.printStackTrace();
                 }
                 System.out.println("SubServers > Deleted SubServer: " + server);
-            }).start();
+            }, "SubServers.Bungee::Internal_Server_Deletion(" + name + ')').start();
             return true;
         } else return false;
     }
@@ -228,7 +228,7 @@ public class InternalHost extends Host {
                     e.printStackTrace();
                 }
                 System.out.println("SubServers > Deleted SubServer: " + server);
-            }).start();
+            }, "SubServers.Bungee::Internal_Server_Deletion(" + name + ')').start();
             return true;
         } else return false;
     }

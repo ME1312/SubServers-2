@@ -189,7 +189,7 @@ public final class SubDataClient {
                     e1.printStackTrace();
                 }
             }
-        }).start();
+        }, "SubServers.Sync::SubData_Packet_Listener").start();
     }
 
     private void recieve(Value input) {
@@ -470,7 +470,7 @@ public final class SubDataClient {
             System.out.println("SubServers > The SubData Connection was closed");
             if (reconnect > 0) {
                 System.out.println("SubServers > Attempting to reconnect in " + reconnect + " seconds");
-                Timer timer = new Timer();
+                Timer timer = new Timer("SubServers.Sync::SubData_Reconnect_Handler");
                 timer.scheduleAtFixedRate(new TimerTask() {
                     @Override
                     public void run() {

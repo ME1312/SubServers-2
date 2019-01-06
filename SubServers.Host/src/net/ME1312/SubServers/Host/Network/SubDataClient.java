@@ -177,7 +177,7 @@ public final class SubDataClient {
                     log.error.println(e1);
                 }
             }
-        }).start();
+        }, SubAPI.getInstance().getAppInfo().getName() + "::SubData_Packet_Listener").start();
     }
 
     private void recieve(Value input) {
@@ -550,7 +550,7 @@ public final class SubDataClient {
             log.info.println("The SubData Connection was closed");
             if (reconnect > 0) {
                 log.info.println("Attempting to reconnect in " + reconnect + " seconds");
-                Timer timer = new Timer();
+                Timer timer = new Timer(SubAPI.getInstance().getAppInfo().getName() + "::SubData_Reconnect_Handler");
                 timer.scheduleAtFixedRate(new TimerTask() {
                     @Override
                     public void run() {

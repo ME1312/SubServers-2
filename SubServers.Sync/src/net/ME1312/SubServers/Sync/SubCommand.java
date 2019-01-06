@@ -114,7 +114,7 @@ public final class SubCommand extends CommandX {
                             }
                         } catch (Exception e) {
                         }
-                    }).start();
+                    }, "SubServers.Sync::Update_Check").start();
                 } else if (args[0].equalsIgnoreCase("list")) {
                     plugin.api.getGroups(groups -> plugin.api.getHosts(hosts -> plugin.api.getServers(servers -> plugin.api.getMasterProxy(proxymaster -> plugin.api.getProxies(proxies -> {
                         int i = 0;

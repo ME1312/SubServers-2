@@ -14,6 +14,7 @@ import net.ME1312.SubServers.Host.Network.API.SubCreator.ServerType;
 import net.ME1312.SubServers.Host.Network.Packet.PacketExCreateServer;
 import net.ME1312.SubServers.Host.Network.Packet.PacketOutExLogMessage;
 import net.ME1312.SubServers.Host.ExHost;
+import net.ME1312.SubServers.Host.SubAPI;
 import org.json.JSONObject;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -190,6 +191,7 @@ public class SubCreator {
         private Process process;
 
         private CreatorTask(String name, ServerTemplate template, Version version, int port, UUID address, String id) {
+            super(SubAPI.getInstance().getAppInfo().getName() + "::SubCreator_Process_Handler(" + name + ')');
             this.name = name;
             this.template = template;
             this.version = version;

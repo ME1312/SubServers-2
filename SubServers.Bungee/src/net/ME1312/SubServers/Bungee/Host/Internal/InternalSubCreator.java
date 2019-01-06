@@ -49,6 +49,7 @@ public class InternalSubCreator extends SubCreator {
         private Process process;
 
         private CreatorTask(UUID player, String name, ServerTemplate template, Version version, int port, Callback<SubServer> callback) {
+            super("SubServers.Bungee::Internal_SubCreator_Process_Handler(" + name + ')');
             this.player = player;
             this.name = name;
             this.template = template;

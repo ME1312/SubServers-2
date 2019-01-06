@@ -138,7 +138,7 @@ public class ExternalSubServer extends SubServerContainer {
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-                }).start();
+                }, "SubServers.Bungee::External_Server_Restart_Handler(" + getName() + ')').start();
             }
         }
     }

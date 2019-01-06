@@ -61,8 +61,8 @@ public class InternalSubLogger extends SubLogger {
                 e.printStackTrace();
             }
         }
-        if (out == null) (out = new Thread(() -> start(process.getInputStream(), false))).start();
-        if (err == null) (err = new Thread(() -> start(process.getErrorStream(), true))).start();
+        if (out == null) (out = new Thread(() -> start(process.getInputStream(), false), "SubServers.Bungee::Internal_Log_Spooler(" + name + ')')).start();
+        if (err == null) (err = new Thread(() -> start(process.getErrorStream(), true), "SubServers.Bungee::Internal_Error_Spooler(" + name + ')')).start();
         List<SubLogFilter> filters = new ArrayList<SubLogFilter>();
         filters.addAll(this.filters);
         for (SubLogFilter filter : filters) try {

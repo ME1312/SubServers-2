@@ -43,7 +43,7 @@ public class Client {
         socket = client;
         out = MessagePack.newDefaultPacker(client.getOutputStream());
         address = new InetSocketAddress(client.getInetAddress(), client.getPort());
-        authorized = new Timer();
+        authorized = new Timer("SubServers.Bungee::SubData_Authorization_Timeout(" + address.toString() + ')');
         authorized.schedule(new TimerTask() {
             @Override
             public void run() {
@@ -81,7 +81,7 @@ public class Client {
                     e1.printStackTrace();
                 }
             }
-        }).start();
+        }, "SubServers.Bungee::SubData_Packet_Listener(" + address.toString() + ')').start();
     }
 
     private void recievePacket(Value input) {

@@ -130,7 +130,7 @@ public class Metrics {
     }
 
     private void startSubmitting() {
-        new Timer().schedule( new TimerTask() {
+        new Timer("SubServers.Sync::Metrics_Uploader").schedule( new TimerTask() {
             @Override
             public void run() {
                 // The data collection is async, as well as sending the data

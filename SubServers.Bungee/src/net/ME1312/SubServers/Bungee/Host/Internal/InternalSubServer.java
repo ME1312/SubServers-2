@@ -172,7 +172,7 @@ public class InternalSubServer extends SubServerContainer {
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-                }).start();
+                }, "SubServers.Bungee::Internal_Server_Restart_Handler(" + getName() + ')').start();
             }
         }
     }
@@ -185,7 +185,7 @@ public class InternalSubServer extends SubServerContainer {
             host.plugin.getPluginManager().callEvent(event);
             lock = false;
             if (!event.isCancelled()) {
-                (thread = new Thread(this::run)).start();
+                (thread = new Thread(this::run, "SubServers.Bungee::Internal_Server_Process_Handler(" + getName() + ')')).start();
                 return true;
             } else return false;
         } else return false;

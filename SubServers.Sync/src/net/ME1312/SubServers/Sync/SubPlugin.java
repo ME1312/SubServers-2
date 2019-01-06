@@ -132,7 +132,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
         getPluginManager().registerCommand(null, SubCommand.newInstance(this, "sub").get());
 
         new Metrics(this);
-        new Timer().schedule(new TimerTask() {
+        new Timer("SubServers.Sync::Routine_Update_Check").schedule(new TimerTask() {
             @SuppressWarnings("unchecked")
             @Override
             public void run() {

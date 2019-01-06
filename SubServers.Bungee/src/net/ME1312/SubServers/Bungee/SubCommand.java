@@ -115,7 +115,7 @@ public final class SubCommand extends CommandX {
                                 sender.sendMessage("SubServers.Bungee v" + updversion + " is available. You are " + updcount + " version" + ((updcount == 1)?"":"s") + " behind.");
                             }
                         } catch (Exception e) {}
-                    }).start();
+                    }, "SubServers.Bungee::Update_Check").start();
                 } else if (args[0].equalsIgnoreCase("reload")) {
                     if (args.length > 1) {
                         switch (args[1].toLowerCase()) {

@@ -12,6 +12,7 @@ import net.ME1312.SubServers.Host.Network.PacketIn;
 import net.ME1312.SubServers.Host.Network.PacketOut;
 import net.ME1312.SubServers.Host.Network.SubDataClient;
 import net.ME1312.SubServers.Host.ExHost;
+import net.ME1312.SubServers.Host.SubAPI;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -106,7 +107,7 @@ public class PacketExDeleteServer implements PacketIn, PacketOut {
                     if (UPnP.isUPnPAvailable() && UPnP.isMappedTCP(server.getPort())) UPnP.closePortTCP(server.getPort());
                     log.info.println("Deleted SubServer: " + data.getRawString("server"));
                     host.subdata.sendPacket(new PacketExDeleteServer(0, "Server Deleted Successfully", (data.contains("id"))?data.getRawString("id"):null));
-                }).start();
+                }, SubAPI.getInstance().getAppInfo().getName() + "::Server_Deletion(" + server.getName() + ')').start();
             }
         } catch (Throwable e) {
             host.subdata.sendPacket(new PacketExDeleteServer(1, e.getClass().getCanonicalName() + ": " + e.getMessage(), (data.contains("id"))?data.getRawString("id"):null));

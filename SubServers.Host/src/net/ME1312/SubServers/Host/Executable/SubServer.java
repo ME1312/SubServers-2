@@ -7,6 +7,7 @@ import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubServers.Host.Library.Exception.InvalidServerException;
 import net.ME1312.SubServers.Host.Network.Packet.PacketExUpdateServer;
 import net.ME1312.SubServers.Host.ExHost;
+import net.ME1312.SubServers.Host.SubAPI;
 
 import java.io.*;
 import java.util.LinkedList;
@@ -141,7 +142,7 @@ public class SubServer {
     public void start(UUID address) {
         if (isEnabled() && !(thread != null && thread.isAlive())) {
             logger.address = address;
-            (thread = new Thread(this::run)).start();
+            (thread = new Thread(this::run, SubAPI.getInstance().getAppInfo().getName() + "::Server_Process_Handler(" + name + ')')).start();
         }
     }
 

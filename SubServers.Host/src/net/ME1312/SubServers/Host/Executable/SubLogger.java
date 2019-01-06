@@ -63,8 +63,8 @@ public class SubLogger {
                 logger.error.println(e);
             }
         }
-        if (out == null) (out = new Thread(() -> start(process.getInputStream(), false))).start();
-        if (err == null) (err = new Thread(() -> start(process.getErrorStream(), true))).start();
+        if (out == null) (out = new Thread(() -> start(process.getInputStream(), false), SubAPI.getInstance().getAppInfo().getName() + "::Log_Spooler(" + name + ')')).start();
+        if (err == null) (err = new Thread(() -> start(process.getErrorStream(), true), SubAPI.getInstance().getAppInfo().getName() + "::Error_Spooler(" + name + ')')).start();
     }
 
 
