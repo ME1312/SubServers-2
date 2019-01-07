@@ -1,8 +1,10 @@
 package net.ME1312.SubServers.Sync;
 
 import com.google.gson.Gson;
+import net.ME1312.SubServers.Sync.Library.Callback;
 import net.ME1312.SubServers.Sync.Library.Compatibility.CommandX;
 import net.ME1312.SubServers.Sync.Library.Config.YAMLSection;
+import net.ME1312.SubServers.Sync.Library.Container;
 import net.ME1312.SubServers.Sync.Library.NamedContainer;
 import net.ME1312.SubServers.Sync.Library.Util;
 import net.ME1312.SubServers.Sync.Library.Version.Version;
@@ -354,20 +356,90 @@ public final class SubCommand extends CommandX {
                                     sender.sendMessage("SubServers > That SubServer is already running");
                                     break;
                                 case 9:
-                                    sender.sendMessages("That SubServer cannot start while these server(s) are running:", data.getRawString("m").split(":\\s")[1]);
-                                    break;
-                                case 0:
-                                case 1:
-                                    sender.sendMessage("SubServers > Server was started successfully");
+                                    sender.sendMessage("SubServers > That SubServer cannot start while these server(s) are running: " + data.getRawString("m").split(":\\s")[1]);
                                     break;
                                 default:
                                     System.out.println("PacketStartServer(null, " + args[1] + ") responded with: " + data.getRawString("m"));
+                                case 0:
+                                case 1:
                                     sender.sendMessage("SubServers > Server was started successfully");
                                     break;
                             }
                         }));
                     } else {
-                        sender.sendMessage("Usage: " + label + " <SubServer>");
+                        sender.sendMessage("Usage: " + label + " " + args[0].toLowerCase() + " <SubServer>");
+                    }
+                } else if (args[0].equalsIgnoreCase("restart")) {
+                    if (args.length > 1) {
+                        TimerTask starter = new TimerTask() {
+                            @Override
+                            public void run() {
+                                plugin.subdata.sendPacket(new PacketStartServer(null, args[1], data -> {
+                                    switch (data.getInt("r")) {
+                                        case 3:
+                                        case 4:
+                                            sender.sendMessage("SubServers > Could not restart server: That SubServer has disappeared");
+                                            break;
+                                        case 5:
+                                            sender.sendMessage("SubServers > Could not restart server: That SubServer's Host is no longer available");
+                                            break;
+                                        case 6:
+                                            sender.sendMessage("SubServers > Could not restart server: That SubServer's Host is no longer enabled");
+                                            break;
+                                        case 7:
+                                            sender.sendMessage("SubServers > Could not restart server: That SubServer is no longer enabled");
+                                            break;
+                                        case 9:
+                                            sender.sendMessage("SubServers > Could not restart server: That SubServer cannot start while these server(s) are running: " + data.getRawString("m").split(":\\s")[1]);
+                                            break;
+                                        default:
+                                            System.out.println("PacketStartServer(null, " + args[1] + ") responded with: " + data.getRawString("m"));
+                                        case 8:
+                                        case 0:
+                                        case 1:
+                                            sender.sendMessage("SubServers > Server was started successfully");
+                                            break;
+                                    }
+                                }));
+                            }
+                        };
+
+                        final Container<Boolean> listening = new Container<Boolean>(true);
+                        PacketInRunEvent.callback("SubStoppedEvent", new Callback<YAMLSection>() {
+                            @Override
+                            public void run(YAMLSection json) {
+                                try {
+                                    if (listening.get()) if (!json.getString("server").equalsIgnoreCase(args[1])) {
+                                        PacketInRunEvent.callback("SubStoppedEvent", this);
+                                    } else {
+                                        new Timer("SubServers.Sync::Server_Restart_Command_Handler(" + args[1] + ')').schedule(starter, 100);
+                                    }
+                                } catch (Exception e) {}
+                            }
+                        });
+
+                        plugin.subdata.sendPacket(new PacketStopServer(null, args[1], false, data -> {
+                            if (data.getInt("r") != 0) listening.set(false);
+                            switch (data.getInt("r")) {
+                                case 3:
+                                    sender.sendMessage("SubServers > There is no server with that name");
+                                    break;
+                                case 4:
+                                    sender.sendMessage("SubServers > That Server is not a SubServer");
+                                    break;
+                                case 5:
+                                    starter.run();
+                                    break;
+                                default:
+                                    System.out.println("PacketStopServer(null, " + args[1] + ", false) responded with: " + data.getRawString("m"));
+                                case 0:
+                                case 1:
+                                    sender.sendMessage("SubServers > Server was stopped successfully");
+                                    break;
+                            }
+                        }));
+                    } else {
+                        sender.sendMessage("Usage: " + label + " " + args[0].toLowerCase() + " <SubServer>");
                     }
                 } else if (args[0].equalsIgnoreCase("stop")) {
                     if (args.length > 1) {
@@ -382,18 +454,16 @@ public final class SubCommand extends CommandX {
                                 case 5:
                                     sender.sendMessage("SubServers > That SubServer is not running");
                                     break;
-                                case 0:
-                                case 1:
-                                    sender.sendMessage("SubServers > Server was stopped successfully");
-                                    break;
                                 default:
                                     System.out.println("PacketStopServer(null, " + args[1] + ", false) responded with: " + data.getRawString("m"));
+                                case 0:
+                                case 1:
                                     sender.sendMessage("SubServers > Server was stopped successfully");
                                     break;
                             }
                         }));
                     } else {
-                        sender.sendMessage("Usage: " + label + " <SubServer>");
+                        sender.sendMessage("Usage: " + label + " " + args[0].toLowerCase() + " <SubServer>");
                     }
                 } else if (args[0].equalsIgnoreCase("kill") || args[0].equalsIgnoreCase("terminate")) {
                     if (args.length > 1) {
@@ -408,18 +478,16 @@ public final class SubCommand extends CommandX {
                                 case 5:
                                     sender.sendMessage("SubServers > That SubServer is not running");
                                     break;
-                                case 0:
-                                case 1:
-                                    sender.sendMessage("SubServers > Server was terminated successfully");
-                                    break;
                                 default:
                                     System.out.println("PacketStopServer(null, " + args[1] + ", true) responded with: " + data.getRawString("m"));
+                                case 0:
+                                case 1:
                                     sender.sendMessage("SubServers > Server was terminated successfully");
                                     break;
                             }
                         }));
                     } else {
-                        sender.sendMessage("Usage: " + label + " <SubServer>");
+                        sender.sendMessage("Usage: " + label + " " + args[0].toLowerCase() + " <SubServer>");
                     }
                 } else if (args[0].equalsIgnoreCase("cmd") || args[0].equalsIgnoreCase("command")) {
                     if (args.length > 2) {
@@ -443,18 +511,16 @@ public final class SubCommand extends CommandX {
                                 case 5:
                                     sender.sendMessage("SubServers > That SubServer is not running");
                                     break;
-                                case 0:
-                                case 1:
-                                    sender.sendMessage("SubServers > Command was sent successfully");
-                                    break;
                                 default:
                                     System.out.println("PacketCommandServer(null, " + args[1] + ", /" + cmd + ") responded with: " + data.getRawString("m"));
+                                case 0:
+                                case 1:
                                     sender.sendMessage("SubServers > Command was sent successfully");
                                     break;
                             }
                         }));
                     } else {
-                        sender.sendMessage("Usage: " + label + " <SubServer> <Command> [Args...]");
+                        sender.sendMessage("Usage: " + label + " " + args[0].toLowerCase() + " <SubServer> <Command> [Args...]");
                     }
                 } else if (args[0].equalsIgnoreCase("create")) {
                     if (args.length > 4) {
@@ -488,19 +554,17 @@ public final class SubCommand extends CommandX {
                                     case 11:
                                         sender.sendMessage("SubServers > Invalid Port Number");
                                         break;
-                                    case 0:
-                                    case 1:
-                                        sender.sendMessage("SubServers > Launching SubCreator...");
-                                        break;
                                     default:
                                         System.out.println("PacketCreateServer(null, " + args[1] + ", " + args[2] + ", " + args[3] + ", " + args[4] + ", " + ((args.length > 5)?args[5]:"null") + ") responded with: " + data.getRawString("m"));
+                                    case 0:
+                                    case 1:
                                         sender.sendMessage("SubServers > Launching SubCreator...");
                                         break;
                                 }
                             }));
                         }
                     } else {
-                        sender.sendMessage("Usage: " + label + " <Name> <Host> <Template> <Version> <Port>");
+                        sender.sendMessage("Usage: " + label + " " + args[0].toLowerCase() + " <Name> <Host> <Template> <Version> <Port>");
                     }
                 } else {
                     sender.sendMessage("SubServers > Unknown sub-command: " + args[0]);
@@ -523,6 +587,7 @@ public final class SubCommand extends CommandX {
                 "   Version: /sub version",
                 "   Info: /sub info [proxy|host|group|server] <Name>",
                 "   Start Server: /sub start <SubServer>",
+                "   Restart Server: /sub restart <SubServer>",
                 "   Stop Server: /sub stop <SubServer>",
                 "   Terminate Server: /sub kill <SubServer>",
                 "   Command Server: /sub cmd <SubServer> <Command> [Args...]",
@@ -653,16 +718,31 @@ public final class SubCommand extends CommandX {
                     return new NamedContainer<>(null, Collections.emptyList());
                 }
             } else if (args[0].equals("start") ||
-                    args[0].equals("stop") ||
-                    args[0].equals("kill") || args[0].equals("terminate")) {
+                    args[0].equals("restart")) {
                 List<String> list = new ArrayList<String>();
                 if (args.length == 2) {
                     if (last.length() == 0) {
                         for (ServerContainer server : plugin.servers.values()) if (server instanceof SubServerContainer) list.add(server.getName());
                     } else {
                         for (ServerContainer server : plugin.servers.values()) {
-                            if (server instanceof SubServerContainer && server.getName().toLowerCase().startsWith(last))
-                                list.add(last + server.getName().substring(last.length()));
+                            if (server instanceof SubServerContainer && server.getName().toLowerCase().startsWith(last)) list.add(last + server.getName().substring(last.length()));
+                        }
+                    }
+                    return new NamedContainer<>((list.size() <= 0)?plugin.api.getLang("SubServers", "Command.Generic.Unknown-SubServer").replace("$str$", args[0]):null, list);
+                } else {
+                    return new NamedContainer<>(null, Collections.emptyList());
+                }
+            } else if (args[0].equals("stop") ||
+                    args[0].equals("kill") || args[0].equals("terminate")) {
+                List<String> list = new ArrayList<String>();
+                if (args.length == 2) {
+                    if (last.length() == 0) {
+                        list.add("*");
+                        for (ServerContainer server : plugin.servers.values()) if (server instanceof SubServerContainer) list.add(server.getName());
+                    } else {
+                        if ("*".startsWith(last)) list.add("*");
+                        for (ServerContainer server : plugin.servers.values()) {
+                            if (server instanceof SubServerContainer && server.getName().toLowerCase().startsWith(last)) list.add(last + server.getName().substring(last.length()));
                         }
                     }
                     return new NamedContainer<>((list.size() <= 0)?plugin.api.getLang("SubServers", "Command.Generic.Unknown-SubServer").replace("$str$", args[0]):null, list);

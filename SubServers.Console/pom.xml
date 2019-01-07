@@ -61,7 +61,7 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.7.0</version>
                 <configuration>
-                    <source>1.7</source>
+                    <source>1.7</source> <!-- Source level 1.7 required by com.intellij.forms_rt -->
                     <target>1.8</target>
                 </configuration>
             </plugin>

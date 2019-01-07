@@ -9,6 +9,7 @@ import net.ME1312.SubServers.Bungee.Host.SubServer;
 import net.ME1312.SubServers.Bungee.Library.Config.YAMLConfig;
 import net.ME1312.SubServers.Bungee.SubAPI;
 import net.ME1312.SubServers.Bungee.SubPlugin;
+import net.ME1312.SubServers.Console.Library.Metrics;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.event.EventHandler;
@@ -24,6 +25,7 @@ public final class ConsolePlugin extends Plugin implements Listener {
     public HashMap<String, ConsoleWindow> cCurrent = new HashMap<String, ConsoleWindow>();
     public HashMap<String, ConsoleWindow> sCurrent = new HashMap<String, ConsoleWindow>();
     public YAMLConfig config;
+    public boolean init = false;
 
     @Override
     public void onEnable() {
@@ -54,16 +56,21 @@ public final class ConsolePlugin extends Plugin implements Listener {
             }
             if (save) config.save();
 
-            getProxy().getPluginManager().registerListener(this, this);
-            getProxy().getPluginManager().registerCommand(this, new ConsoleCommand.POPOUT(this, "popout"));
-            getProxy().getPluginManager().registerCommand(this, new ConsoleCommand.AUTO_POPOUT(this, "apopout"));
-            getProxy().getPluginManager().registerCommand(this, new ConsoleCommand.AUTO_POPOUT(this, "autopopout"));
+            if (!init) {
+                init = true;
 
-            try {
-                UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-                new JFrame("SubServers 2");
-            } catch (ClassNotFoundException | InstantiationException | UnsupportedLookAndFeelException | IllegalAccessException e) {
-                e.printStackTrace();
+                getProxy().getPluginManager().registerListener(this, this);
+                getProxy().getPluginManager().registerCommand(this, new ConsoleCommand.POPOUT(this, "popout"));
+                getProxy().getPluginManager().registerCommand(this, new ConsoleCommand.AUTO_POPOUT(this, "autopopout"));
+
+                new Metrics(this);
+
+                try {
+                    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+                    new JFrame("SubServers 2");
+                } catch (ClassNotFoundException | InstantiationException | UnsupportedLookAndFeelException | IllegalAccessException e) {
+                    e.printStackTrace();
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();

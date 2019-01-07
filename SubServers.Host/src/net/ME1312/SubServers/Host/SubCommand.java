@@ -1,6 +1,9 @@
 package net.ME1312.SubServers.Host;
 
 import net.ME1312.Galaxi.Engine.GalaxiEngine;
+import net.ME1312.Galaxi.Library.Callback;
+import net.ME1312.Galaxi.Library.Config.YAMLSection;
+import net.ME1312.Galaxi.Library.Container;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.Galaxi.Plugin.Command.Command;
@@ -456,12 +459,10 @@ public class SubCommand {
                             case 9:
                                 sender.sendMessage("That SubServer cannot start while these server(s) are running:", data.getRawString("m").split(":\\s")[1]);
                                 break;
-                            case 0:
-                            case 1:
-                                sender.sendMessage("Server was started successfully");
-                                break;
                             default:
                                 host.log.warn.println("PacketStartServer(null, " + args[0] + ") responded with: " + data.getRawString("m"));
+                            case 0:
+                            case 1:
                                 sender.sendMessage("Server was started successfully");
                                 break;
                         }
@@ -497,6 +498,92 @@ public class SubCommand {
                 "Example:",
                 "  /start ExampleServer"
         ).register("start");
+        new Command(host.info) {
+            @Override
+            public void command(CommandSender sender, String handle, String[] args) {
+                if (args.length > 0) {
+                    TimerTask starter = new TimerTask() {
+                        @Override
+                        public void run() {
+                            host.subdata.sendPacket(new PacketStartServer(null, args[0], data -> {
+                                switch (data.getInt("r")) {
+                                    case 3:
+                                    case 4:
+                                        sender.sendMessage("Could not restart server: That SubServer has disappeared");
+                                        break;
+                                    case 5:
+                                        sender.sendMessage("Could not restart server: That SubServer's Host is no longer available");
+                                        break;
+                                    case 6:
+                                        sender.sendMessage("Could not restart server: That SubServer's Host is no longer enabled");
+                                        break;
+                                    case 7:
+                                        sender.sendMessage("Could not restart server: That SubServer is no longer enabled");
+                                        break;
+                                    case 9:
+                                        sender.sendMessage("Could not restart server: That SubServer cannot start while these server(s) are running:", data.getRawString("m").split(":\\s")[1]);
+                                        break;
+                                    default:
+                                        host.log.warn.println("PacketStartServer(null, " + args[0] + ") responded with: " + data.getRawString("m"));
+                                    case 8:
+                                    case 0:
+                                    case 1:
+                                        sender.sendMessage("Server was started successfully");
+                                        break;
+                                }
+                            }));
+                        }
+                    };
+
+                    final Container<Boolean> listening = new Container<Boolean>(true);
+                    PacketInRunEvent.callback("SubStoppedEvent", new Callback<YAMLSection>() {
+                        @Override
+                        public void run(YAMLSection json) {
+                            try {
+                                if (listening.get()) if (!json.getString("server").equalsIgnoreCase(args[0])) {
+                                    PacketInRunEvent.callback("SubStoppedEvent", this);
+                                } else {
+                                    new Timer(SubAPI.getInstance().getAppInfo().getName() + "::Server_Restart_Command_Handler(" + args[0] + ')').schedule(starter, 100);
+                                }
+                            } catch (Exception e) {}
+                        }
+                    });
+
+                    host.subdata.sendPacket(new PacketStopServer(null, args[0], false, data -> {
+                        if (data.getInt("r") != 0) listening.set(false);
+                        switch (data.getInt("r")) {
+                            case 3:
+                                sender.sendMessage("There is no server with that name");
+                                break;
+                            case 4:
+                                sender.sendMessage("That Server is not a SubServer");
+                                break;
+                            case 5:
+                                starter.run();
+                                break;
+                            default:
+                                host.log.warn.println("PacketStopServer(null, " + args[0] + ", false) responded with: " + data.getRawString("m"));
+                            case 0:
+                            case 1:
+                                sender.sendMessage("Server was stopped successfully");
+                                break;
+                        }
+                    }));
+                } else {
+                    sender.sendMessage("Usage: /" + handle + " <SubServer>");
+                }
+            }
+        }.autocomplete(defaultCompletor).usage("<SubServer>").description("Restarts a SubServer").help(
+                "This command is used to request a SubServer to restart via the network.",
+                "Restarting a SubServer in this way will run the stop command",
+                "specified in the server's configuration before re-launching the start command.",
+                "",
+                "The <SubServer> argument is required, and should be the name of",
+                "the SubServer you want to restart.",
+                "",
+                "Example:",
+                "  /restart ExampleServer"
+        ).register("restart");
         new Command(host.info) {
             @Override
             public void command(CommandSender sender, String handle, String[] args) {
@@ -552,12 +639,10 @@ public class SubCommand {
                             case 5:
                                 sender.sendMessage("That SubServer is not running");
                                 break;
-                            case 0:
-                            case 1:
-                                sender.sendMessage("Server was terminated successfully");
-                                break;
                             default:
                                 host.log.warn.println("PacketStopServer(null, " + args[0] + ", true) responded with: " + data.getRawString("m"));
+                            case 0:
+                            case 1:
                                 sender.sendMessage("Server was terminated successfully");
                                 break;
                         }
@@ -601,12 +686,10 @@ public class SubCommand {
                             case 5:
                                 sender.sendMessage("That SubServer is not running");
                                 break;
-                            case 0:
-                            case 1:
-                                sender.sendMessage("Command was sent successfully");
-                                break;
                             default:
                                 host.log.warn.println("PacketCommandServer(null, " + args[0] + ", /" + cmd + ") responded with: " + data.getRawString("m"));
+                            case 0:
+                            case 1:
                                 sender.sendMessage("Command was sent successfully");
                                 break;
                         }
@@ -663,12 +746,10 @@ public class SubCommand {
                                 case 11:
                                     sender.sendMessage("Invalid Port Number");
                                     break;
-                                case 0:
-                                case 1:
-                                    sender.sendMessage("Launching SubCreator...");
-                                    break;
                                 default:
                                     host.log.warn.println("PacketCreateServer(null, " + args[0] + ", " + args[1] + ", " + args[2] + ", " + args[3] + ", " + ((args.length > 4)?args[4]:"null") + ") responded with: " + data.getRawString("m"));
+                                case 0:
+                                case 1:
                                     sender.sendMessage("Launching SubCreator...");
                                     break;
                             }

@@ -51,9 +51,9 @@ public final class ConsoleCommand {
                                 }
                             } else {
                                 if (type == null) {
-                                    sender.sendMessage("SubServers > There is no object with that name");
+                                    sender.sendMessage("SubConsole > There is no object with that name");
                                 } else {
-                                    sender.sendMessage("SubServers > There is no subserver with that name");
+                                    sender.sendMessage("SubConsole > There is no subserver with that name");
                                 }
                             }
                         }

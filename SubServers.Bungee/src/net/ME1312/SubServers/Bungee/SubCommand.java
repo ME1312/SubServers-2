@@ -413,15 +413,69 @@ public final class SubCommand extends CommandX {
                     } else {
                         sender.sendMessage("SubServers > Usage: " + label + " " + args[0].toLowerCase() + " <SubServer>");
                     }
-                } else if (args[0].equalsIgnoreCase("stop")) {
+                } else if (args[0].equalsIgnoreCase("restart")) {
                     if (args.length > 1) {
+                        Runnable starter = () -> {
+                            Map<String, Server> servers = plugin.api.getServers();
+                            if (!servers.keySet().contains(args[1].toLowerCase()) || !(servers.get(args[1].toLowerCase()) instanceof SubServer)) {
+                                sender.sendMessage("SubServers > Could not restart server: That SubServer has disappeared");
+                            } else if (!((SubServer) servers.get(args[1].toLowerCase())).getHost().isAvailable()) {
+                                sender.sendMessage("SubServers > Could not restart server: That SubServer's Host is no longer available");
+                            } else if (!((SubServer) servers.get(args[1].toLowerCase())).getHost().isEnabled()) {
+                                sender.sendMessage("SubServers > Could not restart server: That SubServer's Host is no longer enabled");
+                            } else if (!((SubServer) servers.get(args[1].toLowerCase())).isEnabled()) {
+                                sender.sendMessage("SubServers > Could not restart server: That SubServer is no longer enabled");
+                            } else if (!((SubServer) servers.get(args[1].toLowerCase())).isRunning()) {
+                                if (((SubServer) servers.get(args[1].toLowerCase())).getCurrentIncompatibilities().size() != 0) {
+                                    String list = "";
+                                    for (SubServer server : ((SubServer) servers.get(args[1].toLowerCase())).getCurrentIncompatibilities()) {
+                                        if (list.length() != 0) list += ", ";
+                                        list += server.getName();
+                                    }
+                                    sender.sendMessages("Could not restart server: That SubServer cannot start while these server(s) are running:", list);
+                                } else {
+                                    ((SubServer) servers.get(args[1].toLowerCase())).start();
+                                }
+                            }
+                        };
+
                         Map<String, Server> servers = plugin.api.getServers();
                         if (!servers.keySet().contains(args[1].toLowerCase())) {
                             sender.sendMessage("SubServers > There is no server with that name");
                         } else if (!(servers.get(args[1].toLowerCase()) instanceof SubServer)) {
                             sender.sendMessage("SubServers > That Server is not a SubServer");
-                        } else if (!((SubServer) servers.get(args[1].toLowerCase())).isRunning()) {
+                        } else if (((SubServer) servers.get(args[1].toLowerCase())).isRunning()) {
+                            new Thread(() -> {
+                                try {
+                                    ((SubServer) servers.get(args[1].toLowerCase())).stop();
+                                    ((SubServer) servers.get(args[1].toLowerCase())).waitFor();
+                                    Thread.sleep(100);
+                                    starter.run();
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                            }, "SubServers.Bungee::Server_Restart_Command_Handler(" + servers.get(args[1].toLowerCase()).getName() + ')').start();
+                    } else {
+                            starter.run();
+                        }
+                    } else {
+                        sender.sendMessage("SubServers > Usage: " + label + " " + args[0].toLowerCase() + " <SubServer>");
+                    }
+                } else if (args[0].equalsIgnoreCase("stop")) {
+                    if (args.length > 1) {
+                        Map<String, Server> servers = plugin.api.getServers();
+                        if (!args[1].equals("*") && !servers.keySet().contains(args[1].toLowerCase())) {
+                            sender.sendMessage("SubServers > There is no server with that name");
+                        } else if (!args[1].equals("*") && !(servers.get(args[1].toLowerCase()) instanceof SubServer)) {
+                            sender.sendMessage("SubServers > That Server is not a SubServer");
+                        } else if (!args[1].equals("*") && !((SubServer) servers.get(args[1].toLowerCase())).isRunning()) {
                             sender.sendMessage("SubServers > That SubServer is not running");
+                        } else if (args[1].equals("*")) {
+                            for (Server server : servers.values()) {
+                                if (server instanceof SubServer && ((SubServer) server).isRunning()) {
+                                    ((SubServer) server).stop();
+                                }
+                            }
                         } else {
                             ((SubServer) servers.get(args[1].toLowerCase())).stop();
                         }
@@ -431,12 +485,18 @@ public final class SubCommand extends CommandX {
                 } else if (args[0].equalsIgnoreCase("kill") || args[0].equalsIgnoreCase("terminate")) {
                     if (args.length > 1) {
                         Map<String, Server> servers = plugin.api.getServers();
-                        if (!servers.keySet().contains(args[1].toLowerCase())) {
+                        if (!args[1].equals("*") && !servers.keySet().contains(args[1].toLowerCase())) {
                             sender.sendMessage("SubServers > There is no server with that name");
-                        } else if (!(servers.get(args[1].toLowerCase()) instanceof SubServer)) {
+                        } else if (!args[1].equals("*") && !(servers.get(args[1].toLowerCase()) instanceof SubServer)) {
                             sender.sendMessage("SubServers > That Server is not a SubServer");
-                        } else if (!((SubServer) servers.get(args[1].toLowerCase())).isRunning()) {
+                        } else if (!args[1].equals("*") && !((SubServer) servers.get(args[1].toLowerCase())).isRunning()) {
                             sender.sendMessage("SubServers > That SubServer is not running");
+                        } else if (args[1].equals("*")) {
+                            for (Server server : servers.values()) {
+                                if (server instanceof SubServer && ((SubServer) server).isRunning()) {
+                                    ((SubServer) server).terminate();
+                                }
+                            }
                         } else {
                             ((SubServer) servers.get(args[1].toLowerCase())).terminate();
                         }
@@ -555,6 +615,7 @@ public final class SubCommand extends CommandX {
                 "   Reload: /sub reload [all|config|templates]",
                 "   Info: /sub info [proxy|host|group|server] <Name>",
                 "   Start Server: /sub start <SubServer>",
+                "   Restart Server: /sub restart <SubServer>",
                 "   Stop Server: /sub stop <SubServer>",
                 "   Terminate Server: /sub kill <SubServer>",
                 "   Command Server: /sub cmd <SubServer> <Command> [Args...]",
@@ -685,16 +746,31 @@ public final class SubCommand extends CommandX {
                     return new NamedContainer<>(null, Collections.emptyList());
                 }
             } else if (args[0].equals("start") ||
-                    args[0].equals("stop") ||
-                    args[0].equals("kill") || args[0].equals("terminate")) {
+                    args[0].equals("restart")) {
                     List<String> list = new ArrayList<String>();
                 if (args.length == 2) {
                     if (last.length() == 0) {
                         for (SubServer server : plugin.api.getSubServers().values()) list.add(server.getName());
                     } else {
                         for (SubServer server : plugin.api.getSubServers().values()) {
-                            if (server.getName().toLowerCase().startsWith(last))
-                                list.add(last + server.getName().substring(last.length()));
+                            if (server.getName().toLowerCase().startsWith(last)) list.add(last + server.getName().substring(last.length()));
+                        }
+                    }
+                    return new NamedContainer<>((list.size() <= 0)?plugin.api.getLang("SubServers", "Command.Generic.Unknown-SubServer").replace("$str$", args[0]):null, list);
+                } else {
+                    return new NamedContainer<>(null, Collections.emptyList());
+                }
+            } else if (args[0].equals("stop") ||
+                    args[0].equals("kill") || args[0].equals("terminate")) {
+                List<String> list = new ArrayList<String>();
+                if (args.length == 2) {
+                    if (last.length() == 0) {
+                        list.add("*");
+                        for (SubServer server : plugin.api.getSubServers().values()) list.add(server.getName());
+                    } else {
+                        if ("*".startsWith(last)) list.add("*");
+                        for (SubServer server : plugin.api.getSubServers().values()) {
+                            if (server.getName().toLowerCase().startsWith(last)) list.add(last + server.getName().substring(last.length()));
                         }
                     }
                     return new NamedContainer<>((list.size() <= 0)?plugin.api.getLang("SubServers", "Command.Generic.Unknown-SubServer").replace("$str$", args[0]):null, list);
@@ -705,8 +781,10 @@ public final class SubCommand extends CommandX {
                 if (args.length == 2) {
                     List<String> list = new ArrayList<String>();
                     if (last.length() == 0) {
+                        list.add("*");
                         for (SubServer server : plugin.api.getSubServers().values()) list.add(server.getName());
                     } else {
+                        if ("*".startsWith(last)) list.add("*");
                         for (SubServer server : plugin.api.getSubServers().values()) {
                             if (server.getName().toLowerCase().startsWith(last)) list.add(last + server.getName().substring(last.length()));
                         }

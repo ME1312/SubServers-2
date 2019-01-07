@@ -2,8 +2,10 @@ package net.ME1312.SubServers.Client.Sponge;
 
 import com.google.gson.Gson;
 import net.ME1312.SubServers.Client.Sponge.Graphic.UIRenderer;
+import net.ME1312.SubServers.Client.Sponge.Library.Callback;
 import net.ME1312.SubServers.Client.Sponge.Library.ChatColor;
 import net.ME1312.SubServers.Client.Sponge.Library.Config.YAMLSection;
+import net.ME1312.SubServers.Client.Sponge.Library.Container;
 import net.ME1312.SubServers.Client.Sponge.Library.Util;
 import net.ME1312.SubServers.Client.Sponge.Library.Version.Version;
 import net.ME1312.SubServers.Client.Sponge.Network.API.*;
@@ -29,6 +31,7 @@ import java.net.URL;
 import java.nio.charset.Charset;
 import java.text.DecimalFormat;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 public final class SubCommand implements CommandExecutor {
     private SubPlugin plugin;
@@ -73,6 +76,11 @@ public final class SubCommand implements CommandExecutor {
                         .executor(new START())
                         .arguments(GenericArguments.optional(GenericArguments.string(Text.of("SubServer"))), GenericArguments.optional(GenericArguments.remainingJoinedStrings(Text.of("extra"))))
                         .build(), "start")
+                .child(CommandSpec.builder()
+                        .description(Text.of("The SubServers Command - Restart"))
+                        .executor(new RESTART())
+                        .arguments(GenericArguments.optional(GenericArguments.string(Text.of("SubServer"))), GenericArguments.optional(GenericArguments.remainingJoinedStrings(Text.of("extra"))))
+                        .build(), "restart")
                 .child(CommandSpec.builder()
                         .description(Text.of("The SubServers Command - Stop"))
                         .executor(new STOP())
@@ -657,12 +665,10 @@ public final class SubCommand implements CommandExecutor {
                                 case 9:
                                     sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Start.Server-Incompatible").replace("$str$", data.getString("m").split(":\\s")[1])));
                                     break;
-                                case 0:
-                                case 1:
-                                    sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Start")));
-                                    break;
                                 default:
                                     plugin.logger.warn("PacketStartServer(" + ((sender instanceof Player)?((Player) sender).getUniqueId().toString():"null") + ", " + subserver.get() + ") responded with: " + data.getString("m"));
+                                case 0:
+                                case 1:
                                     sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Start")));
                                     break;
                             }
@@ -674,6 +680,93 @@ public final class SubCommand implements CommandExecutor {
                     }
                 } else {
                     sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Generic.Usage").replace("$str$", "/sub start <SubServer>")));
+                    return CommandResult.builder().successCount(0).build();
+                }
+            } else {
+                sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Generic.Invalid-Permission").replace("$str$", "subservers.command")));
+                return CommandResult.builder().successCount(0).build();
+            }
+        }
+    }
+
+    public final class RESTART implements CommandExecutor {
+        public CommandResult execute(CommandSource sender, CommandContext args) throws CommandException {
+            if (canRun(sender)) {
+                Optional<String> subserver = args.getOne(Text.of("SubServer"));
+                if (subserver.isPresent()) {
+                    if (sender.hasPermission("subservers.subserver.stop." + subserver.get().toLowerCase()) && sender.hasPermission("subservers.subserver.start." + subserver.get().toLowerCase())) {
+                        Runnable starter = () -> plugin.subdata.sendPacket(new PacketStartServer(null, subserver.get(), data -> {
+                            switch (data.getInt("r")) {
+                                case 3:
+                                case 4:
+                                    sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Restart.Disappeared")));
+                                    break;
+                                case 5:
+                                    sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Restart.Host-Unavailable")));
+                                    break;
+                                case 6:
+                                    sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Restart.Host-Disabled")));
+                                    break;
+                                case 7:
+                                    sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Restart.Server-Disabled")));
+                                    break;
+                                case 9:
+                                    sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Start.Server-Incompatible").replace("$str$", data.getString("m").split(":\\s")[1])));
+                                    break;
+                                default:
+                                    plugin.logger.warn("PacketStartServer(" + ((sender instanceof Player)?((Player) sender).getUniqueId().toString():"null") + ", " + subserver.get() + ") responded with: " + data.getString("m"));
+                                case 8:
+                                case 0:
+                                case 1:
+                                    sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Restart.Finish")));
+                                    break;
+                            }
+                        }));
+
+                        final Container<Boolean> listening = new Container<Boolean>(true);
+                        PacketInRunEvent.callback("SubStoppedEvent", new Callback<YAMLSection>() {
+                            @Override
+                            public void run(YAMLSection json) {
+                                try {
+                                    if (listening.get()) if (!json.getString("server").equalsIgnoreCase(subserver.get())) {
+                                        PacketInRunEvent.callback("SubStoppedEvent", this);
+                                    } else {
+                                        plugin.game.getScheduler().createTaskBuilder().execute(starter).delay(100, TimeUnit.MILLISECONDS).submit(plugin);
+                                    }
+                                } catch (Exception e) {}
+                            }
+                        });
+
+                        plugin.subdata.sendPacket(new PacketStopServer((sender instanceof Player) ? ((Player) sender).getUniqueId():null, subserver.get(), false, data -> {
+                            if (data.getInt("r") != 0) listening.set(false);
+                            switch (data.getInt("r")) {
+                                case 3:
+                                    sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Restart.Unknown")));
+                                    break;
+                                case 4:
+                                    sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Restart.Invalid")));
+                                    break;
+                                case 5:
+                                    starter.run();
+                                    break;
+                                default:
+                                    plugin.logger.warn("PacketStopServer(" + ((sender instanceof Player)?((Player) sender).getUniqueId().toString():"null") + ", " + subserver.get() + ", false) responded with: " + data.getString("m"));
+                                case 0:
+                                case 1:
+                                    sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Restart")));
+                                    break;
+                            }
+                        }));
+                        return CommandResult.builder().successCount(1).build();
+                    } else if (!sender.hasPermission("subservers.subserver.stop." + subserver.get().toLowerCase())) {
+                        sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Generic.Invalid-Permission").replace("$str$", "subservers.subserver.stop." + subserver.get().toLowerCase())));
+                        return CommandResult.builder().successCount(0).build();
+                    } else {
+                        sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Generic.Invalid-Permission").replace("$str$", "subservers.subserver.start." + subserver.get().toLowerCase())));
+                        return CommandResult.builder().successCount(0).build();
+                    }
+                } else {
+                    sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Generic.Usage").replace("$str$", "/sub stop <SubServer>")));
                     return CommandResult.builder().successCount(0).build();
                 }
             } else {
@@ -700,12 +793,10 @@ public final class SubCommand implements CommandExecutor {
                                 case 5:
                                     sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Stop.Not-Running")));
                                     break;
-                                case 0:
-                                case 1:
-                                    sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Stop")));
-                                    break;
                                 default:
                                     plugin.logger.warn("PacketStopServer(" + ((sender instanceof Player)?((Player) sender).getUniqueId().toString():"null") + ", " + subserver.get() + ", false) responded with: " + data.getString("m"));
+                                case 0:
+                                case 1:
                                     sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Stop")));
                                     break;
                             }
@@ -743,12 +834,10 @@ public final class SubCommand implements CommandExecutor {
                                 case 5:
                                     sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Terminate.Not-Running")));
                                     break;
-                                case 0:
-                                case 1:
-                                    sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Terminate")));
-                                    break;
                                 default:
                                     plugin.logger.warn("PacketStopServer(" + ((sender instanceof Player)?((Player) sender).getUniqueId().toString():"null") + ", " + subserver.get() + ", true) responded with: " + data.getString("m"));
+                                case 0:
+                                case 1:
                                     sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Terminate")));
                                     break;
                             }
@@ -787,12 +876,10 @@ public final class SubCommand implements CommandExecutor {
                                 case 5:
                                     sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Command.Not-Running")));
                                     break;
-                                case 0:
-                                case 1:
-                                    sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Command")));
-                                    break;
                                 default:
                                     plugin.logger.warn("PacketCommandServer(" + ((sender instanceof Player)?((Player) sender).getUniqueId().toString():"null") + ", " + subserver.get() + ", /" + command.get() + ") responded with: " + data.getString("m"));
+                                case 0:
+                                case 1:
                                     sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Command")));
                                     break;
                             }
@@ -854,12 +941,10 @@ public final class SubCommand implements CommandExecutor {
                                     case 11:
                                         sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Creator.Invalid-Port")));
                                         break;
-                                    case 0:
-                                    case 1:
-                                        sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Creator")));
-                                        break;
                                     default:
                                         plugin.logger.warn("PacketCreateServer(" + ((sender instanceof Player)?((Player) sender).getUniqueId().toString():"null") + ", " + name.get() + ", " + host.get() + ", " + template.get() + ", " + version.get() + ", " + (port.orElse("null")) + ") responded with: " + data.getString("m"));
+                                    case 0:
+                                    case 1:
                                         sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Creator")));
                                         break;
                                 }
@@ -952,6 +1037,7 @@ public final class SubCommand implements CommandExecutor {
                 ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Help.Version").replace("$str$", "/sub version")),
                 ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Help.Info").replace("$str$", "/sub info [proxy|host|group|server] <Name>")),
                 ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Help.SubServer.Start").replace("$str$", "/sub start <SubServer>")),
+                ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Help.SubServer.Restart").replace("$str$", "/sub restart <SubServer>")),
                 ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Help.SubServer.Stop").replace("$str$", "/sub stop <SubServer>")),
                 ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Help.SubServer.Terminate").replace("$str$", "/sub kill <SubServer>")),
                 ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Help.SubServer.Command").replace("$str$", "/sub cmd <SubServer> <Command> [Args...]")),

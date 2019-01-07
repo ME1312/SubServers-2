@@ -59,23 +59,54 @@ public class PacketStopServer implements PacketIn, PacketOut {
     public void execute(Client client, YAMLSection data) {
         try {
             Map<String, Server> servers = plugin.api.getServers();
-            if (!servers.keySet().contains(data.getRawString("server").toLowerCase())) {
+            if (!data.getRawString("server").equals("*") && !servers.keySet().contains(data.getRawString("server").toLowerCase())) {
                 client.sendPacket(new PacketStopServer(3, "There is no server with that name", (data.contains("id"))?data.getRawString("id"):null));
-            } else if (!(servers.get(data.getRawString("server").toLowerCase()) instanceof SubServer)) {
+            } else if (!data.getRawString("server").equals("*") && !(servers.get(data.getRawString("server").toLowerCase()) instanceof SubServer)) {
                 client.sendPacket(new PacketStopServer(4, "That Server is not a SubServer", (data.contains("id"))?data.getRawString("id"):null));
-            } else if (!((SubServer) servers.get(data.getRawString("server").toLowerCase())).isRunning()) {
+            } else if (!data.getRawString("server").equals("*") && !((SubServer) servers.get(data.getRawString("server").toLowerCase())).isRunning()) {
                 client.sendPacket(new PacketStopServer(5, "That SubServer is not running", (data.contains("id"))?data.getRawString("id"):null));
-            } else if (data.contains("force") && data.getBoolean("force")) {
-                if (((SubServer) servers.get(data.getRawString("server").toLowerCase())).terminate((data.contains("player"))?UUID.fromString(data.getRawString("player")):null)) {
-                    client.sendPacket(new PacketStopServer(0, "Terminating SubServer", (data.contains("id"))?data.getRawString("id"):null));
+            } else if (data.getRawString("server").equals("*")) {
+                boolean sent = false;
+                if (data.contains("force") && data.getBoolean("force")) {
+                    for (Server server : servers.values()) {
+                        if (server instanceof SubServer && ((SubServer) server).isRunning()) {
+                            if (((SubServer) server).terminate((data.contains("player"))?UUID.fromString(data.getRawString("player")):null)) {
+                                sent = true;
+                            }
+                        }
+                    }
+                    if (sent) {
+                        client.sendPacket(new PacketStopServer(0, "Terminating SubServers", (data.contains("id"))?data.getRawString("id"):null));
+                    } else {
+                        client.sendPacket(new PacketStopServer(1, "Couldn't terminate SubServers", (data.contains("id"))?data.getRawString("id"):null));
+                    }
                 } else {
-                    client.sendPacket(new PacketStopServer(1, "Couldn't terminate SubServer", (data.contains("id"))?data.getRawString("id"):null));
+                    for (Server server : servers.values()) {
+                        if (server instanceof SubServer && ((SubServer) server).isRunning()) {
+                            if (((SubServer) server).stop((data.contains("player"))?UUID.fromString(data.getRawString("player")):null)) {
+                                sent = true;
+                            }
+                        }
+                    }
+                    if (sent) {
+                        client.sendPacket(new PacketStopServer(0, "Stopping SubServers", (data.contains("id"))?data.getRawString("id"):null));
+                    } else {
+                        client.sendPacket(new PacketStopServer(1, "Couldn't stop SubServers", (data.contains("id"))?data.getRawString("id"):null));
+                    }
                 }
             } else {
-                if (((SubServer) servers.get(data.getRawString("server").toLowerCase())).stop((data.contains("player"))?UUID.fromString(data.getRawString("player")):null)) {
-                    client.sendPacket(new PacketStopServer(0, "Stopping SubServer", (data.contains("id"))?data.getRawString("id"):null));
+                if (data.contains("force") && data.getBoolean("force")) {
+                    if (((SubServer) servers.get(data.getRawString("server").toLowerCase())).terminate((data.contains("player"))?UUID.fromString(data.getRawString("player")):null)) {
+                        client.sendPacket(new PacketStopServer(0, "Terminating SubServer", (data.contains("id"))?data.getRawString("id"):null));
+                    } else {
+                        client.sendPacket(new PacketStopServer(1, "Couldn't terminate SubServer", (data.contains("id"))?data.getRawString("id"):null));
+                    }
                 } else {
-                    client.sendPacket(new PacketStopServer(1, "Couldn't stop SubServer", (data.contains("id"))?data.getRawString("id"):null));
+                    if (((SubServer) servers.get(data.getRawString("server").toLowerCase())).stop((data.contains("player"))?UUID.fromString(data.getRawString("player")):null)) {
+                        client.sendPacket(new PacketStopServer(0, "Stopping SubServer", (data.contains("id"))?data.getRawString("id"):null));
+                    } else {
+                        client.sendPacket(new PacketStopServer(1, "Couldn't stop SubServer", (data.contains("id"))?data.getRawString("id"):null));
+                    }
                 }
             }
         } catch (Throwable e) {

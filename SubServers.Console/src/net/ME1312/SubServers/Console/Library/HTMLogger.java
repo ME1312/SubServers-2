@@ -1,11 +1,10 @@
-package net.ME1312.SubServers.Console;
+package net.ME1312.SubServers.Console.Library;
 
 import net.ME1312.SubServers.Bungee.Library.Container;
 import org.fusesource.jansi.AnsiOutputStream;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.net.URLDecoder;
 import java.util.LinkedList;
 
 /**

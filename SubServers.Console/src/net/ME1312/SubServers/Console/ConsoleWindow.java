@@ -5,6 +5,7 @@ import net.ME1312.SubServers.Bungee.Host.SubLogFilter;
 import net.ME1312.SubServers.Bungee.Host.SubLogger;
 import net.ME1312.SubServers.Bungee.Host.SubServer;
 import net.ME1312.SubServers.Bungee.Library.Util;
+import net.ME1312.SubServers.Console.Library.HTMLogger;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -24,7 +25,7 @@ import java.util.List;
 import java.util.logging.Level;
 
 public final class ConsoleWindow implements SubLogFilter {
-    private static final int MAX_SCROLLBACK = (Integer.getInteger("subservers.console.max_scrollback", 0) >= 128)?Integer.getInteger("subservers.console.max_scrollback"):15000;
+    private static final int MAX_SCROLLBACK = (Integer.getInteger("subservers.console.max_scrollback", 0) >= 128)?Integer.getInteger("subservers.console.max_scrollback"):7500;
     private static final String RESET_VALUE = "\n\u00A0\n\u00A0";
     private ConsolePlugin plugin;
     private JFrame window;
@@ -67,7 +68,7 @@ public final class ConsoleWindow implements SubLogFilter {
                     while (log.getSelectionStart() == log.getSelectionEnd() && (lines = countLines(content = log.getDocument().getText(0, log.getDocument().getLength()))) > MAX_SCROLLBACK) {
                         int lineBreak = 1;
                         for (lines -= MAX_SCROLLBACK; lines > 0; lines--) lineBreak = content.indexOf('\n', lineBreak + 1);
-                        if (lineBreak >= 2) {
+                        if (lineBreak >= 2 && log.getSelectionStart() == log.getSelectionEnd()) {
                             log.getDocument().remove(2, lineBreak);
                         } else break;
                     }
