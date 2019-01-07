@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.logging.Level;
 
 public final class ConsoleWindow implements SubLogFilter {
-    private static final int MAX_SCROLLBACK = (Integer.getInteger("subservers.console.max_scrollback", 15000) >= 128)?Integer.getInteger("subservers.console.max_scrollback", 15000):15000;
+    private static final int MAX_SCROLLBACK = (Integer.getInteger("subservers.console.max_scrollback", 0) >= 128)?Integer.getInteger("subservers.console.max_scrollback"):15000;
     private static final String RESET_VALUE = "\n\u00A0\n\u00A0";
     private ConsolePlugin plugin;
     private JFrame window;
@@ -326,7 +326,7 @@ public final class ConsoleWindow implements SubLogFilter {
         Util.isException(new Util.ExceptionRunnable() {
             @Override
             public void run() throws Throwable {
-                window.setIconImage(ImageIO.read(ConsolePlugin.class.getResourceAsStream("/SubServers.png")));
+                window.setIconImage(ImageIO.read(ConsolePlugin.class.getResourceAsStream("/net/ME1312/SubServers/Console/ConsoleIcon.png")));
             }
         });
         window.setTitle(logger.getName() + " \u2014 SubServers 2");
@@ -558,7 +558,6 @@ public final class ConsoleWindow implements SubLogFilter {
         log.setText(RESET_VALUE);
         loadContent();
         KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(keys);
-        if (logger.isLogging() && !open) open();
     }
     private void hScroll() {
         hScroll.setMaximum(vScroll.getHorizontalScrollBar().getMaximum());
@@ -597,10 +596,6 @@ public final class ConsoleWindow implements SubLogFilter {
         hScroll();
     }
 
-    @Override
-    public void start() {
-        open();
-    }
     public void open() {
         if (!open) {
             window.setVisible(true);
@@ -613,6 +608,8 @@ public final class ConsoleWindow implements SubLogFilter {
         return open;
     }
 
+    @Override
+    public void start() {}
     private void loadContent() {
         if (file != null) {
             try (FileInputStream reader = new FileInputStream(file)) {
@@ -629,18 +626,9 @@ public final class ConsoleWindow implements SubLogFilter {
 
     @Override
     public void stop() {
-        close();
-        clear();
-        if (filewriter != null) try {
-            filewriter.close();
-        } catch (Exception e) {}
-        if (file != null) try {
-            filewriter = new FileOutputStream(file, false);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
+        plugin.onClose(this);
     }
+
     public void close() {
         if (open) {
             this.open = false;
@@ -650,7 +638,6 @@ public final class ConsoleWindow implements SubLogFilter {
                 findO = 0;
             }
             window.setVisible(false);
-            plugin.onClose(this);
         }
     }
 
