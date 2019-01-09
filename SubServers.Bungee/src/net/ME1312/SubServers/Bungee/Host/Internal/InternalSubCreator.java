@@ -358,20 +358,9 @@ public class InternalSubCreator extends SubCreator {
     @Override
     public void terminate(String name) {
         if (this.thread.keySet().contains(name.toLowerCase())) {
-            boolean success = false;
-            if (this.thread.get(name.toLowerCase()).process != null && this.thread.get(name.toLowerCase()).process.isAlive() && System.getProperty("os.name").toLowerCase().startsWith("windows")) try {
-                Process terminator = Runtime.getRuntime().exec(new String[]{"taskkill", "/T", "/F", "/PID", Long.toString((long) Process.class.getDeclaredMethod("pid").invoke(this.thread.get(name.toLowerCase()).process))});
-                terminator.waitFor();
-                if (terminator.exitValue() != 0) throw new IllegalStateException("taskkill exited with code " + terminator.exitValue());
-                success = true;
-            } catch (Exception e) {}
-
             if (this.thread.get(name.toLowerCase()).process != null && this.thread.get(name.toLowerCase()).process.isAlive()) {
-                this.thread.get(name.toLowerCase()).process.destroyForcibly();
-                success = true;
-            }
-
-            if (!success && this.thread.get(name.toLowerCase()).isAlive()) {
+                Executable.terminate(this.thread.get(name.toLowerCase()).process);
+            } else if (this.thread.get(name.toLowerCase()).isAlive()) {
                 this.thread.get(name.toLowerCase()).interrupt();
                 this.thread.remove(name.toLowerCase());
             }

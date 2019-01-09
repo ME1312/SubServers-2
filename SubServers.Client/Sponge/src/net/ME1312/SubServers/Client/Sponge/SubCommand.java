@@ -766,7 +766,7 @@ public final class SubCommand implements CommandExecutor {
                         return CommandResult.builder().successCount(0).build();
                     }
                 } else {
-                    sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Generic.Usage").replace("$str$", "/sub stop <SubServer>")));
+                    sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Generic.Usage").replace("$str$", "/sub restart <SubServer>")));
                     return CommandResult.builder().successCount(0).build();
                 }
             } else {
