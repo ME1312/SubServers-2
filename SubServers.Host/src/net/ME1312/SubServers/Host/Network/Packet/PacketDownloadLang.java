@@ -44,7 +44,7 @@ public class PacketDownloadLang implements PacketIn, PacketOut {
             f.setAccessible(false);
             log.info.println("Lang Settings Downloaded");
         } catch (IllegalAccessException | NoSuchFieldException e) {
-            e.printStackTrace();
+            log.error.println(e);
         }
     }
 

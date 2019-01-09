@@ -1,20 +1,30 @@
 package net.ME1312.SubServers.Host.Network.Packet;
 
 import net.ME1312.Galaxi.Library.Config.YAMLSection;
+import net.ME1312.Galaxi.Library.Log.Logger;
 import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubServers.Host.ExHost;
 import net.ME1312.SubServers.Host.Network.PacketIn;
+import net.ME1312.SubServers.Host.Network.SubDataClient;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
 
 /**
  * Reload Packet
  */
 public class PacketInReload implements PacketIn {
     private ExHost host;
+    private Logger log;
 
     public PacketInReload(ExHost host) {
         this.host = host;
+        try {
+            Field f = SubDataClient.class.getDeclaredField("log");
+            f.setAccessible(true);
+            this.log = (Logger) f.get(null);
+            f.setAccessible(false);
+        } catch (IllegalAccessException | NoSuchFieldException e) {}
     }
 
     @Override
@@ -22,7 +32,7 @@ public class PacketInReload implements PacketIn {
         try {
             host.reload();
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error.println(e);
         }
     }
 

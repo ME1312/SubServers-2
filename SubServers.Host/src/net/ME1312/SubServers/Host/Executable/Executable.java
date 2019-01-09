@@ -1,8 +1,6 @@
 package net.ME1312.SubServers.Host.Executable;
 
-import com.sun.jna.Pointer;
-import com.sun.jna.platform.win32.Kernel32;
-import com.sun.jna.platform.win32.WinNT;
+import net.ME1312.SubServers.Host.Library.Compatibility.JNA;
 
 import java.io.File;
 import java.lang.reflect.Field;
@@ -37,7 +35,7 @@ public class Executable {
      * Get the PID of a currently running process
      *
      * @param process Process
-     * @return Process ID
+     * @return Process ID (null if unknown)
      */
     public static Long pid(Process process) {
         if (process.isAlive()) {
@@ -51,17 +49,22 @@ public class Executable {
                         long handle = f.getLong(process);
                         f.setAccessible(false);
 
-                        Kernel32 k32 = Kernel32.INSTANCE;
-                        WinNT.HANDLE nt = new WinNT.HANDLE();
-                        nt.setPointer(Pointer.createConstant(handle));
-                        return (long) k32.GetProcessId(nt);
+                        ClassLoader jna = JNA.get();
+                        Class<?> pc = jna.loadClass("com.sun.jna.Pointer"),
+                                ntc = jna.loadClass("com.sun.jna.platform.win32.WinNT$HANDLE"),
+                                k32c = jna.loadClass("com.sun.jna.platform.win32.Kernel32");
+                        Object k32 = k32c.getField("INSTANCE").get(null),
+                                nt = ntc.getConstructor().newInstance();
+                        ntc.getMethod("setPointer", pc).invoke(nt, pc.getMethod("createConstant", long.class).invoke(null, handle));
+                        return ((Number) k32c.getMethod("GetProcessId", ntc).invoke(k32, nt)).longValue();
                     } else if (process.getClass().getName().equals("java.lang.UNIXProcess")) {
                         Field f = process.getClass().getDeclaredField("pid");
                         f.setAccessible(true);
                         Object response = f.get(process);
                         f.setAccessible(false);
 
-                        if (response instanceof Number) return ((Number) response).longValue();
+                        if (response instanceof Number)
+                            return ((Number) response).longValue();
                     }
                 } catch (Throwable e) {}
             }
@@ -79,7 +82,7 @@ public class Executable {
             if (System.getProperty("os.name").toLowerCase().startsWith("windows")) {
                 Long pid = pid(process);
                 if (pid != null) try {
-                    Process terminator = Runtime.getRuntime().exec(new String[]{"taskkill", "/T", "/F", "/PID", pid.toString()});
+                    Process terminator = Runtime.getRuntime().exec(new String[]{"taskkill.exe", "/T", "/F", "/PID", pid.toString()});
                     terminator.waitFor();
                 } catch (Throwable e) {}
             }

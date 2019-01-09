@@ -1,6 +1,6 @@
-package net.ME1312.SubServers.Bungee.Library.Compatibility.v1_13;
+package net.ME1312.SubServers.Sync.Library.Compatibility.mc1_13;
 
-import net.ME1312.SubServers.Bungee.Library.NamedContainer;
+import net.ME1312.SubServers.Sync.Library.NamedContainer;
 import net.md_5.bungee.api.CommandSender;
 
 import java.util.LinkedList;
@@ -9,15 +9,15 @@ import java.util.List;
 /**
  * Command Layout Class that implements all possible features (1.13 Version)
  */
-public class CommandX extends net.ME1312.SubServers.Bungee.Library.Compatibility.CommandX/* implements TabValidator */ {
-    public final net.ME1312.SubServers.Bungee.Library.Compatibility.CommandX command;
+public class CommandX extends net.ME1312.SubServers.Sync.Library.Compatibility.CommandX/* implements TabValidator */ {
+    public final net.ME1312.SubServers.Sync.Library.Compatibility.CommandX command;
 
     /**
      * Create a Command
      *
      * @param other CommandX from previous version
      */
-    public CommandX(net.ME1312.SubServers.Bungee.Library.Compatibility.CommandX other) {
+    public CommandX(net.ME1312.SubServers.Sync.Library.Compatibility.CommandX other) {
         super(other.getName());
         command = other;
     }

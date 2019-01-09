@@ -58,7 +58,7 @@ public class SubCommand {
                 commands = (TreeMap<String, Command>) f.get(GalaxiEngine.getInstance().getPluginManager());
                 f.setAccessible(false);
             } catch (Exception e) {
-                e.printStackTrace();
+                SubAPI.getInstance().getAppInfo().getLogger().error.println(e);
                 commands = new TreeMap<String, Command>();
             }
             if (args.length <= 1) {

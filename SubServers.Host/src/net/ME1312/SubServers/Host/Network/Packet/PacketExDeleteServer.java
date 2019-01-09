@@ -92,7 +92,7 @@ public class PacketExDeleteServer implements PacketIn, PacketOut {
                             Util.deleteDirectory(from);
                         }
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        log.error.println(e);
                     }
 
                     log.info.println("Saving...");
@@ -102,7 +102,7 @@ public class PacketExDeleteServer implements PacketIn, PacketOut {
                         data.getSection("info").toJSON().write(writer);
                         writer.close();
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        log.error.println(e);
                     }
                     if (UPnP.isUPnPAvailable() && UPnP.isMappedTCP(server.getPort())) UPnP.closePortTCP(server.getPort());
                     log.info.println("Deleted SubServer: " + data.getRawString("server"));
