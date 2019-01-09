@@ -25,7 +25,7 @@ public class JNA {
             Logger log = new Logger("JNA");
             UniversalFile library = new UniversalFile(Galaxi.getInstance().getRuntimeDirectory(), "Cache:Libraries");
             library.mkdirs();
-            UniversalFile jna = new UniversalFile(library, "JNA.jar");
+            UniversalFile jna = new UniversalFile(library, "jna-" + JNA_VERSION + ".jar");
             if (!jna.exists()) {
                 jna.getParentFile().mkdirs();
                 if (!jna.exists()) {
@@ -39,7 +39,7 @@ public class JNA {
                     }
                 }
             }
-            UniversalFile platform = new UniversalFile(library, "JNA-Platform.jar");
+            UniversalFile platform = new UniversalFile(library, "jna-platform-" + JNA_VERSION + ".jar");
             if (!platform.exists()) {
                 platform.getParentFile().mkdirs();
                 if (!platform.exists()) {

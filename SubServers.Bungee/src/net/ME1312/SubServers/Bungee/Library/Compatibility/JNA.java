@@ -22,7 +22,7 @@ public class JNA {
             boolean announced = false;
             UniversalFile library = new UniversalFile(SubAPI.getInstance().getInternals().dir, "SubServers:Cache:Libraries");
             library.mkdirs();
-            UniversalFile jna = new UniversalFile(library, "JNA.jar");
+            UniversalFile jna = new UniversalFile(library, "jna-" + JNA_VERSION + ".jar");
             if (!jna.exists()) {
                 jna.getParentFile().mkdirs();
                 if (!jna.exists()) {
@@ -36,7 +36,7 @@ public class JNA {
                     announced = true;
                 }
             }
-            UniversalFile platform = new UniversalFile(library, "JNA-Platform.jar");
+            UniversalFile platform = new UniversalFile(library, "jna-platform-" + JNA_VERSION + ".jar");
             if (!platform.exists()) {
                 platform.getParentFile().mkdirs();
                 if (!platform.exists()) {
