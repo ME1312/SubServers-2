@@ -2,25 +2,32 @@ package net.ME1312.SubServers.Sync.Server;
 
 import net.ME1312.SubServers.Sync.Library.Util;
 import net.md_5.bungee.BungeeServerInfo;
-import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.CommandSender;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 import java.lang.reflect.Field;
 import java.net.InetSocketAddress;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.UUID;
 
 /**
  * Server Class
  */
 public class ServerContainer extends BungeeServerInfo {
-    private final String signature;
-    private String nick = null;
     private String subdata;
+    private List<UUID> whitelist = new ArrayList<UUID>();
+    private String nick = null;
     private boolean hidden;
+    private final String signature;
 
-    public ServerContainer(String signature, String name, String display, InetSocketAddress address, String subdata, String motd, boolean hidden, boolean restricted) {
+    public ServerContainer(String signature, String name, String display, InetSocketAddress address, String subdata, String motd, boolean hidden, boolean restricted, Collection<UUID> whitelist) {
         super(name, address, motd, restricted);
         if (Util.isNull(name, address, motd, hidden, restricted)) throw new NullPointerException();
         this.signature = signature;
         this.subdata = subdata;
+        this.whitelist.addAll(whitelist);
         this.hidden = hidden;
         setDisplayName(display);
     }
@@ -63,6 +70,35 @@ public class ServerContainer extends BungeeServerInfo {
         } else {
             this.nick = value;
         }
+    }
+
+    /**
+     * See if a player is whitelisted
+     *
+     * @param player Player
+     * @return Whitelisted Status
+     */
+    public boolean canAccess(CommandSender player) {
+        return (player instanceof ProxiedPlayer && whitelist.contains(((ProxiedPlayer) player).getUniqueId())) || super.canAccess(player);
+    }
+
+    /**
+     * Add a player to the whitelist (for use with restricted servers)
+     *
+     * @param player Player to add
+     */
+    public void whitelist(UUID player) {
+        if (Util.isNull(player)) throw new NullPointerException();
+        whitelist.add(player);
+    }
+
+    /**
+     * Remove a player to the whitelist
+     *
+     * @param player Player to remove
+     */
+    public void unwhitelist(UUID player) {
+        whitelist.remove(player);
     }
 
     /**

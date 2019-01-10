@@ -9,11 +9,13 @@ import net.ME1312.SubServers.Bungee.Library.Exception.InvalidServerException;
 import net.ME1312.SubServers.Bungee.Library.NamedContainer;
 import net.ME1312.SubServers.Bungee.Library.Util;
 import net.ME1312.SubServers.Bungee.Network.Client;
+import net.ME1312.SubServers.Bungee.Network.Packet.PacketOutExUpdateWhitelist;
 import net.ME1312.SubServers.Bungee.Network.Packet.PacketOutRunEvent;
 import net.ME1312.SubServers.Bungee.Network.SubDataServer;
 import net.ME1312.SubServers.Bungee.SubAPI;
 import net.ME1312.SubServers.Bungee.SubPlugin;
 import net.md_5.bungee.BungeeServerInfo;
+import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 import java.lang.reflect.Field;
@@ -25,11 +27,12 @@ import java.util.*;
  */
 public class ServerContainer extends BungeeServerInfo implements Server {
     private YAMLSection extra = new YAMLSection();
-    private final String signature;
     private Client client = null;
-    private List<String> groups = new ArrayList<String>();
     private String nick = null;
+    private List<String> groups = new ArrayList<String>();
+    private List<UUID> whitelist = new ArrayList<UUID>();
     private boolean hidden;
+    private final String signature;
 
     public ServerContainer(String name, InetSocketAddress address, String motd, boolean hidden, boolean restricted) throws InvalidServerException {
         super(name, address, motd, restricted);
@@ -154,6 +157,56 @@ public class ServerContainer extends BungeeServerInfo implements Server {
     }
 
     @Override
+    public Collection<UUID> getWhitelist() {
+        return new ArrayList<UUID>(whitelist);
+    }
+
+    /**
+     * See if a player can access this server
+     *
+     * @param player Player
+     * @return Whitelisted Status
+     */
+    @Override
+    public boolean canAccess(CommandSender player) {
+        return (player instanceof ProxiedPlayer && whitelist.contains(((ProxiedPlayer) player).getUniqueId())) || super.canAccess(player);
+    }
+
+    @Override
+    public boolean isWhitelisted(ProxiedPlayer player) {
+        return isWhitelisted(player.getUniqueId());
+    }
+
+    @Override
+    public boolean isWhitelisted(UUID player) {
+        return whitelist.contains(player);
+    }
+
+    @Override
+    public void whitelist(ProxiedPlayer player) {
+        whitelist(player.getUniqueId());
+    }
+
+    @Override
+    public void whitelist(UUID player) {
+        if (Util.isNull(player)) throw new NullPointerException();
+        whitelist.add(player);
+        for (Proxy proxy : SubAPI.getInstance().getProxies().values()) if (proxy.getSubData() != null) proxy.getSubData().sendPacket(new PacketOutExUpdateWhitelist(getName(), true, player));
+    }
+
+    @Override
+    public void unwhitelist(ProxiedPlayer player) {
+        unwhitelist(player.getUniqueId());
+    }
+
+    @Override
+    public void unwhitelist(UUID player) {
+        if (Util.isNull(player)) throw new NullPointerException();
+        whitelist.remove(player);
+        for (Proxy proxy : SubAPI.getInstance().getProxies().values()) if (proxy.getSubData() != null) proxy.getSubData().sendPacket(new PacketOutExUpdateWhitelist(getName(), false, player));
+    }
+
+    @Override
     public final String getSignature() {
         return signature;
     }
@@ -196,6 +249,7 @@ public class ServerContainer extends BungeeServerInfo implements Server {
         info.set("group", getGroups());
         info.set("address", getAddress().getAddress().getHostAddress() + ':' + getAddress().getPort());
         info.set("motd", getMotd());
+        info.set("whitelist", whitelist);
         info.set("restricted", isRestricted());
         info.set("hidden", isHidden());
         if (getSubData() != null) info.set("subdata", getSubData().getAddress().toString());

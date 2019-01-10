@@ -6,7 +6,7 @@ import java.io.File;
 import java.lang.reflect.Field;
 
 /**
- * Executable String Handler Class
+ * Executable Handler Class
  */
 public class Executable {
     private Executable() {}

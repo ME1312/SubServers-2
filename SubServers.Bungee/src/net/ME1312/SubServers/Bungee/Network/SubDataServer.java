@@ -1,7 +1,6 @@
 package net.ME1312.SubServers.Bungee.Network;
 
 import com.dosse.upnp.UPnP;
-import com.google.gson.Gson;
 import net.ME1312.SubServers.Bungee.Event.SubNetworkConnectEvent;
 import net.ME1312.SubServers.Bungee.Event.SubNetworkDisconnectEvent;
 import net.ME1312.SubServers.Bungee.Library.Config.YAMLSection;
@@ -12,14 +11,11 @@ import net.ME1312.SubServers.Bungee.Library.Version.Version;
 import net.ME1312.SubServers.Bungee.Network.Encryption.AES;
 import net.ME1312.SubServers.Bungee.Network.Packet.*;
 import net.ME1312.SubServers.Bungee.SubPlugin;
-import org.msgpack.core.MessagePack;
 import org.msgpack.value.Value;
-import org.msgpack.value.ValueFactory;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.*;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -130,6 +126,7 @@ public final class SubDataServer {
         registerPacket(PacketExDeleteServer.class, "SubServers", "ExDeleteServer");
         registerPacket(PacketExRemoveServer.class, "SubServers", "ExRemoveServer");
         registerPacket(PacketExUpdateServer.class, "SubServers", "ExUpdateServer");
+        registerPacket(PacketOutExUpdateWhitelist.class, "SubServers", "ExUpdateWhitelist");
         registerPacket(PacketLinkExHost.class, "SubServers", "LinkExHost");
         registerPacket(PacketLinkProxy.class, "SubServers", "LinkProxy");
         registerPacket(PacketLinkServer.class, "SubServers", "LinkServer");

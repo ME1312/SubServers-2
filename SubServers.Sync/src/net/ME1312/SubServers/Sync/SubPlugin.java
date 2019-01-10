@@ -298,11 +298,11 @@ public final class SubPlugin extends BungeeCord implements Listener {
             if (server != null) {
                 if (server instanceof net.ME1312.SubServers.Sync.Network.API.SubServer) {
                     servers.put(server.getName().toLowerCase(), new SubServerContainer(server.getSignature(), server.getName(), server.getDisplayName(), server.getAddress(),
-                            server.getSubData(), server.getMotd(), server.isHidden(), server.isRestricted(), ((net.ME1312.SubServers.Sync.Network.API.SubServer) server).isRunning()));
+                            server.getSubData(), server.getMotd(), server.isHidden(), server.isRestricted(), server.getWhitelist(), ((net.ME1312.SubServers.Sync.Network.API.SubServer) server).isRunning()));
                     System.out.println("SubServers > Added SubServer: " + e.getServer());
                 } else {
                     servers.put(server.getName().toLowerCase(), new ServerContainer(server.getSignature(), server.getName(), server.getDisplayName(), server.getAddress(),
-                            server.getSubData(), server.getMotd(), server.isHidden(), server.isRestricted()));
+                            server.getSubData(), server.getMotd(), server.isHidden(), server.isRestricted(), server.getWhitelist()));
                     System.out.println("SubServers > Added Server: " + e.getServer());
                 }
             } else System.out.println("PacketDownloadServerInfo(" + e.getServer() + ") returned with an invalid response");
@@ -315,10 +315,10 @@ public final class SubPlugin extends BungeeCord implements Listener {
             if (current == null || !current.getSignature().equals(server.getSignature())) {
                 if (server instanceof net.ME1312.SubServers.Sync.Network.API.SubServer) {
                     servers.put(server.getName().toLowerCase(), new SubServerContainer(server.getSignature(), server.getName(), server.getDisplayName(), server.getAddress(),
-                            server.getSubData(), server.getMotd(), server.isHidden(), server.isRestricted(), ((net.ME1312.SubServers.Sync.Network.API.SubServer) server).isRunning()));
+                            server.getSubData(), server.getMotd(), server.isHidden(), server.isRestricted(), server.getWhitelist(), ((net.ME1312.SubServers.Sync.Network.API.SubServer) server).isRunning()));
                 } else {
                     servers.put(server.getName().toLowerCase(), new ServerContainer(server.getSignature(), server.getName(), server.getDisplayName(), server.getAddress(),
-                            server.getSubData(), server.getMotd(), server.isHidden(), server.isRestricted()));
+                            server.getSubData(), server.getMotd(), server.isHidden(), server.isRestricted(), server.getWhitelist()));
                 }
 
                 System.out.println("SubServers > Added "+((server instanceof net.ME1312.SubServers.Sync.Network.API.SubServer)?"Sub":"")+"Server: " + server.getName());

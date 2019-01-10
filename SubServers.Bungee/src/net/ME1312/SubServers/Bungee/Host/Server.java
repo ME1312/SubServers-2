@@ -4,6 +4,7 @@ import net.ME1312.SubServers.Bungee.Library.ExtraDataHandler;
 import net.ME1312.SubServers.Bungee.Library.NamedContainer;
 import net.ME1312.SubServers.Bungee.Network.ClientHandler;
 import net.md_5.bungee.api.config.ServerInfo;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 import java.util.Collection;
 import java.util.List;
@@ -97,6 +98,57 @@ public interface Server extends ServerInfo, ClientHandler, ExtraDataHandler {
      * @param value Value
      */
     void setRestricted(boolean value);
+
+    /**
+     * Get a copy of the current whitelist
+     *
+     * @return Player Whitelist
+     */
+    Collection<UUID> getWhitelist();
+
+    /**
+     * See if a player is whitelisted
+     *
+     * @param player Player to check
+     * @return Whitelisted Status
+     */
+    boolean isWhitelisted(ProxiedPlayer player);
+
+    /**
+     * See if a player is whitelisted
+     *
+     * @param player Player to check
+     * @return Whitelisted Status
+     */
+    boolean isWhitelisted(UUID player);
+
+    /**
+     * Add a player to the whitelist (for use with restricted servers)
+     *
+     * @param player Player to add
+     */
+    void whitelist(ProxiedPlayer player);
+
+    /**
+     * Add a player to the whitelist (for use with restricted servers)
+     *
+     * @param player Player to add
+     */
+    void whitelist(UUID player);
+
+    /**
+     * Remove a player to the whitelist
+     *
+     * @param player Player to remove
+     */
+    void unwhitelist(ProxiedPlayer player);
+
+    /**
+     * Remove a player to the whitelist
+     *
+     * @param player Player to remove
+     */
+    void unwhitelist(UUID player);
 
     /**
      * Get the Signature of this Object

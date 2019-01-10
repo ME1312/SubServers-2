@@ -4,6 +4,7 @@ import net.ME1312.SubServers.Client.Bukkit.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Client.Bukkit.Library.NamedContainer;
 import net.ME1312.SubServers.Client.Bukkit.Network.Packet.PacketDownloadServerInfo;
 import net.ME1312.SubServers.Client.Bukkit.SubAPI;
+import org.bukkit.OfflinePlayer;
 
 import java.net.InetSocketAddress;
 import java.util.*;
@@ -121,6 +122,35 @@ public class Server {
      */
     public boolean isRestricted() {
         return raw.getBoolean("restricted");
+    }
+
+    /**
+     * Get a copy of the current whitelist
+     *
+     * @return Player Whitelist
+     */
+    public Collection<UUID> getWhitelist() {
+        return raw.getUUIDList("whitelist");
+    }
+
+    /**
+     * See if a player is whitelisted
+     *
+     * @param player Player to check
+     * @return Whitelisted Status
+     */
+    public boolean isWhitelisted(OfflinePlayer player) {
+        return isWhitelisted(player.getUniqueId());
+    }
+
+    /**
+     * See if a player is whitelisted
+     *
+     * @param player Player to check
+     * @return Whitelisted Status
+     */
+    public boolean isWhitelisted(UUID player) {
+        return getWhitelist().contains(player);
     }
 
     /**

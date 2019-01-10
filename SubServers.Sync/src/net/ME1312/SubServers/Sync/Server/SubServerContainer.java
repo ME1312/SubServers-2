@@ -1,6 +1,8 @@
 package net.ME1312.SubServers.Sync.Server;
 
 import java.net.InetSocketAddress;
+import java.util.Collection;
+import java.util.UUID;
 
 /**
  * SubServer Class
@@ -8,8 +10,8 @@ import java.net.InetSocketAddress;
 public class SubServerContainer extends ServerContainer {
     private boolean running;
 
-    public SubServerContainer(String signature, String name, String display, InetSocketAddress address, String subdata, String motd, boolean hidden, boolean restricted, boolean running) {
-        super(signature, name, display, address, subdata, motd, hidden, restricted);
+    public SubServerContainer(String signature, String name, String display, InetSocketAddress address, String subdata, String motd, boolean hidden, boolean restricted, Collection<UUID> whitelist, boolean running) {
+        super(signature, name, display, address, subdata, motd, hidden, restricted, whitelist);
         this.running = running;
     }
 

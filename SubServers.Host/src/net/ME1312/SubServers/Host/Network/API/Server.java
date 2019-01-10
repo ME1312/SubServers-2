@@ -124,6 +124,25 @@ public class Server {
     }
 
     /**
+     * Get a copy of the current whitelist
+     *
+     * @return Player Whitelist
+     */
+    public Collection<UUID> getWhitelist() {
+        return raw.getUUIDList("whitelist");
+    }
+
+    /**
+     * See if a player is whitelisted
+     *
+     * @param player Player to check
+     * @return Whitelisted Status
+     */
+    public boolean isWhitelisted(UUID player) {
+        return getWhitelist().contains(player);
+    }
+
+    /**
      * Get the Signature of this Object
      *
      * @return Object Signature
