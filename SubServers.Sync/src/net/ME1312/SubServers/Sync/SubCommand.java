@@ -918,12 +918,15 @@ public final class SubCommand extends CommandX {
         public NamedContainer<String, List<String>> suggestArguments(CommandSender sender, String[] args) {
             if (args.length <= 1) {
                 String last = (args.length > 0)?args[args.length - 1].toLowerCase():"";
+                List<String> list = new ArrayList<String>();
                 if (last.length() == 0) {
-                    return new NamedContainer<>(null, new LinkedList<>(plugin.getServers().keySet()));
+                    for (ServerContainer server : plugin.servers.values()) {
+                        if (!server.isHidden()) list.add(server.getName());
+                    }
+                    return new NamedContainer<>(null, new LinkedList<>(list));
                 } else {
-                    List<String> list = new ArrayList<String>();
-                    for (String server : plugin.getServers().keySet()) {
-                        if (server.toLowerCase().startsWith(last)) list.add(server);
+                    for (ServerContainer server : plugin.servers.values()) {
+                        if (server.getName().toLowerCase().startsWith(last) && !server.isHidden()) list.add(server.getName());
                     }
                     return new NamedContainer<>((list.size() <= 0)?plugin.api.getLang("SubServers", "Bungee.Server.Invalid").replace("$str$", args[0]):null, list);
                 }

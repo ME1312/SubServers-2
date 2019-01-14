@@ -4,7 +4,6 @@ import net.ME1312.SubServers.Sync.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Sync.Library.NamedContainer;
 import net.ME1312.SubServers.Sync.Network.Packet.PacketDownloadServerInfo;
 import net.ME1312.SubServers.Sync.SubAPI;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 import java.net.InetSocketAddress;
 import java.util.*;
@@ -131,16 +130,6 @@ public class Server {
      */
     public Collection<UUID> getWhitelist() {
         return raw.getUUIDList("whitelist");
-    }
-
-    /**
-     * See if a player is whitelisted
-     *
-     * @param player Player to check
-     * @return Whitelisted Status
-     */
-    public boolean isWhitelisted(ProxiedPlayer player) {
-        return isWhitelisted(player.getUniqueId());
     }
 
     /**

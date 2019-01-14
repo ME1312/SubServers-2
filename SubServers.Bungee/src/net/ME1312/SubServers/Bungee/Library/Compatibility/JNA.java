@@ -4,6 +4,7 @@ import com.google.common.io.Resources;
 import net.ME1312.SubServers.Bungee.Library.UniversalFile;
 import net.ME1312.SubServers.Bungee.SubAPI;
 
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -51,16 +52,17 @@ public class JNA {
                     e.printStackTrace();
                 }
             }
-            if (jna.exists()) {
+            if (jna.exists() && platform.exists()) {
                 if (announced) System.out.println(">> Loading JNA Library");
                 try {
                     JNA = new URLClassLoader(new URL[]{jna.toURI().toURL(), platform.toURI().toURL()});
                 } catch (Throwable e) {
+                    System.out.println(">> Could not load JNA Library:");
                     e.printStackTrace();
-                    throw new IllegalArgumentException("Could not load JNA Library");
                 }
             } else {
-                throw new IllegalArgumentException("Could not find JNA Library");
+                System.out.println(">> Could not load JNA Library:");
+                new FileNotFoundException().printStackTrace();
             }
         }
         return JNA;

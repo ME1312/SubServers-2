@@ -49,6 +49,7 @@ public final class ConsoleWindow implements SubLogFilter {
     private int fontSize = 12;
     private File file = null;
     private FileOutputStream filewriter = null;
+    private List<Runnable> spost = new LinkedList<Runnable>();
     private ByteArrayOutputStream scache = new ByteArrayOutputStream();
     private AnsiUIOutputStream stream = AnsiUIOutputStream.wrap(new OutputStream() {
 
@@ -63,16 +64,6 @@ public final class ConsoleWindow implements SubLogFilter {
             scache.write(b);
             if (b == '\n') {
                 try {
-                    int lines;
-                    String content;
-                    while (log.getSelectionStart() == log.getSelectionEnd() && (lines = countLines(content = log.getDocument().getText(0, log.getDocument().getLength()))) > MAX_SCROLLBACK) {
-                        int lineBreak = 1;
-                        for (lines -= MAX_SCROLLBACK; lines > 0; lines--) lineBreak = content.indexOf('\n', lineBreak + 1);
-                        if (lineBreak >= 2 && log.getSelectionStart() == log.getSelectionEnd()) {
-                            log.getDocument().remove(2, lineBreak);
-                        } else break;
-                    }
-                } catch (Exception e) {} try {
                     HTMLEditorKit kit = (HTMLEditorKit) log.getEditorKit();
                     HTMLDocument doc = (HTMLDocument) log.getDocument();
                     kit.insertHTML(doc, doc.getLength() - 2, new String(scache.toByteArray(), "UTF-8"), 0, 0, null);
@@ -82,7 +73,21 @@ public final class ConsoleWindow implements SubLogFilter {
                             hScroll();
                         }
                     });
+                } catch (Exception e) {} try {
+                    int lines;
+                    String content;
+                    if (log.getSelectionStart() == log.getSelectionEnd() && (lines = countLines(content = log.getDocument().getText(0, log.getDocument().getLength()))) > MAX_SCROLLBACK + 2) {
+                        int lineBreak = 1;
+                        for (lines -= MAX_SCROLLBACK; lines > 0; lines--) lineBreak = content.indexOf('\n', lineBreak + 1);
+                        if (lineBreak <= log.getDocument().getLength() - 2 && log.getSelectionStart() == log.getSelectionEnd()) {
+                            log.getDocument().remove(0, lineBreak);
+                        }
+                    }
                 } catch (Exception e) {}
+                for (Runnable post : spost) try {
+                    post.run();
+                } catch (Throwable e) {}
+                spost.clear();
                 scache = new ByteArrayOutputStream();
             }
         }
@@ -833,22 +838,32 @@ public final class ConsoleWindow implements SubLogFilter {
 
         @Override
         protected void processEraseScreen(int mode) throws IOException {
-            if (ansi) log.setText(RESET_VALUE);
+            if (ansi) spost.add(new Runnable() {
+                @Override
+                public void run() {
+                    log.setText(RESET_VALUE);
+                }
+            });
         }
 
         @Override
-        protected void processDeleteLine(int amount) throws IOException {
-            if (ansi) try {
-                String content = log.getDocument().getText(0, log.getDocument().getLength());
-                while (amount > 0) {
-                    int lastLineBreak = content.lastIndexOf('\n');
-                    int length = log.getDocument().getLength() - lastLineBreak - 2;
-                    if (lastLineBreak >= 0 && length > 0) {
-                        log.getDocument().remove(lastLineBreak, length);
-                    }
-                    amount--;
+        protected void processDeleteLine(final int amount) throws IOException {
+            if (ansi) spost.add(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        String content = log.getDocument().getText(0, log.getDocument().getLength());
+                        int lineBreak = log.getDocument().getLength() - 2;
+                        for (int lines = 0; lines < amount; lines++) lineBreak = content.lastIndexOf('\n', lineBreak - 1);
+                        if (lineBreak < 2) lineBreak = 2;
+                        int length = log.getDocument().getLength() - lineBreak - 2;
+                        if (length > 0) {
+                            while (log.getSelectionStart() != log.getSelectionEnd()) Thread.sleep(100);
+                            log.getDocument().remove(lineBreak, length);
+                        }
+                    } catch (Exception e) {}
                 }
-            } catch (Exception e) {}
+            });
         }
 
         @Override

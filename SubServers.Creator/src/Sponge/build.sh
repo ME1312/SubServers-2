@@ -1,8 +1,7 @@
 # SubCreator Sponge Build Script
-# Usage: "bash build.sh <sponge version>"
 #
 #!/usr/bin/env bash
-if [ -z "$1" ]
+if [ -z "$sp_version" ]
   then
     echo ERROR: No Build Version Supplied
     rm -Rf "$0"
@@ -16,7 +15,7 @@ function __DL() {
     fi
 }
 echo Downloading SpongeVanilla...
-__DL Sponge.jar "https://repo.spongepowered.org/maven/org/spongepowered/spongevanilla/$1/spongevanilla-$1.jar"; __RETURN=$?
+__DL Sponge.jar "https://repo.spongepowered.org/maven/org/spongepowered/spongevanilla/$sp_version/spongevanilla-$sp_version.jar"; __RETURN=$?
 if [ $__RETURN -eq 0 ]; then
     echo Cleaning Up...
     rm -Rf "$0"

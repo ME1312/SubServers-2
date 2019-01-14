@@ -204,7 +204,7 @@ public class SubCreator {
         private YAMLSection build(File dir, ServerTemplate template, List<ServerTemplate> history) throws SubCreatorException {
             YAMLSection server = new YAMLSection();
             Version version = this.version;
-            List<String> args = new LinkedList<String>();
+            HashMap<String, String> var = new HashMap<String, String>();
             boolean error = false;
             if (history.contains(template)) throw new IllegalStateException("Template Import loop detected");
             history.add(template);
@@ -231,6 +231,11 @@ public class SubCreator {
                 log.logger.info.println("Loading Template: " + template.getDisplayName());
                 host.subdata.sendPacket(new PacketOutExLogMessage(address, "Loading Template: " + template.getDisplayName()));
                 Util.copyDirectory(template.getDirectory(), dir);
+                var.put("name", name);
+                var.put("template", template.getName());
+                var.put("type", template.getType().toString().toUpperCase());
+                var.put("version", version.toString());
+                var.put("port", Integer.toString(port));
                 switch (template.getType()) {
                     case SPONGE:
                     case FORGE:
@@ -256,12 +261,10 @@ public class SubCreator {
                             log.logger.info.println("Found \"forge-" + mcfversion.toString() + '"');
                             host.subdata.sendPacket(new PacketOutExLogMessage(address, "Found \"forge-" + mcfversion.toString() + '"'));
 
-                            args.add(mcfversion.toString());
+                            var.put("mcf_version", mcfversion.toString());
                         }
-                        args.add(spversion.toString());
+                        var.put("sp_version", spversion.toString());
                         break;
-                    default:
-                        args.add(version.toString());
                 }
             } catch (Exception e) {
                 log.logger.error.println(e);
@@ -272,13 +275,10 @@ public class SubCreator {
                 if (template.getBuildOptions().getBoolean("Use-Cache", true)) {
                     cache = new UniversalFile(GalaxiEngine.getInstance().getRuntimeDirectory(), "Cache:Templates:" + template.getName());
                     cache.mkdirs();
-                    args.add("\"" + cache.toString().replace(File.separatorChar, '/') + '\"');
+                    var.put("cache", cache.toString().replace(File.separatorChar, '/'));
                 } else {
                     cache = null;
                 }
-
-                String command = "bash \"" + template.getBuildOptions().getRawString("Shell-Location") + '\"';
-                for (String arg : args) command += ' ' + arg;
 
                 if (!System.getProperty("os.name").toLowerCase().startsWith("windows") && template.getBuildOptions().contains("Permission")) {
                     try {
@@ -298,7 +298,9 @@ public class SubCreator {
                 try {
                     log.logger.info.println("Launching " + template.getBuildOptions().getRawString("Shell-Location"));
                     host.subdata.sendPacket(new PacketOutExLogMessage(address, "Launching " + template.getBuildOptions().getRawString("Shell-Location")));
-                    process = Runtime.getRuntime().exec(Executable.parse(host.host.getRawString("Git-Bash"), command), null, dir);
+                    ProcessBuilder pb = new ProcessBuilder().command(Executable.parse(host.host.getRawString("Git-Bash"), "bash \"" + template.getBuildOptions().getRawString("Shell-Location") + '\"')).directory(dir);
+                    pb.environment().putAll(var);
+                    process = pb.start();
                     log.file = new File(dir, "SubCreator-" + template.getName() + "-" + version.toString().replace(" ", "@") + ".log");
                     log.process = process;
                     log.start();

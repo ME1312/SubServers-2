@@ -62,7 +62,7 @@ public class InternalSubCreator extends SubCreator {
         private YAMLSection build(File dir, ServerTemplate template, List<ServerTemplate> history) throws SubCreatorException {
             YAMLSection server = new YAMLSection();
             Version version = this.version;
-            List<String> args = new LinkedList<String>();
+            HashMap<String, String> var = new HashMap<String, String>();
             boolean error = false;
             if (history.contains(template)) throw new IllegalStateException("Template Import loop detected");
             history.add(template);
@@ -86,6 +86,11 @@ public class InternalSubCreator extends SubCreator {
             try {
                 System.out.println(name + File.separator + "Creator > Loading Template: " + template.getDisplayName());
                 Util.copyDirectory(template.getDirectory(), dir);
+                var.put("name", name);
+                var.put("template", template.getName());
+                var.put("type", template.getType().toString().toUpperCase());
+                var.put("version", version.toString());
+                var.put("port", Integer.toString(port));
                 switch (template.getType()) {
                     case SPONGE:
                     case FORGE:
@@ -108,12 +113,10 @@ public class InternalSubCreator extends SubCreator {
                             Version mcfversion = new Version(spprofile.getSection("dependencies").getRawString("minecraft") + '-' + spprofile.getSection("dependencies").getRawString("forge"));
                             System.out.println(name + File.separator + "Creator > Found \"forge-" + mcfversion.toString() + '"');
 
-                            args.add(mcfversion.toString());
+                            var.put("mcf_version", mcfversion.toString());
                         }
-                        args.add(spversion.toString());
+                        var.put("sp_version", spversion.toString());
                         break;
-                    default:
-                        args.add(version.toString());
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -124,13 +127,10 @@ public class InternalSubCreator extends SubCreator {
                 if (template.getBuildOptions().getBoolean("Use-Cache", true)) {
                     cache = new UniversalFile(host.plugin.dir, "SubServers:Cache:Templates:" + template.getName());
                     cache.mkdirs();
-                    args.add('\"' + cache.toString().replace(File.separatorChar, '/') + '\"');
+                    var.put("cache", cache.toString().replace(File.separatorChar, '/'));
                 } else {
                     cache = null;
                 }
-
-                String command = "bash \"" + template.getBuildOptions().getRawString("Shell-Location") + '\"';
-                for (String arg : args) command += ' ' + arg;
 
                 if (!System.getProperty("os.name").toLowerCase().startsWith("windows") && template.getBuildOptions().contains("Permission")) {
                     try {
@@ -147,7 +147,9 @@ public class InternalSubCreator extends SubCreator {
 
                 try {
                     System.out.println(name + File.separator + "Creator > Launching " + template.getBuildOptions().getRawString("Shell-Location"));
-                    process = Runtime.getRuntime().exec(Executable.parse(gitBash, command), null, dir);
+                    ProcessBuilder pb = new ProcessBuilder().command(Executable.parse(gitBash, "bash \"" + template.getBuildOptions().getRawString("Shell-Location") + '\"')).directory(dir);
+                    pb.environment().putAll(var);
+                    process = pb.start();
                     log.file = new File(dir, "SubCreator-" + template.getName() + "-" + version.toString() + ".log");
                     log.process = process;
                     log.start();
@@ -292,7 +294,7 @@ public class InternalSubCreator extends SubCreator {
         if (new UniversalFile(host.plugin.dir, "SubServers:Templates").exists())
             for (File file : new UniversalFile(host.plugin.dir, "SubServers:Templates").listFiles()) {
                 try {
-                    if (file.isDirectory()) {
+                    if (file.isDirectory() && !file.getName().endsWith(".x")) {
                         YAMLSection config = (new UniversalFile(file, "template.yml").exists()) ? new YAMLConfig(new UniversalFile(file, "template.yml")).get().getSection("Template", new YAMLSection()) : new YAMLSection();
                         ServerTemplate template = new ServerTemplate(file.getName(), config.getBoolean("Enabled", true), config.getRawString("Icon", "::NULL::"), file, config.getSection("Build", new YAMLSection()), config.getSection("Settings", new YAMLSection()));
                         templates.put(file.getName().toLowerCase(), template);

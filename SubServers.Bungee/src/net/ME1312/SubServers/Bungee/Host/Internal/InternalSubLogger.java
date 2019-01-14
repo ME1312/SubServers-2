@@ -177,8 +177,10 @@ public class InternalSubLogger extends SubLogger {
                 int l = (int) Math.floor((("---------- LOG START \u2014 " + name + " ----------").length() - 9) / 2);
                 String s = "";
                 while (s.length() < l) s += '-';
-                writer.println(s + " LOG END " + s);
-                writer.close();
+                if (writer != null) {
+                    writer.println(s + " LOG END " + s);
+                    writer.close();
+                }
             }
         }
     }

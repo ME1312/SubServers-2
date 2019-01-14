@@ -173,18 +173,8 @@ public class ServerContainer extends BungeeServerInfo implements Server {
     }
 
     @Override
-    public boolean isWhitelisted(ProxiedPlayer player) {
-        return isWhitelisted(player.getUniqueId());
-    }
-
-    @Override
     public boolean isWhitelisted(UUID player) {
         return whitelist.contains(player);
-    }
-
-    @Override
-    public void whitelist(ProxiedPlayer player) {
-        whitelist(player.getUniqueId());
     }
 
     @Override
@@ -192,11 +182,6 @@ public class ServerContainer extends BungeeServerInfo implements Server {
         if (Util.isNull(player)) throw new NullPointerException();
         whitelist.add(player);
         for (Proxy proxy : SubAPI.getInstance().getProxies().values()) if (proxy.getSubData() != null) proxy.getSubData().sendPacket(new PacketOutExUpdateWhitelist(getName(), true, player));
-    }
-
-    @Override
-    public void unwhitelist(ProxiedPlayer player) {
-        unwhitelist(player.getUniqueId());
     }
 
     @Override

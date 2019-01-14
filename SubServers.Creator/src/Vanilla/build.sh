@@ -1,8 +1,7 @@
 # SubCreator Vanilla Build Script
-# Usage: "bash build.sh <version> [cache]"
 #
 #!/usr/bin/env bash
-if [ -z "$1" ]
+if [ -z "$version" ]
   then
     echo ERROR: No Build Version Supplied
     rm -Rf "$0"
@@ -15,7 +14,7 @@ function __DL() {
         curl -o "$1" "$2"; return $?
     fi
 }
-if [ -z "$2" ] || [ ! -f "$2/Vanilla-$1.jar" ]; then
+if [ -z "$cache" ] || [ ! -f "$cache/Vanilla-$version.jar" ]; then
     if [ -d "VanillaCord" ]; then
         rm -Rf VanillaCord
     fi
@@ -25,14 +24,14 @@ if [ -z "$2" ] || [ ! -f "$2/Vanilla-$1.jar" ]; then
     if [ $__RETURN -eq 0 ]; then
         cd VanillaCord
         echo Launching VanillaCord
-        java -jar VanillaCord.jar "$1"; __RETURN=$?;
+        java -jar VanillaCord.jar "$version"; __RETURN=$?;
         if [ $__RETURN -eq 0 ]; then
             echo Copying Finished Jar...
             cd ../
-            if [ ! -z "$2" ] && [ -d "$2" ]; then
-                cp "VanillaCord/out/$1-bungee.jar" "$2/Vanilla-$1.jar"
+            if [ ! -z "$cache" ] && [ -d "$cache" ]; then
+                cp "VanillaCord/out/$version-bungee.jar" "$cache/Vanilla-$version.jar"
             fi
-            cp "VanillaCord/out/$1-bungee.jar" Vanilla.jar
+            cp "VanillaCord/out/$version-bungee.jar" Vanilla.jar
             echo Cleaning Up...
             rm -Rf VanillaCord
             rm -Rf "$0"
@@ -51,7 +50,7 @@ if [ -z "$2" ] || [ ! -f "$2/Vanilla-$1.jar" ]; then
     fi
 else
     echo Copying Cached Jar...
-    cp "$2/Vanilla-$1.jar" Vanilla.jar
+    cp "$cache/Vanilla-$version.jar" Vanilla.jar
     echo Cleaning Up...
     rm -Rf "$0"
     exit 0

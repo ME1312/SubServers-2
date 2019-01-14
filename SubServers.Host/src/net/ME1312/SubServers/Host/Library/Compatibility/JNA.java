@@ -4,6 +4,7 @@ import net.ME1312.Galaxi.Galaxi;
 import net.ME1312.Galaxi.Library.Log.Logger;
 import net.ME1312.Galaxi.Library.UniversalFile;
 
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -54,16 +55,17 @@ public class JNA {
                     log.error.println(e);
                 }
             }
-            if (jna.exists()) {
+            if (jna.exists() && platform.exists()) {
                 if (announced) log.info.println("Loading JNA Library");
                 try {
                     JNA = new URLClassLoader(new URL[]{jna.toURI().toURL(), platform.toURI().toURL()});
                 } catch (Throwable e) {
+                    log.error.println("Could not load JNA Library:");
                     log.error.println(e);
-                    throw new IllegalArgumentException("Could not load JNA Library");
                 }
             } else {
-                throw new IllegalArgumentException("Could not find JNA Library");
+                log.error.println("Could not load JNA Library:");
+                log.error.println(new FileNotFoundException());
             }
         }
         return JNA;

@@ -54,7 +54,7 @@ public class ExternalSubCreator extends SubCreator {
         templates.clear();
         if (new UniversalFile(host.plugin.dir, "SubServers:Templates").exists()) for (File file : new UniversalFile(host.plugin.dir, "SubServers:Templates").listFiles()) {
             try {
-                if (file.isDirectory()) {
+                if (file.isDirectory() && !file.getName().endsWith(".x")) {
                     YAMLSection config = (new UniversalFile(file, "template.yml").exists())?new YAMLConfig(new UniversalFile(file, "template.yml")).get().getSection("Template", new YAMLSection()):new YAMLSection();
                     ServerTemplate template = new ServerTemplate(file.getName(), config.getBoolean("Enabled", true), config.getRawString("Icon", "::NULL::"), file, config.getSection("Build", new YAMLSection()), config.getSection("Settings", new YAMLSection()));
                     templates.put(file.getName().toLowerCase(), template);

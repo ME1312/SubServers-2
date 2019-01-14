@@ -1,8 +1,7 @@
 # SubCreator Spigot Build Script
-# Usage: "bash build.sh <version> [cache]"
 #
 #!/usr/bin/env bash
-if [ -z "$1" ]
+if [ -z "$version" ]
   then
     echo ERROR: No Build Version Supplied
     rm -Rf "$0"
@@ -15,7 +14,7 @@ function __DL() {
         curl -o "$1" "$2"; return $?
     fi
 }
-if [ -z "$2" ] || [ ! -f "$2/Spigot-$1.jar" ]; then
+if [ -z "$cache" ] || [ ! -f "$cache/Spigot-$version.jar" ]; then
     echo Downloading Buildtools...
     __DL Buildtools.jar https://hub.spigotmc.org/jenkins/job/BuildTools/lastSuccessfulBuild/artifact/target/BuildTools.jar; __RETURN=$?
     if [ $__RETURN -eq 0 ]; then
@@ -25,20 +24,20 @@ if [ -z "$2" ] || [ ! -f "$2/Spigot-$1.jar" ]; then
         mkdir Buildtools
         cd "Buildtools"
         echo Launching Buildtools
-        if [ ! -z "$2" ] && [ -d "$2" ]; then
+        if [ ! -z "$cache" ] && [ -d "$cache" ]; then
             export __HOME="$HOME"
-            export HOME="$2"
+            export HOME="$cache"
         fi
         export MAVEN_OPTS="-Xms2G"
-        java -Xms2G -jar ../Buildtools.jar --rev "$1"; __RETURN=$?
-        if [ ! -z "$2" ] && [ ! -z "$__HOME" ] && [ "$2" == "$HOME" ]; then
+        java -Xms2G -jar ../Buildtools.jar --rev "$version"; __RETURN=$?
+        if [ ! -z "$cache" ] && [ ! -z "$__HOME" ] && [ "$cache" == "$HOME" ]; then
             export HOME="$__HOME"
         fi
         cd ../
         if [ $__RETURN -eq 0 ]; then
             echo Copying Finished Jar...
-            if [ ! -z "$2" ] && [ -d "$2" ]; then
-                cp Buildtools/spigot-*.jar "$2/Spigot-$1.jar"
+            if [ ! -z "$cache" ] && [ -d "$cache" ]; then
+                cp Buildtools/spigot-*.jar "$cache/Spigot-$version.jar"
             fi
             cp Buildtools/spigot-*.jar Spigot.jar
             echo Cleaning Up...
@@ -60,7 +59,7 @@ if [ -z "$2" ] || [ ! -f "$2/Spigot-$1.jar" ]; then
     fi
 else
     echo Copying Cached Jar...
-    cp "$2/Spigot-$1.jar" Spigot.jar
+    cp "$cache/Spigot-$version.jar" Spigot.jar
     echo Cleaning Up...
     rm -Rf "$0"
     exit 0
