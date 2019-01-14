@@ -1,6 +1,7 @@
 package net.ME1312.SubServers.Client.Sponge.Network.Packet;
 
 import net.ME1312.SubServers.Client.Sponge.Library.Config.YAMLSection;
+import net.ME1312.SubServers.Client.Sponge.Library.Util;
 import net.ME1312.SubServers.Client.Sponge.Library.Version.Version;
 import net.ME1312.SubServers.Client.Sponge.Network.PacketIn;
 import net.ME1312.SubServers.Client.Sponge.Network.SubDataClient;
@@ -23,12 +24,7 @@ public class PacketInReload implements PacketIn {
      */
     public PacketInReload(SubPlugin plugin) {
         this.plugin = plugin;
-        try {
-            Field f = SubDataClient.class.getDeclaredField("log");
-            f.setAccessible(true);
-            this.log = (Logger) f.get(null);
-            f.setAccessible(false);
-        } catch (IllegalAccessException | NoSuchFieldException e) {}
+        Util.isException(() -> Util.reflect(SubDataClient.class.getDeclaredField("log"), null));
     }
 
     @Override

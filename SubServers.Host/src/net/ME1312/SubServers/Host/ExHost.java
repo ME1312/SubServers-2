@@ -104,11 +104,8 @@ public final class ExHost {
                     if (manifest.getMainAttributes().getValue("Implementation-Version") != null && manifest.getMainAttributes().getValue("Implementation-Version").length() > 0)
                         galaxibuild = new Version(manifest.getMainAttributes().getValue("Implementation-Version"));
                 } catch (Exception e) {} try {
-                    Field f = Version.class.getDeclaredField("type");
-                    f.setAccessible(true);
-                    if (f.get(subservers) != VersionType.SNAPSHOT && ExHost.class.getPackage().getSpecificationTitle() != null)
+                    if (Util.reflect(Version.class.getDeclaredField("type"), subservers) != VersionType.SNAPSHOT && ExHost.class.getPackage().getSpecificationTitle() != null)
                         subserversbuild = new Version(ExHost.class.getPackage().getSpecificationTitle());
-                    f.setAccessible(false);
                 } catch (Exception e) {}
 
                 System.out.println("");

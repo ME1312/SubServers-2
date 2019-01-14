@@ -28,12 +28,7 @@ public class PacketLinkExHost implements PacketIn, PacketOut {
     public PacketLinkExHost(ExHost host) {
         if (Util.isNull(host)) throw new NullPointerException();
         this.host = host;
-        try {
-            Field f = SubDataClient.class.getDeclaredField("log");
-            f.setAccessible(true);
-            this.log = (Logger) f.get(null);
-            f.setAccessible(false);
-        } catch (IllegalAccessException | NoSuchFieldException e) {}
+        Util.isException(() -> this.log = Util.reflect(SubDataClient.class.getDeclaredField("log"), null));
     }
 
     @Override
@@ -46,12 +41,7 @@ public class PacketLinkExHost implements PacketIn, PacketOut {
     @Override
     public void execute(YAMLSection data) {
         if (data.getInt("r") == 0) {
-            try {
-                Method m = SubDataClient.class.getDeclaredMethod("init");
-                m.setAccessible(true);
-                m.invoke(host.subdata);
-                m.setAccessible(false);
-            } catch (Exception e) {}
+            Util.isException(() -> Util.reflect(SubDataClient.class.getDeclaredMethod("init"), host.subdata));
         } else {
             log.info.println("Could not link name with host: " + data.getRawString("m"));
             GalaxiEngine.getInstance().stop();

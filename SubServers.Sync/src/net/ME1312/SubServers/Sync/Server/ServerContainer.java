@@ -128,10 +128,7 @@ public class ServerContainer extends BungeeServerInfo {
     public void setMotd(String value) {
         if (Util.isNull(value)) throw new NullPointerException();
         try {
-            Field f = BungeeServerInfo.class.getDeclaredField("motd");
-            f.setAccessible(true);
-            f.set(this, value);
-            f.setAccessible(false);
+            Util.reflect(BungeeServerInfo.class.getDeclaredField("motd"), this, value);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -145,10 +142,7 @@ public class ServerContainer extends BungeeServerInfo {
     public void setRestricted(boolean value) {
         if (Util.isNull(value)) throw new NullPointerException();
         try {
-            Field f = BungeeServerInfo.class.getDeclaredField("restricted");
-            f.setAccessible(true);
-            f.set(this, value);
-            f.setAccessible(false);
+            Util.reflect(BungeeServerInfo.class.getDeclaredField("restricted"), this, value);
         } catch (Exception e) {
             e.printStackTrace();
         }

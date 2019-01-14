@@ -53,10 +53,7 @@ public class SubCommand {
             String last = (args.length > 0)?args[args.length - 1].toLowerCase():"";
             TreeMap<String, Command> commands;
             try {
-                Field f = PluginManager.class.getDeclaredField("commands");
-                f.setAccessible(true);
-                commands = (TreeMap<String, Command>) f.get(GalaxiEngine.getInstance().getPluginManager());
-                f.setAccessible(false);
+                commands = Util.reflect(PluginManager.class.getDeclaredField("commands"), GalaxiEngine.getInstance().getPluginManager());
             } catch (Exception e) {
                 SubAPI.getInstance().getAppInfo().getLogger().error.println(e);
                 commands = new TreeMap<String, Command>();

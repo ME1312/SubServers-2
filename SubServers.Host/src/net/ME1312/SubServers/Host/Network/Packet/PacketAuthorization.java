@@ -29,12 +29,7 @@ public final class PacketAuthorization implements PacketIn, PacketOut {
     public PacketAuthorization(ExHost host) {
         if (Util.isNull(host)) throw new NullPointerException();
         this.host = host;
-        try {
-            Field f = SubDataClient.class.getDeclaredField("log");
-            f.setAccessible(true);
-            this.log = (Logger) f.get(null);
-            f.setAccessible(false);
-        } catch (IllegalAccessException | NoSuchFieldException e) {}
+        Util.isException(() -> this.log = Util.reflect(SubDataClient.class.getDeclaredField("log"), null));
     }
 
     @Override
@@ -48,12 +43,7 @@ public final class PacketAuthorization implements PacketIn, PacketOut {
     public void execute(YAMLSection data) {
         try {
             if (data.getInt("r") == 0) {
-                try {
-                    Method m = SubDataClient.class.getDeclaredMethod("sendPacket", NamedContainer.class);
-                    m.setAccessible(true);
-                    m.invoke(host.subdata, new NamedContainer<String, PacketOut>(null, new PacketLinkExHost(host)));
-                    m.setAccessible(false);
-                } catch (Exception e) {}
+                Util.isException(() -> Util.reflect(SubDataClient.class.getDeclaredMethod("sendPacket", NamedContainer.class), host.subdata, new NamedContainer<String, PacketOut>(null, new PacketLinkExHost(host))));
             } else {
                 log.info.println("Could not authorize SubData connection: " + data.getRawString("m"));
                 host.subdata.destroy(0);

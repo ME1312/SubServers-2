@@ -40,10 +40,7 @@ public class PacketDownloadLang implements PacketIn, PacketOut {
     @Override
     public void execute(YAMLSection data) {
         try {
-            Field f = SubPlugin.class.getDeclaredField("lang");
-            f.setAccessible(true);
-            f.set(plugin, new NamedContainer<>(Calendar.getInstance().getTime().getTime(), data.getSection("Lang").get()));
-            f.setAccessible(false);
+            Util.reflect(SubPlugin.class.getDeclaredField("lang"), plugin, new NamedContainer<>(Calendar.getInstance().getTime().getTime(), data.getSection("Lang").get()));
             System.out.println("SubData > Lang Settings Downloaded");
         } catch (IllegalAccessException | NoSuchFieldException e) {
             e.printStackTrace();

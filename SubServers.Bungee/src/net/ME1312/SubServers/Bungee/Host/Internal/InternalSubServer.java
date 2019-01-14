@@ -314,10 +314,7 @@ public class InternalSubServer extends SubServerContainer {
                             break;
                         case "group":
                             if (value.isList()) {
-                                Field f = ServerContainer.class.getDeclaredField("groups");
-                                f.setAccessible(true);
-                                f.set(this, value.asStringList());
-                                f.setAccessible(false);
+                                Util.reflect(ServerContainer.class.getDeclaredField("groups"), this, value.asStringList());
                                 if (this.host.plugin.config.get().getSection("Servers").getKeys().contains(getName())) {
                                     this.host.plugin.config.get().getSection("Servers").getSection(getName()).set("Group", value.asStringList());
                                     this.host.plugin.config.save();
@@ -353,10 +350,7 @@ public class InternalSubServer extends SubServerContainer {
                             break;
                         case "motd":
                             if (value.isString()) {
-                                Field f = BungeeServerInfo.class.getDeclaredField("motd");
-                                f.setAccessible(true);
-                                f.set(this, value.asColoredString('&'));
-                                f.setAccessible(false);
+                                Util.reflect(BungeeServerInfo.class.getDeclaredField("motd"), this, value.asColoredString('&'));
                                 if (this.host.plugin.config.get().getSection("Servers").getKeys().contains(getName())) {
                                     this.host.plugin.config.get().getSection("Servers").getSection(getName()).set("Motd", value.asString());
                                     this.host.plugin.config.save();
@@ -455,10 +449,7 @@ public class InternalSubServer extends SubServerContainer {
                             break;
                         case "restricted":
                             if (value.isBoolean()) {
-                                Field f = BungeeServerInfo.class.getDeclaredField("restricted");
-                                f.setAccessible(true);
-                                f.set(this, value.asBoolean());
-                                f.setAccessible(false);
+                                Util.reflect(BungeeServerInfo.class.getDeclaredField("restricted"), this, value.asBoolean());
                                 if (this.host.plugin.config.get().getSection("Servers").getKeys().contains(getName())) {
                                     this.host.plugin.config.get().getSection("Servers").getSection(getName()).set("Restricted", isRestricted());
                                     this.host.plugin.config.save();
@@ -468,10 +459,7 @@ public class InternalSubServer extends SubServerContainer {
                             break;
                         case "hidden":
                             if (value.isBoolean()) {
-                                Field f = ServerContainer.class.getDeclaredField("hidden");
-                                f.setAccessible(true);
-                                f.set(this, value.asBoolean());
-                                f.setAccessible(false);
+                                Util.reflect(ServerContainer.class.getDeclaredField("hidden"), this, value.asBoolean());
                                 if (this.host.plugin.config.get().getSection("Servers").getKeys().contains(getName())) {
                                     this.host.plugin.config.get().getSection("Servers").getSection(getName()).set("Hidden", isHidden());
                                     this.host.plugin.config.save();

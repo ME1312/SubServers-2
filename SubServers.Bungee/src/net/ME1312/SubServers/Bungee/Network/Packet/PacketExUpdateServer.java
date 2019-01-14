@@ -3,6 +3,7 @@ package net.ME1312.SubServers.Bungee.Network.Packet;
 import net.ME1312.SubServers.Bungee.Host.External.ExternalSubServer;
 import net.ME1312.SubServers.Bungee.Host.SubServer;
 import net.ME1312.SubServers.Bungee.Library.Config.YAMLSection;
+import net.ME1312.SubServers.Bungee.Library.Util;
 import net.ME1312.SubServers.Bungee.Library.Version.Version;
 import net.ME1312.SubServers.Bungee.Network.Client;
 import net.ME1312.SubServers.Bungee.Network.PacketIn;
@@ -91,16 +92,10 @@ public class PacketExUpdateServer implements PacketIn, PacketOut {
             ExternalSubServer server = (ExternalSubServer) plugin.api.getSubServer(data.getRawString("server"));
             switch (data.getInt("type")) {
                 case 1:
-                    Method falsestart = ExternalSubServer.class.getDeclaredMethod("falsestart");
-                    falsestart.setAccessible(true);
-                    falsestart.invoke(server);
-                    falsestart.setAccessible(false);
+                    Util.reflect(ExternalSubServer.class.getDeclaredMethod("falsestart"), server);
                     break;
                 case 2:
-                    Method stopped = ExternalSubServer.class.getDeclaredMethod("stopped", Boolean.class);
-                    stopped.setAccessible(true);
-                    stopped.invoke(server, data.getList("args").get(1).asBoolean());
-                    stopped.setAccessible(false);
+                    Util.reflect(ExternalSubServer.class.getDeclaredMethod("stopped", Boolean.class), server, data.getList("args").get(1).asBoolean());
                     break;
             }
         } catch (Exception e) {

@@ -32,12 +32,7 @@ public final class PacketAuthorization implements PacketIn, PacketOut {
     public void execute(YAMLSection data) {
         try {
             if (data.getInt("r") == 0) {
-                try {
-                    Method m = SubDataClient.class.getDeclaredMethod("sendPacket", NamedContainer.class);
-                    m.setAccessible(true);
-                    m.invoke(plugin.subdata, new NamedContainer<String, PacketOut>(null, new PacketLinkServer(plugin)));
-                    m.setAccessible(false);
-                } catch (Exception e) {}
+                Util.isException(() -> Util.reflect(SubDataClient.class.getDeclaredMethod("sendPacket", NamedContainer.class), plugin.subdata, new NamedContainer<String, PacketOut>(null, new PacketLinkServer(plugin))));
             } else {
                 Bukkit.getLogger().info("SubServers > Could not authorize SubData connection: " + data.getRawString("m"));
                 plugin.subdata.destroy(0);

@@ -26,10 +26,7 @@ public class PacketInExLogMessage implements PacketIn {
     public void execute(Client client, YAMLSection data) {
         try {
             if (data.contains("h") && data.contains("m") && data.getRawString("m").length() != 0 && loggers.keySet().contains(UUID.fromString(data.getRawString("h")))) {
-                Method m = ExternalSubLogger.class.getDeclaredMethod("log", String.class);
-                m.setAccessible(true);
-                m.invoke(loggers.get(UUID.fromString(data.getRawString("h"))), data.getRawString("m"));
-                m.setAccessible(false);
+                Util.reflect(ExternalSubLogger.class.getDeclaredMethod("log", String.class), loggers.get(UUID.fromString(data.getRawString("h"))), data.getRawString("m"));
             }
         } catch (Exception e) {
             e.printStackTrace();

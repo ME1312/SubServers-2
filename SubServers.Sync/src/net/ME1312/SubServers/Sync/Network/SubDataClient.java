@@ -100,13 +100,13 @@ public final class SubDataClient {
             try {
                 LinkedList<ListenerInfo> listeners = new LinkedList<ListenerInfo>(plugin.getConfig().getListeners());
                 for (int i = 0; i < platform.getSection("bungee").getSectionList("listeners").size(); i++) if (i < listeners.size()) {
-                    if (plugin.config.get().getSection("Sync", new YAMLSection()).getBoolean("Forced-Hosts", true)) updateField(ListenerInfo.class.getDeclaredField("forcedHosts"), listeners.get(i), platform.getSection("bungee").getSectionList("listeners").get(i).getSection("forced-hosts").get());
-                    if (plugin.config.get().getSection("Sync", new YAMLSection()).getBoolean("Motd", false)) updateField(ListenerInfo.class.getDeclaredField("motd"), listeners.get(i), platform.getSection("bungee").getSectionList("listeners").get(i).getRawString("motd"));
-                    if (plugin.config.get().getSection("Sync", new YAMLSection()).getBoolean("Player-Limit", false)) updateField(ListenerInfo.class.getDeclaredField("maxPlayers"), listeners.get(i), platform.getSection("bungee").getSectionList("listeners").get(i).getInt("player-limit"));
-                    if (plugin.config.get().getSection("Sync", new YAMLSection()).getBoolean("Server-Priorities", true)) updateField(ListenerInfo.class.getDeclaredField("serverPriority"), listeners.get(i), platform.getSection("bungee").getSectionList("listeners").get(i).getRawStringList("priorities"));
+                    if (plugin.config.get().getSection("Sync", new YAMLSection()).getBoolean("Forced-Hosts", true)) Util.reflect(ListenerInfo.class.getDeclaredField("forcedHosts"), listeners.get(i), platform.getSection("bungee").getSectionList("listeners").get(i).getSection("forced-hosts").get());
+                    if (plugin.config.get().getSection("Sync", new YAMLSection()).getBoolean("Motd", false)) Util.reflect(ListenerInfo.class.getDeclaredField("motd"), listeners.get(i), platform.getSection("bungee").getSectionList("listeners").get(i).getRawString("motd"));
+                    if (plugin.config.get().getSection("Sync", new YAMLSection()).getBoolean("Player-Limit", false)) Util.reflect(ListenerInfo.class.getDeclaredField("maxPlayers"), listeners.get(i), platform.getSection("bungee").getSectionList("listeners").get(i).getInt("player-limit"));
+                    if (plugin.config.get().getSection("Sync", new YAMLSection()).getBoolean("Server-Priorities", true)) Util.reflect(ListenerInfo.class.getDeclaredField("serverPriority"), listeners.get(i), platform.getSection("bungee").getSectionList("listeners").get(i).getRawStringList("priorities"));
                 }
-                if (plugin.config.get().getSection("Sync", new YAMLSection()).getBoolean("Disabled-Commands", false)) updateField(Configuration.class.getDeclaredField("disabledCommands"), plugin.getConfig(), platform.getSection("bungee").getRawStringList("disabled-cmds"));
-                if (plugin.config.get().getSection("Sync", new YAMLSection()).getBoolean("Player-Limit", false)) updateField(Configuration.class.getDeclaredField("playerLimit"), plugin.getConfig(), platform.getSection("bungee").getInt("player-limit"));
+                if (plugin.config.get().getSection("Sync", new YAMLSection()).getBoolean("Disabled-Commands", false)) Util.reflect(Configuration.class.getDeclaredField("disabledCommands"), plugin.getConfig(), platform.getSection("bungee").getRawStringList("disabled-cmds"));
+                if (plugin.config.get().getSection("Sync", new YAMLSection()).getBoolean("Player-Limit", false)) Util.reflect(Configuration.class.getDeclaredField("playerLimit"), plugin.getConfig(), platform.getSection("bungee").getInt("player-limit"));
             } catch (Exception e) {
                 System.out.println("SubServers > Problem syncing BungeeCord configuration options");
                 e.printStackTrace();
@@ -121,10 +121,6 @@ public final class SubDataClient {
         }
         socket.rename(true);
         plugin.getPluginManager().callEvent(new SubNetworkConnectEvent(this));
-    }
-    private void updateField(Field field, Object instance, Object value) throws IllegalAccessException {
-        field.setAccessible(true);
-        field.set(instance, value);
     }
 
     static {

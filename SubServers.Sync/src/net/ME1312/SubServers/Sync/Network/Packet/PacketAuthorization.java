@@ -30,12 +30,7 @@ public final class PacketAuthorization implements PacketIn, PacketOut {
     public void execute(YAMLSection data) {
         try {
             if (data.getInt("r") == 0) {
-                try {
-                    Method m = SubDataClient.class.getDeclaredMethod("init");
-                    m.setAccessible(true);
-                    m.invoke(plugin.subdata);
-                    m.setAccessible(false);
-                } catch (Exception e) {}
+                Util.isException(() -> Util.reflect(SubDataClient.class.getDeclaredMethod("init"), plugin.subdata));
             } else {
                 System.out.println("SubServers > Could not authorize SubData connection: " + data.getRawString("m"));
                 plugin.subdata.destroy(0);

@@ -133,10 +133,7 @@ public class ServerContainer extends BungeeServerInfo implements Server {
         if (Util.isNull(value)) throw new NullPointerException();
         SubAPI.getInstance().getInternals().getPluginManager().callEvent(new SubEditServerEvent(null, this, new NamedContainer<String, Object>("motd", value), false));
         try {
-            Field f = BungeeServerInfo.class.getDeclaredField("motd");
-            f.setAccessible(true);
-            f.set(this, value);
-            f.setAccessible(false);
+            Util.reflect(BungeeServerInfo.class.getDeclaredField("motd"), this, value);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -147,10 +144,7 @@ public class ServerContainer extends BungeeServerInfo implements Server {
         if (Util.isNull(value)) throw new NullPointerException();
         SubAPI.getInstance().getInternals().getPluginManager().callEvent(new SubEditServerEvent(null, this, new NamedContainer<String, Object>("restricted", value), false));
         try {
-            Field f = BungeeServerInfo.class.getDeclaredField("restricted");
-            f.setAccessible(true);
-            f.set(this, value);
-            f.setAccessible(false);
+            Util.reflect(BungeeServerInfo.class.getDeclaredField("restricted"), this, value);
         } catch (Exception e) {
             e.printStackTrace();
         }

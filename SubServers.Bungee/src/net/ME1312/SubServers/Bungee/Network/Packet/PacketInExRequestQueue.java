@@ -2,6 +2,7 @@ package net.ME1312.SubServers.Bungee.Network.Packet;
 
 import net.ME1312.SubServers.Bungee.Host.External.ExternalHost;
 import net.ME1312.SubServers.Bungee.Library.Config.YAMLSection;
+import net.ME1312.SubServers.Bungee.Library.Util;
 import net.ME1312.SubServers.Bungee.Library.Version.Version;
 import net.ME1312.SubServers.Bungee.Network.Client;
 import net.ME1312.SubServers.Bungee.Network.PacketIn;
@@ -27,10 +28,7 @@ public class PacketInExRequestQueue implements PacketIn {
     public void execute(Client client, YAMLSection data) {
         if (client.getHandler() != null && client.getHandler() instanceof ExternalHost && plugin.config.get().getSection("Hosts").getKeys().contains(((ExternalHost) client.getHandler()).getName())) {
             try {
-                Method requeue = ExternalHost.class.getDeclaredMethod("requeue");
-                requeue.setAccessible(true);
-                requeue.invoke(client.getHandler());
-                requeue.setAccessible(false);
+                Util.reflect(ExternalHost.class.getDeclaredMethod("requeue"), client.getHandler());
             } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
                 e.printStackTrace();
             }

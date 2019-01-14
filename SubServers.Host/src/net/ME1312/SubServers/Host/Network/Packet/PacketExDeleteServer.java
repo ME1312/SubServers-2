@@ -36,12 +36,7 @@ public class PacketExDeleteServer implements PacketIn, PacketOut {
     public PacketExDeleteServer(ExHost host) {
         if (Util.isNull(host)) throw new NullPointerException();
         this.host = host;
-        try {
-            Field f = SubDataClient.class.getDeclaredField("log");
-            f.setAccessible(true);
-            this.log = (Logger) f.get(null);
-            f.setAccessible(false);
-        } catch (IllegalAccessException | NoSuchFieldException e) {}
+        Util.isException(() -> this.log = Util.reflect(SubDataClient.class.getDeclaredField("log"), null));
     }
 
     /**

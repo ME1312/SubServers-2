@@ -1,6 +1,11 @@
 package net.ME1312.SubServers.Bungee.Library;
 
 import java.io.*;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.nio.file.Files;
 import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -132,6 +137,78 @@ public final class Util {
     }
 
     /**
+     * Get a Field's value using Reflection
+     *
+     * @param field Field to grab
+     * @param instance Object Instance (Null for static fields)
+     * @param <R> Return Type
+     * @return Field Value
+     * @throws IllegalAccessException
+     */
+    @SuppressWarnings("unchecked")
+    public static <R> R reflect(Field field, Object instance) throws IllegalAccessException {
+        R value;
+        field.setAccessible(true);
+        value = (R) field.get(instance);
+        field.setAccessible(false);
+        return value;
+    }
+
+    /**
+     * Set a Field's value using Reflection
+     *
+     * @param field Field to write to
+     * @param instance Object Instance (Null for static fields)
+     * @param value Value to write
+     * @throws IllegalAccessException
+     */
+    public static void reflect(Field field, Object instance, Object value) throws IllegalAccessException {
+        field.setAccessible(true);
+        field.set(instance, value);
+        field.setAccessible(false);
+    }
+
+    /**
+     * Call a method using Reflection
+     *
+     * @param method Method to call
+     * @param instance Object Instance (Null for static methods)
+     * @param arguments Method Arguments
+     * @param <R> Return Type
+     * @return Returned Value
+     * @throws InvocationTargetException
+     * @throws IllegalAccessException
+     */
+    @SuppressWarnings("unchecked")
+    public static <R> R reflect(Method method, Object instance, Object... arguments) throws InvocationTargetException, IllegalAccessException {
+        R value;
+        method.setAccessible(true);
+        value = (R) method.invoke(instance, arguments);
+        method.setAccessible(false);
+        return value;
+    }
+
+    /**
+     * Construct an object using Reflection
+     *
+     * @param constructor Constructor to use
+     * @param arguments Constructor Arguments
+     * @param <R> Return Type
+     * @return New Instance
+     * @throws InvocationTargetException
+     * @throws IllegalAccessException
+     * @throws InstantiationException
+     */
+    @SuppressWarnings("unchecked")
+    public static <R> R reflect(Constructor<?> constructor, Object... arguments) throws InvocationTargetException, IllegalAccessException, InstantiationException {
+        R value;
+        constructor.setAccessible(true);
+        value = (R) constructor.newInstance(arguments);
+        constructor.setAccessible(false);
+        return value;
+    }
+
+    /**
      * Get a variable from a method which may throw an exception
      *
      * @param runnable Runnable
@@ -170,11 +247,13 @@ public final class Util {
     public static void deleteDirectory(File folder) {
         File[] files = folder.listFiles();
         if(files!=null) {
-            for(File f: files) {
-                if(f.isDirectory()) {
+            for(File f : files) {
+                if(f.isDirectory() && !Files.isSymbolicLink(f.toPath())) {
                     deleteDirectory(f);
-                } else {
-                    f.delete();
+                } else try {
+                    Files.delete(f.toPath());
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
             }
         }

@@ -41,15 +41,9 @@ public class PacketLinkServer implements PacketIn, PacketOut {
         if (data.getInt("r") == 0) {
             try {
                 if (data.contains("n")) {
-                    Field f = SubDataClient.class.getDeclaredField("name");
-                    f.setAccessible(true);
-                    f.set(plugin.subdata, data.getRawString("n"));
-                    f.setAccessible(false);
+                    Util.reflect(SubDataClient.class.getDeclaredField("name"), plugin.subdata, data.getRawString("n"));
                 }
-                Method m = SubDataClient.class.getDeclaredMethod("init");
-                m.setAccessible(true);
-                m.invoke(plugin.subdata);
-                m.setAccessible(false);
+                Util.reflect(SubDataClient.class.getDeclaredMethod("init"), plugin.subdata);
             } catch (Exception e) {}
         } else {
             try {

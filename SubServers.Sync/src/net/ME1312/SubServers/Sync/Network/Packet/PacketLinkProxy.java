@@ -36,12 +36,7 @@ public class PacketLinkProxy implements PacketIn, PacketOut {
     @Override
     public void execute(YAMLSection data) {
         if (data.getInt("r") == 0) {
-            if (data.contains("n")) try {
-                Field f = SubDataClient.class.getDeclaredField("name");
-                f.setAccessible(true);
-                f.set(plugin.subdata, data.getRawString("n"));
-                f.setAccessible(false);
-            } catch (Exception e) {}
+            if (data.contains("n")) Util.isException(() -> Util.reflect(SubDataClient.class.getDeclaredField("name"), data.getRawString("n")));
         } else {
             try {
                 if (data.getInt("r") == 2) {

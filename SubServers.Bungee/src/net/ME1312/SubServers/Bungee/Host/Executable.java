@@ -1,6 +1,7 @@
 package net.ME1312.SubServers.Bungee.Host;
 
 import net.ME1312.SubServers.Bungee.Library.Compatibility.JNA;
+import net.ME1312.SubServers.Bungee.Library.Util;
 
 import java.io.File;
 import java.lang.reflect.Field;
@@ -44,10 +45,7 @@ public class Executable {
             } catch (Throwable ex) {
                 try {
                     if (process.getClass().getName().equals("java.lang.Win32Process") || process.getClass().getName().equals("java.lang.ProcessImpl")) {
-                        Field f = process.getClass().getDeclaredField("handle");
-                        f.setAccessible(true);
-                        long handle = f.getLong(process);
-                        f.setAccessible(false);
+                        long handle = Util.reflect(process.getClass().getDeclaredField("handle"), process);
 
                         ClassLoader jna = JNA.get();
                         Class<?> pc = jna.loadClass("com.sun.jna.Pointer"),
@@ -58,10 +56,7 @@ public class Executable {
                         ntc.getMethod("setPointer", pc).invoke(nt, pc.getMethod("createConstant", long.class).invoke(null, handle));
                         return ((Number) k32c.getMethod("GetProcessId", ntc).invoke(k32, nt)).longValue();
                     } else if (process.getClass().getName().equals("java.lang.UNIXProcess")) {
-                        Field f = process.getClass().getDeclaredField("pid");
-                        f.setAccessible(true);
-                        Object response = f.get(process);
-                        f.setAccessible(false);
+                        Object response = Util.reflect(process.getClass().getDeclaredField("pid"), process);
 
                         if (response instanceof Number)
                             return ((Number) response).longValue();

@@ -22,12 +22,7 @@ public class PacketDownloadLang implements PacketIn, PacketOut {
     public PacketDownloadLang(ExHost host) {
         if (Util.isNull(host)) throw new NullPointerException();
         this.host = host;
-        try {
-            Field f = SubDataClient.class.getDeclaredField("log");
-            f.setAccessible(true);
-            this.log = (Logger) f.get(null);
-            f.setAccessible(false);
-        } catch (IllegalAccessException | NoSuchFieldException e) {}
+        Util.isException(() -> this.log = Util.reflect(SubDataClient.class.getDeclaredField("log"), null));
     }
 
     @Override
@@ -38,10 +33,7 @@ public class PacketDownloadLang implements PacketIn, PacketOut {
     @Override
     public void execute(YAMLSection data) {
         try {
-            Field f = ExHost.class.getDeclaredField("lang");
-            f.setAccessible(true);
-            f.set(host, new NamedContainer<>(Calendar.getInstance().getTime().getTime(), data.getSection("Lang").get()));
-            f.setAccessible(false);
+            Util.reflect(ExHost.class.getDeclaredField("lang"), host, new NamedContainer<>(Calendar.getInstance().getTime().getTime(), data.getSection("Lang").get()));
             log.info.println("Lang Settings Downloaded");
         } catch (IllegalAccessException | NoSuchFieldException e) {
             log.error.println(e);
