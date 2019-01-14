@@ -5,7 +5,6 @@ Template:
   Build:
     Server-Type: 'Sponge'
     Use-Cache: false
-    Shell-Location: 'build.sh'
-    Permission: '+x'
+    Executable: 'bash build.sh'
   Settings:
     Executable: 'java -Xmx1024M -jar Sponge.jar'

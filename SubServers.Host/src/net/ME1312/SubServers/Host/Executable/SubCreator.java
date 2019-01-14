@@ -280,25 +280,10 @@ public class SubCreator {
                     cache = null;
                 }
 
-                if (!System.getProperty("os.name").toLowerCase().startsWith("windows") && template.getBuildOptions().contains("Permission")) {
-                    try {
-                        Process process = Runtime.getRuntime().exec("chmod " + template.getBuildOptions().getRawString("Permission") + ' ' + template.getBuildOptions().getRawString("Shell-Location"), null, dir);
-                        Thread.sleep(500);
-                        if (process.exitValue() != 0) {
-                            log.logger.info.println("Couldn't set " + template.getBuildOptions().getRawString("Permission") + " permissions to " + template.getBuildOptions().getRawString("Shell-Location"));
-                            host.subdata.sendPacket(new PacketOutExLogMessage(address, "Couldn't set " + template.getBuildOptions().getRawString("Permission") + " permissions to " + template.getBuildOptions().getRawString("Shell-Location")));
-                        }
-                    } catch (Exception e) {
-                        log.logger.info.println("Couldn't set " + template.getBuildOptions().getRawString("Permission") + " permissions to " + template.getBuildOptions().getRawString("Shell-Location"));
-                        host.subdata.sendPacket(new PacketOutExLogMessage(address, "Couldn't set " + template.getBuildOptions().getRawString("Permission") + " permissions to " + template.getBuildOptions().getRawString("Shell-Location")));
-                        log.logger.error.println(e);
-                    }
-                }
-
                 try {
-                    log.logger.info.println("Launching " + template.getBuildOptions().getRawString("Shell-Location"));
-                    host.subdata.sendPacket(new PacketOutExLogMessage(address, "Launching " + template.getBuildOptions().getRawString("Shell-Location")));
-                    ProcessBuilder pb = new ProcessBuilder().command(Executable.parse(host.host.getRawString("Git-Bash"), "bash \"" + template.getBuildOptions().getRawString("Shell-Location") + '\"')).directory(dir);
+                    log.logger.info.println("Launching Build Script...");
+                    host.subdata.sendPacket(new PacketOutExLogMessage(address, "Launching Build Script..."));
+                    ProcessBuilder pb = new ProcessBuilder().command(Executable.parse(host.host.getRawString("Git-Bash"), template.getBuildOptions().getRawString("Executable"))).directory(dir);
                     pb.environment().putAll(var);
                     process = pb.start();
                     log.file = new File(dir, "SubCreator-" + template.getName() + "-" + version.toString().replace(" ", "@") + ".log");

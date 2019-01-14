@@ -5,7 +5,6 @@ Template:
   Build:
     Server-Type: 'Forge'
     Use-Cache: false
-    Shell-Location: 'build.sh'
-    Permission: '+x'
+    Executable: 'bash build.sh'
   Settings:
     Executable: 'java -Xmx2048M -jar Forge.jar'

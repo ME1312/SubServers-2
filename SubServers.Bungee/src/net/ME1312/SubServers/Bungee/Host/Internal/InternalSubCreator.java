@@ -122,7 +122,7 @@ public class InternalSubCreator extends SubCreator {
                 e.printStackTrace();
             }
 
-            if (template.getBuildOptions().contains("Shell-Location")) {
+            if (template.getBuildOptions().contains("Executable")) {
                 File cache;
                 if (template.getBuildOptions().getBoolean("Use-Cache", true)) {
                     cache = new UniversalFile(host.plugin.dir, "SubServers:Cache:Templates:" + template.getName());
@@ -132,22 +132,9 @@ public class InternalSubCreator extends SubCreator {
                     cache = null;
                 }
 
-                if (!System.getProperty("os.name").toLowerCase().startsWith("windows") && template.getBuildOptions().contains("Permission")) {
-                    try {
-                        Process process = Runtime.getRuntime().exec("chmod " + template.getBuildOptions().getRawString("Permission") + ' ' + template.getBuildOptions().getRawString("Shell-Location"), null, dir);
-                        Thread.sleep(500);
-                        if (process.exitValue() != 0) {
-                            System.out.println(name + File.separator + "Creator > Couldn't set " + template.getBuildOptions().getRawString("Permission") + " permissions to " + template.getBuildOptions().getRawString("Shell-Location"));
-                        }
-                    } catch (Exception e) {
-                        System.out.println(name + File.separator + "Creator > Couldn't set " + template.getBuildOptions().getRawString("Permission") + " permissions to " + template.getBuildOptions().getRawString("Shell-Location"));
-                        e.printStackTrace();
-                    }
-                }
-
                 try {
-                    System.out.println(name + File.separator + "Creator > Launching " + template.getBuildOptions().getRawString("Shell-Location"));
-                    ProcessBuilder pb = new ProcessBuilder().command(Executable.parse(gitBash, "bash \"" + template.getBuildOptions().getRawString("Shell-Location") + '\"')).directory(dir);
+                    System.out.println(name + File.separator + "Creator > Launching Build Script...");
+                    ProcessBuilder pb = new ProcessBuilder().command(Executable.parse(gitBash, template.getBuildOptions().getRawString("Executable"))).directory(dir);
                     pb.environment().putAll(var);
                     process = pb.start();
                     log.file = new File(dir, "SubCreator-" + template.getName() + "-" + version.toString() + ".log");
