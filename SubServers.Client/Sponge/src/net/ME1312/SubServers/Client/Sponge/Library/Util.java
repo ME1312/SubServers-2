@@ -6,6 +6,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.file.Files;
+import java.nio.file.LinkOption;
 import java.util.*;
 
 /**
@@ -264,7 +265,7 @@ public final class Util {
      * @param to Destination
      */
     public static void copyDirectory(File from, File to) {
-        if (from.isDirectory()) {
+        if (from.isDirectory() && !Files.isSymbolicLink(from.toPath())) {
             if (!to.exists()) {
                 to.mkdirs();
             }
@@ -278,34 +279,10 @@ public final class Util {
                 copyDirectory(srcFile, destFile);
             }
         } else {
-            InputStream in = null;
-            OutputStream out = null;
-
             try {
-                in = new FileInputStream(from);
-                out = new FileOutputStream(to);
-
-                byte[] buffer = new byte[1024];
-
-                int length;
-                while ((length = in.read(buffer)) > 0) {
-                    out.write(buffer, 0, length);
-                }
-
-                in.close();
-                out.close();
+                Files.copy(from.toPath(), to.toPath(), LinkOption.NOFOLLOW_LINKS);
             } catch (Exception e) {
-                try {
-                    if (in != null) in.close();
-                } catch (IOException e1) {
-                    e1.printStackTrace();
-                }
-
-                try {
-                    if (out != null) out.close();
-                } catch (IOException e2) {
-                    e2.printStackTrace();
-                }
+                e.printStackTrace();
             }
         }
     }
