@@ -56,7 +56,7 @@ public final class SubCommand extends CommandX {
      */
     @SuppressWarnings("unchecked")
     public void execute(CommandSender sender, String[] args) {
-        if (sender instanceof ConsoleCommandSender) {
+        if (!(sender instanceof ProxiedPlayer)) {
             if (args.length > 0) {
                 if (args[0].equalsIgnoreCase("help") || args[0].equalsIgnoreCase("?")) {
                     sender.sendMessages(printHelp());
