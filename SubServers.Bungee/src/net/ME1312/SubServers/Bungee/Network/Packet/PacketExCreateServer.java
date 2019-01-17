@@ -65,7 +65,7 @@ public class PacketExCreateServer implements PacketIn, PacketOut {
             YAMLSection creator = new YAMLSection();
             creator.set("name", name);
             creator.set("template", template.getName());
-            creator.set("version", version.toString());
+            creator.set("version", version);
             creator.set("port", port);
             creator.set("log", log.toString());
             data.set("creator", creator);

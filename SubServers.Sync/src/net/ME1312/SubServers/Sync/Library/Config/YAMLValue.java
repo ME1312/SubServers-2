@@ -1,6 +1,7 @@
 package net.ME1312.SubServers.Sync.Library.Config;
 
 import net.ME1312.SubServers.Sync.Library.Util;
+import net.ME1312.SubServers.Sync.Library.Version.Version;
 import net.md_5.bungee.api.ChatColor;
 import org.yaml.snakeyaml.Yaml;
 
@@ -271,7 +272,7 @@ public class YAMLValue {
      * @return UUID
      */
     public UUID asUUID() {
-        if (obj != null) return UUID.fromString((String) obj);
+        if (obj != null) return UUID.fromString(asRawString());
         else return null;
     }
 
@@ -290,6 +291,30 @@ public class YAMLValue {
         } else return null;
     }
 
+    /**
+     * Get Object as Version
+     *
+     * @return Version
+     */
+    public Version asVersion() {
+        if (obj != null) return Version.fromString(asRawString());
+        else return null;
+    }
+
+    /**
+     * Get Object as Version List
+     *
+     * @return Version List
+     */
+    public List<Version> asVersionList() {
+        if (obj != null) {
+            List<Version> values = new ArrayList<Version>();
+            for (String value : (List<String>) obj) {
+                values.add(Version.fromString(value));
+            }
+            return values;
+        } else return null;
+    }
 
     /**
      * Check if object is Null
@@ -351,7 +376,7 @@ public class YAMLValue {
      * @return UUID Status
      */
     public boolean isUUID() {
-        return (obj instanceof String && !Util.isException(() -> UUID.fromString((String) obj)));
+        return (obj instanceof String && !Util.isException(() -> UUID.fromString(asRawString())));
     }
 
     @Override

@@ -2,6 +2,7 @@ package net.ME1312.SubServers.Sync.Library.Config;
 
 import com.google.gson.Gson;
 import net.ME1312.SubServers.Sync.Library.Util;
+import net.ME1312.SubServers.Sync.Library.Version.Version;
 import org.msgpack.value.MapValue;
 import org.msgpack.value.Value;
 import org.msgpack.value.ValueFactory;
@@ -213,6 +214,8 @@ public class YAMLSection {
             return list;
         } else if (value instanceof UUID) {
             return value.toString();
+        } else if (value instanceof Version) {
+            return ((Version) value).toFullString();
         } else {
             return value;
         }
@@ -1028,6 +1031,48 @@ public class YAMLSection {
      */
     public boolean isUUID(String handle) {
         return get(handle).isUUID();
+    }
+
+    /**
+     * Get a Version by Handle
+     *
+     * @param handle Handle
+     * @return Version
+     */
+    public Version getVersion(String handle) {
+        return get(handle).asVersion();
+    }
+
+    /**
+     * Get a Version by Handle
+     *
+     * @param handle Handle
+     * @param def Default
+     * @return Version
+     */
+    public Version getVersion(String handle, Version def) {
+        return get(handle, def).asVersion();
+    }
+
+    /**
+     * Get a Version List by Handle
+     *
+     * @param handle Handle
+     * @return Version List
+     */
+    public List<Version> getVersionList(String handle) {
+        return get(handle).asVersionList();
+    }
+
+    /**
+     * Get a Version List by Handle
+     *
+     * @param handle Handle
+     * @param def Default
+     * @return Version List
+     */
+    public List<Version> getVersionList(String handle, List<Version> def) {
+        return get(handle, def).asVersionList();
     }
 
     @Override

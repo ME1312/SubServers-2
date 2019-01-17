@@ -192,8 +192,9 @@ public class InternalSubCreator extends SubCreator {
                     if (host.plugin.exServers.keySet().contains(name.toLowerCase()))
                         host.plugin.exServers.remove(name.toLowerCase());
 
-                    config = new YAMLSection((Map<String, ?>) convert(config.get(), new NamedContainer<>("$player$", (player == null)?"":player.toString()), new NamedContainer<>("$name$", name), new NamedContainer<>("$template$", template.getName()),
-                            new NamedContainer<>("$type$", template.getType().toString()), new NamedContainer<>("$version$", version.toString().replace(" ", "@")), new NamedContainer<>("$port$", Integer.toString(port))));
+                    config = new YAMLSection((Map<String, ?>) convert(config.get(), new NamedContainer<>("$player$", (player == null)?"":player.toString()), new NamedContainer<>("$name$", name),
+                            new NamedContainer<>("$template$", template.getName()), new NamedContainer<>("$type$", template.getType().toString()), new NamedContainer<>("$version$", version.toString().replace(" ", "@")),
+                            new NamedContainer<>("$address$", host.getAddress().getHostAddress()), new NamedContainer<>("$port$", Integer.toString(port))));
 
                     server.set("Enabled", true);
                     server.set("Display", "");

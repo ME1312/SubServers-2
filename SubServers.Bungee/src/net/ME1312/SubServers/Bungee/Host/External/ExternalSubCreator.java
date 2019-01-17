@@ -101,7 +101,10 @@ public class ExternalSubCreator extends SubCreator {
 
                             YAMLSection server = new YAMLSection();
                             YAMLSection config = new YAMLSection((Map<String, ?>) convert(data.getSection("c").get(), new NamedContainer<>("$player$", (player == null)?"":player.toString()), new NamedContainer<>("$name$", name),
-                                    new NamedContainer<>("$template$", template.getName()), new NamedContainer<>("$type$", template.getType().toString()), new NamedContainer<>("$version$", version.toString().replace(" ", "@")), new NamedContainer<>("$port$", Integer.toString(fport))));
+                                    new NamedContainer<>("$template$", template.getName()), new NamedContainer<>("$type$", template.getType().toString()), new NamedContainer<>("$version$", version.toString().replace(" ", "@")),
+                                    new NamedContainer<>("$address$", data.getSection("c").getRawString("\033address", "null")), new NamedContainer<>("$port$", Integer.toString(fport))));
+
+                            config.remove("\033address");
 
                             server.set("Enabled", true);
                             server.set("Display", "");

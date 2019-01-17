@@ -138,7 +138,7 @@ public final class ExHost {
             if (!(new UniversalFile(engine.getRuntimeDirectory(), "config.yml").exists())) {
                 Util.copyFromJar(ExHost.class.getClassLoader(), "net/ME1312/SubServers/Host/Library/Files/config.yml", new UniversalFile(engine.getRuntimeDirectory(), "config.yml").getPath());
                 log.info.println("Created ~/config.yml");
-            } else if ((new Version((new YAMLConfig(new UniversalFile(engine.getRuntimeDirectory(), "config.yml"))).get().getSection("Settings").getString("Version", "0")).compareTo(new Version("2.11.2a+"))) != 0) {
+            } else if (((new YAMLConfig(new UniversalFile(engine.getRuntimeDirectory(), "config.yml"))).get().getSection("Settings").getVersion("Version", new Version(0)).compareTo(new Version("2.11.2a+"))) != 0) {
                 Files.move(new UniversalFile(engine.getRuntimeDirectory(), "config.yml").toPath(), new UniversalFile(engine.getRuntimeDirectory(), "config.old" + Math.round(Math.random() * 100000) + ".yml").toPath());
 
                 Util.copyFromJar(ExHost.class.getClassLoader(), "net/ME1312/SubServers/Host/Library/Files/config.yml", new UniversalFile(engine.getRuntimeDirectory(), "config.yml").getPath());

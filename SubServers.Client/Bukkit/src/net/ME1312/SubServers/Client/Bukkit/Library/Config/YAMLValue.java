@@ -1,6 +1,7 @@
 package net.ME1312.SubServers.Client.Bukkit.Library.Config;
 
 import net.ME1312.SubServers.Client.Bukkit.Library.Util;
+import net.ME1312.SubServers.Client.Bukkit.Library.Version.Version;
 import org.bukkit.ChatColor;
 import org.yaml.snakeyaml.Yaml;
 
@@ -290,6 +291,30 @@ public class YAMLValue {
         } else return null;
     }
 
+    /**
+     * Get Object as Version
+     *
+     * @return Version
+     */
+    public Version asVersion() {
+        if (obj != null) return Version.fromString(asRawString());
+        else return null;
+    }
+
+    /**
+     * Get Object as Version List
+     *
+     * @return Version List
+     */
+    public List<Version> asVersionList() {
+        if (obj != null) {
+            List<Version> values = new ArrayList<Version>();
+            for (String value : (List<String>) obj) {
+                values.add(Version.fromString(value));
+            }
+            return values;
+        } else return null;
+    }
 
     /**
      * Check if object is Null

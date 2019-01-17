@@ -88,7 +88,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
         if (!(new UniversalFile(dir, "config.yml").exists())) {
             Util.copyFromJar(SubPlugin.class.getClassLoader(), "net/ME1312/SubServers/Bungee/Library/Files/config.yml", new UniversalFile(dir, "config.yml").getPath());
             System.out.println("SubServers > Created ~/SubServers/config.yml");
-        } else if ((new Version((new YAMLConfig(new UniversalFile(dir, "config.yml"))).get().getSection("Settings").getString("Version", "0")).compareTo(new Version("2.11.2a+"))) != 0) {
+        } else if (((new YAMLConfig(new UniversalFile(dir, "config.yml"))).get().getSection("Settings").getVersion("Version", new Version(0))).compareTo(new Version("2.11.2a+")) != 0) {
             Files.move(new UniversalFile(dir, "config.yml").toPath(), new UniversalFile(dir, "config.old" + Math.round(Math.random() * 100000) + ".yml").toPath());
 
             Util.copyFromJar(SubPlugin.class.getClassLoader(), "net/ME1312/SubServers/Bungee/Library/Files/config.yml", new UniversalFile(dir, "config.yml").getPath());
@@ -99,7 +99,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
         if (!(new UniversalFile(dir, "lang.yml").exists())) {
             Util.copyFromJar(SubPlugin.class.getClassLoader(), "net/ME1312/SubServers/Bungee/Library/Files/lang.yml", new UniversalFile(dir, "lang.yml").getPath());
             System.out.println("SubServers > Created ~/SubServers/lang.yml");
-        } else if ((new Version((new YAMLConfig(new UniversalFile(dir, "lang.yml"))).get().getString("Version", "0")).compareTo(new Version("2.13.2c+"))) != 0) {
+        } else if (((new YAMLConfig(new UniversalFile(dir, "lang.yml"))).get().getVersion("Version", new Version(9))).compareTo(new Version("2.13.2c+")) != 0) {
             Files.move(new UniversalFile(dir, "lang.yml").toPath(), new UniversalFile(dir, "lang.old" + Math.round(Math.random() * 100000) + ".yml").toPath());
             Util.copyFromJar(SubPlugin.class.getClassLoader(), "net/ME1312/SubServers/Bungee/Library/Files/lang.yml", new UniversalFile(dir, "lang.yml").getPath());
             System.out.println("SubServers > Updated ~/SubServers/lang.yml");
@@ -121,22 +121,22 @@ public final class SubPlugin extends BungeeCord implements Listener {
             Util.unzip(SubPlugin.class.getResourceAsStream("/net/ME1312/SubServers/Bungee/Library/Files/Templates/sponge.zip"), new UniversalFile(dir, "Templates"));
             System.out.println("SubServers > Created ~/SubServers/Templates/Sponge");
         } else {
-            if (new UniversalFile(dir, "Templates:Vanilla:template.yml").exists() && (new Version((new YAMLConfig(new UniversalFile(dir, "Templates:Vanilla:template.yml"))).get().getString("Version", "0")).compareTo(new Version("2.13.2c+"))) != 0) {
+            if (new UniversalFile(dir, "Templates:Vanilla:template.yml").exists() && ((new YAMLConfig(new UniversalFile(dir, "Templates:Vanilla:template.yml"))).get().getVersion("Version", new Version(0))).compareTo(new Version("2.13.2c+")) != 0) {
                 Files.move(new UniversalFile(dir, "Templates:Vanilla").toPath(), new UniversalFile(dir, "Templates:Vanilla.old" + Math.round(Math.random() * 100000) + ".x").toPath());
                 Util.unzip(SubPlugin.class.getResourceAsStream("/net/ME1312/SubServers/Bungee/Library/Files/Templates/vanilla.zip"), new UniversalFile(dir, "Templates"));
                 System.out.println("SubServers > Updated ~/SubServers/Templates/Vanilla");
             }
-            if (new UniversalFile(dir, "Templates:Spigot:template.yml").exists() && (new Version((new YAMLConfig(new UniversalFile(dir, "Templates:Spigot:template.yml"))).get().getString("Version", "0")).compareTo(new Version("2.13.2c+"))) != 0) {
+            if (new UniversalFile(dir, "Templates:Spigot:template.yml").exists() && ((new YAMLConfig(new UniversalFile(dir, "Templates:Spigot:template.yml"))).get().getVersion("Version", new Version(0))).compareTo(new Version("2.13.2c+")) != 0) {
                 Files.move(new UniversalFile(dir, "Templates:Spigot").toPath(), new UniversalFile(dir, "Templates:Spigot.old" + Math.round(Math.random() * 100000) + ".x").toPath());
                 Util.unzip(SubPlugin.class.getResourceAsStream("/net/ME1312/SubServers/Bungee/Library/Files/Templates/spigot.zip"), new UniversalFile(dir, "Templates"));
                 System.out.println("SubServers > Updated ~/SubServers/Templates/Spigot");
             }
-            if (new UniversalFile(dir, "Templates:Forge:template.yml").exists() && (new Version((new YAMLConfig(new UniversalFile(dir, "Templates:Forge:template.yml"))).get().getString("Version", "0")).compareTo(new Version("2.13.2c+"))) != 0) {
+            if (new UniversalFile(dir, "Templates:Forge:template.yml").exists() && ((new YAMLConfig(new UniversalFile(dir, "Templates:Forge:template.yml"))).get().getVersion("Version", new Version(0))).compareTo(new Version("2.13.2c+")) != 0) {
                 Files.move(new UniversalFile(dir, "Templates:Forge").toPath(), new UniversalFile(dir, "Templates:Forge.old" + Math.round(Math.random() * 100000) + ".x").toPath());
                 Util.unzip(SubPlugin.class.getResourceAsStream("/net/ME1312/SubServers/Bungee/Library/Files/Templates/forge.zip"), new UniversalFile(dir, "Templates"));
                 System.out.println("SubServers > Updated ~/SubServers/Templates/Forge");
             }
-            if (new UniversalFile(dir, "Templates:Sponge:template.yml").exists() && (new Version((new YAMLConfig(new UniversalFile(dir, "Templates:Sponge:template.yml"))).get().getString("Version", "0")).compareTo(new Version("2.13.2c+"))) != 0) {
+            if (new UniversalFile(dir, "Templates:Sponge:template.yml").exists() && ((new YAMLConfig(new UniversalFile(dir, "Templates:Sponge:template.yml"))).get().getVersion("Version", new Version(0))).compareTo(new Version("2.13.2c+")) != 0) {
                 Files.move(new UniversalFile(dir, "Templates:Sponge").toPath(), new UniversalFile(dir, "Templates:Sponge.old" + Math.round(Math.random() * 100000) + ".x").toPath());
                 Util.unzip(SubPlugin.class.getResourceAsStream("/net/ME1312/SubServers/Bungee/Library/Files/Templates/sponge.zip"), new UniversalFile(dir, "Templates"));
                 System.out.println("SubServers > Updated ~/SubServers/Templates/Sponge");

@@ -271,7 +271,7 @@ public class SubCreator {
                 log.logger.error.println(e);
             }
 
-            if (template.getBuildOptions().contains("Shell-Location")) {
+            if (template.getBuildOptions().contains("Executable")) {
                 File cache;
                 if (template.getBuildOptions().getBoolean("Use-Cache", true)) {
                     cache = new UniversalFile(GalaxiEngine.getInstance().getRuntimeDirectory(), "Cache:Templates:" + template.getName());
@@ -333,12 +333,13 @@ public class SubCreator {
                 server = null;
                 log.logger.error.println(e);
             }
-
+            YAMLSection config = template.getConfigOptions().clone();
+            config.set("\033address", host.config.get().getSection("Settings").getRawString("Server-Bind"));
             if (server != null) {
-                host.subdata.sendPacket(new PacketExCreateServer(0, "Created Server Successfully", template.getConfigOptions(), id));
+                host.subdata.sendPacket(new PacketExCreateServer(0, "Created Server Successfully", config, id));
             } else {
                 log.logger.info.println("Couldn't build the server jar. Check the SubCreator logs for more detail.");
-                host.subdata.sendPacket(new PacketExCreateServer(-1, "Couldn't build the server jar. Check the SubCreator logs for more detail.", template.getConfigOptions(), id));
+                host.subdata.sendPacket(new PacketExCreateServer(-1, "Couldn't build the server jar. Check the SubCreator logs for more detail.", config, id));
             }
             SubCreator.this.thread.remove(name.toLowerCase());
         }

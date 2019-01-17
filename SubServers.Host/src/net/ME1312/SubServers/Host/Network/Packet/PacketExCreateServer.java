@@ -58,7 +58,7 @@ public class PacketExCreateServer implements PacketIn, PacketOut {
     @Override
     public void execute(YAMLSection data) {
         try {
-            host.creator.create(data.getSection("creator").getRawString("name"), host.templates.get(data.getSection("creator").getRawString("template").toLowerCase()), new Version(data.getSection("creator").getRawString("version")),
+            host.creator.create(data.getSection("creator").getRawString("name"), host.templates.get(data.getSection("creator").getRawString("template").toLowerCase()), data.getSection("creator").getVersion("version"),
                     data.getSection("creator").getInt("port"), data.getSection("creator").getUUID("log"), (data.contains("id"))?data.getRawString("id"):null);
         } catch (Throwable e) {
             if (data.contains("thread")) {

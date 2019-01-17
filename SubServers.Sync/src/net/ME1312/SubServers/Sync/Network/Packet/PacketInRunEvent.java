@@ -49,7 +49,7 @@ public class PacketInRunEvent implements PacketIn {
             @Override
             public void run(YAMLSection data) {
                 ProxyServer.getInstance().getPluginManager().callEvent(new SubCreateEvent((data.contains("player"))?data.getUUID("player"):null, data.getRawString("host"), data.getRawString("name"),
-                        data.getRawString("template"), new Version(data.getRawString("version")), data.getInt("port")));
+                        data.getRawString("template"), data.getVersion("version"), data.getInt("port")));
                 callback("SubCreateEvent", this);
             }
         });

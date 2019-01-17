@@ -457,7 +457,7 @@ public final class SubDataServer {
 
         List<PacketIn> list = new ArrayList<PacketIn>();
         for (PacketIn packet : pIn.get(data.getRawString("n")).get(data.getRawString("h"))) {
-            if (packet.isCompatible(new Version(data.getRawString("v")))) {
+            if (packet.isCompatible(data.getVersion("v"))) {
                 list.add(packet);
             } else {
                 new IllegalPacketException(client.getAddress().toString() + ": Packet Version Mismatch in " + data.getRawString("h") + ": " + data.getRawString("v") + " =/= " + packet.getVersion().toString()).printStackTrace();

@@ -67,7 +67,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
         if (!(new UniversalFile(dir, "sync.yml").exists())) {
             Util.copyFromJar(SubPlugin.class.getClassLoader(), "net/ME1312/SubServers/Sync/Library/Files/config.yml", new UniversalFile(dir, "sync.yml").getPath());
             System.out.println("SubServers > Created ~/SubServers/sync.yml");
-        } else if ((new Version((new YAMLConfig(new UniversalFile(dir, "sync.yml"))).get().getSection("Settings").getRawString("Version", "0")).compareTo(new Version("2.11.2a+"))) != 0) {
+        } else if (((new YAMLConfig(new UniversalFile(dir, "sync.yml"))).get().getSection("Settings").getVersion("Version", new Version(0))).compareTo(new Version("2.11.2a+")) != 0) {
             Files.move(new UniversalFile(dir, "sync.yml").toPath(), new UniversalFile(dir, "config.old" + Math.round(Math.random() * 100000) + ".yml").toPath());
 
             Util.copyFromJar(SubPlugin.class.getClassLoader(), "net/ME1312/SubServers/Sync/Library/Files/config.yml", new UniversalFile(dir, "sync.yml").getPath());

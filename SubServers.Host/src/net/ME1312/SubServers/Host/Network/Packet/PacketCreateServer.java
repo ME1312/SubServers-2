@@ -61,7 +61,7 @@ public class PacketCreateServer implements PacketIn, PacketOut {
         creator.set("name", name);
         creator.set("host", host);
         creator.set("template", template);
-        creator.set("version", version.toString());
+        creator.set("version", version);
         if (port != null) creator.set("port", port);
         data.set("creator", creator);
         return data;

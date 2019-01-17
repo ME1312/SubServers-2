@@ -378,7 +378,7 @@ public final class SubDataClient {
             YAMLSection contents = packet.generate();
             data.set("n", pOut.get(packet.getClass()).name());
             data.set("h", pOut.get(packet.getClass()).get());
-            data.set("v", packet.getVersion().toString());
+            data.set("v", packet.getVersion());
             if (contents != null) data.set("c", contents);
             return data;
         } catch (Throwable e) {
@@ -400,7 +400,7 @@ public final class SubDataClient {
 
         List<PacketIn> list = new ArrayList<PacketIn>();
         for (PacketIn packet : pIn.get(data.getRawString("n")).get(data.getRawString("h"))) {
-            if (packet.isCompatible(new Version(data.getRawString("v")))) {
+            if (packet.isCompatible(data.getVersion("v"))) {
                 list.add(packet);
             } else {
                 new IllegalPacketException("Packet Version Mismatch in " + data.getRawString("h") + ": " + data.getRawString("v") + " -> " + packet.getVersion().toString()).printStackTrace();
