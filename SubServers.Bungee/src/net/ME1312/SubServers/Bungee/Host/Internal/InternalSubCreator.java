@@ -90,6 +90,7 @@ public class InternalSubCreator extends SubCreator {
                 var.put("template", template.getName());
                 var.put("type", template.getType().toString().toUpperCase());
                 var.put("version", version.toString());
+                var.put("address", host.getAddress().getHostAddress());
                 var.put("port", Integer.toString(port));
                 switch (template.getType()) {
                     case SPONGE:

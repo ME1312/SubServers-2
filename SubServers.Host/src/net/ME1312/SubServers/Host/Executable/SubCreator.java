@@ -235,6 +235,7 @@ public class SubCreator {
                 var.put("template", template.getName());
                 var.put("type", template.getType().toString().toUpperCase());
                 var.put("version", version.toString());
+                var.put("address", host.config.get().getSection("Settings").getRawString("Server-Bind"));
                 var.put("port", Integer.toString(port));
                 switch (template.getType()) {
                     case SPONGE:

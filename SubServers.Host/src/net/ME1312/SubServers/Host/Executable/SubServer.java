@@ -110,6 +110,7 @@ public class SubServer {
         try {
             ProcessBuilder pb = new ProcessBuilder().command(Executable.parse(host.host.getRawString("Git-Bash"), executable)).directory(directory);
             pb.environment().put("name", getName());
+            pb.environment().put("address", host.config.get().getSection("Settings").getRawString("Server-Bind"));
             pb.environment().put("port", Integer.toString(getPort()));
             process = pb.start();
             falsestart = false;
