@@ -16,6 +16,7 @@ import net.ME1312.Galaxi.Library.Version.VersionType;
 import net.ME1312.Galaxi.Plugin.Plugin;
 import net.ME1312.Galaxi.Plugin.PluginInfo;
 import net.ME1312.SubServers.Host.Executable.SubCreator;
+import net.ME1312.SubServers.Host.Executable.SubLogger;
 import net.ME1312.SubServers.Host.Executable.SubServer;
 import net.ME1312.SubServers.Host.Library.*;
 import net.ME1312.SubServers.Host.Network.Cipher;
@@ -190,6 +191,9 @@ public final class ExHost {
                 }
             }
 
+            Util.reflect(SubLogger.class.getDeclaredField("logn"), null, config.get().getSection("Settings").getBoolean("Network-Log", true));
+            Util.reflect(SubLogger.class.getDeclaredField("logc"), null, config.get().getSection("Settings").getBoolean("Console-Log", true));
+
             engine.getPluginManager().loadPlugins(new UniversalFile(engine.getRuntimeDirectory(), "Plugins"));
 
             running = true;
@@ -252,6 +256,13 @@ public final class ExHost {
             subdata.destroy(0);
 
         config.reload();
+
+        try {
+            Util.reflect(SubLogger.class.getDeclaredField("logn"), null, config.get().getSection("Settings").getBoolean("Network-Log", true));
+            Util.reflect(SubLogger.class.getDeclaredField("logc"), null, config.get().getSection("Settings").getBoolean("Console-Log", true));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         Cipher cipher = null;
         if (!config.get().getSection("Settings").getSection("SubData").getRawString("Encryption", "NONE").equalsIgnoreCase("NONE")) {

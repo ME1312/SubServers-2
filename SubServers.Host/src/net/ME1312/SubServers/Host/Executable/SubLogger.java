@@ -23,6 +23,8 @@ public class SubLogger {
     protected final String name;
     protected UUID address;
     protected Container<Boolean> log;
+    protected static boolean logn = true;
+    protected static boolean logc = true;
     protected File file;
     private PrintWriter writer = null;
     private boolean started = false;
@@ -71,12 +73,10 @@ public class SubLogger {
     @SuppressWarnings("deprecation")
     private void start(InputStream in, boolean isErr) {
         try {
-            boolean network = SubAPI.getInstance().getInternals().config.get().getSection("Settings").getBoolean("Network-Log", true),
-                    console = SubAPI.getInstance().getInternals().config.get().getSection("Settings").getBoolean("Console-Log", true);
             BufferedReader br = new BufferedReader(new InputStreamReader(in));
             String line;
             while ((line = br.readLine()) != null) {
-                log(line, network, console);
+                log(line);
             }
         } catch (IOException e) {} finally {
             if (isErr) {
@@ -89,7 +89,7 @@ public class SubLogger {
         }
     }
 
-    private void log(String line, boolean network, boolean console) {
+    private void log(String line) {
         if (!line.startsWith(">")) {
             String msg = line;
             LogStream level;
@@ -121,10 +121,10 @@ public class SubLogger {
             }
 
             // Log to NETWORK
-            if (log.get() && network) SubAPI.getInstance().getSubDataNetwork().sendPacket(new PacketOutExLogMessage(address, line));
+            if (log.get() && logn) SubAPI.getInstance().getSubDataNetwork().sendPacket(new PacketOutExLogMessage(address, line));
 
             // Log to CONSOLE
-            if (log.get() && console) level.println(TextColor.convertColor(msg));
+            if (log.get() && logc) level.println(TextColor.convertColor(msg));
 
             // Log to FILE
             if (writer != null) {
