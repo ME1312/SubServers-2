@@ -28,7 +28,7 @@ public class PacketInRunEvent implements PacketIn {
             @Override
             public void run(YAMLSection data) {
                 if (plugin.isEnabled()) {
-                    Bukkit.getPluginManager().callEvent(new SubAddHostEvent((data.contains("player")) ? UUID.fromString(data.getString("player")) : null, data.getString("host")));
+                    Bukkit.getPluginManager().callEvent(new SubAddHostEvent((data.contains("player"))?data.getUUID("player"):null, data.getString("host")));
                     callback("SubAddHostEvent", this);
                 }
             }
@@ -46,7 +46,7 @@ public class PacketInRunEvent implements PacketIn {
             @Override
             public void run(YAMLSection data) {
                 if (plugin.isEnabled()) {
-                    Bukkit.getPluginManager().callEvent(new SubAddServerEvent((data.contains("player")) ? UUID.fromString(data.getString("player")) : null, (data.contains("host"))?data.getRawString("host"):null, data.getString("server")));
+                    Bukkit.getPluginManager().callEvent(new SubAddServerEvent((data.contains("player"))?data.getUUID("player"):null, (data.contains("host"))?data.getRawString("host"):null, data.getString("server")));
                     callback("SubAddServerEvent", this);
                 }
             }
@@ -55,7 +55,7 @@ public class PacketInRunEvent implements PacketIn {
             @Override
             public void run(YAMLSection data) {
                 if (plugin.isEnabled()) {
-                    Bukkit.getPluginManager().callEvent(new SubCreateEvent((data.contains("player")) ? UUID.fromString(data.getString("player")) : null, data.getString("host"), data.getString("name"),
+                    Bukkit.getPluginManager().callEvent(new SubCreateEvent((data.contains("player"))?data.getUUID("player"):null, data.getString("host"), data.getString("name"),
                             data.getString("template"), new Version(data.getString("version")), data.getInt("port")));
                     callback("SubCreateEvent", this);
                 }
@@ -65,7 +65,7 @@ public class PacketInRunEvent implements PacketIn {
             @Override
             public void run(YAMLSection data) {
                 if (plugin.isEnabled()) {
-                    Bukkit.getPluginManager().callEvent(new SubSendCommandEvent((data.contains("player")) ? UUID.fromString(data.getString("player")) : null, data.getString("server"), data.getString("command")));
+                    Bukkit.getPluginManager().callEvent(new SubSendCommandEvent((data.contains("player"))?data.getUUID("player"):null, data.getString("server"), data.getString("command")));
                     callback("SubSendCommandEvent", this);
                 }
             }
@@ -74,7 +74,7 @@ public class PacketInRunEvent implements PacketIn {
             @Override
             public void run(YAMLSection data) {
                 if (plugin.isEnabled()) {
-                    Bukkit.getPluginManager().callEvent(new SubEditServerEvent((data.contains("player")) ? UUID.fromString(data.getString("player")) : null, data.getString("server"), new NamedContainer<String, Object>(data.getString("edit"), data.get("value")), data.getBoolean("perm")));
+                    Bukkit.getPluginManager().callEvent(new SubEditServerEvent((data.contains("player"))?data.getUUID("player"):null, data.getString("server"), new NamedContainer<String, Object>(data.getString("edit"), data.get("value")), data.getBoolean("perm")));
                     callback("SubEditServerEvent", this);
                 }
             }
@@ -83,7 +83,7 @@ public class PacketInRunEvent implements PacketIn {
             @Override
             public void run(YAMLSection data) {
                 if (plugin.isEnabled()) {
-                    Bukkit.getPluginManager().callEvent(new SubStartEvent((data.contains("player")) ? UUID.fromString(data.getString("player")) : null, data.getString("server")));
+                    Bukkit.getPluginManager().callEvent(new SubStartEvent((data.contains("player"))?data.getUUID("player"):null, data.getString("server")));
                     callback("SubStartEvent", this);
                 }
             }
@@ -92,7 +92,7 @@ public class PacketInRunEvent implements PacketIn {
             @Override
             public void run(YAMLSection data) {
                 if (plugin.isEnabled()) {
-                    Bukkit.getPluginManager().callEvent(new SubStopEvent((data.contains("player")) ? UUID.fromString(data.getString("player")) : null, data.getString("server"), data.getBoolean("force")));
+                    Bukkit.getPluginManager().callEvent(new SubStopEvent((data.contains("player"))?data.getUUID("player"):null, data.getString("server"), data.getBoolean("force")));
                     callback("SubStopEvent", this);
                 }
             }
@@ -110,7 +110,7 @@ public class PacketInRunEvent implements PacketIn {
             @Override
             public void run(YAMLSection data) {
                 if (plugin.isEnabled()) {
-                    Bukkit.getPluginManager().callEvent(new SubRemoveServerEvent((data.contains("player")) ? UUID.fromString(data.getString("player")) : null, (data.contains("host"))?data.getRawString("host"):null, data.getString("server")));
+                    Bukkit.getPluginManager().callEvent(new SubRemoveServerEvent((data.contains("player"))?data.getUUID("player"):null, (data.contains("host"))?data.getRawString("host"):null, data.getString("server")));
                     callback("SubRemoveServerEvent", this);
                 }
             }
@@ -128,7 +128,7 @@ public class PacketInRunEvent implements PacketIn {
             @Override
             public void run(YAMLSection data) {
                 if (plugin.isEnabled()) {
-                    Bukkit.getPluginManager().callEvent(new SubRemoveHostEvent((data.contains("player")) ? UUID.fromString(data.getString("player")) : null, data.getString("host")));
+                    Bukkit.getPluginManager().callEvent(new SubRemoveHostEvent((data.contains("player"))?data.getUUID("player"):null, data.getString("host")));
                     callback("SubRemoveHostEvent", this);
                 }
             }

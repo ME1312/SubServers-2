@@ -102,7 +102,7 @@ public class ExternalSubLogger extends SubLogger {
             }
 
             // Filter Message
-            boolean allow = log.get() && (!SubAPI.getInstance().getInternals().canSudo || SubAPI.getInstance().getInternals().sudo == null || SubAPI.getInstance().getInternals().sudo == getHandler());
+            boolean allow = (SubAPI.getInstance().getInternals().sudo == getHandler() && SubAPI.getInstance().getInternals().canSudo) || (log.get() && (SubAPI.getInstance().getInternals().sudo == null || !SubAPI.getInstance().getInternals().canSudo));
             List<SubLogFilter> filters = new ArrayList<SubLogFilter>();
             filters.addAll(this.filters);
             for (SubLogFilter filter : filters)

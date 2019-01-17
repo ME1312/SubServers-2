@@ -70,7 +70,7 @@ public class PacketStopServer implements PacketIn, PacketOut {
                 if (data.contains("force") && data.getBoolean("force")) {
                     for (Server server : servers.values()) {
                         if (server instanceof SubServer && ((SubServer) server).isRunning()) {
-                            if (((SubServer) server).terminate((data.contains("player"))?UUID.fromString(data.getRawString("player")):null)) {
+                            if (((SubServer) server).terminate((data.contains("player"))?data.getUUID("player"):null)) {
                                 sent = true;
                             }
                         }
@@ -83,7 +83,7 @@ public class PacketStopServer implements PacketIn, PacketOut {
                 } else {
                     for (Server server : servers.values()) {
                         if (server instanceof SubServer && ((SubServer) server).isRunning()) {
-                            if (((SubServer) server).stop((data.contains("player"))?UUID.fromString(data.getRawString("player")):null)) {
+                            if (((SubServer) server).stop((data.contains("player"))?data.getUUID("player"):null)) {
                                 sent = true;
                             }
                         }
@@ -96,13 +96,13 @@ public class PacketStopServer implements PacketIn, PacketOut {
                 }
             } else {
                 if (data.contains("force") && data.getBoolean("force")) {
-                    if (((SubServer) servers.get(data.getRawString("server").toLowerCase())).terminate((data.contains("player"))?UUID.fromString(data.getRawString("player")):null)) {
+                    if (((SubServer) servers.get(data.getRawString("server").toLowerCase())).terminate((data.contains("player"))?data.getUUID("player"):null)) {
                         client.sendPacket(new PacketStopServer(0, "Terminating SubServer", (data.contains("id"))?data.getRawString("id"):null));
                     } else {
                         client.sendPacket(new PacketStopServer(1, "Couldn't terminate SubServer", (data.contains("id"))?data.getRawString("id"):null));
                     }
                 } else {
-                    if (((SubServer) servers.get(data.getRawString("server").toLowerCase())).stop((data.contains("player"))?UUID.fromString(data.getRawString("player")):null)) {
+                    if (((SubServer) servers.get(data.getRawString("server").toLowerCase())).stop((data.contains("player"))?data.getUUID("player"):null)) {
                         client.sendPacket(new PacketStopServer(0, "Stopping SubServer", (data.contains("id"))?data.getRawString("id"):null));
                     } else {
                         client.sendPacket(new PacketStopServer(1, "Couldn't stop SubServer", (data.contains("id"))?data.getRawString("id"):null));

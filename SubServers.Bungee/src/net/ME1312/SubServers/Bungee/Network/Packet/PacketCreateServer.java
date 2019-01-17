@@ -73,7 +73,7 @@ public class PacketCreateServer implements PacketIn, PacketOut {
             } else if (data.getSection("creator").contains("port") && (data.getSection("creator").getInt("port") <= 0 || data.getSection("creator").getInt("port") > 65535)) {
                 client.sendPacket(new PacketCreateServer(11, "Invalid Port Number", (data.contains("id")) ? data.getRawString("id") : null));
             } else {
-                if (plugin.hosts.get(data.getSection("creator").getString("host").toLowerCase()).getCreator().create((data.contains("player"))?UUID.fromString(data.getRawString("player")):null, data.getSection("creator").getString("name"), plugin.hosts.get(data.getSection("creator").getString("host").toLowerCase()).getCreator().getTemplate(data.getSection("creator").getString("template")), new Version(data.getSection("creator").getString("version")), (data.getSection("creator").contains("port"))?data.getSection("creator").getInt("port"):null)) {
+                if (plugin.hosts.get(data.getSection("creator").getString("host").toLowerCase()).getCreator().create((data.contains("player"))?data.getUUID("player"):null, data.getSection("creator").getString("name"), plugin.hosts.get(data.getSection("creator").getString("host").toLowerCase()).getCreator().getTemplate(data.getSection("creator").getString("template")), new Version(data.getSection("creator").getString("version")), (data.getSection("creator").contains("port"))?data.getSection("creator").getInt("port"):null)) {
                     if (data.contains("wait") && data.getBoolean("wait")) {
                         new Thread(() -> {
                             try {

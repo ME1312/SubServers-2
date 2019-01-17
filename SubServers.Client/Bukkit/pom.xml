@@ -134,6 +134,9 @@
                             <outputDirectory>${basedir}/../../Javadoc/SubServers.Client.Bukkit</outputDirectory>
                             <reportOutputDirectory>${basedir}/../../Javadoc/SubServers.Client.Bukkit</reportOutputDirectory>
                             <additionalOptions>-Xdoclint:none</additionalOptions>
+                            <links>
+                                <link>https://hub.spigotmc.org/javadocs/spigot/</link>
+                            </links>
                         </configuration>
                     </execution>
                 </executions>

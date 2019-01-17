@@ -85,7 +85,7 @@ public class PacketExUpdateServer implements PacketIn, PacketOut {
                     server.setEnabled(data.getList("args").get(0).asBoolean());
                     break;
                 case 1:
-                    server.start(UUID.fromString(data.getList("args").get(0).asRawString()));
+                    server.start(data.getList("args").get(0).asUUID());
                     break;
                 case 2:
                     server.command(data.getList("args").get(0).asRawString());

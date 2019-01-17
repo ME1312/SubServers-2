@@ -127,7 +127,10 @@ public class InternalSubCreator extends SubCreator {
                 if (template.getBuildOptions().getBoolean("Use-Cache", true)) {
                     cache = new UniversalFile(host.plugin.dir, "SubServers:Cache:Templates:" + template.getName());
                     cache.mkdirs();
-                    var.put("cache", cache.toString().replace(File.separatorChar, '/'));
+                    String c = cache.toString();
+                    if (System.getProperty("os.name").toLowerCase().startsWith("windows") &&
+                            (template.getBuildOptions().getRawString("Executable").toLowerCase().startsWith("bash ") || template.getBuildOptions().getRawString("Executable").toLowerCase().startsWith("sh "))) c = c.replace(File.separatorChar, '/');
+                    var.put("cache", c);
                 } else {
                     cache = null;
                 }

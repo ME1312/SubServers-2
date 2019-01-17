@@ -135,6 +135,9 @@
                             <outputDirectory>${basedir}/../Javadoc/SubServers.Bungee</outputDirectory>
                             <reportOutputDirectory>${basedir}/../Javadoc/SubServers.Bungee</reportOutputDirectory>
                             <additionalOptions>-Xdoclint:none</additionalOptions>
+                            <links>
+                                <link>https://ci.md-5.net/job/BungeeCord/ws/api/target/apidocs/</link>
+                            </links>
                         </configuration>
                     </execution>
                 </executions>

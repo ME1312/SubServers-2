@@ -27,7 +27,7 @@ public class PacketInRunEvent implements PacketIn {
         callback("SubAddHostEvent", new Callback<YAMLSection>() {
             @Override
             public void run(YAMLSection data) {
-                GalaxiEngine.getInstance().getPluginManager().executeEvent(new SubAddHostEvent((data.contains("player"))?UUID.fromString(data.getRawString("player")):null, data.getRawString("host")));
+                GalaxiEngine.getInstance().getPluginManager().executeEvent(new SubAddHostEvent((data.contains("player"))?data.getUUID("player"):null, data.getRawString("host")));
                 callback("SubAddHostEvent", this);
             }
         });
@@ -41,14 +41,14 @@ public class PacketInRunEvent implements PacketIn {
         callback("SubAddServerEvent", new Callback<YAMLSection>() {
             @Override
             public void run(YAMLSection data) {
-                GalaxiEngine.getInstance().getPluginManager().executeEvent(new SubAddServerEvent((data.contains("player"))?UUID.fromString(data.getRawString("player")):null, (data.contains("host"))?data.getRawString("host"):null, data.getRawString("server")));
+                GalaxiEngine.getInstance().getPluginManager().executeEvent(new SubAddServerEvent((data.contains("player"))?data.getUUID("player"):null, (data.contains("host"))?data.getRawString("host"):null, data.getRawString("server")));
                 callback("SubAddServerEvent", this);
             }
         });
         callback("SubCreateEvent", new Callback<YAMLSection>() {
             @Override
             public void run(YAMLSection data) {
-                GalaxiEngine.getInstance().getPluginManager().executeEvent(new SubCreateEvent((data.contains("player"))?UUID.fromString(data.getRawString("player")):null, data.getRawString("host"), data.getRawString("name"),
+                GalaxiEngine.getInstance().getPluginManager().executeEvent(new SubCreateEvent((data.contains("player"))?data.getUUID("player"):null, data.getRawString("host"), data.getRawString("name"),
                         data.getRawString("template"), new Version(data.getRawString("version")), data.getInt("port")));
                 callback("SubCreateEvent", this);
             }
@@ -56,28 +56,28 @@ public class PacketInRunEvent implements PacketIn {
         callback("SubSendCommandEvent", new Callback<YAMLSection>() {
             @Override
             public void run(YAMLSection data) {
-                GalaxiEngine.getInstance().getPluginManager().executeEvent(new SubSendCommandEvent((data.contains("player"))?UUID.fromString(data.getRawString("player")):null, data.getRawString("server"), data.getRawString("command")));
+                GalaxiEngine.getInstance().getPluginManager().executeEvent(new SubSendCommandEvent((data.contains("player"))?data.getUUID("player"):null, data.getRawString("server"), data.getRawString("command")));
                 callback("SubSendCommandEvent", this);
             }
         });
         callback("SubEditServerEvent", new Callback<YAMLSection>() {
             @Override
             public void run(YAMLSection data) {
-                GalaxiEngine.getInstance().getPluginManager().executeEvent(new SubEditServerEvent((data.contains("player")) ? UUID.fromString(data.getRawString("player")):null, data.getRawString("server"), new NamedContainer<String, Object>(data.getRawString("edit"), data.get("value")), data.getBoolean("perm")));
+                GalaxiEngine.getInstance().getPluginManager().executeEvent(new SubEditServerEvent((data.contains("player"))?data.getUUID("player"):null, data.getRawString("server"), new NamedContainer<String, Object>(data.getRawString("edit"), data.get("value")), data.getBoolean("perm")));
                 callback("SubEditServerEvent", this);
             }
         });
         callback("SubStartEvent", new Callback<YAMLSection>() {
             @Override
             public void run(YAMLSection data) {
-                GalaxiEngine.getInstance().getPluginManager().executeEvent(new SubStartEvent((data.contains("player"))?UUID.fromString(data.getRawString("player")):null, data.getRawString("server")));
+                GalaxiEngine.getInstance().getPluginManager().executeEvent(new SubStartEvent((data.contains("player"))?data.getUUID("player"):null, data.getRawString("server")));
                 callback("SubStartEvent", this);
             }
         });
         callback("SubStopEvent", new Callback<YAMLSection>() {
             @Override
             public void run(YAMLSection data) {
-                GalaxiEngine.getInstance().getPluginManager().executeEvent(new SubStopEvent((data.contains("player"))?UUID.fromString(data.getRawString("player")):null, data.getRawString("server"), data.getBoolean("force")));
+                GalaxiEngine.getInstance().getPluginManager().executeEvent(new SubStopEvent((data.contains("player"))?data.getUUID("player"):null, data.getRawString("server"), data.getBoolean("force")));
                 callback("SubStopEvent", this);
             }
         });
@@ -91,7 +91,7 @@ public class PacketInRunEvent implements PacketIn {
         callback("SubRemoveServerEvent", new Callback<YAMLSection>() {
             @Override
             public void run(YAMLSection data) {
-                GalaxiEngine.getInstance().getPluginManager().executeEvent(new SubRemoveServerEvent((data.contains("player"))?UUID.fromString(data.getRawString("player")):null, (data.contains("host"))?data.getRawString("host"):null, data.getRawString("server")));
+                GalaxiEngine.getInstance().getPluginManager().executeEvent(new SubRemoveServerEvent((data.contains("player"))?data.getUUID("player"):null, (data.contains("host"))?data.getRawString("host"):null, data.getRawString("server")));
                 callback("SubRemoveServerEvent", this);
             }
         });
@@ -105,7 +105,7 @@ public class PacketInRunEvent implements PacketIn {
         callback("SubRemoveHostEvent", new Callback<YAMLSection>() {
             @Override
             public void run(YAMLSection data) {
-                GalaxiEngine.getInstance().getPluginManager().executeEvent(new SubRemoveHostEvent((data.contains("player"))?UUID.fromString(data.getRawString("player")):null, data.getRawString("host")));
+                GalaxiEngine.getInstance().getPluginManager().executeEvent(new SubRemoveHostEvent((data.contains("player"))?data.getUUID("player"):null, data.getRawString("host")));
                 callback("SubRemoveHostEvent", this);
             }
         });

@@ -108,7 +108,10 @@ public class SubServer {
         boolean falsestart = true;
         allowrestart = true;
         try {
-            process = Runtime.getRuntime().exec(Executable.parse(host.host.getRawString("Git-Bash"), executable), null, directory);
+            ProcessBuilder pb = new ProcessBuilder().command(Executable.parse(host.host.getRawString("Git-Bash"), executable)).directory(directory);
+            pb.environment().put("name", getName());
+            pb.environment().put("port", Integer.toString(getPort()));
+            process = pb.start();
             falsestart = false;
             host.log.info.println("Now starting " + name);
             logger.process = process;

@@ -119,7 +119,10 @@ public class InternalSubServer extends SubServerContainer {
     private void run() {
         allowrestart = true;
         try {
-            process = Runtime.getRuntime().exec(Executable.parse(host.getCreator().getBashDirectory(), executable), null, directory);
+            ProcessBuilder pb = new ProcessBuilder().command(Executable.parse(host.getCreator().getBashDirectory(), executable)).directory(directory);
+            pb.environment().put("name", getName());
+            pb.environment().put("port", Integer.toString(getAddress().getPort()));
+            process = pb.start();
             System.out.println("SubServers > Now starting " + getName());
             logger.process = process;
             logger.start();

@@ -25,8 +25,8 @@ public class PacketInExLogMessage implements PacketIn {
     @Override
     public void execute(Client client, YAMLSection data) {
         try {
-            if (data.contains("h") && data.contains("m") && data.getRawString("m").length() != 0 && loggers.keySet().contains(UUID.fromString(data.getRawString("h")))) {
-                Util.reflect(ExternalSubLogger.class.getDeclaredMethod("log", String.class), loggers.get(UUID.fromString(data.getRawString("h"))), data.getRawString("m"));
+            if (data.contains("h") && data.contains("m") && data.getRawString("m").length() != 0 && loggers.keySet().contains(data.getUUID("h"))) {
+                Util.reflect(ExternalSubLogger.class.getDeclaredMethod("log", String.class), loggers.get(data.getUUID("h")), data.getRawString("m"));
             }
         } catch (Exception e) {
             e.printStackTrace();

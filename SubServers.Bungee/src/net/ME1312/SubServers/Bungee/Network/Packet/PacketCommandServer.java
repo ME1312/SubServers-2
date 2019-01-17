@@ -70,7 +70,7 @@ public class PacketCommandServer implements PacketIn, PacketOut {
                     boolean sent = false;
                     for (Server server : servers.values()) {
                         if (server instanceof SubServer && ((SubServer) server).isRunning()) {
-                            if (((SubServer) server).command((data.contains("player"))?UUID.fromString(data.getRawString("player")):null, data.getRawString("command"))) {
+                            if (((SubServer) server).command((data.contains("player"))?data.getUUID("player"):null, data.getRawString("command"))) {
                                 sent = true;
                             }
                         }
@@ -81,7 +81,7 @@ public class PacketCommandServer implements PacketIn, PacketOut {
                         client.sendPacket(new PacketCommandServer(1, "Couldn't send command", (data.contains("id")) ? data.getRawString("id") : null));
                     }
                 } else {
-                    if (((SubServer) servers.get(data.getRawString("server").toLowerCase())).command((data.contains("player")) ? UUID.fromString(data.getRawString("player")) : null, data.getRawString("command"))) {
+                    if (((SubServer) servers.get(data.getRawString("server").toLowerCase())).command((data.contains("player"))?data.getUUID("player"):null, data.getRawString("command"))) {
                         client.sendPacket(new PacketCommandServer(0, "Sending Command", (data.contains("id")) ? data.getRawString("id") : null));
                     } else {
                         client.sendPacket(new PacketCommandServer(1, "Couldn't send command", (data.contains("id")) ? data.getRawString("id") : null));

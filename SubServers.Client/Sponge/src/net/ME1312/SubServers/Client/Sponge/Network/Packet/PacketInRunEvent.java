@@ -27,7 +27,7 @@ public class PacketInRunEvent implements PacketIn {
         callback("SubAddHostEvent", new Callback<YAMLSection>() {
             @Override
             public void run(YAMLSection data) {
-                Sponge.getEventManager().post(new SubAddHostEvent((data.contains("player")) ? UUID.fromString(data.getString("player")) : null, data.getString("host")));
+                Sponge.getEventManager().post(new SubAddHostEvent((data.contains("player"))?data.getUUID("player"):null, data.getString("host")));
                 callback("SubAddHostEvent", this);
             }
         });
@@ -41,14 +41,14 @@ public class PacketInRunEvent implements PacketIn {
         callback("SubAddServerEvent", new Callback<YAMLSection>() {
             @Override
             public void run(YAMLSection data) {
-                Sponge.getEventManager().post(new SubAddServerEvent((data.contains("player")) ? UUID.fromString(data.getString("player")) : null, (data.contains("host"))?data.getRawString("host"):null, data.getString("server")));
+                Sponge.getEventManager().post(new SubAddServerEvent((data.contains("player"))?data.getUUID("player"):null, (data.contains("host"))?data.getRawString("host"):null, data.getString("server")));
                 callback("SubAddServerEvent", this);
             }
         });
         callback("SubCreateEvent", new Callback<YAMLSection>() {
             @Override
             public void run(YAMLSection data) {
-                Sponge.getEventManager().post(new SubCreateEvent((data.contains("player")) ? UUID.fromString(data.getString("player")) : null, data.getString("host"), data.getString("name"),
+                Sponge.getEventManager().post(new SubCreateEvent((data.contains("player"))?data.getUUID("player"):null, data.getString("host"), data.getString("name"),
                         data.getString("template"), new Version(data.getString("version")), data.getInt("port")));
                 callback("SubCreateEvent", this);
             }
@@ -56,28 +56,28 @@ public class PacketInRunEvent implements PacketIn {
         callback("SubSendCommandEvent", new Callback<YAMLSection>() {
             @Override
             public void run(YAMLSection data) {
-                Sponge.getEventManager().post(new SubSendCommandEvent((data.contains("player")) ? UUID.fromString(data.getString("player")) : null, data.getString("server"), data.getString("command")));
+                Sponge.getEventManager().post(new SubSendCommandEvent((data.contains("player"))?data.getUUID("player"):null, data.getString("server"), data.getString("command")));
                 callback("SubSendCommandEvent", this);
             }
         });
         callback("SubEditServerEvent", new Callback<YAMLSection>() {
             @Override
             public void run(YAMLSection data) {
-                Sponge.getEventManager().post(new SubEditServerEvent((data.contains("player")) ? UUID.fromString(data.getString("player")) : null, data.getString("server"), new NamedContainer<String, Object>(data.getString("edit"), data.get("value")), data.getBoolean("perm")));
+                Sponge.getEventManager().post(new SubEditServerEvent((data.contains("player"))?data.getUUID("player"):null, data.getString("server"), new NamedContainer<String, Object>(data.getString("edit"), data.get("value")), data.getBoolean("perm")));
                 callback("SubEditServerEvent", this);
             }
         });
         callback("SubStartEvent", new Callback<YAMLSection>() {
             @Override
             public void run(YAMLSection data) {
-                Sponge.getEventManager().post(new SubStartEvent((data.contains("player")) ? UUID.fromString(data.getString("player")) : null, data.getString("server")));
+                Sponge.getEventManager().post(new SubStartEvent((data.contains("player"))?data.getUUID("player"):null, data.getString("server")));
                 callback("SubStartEvent", this);
             }
         });
         callback("SubStopEvent", new Callback<YAMLSection>() {
             @Override
             public void run(YAMLSection data) {
-                Sponge.getEventManager().post(new SubStopEvent((data.contains("player")) ? UUID.fromString(data.getString("player")) : null, data.getString("server"), data.getBoolean("force")));
+                Sponge.getEventManager().post(new SubStopEvent((data.contains("player"))?data.getUUID("player"):null, data.getString("server"), data.getBoolean("force")));
                 callback("SubStopEvent", this);
             }
         });
@@ -91,7 +91,7 @@ public class PacketInRunEvent implements PacketIn {
         callback("SubRemoveServerEvent", new Callback<YAMLSection>() {
             @Override
             public void run(YAMLSection data) {
-                Sponge.getEventManager().post(new SubRemoveServerEvent((data.contains("player")) ? UUID.fromString(data.getString("player")) : null, (data.contains("host"))?data.getRawString("host"):null, data.getString("server")));
+                Sponge.getEventManager().post(new SubRemoveServerEvent((data.contains("player"))?data.getUUID("player"):null, (data.contains("host"))?data.getRawString("host"):null, data.getString("server")));
                 callback("SubRemoveServerEvent", this);
             }
         });
@@ -105,7 +105,7 @@ public class PacketInRunEvent implements PacketIn {
         callback("SubRemoveHostEvent", new Callback<YAMLSection>() {
             @Override
             public void run(YAMLSection data) {
-                Sponge.getEventManager().post(new SubRemoveHostEvent((data.contains("player")) ? UUID.fromString(data.getString("player")) : null, data.getString("host")));
+                Sponge.getEventManager().post(new SubRemoveHostEvent((data.contains("player"))?data.getUUID("player"):null, data.getString("host")));
                 callback("SubRemoveHostEvent", this);
             }
         });

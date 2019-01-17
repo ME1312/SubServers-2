@@ -69,7 +69,7 @@ public class PacketExAddServer implements PacketIn, PacketOut {
                 host.servers.put(data.getSection("server").getRawString("name").toLowerCase(), server);
                 if (UPnP.isUPnPAvailable() && host.config.get().getSection("Settings").getSection("UPnP", new YAMLSection()).getBoolean("Forward-Servers", false)) UPnP.openPortTCP(server.getPort());
                 log.info.println("Added SubServer: " + data.getSection("server").getRawString("name"));
-                if (data.getSection("server").contains("running")) server.start(UUID.fromString(data.getSection("server").getRawString("running")));
+                if (data.getSection("server").contains("running")) server.start(data.getSection("server").getUUID("running"));
                 host.subdata.sendPacket(new PacketExAddServer(0, "Server Added Successfully", (data.contains("id"))?data.getRawString("id"):null));
             }
         } catch (Throwable e) {

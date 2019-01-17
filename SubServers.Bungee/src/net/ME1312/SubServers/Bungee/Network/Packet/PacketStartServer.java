@@ -79,7 +79,7 @@ public class PacketStartServer implements PacketIn, PacketOut {
                 }
                 client.sendPacket(new PacketStartServer(9, "Cannot start SubServer while these servers are running: " + list, (data.contains("id")) ? data.getRawString("id") : null));
             } else {
-                if (((SubServer) servers.get(data.getRawString("server").toLowerCase())).start((data.contains("player"))?UUID.fromString(data.getRawString("player")):null)) {
+                if (((SubServer) servers.get(data.getRawString("server").toLowerCase())).start((data.contains("player"))?data.getUUID("player"):null)) {
                     client.sendPacket(new PacketStartServer(0, "Starting SubServer", (data.contains("id"))?data.getRawString("id"):null));
                 } else {
                     client.sendPacket(new PacketStartServer(1, "Couldn't start SubServer", (data.contains("id"))?data.getRawString("id"):null));

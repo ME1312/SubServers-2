@@ -113,6 +113,9 @@
                             <outputDirectory>${basedir}/../../Javadoc/SubServers.Client.Sponge</outputDirectory>
                             <reportOutputDirectory>${basedir}/../../Javadoc/SubServers.Client.Sponge</reportOutputDirectory>
                             <additionalOptions>-Xdoclint:none</additionalOptions>
+                            <links>
+                                <link>https://jd.spongepowered.org/</link>
+                            </links>
                         </configuration>
                     </execution>
                 </executions>

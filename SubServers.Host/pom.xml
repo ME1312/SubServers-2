@@ -120,6 +120,9 @@
                             <outputDirectory>${basedir}/../Javadoc/SubServers.Host</outputDirectory>
                             <reportOutputDirectory>${basedir}/../Javadoc/SubServers.Host</reportOutputDirectory>
                             <additionalOptions>-Xdoclint:none</additionalOptions>
+                            <links>
+                                <link>https://src.me1312.net/jenkins/job/GalaxiEngine/javadoc/GalaxiEngine/</link>
+                            </links>
                         </configuration>
                     </execution>
                 </executions>

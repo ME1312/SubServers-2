@@ -27,7 +27,7 @@ public class PacketInRunEvent implements PacketIn {
         callback("SubAddHostEvent", new Callback<YAMLSection>() {
             @Override
             public void run(YAMLSection data) {
-                ProxyServer.getInstance().getPluginManager().callEvent(new SubAddHostEvent((data.contains("player"))?UUID.fromString(data.getRawString("player")):null, data.getRawString("host")));
+                ProxyServer.getInstance().getPluginManager().callEvent(new SubAddHostEvent((data.contains("player"))?data.getUUID("player"):null, data.getRawString("host")));
                 callback("SubAddHostEvent", this);
             }
         });
@@ -41,14 +41,14 @@ public class PacketInRunEvent implements PacketIn {
         callback("SubAddServerEvent", new Callback<YAMLSection>() {
             @Override
             public void run(YAMLSection data) {
-                ProxyServer.getInstance().getPluginManager().callEvent(new SubAddServerEvent((data.contains("player"))?UUID.fromString(data.getRawString("player")):null, (data.contains("host"))?data.getRawString("host"):null, data.getRawString("server")));
+                ProxyServer.getInstance().getPluginManager().callEvent(new SubAddServerEvent((data.contains("player"))?data.getUUID("player"):null, (data.contains("host"))?data.getRawString("host"):null, data.getRawString("server")));
                 callback("SubAddServerEvent", this);
             }
         });
         callback("SubCreateEvent", new Callback<YAMLSection>() {
             @Override
             public void run(YAMLSection data) {
-                ProxyServer.getInstance().getPluginManager().callEvent(new SubCreateEvent((data.contains("player")) ? UUID.fromString(data.getRawString("player")) : null, data.getRawString("host"), data.getRawString("name"),
+                ProxyServer.getInstance().getPluginManager().callEvent(new SubCreateEvent((data.contains("player"))?data.getUUID("player"):null, data.getRawString("host"), data.getRawString("name"),
                         data.getRawString("template"), new Version(data.getRawString("version")), data.getInt("port")));
                 callback("SubCreateEvent", this);
             }
@@ -56,21 +56,21 @@ public class PacketInRunEvent implements PacketIn {
         callback("SubSendCommandEvent", new Callback<YAMLSection>() {
             @Override
             public void run(YAMLSection data) {
-                ProxyServer.getInstance().getPluginManager().callEvent(new SubSendCommandEvent((data.contains("player"))?UUID.fromString(data.getRawString("player")):null, data.getRawString("server"), data.getRawString("command")));
+                ProxyServer.getInstance().getPluginManager().callEvent(new SubSendCommandEvent((data.contains("player"))?data.getUUID("player"):null, data.getRawString("server"), data.getRawString("command")));
                 callback("SubSendCommandEvent", this);
             }
         });
         callback("SubEditServerEvent", new Callback<YAMLSection>() {
             @Override
             public void run(YAMLSection data) {
-                ProxyServer.getInstance().getPluginManager().callEvent(new SubEditServerEvent((data.contains("player")) ? UUID.fromString(data.getRawString("player")) : null, data.getRawString("server"), new NamedContainer<String, Object>(data.getRawString("edit"), data.get("value")), data.getBoolean("perm")));
+                ProxyServer.getInstance().getPluginManager().callEvent(new SubEditServerEvent((data.contains("player"))?data.getUUID("player"):null, data.getRawString("server"), new NamedContainer<String, Object>(data.getRawString("edit"), data.get("value")), data.getBoolean("perm")));
                 callback("SubEditServerEvent", this);
             }
         });
         callback("SubStartEvent", new Callback<YAMLSection>() {
             @Override
             public void run(YAMLSection data) {
-                ProxyServer.getInstance().getPluginManager().callEvent(new SubStartEvent((data.contains("player"))?UUID.fromString(data.getRawString("player")):null, data.getRawString("server")));
+                ProxyServer.getInstance().getPluginManager().callEvent(new SubStartEvent((data.contains("player"))?data.getUUID("player"):null, data.getRawString("server")));
                 callback("SubStartEvent", this);
             }
         });
@@ -91,7 +91,7 @@ public class PacketInRunEvent implements PacketIn {
         callback("SubStopEvent", new Callback<YAMLSection>() {
             @Override
             public void run(YAMLSection data) {
-                ProxyServer.getInstance().getPluginManager().callEvent(new SubStopEvent((data.contains("player"))?UUID.fromString(data.getRawString("player")):null, data.getRawString("server"), data.getBoolean("force")));
+                ProxyServer.getInstance().getPluginManager().callEvent(new SubStopEvent((data.contains("player"))?data.getUUID("player"):null, data.getRawString("server"), data.getBoolean("force")));
                 callback("SubStopEvent", this);
             }
         });
@@ -105,7 +105,7 @@ public class PacketInRunEvent implements PacketIn {
         callback("SubRemoveServerEvent", new Callback<YAMLSection>() {
             @Override
             public void run(YAMLSection data) {
-                ProxyServer.getInstance().getPluginManager().callEvent(new SubRemoveServerEvent((data.contains("player"))?UUID.fromString(data.getRawString("player")):null, (data.contains("host"))?data.getRawString("host"):null, data.getRawString("server")));
+                ProxyServer.getInstance().getPluginManager().callEvent(new SubRemoveServerEvent((data.contains("player"))?data.getUUID("player"):null, (data.contains("host"))?data.getRawString("host"):null, data.getRawString("server")));
                 callback("SubRemoveServerEvent", this);
             }
         });
@@ -119,7 +119,7 @@ public class PacketInRunEvent implements PacketIn {
         callback("SubRemoveHostEvent", new Callback<YAMLSection>() {
             @Override
             public void run(YAMLSection data) {
-                ProxyServer.getInstance().getPluginManager().callEvent(new SubRemoveHostEvent((data.contains("player"))?UUID.fromString(data.getRawString("player")):null, data.getRawString("host")));
+                ProxyServer.getInstance().getPluginManager().callEvent(new SubRemoveHostEvent((data.contains("player"))?data.getUUID("player"):null, data.getRawString("host")));
                 callback("SubRemoveHostEvent", this);
             }
         });
