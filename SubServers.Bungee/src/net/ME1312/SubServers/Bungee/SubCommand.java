@@ -638,7 +638,9 @@ public final class SubCommand extends CommandX {
     public NamedContainer<String, List<String>> suggestArguments(CommandSender sender, String[] args) {
         String last = (args.length > 0)?args[args.length - 1].toLowerCase():"";
         if (args.length <= 1) {
-            List<String> cmds = Arrays.asList("help", "list", "info", "status", "version", "start", "stop", "kill", "terminate", "cmd", "command", "create");
+            List<String> cmds = new ArrayList<>();
+            cmds.addAll(Arrays.asList("help", "list", "info", "status", "version", "start", "stop", "kill", "terminate", "cmd", "command", "create"));
+            if (!(sender instanceof ProxiedPlayer)) cmds.addAll(Arrays.asList("reload", "sudo", "screen", "delete"));
             if (last.length() == 0) {
                 return new NamedContainer<>(null, cmds);
             } else {
@@ -745,9 +747,28 @@ public final class SubCommand extends CommandX {
                 } else {
                     return new NamedContainer<>(null, Collections.emptyList());
                 }
+            } else if (!(sender instanceof ProxiedPlayer) && args[0].equals("reload")) {
+                List<String> list = new ArrayList<String>(),
+                        completes = Arrays.asList("all", "config", "templates");
+                if (args.length == 2) {
+                    if (last.length() == 0) {
+                        list = completes;
+                    } else {
+                        for (String complete : completes) {
+                            if (complete.toLowerCase().startsWith(last)) list.add(last + complete.substring(last.length()));
+                        }
+                    }
+                    return new NamedContainer<>((list.size() <= 0)?plugin.api.getLang("SubServers", "Command.Generic.Unknown").replace("$str$", args[0]):null, list);
+                } else {
+                    return new NamedContainer<>(null, Collections.emptyList());
+                }
             } else if (args[0].equals("start") ||
-                    args[0].equals("restart")) {
-                    List<String> list = new ArrayList<String>();
+                    args[0].equals("restart") ||
+                    (!(sender instanceof ProxiedPlayer) && (
+                                args[0].equals("sudo") || args[0].equals("screen") ||
+                                args[0].equals("del") || args[0].equals("delete")
+                            ))) {
+                List<String> list = new ArrayList<String>();
                 if (args.length == 2) {
                     if (last.length() == 0) {
                         for (SubServer server : plugin.api.getSubServers().values()) list.add(server.getName());
