@@ -10,6 +10,9 @@ import net.ME1312.SubServers.Client.Bukkit.Network.PacketOut;
 import java.util.HashMap;
 import java.util.UUID;
 
+/**
+ * Stop Server Packet
+ */
 public class PacketStopServer implements PacketIn, PacketOut {
     private static HashMap<String, Callback<YAMLSection>[]> callbacks = new HashMap<String, Callback<YAMLSection>[]>();
     private UUID player;
@@ -17,8 +20,19 @@ public class PacketStopServer implements PacketIn, PacketOut {
     private String server;
     private String id;
 
+    /**
+     * New PacketStopServer (In)
+     */
     public PacketStopServer() {}
 
+    /**
+     * New PacketStopServer (Out)
+     *
+     * @param player Player Starting
+     * @param server Server
+     * @param force Force Stop
+     * @param callback Callbacks
+     */
     @SafeVarargs
     public PacketStopServer(UUID player, String server, boolean force, Callback<YAMLSection>... callback) {
         if (Util.isNull(server, force, callback)) throw new NullPointerException();

@@ -113,6 +113,7 @@ public final class SubDataClient {
         registerPacket(new PacketInReload(plugin), "SubServers", "Reload");
         registerPacket(new PacketInReset(), "SubServers", "Reset");
         registerPacket(new PacketLinkServer(plugin), "SubServers", "LinkServer");
+        registerPacket(new PacketRestartServer(), "SubServers", "RestartServer");
         registerPacket(new PacketStartServer(), "SubServers", "StartServer");
         registerPacket(new PacketStopServer(), "SubServers", "StopServer");
 
@@ -128,6 +129,7 @@ public final class SubDataClient {
         registerPacket(PacketDownloadProxyInfo.class, "SubServers", "DownloadProxyInfo");
         registerPacket(PacketDownloadServerInfo.class, "SubServers", "DownloadServerInfo");
         registerPacket(PacketLinkServer.class, "SubServers", "LinkServer");
+        registerPacket(PacketRestartServer.class, "SubServers", "RestartServer");
         registerPacket(PacketStartServer.class, "SubServers", "StartServer");
         registerPacket(PacketStopServer.class, "SubServers", "StopServer");
     }

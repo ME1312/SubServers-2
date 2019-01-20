@@ -608,7 +608,7 @@ public final class SubCommand extends CommandX {
     public NamedContainer<String, List<String>> suggestArguments(CommandSender sender, String[] args) {
         String last = (args.length > 0)?args[args.length - 1].toLowerCase():"";
         if (args.length <= 1) {
-            List<String> cmds = Arrays.asList("help", "list", "info", "status", "version", "start", "stop", "kill", "terminate", "cmd", "command", "create");
+            List<String> cmds = Arrays.asList("help", "list", "info", "status", "version", "start", "restart", "stop", "kill", "terminate", "cmd", "command", "create");
             if (last.length() == 0) {
                 return new NamedContainer<>(null, cmds);
             } else {

@@ -128,6 +128,7 @@ public final class SubDataClient {
         registerPacket(new PacketInReset(host), "SubServers", "Reset");
         registerPacket(new PacketInRunEvent(), "SubServers", "RunEvent");
         registerPacket(new PacketLinkExHost(host), "SubServers", "LinkExHost");
+        registerPacket(new PacketRestartServer(), "SubServers", "RestartServer");
         registerPacket(new PacketStartServer(), "SubServers", "StartServer");
         registerPacket(new PacketStopServer(), "SubServers", "StopServer");
 
@@ -152,6 +153,7 @@ public final class SubDataClient {
         registerPacket(PacketLinkExHost.class, "SubServers", "LinkExHost");
         registerPacket(PacketOutExLogMessage.class, "SubServers", "ExLogMessage");
         registerPacket(PacketOutExRequestQueue.class, "SubServers", "ExRequestQueue");
+        registerPacket(PacketRestartServer.class, "SubServers", "RestartServer");
         registerPacket(PacketStartServer.class, "SubServers", "StartServer");
         registerPacket(PacketStopServer.class, "SubServers", "StopServer");
     }

@@ -455,7 +455,7 @@ public final class SubCommand extends CommandX {
                                     e.printStackTrace();
                                 }
                             }, "SubServers.Bungee::Server_Restart_Command_Handler(" + servers.get(args[1].toLowerCase()).getName() + ')').start();
-                    } else {
+                        } else {
                             starter.run();
                         }
                     } else {
@@ -639,7 +639,7 @@ public final class SubCommand extends CommandX {
         String last = (args.length > 0)?args[args.length - 1].toLowerCase():"";
         if (args.length <= 1) {
             List<String> cmds = new ArrayList<>();
-            cmds.addAll(Arrays.asList("help", "list", "info", "status", "version", "start", "stop", "kill", "terminate", "cmd", "command", "create"));
+            cmds.addAll(Arrays.asList("help", "list", "info", "status", "version", "start", "stop", "restart", "kill", "terminate", "cmd", "command", "create"));
             if (!(sender instanceof ProxiedPlayer)) cmds.addAll(Arrays.asList("reload", "sudo", "screen", "delete"));
             if (last.length() == 0) {
                 return new NamedContainer<>(null, cmds);

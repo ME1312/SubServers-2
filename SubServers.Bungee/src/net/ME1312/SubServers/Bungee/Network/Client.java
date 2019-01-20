@@ -133,7 +133,7 @@ public class Client {
      */
     public void sendPacket(PacketOut packet) {
         if (Util.isNull(packet)) throw new NullPointerException();
-        try {
+        if (!isClosed()) try {
             out.packValue(subdata.getCipher().encrypt(subdata.plugin.config.get().getSection("Settings").getSection("SubData").getRawString("Password"), SubDataServer.encodePacket(this, packet)));
             out.flush();
         } catch (Throwable e) {

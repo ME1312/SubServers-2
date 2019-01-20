@@ -11,34 +11,31 @@ import java.util.HashMap;
 import java.util.UUID;
 
 /**
- * Stop Server Packet
+ * Restart Server Packet
  */
-public class PacketStopServer implements PacketIn, PacketOut {
+public class PacketRestartServer implements PacketIn, PacketOut {
     private static HashMap<String, Callback<YAMLSection>[]> callbacks = new HashMap<String, Callback<YAMLSection>[]>();
     private UUID player;
-    private boolean force;
     private String server;
     private String id;
 
     /**
-     * New PacketStopServer (In)
+     * New PacketRestartServer (In)
      */
-    public PacketStopServer() {}
+    public PacketRestartServer() {}
 
     /**
-     * New PacketStopServer (Out)
+     * New PacketRestartServer (Out)
      *
      * @param player Player Starting
      * @param server Server
-     * @param force Force Stop
      * @param callback Callbacks
      */
     @SafeVarargs
-    public PacketStopServer(UUID player, String server, boolean force, Callback<YAMLSection>... callback) {
-        if (Util.isNull(server, force, callback)) throw new NullPointerException();
+    public PacketRestartServer(UUID player, String server, Callback<YAMLSection>... callback) {
+        if (Util.isNull(server, callback)) throw new NullPointerException();
         this.player = player;
         this.server = server;
-        this.force = force;
         this.id = Util.getNew(callbacks.keySet(), UUID::randomUUID).toString();
         callbacks.put(id, callback);
     }
@@ -49,7 +46,6 @@ public class PacketStopServer implements PacketIn, PacketOut {
         data.set("id", id);
         if (player != null) data.set("player", player.toString());
         data.set("server", server);
-        data.set("force", force);
         return data;
     }
 

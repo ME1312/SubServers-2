@@ -106,6 +106,7 @@ public final class SubDataServer {
         registerPacket(new PacketLinkExHost(plugin), "SubServers", "LinkExHost");
         registerPacket(new PacketLinkProxy(plugin), "SubServers", "LinkProxy");
         registerPacket(new PacketLinkServer(plugin), "SubServers", "LinkServer");
+        registerPacket(new PacketRestartServer(plugin), "SubServers", "RestartServer");
         registerPacket(new PacketStartServer(plugin), "SubServers", "StartServer");
         registerPacket(new PacketStopServer(plugin), "SubServers", "StopServer");
 
@@ -133,6 +134,7 @@ public final class SubDataServer {
         registerPacket(PacketOutRunEvent.class, "SubServers", "RunEvent");
         registerPacket(PacketOutReload.class, "SubServers", "Reload");
         registerPacket(PacketOutReset.class, "SubServers", "Reset");
+        registerPacket(PacketRestartServer.class, "SubServers", "RestartServer");
         registerPacket(PacketStartServer.class, "SubServers", "StartServer");
         registerPacket(PacketStopServer.class, "SubServers", "StopServer");
     }

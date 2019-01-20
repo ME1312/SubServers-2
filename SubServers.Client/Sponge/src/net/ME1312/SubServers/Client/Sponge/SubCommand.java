@@ -737,7 +737,7 @@ public final class SubCommand implements CommandExecutor {
                             }
                         });
 
-                        plugin.subdata.sendPacket(new PacketStopServer((sender instanceof Player) ? ((Player) sender).getUniqueId():null, subserver.get(), false, data -> {
+                        Callback<YAMLSection> stopper = data -> {
                             if (data.getInt("r") != 0) listening.set(false);
                             switch (data.getInt("r")) {
                                 case 3:
@@ -756,7 +756,14 @@ public final class SubCommand implements CommandExecutor {
                                     sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Restart")));
                                     break;
                             }
-                        }));
+                        };
+
+                        if (plugin.subdata.getName().equalsIgnoreCase(subserver.get())) {
+                            listening.set(false);
+                            plugin.subdata.sendPacket(new PacketRestartServer((sender instanceof Player)?((Player) sender).getUniqueId():null, subserver.get(), stopper));
+                        } else {
+                            plugin.subdata.sendPacket(new PacketStopServer((sender instanceof Player)?((Player) sender).getUniqueId():null, subserver.get(), false, stopper));
+                        }
                         return CommandResult.builder().successCount(1).build();
                     } else if (!sender.hasPermission("subservers.subserver.stop." + subserver.get().toLowerCase())) {
                         sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Generic.Invalid-Permission").replace("$str$", "subservers.subserver.stop." + subserver.get().toLowerCase())));
