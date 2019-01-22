@@ -416,13 +416,13 @@ public final class SubDataClient {
         YAMLSection json = new YAMLSection();
 
         if (!pOut.keySet().contains(packet.getClass())) throw new IllegalPacketException("Unknown PacketOut Channel: " + packet.getClass().getCanonicalName());
-        if (packet.getVersion().toString() == null) throw new NullPointerException("PacketOut Version cannot be null: " + packet.getClass().getCanonicalName());
+        if (packet.getVersion() == null) throw new NullPointerException("PacketOut Version cannot be null: " + packet.getClass().getCanonicalName());
 
         try {
             YAMLSection contents = packet.generate();
             json.set("n", pOut.get(packet.getClass()).name());
             json.set("h", pOut.get(packet.getClass()).get());
-            json.set("v", packet.getVersion().toString());
+            json.set("v", packet.getVersion());
             if (contents != null) json.set("c", contents);
             return json;
         } catch (Throwable e) {
@@ -447,7 +447,7 @@ public final class SubDataClient {
             if (packet.isCompatible(data.getVersion("v"))) {
                 list.add(packet);
             } else {
-                new IllegalPacketException("Packet Version Mismatch in " + data.getRawString("h") + ": " + data.getRawString("v") + " -> " + packet.getVersion().toString()).printStackTrace();
+                new IllegalPacketException("Packet Version Mismatch in " + data.getRawString("h") + ": " + data.getRawString("v") + " -> " + packet.getVersion().toFullString()).printStackTrace();
             }
         }
 

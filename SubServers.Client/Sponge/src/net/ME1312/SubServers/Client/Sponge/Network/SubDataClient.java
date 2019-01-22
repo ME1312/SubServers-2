@@ -36,7 +36,7 @@ public final class SubDataClient {
     private static HashMap<String, HashMap<String, List<PacketIn>>> pIn = new HashMap<String, HashMap<String, List<PacketIn>>>();
     private static HashMap<String, Cipher> ciphers = new HashMap<String, Cipher>();
     private static boolean defaults = false;
-    protected static Logger log;
+    protected static Logger log = LoggerFactory.getLogger("SubData");
     private MessagePacker out;
     private NamedContainer<Boolean, Socket> socket;
     private String name;
@@ -378,7 +378,7 @@ public final class SubDataClient {
         YAMLSection data = new YAMLSection();
 
         if (!pOut.keySet().contains(packet.getClass())) throw new IllegalPacketException("Unknown PacketOut Channel: " + packet.getClass().getCanonicalName());
-        if (packet.getVersion().toString() == null) throw new NullPointerException("PacketOut Version cannot be null: " + packet.getClass().getCanonicalName());
+        if (packet.getVersion() == null) throw new NullPointerException("PacketOut Version cannot be null: " + packet.getClass().getCanonicalName());
 
         try {
             YAMLSection contents = packet.generate();
@@ -409,7 +409,7 @@ public final class SubDataClient {
             if (packet.isCompatible(data.getVersion("v"))) {
                 list.add(packet);
             } else {
-                new IllegalPacketException("Packet Version Mismatch in " + data.getRawString("h") + ": " + data.getRawString("v") + " -> " + packet.getVersion().toString()).printStackTrace();
+                new IllegalPacketException("Packet Version Mismatch in " + data.getRawString("h") + ": " + data.getRawString("v") + " -> " + packet.getVersion()).printStackTrace();
             }
         }
 

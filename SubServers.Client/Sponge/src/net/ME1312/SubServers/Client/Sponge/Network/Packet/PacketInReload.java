@@ -24,7 +24,7 @@ public class PacketInReload implements PacketIn {
      */
     public PacketInReload(SubPlugin plugin) {
         this.plugin = plugin;
-        Util.isException(() -> Util.reflect(SubDataClient.class.getDeclaredField("log"), null));
+        Util.isException(() -> this.log = Util.reflect(SubDataClient.class.getDeclaredField("log"), null));
     }
 
     @Override

@@ -27,7 +27,7 @@ public class PacketLinkServer implements PacketIn, PacketOut {
     public PacketLinkServer(SubPlugin plugin) {
         if (Util.isNull(plugin)) throw new NullPointerException();
         this.plugin = plugin;
-        Util.isException(() -> Util.reflect(SubDataClient.class.getDeclaredField("log"), null));
+        Util.isException(() -> this.log = Util.reflect(SubDataClient.class.getDeclaredField("log"), null));
     }
 
     @Override

@@ -23,7 +23,7 @@ public class Version implements Serializable, Comparable<Version> {
      * @param string Version String
      */
     public Version(String string) {
-        this(VersionType.RELEASE, string);
+        this(VersionType.VERSION, string);
     }
 
     /**
@@ -43,7 +43,7 @@ public class Version implements Serializable, Comparable<Version> {
      * @param string Version String
      */
     public Version(Version parent, String string) {
-        this(parent, VersionType.RELEASE, string);
+        this(parent, VersionType.VERSION, string);
     }
 
     /**
@@ -66,7 +66,7 @@ public class Version implements Serializable, Comparable<Version> {
      * @param ints Version Numbers (Will be separated with dots)
      */
     public Version(int... ints) {
-        this(VersionType.RELEASE, ints);
+        this(VersionType.VERSION, ints);
     }
 
     /**
@@ -86,7 +86,7 @@ public class Version implements Serializable, Comparable<Version> {
      * @param ints Version Numbers (Will be separated with dots)
      */
     public Version(Version parent, int... ints) {
-        this(parent, VersionType.RELEASE, ints);
+        this(parent, VersionType.VERSION, ints);
     }
 
     /**

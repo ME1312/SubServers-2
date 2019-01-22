@@ -20,7 +20,7 @@ public class PacketInReset implements PacketIn {
      * New PacketInReset
      */
     public PacketInReset() {
-        Util.isException(() -> Util.reflect(SubDataClient.class.getDeclaredField("log"), null));
+        Util.isException(() -> this.log = Util.reflect(SubDataClient.class.getDeclaredField("log"), null));
     }
 
     @Override
