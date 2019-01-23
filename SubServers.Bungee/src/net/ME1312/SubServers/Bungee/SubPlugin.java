@@ -501,27 +501,15 @@ public final class SubPlugin extends BungeeCord implements Listener {
         legServers.clear();
 
         int plugins = 0;
-        List<?> listeners = (status)?api.reloadListeners:api.listeners;
+        List<Runnable> listeners = (status)?api.reloadListeners:api.enableListeners;
         if (listeners.size() > 0) {
             System.out.println("SubServers > "+((status)?"Rel":"L")+"oading SubAPI Plugins...");
-            for (Object obj : listeners) {
-                if (status) {
-                    try {
-                        ((Runnable) obj).run();
-                        plugins++;
-                    } catch (Throwable e) {
-                        new InvocationTargetException(e, "Problem enabling plugin").printStackTrace();
-                    }
-                } else {
-                    NamedContainer<Runnable, Runnable> listener = (NamedContainer<Runnable, Runnable>) obj;
-                    try {
-                        if (listener.name() != null) {
-                            listener.name().run();
-                            plugins++;
-                        }
-                    } catch (Throwable e) {
-                        new InvocationTargetException(e, "Problem enabling plugin").printStackTrace();
-                    }
+            for (Runnable obj : listeners) {
+                try {
+                    obj.run();
+                    plugins++;
+                } catch (Throwable e) {
+                    new InvocationTargetException(e, "Problem " + ((status)?"reloading":"enabling") + " plugin").printStackTrace();
                 }
             }
         }
@@ -590,11 +578,11 @@ public final class SubPlugin extends BungeeCord implements Listener {
         try {
             legServers.clear();
             legServers.putAll(getServers());
-            if (api.listeners.size() > 0) {
+            if (api.disableListeners.size() > 0) {
                 System.out.println("SubServers > Resetting SubAPI Plugins...");
-                for (NamedContainer<Runnable, Runnable> listener : api.listeners) {
+                for (Runnable listener : api.disableListeners) {
                     try {
-                        if (listener.get() != null) listener.get().run();
+                        listener.run();
                     } catch (Throwable e) {
                         new InvocationTargetException(e, "Problem disabling plugin").printStackTrace();
                     }
@@ -697,7 +685,6 @@ public final class SubPlugin extends BungeeCord implements Listener {
     /**
      * Emulate BungeeCord's getServers()
      *
-     * @see SubAPI#getServers()
      * @return Server Map
      */
     @Override

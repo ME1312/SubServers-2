@@ -372,11 +372,11 @@ public final class SubPlugin extends BungeeCord implements Listener {
     }
 
     public void connect(ServerContainer server, String address) {
-        server.setSubData(address);
+        if (server != null) server.setSubData(address);
     }
 
     public void disconnect(ServerContainer server) {
-        server.setSubData(null);
+        if (server != null) server.setSubData(null);
     }
 
     @EventHandler(priority = Byte.MIN_VALUE)

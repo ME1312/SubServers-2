@@ -25,53 +25,47 @@ public final class ConsolePlugin extends Plugin implements Listener {
     public HashMap<String, ConsoleWindow> cCurrent = new HashMap<String, ConsoleWindow>();
     public HashMap<String, ConsoleWindow> sCurrent = new HashMap<String, ConsoleWindow>();
     public YAMLConfig config;
-    public boolean init = false;
 
     @Override
     public void onEnable() {
-        SubAPI.getInstance().addListener(new Runnable() {
+        reload();
+
+        getProxy().getPluginManager().registerListener(this, this);
+        getProxy().getPluginManager().registerCommand(this, new ConsoleCommand.POPOUT(this, "popout"));
+        getProxy().getPluginManager().registerCommand(this, new ConsoleCommand.AUTO_POPOUT(this, "apopout"));
+        getProxy().getPluginManager().registerCommand(this, new ConsoleCommand.AUTO_POPOUT(this, "autopopout"));
+
+        new Metrics(this);
+
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+            new JFrame("SubServers 2");
+        } catch (ClassNotFoundException | InstantiationException | UnsupportedLookAndFeelException | IllegalAccessException e) {
+            e.printStackTrace();
+        }
+
+        SubAPI.getInstance().addListener(null, new Runnable() {
             @Override
             public void run() {
-                enable();
+                reload();
             }
-        }, new Runnable() {
-            @Override
-            public void run() {
-                disable();
-            }
-        });
+        }, null);
     }
 
-    public void enable() {
-        try {this.
-            getDataFolder().mkdirs();
+    private void reload() {
+        try {
+            this.getDataFolder().mkdirs();
             config = new YAMLConfig(new File(getDataFolder(), "config.yml"));
             boolean save = false;
             if (!config.get().getKeys().contains("Enabled-Servers")) {
                 config.get().set("Enabled-Servers", Collections.emptyList());
                 save = true;
-            } if (!config.get().getKeys().contains("Enabled-Creators")) {
+            }
+            if (!config.get().getKeys().contains("Enabled-Creators")) {
                 config.get().set("Enabled-Creators", Collections.emptyList());
                 save = true;
             }
             if (save) config.save();
-
-            if (!init) {
-                init = true;
-
-                getProxy().getPluginManager().registerListener(this, this);
-                getProxy().getPluginManager().registerCommand(this, new ConsoleCommand.POPOUT(this, "popout"));
-                getProxy().getPluginManager().registerCommand(this, new ConsoleCommand.AUTO_POPOUT(this, "autopopout"));
-
-                new Metrics(this);
-
-                try {
-                    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-                    new JFrame("SubServers 2");
-                } catch (ClassNotFoundException | InstantiationException | UnsupportedLookAndFeelException | IllegalAccessException e) {
-                    e.printStackTrace();
-                }
-            }
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -126,7 +120,8 @@ public final class ConsolePlugin extends Plugin implements Listener {
         }
     }
 
-    public void disable() {
+    @Override
+    public void onDisable() {
         for (ConsoleWindow window : sCurrent.values()) {
             window.destroy();
         }

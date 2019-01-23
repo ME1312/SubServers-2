@@ -25,8 +25,9 @@ import java.util.*;
  * SubAPI Class
  */
 public final class SubAPI {
-    LinkedList<NamedContainer<Runnable, Runnable>> listeners = new LinkedList<NamedContainer<Runnable, Runnable>>();
+    LinkedList<Runnable> enableListeners = new LinkedList<Runnable>();
     LinkedList<Runnable> reloadListeners = new LinkedList<Runnable>();
+    LinkedList<Runnable> disableListeners = new LinkedList<Runnable>();
     private static HashMap<String, Object> knownSignatures = new HashMap<String, Object>();
     boolean ready = false;
     private final SubPlugin plugin;
@@ -65,7 +66,8 @@ public final class SubAPI {
      * @param disable An Event that will be called before SubAPI is disabled (your plugin should reset it's values in case this is a hard-reset instead of a shutdown)
      */
     public void addListener(Runnable enable, Runnable disable) {
-        if (!Util.isNull(enable, disable)) listeners.add(new NamedContainer<Runnable, Runnable>(enable, disable));
+        if (enable != null) enableListeners.add(enable);
+        if (disable != null) disableListeners.add(disable);
     }
 
     /**
