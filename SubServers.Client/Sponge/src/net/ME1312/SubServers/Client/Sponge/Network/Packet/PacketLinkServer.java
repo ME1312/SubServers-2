@@ -48,15 +48,17 @@ public class PacketLinkServer implements PacketIn, PacketOut {
                 Util.reflect(SubDataClient.class.getDeclaredMethod("init"), plugin.subdata);
             } catch (Exception e) {}
         } else {
+            log.info("Could not link name with server: " + data.getRawString("m"));
             try {
                 if (data.getInt("r") == 2) {
                     if (!plugin.config.get().getSection("Settings").getSection("SubData").contains("Name")) {
-                        plugin.config.get().getSection("Settings").getSection("SubData").set("Name", "undefined");
+                        plugin.config.get().getSection("Settings").getSection("SubData").set("Name", "");
                         plugin.config.save();
                     }
+                    if (plugin.config.get().getSection("Settings").getSection("SubData").getRawString("Name").length() <= 0)
+                        log.info("Use the server \"Name\" option to override auto-linking");
                 }
             } catch (Exception e) {}
-            log.info("Could not link name with server: " + data.getRawString("m"));
             plugin.disable(null);
         }
     }

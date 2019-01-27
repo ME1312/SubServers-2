@@ -22,6 +22,12 @@ public class PacketLinkServer implements PacketIn, PacketOut {
     private String message;
     private String name;
 
+    private static class ServerLinkException extends IllegalStateException {
+        public ServerLinkException(String message) {
+            super(message);
+        }
+    }
+
     /**
      * New PacketLinkServer (In)
      *
@@ -62,12 +68,16 @@ public class PacketLinkServer implements PacketIn, PacketOut {
             Server server;
             if (data.contains("name") && servers.keySet().contains(data.getRawString("name").toLowerCase())) {
                 link(client, servers.get(data.getRawString("name").toLowerCase()));
-            } else if ((server = searchIP(new InetSocketAddress(client.getAddress().getAddress(), data.getInt("port")))) != null) {
+            } else if ((server = search(new InetSocketAddress(client.getAddress().getAddress(), data.getInt("port")))) != null) {
                 link(client, server);
-            } else if (data.contains("name")) {
+            } else {
+                throw new ServerLinkException("There is no server with address: " + client.getAddress().getAddress().getHostAddress() + ':' + data.getInt("port"));
+            }
+        } catch (ServerLinkException e) {
+            if (data.contains("name")) {
                 client.sendPacket(new PacketLinkServer(null, 2, "There is no server with name: " + data.getRawString("name")));
             } else {
-                client.sendPacket(new PacketLinkServer(null, 2, "There is no server with address: " + client.getAddress().getAddress().getHostAddress() + ':' + data.getInt("port")));
+                client.sendPacket(new PacketLinkServer(null, 2, e.getMessage()));
             }
         } catch (Exception e) {
             client.sendPacket(new PacketLinkServer(null, 1, e.getClass().getCanonicalName() + ": " + e.getMessage()));
@@ -86,11 +96,11 @@ public class PacketLinkServer implements PacketIn, PacketOut {
         }
     }
 
-    private Server searchIP(InetSocketAddress address) {
+    private Server search(InetSocketAddress address) throws ServerLinkException {
         Server server = null;
         for (Server s : plugin.api.getServers().values()) {
             if (s.getAddress().equals(address)) {
-                if (server != null) throw new IllegalStateException("Multiple servers match address: " + address.getAddress().getHostAddress() + ':' + address.getPort());
+                if (server != null) throw new ServerLinkException("Multiple servers match address: " + address.getAddress().getHostAddress() + ':' + address.getPort());
                 server = s;
             }
         }

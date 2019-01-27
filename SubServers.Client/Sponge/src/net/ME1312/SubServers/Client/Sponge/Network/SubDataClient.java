@@ -58,7 +58,7 @@ public final class SubDataClient {
         if (Util.isNull(plugin, address, port)) throw new NullPointerException();
         socket = new NamedContainer<>(false, new Socket(address, port));
         this.plugin = plugin;
-        this.name = name;
+        this.name = (name == null || name.length() > 0)?name:null;
         this.out = MessagePack.newDefaultPacker(socket.get().getOutputStream());
         this.queue = new LinkedList<NamedContainer<String, PacketOut>>();
         this.cipher = (cipher != null)?cipher:new Cipher() {

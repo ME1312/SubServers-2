@@ -1,6 +1,6 @@
 name: 'SubServers-Client-Bukkit'
 main: 'net.ME1312.SubServers.Client.Bukkit.SubPlugin'
-version: '2.13.2c'
+version: '2.13.2d'
 authors: [ME1312]
 softdepend: [Vault, TitleManager]
 website: 'https://github.com/ME1312/SubServers-2'
@@ -24,9 +24,6 @@ permissions:
         default: op
       subservers.command:
         description: 'Grants Access to the SubServers Command'
-        default: op
-      subservers.reload:
-        description: 'Grants Access to Reload SubServers.Client'
         default: op
       subservers.host.*:
         description: 'Grants Access to SubServers Host Actions'
@@ -56,7 +53,7 @@ permissions:
         default: op
         children:
           subservers.server.teleport-others:
-            description: 'Grants Acces to Teleport Others to a Server'
+            description: 'Grants Access to Teleport Others to a Server'
             default: op
           subservers.server.teleport.*:
             description: 'Grants Access to Teleport to a Server'

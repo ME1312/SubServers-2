@@ -153,7 +153,6 @@ public final class SubPlugin extends JavaPlugin {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        setEnabled(false);
     }
 
     /**
