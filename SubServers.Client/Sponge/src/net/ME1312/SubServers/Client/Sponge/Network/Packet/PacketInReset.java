@@ -25,8 +25,8 @@ public class PacketInReset implements PacketIn {
 
     @Override
     public void execute(YAMLSection data) {
-        if (data != null && data.contains("m")) log.warn("Received request for a server shutdown: " + data.getString("m"));
-        else log.warn("Received request for a server shutdown");
+        if (data != null && data.contains("m")) log.warn("Received shutdown signal: " + data.getString("m"));
+        else log.warn("Received shutdown signal");
         Sponge.getServer().shutdown();
     }
 

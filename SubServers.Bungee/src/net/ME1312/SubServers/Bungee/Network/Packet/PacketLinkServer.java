@@ -68,10 +68,14 @@ public class PacketLinkServer implements PacketIn, PacketOut {
             Server server;
             if (data.contains("name") && servers.keySet().contains(data.getRawString("name").toLowerCase())) {
                 link(client, servers.get(data.getRawString("name").toLowerCase()));
-            } else if ((server = search(new InetSocketAddress(client.getAddress().getAddress(), data.getInt("port")))) != null) {
-                link(client, server);
+            } else if (data.contains("port")) {
+                if ((server = search(new InetSocketAddress(client.getAddress().getAddress(), data.getInt("port")))) != null) {
+                    link(client, server);
+                } else {
+                    throw new ServerLinkException("There is no server with address: " + client.getAddress().getAddress().getHostAddress() + ':' + data.getInt("port"));
+                }
             } else {
-                throw new ServerLinkException("There is no server with address: " + client.getAddress().getAddress().getHostAddress() + ':' + data.getInt("port"));
+                throw new ServerLinkException("Not enough arguments");
             }
         } catch (ServerLinkException e) {
             if (data.contains("name")) {
@@ -89,8 +93,12 @@ public class PacketLinkServer implements PacketIn, PacketOut {
         if (server.getSubData() == null) {
             client.setHandler(server);
             System.out.println("SubData > " + client.getAddress().toString() + " has been defined as " + ((server instanceof SubServer) ? "SubServer" : "Server") + ": " + server.getName());
-            client.sendPacket(new PacketLinkServer(server.getName(), 0, "Definition Successful"));
-            if (server instanceof SubServer && !((SubServer) server).isRunning()) client.sendPacket(new PacketOutReset("Rogue SubServer Detected"));
+            if (server instanceof SubServer && !((SubServer) server).isRunning()) {
+                System.out.println("SubServers > Sending shutdown signal to rogue SubServer: " + server.getName());
+                client.sendPacket(new PacketOutReset("Rogue SubServer Detected"));
+            } else {
+                client.sendPacket(new PacketLinkServer(server.getName(), 0, "Definition Successful"));
+            }
         } else {
             client.sendPacket(new PacketLinkServer(null, 3, "Server already linked"));
         }

@@ -493,8 +493,6 @@ public final class SubPlugin extends BungeeCord implements Listener {
                 SubServer oserver = api.getSubServer(oname);
                 if (oserver != null && server.isCompatible(oserver)) server.toggleCompatibility(oserver);
             }
-            if (autorun.contains(name))
-                server.start();
         }
         ukeys.clear();
         api.ready = true;
@@ -520,6 +518,37 @@ public final class SubPlugin extends BungeeCord implements Listener {
         }
 
         System.out.println("SubServers > " + ((plugins > 0)?plugins+" Plugin"+((plugins == 1)?"":"s")+", ":"") + ((proxies > 1)?proxies+" Proxies, ":"") + hosts + " Host"+((hosts == 1)?"":"s")+", " + servers + " Server"+((servers == 1)?"":"s")+", and " + subservers + " SubServer"+((subservers == 1)?"":"s")+" "+((status)?"re":"")+"loaded in " + new DecimalFormat("0.000").format((Calendar.getInstance().getTime().getTime() - begin) / 1000D) + "s");
+
+        long scd = TimeUnit.SECONDS.toMillis(config.get().getSection("Settings").getLong("Run-On-Launch-Cooldown", 0L));
+        for (Host host : api.getHosts().values()) {
+            new Thread(() -> {
+                try {
+                    while (running && begin == resetDate && !host.isAvailable()) {
+                        Thread.sleep(250);
+                    }
+                    List<String> ar = new LinkedList<String>();
+                    ar.addAll(autorun);
+                    long init = Calendar.getInstance().getTime().getTime();
+                    while (running && begin == resetDate && ar.size() > 0) {
+                        SubServer server = host.getSubServer(ar.get(0));
+                        ar.remove(0);
+                        if (server != null && !server.isRunning()) {
+                            server.start();
+                            if (ar.size() > 0 && scd > 0) {
+                                long sleep = Calendar.getInstance().getTime().getTime();
+                                while (running && begin == resetDate && server.getSubData() == null && Calendar.getInstance().getTime().getTime() - sleep < scd) {
+                                    Thread.sleep(250);
+                                }
+                            }
+                        }
+                    }
+                    if (running && begin == resetDate && Calendar.getInstance().getTime().getTime() - init >= 5000)
+                        System.out.println("SubServers > The auto-start queue for " + host.getName() + " has been finished");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }, "SubServers.Bungee::Automatic_Server_Starter(" + host.getName() + ")").start();
+        }
     }
 
     private void post() {
