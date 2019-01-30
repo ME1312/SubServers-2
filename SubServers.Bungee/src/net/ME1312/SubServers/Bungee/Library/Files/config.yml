@@ -1,6 +1,7 @@
 Settings:
   Version: '2.11.2a+'
   Override-Bungee-Commands: true
+  Run-On-Launch-Timeout: 0
   UPnP:
     Forward-Proxy: true
     Forward-SubData: false
