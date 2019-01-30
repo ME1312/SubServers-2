@@ -519,7 +519,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
 
         System.out.println("SubServers > " + ((plugins > 0)?plugins+" Plugin"+((plugins == 1)?"":"s")+", ":"") + ((proxies > 1)?proxies+" Proxies, ":"") + hosts + " Host"+((hosts == 1)?"":"s")+", " + servers + " Server"+((servers == 1)?"":"s")+", and " + subservers + " SubServer"+((subservers == 1)?"":"s")+" "+((status)?"re":"")+"loaded in " + new DecimalFormat("0.000").format((Calendar.getInstance().getTime().getTime() - begin) / 1000D) + "s");
 
-        long scd = TimeUnit.SECONDS.toMillis(config.get().getSection("Settings").getLong("Run-On-Launch-Cooldown", 0L));
+        long scd = TimeUnit.SECONDS.toMillis(config.get().getSection("Settings").getLong("Run-On-Launch-Timeout", 0L));
         for (Host host : api.getHosts().values()) {
             new Thread(() -> {
                 try {
