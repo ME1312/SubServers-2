@@ -19,10 +19,11 @@ import net.ME1312.SubServers.Bungee.Network.Packet.PacketOutReload;
 import net.ME1312.SubServers.Bungee.Network.SubDataServer;
 import net.md_5.bungee.BungeeCord;
 import net.md_5.bungee.BungeeServerInfo;
+import net.md_5.bungee.api.ServerPing;
+import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.config.ListenerInfo;
 import net.md_5.bungee.api.config.ServerInfo;
-import net.md_5.bungee.api.event.ServerConnectEvent;
-import net.md_5.bungee.api.event.ServerKickEvent;
+import net.md_5.bungee.api.event.*;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
 
@@ -99,7 +100,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
         if (!(new UniversalFile(dir, "lang.yml").exists())) {
             Util.copyFromJar(SubPlugin.class.getClassLoader(), "net/ME1312/SubServers/Bungee/Library/Files/lang.yml", new UniversalFile(dir, "lang.yml").getPath());
             System.out.println("SubServers > Created ~/SubServers/lang.yml");
-        } else if (((new YAMLConfig(new UniversalFile(dir, "lang.yml"))).get().getVersion("Version", new Version(9))).compareTo(new Version("2.13.2c+")) != 0) {
+        } else if (((new YAMLConfig(new UniversalFile(dir, "lang.yml"))).get().getVersion("Version", new Version(9))).compareTo(new Version("2.13.2d+")) != 0) {
             Files.move(new UniversalFile(dir, "lang.yml").toPath(), new UniversalFile(dir, "lang.old" + Math.round(Math.random() * 100000) + ".yml").toPath());
             Util.copyFromJar(SubPlugin.class.getClassLoader(), "net/ME1312/SubServers/Bungee/Library/Files/lang.yml", new UniversalFile(dir, "lang.yml").getPath());
             System.out.println("SubServers > Updated ~/SubServers/lang.yml");
@@ -731,9 +732,22 @@ public final class SubPlugin extends BungeeCord implements Listener {
         return servers;
     }
 
+    @EventHandler(priority = Byte.MAX_VALUE)
+    public void ping(ProxyPingEvent e) {
+        int offline = 0;
+        for (String name : e.getConnection().getListener().getServerPriority()) {
+            ServerInfo server = getServerInfo(name);
+            if (server == null || server instanceof SubServer && !((SubServer) server).isRunning()) offline++;
+        }
+
+        if (offline >= e.getConnection().getListener().getServerPriority().size()) {
+            e.setResponse(new ServerPing(e.getResponse().getVersion(), e.getResponse().getPlayers(), new TextComponent(api.getLang("SubServers", "Bungee.Ping.Offline")), null));
+        }
+    }
+
     @SuppressWarnings("deprecation")
     @EventHandler(priority = Byte.MAX_VALUE)
-    public void reroute(ServerConnectEvent e) {
+    public void validate(ServerConnectEvent e) {
         Map<String, ServerInfo> servers = new TreeMap<String, ServerInfo>(api.getServers());
         if (servers.keySet().contains(e.getTarget().getName().toLowerCase()) && e.getTarget() != servers.get(e.getTarget().getName().toLowerCase())) {
             e.setTarget(servers.get(e.getTarget().getName().toLowerCase()));
@@ -748,45 +762,51 @@ public final class SubPlugin extends BungeeCord implements Listener {
             e.setCancelled(true);
             if (e.getPlayer().getServer() != null) e.getPlayer().sendMessage(getTranslation("no_server_permission"));
             else e.getPlayer().disconnect(getTranslation("no_server_permission"));
+        } else if (e.getPlayer().getServer() != null && e.getTarget() instanceof SubServer && !((SubServer) e.getTarget()).isRunning()) {
+            e.setCancelled(true);
+            e.getPlayer().sendMessage(api.getLang("SubServers", "Bungee.Server.Offline"));
         }
     }
 
     @SuppressWarnings("deprecation")
     @EventHandler(priority = Byte.MIN_VALUE)
     public void fallback(ServerKickEvent e) {
-        if (e.getPlayer().getPendingConnection().getListener().isForceDefault()) {
-            NamedContainer<Integer, ServerInfo> next = null;
-            for (String name : e.getPlayer().getPendingConnection().getListener().getServerPriority()) {
-                if (!e.getKickedFrom().getName().equalsIgnoreCase(name)) {
-                    ServerInfo server = getServerInfo(name);
-                    if (server != null) {
-                        int confidence = 0;
-                        if (server instanceof Server) {
-                            if (!((Server) server).isHidden()) confidence++;
-                            if (!((Server) server).isRestricted()) confidence++;
-                            if (((Server) server).getSubData() != null) confidence++;
+        NamedContainer<Integer, List<ServerInfo>> next = null;
+        for (String name : e.getPlayer().getPendingConnection().getListener().getServerPriority()) {
+            if (!e.getKickedFrom().getName().equalsIgnoreCase(name)) {
+                ServerInfo server = getServerInfo(name);
+                if (server != null) {
+                    int confidence = 0;
+                    if (server instanceof Server) {
+                        if (!((Server) server).isHidden()) confidence++;
+                        if (!((Server) server).isRestricted()) confidence++;
+                        if (((Server) server).getSubData() != null) confidence++;
 
-                            if (server instanceof SubServer) {
-                                if (((SubServer) server).isRunning()) confidence++;
-                            } else confidence++;
-                        }
+                        if (server instanceof SubServer) {
+                            if (!((SubServer) server).isRunning()) continue;
+                        }// else confidence += 0;
+                    }
 
-                        if (next == null || confidence > next.name())
-                            next = new NamedContainer<Integer, ServerInfo>(confidence, server);
+                    if (next == null || confidence > next.name()) {
+                        List<ServerInfo> servers = new ArrayList<ServerInfo>();
+                        servers.add(server);
+                        next = new NamedContainer<Integer, List<ServerInfo>>(confidence, servers);
+                    } else if (confidence == next.name()) {
+                        next.get().add(server);
                     }
                 }
             }
+        }
 
-            if (next != null) {
-                e.setCancelServer(next.get());
-                e.setCancelled(true);
-                e.getPlayer().sendMessage(api.getLang("SubServers", "Bungee.Feature.Return").replace("$str$", (next.get() instanceof Server)?((Server) next.get()).getDisplayName():next.get().getName()).replace("$msg$", e.getKickReason()));
-            }
+        if (next != null) {
+            e.setCancelServer(next.get().get(new Random().nextInt(next.get().size())));
+            e.setCancelled(true);
+            e.getPlayer().sendMessage(api.getLang("SubServers", "Bungee.Feature.Return").replace("$str$", (e.getCancelServer() instanceof Server)?((Server) e.getCancelServer()).getDisplayName():e.getCancelServer().getName()).replace("$msg$", e.getKickReason()));
         }
     }
 
     @EventHandler(priority = Byte.MIN_VALUE)
-    public void resetSudo(SubStoppedEvent e) {
+    public void unsudo(SubStoppedEvent e) {
         if (sudo == e.getServer()) {
             sudo = null;
             System.out.println("SubServers > Reverting to the BungeeCord Console");

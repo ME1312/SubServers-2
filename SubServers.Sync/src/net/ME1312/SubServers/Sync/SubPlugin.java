@@ -15,8 +15,11 @@ import net.ME1312.SubServers.Sync.Network.SubDataClient;
 import net.ME1312.SubServers.Sync.Server.ServerContainer;
 import net.ME1312.SubServers.Sync.Server.SubServerContainer;
 import net.md_5.bungee.BungeeCord;
+import net.md_5.bungee.api.ServerPing;
+import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.config.ListenerInfo;
 import net.md_5.bungee.api.config.ServerInfo;
+import net.md_5.bungee.api.event.ProxyPingEvent;
 import net.md_5.bungee.api.event.ServerConnectEvent;
 import net.md_5.bungee.api.event.ServerKickEvent;
 import net.md_5.bungee.api.plugin.Listener;
@@ -238,9 +241,22 @@ public final class SubPlugin extends BungeeCord implements Listener {
         super.stopListeners();
     }
 
+    @EventHandler(priority = Byte.MAX_VALUE)
+    public void ping(ProxyPingEvent e) {
+        int offline = 0;
+        for (String name : e.getConnection().getListener().getServerPriority()) {
+            ServerInfo server = getServerInfo(name);
+            if (server == null || server instanceof SubServerContainer && !((SubServerContainer) server).isRunning()) offline++;
+        }
+
+        if (offline >= e.getConnection().getListener().getServerPriority().size()) {
+            e.setResponse(new ServerPing(e.getResponse().getVersion(), e.getResponse().getPlayers(), new TextComponent(api.getLang("SubServers", "Bungee.Ping.Offline")), null));
+        }
+    }
+
     @SuppressWarnings("deprecation")
     @EventHandler(priority = Byte.MAX_VALUE)
-    public void reroute(ServerConnectEvent e) {
+    public void validate(ServerConnectEvent e) {
         Map<String, ServerInfo> servers = new TreeMap<String, ServerInfo>(this.servers);
         if (servers.keySet().contains(e.getTarget().getName().toLowerCase()) && e.getTarget() != servers.get(e.getTarget().getName().toLowerCase())) {
             e.setTarget(servers.get(e.getTarget().getName().toLowerCase()));
@@ -255,40 +271,46 @@ public final class SubPlugin extends BungeeCord implements Listener {
             e.setCancelled(true);
             if (e.getPlayer().getServer() != null) e.getPlayer().sendMessage(getTranslation("no_server_permission"));
             else e.getPlayer().disconnect(getTranslation("no_server_permission"));
+        } else if (e.getPlayer().getServer() != null && e.getTarget() instanceof SubServerContainer && !((SubServerContainer) e.getTarget()).isRunning()) {
+            e.setCancelled(true);
+            e.getPlayer().sendMessage(api.getLang("SubServers", "Bungee.Server.Offline"));
         }
     }
 
     @SuppressWarnings("deprecation")
     @EventHandler(priority = Byte.MIN_VALUE)
     public void fallback(ServerKickEvent e) {
-        if (e.getPlayer().getPendingConnection().getListener().isForceDefault()) {
-            NamedContainer<Integer, ServerInfo> next = null;
-            for (String name : e.getPlayer().getPendingConnection().getListener().getServerPriority()) {
-                if (!e.getKickedFrom().getName().equalsIgnoreCase(name)) {
-                    ServerInfo server = getServerInfo(name);
-                    if (server != null) {
-                        int confidence = 0;
-                        if (server instanceof ServerContainer) {
-                            if (!((ServerContainer) server).isHidden()) confidence++;
-                            if (!((ServerContainer) server).isRestricted()) confidence++;
-                            if (((ServerContainer) server).getSubData() != null) confidence++;
+        NamedContainer<Integer, List<ServerInfo>> next = null;
+        for (String name : e.getPlayer().getPendingConnection().getListener().getServerPriority()) {
+            if (!e.getKickedFrom().getName().equalsIgnoreCase(name)) {
+                ServerInfo server = getServerInfo(name);
+                if (server != null) {
+                    int confidence = 0;
+                    if (server instanceof ServerContainer) {
+                        if (!((ServerContainer) server).isHidden()) confidence++;
+                        if (!((ServerContainer) server).isRestricted()) confidence++;
+                        if (((ServerContainer) server).getSubData() != null) confidence++;
 
-                            if (server instanceof SubServerContainer) {
-                                if (((SubServerContainer) server).isRunning()) confidence++;
-                            } else confidence++;
-                        }
+                        if (server instanceof SubServerContainer) {
+                            if (!((SubServerContainer) server).isRunning()) continue;
+                        }// else confidence += 0;
+                    }
 
-                        if (next == null || confidence > next.name())
-                            next = new NamedContainer<Integer, ServerInfo>(confidence, server);
+                    if (next == null || confidence > next.name()) {
+                        List<ServerInfo> servers = new ArrayList<ServerInfo>();
+                        servers.add(server);
+                        next = new NamedContainer<Integer, List<ServerInfo>>(confidence, servers);
+                    } else if (confidence == next.name()) {
+                        next.get().add(server);
                     }
                 }
             }
+        }
 
-            if (next != null) {
-                e.setCancelServer(next.get());
-                e.setCancelled(true);
-                e.getPlayer().sendMessage(api.getLang("SubServers", "Bungee.Feature.Return").replace("$str$", (next.get() instanceof ServerContainer)?((ServerContainer) next.get()).getDisplayName():next.get().getName()).replace("$msg$", e.getKickReason()));
-            }
+        if (next != null) {
+            e.setCancelServer(next.get().get(new Random().nextInt(next.get().size())));
+            e.setCancelled(true);
+            e.getPlayer().sendMessage(api.getLang("SubServers", "Bungee.Feature.Return").replace("$str$", (e.getCancelServer() instanceof ServerContainer)?((ServerContainer) e.getCancelServer()).getDisplayName():e.getCancelServer().getName()).replace("$msg$", e.getKickReason()));
         }
     }
 
