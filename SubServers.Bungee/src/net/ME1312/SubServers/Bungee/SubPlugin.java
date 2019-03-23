@@ -775,16 +775,12 @@ public final class SubPlugin extends BungeeCord implements Listener {
         for (String name : e.getPlayer().getPendingConnection().getListener().getServerPriority()) {
             if (!e.getKickedFrom().getName().equalsIgnoreCase(name)) {
                 ServerInfo server = getServerInfo(name);
-                if (server != null) {
+                if (server != null && (!(server instanceof SubServer) || ((SubServer) server).isRunning())) {
                     int confidence = 0;
                     if (server instanceof Server) {
                         if (!((Server) server).isHidden()) confidence++;
                         if (!((Server) server).isRestricted()) confidence++;
                         if (((Server) server).getSubData() != null) confidence++;
-
-                        if (server instanceof SubServer) {
-                            if (!((SubServer) server).isRunning()) continue;
-                        }// else confidence += 0;
                     }
 
                     if (next == null || confidence > next.name()) {
