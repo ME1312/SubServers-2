@@ -77,13 +77,11 @@ public final class SubPlugin extends JavaPlugin {
 
             reload(false);
 
-            if (config.get().getSection("Settings").getBoolean("Ingame-Access", true)) {
-                gui = new DefaultUIHandler(this);
-                SubCommand cmd = new SubCommand(this);
-                getCommand("subservers").setExecutor(cmd);
-                getCommand("subserver").setExecutor(cmd);
-                getCommand("sub").setExecutor(cmd);
-            }
+            gui = new DefaultUIHandler(this);
+            SubCommand cmd = new SubCommand(this);
+            getCommand("subservers").setExecutor(cmd);
+            getCommand("subserver").setExecutor(cmd);
+            getCommand("sub").setExecutor(cmd);
 
             new Metrics(this);
             Bukkit.getScheduler().runTaskTimerAsynchronously(this, () -> {

@@ -102,10 +102,8 @@ public final class SubPlugin {
 
             reload(false);
 
-            if (config.get().getSection("Settings").getBoolean("Ingame-Access", true)) {
-                //gui = new InternalUIHandler(this);
-                Sponge.getCommandManager().register(plugin, new SubCommand(this).spec(), "sub", "subserver", "subservers");
-            }
+            //gui = new InternalUIHandler(this);
+            Sponge.getCommandManager().register(plugin, new SubCommand(this).spec(), "sub", "subserver", "subservers");
 
             new Metrics(this);
             game.getScheduler().createTaskBuilder().async().execute(() -> {

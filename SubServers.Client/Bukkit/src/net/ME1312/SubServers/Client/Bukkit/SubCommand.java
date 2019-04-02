@@ -40,6 +40,8 @@ public final class SubCommand implements CommandExecutor {
         } else if (plugin.lang == null) {
             new IllegalStateException("There are no lang options available at this time").printStackTrace();
             if (!(sender instanceof ConsoleCommandSender)) sender.sendMessage(ChatColor.RED + "An exception has occurred while running this command");
+        } else if (!(sender instanceof ConsoleCommandSender || plugin.config.get().getSection("Settings").getBoolean("Ingame-Access", true))) {
+            sender.sendMessage(plugin.api.getLang("SubServers", "Command.Generic.Invalid-Permission").replace("$str$", "subservers.command"));
         } else {
             if (sender.hasPermission("subservers.command")) {
                 if (args.length > 0) {
