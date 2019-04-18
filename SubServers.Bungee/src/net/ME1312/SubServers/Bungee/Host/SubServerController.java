@@ -1,6 +1,6 @@
 package net.ME1312.SubServers.Bungee.Host;
 
-import net.ME1312.SubServers.Bungee.Library.Config.YAMLSection;
+import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.SubServers.Bungee.Library.Exception.InvalidServerException;
 
 import java.util.*;
@@ -64,12 +64,12 @@ public abstract class SubServerController {
             }
 
             @Override
-            public int edit(YAMLSection edit) {
+            public int edit(ObjectMap<String> edit) {
                 return SubServerController.this.edit(edit);
             }
 
             @Override
-            public int edit(UUID player, YAMLSection edit) {
+            public int edit(UUID player, ObjectMap<String> edit) {
                 return SubServerController.this.edit(player, edit);
             }
 
@@ -236,7 +236,7 @@ public abstract class SubServerController {
      * @param edit Edits
      * @return Success Status
      */
-    public int edit(UUID player, YAMLSection edit) {
+    public int edit(UUID player, ObjectMap<String> edit) {
         return -1;
     }
 
@@ -246,7 +246,7 @@ public abstract class SubServerController {
      * @param edit Edits
      * @return Success Status
      */
-    public int edit(YAMLSection edit) {
+    public int edit(ObjectMap<String> edit) {
         return -1;
     }
 
@@ -352,9 +352,4 @@ public abstract class SubServerController {
      * @param action Stop Action
      */
     public abstract void setStopAction(SubServer.StopAction action);
-
-    @Override
-    public String toString() {
-        return control.toString();
-    }
 }

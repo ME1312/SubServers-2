@@ -1,21 +1,21 @@
 package net.ME1312.SubServers.Bungee.Network.Packet;
 
-import net.ME1312.SubServers.Bungee.Library.Config.YAMLSection;
-import net.ME1312.SubServers.Bungee.Library.Version.Version;
-import net.ME1312.SubServers.Bungee.Network.Client;
-import net.ME1312.SubServers.Bungee.Network.PacketIn;
-import net.ME1312.SubServers.Bungee.Network.PacketOut;
+import net.ME1312.Galaxi.Library.Map.ObjectMap;
+import net.ME1312.SubData.Server.SubDataClient;
+import net.ME1312.SubData.Server.Protocol.PacketObjectOut;
+import net.ME1312.SubData.Server.Protocol.PacketObjectIn;
 import net.ME1312.SubServers.Bungee.SubPlugin;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * Download Lang Packet
  */
-public class PacketDownloadLang implements PacketIn, PacketOut {
+public class PacketDownloadLang implements PacketObjectIn<Integer>, PacketObjectOut<Integer> {
     private SubPlugin plugin;
-    private String id;
+    private UUID tracker;
 
     /**
      * New PacketDownloadLang (In)
@@ -30,31 +30,31 @@ public class PacketDownloadLang implements PacketIn, PacketOut {
      * New PacketDownloadLang (Out)
      *
      * @param plugin SubPlugin
-     * @param id Receiver ID
+     * @param tracker Receiver ID
      */
-    public PacketDownloadLang(SubPlugin plugin, String id) {
+    public PacketDownloadLang(SubPlugin plugin, UUID tracker) {
         this.plugin = plugin;
-        this.id = id;
+        this.tracker = tracker;
     }
 
     @Override
-    public YAMLSection generate() {
-        YAMLSection data = new YAMLSection();
-        if (id != null) data.set("id", id);
+    public ObjectMap<Integer> send(SubDataClient client) {
+        ObjectMap<Integer> data = new ObjectMap<Integer>();
+        if (tracker != null) data.set(0x0000, tracker);
         LinkedHashMap<String, Map<String, String>> full = new LinkedHashMap<>();
         for (String channel : plugin.api.getLangChannels())
             full.put(channel, plugin.api.getLang(channel));
-        data.set("Lang", full);
+        data.set(0x0001, full);
         return data;
     }
 
     @Override
-    public void execute(Client client, YAMLSection data) {
-        client.sendPacket(new PacketDownloadLang(plugin, (data != null && data.contains("id"))?data.getRawString("id"):null));
+    public void receive(SubDataClient client, ObjectMap<Integer> data) {
+        client.sendPacket(new PacketDownloadLang(plugin, (data != null && data.contains(0x0000))?data.getUUID(0x0000):null));
     }
 
     @Override
-    public Version getVersion() {
-        return new Version("2.11.0a");
+    public int version() {
+        return 0x0001;
     }
 }

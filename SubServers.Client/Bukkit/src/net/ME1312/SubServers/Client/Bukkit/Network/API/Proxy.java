@@ -1,16 +1,17 @@
 package net.ME1312.SubServers.Client.Bukkit.Network.API;
 
-import net.ME1312.SubServers.Client.Bukkit.Library.Config.YAMLSection;
-import net.ME1312.SubServers.Client.Bukkit.Library.Config.YAMLValue;
-import net.ME1312.SubServers.Client.Bukkit.Library.NamedContainer;
-import net.ME1312.SubServers.Client.Bukkit.Library.Util;
+import net.ME1312.Galaxi.Library.Map.ObjectMap;
+import net.ME1312.Galaxi.Library.Map.ObjectMapValue;
+import net.ME1312.Galaxi.Library.NamedContainer;
+import net.ME1312.Galaxi.Library.Util;
+import net.ME1312.SubData.Client.SubDataClient;
 import net.ME1312.SubServers.Client.Bukkit.Network.Packet.PacketDownloadProxyInfo;
 import net.ME1312.SubServers.Client.Bukkit.SubAPI;
 
 import java.util.*;
 
 public class Proxy {
-    YAMLSection raw;
+    ObjectMap<String> raw;
     long timestamp;
 
     /**
@@ -18,7 +19,7 @@ public class Proxy {
      *
      * @param raw Raw representation of the Proxy
      */
-    public Proxy(YAMLSection raw) {
+    public Proxy(ObjectMap<String> raw) {
         load(raw);
     }
 
@@ -27,7 +28,7 @@ public class Proxy {
         return obj instanceof Proxy && getSignature().equals(((Proxy) obj).getSignature());
     }
 
-    private void load(YAMLSection raw) {
+    private void load(ObjectMap<String> raw) {
         this.raw = raw;
         this.timestamp = Calendar.getInstance().getTime().getTime();
     }
@@ -37,16 +38,16 @@ public class Proxy {
      */
     public void refresh() {
         String name = getName();
-        SubAPI.getInstance().getSubDataNetwork().sendPacket(new PacketDownloadProxyInfo(name, data -> load(data.getSection("proxies").getSection(name))));
+        ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()).sendPacket(new PacketDownloadProxyInfo(name, data -> load(data.getMap(name))));
     }
 
     /**
-     * Gets the SubData Client
+     * Gets the SubData Client ID
      *
-     * @return SubData Client (or null if not linked)
+     * @return SubData Client ID (or null if not linked)
      */
-    public String getSubData() {
-        return raw.getRawString("subdata", null);
+    public UUID getSubData() {
+        return raw.getUUID("subdata", null);
     }
 
     /**
@@ -83,8 +84,8 @@ public class Proxy {
      */
     public Collection<NamedContainer<String, UUID>> getPlayers() {
         List<NamedContainer<String, UUID>> players = new ArrayList<NamedContainer<String, UUID>>();
-        for (String id : raw.getSection("players").getKeys()) {
-            players.add(new NamedContainer<String, UUID>(raw.getSection("players").getSection(id).getRawString("name"), UUID.fromString(id)));
+        for (String id : raw.getMap("players").getKeys()) {
+            players.add(new NamedContainer<String, UUID>(raw.getMap("players").getMap(id).getRawString("name"), UUID.fromString(id)));
         }
         return players;
     }
@@ -115,7 +116,7 @@ public class Proxy {
      */
     public boolean hasExtra(String handle) {
         if (Util.isNull(handle)) throw new NullPointerException();
-        return raw.getSection("extra").getKeys().contains(handle);
+        return raw.getMap("extra").getKeys().contains(handle);
     }
 
     /**
@@ -124,9 +125,9 @@ public class Proxy {
      * @param handle Handle
      * @return Value
      */
-    public YAMLValue getExtra(String handle) {
+    public ObjectMapValue<String> getExtra(String handle) {
         if (Util.isNull(handle)) throw new NullPointerException();
-        return raw.getSection("extra").get(handle);
+        return raw.getMap("extra").get(handle);
     }
 
     /**
@@ -134,8 +135,8 @@ public class Proxy {
      *
      * @return Extra Value Section
      */
-    public YAMLSection getExtra() {
-        return raw.getSection("extra").clone();
+    public ObjectMap<String> getExtra() {
+        return raw.getMap("extra").clone();
     }
 
     /**
@@ -143,13 +144,7 @@ public class Proxy {
      *
      * @return Raw Proxy
      */
-    public YAMLSection getRaw() {
+    public ObjectMap<String> getRaw() {
         return raw.clone();
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public String toString() {
-        return raw.toJSON().toString();
     }
 }

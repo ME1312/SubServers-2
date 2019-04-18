@@ -1,9 +1,9 @@
 package net.ME1312.SubServers.Client.Bukkit.Graphic;
 
-import net.ME1312.SubServers.Client.Bukkit.Library.Container;
-import net.ME1312.SubServers.Client.Bukkit.Library.NamedContainer;
-import net.ME1312.SubServers.Client.Bukkit.Library.Util;
-import net.ME1312.SubServers.Client.Bukkit.Library.Version.Version;
+import net.ME1312.Galaxi.Library.Container;
+import net.ME1312.Galaxi.Library.NamedContainer;
+import net.ME1312.Galaxi.Library.Util;
+import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubServers.Client.Bukkit.Network.API.Host;
 import net.ME1312.SubServers.Client.Bukkit.Network.API.SubServer;
 import net.ME1312.SubServers.Client.Bukkit.SubPlugin;
@@ -98,7 +98,7 @@ public abstract class UIRenderer {
      */
     public boolean sendTitle(String str, int fadein, int stay, int fadeout) {
         if (Util.isNull(str, fadein, stay, fadeout)) throw new NullPointerException();
-        if (plugin.config.get().getSection("Settings").getBoolean("Use-Title-Messages", true)) {
+        if (plugin.config.get().getMap("Settings").getBoolean("Use-Title-Messages", true)) {
             String line1, line2;
             if (!str.startsWith("\n") && str.contains("\n")) {
                 line1 = str.split("\\n")[0];
@@ -135,7 +135,7 @@ public abstract class UIRenderer {
      * @param subtitle Subtitle to display (or null to hide)
      */
     public void setDownloading(String subtitle) {
-        if (subtitle != null && !(plugin.config.get().getSection("Settings").getBoolean("Use-Title-Messages", true) && (plugin.api.getGameVersion().compareTo(new Version("1.11")) >= 0 || Bukkit.getPluginManager().getPlugin("TitleManager") != null))) {
+        if (subtitle != null && !(plugin.config.get().getMap("Settings").getBoolean("Use-Title-Messages", true) && (plugin.api.getGameVersion().compareTo(new Version("1.11")) >= 0 || Bukkit.getPluginManager().getPlugin("TitleManager") != null))) {
             if (download != -1) Bukkit.getScheduler().cancelTask(download);
             download = Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, () -> {
                 if (tdownload != null) Bukkit.getPlayer(player).sendMessage(plugin.api.getLang("SubServers", "Interface.Generic.Downloading").replace("$str$", subtitle));

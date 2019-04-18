@@ -1,12 +1,11 @@
 package net.ME1312.SubServers.Bungee.Network.Packet;
 
-import net.ME1312.SubServers.Bungee.Library.Callback;
-import net.ME1312.SubServers.Bungee.Library.Config.YAMLSection;
-import net.ME1312.SubServers.Bungee.Library.Util;
-import net.ME1312.SubServers.Bungee.Library.Version.Version;
-import net.ME1312.SubServers.Bungee.Network.Client;
-import net.ME1312.SubServers.Bungee.Network.PacketIn;
-import net.ME1312.SubServers.Bungee.Network.PacketOut;
+import net.ME1312.SubData.Server.SubDataClient;
+import net.ME1312.Galaxi.Library.Callback.Callback;
+import net.ME1312.Galaxi.Library.Map.ObjectMap;
+import net.ME1312.Galaxi.Library.Util;
+import net.ME1312.SubData.Server.Protocol.PacketObjectIn;
+import net.ME1312.SubData.Server.Protocol.PacketObjectOut;
 
 import java.util.HashMap;
 import java.util.UUID;
@@ -14,10 +13,10 @@ import java.util.UUID;
 /**
  * Create Server External Host Packet
  */
-public class PacketExRemoveServer implements PacketIn, PacketOut {
-    private static HashMap<String, Callback<YAMLSection>[]> callbacks = new HashMap<String, Callback<YAMLSection>[]>();
+public class PacketExRemoveServer implements PacketObjectIn<Integer>, PacketObjectOut<Integer> {
+    private static HashMap<UUID, Callback<ObjectMap<Integer>>[]> callbacks = new HashMap<UUID, Callback<ObjectMap<Integer>>[]>();
     private String name;
-    private String id;
+    private UUID tracker;
 
     /**
      * New PacketExRemoveServer (In)
@@ -31,29 +30,29 @@ public class PacketExRemoveServer implements PacketIn, PacketOut {
      * @param callback Callbacks
      */
     @SafeVarargs
-    public PacketExRemoveServer(String name, Callback<YAMLSection>... callback) {
+    public PacketExRemoveServer(String name, Callback<ObjectMap<Integer>>... callback) {
         if (Util.isNull(name, callback)) throw new NullPointerException();
         this.name = name;
-        this.id = Util.getNew(callbacks.keySet(), UUID::randomUUID).toString();
-        callbacks.put(id, callback);
+        this.tracker = Util.getNew(callbacks.keySet(), UUID::randomUUID);
+        callbacks.put(tracker, callback);
     }
 
     @Override
-    public YAMLSection generate() {
-        YAMLSection data = new YAMLSection();
-        if (id != null) data.set("id", id);
-        data.set("server", name);
+    public ObjectMap<Integer> send(SubDataClient client) {
+        ObjectMap<Integer> data = new ObjectMap<Integer>();
+        if (tracker != null) data.set(0x0000, tracker);
+        data.set(0x0001, name);
         return data;
     }
 
     @Override
-    public void execute(Client client, YAMLSection data) {
-        for (Callback<YAMLSection> callback : callbacks.get(data.getString("id"))) callback.run(data);
-        callbacks.remove(data.getString("id"));
+    public void receive(SubDataClient client, ObjectMap<Integer> data) {
+        for (Callback<ObjectMap<Integer>> callback : callbacks.get(data.getUUID(0x0000))) callback.run(data);
+        callbacks.remove(data.getUUID(0x0000));
     }
 
     @Override
-    public Version getVersion() {
-        return new Version("2.11.0a");
+    public int version() {
+        return 0x0001;
     }
 }

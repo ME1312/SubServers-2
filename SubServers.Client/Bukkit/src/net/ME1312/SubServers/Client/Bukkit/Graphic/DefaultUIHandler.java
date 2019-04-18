@@ -1,10 +1,11 @@
 package net.ME1312.SubServers.Client.Bukkit.Graphic;
 
-import net.ME1312.SubServers.Client.Bukkit.Library.Config.YAMLSection;
-import net.ME1312.SubServers.Client.Bukkit.Library.Container;
-import net.ME1312.SubServers.Client.Bukkit.Library.Callback;
-import net.ME1312.SubServers.Client.Bukkit.Library.Util;
-import net.ME1312.SubServers.Client.Bukkit.Library.Version.Version;
+import net.ME1312.Galaxi.Library.Config.YAMLSection;
+import net.ME1312.Galaxi.Library.Container;
+import net.ME1312.Galaxi.Library.Callback.Callback;
+import net.ME1312.Galaxi.Library.Map.ObjectMap;
+import net.ME1312.Galaxi.Library.Util;
+import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubServers.Client.Bukkit.Network.API.Host;
 import net.ME1312.SubServers.Client.Bukkit.Network.API.SubServer;
 import net.ME1312.SubServers.Client.Bukkit.Network.Packet.*;
@@ -123,7 +124,7 @@ public class DefaultUIHandler implements UIHandler, Listener {
                                     Bukkit.getScheduler().runTaskLater(plugin, () -> gui.hostCreator((UIRenderer.CreatorOptions) gui.lastVisitedObjects[0]), 4 * 20);
                                 } else {
                                     gui.setDownloading(plugin.api.getLang("SubServers", "Interface.Generic.Downloading.Response"));
-                                    plugin.api.getServer(m.getString("message"), server -> {
+                                    plugin.api.getSubServer(m.getString("message"), server -> {
                                         if (server != null) {
                                             gui.setDownloading(null);
                                             if (!gui.sendTitle(plugin.api.getLang("SubServers", "Interface.Host-Creator.Edit-Name.Exists-Title"), 4 * 20))
@@ -327,12 +328,12 @@ public class DefaultUIHandler implements UIHandler, Listener {
                             if (player.hasPermission("subservers.subserver.stop.*") || player.hasPermission("subservers.subserver.stop." + ((String) gui.lastVisitedObjects[0]).toLowerCase())) {
                                 gui.setDownloading(plugin.api.getLang("SubServers", "Interface.Generic.Downloading.Response"));
                                 final Container<Boolean> listening = new Container<Boolean>(true);
-                                PacketInRunEvent.callback("SubStoppedEvent", new Callback<YAMLSection>() {
+                                PacketInExRunEvent.callback("SubStoppedEvent", new Callback<ObjectMap<String>>() {
                                     @Override
-                                    public void run(YAMLSection json) {
+                                    public void run(ObjectMap<String> json) {
                                         try {
                                             if (listening.get()) if (!json.getString("server").equalsIgnoreCase((String) gui.lastVisitedObjects[0])) {
-                                                PacketInRunEvent.callback("SubStoppedEvent", this);
+                                                PacketInExRunEvent.callback("SubStoppedEvent", this);
                                             } else {
                                                 Bukkit.getScheduler().runTaskLater(plugin, gui::reopen, 5);
                                             }
@@ -340,7 +341,7 @@ public class DefaultUIHandler implements UIHandler, Listener {
                                     }
                                 });
                                 plugin.subdata.sendPacket(new PacketStopServer(player.getUniqueId(), (String) gui.lastVisitedObjects[0], false, data -> {
-                                    if (data.getInt("r") != 0) {
+                                    if (data.getInt(0x0001) != 0) {
                                         gui.reopen();
                                         listening.set(false);
                                     } else gui.setDownloading(plugin.api.getLang("SubServers", "Interface.SubServer-Admin.Stop.Title").replace("$str$", (String) gui.lastVisitedObjects[0]));
@@ -351,12 +352,12 @@ public class DefaultUIHandler implements UIHandler, Listener {
                             if (player.hasPermission("subservers.subserver.terminate.*") || player.hasPermission("subservers.subserver.terminate." + ((String) gui.lastVisitedObjects[0]).toLowerCase())) {
                                 gui.setDownloading(plugin.api.getLang("SubServers", "Interface.Generic.Downloading.Response"));
                                 final Container<Boolean> listening = new Container<Boolean>(true);
-                                PacketInRunEvent.callback("SubStoppedEvent", new Callback<YAMLSection>() {
+                                PacketInExRunEvent.callback("SubStoppedEvent", new Callback<ObjectMap<String>>() {
                                     @Override
-                                    public void run(YAMLSection json) {
+                                    public void run(ObjectMap<String> json) {
                                         try {
                                             if (listening.get()) if (!json.getString("server").equalsIgnoreCase((String) gui.lastVisitedObjects[0])) {
-                                                PacketInRunEvent.callback("SubStoppedEvent", this);
+                                                PacketInExRunEvent.callback("SubStoppedEvent", this);
                                             } else {
                                                 gui.reopen();
                                             }
@@ -364,7 +365,7 @@ public class DefaultUIHandler implements UIHandler, Listener {
                                     }
                                 });
                                 plugin.subdata.sendPacket(new PacketStopServer(player.getUniqueId(), (String) gui.lastVisitedObjects[0], false, data -> {
-                                    if (data.getInt("r") != 0) {
+                                    if (data.getInt(0x0001) != 0) {
                                         gui.reopen();
                                         listening.set(false);
                                     } else gui.setDownloading(plugin.api.getLang("SubServers", "Interface.SubServer-Admin.Terminate.Title").replace("$str$", (String) gui.lastVisitedObjects[0]));

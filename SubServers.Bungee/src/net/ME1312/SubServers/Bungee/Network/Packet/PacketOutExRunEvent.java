@@ -1,175 +1,186 @@
 package net.ME1312.SubServers.Bungee.Network.Packet;
 
+import net.ME1312.SubData.Server.SubDataClient;
 import net.ME1312.SubServers.Bungee.Event.*;
-import net.ME1312.SubServers.Bungee.Library.Config.YAMLSection;
+import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.SubServers.Bungee.Library.SubEvent;
-import net.ME1312.SubServers.Bungee.Library.Util;
-import net.ME1312.SubServers.Bungee.Library.Version.Version;
-import net.ME1312.SubServers.Bungee.Network.PacketOut;
+import net.ME1312.Galaxi.Library.Util;
+import net.ME1312.SubData.Server.Protocol.PacketObjectOut;
 import net.ME1312.SubServers.Bungee.SubPlugin;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
 
+import java.util.LinkedList;
+import java.util.List;
+
 /**
  * Event Send Packet
  */
-public class PacketOutRunEvent implements Listener, PacketOut {
+public class PacketOutExRunEvent implements Listener, PacketObjectOut<Integer> {
     private SubPlugin plugin;
-    private YAMLSection args;
+    private ObjectMap<String> args;
     private String type;
 
     /**
-     * New PacketOutRunEvent (Registerer)
+     * New PacketOutExRunEvent (Registerer)
      *
      * @param plugin
      */
-    public PacketOutRunEvent(SubPlugin plugin) {
+    public PacketOutExRunEvent(SubPlugin plugin) {
         if (Util.isNull(plugin)) throw new NullPointerException();
         this.plugin = plugin;
     }
 
     /**
-     * New PacketOutRunEvent (Out)
+     * New PacketOutExRunEvent (Out)
      *
      * @param event Event to be run
      * @param args Arguments
      */
-    public PacketOutRunEvent(Class<? extends SubEvent> event, YAMLSection args) {
+    public PacketOutExRunEvent(Class<? extends SubEvent> event, ObjectMap<String> args) {
         if (Util.isNull(event, args)) throw new NullPointerException();
         this.type = event.getSimpleName();
         this.args = args;
     }
 
     @Override
-    public YAMLSection generate() {
-        YAMLSection json = new YAMLSection();
-        json.set("type", type);
-        json.set("args", args);
+    public ObjectMap<Integer> send(SubDataClient client) {
+        ObjectMap<Integer> json = new ObjectMap<Integer>();
+        json.set(0x0000, type);
+        json.set(0x0001, args);
         return json;
     }
 
     @Override
-    public Version getVersion() {
-        return new Version("2.11.0a");
+    public int version() {
+        return 0x0001;
+    }
+
+    private void broadcast(PacketOutExRunEvent packet) {
+        List<SubDataClient> clients = new LinkedList<SubDataClient>();
+        clients.addAll(plugin.subdata.getClients().values());
+        for (SubDataClient client : clients) {
+            client.sendPacket(packet);
+        }
     }
 
     @EventHandler(priority = Byte.MAX_VALUE)
     public void event(SubAddProxyEvent event) {
-        YAMLSection args = new YAMLSection();
+        ObjectMap<String> args = new ObjectMap<String>();
         args.set("proxy", event.getProxy().getName());
-        plugin.subdata.broadcastPacket(new PacketOutRunEvent(event.getClass(), args));
+        broadcast(new PacketOutExRunEvent(event.getClass(), args));
     }
 
     @EventHandler(priority = Byte.MAX_VALUE)
     public void event(SubAddHostEvent event) {
         if (!event.isCancelled()) {
-            YAMLSection args = new YAMLSection();
-            if (event.getPlayer() != null) args.set("player",event.getPlayer().toString());
+            ObjectMap<String> args = new ObjectMap<String>();
+            if (event.getPlayer() != null) args.set("player", event.getPlayer().toString());
             args.set("host", event.getHost().getName());
-            plugin.subdata.broadcastPacket(new PacketOutRunEvent(event.getClass(), args));
+            broadcast(new PacketOutExRunEvent(event.getClass(), args));
         }
     }
 
     @EventHandler(priority = Byte.MAX_VALUE)
     public void event(SubAddServerEvent event) {
         if (!event.isCancelled()) {
-            YAMLSection args = new YAMLSection();
+            ObjectMap<String> args = new ObjectMap<String>();
             if (event.getPlayer() != null) args.set("player", event.getPlayer().toString());
             if (event.getHost() != null) args.set("host", event.getHost().getName());
             args.set("server", event.getServer().getName());
-            plugin.subdata.broadcastPacket(new PacketOutRunEvent(event.getClass(), args));
+            broadcast(new PacketOutExRunEvent(event.getClass(), args));
         }
     }
 
     @EventHandler(priority = Byte.MAX_VALUE)
     public void event(SubCreateEvent event) {
         if (!event.isCancelled()) {
-            YAMLSection args = new YAMLSection();
+            ObjectMap<String> args = new ObjectMap<String>();
             if (event.getPlayer() != null) args.set("player", event.getPlayer().toString());
             args.set("host", event.getHost().getName());
             args.set("name", event.getName());
             args.set("template", event.getTemplate().getName());
-            args.set("version", event.getVersion());
+            if (event.getVersion() != null) args.set("version", event.getVersion());
             args.set("port", event.getPort());
-            plugin.subdata.broadcastPacket(new PacketOutRunEvent(event.getClass(), args));
+            broadcast(new PacketOutExRunEvent(event.getClass(), args));
         }
     }
     @EventHandler(priority = Byte.MAX_VALUE)
     public void event(SubSendCommandEvent event) {
         if (!event.isCancelled()) {
-            YAMLSection args = new YAMLSection();
+            ObjectMap<String> args = new ObjectMap<String>();
             if (event.getPlayer() != null) args.set("player", event.getPlayer().toString());
             args.set("server", event.getServer().getName());
             args.set("command", event.getCommand());
-            plugin.subdata.broadcastPacket(new PacketOutRunEvent(event.getClass(), args));
+            broadcast(new PacketOutExRunEvent(event.getClass(), args));
         }
     }
 
     @EventHandler(priority = Byte.MAX_VALUE)
     public void event(SubEditServerEvent event) {
         if (!event.isCancelled()) {
-            YAMLSection args = new YAMLSection();
+            ObjectMap<String> args = new ObjectMap<String>();
             if (event.getPlayer() != null) args.set("player", event.getPlayer().toString());
             args.set("server", event.getServer().getName());
             args.set("edit", event.getEdit().name());
             args.set("value", event.getEdit().get().asObject());
             args.set("perm", event.isPermanent());
-            plugin.subdata.broadcastPacket(new PacketOutRunEvent(event.getClass(), args));
+            broadcast(new PacketOutExRunEvent(event.getClass(), args));
         }
     }
     
     @EventHandler(priority = Byte.MAX_VALUE)
     public void event(SubStartEvent event) {
         if (!event.isCancelled()) {
-            YAMLSection args = new YAMLSection();
+            ObjectMap<String> args = new ObjectMap<String>();
             if (event.getPlayer() != null) args.set("player", event.getPlayer().toString());
             args.set("server", event.getServer().getName());
-            plugin.subdata.broadcastPacket(new PacketOutRunEvent(event.getClass(), args));
+            broadcast(new PacketOutExRunEvent(event.getClass(), args));
         }
     }
     @EventHandler(priority = Byte.MAX_VALUE)
     public void event(SubStopEvent event) {
         if (!event.isCancelled()) {
-            YAMLSection args = new YAMLSection();
+            ObjectMap<String> args = new ObjectMap<String>();
             if (event.getPlayer() != null) args.set("player", event.getPlayer().toString());
             args.set("server", event.getServer().getName());
             args.set("force", event.isForced());
-            plugin.subdata.broadcastPacket(new PacketOutRunEvent(event.getClass(), args));
+            broadcast(new PacketOutExRunEvent(event.getClass(), args));
 
         }
     }
     @EventHandler(priority = Byte.MAX_VALUE)
     public void event(SubStoppedEvent event) {
-        YAMLSection args = new YAMLSection();
+        ObjectMap<String> args = new ObjectMap<String>();
         args.set("server", event.getServer().getName());
-        plugin.subdata.broadcastPacket(new PacketOutRunEvent(event.getClass(), args));
+        broadcast(new PacketOutExRunEvent(event.getClass(), args));
 
     }
     @EventHandler(priority = Byte.MAX_VALUE)
     public void event(SubRemoveServerEvent event) {
         if (!event.isCancelled()) {
-            YAMLSection args = new YAMLSection();
+            ObjectMap<String> args = new ObjectMap<String>();
             if (event.getPlayer() != null) args.set("player", event.getPlayer().toString());
             if (event.getHost() != null) args.set("host", event.getHost().getName());
             args.set("server", event.getServer().getName());
-            plugin.subdata.broadcastPacket(new PacketOutRunEvent(event.getClass(), args));
+            broadcast(new PacketOutExRunEvent(event.getClass(), args));
         }
     }
 
     @EventHandler(priority = Byte.MAX_VALUE)
     public void event(SubRemoveHostEvent event) {
         if (!event.isCancelled()) {
-            YAMLSection args = new YAMLSection();
+            ObjectMap<String> args = new ObjectMap<String>();
             if (event.getPlayer() != null) args.set("player", event.getPlayer().toString());
             args.set("host", event.getHost().getName());
-            plugin.subdata.broadcastPacket(new PacketOutRunEvent(event.getClass(), args));
+            broadcast(new PacketOutExRunEvent(event.getClass(), args));
         }
     }
 
     @EventHandler(priority = Byte.MAX_VALUE)
     public void event(SubRemoveProxyEvent event) {
-        YAMLSection args = new YAMLSection();
+        ObjectMap<String> args = new ObjectMap<String>();
         args.set("proxy", event.getProxy().getName());
-        plugin.subdata.broadcastPacket(new PacketOutRunEvent(event.getClass(), args));
+        broadcast(new PacketOutExRunEvent(event.getClass(), args));
     }
 }

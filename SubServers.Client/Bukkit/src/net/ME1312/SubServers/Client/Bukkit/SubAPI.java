@@ -1,16 +1,17 @@
 package net.ME1312.SubServers.Client.Bukkit;
 
+import net.ME1312.SubData.Client.DataClient;
 import net.ME1312.SubServers.Client.Bukkit.Graphic.UIHandler;
-import net.ME1312.SubServers.Client.Bukkit.Library.Callback;
-import net.ME1312.SubServers.Client.Bukkit.Library.NamedContainer;
-import net.ME1312.SubServers.Client.Bukkit.Library.Util;
-import net.ME1312.SubServers.Client.Bukkit.Library.Version.Version;
+import net.ME1312.Galaxi.Library.Callback.Callback;
+import net.ME1312.Galaxi.Library.NamedContainer;
+import net.ME1312.Galaxi.Library.Util;
+import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubServers.Client.Bukkit.Network.API.Host;
 import net.ME1312.SubServers.Client.Bukkit.Network.API.Proxy;
 import net.ME1312.SubServers.Client.Bukkit.Network.API.Server;
 import net.ME1312.SubServers.Client.Bukkit.Network.API.SubServer;
 import net.ME1312.SubServers.Client.Bukkit.Network.Packet.*;
-import net.ME1312.SubServers.Client.Bukkit.Network.SubDataClient;
+import net.ME1312.SubData.Client.SubDataClient;
 import org.bukkit.Bukkit;
 
 import java.lang.reflect.InvocationTargetException;
@@ -23,6 +24,7 @@ public final class SubAPI {
     LinkedList<Runnable> reloadListeners = new LinkedList<Runnable>();
     private final SubPlugin plugin;
     private static SubAPI api;
+    String name;
 
     protected SubAPI(SubPlugin plugin) {
         this.plugin = plugin;
@@ -60,6 +62,15 @@ public final class SubAPI {
     }
 
     /**
+     * Get the Server Name
+     *
+     * @return Server Name
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
      * Gets the Hosts
      *
      * @param callback Host Map
@@ -69,8 +80,8 @@ public final class SubAPI {
         StackTraceElement[] origin = new Exception().getStackTrace();
         plugin.subdata.sendPacket(new PacketDownloadHostInfo(null, data -> {
             TreeMap<String, Host> hosts = new TreeMap<String, Host>();
-            for (String host : data.getSection("hosts").getKeys()) {
-                hosts.put(host.toLowerCase(), new Host(data.getSection("hosts").getSection(host)));
+            for (String host : data.getKeys()) {
+                hosts.put(host.toLowerCase(), new Host(data.getMap(host)));
             }
 
             try {
@@ -94,8 +105,8 @@ public final class SubAPI {
         StackTraceElement[] origin = new Exception().getStackTrace();
         plugin.subdata.sendPacket(new PacketDownloadHostInfo(name, data -> {
             Host host = null;
-            if (data.getSection("hosts").getKeys().size() > 0) {
-                host = new Host(data.getSection("hosts").getSection(new LinkedList<String>(data.getSection("hosts").getKeys()).getFirst()));
+            if (data.getKeys().size() > 0) {
+                host = new Host(data.getMap(new LinkedList<String>(data.getKeys()).getFirst()));
             }
 
             try {
@@ -118,13 +129,13 @@ public final class SubAPI {
         StackTraceElement[] origin = new Exception().getStackTrace();
         plugin.subdata.sendPacket(new PacketDownloadGroupInfo(null, data -> {
             TreeMap<String, List<Server>> groups = new TreeMap<String, List<Server>>();
-            for (String group : data.getSection("groups").getKeys()) {
+            for (String group : data.getKeys()) {
                 ArrayList<Server> servers = new ArrayList<Server>();
-                for (String server : data.getSection("groups").getSection(group).getKeys()) {
-                    if (data.getSection("groups").getSection(group).getSection(server).getRawString("type", "Server").equals("SubServer")) {
-                        servers.add(new SubServer(data.getSection("groups").getSection(group).getSection(server)));
+                for (String server : data.getMap(group).getKeys()) {
+                    if (data.getMap(group).getMap(server).getRawString("type", "Server").equals("SubServer")) {
+                        servers.add(new SubServer(data.getMap(group).getMap(server)));
                     } else {
-                        servers.add(new Server(data.getSection("groups").getSection(group).getSection(server)));
+                        servers.add(new Server(data.getMap(group).getMap(server)));
                     }
                 }
                 if (servers.size() > 0) groups.put(group, servers);
@@ -167,14 +178,14 @@ public final class SubAPI {
         StackTraceElement[] origin = new Exception().getStackTrace();
         plugin.subdata.sendPacket(new PacketDownloadGroupInfo(name, data -> {
             List<Server> servers = null;
-            if (data.getSection("groups").getKeys().size() > 0) {
-                String key = new LinkedList<String>(data.getSection("groups").getKeys()).getFirst();
+            if (data.getKeys().size() > 0) {
+                String key = new LinkedList<String>(data.getKeys()).getFirst();
                 servers = new ArrayList<Server>();
-                for (String server : data.getSection("groups").getSection(key).getKeys()) {
-                    if (data.getSection("groups").getSection(key).getSection(server).getRawString("type", "Server").equals("SubServer")) {
-                        servers.add(new SubServer(data.getSection("groups").getSection(key).getSection(server)));
+                for (String server : data.getMap(key).getKeys()) {
+                    if (data.getMap(key).getMap(server).getRawString("type", "Server").equals("SubServer")) {
+                        servers.add(new SubServer(data.getMap(key).getMap(server)));
                     } else {
-                        servers.add(new Server(data.getSection("groups").getSection(key).getSection(server)));
+                        servers.add(new Server(data.getMap(key).getMap(server)));
                     }
                 }
             }
@@ -199,11 +210,11 @@ public final class SubAPI {
         StackTraceElement[] origin = new Exception().getStackTrace();
         plugin.subdata.sendPacket(new PacketDownloadServerInfo(null, data -> {
             TreeMap<String, Server> servers = new TreeMap<String, Server>();
-            for (String server : data.getSection("servers").getKeys()) {
-                if (data.getSection("servers").getSection(server).getRawString("type", "Server").equals("SubServer")) {
-                    servers.put(server.toLowerCase(), new SubServer(data.getSection("servers").getSection(server)));
+            for (String server : data.getKeys()) {
+                if (data.getMap(server).getRawString("type", "Server").equals("SubServer")) {
+                    servers.put(server.toLowerCase(), new SubServer(data.getMap(server)));
                 } else {
-                    servers.put(server.toLowerCase(), new Server(data.getSection("servers").getSection(server)));
+                    servers.put(server.toLowerCase(), new Server(data.getMap(server)));
                 }
             }
 
@@ -228,12 +239,12 @@ public final class SubAPI {
         StackTraceElement[] origin = new Exception().getStackTrace();
         plugin.subdata.sendPacket(new PacketDownloadServerInfo(name, data -> {
             Server server = null;
-            if (data.getSection("servers").getKeys().size() > 0) {
-                String key = new LinkedList<String>(data.getSection("servers").getKeys()).getFirst();
-                if (data.getSection("servers").getSection(key).getRawString("type", "Server").equals("SubServer")) {
-                    server = new SubServer(data.getSection("servers").getSection(key));
+            if (data.getKeys().size() > 0) {
+                String key = new LinkedList<String>(data.getKeys()).getFirst();
+                if (data.getMap(key).getRawString("type", "Server").equals("SubServer")) {
+                    server = new SubServer(data.getMap(key));
                 } else {
-                    server = new Server(data.getSection("servers").getSection(key));
+                    server = new Server(data.getMap(key));
                 }
             }
 
@@ -284,8 +295,8 @@ public final class SubAPI {
         StackTraceElement[] origin = new Exception().getStackTrace();
         plugin.subdata.sendPacket(new PacketDownloadProxyInfo(null, data -> {
             TreeMap<String, Proxy> proxies = new TreeMap<String, Proxy>();
-            for (String proxy : data.getSection("proxies").getKeys()) {
-                proxies.put(proxy.toLowerCase(), new Proxy(data.getSection("proxies").getSection(proxy)));
+            for (String proxy : data.getKeys()) {
+                proxies.put(proxy.toLowerCase(), new Proxy(data.getMap(proxy)));
             }
 
             try {
@@ -309,8 +320,8 @@ public final class SubAPI {
         StackTraceElement[] origin = new Exception().getStackTrace();
         plugin.subdata.sendPacket(new PacketDownloadProxyInfo(name, data -> {
             Proxy proxy = null;
-            if (data.getSection("proxies").getKeys().size() > 0) {
-                proxy = new Proxy(data.getSection("proxies").getSection(new LinkedList<String>(data.getSection("proxies").getKeys()).getFirst()));
+            if (data.getKeys().size() > 0) {
+                proxy = new Proxy(data.getMap(new LinkedList<String>(data.getKeys()).getFirst()));
             }
 
             try {
@@ -333,8 +344,8 @@ public final class SubAPI {
         StackTraceElement[] origin = new Exception().getStackTrace();
         plugin.subdata.sendPacket(new PacketDownloadProxyInfo("", data -> {
             Proxy proxy = null;
-            if (data.getKeys().contains("master")) {
-                proxy = new Proxy(data.getSection("master"));
+            if (data != null) {
+                proxy = new Proxy(data);
             }
 
             try {
@@ -358,8 +369,8 @@ public final class SubAPI {
         StackTraceElement[] origin = new Exception().getStackTrace();
         plugin.subdata.sendPacket(new PacketDownloadPlayerList(data -> {
             List<NamedContainer<String, UUID>> players = new ArrayList<NamedContainer<String, UUID>>();
-            for (String id : data.getSection("players").getKeys()) {
-                players.add(new NamedContainer<String, UUID>(data.getSection("players").getSection(id).getRawString("name"), UUID.fromString(id)));
+            for (String id : data.getKeys()) {
+                players.add(new NamedContainer<String, UUID>(data.getMap(id).getRawString("name"), UUID.fromString(id)));
             }
 
             try {
@@ -377,7 +388,7 @@ public final class SubAPI {
      *
      * @return SubData Network Manager
      */
-    public SubDataClient getSubDataNetwork() {
+    public DataClient getSubDataNetwork() {
         return plugin.subdata;
     }
 

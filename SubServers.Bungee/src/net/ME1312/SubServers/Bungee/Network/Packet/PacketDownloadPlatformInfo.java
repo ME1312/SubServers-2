@@ -1,21 +1,22 @@
 package net.ME1312.SubServers.Bungee.Network.Packet;
 
-import net.ME1312.SubServers.Bungee.Library.Config.YAMLSection;
-import net.ME1312.SubServers.Bungee.Library.Version.Version;
-import net.ME1312.SubServers.Bungee.Network.Client;
-import net.ME1312.SubServers.Bungee.Network.PacketIn;
-import net.ME1312.SubServers.Bungee.Network.PacketOut;
+import net.ME1312.SubData.Server.SubDataClient;
+import net.ME1312.Galaxi.Library.Map.ObjectMap;
+import net.ME1312.Galaxi.Library.Version.Version;
+import net.ME1312.SubData.Server.Protocol.PacketObjectOut;
+import net.ME1312.SubData.Server.Protocol.PacketObjectIn;
 import net.ME1312.SubServers.Bungee.SubPlugin;
 import net.md_5.bungee.api.config.ListenerInfo;
 
 import java.util.LinkedList;
+import java.util.UUID;
 
 /**
  * Download Proxy Info Packet
  */
-public class PacketDownloadPlatformInfo implements PacketIn, PacketOut {
+public class PacketDownloadPlatformInfo implements PacketObjectIn<Integer>, PacketObjectOut<Integer> {
     private SubPlugin plugin;
-    private String id;
+    private UUID tracker;
 
     /**
      * New PacketDownloadPlatformInfo (In)
@@ -30,65 +31,67 @@ public class PacketDownloadPlatformInfo implements PacketIn, PacketOut {
      * New PacketDownloadPlatformInfo (Out)
      *
      * @param plugin SubPlugin
-     * @param id Receiver ID
+     * @param tracker Receiver ID
      */
-    public PacketDownloadPlatformInfo(SubPlugin plugin, String id) {
+    public PacketDownloadPlatformInfo(SubPlugin plugin, UUID tracker) {
         this.plugin = plugin;
-        this.id = id;
+        this.tracker = tracker;
     }
 
     @Override
-    public YAMLSection generate() {
-        YAMLSection data = new YAMLSection();
-        if (id != null) data.set("id", id);
-        YAMLSection subservers = new YAMLSection();
+    public ObjectMap<Integer> send(SubDataClient client) {
+        ObjectMap<Integer> data = new ObjectMap<Integer>();
+        if (tracker != null) data.set(0x0000, tracker);
+        ObjectMap<String> info = new ObjectMap<String>();
+        ObjectMap<String> subservers = new ObjectMap<String>();
         subservers.set("version", plugin.api.getWrapperVersion().toString());
         if (plugin.api.getWrapperBuild() != null) subservers.set("build", plugin.api.getWrapperBuild().toString());
         subservers.set("last-reload", plugin.resetDate);
         subservers.set("hosts", plugin.api.getHosts().size());
         subservers.set("subservers", plugin.api.getSubServers().size());
-        data.set("subservers", subservers);
-        YAMLSection bungee = new YAMLSection();
+        info.set("subservers", subservers);
+        ObjectMap<String> bungee = new ObjectMap<String>();
         bungee.set("version", plugin.api.getProxyVersion().toString());
         bungee.set("disabled-cmds", plugin.getConfig().getDisabledCommands());
         bungee.set("player-limit", plugin.getConfig().getPlayerLimit());
         bungee.set("servers", plugin.api.getServers().size());
-        LinkedList<YAMLSection> listeners = new LinkedList<YAMLSection>();
-        for (ListenerInfo info : plugin.getConfig().getListeners()) {
-            YAMLSection listener = new YAMLSection();
-            listener.set("forced-hosts", info.getForcedHosts());
-            listener.set("motd", info.getMotd());
-            listener.set("priorities", info.getServerPriority());
-            listener.set("player-limit", info.getMaxPlayers());
+        LinkedList<ObjectMap<String>> listeners = new LinkedList<ObjectMap<String>>();
+        for (ListenerInfo next : plugin.getConfig().getListeners()) {
+            ObjectMap<String> listener = new ObjectMap<String>();
+            listener.set("forced-hosts", next.getForcedHosts());
+            listener.set("motd", next.getMotd());
+            listener.set("priorities", next.getServerPriority());
+            listener.set("player-limit", next.getMaxPlayers());
             listeners.add(listener);
         }
         bungee.set("listeners", listeners);
-        data.set("bungee", bungee);
-        YAMLSection minecraft = new YAMLSection();
+        info.set("bungee", bungee);
+        ObjectMap<String> minecraft = new ObjectMap<String>();
         LinkedList<String> mcversions = new LinkedList<String>();
         for (Version version : plugin.api.getGameVersion()) mcversions.add(version.toString());
         minecraft.set("version", mcversions);
         minecraft.set("players", plugin.api.getGlobalPlayers().size());
-        data.set("minecraft", minecraft);
-        YAMLSection system = new YAMLSection();
-        YAMLSection os = new YAMLSection();
+        info.set("minecraft", minecraft);
+        ObjectMap<String> system = new ObjectMap<String>();
+        ObjectMap<String> os = new ObjectMap<String>();
         os.set("name", System.getProperty("os.name"));
         os.set("version", System.getProperty("os.version"));
         system.set("os", os);
-        YAMLSection java = new YAMLSection();
+        ObjectMap<String> java = new ObjectMap<String>();
         java.set("version",  System.getProperty("java.version"));
         system.set("java", java);
-        data.set("system", system);
+        info.set("system", system);
+        data.set(0x0001, info);
         return data;
     }
 
     @Override
-    public void execute(Client client, YAMLSection data) {
-        client.sendPacket(new PacketDownloadPlatformInfo(plugin, (data != null && data.contains("id"))?data.getRawString("id"):null));
+    public void receive(SubDataClient client, ObjectMap<Integer> data) {
+        client.sendPacket(new PacketDownloadPlatformInfo(plugin, (data != null && data.contains(0x0000))?data.getUUID(0x0000):null));
     }
 
     @Override
-    public Version getVersion() {
-        return new Version("2.11.0a");
+    public int version() {
+        return 0x0001;
     }
 }

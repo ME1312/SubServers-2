@@ -1,12 +1,11 @@
 package net.ME1312.SubServers.Bungee.Network.Packet;
 
+import net.ME1312.SubData.Server.SubDataClient;
 import net.ME1312.SubServers.Bungee.Host.SubCreator;
-import net.ME1312.SubServers.Bungee.Host.SubServer;
-import net.ME1312.SubServers.Bungee.Library.Config.YAMLSection;
-import net.ME1312.SubServers.Bungee.Library.Version.Version;
-import net.ME1312.SubServers.Bungee.Network.Client;
-import net.ME1312.SubServers.Bungee.Network.PacketIn;
-import net.ME1312.SubServers.Bungee.Network.PacketOut;
+import net.ME1312.Galaxi.Library.Map.ObjectMap;
+import net.ME1312.Galaxi.Library.Version.Version;
+import net.ME1312.SubData.Server.Protocol.PacketObjectIn;
+import net.ME1312.SubData.Server.Protocol.PacketObjectOut;
 import net.ME1312.SubServers.Bungee.SubPlugin;
 
 import java.util.UUID;
@@ -14,11 +13,10 @@ import java.util.UUID;
 /**
  * Create Server Packet
  */
-public class PacketCreateServer implements PacketIn, PacketOut {
+public class PacketCreateServer implements PacketObjectIn<Integer>, PacketObjectOut<Integer> {
     private SubPlugin plugin;
     private int response;
-    private String message;
-    private String id;
+    private UUID tracker;
 
     /**
      * New PacketCreateServer (In)
@@ -33,72 +31,76 @@ public class PacketCreateServer implements PacketIn, PacketOut {
      * New PacketCreateServer (Out)
      *
      * @param response Response ID
-     * @param message Message
      * @param id Receiver ID
      */
-    public PacketCreateServer(int response, String message, String id) {
+    public PacketCreateServer(int response, UUID id) {
         this.response = response;
-        this.message = message;
-        this.id = id;
+        this.tracker = id;
     }
 
     @Override
-    public YAMLSection generate() {
-        YAMLSection data = new YAMLSection();
-        if (id != null) data.set("id", id);
-        data.set("r", response);
-        data.set("m", message);
+    public ObjectMap<Integer> send(SubDataClient client) {
+        ObjectMap<Integer> data = new ObjectMap<Integer>();
+        if (tracker != null) data.set(0x0000, tracker);
+        data.set(0x0001, response);
         return data;
     }
 
     @Override
-    public void execute(Client client, YAMLSection data) {
+    public void receive(SubDataClient client, ObjectMap<Integer> data) {
         try {
-            if (data.getSection("creator").getString("name").contains(" ")) {
-                client.sendPacket(new PacketCreateServer(3, "Server names cannot have spaces", (data.contains("id")) ? data.getRawString("id") : null));
-            } else if (plugin.api.getSubServers().keySet().contains(data.getSection("creator").getString("name").toLowerCase()) || SubCreator.isReserved(data.getSection("creator").getString("name"))) {
-                client.sendPacket(new PacketCreateServer(4, "There is already a subserver with that name", (data.contains("id")) ? data.getRawString("id") : null));
-            } else if (!plugin.hosts.keySet().contains(data.getSection("creator").getString("host").toLowerCase())) {
-                client.sendPacket(new PacketCreateServer(5, "There is no Host with that name", (data.contains("id")) ? data.getRawString("id") : null));
-            } else if (!plugin.hosts.get(data.getSection("creator").getString("host").toLowerCase()).isAvailable()) {
-                client.sendPacket(new PacketStartServer(6, "That SubServer's Host is not available", (data.contains("id"))?data.getRawString("id"):null));
-            } else if (!plugin.hosts.get(data.getSection("creator").getString("host").toLowerCase()).isEnabled()) {
-                client.sendPacket(new PacketStartServer(7, "That SubServer's Host is not enabled", (data.contains("id"))?data.getRawString("id"):null));
-            } else if (!plugin.hosts.get(data.getSection("creator").getString("host").toLowerCase()).getCreator().getTemplates().keySet().contains(data.getSection("creator").getString("template").toLowerCase())) {
-                client.sendPacket(new PacketCreateServer(8, "There is no template with that name", (data.contains("id")) ? data.getRawString("id") : null));
-            } else if (!plugin.hosts.get(data.getSection("creator").getString("host").toLowerCase()).getCreator().getTemplate(data.getSection("creator").getString("template")).isEnabled()) {
-                client.sendPacket(new PacketCreateServer(8, "That Template is not enabled", (data.contains("id")) ? data.getRawString("id") : null));
-            } else if (new Version("1.8").compareTo(data.getSection("creator").getVersion("version")) > 0) {
-                client.sendPacket(new PacketCreateServer(10, "SubCreator cannot create servers before Minecraft 1.8", (data.contains("id")) ? data.getRawString("id") : null));
-            } else if (data.getSection("creator").contains("port") && (data.getSection("creator").getInt("port") <= 0 || data.getSection("creator").getInt("port") > 65535)) {
-                client.sendPacket(new PacketCreateServer(11, "Invalid Port Number", (data.contains("id")) ? data.getRawString("id") : null));
+            UUID tracker =       (data.contains(0x0000)?data.getUUID(0x0000):null);
+            String name =     data.getRawString(0x0001);
+            String host =     data.getRawString(0x0002);
+            String template = data.getRawString(0x0003);
+            Version version =       (data.contains(0x0004)?data.getVersion(0x0004):null);
+            Integer port =       (data.contains(0x0005)?data.getInt(0x0005):null);
+            UUID player =        (data.contains(0x0006)?data.getUUID(0x0006):null);
+            boolean waitfor =    (data.contains(0x0007)?data.getBoolean(0x0007):false);
+
+            if (name.contains(" ")) {
+                client.sendPacket(new PacketCreateServer(3, tracker));
+            } else if (plugin.api.getSubServers().keySet().contains(name.toLowerCase()) || SubCreator.isReserved(name)) {
+                client.sendPacket(new PacketCreateServer(4, tracker));
+            } else if (!plugin.hosts.keySet().contains(host.toLowerCase())) {
+                client.sendPacket(new PacketCreateServer(5, tracker));
+            } else if (!plugin.hosts.get(host.toLowerCase()).isAvailable()) {
+                client.sendPacket(new PacketCreateServer(6, tracker));
+            } else if (!plugin.hosts.get(host.toLowerCase()).isEnabled()) {
+                client.sendPacket(new PacketCreateServer(7, tracker));
+            } else if (!plugin.hosts.get(host.toLowerCase()).getCreator().getTemplates().keySet().contains(template.toLowerCase())) {
+                client.sendPacket(new PacketCreateServer(8, tracker));
+            } else if (!plugin.hosts.get(host.toLowerCase()).getCreator().getTemplate(template).isEnabled()) {
+                client.sendPacket(new PacketCreateServer(9, tracker));
+            } else if (port != null && (port <= 0 || port > 65535)) {
+                client.sendPacket(new PacketCreateServer(10, tracker));
             } else {
-                if (plugin.hosts.get(data.getSection("creator").getString("host").toLowerCase()).getCreator().create((data.contains("player"))?data.getUUID("player"):null, data.getSection("creator").getString("name"), plugin.hosts.get(data.getSection("creator").getString("host").toLowerCase()).getCreator().getTemplate(data.getSection("creator").getString("template")), data.getSection("creator").getVersion("version"), (data.getSection("creator").contains("port"))?data.getSection("creator").getInt("port"):null)) {
-                    if (data.contains("wait") && data.getBoolean("wait")) {
+                if (plugin.hosts.get(host.toLowerCase()).getCreator().create(player, name, plugin.hosts.get(host.toLowerCase()).getCreator().getTemplate(template), version, port)) {
+                    if (waitfor) {
                         new Thread(() -> {
                             try {
-                                plugin.hosts.get(data.getSection("creator").getString("host").toLowerCase()).getCreator().waitFor();
-                                client.sendPacket(new PacketCreateServer(0, "Created SubServer", (data.contains("id")) ? data.getRawString("id") : null));
+                                plugin.hosts.get(host.toLowerCase()).getCreator().waitFor();
+                                client.sendPacket(new PacketCreateServer(0, tracker));
                             } catch (InterruptedException e) {
                                 e.printStackTrace();
                             }
                         }, "SubServers.Bungee::SubData_SubCreator_Handler(" + client.getAddress().toString() + ')').start();
                     } else {
-                        client.sendPacket(new PacketCreateServer(0, "Creating SubServer", (data.contains("id")) ? data.getRawString("id") : null));
+                        client.sendPacket(new PacketCreateServer(0, tracker));
                     }
                 } else {
-                    client.sendPacket(new PacketCreateServer(1, "Couldn't create SubServer", (data.contains("id")) ? data.getRawString("id") : null));
+                    client.sendPacket(new PacketCreateServer(1, tracker));
                 }
 
             }
         } catch (Throwable e) {
-            client.sendPacket(new PacketCreateServer(2, e.getClass().getCanonicalName() + ": " + e.getMessage(), (data.contains("id")) ? data.getRawString("id") : null));
+            client.sendPacket(new PacketCreateServer(2, tracker));
             e.printStackTrace();
         }
     }
 
     @Override
-    public Version getVersion() {
-        return new Version("2.13b");
+    public int version() {
+        return 0x0001;
     }
 }

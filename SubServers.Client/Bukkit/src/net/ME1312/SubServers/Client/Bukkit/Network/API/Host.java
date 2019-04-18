@@ -1,8 +1,9 @@
 package net.ME1312.SubServers.Client.Bukkit.Network.API;
 
-import net.ME1312.SubServers.Client.Bukkit.Library.Config.YAMLSection;
-import net.ME1312.SubServers.Client.Bukkit.Library.Config.YAMLValue;
-import net.ME1312.SubServers.Client.Bukkit.Library.Util;
+import net.ME1312.Galaxi.Library.Map.ObjectMap;
+import net.ME1312.Galaxi.Library.Map.ObjectMapValue;
+import net.ME1312.Galaxi.Library.Util;
+import net.ME1312.SubData.Client.SubDataClient;
 import net.ME1312.SubServers.Client.Bukkit.Network.Packet.PacketDownloadHostInfo;
 import net.ME1312.SubServers.Client.Bukkit.SubAPI;
 
@@ -13,7 +14,7 @@ import java.util.*;
 public class Host {
     HashMap<String, SubServer> servers = new HashMap<String, SubServer>();
     private SubCreator creator;
-    YAMLSection raw;
+    ObjectMap<String> raw;
     long timestamp;
 
     /**
@@ -21,7 +22,7 @@ public class Host {
      *
      * @param raw Raw representation of the Host
      */
-    public Host(YAMLSection raw) {
+    public Host(ObjectMap<String> raw) {
         load(raw);
     }
 
@@ -30,14 +31,14 @@ public class Host {
         return obj instanceof Host && getSignature().equals(((Host) obj).getSignature());
     }
 
-    private void load(YAMLSection raw) {
+    private void load(ObjectMap<String> raw) {
         this.raw = raw;
         this.timestamp = Calendar.getInstance().getTime().getTime();
 
         servers.clear();
-        this.creator = new SubCreator(this, raw.getSection("creator"));
-        for (String server : raw.getSection("servers").getKeys()) {
-            servers.put(server.toLowerCase(), new SubServer(this, raw.getSection("servers").getSection(server)));
+        this.creator = new SubCreator(this, raw.getMap("creator"));
+        for (String server : raw.getMap("servers").getKeys()) {
+            servers.put(server.toLowerCase(), new SubServer(this, raw.getMap("servers").getMap(server)));
         }
     }
 
@@ -46,16 +47,16 @@ public class Host {
      */
     public void refresh() {
         String name = getName();
-        SubAPI.getInstance().getSubDataNetwork().sendPacket(new PacketDownloadHostInfo(name, data -> load(data.getSection("hosts").getSection(name))));
+        ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()).sendPacket(new PacketDownloadHostInfo(name, data -> load(data.getMap(name))));
     }
 
     /**
-     * Gets the SubData Client Address
+     * Gets the SubData Client ID
      *
-     * @return SubData Client Address (or null if unlinked/unsupported)
+     * @return SubData Client ID (or null if unlinked/unsupported)
      */
-    public String getSubData() {
-        return raw.getRawString("subdata", null);
+    public UUID getSubData() {
+        return raw.getUUID("subdata", null);
     }
 
     /**
@@ -258,7 +259,7 @@ public class Host {
      */
     public boolean hasExtra(String handle) {
         if (Util.isNull(handle)) throw new NullPointerException();
-        return raw.getSection("extra").getKeys().contains(handle);
+        return raw.getMap("extra").getKeys().contains(handle);
     }
 
     /**
@@ -267,9 +268,9 @@ public class Host {
      * @param handle Handle
      * @return Value
      */
-    public YAMLValue getExtra(String handle) {
+    public ObjectMapValue<String> getExtra(String handle) {
         if (Util.isNull(handle)) throw new NullPointerException();
-        return raw.getSection("extra").get(handle);
+        return raw.getMap("extra").get(handle);
     }
 
     /**
@@ -277,8 +278,8 @@ public class Host {
      *
      * @return Extra Value Section
      */
-    public YAMLSection getExtra() {
-        return raw.getSection("extra").clone();
+    public ObjectMap<String> getExtra() {
+        return raw.getMap("extra").clone();
     }
 
     /**
@@ -286,13 +287,7 @@ public class Host {
      *
      * @return Raw Host
      */
-    public YAMLSection getRaw() {
+    public ObjectMap<String> getRaw() {
         return raw.clone();
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public String toString() {
-        return raw.toJSON().toString();
     }
 }

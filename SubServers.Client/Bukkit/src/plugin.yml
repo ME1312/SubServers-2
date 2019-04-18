@@ -7,13 +7,13 @@ website: 'https://github.com/ME1312/SubServers-2'
 commands:
   subservers:
     description: 'The SubServers Command'
-    usage: '/subservers help'
+    usage: '/subservers is currently unavailable'
   subserver:
     description: 'The SubServers Command'
-    usage: '/subserver help'
+    usage: '/subserver is currently unavailable'
   sub:
     description: 'The SubServers Command'
-    usage: '/sub help'
+    usage: '/sub is currently unavailable'
 permissions:
   subservers.*:
     description: 'Grants Access to to Everything in SubServers.Client'

@@ -1,11 +1,11 @@
 package net.ME1312.SubServers.Client.Bukkit.Network.API;
 
-import net.ME1312.SubServers.Client.Bukkit.Library.Callback;
-import net.ME1312.SubServers.Client.Bukkit.Library.Config.YAMLSection;
-import net.ME1312.SubServers.Client.Bukkit.Library.Util;
-import net.ME1312.SubServers.Client.Bukkit.Library.Version.Version;
+import net.ME1312.Galaxi.Library.Callback.Callback;
+import net.ME1312.Galaxi.Library.Map.ObjectMap;
+import net.ME1312.Galaxi.Library.Util;
+import net.ME1312.Galaxi.Library.Version.Version;
+import net.ME1312.SubData.Client.SubDataClient;
 import net.ME1312.SubServers.Client.Bukkit.Network.Packet.PacketCreateServer;
-import net.ME1312.SubServers.Client.Bukkit.Network.Packet.PacketStartServer;
 import net.ME1312.SubServers.Client.Bukkit.SubAPI;
 
 import java.lang.reflect.InvocationTargetException;
@@ -17,14 +17,14 @@ import java.util.UUID;
 public class SubCreator {
     HashMap<String, ServerTemplate> templates = new HashMap<String, ServerTemplate>();
     Host host;
-    YAMLSection raw;
+    ObjectMap<String> raw;
 
-    SubCreator(Host host, YAMLSection raw) {
+    SubCreator(Host host, ObjectMap<String> raw) {
         this.host = host;
         this.raw = raw;
 
-        for (String template : raw.getSection("templates").getKeys()) {
-            templates.put(template.toLowerCase(), new ServerTemplate(raw.getSection("templates").getSection(template)));
+        for (String template : raw.getMap("templates").getKeys()) {
+            templates.put(template.toLowerCase(), new ServerTemplate(raw.getMap("templates").getMap(template)));
         }
     }
 
@@ -34,10 +34,10 @@ public class SubCreator {
     }
 
     public static class ServerTemplate {
-        private YAMLSection raw;
+        private ObjectMap<String> raw;
         private ServerType type;
 
-        public ServerTemplate(YAMLSection raw) {
+        public ServerTemplate(ObjectMap<String> raw) {
             this.raw = raw;
             this.type = (Util.isException(() -> ServerType.valueOf(raw.getRawString("type").toUpperCase())))?ServerType.valueOf(raw.getRawString("type").toUpperCase()):ServerType.CUSTOM;
         }
@@ -86,17 +86,6 @@ public class SubCreator {
         public ServerType getType() {
             return type;
         }
-
-        @Override
-        public String toString() {
-            YAMLSection tinfo = new YAMLSection();
-            tinfo.set("enabled", isEnabled());
-            tinfo.set("name", getName());
-            tinfo.set("display", getDisplayName());
-            tinfo.set("icon", getIcon());
-            tinfo.set("type", getType().toString());
-            return tinfo.toJSON();
-        }
     }
     public enum ServerType {
         SPIGOT,
@@ -124,9 +113,9 @@ public class SubCreator {
     public void create(UUID player, String name, ServerTemplate template, Version version, int port, Callback<Integer> response) {
         if (Util.isNull(response)) throw new NullPointerException();
         StackTraceElement[] origin = new Exception().getStackTrace();
-        SubAPI.getInstance().getSubDataNetwork().sendPacket(new PacketCreateServer(player, name, host.getName(), template.getName(), version, port, data -> {
+        ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()).sendPacket(new PacketCreateServer(player, name, host.getName(), template.getName(), version, port, data -> {
             try {
-                response.run(data.getInt("r"));
+                response.run(data.getInt(0x0001));
             } catch (Throwable e) {
                 Throwable ew = new InvocationTargetException(e);
                 ew.setStackTrace(origin);
@@ -200,11 +189,5 @@ public class SubCreator {
     public ServerTemplate getTemplate(String name) {
         if (Util.isNull(name)) throw new NullPointerException();
         return getTemplates().get(name.toLowerCase());
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public String toString() {
-        return raw.toJSON().toString();
     }
 }

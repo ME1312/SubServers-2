@@ -1,7 +1,7 @@
 package net.ME1312.SubServers.Bungee.Host;
 
-import net.ME1312.SubServers.Bungee.Library.Config.YAMLSection;
-import net.ME1312.SubServers.Bungee.Library.Util;
+import net.ME1312.Galaxi.Library.Map.ObjectMap;
+import net.ME1312.Galaxi.Library.Util;
 
 import java.util.*;
 
@@ -17,6 +17,7 @@ public interface SubServer extends Server {
         NONE,
         RESTART,
         REMOVE_SERVER,
+        RECYCLE_SERVER,
         DELETE_SERVER;
 
         @Override
@@ -169,7 +170,7 @@ public interface SubServer extends Server {
      * @param edit Edits
      * @return Success Status
      */
-    default int edit(UUID player, YAMLSection edit) {
+    default int edit(UUID player, ObjectMap<String> edit) {
         return -1;
     }
 
@@ -179,7 +180,7 @@ public interface SubServer extends Server {
      * @param edit Edits
      * @return Success Status
      */
-    default int edit(YAMLSection edit) {
+    default int edit(ObjectMap<String> edit) {
         return -1;
     }
 
@@ -221,12 +222,12 @@ public interface SubServer extends Server {
     /**
      * If the Server is accepting requests to edit()
      *
-     * @see #edit(YAMLSection)
-     * @see #edit(UUID, YAMLSection)
+     * @see #edit(ObjectMap<String>)
+     * @see #edit(UUID, ObjectMap<String>)
      * @return Edit Status
      */
     default boolean isEditable() {
-        return edit(new YAMLSection()) >= 0;
+        return edit(new ObjectMap<String>()) >= 0;
     }
 
     /**

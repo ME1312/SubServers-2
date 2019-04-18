@@ -1,17 +1,18 @@
 package net.ME1312.SubServers.Bungee.Host.External;
 
 import com.google.common.collect.Range;
+import net.ME1312.Galaxi.Library.*;
+import net.ME1312.Galaxi.Library.Callback.Callback;
+import net.ME1312.SubData.Server.SubDataClient;
 import net.ME1312.SubServers.Bungee.Event.SubCreateEvent;
 import net.ME1312.SubServers.Bungee.Host.*;
-import net.ME1312.SubServers.Bungee.Host.Internal.InternalSubCreator;
-import net.ME1312.SubServers.Bungee.Library.*;
-import net.ME1312.SubServers.Bungee.Library.Config.YAMLConfig;
-import net.ME1312.SubServers.Bungee.Library.Config.YAMLSection;
-import net.ME1312.SubServers.Bungee.Library.Exception.InvalidHostException;
-import net.ME1312.SubServers.Bungee.Library.Version.Version;
+import net.ME1312.Galaxi.Library.Config.YAMLConfig;
+import net.ME1312.Galaxi.Library.Map.ObjectMap;
+import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubServers.Bungee.Network.Packet.PacketExConfigureHost;
 import net.ME1312.SubServers.Bungee.Network.Packet.PacketExCreateServer;
 import net.ME1312.SubServers.Bungee.SubAPI;
+import net.md_5.bungee.api.ChatColor;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
@@ -55,8 +56,8 @@ public class ExternalSubCreator extends SubCreator {
         if (new UniversalFile(host.plugin.dir, "SubServers:Templates").exists()) for (File file : new UniversalFile(host.plugin.dir, "SubServers:Templates").listFiles()) {
             try {
                 if (file.isDirectory() && !file.getName().endsWith(".x")) {
-                    YAMLSection config = (new UniversalFile(file, "template.yml").exists())?new YAMLConfig(new UniversalFile(file, "template.yml")).get().getSection("Template", new YAMLSection()):new YAMLSection();
-                    ServerTemplate template = new ServerTemplate(file.getName(), config.getBoolean("Enabled", true), config.getRawString("Icon", "::NULL::"), file, config.getSection("Build", new YAMLSection()), config.getSection("Settings", new YAMLSection()));
+                    ObjectMap<String> config = (new UniversalFile(file, "template.yml").exists())?new YAMLConfig(new UniversalFile(file, "template.yml")).get().getMap("Template", new ObjectMap<String>()):new ObjectMap<String>();
+                    ServerTemplate template = new ServerTemplate(file.getName(), config.getBoolean("Enabled", true), config.getRawString("Icon", "::NULL::"), file, config.getMap("Build", new ObjectMap<String>()), config.getMap("Settings", new ObjectMap<String>()));
                     templates.put(file.getName().toLowerCase(), template);
                     if (config.getKeys().contains("Display")) template.setDisplayName(config.getString("Display"));
                 }
@@ -70,7 +71,7 @@ public class ExternalSubCreator extends SubCreator {
 
     @Override
     public boolean create(UUID player, String name, ServerTemplate template, Version version, Integer port, Callback<SubServer> callback) {
-        if (Util.isNull(name, template, version)) throw new NullPointerException();
+        if (Util.isNull(name, template)) throw new NullPointerException();
         if (host.isAvailable() && host.isEnabled() && template.isEnabled() && !SubAPI.getInstance().getSubServers().keySet().contains(name.toLowerCase()) && !SubCreator.isReserved(name)) {
             StackTraceElement[] origin = new Exception().getStackTrace();
 
@@ -94,15 +95,15 @@ public class ExternalSubCreator extends SubCreator {
                 logger.start();
                 host.queue(new PacketExCreateServer(name, template, version, port, logger.getExternalAddress(), data -> {
                     try {
-                        if (data.getInt("r") == 0) {
+                        if (data.getInt(0x0001) == 0) {
                             System.out.println(name + "/Creator > Saving...");
                             if (host.plugin.exServers.keySet().contains(name.toLowerCase()))
                                 host.plugin.exServers.remove(name.toLowerCase());
 
-                            YAMLSection server = new YAMLSection();
-                            YAMLSection config = new YAMLSection((Map<String, ?>) convert(data.getSection("c").get(), new NamedContainer<>("$player$", (player == null)?"":player.toString()), new NamedContainer<>("$name$", name),
-                                    new NamedContainer<>("$template$", template.getName()), new NamedContainer<>("$type$", template.getType().toString()), new NamedContainer<>("$version$", version.toString().replace(" ", "@")),
-                                    new NamedContainer<>("$address$", data.getSection("c").getRawString("\033address", "null")), new NamedContainer<>("$port$", Integer.toString(fport))));
+                            ObjectMap<String> server = new ObjectMap<String>();
+                            ObjectMap<String> config = new ObjectMap<String>((Map<String, ?>) convert(data.getMap(0x0002).get(), new NamedContainer<>("$player$", (player == null)?"":player.toString()), new NamedContainer<>("$name$", name),
+                                    new NamedContainer<>("$template$", template.getName()), new NamedContainer<>("$type$", template.getType().toString()), new NamedContainer<>("$version$", (version != null)?version.toString().replace(" ", "@"):""),
+                                    new NamedContainer<>("$address$", new ObjectMap<String>((Map<String, ?>) data.getObject(0x0002)).getRawString("\033address", "null")), new NamedContainer<>("$port$", Integer.toString(fport))));
 
                             config.remove("\033address");
 
@@ -123,15 +124,15 @@ public class ExternalSubCreator extends SubCreator {
                             server.set("Hidden", false);
                             server.setAll(config);
 
-                            SubServer subserver = host.addSubServer(player, name, server.getBoolean("Enabled"), fport, server.getColoredString("Motd", '&'), server.getBoolean("Log"), server.getRawString("Directory"),
+                            SubServer subserver = host.addSubServer(player, name, server.getBoolean("Enabled"), fport, ChatColor.translateAlternateColorCodes('&', server.getString("Motd")), server.getBoolean("Log"), server.getRawString("Directory"),
                                     server.getRawString("Executable"), server.getRawString("Stop-Command"), server.getBoolean("Hidden"), server.getBoolean("Restricted"));
                             if (server.getString("Display").length() > 0) subserver.setDisplayName(server.getString("Display"));
                             for (String group : server.getStringList("Group")) subserver.addGroup(group);
                             SubServer.StopAction action = Util.getDespiteException(() -> SubServer.StopAction.valueOf(server.getRawString("Stop-Action").toUpperCase().replace('-', '_').replace(' ', '_')), null);
                             if (action != null) subserver.setStopAction(action);
-                            if (server.contains("Extra")) for (String extra : server.getSection("Extra").getKeys())
-                                subserver.addExtra(extra, server.getSection("Extra").getObject(extra));
-                            host.plugin.config.get().getSection("Servers").set(name, server);
+                            if (server.contains("Extra")) for (String extra : server.getMap("Extra").getKeys())
+                                subserver.addExtra(extra, server.getMap("Extra").getObject(extra));
+                            host.plugin.config.get().getMap("Servers").set(name, server);
                             host.plugin.config.save();
                             if (template.getBuildOptions().getBoolean("Run-On-Finish", true))
                                 subserver.start();
@@ -144,7 +145,7 @@ public class ExternalSubCreator extends SubCreator {
                                 ew.printStackTrace();
                             }
                         } else {
-                            System.out.println(name + "/Creator > " + data.getString("m"));
+                            System.out.println(name + "/Creator > " + data.getString(0x0003));
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -194,7 +195,7 @@ public class ExternalSubCreator extends SubCreator {
     @Override
     public void terminate(String name) {
         if (this.thread.keySet().contains(name.toLowerCase())) {
-            host.getSubData().sendPacket(new PacketExCreateServer(name.toLowerCase()));
+            ((SubDataClient) host.getSubData()).sendPacket(new PacketExCreateServer(name.toLowerCase()));
             thread.remove(name.toLowerCase());
         }
     }

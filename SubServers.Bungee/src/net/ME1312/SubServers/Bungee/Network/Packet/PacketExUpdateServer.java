@@ -1,22 +1,21 @@
 package net.ME1312.SubServers.Bungee.Network.Packet;
 
+import net.ME1312.SubData.Server.SubDataClient;
 import net.ME1312.SubServers.Bungee.Host.External.ExternalSubServer;
 import net.ME1312.SubServers.Bungee.Host.SubServer;
-import net.ME1312.SubServers.Bungee.Library.Config.YAMLSection;
-import net.ME1312.SubServers.Bungee.Library.Util;
-import net.ME1312.SubServers.Bungee.Library.Version.Version;
-import net.ME1312.SubServers.Bungee.Network.Client;
-import net.ME1312.SubServers.Bungee.Network.PacketIn;
-import net.ME1312.SubServers.Bungee.Network.PacketOut;
+import net.ME1312.Galaxi.Library.Map.ObjectMap;
+import net.ME1312.Galaxi.Library.Util;
+import net.ME1312.Galaxi.Library.Version.Version;
+import net.ME1312.SubData.Server.Protocol.PacketObjectOut;
+import net.ME1312.SubData.Server.Protocol.PacketObjectIn;
 import net.ME1312.SubServers.Bungee.SubPlugin;
 
-import java.lang.reflect.Method;
 import java.util.Arrays;
 
 /**
  * Update External Server Packet
  */
-public class PacketExUpdateServer implements PacketIn, PacketOut {
+public class PacketExUpdateServer implements PacketObjectIn<Integer>, PacketObjectOut<Integer> {
     private SubPlugin plugin;
     private SubServer server;
     private UpdateType type;
@@ -78,24 +77,24 @@ public class PacketExUpdateServer implements PacketIn, PacketOut {
     }
 
     @Override
-    public YAMLSection generate() {
-        YAMLSection data = new YAMLSection();
-        data.set("server", server.getName());
-        data.set("type", type.getValue());
-        data.set("args", Arrays.asList(args));
+    public ObjectMap<Integer> send(SubDataClient client) {
+        ObjectMap<Integer> data = new ObjectMap<Integer>();
+        data.set(0x0000, server.getName());
+        data.set(0x0001, type.getValue());
+        data.set(0x0002, Arrays.asList(args));
         return data;
     }
 
     @Override
-    public void execute(Client client, YAMLSection data) {
+    public void receive(SubDataClient client, ObjectMap<Integer> data) {
         try {
-            ExternalSubServer server = (ExternalSubServer) plugin.api.getSubServer(data.getRawString("server"));
-            switch (data.getInt("type")) {
+            ExternalSubServer server = (ExternalSubServer) plugin.api.getSubServer(data.getRawString(0x0000));
+            switch (data.getInt(0x0001)) {
                 case 1:
                     Util.reflect(ExternalSubServer.class.getDeclaredMethod("falsestart"), server);
                     break;
                 case 2:
-                    Util.reflect(ExternalSubServer.class.getDeclaredMethod("stopped", Boolean.class), server, data.getList("args").get(1).asBoolean());
+                    Util.reflect(ExternalSubServer.class.getDeclaredMethod("stopped", Boolean.class), server, data.getList(0x0002).get(1).asBoolean());
                     break;
             }
         } catch (Exception e) {
@@ -104,7 +103,7 @@ public class PacketExUpdateServer implements PacketIn, PacketOut {
     }
 
     @Override
-    public Version getVersion() {
-        return new Version("2.11.0a");
+    public int version() {
+        return 0x0001;
     }
 }

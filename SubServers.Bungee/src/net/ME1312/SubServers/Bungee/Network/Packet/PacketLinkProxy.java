@@ -2,24 +2,22 @@ package net.ME1312.SubServers.Bungee.Network.Packet;
 
 import net.ME1312.SubServers.Bungee.Event.SubAddProxyEvent;
 import net.ME1312.SubServers.Bungee.Host.Proxy;
-import net.ME1312.SubServers.Bungee.Library.Config.YAMLSection;
-import net.ME1312.SubServers.Bungee.Library.Util;
-import net.ME1312.SubServers.Bungee.Library.Version.Version;
-import net.ME1312.SubServers.Bungee.Network.Client;
-import net.ME1312.SubServers.Bungee.Network.PacketIn;
-import net.ME1312.SubServers.Bungee.Network.PacketOut;
+import net.ME1312.Galaxi.Library.Map.ObjectMap;
+import net.ME1312.Galaxi.Library.Util;
+import net.ME1312.Galaxi.Library.Version.Version;
+import net.ME1312.SubData.Server.SubDataClient;
+import net.ME1312.SubData.Server.Protocol.PacketObjectOut;
+import net.ME1312.SubData.Server.Protocol.PacketObjectIn;
 import net.ME1312.SubServers.Bungee.SubPlugin;
 
 import java.util.Map;
-import java.util.UUID;
 
 /**
  * Link Proxy Packet
  */
-public class PacketLinkProxy implements PacketIn, PacketOut {
+public class PacketLinkProxy implements PacketObjectIn<Integer>, PacketObjectOut<Integer> {
     private SubPlugin plugin;
     private int response;
-    private String message;
     private String name;
 
     /**
@@ -37,48 +35,45 @@ public class PacketLinkProxy implements PacketIn, PacketOut {
      *
      * @param name The name that was generated
      * @param response Response ID
-     * @param message Message
      */
-    public PacketLinkProxy(String name, int response, String message) {
-        if (Util.isNull(response, message)) throw new NullPointerException();
+    public PacketLinkProxy(String name, int response) {
         this.name = name;
         this.response = response;
-        this.message = message;
     }
 
     @Override
-    public YAMLSection generate() {
-        YAMLSection json = new YAMLSection();
-        json.set("n", name);
-        json.set("r", response);
-        json.set("m", message);
+    public ObjectMap<Integer> send(SubDataClient client) {
+        ObjectMap<Integer> json = new ObjectMap<Integer>();
+        json.set(0x0000, name);
+        json.set(0x0001, response);
         return json;
     }
 
     @Override
-    public void execute(Client client, YAMLSection data) {
+    public void receive(SubDataClient client, ObjectMap<Integer> data) {
         try {
             Map<String, Proxy> proxies = plugin.api.getProxies();
+            String name = ((data.contains(0x0000))?data.getRawString(0x0000):null);
             Proxy proxy;
-            if (data.contains("name") && proxies.keySet().contains(data.getRawString("name").toLowerCase()) && proxies.get(data.getRawString("name").toLowerCase()).getSubData() == null) {
-                proxy = proxies.get(data.getRawString("name").toLowerCase());
+            if (name != null && proxies.keySet().contains(name.toLowerCase()) && proxies.get(name.toLowerCase()).getSubData() == null) {
+                proxy = proxies.get(name.toLowerCase());
             } else {
-                proxy = new Proxy((data.contains("name") && !proxies.keySet().contains(data.getRawString("name").toLowerCase()))?data.getRawString("name"):null);
+                proxy = new Proxy((name != null && !proxies.keySet().contains(name.toLowerCase()))?name:null);
                 plugin.getPluginManager().callEvent(new SubAddProxyEvent(proxy));
                 plugin.proxies.put(proxy.getName().toLowerCase(), proxy);
             }
 
             client.setHandler(proxy);
             System.out.println("SubData > " + client.getAddress().toString() + " has been defined as Proxy: " + proxy.getName());
-            client.sendPacket(new PacketLinkProxy(proxy.getName(), 0, "Definition Successful"));
+            client.sendPacket(new PacketLinkProxy(proxy.getName(), 0));
         } catch (Exception e) {
-            client.sendPacket(new PacketLinkProxy(null, 1, e.getClass().getCanonicalName() + ": " + e.getMessage()));
+            client.sendPacket(new PacketLinkProxy(null, 1));
             e.printStackTrace();
         }
     }
 
     @Override
-    public Version getVersion() {
-        return new Version("2.11.0a");
+    public int version() {
+        return 0x0001;
     }
 }

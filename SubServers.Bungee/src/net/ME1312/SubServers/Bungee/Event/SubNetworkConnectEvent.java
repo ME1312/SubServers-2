@@ -1,8 +1,11 @@
 package net.ME1312.SubServers.Bungee.Event;
 
+import net.ME1312.SubData.Server.DataClient;
+import net.ME1312.SubData.Server.DataServer;
+import net.ME1312.SubData.Server.SubDataClient;
 import net.ME1312.SubServers.Bungee.Library.SubEvent;
-import net.ME1312.SubServers.Bungee.Library.Util;
-import net.ME1312.SubServers.Bungee.Network.SubDataServer;
+import net.ME1312.Galaxi.Library.Util;
+import net.ME1312.SubData.Server.SubDataServer;
 import net.md_5.bungee.api.plugin.Cancellable;
 import net.md_5.bungee.api.plugin.Event;
 
@@ -13,16 +16,16 @@ import java.net.InetAddress;
  */
 public class SubNetworkConnectEvent extends Event implements SubEvent, Cancellable {
     private boolean cancelled = false;
-    private SubDataServer network;
-    private InetAddress address;
+    private DataServer network;
+    private DataClient client;
 
     /**
      * SubData Network Connect Event
      */
-    public SubNetworkConnectEvent(SubDataServer network, InetAddress address) {
-        if (Util.isNull(network, address)) throw new NullPointerException();
+    public SubNetworkConnectEvent(DataServer network, DataClient client) {
+        if (Util.isNull(network, client)) throw new NullPointerException();
         this.network = network;
-        this.address = address;
+        this.client = client;
     }
 
     /**
@@ -30,17 +33,17 @@ public class SubNetworkConnectEvent extends Event implements SubEvent, Cancellab
      *
      * @return SubData Network
      */
-    public SubDataServer getNetwork() {
+    public DataServer getNetwork() {
         return network;
     }
 
     /**
-     * Get the address of the connecting client
+     * Get the connecting client
      *
-     * @return Client address
+     * @return Client
      */
-    public InetAddress getAddress() {
-        return address;
+    public DataClient getClient() {
+        return client;
     }
 
     /**

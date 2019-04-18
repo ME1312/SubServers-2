@@ -2,27 +2,27 @@ package net.ME1312.SubServers.Bungee.Host.Internal;
 
 import com.google.common.collect.Range;
 import com.google.gson.Gson;
+import net.ME1312.Galaxi.Library.*;
+import net.ME1312.Galaxi.Library.Callback.Callback;
+import net.ME1312.Galaxi.Library.Config.YAMLSection;
+import net.ME1312.Galaxi.Library.Map.ObjectMapValue;
 import net.ME1312.SubServers.Bungee.Event.SubCreateEvent;
 import net.ME1312.SubServers.Bungee.Host.*;
-import net.ME1312.SubServers.Bungee.Library.*;
-import net.ME1312.SubServers.Bungee.Library.Config.YAMLConfig;
-import net.ME1312.SubServers.Bungee.Library.Config.YAMLSection;
+import net.ME1312.Galaxi.Library.Config.YAMLConfig;
+import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.SubServers.Bungee.Library.Exception.InvalidServerException;
 import net.ME1312.SubServers.Bungee.Library.Exception.SubCreatorException;
-import net.ME1312.SubServers.Bungee.Library.Version.Version;
+import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubServers.Bungee.SubAPI;
 import net.ME1312.SubServers.Bungee.SubPlugin;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
+import net.md_5.bungee.api.ChatColor;
 
-import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.net.InetSocketAddress;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -59,8 +59,8 @@ public class InternalSubCreator extends SubCreator {
             this.callback = callback;
         }
 
-        private YAMLSection build(File dir, ServerTemplate template, List<ServerTemplate> history) throws SubCreatorException {
-            YAMLSection server = new YAMLSection();
+        private ObjectMap<String> build(File dir, ServerTemplate template, List<ServerTemplate> history) throws SubCreatorException {
+            ObjectMap<String> server = new ObjectMap<String>();
             Version version = this.version;
             HashMap<String, String> var = new HashMap<String, String>();
             boolean error = false;
@@ -69,7 +69,7 @@ public class InternalSubCreator extends SubCreator {
             for (String other : template.getBuildOptions().getStringList("Import", new ArrayList<String>())) {
                 if (templates.keySet().contains(other.toLowerCase())) {
                     if (templates.get(other.toLowerCase()).isEnabled()) {
-                        YAMLSection config = build(dir, templates.get(other.toLowerCase()), history);
+                        ObjectMap<String> config = build(dir, templates.get(other.toLowerCase()), history);
                         if (config == null) {
                             throw new SubCreatorException();
                         } else {
@@ -89,34 +89,36 @@ public class InternalSubCreator extends SubCreator {
                 var.put("name", name);
                 var.put("template", template.getName());
                 var.put("type", template.getType().toString().toUpperCase());
-                var.put("version", version.toString());
+                if (version != null) var.put("version", version.toString());
                 var.put("address", host.getAddress().getHostAddress());
                 var.put("port", Integer.toString(port));
                 switch (template.getType()) {
                     case SPONGE:
                     case FORGE:
-                        System.out.println(name + File.separator + "Creator > Searching Versions...");
-                        YAMLSection spversionmanifest = new YAMLSection(new Gson().fromJson("{\"versions\":" + Util.readAll(new BufferedReader(new InputStreamReader(new URL("https://dl-api.spongepowered.org/v1/org.spongepowered/sponge" + ((template.getType() == ServerType.FORGE)?"forge":"vanilla") + "/downloads?type=stable&minecraft=" + version).openStream(), Charset.forName("UTF-8")))) + '}', Map.class));
+                        if (version != null) {
+                            System.out.println(name + File.separator + "Creator > Searching Versions...");
+                            ObjectMap<String> spversionmanifest = new ObjectMap<String>(new Gson().fromJson("{\"versions\":" + Util.readAll(new BufferedReader(new InputStreamReader(new URL("https://dl-api.spongepowered.org/v1/org.spongepowered/sponge" + ((template.getType() == ServerType.FORGE)?"forge":"vanilla") + "/downloads?type=stable&minecraft=" + version).openStream(), Charset.forName("UTF-8")))) + '}', Map.class));
 
-                        YAMLSection spprofile = null;
-                        Version spversion = null;
-                        for (YAMLSection profile : spversionmanifest.getSectionList("versions")) {
-                            if (profile.getSection("dependencies").getRawString("minecraft").equalsIgnoreCase(version.toString()) && (spversion == null || new Version(profile.getRawString("version")).compareTo(spversion) >= 0)) {
-                                spprofile = profile;
-                                spversion = new Version(profile.getRawString("version"));
+                            ObjectMap<String> spprofile = null;
+                            Version spversion = null;
+                            for (ObjectMap<String> profile : spversionmanifest.getMapList("versions")) {
+                                if (profile.getMap("dependencies").getRawString("minecraft").equalsIgnoreCase(version.toString()) && (spversion == null || new Version(profile.getRawString("version")).compareTo(spversion) >= 0)) {
+                                    spprofile = profile;
+                                    spversion = new Version(profile.getRawString("version"));
+                                }
                             }
-                        }
-                        if (spversion == null)
-                            throw new InvalidServerException("Cannot find Sponge version for Minecraft " + version.toString());
-                        System.out.println(name + File.separator + "Creator > Found \"sponge" + ((template.getType() == ServerType.FORGE)?"forge":"vanilla") + "-" + spversion.toString() + '"');
+                            if (spversion == null)
+                                throw new InvalidServerException("Cannot find Sponge version for Minecraft " + version.toString());
+                            System.out.println(name + File.separator + "Creator > Found \"sponge" + ((template.getType() == ServerType.FORGE)?"forge":"vanilla") + "-" + spversion.toString() + '"');
 
-                        if (template.getType() == ServerType.FORGE) {
-                            Version mcfversion = new Version(spprofile.getSection("dependencies").getRawString("minecraft") + '-' + spprofile.getSection("dependencies").getRawString("forge"));
-                            System.out.println(name + File.separator + "Creator > Found \"forge-" + mcfversion.toString() + '"');
+                            if (template.getType() == ServerType.FORGE) {
+                                Version mcfversion = new Version(((spprofile.getMap("dependencies").getRawString("forge").contains("-"))?"":spprofile.getMap("dependencies").getRawString("minecraft") + '-') + spprofile.getMap("dependencies").getRawString("forge"));
+                                System.out.println(name + File.separator + "Creator > Found \"forge-" + mcfversion.toString() + '"');
 
-                            var.put("mcf_version", mcfversion.toString());
+                                var.put("mcf_version", mcfversion.toString());
+                            }
+                            var.put("sp_version", spversion.toString());
                         }
-                        var.put("sp_version", spversion.toString());
                         break;
                 }
             } catch (Exception e) {
@@ -141,7 +143,7 @@ public class InternalSubCreator extends SubCreator {
                     ProcessBuilder pb = new ProcessBuilder().command(Executable.parse(gitBash, template.getBuildOptions().getRawString("Executable"))).directory(dir);
                     pb.environment().putAll(var);
                     process = pb.start();
-                    log.file = new File(dir, "SubCreator-" + template.getName() + "-" + version.toString() + ".log");
+                    log.file = new File(dir, "SubCreator-" + template.getName() + ((version != null)?"-"+version.toString():"") + ".log");
                     log.process = process;
                     log.start();
 
@@ -173,8 +175,8 @@ public class InternalSubCreator extends SubCreator {
         public void run() {
             UniversalFile dir = new UniversalFile(new File(host.getPath()), name);
             dir.mkdirs();
-            YAMLSection server = new YAMLSection();
-            YAMLSection config;
+            ObjectMap<String> server = new ObjectMap<String>();
+            ObjectMap<String> config;
             try {
                 config = build(dir, template, new LinkedList<>());
                 generateProperties(dir, port);
@@ -192,7 +194,7 @@ public class InternalSubCreator extends SubCreator {
                     if (host.plugin.exServers.keySet().contains(name.toLowerCase()))
                         host.plugin.exServers.remove(name.toLowerCase());
 
-                    config = new YAMLSection((Map<String, ?>) convert(config.get(), new NamedContainer<>("$player$", (player == null)?"":player.toString()), new NamedContainer<>("$name$", name),
+                    config = new ObjectMap<String>((Map<String, ?>) convert(config.get(), new NamedContainer<>("$player$", (player == null)?"":player.toString()), new NamedContainer<>("$name$", name),
                             new NamedContainer<>("$template$", template.getName()), new NamedContainer<>("$type$", template.getType().toString()), new NamedContainer<>("$version$", version.toString().replace(" ", "@")),
                             new NamedContainer<>("$address$", host.getAddress().getHostAddress()), new NamedContainer<>("$port$", Integer.toString(port))));
 
@@ -213,15 +215,15 @@ public class InternalSubCreator extends SubCreator {
                     server.set("Hidden", false);
                     server.setAll(config);
 
-                    SubServer subserver = host.addSubServer(player, name, server.getBoolean("Enabled"), port, server.getColoredString("Motd", '&'), server.getBoolean("Log"), server.getRawString("Directory"),
+                    SubServer subserver = host.addSubServer(player, name, server.getBoolean("Enabled"), port, ChatColor.translateAlternateColorCodes('&', server.getString("Motd")), server.getBoolean("Log"), server.getRawString("Directory"),
                             server.getRawString("Executable"), server.getRawString("Stop-Command"), server.getBoolean("Hidden"), server.getBoolean("Restricted"));
                     if (server.getString("Display").length() > 0) subserver.setDisplayName(server.getString("Display"));
                     for (String group : server.getStringList("Group")) subserver.addGroup(group);
                     SubServer.StopAction action = Util.getDespiteException(() -> SubServer.StopAction.valueOf(server.getRawString("Stop-Action").toUpperCase().replace('-', '_').replace(' ', '_')), null);
                     if (action != null) subserver.setStopAction(action);
-                    if (server.contains("Extra")) for (String extra : server.getSection("Extra").getKeys())
-                        subserver.addExtra(extra, server.getSection("Extra").getObject(extra));
-                    host.plugin.config.get().getSection("Servers").set(name, server);
+                    if (server.contains("Extra")) for (String extra : server.getMap("Extra").getKeys())
+                        subserver.addExtra(extra, server.getMap("Extra").getObject(extra));
+                    host.plugin.config.get().getMap("Servers").set(name, server);
                     host.plugin.config.save();
                     if (template.getBuildOptions().getBoolean("Run-On-Finish", true))
                         subserver.start();
@@ -287,8 +289,8 @@ public class InternalSubCreator extends SubCreator {
             for (File file : new UniversalFile(host.plugin.dir, "SubServers:Templates").listFiles()) {
                 try {
                     if (file.isDirectory() && !file.getName().endsWith(".x")) {
-                        YAMLSection config = (new UniversalFile(file, "template.yml").exists()) ? new YAMLConfig(new UniversalFile(file, "template.yml")).get().getSection("Template", new YAMLSection()) : new YAMLSection();
-                        ServerTemplate template = new ServerTemplate(file.getName(), config.getBoolean("Enabled", true), config.getRawString("Icon", "::NULL::"), file, config.getSection("Build", new YAMLSection()), config.getSection("Settings", new YAMLSection()));
+                        ObjectMap<String> config = (new UniversalFile(file, "template.yml").exists()) ? new YAMLConfig(new UniversalFile(file, "template.yml")).get().getMap("Template", new ObjectMap<String>()) : new ObjectMap<String>();
+                        ServerTemplate template = new ServerTemplate(file.getName(), config.getBoolean("Enabled", true), config.getRawString("Icon", "::NULL::"), file, config.getMap("Build", new ObjectMap<String>()), config.getMap("Settings", new ObjectMap<String>()));
                         templates.put(file.getName().toLowerCase(), template);
                         if (config.getKeys().contains("Display")) template.setDisplayName(config.getString("Display"));
                     }
@@ -302,7 +304,7 @@ public class InternalSubCreator extends SubCreator {
     @SuppressWarnings("deprecation")
     @Override
     public boolean create(UUID player, String name, ServerTemplate template, Version version, Integer port, Callback<SubServer> callback) {
-        if (Util.isNull(name, template, version)) throw new NullPointerException();
+        if (Util.isNull(name, template)) throw new NullPointerException();
         if (host.isAvailable() && host.isEnabled() && template.isEnabled() && !SubAPI.getInstance().getSubServers().keySet().contains(name.toLowerCase()) && !SubCreator.isReserved(name)) {
             StackTraceElement[] origin = new Exception().getStackTrace();
 
@@ -450,6 +452,7 @@ public class InternalSubCreator extends SubCreator {
 
     private void generateClient(File dir, ServerType type, String name) throws IOException {
         if (new UniversalFile(dir, "subservers.client").exists()) {
+            Files.delete(new UniversalFile(dir, "subservers.client").toPath());
             if (type == ServerType.SPIGOT) {
                 if (!new UniversalFile(dir, "plugins").exists()) new UniversalFile(dir, "plugins").mkdirs();
                 Util.copyFromJar(SubPlugin.class.getClassLoader(), "net/ME1312/SubServers/Bungee/Library/Files/client.jar", new UniversalFile(dir, "plugins:SubServers.Client.jar").getPath());
@@ -458,13 +461,16 @@ public class InternalSubCreator extends SubCreator {
                 Util.copyFromJar(SubPlugin.class.getClassLoader(), "net/ME1312/SubServers/Bungee/Library/Files/client.jar", new UniversalFile(dir, "mods:SubServers.Client.jar").getPath());
             }
             YAMLSection config = new YAMLSection();
-            FileWriter writer = new FileWriter(new UniversalFile(dir, "subservers.client"), false);
+            FileWriter writer = new FileWriter(new UniversalFile(dir, "subdata.json"), false);
             config.set("Name", name);
-            config.set("Address", host.plugin.config.get().getSection("Settings").getSection("SubData").getRawString("Address", "127.0.0.1").replace("0.0.0.0", "127.0.0.1"));
-            config.set("Password", host.plugin.config.get().getSection("Settings").getSection("SubData").getRawString("Password", ""));
-            config.set("Encryption", host.plugin.config.get().getSection("Settings").getSection("SubData").getRawString("Encryption", "NONE"));
-            writer.write(config.toJSON());
+            config.set("Address", host.plugin.config.get().getMap("Settings").getMap("SubData").getRawString("Address", "127.0.0.1").replace("0.0.0.0", "127.0.0.1"));
+            config.set("Password", host.plugin.config.get().getMap("Settings").getMap("SubData").getRawString("Password", ""));
+            writer.write(config.toJSON().toString());
             writer.close();
+
+            if (new UniversalFile("SubServers:subdata.rsa.key").exists()) {
+                Files.copy(new UniversalFile("SubServers:subdata.rsa.key").toPath(), new UniversalFile(dir, "subdata.rsa.key").toPath());
+            }
         }
     }
     private void generateProperties(File dir, int port) throws IOException {

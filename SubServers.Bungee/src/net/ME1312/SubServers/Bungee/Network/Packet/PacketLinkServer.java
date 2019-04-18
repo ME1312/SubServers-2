@@ -1,13 +1,12 @@
 package net.ME1312.SubServers.Bungee.Network.Packet;
 
+import net.ME1312.SubData.Server.SubDataClient;
 import net.ME1312.SubServers.Bungee.Host.Server;
 import net.ME1312.SubServers.Bungee.Host.SubServer;
-import net.ME1312.SubServers.Bungee.Library.Config.YAMLSection;
-import net.ME1312.SubServers.Bungee.Library.Util;
-import net.ME1312.SubServers.Bungee.Library.Version.Version;
-import net.ME1312.SubServers.Bungee.Network.Client;
-import net.ME1312.SubServers.Bungee.Network.PacketIn;
-import net.ME1312.SubServers.Bungee.Network.PacketOut;
+import net.ME1312.Galaxi.Library.Map.ObjectMap;
+import net.ME1312.Galaxi.Library.Util;
+import net.ME1312.SubData.Server.Protocol.PacketObjectIn;
+import net.ME1312.SubData.Server.Protocol.PacketObjectOut;
 import net.ME1312.SubServers.Bungee.SubPlugin;
 
 import java.net.InetSocketAddress;
@@ -16,7 +15,7 @@ import java.util.Map;
 /**
  * Link Server Packet
  */
-public class PacketLinkServer implements PacketIn, PacketOut {
+public class PacketLinkServer implements PacketObjectIn<Integer>, PacketObjectOut<Integer> {
     private SubPlugin plugin;
     private int response;
     private String message;
@@ -46,61 +45,64 @@ public class PacketLinkServer implements PacketIn, PacketOut {
      * @param message Message
      */
     public PacketLinkServer(String name, int response, String message) {
-        if (Util.isNull(response, message)) throw new NullPointerException();
+        if (Util.isNull(response)) throw new NullPointerException();
         this.name = name;
         this.response = response;
         this.message = message;
     }
 
     @Override
-    public YAMLSection generate() {
-        YAMLSection data = new YAMLSection();
-        data.set("n", name);
-        data.set("r", response);
-        data.set("m", message);
+    public ObjectMap<Integer> send(SubDataClient client) {
+        ObjectMap<Integer> data = new ObjectMap<Integer>();
+        data.set(0x0000, name);
+        data.set(0x0001, response);
+        if (message != null) data.set(0x0002, message);
         return data;
     }
 
     @Override
-    public void execute(Client client, YAMLSection data) {
+    public void receive(SubDataClient client, ObjectMap<Integer> data) {
+        String name =  (data.contains(0x0000))?data.getRawString(0x0000):null;
+        Integer port = (data.contains(0x0001))?data.getInt(0x0001):null;
+
         try {
             Map<String, Server> servers = plugin.api.getServers();
             Server server;
-            if (data.contains("name") && servers.keySet().contains(data.getRawString("name").toLowerCase())) {
-                link(client, servers.get(data.getRawString("name").toLowerCase()));
-            } else if (data.contains("port")) {
-                if ((server = search(new InetSocketAddress(client.getAddress().getAddress(), data.getInt("port")))) != null) {
+            if (name != null && servers.keySet().contains(name.toLowerCase())) {
+                link(client, servers.get(name.toLowerCase()));
+            } else if (port != null) {
+                if ((server = search(new InetSocketAddress(client.getAddress().getAddress(), port))) != null) {
                     link(client, server);
                 } else {
-                    throw new ServerLinkException("There is no server with address: " + client.getAddress().getAddress().getHostAddress() + ':' + data.getInt("port"));
+                    throw new ServerLinkException("There is no server with address: " + client.getAddress().getAddress().getHostAddress() + ':' + port);
                 }
             } else {
                 throw new ServerLinkException("Not enough arguments");
             }
         } catch (ServerLinkException e) {
-            if (data.contains("name")) {
-                client.sendPacket(new PacketLinkServer(null, 2, "There is no server with name: " + data.getRawString("name")));
+            if (name != null) {
+                client.sendPacket(new PacketLinkServer(null, 3, "There is no server with name: " + name));
             } else {
                 client.sendPacket(new PacketLinkServer(null, 2, e.getMessage()));
             }
         } catch (Exception e) {
-            client.sendPacket(new PacketLinkServer(null, 1, e.getClass().getCanonicalName() + ": " + e.getMessage()));
+            client.sendPacket(new PacketLinkServer(null, 1, null));
             e.printStackTrace();
         }
     }
 
-    private void link(Client client, Server server) {
+    private void link(SubDataClient client, Server server) {
         if (server.getSubData() == null) {
             client.setHandler(server);
             System.out.println("SubData > " + client.getAddress().toString() + " has been defined as " + ((server instanceof SubServer) ? "SubServer" : "Server") + ": " + server.getName());
             if (server instanceof SubServer && !((SubServer) server).isRunning()) {
                 System.out.println("SubServers > Sending shutdown signal to rogue SubServer: " + server.getName());
-                client.sendPacket(new PacketOutReset("Rogue SubServer Detected"));
+                client.sendPacket(new PacketOutExReset("Rogue SubServer Detected"));
             } else {
-                client.sendPacket(new PacketLinkServer(server.getName(), 0, "Definition Successful"));
+                client.sendPacket(new PacketLinkServer(server.getName(), 0, null));
             }
         } else {
-            client.sendPacket(new PacketLinkServer(null, 3, "Server already linked"));
+            client.sendPacket(new PacketLinkServer(null, 4, "Server already linked"));
         }
     }
 
@@ -116,7 +118,7 @@ public class PacketLinkServer implements PacketIn, PacketOut {
     }
 
     @Override
-    public Version getVersion() {
-        return new Version("2.11.0a");
+    public int version() {
+        return 0x0001;
     }
 }

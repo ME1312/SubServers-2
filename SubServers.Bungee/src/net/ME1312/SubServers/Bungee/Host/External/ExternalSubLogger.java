@@ -2,8 +2,8 @@ package net.ME1312.SubServers.Bungee.Host.External;
 
 import net.ME1312.SubServers.Bungee.Host.SubLogFilter;
 import net.ME1312.SubServers.Bungee.Host.SubLogger;
-import net.ME1312.SubServers.Bungee.Library.Container;
-import net.ME1312.SubServers.Bungee.Library.Util;
+import net.ME1312.Galaxi.Library.Container;
+import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubServers.Bungee.Network.Packet.PacketInExLogMessage;
 import net.ME1312.SubServers.Bungee.SubAPI;
 import net.md_5.bungee.api.ProxyServer;
@@ -14,7 +14,6 @@ import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 import java.util.logging.Level;

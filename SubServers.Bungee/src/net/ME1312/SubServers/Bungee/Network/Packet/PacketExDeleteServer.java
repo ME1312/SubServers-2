@@ -1,12 +1,11 @@
 package net.ME1312.SubServers.Bungee.Network.Packet;
 
-import net.ME1312.SubServers.Bungee.Library.Callback;
-import net.ME1312.SubServers.Bungee.Library.Config.YAMLSection;
-import net.ME1312.SubServers.Bungee.Library.Util;
-import net.ME1312.SubServers.Bungee.Library.Version.Version;
-import net.ME1312.SubServers.Bungee.Network.Client;
-import net.ME1312.SubServers.Bungee.Network.PacketIn;
-import net.ME1312.SubServers.Bungee.Network.PacketOut;
+import net.ME1312.Galaxi.Library.Callback.Callback;
+import net.ME1312.Galaxi.Library.Map.ObjectMap;
+import net.ME1312.Galaxi.Library.Util;
+import net.ME1312.SubData.Server.SubDataClient;
+import net.ME1312.SubData.Server.Protocol.PacketObjectIn;
+import net.ME1312.SubData.Server.Protocol.PacketObjectOut;
 
 import java.util.HashMap;
 import java.util.UUID;
@@ -14,11 +13,12 @@ import java.util.UUID;
 /**
  * Delete Server External Host Packet
  */
-public class PacketExDeleteServer implements PacketIn, PacketOut {
-    private static HashMap<String, Callback<YAMLSection>[]> callbacks = new HashMap<String, Callback<YAMLSection>[]>();
+public class PacketExDeleteServer implements PacketObjectIn<Integer>, PacketObjectOut<Integer> {
+    private static HashMap<UUID, Callback<ObjectMap<Integer>>[]> callbacks = new HashMap<UUID, Callback<ObjectMap<Integer>>[]>();
     private String name;
-    private YAMLSection info;
-    private String id = null;
+    private ObjectMap<String> info;
+    private boolean recycle;
+    private UUID tracker = null;
 
     /**
      * New PacketExDeleteServer
@@ -33,35 +33,37 @@ public class PacketExDeleteServer implements PacketIn, PacketOut {
      * @param callback Callbacks
      */
     @SafeVarargs
-    public PacketExDeleteServer(String name, YAMLSection info, Callback<YAMLSection>... callback) {
+    public PacketExDeleteServer(String name, ObjectMap<String> info, boolean recycle, Callback<ObjectMap<Integer>>... callback) {
         if (Util.isNull(name, info, callback)) throw new NullPointerException();
         this.name = name;
         this.info = info;
-        this.id = Util.getNew(callbacks.keySet(), UUID::randomUUID).toString();
-        callbacks.put(id, callback);
+        this.recycle = recycle;
+        this.tracker = Util.getNew(callbacks.keySet(), UUID::randomUUID);
+        callbacks.put(tracker, callback);
     }
 
     @Override
-    public YAMLSection generate() {
-        if (id == null) {
+    public ObjectMap<Integer> send(SubDataClient client) {
+        if (tracker == null) {
             return null;
         } else {
-            YAMLSection data = new YAMLSection();
-            data.set("id", id);
-            data.set("server", name);
-            data.set("info", info);
+            ObjectMap<Integer> data = new ObjectMap<Integer>();
+            data.set(0x0000, tracker);
+            data.set(0x0001, name);
+            data.set(0x0002, info);
+            if (recycle) data.set(0x0003, true);
             return data;
         }
     }
 
     @Override
-    public void execute(Client client, YAMLSection data) {
-        for (Callback<YAMLSection> callback : callbacks.get(data.getRawString("id"))) callback.run(data);
-        callbacks.remove(data.getRawString("id"));
+    public void receive(SubDataClient client, ObjectMap<Integer> data) {
+        for (Callback<ObjectMap<Integer>> callback : callbacks.get(data.getUUID(0x0000))) callback.run(data);
+        callbacks.remove(data.getUUID(0x0000));
     }
 
     @Override
-    public Version getVersion() {
-        return new Version("2.11.0a");
+    public int version() {
+        return 0x0001;
     }
 }

@@ -1,11 +1,11 @@
 package net.ME1312.SubServers.Bungee.Event;
 
 import net.ME1312.SubServers.Bungee.Host.Server;
-import net.ME1312.SubServers.Bungee.Library.Config.YAMLSection;
-import net.ME1312.SubServers.Bungee.Library.Config.YAMLValue;
-import net.ME1312.SubServers.Bungee.Library.NamedContainer;
+import net.ME1312.Galaxi.Library.Map.ObjectMap;
+import net.ME1312.Galaxi.Library.Map.ObjectMapValue;
+import net.ME1312.Galaxi.Library.NamedContainer;
 import net.ME1312.SubServers.Bungee.Library.SubEvent;
-import net.ME1312.SubServers.Bungee.Library.Util;
+import net.ME1312.Galaxi.Library.Util;
 import net.md_5.bungee.api.plugin.Cancellable;
 import net.md_5.bungee.api.plugin.Event;
 
@@ -18,7 +18,7 @@ public class SubEditServerEvent extends Event implements SubEvent, Cancellable {
     private boolean cancelled = false;
     private UUID player;
     private Server server;
-    private NamedContainer<String, YAMLValue> edit;
+    private NamedContainer<String, ObjectMapValue> edit;
     private boolean perm;
 
     /**
@@ -31,11 +31,11 @@ public class SubEditServerEvent extends Event implements SubEvent, Cancellable {
      */
     public SubEditServerEvent(UUID player, Server server, NamedContainer<String, ?> edit, boolean permanent) {
         if (Util.isNull(server, edit)) throw new NullPointerException();
-        YAMLSection section = new YAMLSection();
+        ObjectMap<String> section = new ObjectMap<String>();
         section.set(".", edit.get());
         this.player = player;
         this.server = server;
-        this.edit = new NamedContainer<String, YAMLValue>(edit.name(), section.get("."));
+        this.edit = new NamedContainer<String, ObjectMapValue>(edit.name(), section.get("."));
         this.perm = permanent;
     }
 
@@ -58,7 +58,7 @@ public class SubEditServerEvent extends Event implements SubEvent, Cancellable {
      *
      * @return Edit to be made
      */
-    public NamedContainer<String, YAMLValue> getEdit() {
+    public NamedContainer<String, ObjectMapValue> getEdit() {
         return edit;
     }
 

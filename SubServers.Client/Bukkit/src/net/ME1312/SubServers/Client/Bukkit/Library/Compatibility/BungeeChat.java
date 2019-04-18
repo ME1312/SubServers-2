@@ -59,7 +59,7 @@ public class BungeeChat {
                                     hover.setColor(ChatColor.GRAY);
                                     hoverm.add(hover);
                                 }
-                                if (((SubServer) server).getStopAction() == SubServer.StopAction.REMOVE_SERVER || ((SubServer) server).getStopAction() == SubServer.StopAction.DELETE_SERVER) {
+                                if (((SubServer) server).getStopAction() == SubServer.StopAction.REMOVE_SERVER || ((SubServer) server).getStopAction() == SubServer.StopAction.RECYCLE_SERVER || ((SubServer) server).getStopAction() == SubServer.StopAction.DELETE_SERVER) {
                                     message.setColor(ChatColor.AQUA);
                                     hover.setColor(ChatColor.AQUA);
                                     hover = new TextComponent(plugin.api.getLang("SubServers", "Interface.Server-Menu.SubServer-Temporary") + '\n');
@@ -99,7 +99,7 @@ public class BungeeChat {
                                 }
                             }
                             hoverm.add(hover);
-                            if (plugin.config.get().getSection("Settings").getBoolean("Show-Addresses", false)) {
+                            if (plugin.config.get().getMap("Settings").getBoolean("Show-Addresses", false)) {
                                 hover = new TextComponent('\n' + server.getAddress().getAddress().getHostAddress() + ':' + server.getAddress().getPort());
                             } else {
                                 hover = new TextComponent("\n" + server.getAddress().getPort());
@@ -120,7 +120,7 @@ public class BungeeChat {
                             hoverm.add(hover);
                             hover = new TextComponent(plugin.api.getLang("SubServers", "Interface.Server-Menu.Server-Player-Count").replace("$int$", new DecimalFormat("#,###").format(server.getPlayers().size())) + ChatColor.RESET);
                             hoverm.add(hover);
-                            if (plugin.config.get().getSection("Settings").getBoolean("Show-Addresses", false)) {
+                            if (plugin.config.get().getMap("Settings").getBoolean("Show-Addresses", false)) {
                                 hover = new TextComponent('\n' + server.getAddress().getAddress().getHostAddress() + ':' + server.getAddress().getPort());
                             } else {
                                 hover = new TextComponent("\n" + server.getAddress().getPort());
@@ -168,7 +168,7 @@ public class BungeeChat {
                     }
                     hover = new TextComponent(plugin.api.getLang("SubServers", (!host.isAvailable())?"Interface.Host-Menu.Host-Unavailable":"Interface.Host-Menu.Host-Disabled"));
                 }
-                if (plugin.config.get().getSection("Settings").getBoolean("Show-Addresses", false)) {
+                if (plugin.config.get().getMap("Settings").getBoolean("Show-Addresses", false)) {
                     hoverm.add(hover);
                     hover = new TextComponent('\n' + host.getAddress().getHostAddress());
                     hover.setColor(ChatColor.WHITE);
@@ -193,7 +193,7 @@ public class BungeeChat {
                             hover.setColor(ChatColor.GRAY);
                             hoverm.add(hover);
                         }
-                        if (subserver.getStopAction() == SubServer.StopAction.REMOVE_SERVER || subserver.getStopAction() == SubServer.StopAction.DELETE_SERVER) {
+                        if (subserver.getStopAction() == SubServer.StopAction.REMOVE_SERVER || subserver.getStopAction() == SubServer.StopAction.RECYCLE_SERVER || subserver.getStopAction() == SubServer.StopAction.DELETE_SERVER) {
                             message.setColor(ChatColor.AQUA);
                             hover.setColor(ChatColor.AQUA);
                             hover = new TextComponent(plugin.api.getLang("SubServers", "Interface.Server-Menu.SubServer-Temporary") + '\n');
@@ -233,7 +233,7 @@ public class BungeeChat {
                         }
                     }
                     hoverm.add(hover);
-                    if (plugin.config.get().getSection("Settings").getBoolean("Show-Addresses", false)) {
+                    if (plugin.config.get().getMap("Settings").getBoolean("Show-Addresses", false)) {
                         hover = new TextComponent('\n' + subserver.getAddress().getAddress().getHostAddress()+':'+subserver.getAddress().getPort());
                     } else {
                         hover = new TextComponent("\n" + subserver.getAddress().getPort());
@@ -270,7 +270,7 @@ public class BungeeChat {
                 hoverm.add(hover);
                 hover = new TextComponent(plugin.api.getLang("SubServers", "Interface.Server-Menu.Server-Player-Count").replace("$int$", new DecimalFormat("#,###").format(server.getPlayers().size())) + ChatColor.RESET);
                 hoverm.add(hover);
-                if (plugin.config.get().getSection("Settings").getBoolean("Show-Addresses", false)) {
+                if (plugin.config.get().getMap("Settings").getBoolean("Show-Addresses", false)) {
                     hover = new TextComponent('\n' + server.getAddress().getAddress().getHostAddress()+':'+server.getAddress().getPort());
                 } else {
                     hover = new TextComponent("\n" + server.getAddress().getPort());

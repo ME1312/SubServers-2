@@ -1,13 +1,12 @@
 package net.ME1312.SubServers.Bungee.Network.Packet;
 
+import net.ME1312.SubData.Server.SubDataClient;
 import net.ME1312.SubServers.Bungee.Host.Server;
 import net.ME1312.SubServers.Bungee.Host.SubServer;
-import net.ME1312.SubServers.Bungee.Library.Config.YAMLSection;
-import net.ME1312.SubServers.Bungee.Library.Util;
-import net.ME1312.SubServers.Bungee.Library.Version.Version;
-import net.ME1312.SubServers.Bungee.Network.Client;
-import net.ME1312.SubServers.Bungee.Network.PacketIn;
-import net.ME1312.SubServers.Bungee.Network.PacketOut;
+import net.ME1312.Galaxi.Library.Map.ObjectMap;
+import net.ME1312.Galaxi.Library.Util;
+import net.ME1312.SubData.Server.Protocol.PacketObjectIn;
+import net.ME1312.SubData.Server.Protocol.PacketObjectOut;
 import net.ME1312.SubServers.Bungee.SubPlugin;
 
 import java.util.Map;
@@ -16,11 +15,11 @@ import java.util.UUID;
 /**
  * Start Server Packet
  */
-public class PacketStartServer implements PacketIn, PacketOut {
+public class PacketStartServer implements PacketObjectIn<Integer>, PacketObjectOut<Integer> {
     private SubPlugin plugin;
     private int response;
-    private String message;
-    private String id;
+    private String extra;
+    private UUID tracker;
 
     /**
      * New PacketStartServer (In)
@@ -36,63 +35,75 @@ public class PacketStartServer implements PacketIn, PacketOut {
      * New PacketStartServer (Out)
      *
      * @param response Response ID
-     * @param message Message
-     * @param id Receiver ID
+     * @param tracker Receiver ID
      */
-    public PacketStartServer(int response, String message, String id) {
-        if (Util.isNull(response, message)) throw new NullPointerException();
+    public PacketStartServer(int response, UUID tracker) {
+        this(response, null, tracker);
+    }
+
+    /**
+     * New PacketStartServer (Out)
+     *
+     * @param response Response ID
+     * @param tracker Receiver ID
+     */
+    public PacketStartServer(int response, String extra, UUID tracker) {
         this.response = response;
-        this.message = message;
-        this.id = id;
+        this.extra = extra;
+        this.tracker = tracker;
     }
 
     @Override
-    public YAMLSection generate() {
-        YAMLSection json = new YAMLSection();
-        if (id != null) json.set("id", id);
-        json.set("r", response);
-        json.set("m", message);
+    public ObjectMap<Integer> send(SubDataClient client) {
+        ObjectMap<Integer> json = new ObjectMap<Integer>();
+        if (tracker != null) json.set(0x0000, tracker);
+        json.set(0x0001, response);
+        if (extra != null) json.set(0x0002, extra);
         return json;
     }
 
     @Override
-    public void execute(Client client, YAMLSection data) {
+    public void receive(SubDataClient client, ObjectMap<Integer> data) {
+        UUID tracker =       (data.contains(0x0000)?data.getUUID(0x0000):null);
         try {
+            String name = data.getRawString(0x0001);
+            UUID player =    (data.contains(0x0002)?data.getUUID(0x0002):null);
+
             Map<String, Server> servers = plugin.api.getServers();
-            if (!servers.keySet().contains(data.getRawString("server").toLowerCase())) {
-                client.sendPacket(new PacketStartServer(3, "There is no server with that name", (data.contains("id"))?data.getRawString("id"):null));
-            } else if (!(servers.get(data.getRawString("server").toLowerCase()) instanceof SubServer)) {
-                client.sendPacket(new PacketStartServer(4, "That Server is not a SubServer", (data.contains("id"))?data.getRawString("id"):null));
-            } else if (!((SubServer) servers.get(data.getRawString("server").toLowerCase())).getHost().isAvailable()) {
-                client.sendPacket(new PacketStartServer(5, "That SubServer's Host is not available", (data.contains("id"))?data.getRawString("id"):null));
-            } else if (!((SubServer) servers.get(data.getRawString("server").toLowerCase())).getHost().isEnabled()) {
-                client.sendPacket(new PacketStartServer(6, "That SubServer's Host is not enabled", (data.contains("id"))?data.getRawString("id"):null));
-            } else if (!((SubServer) servers.get(data.getRawString("server").toLowerCase())).isEnabled()) {
-                client.sendPacket(new PacketStartServer(7, "That SubServer is not enabled", (data.contains("id"))?data.getRawString("id"):null));
-            } else if (((SubServer) servers.get(data.getRawString("server").toLowerCase())).isRunning()) {
-                client.sendPacket(new PacketStartServer(8, "That SubServer is already running", (data.contains("id")) ? data.getRawString("id") : null));
-            } else if (((SubServer) servers.get(data.getRawString("server").toLowerCase())).getCurrentIncompatibilities().size() != 0) {
+            if (!servers.keySet().contains(name.toLowerCase())) {
+                client.sendPacket(new PacketStartServer(3, tracker));
+            } else if (!(servers.get(name.toLowerCase()) instanceof SubServer)) {
+                client.sendPacket(new PacketStartServer(4, tracker));
+            } else if (!((SubServer) servers.get(name.toLowerCase())).getHost().isAvailable()) {
+                client.sendPacket(new PacketStartServer(5, tracker));
+            } else if (!((SubServer) servers.get(name.toLowerCase())).getHost().isEnabled()) {
+                client.sendPacket(new PacketStartServer(6, tracker));
+            } else if (!((SubServer) servers.get(name.toLowerCase())).isEnabled()) {
+                client.sendPacket(new PacketStartServer(7, tracker));
+            } else if (((SubServer) servers.get(name.toLowerCase())).isRunning()) {
+                client.sendPacket(new PacketStartServer(8, tracker));
+            } else if (((SubServer) servers.get(name.toLowerCase())).getCurrentIncompatibilities().size() != 0) {
                 String list = "";
-                for (SubServer server : ((SubServer) servers.get(data.getRawString("server").toLowerCase())).getCurrentIncompatibilities()) {
+                for (SubServer server : ((SubServer) servers.get(name.toLowerCase())).getCurrentIncompatibilities()) {
                     if (list.length() != 0) list += ", ";
                     list += server.getName();
                 }
-                client.sendPacket(new PacketStartServer(9, "Cannot start SubServer while these servers are running: " + list, (data.contains("id")) ? data.getRawString("id") : null));
+                client.sendPacket(new PacketStartServer(9, list, tracker));
             } else {
-                if (((SubServer) servers.get(data.getRawString("server").toLowerCase())).start((data.contains("player"))?data.getUUID("player"):null)) {
-                    client.sendPacket(new PacketStartServer(0, "Starting SubServer", (data.contains("id"))?data.getRawString("id"):null));
+                if (((SubServer) servers.get(name.toLowerCase())).start(player)) {
+                    client.sendPacket(new PacketStartServer(0, tracker));
                 } else {
-                    client.sendPacket(new PacketStartServer(1, "Couldn't start SubServer", (data.contains("id"))?data.getRawString("id"):null));
+                    client.sendPacket(new PacketStartServer(1, tracker));
                 }
             }
         } catch (Throwable e) {
-            client.sendPacket(new PacketStartServer(2, e.getClass().getCanonicalName() + ": " + e.getMessage(), (data.contains("id"))?data.getRawString("id"):null));
+            client.sendPacket(new PacketStartServer(2, tracker));
             e.printStackTrace();
         }
     }
 
     @Override
-    public Version getVersion() {
-        return new Version("2.13b");
+    public int version() {
+        return 0x0001;
     }
 }

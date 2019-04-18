@@ -2,15 +2,16 @@ package net.ME1312.SubServers.Bungee.Host.Internal;
 
 import com.dosse.upnp.UPnP;
 import com.google.common.collect.Range;
+import net.ME1312.Galaxi.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Bungee.Event.SubAddServerEvent;
 import net.ME1312.SubServers.Bungee.Event.SubRemoveServerEvent;
-import net.ME1312.SubServers.Bungee.Library.Config.YAMLSection;
+import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.SubServers.Bungee.Library.Exception.InvalidServerException;
 import net.ME1312.SubServers.Bungee.Host.Host;
 import net.ME1312.SubServers.Bungee.Host.SubCreator;
 import net.ME1312.SubServers.Bungee.Host.SubServer;
-import net.ME1312.SubServers.Bungee.Library.UniversalFile;
-import net.ME1312.SubServers.Bungee.Library.Util;
+import net.ME1312.Galaxi.Library.UniversalFile;
+import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubServers.Bungee.SubPlugin;
 
 import java.io.File;
@@ -103,7 +104,7 @@ public class InternalHost extends Host {
         plugin.getPluginManager().callEvent(event);
         if (!event.isCancelled()) {
             servers.put(name.toLowerCase(), server);
-            if (UPnP.isUPnPAvailable() && plugin.config.get().getSection("Settings").getSection("UPnP", new YAMLSection()).getBoolean("Forward-Servers", false)) UPnP.openPortTCP(port);
+            if (UPnP.isUPnPAvailable() && plugin.config.get().getMap("Settings").getMap("UPnP", new ObjectMap<String>()).getBoolean("Forward-Servers", false)) UPnP.openPortTCP(port);
             return server;
         } else {
             return null;
@@ -144,6 +145,96 @@ public class InternalHost extends Host {
     }
 
     @Override
+    public boolean recycleSubServer(UUID player, String name) throws InterruptedException {
+        if (Util.isNull(name)) throw new NullPointerException();
+        String server = servers.get(name.toLowerCase()).getName();
+        File from = new File(getPath(), servers.get(server.toLowerCase()).getPath());
+        if (removeSubServer(player, server)) {
+            new Thread(() -> {
+                UniversalFile to = new UniversalFile(plugin.dir, "SubServers:Recently Deleted:" + server.toLowerCase());
+                try {
+                    if (from.exists()) {
+                        System.out.println("SubServers > Moving Files...");
+                        if (to.exists()) {
+                            if (to.isDirectory()) Util.deleteDirectory(to);
+                            else to.delete();
+                        }
+                        to.mkdirs();
+                        Util.copyDirectory(from, to);
+                        Util.deleteDirectory(from);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                System.out.println("SubServers > Saving...");
+                YAMLSection info = (plugin.config.get().getMap("Servers").getKeys().contains(server))?new YAMLSection(plugin.config.get().getMap("Servers").getMap(server).get()):new YAMLSection();
+                info.set("Name", server);
+                info.set("Timestamp", Calendar.getInstance().getTime().getTime());
+                try {
+                    if (plugin.config.get().getMap("Servers").getKeys().contains(server)) {
+                        plugin.config.get().getMap("Servers").remove(server);
+                        plugin.config.save();
+                    }
+                    if (!to.exists()) to.mkdirs();
+                    FileWriter writer = new FileWriter(new File(to, "info.json"));
+                    writer.write(info.toJSON().toString());
+                    writer.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                System.out.println("SubServers > Deleted SubServer: " + server);
+            }, "SubServers.Bungee::Internal_Server_Recycler(" + name + ')').start();
+            return true;
+        } else return false;
+    }
+
+    @Override
+    public boolean forceRecycleSubServer(UUID player, String name) throws InterruptedException {
+        if (Util.isNull(name)) throw new NullPointerException();
+        String server = servers.get(name.toLowerCase()).getName();
+        File from = new File(getPath(), servers.get(server.toLowerCase()).getPath());
+        if (forceRemoveSubServer(player, server)) {
+            new Thread(() -> {
+                UniversalFile to = new UniversalFile(plugin.dir, "SubServers:Recently Deleted:" + server.toLowerCase());
+                try {
+                    if (from.exists()) {
+                        System.out.println("SubServers > Moving Files...");
+                        if (to.exists()) {
+                            if (to.isDirectory()) Util.deleteDirectory(to);
+                            else to.delete();
+                        }
+                        to.mkdirs();
+                        Util.copyDirectory(from, to);
+                        Util.deleteDirectory(from);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                System.out.println("SubServers > Saving...");
+                YAMLSection info = (plugin.config.get().getMap("Servers").getKeys().contains(server))?new YAMLSection(plugin.config.get().getMap("Servers").getMap(server).get()):new YAMLSection();
+                info.set("Name", server);
+                info.set("Timestamp", Calendar.getInstance().getTime().getTime());
+                try {
+                    if (plugin.config.get().getMap("Servers").getKeys().contains(server)) {
+                        plugin.config.get().getMap("Servers").remove(server);
+                        plugin.config.save();
+                    }
+                    if (!to.exists()) to.mkdirs();
+                    FileWriter writer = new FileWriter(new File(to, "info.json"), false);
+                    writer.write(info.toJSON().toString());
+                    writer.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                System.out.println("SubServers > Deleted SubServer: " + server);
+            }, "SubServers.Bungee::Internal_Server_Recycler(" + name + ')').start();
+            return true;
+        } else return false;
+    }
+
+    @Override
     public boolean deleteSubServer(UUID player, String name) throws InterruptedException {
         if (Util.isNull(name)) throw new NullPointerException();
         String server = servers.get(name.toLowerCase()).getName();
@@ -159,7 +250,6 @@ public class InternalHost extends Host {
                             else to.delete();
                         }
                         to.mkdirs();
-                        Util.copyDirectory(from, to);
                         Util.deleteDirectory(from);
                     }
                 } catch (Exception e) {
@@ -167,17 +257,17 @@ public class InternalHost extends Host {
                 }
 
                 System.out.println("SubServers > Saving...");
-                YAMLSection info = (plugin.config.get().getSection("Servers").getKeys().contains(server))?plugin.config.get().getSection("Servers").getSection(server).clone():new YAMLSection();
+                YAMLSection info = (plugin.config.get().getMap("Servers").getKeys().contains(server))?new YAMLSection(plugin.config.get().getMap("Servers").getMap(server).get()):new YAMLSection();
                 info.set("Name", server);
                 info.set("Timestamp", Calendar.getInstance().getTime().getTime());
                 try {
-                    if (plugin.config.get().getSection("Servers").getKeys().contains(server)) {
-                        plugin.config.get().getSection("Servers").remove(server);
+                    if (plugin.config.get().getMap("Servers").getKeys().contains(server)) {
+                        plugin.config.get().getMap("Servers").remove(server);
                         plugin.config.save();
                     }
                     if (!to.exists()) to.mkdirs();
                     FileWriter writer = new FileWriter(new File(to, "info.json"));
-                    writer.write(info.toJSON());
+                    writer.write(info.toJSON().toString());
                     writer.close();
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -212,17 +302,17 @@ public class InternalHost extends Host {
                 }
 
                 System.out.println("SubServers > Saving...");
-                YAMLSection info = (plugin.config.get().getSection("Servers").getKeys().contains(server))?plugin.config.get().getSection("Servers").getSection(server).clone():new YAMLSection();
+                YAMLSection info = (plugin.config.get().getMap("Servers").getKeys().contains(server))?new YAMLSection(plugin.config.get().getMap("Servers").getMap(server).get()):new YAMLSection();
                 info.set("Name", server);
                 info.set("Timestamp", Calendar.getInstance().getTime().getTime());
                 try {
-                    if (plugin.config.get().getSection("Servers").getKeys().contains(server)) {
-                        plugin.config.get().getSection("Servers").remove(server);
+                    if (plugin.config.get().getMap("Servers").getKeys().contains(server)) {
+                        plugin.config.get().getMap("Servers").remove(server);
                         plugin.config.save();
                     }
                     if (!to.exists()) to.mkdirs();
                     FileWriter writer = new FileWriter(new File(to, "info.json"), false);
-                    writer.write(info.toJSON());
+                    writer.write(info.toJSON().toString());
                     writer.close();
                 } catch (Exception e) {
                     e.printStackTrace();

@@ -1,20 +1,19 @@
 package net.ME1312.SubServers.Bungee.Network.Packet;
 
+import net.ME1312.SubData.Server.SubDataClient;
 import net.ME1312.SubServers.Bungee.Host.External.ExternalSubLogger;
-import net.ME1312.SubServers.Bungee.Library.Config.YAMLSection;
-import net.ME1312.SubServers.Bungee.Library.Util;
-import net.ME1312.SubServers.Bungee.Library.Version.Version;
-import net.ME1312.SubServers.Bungee.Network.Client;
-import net.ME1312.SubServers.Bungee.Network.PacketIn;
+import net.ME1312.Galaxi.Library.Map.ObjectMap;
+import net.ME1312.Galaxi.Library.Util;
+import net.ME1312.Galaxi.Library.Version.Version;
+import net.ME1312.SubData.Server.Protocol.PacketObjectIn;
 
-import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.UUID;
 
 /**
  * Message Log External Host Packet
  */
-public class PacketInExLogMessage implements PacketIn {
+public class PacketInExLogMessage implements PacketObjectIn<Integer> {
     private static HashMap<UUID, ExternalSubLogger> loggers = new HashMap<UUID, ExternalSubLogger>();
 
     /**
@@ -23,10 +22,10 @@ public class PacketInExLogMessage implements PacketIn {
     public PacketInExLogMessage() {}
 
     @Override
-    public void execute(Client client, YAMLSection data) {
+    public void receive(SubDataClient client, ObjectMap<Integer> data) {
         try {
-            if (data.contains("h") && data.contains("m") && data.getRawString("m").length() != 0 && loggers.keySet().contains(data.getUUID("h"))) {
-                Util.reflect(ExternalSubLogger.class.getDeclaredMethod("log", String.class), loggers.get(data.getUUID("h")), data.getRawString("m"));
+            if (data.contains(0x0000) && data.contains(0x0001) && loggers.keySet().contains(data.getUUID(0x0000))) {
+                Util.reflect(ExternalSubLogger.class.getDeclaredMethod("log", String.class), loggers.get(data.getUUID(0x0000)), data.getRawString(0x0001));
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -34,8 +33,8 @@ public class PacketInExLogMessage implements PacketIn {
     }
 
     @Override
-    public Version getVersion() {
-        return new Version("2.11.0a");
+    public int version() {
+        return 0x0001;
     }
 
     /**

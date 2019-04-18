@@ -1,23 +1,23 @@
 package net.ME1312.SubServers.Bungee.Host.External;
 
 import com.google.common.collect.Range;
+import net.ME1312.SubData.Server.DataClient;
+import net.ME1312.SubData.Server.SerializableClientHandler;
+import net.ME1312.SubData.Server.SubDataClient;
 import net.ME1312.SubServers.Bungee.Event.SubAddServerEvent;
 import net.ME1312.SubServers.Bungee.Event.SubRemoveServerEvent;
 import net.ME1312.SubServers.Bungee.Host.Host;
 import net.ME1312.SubServers.Bungee.Host.SubCreator;
 import net.ME1312.SubServers.Bungee.Host.SubServer;
-import net.ME1312.SubServers.Bungee.Library.Callback;
-import net.ME1312.SubServers.Bungee.Library.Config.YAMLSection;
+import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.SubServers.Bungee.Library.Exception.InvalidServerException;
-import net.ME1312.SubServers.Bungee.Library.NamedContainer;
-import net.ME1312.SubServers.Bungee.Library.Util;
-import net.ME1312.SubServers.Bungee.Network.Client;
-import net.ME1312.SubServers.Bungee.Network.ClientHandler;
+import net.ME1312.Galaxi.Library.NamedContainer;
+import net.ME1312.Galaxi.Library.Util;
+import net.ME1312.SubData.Server.Protocol.PacketObjectOut;
 import net.ME1312.SubServers.Bungee.Network.Packet.PacketExAddServer;
 import net.ME1312.SubServers.Bungee.Network.Packet.PacketExDeleteServer;
 import net.ME1312.SubServers.Bungee.Network.Packet.PacketExRemoveServer;
-import net.ME1312.SubServers.Bungee.Network.Packet.PacketOutReset;
-import net.ME1312.SubServers.Bungee.Network.PacketOut;
+import net.ME1312.SubServers.Bungee.Network.Packet.PacketOutExReset;
 import net.ME1312.SubServers.Bungee.SubPlugin;
 
 import java.net.InetAddress;
@@ -26,15 +26,15 @@ import java.util.*;
 /**
  * External Host Class
  */
-public class ExternalHost extends Host implements ClientHandler {
+public class ExternalHost extends Host implements SerializableClientHandler {
     private HashMap<String, SubServer> servers = new HashMap<String, SubServer>();
     private String name;
     private boolean enabled;
     private InetAddress address;
     private SubCreator creator;
     private String directory;
-    protected NamedContainer<Boolean, Client> client;
-    private LinkedList<PacketOut> queue;
+    protected NamedContainer<Boolean, SubDataClient> client;
+    private LinkedList<PacketObjectOut> queue;
     private boolean clean;
     protected SubPlugin plugin;
 
@@ -56,26 +56,26 @@ public class ExternalHost extends Host implements ClientHandler {
         this.name = name;
         this.enabled = enabled;
         this.address = address;
-        this.client = new NamedContainer<Boolean, Client>(false, null);
+        this.client = new NamedContainer<Boolean, SubDataClient>(false, null);
         this.creator = new ExternalSubCreator(this, ports, log, gitBash);
         this.directory = directory;
-        this.queue = new LinkedList<PacketOut>();
+        this.queue = new LinkedList<PacketObjectOut>();
         this.clean = false;
     }
 
     @Override
-    public Client getSubData() {
+    public DataClient getSubData() {
         return client.get();
     }
 
     @Override
-    public void setSubData(Client client) {
-        this.client = new NamedContainer<Boolean, Client>(false, client);
-        if (client != null && (client.getHandler() == null || !equals(client.getHandler()))) client.setHandler(this);
+    public void setSubData(DataClient client) {
+        this.client = new NamedContainer<Boolean, SubDataClient>(false, (SubDataClient) client);
+        if (client != null && (client.getHandler() == null || !equals(client.getHandler()))) ((SubDataClient) client).setHandler(this);
     }
 
-    protected void queue(PacketOut... packet) {
-        for (PacketOut p : packet) if (client.get() == null || client.name() == false) {
+    protected void queue(PacketObjectOut... packet) {
+        for (PacketObjectOut p : packet) if (client.get() == null || client.name() == false) {
             queue.add(p);
         } else {
             client.get().sendPacket(p);
@@ -83,7 +83,7 @@ public class ExternalHost extends Host implements ClientHandler {
     }
     private void requeue() {
         if (!clean) {
-            client.get().sendPacket(new PacketOutReset("Prevent Desync"));
+            client.get().sendPacket(new PacketOutExReset("Prevent Desync"));
             clean = true;
         }
         for (SubServer server : servers.values()) {
@@ -170,7 +170,7 @@ public class ExternalHost extends Host implements ClientHandler {
                 getSubServer(server).waitFor();
             }
             queue(new PacketExRemoveServer(server, data -> {
-                if (data.getInt("r") == 0) {
+                if (data.getInt(0x0001) == 0) {
                     servers.remove(server.toLowerCase());
                 }
             }));
@@ -189,8 +189,84 @@ public class ExternalHost extends Host implements ClientHandler {
             getSubServer(server).terminate();
         }
         queue(new PacketExRemoveServer(server, data -> {
-            if (data.getInt("r") == 0) {
+            if (data.getInt(0x0001) == 0) {
                 servers.remove(server.toLowerCase());
+            }
+        }));
+        return true;
+    }
+
+    @Override
+    public boolean recycleSubServer(UUID player, String name) throws InterruptedException {
+        if (Util.isNull(name)) throw new NullPointerException();
+        String server = servers.get(name.toLowerCase()).getName();
+
+        SubRemoveServerEvent event = new SubRemoveServerEvent(player, this, getSubServer(server));
+        plugin.getPluginManager().callEvent(event);
+        if (!event.isCancelled()) {
+            if (getSubServer(server).isRunning()) {
+                getSubServer(server).stop();
+                getSubServer(server).waitFor();
+            }
+
+            System.out.println("SubServers > Saving...");
+            ObjectMap<String> info = (plugin.config.get().getMap("Servers").getKeys().contains(server))?plugin.config.get().getMap("Servers").getMap(server).clone():new ObjectMap<String>();
+            info.set("Name", server);
+            info.set("Timestamp", Calendar.getInstance().getTime().getTime());
+            try {
+                if (plugin.config.get().getMap("Servers").getKeys().contains(server)) {
+                    plugin.config.get().getMap("Servers").remove(server);
+                    plugin.config.save();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            System.out.println("SubServers > Moving Files...");
+            queue(new PacketExDeleteServer(server, info, true, data -> {
+                if (data.getInt(0x0001) == 0) {
+                    servers.remove(server.toLowerCase());
+                    System.out.println("SubServers > Deleted SubServer: " + server);
+                } else {
+                    System.out.println("SubServers > Couldn't remove " + server + " from memory. See " + getName() + " console for more details");
+                }
+            }));
+            return true;
+        } else return false;
+    }
+
+    @Override
+    public boolean forceRecycleSubServer(UUID player, String name) throws InterruptedException {
+        if (Util.isNull(name)) throw new NullPointerException();
+        String server = servers.get(name.toLowerCase()).getName();
+
+        SubRemoveServerEvent event = new SubRemoveServerEvent(player, this, getSubServer(server));
+        plugin.getPluginManager().callEvent(event);
+        if (getSubServer(server).isRunning()) {
+            getSubServer(server).terminate();
+        }
+
+        System.out.println("SubServers > Saving...");
+        ObjectMap<String> info = (plugin.config.get().getMap("Servers").getKeys().contains(server))?plugin.config.get().getMap("Servers").getMap(server).clone():new ObjectMap<String>();
+        info.set("Name", server);
+        info.set("Timestamp", Calendar.getInstance().getTime().getTime());
+        try {
+            if (plugin.config.get().getMap("Servers").getKeys().contains(server)) {
+                plugin.config.get().getMap("Servers").remove(server);
+                plugin.config.save();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        System.out.println("SubServers > Moving Files...");
+        queue(new PacketExDeleteServer(server, info, true, data -> {
+            if (data.getInt(0x0001) == 0) {
+                for (String group : getSubServer(server).getGroups()) getSubServer(server).removeGroup(group);
+                servers.remove(server.toLowerCase());
+                System.out.println("SubServers > Deleted SubServer: " + server);
+            } else {
+                System.out.println("SubServers > Couldn't remove " + server + " from memory. See " + getName() + " console for more details");
             }
         }));
         return true;
@@ -210,12 +286,12 @@ public class ExternalHost extends Host implements ClientHandler {
             }
 
             System.out.println("SubServers > Saving...");
-            YAMLSection info = (plugin.config.get().getSection("Servers").getKeys().contains(server))?plugin.config.get().getSection("Servers").getSection(server).clone():new YAMLSection();
+            ObjectMap<String> info = (plugin.config.get().getMap("Servers").getKeys().contains(server))?plugin.config.get().getMap("Servers").getMap(server).clone():new ObjectMap<String>();
             info.set("Name", server);
             info.set("Timestamp", Calendar.getInstance().getTime().getTime());
             try {
-                if (plugin.config.get().getSection("Servers").getKeys().contains(server)) {
-                    plugin.config.get().getSection("Servers").remove(server);
+                if (plugin.config.get().getMap("Servers").getKeys().contains(server)) {
+                    plugin.config.get().getMap("Servers").remove(server);
                     plugin.config.save();
                 }
             } catch (Exception e) {
@@ -223,8 +299,8 @@ public class ExternalHost extends Host implements ClientHandler {
             }
 
             System.out.println("SubServers > Removing Files...");
-            queue(new PacketExDeleteServer(server, info, data -> {
-                if (data.getInt("r") == 0) {
+            queue(new PacketExDeleteServer(server, info, false, data -> {
+                if (data.getInt(0x0001) == 0) {
                     servers.remove(server.toLowerCase());
                     System.out.println("SubServers > Deleted SubServer: " + server);
                 } else {
@@ -247,12 +323,12 @@ public class ExternalHost extends Host implements ClientHandler {
         }
 
         System.out.println("SubServers > Saving...");
-        YAMLSection info = (plugin.config.get().getSection("Servers").getKeys().contains(server))?plugin.config.get().getSection("Servers").getSection(server).clone():new YAMLSection();
+        ObjectMap<String> info = (plugin.config.get().getMap("Servers").getKeys().contains(server))?plugin.config.get().getMap("Servers").getMap(server).clone():new ObjectMap<String>();
         info.set("Name", server);
         info.set("Timestamp", Calendar.getInstance().getTime().getTime());
         try {
-            if (plugin.config.get().getSection("Servers").getKeys().contains(server)) {
-                plugin.config.get().getSection("Servers").remove(server);
+            if (plugin.config.get().getMap("Servers").getKeys().contains(server)) {
+                plugin.config.get().getMap("Servers").remove(server);
                 plugin.config.save();
             }
         } catch (Exception e) {
@@ -260,8 +336,8 @@ public class ExternalHost extends Host implements ClientHandler {
         }
 
         System.out.println("SubServers > Removing Files...");
-        queue(new PacketExDeleteServer(server, info, data -> {
-            if (data.getInt("r") == 0) {
+        queue(new PacketExDeleteServer(server, info, false, data -> {
+            if (data.getInt(0x0001) == 0) {
                 for (String group : getSubServer(server).getGroups()) getSubServer(server).removeGroup(group);
                 servers.remove(server.toLowerCase());
                 System.out.println("SubServers > Deleted SubServer: " + server);

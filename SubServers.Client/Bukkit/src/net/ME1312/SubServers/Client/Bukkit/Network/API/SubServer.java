@@ -1,8 +1,9 @@
 package net.ME1312.SubServers.Client.Bukkit.Network.API;
 
-import net.ME1312.SubServers.Client.Bukkit.Library.Callback;
-import net.ME1312.SubServers.Client.Bukkit.Library.Config.YAMLSection;
-import net.ME1312.SubServers.Client.Bukkit.Library.Util;
+import net.ME1312.Galaxi.Library.Callback.Callback;
+import net.ME1312.Galaxi.Library.Map.ObjectMap;
+import net.ME1312.Galaxi.Library.Util;
+import net.ME1312.SubData.Client.SubDataClient;
 import net.ME1312.SubServers.Client.Bukkit.Network.Packet.*;
 import net.ME1312.SubServers.Client.Bukkit.SubAPI;
 
@@ -20,6 +21,7 @@ public class SubServer extends Server {
         NONE,
         RESTART,
         REMOVE_SERVER,
+        RECYCLE_SERVER,
         DELETE_SERVER;
 
         @Override
@@ -33,7 +35,7 @@ public class SubServer extends Server {
      *
      * @param raw JSON representation of the Server
      */
-    public SubServer(YAMLSection raw) {
+    public SubServer(ObjectMap<String> raw) {
         super(raw);
     }
 
@@ -43,7 +45,7 @@ public class SubServer extends Server {
      * @param host Host
      * @param raw JSON representation of the Server
      */
-    SubServer(Host host, YAMLSection raw) {
+    SubServer(Host host, ObjectMap<String> raw) {
         super(raw);
         this.host = host;
     }
@@ -69,9 +71,9 @@ public class SubServer extends Server {
     public void start(UUID player, Callback<Integer> response) {
         if (Util.isNull(response)) throw new NullPointerException();
         StackTraceElement[] origin = new Exception().getStackTrace();
-        SubAPI.getInstance().getSubDataNetwork().sendPacket(new PacketStartServer(player, getName(), data -> {
+        ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()).sendPacket(new PacketStartServer(player, getName(), data -> {
             try {
-                response.run(data.getInt("r"));
+                response.run(data.getInt(0x0001));
             } catch (Throwable e) {
                 Throwable ew = new InvocationTargetException(e);
                 ew.setStackTrace(origin);
@@ -114,9 +116,9 @@ public class SubServer extends Server {
     public void stop(UUID player, Callback<Integer> response) {
         if (Util.isNull(response)) throw new NullPointerException();
         StackTraceElement[] origin = new Exception().getStackTrace();
-        SubAPI.getInstance().getSubDataNetwork().sendPacket(new PacketStopServer(player, getName(), false, data -> {
+        ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()).sendPacket(new PacketStopServer(player, getName(), false, data -> {
             try {
-                response.run(data.getInt("r"));
+                response.run(data.getInt(0x0001));
             } catch (Throwable e) {
                 Throwable ew = new InvocationTargetException(e);
                 ew.setStackTrace(origin);
@@ -159,9 +161,9 @@ public class SubServer extends Server {
     public void terminate(UUID player, Callback<Integer> response) {
         if (Util.isNull(response)) throw new NullPointerException();
         StackTraceElement[] origin = new Exception().getStackTrace();
-        SubAPI.getInstance().getSubDataNetwork().sendPacket(new PacketStopServer(player, getName(), true, data -> {
+        ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()).sendPacket(new PacketStopServer(player, getName(), true, data -> {
             try {
-                response.run(data.getInt("r"));
+                response.run(data.getInt(0x0001));
             } catch (Throwable e) {
                 Throwable ew = new InvocationTargetException(e);
                 ew.setStackTrace(origin);
@@ -205,9 +207,9 @@ public class SubServer extends Server {
     public void command(UUID player, String command, Callback<Integer> response) {
         if (Util.isNull(command, response)) throw new NullPointerException();
         StackTraceElement[] origin = new Exception().getStackTrace();
-        SubAPI.getInstance().getSubDataNetwork().sendPacket(new PacketCommandServer(player, getName(), command, data -> {
+        ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()).sendPacket(new PacketCommandServer(player, getName(), command, data -> {
             try {
-                response.run(data.getInt("r"));
+                response.run(data.getInt(0x0001));
             } catch (Throwable e) {
                 Throwable ew = new InvocationTargetException(e);
                 ew.setStackTrace(origin);

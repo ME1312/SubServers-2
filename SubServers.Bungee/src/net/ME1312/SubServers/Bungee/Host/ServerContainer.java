@@ -1,24 +1,23 @@
 package net.ME1312.SubServers.Bungee.Host;
 
+import net.ME1312.SubData.Server.DataClient;
+import net.ME1312.SubData.Server.SubDataClient;
 import net.ME1312.SubServers.Bungee.Event.SubEditServerEvent;
 import net.ME1312.SubServers.Bungee.Event.SubNetworkConnectEvent;
 import net.ME1312.SubServers.Bungee.Event.SubNetworkDisconnectEvent;
-import net.ME1312.SubServers.Bungee.Library.Config.YAMLSection;
-import net.ME1312.SubServers.Bungee.Library.Config.YAMLValue;
+import net.ME1312.Galaxi.Library.Map.ObjectMap;
+import net.ME1312.Galaxi.Library.Map.ObjectMapValue;
 import net.ME1312.SubServers.Bungee.Library.Exception.InvalidServerException;
-import net.ME1312.SubServers.Bungee.Library.NamedContainer;
-import net.ME1312.SubServers.Bungee.Library.Util;
-import net.ME1312.SubServers.Bungee.Network.Client;
+import net.ME1312.Galaxi.Library.NamedContainer;
+import net.ME1312.Galaxi.Library.Util;
+import net.ME1312.SubServers.Bungee.Network.Packet.PacketOutExRunEvent;
 import net.ME1312.SubServers.Bungee.Network.Packet.PacketOutExUpdateWhitelist;
-import net.ME1312.SubServers.Bungee.Network.Packet.PacketOutRunEvent;
-import net.ME1312.SubServers.Bungee.Network.SubDataServer;
 import net.ME1312.SubServers.Bungee.SubAPI;
 import net.ME1312.SubServers.Bungee.SubPlugin;
 import net.md_5.bungee.BungeeServerInfo;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
-import java.lang.reflect.Field;
 import java.net.InetSocketAddress;
 import java.util.*;
 
@@ -26,8 +25,8 @@ import java.util.*;
  * Server Class
  */
 public class ServerContainer extends BungeeServerInfo implements Server {
-    private YAMLSection extra = new YAMLSection();
-    private Client client = null;
+    private ObjectMap<String> extra = new ObjectMap<String>();
+    private SubDataClient client = null;
     private String nick = null;
     private List<String> groups = new ArrayList<String>();
     private List<UUID> whitelist = new ArrayList<UUID>();
@@ -39,25 +38,25 @@ public class ServerContainer extends BungeeServerInfo implements Server {
         if (Util.isNull(name, address, motd, hidden, restricted)) throw new NullPointerException();
         if (name.contains(" ")) throw new InvalidServerException("Server names cannot have spaces: " + name);
         signature = SubAPI.getInstance().signAnonymousObject();
-        SubDataServer.allowConnection(getAddress().getAddress().getHostAddress());
+        SubAPI.getInstance().getSubDataNetwork().getProtocol().whitelist(getAddress().getAddress().getHostAddress());
         this.hidden = hidden;
     }
 
     @Override
-    public Client getSubData() {
+    public DataClient getSubData() {
         return client;
     }
 
     @Override
-    public void setSubData(Client client) {
-        this.client = client;
+    public void setSubData(DataClient client) {
+        this.client = (SubDataClient) client;
         for (Proxy proxy : SubAPI.getInstance().getProxies().values()) if (proxy.getSubData() != null) {
-            YAMLSection args = new YAMLSection();
+            ObjectMap<String> args = new ObjectMap<String>();
             args.set("server", getName());
             if (client != null) args.set("address", client.getAddress().toString());
-            proxy.getSubData().sendPacket(new PacketOutRunEvent((client != null)?SubNetworkConnectEvent.class:SubNetworkDisconnectEvent.class, args));
+            ((SubDataClient) proxy.getSubData()).sendPacket(new PacketOutExRunEvent((client != null)?SubNetworkConnectEvent.class:SubNetworkDisconnectEvent.class, args));
         }
-        if (client != null && (client.getHandler() == null || !equals(client.getHandler()))) client.setHandler(this);
+        if (client != null && (client.getHandler() == null || !equals(client.getHandler()))) ((SubDataClient) client).setHandler(this);
     }
 
     @Override
@@ -175,14 +174,14 @@ public class ServerContainer extends BungeeServerInfo implements Server {
     public void whitelist(UUID player) {
         if (Util.isNull(player)) throw new NullPointerException();
         whitelist.add(player);
-        for (Proxy proxy : SubAPI.getInstance().getProxies().values()) if (proxy.getSubData() != null) proxy.getSubData().sendPacket(new PacketOutExUpdateWhitelist(getName(), true, player));
+        for (Proxy proxy : SubAPI.getInstance().getProxies().values()) if (proxy.getSubData() != null) ((SubDataClient) proxy.getSubData()).sendPacket(new PacketOutExUpdateWhitelist(getName(), true, player));
     }
 
     @Override
     public void unwhitelist(UUID player) {
         if (Util.isNull(player)) throw new NullPointerException();
         whitelist.remove(player);
-        for (Proxy proxy : SubAPI.getInstance().getProxies().values()) if (proxy.getSubData() != null) proxy.getSubData().sendPacket(new PacketOutExUpdateWhitelist(getName(), false, player));
+        for (Proxy proxy : SubAPI.getInstance().getProxies().values()) if (proxy.getSubData() != null) ((SubDataClient) proxy.getSubData()).sendPacket(new PacketOutExUpdateWhitelist(getName(), false, player));
     }
 
     @Override
@@ -203,13 +202,13 @@ public class ServerContainer extends BungeeServerInfo implements Server {
     }
 
     @Override
-    public YAMLValue getExtra(String handle) {
+    public ObjectMapValue getExtra(String handle) {
         if (Util.isNull(handle)) throw new NullPointerException();
         return extra.get(handle);
     }
 
     @Override
-    public YAMLSection getExtra() {
+    public ObjectMap<String> getExtra() {
         return extra.clone();
     }
 
@@ -220,8 +219,8 @@ public class ServerContainer extends BungeeServerInfo implements Server {
     }
 
     @Override
-    public String toString() {
-        YAMLSection info = new YAMLSection();
+    public ObjectMap<String> forSubData() {
+        ObjectMap<String> info = new ObjectMap<String>();
         info.set("type", "Server");
         info.set("name", getName());
         info.set("display", getDisplayName());
@@ -231,17 +230,16 @@ public class ServerContainer extends BungeeServerInfo implements Server {
         info.set("whitelist", whitelist);
         info.set("restricted", isRestricted());
         info.set("hidden", isHidden());
-        if (getSubData() != null) info.set("subdata", getSubData().getAddress().toString());
-        YAMLSection players = new YAMLSection();
+        ObjectMap<String> players = new ObjectMap<String>();
         for (NamedContainer<String, UUID> player : getGlobalPlayers()) {
-            YAMLSection pinfo = new YAMLSection();
+            ObjectMap<String> pinfo = new ObjectMap<String>();
             pinfo.set("name", player.name());
             players.set(player.get().toString(), pinfo);
         }
         info.set("players", players);
-        if (getSubData() != null) info.set("subdata", getSubData().getAddress().toString());
+        if (getSubData() != null) info.set("subdata", getSubData().getID());
         info.set("signature", signature);
         info.set("extra", getExtra());
-        return info.toJSON();
+        return info;
     }
 }

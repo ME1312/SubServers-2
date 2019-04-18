@@ -1,13 +1,15 @@
 package net.ME1312.SubServers.Bungee.Host;
 
+import net.ME1312.SubData.Server.DataClient;
+import net.ME1312.SubData.Server.SerializableClientHandler;
+import net.ME1312.SubData.Server.SubDataClient;
 import net.ME1312.SubServers.Bungee.Event.SubRemoveProxyEvent;
-import net.ME1312.SubServers.Bungee.Library.Config.YAMLSection;
-import net.ME1312.SubServers.Bungee.Library.Config.YAMLValue;
-import net.ME1312.SubServers.Bungee.Library.ExtraDataHandler;
-import net.ME1312.SubServers.Bungee.Library.NamedContainer;
-import net.ME1312.SubServers.Bungee.Library.Util;
-import net.ME1312.SubServers.Bungee.Network.Client;
-import net.ME1312.SubServers.Bungee.Network.ClientHandler;
+import net.ME1312.Galaxi.Library.Map.ObjectMap;
+import net.ME1312.Galaxi.Library.Map.ObjectMapValue;
+import net.ME1312.Galaxi.Library.ExtraDataHandler;
+import net.ME1312.Galaxi.Library.NamedContainer;
+import net.ME1312.Galaxi.Library.Util;
+import net.ME1312.SubData.Server.ClientHandler;
 import net.ME1312.SubServers.Bungee.SubAPI;
 import net.ME1312.SubServers.Bungee.SubPlugin;
 import net.md_5.bungee.api.ProxyServer;
@@ -17,11 +19,11 @@ import java.util.*;
 /**
  * Proxy Class
  */
-public class Proxy implements ClientHandler, ExtraDataHandler {
-    private YAMLSection extra = new YAMLSection();
+public class Proxy implements SerializableClientHandler, ExtraDataHandler {
+    private ObjectMap<String> extra = new ObjectMap<String>();
     private final String signature;
     private boolean persistent = true;
-    private Client client = null;
+    private SubDataClient client = null;
     private String nick = null;
     private final String name;
 
@@ -37,19 +39,19 @@ public class Proxy implements ClientHandler, ExtraDataHandler {
     }
 
     @Override
-    public Client getSubData() {
+    public DataClient getSubData() {
         return client;
     }
 
     @Override
     @SuppressWarnings("deprecation")
-    public void setSubData(Client client) {
-        this.client = client;
+    public void setSubData(DataClient client) {
+        this.client = (SubDataClient) client;
         if (client == null && !persistent) {
             ProxyServer.getInstance().getPluginManager().callEvent(new SubRemoveProxyEvent(this));
             SubAPI.getInstance().getInternals().proxies.remove(getName().toLowerCase());
         }
-        if (client != null && (client.getHandler() == null || !equals(client.getHandler()))) client.setHandler(this);
+        if (client != null && (client.getHandler() == null || !equals(client.getHandler()))) ((SubDataClient) client).setHandler(this);
     }
 
     /**
@@ -134,13 +136,13 @@ public class Proxy implements ClientHandler, ExtraDataHandler {
     }
 
     @Override
-    public YAMLValue getExtra(String handle) {
+    public ObjectMapValue getExtra(String handle) {
         if (Util.isNull(handle)) throw new NullPointerException();
         return extra.get(handle);
     }
 
     @Override
-    public YAMLSection getExtra() {
+    public ObjectMap<String> getExtra() {
         return extra.clone();
     }
 
@@ -151,22 +153,22 @@ public class Proxy implements ClientHandler, ExtraDataHandler {
     }
 
     @Override
-    public String toString() {
-        YAMLSection info = new YAMLSection();
+    public ObjectMap<String> forSubData() {
+        ObjectMap<String> info = new ObjectMap<String>();
         info.set("type", "Proxy");
         info.set("name", getName());
         info.set("display", getDisplayName());
-        YAMLSection players = new YAMLSection();
+        ObjectMap<String> players = new ObjectMap<String>();
         for (NamedContainer<String, UUID> player : getPlayers()) {
-            YAMLSection pinfo = new YAMLSection();
+            ObjectMap<String> pinfo = new ObjectMap<String>();
             pinfo.set("name", player.name());
             players.set(player.get().toString(), pinfo);
         }
         info.set("players", players);
         info.set("redis", isRedis());
-        if (getSubData() != null) info.set("subdata", getSubData().getAddress().toString());
+        if (getSubData() != null) info.set("subdata", getSubData().getID());
         info.set("signature", signature);
         info.set("extra", getExtra());
-        return info.toJSON();
+        return info;
     }
 }

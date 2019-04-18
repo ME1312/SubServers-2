@@ -1,18 +1,18 @@
 package net.ME1312.SubServers.Bungee;
 
 import com.google.common.collect.Range;
+import net.ME1312.SubData.Server.DataServer;
 import net.ME1312.SubServers.Bungee.Event.SubAddHostEvent;
 import net.ME1312.SubServers.Bungee.Event.SubAddServerEvent;
 import net.ME1312.SubServers.Bungee.Event.SubRemoveHostEvent;
 import net.ME1312.SubServers.Bungee.Event.SubRemoveServerEvent;
 import net.ME1312.SubServers.Bungee.Host.*;
-import net.ME1312.SubServers.Bungee.Library.Container;
 import net.ME1312.SubServers.Bungee.Library.Exception.InvalidHostException;
-import net.ME1312.SubServers.Bungee.Library.NamedContainer;
-import net.ME1312.SubServers.Bungee.Library.UniversalFile;
-import net.ME1312.SubServers.Bungee.Library.Util;
-import net.ME1312.SubServers.Bungee.Library.Version.Version;
-import net.ME1312.SubServers.Bungee.Network.SubDataServer;
+import net.ME1312.Galaxi.Library.NamedContainer;
+import net.ME1312.Galaxi.Library.UniversalFile;
+import net.ME1312.Galaxi.Library.Util;
+import net.ME1312.Galaxi.Library.Version.Version;
+import net.ME1312.SubData.Server.SubDataServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.protocol.ProtocolConstants;
 
@@ -87,7 +87,7 @@ public final class SubAPI {
      *
      * @return SubData Network Manager
      */
-    public SubDataServer getSubDataNetwork() {
+    public DataServer getSubDataNetwork() {
         return plugin.subdata;
     }
 

@@ -6,7 +6,7 @@ import net.ME1312.SubServers.Bungee.Event.SubStartEvent;
 import net.ME1312.SubServers.Bungee.Host.Host;
 import net.ME1312.SubServers.Bungee.Host.SubCreator;
 import net.ME1312.SubServers.Bungee.Host.SubServer;
-import net.ME1312.SubServers.Bungee.Library.Config.YAMLConfig;
+import net.ME1312.Galaxi.Library.Config.YAMLConfig;
 import net.ME1312.SubServers.Bungee.SubAPI;
 import net.ME1312.SubServers.Bungee.SubPlugin;
 import net.ME1312.SubServers.Console.Library.Metrics;

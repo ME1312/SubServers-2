@@ -1,15 +1,14 @@
 package net.ME1312.SubServers.Console;
 
+import net.ME1312.Galaxi.Library.Callback.Callback;
 import net.ME1312.SubServers.Bungee.Host.Host;
 import net.ME1312.SubServers.Bungee.Host.SubServer;
-import net.ME1312.SubServers.Bungee.Library.Callback;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
 import net.md_5.bungee.command.ConsoleCommandSender;
 
 import java.util.List;
-import java.util.Map;
 
 @SuppressWarnings("unchecked")
 public final class ConsoleCommand {

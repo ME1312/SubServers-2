@@ -1,11 +1,12 @@
 package net.ME1312.SubServers.Client.Bukkit;
 
+import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.SubServers.Client.Bukkit.Graphic.UIRenderer;
-import net.ME1312.SubServers.Client.Bukkit.Library.Callback;
-import net.ME1312.SubServers.Client.Bukkit.Library.Config.YAMLSection;
-import net.ME1312.SubServers.Client.Bukkit.Library.Container;
-import net.ME1312.SubServers.Client.Bukkit.Library.Util;
-import net.ME1312.SubServers.Client.Bukkit.Library.Version.Version;
+import net.ME1312.Galaxi.Library.Callback.Callback;
+import net.ME1312.Galaxi.Library.Config.YAMLSection;
+import net.ME1312.Galaxi.Library.Container;
+import net.ME1312.Galaxi.Library.Util;
+import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubServers.Client.Bukkit.Network.API.*;
 import net.ME1312.SubServers.Client.Bukkit.Network.Packet.*;
 import org.bukkit.Bukkit;
@@ -40,8 +41,6 @@ public final class SubCommand implements CommandExecutor {
         } else if (plugin.lang == null) {
             new IllegalStateException("There are no lang options available at this time").printStackTrace();
             if (!(sender instanceof ConsoleCommandSender)) sender.sendMessage(ChatColor.RED + "An exception has occurred while running this command");
-        } else if (!(sender instanceof ConsoleCommandSender || plugin.config.get().getSection("Settings").getBoolean("Ingame-Access", true))) {
-            sender.sendMessage(plugin.api.getLang("SubServers", "Command.Generic.Invalid-Permission").replace("$str$", "subservers.command"));
         } else {
             if (sender.hasPermission("subservers.command")) {
                 if (args.length > 0) {
@@ -87,7 +86,7 @@ public final class SubCommand implements CommandExecutor {
 
                                 Version updversion = plugin.version;
                                 int updcount = 0;
-                                for (YAMLSection tag : tags.getSectionList("tags")) versions.add(Version.fromString(tag.getString("ref").substring(10)));
+                                for (ObjectMap<String> tag : tags.getMapList("tags")) versions.add(Version.fromString(tag.getString("ref").substring(10)));
                                 Collections.sort(versions);
                                 for (Version version : versions) {
                                     if (version.compareTo(updversion) > 0) {
@@ -122,7 +121,7 @@ public final class SubCommand implements CommandExecutor {
                                             if (!(server instanceof SubServer)) {
                                                 message += ChatColor.WHITE;
                                             } else if (((SubServer) server).isRunning()) {
-                                                if (((SubServer) server).getStopAction() == SubServer.StopAction.REMOVE_SERVER || ((SubServer) server).getStopAction() == SubServer.StopAction.DELETE_SERVER) {
+                                                if (((SubServer) server).getStopAction() == SubServer.StopAction.REMOVE_SERVER || ((SubServer) server).getStopAction() == SubServer.StopAction.RECYCLE_SERVER || ((SubServer) server).getStopAction() == SubServer.StopAction.DELETE_SERVER) {
                                                     message += ChatColor.AQUA;
                                                 } else {
                                                     message += ChatColor.GREEN;
@@ -132,7 +131,7 @@ public final class SubCommand implements CommandExecutor {
                                             } else {
                                                 message += ChatColor.RED;
                                             }
-                                            message += server.getDisplayName() + " (" + ((plugin.config.get().getSection("Settings").getBoolean("Show-Addresses", false))?server.getAddress().getAddress().getHostAddress()+':':"") + server.getAddress().getPort() + ((server.getName().equals(server.getDisplayName()))?"":ChatColor.stripColor(div)+server.getName()) + ")";
+                                            message += server.getDisplayName() + " (" + ((plugin.config.get().getMap("Settings").getBoolean("Show-Addresses", false))?server.getAddress().getAddress().getHostAddress()+':':"") + server.getAddress().getPort() + ((server.getName().equals(server.getDisplayName()))?"":ChatColor.stripColor(div)+server.getName()) + ")";
                                             i++;
                                         }
                                         if (i == 0) message += plugin.api.getLang("SubServers", "Command.List.Empty");
@@ -152,7 +151,7 @@ public final class SubCommand implements CommandExecutor {
                                         message += ChatColor.RED;
                                     }
                                     message += host.getDisplayName();
-                                    if (plugin.config.get().getSection("Settings").getBoolean("Show-Addresses", false)) {
+                                    if (plugin.config.get().getMap("Settings").getBoolean("Show-Addresses", false)) {
                                         message += " (" + host.getAddress() + ((host.getName().equals(host.getDisplayName()))?"":ChatColor.stripColor(div)+host.getName()) + ")";
                                     } else if (!host.getName().equals(host.getDisplayName())) {
                                         message += " (" + host.getName() + ")";
@@ -161,7 +160,7 @@ public final class SubCommand implements CommandExecutor {
                                     for (SubServer subserver : host.getSubServers().values()) {
                                         if (i != 0) message += div;
                                         if (subserver.isRunning()) {
-                                            if (subserver.getStopAction() == SubServer.StopAction.REMOVE_SERVER || subserver.getStopAction() == SubServer.StopAction.DELETE_SERVER) {
+                                            if (subserver.getStopAction() == SubServer.StopAction.REMOVE_SERVER || subserver.getStopAction() == SubServer.StopAction.RECYCLE_SERVER || subserver.getStopAction() == SubServer.StopAction.DELETE_SERVER) {
                                                 message += ChatColor.AQUA;
                                             } else {
                                                 message += ChatColor.GREEN;
@@ -184,7 +183,7 @@ public final class SubCommand implements CommandExecutor {
                                 String message = "  ";
                                 for (Server server : servers.values()) if (!(server instanceof SubServer)) {
                                     if (i != 0) message += div;
-                                    message += ChatColor.WHITE + server.getDisplayName() + " (" + ((plugin.config.get().getSection("Settings").getBoolean("Show-Addresses", false))?server.getAddress().getAddress().getHostAddress()+':':"") + server.getAddress().getPort() + ((server.getName().equals(server.getDisplayName()))?"":ChatColor.stripColor(div)+server.getName()) + ")";
+                                    message += ChatColor.WHITE + server.getDisplayName() + " (" + ((plugin.config.get().getMap("Settings").getBoolean("Show-Addresses", false))?server.getAddress().getAddress().getHostAddress()+':':"") + server.getAddress().getPort() + ((server.getName().equals(server.getDisplayName()))?"":ChatColor.stripColor(div)+server.getName()) + ")";
                                     i++;
                                 }
                                 if (i == 0) sender.sendMessage("  " + plugin.api.getLang("SubServers", "Command.List.Empty"));
@@ -225,7 +224,7 @@ public final class SubCommand implements CommandExecutor {
                                     }
                                     if (server.getGroups().size() > 0) sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Group" + ((server.getGroups().size() > 1)?"s":"")) + ((server.getGroups().size() > 1)?"":ChatColor.WHITE + server.getGroups().get(0)));
                                     if (server.getGroups().size() > 1) for (String group : server.getGroups()) sender.sendMessage("    " + plugin.api.getLang("SubServers", "Command.Info.List") + ChatColor.WHITE + group);
-                                    if (plugin.config.get().getSection("Settings").getBoolean("Show-Addresses", false)) sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Address") + ChatColor.WHITE + server.getAddress().getAddress().getHostAddress()+':'+server.getAddress().getPort());
+                                    if (plugin.config.get().getMap("Settings").getBoolean("Show-Addresses", false)) sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Address") + ChatColor.WHITE + server.getAddress().getAddress().getHostAddress()+':'+server.getAddress().getPort());
                                     else sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Port") + ChatColor.AQUA.toString() + server.getAddress().getPort());
                                     if (server instanceof SubServer) sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Running") + ((((SubServer) server).isRunning())?ChatColor.GREEN+"yes":ChatColor.RED+"no"));
                                     if (!(server instanceof SubServer) || ((SubServer) server).isRunning()) {
@@ -271,7 +270,7 @@ public final class SubCommand implements CommandExecutor {
                                     if (!host.getName().equals(host.getDisplayName())) sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "System Name") + ChatColor.WHITE  + host.getName());
                                     sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Available") + ((host.isAvailable())?ChatColor.GREEN+"yes":ChatColor.RED+"no"));
                                     sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Enabled") + ((host.isEnabled())?ChatColor.GREEN+"yes":ChatColor.RED+"no"));
-                                    if (plugin.config.get().getSection("Settings").getBoolean("Show-Addresses", false)) sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Address") + ChatColor.WHITE + host.getAddress().getHostAddress());
+                                    if (plugin.config.get().getMap("Settings").getBoolean("Show-Addresses", false)) sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Address") + ChatColor.WHITE + host.getAddress().getHostAddress());
                                     if (host.getSubData() != null) sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Connected") + ChatColor.GREEN + "yes");
                                     sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "SubServers") + ((host.getSubServers().keySet().size() <= 0)?ChatColor.GRAY + "(none)":ChatColor.AQUA.toString() + host.getSubServers().keySet().size()));
                                     for (SubServer subserver : host.getSubServers().values()) sender.sendMessage("    " + plugin.api.getLang("SubServers", "Command.Info.List") + ((subserver.isEnabled())?ChatColor.WHITE:ChatColor.GRAY) + subserver.getDisplayName() + ((subserver.getName().equals(subserver.getDisplayName()))?"":" ("+subserver.getName()+')'));
@@ -335,7 +334,7 @@ public final class SubCommand implements CommandExecutor {
                         if (args.length > 1) {
                             if (sender.hasPermission("subservers.subserver.start.*") || sender.hasPermission("subservers.subserver.start." + args[1].toLowerCase())) {
                                 plugin.subdata.sendPacket(new PacketStartServer((sender instanceof Player)?((Player) sender).getUniqueId():null, args[1], data -> {
-                                    switch (data.getInt("r")) {
+                                    switch (data.getInt(0x0001)) {
                                         case 3:
                                             sender.sendMessage(plugin.api.getLang("SubServers", "Command.Start.Unknown"));
                                             break;
@@ -355,10 +354,8 @@ public final class SubCommand implements CommandExecutor {
                                             sender.sendMessage(plugin.api.getLang("SubServers", "Command.Start.Running"));
                                             break;
                                         case 9:
-                                            sender.sendMessage(plugin.api.getLang("SubServers", "Command.Start.Server-Incompatible").replace("$str$", data.getString("m").split(":\\s")[1]));
+                                            sender.sendMessage(plugin.api.getLang("SubServers", "Command.Start.Server-Incompatible").replace("$str$", data.getString(0x0002)));
                                             break;
-                                        default:
-                                            Bukkit.getLogger().warning("SubData > PacketStartServer(" + ((sender instanceof Player)?((Player) sender).getUniqueId().toString():"null") + ", " + args[1] + ") responded with: " + data.getString("m"));
                                         case 0:
                                         case 1:
                                             sender.sendMessage(plugin.api.getLang("SubServers", "Command.Start"));
@@ -375,7 +372,7 @@ public final class SubCommand implements CommandExecutor {
                         if (args.length > 1) {
                             if ((sender.hasPermission("subservers.subserver.stop.*") || sender.hasPermission("subservers.subserver.stop." + args[1].toLowerCase())) && (sender.hasPermission("subservers.subserver.start.*") || sender.hasPermission("subservers.subserver.start." + args[1].toLowerCase()))) {
                                 Runnable starter = () -> plugin.subdata.sendPacket(new PacketStartServer(null, args[1], data -> {
-                                    switch (data.getInt("r")) {
+                                    switch (data.getInt(0x0001)) {
                                         case 3:
                                         case 4:
                                             sender.sendMessage(plugin.api.getLang("SubServers", "Command.Restart.Disappeared"));
@@ -390,10 +387,8 @@ public final class SubCommand implements CommandExecutor {
                                             sender.sendMessage(plugin.api.getLang("SubServers", "Command.Restart.Server-Disabled"));
                                             break;
                                         case 9:
-                                            sender.sendMessage(plugin.api.getLang("SubServers", "Command.Restart.Server-Incompatible").replace("$str$", data.getString("m").split(":\\s")[1]));
+                                            sender.sendMessage(plugin.api.getLang("SubServers", "Command.Restart.Server-Incompatible"));
                                             break;
-                                        default:
-                                            Bukkit.getLogger().warning("SubData > PacketStartServer(" + ((sender instanceof Player)?((Player) sender).getUniqueId().toString():"null") + ", " + args[1] + ") responded with: " + data.getString("m"));
                                         case 8:
                                         case 0:
                                         case 1:
@@ -403,12 +398,12 @@ public final class SubCommand implements CommandExecutor {
                                 }));
 
                                 final Container<Boolean> listening = new Container<Boolean>(true);
-                                PacketInRunEvent.callback("SubStoppedEvent", new Callback<YAMLSection>() {
+                                PacketInExRunEvent.callback("SubStoppedEvent", new Callback<ObjectMap<String>>() {
                                     @Override
-                                    public void run(YAMLSection json) {
+                                    public void run(ObjectMap<String> json) {
                                         try {
                                             if (listening.get()) if (!json.getString("server").equalsIgnoreCase(args[1])) {
-                                                PacketInRunEvent.callback("SubStoppedEvent", this);
+                                                PacketInExRunEvent.callback("SubStoppedEvent", this);
                                             } else {
                                                 Bukkit.getScheduler().runTaskLater(plugin, starter, 5);
                                             }
@@ -416,9 +411,9 @@ public final class SubCommand implements CommandExecutor {
                                     }
                                 });
 
-                                Callback<YAMLSection> stopper = data -> {
-                                    if (data.getInt("r") != 0) listening.set(false);
-                                    switch (data.getInt("r")) {
+                                Callback<ObjectMap<Integer>> stopper = data -> {
+                                    if (data.getInt(0x0000) != 0) listening.set(false);
+                                    switch (data.getInt(0x0000)) {
                                         case 3:
                                             sender.sendMessage(plugin.api.getLang("SubServers", "Command.Restart.Unknown"));
                                             break;
@@ -428,8 +423,6 @@ public final class SubCommand implements CommandExecutor {
                                         case 5:
                                             starter.run();
                                             break;
-                                        default:
-                                            Bukkit.getLogger().warning("SubData > PacketStopServer(" + ((sender instanceof Player)?((Player) sender).getUniqueId().toString():"null") + ", " + args[1] + ", false) responded with: " + data.getString("m"));
                                         case 0:
                                         case 1:
                                             sender.sendMessage(plugin.api.getLang("SubServers", "Command.Restart"));
@@ -437,7 +430,7 @@ public final class SubCommand implements CommandExecutor {
                                     }
                                 };
 
-                                if (plugin.subdata.getName().equalsIgnoreCase(args[1])) {
+                                if (plugin.api.getName().equalsIgnoreCase(args[1])) {
                                     listening.set(false);
                                     plugin.subdata.sendPacket(new PacketRestartServer((sender instanceof Player)?((Player) sender).getUniqueId():null, args[1], stopper));
                                 } else {
@@ -455,7 +448,7 @@ public final class SubCommand implements CommandExecutor {
                         if (args.length > 1) {
                             if (sender.hasPermission("subservers.subserver.stop.*") || sender.hasPermission("subservers.subserver.stop." + args[1].toLowerCase())) {
                                 plugin.subdata.sendPacket(new PacketStopServer((sender instanceof Player)?((Player) sender).getUniqueId():null, args[1], false, data -> {
-                                    switch (data.getInt("r")) {
+                                    switch (data.getInt(0x0001)) {
                                         case 3:
                                             sender.sendMessage(plugin.api.getLang("SubServers", "Command.Stop.Unknown"));
                                             break;
@@ -465,8 +458,6 @@ public final class SubCommand implements CommandExecutor {
                                         case 5:
                                             sender.sendMessage(plugin.api.getLang("SubServers", "Command.Stop.Not-Running"));
                                             break;
-                                        default:
-                                            Bukkit.getLogger().warning("SubData > PacketStopServer(" + ((sender instanceof Player)?((Player) sender).getUniqueId().toString():"null") + ", " + args[1] + ", false) responded with: " + data.getString("m"));
                                         case 0:
                                         case 1:
                                             sender.sendMessage(plugin.api.getLang("SubServers", "Command.Stop"));
@@ -483,7 +474,7 @@ public final class SubCommand implements CommandExecutor {
                         if (args.length > 1) {
                             if (sender.hasPermission("subservers.subserver.terminate.*") || sender.hasPermission("subservers.subserver.terminate." + args[1].toLowerCase())) {
                                 plugin.subdata.sendPacket(new PacketStopServer((sender instanceof Player)?((Player) sender).getUniqueId():null, args[1], true, data -> {
-                                    switch (data.getInt("r")) {
+                                    switch (data.getInt(0x0001)) {
                                         case 3:
                                             sender.sendMessage(plugin.api.getLang("SubServers", "Command.Terminate.Unknown"));
                                             break;
@@ -493,8 +484,6 @@ public final class SubCommand implements CommandExecutor {
                                         case 5:
                                             sender.sendMessage(plugin.api.getLang("SubServers", "Command.Terminate.Not-Running"));
                                             break;
-                                        default:
-                                            Bukkit.getLogger().warning("SubData > PacketStopServer(" + ((sender instanceof Player)?((Player) sender).getUniqueId().toString():"null") + ", " + args[1] + ", true) responded with: " + data.getString("m"));
                                         case 0:
                                         case 1:
                                             sender.sendMessage(plugin.api.getLang("SubServers", "Command.Terminate"));
@@ -520,7 +509,7 @@ public final class SubCommand implements CommandExecutor {
                                 }
                                 final String cmd = str;
                                 plugin.subdata.sendPacket(new PacketCommandServer((sender instanceof Player)?((Player) sender).getUniqueId():null, args[1], cmd, data -> {
-                                    switch (data.getInt("r")) {
+                                    switch (data.getInt(0x0001)) {
                                         case 3:
                                             sender.sendMessage(plugin.api.getLang("SubServers", "Command.Command.Unknown"));
                                             break;
@@ -530,8 +519,6 @@ public final class SubCommand implements CommandExecutor {
                                         case 5:
                                             sender.sendMessage(plugin.api.getLang("SubServers", "Command.Command.Not-Running"));
                                             break;
-                                        default:
-                                            Bukkit.getLogger().warning("SubData > PacketCommandServer(" + ((sender instanceof Player)?((Player) sender).getUniqueId().toString():"null") + ", " + args[1] + ", /" + cmd + ") responded with: " + data.getString("m"));
                                         case 0:
                                         case 1:
                                             sender.sendMessage(plugin.api.getLang("SubServers", "Command.Command"));
@@ -545,13 +532,13 @@ public final class SubCommand implements CommandExecutor {
                             sender.sendMessage(plugin.api.getLang("SubServers", "Command.Generic.Usage").replace("$str$", label.toLowerCase() + " " + args[0].toLowerCase() + " <SubServer> <Command> [Args...]"));
                         }
                     } else if (args[0].equalsIgnoreCase("create")) {
-                        if (args.length > 4) {
+                        if (args.length > 3) {
                             if (sender.hasPermission("subservers.host.create.*") || sender.hasPermission("subservers.host.create." + args[2].toLowerCase())) {
                                 if (args.length > 5 && Util.isException(() -> Integer.parseInt(args[5]))) {
                                     sender.sendMessage(plugin.api.getLang("SubServers", "Command.Creator.Invalid-Port"));
                                 } else {
-                                    plugin.subdata.sendPacket(new PacketCreateServer((sender instanceof Player)?((Player) sender).getUniqueId():null, args[1], args[2], args[3], new Version(args[4]), (args.length > 5)?Integer.parseInt(args[5]):null, data -> {
-                                        switch (data.getInt("r")) {
+                                    plugin.subdata.sendPacket(new PacketCreateServer((sender instanceof Player)?((Player) sender).getUniqueId():null, args[1], args[2], args[3], (args.length > 4)?new Version(args[4]):null, (args.length > 5)?Integer.parseInt(args[5]):null, data -> {
+                                        switch (data.getInt(0x0001)) {
                                             case 3:
                                             case 4:
                                                 sender.sendMessage(plugin.api.getLang("SubServers", "Command.Creator.Exists"));
@@ -572,13 +559,8 @@ public final class SubCommand implements CommandExecutor {
                                                 sender.sendMessage(plugin.api.getLang("SubServers", "Command.Creator.Template-Disabled"));
                                                 break;
                                             case 10:
-                                                sender.sendMessage(plugin.api.getLang("SubServers", "Command.Creator.Invalid-Version"));
-                                                break;
-                                            case 11:
                                                 sender.sendMessage(plugin.api.getLang("SubServers", "Command.Creator.Invalid-Port"));
                                                 break;
-                                            default:
-                                                Bukkit.getLogger().warning("SubData > PacketCreateServer(" + ((sender instanceof Player)?((Player) sender).getUniqueId().toString():"null") + ", " + args[1] + ", " + args[2] + ", " + args[3] + ", " + args[4] + ", " + ((args.length > 5)?args[5]:"null") + ") responded with: " + data.getString("m"));
                                             case 0:
                                             case 1:
                                                 sender.sendMessage(plugin.api.getLang("SubServers", "Command.Creator"));
@@ -590,7 +572,7 @@ public final class SubCommand implements CommandExecutor {
                                 sender.sendMessage(plugin.api.getLang("SubServers", "Command.Generic.Invalid-Permission").replace("$str$", "subservers.host.create." + args[2].toLowerCase()));
                             }
                         } else {
-                            sender.sendMessage(plugin.api.getLang("SubServers", "Command.Generic.Usage").replace("$str$", label.toLowerCase() + " " + args[0].toLowerCase() + " <Name> <Host> <Template> <Version> <Port>"));
+                            sender.sendMessage(plugin.api.getLang("SubServers", "Command.Generic.Usage").replace("$str$", label.toLowerCase() + " " + args[0].toLowerCase() + " <Name> <Host> <Template> [Version] <Port>"));
                         }
                     } else if ((args[0].equalsIgnoreCase("view") || args[0].equalsIgnoreCase("open")) && sender instanceof Player) {
                         if (plugin.gui != null) {
@@ -672,7 +654,7 @@ public final class SubCommand implements CommandExecutor {
                 plugin.api.getLang("SubServers", "Command.Help.SubServer.Stop").replace("$str$", label.toLowerCase() + " stop <SubServer>"),
                 plugin.api.getLang("SubServers", "Command.Help.SubServer.Terminate").replace("$str$", label.toLowerCase() + " kill <SubServer>"),
                 plugin.api.getLang("SubServers", "Command.Help.SubServer.Command").replace("$str$", label.toLowerCase() + " cmd <SubServer> <Command> [Args...]"),
-                plugin.api.getLang("SubServers", "Command.Help.Host.Create").replace("$str$", label.toLowerCase() + " create <Name> <Host> <Template> <Version> [Port]"),
+                plugin.api.getLang("SubServers", "Command.Help.Host.Create").replace("$str$", label.toLowerCase() + " create <Name> <Host> <Template> [Version] [Port]"),
         };
     }
 }

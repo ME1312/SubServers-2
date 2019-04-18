@@ -1,15 +1,14 @@
 package net.ME1312.SubServers.Bungee.Host;
 
 import com.google.common.collect.Range;
-import net.ME1312.SubServers.Bungee.Library.Callback;
-import net.ME1312.SubServers.Bungee.Library.Config.YAMLSection;
+import net.ME1312.Galaxi.Library.Callback.Callback;
+import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.SubServers.Bungee.Library.Exception.InvalidTemplateException;
-import net.ME1312.SubServers.Bungee.Library.Util;
-import net.ME1312.SubServers.Bungee.Library.Version.Version;
+import net.ME1312.Galaxi.Library.Util;
+import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubServers.Bungee.SubAPI;
 
 import java.io.File;
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.*;
 
@@ -24,8 +23,8 @@ public abstract class SubCreator {
         private String icon;
         private File directory;
         private ServerType type;
-        private YAMLSection build;
-        private YAMLSection options;
+        private ObjectMap<String> build;
+        private ObjectMap<String> options;
 
         /**
          * Create a SubCreator Template
@@ -35,7 +34,7 @@ public abstract class SubCreator {
          * @param build Build Options
          * @param options Configuration Options
          */
-        public ServerTemplate(String name, boolean enabled, String icon, File directory, YAMLSection build, YAMLSection options) {
+        public ServerTemplate(String name, boolean enabled, String icon, File directory, ObjectMap<String> build, ObjectMap<String> options) {
             if (Util.isNull(name, enabled, directory, build, options)) throw new NullPointerException();
             if (name.contains(" ")) throw new InvalidTemplateException("Template names cannot have spaces: " + name);
             this.name = name;
@@ -137,7 +136,7 @@ public abstract class SubCreator {
          *
          * @return Build Options
          */
-        public YAMLSection getBuildOptions() {
+        public ObjectMap<String> getBuildOptions() {
             return build;
         }
 
@@ -146,19 +145,19 @@ public abstract class SubCreator {
          *
          * @return Configuration Options
          */
-        public YAMLSection getConfigOptions() {
+        public ObjectMap<String> getConfigOptions() {
             return options;
         }
 
-        @Override
-        public String toString() {
-            YAMLSection tinfo = new YAMLSection();
+
+        public ObjectMap<String> forSubData() {
+            ObjectMap<String> tinfo = new ObjectMap<String>();
             tinfo.set("enabled", isEnabled());
             tinfo.set("name", getName());
             tinfo.set("display", getDisplayName());
             tinfo.set("icon", getIcon());
             tinfo.set("type", getType().toString());
-            return tinfo.toJSON();
+            return tinfo;
         }
     }
     public enum ServerType {
@@ -180,7 +179,7 @@ public abstract class SubCreator {
      * @param player Player Creating
      * @param name Server Name
      * @param template Server Template
-     * @param version Server Version
+     * @param version Server Version (may be null)
      * @param port Server Port Number (null to auto-select)
      * @return Success Status
      */
@@ -192,7 +191,7 @@ public abstract class SubCreator {
      * @param player Player Creating
      * @param name Server Name
      * @param template Server Template
-     * @param version Server Version
+     * @param version Server Version (may be null)
      * @param port Server Port Number (null to auto-select)
      * @return Success Status
      */
@@ -205,7 +204,7 @@ public abstract class SubCreator {
      *
      * @param name Server Name
      * @param template Server Template
-     * @param version Server Version
+     * @param version Server Version (may be null)
      * @param port Server Port Number (null to auto-select)
      * @return Success Status
      */
@@ -218,7 +217,7 @@ public abstract class SubCreator {
      *
      * @param name Server Name
      * @param template Server Template
-     * @param version Server Version
+     * @param version Server Version (may be null)
      * @param port Server Port Number (null to auto-select)
      * @return Success Status
      */

@@ -3,11 +3,11 @@ package net.ME1312.SubServers.Bungee;
 import com.google.gson.Gson;
 import net.ME1312.SubServers.Bungee.Host.*;
 import net.ME1312.SubServers.Bungee.Library.Compatibility.CommandX;
-import net.ME1312.SubServers.Bungee.Library.Config.YAMLSection;
-import net.ME1312.SubServers.Bungee.Library.NamedContainer;
-import net.ME1312.SubServers.Bungee.Library.Util;
-import net.ME1312.SubServers.Bungee.Library.Version.Version;
-import net.ME1312.SubServers.Bungee.Network.ClientHandler;
+import net.ME1312.Galaxi.Library.Map.ObjectMap;
+import net.ME1312.Galaxi.Library.NamedContainer;
+import net.ME1312.Galaxi.Library.Util;
+import net.ME1312.Galaxi.Library.Version.Version;
+import net.ME1312.SubData.Server.ClientHandler;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -96,12 +96,12 @@ public final class SubCommand extends CommandX {
                     sender.sendMessage("");
                     new Thread(() -> {
                         try {
-                            YAMLSection tags = new YAMLSection(new Gson().fromJson("{\"tags\":" + Util.readAll(new BufferedReader(new InputStreamReader(new URL("https://api.github.com/repos/ME1312/SubServers-2/git/refs/tags").openStream(), Charset.forName("UTF-8")))) + '}', Map.class));
+                            ObjectMap<String> tags = new ObjectMap<String>(new Gson().fromJson("{\"tags\":" + Util.readAll(new BufferedReader(new InputStreamReader(new URL("https://api.github.com/repos/ME1312/SubServers-2/git/refs/tags").openStream(), Charset.forName("UTF-8")))) + '}', Map.class));
                             List<Version> versions = new LinkedList<Version>();
 
                             Version updversion = plugin.version;
                             int updcount = 0;
-                            for (YAMLSection tag : tags.getSectionList("tags")) versions.add(Version.fromString(tag.getString("ref").substring(10)));
+                            for (ObjectMap<String> tag : tags.getMapList("tags")) versions.add(Version.fromString(tag.getString("ref").substring(10)));
                             Collections.sort(versions);
                             for (Version version : versions) {
                                 if (version.compareTo(updversion) > 0) {
@@ -179,7 +179,7 @@ public final class SubCommand extends CommandX {
                                 if (!(servers.get(name.toLowerCase()) instanceof SubServer)) {
                                     message += ChatColor.WHITE;
                                 } else if (((SubServer) server).isRunning()) {
-                                    if (((SubServer) server).getStopAction() == SubServer.StopAction.REMOVE_SERVER || ((SubServer) server).getStopAction() == SubServer.StopAction.DELETE_SERVER) {
+                                    if (((SubServer) server).getStopAction() == SubServer.StopAction.REMOVE_SERVER || ((SubServer) server).getStopAction() == SubServer.StopAction.RECYCLE_SERVER || ((SubServer) server).getStopAction() == SubServer.StopAction.DELETE_SERVER) {
                                         message += ChatColor.AQUA;
                                     } else {
                                         message += ChatColor.GREEN;
@@ -212,7 +212,7 @@ public final class SubCommand extends CommandX {
                         for (SubServer subserver : host.getSubServers().values()) {
                             if (i != 0) message += div;
                             if (subserver.isRunning()) {
-                                if (subserver.getStopAction() == SubServer.StopAction.REMOVE_SERVER || subserver.getStopAction() == SubServer.StopAction.DELETE_SERVER) {
+                                if (subserver.getStopAction() == SubServer.StopAction.REMOVE_SERVER || subserver.getStopAction() == SubServer.StopAction.RECYCLE_SERVER || subserver.getStopAction() == SubServer.StopAction.DELETE_SERVER) {
                                     message += ChatColor.AQUA;
                                 } else {
                                     message += ChatColor.GREEN;
@@ -551,7 +551,7 @@ public final class SubCommand extends CommandX {
                         sender.sendMessage("SubServers > The BungeeCord library provided does not support console sudo.");
                     }
                 } else if (args[0].equalsIgnoreCase("create")) {
-                    if (args.length > 4) {
+                    if (args.length > 3) {
                         if (plugin.api.getSubServers().keySet().contains(args[1].toLowerCase()) || SubCreator.isReserved(args[1])) {
                             sender.sendMessage("SubServers > There is already a SubServer with that name");
                         } else if (!plugin.hosts.keySet().contains(args[2].toLowerCase())) {
@@ -564,15 +564,13 @@ public final class SubCommand extends CommandX {
                             sender.sendMessage("SubServers > There is no template with that name");
                         } else if (!plugin.hosts.get(args[2].toLowerCase()).getCreator().getTemplate(args[3]).isEnabled()) {
                             sender.sendMessage("SubServers > That Template is not enabled");
-                        } else if (new Version("1.8").compareTo(new Version(args[4])) > 0) {
-                            sender.sendMessage("SubServers > SubCreator cannot create servers before Minecraft 1.8");
                         } else if (args.length > 5 && (Util.isException(() -> Integer.parseInt(args[5])) || Integer.parseInt(args[5]) <= 0 || Integer.parseInt(args[5]) > 65535)) {
                             sender.sendMessage("SubServers > Invalid Port Number");
                         } else {
-                            plugin.hosts.get(args[2].toLowerCase()).getCreator().create(args[1], plugin.hosts.get(args[2].toLowerCase()).getCreator().getTemplate(args[3]), new Version(args[4]), (args.length > 5)?Integer.parseInt(args[5]):null);
+                            plugin.hosts.get(args[2].toLowerCase()).getCreator().create(args[1], plugin.hosts.get(args[2].toLowerCase()).getCreator().getTemplate(args[3]), (args.length > 4)?new Version(args[4]):null, (args.length > 5)?Integer.parseInt(args[5]):null);
                         }
                     } else {
-                        sender.sendMessage("SubServers > Usage: " + label + " " + args[0].toLowerCase() + " <Name> <Host> <Template> <Version> [Port]");
+                        sender.sendMessage("SubServers > Usage: " + label + " " + args[0].toLowerCase() + " <Name> <Host> <Template> [Version] [Port]");
                     }
                 } else if (args[0].equalsIgnoreCase("del") || args[0].equalsIgnoreCase("delete")) {
                     if (args.length > 1) {
@@ -584,7 +582,7 @@ public final class SubCommand extends CommandX {
                                 sender.sendMessage("SubServers > That Server is not a SubServer");
                             } else if (((SubServer) servers.get(args[1].toLowerCase())).isRunning()) {
                                 sender.sendMessage("SubServers > That SubServer is still running");
-                            } else if (!((SubServer) servers.get(args[1].toLowerCase())).getHost().deleteSubServer(args[1].toLowerCase())){
+                            } else if (!((SubServer) servers.get(args[1].toLowerCase())).getHost().recycleSubServer(args[1].toLowerCase())){
                                 System.out.println("SubServers > Couldn't remove server from memory.");
                             }
                         } catch (Exception e) {
@@ -620,7 +618,7 @@ public final class SubCommand extends CommandX {
                 "   Terminate Server: /sub kill <SubServer>",
                 "   Command Server: /sub cmd <SubServer> <Command> [Args...]",
                 "   Sudo Server: /sub sudo <SubServer>",
-                "   Create Server: /sub create <Name> <Host> <Template> <Version> [Port]",
+                "   Create Server: /sub create <Name> <Host> <Template> [Version] [Port]",
                 "   Remove Server: /sub delete <SubServer>",
                 "",
                 "   To see BungeeCord supplied commands, please visit:",

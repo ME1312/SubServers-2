@@ -15,6 +15,14 @@
             <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
         </repository>
         <repository>
+            <id>bungeecord-repo</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+        </repository>
+        <repository>
+            <id>me1312-repo</id>
+            <url>https://src.me1312.net/maven</url>
+        </repository>
+        <repository>
             <id>puharesource-repo</id>
             <url>https://repo.puha.io/repo/</url>
         </repository>
@@ -32,9 +40,21 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.msgpack</groupId>
-            <artifactId>msgpack-core</artifactId>
-            <version>0.8.16</version>
+            <groupId>net.md-5</groupId>
+            <artifactId>bungeecord-chat</artifactId>
+            <version>1.10-SNAPSHOT</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.ME1312.Galaxi</groupId>
+            <artifactId>GalaxiUtil</artifactId>
+            <version>19w16a</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.ME1312.SubData</groupId>
+            <artifactId>Client</artifactId>
+            <version>19w16b</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
@@ -135,6 +155,8 @@
                             <reportOutputDirectory>${basedir}/../../Javadoc/SubServers.Client.Bukkit</reportOutputDirectory>
                             <additionalOptions>-Xdoclint:none</additionalOptions>
                             <links>
+                                <link>https://src.me1312.net/jenkins/job/GalaxiEngine/javadoc/GalaxiUtil/</link>
+                                <link>https://src.me1312.net/jenkins/job/SubData/javadoc/Client/</link>
                                 <link>https://hub.spigotmc.org/javadocs/spigot/</link>
                             </links>
                         </configuration>

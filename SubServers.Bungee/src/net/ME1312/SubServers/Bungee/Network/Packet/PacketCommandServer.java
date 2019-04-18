@@ -1,13 +1,12 @@
 package net.ME1312.SubServers.Bungee.Network.Packet;
 
+import net.ME1312.SubData.Server.SubDataClient;
 import net.ME1312.SubServers.Bungee.Host.Server;
 import net.ME1312.SubServers.Bungee.Host.SubServer;
-import net.ME1312.SubServers.Bungee.Library.Config.YAMLSection;
-import net.ME1312.SubServers.Bungee.Library.Util;
-import net.ME1312.SubServers.Bungee.Library.Version.Version;
-import net.ME1312.SubServers.Bungee.Network.Client;
-import net.ME1312.SubServers.Bungee.Network.PacketIn;
-import net.ME1312.SubServers.Bungee.Network.PacketOut;
+import net.ME1312.Galaxi.Library.Map.ObjectMap;
+import net.ME1312.Galaxi.Library.Util;
+import net.ME1312.SubData.Server.Protocol.PacketObjectIn;
+import net.ME1312.SubData.Server.Protocol.PacketObjectOut;
 import net.ME1312.SubServers.Bungee.SubPlugin;
 
 import java.util.Map;
@@ -16,11 +15,10 @@ import java.util.UUID;
 /**
  * Server Command Packet
  */
-public class PacketCommandServer implements PacketIn, PacketOut {
+public class PacketCommandServer implements PacketObjectIn<Integer>, PacketObjectOut<Integer> {
     private SubPlugin plugin;
     private int response;
-    private String message;
-    private String id;
+    private UUID tracker;
 
     /**
      * New PacketCommandServer (In)
@@ -36,66 +34,67 @@ public class PacketCommandServer implements PacketIn, PacketOut {
      * New PacketCommandServer (Out)
      *
      * @param response Response ID
-     * @param message Message
-     * @param id Receiver ID
+     * @param tracker Tracker ID
      */
-    public PacketCommandServer(int response, String message, String id) {
-        if (Util.isNull(response, message)) throw new NullPointerException();
+    public PacketCommandServer(int response, UUID tracker) {
         this.response = response;
-        this.message = message;
-        this.id = id;
+        this.tracker = tracker;
     }
 
     @Override
-    public YAMLSection generate() {
-        YAMLSection data = new YAMLSection();
-        if (id != null) data.set("id", id);
-        data.set("r", response);
-        data.set("m", message);
+    public ObjectMap<Integer> send(SubDataClient client) {
+        ObjectMap<Integer> data = new ObjectMap<Integer>();
+        if (tracker != null) data.set(0x0000, tracker);
+        data.set(0x0001, response);
         return data;
     }
 
     @Override
-    public void execute(Client client, YAMLSection data) {
+    public void receive(SubDataClient client, ObjectMap<Integer> data) {
         try {
+            UUID tracker =      (data.contains(0x0000)?data.getUUID(0x0000):null);
+            String server =  data.getRawString(0x0001);
+            String command = data.getRawString(0x0002);
+            UUID player =       (data.contains(0x0003)?data.getUUID(0x0003):null);
+
             Map<String, Server> servers = plugin.api.getServers();
-            if (!data.getRawString("server").equals("*") && !servers.keySet().contains(data.getRawString("server").toLowerCase())) {
-                client.sendPacket(new PacketCommandServer(3, "There is no server with that name", (data.contains("id")) ? data.getRawString("id") : null));
-            } else if (!data.getRawString("server").equals("*") && !(servers.get(data.getRawString("server").toLowerCase()) instanceof SubServer)) {
-                client.sendPacket(new PacketCommandServer(4, "That Server is not a SubServer", (data.contains("id")) ? data.getRawString("id") : null));
-            } else if (!data.getRawString("server").equals("*") && !((SubServer) servers.get(data.getRawString("server").toLowerCase())).isRunning()) {
-                client.sendPacket(new PacketCommandServer(5, "That SubServer is not running", (data.contains("id")) ? data.getRawString("id") : null));
+            if (!server.equals("*") && !servers.keySet().contains(server.toLowerCase())) {
+                client.sendPacket(new PacketCommandServer(3, tracker));
+            } else if (!server.equals("*") && !(servers.get(server.toLowerCase()) instanceof SubServer)) {
+                client.sendPacket(new PacketCommandServer(4, tracker));
+            } else if (!server.equals("*") && !((SubServer) servers.get(server.toLowerCase())).isRunning()) {
+                client.sendPacket(new PacketCommandServer(5, tracker));
             } else {
-                if (data.getRawString("server").equals("*")) {
+                if (server.equals("*")) {
                     boolean sent = false;
-                    for (Server server : servers.values()) {
-                        if (server instanceof SubServer && ((SubServer) server).isRunning()) {
-                            if (((SubServer) server).command((data.contains("player"))?data.getUUID("player"):null, data.getRawString("command"))) {
+                    for (Server next : servers.values()) {
+                        if (next instanceof SubServer && ((SubServer) next).isRunning()) {
+                            if (((SubServer) next).command(player, command)) {
                                 sent = true;
                             }
                         }
                     }
                     if (sent) {
-                        client.sendPacket(new PacketCommandServer(0, "Sending Command", (data.contains("id")) ? data.getRawString("id") : null));
+                        client.sendPacket(new PacketCommandServer(0, tracker));
                     } else {
-                        client.sendPacket(new PacketCommandServer(1, "Couldn't send command", (data.contains("id")) ? data.getRawString("id") : null));
+                        client.sendPacket(new PacketCommandServer(1, tracker));
                     }
                 } else {
-                    if (((SubServer) servers.get(data.getRawString("server").toLowerCase())).command((data.contains("player"))?data.getUUID("player"):null, data.getRawString("command"))) {
-                        client.sendPacket(new PacketCommandServer(0, "Sending Command", (data.contains("id")) ? data.getRawString("id") : null));
+                    if (((SubServer) servers.get(server.toLowerCase())).command(player, command)) {
+                        client.sendPacket(new PacketCommandServer(0, tracker));
                     } else {
-                        client.sendPacket(new PacketCommandServer(1, "Couldn't send command", (data.contains("id")) ? data.getRawString("id") : null));
+                        client.sendPacket(new PacketCommandServer(1, tracker));
                     }
                 }
             }
         } catch (Throwable e) {
-            client.sendPacket(new PacketCommandServer(2, e.getClass().getCanonicalName() + ": " + e.getMessage(), (data.contains("id")) ? data.getRawString("id") : null));
+            client.sendPacket(new PacketCommandServer(2, tracker));
             e.printStackTrace();
         }
     }
 
     @Override
-    public Version getVersion() {
-        return new Version("2.11.0a");
+    public int version() {
+        return 0x0001;
     }
 }

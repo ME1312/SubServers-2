@@ -17,7 +17,6 @@ import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.args.GenericArguments;
-import org.spongepowered.api.command.source.ConsoleSource;
 import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.entity.living.player.Player;
@@ -116,7 +115,7 @@ public final class SubCommand implements CommandExecutor {
         } else if (plugin.lang == null) {
             throw new CommandException(Text.builder("An exception has occurred while running this command").color(TextColors.RED).build(), new IllegalStateException("There are no lang options available at this time"), false);
         } else {
-            return (sender instanceof ConsoleSource || plugin.config.get().getSection("Settings").getBoolean("Ingame-Access", true)) && sender.hasPermission("subservers.command");
+            return sender.hasPermission("subservers.command");
         }
     }
 

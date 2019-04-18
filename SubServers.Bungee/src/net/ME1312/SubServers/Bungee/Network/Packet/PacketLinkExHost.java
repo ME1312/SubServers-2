@@ -1,13 +1,12 @@
 package net.ME1312.SubServers.Bungee.Network.Packet;
 
+import net.ME1312.SubData.Server.SubDataClient;
 import net.ME1312.SubServers.Bungee.Host.Host;
-import net.ME1312.SubServers.Bungee.Library.Config.YAMLSection;
-import net.ME1312.SubServers.Bungee.Library.Util;
-import net.ME1312.SubServers.Bungee.Library.Version.Version;
-import net.ME1312.SubServers.Bungee.Network.Client;
-import net.ME1312.SubServers.Bungee.Network.ClientHandler;
-import net.ME1312.SubServers.Bungee.Network.PacketIn;
-import net.ME1312.SubServers.Bungee.Network.PacketOut;
+import net.ME1312.Galaxi.Library.Map.ObjectMap;
+import net.ME1312.Galaxi.Library.Util;
+import net.ME1312.SubData.Server.ClientHandler;
+import net.ME1312.SubData.Server.Protocol.PacketObjectIn;
+import net.ME1312.SubData.Server.Protocol.PacketObjectOut;
 import net.ME1312.SubServers.Bungee.SubPlugin;
 
 import java.util.Map;
@@ -15,10 +14,9 @@ import java.util.Map;
 /**
  * Link External Host Packet
  */
-public class PacketLinkExHost implements PacketIn, PacketOut {
+public class PacketLinkExHost implements PacketObjectIn<Integer>, PacketObjectOut<Integer> {
     private SubPlugin plugin;
     private int response;
-    private String message;
 
     /**
      * New PacketLinkExHost (In)
@@ -34,50 +32,46 @@ public class PacketLinkExHost implements PacketIn, PacketOut {
      * New PacketLinkExHost (Out)
      *
      * @param response Response ID
-     * @param message Message
      */
-    public PacketLinkExHost(int response, String message) {
-        if (Util.isNull(response, message)) throw new NullPointerException();
+    public PacketLinkExHost(int response) {
         this.response = response;
-        this.message = message;
     }
 
     @Override
-    public YAMLSection generate() {
-        YAMLSection data = new YAMLSection();
-        data.set("r", response);
-        data.set("m", message);
+    public ObjectMap<Integer> send(SubDataClient client) {
+        ObjectMap<Integer> data = new ObjectMap<Integer>();
+        data.set(0x0001, response);
         return data;
     }
 
     @Override
-    public void execute(Client client, YAMLSection data) {
+    public void receive(SubDataClient client, ObjectMap<Integer> data) {
         try {
             Map<String, Host> hosts = plugin.api.getHosts();
-            if (hosts.keySet().contains(data.getRawString("name").toLowerCase())) {
-                Host host = hosts.get(data.getRawString("name").toLowerCase());
+            if (hosts.keySet().contains(data.getRawString(0x0000).toLowerCase())) {
+                Host host = hosts.get(data.getRawString(0x0000).toLowerCase());
                 if (host instanceof ClientHandler) {
                     if (((ClientHandler) host).getSubData() == null) {
                         client.setHandler((ClientHandler) host);
                         System.out.println("SubData > " + client.getAddress().toString() + " has been defined as Host: " + host.getName());
-                        client.sendPacket(new PacketLinkExHost(0, "Definition Successful"));
+                        client.sendPacket(new PacketLinkExHost(0));
                     } else {
-                        client.sendPacket(new PacketLinkExHost(3, "Host already linked"));
+                        client.sendPacket(new PacketLinkExHost(3));
                     }
                 } else {
-                    client.sendPacket(new PacketLinkExHost(4, "That host does not support a network interface"));
+                    client.sendPacket(new PacketLinkExHost(4));
                 }
             } else {
-                client.sendPacket(new PacketLinkExHost(2, "There is no host with name: " + data.getRawString("name")));
+                client.sendPacket(new PacketLinkExHost(2));
             }
         } catch (Exception e) {
-            client.sendPacket(new PacketLinkExHost(1, e.getClass().getCanonicalName() + ": " + e.getMessage()));
+            client.sendPacket(new PacketLinkExHost(1));
             e.printStackTrace();
         }
     }
 
     @Override
-    public Version getVersion() {
-        return new Version("2.11.0a");
+    public int version() {
+        return 0x0001;
     }
 }

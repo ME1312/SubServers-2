@@ -1,16 +1,14 @@
 package net.ME1312.SubServers.Bungee.Host;
 
 import com.google.common.collect.Range;
-import com.google.gson.Gson;
-import net.ME1312.SubServers.Bungee.Library.Config.YAMLSection;
-import net.ME1312.SubServers.Bungee.Library.Config.YAMLValue;
+import net.ME1312.Galaxi.Library.Map.ObjectMap;
+import net.ME1312.Galaxi.Library.Map.ObjectMapValue;
 import net.ME1312.SubServers.Bungee.Library.Exception.InvalidHostException;
 import net.ME1312.SubServers.Bungee.Library.Exception.InvalidServerException;
-import net.ME1312.SubServers.Bungee.Library.ExtraDataHandler;
-import net.ME1312.SubServers.Bungee.Library.NamedContainer;
-import net.ME1312.SubServers.Bungee.Library.Util;
-import net.ME1312.SubServers.Bungee.Network.ClientHandler;
-import net.ME1312.SubServers.Bungee.Network.SubDataServer;
+import net.ME1312.Galaxi.Library.ExtraDataHandler;
+import net.ME1312.Galaxi.Library.Util;
+import net.ME1312.SubData.Server.ClientHandler;
+import net.ME1312.SubServers.Bungee.SubAPI;
 import net.ME1312.SubServers.Bungee.SubPlugin;
 
 import java.net.InetAddress;
@@ -21,7 +19,7 @@ import java.util.UUID;
  * Host Layout Class
  */
 public abstract class Host implements ExtraDataHandler {
-    private YAMLSection extra = new YAMLSection();
+    private ObjectMap<String> extra = new ObjectMap<String>();
     private final String signature;
     private String nick = null;
 
@@ -42,7 +40,7 @@ public abstract class Host implements ExtraDataHandler {
         if (!ports.hasLowerBound() || !ports.hasUpperBound()) throw new InvalidHostException("Port range is not bound");
         if (Util.isNull(plugin, name, enabled, ports, log, address, directory, gitBash)) throw new NullPointerException();
         signature = plugin.api.signAnonymousObject();
-        SubDataServer.allowConnection(address.getHostAddress());
+        SubAPI.getInstance().getSubDataNetwork().getProtocol().whitelist(address.getHostAddress());
     }
 
     /**
@@ -305,12 +303,50 @@ public abstract class Host implements ExtraDataHandler {
     }
 
     /**
-     * Forces the Removal of a SubServer
+     * Forces the Removal of a SubServer (will move to 'Recently Deleted')
      *
      * @param player Player Removing
      * @param name SubServer Name
      */
     public abstract boolean forceRemoveSubServer(UUID player, String name) throws InterruptedException;
+
+    /**
+     * Delete a SubServer (will move to 'Recently Deleted')
+     *
+     * @param name SubServer Name
+     * @return Success Status
+     */
+    public boolean recycleSubServer(String name) throws InterruptedException {
+        return recycleSubServer(null, name);
+    }
+
+    /**
+     * Delete a SubServer
+     *
+     * @param player Player Deleting
+     * @param name SubServer Name
+     * @return Success Status
+     */
+    public abstract boolean recycleSubServer(UUID player, String name) throws InterruptedException;
+
+    /**
+     * Forced the Deletion of a SubServer (will move to 'Recently Deleted')
+     *
+     * @param name SubServer Name
+     * @return Success Status
+     */
+    public boolean forceRecycleSubServer(String name) throws InterruptedException {
+        return forceRecycleSubServer(null, name);
+    }
+
+    /**
+     * Forces the Deletion of a SubServer (will move to 'Recently Deleted')
+     *
+     * @param player Player Deleting
+     * @param name SubServer Name
+     * @return Success Status
+     */
+    public abstract boolean forceRecycleSubServer(UUID player, String name) throws InterruptedException;
 
     /**
      * Delete a SubServer
@@ -338,7 +374,7 @@ public abstract class Host implements ExtraDataHandler {
      * @return Success Status
      */
     public boolean forceDeleteSubServer(String name) throws InterruptedException {
-        return deleteSubServer(null, name);
+        return forceDeleteSubServer(null, name);
     }
 
     /**
@@ -372,13 +408,13 @@ public abstract class Host implements ExtraDataHandler {
     }
 
     @Override
-    public YAMLValue getExtra(String handle) {
+    public ObjectMapValue getExtra(String handle) {
         if (Util.isNull(handle)) throw new NullPointerException();
         return extra.get(handle);
     }
 
     @Override
-    public YAMLSection getExtra() {
+    public ObjectMap<String> getExtra() {
         return extra.clone();
     }
 
@@ -388,10 +424,8 @@ public abstract class Host implements ExtraDataHandler {
         extra.remove(handle);
     }
 
-    @Override
-    @SuppressWarnings("unchecked")
-    public String toString() {
-        YAMLSection hinfo = new YAMLSection();
+    public ObjectMap<String> forSubData() {
+        ObjectMap<String> hinfo = new ObjectMap<String>();
         hinfo.set("type", "Host");
         hinfo.set("name", getName());
         hinfo.set("display", getDisplayName());
@@ -400,21 +434,21 @@ public abstract class Host implements ExtraDataHandler {
         hinfo.set("address", getAddress().getHostAddress());
         hinfo.set("dir", getPath());
 
-        YAMLSection cinfo = new YAMLSection();
-        YAMLSection templates = new YAMLSection();
+        ObjectMap<String> cinfo = new ObjectMap<String>();
+        ObjectMap<String> templates = new ObjectMap<String>();
         for (SubCreator.ServerTemplate template : getCreator().getTemplates().values())
-            templates.set(template.getName(), new YAMLSection(new Gson().fromJson(template.toString(), Map.class)));
+            templates.set(template.getName(), template.forSubData());
         cinfo.set("templates", templates);
         hinfo.set("creator", cinfo);
 
-        YAMLSection servers = new YAMLSection();
+        ObjectMap<String> servers = new ObjectMap<String>();
         for (SubServer server : getSubServers().values()) {
-            servers.set(server.getName(), new YAMLSection(new Gson().fromJson(server.toString(), Map.class)));
+            servers.set(server.getName(), server.forSubData());
         }
         hinfo.set("servers", servers);
-        if (this instanceof ClientHandler && ((ClientHandler) this).getSubData() != null) hinfo.set("subdata", ((ClientHandler) this).getSubData().getAddress().toString());
+        if (this instanceof ClientHandler && ((ClientHandler) this).getSubData() != null) hinfo.set("subdata", ((ClientHandler) this).getSubData().getID());
         hinfo.set("signature", signature);
         hinfo.set("extra", getExtra());
-        return hinfo.toJSON();
+        return hinfo;
     }
 }

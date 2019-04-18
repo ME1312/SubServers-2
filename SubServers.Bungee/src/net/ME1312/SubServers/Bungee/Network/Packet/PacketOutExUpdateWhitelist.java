@@ -1,16 +1,17 @@
 package net.ME1312.SubServers.Bungee.Network.Packet;
 
-import net.ME1312.SubServers.Bungee.Library.Config.YAMLSection;
-import net.ME1312.SubServers.Bungee.Library.Util;
-import net.ME1312.SubServers.Bungee.Library.Version.Version;
-import net.ME1312.SubServers.Bungee.Network.PacketOut;
+import net.ME1312.Galaxi.Library.Map.ObjectMap;
+import net.ME1312.Galaxi.Library.Util;
+import net.ME1312.Galaxi.Library.Version.Version;
+import net.ME1312.SubData.Server.Protocol.PacketObjectOut;
+import net.ME1312.SubData.Server.SubDataClient;
 
 import java.util.UUID;
 
 /**
  * Update External Whitelist Packet
  */
-public class PacketOutExUpdateWhitelist implements PacketOut {
+public class PacketOutExUpdateWhitelist implements PacketObjectOut<Integer> {
     private String name;
     private boolean mode;
     private UUID value;
@@ -30,15 +31,16 @@ public class PacketOutExUpdateWhitelist implements PacketOut {
     }
 
     @Override
-    public YAMLSection generate() {
-        YAMLSection data = new YAMLSection();
-        data.set("server", name);
-        data.set("mode", mode);
-        data.set("value", value);
+    public ObjectMap<Integer> send(SubDataClient client) {
+        ObjectMap<Integer> data = new ObjectMap<Integer>();
+        data.set(0x0000, name);
+        data.set(0x0001, mode);
+        data.set(0x0002, value);
         return data;
     }
+
     @Override
-    public Version getVersion() {
-        return new Version("2.13.2c");
+    public int version() {
+        return 0x0001;
     }
 }

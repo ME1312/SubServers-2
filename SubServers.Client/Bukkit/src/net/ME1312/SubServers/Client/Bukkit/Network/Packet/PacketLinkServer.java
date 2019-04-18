@@ -1,27 +1,19 @@
 package net.ME1312.SubServers.Client.Bukkit.Network.Packet;
 
-import net.ME1312.SubServers.Client.Bukkit.Library.Callback;
-import net.ME1312.SubServers.Client.Bukkit.Library.Config.YAMLSection;
-import net.ME1312.SubServers.Client.Bukkit.Library.Util;
-import net.ME1312.SubServers.Client.Bukkit.Library.Version.Version;
-import net.ME1312.SubServers.Client.Bukkit.Network.PacketIn;
-import net.ME1312.SubServers.Client.Bukkit.Network.PacketOut;
-import net.ME1312.SubServers.Client.Bukkit.Network.SubDataClient;
+import net.ME1312.Galaxi.Library.Map.ObjectMap;
+import net.ME1312.Galaxi.Library.Util;
+import net.ME1312.SubData.Client.Protocol.PacketObjectIn;
+import net.ME1312.SubData.Client.Protocol.PacketObjectOut;
+import net.ME1312.SubData.Client.SubDataClient;
+import net.ME1312.SubServers.Client.Bukkit.Event.SubNetworkConnectEvent;
 import net.ME1312.SubServers.Client.Bukkit.SubAPI;
 import net.ME1312.SubServers.Client.Bukkit.SubPlugin;
 import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
-import org.bukkit.event.*;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.plugin.EventExecutor;
-
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 
 /**
  * Link Server Packet
  */
-public class PacketLinkServer implements PacketIn, PacketOut, Listener {
+public class PacketLinkServer implements PacketObjectIn<Integer>, PacketObjectOut<Integer> {
     private SubPlugin plugin;
 
     /**
@@ -35,40 +27,42 @@ public class PacketLinkServer implements PacketIn, PacketOut, Listener {
     }
 
     @Override
-    public YAMLSection generate() {
-        YAMLSection json = new YAMLSection();
-        if (plugin.subdata.getName() != null) json.set("name", plugin.subdata.getName());
-        json.set("port", Bukkit.getServer().getPort());
+    public ObjectMap<Integer> send(SubDataClient client) {
+        ObjectMap<Integer> json = new ObjectMap<Integer>();
+        if (plugin.api.getName() != null) json.set(0x0000, plugin.api.getName());
+        json.set(0x0001, Bukkit.getServer().getPort());
         return json;
     }
 
     @Override
-    public void execute(YAMLSection data) {
-        if (data.getInt("r") == 0) {
+    public void receive(SubDataClient client, ObjectMap<Integer> data) {
+        if (data.getInt(0x0001) == 0) {
             try {
-                if (data.contains("n")) {
-                    Util.reflect(SubDataClient.class.getDeclaredField("name"), plugin.subdata, data.getRawString("n"));
+                if (data.contains(0x0000)) {
+                    Util.reflect(SubAPI.class.getDeclaredField("name"), plugin.api, data.getRawString(0x0000));
                 }
-                Util.reflect(SubDataClient.class.getDeclaredMethod("init"), plugin.subdata);
+                client.sendPacket(new PacketDownloadLang());
+                Bukkit.getPluginManager().callEvent(new SubNetworkConnectEvent(client));
             } catch (Exception e) {}
         } else {
-            Bukkit.getLogger().info("SubData > Could not link name with server: " + data.getRawString("m"));
+            Bukkit.getLogger().info("SubData > Could not link name with server" + ((data.contains(0x0002))?": "+data.getRawString(0x0002):'.'));
             try {
-                if (data.getInt("r") == 2) {
-                    if (!plugin.config.get().getSection("Settings").getSection("SubData").contains("Name")) {
-                        plugin.config.get().getSection("Settings").getSection("SubData").set("Name", "");
+                if (data.getInt(0x0001) == 2) {
+                    if (!plugin.config.get().getMap("Settings").getMap("SubData").contains("Name")) {
+                        plugin.config.get().getMap("Settings").getMap("SubData").set("Name", "");
                         plugin.config.save();
                     }
-                    if (plugin.config.get().getSection("Settings").getSection("SubData").getRawString("Name").length() <= 0)
+                    if (plugin.config.get().getMap("Settings").getMap("SubData").getRawString("Name").length() <= 0)
                         Bukkit.getLogger().info("SubData > Use the server \"Name\" option to override auto-linking");
                 }
             } catch (Exception e) {}
+            new IllegalStateException().printStackTrace();
             plugin.onDisable();
         }
     }
 
     @Override
-    public Version getVersion() {
-        return new Version("2.11.0a");
+    public int version() {
+        return 0x0001;
     }
 }

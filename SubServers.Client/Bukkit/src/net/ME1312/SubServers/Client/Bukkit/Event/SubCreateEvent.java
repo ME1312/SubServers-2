@@ -1,9 +1,8 @@
 package net.ME1312.SubServers.Client.Bukkit.Event;
 
 import net.ME1312.SubServers.Client.Bukkit.Library.SubEvent;
-import net.ME1312.SubServers.Client.Bukkit.Library.Util;
-import net.ME1312.SubServers.Client.Bukkit.Library.Version.Version;
-import net.ME1312.SubServers.Client.Bukkit.Network.Packet.PacketCreateServer;
+import net.ME1312.Galaxi.Library.Util;
+import net.ME1312.Galaxi.Library.Version.Version;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
@@ -31,7 +30,7 @@ public class SubCreateEvent extends Event implements SubEvent {
      * @param port Server Port Number
      */
     public SubCreateEvent(UUID player, String host, String name, String template, Version version, int port) {
-        if (Util.isNull(host, name, template, version, port)) throw new NullPointerException();
+        if (Util.isNull(host, name, template, port)) throw new NullPointerException();
         this.player = player;
         this.host = host;
         this.name = name;

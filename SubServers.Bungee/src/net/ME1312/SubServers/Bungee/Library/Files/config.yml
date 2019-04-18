@@ -7,9 +7,9 @@ Settings:
     Forward-SubData: false
     Forward-Servers: false
   SubData:
-    Address: '127.0.0.1:4391'
-    Password: 'default'
-    Encryption: 'AES'
+    Address: '0.0.0.0:4391'
+    Password: ''
+    Encryption: 'RSA/AES'
     Allowed-Connections: []
 
 Hosts:

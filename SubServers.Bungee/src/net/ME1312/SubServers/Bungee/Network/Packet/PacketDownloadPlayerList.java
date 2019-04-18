@@ -1,12 +1,11 @@
 package net.ME1312.SubServers.Bungee.Network.Packet;
 
-import net.ME1312.SubServers.Bungee.Library.Config.YAMLSection;
-import net.ME1312.SubServers.Bungee.Library.NamedContainer;
-import net.ME1312.SubServers.Bungee.Library.Util;
-import net.ME1312.SubServers.Bungee.Library.Version.Version;
-import net.ME1312.SubServers.Bungee.Network.Client;
-import net.ME1312.SubServers.Bungee.Network.PacketIn;
-import net.ME1312.SubServers.Bungee.Network.PacketOut;
+import net.ME1312.SubData.Server.SubDataClient;
+import net.ME1312.Galaxi.Library.Map.ObjectMap;
+import net.ME1312.Galaxi.Library.NamedContainer;
+import net.ME1312.Galaxi.Library.Util;
+import net.ME1312.SubData.Server.Protocol.PacketObjectIn;
+import net.ME1312.SubData.Server.Protocol.PacketObjectOut;
 import net.ME1312.SubServers.Bungee.SubPlugin;
 import net.md_5.bungee.api.config.ServerInfo;
 
@@ -15,9 +14,9 @@ import java.util.UUID;
 /**
  * Download Player List Packet
  */
-public class PacketDownloadPlayerList implements PacketIn, PacketOut {
+public class PacketDownloadPlayerList implements PacketObjectIn<Integer>, PacketObjectOut<Integer> {
     private SubPlugin plugin;
-    private String id;
+    private UUID tracker;
 
     /**
      * New PacketDownloadPlayerList (In)
@@ -33,22 +32,22 @@ public class PacketDownloadPlayerList implements PacketIn, PacketOut {
      * New PacketDownloadPlayerList (Out)
      *
      * @param plugin SubPlugin
-     * @param id Receiver ID
+     * @param tracker Receiver ID
      */
-    public PacketDownloadPlayerList(SubPlugin plugin, String id) {
+    public PacketDownloadPlayerList(SubPlugin plugin, UUID tracker) {
         if (Util.isNull(plugin)) throw new NullPointerException();
         this.plugin = plugin;
-        this.id = id;
+        this.tracker = tracker;
     }
 
-    @Override
     @SuppressWarnings("unchecked")
-    public YAMLSection generate() {
-        YAMLSection data = new YAMLSection();
-        if (id != null) data.set("id", id);
-        YAMLSection players = new YAMLSection();
+    @Override
+    public ObjectMap<Integer> send(SubDataClient client) {
+        ObjectMap<Integer> data = new ObjectMap<Integer>();
+        if (tracker != null) data.set(0x0000, tracker);
+        ObjectMap<String> players = new ObjectMap<String>();
         for (NamedContainer<String, UUID> player : plugin.api.getGlobalPlayers()) {
-            YAMLSection pinfo = new YAMLSection();
+            ObjectMap<String> pinfo = new ObjectMap<String>();
             pinfo.set("name", player.get());
             if (plugin.redis != null) {
                 try {
@@ -61,17 +60,17 @@ public class PacketDownloadPlayerList implements PacketIn, PacketOut {
             }
             players.set(player.get().toString(), pinfo);
         }
-        data.set("players", players);
+        data.set(0x0001, players);
         return data;
     }
 
     @Override
-    public void execute(Client client, YAMLSection data) {
-        client.sendPacket(new PacketDownloadPlayerList(plugin, (data != null && data.contains("id"))?data.getRawString("id"):null));
+    public void receive(SubDataClient client, ObjectMap<Integer> data) {
+        client.sendPacket(new PacketDownloadPlayerList(plugin, (data.contains(0x0000))?data.getUUID(0x0000):null));
     }
 
     @Override
-    public Version getVersion() {
-        return new Version("2.11.0a");
+    public int version() {
+        return 0x0001;
     }
 }

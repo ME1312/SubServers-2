@@ -1,7 +1,7 @@
 package net.ME1312.SubServers.Bungee.Library.Compatibility;
 
 import com.google.common.io.Resources;
-import net.ME1312.SubServers.Bungee.Library.UniversalFile;
+import net.ME1312.Galaxi.Library.UniversalFile;
 import net.ME1312.SubServers.Bungee.SubAPI;
 
 import java.io.FileNotFoundException;

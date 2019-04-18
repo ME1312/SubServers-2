@@ -3,22 +3,26 @@ package net.ME1312.SubServers.Bungee;
 import com.dosse.upnp.UPnP;
 import com.google.common.collect.Range;
 import com.google.gson.Gson;
-import net.ME1312.SubServers.Bungee.Event.SubAddProxyEvent;
-import net.ME1312.SubServers.Bungee.Event.SubRemoveProxyEvent;
-import net.ME1312.SubServers.Bungee.Event.SubStoppedEvent;
+import net.ME1312.Galaxi.Library.Map.ObjectMap;
+import net.ME1312.Galaxi.Library.NamedContainer;
+import net.ME1312.Galaxi.Library.UniversalFile;
+import net.ME1312.Galaxi.Library.Util;
+import net.ME1312.SubData.Server.*;
+import net.ME1312.SubData.Server.Encryption.AES;
+import net.ME1312.SubData.Server.Encryption.RSA;
+import net.ME1312.SubServers.Bungee.Event.*;
 import net.ME1312.SubServers.Bungee.Host.*;
 import net.ME1312.SubServers.Bungee.Library.*;
-import net.ME1312.SubServers.Bungee.Library.Config.YAMLConfig;
-import net.ME1312.SubServers.Bungee.Library.Config.YAMLSection;
+import net.ME1312.Galaxi.Library.Config.YAMLConfig;
+import net.ME1312.Galaxi.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Bungee.Library.Exception.InvalidHostException;
 import net.ME1312.SubServers.Bungee.Library.Exception.InvalidServerException;
-import net.ME1312.SubServers.Bungee.Library.Version.Version;
-import net.ME1312.SubServers.Bungee.Network.Cipher;
-import net.ME1312.SubServers.Bungee.Network.ClientHandler;
-import net.ME1312.SubServers.Bungee.Network.Packet.PacketOutReload;
-import net.ME1312.SubServers.Bungee.Network.SubDataServer;
+import net.ME1312.Galaxi.Library.Version.Version;
+import net.ME1312.SubServers.Bungee.Network.Packet.PacketOutExReload;
+import net.ME1312.SubServers.Bungee.Network.SubProtocol;
 import net.md_5.bungee.BungeeCord;
 import net.md_5.bungee.BungeeServerInfo;
+import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ServerPing;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.config.ListenerInfo;
@@ -32,10 +36,10 @@ import java.lang.reflect.InvocationTargetException;
 import java.math.BigInteger;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.net.SocketException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.security.SecureRandom;
 import java.text.DecimalFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -57,6 +61,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
     private YAMLConfig bungeeconfig;
     public YAMLConfig langconfig;
     public final SubAPI api = new SubAPI(this);
+    public SubDataProtocol subprotocol;
     public SubDataServer subdata = null;
     public SubServer sudo = null;
     public static final Version version = Version.fromString("2.13.2d");
@@ -89,7 +94,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
         if (!(new UniversalFile(dir, "config.yml").exists())) {
             Util.copyFromJar(SubPlugin.class.getClassLoader(), "net/ME1312/SubServers/Bungee/Library/Files/config.yml", new UniversalFile(dir, "config.yml").getPath());
             System.out.println("SubServers > Created ~/SubServers/config.yml");
-        } else if (((new YAMLConfig(new UniversalFile(dir, "config.yml"))).get().getSection("Settings").getVersion("Version", new Version(0))).compareTo(new Version("2.11.2a+")) != 0) {
+        } else if (((new YAMLConfig(new UniversalFile(dir, "config.yml"))).get().getMap("Settings").getVersion("Version", new Version(0))).compareTo(new Version("2.11.2a+")) != 0) {
             Files.move(new UniversalFile(dir, "config.yml").toPath(), new UniversalFile(dir, "config.old" + Math.round(Math.random() * 100000) + ".yml").toPath());
 
             Util.copyFromJar(SubPlugin.class.getClassLoader(), "net/ME1312/SubServers/Bungee/Library/Files/config.yml", new UniversalFile(dir, "config.yml").getPath());
@@ -191,15 +196,17 @@ public final class SubPlugin extends BungeeCord implements Listener {
         getPluginManager().registerListener(null, this);
 
         System.out.println("SubServers > Pre-Parsing Config...");
-        for (String name : config.get().getSection("Servers").getKeys()) {
+        for (String name : config.get().getMap("Servers").getKeys()) {
             try {
-                if (Util.getCaseInsensitively(config.get().getSection("Hosts").get(), config.get().getSection("Servers").getSection(name).getString("Host")) == null) throw new InvalidServerException("There is no host with this name: " + config.get().getSection("Servers").getSection(name).getString("Host"));
-                legServers.put(name, new BungeeServerInfo(name, new InetSocketAddress(InetAddress.getByName((String) ((Map<String, ?>) Util.getCaseInsensitively(config.get().getSection("Hosts").get(), config.get().getSection("Servers").getSection(name).getString("Host"))).get("Address")), config.get().getSection("Servers").getSection(name).getInt("Port")), config.get().getSection("Servers").getSection(name).getColoredString("Motd", '&'), config.get().getSection("Servers").getSection(name).getBoolean("Restricted")));
+                if (Util.getCaseInsensitively(config.get().getMap("Hosts").get(), config.get().getMap("Servers").getMap(name).getString("Host")) == null) throw new InvalidServerException("There is no host with this name: " + config.get().getMap("Servers").getMap(name).getString("Host"));
+                legServers.put(name, new BungeeServerInfo(name, new InetSocketAddress(InetAddress.getByName((String) ((Map<String, ?>) Util.getCaseInsensitively(config.get().getMap("Hosts").get(), config.get().getMap("Servers").getMap(name).getString("Host"))).get("Address")), config.get().getMap("Servers").getMap(name).getInt("Port")),
+                        ChatColor.translateAlternateColorCodes('&', config.get().getMap("Servers").getMap(name).getString("Motd")), config.get().getMap("Servers").getMap(name).getBoolean("Restricted")));
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
 
+        subprotocol = SubProtocol.get();
         System.out.println("SubServers > Loading BungeeCord Libraries...");
     }
 
@@ -214,7 +221,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
             reload();
 
             if (UPnP.isUPnPAvailable()) {
-                if (config.get().getSection("Settings").getSection("UPnP", new YAMLSection()).getBoolean("Forward-Proxy", true)) for (ListenerInfo listener : getConfig().getListeners()) {
+                if (config.get().getMap("Settings").getMap("UPnP", new ObjectMap<String>()).getBoolean("Forward-Proxy", true)) for (ListenerInfo listener : getConfig().getListeners()) {
                     UPnP.openPortTCP(listener.getHost().getPort());
                 }
             } else {
@@ -247,34 +254,62 @@ public final class SubPlugin extends BungeeCord implements Listener {
         YAMLSection prevconfig = config.get();
         config.reload();
         langconfig.reload();
-        for (String key : langconfig.get().getSection("Lang").getKeys())
-            api.setLang("SubServers", key, langconfig.get().getSection("Lang").getColoredString(key, '&'));
+        for (String key : langconfig.get().getMap("Lang").getKeys())
+            api.setLang("SubServers", key, ChatColor.translateAlternateColorCodes('&', langconfig.get().getMap("Lang").getString(key)));
 
         if (subdata == null || // SubData Server must be reset
-                !config.get().getSection("Settings").getSection("SubData").getRawString("Address", "127.0.0.1:4391").equals(prevconfig.getSection("Settings").getSection("SubData").getRawString("Address", "127.0.0.1:4391")) ||
-                !config.get().getSection("Settings").getSection("SubData").getRawString("Encryption", "NONE").equals(prevconfig.getSection("Settings").getSection("SubData").getRawString("Encryption", "NONE"))
+                !config.get().getMap("Settings").getMap("SubData").getRawString("Address", "127.0.0.1:4391").equals(prevconfig.getMap("Settings").getMap("SubData").getRawString("Address", "127.0.0.1:4391")) ||
+                !config.get().getMap("Settings").getMap("SubData").getRawString("Encryption", "NONE").equals(prevconfig.getMap("Settings").getMap("SubData").getRawString("Encryption", "NONE"))
                 ) {
-            if (subdata != null) subdata.destroy();
+            if (subdata != null) {
+                subdata.close();
+                Util.isException(subdata::waitFor);
+            }
 
-            Cipher cipher = null;
-            if (!config.get().getSection("Settings").getSection("SubData").getRawString("Encryption", "NONE").equalsIgnoreCase("NONE")) {
-                if (config.get().getSection("Settings").getSection("SubData").getString("Password", "").length() == 0) {
-                    System.out.println("SubData > Cannot encrypt connection without a password");
-                } else if (!SubDataServer.getCiphers().keySet().contains(config.get().getSection("Settings").getSection("SubData").getRawString("Encryption").toUpperCase().replace('-', '_').replace(' ', '_'))) {
-                    System.out.println("SubData > Unknown encryption type: " + config.get().getSection("Settings").getSection("SubData").getRawString("Encryption"));
-                } else {
-                    cipher = SubDataServer.getCipher(config.get().getSection("Settings").getSection("SubData").getRawString("Encryption"));
+            subprotocol.unregisterCipher("AES");
+            subprotocol.unregisterCipher("AES-128");
+            subprotocol.unregisterCipher("AES-192");
+            subprotocol.unregisterCipher("AES-256");
+            subprotocol.unregisterCipher("RSA");
+            String cipher = config.get().getMap("Settings").getMap("SubData").getRawString("Encryption", "NULL");
+            String[] ciphers = (cipher.contains("/"))?cipher.split("/"):new String[]{cipher};
+            if (ciphers[0].equals("AES") || ciphers[0].equals("AES-128") || ciphers[0].equals("AES-192") || ciphers[0].equals("AES-256")) {
+                if (config.get().getMap("Settings").getMap("SubData").getRawString("Password", "").length() == 0) {
+                    byte[] bytes = new byte[32];
+                    new SecureRandom().nextBytes(bytes);
+                    String random = Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
+                    if (random.length() > bytes.length) random = random.substring(0, bytes.length);
+                    config.get().getMap("Settings").getMap("SubData").set("Password", random);
+                    config.save();
+                }
+
+                subprotocol.registerCipher("AES", new AES(128, config.get().getMap("Settings").getMap("SubData").getRawString("Password")));
+                subprotocol.registerCipher("AES-128", new AES(128, config.get().getMap("Settings").getMap("SubData").getRawString("Password")));
+                subprotocol.registerCipher("AES-192", new AES(192, config.get().getMap("Settings").getMap("SubData").getRawString("Password")));
+                subprotocol.registerCipher("AES-256", new AES(256, config.get().getMap("Settings").getMap("SubData").getRawString("Password")));
+
+                System.out.println("SubData > Encrypting SubData with AES:");
+                System.out.println("SubData > Use the password in config.yml to allow clients to connect");
+            } else if (ciphers[0].equals("RSA") || ciphers[0].equals("RSA-2048") || ciphers[0].equals("RSA-3072") || ciphers[0].equals("RSA-4096")) {
+                try {
+                    int length = (ciphers[0].contains("-"))?Integer.parseInt(ciphers[0].split("-")[1]):2048;
+                    subprotocol.registerCipher("RSA", new RSA(length, new UniversalFile("SubServers:Cache:private.rsa.key"), new UniversalFile("SubServers:subdata.rsa.key")));
+                    cipher = "RSA" + cipher.substring(ciphers[0].length());
+
+                    System.out.println("SubData > Encrypting SubData with RSA:");
+                    System.out.println("SubData > Copy your subdata.rsa.key to clients to allow them to connect");
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }
-            subdata = new SubDataServer(this, Integer.parseInt(config.get().getSection("Settings").getSection("SubData").getRawString("Address", "127.0.0.1:4391").split(":")[1]),
-                    (config.get().getSection("Settings").getSection("SubData").getRawString("Address", "127.0.0.1:4391").split(":")[0].equals("0.0.0.0"))?null:InetAddress.getByName(config.get().getSection("Settings").getSection("SubData").getRawString("Address", "127.0.0.1:4391").split(":")[0]),
-                    cipher);
-            System.out.println("SubServers > SubData Direct Listening on " + subdata.getServer().getLocalSocketAddress().toString());
-            loop();
+
+            System.out.println("SubData > ");
+            subdata = subprotocol.open((config.get().getMap("Settings").getMap("SubData").getRawString("Address", "127.0.0.1:4391").split(":")[0].equals("0.0.0.0"))?null:InetAddress.getByName(config.get().getMap("Settings").getMap("SubData").getRawString("Address", "127.0.0.1:4391").split(":")[0]),
+                    Integer.parseInt(config.get().getMap("Settings").getMap("SubData").getRawString("Address", "127.0.0.1:4391").split(":")[1]), cipher);
         } // Add new entries to Allowed-Connections
-        for (String s : config.get().getSection("Settings").getSection("SubData").getStringList("Allowed-Connections", new ArrayList<String>())) {
+        for (String s : config.get().getMap("Settings").getMap("SubData").getStringList("Allowed-Connections", new ArrayList<String>())) {
             try {
-                SubDataServer.allowConnection(s);
+                subdata.whitelist(s);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -310,33 +345,33 @@ public final class SubPlugin extends BungeeCord implements Listener {
 
         int hosts = 0;
         System.out.println("SubServers > "+((status)?"Rel":"L")+"oading Hosts...");
-        for (String name : config.get().getSection("Hosts").getKeys()) {
+        for (String name : config.get().getMap("Hosts").getKeys()) {
             if (!ukeys.contains(name.toLowerCase())) try {
-                if (!hostDrivers.keySet().contains(config.get().getSection("Hosts").getSection(name).getRawString("Driver").toUpperCase().replace('-', '_').replace(' ', '_'))) throw new InvalidHostException("Invalid Driver for host: " + name);
+                if (!hostDrivers.keySet().contains(config.get().getMap("Hosts").getMap(name).getRawString("Driver").toUpperCase().replace('-', '_').replace(' ', '_'))) throw new InvalidHostException("Invalid Driver for host: " + name);
                 Host host = this.hosts.get(name.toLowerCase());
                 if (host == null || // Host must be reset
-                        !hostDrivers.get(config.get().getSection("Hosts").getSection(name).getRawString("Driver").toUpperCase().replace('-', '_').replace(' ', '_')).equals(host.getClass()) ||
-                        !config.get().getSection("Hosts").getSection(name).getRawString("Address").equals(host.getAddress().getHostAddress()) ||
-                        !config.get().getSection("Hosts").getSection(name).getRawString("Directory").equals(host.getPath()) ||
-                        !config.get().getSection("Hosts").getSection(name).getRawString("Git-Bash").equals(host.getCreator().getBashDirectory())
+                        !hostDrivers.get(config.get().getMap("Hosts").getMap(name).getRawString("Driver").toUpperCase().replace('-', '_').replace(' ', '_')).equals(host.getClass()) ||
+                        !config.get().getMap("Hosts").getMap(name).getRawString("Address").equals(host.getAddress().getHostAddress()) ||
+                        !config.get().getMap("Hosts").getMap(name).getRawString("Directory").equals(host.getPath()) ||
+                        !config.get().getMap("Hosts").getMap(name).getRawString("Git-Bash").equals(host.getCreator().getBashDirectory())
                         ) {
                     if (host != null) api.forceRemoveHost(name);
-                    host = api.addHost(config.get().getSection("Hosts").getSection(name).getRawString("Driver").toLowerCase(), name, config.get().getSection("Hosts").getSection(name).getBoolean("Enabled"),
-                            Range.closed(Integer.parseInt(config.get().getSection("Hosts").getSection(name).getRawString("Port-Range", "25500-25559").split("-")[0]), Integer.parseInt(config.get().getSection("Hosts").getSection(name).getRawString("Port-Range", "25500-25559").split("-")[1])),
-                            config.get().getSection("Hosts").getSection(name).getBoolean("Log-Creator", true), InetAddress.getByName(config.get().getSection("Hosts").getSection(name).getRawString("Address")),
-                            config.get().getSection("Hosts").getSection(name).getRawString("Directory"), config.get().getSection("Hosts").getSection(name).getRawString("Git-Bash"));
+                    host = api.addHost(config.get().getMap("Hosts").getMap(name).getRawString("Driver").toLowerCase(), name, config.get().getMap("Hosts").getMap(name).getBoolean("Enabled"),
+                            Range.closed(Integer.parseInt(config.get().getMap("Hosts").getMap(name).getRawString("Port-Range", "25500-25559").split("-")[0]), Integer.parseInt(config.get().getMap("Hosts").getMap(name).getRawString("Port-Range", "25500-25559").split("-")[1])),
+                            config.get().getMap("Hosts").getMap(name).getBoolean("Log-Creator", true), InetAddress.getByName(config.get().getMap("Hosts").getMap(name).getRawString("Address")),
+                            config.get().getMap("Hosts").getMap(name).getRawString("Directory"), config.get().getMap("Hosts").getMap(name).getRawString("Git-Bash"));
                 } else { // Host wasn't reset, so check for these changes
-                    if (config.get().getSection("Hosts").getSection(name).getBoolean("Enabled") != host.isEnabled())
-                        host.setEnabled(config.get().getSection("Hosts").getSection(name).getBoolean("Enabled"));
-                    if (!config.get().getSection("Hosts").getSection(name).getRawString("Port-Range", "25500-25559").equals(prevconfig.getSection("Hosts", new YAMLSection()).getSection(name, new YAMLSection()).getRawString("Port-Range", "25500-25559")))
-                        host.getCreator().setPortRange(Range.closed(Integer.parseInt(config.get().getSection("Hosts").getSection(name).getRawString("Port-Range", "25500-25559").split("-")[0]), Integer.parseInt(config.get().getSection("Hosts").getSection(name).getRawString("Port-Range", "25500-25559").split("-")[1])));
-                    if (config.get().getSection("Hosts").getSection(name).getBoolean("Log-Creator", true) != host.getCreator().isLogging())
-                        host.getCreator().setLogging(config.get().getSection("Hosts").getSection(name).getBoolean("Log-Creator", true));
+                    if (config.get().getMap("Hosts").getMap(name).getBoolean("Enabled") != host.isEnabled())
+                        host.setEnabled(config.get().getMap("Hosts").getMap(name).getBoolean("Enabled"));
+                    if (!config.get().getMap("Hosts").getMap(name).getRawString("Port-Range", "25500-25559").equals(prevconfig.getMap("Hosts", new ObjectMap<String>()).getMap(name, new ObjectMap<String>()).getRawString("Port-Range", "25500-25559")))
+                        host.getCreator().setPortRange(Range.closed(Integer.parseInt(config.get().getMap("Hosts").getMap(name).getRawString("Port-Range", "25500-25559").split("-")[0]), Integer.parseInt(config.get().getMap("Hosts").getMap(name).getRawString("Port-Range", "25500-25559").split("-")[1])));
+                    if (config.get().getMap("Hosts").getMap(name).getBoolean("Log-Creator", true) != host.getCreator().isLogging())
+                        host.getCreator().setLogging(config.get().getMap("Hosts").getMap(name).getBoolean("Log-Creator", true));
                 } // Check for other changes
-                if (config.get().getSection("Hosts").getSection(name).getKeys().contains("Display") && ((config.get().getSection("Hosts").getSection(name).getString("Display").length() == 0 && !host.getDisplayName().equals(host.getName())) || !config.get().getSection("Hosts").getSection(name).getString("Display").equals(host.getDisplayName())))
-                    host.setDisplayName(config.get().getSection("Hosts").getSection(name).getString("Display"));
-                if (config.get().getSection("Hosts").getSection(name).getKeys().contains("Extra"))
-                    for (String extra : config.get().getSection("Hosts").getSection(name).getSection("Extra").getKeys()) host.addExtra(extra, config.get().getSection("Hosts").getSection(name).getSection("Extra").getObject(extra));
+                if (config.get().getMap("Hosts").getMap(name).getKeys().contains("Display") && ((config.get().getMap("Hosts").getMap(name).getString("Display").length() == 0 && !host.getDisplayName().equals(host.getName())) || !config.get().getMap("Hosts").getMap(name).getString("Display").equals(host.getDisplayName())))
+                    host.setDisplayName(config.get().getMap("Hosts").getMap(name).getString("Display"));
+                if (config.get().getMap("Hosts").getMap(name).getKeys().contains("Extra"))
+                    for (String extra : config.get().getMap("Hosts").getMap(name).getMap("Extra").getKeys()) host.addExtra(extra, config.get().getMap("Hosts").getMap(name).getMap("Extra").getObject(extra));
                 ukeys.add(name.toLowerCase());
                 hosts++;
             } catch (Exception e) {
@@ -348,35 +383,35 @@ public final class SubPlugin extends BungeeCord implements Listener {
         int servers = 0;
         System.out.println("SubServers > "+((status)?"Rel":"L")+"oading Servers...");
         bungeeconfig.reload();
-        for (String name : bungeeconfig.get().getSection("servers").getKeys()) {
+        for (String name : bungeeconfig.get().getMap("servers").getKeys()) {
             if (!ukeys.contains(name.toLowerCase())) try {
                 Server server = api.getServer(name);
                 if (server == null || !(server instanceof SubServer)) {
                     if (server == null || // Server must be reset
-                            bungeeconfig.get().getSection("servers").getSection(name).getRawString("address").equals(server.getAddress().getAddress().getHostAddress() + ':' + server.getAddress().getPort())
+                            bungeeconfig.get().getMap("servers").getMap(name).getRawString("address").equals(server.getAddress().getAddress().getHostAddress() + ':' + server.getAddress().getPort())
                     ) {
                         if (server != null) api.forceRemoveServer(name);
-                        server = api.addServer(name, InetAddress.getByName(bungeeconfig.get().getSection("servers").getSection(name).getRawString("address").split(":")[0]),
-                                Integer.parseInt(bungeeconfig.get().getSection("servers").getSection(name).getRawString("address").split(":")[1]), bungeeconfig.get().getSection("servers").getSection(name).getColoredString("motd", '&'),
-                                bungeeconfig.get().getSection("servers").getSection(name).getBoolean("hidden", false), bungeeconfig.get().getSection("servers").getSection(name).getBoolean("restricted"));
+                        server = api.addServer(name, InetAddress.getByName(bungeeconfig.get().getMap("servers").getMap(name).getRawString("address").split(":")[0]),
+                                Integer.parseInt(bungeeconfig.get().getMap("servers").getMap(name).getRawString("address").split(":")[1]), ChatColor.translateAlternateColorCodes('&', bungeeconfig.get().getMap("servers").getMap(name).getString("motd")),
+                                bungeeconfig.get().getMap("servers").getMap(name).getBoolean("hidden", false), bungeeconfig.get().getMap("servers").getMap(name).getBoolean("restricted"));
                     } else { // Server wasn't reset, so check for these changes
-                        if (!bungeeconfig.get().getSection("servers").getSection(name).getColoredString("motd", '&').equals(server.getMotd()))
-                            server.setMotd(bungeeconfig.get().getSection("servers").getSection(name).getColoredString("motd", '&'));
-                        if (bungeeconfig.get().getSection("servers").getSection(name).getBoolean("hidden", false) != server.isHidden())
-                            server.setHidden(bungeeconfig.get().getSection("servers").getSection(name).getBoolean("hidden", false));
-                        if (bungeeconfig.get().getSection("servers").getSection(name).getBoolean("restricted") != server.isRestricted())
-                            server.setRestricted(bungeeconfig.get().getSection("servers").getSection(name).getBoolean("restricted"));
+                        if (!ChatColor.translateAlternateColorCodes('&', bungeeconfig.get().getMap("servers").getMap(name).getString("motd")).equals(server.getMotd()))
+                            server.setMotd(ChatColor.translateAlternateColorCodes('&', bungeeconfig.get().getMap("servers").getMap(name).getString("motd")));
+                        if (bungeeconfig.get().getMap("servers").getMap(name).getBoolean("hidden", false) != server.isHidden())
+                            server.setHidden(bungeeconfig.get().getMap("servers").getMap(name).getBoolean("hidden", false));
+                        if (bungeeconfig.get().getMap("servers").getMap(name).getBoolean("restricted") != server.isRestricted())
+                            server.setRestricted(bungeeconfig.get().getMap("servers").getMap(name).getBoolean("restricted"));
                     } // Check for other changes
-                    if (bungeeconfig.get().getSection("servers").getSection(name).getKeys().contains("display") && ((bungeeconfig.get().getSection("servers").getSection(name).getRawString("display").length() == 0 && !server.getDisplayName().equals(server.getName())) || !bungeeconfig.get().getSection("servers").getSection(name).getRawString("display").equals(server.getDisplayName())))
-                        server.setDisplayName(bungeeconfig.get().getSection("servers").getSection(name).getString("display"));
-                    if (bungeeconfig.get().getSection("servers").getSection(name).getKeys().contains("group")) {
+                    if (bungeeconfig.get().getMap("servers").getMap(name).getKeys().contains("display") && ((bungeeconfig.get().getMap("servers").getMap(name).getRawString("display").length() == 0 && !server.getDisplayName().equals(server.getName())) || !bungeeconfig.get().getMap("servers").getMap(name).getRawString("display").equals(server.getDisplayName())))
+                        server.setDisplayName(bungeeconfig.get().getMap("servers").getMap(name).getString("display"));
+                    if (bungeeconfig.get().getMap("servers").getMap(name).getKeys().contains("group")) {
                         for (String group : server.getGroups()) server.removeGroup(group);
-                        for (String group : bungeeconfig.get().getSection("servers").getSection(name).getStringList("group")) server.addGroup(group);
+                        for (String group : bungeeconfig.get().getMap("servers").getMap(name).getStringList("group")) server.addGroup(group);
                     }
-                    if (bungeeconfig.get().getSection("servers").getSection(name).getKeys().contains("extra"))
-                        for (String extra : config.get().getSection("servers").getSection(name).getSection("extra").getKeys()) server.addExtra(extra, config.get().getSection("servers").getSection(name).getSection("extra").getObject(extra));
+                    if (bungeeconfig.get().getMap("servers").getMap(name).getKeys().contains("extra"))
+                        for (String extra : config.get().getMap("servers").getMap(name).getMap("extra").getKeys()) server.addExtra(extra, config.get().getMap("servers").getMap(name).getMap("extra").getObject(extra));
                     if (server.getSubData() != null)
-                        server.getSubData().sendPacket(new PacketOutReload(null));
+                        ((SubDataClient) server.getSubData()).sendPacket(new PacketOutExReload(null));
                     ukeys.add(name.toLowerCase());
                     servers++;
                 }
@@ -400,43 +435,43 @@ public final class SubPlugin extends BungeeCord implements Listener {
         }, "SubServers.Bungee::System_Shutdown"));
         running = true;
         List<String> autorun = new LinkedList<String>();
-        for (String name : config.get().getSection("Servers").getKeys()) {
+        for (String name : config.get().getMap("Servers").getKeys()) {
             if (!ukeys.contains(name.toLowerCase())) try {
-                if (!this.hosts.keySet().contains(config.get().getSection("Servers").getSection(name).getString("Host").toLowerCase())) throw new InvalidServerException("There is no host with this name: " + config.get().getSection("Servers").getSection(name).getString("Host"));
+                if (!this.hosts.keySet().contains(config.get().getMap("Servers").getMap(name).getString("Host").toLowerCase())) throw new InvalidServerException("There is no host with this name: " + config.get().getMap("Servers").getMap(name).getString("Host"));
                 if (exServers.keySet().contains(name.toLowerCase())) {
                     exServers.remove(name.toLowerCase());
                     servers--;
                 }
                 SubServer server = api.getSubServer(name);
                 if (server != null && server.isEditable()) { // Server can edit() (May be reset depending on change severity)
-                    YAMLSection edits = new YAMLSection();
-                    if (config.get().getSection("Servers").getSection(name).getBoolean("Enabled") != server.isEnabled())
-                        edits.set("enabled", config.get().getSection("Servers").getSection(name).getBoolean("Enabled"));
-                    if (config.get().getSection("Servers").getSection(name).getKeys().contains("Display") && ((config.get().getSection("Servers").getSection(name).getRawString("Display").length() == 0 && !server.getDisplayName().equals(server.getName())) || !config.get().getSection("Servers").getSection(name).getRawString("Display").equals(server.getDisplayName())))
-                        edits.set("display", config.get().getSection("Servers").getSection(name).getRawString("Display"));
-                    if (!config.get().getSection("Servers").getSection(name).getString("Host").equalsIgnoreCase(server.getHost().getName()))
-                        edits.set("host", config.get().getSection("Servers").getSection(name).getRawString("Host"));
-                    if (!config.get().getSection("Servers").getSection(name).getStringList("Group").equals(server.getGroups()))
-                        edits.set("group", config.get().getSection("Servers").getSection(name).getRawStringList("Group"));
-                    if (config.get().getSection("Servers").getSection(name).getInt("Port") != server.getAddress().getPort())
-                        edits.set("port", config.get().getSection("Servers").getSection(name).getInt("Port"));
-                    if (!config.get().getSection("Servers").getSection(name).getColoredString("Motd", '&').equals(server.getMotd()))
-                        edits.set("motd", config.get().getSection("Servers").getSection(name).getRawString("Motd"));
-                    if (config.get().getSection("Servers").getSection(name).getBoolean("Log") != server.isLogging())
-                        edits.set("log", config.get().getSection("Servers").getSection(name).getBoolean("Log"));
-                    if (!config.get().getSection("Servers").getSection(name).getRawString("Directory").equals(server.getPath()))
-                        edits.set("dir", config.get().getSection("Servers").getSection(name).getRawString("Directory"));
-                    if (!config.get().getSection("Servers").getSection(name).getRawString("Executable").equals(server.getExecutable()))
-                        edits.set("exec", config.get().getSection("Servers").getSection(name).getRawString("Executable"));
-                    if (!config.get().getSection("Servers").getSection(name).getRawString("Stop-Command").equals(server.getStopCommand()))
-                        edits.set("stop-cmd", config.get().getSection("Servers").getSection(name).getRawString("Stop-Command"));
-                    SubServer.StopAction action = Util.getDespiteException(() -> SubServer.StopAction.valueOf(config.get().getSection("Servers").getSection(name).getRawString("Stop-Action", "NONE").toUpperCase().replace('-', '_').replace(' ', '_')), null);
+                    ObjectMap<String> edits = new ObjectMap<String>();
+                    if (config.get().getMap("Servers").getMap(name).getBoolean("Enabled") != server.isEnabled())
+                        edits.set("enabled", config.get().getMap("Servers").getMap(name).getBoolean("Enabled"));
+                    if (config.get().getMap("Servers").getMap(name).getKeys().contains("Display") && ((config.get().getMap("Servers").getMap(name).getRawString("Display").length() == 0 && !server.getDisplayName().equals(server.getName())) || !config.get().getMap("Servers").getMap(name).getRawString("Display").equals(server.getDisplayName())))
+                        edits.set("display", config.get().getMap("Servers").getMap(name).getRawString("Display"));
+                    if (!config.get().getMap("Servers").getMap(name).getString("Host").equalsIgnoreCase(server.getHost().getName()))
+                        edits.set("host", config.get().getMap("Servers").getMap(name).getRawString("Host"));
+                    if (!config.get().getMap("Servers").getMap(name).getStringList("Group").equals(server.getGroups()))
+                        edits.set("group", config.get().getMap("Servers").getMap(name).getRawStringList("Group"));
+                    if (config.get().getMap("Servers").getMap(name).getInt("Port") != server.getAddress().getPort())
+                        edits.set("port", config.get().getMap("Servers").getMap(name).getInt("Port"));
+                    if (!(ChatColor.translateAlternateColorCodes('&', config.get().getMap("Servers").getMap(name).getString("Motd")).equals(server.getMotd())))
+                        edits.set("motd", config.get().getMap("Servers").getMap(name).getRawString("Motd"));
+                    if (config.get().getMap("Servers").getMap(name).getBoolean("Log") != server.isLogging())
+                        edits.set("log", config.get().getMap("Servers").getMap(name).getBoolean("Log"));
+                    if (!config.get().getMap("Servers").getMap(name).getRawString("Directory").equals(server.getPath()))
+                        edits.set("dir", config.get().getMap("Servers").getMap(name).getRawString("Directory"));
+                    if (!config.get().getMap("Servers").getMap(name).getRawString("Executable").equals(server.getExecutable()))
+                        edits.set("exec", config.get().getMap("Servers").getMap(name).getRawString("Executable"));
+                    if (!config.get().getMap("Servers").getMap(name).getRawString("Stop-Command").equals(server.getStopCommand()))
+                        edits.set("stop-cmd", config.get().getMap("Servers").getMap(name).getRawString("Stop-Command"));
+                    SubServer.StopAction action = Util.getDespiteException(() -> SubServer.StopAction.valueOf(config.get().getMap("Servers").getMap(name).getRawString("Stop-Action", "NONE").toUpperCase().replace('-', '_').replace(' ', '_')), null);
                     if (action != null && action != server.getStopAction())
                         edits.set("stop-action", action.toString());
-                    if (config.get().getSection("Servers").getSection(name).getBoolean("Restricted") != server.isRestricted())
-                        edits.set("restricted", config.get().getSection("Servers").getSection(name).getBoolean("Restricted"));
-                    if (config.get().getSection("Servers").getSection(name).getBoolean("Hidden") != server.isHidden())
-                        edits.set("hidden", config.get().getSection("Servers").getSection(name).getBoolean("Hidden"));
+                    if (config.get().getMap("Servers").getMap(name).getBoolean("Restricted") != server.isRestricted())
+                        edits.set("restricted", config.get().getMap("Servers").getMap(name).getBoolean("Restricted"));
+                    if (config.get().getMap("Servers").getMap(name).getBoolean("Hidden") != server.isHidden())
+                        edits.set("hidden", config.get().getMap("Servers").getMap(name).getBoolean("Hidden"));
 
 
                     if (edits.getKeys().size() > 0) {
@@ -445,43 +480,43 @@ public final class SubPlugin extends BungeeCord implements Listener {
                     }
                 } else { // Server cannot edit()
                     if (server == null ||  // Server must be reset
-                            !config.get().getSection("Servers").getSection(name).getString("Host").equalsIgnoreCase(server.getHost().getName()) ||
-                            config.get().getSection("Servers").getSection(name).getInt("Port") != server.getAddress().getPort() ||
-                            !config.get().getSection("Servers").getSection(name).getRawString("Directory").equals(server.getPath()) ||
-                            !config.get().getSection("Servers").getSection(name).getRawString("Executable").equals(server.getExecutable())
+                            !config.get().getMap("Servers").getMap(name).getString("Host").equalsIgnoreCase(server.getHost().getName()) ||
+                            config.get().getMap("Servers").getMap(name).getInt("Port") != server.getAddress().getPort() ||
+                            !config.get().getMap("Servers").getMap(name).getRawString("Directory").equals(server.getPath()) ||
+                            !config.get().getMap("Servers").getMap(name).getRawString("Executable").equals(server.getExecutable())
                             ) {
                             if (server != null) server.getHost().forceRemoveSubServer(name);
-                            server = this.hosts.get(config.get().getSection("Servers").getSection(name).getString("Host").toLowerCase()).addSubServer(name, config.get().getSection("Servers").getSection(name).getBoolean("Enabled"),
-                                    config.get().getSection("Servers").getSection(name).getInt("Port"), config.get().getSection("Servers").getSection(name).getColoredString("Motd", '&'), config.get().getSection("Servers").getSection(name).getBoolean("Log"),
-                                    config.get().getSection("Servers").getSection(name).getRawString("Directory"), config.get().getSection("Servers").getSection(name).getRawString("Executable"), config.get().getSection("Servers").getSection(name).getRawString("Stop-Command"),
-                                    config.get().getSection("Servers").getSection(name).getBoolean("Hidden"), config.get().getSection("Servers").getSection(name).getBoolean("Restricted"));
+                            server = this.hosts.get(config.get().getMap("Servers").getMap(name).getString("Host").toLowerCase()).addSubServer(name, config.get().getMap("Servers").getMap(name).getBoolean("Enabled"),
+                                    config.get().getMap("Servers").getMap(name).getInt("Port"), ChatColor.translateAlternateColorCodes('&', config.get().getMap("Servers").getMap(name).getString("Motd")), config.get().getMap("Servers").getMap(name).getBoolean("Log"),
+                                    config.get().getMap("Servers").getMap(name).getRawString("Directory"), config.get().getMap("Servers").getMap(name).getRawString("Executable"), config.get().getMap("Servers").getMap(name).getRawString("Stop-Command"),
+                                    config.get().getMap("Servers").getMap(name).getBoolean("Hidden"), config.get().getMap("Servers").getMap(name).getBoolean("Restricted"));
                     } else { // Server doesn't need to reset
-                        if (config.get().getSection("Servers").getSection(name).getBoolean("Enabled") != server.isEnabled())
-                            server.setEnabled(config.get().getSection("Servers").getSection(name).getBoolean("Enabled"));
-                        if (!config.get().getSection("Servers").getSection(name).getColoredString("Motd", '&').equals(server.getMotd()))
-                            server.setMotd(config.get().getSection("Servers").getSection(name).getColoredString("Motd", '&'));
-                        if (config.get().getSection("Servers").getSection(name).getBoolean("Log") != server.isLogging())
-                            server.setLogging(config.get().getSection("Servers").getSection(name).getBoolean("Log"));
-                        if (!config.get().getSection("Servers").getSection(name).getRawString("Stop-Command").equals(server.getStopCommand()))
-                            server.setStopCommand(config.get().getSection("Servers").getSection(name).getRawString("Stop-Command"));
-                        if (config.get().getSection("Servers").getSection(name).getBoolean("Restricted") != server.isRestricted())
-                            server.setRestricted(config.get().getSection("Servers").getSection(name).getBoolean("Restricted"));
-                        if (config.get().getSection("Servers").getSection(name).getBoolean("Hidden") != server.isHidden())
-                            server.setHidden(config.get().getSection("Servers").getSection(name).getBoolean("Hidden"));
+                        if (config.get().getMap("Servers").getMap(name).getBoolean("Enabled") != server.isEnabled())
+                            server.setEnabled(config.get().getMap("Servers").getMap(name).getBoolean("Enabled"));
+                        if (!ChatColor.translateAlternateColorCodes('&', config.get().getMap("Servers").getMap(name).getString("Motd")).equals(server.getMotd()))
+                            server.setMotd(ChatColor.translateAlternateColorCodes('&', config.get().getMap("Servers").getMap(name).getString("Motd")));
+                        if (config.get().getMap("Servers").getMap(name).getBoolean("Log") != server.isLogging())
+                            server.setLogging(config.get().getMap("Servers").getMap(name).getBoolean("Log"));
+                        if (!config.get().getMap("Servers").getMap(name).getRawString("Stop-Command").equals(server.getStopCommand()))
+                            server.setStopCommand(config.get().getMap("Servers").getMap(name).getRawString("Stop-Command"));
+                        if (config.get().getMap("Servers").getMap(name).getBoolean("Restricted") != server.isRestricted())
+                            server.setRestricted(config.get().getMap("Servers").getMap(name).getBoolean("Restricted"));
+                        if (config.get().getMap("Servers").getMap(name).getBoolean("Hidden") != server.isHidden())
+                            server.setHidden(config.get().getMap("Servers").getMap(name).getBoolean("Hidden"));
                     } // Apply these changes regardless of reset
-                    SubServer.StopAction action = Util.getDespiteException(() -> SubServer.StopAction.valueOf(config.get().getSection("Servers").getSection(name).getRawString("Stop-Action", "NONE").toUpperCase().replace('-', '_').replace(' ', '_')), null);
+                    SubServer.StopAction action = Util.getDespiteException(() -> SubServer.StopAction.valueOf(config.get().getMap("Servers").getMap(name).getRawString("Stop-Action", "NONE").toUpperCase().replace('-', '_').replace(' ', '_')), null);
                     if (action != null && action != server.getStopAction())
                         server.setStopAction(action);
-                    if (!status && config.get().getSection("Servers").getSection(name).getBoolean("Run-On-Launch"))
+                    if (!status && config.get().getMap("Servers").getMap(name).getBoolean("Run-On-Launch"))
                         autorun.add(name.toLowerCase());
-                    if (config.get().getSection("Servers").getSection(name).getKeys().contains("Display") && ((config.get().getSection("Servers").getSection(name).getRawString("Display").length() == 0 && !server.getDisplayName().equals(server.getName())) || !config.get().getSection("Servers").getSection(name).getRawString("Display").equals(server.getDisplayName())))
-                        server.setDisplayName(config.get().getSection("Servers").getSection(name).getRawString("Display"));
-                    if (config.get().getSection("Servers").getSection(name).getKeys().contains("Group")) {
+                    if (config.get().getMap("Servers").getMap(name).getKeys().contains("Display") && ((config.get().getMap("Servers").getMap(name).getRawString("Display").length() == 0 && !server.getDisplayName().equals(server.getName())) || !config.get().getMap("Servers").getMap(name).getRawString("Display").equals(server.getDisplayName())))
+                        server.setDisplayName(config.get().getMap("Servers").getMap(name).getRawString("Display"));
+                    if (config.get().getMap("Servers").getMap(name).getKeys().contains("Group")) {
                         for (String group : server.getGroups()) server.removeGroup(group);
-                        for (String group : config.get().getSection("Servers").getSection(name).getStringList("Group")) server.addGroup(group);
+                        for (String group : config.get().getMap("Servers").getMap(name).getStringList("Group")) server.addGroup(group);
                     }
                 } // Apply these changes regardless of edit/reset
-                if (config.get().getSection("Servers").getSection(name).getKeys().contains("Extra")) for (String extra : config.get().getSection("Servers").getSection(name).getSection("Extra").getKeys()) server.addExtra(extra, config.get().getSection("Servers").getSection(name).getSection("Extra").getObject(extra));
+                if (config.get().getMap("Servers").getMap(name).getKeys().contains("Extra")) for (String extra : config.get().getMap("Servers").getMap(name).getMap("Extra").getKeys()) server.addExtra(extra, config.get().getMap("Servers").getMap(name).getMap("Extra").getObject(extra));
                 ukeys.add(name.toLowerCase());
                 subservers++;
             } catch (Exception e) {
@@ -490,7 +525,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
         }
         for (String name : ukeys) {
             SubServer server = api.getSubServer(name);
-            for (String oname : config.get().getSection("Servers").getSection(server.getName()).getRawStringList("Incompatible", new ArrayList<>())) {
+            for (String oname : config.get().getMap("Servers").getMap(server.getName()).getRawStringList("Incompatible", new ArrayList<>())) {
                 SubServer oserver = api.getSubServer(oname);
                 if (oserver != null && server.isCompatible(oserver)) server.toggleCompatibility(oserver);
             }
@@ -514,13 +549,13 @@ public final class SubPlugin extends BungeeCord implements Listener {
         }
 
         if (status) {
-            for (Host host : api.getHosts().values()) if (host instanceof ClientHandler && ((ClientHandler) host).getSubData() != null) ((ClientHandler) host).getSubData().sendPacket(new PacketOutReload(null));
-            for (Server server : api.getServers().values()) if (server.getSubData() != null) server.getSubData().sendPacket(new PacketOutReload(null));
+            for (Host host : api.getHosts().values()) if (host instanceof ClientHandler && ((ClientHandler) host).getSubData() != null) ((SubDataClient) ((ClientHandler) host).getSubData()).sendPacket(new PacketOutExReload(null));
+            for (Server server : api.getServers().values()) if (server.getSubData() != null) ((SubDataClient) server.getSubData()).sendPacket(new PacketOutExReload(null));
         }
 
         System.out.println("SubServers > " + ((plugins > 0)?plugins+" Plugin"+((plugins == 1)?"":"s")+", ":"") + ((proxies > 1)?proxies+" Proxies, ":"") + hosts + " Host"+((hosts == 1)?"":"s")+", " + servers + " Server"+((servers == 1)?"":"s")+", and " + subservers + " SubServer"+((subservers == 1)?"":"s")+" "+((status)?"re":"")+"loaded in " + new DecimalFormat("0.000").format((Calendar.getInstance().getTime().getTime() - begin) / 1000D) + "s");
 
-        long scd = TimeUnit.SECONDS.toMillis(config.get().getSection("Settings").getLong("Run-On-Launch-Timeout", 0L));
+        long scd = TimeUnit.SECONDS.toMillis(config.get().getMap("Settings").getLong("Run-On-Launch-Timeout", 0L));
         if (autorun.size() > 0) for (Host host : api.getHosts().values()) {
             List<String> ar = new LinkedList<String>();
             for (String name : autorun) if (host.getSubServer(name) != null) ar.add(name);
@@ -553,7 +588,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
     }
 
     private void post() {
-        if (config.get().getSection("Settings").getBoolean("Override-Bungee-Commands", true)) {
+        if (config.get().getMap("Settings").getBoolean("Override-Bungee-Commands", true)) {
             getPluginManager().registerCommand(null, SubCommand.BungeeServer.newInstance(this, "server").get());
             getPluginManager().registerCommand(null, new SubCommand.BungeeList(this, "glist"));
         }
@@ -567,12 +602,12 @@ public final class SubPlugin extends BungeeCord implements Listener {
             @Override
             public void run() {
                 try {
-                    YAMLSection tags = new YAMLSection(new Gson().fromJson("{\"tags\":" + Util.readAll(new BufferedReader(new InputStreamReader(new URL("https://api.github.com/repos/ME1312/SubServers-2/git/refs/tags").openStream(), Charset.forName("UTF-8")))) + '}', Map.class));
+                    ObjectMap<String> tags = new ObjectMap<String>(new Gson().fromJson("{\"tags\":" + Util.readAll(new BufferedReader(new InputStreamReader(new URL("https://api.github.com/repos/ME1312/SubServers-2/git/refs/tags").openStream(), Charset.forName("UTF-8")))) + '}', Map.class));
                     List<Version> versions = new LinkedList<Version>();
 
                     Version updversion = version;
                     int updcount = 0;
-                    for (YAMLSection tag : tags.getSectionList("tags")) versions.add(Version.fromString(tag.getString("ref").substring(10)));
+                    for (ObjectMap<String> tag : tags.getMapList("tags")) versions.add(Version.fromString(tag.getString("ref").substring(10)));
                     Collections.sort(versions);
                     for (Version version : versions) {
                         if (version.compareTo(updversion) > 0) {
@@ -584,18 +619,6 @@ public final class SubPlugin extends BungeeCord implements Listener {
                 } catch (Exception e) {}
             }
         }, 0, TimeUnit.DAYS.toMillis(2));
-    }
-
-    private void loop() {
-        new Thread(() -> {
-            while (subdata != null) {
-                try {
-                    subdata.addClient(subdata.getServer().accept());
-                } catch (IOException e) {
-                    if (!(e instanceof SocketException)) e.printStackTrace();
-                }
-            }
-        }, "SubServers.Bungee::SubData_Connection_Listener").start();
     }
 
     /**
@@ -621,7 +644,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
 
             shutdown();
 
-            subdata.destroy();
+            subdata.close();
 
             for (ListenerInfo listener : getConfig().getListeners()) {
                 if (UPnP.isUPnPAvailable() && UPnP.isMappedTCP(listener.getHost().getPort())) UPnP.closePortTCP(listener.getHost().getPort());

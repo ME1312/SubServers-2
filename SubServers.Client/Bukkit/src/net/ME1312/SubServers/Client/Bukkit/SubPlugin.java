@@ -1,16 +1,22 @@
 package net.ME1312.SubServers.Client.Bukkit;
 
+import net.ME1312.Galaxi.Library.Map.ObjectMap;
+import net.ME1312.SubData.Client.Encryption.AES;
+import net.ME1312.SubData.Client.Encryption.RSA;
+import net.ME1312.SubData.Client.SubDataProtocol;
+import net.ME1312.SubServers.Client.Bukkit.Event.SubNetworkDisconnectEvent;
 import net.ME1312.SubServers.Client.Bukkit.Graphic.DefaultUIHandler;
 import net.ME1312.SubServers.Client.Bukkit.Graphic.UIHandler;
-import net.ME1312.SubServers.Client.Bukkit.Library.Config.YAMLConfig;
-import net.ME1312.SubServers.Client.Bukkit.Library.Config.YAMLSection;
+import net.ME1312.Galaxi.Library.Config.YAMLConfig;
+import net.ME1312.Galaxi.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Client.Bukkit.Library.Metrics;
-import net.ME1312.SubServers.Client.Bukkit.Library.NamedContainer;
-import net.ME1312.SubServers.Client.Bukkit.Library.UniversalFile;
-import net.ME1312.SubServers.Client.Bukkit.Library.Util;
-import net.ME1312.SubServers.Client.Bukkit.Library.Version.Version;
-import net.ME1312.SubServers.Client.Bukkit.Network.Cipher;
-import net.ME1312.SubServers.Client.Bukkit.Network.SubDataClient;
+import net.ME1312.Galaxi.Library.NamedContainer;
+import net.ME1312.Galaxi.Library.UniversalFile;
+import net.ME1312.Galaxi.Library.Util;
+import net.ME1312.Galaxi.Library.Version.Version;
+import net.ME1312.SubData.Client.SubDataClient;
+import net.ME1312.SubServers.Client.Bukkit.Network.Packet.PacketLinkServer;
+import net.ME1312.SubServers.Client.Bukkit.Network.SubProtocol;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -34,6 +40,7 @@ public final class SubPlugin extends JavaPlugin {
     protected NamedContainer<Long, Map<String, Map<String, String>>> lang = null;
     public YAMLConfig config;
     public SubDataClient subdata = null;
+    public SubDataProtocol subprotocol;
 
     public UIHandler gui = null;
     public final Version version;
@@ -60,28 +67,34 @@ public final class SubPlugin extends JavaPlugin {
             if (!(new UniversalFile(getDataFolder(), "config.yml").exists())) {
                 Util.copyFromJar(SubPlugin.class.getClassLoader(), "config.yml", new UniversalFile(getDataFolder(), "config.yml").getPath());
                 Bukkit.getLogger().info("SubServers > Created ~/plugins/SubServers-Client-Bukkit/config.yml");
-            } else if (((new YAMLConfig(new UniversalFile(getDataFolder(), "config.yml"))).get().getSection("Settings").getVersion("Version", new Version(0))).compareTo(new Version("2.11.2a+")) != 0) {
+            } else if (((new YAMLConfig(new UniversalFile(getDataFolder(), "config.yml"))).get().getMap("Settings").getVersion("Version", new Version(0))).compareTo(new Version("2.11.2a+")) != 0) {
                 Files.move(new UniversalFile(getDataFolder(), "config.yml").toPath(), new UniversalFile(getDataFolder(), "config.old" + Math.round(Math.random() * 100000) + ".yml").toPath());
 
                 Util.copyFromJar(SubPlugin.class.getClassLoader(), "config.yml", new UniversalFile(getDataFolder(), "config.yml").getPath());
                 Bukkit.getLogger().info("SubServers > Updated ~/plugins/SubServers-Client-Bukkit/config.yml");
             }
             config = new YAMLConfig(new UniversalFile(getDataFolder(), "config.yml"));
-            if (new UniversalFile(new File(System.getProperty("user.dir")), "subservers.client").exists()) {
-                FileReader reader = new FileReader(new UniversalFile(new File(System.getProperty("user.dir")), "subservers.client"));
-                config.get().getSection("Settings").set("SubData", new YAMLSection(parseJSON(Util.readAll(reader))));
+            if (new UniversalFile(new File(System.getProperty("user.dir")), "subdata.json").exists()) {
+                FileReader reader = new FileReader(new UniversalFile(new File(System.getProperty("user.dir")), "subdata.json"));
+                config.get().getMap("Settings").set("SubData", new YAMLSection(parseJSON(Util.readAll(reader))));
                 config.save();
                 reader.close();
-                new UniversalFile(new File(System.getProperty("user.dir")), "subservers.client").delete();
+                new UniversalFile(new File(System.getProperty("user.dir")), "subdata.json").delete();
+            }
+            if (new UniversalFile(new File(System.getProperty("user.dir")), "subdata.rsa.key").exists()) {
+                Files.move(new UniversalFile(new File(System.getProperty("user.dir")), "subdata.rsa.key").toPath(), new UniversalFile(getDataFolder(), "subdata.rsa.key").toPath());
             }
 
+            subprotocol = SubProtocol.get();
             reload(false);
 
-            gui = new DefaultUIHandler(this);
-            SubCommand cmd = new SubCommand(this);
-            getCommand("subservers").setExecutor(cmd);
-            getCommand("subserver").setExecutor(cmd);
-            getCommand("sub").setExecutor(cmd);
+            if (config.get().getMap("Settings").getBoolean("Ingame-Access", true)) {
+                gui = new DefaultUIHandler(this);
+                SubCommand cmd = new SubCommand(this);
+                getCommand("subservers").setExecutor(cmd);
+                getCommand("subserver").setExecutor(cmd);
+                getCommand("sub").setExecutor(cmd);
+            }
 
             new Metrics(this);
             Bukkit.getScheduler().runTaskTimerAsynchronously(this, () -> {
@@ -91,7 +104,7 @@ public final class SubPlugin extends JavaPlugin {
 
                     Version updversion = version;
                     int updcount = 0;
-                    for (YAMLSection tag : tags.getSectionList("tags")) versions.add(Version.fromString(tag.getString("ref").substring(10)));
+                    for (ObjectMap<String> tag : tags.getMapList("tags")) versions.add(Version.fromString(tag.getString("ref").substring(10)));
                     Collections.sort(versions);
                     for (Version version : versions) {
                         if (version.compareTo(updversion) > 0) {
@@ -109,23 +122,37 @@ public final class SubPlugin extends JavaPlugin {
 
     public void reload(boolean notifyPlugins) throws IOException {
         if (subdata != null)
-            subdata.destroy(0);
+            subdata.close();
 
         config.reload();
 
-        Cipher cipher = null;
-        if (!config.get().getSection("Settings").getSection("SubData").getRawString("Encryption", "NONE").equalsIgnoreCase("NONE")) {
-            if (config.get().getSection("Settings").getSection("SubData").getString("Password", "").length() == 0) {
-                Bukkit.getLogger().info("SubData > Cannot encrypt connection without a password");
-            } else if (!SubDataClient.getCiphers().keySet().contains(config.get().getSection("Settings").getSection("SubData").getRawString("Encryption").toUpperCase().replace('-', '_').replace(' ', '_'))) {
-                Bukkit.getLogger().info("SubData > Unknown encryption type: " + config.get().getSection("Settings").getSection("SubData").getRawString("Encryption"));
-            } else {
-                cipher = SubDataClient.getCipher(config.get().getSection("Settings").getSection("SubData").getRawString("Encryption"));
+        subprotocol.unregisterCipher("AES");
+        subprotocol.unregisterCipher("AES-128");
+        subprotocol.unregisterCipher("AES-192");
+        subprotocol.unregisterCipher("AES-256");
+        subprotocol.unregisterCipher("RSA");
+        api.name = config.get().getMap("Settings").getMap("SubData").getString("Name", null);
+
+        if (config.get().getMap("Settings").getMap("SubData").getRawString("Password", "").length() > 0) {
+            subprotocol.registerCipher("AES", new AES(128, config.get().getMap("Settings").getMap("SubData").getRawString("Password")));
+            subprotocol.registerCipher("AES-128", new AES(128, config.get().getMap("Settings").getMap("SubData").getRawString("Password")));
+            subprotocol.registerCipher("AES-192", new AES(192, config.get().getMap("Settings").getMap("SubData").getRawString("Password")));
+            subprotocol.registerCipher("AES-256", new AES(256, config.get().getMap("Settings").getMap("SubData").getRawString("Password")));
+
+            System.out.println("SubData > AES Encryption Available");
+        }
+        if (new UniversalFile(getDataFolder(), "subdata.rsa.key").exists()) {
+            try {
+                subprotocol.registerCipher("RSA", new RSA(new UniversalFile(getDataFolder(), "subdata.rsa.key")));
+                System.out.println("SubData > RSA Encryption Available");
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
-        subdata = new SubDataClient(this, config.get().getSection("Settings").getSection("SubData").getString("Name", null),
-                InetAddress.getByName(config.get().getSection("Settings").getSection("SubData").getString("Address", "127.0.0.1:4391").split(":")[0]),
-                Integer.parseInt(config.get().getSection("Settings").getSection("SubData").getString("Address", "127.0.0.1:4391").split(":")[1]), cipher);
+
+        System.out.println("SubData > ");
+        subdata = subprotocol.open((config.get().getMap("Settings").getMap("SubData").getRawString("Address", "127.0.0.1:4391").split(":")[0].equals("0.0.0.0"))?null:InetAddress.getByName(config.get().getMap("Settings").getMap("SubData").getRawString("Address", "127.0.0.1:4391").split(":")[0]),
+                Integer.parseInt(config.get().getMap("Settings").getMap("SubData").getRawString("Address", "127.0.0.1:4391").split(":")[1]));
 
         if (notifyPlugins) {
             List<Runnable> listeners = api.reloadListeners;
@@ -147,7 +174,7 @@ public final class SubPlugin extends JavaPlugin {
     @Override
     public void onDisable() {
         if (subdata != null) try {
-            subdata.destroy(0);
+            subdata.close();
         } catch (IOException e) {
             e.printStackTrace();
         }

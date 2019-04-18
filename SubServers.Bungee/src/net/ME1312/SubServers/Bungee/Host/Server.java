@@ -1,8 +1,9 @@
 package net.ME1312.SubServers.Bungee.Host;
 
-import net.ME1312.SubServers.Bungee.Library.ExtraDataHandler;
-import net.ME1312.SubServers.Bungee.Library.NamedContainer;
-import net.ME1312.SubServers.Bungee.Network.ClientHandler;
+import net.ME1312.Galaxi.Library.ExtraDataHandler;
+import net.ME1312.Galaxi.Library.NamedContainer;
+import net.ME1312.SubData.Server.ClientHandler;
+import net.ME1312.SubData.Server.SerializableClientHandler;
 import net.md_5.bungee.api.config.ServerInfo;
 
 import java.util.Collection;
@@ -12,7 +13,7 @@ import java.util.UUID;
 /**
  * Server Interface
  */
-public interface Server extends ServerInfo, ClientHandler, ExtraDataHandler {
+public interface Server extends ServerInfo, SerializableClientHandler, ExtraDataHandler {
 
     /**
      * Get the Display Name of this Server

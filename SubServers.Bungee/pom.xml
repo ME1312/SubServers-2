@@ -28,9 +28,15 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.msgpack</groupId>
-            <artifactId>msgpack-core</artifactId>
-            <version>0.8.16</version>
+            <groupId>net.ME1312.Galaxi</groupId>
+            <artifactId>GalaxiUtil</artifactId>
+            <version>19w16a</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.ME1312.SubData</groupId>
+            <artifactId>Server</artifactId>
+            <version>19w16b</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
@@ -136,6 +142,8 @@
                             <reportOutputDirectory>${basedir}/../Javadoc/SubServers.Bungee</reportOutputDirectory>
                             <additionalOptions>-Xdoclint:none</additionalOptions>
                             <links>
+                                <link>https://src.me1312.net/jenkins/job/GalaxiEngine/javadoc/GalaxiUtil/</link>
+                                <link>https://src.me1312.net/jenkins/job/SubData/javadoc/Server/</link>
                                 <link>https://ci.md-5.net/job/BungeeCord/ws/api/target/apidocs/</link>
                             </links>
                         </configuration>

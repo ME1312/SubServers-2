@@ -1,21 +1,21 @@
 package net.ME1312.SubServers.Client.Bukkit.Network.Packet;
 
-import net.ME1312.SubServers.Client.Bukkit.Library.Config.YAMLSection;
-import net.ME1312.SubServers.Client.Bukkit.Library.NamedContainer;
-import net.ME1312.SubServers.Client.Bukkit.Library.Util;
-import net.ME1312.SubServers.Client.Bukkit.Library.Version.Version;
-import net.ME1312.SubServers.Client.Bukkit.Network.PacketIn;
-import net.ME1312.SubServers.Client.Bukkit.Network.PacketOut;
+import net.ME1312.Galaxi.Library.Map.ObjectMap;
+import net.ME1312.Galaxi.Library.NamedContainer;
+import net.ME1312.Galaxi.Library.Util;
+import net.ME1312.SubData.Client.Protocol.PacketObjectIn;
+import net.ME1312.SubData.Client.Protocol.PacketObjectOut;
+import net.ME1312.SubData.Client.Protocol.PacketOut;
+import net.ME1312.SubData.Client.SubDataClient;
 import net.ME1312.SubServers.Client.Bukkit.SubPlugin;
 import org.bukkit.Bukkit;
 
-import java.lang.reflect.Field;
 import java.util.Calendar;
 
 /**
  * Download Lang Packet
  */
-public class PacketDownloadLang implements PacketIn, PacketOut {
+public class PacketDownloadLang implements PacketObjectIn<Integer>, PacketObjectOut<Integer> {
     private SubPlugin plugin;
 
     /**
@@ -34,14 +34,14 @@ public class PacketDownloadLang implements PacketIn, PacketOut {
     public PacketDownloadLang() {}
 
     @Override
-    public YAMLSection generate() {
+    public ObjectMap<Integer> send(SubDataClient subDataClient) throws Throwable {
         return null;
     }
 
     @Override
-    public void execute(YAMLSection data) {
+    public void receive(SubDataClient client, ObjectMap<Integer> data) {
         try {
-            Util.reflect(SubPlugin.class.getDeclaredField("lang"), plugin, new NamedContainer<>(Calendar.getInstance().getTime().getTime(), data.getSection("Lang").get()));
+            Util.reflect(SubPlugin.class.getDeclaredField("lang"), plugin, new NamedContainer<>(Calendar.getInstance().getTime().getTime(), data.getObject(0x0001)));
             Bukkit.getLogger().info("SubData > Lang Settings Downloaded");
         } catch (IllegalAccessException | NoSuchFieldException e) {
             e.printStackTrace();
@@ -49,7 +49,7 @@ public class PacketDownloadLang implements PacketIn, PacketOut {
     }
 
     @Override
-    public Version getVersion() {
-        return new Version("2.11.0a");
+    public int version() {
+        return 0x0001;
     }
 }

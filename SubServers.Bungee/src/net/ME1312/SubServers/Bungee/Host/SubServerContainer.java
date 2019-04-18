@@ -1,9 +1,8 @@
 package net.ME1312.SubServers.Bungee.Host;
 
-import com.google.gson.Gson;
-import net.ME1312.SubServers.Bungee.Library.Config.YAMLSection;
+import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.SubServers.Bungee.Library.Exception.InvalidServerException;
-import net.ME1312.SubServers.Bungee.Library.NamedContainer;
+import net.ME1312.Galaxi.Library.NamedContainer;
 import net.ME1312.SubServers.Bungee.SubAPI;
 
 import java.io.File;
@@ -51,7 +50,7 @@ public abstract class SubServerContainer extends ServerContainer implements SubS
     }
 
     @Override
-    public int edit(YAMLSection edit) {
+    public int edit(ObjectMap<String> edit) {
         return edit(null, edit);
     }
 
@@ -109,8 +108,8 @@ public abstract class SubServerContainer extends ServerContainer implements SubS
 
     @SuppressWarnings({"deprecation", "unchecked"})
     @Override
-    public String toString() {
-        YAMLSection sinfo = new YAMLSection(new Gson().fromJson(super.toString(), Map.class));
+    public ObjectMap<String> forSubData() {
+        ObjectMap<String> sinfo = super.forSubData();
         sinfo.set("type", "SubServer");
         sinfo.set("host", getHost().getName());
         sinfo.set("enabled", isEnabled());
@@ -121,13 +120,13 @@ public abstract class SubServerContainer extends ServerContainer implements SubS
         sinfo.set("running", isRunning());
         sinfo.set("stop-cmd", getStopCommand());
         sinfo.set("stop-action", getStopAction().toString());
-        sinfo.set("auto-run", SubAPI.getInstance().getInternals().config.get().getSection("Servers").getSection(getName(), new YAMLSection()).getBoolean("Run-On-Launch", false));
+        sinfo.set("auto-run", SubAPI.getInstance().getInternals().config.get().getMap("Servers").getMap(getName(), new ObjectMap<String>()).getBoolean("Run-On-Launch", false));
         List<String> incompatibleCurrent = new ArrayList<String>();
         List<String> incompatible = new ArrayList<String>();
         for (SubServer server : getCurrentIncompatibilities()) incompatibleCurrent.add(server.getName());
         for (SubServer server : getIncompatibilities()) incompatible.add(server.getName());
         sinfo.set("incompatible", incompatibleCurrent);
         sinfo.set("incompatible-list", incompatible);
-        return sinfo.toJSON();
+        return sinfo;
     }
 }

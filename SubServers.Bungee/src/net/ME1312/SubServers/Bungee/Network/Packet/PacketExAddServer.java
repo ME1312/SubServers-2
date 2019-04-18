@@ -1,12 +1,11 @@
 package net.ME1312.SubServers.Bungee.Network.Packet;
 
-import net.ME1312.SubServers.Bungee.Library.Config.YAMLSection;
-import net.ME1312.SubServers.Bungee.Library.Callback;
-import net.ME1312.SubServers.Bungee.Library.Util;
-import net.ME1312.SubServers.Bungee.Library.Version.Version;
-import net.ME1312.SubServers.Bungee.Network.Client;
-import net.ME1312.SubServers.Bungee.Network.PacketIn;
-import net.ME1312.SubServers.Bungee.Network.PacketOut;
+import net.ME1312.Galaxi.Library.Map.ObjectMap;
+import net.ME1312.Galaxi.Library.Callback.Callback;
+import net.ME1312.Galaxi.Library.Util;
+import net.ME1312.SubData.Server.SubDataClient;
+import net.ME1312.SubData.Server.Protocol.PacketObjectIn;
+import net.ME1312.SubData.Server.Protocol.PacketObjectOut;
 
 import java.util.HashMap;
 import java.util.UUID;
@@ -14,8 +13,8 @@ import java.util.UUID;
 /**
  * Add Server External Host Packet
  */
-public class PacketExAddServer implements PacketIn, PacketOut {
-    private static HashMap<String, Callback<YAMLSection>[]> callbacks = new HashMap<String, Callback<YAMLSection>[]>();
+public class PacketExAddServer implements PacketObjectIn<Integer>, PacketObjectOut<Integer> {
+    private static HashMap<UUID, Callback<ObjectMap<Integer>>[]> callbacks = new HashMap<UUID, Callback<ObjectMap<Integer>>[]>();
     private String name;
     private boolean enabled;
     private int port;
@@ -24,7 +23,7 @@ public class PacketExAddServer implements PacketIn, PacketOut {
     private String executable;
     private String stopcmd;
     private UUID running;
-    private String id;
+    private UUID tracker;
 
     /**
      * New PacketExAddServer (In)
@@ -41,7 +40,7 @@ public class PacketExAddServer implements PacketIn, PacketOut {
      * @param executable Executable
      */
     @SafeVarargs
-    public PacketExAddServer(String name, boolean enabled, int port, boolean log, String directory, String executable, String stopcmd, UUID running, Callback<YAMLSection>... callback) {
+    public PacketExAddServer(String name, boolean enabled, int port, boolean log, String directory, String executable, String stopcmd, UUID running, Callback<ObjectMap<Integer>>... callback) {
         if (Util.isNull(name, enabled, log, directory, executable, callback)) throw new NullPointerException();
         this.name = name;
         this.enabled = enabled;
@@ -51,35 +50,33 @@ public class PacketExAddServer implements PacketIn, PacketOut {
         this.executable = executable;
         this.stopcmd = stopcmd;
         this.running = running;
-        this.id = Util.getNew(callbacks.keySet(), UUID::randomUUID).toString();
-        callbacks.put(id, callback);
+        this.tracker = Util.getNew(callbacks.keySet(), UUID::randomUUID);
+        callbacks.put(tracker, callback);
     }
 
     @Override
-    public YAMLSection generate() {
-        YAMLSection data = new YAMLSection();
-        if (id != null) data.set("id", id);
-        YAMLSection server = new YAMLSection();
-        server.set("name", name);
-        server.set("enabled", enabled);
-        server.set("port", port);
-        server.set("log", log);
-        server.set("dir", directory);
-        server.set("exec", executable);
-        server.set("stopcmd", stopcmd);
-        if (running != null) server.set("running", running.toString());
-        data.set("server", server);
+    public ObjectMap<Integer> send(SubDataClient client) {
+        ObjectMap<Integer> data = new ObjectMap<Integer>();
+        if (tracker != null) data.set(0x0000, tracker);
+        data.set(0x0001, name);
+        data.set(0x0002, enabled);
+        data.set(0x0003, port);
+        data.set(0x0004, log);
+        data.set(0x0005, directory);
+        data.set(0x0006, executable);
+        data.set(0x0007, stopcmd);
+        if (running != null) data.set(0x0008, running.toString());
         return data;
     }
 
     @Override
-    public void execute(Client client, YAMLSection data) {
-        for (Callback<YAMLSection> callback : callbacks.get(data.getRawString("id"))) callback.run(data);
-        callbacks.remove(data.getRawString("id"));
+    public void receive(SubDataClient client, ObjectMap<Integer> data) {
+        for (Callback<ObjectMap<Integer>> callback : callbacks.get(data.getUUID(0x0000))) callback.run(data);
+        callbacks.remove(data.getUUID(0x0000));
     }
 
     @Override
-    public Version getVersion() {
-        return new Version("2.13.1b");
+    public int version() {
+        return 0x0001;
     }
 }
