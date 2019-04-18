@@ -111,7 +111,7 @@ public class InternalSubCreator extends SubCreator {
                         System.out.println(name + File.separator + "Creator > Found \"sponge" + ((template.getType() == ServerType.FORGE)?"forge":"vanilla") + "-" + spversion.toString() + '"');
 
                         if (template.getType() == ServerType.FORGE) {
-                            Version mcfversion = new Version(spprofile.getSection("dependencies").getRawString("minecraft") + '-' + spprofile.getSection("dependencies").getRawString("forge"));
+                            Version mcfversion = new Version(((spprofile.getSection("dependencies").getRawString("forge").contains("-"))?"":spprofile.getSection("dependencies").getRawString("minecraft") + '-') + spprofile.getSection("dependencies").getRawString("forge"));
                             System.out.println(name + File.separator + "Creator > Found \"forge-" + mcfversion.toString() + '"');
 
                             var.put("mcf_version", mcfversion.toString());

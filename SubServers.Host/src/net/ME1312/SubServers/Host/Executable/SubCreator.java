@@ -258,7 +258,7 @@ public class SubCreator {
                         host.subdata.sendPacket(new PacketOutExLogMessage(address, "Found \"sponge" + ((template.getType() == ServerType.FORGE)?"forge":"vanilla") + "-" + spversion.toString() + '"'));
 
                         if (template.getType() == ServerType.FORGE) {
-                            Version mcfversion = new Version(spprofile.getSection("dependencies").getRawString("minecraft") + '-' + spprofile.getSection("dependencies").getRawString("forge"));
+                            Version mcfversion = new Version(((spprofile.getSection("dependencies").getRawString("forge").contains("-"))?"":spprofile.getSection("dependencies").getRawString("minecraft") + '-') + spprofile.getSection("dependencies").getRawString("forge"));
                             log.logger.info.println("Found \"forge-" + mcfversion.toString() + '"');
                             host.subdata.sendPacket(new PacketOutExLogMessage(address, "Found \"forge-" + mcfversion.toString() + '"'));
 
