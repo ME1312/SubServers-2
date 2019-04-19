@@ -64,7 +64,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
     public SubDataProtocol subprotocol;
     public SubDataServer subdata = null;
     public SubServer sudo = null;
-    public static final Version version = Version.fromString("2.13.2d");
+    public static final Version version = Version.fromString("2.14a");
 
     public Proxy redis = null;
     public boolean canSudo = false;
@@ -105,7 +105,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
         if (!(new UniversalFile(dir, "lang.yml").exists())) {
             Util.copyFromJar(SubPlugin.class.getClassLoader(), "net/ME1312/SubServers/Bungee/Library/Files/lang.yml", new UniversalFile(dir, "lang.yml").getPath());
             System.out.println("SubServers > Created ~/SubServers/lang.yml");
-        } else if (((new YAMLConfig(new UniversalFile(dir, "lang.yml"))).get().getVersion("Version", new Version(9))).compareTo(new Version("2.13.2d+")) != 0) {
+        } else if (((new YAMLConfig(new UniversalFile(dir, "lang.yml"))).get().getVersion("Version", new Version(9))).compareTo(new Version("2.14a+")) != 0) {
             Files.move(new UniversalFile(dir, "lang.yml").toPath(), new UniversalFile(dir, "lang.old" + Math.round(Math.random() * 100000) + ".yml").toPath());
             Util.copyFromJar(SubPlugin.class.getClassLoader(), "net/ME1312/SubServers/Bungee/Library/Files/lang.yml", new UniversalFile(dir, "lang.yml").getPath());
             System.out.println("SubServers > Updated ~/SubServers/lang.yml");

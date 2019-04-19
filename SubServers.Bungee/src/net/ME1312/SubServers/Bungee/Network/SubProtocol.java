@@ -51,7 +51,7 @@ public class SubProtocol extends SubDataProtocol {
             plugin.getPluginManager().registerListener(null, new PacketOutExRunEvent(plugin));
 
             instance.setName("SubServers 2");
-            instance.setVersion(new Version("2.13.2a+"));
+            instance.setVersion(new Version("2.14a+"));
 
 
          // 00-09: Object Link Packets
