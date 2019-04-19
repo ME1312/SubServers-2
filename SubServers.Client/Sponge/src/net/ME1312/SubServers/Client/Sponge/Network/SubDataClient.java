@@ -41,6 +41,7 @@ public final class SubDataClient {
     private NamedContainer<Boolean, Socket> socket;
     private String name;
     private Cipher cipher;
+    private String password;
     private SubPlugin plugin;
     private LinkedList<NamedContainer<String, PacketOut>> queue;
 
@@ -61,6 +62,7 @@ public final class SubDataClient {
         this.name = (name == null || name.length() > 0)?name:null;
         this.out = MessagePack.newDefaultPacker(socket.get().getOutputStream());
         this.queue = new LinkedList<NamedContainer<String, PacketOut>>();
+        this.password = plugin.config.get().getSection("Settings").getSection("SubData").getRawString("Password");
         this.cipher = (cipher != null)?cipher:new Cipher() {
             @Override
             public String getName() {
@@ -80,7 +82,7 @@ public final class SubDataClient {
         if (!defaults) loadDefaults();
         loop();
 
-        sendPacket(new NamedContainer<>(null, new PacketAuthorization(plugin)));
+        sendPacket(new NamedContainer<>(null, new PacketAuthorization(plugin, password)));
     }
 
     private void init() {
@@ -102,7 +104,7 @@ public final class SubDataClient {
         defaults = true;
         log = LoggerFactory.getLogger("SubData");
 
-        registerPacket(new PacketAuthorization(plugin), "SubData", "Authorization");
+        registerPacket(new PacketAuthorization(plugin, null), "SubData", "Authorization");
         registerPacket(new PacketCommandServer(), "SubServers", "CommandServer");
         registerPacket(new PacketCreateServer(), "SubServers", "CreateServer");
         registerPacket(new PacketDownloadGroupInfo(), "SubServers", "DownloadGroupInfo");
@@ -164,7 +166,7 @@ public final class SubDataClient {
 
     private void recieve(Value input) {
         try {
-            YAMLSection data = getCipher().decrypt(plugin.config.get().getSection("Settings").getSection("SubData").getRawString("Password"), input);
+            YAMLSection data = getCipher().decrypt(password, input);
             for (PacketIn packet : decodePacket(data)) {
                 Sponge.getScheduler().createTaskBuilder().execute(() -> {
                     try {
@@ -336,7 +338,7 @@ public final class SubDataClient {
         try {
             YAMLSection data = encodePacket(packet.get());
             if (packet.name() != null) data.set("f", packet.name());
-            out.packValue(getCipher().encrypt(plugin.config.get().getSection("Settings").getSection("SubData").getRawString("Password"), data));
+            out.packValue(getCipher().encrypt(password, data));
             out.flush();
         } catch (Throwable e) {
             e.printStackTrace();

@@ -34,6 +34,7 @@ public final class SubDataServer {
     private ServerSocket server;
     private Cipher cipher;
     protected SubPlugin plugin;
+    String password;
 
     /**
      * SubData Server Instance
@@ -55,6 +56,7 @@ public final class SubDataServer {
         }
         if (UPnP.isUPnPAvailable() && plugin.config.get().getSection("Settings").getSection("UPnP", new YAMLSection()).getBoolean("Forward-SubData", false)) UPnP.openPortTCP(port);
         this.plugin = plugin;
+        this.password = plugin.config.get().getSection("Settings").getSection("SubData").getRawString("Password");
         this.cipher = (cipher != null)?cipher:new Cipher() {
             @Override
             public String getName() {

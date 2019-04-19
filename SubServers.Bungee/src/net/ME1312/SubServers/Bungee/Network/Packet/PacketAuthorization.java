@@ -6,6 +6,7 @@ import net.ME1312.SubServers.Bungee.Library.Version.Version;
 import net.ME1312.SubServers.Bungee.Network.Client;
 import net.ME1312.SubServers.Bungee.Network.PacketIn;
 import net.ME1312.SubServers.Bungee.Network.PacketOut;
+import net.ME1312.SubServers.Bungee.Network.SubDataServer;
 import net.ME1312.SubServers.Bungee.SubPlugin;
 
 /**
@@ -49,7 +50,7 @@ public final class PacketAuthorization implements PacketIn, PacketOut {
     @Override
     public void execute(Client client, YAMLSection data) {
         try {
-            if (data.getRawString("password").equals(plugin.config.get().getSection("Settings").getSection("SubData").getRawString("Password"))) {
+            if (data.getRawString("password").equals(Util.reflect(SubDataServer.class.getDeclaredField("password"), plugin.subdata))) {
                 client.authorize();
                 client.sendPacket(new PacketAuthorization(0, "Successfully Logged in"));
             } else {

@@ -15,16 +15,18 @@ import java.lang.reflect.Method;
 
 public final class PacketAuthorization implements PacketIn, PacketOut {
     private SubPlugin plugin;
+    private String password;
 
-    public PacketAuthorization(SubPlugin plugin) {
+    public PacketAuthorization(SubPlugin plugin, String password) {
         if (Util.isNull(plugin)) throw new NullPointerException();
         this.plugin = plugin;
+        this.password = password;
     }
 
     @Override
     public YAMLSection generate() {
         YAMLSection json = new YAMLSection();
-        json.set("password", plugin.config.get().getSection("Settings").getSection("SubData").getString("Password"));
+        json.set("password", password);
         return json;
     }
 

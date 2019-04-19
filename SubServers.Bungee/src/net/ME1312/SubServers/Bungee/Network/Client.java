@@ -86,7 +86,7 @@ public class Client {
 
     private void recievePacket(Value input) {
         try {
-            YAMLSection data = subdata.getCipher().decrypt(subdata.plugin.config.get().getSection("Settings").getSection("SubData").getRawString("Password"), input);
+            YAMLSection data = subdata.getCipher().decrypt(subdata.password, input);
             for (PacketIn packet : SubDataServer.decodePacket(this, data)) {
                 boolean auth = authorized == null;
                 if (auth || packet instanceof PacketAuthorization) {
@@ -134,7 +134,7 @@ public class Client {
     public void sendPacket(PacketOut packet) {
         if (Util.isNull(packet)) throw new NullPointerException();
         if (!isClosed()) try {
-            out.packValue(subdata.getCipher().encrypt(subdata.plugin.config.get().getSection("Settings").getSection("SubData").getRawString("Password"), SubDataServer.encodePacket(this, packet)));
+            out.packValue(subdata.getCipher().encrypt(subdata.password, SubDataServer.encodePacket(this, packet)));
             out.flush();
         } catch (Throwable e) {
             e.printStackTrace();

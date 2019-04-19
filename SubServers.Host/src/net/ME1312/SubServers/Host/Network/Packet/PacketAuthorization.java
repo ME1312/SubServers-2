@@ -20,22 +20,18 @@ import java.lang.reflect.Method;
 public final class PacketAuthorization implements PacketIn, PacketOut {
     private ExHost host;
     private Logger log = null;
+    private String password;
 
-    /**
-     * New PacketAuthorization
-     *
-     * @param host SubServers.Host
-     */
-    public PacketAuthorization(ExHost host) {
+    public PacketAuthorization(ExHost host, String password) {
         if (Util.isNull(host)) throw new NullPointerException();
         this.host = host;
-        Util.isException(() -> this.log = Util.reflect(SubDataClient.class.getDeclaredField("log"), null));
+        this.password = password;
     }
 
     @Override
     public YAMLSection generate() {
         YAMLSection json = new YAMLSection();
-        json.set("password", host.config.get().getSection("Settings").getSection("SubData").getString("Password"));
+        json.set("password", password);
         return json;
     }
 
