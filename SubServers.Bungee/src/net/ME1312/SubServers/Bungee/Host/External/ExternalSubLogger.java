@@ -141,7 +141,7 @@ public class ExternalSubLogger extends SubLogger {
     @Override
     public void unregisterFilter(SubLogFilter filter) {
         if (Util.isNull(filter)) throw new NullPointerException();
-        filters.remove(filter);
+        Util.isException(() -> filters.remove(filter));
     }
 
     @Override
