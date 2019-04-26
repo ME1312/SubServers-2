@@ -149,46 +149,59 @@ public final class SubPlugin extends BungeeCord implements Listener {
             }
         }
 
-        if (new UniversalFile(dir, "Recently Deleted").exists()) {
-            int f = new UniversalFile(dir, "Recently Deleted").listFiles().length;
-            for (File file : new UniversalFile(dir, "Recently Deleted").listFiles()) {
-                try {
-                    if (file.isDirectory()) {
-                        if (new UniversalFile(dir, "Recently Deleted:" + file.getName() + ":info.json").exists()) {
-                            FileReader reader = new FileReader(new UniversalFile(dir, "Recently Deleted:" + file.getName() + ":info.json"));
-                            YAMLSection info = new YAMLSection(new Gson().fromJson(Util.readAll(reader), Map.class));
-                            reader.close();
-                            if (info.contains("Timestamp")) {
-                                if (TimeUnit.MILLISECONDS.toDays(Calendar.getInstance().getTime().getTime() - info.getLong("Timestamp")) >= 7) {
+        Runnable clean = () -> {
+            try {
+                if (new UniversalFile(dir, "Recently Deleted").exists()) {
+                    int f = new UniversalFile(dir, "Recently Deleted").listFiles().length;
+                    for (File file : new UniversalFile(dir, "Recently Deleted").listFiles()) {
+                        try {
+                            if (file.isDirectory()) {
+                                if (new UniversalFile(dir, "Recently Deleted:" + file.getName() + ":info.json").exists()) {
+                                    FileReader reader = new FileReader(new UniversalFile(dir, "Recently Deleted:" + file.getName() + ":info.json"));
+                                    YAMLSection info = new YAMLSection(new Gson().fromJson(Util.readAll(reader), Map.class));
+                                    reader.close();
+                                    if (info.contains("Timestamp")) {
+                                        if (TimeUnit.MILLISECONDS.toDays(Calendar.getInstance().getTime().getTime() - info.getLong("Timestamp")) >= 7) {
+                                            Util.deleteDirectory(file);
+                                            f--;
+                                            System.out.println("SubServers > Removed ~/SubServers/Recently Deleted/" + file.getName());
+                                        }
+                                    } else {
+                                        Util.deleteDirectory(file);
+                                        f--;
+                                        System.out.println("SubServers > Removed ~/SubServers/Recently Deleted/" + file.getName());
+                                    }
+                                } else {
                                     Util.deleteDirectory(file);
                                     f--;
                                     System.out.println("SubServers > Removed ~/SubServers/Recently Deleted/" + file.getName());
                                 }
                             } else {
-                                Util.deleteDirectory(file);
+                                Files.delete(file.toPath());
                                 f--;
                                 System.out.println("SubServers > Removed ~/SubServers/Recently Deleted/" + file.getName());
                             }
-                        } else {
-                            Util.deleteDirectory(file);
-                            f--;
-                            System.out.println("SubServers > Removed ~/SubServers/Recently Deleted/" + file.getName());
+                        } catch (Exception e) {
+                            System.out.println("SubServers > Problem scanning ~/SubServers/Recently Deleted/" + file.getName());
+                            e.printStackTrace();
+                            Files.delete(file.toPath());
                         }
-                    } else {
-                        Files.delete(file.toPath());
-                        f--;
-                        System.out.println("SubServers > Removed ~/SubServers/Recently Deleted/" + file.getName());
                     }
-                } catch (Exception e) {
-                    System.out.println("SubServers > Problem scanning ~/SubServers/Recently Deleted/" + file.getName());
-                    e.printStackTrace();
-                    Files.delete(file.toPath());
+                    if (f <= 0) {
+                        Files.delete(new UniversalFile(dir, "Recently Deleted").toPath());
+                    }
                 }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-            if (f <= 0) {
-                Files.delete(new UniversalFile(dir, "Recently Deleted").toPath());
+        };
+        clean.run();
+        new Timer("SubServers.Bungee::Recycle_Cleaner").scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                clean.run();
             }
-        }
+        }, TimeUnit.DAYS.toMillis(7), TimeUnit.DAYS.toMillis(7));
 
         api.addHostDriver(net.ME1312.SubServers.Bungee.Host.Internal.InternalHost.class, "built-in");
         api.addHostDriver(net.ME1312.SubServers.Bungee.Host.External.ExternalHost.class, "network");

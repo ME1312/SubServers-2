@@ -83,27 +83,27 @@ public class SubProtocol extends SubDataProtocol {
 
 
          // 30-49: Control Packets
-          //instance.registerPacket(0x0030, PacketInReload.class);     TODO
+          //instance.registerPacket(0x0030, PacketInReload.class);     // TODO
             instance.registerPacket(0x0031, PacketCreateServer.class);
-          //instance.registerPacket(0x0032, PacketAddServer.class);    TODO
+          //instance.registerPacket(0x0032, PacketAddServer.class);    // TODO
             instance.registerPacket(0x0033, PacketStartServer.class);
-          //instance.registerPacket(0x0034, PacketEditServer.class);   TODO
+          //instance.registerPacket(0x0034, PacketEditServer.class);   // TODO
             instance.registerPacket(0x0035, PacketRestartServer.class);
             instance.registerPacket(0x0036, PacketCommandServer.class);
             instance.registerPacket(0x0037, PacketStopServer.class);
-          //instance.registerPacket(0x0038, PacketRemoveServer.class); TODO
-          //instance.registerPacket(0x0039, PacketDeleteServer.class); TODO
+          //instance.registerPacket(0x0038, PacketRemoveServer.class); // TODO
+          //instance.registerPacket(0x0039, PacketDeleteServer.class); // TODO
 
-          //instance.registerPacket(0x0030, new PacketInReload(plugin));     TODO
+          //instance.registerPacket(0x0030, new PacketInReload(plugin));     // TODO
             instance.registerPacket(0x0031, new PacketCreateServer(plugin));
-          //instance.registerPacket(0x0032, new PacketAddServer(plugin));    TODO
+          //instance.registerPacket(0x0032, new PacketAddServer(plugin));    // TODO
             instance.registerPacket(0x0033, new PacketStartServer(plugin));
-          //instance.registerPacket(0x0034, new PacketEditServer(plugin));   TODO
+          //instance.registerPacket(0x0034, new PacketEditServer(plugin));   // TODO
             instance.registerPacket(0x0035, new PacketRestartServer(plugin));
             instance.registerPacket(0x0036, new PacketCommandServer(plugin));
             instance.registerPacket(0x0037, new PacketStopServer(plugin));
-          //instance.registerPacket(0x0038, new PacketRemoveServer(plugin)); TODO
-          //instance.registerPacket(0x0039, new PacketDeleteServer(plugin)); TODO
+          //instance.registerPacket(0x0038, new PacketRemoveServer(plugin)); // TODO
+          //instance.registerPacket(0x0039, new PacketDeleteServer(plugin)); // TODO
 
 
          // 50-69: External Host Packets
