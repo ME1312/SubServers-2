@@ -156,7 +156,7 @@ public class InternalSubLogger extends SubLogger {
     @Override
     public void unregisterFilter(SubLogFilter filter) {
         if (Util.isNull(filter)) throw new NullPointerException();
-        filters.remove(filter);
+        Util.isException(() -> filters.remove(filter));
     }
 
     private void destroy() {

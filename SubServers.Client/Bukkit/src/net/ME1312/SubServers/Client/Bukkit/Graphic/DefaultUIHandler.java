@@ -59,12 +59,14 @@ public class DefaultUIHandler implements UIHandler, Listener {
         Player player = (Player) event.getWhoClicked();
         if (!event.isCancelled() && enabled && gui.keySet().contains(player.getUniqueId())) {
             DefaultUIRenderer gui = this.gui.get(player.getUniqueId());
-            if (gui.open && event.getClickedInventory() != null && event.getClickedInventory().getTitle() != null) {
+            String title = event.getView().getTitle();
+            
+            if (gui.open && event.getClickedInventory() != null && title != null) {
                 if (plugin.subdata == null) {
                     new IllegalStateException("SubData is not connected").printStackTrace();
                 } else if (Util.isException(() -> plugin.api.getLangChannels())) {
                     new IllegalStateException("There are no lang options available at this time").printStackTrace();
-                } else if (event.getClickedInventory().getTitle().equals(plugin.api.getLang("SubServers", "Interface.Host-Menu.Title"))) { // Host Menu
+                } else if (title.equals(plugin.api.getLang("SubServers", "Interface.Host-Menu.Title"))) { // Host Menu
                     if (event.getCurrentItem() != null && event.getCurrentItem().getType() != Material.AIR && event.getCurrentItem().hasItemMeta()) {
                         String item = event.getCurrentItem().getItemMeta().getDisplayName();
 
@@ -91,9 +93,9 @@ public class DefaultUIHandler implements UIHandler, Listener {
                             gui.hostAdmin(obj);
                         }
                     }
-                } else if (event.getClickedInventory().getTitle().startsWith(plugin.api.getLang("SubServers", "Interface.Host-Creator.Title").split("\\$str\\$")[0]) && // Host Creator
+                } else if (title.startsWith(plugin.api.getLang("SubServers", "Interface.Host-Creator.Title").split("\\$str\\$")[0]) && // Host Creator
                         (plugin.api.getLang("SubServers", "Interface.Host-Creator.Title").split("\\$str\\$").length == 1 ||
-                                event.getClickedInventory().getTitle().endsWith(plugin.api.getLang("SubServers", "Interface.Host-Creator.Title").split("\\$str\\$")[1]))) {
+                                title.endsWith(plugin.api.getLang("SubServers", "Interface.Host-Creator.Title").split("\\$str\\$")[1]))) {
                     if (event.getCurrentItem() != null && event.getCurrentItem().getType() != Material.AIR && event.getCurrentItem().hasItemMeta()) {
                         String item = event.getCurrentItem().getItemMeta().getDisplayName();
                         if (item.equals(plugin.api.getLang("SubServers", "Interface.Generic.Back"))) {
@@ -170,9 +172,9 @@ public class DefaultUIHandler implements UIHandler, Listener {
                             });
                         }
                     }
-                } else if (event.getClickedInventory().getTitle().startsWith(plugin.api.getLang("SubServers", "Interface.Host-Creator.Edit-Template.Title").split("\\$str\\$")[0]) && // Host Creator Templates
+                } else if (title.startsWith(plugin.api.getLang("SubServers", "Interface.Host-Creator.Edit-Template.Title").split("\\$str\\$")[0]) && // Host Creator Templates
                         (plugin.api.getLang("SubServers", "Interface.Host-Creator.Edit-Template.Title").split("\\$str\\$").length == 1 ||
-                                event.getClickedInventory().getTitle().endsWith(plugin.api.getLang("SubServers", "Interface.Host-Creator.Edit-Template.Title").split("\\$str\\$")[1]))) {
+                                title.endsWith(plugin.api.getLang("SubServers", "Interface.Host-Creator.Edit-Template.Title").split("\\$str\\$")[1]))) {
                     if (event.getCurrentItem() != null && event.getCurrentItem().getType() != Material.AIR && event.getCurrentItem().hasItemMeta()) {
                         String item = event.getCurrentItem().getItemMeta().getDisplayName();
                         if (item.equals(plugin.api.getLang("SubServers", "Interface.Generic.Back-Arrow"))) {
@@ -196,9 +198,9 @@ public class DefaultUIHandler implements UIHandler, Listener {
                             gui.hostCreator((UIRenderer.CreatorOptions) gui.lastVisitedObjects[0]);
                         }
                     }
-                } else if (event.getClickedInventory().getTitle().startsWith(plugin.api.getLang("SubServers", "Interface.Host-Plugin.Title").split("\\$str\\$")[0]) && // Host Plugin
+                } else if (title.startsWith(plugin.api.getLang("SubServers", "Interface.Host-Plugin.Title").split("\\$str\\$")[0]) && // Host Plugin
                         (plugin.api.getLang("SubServers", "Interface.Host-Plugin.Title").split("\\$str\\$").length == 1 ||
-                                event.getClickedInventory().getTitle().endsWith(plugin.api.getLang("SubServers", "Interface.Host-Plugin.Title").split("\\$str\\$")[1]))) {
+                                title.endsWith(plugin.api.getLang("SubServers", "Interface.Host-Plugin.Title").split("\\$str\\$")[1]))) {
                     if (event.getCurrentItem() != null && event.getCurrentItem().getType() != Material.AIR && event.getCurrentItem().hasItemMeta()) {
                         String item = event.getCurrentItem().getItemMeta().getDisplayName();
                         if (item.equals(plugin.api.getLang("SubServers", "Interface.Generic.Back-Arrow"))) {
@@ -232,7 +234,7 @@ public class DefaultUIHandler implements UIHandler, Listener {
                         }
                     }
 
-                } else if (event.getClickedInventory().getTitle().equals(plugin.api.getLang("SubServers", "Interface.Group-Menu.Title"))) { // Host Menu
+                } else if (title.equals(plugin.api.getLang("SubServers", "Interface.Group-Menu.Title"))) { // Host Menu
                     if (event.getCurrentItem() != null && event.getCurrentItem().getType() != Material.AIR && event.getCurrentItem().hasItemMeta()) {
                         String item = event.getCurrentItem().getItemMeta().getDisplayName();
 
@@ -250,13 +252,13 @@ public class DefaultUIHandler implements UIHandler, Listener {
                             gui.serverMenu(1, null, ChatColor.stripColor(item));
                         }
                     }
-                } else if (event.getClickedInventory().getTitle().equals(plugin.api.getLang("SubServers", "Interface.Server-Menu.Title")) || // SubServer Menu
-                        event.getClickedInventory().getTitle().startsWith(plugin.api.getLang("SubServers", "Interface.Host-SubServer.Title").split("\\$str\\$")[0]) &&
+                } else if (title.equals(plugin.api.getLang("SubServers", "Interface.Server-Menu.Title")) || // SubServer Menu
+                        title.startsWith(plugin.api.getLang("SubServers", "Interface.Host-SubServer.Title").split("\\$str\\$")[0]) &&
                                 (plugin.api.getLang("SubServers", "Interface.Host-SubServer.Title").split("\\$str\\$").length == 1 ||
-                                        event.getClickedInventory().getTitle().endsWith(plugin.api.getLang("SubServers", "Interface.Host-SubServer.Title").split("\\$str\\$")[1])) ||
-                        event.getClickedInventory().getTitle().startsWith(plugin.api.getLang("SubServers", "Interface.Group-SubServer.Title").split("\\$str\\$")[0]) &&
+                                        title.endsWith(plugin.api.getLang("SubServers", "Interface.Host-SubServer.Title").split("\\$str\\$")[1])) ||
+                        title.startsWith(plugin.api.getLang("SubServers", "Interface.Group-SubServer.Title").split("\\$str\\$")[0]) &&
                                 (plugin.api.getLang("SubServers", "Interface.Group-SubServer.Title").split("\\$str\\$").length == 1 ||
-                                        event.getClickedInventory().getTitle().endsWith(plugin.api.getLang("SubServers", "Interface.Group-SubServer.Title").split("\\$str\\$")[1]))) {
+                                        title.endsWith(plugin.api.getLang("SubServers", "Interface.Group-SubServer.Title").split("\\$str\\$")[1]))) {
                     if (event.getCurrentItem() != null && event.getCurrentItem().getType() != Material.AIR && event.getCurrentItem().hasItemMeta()) {
                         String item = event.getCurrentItem().getItemMeta().getDisplayName();
 
@@ -283,9 +285,9 @@ public class DefaultUIHandler implements UIHandler, Listener {
                             gui.subserverAdmin(obj);
                         }
                     }
-                } else if (event.getClickedInventory().getTitle().startsWith(plugin.api.getLang("SubServers", "Interface.Host-Admin.Title").split("\\$str\\$")[0]) && // Host Admin
+                } else if (title.startsWith(plugin.api.getLang("SubServers", "Interface.Host-Admin.Title").split("\\$str\\$")[0]) && // Host Admin
                         (plugin.api.getLang("SubServers", "Interface.Host-Admin.Title").split("\\$str\\$").length == 1 ||
-                                event.getClickedInventory().getTitle().endsWith(plugin.api.getLang("SubServers", "Interface.Host-Admin.Title").split("\\$str\\$")[1]))) {
+                                title.endsWith(plugin.api.getLang("SubServers", "Interface.Host-Admin.Title").split("\\$str\\$")[1]))) {
                     if (event.getCurrentItem() != null && event.getCurrentItem().getType() != Material.AIR && event.getCurrentItem().hasItemMeta()) {
                         String item = event.getCurrentItem().getItemMeta().getDisplayName();
 
@@ -305,9 +307,9 @@ public class DefaultUIHandler implements UIHandler, Listener {
                             gui.hostPlugin(1, (String) gui.lastVisitedObjects[0]);
                         }
                     }
-                } else if (event.getClickedInventory().getTitle().startsWith(plugin.api.getLang("SubServers", "Interface.SubServer-Admin.Title").split("\\$str\\$")[0]) && // SubServer Admin
+                } else if (title.startsWith(plugin.api.getLang("SubServers", "Interface.SubServer-Admin.Title").split("\\$str\\$")[0]) && // SubServer Admin
                         (plugin.api.getLang("SubServers", "Interface.SubServer-Admin.Title").split("\\$str\\$").length == 1 ||
-                                event.getClickedInventory().getTitle().endsWith(plugin.api.getLang("SubServers", "Interface.SubServer-Admin.Title").split("\\$str\\$")[1]))) {
+                                title.endsWith(plugin.api.getLang("SubServers", "Interface.SubServer-Admin.Title").split("\\$str\\$")[1]))) {
                     if (event.getCurrentItem() != null && event.getCurrentItem().getType() != Material.AIR && event.getCurrentItem().hasItemMeta()) {
                         String item = event.getCurrentItem().getItemMeta().getDisplayName();
 
@@ -388,9 +390,9 @@ public class DefaultUIHandler implements UIHandler, Listener {
                             gui.subserverPlugin(1, (String) gui.lastVisitedObjects[0]);
                         }
                     }
-                } else if (event.getClickedInventory().getTitle().startsWith(plugin.api.getLang("SubServers", "Interface.SubServer-Plugin.Title").split("\\$str\\$")[0]) && // SubServer Plugin
+                } else if (title.startsWith(plugin.api.getLang("SubServers", "Interface.SubServer-Plugin.Title").split("\\$str\\$")[0]) && // SubServer Plugin
                         (plugin.api.getLang("SubServers", "Interface.SubServer-Plugin.Title").split("\\$str\\$").length == 1 ||
-                                event.getClickedInventory().getTitle().endsWith(plugin.api.getLang("SubServers", "Interface.SubServer-Plugin.Title").split("\\$str\\$")[1]))) {
+                                title.endsWith(plugin.api.getLang("SubServers", "Interface.SubServer-Plugin.Title").split("\\$str\\$")[1]))) {
                     if (event.getCurrentItem() != null && event.getCurrentItem().getType() != Material.AIR && event.getCurrentItem().hasItemMeta()) {
                         String item = event.getCurrentItem().getItemMeta().getDisplayName();
                         if (item.equals(plugin.api.getLang("SubServers", "Interface.Generic.Back-Arrow"))) {
