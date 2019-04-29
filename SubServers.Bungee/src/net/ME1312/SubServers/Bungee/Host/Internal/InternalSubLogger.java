@@ -11,6 +11,7 @@ import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -23,7 +24,7 @@ public class InternalSubLogger extends SubLogger {
     private Object handle;
     protected String name;
     protected Container<Boolean> log;
-    private List<SubLogFilter> filters = new ArrayList<SubLogFilter>();
+    private List<SubLogFilter> filters = new CopyOnWriteArrayList<>();
     protected File file;
     private PrintWriter writer = null;
     private boolean started = false;

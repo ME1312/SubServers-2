@@ -120,7 +120,7 @@ public abstract class SubServerContainer extends ServerContainer implements SubS
         sinfo.set("running", isRunning());
         sinfo.set("stop-cmd", getStopCommand());
         sinfo.set("stop-action", getStopAction().toString());
-        sinfo.set("auto-run", SubAPI.getInstance().getInternals().config.get().getMap("Servers").getMap(getName(), new ObjectMap<String>()).getBoolean("Run-On-Launch", false));
+        sinfo.set("auto-run", SubAPI.getInstance().getInternals().servers.get().getMap("Servers").getMap(getName(), new ObjectMap<String>()).getBoolean("Run-On-Launch", false));
         List<String> incompatibleCurrent = new ArrayList<String>();
         List<String> incompatible = new ArrayList<String>();
         for (SubServer server : getCurrentIncompatibilities()) incompatibleCurrent.add(server.getName());

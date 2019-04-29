@@ -1,5 +1,6 @@
 package net.ME1312.SubServers.Bungee.Network;
 
+import net.ME1312.Galaxi.Library.Callback.Callback;
 import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubData.Server.SubDataProtocol;
 import net.ME1312.SubData.Server.SubDataServer;
@@ -18,14 +19,13 @@ import java.util.logging.Logger;
 
 public class SubProtocol extends SubDataProtocol {
     private static SubProtocol instance;
-    private SubProtocol(Logger logger) {
-        super(logger);
-    }
+    private static Logger log;
+    private SubProtocol() {}
 
     @SuppressWarnings("deprecation")
     public static SubProtocol get() {
         if (instance == null) {
-            Logger log = Logger.getAnonymousLogger();
+            log = Logger.getAnonymousLogger();
             log.setUseParentHandlers(false);
             log.addHandler(new Handler() {
                 private boolean open = true;
@@ -46,7 +46,7 @@ public class SubProtocol extends SubDataProtocol {
                     open = false;
                 }
             });
-            instance = new SubProtocol(log);
+            instance = new SubProtocol();
             SubPlugin plugin = SubAPI.getInstance().getInternals();
             plugin.getPluginManager().registerListener(null, new PacketOutExRunEvent(plugin));
 
@@ -145,8 +145,8 @@ public class SubProtocol extends SubDataProtocol {
 
     @SuppressWarnings("deprecation")
     @Override
-    public SubDataServer open(InetAddress address, int port, String cipher) throws IOException {
-        SubDataServer subdata = super.open(address, port, cipher);
+    public SubDataServer open(Callback<Runnable> scheduler, Logger logger, InetAddress address, int port, String cipher) throws IOException {
+        SubDataServer subdata = super.open(scheduler, logger, address, port, cipher);
         SubPlugin plugin = SubAPI.getInstance().getInternals();
 
         subdata.on.closed(server -> plugin.subdata = null);
@@ -158,5 +158,9 @@ public class SubProtocol extends SubDataProtocol {
         });
 
         return subdata;
+    }
+
+    public SubDataServer open(InetAddress address, int port, String cipher) throws IOException {
+        return open(log, address, port, cipher);
     }
 }

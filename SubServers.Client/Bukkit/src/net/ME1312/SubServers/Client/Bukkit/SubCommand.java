@@ -15,6 +15,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
+import org.bukkit.command.defaults.BukkitCommand;
 import org.bukkit.entity.Player;
 
 import java.io.BufferedReader;
@@ -24,16 +25,23 @@ import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.*;
 
-public final class SubCommand implements CommandExecutor {
+public final class SubCommand extends BukkitCommand {
     private SubPlugin plugin;
 
-    public SubCommand(SubPlugin plugin) {
+    public SubCommand(SubPlugin plugin, String name) {
+        super(
+                name,
+                "The SubServers Command",
+                "/" + name + " is currently unavailable",
+                Collections.emptyList()
+        );
+
         this.plugin = plugin;
     }
 
-    @SuppressWarnings("unchecked")
+
     @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+    public boolean execute(CommandSender sender, String label, String[] args) {
         label = "/" + label;
         if (plugin.subdata == null) {
             new IllegalStateException("SubData is not connected").printStackTrace();

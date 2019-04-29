@@ -15,6 +15,8 @@ import net.ME1312.SubServers.Bungee.Host.*;
 import net.ME1312.SubServers.Bungee.Library.*;
 import net.ME1312.Galaxi.Library.Config.YAMLConfig;
 import net.ME1312.Galaxi.Library.Config.YAMLSection;
+import net.ME1312.SubServers.Bungee.Library.Fallback.SmartReconnectHandler;
+import net.ME1312.SubServers.Bungee.Library.Compatibility.Updates.ConfigUpdater;
 import net.ME1312.SubServers.Bungee.Library.Exception.InvalidHostException;
 import net.ME1312.SubServers.Bungee.Library.Exception.InvalidServerException;
 import net.ME1312.Galaxi.Library.Version.Version;
@@ -22,8 +24,10 @@ import net.ME1312.SubServers.Bungee.Network.Packet.PacketOutExReload;
 import net.ME1312.SubServers.Bungee.Network.SubProtocol;
 import net.md_5.bungee.BungeeCord;
 import net.md_5.bungee.BungeeServerInfo;
+import net.md_5.bungee.UserConnection;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ServerPing;
+import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.config.ListenerInfo;
 import net.md_5.bungee.api.config.ServerInfo;
@@ -42,26 +46,29 @@ import java.nio.file.Files;
 import java.security.SecureRandom;
 import java.text.DecimalFormat;
 import java.util.*;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 /**
  * Main Plugin Class
  */
 public final class SubPlugin extends BungeeCord implements Listener {
-    protected final LinkedHashMap<String, LinkedHashMap<String, String>> lang = new LinkedHashMap<String, LinkedHashMap<String, String>>();
+    protected final LinkedHashMap<String, LinkedHashMap<String, String>> exLang = new LinkedHashMap<String, LinkedHashMap<String, String>>();
     protected final HashMap<String, Class<? extends Host>> hostDrivers = new HashMap<String, Class<? extends Host>>();
     public final HashMap<String, Proxy> proxies = new HashMap<String, Proxy>();
     public final HashMap<String, Host> hosts = new HashMap<String, Host>();
     public final HashMap<String, Server> exServers = new HashMap<String, Server>();
     private final HashMap<String, ServerInfo> legServers = new HashMap<String, ServerInfo>();
+    private final HashMap<UUID, List<ServerInfo>> fallbackLimbo = new HashMap<UUID, List<ServerInfo>>();
 
     public final PrintStream out;
     public final UniversalFile dir = new UniversalFile(new File(System.getProperty("user.dir")));
     public YAMLConfig config;
-    private YAMLConfig bungeeconfig;
-    public YAMLConfig langconfig;
+    public YAMLConfig servers;
+    private YAMLConfig bungee;
+    public YAMLConfig lang;
     public final SubAPI api = new SubAPI(this);
-    public SubDataProtocol subprotocol;
+    public SubProtocol subprotocol;
     public SubDataServer subdata = null;
     public SubServer sudo = null;
     public static final Version version = Version.fromString("2.14a");
@@ -85,67 +92,63 @@ public final class SubPlugin extends BungeeCord implements Listener {
             YAMLConfig tmp = new YAMLConfig(new UniversalFile("config.yml"));
             tmp.get().set("stats", UUID.randomUUID().toString());
             tmp.save();
-            System.out.println("SubServers > Created ~/config.yml");
+            System.out.println("SubServers > Created ./config.yml");
         }
-        bungeeconfig = new YAMLConfig(new UniversalFile(dir, "config.yml"));
+        bungee = new YAMLConfig(new UniversalFile(dir, "config.yml"));
 
         UniversalFile dir = new UniversalFile(this.dir, "SubServers");
         dir.mkdir();
-        if (!(new UniversalFile(dir, "config.yml").exists())) {
-            Util.copyFromJar(SubPlugin.class.getClassLoader(), "net/ME1312/SubServers/Bungee/Library/Files/config.yml", new UniversalFile(dir, "config.yml").getPath());
-            System.out.println("SubServers > Created ~/SubServers/config.yml");
-        } else if (((new YAMLConfig(new UniversalFile(dir, "config.yml"))).get().getMap("Settings").getVersion("Version", new Version(0))).compareTo(new Version("2.11.2a+")) != 0) {
-            Files.move(new UniversalFile(dir, "config.yml").toPath(), new UniversalFile(dir, "config.old" + Math.round(Math.random() * 100000) + ".yml").toPath());
 
-            Util.copyFromJar(SubPlugin.class.getClassLoader(), "net/ME1312/SubServers/Bungee/Library/Files/config.yml", new UniversalFile(dir, "config.yml").getPath());
-            System.out.println("SubServers > Updated ~/SubServers/config.yml");
-        }
+        ConfigUpdater.updateConfig(new UniversalFile(dir, "config.yml"));
         config = new YAMLConfig(new UniversalFile(dir, "config.yml"));
 
         if (!(new UniversalFile(dir, "lang.yml").exists())) {
             Util.copyFromJar(SubPlugin.class.getClassLoader(), "net/ME1312/SubServers/Bungee/Library/Files/lang.yml", new UniversalFile(dir, "lang.yml").getPath());
-            System.out.println("SubServers > Created ~/SubServers/lang.yml");
+            System.out.println("SubServers > Created ./SubServers/lang.yml");
         } else if (((new YAMLConfig(new UniversalFile(dir, "lang.yml"))).get().getVersion("Version", new Version(9))).compareTo(new Version("2.14a+")) != 0) {
             Files.move(new UniversalFile(dir, "lang.yml").toPath(), new UniversalFile(dir, "lang.old" + Math.round(Math.random() * 100000) + ".yml").toPath());
             Util.copyFromJar(SubPlugin.class.getClassLoader(), "net/ME1312/SubServers/Bungee/Library/Files/lang.yml", new UniversalFile(dir, "lang.yml").getPath());
-            System.out.println("SubServers > Updated ~/SubServers/lang.yml");
+            System.out.println("SubServers > Updated ./SubServers/lang.yml");
         }
-        langconfig = new YAMLConfig(new UniversalFile(dir, "lang.yml"));
+        lang = new YAMLConfig(new UniversalFile(dir, "lang.yml"));
+
+        ConfigUpdater.updateServers(new UniversalFile(dir, "servers.yml"));
+        servers = new YAMLConfig(new UniversalFile(dir, "servers.yml"));
 
         if (!(new UniversalFile(dir, "Templates").exists())) {
             new UniversalFile(dir, "Templates").mkdirs();
 
             Util.unzip(SubPlugin.class.getResourceAsStream("/net/ME1312/SubServers/Bungee/Library/Files/Templates/vanilla.zip"), new UniversalFile(dir, "Templates"));
-            System.out.println("SubServers > Created ~/SubServers/Templates/Vanilla");
+            System.out.println("SubServers > Created ./SubServers/Templates/Vanilla");
 
             Util.unzip(SubPlugin.class.getResourceAsStream("/net/ME1312/SubServers/Bungee/Library/Files/Templates/spigot.zip"), new UniversalFile(dir, "Templates"));
-            System.out.println("SubServers > Created ~/SubServers/Templates/Spigot");
+            System.out.println("SubServers > Created ./SubServers/Templates/Spigot");
 
             Util.unzip(SubPlugin.class.getResourceAsStream("/net/ME1312/SubServers/Bungee/Library/Files/Templates/forge.zip"), new UniversalFile(dir, "Templates"));
-            System.out.println("SubServers > Created ~/SubServers/Templates/Forge");
+            System.out.println("SubServers > Created ./SubServers/Templates/Forge");
 
             Util.unzip(SubPlugin.class.getResourceAsStream("/net/ME1312/SubServers/Bungee/Library/Files/Templates/sponge.zip"), new UniversalFile(dir, "Templates"));
-            System.out.println("SubServers > Created ~/SubServers/Templates/Sponge");
+            System.out.println("SubServers > Created ./SubServers/Templates/Sponge");
         } else {
             if (new UniversalFile(dir, "Templates:Vanilla:template.yml").exists() && ((new YAMLConfig(new UniversalFile(dir, "Templates:Vanilla:template.yml"))).get().getVersion("Version", new Version(0))).compareTo(new Version("2.13.2c+")) != 0) {
                 Files.move(new UniversalFile(dir, "Templates:Vanilla").toPath(), new UniversalFile(dir, "Templates:Vanilla.old" + Math.round(Math.random() * 100000) + ".x").toPath());
                 Util.unzip(SubPlugin.class.getResourceAsStream("/net/ME1312/SubServers/Bungee/Library/Files/Templates/vanilla.zip"), new UniversalFile(dir, "Templates"));
-                System.out.println("SubServers > Updated ~/SubServers/Templates/Vanilla");
+                System.out.println("SubServers > Updated ./SubServers/Templates/Vanilla");
             }
             if (new UniversalFile(dir, "Templates:Spigot:template.yml").exists() && ((new YAMLConfig(new UniversalFile(dir, "Templates:Spigot:template.yml"))).get().getVersion("Version", new Version(0))).compareTo(new Version("2.13.2c+")) != 0) {
                 Files.move(new UniversalFile(dir, "Templates:Spigot").toPath(), new UniversalFile(dir, "Templates:Spigot.old" + Math.round(Math.random() * 100000) + ".x").toPath());
                 Util.unzip(SubPlugin.class.getResourceAsStream("/net/ME1312/SubServers/Bungee/Library/Files/Templates/spigot.zip"), new UniversalFile(dir, "Templates"));
-                System.out.println("SubServers > Updated ~/SubServers/Templates/Spigot");
+                System.out.println("SubServers > Updated ./SubServers/Templates/Spigot");
             }
             if (new UniversalFile(dir, "Templates:Forge:template.yml").exists() && ((new YAMLConfig(new UniversalFile(dir, "Templates:Forge:template.yml"))).get().getVersion("Version", new Version(0))).compareTo(new Version("2.13.2c+")) != 0) {
                 Files.move(new UniversalFile(dir, "Templates:Forge").toPath(), new UniversalFile(dir, "Templates:Forge.old" + Math.round(Math.random() * 100000) + ".x").toPath());
                 Util.unzip(SubPlugin.class.getResourceAsStream("/net/ME1312/SubServers/Bungee/Library/Files/Templates/forge.zip"), new UniversalFile(dir, "Templates"));
-                System.out.println("SubServers > Updated ~/SubServers/Templates/Forge");
+                System.out.println("SubServers > Updated ./SubServers/Templates/Forge");
             }
             if (new UniversalFile(dir, "Templates:Sponge:template.yml").exists() && ((new YAMLConfig(new UniversalFile(dir, "Templates:Sponge:template.yml"))).get().getVersion("Version", new Version(0))).compareTo(new Version("2.13.2c+")) != 0) {
                 Files.move(new UniversalFile(dir, "Templates:Sponge").toPath(), new UniversalFile(dir, "Templates:Sponge.old" + Math.round(Math.random() * 100000) + ".x").toPath());
                 Util.unzip(SubPlugin.class.getResourceAsStream("/net/ME1312/SubServers/Bungee/Library/Files/Templates/sponge.zip"), new UniversalFile(dir, "Templates"));
-                System.out.println("SubServers > Updated ~/SubServers/Templates/Sponge");
+                System.out.println("SubServers > Updated ./SubServers/Templates/Sponge");
             }
         }
 
@@ -164,25 +167,25 @@ public final class SubPlugin extends BungeeCord implements Listener {
                                         if (TimeUnit.MILLISECONDS.toDays(Calendar.getInstance().getTime().getTime() - info.getLong("Timestamp")) >= 7) {
                                             Util.deleteDirectory(file);
                                             f--;
-                                            System.out.println("SubServers > Removed ~/SubServers/Recently Deleted/" + file.getName());
+                                            System.out.println("SubServers > Removed ./SubServers/Recently Deleted/" + file.getName());
                                         }
                                     } else {
                                         Util.deleteDirectory(file);
                                         f--;
-                                        System.out.println("SubServers > Removed ~/SubServers/Recently Deleted/" + file.getName());
+                                        System.out.println("SubServers > Removed ./SubServers/Recently Deleted/" + file.getName());
                                     }
                                 } else {
                                     Util.deleteDirectory(file);
                                     f--;
-                                    System.out.println("SubServers > Removed ~/SubServers/Recently Deleted/" + file.getName());
+                                    System.out.println("SubServers > Removed ./SubServers/Recently Deleted/" + file.getName());
                                 }
                             } else {
                                 Files.delete(file.toPath());
                                 f--;
-                                System.out.println("SubServers > Removed ~/SubServers/Recently Deleted/" + file.getName());
+                                System.out.println("SubServers > Removed ./SubServers/Recently Deleted/" + file.getName());
                             }
                         } catch (Exception e) {
-                            System.out.println("SubServers > Problem scanning ~/SubServers/Recently Deleted/" + file.getName());
+                            System.out.println("SubServers > Problem scanning .SubServers/Recently Deleted/" + file.getName());
                             e.printStackTrace();
                             Files.delete(file.toPath());
                         }
@@ -209,11 +212,11 @@ public final class SubPlugin extends BungeeCord implements Listener {
         getPluginManager().registerListener(null, this);
 
         System.out.println("SubServers > Pre-Parsing Config...");
-        for (String name : config.get().getMap("Servers").getKeys()) {
+        for (String name : servers.get().getMap("Servers").getKeys()) {
             try {
-                if (Util.getCaseInsensitively(config.get().getMap("Hosts").get(), config.get().getMap("Servers").getMap(name).getString("Host")) == null) throw new InvalidServerException("There is no host with this name: " + config.get().getMap("Servers").getMap(name).getString("Host"));
-                legServers.put(name, new BungeeServerInfo(name, new InetSocketAddress(InetAddress.getByName((String) ((Map<String, ?>) Util.getCaseInsensitively(config.get().getMap("Hosts").get(), config.get().getMap("Servers").getMap(name).getString("Host"))).get("Address")), config.get().getMap("Servers").getMap(name).getInt("Port")),
-                        ChatColor.translateAlternateColorCodes('&', config.get().getMap("Servers").getMap(name).getString("Motd")), config.get().getMap("Servers").getMap(name).getBoolean("Restricted")));
+                if (Util.getCaseInsensitively(config.get().getMap("Hosts").get(), servers.get().getMap("Servers").getMap(name).getString("Host")) == null) throw new InvalidServerException("There is no host with this name: " + servers.get().getMap("Servers").getMap(name).getString("Host"));
+                legServers.put(name, new BungeeServerInfo(name, new InetSocketAddress(InetAddress.getByName((String) ((Map<String, ?>) Util.getCaseInsensitively(config.get().getMap("Hosts").get(), servers.get().getMap("Servers").getMap(name).getString("Host"))).get("Address")), servers.get().getMap("Servers").getMap(name).getInt("Port")),
+                        ChatColor.translateAlternateColorCodes('&', servers.get().getMap("Servers").getMap(name).getString("Motd")), servers.get().getMap("Servers").getMap(name).getBoolean("Restricted")));
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -264,11 +267,16 @@ public final class SubPlugin extends BungeeCord implements Listener {
         boolean status;
         if (!(status = running)) resetDate = begin;
 
+        ConfigUpdater.updateConfig(new UniversalFile(dir, "SubServers:config.yml"));
+        ConfigUpdater.updateServers(new UniversalFile(dir, "SubServers:servers.yml"));
+        ConfigUpdater.updateLang(new UniversalFile(dir, "SubServers:lang.yml"));
+
         YAMLSection prevconfig = config.get();
         config.reload();
-        langconfig.reload();
-        for (String key : langconfig.get().getMap("Lang").getKeys())
-            api.setLang("SubServers", key, ChatColor.translateAlternateColorCodes('&', langconfig.get().getMap("Lang").getString(key)));
+        servers.reload();
+        lang.reload();
+        for (String key : lang.get().getMap("Lang").getKeys())
+            api.setLang("SubServers", key, ChatColor.translateAlternateColorCodes('&', lang.get().getMap("Lang").getString(key)));
 
         if (subdata == null || // SubData Server must be reset
                 !config.get().getMap("Settings").getMap("SubData").getRawString("Address", "127.0.0.1:4391").equals(prevconfig.getMap("Settings").getMap("SubData").getRawString("Address", "127.0.0.1:4391")) ||
@@ -395,33 +403,33 @@ public final class SubPlugin extends BungeeCord implements Listener {
 
         int servers = 0;
         System.out.println("SubServers > "+((status)?"Rel":"L")+"oading Servers...");
-        bungeeconfig.reload();
-        for (String name : bungeeconfig.get().getMap("servers").getKeys()) {
+        bungee.reload();
+        for (String name : bungee.get().getMap("servers").getKeys()) {
             if (!ukeys.contains(name.toLowerCase())) try {
                 Server server = api.getServer(name);
                 if (server == null || !(server instanceof SubServer)) {
                     if (server == null || // Server must be reset
-                            bungeeconfig.get().getMap("servers").getMap(name).getRawString("address").equals(server.getAddress().getAddress().getHostAddress() + ':' + server.getAddress().getPort())
+                            bungee.get().getMap("servers").getMap(name).getRawString("address").equals(server.getAddress().getAddress().getHostAddress() + ':' + server.getAddress().getPort())
                     ) {
                         if (server != null) api.forceRemoveServer(name);
-                        server = api.addServer(name, InetAddress.getByName(bungeeconfig.get().getMap("servers").getMap(name).getRawString("address").split(":")[0]),
-                                Integer.parseInt(bungeeconfig.get().getMap("servers").getMap(name).getRawString("address").split(":")[1]), ChatColor.translateAlternateColorCodes('&', bungeeconfig.get().getMap("servers").getMap(name).getString("motd")),
-                                bungeeconfig.get().getMap("servers").getMap(name).getBoolean("hidden", false), bungeeconfig.get().getMap("servers").getMap(name).getBoolean("restricted"));
+                        server = api.addServer(name, InetAddress.getByName(bungee.get().getMap("servers").getMap(name).getRawString("address").split(":")[0]),
+                                Integer.parseInt(bungee.get().getMap("servers").getMap(name).getRawString("address").split(":")[1]), ChatColor.translateAlternateColorCodes('&', bungee.get().getMap("servers").getMap(name).getString("motd")),
+                                bungee.get().getMap("servers").getMap(name).getBoolean("hidden", false), bungee.get().getMap("servers").getMap(name).getBoolean("restricted"));
                     } else { // Server wasn't reset, so check for these changes
-                        if (!ChatColor.translateAlternateColorCodes('&', bungeeconfig.get().getMap("servers").getMap(name).getString("motd")).equals(server.getMotd()))
-                            server.setMotd(ChatColor.translateAlternateColorCodes('&', bungeeconfig.get().getMap("servers").getMap(name).getString("motd")));
-                        if (bungeeconfig.get().getMap("servers").getMap(name).getBoolean("hidden", false) != server.isHidden())
-                            server.setHidden(bungeeconfig.get().getMap("servers").getMap(name).getBoolean("hidden", false));
-                        if (bungeeconfig.get().getMap("servers").getMap(name).getBoolean("restricted") != server.isRestricted())
-                            server.setRestricted(bungeeconfig.get().getMap("servers").getMap(name).getBoolean("restricted"));
+                        if (!ChatColor.translateAlternateColorCodes('&', bungee.get().getMap("servers").getMap(name).getString("motd")).equals(server.getMotd()))
+                            server.setMotd(ChatColor.translateAlternateColorCodes('&', bungee.get().getMap("servers").getMap(name).getString("motd")));
+                        if (bungee.get().getMap("servers").getMap(name).getBoolean("hidden", false) != server.isHidden())
+                            server.setHidden(bungee.get().getMap("servers").getMap(name).getBoolean("hidden", false));
+                        if (bungee.get().getMap("servers").getMap(name).getBoolean("restricted") != server.isRestricted())
+                            server.setRestricted(bungee.get().getMap("servers").getMap(name).getBoolean("restricted"));
                     } // Check for other changes
-                    if (bungeeconfig.get().getMap("servers").getMap(name).getKeys().contains("display") && ((bungeeconfig.get().getMap("servers").getMap(name).getRawString("display").length() == 0 && !server.getDisplayName().equals(server.getName())) || !bungeeconfig.get().getMap("servers").getMap(name).getRawString("display").equals(server.getDisplayName())))
-                        server.setDisplayName(bungeeconfig.get().getMap("servers").getMap(name).getString("display"));
-                    if (bungeeconfig.get().getMap("servers").getMap(name).getKeys().contains("group")) {
+                    if (bungee.get().getMap("servers").getMap(name).getKeys().contains("display") && ((bungee.get().getMap("servers").getMap(name).getRawString("display").length() == 0 && !server.getDisplayName().equals(server.getName())) || !bungee.get().getMap("servers").getMap(name).getRawString("display").equals(server.getDisplayName())))
+                        server.setDisplayName(bungee.get().getMap("servers").getMap(name).getString("display"));
+                    if (bungee.get().getMap("servers").getMap(name).getKeys().contains("group")) {
                         for (String group : server.getGroups()) server.removeGroup(group);
-                        for (String group : bungeeconfig.get().getMap("servers").getMap(name).getStringList("group")) server.addGroup(group);
+                        for (String group : bungee.get().getMap("servers").getMap(name).getStringList("group")) server.addGroup(group);
                     }
-                    if (bungeeconfig.get().getMap("servers").getMap(name).getKeys().contains("extra"))
+                    if (bungee.get().getMap("servers").getMap(name).getKeys().contains("extra"))
                         for (String extra : config.get().getMap("servers").getMap(name).getMap("extra").getKeys()) server.addExtra(extra, config.get().getMap("servers").getMap(name).getMap("extra").getObject(extra));
                     if (server.getSubData() != null)
                         ((SubDataClient) server.getSubData()).sendPacket(new PacketOutExReload(null));
@@ -448,9 +456,9 @@ public final class SubPlugin extends BungeeCord implements Listener {
         }, "SubServers.Bungee::System_Shutdown"));
         running = true;
         List<String> autorun = new LinkedList<String>();
-        for (String name : config.get().getMap("Servers").getKeys()) {
+        for (String name : this.servers.get().getMap("Servers").getKeys()) {
             if (!ukeys.contains(name.toLowerCase())) try {
-                if (!this.hosts.keySet().contains(config.get().getMap("Servers").getMap(name).getString("Host").toLowerCase())) throw new InvalidServerException("There is no host with this name: " + config.get().getMap("Servers").getMap(name).getString("Host"));
+                if (!this.hosts.keySet().contains(this.servers.get().getMap("Servers").getMap(name).getString("Host").toLowerCase())) throw new InvalidServerException("There is no host with this name: " + this.servers.get().getMap("Servers").getMap(name).getString("Host"));
                 if (exServers.keySet().contains(name.toLowerCase())) {
                     exServers.remove(name.toLowerCase());
                     servers--;
@@ -458,33 +466,33 @@ public final class SubPlugin extends BungeeCord implements Listener {
                 SubServer server = api.getSubServer(name);
                 if (server != null && server.isEditable()) { // Server can edit() (May be reset depending on change severity)
                     ObjectMap<String> edits = new ObjectMap<String>();
-                    if (config.get().getMap("Servers").getMap(name).getBoolean("Enabled") != server.isEnabled())
-                        edits.set("enabled", config.get().getMap("Servers").getMap(name).getBoolean("Enabled"));
-                    if (config.get().getMap("Servers").getMap(name).getKeys().contains("Display") && ((config.get().getMap("Servers").getMap(name).getRawString("Display").length() == 0 && !server.getDisplayName().equals(server.getName())) || !config.get().getMap("Servers").getMap(name).getRawString("Display").equals(server.getDisplayName())))
-                        edits.set("display", config.get().getMap("Servers").getMap(name).getRawString("Display"));
-                    if (!config.get().getMap("Servers").getMap(name).getString("Host").equalsIgnoreCase(server.getHost().getName()))
-                        edits.set("host", config.get().getMap("Servers").getMap(name).getRawString("Host"));
-                    if (!config.get().getMap("Servers").getMap(name).getStringList("Group").equals(server.getGroups()))
-                        edits.set("group", config.get().getMap("Servers").getMap(name).getRawStringList("Group"));
-                    if (config.get().getMap("Servers").getMap(name).getInt("Port") != server.getAddress().getPort())
-                        edits.set("port", config.get().getMap("Servers").getMap(name).getInt("Port"));
-                    if (!(ChatColor.translateAlternateColorCodes('&', config.get().getMap("Servers").getMap(name).getString("Motd")).equals(server.getMotd())))
-                        edits.set("motd", config.get().getMap("Servers").getMap(name).getRawString("Motd"));
-                    if (config.get().getMap("Servers").getMap(name).getBoolean("Log") != server.isLogging())
-                        edits.set("log", config.get().getMap("Servers").getMap(name).getBoolean("Log"));
-                    if (!config.get().getMap("Servers").getMap(name).getRawString("Directory").equals(server.getPath()))
-                        edits.set("dir", config.get().getMap("Servers").getMap(name).getRawString("Directory"));
-                    if (!config.get().getMap("Servers").getMap(name).getRawString("Executable").equals(server.getExecutable()))
-                        edits.set("exec", config.get().getMap("Servers").getMap(name).getRawString("Executable"));
-                    if (!config.get().getMap("Servers").getMap(name).getRawString("Stop-Command").equals(server.getStopCommand()))
-                        edits.set("stop-cmd", config.get().getMap("Servers").getMap(name).getRawString("Stop-Command"));
-                    SubServer.StopAction action = Util.getDespiteException(() -> SubServer.StopAction.valueOf(config.get().getMap("Servers").getMap(name).getRawString("Stop-Action", "NONE").toUpperCase().replace('-', '_').replace(' ', '_')), null);
+                    if (this.servers.get().getMap("Servers").getMap(name).getBoolean("Enabled") != server.isEnabled())
+                        edits.set("enabled", this.servers.get().getMap("Servers").getMap(name).getBoolean("Enabled"));
+                    if (this.servers.get().getMap("Servers").getMap(name).getKeys().contains("Display") && ((this.servers.get().getMap("Servers").getMap(name).getRawString("Display").length() == 0 && !server.getDisplayName().equals(server.getName())) || !this.servers.get().getMap("Servers").getMap(name).getRawString("Display").equals(server.getDisplayName())))
+                        edits.set("display", this.servers.get().getMap("Servers").getMap(name).getRawString("Display"));
+                    if (!this.servers.get().getMap("Servers").getMap(name).getString("Host").equalsIgnoreCase(server.getHost().getName()))
+                        edits.set("host", this.servers.get().getMap("Servers").getMap(name).getRawString("Host"));
+                    if (!this.servers.get().getMap("Servers").getMap(name).getStringList("Group").equals(server.getGroups()))
+                        edits.set("group", this.servers.get().getMap("Servers").getMap(name).getRawStringList("Group"));
+                    if (this.servers.get().getMap("Servers").getMap(name).getInt("Port") != server.getAddress().getPort())
+                        edits.set("port", this.servers.get().getMap("Servers").getMap(name).getInt("Port"));
+                    if (!(ChatColor.translateAlternateColorCodes('&', this.servers.get().getMap("Servers").getMap(name).getString("Motd")).equals(server.getMotd())))
+                        edits.set("motd", this.servers.get().getMap("Servers").getMap(name).getRawString("Motd"));
+                    if (this.servers.get().getMap("Servers").getMap(name).getBoolean("Log") != server.isLogging())
+                        edits.set("log", this.servers.get().getMap("Servers").getMap(name).getBoolean("Log"));
+                    if (!this.servers.get().getMap("Servers").getMap(name).getRawString("Directory").equals(server.getPath()))
+                        edits.set("dir", this.servers.get().getMap("Servers").getMap(name).getRawString("Directory"));
+                    if (!this.servers.get().getMap("Servers").getMap(name).getRawString("Executable").equals(server.getExecutable()))
+                        edits.set("exec", this.servers.get().getMap("Servers").getMap(name).getRawString("Executable"));
+                    if (!this.servers.get().getMap("Servers").getMap(name).getRawString("Stop-Command").equals(server.getStopCommand()))
+                        edits.set("stop-cmd", this.servers.get().getMap("Servers").getMap(name).getRawString("Stop-Command"));
+                    SubServer.StopAction action = Util.getDespiteException(() -> SubServer.StopAction.valueOf(this.servers.get().getMap("Servers").getMap(name).getRawString("Stop-Action", "NONE").toUpperCase().replace('-', '_').replace(' ', '_')), null);
                     if (action != null && action != server.getStopAction())
                         edits.set("stop-action", action.toString());
-                    if (config.get().getMap("Servers").getMap(name).getBoolean("Restricted") != server.isRestricted())
-                        edits.set("restricted", config.get().getMap("Servers").getMap(name).getBoolean("Restricted"));
-                    if (config.get().getMap("Servers").getMap(name).getBoolean("Hidden") != server.isHidden())
-                        edits.set("hidden", config.get().getMap("Servers").getMap(name).getBoolean("Hidden"));
+                    if (this.servers.get().getMap("Servers").getMap(name).getBoolean("Restricted") != server.isRestricted())
+                        edits.set("restricted", this.servers.get().getMap("Servers").getMap(name).getBoolean("Restricted"));
+                    if (this.servers.get().getMap("Servers").getMap(name).getBoolean("Hidden") != server.isHidden())
+                        edits.set("hidden", this.servers.get().getMap("Servers").getMap(name).getBoolean("Hidden"));
 
 
                     if (edits.getKeys().size() > 0) {
@@ -493,43 +501,43 @@ public final class SubPlugin extends BungeeCord implements Listener {
                     }
                 } else { // Server cannot edit()
                     if (server == null ||  // Server must be reset
-                            !config.get().getMap("Servers").getMap(name).getString("Host").equalsIgnoreCase(server.getHost().getName()) ||
-                            config.get().getMap("Servers").getMap(name).getInt("Port") != server.getAddress().getPort() ||
-                            !config.get().getMap("Servers").getMap(name).getRawString("Directory").equals(server.getPath()) ||
-                            !config.get().getMap("Servers").getMap(name).getRawString("Executable").equals(server.getExecutable())
+                            !this.servers.get().getMap("Servers").getMap(name).getString("Host").equalsIgnoreCase(server.getHost().getName()) ||
+                            this.servers.get().getMap("Servers").getMap(name).getInt("Port") != server.getAddress().getPort() ||
+                            !this.servers.get().getMap("Servers").getMap(name).getRawString("Directory").equals(server.getPath()) ||
+                            !this.servers.get().getMap("Servers").getMap(name).getRawString("Executable").equals(server.getExecutable())
                             ) {
                             if (server != null) server.getHost().forceRemoveSubServer(name);
-                            server = this.hosts.get(config.get().getMap("Servers").getMap(name).getString("Host").toLowerCase()).addSubServer(name, config.get().getMap("Servers").getMap(name).getBoolean("Enabled"),
-                                    config.get().getMap("Servers").getMap(name).getInt("Port"), ChatColor.translateAlternateColorCodes('&', config.get().getMap("Servers").getMap(name).getString("Motd")), config.get().getMap("Servers").getMap(name).getBoolean("Log"),
-                                    config.get().getMap("Servers").getMap(name).getRawString("Directory"), config.get().getMap("Servers").getMap(name).getRawString("Executable"), config.get().getMap("Servers").getMap(name).getRawString("Stop-Command"),
-                                    config.get().getMap("Servers").getMap(name).getBoolean("Hidden"), config.get().getMap("Servers").getMap(name).getBoolean("Restricted"));
+                            server = this.hosts.get(this.servers.get().getMap("Servers").getMap(name).getString("Host").toLowerCase()).addSubServer(name, this.servers.get().getMap("Servers").getMap(name).getBoolean("Enabled"),
+                                    this.servers.get().getMap("Servers").getMap(name).getInt("Port"), ChatColor.translateAlternateColorCodes('&', this.servers.get().getMap("Servers").getMap(name).getString("Motd")), this.servers.get().getMap("Servers").getMap(name).getBoolean("Log"),
+                                    this.servers.get().getMap("Servers").getMap(name).getRawString("Directory"), this.servers.get().getMap("Servers").getMap(name).getRawString("Executable"), this.servers.get().getMap("Servers").getMap(name).getRawString("Stop-Command"),
+                                    this.servers.get().getMap("Servers").getMap(name).getBoolean("Hidden"), this.servers.get().getMap("Servers").getMap(name).getBoolean("Restricted"));
                     } else { // Server doesn't need to reset
-                        if (config.get().getMap("Servers").getMap(name).getBoolean("Enabled") != server.isEnabled())
-                            server.setEnabled(config.get().getMap("Servers").getMap(name).getBoolean("Enabled"));
-                        if (!ChatColor.translateAlternateColorCodes('&', config.get().getMap("Servers").getMap(name).getString("Motd")).equals(server.getMotd()))
-                            server.setMotd(ChatColor.translateAlternateColorCodes('&', config.get().getMap("Servers").getMap(name).getString("Motd")));
-                        if (config.get().getMap("Servers").getMap(name).getBoolean("Log") != server.isLogging())
-                            server.setLogging(config.get().getMap("Servers").getMap(name).getBoolean("Log"));
-                        if (!config.get().getMap("Servers").getMap(name).getRawString("Stop-Command").equals(server.getStopCommand()))
-                            server.setStopCommand(config.get().getMap("Servers").getMap(name).getRawString("Stop-Command"));
-                        if (config.get().getMap("Servers").getMap(name).getBoolean("Restricted") != server.isRestricted())
-                            server.setRestricted(config.get().getMap("Servers").getMap(name).getBoolean("Restricted"));
-                        if (config.get().getMap("Servers").getMap(name).getBoolean("Hidden") != server.isHidden())
-                            server.setHidden(config.get().getMap("Servers").getMap(name).getBoolean("Hidden"));
+                        if (this.servers.get().getMap("Servers").getMap(name).getBoolean("Enabled") != server.isEnabled())
+                            server.setEnabled(this.servers.get().getMap("Servers").getMap(name).getBoolean("Enabled"));
+                        if (!ChatColor.translateAlternateColorCodes('&', this.servers.get().getMap("Servers").getMap(name).getString("Motd")).equals(server.getMotd()))
+                            server.setMotd(ChatColor.translateAlternateColorCodes('&', this.servers.get().getMap("Servers").getMap(name).getString("Motd")));
+                        if (this.servers.get().getMap("Servers").getMap(name).getBoolean("Log") != server.isLogging())
+                            server.setLogging(this.servers.get().getMap("Servers").getMap(name).getBoolean("Log"));
+                        if (!this.servers.get().getMap("Servers").getMap(name).getRawString("Stop-Command").equals(server.getStopCommand()))
+                            server.setStopCommand(this.servers.get().getMap("Servers").getMap(name).getRawString("Stop-Command"));
+                        if (this.servers.get().getMap("Servers").getMap(name).getBoolean("Restricted") != server.isRestricted())
+                            server.setRestricted(this.servers.get().getMap("Servers").getMap(name).getBoolean("Restricted"));
+                        if (this.servers.get().getMap("Servers").getMap(name).getBoolean("Hidden") != server.isHidden())
+                            server.setHidden(this.servers.get().getMap("Servers").getMap(name).getBoolean("Hidden"));
                     } // Apply these changes regardless of reset
-                    SubServer.StopAction action = Util.getDespiteException(() -> SubServer.StopAction.valueOf(config.get().getMap("Servers").getMap(name).getRawString("Stop-Action", "NONE").toUpperCase().replace('-', '_').replace(' ', '_')), null);
+                    SubServer.StopAction action = Util.getDespiteException(() -> SubServer.StopAction.valueOf(this.servers.get().getMap("Servers").getMap(name).getRawString("Stop-Action", "NONE").toUpperCase().replace('-', '_').replace(' ', '_')), null);
                     if (action != null && action != server.getStopAction())
                         server.setStopAction(action);
-                    if (!status && config.get().getMap("Servers").getMap(name).getBoolean("Run-On-Launch"))
+                    if (!status && this.servers.get().getMap("Servers").getMap(name).getBoolean("Run-On-Launch"))
                         autorun.add(name.toLowerCase());
-                    if (config.get().getMap("Servers").getMap(name).getKeys().contains("Display") && ((config.get().getMap("Servers").getMap(name).getRawString("Display").length() == 0 && !server.getDisplayName().equals(server.getName())) || !config.get().getMap("Servers").getMap(name).getRawString("Display").equals(server.getDisplayName())))
-                        server.setDisplayName(config.get().getMap("Servers").getMap(name).getRawString("Display"));
-                    if (config.get().getMap("Servers").getMap(name).getKeys().contains("Group")) {
+                    if (this.servers.get().getMap("Servers").getMap(name).getKeys().contains("Display") && ((this.servers.get().getMap("Servers").getMap(name).getRawString("Display").length() == 0 && !server.getDisplayName().equals(server.getName())) || !this.servers.get().getMap("Servers").getMap(name).getRawString("Display").equals(server.getDisplayName())))
+                        server.setDisplayName(this.servers.get().getMap("Servers").getMap(name).getRawString("Display"));
+                    if (this.servers.get().getMap("Servers").getMap(name).getKeys().contains("Group")) {
                         for (String group : server.getGroups()) server.removeGroup(group);
-                        for (String group : config.get().getMap("Servers").getMap(name).getStringList("Group")) server.addGroup(group);
+                        for (String group : this.servers.get().getMap("Servers").getMap(name).getStringList("Group")) server.addGroup(group);
                     }
                 } // Apply these changes regardless of edit/reset
-                if (config.get().getMap("Servers").getMap(name).getKeys().contains("Extra")) for (String extra : config.get().getMap("Servers").getMap(name).getMap("Extra").getKeys()) server.addExtra(extra, config.get().getMap("Servers").getMap(name).getMap("Extra").getObject(extra));
+                if (this.servers.get().getMap("Servers").getMap(name).getKeys().contains("Extra")) for (String extra : this.servers.get().getMap("Servers").getMap(name).getMap("Extra").getKeys()) server.addExtra(extra, this.servers.get().getMap("Servers").getMap(name).getMap("Extra").getObject(extra));
                 ukeys.add(name.toLowerCase());
                 subservers++;
             } catch (Exception e) {
@@ -538,7 +546,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
         }
         for (String name : ukeys) {
             SubServer server = api.getSubServer(name);
-            for (String oname : config.get().getMap("Servers").getMap(server.getName()).getRawStringList("Incompatible", new ArrayList<>())) {
+            for (String oname : this.servers.get().getMap("Servers").getMap(server.getName()).getRawStringList("Incompatible", new ArrayList<>())) {
                 SubServer oserver = api.getSubServer(oname);
                 if (oserver != null && server.isCompatible(oserver)) server.toggleCompatibility(oserver);
             }
@@ -568,7 +576,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
 
         System.out.println("SubServers > " + ((plugins > 0)?plugins+" Plugin"+((plugins == 1)?"":"s")+", ":"") + ((proxies > 1)?proxies+" Proxies, ":"") + hosts + " Host"+((hosts == 1)?"":"s")+", " + servers + " Server"+((servers == 1)?"":"s")+", and " + subservers + " SubServer"+((subservers == 1)?"":"s")+" "+((status)?"re":"")+"loaded in " + new DecimalFormat("0.000").format((Calendar.getInstance().getTime().getTime() - begin) / 1000D) + "s");
 
-        long scd = TimeUnit.SECONDS.toMillis(config.get().getMap("Settings").getLong("Run-On-Launch-Timeout", 0L));
+        long scd = TimeUnit.SECONDS.toMillis(this.servers.get().getMap("Settings").getLong("Run-On-Launch-Timeout", 0L));
         if (autorun.size() > 0) for (Host host : api.getHosts().values()) {
             List<String> ar = new LinkedList<String>();
             for (String name : autorun) if (host.getSubServer(name) != null) ar.add(name);
@@ -604,6 +612,9 @@ public final class SubPlugin extends BungeeCord implements Listener {
         if (config.get().getMap("Settings").getBoolean("Override-Bungee-Commands", true)) {
             getPluginManager().registerCommand(null, SubCommand.BungeeServer.newInstance(this, "server").get());
             getPluginManager().registerCommand(null, new SubCommand.BungeeList(this, "glist"));
+        }
+        if (config.get().getMap("Settings").getBoolean("Smart-Fallback", true)) {
+            setReconnectHandler(new SmartReconnectHandler());
         }
         getPluginManager().registerCommand(null, SubCommand.newInstance(this, "subservers").get());
         getPluginManager().registerCommand(null, SubCommand.newInstance(this, "subserver").get());
@@ -772,7 +783,8 @@ public final class SubPlugin extends BungeeCord implements Listener {
     public void ping(ProxyPingEvent e) {
         int offline = 0;
         for (String name : e.getConnection().getListener().getServerPriority()) {
-            ServerInfo server = getServerInfo(name);
+            ServerInfo server = api.getServer(name.toLowerCase());
+            if (server == null) server = getServerInfo(name);
             if (server == null || server instanceof SubServer && !((SubServer) server).isRunning()) offline++;
         }
 
@@ -795,46 +807,74 @@ public final class SubPlugin extends BungeeCord implements Listener {
         }
 
         if (!e.getTarget().canAccess(e.getPlayer())) {
-            e.setCancelled(true);
-            if (e.getPlayer().getServer() != null) e.getPlayer().sendMessage(getTranslation("no_server_permission"));
-            else e.getPlayer().disconnect(getTranslation("no_server_permission"));
-        } else if (e.getPlayer().getServer() != null && e.getTarget() instanceof SubServer && !((SubServer) e.getTarget()).isRunning()) {
-            e.setCancelled(true);
+            if (e.getPlayer().getServer() == null || fallbackLimbo.keySet().contains(e.getPlayer().getUniqueId())) {
+                if (!fallbackLimbo.keySet().contains(e.getPlayer().getUniqueId()) || fallbackLimbo.get(e.getPlayer().getUniqueId()).contains(e.getTarget())) {
+                    ServerKickEvent kick = new ServerKickEvent(e.getPlayer(), e.getTarget(), new BaseComponent[]{
+                            new TextComponent(getTranslation("no_server_permission"))
+                    }, null, ServerKickEvent.State.CONNECTING);
+                    fallback(kick);
+                    if (!kick.isCancelled()) e.getPlayer().disconnect(kick.getKickReasonComponent());
+                    if (e.getPlayer().getServer() != null) e.setCancelled(true);
+                }
+            } else {
+                e.getPlayer().sendMessage(getTranslation("no_server_permission"));
+                e.setCancelled(true);
+            }
+        } else if (e.getPlayer().getServer() != null && !fallbackLimbo.keySet().contains(e.getPlayer().getUniqueId()) && e.getTarget() instanceof SubServer && !((SubServer) e.getTarget()).isRunning()) {
             e.getPlayer().sendMessage(api.getLang("SubServers", "Bungee.Server.Offline"));
+            e.setCancelled(true);
+        }
+
+        if (fallbackLimbo.keySet().contains(e.getPlayer().getUniqueId())) {
+            if (fallbackLimbo.get(e.getPlayer().getUniqueId()).contains(e.getTarget())) {
+                fallbackLimbo.get(e.getPlayer().getUniqueId()).remove(e.getTarget());
+            } else if (e.getPlayer().getServer() != null) {
+                e.setCancelled(true);
+            }
         }
     }
 
     @SuppressWarnings("deprecation")
-    @EventHandler(priority = Byte.MIN_VALUE)
+    @EventHandler(priority = Byte.MAX_VALUE)
     public void fallback(ServerKickEvent e) {
-        NamedContainer<Integer, List<ServerInfo>> next = null;
-        for (String name : e.getPlayer().getPendingConnection().getListener().getServerPriority()) {
-            if (!e.getKickedFrom().getName().equalsIgnoreCase(name)) {
-                ServerInfo server = getServerInfo(name);
-                if (server != null && (!(server instanceof SubServer) || ((SubServer) server).isRunning())) {
-                    int confidence = 0;
-                    if (server instanceof Server) {
-                        if (!((Server) server).isHidden()) confidence++;
-                        if (!((Server) server).isRestricted()) confidence++;
-                        if (((Server) server).getSubData() != null) confidence++;
-                    }
+        if (e.getPlayer() instanceof UserConnection && config.get().getMap("Settings").getBoolean("Smart-Fallback", true)) {
+            Map<String, ServerInfo> fallbacks;
+            if (!fallbackLimbo.keySet().contains(e.getPlayer().getUniqueId())) {
+                fallbacks = SmartReconnectHandler.getFallbackServers(e.getPlayer().getPendingConnection().getListener());
+            } else {
+                fallbacks = new LinkedHashMap<String, ServerInfo>();
+                for (ServerInfo server : fallbackLimbo.get(e.getPlayer().getUniqueId())) fallbacks.put(server.getName(), server);
+            }
 
-                    if (next == null || confidence > next.name()) {
-                        List<ServerInfo> servers = new ArrayList<ServerInfo>();
-                        servers.add(server);
-                        next = new NamedContainer<Integer, List<ServerInfo>>(confidence, servers);
-                    } else if (confidence == next.name()) {
-                        next.get().add(server);
-                    }
-                }
+            fallbacks.remove(e.getKickedFrom().getName());
+            if (!fallbacks.isEmpty()) {
+                e.setCancelled(true);
+                e.getPlayer().sendMessage(api.getLang("SubServers", "Bungee.Feature.Smart-Fallback").replace("$str$", (e.getKickedFrom() instanceof Server)?((Server) e.getKickedFrom()).getDisplayName():e.getKickedFrom().getName()).replace("$msg$", e.getKickReason()));
+                if (!fallbackLimbo.keySet().contains(e.getPlayer().getUniqueId())) fallbackLimbo.put(e.getPlayer().getUniqueId(), new LinkedList<>(fallbacks.values()));
+
+                ServerInfo next = new LinkedList<Map.Entry<String, ServerInfo>>(fallbacks.entrySet()).getFirst().getValue();
+                e.setCancelServer(next);
+                ((UserConnection) e.getPlayer()).setServerJoinQueue(new LinkedBlockingQueue<>(fallbacks.keySet()));
+                ((UserConnection) e.getPlayer()).connect(next, null, true);
             }
         }
-
-        if (next != null) {
-            e.setCancelServer(next.get().get(new Random().nextInt(next.get().size())));
-            e.setCancelled(true);
-            e.getPlayer().sendMessage(api.getLang("SubServers", "Bungee.Feature.Return").replace("$str$", (e.getCancelServer() instanceof Server)?((Server) e.getCancelServer()).getDisplayName():e.getCancelServer().getName()).replace("$msg$", e.getKickReason()));
-        }
+    }
+    @SuppressWarnings("deprecation")
+    @EventHandler(priority = Byte.MAX_VALUE)
+    public void fallbackFound(ServerConnectedEvent e) {
+        if (fallbackLimbo.keySet().contains(e.getPlayer().getUniqueId())) new Timer("SubServers.Bungee::Fallback_Limbo_Timer(" + e.getPlayer().getUniqueId() + ')').schedule(new TimerTask() {
+            @Override
+            public void run() {
+               if (e.getPlayer().getServer() != null && !((UserConnection) e.getPlayer()).isDimensionChange() && e.getPlayer().getServer().getInfo().getAddress().equals(e.getServer().getInfo().getAddress())) {
+                   fallbackLimbo.remove(e.getPlayer().getUniqueId());
+                   e.getPlayer().sendMessage(api.getLang("SubServers", "Bungee.Feature.Smart-Fallback.Result").replace("$str$", (e.getServer().getInfo() instanceof Server)?((Server) e.getServer().getInfo()).getDisplayName():e.getServer().getInfo().getName()));
+               }
+            }
+        }, 1000);
+    }
+    @EventHandler(priority = Byte.MIN_VALUE)
+    public void resetLimbo(PlayerDisconnectEvent e) {
+        fallbackLimbo.remove(e.getPlayer().getUniqueId());
     }
 
     @EventHandler(priority = Byte.MIN_VALUE)

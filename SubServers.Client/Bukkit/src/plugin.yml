@@ -4,16 +4,16 @@ version: '2.14a'
 authors: [ME1312]
 softdepend: [Vault, TitleManager]
 website: 'https://github.com/ME1312/SubServers-2'
-commands:
-  subservers:
-    description: 'The SubServers Command'
-    usage: '/subservers is currently unavailable'
-  subserver:
-    description: 'The SubServers Command'
-    usage: '/subserver is currently unavailable'
-  sub:
-    description: 'The SubServers Command'
-    usage: '/sub is currently unavailable'
+#commands:
+#  subservers:
+#    description: 'The SubServers Command'
+#    usage: '/subservers is currently unavailable'
+#  subserver:
+#    description: 'The SubServers Command'
+#    usage: '/subserver is currently unavailable'
+#  sub:
+#    description: 'The SubServers Command'
+#    usage: '/sub is currently unavailable'
 permissions:
   subservers.*:
     description: 'Grants Access to to Everything in SubServers.Client'

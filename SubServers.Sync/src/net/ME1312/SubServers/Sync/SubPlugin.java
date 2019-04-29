@@ -5,6 +5,7 @@ import com.google.gson.Gson;
 import net.ME1312.SubServers.Sync.Event.*;
 import net.ME1312.SubServers.Sync.Library.Config.YAMLConfig;
 import net.ME1312.SubServers.Sync.Library.Config.YAMLSection;
+import net.ME1312.SubServers.Sync.Library.Fallback.SmartReconnectHandler;
 import net.ME1312.SubServers.Sync.Library.Metrics;
 import net.ME1312.SubServers.Sync.Library.NamedContainer;
 import net.ME1312.SubServers.Sync.Library.UniversalFile;
@@ -15,13 +16,13 @@ import net.ME1312.SubServers.Sync.Network.SubDataClient;
 import net.ME1312.SubServers.Sync.Server.ServerContainer;
 import net.ME1312.SubServers.Sync.Server.SubServerContainer;
 import net.md_5.bungee.BungeeCord;
+import net.md_5.bungee.UserConnection;
 import net.md_5.bungee.api.ServerPing;
+import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.config.ListenerInfo;
 import net.md_5.bungee.api.config.ServerInfo;
-import net.md_5.bungee.api.event.ProxyPingEvent;
-import net.md_5.bungee.api.event.ServerConnectEvent;
-import net.md_5.bungee.api.event.ServerKickEvent;
+import net.md_5.bungee.api.event.*;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
 
@@ -32,6 +33,7 @@ import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.*;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -40,6 +42,7 @@ import java.util.concurrent.TimeUnit;
 public final class SubPlugin extends BungeeCord implements Listener {
     protected NamedContainer<Long, Map<String, Map<String, String>>> lang = null;
     public final Map<String, ServerContainer> servers = new TreeMap<String, ServerContainer>();
+    private final HashMap<UUID, List<ServerInfo>> fallbackLimbo = new HashMap<UUID, List<ServerInfo>>();
 
     public final PrintStream out;
     public final UniversalFile dir = new UniversalFile(new File(System.getProperty("user.dir")));
@@ -63,18 +66,18 @@ public final class SubPlugin extends BungeeCord implements Listener {
             YAMLConfig tmp = new YAMLConfig(new UniversalFile("config.yml"));
             tmp.get().set("stats", UUID.randomUUID().toString());
             tmp.save();
-            System.out.println("SubServers > Created ~/config.yml");
+            System.out.println("SubServers > Created ./config.yml");
         }
         UniversalFile dir = new UniversalFile(this.dir, "SubServers");
         dir.mkdir();
         if (!(new UniversalFile(dir, "sync.yml").exists())) {
             Util.copyFromJar(SubPlugin.class.getClassLoader(), "net/ME1312/SubServers/Sync/Library/Files/config.yml", new UniversalFile(dir, "sync.yml").getPath());
-            System.out.println("SubServers > Created ~/SubServers/sync.yml");
+            System.out.println("SubServers > Created ./SubServers/sync.yml");
         } else if (((new YAMLConfig(new UniversalFile(dir, "sync.yml"))).get().getSection("Settings").getVersion("Version", new Version(0))).compareTo(new Version("2.11.2a+")) != 0) {
             Files.move(new UniversalFile(dir, "sync.yml").toPath(), new UniversalFile(dir, "config.old" + Math.round(Math.random() * 100000) + ".yml").toPath());
 
             Util.copyFromJar(SubPlugin.class.getClassLoader(), "net/ME1312/SubServers/Sync/Library/Files/config.yml", new UniversalFile(dir, "sync.yml").getPath());
-            System.out.println("SubServers > Updated ~/SubServers/sync.yml");
+            System.out.println("SubServers > Updated ./SubServers/sync.yml");
         }
         config = new YAMLConfig(new UniversalFile(dir, "sync.yml"));
 
@@ -268,46 +271,74 @@ public final class SubPlugin extends BungeeCord implements Listener {
         }
 
         if (!e.getTarget().canAccess(e.getPlayer())) {
-            e.setCancelled(true);
-            if (e.getPlayer().getServer() != null) e.getPlayer().sendMessage(getTranslation("no_server_permission"));
-            else e.getPlayer().disconnect(getTranslation("no_server_permission"));
-        } else if (e.getPlayer().getServer() != null && e.getTarget() instanceof SubServerContainer && !((SubServerContainer) e.getTarget()).isRunning()) {
-            e.setCancelled(true);
+            if (e.getPlayer().getServer() == null || fallbackLimbo.keySet().contains(e.getPlayer().getUniqueId())) {
+                if (!fallbackLimbo.keySet().contains(e.getPlayer().getUniqueId()) || fallbackLimbo.get(e.getPlayer().getUniqueId()).contains(e.getTarget())) {
+                    ServerKickEvent kick = new ServerKickEvent(e.getPlayer(), e.getTarget(), new BaseComponent[]{
+                            new TextComponent(getTranslation("no_server_permission"))
+                    }, null, ServerKickEvent.State.CONNECTING);
+                    fallback(kick);
+                    if (!kick.isCancelled()) e.getPlayer().disconnect(kick.getKickReasonComponent());
+                    if (e.getPlayer().getServer() != null) e.setCancelled(true);
+                }
+            } else {
+                e.getPlayer().sendMessage(getTranslation("no_server_permission"));
+                e.setCancelled(true);
+            }
+        } else if (e.getPlayer().getServer() != null && !fallbackLimbo.keySet().contains(e.getPlayer().getUniqueId()) && e.getTarget() instanceof SubServerContainer && !((SubServerContainer) e.getTarget()).isRunning()) {
             e.getPlayer().sendMessage(api.getLang("SubServers", "Bungee.Server.Offline"));
+            e.setCancelled(true);
+        }
+
+        if (fallbackLimbo.keySet().contains(e.getPlayer().getUniqueId())) {
+            if (fallbackLimbo.get(e.getPlayer().getUniqueId()).contains(e.getTarget())) {
+                fallbackLimbo.get(e.getPlayer().getUniqueId()).remove(e.getTarget());
+            } else if (e.getPlayer().getServer() != null) {
+                e.setCancelled(true);
+            }
         }
     }
 
     @SuppressWarnings("deprecation")
-    @EventHandler(priority = Byte.MIN_VALUE)
+    @EventHandler(priority = Byte.MAX_VALUE)
     public void fallback(ServerKickEvent e) {
-        NamedContainer<Integer, List<ServerInfo>> next = null;
-        for (String name : e.getPlayer().getPendingConnection().getListener().getServerPriority()) {
-            if (!e.getKickedFrom().getName().equalsIgnoreCase(name)) {
-                ServerInfo server = getServerInfo(name);
-                if (server != null && (!(server instanceof SubServerContainer) || ((SubServerContainer) server).isRunning())) {
-                    int confidence = 0;
-                    if (server instanceof ServerContainer) {
-                        if (!((ServerContainer) server).isHidden()) confidence++;
-                        if (!((ServerContainer) server).isRestricted()) confidence++;
-                        if (((ServerContainer) server).getSubData() != null) confidence++;
-                    }
+        if (e.getPlayer() instanceof UserConnection && config.get().getSection("Settings").getBoolean("Smart-Fallback", true)) {
+            Map<String, ServerInfo> fallbacks;
+            if (!fallbackLimbo.keySet().contains(e.getPlayer().getUniqueId())) {
+                fallbacks = SmartReconnectHandler.getFallbackServers(e.getPlayer().getPendingConnection().getListener());
+            } else {
+                fallbacks = new LinkedHashMap<String, ServerInfo>();
+                for (ServerInfo server : fallbackLimbo.get(e.getPlayer().getUniqueId())) fallbacks.put(server.getName(), server);
+            }
 
-                    if (next == null || confidence > next.name()) {
-                        List<ServerInfo> servers = new ArrayList<ServerInfo>();
-                        servers.add(server);
-                        next = new NamedContainer<Integer, List<ServerInfo>>(confidence, servers);
-                    } else if (confidence == next.name()) {
-                        next.get().add(server);
-                    }
-                }
+            fallbacks.remove(e.getKickedFrom().getName());
+            if (!fallbacks.isEmpty()) {
+                e.setCancelled(true);
+                e.getPlayer().sendMessage(api.getLang("SubServers", "Bungee.Feature.Smart-Fallback").replace("$str$", (e.getKickedFrom() instanceof ServerContainer)?((ServerContainer) e.getKickedFrom()).getDisplayName():e.getKickedFrom().getName()).replace("$msg$", e.getKickReason()));
+                if (!fallbackLimbo.keySet().contains(e.getPlayer().getUniqueId())) fallbackLimbo.put(e.getPlayer().getUniqueId(), new LinkedList<>(fallbacks.values()));
+
+                ServerInfo next = new LinkedList<Map.Entry<String, ServerInfo>>(fallbacks.entrySet()).getFirst().getValue();
+                e.setCancelServer(next);
+                ((UserConnection) e.getPlayer()).setServerJoinQueue(new LinkedBlockingQueue<>(fallbacks.keySet()));
+                ((UserConnection) e.getPlayer()).connect(next, null, true);
             }
         }
-
-        if (next != null) {
-            e.setCancelServer(next.get().get(new Random().nextInt(next.get().size())));
-            e.setCancelled(true);
-            e.getPlayer().sendMessage(api.getLang("SubServers", "Bungee.Feature.Return").replace("$str$", (e.getCancelServer() instanceof ServerContainer)?((ServerContainer) e.getCancelServer()).getDisplayName():e.getCancelServer().getName()).replace("$msg$", e.getKickReason()));
-        }
+    }
+    @SuppressWarnings("deprecation")
+    @EventHandler(priority = Byte.MAX_VALUE)
+    public void fallbackFound(ServerConnectedEvent e) {
+        if (fallbackLimbo.keySet().contains(e.getPlayer().getUniqueId())) new Timer("SubServers.Sync::Fallback_Limbo_Timer(" + e.getPlayer().getUniqueId() + ')').schedule(new TimerTask() {
+            @Override
+            public void run() {
+                if (e.getPlayer().getServer() != null && !((UserConnection) e.getPlayer()).isDimensionChange() && e.getPlayer().getServer().getInfo().getAddress().equals(e.getServer().getInfo().getAddress())) {
+                    fallbackLimbo.remove(e.getPlayer().getUniqueId());
+                    e.getPlayer().sendMessage(api.getLang("SubServers", "Bungee.Feature.Smart-Fallback.Result").replace("$str$", (e.getServer().getInfo() instanceof ServerContainer)?((ServerContainer) e.getServer().getInfo()).getDisplayName():e.getServer().getInfo().getName()));
+                }
+            }
+        }, 1000);
+    }
+    @EventHandler(priority = Byte.MIN_VALUE)
+    public void resetLimbo(PlayerDisconnectEvent e) {
+        fallbackLimbo.remove(e.getPlayer().getUniqueId());
     }
 
     @EventHandler(priority = Byte.MIN_VALUE)

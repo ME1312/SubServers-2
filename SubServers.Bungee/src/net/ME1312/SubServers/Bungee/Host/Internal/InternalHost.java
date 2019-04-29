@@ -168,13 +168,13 @@ public class InternalHost extends Host {
                 }
 
                 System.out.println("SubServers > Saving...");
-                YAMLSection info = (plugin.config.get().getMap("Servers").getKeys().contains(server))?new YAMLSection(plugin.config.get().getMap("Servers").getMap(server).get()):new YAMLSection();
+                YAMLSection info = (plugin.servers.get().getMap("Servers").getKeys().contains(server))?new YAMLSection(plugin.servers.get().getMap("Servers").getMap(server).get()):new YAMLSection();
                 info.set("Name", server);
                 info.set("Timestamp", Calendar.getInstance().getTime().getTime());
                 try {
-                    if (plugin.config.get().getMap("Servers").getKeys().contains(server)) {
-                        plugin.config.get().getMap("Servers").remove(server);
-                        plugin.config.save();
+                    if (plugin.servers.get().getMap("Servers").getKeys().contains(server)) {
+                        plugin.servers.get().getMap("Servers").remove(server);
+                        plugin.servers.save();
                     }
                     if (!to.exists()) to.mkdirs();
                     FileWriter writer = new FileWriter(new File(to, "info.json"));
@@ -213,13 +213,13 @@ public class InternalHost extends Host {
                 }
 
                 System.out.println("SubServers > Saving...");
-                YAMLSection info = (plugin.config.get().getMap("Servers").getKeys().contains(server))?new YAMLSection(plugin.config.get().getMap("Servers").getMap(server).get()):new YAMLSection();
+                YAMLSection info = (plugin.servers.get().getMap("Servers").getKeys().contains(server))?new YAMLSection(plugin.servers.get().getMap("Servers").getMap(server).get()):new YAMLSection();
                 info.set("Name", server);
                 info.set("Timestamp", Calendar.getInstance().getTime().getTime());
                 try {
-                    if (plugin.config.get().getMap("Servers").getKeys().contains(server)) {
-                        plugin.config.get().getMap("Servers").remove(server);
-                        plugin.config.save();
+                    if (plugin.servers.get().getMap("Servers").getKeys().contains(server)) {
+                        plugin.servers.get().getMap("Servers").remove(server);
+                        plugin.servers.save();
                     }
                     if (!to.exists()) to.mkdirs();
                     FileWriter writer = new FileWriter(new File(to, "info.json"), false);
@@ -257,13 +257,13 @@ public class InternalHost extends Host {
                 }
 
                 System.out.println("SubServers > Saving...");
-                YAMLSection info = (plugin.config.get().getMap("Servers").getKeys().contains(server))?new YAMLSection(plugin.config.get().getMap("Servers").getMap(server).get()):new YAMLSection();
+                YAMLSection info = (plugin.servers.get().getMap("Servers").getKeys().contains(server))?new YAMLSection(plugin.servers.get().getMap("Servers").getMap(server).get()):new YAMLSection();
                 info.set("Name", server);
                 info.set("Timestamp", Calendar.getInstance().getTime().getTime());
                 try {
-                    if (plugin.config.get().getMap("Servers").getKeys().contains(server)) {
-                        plugin.config.get().getMap("Servers").remove(server);
-                        plugin.config.save();
+                    if (plugin.servers.get().getMap("Servers").getKeys().contains(server)) {
+                        plugin.servers.get().getMap("Servers").remove(server);
+                        plugin.servers.save();
                     }
                     if (!to.exists()) to.mkdirs();
                     FileWriter writer = new FileWriter(new File(to, "info.json"));
@@ -302,13 +302,13 @@ public class InternalHost extends Host {
                 }
 
                 System.out.println("SubServers > Saving...");
-                YAMLSection info = (plugin.config.get().getMap("Servers").getKeys().contains(server))?new YAMLSection(plugin.config.get().getMap("Servers").getMap(server).get()):new YAMLSection();
+                YAMLSection info = (plugin.servers.get().getMap("Servers").getKeys().contains(server))?new YAMLSection(plugin.servers.get().getMap("Servers").getMap(server).get()):new YAMLSection();
                 info.set("Name", server);
                 info.set("Timestamp", Calendar.getInstance().getTime().getTime());
                 try {
-                    if (plugin.config.get().getMap("Servers").getKeys().contains(server)) {
-                        plugin.config.get().getMap("Servers").remove(server);
-                        plugin.config.save();
+                    if (plugin.servers.get().getMap("Servers").getKeys().contains(server)) {
+                        plugin.servers.get().getMap("Servers").remove(server);
+                        plugin.servers.save();
                     }
                     if (!to.exists()) to.mkdirs();
                     FileWriter writer = new FileWriter(new File(to, "info.json"), false);

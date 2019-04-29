@@ -223,8 +223,8 @@ public class InternalSubCreator extends SubCreator {
                     if (action != null) subserver.setStopAction(action);
                     if (server.contains("Extra")) for (String extra : server.getMap("Extra").getKeys())
                         subserver.addExtra(extra, server.getMap("Extra").getObject(extra));
-                    host.plugin.config.get().getMap("Servers").set(name, server);
-                    host.plugin.config.save();
+                    host.plugin.servers.get().getMap("Servers").set(name, server);
+                    host.plugin.servers.save();
                     if (template.getBuildOptions().getBoolean("Run-On-Finish", true))
                         subserver.start();
 

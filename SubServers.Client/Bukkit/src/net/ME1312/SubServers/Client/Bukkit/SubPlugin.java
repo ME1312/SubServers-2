@@ -3,8 +3,6 @@ package net.ME1312.SubServers.Client.Bukkit;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.SubData.Client.Encryption.AES;
 import net.ME1312.SubData.Client.Encryption.RSA;
-import net.ME1312.SubData.Client.SubDataProtocol;
-import net.ME1312.SubServers.Client.Bukkit.Event.SubNetworkDisconnectEvent;
 import net.ME1312.SubServers.Client.Bukkit.Graphic.DefaultUIHandler;
 import net.ME1312.SubServers.Client.Bukkit.Graphic.UIHandler;
 import net.ME1312.Galaxi.Library.Config.YAMLConfig;
@@ -15,9 +13,9 @@ import net.ME1312.Galaxi.Library.UniversalFile;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubData.Client.SubDataClient;
-import net.ME1312.SubServers.Client.Bukkit.Network.Packet.PacketLinkServer;
 import net.ME1312.SubServers.Client.Bukkit.Network.SubProtocol;
 import org.bukkit.Bukkit;
+import org.bukkit.command.CommandMap;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.*;
@@ -40,7 +38,7 @@ public final class SubPlugin extends JavaPlugin {
     protected NamedContainer<Long, Map<String, Map<String, String>>> lang = null;
     public YAMLConfig config;
     public SubDataClient subdata = null;
-    public SubDataProtocol subprotocol;
+    public SubProtocol subprotocol;
 
     public UIHandler gui = null;
     public final Version version;
@@ -66,12 +64,12 @@ public final class SubPlugin extends JavaPlugin {
             }
             if (!(new UniversalFile(getDataFolder(), "config.yml").exists())) {
                 Util.copyFromJar(SubPlugin.class.getClassLoader(), "config.yml", new UniversalFile(getDataFolder(), "config.yml").getPath());
-                Bukkit.getLogger().info("SubServers > Created ~/plugins/SubServers-Client-Bukkit/config.yml");
+                Bukkit.getLogger().info("SubServers > Created ./plugins/SubServers-Client-Bukkit/config.yml");
             } else if (((new YAMLConfig(new UniversalFile(getDataFolder(), "config.yml"))).get().getMap("Settings").getVersion("Version", new Version(0))).compareTo(new Version("2.11.2a+")) != 0) {
                 Files.move(new UniversalFile(getDataFolder(), "config.yml").toPath(), new UniversalFile(getDataFolder(), "config.old" + Math.round(Math.random() * 100000) + ".yml").toPath());
 
                 Util.copyFromJar(SubPlugin.class.getClassLoader(), "config.yml", new UniversalFile(getDataFolder(), "config.yml").getPath());
-                Bukkit.getLogger().info("SubServers > Updated ~/plugins/SubServers-Client-Bukkit/config.yml");
+                Bukkit.getLogger().info("SubServers > Updated .plugins/SubServers-Client-Bukkit/config.yml");
             }
             config = new YAMLConfig(new UniversalFile(getDataFolder(), "config.yml"));
             if (new UniversalFile(new File(System.getProperty("user.dir")), "subdata.json").exists()) {
@@ -89,11 +87,12 @@ public final class SubPlugin extends JavaPlugin {
             reload(false);
 
             if (config.get().getMap("Settings").getBoolean("Ingame-Access", true)) {
+                CommandMap cmd = Util.reflect(Bukkit.getServer().getClass().getDeclaredField("commandMap"), Bukkit.getServer());
                 gui = new DefaultUIHandler(this);
-                SubCommand cmd = new SubCommand(this);
-                getCommand("subservers").setExecutor(cmd);
-                getCommand("subserver").setExecutor(cmd);
-                getCommand("sub").setExecutor(cmd);
+
+                cmd.register("subservers", new SubCommand(this, "subservers"));
+                cmd.register("subservers", new SubCommand(this, "subserver"));
+                cmd.register("subservers", new SubCommand(this, "sub"));
             }
 
             new Metrics(this);
@@ -174,8 +173,10 @@ public final class SubPlugin extends JavaPlugin {
     @Override
     public void onDisable() {
         if (subdata != null) try {
+            setEnabled(false);
             subdata.close();
-        } catch (IOException e) {
+            subdata.waitFor();
+        } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }
     }

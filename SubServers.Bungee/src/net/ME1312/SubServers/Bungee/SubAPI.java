@@ -12,7 +12,6 @@ import net.ME1312.Galaxi.Library.NamedContainer;
 import net.ME1312.Galaxi.Library.UniversalFile;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
-import net.ME1312.SubData.Server.SubDataServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.protocol.ProtocolConstants;
 
@@ -575,9 +574,9 @@ public final class SubAPI {
      */
     public void setLang(String channel, String key, String value) {
         if (Util.isNull(channel, key, value)) throw new NullPointerException();
-        LinkedHashMap<String, String> map = (plugin.lang.keySet().contains(channel.toLowerCase()))?plugin.lang.get(channel.toLowerCase()):new LinkedHashMap<String, String>();
+        LinkedHashMap<String, String> map = (plugin.exLang.keySet().contains(channel.toLowerCase()))?plugin.exLang.get(channel.toLowerCase()):new LinkedHashMap<String, String>();
         map.put(key, value);
-        plugin.lang.put(channel.toLowerCase(), map);
+        plugin.exLang.put(channel.toLowerCase(), map);
     }
 
     /**
@@ -586,7 +585,7 @@ public final class SubAPI {
      * @return SubServers Lang Channel list
      */
     public Collection<String> getLangChannels() {
-        return plugin.lang.keySet();
+        return plugin.exLang.keySet();
     }
 
     /**
@@ -597,7 +596,7 @@ public final class SubAPI {
      */
     public Map<String, String> getLang(String channel) {
         if (Util.isNull(channel)) throw new NullPointerException();
-        return new LinkedHashMap<>(plugin.lang.get(channel.toLowerCase()));
+        return new LinkedHashMap<>(plugin.exLang.get(channel.toLowerCase()));
     }
 
     /**

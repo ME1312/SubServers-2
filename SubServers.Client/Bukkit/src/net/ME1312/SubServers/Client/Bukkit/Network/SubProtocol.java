@@ -1,5 +1,6 @@
 package net.ME1312.SubServers.Client.Bukkit.Network;
 
+import net.ME1312.Galaxi.Library.Callback.Callback;
 import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubData.Client.SubDataClient;
 import net.ME1312.SubData.Client.SubDataProtocol;
@@ -17,14 +18,13 @@ import java.util.logging.Logger;
 
 public class SubProtocol extends SubDataProtocol {
     private static SubProtocol instance;
-    private SubProtocol(Logger logger) {
-        super(logger);
-    }
+    private static Logger log;
+    private SubProtocol() {}
 
     @SuppressWarnings("deprecation")
     public static SubProtocol get() {
         if (instance == null) {
-            Logger log = Logger.getAnonymousLogger();
+            log = Logger.getAnonymousLogger();
             log.setUseParentHandlers(false);
             log.addHandler(new Handler() {
                 private boolean open = true;
@@ -45,11 +45,11 @@ public class SubProtocol extends SubDataProtocol {
                     open = false;
                 }
             });
-            instance = new SubProtocol(log);
+            instance = new SubProtocol();
             SubPlugin plugin = SubAPI.getInstance().getInternals();
 
             instance.setName("SubServers 2");
-            instance.addVersion(new Version("2.13.2a+"));
+            instance.addVersion(new Version("2.14a+"));
 
 
             // 00-09: Object Link Packets
@@ -114,16 +114,30 @@ public class SubProtocol extends SubDataProtocol {
 
     @SuppressWarnings("deprecation")
     @Override
-    public SubDataClient open(InetAddress address, int port) throws IOException {
-        SubDataClient subdata = super.open(address, port);
+    public SubDataClient open(Callback<Runnable> scheduler, Logger logger, InetAddress address, int port) throws IOException {
+        SubDataClient subdata = super.open(scheduler, logger, address, port);
         SubPlugin plugin = SubAPI.getInstance().getInternals();
 
         subdata.on.ready(client -> ((SubDataClient) client).sendPacket(new PacketLinkServer(plugin)));
         subdata.on.closed(client -> {
             SubNetworkDisconnectEvent event = new SubNetworkDisconnectEvent(client.get(), client.name());
-            Bukkit.getPluginManager().callEvent(event);
+            if (plugin.isEnabled()) Bukkit.getPluginManager().callEvent(event);
         });
 
         return subdata;
+    }
+
+    @SuppressWarnings("deprecation")
+    @Override
+    public SubDataClient open(Logger logger, InetAddress address, int port) throws IOException {
+        SubPlugin plugin = SubAPI.getInstance().getInternals();
+        return open(event -> {
+            if (plugin.isEnabled()) Bukkit.getScheduler().runTask(plugin, event);
+            else event.run();
+        }, logger, address, port);
+    }
+
+    public SubDataClient open(InetAddress address, int port) throws IOException {
+        return open(log, address, port);
     }
 }

@@ -155,9 +155,9 @@ public class InternalSubServer extends SubServerContainer {
                     host.deleteSubServer(getName());
                 } else {
                     try {
-                        if (host.plugin.config.get().getMap("Servers").getKeys().contains(getName())) {
-                            host.plugin.config.get().getMap("Servers").remove(getName());
-                            host.plugin.config.save();
+                        if (host.plugin.servers.get().getMap("Servers").getKeys().contains(getName())) {
+                            host.plugin.servers.get().getMap("Servers").remove(getName());
+                            host.plugin.servers.save();
                         }
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -275,11 +275,11 @@ public class InternalSubServer extends SubServerContainer {
                             if (value.isString() && host.removeSubServer(player, getName())) {
                                 SubServer server = host.addSubServer(player, value.asRawString(), isEnabled(), getAddress().getPort(), getMotd(), isLogging(), getPath(), getExecutable(), getStopCommand(), isHidden(), isRestricted());
                                 if (server != null) {
-                                    if (this.host.plugin.config.get().getMap("Servers").getKeys().contains(getName())) {
-                                        ObjectMap<String> config = this.host.plugin.config.get().getMap("Servers").getMap(getName());
-                                        this.host.plugin.config.get().getMap("Servers").remove(getName());
-                                        this.host.plugin.config.get().getMap("Servers").set(server.getName(), config);
-                                        this.host.plugin.config.save();
+                                    if (this.host.plugin.servers.get().getMap("Servers").getKeys().contains(getName())) {
+                                        ObjectMap<String> config = this.host.plugin.servers.get().getMap("Servers").getMap(getName());
+                                        this.host.plugin.servers.get().getMap("Servers").remove(getName());
+                                        this.host.plugin.servers.get().getMap("Servers").set(server.getName(), config);
+                                        this.host.plugin.servers.save();
                                     }
                                     forward = server;
                                     c++;
@@ -297,13 +297,13 @@ public class InternalSubServer extends SubServerContainer {
                                 }
                                 f.setAccessible(false);
                                 logger.name = getDisplayName();
-                                if (this.host.plugin.config.get().getMap("Servers").getKeys().contains(getName())) {
+                                if (this.host.plugin.servers.get().getMap("Servers").getKeys().contains(getName())) {
                                     if (getName().equals(getDisplayName())) {
-                                        this.host.plugin.config.get().getMap("Servers").getMap(getName()).remove("Display");
+                                        this.host.plugin.servers.get().getMap("Servers").getMap(getName()).remove("Display");
                                     } else {
-                                        this.host.plugin.config.get().getMap("Servers").getMap(getName()).set("Display", getDisplayName());
+                                        this.host.plugin.servers.get().getMap("Servers").getMap(getName()).set("Display", getDisplayName());
                                     }
-                                    this.host.plugin.config.save();
+                                    this.host.plugin.servers.save();
                                 }
                                 c++;
                             }
@@ -311,9 +311,9 @@ public class InternalSubServer extends SubServerContainer {
                         case "enabled":
                             if (value.isBoolean()) {
                                 enabled = value.asBoolean();
-                                if (this.host.plugin.config.get().getMap("Servers").getKeys().contains(getName())) {
-                                    this.host.plugin.config.get().getMap("Servers").getMap(getName()).set("Enabled", isEnabled());
-                                    this.host.plugin.config.save();
+                                if (this.host.plugin.servers.get().getMap("Servers").getKeys().contains(getName())) {
+                                    this.host.plugin.servers.get().getMap("Servers").getMap(getName()).set("Enabled", isEnabled());
+                                    this.host.plugin.servers.save();
                                 }
                                 c++;
                             }
@@ -321,9 +321,9 @@ public class InternalSubServer extends SubServerContainer {
                         case "group":
                             if (value.isList()) {
                                 Util.reflect(ServerContainer.class.getDeclaredField("groups"), this, value.asStringList());
-                                if (this.host.plugin.config.get().getMap("Servers").getKeys().contains(getName())) {
-                                    this.host.plugin.config.get().getMap("Servers").getMap(getName()).set("Group", value.asStringList());
-                                    this.host.plugin.config.save();
+                                if (this.host.plugin.servers.get().getMap("Servers").getKeys().contains(getName())) {
+                                    this.host.plugin.servers.get().getMap("Servers").getMap(getName()).set("Group", value.asStringList());
+                                    this.host.plugin.servers.save();
                                 }
                                 c++;
                             }
@@ -332,9 +332,9 @@ public class InternalSubServer extends SubServerContainer {
                             if (value.isString() && host.removeSubServer(player, getName())) {
                                 SubServer server = this.host.plugin.api.getHost(value.asRawString()).addSubServer(player, getName(), isEnabled(), getAddress().getPort(), getMotd(), isLogging(), getPath(), getExecutable(), getStopCommand(), isHidden(), isRestricted());
                                 if (server != null) {
-                                    if (this.host.plugin.config.get().getMap("Servers").getKeys().contains(getName())) {
-                                        this.host.plugin.config.get().getMap("Servers").getMap(getName()).set("Host", server.getHost().getName());
-                                        this.host.plugin.config.save();
+                                    if (this.host.plugin.servers.get().getMap("Servers").getKeys().contains(getName())) {
+                                        this.host.plugin.servers.get().getMap("Servers").getMap(getName()).set("Host", server.getHost().getName());
+                                        this.host.plugin.servers.save();
                                     }
                                     forward = server;
                                     c++;
@@ -345,9 +345,9 @@ public class InternalSubServer extends SubServerContainer {
                             if (value.isNumber() && host.removeSubServer(player, getName())) {
                                 SubServer server = host.addSubServer(player, getName(), isEnabled(), value.asInt(), getMotd(), isLogging(), getPath(), getExecutable(), getStopCommand(), isHidden(), isRestricted());
                                 if (server != null) {
-                                    if (this.host.plugin.config.get().getMap("Servers").getKeys().contains(getName())) {
-                                        this.host.plugin.config.get().getMap("Servers").getMap(getName()).set("Port", server.getAddress().getPort());
-                                        this.host.plugin.config.save();
+                                    if (this.host.plugin.servers.get().getMap("Servers").getKeys().contains(getName())) {
+                                        this.host.plugin.servers.get().getMap("Servers").getMap(getName()).set("Port", server.getAddress().getPort());
+                                        this.host.plugin.servers.save();
                                     }
                                     forward = server;
                                     c++;
@@ -357,9 +357,9 @@ public class InternalSubServer extends SubServerContainer {
                         case "motd":
                             if (value.isString()) {
                                 Util.reflect(BungeeServerInfo.class.getDeclaredField("motd"), this, ChatColor.translateAlternateColorCodes('&', value.asString()));
-                                if (this.host.plugin.config.get().getMap("Servers").getKeys().contains(getName())) {
-                                    this.host.plugin.config.get().getMap("Servers").getMap(getName()).set("Motd", value.asString());
-                                    this.host.plugin.config.save();
+                                if (this.host.plugin.servers.get().getMap("Servers").getKeys().contains(getName())) {
+                                    this.host.plugin.servers.get().getMap("Servers").getMap(getName()).set("Motd", value.asString());
+                                    this.host.plugin.servers.save();
                                 }
                                 c++;
                             }
@@ -367,9 +367,9 @@ public class InternalSubServer extends SubServerContainer {
                         case "log":
                             if (value.isBoolean()) {
                                 log.set(value.asBoolean());
-                                if (this.host.plugin.config.get().getMap("Servers").getKeys().contains(getName())) {
-                                    this.host.plugin.config.get().getMap("Servers").getMap(getName()).set("Log", isLogging());
-                                    this.host.plugin.config.save();
+                                if (this.host.plugin.servers.get().getMap("Servers").getKeys().contains(getName())) {
+                                    this.host.plugin.servers.get().getMap("Servers").getMap(getName()).set("Log", isLogging());
+                                    this.host.plugin.servers.save();
                                 }
                                 c++;
                             }
@@ -382,9 +382,9 @@ public class InternalSubServer extends SubServerContainer {
                                 }
                                 dir = value.asRawString();
                                 directory = new File(getHost().getPath(), value.asRawString());
-                                if (this.host.plugin.config.get().getMap("Servers").getKeys().contains(getName())) {
-                                    this.host.plugin.config.get().getMap("Servers").getMap(getName()).set("Directory", getPath());
-                                    this.host.plugin.config.save();
+                                if (this.host.plugin.servers.get().getMap("Servers").getKeys().contains(getName())) {
+                                    this.host.plugin.servers.get().getMap("Servers").getMap(getName()).set("Directory", getPath());
+                                    this.host.plugin.servers.save();
                                 }
                                 c++;
                             }
@@ -396,9 +396,9 @@ public class InternalSubServer extends SubServerContainer {
                                     waitFor();
                                 }
                                 executable = value.asRawString();
-                                if (this.host.plugin.config.get().getMap("Servers").getKeys().contains(getName())) {
-                                    this.host.plugin.config.get().getMap("Servers").getMap(getName()).set("Executable", value.asRawString());
-                                    this.host.plugin.config.save();
+                                if (this.host.plugin.servers.get().getMap("Servers").getKeys().contains(getName())) {
+                                    this.host.plugin.servers.get().getMap("Servers").getMap(getName()).set("Executable", value.asRawString());
+                                    this.host.plugin.servers.save();
                                 }
                                 c++;
                             }
@@ -406,9 +406,9 @@ public class InternalSubServer extends SubServerContainer {
                         case "stop-cmd":
                             if (value.isString()) {
                                 stopcmd = value.asRawString();
-                                if (this.host.plugin.config.get().getMap("Servers").getKeys().contains(getName())) {
-                                    this.host.plugin.config.get().getMap("Servers").getMap(getName()).set("Stop-Command", getStopCommand());
-                                    this.host.plugin.config.save();
+                                if (this.host.plugin.servers.get().getMap("Servers").getKeys().contains(getName())) {
+                                    this.host.plugin.servers.get().getMap("Servers").getMap(getName()).set("Stop-Command", getStopCommand());
+                                    this.host.plugin.servers.save();
                                 }
                                 c++;
                             }
@@ -418,9 +418,9 @@ public class InternalSubServer extends SubServerContainer {
                                 StopAction action = Util.getDespiteException(() -> StopAction.valueOf(value.asRawString().toUpperCase().replace('-', '_').replace(' ', '_')), null);
                                 if (action != null) {
                                     stopaction = action;
-                                    if (this.host.plugin.config.get().getMap("Servers").getKeys().contains(getName())) {
-                                        this.host.plugin.config.get().getMap("Servers").getMap(getName()).set("Stop-Action", getStopAction().toString());
-                                        this.host.plugin.config.save();
+                                    if (this.host.plugin.servers.get().getMap("Servers").getKeys().contains(getName())) {
+                                        this.host.plugin.servers.get().getMap("Servers").getMap(getName()).set("Stop-Action", getStopAction().toString());
+                                        this.host.plugin.servers.save();
                                     }
                                     c++;
                                 }
@@ -433,9 +433,9 @@ public class InternalSubServer extends SubServerContainer {
                             break;
                         case "auto-run":
                             if (value.isBoolean()) {
-                                if (this.host.plugin.config.get().getMap("Servers").getKeys().contains(getName())) {
-                                    this.host.plugin.config.get().getMap("Servers").getMap(getName()).set("Run-On-Launch", value.asBoolean());
-                                    this.host.plugin.config.save();
+                                if (this.host.plugin.servers.get().getMap("Servers").getKeys().contains(getName())) {
+                                    this.host.plugin.servers.get().getMap("Servers").getMap(getName()).set("Run-On-Launch", value.asBoolean());
+                                    this.host.plugin.servers.save();
                                 }
                                 c++;
                             }
@@ -446,9 +446,9 @@ public class InternalSubServer extends SubServerContainer {
                                     SubServer oserver = host.plugin.api.getSubServer(oname);
                                     if (oserver != null && isCompatible(oserver)) toggleCompatibility(oserver);
                                 }
-                                if (this.host.plugin.config.get().getMap("Servers").getKeys().contains(getName())) {
-                                    this.host.plugin.config.get().getMap("Servers").getMap(getName()).set("Incompatible", value.asStringList());
-                                    this.host.plugin.config.save();
+                                if (this.host.plugin.servers.get().getMap("Servers").getKeys().contains(getName())) {
+                                    this.host.plugin.servers.get().getMap("Servers").getMap(getName()).set("Incompatible", value.asStringList());
+                                    this.host.plugin.servers.save();
                                 }
                                 c++;
                             }
@@ -456,9 +456,9 @@ public class InternalSubServer extends SubServerContainer {
                         case "restricted":
                             if (value.isBoolean()) {
                                 Util.reflect(BungeeServerInfo.class.getDeclaredField("restricted"), this, value.asBoolean());
-                                if (this.host.plugin.config.get().getMap("Servers").getKeys().contains(getName())) {
-                                    this.host.plugin.config.get().getMap("Servers").getMap(getName()).set("Restricted", isRestricted());
-                                    this.host.plugin.config.save();
+                                if (this.host.plugin.servers.get().getMap("Servers").getKeys().contains(getName())) {
+                                    this.host.plugin.servers.get().getMap("Servers").getMap(getName()).set("Restricted", isRestricted());
+                                    this.host.plugin.servers.save();
                                 }
                                 c++;
                             }
@@ -466,9 +466,9 @@ public class InternalSubServer extends SubServerContainer {
                         case "hidden":
                             if (value.isBoolean()) {
                                 Util.reflect(ServerContainer.class.getDeclaredField("hidden"), this, value.asBoolean());
-                                if (this.host.plugin.config.get().getMap("Servers").getKeys().contains(getName())) {
-                                    this.host.plugin.config.get().getMap("Servers").getMap(getName()).set("Hidden", isHidden());
-                                    this.host.plugin.config.save();
+                                if (this.host.plugin.servers.get().getMap("Servers").getKeys().contains(getName())) {
+                                    this.host.plugin.servers.get().getMap("Servers").getMap(getName()).set("Hidden", isHidden());
+                                    this.host.plugin.servers.save();
                                 }
                                 c++;
                             }

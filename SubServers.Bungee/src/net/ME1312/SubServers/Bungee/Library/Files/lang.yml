@@ -1,6 +1,7 @@
 Version: '2.14a+'
 Lang:
-  'Bungee.Feature.Return': '&6Returning to $str$: &r$msg$'
+  'Bungee.Feature.Smart-Fallback': '&6Returning from $str$: &r$msg$'
+  'Bungee.Feature.Smart-Fallback.Result': '&6You are now on $str$.'
   'Bungee.Ping.Offline': '&6&l[&e&lWarning&6&l] &7Backend server(s) are not running'
   'Bungee.Server.Current': '&6You are currently connected to $str$'
   'Bungee.Server.Available': '&6You may connect to the following servers at this time:'

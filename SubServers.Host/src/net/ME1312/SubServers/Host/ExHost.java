@@ -138,18 +138,18 @@ public final class ExHost {
             log.info.println("Loading SubServers.Host v" + info.getVersion().toString() + " Libraries");
             if (!(new UniversalFile(engine.getRuntimeDirectory(), "config.yml").exists())) {
                 Util.copyFromJar(ExHost.class.getClassLoader(), "net/ME1312/SubServers/Host/Library/Files/config.yml", new UniversalFile(engine.getRuntimeDirectory(), "config.yml").getPath());
-                log.info.println("Created ~/config.yml");
+                log.info.println("Created ./config.yml");
             } else if (((new YAMLConfig(new UniversalFile(engine.getRuntimeDirectory(), "config.yml"))).get().getSection("Settings").getVersion("Version", new Version(0)).compareTo(new Version("2.11.2a+"))) != 0) {
                 Files.move(new UniversalFile(engine.getRuntimeDirectory(), "config.yml").toPath(), new UniversalFile(engine.getRuntimeDirectory(), "config.old" + Math.round(Math.random() * 100000) + ".yml").toPath());
 
                 Util.copyFromJar(ExHost.class.getClassLoader(), "net/ME1312/SubServers/Host/Library/Files/config.yml", new UniversalFile(engine.getRuntimeDirectory(), "config.yml").getPath());
-                log.info.println("Updated ~/config.yml");
+                log.info.println("Updated ./config.yml");
             }
             config = new YAMLConfig(new UniversalFile(engine.getRuntimeDirectory(), "config.yml"));
 
             if (!(new UniversalFile(engine.getRuntimeDirectory(), "Templates").exists())) {
                 new UniversalFile(engine.getRuntimeDirectory(), "Templates").mkdir();
-                log.info.println("Created ~/Templates/");
+                log.info.println("Created ./Templates/");
             }
 
             if (new UniversalFile(engine.getRuntimeDirectory(), "Recently Deleted").exists()) {
@@ -165,22 +165,22 @@ public final class ExHost {
                                     if (TimeUnit.MILLISECONDS.toDays(Calendar.getInstance().getTime().getTime() - json.getLong("Timestamp")) >= 7) {
                                         Util.deleteDirectory(file);
                                         f--;
-                                        log.info.println("Removed ~/Recently Deleted/" + file.getName());
+                                        log.info.println("Removed ./Recently Deleted/" + file.getName());
                                     }
                                 } else {
                                     Util.deleteDirectory(file);
                                     f--;
-                                    log.info.println("Removed ~/Recently Deleted/" + file.getName());
+                                    log.info.println("Removed ./Recently Deleted/" + file.getName());
                                 }
                             } else {
                                 Util.deleteDirectory(file);
                                 f--;
-                                log.info.println("Removed ~/Recently Deleted/" + file.getName());
+                                log.info.println("Removed ./Recently Deleted/" + file.getName());
                             }
                         } else {
                             Files.delete(file.toPath());
                             f--;
-                            log.info.println("Removed ~/Recently Deleted/" + file.getName());
+                            log.info.println("Removed ./Recently Deleted/" + file.getName());
                         }
                     } catch (Exception e) {
                         log.error.println(e);

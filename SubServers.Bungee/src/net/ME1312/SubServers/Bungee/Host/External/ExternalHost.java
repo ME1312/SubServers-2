@@ -210,13 +210,13 @@ public class ExternalHost extends Host implements SerializableClientHandler {
             }
 
             System.out.println("SubServers > Saving...");
-            ObjectMap<String> info = (plugin.config.get().getMap("Servers").getKeys().contains(server))?plugin.config.get().getMap("Servers").getMap(server).clone():new ObjectMap<String>();
+            ObjectMap<String> info = (plugin.servers.get().getMap("Servers").getKeys().contains(server))?plugin.servers.get().getMap("Servers").getMap(server).clone():new ObjectMap<String>();
             info.set("Name", server);
             info.set("Timestamp", Calendar.getInstance().getTime().getTime());
             try {
-                if (plugin.config.get().getMap("Servers").getKeys().contains(server)) {
-                    plugin.config.get().getMap("Servers").remove(server);
-                    plugin.config.save();
+                if (plugin.servers.get().getMap("Servers").getKeys().contains(server)) {
+                    plugin.servers.get().getMap("Servers").remove(server);
+                    plugin.servers.save();
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -247,13 +247,13 @@ public class ExternalHost extends Host implements SerializableClientHandler {
         }
 
         System.out.println("SubServers > Saving...");
-        ObjectMap<String> info = (plugin.config.get().getMap("Servers").getKeys().contains(server))?plugin.config.get().getMap("Servers").getMap(server).clone():new ObjectMap<String>();
+        ObjectMap<String> info = (plugin.servers.get().getMap("Servers").getKeys().contains(server))?plugin.servers.get().getMap("Servers").getMap(server).clone():new ObjectMap<String>();
         info.set("Name", server);
         info.set("Timestamp", Calendar.getInstance().getTime().getTime());
         try {
-            if (plugin.config.get().getMap("Servers").getKeys().contains(server)) {
-                plugin.config.get().getMap("Servers").remove(server);
-                plugin.config.save();
+            if (plugin.servers.get().getMap("Servers").getKeys().contains(server)) {
+                plugin.servers.get().getMap("Servers").remove(server);
+                plugin.servers.save();
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -286,13 +286,13 @@ public class ExternalHost extends Host implements SerializableClientHandler {
             }
 
             System.out.println("SubServers > Saving...");
-            ObjectMap<String> info = (plugin.config.get().getMap("Servers").getKeys().contains(server))?plugin.config.get().getMap("Servers").getMap(server).clone():new ObjectMap<String>();
+            ObjectMap<String> info = (plugin.servers.get().getMap("Servers").getKeys().contains(server))?plugin.servers.get().getMap("Servers").getMap(server).clone():new ObjectMap<String>();
             info.set("Name", server);
             info.set("Timestamp", Calendar.getInstance().getTime().getTime());
             try {
-                if (plugin.config.get().getMap("Servers").getKeys().contains(server)) {
-                    plugin.config.get().getMap("Servers").remove(server);
-                    plugin.config.save();
+                if (plugin.servers.get().getMap("Servers").getKeys().contains(server)) {
+                    plugin.servers.get().getMap("Servers").remove(server);
+                    plugin.servers.save();
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -323,13 +323,13 @@ public class ExternalHost extends Host implements SerializableClientHandler {
         }
 
         System.out.println("SubServers > Saving...");
-        ObjectMap<String> info = (plugin.config.get().getMap("Servers").getKeys().contains(server))?plugin.config.get().getMap("Servers").getMap(server).clone():new ObjectMap<String>();
+        ObjectMap<String> info = (plugin.servers.get().getMap("Servers").getKeys().contains(server))?plugin.servers.get().getMap("Servers").getMap(server).clone():new ObjectMap<String>();
         info.set("Name", server);
         info.set("Timestamp", Calendar.getInstance().getTime().getTime());
         try {
-            if (plugin.config.get().getMap("Servers").getKeys().contains(server)) {
-                plugin.config.get().getMap("Servers").remove(server);
-                plugin.config.save();
+            if (plugin.servers.get().getMap("Servers").getKeys().contains(server)) {
+                plugin.servers.get().getMap("Servers").remove(server);
+                plugin.servers.save();
             }
         } catch (Exception e) {
             e.printStackTrace();
