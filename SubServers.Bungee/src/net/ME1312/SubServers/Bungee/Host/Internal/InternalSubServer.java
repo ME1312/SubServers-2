@@ -121,6 +121,7 @@ public class InternalSubServer extends SubServerContainer {
         try {
             ProcessBuilder pb = new ProcessBuilder().command(Executable.parse(host.getCreator().getBashDirectory(), executable)).directory(directory);
             pb.environment().put("name", getName());
+            pb.environment().put("host", host.getName());
             pb.environment().put("address", host.getAddress().getHostAddress());
             pb.environment().put("port", Integer.toString(getAddress().getPort()));
             process = pb.start();

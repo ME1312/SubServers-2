@@ -232,6 +232,7 @@ public class SubCreator {
                 host.subdata.sendPacket(new PacketOutExLogMessage(address, "Loading Template: " + template.getDisplayName()));
                 Util.copyDirectory(template.getDirectory(), dir);
                 var.put("name", name);
+                if (host.subdata != null) var.put("host", host.subdata.getName());
                 var.put("template", template.getName());
                 var.put("type", template.getType().toString().toUpperCase());
                 var.put("version", version.toString());
