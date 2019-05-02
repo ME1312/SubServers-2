@@ -87,6 +87,7 @@ public class InternalSubCreator extends SubCreator {
                 System.out.println(name + File.separator + "Creator > Loading Template: " + template.getDisplayName());
                 Util.copyDirectory(template.getDirectory(), dir);
                 var.put("name", name);
+                var.put("host", host.getName());
                 var.put("template", template.getName());
                 var.put("type", template.getType().toString().toUpperCase());
                 if (version != null) var.put("version", version.toString());
