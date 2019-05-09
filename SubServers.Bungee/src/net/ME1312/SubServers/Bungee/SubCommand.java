@@ -564,6 +564,8 @@ public final class SubCommand extends CommandX {
                             sender.sendMessage("SubServers > There is no template with that name");
                         } else if (!plugin.hosts.get(args[2].toLowerCase()).getCreator().getTemplate(args[3]).isEnabled()) {
                             sender.sendMessage("SubServers > That Template is not enabled");
+                        } else if (args.length <= 4 && plugin.hosts.get(args[2].toLowerCase()).getCreator().getTemplate(args[3]).requiresVersion()) {
+                            sender.sendMessage("SubServers > That Template requires a Minecraft Version to be specified");
                         } else if (args.length > 5 && (Util.isException(() -> Integer.parseInt(args[5])) || Integer.parseInt(args[5]) <= 0 || Integer.parseInt(args[5]) > 65535)) {
                             sender.sendMessage("SubServers > Invalid Port Number");
                         } else {
@@ -846,7 +848,7 @@ public final class SubCommand extends CommandX {
                             return new NamedContainer<>(plugin.api.getLang("SubServers", "Command.Creator.Invalid-Version"), Collections.emptyList());
                         }
                     }
-                    return new NamedContainer<>(null, Collections.singletonList("<Version>"));
+                    return new NamedContainer<>(null, Collections.singletonList("[Version]"));
                 } else if (args.length == 6) {
                     if (last.length() > 0) {
                         if (Util.isException(() -> Integer.parseInt(last)) || Integer.parseInt(last) <= 0 || Integer.parseInt(last) > 65535) {

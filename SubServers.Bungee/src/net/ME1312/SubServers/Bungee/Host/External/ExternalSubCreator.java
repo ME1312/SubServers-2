@@ -72,7 +72,7 @@ public class ExternalSubCreator extends SubCreator {
     @Override
     public boolean create(UUID player, String name, ServerTemplate template, Version version, Integer port, Callback<SubServer> callback) {
         if (Util.isNull(name, template)) throw new NullPointerException();
-        if (host.isAvailable() && host.isEnabled() && template.isEnabled() && !SubAPI.getInstance().getSubServers().keySet().contains(name.toLowerCase()) && !SubCreator.isReserved(name)) {
+        if (host.isAvailable() && host.isEnabled() && template.isEnabled() && !SubAPI.getInstance().getSubServers().keySet().contains(name.toLowerCase()) && !SubCreator.isReserved(name) && (version != null || !template.requiresVersion())) {
             StackTraceElement[] origin = new Exception().getStackTrace();
 
             if (port == null) {

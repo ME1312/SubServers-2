@@ -4,6 +4,7 @@ Template:
   Icon: 'lava_bucket'
   Build:
     Server-Type: 'Spigot'
+    Require-Version: true
     Executable: 'bash build.sh'
   Settings:
     Executable: 'java -Xmx1024M -Dorg.bukkit.craftbukkit.libs.jline.terminal=unix -Djansi.passthrough=true -jar Spigot.jar -p $port$'

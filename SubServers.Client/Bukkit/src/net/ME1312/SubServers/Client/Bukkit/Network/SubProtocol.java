@@ -76,27 +76,25 @@ public class SubProtocol extends SubDataProtocol {
 
 
             // 30-49: Control Packets
-          //instance.registerPacket(0x0030, PacketOutReload.class);    TODO
-            instance.registerPacket(0x0031, PacketCreateServer.class);
-          //instance.registerPacket(0x0032, PacketAddServer.class);    TODO
-            instance.registerPacket(0x0033, PacketStartServer.class);
-          //instance.registerPacket(0x0034, PacketEditServer.class);   TODO
-            instance.registerPacket(0x0035, PacketRestartServer.class);
-            instance.registerPacket(0x0036, PacketCommandServer.class);
-            instance.registerPacket(0x0037, PacketStopServer.class);
-          //instance.registerPacket(0x0038, PacketRemoveServer.class); TODO
-          //instance.registerPacket(0x0039, PacketDeleteServer.class); TODO
+            instance.registerPacket(0x0030, PacketCreateServer.class);
+            instance.registerPacket(0x0031, PacketAddServer.class);
+            instance.registerPacket(0x0032, PacketStartServer.class);
+            instance.registerPacket(0x0033, PacketEditServer.class);
+            instance.registerPacket(0x0034, PacketRestartServer.class);
+            instance.registerPacket(0x0035, PacketCommandServer.class);
+            instance.registerPacket(0x0036, PacketStopServer.class);
+            instance.registerPacket(0x0037, PacketRemoveServer.class);
+            instance.registerPacket(0x0038, PacketDeleteServer.class);
 
-          //instance.registerPacket(0x0030  new PacketOutReload());    TODO
-            instance.registerPacket(0x0031, new PacketCreateServer());
-          //instance.registerPacket(0x0032, new PacketAddServer());    TODO
-            instance.registerPacket(0x0033, new PacketStartServer());
-          //instance.registerPacket(0x0034, new PacketEditServer());   TODO
-            instance.registerPacket(0x0035, new PacketRestartServer());
-            instance.registerPacket(0x0036, new PacketCommandServer());
-            instance.registerPacket(0x0037, new PacketStopServer());
-          //instance.registerPacket(0x0038, new PacketRemoveServer()); TODO
-          //instance.registerPacket(0x0039, new PacketDeleteServer()); TODO
+            instance.registerPacket(0x0030, new PacketCreateServer());
+            instance.registerPacket(0x0031, new PacketAddServer());
+            instance.registerPacket(0x0032, new PacketStartServer());
+            instance.registerPacket(0x0033, new PacketEditServer());
+            instance.registerPacket(0x0034, new PacketRestartServer());
+            instance.registerPacket(0x0035, new PacketCommandServer());
+            instance.registerPacket(0x0036, new PacketStopServer());
+            instance.registerPacket(0x0037, new PacketRemoveServer());
+            instance.registerPacket(0x0038, new PacketDeleteServer());
 
 
             // 70-79: External Misc Packets

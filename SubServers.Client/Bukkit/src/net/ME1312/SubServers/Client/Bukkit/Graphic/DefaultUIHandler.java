@@ -147,21 +147,20 @@ public class DefaultUIHandler implements UIHandler, Listener {
                             if (!gui.sendTitle(plugin.api.getLang("SubServers", "Interface.Host-Creator.Edit-Version.Title"), 4 * 20))
                                 player.sendMessage(plugin.api.getLang("SubServers", "Interface.Host-Creator.Edit-Version.Message"));
                             input.put(player.getUniqueId(), m -> {
-                                if (new Version("1.8").compareTo(new Version(m.getString("message"))) > 0) {
-                                    if (!gui.sendTitle(plugin.api.getLang("SubServers", "Interface.Host-Creator.Edit-Version.Unavailable-Title"), 4 * 20))
-                                        player.sendMessage(plugin.api.getLang("SubServers", "Interface.Host-Creator.Edit-Version.Unavailable"));
-                                    Bukkit.getScheduler().runTaskLater(plugin, () -> gui.hostCreator((UIRenderer.CreatorOptions) gui.lastVisitedObjects[0]), 4 * 20);
-                                } else {
-                                    ((UIRenderer.CreatorOptions) gui.lastVisitedObjects[0]).setVersion(new Version(m.getString("message")));
-                                    gui.hostCreator((UIRenderer.CreatorOptions) gui.lastVisitedObjects[0]);
-                                }
+                                if (m.getString("message").length() <= 0) {
+                                    ((UIRenderer.CreatorOptions) gui.lastVisitedObjects[0]).setVersion(null);
+                                } else ((UIRenderer.CreatorOptions) gui.lastVisitedObjects[0]).setVersion(new Version(m.getString("message")));
+                                gui.hostCreator((UIRenderer.CreatorOptions) gui.lastVisitedObjects[0]);
                             });
                         } else if (ChatColor.stripColor(item).equals(ChatColor.stripColor(plugin.api.getLang("SubServers", "Interface.Host-Creator.Edit-Port")))) {
                             player.closeInventory();
                             if (!gui.sendTitle(plugin.api.getLang("SubServers", "Interface.Host-Creator.Edit-Port.Title"), 4 * 20))
                                 player.sendMessage(plugin.api.getLang("SubServers", "Interface.Host-Creator.Edit-Port.Message"));
                             input.put(player.getUniqueId(), m -> {
-                                if (Util.isException(() -> Integer.parseInt(m.getString("message"))) || Integer.parseInt(m.getString("message")) <= 0 || Integer.parseInt(m.getString("message")) > 65535) {
+                                if (m.getString("message").length() <= 0) {
+                                    ((UIRenderer.CreatorOptions) gui.lastVisitedObjects[0]).setPort(null);
+                                    gui.hostCreator((UIRenderer.CreatorOptions) gui.lastVisitedObjects[0]);
+                                } else if (Util.isException(() -> Integer.parseInt(m.getString("message"))) || Integer.parseInt(m.getString("message")) <= 0 || Integer.parseInt(m.getString("message")) > 65535) {
                                     if (!gui.sendTitle(plugin.api.getLang("SubServers", "Interface.Host-Creator.Edit-Port.Invalid-Title"), 4 * 20))
                                         player.sendMessage(plugin.api.getLang("SubServers", "Interface.Host-Creator.Edit-Port.Invalid"));
                                     Bukkit.getScheduler().runTaskLater(plugin, () -> gui.hostCreator((UIRenderer.CreatorOptions) gui.lastVisitedObjects[0]), 4 * 20);
@@ -457,7 +456,7 @@ public class DefaultUIHandler implements UIHandler, Listener {
     public void input(PlayerCommandPreprocessEvent event) {
         if (!event.isCancelled() && enabled && input.keySet().contains(event.getPlayer().getUniqueId())) {
             YAMLSection data = new YAMLSection();
-            data.set("message", event.getMessage());
+            data.set("message", (event.getMessage().startsWith("/"))?event.getMessage().substring(1):event.getMessage());
             input.get(event.getPlayer().getUniqueId()).run(data);
             input.remove(event.getPlayer().getUniqueId());
             event.setCancelled(true);

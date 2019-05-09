@@ -132,6 +132,15 @@ public abstract class SubCreator {
         }
 
         /**
+         * Get whether this Template requires the Version argument
+         *
+         * @return Version Requirement
+         */
+        public boolean requiresVersion() {
+            return getBuildOptions().getBoolean("Require-Version", false);
+        }
+
+        /**
          * Get the Build Options for this Template
          *
          * @return Build Options
@@ -157,6 +166,7 @@ public abstract class SubCreator {
             tinfo.set("display", getDisplayName());
             tinfo.set("icon", getIcon());
             tinfo.set("type", getType().toString());
+            tinfo.set("version-req", requiresVersion());
             return tinfo;
         }
     }

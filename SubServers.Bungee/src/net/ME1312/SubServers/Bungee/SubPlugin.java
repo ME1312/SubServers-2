@@ -16,7 +16,7 @@ import net.ME1312.SubServers.Bungee.Library.*;
 import net.ME1312.Galaxi.Library.Config.YAMLConfig;
 import net.ME1312.Galaxi.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Bungee.Library.Fallback.SmartReconnectHandler;
-import net.ME1312.SubServers.Bungee.Library.Compatibility.Updates.ConfigUpdater;
+import net.ME1312.SubServers.Bungee.Library.Updates.ConfigUpdater;
 import net.ME1312.SubServers.Bungee.Library.Exception.InvalidHostException;
 import net.ME1312.SubServers.Bungee.Library.Exception.InvalidServerException;
 import net.ME1312.Galaxi.Library.Version.Version;
@@ -102,18 +102,11 @@ public final class SubPlugin extends BungeeCord implements Listener {
         ConfigUpdater.updateConfig(new UniversalFile(dir, "config.yml"));
         config = new YAMLConfig(new UniversalFile(dir, "config.yml"));
 
-        if (!(new UniversalFile(dir, "lang.yml").exists())) {
-            Util.copyFromJar(SubPlugin.class.getClassLoader(), "net/ME1312/SubServers/Bungee/Library/Files/lang.yml", new UniversalFile(dir, "lang.yml").getPath());
-            System.out.println("SubServers > Created ./SubServers/lang.yml");
-        } else if (((new YAMLConfig(new UniversalFile(dir, "lang.yml"))).get().getVersion("Version", new Version(9))).compareTo(new Version("2.14a+")) != 0) {
-            Files.move(new UniversalFile(dir, "lang.yml").toPath(), new UniversalFile(dir, "lang.old" + Math.round(Math.random() * 100000) + ".yml").toPath());
-            Util.copyFromJar(SubPlugin.class.getClassLoader(), "net/ME1312/SubServers/Bungee/Library/Files/lang.yml", new UniversalFile(dir, "lang.yml").getPath());
-            System.out.println("SubServers > Updated ./SubServers/lang.yml");
-        }
-        lang = new YAMLConfig(new UniversalFile(dir, "lang.yml"));
-
         ConfigUpdater.updateServers(new UniversalFile(dir, "servers.yml"));
         servers = new YAMLConfig(new UniversalFile(dir, "servers.yml"));
+
+        ConfigUpdater.updateLang(new UniversalFile(dir, "lang.yml"));
+        lang = new YAMLConfig(new UniversalFile(dir, "lang.yml"));
 
         if (!(new UniversalFile(dir, "Templates").exists())) {
             new UniversalFile(dir, "Templates").mkdirs();
@@ -496,7 +489,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
 
 
                     if (edits.getKeys().size() > 0) {
-                        server.edit(edits);
+                        server.permaEdit(edits);
                         server = api.getSubServer(name);
                     }
                 } else { // Server cannot edit()

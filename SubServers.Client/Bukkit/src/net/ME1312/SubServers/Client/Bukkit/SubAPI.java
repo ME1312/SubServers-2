@@ -14,7 +14,9 @@ import net.ME1312.SubServers.Client.Bukkit.Network.Packet.*;
 import net.ME1312.SubData.Client.SubDataClient;
 import org.bukkit.Bukkit;
 
+import javax.xml.ws.Response;
 import java.lang.reflect.InvocationTargetException;
+import java.net.InetAddress;
 import java.util.*;
 
 /**
@@ -250,6 +252,174 @@ public final class SubAPI {
 
             try {
                 callback.run(server);
+            } catch (Throwable e) {
+                Throwable ew = new InvocationTargetException(e);
+                ew.setStackTrace(origin);
+                ew.printStackTrace();
+            }
+        }));
+    }
+
+    /**
+     * Adds a Server to the Network
+     *
+     * @param name Name of the Server
+     * @param ip IP of the Server
+     * @param port Port of the Server
+     * @param motd MOTD of the Server
+     * @param hidden if the server should be hidden from players
+     * @param restricted Players will need a permission to join if true
+     * @param response Response Code
+     */
+    public void addServer(String name, InetAddress ip, int port, String motd, boolean hidden, boolean restricted, Callback<Integer> response) {
+        addServer(null, name, ip, port, motd, hidden, restricted, response);
+    }
+
+    /**
+     * Adds a Server to the Network
+     *
+     * @param player Player who added
+     * @param name Name of the Server
+     * @param ip IP of the Server
+     * @param port Port of the Server
+     * @param motd MOTD of the Server
+     * @param hidden If the server should be hidden from players
+     * @param restricted Players will need a permission to join if true
+     * @param response Response Code
+     */
+    public void addServer(UUID player, String name, InetAddress ip, int port, String motd, boolean hidden, boolean restricted, Callback<Integer> response) {
+        if (Util.isNull(response)) throw new NullPointerException();
+        StackTraceElement[] origin = new Exception().getStackTrace();
+        ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()).sendPacket(new PacketAddServer(player, name, ip, port, motd, hidden, restricted, data -> {
+            try {
+                response.run(data.getInt(0x0001));
+            } catch (Throwable e) {
+                Throwable ew = new InvocationTargetException(e);
+                ew.setStackTrace(origin);
+                ew.printStackTrace();
+            }
+        }));
+    }
+
+    /**
+     * Adds a Server to the Network
+     *
+     * @param name Name of the Server
+     * @param ip IP of the Server
+     * @param port Port of the Server
+     * @param motd MOTD of the Server
+     * @param hidden if the server should be hidden from players
+     * @param restricted Players will need a permission to join if true
+     */
+    public void addServer(String name, InetAddress ip, int port, String motd, boolean hidden, boolean restricted) {
+        addServer(null, name, ip, port, motd, hidden, restricted);
+    }
+
+    /**
+     * Adds a Server to the Network
+     *
+     * @param player Player who added
+     * @param name Name of the Server
+     * @param ip IP of the Server
+     * @param port Port of the Server
+     * @param motd MOTD of the Server
+     * @param hidden If the server should be hidden from players
+     * @param restricted Players will need a permission to join if true
+     */
+    public void addServer(UUID player, String name, InetAddress ip, int port, String motd, boolean hidden, boolean restricted) {
+        addServer(player, name, ip, port, motd, hidden, restricted, i -> {});
+    }
+
+    /**
+     * Remove a Server from the Network
+     *
+     * @param name Name of the Server
+     * @param response Response Code
+     */
+    public void removeServer(String name, Callback<Integer> response) {
+        removeServer(null, name, response);
+    }
+
+    /**
+     * Remove a Server from the Network
+     *
+     * @param player Player Removing
+     * @param name Name of the Server
+     * @param response Response Code
+     */
+    public void removeServer(UUID player, String name, Callback<Integer> response) {
+        if (Util.isNull(name)) throw new NullPointerException();
+        removeServer(player, name, false, response);
+    }
+
+    /**
+     * Remove a Server from the Network
+     *
+     * @param name Name of the Server
+     */
+    public void removeServer(String name) {
+        removeServer(null, name);
+    }
+
+    /**
+     * Remove a Server from the Network
+     *
+     * @param player Player Removing
+     * @param name Name of the Server
+     */
+    public void removeServer(UUID player, String name) {
+        if (Util.isNull(name)) throw new NullPointerException();
+        removeServer(player, name, i -> {});
+    }
+
+    /**
+     * Force Remove a Server from the Network
+     *
+     * @param name Name of the Server
+     * @param response Response Code
+     */
+    public void forceRemoveServer(String name, Callback<Integer> response) {
+        forceRemoveServer(null, name, response);
+    }
+
+    /**
+     * Force Remove a Server from the Network
+     *
+     * @param player Player Removing
+     * @param name Name of the Server
+     * @param response Response Code
+     */
+    public void forceRemoveServer(UUID player, String name, Callback<Integer> response) {
+        if (Util.isNull(name)) throw new NullPointerException();
+        removeServer(player, name, true, response);
+    }
+
+    /**
+     * Force Remove a Server from the Network
+     *
+     * @param name Name of the Server
+     */
+    public void forceRemoveServer(String name) {
+        forceRemoveServer(null, name);
+    }
+
+    /**
+     * Force Remove a Server from the Network
+     *
+     * @param player Player Removing
+     * @param name Name of the Server
+     */
+    public void forceRemoveServer(UUID player, String name) {
+        if (Util.isNull(name)) throw new NullPointerException();
+        forceRemoveServer(player, name, i -> {});
+    }
+
+    private void removeServer(UUID player, String name, boolean force, Callback<Integer> response) {
+        if (Util.isNull(response)) throw new NullPointerException();
+        StackTraceElement[] origin = new Exception().getStackTrace();
+        ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()).sendPacket(new PacketRemoveServer(player, name, force, data -> {
+            try {
+                response.run(data.getInt(0x0001));
             } catch (Throwable e) {
                 Throwable ew = new InvocationTargetException(e);
                 ew.setStackTrace(origin);

@@ -86,6 +86,15 @@ public class SubCreator {
         public ServerType getType() {
             return type;
         }
+
+        /**
+         * Get whether this Template requires the Version argument
+         *
+         * @return Version Requirement
+         */
+        public boolean requiresVersion() {
+            return raw.getBoolean("version-req");
+        }
     }
     public enum ServerType {
         SPIGOT,
@@ -106,8 +115,8 @@ public class SubCreator {
      * @param player Player Creating
      * @param name Server Name
      * @param template Server Template
-     * @param version Server Version
-     * @param port Server Port Number
+     * @param version Server Version (may be null)
+     * @param port Server Port Number (null to auto-select)
      * @param response Response Code
      */
     public void create(UUID player, String name, ServerTemplate template, Version version, int port, Callback<Integer> response) {
@@ -129,8 +138,8 @@ public class SubCreator {
      *
      * @param name Server Name
      * @param template Server Template
-     * @param version Server Version
-     * @param port Server Port Number
+     * @param version Server Version (may be null)
+     * @param port Server Port Number (null to auto-select)
      * @param response Response Code
      */
     public void create(String name, ServerTemplate template, Version version, int port, Callback<Integer> response) {
@@ -143,8 +152,8 @@ public class SubCreator {
      * @param player Player Creating
      * @param name Server Name
      * @param template Server Template
-     * @param version Server Version
-     * @param port Server Port Number
+     * @param version Server Version (may be null)
+     * @param port Server Port Number (null to auto-select)
      */
     public void create(UUID player, String name, ServerTemplate template, Version version, int port) {
         create(player, name, template, version, port, i -> {});
@@ -155,8 +164,8 @@ public class SubCreator {
      *
      * @param name Server Name
      * @param template Server Template
-     * @param version Server Version
-     * @param port Server Port Number
+     * @param version Server Version (may be null)
+     * @param port Server Port Number (null to auto-select)
      */
     public void create(String name, ServerTemplate template, Version version, int port) {
         create(name, template, version, port, i -> {});

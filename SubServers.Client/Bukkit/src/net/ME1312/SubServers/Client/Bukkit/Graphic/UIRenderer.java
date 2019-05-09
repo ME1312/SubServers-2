@@ -499,7 +499,6 @@ public abstract class UIRenderer {
          * @param value Value
          */
         public void setVersion(Version value) {
-            if (Util.isNull(value)) throw new NullPointerException();
             final Version version = this.version;
             history.add(() -> this.version = version);
             this.version = value;
@@ -520,8 +519,7 @@ public abstract class UIRenderer {
          * @param value Value (null for auto-select)
          */
         public void setPort(Integer value) {
-            if (Util.isNull(value)) throw new NullPointerException();
-            final int port = this.port;
+            final Integer port = this.port;
             history.add(() -> this.port = port);
             this.port = value;
         }

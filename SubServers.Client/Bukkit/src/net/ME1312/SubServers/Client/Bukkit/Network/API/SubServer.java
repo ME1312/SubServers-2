@@ -248,6 +248,104 @@ public class SubServer extends Server {
     }
 
     /**
+     * Edits the Server
+     *
+     * @param player Player Editing
+     * @param edit Edits
+     * @param response Negative Response Code -or- Positive Success Status
+     */
+    public void edit(UUID player, ObjectMap<String> edit, Callback<Integer> response) {
+        edit(player, edit, false, response);
+    }
+
+    /**
+     * Edits the Server
+     *
+     * @param edit Edits
+     * @param response Negative Response Code -or- Positive Success Status
+     */
+    public void edit(ObjectMap<String> edit, Callback<Integer> response) {
+        edit(null, edit, response);
+    }
+
+    /**
+     * Edits the Server
+     *
+     * @param player Player Editing
+     * @param edit Edits
+     */
+    public void edit(UUID player, ObjectMap<String> edit) {
+        edit(player, edit, i -> {});
+    }
+
+    /**
+     * Edits the Server
+     *
+     * @param edit Edits
+     */
+    public void edit(ObjectMap<String> edit) {
+        edit(null, edit);
+    }
+
+    /**
+     * Edits the Server (& Saves Changes)
+     *
+     * @param player Player Editing
+     * @param edit Edits
+     * @param response Negative Response Code -or- Positive Success Status
+     */
+    public void permaEdit(UUID player, ObjectMap<String> edit, Callback<Integer> response) {
+        edit(player, edit, true, response);
+    }
+
+    /**
+     * Edits the Server (& Saves Changes)
+     *
+     * @param edit Edits
+     * @param response Negative Response Code -or- Positive Success Status
+     */
+    public void permaEdit(ObjectMap<String> edit, Callback<Integer> response) {
+        permaEdit(null, edit, response);
+    }
+
+    /**
+     * Edits the Server (& Saves Changes)
+     *
+     * @param player Player Editing
+     * @param edit Edits
+     */
+    public void permaEdit(UUID player, ObjectMap<String> edit) {
+        permaEdit(player, edit, i -> {});
+    }
+
+    /**
+     * Edits the Server (& Saves Changes)
+     *
+     * @param edit Edits
+     */
+    public void permaEdit(ObjectMap<String> edit) {
+        permaEdit(null, edit);
+    }
+
+    private void edit(UUID player, ObjectMap<String> edit, boolean perma, Callback<Integer> response) {
+        if (Util.isNull(response)) throw new NullPointerException();
+        StackTraceElement[] origin = new Exception().getStackTrace();
+        ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()).sendPacket(new PacketEditServer(player, getName(), edit, perma, data -> {
+            try {
+                if (data.getInt(0x0001) != 0) {
+                    response.run(data.getInt(0x0001) * -1);
+                } else {
+                    response.run(data.getInt(0x0002));
+                }
+            } catch (Throwable e) {
+                Throwable ew = new InvocationTargetException(e);
+                ew.setStackTrace(origin);
+                ew.printStackTrace();
+            }
+        }));
+    }
+
+    /**
      * If the Server is Running
      *
      * @return Running Status
@@ -303,6 +401,31 @@ public class SubServer extends Server {
     }
 
     /**
+     * Set if the Server is Enabled
+     *
+     * @param value Value
+     */
+    public void setEnabled(boolean value) {
+        setEnabled(value, b -> {});
+    }
+
+    /**
+     * Set if the Server is Enabled
+     *
+     * @param value Value
+     * @param response Success Status
+     */
+    public void setEnabled(boolean value, Callback<Boolean> response) {
+        if (Util.isNull(value, response)) throw new NullPointerException();
+        ObjectMap<String> edit = new ObjectMap<String>();
+        edit.set("enabled", value);
+        edit(edit, r -> {
+            if (r > 0) raw.set("enabled", value);
+            response.run(r > 0);
+        });
+    }
+
+    /**
      * If the Server is accepting requests to edit()
      *
      * @return Edit Status
@@ -318,6 +441,31 @@ public class SubServer extends Server {
      */
     public boolean isLogging() {
         return raw.getBoolean("log");
+    }
+
+    /**
+     * Set if the Server is Logging
+     *
+     * @param value Value
+     */
+    public void setLogging(boolean value) {
+        setLogging(value, b -> {});
+    }
+
+    /**
+     * Set if the Server is Logging
+     *
+     * @param value Value
+     * @param response Success Status
+     */
+    public void setLogging(boolean value, Callback<Boolean> response) {
+        if (Util.isNull(value, response)) throw new NullPointerException();
+        ObjectMap<String> edit = new ObjectMap<String>();
+        edit.set("log", value);
+        edit(edit, r -> {
+            if (r > 0) raw.set("log", value);
+            response.run(r > 0);
+        });
     }
 
     /**
@@ -348,12 +496,62 @@ public class SubServer extends Server {
     }
 
     /**
+     * Set the Command that Stops the Server
+     *
+     * @param value Value
+     */
+    public void setStopCommand(String value) {
+        setStopCommand(value, b -> {});
+    }
+
+    /**
+     * Set the Command that Stops the Server
+     *
+     * @param value Value
+     * @param response Success Status
+     */
+    public void setStopCommand(String value, Callback<Boolean> response) {
+        if (Util.isNull(value, response)) throw new NullPointerException();
+        ObjectMap<String> edit = new ObjectMap<String>();
+        edit.set("stop-cmd", value);
+        edit(edit, r -> {
+            if (r > 0) raw.set("stop-cmd", value);
+            response.run(r > 0);
+        });
+    }
+
+    /**
      * Get the action the Server will take when it stops
      *
      * @return Stop Action
      */
     public StopAction getStopAction() {
         return Util.getDespiteException(() -> StopAction.valueOf(raw.getRawString("stop-action").toUpperCase().replace('-', '_').replace(' ', '_')), null);
+    }
+
+    /**
+     * Set the action the Server will take when it stops
+     *
+     * @param action Stop Action
+     */
+    public void setStopAction(StopAction action) {
+        setStopAction(action, b -> {});
+    }
+
+    /**
+     * Set the action the Server will take when it stops
+     *
+     * @param action Stop Action
+     * @param response Success Status
+     */
+    public void setStopAction(StopAction action, Callback<Boolean> response) {
+        if (Util.isNull(action, response)) throw new NullPointerException();
+        ObjectMap<String> edit = new ObjectMap<String>();
+        edit.set("stop-action", action.toString());
+        edit(edit, r -> {
+            if (r > 0) raw.set("stop-action", action.toString());
+            response.run(r > 0);
+        });
     }
 
     /**

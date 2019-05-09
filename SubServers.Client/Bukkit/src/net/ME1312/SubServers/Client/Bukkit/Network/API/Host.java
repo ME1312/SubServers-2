@@ -1,12 +1,14 @@
 package net.ME1312.SubServers.Client.Bukkit.Network.API;
 
+import net.ME1312.Galaxi.Library.Callback.Callback;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Map.ObjectMapValue;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubData.Client.SubDataClient;
-import net.ME1312.SubServers.Client.Bukkit.Network.Packet.PacketDownloadHostInfo;
+import net.ME1312.SubServers.Client.Bukkit.Network.Packet.*;
 import net.ME1312.SubServers.Client.Bukkit.SubAPI;
 
+import java.lang.reflect.InvocationTargetException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.*;
@@ -231,6 +233,380 @@ public class Host {
     public SubServer getSubServer(String name) {
         if (Util.isNull(name)) throw new NullPointerException();
         return getSubServers().get(name.toLowerCase());
+    }
+
+    /**
+     * Adds a SubServer
+     *
+     * @param name Name of Server
+     * @param enabled Enabled Status
+     * @param port Port Number
+     * @param motd Motd of the Server
+     * @param log Logging Status
+     * @param directory Directory
+     * @param executable Executable String
+     * @param stopcmd Command to Stop the Server
+     * @param hidden if the server should be hidden from players
+     * @param restricted Players will need a permission to join if true
+     * @param response Response Code
+     * @return The SubServer
+     */
+    public void addSubServer(String name, boolean enabled, int port, String motd, boolean log, String directory, String executable, String stopcmd, boolean hidden, boolean restricted, Callback<Integer> response) {
+        addSubServer(null, name, enabled, port, motd, log, directory, executable, stopcmd, hidden, restricted, response);
+    }
+
+    /**
+     * Adds a SubServer
+     *
+     * @param player Player adding
+     * @param name Name of Server
+     * @param enabled Enabled Status
+     * @param port Port Number
+     * @param motd Motd of the Server
+     * @param log Logging Status
+     * @param directory Directory
+     * @param executable Executable String
+     * @param stopcmd Command to Stop the Server
+     * @param hidden if the server should be hidden from players
+     * @param restricted Players will need a permission to join if true
+     * @param response Response Code
+     * @return The SubServer
+     */
+    public void addSubServer(UUID player, String name, boolean enabled, int port, String motd, boolean log, String directory, String executable, String stopcmd, boolean hidden, boolean restricted, Callback<Integer> response) {
+        if (Util.isNull(response)) throw new NullPointerException();
+        StackTraceElement[] origin = new Exception().getStackTrace();
+        ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()).sendPacket(new PacketAddServer(player, name, enabled, getName(), port, motd, log, directory, executable, stopcmd, hidden, restricted, data -> {
+            try {
+                response.run(data.getInt(0x0001));
+            } catch (Throwable e) {
+                Throwable ew = new InvocationTargetException(e);
+                ew.setStackTrace(origin);
+                ew.printStackTrace();
+            }
+        }));
+    }
+
+    /**
+     * Adds a SubServer
+     *
+     * @param name Name of Server
+     * @param enabled Enabled Status
+     * @param port Port Number
+     * @param motd Motd of the Server
+     * @param log Logging Status
+     * @param directory Directory
+     * @param executable Executable String
+     * @param stopcmd Command to Stop the Server
+     * @param hidden if the server should be hidden from players
+     * @param restricted Players will need a permission to join if true
+     * @return The SubServer
+     */
+    public void addSubServer(String name, boolean enabled, int port, String motd, boolean log, String directory, String executable, String stopcmd, boolean hidden, boolean restricted) {
+        addSubServer(null, name, enabled, port, motd, log, directory, executable, stopcmd, hidden, restricted);
+    }
+
+    /**
+     * Adds a SubServer
+     *
+     * @param player Player adding
+     * @param name Name of Server
+     * @param enabled Enabled Status
+     * @param port Port Number
+     * @param motd Motd of the Server
+     * @param log Logging Status
+     * @param directory Directory
+     * @param executable Executable String
+     * @param stopcmd Command to Stop the Server
+     * @param hidden if the server should be hidden from players
+     * @param restricted Players will need a permission to join if true
+     * @return The SubServer
+     */
+    public void addSubServer(UUID player, String name, boolean enabled, int port, String motd, boolean log, String directory, String executable, String stopcmd, boolean hidden, boolean restricted) {
+        addSubServer(player, name, enabled, port, motd, log, directory, executable, stopcmd, hidden, restricted, i -> {});
+    }
+
+    /**
+     * Removes a SubServer
+     *
+     * @param name SubServer Name
+     */
+    public void removeSubServer(String name) throws InterruptedException {
+        removeSubServer(null, name);
+    }
+
+    /**
+     * Removes a SubServer
+     *
+     * @param player Player Removing
+     * @param name SubServer Name
+     */
+    public void removeSubServer(UUID player, String name) throws InterruptedException {
+        if (Util.isNull(name)) throw new NullPointerException();
+        removeSubServer(player, name, false, i -> {});
+    }
+
+    /**
+     * Forces the Removal of a SubServer
+     *
+     * @param name SubServer Name
+     */
+    public void forceRemoveSubServer(String name) throws InterruptedException {
+        forceRemoveSubServer(null, name);
+    }
+
+    /**
+     * Forces the Removal of a SubServer (will move to 'Recently Deleted')
+     *
+     * @param player Player Removing
+     * @param name SubServer Name
+     */
+    public void forceRemoveSubServer(UUID player, String name) {
+        if (Util.isNull(name)) throw new NullPointerException();
+        removeSubServer(player, name, true, i -> {});
+    }
+
+    /**
+     * Removes a SubServer
+     *
+     * @param name SubServer Name
+     * @param response Response Code
+     */
+    public void removeSubServer(String name, Callback<Integer> response) throws InterruptedException {
+        removeSubServer(null, name, response);
+    }
+
+    /**
+     * Removes a SubServer
+     *
+     * @param player Player Removing
+     * @param name SubServer Name
+     * @param response Response Code
+     */
+    public void removeSubServer(UUID player, String name, Callback<Integer> response) throws InterruptedException {
+        if (Util.isNull(name)) throw new NullPointerException();
+        removeSubServer(player, name, false, response);
+    }
+
+    /**
+     * Forces the Removal of a SubServer
+     *
+     * @param name SubServer Name
+     * @param response Response Code
+     */
+    public void forceRemoveSubServer(String name, Callback<Integer> response) throws InterruptedException {
+        forceRemoveSubServer(null, name, response);
+    }
+
+    /**
+     * Forces the Removal of a SubServer (will move to 'Recently Deleted')
+     *
+     * @param player Player Removing
+     * @param name SubServer Name
+     * @param response Response Code
+     */
+    public void forceRemoveSubServer(UUID player, String name, Callback<Integer> response) {
+        if (Util.isNull(name)) throw new NullPointerException();
+        removeSubServer(player, name, true, response);
+    }
+
+    private void removeSubServer(UUID player, String name, boolean force, Callback<Integer> response) {
+        if (Util.isNull(response)) throw new NullPointerException();
+        StackTraceElement[] origin = new Exception().getStackTrace();
+        ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()).sendPacket(new PacketRemoveServer(player, name, force, data -> {
+            try {
+                response.run(data.getInt(0x0001));
+            } catch (Throwable e) {
+                Throwable ew = new InvocationTargetException(e);
+                ew.setStackTrace(origin);
+                ew.printStackTrace();
+            }
+        }));
+    }
+
+    /**
+     * Delete a SubServer (will move to 'Recently Deleted')
+     *
+     * @param name SubServer Name
+     */
+    public void recycleSubServer(String name) throws InterruptedException {
+        recycleSubServer(null, name);
+    }
+
+    /**
+     * Delete a SubServer
+     *
+     * @param player Player Deleting
+     * @param name SubServer Name
+     */
+    public void recycleSubServer(UUID player, String name) throws InterruptedException {
+        if (Util.isNull(name)) throw new NullPointerException();
+        deleteSubServer(player, name, true, false, i -> {});
+    }
+
+    /**
+     * Forced the Deletion of a SubServer (will move to 'Recently Deleted')
+     *
+     * @param name SubServer Name
+     */
+    public void forceRecycleSubServer(String name) throws InterruptedException {
+        forceRecycleSubServer(null, name);
+    }
+
+    /**
+     * Forces the Deletion of a SubServer (will move to 'Recently Deleted')
+     *
+     * @param player Player Deleting
+     * @param name SubServer Name
+     */
+    public void forceRecycleSubServer(UUID player, String name) throws InterruptedException {
+        if (Util.isNull(name)) throw new NullPointerException();
+        deleteSubServer(player, name, true, true, i -> {});
+    }
+
+    /**
+     * Delete a SubServer (will move to 'Recently Deleted')
+     *
+     * @param name SubServer Name
+     * @param response Response Code
+     */
+    public void recycleSubServer(String name, Callback<Integer> response) throws InterruptedException {
+        recycleSubServer(null, name, response);
+    }
+
+    /**
+     * Delete a SubServer
+     *
+     * @param player Player Deleting
+     * @param name SubServer Name
+     * @param response Response Code
+     */
+    public void recycleSubServer(UUID player, String name, Callback<Integer> response) throws InterruptedException {
+        if (Util.isNull(name)) throw new NullPointerException();
+        deleteSubServer(player, name, true, false, response);
+    }
+
+    /**
+     * Forced the Deletion of a SubServer (will move to 'Recently Deleted')
+     *
+     * @param name SubServer Name
+     * @param response Response Code
+     */
+    public void forceRecycleSubServer(String name, Callback<Integer> response) throws InterruptedException {
+        forceRecycleSubServer(null, name, response);
+    }
+
+    /**
+     * Forces the Deletion of a SubServer (will move to 'Recently Deleted')
+     *
+     * @param player Player Deleting
+     * @param name SubServer Name
+     * @param response Response Code
+     */
+    public void forceRecycleSubServer(UUID player, String name, Callback<Integer> response) throws InterruptedException {
+        if (Util.isNull(name)) throw new NullPointerException();
+        deleteSubServer(player, name, true, true, response);
+    }
+
+    /**
+     * Delete a SubServer
+     *
+     * @param name SubServer Name
+     * @return Success Status
+     */
+    public void deleteSubServer(String name) throws InterruptedException {
+        deleteSubServer(null, name);
+    }
+
+    /**
+     * Forces the Deletion of a SubServer
+     *
+     * @param player Player Deleting
+     * @param name SubServer Name
+     * @return Success Status
+     */
+    public void deleteSubServer(UUID player, String name) throws InterruptedException {
+        if (Util.isNull(name)) throw new NullPointerException();
+        deleteSubServer(player, name, false, false, i -> {});
+    }
+
+    /**
+     * Forced the Deletion of a SubServer
+     *
+     * @param name SubServer Name
+     * @return Success Status
+     */
+    public void forceDeleteSubServer(String name) throws InterruptedException {
+        forceDeleteSubServer(null, name);
+    }
+
+    /**
+     * Forces the Deletion of a SubServer
+     *
+     * @param player Player Deleting
+     * @param name SubServer Name
+     * @return Success Status
+     */
+    public void forceDeleteSubServer(UUID player, String name) throws InterruptedException {
+        if (Util.isNull(name)) throw new NullPointerException();
+        deleteSubServer(player, name, false, true, i -> {});
+    }
+
+    /**
+     * Delete a SubServer
+     *
+     * @param name SubServer Name
+     * @return Success Status
+     */
+    public void deleteSubServer(String name, Callback<Integer> response) throws InterruptedException {
+        deleteSubServer(null, name, response);
+    }
+
+    /**
+     * Forces the Deletion of a SubServer
+     *
+     * @param player Player Deleting
+     * @param name SubServer Name
+     * @return Success Status
+     */
+    public void deleteSubServer(UUID player, String name, Callback<Integer> response) throws InterruptedException {
+        if (Util.isNull(name)) throw new NullPointerException();
+        deleteSubServer(player, name, false, false, response);
+    }
+
+    /**
+     * Forced the Deletion of a SubServer
+     *
+     * @param name SubServer Name
+     * @return Success Status
+     */
+    public void forceDeleteSubServer(String name, Callback<Integer> response) throws InterruptedException {
+        forceDeleteSubServer(null, name, response);
+    }
+
+    /**
+     * Forces the Deletion of a SubServer
+     *
+     * @param player Player Deleting
+     * @param name SubServer Name
+     * @return Success Status
+     */
+    public void forceDeleteSubServer(UUID player, String name, Callback<Integer> response) throws InterruptedException {
+        if (Util.isNull(name)) throw new NullPointerException();
+        deleteSubServer(player, name, false, true, response);
+    }
+
+    private void deleteSubServer(UUID player, String name, boolean recycle, boolean force, Callback<Integer> response) {
+        if (Util.isNull(response)) throw new NullPointerException();
+        StackTraceElement[] origin = new Exception().getStackTrace();
+        ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()).sendPacket(new PacketDeleteServer(player, name, recycle, force, data -> {
+            try {
+                response.run(data.getInt(0x0001));
+            } catch (Throwable e) {
+                Throwable ew = new InvocationTargetException(e);
+                ew.setStackTrace(origin);
+                ew.printStackTrace();
+            }
+        }));
     }
 
     /**

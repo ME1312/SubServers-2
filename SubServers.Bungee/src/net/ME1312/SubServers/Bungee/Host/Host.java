@@ -281,7 +281,7 @@ public abstract class Host implements ExtraDataHandler {
      */
     public boolean removeSubServer(String name) throws InterruptedException {
         return removeSubServer(null, name);
-    };
+    }
 
     /**
      * Removes a SubServer
@@ -297,6 +297,7 @@ public abstract class Host implements ExtraDataHandler {
      * Forces the Removal of a SubServer
      *
      * @param name SubServer Name
+     * @return Success Status
      */
     public boolean forceRemoveSubServer(String name) throws InterruptedException {
         return forceRemoveSubServer(null, name);
@@ -307,6 +308,7 @@ public abstract class Host implements ExtraDataHandler {
      *
      * @param player Player Removing
      * @param name SubServer Name
+     * @return Success Status
      */
     public abstract boolean forceRemoveSubServer(UUID player, String name) throws InterruptedException;
 

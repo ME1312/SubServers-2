@@ -567,6 +567,9 @@ public final class SubCommand extends BukkitCommand {
                                                 sender.sendMessage(plugin.api.getLang("SubServers", "Command.Creator.Template-Disabled"));
                                                 break;
                                             case 10:
+                                                sender.sendMessage(plugin.api.getLang("SubServers", "Command.Creator.Version-Required"));
+                                                break;
+                                            case 11:
                                                 sender.sendMessage(plugin.api.getLang("SubServers", "Command.Creator.Invalid-Port"));
                                                 break;
                                             case 0:

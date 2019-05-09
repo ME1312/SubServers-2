@@ -69,11 +69,15 @@ public class InternalSubCreator extends SubCreator {
             for (String other : template.getBuildOptions().getStringList("Import", new ArrayList<String>())) {
                 if (templates.keySet().contains(other.toLowerCase())) {
                     if (templates.get(other.toLowerCase()).isEnabled()) {
-                        ObjectMap<String> config = build(dir, templates.get(other.toLowerCase()), history);
-                        if (config == null) {
-                            throw new SubCreatorException();
+                        if (version != null || !templates.get(other.toLowerCase()).requiresVersion()) {
+                            ObjectMap<String> config = build(dir, templates.get(other.toLowerCase()), history);
+                            if (config == null) {
+                                throw new SubCreatorException();
+                            } else {
+                                server.setAll(config);
+                            }
                         } else {
-                            server.setAll(config);
+                            System.out.println(name + File.separator + "Creator > Skipping template that requires extra versioning: " + other);
                         }
                     } else {
                         System.out.println(name + File.separator + "Creator > Skipping disabled template: " + other);
@@ -306,7 +310,7 @@ public class InternalSubCreator extends SubCreator {
     @Override
     public boolean create(UUID player, String name, ServerTemplate template, Version version, Integer port, Callback<SubServer> callback) {
         if (Util.isNull(name, template)) throw new NullPointerException();
-        if (host.isAvailable() && host.isEnabled() && template.isEnabled() && !SubAPI.getInstance().getSubServers().keySet().contains(name.toLowerCase()) && !SubCreator.isReserved(name)) {
+        if (host.isAvailable() && host.isEnabled() && template.isEnabled() && !SubAPI.getInstance().getSubServers().keySet().contains(name.toLowerCase()) && !SubCreator.isReserved(name) && (version != null || !template.requiresVersion())) {
             StackTraceElement[] origin = new Exception().getStackTrace();
 
             if (port == null) {

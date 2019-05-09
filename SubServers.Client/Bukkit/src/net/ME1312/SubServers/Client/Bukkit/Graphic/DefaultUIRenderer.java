@@ -388,10 +388,16 @@ public class DefaultUIRenderer extends UIRenderer {
                 inv.setItem(29, block);
                 inv.setItem(30, block);
 
-                block = createItem("STAINED_GLASS_PANE", "LIME_STAINED_GLASS_PANE", (short) 5);
-                blockMeta = block.getItemMeta();
-                blockMeta.setDisplayName(ChatColor.GREEN + plugin.api.getLang("SubServers", "Interface.Host-Creator.Edit-Version"));
-                blockMeta.setLore(Arrays.asList(ChatColor.GRAY + ((options.getVersion() == null)?"Undefined":"Minecraft "+options.getVersion().toString())));
+                if (options.getVersion() == null && (options.getTemplate() == null || host.getCreator().getTemplate(options.getTemplate()).requiresVersion())) {
+                    block = createItem("STAINED_GLASS_PANE", "RED_STAINED_GLASS_PANE", (short) 14);
+                    blockMeta = block.getItemMeta();
+                    blockMeta.setDisplayName(ChatColor.RED + plugin.api.getLang("SubServers", "Interface.Host-Creator.Edit-Version"));
+                } else {
+                    block = createItem("STAINED_GLASS_PANE", "LIME_STAINED_GLASS_PANE", (short) 5);
+                    blockMeta = block.getItemMeta();
+                    blockMeta.setDisplayName(ChatColor.GREEN + plugin.api.getLang("SubServers", "Interface.Host-Creator.Edit-Version"));
+                    blockMeta.setLore(Arrays.asList(ChatColor.GRAY + ((options.getVersion() == null)?"Auto Select":"Minecraft "+options.getVersion().toString())));
+                }
                 block.setItemMeta(blockMeta);
                 inv.setItem(32, block);
                 inv.setItem(33, block);
@@ -412,7 +418,7 @@ public class DefaultUIRenderer extends UIRenderer {
                 inv.setItem(45, block);
                 inv.setItem(46, block);
 
-                if (options.getName() == null || options.getTemplate() == null) {
+                if (options.getName() == null || options.getTemplate() == null || (options.getVersion() == null && host.getCreator().getTemplate(options.getTemplate()).requiresVersion())) {
                     block = createItem("STAINED_GLASS_PANE", "GRAY_STAINED_GLASS_PANE", (short) 7);
                     blockMeta = block.getItemMeta();
                     blockMeta.setDisplayName(ChatColor.GRAY + ChatColor.stripColor(plugin.api.getLang("SubServers", "Interface.Host-Creator.Submit")));

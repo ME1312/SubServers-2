@@ -72,8 +72,10 @@ public class PacketCreateServer implements PacketObjectIn<Integer>, PacketObject
                 client.sendPacket(new PacketCreateServer(8, tracker));
             } else if (!plugin.hosts.get(host.toLowerCase()).getCreator().getTemplate(template).isEnabled()) {
                 client.sendPacket(new PacketCreateServer(9, tracker));
-            } else if (port != null && (port <= 0 || port > 65535)) {
+            } else if (version == null && plugin.hosts.get(host.toLowerCase()).getCreator().getTemplate(template).requiresVersion()) {
                 client.sendPacket(new PacketCreateServer(10, tracker));
+            } else if (port != null && (port <= 0 || port > 65535)) {
+                client.sendPacket(new PacketCreateServer(11, tracker));
             } else {
                 if (plugin.hosts.get(host.toLowerCase()).getCreator().create(player, name, plugin.hosts.get(host.toLowerCase()).getCreator().getTemplate(template), version, port)) {
                     if (waitfor) {

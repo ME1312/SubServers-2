@@ -181,7 +181,28 @@ public interface SubServer extends Server {
      * @return Success Status
      */
     default int edit(ObjectMap<String> edit) {
+        return edit(null, edit);
+    }
+
+    /**
+     * Edits the Server (& Saves Changes)
+     *
+     * @param player Player Editing
+     * @param edit Edits
+     * @return Success Status
+     */
+    default int permaEdit(UUID player, ObjectMap<String> edit) {
         return -1;
+    }
+
+    /**
+     * Edits the Server (& Saves Changes)
+     *
+     * @param edit Edits
+     * @return Success Status
+     */
+    default int permaEdit(ObjectMap<String> edit) {
+        return permaEdit(null, edit);
     }
 
     /**
@@ -222,12 +243,12 @@ public interface SubServer extends Server {
     /**
      * If the Server is accepting requests to edit()
      *
-     * @see #edit(ObjectMap<String>)
-     * @see #edit(UUID, ObjectMap<String>)
+     * @see #permaEdit(ObjectMap<String>)
+     * @see #permaEdit(UUID, ObjectMap<String>)
      * @return Edit Status
      */
     default boolean isEditable() {
-        return edit(new ObjectMap<String>()) >= 0;
+        return permaEdit(new ObjectMap<String>()) >= 0;
     }
 
     /**

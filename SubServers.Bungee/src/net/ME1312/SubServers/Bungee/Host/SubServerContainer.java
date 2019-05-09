@@ -50,8 +50,8 @@ public abstract class SubServerContainer extends ServerContainer implements SubS
     }
 
     @Override
-    public int edit(ObjectMap<String> edit) {
-        return edit(null, edit);
+    public int permaEdit(ObjectMap<String> edit) {
+        return permaEdit(null, edit);
     }
 
     @Override

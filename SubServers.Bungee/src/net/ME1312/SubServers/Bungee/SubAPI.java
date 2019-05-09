@@ -12,6 +12,7 @@ import net.ME1312.Galaxi.Library.NamedContainer;
 import net.ME1312.Galaxi.Library.UniversalFile;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
+import net.ME1312.SubServers.Bungee.Library.Exception.InvalidServerException;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.protocol.ProtocolConstants;
 
@@ -431,6 +432,7 @@ public final class SubAPI {
      * @return The Server
      */
     public Server addServer(UUID player, String name, InetAddress ip, int port, String motd, boolean hidden, boolean restricted) {
+        if (getServers().keySet().contains(name.toLowerCase())) throw new InvalidServerException("A Server already exists with this name!");
         Server server = new ServerContainer(name, new InetSocketAddress(ip, port), motd, hidden, restricted);
         SubAddServerEvent event = new SubAddServerEvent(player, null, server);
         plugin.getPluginManager().callEvent(event);
