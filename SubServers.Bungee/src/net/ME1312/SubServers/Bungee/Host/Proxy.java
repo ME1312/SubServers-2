@@ -50,15 +50,20 @@ public class Proxy implements ClientHandler, ExtraDataHandler {
 
     @SuppressWarnings("deprecation")
     public void setSubData(DataClient client, int channel) {
+        boolean update = false;
         if (channel < 0) throw new IllegalArgumentException("Subchannel ID cannot be less than zero");
-        if (!subdata.keySet().contains(channel) || (channel == 0 && subdata.get(channel) == null)) {
-            if (client != null || channel == 0) {
+        if (client != null || channel == 0) {
+            if (!subdata.keySet().contains(channel) || (channel == 0 && (client == null || subdata.get(channel) == null))) {
+                update = true;
                 subdata.put(channel, (SubDataClient) client);
                 if (client != null && (client.getHandler() == null || !equals(client.getHandler()))) ((SubDataClient) client).setHandler(this);
-            } else {
-                subdata.remove(channel);
             }
+        } else {
+            update = true;
+            subdata.remove(channel);
+        }
 
+        if (update) {
             DataClient[] subdata = getSubData();
             if (subdata[0] == null && subdata.length <= 1 && !persistent) {
                 ProxyServer.getInstance().getPluginManager().callEvent(new SubRemoveProxyEvent(this));

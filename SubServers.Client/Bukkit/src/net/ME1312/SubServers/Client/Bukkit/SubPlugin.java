@@ -47,6 +47,7 @@ public final class SubPlugin extends JavaPlugin {
     public SubPlugin() {
         super();
         version = Version.fromString(getDescription().getVersion());
+        subdata.put(0, null);
     }
 
     /**

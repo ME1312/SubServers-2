@@ -28,6 +28,9 @@ public class SubProtocol extends SubDataProtocol {
     @SuppressWarnings("deprecation")
     public static SubProtocol get() {
         if (instance == null) {
+            instance = new SubProtocol();
+            SubPlugin plugin = SubAPI.getInstance().getInternals();
+
             log = Logger.getAnonymousLogger();
             log.setUseParentHandlers(false);
             log.addHandler(new Handler() {
@@ -35,8 +38,13 @@ public class SubProtocol extends SubDataProtocol {
 
                 @Override
                 public void publish(LogRecord record) {
-                    if (open)
-                        Bukkit.getLogger().log(record.getLevel(), "SubData > " + record.getMessage(), record.getParameters());
+                    if (open) {
+                        if (plugin.isEnabled()) {
+                            Bukkit.getScheduler().runTask(plugin, () -> Bukkit.getLogger().log(record.getLevel(), "SubData > " + record.getMessage(), record.getParameters()));
+                        } else {
+                            Bukkit.getLogger().log(record.getLevel(), "SubData > " + record.getMessage(), record.getParameters());
+                        }
+                    }
                 }
 
                 @Override
@@ -49,8 +57,6 @@ public class SubProtocol extends SubDataProtocol {
                     open = false;
                 }
             });
-            instance = new SubProtocol();
-            SubPlugin plugin = SubAPI.getInstance().getInternals();
 
             instance.setName("SubServers 2");
             instance.addVersion(new Version("2.14a+"));

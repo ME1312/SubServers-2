@@ -54,22 +54,25 @@ public class ServerContainer extends BungeeServerInfo implements Server {
     }
 
     public void setSubData(DataClient client, int channel) {
+        boolean update = false;
         if (channel < 0) throw new IllegalArgumentException("Subchannel ID cannot be less than zero");
-        if (!subdata.keySet().contains(channel) || (channel == 0 && subdata.get(channel) == null)) {
-            if (client != null || channel == 0) {
+        if (client != null || channel == 0) {
+            if (!subdata.keySet().contains(channel) || (channel == 0 && (client == null || subdata.get(channel) == null))) {
+                update = true;
                 subdata.put(channel, (SubDataClient) client);
                 if (client != null && (client.getHandler() == null || !equals(client.getHandler()))) ((SubDataClient) client).setHandler(this);
-            } else {
-                subdata.remove(channel);
             }
+        } else {
+            update = true;
+            subdata.remove(channel);
+        }
 
-            for (Proxy proxy : SubAPI.getInstance().getProxies().values()) if (proxy.getSubData()[0] != null) {
-                ObjectMap<String> args = new ObjectMap<String>();
-                args.set("server", getName());
-                args.set("channel", channel);
-                if (client != null) args.set("address", client.getAddress().toString());
-                ((SubDataClient) proxy.getSubData()[0]).sendPacket(new PacketOutExRunEvent((client != null)?SubNetworkConnectEvent.class:SubNetworkDisconnectEvent.class, args));
-            }
+        if (update) for (Proxy proxy : SubAPI.getInstance().getProxies().values()) if (proxy.getSubData()[0] != null) {
+            ObjectMap<String> args = new ObjectMap<String>();
+            args.set("server", getName());
+            args.set("channel", channel);
+            if (client != null) args.set("address", client.getAddress().toString());
+            ((SubDataClient) proxy.getSubData()[0]).sendPacket(new PacketOutExRunEvent((client != null)?SubNetworkConnectEvent.class:SubNetworkDisconnectEvent.class, args));
         }
     }
 

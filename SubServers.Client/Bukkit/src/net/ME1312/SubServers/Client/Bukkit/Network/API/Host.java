@@ -55,7 +55,7 @@ public class Host {
     /**
      * Gets the SubData Client Channel IDs
      *
-     * @return SubData Client Channel ID Array
+     * @return SubData Client Channel ID Array (may be empty if unsupported)
      */
     public UUID[] getSubData() {
         return raw.getUUIDList("subdata", Collections.emptyList()).toArray(new UUID[0]);
