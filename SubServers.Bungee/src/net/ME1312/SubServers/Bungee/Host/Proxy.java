@@ -1,7 +1,6 @@
 package net.ME1312.SubServers.Bungee.Host;
 
 import net.ME1312.SubData.Server.DataClient;
-import net.ME1312.SubData.Server.SerializableClientHandler;
 import net.ME1312.SubData.Server.SubDataClient;
 import net.ME1312.SubServers.Bungee.Event.SubRemoveProxyEvent;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
@@ -19,11 +18,11 @@ import java.util.*;
 /**
  * Proxy Class
  */
-public class Proxy implements SerializableClientHandler, ExtraDataHandler {
+public class Proxy implements ClientHandler, ExtraDataHandler {
+    private HashMap<Integer, SubDataClient> subdata = new HashMap<Integer, SubDataClient>();
     private ObjectMap<String> extra = new ObjectMap<String>();
     private final String signature;
     private boolean persistent = true;
-    private SubDataClient client = null;
     private String nick = null;
     private final String name;
 
@@ -36,22 +35,41 @@ public class Proxy implements SerializableClientHandler, ExtraDataHandler {
         if (name.contains(" ")) throw new IllegalArgumentException("Proxy names cannot have spaces: " + name);
         this.name = name;
         this.signature = SubAPI.getInstance().signAnonymousObject();
+
+        setSubData(null, 0);
     }
 
     @Override
-    public DataClient getSubData() {
-        return client;
+    public DataClient[] getSubData() {
+        LinkedList<Integer> keys = new LinkedList<Integer>(subdata.keySet());
+        LinkedList<SubDataClient> channels = new LinkedList<SubDataClient>();
+        Collections.sort(keys);
+        for (Integer channel : keys) channels.add(subdata.get(channel));
+        return channels.toArray(new DataClient[0]);
     }
 
-    @Override
     @SuppressWarnings("deprecation")
-    public void setSubData(DataClient client) {
-        this.client = (SubDataClient) client;
-        if (client == null && !persistent) {
-            ProxyServer.getInstance().getPluginManager().callEvent(new SubRemoveProxyEvent(this));
-            SubAPI.getInstance().getInternals().proxies.remove(getName().toLowerCase());
+    public void setSubData(DataClient client, int channel) {
+        if (channel < 0) throw new IllegalArgumentException("Subchannel ID cannot be less than zero");
+        if (!subdata.keySet().contains(channel) || (channel == 0 && subdata.get(channel) == null)) {
+            if (client != null || channel == 0) {
+                subdata.put(channel, (SubDataClient) client);
+                if (client != null && (client.getHandler() == null || !equals(client.getHandler()))) ((SubDataClient) client).setHandler(this);
+            } else {
+                subdata.remove(channel);
+            }
+
+            DataClient[] subdata = getSubData();
+            if (subdata[0] == null && subdata.length <= 1 && !persistent) {
+                ProxyServer.getInstance().getPluginManager().callEvent(new SubRemoveProxyEvent(this));
+                SubAPI.getInstance().getInternals().proxies.remove(getName().toLowerCase());
+            }
         }
-        if (client != null && (client.getHandler() == null || !equals(client.getHandler()))) ((SubDataClient) client).setHandler(this);
+    }
+
+    @Override
+    public void removeSubData(DataClient client) {
+        for (Integer channel : Util.getBackwards(subdata, (SubDataClient) client)) setSubData(null, channel);
     }
 
     /**
@@ -166,7 +184,9 @@ public class Proxy implements SerializableClientHandler, ExtraDataHandler {
         }
         info.set("players", players);
         info.set("redis", isRedis());
-        if (getSubData() != null) info.set("subdata", getSubData().getID());
+        LinkedList<UUID> subdata = new LinkedList<UUID>();
+        for (DataClient client : getSubData()) subdata.add((client == null)?null:client.getID());
+        info.set("subdata", subdata);
         info.set("signature", signature);
         info.set("extra", getExtra());
         return info;

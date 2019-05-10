@@ -3,6 +3,7 @@ package net.ME1312.SubServers.Client.Bukkit;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.SubData.Client.Encryption.AES;
 import net.ME1312.SubData.Client.Encryption.RSA;
+import net.ME1312.SubData.Client.Library.DisconnectReason;
 import net.ME1312.SubServers.Client.Bukkit.Graphic.DefaultUIHandler;
 import net.ME1312.SubServers.Client.Bukkit.Graphic.UIHandler;
 import net.ME1312.Galaxi.Library.Config.YAMLConfig;
@@ -25,24 +26,23 @@ import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
  * SubServers Client Plugin Class
  */
 public final class SubPlugin extends JavaPlugin {
+    protected HashMap<Integer, SubDataClient> subdata = new HashMap<Integer, SubDataClient>();
     protected NamedContainer<Long, Map<String, Map<String, String>>> lang = null;
     public YAMLConfig config;
-    public SubDataClient subdata = null;
     public SubProtocol subprotocol;
 
     public UIHandler gui = null;
     public final Version version;
     public final SubAPI api = new SubAPI(this);
+
+    private boolean reconnect = false;
 
     public SubPlugin() {
         super();
@@ -120,8 +120,14 @@ public final class SubPlugin extends JavaPlugin {
     }
 
     public void reload(boolean notifyPlugins) throws IOException {
-        if (subdata != null)
-            subdata.close();
+        reconnect = false;
+        ArrayList<SubDataClient> tmp = new ArrayList<SubDataClient>();
+        tmp.addAll(subdata.values());
+        for (SubDataClient client : tmp) {
+            client.close();
+            Util.isException(client::waitFor);
+        }
+        subdata.clear();
 
         config.reload();
 
@@ -149,9 +155,9 @@ public final class SubPlugin extends JavaPlugin {
             }
         }
 
+        reconnect = true;
         System.out.println("SubData > ");
-        subdata = subprotocol.open((config.get().getMap("Settings").getMap("SubData").getRawString("Address", "127.0.0.1:4391").split(":")[0].equals("0.0.0.0"))?null:InetAddress.getByName(config.get().getMap("Settings").getMap("SubData").getRawString("Address", "127.0.0.1:4391").split(":")[0]),
-                Integer.parseInt(config.get().getMap("Settings").getMap("SubData").getRawString("Address", "127.0.0.1:4391").split(":")[1]));
+        connect();
 
         if (notifyPlugins) {
             List<Runnable> listeners = api.reloadListeners;
@@ -167,6 +173,11 @@ public final class SubPlugin extends JavaPlugin {
         }
     }
 
+    private void connect() throws IOException {
+        subdata.put(0, subprotocol.open((config.get().getMap("Settings").getMap("SubData").getRawString("Address", "127.0.0.1:4391").split(":")[0].equals("0.0.0.0"))?null:InetAddress.getByName(config.get().getMap("Settings").getMap("SubData").getRawString("Address", "127.0.0.1:4391").split(":")[0]),
+                Integer.parseInt(config.get().getMap("Settings").getMap("SubData").getRawString("Address", "127.0.0.1:4391").split(":")[1])));
+    }
+
     /**
      * Disable Plugin
      */
@@ -174,8 +185,15 @@ public final class SubPlugin extends JavaPlugin {
     public void onDisable() {
         if (subdata != null) try {
             setEnabled(false);
-            subdata.close();
-            subdata.waitFor();
+            reconnect = false;
+
+            ArrayList<SubDataClient> temp = new ArrayList<SubDataClient>();
+            temp.addAll(subdata.values());
+            for (SubDataClient client : temp) {
+                client.close();
+                client.waitFor();
+            }
+            subdata.clear();
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }

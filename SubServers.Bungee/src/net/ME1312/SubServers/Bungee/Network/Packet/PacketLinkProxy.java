@@ -8,8 +8,10 @@ import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubData.Server.SubDataClient;
 import net.ME1312.SubData.Server.Protocol.PacketObjectOut;
 import net.ME1312.SubData.Server.Protocol.PacketObjectIn;
+import net.ME1312.SubServers.Bungee.Host.ServerContainer;
 import net.ME1312.SubServers.Bungee.SubPlugin;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -54,18 +56,24 @@ public class PacketLinkProxy implements PacketObjectIn<Integer>, PacketObjectOut
         try {
             Map<String, Proxy> proxies = plugin.api.getProxies();
             String name = ((data.contains(0x0000))?data.getRawString(0x0000):null);
+            Integer channel = data.getInt(0x0001);
             Proxy proxy;
-            if (name != null && proxies.keySet().contains(name.toLowerCase()) && proxies.get(name.toLowerCase()).getSubData() == null) {
+            if (name != null && proxies.keySet().contains(name.toLowerCase())) {
                 proxy = proxies.get(name.toLowerCase());
             } else {
                 proxy = new Proxy((name != null && !proxies.keySet().contains(name.toLowerCase()))?name:null);
                 plugin.getPluginManager().callEvent(new SubAddProxyEvent(proxy));
                 plugin.proxies.put(proxy.getName().toLowerCase(), proxy);
             }
+            HashMap<Integer, SubDataClient> subdata = Util.getDespiteException(() -> Util.reflect(Proxy.class.getDeclaredField("subdata"), proxy), null);
+            if (!subdata.keySet().contains(channel) || (channel == 0 && subdata.get(0) == null)) {
+                proxy.setSubData(client, channel);
+                System.out.println("SubData > " + client.getAddress().toString() + " has been defined as Proxy: " + proxy.getName() + ((channel > 0)?" (Sub "+channel+")":""));
+                client.sendPacket(new PacketLinkProxy(proxy.getName(), 0));
+            } else {
+                client.sendPacket(new PacketLinkProxy(proxy.getName(), 2));
 
-            client.setHandler(proxy);
-            System.out.println("SubData > " + client.getAddress().toString() + " has been defined as Proxy: " + proxy.getName());
-            client.sendPacket(new PacketLinkProxy(proxy.getName(), 0));
+            }
         } catch (Exception e) {
             client.sendPacket(new PacketLinkProxy(null, 1));
             e.printStackTrace();

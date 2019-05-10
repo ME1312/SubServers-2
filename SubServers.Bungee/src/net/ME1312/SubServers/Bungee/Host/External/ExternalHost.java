@@ -1,8 +1,8 @@
 package net.ME1312.SubServers.Bungee.Host.External;
 
 import com.google.common.collect.Range;
+import net.ME1312.SubData.Server.ClientHandler;
 import net.ME1312.SubData.Server.DataClient;
-import net.ME1312.SubData.Server.SerializableClientHandler;
 import net.ME1312.SubData.Server.SubDataClient;
 import net.ME1312.SubServers.Bungee.Event.SubAddServerEvent;
 import net.ME1312.SubServers.Bungee.Event.SubRemoveServerEvent;
@@ -11,7 +11,6 @@ import net.ME1312.SubServers.Bungee.Host.SubCreator;
 import net.ME1312.SubServers.Bungee.Host.SubServer;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.SubServers.Bungee.Library.Exception.InvalidServerException;
-import net.ME1312.Galaxi.Library.NamedContainer;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubData.Server.Protocol.PacketObjectOut;
 import net.ME1312.SubServers.Bungee.Network.Packet.PacketExAddServer;
@@ -26,14 +25,15 @@ import java.util.*;
 /**
  * External Host Class
  */
-public class ExternalHost extends Host implements SerializableClientHandler {
+public class ExternalHost extends Host implements ClientHandler {
+    private HashMap<Integer, SubDataClient> subdata = new HashMap<Integer, SubDataClient>();
     private HashMap<String, SubServer> servers = new HashMap<String, SubServer>();
     private String name;
+    protected boolean available;
     private boolean enabled;
     private InetAddress address;
     private SubCreator creator;
     private String directory;
-    protected NamedContainer<Boolean, SubDataClient> client;
     private LinkedList<PacketObjectOut> queue;
     private boolean clean;
     protected SubPlugin plugin;
@@ -54,51 +54,69 @@ public class ExternalHost extends Host implements SerializableClientHandler {
         super(plugin, name, enabled, ports, log, address, directory, gitBash);
         this.plugin = plugin;
         this.name = name;
+        this.available = false;
         this.enabled = enabled;
         this.address = address;
-        this.client = new NamedContainer<Boolean, SubDataClient>(false, null);
         this.creator = new ExternalSubCreator(this, ports, log, gitBash);
         this.directory = directory;
         this.queue = new LinkedList<PacketObjectOut>();
         this.clean = false;
+
+        setSubData(null, 0);
     }
 
     @Override
-    public DataClient getSubData() {
-        return client.get();
+    public DataClient[] getSubData() {
+        LinkedList<Integer> keys = new LinkedList<Integer>(subdata.keySet());
+        LinkedList<SubDataClient> channels = new LinkedList<SubDataClient>();
+        Collections.sort(keys);
+        for (Integer channel : keys) channels.add(subdata.get(channel));
+        return channels.toArray(new DataClient[0]);
+    }
+
+    public void setSubData(DataClient client, int channel) {
+        if (channel < 0) throw new IllegalArgumentException("Subchannel ID cannot be less than zero");
+        if (!subdata.keySet().contains(channel) || (channel == 0 && subdata.get(channel) == null)) {
+            if (client != null || channel == 0) {
+                subdata.put(channel, (SubDataClient) client);
+                if (client != null && (client.getHandler() == null || !equals(client.getHandler()))) ((SubDataClient) client).setHandler(this);
+            } else {
+                subdata.remove(channel);
+            }
+        }
     }
 
     @Override
-    public void setSubData(DataClient client) {
-        this.client = new NamedContainer<Boolean, SubDataClient>(false, (SubDataClient) client);
-        if (client != null && (client.getHandler() == null || !equals(client.getHandler()))) ((SubDataClient) client).setHandler(this);
+    public void removeSubData(DataClient client) {
+        for (Integer channel : Util.getBackwards(subdata, (SubDataClient) client)) setSubData(null, channel);
     }
 
     protected void queue(PacketObjectOut... packet) {
-        for (PacketObjectOut p : packet) if (client.get() == null || client.name() == false) {
+        for (PacketObjectOut p : packet) if (getSubData()[0] == null || !available) {
             queue.add(p);
         } else {
-            client.get().sendPacket(p);
+            ((SubDataClient) getSubData()[0]).sendPacket(p);
         }
     }
     private void requeue() {
+        SubDataClient client = (SubDataClient) getSubData()[0];
         if (!clean) {
-            client.get().sendPacket(new PacketOutExReset("Prevent Desync"));
+            client.sendPacket(new PacketOutExReset("Prevent Desync"));
             clean = true;
         }
         for (SubServer server : servers.values()) {
-            client.get().sendPacket(new PacketExAddServer(server.getName(), server.isEnabled(), server.getAddress().getPort(), server.isLogging(), server.getPath(), ((ExternalSubServer) server).exec, server.getStopCommand(), (server.isRunning())?((ExternalSubLogger) server.getLogger()).getExternalAddress():null));
+            client.sendPacket(new PacketExAddServer(server.getName(), server.isEnabled(), server.getAddress().getPort(), server.isLogging(), server.getPath(), ((ExternalSubServer) server).exec, server.getStopCommand(), (server.isRunning())?((ExternalSubLogger) server.getLogger()).getExternalAddress():null));
         }
         while (queue.size() != 0) {
-            client.get().sendPacket(queue.get(0));
+            client.sendPacket(queue.get(0));
             queue.remove(0);
         }
-        client.rename(true);
+        available = true;
     }
 
     @Override
     public boolean isAvailable() {
-        return this.client.name();
+        return available;
     }
 
     @Override

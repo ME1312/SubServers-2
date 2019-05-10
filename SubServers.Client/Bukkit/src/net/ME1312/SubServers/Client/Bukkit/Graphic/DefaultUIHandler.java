@@ -6,6 +6,7 @@ import net.ME1312.Galaxi.Library.Callback.Callback;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
+import net.ME1312.SubData.Client.SubDataClient;
 import net.ME1312.SubServers.Client.Bukkit.Network.API.Host;
 import net.ME1312.SubServers.Client.Bukkit.Network.API.SubServer;
 import net.ME1312.SubServers.Client.Bukkit.Network.Packet.*;
@@ -62,7 +63,7 @@ public class DefaultUIHandler implements UIHandler, Listener {
             String title = event.getView().getTitle();
             
             if (gui.open && event.getClickedInventory() != null && title != null) {
-                if (plugin.subdata == null) {
+                if (plugin.api.getSubDataNetwork()[0] == null) {
                     new IllegalStateException("SubData is not connected").printStackTrace();
                 } else if (Util.isException(() -> plugin.api.getLangChannels())) {
                     new IllegalStateException("There are no lang options available at this time").printStackTrace();
@@ -109,7 +110,7 @@ public class DefaultUIHandler implements UIHandler, Listener {
                             if (player.hasPermission("subservers.host.create.*") || player.hasPermission("subservers.host.create." + ((UIRenderer.CreatorOptions) gui.lastVisitedObjects[0]).getHost().toLowerCase())) {
                                 player.closeInventory();
                                 gui.setDownloading(plugin.api.getLang("SubServers", "Interface.Generic.Downloading.Response"));
-                                plugin.subdata.sendPacket(new PacketCreateServer(player.getUniqueId(), ((UIRenderer.CreatorOptions) gui.lastVisitedObjects[0]), data -> {
+                                ((SubDataClient) plugin.api.getSubDataNetwork()[0]).sendPacket(new PacketCreateServer(player.getUniqueId(), ((UIRenderer.CreatorOptions) gui.lastVisitedObjects[0]), data -> {
                                     gui.back();
                                 }));
                             } else {
@@ -319,7 +320,7 @@ public class DefaultUIHandler implements UIHandler, Listener {
                             player.closeInventory();
                             if (player.hasPermission("subservers.subserver.start.*") || player.hasPermission("subservers.subserver.start." + ((String) gui.lastVisitedObjects[0]).toLowerCase())) {
                                 gui.setDownloading(plugin.api.getLang("SubServers", "Interface.Generic.Downloading.Response"));
-                                plugin.subdata.sendPacket(new PacketStartServer(player.getUniqueId(), (String) gui.lastVisitedObjects[0], data -> {
+                                ((SubDataClient) plugin.api.getSubDataNetwork()[0]).sendPacket(new PacketStartServer(player.getUniqueId(), (String) gui.lastVisitedObjects[0], data -> {
                                     gui.setDownloading(plugin.api.getLang("SubServers", "Interface.SubServer-Admin.Start.Title"));
                                     Bukkit.getScheduler().runTaskLater(plugin, gui::reopen, 30);
                                 }));
@@ -341,7 +342,7 @@ public class DefaultUIHandler implements UIHandler, Listener {
                                         } catch (Exception e) {}
                                     }
                                 });
-                                plugin.subdata.sendPacket(new PacketStopServer(player.getUniqueId(), (String) gui.lastVisitedObjects[0], false, data -> {
+                                ((SubDataClient) plugin.api.getSubDataNetwork()[0]).sendPacket(new PacketStopServer(player.getUniqueId(), (String) gui.lastVisitedObjects[0], false, data -> {
                                     if (data.getInt(0x0001) != 0) {
                                         gui.reopen();
                                         listening.set(false);
@@ -365,7 +366,7 @@ public class DefaultUIHandler implements UIHandler, Listener {
                                         } catch (Exception e) {}
                                     }
                                 });
-                                plugin.subdata.sendPacket(new PacketStopServer(player.getUniqueId(), (String) gui.lastVisitedObjects[0], false, data -> {
+                                ((SubDataClient) plugin.api.getSubDataNetwork()[0]).sendPacket(new PacketStopServer(player.getUniqueId(), (String) gui.lastVisitedObjects[0], false, data -> {
                                     if (data.getInt(0x0001) != 0) {
                                         gui.reopen();
                                         listening.set(false);
@@ -379,7 +380,7 @@ public class DefaultUIHandler implements UIHandler, Listener {
                                     player.sendMessage(plugin.api.getLang("SubServers", "Interface.SubServer-Admin.Command.Message"));
                                 input.put(player.getUniqueId(), m -> {
                                     gui.setDownloading(plugin.api.getLang("SubServers", "Interface.Generic.Downloading.Response"));
-                                    plugin.subdata.sendPacket(new PacketCommandServer(player.getUniqueId(), (String) gui.lastVisitedObjects[0], (m.getString("message").startsWith("/"))?m.getString("message").substring(1):m.getString("message"), data -> {
+                                    ((SubDataClient) plugin.api.getSubDataNetwork()[0]).sendPacket(new PacketCommandServer(player.getUniqueId(), (String) gui.lastVisitedObjects[0], (m.getString("message").startsWith("/"))?m.getString("message").substring(1):m.getString("message"), data -> {
                                         gui.reopen();
                                     }));
                                 });

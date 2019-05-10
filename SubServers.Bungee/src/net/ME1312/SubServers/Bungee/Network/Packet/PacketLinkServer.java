@@ -1,7 +1,9 @@
 package net.ME1312.SubServers.Bungee.Network.Packet;
 
+import net.ME1312.SubData.Server.DataClient;
 import net.ME1312.SubData.Server.SubDataClient;
 import net.ME1312.SubServers.Bungee.Host.Server;
+import net.ME1312.SubServers.Bungee.Host.ServerContainer;
 import net.ME1312.SubServers.Bungee.Host.SubServer;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Util;
@@ -10,6 +12,7 @@ import net.ME1312.SubData.Server.Protocol.PacketObjectOut;
 import net.ME1312.SubServers.Bungee.SubPlugin;
 
 import java.net.InetSocketAddress;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -64,15 +67,16 @@ public class PacketLinkServer implements PacketObjectIn<Integer>, PacketObjectOu
     public void receive(SubDataClient client, ObjectMap<Integer> data) {
         String name =  (data.contains(0x0000))?data.getRawString(0x0000):null;
         Integer port = (data.contains(0x0001))?data.getInt(0x0001):null;
+        Integer channel = data.getInt(0x0002);
 
         try {
             Map<String, Server> servers = plugin.api.getServers();
             Server server;
             if (name != null && servers.keySet().contains(name.toLowerCase())) {
-                link(client, servers.get(name.toLowerCase()));
+                link(client, servers.get(name.toLowerCase()), channel);
             } else if (port != null) {
                 if ((server = search(new InetSocketAddress(client.getAddress().getAddress(), port))) != null) {
-                    link(client, server);
+                    link(client, server, channel);
                 } else {
                     throw new ServerLinkException("There is no server with address: " + client.getAddress().getAddress().getHostAddress() + ':' + port);
                 }
@@ -91,10 +95,11 @@ public class PacketLinkServer implements PacketObjectIn<Integer>, PacketObjectOu
         }
     }
 
-    private void link(SubDataClient client, Server server) {
-        if (server.getSubData() == null) {
-            client.setHandler(server);
-            System.out.println("SubData > " + client.getAddress().toString() + " has been defined as " + ((server instanceof SubServer) ? "SubServer" : "Server") + ": " + server.getName());
+    private void link(SubDataClient client, Server server, int channel) {
+        HashMap<Integer, SubDataClient> subdata = Util.getDespiteException(() -> Util.reflect(ServerContainer.class.getDeclaredField("subdata"), server), null);
+        if (!subdata.keySet().contains(channel) || (channel == 0 && subdata.get(0) == null)) {
+            server.setSubData(client, channel);
+            System.out.println("SubData > " + client.getAddress().toString() + " has been defined as " + ((server instanceof SubServer) ? "SubServer" : "Server") + ": " + server.getName() + ((channel > 0)?" (Sub "+channel+")":""));
             if (server instanceof SubServer && !((SubServer) server).isRunning()) {
                 System.out.println("SubServers > Sending shutdown signal to rogue SubServer: " + server.getName());
                 client.sendPacket(new PacketOutExReset("Rogue SubServer Detected"));

@@ -15,9 +15,10 @@ import org.bukkit.Bukkit;
  */
 public class PacketLinkServer implements PacketObjectIn<Integer>, PacketObjectOut<Integer> {
     private SubPlugin plugin;
+    private int channel;
 
     /**
-     * New PacketLinkServer
+     * New PacketLinkServer (In)
      *
      * @param plugin SubServers.Client
      */
@@ -25,12 +26,24 @@ public class PacketLinkServer implements PacketObjectIn<Integer>, PacketObjectOu
         if (Util.isNull(plugin)) throw new NullPointerException();
         this.plugin = plugin;
     }
+    /**
+     * New PacketLinkServer (Out)
+     *
+     * @param plugin SubServers.Client
+     * @param channel Channel ID
+     */
+    public PacketLinkServer(SubPlugin plugin, int channel) {
+        if (Util.isNull(plugin)) throw new NullPointerException();
+        this.plugin = plugin;
+        this.channel = channel;
+    }
 
     @Override
     public ObjectMap<Integer> send(SubDataClient client) {
         ObjectMap<Integer> json = new ObjectMap<Integer>();
         if (plugin.api.getName() != null) json.set(0x0000, plugin.api.getName());
         json.set(0x0001, Bukkit.getServer().getPort());
+        json.set(0x0002, channel);
         return json;
     }
 
@@ -41,8 +54,10 @@ public class PacketLinkServer implements PacketObjectIn<Integer>, PacketObjectOu
                 if (data.contains(0x0000)) {
                     Util.reflect(SubAPI.class.getDeclaredField("name"), plugin.api, data.getRawString(0x0000));
                 }
-                client.sendPacket(new PacketDownloadLang());
-                Bukkit.getPluginManager().callEvent(new SubNetworkConnectEvent(client));
+                if (SubAPI.getInstance().getSubDataNetwork()[0] == client) {
+                    client.sendPacket(new PacketDownloadLang());
+                    Bukkit.getPluginManager().callEvent(new SubNetworkConnectEvent(client));
+                }
             } catch (Exception e) {}
         } else {
             Bukkit.getLogger().info("SubData > Could not link name with server" + ((data.contains(0x0002))?": "+data.getRawString(0x0002):'.'));

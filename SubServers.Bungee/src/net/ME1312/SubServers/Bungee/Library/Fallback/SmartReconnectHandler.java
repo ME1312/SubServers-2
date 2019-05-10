@@ -77,7 +77,7 @@ public class SmartReconnectHandler implements ReconnectHandler {
                 if (server instanceof Server) {
                     if (!((Server) server).isHidden()) confidence++;
                     if (!((Server) server).isRestricted()) confidence++;
-                    if (((Server) server).getSubData() != null) confidence++;
+                    if (((Server) server).getSubData()[0] != null) confidence++;
                 } if (server instanceof SubServer) {
                     if (!((SubServer) server).isRunning()) valid = false;
                 }

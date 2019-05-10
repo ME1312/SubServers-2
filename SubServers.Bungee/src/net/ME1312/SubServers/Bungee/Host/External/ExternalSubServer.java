@@ -442,7 +442,7 @@ public class ExternalSubServer extends SubServerContainer {
 
     @Override
     public void waitFor() throws InterruptedException {
-        while (running && host.client.get() != null) {
+        while (running && host.getSubData()[0] != null) {
             Thread.sleep(250);
         }
     }

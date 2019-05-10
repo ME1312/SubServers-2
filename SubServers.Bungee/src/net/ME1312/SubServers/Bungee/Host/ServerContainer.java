@@ -25,8 +25,8 @@ import java.util.*;
  * Server Class
  */
 public class ServerContainer extends BungeeServerInfo implements Server {
+    private HashMap<Integer, SubDataClient> subdata = new HashMap<Integer, SubDataClient>();
     private ObjectMap<String> extra = new ObjectMap<String>();
-    private SubDataClient client = null;
     private String nick = null;
     private List<String> groups = new ArrayList<String>();
     private List<UUID> whitelist = new ArrayList<UUID>();
@@ -40,23 +40,42 @@ public class ServerContainer extends BungeeServerInfo implements Server {
         signature = SubAPI.getInstance().signAnonymousObject();
         SubAPI.getInstance().getSubDataNetwork().getProtocol().whitelist(getAddress().getAddress().getHostAddress());
         this.hidden = hidden;
+
+        setSubData(null, 0);
     }
 
     @Override
-    public DataClient getSubData() {
-        return client;
+    public DataClient[] getSubData() {
+        LinkedList<Integer> keys = new LinkedList<Integer>(subdata.keySet());
+        LinkedList<SubDataClient> channels = new LinkedList<SubDataClient>();
+        Collections.sort(keys);
+        for (Integer channel : keys) channels.add(subdata.get(channel));
+        return channels.toArray(new DataClient[0]);
     }
 
-    @Override
-    public void setSubData(DataClient client) {
-        this.client = (SubDataClient) client;
-        for (Proxy proxy : SubAPI.getInstance().getProxies().values()) if (proxy.getSubData() != null) {
-            ObjectMap<String> args = new ObjectMap<String>();
-            args.set("server", getName());
-            if (client != null) args.set("address", client.getAddress().toString());
-            ((SubDataClient) proxy.getSubData()).sendPacket(new PacketOutExRunEvent((client != null)?SubNetworkConnectEvent.class:SubNetworkDisconnectEvent.class, args));
+    public void setSubData(DataClient client, int channel) {
+        if (channel < 0) throw new IllegalArgumentException("Subchannel ID cannot be less than zero");
+        if (!subdata.keySet().contains(channel) || (channel == 0 && subdata.get(channel) == null)) {
+            if (client != null || channel == 0) {
+                subdata.put(channel, (SubDataClient) client);
+                if (client != null && (client.getHandler() == null || !equals(client.getHandler()))) ((SubDataClient) client).setHandler(this);
+            } else {
+                subdata.remove(channel);
+            }
+
+            for (Proxy proxy : SubAPI.getInstance().getProxies().values()) if (proxy.getSubData()[0] != null) {
+                ObjectMap<String> args = new ObjectMap<String>();
+                args.set("server", getName());
+                args.set("channel", channel);
+                if (client != null) args.set("address", client.getAddress().toString());
+                ((SubDataClient) proxy.getSubData()[0]).sendPacket(new PacketOutExRunEvent((client != null)?SubNetworkConnectEvent.class:SubNetworkDisconnectEvent.class, args));
+            }
         }
-        if (client != null && (client.getHandler() == null || !equals(client.getHandler()))) ((SubDataClient) client).setHandler(this);
+    }
+
+    @Override
+    public void removeSubData(DataClient client) {
+        for (Integer channel : Util.getBackwards(subdata, (SubDataClient) client)) setSubData(null, channel);
     }
 
     @Override
@@ -174,14 +193,14 @@ public class ServerContainer extends BungeeServerInfo implements Server {
     public void whitelist(UUID player) {
         if (Util.isNull(player)) throw new NullPointerException();
         whitelist.add(player);
-        for (Proxy proxy : SubAPI.getInstance().getProxies().values()) if (proxy.getSubData() != null) ((SubDataClient) proxy.getSubData()).sendPacket(new PacketOutExUpdateWhitelist(getName(), true, player));
+        for (Proxy proxy : SubAPI.getInstance().getProxies().values()) if (proxy.getSubData()[0] != null) ((SubDataClient) proxy.getSubData()[0]).sendPacket(new PacketOutExUpdateWhitelist(getName(), true, player));
     }
 
     @Override
     public void unwhitelist(UUID player) {
         if (Util.isNull(player)) throw new NullPointerException();
         whitelist.remove(player);
-        for (Proxy proxy : SubAPI.getInstance().getProxies().values()) if (proxy.getSubData() != null) ((SubDataClient) proxy.getSubData()).sendPacket(new PacketOutExUpdateWhitelist(getName(), false, player));
+        for (Proxy proxy : SubAPI.getInstance().getProxies().values()) if (proxy.getSubData()[0] != null) ((SubDataClient) proxy.getSubData()[0]).sendPacket(new PacketOutExUpdateWhitelist(getName(), false, player));
     }
 
     @Override
@@ -237,7 +256,9 @@ public class ServerContainer extends BungeeServerInfo implements Server {
             players.set(player.get().toString(), pinfo);
         }
         info.set("players", players);
-        if (getSubData() != null) info.set("subdata", getSubData().getID());
+        LinkedList<UUID> subdata = new LinkedList<UUID>();
+        for (DataClient client : getSubData()) subdata.add((client == null)?null:client.getID());
+        info.set("subdata", subdata);
         info.set("signature", signature);
         info.set("extra", getExtra());
         return info;

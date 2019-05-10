@@ -3,7 +3,7 @@ package net.ME1312.SubServers.Bungee.Host;
 import net.ME1312.Galaxi.Library.ExtraDataHandler;
 import net.ME1312.Galaxi.Library.NamedContainer;
 import net.ME1312.SubData.Server.ClientHandler;
-import net.ME1312.SubData.Server.SerializableClientHandler;
+import net.ME1312.SubData.Server.DataClient;
 import net.md_5.bungee.api.config.ServerInfo;
 
 import java.util.Collection;
@@ -13,7 +13,15 @@ import java.util.UUID;
 /**
  * Server Interface
  */
-public interface Server extends ServerInfo, SerializableClientHandler, ExtraDataHandler {
+public interface Server extends ServerInfo, ClientHandler, ExtraDataHandler {
+
+    /**
+     * Link a SubData Client to this Object
+     *
+     * @param client Client to Link
+     * @param channel Channel ID
+     */
+    void setSubData(DataClient client, int channel);
 
     /**
      * Get the Display Name of this Server

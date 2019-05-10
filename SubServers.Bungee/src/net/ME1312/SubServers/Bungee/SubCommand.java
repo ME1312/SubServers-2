@@ -247,9 +247,9 @@ public final class SubCommand extends CommandX {
                         message = "  (master)";
                         for (Proxy proxy : plugin.api.getProxies().values()) {
                             message += div;
-                            if (proxy.getSubData() != null && proxy.isRedis()) {
+                            if (proxy.getSubData()[0] != null && proxy.isRedis()) {
                                 message += ChatColor.GREEN;
-                            } else if (proxy.getSubData() != null) {
+                            } else if (proxy.getSubData()[0] != null) {
                                 message += ChatColor.AQUA;
                             } else if (proxy.isRedis()) {
                                 message += ChatColor.WHITE;
@@ -280,7 +280,7 @@ public final class SubCommand extends CommandX {
                                 sender.sendMessage(" -> Address: " + ChatColor.WHITE + server.getAddress().getAddress().getHostAddress()+':'+server.getAddress().getPort());
                                 if (server instanceof SubServer) sender.sendMessage(" -> Running: " + ((((SubServer) server).isRunning())?ChatColor.GREEN+"yes":ChatColor.RED+"no"));
                                 if (!(server instanceof SubServer) || ((SubServer) server).isRunning()) {
-                                    sender.sendMessage(" -> Connected: " + ((server.getSubData() != null)?ChatColor.GREEN+"yes":ChatColor.RED+"no"));
+                                    sender.sendMessage(" -> Connected: " + ((server.getSubData()[0] != null)?ChatColor.GREEN+"yes"+((server.getSubData().length > 1)?ChatColor.AQUA+" +"+(server.getSubData().length-1):""):ChatColor.RED+"no"));
                                     sender.sendMessage(" -> Players: " + ChatColor.AQUA + server.getPlayers().size() + " online");
                                 }
                                 sender.sendMessage(" -> MOTD: " + ChatColor.WHITE + ChatColor.stripColor(server.getMotd()));
@@ -325,7 +325,7 @@ public final class SubCommand extends CommandX {
                                 sender.sendMessage(" -> Available: " + ((host.isAvailable())?ChatColor.GREEN+"yes":ChatColor.RED+"no"));
                                 sender.sendMessage(" -> Enabled: " + ((host.isEnabled())?ChatColor.GREEN+"yes":ChatColor.RED+"no"));
                                 sender.sendMessage(" -> Address: " + ChatColor.WHITE + host.getAddress().getHostAddress());
-                                if (host instanceof ClientHandler && ((ClientHandler) host).getSubData() != null) sender.sendMessage(" -> Connected: " + ChatColor.GREEN + "yes");
+                                if (host instanceof ClientHandler && ((ClientHandler) host).getSubData()[0] != null) sender.sendMessage(" -> Connected: " + ChatColor.GREEN + "yes" + ((((ClientHandler) host).getSubData().length > 1)?ChatColor.AQUA+" +"+(((ClientHandler) host).getSubData().length-1):""));
                                 sender.sendMessage(" -> SubServers: " + ((host.getSubServers().keySet().size() <= 0)?ChatColor.GRAY + "(none)":ChatColor.AQUA.toString() + host.getSubServers().keySet().size()));
                                 for (SubServer subserver : host.getSubServers().values()) sender.sendMessage("      - " + ((subserver.isEnabled())?ChatColor.WHITE:ChatColor.GRAY) + subserver.getDisplayName() + ((subserver.getName().equals(subserver.getDisplayName()))?"":" ("+subserver.getName()+')'));
                                 sender.sendMessage(" -> Templates: " + ((host.getCreator().getTemplates().keySet().size() <= 0)?ChatColor.GRAY + "(none)":ChatColor.AQUA.toString() + host.getCreator().getTemplates().keySet().size()));
@@ -344,7 +344,7 @@ public final class SubCommand extends CommandX {
                             if (proxy != null) {
                                 sender.sendMessage("SubServers > Info on Proxy: " + ChatColor.WHITE + proxy.getDisplayName());
                                 if (!proxy.getName().equals(proxy.getDisplayName())) sender.sendMessage(" -> System Name: " + ChatColor.WHITE  + proxy.getName());
-                                sender.sendMessage(" -> Connected: " + ((proxy.getSubData() != null)?ChatColor.GREEN+"yes":ChatColor.RED+"no"));
+                                sender.sendMessage(" -> Connected: " + ((proxy.getSubData()[0] != null)?ChatColor.GREEN+"yes"+((proxy.getSubData().length > 1)?ChatColor.AQUA+" +"+(proxy.getSubData().length-1):""):ChatColor.RED+"no"));
                                 sender.sendMessage(" -> Redis: "  + ((proxy.isRedis())?ChatColor.GREEN:ChatColor.RED+"un") + "available");
                                 if (proxy.isRedis()) sender.sendMessage(" -> Players: " + ChatColor.AQUA + proxy.getPlayers().size() + " online");
                                 sender.sendMessage(" -> Signature: " + ChatColor.AQUA + proxy.getSignature());

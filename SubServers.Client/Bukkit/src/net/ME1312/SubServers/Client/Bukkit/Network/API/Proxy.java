@@ -38,16 +38,16 @@ public class Proxy {
      */
     public void refresh() {
         String name = getName();
-        ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()).sendPacket(new PacketDownloadProxyInfo(name, data -> load(data.getMap(name))));
+        ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketDownloadProxyInfo(name, data -> load(data.getMap(name))));
     }
 
     /**
-     * Gets the SubData Client ID
+     * Gets the SubData Client Channel IDs
      *
-     * @return SubData Client ID (or null if not linked)
+     * @return SubData Client Channel ID Array
      */
-    public UUID getSubData() {
-        return raw.getUUID("subdata", null);
+    public UUID[] getSubData() {
+        return raw.getUUIDList("subdata", Collections.emptyList()).toArray(new UUID[0]);
     }
 
     /**

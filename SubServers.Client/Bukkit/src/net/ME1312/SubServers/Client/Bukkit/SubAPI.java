@@ -14,7 +14,6 @@ import net.ME1312.SubServers.Client.Bukkit.Network.Packet.*;
 import net.ME1312.SubData.Client.SubDataClient;
 import org.bukkit.Bukkit;
 
-import javax.xml.ws.Response;
 import java.lang.reflect.InvocationTargetException;
 import java.net.InetAddress;
 import java.util.*;
@@ -80,7 +79,7 @@ public final class SubAPI {
     public void getHosts(Callback<Map<String, Host>> callback) {
         if (Util.isNull(callback)) throw new NullPointerException();
         StackTraceElement[] origin = new Exception().getStackTrace();
-        plugin.subdata.sendPacket(new PacketDownloadHostInfo(null, data -> {
+        ((SubDataClient) plugin.api.getSubDataNetwork()[0]).sendPacket(new PacketDownloadHostInfo(null, data -> {
             TreeMap<String, Host> hosts = new TreeMap<String, Host>();
             for (String host : data.getKeys()) {
                 hosts.put(host.toLowerCase(), new Host(data.getMap(host)));
@@ -105,7 +104,7 @@ public final class SubAPI {
     public void getHost(String name, Callback<Host> callback) {
         if (Util.isNull(name, callback)) throw new NullPointerException();
         StackTraceElement[] origin = new Exception().getStackTrace();
-        plugin.subdata.sendPacket(new PacketDownloadHostInfo(name, data -> {
+        ((SubDataClient) plugin.api.getSubDataNetwork()[0]).sendPacket(new PacketDownloadHostInfo(name, data -> {
             Host host = null;
             if (data.getKeys().size() > 0) {
                 host = new Host(data.getMap(new LinkedList<String>(data.getKeys()).getFirst()));
@@ -129,7 +128,7 @@ public final class SubAPI {
     public void getGroups(Callback<Map<String, List<Server>>> callback) {
         if (Util.isNull(callback)) throw new NullPointerException();
         StackTraceElement[] origin = new Exception().getStackTrace();
-        plugin.subdata.sendPacket(new PacketDownloadGroupInfo(null, data -> {
+        ((SubDataClient) plugin.api.getSubDataNetwork()[0]).sendPacket(new PacketDownloadGroupInfo(null, data -> {
             TreeMap<String, List<Server>> groups = new TreeMap<String, List<Server>>();
             for (String group : data.getKeys()) {
                 ArrayList<Server> servers = new ArrayList<Server>();
@@ -178,7 +177,7 @@ public final class SubAPI {
     public void getGroup(String name, Callback<List<Server>> callback) {
         if (Util.isNull(name, callback)) throw new NullPointerException();
         StackTraceElement[] origin = new Exception().getStackTrace();
-        plugin.subdata.sendPacket(new PacketDownloadGroupInfo(name, data -> {
+        ((SubDataClient) plugin.api.getSubDataNetwork()[0]).sendPacket(new PacketDownloadGroupInfo(name, data -> {
             List<Server> servers = null;
             if (data.getKeys().size() > 0) {
                 String key = new LinkedList<String>(data.getKeys()).getFirst();
@@ -210,7 +209,7 @@ public final class SubAPI {
     public void getServers(Callback<Map<String, Server>> callback) {
         if (Util.isNull(callback)) throw new NullPointerException();
         StackTraceElement[] origin = new Exception().getStackTrace();
-        plugin.subdata.sendPacket(new PacketDownloadServerInfo(null, data -> {
+        ((SubDataClient) plugin.api.getSubDataNetwork()[0]).sendPacket(new PacketDownloadServerInfo(null, data -> {
             TreeMap<String, Server> servers = new TreeMap<String, Server>();
             for (String server : data.getKeys()) {
                 if (data.getMap(server).getRawString("type", "Server").equals("SubServer")) {
@@ -239,7 +238,7 @@ public final class SubAPI {
     public void getServer(String name, Callback<Server> callback) {
         if (Util.isNull(name, callback)) throw new NullPointerException();
         StackTraceElement[] origin = new Exception().getStackTrace();
-        plugin.subdata.sendPacket(new PacketDownloadServerInfo(name, data -> {
+        ((SubDataClient) plugin.api.getSubDataNetwork()[0]).sendPacket(new PacketDownloadServerInfo(name, data -> {
             Server server = null;
             if (data.getKeys().size() > 0) {
                 String key = new LinkedList<String>(data.getKeys()).getFirst();
@@ -290,7 +289,7 @@ public final class SubAPI {
     public void addServer(UUID player, String name, InetAddress ip, int port, String motd, boolean hidden, boolean restricted, Callback<Integer> response) {
         if (Util.isNull(response)) throw new NullPointerException();
         StackTraceElement[] origin = new Exception().getStackTrace();
-        ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()).sendPacket(new PacketAddServer(player, name, ip, port, motd, hidden, restricted, data -> {
+        ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketAddServer(player, name, ip, port, motd, hidden, restricted, data -> {
             try {
                 response.run(data.getInt(0x0001));
             } catch (Throwable e) {
@@ -417,7 +416,7 @@ public final class SubAPI {
     private void removeServer(UUID player, String name, boolean force, Callback<Integer> response) {
         if (Util.isNull(response)) throw new NullPointerException();
         StackTraceElement[] origin = new Exception().getStackTrace();
-        ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()).sendPacket(new PacketRemoveServer(player, name, force, data -> {
+        ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketRemoveServer(player, name, force, data -> {
             try {
                 response.run(data.getInt(0x0001));
             } catch (Throwable e) {
@@ -463,7 +462,7 @@ public final class SubAPI {
     public void getProxies(Callback<Map<String, Proxy>> callback) {
         if (Util.isNull(callback)) throw new NullPointerException();
         StackTraceElement[] origin = new Exception().getStackTrace();
-        plugin.subdata.sendPacket(new PacketDownloadProxyInfo(null, data -> {
+        ((SubDataClient) plugin.api.getSubDataNetwork()[0]).sendPacket(new PacketDownloadProxyInfo(null, data -> {
             TreeMap<String, Proxy> proxies = new TreeMap<String, Proxy>();
             for (String proxy : data.getKeys()) {
                 proxies.put(proxy.toLowerCase(), new Proxy(data.getMap(proxy)));
@@ -488,7 +487,7 @@ public final class SubAPI {
     public void getProxy(String name, Callback<Proxy> callback) {
         if (Util.isNull(name, callback)) throw new NullPointerException();
         StackTraceElement[] origin = new Exception().getStackTrace();
-        plugin.subdata.sendPacket(new PacketDownloadProxyInfo(name, data -> {
+        ((SubDataClient) plugin.api.getSubDataNetwork()[0]).sendPacket(new PacketDownloadProxyInfo(name, data -> {
             Proxy proxy = null;
             if (data.getKeys().size() > 0) {
                 proxy = new Proxy(data.getMap(new LinkedList<String>(data.getKeys()).getFirst()));
@@ -512,7 +511,7 @@ public final class SubAPI {
     public void getMasterProxy(Callback<Proxy> callback) {
         if (Util.isNull(callback)) throw new NullPointerException();
         StackTraceElement[] origin = new Exception().getStackTrace();
-        plugin.subdata.sendPacket(new PacketDownloadProxyInfo("", data -> {
+        ((SubDataClient) plugin.api.getSubDataNetwork()[0]).sendPacket(new PacketDownloadProxyInfo("", data -> {
             Proxy proxy = null;
             if (data != null) {
                 proxy = new Proxy(data);
@@ -537,7 +536,7 @@ public final class SubAPI {
     public void getGlobalPlayers(Callback<Collection<NamedContainer<String, UUID>>> callback) {
         if (Util.isNull(callback)) throw new NullPointerException();
         StackTraceElement[] origin = new Exception().getStackTrace();
-        plugin.subdata.sendPacket(new PacketDownloadPlayerList(data -> {
+        ((SubDataClient) plugin.api.getSubDataNetwork()[0]).sendPacket(new PacketDownloadPlayerList(data -> {
             List<NamedContainer<String, UUID>> players = new ArrayList<NamedContainer<String, UUID>>();
             for (String id : data.getKeys()) {
                 players.add(new NamedContainer<String, UUID>(data.getMap(id).getRawString("name"), UUID.fromString(id)));
@@ -558,8 +557,12 @@ public final class SubAPI {
      *
      * @return SubData Network Manager
      */
-    public DataClient getSubDataNetwork() {
-        return plugin.subdata;
+    public DataClient[] getSubDataNetwork() {
+        LinkedList<Integer> keys = new LinkedList<Integer>(plugin.subdata.keySet());
+        LinkedList<SubDataClient> channels = new LinkedList<SubDataClient>();
+        Collections.sort(keys);
+        for (Integer channel : keys) channels.add(plugin.subdata.get(channel));
+        return channels.toArray(new DataClient[0]);
     }
 
     /**

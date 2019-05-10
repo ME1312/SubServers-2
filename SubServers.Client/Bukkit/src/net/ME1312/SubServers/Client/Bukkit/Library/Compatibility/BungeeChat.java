@@ -311,7 +311,7 @@ public class BungeeChat {
                     hoverm = new LinkedList<TextComponent>();
                     message = new TextComponent(proxy.getDisplayName());
                     hover = new TextComponent(proxy.getDisplayName());
-                    if (proxy.getSubData() != null && proxy.isRedis()) {
+                    if (proxy.getSubData()[0] != null && proxy.isRedis()) {
                         message.setColor(ChatColor.GREEN);
                         hover.setColor(ChatColor.GREEN);
                         if (!proxy.getName().equals(proxy.getDisplayName())) {
@@ -321,7 +321,7 @@ public class BungeeChat {
                         }
                         hoverm.add(hover);
                         hover = new TextComponent('\n' + plugin.api.getLang("SubServers", "Interface.Proxy-Menu.Proxy-Player-Count").replace("$int$", new DecimalFormat("#,###").format(proxy.getPlayers().size())));
-                    } else if (proxy.getSubData() != null) {
+                    } else if (proxy.getSubData()[0] != null) {
                         message.setColor(ChatColor.AQUA);
                         hover.setColor(ChatColor.AQUA);
                         if (!proxy.getName().equals(proxy.getDisplayName())) {

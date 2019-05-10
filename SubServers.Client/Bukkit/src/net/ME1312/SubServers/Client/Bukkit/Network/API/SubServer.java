@@ -71,7 +71,7 @@ public class SubServer extends Server {
     public void start(UUID player, Callback<Integer> response) {
         if (Util.isNull(response)) throw new NullPointerException();
         StackTraceElement[] origin = new Exception().getStackTrace();
-        ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()).sendPacket(new PacketStartServer(player, getName(), data -> {
+        ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketStartServer(player, getName(), data -> {
             try {
                 response.run(data.getInt(0x0001));
             } catch (Throwable e) {
@@ -116,7 +116,7 @@ public class SubServer extends Server {
     public void stop(UUID player, Callback<Integer> response) {
         if (Util.isNull(response)) throw new NullPointerException();
         StackTraceElement[] origin = new Exception().getStackTrace();
-        ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()).sendPacket(new PacketStopServer(player, getName(), false, data -> {
+        ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketStopServer(player, getName(), false, data -> {
             try {
                 response.run(data.getInt(0x0001));
             } catch (Throwable e) {
@@ -161,7 +161,7 @@ public class SubServer extends Server {
     public void terminate(UUID player, Callback<Integer> response) {
         if (Util.isNull(response)) throw new NullPointerException();
         StackTraceElement[] origin = new Exception().getStackTrace();
-        ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()).sendPacket(new PacketStopServer(player, getName(), true, data -> {
+        ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketStopServer(player, getName(), true, data -> {
             try {
                 response.run(data.getInt(0x0001));
             } catch (Throwable e) {
@@ -207,7 +207,7 @@ public class SubServer extends Server {
     public void command(UUID player, String command, Callback<Integer> response) {
         if (Util.isNull(command, response)) throw new NullPointerException();
         StackTraceElement[] origin = new Exception().getStackTrace();
-        ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()).sendPacket(new PacketCommandServer(player, getName(), command, data -> {
+        ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketCommandServer(player, getName(), command, data -> {
             try {
                 response.run(data.getInt(0x0001));
             } catch (Throwable e) {
@@ -330,7 +330,7 @@ public class SubServer extends Server {
     private void edit(UUID player, ObjectMap<String> edit, boolean perma, Callback<Integer> response) {
         if (Util.isNull(response)) throw new NullPointerException();
         StackTraceElement[] origin = new Exception().getStackTrace();
-        ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()).sendPacket(new PacketEditServer(player, getName(), edit, perma, data -> {
+        ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketEditServer(player, getName(), edit, perma, data -> {
             try {
                 if (data.getInt(0x0001) != 0) {
                     response.run(data.getInt(0x0001) * -1);

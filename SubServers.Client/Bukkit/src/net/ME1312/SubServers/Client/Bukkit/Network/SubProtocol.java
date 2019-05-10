@@ -1,7 +1,9 @@
 package net.ME1312.SubServers.Client.Bukkit.Network;
 
 import net.ME1312.Galaxi.Library.Callback.Callback;
+import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
+import net.ME1312.SubData.Client.Library.DisconnectReason;
 import net.ME1312.SubData.Client.SubDataClient;
 import net.ME1312.SubData.Client.SubDataProtocol;
 import net.ME1312.SubServers.Client.Bukkit.Event.SubNetworkDisconnectEvent;
@@ -11,7 +13,9 @@ import net.ME1312.SubServers.Client.Bukkit.SubPlugin;
 import org.bukkit.Bukkit;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.net.InetAddress;
+import java.util.HashMap;
 import java.util.logging.Handler;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
@@ -110,16 +114,56 @@ public class SubProtocol extends SubDataProtocol {
         return instance;
     }
 
+    @Override
+    protected SubDataClient openChannel(Callback<Runnable> scheduler, Logger logger, InetAddress address, int port) throws IOException {
+        SubPlugin plugin = SubAPI.getInstance().getInternals();
+        SubDataClient subdata = super.open(scheduler, logger, address, port);
+        HashMap<Integer, SubDataClient> map = Util.getDespiteException(() -> Util.reflect(SubPlugin.class.getDeclaredField("subdata"), plugin), null);
+
+        int channel = 1;
+        while (map.keySet().contains(channel)) channel++;
+        final int fc = channel;
+
+        map.put(fc, subdata);
+        subdata.on.ready(client -> ((SubDataClient) client).sendPacket(new PacketLinkServer(plugin, fc)));
+        subdata.on.closed(client -> map.remove(fc));
+
+        return subdata;
+    }
+
     @SuppressWarnings("deprecation")
     @Override
     public SubDataClient open(Callback<Runnable> scheduler, Logger logger, InetAddress address, int port) throws IOException {
-        SubDataClient subdata = super.open(scheduler, logger, address, port);
         SubPlugin plugin = SubAPI.getInstance().getInternals();
+        SubDataClient subdata = super.open(scheduler, logger, address, port);
+        HashMap<Integer, SubDataClient> map = Util.getDespiteException(() -> Util.reflect(SubPlugin.class.getDeclaredField("subdata"), plugin), null);
 
-        subdata.on.ready(client -> ((SubDataClient) client).sendPacket(new PacketLinkServer(plugin)));
+        subdata.on.ready(client -> ((SubDataClient) client).sendPacket(new PacketLinkServer(plugin, 0)));
         subdata.on.closed(client -> {
             SubNetworkDisconnectEvent event = new SubNetworkDisconnectEvent(client.get(), client.name());
             if (plugin.isEnabled()) Bukkit.getPluginManager().callEvent(event);
+            map.put(0, null);
+
+            int reconnect = plugin.config.get().getMap("Settings").getMap("SubData").getInt("Reconnect", 30);
+            if (Util.getDespiteException(() -> Util.reflect(SubPlugin.class.getDeclaredField("reconnect"), plugin), false) && reconnect > 0
+                    && client.name() != DisconnectReason.PROTOCOL_MISMATCH && client.name() != DisconnectReason.ENCRYPTION_MISMATCH) {
+                Bukkit.getLogger().info("SubData > Attempting reconnect in " + reconnect + " seconds");
+                Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            Util.reflect(SubPlugin.class.getDeclaredMethod("connect"), plugin);
+                        } catch (InvocationTargetException e) {
+                            if (e.getTargetException() instanceof IOException) {
+                                Bukkit.getLogger().info("SubData > Connection was unsuccessful, retrying in " + reconnect + " seconds");
+                                Bukkit.getScheduler().runTaskLater(plugin, this, reconnect * 20);
+                            } else e.printStackTrace();
+                        } catch (NoSuchMethodException | IllegalAccessException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }, reconnect * 20);
+            }
         });
 
         return subdata;

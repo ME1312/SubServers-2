@@ -1,14 +1,17 @@
 package net.ME1312.SubServers.Bungee.Network.Packet;
 
 import net.ME1312.SubData.Server.SubDataClient;
+import net.ME1312.SubServers.Bungee.Host.External.ExternalHost;
 import net.ME1312.SubServers.Bungee.Host.Host;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubData.Server.ClientHandler;
 import net.ME1312.SubData.Server.Protocol.PacketObjectIn;
 import net.ME1312.SubData.Server.Protocol.PacketObjectOut;
+import net.ME1312.SubServers.Bungee.Host.ServerContainer;
 import net.ME1312.SubServers.Bungee.SubPlugin;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -50,10 +53,12 @@ public class PacketLinkExHost implements PacketObjectIn<Integer>, PacketObjectOu
             Map<String, Host> hosts = plugin.api.getHosts();
             if (hosts.keySet().contains(data.getRawString(0x0000).toLowerCase())) {
                 Host host = hosts.get(data.getRawString(0x0000).toLowerCase());
-                if (host instanceof ClientHandler) {
-                    if (((ClientHandler) host).getSubData() == null) {
-                        client.setHandler((ClientHandler) host);
-                        System.out.println("SubData > " + client.getAddress().toString() + " has been defined as Host: " + host.getName());
+                if (host instanceof ExternalHost) {
+                    Integer channel = data.getInt(0x0001);
+                    HashMap<Integer, SubDataClient> subdata = Util.getDespiteException(() -> Util.reflect(ExternalHost.class.getDeclaredField("subdata"), host), null);
+                    if (!subdata.keySet().contains(channel) || (channel == 0 && subdata.get(0) == null)) {
+                        ((ExternalHost) host).setSubData(client, channel);
+                        System.out.println("SubData > " + client.getAddress().toString() + " has been defined as Host: " + host.getName() + ((channel > 0)?" (Sub "+channel+")":""));
                         client.sendPacket(new PacketLinkExHost(0));
                     } else {
                         client.sendPacket(new PacketLinkExHost(3));

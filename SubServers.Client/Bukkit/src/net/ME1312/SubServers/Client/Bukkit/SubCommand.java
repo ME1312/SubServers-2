@@ -1,6 +1,7 @@
 package net.ME1312.SubServers.Client.Bukkit;
 
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
+import net.ME1312.SubData.Client.SubDataClient;
 import net.ME1312.SubServers.Client.Bukkit.Graphic.UIRenderer;
 import net.ME1312.Galaxi.Library.Callback.Callback;
 import net.ME1312.Galaxi.Library.Config.YAMLSection;
@@ -43,7 +44,7 @@ public final class SubCommand extends BukkitCommand {
     @Override
     public boolean execute(CommandSender sender, String label, String[] args) {
         label = "/" + label;
-        if (plugin.subdata == null) {
+        if (plugin.api.getSubDataNetwork()[0] == null) {
             new IllegalStateException("SubData is not connected").printStackTrace();
             if (!(sender instanceof ConsoleCommandSender)) sender.sendMessage(ChatColor.RED + "An exception has occurred while running this command");
         } else if (plugin.lang == null) {
@@ -201,9 +202,9 @@ public final class SubCommand extends BukkitCommand {
                                     message = "  (master)";
                                     for (Proxy proxy : proxies.values()) {
                                         message += div;
-                                        if (proxy.getSubData() != null && proxy.isRedis()) {
+                                        if (proxy.getSubData()[0] != null && proxy.isRedis()) {
                                             message += ChatColor.GREEN;
-                                        } else if (proxy.getSubData() != null) {
+                                        } else if (proxy.getSubData()[0] != null) {
                                             message += ChatColor.AQUA;
                                         } else if (proxy.isRedis()) {
                                             message += ChatColor.WHITE;
@@ -236,7 +237,7 @@ public final class SubCommand extends BukkitCommand {
                                     else sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Port") + ChatColor.AQUA.toString() + server.getAddress().getPort());
                                     if (server instanceof SubServer) sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Running") + ((((SubServer) server).isRunning())?ChatColor.GREEN+"yes":ChatColor.RED+"no"));
                                     if (!(server instanceof SubServer) || ((SubServer) server).isRunning()) {
-                                        sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Connected") + ((server.getSubData() != null)?ChatColor.GREEN+"yes":ChatColor.RED+"no"));
+                                        sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Connected") + ((server.getSubData()[0] != null)?ChatColor.GREEN+"yes"+((server.getSubData().length > 1)?ChatColor.AQUA+" +"+(server.getSubData().length-1):""):ChatColor.RED+"no"));
                                         sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Players") + ChatColor.AQUA + server.getPlayers().size() + " online");
                                     }
                                     sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "MOTD") + ChatColor.WHITE + ChatColor.stripColor(server.getMotd()));
@@ -279,7 +280,7 @@ public final class SubCommand extends BukkitCommand {
                                     sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Available") + ((host.isAvailable())?ChatColor.GREEN+"yes":ChatColor.RED+"no"));
                                     sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Enabled") + ((host.isEnabled())?ChatColor.GREEN+"yes":ChatColor.RED+"no"));
                                     if (plugin.config.get().getMap("Settings").getBoolean("Show-Addresses", false)) sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Address") + ChatColor.WHITE + host.getAddress().getHostAddress());
-                                    if (host.getSubData() != null) sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Connected") + ChatColor.GREEN + "yes");
+                                    if (host.getSubData()[0] != null) sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Connected") + ChatColor.GREEN + "yes" + ((host.getSubData().length > 1)?ChatColor.AQUA+" +"+(host.getSubData().length-1):""));
                                     sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "SubServers") + ((host.getSubServers().keySet().size() <= 0)?ChatColor.GRAY + "(none)":ChatColor.AQUA.toString() + host.getSubServers().keySet().size()));
                                     for (SubServer subserver : host.getSubServers().values()) sender.sendMessage("    " + plugin.api.getLang("SubServers", "Command.Info.List") + ((subserver.isEnabled())?ChatColor.WHITE:ChatColor.GRAY) + subserver.getDisplayName() + ((subserver.getName().equals(subserver.getDisplayName()))?"":" ("+subserver.getName()+')'));
                                     sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Templates") + ((host.getCreator().getTemplates().keySet().size() <= 0)?ChatColor.GRAY + "(none)":ChatColor.AQUA.toString() + host.getCreator().getTemplates().keySet().size()));
@@ -297,7 +298,7 @@ public final class SubCommand extends BukkitCommand {
                                 if (proxy != null) {
                                     sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info").replace("$str$", "Proxy") + ChatColor.WHITE + proxy.getDisplayName());
                                     if (!proxy.getName().equals(proxy.getDisplayName())) sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "System Name") + ChatColor.WHITE  + proxy.getName());
-                                    sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Connected") + ((proxy.getSubData() != null)?ChatColor.GREEN+"yes":ChatColor.RED+"no"));
+                                    sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Connected") + ((proxy.getSubData()[0] != null)?ChatColor.GREEN+"yes"+((proxy.getSubData().length > 1)?ChatColor.AQUA+" +"+(proxy.getSubData().length-1):""):ChatColor.RED+"no"));
                                     sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Redis")  + ((proxy.isRedis())?ChatColor.GREEN:ChatColor.RED+"un") + "available");
                                     if (proxy.isRedis()) sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Players") + ChatColor.AQUA + proxy.getPlayers().size() + " online");
                                     sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Signature") + ChatColor.AQUA + proxy.getSignature());
@@ -341,7 +342,7 @@ public final class SubCommand extends BukkitCommand {
                     } else if (args[0].equalsIgnoreCase("start")) {
                         if (args.length > 1) {
                             if (sender.hasPermission("subservers.subserver.start.*") || sender.hasPermission("subservers.subserver.start." + args[1].toLowerCase())) {
-                                plugin.subdata.sendPacket(new PacketStartServer((sender instanceof Player)?((Player) sender).getUniqueId():null, args[1], data -> {
+                                ((SubDataClient) plugin.api.getSubDataNetwork()[0]).sendPacket(new PacketStartServer((sender instanceof Player)?((Player) sender).getUniqueId():null, args[1], data -> {
                                     switch (data.getInt(0x0001)) {
                                         case 3:
                                             sender.sendMessage(plugin.api.getLang("SubServers", "Command.Start.Unknown"));
@@ -379,7 +380,7 @@ public final class SubCommand extends BukkitCommand {
                     } else if (args[0].equalsIgnoreCase("restart")) {
                         if (args.length > 1) {
                             if ((sender.hasPermission("subservers.subserver.stop.*") || sender.hasPermission("subservers.subserver.stop." + args[1].toLowerCase())) && (sender.hasPermission("subservers.subserver.start.*") || sender.hasPermission("subservers.subserver.start." + args[1].toLowerCase()))) {
-                                Runnable starter = () -> plugin.subdata.sendPacket(new PacketStartServer(null, args[1], data -> {
+                                Runnable starter = () -> ((SubDataClient) plugin.api.getSubDataNetwork()[0]).sendPacket(new PacketStartServer(null, args[1], data -> {
                                     switch (data.getInt(0x0001)) {
                                         case 3:
                                         case 4:
@@ -440,9 +441,9 @@ public final class SubCommand extends BukkitCommand {
 
                                 if (plugin.api.getName().equalsIgnoreCase(args[1])) {
                                     listening.set(false);
-                                    plugin.subdata.sendPacket(new PacketRestartServer((sender instanceof Player)?((Player) sender).getUniqueId():null, args[1], stopper));
+                                    ((SubDataClient) plugin.api.getSubDataNetwork()[0]).sendPacket(new PacketRestartServer((sender instanceof Player)?((Player) sender).getUniqueId():null, args[1], stopper));
                                 } else {
-                                    plugin.subdata.sendPacket(new PacketStopServer((sender instanceof Player)?((Player) sender).getUniqueId():null, args[1], false, stopper));
+                                    ((SubDataClient) plugin.api.getSubDataNetwork()[0]).sendPacket(new PacketStopServer((sender instanceof Player)?((Player) sender).getUniqueId():null, args[1], false, stopper));
                                 }
                             } else if (!(sender.hasPermission("subservers.subserver.stop.*") || sender.hasPermission("subservers.subserver.stop." + args[1].toLowerCase()))) {
                                 sender.sendMessage(plugin.api.getLang("SubServers", "Command.Generic.Invalid-Permission").replace("$str$", "subservers.subserver.stop." + args[1].toLowerCase()));
@@ -455,7 +456,7 @@ public final class SubCommand extends BukkitCommand {
                     } else if (args[0].equalsIgnoreCase("stop")) {
                         if (args.length > 1) {
                             if (sender.hasPermission("subservers.subserver.stop.*") || sender.hasPermission("subservers.subserver.stop." + args[1].toLowerCase())) {
-                                plugin.subdata.sendPacket(new PacketStopServer((sender instanceof Player)?((Player) sender).getUniqueId():null, args[1], false, data -> {
+                                ((SubDataClient) plugin.api.getSubDataNetwork()[0]).sendPacket(new PacketStopServer((sender instanceof Player)?((Player) sender).getUniqueId():null, args[1], false, data -> {
                                     switch (data.getInt(0x0001)) {
                                         case 3:
                                             sender.sendMessage(plugin.api.getLang("SubServers", "Command.Stop.Unknown"));
@@ -481,7 +482,7 @@ public final class SubCommand extends BukkitCommand {
                     } else if (args[0].equalsIgnoreCase("kill") || args[0].equalsIgnoreCase("terminate")) {
                         if (args.length > 1) {
                             if (sender.hasPermission("subservers.subserver.terminate.*") || sender.hasPermission("subservers.subserver.terminate." + args[1].toLowerCase())) {
-                                plugin.subdata.sendPacket(new PacketStopServer((sender instanceof Player)?((Player) sender).getUniqueId():null, args[1], true, data -> {
+                                ((SubDataClient) plugin.api.getSubDataNetwork()[0]).sendPacket(new PacketStopServer((sender instanceof Player)?((Player) sender).getUniqueId():null, args[1], true, data -> {
                                     switch (data.getInt(0x0001)) {
                                         case 3:
                                             sender.sendMessage(plugin.api.getLang("SubServers", "Command.Terminate.Unknown"));
@@ -516,7 +517,7 @@ public final class SubCommand extends BukkitCommand {
                                     } while ((i + 1) != args.length);
                                 }
                                 final String cmd = str;
-                                plugin.subdata.sendPacket(new PacketCommandServer((sender instanceof Player)?((Player) sender).getUniqueId():null, args[1], cmd, data -> {
+                                ((SubDataClient) plugin.api.getSubDataNetwork()[0]).sendPacket(new PacketCommandServer((sender instanceof Player)?((Player) sender).getUniqueId():null, args[1], cmd, data -> {
                                     switch (data.getInt(0x0001)) {
                                         case 3:
                                             sender.sendMessage(plugin.api.getLang("SubServers", "Command.Command.Unknown"));
@@ -545,7 +546,7 @@ public final class SubCommand extends BukkitCommand {
                                 if (args.length > 5 && Util.isException(() -> Integer.parseInt(args[5]))) {
                                     sender.sendMessage(plugin.api.getLang("SubServers", "Command.Creator.Invalid-Port"));
                                 } else {
-                                    plugin.subdata.sendPacket(new PacketCreateServer((sender instanceof Player)?((Player) sender).getUniqueId():null, args[1], args[2], args[3], (args.length > 4)?new Version(args[4]):null, (args.length > 5)?Integer.parseInt(args[5]):null, data -> {
+                                    ((SubDataClient) plugin.api.getSubDataNetwork()[0]).sendPacket(new PacketCreateServer((sender instanceof Player)?((Player) sender).getUniqueId():null, args[1], args[2], args[3], (args.length > 4)?new Version(args[4]):null, (args.length > 5)?Integer.parseInt(args[5]):null, data -> {
                                         switch (data.getInt(0x0001)) {
                                             case 3:
                                             case 4:

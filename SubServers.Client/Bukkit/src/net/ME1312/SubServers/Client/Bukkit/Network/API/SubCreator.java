@@ -122,7 +122,7 @@ public class SubCreator {
     public void create(UUID player, String name, ServerTemplate template, Version version, int port, Callback<Integer> response) {
         if (Util.isNull(response)) throw new NullPointerException();
         StackTraceElement[] origin = new Exception().getStackTrace();
-        ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()).sendPacket(new PacketCreateServer(player, name, host.getName(), template.getName(), version, port, data -> {
+        ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketCreateServer(player, name, host.getName(), template.getName(), version, port, data -> {
             try {
                 response.run(data.getInt(0x0001));
             } catch (Throwable e) {

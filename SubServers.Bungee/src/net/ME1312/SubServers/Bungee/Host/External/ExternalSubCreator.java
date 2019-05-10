@@ -66,7 +66,7 @@ public class ExternalSubCreator extends SubCreator {
                 e.printStackTrace();
             }
         }
-        if (host.client.name()) host.queue(new PacketExConfigureHost(host.plugin, host));
+        if (host.available) host.queue(new PacketExConfigureHost(host.plugin, host));
     }
 
     @Override
@@ -195,7 +195,7 @@ public class ExternalSubCreator extends SubCreator {
     @Override
     public void terminate(String name) {
         if (this.thread.keySet().contains(name.toLowerCase())) {
-            ((SubDataClient) host.getSubData()).sendPacket(new PacketExCreateServer(name.toLowerCase()));
+            ((SubDataClient) host.getSubData()[0]).sendPacket(new PacketExCreateServer(name.toLowerCase()));
             thread.remove(name.toLowerCase());
         }
     }
@@ -211,7 +211,7 @@ public class ExternalSubCreator extends SubCreator {
 
     @Override
     public void waitFor(String name) throws InterruptedException {
-        while (this.thread.keySet().contains(name.toLowerCase()) && host.client.get() != null) {
+        while (this.thread.keySet().contains(name.toLowerCase()) && host.getSubData()[0] != null) {
             Thread.sleep(250);
         }
     }

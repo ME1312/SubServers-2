@@ -46,6 +46,7 @@ import java.nio.file.Files;
 import java.security.SecureRandom;
 import java.text.DecimalFormat;
 import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
@@ -424,8 +425,8 @@ public final class SubPlugin extends BungeeCord implements Listener {
                     }
                     if (bungee.get().getMap("servers").getMap(name).getKeys().contains("extra"))
                         for (String extra : config.get().getMap("servers").getMap(name).getMap("extra").getKeys()) server.addExtra(extra, config.get().getMap("servers").getMap(name).getMap("extra").getObject(extra));
-                    if (server.getSubData() != null)
-                        ((SubDataClient) server.getSubData()).sendPacket(new PacketOutExReload(null));
+                    if (server.getSubData()[0] != null)
+                        ((SubDataClient) server.getSubData()[0]).sendPacket(new PacketOutExReload(null));
                     ukeys.add(name.toLowerCase());
                     servers++;
                 }
@@ -563,8 +564,8 @@ public final class SubPlugin extends BungeeCord implements Listener {
         }
 
         if (status) {
-            for (Host host : api.getHosts().values()) if (host instanceof ClientHandler && ((ClientHandler) host).getSubData() != null) ((SubDataClient) ((ClientHandler) host).getSubData()).sendPacket(new PacketOutExReload(null));
-            for (Server server : api.getServers().values()) if (server.getSubData() != null) ((SubDataClient) server.getSubData()).sendPacket(new PacketOutExReload(null));
+            for (Host host : api.getHosts().values()) if (host instanceof ClientHandler && ((ClientHandler) host).getSubData()[0] != null) ((SubDataClient) ((ClientHandler) host).getSubData()[0]).sendPacket(new PacketOutExReload(null));
+            for (Server server : api.getServers().values()) if (server.getSubData()[0] != null) ((SubDataClient) server.getSubData()[0]).sendPacket(new PacketOutExReload(null));
         }
 
         System.out.println("SubServers > " + ((plugins > 0)?plugins+" Plugin"+((plugins == 1)?"":"s")+", ":"") + ((proxies > 1)?proxies+" Proxies, ":"") + hosts + " Host"+((hosts == 1)?"":"s")+", " + servers + " Server"+((servers == 1)?"":"s")+", and " + subservers + " SubServer"+((subservers == 1)?"":"s")+" "+((status)?"re":"")+"loaded in " + new DecimalFormat("0.000").format((Calendar.getInstance().getTime().getTime() - begin) / 1000D) + "s");
@@ -586,7 +587,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
                             server.start();
                             if (ar.size() > 0 && scd > 0) {
                                 long sleep = Calendar.getInstance().getTime().getTime();
-                                while (running && begin == resetDate && server.getSubData() == null && Calendar.getInstance().getTime().getTime() - sleep < scd) {
+                                while (running && begin == resetDate && server.getSubData()[0] == null && Calendar.getInstance().getTime().getTime() - sleep < scd) {
                                     Thread.sleep(250);
                                 }
                             }

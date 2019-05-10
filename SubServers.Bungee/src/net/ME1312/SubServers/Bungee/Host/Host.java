@@ -3,6 +3,7 @@ package net.ME1312.SubServers.Bungee.Host;
 import com.google.common.collect.Range;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Map.ObjectMapValue;
+import net.ME1312.SubData.Server.DataClient;
 import net.ME1312.SubServers.Bungee.Library.Exception.InvalidHostException;
 import net.ME1312.SubServers.Bungee.Library.Exception.InvalidServerException;
 import net.ME1312.Galaxi.Library.ExtraDataHandler;
@@ -12,6 +13,7 @@ import net.ME1312.SubServers.Bungee.SubAPI;
 import net.ME1312.SubServers.Bungee.SubPlugin;
 
 import java.net.InetAddress;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.UUID;
 
@@ -448,7 +450,11 @@ public abstract class Host implements ExtraDataHandler {
             servers.set(server.getName(), server.forSubData());
         }
         hinfo.set("servers", servers);
-        if (this instanceof ClientHandler && ((ClientHandler) this).getSubData() != null) hinfo.set("subdata", ((ClientHandler) this).getSubData().getID());
+        if (this instanceof ClientHandler) {
+            LinkedList<UUID> subdata = new LinkedList<UUID>();
+            for (DataClient client : ((ClientHandler) this).getSubData()) subdata.add((client == null)?null:client.getID());
+            hinfo.set("subdata", subdata);
+        }
         hinfo.set("signature", signature);
         hinfo.set("extra", getExtra());
         return hinfo;
