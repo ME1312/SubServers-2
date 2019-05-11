@@ -869,6 +869,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
     @EventHandler(priority = Byte.MIN_VALUE)
     public void resetLimbo(PlayerDisconnectEvent e) {
         fallbackLimbo.remove(e.getPlayer().getUniqueId());
+        SubCommand.players.remove(e.getPlayer().getUniqueId());
     }
 
     @EventHandler(priority = Byte.MIN_VALUE)

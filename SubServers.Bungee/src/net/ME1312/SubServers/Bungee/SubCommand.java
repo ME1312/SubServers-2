@@ -1,6 +1,7 @@
 package net.ME1312.SubServers.Bungee;
 
 import com.google.gson.Gson;
+import net.ME1312.SubData.Server.SubDataClient;
 import net.ME1312.SubServers.Bungee.Host.*;
 import net.ME1312.SubServers.Bungee.Library.Compatibility.CommandX;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
@@ -8,11 +9,13 @@ import net.ME1312.Galaxi.Library.NamedContainer;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubData.Server.ClientHandler;
+import net.ME1312.SubServers.Bungee.Network.Packet.PacketExCheckPermission;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
+import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
 import net.md_5.bungee.command.ConsoleCommandSender;
@@ -23,12 +26,14 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Plugin Command Class
  */
 @SuppressWarnings("deprecation")
 public final class SubCommand extends CommandX {
+    static HashMap<UUID, HashMap<ServerInfo, NamedContainer<Long, Boolean>>> players = new HashMap<UUID, HashMap<ServerInfo, NamedContainer<Long, Boolean>>>();
     private SubPlugin plugin;
     private String label;
 
@@ -637,7 +642,29 @@ public final class SubCommand extends CommandX {
      */
     public NamedContainer<String, List<String>> suggestArguments(CommandSender sender, String[] args) {
         String last = (args.length > 0)?args[args.length - 1].toLowerCase():"";
-        if (args.length <= 1) {
+
+        if (sender instanceof ProxiedPlayer && (!players.keySet().contains(((ProxiedPlayer) sender).getUniqueId()) || !players.get(((ProxiedPlayer) sender).getUniqueId()).keySet().contains(((ProxiedPlayer) sender).getServer().getInfo())
+        || !players.get(((ProxiedPlayer) sender).getUniqueId()).get(((ProxiedPlayer) sender).getServer().getInfo()).get())) {
+            if (players.keySet().contains(((ProxiedPlayer) sender).getUniqueId()) && players.get(((ProxiedPlayer) sender).getUniqueId()).keySet().contains(((ProxiedPlayer) sender).getServer().getInfo())
+                    && players.get(((ProxiedPlayer) sender).getUniqueId()).get(((ProxiedPlayer) sender).getServer().getInfo()).name() == null) {
+                // do nothing
+            } else if (!players.keySet().contains(((ProxiedPlayer) sender).getUniqueId()) || !players.get(((ProxiedPlayer) sender).getUniqueId()).keySet().contains(((ProxiedPlayer) sender).getServer().getInfo())
+            || Calendar.getInstance().getTime().getTime() - players.get(((ProxiedPlayer) sender).getUniqueId()).get(((ProxiedPlayer) sender).getServer().getInfo()).name() >= TimeUnit.MINUTES.toMillis(1)) {
+                if (!(((ProxiedPlayer) sender).getServer().getInfo() instanceof Server) || ((Server) ((ProxiedPlayer) sender).getServer().getInfo()).getSubData()[0] == null) {
+                    HashMap<ServerInfo, NamedContainer<Long, Boolean>> map = (players.keySet().contains(((ProxiedPlayer) sender).getUniqueId()))?players.get(((ProxiedPlayer) sender).getUniqueId()):new HashMap<ServerInfo, NamedContainer<Long, Boolean>>();
+                    map.put(((ProxiedPlayer) sender).getServer().getInfo(), new NamedContainer<>(Calendar.getInstance().getTime().getTime(), false));
+                    players.put(((ProxiedPlayer) sender).getUniqueId(), map);
+                } else {
+                    HashMap<ServerInfo, NamedContainer<Long, Boolean>> map = (players.keySet().contains(((ProxiedPlayer) sender).getUniqueId()))?players.get(((ProxiedPlayer) sender).getUniqueId()):new HashMap<ServerInfo, NamedContainer<Long, Boolean>>();
+                    map.put(((ProxiedPlayer) sender).getServer().getInfo(), new NamedContainer<>(null, false));
+                    players.put(((ProxiedPlayer) sender).getUniqueId(), map);
+                    ((SubDataClient) ((Server) ((ProxiedPlayer) sender).getServer().getInfo()).getSubData()[0]).sendPacket(new PacketExCheckPermission(((ProxiedPlayer) sender).getUniqueId(), "subservers.command", result -> {
+                        map.put(((ProxiedPlayer) sender).getServer().getInfo(), new NamedContainer<>(Calendar.getInstance().getTime().getTime(), result));
+                    }));
+                }
+            }
+            return new NamedContainer<>(null, Collections.emptyList());
+        } else if (args.length <= 1) {
             List<String> cmds = new ArrayList<>();
             cmds.addAll(Arrays.asList("help", "list", "info", "status", "version", "start", "stop", "restart", "kill", "terminate", "cmd", "command", "create"));
             if (!(sender instanceof ProxiedPlayer)) cmds.addAll(Arrays.asList("reload", "sudo", "screen", "delete"));

@@ -1,5 +1,6 @@
 package net.ME1312.SubServers.Bungee.Network.Packet;
 
+import net.ME1312.SubData.Server.Protocol.Initial.InitialPacket;
 import net.ME1312.SubServers.Bungee.Event.SubAddProxyEvent;
 import net.ME1312.SubServers.Bungee.Host.Proxy;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
@@ -17,7 +18,7 @@ import java.util.Map;
 /**
  * Link Proxy Packet
  */
-public class PacketLinkProxy implements PacketObjectIn<Integer>, PacketObjectOut<Integer> {
+public class PacketLinkProxy implements InitialPacket, PacketObjectIn<Integer>, PacketObjectOut<Integer> {
     private SubPlugin plugin;
     private int response;
     private String name;
@@ -70,11 +71,12 @@ public class PacketLinkProxy implements PacketObjectIn<Integer>, PacketObjectOut
                 proxy.setSubData(client, channel);
                 System.out.println("SubData > " + client.getAddress().toString() + " has been defined as Proxy: " + proxy.getName() + ((channel > 0)?" (Sub "+channel+")":""));
                 client.sendPacket(new PacketLinkProxy(proxy.getName(), 0));
+                setReady(client, true);
             } else {
                 client.sendPacket(new PacketLinkProxy(proxy.getName(), 2));
 
             }
-        } catch (Exception e) {
+        } catch (Throwable e) {
             client.sendPacket(new PacketLinkProxy(null, 1));
             e.printStackTrace();
         }

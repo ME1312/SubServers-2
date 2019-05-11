@@ -1,5 +1,6 @@
 package net.ME1312.SubServers.Bungee.Network.Packet;
 
+import net.ME1312.SubData.Server.Protocol.Initial.InitialPacket;
 import net.ME1312.SubData.Server.SubDataClient;
 import net.ME1312.SubServers.Bungee.Host.External.ExternalHost;
 import net.ME1312.SubServers.Bungee.Host.Host;
@@ -17,7 +18,7 @@ import java.util.Map;
 /**
  * Link External Host Packet
  */
-public class PacketLinkExHost implements PacketObjectIn<Integer>, PacketObjectOut<Integer> {
+public class PacketLinkExHost implements InitialPacket, PacketObjectIn<Integer>, PacketObjectOut<Integer> {
     private SubPlugin plugin;
     private int response;
 
@@ -60,6 +61,7 @@ public class PacketLinkExHost implements PacketObjectIn<Integer>, PacketObjectOu
                         ((ExternalHost) host).setSubData(client, channel);
                         System.out.println("SubData > " + client.getAddress().toString() + " has been defined as Host: " + host.getName() + ((channel > 0)?" (Sub "+channel+")":""));
                         client.sendPacket(new PacketLinkExHost(0));
+                        setReady(client, true);
                     } else {
                         client.sendPacket(new PacketLinkExHost(3));
                     }
@@ -69,7 +71,7 @@ public class PacketLinkExHost implements PacketObjectIn<Integer>, PacketObjectOu
             } else {
                 client.sendPacket(new PacketLinkExHost(2));
             }
-        } catch (Exception e) {
+        } catch (Throwable e) {
             client.sendPacket(new PacketLinkExHost(1));
             e.printStackTrace();
         }

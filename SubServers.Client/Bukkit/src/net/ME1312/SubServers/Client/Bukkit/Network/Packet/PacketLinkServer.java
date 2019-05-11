@@ -2,6 +2,7 @@ package net.ME1312.SubServers.Client.Bukkit.Network.Packet;
 
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Util;
+import net.ME1312.SubData.Client.Protocol.Initial.InitialPacket;
 import net.ME1312.SubData.Client.Protocol.PacketObjectIn;
 import net.ME1312.SubData.Client.Protocol.PacketObjectOut;
 import net.ME1312.SubData.Client.SubDataClient;
@@ -13,7 +14,7 @@ import org.bukkit.Bukkit;
 /**
  * Link Server Packet
  */
-public class PacketLinkServer implements PacketObjectIn<Integer>, PacketObjectOut<Integer> {
+public class PacketLinkServer implements InitialPacket, PacketObjectIn<Integer>, PacketObjectOut<Integer> {
     private SubPlugin plugin;
     private int channel;
 
@@ -53,12 +54,11 @@ public class PacketLinkServer implements PacketObjectIn<Integer>, PacketObjectOu
             try {
                 if (data.contains(0x0000)) {
                     Util.reflect(SubAPI.class.getDeclaredField("name"), plugin.api, data.getRawString(0x0000));
+                    setReady(client, true);
                 }
-                if (SubAPI.getInstance().getSubDataNetwork()[0] == client) {
-                    client.sendPacket(new PacketDownloadLang());
-                    Bukkit.getPluginManager().callEvent(new SubNetworkConnectEvent(client));
-                }
-            } catch (Exception e) {}
+            } catch (Throwable e) {
+                e.printStackTrace();
+            }
         } else {
             Bukkit.getLogger().info("SubData > Could not link name with server" + ((data.contains(0x0002))?": "+data.getRawString(0x0002):'.'));
             try {

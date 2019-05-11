@@ -25,15 +25,16 @@ public class ConfigUpdater {
      */
     public static void updateConfig(File file) throws IOException {
         YAMLConfig config = new YAMLConfig(file);
-        YAMLSection updated = config.get().clone();
+        YAMLSection existing = config.get().clone();
+        YAMLSection updated = existing.clone();
         YAMLSection rewritten = new YAMLSection();
 
-        Version was = updated.getMap("Settings", new ObjectMap<>()).getVersion("Version", new Version(0));
+        Version was = existing.getMap("Settings", new ObjectMap<>()).getVersion("Version", new Version(0));
         Version now = SubAPI.getInstance().getWrapperBuild();
 
         int i = 0;
         if (now == null) now = UNSIGNED;
-        if (!updated.contains("Settings") || !updated.getMap("Settings").contains("Version")) {
+        if (!existing.contains("Settings") || !existing.getMap("Settings").contains("Version")) {
             YAMLSection hosts = new YAMLSection();
             YAMLSection host = new YAMLSection();
             host.set("Enabled", true);
@@ -45,27 +46,29 @@ public class ConfigUpdater {
             System.out.println("SubServers > Created ./SubServers/config.yml");
         } else {
             if (was.compareTo(new Version("19w17a")) <= 0) {
-                if (updated.getMap("Settings", new YAMLSection()).contains("Log-Creator")) for (String name : updated.getMap("Hosts", new YAMLSection()).getKeys())
-                    updated.getMap("Hosts").getMap(name).safeSet("Log-Creator", updated.getMap("Settings").getBoolean("Log-Creator"));
+                if (existing.getMap("Settings", new YAMLSection()).contains("Log-Creator")) for (String name : existing.getMap("Hosts", new YAMLSection()).getKeys())
+                    updated.getMap("Hosts").getMap(name).safeSet("Log-Creator", existing.getMap("Settings").getBoolean("Log-Creator"));
 
-                if (updated.getMap("Settings", new YAMLSection()).contains("SubData") && !updated.getMap("Settings", new YAMLSection()).getMap("SubData").contains("Encryption"))
+                if (existing.getMap("Settings", new YAMLSection()).contains("SubData") && !existing.getMap("Settings", new YAMLSection()).getMap("SubData").contains("Encryption"))
                     updated.getMap("Settings").getMap("SubData").set("Encryption", "NONE");
 
-                if (updated.getMap("Settings", new YAMLSection()).getMap("SubData", new YAMLSection()).contains("Allowed-Connections"))
-                    updated.getMap("Settings").getMap("SubData").safeSet("Whitelist", updated.getMap("Settings").getMap("SubData").getRawStringList("Allowed-Connections"));
+                if (existing.getMap("Settings", new YAMLSection()).getMap("SubData", new YAMLSection()).contains("Allowed-Connections"))
+                    updated.getMap("Settings").getMap("SubData").safeSet("Whitelist", existing.getMap("Settings").getMap("SubData").getRawStringList("Allowed-Connections"));
 
-                if (updated.contains("Servers")) {
+                if (existing.contains("Servers")) {
                     YAMLConfig sc = new YAMLConfig(new File(file.getParentFile(), "servers.yml"));
                     YAMLSection settings = new YAMLSection();
                     settings.set("Version", was.toString());
-                    settings.set("Run-On-Launch-Timeout", (updated.getMap("Settings", new YAMLSection()).contains("Run-On-Launch-Timeout"))?updated.getMap("Settings").getInt("Run-On-Launch-Timeout"):0);
+                    settings.set("Run-On-Launch-Timeout", (existing.getMap("Settings", new YAMLSection()).contains("Run-On-Launch-Timeout"))?existing.getMap("Settings").getInt("Run-On-Launch-Timeout"):0);
                     sc.get().safeSet("Settings", settings);
 
                     sc.get().safeSet("Servers", new YAMLSection());
-                    sc.get().getMap("Servers").safeSetAll(updated.getMap("Servers"));
+                    sc.get().getMap("Servers").safeSetAll(existing.getMap("Servers"));
                     System.out.println("SubServers > Created ./SubServers/servers.yml (using existing data)");
                     sc.save();
                 }
+
+                existing = updated.clone();
                 i++;
             }// if (was.compareTo(new Version("99w99a")) <= 0) {
             //  // do something
@@ -88,7 +91,7 @@ public class ConfigUpdater {
 
             YAMLSection subdata = new YAMLSection();
             subdata.set("Address", updated.getMap("Settings", new YAMLSection()).getMap("SubData", new YAMLSection()).getRawString("Address", "127.0.0.1:4391"));
-            subdata.set("Password", updated.getMap("Settings", new YAMLSection()).getMap("SubData", new YAMLSection()).getRawString("Password", ""));
+            if (updated.getMap("Settings", new YAMLSection()).getMap("SubData", new YAMLSection()).contains("Password")) subdata.set("Password", updated.getMap("Settings").getMap("SubData").getRawString("Password"));
             subdata.set("Encryption", updated.getMap("Settings", new YAMLSection()).getMap("SubData", new YAMLSection()).getRawString("Encryption", "RSA/AES"));
             subdata.set("Whitelist", updated.getMap("Settings", new YAMLSection()).getMap("SubData", new YAMLSection()).getRawStringList("Whitelist", Collections.emptyList()));
             settings.set("SubData", subdata);
@@ -124,15 +127,16 @@ public class ConfigUpdater {
      */
     public static void updateServers(File file) throws IOException {
         YAMLConfig config = new YAMLConfig(file);
-        YAMLSection updated = config.get().clone();
+        YAMLSection existing = config.get().clone();
+        YAMLSection updated = existing.clone();
         YAMLSection rewritten = new YAMLSection();
 
-        Version was = updated.getMap("Settings", new ObjectMap<>()).getVersion("Version", new Version(0));
+        Version was = existing.getMap("Settings", new ObjectMap<>()).getVersion("Version", new Version(0));
         Version now = SubAPI.getInstance().getWrapperBuild();
 
         int i = 0;
         if (now == null) now = UNSIGNED;
-        if (!updated.contains("Settings") || !updated.getMap("Settings").contains("Version")) {
+        if (!existing.contains("Settings") || !existing.getMap("Settings").contains("Version")) {
             YAMLSection servers = new YAMLSection();
             servers.set("Example", new YAMLSection());
             updated.set("Servers", servers);
@@ -141,11 +145,11 @@ public class ConfigUpdater {
             System.out.println("SubServers > Created ./SubServers/servers.yml");
         } else {
             if (was.compareTo(new Version("19w17a")) <= 0) {
-                for (String name : updated.getMap("Servers", new YAMLSection()).getKeys()) {
-                    if (updated.getMap("Servers").getMap(name).getBoolean("Auto-Restart", true))
+                for (String name : existing.getMap("Servers", new YAMLSection()).getKeys()) {
+                    if (existing.getMap("Servers").getMap(name).getBoolean("Auto-Restart", true))
                         updated.getMap("Servers").getMap(name).safeSet("Stop-Action", "RESTART");
 
-                    if (updated.getMap("Servers").getMap(name).getRawString("Stop-Action", "NONE").equalsIgnoreCase("DELETE_SERVER"))
+                    if (existing.getMap("Servers").getMap(name).getRawString("Stop-Action", "NONE").equalsIgnoreCase("DELETE_SERVER"))
                         updated.getMap("Servers").getMap(name).set("Stop-Action", "RECYCLE_SERVER");
                 }
                 i++;
@@ -201,15 +205,16 @@ public class ConfigUpdater {
      */
     public static void updateLang(File file) throws IOException {
         YAMLConfig config = new YAMLConfig(file);
-        YAMLSection updated = config.get().clone();
+        YAMLSection existing = config.get().clone();
+        YAMLSection updated = existing.clone();
         YAMLSection rewritten = new YAMLSection();
 
-        Version was = updated.getMap("Settings", new ObjectMap<>()).getVersion("Version", new Version(0));
+        Version was = existing.getMap("Settings", new ObjectMap<>()).getVersion("Version", new Version(0));
         Version now = SubAPI.getInstance().getWrapperBuild();
 
         int i = 0;
         if (now == null) now = UNSIGNED;
-        if (!updated.contains("Settings") || !updated.getMap("Settings").contains("Version")) {
+        if (!existing.contains("Settings") || !existing.getMap("Settings").contains("Version")) {
 
             i++;
             System.out.println("SubServers > Created ./SubServers/lang.yml");

@@ -1,6 +1,7 @@
 package net.ME1312.SubServers.Bungee.Network.Packet;
 
 import net.ME1312.SubData.Server.DataClient;
+import net.ME1312.SubData.Server.Protocol.Initial.InitialPacket;
 import net.ME1312.SubData.Server.SubDataClient;
 import net.ME1312.SubServers.Bungee.Host.Server;
 import net.ME1312.SubServers.Bungee.Host.ServerContainer;
@@ -18,7 +19,7 @@ import java.util.Map;
 /**
  * Link Server Packet
  */
-public class PacketLinkServer implements PacketObjectIn<Integer>, PacketObjectOut<Integer> {
+public class PacketLinkServer implements InitialPacket, PacketObjectIn<Integer>, PacketObjectOut<Integer> {
     private SubPlugin plugin;
     private int response;
     private String message;
@@ -89,13 +90,13 @@ public class PacketLinkServer implements PacketObjectIn<Integer>, PacketObjectOu
             } else {
                 client.sendPacket(new PacketLinkServer(null, 2, e.getMessage()));
             }
-        } catch (Exception e) {
+        } catch (Throwable e) {
             client.sendPacket(new PacketLinkServer(null, 1, null));
             e.printStackTrace();
         }
     }
 
-    private void link(SubDataClient client, Server server, int channel) {
+    private void link(SubDataClient client, Server server, int channel) throws Throwable {
         HashMap<Integer, SubDataClient> subdata = Util.getDespiteException(() -> Util.reflect(ServerContainer.class.getDeclaredField("subdata"), server), null);
         if (!subdata.keySet().contains(channel) || (channel == 0 && subdata.get(0) == null)) {
             server.setSubData(client, channel);
@@ -106,6 +107,7 @@ public class PacketLinkServer implements PacketObjectIn<Integer>, PacketObjectOu
             } else {
                 client.sendPacket(new PacketLinkServer(server.getName(), 0, null));
             }
+            setReady(client, true);
         } else {
             client.sendPacket(new PacketLinkServer(null, 4, "Server already linked"));
         }

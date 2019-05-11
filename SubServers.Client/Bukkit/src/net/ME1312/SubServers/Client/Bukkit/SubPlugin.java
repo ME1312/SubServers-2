@@ -14,6 +14,7 @@ import net.ME1312.Galaxi.Library.UniversalFile;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubData.Client.SubDataClient;
+import net.ME1312.SubServers.Client.Bukkit.Library.Updates.ConfigUpdater;
 import net.ME1312.SubServers.Client.Bukkit.Network.SubProtocol;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandMap;
@@ -63,15 +64,7 @@ public final class SubPlugin extends JavaPlugin {
                 Files.move(new UniversalFile(getDataFolder().getParentFile(), "SubServers-Client:config.yml").toPath(), new UniversalFile(getDataFolder(), "config.yml").toPath(), StandardCopyOption.REPLACE_EXISTING);
                 Util.deleteDirectory(new UniversalFile(getDataFolder().getParentFile(), "SubServers-Client"));
             }
-            if (!(new UniversalFile(getDataFolder(), "config.yml").exists())) {
-                Util.copyFromJar(SubPlugin.class.getClassLoader(), "config.yml", new UniversalFile(getDataFolder(), "config.yml").getPath());
-                Bukkit.getLogger().info("SubServers > Created ./plugins/SubServers-Client-Bukkit/config.yml");
-            } else if (((new YAMLConfig(new UniversalFile(getDataFolder(), "config.yml"))).get().getMap("Settings").getVersion("Version", new Version(0))).compareTo(new Version("2.11.2a+")) != 0) {
-                Files.move(new UniversalFile(getDataFolder(), "config.yml").toPath(), new UniversalFile(getDataFolder(), "config.old" + Math.round(Math.random() * 100000) + ".yml").toPath());
-
-                Util.copyFromJar(SubPlugin.class.getClassLoader(), "config.yml", new UniversalFile(getDataFolder(), "config.yml").getPath());
-                Bukkit.getLogger().info("SubServers > Updated .plugins/SubServers-Client-Bukkit/config.yml");
-            }
+            ConfigUpdater.updateConfig(new UniversalFile(getDataFolder(), "config.yml"));
             config = new YAMLConfig(new UniversalFile(getDataFolder(), "config.yml"));
             if (new UniversalFile(new File(System.getProperty("user.dir")), "subdata.json").exists()) {
                 FileReader reader = new FileReader(new UniversalFile(new File(System.getProperty("user.dir")), "subdata.json"));
@@ -87,7 +80,7 @@ public final class SubPlugin extends JavaPlugin {
             subprotocol = SubProtocol.get();
             reload(false);
 
-            if (config.get().getMap("Settings").getBoolean("Ingame-Access", true)) {
+            if (!config.get().getMap("Settings").getBoolean("API-Only-Mode", false)) {
                 CommandMap cmd = Util.reflect(Bukkit.getServer().getClass().getDeclaredField("commandMap"), Bukkit.getServer());
                 gui = new DefaultUIHandler(this);
 
@@ -124,12 +117,14 @@ public final class SubPlugin extends JavaPlugin {
         reconnect = false;
         ArrayList<SubDataClient> tmp = new ArrayList<SubDataClient>();
         tmp.addAll(subdata.values());
-        for (SubDataClient client : tmp) {
+        for (SubDataClient client : tmp) if (client != null) {
             client.close();
             Util.isException(client::waitFor);
         }
         subdata.clear();
+        subdata.put(0, null);
 
+        ConfigUpdater.updateConfig(new UniversalFile(getDataFolder(), "config.yml"));
         config.reload();
 
         subprotocol.unregisterCipher("AES");
@@ -190,11 +185,12 @@ public final class SubPlugin extends JavaPlugin {
 
             ArrayList<SubDataClient> temp = new ArrayList<SubDataClient>();
             temp.addAll(subdata.values());
-            for (SubDataClient client : temp) {
+            for (SubDataClient client : temp) if (client != null)  {
                 client.close();
                 client.waitFor();
             }
             subdata.clear();
+            subdata.put(0, null);
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }

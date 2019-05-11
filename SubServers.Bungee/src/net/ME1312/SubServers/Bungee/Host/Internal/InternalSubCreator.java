@@ -469,7 +469,7 @@ public class InternalSubCreator extends SubCreator {
             FileWriter writer = new FileWriter(new UniversalFile(dir, "subdata.json"), false);
             config.set("Name", name);
             config.set("Address", host.plugin.config.get().getMap("Settings").getMap("SubData").getRawString("Address", "127.0.0.1").replace("0.0.0.0", "127.0.0.1"));
-            config.set("Password", host.plugin.config.get().getMap("Settings").getMap("SubData").getRawString("Password", ""));
+            if (host.plugin.config.get().getMap("Settings").getMap("SubData").getRawString("Password", "").length() > 0) config.set("Password", host.plugin.config.get().getMap("Settings").getMap("SubData").getRawString("Password"));
             writer.write(config.toJSON().toString());
             writer.close();
 

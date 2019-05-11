@@ -54,7 +54,7 @@
         <dependency>
             <groupId>net.ME1312.SubData</groupId>
             <artifactId>Client</artifactId>
-            <version>19w19d</version>
+            <version>19w19f</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
@@ -104,7 +104,6 @@
                         <configuration>
                             <tasks>
                                 <mkdir dir="${project.build.directory}" />
-                                <copy file="${basedir}/../config.yml" todir="${project.build.directory}/classes" />
                                 <copy file="${basedir}/../../LICENSE" todir="${project.build.directory}/classes" />
                             </tasks>
                         </configuration>
