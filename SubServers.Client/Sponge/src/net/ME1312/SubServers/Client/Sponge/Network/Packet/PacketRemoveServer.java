@@ -11,31 +11,33 @@ import java.util.HashMap;
 import java.util.UUID;
 
 /**
- * Restart Server Packet
+ * Remove Server Packet
  */
-public class PacketRestartServer implements PacketObjectIn<Integer>, PacketObjectOut<Integer> {
+public class PacketRemoveServer implements PacketObjectIn<Integer>, PacketObjectOut<Integer> {
     private static HashMap<UUID, Callback<ObjectMap<Integer>>[]> callbacks = new HashMap<UUID, Callback<ObjectMap<Integer>>[]>();
     private UUID player;
     private String server;
+    private boolean force;
     private UUID tracker;
 
     /**
-     * New PacketRestartServer (In)
+     * New PacketRemoveServer (In)
      */
-    public PacketRestartServer() {}
+    public PacketRemoveServer() {}
 
     /**
-     * New PacketRestartServer (Out)
+     * New PacketRemoveServer (Out)
      *
-     * @param player Player Starting
+     * @param player Player Removing
      * @param server Server
      * @param callback Callbacks
      */
     @SafeVarargs
-    public PacketRestartServer(UUID player, String server, Callback<ObjectMap<Integer>>... callback) {
+    public PacketRemoveServer(UUID player, String server, boolean force, Callback<ObjectMap<Integer>>... callback) {
         if (Util.isNull(server, callback)) throw new NullPointerException();
         this.player = player;
         this.server = server;
+        this.force = force;
         this.tracker = Util.getNew(callbacks.keySet(), UUID::randomUUID);
         callbacks.put(tracker, callback);
     }
@@ -45,7 +47,8 @@ public class PacketRestartServer implements PacketObjectIn<Integer>, PacketObjec
         ObjectMap<Integer> data = new ObjectMap<Integer>();
         data.set(0x0000, tracker);
         data.set(0x0001, server);
-        if (player != null) data.set(0x0002, player.toString());
+        data.set(0x0002, force);
+        if (player != null) data.set(0x0003, player.toString());
         return data;
     }
 

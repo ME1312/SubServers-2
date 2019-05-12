@@ -1,10 +1,10 @@
 package net.ME1312.SubServers.Client.Sponge.Graphic;
 
 import net.ME1312.SubServers.Client.Sponge.Library.ChatColor;
-import net.ME1312.SubServers.Client.Sponge.Library.Container;
-import net.ME1312.SubServers.Client.Sponge.Library.NamedContainer;
-import net.ME1312.SubServers.Client.Sponge.Library.Util;
-import net.ME1312.SubServers.Client.Sponge.Library.Version.Version;
+import net.ME1312.Galaxi.Library.Container;
+import net.ME1312.Galaxi.Library.NamedContainer;
+import net.ME1312.Galaxi.Library.Util;
+import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubServers.Client.Sponge.Network.API.Host;
 import net.ME1312.SubServers.Client.Sponge.Network.API.SubServer;
 import net.ME1312.SubServers.Client.Sponge.SubPlugin;
@@ -99,7 +99,7 @@ public abstract class UIRenderer {
      */
     public boolean sendTitle(String str, int fadein, int stay, int fadeout) {
         if (Util.isNull(str, fadein, stay, fadeout)) throw new NullPointerException();
-        if (plugin.config.get().getSection("Settings").getBoolean("Use-Title-Messages", true)) {
+        if (plugin.config.get().getMap("Settings").getBoolean("Use-Title-Messages", true)) {
             String line1, line2;
             if (!str.startsWith("\n") && str.contains("\n")) {
                 line1 = str.split("\\n")[0];
@@ -127,7 +127,7 @@ public abstract class UIRenderer {
      * @param subtitle Subtitle to display (or null to hide)
      */
     public void setDownloading(String subtitle) {
-        if (subtitle != null && !plugin.config.get().getSection("Settings").getBoolean("Use-Title-Messages", true)) {
+        if (subtitle != null && !plugin.config.get().getMap("Settings").getBoolean("Use-Title-Messages", true)) {
             if (download != null && Sponge.getScheduler().getTaskById(download).isPresent()) Sponge.getScheduler().getTaskById(download).get().cancel();
             download = Sponge.getScheduler().createTaskBuilder().execute(() -> {
                 if (tdownload != null) Sponge.getServer().getPlayer(player).get().sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", "Interface.Generic.Downloading").replace("$str$", subtitle)));

@@ -11,31 +11,37 @@ import java.util.HashMap;
 import java.util.UUID;
 
 /**
- * Restart Server Packet
+ * Edit Server Packet
  */
-public class PacketRestartServer implements PacketObjectIn<Integer>, PacketObjectOut<Integer> {
+public class PacketEditServer implements PacketObjectIn<Integer>, PacketObjectOut<Integer> {
     private static HashMap<UUID, Callback<ObjectMap<Integer>>[]> callbacks = new HashMap<UUID, Callback<ObjectMap<Integer>>[]>();
     private UUID player;
     private String server;
+    private ObjectMap<String> edit;
+    private boolean perma;
     private UUID tracker;
 
     /**
-     * New PacketRestartServer (In)
+     * New PacketEditServer (In)
      */
-    public PacketRestartServer() {}
+    public PacketEditServer() {}
 
     /**
-     * New PacketRestartServer (Out)
+     * New PacketEditServer (Out)
      *
-     * @param player Player Starting
+     * @param player Player Editing
      * @param server Server
+     * @param edit Edits
+     * @param perma Save Changes
      * @param callback Callbacks
      */
     @SafeVarargs
-    public PacketRestartServer(UUID player, String server, Callback<ObjectMap<Integer>>... callback) {
+    public PacketEditServer(UUID player, String server, ObjectMap<String> edit, boolean perma, Callback<ObjectMap<Integer>>... callback) {
         if (Util.isNull(server, callback)) throw new NullPointerException();
         this.player = player;
         this.server = server;
+        this.edit = edit;
+        this.perma = perma;
         this.tracker = Util.getNew(callbacks.keySet(), UUID::randomUUID);
         callbacks.put(tracker, callback);
     }
@@ -45,7 +51,9 @@ public class PacketRestartServer implements PacketObjectIn<Integer>, PacketObjec
         ObjectMap<Integer> data = new ObjectMap<Integer>();
         data.set(0x0000, tracker);
         data.set(0x0001, server);
-        if (player != null) data.set(0x0002, player.toString());
+        data.set(0x0002, edit);
+        data.set(0x0003, perma);
+        if (player != null) data.set(0x0004, player.toString());
         return data;
     }
 

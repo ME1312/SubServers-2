@@ -14,6 +14,10 @@
             <id>sponge-repo</id>
             <url>https://repo.spongepowered.org/maven</url>
         </repository>
+        <repository>
+            <id>me1312-repo</id>
+            <url>https://src.me1312.net/maven</url>
+        </repository>
     </repositories>
 
     <dependencies>
@@ -24,9 +28,15 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.msgpack</groupId>
-            <artifactId>msgpack-core</artifactId>
-            <version>0.8.16</version>
+            <groupId>net.ME1312.Galaxi</groupId>
+            <artifactId>GalaxiUtil</artifactId>
+            <version>19w19c</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.ME1312.SubData</groupId>
+            <artifactId>Client</artifactId>
+            <version>19w19f</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>
@@ -64,7 +74,6 @@
                         <configuration>
                             <tasks>
                                 <mkdir dir="${project.build.directory}" />
-                                <copy file="${basedir}/../config.yml" todir="${project.build.directory}/classes" />
                                 <copy file="${basedir}/../../LICENSE" todir="${project.build.directory}/classes" />
                             </tasks>
                         </configuration>

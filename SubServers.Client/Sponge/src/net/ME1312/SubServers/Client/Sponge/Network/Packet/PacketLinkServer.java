@@ -1,70 +1,84 @@
 package net.ME1312.SubServers.Client.Sponge.Network.Packet;
 
-import net.ME1312.SubServers.Client.Sponge.Library.Config.YAMLSection;
-import net.ME1312.SubServers.Client.Sponge.Library.Util;
-import net.ME1312.SubServers.Client.Sponge.Library.Version.Version;
-import net.ME1312.SubServers.Client.Sponge.Network.PacketIn;
-import net.ME1312.SubServers.Client.Sponge.Network.PacketOut;
-import net.ME1312.SubServers.Client.Sponge.Network.SubDataClient;
+import net.ME1312.Galaxi.Library.Map.ObjectMap;
+import net.ME1312.Galaxi.Library.Util;
+import net.ME1312.SubData.Client.Protocol.Initial.InitialPacket;
+import net.ME1312.SubData.Client.Protocol.PacketObjectIn;
+import net.ME1312.SubData.Client.Protocol.PacketObjectOut;
+import net.ME1312.SubData.Client.SubDataClient;
+import net.ME1312.SubServers.Client.Sponge.SubAPI;
 import net.ME1312.SubServers.Client.Sponge.SubPlugin;
-import org.slf4j.Logger;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
+import java.util.logging.Logger;
 
 /**
  * Link Server Packet
  */
-public class PacketLinkServer implements PacketIn, PacketOut {
+public class PacketLinkServer implements InitialPacket, PacketObjectIn<Integer>, PacketObjectOut<Integer> {
     private SubPlugin plugin;
-    private Logger log = null;
+    private int channel;
 
     /**
-     * New PacketLinkServer
+     * New PacketLinkServer (In)
      *
      * @param plugin SubServers.Client
      */
     public PacketLinkServer(SubPlugin plugin) {
         if (Util.isNull(plugin)) throw new NullPointerException();
         this.plugin = plugin;
-        Util.isException(() -> this.log = Util.reflect(SubDataClient.class.getDeclaredField("log"), null));
+    }
+    /**
+     * New PacketLinkServer (Out)
+     *
+     * @param plugin SubServers.Client
+     * @param channel Channel ID
+     */
+    public PacketLinkServer(SubPlugin plugin, int channel) {
+        if (Util.isNull(plugin)) throw new NullPointerException();
+        this.plugin = plugin;
+        this.channel = channel;
     }
 
     @Override
-    public YAMLSection generate() {
-        YAMLSection json = new YAMLSection();
-        if (plugin.subdata.getName() != null) json.set("name", plugin.subdata.getName());
-        if (plugin.game.getServer().getBoundAddress().isPresent()) json.set("port", plugin.game.getServer().getBoundAddress().get());
+    public ObjectMap<Integer> send(SubDataClient client) {
+        ObjectMap<Integer> json = new ObjectMap<Integer>();
+        if (plugin.api.getName() != null) json.set(0x0000, plugin.api.getName());
+        if (plugin.game.getServer().getBoundAddress().isPresent()) json.set(0x0001, plugin.game.getServer().getBoundAddress().get());
+        json.set(0x0002, channel);
         return json;
     }
 
     @Override
-    public void execute(YAMLSection data) {
-        if (data.getInt("r") == 0) {
+    public void receive(SubDataClient client, ObjectMap<Integer> data) {
+        Logger log = Util.getDespiteException(() -> Util.reflect(SubDataClient.class.getDeclaredField("log"), client), null);
+        if (data.getInt(0x0001) == 0) {
             try {
-                if (data.contains("n")) {
-                    Util.reflect(SubDataClient.class.getDeclaredField("name"), plugin.subdata, data.getRawString("n"));
+                if (data.contains(0x0000)) {
+                    Util.reflect(SubAPI.class.getDeclaredField("name"), plugin.api, data.getRawString(0x0000));
+                    setReady(client, true);
                 }
-                Util.reflect(SubDataClient.class.getDeclaredMethod("init"), plugin.subdata);
-            } catch (Exception e) {}
+            } catch (Throwable e) {
+                e.printStackTrace();
+            }
         } else {
-            log.info("Could not link name with server: " + data.getRawString("m"));
+            log.info("Could not link name with server" + ((data.contains(0x0002))?": "+data.getRawString(0x0002):'.'));
             try {
-                if (data.getInt("r") == 2) {
-                    if (!plugin.config.get().getSection("Settings").getSection("SubData").contains("Name")) {
-                        plugin.config.get().getSection("Settings").getSection("SubData").set("Name", "");
+                if (data.getInt(0x0001) == 2) {
+                    if (!plugin.config.get().getMap("Settings").getMap("SubData").contains("Name")) {
+                        plugin.config.get().getMap("Settings").getMap("SubData").set("Name", "");
                         plugin.config.save();
                     }
-                    if (plugin.config.get().getSection("Settings").getSection("SubData").getRawString("Name").length() <= 0)
+                    if (plugin.config.get().getMap("Settings").getMap("SubData").getRawString("Name").length() <= 0)
                         log.info("Use the server \"Name\" option to override auto-linking");
                 }
             } catch (Exception e) {}
+            new IllegalStateException().printStackTrace();
             plugin.disable(null);
         }
     }
 
     @Override
-    public Version getVersion() {
-        return new Version("2.11.0a");
+    public int version() {
+        return 0x0001;
     }
 }

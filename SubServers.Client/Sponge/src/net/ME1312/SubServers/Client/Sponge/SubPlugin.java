@@ -2,17 +2,19 @@ package net.ME1312.SubServers.Client.Sponge;
 
 import com.google.gson.Gson;
 import com.google.inject.Inject;
+import net.ME1312.SubData.Client.Encryption.AES;
+import net.ME1312.SubData.Client.Encryption.RSA;
+import net.ME1312.SubData.Client.SubDataClient;
 import net.ME1312.SubServers.Client.Sponge.Graphic.UIHandler;
-import net.ME1312.SubServers.Client.Sponge.Library.Config.YAMLConfig;
-import net.ME1312.SubServers.Client.Sponge.Library.Config.YAMLSection;
+import net.ME1312.Galaxi.Library.Config.YAMLConfig;
+import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.SubServers.Client.Sponge.Library.Metrics;
-import net.ME1312.SubServers.Client.Sponge.Library.NamedContainer;
-import net.ME1312.SubServers.Client.Sponge.Library.UniversalFile;
-import net.ME1312.SubServers.Client.Sponge.Library.Util;
-import net.ME1312.SubServers.Client.Sponge.Library.Version.Version;
-import net.ME1312.SubServers.Client.Sponge.Library.Version.VersionType;
-import net.ME1312.SubServers.Client.Sponge.Network.Cipher;
-import net.ME1312.SubServers.Client.Sponge.Network.SubDataClient;
+import net.ME1312.Galaxi.Library.NamedContainer;
+import net.ME1312.Galaxi.Library.UniversalFile;
+import net.ME1312.Galaxi.Library.Util;
+import net.ME1312.Galaxi.Library.Version.Version;
+import net.ME1312.SubServers.Client.Sponge.Library.Updates.ConfigUpdater;
+import net.ME1312.SubServers.Client.Sponge.Network.SubProtocol;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongepowered.api.Game;
@@ -24,12 +26,7 @@ import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
 import org.spongepowered.api.event.game.state.GameStoppingEvent;
 import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.plugin.PluginContainer;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
 
-import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.net.InetAddress;
@@ -37,10 +34,7 @@ import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -48,24 +42,29 @@ import java.util.concurrent.TimeUnit;
  */
 @Plugin(id = "subservers-client-sponge", name = "SubServers-Client-Sponge", authors = "ME1312", version = "2.14a", url = "https://github.com/ME1312/SubServers-2", description = "Access your SubServers from Anywhere")
 public final class SubPlugin {
+    protected HashMap<Integer, SubDataClient> subdata = new HashMap<Integer, SubDataClient>();
     protected NamedContainer<Long, Map<String, Map<String, String>>> lang = null;
     public YAMLConfig config;
-    public SubDataClient subdata = null;
+    public SubProtocol subprotocol;
 
     @ConfigDir(sharedRoot = false)
     @Inject public File dir;
-    public Logger logger = LoggerFactory.getLogger("SubServers");
+    public Logger log = LoggerFactory.getLogger("SubServers");
     public UIHandler gui = null;
     public Version version;
     public SubAPI api;
     @Inject public PluginContainer plugin;
     @Inject public Game game;
 
+    private boolean reconnect = false;
+    private boolean scheduling = false;
+
     @Listener
     public void setup(GamePreInitializationEvent event) {
         if (plugin.getVersion().isPresent()) {
             version = Version.fromString(plugin.getVersion().get());
         } else version = new Version("Custom");
+        subdata.put(0, null);
     }
 
     /**
@@ -76,33 +75,30 @@ public final class SubPlugin {
     public void enable(GameInitializationEvent event) {
         api = new SubAPI(this);
         try {
-            logger.info("Loading SubServers.Client.Sponge v" + version.toString() + " Libraries (for Minecraft " + api.getGameVersion() + ")");
+            log.info("Loading SubServers.Client.Sponge v" + version.toString() + " Libraries (for Minecraft " + api.getGameVersion() + ")");
             dir.mkdirs();
             if (new UniversalFile(dir.getParentFile(), "SubServers-Client:config.yml").exists()) {
                 Files.move(new UniversalFile(dir.getParentFile(), "SubServers-Client:config.yml").toPath(), new UniversalFile(dir, "config.yml").toPath(), StandardCopyOption.REPLACE_EXISTING);
                 Util.deleteDirectory(new UniversalFile(dir.getParentFile(), "SubServers-Client"));
             }
-            if (!(new UniversalFile(dir, "config.yml").exists())) {
-                Util.copyFromJar(SubPlugin.class.getClassLoader(), "config.yml", new UniversalFile(dir, "config.yml").getPath());
-                logger.info("Created ./config/subservers-client-sponge/config.yml");
-            } else if (((new YAMLConfig(new UniversalFile(dir, "config.yml"))).get().getSection("Settings").getVersion("Version", new Version(0))).compareTo(new Version("2.11.2a+")) != 0) {
-                Files.move(new UniversalFile(dir, "config.yml").toPath(), new UniversalFile(dir, "config.old" + Math.round(Math.random() * 100000) + ".yml").toPath());
-
-                Util.copyFromJar(SubPlugin.class.getClassLoader(), "config.yml", new UniversalFile(dir, "config.yml").getPath());
-                logger.info("Updated ./config/subservers-client-sponge/config.yml");
-            }
+            ConfigUpdater.updateConfig(new UniversalFile(dir, "config.yml"));
             config = new YAMLConfig(new UniversalFile(dir, "config.yml"));
-            if (new UniversalFile(new File(System.getProperty("user.dir")), "subservers.client").exists()) {
-                FileReader reader = new FileReader(new UniversalFile(new File(System.getProperty("user.dir")), "subservers.client"));
-                config.get().getSection("Settings").set("SubData", new YAMLSection(new Gson().fromJson(Util.readAll(reader), Map.class)));
+            if (new UniversalFile(new File(System.getProperty("user.dir")), "subdata.json").exists()) {
+                FileReader reader = new FileReader(new UniversalFile(new File(System.getProperty("user.dir")), "subdata.json"));
+                config.get().getMap("Settings").set("SubData", new ObjectMap<String>(new Gson().fromJson(Util.readAll(reader), Map.class)));
                 config.save();
                 reader.close();
-                new UniversalFile(new File(System.getProperty("user.dir")), "subservers.client").delete();
+                new UniversalFile(new File(System.getProperty("user.dir")), "subdata.json").delete();
+            }
+            if (new UniversalFile(new File(System.getProperty("user.dir")), "subdata.rsa.key").exists()) {
+                Files.move(new UniversalFile(new File(System.getProperty("user.dir")), "subdata.rsa.key").toPath(), new UniversalFile(dir, "subdata.rsa.key").toPath());
             }
 
+            scheduling = true;
+            subprotocol = SubProtocol.get();
             reload(false);
 
-            if (config.get().getSection("Settings").getBoolean("Ingame-Access", true)) {
+            if (!config.get().getMap("Settings").getBoolean("API-Only-Mode", false)) {
                 //gui = new InternalUIHandler(this);
                 Sponge.getCommandManager().register(plugin, new SubCommand(this).spec(), "sub", "subserver", "subservers");
             }
@@ -110,12 +106,12 @@ public final class SubPlugin {
             new Metrics(this);
             game.getScheduler().createTaskBuilder().async().execute(() -> {
                 try {
-                    YAMLSection tags = new YAMLSection(new Gson().fromJson("{\"tags\":" + Util.readAll(new BufferedReader(new InputStreamReader(new URL("https://api.github.com/repos/ME1312/SubServers-2/git/refs/tags").openStream(), Charset.forName("UTF-8")))) + '}', Map.class));
+                    ObjectMap<String> tags = new ObjectMap<String>(new Gson().fromJson("{\"tags\":" + Util.readAll(new BufferedReader(new InputStreamReader(new URL("https://api.github.com/repos/ME1312/SubServers-2/git/refs/tags").openStream(), Charset.forName("UTF-8")))) + '}', Map.class));
                     List<Version> versions = new LinkedList<Version>();
 
                     Version updversion = version;
                     int updcount = 0;
-                    for (YAMLSection tag : tags.getSectionList("tags")) versions.add(Version.fromString(tag.getString("ref").substring(10)));
+                    for (ObjectMap<String> tag : tags.getMapList("tags")) versions.add(Version.fromString(tag.getString("ref").substring(10)));
                     Collections.sort(versions);
                     for (Version version : versions) {
                         if (version.compareTo(updversion) > 0) {
@@ -123,7 +119,7 @@ public final class SubPlugin {
                             updcount++;
                         }
                     }
-                    if (updcount > 0) logger.info("SubServers.Client.Sponge v" + updversion + " is available. You are " + updcount + " version" + ((updcount == 1)?"":"s") + " behind.");
+                    if (updcount > 0) log.info("SubServers.Client.Sponge v" + updversion + " is available. You are " + updcount + " version" + ((updcount == 1)?"":"s") + " behind.");
                 } catch (Exception e) {}
             }).delay(0, TimeUnit.MILLISECONDS).interval(2, TimeUnit.DAYS).submit(plugin);
         } catch (IOException e) {
@@ -131,25 +127,50 @@ public final class SubPlugin {
         }
     }
 
-    public void reload(boolean notifyPlugins) throws IOException {
-        if (subdata != null)
-            subdata.destroy(0);
 
+
+    public void reload(boolean notifyPlugins) throws IOException {
+        reconnect = false;
+        ArrayList<SubDataClient> tmp = new ArrayList<SubDataClient>();
+        tmp.addAll(subdata.values());
+        for (SubDataClient client : tmp) if (client != null) {
+            client.close();
+            Util.isException(client::waitFor);
+        }
+        subdata.clear();
+        subdata.put(0, null);
+
+        ConfigUpdater.updateConfig(new UniversalFile(dir, "config.yml"));
         config.reload();
 
-        Cipher cipher = null;
-        if (!config.get().getSection("Settings").getSection("SubData").getRawString("Encryption", "NONE").equalsIgnoreCase("NONE")) {
-            if (config.get().getSection("Settings").getSection("SubData").getString("Password", "").length() == 0) {
-                logger.info("Cannot encrypt connection without a password");
-            } else if (!SubDataClient.getCiphers().keySet().contains(config.get().getSection("Settings").getSection("SubData").getRawString("Encryption").toUpperCase().replace('-', '_').replace(' ', '_'))) {
-                logger.info("Unknown encryption type: " + config.get().getSection("Settings").getSection("SubData").getRawString("Encryption"));
-            } else {
-                cipher = SubDataClient.getCipher(config.get().getSection("Settings").getSection("SubData").getRawString("Encryption"));
+        subprotocol.unregisterCipher("AES");
+        subprotocol.unregisterCipher("AES-128");
+        subprotocol.unregisterCipher("AES-192");
+        subprotocol.unregisterCipher("AES-256");
+        subprotocol.unregisterCipher("RSA");
+        api.name = config.get().getMap("Settings").getMap("SubData").getString("Name", null);
+        Logger log = LoggerFactory.getLogger("SubData");
+
+        if (config.get().getMap("Settings").getMap("SubData").getRawString("Password", "").length() > 0) {
+            subprotocol.registerCipher("AES", new AES(128, config.get().getMap("Settings").getMap("SubData").getRawString("Password")));
+            subprotocol.registerCipher("AES-128", new AES(128, config.get().getMap("Settings").getMap("SubData").getRawString("Password")));
+            subprotocol.registerCipher("AES-192", new AES(192, config.get().getMap("Settings").getMap("SubData").getRawString("Password")));
+            subprotocol.registerCipher("AES-256", new AES(256, config.get().getMap("Settings").getMap("SubData").getRawString("Password")));
+
+            log.info("AES Encryption Available");
+        }
+        if (new UniversalFile(dir, "subdata.rsa.key").exists()) {
+            try {
+                subprotocol.registerCipher("RSA", new RSA(new UniversalFile(dir, "subdata.rsa.key")));
+                log.info("RSA Encryption Available");
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
-        subdata = new SubDataClient(this, config.get().getSection("Settings").getSection("SubData").getString("Name", null),
-                InetAddress.getByName(config.get().getSection("Settings").getSection("SubData").getString("Address", "127.0.0.1:4391").split(":")[0]),
-                Integer.parseInt(config.get().getSection("Settings").getSection("SubData").getString("Address", "127.0.0.1:4391").split(":")[1]), cipher);
+
+        reconnect = true;
+        log.info(" ");
+        connect();
 
         if (notifyPlugins) {
             List<Runnable> listeners = api.reloadListeners;
@@ -165,14 +186,29 @@ public final class SubPlugin {
         }
     }
 
+    private void connect() throws IOException {
+        subdata.put(0, subprotocol.open((config.get().getMap("Settings").getMap("SubData").getRawString("Address", "127.0.0.1:4391").split(":")[0].equals("0.0.0.0"))?null:InetAddress.getByName(config.get().getMap("Settings").getMap("SubData").getRawString("Address", "127.0.0.1:4391").split(":")[0]),
+                Integer.parseInt(config.get().getMap("Settings").getMap("SubData").getRawString("Address", "127.0.0.1:4391").split(":")[1])));
+    }
+
     /**
      * Disable Plugin
      */
     @Listener
     public void disable(GameStoppingEvent event) {
+        scheduling = false;
         if (subdata != null) try {
-            subdata.destroy(0);
-        } catch (IOException e) {
+            reconnect = false;
+
+            ArrayList<SubDataClient> temp = new ArrayList<SubDataClient>();
+            temp.addAll(subdata.values());
+            for (SubDataClient client : temp) if (client != null)  {
+                client.close();
+                client.waitFor();
+            }
+            subdata.clear();
+            subdata.put(0, null);
+        } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }
     }

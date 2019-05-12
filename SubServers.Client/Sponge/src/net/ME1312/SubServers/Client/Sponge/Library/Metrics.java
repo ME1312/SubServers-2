@@ -8,10 +8,7 @@ import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
-import org.spongepowered.api.Platform;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.config.ConfigDir;
-import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.scheduler.Scheduler;
 import org.spongepowered.api.scheduler.Task;
 
@@ -95,7 +92,7 @@ public class Metrics {
         }
 
         this.plugin = plugin;
-        this.logger = plugin.logger;
+        this.logger = plugin.log;
         this.configDir = plugin.dir.getParentFile().toPath();
 
         try {

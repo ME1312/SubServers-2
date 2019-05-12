@@ -1,10 +1,10 @@
 package net.ME1312.SubServers.Client.Sponge.Event;
 
-import net.ME1312.SubServers.Client.Sponge.Library.Config.YAMLSection;
-import net.ME1312.SubServers.Client.Sponge.Library.Config.YAMLValue;
-import net.ME1312.SubServers.Client.Sponge.Library.NamedContainer;
+import net.ME1312.Galaxi.Library.Map.ObjectMap;
+import net.ME1312.Galaxi.Library.Map.ObjectMapValue;
+import net.ME1312.Galaxi.Library.NamedContainer;
 import net.ME1312.SubServers.Client.Sponge.Library.SubEvent;
-import net.ME1312.SubServers.Client.Sponge.Library.Util;
+import net.ME1312.Galaxi.Library.Util;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.impl.AbstractEvent;
 
@@ -16,7 +16,7 @@ import java.util.UUID;
 public class SubEditServerEvent extends AbstractEvent implements SubEvent {
     private UUID player;
     private String server;
-    private NamedContainer<String, YAMLValue> edit;
+    private NamedContainer<String, ObjectMapValue<String>> edit;
     private boolean perm;
 
     /**
@@ -29,11 +29,11 @@ public class SubEditServerEvent extends AbstractEvent implements SubEvent {
      */
     public SubEditServerEvent(UUID player, String server, NamedContainer<String, ?> edit, boolean permanent) {
         if (Util.isNull(server, edit)) throw new NullPointerException();
-        YAMLSection section = new YAMLSection();
+        ObjectMap<String> section = new ObjectMap<String>();
         section.set(".", edit.get());
         this.player = player;
         this.server = server;
-        this.edit = new NamedContainer<String, YAMLValue>(edit.name(), section.contains(".")?section.get("."):null);
+        this.edit = new NamedContainer<String, ObjectMapValue<String>>(edit.name(), section.contains(".")?section.get("."):null);
         this.perm = permanent;
     }
 
@@ -56,7 +56,7 @@ public class SubEditServerEvent extends AbstractEvent implements SubEvent {
      *
      * @return Edit to be made
      */
-    public NamedContainer<String, YAMLValue> getEdit() {
+    public NamedContainer<String, ObjectMapValue<String>> getEdit() {
         return edit;
     }
 

@@ -1,12 +1,13 @@
 package net.ME1312.SubServers.Client.Sponge.Network.Packet;
 
+import net.ME1312.Galaxi.Library.Callback.Callback;
+import net.ME1312.Galaxi.Library.Map.ObjectMap;
+import net.ME1312.Galaxi.Library.Util;
+import net.ME1312.Galaxi.Library.Version.Version;
+import net.ME1312.SubData.Client.Protocol.PacketObjectIn;
+import net.ME1312.SubData.Client.Protocol.PacketObjectOut;
+import net.ME1312.SubData.Client.SubDataClient;
 import net.ME1312.SubServers.Client.Sponge.Graphic.UIRenderer;
-import net.ME1312.SubServers.Client.Sponge.Library.Callback;
-import net.ME1312.SubServers.Client.Sponge.Library.Config.YAMLSection;
-import net.ME1312.SubServers.Client.Sponge.Library.Util;
-import net.ME1312.SubServers.Client.Sponge.Library.Version.Version;
-import net.ME1312.SubServers.Client.Sponge.Network.PacketIn;
-import net.ME1312.SubServers.Client.Sponge.Network.PacketOut;
 
 import java.util.HashMap;
 import java.util.UUID;
@@ -14,15 +15,16 @@ import java.util.UUID;
 /**
  * Create Server Packet
  */
-public class PacketCreateServer implements PacketIn, PacketOut {
-    private static HashMap<String, Callback<YAMLSection>[]> callbacks = new HashMap<String, Callback<YAMLSection>[]>();
+public class PacketCreateServer implements PacketObjectIn<Integer>, PacketObjectOut<Integer> {
+    private static HashMap<UUID, Callback<ObjectMap<Integer>>[]> callbacks = new HashMap<UUID, Callback<ObjectMap<Integer>>[]>();
     private UUID player;
     private String name;
     private String host;
     private String template;
     private Version version;
     private Integer port;
-    private String id;
+    private boolean waitfor;
+    private UUID tracker;
 
     /**
      * New PacketCreateServer (In)
@@ -41,16 +43,34 @@ public class PacketCreateServer implements PacketIn, PacketOut {
      * @param callback Callbacks
      */
     @SafeVarargs
-    public PacketCreateServer(UUID player, String name, String host, String template, Version version, Integer port, Callback<YAMLSection>... callback) {
-        if (Util.isNull(name, host, template, version, callback)) throw new NullPointerException();
+    public PacketCreateServer(UUID player, String name, String host, String template, Version version, Integer port, Callback<ObjectMap<Integer>>... callback) {
+        this(player, name, host, template, version, port, false, callback);
+    }
+
+    /**
+     * New PacketCreateServer (Out)
+     *
+     * @param player Player Creating
+     * @param name Server Name
+     * @param host Host to use
+     * @param template Server Template
+     * @param version Server Version
+     * @param port Server Port
+     * @param waitfor Wait until completion to send callback
+     * @param callback Callbacks
+     */
+    @SafeVarargs
+    public PacketCreateServer(UUID player, String name, String host, String template, Version version, Integer port, boolean waitfor, Callback<ObjectMap<Integer>>... callback) {
+        if (Util.isNull(name, host, template, callback)) throw new NullPointerException();
         this.player = player;
         this.name = name;
         this.host = host;
         this.template = template;
         this.version = version;
         this.port = port;
-        this.id = Util.getNew(callbacks.keySet(), UUID::randomUUID).toString();
-        callbacks.put(id, callback);
+        this.waitfor = waitfor;
+        this.tracker = Util.getNew(callbacks.keySet(), UUID::randomUUID);
+        callbacks.put(tracker, callback);
     }
 
     /**
@@ -61,7 +81,20 @@ public class PacketCreateServer implements PacketIn, PacketOut {
      * @param callback Callbacks
      */
     @SafeVarargs
-    public PacketCreateServer(UUID player, UIRenderer.CreatorOptions options, Callback<YAMLSection>... callback) {
+    public PacketCreateServer(UUID player, UIRenderer.CreatorOptions options, Callback<ObjectMap<Integer>>... callback) {
+        this(player, options, false, callback);
+    }
+
+    /**
+     * New PacketCreateServer (Out)
+     *
+     * @param player Player Creating
+     * @param options Creator UI Options
+     * @param waitfor Wait until completion to send callback
+     * @param callback Callbacks
+     */
+    @SafeVarargs
+    public PacketCreateServer(UUID player, UIRenderer.CreatorOptions options, boolean waitfor, Callback<ObjectMap<Integer>>... callback) {
         if (Util.isNull(options, callback)) throw new NullPointerException();
         this.player = player;
         this.name = options.getName();
@@ -69,34 +102,34 @@ public class PacketCreateServer implements PacketIn, PacketOut {
         this.template = options.getTemplate();
         this.version = options.getVersion();
         this.port = options.getPort();
-        this.id = Util.getNew(callbacks.keySet(), UUID::randomUUID).toString();
-        callbacks.put(id, callback);
+        this.waitfor = waitfor;
+        this.tracker = Util.getNew(callbacks.keySet(), UUID::randomUUID);
+        callbacks.put(tracker, callback);
 
     }
 
     @Override
-    public YAMLSection generate() {
-        YAMLSection data = new YAMLSection();
-        data.set("id", id);
-        if (player != null) data.set("player", player.toString());
-        YAMLSection creator = new YAMLSection();
-        creator.set("name", name);
-        creator.set("host", host);
-        creator.set("template", template);
-        creator.set("version", version);
-        if (port != null) creator.set("port", port);
-        data.set("creator", creator);
+    public ObjectMap<Integer> send(SubDataClient client) {
+        ObjectMap<Integer> data = new ObjectMap<Integer>();
+        data.set(0x0000, tracker);
+        data.set(0x0001, name);
+        data.set(0x0002, host);
+        data.set(0x0003, template);
+        if (version != null) data.set(0x0004, version);
+        if (port != null)   data.set(0x0005, port);
+        if (player != null) data.set(0x0006, player);
+        if (waitfor) data.set(0x0007, true);
         return data;
     }
 
     @Override
-    public void execute(YAMLSection data) {
-        for (Callback<YAMLSection> callback : callbacks.get(data.getRawString("id"))) callback.run(data);
-        callbacks.remove(data.getRawString("id"));
+    public void receive(SubDataClient client, ObjectMap<Integer> data) {
+        for (Callback<ObjectMap<Integer>> callback : callbacks.get(data.getUUID(0x0000))) callback.run(data);
+        callbacks.remove(data.getUUID(0x0000));
     }
 
     @Override
-    public Version getVersion() {
-        return new Version("2.13b");
+    public int version() {
+        return 0x0001;
     }
 }

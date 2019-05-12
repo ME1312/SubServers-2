@@ -1,24 +1,21 @@
 package net.ME1312.SubServers.Client.Sponge.Network.Packet;
 
-import net.ME1312.SubServers.Client.Sponge.Library.Config.YAMLSection;
-import net.ME1312.SubServers.Client.Sponge.Library.NamedContainer;
-import net.ME1312.SubServers.Client.Sponge.Library.Util;
-import net.ME1312.SubServers.Client.Sponge.Library.Version.Version;
-import net.ME1312.SubServers.Client.Sponge.Network.PacketIn;
-import net.ME1312.SubServers.Client.Sponge.Network.PacketOut;
-import net.ME1312.SubServers.Client.Sponge.Network.SubDataClient;
+import net.ME1312.Galaxi.Library.Map.ObjectMap;
+import net.ME1312.Galaxi.Library.NamedContainer;
+import net.ME1312.Galaxi.Library.Util;
+import net.ME1312.SubData.Client.Protocol.PacketObjectIn;
+import net.ME1312.SubData.Client.Protocol.PacketObjectOut;
+import net.ME1312.SubData.Client.SubDataClient;
 import net.ME1312.SubServers.Client.Sponge.SubPlugin;
-import org.slf4j.Logger;
 
-import java.lang.reflect.Field;
 import java.util.Calendar;
+import java.util.logging.Logger;
 
 /**
  * Download Lang Packet
  */
-public class PacketDownloadLang implements PacketIn, PacketOut {
+public class PacketDownloadLang implements PacketObjectIn<Integer>, PacketObjectOut<Integer> {
     private SubPlugin plugin;
-    private Logger log = null;
 
     /**
      * New PacketDownloadLang (In)
@@ -28,7 +25,6 @@ public class PacketDownloadLang implements PacketIn, PacketOut {
     public PacketDownloadLang(SubPlugin plugin) {
         if (Util.isNull(plugin)) throw new NullPointerException();
         this.plugin = plugin;
-        Util.isException(() -> this.log = Util.reflect(SubDataClient.class.getDeclaredField("log"), null));
     }
 
     /**
@@ -37,14 +33,15 @@ public class PacketDownloadLang implements PacketIn, PacketOut {
     public PacketDownloadLang() {}
 
     @Override
-    public YAMLSection generate() {
+    public ObjectMap<Integer> send(SubDataClient subDataClient) throws Throwable {
         return null;
     }
 
     @Override
-    public void execute(YAMLSection data) {
+    public void receive(SubDataClient client, ObjectMap<Integer> data) {
+        Logger log = Util.getDespiteException(() -> Util.reflect(SubDataClient.class.getDeclaredField("log"), client), null);
         try {
-            Util.reflect(SubPlugin.class.getDeclaredField("lang"), plugin, new NamedContainer<>(Calendar.getInstance().getTime().getTime(), data.getSection("Lang").get()));
+            Util.reflect(SubPlugin.class.getDeclaredField("lang"), plugin, new NamedContainer<>(Calendar.getInstance().getTime().getTime(), data.getObject(0x0001)));
             log.info("Lang Settings Downloaded");
         } catch (IllegalAccessException | NoSuchFieldException e) {
             e.printStackTrace();
@@ -52,7 +49,7 @@ public class PacketDownloadLang implements PacketIn, PacketOut {
     }
 
     @Override
-    public Version getVersion() {
-        return new Version("2.11.0a");
+    public int version() {
+        return 0x0001;
     }
 }

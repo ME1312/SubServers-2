@@ -396,7 +396,7 @@ public final class SubCommand extends BukkitCommand {
                                             sender.sendMessage(plugin.api.getLang("SubServers", "Command.Restart.Server-Disabled"));
                                             break;
                                         case 9:
-                                            sender.sendMessage(plugin.api.getLang("SubServers", "Command.Restart.Server-Incompatible"));
+                                            sender.sendMessage(plugin.api.getLang("SubServers", "Command.Restart.Server-Incompatible").replace("$str$", data.getString(0x0002)));
                                             break;
                                         case 8:
                                         case 0:
@@ -421,8 +421,8 @@ public final class SubCommand extends BukkitCommand {
                                 });
 
                                 Callback<ObjectMap<Integer>> stopper = data -> {
-                                    if (data.getInt(0x0000) != 0) listening.set(false);
-                                    switch (data.getInt(0x0000)) {
+                                    if (data.getInt(0x0001) != 0) listening.set(false);
+                                    switch (data.getInt(0x0001)) {
                                         case 3:
                                             sender.sendMessage(plugin.api.getLang("SubServers", "Command.Restart.Unknown"));
                                             break;

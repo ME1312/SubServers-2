@@ -1,11 +1,11 @@
 package net.ME1312.SubServers.Client.Sponge.Network.Packet;
 
-import net.ME1312.SubServers.Client.Sponge.Library.Callback;
-import net.ME1312.SubServers.Client.Sponge.Library.Config.YAMLSection;
-import net.ME1312.SubServers.Client.Sponge.Library.Util;
-import net.ME1312.SubServers.Client.Sponge.Library.Version.Version;
-import net.ME1312.SubServers.Client.Sponge.Network.PacketIn;
-import net.ME1312.SubServers.Client.Sponge.Network.PacketOut;
+import net.ME1312.Galaxi.Library.Callback.Callback;
+import net.ME1312.Galaxi.Library.Map.ObjectMap;
+import net.ME1312.Galaxi.Library.Util;
+import net.ME1312.SubData.Client.Protocol.PacketObjectIn;
+import net.ME1312.SubData.Client.Protocol.PacketObjectOut;
+import net.ME1312.SubData.Client.SubDataClient;
 
 import java.util.HashMap;
 import java.util.UUID;
@@ -13,12 +13,12 @@ import java.util.UUID;
 /**
  * Stop Server Packet
  */
-public class PacketStopServer implements PacketIn, PacketOut {
-    private static HashMap<String, Callback<YAMLSection>[]> callbacks = new HashMap<String, Callback<YAMLSection>[]>();
+public class PacketStopServer implements PacketObjectIn<Integer>, PacketObjectOut<Integer> {
+    private static HashMap<UUID, Callback<ObjectMap<Integer>>[]> callbacks = new HashMap<UUID, Callback<ObjectMap<Integer>>[]>();
     private UUID player;
     private boolean force;
     private String server;
-    private String id;
+    private UUID id;
 
     /**
      * New PacketStopServer (In)
@@ -34,33 +34,33 @@ public class PacketStopServer implements PacketIn, PacketOut {
      * @param callback Callbacks
      */
     @SafeVarargs
-    public PacketStopServer(UUID player, String server, boolean force, Callback<YAMLSection>... callback) {
+    public PacketStopServer(UUID player, String server, boolean force, Callback<ObjectMap<Integer>>... callback) {
         if (Util.isNull(server, force, callback)) throw new NullPointerException();
         this.player = player;
         this.server = server;
         this.force = force;
-        this.id = Util.getNew(callbacks.keySet(), UUID::randomUUID).toString();
+        this.id = Util.getNew(callbacks.keySet(), UUID::randomUUID);
         callbacks.put(id, callback);
     }
 
     @Override
-    public YAMLSection generate() {
-        YAMLSection data = new YAMLSection();
-        data.set("id", id);
-        if (player != null) data.set("player", player.toString());
-        data.set("server", server);
-        data.set("force", force);
+    public ObjectMap<Integer> send(SubDataClient client) {
+        ObjectMap<Integer> data = new ObjectMap<Integer>();
+        data.set(0x0000, id);
+        data.set(0x0001, server);
+        data.set(0x0002, force);
+        if (player != null) data.set(0x0003, player.toString());
         return data;
     }
 
     @Override
-    public void execute(YAMLSection data) {
-        for (Callback<YAMLSection> callback : callbacks.get(data.getRawString("id"))) callback.run(data);
-        callbacks.remove(data.getRawString("id"));
+    public void receive(SubDataClient client, ObjectMap<Integer> data) {
+        for (Callback<ObjectMap<Integer>> callback : callbacks.get(data.getUUID(0x0000))) callback.run(data);
+        callbacks.remove(data.getUUID(0x0000));
     }
 
     @Override
-    public Version getVersion() {
-        return new Version("2.11.0a");
+    public int version() {
+        return 0x0001;
     }
 }

@@ -10,9 +10,9 @@
     <modules>
         <module>SubServers.Client</module>
         <module>SubServers.Bungee</module>
+        <module>SubServers.Console</module>
         <module>SubServers.Host</module>
         <module>SubServers.Sync</module>
-        <module>SubServers.Console</module>
         <module>SubServers.Test</module>
     </modules>
 </project>
