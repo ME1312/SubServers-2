@@ -1,10 +1,11 @@
 package net.ME1312.SubServers.Host.Network.Packet;
 
-import net.ME1312.Galaxi.Library.Config.YAMLSection;
+import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Version.Version;
+import net.ME1312.SubData.Client.Protocol.PacketObjectIn;
+import net.ME1312.SubData.Client.Protocol.PacketObjectOut;
+import net.ME1312.SubData.Client.SubDataClient;
 import net.ME1312.SubServers.Host.Executable.SubServer;
-import net.ME1312.SubServers.Host.Network.PacketIn;
-import net.ME1312.SubServers.Host.Network.PacketOut;
 import net.ME1312.SubServers.Host.ExHost;
 
 import java.util.Arrays;
@@ -13,7 +14,7 @@ import java.util.UUID;
 /**
  * Update Server Packet
  */
-public class PacketExUpdateServer implements PacketIn, PacketOut {
+public class PacketExUpdateServer implements PacketObjectIn<Integer>, PacketObjectOut<Integer> {
     private ExHost host;
     private SubServer server;
     private UpdateType type;
@@ -43,7 +44,7 @@ public class PacketExUpdateServer implements PacketIn, PacketOut {
 
     /**
      * New PacketExUpdateServer (In)
-     * @param host SubPlugin
+     * @param host ExHost
      */
     public PacketExUpdateServer(ExHost host) {
         this.host = host;
@@ -68,27 +69,27 @@ public class PacketExUpdateServer implements PacketIn, PacketOut {
     }
 
     @Override
-    public YAMLSection generate() {
-        YAMLSection data = new YAMLSection();
-        data.set("server", server.getName());
-        data.set("type", type.getValue());
-        data.set("args", Arrays.asList(args));
+    public ObjectMap<Integer> send(SubDataClient client) {
+        ObjectMap<Integer> data = new ObjectMap<Integer>();
+        data.set(0x0000, server.getName());
+        data.set(0x0001, type.getValue());
+        data.set(0x0002, Arrays.asList(args));
         return data;
     }
 
     @Override
-    public void execute(YAMLSection data) {
+    public void receive(SubDataClient client, ObjectMap<Integer> data) {
         try {
-            SubServer server = host.servers.get(data.getString("server").toLowerCase());
-            switch (data.getInt("type")) {
+            SubServer server = host.servers.get(data.getString(0x0000).toLowerCase());
+            switch (data.getInt(0x0001)) {
                 case 0:
-                    server.setEnabled(data.getList("args").get(0).asBoolean());
+                    server.setEnabled(data.getList(0x0002).get(0).asBoolean());
                     break;
                 case 1:
-                    server.start(data.getList("args").get(0).asUUID());
+                    server.start(data.getList(0x0002).get(0).asUUID());
                     break;
                 case 2:
-                    server.command(data.getList("args").get(0).asRawString());
+                    server.command(data.getList(0x0002).get(0).asRawString());
                     break;
                 case 3:
                     server.stop();
@@ -97,10 +98,10 @@ public class PacketExUpdateServer implements PacketIn, PacketOut {
                     server.terminate();
                     break;
                 case 5:
-                    server.setLogging(data.getList("args").get(0).asBoolean());
+                    server.setLogging(data.getList(0x0002).get(0).asBoolean());
                     break;
                 case 6:
-                    server.setStopCommand(data.getList("args").get(0).asRawString());
+                    server.setStopCommand(data.getList(0x0002).get(0).asRawString());
                     break;
             }
         } catch (Exception e) {
@@ -109,7 +110,7 @@ public class PacketExUpdateServer implements PacketIn, PacketOut {
     }
 
     @Override
-    public Version getVersion() {
-        return new Version("2.11.0a");
+    public int version() {
+        return 0x0001;
     }
 }

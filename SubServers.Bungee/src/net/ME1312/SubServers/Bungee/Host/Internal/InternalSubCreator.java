@@ -210,7 +210,7 @@ public class InternalSubCreator extends SubCreator {
                     server.set("Port", port);
                     server.set("Motd", "Some SubServer");
                     server.set("Log", true);
-                    server.set("Directory", "." + File.separatorChar + name);
+                    server.set("Directory", "./" + name);
                     server.set("Executable", "java -Xmx1024M -jar " + template.getType().toString() + ".jar");
                     server.set("Stop-Command", "stop");
                     server.set("Stop-Action", "NONE");

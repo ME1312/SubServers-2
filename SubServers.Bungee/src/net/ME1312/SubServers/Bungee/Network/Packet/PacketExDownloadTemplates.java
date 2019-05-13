@@ -36,6 +36,7 @@ public class PacketExDownloadTemplates implements PacketIn, PacketStreamOut {
     public void send(SubDataClient client, OutputStream stream) throws Throwable {
         try {
             Util.zip(new UniversalFile(plugin.dir, "SubServers:Templates"), stream);
+            stream.close();
         } catch (Exception e) {
             System.out.println("SubData > Problem encoding template files for Host: " + host.getName());
             e.printStackTrace();

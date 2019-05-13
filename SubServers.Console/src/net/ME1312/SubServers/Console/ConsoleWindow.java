@@ -1,5 +1,6 @@
 package net.ME1312.SubServers.Console;
 
+import net.ME1312.Galaxi.Library.Callback.ExceptionReturnRunnable;
 import net.ME1312.Galaxi.Library.Callback.ExceptionRunnable;
 import net.ME1312.SubServers.Bungee.Host.SubCreator;
 import net.ME1312.SubServers.Bungee.Host.SubLogFilter;
@@ -46,6 +47,8 @@ public final class ConsoleWindow implements SubLogFilter {
     private int findO = 0;
     private int findI = 0;
     private boolean open = false;
+    private boolean running = true;
+    private LinkedList<Object> messages = new LinkedList<Object>();
     private SubLogger logger;
     private int fontSize = 12;
     private File file = null;
@@ -564,6 +567,7 @@ public final class ConsoleWindow implements SubLogFilter {
         logger.registerFilter(this);
         log.setText(RESET_VALUE);
         loadContent();
+        log();
         KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(keys);
     }
     private void hScroll() {
@@ -579,9 +583,7 @@ public final class ConsoleWindow implements SubLogFilter {
 
     public void log(Date date, String message) {
         try {
-            byte[] msg = ('\u00A0' + new SimpleDateFormat("hh:mm:ss").format(date) + ' ' + message + "\u00A0\n").getBytes("UTF-8");
-            filewriter.write(msg);
-            stream.write(msg);
+            messages.add(('\u00A0' + new SimpleDateFormat("hh:mm:ss").format(date) + ' ' + message + "\u00A0\n").getBytes("UTF-8"));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -596,6 +598,33 @@ public final class ConsoleWindow implements SubLogFilter {
     public boolean log(Level level, String message) {
         log(Calendar.getInstance().getTime(), level, message);
         return !open;
+    }
+
+    private void log() {
+        new Thread("SubServers.Console::Log_Spooler(" + logger.getName() + ")") {
+            @Override
+            public void run() {
+                while (running) {
+                    while (running && messages.size() > 0) try {
+                        byte[] msg = (byte[]) Util.getDespiteException(new ExceptionReturnRunnable<Object>() {
+                            @Override
+                            public Object run() throws Throwable {
+                                return messages.get(0);
+                            }
+                        }, null);
+                        if (msg != null) {
+                            filewriter.write(msg);
+                            stream.write(msg);
+                        }
+                        try { ConsoleWindow.this.messages.remove(0); } catch (Throwable e) {}
+                    } catch (Throwable e) {
+                        try { ConsoleWindow.this.messages.remove(0); } catch (Throwable ex) {}
+                        e.printStackTrace();
+                    }
+                    try { Thread.sleep(32); } catch (Throwable e) {}
+                }
+            }
+        }.start();
     }
 
     public void clear() {
@@ -650,6 +679,7 @@ public final class ConsoleWindow implements SubLogFilter {
 
     public void destroy() {
         close();
+        running = false;
         logger.unregisterFilter(this);
         if (filewriter != null) try {
             filewriter.close();

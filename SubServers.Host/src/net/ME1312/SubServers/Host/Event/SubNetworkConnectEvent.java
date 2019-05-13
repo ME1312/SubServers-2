@@ -2,7 +2,7 @@ package net.ME1312.SubServers.Host.Event;
 
 import net.ME1312.Galaxi.Library.Event.Event;
 import net.ME1312.Galaxi.Library.Util;
-import net.ME1312.SubServers.Host.Network.SubDataClient;
+import net.ME1312.SubData.Client.SubDataClient;
 
 /**
  * SubData Network Connect Event

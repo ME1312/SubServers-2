@@ -15,7 +15,7 @@ import java.util.Calendar;
 /**
  * Download Lang Packet
  */
-public class PacketDownloadLang implements PacketObjectIn<Integer>, PacketObjectOut<Integer> {
+public class PacketDownloadLang implements PacketObjectIn<Integer>, PacketOut {
     private SubPlugin plugin;
 
     /**
@@ -32,11 +32,6 @@ public class PacketDownloadLang implements PacketObjectIn<Integer>, PacketObject
      * New PacketDownloadLang (Out)
      */
     public PacketDownloadLang() {}
-
-    @Override
-    public ObjectMap<Integer> send(SubDataClient subDataClient) throws Throwable {
-        return null;
-    }
 
     @Override
     public void receive(SubDataClient client, ObjectMap<Integer> data) {

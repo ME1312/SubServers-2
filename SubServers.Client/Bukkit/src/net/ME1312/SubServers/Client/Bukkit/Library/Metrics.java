@@ -234,7 +234,7 @@ public class Metrics {
             } catch (NoSuchFieldException ignored) { }
         }
 
-        data.put("plugins", pluginData);
+        data.put("Plugins", pluginData);
 
         // Create a new thread for the connection to the bStats server
         new Thread(new Runnable() {

@@ -241,15 +241,9 @@ public class InternalHost extends Host {
         File from = new File(getPath(), servers.get(server.toLowerCase()).getPath());
         if (removeSubServer(player, server)) {
             new Thread(() -> {
-                UniversalFile to = new UniversalFile(plugin.dir, "SubServers:Recently Deleted:" + server.toLowerCase());
                 try {
                     if (from.exists()) {
                         System.out.println("SubServers > Removing Files...");
-                        if (to.exists()) {
-                            if (to.isDirectory()) Util.deleteDirectory(to);
-                            else to.delete();
-                        }
-                        to.mkdirs();
                         Util.deleteDirectory(from);
                     }
                 } catch (Exception e) {
@@ -257,18 +251,11 @@ public class InternalHost extends Host {
                 }
 
                 System.out.println("SubServers > Saving...");
-                YAMLSection info = (plugin.servers.get().getMap("Servers").getKeys().contains(server))?new YAMLSection(plugin.servers.get().getMap("Servers").getMap(server).get()):new YAMLSection();
-                info.set("Name", server);
-                info.set("Timestamp", Calendar.getInstance().getTime().getTime());
                 try {
                     if (plugin.servers.get().getMap("Servers").getKeys().contains(server)) {
                         plugin.servers.get().getMap("Servers").remove(server);
                         plugin.servers.save();
                     }
-                    if (!to.exists()) to.mkdirs();
-                    FileWriter writer = new FileWriter(new File(to, "info.json"));
-                    writer.write(info.toJSON().toString());
-                    writer.close();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -285,16 +272,9 @@ public class InternalHost extends Host {
         File from = new File(getPath(), servers.get(server.toLowerCase()).getPath());
         if (forceRemoveSubServer(player, server)) {
             new Thread(() -> {
-                UniversalFile to = new UniversalFile(plugin.dir, "SubServers:Recently Deleted:" + server.toLowerCase());
                 try {
                     if (from.exists()) {
                         System.out.println("SubServers > Removing Files...");
-                        if (to.exists()) {
-                            if (to.isDirectory()) Util.deleteDirectory(to);
-                            else to.delete();
-                        }
-                        to.mkdirs();
-                        Util.copyDirectory(from, to);
                         Util.deleteDirectory(from);
                     }
                 } catch (Exception e) {
@@ -302,18 +282,11 @@ public class InternalHost extends Host {
                 }
 
                 System.out.println("SubServers > Saving...");
-                YAMLSection info = (plugin.servers.get().getMap("Servers").getKeys().contains(server))?new YAMLSection(plugin.servers.get().getMap("Servers").getMap(server).get()):new YAMLSection();
-                info.set("Name", server);
-                info.set("Timestamp", Calendar.getInstance().getTime().getTime());
                 try {
                     if (plugin.servers.get().getMap("Servers").getKeys().contains(server)) {
                         plugin.servers.get().getMap("Servers").remove(server);
                         plugin.servers.save();
                     }
-                    if (!to.exists()) to.mkdirs();
-                    FileWriter writer = new FileWriter(new File(to, "info.json"), false);
-                    writer.write(info.toJSON().toString());
-                    writer.close();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

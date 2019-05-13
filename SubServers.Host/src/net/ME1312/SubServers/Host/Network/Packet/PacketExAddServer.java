@@ -1,85 +1,87 @@
 package net.ME1312.SubServers.Host.Network.Packet;
 
 import com.dosse.upnp.UPnP;
-import net.ME1312.Galaxi.Library.Config.YAMLSection;
-import net.ME1312.Galaxi.Library.Log.Logger;
+import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Util;
-import net.ME1312.Galaxi.Library.Version.Version;
+import net.ME1312.SubData.Client.Protocol.PacketObjectIn;
+import net.ME1312.SubData.Client.Protocol.PacketObjectOut;
+import net.ME1312.SubData.Client.SubDataClient;
 import net.ME1312.SubServers.Host.Executable.SubServer;
-import net.ME1312.SubServers.Host.Network.PacketIn;
-import net.ME1312.SubServers.Host.Network.PacketOut;
-import net.ME1312.SubServers.Host.Network.SubDataClient;
 import net.ME1312.SubServers.Host.ExHost;
 
-import java.lang.reflect.Field;
 import java.util.UUID;
+import java.util.logging.Logger;
 
 /**
  * Create Server Packet
  */
-public class PacketExAddServer implements PacketIn, PacketOut {
+public class PacketExAddServer implements PacketObjectIn<Integer>, PacketObjectOut<Integer> {
     private ExHost host;
     private int response;
-    private String message;
-    private String id;
-    private Logger log = null;
+    private UUID tracker;
 
     /**
      * New PacketExAddServer (In)
      *
-     * @param host SubPlugin
+     * @param host ExHost
      */
     public PacketExAddServer(ExHost host) {
         if (Util.isNull(host)) throw new NullPointerException();
         this.host = host;
-        Util.isException(() -> this.log = Util.reflect(SubDataClient.class.getDeclaredField("log"), null));
     }
 
     /**
      * New PacketExAddServer (Out)
      *
      * @param response Response ID
-     * @param message Message
-     * @param id Receiver ID
+     * @param tracker Receiver ID
      */
-    public PacketExAddServer(int response, String message, String id) {
-        if (Util.isNull(response, message)) throw new NullPointerException();
+    public PacketExAddServer(int response, UUID tracker) {
+        if (Util.isNull(response)) throw new NullPointerException();
         this.response = response;
-        this.message = message;
-        this.id = id;
+        this.tracker = tracker;
     }
 
     @Override
-    public YAMLSection generate() {
-        YAMLSection data = new YAMLSection();
-        if (id != null) data.set("id", id);
-        data.set("r", response);
-        data.set("m", message);
+    public ObjectMap<Integer> send(SubDataClient client) {
+        ObjectMap<Integer> data = new ObjectMap<Integer>();
+        if (tracker != null) data.set(0x0000, tracker);
+        data.set(0x0001, response);
         return data;
     }
 
     @Override
-    public void execute(YAMLSection data) {
+    public void receive(SubDataClient client, ObjectMap<Integer> data) {
+        Logger logger = Util.getDespiteException(() -> Util.reflect(SubDataClient.class.getDeclaredField("log"), client), null);
+        UUID tracker =          (data.contains(0x0000)?data.getUUID(0x0000):null);
         try {
-            if (host.servers.keySet().contains(data.getSection("server").getRawString("name").toLowerCase())) {
-                host.subdata.sendPacket(new PacketExAddServer(0, "Server Already Added", (data.contains("id"))?data.getRawString("id"):null));
+            String name =    data.getRawString(0x0001);
+            boolean enabled =  data.getBoolean(0x0002);
+            int port =             data.getInt(0x0003);
+            boolean log =      data.getBoolean(0x0004);
+            String dir =     data.getRawString(0x0005);
+            String exec =    data.getRawString(0x0006);
+            String stopcmd = data.getRawString(0x0007);
+            UUID running =       data.contains(0x0008)?data.getUUID(0x0008):null;
+
+            if (host.servers.keySet().contains(name.toLowerCase())) {
+                client.sendPacket(new PacketExAddServer(1, tracker));
             } else {
-                SubServer server = new SubServer(host, data.getSection("server").getRawString("name"), data.getSection("server").getBoolean("enabled"), data.getSection("server").getInt("port"), data.getSection("server").getBoolean("log"),
-                        data.getSection("server").getRawString("dir"), data.getSection("server").getRawString("exec"), data.getSection("server").getRawString("stopcmd"));
-                host.servers.put(data.getSection("server").getRawString("name").toLowerCase(), server);
-                if (UPnP.isUPnPAvailable() && host.config.get().getSection("Settings").getSection("UPnP", new YAMLSection()).getBoolean("Forward-Servers", false)) UPnP.openPortTCP(server.getPort());
-                log.info.println("Added SubServer: " + data.getSection("server").getRawString("name"));
-                if (data.getSection("server").contains("running")) server.start(data.getSection("server").getUUID("running"));
-                host.subdata.sendPacket(new PacketExAddServer(0, "Server Added Successfully", (data.contains("id"))?data.getRawString("id"):null));
+                SubServer server = new SubServer(host, name, enabled, port, log, dir, exec, stopcmd);
+                host.servers.put(name.toLowerCase(), server);
+                if (UPnP.isUPnPAvailable() && host.config.get().getMap("Settings").getMap("UPnP", new ObjectMap<String>()).getBoolean("Forward-Servers", false)) UPnP.openPortTCP(server.getPort());
+                logger.info("Added SubServer: " + name);
+                if (running != null) server.start(running);
+                client.sendPacket(new PacketExAddServer(0, tracker));
             }
         } catch (Throwable e) {
-            host.subdata.sendPacket(new PacketExAddServer(1, e.getClass().getCanonicalName() + ": " + e.getMessage(), (data.contains("id"))?data.getRawString("id"):null));
+            client.sendPacket(new PacketExAddServer(2, tracker));
             host.log.error.println(e);
         }
     }
 
     @Override
-    public Version getVersion() {
-        return new Version("2.13.1b");
+    public int version() {
+        return 0x0001;
     }
 }

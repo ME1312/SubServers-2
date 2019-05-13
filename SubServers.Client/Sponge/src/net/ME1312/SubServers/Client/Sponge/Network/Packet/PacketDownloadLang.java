@@ -5,6 +5,7 @@ import net.ME1312.Galaxi.Library.NamedContainer;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubData.Client.Protocol.PacketObjectIn;
 import net.ME1312.SubData.Client.Protocol.PacketObjectOut;
+import net.ME1312.SubData.Client.Protocol.PacketOut;
 import net.ME1312.SubData.Client.SubDataClient;
 import net.ME1312.SubServers.Client.Sponge.SubPlugin;
 
@@ -14,7 +15,7 @@ import java.util.logging.Logger;
 /**
  * Download Lang Packet
  */
-public class PacketDownloadLang implements PacketObjectIn<Integer>, PacketObjectOut<Integer> {
+public class PacketDownloadLang implements PacketObjectIn<Integer>, PacketOut {
     private SubPlugin plugin;
 
     /**
@@ -31,11 +32,6 @@ public class PacketDownloadLang implements PacketObjectIn<Integer>, PacketObject
      * New PacketDownloadLang (Out)
      */
     public PacketDownloadLang() {}
-
-    @Override
-    public ObjectMap<Integer> send(SubDataClient subDataClient) throws Throwable {
-        return null;
-    }
 
     @Override
     public void receive(SubDataClient client, ObjectMap<Integer> data) {

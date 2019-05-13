@@ -20,13 +20,13 @@
         <dependency>
             <groupId>net.ME1312.Galaxi</groupId>
             <artifactId>GalaxiEngine</artifactId>
-            <version>19w04c</version>
+            <version>19w20a</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>org.msgpack</groupId>
-            <artifactId>msgpack-core</artifactId>
-            <version>0.8.16</version>
+            <groupId>net.ME1312.SubData</groupId>
+            <artifactId>Client</artifactId>
+            <version>19w20f</version>
             <scope>compile</scope>
         </dependency>
         <dependency>

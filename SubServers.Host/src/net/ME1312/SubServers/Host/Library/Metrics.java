@@ -2,7 +2,7 @@ package net.ME1312.SubServers.Host.Library;
 
 import net.ME1312.Galaxi.Engine.GalaxiEngine;
 import net.ME1312.Galaxi.Library.Config.YAMLConfig;
-import net.ME1312.Galaxi.Library.Config.YAMLSection;
+import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Log.Logger;
 import net.ME1312.SubServers.Host.ExHost;
 import net.ME1312.SubServers.Host.SubAPI;
@@ -69,7 +69,7 @@ public class Metrics {
                 writer.close();
             }
 
-            YAMLSection configuration = new YAMLConfig(configFile).get();
+            ObjectMap<String> configuration = new YAMLConfig(configFile).get();
 
             // Load configuration
             enabled = configuration.getBoolean("enabled", true);

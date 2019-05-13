@@ -1,47 +1,51 @@
 package net.ME1312.SubServers.Host.Network.Packet;
 
-import net.ME1312.Galaxi.Library.Config.YAMLSection;
-import net.ME1312.Galaxi.Library.Log.Logger;
+import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.NamedContainer;
 import net.ME1312.Galaxi.Library.Util;
-import net.ME1312.Galaxi.Library.Version.Version;
-import net.ME1312.SubServers.Host.Network.PacketIn;
-import net.ME1312.SubServers.Host.Network.PacketOut;
-import net.ME1312.SubServers.Host.Network.SubDataClient;
+import net.ME1312.SubData.Client.Protocol.PacketObjectIn;
+import net.ME1312.SubData.Client.Protocol.PacketObjectOut;
+import net.ME1312.SubData.Client.Protocol.PacketOut;
+import net.ME1312.SubData.Client.SubDataClient;
 import net.ME1312.SubServers.Host.ExHost;
 
-import java.lang.reflect.Field;
 import java.util.Calendar;
+import java.util.logging.Logger;
 
-public class PacketDownloadLang implements PacketIn, PacketOut {
+/**
+ * Download Lang Packet
+ */
+public class PacketDownloadLang implements PacketObjectIn<Integer>, PacketOut {
     private ExHost host;
-    private Logger log = null;
 
-    public PacketDownloadLang() {}
-
+    /**
+     * New PacketDownloadLang (In)
+     *
+     * @param host ExHost
+     */
     public PacketDownloadLang(ExHost host) {
         if (Util.isNull(host)) throw new NullPointerException();
         this.host = host;
-        Util.isException(() -> this.log = Util.reflect(SubDataClient.class.getDeclaredField("log"), null));
     }
 
-    @Override
-    public YAMLSection generate() {
-        return null;
-    }
+    /**
+     * New PacketDownloadLang (Out)
+     */
+    public PacketDownloadLang() {}
 
     @Override
-    public void execute(YAMLSection data) {
+    public void receive(SubDataClient client, ObjectMap<Integer> data) {
+        Logger log = Util.getDespiteException(() -> Util.reflect(SubDataClient.class.getDeclaredField("log"), client), null);
         try {
-            Util.reflect(ExHost.class.getDeclaredField("lang"), host, new NamedContainer<>(Calendar.getInstance().getTime().getTime(), data.getSection("Lang").get()));
-            log.info.println("Lang Settings Downloaded");
+            Util.reflect(ExHost.class.getDeclaredField("lang"), host, new NamedContainer<>(Calendar.getInstance().getTime().getTime(), data.getObject(0x0001)));
+            log.info("Lang Settings Downloaded");
         } catch (IllegalAccessException | NoSuchFieldException e) {
-            log.error.println(e);
+            e.printStackTrace();
         }
     }
 
     @Override
-    public Version getVersion() {
-        return new Version("2.11.0a");
+    public int version() {
+        return 0x0001;
     }
 }

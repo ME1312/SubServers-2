@@ -57,7 +57,6 @@ public final class SubPlugin {
     @Inject public Game game;
 
     private boolean reconnect = false;
-    private boolean scheduling = false;
 
     @Listener
     public void setup(GamePreInitializationEvent event) {
@@ -94,7 +93,6 @@ public final class SubPlugin {
                 Files.move(new UniversalFile(new File(System.getProperty("user.dir")), "subdata.rsa.key").toPath(), new UniversalFile(dir, "subdata.rsa.key").toPath());
             }
 
-            scheduling = true;
             subprotocol = SubProtocol.get();
             reload(false);
 
@@ -196,7 +194,6 @@ public final class SubPlugin {
      */
     @Listener
     public void disable(GameStoppingEvent event) {
-        scheduling = false;
         if (subdata != null) try {
             reconnect = false;
 

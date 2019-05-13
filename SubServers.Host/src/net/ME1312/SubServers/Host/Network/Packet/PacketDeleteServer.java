@@ -11,31 +11,35 @@ import java.util.HashMap;
 import java.util.UUID;
 
 /**
- * Restart Server Packet
+ * Delete Server Packet
  */
-public class PacketRestartServer implements PacketObjectIn<Integer>, PacketObjectOut<Integer> {
+public class PacketDeleteServer implements PacketObjectIn<Integer>, PacketObjectOut<Integer> {
     private static HashMap<UUID, Callback<ObjectMap<Integer>>[]> callbacks = new HashMap<UUID, Callback<ObjectMap<Integer>>[]>();
     private UUID player;
     private String server;
+    private boolean recycle;
+    private boolean force;
     private UUID tracker;
 
     /**
-     * New PacketRestartServer (In)
+     * New PacketDeleteServer (In)
      */
-    public PacketRestartServer() {}
+    public PacketDeleteServer() {}
 
     /**
-     * New PacketRestartServer (Out)
+     * New PacketDeleteServer (Out)
      *
-     * @param player Player Starting
+     * @param player Player Deleting
      * @param server Server
      * @param callback Callbacks
      */
     @SafeVarargs
-    public PacketRestartServer(UUID player, String server, Callback<ObjectMap<Integer>>... callback) {
+    public PacketDeleteServer(UUID player, String server, boolean recycle, boolean force, Callback<ObjectMap<Integer>>... callback) {
         if (Util.isNull(server, callback)) throw new NullPointerException();
         this.player = player;
         this.server = server;
+        this.recycle = recycle;
+        this.force = force;
         this.tracker = Util.getNew(callbacks.keySet(), UUID::randomUUID);
         callbacks.put(tracker, callback);
     }
@@ -45,7 +49,9 @@ public class PacketRestartServer implements PacketObjectIn<Integer>, PacketObjec
         ObjectMap<Integer> data = new ObjectMap<Integer>();
         data.set(0x0000, tracker);
         data.set(0x0001, server);
-        if (player != null) data.set(0x0002, player.toString());
+        data.set(0x0002, recycle);
+        data.set(0x0003, force);
+        if (player != null) data.set(0x0004, player.toString());
         return data;
     }
 

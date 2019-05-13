@@ -21,6 +21,7 @@ import java.util.Map;
 public class PacketLinkProxy implements InitialPacket, PacketObjectIn<Integer>, PacketObjectOut<Integer> {
     private SubPlugin plugin;
     private int response;
+    private String message;
     private String name;
 
     /**
@@ -39,9 +40,10 @@ public class PacketLinkProxy implements InitialPacket, PacketObjectIn<Integer>, 
      * @param name The name that was generated
      * @param response Response ID
      */
-    public PacketLinkProxy(String name, int response) {
+    public PacketLinkProxy(String name, int response, String message) {
         this.name = name;
         this.response = response;
+        this.message = message;
     }
 
     @Override
@@ -49,6 +51,7 @@ public class PacketLinkProxy implements InitialPacket, PacketObjectIn<Integer>, 
         ObjectMap<Integer> json = new ObjectMap<Integer>();
         json.set(0x0000, name);
         json.set(0x0001, response);
+        if (message != null) json.set(0x0002, message);
         return json;
     }
 
@@ -69,15 +72,15 @@ public class PacketLinkProxy implements InitialPacket, PacketObjectIn<Integer>, 
             HashMap<Integer, SubDataClient> subdata = Util.getDespiteException(() -> Util.reflect(Proxy.class.getDeclaredField("subdata"), proxy), null);
             if (!subdata.keySet().contains(channel) || (channel == 0 && subdata.get(0) == null)) {
                 proxy.setSubData(client, channel);
-                System.out.println("SubData > " + client.getAddress().toString() + " has been defined as Proxy: " + proxy.getName() + ((channel > 0)?" (Sub "+channel+")":""));
-                client.sendPacket(new PacketLinkProxy(proxy.getName(), 0));
+                System.out.println("SubData > " + client.getAddress().toString() + " has been defined as Proxy: " + proxy.getName() + ((channel > 0)?" (Sub-"+channel+")":""));
+                client.sendPacket(new PacketLinkProxy(proxy.getName(), 0, null));
                 setReady(client, true);
             } else {
-                client.sendPacket(new PacketLinkProxy(proxy.getName(), 2));
+                client.sendPacket(new PacketLinkProxy(proxy.getName(), 2, "Proxy already linked"));
 
             }
         } catch (Throwable e) {
-            client.sendPacket(new PacketLinkProxy(null, 1));
+            client.sendPacket(new PacketLinkProxy(null, 1, null));
             e.printStackTrace();
         }
     }

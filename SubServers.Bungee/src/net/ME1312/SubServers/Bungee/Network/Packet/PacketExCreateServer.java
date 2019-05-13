@@ -43,7 +43,7 @@ public class PacketExCreateServer implements PacketObjectIn<Integer>, PacketObje
      */
     @SafeVarargs
     public PacketExCreateServer(String name, SubCreator.ServerTemplate template, Version version, int port, UUID log, Callback<ObjectMap<Integer>>... callback) {
-        if (Util.isNull(name, template, version, port, log, callback)) throw new NullPointerException();
+        if (Util.isNull(name, template, port, log, callback)) throw new NullPointerException();
         this.name = name;
         this.template = template;
         this.version = version;
@@ -64,7 +64,7 @@ public class PacketExCreateServer implements PacketObjectIn<Integer>, PacketObje
             data.set(0x0003, template.getName());
             data.set(0x0004, version);
             data.set(0x0005, port);
-            data.set(0x0006, log.toString());
+            data.set(0x0006, log);
         }
         return data;
     }

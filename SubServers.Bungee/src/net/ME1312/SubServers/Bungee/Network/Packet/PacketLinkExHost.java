@@ -21,6 +21,7 @@ import java.util.Map;
 public class PacketLinkExHost implements InitialPacket, PacketObjectIn<Integer>, PacketObjectOut<Integer> {
     private SubPlugin plugin;
     private int response;
+    private String message;
 
     /**
      * New PacketLinkExHost (In)
@@ -36,15 +37,19 @@ public class PacketLinkExHost implements InitialPacket, PacketObjectIn<Integer>,
      * New PacketLinkExHost (Out)
      *
      * @param response Response ID
+     * @param message Message
      */
-    public PacketLinkExHost(int response) {
+    public PacketLinkExHost(int response, String message) {
+        if (Util.isNull(response)) throw new NullPointerException();
         this.response = response;
+        this.message = message;
     }
 
     @Override
     public ObjectMap<Integer> send(SubDataClient client) {
         ObjectMap<Integer> data = new ObjectMap<Integer>();
         data.set(0x0001, response);
+        if (message != null) data.set(0x0002, message);
         return data;
     }
 
@@ -59,20 +64,20 @@ public class PacketLinkExHost implements InitialPacket, PacketObjectIn<Integer>,
                     HashMap<Integer, SubDataClient> subdata = Util.getDespiteException(() -> Util.reflect(ExternalHost.class.getDeclaredField("subdata"), host), null);
                     if (!subdata.keySet().contains(channel) || (channel == 0 && subdata.get(0) == null)) {
                         ((ExternalHost) host).setSubData(client, channel);
-                        System.out.println("SubData > " + client.getAddress().toString() + " has been defined as Host: " + host.getName() + ((channel > 0)?" (Sub "+channel+")":""));
-                        client.sendPacket(new PacketLinkExHost(0));
+                        System.out.println("SubData > " + client.getAddress().toString() + " has been defined as Host: " + host.getName() + ((channel > 0)?" (Sub-"+channel+")":""));
+                        client.sendPacket(new PacketLinkExHost(0, null));
                         setReady(client, true);
                     } else {
-                        client.sendPacket(new PacketLinkExHost(3));
+                        client.sendPacket(new PacketLinkExHost(3, "Host already linked"));
                     }
                 } else {
-                    client.sendPacket(new PacketLinkExHost(4));
+                    client.sendPacket(new PacketLinkExHost(4, "That host does not support a network interface"));
                 }
             } else {
-                client.sendPacket(new PacketLinkExHost(2));
+                client.sendPacket(new PacketLinkExHost(2, "There is no host with name: " + data.getRawString(0x0000)));
             }
         } catch (Throwable e) {
-            client.sendPacket(new PacketLinkExHost(1));
+            client.sendPacket(new PacketLinkExHost(1, null));
             e.printStackTrace();
         }
     }

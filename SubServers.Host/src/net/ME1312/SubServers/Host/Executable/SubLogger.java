@@ -1,9 +1,11 @@
 package net.ME1312.SubServers.Host.Executable;
 
-import net.ME1312.Galaxi.Library.Config.YAMLSection;
+import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Container;
 import net.ME1312.Galaxi.Library.Log.LogStream;
 import net.ME1312.Galaxi.Library.Log.Logger;
+import net.ME1312.Galaxi.Library.Util;
+import net.ME1312.SubData.Client.SubDataClient;
 import net.ME1312.SubServers.Host.Library.TextColor;
 import net.ME1312.SubServers.Host.Network.Packet.PacketOutExLogMessage;
 import net.ME1312.SubServers.Host.SubAPI;
@@ -26,6 +28,7 @@ public class SubLogger {
     protected static boolean logn = true;
     protected static boolean logc = true;
     protected File file;
+    private SubDataClient channel = null;
     private PrintWriter writer = null;
     private boolean started = false;
     private Thread out = null;
@@ -56,12 +59,13 @@ public class SubLogger {
      */
     public void start() {
         started = true;
+        if (logn) Util.isException(() -> channel = (SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0].newChannel());
         if (file != null && writer == null) {
             try {
                 this.writer = new PrintWriter(file, "UTF-8");
                 this.writer.println("---------- LOG START \u2014 " + name + " ----------");
                 this.writer.flush();
-            } catch (UnsupportedEncodingException | FileNotFoundException e) {
+            } catch (IOException e) {
                 logger.error.println(e);
             }
         }
@@ -121,7 +125,7 @@ public class SubLogger {
             }
 
             // Log to NETWORK
-            if (log.get() && logn) SubAPI.getInstance().getSubDataNetwork().sendPacket(new PacketOutExLogMessage(address, line));
+            if (log.get() && channel != null && !channel.isClosed()) channel.sendPacket(new PacketOutExLogMessage(address, line));
 
             // Log to CONSOLE
             if (log.get() && logc) level.println(TextColor.convertColor(msg));
@@ -157,6 +161,10 @@ public class SubLogger {
                     writer.close();
                 }
             }
+            if (channel != null && !channel.isClosed()) {
+                channel.sendPacket(new PacketOutExLogMessage(address, true));
+            }
+            channel = null;
         }
     }
 

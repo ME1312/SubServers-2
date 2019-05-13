@@ -100,7 +100,7 @@ public class PacketLinkServer implements InitialPacket, PacketObjectIn<Integer>,
         HashMap<Integer, SubDataClient> subdata = Util.getDespiteException(() -> Util.reflect(ServerContainer.class.getDeclaredField("subdata"), server), null);
         if (!subdata.keySet().contains(channel) || (channel == 0 && subdata.get(0) == null)) {
             server.setSubData(client, channel);
-            System.out.println("SubData > " + client.getAddress().toString() + " has been defined as " + ((server instanceof SubServer) ? "SubServer" : "Server") + ": " + server.getName() + ((channel > 0)?" (Sub "+channel+")":""));
+            System.out.println("SubData > " + client.getAddress().toString() + " has been defined as " + ((server instanceof SubServer) ? "SubServer" : "Server") + ": " + server.getName() + ((channel > 0)?" (Sub-"+channel+")":""));
             if (server instanceof SubServer && !((SubServer) server).isRunning()) {
                 System.out.println("SubServers > Sending shutdown signal to rogue SubServer: " + server.getName());
                 client.sendPacket(new PacketOutExReset("Rogue SubServer Detected"));

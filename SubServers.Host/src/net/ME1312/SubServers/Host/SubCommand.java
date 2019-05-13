@@ -1,8 +1,9 @@
 package net.ME1312.SubServers.Host;
 
 import net.ME1312.Galaxi.Engine.GalaxiEngine;
-import net.ME1312.Galaxi.Library.Callback;
-import net.ME1312.Galaxi.Library.Config.YAMLSection;
+import net.ME1312.Galaxi.Library.Callback.Callback;
+import net.ME1312.Galaxi.Library.Map.ObjectMap;
+import net.ME1312.Galaxi.Library.Map.ObjectMapValue;
 import net.ME1312.Galaxi.Library.Container;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
@@ -10,6 +11,7 @@ import net.ME1312.Galaxi.Plugin.Command.Command;
 import net.ME1312.Galaxi.Plugin.Command.CommandSender;
 import net.ME1312.Galaxi.Plugin.Command.CompletionHandler;
 import net.ME1312.Galaxi.Plugin.PluginManager;
+import net.ME1312.SubData.Client.SubDataClient;
 import net.ME1312.SubServers.Host.Library.TextColor;
 import net.ME1312.SubServers.Host.Network.API.*;
 import net.ME1312.SubServers.Host.Network.Packet.*;
@@ -103,7 +105,7 @@ public class SubCommand {
                                 if (!(server instanceof SubServer)) {
                                     message += TextColor.WHITE;
                                 } else if (((SubServer) server).isRunning()) {
-                                    if (((SubServer) server).getStopAction() == SubServer.StopAction.REMOVE_SERVER || ((SubServer) server).getStopAction() == SubServer.StopAction.DELETE_SERVER) {
+                                    if (((SubServer) server).getStopAction() == SubServer.StopAction.REMOVE_SERVER || ((SubServer) server).getStopAction() == SubServer.StopAction.RECYCLE_SERVER || ((SubServer) server).getStopAction() == SubServer.StopAction.DELETE_SERVER) {
                                         message += TextColor.AQUA;
                                     } else {
                                         message += TextColor.GREEN;
@@ -136,7 +138,7 @@ public class SubCommand {
                         for (SubServer subserver : host.getSubServers().values()) {
                             if (i != 0) message += div;
                             if (subserver.isRunning()) {
-                                if (subserver.getStopAction() == SubServer.StopAction.REMOVE_SERVER || subserver.getStopAction() == SubServer.StopAction.DELETE_SERVER) {
+                                if (subserver.getStopAction() == SubServer.StopAction.REMOVE_SERVER || subserver.getStopAction() == SubServer.StopAction.RECYCLE_SERVER || subserver.getStopAction() == SubServer.StopAction.DELETE_SERVER) {
                                     message += TextColor.AQUA;
                                 } else {
                                     message += TextColor.GREEN;
@@ -169,9 +171,9 @@ public class SubCommand {
                         message = "  (master)";
                         for (Proxy proxy : proxies.values()) {
                             message += div;
-                            if (proxy.getSubData() != null && proxy.isRedis()) {
+                            if (proxy.getSubData()[0] != null && proxy.isRedis()) {
                                 message += TextColor.GREEN;
-                            } else if (proxy.getSubData() != null) {
+                            } else if (proxy.getSubData()[0] != null) {
                                 message += TextColor.AQUA;
                             } else if (proxy.isRedis()) {
                                 message += TextColor.WHITE;
@@ -212,7 +214,7 @@ public class SubCommand {
                             sender.sendMessage(" -> Address: " + TextColor.WHITE + server.getAddress().getAddress().getHostAddress()+':'+server.getAddress().getPort());
                             if (server instanceof SubServer) sender.sendMessage(" -> Running: " + ((((SubServer) server).isRunning())?TextColor.GREEN+"yes":TextColor.RED+"no"));
                             if (!(server instanceof SubServer) || ((SubServer) server).isRunning()) {
-                                sender.sendMessage(" -> Connected: " + ((server.getSubData() != null)?TextColor.GREEN+"yes":TextColor.RED+"no"));
+                                sender.sendMessage(" -> Connected: " + ((server.getSubData()[0] != null)?TextColor.GREEN+"yes"+((server.getSubData().length > 1)?TextColor.AQUA+" +"+(server.getSubData().length-1)+" subchannel"+((server.getSubData().length == 2)?"":"s"):""):TextColor.RED+"no"));
                                 sender.sendMessage(" -> Players: " + TextColor.AQUA + server.getPlayers().size() + " online");
                             }
                             sender.sendMessage(" -> MOTD: " + TextColor.WHITE + TextColor.stripColor(server.getMotd()));
@@ -255,7 +257,7 @@ public class SubCommand {
                             sender.sendMessage(" -> Available: " + ((host.isAvailable())?TextColor.GREEN+"yes":TextColor.RED+"no"));
                             sender.sendMessage(" -> Enabled: " + ((host.isEnabled())?TextColor.GREEN+"yes":TextColor.RED+"no"));
                             sender.sendMessage(" -> Address: " + TextColor.WHITE + host.getAddress().getHostAddress());
-                            if (host.getSubData() != null) sender.sendMessage(" -> Connected: " + TextColor.GREEN + "yes");
+                            if (host.getSubData().length > 0) sender.sendMessage(" -> Connected: " + ((host.getSubData()[0] != null)?TextColor.GREEN+"yes"+((host.getSubData().length > 1)?TextColor.AQUA+" +"+(host.getSubData().length-1)+" subchannel"+((host.getSubData().length == 2)?"":"s"):""):TextColor.RED+"no"));
                             sender.sendMessage(" -> SubServers: " + ((host.getSubServers().keySet().size() <= 0)?TextColor.GRAY + "(none)":TextColor.AQUA.toString() + host.getSubServers().keySet().size()));
                             for (SubServer subserver : host.getSubServers().values()) sender.sendMessage("      - " + ((subserver.isEnabled())?TextColor.WHITE:TextColor.GRAY) + subserver.getDisplayName() + ((subserver.getName().equals(subserver.getDisplayName()))?"":" ("+subserver.getName()+')'));
                             sender.sendMessage(" -> Templates: " + ((host.getCreator().getTemplates().keySet().size() <= 0)?TextColor.GRAY + "(none)":TextColor.AQUA.toString() + host.getCreator().getTemplates().keySet().size()));
@@ -273,7 +275,7 @@ public class SubCommand {
                         if (proxy != null) {
                             sender.sendMessage("SubServers > Info on Proxy: " + TextColor.WHITE + proxy.getDisplayName());
                             if (!proxy.getName().equals(proxy.getDisplayName())) sender.sendMessage(" -> System Name: " + TextColor.WHITE  + proxy.getName());
-                            sender.sendMessage(" -> Connected: " + ((proxy.getSubData() != null)?TextColor.GREEN+"yes":TextColor.RED+"no"));
+                            sender.sendMessage(" -> Connected: " + ((proxy.getSubData()[0] != null)?TextColor.GREEN+"yes"+((proxy.getSubData().length > 1)?TextColor.AQUA+" +"+(proxy.getSubData().length-1)+" subchannel"+((proxy.getSubData().length == 2)?"":"s"):""):TextColor.RED+"no"));
                             sender.sendMessage(" -> Redis: "  + ((proxy.isRedis())?TextColor.GREEN:TextColor.RED+"un") + "available");
                             if (proxy.isRedis()) sender.sendMessage(" -> Players: " + TextColor.AQUA + proxy.getPlayers().size() + " online");
                             sender.sendMessage(" -> Signature: " + TextColor.AQUA + proxy.getSignature());
@@ -433,8 +435,8 @@ public class SubCommand {
             @Override
             public void command(CommandSender sender, String handle, String[] args) {
                 if (args.length > 0) {
-                    host.subdata.sendPacket(new PacketStartServer(null, args[0], data -> {
-                        switch (data.getInt("r")) {
+                    ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketStartServer(null, args[0], data -> {
+                        switch (data.getInt(0x0001)) {
                             case 3:
                                 sender.sendMessage("There is no server with that name");
                                 break;
@@ -454,10 +456,8 @@ public class SubCommand {
                                 sender.sendMessage("That SubServer is already running");
                                 break;
                             case 9:
-                                sender.sendMessage("That SubServer cannot start while these server(s) are running:", data.getRawString("m").split(":\\s")[1]);
+                                sender.sendMessage("That SubServer cannot start while these server(s) are running:", data.getRawString(0x0002));
                                 break;
-                            default:
-                                host.log.warn.println("PacketStartServer(null, " + args[0] + ") responded with: " + data.getRawString("m"));
                             case 0:
                             case 1:
                                 sender.sendMessage("Server was started successfully");
@@ -502,8 +502,8 @@ public class SubCommand {
                     TimerTask starter = new TimerTask() {
                         @Override
                         public void run() {
-                            host.subdata.sendPacket(new PacketStartServer(null, args[0], data -> {
-                                switch (data.getInt("r")) {
+                            ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketStartServer(null, args[0], data -> {
+                                switch (data.getInt(0x0001)) {
                                     case 3:
                                     case 4:
                                         sender.sendMessage("Could not restart server: That SubServer has disappeared");
@@ -518,10 +518,8 @@ public class SubCommand {
                                         sender.sendMessage("Could not restart server: That SubServer is no longer enabled");
                                         break;
                                     case 9:
-                                        sender.sendMessage("Could not restart server: That SubServer cannot start while these server(s) are running:", data.getRawString("m").split(":\\s")[1]);
+                                        sender.sendMessage("Could not restart server: That SubServer cannot start while these server(s) are running:", data.getRawString(0x0002));
                                         break;
-                                    default:
-                                        host.log.warn.println("PacketStartServer(null, " + args[0] + ") responded with: " + data.getRawString("m"));
                                     case 8:
                                     case 0:
                                     case 1:
@@ -533,12 +531,12 @@ public class SubCommand {
                     };
 
                     final Container<Boolean> listening = new Container<Boolean>(true);
-                    PacketInRunEvent.callback("SubStoppedEvent", new Callback<YAMLSection>() {
+                    PacketInExRunEvent.callback("SubStoppedEvent", new Callback<ObjectMap<String>>() {
                         @Override
-                        public void run(YAMLSection json) {
+                        public void run(ObjectMap<String> json) {
                             try {
                                 if (listening.get()) if (!json.getString("server").equalsIgnoreCase(args[0])) {
-                                    PacketInRunEvent.callback("SubStoppedEvent", this);
+                                    PacketInExRunEvent.callback("SubStoppedEvent", this);
                                 } else {
                                     new Timer(SubAPI.getInstance().getAppInfo().getName() + "::Server_Restart_Command_Handler(" + args[0] + ')').schedule(starter, 100);
                                 }
@@ -546,9 +544,9 @@ public class SubCommand {
                         }
                     });
 
-                    host.subdata.sendPacket(new PacketStopServer(null, args[0], false, data -> {
-                        if (data.getInt("r") != 0) listening.set(false);
-                        switch (data.getInt("r")) {
+                    ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketStopServer(null, args[0], false, data -> {
+                        if (data.getInt(0x0001) != 0) listening.set(false);
+                        switch (data.getInt(0x0001)) {
                             case 3:
                                 sender.sendMessage("There is no server with that name");
                                 break;
@@ -558,8 +556,6 @@ public class SubCommand {
                             case 5:
                                 starter.run();
                                 break;
-                            default:
-                                host.log.warn.println("PacketStopServer(null, " + args[0] + ", false) responded with: " + data.getRawString("m"));
                             case 0:
                             case 1:
                                 sender.sendMessage("Server was stopped successfully");
@@ -585,8 +581,8 @@ public class SubCommand {
             @Override
             public void command(CommandSender sender, String handle, String[] args) {
                 if (args.length > 0) {
-                    host.subdata.sendPacket(new PacketStopServer(null, args[0], false, data -> {
-                        switch (data.getInt("r")) {
+                    ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketStopServer(null, args[0], false, data -> {
+                        switch (data.getInt(0x0001)) {
                             case 3:
                                 sender.sendMessage("There is no server with that name");
                                 break;
@@ -598,10 +594,6 @@ public class SubCommand {
                                 break;
                             case 0:
                             case 1:
-                                sender.sendMessage("Server was stopped successfully");
-                                break;
-                            default:
-                                host.log.warn.println("PacketStopServer(null, " + args[0] + ", false) responded with: " + data.getRawString("m"));
                                 sender.sendMessage("Server was stopped successfully");
                                 break;
                         }
@@ -625,8 +617,8 @@ public class SubCommand {
             @Override
             public void command(CommandSender sender, String handle, String[] args) {
                 if (args.length > 0) {
-                    host.subdata.sendPacket(new PacketStopServer(null, args[0], true, data -> {
-                        switch (data.getInt("r")) {
+                    ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketStopServer(null, args[0], true, data -> {
+                        switch (data.getInt(0x0001)) {
                             case 3:
                                 sender.sendMessage("There is no server with that name");
                                 break;
@@ -636,8 +628,6 @@ public class SubCommand {
                             case 5:
                                 sender.sendMessage("That SubServer is not running");
                                 break;
-                            default:
-                                host.log.warn.println("PacketStopServer(null, " + args[0] + ", true) responded with: " + data.getRawString("m"));
                             case 0:
                             case 1:
                                 sender.sendMessage("Server was terminated successfully");
@@ -672,8 +662,8 @@ public class SubCommand {
                         } while ((i + 1) != args.length);
                     }
                     final String cmd = str;
-                    host.subdata.sendPacket(new PacketCommandServer(null, args[0], cmd, data -> {
-                        switch (data.getInt("r")) {
+                    ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketCommandServer(null, args[0], cmd, data -> {
+                        switch (data.getInt(0x0001)) {
                             case 3:
                                 sender.sendMessage("There is no server with that name");
                                 break;
@@ -683,8 +673,6 @@ public class SubCommand {
                             case 5:
                                 sender.sendMessage("That SubServer is not running");
                                 break;
-                            default:
-                                host.log.warn.println("PacketCommandServer(null, " + args[0] + ", /" + cmd + ") responded with: " + data.getRawString("m"));
                             case 0:
                             case 1:
                                 sender.sendMessage("Command was sent successfully");
@@ -715,8 +703,8 @@ public class SubCommand {
                     if (args.length > 4 && Util.isException(() -> Integer.parseInt(args[4]))) {
                         sender.sendMessage("Invalid Port Number");
                     } else {
-                        host.subdata.sendPacket(new PacketCreateServer(null, args[0], args[1], args[2], new Version(args[3]), (args.length > 4)?Integer.parseInt(args[4]):null, data -> {
-                            switch (data.getInt("r")) {
+                        ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketCreateServer(null, args[0], args[1], args[2], new Version(args[3]), (args.length > 4)?Integer.parseInt(args[4]):null, data -> {
+                            switch (data.getInt(0x0001)) {
                                 case 3:
                                     sender.sendMessage("Server names cannot use spaces");
                                 case 4:
@@ -738,13 +726,11 @@ public class SubCommand {
                                     sender.sendMessage("That Template is not enabled");
                                     break;
                                 case 10:
-                                    sender.sendMessage("SubCreator cannot create servers before Minecraft 1.8");
+                                    sender.sendMessage("That Template requires a Minecraft Version to be specified");
                                     break;
                                 case 11:
                                     sender.sendMessage("Invalid Port Number");
                                     break;
-                                default:
-                                    host.log.warn.println("PacketCreateServer(null, " + args[0] + ", " + args[1] + ", " + args[2] + ", " + args[3] + ", " + ((args.length > 4)?args[4]:"null") + ") responded with: " + data.getRawString("m"));
                                 case 0:
                                 case 1:
                                     sender.sendMessage("Launching SubCreator...");
@@ -753,7 +739,7 @@ public class SubCommand {
                         }));
                     }
                 } else {
-                    sender.sendMessage("Usage: /" + handle + " <Name> <Host> <Template> <Version> <Port>");
+                    sender.sendMessage("Usage: /" + handle + " <Name> <Host> <Template> [Version] [Port]");
                 }
             }
         }.autocomplete((sender, handle, args) -> {
@@ -798,15 +784,16 @@ public class SubCommand {
                 "The <Template> argument is required, and should be the name of",
                 "the template you want to create your server with.",
                 "",
-                "The <Version> argument is required, and should be a version",
-                "string of the type of server that you want to create",
+                "When the [Version] argument is provided, it will set the",
+                "Minecraft version of the type of server that you want to create",
                 "",
-                "When the <Port> argument is provided, it will set the port number",
+                "When the [Port] argument is provided, it will set the port number",
                 "the server will listen on after it has been created.",
                 "",
                 "Examples:",
-                "  /create ExampleServer ExampleHost Spigot 1.13.1",
-                "  /create ExampleServer ExampleHost Spigot 1.13.1 25565"
+                "  /create ExampleServer ExampleHost Spigot",
+                "  /create ExampleServer ExampleHost Spigot 1.12.2",
+                "  /create ExampleServer ExampleHost Spigot 1.12.2 25565"
         ).register("create");
     }
 

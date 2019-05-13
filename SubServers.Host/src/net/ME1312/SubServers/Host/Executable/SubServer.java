@@ -4,6 +4,7 @@ import net.ME1312.Galaxi.Library.Container;
 import net.ME1312.Galaxi.Library.UniversalFile;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
+import net.ME1312.SubData.Client.SubDataClient;
 import net.ME1312.SubServers.Host.Library.Exception.InvalidServerException;
 import net.ME1312.SubServers.Host.Network.Packet.PacketExUpdateServer;
 import net.ME1312.SubServers.Host.ExHost;
@@ -110,8 +111,8 @@ public class SubServer {
         try {
             ProcessBuilder pb = new ProcessBuilder().command(Executable.parse(host.host.getRawString("Git-Bash"), executable)).directory(directory);
             pb.environment().put("name", getName());
-            if (host.subdata != null) pb.environment().put("host", host.subdata.getName());
-            pb.environment().put("address", host.config.get().getSection("Settings").getRawString("Server-Bind"));
+            if (SubAPI.getInstance().getSubDataNetwork()[0] != null) pb.environment().put("host", SubAPI.getInstance().getName());
+            pb.environment().put("address", host.config.get().getMap("Settings").getRawString("Server-Bind"));
             pb.environment().put("port", Integer.toString(getPort()));
             process = pb.start();
             falsestart = false;
@@ -130,10 +131,10 @@ public class SubServer {
         } catch (IOException | InterruptedException e) {
             host.log.error.println(e);
             allowrestart = false;
-            if (falsestart) host.subdata.sendPacket(new PacketExUpdateServer(this, PacketExUpdateServer.UpdateType.LAUNCH_EXCEPTION));
+            if (falsestart) ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketExUpdateServer(this, PacketExUpdateServer.UpdateType.LAUNCH_EXCEPTION));
         }
 
-        host.subdata.sendPacket(new PacketExUpdateServer(this, PacketExUpdateServer.UpdateType.STOPPED, (Integer) process.exitValue(), (Boolean) allowrestart));
+        ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketExUpdateServer(this, PacketExUpdateServer.UpdateType.STOPPED, (Integer) process.exitValue(), (Boolean) allowrestart));
         host.log.info.println(name + " has stopped");
         process = null;
         command = null;

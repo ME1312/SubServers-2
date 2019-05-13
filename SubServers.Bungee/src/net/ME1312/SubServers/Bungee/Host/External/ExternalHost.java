@@ -188,7 +188,7 @@ public class ExternalHost extends Host implements ClientHandler {
                 getSubServer(server).waitFor();
             }
             queue(new PacketExRemoveServer(server, data -> {
-                if (data.getInt(0x0001) == 0) {
+                if (data.getInt(0x0001) == 0 || data.getInt(0x0001) == 1) {
                     servers.remove(server.toLowerCase());
                 }
             }));
@@ -207,7 +207,7 @@ public class ExternalHost extends Host implements ClientHandler {
             getSubServer(server).terminate();
         }
         queue(new PacketExRemoveServer(server, data -> {
-            if (data.getInt(0x0001) == 0) {
+            if (data.getInt(0x0001) == 0 || data.getInt(0x0001) == 1) {
                 servers.remove(server.toLowerCase());
             }
         }));
@@ -242,7 +242,7 @@ public class ExternalHost extends Host implements ClientHandler {
 
             System.out.println("SubServers > Moving Files...");
             queue(new PacketExDeleteServer(server, info, true, data -> {
-                if (data.getInt(0x0001) == 0) {
+                if (data.getInt(0x0001) == 0 || data.getInt(0x0001) == 1) {
                     servers.remove(server.toLowerCase());
                     System.out.println("SubServers > Deleted SubServer: " + server);
                 } else {
@@ -279,7 +279,7 @@ public class ExternalHost extends Host implements ClientHandler {
 
         System.out.println("SubServers > Moving Files...");
         queue(new PacketExDeleteServer(server, info, true, data -> {
-            if (data.getInt(0x0001) == 0) {
+            if (data.getInt(0x0001) == 0 || data.getInt(0x0001) == 1) {
                 for (String group : getSubServer(server).getGroups()) getSubServer(server).removeGroup(group);
                 servers.remove(server.toLowerCase());
                 System.out.println("SubServers > Deleted SubServer: " + server);
@@ -318,7 +318,7 @@ public class ExternalHost extends Host implements ClientHandler {
 
             System.out.println("SubServers > Removing Files...");
             queue(new PacketExDeleteServer(server, info, false, data -> {
-                if (data.getInt(0x0001) == 0) {
+                if (data.getInt(0x0001) == 0 || data.getInt(0x0001) == 1) {
                     servers.remove(server.toLowerCase());
                     System.out.println("SubServers > Deleted SubServer: " + server);
                 } else {
@@ -355,7 +355,7 @@ public class ExternalHost extends Host implements ClientHandler {
 
         System.out.println("SubServers > Removing Files...");
         queue(new PacketExDeleteServer(server, info, false, data -> {
-            if (data.getInt(0x0001) == 0) {
+            if (data.getInt(0x0001) == 0 || data.getInt(0x0001) == 1) {
                 for (String group : getSubServer(server).getGroups()) getSubServer(server).removeGroup(group);
                 servers.remove(server.toLowerCase());
                 System.out.println("SubServers > Deleted SubServer: " + server);

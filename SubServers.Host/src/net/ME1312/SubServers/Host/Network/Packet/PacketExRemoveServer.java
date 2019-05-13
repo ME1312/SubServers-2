@@ -1,83 +1,81 @@
 package net.ME1312.SubServers.Host.Network.Packet;
 
 import com.dosse.upnp.UPnP;
-import net.ME1312.Galaxi.Library.Config.YAMLSection;
-import net.ME1312.Galaxi.Library.Log.Logger;
+import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
-import net.ME1312.SubServers.Host.Network.PacketIn;
-import net.ME1312.SubServers.Host.Network.PacketOut;
-import net.ME1312.SubServers.Host.Network.SubDataClient;
+import net.ME1312.SubData.Client.Protocol.PacketObjectIn;
+import net.ME1312.SubData.Client.Protocol.PacketObjectOut;
+import net.ME1312.SubData.Client.SubDataClient;
 import net.ME1312.SubServers.Host.ExHost;
+import net.ME1312.SubServers.Host.SubAPI;
 
-import java.lang.reflect.Field;
+import java.util.UUID;
+import java.util.logging.Logger;
 
 /**
  * Create Server Packet
  */
-public class PacketExRemoveServer implements PacketIn, PacketOut {
+public class PacketExRemoveServer implements PacketObjectIn<Integer>, PacketObjectOut<Integer> {
     private ExHost host;
     private int response;
-    private String message;
-    private String id;
-    private Logger log = null;
+    private UUID tracker;
 
     /**
      * New PacketExRemoveServer (In)
      *
-     * @param host SubPlugin
+     * @param host ExHost
      */
     public PacketExRemoveServer(ExHost host) {
         if (Util.isNull(host)) throw new NullPointerException();
         this.host = host;
-        Util.isException(() -> this.log = Util.reflect(SubDataClient.class.getDeclaredField("log"), null));
     }
 
     /**
      * New PacketExRemoveServer (Out)
      *
      * @param response Response ID
-     * @param message Message
-     * @param id Receiver ID
+     * @param tracker Receiver ID
      */
-    public PacketExRemoveServer(int response, String message, String id) {
-        if (Util.isNull(response, message)) throw new NullPointerException();
+    public PacketExRemoveServer(int response, UUID tracker) {
+        if (Util.isNull(response)) throw new NullPointerException();
         this.response = response;
-        this.message = message;
-        this.id = id;
+        this.tracker = tracker;
     }
 
     @Override
-    public YAMLSection generate() {
-        YAMLSection data = new YAMLSection();
-        if (id != null) data.set("id", id);
-        data.set("r", response);
-        data.set("m", message);
+    public ObjectMap<Integer> send(SubDataClient client) {
+        ObjectMap<Integer> data = new ObjectMap<Integer>();
+        if (tracker != null) data.set(0x0000, tracker);
+        data.set(0x0001, response);
         return data;
     }
 
     @Override
-    public void execute(YAMLSection data) {
+    public void receive(SubDataClient client, ObjectMap<Integer> data) {
+        Logger log = Util.getDespiteException(() -> Util.reflect(SubDataClient.class.getDeclaredField("log"), client), null);
+        UUID tracker =       (data.contains(0x0000)?data.getUUID(0x0000):null);
         try {
-            if (!host.servers.keySet().contains(data.getRawString("server").toLowerCase())) {
-                host.subdata.sendPacket(new PacketExRemoveServer(0, "Server Didn't Exist", (data.contains("id"))?data.getRawString("id"):null));
-            } else if (host.servers.get(data.getRawString("server").toLowerCase()).isRunning()) {
-                host.subdata.sendPacket(new PacketExRemoveServer(2, "That server is still running.", (data.contains("id"))?data.getRawString("id"):null));
+            String name = data.getRawString(0x0001);
+            if (!host.servers.keySet().contains(name.toLowerCase())) {
+                ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketExRemoveServer(1, tracker));
+            } else if (host.servers.get(name.toLowerCase()).isRunning()) {
+                ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketExRemoveServer(3, tracker));
             } else {
-                if (UPnP.isUPnPAvailable() && UPnP.isMappedTCP(host.servers.get(data.getRawString("server").toLowerCase()).getPort()))
-                    UPnP.closePortTCP(host.servers.get(data.getRawString("server").toLowerCase()).getPort());
-                host.servers.remove(data.getRawString("server").toLowerCase());
-                log.info.println("Removed SubServer: " + data.getRawString("server"));
-                host.subdata.sendPacket(new PacketExRemoveServer(0, "Server Removed Successfully", (data.contains("id"))?data.getRawString("id"):null));
+                if (UPnP.isUPnPAvailable() && UPnP.isMappedTCP(host.servers.get(name.toLowerCase()).getPort()))
+                    UPnP.closePortTCP(host.servers.get(name.toLowerCase()).getPort());
+                host.servers.remove(name.toLowerCase());
+                log.info("Removed SubServer: " + name);
+                ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketExRemoveServer(0, tracker));
             }
         } catch (Throwable e) {
-            host.subdata.sendPacket(new PacketExRemoveServer(1, e.getClass().getCanonicalName() + ": " + e.getMessage(), (data.contains("id"))?data.getRawString("id"):null));
+            ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketExRemoveServer(2, tracker));
             host.log.error.println(e);
         }
     }
 
     @Override
-    public Version getVersion() {
-        return new Version("2.11.0a");
+    public int version() {
+        return 0x0001;
     }
 }

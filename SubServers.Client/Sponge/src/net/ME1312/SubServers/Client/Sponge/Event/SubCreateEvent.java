@@ -30,7 +30,7 @@ public class SubCreateEvent extends AbstractEvent implements SubEvent {
      * @param port Server Port Number
      */
     public SubCreateEvent(UUID player, String host, String name, String template, Version version, int port) {
-        if (Util.isNull(host, name, template, version, port)) throw new NullPointerException();
+        if (Util.isNull(host, name, template, port)) throw new NullPointerException();
         this.player = player;
         this.host = host;
         this.name = name;

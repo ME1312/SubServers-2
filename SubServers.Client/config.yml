@@ -1,9 +1,0 @@
-Settings:
-  Version: '2.11.2a+'
-  Ingame-Access: true
-  Show-Addresses: false
-  Use-Title-Messages: true
-  SubData:
-    Address: '127.0.0.1:4391'
-    Password: 'default'
-    Encryption: 'AES'

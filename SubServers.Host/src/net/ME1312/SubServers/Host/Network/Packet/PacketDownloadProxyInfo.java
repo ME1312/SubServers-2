@@ -1,22 +1,24 @@
 package net.ME1312.SubServers.Host.Network.Packet;
 
-import net.ME1312.Galaxi.Library.Callback;
-import net.ME1312.Galaxi.Library.Config.YAMLSection;
+import net.ME1312.Galaxi.Library.Callback.Callback;
+import net.ME1312.Galaxi.Library.Map.ObjectMap;
+import net.ME1312.Galaxi.Library.NamedContainer;
 import net.ME1312.Galaxi.Library.Util;
-import net.ME1312.Galaxi.Library.Version.Version;
-import net.ME1312.SubServers.Host.Network.PacketIn;
-import net.ME1312.SubServers.Host.Network.PacketOut;
+import net.ME1312.SubData.Client.Protocol.PacketObjectIn;
+import net.ME1312.SubData.Client.Protocol.PacketObjectOut;
+import net.ME1312.SubData.Client.SubDataClient;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 /**
  * Download Proxy Info Packet
  */
-public class PacketDownloadProxyInfo implements PacketIn, PacketOut {
-    private static HashMap<String, Callback<YAMLSection>[]> callbacks = new HashMap<String, Callback<YAMLSection>[]>();
+public class PacketDownloadProxyInfo implements PacketObjectIn<Integer>, PacketObjectOut<Integer> {
+    private static HashMap<UUID, NamedContainer<Boolean, Callback<ObjectMap<String>>[]>> callbacks = new HashMap<UUID, NamedContainer<Boolean, Callback<ObjectMap<String>>[]>>();
     private String proxy;
-    private String id;
+    private UUID tracker;
 
     /**
      * New PacketDownloadProxyInfo (In)
@@ -30,29 +32,35 @@ public class PacketDownloadProxyInfo implements PacketIn, PacketOut {
      * @param callback Callbacks
      */
     @SafeVarargs
-    public PacketDownloadProxyInfo(String proxy, Callback<YAMLSection>... callback) {
+    public PacketDownloadProxyInfo(String proxy, Callback<ObjectMap<String>>... callback) {
         if (Util.isNull((Object) callback)) throw new NullPointerException();
         this.proxy = proxy;
-        this.id = Util.getNew(callbacks.keySet(), UUID::randomUUID).toString();
-        callbacks.put(id, callback);
+        this.tracker = Util.getNew(callbacks.keySet(), UUID::randomUUID);
+        callbacks.put(tracker, new NamedContainer<>(proxy != null && proxy.length() <= 0, callback));
     }
 
     @Override
-    public YAMLSection generate() {
-        YAMLSection json = new YAMLSection();
-        json.set("id", id);
-        if (proxy != null) json.set("proxy", proxy);
+    public ObjectMap<Integer> send(SubDataClient client) {
+        ObjectMap<Integer> json = new ObjectMap<Integer>();
+        json.set(0x0000, tracker);
+        if (proxy != null) json.set(0x0001, proxy);
         return json;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public void execute(YAMLSection data) {
-        for (Callback<YAMLSection> callback : callbacks.get(data.getRawString("id"))) callback.run(data);
-        callbacks.remove(data.getRawString("id"));
+    public void receive(SubDataClient client, ObjectMap<Integer> data) {
+        boolean mode = callbacks.get(data.getUUID(0x0000)).name();
+        for (Callback<ObjectMap<String>> callback : callbacks.get(data.getUUID(0x0000)).get()) {
+            if (mode) {
+                callback.run((data.contains(0x0002))?new ObjectMap<String>((Map<String, ?>) data.getObject(0x0002)):null);
+            } else callback.run(new ObjectMap<String>((Map<String, ?>) data.getObject(0x0001)));
+        }
+        callbacks.remove(data.getUUID(0x0000));
     }
 
     @Override
-    public Version getVersion() {
-        return new Version("2.13b");
+    public int version() {
+        return 0x0001;
     }
 }

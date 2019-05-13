@@ -23,7 +23,6 @@ import java.util.logging.Logger;
 
 public class SubProtocol extends SubDataProtocol {
     private static SubProtocol instance;
-    private static Logger log;
     private SubProtocol() {}
 
     @SuppressWarnings("deprecation")
@@ -31,33 +30,6 @@ public class SubProtocol extends SubDataProtocol {
         if (instance == null) {
             instance = new SubProtocol();
             SubPlugin plugin = SubAPI.getInstance().getInternals();
-
-            log = Logger.getAnonymousLogger();
-            log.setUseParentHandlers(false);
-            log.addHandler(new Handler() {
-                private boolean open = true;
-
-                @Override
-                public void publish(LogRecord record) {
-                    if (open) {
-                        if (plugin.isEnabled()) {
-                            Bukkit.getScheduler().runTask(plugin, () -> Bukkit.getLogger().log(record.getLevel(), "SubData > " + record.getMessage(), record.getParameters()));
-                        } else {
-                            Bukkit.getLogger().log(record.getLevel(), "SubData > " + record.getMessage(), record.getParameters());
-                        }
-                    }
-                }
-
-                @Override
-                public void flush() {
-
-                }
-
-                @Override
-                public void close() throws SecurityException {
-                    open = false;
-                }
-            });
 
             instance.setName("SubServers 2");
             instance.addVersion(new Version("2.14a+"));
@@ -125,16 +97,50 @@ public class SubProtocol extends SubDataProtocol {
         return instance;
     }
 
+    @SuppressWarnings("deprecation")
+    private Logger getLogger(int channel) {
+        SubPlugin plugin = SubAPI.getInstance().getInternals();
+        Logger log = Logger.getAnonymousLogger();
+        log.setUseParentHandlers(false);
+        log.addHandler(new Handler() {
+            private boolean open = true;
+            private String prefix = "SubData" + ((channel != 0)? "/Sub-"+channel:"");
+
+            @Override
+            public void publish(LogRecord record) {
+                if (open) {
+                    if (plugin.isEnabled()) {
+                        Bukkit.getScheduler().runTask(plugin, () -> Bukkit.getLogger().log(record.getLevel(), prefix + " > " + record.getMessage(), record.getParameters()));
+                    } else {
+                        Bukkit.getLogger().log(record.getLevel(), prefix + " > " + record.getMessage(), record.getParameters());
+                    }
+                }
+            }
+
+            @Override
+            public void flush() {
+
+            }
+
+            @Override
+            public void close() throws SecurityException {
+                open = false;
+            }
+        });
+
+        return log;
+    }
+
     @Override
     protected SubDataClient sub(Callback<Runnable> scheduler, Logger logger, InetAddress address, int port) throws IOException {
         SubPlugin plugin = SubAPI.getInstance().getInternals();
-        SubDataClient subdata = super.open(scheduler, logger, address, port);
         HashMap<Integer, SubDataClient> map = Util.getDespiteException(() -> Util.reflect(SubPlugin.class.getDeclaredField("subdata"), plugin), null);
 
         int channel = 1;
         while (map.keySet().contains(channel)) channel++;
         final int fc = channel;
 
+        SubDataClient subdata = super.open(scheduler, getLogger(fc), address, port);
         map.put(fc, subdata);
         subdata.sendPacket(new PacketLinkServer(plugin, fc));
         subdata.on.closed(client -> map.remove(fc));
@@ -193,6 +199,6 @@ public class SubProtocol extends SubDataProtocol {
     }
 
     public SubDataClient open(InetAddress address, int port) throws IOException {
-        return open(log, address, port);
+        return open(getLogger(0), address, port);
     }
 }

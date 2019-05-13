@@ -1,8 +1,8 @@
 package net.ME1312.SubServers.Host.Network.Packet;
 
-import net.ME1312.Galaxi.Library.Config.YAMLSection;
-import net.ME1312.Galaxi.Library.Version.Version;
-import net.ME1312.SubServers.Host.Network.PacketIn;
+import net.ME1312.Galaxi.Library.Map.ObjectMap;
+import net.ME1312.SubData.Client.Protocol.PacketObjectIn;
+import net.ME1312.SubData.Client.SubDataClient;
 import net.ME1312.SubServers.Host.ExHost;
 
 import java.util.ArrayList;
@@ -11,15 +11,15 @@ import java.util.List;
 /**
  * Reset Packet
  */
-public class PacketInReset implements PacketIn {
+public class PacketInExReset implements PacketObjectIn<Integer> {
     private ExHost host;
 
-    public PacketInReset(ExHost host) {
+    public PacketInExReset(ExHost host) {
         this.host = host;
     }
 
     @Override
-    public void execute(YAMLSection data) {
+    public void receive(SubDataClient client, ObjectMap<Integer> data) {
         List<String> subservers = new ArrayList<String>();
         subservers.addAll(host.servers.keySet());
 
@@ -43,7 +43,7 @@ public class PacketInReset implements PacketIn {
     }
 
     @Override
-    public Version getVersion() {
-        return new Version("2.11.0a");
+    public int version() {
+        return 0x0001;
     }
 }

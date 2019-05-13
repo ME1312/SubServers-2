@@ -7,6 +7,7 @@ import net.ME1312.Galaxi.Event.GalaxiReloadEvent;
 import net.ME1312.Galaxi.Galaxi;
 import net.ME1312.Galaxi.Library.Config.YAMLConfig;
 import net.ME1312.Galaxi.Library.Config.YAMLSection;
+import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Log.Logger;
 import net.ME1312.Galaxi.Library.NamedContainer;
 import net.ME1312.Galaxi.Library.UniversalFile;
@@ -15,12 +16,16 @@ import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.Galaxi.Library.Version.VersionType;
 import net.ME1312.Galaxi.Plugin.Plugin;
 import net.ME1312.Galaxi.Plugin.PluginInfo;
+import net.ME1312.SubData.Client.Encryption.AES;
+import net.ME1312.SubData.Client.Encryption.RSA;
+import net.ME1312.SubData.Client.Protocol.PacketObjectIn;
+import net.ME1312.SubData.Client.SubDataClient;
 import net.ME1312.SubServers.Host.Executable.SubCreator;
 import net.ME1312.SubServers.Host.Executable.SubLogger;
 import net.ME1312.SubServers.Host.Executable.SubServer;
 import net.ME1312.SubServers.Host.Library.*;
-import net.ME1312.SubServers.Host.Network.Cipher;
-import net.ME1312.SubServers.Host.Network.SubDataClient;
+import net.ME1312.SubServers.Host.Library.Updates.ConfigUpdater;
+import net.ME1312.SubServers.Host.Network.SubProtocol;
 import org.json.JSONObject;
 
 import java.io.*;
@@ -38,6 +43,7 @@ import java.util.jar.Manifest;
  */
 @Plugin(name = "SubServers.Host", version = "2.14a", authors = "ME1312", description = "Host SubServers from other Machines", website = "https://github.com/ME1312/SubServers-2")
 public final class ExHost {
+    protected HashMap<Integer, SubDataClient> subdata = new HashMap<Integer, SubDataClient>();
     protected NamedContainer<Long, Map<String, Map<String, String>>> lang = null;
     public HashMap<String, SubCreator.ServerTemplate> templates = new HashMap<String, SubCreator.ServerTemplate>();
     public HashMap<String, SubServer> servers = new HashMap<String, SubServer>();
@@ -47,11 +53,12 @@ public final class ExHost {
     public PluginInfo info;
     public GalaxiEngine engine;
     public YAMLConfig config;
-    public YAMLSection host = null;
-    public SubDataClient subdata = null;
+    public ObjectMap<String> host = null;
+    public SubProtocol subprotocol;
 
     public final SubAPI api = new SubAPI(this);
 
+    private boolean reconnect = true;
     private boolean running = false;
 
     /**
@@ -136,15 +143,8 @@ public final class ExHost {
             info.setIcon(ExHost.class.getResourceAsStream("/net/ME1312/SubServers/Host/Library/Files/icon.png"));
             engine = GalaxiEngine.init(info);
             log.info.println("Loading SubServers.Host v" + info.getVersion().toString() + " Libraries");
-            if (!(new UniversalFile(engine.getRuntimeDirectory(), "config.yml").exists())) {
-                Util.copyFromJar(ExHost.class.getClassLoader(), "net/ME1312/SubServers/Host/Library/Files/config.yml", new UniversalFile(engine.getRuntimeDirectory(), "config.yml").getPath());
-                log.info.println("Created ./config.yml");
-            } else if (((new YAMLConfig(new UniversalFile(engine.getRuntimeDirectory(), "config.yml"))).get().getSection("Settings").getVersion("Version", new Version(0)).compareTo(new Version("2.11.2a+"))) != 0) {
-                Files.move(new UniversalFile(engine.getRuntimeDirectory(), "config.yml").toPath(), new UniversalFile(engine.getRuntimeDirectory(), "config.old" + Math.round(Math.random() * 100000) + ".yml").toPath());
 
-                Util.copyFromJar(ExHost.class.getClassLoader(), "net/ME1312/SubServers/Host/Library/Files/config.yml", new UniversalFile(engine.getRuntimeDirectory(), "config.yml").getPath());
-                log.info.println("Updated ./config.yml");
-            }
+            ConfigUpdater.updateConfig(new UniversalFile(engine.getRuntimeDirectory(), "config.yml"));
             config = new YAMLConfig(new UniversalFile(engine.getRuntimeDirectory(), "config.yml"));
 
             if (!(new UniversalFile(engine.getRuntimeDirectory(), "Templates").exists())) {
@@ -191,34 +191,16 @@ public final class ExHost {
                 }
             }
 
-            Util.reflect(SubLogger.class.getDeclaredField("logn"), null, config.get().getSection("Settings").getBoolean("Network-Log", true));
-            Util.reflect(SubLogger.class.getDeclaredField("logc"), null, config.get().getSection("Settings").getBoolean("Console-Log", true));
+            Util.reflect(SubLogger.class.getDeclaredField("logn"), null, config.get().getMap("Settings").getBoolean("Network-Log", true));
+            Util.reflect(SubLogger.class.getDeclaredField("logc"), null, config.get().getMap("Settings").getBoolean("Console-Log", true));
 
             engine.getPluginManager().loadPlugins(new UniversalFile(engine.getRuntimeDirectory(), "Plugins"));
 
             running = true;
-            Cipher cipher = null;
-            if (!config.get().getSection("Settings").getSection("SubData").getRawString("Encryption", "NONE").equalsIgnoreCase("NONE")) {
-                if (config.get().getSection("Settings").getSection("SubData").getString("Password", "").length() == 0) {
-                    log.info.println("Cannot encrypt connection without a password");
-                } else if (!SubDataClient.getCiphers().keySet().contains(config.get().getSection("Settings").getSection("SubData").getRawString("Encryption").toUpperCase().replace('-', '_').replace(' ', '_'))) {
-                    log.info.println("Unknown encryption type: " + config.get().getSection("Settings").getSection("SubData").getRawString("Encryption"));
-                } else {
-                    cipher = SubDataClient.getCipher(config.get().getSection("Settings").getSection("SubData").getRawString("Encryption"));
-                }
-            }
-            subdata = new SubDataClient(this, config.get().getSection("Settings").getSection("SubData").getString("Name", "undefined"),
-                    InetAddress.getByName(config.get().getSection("Settings").getSection("SubData").getString("Address", "127.0.0.1:4391").split(":")[0]),
-                    Integer.parseInt(config.get().getSection("Settings").getSection("SubData").getString("Address", "127.0.0.1:4391").split(":")[1]), cipher);
-            Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-                if (running) {
-                    log.warn.println("Received request from system to shutdown");
-                    engine.stop();
-                }
-            }, SubAPI.getInstance().getAppInfo().getName() + "::System_Shutdown"));
             creator = new SubCreator(this);
-
+            subprotocol = SubProtocol.get();
             loadDefaults();
+            reload(false);
 
             new Metrics(this);
             info.setUpdateChecker(() -> {
@@ -228,7 +210,7 @@ public final class ExHost {
 
                     Version updversion = info.getVersion();
                     int updcount = 0;
-                    for (YAMLSection tag : tags.getSectionList("tags")) versions.add(Version.fromString(tag.getString("ref").substring(10)));
+                    for (ObjectMap<String> tag : tags.getMapList("tags")) versions.add(Version.fromString(tag.getString("ref").substring(10)));
                     Collections.sort(versions);
                     for (Version version : versions) {
                         if (version.compareTo(updversion) > 0) {
@@ -251,38 +233,61 @@ public final class ExHost {
         }
     }
 
-    public void reload() throws IOException {
-        if (subdata != null)
-            subdata.destroy(0);
-
-        config.reload();
-
-        try {
-            Util.reflect(SubLogger.class.getDeclaredField("logn"), null, config.get().getSection("Settings").getBoolean("Network-Log", true));
-            Util.reflect(SubLogger.class.getDeclaredField("logc"), null, config.get().getSection("Settings").getBoolean("Console-Log", true));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        Cipher cipher = null;
-        if (!config.get().getSection("Settings").getSection("SubData").getRawString("Encryption", "NONE").equalsIgnoreCase("NONE")) {
-            if (config.get().getSection("Settings").getSection("SubData").getString("Password", "").length() == 0) {
-                log.info.println("Cannot encrypt connection without a password");
-            } else if (!SubDataClient.getCiphers().keySet().contains(config.get().getSection("Settings").getSection("SubData").getRawString("Encryption").toUpperCase().replace('-', '_').replace(' ', '_'))) {
-                log.info.println("Unknown encryption type: " + config.get().getSection("Settings").getSection("SubData").getRawString("Encryption"));
-            } else {
-                cipher = SubDataClient.getCipher(config.get().getSection("Settings").getSection("SubData").getRawString("Encryption"));
-            }
-        }
-        subdata = new SubDataClient(this, config.get().getSection("Settings").getSection("SubData").getString("Name", "undefined"),
-                InetAddress.getByName(config.get().getSection("Settings").getSection("SubData").getString("Address", "127.0.0.1:4391").split(":")[0]),
-                Integer.parseInt(config.get().getSection("Settings").getSection("SubData").getString("Address", "127.0.0.1:4391").split(":")[1]), cipher);
-
-        engine.getPluginManager().executeEvent(new GalaxiReloadEvent(engine));
-    }
-
     private void loadDefaults() {
         SubCommand.load(this);
+    }
+
+    public void reload(boolean notifyPlugins) throws IOException {
+        reconnect = false;
+        ArrayList<SubDataClient> tmp = new ArrayList<SubDataClient>();
+        tmp.addAll(subdata.values());
+        for (SubDataClient client : tmp) if (client != null) {
+            client.close();
+            Util.isException(client::waitFor);
+        }
+        subdata.clear();
+        subdata.put(0, null);
+
+        ConfigUpdater.updateConfig(new UniversalFile(engine.getRuntimeDirectory(), "config.yml"));
+        config.reload();
+
+        subprotocol.unregisterCipher("AES");
+        subprotocol.unregisterCipher("AES-128");
+        subprotocol.unregisterCipher("AES-192");
+        subprotocol.unregisterCipher("AES-256");
+        subprotocol.unregisterCipher("RSA");
+        api.name = config.get().getMap("Settings").getMap("SubData").getString("Name", null);
+        Logger log = new Logger("SubData");
+
+        if (config.get().getMap("Settings").getMap("SubData").getRawString("Password", "").length() > 0) {
+            subprotocol.registerCipher("AES", new AES(128, config.get().getMap("Settings").getMap("SubData").getRawString("Password")));
+            subprotocol.registerCipher("AES-128", new AES(128, config.get().getMap("Settings").getMap("SubData").getRawString("Password")));
+            subprotocol.registerCipher("AES-192", new AES(192, config.get().getMap("Settings").getMap("SubData").getRawString("Password")));
+            subprotocol.registerCipher("AES-256", new AES(256, config.get().getMap("Settings").getMap("SubData").getRawString("Password")));
+
+            log.info.println("AES Encryption Available");
+        }
+        if (new UniversalFile(engine.getRuntimeDirectory(), "subdata.rsa.key").exists()) {
+            try {
+                subprotocol.registerCipher("RSA", new RSA(new UniversalFile(engine.getRuntimeDirectory(), "subdata.rsa.key")));
+                log.info.println("RSA Encryption Available");
+            } catch (Exception e) {
+                log.error.println(e);
+            }
+        }
+
+        reconnect = true;
+        log.info.println();
+        connect();
+
+        if (notifyPlugins) {
+            engine.getPluginManager().executeEvent(new GalaxiReloadEvent(engine));
+        }
+    }
+
+    private void connect() throws IOException {
+        subdata.put(0, subprotocol.open((config.get().getMap("Settings").getMap("SubData").getRawString("Address", "127.0.0.1:4391").split(":")[0].equals("0.0.0.0"))?null:InetAddress.getByName(config.get().getMap("Settings").getMap("SubData").getRawString("Address", "127.0.0.1:4391").split(":")[0]),
+                Integer.parseInt(config.get().getMap("Settings").getMap("SubData").getRawString("Address", "127.0.0.1:4391").split(":")[1])));
     }
 
     private void stop() {
@@ -318,7 +323,20 @@ public final class ExHost {
             } catch (Exception e) {
                 log.error.println(e);
             }
-            if (subdata != null) Util.isException(() -> subdata.destroy(0));
+
+            reconnect = false;
+            try {
+                ArrayList<SubDataClient> temp = new ArrayList<SubDataClient>();
+                temp.addAll(subdata.values());
+                for (SubDataClient client : temp) if (client != null)  {
+                    client.close();
+                    client.waitFor();
+                }
+                subdata.clear();
+                subdata.put(0, null);
+            } catch (Exception e) {
+                log.error.println(e);
+            }
 
             if (new File(engine.getRuntimeDirectory(), "Templates").exists()) Util.deleteDirectory(new File(engine.getRuntimeDirectory(), "Templates"));
         }

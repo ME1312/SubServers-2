@@ -1,74 +1,69 @@
 package net.ME1312.SubServers.Host.Network.Packet;
 
 import net.ME1312.Galaxi.Engine.GalaxiEngine;
-import net.ME1312.Galaxi.Library.Config.YAMLSection;
-import net.ME1312.Galaxi.Library.Log.Logger;
+import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.UniversalFile;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
+import net.ME1312.SubData.Client.Protocol.Initial.InitialPacket;
+import net.ME1312.SubData.Client.Protocol.PacketObjectIn;
+import net.ME1312.SubData.Client.Protocol.PacketOut;
+import net.ME1312.SubData.Client.SubDataClient;
 import net.ME1312.SubServers.Host.Executable.SubCreator;
-import net.ME1312.SubServers.Host.Network.PacketIn;
-import net.ME1312.SubServers.Host.Network.PacketOut;
-import net.ME1312.SubServers.Host.Network.SubDataClient;
 import net.ME1312.SubServers.Host.ExHost;
-import org.msgpack.value.Value;
 
-import java.io.ByteArrayInputStream;
-import java.lang.reflect.Field;
+import java.util.Map;
 
 /**
  * External Host Configuration Packet
  */
-public class PacketExConfigureHost implements PacketIn, PacketOut {
+public class PacketExConfigureHost implements PacketObjectIn<Integer>, PacketOut {
     private static boolean first = false;
     private ExHost host;
-    private Logger log = null;
 
     /**
      * New PacketExConfigureHost
      */
     public PacketExConfigureHost(ExHost host) {
         this.host = host;
-        Util.isException(() -> this.log = Util.reflect(SubDataClient.class.getDeclaredField("log"), null));
     }
 
     @Override
-    public YAMLSection generate() {
+    public void sending(SubDataClient client) {
         host.log.info.println("Downloading Host Settings...");
         first = true;
-        return null;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public void execute(YAMLSection data) {
-        host.host = data.getSection("host").clone();
+    public void receive(SubDataClient client, ObjectMap<Integer> data) {
+        host.host = new ObjectMap<>((Map<String, ?>) data.getObject(0x0000));
         for (SubCreator.ServerTemplate template : host.templates.values()) {
             Util.deleteDirectory(template.getDirectory());
         }
         host.templates.clear();
-        UniversalFile templates = new UniversalFile(GalaxiEngine.getInstance().getRuntimeDirectory(), "Templates");
-        Util.deleteDirectory(templates);
-        templates.mkdirs();
-        for (String name : data.getSection("templates").getKeys()) {
+        UniversalFile templatedir = new UniversalFile(GalaxiEngine.getInstance().getRuntimeDirectory(), "Templates");
+        ObjectMap<String> templates = new ObjectMap<>((Map<String, ?>) data.getObject(0x0001));
+        Util.deleteDirectory(templatedir);
+        templatedir.mkdirs();
+        for (String name : templates.getKeys()) {
             try {
-                UniversalFile dir = new UniversalFile(templates, name);
-                dir.mkdirs();
-                Util.unzip(new ByteArrayInputStream(((Value) data.getSection("templates").getSection(name).getObject("files")).asBinaryValue().asByteArray()), dir);
-                SubCreator.ServerTemplate template = new SubCreator.ServerTemplate(name, data.getSection("templates").getSection(name).getBoolean("enabled"), data.getSection("templates").getSection(name).getRawString("icon"), dir,
-                        data.getSection("templates").getSection(name).getSection("build").clone(), data.getSection("templates").getSection(name).getSection("settings").clone());
+                UniversalFile dir = new UniversalFile(templatedir, name);
+                SubCreator.ServerTemplate template = new SubCreator.ServerTemplate(name, templates.getMap(name).getBoolean("enabled"), templates.getMap(name).getRawString("icon"), dir,
+                        templates.getMap(name).getMap("build").clone(), templates.getMap(name).getMap("settings").clone());
                 host.templates.put(name.toLowerCase(), template);
-                if (!data.getSection("templates").getSection(name).getRawString("display").equals(name)) template.setDisplayName(data.getSection("templates").getSection(name).getRawString("display"));
+                if (!templates.getMap(name).getRawString("display").equals(name)) template.setDisplayName(templates.getMap(name).getRawString("display"));
             } catch (Exception e) {
                 host.log.error.println("Couldn't load template: " + name);
                 host.log.error.println(e);
             }
         }
-        log.info.println(((first)?"":"New ") + "Host Settings Downloaded");
+        host.log.info.println(((first)?"":"New ") + "Host Settings Downloaded");
         first = false;
     }
 
     @Override
-    public Version getVersion() {
-        return new Version("2.11.0a");
+    public int version() {
+        return 0x0001;
     }
 }
