@@ -11,45 +11,49 @@ import java.util.HashMap;
 import java.util.UUID;
 
 /**
- * Stop Server Packet
+ * Edit Server Packet
  */
-public class PacketStopServer implements PacketObjectIn<Integer>, PacketObjectOut<Integer> {
+public class PacketEditServer implements PacketObjectIn<Integer>, PacketObjectOut<Integer> {
     private static HashMap<UUID, Callback<ObjectMap<Integer>>[]> callbacks = new HashMap<UUID, Callback<ObjectMap<Integer>>[]>();
     private UUID player;
-    private boolean force;
     private String server;
-    private UUID id;
+    private ObjectMap<String> edit;
+    private boolean perma;
+    private UUID tracker;
 
     /**
-     * New PacketStopServer (In)
+     * New PacketEditServer (In)
      */
-    public PacketStopServer() {}
+    public PacketEditServer() {}
 
     /**
-     * New PacketStopServer (Out)
+     * New PacketEditServer (Out)
      *
-     * @param player Player Starting
+     * @param player Player Editing
      * @param server Server
-     * @param force Force Stop
+     * @param edit Edits
+     * @param perma Save Changes
      * @param callback Callbacks
      */
     @SafeVarargs
-    public PacketStopServer(UUID player, String server, boolean force, Callback<ObjectMap<Integer>>... callback) {
-        if (Util.isNull(server, force, callback)) throw new NullPointerException();
+    public PacketEditServer(UUID player, String server, ObjectMap<String> edit, boolean perma, Callback<ObjectMap<Integer>>... callback) {
+        if (Util.isNull(server, callback)) throw new NullPointerException();
         this.player = player;
         this.server = server;
-        this.force = force;
-        this.id = Util.getNew(callbacks.keySet(), UUID::randomUUID);
-        callbacks.put(id, callback);
+        this.edit = edit;
+        this.perma = perma;
+        this.tracker = Util.getNew(callbacks.keySet(), UUID::randomUUID);
+        callbacks.put(tracker, callback);
     }
 
     @Override
     public ObjectMap<Integer> send(SubDataClient client) {
         ObjectMap<Integer> data = new ObjectMap<Integer>();
-        data.set(0x0000, id);
+        data.set(0x0000, tracker);
         data.set(0x0001, server);
-        data.set(0x0002, force);
-        if (player != null) data.set(0x0003, player.toString());
+        data.set(0x0002, edit);
+        data.set(0x0003, perma);
+        if (player != null) data.set(0x0004, player.toString());
         return data;
     }
 

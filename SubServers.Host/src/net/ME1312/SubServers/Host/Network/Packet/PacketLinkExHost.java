@@ -4,6 +4,7 @@ import net.ME1312.Galaxi.Engine.GalaxiEngine;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
+import net.ME1312.SubData.Client.Library.DebugUtil;
 import net.ME1312.SubData.Client.Protocol.Initial.InitialPacket;
 import net.ME1312.SubData.Client.Protocol.PacketObjectIn;
 import net.ME1312.SubData.Client.Protocol.PacketObjectOut;
@@ -57,7 +58,8 @@ public class PacketLinkExHost implements InitialPacket, PacketObjectIn<Integer>,
         if (data.getInt(0x0001) == 0) {
             setReady(client, true);
         } else {
-            log.info("Could not link name with host" + ((data.contains(0x0002))?": "+data.getRawString(0x0002):'.'));
+            log.severe("Could not link name with host" + ((data.contains(0x0002))?": "+data.getRawString(0x0002):'.'));
+            DebugUtil.logException(new IllegalStateException(), log);
             GalaxiEngine.getInstance().stop();
         }
     }

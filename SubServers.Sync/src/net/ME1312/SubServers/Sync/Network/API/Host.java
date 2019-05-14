@@ -1,11 +1,17 @@
 package net.ME1312.SubServers.Sync.Network.API;
 
-import net.ME1312.SubServers.Sync.Library.Config.YAMLSection;
-import net.ME1312.SubServers.Sync.Library.Config.YAMLValue;
-import net.ME1312.SubServers.Sync.Library.Util;
+import net.ME1312.Galaxi.Library.Callback.Callback;
+import net.ME1312.Galaxi.Library.Map.ObjectMap;
+import net.ME1312.Galaxi.Library.Map.ObjectMapValue;
+import net.ME1312.Galaxi.Library.Util;
+import net.ME1312.SubData.Client.SubDataClient;
+import net.ME1312.SubServers.Sync.Network.Packet.PacketAddServer;
+import net.ME1312.SubServers.Sync.Network.Packet.PacketDeleteServer;
 import net.ME1312.SubServers.Sync.Network.Packet.PacketDownloadHostInfo;
+import net.ME1312.SubServers.Sync.Network.Packet.PacketRemoveServer;
 import net.ME1312.SubServers.Sync.SubAPI;
 
+import java.lang.reflect.InvocationTargetException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.*;
@@ -13,7 +19,7 @@ import java.util.*;
 public class Host {
     HashMap<String, SubServer> servers = new HashMap<String, SubServer>();
     private SubCreator creator;
-    YAMLSection raw;
+    ObjectMap<String> raw;
     long timestamp;
 
     /**
@@ -21,7 +27,7 @@ public class Host {
      *
      * @param raw Raw representation of the Host
      */
-    public Host(YAMLSection raw) {
+    public Host(ObjectMap<String> raw) {
         load(raw);
     }
 
@@ -30,14 +36,14 @@ public class Host {
         return obj instanceof Host && getSignature().equals(((Host) obj).getSignature());
     }
 
-    private void load(YAMLSection raw) {
+    private void load(ObjectMap<String> raw) {
         this.raw = raw;
         this.timestamp = Calendar.getInstance().getTime().getTime();
 
         servers.clear();
-        this.creator = new SubCreator(this, raw.getSection("creator"));
-        for (String server : raw.getSection("servers").getKeys()) {
-            servers.put(server.toLowerCase(), new SubServer(this, raw.getSection("servers").getSection(server)));
+        this.creator = new SubCreator(this, raw.getMap("creator"));
+        for (String server : raw.getMap("servers").getKeys()) {
+            servers.put(server.toLowerCase(), new SubServer(this, raw.getMap("servers").getMap(server)));
         }
     }
 
@@ -46,16 +52,26 @@ public class Host {
      */
     public void refresh() {
         String name = getName();
-        SubAPI.getInstance().getSubDataNetwork().sendPacket(new PacketDownloadHostInfo(name, data -> load(data.getSection("hosts").getSection(name))));
+        ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketDownloadHostInfo(name, data -> load(data.getMap(name))));
     }
 
     /**
-     * Gets the SubData Client Address
+     * Gets the SubData Client Channel IDs
      *
-     * @return SubData Client Address (or null if unlinked/unsupported)
+     * @return SubData Client Channel ID Array (may be empty if unsupported)
      */
-    public String getSubData() {
-        return raw.getRawString("subdata", null);
+    @SuppressWarnings("unchecked")
+    public UUID[] getSubData() {
+        if (raw.contains("subdata")) {
+            ObjectMap<Integer> subdata = new ObjectMap<Integer>((Map<Integer, ?>) raw.getObject("subdata"));
+            LinkedList<Integer> keys = new LinkedList<Integer>(subdata.getKeys());
+            LinkedList<UUID> channels = new LinkedList<UUID>();
+            Collections.sort(keys);
+            for (Integer channel : keys) channels.add(subdata.getUUID(channel));
+            return channels.toArray(new UUID[0]);
+        } else {
+            return new UUID[0];
+        }
     }
 
     /**
@@ -233,6 +249,380 @@ public class Host {
     }
 
     /**
+     * Adds a SubServer
+     *
+     * @param name Name of Server
+     * @param enabled Enabled Status
+     * @param port Port Number
+     * @param motd Motd of the Server
+     * @param log Logging Status
+     * @param directory Directory
+     * @param executable Executable String
+     * @param stopcmd Command to Stop the Server
+     * @param hidden if the server should be hidden from players
+     * @param restricted Players will need a permission to join if true
+     * @param response Response Code
+     * @return The SubServer
+     */
+    public void addSubServer(String name, boolean enabled, int port, String motd, boolean log, String directory, String executable, String stopcmd, boolean hidden, boolean restricted, Callback<Integer> response) {
+        addSubServer(null, name, enabled, port, motd, log, directory, executable, stopcmd, hidden, restricted, response);
+    }
+
+    /**
+     * Adds a SubServer
+     *
+     * @param player Player adding
+     * @param name Name of Server
+     * @param enabled Enabled Status
+     * @param port Port Number
+     * @param motd Motd of the Server
+     * @param log Logging Status
+     * @param directory Directory
+     * @param executable Executable String
+     * @param stopcmd Command to Stop the Server
+     * @param hidden if the server should be hidden from players
+     * @param restricted Players will need a permission to join if true
+     * @param response Response Code
+     * @return The SubServer
+     */
+    public void addSubServer(UUID player, String name, boolean enabled, int port, String motd, boolean log, String directory, String executable, String stopcmd, boolean hidden, boolean restricted, Callback<Integer> response) {
+        if (Util.isNull(response)) throw new NullPointerException();
+        StackTraceElement[] origin = new Exception().getStackTrace();
+        ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketAddServer(player, name, enabled, getName(), port, motd, log, directory, executable, stopcmd, hidden, restricted, data -> {
+            try {
+                response.run(data.getInt(0x0001));
+            } catch (Throwable e) {
+                Throwable ew = new InvocationTargetException(e);
+                ew.setStackTrace(origin);
+                ew.printStackTrace();
+            }
+        }));
+    }
+
+    /**
+     * Adds a SubServer
+     *
+     * @param name Name of Server
+     * @param enabled Enabled Status
+     * @param port Port Number
+     * @param motd Motd of the Server
+     * @param log Logging Status
+     * @param directory Directory
+     * @param executable Executable String
+     * @param stopcmd Command to Stop the Server
+     * @param hidden if the server should be hidden from players
+     * @param restricted Players will need a permission to join if true
+     * @return The SubServer
+     */
+    public void addSubServer(String name, boolean enabled, int port, String motd, boolean log, String directory, String executable, String stopcmd, boolean hidden, boolean restricted) {
+        addSubServer(null, name, enabled, port, motd, log, directory, executable, stopcmd, hidden, restricted);
+    }
+
+    /**
+     * Adds a SubServer
+     *
+     * @param player Player adding
+     * @param name Name of Server
+     * @param enabled Enabled Status
+     * @param port Port Number
+     * @param motd Motd of the Server
+     * @param log Logging Status
+     * @param directory Directory
+     * @param executable Executable String
+     * @param stopcmd Command to Stop the Server
+     * @param hidden if the server should be hidden from players
+     * @param restricted Players will need a permission to join if true
+     * @return The SubServer
+     */
+    public void addSubServer(UUID player, String name, boolean enabled, int port, String motd, boolean log, String directory, String executable, String stopcmd, boolean hidden, boolean restricted) {
+        addSubServer(player, name, enabled, port, motd, log, directory, executable, stopcmd, hidden, restricted, i -> {});
+    }
+
+    /**
+     * Removes a SubServer
+     *
+     * @param name SubServer Name
+     */
+    public void removeSubServer(String name) throws InterruptedException {
+        removeSubServer(null, name);
+    }
+
+    /**
+     * Removes a SubServer
+     *
+     * @param player Player Removing
+     * @param name SubServer Name
+     */
+    public void removeSubServer(UUID player, String name) throws InterruptedException {
+        if (Util.isNull(name)) throw new NullPointerException();
+        removeSubServer(player, name, false, i -> {});
+    }
+
+    /**
+     * Forces the Removal of a SubServer
+     *
+     * @param name SubServer Name
+     */
+    public void forceRemoveSubServer(String name) throws InterruptedException {
+        forceRemoveSubServer(null, name);
+    }
+
+    /**
+     * Forces the Removal of a SubServer (will move to 'Recently Deleted')
+     *
+     * @param player Player Removing
+     * @param name SubServer Name
+     */
+    public void forceRemoveSubServer(UUID player, String name) {
+        if (Util.isNull(name)) throw new NullPointerException();
+        removeSubServer(player, name, true, i -> {});
+    }
+
+    /**
+     * Removes a SubServer
+     *
+     * @param name SubServer Name
+     * @param response Response Code
+     */
+    public void removeSubServer(String name, Callback<Integer> response) throws InterruptedException {
+        removeSubServer(null, name, response);
+    }
+
+    /**
+     * Removes a SubServer
+     *
+     * @param player Player Removing
+     * @param name SubServer Name
+     * @param response Response Code
+     */
+    public void removeSubServer(UUID player, String name, Callback<Integer> response) throws InterruptedException {
+        if (Util.isNull(name)) throw new NullPointerException();
+        removeSubServer(player, name, false, response);
+    }
+
+    /**
+     * Forces the Removal of a SubServer
+     *
+     * @param name SubServer Name
+     * @param response Response Code
+     */
+    public void forceRemoveSubServer(String name, Callback<Integer> response) throws InterruptedException {
+        forceRemoveSubServer(null, name, response);
+    }
+
+    /**
+     * Forces the Removal of a SubServer (will move to 'Recently Deleted')
+     *
+     * @param player Player Removing
+     * @param name SubServer Name
+     * @param response Response Code
+     */
+    public void forceRemoveSubServer(UUID player, String name, Callback<Integer> response) {
+        if (Util.isNull(name)) throw new NullPointerException();
+        removeSubServer(player, name, true, response);
+    }
+
+    private void removeSubServer(UUID player, String name, boolean force, Callback<Integer> response) {
+        if (Util.isNull(response)) throw new NullPointerException();
+        StackTraceElement[] origin = new Exception().getStackTrace();
+        ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketRemoveServer(player, name, force, data -> {
+            try {
+                response.run(data.getInt(0x0001));
+            } catch (Throwable e) {
+                Throwable ew = new InvocationTargetException(e);
+                ew.setStackTrace(origin);
+                ew.printStackTrace();
+            }
+        }));
+    }
+
+    /**
+     * Delete a SubServer (will move to 'Recently Deleted')
+     *
+     * @param name SubServer Name
+     */
+    public void recycleSubServer(String name) throws InterruptedException {
+        recycleSubServer(null, name);
+    }
+
+    /**
+     * Delete a SubServer
+     *
+     * @param player Player Deleting
+     * @param name SubServer Name
+     */
+    public void recycleSubServer(UUID player, String name) throws InterruptedException {
+        if (Util.isNull(name)) throw new NullPointerException();
+        deleteSubServer(player, name, true, false, i -> {});
+    }
+
+    /**
+     * Forced the Deletion of a SubServer (will move to 'Recently Deleted')
+     *
+     * @param name SubServer Name
+     */
+    public void forceRecycleSubServer(String name) throws InterruptedException {
+        forceRecycleSubServer(null, name);
+    }
+
+    /**
+     * Forces the Deletion of a SubServer (will move to 'Recently Deleted')
+     *
+     * @param player Player Deleting
+     * @param name SubServer Name
+     */
+    public void forceRecycleSubServer(UUID player, String name) throws InterruptedException {
+        if (Util.isNull(name)) throw new NullPointerException();
+        deleteSubServer(player, name, true, true, i -> {});
+    }
+
+    /**
+     * Delete a SubServer (will move to 'Recently Deleted')
+     *
+     * @param name SubServer Name
+     * @param response Response Code
+     */
+    public void recycleSubServer(String name, Callback<Integer> response) throws InterruptedException {
+        recycleSubServer(null, name, response);
+    }
+
+    /**
+     * Delete a SubServer
+     *
+     * @param player Player Deleting
+     * @param name SubServer Name
+     * @param response Response Code
+     */
+    public void recycleSubServer(UUID player, String name, Callback<Integer> response) throws InterruptedException {
+        if (Util.isNull(name)) throw new NullPointerException();
+        deleteSubServer(player, name, true, false, response);
+    }
+
+    /**
+     * Forced the Deletion of a SubServer (will move to 'Recently Deleted')
+     *
+     * @param name SubServer Name
+     * @param response Response Code
+     */
+    public void forceRecycleSubServer(String name, Callback<Integer> response) throws InterruptedException {
+        forceRecycleSubServer(null, name, response);
+    }
+
+    /**
+     * Forces the Deletion of a SubServer (will move to 'Recently Deleted')
+     *
+     * @param player Player Deleting
+     * @param name SubServer Name
+     * @param response Response Code
+     */
+    public void forceRecycleSubServer(UUID player, String name, Callback<Integer> response) throws InterruptedException {
+        if (Util.isNull(name)) throw new NullPointerException();
+        deleteSubServer(player, name, true, true, response);
+    }
+
+    /**
+     * Delete a SubServer
+     *
+     * @param name SubServer Name
+     * @return Success Status
+     */
+    public void deleteSubServer(String name) throws InterruptedException {
+        deleteSubServer(null, name);
+    }
+
+    /**
+     * Forces the Deletion of a SubServer
+     *
+     * @param player Player Deleting
+     * @param name SubServer Name
+     * @return Success Status
+     */
+    public void deleteSubServer(UUID player, String name) throws InterruptedException {
+        if (Util.isNull(name)) throw new NullPointerException();
+        deleteSubServer(player, name, false, false, i -> {});
+    }
+
+    /**
+     * Forced the Deletion of a SubServer
+     *
+     * @param name SubServer Name
+     * @return Success Status
+     */
+    public void forceDeleteSubServer(String name) throws InterruptedException {
+        forceDeleteSubServer(null, name);
+    }
+
+    /**
+     * Forces the Deletion of a SubServer
+     *
+     * @param player Player Deleting
+     * @param name SubServer Name
+     * @return Success Status
+     */
+    public void forceDeleteSubServer(UUID player, String name) throws InterruptedException {
+        if (Util.isNull(name)) throw new NullPointerException();
+        deleteSubServer(player, name, false, true, i -> {});
+    }
+
+    /**
+     * Delete a SubServer
+     *
+     * @param name SubServer Name
+     * @return Success Status
+     */
+    public void deleteSubServer(String name, Callback<Integer> response) throws InterruptedException {
+        deleteSubServer(null, name, response);
+    }
+
+    /**
+     * Forces the Deletion of a SubServer
+     *
+     * @param player Player Deleting
+     * @param name SubServer Name
+     * @return Success Status
+     */
+    public void deleteSubServer(UUID player, String name, Callback<Integer> response) throws InterruptedException {
+        if (Util.isNull(name)) throw new NullPointerException();
+        deleteSubServer(player, name, false, false, response);
+    }
+
+    /**
+     * Forced the Deletion of a SubServer
+     *
+     * @param name SubServer Name
+     * @return Success Status
+     */
+    public void forceDeleteSubServer(String name, Callback<Integer> response) throws InterruptedException {
+        forceDeleteSubServer(null, name, response);
+    }
+
+    /**
+     * Forces the Deletion of a SubServer
+     *
+     * @param player Player Deleting
+     * @param name SubServer Name
+     * @return Success Status
+     */
+    public void forceDeleteSubServer(UUID player, String name, Callback<Integer> response) throws InterruptedException {
+        if (Util.isNull(name)) throw new NullPointerException();
+        deleteSubServer(player, name, false, true, response);
+    }
+
+    private void deleteSubServer(UUID player, String name, boolean recycle, boolean force, Callback<Integer> response) {
+        if (Util.isNull(response)) throw new NullPointerException();
+        StackTraceElement[] origin = new Exception().getStackTrace();
+        ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketDeleteServer(player, name, recycle, force, data -> {
+            try {
+                response.run(data.getInt(0x0001));
+            } catch (Throwable e) {
+                Throwable ew = new InvocationTargetException(e);
+                ew.setStackTrace(origin);
+                ew.printStackTrace();
+            }
+        }));
+    }
+
+    /**
      * Get the Signature of this Object
      *
      * @return Object Signature
@@ -258,7 +648,7 @@ public class Host {
      */
     public boolean hasExtra(String handle) {
         if (Util.isNull(handle)) throw new NullPointerException();
-        return raw.getSection("extra").getKeys().contains(handle);
+        return raw.getMap("extra").getKeys().contains(handle);
     }
 
     /**
@@ -267,9 +657,9 @@ public class Host {
      * @param handle Handle
      * @return Value
      */
-    public YAMLValue getExtra(String handle) {
+    public ObjectMapValue<String> getExtra(String handle) {
         if (Util.isNull(handle)) throw new NullPointerException();
-        return raw.getSection("extra").get(handle);
+        return raw.getMap("extra").get(handle);
     }
 
     /**
@@ -277,8 +667,8 @@ public class Host {
      *
      * @return Extra Value Section
      */
-    public YAMLSection getExtra() {
-        return raw.getSection("extra").clone();
+    public ObjectMap<String> getExtra() {
+        return raw.getMap("extra").clone();
     }
 
     /**
@@ -286,13 +676,7 @@ public class Host {
      *
      * @return Raw Host
      */
-    public YAMLSection getRaw() {
+    public ObjectMap<String> getRaw() {
         return raw.clone();
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public String toString() {
-        return raw.toJSON().toString();
     }
 }

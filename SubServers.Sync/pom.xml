@@ -28,9 +28,15 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.msgpack</groupId>
-            <artifactId>msgpack-core</artifactId>
-            <version>0.8.16</version>
+            <groupId>net.ME1312.Galaxi</groupId>
+            <artifactId>GalaxiUtil</artifactId>
+            <version>19w20b</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.ME1312.SubData</groupId>
+            <artifactId>Client</artifactId>
+            <version>19w20g</version>
             <scope>compile</scope>
         </dependency>
         <dependency>

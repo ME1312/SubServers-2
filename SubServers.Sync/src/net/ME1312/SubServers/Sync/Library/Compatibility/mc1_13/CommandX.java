@@ -1,6 +1,6 @@
 package net.ME1312.SubServers.Sync.Library.Compatibility.mc1_13;
 
-import net.ME1312.SubServers.Sync.Library.NamedContainer;
+import net.ME1312.Galaxi.Library.NamedContainer;
 import net.md_5.bungee.api.CommandSender;
 
 import java.util.LinkedList;

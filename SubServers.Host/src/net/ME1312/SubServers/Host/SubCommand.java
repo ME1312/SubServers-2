@@ -16,8 +16,8 @@ import net.ME1312.SubServers.Host.Library.TextColor;
 import net.ME1312.SubServers.Host.Network.API.*;
 import net.ME1312.SubServers.Host.Network.Packet.*;
 
-import java.lang.reflect.Field;
 import java.util.*;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -30,6 +30,14 @@ public class SubCommand {
     private static TreeMap<String, Boolean> serverCache = new TreeMap<String, Boolean>();
     private static long cacheDate = 0;
 
+    private static boolean canRun() {
+        if (SubAPI.getInstance().getSubDataNetwork()[0] == null) {
+            throw new IllegalStateException("SubData is not connected");
+        } else {
+            return true;
+        }
+    }
+
     private SubCommand() {}
     @SuppressWarnings("unchecked")
     protected static void load(ExHost host) {
@@ -37,18 +45,20 @@ public class SubCommand {
         new Command(host.info) {
             @Override
             public void command(CommandSender sender, String handle, String[] args) {
-                if (args.length > 0) {
-                    int i = 0;
-                    String str = args[0];
-                    if (args.length > 1) {
-                        do {
-                            i++;
-                            str = str + " " + args[i].replace(" ", "\\ ");
-                        } while ((i + 1) != args.length);
+                if (canRun()) {
+                    if (args.length > 0) {
+                        int i = 0;
+                        String str = args[0];
+                        if (args.length > 1) {
+                            do {
+                                i++;
+                                str = str + " " + args[i].replace(" ", "\\ ");
+                            } while ((i + 1) != args.length);
+                        }
+                        GalaxiEngine.getInstance().getConsoleReader().runCommand(sender, str);
+                    } else {
+                        sender.sendMessage("Usage: /" + handle + " <Command> [Args...]");
                     }
-                    GalaxiEngine.getInstance().getConsoleReader().runCommand(sender, str);
-                } else {
-                    sender.sendMessage("Usage: /" + handle + " <Command> [Args...]");
                 }
             }
         }.autocomplete((sender, handle, args) -> {
@@ -91,7 +101,7 @@ public class SubCommand {
         new Command(host.info) {
             @Override
             public void command(CommandSender sender, String handle, String[] args) {
-                host.api.getGroups(groups -> host.api.getHosts(hosts -> host.api.getServers(servers -> host.api.getMasterProxy(proxymaster -> host.api.getProxies(proxies -> {
+                if (canRun()) host.api.getGroups(groups -> host.api.getHosts(hosts -> host.api.getServers(servers -> host.api.getMasterProxy(proxymaster -> host.api.getProxies(proxies -> {
                     int i = 0;
                     boolean sent = false;
                     String div = TextColor.RESET + ", ";
@@ -196,125 +206,127 @@ public class SubCommand {
         new Command(host.info) {
             @Override
             public void command(CommandSender sender, String handle, String[] args) {
-                if (args.length > 0) {
-                    String type = (args.length > 1)?args[0]:null;
-                    String name = args[(type != null)?1:0];
-
-                    Runnable getServer = () -> host.api.getServer(name, server -> {
-                        if (server != null) {
-                            sender.sendMessage("SubServers > Info on " + ((server instanceof SubServer)?"Sub":"") + "Server: " + TextColor.WHITE + server.getDisplayName());
-                            if (!server.getName().equals(server.getDisplayName())) sender.sendMessage(" -> System Name: " + TextColor.WHITE  + server.getName());
-                            if (server instanceof SubServer) {
-                                sender.sendMessage(" -> Enabled: " + ((((SubServer) server).isEnabled())?TextColor.GREEN+"yes":TextColor.RED+"no"));
-                                if (!((SubServer) server).isEditable()) sender.sendMessage(" -> Editable: " + TextColor.RED + "no");
-                                sender.sendMessage(" -> Host: " + TextColor.WHITE  + ((SubServer) server).getHost());
-                            }
-                            if (server.getGroups().size() > 0) sender.sendMessage(" -> Group" + ((server.getGroups().size() > 1)?"s:":": " + TextColor.WHITE + server.getGroups().get(0)));
-                            if (server.getGroups().size() > 1) for (String group : server.getGroups()) sender.sendMessage("      - " + TextColor.WHITE + group);
-                            sender.sendMessage(" -> Address: " + TextColor.WHITE + server.getAddress().getAddress().getHostAddress()+':'+server.getAddress().getPort());
-                            if (server instanceof SubServer) sender.sendMessage(" -> Running: " + ((((SubServer) server).isRunning())?TextColor.GREEN+"yes":TextColor.RED+"no"));
-                            if (!(server instanceof SubServer) || ((SubServer) server).isRunning()) {
-                                sender.sendMessage(" -> Connected: " + ((server.getSubData()[0] != null)?TextColor.GREEN+"yes"+((server.getSubData().length > 1)?TextColor.AQUA+" +"+(server.getSubData().length-1)+" subchannel"+((server.getSubData().length == 2)?"":"s"):""):TextColor.RED+"no"));
-                                sender.sendMessage(" -> Players: " + TextColor.AQUA + server.getPlayers().size() + " online");
-                            }
-                            sender.sendMessage(" -> MOTD: " + TextColor.WHITE + TextColor.stripColor(server.getMotd()));
-                            if (server instanceof SubServer && ((SubServer) server).getStopAction() != SubServer.StopAction.NONE) sender.sendMessage(" -> Stop Action: " + TextColor.WHITE + ((SubServer) server).getStopAction().toString());
-                            sender.sendMessage(" -> Signature: " + TextColor.AQUA + server.getSignature());
-                            if (server instanceof SubServer) sender.sendMessage(" -> Logging: " + ((((SubServer) server).isLogging())?TextColor.GREEN+"yes":TextColor.RED+"no"));
-                            sender.sendMessage(" -> Restricted: " + ((server.isRestricted())?TextColor.GREEN+"yes":TextColor.RED+"no"));
-                            if (server instanceof SubServer && ((SubServer) server).getIncompatibilities().size() > 0) {
-                                List<String> current = new ArrayList<String>();
-                                for (String other : ((SubServer) server).getCurrentIncompatibilities()) current.add(other.toLowerCase());
-                                sender.sendMessage(" -> Incompatibilities:");
-                                for (String other : ((SubServer) server).getIncompatibilities()) sender.sendMessage("      - " + ((current.contains(other.toLowerCase()))?TextColor.WHITE:TextColor.GRAY) + other);
-                            }
-                            sender.sendMessage(" -> Hidden: " + ((server.isHidden())?TextColor.GREEN+"yes":TextColor.RED+"no"));
-                        } else {
-                            if (type == null) {
-                                sender.sendMessage("SubServers > There is no object with that name");
+                if (canRun()) {
+                    if (args.length > 0) {
+                        String type = (args.length > 1)?args[0]:null;
+                        String name = args[(type != null)?1:0];
+    
+                        Runnable getServer = () -> host.api.getServer(name, server -> {
+                            if (server != null) {
+                                sender.sendMessage("SubServers > Info on " + ((server instanceof SubServer)?"Sub":"") + "Server: " + TextColor.WHITE + server.getDisplayName());
+                                if (!server.getName().equals(server.getDisplayName())) sender.sendMessage(" -> System Name: " + TextColor.WHITE  + server.getName());
+                                if (server instanceof SubServer) {
+                                    sender.sendMessage(" -> Enabled: " + ((((SubServer) server).isEnabled())?TextColor.GREEN+"yes":TextColor.RED+"no"));
+                                    if (!((SubServer) server).isEditable()) sender.sendMessage(" -> Editable: " + TextColor.RED + "no");
+                                    sender.sendMessage(" -> Host: " + TextColor.WHITE  + ((SubServer) server).getHost());
+                                }
+                                if (server.getGroups().size() > 0) sender.sendMessage(" -> Group" + ((server.getGroups().size() > 1)?"s:":": " + TextColor.WHITE + server.getGroups().get(0)));
+                                if (server.getGroups().size() > 1) for (String group : server.getGroups()) sender.sendMessage("      - " + TextColor.WHITE + group);
+                                sender.sendMessage(" -> Address: " + TextColor.WHITE + server.getAddress().getAddress().getHostAddress()+':'+server.getAddress().getPort());
+                                if (server instanceof SubServer) sender.sendMessage(" -> Running: " + ((((SubServer) server).isRunning())?TextColor.GREEN+"yes":TextColor.RED+"no"));
+                                if (!(server instanceof SubServer) || ((SubServer) server).isRunning()) {
+                                    sender.sendMessage(" -> Connected: " + ((server.getSubData()[0] != null)?TextColor.GREEN+"yes"+((server.getSubData().length > 1)?TextColor.AQUA+" +"+(server.getSubData().length-1)+" subchannel"+((server.getSubData().length == 2)?"":"s"):""):TextColor.RED+"no"));
+                                    sender.sendMessage(" -> Players: " + TextColor.AQUA + server.getPlayers().size() + " online");
+                                }
+                                sender.sendMessage(" -> MOTD: " + TextColor.WHITE + TextColor.stripColor(server.getMotd()));
+                                if (server instanceof SubServer && ((SubServer) server).getStopAction() != SubServer.StopAction.NONE) sender.sendMessage(" -> Stop Action: " + TextColor.WHITE + ((SubServer) server).getStopAction().toString());
+                                sender.sendMessage(" -> Signature: " + TextColor.AQUA + server.getSignature());
+                                if (server instanceof SubServer) sender.sendMessage(" -> Logging: " + ((((SubServer) server).isLogging())?TextColor.GREEN+"yes":TextColor.RED+"no"));
+                                sender.sendMessage(" -> Restricted: " + ((server.isRestricted())?TextColor.GREEN+"yes":TextColor.RED+"no"));
+                                if (server instanceof SubServer && ((SubServer) server).getIncompatibilities().size() > 0) {
+                                    List<String> current = new ArrayList<String>();
+                                    for (String other : ((SubServer) server).getCurrentIncompatibilities()) current.add(other.toLowerCase());
+                                    sender.sendMessage(" -> Incompatibilities:");
+                                    for (String other : ((SubServer) server).getIncompatibilities()) sender.sendMessage("      - " + ((current.contains(other.toLowerCase()))?TextColor.WHITE:TextColor.GRAY) + other);
+                                }
+                                sender.sendMessage(" -> Hidden: " + ((server.isHidden())?TextColor.GREEN+"yes":TextColor.RED+"no"));
                             } else {
-                                sender.sendMessage("SubServers > There is no server with that name");
+                                if (type == null) {
+                                    sender.sendMessage("SubServers > There is no object with that name");
+                                } else {
+                                    sender.sendMessage("SubServers > There is no server with that name");
+                                }
+                            }
+                        });
+                        Runnable getGroup = () -> host.api.getGroup(name, group -> {
+                            if (group != null) {
+                                sender.sendMessage("SubServers > Info on Group: " + TextColor.WHITE + name);
+                                sender.sendMessage(" -> Servers: " + ((group.size() <= 0)?TextColor.GRAY + "(none)":TextColor.AQUA.toString() + group.size()));
+                                for (Server server : group) sender.sendMessage("      - " + TextColor.WHITE + server.getDisplayName() + ((server.getName().equals(server.getDisplayName()))?"":" ("+server.getName()+')'));
+                            } else {
+                                if (type == null) {
+                                    getServer.run();
+                                } else {
+                                    sender.sendMessage("SubServers > There is no group with that name");
+                                }
+                            }
+                        });
+                        Runnable getHost = () -> host.api.getHost(name, host -> {
+                            if (host != null) {
+                                sender.sendMessage("SubServers > Info on Host: " + TextColor.WHITE + host.getDisplayName());
+                                if (!host.getName().equals(host.getDisplayName())) sender.sendMessage(" -> System Name: " + TextColor.WHITE  + host.getName());
+                                sender.sendMessage(" -> Available: " + ((host.isAvailable())?TextColor.GREEN+"yes":TextColor.RED+"no"));
+                                sender.sendMessage(" -> Enabled: " + ((host.isEnabled())?TextColor.GREEN+"yes":TextColor.RED+"no"));
+                                sender.sendMessage(" -> Address: " + TextColor.WHITE + host.getAddress().getHostAddress());
+                                if (host.getSubData().length > 0) sender.sendMessage(" -> Connected: " + ((host.getSubData()[0] != null)?TextColor.GREEN+"yes"+((host.getSubData().length > 1)?TextColor.AQUA+" +"+(host.getSubData().length-1)+" subchannel"+((host.getSubData().length == 2)?"":"s"):""):TextColor.RED+"no"));
+                                sender.sendMessage(" -> SubServers: " + ((host.getSubServers().keySet().size() <= 0)?TextColor.GRAY + "(none)":TextColor.AQUA.toString() + host.getSubServers().keySet().size()));
+                                for (SubServer subserver : host.getSubServers().values()) sender.sendMessage("      - " + ((subserver.isEnabled())?TextColor.WHITE:TextColor.GRAY) + subserver.getDisplayName() + ((subserver.getName().equals(subserver.getDisplayName()))?"":" ("+subserver.getName()+')'));
+                                sender.sendMessage(" -> Templates: " + ((host.getCreator().getTemplates().keySet().size() <= 0)?TextColor.GRAY + "(none)":TextColor.AQUA.toString() + host.getCreator().getTemplates().keySet().size()));
+                                for (SubCreator.ServerTemplate template : host.getCreator().getTemplates().values()) sender.sendMessage("      - " + ((template.isEnabled())?TextColor.WHITE:TextColor.GRAY) + template.getDisplayName() + ((template.getName().equals(template.getDisplayName()))?"":" ("+template.getName()+')'));
+                                sender.sendMessage(" -> Signature: " + TextColor.AQUA + host.getSignature());
+                            } else {
+                                if (type == null) {
+                                    getGroup.run();
+                                } else {
+                                    sender.sendMessage("SubServers > There is no host with that name");
+                                }
+                            }
+                        });
+                        Runnable getProxy = () -> host.api.getProxy(name, proxy -> {
+                            if (proxy != null) {
+                                sender.sendMessage("SubServers > Info on Proxy: " + TextColor.WHITE + proxy.getDisplayName());
+                                if (!proxy.getName().equals(proxy.getDisplayName())) sender.sendMessage(" -> System Name: " + TextColor.WHITE  + proxy.getName());
+                                sender.sendMessage(" -> Connected: " + ((proxy.getSubData()[0] != null)?TextColor.GREEN+"yes"+((proxy.getSubData().length > 1)?TextColor.AQUA+" +"+(proxy.getSubData().length-1)+" subchannel"+((proxy.getSubData().length == 2)?"":"s"):""):TextColor.RED+"no"));
+                                sender.sendMessage(" -> Redis: "  + ((proxy.isRedis())?TextColor.GREEN:TextColor.RED+"un") + "available");
+                                if (proxy.isRedis()) sender.sendMessage(" -> Players: " + TextColor.AQUA + proxy.getPlayers().size() + " online");
+                                sender.sendMessage(" -> Signature: " + TextColor.AQUA + proxy.getSignature());
+                            } else {
+                                if (type == null) {
+                                    getHost.run();
+                                } else {
+                                    sender.sendMessage("SubServers > There is no proxy with that name");
+                                }
+                            }
+                        });
+    
+                        if (type == null) {
+                            getProxy.run();
+                        } else {
+                            switch (type.toLowerCase()) {
+                                case "p":
+                                case "proxy":
+                                    getProxy.run();
+                                    break;
+                                case "h":
+                                case "host":
+                                    getHost.run();
+                                    break;
+                                case "g":
+                                case "group":
+                                    getGroup.run();
+                                    break;
+                                case "s":
+                                case "server":
+                                case "subserver":
+                                    getServer.run();
+                                    break;
+                                default:
+                                    sender.sendMessage("SubServers > There is no object type with that name");
                             }
                         }
-                    });
-                    Runnable getGroup = () -> host.api.getGroup(name, group -> {
-                        if (group != null) {
-                            sender.sendMessage("SubServers > Info on Group: " + TextColor.WHITE + name);
-                            sender.sendMessage(" -> Servers: " + ((group.size() <= 0)?TextColor.GRAY + "(none)":TextColor.AQUA.toString() + group.size()));
-                            for (Server server : group) sender.sendMessage("      - " + TextColor.WHITE + server.getDisplayName() + ((server.getName().equals(server.getDisplayName()))?"":" ("+server.getName()+')'));
-                        } else {
-                            if (type == null) {
-                                getServer.run();
-                            } else {
-                                sender.sendMessage("SubServers > There is no group with that name");
-                            }
-                        }
-                    });
-                    Runnable getHost = () -> host.api.getHost(name, host -> {
-                        if (host != null) {
-                            sender.sendMessage("SubServers > Info on Host: " + TextColor.WHITE + host.getDisplayName());
-                            if (!host.getName().equals(host.getDisplayName())) sender.sendMessage(" -> System Name: " + TextColor.WHITE  + host.getName());
-                            sender.sendMessage(" -> Available: " + ((host.isAvailable())?TextColor.GREEN+"yes":TextColor.RED+"no"));
-                            sender.sendMessage(" -> Enabled: " + ((host.isEnabled())?TextColor.GREEN+"yes":TextColor.RED+"no"));
-                            sender.sendMessage(" -> Address: " + TextColor.WHITE + host.getAddress().getHostAddress());
-                            if (host.getSubData().length > 0) sender.sendMessage(" -> Connected: " + ((host.getSubData()[0] != null)?TextColor.GREEN+"yes"+((host.getSubData().length > 1)?TextColor.AQUA+" +"+(host.getSubData().length-1)+" subchannel"+((host.getSubData().length == 2)?"":"s"):""):TextColor.RED+"no"));
-                            sender.sendMessage(" -> SubServers: " + ((host.getSubServers().keySet().size() <= 0)?TextColor.GRAY + "(none)":TextColor.AQUA.toString() + host.getSubServers().keySet().size()));
-                            for (SubServer subserver : host.getSubServers().values()) sender.sendMessage("      - " + ((subserver.isEnabled())?TextColor.WHITE:TextColor.GRAY) + subserver.getDisplayName() + ((subserver.getName().equals(subserver.getDisplayName()))?"":" ("+subserver.getName()+')'));
-                            sender.sendMessage(" -> Templates: " + ((host.getCreator().getTemplates().keySet().size() <= 0)?TextColor.GRAY + "(none)":TextColor.AQUA.toString() + host.getCreator().getTemplates().keySet().size()));
-                            for (SubCreator.ServerTemplate template : host.getCreator().getTemplates().values()) sender.sendMessage("      - " + ((template.isEnabled())?TextColor.WHITE:TextColor.GRAY) + template.getDisplayName() + ((template.getName().equals(template.getDisplayName()))?"":" ("+template.getName()+')'));
-                            sender.sendMessage(" -> Signature: " + TextColor.AQUA + host.getSignature());
-                        } else {
-                            if (type == null) {
-                                getGroup.run();
-                            } else {
-                                sender.sendMessage("SubServers > There is no host with that name");
-                            }
-                        }
-                    });
-                    Runnable getProxy = () -> host.api.getProxy(name, proxy -> {
-                        if (proxy != null) {
-                            sender.sendMessage("SubServers > Info on Proxy: " + TextColor.WHITE + proxy.getDisplayName());
-                            if (!proxy.getName().equals(proxy.getDisplayName())) sender.sendMessage(" -> System Name: " + TextColor.WHITE  + proxy.getName());
-                            sender.sendMessage(" -> Connected: " + ((proxy.getSubData()[0] != null)?TextColor.GREEN+"yes"+((proxy.getSubData().length > 1)?TextColor.AQUA+" +"+(proxy.getSubData().length-1)+" subchannel"+((proxy.getSubData().length == 2)?"":"s"):""):TextColor.RED+"no"));
-                            sender.sendMessage(" -> Redis: "  + ((proxy.isRedis())?TextColor.GREEN:TextColor.RED+"un") + "available");
-                            if (proxy.isRedis()) sender.sendMessage(" -> Players: " + TextColor.AQUA + proxy.getPlayers().size() + " online");
-                            sender.sendMessage(" -> Signature: " + TextColor.AQUA + proxy.getSignature());
-                        } else {
-                            if (type == null) {
-                                getHost.run();
-                            } else {
-                                sender.sendMessage("SubServers > There is no proxy with that name");
-                            }
-                        }
-                    });
-
-                    if (type == null) {
-                        getProxy.run();
                     } else {
-                        switch (type.toLowerCase()) {
-                            case "p":
-                            case "proxy":
-                                getProxy.run();
-                                break;
-                            case "h":
-                            case "host":
-                                getHost.run();
-                                break;
-                            case "g":
-                            case "group":
-                                getGroup.run();
-                                break;
-                            case "s":
-                            case "server":
-                            case "subserver":
-                                getServer.run();
-                                break;
-                            default:
-                                sender.sendMessage("SubServers > There is no object type with that name");
-                        }
+                        sender.sendMessage("SubServers > Usage: /" + handle + " [proxy|host|group|server] <Name>");
                     }
-                } else {
-                    sender.sendMessage("SubServers > Usage: /" + handle + " [proxy|host|group|server] <Name>");
                 }
             }
         }.autocomplete((sender, handle, args) -> {
@@ -434,38 +446,40 @@ public class SubCommand {
         new Command(host.info) {
             @Override
             public void command(CommandSender sender, String handle, String[] args) {
-                if (args.length > 0) {
-                    ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketStartServer(null, args[0], data -> {
-                        switch (data.getInt(0x0001)) {
-                            case 3:
-                                sender.sendMessage("There is no server with that name");
-                                break;
-                            case 4:
-                                sender.sendMessage("That Server is not a SubServer");
-                                break;
-                            case 5:
-                                sender.sendMessage("That SubServer's Host is not available");
-                                break;
-                            case 6:
-                                sender.sendMessage("That SubServer's Host is not enabled");
-                                break;
-                            case 7:
-                                sender.sendMessage("That SubServer is not enabled");
-                                break;
-                            case 8:
-                                sender.sendMessage("That SubServer is already running");
-                                break;
-                            case 9:
-                                sender.sendMessage("That SubServer cannot start while these server(s) are running:", data.getRawString(0x0002));
-                                break;
-                            case 0:
-                            case 1:
-                                sender.sendMessage("Server was started successfully");
-                                break;
-                        }
-                    }));
-                } else {
-                    sender.sendMessage("Usage: /" + handle + " <SubServer>");
+                if (canRun()) {
+                    if (args.length > 0) {
+                        ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketStartServer(null, args[0], data -> {
+                            switch (data.getInt(0x0001)) {
+                                case 3:
+                                    sender.sendMessage("There is no server with that name");
+                                    break;
+                                case 4:
+                                    sender.sendMessage("That Server is not a SubServer");
+                                    break;
+                                case 5:
+                                    sender.sendMessage("That SubServer's Host is not available");
+                                    break;
+                                case 6:
+                                    sender.sendMessage("That SubServer's Host is not enabled");
+                                    break;
+                                case 7:
+                                    sender.sendMessage("That SubServer is not enabled");
+                                    break;
+                                case 8:
+                                    sender.sendMessage("That SubServer is already running");
+                                    break;
+                                case 9:
+                                    sender.sendMessage("That SubServer cannot start while these server(s) are running:", data.getRawString(0x0002));
+                                    break;
+                                case 0:
+                                case 1:
+                                    sender.sendMessage("Server was started successfully");
+                                    break;
+                            }
+                        }));
+                    } else {
+                        sender.sendMessage("Usage: /" + handle + " <SubServer>");
+                    }
                 }
             }
         }.autocomplete(defaultCompletor = (sender, handle, args) -> {
@@ -498,72 +512,74 @@ public class SubCommand {
         new Command(host.info) {
             @Override
             public void command(CommandSender sender, String handle, String[] args) {
-                if (args.length > 0) {
-                    TimerTask starter = new TimerTask() {
-                        @Override
-                        public void run() {
-                            ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketStartServer(null, args[0], data -> {
-                                switch (data.getInt(0x0001)) {
-                                    case 3:
-                                    case 4:
-                                        sender.sendMessage("Could not restart server: That SubServer has disappeared");
-                                        break;
-                                    case 5:
-                                        sender.sendMessage("Could not restart server: That SubServer's Host is no longer available");
-                                        break;
-                                    case 6:
-                                        sender.sendMessage("Could not restart server: That SubServer's Host is no longer enabled");
-                                        break;
-                                    case 7:
-                                        sender.sendMessage("Could not restart server: That SubServer is no longer enabled");
-                                        break;
-                                    case 9:
-                                        sender.sendMessage("Could not restart server: That SubServer cannot start while these server(s) are running:", data.getRawString(0x0002));
-                                        break;
-                                    case 8:
-                                    case 0:
-                                    case 1:
-                                        sender.sendMessage("Server was started successfully");
-                                        break;
-                                }
-                            }));
-                        }
-                    };
-
-                    final Container<Boolean> listening = new Container<Boolean>(true);
-                    PacketInExRunEvent.callback("SubStoppedEvent", new Callback<ObjectMap<String>>() {
-                        @Override
-                        public void run(ObjectMap<String> json) {
-                            try {
-                                if (listening.get()) if (!json.getString("server").equalsIgnoreCase(args[0])) {
-                                    PacketInExRunEvent.callback("SubStoppedEvent", this);
-                                } else {
-                                    new Timer(SubAPI.getInstance().getAppInfo().getName() + "::Server_Restart_Command_Handler(" + args[0] + ')').schedule(starter, 100);
-                                }
-                            } catch (Exception e) {}
-                        }
-                    });
-
-                    ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketStopServer(null, args[0], false, data -> {
-                        if (data.getInt(0x0001) != 0) listening.set(false);
-                        switch (data.getInt(0x0001)) {
-                            case 3:
-                                sender.sendMessage("There is no server with that name");
-                                break;
-                            case 4:
-                                sender.sendMessage("That Server is not a SubServer");
-                                break;
-                            case 5:
-                                starter.run();
-                                break;
-                            case 0:
-                            case 1:
-                                sender.sendMessage("Server was stopped successfully");
-                                break;
-                        }
-                    }));
-                } else {
-                    sender.sendMessage("Usage: /" + handle + " <SubServer>");
+                if (canRun()) {
+                    if (args.length > 0) {
+                        TimerTask starter = new TimerTask() {
+                            @Override
+                            public void run() {
+                                ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketStartServer(null, args[0], data -> {
+                                    switch (data.getInt(0x0001)) {
+                                        case 3:
+                                        case 4:
+                                            sender.sendMessage("Could not restart server: That SubServer has disappeared");
+                                            break;
+                                        case 5:
+                                            sender.sendMessage("Could not restart server: That SubServer's Host is no longer available");
+                                            break;
+                                        case 6:
+                                            sender.sendMessage("Could not restart server: That SubServer's Host is no longer enabled");
+                                            break;
+                                        case 7:
+                                            sender.sendMessage("Could not restart server: That SubServer is no longer enabled");
+                                            break;
+                                        case 9:
+                                            sender.sendMessage("Could not restart server: That SubServer cannot start while these server(s) are running:", data.getRawString(0x0002));
+                                            break;
+                                        case 8:
+                                        case 0:
+                                        case 1:
+                                            sender.sendMessage("Server was started successfully");
+                                            break;
+                                    }
+                                }));
+                            }
+                        };
+    
+                        final Container<Boolean> listening = new Container<Boolean>(true);
+                        PacketInExRunEvent.callback("SubStoppedEvent", new Callback<ObjectMap<String>>() {
+                            @Override
+                            public void run(ObjectMap<String> json) {
+                                try {
+                                    if (listening.get()) if (!json.getString("server").equalsIgnoreCase(args[0])) {
+                                        PacketInExRunEvent.callback("SubStoppedEvent", this);
+                                    } else {
+                                        new Timer(SubAPI.getInstance().getAppInfo().getName() + "::Server_Restart_Command_Handler(" + args[0] + ')').schedule(starter, 100);
+                                    }
+                                } catch (Exception e) {}
+                            }
+                        });
+    
+                        ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketStopServer(null, args[0], false, data -> {
+                            if (data.getInt(0x0001) != 0) listening.set(false);
+                            switch (data.getInt(0x0001)) {
+                                case 3:
+                                    sender.sendMessage("There is no server with that name");
+                                    break;
+                                case 4:
+                                    sender.sendMessage("That Server is not a SubServer");
+                                    break;
+                                case 5:
+                                    starter.run();
+                                    break;
+                                case 0:
+                                case 1:
+                                    sender.sendMessage("Server was stopped successfully");
+                                    break;
+                            }
+                        }));
+                    } else {
+                        sender.sendMessage("Usage: /" + handle + " <SubServer>");
+                    }
                 }
             }
         }.autocomplete(defaultCompletor).usage("<SubServer>").description("Restarts a SubServer").help(
@@ -580,26 +596,28 @@ public class SubCommand {
         new Command(host.info) {
             @Override
             public void command(CommandSender sender, String handle, String[] args) {
-                if (args.length > 0) {
-                    ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketStopServer(null, args[0], false, data -> {
-                        switch (data.getInt(0x0001)) {
-                            case 3:
-                                sender.sendMessage("There is no server with that name");
-                                break;
-                            case 4:
-                                sender.sendMessage("That Server is not a SubServer");
-                                break;
-                            case 5:
-                                sender.sendMessage("That SubServer is not running");
-                                break;
-                            case 0:
-                            case 1:
-                                sender.sendMessage("Server was stopped successfully");
-                                break;
-                        }
-                    }));
-                } else {
-                    sender.sendMessage("Usage: /" + handle + " <SubServer>");
+                if (canRun()) {
+                    if (args.length > 0) {
+                        ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketStopServer(null, args[0], false, data -> {
+                            switch (data.getInt(0x0001)) {
+                                case 3:
+                                    sender.sendMessage("There is no server with that name");
+                                    break;
+                                case 4:
+                                    sender.sendMessage("That Server is not a SubServer");
+                                    break;
+                                case 5:
+                                    sender.sendMessage("That SubServer is not running");
+                                    break;
+                                case 0:
+                                case 1:
+                                    sender.sendMessage("Server was stopped successfully");
+                                    break;
+                            }
+                        }));
+                    } else {
+                        sender.sendMessage("Usage: /" + handle + " <SubServer>");
+                    }
                 }
             }
         }.autocomplete(defaultCompletor).usage("<SubServer>").description("Stops a SubServer").help(
@@ -616,26 +634,28 @@ public class SubCommand {
         new Command(host.info) {
             @Override
             public void command(CommandSender sender, String handle, String[] args) {
-                if (args.length > 0) {
-                    ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketStopServer(null, args[0], true, data -> {
-                        switch (data.getInt(0x0001)) {
-                            case 3:
-                                sender.sendMessage("There is no server with that name");
-                                break;
-                            case 4:
-                                sender.sendMessage("That Server is not a SubServer");
-                                break;
-                            case 5:
-                                sender.sendMessage("That SubServer is not running");
-                                break;
-                            case 0:
-                            case 1:
-                                sender.sendMessage("Server was terminated successfully");
-                                break;
-                        }
-                    }));
-                } else {
-                    sender.sendMessage("Usage: /" + handle + " <SubServer>");
+                if (canRun()) {
+                    if (args.length > 0) {
+                        ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketStopServer(null, args[0], true, data -> {
+                            switch (data.getInt(0x0001)) {
+                                case 3:
+                                    sender.sendMessage("There is no server with that name");
+                                    break;
+                                case 4:
+                                    sender.sendMessage("That Server is not a SubServer");
+                                    break;
+                                case 5:
+                                    sender.sendMessage("That SubServer is not running");
+                                    break;
+                                case 0:
+                                case 1:
+                                    sender.sendMessage("Server was terminated successfully");
+                                    break;
+                            }
+                        }));
+                    } else {
+                        sender.sendMessage("Usage: /" + handle + " <SubServer>");
+                    }
                 }
             }
         }.autocomplete(defaultCompletor).usage("<SubServer>").description("Terminates a SubServer").help(
@@ -652,35 +672,37 @@ public class SubCommand {
         new Command(host.info) {
             @Override
             public void command(CommandSender sender, String handle, String[] args) {
-                if (args.length > 1) {
-                    int i = 1;
-                    String str = args[1];
-                    if (args.length > 2) {
-                        do {
-                            i++;
-                            str = str + " " + args[i];
-                        } while ((i + 1) != args.length);
-                    }
-                    final String cmd = str;
-                    ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketCommandServer(null, args[0], cmd, data -> {
-                        switch (data.getInt(0x0001)) {
-                            case 3:
-                                sender.sendMessage("There is no server with that name");
-                                break;
-                            case 4:
-                                sender.sendMessage("That Server is not a SubServer");
-                                break;
-                            case 5:
-                                sender.sendMessage("That SubServer is not running");
-                                break;
-                            case 0:
-                            case 1:
-                                sender.sendMessage("Command was sent successfully");
-                                break;
+                if (canRun()) {
+                    if (args.length > 1) {
+                        int i = 1;
+                        String str = args[1];
+                        if (args.length > 2) {
+                            do {
+                                i++;
+                                str = str + " " + args[i];
+                            } while ((i + 1) != args.length);
                         }
-                    }));
-                } else {
-                    sender.sendMessage("Usage: /" + handle + " <SubServer> <Command> [Args...]");
+                        final String cmd = str;
+                        ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketCommandServer(null, args[0], cmd, data -> {
+                            switch (data.getInt(0x0001)) {
+                                case 3:
+                                    sender.sendMessage("There is no server with that name");
+                                    break;
+                                case 4:
+                                    sender.sendMessage("That Server is not a SubServer");
+                                    break;
+                                case 5:
+                                    sender.sendMessage("That SubServer is not running");
+                                    break;
+                                case 0:
+                                case 1:
+                                    sender.sendMessage("Command was sent successfully");
+                                    break;
+                            }
+                        }));
+                    } else {
+                        sender.sendMessage("Usage: /" + handle + " <SubServer> <Command> [Args...]");
+                    }
                 }
             }
         }.autocomplete(defaultCompletor).usage("<SubServer>", "<Command>", "[Args...]").description("Sends a Command to a SubServer").help(
@@ -699,47 +721,49 @@ public class SubCommand {
         new Command(host.info) {
             @Override
             public void command(CommandSender sender, String handle, String[] args) {
-                if (args.length > 3) {
-                    if (args.length > 4 && Util.isException(() -> Integer.parseInt(args[4]))) {
-                        sender.sendMessage("Invalid Port Number");
+                if (canRun()) {
+                    if (args.length > 3) {
+                        if (args.length > 4 && Util.isException(() -> Integer.parseInt(args[4]))) {
+                            sender.sendMessage("Invalid Port Number");
+                        } else {
+                            ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketCreateServer(null, args[0], args[1], args[2], new Version(args[3]), (args.length > 4)?Integer.parseInt(args[4]):null, data -> {
+                                switch (data.getInt(0x0001)) {
+                                    case 3:
+                                        sender.sendMessage("Server names cannot use spaces");
+                                    case 4:
+                                        sender.sendMessage("There is already a SubServer with that name");
+                                        break;
+                                    case 5:
+                                        sender.sendMessage("There is no host with that name");
+                                        break;
+                                    case 6:
+                                        sender.sendMessage("That Host is not available");
+                                        break;
+                                    case 7:
+                                        sender.sendMessage("That Host is not enabled");
+                                        break;
+                                    case 8:
+                                        sender.sendMessage("There is no template with that name");
+                                        break;
+                                    case 9:
+                                        sender.sendMessage("That Template is not enabled");
+                                        break;
+                                    case 10:
+                                        sender.sendMessage("That Template requires a Minecraft Version to be specified");
+                                        break;
+                                    case 11:
+                                        sender.sendMessage("Invalid Port Number");
+                                        break;
+                                    case 0:
+                                    case 1:
+                                        sender.sendMessage("Launching SubCreator...");
+                                        break;
+                                }
+                            }));
+                        }
                     } else {
-                        ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketCreateServer(null, args[0], args[1], args[2], new Version(args[3]), (args.length > 4)?Integer.parseInt(args[4]):null, data -> {
-                            switch (data.getInt(0x0001)) {
-                                case 3:
-                                    sender.sendMessage("Server names cannot use spaces");
-                                case 4:
-                                    sender.sendMessage("There is already a SubServer with that name");
-                                    break;
-                                case 5:
-                                    sender.sendMessage("There is no host with that name");
-                                    break;
-                                case 6:
-                                    sender.sendMessage("That Host is not available");
-                                    break;
-                                case 7:
-                                    sender.sendMessage("That Host is not enabled");
-                                    break;
-                                case 8:
-                                    sender.sendMessage("There is no template with that name");
-                                    break;
-                                case 9:
-                                    sender.sendMessage("That Template is not enabled");
-                                    break;
-                                case 10:
-                                    sender.sendMessage("That Template requires a Minecraft Version to be specified");
-                                    break;
-                                case 11:
-                                    sender.sendMessage("Invalid Port Number");
-                                    break;
-                                case 0:
-                                case 1:
-                                    sender.sendMessage("Launching SubCreator...");
-                                    break;
-                            }
-                        }));
+                        sender.sendMessage("Usage: /" + handle + " <Name> <Host> <Template> [Version] [Port]");
                     }
-                } else {
-                    sender.sendMessage("Usage: /" + handle + " <Name> <Host> <Template> [Version] [Port]");
                 }
             }
         }.autocomplete((sender, handle, args) -> {
@@ -798,34 +822,36 @@ public class SubCommand {
     }
 
     private static void updateCache() {
-        if (Calendar.getInstance().getTime().getTime() - cacheDate >= TimeUnit.MINUTES.toMillis(1)) {
-            cacheDate = Calendar.getInstance().getTime().getTime();
-            SubAPI.getInstance().getProxies(proxies -> {
-                proxyCache = new LinkedList<String>(proxies.keySet());
+        if (canRun()) {
+            if (Calendar.getInstance().getTime().getTime() - cacheDate >= TimeUnit.MINUTES.toMillis(1)) {
                 cacheDate = Calendar.getInstance().getTime().getTime();
-            });
-            SubAPI.getInstance().getHosts(hosts -> {
-                TreeMap<String, List<String>> cache = new TreeMap<String, List<String>>();
-                for (Host host : hosts.values()) {
-                    List<String> templates = new ArrayList<String>();
-                    templates.addAll(host.getCreator().getTemplates().keySet());
-                    cache.put(host.getName().toLowerCase(), templates);
-                }
-                hostCache = cache;
-                cacheDate = Calendar.getInstance().getTime().getTime();
-            });
-            SubAPI.getInstance().getGroups(groups -> {
-                groupCache = new LinkedList<String>(groups.keySet());
-                cacheDate = Calendar.getInstance().getTime().getTime();
-            });
-            SubAPI.getInstance().getServers(servers -> {
-                TreeMap<String, Boolean> cache = new TreeMap<String, Boolean>();
-                for (Server server : servers.values()) {
-                    cache.put(server.getName(), server instanceof SubServer);
-                }
-                serverCache = cache;
-                cacheDate = Calendar.getInstance().getTime().getTime();
-            });
+                SubAPI.getInstance().getProxies(proxies -> {
+                    proxyCache = new LinkedList<String>(proxies.keySet());
+                    cacheDate = Calendar.getInstance().getTime().getTime();
+                });
+                SubAPI.getInstance().getHosts(hosts -> {
+                    TreeMap<String, List<String>> cache = new TreeMap<String, List<String>>();
+                    for (Host host : hosts.values()) {
+                        List<String> templates = new ArrayList<String>();
+                        templates.addAll(host.getCreator().getTemplates().keySet());
+                        cache.put(host.getName().toLowerCase(), templates);
+                    }
+                    hostCache = cache;
+                    cacheDate = Calendar.getInstance().getTime().getTime();
+                });
+                SubAPI.getInstance().getGroups(groups -> {
+                    groupCache = new LinkedList<String>(groups.keySet());
+                    cacheDate = Calendar.getInstance().getTime().getTime();
+                });
+                SubAPI.getInstance().getServers(servers -> {
+                    TreeMap<String, Boolean> cache = new TreeMap<String, Boolean>();
+                    for (Server server : servers.values()) {
+                        cache.put(server.getName(), server instanceof SubServer);
+                    }
+                    serverCache = cache;
+                    cacheDate = Calendar.getInstance().getTime().getTime();
+                });
+            }
         }
 
     }

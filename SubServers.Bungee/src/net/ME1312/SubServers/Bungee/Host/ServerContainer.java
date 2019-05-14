@@ -41,7 +41,7 @@ public class ServerContainer extends BungeeServerInfo implements Server {
         SubAPI.getInstance().getSubDataNetwork().getProtocol().whitelist(getAddress().getAddress().getHostAddress());
         this.hidden = hidden;
 
-        setSubData(null, 0);
+        subdata.put(0, null);
     }
 
     @Override
@@ -71,7 +71,7 @@ public class ServerContainer extends BungeeServerInfo implements Server {
             ObjectMap<String> args = new ObjectMap<String>();
             args.set("server", getName());
             args.set("channel", channel);
-            if (client != null) args.set("address", client.getAddress().toString());
+            if (client != null) args.set("id", client.getID());
             ((SubDataClient) proxy.getSubData()[0]).sendPacket(new PacketOutExRunEvent((client != null)?SubNetworkConnectEvent.class:SubNetworkDisconnectEvent.class, args));
         }
     }
@@ -259,8 +259,8 @@ public class ServerContainer extends BungeeServerInfo implements Server {
             players.set(player.get().toString(), pinfo);
         }
         info.set("players", players);
-        LinkedList<UUID> subdata = new LinkedList<UUID>();
-        for (DataClient client : getSubData()) subdata.add((client == null)?null:client.getID());
+        ObjectMap<Integer> subdata = new ObjectMap<Integer>();
+        for (int channel : this.subdata.keySet()) subdata.set(channel, (this.subdata.get(channel) == null)?null:this.subdata.get(channel).getID());
         info.set("subdata", subdata);
         info.set("signature", signature);
         info.set("extra", getExtra());

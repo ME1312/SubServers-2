@@ -1,14 +1,14 @@
 package net.ME1312.SubServers.Sync.Network.Packet;
 
-import net.ME1312.SubServers.Sync.Library.Config.YAMLSection;
-import net.ME1312.SubServers.Sync.Library.Version.Version;
-import net.ME1312.SubServers.Sync.Network.PacketIn;
+import net.ME1312.Galaxi.Library.Map.ObjectMap;
+import net.ME1312.SubData.Client.Protocol.PacketObjectIn;
+import net.ME1312.SubData.Client.SubDataClient;
 import net.ME1312.SubServers.Sync.SubPlugin;
 
 /**
  * Update External Whitelist Packet
  */
-public class PacketInExUpdateWhitelist implements PacketIn {
+public class PacketInExUpdateWhitelist implements PacketObjectIn<Integer> {
     private SubPlugin plugin;
 
     /**
@@ -19,16 +19,16 @@ public class PacketInExUpdateWhitelist implements PacketIn {
     }
 
     @Override
-    public void execute(YAMLSection data) throws Throwable {
-        if (data.getBoolean("mode")) {
-            plugin.servers.get(data.getRawString("name")).whitelist(data.getUUID("value"));
+    public void receive(SubDataClient client, ObjectMap<Integer> data) {
+        if (data.getBoolean(0x0001)) {
+            plugin.servers.get(data.getRawString(0x0000)).whitelist(data.getUUID(0x0002));
         } else {
-            plugin.servers.get(data.getRawString("name")).unwhitelist(data.getUUID("value"));
+            plugin.servers.get(data.getRawString(0x0000)).unwhitelist(data.getUUID(0x0002));
         }
     }
 
     @Override
-    public Version getVersion() {
-        return new Version("2.13.2c");
+    public int version() {
+        return 0x0001;
     }
 }

@@ -2,21 +2,25 @@ package net.ME1312.SubServers.Sync;
 
 import com.dosse.upnp.UPnP;
 import com.google.gson.Gson;
+import net.ME1312.SubData.Client.Encryption.AES;
+import net.ME1312.SubData.Client.Encryption.RSA;
 import net.ME1312.SubServers.Sync.Event.*;
-import net.ME1312.SubServers.Sync.Library.Config.YAMLConfig;
-import net.ME1312.SubServers.Sync.Library.Config.YAMLSection;
+import net.ME1312.Galaxi.Library.Config.YAMLConfig;
+import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.SubServers.Sync.Library.Fallback.SmartReconnectHandler;
 import net.ME1312.SubServers.Sync.Library.Metrics;
-import net.ME1312.SubServers.Sync.Library.NamedContainer;
-import net.ME1312.SubServers.Sync.Library.UniversalFile;
-import net.ME1312.SubServers.Sync.Library.Util;
-import net.ME1312.SubServers.Sync.Library.Version.Version;
-import net.ME1312.SubServers.Sync.Network.Cipher;
-import net.ME1312.SubServers.Sync.Network.SubDataClient;
+import net.ME1312.Galaxi.Library.NamedContainer;
+import net.ME1312.Galaxi.Library.UniversalFile;
+import net.ME1312.Galaxi.Library.Util;
+import net.ME1312.Galaxi.Library.Version.Version;
+import net.ME1312.SubData.Client.SubDataClient;
+import net.ME1312.SubServers.Sync.Library.Updates.ConfigUpdater;
+import net.ME1312.SubServers.Sync.Network.SubProtocol;
 import net.ME1312.SubServers.Sync.Server.ServerContainer;
 import net.ME1312.SubServers.Sync.Server.SubServerContainer;
 import net.md_5.bungee.BungeeCord;
 import net.md_5.bungee.UserConnection;
+import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ServerPing;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -40,6 +44,7 @@ import java.util.concurrent.TimeUnit;
  * Main Plugin Class
  */
 public final class SubPlugin extends BungeeCord implements Listener {
+    protected HashMap<Integer, SubDataClient> subdata = new HashMap<Integer, SubDataClient>();
     protected NamedContainer<Long, Map<String, Map<String, String>>> lang = null;
     public final Map<String, ServerContainer> servers = new TreeMap<String, ServerContainer>();
     private final HashMap<UUID, List<ServerInfo>> fallbackLimbo = new HashMap<UUID, List<ServerInfo>>();
@@ -49,11 +54,12 @@ public final class SubPlugin extends BungeeCord implements Listener {
     public YAMLConfig config;
     public boolean redis = false;
     public final SubAPI api = new SubAPI(this);
-    public SubDataClient subdata = null;
+    public SubProtocol subprotocol;
     public static final Version version = Version.fromString("2.14a");
 
     public final boolean isPatched;
     public long lastReload = -1;
+    private boolean reconnect = false;
     private boolean posted = false;
 
     protected SubPlugin(PrintStream out, boolean isPatched) throws IOException {
@@ -70,17 +76,11 @@ public final class SubPlugin extends BungeeCord implements Listener {
         }
         UniversalFile dir = new UniversalFile(this.dir, "SubServers");
         dir.mkdir();
-        if (!(new UniversalFile(dir, "sync.yml").exists())) {
-            Util.copyFromJar(SubPlugin.class.getClassLoader(), "net/ME1312/SubServers/Sync/Library/Files/config.yml", new UniversalFile(dir, "sync.yml").getPath());
-            System.out.println("SubServers > Created ./SubServers/sync.yml");
-        } else if (((new YAMLConfig(new UniversalFile(dir, "sync.yml"))).get().getSection("Settings").getVersion("Version", new Version(0))).compareTo(new Version("2.11.2a+")) != 0) {
-            Files.move(new UniversalFile(dir, "sync.yml").toPath(), new UniversalFile(dir, "config.old" + Math.round(Math.random() * 100000) + ".yml").toPath());
 
-            Util.copyFromJar(SubPlugin.class.getClassLoader(), "net/ME1312/SubServers/Sync/Library/Files/config.yml", new UniversalFile(dir, "sync.yml").getPath());
-            System.out.println("SubServers > Updated ./SubServers/sync.yml");
-        }
+        ConfigUpdater.updateConfig(new UniversalFile(dir, "sync.yml"));
         config = new YAMLConfig(new UniversalFile(dir, "sync.yml"));
 
+        subprotocol = SubProtocol.get();
         getPluginManager().registerListener(null, this);
 
         System.out.println("SubServers > Loading BungeeCord Libraries...");
@@ -93,26 +93,41 @@ public final class SubPlugin extends BungeeCord implements Listener {
     public void startListeners() {
         try {
             redis = getPluginManager().getPlugin("RedisBungee") != null;
+            ConfigUpdater.updateConfig(new UniversalFile(dir, "SubServers:sync.yml"));
             config.reload();
 
-            Cipher cipher = null;
-            if (!config.get().getSection("Settings").getSection("SubData").getRawString("Encryption", "NONE").equalsIgnoreCase("NONE")) {
-                if (config.get().getSection("Settings").getSection("SubData").getRawString("Password", "").length() == 0) {
-                    System.out.println("SubData > Cannot encrypt connection without a password");
-                } else if (!SubDataClient.getCiphers().keySet().contains(config.get().getSection("Settings").getSection("SubData").getRawString("Encryption").toUpperCase().replace('-', '_').replace(' ', '_'))) {
-                    System.out.println("SubData > Unknown encryption type: " + config.get().getSection("Settings").getSection("SubData").getRawString("Encryption"));
-                } else {
-                    cipher = SubDataClient.getCipher(config.get().getSection("Settings").getSection("SubData").getRawString("Encryption"));
+            subprotocol.unregisterCipher("AES");
+            subprotocol.unregisterCipher("AES-128");
+            subprotocol.unregisterCipher("AES-192");
+            subprotocol.unregisterCipher("AES-256");
+            subprotocol.unregisterCipher("RSA");
+            api.name = config.get().getMap("Settings").getMap("SubData").getString("Name", null);
+
+            if (config.get().getMap("Settings").getMap("SubData").getRawString("Password", "").length() > 0) {
+                subprotocol.registerCipher("AES", new AES(128, config.get().getMap("Settings").getMap("SubData").getRawString("Password")));
+                subprotocol.registerCipher("AES-128", new AES(128, config.get().getMap("Settings").getMap("SubData").getRawString("Password")));
+                subprotocol.registerCipher("AES-192", new AES(192, config.get().getMap("Settings").getMap("SubData").getRawString("Password")));
+                subprotocol.registerCipher("AES-256", new AES(256, config.get().getMap("Settings").getMap("SubData").getRawString("Password")));
+
+                System.out.println("SubData > AES Encryption Available");
+            }
+            if (new UniversalFile(dir, "SubServers:subdata.rsa.key").exists()) {
+                try {
+                    subprotocol.registerCipher("RSA", new RSA(new UniversalFile(dir, "SubServers:subdata.rsa.key")));
+                    System.out.println("SubData > RSA Encryption Available");
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }
-            subdata = new SubDataClient(this, config.get().getSection("Settings").getSection("SubData").getRawString("Name", null),
-                    InetAddress.getByName(config.get().getSection("Settings").getSection("SubData").getRawString("Address", "127.0.0.1:4391").split(":")[0]),
-                    Integer.parseInt(config.get().getSection("Settings").getSection("SubData").getRawString("Address", "127.0.0.1:4391").split(":")[1]), cipher);
+
+            reconnect = true;
+            System.out.println("SubData > ");
+            connect();
 
             super.startListeners();
 
             if (UPnP.isUPnPAvailable()) {
-                if (config.get().getSection("Settings").getSection("UPnP", new YAMLSection()).getBoolean("Forward-Proxy", true)) for (ListenerInfo listener : getConfig().getListeners()) {
+                if (config.get().getMap("Settings").getMap("UPnP", new ObjectMap<String>()).getBoolean("Forward-Proxy", true)) for (ListenerInfo listener : getConfig().getListeners()) {
                     UPnP.openPortTCP(listener.getHost().getPort());
                 }
             } else {
@@ -128,8 +143,13 @@ public final class SubPlugin extends BungeeCord implements Listener {
         }
     }
 
+    private void connect() throws IOException {
+        subdata.put(0, subprotocol.open((config.get().getMap("Settings").getMap("SubData").getRawString("Address", "127.0.0.1:4391").split(":")[0].equals("0.0.0.0"))?null:InetAddress.getByName(config.get().getMap("Settings").getMap("SubData").getRawString("Address", "127.0.0.1:4391").split(":")[0]),
+                Integer.parseInt(config.get().getMap("Settings").getMap("SubData").getRawString("Address", "127.0.0.1:4391").split(":")[1])));
+    }
+
     private void post() {
-        if (config.get().getSection("Settings").getBoolean("Override-Bungee-Commands", true)) {
+        if (config.get().getMap("Settings").getBoolean("Override-Bungee-Commands", true)) {
             getPluginManager().registerCommand(null, SubCommand.BungeeServer.newInstance(this, "server").get());
             getPluginManager().registerCommand(null, new SubCommand.BungeeList(this, "glist"));
         }
@@ -143,12 +163,12 @@ public final class SubPlugin extends BungeeCord implements Listener {
             @Override
             public void run() {
                 try {
-                    YAMLSection tags = new YAMLSection(new Gson().fromJson("{\"tags\":" + Util.readAll(new BufferedReader(new InputStreamReader(new URL("https://api.github.com/repos/ME1312/SubServers-2/git/refs/tags").openStream(), Charset.forName("UTF-8")))) + '}', Map.class));
+                    ObjectMap<String> tags = new ObjectMap<String>(new Gson().fromJson("{\"tags\":" + Util.readAll(new BufferedReader(new InputStreamReader(new URL("https://api.github.com/repos/ME1312/SubServers-2/git/refs/tags").openStream(), Charset.forName("UTF-8")))) + '}', Map.class));
                     List<Version> versions = new LinkedList<Version>();
 
                     Version updversion = version;
                     int updcount = 0;
-                    for (YAMLSection tag : tags.getSectionList("tags")) versions.add(Version.fromString(tag.getString("ref").substring(10)));
+                    for (ObjectMap<String> tag : tags.getMapList("tags")) versions.add(Version.fromString(tag.getString("ref").substring(10)));
                     Collections.sort(versions);
                     for (Version version : versions) {
                         if (version.compareTo(updversion) > 0) {
@@ -232,7 +252,15 @@ public final class SubPlugin extends BungeeCord implements Listener {
             System.out.println("SubServers > Resetting Server Data");
             servers.clear();
 
-            subdata.destroy(0);
+            reconnect = false;
+            ArrayList<SubDataClient> tmp = new ArrayList<SubDataClient>();
+            tmp.addAll(subdata.values());
+            for (SubDataClient client : tmp) if (client != null) {
+                client.close();
+                Util.isException(client::waitFor);
+            }
+            subdata.clear();
+            subdata.put(0, null);
 
             for (ListenerInfo listener : getConfig().getListeners()) {
                 if (UPnP.isUPnPAvailable() && UPnP.isMappedTCP(listener.getHost().getPort())) UPnP.closePortTCP(listener.getHost().getPort());
@@ -301,7 +329,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
     @SuppressWarnings("deprecation")
     @EventHandler(priority = Byte.MAX_VALUE)
     public void fallback(ServerKickEvent e) {
-        if (e.getPlayer() instanceof UserConnection && config.get().getSection("Settings").getBoolean("Smart-Fallback", true)) {
+        if (e.getPlayer() instanceof UserConnection && config.get().getMap("Settings").getBoolean("Smart-Fallback", true)) {
             Map<String, ServerInfo> fallbacks;
             if (!fallbackLimbo.keySet().contains(e.getPlayer().getUniqueId())) {
                 fallbacks = SmartReconnectHandler.getFallbackServers(e.getPlayer().getPendingConnection().getListener());
@@ -339,6 +367,15 @@ public final class SubPlugin extends BungeeCord implements Listener {
     @EventHandler(priority = Byte.MIN_VALUE)
     public void resetLimbo(PlayerDisconnectEvent e) {
         fallbackLimbo.remove(e.getPlayer().getUniqueId());
+        SubCommand.players.remove(e.getPlayer().getUniqueId());
+    }
+
+    @SuppressWarnings("unchecked")
+    private Map<Integer, UUID> getSubDataAsMap(net.ME1312.SubServers.Sync.Network.API.Server server) {
+        HashMap<Integer, UUID> map = new HashMap<Integer, UUID>();
+        ObjectMap<Integer> subdata = new ObjectMap<Integer>((Map<Integer, ?>) server.getRaw().getObject("subdata"));
+        for (Integer channel : subdata.getKeys()) map.put(channel, subdata.getUUID(channel));
+        return map;
     }
 
     @EventHandler(priority = Byte.MIN_VALUE)
@@ -347,11 +384,11 @@ public final class SubPlugin extends BungeeCord implements Listener {
             if (server != null) {
                 if (server instanceof net.ME1312.SubServers.Sync.Network.API.SubServer) {
                     servers.put(server.getName().toLowerCase(), new SubServerContainer(server.getSignature(), server.getName(), server.getDisplayName(), server.getAddress(),
-                            server.getSubData(), server.getMotd(), server.isHidden(), server.isRestricted(), server.getWhitelist(), ((net.ME1312.SubServers.Sync.Network.API.SubServer) server).isRunning()));
+                            getSubDataAsMap(server), server.getMotd(), server.isHidden(), server.isRestricted(), server.getWhitelist(), ((net.ME1312.SubServers.Sync.Network.API.SubServer) server).isRunning()));
                     System.out.println("SubServers > Added SubServer: " + e.getServer());
                 } else {
                     servers.put(server.getName().toLowerCase(), new ServerContainer(server.getSignature(), server.getName(), server.getDisplayName(), server.getAddress(),
-                            server.getSubData(), server.getMotd(), server.isHidden(), server.isRestricted(), server.getWhitelist()));
+                            getSubDataAsMap(server), server.getMotd(), server.isHidden(), server.isRestricted(), server.getWhitelist()));
                     System.out.println("SubServers > Added Server: " + e.getServer());
                 }
             } else System.out.println("PacketDownloadServerInfo(" + e.getServer() + ") returned with an invalid response");
@@ -364,10 +401,10 @@ public final class SubPlugin extends BungeeCord implements Listener {
             if (current == null || !current.getSignature().equals(server.getSignature())) {
                 if (server instanceof net.ME1312.SubServers.Sync.Network.API.SubServer) {
                     servers.put(server.getName().toLowerCase(), new SubServerContainer(server.getSignature(), server.getName(), server.getDisplayName(), server.getAddress(),
-                            server.getSubData(), server.getMotd(), server.isHidden(), server.isRestricted(), server.getWhitelist(), ((net.ME1312.SubServers.Sync.Network.API.SubServer) server).isRunning()));
+                            getSubDataAsMap(server), server.getMotd(), server.isHidden(), server.isRestricted(), server.getWhitelist(), ((net.ME1312.SubServers.Sync.Network.API.SubServer) server).isRunning()));
                 } else {
                     servers.put(server.getName().toLowerCase(), new ServerContainer(server.getSignature(), server.getName(), server.getDisplayName(), server.getAddress(),
-                            server.getSubData(), server.getMotd(), server.isHidden(), server.isRestricted(), server.getWhitelist()));
+                            getSubDataAsMap(server), server.getMotd(), server.isHidden(), server.isRestricted(), server.getWhitelist()));
                 }
 
                 System.out.println("SubServers > Added "+((server instanceof net.ME1312.SubServers.Sync.Network.API.SubServer)?"Sub":"")+"Server: " + server.getName());
@@ -402,7 +439,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
                     server.setDisplayName(e.getEdit().get().asString());
                     break;
                 case "motd":
-                    server.setMotd(e.getEdit().get().asColoredString('&'));
+                    server.setMotd(ChatColor.translateAlternateColorCodes('&', e.getEdit().get().asString()));
                     break;
                 case "restricted":
                     server.setRestricted(e.getEdit().get().asBoolean());
@@ -420,12 +457,16 @@ public final class SubPlugin extends BungeeCord implements Listener {
             ((SubServerContainer) servers.get(e.getServer().toLowerCase())).setRunning(true);
     }
 
-    public void connect(ServerContainer server, String address) {
-        if (server != null) server.setSubData(address);
+    public void connect(ServerContainer server, int channel, UUID address) {
+        if (server != null) {
+            server.setSubData(address, channel);
+        }
     }
 
-    public void disconnect(ServerContainer server) {
-        if (server != null) server.setSubData(null);
+    public void disconnect(ServerContainer server, int channel) {
+        if (server != null) {
+            server.setSubData(null, channel);
+        }
     }
 
     @EventHandler(priority = Byte.MIN_VALUE)

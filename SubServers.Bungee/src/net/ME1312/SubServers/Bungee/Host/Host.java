@@ -450,11 +450,6 @@ public abstract class Host implements ExtraDataHandler {
             servers.set(server.getName(), server.forSubData());
         }
         hinfo.set("servers", servers);
-        if (this instanceof ClientHandler) {
-            LinkedList<UUID> subdata = new LinkedList<UUID>();
-            for (DataClient client : ((ClientHandler) this).getSubData()) subdata.add((client == null)?null:client.getID());
-            hinfo.set("subdata", subdata);
-        }
         hinfo.set("signature", signature);
         hinfo.set("extra", getExtra());
         return hinfo;

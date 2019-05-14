@@ -11,45 +11,47 @@ import java.util.HashMap;
 import java.util.UUID;
 
 /**
- * Stop Server Packet
+ * Delete Server Packet
  */
-public class PacketStopServer implements PacketObjectIn<Integer>, PacketObjectOut<Integer> {
+public class PacketDeleteServer implements PacketObjectIn<Integer>, PacketObjectOut<Integer> {
     private static HashMap<UUID, Callback<ObjectMap<Integer>>[]> callbacks = new HashMap<UUID, Callback<ObjectMap<Integer>>[]>();
     private UUID player;
-    private boolean force;
     private String server;
-    private UUID id;
+    private boolean recycle;
+    private boolean force;
+    private UUID tracker;
 
     /**
-     * New PacketStopServer (In)
+     * New PacketDeleteServer (In)
      */
-    public PacketStopServer() {}
+    public PacketDeleteServer() {}
 
     /**
-     * New PacketStopServer (Out)
+     * New PacketDeleteServer (Out)
      *
-     * @param player Player Starting
+     * @param player Player Deleting
      * @param server Server
-     * @param force Force Stop
      * @param callback Callbacks
      */
     @SafeVarargs
-    public PacketStopServer(UUID player, String server, boolean force, Callback<ObjectMap<Integer>>... callback) {
-        if (Util.isNull(server, force, callback)) throw new NullPointerException();
+    public PacketDeleteServer(UUID player, String server, boolean recycle, boolean force, Callback<ObjectMap<Integer>>... callback) {
+        if (Util.isNull(server, callback)) throw new NullPointerException();
         this.player = player;
         this.server = server;
+        this.recycle = recycle;
         this.force = force;
-        this.id = Util.getNew(callbacks.keySet(), UUID::randomUUID);
-        callbacks.put(id, callback);
+        this.tracker = Util.getNew(callbacks.keySet(), UUID::randomUUID);
+        callbacks.put(tracker, callback);
     }
 
     @Override
     public ObjectMap<Integer> send(SubDataClient client) {
         ObjectMap<Integer> data = new ObjectMap<Integer>();
-        data.set(0x0000, id);
+        data.set(0x0000, tracker);
         data.set(0x0001, server);
-        data.set(0x0002, force);
-        if (player != null) data.set(0x0003, player.toString());
+        data.set(0x0002, recycle);
+        data.set(0x0003, force);
+        if (player != null) data.set(0x0004, player.toString());
         return data;
     }
 

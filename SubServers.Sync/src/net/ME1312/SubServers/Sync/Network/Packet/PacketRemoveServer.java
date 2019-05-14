@@ -11,42 +11,41 @@ import java.util.HashMap;
 import java.util.UUID;
 
 /**
- * Stop Server Packet
+ * Remove Server Packet
  */
-public class PacketStopServer implements PacketObjectIn<Integer>, PacketObjectOut<Integer> {
+public class PacketRemoveServer implements PacketObjectIn<Integer>, PacketObjectOut<Integer> {
     private static HashMap<UUID, Callback<ObjectMap<Integer>>[]> callbacks = new HashMap<UUID, Callback<ObjectMap<Integer>>[]>();
     private UUID player;
-    private boolean force;
     private String server;
-    private UUID id;
+    private boolean force;
+    private UUID tracker;
 
     /**
-     * New PacketStopServer (In)
+     * New PacketRemoveServer (In)
      */
-    public PacketStopServer() {}
+    public PacketRemoveServer() {}
 
     /**
-     * New PacketStopServer (Out)
+     * New PacketRemoveServer (Out)
      *
-     * @param player Player Starting
+     * @param player Player Removing
      * @param server Server
-     * @param force Force Stop
      * @param callback Callbacks
      */
     @SafeVarargs
-    public PacketStopServer(UUID player, String server, boolean force, Callback<ObjectMap<Integer>>... callback) {
-        if (Util.isNull(server, force, callback)) throw new NullPointerException();
+    public PacketRemoveServer(UUID player, String server, boolean force, Callback<ObjectMap<Integer>>... callback) {
+        if (Util.isNull(server, callback)) throw new NullPointerException();
         this.player = player;
         this.server = server;
         this.force = force;
-        this.id = Util.getNew(callbacks.keySet(), UUID::randomUUID);
-        callbacks.put(id, callback);
+        this.tracker = Util.getNew(callbacks.keySet(), UUID::randomUUID);
+        callbacks.put(tracker, callback);
     }
 
     @Override
     public ObjectMap<Integer> send(SubDataClient client) {
         ObjectMap<Integer> data = new ObjectMap<Integer>();
-        data.set(0x0000, id);
+        data.set(0x0000, tracker);
         data.set(0x0001, server);
         data.set(0x0002, force);
         if (player != null) data.set(0x0003, player.toString());

@@ -1,6 +1,6 @@
 package net.ME1312.SubServers.Sync.Library.Fallback;
 
-import net.ME1312.SubServers.Sync.Library.Util;
+import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubServers.Sync.Server.ServerContainer;
 import net.ME1312.SubServers.Sync.Server.SubServerContainer;
 import net.ME1312.SubServers.Sync.SubAPI;
@@ -78,7 +78,7 @@ public class SmartReconnectHandler implements ReconnectHandler {
                 if (server instanceof ServerContainer) {
                     if (!((ServerContainer) server).isHidden()) confidence++;
                     if (!((ServerContainer) server).isRestricted()) confidence++;
-                    if (((ServerContainer) server).getSubData() != null) confidence++;
+                    if (((ServerContainer) server).getSubData()[0] != null) confidence++;
                 } if (server instanceof SubServerContainer) {
                     if (!((SubServerContainer) server).isRunning()) valid = false;
                 }

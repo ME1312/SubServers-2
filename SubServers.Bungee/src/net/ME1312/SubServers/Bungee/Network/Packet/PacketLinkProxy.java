@@ -61,17 +61,20 @@ public class PacketLinkProxy implements InitialPacket, PacketObjectIn<Integer>, 
             Map<String, Proxy> proxies = plugin.api.getProxies();
             String name = ((data.contains(0x0000))?data.getRawString(0x0000):null);
             Integer channel = data.getInt(0x0001);
+
+            boolean isnew = false;
             Proxy proxy;
             if (name != null && proxies.keySet().contains(name.toLowerCase())) {
                 proxy = proxies.get(name.toLowerCase());
             } else {
                 proxy = new Proxy((name != null && !proxies.keySet().contains(name.toLowerCase()))?name:null);
-                plugin.getPluginManager().callEvent(new SubAddProxyEvent(proxy));
+                isnew = true;
                 plugin.proxies.put(proxy.getName().toLowerCase(), proxy);
             }
             HashMap<Integer, SubDataClient> subdata = Util.getDespiteException(() -> Util.reflect(Proxy.class.getDeclaredField("subdata"), proxy), null);
             if (!subdata.keySet().contains(channel) || (channel == 0 && subdata.get(0) == null)) {
                 proxy.setSubData(client, channel);
+                if (isnew) plugin.getPluginManager().callEvent(new SubAddProxyEvent(proxy));
                 System.out.println("SubData > " + client.getAddress().toString() + " has been defined as Proxy: " + proxy.getName() + ((channel > 0)?" (Sub-"+channel+")":""));
                 client.sendPacket(new PacketLinkProxy(proxy.getName(), 0, null));
                 setReady(client, true);

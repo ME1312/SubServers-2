@@ -1,7 +1,8 @@
 package net.ME1312.SubServers.Sync.Network.API;
 
-import net.ME1312.SubServers.Sync.Library.Config.YAMLSection;
-import net.ME1312.SubServers.Sync.Library.NamedContainer;
+import net.ME1312.Galaxi.Library.Map.ObjectMap;
+import net.ME1312.Galaxi.Library.NamedContainer;
+import net.ME1312.SubData.Client.SubDataClient;
 import net.ME1312.SubServers.Sync.Network.Packet.PacketDownloadServerInfo;
 import net.ME1312.SubServers.Sync.SubAPI;
 
@@ -9,7 +10,7 @@ import java.net.InetSocketAddress;
 import java.util.*;
 
 public class Server {
-    YAMLSection raw;
+    ObjectMap<String> raw;
     long timestamp;
 
     /**
@@ -17,7 +18,7 @@ public class Server {
      *
      * @param raw Raw representation of the Server
      */
-    public Server(YAMLSection raw) {
+    public Server(ObjectMap<String> raw) {
         load(raw);
     }
 
@@ -26,7 +27,7 @@ public class Server {
         return obj instanceof Server && getSignature().equals(((Server) obj).getSignature());
     }
 
-    void load(YAMLSection raw) {
+    void load(ObjectMap<String>  raw) {
         this.raw = raw;
         this.timestamp = Calendar.getInstance().getTime().getTime();
     }
@@ -36,16 +37,22 @@ public class Server {
      */
     public void refresh() {
         String name = getName();
-        SubAPI.getInstance().getSubDataNetwork().sendPacket(new PacketDownloadServerInfo(name, data -> load(data.getSection("servers").getSection(name))));
+        ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketDownloadServerInfo(name, data -> load(data.getMap(name))));
     }
 
     /**
-     * Gets the SubData Client Address
+     * Gets the SubData Client Channel IDs
      *
-     * @return SubData Client Address (or null if not linked)
+     * @return SubData Client Channel ID Array
      */
-    public String getSubData() {
-        return raw.getRawString("subdata", null);
+    @SuppressWarnings("unchecked")
+    public UUID[] getSubData() {
+        ObjectMap<Integer> subdata = new ObjectMap<Integer>((Map<Integer, ?>) raw.getObject("subdata"));
+        LinkedList<Integer> keys = new LinkedList<Integer>(subdata.getKeys());
+        LinkedList<UUID> channels = new LinkedList<UUID>();
+        Collections.sort(keys);
+        for (Integer channel : keys) channels.add(subdata.getUUID(channel));
+        return channels.toArray(new UUID[0]);
     }
 
     /**
@@ -90,8 +97,8 @@ public class Server {
      */
     public Collection<NamedContainer<String, UUID>> getPlayers() {
         List<NamedContainer<String, UUID>> players = new ArrayList<NamedContainer<String, UUID>>();
-        for (String id : raw.getSection("players").getKeys()) {
-            players.add(new NamedContainer<String, UUID>(raw.getSection("players").getSection(id).getRawString("name"), UUID.fromString(id)));
+        for (String id : raw.getMap("players").getKeys()) {
+            players.add(new NamedContainer<String, UUID>(raw.getMap("players").getMap(id).getRawString("name"), UUID.fromString(id)));
         }
         return players;
     }
@@ -165,13 +172,7 @@ public class Server {
      *
      * @return Raw Server
      */
-    public YAMLSection getRaw() {
+    public ObjectMap<String> getRaw() {
         return raw.clone();
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public String toString() {
-        return raw.toJSON().toString();
     }
 }

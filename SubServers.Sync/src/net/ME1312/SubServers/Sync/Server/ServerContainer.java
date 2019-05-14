@@ -1,53 +1,64 @@
 package net.ME1312.SubServers.Sync.Server;
 
-import net.ME1312.SubServers.Sync.Library.Util;
+import net.ME1312.Galaxi.Library.Util;
 import net.md_5.bungee.BungeeServerInfo;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 import java.lang.reflect.Field;
 import java.net.InetSocketAddress;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Server Class
  */
 public class ServerContainer extends BungeeServerInfo {
-    private String subdata;
+    private HashMap<Integer, UUID> subdata = new HashMap<Integer, UUID>();
     private List<UUID> whitelist = new ArrayList<UUID>();
     private String nick = null;
     private boolean hidden;
     private final String signature;
 
-    public ServerContainer(String signature, String name, String display, InetSocketAddress address, String subdata, String motd, boolean hidden, boolean restricted, Collection<UUID> whitelist) {
+    public ServerContainer(String signature, String name, String display, InetSocketAddress address, Map<Integer, UUID> subdata, String motd, boolean hidden, boolean restricted, Collection<UUID> whitelist) {
         super(name, address, motd, restricted);
         if (Util.isNull(name, address, motd, hidden, restricted)) throw new NullPointerException();
         this.signature = signature;
-        this.subdata = subdata;
         this.whitelist.addAll(whitelist);
         this.hidden = hidden;
         setDisplayName(display);
+
+        for (int channel : subdata.keySet())
+            setSubData(subdata.get(channel), channel);
     }
 
     /**
-     * Gets the SubData Client Address
+     * Gets the SubData Client Channel IDs
      *
-     * @return SubData Client Address (or null if not linked)
+     * @return SubData Client Channel ID Array
      */
-    public String getSubData() {
-        return subdata;
+    public UUID[] getSubData() {
+        LinkedList<Integer> keys = new LinkedList<Integer>(subdata.keySet());
+        LinkedList<UUID> channels = new LinkedList<UUID>();
+        Collections.sort(keys);
+        for (Integer channel : keys) channels.add(subdata.get(channel));
+        return channels.toArray(new UUID[0]);
     }
 
     /**
-     * Sets the SubData Client Address
+     * Link a SubData Client to this Object
      *
-     * @param subdata SubData Client Address (null represents not linked)
+     * @param client Client to Link
+     * @param channel Channel ID
      */
-    public void setSubData(String subdata) {
-        this.subdata = subdata;
+    public void setSubData(UUID client, int channel) {
+        if (channel < 0) throw new IllegalArgumentException("Subchannel ID cannot be less than zero");
+        if (client != null || channel == 0) {
+            if (!subdata.keySet().contains(channel) || (channel == 0 && (client == null || subdata.get(channel) == null))) {
+                subdata.put(channel, client);
+            }
+        } else {
+            subdata.remove(channel);
+        }
     }
 
     /**

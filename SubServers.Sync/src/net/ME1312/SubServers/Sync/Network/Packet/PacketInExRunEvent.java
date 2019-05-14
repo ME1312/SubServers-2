@@ -1,149 +1,151 @@
 package net.ME1312.SubServers.Sync.Network.Packet;
 
-import net.ME1312.SubServers.Sync.Event.*;
-import net.ME1312.SubServers.Sync.Library.Callback;
-import net.ME1312.SubServers.Sync.Library.Config.YAMLSection;
-import net.ME1312.SubServers.Sync.Library.NamedContainer;
-import net.ME1312.SubServers.Sync.Library.Version.Version;
-import net.ME1312.SubServers.Sync.Network.PacketIn;
+import net.ME1312.Galaxi.Library.Callback.Callback;
+import net.ME1312.Galaxi.Library.Map.ObjectMap;
+import net.ME1312.Galaxi.Library.NamedContainer;
+import net.ME1312.Galaxi.Library.Version.Version;
+import net.ME1312.SubData.Client.Protocol.PacketObjectIn;
+import net.ME1312.SubData.Client.SubDataClient;
 import net.ME1312.SubServers.Sync.SubPlugin;
+import net.ME1312.SubServers.Sync.Event.*;
 import net.md_5.bungee.api.ProxyServer;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.UUID;
+import java.util.Map;
 
 /**
  * Run Event Packet
  */
-public class PacketInRunEvent implements PacketIn {
-    private static HashMap<String, List<Callback<YAMLSection>>> callbacks = new HashMap<String, List<Callback<YAMLSection>>>();
+public class PacketInExRunEvent implements PacketObjectIn<Integer> {
+    private static HashMap<String, List<Callback<ObjectMap<String>>>> callbacks = new HashMap<String, List<Callback<ObjectMap<String>>>>();
 
     /**
-     * New PacketInRunEvent
+     * New PacketInExRunEvent
      */
-    public PacketInRunEvent(SubPlugin plugin) {
-        callback("SubAddHostEvent", new Callback<YAMLSection>() {
+    public PacketInExRunEvent(SubPlugin plugin) {
+        callback("SubAddHostEvent", new Callback<ObjectMap<String>>() {
             @Override
-            public void run(YAMLSection data) {
+            public void run(ObjectMap<String> data) {
                 ProxyServer.getInstance().getPluginManager().callEvent(new SubAddHostEvent((data.contains("player"))?data.getUUID("player"):null, data.getRawString("host")));
                 callback("SubAddHostEvent", this);
             }
         });
-        callback("SubAddProxyEvent", new Callback<YAMLSection>() {
+        callback("SubAddProxyEvent", new Callback<ObjectMap<String>>() {
             @Override
-            public void run(YAMLSection data) {
+            public void run(ObjectMap<String> data) {
                 ProxyServer.getInstance().getPluginManager().callEvent(new SubAddProxyEvent(data.getRawString("proxy")));
                 callback("SubAddProxyEvent", this);
             }
         });
-        callback("SubAddServerEvent", new Callback<YAMLSection>() {
+        callback("SubAddServerEvent", new Callback<ObjectMap<String>>() {
             @Override
-            public void run(YAMLSection data) {
+            public void run(ObjectMap<String> data) {
                 ProxyServer.getInstance().getPluginManager().callEvent(new SubAddServerEvent((data.contains("player"))?data.getUUID("player"):null, (data.contains("host"))?data.getRawString("host"):null, data.getRawString("server")));
                 callback("SubAddServerEvent", this);
             }
         });
-        callback("SubCreateEvent", new Callback<YAMLSection>() {
+        callback("SubCreateEvent", new Callback<ObjectMap<String>>() {
             @Override
-            public void run(YAMLSection data) {
+            public void run(ObjectMap<String> data) {
                 ProxyServer.getInstance().getPluginManager().callEvent(new SubCreateEvent((data.contains("player"))?data.getUUID("player"):null, data.getRawString("host"), data.getRawString("name"),
                         data.getRawString("template"), data.getVersion("version"), data.getInt("port")));
                 callback("SubCreateEvent", this);
             }
         });
-        callback("SubSendCommandEvent", new Callback<YAMLSection>() {
+        callback("SubSendCommandEvent", new Callback<ObjectMap<String>>() {
             @Override
-            public void run(YAMLSection data) {
+            public void run(ObjectMap<String> data) {
                 ProxyServer.getInstance().getPluginManager().callEvent(new SubSendCommandEvent((data.contains("player"))?data.getUUID("player"):null, data.getRawString("server"), data.getRawString("command")));
                 callback("SubSendCommandEvent", this);
             }
         });
-        callback("SubEditServerEvent", new Callback<YAMLSection>() {
+        callback("SubEditServerEvent", new Callback<ObjectMap<String>>() {
             @Override
-            public void run(YAMLSection data) {
+            public void run(ObjectMap<String> data) {
                 ProxyServer.getInstance().getPluginManager().callEvent(new SubEditServerEvent((data.contains("player"))?data.getUUID("player"):null, data.getRawString("server"), new NamedContainer<String, Object>(data.getRawString("edit"), data.get("value")), data.getBoolean("perm")));
                 callback("SubEditServerEvent", this);
             }
         });
-        callback("SubStartEvent", new Callback<YAMLSection>() {
+        callback("SubStartEvent", new Callback<ObjectMap<String>>() {
             @Override
-            public void run(YAMLSection data) {
+            public void run(ObjectMap<String> data) {
                 ProxyServer.getInstance().getPluginManager().callEvent(new SubStartEvent((data.contains("player"))?data.getUUID("player"):null, data.getRawString("server")));
                 callback("SubStartEvent", this);
             }
         });
-        callback("SubNetworkConnectEvent", new Callback<YAMLSection>() {
+        callback("SubNetworkConnectEvent", new Callback<ObjectMap<String>>() {
             @Override
-            public void run(YAMLSection data) {
-                plugin.connect(plugin.servers.get(data.getRawString("server").toLowerCase()), data.getRawString("address"));
+            public void run(ObjectMap<String> data) {
+                plugin.connect(plugin.servers.get(data.getRawString("server").toLowerCase()), data.getInt("channel"), data.getUUID("id"));
                 callback("SubNetworkConnectEvent", this);
             }
         });
-        callback("SubNetworkDisconnectEvent", new Callback<YAMLSection>() {
+        callback("SubNetworkDisconnectEvent", new Callback<ObjectMap<String>>() {
             @Override
-            public void run(YAMLSection data) {
-                plugin.disconnect(plugin.servers.get(data.getRawString("server").toLowerCase()));
+            public void run(ObjectMap<String> data) {
+                plugin.disconnect(plugin.servers.get(data.getRawString("server").toLowerCase()), data.getInt("channel"));
                 callback("SubNetworkDisconnectEvent", this);
             }
         });
-        callback("SubStopEvent", new Callback<YAMLSection>() {
+        callback("SubStopEvent", new Callback<ObjectMap<String>>() {
             @Override
-            public void run(YAMLSection data) {
+            public void run(ObjectMap<String> data) {
                 ProxyServer.getInstance().getPluginManager().callEvent(new SubStopEvent((data.contains("player"))?data.getUUID("player"):null, data.getRawString("server"), data.getBoolean("force")));
                 callback("SubStopEvent", this);
             }
         });
-        callback("SubStoppedEvent", new Callback<YAMLSection>() {
+        callback("SubStoppedEvent", new Callback<ObjectMap<String>>() {
             @Override
-            public void run(YAMLSection data) {
+            public void run(ObjectMap<String> data) {
                 ProxyServer.getInstance().getPluginManager().callEvent(new SubStoppedEvent(data.getRawString("server")));
                 callback("SubStoppedEvent", this);
             }
         });
-        callback("SubRemoveServerEvent", new Callback<YAMLSection>() {
+        callback("SubRemoveServerEvent", new Callback<ObjectMap<String>>() {
             @Override
-            public void run(YAMLSection data) {
+            public void run(ObjectMap<String> data) {
                 ProxyServer.getInstance().getPluginManager().callEvent(new SubRemoveServerEvent((data.contains("player"))?data.getUUID("player"):null, (data.contains("host"))?data.getRawString("host"):null, data.getRawString("server")));
                 callback("SubRemoveServerEvent", this);
             }
         });
-        callback("SubRemoveProxyEvent", new Callback<YAMLSection>() {
+        callback("SubRemoveProxyEvent", new Callback<ObjectMap<String>>() {
             @Override
-            public void run(YAMLSection data) {
+            public void run(ObjectMap<String> data) {
                 ProxyServer.getInstance().getPluginManager().callEvent(new SubAddProxyEvent(data.getRawString("proxy")));
                 callback("SubRemoveProxyEvent", this);
             }
         });
-        callback("SubRemoveHostEvent", new Callback<YAMLSection>() {
+        callback("SubRemoveHostEvent", new Callback<ObjectMap<String>>() {
             @Override
-            public void run(YAMLSection data) {
+            public void run(ObjectMap<String> data) {
                 ProxyServer.getInstance().getPluginManager().callEvent(new SubRemoveHostEvent((data.contains("player"))?data.getUUID("player"):null, data.getRawString("host")));
                 callback("SubRemoveHostEvent", this);
             }
         });
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public void execute(YAMLSection data) {
-        if (callbacks.keySet().contains(data.getString("type"))) {
-            List<Callback<YAMLSection>> callbacks = PacketInRunEvent.callbacks.get(data.getString("type"));
-            PacketInRunEvent.callbacks.remove(data.getString("type"));
-            for (Callback<YAMLSection> callback : callbacks) {
-                callback.run(data.getSection("args"));
+    public void receive(SubDataClient client, ObjectMap<Integer> data) {
+        if (callbacks.keySet().contains(data.getString(0x0000))) {
+            List<Callback<ObjectMap<String>>> callbacks = PacketInExRunEvent.callbacks.get(data.getString(0x0000));
+            PacketInExRunEvent.callbacks.remove(data.getString(0x0000));
+            for (Callback<ObjectMap<String>> callback : callbacks) {
+                callback.run(new ObjectMap<>((Map<String, ?>) data.getObject(0x0001)));
             }
         }
     }
 
     @Override
-    public Version getVersion() {
-        return new Version("2.11.0a");
+    public int version() {
+        return 0x0001;
     }
 
-    public static void callback(String event, Callback<YAMLSection> callback) {
-        List<Callback<YAMLSection>> callbacks = (PacketInRunEvent.callbacks.keySet().contains(event))?PacketInRunEvent.callbacks.get(event):new ArrayList<Callback<YAMLSection>>();
+    public static void callback(String event, Callback<ObjectMap<String>> callback) {
+        List<Callback<ObjectMap<String>>> callbacks = (PacketInExRunEvent.callbacks.keySet().contains(event))? PacketInExRunEvent.callbacks.get(event):new ArrayList<Callback<ObjectMap<String>>>();
         callbacks.add(callback);
-        PacketInRunEvent.callbacks.put(event, callbacks);
+        PacketInExRunEvent.callbacks.put(event, callbacks);
     }
 }

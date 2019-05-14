@@ -36,7 +36,7 @@ public class Proxy implements ClientHandler, ExtraDataHandler {
         this.name = name;
         this.signature = SubAPI.getInstance().signAnonymousObject();
 
-        setSubData(null, 0);
+        subdata.put(0, null);
     }
 
     @Override
@@ -48,8 +48,7 @@ public class Proxy implements ClientHandler, ExtraDataHandler {
         return channels.toArray(new DataClient[0]);
     }
 
-    @SuppressWarnings("deprecation")
-    public void setSubData(DataClient client, int channel) {
+    public void setSubData(SubDataClient client, int channel) {
         boolean update = false;
         if (channel < 0) throw new IllegalArgumentException("Subchannel ID cannot be less than zero");
         if (client != null || channel == 0) {
@@ -189,8 +188,8 @@ public class Proxy implements ClientHandler, ExtraDataHandler {
         }
         info.set("players", players);
         info.set("redis", isRedis());
-        LinkedList<UUID> subdata = new LinkedList<UUID>();
-        for (DataClient client : getSubData()) subdata.add((client == null)?null:client.getID());
+        ObjectMap<Integer> subdata = new ObjectMap<Integer>();
+        for (int channel : this.subdata.keySet()) subdata.set(channel, (this.subdata.get(channel) == null)?null:this.subdata.get(channel).getID());
         info.set("subdata", subdata);
         info.set("signature", signature);
         info.set("extra", getExtra());

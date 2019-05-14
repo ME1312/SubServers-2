@@ -57,10 +57,18 @@ public class PacketOutExRunEvent implements Listener, PacketObjectOut<Integer> {
     }
 
     private void broadcast(PacketOutExRunEvent packet) {
+        broadcast(null, packet);
+    }
+
+    private void broadcast(Object self, PacketOutExRunEvent packet) {
         List<SubDataClient> clients = new LinkedList<SubDataClient>();
         clients.addAll(plugin.subdata.getClients().values());
         for (SubDataClient client : clients) {
-            client.sendPacket(packet);
+            if (client.getHandler() == null || client.getHandler() != self) { // Don't send events about yourself to yourself
+                if (client.getHandler() == null || client.getHandler().getSubData()[0] == client) { // Don't send events over subchannels
+                    client.sendPacket(packet);
+                }
+            }
         }
     }
 
@@ -68,7 +76,7 @@ public class PacketOutExRunEvent implements Listener, PacketObjectOut<Integer> {
     public void event(SubAddProxyEvent event) {
         ObjectMap<String> args = new ObjectMap<String>();
         args.set("proxy", event.getProxy().getName());
-        broadcast(new PacketOutExRunEvent(event.getClass(), args));
+        broadcast(event.getProxy(), new PacketOutExRunEvent(event.getClass(), args));
     }
 
     @EventHandler(priority = Byte.MAX_VALUE)
@@ -77,7 +85,7 @@ public class PacketOutExRunEvent implements Listener, PacketObjectOut<Integer> {
             ObjectMap<String> args = new ObjectMap<String>();
             if (event.getPlayer() != null) args.set("player", event.getPlayer().toString());
             args.set("host", event.getHost().getName());
-            broadcast(new PacketOutExRunEvent(event.getClass(), args));
+            broadcast(event.getHost(), new PacketOutExRunEvent(event.getClass(), args));
         }
     }
 
@@ -88,7 +96,7 @@ public class PacketOutExRunEvent implements Listener, PacketObjectOut<Integer> {
             if (event.getPlayer() != null) args.set("player", event.getPlayer().toString());
             if (event.getHost() != null) args.set("host", event.getHost().getName());
             args.set("server", event.getServer().getName());
-            broadcast(new PacketOutExRunEvent(event.getClass(), args));
+            broadcast(event.getServer(), new PacketOutExRunEvent(event.getClass(), args));
         }
     }
 
@@ -163,7 +171,7 @@ public class PacketOutExRunEvent implements Listener, PacketObjectOut<Integer> {
             if (event.getPlayer() != null) args.set("player", event.getPlayer().toString());
             if (event.getHost() != null) args.set("host", event.getHost().getName());
             args.set("server", event.getServer().getName());
-            broadcast(new PacketOutExRunEvent(event.getClass(), args));
+            broadcast(event.getServer(), new PacketOutExRunEvent(event.getClass(), args));
         }
     }
 
@@ -173,7 +181,7 @@ public class PacketOutExRunEvent implements Listener, PacketObjectOut<Integer> {
             ObjectMap<String> args = new ObjectMap<String>();
             if (event.getPlayer() != null) args.set("player", event.getPlayer().toString());
             args.set("host", event.getHost().getName());
-            broadcast(new PacketOutExRunEvent(event.getClass(), args));
+            broadcast(event.getHost(), new PacketOutExRunEvent(event.getClass(), args));
         }
     }
 
@@ -181,6 +189,6 @@ public class PacketOutExRunEvent implements Listener, PacketObjectOut<Integer> {
     public void event(SubRemoveProxyEvent event) {
         ObjectMap<String> args = new ObjectMap<String>();
         args.set("proxy", event.getProxy().getName());
-        broadcast(new PacketOutExRunEvent(event.getClass(), args));
+        broadcast(event.getProxy(), new PacketOutExRunEvent(event.getClass(), args));
     }
 }

@@ -1,9 +1,9 @@
 package net.ME1312.SubServers.Sync;
 
-import net.ME1312.SubServers.Sync.Library.Container;
-import net.ME1312.SubServers.Sync.Library.Util;
-import net.ME1312.SubServers.Sync.Library.Version.Version;
-import net.ME1312.SubServers.Sync.Library.Version.VersionType;
+import net.ME1312.Galaxi.Library.Container;
+import net.ME1312.Galaxi.Library.Util;
+import net.ME1312.Galaxi.Library.Version.Version;
+import net.ME1312.Galaxi.Library.Version.VersionType;
 
 import java.lang.reflect.Field;
 import java.security.Security;

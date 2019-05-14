@@ -1,8 +1,8 @@
 package net.ME1312.SubServers.Sync.Event;
 
 import net.ME1312.SubServers.Sync.Library.SubEvent;
-import net.ME1312.SubServers.Sync.Library.Util;
-import net.ME1312.SubServers.Sync.Network.SubDataClient;
+import net.ME1312.Galaxi.Library.Util;
+import net.ME1312.SubData.Client.SubDataClient;
 import net.md_5.bungee.api.plugin.Event;
 
 /**

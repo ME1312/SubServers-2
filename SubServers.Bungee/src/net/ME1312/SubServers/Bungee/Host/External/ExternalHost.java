@@ -62,7 +62,7 @@ public class ExternalHost extends Host implements ClientHandler {
         this.queue = new LinkedList<PacketObjectOut>();
         this.clean = false;
 
-        setSubData(null, 0);
+        subdata.put(0, null);
     }
 
     @Override
@@ -364,5 +364,14 @@ public class ExternalHost extends Host implements ClientHandler {
             }
         }));
         return true;
+    }
+
+    @Override
+    public ObjectMap<String> forSubData() {
+        ObjectMap<String> hinfo = super.forSubData();
+        ObjectMap<Integer> subdata = new ObjectMap<Integer>();
+        for (int channel : this.subdata.keySet()) subdata.set(channel, (this.subdata.get(channel) == null)?null:this.subdata.get(channel).getID());
+        hinfo.set("subdata", subdata);
+        return hinfo;
     }
 }

@@ -1,10 +1,10 @@
 package net.ME1312.SubServers.Sync.Event;
 
-import net.ME1312.SubServers.Sync.Library.Config.YAMLSection;
-import net.ME1312.SubServers.Sync.Library.Config.YAMLValue;
-import net.ME1312.SubServers.Sync.Library.NamedContainer;
+import net.ME1312.Galaxi.Library.Map.ObjectMap;
+import net.ME1312.Galaxi.Library.Map.ObjectMapValue;
+import net.ME1312.Galaxi.Library.NamedContainer;
 import net.ME1312.SubServers.Sync.Library.SubEvent;
-import net.ME1312.SubServers.Sync.Library.Util;
+import net.ME1312.Galaxi.Library.Util;
 import net.md_5.bungee.api.plugin.Event;
 
 import java.util.UUID;
@@ -15,7 +15,7 @@ import java.util.UUID;
 public class SubEditServerEvent extends Event implements SubEvent {
     private UUID player;
     private String server;
-    private NamedContainer<String, YAMLValue> edit;
+    private NamedContainer<String, ObjectMapValue<String>> edit;
     private boolean perm;
 
     /**
@@ -28,11 +28,11 @@ public class SubEditServerEvent extends Event implements SubEvent {
      */
     public SubEditServerEvent(UUID player, String server, NamedContainer<String, ?> edit, boolean permanent) {
         if (Util.isNull(server, edit)) throw new NullPointerException();
-        YAMLSection section = new YAMLSection();
+        ObjectMap<String> section = new ObjectMap<String>();
         section.set(".", edit.get());
         this.player = player;
         this.server = server;
-        this.edit = new NamedContainer<String, YAMLValue>(edit.name(), section.get("."));
+        this.edit = new NamedContainer<String, ObjectMapValue<String>>(edit.name(), section.get("."));
         this.perm = permanent;
     }
 
@@ -55,7 +55,7 @@ public class SubEditServerEvent extends Event implements SubEvent {
      *
      * @return Edit to be made
      */
-    public NamedContainer<String, YAMLValue> getEdit() {
+    public NamedContainer<String, ObjectMapValue<String>> getEdit() {
         return edit;
     }
 

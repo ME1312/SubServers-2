@@ -46,8 +46,14 @@ public class Proxy {
      *
      * @return SubData Client Channel ID Array
      */
+    @SuppressWarnings("unchecked")
     public UUID[] getSubData() {
-        return raw.getUUIDList("subdata", Collections.emptyList()).toArray(new UUID[0]);
+        ObjectMap<Integer> subdata = new ObjectMap<Integer>((Map<Integer, ?>) raw.getObject("subdata"));
+        LinkedList<Integer> keys = new LinkedList<Integer>(subdata.getKeys());
+        LinkedList<UUID> channels = new LinkedList<UUID>();
+        Collections.sort(keys);
+        for (Integer channel : keys) channels.add(subdata.getUUID(channel));
+        return channels.toArray(new UUID[0]);
     }
 
     /**

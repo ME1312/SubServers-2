@@ -1,25 +1,33 @@
 package net.ME1312.SubServers.Sync;
 
+import net.ME1312.Galaxi.Library.Callback.Callback;
+import net.ME1312.Galaxi.Library.NamedContainer;
+import net.ME1312.Galaxi.Library.UniversalFile;
+import net.ME1312.Galaxi.Library.Util;
+import net.ME1312.SubData.Client.DataClient;
 import net.ME1312.SubServers.Sync.Library.*;
-import net.ME1312.SubServers.Sync.Library.Version.Version;
+import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubServers.Sync.Network.API.Host;
 import net.ME1312.SubServers.Sync.Network.API.Proxy;
 import net.ME1312.SubServers.Sync.Network.API.Server;
 import net.ME1312.SubServers.Sync.Network.API.SubServer;
 import net.ME1312.SubServers.Sync.Network.Packet.*;
-import net.ME1312.SubServers.Sync.Network.SubDataClient;
+import net.ME1312.SubData.Client.SubDataClient;
 import net.md_5.bungee.protocol.ProtocolConstants;
 
 import java.lang.reflect.InvocationTargetException;
+import java.net.InetAddress;
 import java.util.*;
 
 /**
  * SubAPI Class
  */
 public final class SubAPI {
-    LinkedList<NamedContainer<Runnable, Runnable>> listeners = new LinkedList<NamedContainer<Runnable, Runnable>>();
+    LinkedList<Runnable> enableListeners = new LinkedList<Runnable>();
+    LinkedList<Runnable> disableListeners = new LinkedList<Runnable>();
     private final SubPlugin plugin;
     private static SubAPI api;
+    String name;
 
     protected SubAPI(SubPlugin plugin) {
         this.plugin = plugin;
@@ -51,10 +59,31 @@ public final class SubAPI {
      * Adds a SubAPI Listener
      *
      * @param enable An Event that will be called when SubAPI is ready
-     * @param disable An Event that will be called before SubAPI is disabled
+     * @param disable An Event that will be called before SubAPI is disabled (your plugin should reset it's values in case this is a hard-reset instead of a shutdown)
      */
     public void addListener(Runnable enable, Runnable disable) {
-        listeners.add(new NamedContainer<Runnable, Runnable>(enable, disable));
+        if (enable != null) enableListeners.add(enable);
+        if (disable != null) disableListeners.add(disable);
+    }
+
+    /**
+     * Get the Server Name
+     *
+     * @return Server Name
+     */
+    @SuppressWarnings("unchecked")
+    public String getName() {
+        if (name != null) {
+            return name;
+        } else if (plugin.redis) {
+            try {
+                return (String) plugin.redis("getServerId");
+            } catch (Exception e) {
+                return null;
+            }
+        } else {
+            return null;
+        }
     }
 
     /**
@@ -65,10 +94,10 @@ public final class SubAPI {
     public void getHosts(Callback<Map<String, Host>> callback) {
         if (Util.isNull(callback)) throw new NullPointerException();
         StackTraceElement[] origin = new Exception().getStackTrace();
-        plugin.subdata.sendPacket(new PacketDownloadHostInfo(null, data -> {
+        ((SubDataClient) plugin.api.getSubDataNetwork()[0]).sendPacket(new PacketDownloadHostInfo(null, data -> {
             TreeMap<String, Host> hosts = new TreeMap<String, Host>();
-            for (String host : data.getSection("hosts").getKeys()) {
-                hosts.put(host.toLowerCase(), new Host(data.getSection("hosts").getSection(host)));
+            for (String host : data.getKeys()) {
+                hosts.put(host.toLowerCase(), new Host(data.getMap(host)));
             }
 
             try {
@@ -90,10 +119,10 @@ public final class SubAPI {
     public void getHost(String name, Callback<Host> callback) {
         if (Util.isNull(name, callback)) throw new NullPointerException();
         StackTraceElement[] origin = new Exception().getStackTrace();
-        plugin.subdata.sendPacket(new PacketDownloadHostInfo(name, data -> {
+        ((SubDataClient) plugin.api.getSubDataNetwork()[0]).sendPacket(new PacketDownloadHostInfo(name, data -> {
             Host host = null;
-            if (data.getSection("hosts").getKeys().size() > 0) {
-                host = new Host(data.getSection("hosts").getSection(new LinkedList<String>(data.getSection("hosts").getKeys()).getFirst()));
+            if (data.getKeys().size() > 0) {
+                host = new Host(data.getMap(new LinkedList<String>(data.getKeys()).getFirst()));
             }
 
             try {
@@ -114,15 +143,15 @@ public final class SubAPI {
     public void getGroups(Callback<Map<String, List<Server>>> callback) {
         if (Util.isNull(callback)) throw new NullPointerException();
         StackTraceElement[] origin = new Exception().getStackTrace();
-        plugin.subdata.sendPacket(new PacketDownloadGroupInfo(null, data -> {
+        ((SubDataClient) plugin.api.getSubDataNetwork()[0]).sendPacket(new PacketDownloadGroupInfo(null, data -> {
             TreeMap<String, List<Server>> groups = new TreeMap<String, List<Server>>();
-            for (String group : data.getSection("groups").getKeys()) {
+            for (String group : data.getKeys()) {
                 ArrayList<Server> servers = new ArrayList<Server>();
-                for (String server : data.getSection("groups").getSection(group).getKeys()) {
-                    if (data.getSection("groups").getSection(group).getSection(server).getRawString("type", "Server").equals("SubServer")) {
-                        servers.add(new SubServer(data.getSection("groups").getSection(group).getSection(server)));
+                for (String server : data.getMap(group).getKeys()) {
+                    if (data.getMap(group).getMap(server).getRawString("type", "Server").equals("SubServer")) {
+                        servers.add(new SubServer(data.getMap(group).getMap(server)));
                     } else {
-                        servers.add(new Server(data.getSection("groups").getSection(group).getSection(server)));
+                        servers.add(new Server(data.getMap(group).getMap(server)));
                     }
                 }
                 if (servers.size() > 0) groups.put(group, servers);
@@ -163,16 +192,16 @@ public final class SubAPI {
     public void getGroup(String name, Callback<List<Server>> callback) {
         if (Util.isNull(name, callback)) throw new NullPointerException();
         StackTraceElement[] origin = new Exception().getStackTrace();
-        plugin.subdata.sendPacket(new PacketDownloadGroupInfo(name, data -> {
+        ((SubDataClient) plugin.api.getSubDataNetwork()[0]).sendPacket(new PacketDownloadGroupInfo(name, data -> {
             List<Server> servers = null;
-            if (data.getSection("groups").getKeys().size() > 0) {
-                String key = new LinkedList<String>(data.getSection("groups").getKeys()).getFirst();
+            if (data.getKeys().size() > 0) {
+                String key = new LinkedList<String>(data.getKeys()).getFirst();
                 servers = new ArrayList<Server>();
-                for (String server : data.getSection("groups").getSection(key).getKeys()) {
-                    if (data.getSection("groups").getSection(key).getSection(server).getRawString("type", "Server").equals("SubServer")) {
-                        servers.add(new SubServer(data.getSection("groups").getSection(key).getSection(server)));
+                for (String server : data.getMap(key).getKeys()) {
+                    if (data.getMap(key).getMap(server).getRawString("type", "Server").equals("SubServer")) {
+                        servers.add(new SubServer(data.getMap(key).getMap(server)));
                     } else {
-                        servers.add(new Server(data.getSection("groups").getSection(key).getSection(server)));
+                        servers.add(new Server(data.getMap(key).getMap(server)));
                     }
                 }
             }
@@ -195,13 +224,13 @@ public final class SubAPI {
     public void getServers(Callback<Map<String, Server>> callback) {
         if (Util.isNull(callback)) throw new NullPointerException();
         StackTraceElement[] origin = new Exception().getStackTrace();
-        plugin.subdata.sendPacket(new PacketDownloadServerInfo(null, data -> {
+        ((SubDataClient) plugin.api.getSubDataNetwork()[0]).sendPacket(new PacketDownloadServerInfo(null, data -> {
             TreeMap<String, Server> servers = new TreeMap<String, Server>();
-            for (String server : data.getSection("servers").getKeys()) {
-                if (data.getSection("servers").getSection(server).getRawString("type", "Server").equals("SubServer")) {
-                    servers.put(server.toLowerCase(), new SubServer(data.getSection("servers").getSection(server)));
+            for (String server : data.getKeys()) {
+                if (data.getMap(server).getRawString("type", "Server").equals("SubServer")) {
+                    servers.put(server.toLowerCase(), new SubServer(data.getMap(server)));
                 } else {
-                    servers.put(server.toLowerCase(), new Server(data.getSection("servers").getSection(server)));
+                    servers.put(server.toLowerCase(), new Server(data.getMap(server)));
                 }
             }
 
@@ -224,19 +253,187 @@ public final class SubAPI {
     public void getServer(String name, Callback<Server> callback) {
         if (Util.isNull(name, callback)) throw new NullPointerException();
         StackTraceElement[] origin = new Exception().getStackTrace();
-        plugin.subdata.sendPacket(new PacketDownloadServerInfo(name, data -> {
+        ((SubDataClient) plugin.api.getSubDataNetwork()[0]).sendPacket(new PacketDownloadServerInfo(name, data -> {
             Server server = null;
-            if (data.getSection("servers").getKeys().size() > 0) {
-                String key = new LinkedList<String>(data.getSection("servers").getKeys()).getFirst();
-                if (data.getSection("servers").getSection(key).getRawString("type", "Server").equals("SubServer")) {
-                    server = new SubServer(data.getSection("servers").getSection(key));
+            if (data.getKeys().size() > 0) {
+                String key = new LinkedList<String>(data.getKeys()).getFirst();
+                if (data.getMap(key).getRawString("type", "Server").equals("SubServer")) {
+                    server = new SubServer(data.getMap(key));
                 } else {
-                    server = new Server(data.getSection("servers").getSection(key));
+                    server = new Server(data.getMap(key));
                 }
             }
 
             try {
                 callback.run(server);
+            } catch (Throwable e) {
+                Throwable ew = new InvocationTargetException(e);
+                ew.setStackTrace(origin);
+                ew.printStackTrace();
+            }
+        }));
+    }
+
+    /**
+     * Adds a Server to the Network
+     *
+     * @param name Name of the Server
+     * @param ip IP of the Server
+     * @param port Port of the Server
+     * @param motd MOTD of the Server
+     * @param hidden if the server should be hidden from players
+     * @param restricted Players will need a permission to join if true
+     * @param response Response Code
+     */
+    public void addServer(String name, InetAddress ip, int port, String motd, boolean hidden, boolean restricted, Callback<Integer> response) {
+        addServer(null, name, ip, port, motd, hidden, restricted, response);
+    }
+
+    /**
+     * Adds a Server to the Network
+     *
+     * @param player Player who added
+     * @param name Name of the Server
+     * @param ip IP of the Server
+     * @param port Port of the Server
+     * @param motd MOTD of the Server
+     * @param hidden If the server should be hidden from players
+     * @param restricted Players will need a permission to join if true
+     * @param response Response Code
+     */
+    public void addServer(UUID player, String name, InetAddress ip, int port, String motd, boolean hidden, boolean restricted, Callback<Integer> response) {
+        if (Util.isNull(response)) throw new NullPointerException();
+        StackTraceElement[] origin = new Exception().getStackTrace();
+        ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketAddServer(player, name, ip, port, motd, hidden, restricted, data -> {
+            try {
+                response.run(data.getInt(0x0001));
+            } catch (Throwable e) {
+                Throwable ew = new InvocationTargetException(e);
+                ew.setStackTrace(origin);
+                ew.printStackTrace();
+            }
+        }));
+    }
+
+    /**
+     * Adds a Server to the Network
+     *
+     * @param name Name of the Server
+     * @param ip IP of the Server
+     * @param port Port of the Server
+     * @param motd MOTD of the Server
+     * @param hidden if the server should be hidden from players
+     * @param restricted Players will need a permission to join if true
+     */
+    public void addServer(String name, InetAddress ip, int port, String motd, boolean hidden, boolean restricted) {
+        addServer(null, name, ip, port, motd, hidden, restricted);
+    }
+
+    /**
+     * Adds a Server to the Network
+     *
+     * @param player Player who added
+     * @param name Name of the Server
+     * @param ip IP of the Server
+     * @param port Port of the Server
+     * @param motd MOTD of the Server
+     * @param hidden If the server should be hidden from players
+     * @param restricted Players will need a permission to join if true
+     */
+    public void addServer(UUID player, String name, InetAddress ip, int port, String motd, boolean hidden, boolean restricted) {
+        addServer(player, name, ip, port, motd, hidden, restricted, i -> {});
+    }
+
+    /**
+     * Remove a Server from the Network
+     *
+     * @param name Name of the Server
+     * @param response Response Code
+     */
+    public void removeServer(String name, Callback<Integer> response) {
+        removeServer(null, name, response);
+    }
+
+    /**
+     * Remove a Server from the Network
+     *
+     * @param player Player Removing
+     * @param name Name of the Server
+     * @param response Response Code
+     */
+    public void removeServer(UUID player, String name, Callback<Integer> response) {
+        if (Util.isNull(name)) throw new NullPointerException();
+        removeServer(player, name, false, response);
+    }
+
+    /**
+     * Remove a Server from the Network
+     *
+     * @param name Name of the Server
+     */
+    public void removeServer(String name) {
+        removeServer(null, name);
+    }
+
+    /**
+     * Remove a Server from the Network
+     *
+     * @param player Player Removing
+     * @param name Name of the Server
+     */
+    public void removeServer(UUID player, String name) {
+        if (Util.isNull(name)) throw new NullPointerException();
+        removeServer(player, name, i -> {});
+    }
+
+    /**
+     * Force Remove a Server from the Network
+     *
+     * @param name Name of the Server
+     * @param response Response Code
+     */
+    public void forceRemoveServer(String name, Callback<Integer> response) {
+        forceRemoveServer(null, name, response);
+    }
+
+    /**
+     * Force Remove a Server from the Network
+     *
+     * @param player Player Removing
+     * @param name Name of the Server
+     * @param response Response Code
+     */
+    public void forceRemoveServer(UUID player, String name, Callback<Integer> response) {
+        if (Util.isNull(name)) throw new NullPointerException();
+        removeServer(player, name, true, response);
+    }
+
+    /**
+     * Force Remove a Server from the Network
+     *
+     * @param name Name of the Server
+     */
+    public void forceRemoveServer(String name) {
+        forceRemoveServer(null, name);
+    }
+
+    /**
+     * Force Remove a Server from the Network
+     *
+     * @param player Player Removing
+     * @param name Name of the Server
+     */
+    public void forceRemoveServer(UUID player, String name) {
+        if (Util.isNull(name)) throw new NullPointerException();
+        forceRemoveServer(player, name, i -> {});
+    }
+
+    private void removeServer(UUID player, String name, boolean force, Callback<Integer> response) {
+        if (Util.isNull(response)) throw new NullPointerException();
+        StackTraceElement[] origin = new Exception().getStackTrace();
+        ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketRemoveServer(player, name, force, data -> {
+            try {
+                response.run(data.getInt(0x0001));
             } catch (Throwable e) {
                 Throwable ew = new InvocationTargetException(e);
                 ew.setStackTrace(origin);
@@ -280,10 +477,10 @@ public final class SubAPI {
     public void getProxies(Callback<Map<String, Proxy>> callback) {
         if (Util.isNull(callback)) throw new NullPointerException();
         StackTraceElement[] origin = new Exception().getStackTrace();
-        plugin.subdata.sendPacket(new PacketDownloadProxyInfo(null, data -> {
+        ((SubDataClient) plugin.api.getSubDataNetwork()[0]).sendPacket(new PacketDownloadProxyInfo(null, data -> {
             TreeMap<String, Proxy> proxies = new TreeMap<String, Proxy>();
-            for (String proxy : data.getSection("proxies").getKeys()) {
-                proxies.put(proxy.toLowerCase(), new Proxy(data.getSection("proxies").getSection(proxy)));
+            for (String proxy : data.getKeys()) {
+                proxies.put(proxy.toLowerCase(), new Proxy(data.getMap(proxy)));
             }
 
             try {
@@ -305,10 +502,10 @@ public final class SubAPI {
     public void getProxy(String name, Callback<Proxy> callback) {
         if (Util.isNull(name, callback)) throw new NullPointerException();
         StackTraceElement[] origin = new Exception().getStackTrace();
-        plugin.subdata.sendPacket(new PacketDownloadProxyInfo(name, data -> {
+        ((SubDataClient) plugin.api.getSubDataNetwork()[0]).sendPacket(new PacketDownloadProxyInfo(name, data -> {
             Proxy proxy = null;
-            if (data.getSection("proxies").getKeys().size() > 0) {
-                proxy = new Proxy(data.getSection("proxies").getSection(new LinkedList<String>(data.getSection("proxies").getKeys()).getFirst()));
+            if (data.getKeys().size() > 0) {
+                proxy = new Proxy(data.getMap(new LinkedList<String>(data.getKeys()).getFirst()));
             }
 
             try {
@@ -329,10 +526,10 @@ public final class SubAPI {
     public void getMasterProxy(Callback<Proxy> callback) {
         if (Util.isNull(callback)) throw new NullPointerException();
         StackTraceElement[] origin = new Exception().getStackTrace();
-        plugin.subdata.sendPacket(new PacketDownloadProxyInfo("", data -> {
+        ((SubDataClient) plugin.api.getSubDataNetwork()[0]).sendPacket(new PacketDownloadProxyInfo("", data -> {
             Proxy proxy = null;
-            if (data.getKeys().contains("master")) {
-                proxy = new Proxy(data.getSection("master"));
+            if (data != null) {
+                proxy = new Proxy(data);
             }
 
             try {
@@ -354,10 +551,10 @@ public final class SubAPI {
     public void getGlobalPlayers(Callback<Collection<NamedContainer<String, UUID>>> callback) {
         if (Util.isNull(callback)) throw new NullPointerException();
         StackTraceElement[] origin = new Exception().getStackTrace();
-        plugin.subdata.sendPacket(new PacketDownloadPlayerList(data -> {
+        ((SubDataClient) plugin.api.getSubDataNetwork()[0]).sendPacket(new PacketDownloadPlayerList(data -> {
             List<NamedContainer<String, UUID>> players = new ArrayList<NamedContainer<String, UUID>>();
-            for (String id : data.getSection("players").getKeys()) {
-                players.add(new NamedContainer<String, UUID>(data.getSection("players").getSection(id).getRawString("name"), UUID.fromString(id)));
+            for (String id : data.getKeys()) {
+                players.add(new NamedContainer<String, UUID>(data.getMap(id).getRawString("name"), UUID.fromString(id)));
             }
 
             try {
@@ -375,8 +572,12 @@ public final class SubAPI {
      *
      * @return SubData Network Manager
      */
-    public SubDataClient getSubDataNetwork() {
-        return plugin.subdata;
+    public DataClient[] getSubDataNetwork() {
+        LinkedList<Integer> keys = new LinkedList<Integer>(plugin.subdata.keySet());
+        LinkedList<SubDataClient> channels = new LinkedList<SubDataClient>();
+        Collections.sort(keys);
+        for (Integer channel : keys) channels.add(plugin.subdata.get(channel));
+        return channels.toArray(new DataClient[0]);
     }
 
     /**
@@ -421,9 +622,9 @@ public final class SubAPI {
     }
 
     /**
-     * Gets the SubServers.Sync Version
+     * Gets the SubServers Version
      *
-     * @return SubServers.Sync Version
+     * @return SubServers Version
      */
     public Version getWrapperVersion() {
         return plugin.version;

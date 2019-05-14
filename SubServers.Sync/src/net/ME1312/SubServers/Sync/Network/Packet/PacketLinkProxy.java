@@ -1,57 +1,77 @@
 package net.ME1312.SubServers.Sync.Network.Packet;
 
-import net.ME1312.SubServers.Sync.Library.Config.YAMLSection;
-import net.ME1312.SubServers.Sync.Library.Util;
-import net.ME1312.SubServers.Sync.Library.Version.Version;
-import net.ME1312.SubServers.Sync.Network.PacketIn;
-import net.ME1312.SubServers.Sync.Network.PacketOut;
-import net.ME1312.SubServers.Sync.Network.SubDataClient;
+import net.ME1312.Galaxi.Library.Map.ObjectMap;
+import net.ME1312.Galaxi.Library.Util;
+import net.ME1312.SubData.Client.Protocol.Initial.InitialPacket;
+import net.ME1312.SubData.Client.Protocol.PacketObjectIn;
+import net.ME1312.SubData.Client.Protocol.PacketObjectOut;
+import net.ME1312.SubData.Client.SubDataClient;
+import net.ME1312.SubServers.Sync.SubAPI;
 import net.ME1312.SubServers.Sync.SubPlugin;
-
-import java.lang.reflect.Field;
 
 /**
  * Link Proxy Packet
  */
-public class PacketLinkProxy implements PacketIn, PacketOut {
+public class PacketLinkProxy implements InitialPacket, PacketObjectIn<Integer>, PacketObjectOut<Integer> {
     private SubPlugin plugin;
+    private int channel;
 
     /**
-     * New PacketLinkProxy
+     * New PacketLinkProxy (In)
      *
-     * @param plugin SubServers.Sync
+     * @param plugin SubServers.Client
      */
     public PacketLinkProxy(SubPlugin plugin) {
         if (Util.isNull(plugin)) throw new NullPointerException();
         this.plugin = plugin;
     }
-
-    @Override
-    public YAMLSection generate() {
-        YAMLSection data = new YAMLSection();
-        data.set("name", plugin.subdata.getName());
-        return data;
+    /**
+     * New PacketLinkProxy (Out)
+     *
+     * @param plugin SubServers.Client
+     * @param channel Channel ID
+     */
+    public PacketLinkProxy(SubPlugin plugin, int channel) {
+        if (Util.isNull(plugin)) throw new NullPointerException();
+        this.plugin = plugin;
+        this.channel = channel;
     }
 
     @Override
-    public void execute(YAMLSection data) {
-        if (data.getInt("r") == 0) {
-            if (data.contains("n")) Util.isException(() -> Util.reflect(SubDataClient.class.getDeclaredField("name"), data.getRawString("n")));
-        } else {
+    public ObjectMap<Integer> send(SubDataClient client) {
+        ObjectMap<Integer> json = new ObjectMap<Integer>();
+        json.set(0x0000, plugin.api.getName());
+        json.set(0x0001, channel);
+        return json;
+    }
+
+    @Override
+    public void receive(SubDataClient client, ObjectMap<Integer> data) {
+        if (data.getInt(0x0001) == 0) {
             try {
-                if (data.getInt("r") == 2) {
-                    if (!plugin.config.get().getSection("Settings").getSection("SubData").contains("Name")) {
-                        plugin.config.get().getSection("Settings").getSection("SubData").set("Name", "undefined");
+                if (data.contains(0x0000)) Util.reflect(SubAPI.class.getDeclaredField("name"), plugin.api, data.getRawString(0x0000));
+                setReady(client, true);
+            } catch (Throwable e) {
+                e.printStackTrace();
+            }
+        } else {
+            System.out.println("SubData > Could not link name with proxy" + ((data.contains(0x0002))?": "+data.getRawString(0x0002):'.'));
+            try {
+                if (data.getInt(0x0001) == 2) {
+                    if (!plugin.config.get().getMap("Settings").getMap("SubData").contains("Name")) {
+                        plugin.config.get().getMap("Settings").getMap("SubData").set("Name", "");
                         plugin.config.save();
                     }
+                    if (plugin.config.get().getMap("Settings").getMap("SubData").getRawString("Name").length() <= 0)
+                        System.out.println("SubData > Use the proxy \"Name\" option to override auto-linking");
                 }
             } catch (Exception e) {}
-            System.out.println("SubData > Could not link name with server: " + data.getRawString("m"));
+            new IllegalStateException().printStackTrace();
         }
     }
 
     @Override
-    public Version getVersion() {
-        return new Version("2.11.0a");
+    public int version() {
+        return 0x0001;
     }
 }
