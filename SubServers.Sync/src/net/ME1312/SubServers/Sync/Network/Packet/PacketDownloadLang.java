@@ -6,6 +6,7 @@ import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubData.Client.Protocol.PacketObjectIn;
 import net.ME1312.SubData.Client.Protocol.PacketOut;
 import net.ME1312.SubData.Client.SubDataClient;
+import net.ME1312.SubServers.Sync.Library.Compatibility.Logger;
 import net.ME1312.SubServers.Sync.SubPlugin;
 
 import java.util.Calendar;
@@ -35,7 +36,7 @@ public class PacketDownloadLang implements PacketObjectIn<Integer>, PacketOut {
     public void receive(SubDataClient client, ObjectMap<Integer> data) {
         try {
             Util.reflect(SubPlugin.class.getDeclaredField("lang"), plugin, new NamedContainer<>(Calendar.getInstance().getTime().getTime(), data.getObject(0x0001)));
-            System.out.println("SubData > Lang Settings Downloaded");
+            Logger.get("SubData").info("Lang Settings Downloaded");
         } catch (IllegalAccessException | NoSuchFieldException e) {
             e.printStackTrace();
         }

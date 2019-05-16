@@ -20,7 +20,7 @@
         <dependency>
             <groupId>net.ME1312.Galaxi</groupId>
             <artifactId>GalaxiEngine</artifactId>
-            <version>19w20b</version>
+            <version>19w20k</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
@@ -122,6 +122,7 @@
                             <additionalOptions>-Xdoclint:none</additionalOptions>
                             <links>
                                 <link>https://src.me1312.net/jenkins/job/GalaxiEngine/javadoc/GalaxiEngine/</link>
+                                <link>https://src.me1312.net/jenkins/job/SubData/javadoc/Client/</link>
                             </links>
                         </configuration>
                     </execution>

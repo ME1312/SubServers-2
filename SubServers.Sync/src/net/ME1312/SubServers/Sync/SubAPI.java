@@ -67,9 +67,9 @@ public final class SubAPI {
     }
 
     /**
-     * Get the Server Name
+     * Get the Proxy Name
      *
-     * @return Server Name
+     * @return Proxy Name
      */
     @SuppressWarnings("unchecked")
     public String getName() {

@@ -30,7 +30,7 @@
         <dependency>
             <groupId>net.ME1312.Galaxi</groupId>
             <artifactId>GalaxiUtil</artifactId>
-            <version>19w20b</version>
+            <version>19w20k</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
@@ -136,6 +136,8 @@
                             <reportOutputDirectory>${basedir}/../Javadoc/SubServers.Sync</reportOutputDirectory>
                             <additionalOptions>-Xdoclint:none</additionalOptions>
                             <links>
+                                <link>https://src.me1312.net/jenkins/job/GalaxiEngine/javadoc/GalaxiUtil/</link>
+                                <link>https://src.me1312.net/jenkins/job/SubData/javadoc/Client/</link>
                                 <link>https://ci.md-5.net/job/BungeeCord/ws/api/target/apidocs/</link>
                             </links>
                         </configuration>

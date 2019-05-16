@@ -9,6 +9,8 @@ import net.ME1312.Galaxi.Library.NamedContainer;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubData.Server.ClientHandler;
+import net.ME1312.SubServers.Bungee.Library.Compatibility.GalaxiInfo;
+import net.ME1312.SubServers.Bungee.Library.Compatibility.Logger;
 import net.ME1312.SubServers.Bungee.Network.Packet.PacketExCheckPermission;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.CommandSender;
@@ -27,6 +29,8 @@ import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+
+import static net.ME1312.SubServers.Bungee.Library.Compatibility.GalaxiCommand.*;
 
 /**
  * Plugin Command Class
@@ -51,6 +55,15 @@ public final class SubCommand extends CommandX {
         super(command);
         this.plugin = plugin;
         this.label = '/' + command;
+
+        description(this, "The SubServers Command");
+        help(this,
+                "The command for accessing the SubServers Server Manager.",
+                "",
+                "Permission: subservers.command",
+                "Extended help entries:",
+                "  /sub help"
+        );
     }
 
     /**
@@ -93,10 +106,15 @@ public final class SubCommand extends CommandX {
                                 javaarch = System.getProperty("sun.arch.data.model");
                     }
 
+                    Version galaxi = GalaxiInfo.getVersion();
+                    Version galaxibuild = GalaxiInfo.getSignature();
+
                     sender.sendMessage("SubServers > These are the platforms and versions that are running SubServers.Bungee:");
                     sender.sendMessage("  " + System.getProperty("os.name") + ((!System.getProperty("os.name").toLowerCase().startsWith("windows"))?' ' + System.getProperty("os.version"):"") + ((osarch != null)?" [" + osarch + ']':"") + ',');
                     sender.sendMessage("  Java " + System.getProperty("java.version") + ((javaarch != null)?" [" + javaarch + ']':"") + ',');
-                    sender.sendMessage("  " + plugin.getBungeeName() + ((plugin.isPatched)?" [Patched] ":" ") + net.md_5.bungee.Bootstrap.class.getPackage().getImplementationVersion() + ',');
+                    if (galaxi != null)
+                        Util.isException(() -> sender.sendMessage("  GalaxiEngine v" + galaxi.toExtendedString() + ((galaxibuild != null)?" (" + galaxibuild + ')':"") + ','));
+                    sender.sendMessage("  " + plugin.getBungeeName() + ((plugin.isGalaxi)?" v":" ") + plugin.getVersion() + ((plugin.isPatched)?" [Patched]":"") + ',');
                     sender.sendMessage("  SubServers.Bungee v" + SubPlugin.version.toExtendedString() + ((plugin.api.getWrapperBuild() != null)?" (" + plugin.api.getWrapperBuild() + ')':""));
                     sender.sendMessage("");
                     new Thread(() -> {
@@ -547,7 +565,7 @@ public final class SubCommand extends CommandX {
                                 sender.sendMessage("SubServers > That SubServer is not running");
                             } else {
                                 plugin.sudo = (SubServer) servers.get(args[1].toLowerCase());
-                                System.out.println("SubServers > Now forwarding commands to " + plugin.sudo.getDisplayName() + ". Type \"exit\" to return.");
+                                Logger.get("SubServers").info("Now forwarding commands to " + plugin.sudo.getDisplayName() + ". Type \"exit\" to return.");
                             }
                         } else {
                             sender.sendMessage("SubServers > Usage: " + label + " " + args[0].toLowerCase() + " <SubServer>");
@@ -590,7 +608,7 @@ public final class SubCommand extends CommandX {
                             } else if (((SubServer) servers.get(args[1].toLowerCase())).isRunning()) {
                                 sender.sendMessage("SubServers > That SubServer is still running");
                             } else if (!((SubServer) servers.get(args[1].toLowerCase())).getHost().recycleSubServer(args[1].toLowerCase())){
-                                System.out.println("SubServers > Couldn't remove server from memory.");
+                                Logger.get("SubServers").info("Couldn't remove server from memory.");
                             }
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -900,6 +918,16 @@ public final class SubCommand extends CommandX {
         private BungeeServer(SubPlugin plugin, String command) {
             super(command, "bungeecord.command.server");
             this.plugin = plugin;
+
+            description(this, "Displays a list of or connects you to servers");
+            help(this,
+                    "Displays a list of all players connected to BungeeCord.",
+                    "This list is separated into groups by server.",
+                    "",
+                    "Permission: bungeecord.command.list",
+                    "Example:",
+                    "  /glist"
+            );
         }
 
         protected static NamedContainer<BungeeServer, CommandX> newInstance(SubPlugin plugin, String command) {
@@ -993,6 +1021,16 @@ public final class SubCommand extends CommandX {
         protected BungeeList(SubPlugin plugin, String command) {
             super(command, "bungeecord.command.list");
             this.plugin = plugin;
+
+            description(this, "Displays a list of all players");
+            help(this,
+                    "Displays a list of all players connected to BungeeCord.",
+                    "This list is separated into groups by server.",
+                    "",
+                    "Permission: bungeecord.command.list",
+                    "Example:",
+                    "  /glist"
+            );
         }
 
         /**

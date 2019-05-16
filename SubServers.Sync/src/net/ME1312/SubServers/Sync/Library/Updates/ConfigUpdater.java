@@ -4,6 +4,7 @@ import net.ME1312.Galaxi.Library.Config.YAMLConfig;
 import net.ME1312.Galaxi.Library.Config.YAMLSection;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Version.Version;
+import net.ME1312.SubServers.Sync.Library.Compatibility.Logger;
 import net.ME1312.SubServers.Sync.SubAPI;
 
 import java.io.File;
@@ -36,7 +37,7 @@ public class ConfigUpdater {
         if (!existing.contains("Settings") || !existing.getMap("Settings").contains("Version")) {
 
             i++;
-            System.out.println("SubServers > Created ./SubServers/sync.yml");
+            Logger.get("SubServers").info("Created ./SubServers/sync.yml");
         } else {
             if (was.compareTo(new Version("19w17a")) <= 0) {
 
@@ -46,7 +47,7 @@ public class ConfigUpdater {
             //  i++
             //}
 
-            if (i > 0) System.out.println("SubServers > Updated ./SubServers/sync.yml (" + i + " pass" + ((i != 1)?"es":"") + ")");
+            if (i > 0) Logger.get("SubServers").info("Updated ./SubServers/sync.yml (" + i + " pass" + ((i != 1)?"es":"") + ")");
         }
 
         if (i > 0) {

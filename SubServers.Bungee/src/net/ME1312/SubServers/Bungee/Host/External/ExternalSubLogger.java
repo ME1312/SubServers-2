@@ -4,6 +4,7 @@ import net.ME1312.SubServers.Bungee.Host.SubLogFilter;
 import net.ME1312.SubServers.Bungee.Host.SubLogger;
 import net.ME1312.Galaxi.Library.Container;
 import net.ME1312.Galaxi.Library.Util;
+import net.ME1312.SubServers.Bungee.Library.Compatibility.Logger;
 import net.ME1312.SubServers.Bungee.Network.Packet.PacketInExLogMessage;
 import net.ME1312.SubServers.Bungee.SubAPI;
 import net.md_5.bungee.api.ProxyServer;
@@ -113,7 +114,7 @@ public class ExternalSubLogger extends SubLogger {
                 }
 
             // Log to CONSOLE
-            if (allow) ProxyServer.getInstance().getLogger().log(level, name + " > " + msg);
+            if (allow) Logger.get(name).log(level, msg);
 
             // Log to FILE
             if (writer != null) {

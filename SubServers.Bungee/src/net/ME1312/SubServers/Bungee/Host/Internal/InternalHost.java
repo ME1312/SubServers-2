@@ -6,6 +6,7 @@ import net.ME1312.Galaxi.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Bungee.Event.SubAddServerEvent;
 import net.ME1312.SubServers.Bungee.Event.SubRemoveServerEvent;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
+import net.ME1312.SubServers.Bungee.Library.Compatibility.Logger;
 import net.ME1312.SubServers.Bungee.Library.Exception.InvalidServerException;
 import net.ME1312.SubServers.Bungee.Host.Host;
 import net.ME1312.SubServers.Bungee.Host.SubCreator;
@@ -154,7 +155,7 @@ public class InternalHost extends Host {
                 UniversalFile to = new UniversalFile(plugin.dir, "SubServers:Recently Deleted:" + server.toLowerCase());
                 try {
                     if (from.exists()) {
-                        System.out.println("SubServers > Moving Files...");
+                        Logger.get("SubServers").info("Moving Files...");
                         if (to.exists()) {
                             if (to.isDirectory()) Util.deleteDirectory(to);
                             else to.delete();
@@ -167,7 +168,7 @@ public class InternalHost extends Host {
                     e.printStackTrace();
                 }
 
-                System.out.println("SubServers > Saving...");
+                Logger.get("SubServers").info("Saving...");
                 YAMLSection info = (plugin.servers.get().getMap("Servers").getKeys().contains(server))?new YAMLSection(plugin.servers.get().getMap("Servers").getMap(server).get()):new YAMLSection();
                 info.set("Name", server);
                 info.set("Timestamp", Calendar.getInstance().getTime().getTime());
@@ -183,7 +184,7 @@ public class InternalHost extends Host {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                System.out.println("SubServers > Deleted SubServer: " + server);
+                Logger.get("SubServers").info("Deleted SubServer: " + server);
             }, "SubServers.Bungee::Internal_Server_Recycler(" + name + ')').start();
             return true;
         } else return false;
@@ -199,7 +200,7 @@ public class InternalHost extends Host {
                 UniversalFile to = new UniversalFile(plugin.dir, "SubServers:Recently Deleted:" + server.toLowerCase());
                 try {
                     if (from.exists()) {
-                        System.out.println("SubServers > Moving Files...");
+                        Logger.get("SubServers").info("Moving Files...");
                         if (to.exists()) {
                             if (to.isDirectory()) Util.deleteDirectory(to);
                             else to.delete();
@@ -212,7 +213,7 @@ public class InternalHost extends Host {
                     e.printStackTrace();
                 }
 
-                System.out.println("SubServers > Saving...");
+                Logger.get("SubServers").info("Saving...");
                 YAMLSection info = (plugin.servers.get().getMap("Servers").getKeys().contains(server))?new YAMLSection(plugin.servers.get().getMap("Servers").getMap(server).get()):new YAMLSection();
                 info.set("Name", server);
                 info.set("Timestamp", Calendar.getInstance().getTime().getTime());
@@ -228,7 +229,7 @@ public class InternalHost extends Host {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                System.out.println("SubServers > Deleted SubServer: " + server);
+                Logger.get("SubServers").info("Deleted SubServer: " + server);
             }, "SubServers.Bungee::Internal_Server_Recycler(" + name + ')').start();
             return true;
         } else return false;
@@ -243,14 +244,14 @@ public class InternalHost extends Host {
             new Thread(() -> {
                 try {
                     if (from.exists()) {
-                        System.out.println("SubServers > Removing Files...");
+                        Logger.get("SubServers").info("Removing Files...");
                         Util.deleteDirectory(from);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
 
-                System.out.println("SubServers > Saving...");
+                Logger.get("SubServers").info("Saving...");
                 try {
                     if (plugin.servers.get().getMap("Servers").getKeys().contains(server)) {
                         plugin.servers.get().getMap("Servers").remove(server);
@@ -259,7 +260,7 @@ public class InternalHost extends Host {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                System.out.println("SubServers > Deleted SubServer: " + server);
+                Logger.get("SubServers").info("Deleted SubServer: " + server);
             }, "SubServers.Bungee::Internal_Server_Deletion(" + name + ')').start();
             return true;
         } else return false;
@@ -274,14 +275,14 @@ public class InternalHost extends Host {
             new Thread(() -> {
                 try {
                     if (from.exists()) {
-                        System.out.println("SubServers > Removing Files...");
+                        Logger.get("SubServers").info("Removing Files...");
                         Util.deleteDirectory(from);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
 
-                System.out.println("SubServers > Saving...");
+                Logger.get("SubServers").info("Saving...");
                 try {
                     if (plugin.servers.get().getMap("Servers").getKeys().contains(server)) {
                         plugin.servers.get().getMap("Servers").remove(server);
@@ -290,7 +291,7 @@ public class InternalHost extends Host {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                System.out.println("SubServers > Deleted SubServer: " + server);
+                Logger.get("SubServers").info("Deleted SubServer: " + server);
             }, "SubServers.Bungee::Internal_Server_Deletion(" + name + ')').start();
             return true;
         } else return false;

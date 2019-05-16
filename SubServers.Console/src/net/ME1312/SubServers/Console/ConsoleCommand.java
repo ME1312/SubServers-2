@@ -3,6 +3,7 @@ package net.ME1312.SubServers.Console;
 import net.ME1312.Galaxi.Library.Callback.Callback;
 import net.ME1312.SubServers.Bungee.Host.Host;
 import net.ME1312.SubServers.Bungee.Host.SubServer;
+import net.ME1312.SubServers.Bungee.Library.Compatibility.Logger;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
@@ -37,7 +38,7 @@ public final class ConsoleCommand {
                             SubServer server = plugin.getProxy().api.getSubServer(name);
                             if (server != null) {
                                 if (server.isRunning()) {
-                                    System.out.println("SubConsole > Opening console window...");
+                                    Logger.get("SubConsole").info("Opening console window...");
                                     if (!plugin.sCurrent.keySet().contains(name.toLowerCase())) {
                                         ConsoleWindow window = new ConsoleWindow(plugin, server.getLogger());
                                         plugin.sCurrent.put(name.toLowerCase(), window);
@@ -107,7 +108,7 @@ public final class ConsoleCommand {
                         }
                     }
                 } else {
-                    System.out.println("SubConsole > Usage: /" + label + " [host|server] <Name>");
+                    Logger.get("SubConsole").info("Usage: /" + label + " [host|server] <Name>");
                 }
             } else {
                 String str = label;
@@ -204,7 +205,7 @@ public final class ConsoleCommand {
                         }
                     }
                 } else {
-                    System.out.println("SubConsole > Usage: /" + label + " [host|server] <Name>");
+                    Logger.get("SubConsole").info("Usage: /" + label + " [host|server] <Name>");
                 }
             } else {
                 String str = label;

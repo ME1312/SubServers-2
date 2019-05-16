@@ -6,6 +6,7 @@ import net.ME1312.SubServers.Bungee.Host.*;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Map.ObjectMapValue;
 import net.ME1312.Galaxi.Library.Container;
+import net.ME1312.SubServers.Bungee.Library.Compatibility.Logger;
 import net.ME1312.SubServers.Bungee.Library.Exception.InvalidServerException;
 import net.ME1312.Galaxi.Library.NamedContainer;
 import net.ME1312.Galaxi.Library.Util;
@@ -77,7 +78,7 @@ public class ExternalSubServer extends SubServerContainer {
             host.plugin.getPluginManager().callEvent(event);
             lock = false;
             if (!event.isCancelled()) {
-                System.out.println("SubServers > Now starting " + getName());
+                Logger.get("SubServers").info("Now starting " + getName());
                 running = true;
                 logger.start();
                 host.queue(new PacketExUpdateServer(this, PacketExUpdateServer.UpdateType.START, logger.getExternalAddress().toString()));
@@ -86,7 +87,7 @@ public class ExternalSubServer extends SubServerContainer {
         } else return false;
     }
     private void falsestart() {
-        System.out.println("SubServers > Couldn't start " + getName() + " - See the " + host.getName() + " console for more details");
+        Logger.get("SubServers").info("Couldn't start " + getName() + " - See the " + host.getName() + " console for more details");
         running = false;
         logger.stop();
     }
@@ -106,7 +107,7 @@ public class ExternalSubServer extends SubServerContainer {
     private void stopped(Boolean allowrestart) {
         SubStoppedEvent event = new SubStoppedEvent(this);
         host.plugin.getPluginManager().callEvent(event);
-        System.out.println("SubServers > " + getName() + " has stopped");
+        Logger.get("SubServers").info(getName() + " has stopped");
         logger.stop();
         history.clear();
         running = false;

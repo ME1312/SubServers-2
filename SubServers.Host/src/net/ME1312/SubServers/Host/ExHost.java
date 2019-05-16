@@ -14,7 +14,7 @@ import net.ME1312.Galaxi.Library.UniversalFile;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.Galaxi.Library.Version.VersionType;
-import net.ME1312.Galaxi.Plugin.Plugin;
+import net.ME1312.Galaxi.Plugin.App;
 import net.ME1312.Galaxi.Plugin.PluginInfo;
 import net.ME1312.SubData.Client.Encryption.AES;
 import net.ME1312.SubData.Client.Encryption.RSA;
@@ -41,10 +41,10 @@ import java.util.jar.Manifest;
 /**
  * SubServers.Host Main Class
  */
-@Plugin(name = "SubServers.Host", version = "2.14a", authors = "ME1312", description = "Host SubServers from other Machines", website = "https://github.com/ME1312/SubServers-2")
+@App(name = "SubServers.Host", version = "2.14a", authors = "ME1312", description = "Host SubServers from other Machines", website = "https://github.com/ME1312/SubServers-2")
 public final class ExHost {
-    protected HashMap<Integer, SubDataClient> subdata = new HashMap<Integer, SubDataClient>();
-    protected NamedContainer<Long, Map<String, Map<String, String>>> lang = null;
+    HashMap<Integer, SubDataClient> subdata = new HashMap<Integer, SubDataClient>();
+    NamedContainer<Long, Map<String, Map<String, String>>> lang = null;
     public HashMap<String, SubCreator.ServerTemplate> templates = new HashMap<String, SubCreator.ServerTemplate>();
     public HashMap<String, SubServer> servers = new HashMap<String, SubServer>();
     public SubCreator creator;
@@ -103,8 +103,8 @@ public final class ExHost {
                             javaarch = System.getProperty("sun.arch.data.model");
                 }
 
-                Version galaxi = Version.fromString(GalaxiEngine.class.getAnnotation(Plugin.class).version());
-                Version subservers = Version.fromString(ExHost.class.getAnnotation(Plugin.class).version());
+                Version galaxi = Version.fromString(GalaxiEngine.class.getAnnotation(App.class).version());
+                Version subservers = Version.fromString(ExHost.class.getAnnotation(App.class).version());
                 Version galaxibuild = null;
                 Version subserversbuild = null;
                 try {
@@ -119,9 +119,8 @@ public final class ExHost {
                 System.out.println("");
                 System.out.println(System.getProperty("os.name") + ((!System.getProperty("os.name").toLowerCase().startsWith("windows"))?' ' + System.getProperty("os.version"):"") + ((osarch != null)?" [" + osarch + ']':"") + ',');
                 System.out.println("Java " + System.getProperty("java.version") + ((javaarch != null)?" [" + javaarch + ']':"") + ',');
-                System.out.println(GalaxiEngine.class.getAnnotation(Plugin.class).name() + " v" + galaxi.toExtendedString() + ((galaxibuild != null)?" (" + galaxibuild + ')':"")
-                        + ((GalaxiEngine.class.getProtectionDomain().getCodeSource().getLocation().equals(ExHost.class.getProtectionDomain().getCodeSource().getLocation()))?" [Patched]":"") + ',');
-                System.out.println(ExHost.class.getAnnotation(Plugin.class).name() + " v" + subservers.toExtendedString() + ((subserversbuild != null)?" (" + subserversbuild + ')':""));
+                System.out.println(GalaxiEngine.class.getAnnotation(App.class).name() + " v" + galaxi.toExtendedString() + ((galaxibuild != null)?" (" + galaxibuild + ')':"") + ',');
+                System.out.println(ExHost.class.getAnnotation(App.class).name() + " v" + subservers.toExtendedString() + ((subserversbuild != null)?" (" + subserversbuild + ')':""));
                 System.out.println("");
             } else {
                 new ExHost(options);

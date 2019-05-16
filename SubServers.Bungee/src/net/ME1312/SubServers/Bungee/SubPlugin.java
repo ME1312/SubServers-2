@@ -15,6 +15,7 @@ import net.ME1312.SubServers.Bungee.Host.*;
 import net.ME1312.SubServers.Bungee.Library.*;
 import net.ME1312.Galaxi.Library.Config.YAMLConfig;
 import net.ME1312.Galaxi.Library.Config.YAMLSection;
+import net.ME1312.SubServers.Bungee.Library.Compatibility.Logger;
 import net.ME1312.SubServers.Bungee.Library.Fallback.SmartReconnectHandler;
 import net.ME1312.SubServers.Bungee.Library.Updates.ConfigUpdater;
 import net.ME1312.SubServers.Bungee.Library.Exception.InvalidHostException;
@@ -77,15 +78,22 @@ public final class SubPlugin extends BungeeCord implements Listener {
     public Proxy redis = null;
     public boolean canSudo = false;
     public final boolean isPatched;
+    public final boolean isGalaxi;
     public long resetDate = 0;
     private boolean running = false;
     private boolean posted = false;
     private static BigInteger lastSignature = BigInteger.valueOf(-1);
 
     @SuppressWarnings("unchecked")
-    protected SubPlugin(PrintStream out, boolean isPatched) throws IOException {
+    protected SubPlugin(PrintStream out, boolean isPatched) throws Exception {
         this.isPatched = isPatched;
-        System.out.println("SubServers > Loading SubServers.Bungee v" + version.toString() + " Libraries (for Minecraft " + api.getGameVersion()[api.getGameVersion().length - 1] + ")");
+        this.isGalaxi = !Util.isException(() ->
+                Util.reflect(Class.forName("net.ME1312.Galaxi.Engine.PluginManager").getMethod("findClasses", Class.class),
+                        Util.reflect(Class.forName("net.ME1312.Galaxi.Engine.GalaxiEngine").getMethod("getPluginManager"),
+                                Util.reflect(Class.forName("net.ME1312.Galaxi.Engine.GalaxiEngine").getMethod("getInstance"), null)), Launch.class));
+
+        Util.reflect(Logger.class.getDeclaredField("plugin"), null, this);
+        Logger.get("SubServers").info("Loading SubServers.Bungee v" + version.toString() + " Libraries (for Minecraft " + api.getGameVersion()[api.getGameVersion().length - 1] + ")");
 
         this.out = out;
         if (!(new UniversalFile(dir, "config.yml").exists())) {
@@ -93,7 +101,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
             YAMLConfig tmp = new YAMLConfig(new UniversalFile("config.yml"));
             tmp.get().set("stats", UUID.randomUUID().toString());
             tmp.save();
-            System.out.println("SubServers > Created ./config.yml");
+            Logger.get("SubServers").info("Created ./config.yml");
         }
         bungee = new YAMLConfig(new UniversalFile(dir, "config.yml"));
 
@@ -113,36 +121,36 @@ public final class SubPlugin extends BungeeCord implements Listener {
             new UniversalFile(dir, "Templates").mkdirs();
 
             Util.unzip(SubPlugin.class.getResourceAsStream("/net/ME1312/SubServers/Bungee/Library/Files/Templates/vanilla.zip"), new UniversalFile(dir, "Templates"));
-            System.out.println("SubServers > Created ./SubServers/Templates/Vanilla");
+            Logger.get("SubServers").info("Created ./SubServers/Templates/Vanilla");
 
             Util.unzip(SubPlugin.class.getResourceAsStream("/net/ME1312/SubServers/Bungee/Library/Files/Templates/spigot.zip"), new UniversalFile(dir, "Templates"));
-            System.out.println("SubServers > Created ./SubServers/Templates/Spigot");
+            Logger.get("SubServers").info("Created ./SubServers/Templates/Spigot");
 
             Util.unzip(SubPlugin.class.getResourceAsStream("/net/ME1312/SubServers/Bungee/Library/Files/Templates/forge.zip"), new UniversalFile(dir, "Templates"));
-            System.out.println("SubServers > Created ./SubServers/Templates/Forge");
+            Logger.get("SubServers").info("Created ./SubServers/Templates/Forge");
 
             Util.unzip(SubPlugin.class.getResourceAsStream("/net/ME1312/SubServers/Bungee/Library/Files/Templates/sponge.zip"), new UniversalFile(dir, "Templates"));
-            System.out.println("SubServers > Created ./SubServers/Templates/Sponge");
+            Logger.get("SubServers").info("Created ./SubServers/Templates/Sponge");
         } else {
             if (new UniversalFile(dir, "Templates:Vanilla:template.yml").exists() && ((new YAMLConfig(new UniversalFile(dir, "Templates:Vanilla:template.yml"))).get().getVersion("Version", new Version(0))).compareTo(new Version("2.13.2c+")) != 0) {
                 Files.move(new UniversalFile(dir, "Templates:Vanilla").toPath(), new UniversalFile(dir, "Templates:Vanilla.old" + Math.round(Math.random() * 100000) + ".x").toPath());
                 Util.unzip(SubPlugin.class.getResourceAsStream("/net/ME1312/SubServers/Bungee/Library/Files/Templates/vanilla.zip"), new UniversalFile(dir, "Templates"));
-                System.out.println("SubServers > Updated ./SubServers/Templates/Vanilla");
+                Logger.get("SubServers").info("Updated ./SubServers/Templates/Vanilla");
             }
             if (new UniversalFile(dir, "Templates:Spigot:template.yml").exists() && ((new YAMLConfig(new UniversalFile(dir, "Templates:Spigot:template.yml"))).get().getVersion("Version", new Version(0))).compareTo(new Version("2.13.2c+")) != 0) {
                 Files.move(new UniversalFile(dir, "Templates:Spigot").toPath(), new UniversalFile(dir, "Templates:Spigot.old" + Math.round(Math.random() * 100000) + ".x").toPath());
                 Util.unzip(SubPlugin.class.getResourceAsStream("/net/ME1312/SubServers/Bungee/Library/Files/Templates/spigot.zip"), new UniversalFile(dir, "Templates"));
-                System.out.println("SubServers > Updated ./SubServers/Templates/Spigot");
+                Logger.get("SubServers").info("Updated ./SubServers/Templates/Spigot");
             }
             if (new UniversalFile(dir, "Templates:Forge:template.yml").exists() && ((new YAMLConfig(new UniversalFile(dir, "Templates:Forge:template.yml"))).get().getVersion("Version", new Version(0))).compareTo(new Version("2.13.2c+")) != 0) {
                 Files.move(new UniversalFile(dir, "Templates:Forge").toPath(), new UniversalFile(dir, "Templates:Forge.old" + Math.round(Math.random() * 100000) + ".x").toPath());
                 Util.unzip(SubPlugin.class.getResourceAsStream("/net/ME1312/SubServers/Bungee/Library/Files/Templates/forge.zip"), new UniversalFile(dir, "Templates"));
-                System.out.println("SubServers > Updated ./SubServers/Templates/Forge");
+                Logger.get("SubServers").info("Updated ./SubServers/Templates/Forge");
             }
             if (new UniversalFile(dir, "Templates:Sponge:template.yml").exists() && ((new YAMLConfig(new UniversalFile(dir, "Templates:Sponge:template.yml"))).get().getVersion("Version", new Version(0))).compareTo(new Version("2.13.2c+")) != 0) {
                 Files.move(new UniversalFile(dir, "Templates:Sponge").toPath(), new UniversalFile(dir, "Templates:Sponge.old" + Math.round(Math.random() * 100000) + ".x").toPath());
                 Util.unzip(SubPlugin.class.getResourceAsStream("/net/ME1312/SubServers/Bungee/Library/Files/Templates/sponge.zip"), new UniversalFile(dir, "Templates"));
-                System.out.println("SubServers > Updated ./SubServers/Templates/Sponge");
+                Logger.get("SubServers").info("Updated ./SubServers/Templates/Sponge");
             }
         }
 
@@ -161,25 +169,25 @@ public final class SubPlugin extends BungeeCord implements Listener {
                                         if (TimeUnit.MILLISECONDS.toDays(Calendar.getInstance().getTime().getTime() - info.getLong("Timestamp")) >= 7) {
                                             Util.deleteDirectory(file);
                                             f--;
-                                            System.out.println("SubServers > Removed ./SubServers/Recently Deleted/" + file.getName());
+                                            Logger.get("SubServers").info("Removed ./SubServers/Recently Deleted/" + file.getName());
                                         }
                                     } else {
                                         Util.deleteDirectory(file);
                                         f--;
-                                        System.out.println("SubServers > Removed ./SubServers/Recently Deleted/" + file.getName());
+                                        Logger.get("SubServers").info("Removed ./SubServers/Recently Deleted/" + file.getName());
                                     }
                                 } else {
                                     Util.deleteDirectory(file);
                                     f--;
-                                    System.out.println("SubServers > Removed ./SubServers/Recently Deleted/" + file.getName());
+                                    Logger.get("SubServers").info("Removed ./SubServers/Recently Deleted/" + file.getName());
                                 }
                             } else {
                                 Files.delete(file.toPath());
                                 f--;
-                                System.out.println("SubServers > Removed ./SubServers/Recently Deleted/" + file.getName());
+                                Logger.get("SubServers").info("Removed ./SubServers/Recently Deleted/" + file.getName());
                             }
                         } catch (Exception e) {
-                            System.out.println("SubServers > Problem scanning .SubServers/Recently Deleted/" + file.getName());
+                            Logger.get("SubServers").info("Problem scanning .SubServers/Recently Deleted/" + file.getName());
                             e.printStackTrace();
                             Files.delete(file.toPath());
                         }
@@ -205,7 +213,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
 
         getPluginManager().registerListener(null, this);
 
-        System.out.println("SubServers > Pre-Parsing Config...");
+        Logger.get("SubServers").info("Pre-Parsing Config...");
         for (String name : servers.get().getMap("Servers").getKeys()) {
             try {
                 if (Util.getCaseInsensitively(config.get().getMap("Hosts").get(), servers.get().getMap("Servers").getMap(name).getString("Host")) == null) throw new InvalidServerException("There is no host with this name: " + servers.get().getMap("Servers").getMap(name).getString("Host"));
@@ -217,7 +225,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
         }
 
         subprotocol = SubProtocol.get();
-        System.out.println("SubServers > Loading BungeeCord Libraries...");
+        Logger.get("SubServers").info("Loading BungeeCord Libraries...");
     }
 
     /**
@@ -303,22 +311,22 @@ public final class SubPlugin extends BungeeCord implements Listener {
                 subprotocol.registerCipher("AES-192", new AES(192, config.get().getMap("Settings").getMap("SubData").getRawString("Password")));
                 subprotocol.registerCipher("AES-256", new AES(256, config.get().getMap("Settings").getMap("SubData").getRawString("Password")));
 
-                System.out.println("SubData > Encrypting SubData with AES:");
-                System.out.println("SubData > Use the password in config.yml to allow clients to connect");
+                Logger.get("SubData").info("Encrypting SubData with AES:");
+                Logger.get("SubData").info("Use the password in config.yml to allow clients to connect");
             } else if (ciphers[0].equals("RSA") || ciphers[0].equals("RSA-2048") || ciphers[0].equals("RSA-3072") || ciphers[0].equals("RSA-4096")) {
                 try {
                     int length = (ciphers[0].contains("-"))?Integer.parseInt(ciphers[0].split("-")[1]):2048;
                     subprotocol.registerCipher("RSA", new RSA(length, new UniversalFile("SubServers:Cache:private.rsa.key"), new UniversalFile("SubServers:subdata.rsa.key")));
                     cipher = "RSA" + cipher.substring(ciphers[0].length());
 
-                    System.out.println("SubData > Encrypting SubData with RSA:");
-                    System.out.println("SubData > Copy your subdata.rsa.key to clients to allow them to connect");
+                    Logger.get("SubData").info("Encrypting SubData with RSA:");
+                    Logger.get("SubData").info("Copy your subdata.rsa.key to clients to allow them to connect");
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
 
-            System.out.println("SubData > ");
+            Logger.get("SubData").info("");
             subdata = subprotocol.open((config.get().getMap("Settings").getMap("SubData").getRawString("Address", "127.0.0.1:4391").split(":")[0].equals("0.0.0.0"))?null:InetAddress.getByName(config.get().getMap("Settings").getMap("SubData").getRawString("Address", "127.0.0.1:4391").split(":")[0]),
                     Integer.parseInt(config.get().getMap("Settings").getMap("SubData").getRawString("Address", "127.0.0.1:4391").split(":")[1]), cipher);
         } // Add new entries to Allowed-Connections
@@ -338,7 +346,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
                 if (!redis.getDisplayName().equals("(master)")) redis.setDisplayName("(master)");
                 for (String name : (List<String>) redis("getAllServers")) {
                     if (!ukeys.contains(name.toLowerCase()) && !master.equals(name)) try {
-                        if (first) System.out.println("SubServers > "+((status)?"Rel":"L")+"oading Proxies...");
+                        if (first) Logger.get("SubServers").info(((status)?"Rel":"L")+"oading Proxies...");
                         first = false;
                         Proxy proxy = this.proxies.get(name.toLowerCase());
                         if (proxy == null) {
@@ -359,7 +367,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
         ukeys.clear();
 
         int hosts = 0;
-        System.out.println("SubServers > "+((status)?"Rel":"L")+"oading Hosts...");
+        Logger.get("SubServers").info(((status)?"Rel":"L")+"oading Hosts...");
         for (String name : config.get().getMap("Hosts").getKeys()) {
             if (!ukeys.contains(name.toLowerCase())) try {
                 if (!hostDrivers.keySet().contains(config.get().getMap("Hosts").getMap(name).getRawString("Driver").toUpperCase().replace('-', '_').replace(' ', '_'))) throw new InvalidHostException("Invalid Driver for host: " + name);
@@ -396,7 +404,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
         ukeys.clear();
 
         int servers = 0;
-        System.out.println("SubServers > "+((status)?"Rel":"L")+"oading Servers...");
+        Logger.get("SubServers").info(((status)?"Rel":"L")+"oading Servers...");
         bungee.reload();
         for (String name : bungee.get().getMap("servers").getKeys()) {
             if (!ukeys.contains(name.toLowerCase())) try {
@@ -437,10 +445,10 @@ public final class SubPlugin extends BungeeCord implements Listener {
         ukeys.clear();
 
         int subservers = 0;
-        System.out.println("SubServers > "+((status)?"Rel":"L")+"oading SubServers...");
+        Logger.get("SubServers").info(((status)?"Rel":"L")+"oading SubServers...");
         if (!posted) Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             if (running) {
-                System.out.println("SubServers > Received request from system to shutdown");
+                Logger.get("SubServers").info("Received request from system to shutdown");
                 try {
                     shutdown();
                 } catch (Exception e) {
@@ -552,7 +560,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
         int plugins = 0;
         List<Runnable> listeners = (status)?api.reloadListeners:api.enableListeners;
         if (listeners.size() > 0) {
-            System.out.println("SubServers > "+((status)?"Rel":"L")+"oading SubAPI Plugins...");
+            Logger.get("SubServers").info(((status)?"Rel":"L")+"oading SubAPI Plugins...");
             for (Runnable obj : listeners) {
                 try {
                     obj.run();
@@ -568,7 +576,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
             for (Server server : api.getServers().values()) if (server.getSubData()[0] != null) ((SubDataClient) server.getSubData()[0]).sendPacket(new PacketOutExReload(null));
         }
 
-        System.out.println("SubServers > " + ((plugins > 0)?plugins+" Plugin"+((plugins == 1)?"":"s")+", ":"") + ((proxies > 1)?proxies+" Proxies, ":"") + hosts + " Host"+((hosts == 1)?"":"s")+", " + servers + " Server"+((servers == 1)?"":"s")+", and " + subservers + " SubServer"+((subservers == 1)?"":"s")+" "+((status)?"re":"")+"loaded in " + new DecimalFormat("0.000").format((Calendar.getInstance().getTime().getTime() - begin) / 1000D) + "s");
+        Logger.get("SubServers").info(((plugins > 0)?plugins+" Plugin"+((plugins == 1)?"":"s")+", ":"") + ((proxies > 1)?proxies+" Proxies, ":"") + hosts + " Host"+((hosts == 1)?"":"s")+", " + servers + " Server"+((servers == 1)?"":"s")+", and " + subservers + " SubServer"+((subservers == 1)?"":"s")+" "+((status)?"re":"")+"loaded in " + new DecimalFormat("0.000").format((Calendar.getInstance().getTime().getTime() - begin) / 1000D) + "s");
 
         long scd = TimeUnit.SECONDS.toMillis(this.servers.get().getMap("Settings").getLong("Run-On-Launch-Timeout", 0L));
         if (autorun.size() > 0) for (Host host : api.getHosts().values()) {
@@ -594,7 +602,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
                         }
                     }
                     if (running && begin == resetDate && Calendar.getInstance().getTime().getTime() - init >= 5000)
-                        System.out.println("SubServers > The auto-start queue for " + host.getName() + " has been finished");
+                        Logger.get("SubServers").info("The auto-start queue for " + host.getName() + " has been finished");
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -633,7 +641,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
                             updcount++;
                         }
                     }
-                    if (updcount > 0) System.out.println("SubServers > SubServers.Bungee v" + updversion + " is available. You are " + updcount + " version" + ((updcount == 1)?"":"s") + " behind.");
+                    if (updcount > 0) Logger.get("SubServers").info("SubServers.Bungee v" + updversion + " is available. You are " + updcount + " version" + ((updcount == 1)?"":"s") + " behind.");
                 } catch (Exception e) {}
             }
         }, 0, TimeUnit.DAYS.toMillis(2));
@@ -650,7 +658,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
             legServers.clear();
             legServers.putAll(getServers());
             if (api.disableListeners.size() > 0) {
-                System.out.println("SubServers > Resetting SubAPI Plugins...");
+                Logger.get("SubServers").info("Resetting SubAPI Plugins...");
                 for (Runnable listener : api.disableListeners) {
                     try {
                         listener.run();
@@ -674,7 +682,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
         super.stopListeners();
     } private void shutdown() throws Exception {
         api.ready = false;
-        System.out.println("SubServers > Resetting Hosts and Server Data");
+        Logger.get("SubServers").info("Resetting Hosts and Server Data");
         List<String> hosts = new ArrayList<String>();
         hosts.addAll(this.hosts.keySet());
 
@@ -876,7 +884,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
     public void unsudo(SubStoppedEvent e) {
         if (sudo == e.getServer()) {
             sudo = null;
-            System.out.println("SubServers > Reverting to the BungeeCord Console");
+            Logger.get("SubServers").info("Reverting to the BungeeCord Console");
         }
     }
 }

@@ -42,7 +42,7 @@ public final class SubAPI {
      * Gets the SubServers Internals
      *
      * @deprecated Use SubAPI Methods when available
-     * @return SubPlugin Internals
+     * @return ExHost Internals
      */
     @Deprecated
     public ExHost getInternals() {
@@ -50,9 +50,9 @@ public final class SubAPI {
     }
 
     /**
-     * Get the Server Name
+     * Get the Host Name
      *
-     * @return Server Name
+     * @return Host Name
      */
     public String getName() {
         return name;

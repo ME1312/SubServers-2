@@ -9,6 +9,7 @@ import net.ME1312.Galaxi.Library.Container;
 import net.ME1312.Galaxi.Library.NamedContainer;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
+import net.ME1312.SubServers.Sync.Library.Compatibility.GalaxiInfo;
 import net.ME1312.SubServers.Sync.Network.API.*;
 import net.ME1312.SubServers.Sync.Network.Packet.*;
 import net.ME1312.SubServers.Sync.Server.ServerContainer;
@@ -29,6 +30,8 @@ import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+
+import static net.ME1312.SubServers.Sync.Library.Compatibility.GalaxiCommand.*;
 
 @SuppressWarnings("deprecation")
 public final class SubCommand extends CommandX {
@@ -54,6 +57,15 @@ public final class SubCommand extends CommandX {
         super(command);
         this.plugin = plugin;
         this.label = '/' + command;
+
+        description(this, "The SubServers Command");
+        help(this,
+                "The command for accessing the SubServers Server Manager.",
+                "",
+                "Permission: subservers.command",
+                "Extended help entries:",
+                "  /sub help"
+        );
     }
 
     @SuppressWarnings("unchecked")
@@ -95,10 +107,15 @@ public final class SubCommand extends CommandX {
                                     javaarch = System.getProperty("sun.arch.data.model");
                         }
 
+                        Version galaxi = GalaxiInfo.getVersion();
+                        Version galaxibuild = GalaxiInfo.getSignature();
+
                         sender.sendMessage("SubServers > These are the platforms and versions that are running SubServers.Sync:");
                         sender.sendMessage("  " + System.getProperty("os.name") + ((!System.getProperty("os.name").toLowerCase().startsWith("windows"))?' ' + System.getProperty("os.version"):"") + ((osarch != null)?" [" + osarch + ']':"") + ',');
                         sender.sendMessage("  Java " + System.getProperty("java.version") + ((javaarch != null)?" [" + javaarch + ']':"") + ',');
-                        sender.sendMessage("  " + plugin.getBungeeName() + ((plugin.isPatched)?" [Patched] ":" ") + net.md_5.bungee.Bootstrap.class.getPackage().getImplementationVersion() + ',');
+                        if (galaxi != null)
+                            Util.isException(() -> sender.sendMessage("GalaxiEngine v" + galaxi.toExtendedString() + ((galaxibuild != null)?" (" + galaxibuild + ')':"") + ','));
+                        sender.sendMessage("  " + plugin.getBungeeName() + ((plugin.isGalaxi)?" v":" ") + plugin.getVersion() + ((plugin.isPatched)?" [Patched]":"") + ',');
                         sender.sendMessage("  SubServers.Sync v" + SubPlugin.version.toExtendedString() + ((plugin.api.getWrapperBuild() != null)?" (" + plugin.api.getWrapperBuild() + ')':""));
                         sender.sendMessage("");
                         new Thread(() -> {
@@ -871,6 +888,16 @@ public final class SubCommand extends CommandX {
         private BungeeServer(SubPlugin plugin, String command) {
             super(command, "bungeecord.command.server");
             this.plugin = plugin;
+
+            description(this, "Displays a list of or connects you to servers");
+            help(this,
+                    "Displays a list of all players connected to BungeeCord.",
+                    "This list is separated into groups by server.",
+                    "",
+                    "Permission: bungeecord.command.list",
+                    "Example:",
+                    "  /glist"
+            );
         }
 
         protected static NamedContainer<BungeeServer, CommandX> newInstance(SubPlugin plugin, String command) {
@@ -965,6 +992,16 @@ public final class SubCommand extends CommandX {
         protected BungeeList(SubPlugin plugin, String command) {
             super(command, "bungeecord.command.list");
             this.plugin = plugin;
+
+            description(this, "Displays a list of all players");
+            help(this,
+                    "Displays a list of all players connected to BungeeCord.",
+                    "This list is separated into groups by server.",
+                    "",
+                    "Permission: bungeecord.command.list",
+                    "Example:",
+                    "  /glist"
+            );
         }
 
         /**

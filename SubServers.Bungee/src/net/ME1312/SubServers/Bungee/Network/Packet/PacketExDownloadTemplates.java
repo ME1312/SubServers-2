@@ -6,6 +6,7 @@ import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubData.Server.SubDataClient;
 import net.ME1312.SubData.Server.Protocol.PacketIn;
 import net.ME1312.SubData.Server.Protocol.PacketStreamOut;
+import net.ME1312.SubServers.Bungee.Library.Compatibility.Logger;
 import net.ME1312.SubServers.Bungee.SubPlugin;
 
 import java.io.*;
@@ -38,7 +39,7 @@ public class PacketExDownloadTemplates implements PacketIn, PacketStreamOut {
             Util.zip(new UniversalFile(plugin.dir, "SubServers:Templates"), stream);
             stream.close();
         } catch (Exception e) {
-            System.out.println("SubData > Problem encoding template files for Host: " + host.getName());
+            Logger.get("SubData").info("Problem encoding template files for Host: " + host.getName());
             e.printStackTrace();
         }
     }

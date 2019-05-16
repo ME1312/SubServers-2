@@ -5,6 +5,7 @@ import net.ME1312.SubServers.Bungee.Host.*;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Map.ObjectMapValue;
 import net.ME1312.Galaxi.Library.Container;
+import net.ME1312.SubServers.Bungee.Library.Compatibility.Logger;
 import net.ME1312.SubServers.Bungee.Library.Exception.InvalidServerException;
 import net.ME1312.Galaxi.Library.NamedContainer;
 import net.ME1312.Galaxi.Library.UniversalFile;
@@ -125,7 +126,7 @@ public class InternalSubServer extends SubServerContainer {
             pb.environment().put("address", host.getAddress().getHostAddress());
             pb.environment().put("port", Integer.toString(getAddress().getPort()));
             process = pb.start();
-            System.out.println("SubServers > Now starting " + getName());
+            Logger.get("SubServers").info("Now starting " + getName());
             logger.process = process;
             logger.start();
             command = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
@@ -143,7 +144,7 @@ public class InternalSubServer extends SubServerContainer {
 
         SubStoppedEvent event = new SubStoppedEvent(this);
         host.plugin.getPluginManager().callEvent(event);
-        System.out.println("SubServers > " + getName() + " has stopped");
+        Logger.get("SubServers").info(getName() + " has stopped");
         process = null;
         command = null;
         history.clear();

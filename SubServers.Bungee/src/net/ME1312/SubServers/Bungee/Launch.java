@@ -1,11 +1,15 @@
 package net.ME1312.SubServers.Bungee;
 
 import net.ME1312.Galaxi.Library.Util;
+import net.ME1312.Galaxi.Library.Version.Version;
+import net.ME1312.SubServers.Bungee.Library.Compatibility.GalaxiInfo;
 
 import java.security.Security;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.jar.Manifest;
+import java.util.logging.Logger;
 
 /**
  * SubServers/BungeeCord Launch Class
@@ -71,54 +75,65 @@ public final class Launch {
                             javaarch = System.getProperty("sun.arch.data.model");
                 }
 
+                Version galaxi = GalaxiInfo.getVersion();
+                Version galaxibuild = GalaxiInfo.getSignature();
+
                 System.out.println("");
                 System.out.println(System.getProperty("os.name") + ((!System.getProperty("os.name").toLowerCase().startsWith("windows"))?' ' + System.getProperty("os.version"):"") + ((osarch != null)?" [" + osarch + ']':"") + ',');
                 System.out.println("Java " + System.getProperty("java.version") + ((javaarch != null)?" [" + javaarch + ']':"") + ',');
-                System.out.println("BungeeCord" + ((patched)?" [Patched] ":" ") + net.md_5.bungee.Bootstrap.class.getPackage().getImplementationVersion() + ',');
+                if (galaxi != null)
+                    System.out.println("GalaxiEngine v" + galaxi.toExtendedString() + ((galaxibuild != null)?" (" + galaxibuild + ')':"") + ',');
+                System.out.println("BungeeCord" + net.md_5.bungee.Bootstrap.class.getPackage().getImplementationVersion() + ((patched)?" [Patched]":"") + ',');
                 System.out.println("SubServers.Bungee v" + SubPlugin.version.toExtendedString() + ((SubPlugin.class.getPackage().getSpecificationTitle() != null)?" (" + SubPlugin.class.getPackage().getSpecificationTitle() + ')':""));
                 System.out.println("");
             } else {
-                System.out.println("");
-                System.out.println("*******************************************");
-                System.out.println("***  Warning: this build is unofficial  ***");
-                System.out.println("***                                     ***");
-                System.out.println("*** Please report all issues to ME1312, ***");
-                System.out.println("***   NOT the Spigot Team. Thank You!   ***");
-                System.out.println("*******************************************");
-                try {
-                    if (net.md_5.bungee.BungeeCord.class.getPackage().getSpecificationVersion() != null) {
-                        Date date = (new SimpleDateFormat("yyyyMMdd")).parse(net.md_5.bungee.BungeeCord.class.getPackage().getSpecificationVersion());
-                        Calendar line = Calendar.getInstance();
-                        line.add(3, -4);
-                        if (date.before(line.getTime())) {
-                            System.out.println("***   Warning: BungeeCord is outdated   ***");
-                            System.out.println("***  Please download a new build from:  ***");
-                            System.out.println("***  http://ci.md-5.net/job/BungeeCord  ***");
-                            System.out.println("*** Errors may arise on older versions! ***");
-                            System.out.println("*******************************************");
-                        }
-                    } else throw new Exception();
-                } catch (Exception e) {
-                    System.out.println("*** Problem checking BungeeCord version ***");
-                    System.out.println("***    BungeeCord could be outdated.    ***");
-                    System.out.println("***                                     ***");
-                    System.out.println("*** Errors may arise on older versions! ***");
+                boolean gb;
+                if (!(gb = !Util.isException(() -> Util.reflect(net.md_5.bungee.log.LoggingOutputStream.class.getMethod("setLogger", Logger.class, String.class), null,
+                        Util.reflect(net.md_5.bungee.log.BungeeLogger.class.getMethod("get", String.class), null, "SubServers"), "net.ME1312.SubServers.Bungee.")))) {
+                    System.out.println("");
                     System.out.println("*******************************************");
+                    System.out.println("***  Warning: this build is unofficial  ***");
+                    System.out.println("***                                     ***");
+                    System.out.println("*** Please report all issues to ME1312, ***");
+                    System.out.println("***   NOT the Spigot Team. Thank You!   ***");
+                    System.out.println("*******************************************");
+                    try {
+                        if (net.md_5.bungee.BungeeCord.class.getPackage().getSpecificationVersion() != null) {
+                            Date date = (new SimpleDateFormat("yyyyMMdd")).parse(net.md_5.bungee.BungeeCord.class.getPackage().getSpecificationVersion());
+                            Calendar line = Calendar.getInstance();
+                            line.add(3, -4);
+                            if (date.before(line.getTime())) {
+                                System.out.println("***   Warning: BungeeCord is outdated   ***");
+                                System.out.println("***  Please download a new build from:  ***");
+                                System.out.println("***  http://ci.md-5.net/job/BungeeCord  ***");
+                                System.out.println("*** Errors may arise on older versions! ***");
+                                System.out.println("*******************************************");
+                            }
+                        } else throw new Exception();
+                    } catch (Exception e) {
+                        System.out.println("*** Problem checking BungeeCord version ***");
+                        System.out.println("***    BungeeCord could be outdated.    ***");
+                        System.out.println("***                                     ***");
+                        System.out.println("*** Errors may arise on older versions! ***");
+                        System.out.println("*******************************************");
+                    }
+                    System.out.println("");
                 }
-                System.out.println("");
 
                 SubPlugin plugin = new SubPlugin(System.out, patched);
                 net.md_5.bungee.api.ProxyServer.class.getMethod("setInstance", net.md_5.bungee.api.ProxyServer.class).invoke(null, plugin);
-                plugin.getLogger().info("Enabled " + plugin.getBungeeName() + " version " + plugin.getVersion());
+                if (!gb) plugin.getLogger().info("Enabled " + plugin.getBungeeName() + " version " + plugin.getVersion());
                 plugin.start();
 
                 if (!options.has("noconsole")) {
                     try {
-                        if (Util.getDespiteException(() -> Class.forName("io.github.waterfallmc.waterfall.console.WaterfallConsole").getMethod("readCommands") != null, false)) {
+                        if (Util.getDespiteException(() -> Class.forName("io.github.waterfallmc.waterfall.console.WaterfallConsole").getMethod("readCommands") != null, false)) { // Waterfall Setup
                             Class.forName("io.github.waterfallmc.waterfall.console.WaterfallConsole").getMethod("readCommands").invoke(null);
                         } else if (Util.getDespiteException(() -> Class.forName("io.github.waterfallmc.waterfall.console.WaterfallConsole").getMethod("start") != null, false)) {
                             Class console = Class.forName("io.github.waterfallmc.waterfall.console.WaterfallConsole");
                             console.getMethod("start").invoke(console.getConstructor().newInstance());
+                        } else if (Util.getDespiteException(() -> Class.forName("net.md_5.bungee.util.GalaxiBungeeInfo").getMethod("get").invoke(null).getClass().getCanonicalName().equals("net.ME1312.Galaxi.Plugin.PluginInfo"), false)) {
+                            // GalaxiBungee initializes its console automatically
                         } else {
                             plugin.canSudo = true;
                             String line;
@@ -129,7 +144,7 @@ public final class Launch {
                                     }
                                 } else if (line.equalsIgnoreCase("exit")) {
                                     plugin.sudo = null;
-                                    System.out.println("SubServers > Reverting to the BungeeCord Console");
+                                    net.ME1312.SubServers.Bungee.Library.Compatibility.Logger.get("SubServers").info("Reverting to the BungeeCord Console");
                                 } else {
                                     plugin.sudo.command(line);
                                 }

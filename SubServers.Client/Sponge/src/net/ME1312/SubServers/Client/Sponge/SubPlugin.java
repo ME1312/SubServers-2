@@ -42,8 +42,8 @@ import java.util.concurrent.TimeUnit;
  */
 @Plugin(id = "subservers-client-sponge", name = "SubServers-Client-Sponge", authors = "ME1312", version = "2.14a", url = "https://github.com/ME1312/SubServers-2", description = "Access your SubServers from Anywhere")
 public final class SubPlugin {
-    protected HashMap<Integer, SubDataClient> subdata = new HashMap<Integer, SubDataClient>();
-    protected NamedContainer<Long, Map<String, Map<String, String>>> lang = null;
+    HashMap<Integer, SubDataClient> subdata = new HashMap<Integer, SubDataClient>();
+    NamedContainer<Long, Map<String, Map<String, String>>> lang = null;
     public YAMLConfig config;
     public SubProtocol subprotocol;
 

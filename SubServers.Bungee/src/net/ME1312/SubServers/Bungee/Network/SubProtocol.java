@@ -25,28 +25,8 @@ public class SubProtocol extends SubDataProtocol {
     @SuppressWarnings("deprecation")
     public static SubProtocol get() {
         if (instance == null) {
-            log = Logger.getAnonymousLogger();
-            log.setUseParentHandlers(false);
-            log.addHandler(new Handler() {
-                private boolean open = true;
-
-                @Override
-                public void publish(LogRecord record) {
-                    if (open)
-                        ProxyServer.getInstance().getLogger().log(record.getLevel(), "SubData > " + record.getMessage(), record.getParameters());
-                }
-
-                @Override
-                public void flush() {
-
-                }
-
-                @Override
-                public void close() throws SecurityException {
-                    open = false;
-                }
-            });
             instance = new SubProtocol();
+            log = net.ME1312.SubServers.Bungee.Library.Compatibility.Logger.get("SubData");
             SubPlugin plugin = SubAPI.getInstance().getInternals();
             plugin.getPluginManager().registerListener(null, new PacketOutExRunEvent(plugin));
 

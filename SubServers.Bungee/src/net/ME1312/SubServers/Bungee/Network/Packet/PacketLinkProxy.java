@@ -10,6 +10,7 @@ import net.ME1312.SubData.Server.SubDataClient;
 import net.ME1312.SubData.Server.Protocol.PacketObjectOut;
 import net.ME1312.SubData.Server.Protocol.PacketObjectIn;
 import net.ME1312.SubServers.Bungee.Host.ServerContainer;
+import net.ME1312.SubServers.Bungee.Library.Compatibility.Logger;
 import net.ME1312.SubServers.Bungee.SubPlugin;
 
 import java.util.HashMap;
@@ -75,7 +76,7 @@ public class PacketLinkProxy implements InitialPacket, PacketObjectIn<Integer>, 
             if (!subdata.keySet().contains(channel) || (channel == 0 && subdata.get(0) == null)) {
                 proxy.setSubData(client, channel);
                 if (isnew) plugin.getPluginManager().callEvent(new SubAddProxyEvent(proxy));
-                System.out.println("SubData > " + client.getAddress().toString() + " has been defined as Proxy: " + proxy.getName() + ((channel > 0)?" (Sub-"+channel+")":""));
+                Logger.get("SubData").info(client.getAddress().toString() + " has been defined as Proxy: " + proxy.getName() + ((channel > 0)?" (Sub-"+channel+")":""));
                 client.sendPacket(new PacketLinkProxy(proxy.getName(), 0, null));
                 setReady(client, true);
             } else {

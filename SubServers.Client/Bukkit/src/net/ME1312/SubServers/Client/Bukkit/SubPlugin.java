@@ -34,8 +34,8 @@ import java.util.concurrent.TimeUnit;
  * SubServers Client Plugin Class
  */
 public final class SubPlugin extends JavaPlugin {
-    protected HashMap<Integer, SubDataClient> subdata = new HashMap<Integer, SubDataClient>();
-    protected NamedContainer<Long, Map<String, Map<String, String>>> lang = null;
+    HashMap<Integer, SubDataClient> subdata = new HashMap<Integer, SubDataClient>();
+    NamedContainer<Long, Map<String, Map<String, String>>> lang = null;
     public YAMLConfig config;
     public SubProtocol subprotocol;
 

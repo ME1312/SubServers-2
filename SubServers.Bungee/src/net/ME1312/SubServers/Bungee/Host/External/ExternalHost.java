@@ -10,6 +10,7 @@ import net.ME1312.SubServers.Bungee.Host.Host;
 import net.ME1312.SubServers.Bungee.Host.SubCreator;
 import net.ME1312.SubServers.Bungee.Host.SubServer;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
+import net.ME1312.SubServers.Bungee.Library.Compatibility.Logger;
 import net.ME1312.SubServers.Bungee.Library.Exception.InvalidServerException;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubData.Server.Protocol.PacketObjectOut;
@@ -227,7 +228,7 @@ public class ExternalHost extends Host implements ClientHandler {
                 getSubServer(server).waitFor();
             }
 
-            System.out.println("SubServers > Saving...");
+            Logger.get("SubServers").info("Saving...");
             ObjectMap<String> info = (plugin.servers.get().getMap("Servers").getKeys().contains(server))?plugin.servers.get().getMap("Servers").getMap(server).clone():new ObjectMap<String>();
             info.set("Name", server);
             info.set("Timestamp", Calendar.getInstance().getTime().getTime());
@@ -240,13 +241,13 @@ public class ExternalHost extends Host implements ClientHandler {
                 e.printStackTrace();
             }
 
-            System.out.println("SubServers > Moving Files...");
+            Logger.get("SubServers").info("Moving Files...");
             queue(new PacketExDeleteServer(server, info, true, data -> {
                 if (data.getInt(0x0001) == 0 || data.getInt(0x0001) == 1) {
                     servers.remove(server.toLowerCase());
-                    System.out.println("SubServers > Deleted SubServer: " + server);
+                    Logger.get("SubServers").info("Deleted SubServer: " + server);
                 } else {
-                    System.out.println("SubServers > Couldn't remove " + server + " from memory. See " + getName() + " console for more details");
+                    Logger.get("SubServers").info("Couldn't remove " + server + " from memory. See " + getName() + " console for more details");
                 }
             }));
             return true;
@@ -264,7 +265,7 @@ public class ExternalHost extends Host implements ClientHandler {
             getSubServer(server).terminate();
         }
 
-        System.out.println("SubServers > Saving...");
+        Logger.get("SubServers").info("Saving...");
         ObjectMap<String> info = (plugin.servers.get().getMap("Servers").getKeys().contains(server))?plugin.servers.get().getMap("Servers").getMap(server).clone():new ObjectMap<String>();
         info.set("Name", server);
         info.set("Timestamp", Calendar.getInstance().getTime().getTime());
@@ -277,14 +278,14 @@ public class ExternalHost extends Host implements ClientHandler {
             e.printStackTrace();
         }
 
-        System.out.println("SubServers > Moving Files...");
+        Logger.get("SubServers").info("Moving Files...");
         queue(new PacketExDeleteServer(server, info, true, data -> {
             if (data.getInt(0x0001) == 0 || data.getInt(0x0001) == 1) {
                 for (String group : getSubServer(server).getGroups()) getSubServer(server).removeGroup(group);
                 servers.remove(server.toLowerCase());
-                System.out.println("SubServers > Deleted SubServer: " + server);
+                Logger.get("SubServers").info("Deleted SubServer: " + server);
             } else {
-                System.out.println("SubServers > Couldn't remove " + server + " from memory. See " + getName() + " console for more details");
+                Logger.get("SubServers").info("Couldn't remove " + server + " from memory. See " + getName() + " console for more details");
             }
         }));
         return true;
@@ -303,7 +304,7 @@ public class ExternalHost extends Host implements ClientHandler {
                 getSubServer(server).waitFor();
             }
 
-            System.out.println("SubServers > Saving...");
+            Logger.get("SubServers").info("Saving...");
             ObjectMap<String> info = (plugin.servers.get().getMap("Servers").getKeys().contains(server))?plugin.servers.get().getMap("Servers").getMap(server).clone():new ObjectMap<String>();
             info.set("Name", server);
             info.set("Timestamp", Calendar.getInstance().getTime().getTime());
@@ -316,13 +317,13 @@ public class ExternalHost extends Host implements ClientHandler {
                 e.printStackTrace();
             }
 
-            System.out.println("SubServers > Removing Files...");
+            Logger.get("SubServers").info("Removing Files...");
             queue(new PacketExDeleteServer(server, info, false, data -> {
                 if (data.getInt(0x0001) == 0 || data.getInt(0x0001) == 1) {
                     servers.remove(server.toLowerCase());
-                    System.out.println("SubServers > Deleted SubServer: " + server);
+                    Logger.get("SubServers").info("Deleted SubServer: " + server);
                 } else {
-                    System.out.println("SubServers > Couldn't remove " + server + " from memory. See " + getName() + " console for more details");
+                    Logger.get("SubServers").info("Couldn't remove " + server + " from memory. See " + getName() + " console for more details");
                 }
             }));
             return true;
@@ -340,7 +341,7 @@ public class ExternalHost extends Host implements ClientHandler {
             getSubServer(server).terminate();
         }
 
-        System.out.println("SubServers > Saving...");
+        Logger.get("SubServers").info("Saving...");
         ObjectMap<String> info = (plugin.servers.get().getMap("Servers").getKeys().contains(server))?plugin.servers.get().getMap("Servers").getMap(server).clone():new ObjectMap<String>();
         info.set("Name", server);
         info.set("Timestamp", Calendar.getInstance().getTime().getTime());
@@ -353,14 +354,14 @@ public class ExternalHost extends Host implements ClientHandler {
             e.printStackTrace();
         }
 
-        System.out.println("SubServers > Removing Files...");
+        Logger.get("SubServers").info("Removing Files...");
         queue(new PacketExDeleteServer(server, info, false, data -> {
             if (data.getInt(0x0001) == 0 || data.getInt(0x0001) == 1) {
                 for (String group : getSubServer(server).getGroups()) getSubServer(server).removeGroup(group);
                 servers.remove(server.toLowerCase());
-                System.out.println("SubServers > Deleted SubServer: " + server);
+                Logger.get("SubServers").info("Deleted SubServer: " + server);
             } else {
-                System.out.println("SubServers > Couldn't remove " + server + " from memory. See " + getName() + " console for more details");
+                Logger.get("SubServers").info("Couldn't remove " + server + " from memory. See " + getName() + " console for more details");
             }
         }));
         return true;

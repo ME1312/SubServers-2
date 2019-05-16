@@ -7,6 +7,7 @@ import net.ME1312.SubData.Client.Encryption.RSA;
 import net.ME1312.SubServers.Sync.Event.*;
 import net.ME1312.Galaxi.Library.Config.YAMLConfig;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
+import net.ME1312.SubServers.Sync.Library.Compatibility.Logger;
 import net.ME1312.SubServers.Sync.Library.Fallback.SmartReconnectHandler;
 import net.ME1312.SubServers.Sync.Library.Metrics;
 import net.ME1312.Galaxi.Library.NamedContainer;
@@ -44,8 +45,8 @@ import java.util.concurrent.TimeUnit;
  * Main Plugin Class
  */
 public final class SubPlugin extends BungeeCord implements Listener {
-    protected HashMap<Integer, SubDataClient> subdata = new HashMap<Integer, SubDataClient>();
-    protected NamedContainer<Long, Map<String, Map<String, String>>> lang = null;
+    HashMap<Integer, SubDataClient> subdata = new HashMap<Integer, SubDataClient>();
+    NamedContainer<Long, Map<String, Map<String, String>>> lang = null;
     public final Map<String, ServerContainer> servers = new TreeMap<String, ServerContainer>();
     private final HashMap<UUID, List<ServerInfo>> fallbackLimbo = new HashMap<UUID, List<ServerInfo>>();
 
@@ -58,13 +59,20 @@ public final class SubPlugin extends BungeeCord implements Listener {
     public static final Version version = Version.fromString("2.14a");
 
     public final boolean isPatched;
+    public final boolean isGalaxi;
     public long lastReload = -1;
     private boolean reconnect = false;
     private boolean posted = false;
 
-    protected SubPlugin(PrintStream out, boolean isPatched) throws IOException {
+    protected SubPlugin(PrintStream out, boolean isPatched) throws Exception {
         this.isPatched = isPatched;
-        System.out.println("SubServers > Loading SubServers.Sync v" + version.toString() + " Libraries (for Minecraft " + api.getGameVersion()[api.getGameVersion().length - 1] + ")");
+        this.isGalaxi = !Util.isException(() ->
+                Util.reflect(Class.forName("net.ME1312.Galaxi.Engine.PluginManager").getMethod("findClasses", Class.class),
+                        Util.reflect(Class.forName("net.ME1312.Galaxi.Engine.GalaxiEngine").getMethod("getPluginManager"),
+                                Util.reflect(Class.forName("net.ME1312.Galaxi.Engine.GalaxiEngine").getMethod("getInstance"), null)), Launch.class));
+
+        Util.reflect(Logger.class.getDeclaredField("plugin"), null, this);
+        Logger.get("SubServers").info("Loading SubServers.Sync v" + version.toString() + " Libraries (for Minecraft " + api.getGameVersion()[api.getGameVersion().length - 1] + ")");
 
         this.out = out;
         if (!(new UniversalFile(dir, "config.yml").exists())) {
@@ -72,7 +80,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
             YAMLConfig tmp = new YAMLConfig(new UniversalFile("config.yml"));
             tmp.get().set("stats", UUID.randomUUID().toString());
             tmp.save();
-            System.out.println("SubServers > Created ./config.yml");
+            Logger.get("SubServers").info("Created ./config.yml");
         }
         UniversalFile dir = new UniversalFile(this.dir, "SubServers");
         dir.mkdir();
@@ -83,7 +91,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
         subprotocol = SubProtocol.get();
         getPluginManager().registerListener(null, this);
 
-        System.out.println("SubServers > Loading BungeeCord Libraries...");
+        Logger.get("SubServers").info("Loading BungeeCord Libraries...");
     }
 
     /**
@@ -109,19 +117,19 @@ public final class SubPlugin extends BungeeCord implements Listener {
                 subprotocol.registerCipher("AES-192", new AES(192, config.get().getMap("Settings").getMap("SubData").getRawString("Password")));
                 subprotocol.registerCipher("AES-256", new AES(256, config.get().getMap("Settings").getMap("SubData").getRawString("Password")));
 
-                System.out.println("SubData > AES Encryption Available");
+                Logger.get("SubData").info("AES Encryption Available");
             }
             if (new UniversalFile(dir, "SubServers:subdata.rsa.key").exists()) {
                 try {
                     subprotocol.registerCipher("RSA", new RSA(new UniversalFile(dir, "SubServers:subdata.rsa.key")));
-                    System.out.println("SubData > RSA Encryption Available");
+                    Logger.get("SubData").info("RSA Encryption Available");
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
 
             reconnect = true;
-            System.out.println("SubData > ");
+            Logger.get("SubData").info("");
             connect();
 
             super.startListeners();
@@ -176,7 +184,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
                             updcount++;
                         }
                     }
-                    if (updcount > 0) System.out.println("SubServers > SubServers.Sync v" + updversion + " is available. You are " + updcount + " version" + ((updcount == 1)?"":"s") + " behind.");
+                    if (updcount > 0) Logger.get("SubServers").info("SubServers.Sync v" + updversion + " is available. You are " + updcount + " version" + ((updcount == 1)?"":"s") + " behind.");
                 } catch (Exception e) {}
             }
         }, 0, TimeUnit.DAYS.toMillis(2));
@@ -249,7 +257,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
     @Override
     public void stopListeners() {
         try {
-            System.out.println("SubServers > Resetting Server Data");
+            Logger.get("SubServers").info("Resetting Server Data");
             servers.clear();
 
             reconnect = false;
@@ -385,11 +393,11 @@ public final class SubPlugin extends BungeeCord implements Listener {
                 if (server instanceof net.ME1312.SubServers.Sync.Network.API.SubServer) {
                     servers.put(server.getName().toLowerCase(), new SubServerContainer(server.getSignature(), server.getName(), server.getDisplayName(), server.getAddress(),
                             getSubDataAsMap(server), server.getMotd(), server.isHidden(), server.isRestricted(), server.getWhitelist(), ((net.ME1312.SubServers.Sync.Network.API.SubServer) server).isRunning()));
-                    System.out.println("SubServers > Added SubServer: " + e.getServer());
+                    Logger.get("SubServers").info("Added SubServer: " + e.getServer());
                 } else {
                     servers.put(server.getName().toLowerCase(), new ServerContainer(server.getSignature(), server.getName(), server.getDisplayName(), server.getAddress(),
                             getSubDataAsMap(server), server.getMotd(), server.isHidden(), server.isRestricted(), server.getWhitelist()));
-                    System.out.println("SubServers > Added Server: " + e.getServer());
+                    Logger.get("SubServers").info("Added Server: " + e.getServer());
                 }
             } else System.out.println("PacketDownloadServerInfo(" + e.getServer() + ") returned with an invalid response");
         });
@@ -407,7 +415,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
                             getSubDataAsMap(server), server.getMotd(), server.isHidden(), server.isRestricted(), server.getWhitelist()));
                 }
 
-                System.out.println("SubServers > Added "+((server instanceof net.ME1312.SubServers.Sync.Network.API.SubServer)?"Sub":"")+"Server: " + server.getName());
+                Logger.get("SubServers").info("Added "+((server instanceof net.ME1312.SubServers.Sync.Network.API.SubServer)?"Sub":"")+"Server: " + server.getName());
                 return true;
             } else {
                 if (server instanceof net.ME1312.SubServers.Sync.Network.API.SubServer) {
@@ -423,7 +431,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
                 if (!server.getDisplayName().equals(current.getDisplayName()))
                     current.setDisplayName(server.getDisplayName());
 
-                System.out.println("SubServers > Re-added "+((server instanceof net.ME1312.SubServers.Sync.Network.API.SubServer)?"Sub":"")+"Server: " + server.getName());
+                Logger.get("SubServers").info("Re-added "+((server instanceof net.ME1312.SubServers.Sync.Network.API.SubServer)?"Sub":"")+"Server: " + server.getName());
                 return false;
             }
         }
@@ -479,6 +487,6 @@ public final class SubPlugin extends BungeeCord implements Listener {
     public void remove(SubRemoveServerEvent e) {
         if (servers.keySet().contains(e.getServer().toLowerCase()))
             servers.remove(e.getServer().toLowerCase());
-            System.out.println("SubServers > Removed Server: " + e.getServer());
+            Logger.get("SubServers").info("Removed Server: " + e.getServer());
     }
 }

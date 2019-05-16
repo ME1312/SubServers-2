@@ -104,30 +104,7 @@ public class SubProtocol extends SubDataProtocol {
     }
 
     private Logger getLogger(int channel) {
-        Logger log = Logger.getAnonymousLogger();
-        log.setUseParentHandlers(false);
-        log.addHandler(new Handler() {
-            private boolean open = true;
-            private String prefix = "SubData" + ((channel != 0)? "/Sub-"+channel:"");
-
-            @Override
-            public void publish(LogRecord record) {
-                if (open)
-                    ProxyServer.getInstance().getLogger().log(record.getLevel(), prefix + " > " + record.getMessage(), record.getParameters());
-            }
-
-            @Override
-            public void flush() {
-
-            }
-
-            @Override
-            public void close() throws SecurityException {
-                open = false;
-            }
-        });
-
-        return log;
+        return net.ME1312.SubServers.Sync.Library.Compatibility.Logger.get("SubData" + ((channel != 0)? "/Sub-"+channel:""));
     }
 
     @Override
@@ -158,7 +135,7 @@ public class SubProtocol extends SubDataProtocol {
         subdata.sendPacket(new PacketDownloadLang());
         subdata.sendPacket(new PacketDownloadPlatformInfo(platform -> {
             if (plugin.lastReload != platform.getMap("subservers").getLong("last-reload")) {
-                System.out.println("SubServers > Resetting Server Data");
+                net.ME1312.SubServers.Sync.Library.Compatibility.Logger.get("SubServers").info("Resetting Server Data");
                 plugin.servers.clear();
                 plugin.lastReload = platform.getMap("subservers").getLong("last-reload");
             }
@@ -173,7 +150,7 @@ public class SubProtocol extends SubDataProtocol {
                 if (plugin.config.get().getMap("Sync", new ObjectMap<>()).getBoolean("Disabled-Commands", false)) Util.reflect(Configuration.class.getDeclaredField("disabledCommands"), plugin.getConfig(), platform.getMap("bungee").getRawStringList("disabled-cmds"));
                 if (plugin.config.get().getMap("Sync", new ObjectMap<>()).getBoolean("Player-Limit", false)) Util.reflect(Configuration.class.getDeclaredField("playerLimit"), plugin.getConfig(), platform.getMap("bungee").getInt("player-limit"));
             } catch (Exception e) {
-                System.out.println("SubServers > Problem syncing BungeeCord configuration options");
+                net.ME1312.SubServers.Sync.Library.Compatibility.Logger.get("SubServers").info("Problem syncing BungeeCord configuration options");
                 e.printStackTrace();
             }
 
@@ -192,7 +169,7 @@ public class SubProtocol extends SubDataProtocol {
             int reconnect = plugin.config.get().getMap("Settings").getMap("SubData").getInt("Reconnect", 30);
             if (Util.getDespiteException(() -> Util.reflect(SubPlugin.class.getDeclaredField("reconnect"), plugin), false) && reconnect > 0
                     && client.name() != DisconnectReason.PROTOCOL_MISMATCH && client.name() != DisconnectReason.ENCRYPTION_MISMATCH) {
-                System.out.println("SubData > Attempting reconnect in " + reconnect + " seconds");
+                net.ME1312.SubServers.Sync.Library.Compatibility.Logger.get("SubData").info("Attempting reconnect in " + reconnect + " seconds");
                 Timer timer = new Timer("SubServers.Sync::SubData_Reconnect_Handler");
                 timer.scheduleAtFixedRate(new TimerTask() {
                     @Override
@@ -202,7 +179,7 @@ public class SubProtocol extends SubDataProtocol {
                             timer.cancel();
                         } catch (InvocationTargetException e) {
                             if (e.getTargetException() instanceof IOException) {
-                                System.out.println("SubData > Connection was unsuccessful, retrying in " + reconnect + " seconds");
+                                net.ME1312.SubServers.Sync.Library.Compatibility.Logger.get("SubData").info("Connection was unsuccessful, retrying in " + reconnect + " seconds");
                             } else e.printStackTrace();
                         } catch (NoSuchMethodException | IllegalAccessException e) {
                             e.printStackTrace();

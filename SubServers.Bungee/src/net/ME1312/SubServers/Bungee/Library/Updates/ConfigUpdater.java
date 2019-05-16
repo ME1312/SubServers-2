@@ -4,6 +4,7 @@ import net.ME1312.Galaxi.Library.Config.YAMLConfig;
 import net.ME1312.Galaxi.Library.Config.YAMLSection;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Version.Version;
+import net.ME1312.SubServers.Bungee.Library.Compatibility.Logger;
 import net.ME1312.SubServers.Bungee.SubAPI;
 
 import java.io.File;
@@ -43,7 +44,7 @@ public class ConfigUpdater {
             updated.set("Hosts", hosts);
 
             i++;
-            System.out.println("SubServers > Created ./SubServers/config.yml");
+            Logger.get("SubServers").info("Created ./SubServers/config.yml");
         } else {
             if (was.compareTo(new Version("19w17a")) <= 0) {
                 if (existing.getMap("Settings", new YAMLSection()).contains("Log-Creator")) for (String name : existing.getMap("Hosts", new YAMLSection()).getKeys())
@@ -64,7 +65,7 @@ public class ConfigUpdater {
 
                     sc.get().safeSet("Servers", new YAMLSection());
                     sc.get().getMap("Servers").safeSetAll(existing.getMap("Servers"));
-                    System.out.println("SubServers > Created ./SubServers/servers.yml (using existing data)");
+                    Logger.get("SubServers").info("Created ./SubServers/servers.yml (using existing data)");
                     sc.save();
                 }
 
@@ -75,7 +76,7 @@ public class ConfigUpdater {
             //  i++
             //}
 
-            if (i > 0) System.out.println("SubServers > Updated ./SubServers/config.yml (" + i + " pass" + ((i != 1)?"es":"") + ")");
+            if (i > 0) Logger.get("SubServers").info("Updated ./SubServers/config.yml (" + i + " pass" + ((i != 1)?"es":"") + ")");
         }
 
         if (i > 0) {
@@ -143,7 +144,7 @@ public class ConfigUpdater {
             updated.set("Servers", servers);
 
             i++;
-            System.out.println("SubServers > Created ./SubServers/servers.yml");
+            Logger.get("SubServers").info("Created ./SubServers/servers.yml");
         } else {
             if (was.compareTo(new Version("19w17a")) <= 0) {
                 for (String name : existing.getMap("Servers", new YAMLSection()).getKeys()) {
@@ -159,7 +160,7 @@ public class ConfigUpdater {
             //  i++
             //}
 
-            if (i > 0) System.out.println("SubServers > Updated ./SubServers/servers.yml (" + i + " pass" + ((i != 1)?"es":"") + ")");
+            if (i > 0) Logger.get("SubServers").info("Updated ./SubServers/servers.yml (" + i + " pass" + ((i != 1)?"es":"") + ")");
         }
 
         if (i > 0) {
@@ -217,7 +218,7 @@ public class ConfigUpdater {
         if (!existing.contains("Settings") || !existing.getMap("Settings").contains("Version")) {
 
             i++;
-            System.out.println("SubServers > Created ./SubServers/lang.yml");
+            Logger.get("SubServers").info("Created ./SubServers/lang.yml");
         } else {
             if (was.compareTo(new Version("19w17a")) <= 0) {
                 i++;
@@ -226,7 +227,7 @@ public class ConfigUpdater {
             //  i++
             //}
 
-            if (i > 0) System.out.println("SubServers > Updated ./SubServers/lang.yml (" + i + " pass" + ((i != 1)?"es":"") + ")");
+            if (i > 0) Logger.get("SubServers").info("Updated ./SubServers/lang.yml (" + i + " pass" + ((i != 1)?"es":"") + ")");
         }
 
         if (i > 0) {
