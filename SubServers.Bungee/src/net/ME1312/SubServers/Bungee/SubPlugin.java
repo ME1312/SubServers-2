@@ -856,8 +856,10 @@ public final class SubPlugin extends BungeeCord implements Listener {
 
                 ServerInfo next = new LinkedList<Map.Entry<String, ServerInfo>>(fallbacks.entrySet()).getFirst().getValue();
                 e.setCancelServer(next);
-                ((UserConnection) e.getPlayer()).setServerJoinQueue(new LinkedBlockingQueue<>(fallbacks.keySet()));
-                ((UserConnection) e.getPlayer()).connect(next, null, true);
+                if (Util.isException(() -> Util.reflect(ServerKickEvent.class.getDeclaredMethod("setCancelServers", ServerInfo[].class), e, (Object) fallbacks.values().toArray(new ServerInfo[0])))) {
+                    ((UserConnection) e.getPlayer()).setServerJoinQueue(new LinkedBlockingQueue<>(fallbacks.keySet()));
+                    ((UserConnection) e.getPlayer()).connect(next, null, true);
+                }
             }
         }
     }

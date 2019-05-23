@@ -34,7 +34,7 @@ public class SmartReconnectHandler implements ReconnectHandler {
             if (fallbacks.isEmpty()) {
                 return null;
             } else {
-                if (player instanceof UserConnection) ((UserConnection) player).setServerJoinQueue(new LinkedBlockingQueue<>(fallbacks.keySet()));
+                if (player instanceof UserConnection) ((UserConnection) player).setServerJoinQueue(new LinkedList<>(fallbacks.keySet()));
                 return new LinkedList<Map.Entry<String, ServerInfo>>(fallbacks.entrySet()).getFirst().getValue();
             }
         }
