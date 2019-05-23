@@ -7,6 +7,7 @@ import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.NamedContainer;
 import net.ME1312.Galaxi.Library.UniversalFile;
 import net.ME1312.Galaxi.Library.Util;
+import net.ME1312.Galaxi.Plugin.PluginInfo;
 import net.ME1312.SubData.Server.*;
 import net.ME1312.SubData.Server.Encryption.AES;
 import net.ME1312.SubData.Server.Encryption.RSA;
@@ -226,6 +227,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
 
         subprotocol = SubProtocol.get();
         Logger.get("SubServers").info("Loading BungeeCord Libraries...");
+        if (isGalaxi) Util.reflect(net.ME1312.SubServers.Bungee.Library.Compatibility.GalaxiEventListener.class.getConstructor(SubPlugin.class), this);
     }
 
     /**
@@ -857,7 +859,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
                 ServerInfo next = new LinkedList<Map.Entry<String, ServerInfo>>(fallbacks.entrySet()).getFirst().getValue();
                 e.setCancelServer(next);
                 if (Util.isException(() -> Util.reflect(ServerKickEvent.class.getDeclaredMethod("setCancelServers", ServerInfo[].class), e, (Object) fallbacks.values().toArray(new ServerInfo[0])))) {
-                    ((UserConnection) e.getPlayer()).setServerJoinQueue(new LinkedBlockingQueue<>(fallbacks.keySet()));
+                    ((UserConnection) e.getPlayer()).setServerJoinQueue(new LinkedList<>(fallbacks.keySet()));
                     ((UserConnection) e.getPlayer()).connect(next, null, true);
                 }
             }
