@@ -318,6 +318,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
             } else if (ciphers[0].equals("RSA") || ciphers[0].equals("RSA-2048") || ciphers[0].equals("RSA-3072") || ciphers[0].equals("RSA-4096")) {
                 try {
                     int length = (ciphers[0].contains("-"))?Integer.parseInt(ciphers[0].split("-")[1]):2048;
+                    if (!(new UniversalFile("SubServers:Cache").exists())) new UniversalFile("SubServers:Cache").mkdirs();
                     subprotocol.registerCipher("RSA", new RSA(length, new UniversalFile("SubServers:Cache:private.rsa.key"), new UniversalFile("SubServers:subdata.rsa.key")));
                     cipher = "RSA" + cipher.substring(ciphers[0].length());
 

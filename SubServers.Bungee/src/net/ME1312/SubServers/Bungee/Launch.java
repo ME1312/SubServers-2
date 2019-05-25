@@ -8,7 +8,6 @@ import java.security.Security;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.jar.Manifest;
 import java.util.logging.Logger;
 
 /**
@@ -87,9 +86,11 @@ public final class Launch {
                 System.out.println("SubServers.Bungee v" + SubPlugin.version.toExtendedString() + ((SubPlugin.class.getPackage().getSpecificationTitle() != null)?" (" + SubPlugin.class.getPackage().getSpecificationTitle() + ')':""));
                 System.out.println("");
             } else {
-                boolean gb;
-                if (!(gb = !Util.isException(() -> Util.reflect(net.md_5.bungee.log.LoggingOutputStream.class.getMethod("setLogger", Logger.class, String.class), null,
-                        Util.reflect(net.md_5.bungee.log.BungeeLogger.class.getMethod("get", String.class), null, "SubServers"), "net.ME1312.SubServers.Bungee.")))) {
+                boolean gb = Util.getDespiteException(() -> Class.forName("net.md_5.bungee.util.GalaxiBungeeInfo").getMethod("get").getReturnType().equals(Class.forName("net.ME1312.Galaxi.Plugin.PluginInfo")), false);
+                if (gb) {
+                    Util.reflect(net.md_5.bungee.log.LoggingOutputStream.class.getMethod("setLogger", Logger.class, String.class), null,
+                            Util.reflect(net.md_5.bungee.log.BungeeLogger.class.getMethod("get", String.class), null, "SubServers"), "net.ME1312.SubServers.Bungee.");
+                } else {
                     System.out.println("");
                     System.out.println("*******************************************");
                     System.out.println("***  Warning: this build is unofficial  ***");
@@ -126,14 +127,12 @@ public final class Launch {
                 plugin.start();
 
                 if (!options.has("noconsole")) {
-                    try {
+                    if (!gb) try {
                         if (Util.getDespiteException(() -> Class.forName("io.github.waterfallmc.waterfall.console.WaterfallConsole").getMethod("readCommands") != null, false)) { // Waterfall Setup
                             Class.forName("io.github.waterfallmc.waterfall.console.WaterfallConsole").getMethod("readCommands").invoke(null);
                         } else if (Util.getDespiteException(() -> Class.forName("io.github.waterfallmc.waterfall.console.WaterfallConsole").getMethod("start") != null, false)) {
                             Class console = Class.forName("io.github.waterfallmc.waterfall.console.WaterfallConsole");
                             console.getMethod("start").invoke(console.getConstructor().newInstance());
-                        } else if (Util.getDespiteException(() -> Class.forName("net.md_5.bungee.util.GalaxiBungeeInfo").getMethod("get").invoke(null).getClass().getCanonicalName().equals("net.ME1312.Galaxi.Plugin.PluginInfo"), false)) {
-                            // GalaxiBungee initializes its console automatically
                         } else {
                             plugin.canSudo = true;
                             String line;

@@ -1,12 +1,9 @@
 package net.ME1312.SubServers.Sync;
 
-import net.ME1312.Galaxi.Library.Container;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
-import net.ME1312.Galaxi.Library.Version.VersionType;
 import net.ME1312.SubServers.Sync.Library.Compatibility.GalaxiInfo;
 
-import java.lang.reflect.Field;
 import java.security.Security;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -24,7 +21,7 @@ public final class Launch {
      * @param args Launch Arguments
      * @throws Exception
      */
-    @SuppressWarnings("deprecation")
+    @SuppressWarnings({"deprecation", "unchecked"})
     public static void main(String[] args) throws Exception {
         System.setProperty("apple.laf.useScreenMenuBar", "true");
 
@@ -89,9 +86,11 @@ public final class Launch {
                 System.out.println("SubServers.Sync v" + SubPlugin.version.toExtendedString() + ((SubPlugin.class.getPackage().getSpecificationTitle() != null)?" (" + SubPlugin.class.getPackage().getSpecificationTitle() + ')':""));
                 System.out.println("");
             } else {
-                boolean gb;
-                if (!(gb = !Util.isException(() -> Util.reflect(net.md_5.bungee.log.LoggingOutputStream.class.getMethod("setLogger", Logger.class, String.class), null,
-                        Util.reflect(net.md_5.bungee.log.BungeeLogger.class.getMethod("get", String.class), null, "SubServers"), "net.ME1312.SubServers.Sync.")))) {
+                boolean gb = Util.getDespiteException(() -> Class.forName("net.md_5.bungee.util.GalaxiBungeeInfo").getMethod("get").getReturnType().equals(Class.forName("net.ME1312.Galaxi.Plugin.PluginInfo")), false);
+                if (gb) {
+                    Util.reflect(net.md_5.bungee.log.LoggingOutputStream.class.getMethod("setLogger", Logger.class, String.class), null,
+                            Util.reflect(net.md_5.bungee.log.BungeeLogger.class.getMethod("get", String.class), null, "SubServers"), "net.ME1312.SubServers.Sync.");
+                } else {
                     System.out.println("");
                     System.out.println("*******************************************");
                     System.out.println("***  Warning: this build is Unofficial  ***");
@@ -120,8 +119,6 @@ public final class Launch {
                         System.out.println("*******************************************");
                     }
                     System.out.println("");
-                } else {
-                    
                 }
 
                 SubPlugin plugin = new SubPlugin(System.out, patched);
@@ -130,14 +127,12 @@ public final class Launch {
                 plugin.start();
 
                 if (!options.has("noconsole")) {
-                    try {
+                    if (!gb) try {
                         if (Util.getDespiteException(() -> Class.forName("io.github.waterfallmc.waterfall.console.WaterfallConsole").getMethod("readCommands") != null, false)) { // Waterfall Setup
                             Class.forName("io.github.waterfallmc.waterfall.console.WaterfallConsole").getMethod("readCommands").invoke(null);
                         } else if (Util.getDespiteException(() -> Class.forName("io.github.waterfallmc.waterfall.console.WaterfallConsole").getMethod("start") != null, false)) {
                             Class console = Class.forName("io.github.waterfallmc.waterfall.console.WaterfallConsole");
                             console.getMethod("start").invoke(console.getConstructor().newInstance());
-                        } else if (Util.getDespiteException(() -> Class.forName("net.md_5.bungee.util.GalaxiBungeeInfo").getMethod("get").invoke(null).getClass().getCanonicalName().equals("net.ME1312.Galaxi.Plugin.PluginInfo"), false)) {
-                            // GalaxiBungee initializes its console automatically
                         } else {
                             String line;
                             while (plugin.isRunning && (line = plugin.getConsoleReader().readLine(">")) != null) {
