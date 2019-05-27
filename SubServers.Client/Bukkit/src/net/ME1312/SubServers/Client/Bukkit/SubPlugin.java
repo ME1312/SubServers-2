@@ -74,6 +74,7 @@ public final class SubPlugin extends JavaPlugin {
                 new UniversalFile(new File(System.getProperty("user.dir")), "subdata.json").delete();
             }
             if (new UniversalFile(new File(System.getProperty("user.dir")), "subdata.rsa.key").exists()) {
+                if (new UniversalFile(getDataFolder(), "subdata.rsa.key").exists()) new UniversalFile(getDataFolder(), "subdata.rsa.key").delete();
                 Files.move(new UniversalFile(new File(System.getProperty("user.dir")), "subdata.rsa.key").toPath(), new UniversalFile(getDataFolder(), "subdata.rsa.key").toPath());
             }
 

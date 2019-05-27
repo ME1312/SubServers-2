@@ -90,6 +90,7 @@ public final class SubPlugin {
                 new UniversalFile(new File(System.getProperty("user.dir")), "subdata.json").delete();
             }
             if (new UniversalFile(new File(System.getProperty("user.dir")), "subdata.rsa.key").exists()) {
+                if (new UniversalFile(dir, "subdata.rsa.key").exists()) new UniversalFile(dir, "subdata.rsa.key").delete();
                 Files.move(new UniversalFile(new File(System.getProperty("user.dir")), "subdata.rsa.key").toPath(), new UniversalFile(dir, "subdata.rsa.key").toPath());
             }
 

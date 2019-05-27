@@ -14,6 +14,7 @@ import net.ME1312.SubServers.Sync.Network.API.*;
 import net.ME1312.SubServers.Sync.Network.Packet.*;
 import net.ME1312.SubServers.Sync.Server.ServerContainer;
 import net.ME1312.SubServers.Sync.Server.SubServerContainer;
+import net.md_5.bungee.BungeeCord;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -108,14 +109,16 @@ public final class SubCommand extends CommandX {
                         }
 
                         Version galaxi = GalaxiInfo.getVersion();
+                        Version bungee = Util.getDespiteException(() -> (Version) BungeeCord.class.getMethod("getBuildVersion").invoke(plugin), null);
                         Version galaxibuild = GalaxiInfo.getSignature();
+                        Version bungeebuild = Util.getDespiteException(() -> (Version) BungeeCord.class.getMethod("getBuildSignature").invoke(plugin), null);
 
                         sender.sendMessage("SubServers > These are the platforms and versions that are running SubServers.Sync:");
                         sender.sendMessage("  " + System.getProperty("os.name") + ((!System.getProperty("os.name").toLowerCase().startsWith("windows"))?' ' + System.getProperty("os.version"):"") + ((osarch != null)?" [" + osarch + ']':"") + ',');
                         sender.sendMessage("  Java " + System.getProperty("java.version") + ((javaarch != null)?" [" + javaarch + ']':"") + ',');
                         if (galaxi != null)
                             Util.isException(() -> sender.sendMessage("GalaxiEngine v" + galaxi.toExtendedString() + ((galaxibuild != null)?" (" + galaxibuild + ')':"") + ','));
-                        sender.sendMessage("  " + plugin.getBungeeName() + ((plugin.isGalaxi)?" v":" ") + plugin.getVersion() + ((plugin.isPatched)?" [Patched]":"") + ',');
+                        sender.sendMessage("  " + plugin.getBungeeName() + ((plugin.isGalaxi)?" v":" ") + ((bungee != null)?bungee:plugin.getVersion()) + ((bungeebuild != null)?" (" + bungeebuild + ')':"") + ((plugin.isPatched)?" [Patched]":"") + ',');
                         sender.sendMessage("  SubServers.Sync v" + SubPlugin.version.toExtendedString() + ((plugin.api.getWrapperBuild() != null)?" (" + plugin.api.getWrapperBuild() + ')':""));
                         sender.sendMessage("");
                         new Thread(() -> {
