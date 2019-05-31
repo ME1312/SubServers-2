@@ -48,7 +48,7 @@
         <dependency>
             <groupId>net.ME1312.Galaxi</groupId>
             <artifactId>GalaxiUtil</artifactId>
-            <version>19w22a</version>
+            <version>19w22b</version>
             <scope>compile</scope>
         </dependency>
         <dependency>

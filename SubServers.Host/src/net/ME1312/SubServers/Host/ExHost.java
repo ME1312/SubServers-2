@@ -227,8 +227,13 @@ public final class ExHost {
                 log.warn.println("UPnP is currently unavailable; Ports may not be automatically forwarded on this device");
             }
         } catch (Exception e) {
-            log.error.println(e);
-            engine.stop(1);
+            if (engine == null) {
+                e.printStackTrace();
+                System.exit(1);
+            } else {
+                log.error.println(e);
+                engine.stop(1);
+            }
         }
     }
 
