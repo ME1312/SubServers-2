@@ -157,6 +157,15 @@ public class SubCreator {
         }
 
         /**
+         * Get whether this Template can be used to update it's servers
+         *
+         * @return Updatable Status
+         */
+        public boolean canUpdate() {
+            return getBuildOptions().getBoolean("Can-Update", false);
+        }
+
+        /**
          * Get the Build Options for this Template
          *
          * @return Build Options
@@ -187,6 +196,7 @@ public class SubCreator {
     }
 
     private class CreatorTask extends Thread {
+        private final SubServer update;
         private final String name;
         private final ServerTemplate template;
         private final Version version;
@@ -198,11 +208,12 @@ public class SubCreator {
 
         private CreatorTask(String name, ServerTemplate template, Version version, int port, UUID address, UUID tracker) {
             super(SubAPI.getInstance().getAppInfo().getName() + "::SubCreator_Process_Handler(" + name + ')');
+            this.update = host.servers.getOrDefault(name.toLowerCase(), null);
             this.name = name;
             this.template = template;
             this.version = version;
             this.port = port;
-            this.log = new SubLogger(null, this, name + File.separator + "Creator", address, new Container<Boolean>(true), null);
+            this.log = new SubLogger(null, this, name + File.separator + ((update == null)?"Creator":"Updater"), address, new Container<Boolean>(true), null);
             this.address = address;
             this.tracker = tracker;
         }
@@ -218,11 +229,16 @@ public class SubCreator {
                 if (host.templates.keySet().contains(other.toLowerCase())) {
                     if (host.templates.get(other.toLowerCase()).isEnabled()) {
                         if (version != null || !host.templates.get(other.toLowerCase()).requiresVersion()) {
-                            ObjectMap<String> config = build(dir, host.templates.get(other.toLowerCase()), history);
-                            if (config == null) {
-                                throw new SubCreatorException();
+                            if (update == null || host.templates.get(other.toLowerCase()).canUpdate()) {
+                                ObjectMap<String> config = build(dir, host.templates.get(other.toLowerCase()), history);
+                                if (config == null) {
+                                    throw new SubCreatorException();
+                                } else {
+                                    server.setAll(config);
+                                }
                             } else {
-                                server.setAll(config);
+                                log.logger.warn.println("Skipping template that cannot be run in update mode: " + other);
+                                ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketOutExLogMessage(address, "Skipping template that cannot be run in update mode: " + other));
                             }
                         } else {
                             log.logger.warn.println("Skipping template that requires extra versioning: " + other);
@@ -242,6 +258,7 @@ public class SubCreator {
                 log.logger.info.println("Loading Template: " + template.getDisplayName());
                 ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketOutExLogMessage(address, "Loading Template: " + template.getDisplayName()));
                 Util.copyDirectory(template.getDirectory(), dir);
+                var.put("mode", (update == null)?"CREATE":"UPDATE");
                 var.put("name", name);
                 if (SubAPI.getInstance().getSubDataNetwork()[0] != null) var.put("host", SubAPI.getInstance().getName());
                 var.put("template", template.getName());
@@ -334,7 +351,7 @@ public class SubCreator {
         }
 
         public void run() {
-            UniversalFile dir = new UniversalFile(new File(host.host.getRawString("Directory")), name);
+            File dir = new File(host.host.getRawString("Directory"), (update != null)?update.getDirectory():name);
             dir.mkdirs();
             ObjectMap<String> server;
             try {
@@ -430,10 +447,12 @@ public class SubCreator {
             Files.delete(new UniversalFile(dir, "subservers.client").toPath());
             if (type == ServerType.SPIGOT) {
                 if (!new UniversalFile(dir, "plugins").exists()) new UniversalFile(dir, "plugins").mkdirs();
-                Util.copyFromJar(ExHost.class.getClassLoader(), "net/ME1312/SubServers/Host/Library/Files/client.jar", new UniversalFile(dir, "plugins:SubServers.Client.jar").getPath());
+                if (!new UniversalFile(dir, "plugins:SubServers.Client.jar").exists())
+                    Util.copyFromJar(ExHost.class.getClassLoader(), "net/ME1312/SubServers/Host/Library/Files/client.jar", new UniversalFile(dir, "plugins:SubServers.Client.jar").getPath());
             } else if (type == ServerType.FORGE || type == ServerType.SPONGE) {
                 if (!new UniversalFile(dir, "mods").exists()) new UniversalFile(dir, "mods").mkdirs();
-                Util.copyFromJar(ExHost.class.getClassLoader(), "net/ME1312/SubServers/Host/Library/Files/client.jar", new UniversalFile(dir, "mods:SubServers.Client.jar").getPath());
+                if (!new UniversalFile(dir, "mods:SubServers.Client.jar").exists())
+                    Util.copyFromJar(ExHost.class.getClassLoader(), "net/ME1312/SubServers/Host/Library/Files/client.jar", new UniversalFile(dir, "mods:SubServers.Client.jar").getPath());
             }
             JSONObject config = new JSONObject();
             FileWriter writer = new FileWriter(new UniversalFile(dir, "subdata.json"), false);
@@ -443,7 +462,7 @@ public class SubCreator {
             config.write(writer);
             writer.close();
 
-            if (new UniversalFile("subdata.rsa.key").exists()) {
+            if (!new UniversalFile(dir, "subdata.rsa.key").exists() && new UniversalFile("subdata.rsa.key").exists()) {
                 Files.copy(new UniversalFile("subdata.rsa.key").toPath(), new UniversalFile(dir, "subdata.rsa.key").toPath());
             }
         }

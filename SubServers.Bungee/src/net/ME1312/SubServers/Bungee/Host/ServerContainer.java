@@ -195,7 +195,7 @@ public class ServerContainer extends BungeeServerInfo implements Server {
     @Override
     public void whitelist(UUID player) {
         if (Util.isNull(player)) throw new NullPointerException();
-        whitelist.add(player);
+        if (!whitelist.contains(player)) whitelist.add(player);
         for (Proxy proxy : SubAPI.getInstance().getProxies().values()) if (proxy.getSubData()[0] != null) ((SubDataClient) proxy.getSubData()[0]).sendPacket(new PacketOutExUpdateWhitelist(getName(), true, player));
     }
 
@@ -249,7 +249,7 @@ public class ServerContainer extends BungeeServerInfo implements Server {
         info.set("group", getGroups());
         info.set("address", getAddress().getAddress().getHostAddress() + ':' + getAddress().getPort());
         info.set("motd", getMotd());
-        info.set("whitelist", whitelist);
+        info.set("whitelist", getWhitelist());
         info.set("restricted", isRestricted());
         info.set("hidden", isHidden());
         ObjectMap<String> players = new ObjectMap<String>();

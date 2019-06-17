@@ -14,6 +14,8 @@ import java.util.*;
  */
 public abstract class SubServerContainer extends ServerContainer implements SubServer {
     private List<NamedContainer<String, String>> incompatibilities = new ArrayList<NamedContainer<String, String>>();
+    private String template = null;
+    private boolean lock;
 
     /**
      * Creates a SubServer
@@ -52,6 +54,25 @@ public abstract class SubServerContainer extends ServerContainer implements SubS
     @Override
     public int permaEdit(ObjectMap<String> edit) {
         return permaEdit(null, edit);
+    }
+
+    @Override
+    public boolean isAvailable() {
+        return !lock && getHost().isAvailable();
+    }
+
+    @Override
+    public void setTemplate(SubCreator.ServerTemplate template) {
+        this.template = (template != null)?template.getName():null;
+    }
+
+    @Override
+    public SubCreator.ServerTemplate getTemplate() {
+        if (template != null && getHost().getCreator().getTemplates().keySet().contains(template.toLowerCase())) {
+            return getHost().getCreator().getTemplate(template.toLowerCase());
+        } else {
+            return null;
+        }
     }
 
     @Override
@@ -112,6 +133,8 @@ public abstract class SubServerContainer extends ServerContainer implements SubS
         ObjectMap<String> sinfo = super.forSubData();
         sinfo.set("type", "SubServer");
         sinfo.set("host", getHost().getName());
+        sinfo.set("template", (getTemplate() != null)?getTemplate().getName():null);
+        sinfo.set("available", isAvailable());
         sinfo.set("enabled", isEnabled());
         sinfo.set("editable", isEditable());
         sinfo.set("log", isLogging());

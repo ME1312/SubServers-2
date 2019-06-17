@@ -67,22 +67,24 @@ public class SubProtocol extends SubDataProtocol {
             instance.registerPacket(0x0030, PacketCreateServer.class);
             instance.registerPacket(0x0031, PacketAddServer.class);
             instance.registerPacket(0x0032, PacketStartServer.class);
-            instance.registerPacket(0x0033, PacketEditServer.class);
-            instance.registerPacket(0x0034, PacketRestartServer.class);
-            instance.registerPacket(0x0035, PacketCommandServer.class);
-            instance.registerPacket(0x0036, PacketStopServer.class);
-            instance.registerPacket(0x0037, PacketRemoveServer.class);
-            instance.registerPacket(0x0038, PacketDeleteServer.class);
+            instance.registerPacket(0x0033, PacketUpdateServer.class);
+            instance.registerPacket(0x0034, PacketEditServer.class);
+            instance.registerPacket(0x0035, PacketRestartServer.class);
+            instance.registerPacket(0x0036, PacketCommandServer.class);
+            instance.registerPacket(0x0037, PacketStopServer.class);
+            instance.registerPacket(0x0038, PacketRemoveServer.class);
+            instance.registerPacket(0x0039, PacketDeleteServer.class);
 
             instance.registerPacket(0x0030, new PacketCreateServer());
             instance.registerPacket(0x0031, new PacketAddServer());
             instance.registerPacket(0x0032, new PacketStartServer());
-            instance.registerPacket(0x0033, new PacketEditServer());
-            instance.registerPacket(0x0034, new PacketRestartServer());
-            instance.registerPacket(0x0035, new PacketCommandServer());
-            instance.registerPacket(0x0036, new PacketStopServer());
-            instance.registerPacket(0x0037, new PacketRemoveServer());
-            instance.registerPacket(0x0038, new PacketDeleteServer());
+            instance.registerPacket(0x0033, new PacketUpdateServer());
+            instance.registerPacket(0x0034, new PacketEditServer());
+            instance.registerPacket(0x0035, new PacketRestartServer());
+            instance.registerPacket(0x0036, new PacketCommandServer());
+            instance.registerPacket(0x0037, new PacketStopServer());
+            instance.registerPacket(0x0038, new PacketRemoveServer());
+            instance.registerPacket(0x0039, new PacketDeleteServer());
 
 
          // 50-69: External Host Packets
@@ -91,7 +93,7 @@ public class SubProtocol extends SubDataProtocol {
             instance.registerPacket(0x0052, PacketOutExRequestQueue.class);
             instance.registerPacket(0x0053, PacketExCreateServer.class);
             instance.registerPacket(0x0054, PacketExAddServer.class);
-            instance.registerPacket(0x0055, PacketExUpdateServer.class);
+            instance.registerPacket(0x0055, PacketExEditServer.class);
             instance.registerPacket(0x0056, PacketOutExLogMessage.class);
             instance.registerPacket(0x0057, PacketExDeleteServer.class);
             instance.registerPacket(0x0058, PacketExRemoveServer.class);
@@ -101,7 +103,7 @@ public class SubProtocol extends SubDataProtocol {
           //instance.registerPacket(0x0052, new PacketOutExRequestQueue(host));
             instance.registerPacket(0x0053, new PacketExCreateServer(host));
             instance.registerPacket(0x0054, new PacketExAddServer(host));
-            instance.registerPacket(0x0055, new PacketExUpdateServer(host));
+            instance.registerPacket(0x0055, new PacketExEditServer(host));
           //instance.registerPacket(0x0056, new PacketOutExLogMessage());
             instance.registerPacket(0x0057, new PacketExDeleteServer(host));
             instance.registerPacket(0x0058, new PacketExRemoveServer(host));

@@ -227,6 +227,27 @@ public interface SubServer extends Server {
     Host getHost();
 
     /**
+     * Grabs the Template this Server was created from
+     *
+     * @return The Template
+     */
+    SubCreator.ServerTemplate getTemplate();
+
+    /**
+     * Sets the Template this Server was created from
+     *
+     * @param value Value
+     */
+    void setTemplate(SubCreator.ServerTemplate value);
+
+    /**
+     * Is this Host Available?
+     *
+     * @return Availability Status
+     */
+    boolean isAvailable();
+
+    /**
      * If the Server is Enabled
      *
      * @return Enabled Status

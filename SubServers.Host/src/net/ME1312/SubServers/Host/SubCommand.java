@@ -120,7 +120,7 @@ public class SubCommand {
                                     } else {
                                         message += TextColor.GREEN;
                                     }
-                                } else if (((SubServer) server).isEnabled() && ((SubServer) server).getCurrentIncompatibilities().size() == 0) {
+                                } else if (((SubServer) server).isAvailable() && ((SubServer) server).isEnabled() && ((SubServer) server).getCurrentIncompatibilities().size() == 0) {
                                     message += TextColor.YELLOW;
                                 } else {
                                     message += TextColor.RED;
@@ -153,7 +153,7 @@ public class SubCommand {
                                 } else {
                                     message += TextColor.GREEN;
                                 }
-                            } else if (subserver.isEnabled() && subserver.getCurrentIncompatibilities().size() == 0) {
+                            } else if (subserver.isAvailable() && subserver.isEnabled() && subserver.getCurrentIncompatibilities().size() == 0) {
                                 message += TextColor.YELLOW;
                             } else {
                                 message += TextColor.RED;
@@ -216,9 +216,11 @@ public class SubCommand {
                                 sender.sendMessage("SubServers > Info on " + ((server instanceof SubServer)?"Sub":"") + "Server: " + TextColor.WHITE + server.getDisplayName());
                                 if (!server.getName().equals(server.getDisplayName())) sender.sendMessage(" -> System Name: " + TextColor.WHITE  + server.getName());
                                 if (server instanceof SubServer) {
+                                    sender.sendMessage(" -> Available: " + ((((SubServer) server).isAvailable())?TextColor.GREEN+"yes":TextColor.RED+"no"));
                                     sender.sendMessage(" -> Enabled: " + ((((SubServer) server).isEnabled())?TextColor.GREEN+"yes":TextColor.RED+"no"));
                                     if (!((SubServer) server).isEditable()) sender.sendMessage(" -> Editable: " + TextColor.RED + "no");
                                     sender.sendMessage(" -> Host: " + TextColor.WHITE  + ((SubServer) server).getHost());
+                                    if (((SubServer) server).getTemplate() != null) sender.sendMessage(" -> Template: " + TextColor.WHITE  + ((SubServer) server).getTemplate());
                                 }
                                 if (server.getGroups().size() > 0) sender.sendMessage(" -> Group" + ((server.getGroups().size() > 1)?"s:":": " + TextColor.WHITE + server.getGroups().get(0)));
                                 if (server.getGroups().size() > 1) for (String group : server.getGroups()) sender.sendMessage("      - " + TextColor.WHITE + group);
@@ -463,12 +465,15 @@ public class SubCommand {
                                     sender.sendMessage("That SubServer's Host is not enabled");
                                     break;
                                 case 7:
-                                    sender.sendMessage("That SubServer is not enabled");
+                                    sender.sendMessage("That SubServer is not available");
                                     break;
                                 case 8:
-                                    sender.sendMessage("That SubServer is already running");
+                                    sender.sendMessage("That SubServer is not enabled");
                                     break;
                                 case 9:
+                                    sender.sendMessage("That SubServer is already running");
+                                    break;
+                                case 10:
                                     sender.sendMessage("That SubServer cannot start while these server(s) are running:", data.getRawString(0x0002));
                                     break;
                                 case 0:
@@ -530,12 +535,15 @@ public class SubCommand {
                                             sender.sendMessage("Could not restart server: That SubServer's Host is no longer enabled");
                                             break;
                                         case 7:
-                                            sender.sendMessage("Could not restart server: That SubServer is no longer enabled");
-                                            break;
-                                        case 9:
-                                            sender.sendMessage("Could not restart server: That SubServer cannot start while these server(s) are running:", data.getRawString(0x0002));
+                                            sender.sendMessage("Could not restart server: That SubServer is no longer available");
                                             break;
                                         case 8:
+                                            sender.sendMessage("Could not restart server: That SubServer is no longer enabled");
+                                            break;
+                                        case 10:
+                                            sender.sendMessage("Could not restart server: That SubServer cannot start while these server(s) are running:", data.getRawString(0x0002));
+                                            break;
+                                        case 9:
                                         case 0:
                                         case 1:
                                             sender.sendMessage("Server was started successfully");
@@ -722,11 +730,11 @@ public class SubCommand {
             @Override
             public void command(CommandSender sender, String handle, String[] args) {
                 if (canRun()) {
-                    if (args.length > 3) {
+                    if (args.length > 2) {
                         if (args.length > 4 && Util.isException(() -> Integer.parseInt(args[4]))) {
                             sender.sendMessage("Invalid Port Number");
                         } else {
-                            ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketCreateServer(null, args[0], args[1], args[2], new Version(args[3]), (args.length > 4)?Integer.parseInt(args[4]):null, data -> {
+                            ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketCreateServer(null, args[0], args[1], args[2], (args.length > 3)?new Version(args[3]):null, (args.length > 4)?Integer.parseInt(args[4]):null, data -> {
                                 switch (data.getInt(0x0001)) {
                                     case 3:
                                         sender.sendMessage("Server names cannot use spaces");
@@ -795,7 +803,7 @@ public class SubCommand {
             } else {
                 return new String[0];
             }
-        }).usage("<Name>", "<Host>", "<Template>", "<Version>", "[Port]").description("Creates a SubServer").help(
+        }).usage("<Name>", "<Host>", "<Template>", "[Version]", "[Port]").description("Creates a SubServer").help(
                 "This command is used to create and launch a SubServer on the specified host via the network.",
                 "Templates are downloaded from SubServers.Bungee to ./Templates.",
                 "",
@@ -819,6 +827,85 @@ public class SubCommand {
                 "  /create ExampleServer ExampleHost Spigot 1.12.2",
                 "  /create ExampleServer ExampleHost Spigot 1.12.2 25565"
         ).register("create");
+        new Command(host.info) {
+            @Override
+            public void command(CommandSender sender, String handle, String[] args) {
+                if (canRun()) {
+                    if (args.length > 0) {
+                        ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketUpdateServer(null, args[0], (args.length > 1)?new Version(args[1]):null, data -> {
+                            switch (data.getInt(0x0001)) {
+                                case 3:
+                                    sender.sendMessage("There is no server with that name");
+                                    break;
+                                case 4:
+                                    sender.sendMessage("That Server is not a SubServer");
+                                    break;
+                                case 5:
+                                    sender.sendMessage("That SubServer's Host is not available");
+                                    break;
+                                case 6:
+                                    sender.sendMessage("That SubServer's Host is not enabled");
+                                    break;
+                                case 7:
+                                    sender.sendMessage("That SubServer is not available");
+                                    break;
+                                case 8:
+                                    sender.sendMessage("Cannot update servers while they are still running");
+                                    break;
+                                case 9:
+                                    sender.sendMessage("We don't know which template created that SubServer");
+                                    break;
+                                case 10:
+                                    sender.sendMessage("That SubServer's Template is not enabled");
+                                    break;
+                                case 11:
+                                    sender.sendMessage("That SubServer's Template does not support server updating");
+                                    break;
+                                case 12:
+                                    sender.sendMessage("That SubServer's Template requires a Minecraft Version to be specified");
+                                    break;
+                                case 0:
+                                case 1:
+                                    sender.sendMessage("Launching SubCreator...");
+                                    break;
+                            }
+                        }));
+                    } else {
+                        sender.sendMessage("Usage: /" + handle + " <SubServer> [Version]");
+                    }
+                }
+            }
+        }.autocomplete((sender, handle, args) -> {
+            String last = (args.length > 0)?args[args.length - 1].toLowerCase():"";
+            if (args.length == 1) {
+                updateCache();
+                List<String> list = new ArrayList<String>();
+                if (last.length() == 0) {
+                    for (String server : serverCache.keySet()) if (serverCache.get(server) == Boolean.TRUE) list.add(server);
+                } else {
+                    for (String server : serverCache.keySet()) {
+                        if (serverCache.get(server) == Boolean.TRUE && server.toLowerCase().startsWith(last));
+                        list.add(last + server.substring(last.length()));
+                    }
+                }
+                return list.toArray(new String[0]);
+            } else {
+                return new String[0];
+            }
+        }).usage("<SubServer>", "[Version]").description("Updates a SubServer").help(
+                "This command is used to update a SubServer via the network.",
+                "Templates are downloaded from SubServers.Bungee to ./Templates.",
+                "",
+                "The <SubServer> argument is required, and should be the name of",
+                "the SubServer you want to update.",
+                "",
+                "When the [Version] argument is provided, it will set the",
+                "Minecraft version of the type of server that you want to update to",
+                "",
+                "Examples:",
+                "  /update ExampleServer",
+                "  /update ExampleServer 1.12.2"
+        ).register("update", "upgrade");
     }
 
     private static void updateCache() {

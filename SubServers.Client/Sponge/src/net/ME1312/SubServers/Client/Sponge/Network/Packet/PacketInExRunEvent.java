@@ -50,7 +50,7 @@ public class PacketInExRunEvent implements PacketObjectIn<Integer> {
             @Override
             public void run(ObjectMap<String> data) {
                 Sponge.getEventManager().post(new SubCreateEvent((data.contains("player"))?data.getUUID("player"):null, data.getString("host"), data.getString("name"),
-                        data.getString("template"), new Version(data.getString("version")), data.getInt("port")));
+                        data.getString("template"), new Version(data.getString("version")), data.getInt("port"), data.getBoolean("update")));
                 callback("SubCreateEvent", this);
             }
         });

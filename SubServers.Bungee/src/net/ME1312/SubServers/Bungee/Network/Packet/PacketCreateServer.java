@@ -48,8 +48,8 @@ public class PacketCreateServer implements PacketObjectIn<Integer>, PacketObject
 
     @Override
     public void receive(SubDataClient client, ObjectMap<Integer> data) {
+        UUID tracker =       (data.contains(0x0000)?data.getUUID(0x0000):null);
         try {
-            UUID tracker =       (data.contains(0x0000)?data.getUUID(0x0000):null);
             String name =     data.getRawString(0x0001);
             String host =     data.getRawString(0x0002);
             String template = data.getRawString(0x0003);

@@ -154,6 +154,8 @@ public class ConfigUpdater {
                     if (existing.getMap("Servers").getMap(name).getRawString("Stop-Action", "NONE").equalsIgnoreCase("DELETE_SERVER"))
                         updated.getMap("Servers").getMap(name).set("Stop-Action", "RECYCLE_SERVER");
                 }
+
+                existing = updated.clone();
                 i++;
             }// if (was.compareTo(new Version("99w99a")) <= 0) {
             //  // do something
@@ -177,6 +179,7 @@ public class ConfigUpdater {
                 server.set("Enabled", updated.getMap("Servers").getMap(name).getBoolean("Enabled", false));
                 server.set("Display", updated.getMap("Servers").getMap(name).getRawString("Display", ""));
                 server.set("Host", updated.getMap("Servers").getMap(name).getRawString("Host", "~"));
+                if (updated.getMap("Servers").getMap(name).contains("Template")) server.set("Template", updated.getMap("Servers").getMap(name).getRawString("Template"));
                 server.set("Group", updated.getMap("Servers").getMap(name).getRawStringList("Groups", Collections.emptyList()));
                 server.set("Port", updated.getMap("Servers").getMap(name).getInt("Port", 25567));
                 server.set("Motd", updated.getMap("Servers").getMap(name).getRawString("Motd", "Some SubServer"));
@@ -220,7 +223,9 @@ public class ConfigUpdater {
             i++;
             Logger.get("SubServers").info("Created ./SubServers/lang.yml");
         } else {
-            if (was.compareTo(new Version("19w17a")) <= 0) {
+            if (was.compareTo(new Version("19w22b")) <= 0) {
+                updated.getMap("Lang").remove("Interface.Host-Admin.SubServers");
+                updated.getMap("Lang").remove("Interface.SubServer-Admin.Command");
                 i++;
             }// if (was.compareTo(new Version("99w99a")) <= 0) {
             //  // do something
@@ -274,6 +279,7 @@ public class ConfigUpdater {
             lang.set("Command.Help.SubServer.Stop", updated.getMap("Lang", new YAMLSection()).getRawString("Command.Help.SubServer.Stop", "   &7Stop Server:&f $str$"));
             lang.set("Command.Help.SubServer.Terminate", updated.getMap("Lang", new YAMLSection()).getRawString("Command.Help.SubServer.Terminate", "   &7Terminate Server:&f $str$"));
             lang.set("Command.Help.SubServer.Command", updated.getMap("Lang", new YAMLSection()).getRawString("Command.Help.SubServer.Command", "   &7Command Server:&f $str$"));
+            lang.set("Command.Help.SubServer.Update", updated.getMap("Lang", new YAMLSection()).getRawString("Command.Help.SubServer.Update", "   &7Update Server:&f $str$"));
             lang.set("Command.Version", updated.getMap("Lang", new YAMLSection()).getRawString("Command.Version", "&7SubServers &8&l\u00BB&7 These are the platforms and versions that are running &f$str$&7:"));
             lang.set("Command.Version.Outdated", updated.getMap("Lang", new YAMLSection()).getRawString("Command.Version.Outdated", "&7$name$ &f$str$ &7is available. You are $int$ version(s) behind."));
             lang.set("Command.Version.Latest", updated.getMap("Lang", new YAMLSection()).getRawString("Command.Version.Latest", "&7You are on the latest version."));
@@ -298,6 +304,7 @@ public class ConfigUpdater {
             lang.set("Command.Start.Invalid", updated.getMap("Lang", new YAMLSection()).getRawString("Command.Start.Invalid", "&cSubServers &4&l\u00BB&c That Server is not a SubServer"));
             lang.set("Command.Start.Host-Unavailable", updated.getMap("Lang", new YAMLSection()).getRawString("Command.Start.Host-Unavailable", "&cSubServers &4&l\u00BB&c That SubServer\u0027s Host is not available"));
             lang.set("Command.Start.Host-Disabled", updated.getMap("Lang", new YAMLSection()).getRawString("Command.Start.Host-Disabled", "&cSubServers &4&l\u00BB&c That SubServer\u0027s Host is not enabled"));
+            lang.set("Command.Start.Server-Unavailable", updated.getMap("Lang", new YAMLSection()).getRawString("Command.Start.Server-Unavailable", "&cSubServers &4&l\u00BB&c That SubServer is not available"));
             lang.set("Command.Start.Server-Disabled", updated.getMap("Lang", new YAMLSection()).getRawString("Command.Start.Server-Disabled", "&cSubServers &4&l\u00BB&c That SubServer is not enabled"));
             lang.set("Command.Start.Server-Incompatible", updated.getMap("Lang", new YAMLSection()).getRawString("Command.Start.Server-Incompatible", "&cSubServers &4&l\u00BB&c That SubServer cannot start while these server(s) are running: &4$str$"));
             lang.set("Command.Start.Running", updated.getMap("Lang", new YAMLSection()).getRawString("Command.Start.Running", "&cSubServers &4&l\u00BB&c That SubServer is already running"));
@@ -308,6 +315,7 @@ public class ConfigUpdater {
             lang.set("Command.Restart.Disappeared", updated.getMap("Lang", new YAMLSection()).getRawString("Command.Restart.Disappeared", "&cSubServers &4&l\u00BB&c Could not restart server: That SubServer has disappeared"));
             lang.set("Command.Restart.Host-Unavailable", updated.getMap("Lang", new YAMLSection()).getRawString("Command.Restart.Host-Unavailable", "&cSubServers &4&l\u00BB&c Could not restart server: That SubServer\u0027s Host is no longer available"));
             lang.set("Command.Restart.Host-Disabled", updated.getMap("Lang", new YAMLSection()).getRawString("Command.Restart.Host-Disabled", "&cSubServers &4&l\u00BB&c Could not restart server: That SubServer\u0027s Host is no longer enabled"));
+            lang.set("Command.Restart.Server-Unavailable", updated.getMap("Lang", new YAMLSection()).getRawString("Command.Restart.Server-Unavailable", "&cSubServers &4&l\u00BB&c Could not restart server: That SubServer is no longer available"));
             lang.set("Command.Restart.Server-Disabled", updated.getMap("Lang", new YAMLSection()).getRawString("Command.Restart.Server-Disabled", "&cSubServers &4&l\u00BB&c Could not restart server: That SubServer is no longer enabled"));
             lang.set("Command.Restart.Server-Incompatible", updated.getMap("Lang", new YAMLSection()).getRawString("Command.Restart.Server-Incompatible", "&cSubServers &4&l\u00BB&c Could not restart server: That SubServer cannot start while these server(s) are running: &4$str$"));
             lang.set("Command.Stop", updated.getMap("Lang", new YAMLSection()).getRawString("Command.Stop", "&aSubServers &2&l\u00BB&a Stopping SubServer"));
@@ -331,6 +339,17 @@ public class ConfigUpdater {
             lang.set("Command.Creator.Template-Disabled", updated.getMap("Lang", new YAMLSection()).getRawString("Command.Creator.Template-Disabled", "&cSubServers &4&l\u00BB&c That Template is not enabled"));
             lang.set("Command.Creator.Version-Required", updated.getMap("Lang", new YAMLSection()).getRawString("Command.Creator.Version-Required", "&cSubServers &4&l\u00BB&c That Template requires a Minecraft Version to be specified"));
             lang.set("Command.Creator.Invalid-Port", updated.getMap("Lang", new YAMLSection()).getRawString("Command.Creator.Invalid-Port", "&cSubServers &4&l\u00BB&c Invalid Port Number"));
+            lang.set("Command.Update", updated.getMap("Lang", new YAMLSection()).getRawString("Command.Creator", "&aSubServers &2&l\u00BB&a Updating SubServer"));
+            lang.set("Command.Update.Unknown", updated.getMap("Lang", new YAMLSection()).getRawString("Command.Update.Unknown", "&cSubServers &4&l\u00BB&c There is no Server with that name"));
+            lang.set("Command.Update.Invalid", updated.getMap("Lang", new YAMLSection()).getRawString("Command.Update.Invalid", "&cSubServers &4&l\u00BB&c That Server is not a SubServer"));
+            lang.set("Command.Update.Host-Unavailable", updated.getMap("Lang", new YAMLSection()).getRawString("Command.Update.Host-Unavailable", "&cSubServers &4&l\u00BB&c That SubServer\u0027s Host is not available"));
+            lang.set("Command.Update.Host-Disabled", updated.getMap("Lang", new YAMLSection()).getRawString("Command.Update.Host-Disabled", "&cSubServers &4&l\u00BB&c That SubServer\u0027s Host is not enabled"));
+            lang.set("Command.Update.Server-Unavailable", updated.getMap("Lang", new YAMLSection()).getRawString("Command.Update.Server-Unavailable", "&cSubServers &4&l\u00BB&c That SubServer is not available"));
+            lang.set("Command.Update.Running", updated.getMap("Lang", new YAMLSection()).getRawString("Command.Update.Running", "&cSubServers &4&l\u00BB&c Cannot update servers while they are still running"));
+            lang.set("Command.Update.Unknown-Template", updated.getMap("Lang", new YAMLSection()).getRawString("Command.Update.Unknown-Template", "&cSubServers &4&l\u00BB&c We don't know which template created that SubServer"));
+            lang.set("Command.Update.Template-Disabled", updated.getMap("Lang", new YAMLSection()).getRawString("Command.Update.Template-Disabled", "&cSubServers &4&l\u00BB&c That SubServer's Template is not enabled"));
+            lang.set("Command.Update.Template-Invalid", updated.getMap("Lang", new YAMLSection()).getRawString("Command.Update.Template-Invalid", "&cSubServers &4&l\u00BB&c That SubServer's Template does not support server updating"));
+            lang.set("Command.Update.Version-Required", updated.getMap("Lang", new YAMLSection()).getRawString("Command.Update.Version-Required", "&cSubServers &4&l\u00BB&c That SubServer's Template requires a Minecraft Version to be specified"));
             lang.set("Interface.Generic.Back", updated.getMap("Lang", new YAMLSection()).getRawString("Interface.Generic.Back", "&cBack"));
             lang.set("Interface.Generic.Back-Arrow", updated.getMap("Lang", new YAMLSection()).getRawString("Interface.Generic.Back-Arrow", "&e&l<--"));
             lang.set("Interface.Generic.Next-Arrow", updated.getMap("Lang", new YAMLSection()).getRawString("Interface.Generic.Next-Arrow", "&e&l-->"));
@@ -355,7 +374,7 @@ public class ConfigUpdater {
             lang.set("Interface.Host-Menu.Server-Menu", updated.getMap("Lang", new YAMLSection()).getRawString("Interface.Host-Menu.Server-Menu", "&a&lView Servers"));
             lang.set("Interface.Host-Admin.Title", updated.getMap("Lang", new YAMLSection()).getRawString("Interface.Host-Admin.Title", "Host/$str$"));
             lang.set("Interface.Host-Admin.Creator", updated.getMap("Lang", new YAMLSection()).getRawString("Interface.Host-Admin.Creator", "&eCreate a SubServer"));
-            lang.set("Interface.Host-Admin.SubServers", updated.getMap("Lang", new YAMLSection()).getRawString("Interface.Host-Admin.SubServers", "&aView SubServers"));
+            lang.set("Interface.Host-Admin.SubServers", updated.getMap("Lang", new YAMLSection()).getRawString("Interface.Host-Admin.SubServers", "&bView SubServers"));
             lang.set("Interface.Host-Admin.Plugins", updated.getMap("Lang", new YAMLSection()).getRawString("Interface.Host-Admin.Plugins", "&bPlugins..."));
             lang.set("Interface.Host-Creator.Title", updated.getMap("Lang", new YAMLSection()).getRawString("Interface.Host-Creator.Title", "Host/$str$/Create"));
             lang.set("Interface.Host-Creator.Edit-Name", updated.getMap("Lang", new YAMLSection()).getRawString("Interface.Host-Creator.Edit-Name", "Change Name"));
@@ -392,6 +411,7 @@ public class ConfigUpdater {
             lang.set("Interface.Server-Menu.SubServer-Temporary", updated.getMap("Lang", new YAMLSection()).getRawString("Interface.Server-Menu.SubServer-Temporary", "&9Temporary"));
             lang.set("Interface.Server-Menu.SubServer-Offline", updated.getMap("Lang", new YAMLSection()).getRawString("Interface.Server-Menu.SubServer-Offline", "&6Offline"));
             lang.set("Interface.Server-Menu.SubServer-Incompatible", updated.getMap("Lang", new YAMLSection()).getRawString("Interface.Server-Menu.SubServer-Incompatible", "&4Incompatible with $str$"));
+            lang.set("Interface.Server-Menu.SubServer-Unavailable", updated.getMap("Lang", new YAMLSection()).getRawString("Interface.Server-Menu.SubServer-Unavailable", "&4Unavailable"));
             lang.set("Interface.Server-Menu.SubServer-Disabled", updated.getMap("Lang", new YAMLSection()).getRawString("Interface.Server-Menu.SubServer-Disabled", "&4Disabled"));
             lang.set("Interface.Server-Menu.SubServer-Invalid", updated.getMap("Lang", new YAMLSection()).getRawString("Interface.Server-Menu.SubServer-Invalid", "&4Cannot be managed by SubServers"));
             lang.set("Interface.Server-Menu.No-Servers", updated.getMap("Lang", new YAMLSection()).getRawString("Interface.Server-Menu.No-Servers", "&c&oThere are No Servers"));
@@ -403,9 +423,12 @@ public class ConfigUpdater {
             lang.set("Interface.SubServer-Admin.Stop.Title", updated.getMap("Lang", new YAMLSection()).getRawString("Interface.SubServer-Admin.Stop.Title", "&cStopping $str$"));
             lang.set("Interface.SubServer-Admin.Terminate", updated.getMap("Lang", new YAMLSection()).getRawString("Interface.SubServer-Admin.Terminate", "&4Terminate SubServer"));
             lang.set("Interface.SubServer-Admin.Terminate.Title", updated.getMap("Lang", new YAMLSection()).getRawString("Interface.SubServer-Admin.Terminate.Title", "&cTerminating $str$"));
-            lang.set("Interface.SubServer-Admin.Command", updated.getMap("Lang", new YAMLSection()).getRawString("Interface.SubServer-Admin.Command", "&eSend a Command to the SubServer"));
+            lang.set("Interface.SubServer-Admin.Command", updated.getMap("Lang", new YAMLSection()).getRawString("Interface.SubServer-Admin.Command", "&bSend a Command to the SubServer"));
             lang.set("Interface.SubServer-Admin.Command.Title", updated.getMap("Lang", new YAMLSection()).getRawString("Interface.SubServer-Admin.Command.Title", "&eSubServers\n&6Enter a Command to send via Chat"));
             lang.set("Interface.SubServer-Admin.Command.Message", updated.getMap("Lang", new YAMLSection()).getRawString("Interface.SubServer-Admin.Command.Message", "&eSubServers &6&l\u00BB&e Enter a Command to send via Chat"));
+            lang.set("Interface.SubServer-Admin.Update", updated.getMap("Lang", new YAMLSection()).getRawString("Interface.SubServer-Admin.Update", "&eUpdate SubServer"));
+            lang.set("Interface.SubServer-Admin.Update.Title", updated.getMap("Lang", new YAMLSection()).getRawString("Interface.SubServer-Admin.Update.Title", "&eSubServers\n&6Enter a Server Version to update to"));
+            lang.set("Interface.SubServer-Admin.Update.Message", updated.getMap("Lang", new YAMLSection()).getRawString("Interface.SubServer-Admin.Update.Message", "&eSubServers &6&l\u00BB&e Enter a Server Version to update to via Chat"));
             lang.set("Interface.SubServer-Admin.Plugins", updated.getMap("Lang", new YAMLSection()).getRawString("Interface.SubServer-Admin.Plugins", "&bPlugins..."));
             lang.set("Interface.SubServer-Plugin.Title", updated.getMap("Lang", new YAMLSection()).getRawString("Interface.SubServer-Plugin.Title", "SubServer/$str$/Plugins"));
             lang.set("Interface.SubServer-Plugin.No-Plugins", updated.getMap("Lang", new YAMLSection()).getRawString("Interface.SubServer-Plugin.No-Plugins", "&c&oThere are No Plugins Available"));

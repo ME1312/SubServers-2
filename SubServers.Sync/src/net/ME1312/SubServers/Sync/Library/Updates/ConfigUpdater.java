@@ -71,11 +71,11 @@ public class ConfigUpdater {
 
 
             YAMLSection sync = new YAMLSection();
-            settings.set("Disabled-Commands", updated.getMap("Settings", new YAMLSection()).getBoolean("Disabled-Commands", false));
-            settings.set("Forced-Hosts", updated.getMap("Settings", new YAMLSection()).getBoolean("Forced-Hosts", true));
-            settings.set("Motd", updated.getMap("Settings", new YAMLSection()).getBoolean("Motd", false));
-            settings.set("Player-Limit", updated.getMap("Settings", new YAMLSection()).getBoolean("Player-Limit", false));
-            settings.set("Server-Priorities", updated.getMap("Settings", new YAMLSection()).getBoolean("Server-Priorities", true));
+            sync.set("Disabled-Commands", updated.getMap("Settings", new YAMLSection()).getBoolean("Disabled-Commands", false));
+            sync.set("Forced-Hosts", updated.getMap("Settings", new YAMLSection()).getBoolean("Forced-Hosts", true));
+            sync.set("Motd", updated.getMap("Settings", new YAMLSection()).getBoolean("Motd", false));
+            sync.set("Player-Limit", updated.getMap("Settings", new YAMLSection()).getBoolean("Player-Limit", false));
+            sync.set("Server-Priorities", updated.getMap("Settings", new YAMLSection()).getBoolean("Server-Priorities", true));
 
             rewritten.set("Sync", sync);
 

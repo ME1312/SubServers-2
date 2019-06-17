@@ -8,6 +8,7 @@ import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubData.Server.SubDataClient;
 import net.ME1312.SubData.Server.Protocol.PacketObjectOut;
 import net.ME1312.SubData.Server.Protocol.PacketObjectIn;
+import net.ME1312.SubServers.Bungee.Host.SubServer;
 
 import java.util.HashMap;
 import java.util.UUID;
@@ -29,6 +30,26 @@ public class PacketExCreateServer implements PacketObjectIn<Integer>, PacketObje
      */
     public PacketExCreateServer(String name) {
         this.name = name;
+    }
+
+    /**
+     * New PacketExCreateServer (Out)
+     *
+     * @param server Server to Update
+     * @param version Server Version
+     * @param log Log Address
+     * @param callback Callbacks
+     */
+    @SafeVarargs
+    public PacketExCreateServer(SubServer server, Version version, UUID log, Callback<ObjectMap<Integer>>... callback) {
+        if (Util.isNull(server, log, callback)) throw new NullPointerException();
+        this.name = server.getName();
+        this.template = server.getTemplate();
+        this.version = version;
+        this.port = server.getAddress().getPort();
+        this.log = log;
+        this.tracker = Util.getNew(callbacks.keySet(), UUID::randomUUID);
+        callbacks.put(tracker, callback);
     }
 
     /**

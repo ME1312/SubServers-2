@@ -11,6 +11,7 @@ import net.ME1312.SubServers.Client.Sponge.Network.Packet.PacketStopServer;
 import net.ME1312.SubServers.Client.Sponge.SubAPI;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
@@ -397,6 +398,24 @@ public class SubServer extends Server {
     }
 
     /**
+     * Grabs the Template this Server was created from
+     *
+     * @return The Template
+     */
+    public String getTemplate() {
+        return raw.getRawString("template");
+    }
+
+    /**
+     * Is this Server Available?
+     *
+     * @return Availability Status
+     */
+    public boolean isAvailable() {
+        return raw.getBoolean("available");
+    }
+
+    /**
      * If the Server is Enabled
      *
      * @return Enabled Status
@@ -560,6 +579,35 @@ public class SubServer extends Server {
     }
 
     /**
+     * Toggles compatibility with other Servers
+     *
+     * @param server SubServer to toggle
+     */
+    public void toggleCompatibility(String server) {
+        toggleCompatibility(server, b -> {});
+    }
+
+    /**
+     * Toggles compatibility with other Servers
+     *
+     * @param server SubServer to toggle
+     */
+    public void toggleCompatibility(String server, Callback<Boolean> response) {
+        if (Util.isNull(server, response)) throw new NullPointerException();
+        ArrayList<String> value = new ArrayList<String>();
+        value.addAll(getIncompatibilities());
+        if (!value.contains(server)) value.add(server);
+        else value.remove(server);
+
+        ObjectMap<String> edit = new ObjectMap<String>();
+        edit.set("incompatible", value);
+        edit(edit, r -> {
+            if (r > 0) raw.set("incompatible", value);
+            response.run(r > 0);
+        });
+    }
+
+    /**
      * Checks if a Server is compatible
      *
      * @param server Server name to check
@@ -640,6 +688,222 @@ public class SubServer extends Server {
                 if (incompatableNames.contains(subserver.getName().toLowerCase()))
                     current.add(subserver);
             callback.run(current);
+        });
+    }
+
+    /**
+     * Sets the Display Name for this Server
+     *
+     * @param value Value (or null to reset)
+     */
+    public void setDisplayName(String value) {
+        setMotd(value, b -> {});
+    }
+
+    /**
+     * Sets the Display Name for this Server
+     *
+     * @param value Value (or null to reset)
+     * @param response Success Status
+     */
+    public void setDisplayName(String value, Callback<Boolean> response) {
+        if (Util.isNull(value, response)) throw new NullPointerException();
+        ObjectMap<String> edit = new ObjectMap<String>();
+        edit.set("display", (value == null)?"":value);
+        edit(edit, r -> {
+            if (r > 0) raw.set("display", (value == null)?getName():value);
+            response.run(r > 0);
+        });
+    }
+
+    /**
+     * Add this Server to a Group
+     *
+     * @param value Group name
+     */
+    public void addGroup(String value) {
+        addGroup(value, b -> {});
+    }
+
+    /**
+     * Add this Server to a Group
+     *
+     * @param value Group name
+     * @param response Success Status
+     */
+    public void addGroup(String value, Callback<Boolean> response) {
+        if (Util.isNull(value, response)) throw new NullPointerException();
+        ArrayList<String> v = new ArrayList<String>();
+        v.addAll(getGroups());
+        if (!v.contains(value)) v.add(value);
+
+        ObjectMap<String> edit = new ObjectMap<String>();
+        edit.set("group", v);
+        edit(edit, r -> {
+            if (r > 0) raw.set("group", v);
+            response.run(r > 0);
+        });
+    }
+
+    /**
+     * Remove this Server from a Group
+     *
+     * @param value value Group name
+     */
+    public void removeGroup(String value) {
+        removeGroup(value, b -> {});
+    }
+
+    /**
+     * Remove this Server from a Group
+     *
+     * @param value value Group name
+     * @param response Success Status
+     */
+    public void removeGroup(String value, Callback<Boolean> response) {
+        if (Util.isNull(value, response)) throw new NullPointerException();
+        ArrayList<UUID> v = new ArrayList<UUID>();
+        v.addAll(getWhitelist());
+        v.remove(value);
+
+        ObjectMap<String> edit = new ObjectMap<String>();
+        edit.set("group", v);
+        edit(edit, r -> {
+            if (r > 0) raw.set("group", v);
+            response.run(r > 0);
+        });
+    }
+
+    /**
+     * Set if the server is hidden from players
+     *
+     * @param value Value
+     */
+    public void setHidden(boolean value) {
+        setHidden(value, b -> {});
+    }
+
+    /**
+     * Set if the server is hidden from players
+     *
+     * @param value Value
+     * @param response Success Status
+     */
+    public void setHidden(boolean value, Callback<Boolean> response) {
+        if (Util.isNull(value, response)) throw new NullPointerException();
+        ObjectMap<String> edit = new ObjectMap<String>();
+        edit.set("restricted", value);
+        edit(edit, r -> {
+            if (r > 0) raw.set("restricted", value);
+            response.run(r > 0);
+        });
+    }
+
+    /**
+     * Sets the MOTD of the Server
+     *
+     * @param value Value
+     */
+    public void setMotd(String value) {
+        setMotd(value, b -> {});
+    }
+
+    /**
+     * Sets the MOTD of the Server
+     *
+     * @param value Value
+     * @param response Success Status
+     */
+    public void setMotd(String value, Callback<Boolean> response) {
+        if (Util.isNull(value, response)) throw new NullPointerException();
+        ObjectMap<String> edit = new ObjectMap<String>();
+        edit.set("motd", value);
+        edit(edit, r -> {
+            if (r > 0) raw.set("motd", value);
+            response.run(r > 0);
+        });
+    }
+
+    /**
+     * Sets if the Server is Restricted
+     *
+     * @param value Value
+     */
+    public void setRestricted(boolean value) {
+        setRestricted(value, b -> {});
+    }
+
+    /**
+     * Sets if the Server is Restricted
+     *
+     * @param value Value
+     * @param response Success Status
+     */
+    public void setRestricted(boolean value, Callback<Boolean> response) {
+        if (Util.isNull(value, response)) throw new NullPointerException();
+        ObjectMap<String> edit = new ObjectMap<String>();
+        edit.set("restricted", value);
+        edit(edit, r -> {
+            if (r > 0) raw.set("restricted", value);
+            response.run(r > 0);
+        });
+    }
+
+    /**
+     * Add a player to the whitelist (for use with restricted servers)
+     *
+     * @param player Player to add
+     */
+    public void whitelist(UUID player) {
+        whitelist(player, b -> {});
+    }
+
+    /**
+     * Add a player to the whitelist (for use with restricted servers)
+     *
+     * @param player Player to add
+     * @param response Success Status
+     */
+    public void whitelist(UUID player, Callback<Boolean> response) {
+        if (Util.isNull(player, response)) throw new NullPointerException();
+        ArrayList<UUID> value = new ArrayList<UUID>();
+        value.addAll(getWhitelist());
+        if (!value.contains(player)) value.add(player);
+
+        ObjectMap<String> edit = new ObjectMap<String>();
+        edit.set("whitelist", value);
+        edit(edit, r -> {
+            if (r > 0) raw.set("whitelist", value);
+            response.run(r > 0);
+        });
+    }
+
+    /**
+     * Remove a player to the whitelist
+     *
+     * @param player Player to remove
+     */
+    public void unwhitelist(UUID player) {
+        unwhitelist(player, b -> {});
+    }
+
+    /**
+     * Remove a player to the whitelist
+     *
+     * @param player Player to remove
+     * @param response Success Status
+     */
+    public void unwhitelist(UUID player, Callback<Boolean> response) {
+        if (Util.isNull(player, response)) throw new NullPointerException();
+        ArrayList<UUID> value = new ArrayList<UUID>();
+        value.addAll(getWhitelist());
+        value.remove(player);
+
+        ObjectMap<String> edit = new ObjectMap<String>();
+        edit.set("whitelist", value);
+        edit(edit, r -> {
+            if (r > 0) raw.set("whitelist", value);
+            response.run(r > 0);
         });
     }
 }

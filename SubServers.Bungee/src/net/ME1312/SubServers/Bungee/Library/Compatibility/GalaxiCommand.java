@@ -9,6 +9,16 @@ import net.md_5.bungee.api.plugin.Command;
 public class GalaxiCommand {
 
     /**
+     * Group similar Commands
+     *
+     * @param commands Command Classes
+     */
+    @SafeVarargs
+    public static void group(Class<? extends Command>... commands) {
+        Util.isException(() -> Util.reflect(GalaxiCommandWrapper.class.getDeclaredConstructor(Class[].class), (Object) commands));
+    }
+
+    /**
      * Set the Description of a Command
      *
      * @param command Command

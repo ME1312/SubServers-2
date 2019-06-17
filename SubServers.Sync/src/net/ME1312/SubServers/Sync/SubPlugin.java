@@ -7,6 +7,7 @@ import net.ME1312.SubData.Client.Encryption.RSA;
 import net.ME1312.SubServers.Sync.Event.*;
 import net.ME1312.Galaxi.Library.Config.YAMLConfig;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
+import net.ME1312.SubServers.Sync.Library.Compatibility.GalaxiCommand;
 import net.ME1312.SubServers.Sync.Library.Compatibility.Logger;
 import net.ME1312.SubServers.Sync.Library.Fallback.SmartReconnectHandler;
 import net.ME1312.SubServers.Sync.Library.Metrics;
@@ -54,7 +55,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
     public boolean redis = false;
     public final SubAPI api = new SubAPI(this);
     public SubProtocol subprotocol;
-    public static final Version version = Version.fromString("2.14a");
+    public static final Version version = Version.fromString("2.14.2a");
 
     public final boolean isPatched;
     public final boolean isGalaxi;
@@ -162,6 +163,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
         getPluginManager().registerCommand(null, SubCommand.newInstance(this, "subservers").get());
         getPluginManager().registerCommand(null, SubCommand.newInstance(this, "subserver").get());
         getPluginManager().registerCommand(null, SubCommand.newInstance(this, "sub").get());
+        GalaxiCommand.group(SubCommand.class);
 
         new Metrics(this);
         new Timer("SubServers.Sync::Routine_Update_Check").schedule(new TimerTask() {

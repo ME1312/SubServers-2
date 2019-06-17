@@ -9,12 +9,9 @@ import net.ME1312.SubServers.Bungee.Event.SubNetworkDisconnectEvent;
 import net.ME1312.SubServers.Bungee.Network.Packet.*;
 import net.ME1312.SubServers.Bungee.SubAPI;
 import net.ME1312.SubServers.Bungee.SubPlugin;
-import net.md_5.bungee.api.ProxyServer;
 
 import java.io.IOException;
 import java.net.InetAddress;
-import java.util.logging.Handler;
-import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
 public class SubProtocol extends SubDataProtocol {
@@ -68,22 +65,24 @@ public class SubProtocol extends SubDataProtocol {
             instance.registerPacket(0x0030, PacketCreateServer.class);
             instance.registerPacket(0x0031, PacketAddServer.class);
             instance.registerPacket(0x0032, PacketStartServer.class);
-            instance.registerPacket(0x0033, PacketEditServer.class);
-            instance.registerPacket(0x0034, PacketRestartServer.class);
-            instance.registerPacket(0x0035, PacketCommandServer.class);
-            instance.registerPacket(0x0036, PacketStopServer.class);
-            instance.registerPacket(0x0037, PacketRemoveServer.class);
-            instance.registerPacket(0x0038, PacketDeleteServer.class);
+            instance.registerPacket(0x0033, PacketUpdateServer.class);
+            instance.registerPacket(0x0034, PacketEditServer.class);
+            instance.registerPacket(0x0035, PacketRestartServer.class);
+            instance.registerPacket(0x0036, PacketCommandServer.class);
+            instance.registerPacket(0x0037, PacketStopServer.class);
+            instance.registerPacket(0x0038, PacketRemoveServer.class);
+            instance.registerPacket(0x0039, PacketDeleteServer.class);
 
             instance.registerPacket(0x0030, new PacketCreateServer(plugin));
             instance.registerPacket(0x0031, new PacketAddServer(plugin));
             instance.registerPacket(0x0032, new PacketStartServer(plugin));
-            instance.registerPacket(0x0033, new PacketEditServer(plugin));
-            instance.registerPacket(0x0034, new PacketRestartServer(plugin));
-            instance.registerPacket(0x0035, new PacketCommandServer(plugin));
-            instance.registerPacket(0x0036, new PacketStopServer(plugin));
-            instance.registerPacket(0x0037, new PacketRemoveServer(plugin));
-            instance.registerPacket(0x0038, new PacketDeleteServer(plugin));
+            instance.registerPacket(0x0033, new PacketUpdateServer(plugin));
+            instance.registerPacket(0x0034, new PacketEditServer(plugin));
+            instance.registerPacket(0x0035, new PacketRestartServer(plugin));
+            instance.registerPacket(0x0036, new PacketCommandServer(plugin));
+            instance.registerPacket(0x0037, new PacketStopServer(plugin));
+            instance.registerPacket(0x0038, new PacketRemoveServer(plugin));
+            instance.registerPacket(0x0039, new PacketDeleteServer(plugin));
 
 
          // 50-69: External Host Packets
@@ -92,7 +91,7 @@ public class SubProtocol extends SubDataProtocol {
           //instance.registerPacket(0x0052, PacketInExRequestQueue.class);
             instance.registerPacket(0x0053, PacketExCreateServer.class);
             instance.registerPacket(0x0054, PacketExAddServer.class);
-            instance.registerPacket(0x0055, PacketExUpdateServer.class);
+            instance.registerPacket(0x0055, PacketExEditServer.class);
           //instance.registerPacket(0x0056, PacketInExLogMessage.class);
             instance.registerPacket(0x0057, PacketExDeleteServer.class);
             instance.registerPacket(0x0058, PacketExRemoveServer.class);
@@ -102,7 +101,7 @@ public class SubProtocol extends SubDataProtocol {
             instance.registerPacket(0x0052, new PacketInExRequestQueue(plugin));
             instance.registerPacket(0x0053, new PacketExCreateServer(null));
             instance.registerPacket(0x0054, new PacketExAddServer());
-            instance.registerPacket(0x0055, new PacketExUpdateServer(plugin));
+            instance.registerPacket(0x0055, new PacketExEditServer(plugin));
             instance.registerPacket(0x0056, new PacketInExLogMessage());
             instance.registerPacket(0x0057, new PacketExDeleteServer());
             instance.registerPacket(0x0058, new PacketExRemoveServer());

@@ -41,7 +41,7 @@ import java.util.jar.Manifest;
 /**
  * SubServers.Host Main Class
  */
-@App(name = "SubServers.Host", version = "2.14a", authors = "ME1312", description = "Host SubServers from other Machines", website = "https://github.com/ME1312/SubServers-2")
+@App(name = "SubServers.Host", version = "2.14.2a", authors = "ME1312", description = "Host SubServers from other Machines", website = "https://github.com/ME1312/SubServers-2")
 public final class ExHost {
     HashMap<Integer, SubDataClient> subdata = new HashMap<Integer, SubDataClient>();
     NamedContainer<Long, Map<String, Map<String, String>>> lang = null;

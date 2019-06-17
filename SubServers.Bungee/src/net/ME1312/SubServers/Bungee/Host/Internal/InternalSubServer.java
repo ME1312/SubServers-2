@@ -187,7 +187,7 @@ public class InternalSubServer extends SubServerContainer {
 
     @Override
     public boolean start(UUID player) {
-        if (!lock && isEnabled() && !(thread != null && thread.isAlive()) && getCurrentIncompatibilities().size() == 0) {
+        if (!lock && isAvailable() && isEnabled() && !(thread != null && thread.isAlive()) && getCurrentIncompatibilities().size() == 0) {
             lock = true;
             SubStartEvent event = new SubStartEvent(player, this);
             host.plugin.getPluginManager().callEvent(event);
@@ -269,251 +269,271 @@ public class InternalSubServer extends SubServerContainer {
 
     @SuppressWarnings({"deprecation", "unchecked"})
     private int edit(UUID player, ObjectMap<String> edit, boolean perma) {
-        int c = 0;
-        boolean state = isRunning();
-        SubServer forward = null;
-        ObjectMap<String> pending = edit.clone();
-        for (String key : edit.getKeys()) {
-            pending.remove(key);
-            ObjectMapValue value = edit.get(key);
-            SubEditServerEvent event = new SubEditServerEvent(player, this, new NamedContainer<String, ObjectMapValue>(key, value), perma);
-            host.plugin.getPluginManager().callEvent(event);
-            if (!event.isCancelled()) {
-                try {
-                    switch (key.toLowerCase()) {
-                        case "name":
-                            if (value.isString() && host.removeSubServer(player, getName())) {
-                                SubServer server = host.addSubServer(player, value.asRawString(), isEnabled(), getAddress().getPort(), getMotd(), isLogging(), getPath(), getExecutable(), getStopCommand(), isHidden(), isRestricted());
-                                if (server != null) {
-                                    if (perma && this.host.plugin.servers.get().getMap("Servers").getKeys().contains(getName())) {
-                                        ObjectMap<String> config = this.host.plugin.servers.get().getMap("Servers").getMap(getName());
-                                        this.host.plugin.servers.get().getMap("Servers").remove(getName());
-                                        this.host.plugin.servers.get().getMap("Servers").set(server.getName(), config);
-                                        this.host.plugin.servers.save();
+        if (isAvailable()) {
+            int c = 0;
+            boolean state = isRunning();
+            SubServer forward = null;
+            ObjectMap<String> pending = edit.clone();
+            for (String key : edit.getKeys()) {
+                pending.remove(key);
+                ObjectMapValue value = edit.get(key);
+                SubEditServerEvent event = new SubEditServerEvent(player, this, new NamedContainer<String, ObjectMapValue>(key, value), perma);
+                host.plugin.getPluginManager().callEvent(event);
+                if (!event.isCancelled()) {
+                    try {
+                        switch (key.toLowerCase()) {
+                            case "name":
+                                if (value.isString() && host.removeSubServer(player, getName())) {
+                                    SubServer server = host.addSubServer(player, value.asRawString(), isEnabled(), getAddress().getPort(), getMotd(), isLogging(), getPath(), getExecutable(), getStopCommand(), isHidden(), isRestricted());
+                                    if (server != null) {
+                                        if (perma && this.host.plugin.servers.get().getMap("Servers").getKeys().contains(getName())) {
+                                            ObjectMap<String> config = this.host.plugin.servers.get().getMap("Servers").getMap(getName());
+                                            this.host.plugin.servers.get().getMap("Servers").remove(getName());
+                                            this.host.plugin.servers.get().getMap("Servers").set(server.getName(), config);
+                                            this.host.plugin.servers.save();
+                                        }
+                                        forward = server;
+                                        c++;
                                     }
-                                    forward = server;
-                                    c++;
                                 }
-                            }
-                            break;
-                        case "display":
-                            if (value.isString()) {
-                                Field f = ServerContainer.class.getDeclaredField("nick");
-                                f.setAccessible(true);
-                                if (value == null || value.asString().length() == 0 || getName().equals(value)) {
-                                    f.set(this, null);
-                                } else {
-                                    f.set(this, value.asString());
-                                }
-                                f.setAccessible(false);
-                                logger.name = getDisplayName();
-                                if (perma && this.host.plugin.servers.get().getMap("Servers").getKeys().contains(getName())) {
-                                    if (getName().equals(getDisplayName())) {
-                                        this.host.plugin.servers.get().getMap("Servers").getMap(getName()).remove("Display");
+                                break;
+                            case "display":
+                                if (value.isString()) {
+                                    Field f = ServerContainer.class.getDeclaredField("nick");
+                                    f.setAccessible(true);
+                                    if (value.isNull() || value.asString().length() == 0 || getName().equals(value.asString())) {
+                                        f.set(this, null);
                                     } else {
-                                        this.host.plugin.servers.get().getMap("Servers").getMap(getName()).set("Display", getDisplayName());
+                                        f.set(this, value.asString());
                                     }
-                                    this.host.plugin.servers.save();
-                                }
-                                c++;
-                            }
-                            break;
-                        case "enabled":
-                            if (value.isBoolean()) {
-                                enabled = value.asBoolean();
-                                if (perma && this.host.plugin.servers.get().getMap("Servers").getKeys().contains(getName())) {
-                                    this.host.plugin.servers.get().getMap("Servers").getMap(getName()).set("Enabled", isEnabled());
-                                    this.host.plugin.servers.save();
-                                }
-                                c++;
-                            }
-                            break;
-                        case "group":
-                            if (value.isList()) {
-                                Util.reflect(ServerContainer.class.getDeclaredField("groups"), this, value.asStringList());
-                                if (perma && this.host.plugin.servers.get().getMap("Servers").getKeys().contains(getName())) {
-                                    this.host.plugin.servers.get().getMap("Servers").getMap(getName()).set("Group", value.asStringList());
-                                    this.host.plugin.servers.save();
-                                }
-                                c++;
-                            }
-                            break;
-                        case "host":
-                            if (value.isString() && host.removeSubServer(player, getName())) {
-                                SubServer server = this.host.plugin.api.getHost(value.asRawString()).addSubServer(player, getName(), isEnabled(), getAddress().getPort(), getMotd(), isLogging(), getPath(), getExecutable(), getStopCommand(), isHidden(), isRestricted());
-                                if (server != null) {
+                                    f.setAccessible(false);
+                                    logger.name = getDisplayName();
                                     if (perma && this.host.plugin.servers.get().getMap("Servers").getKeys().contains(getName())) {
-                                        this.host.plugin.servers.get().getMap("Servers").getMap(getName()).set("Host", server.getHost().getName());
-                                        this.host.plugin.servers.save();
-                                    }
-                                    forward = server;
-                                    c++;
-                                }
-                            }
-                            break;
-                        case "port":
-                            if (value.isNumber() && host.removeSubServer(player, getName())) {
-                                SubServer server = host.addSubServer(player, getName(), isEnabled(), value.asInt(), getMotd(), isLogging(), getPath(), getExecutable(), getStopCommand(), isHidden(), isRestricted());
-                                if (server != null) {
-                                    if (perma && this.host.plugin.servers.get().getMap("Servers").getKeys().contains(getName())) {
-                                        this.host.plugin.servers.get().getMap("Servers").getMap(getName()).set("Port", server.getAddress().getPort());
-                                        this.host.plugin.servers.save();
-                                    }
-                                    forward = server;
-                                    c++;
-                                }
-                            }
-                            break;
-                        case "motd":
-                            if (value.isString()) {
-                                Util.reflect(BungeeServerInfo.class.getDeclaredField("motd"), this, ChatColor.translateAlternateColorCodes('&', value.asString()));
-                                if (perma && this.host.plugin.servers.get().getMap("Servers").getKeys().contains(getName())) {
-                                    this.host.plugin.servers.get().getMap("Servers").getMap(getName()).set("Motd", value.asString());
-                                    this.host.plugin.servers.save();
-                                }
-                                c++;
-                            }
-                            break;
-                        case "log":
-                            if (value.isBoolean()) {
-                                log.set(value.asBoolean());
-                                if (perma && this.host.plugin.servers.get().getMap("Servers").getKeys().contains(getName())) {
-                                    this.host.plugin.servers.get().getMap("Servers").getMap(getName()).set("Log", isLogging());
-                                    this.host.plugin.servers.save();
-                                }
-                                c++;
-                            }
-                            break;
-                        case "dir":
-                        case "directory":
-                            if (value.isString()) {
-                                if (isRunning()) {
-                                    stop(player);
-                                    waitFor();
-                                }
-                                dir = value.asRawString();
-                                directory = new File(getHost().getPath(), value.asRawString());
-                                if (perma && this.host.plugin.servers.get().getMap("Servers").getKeys().contains(getName())) {
-                                    this.host.plugin.servers.get().getMap("Servers").getMap(getName()).set("Directory", getPath());
-                                    this.host.plugin.servers.save();
-                                }
-                                c++;
-                            }
-                            break;
-                        case "exec":
-                        case "executable":
-                            if (value.isString()) {
-                                if (isRunning()) {
-                                    stop(player);
-                                    waitFor();
-                                }
-                                executable = value.asRawString();
-                                if (perma && this.host.plugin.servers.get().getMap("Servers").getKeys().contains(getName())) {
-                                    this.host.plugin.servers.get().getMap("Servers").getMap(getName()).set("Executable", value.asRawString());
-                                    this.host.plugin.servers.save();
-                                }
-                                c++;
-                            }
-                            break;
-                        case "stop-cmd":
-                        case "stop-command":
-                            if (value.isString()) {
-                                stopcmd = value.asRawString();
-                                if (perma && this.host.plugin.servers.get().getMap("Servers").getKeys().contains(getName())) {
-                                    this.host.plugin.servers.get().getMap("Servers").getMap(getName()).set("Stop-Command", getStopCommand());
-                                    this.host.plugin.servers.save();
-                                }
-                                c++;
-                            }
-                            break;
-                        case "stop-action":
-                            if (value.isString()) {
-                                StopAction action = Util.getDespiteException(() -> StopAction.valueOf(value.asRawString().toUpperCase().replace('-', '_').replace(' ', '_')), null);
-                                if (action != null) {
-                                    stopaction = action;
-                                    if (perma && this.host.plugin.servers.get().getMap("Servers").getKeys().contains(getName())) {
-                                        this.host.plugin.servers.get().getMap("Servers").getMap(getName()).set("Stop-Action", getStopAction().toString());
+                                        if (getName().equals(getDisplayName())) {
+                                            this.host.plugin.servers.get().getMap("Servers").getMap(getName()).remove("Display");
+                                        } else {
+                                            this.host.plugin.servers.get().getMap("Servers").getMap(getName()).set("Display", getDisplayName());
+                                        }
                                         this.host.plugin.servers.save();
                                     }
                                     c++;
                                 }
-                            }
-                            break;
-                        case "state":
-                            if (value.isBoolean()) {
-                                state = value.asBoolean();
-                            }
-                            break;
-                        case "auto-run":
-                        case "run-on-launch":
-                            if (value.isBoolean()) {
-                                if (perma && this.host.plugin.servers.get().getMap("Servers").getKeys().contains(getName())) {
-                                    this.host.plugin.servers.get().getMap("Servers").getMap(getName()).set("Run-On-Launch", value.asBoolean());
-                                    this.host.plugin.servers.save();
+                                break;
+                            case "enabled":
+                                if (value.isBoolean()) {
+                                    enabled = value.asBoolean();
+                                    if (perma && this.host.plugin.servers.get().getMap("Servers").getKeys().contains(getName())) {
+                                        this.host.plugin.servers.get().getMap("Servers").getMap(getName()).set("Enabled", isEnabled());
+                                        this.host.plugin.servers.save();
+                                    }
+                                    c++;
                                 }
-                                c++;
-                            }
-                            break;
-                        case "incompatible":
-                            if (value.isList()) {
-                                for (String oname : (List<String>) value.asStringList()) {
-                                    SubServer oserver = host.plugin.api.getSubServer(oname);
-                                    if (oserver != null && isCompatible(oserver)) toggleCompatibility(oserver);
+                                break;
+                            case "group":
+                                if (value.isList()) {
+                                    Util.reflect(ServerContainer.class.getDeclaredField("groups"), this, value.asRawStringList());
+                                    if (perma && this.host.plugin.servers.get().getMap("Servers").getKeys().contains(getName())) {
+                                        this.host.plugin.servers.get().getMap("Servers").getMap(getName()).set("Group", value.asRawStringList());
+                                        this.host.plugin.servers.save();
+                                    }
+                                    c++;
                                 }
-                                if (perma && this.host.plugin.servers.get().getMap("Servers").getKeys().contains(getName())) {
-                                    this.host.plugin.servers.get().getMap("Servers").getMap(getName()).set("Incompatible", value.asStringList());
-                                    this.host.plugin.servers.save();
+                                break;
+                            case "host":
+                                if (value.isString() && host.removeSubServer(player, getName())) {
+                                    SubServer server = this.host.plugin.api.getHost(value.asRawString()).addSubServer(player, getName(), isEnabled(), getAddress().getPort(), getMotd(), isLogging(), getPath(), getExecutable(), getStopCommand(), isHidden(), isRestricted());
+                                    if (server != null) {
+                                        if (perma && this.host.plugin.servers.get().getMap("Servers").getKeys().contains(getName())) {
+                                            this.host.plugin.servers.get().getMap("Servers").getMap(getName()).set("Host", server.getHost().getName());
+                                            this.host.plugin.servers.save();
+                                        }
+                                        forward = server;
+                                        c++;
+                                    }
                                 }
-                                c++;
-                            }
-                            break;
-                        case "restricted":
-                            if (value.isBoolean()) {
-                                Util.reflect(BungeeServerInfo.class.getDeclaredField("restricted"), this, value.asBoolean());
-                                if (perma && this.host.plugin.servers.get().getMap("Servers").getKeys().contains(getName())) {
-                                    this.host.plugin.servers.get().getMap("Servers").getMap(getName()).set("Restricted", isRestricted());
-                                    this.host.plugin.servers.save();
+                                break;
+                            case "template":
+                                if (value.isString()) {
+                                    Util.reflect(SubServerContainer.class.getDeclaredField("template"), this, value.asRawString());
+                                    if (perma && this.host.plugin.servers.get().getMap("Servers").getKeys().contains(getName())) {
+                                        this.host.plugin.servers.get().getMap("Servers").getMap(getName()).set("Template", value.asRawString());
+                                        this.host.plugin.servers.save();
+                                    }
+                                    c++;
                                 }
-                                c++;
-                            }
-                            break;
-                        case "hidden":
-                            if (value.isBoolean()) {
-                                Util.reflect(ServerContainer.class.getDeclaredField("hidden"), this, value.asBoolean());
-                                if (perma && this.host.plugin.servers.get().getMap("Servers").getKeys().contains(getName())) {
-                                    this.host.plugin.servers.get().getMap("Servers").getMap(getName()).set("Hidden", isHidden());
-                                    this.host.plugin.servers.save();
+                                break;
+                            case "port":
+                                if (value.isNumber() && host.removeSubServer(player, getName())) {
+                                    SubServer server = host.addSubServer(player, getName(), isEnabled(), value.asInt(), getMotd(), isLogging(), getPath(), getExecutable(), getStopCommand(), isHidden(), isRestricted());
+                                    if (server != null) {
+                                        if (perma && this.host.plugin.servers.get().getMap("Servers").getKeys().contains(getName())) {
+                                            this.host.plugin.servers.get().getMap("Servers").getMap(getName()).set("Port", server.getAddress().getPort());
+                                            this.host.plugin.servers.save();
+                                        }
+                                        forward = server;
+                                        c++;
+                                    }
                                 }
-                                c++;
-                            }
-                            break;
-                    }
-                    if (forward != null) {
-                        forward.setStopAction(getStopAction());
-                        if (!getName().equals(getDisplayName())) forward.setDisplayName(getDisplayName());
-                        List<String> groups = new ArrayList<String>();
-                        groups.addAll(getGroups());
-                        for (String group : groups) {
-                            removeGroup(group);
-                            forward.addGroup(group);
+                                break;
+                            case "motd":
+                                if (value.isString()) {
+                                    Util.reflect(BungeeServerInfo.class.getDeclaredField("motd"), this, ChatColor.translateAlternateColorCodes('&', value.asString()));
+                                    if (perma && this.host.plugin.servers.get().getMap("Servers").getKeys().contains(getName())) {
+                                        this.host.plugin.servers.get().getMap("Servers").getMap(getName()).set("Motd", value.asString());
+                                        this.host.plugin.servers.save();
+                                    }
+                                    c++;
+                                }
+                                break;
+                            case "log":
+                                if (value.isBoolean()) {
+                                    log.set(value.asBoolean());
+                                    if (perma && this.host.plugin.servers.get().getMap("Servers").getKeys().contains(getName())) {
+                                        this.host.plugin.servers.get().getMap("Servers").getMap(getName()).set("Log", isLogging());
+                                        this.host.plugin.servers.save();
+                                    }
+                                    c++;
+                                }
+                                break;
+                            case "dir":
+                            case "directory":
+                                if (value.isString()) {
+                                    if (isRunning()) {
+                                        stop(player);
+                                        waitFor();
+                                    }
+                                    dir = value.asRawString();
+                                    directory = new File(getHost().getPath(), value.asRawString());
+                                    if (perma && this.host.plugin.servers.get().getMap("Servers").getKeys().contains(getName())) {
+                                        this.host.plugin.servers.get().getMap("Servers").getMap(getName()).set("Directory", getPath());
+                                        this.host.plugin.servers.save();
+                                    }
+                                    c++;
+                                }
+                                break;
+                            case "exec":
+                            case "executable":
+                                if (value.isString()) {
+                                    if (isRunning()) {
+                                        stop(player);
+                                        waitFor();
+                                    }
+                                    executable = value.asRawString();
+                                    if (perma && this.host.plugin.servers.get().getMap("Servers").getKeys().contains(getName())) {
+                                        this.host.plugin.servers.get().getMap("Servers").getMap(getName()).set("Executable", value.asRawString());
+                                        this.host.plugin.servers.save();
+                                    }
+                                    c++;
+                                }
+                                break;
+                            case "stop-cmd":
+                            case "stop-command":
+                                if (value.isString()) {
+                                    stopcmd = value.asRawString();
+                                    if (perma && this.host.plugin.servers.get().getMap("Servers").getKeys().contains(getName())) {
+                                        this.host.plugin.servers.get().getMap("Servers").getMap(getName()).set("Stop-Command", getStopCommand());
+                                        this.host.plugin.servers.save();
+                                    }
+                                    c++;
+                                }
+                                break;
+                            case "stop-action":
+                                if (value.isString()) {
+                                    StopAction action = Util.getDespiteException(() -> StopAction.valueOf(value.asRawString().toUpperCase().replace('-', '_').replace(' ', '_')), null);
+                                    if (action != null) {
+                                        stopaction = action;
+                                        if (perma && this.host.plugin.servers.get().getMap("Servers").getKeys().contains(getName())) {
+                                            this.host.plugin.servers.get().getMap("Servers").getMap(getName()).set("Stop-Action", getStopAction().toString());
+                                            this.host.plugin.servers.save();
+                                        }
+                                        c++;
+                                    }
+                                }
+                                break;
+                            case "state":
+                                if (value.isBoolean()) {
+                                    state = value.asBoolean();
+                                }
+                                break;
+                            case "auto-run":
+                            case "run-on-launch":
+                                if (value.isBoolean()) {
+                                    if (perma && this.host.plugin.servers.get().getMap("Servers").getKeys().contains(getName())) {
+                                        this.host.plugin.servers.get().getMap("Servers").getMap(getName()).set("Run-On-Launch", value.asBoolean());
+                                        this.host.plugin.servers.save();
+                                    }
+                                    c++;
+                                }
+                                break;
+                            case "incompatible":
+                                if (value.isList()) {
+                                    for (SubServer oserver : getIncompatibilities()) toggleCompatibility(oserver);
+                                    for (String oname : (List<String>) value.asStringList()) {
+                                        SubServer oserver = host.plugin.api.getSubServer(oname);
+                                        if (oserver != null && isCompatible(oserver)) toggleCompatibility(oserver);
+                                    }
+                                    if (perma && this.host.plugin.servers.get().getMap("Servers").getKeys().contains(getName())) {
+                                        this.host.plugin.servers.get().getMap("Servers").getMap(getName()).set("Incompatible", value.asStringList());
+                                        this.host.plugin.servers.save();
+                                    }
+                                    c++;
+                                }
+                                break;
+                            case "restricted":
+                                if (value.isBoolean()) {
+                                    Util.reflect(BungeeServerInfo.class.getDeclaredField("restricted"), this, value.asBoolean());
+                                    if (perma && this.host.plugin.servers.get().getMap("Servers").getKeys().contains(getName())) {
+                                        this.host.plugin.servers.get().getMap("Servers").getMap(getName()).set("Restricted", isRestricted());
+                                        this.host.plugin.servers.save();
+                                    }
+                                    c++;
+                                }
+                                break;
+                            case "hidden":
+                                if (value.isBoolean()) {
+                                    Util.reflect(ServerContainer.class.getDeclaredField("hidden"), this, value.asBoolean());
+                                    if (perma && this.host.plugin.servers.get().getMap("Servers").getKeys().contains(getName())) {
+                                        this.host.plugin.servers.get().getMap("Servers").getMap(getName()).set("Hidden", isHidden());
+                                        this.host.plugin.servers.save();
+                                    }
+                                    c++;
+                                }
+                                break;
+                            case "whitelist":
+                                if (value.isList()) {
+                                    Util.reflect(ServerContainer.class.getDeclaredField("whitelist"), this, value.asUUIDList());
+                                    c++;
+                                }
+                                break;
                         }
-                        for (SubServer server : getIncompatibilities()) {
-                            toggleCompatibility(server);
-                            forward.toggleCompatibility(server);
-                        }
-                        for (String extra : getExtra().getKeys()) forward.addExtra(extra, getExtra(extra));
+                        if (forward != null) {
+                            forward.setStopAction(getStopAction());
+                            if (!getName().equals(getDisplayName())) forward.setDisplayName(getDisplayName());
+                            Util.reflect(SubServerContainer.class.getDeclaredField("template"), forward, Util.reflect(SubServerContainer.class.getDeclaredField("template"), this));
+                            List<String> groups = new ArrayList<String>();
+                            groups.addAll(getGroups());
+                            for (String group : groups) {
+                                removeGroup(group);
+                                forward.addGroup(group);
+                            }
+                            for (SubServer server : getIncompatibilities()) {
+                                toggleCompatibility(server);
+                                forward.toggleCompatibility(server);
+                            }
+                            for (String extra : getExtra().getKeys()) forward.addExtra(extra, getExtra(extra));
 
-                        if (state) pending.set("state", true);
-                        c += (perma)?forward.permaEdit(player, pending):forward.edit(player, pending);
-                        break;
+                            if (state) pending.set("state", true);
+                            c += (perma)?forward.permaEdit(player, pending):forward.edit(player, pending);
+                            break;
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
-                } catch (Exception e) {
-                    e.printStackTrace();
                 }
             }
-        }
-        if (!isRunning() && forward == null && state) start(player);
-        return c;
+            if (!isRunning() && forward == null && state) start(player);
+            return c;
+        } else return -1;
     }
 
     @Override
@@ -541,7 +561,7 @@ public class InternalSubServer extends SubServerContainer {
 
     @Override
     public boolean isEnabled() {
-        return enabled;
+        return enabled && host.isEnabled();
     }
 
     @Override

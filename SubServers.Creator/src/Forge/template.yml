@@ -1,4 +1,4 @@
-Version: '2.13.2c+'
+Version: '2.14.2a+'
 Template:
   Enabled: true
   Icon: 'anvil'
@@ -6,6 +6,7 @@ Template:
     Server-Type: 'Forge'
     Use-Cache: false
     Require-Version: true
+    Can-Update: true
     Executable: 'bash build.sh'
   Settings:
     Executable: 'java -Xmx2048M -jar Forge.jar'

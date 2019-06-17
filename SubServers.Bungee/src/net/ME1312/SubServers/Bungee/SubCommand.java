@@ -149,6 +149,7 @@ public final class SubCommand extends CommandX {
                             case "all":
                             case "system":
                             case "bungee":
+                            case "bungeecord":
                             case "network":
                                 plugin.getPluginManager().dispatchCommand(ConsoleCommandSender.getInstance(), "greload");
                                 break;
@@ -210,7 +211,7 @@ public final class SubCommand extends CommandX {
                                     } else {
                                         message += ChatColor.GREEN;
                                     }
-                                } else if (((SubServer) server).getHost().isAvailable() && ((SubServer) server).getHost().isEnabled() && ((SubServer) server).isEnabled() && ((SubServer) server).getCurrentIncompatibilities().size() == 0) {
+                                } else if (((SubServer) server).getHost().isAvailable() && ((SubServer) server).getHost().isEnabled() && ((SubServer) server).isAvailable() && ((SubServer) server).isEnabled() && ((SubServer) server).getCurrentIncompatibilities().size() == 0) {
                                     message += ChatColor.YELLOW;
                                 } else {
                                     message += ChatColor.RED;
@@ -243,7 +244,7 @@ public final class SubCommand extends CommandX {
                                 } else {
                                     message += ChatColor.GREEN;
                                 }
-                            } else if (subserver.getHost().isEnabled() && subserver.isEnabled() && subserver.getCurrentIncompatibilities().size() == 0) {
+                            } else if (subserver.getHost().isAvailable() && subserver.getHost().isEnabled() && subserver.isAvailable() && subserver.isEnabled() && subserver.getCurrentIncompatibilities().size() == 0) {
                                 message += ChatColor.YELLOW;
                             } else {
                                 message += ChatColor.RED;
@@ -297,9 +298,11 @@ public final class SubCommand extends CommandX {
                                 sender.sendMessage("SubServers > Info on " + ((server instanceof SubServer)?"Sub":"") + "Server: " + ChatColor.WHITE + server.getDisplayName());
                                 if (!server.getName().equals(server.getDisplayName())) sender.sendMessage(" -> System Name: " + ChatColor.WHITE  + server.getName());
                                 if (server instanceof SubServer) {
+                                    sender.sendMessage(" -> Available: " + ((((SubServer) server).isAvailable())?ChatColor.GREEN+"yes":ChatColor.RED+"no"));
                                     sender.sendMessage(" -> Enabled: " + ((((SubServer) server).isEnabled())?ChatColor.GREEN+"yes":ChatColor.RED+"no"));
                                     if (!((SubServer) server).isEditable()) sender.sendMessage(" -> Editable: " + ChatColor.RED + "no");
                                     sender.sendMessage(" -> Host: " + ChatColor.WHITE  + ((SubServer) server).getHost().getName());
+                                    if (((SubServer) server).getTemplate() != null) sender.sendMessage(" -> Template: " + ChatColor.WHITE  + ((SubServer) server).getTemplate().getName());
                                 }
                                 if (server.getGroups().size() > 0) sender.sendMessage(" -> Group" + ((server.getGroups().size() > 1)?"s:":": " + ChatColor.WHITE + server.getGroups().get(0)));
                                 if (server.getGroups().size() > 1) for (String group : server.getGroups()) sender.sendMessage("      - " + ChatColor.WHITE + group);
@@ -422,6 +425,8 @@ public final class SubCommand extends CommandX {
                             sender.sendMessage("SubServers > That SubServer's Host is not available");
                         } else if (!((SubServer) servers.get(args[1].toLowerCase())).getHost().isEnabled()) {
                             sender.sendMessage("SubServers > That SubServer's Host is not enabled");
+                        } else if (!((SubServer) servers.get(args[1].toLowerCase())).isAvailable()) {
+                            sender.sendMessage("SubServers > That SubServer is not available");
                         } else if (!((SubServer) servers.get(args[1].toLowerCase())).isEnabled()) {
                             sender.sendMessage("SubServers > That SubServer is not enabled");
                         } else if (((SubServer) servers.get(args[1].toLowerCase())).isRunning()) {
@@ -449,6 +454,8 @@ public final class SubCommand extends CommandX {
                                 sender.sendMessage("SubServers > Could not restart server: That SubServer's Host is no longer available");
                             } else if (!((SubServer) servers.get(args[1].toLowerCase())).getHost().isEnabled()) {
                                 sender.sendMessage("SubServers > Could not restart server: That SubServer's Host is no longer enabled");
+                            } else if (!((SubServer) servers.get(args[1].toLowerCase())).isAvailable()) {
+                                sender.sendMessage("SubServers > Could not restart server: That SubServer is no longer available");
                             } else if (!((SubServer) servers.get(args[1].toLowerCase())).isEnabled()) {
                                 sender.sendMessage("SubServers > Could not restart server: That SubServer is no longer enabled");
                             } else if (!((SubServer) servers.get(args[1].toLowerCase())).isRunning()) {
@@ -600,6 +607,35 @@ public final class SubCommand extends CommandX {
                     } else {
                         sender.sendMessage("SubServers > Usage: " + label + " " + args[0].toLowerCase() + " <Name> <Host> <Template> [Version] [Port]");
                     }
+                } else if (args[0].equalsIgnoreCase("update") || args[0].equalsIgnoreCase("upgrade")) {
+                    if (args.length > 1) {
+                        Map<String, Server> servers = plugin.api.getServers();
+                        if (!servers.keySet().contains(args[1].toLowerCase())) {
+                            sender.sendMessage("SubServers > There is no server with that name");
+                        } else if (!(servers.get(args[1].toLowerCase()) instanceof SubServer)) {
+                            sender.sendMessage("SubServers > That Server is not a SubServer");
+                        } else if (!((SubServer) servers.get(args[1].toLowerCase())).getHost().isAvailable()) {
+                            sender.sendMessage("SubServers > That SubServer's Host is not available");
+                        } else if (!((SubServer) servers.get(args[1].toLowerCase())).getHost().isEnabled()) {
+                            sender.sendMessage("SubServers > That SubServer's Host is not enabled");
+                        } else if (!((SubServer) servers.get(args[1].toLowerCase())).isAvailable()) {
+                            sender.sendMessage("SubServers > That SubServer is not available");
+                        } else if (((SubServer) servers.get(args[1].toLowerCase())).isRunning()) {
+                            sender.sendMessage("SubServers > Cannot update servers while they are still running");
+                        } else if (((SubServer) servers.get(args[1].toLowerCase())).getTemplate() == null) {
+                            sender.sendMessage("SubServers > We don't know which template created that SubServer");
+                        } else if (!((SubServer) servers.get(args[1].toLowerCase())).getTemplate().isEnabled()) {
+                            sender.sendMessage("SubServers > That SubServer's Template is not enabled");
+                        } else if (!((SubServer) servers.get(args[1].toLowerCase())).getTemplate().canUpdate()) {
+                            sender.sendMessage("SubServers > That SubServer's Template does not support server updating");
+                        } else if (args.length <= 2 && ((SubServer) servers.get(args[1].toLowerCase())).getTemplate().requiresVersion()) {
+                            sender.sendMessage("SubServers > That SubServer's Template requires a Minecraft Version to be specified");
+                        } else {
+                            ((SubServer) servers.get(args[1].toLowerCase())).getHost().getCreator().update(((SubServer) servers.get(args[1].toLowerCase())), (args.length > 2)?new Version(args[2]):null);
+                        }
+                    } else {
+                        sender.sendMessage("SubServers > Usage: " + label + " " + args[0].toLowerCase() + " <SubServer> [Version]");
+                    }
                 } else if (args[0].equalsIgnoreCase("del") || args[0].equalsIgnoreCase("delete")) {
                     if (args.length > 1) {
                         Map<String, Server> servers = plugin.api.getServers();
@@ -619,6 +655,8 @@ public final class SubCommand extends CommandX {
                     } else {
                         sender.sendMessage("SubServers > Usage: " + label + " " + args[0].toLowerCase() + " <SubServer>");
                     }
+                } else if (args[0].equalsIgnoreCase("restore")) {
+                    // TODO
                 } else {
                     sender.sendMessage("SubServers > Unknown sub-command: " + args[0]);
                 }
@@ -647,7 +685,9 @@ public final class SubCommand extends CommandX {
                 "   Command Server: /sub cmd <SubServer> <Command> [Args...]",
                 "   Sudo Server: /sub sudo <SubServer>",
                 "   Create Server: /sub create <Name> <Host> <Template> [Version] [Port]",
+                "   Update Server: /sub update <SubServer> [Version]",
                 "   Remove Server: /sub delete <SubServer>",
+              //"   Restore Server: /sub restore <SubServer>",
                 "",
                 "   To see BungeeCord supplied commands, please visit:",
                 "   https://www.spigotmc.org/wiki/bungeecord-commands/"
@@ -687,8 +727,8 @@ public final class SubCommand extends CommandX {
             return new NamedContainer<>(null, Collections.emptyList());
         } else if (args.length <= 1) {
             List<String> cmds = new ArrayList<>();
-            cmds.addAll(Arrays.asList("help", "list", "info", "status", "version", "start", "stop", "restart", "kill", "terminate", "cmd", "command", "create"));
-            if (!(sender instanceof ProxiedPlayer)) cmds.addAll(Arrays.asList("reload", "sudo", "screen", "delete"));
+            cmds.addAll(Arrays.asList("help", "list", "info", "status", "version", "start", "stop", "restart", "kill", "terminate", "cmd", "command", "create", "update", "upgrade"));
+            if (!(sender instanceof ProxiedPlayer)) cmds.addAll(Arrays.asList("reload", "sudo", "screen", "delete", "restore"));
             if (last.length() == 0) {
                 return new NamedContainer<>(null, cmds);
             } else {
@@ -795,20 +835,28 @@ public final class SubCommand extends CommandX {
                 } else {
                     return new NamedContainer<>(null, Collections.emptyList());
                 }
-            } else if (!(sender instanceof ProxiedPlayer) && args[0].equals("reload")) {
-                List<String> list = new ArrayList<String>(),
-                        completes = Arrays.asList("all", "config", "templates");
-                if (args.length == 2) {
-                    if (last.length() == 0) {
-                        list = completes;
-                    } else {
-                        for (String complete : completes) {
-                            if (complete.toLowerCase().startsWith(last)) list.add(last + complete.substring(last.length()));
+            } else if (!(sender instanceof ProxiedPlayer) && (args[0].equals("reload") || args[0].equals("restore"))) {
+                if (args[0].equals("reload")) {
+                    List<String> list = new ArrayList<String>(),
+                            completes = Arrays.asList("all", "config", "templates");
+                    if (args.length == 2) {
+                        if (last.length() == 0) {
+                            list = completes;
+                        } else {
+                            for (String complete : completes) {
+                                if (complete.toLowerCase().startsWith(last)) list.add(last + complete.substring(last.length()));
+                            }
                         }
+                        return new NamedContainer<>((list.size() <= 0)?plugin.api.getLang("SubServers", "Command.Generic.Unknown").replace("$str$", args[0]):null, list);
+                    } else {
+                        return new NamedContainer<>(null, Collections.emptyList());
                     }
-                    return new NamedContainer<>((list.size() <= 0)?plugin.api.getLang("SubServers", "Command.Generic.Unknown").replace("$str$", args[0]):null, list);
-                } else {
-                    return new NamedContainer<>(null, Collections.emptyList());
+                } else /* if (args[0].equals("restore")) */ {
+                    if (args.length == 2) {
+                        return new NamedContainer<>(null, Collections.singletonList("<SubServer>"));
+                    } else {
+                        return new NamedContainer<>(null, Collections.emptyList());
+                    }
                 }
             } else if (args[0].equals("start") ||
                     args[0].equals("restart") ||
@@ -891,11 +939,6 @@ public final class SubCommand extends CommandX {
                     }
                     return new NamedContainer<>((list.size() <= 0)?plugin.api.getLang("SubServers", "Command.Creator.Invalid-Template").replace("$str$", args[0]):null, list);
                 } else if (args.length == 5) {
-                    if (last.length() > 0) {
-                        if (new Version("1.8").compareTo(new Version(last)) > 0) {
-                            return new NamedContainer<>(plugin.api.getLang("SubServers", "Command.Creator.Invalid-Version"), Collections.emptyList());
-                        }
-                    }
                     return new NamedContainer<>(null, Collections.singletonList("[Version]"));
                 } else if (args.length == 6) {
                     if (last.length() > 0) {
@@ -903,7 +946,23 @@ public final class SubCommand extends CommandX {
                             return new NamedContainer<>(plugin.api.getLang("SubServers", "Command.Creator.Invalid-Port"), Collections.emptyList());
                         }
                     }
-                    return new NamedContainer<>(null, Collections.singletonList("<Port>"));
+                    return new NamedContainer<>(null, Collections.singletonList("[Port]"));
+                } else {
+                    return new NamedContainer<>(null, Collections.emptyList());
+                }
+            } else if (args[0].equals("update") || args[0].equals("upgrade")) {
+                if (args.length == 2) {
+                    List<String> list = new ArrayList<String>();
+                    if (last.length() == 0) {
+                        for (SubServer server : plugin.api.getSubServers().values()) list.add(server.getName());
+                    } else {
+                        for (SubServer server : plugin.api.getSubServers().values()) {
+                            if (server.getName().toLowerCase().startsWith(last)) list.add(last + server.getName().substring(last.length()));
+                        }
+                    }
+                    return new NamedContainer<>((list.size() <= 0)?plugin.api.getLang("SubServers", "Command.Generic.Unknown-SubServer").replace("$str$", args[0]):null, list);
+                } else if (args.length == 3) {
+                    return new NamedContainer<>(null, Collections.singletonList("[Version]"));
                 } else {
                     return new NamedContainer<>(null, Collections.emptyList());
                 }

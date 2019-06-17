@@ -1,42 +1,51 @@
 # SubCreator Spigot Build Script
 #
 #!/usr/bin/env bash
-if [ -z "$version" ]
+if [[ -z "$version" ]]
   then
     echo ERROR: No Build Version Supplied
     rm -Rf "$0"
     exit 1
 fi
 function __DL() {
-    if [ -x "$(command -v wget)" ]; then
+    if [[ -x "$(command -v wget)" ]]; then
         wget -O "$1" "$2"; return $?
     else
         curl -o "$1" "$2"; return $?
     fi
 }
-if [ -z "$cache" ] || [ ! -f "$cache/Spigot-$version.jar" ]; then
+if [[ -z "$cache" ]] || [[ ! -f "$cache/Spigot-$version.jar" ]] || [[ "$mode" == "UPDATE" && $(find "$cache/Spigot-$version.jar" -mtime +1 -print) ]]; then
     echo Downloading Buildtools...
     __DL Buildtools.jar https://hub.spigotmc.org/jenkins/job/BuildTools/lastSuccessfulBuild/artifact/target/BuildTools.jar; __RETURN=$?
-    if [ $__RETURN -eq 0 ]; then
-        if [ -d "Buildtools" ]; then
+    if [[ $__RETURN -eq 0 ]]; then
+        if [[ -d "Buildtools" ]]; then
             rm -Rf Buildtools
         fi
         mkdir Buildtools
         cd "Buildtools"
         echo Launching Buildtools
-        if [ ! -z "$cache" ] && [ -d "$cache" ]; then
+        if [[ ! -z "$cache" ]] && [[ -d "$cache" ]]; then
             export __HOME="$HOME"
             export HOME="$cache"
         fi
         export MAVEN_OPTS="-Xms2G"
         java -Xms2G -jar ../Buildtools.jar --rev "$version"; __RETURN=$?
-        if [ ! -z "$cache" ] && [ ! -z "$__HOME" ] && [ "$cache" == "$HOME" ]; then
+        if [[ ! -z "$cache" ]] && [[ ! -z "$__HOME" ]] && [[ "$cache" == "$HOME" ]]; then
             export HOME="$__HOME"
         fi
         cd ../
-        if [ $__RETURN -eq 0 ]; then
+        if [[ $__RETURN -eq 0 ]]; then
             echo Copying Finished Jar...
-            if [ ! -z "$cache" ] && [ -d "$cache" ]; then
+            if [[ -f "Spigot.jar" ]]; then
+                if [[ -f "Spigot.old.jar.x" ]]; then
+                    rm -Rf Spigot.old.jar.x
+                fi
+                mv Spigot.jar Spigot.old.jar.x
+            fi
+            if [[ ! -z "$cache" ]] && [[ -d "$cache" ]]; then
+                if [[ -f "$cache/Spigot-$version.jar" ]]; then
+                    rm -Rf "$cache/Spigot-$version.jar"
+                fi
                 cp Buildtools/spigot-*.jar "$cache/Spigot-$version.jar"
             fi
             cp Buildtools/spigot-*.jar Spigot.jar

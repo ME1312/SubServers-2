@@ -1,10 +1,11 @@
-Version: '2.13.2c+'
+Version: '2.14.2a+'
 Template:
   Enabled: true
   Icon: 'bukkit:grass'
   Build:
     Server-Type: 'Vanilla'
     Require-Version: true
+    Can-Update: true
     Executable: 'bash build.sh'
   Settings:
     Executable: 'java -Xmx1024M -jar Vanilla.jar nogui'

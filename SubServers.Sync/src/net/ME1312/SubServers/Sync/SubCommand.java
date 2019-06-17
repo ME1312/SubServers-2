@@ -164,7 +164,7 @@ public final class SubCommand extends CommandX {
                                             } else {
                                                 message += ChatColor.GREEN;
                                             }
-                                        } else if (((SubServer) server).isEnabled() && ((SubServer) server).getCurrentIncompatibilities().size() == 0) {
+                                        } else if (((SubServer) server).isAvailable() && ((SubServer) server).isEnabled() && ((SubServer) server).getCurrentIncompatibilities().size() == 0) {
                                             message += ChatColor.YELLOW;
                                         } else {
                                             message += ChatColor.RED;
@@ -183,7 +183,7 @@ public final class SubCommand extends CommandX {
                             sender.sendMessage("Host/SubServer List:");
                             for (Host host : hosts.values()) {
                                 String message = "  ";
-                                if (host.isEnabled()) {
+                                if (host.isAvailable() && host.isEnabled()) {
                                     message += ChatColor.AQUA;
                                 } else {
                                     message += ChatColor.RED;
@@ -197,7 +197,7 @@ public final class SubCommand extends CommandX {
                                         } else {
                                             message += ChatColor.GREEN;
                                         }
-                                    } else if (subserver.isEnabled() && subserver.getCurrentIncompatibilities().size() == 0) {
+                                    } else if (subserver.isAvailable() && subserver.isEnabled() && subserver.getCurrentIncompatibilities().size() == 0) {
                                         message += ChatColor.YELLOW;
                                     } else {
                                         message += ChatColor.RED;
@@ -249,9 +249,11 @@ public final class SubCommand extends CommandX {
                                     sender.sendMessage("SubServers > Info on " + ((server instanceof SubServer)?"Sub":"") + "Server: " + ChatColor.WHITE + server.getDisplayName());
                                     if (!server.getName().equals(server.getDisplayName())) sender.sendMessage(" -> System Name: " + ChatColor.WHITE  + server.getName());
                                     if (server instanceof SubServer) {
+                                        sender.sendMessage(" -> Available: " + ((((SubServer) server).isAvailable())?ChatColor.GREEN+"yes":ChatColor.RED+"no"));
                                         sender.sendMessage(" -> Enabled: " + ((((SubServer) server).isEnabled())?ChatColor.GREEN+"yes":ChatColor.RED+"no"));
                                         if (!((SubServer) server).isEditable()) sender.sendMessage(" -> Editable: " + ChatColor.RED + "no");
                                         sender.sendMessage(" -> Host: " + ChatColor.WHITE  + ((SubServer) server).getHost());
+                                        if (((SubServer) server).getTemplate() != null) sender.sendMessage(" -> Template: " + ChatColor.WHITE  + ((SubServer) server).getHost());
                                     }
                                     if (server.getGroups().size() > 0) sender.sendMessage(" -> Group" + ((server.getGroups().size() > 1)?"s:":": " + ChatColor.WHITE + server.getGroups().get(0)));
                                     if (server.getGroups().size() > 1) for (String group : server.getGroups()) sender.sendMessage("      - " + ChatColor.WHITE + group);
@@ -377,12 +379,15 @@ public final class SubCommand extends CommandX {
                                         sender.sendMessage("SubServers > That SubServer's Host is not enabled");
                                         break;
                                     case 7:
-                                        sender.sendMessage("SubServers > That SubServer is not enabled");
+                                        sender.sendMessage("SubServers > That SubServer is not available");
                                         break;
                                     case 8:
-                                        sender.sendMessage("SubServers > That SubServer is already running");
+                                        sender.sendMessage("SubServers > That SubServer is not enabled");
                                         break;
                                     case 9:
+                                        sender.sendMessage("SubServers > That SubServer is already running");
+                                        break;
+                                    case 10:
                                         sender.sendMessage("SubServers > That SubServer cannot start while these server(s) are running: " + data.getRawString(0x0002));
                                         break;
                                     case 0:
@@ -412,12 +417,15 @@ public final class SubCommand extends CommandX {
                                                 sender.sendMessage("SubServers > Could not restart server: That SubServer's Host is no longer enabled");
                                                 break;
                                             case 7:
-                                                sender.sendMessage("SubServers > Could not restart server: That SubServer is no longer enabled");
-                                                break;
-                                            case 9:
-                                                sender.sendMessage("SubServers > Could not restart server: That SubServer cannot start while these server(s) are running: " + data.getRawString(0x0002));
+                                                sender.sendMessage("SubServers > Could not restart server: That SubServer is no longer available");
                                                 break;
                                             case 8:
+                                                sender.sendMessage("SubServers > Could not restart server: That SubServer is no longer enabled");
+                                                break;
+                                            case 10:
+                                                sender.sendMessage("SubServers > Could not restart server: That SubServer cannot start while these server(s) are running: " + data.getRawString(0x0002));
+                                                break;
+                                            case 9:
                                             case 0:
                                             case 1:
                                                 sender.sendMessage("SubServers > Server was started successfully");
@@ -538,11 +546,11 @@ public final class SubCommand extends CommandX {
                             sender.sendMessage("Usage: " + label + " " + args[0].toLowerCase() + " <SubServer> <Command> [Args...]");
                         }
                     } else if (args[0].equalsIgnoreCase("create")) {
-                        if (args.length > 4) {
+                        if (args.length > 3) {
                             if (args.length > 5 && Util.isException(() -> Integer.parseInt(args[5]))) {
                                 sender.sendMessage("Invalid Port Number");
                             } else {
-                                ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketCreateServer(null, args[1], args[2],args[3], new Version(args[4]), (args.length > 5)?Integer.parseInt(args[5]):null, data -> {
+                                ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketCreateServer(null, args[1], args[2],args[3], (args.length > 4)?new Version(args[4]):null, (args.length > 5)?Integer.parseInt(args[5]):null, data -> {
                                     switch (data.getInt(0x0001)) {
                                         case 3:
                                         case 4:
@@ -576,8 +584,49 @@ public final class SubCommand extends CommandX {
                                     }
                                 }));
                             }
+                        }
+                    } else if (args[0].equalsIgnoreCase("update") || args[0].equalsIgnoreCase("upgrade")) {
+                        if (args.length > 1) {
+                            ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketUpdateServer(null, args[1], (args.length > 2)?new Version(args[2]):null, data -> {
+                                switch (data.getInt(0x0001)) {
+                                    case 3:
+                                        sender.sendMessage("SubServers > There is no server with that name");
+                                        break;
+                                    case 4:
+                                        sender.sendMessage("SubServers > That Server is not a SubServer");
+                                        break;
+                                    case 5:
+                                        sender.sendMessage("SubServers > That SubServer's Host is not available");
+                                        break;
+                                    case 6:
+                                        sender.sendMessage("SubServers > That SubServer's Host is not enabled");
+                                        break;
+                                    case 7:
+                                        sender.sendMessage("SubServers > That SubServer is not available");
+                                        break;
+                                    case 8:
+                                        sender.sendMessage("SubServers > Cannot update servers while they are still running");
+                                        break;
+                                    case 9:
+                                        sender.sendMessage("SubServers > We don't know which template created that SubServer");
+                                        break;
+                                    case 10:
+                                        sender.sendMessage("SubServers > That SubServer's Template is not enabled");
+                                        break;
+                                    case 11:
+                                        sender.sendMessage("SubServers > That SubServer's Template does not support server updating");
+                                        break;
+                                    case 12:
+                                        sender.sendMessage("SubServers > That SubServer's Template requires a Minecraft Version to be specified");
+                                        break;
+                                    case 0:
+                                    case 1:
+                                        sender.sendMessage("SubServers > Launching SubCreator...");
+                                        break;
+                                }
+                            }));
                         } else {
-                            sender.sendMessage("Usage: " + label + " " + args[0].toLowerCase() + " <Name> <Host> <Template> [Version] [Port]");
+                            sender.sendMessage("Usage: " + label + " " + args[0].toLowerCase() + " <SubServer> [Version]");
                         }
                     } else {
                         sender.sendMessage("SubServers > Unknown sub-command: " + args[0]);
@@ -606,6 +655,7 @@ public final class SubCommand extends CommandX {
                 "   Terminate Server: /sub kill <SubServer>",
                 "   Command Server: /sub cmd <SubServer> <Command> [Args...]",
                 "   Create Server: /sub create <Name> <Host> <Template> [Version] [Port]",
+                "   Update Server: /sub update <SubServer> [Version]",
                 "",
                 "   To see BungeeCord Supplied Commands, please visit:",
                 "   https://www.spigotmc.org/wiki/bungeecord-commands/"
@@ -648,7 +698,7 @@ public final class SubCommand extends CommandX {
             }
             return new NamedContainer<>(null, Collections.emptyList());
         } else if (args.length <= 1) {
-            List<String> cmds = Arrays.asList("help", "list", "info", "status", "version", "start", "restart", "stop", "kill", "terminate", "cmd", "command", "create");
+            List<String> cmds = Arrays.asList("help", "list", "info", "status", "version", "start", "restart", "stop", "kill", "terminate", "cmd", "command", "create", "update", "upgrade");
             if (last.length() == 0) {
                 return new NamedContainer<>(null, cmds);
             } else {
@@ -835,19 +885,30 @@ public final class SubCommand extends CommandX {
                     }
                     return new NamedContainer<>((list.size() <= 0)?plugin.api.getLang("SubServers", "Command.Creator.Invalid-Template").replace("$str$", args[0]):null, list);
                 } else if (args.length == 5) {
-                    if (last.length() > 0) {
-                        if (new Version("1.8").compareTo(new Version(last)) > 0) {
-                            return new NamedContainer<>(plugin.api.getLang("SubServers", "Command.Creator.Invalid-Version"), Collections.emptyList());
-                        }
-                    }
-                    return new NamedContainer<>(null, Collections.singletonList("<Version>"));
+                    return new NamedContainer<>(null, Collections.singletonList("[Version]"));
                 } else if (args.length == 6) {
                     if (last.length() > 0) {
                         if (Util.isException(() -> Integer.parseInt(last)) || Integer.parseInt(last) <= 0 || Integer.parseInt(last) > 65535) {
                             return new NamedContainer<>(plugin.api.getLang("SubServers", "Command.Creator.Invalid-Port"), Collections.emptyList());
                         }
                     }
-                    return new NamedContainer<>(null, Collections.singletonList("<Port>"));
+                    return new NamedContainer<>(null, Collections.singletonList("[Port]"));
+                } else {
+                    return new NamedContainer<>(null, Collections.emptyList());
+                }
+            } else if (args[0].equals("update") || args[0].equals("upgrade")) {
+                if (args.length == 2) {
+                    List<String> list = new ArrayList<String>();
+                    if (last.length() == 0) {
+                        for (ServerContainer server : plugin.servers.values()) list.add(server.getName());
+                    } else {
+                        for (ServerContainer server : plugin.servers.values()) {
+                            if (server.getName().toLowerCase().startsWith(last)) list.add(last + server.getName().substring(last.length()));
+                        }
+                    }
+                    return new NamedContainer<>((list.size() <= 0)?plugin.api.getLang("SubServers", "Command.Generic.Unknown-SubServer").replace("$str$", args[0]):null, list);
+                } else if (args.length == 3) {
+                    return new NamedContainer<>(null, Collections.singletonList("[Version]"));
                 } else {
                     return new NamedContainer<>(null, Collections.emptyList());
                 }

@@ -13,9 +13,9 @@ import net.ME1312.SubServers.Bungee.SubPlugin;
 import java.util.Arrays;
 
 /**
- * Update External Server Packet
+ * Edit External Server Packet
  */
-public class PacketExUpdateServer implements PacketObjectIn<Integer>, PacketObjectOut<Integer> {
+public class PacketExEditServer implements PacketObjectIn<Integer>, PacketObjectOut<Integer> {
     private SubPlugin plugin;
     private SubServer server;
     private UpdateType type;
@@ -50,22 +50,22 @@ public class PacketExUpdateServer implements PacketObjectIn<Integer>, PacketObje
     }
 
     /**
-     * New PacketExUpdateServer (In)
+     * New PacketExEditServer (In)
      * @param plugin SubPlugin
      */
-    public PacketExUpdateServer(SubPlugin plugin) {
+    public PacketExEditServer(SubPlugin plugin) {
         this.plugin = plugin;
     }
 
     /**
-     * New PacketExUpdateServer (Out)
+     * New PacketExEditServer (Out)
      *
      * @param server SubServer
      * @param type Update Type
      * @param arguments Arguments
      */
-    public PacketExUpdateServer(SubServer server, UpdateType type, Object... arguments) {
-        if (arguments.length != type.getArguments().length) throw new IllegalArgumentException("Not enough arguments for type: " + type.toString());
+    public PacketExEditServer(SubServer server, UpdateType type, Object... arguments) {
+        if (arguments.length != type.getArguments().length) throw new IllegalArgumentException(((arguments.length > type.getArguments().length)?"Too many":"Not enough") + " arguments for type: " + type.toString());
         int i = 0;
         while (i < arguments.length) {
             if (!type.getArguments()[i].isInstance(arguments[i])) throw new IllegalArgumentException("Argument " + (i+1) + " is not " + type.getArguments()[i].getCanonicalName());

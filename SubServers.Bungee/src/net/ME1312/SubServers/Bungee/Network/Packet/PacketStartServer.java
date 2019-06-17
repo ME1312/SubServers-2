@@ -78,17 +78,19 @@ public class PacketStartServer implements PacketObjectIn<Integer>, PacketObjectO
                 client.sendPacket(new PacketStartServer(5, tracker));
             } else if (!((SubServer) servers.get(name.toLowerCase())).getHost().isEnabled()) {
                 client.sendPacket(new PacketStartServer(6, tracker));
-            } else if (!((SubServer) servers.get(name.toLowerCase())).isEnabled()) {
+            } else if (!((SubServer) servers.get(name.toLowerCase())).isAvailable()) {
                 client.sendPacket(new PacketStartServer(7, tracker));
-            } else if (((SubServer) servers.get(name.toLowerCase())).isRunning()) {
+            } else if (!((SubServer) servers.get(name.toLowerCase())).isEnabled()) {
                 client.sendPacket(new PacketStartServer(8, tracker));
+            } else if (((SubServer) servers.get(name.toLowerCase())).isRunning()) {
+                client.sendPacket(new PacketStartServer(9, tracker));
             } else if (((SubServer) servers.get(name.toLowerCase())).getCurrentIncompatibilities().size() != 0) {
                 String list = "";
                 for (SubServer server : ((SubServer) servers.get(name.toLowerCase())).getCurrentIncompatibilities()) {
                     if (list.length() != 0) list += ", ";
                     list += server.getName();
                 }
-                client.sendPacket(new PacketStartServer(9, list, tracker));
+                client.sendPacket(new PacketStartServer(10, list, tracker));
             } else {
                 if (((SubServer) servers.get(name.toLowerCase())).start(player)) {
                     client.sendPacket(new PacketStartServer(0, tracker));

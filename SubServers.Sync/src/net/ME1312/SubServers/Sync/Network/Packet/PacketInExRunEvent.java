@@ -50,7 +50,7 @@ public class PacketInExRunEvent implements PacketObjectIn<Integer> {
             @Override
             public void run(ObjectMap<String> data) {
                 ProxyServer.getInstance().getPluginManager().callEvent(new SubCreateEvent((data.contains("player"))?data.getUUID("player"):null, data.getRawString("host"), data.getRawString("name"),
-                        data.getRawString("template"), data.getVersion("version"), data.getInt("port")));
+                        data.getRawString("template"), data.getVersion("version"), data.getInt("port"), data.getBoolean("update")));
                 callback("SubCreateEvent", this);
             }
         });

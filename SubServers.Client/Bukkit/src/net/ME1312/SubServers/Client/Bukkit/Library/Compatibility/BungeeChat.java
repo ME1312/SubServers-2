@@ -66,7 +66,7 @@ public class BungeeChat {
                                     hoverm.add(hover);
                                 }
                                 hover = new TextComponent(plugin.api.getLang("SubServers", "Interface.Server-Menu.Server-Player-Count").replace("$int$", new DecimalFormat("#,###").format(server.getPlayers().size())) + ChatColor.RESET);
-                            } else if (((SubServer) server).isEnabled() && ((SubServer) server).getCurrentIncompatibilities().size() == 0) {
+                            } else if (((SubServer) server).isAvailable() && ((SubServer) server).isEnabled() && ((SubServer) server).getCurrentIncompatibilities().size() == 0) {
                                 message.setColor(ChatColor.YELLOW);
                                 hover.setColor(ChatColor.YELLOW);
                                 hoverm.add(hover);
@@ -91,11 +91,11 @@ public class BungeeChat {
                                         if (list.length() != 0) list += ", ";
                                         list += other;
                                     }
-                                    hover = new TextComponent(plugin.api.getLang("SubServers", "Interface.Server-Menu.SubServer-Incompatible").replace("$str$", list) + ((((SubServer) server).isEnabled())?"":"\n"));
+                                    hover = new TextComponent(plugin.api.getLang("SubServers", "Interface.Server-Menu.SubServer-Incompatible").replace("$str$", list) + (((SubServer) server).isAvailable() && (((SubServer) server).isEnabled())?"":"\n"));
                                 }
-                                if (!((SubServer) server).isEnabled()) {
+                                if (!((SubServer) server).isAvailable() || !((SubServer) server).isEnabled()) {
                                     hoverm.add(hover);
-                                    hover = new TextComponent(plugin.api.getLang("SubServers", "Interface.Server-Menu.SubServer-Disabled"));
+                                    hover = new TextComponent(plugin.api.getLang("SubServers", (!((SubServer) server).isAvailable())?"Interface.Server-Menu.SubServer-Unavailable":"Interface.Server-Menu.SubServer-Disabled"));
                                 }
                             }
                             hoverm.add(hover);
@@ -200,7 +200,7 @@ public class BungeeChat {
                             hoverm.add(hover);
                         }
                         hover = new TextComponent(plugin.api.getLang("SubServers", "Interface.Server-Menu.Server-Player-Count").replace("$int$", new DecimalFormat("#,###").format(subserver.getPlayers().size())) + ChatColor.RESET);
-                    } else if (subserver.isEnabled() && subserver.getCurrentIncompatibilities().size() == 0) {
+                    } else if (subserver.isAvailable() && subserver.isEnabled() && subserver.getCurrentIncompatibilities().size() == 0) {
                         message.setColor(ChatColor.YELLOW);
                         hover.setColor(ChatColor.YELLOW);
                         hoverm.add(hover);
@@ -225,11 +225,11 @@ public class BungeeChat {
                                 if (list.length() != 0) list += ", ";
                                 list += other;
                             }
-                            hover = new TextComponent(plugin.api.getLang("SubServers", "Interface.Server-Menu.SubServer-Incompatible").replace("$str$", list) + ((subserver.isEnabled())?"":"\n"));
+                            hover = new TextComponent(plugin.api.getLang("SubServers", "Interface.Server-Menu.SubServer-Incompatible").replace("$str$", list) + ((subserver.isAvailable() && subserver.isEnabled())?"":"\n"));
                         }
-                        if (!subserver.isEnabled()) {
+                        if (!subserver.isAvailable() || !subserver.isEnabled()) {
                             hoverm.add(hover);
-                            hover = new TextComponent(plugin.api.getLang("SubServers", "Interface.Server-Menu.SubServer-Disabled"));
+                            hover = new TextComponent(plugin.api.getLang("SubServers", (!subserver.isAvailable())?"Interface.Server-Menu.SubServer-Unavailable":"Interface.Server-Menu.SubServer-Disabled"));
                         }
                     }
                     hoverm.add(hover);

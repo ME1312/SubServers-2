@@ -2,6 +2,7 @@ package net.ME1312.SubServers.Bungee.Event;
 
 import net.ME1312.SubServers.Bungee.Host.Host;
 import net.ME1312.SubServers.Bungee.Host.SubCreator;
+import net.ME1312.SubServers.Bungee.Host.SubServer;
 import net.ME1312.SubServers.Bungee.Library.SubEvent;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
@@ -16,6 +17,7 @@ import java.util.UUID;
 public class SubCreateEvent extends Event implements SubEvent, Cancellable {
     private boolean cancelled = false;
     private UUID player;
+    private SubServer update;
     private Host host;
     private String name;
     private SubCreator.ServerTemplate template;
@@ -42,6 +44,17 @@ public class SubCreateEvent extends Event implements SubEvent, Cancellable {
         this.port = port;
     }
 
+    public SubCreateEvent(UUID player, SubServer server, Version version) {
+        if (Util.isNull(server)) throw new NullPointerException();
+        this.player = player;
+        this.update = server;
+        this.name = server.getName();
+        this.host = server.getHost();
+        this.template = server.getTemplate();
+        this.version = version;
+        this.port = server.getAddress().getPort();
+    }
+
     /**
      * Get the Host the SubServer will run on
      *
@@ -49,6 +62,24 @@ public class SubCreateEvent extends Event implements SubEvent, Cancellable {
      */
     public Host getHost() {
         return host;
+    }
+
+    /**
+     * Get if SubCreator is being run in update mode
+     *
+     * @return Update Mode Status
+     */
+    public boolean isUpdate() {
+        return update != null;
+    }
+
+    /**
+     * Get the Server that's being updated
+     *
+     * @return Updating Server
+     */
+    public SubServer getUpdating() {
+        return update;
     }
 
     /**

@@ -1,10 +1,14 @@
 package net.ME1312.SubServers.Sync.Event;
 
+import net.ME1312.Galaxi.Library.Callback.Callback;
 import net.ME1312.SubServers.Sync.Library.SubEvent;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
+import net.ME1312.SubServers.Sync.Network.API.SubServer;
+import net.ME1312.SubServers.Sync.SubAPI;
 import net.md_5.bungee.api.plugin.Event;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.UUID;
 
 /**
@@ -12,6 +16,7 @@ import java.util.UUID;
  */
 public class SubCreateEvent extends Event implements SubEvent {
     private UUID player;
+    private boolean update;
     private String host;
     private String name;
     private String template;
@@ -28,9 +33,10 @@ public class SubCreateEvent extends Event implements SubEvent {
      * @param version Server Version
      * @param port Server Port Number
      */
-    public SubCreateEvent(UUID player, String host, String name, String template, Version version, int port) {
+    public SubCreateEvent(UUID player, String host, String name, String template, Version version, int port, boolean update) {
         if (Util.isNull(host, name, template, version, port)) throw new NullPointerException();
         this.player = player;
+        this.update = update;
         this.host = host;
         this.name = name;
         this.template = template;
@@ -45,6 +51,33 @@ public class SubCreateEvent extends Event implements SubEvent {
      */
     public String getHost() {
         return host;
+    }
+
+    /**
+     * Get if SubCreator is being run in update mode
+     *
+     * @return Update Mode Status
+     */
+    public boolean isUpdate() {
+        return update;
+    }
+
+    /**
+     * Get the Server that's being updated
+     *
+     * @param callback Updating Server
+     */
+    public void getUpdating(Callback<SubServer> callback) {
+        if (!update) {
+            try {
+                callback.run(null);
+            } catch (Throwable e) {
+                Throwable ew = new InvocationTargetException(e);
+                ew.printStackTrace();
+            }
+        } else {
+            SubAPI.getInstance().getSubServer(name, callback);
+        }
     }
 
     /**

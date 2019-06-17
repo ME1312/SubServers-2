@@ -1,6 +1,6 @@
 name: 'SubServers-Client-Bukkit'
 main: 'net.ME1312.SubServers.Client.Bukkit.SubPlugin'
-version: '2.14a'
+version: '2.14.2a'
 authors: [ME1312]
 softdepend: [Vault, TitleManager]
 website: 'https://github.com/ME1312/SubServers-2'
@@ -36,6 +36,9 @@ permissions:
         description: 'Grants Access to SubServers SubServer Actions'
         default: op
         children:
+          subservers.subserver.update.*:
+            description: 'Grants Access to Update a SubServer'
+            default: op
           subservers.subserver.start.*:
             description: 'Grants Access to Start a SubServer'
             default: op

@@ -12,9 +12,9 @@ import java.util.Arrays;
 import java.util.UUID;
 
 /**
- * Update Server Packet
+ * Edit Server Packet
  */
-public class PacketExUpdateServer implements PacketObjectIn<Integer>, PacketObjectOut<Integer> {
+public class PacketExEditServer implements PacketObjectIn<Integer>, PacketObjectOut<Integer> {
     private ExHost host;
     private SubServer server;
     private UpdateType type;
@@ -43,21 +43,21 @@ public class PacketExUpdateServer implements PacketObjectIn<Integer>, PacketObje
     }
 
     /**
-     * New PacketExUpdateServer (In)
+     * New PacketExEditServer (In)
      * @param host ExHost
      */
-    public PacketExUpdateServer(ExHost host) {
+    public PacketExEditServer(ExHost host) {
         this.host = host;
     }
 
     /**
-     * New PacketExUpdateServer (Out)
+     * New PacketExEditServer (Out)
      *
      * @param type Update Type
      * @param arguments Arguments
      */
-    public PacketExUpdateServer(SubServer server, UpdateType type, Object... arguments) {
-        if (arguments.length != type.getArguments().length) throw new IllegalArgumentException("Not enough arguments for type: " + type.toString());
+    public PacketExEditServer(SubServer server, UpdateType type, Object... arguments) {
+        if (arguments.length != type.getArguments().length) throw new IllegalArgumentException(((arguments.length > type.getArguments().length)?"Too many":"Not enough") + " arguments for type: " + type.toString());
         int i = 0;
         while (i < arguments.length) {
             if (!type.getArguments()[i].isInstance(arguments[i])) throw new IllegalArgumentException("Argument " + (i+1) + " is not " + type.getArguments()[i].getCanonicalName());

@@ -105,8 +105,9 @@ public class PacketOutExRunEvent implements Listener, PacketObjectOut<Integer> {
         if (!event.isCancelled()) {
             ObjectMap<String> args = new ObjectMap<String>();
             if (event.getPlayer() != null) args.set("player", event.getPlayer().toString());
-            args.set("host", event.getHost().getName());
+            args.set("update", event.isUpdate());
             args.set("name", event.getName());
+            args.set("host", event.getHost().getName());
             args.set("template", event.getTemplate().getName());
             if (event.getVersion() != null) args.set("version", event.getVersion());
             args.set("port", event.getPort());

@@ -1,4 +1,4 @@
-Version: '2.13.2c+'
+Version: '2.14.2a+'
 Template:
   Enabled: true
   Icon: 'sponge'
@@ -6,6 +6,7 @@ Template:
     Server-Type: 'Sponge'
     Use-Cache: false
     Require-Version: true
+    Can-Update: true
     Executable: 'bash build.sh'
   Settings:
     Executable: 'java -Xmx1024M -jar Sponge.jar'

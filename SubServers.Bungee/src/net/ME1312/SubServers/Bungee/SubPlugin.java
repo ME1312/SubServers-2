@@ -16,6 +16,7 @@ import net.ME1312.SubServers.Bungee.Host.*;
 import net.ME1312.SubServers.Bungee.Library.*;
 import net.ME1312.Galaxi.Library.Config.YAMLConfig;
 import net.ME1312.Galaxi.Library.Config.YAMLSection;
+import net.ME1312.SubServers.Bungee.Library.Compatibility.GalaxiCommand;
 import net.ME1312.SubServers.Bungee.Library.Compatibility.Logger;
 import net.ME1312.SubServers.Bungee.Library.Fallback.SmartReconnectHandler;
 import net.ME1312.SubServers.Bungee.Library.Updates.ConfigUpdater;
@@ -74,7 +75,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
     public SubProtocol subprotocol;
     public SubDataServer subdata = null;
     public SubServer sudo = null;
-    public static final Version version = Version.fromString("2.14a");
+    public static final Version version = Version.fromString("2.14.2a");
 
     public Proxy redis = null;
     public boolean canSudo = false;
@@ -133,22 +134,22 @@ public final class SubPlugin extends BungeeCord implements Listener {
             Util.unzip(SubPlugin.class.getResourceAsStream("/net/ME1312/SubServers/Bungee/Library/Files/Templates/sponge.zip"), new UniversalFile(dir, "Templates"));
             Logger.get("SubServers").info("Created ./SubServers/Templates/Sponge");
         } else {
-            if (new UniversalFile(dir, "Templates:Vanilla:template.yml").exists() && ((new YAMLConfig(new UniversalFile(dir, "Templates:Vanilla:template.yml"))).get().getVersion("Version", new Version(0))).compareTo(new Version("2.13.2c+")) != 0) {
+            if (new UniversalFile(dir, "Templates:Vanilla:template.yml").exists() && ((new YAMLConfig(new UniversalFile(dir, "Templates:Vanilla:template.yml"))).get().getVersion("Version", new Version(0))).compareTo(new Version("2.14.2a+")) != 0) {
                 Files.move(new UniversalFile(dir, "Templates:Vanilla").toPath(), new UniversalFile(dir, "Templates:Vanilla.old" + Math.round(Math.random() * 100000) + ".x").toPath());
                 Util.unzip(SubPlugin.class.getResourceAsStream("/net/ME1312/SubServers/Bungee/Library/Files/Templates/vanilla.zip"), new UniversalFile(dir, "Templates"));
                 Logger.get("SubServers").info("Updated ./SubServers/Templates/Vanilla");
             }
-            if (new UniversalFile(dir, "Templates:Spigot:template.yml").exists() && ((new YAMLConfig(new UniversalFile(dir, "Templates:Spigot:template.yml"))).get().getVersion("Version", new Version(0))).compareTo(new Version("2.13.2c+")) != 0) {
+            if (new UniversalFile(dir, "Templates:Spigot:template.yml").exists() && ((new YAMLConfig(new UniversalFile(dir, "Templates:Spigot:template.yml"))).get().getVersion("Version", new Version(0))).compareTo(new Version("2.14.2a+")) != 0) {
                 Files.move(new UniversalFile(dir, "Templates:Spigot").toPath(), new UniversalFile(dir, "Templates:Spigot.old" + Math.round(Math.random() * 100000) + ".x").toPath());
                 Util.unzip(SubPlugin.class.getResourceAsStream("/net/ME1312/SubServers/Bungee/Library/Files/Templates/spigot.zip"), new UniversalFile(dir, "Templates"));
                 Logger.get("SubServers").info("Updated ./SubServers/Templates/Spigot");
             }
-            if (new UniversalFile(dir, "Templates:Forge:template.yml").exists() && ((new YAMLConfig(new UniversalFile(dir, "Templates:Forge:template.yml"))).get().getVersion("Version", new Version(0))).compareTo(new Version("2.13.2c+")) != 0) {
+            if (new UniversalFile(dir, "Templates:Forge:template.yml").exists() && ((new YAMLConfig(new UniversalFile(dir, "Templates:Forge:template.yml"))).get().getVersion("Version", new Version(0))).compareTo(new Version("2.14.2a+")) != 0) {
                 Files.move(new UniversalFile(dir, "Templates:Forge").toPath(), new UniversalFile(dir, "Templates:Forge.old" + Math.round(Math.random() * 100000) + ".x").toPath());
                 Util.unzip(SubPlugin.class.getResourceAsStream("/net/ME1312/SubServers/Bungee/Library/Files/Templates/forge.zip"), new UniversalFile(dir, "Templates"));
                 Logger.get("SubServers").info("Updated ./SubServers/Templates/Forge");
             }
-            if (new UniversalFile(dir, "Templates:Sponge:template.yml").exists() && ((new YAMLConfig(new UniversalFile(dir, "Templates:Sponge:template.yml"))).get().getVersion("Version", new Version(0))).compareTo(new Version("2.13.2c+")) != 0) {
+            if (new UniversalFile(dir, "Templates:Sponge:template.yml").exists() && ((new YAMLConfig(new UniversalFile(dir, "Templates:Sponge:template.yml"))).get().getVersion("Version", new Version(0))).compareTo(new Version("2.14.2a+")) != 0) {
                 Files.move(new UniversalFile(dir, "Templates:Sponge").toPath(), new UniversalFile(dir, "Templates:Sponge.old" + Math.round(Math.random() * 100000) + ".x").toPath());
                 Util.unzip(SubPlugin.class.getResourceAsStream("/net/ME1312/SubServers/Bungee/Library/Files/Templates/sponge.zip"), new UniversalFile(dir, "Templates"));
                 Logger.get("SubServers").info("Updated ./SubServers/Templates/Sponge");
@@ -477,6 +478,8 @@ public final class SubPlugin extends BungeeCord implements Listener {
                         edits.set("display", this.servers.get().getMap("Servers").getMap(name).getRawString("Display"));
                     if (!this.servers.get().getMap("Servers").getMap(name).getString("Host").equalsIgnoreCase(server.getHost().getName()))
                         edits.set("host", this.servers.get().getMap("Servers").getMap(name).getRawString("Host"));
+                    if (this.servers.get().getMap("Servers").getMap(name).getKeys().contains("Template") && ((this.servers.get().getMap("Servers").getMap(name).getRawString("Template").length() == 0 && server.getTemplate() != null) || (this.servers.get().getMap("Servers").getMap(name).getRawString("Template").length() > 0 && server.getTemplate() == null) || (server.getTemplate() != null && !this.servers.get().getMap("Servers").getMap(name).getString("Template").equalsIgnoreCase(server.getTemplate().getName()))))
+                        edits.set("template", this.servers.get().getMap("Servers").getMap(name).getString("Template"));
                     if (!this.servers.get().getMap("Servers").getMap(name).getStringList("Group").equals(server.getGroups()))
                         edits.set("group", this.servers.get().getMap("Servers").getMap(name).getRawStringList("Group"));
                     if (this.servers.get().getMap("Servers").getMap(name).getInt("Port") != server.getAddress().getPort())
@@ -537,6 +540,8 @@ public final class SubPlugin extends BungeeCord implements Listener {
                         autorun.add(name.toLowerCase());
                     if (this.servers.get().getMap("Servers").getMap(name).getKeys().contains("Display") && ((this.servers.get().getMap("Servers").getMap(name).getRawString("Display").length() == 0 && !server.getDisplayName().equals(server.getName())) || !this.servers.get().getMap("Servers").getMap(name).getRawString("Display").equals(server.getDisplayName())))
                         server.setDisplayName(this.servers.get().getMap("Servers").getMap(name).getRawString("Display"));
+                    if (this.servers.get().getMap("Servers").getMap(name).getKeys().contains("Template") && ((this.servers.get().getMap("Servers").getMap(name).getRawString("Template").length() == 0 && server.getTemplate() != null) || (this.servers.get().getMap("Servers").getMap(name).getRawString("Template").length() > 0 && server.getTemplate() == null) || (server.getTemplate() != null && !this.servers.get().getMap("Servers").getMap(name).getString("Template").equalsIgnoreCase(server.getTemplate().getName()))))
+                        server.setTemplate(server.getHost().getCreator().getTemplate(this.servers.get().getMap("Servers").getMap(name).getString("Template")));
                     if (this.servers.get().getMap("Servers").getMap(name).getKeys().contains("Group")) {
                         for (String group : server.getGroups()) server.removeGroup(group);
                         for (String group : this.servers.get().getMap("Servers").getMap(name).getStringList("Group")) server.addGroup(group);
@@ -624,6 +629,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
         getPluginManager().registerCommand(null, SubCommand.newInstance(this, "subservers").get());
         getPluginManager().registerCommand(null, SubCommand.newInstance(this, "subserver").get());
         getPluginManager().registerCommand(null, SubCommand.newInstance(this, "sub").get());
+        GalaxiCommand.group(SubCommand.class);
 
         new Metrics(this);
         new Timer("SubServers.Bungee::Routine_Update_Check").schedule(new TimerTask() {

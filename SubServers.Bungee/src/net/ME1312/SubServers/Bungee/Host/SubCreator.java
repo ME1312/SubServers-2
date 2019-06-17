@@ -141,6 +141,15 @@ public abstract class SubCreator {
         }
 
         /**
+         * Get whether this Template can be used to update it's servers
+         *
+         * @return Updatable Status
+         */
+        public boolean canUpdate() {
+            return getBuildOptions().getBoolean("Can-Update", false);
+        }
+
+        /**
          * Get the Build Options for this Template
          *
          * @return Build Options
@@ -167,6 +176,7 @@ public abstract class SubCreator {
             tinfo.set("icon", getIcon());
             tinfo.set("type", getType().toString());
             tinfo.set("version-req", requiresVersion());
+            tinfo.set("can-update", canUpdate());
             return tinfo;
         }
     }
@@ -191,6 +201,7 @@ public abstract class SubCreator {
      * @param template Server Template
      * @param version Server Version (may be null)
      * @param port Server Port Number (null to auto-select)
+     * @param callback Callback
      * @return Success Status
      */
     public abstract boolean create(UUID player, String name, ServerTemplate template, Version version, Integer port, Callback<SubServer> callback);
@@ -216,6 +227,7 @@ public abstract class SubCreator {
      * @param template Server Template
      * @param version Server Version (may be null)
      * @param port Server Port Number (null to auto-select)
+     * @param callback Callback
      * @return Success Status
      */
     public boolean create(String name, ServerTemplate template, Version version, Integer port, Callback<SubServer> callback) {
@@ -233,6 +245,52 @@ public abstract class SubCreator {
      */
     public boolean create(String name, ServerTemplate template, Version version, Integer port) {
         return create(null, name, template, version, port);
+    }
+
+    /**
+     * Update a SubServer
+     *
+     * @param player Player Updating
+     * @param server Server to Update
+     * @param version Server Version (may be null)
+     * @param callback Callback
+     * @return Success Status
+     */
+    public abstract boolean update(UUID player, SubServer server, Version version, Callback<SubServer> callback);
+
+    /**
+     * Update a SubServer
+     *
+     * @param player Player Updating
+     * @param server Server to Update
+     * @param version Server Version (may be null)
+     * @return Success Status
+     */
+    public boolean update(UUID player, SubServer server, Version version) {
+        return update(player, server, version, null);
+    }
+
+    /**
+     * Update a SubServer
+     *
+     * @param server Server to Update
+     * @param version Server Version (may be null)
+     * @param callback Callback
+     * @return Success Status
+     */
+    public boolean update(SubServer server, Version version, Callback<SubServer> callback) {
+        return update(null, server, version, callback);
+    }
+
+    /**
+     * Update a SubServer
+     *
+     * @param server Server to Update
+     * @param version Server Version (may be null)
+     * @return Success Status
+     */
+    public boolean update(SubServer server, Version version) {
+        return update(null, server, version);
     }
 
     /**

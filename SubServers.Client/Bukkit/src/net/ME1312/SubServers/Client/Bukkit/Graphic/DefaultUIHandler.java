@@ -316,6 +316,19 @@ public class DefaultUIHandler implements UIHandler, Listener {
                         if (item.equals(plugin.api.getLang("SubServers", "Interface.Generic.Back"))) {
                             player.closeInventory();
                             gui.back();
+                        } else if (item.equals(plugin.api.getLang("SubServers", "Interface.SubServer-Admin.Update"))) {
+                            player.closeInventory();
+                            if (player.hasPermission("subservers.subserver.command.*") || player.hasPermission("subservers.subserver.update." + ((String) gui.lastVisitedObjects[0]).toLowerCase())) {
+                                if (!gui.sendTitle(plugin.api.getLang("SubServers", "Interface.SubServer-Admin.Update.Title"), 4 * 20))
+                                    player.sendMessage(plugin.api.getLang("SubServers", "Interface.SubServer-Admin.Update.Message"));
+                                input.put(player.getUniqueId(), m -> {
+                                    gui.setDownloading(plugin.api.getLang("SubServers", "Interface.Generic.Downloading.Response"));
+                                    ((SubDataClient) plugin.api.getSubDataNetwork()[0]).sendPacket(new PacketUpdateServer(player.getUniqueId(), (String) gui.lastVisitedObjects[0],
+                                            (m.getString("message").length() == 0 || m.getString("message").equals("/"))?null:new Version((m.getString("message").startsWith("/"))?m.getString("message").substring(1):m.getString("message")), data -> {
+                                        gui.reopen();
+                                    }));
+                                });
+                            } else gui.reopen();
                         } else if (item.equals(plugin.api.getLang("SubServers", "Interface.SubServer-Admin.Start"))) {
                             player.closeInventory();
                             if (player.hasPermission("subservers.subserver.start.*") || player.hasPermission("subservers.subserver.start." + ((String) gui.lastVisitedObjects[0]).toLowerCase())) {

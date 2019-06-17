@@ -40,7 +40,6 @@ public final class SubCommand extends BukkitCommand {
         this.plugin = plugin;
     }
 
-
     @Override
     public boolean execute(CommandSender sender, String label, String[] args) {
         label = "/" + label;
@@ -135,7 +134,7 @@ public final class SubCommand extends BukkitCommand {
                                                 } else {
                                                     message += ChatColor.GREEN;
                                                 }
-                                            } else if (((SubServer) server).isEnabled() && ((SubServer) server).getCurrentIncompatibilities().size() == 0) {
+                                            } else if (((SubServer) server).isAvailable() && ((SubServer) server).isEnabled() && ((SubServer) server).getCurrentIncompatibilities().size() == 0) {
                                                 message += ChatColor.YELLOW;
                                             } else {
                                                 message += ChatColor.RED;
@@ -174,7 +173,7 @@ public final class SubCommand extends BukkitCommand {
                                             } else {
                                                 message += ChatColor.GREEN;
                                             }
-                                        } else if (subserver.isEnabled() && subserver.getCurrentIncompatibilities().size() == 0) {
+                                        } else if (subserver.isAvailable() && subserver.isEnabled() && subserver.getCurrentIncompatibilities().size() == 0) {
                                             message += ChatColor.YELLOW;
                                         } else {
                                             message += ChatColor.RED;
@@ -227,9 +226,11 @@ public final class SubCommand extends BukkitCommand {
                                     sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info").replace("$str$", ((server instanceof SubServer)?"Sub":"") + "Server") + ChatColor.WHITE + server.getDisplayName());
                                     if (!server.getName().equals(server.getDisplayName())) sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "System Name") + ChatColor.WHITE  + server.getName());
                                     if (server instanceof SubServer) {
+                                        sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Available") + ((((SubServer) server).isAvailable())?ChatColor.GREEN+"yes":ChatColor.RED+"no"));
                                         sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Enabled") + ((((SubServer) server).isEnabled())?ChatColor.GREEN+"yes":ChatColor.RED+"no"));
                                         if (!((SubServer) server).isEditable()) sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Editable") + ChatColor.RED + "no");
                                         sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Host") + ChatColor.WHITE  + ((SubServer) server).getHost());
+                                        sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Template") + ChatColor.WHITE  + ((SubServer) server).getTemplate());
                                     }
                                     if (server.getGroups().size() > 0) sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Group" + ((server.getGroups().size() > 1)?"s":"")) + ((server.getGroups().size() > 1)?"":ChatColor.WHITE + server.getGroups().get(0)));
                                     if (server.getGroups().size() > 1) for (String group : server.getGroups()) sender.sendMessage("    " + plugin.api.getLang("SubServers", "Command.Info.List") + ChatColor.WHITE + group);
@@ -357,12 +358,15 @@ public final class SubCommand extends BukkitCommand {
                                             sender.sendMessage(plugin.api.getLang("SubServers", "Command.Start.Host-Disabled"));
                                             break;
                                         case 7:
-                                            sender.sendMessage(plugin.api.getLang("SubServers", "Command.Start.Server-Disabled"));
+                                            sender.sendMessage(plugin.api.getLang("SubServers", "Command.Start.Server-Unavailable"));
                                             break;
                                         case 8:
-                                            sender.sendMessage(plugin.api.getLang("SubServers", "Command.Start.Running"));
+                                            sender.sendMessage(plugin.api.getLang("SubServers", "Command.Start.Server-Disabled"));
                                             break;
                                         case 9:
+                                            sender.sendMessage(plugin.api.getLang("SubServers", "Command.Start.Running"));
+                                            break;
+                                        case 10:
                                             sender.sendMessage(plugin.api.getLang("SubServers", "Command.Start.Server-Incompatible").replace("$str$", data.getString(0x0002)));
                                             break;
                                         case 0:
@@ -393,12 +397,15 @@ public final class SubCommand extends BukkitCommand {
                                             sender.sendMessage(plugin.api.getLang("SubServers", "Command.Restart.Host-Disabled"));
                                             break;
                                         case 7:
-                                            sender.sendMessage(plugin.api.getLang("SubServers", "Command.Restart.Server-Disabled"));
-                                            break;
-                                        case 9:
-                                            sender.sendMessage(plugin.api.getLang("SubServers", "Command.Restart.Server-Incompatible").replace("$str$", data.getString(0x0002)));
+                                            sender.sendMessage(plugin.api.getLang("SubServers", "Command.Restart.Server-Unavailable"));
                                             break;
                                         case 8:
+                                            sender.sendMessage(plugin.api.getLang("SubServers", "Command.Restart.Server-Disabled"));
+                                            break;
+                                        case 10:
+                                            sender.sendMessage(plugin.api.getLang("SubServers", "Command.Restart.Server-Incompatible").replace("$str$", data.getString(0x0002)));
+                                            break;
+                                        case 9:
                                         case 0:
                                         case 1:
                                             sender.sendMessage(plugin.api.getLang("SubServers", "Command.Restart.Finish"));
@@ -556,10 +563,10 @@ public final class SubCommand extends BukkitCommand {
                                                 sender.sendMessage(plugin.api.getLang("SubServers", "Command.Creator.Unknown-Host"));
                                                 break;
                                             case 6:
-                                                sender.sendMessage(plugin.api.getLang("SubServers", "Command.Start.Host-Unavailable"));
+                                                sender.sendMessage(plugin.api.getLang("SubServers", "Command.Creator.Host-Unavailable"));
                                                 break;
                                             case 7:
-                                                sender.sendMessage(plugin.api.getLang("SubServers", "Command.Start.Host-Disabled"));
+                                                sender.sendMessage(plugin.api.getLang("SubServers", "Command.Creator.Host-Disabled"));
                                                 break;
                                             case 8:
                                                 sender.sendMessage(plugin.api.getLang("SubServers", "Command.Creator.Unknown-Template"));
@@ -585,6 +592,53 @@ public final class SubCommand extends BukkitCommand {
                             }
                         } else {
                             sender.sendMessage(plugin.api.getLang("SubServers", "Command.Generic.Usage").replace("$str$", label.toLowerCase() + " " + args[0].toLowerCase() + " <Name> <Host> <Template> [Version] [Port]"));
+                        }
+                    } else if (args[0].equalsIgnoreCase("update") || args[0].equalsIgnoreCase("upgrade")) {
+                        if (args.length > 1) {
+                            if (sender.hasPermission("subservers.subserver.update.*") || sender.hasPermission("subservers.subserver.update." + args[1].toLowerCase())) {
+                                ((SubDataClient) plugin.api.getSubDataNetwork()[0]).sendPacket(new PacketUpdateServer((sender instanceof Player)?((Player) sender).getUniqueId():null, args[1], (args.length > 2)?new Version(args[2]):null, data -> {
+                                    switch (data.getInt(0x0001)) {
+                                        case 3:
+                                            sender.sendMessage(plugin.api.getLang("SubServers", "Command.Update.Unknown"));
+                                            break;
+                                        case 4:
+                                            sender.sendMessage(plugin.api.getLang("SubServers", "Command.Update.Invalid"));
+                                            break;
+                                        case 5:
+                                            sender.sendMessage(plugin.api.getLang("SubServers", "Command.Update.Host-Unavailable"));
+                                            break;
+                                        case 6:
+                                            sender.sendMessage(plugin.api.getLang("SubServers", "Command.Update.Host-Disabled"));
+                                            break;
+                                        case 7:
+                                            sender.sendMessage(plugin.api.getLang("SubServers", "Command.Update.Server-Unavailable"));
+                                            break;
+                                        case 8:
+                                            sender.sendMessage(plugin.api.getLang("SubServers", "Command.Update.Running"));
+                                            break;
+                                        case 9:
+                                            sender.sendMessage(plugin.api.getLang("SubServers", "Command.Update.Unknown-Template"));
+                                            break;
+                                        case 10:
+                                            sender.sendMessage(plugin.api.getLang("SubServers", "Command.Update.Template-Disabled"));
+                                            break;
+                                        case 11:
+                                            sender.sendMessage(plugin.api.getLang("SubServers", "Command.Update.Template-Invalid"));
+                                            break;
+                                        case 12:
+                                            sender.sendMessage(plugin.api.getLang("SubServers", "Command.Update.Version-Required"));
+                                            break;
+                                        case 0:
+                                        case 1:
+                                            sender.sendMessage(plugin.api.getLang("SubServers", "Command.Update"));
+                                            break;
+                                    }
+                                }));
+                            } else {
+                                sender.sendMessage(plugin.api.getLang("SubServers", "Command.Generic.Invalid-Permission").replace("$str$", "subservers.subserver.update." + args[1].toLowerCase()));
+                            }
+                        } else {
+                            sender.sendMessage(plugin.api.getLang("SubServers", "Command.Generic.Usage").replace("$str$", label.toLowerCase() + " " + args[0].toLowerCase() + " <SubServer> [Version]"));
                         }
                     } else if ((args[0].equalsIgnoreCase("view") || args[0].equalsIgnoreCase("open")) && sender instanceof Player) {
                         if (plugin.gui != null) {
@@ -667,6 +721,7 @@ public final class SubCommand extends BukkitCommand {
                 plugin.api.getLang("SubServers", "Command.Help.SubServer.Terminate").replace("$str$", label.toLowerCase() + " kill <SubServer>"),
                 plugin.api.getLang("SubServers", "Command.Help.SubServer.Command").replace("$str$", label.toLowerCase() + " cmd <SubServer> <Command> [Args...]"),
                 plugin.api.getLang("SubServers", "Command.Help.Host.Create").replace("$str$", label.toLowerCase() + " create <Name> <Host> <Template> [Version] [Port]"),
+                plugin.api.getLang("SubServers", "Command.Help.SubServer.Update").replace("$str$", label.toLowerCase() + " update <SubServer> [Version]"),
         };
     }
 }

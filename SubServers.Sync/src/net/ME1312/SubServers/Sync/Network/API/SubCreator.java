@@ -6,6 +6,7 @@ import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubData.Client.SubDataClient;
 import net.ME1312.SubServers.Sync.Network.Packet.PacketCreateServer;
+import net.ME1312.SubServers.Sync.Network.Packet.PacketUpdateServer;
 import net.ME1312.SubServers.Sync.SubAPI;
 
 import java.lang.reflect.InvocationTargetException;
@@ -95,6 +96,15 @@ public class SubCreator {
         public boolean requiresVersion() {
             return raw.getBoolean("version-req");
         }
+
+        /**
+         * Get whether this Template can be used to update it's servers
+         *
+         * @return Updatable Status
+         */
+        public boolean canUpdate() {
+            return raw.getBoolean("can-update");
+        }
     }
     public enum ServerType {
         SPIGOT,
@@ -119,7 +129,7 @@ public class SubCreator {
      * @param port Server Port Number (null to auto-select)
      * @param response Response Code
      */
-    public void create(UUID player, String name, ServerTemplate template, Version version, int port, Callback<Integer> response) {
+    public void create(UUID player, String name, ServerTemplate template, Version version, Integer port, Callback<Integer> response) {
         if (Util.isNull(response)) throw new NullPointerException();
         StackTraceElement[] origin = new Exception().getStackTrace();
         ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketCreateServer(player, name, host.getName(), template.getName(), version, port, data -> {
@@ -142,7 +152,7 @@ public class SubCreator {
      * @param port Server Port Number (null to auto-select)
      * @param response Response Code
      */
-    public void create(String name, ServerTemplate template, Version version, int port, Callback<Integer> response) {
+    public void create(String name, ServerTemplate template, Version version, Integer port, Callback<Integer> response) {
         create(null, name, template, version, port, response);
     }
 
@@ -155,7 +165,7 @@ public class SubCreator {
      * @param version Server Version (may be null)
      * @param port Server Port Number (null to auto-select)
      */
-    public void create(UUID player, String name, ServerTemplate template, Version version, int port) {
+    public void create(UUID player, String name, ServerTemplate template, Version version, Integer port) {
         create(player, name, template, version, port, i -> {});
     }
 
@@ -167,8 +177,62 @@ public class SubCreator {
      * @param version Server Version (may be null)
      * @param port Server Port Number (null to auto-select)
      */
-    public void create(String name, ServerTemplate template, Version version, int port) {
+    public void create(String name, ServerTemplate template, Version version, Integer port) {
         create(name, template, version, port, i -> {});
+    }
+
+    /**
+     * Update a SubServer
+     *
+     * @param player Player Updating
+     * @param server Server to Update
+     * @param version Server Version (may be null)
+     * @param response Response Code
+     */
+    public void update(UUID player, String server, Version version, Callback<Integer> response) {
+        if (Util.isNull(response)) throw new NullPointerException();
+        StackTraceElement[] origin = new Exception().getStackTrace();
+        ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketUpdateServer(player, server, version, data -> {
+            try {
+                response.run(data.getInt(0x0001));
+            } catch (Throwable e) {
+                Throwable ew = new InvocationTargetException(e);
+                ew.setStackTrace(origin);
+                ew.printStackTrace();
+            }
+        }));
+    }
+
+    /**
+     * Update a SubServer
+     *
+     * @param server Server to Update
+     * @param version Server Version (may be null)
+     * @param response Response Code
+     */
+    public void update(String server, Version version, Callback<Integer> response) {
+        update(null, server, version, response);
+    }
+
+    /**
+     * Update a SubServer
+     *
+     * @param player Player Updating
+     * @param server Server to Update
+     * @param version Server Version (may be null)
+     */
+    public void update(UUID player, String server, Version version) {
+        update(player, server, version, i -> {});
+    }
+
+    /**
+     * Update a SubServer
+     *
+     * @param server Server to Update
+     * @param version Server Version (may be null)
+     */
+    public void update(String server, Version version) {
+        update(null, server, version);
     }
 
     /**
@@ -196,7 +260,6 @@ public class SubCreator {
      * @return Template
      */
     public ServerTemplate getTemplate(String name) {
-        if (Util.isNull(name)) throw new NullPointerException();
         return getTemplates().get(name.toLowerCase());
     }
 }

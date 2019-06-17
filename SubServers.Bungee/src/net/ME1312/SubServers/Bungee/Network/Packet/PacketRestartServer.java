@@ -62,6 +62,7 @@ public class PacketRestartServer implements PacketObjectIn<Integer>, PacketObjec
                 } else if (!(servers.get(name.toLowerCase()) instanceof SubServer)) {
                 } else if (!((SubServer) servers.get(name.toLowerCase())).getHost().isAvailable()) {
                 } else if (!((SubServer) servers.get(name.toLowerCase())).getHost().isEnabled()) {
+                } else if (!((SubServer) servers.get(name.toLowerCase())).isAvailable()) {
                 } else if (!((SubServer) servers.get(name.toLowerCase())).isEnabled()) {
                 } else if (((SubServer) servers.get(name.toLowerCase())).isRunning()) {
                 } else if (((SubServer) servers.get(name.toLowerCase())).getCurrentIncompatibilities().size() != 0) {

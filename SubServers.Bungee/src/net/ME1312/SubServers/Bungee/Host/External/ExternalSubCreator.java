@@ -9,6 +9,7 @@ import net.ME1312.SubServers.Bungee.Host.*;
 import net.ME1312.Galaxi.Library.Config.YAMLConfig;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Version.Version;
+import net.ME1312.SubServers.Bungee.Library.Compatibility.Logger;
 import net.ME1312.SubServers.Bungee.Network.Packet.PacketExConfigureHost;
 import net.ME1312.SubServers.Bungee.Network.Packet.PacketExCreateServer;
 import net.ME1312.SubServers.Bungee.SubAPI;
@@ -85,7 +86,8 @@ public class ExternalSubCreator extends SubCreator {
                     return new InetSocketAddress(host.getAddress(), i.get());
                 }).getPort();
             }
-            ExternalSubLogger logger = new ExternalSubLogger(this, name + File.separator + "Creator", log, null);
+            String prefix = name + File.separator + "Creator";
+            ExternalSubLogger logger = new ExternalSubLogger(this, prefix, log, null);
             thread.put(name.toLowerCase(), new NamedContainer<>(port, logger));
 
             final int fport = port;
@@ -96,7 +98,7 @@ public class ExternalSubCreator extends SubCreator {
                 host.queue(new PacketExCreateServer(name, template, version, port, logger.getExternalAddress(), data -> {
                     try {
                         if (data.getInt(0x0001) == 0) {
-                            System.out.println(name + "/Creator > Saving...");
+                            Logger.get(prefix).info("Saving...");
                             if (host.plugin.exServers.keySet().contains(name.toLowerCase()))
                                 host.plugin.exServers.remove(name.toLowerCase());
 
@@ -110,6 +112,7 @@ public class ExternalSubCreator extends SubCreator {
                             server.set("Enabled", true);
                             server.set("Display", "");
                             server.set("Host", host.getName());
+                            server.set("Template", template.getName());
                             server.set("Group", new ArrayList<String>());
                             server.set("Port", fport);
                             server.set("Motd", "Some SubServer");
@@ -127,6 +130,7 @@ public class ExternalSubCreator extends SubCreator {
                             SubServer subserver = host.addSubServer(player, name, server.getBoolean("Enabled"), fport, ChatColor.translateAlternateColorCodes('&', server.getString("Motd")), server.getBoolean("Log"), server.getRawString("Directory"),
                                     server.getRawString("Executable"), server.getRawString("Stop-Command"), server.getBoolean("Hidden"), server.getBoolean("Restricted"));
                             if (server.getString("Display").length() > 0) subserver.setDisplayName(server.getString("Display"));
+                            subserver.setTemplate(getTemplate(server.getRawString("Template")));
                             for (String group : server.getStringList("Group")) subserver.addGroup(group);
                             SubServer.StopAction action = Util.getDespiteException(() -> SubServer.StopAction.valueOf(server.getRawString("Stop-Action").toUpperCase().replace('-', '_').replace(' ', '_')), null);
                             if (action != null) subserver.setStopAction(action);
@@ -145,7 +149,7 @@ public class ExternalSubCreator extends SubCreator {
                                 ew.printStackTrace();
                             }
                         } else {
-                            System.out.println(name + "/Creator > " + data.getString(0x0003));
+                            Logger.get(prefix).info(data.getString(0x0003));
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -181,6 +185,51 @@ public class ExternalSubCreator extends SubCreator {
     } private String replace(String string, NamedContainer<String, String>... replacements) {
         for (NamedContainer<String, String> replacement : replacements) string = string.replace(replacement.name(), replacement.get());
         return string;
+    }
+
+    @Override
+    public boolean update(UUID player, SubServer server, Version version, Callback<SubServer> callback) {
+        if (Util.isNull(server)) throw new NullPointerException();
+        if (host.isAvailable() && host.isEnabled() && host == server.getHost() && server.isAvailable() && !server.isRunning() && server.getTemplate() != null && server.getTemplate().isEnabled() && server.getTemplate().canUpdate() && (version != null || !server.getTemplate().requiresVersion())) {
+            StackTraceElement[] origin = new Exception().getStackTrace();
+
+            String name = server.getName();
+            String prefix = name + File.separator + "Updater";
+            Util.isException(() -> Util.reflect(SubServerContainer.class.getDeclaredField("lock"), server, true));
+            ExternalSubLogger logger = new ExternalSubLogger(this, prefix, log, null);
+            thread.put(name.toLowerCase(), new NamedContainer<>(server.getAddress().getPort(), logger));
+
+            final SubCreateEvent event = new SubCreateEvent(player, server, version);
+            host.plugin.getPluginManager().callEvent(event);
+            if (!event.isCancelled()) {
+                logger.start();
+                host.queue(new PacketExCreateServer(server, version, logger.getExternalAddress(), data -> {
+                    Util.isException(() -> Util.reflect(SubServerContainer.class.getDeclaredField("lock"), server, false));
+                    try {
+                        if (data.getInt(0x0001) == 0) {
+                            Logger.get(prefix).info("Saving...");
+                            if (callback != null) try {
+                                callback.run(server);
+                            } catch (Throwable e) {
+                                Throwable ew = new InvocationTargetException(e);
+                                ew.setStackTrace(origin);
+                                ew.printStackTrace();
+                            }
+                        } else {
+                            Logger.get(prefix).info(data.getString(0x0003));
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    logger.stop();
+                    this.thread.remove(name.toLowerCase());
+                }));
+                return true;
+            } else {
+                thread.remove(name.toLowerCase());
+                return false;
+            }
+        } else return false;
     }
 
     @Override
