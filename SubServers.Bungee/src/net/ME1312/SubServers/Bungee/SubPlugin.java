@@ -395,7 +395,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
                     if (config.get().getMap("Hosts").getMap(name).getBoolean("Log-Creator", true) != host.getCreator().isLogging())
                         host.getCreator().setLogging(config.get().getMap("Hosts").getMap(name).getBoolean("Log-Creator", true));
                 } // Check for other changes
-                if (config.get().getMap("Hosts").getMap(name).getKeys().contains("Display") && ((config.get().getMap("Hosts").getMap(name).getString("Display").length() == 0 && !host.getDisplayName().equals(host.getName())) || !config.get().getMap("Hosts").getMap(name).getString("Display").equals(host.getDisplayName())))
+                if (config.get().getMap("Hosts").getMap(name).getKeys().contains("Display") && ((config.get().getMap("Hosts").getMap(name).getString("Display").length() == 0 && !host.getName().equals(host.getDisplayName())) || (config.get().getMap("Hosts").getMap(name).getString("Display").length() > 0 && !config.get().getMap("Hosts").getMap(name).getString("Display").equals(host.getDisplayName()))))
                     host.setDisplayName(config.get().getMap("Hosts").getMap(name).getString("Display"));
                 if (config.get().getMap("Hosts").getMap(name).getKeys().contains("Extra"))
                     for (String extra : config.get().getMap("Hosts").getMap(name).getMap("Extra").getKeys()) host.addExtra(extra, config.get().getMap("Hosts").getMap(name).getMap("Extra").getObject(extra));
@@ -429,7 +429,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
                         if (bungee.get().getMap("servers").getMap(name).getBoolean("restricted") != server.isRestricted())
                             server.setRestricted(bungee.get().getMap("servers").getMap(name).getBoolean("restricted"));
                     } // Check for other changes
-                    if (bungee.get().getMap("servers").getMap(name).getKeys().contains("display") && ((bungee.get().getMap("servers").getMap(name).getRawString("display").length() == 0 && !server.getDisplayName().equals(server.getName())) || !bungee.get().getMap("servers").getMap(name).getRawString("display").equals(server.getDisplayName())))
+                    if (bungee.get().getMap("servers").getMap(name).getKeys().contains("display") && ((bungee.get().getMap("servers").getMap(name).getRawString("display").length() == 0 && !server.getName().equals(server.getDisplayName())) || (bungee.get().getMap("servers").getMap(name).getRawString("display").length() > 0 && !bungee.get().getMap("servers").getMap(name).getRawString("display").equals(server.getDisplayName()))))
                         server.setDisplayName(bungee.get().getMap("servers").getMap(name).getString("display"));
                     if (bungee.get().getMap("servers").getMap(name).getKeys().contains("group")) {
                         for (String group : server.getGroups()) server.removeGroup(group);
@@ -474,7 +474,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
                     ObjectMap<String> edits = new ObjectMap<String>();
                     if (this.servers.get().getMap("Servers").getMap(name).getBoolean("Enabled") != server.isEnabled())
                         edits.set("enabled", this.servers.get().getMap("Servers").getMap(name).getBoolean("Enabled"));
-                    if (this.servers.get().getMap("Servers").getMap(name).getKeys().contains("Display") && ((this.servers.get().getMap("Servers").getMap(name).getRawString("Display").length() == 0 && !server.getDisplayName().equals(server.getName())) || !this.servers.get().getMap("Servers").getMap(name).getRawString("Display").equals(server.getDisplayName())))
+                    if (this.servers.get().getMap("Servers").getMap(name).getKeys().contains("Display") && ((this.servers.get().getMap("Servers").getMap(name).getRawString("Display").length() == 0 && !server.getName().equals(server.getDisplayName())) || (this.servers.get().getMap("Servers").getMap(name).getRawString("Display").length() > 0 && !this.servers.get().getMap("Servers").getMap(name).getRawString("Display").equals(server.getDisplayName()))))
                         edits.set("display", this.servers.get().getMap("Servers").getMap(name).getRawString("Display"));
                     if (!this.servers.get().getMap("Servers").getMap(name).getString("Host").equalsIgnoreCase(server.getHost().getName()))
                         edits.set("host", this.servers.get().getMap("Servers").getMap(name).getRawString("Host"));
@@ -538,7 +538,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
                         server.setStopAction(action);
                     if (!status && this.servers.get().getMap("Servers").getMap(name).getBoolean("Run-On-Launch"))
                         autorun.add(name.toLowerCase());
-                    if (this.servers.get().getMap("Servers").getMap(name).getKeys().contains("Display") && ((this.servers.get().getMap("Servers").getMap(name).getRawString("Display").length() == 0 && !server.getDisplayName().equals(server.getName())) || !this.servers.get().getMap("Servers").getMap(name).getRawString("Display").equals(server.getDisplayName())))
+                    if (this.servers.get().getMap("Servers").getMap(name).getKeys().contains("Display") && ((this.servers.get().getMap("Servers").getMap(name).getRawString("Display").length() == 0 && !server.getName().equals(server.getDisplayName())) || (this.servers.get().getMap("Servers").getMap(name).getRawString("Display").length() > 0 && !this.servers.get().getMap("Servers").getMap(name).getRawString("Display").equals(server.getDisplayName()))))
                         server.setDisplayName(this.servers.get().getMap("Servers").getMap(name).getRawString("Display"));
                     if (this.servers.get().getMap("Servers").getMap(name).getKeys().contains("Template") && ((this.servers.get().getMap("Servers").getMap(name).getRawString("Template").length() == 0 && server.getTemplate() != null) || (this.servers.get().getMap("Servers").getMap(name).getRawString("Template").length() > 0 && server.getTemplate() == null) || (server.getTemplate() != null && !this.servers.get().getMap("Servers").getMap(name).getString("Template").equalsIgnoreCase(server.getTemplate().getName()))))
                         server.setTemplate(server.getHost().getCreator().getTemplate(this.servers.get().getMap("Servers").getMap(name).getString("Template")));
