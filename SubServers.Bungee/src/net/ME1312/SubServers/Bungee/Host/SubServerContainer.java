@@ -1,6 +1,7 @@
 package net.ME1312.SubServers.Bungee.Host;
 
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
+import net.ME1312.SubServers.Bungee.Event.SubEditServerEvent;
 import net.ME1312.SubServers.Bungee.Library.Exception.InvalidServerException;
 import net.ME1312.Galaxi.Library.NamedContainer;
 import net.ME1312.SubServers.Bungee.SubAPI;
@@ -63,6 +64,7 @@ public abstract class SubServerContainer extends ServerContainer implements SubS
 
     @Override
     public void setTemplate(SubCreator.ServerTemplate template) {
+        SubAPI.getInstance().getInternals().getPluginManager().callEvent(new SubEditServerEvent(null, this, new NamedContainer<String, Object>("template", (template != null)?template.getName():null), false));
         this.template = (template != null)?template.getName():null;
     }
 

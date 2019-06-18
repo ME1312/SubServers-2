@@ -35,12 +35,12 @@ public class SubProtocol extends SubDataProtocol {
             instance.addVersion(new Version("2.14a+"));
 
 
-            // 00-09: Object Link Packets
+            // 00-0F: Object Link Packets
             instance.registerPacket(0x0002, PacketLinkServer.class);
             instance.registerPacket(0x0002, new PacketLinkServer(plugin));
 
 
-            // 10-29: Download Packets
+            // 10-2F: Download Packets
             instance.registerPacket(0x0010, PacketDownloadLang.class);
             instance.registerPacket(0x0011, PacketDownloadPlatformInfo.class);
             instance.registerPacket(0x0012, PacketDownloadProxyInfo.class);
@@ -60,7 +60,7 @@ public class SubProtocol extends SubDataProtocol {
             instance.registerPacket(0x0017, new PacketCheckPermission());
 
 
-            // 30-49: Control Packets
+            // 30-4F: Control Packets
             instance.registerPacket(0x0030, PacketCreateServer.class);
             instance.registerPacket(0x0031, PacketAddServer.class);
             instance.registerPacket(0x0032, PacketStartServer.class);
@@ -84,7 +84,7 @@ public class SubProtocol extends SubDataProtocol {
             instance.registerPacket(0x0039, new PacketDeleteServer());
 
 
-            // 70-79: External Misc Packets
+            // 70-7F: External Misc Packets
           //instance.registerPacket(0x0070, PacketInExRunEvent.class);
           //instance.registerPacket(0x0071, PacketInExReset.class);
           //instance.registerPacket(0x0072, PacketInExReload.class);

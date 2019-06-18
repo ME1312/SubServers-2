@@ -504,7 +504,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
 
 
                     if (edits.getKeys().size() > 0) {
-                        server.permaEdit(edits);
+                        server.edit(edits);
                         server = api.getSubServer(name);
                     }
                 } else { // Server cannot edit()
