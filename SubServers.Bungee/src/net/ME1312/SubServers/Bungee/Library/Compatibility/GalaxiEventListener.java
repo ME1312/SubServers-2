@@ -20,7 +20,7 @@ public class GalaxiEventListener {
     public GalaxiEventListener(SubPlugin plugin) throws Throwable {
         this.plugin = plugin;
 
-        Galaxi.getInstance().getPluginManager().registerListener(Galaxi.getInstance().getAppInfo(), this);
+        Galaxi.getInstance().getPluginManager().registerListeners(Galaxi.getInstance().getAppInfo(), this);
         plugin.canSudo = true;
     }
 
