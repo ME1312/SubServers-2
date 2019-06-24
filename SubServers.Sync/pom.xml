@@ -30,19 +30,19 @@
         <dependency>
             <groupId>net.ME1312.Galaxi</groupId>
             <artifactId>GalaxiUtil</artifactId>
-            <version>19w25a</version>
+            <version>19w26a</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>net.ME1312.Galaxi</groupId>
             <artifactId>GalaxiEngine</artifactId>
-            <version>19w25a</version>
+            <version>19w26a</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>net.ME1312.SubData</groupId>
             <artifactId>Client</artifactId>
-            <version>19w22a</version>
+            <version>19w26a</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
