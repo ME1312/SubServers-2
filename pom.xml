@@ -13,6 +13,5 @@
         <module>SubServers.Console</module>
         <module>SubServers.Host</module>
         <module>SubServers.Sync</module>
-        <module>SubServers.Test</module>
     </modules>
 </project>
