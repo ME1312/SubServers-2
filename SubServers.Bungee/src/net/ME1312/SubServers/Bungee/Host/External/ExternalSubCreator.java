@@ -195,7 +195,7 @@ public class ExternalSubCreator extends SubCreator {
 
             String name = server.getName();
             String prefix = name + File.separator + "Updater";
-            Util.isException(() -> Util.reflect(SubServerContainer.class.getDeclaredField("lock"), server, true));
+            Util.isException(() -> Util.reflect(SubServerContainer.class.getDeclaredField("updating"), server, true));
             ExternalSubLogger logger = new ExternalSubLogger(this, prefix, log, null);
             thread.put(name.toLowerCase(), new NamedContainer<>(server.getAddress().getPort(), logger));
 
@@ -204,7 +204,7 @@ public class ExternalSubCreator extends SubCreator {
             if (!event.isCancelled()) {
                 logger.start();
                 host.queue(new PacketExCreateServer(server, version, logger.getExternalAddress(), data -> {
-                    Util.isException(() -> Util.reflect(SubServerContainer.class.getDeclaredField("lock"), server, false));
+                    Util.isException(() -> Util.reflect(SubServerContainer.class.getDeclaredField("updating"), server, false));
                     try {
                         if (data.getInt(0x0001) == 0) {
                             Logger.get(prefix).info("Saving...");

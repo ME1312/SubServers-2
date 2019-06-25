@@ -79,6 +79,7 @@ public class ExternalSubServer extends SubServerContainer {
             lock = false;
             if (!event.isCancelled()) {
                 Logger.get("SubServers").info("Now starting " + getName());
+                started = false;
                 running = true;
                 logger.start();
                 host.queue(new PacketExEditServer(this, PacketExEditServer.UpdateType.START, logger.getExternalAddress().toString()));
@@ -105,12 +106,12 @@ public class ExternalSubServer extends SubServerContainer {
         } else return false;
     }
     private void stopped(Boolean allowrestart) {
-        SubStoppedEvent event = new SubStoppedEvent(this);
-        host.plugin.getPluginManager().callEvent(event);
-        Logger.get("SubServers").info(getName() + " has stopped");
         logger.stop();
         history.clear();
         running = false;
+        SubStoppedEvent event = new SubStoppedEvent(this);
+        host.plugin.getPluginManager().callEvent(event);
+        Logger.get("SubServers").info(getName() + " has stopped");
 
         if (stopaction == StopAction.REMOVE_SERVER || stopaction == StopAction.RECYCLE_SERVER || stopaction == StopAction.DELETE_SERVER) {
             try {

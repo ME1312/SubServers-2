@@ -75,6 +75,13 @@ public class PacketInExRunEvent implements PacketObjectIn<Integer> {
                 callback("SubStartEvent", this);
             }
         });
+        callback("SubStartedEvent", new Callback<ObjectMap<String>>() {
+            @Override
+            public void run(ObjectMap<String> data) {
+                ProxyServer.getInstance().getPluginManager().callEvent(new SubStartedEvent(data.getRawString("server")));
+                callback("SubStartedEvent", this);
+            }
+        });
         callback("SubNetworkConnectEvent", new Callback<ObjectMap<String>>() {
             @Override
             public void run(ObjectMap<String> data) {

@@ -3,6 +3,7 @@ package net.ME1312.SubServers.Bungee.Network.Packet;
 import net.ME1312.SubData.Server.DataClient;
 import net.ME1312.SubData.Server.Protocol.Initial.InitialPacket;
 import net.ME1312.SubData.Server.SubDataClient;
+import net.ME1312.SubServers.Bungee.Event.SubStartedEvent;
 import net.ME1312.SubServers.Bungee.Host.Server;
 import net.ME1312.SubServers.Bungee.Host.ServerContainer;
 import net.ME1312.SubServers.Bungee.Host.SubServer;
@@ -10,8 +11,10 @@ import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubData.Server.Protocol.PacketObjectIn;
 import net.ME1312.SubData.Server.Protocol.PacketObjectOut;
+import net.ME1312.SubServers.Bungee.Host.SubServerContainer;
 import net.ME1312.SubServers.Bungee.Library.Compatibility.Logger;
 import net.ME1312.SubServers.Bungee.SubPlugin;
+import net.md_5.bungee.api.ProxyServer;
 
 import java.net.InetSocketAddress;
 import java.util.HashMap;
@@ -106,6 +109,11 @@ public class PacketLinkServer implements InitialPacket, PacketObjectIn<Integer>,
                 Logger.get("SubServers").info("Sending shutdown signal to rogue SubServer: " + server.getName());
                 client.sendPacket(new PacketOutExReset("Rogue SubServer Detected"));
             } else {
+                if (server instanceof SubServer && !Util.getDespiteException(() -> Util.reflect(SubServerContainer.class.getDeclaredField("started"), server), true)) {
+                    Util.isException(() -> Util.reflect(SubServerContainer.class.getDeclaredField("started"), server, true));
+                    SubStartedEvent event = new SubStartedEvent((SubServer) server);
+                    ProxyServer.getInstance().getPluginManager().callEvent(event);
+                }
                 client.sendPacket(new PacketLinkServer(server.getName(), 0, null));
             }
             setReady(client, true);

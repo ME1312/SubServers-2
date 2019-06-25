@@ -89,6 +89,15 @@ public class PacketInExRunEvent implements PacketObjectIn<Integer> {
                 }
             }
         });
+        callback("SubStartedEvent", new Callback<ObjectMap<String>>() {
+            @Override
+            public void run(ObjectMap<String> data) {
+                if (plugin.isEnabled()) {
+                    Bukkit.getPluginManager().callEvent(new SubStartedEvent(data.getString("server")));
+                    callback("SubStartedEvent", this);
+                }
+            }
+        });
         callback("SubStopEvent", new Callback<ObjectMap<String>>() {
             @Override
             public void run(ObjectMap<String> data) {

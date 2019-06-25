@@ -114,6 +114,7 @@ public class PacketOutExRunEvent implements Listener, PacketObjectOut<Integer> {
             broadcast(new PacketOutExRunEvent(event.getClass(), args));
         }
     }
+
     @EventHandler(priority = Byte.MAX_VALUE)
     public void event(SubSendCommandEvent event) {
         if (!event.isCancelled()) {
@@ -148,6 +149,14 @@ public class PacketOutExRunEvent implements Listener, PacketObjectOut<Integer> {
         }
     }
     @EventHandler(priority = Byte.MAX_VALUE)
+    public void event(SubStartedEvent event) {
+        ObjectMap<String> args = new ObjectMap<String>();
+        args.set("server", event.getServer().getName());
+        broadcast(event.getServer(), new PacketOutExRunEvent(event.getClass(), args));
+
+    }
+
+    @EventHandler(priority = Byte.MAX_VALUE)
     public void event(SubStopEvent event) {
         if (!event.isCancelled()) {
             ObjectMap<String> args = new ObjectMap<String>();
@@ -162,9 +171,10 @@ public class PacketOutExRunEvent implements Listener, PacketObjectOut<Integer> {
     public void event(SubStoppedEvent event) {
         ObjectMap<String> args = new ObjectMap<String>();
         args.set("server", event.getServer().getName());
-        broadcast(new PacketOutExRunEvent(event.getClass(), args));
+        broadcast(event.getServer(), new PacketOutExRunEvent(event.getClass(), args));
 
     }
+
     @EventHandler(priority = Byte.MAX_VALUE)
     public void event(SubRemoveServerEvent event) {
         if (!event.isCancelled()) {

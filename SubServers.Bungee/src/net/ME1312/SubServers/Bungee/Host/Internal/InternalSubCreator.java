@@ -380,10 +380,10 @@ public class InternalSubCreator extends SubCreator {
         if (host.isAvailable() && host.isEnabled() && host == server.getHost() && server.isAvailable() && !server.isRunning() && server.getTemplate() != null && server.getTemplate().isEnabled() && server.getTemplate().canUpdate() && (version != null || !server.getTemplate().requiresVersion())) {
             StackTraceElement[] origin = new Exception().getStackTrace();
 
-            Util.isException(() -> Util.reflect(SubServerContainer.class.getDeclaredField("lock"), server, true));
+            Util.isException(() -> Util.reflect(SubServerContainer.class.getDeclaredField("updating"), server, true));
 
             CreatorTask task = new CreatorTask(player, server, version, x -> {
-                Util.isException(() -> Util.reflect(SubServerContainer.class.getDeclaredField("lock"), server, false));
+                Util.isException(() -> Util.reflect(SubServerContainer.class.getDeclaredField("updating"), server, false));
                 if (callback != null && x != null) try {
                     callback.run(x);
                 } catch (Throwable e) {

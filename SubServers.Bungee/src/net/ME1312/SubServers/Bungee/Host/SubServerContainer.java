@@ -16,7 +16,8 @@ import java.util.*;
 public abstract class SubServerContainer extends ServerContainer implements SubServer {
     private List<NamedContainer<String, String>> incompatibilities = new ArrayList<NamedContainer<String, String>>();
     private String template = null;
-    private boolean lock;
+    protected boolean started;
+    private boolean updating;
 
     /**
      * Creates a SubServer
@@ -59,7 +60,7 @@ public abstract class SubServerContainer extends ServerContainer implements SubS
 
     @Override
     public boolean isAvailable() {
-        return !lock && getHost().isAvailable();
+        return !updating && getHost().isAvailable();
     }
 
     @Override

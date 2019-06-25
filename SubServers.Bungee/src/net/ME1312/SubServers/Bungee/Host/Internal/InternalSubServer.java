@@ -119,6 +119,7 @@ public class InternalSubServer extends SubServerContainer {
 
     private void run() {
         allowrestart = true;
+        started = false;
         try {
             ProcessBuilder pb = new ProcessBuilder().command(Executable.parse(host.getCreator().getBashDirectory(), executable)).directory(directory);
             pb.environment().put("name", getName());
@@ -142,12 +143,13 @@ public class InternalSubServer extends SubServerContainer {
             allowrestart = false;
         }
 
-        SubStoppedEvent event = new SubStoppedEvent(this);
-        host.plugin.getPluginManager().callEvent(event);
         Logger.get("SubServers").info(getName() + " has stopped");
         process = null;
         command = null;
         history.clear();
+
+        SubStoppedEvent event = new SubStoppedEvent(this);
+        host.plugin.getPluginManager().callEvent(event);
 
         if (stopaction == StopAction.REMOVE_SERVER || stopaction == StopAction.RECYCLE_SERVER || stopaction == StopAction.DELETE_SERVER) {
             try {

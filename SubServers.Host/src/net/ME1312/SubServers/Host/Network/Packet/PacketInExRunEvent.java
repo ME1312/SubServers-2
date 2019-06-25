@@ -73,6 +73,13 @@ public class PacketInExRunEvent implements PacketObjectIn<Integer> {
                 callback("SubStartEvent", this);
             }
         });
+        callback("SubStartedEvent", new Callback<ObjectMap<String>>() {
+            @Override
+            public void run(ObjectMap<String> data) {
+                GalaxiEngine.getInstance().getPluginManager().executeEvent(new SubStartedEvent(data.getRawString("server")));
+                callback("SubStartedEvent", this);
+            }
+        });
         callback("SubStopEvent", new Callback<ObjectMap<String>>() {
             @Override
             public void run(ObjectMap<String> data) {

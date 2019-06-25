@@ -25,12 +25,18 @@ public abstract class SubServerController {
         control = new SubServerContainer(host, name, port, motd, hidden, restricted) {
             @Override
             public boolean start() {
-                return SubServerController.this.start();
+                if (SubServerController.this.start()) {
+                    started = false;
+                    return true;
+                } else return false;
             }
 
             @Override
             public boolean start(UUID player) {
-                return SubServerController.this.start(player);
+                if (SubServerController.this.start(player)) {
+                    started = false;
+                    return true;
+                } else return false;
             }
 
             @Override

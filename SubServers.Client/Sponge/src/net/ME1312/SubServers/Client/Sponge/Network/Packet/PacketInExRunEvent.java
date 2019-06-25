@@ -75,6 +75,13 @@ public class PacketInExRunEvent implements PacketObjectIn<Integer> {
                 callback("SubStartEvent", this);
             }
         });
+        callback("SubStartedEvent", new Callback<ObjectMap<String>>() {
+            @Override
+            public void run(ObjectMap<String> data) {
+                Sponge.getEventManager().post(new SubStartedEvent(data.getString("server")));
+                callback("SubStartedEvent", this);
+            }
+        });
         callback("SubStopEvent", new Callback<ObjectMap<String>>() {
             @Override
             public void run(ObjectMap<String> data) {
