@@ -115,6 +115,7 @@
               <background color="-12236470"/>
               <contentAreaFilled value="false"/>
               <focusPainted value="false"/>
+              <font size="12"/>
               <foreground color="-1"/>
               <opaque value="true"/>
               <text value="  Next  "/>
@@ -128,6 +129,7 @@
               <background color="-12236470"/>
               <contentAreaFilled value="false"/>
               <focusPainted value="false"/>
+              <font size="12"/>
               <foreground color="-1"/>
               <opaque value="true"/>
               <text value="  Previous  "/>
@@ -141,6 +143,7 @@
               <background color="-12236470"/>
               <contentAreaFilled value="false"/>
               <focusPainted value="false"/>
+              <font size="12"/>
               <foreground color="-1"/>
               <opaque value="true"/>
               <text value="  Done  "/>

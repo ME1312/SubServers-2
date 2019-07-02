@@ -31,6 +31,7 @@ public final class ConsoleWindow implements SubLogFilter {
     private static final String RESET_VALUE = "\n\u00A0\n\u00A0";
     private ConsolePlugin plugin;
     private JFrame window;
+    private double scale = 1.0;
     private JPanel panel;
     private JTextField input;
     private boolean ifocus = false;
@@ -50,7 +51,7 @@ public final class ConsoleWindow implements SubLogFilter {
     private boolean running = true;
     private LinkedList<Object> messages = new LinkedList<Object>();
     private SubLogger logger;
-    private int fontSize = 12;
+    private int fontSize;
     private File file = null;
     private FileOutputStream filewriter = null;
     private List<Runnable> spost = new LinkedList<Runnable>();
@@ -130,6 +131,24 @@ public final class ConsoleWindow implements SubLogFilter {
                             findO = 0;
                         }
                         break;
+                    case KeyEvent.VK_F:
+                        if (kpressed[KeyEvent.VK_SHIFT] == Boolean.TRUE) {
+                            boolean open = false;
+                            if (ifocus) {
+                                findT.setText(input.getSelectedText());
+                                open = true;
+                            } else if (log.hasFocus()) {
+                                findT.setText(log.getSelectedText());
+                                open = true;
+                            }
+                            if (open) {
+                                findI = 0;
+                                findO = 0;
+                                ConsoleWindow.this.find.setVisible(true);
+                                ConsoleWindow.this.find(true);
+                            }
+                        }
+                        break;
                     case KeyEvent.VK_ENTER:
                         if (find.isVisible() && !ifocus)
                             ConsoleWindow.this.find(kpressed[KeyEvent.VK_SHIFT] != Boolean.TRUE);
@@ -157,6 +176,14 @@ public final class ConsoleWindow implements SubLogFilter {
         }
 
         window = new JFrame();
+        Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
+        if (Float.parseFloat(System.getProperty("java.class.version")) < 53.0) { // Automatic scaling for Java 8
+            if (screen.getWidth() < screen.getHeight()) {
+                if (screen.getWidth() > 1920) scale = screen.getWidth() / 1920;
+            } else {
+                if (screen.getHeight() > 1080) scale = screen.getHeight() / 1080;
+            }
+        }
 
         JMenuBar jMenu = new JMenuBar();
         JMenu menu = new JMenu("\u00A0Log\u00A0");
@@ -298,7 +325,7 @@ public final class ConsoleWindow implements SubLogFilter {
             @Override
             public void actionPerformed(ActionEvent event) {
                 HTMLDocument doc = (HTMLDocument) log.getDocument();
-                fontSize = 12;
+                fontSize = (int) (12 * scale);
                 doc.getStyleSheet().addRule("body {font-size: " + fontSize + ";}\n");
                 ConsoleWindow.this.hScroll();
             }
@@ -310,7 +337,7 @@ public final class ConsoleWindow implements SubLogFilter {
             @Override
             public void actionPerformed(ActionEvent event) {
                 HTMLDocument doc = (HTMLDocument) log.getDocument();
-                fontSize += 2;
+                fontSize += 2 * scale;
                 doc.getStyleSheet().addRule("body {font-size: " + fontSize + ";}\n");
                 ConsoleWindow.this.hScroll();
             }
@@ -322,7 +349,7 @@ public final class ConsoleWindow implements SubLogFilter {
             @Override
             public void actionPerformed(ActionEvent event) {
                 HTMLDocument doc = (HTMLDocument) log.getDocument();
-                fontSize -= 2;
+                fontSize -= 2 * scale;
                 doc.getStyleSheet().addRule("body {font-size: " + fontSize + ";}\n");
                 ConsoleWindow.this.hScroll();
             }
@@ -341,10 +368,11 @@ public final class ConsoleWindow implements SubLogFilter {
         });
         window.setTitle(logger.getName() + " \u2014 SubServers 2");
         window.setSize(1024, 576);
-        Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize();
-        int x = (int) ((dimension.getWidth() - window.getWidth()) / 2);
-        int y = (int) ((dimension.getHeight() - window.getHeight()) / 2);
-        window.setLocation(x, y);
+        window.setSize((int) (1024 * scale), (int) (576 * scale));
+        window.setLocation(
+                (int) ((screen.getWidth() - window.getWidth()) / 2),
+                (int) ((screen.getHeight() - window.getHeight()) / 2)
+        );
         window.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         window.addWindowListener(new WindowAdapter() {
             @Override
@@ -363,16 +391,17 @@ public final class ConsoleWindow implements SubLogFilter {
         log.setContentType("text/html");
         log.setEditorKit(new HTMLEditorKit());
         StyleSheet style = new StyleSheet();
+        fontSize = (int) (12 * scale);
         String font;
         try {
             Font f = Font.createFont(Font.TRUETYPE_FONT, ConsoleWindow.class.getResourceAsStream("/net/ME1312/SubServers/Console/ConsoleFont.ttf"));
             GraphicsEnvironment.getLocalGraphicsEnvironment().registerFont(f);
             font = f.getFontName();
-            input.setFont(f.deriveFont(14f));
+            input.setFont(f.deriveFont((float) (14 * scale)));
         } catch (Exception e) {
             font = "Courier";
         }
-        style.addRule("body {color: #dcdcdc; font-family: " + font + "; font-size: 12;}\n");
+        style.addRule("body {color: #dcdcdc; font-family: " + font + "; font-size: " + fontSize + ";}\n");
         log.setDocument(new HTMLDocument(style));
         log.setBorder(BorderFactory.createLineBorder(new Color(40, 44, 45)));
         new TextFieldPopup(log, false);
@@ -398,7 +427,9 @@ public final class ConsoleWindow implements SubLogFilter {
 
 
         popup = new TextFieldPopup(input, true);
-        input.setBorder(BorderFactory.createLineBorder(new Color(40, 44, 45), 4));
+        input.setFont(input.getFont().deriveFont((float) (14 * scale)));
+        input.getPreferredSize().setSize(input.getPreferredSize().getWidth(), input.getPreferredSize().getHeight() * scale);
+        input.setBorder(BorderFactory.createLineBorder(new Color(40, 44, 45), (int) (4 * scale)));
         input.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent event) {
@@ -487,7 +518,9 @@ public final class ConsoleWindow implements SubLogFilter {
         });
 
         new TextFieldPopup(findT, false);
-        findT.setBorder(BorderFactory.createLineBorder(new Color(40, 44, 45), 4));
+        findT.setFont(findT.getFont().deriveFont((float) (findT.getFont().getSize() * scale)));
+        findT.getPreferredSize().setSize(findT.getPreferredSize().getWidth(), findT.getPreferredSize().getHeight() * scale);
+        findT.setBorder(BorderFactory.createLineBorder(new Color(40, 44, 45), (int) (4 * scale)));
         ((AbstractDocument) findT.getDocument()).setDocumentFilter(new DocumentFilter() {
             @Override
             public void insertString(FilterBypass fb, int offset, String string, AttributeSet attr) throws BadLocationException {
@@ -510,6 +543,7 @@ public final class ConsoleWindow implements SubLogFilter {
                 findO = 0;
             }
         });
+        findP.setFont(findP.getFont().deriveFont((float) (findP.getFont().getSize() * scale)));
         findP.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
@@ -517,7 +551,8 @@ public final class ConsoleWindow implements SubLogFilter {
                 else findP.setBackground(new Color(69, 73, 74));
             }
         });
-        findP.setBorder(new ButtonBorder(40, 44, 45, 4));
+        findP.setBorder(new ButtonBorder(40, 44, 45, (int) (4 * scale)));
+        findN.setFont(findN.getFont().deriveFont((float) (findN.getFont().getSize() * scale)));
         findP.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent event) {
@@ -531,13 +566,14 @@ public final class ConsoleWindow implements SubLogFilter {
                 else findN.setBackground(new Color(69, 73, 74));
             }
         });
-        findN.setBorder(new ButtonBorder(40, 44, 45, 4));
+        findN.setBorder(new ButtonBorder(40, 44, 45, (int) (4 * scale)));
         findN.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent event) {
                 ConsoleWindow.this.find(true);
             }
         });
+        findD.setFont(findD.getFont().deriveFont((float) (findD.getFont().getSize() * scale)));
         findD.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
@@ -545,7 +581,7 @@ public final class ConsoleWindow implements SubLogFilter {
                 else findD.setBackground(new Color(69, 73, 74));
             }
         });
-        findD.setBorder(new ButtonBorder(40, 44, 45, 4));
+        findD.setBorder(new ButtonBorder(40, 44, 45, (int) (4 * scale)));
         findD.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent event) {
