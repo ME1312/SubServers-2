@@ -4,6 +4,7 @@ import com.google.common.collect.Range;
 import com.google.gson.Gson;
 import net.ME1312.Galaxi.Library.*;
 import net.ME1312.Galaxi.Library.Callback.Callback;
+import net.ME1312.Galaxi.Library.Callback.ReturnCallback;
 import net.ME1312.Galaxi.Library.Config.YAMLSection;
 import net.ME1312.Galaxi.Library.Map.ObjectMapValue;
 import net.ME1312.SubServers.Bungee.Event.SubCreateEvent;
@@ -199,7 +200,12 @@ public class InternalSubCreator extends SubCreator {
         }
 
         public void run() {
-            File dir = (update != null)?new File(update.getFullPath()):new File(host.getPath(), name);
+            ReturnCallback<Object, Object> conversion = obj -> convert(obj, new NamedContainer<>("$player$", (player == null)?"":player.toString()), new NamedContainer<>("$name$", name),
+                    new NamedContainer<>("$template$", template.getName()), new NamedContainer<>("$type$", template.getType().toString()), new NamedContainer<>("$version$", (version != null)?version.toString().replace(" ", "@"):""),
+                    new NamedContainer<>("$address$", host.getAddress().getHostAddress()), new NamedContainer<>("$port$", Integer.toString(port)));
+
+            File dir = (update != null)?new File(update.getFullPath()):new File(host.getPath(),
+                    (template.getConfigOptions().contains("Directory"))?conversion.run(template.getConfigOptions().getRawString("Directory")).toString():name);
             dir.mkdirs();
             ObjectMap<String> server = new ObjectMap<String>();
             ObjectMap<String> config;
@@ -222,9 +228,7 @@ public class InternalSubCreator extends SubCreator {
                         if (host.plugin.exServers.keySet().contains(name.toLowerCase()))
                             host.plugin.exServers.remove(name.toLowerCase());
 
-                        config = new ObjectMap<String>((Map<String, ?>) convert(config.get(), new NamedContainer<>("$player$", (player == null)?"":player.toString()), new NamedContainer<>("$name$", name),
-                                new NamedContainer<>("$template$", template.getName()), new NamedContainer<>("$type$", template.getType().toString()), new NamedContainer<>("$version$", version.toString().replace(" ", "@")),
-                                new NamedContainer<>("$address$", host.getAddress().getHostAddress()), new NamedContainer<>("$port$", Integer.toString(port))));
+                        config = new ObjectMap<String>((Map<String, ?>) conversion.run(config.get()));
 
                         server.set("Enabled", true);
                         server.set("Display", "");

@@ -18,6 +18,7 @@ public class PacketExCreateServer implements PacketObjectIn<Integer>, PacketObje
     private int response;
     private String message;
     private ObjectMap<String> info;
+    private String address;
     private UUID tracker;
 
     /**
@@ -35,14 +36,30 @@ public class PacketExCreateServer implements PacketObjectIn<Integer>, PacketObje
      *
      * @param response Response ID
      * @param message Message
-     * @param info Creator Info
      * @param tracker Receiver ID
      */
-    public PacketExCreateServer(int response, String message, ObjectMap<String> info, UUID tracker) {
+    public PacketExCreateServer(int response, String message, UUID tracker) {
+        if (Util.isNull(response)) throw new NullPointerException();
+        this.response = response;
+        this.message = message;
+        this.tracker = tracker;
+    }
+
+    /**
+     * New PacketCreateServer (Out)
+     *
+     * @param response Response ID
+     * @param message Message
+     * @param info Creator Info
+     * @param address Internal Server Address
+     * @param tracker Receiver ID
+     */
+    public PacketExCreateServer(int response, String message, ObjectMap<String> info, String address, UUID tracker) {
         if (Util.isNull(response)) throw new NullPointerException();
         this.response = response;
         this.message = message;
         this.info = info;
+        this.address = address;
         this.tracker = tracker;
     }
 
@@ -51,8 +68,9 @@ public class PacketExCreateServer implements PacketObjectIn<Integer>, PacketObje
         ObjectMap<Integer> data = new ObjectMap<Integer>();
         if (tracker != null) data.set(0x0000, tracker);
         data.set(0x0001, response);
-        data.set(0x0002, info);
-        if (message != null) data.set(0x0003, message);
+        if (info != null) data.set(0x0002, info);
+        if (address != null) data.set(0x0003, address);
+        if (message != null) data.set(0x0004, message);
         return data;
     }
 
@@ -66,16 +84,17 @@ public class PacketExCreateServer implements PacketObjectIn<Integer>, PacketObje
                 } else {
                     host.creator.terminate();
                 }
-                client.sendPacket(new PacketExCreateServer(1, null, null, tracker));
+                client.sendPacket(new PacketExCreateServer(1, null, tracker));
             } else {
                 String name =     data.getRawString(0x0002);
                 String template = data.getRawString(0x0003);
                 Version version =    (data.contains(0x0004)?data.getVersion(0x0004):null);
                 Integer port =          data.getInt(0x0005);
-                UUID log =             data.getUUID(0x0006);
+                String dir =      data.getRawString(0x0006);
+                UUID log =             data.getUUID(0x0007);
 
                 host.creator.create(name, host.templates.get(template.toLowerCase()), version,
-                        port, log, tracker);
+                        port, dir, log, tracker);
             }
         } catch (Throwable e) {
             host.log.error.println(e);

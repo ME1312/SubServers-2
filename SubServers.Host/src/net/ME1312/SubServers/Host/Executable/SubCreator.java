@@ -201,18 +201,20 @@ public class SubCreator {
         private final ServerTemplate template;
         private final Version version;
         private final int port;
+        private final File dir;
         private final UUID address;
         private final UUID tracker;
         private final SubLogger log;
         private Process process;
 
-        private CreatorTask(String name, ServerTemplate template, Version version, int port, UUID address, UUID tracker) {
+        private CreatorTask(String name, ServerTemplate template, Version version, int port, String dir, UUID address, UUID tracker) {
             super(SubAPI.getInstance().getAppInfo().getName() + "::SubCreator_Process_Handler(" + name + ')');
             this.update = host.servers.getOrDefault(name.toLowerCase(), null);
             this.name = name;
             this.template = template;
             this.version = version;
             this.port = port;
+            this.dir = new File(host.host.getRawString("Directory"), dir.replace("$address$", host.config.get().getMap("Settings").getRawString("Server-Bind")));
             this.log = new SubLogger(null, this, name + File.separator + ((update == null)?"Creator":"Updater"), address, new Container<Boolean>(true), null);
             this.address = address;
             this.tracker = tracker;
@@ -351,7 +353,6 @@ public class SubCreator {
         }
 
         public void run() {
-            File dir = new File(host.host.getRawString("Directory"), (update != null)?update.getDirectory():name);
             dir.mkdirs();
             ObjectMap<String> server;
             try {
@@ -365,12 +366,11 @@ public class SubCreator {
                 log.logger.error.println(e);
             }
             ObjectMap<String> config = template.getConfigOptions().clone();
-            config.set("\033address", host.config.get().getMap("Settings").getRawString("Server-Bind"));
             if (server != null) {
-                ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketExCreateServer(0, null, config, tracker));
+                ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketExCreateServer(0, null, config, host.config.get().getMap("Settings").getRawString("Server-Bind"), tracker));
             } else {
                 log.logger.info.println("Couldn't build the server jar. Check the SubCreator logs for more detail.");
-                ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketExCreateServer(-1, "Couldn't build the server jar. Check the SubCreator logs for more detail.", config, tracker));
+                ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketExCreateServer(-1, "Couldn't build the server jar. Check the SubCreator logs for more detail.", tracker));
             }
             SubCreator.this.thread.remove(name.toLowerCase());
         }
@@ -387,9 +387,9 @@ public class SubCreator {
         this.thread = new TreeMap<>();
     }
 
-    public boolean create(String name, ServerTemplate template, Version version, int port, UUID address, UUID tracker) {
-        if (Util.isNull(name, template, port, address)) throw new NullPointerException();
-        CreatorTask task = new CreatorTask(name, template, version, port, address, tracker);
+    public boolean create(String name, ServerTemplate template, Version version, int port, String dir, UUID address, UUID tracker) {
+        if (Util.isNull(name, template, port, dir, address)) throw new NullPointerException();
+        CreatorTask task = new CreatorTask(name, template, version, port, dir, address, tracker);
         this.thread.put(name.toLowerCase(), task);
         task.start();
         return true;

@@ -3,6 +3,7 @@ package net.ME1312.SubServers.Bungee.Host.External;
 import com.google.common.collect.Range;
 import net.ME1312.Galaxi.Library.*;
 import net.ME1312.Galaxi.Library.Callback.Callback;
+import net.ME1312.Galaxi.Library.Callback.ReturnCallback;
 import net.ME1312.SubData.Server.SubDataClient;
 import net.ME1312.SubServers.Bungee.Event.SubCreateEvent;
 import net.ME1312.SubServers.Bungee.Host.*;
@@ -94,18 +95,22 @@ public class ExternalSubCreator extends SubCreator {
             final SubCreateEvent event = new SubCreateEvent(player, host, name, template, version, port);
             host.plugin.getPluginManager().callEvent(event);
             if (!event.isCancelled()) {
+                Container<String> address = new Container<>("$address$");
+                ReturnCallback<Object, Object> conversion = obj -> convert(obj, new NamedContainer<>("$player$", (player == null)?"":player.toString()), new NamedContainer<>("$name$", name),
+                        new NamedContainer<>("$template$", template.getName()), new NamedContainer<>("$type$", template.getType().toString()), new NamedContainer<>("$version$", (version != null)?version.toString().replace(" ", "@"):""),
+                        new NamedContainer<>("$address$", address.get()), new NamedContainer<>("$port$", Integer.toString(fport)));
+
                 logger.start();
-                host.queue(new PacketExCreateServer(name, template, version, port, logger.getExternalAddress(), data -> {
+                host.queue(new PacketExCreateServer(name, template, version, port, (template.getConfigOptions().contains("Directory"))?conversion.run(template.getConfigOptions().getRawString("Directory")).toString():name, logger.getExternalAddress(), data -> {
                     try {
                         if (data.getInt(0x0001) == 0) {
                             Logger.get(prefix).info("Saving...");
+                            address.set(data.getRawString(0x0003));
                             if (host.plugin.exServers.keySet().contains(name.toLowerCase()))
                                 host.plugin.exServers.remove(name.toLowerCase());
 
                             ObjectMap<String> server = new ObjectMap<String>();
-                            ObjectMap<String> config = new ObjectMap<String>((Map<String, ?>) convert(data.getMap(0x0002).get(), new NamedContainer<>("$player$", (player == null)?"":player.toString()), new NamedContainer<>("$name$", name),
-                                    new NamedContainer<>("$template$", template.getName()), new NamedContainer<>("$type$", template.getType().toString()), new NamedContainer<>("$version$", (version != null)?version.toString().replace(" ", "@"):""),
-                                    new NamedContainer<>("$address$", new ObjectMap<String>((Map<String, ?>) data.getObject(0x0002)).getRawString("\033address", "null")), new NamedContainer<>("$port$", Integer.toString(fport))));
+                            ObjectMap<String> config = new ObjectMap<String>((Map<String, ?>) conversion.run(data.getMap(0x0002).get()));
 
                             config.remove("\033address");
 
@@ -149,7 +154,7 @@ public class ExternalSubCreator extends SubCreator {
                                 ew.printStackTrace();
                             }
                         } else {
-                            Logger.get(prefix).info(data.getString(0x0003));
+                            Logger.get(prefix).info(data.getString(0x0004));
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -216,7 +221,7 @@ public class ExternalSubCreator extends SubCreator {
                                 ew.printStackTrace();
                             }
                         } else {
-                            Logger.get(prefix).info(data.getString(0x0003));
+                            Logger.get(prefix).info(data.getString(0x0004));
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
