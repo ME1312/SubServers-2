@@ -7,7 +7,6 @@ import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.NamedContainer;
 import net.ME1312.Galaxi.Library.UniversalFile;
 import net.ME1312.Galaxi.Library.Util;
-import net.ME1312.Galaxi.Plugin.PluginInfo;
 import net.ME1312.SubData.Server.*;
 import net.ME1312.SubData.Server.Encryption.AES;
 import net.ME1312.SubData.Server.Encryption.RSA;
@@ -49,14 +48,12 @@ import java.nio.file.Files;
 import java.security.SecureRandom;
 import java.text.DecimalFormat;
 import java.util.*;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 /**
  * Main Plugin Class
  */
-public final class SubPlugin extends BungeeCord implements Listener {
+public final class SubProxy extends BungeeCord implements Listener {
     protected final LinkedHashMap<String, LinkedHashMap<String, String>> exLang = new LinkedHashMap<String, LinkedHashMap<String, String>>();
     protected final HashMap<String, Class<? extends Host>> hostDrivers = new HashMap<String, Class<? extends Host>>();
     public final HashMap<String, Proxy> proxies = new HashMap<String, Proxy>();
@@ -87,7 +84,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
     private static BigInteger lastSignature = BigInteger.valueOf(-1);
 
     @SuppressWarnings("unchecked")
-    protected SubPlugin(PrintStream out, boolean isPatched) throws Exception {
+    protected SubProxy(PrintStream out, boolean isPatched) throws Exception {
         this.isPatched = isPatched;
         this.isGalaxi = !Util.isException(() ->
                 Util.reflect(Class.forName("net.ME1312.Galaxi.Engine.PluginManager").getMethod("findClasses", Class.class),
@@ -99,7 +96,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
 
         this.out = out;
         if (!(new UniversalFile(dir, "config.yml").exists())) {
-            Util.copyFromJar(SubPlugin.class.getClassLoader(), "net/ME1312/SubServers/Bungee/Library/Files/bungee.yml", new UniversalFile(dir, "config.yml").getPath());
+            Util.copyFromJar(SubProxy.class.getClassLoader(), "net/ME1312/SubServers/Bungee/Library/Files/bungee.yml", new UniversalFile(dir, "config.yml").getPath());
             YAMLConfig tmp = new YAMLConfig(new UniversalFile("config.yml"));
             tmp.get().set("stats", UUID.randomUUID().toString());
             tmp.save();
@@ -122,36 +119,36 @@ public final class SubPlugin extends BungeeCord implements Listener {
         if (!(new UniversalFile(dir, "Templates").exists())) {
             new UniversalFile(dir, "Templates").mkdirs();
 
-            Util.unzip(SubPlugin.class.getResourceAsStream("/net/ME1312/SubServers/Bungee/Library/Files/Templates/vanilla.zip"), new UniversalFile(dir, "Templates"));
+            Util.unzip(SubProxy.class.getResourceAsStream("/net/ME1312/SubServers/Bungee/Library/Files/Templates/vanilla.zip"), new UniversalFile(dir, "Templates"));
             Logger.get("SubServers").info("Created ./SubServers/Templates/Vanilla");
 
-            Util.unzip(SubPlugin.class.getResourceAsStream("/net/ME1312/SubServers/Bungee/Library/Files/Templates/spigot.zip"), new UniversalFile(dir, "Templates"));
+            Util.unzip(SubProxy.class.getResourceAsStream("/net/ME1312/SubServers/Bungee/Library/Files/Templates/spigot.zip"), new UniversalFile(dir, "Templates"));
             Logger.get("SubServers").info("Created ./SubServers/Templates/Spigot");
 
-            Util.unzip(SubPlugin.class.getResourceAsStream("/net/ME1312/SubServers/Bungee/Library/Files/Templates/forge.zip"), new UniversalFile(dir, "Templates"));
+            Util.unzip(SubProxy.class.getResourceAsStream("/net/ME1312/SubServers/Bungee/Library/Files/Templates/forge.zip"), new UniversalFile(dir, "Templates"));
             Logger.get("SubServers").info("Created ./SubServers/Templates/Forge");
 
-            Util.unzip(SubPlugin.class.getResourceAsStream("/net/ME1312/SubServers/Bungee/Library/Files/Templates/sponge.zip"), new UniversalFile(dir, "Templates"));
+            Util.unzip(SubProxy.class.getResourceAsStream("/net/ME1312/SubServers/Bungee/Library/Files/Templates/sponge.zip"), new UniversalFile(dir, "Templates"));
             Logger.get("SubServers").info("Created ./SubServers/Templates/Sponge");
         } else {
             if (new UniversalFile(dir, "Templates:Vanilla:template.yml").exists() && ((new YAMLConfig(new UniversalFile(dir, "Templates:Vanilla:template.yml"))).get().getVersion("Version", new Version(0))).compareTo(new Version("2.14.2a+")) != 0) {
                 Files.move(new UniversalFile(dir, "Templates:Vanilla").toPath(), new UniversalFile(dir, "Templates:Vanilla.old" + Math.round(Math.random() * 100000) + ".x").toPath());
-                Util.unzip(SubPlugin.class.getResourceAsStream("/net/ME1312/SubServers/Bungee/Library/Files/Templates/vanilla.zip"), new UniversalFile(dir, "Templates"));
+                Util.unzip(SubProxy.class.getResourceAsStream("/net/ME1312/SubServers/Bungee/Library/Files/Templates/vanilla.zip"), new UniversalFile(dir, "Templates"));
                 Logger.get("SubServers").info("Updated ./SubServers/Templates/Vanilla");
             }
             if (new UniversalFile(dir, "Templates:Spigot:template.yml").exists() && ((new YAMLConfig(new UniversalFile(dir, "Templates:Spigot:template.yml"))).get().getVersion("Version", new Version(0))).compareTo(new Version("2.14.2a+")) != 0) {
                 Files.move(new UniversalFile(dir, "Templates:Spigot").toPath(), new UniversalFile(dir, "Templates:Spigot.old" + Math.round(Math.random() * 100000) + ".x").toPath());
-                Util.unzip(SubPlugin.class.getResourceAsStream("/net/ME1312/SubServers/Bungee/Library/Files/Templates/spigot.zip"), new UniversalFile(dir, "Templates"));
+                Util.unzip(SubProxy.class.getResourceAsStream("/net/ME1312/SubServers/Bungee/Library/Files/Templates/spigot.zip"), new UniversalFile(dir, "Templates"));
                 Logger.get("SubServers").info("Updated ./SubServers/Templates/Spigot");
             }
             if (new UniversalFile(dir, "Templates:Forge:template.yml").exists() && ((new YAMLConfig(new UniversalFile(dir, "Templates:Forge:template.yml"))).get().getVersion("Version", new Version(0))).compareTo(new Version("2.14.2a+")) != 0) {
                 Files.move(new UniversalFile(dir, "Templates:Forge").toPath(), new UniversalFile(dir, "Templates:Forge.old" + Math.round(Math.random() * 100000) + ".x").toPath());
-                Util.unzip(SubPlugin.class.getResourceAsStream("/net/ME1312/SubServers/Bungee/Library/Files/Templates/forge.zip"), new UniversalFile(dir, "Templates"));
+                Util.unzip(SubProxy.class.getResourceAsStream("/net/ME1312/SubServers/Bungee/Library/Files/Templates/forge.zip"), new UniversalFile(dir, "Templates"));
                 Logger.get("SubServers").info("Updated ./SubServers/Templates/Forge");
             }
             if (new UniversalFile(dir, "Templates:Sponge:template.yml").exists() && ((new YAMLConfig(new UniversalFile(dir, "Templates:Sponge:template.yml"))).get().getVersion("Version", new Version(0))).compareTo(new Version("2.14.2a+")) != 0) {
                 Files.move(new UniversalFile(dir, "Templates:Sponge").toPath(), new UniversalFile(dir, "Templates:Sponge.old" + Math.round(Math.random() * 100000) + ".x").toPath());
-                Util.unzip(SubPlugin.class.getResourceAsStream("/net/ME1312/SubServers/Bungee/Library/Files/Templates/sponge.zip"), new UniversalFile(dir, "Templates"));
+                Util.unzip(SubProxy.class.getResourceAsStream("/net/ME1312/SubServers/Bungee/Library/Files/Templates/sponge.zip"), new UniversalFile(dir, "Templates"));
                 Logger.get("SubServers").info("Updated ./SubServers/Templates/Sponge");
             }
         }
@@ -228,7 +225,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
 
         subprotocol = SubProtocol.get();
         Logger.get("SubServers").info("Loading BungeeCord Libraries...");
-        if (isGalaxi) Util.reflect(net.ME1312.SubServers.Bungee.Library.Compatibility.GalaxiEventListener.class.getConstructor(SubPlugin.class), this);
+        if (isGalaxi) Util.reflect(net.ME1312.SubServers.Bungee.Library.Compatibility.GalaxiEventListener.class.getConstructor(SubProxy.class), this);
     }
 
     /**
@@ -283,63 +280,13 @@ public final class SubPlugin extends BungeeCord implements Listener {
         for (String key : lang.get().getMap("Lang").getKeys())
             api.setLang("SubServers", key, ChatColor.translateAlternateColorCodes('&', lang.get().getMap("Lang").getString(key)));
 
-        if (subdata == null || // SubData Server must be reset
+        if (subdata != null && ( // SubData Server must be reset
                 !config.get().getMap("Settings").getMap("SubData").getRawString("Address", "127.0.0.1:4391").equals(prevconfig.getMap("Settings").getMap("SubData").getRawString("Address", "127.0.0.1:4391")) ||
                 !config.get().getMap("Settings").getMap("SubData").getRawString("Encryption", "NONE").equals(prevconfig.getMap("Settings").getMap("SubData").getRawString("Encryption", "NONE"))
-                ) {
-            if (subdata != null) {
-                subdata.close();
-                Util.isException(subdata::waitFor);
-            }
-
-            subprotocol.unregisterCipher("AES");
-            subprotocol.unregisterCipher("AES-128");
-            subprotocol.unregisterCipher("AES-192");
-            subprotocol.unregisterCipher("AES-256");
-            subprotocol.unregisterCipher("RSA");
-            String cipher = config.get().getMap("Settings").getMap("SubData").getRawString("Encryption", "NULL");
-            String[] ciphers = (cipher.contains("/"))?cipher.split("/"):new String[]{cipher};
-            if (ciphers[0].equals("AES") || ciphers[0].equals("AES-128") || ciphers[0].equals("AES-192") || ciphers[0].equals("AES-256")) {
-                if (config.get().getMap("Settings").getMap("SubData").getRawString("Password", "").length() == 0) {
-                    byte[] bytes = new byte[32];
-                    new SecureRandom().nextBytes(bytes);
-                    String random = Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
-                    if (random.length() > bytes.length) random = random.substring(0, bytes.length);
-                    config.get().getMap("Settings").getMap("SubData").set("Password", random);
-                    config.save();
-                }
-
-                subprotocol.registerCipher("AES", new AES(128, config.get().getMap("Settings").getMap("SubData").getRawString("Password")));
-                subprotocol.registerCipher("AES-128", new AES(128, config.get().getMap("Settings").getMap("SubData").getRawString("Password")));
-                subprotocol.registerCipher("AES-192", new AES(192, config.get().getMap("Settings").getMap("SubData").getRawString("Password")));
-                subprotocol.registerCipher("AES-256", new AES(256, config.get().getMap("Settings").getMap("SubData").getRawString("Password")));
-
-                Logger.get("SubData").info("Encrypting SubData with AES:");
-                Logger.get("SubData").info("Use the password in config.yml to allow clients to connect");
-            } else if (ciphers[0].equals("RSA") || ciphers[0].equals("RSA-2048") || ciphers[0].equals("RSA-3072") || ciphers[0].equals("RSA-4096")) {
-                try {
-                    int length = (ciphers[0].contains("-"))?Integer.parseInt(ciphers[0].split("-")[1]):2048;
-                    if (!(new UniversalFile("SubServers:Cache").exists())) new UniversalFile("SubServers:Cache").mkdirs();
-                    subprotocol.registerCipher("RSA", new RSA(length, new UniversalFile("SubServers:Cache:private.rsa.key"), new UniversalFile("SubServers:subdata.rsa.key")));
-                    cipher = "RSA" + cipher.substring(ciphers[0].length());
-
-                    Logger.get("SubData").info("Encrypting SubData with RSA:");
-                    Logger.get("SubData").info("Copy your subdata.rsa.key to clients to allow them to connect");
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-
-            Logger.get("SubData").info("");
-            subdata = subprotocol.open((config.get().getMap("Settings").getMap("SubData").getRawString("Address", "127.0.0.1:4391").split(":")[0].equals("0.0.0.0"))?null:InetAddress.getByName(config.get().getMap("Settings").getMap("SubData").getRawString("Address", "127.0.0.1:4391").split(":")[0]),
-                    Integer.parseInt(config.get().getMap("Settings").getMap("SubData").getRawString("Address", "127.0.0.1:4391").split(":")[1]), cipher);
-        } // Add new entries to Allowed-Connections
-        for (String s : config.get().getMap("Settings").getMap("SubData").getStringList("Allowed-Connections", new ArrayList<String>())) {
-            try {
-                subdata.whitelist(s);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+                )) {
+            subdata.close();
+            Util.isException(subdata::waitFor);
+            subdata = null;
         }
         int proxies = 1;
         if (redis != null) {
@@ -565,6 +512,58 @@ public final class SubPlugin extends BungeeCord implements Listener {
         api.ready = true;
         legServers.clear();
 
+        // Initialize SubData
+        if (subdata == null) {
+            subprotocol.unregisterCipher("AES");
+            subprotocol.unregisterCipher("AES-128");
+            subprotocol.unregisterCipher("AES-192");
+            subprotocol.unregisterCipher("AES-256");
+            subprotocol.unregisterCipher("RSA");
+            String cipher = config.get().getMap("Settings").getMap("SubData").getRawString("Encryption", "NULL");
+            String[] ciphers = (cipher.contains("/"))?cipher.split("/"):new String[]{cipher};
+            if (ciphers[0].equals("AES") || ciphers[0].equals("AES-128") || ciphers[0].equals("AES-192") || ciphers[0].equals("AES-256")) {
+                if (config.get().getMap("Settings").getMap("SubData").getRawString("Password", "").length() == 0) {
+                    byte[] bytes = new byte[32];
+                    new SecureRandom().nextBytes(bytes);
+                    String random = Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
+                    if (random.length() > bytes.length) random = random.substring(0, bytes.length);
+                    config.get().getMap("Settings").getMap("SubData").set("Password", random);
+                    config.save();
+                }
+
+                subprotocol.registerCipher("AES", new AES(128, config.get().getMap("Settings").getMap("SubData").getRawString("Password")));
+                subprotocol.registerCipher("AES-128", new AES(128, config.get().getMap("Settings").getMap("SubData").getRawString("Password")));
+                subprotocol.registerCipher("AES-192", new AES(192, config.get().getMap("Settings").getMap("SubData").getRawString("Password")));
+                subprotocol.registerCipher("AES-256", new AES(256, config.get().getMap("Settings").getMap("SubData").getRawString("Password")));
+
+                Logger.get("SubData").info("Encrypting SubData with AES:");
+                Logger.get("SubData").info("Use the password in config.yml to allow clients to connect");
+            } else if (ciphers[0].equals("RSA") || ciphers[0].equals("RSA-2048") || ciphers[0].equals("RSA-3072") || ciphers[0].equals("RSA-4096")) {
+                try {
+                    int length = (ciphers[0].contains("-"))?Integer.parseInt(ciphers[0].split("-")[1]):2048;
+                    if (!(new UniversalFile("SubServers:Cache").exists())) new UniversalFile("SubServers:Cache").mkdirs();
+                    subprotocol.registerCipher("RSA", new RSA(length, new UniversalFile("SubServers:Cache:private.rsa.key"), new UniversalFile("SubServers:subdata.rsa.key")));
+                    cipher = "RSA" + cipher.substring(ciphers[0].length());
+
+                    Logger.get("SubData").info("Encrypting SubData with RSA:");
+                    Logger.get("SubData").info("Copy your subdata.rsa.key to clients to allow them to connect");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+            Logger.get("SubData").info("");
+            subdata = subprotocol.open((config.get().getMap("Settings").getMap("SubData").getRawString("Address", "127.0.0.1:4391").split(":")[0].equals("0.0.0.0"))?null:InetAddress.getByName(config.get().getMap("Settings").getMap("SubData").getRawString("Address", "127.0.0.1:4391").split(":")[0]),
+                    Integer.parseInt(config.get().getMap("Settings").getMap("SubData").getRawString("Address", "127.0.0.1:4391").split(":")[1]), cipher);
+        } // Add new entries to Allowed-Connections
+        for (String s : config.get().getMap("Settings").getMap("SubData").getStringList("Allowed-Connections", new ArrayList<String>())) {
+            try {
+                subdata.whitelist(s);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
         int plugins = 0;
         List<Runnable> listeners = (status)?api.reloadListeners:api.enableListeners;
         if (listeners.size() > 0) {
@@ -659,7 +658,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
     /**
      * Reset all changes made by startListeners
      *
-     * @see SubPlugin#startListeners()
+     * @see SubProxy#startListeners()
      */
     @Override
     public void stopListeners() {

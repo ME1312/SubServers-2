@@ -2,7 +2,7 @@ package net.ME1312.SubServers.Sync.Library;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import net.ME1312.SubServers.Sync.SubPlugin;
+import net.ME1312.SubServers.Sync.ExProxy;
 import net.md_5.bungee.config.Configuration;
 import net.md_5.bungee.config.ConfigurationProvider;
 import net.md_5.bungee.config.YamlConfiguration;
@@ -13,10 +13,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.nio.file.Path;
 import java.util.*;
-import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.zip.GZIPOutputStream;
 
 /**
@@ -47,7 +45,7 @@ public class Metrics {
     private static final String URL = "https://bStats.org/submitData/bungeecord";
 
     // The plugin
-    private final SubPlugin plugin;
+    private final ExProxy plugin;
 
     // Is bStats enabled on this server?
     private boolean enabled;
@@ -61,7 +59,7 @@ public class Metrics {
     // A list with all known metrics class objects including this one
     private static final List<Object> knownMetricsInstances = new ArrayList<>();
 
-    public Metrics(SubPlugin plugin) {
+    public Metrics(ExProxy plugin) {
         this.plugin = plugin;
 
         try {

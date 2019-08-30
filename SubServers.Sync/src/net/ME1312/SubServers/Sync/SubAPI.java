@@ -5,7 +5,6 @@ import net.ME1312.Galaxi.Library.NamedContainer;
 import net.ME1312.Galaxi.Library.UniversalFile;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubData.Client.DataClient;
-import net.ME1312.SubServers.Sync.Library.*;
 import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubServers.Sync.Network.API.Host;
 import net.ME1312.SubServers.Sync.Network.API.Proxy;
@@ -25,11 +24,11 @@ import java.util.*;
 public final class SubAPI {
     LinkedList<Runnable> enableListeners = new LinkedList<Runnable>();
     LinkedList<Runnable> disableListeners = new LinkedList<Runnable>();
-    private final SubPlugin plugin;
+    private final ExProxy plugin;
     private static SubAPI api;
     String name;
 
-    protected SubAPI(SubPlugin plugin) {
+    protected SubAPI(ExProxy plugin) {
         this.plugin = plugin;
         GAME_VERSION = getGameVersion();
         api = this;
@@ -51,7 +50,7 @@ public final class SubAPI {
      * @return SubPlugin Internals
      */
     @Deprecated
-    public SubPlugin getInternals() {
+    public ExProxy getInternals() {
         return plugin;
     }
 
@@ -636,7 +635,7 @@ public final class SubAPI {
      * @return SubServers Build Signature (or null if unsigned)
      */
     public Version getWrapperBuild() {
-        return (SubPlugin.class.getPackage().getSpecificationTitle() != null)?new Version(SubPlugin.class.getPackage().getSpecificationTitle()):null;
+        return (ExProxy.class.getPackage().getSpecificationTitle() != null)?new Version(ExProxy.class.getPackage().getSpecificationTitle()):null;
     }
 
     /**

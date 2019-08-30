@@ -18,7 +18,7 @@ import net.ME1312.SubServers.Bungee.Network.Packet.PacketExAddServer;
 import net.ME1312.SubServers.Bungee.Network.Packet.PacketExDeleteServer;
 import net.ME1312.SubServers.Bungee.Network.Packet.PacketExRemoveServer;
 import net.ME1312.SubServers.Bungee.Network.Packet.PacketOutExReset;
-import net.ME1312.SubServers.Bungee.SubPlugin;
+import net.ME1312.SubServers.Bungee.SubProxy;
 import net.md_5.bungee.BungeeCord;
 
 import java.net.InetAddress;
@@ -38,7 +38,7 @@ public class ExternalHost extends Host implements ClientHandler {
     private String directory;
     private LinkedList<PacketObjectOut> queue;
     private boolean clean;
-    protected SubPlugin plugin;
+    protected SubProxy plugin;
 
     /**
      * Creates an External Host
@@ -52,7 +52,7 @@ public class ExternalHost extends Host implements ClientHandler {
      * @param directory The runtime directory of your Host
      * @param gitBash The Git Bash directory
      */
-    public ExternalHost(SubPlugin plugin, String name, boolean enabled, Range<Integer> ports, boolean log, InetAddress address, String directory, String gitBash) {
+    public ExternalHost(SubProxy plugin, String name, boolean enabled, Range<Integer> ports, boolean log, InetAddress address, String directory, String gitBash) {
         super(plugin, name, enabled, ports, log, address, directory, gitBash);
         this.plugin = plugin;
         this.name = name;

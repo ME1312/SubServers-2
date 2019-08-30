@@ -4,7 +4,7 @@ import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.SubData.Server.SubDataClient;
 import net.ME1312.SubData.Server.Protocol.PacketObjectOut;
 import net.ME1312.SubData.Server.Protocol.PacketObjectIn;
-import net.ME1312.SubServers.Bungee.SubPlugin;
+import net.ME1312.SubServers.Bungee.SubProxy;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -14,7 +14,7 @@ import java.util.UUID;
  * Download Lang Packet
  */
 public class PacketDownloadLang implements PacketObjectIn<Integer>, PacketObjectOut<Integer> {
-    private SubPlugin plugin;
+    private SubProxy plugin;
     private UUID tracker;
 
     /**
@@ -22,7 +22,7 @@ public class PacketDownloadLang implements PacketObjectIn<Integer>, PacketObject
      *
      * @param plugin SubPlugin
      */
-    public PacketDownloadLang(SubPlugin plugin) {
+    public PacketDownloadLang(SubProxy plugin) {
         this.plugin = plugin;
     }
 
@@ -32,7 +32,7 @@ public class PacketDownloadLang implements PacketObjectIn<Integer>, PacketObject
      * @param plugin SubPlugin
      * @param tracker Receiver ID
      */
-    public PacketDownloadLang(SubPlugin plugin, UUID tracker) {
+    public PacketDownloadLang(SubProxy plugin, UUID tracker) {
         this.plugin = plugin;
         this.tracker = tracker;
     }

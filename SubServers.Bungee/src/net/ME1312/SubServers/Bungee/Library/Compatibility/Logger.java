@@ -1,9 +1,7 @@
 package net.ME1312.SubServers.Bungee.Library.Compatibility;
 
 import net.ME1312.Galaxi.Library.Util;
-import net.ME1312.SubServers.Bungee.SubAPI;
-import net.ME1312.SubServers.Bungee.SubPlugin;
-import net.md_5.bungee.api.ProxyServer;
+import net.ME1312.SubServers.Bungee.SubProxy;
 
 import java.util.HashMap;
 import java.util.logging.Handler;
@@ -14,7 +12,7 @@ import java.util.logging.LogRecord;
  */
 public class Logger {
     private static final HashMap<String, java.util.logging.Logger> existing = new HashMap<String, java.util.logging.Logger>();
-    private static SubPlugin plugin;
+    private static SubProxy plugin;
 
     /**
      * Get a logger

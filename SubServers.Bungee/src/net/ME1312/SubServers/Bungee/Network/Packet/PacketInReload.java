@@ -3,20 +3,20 @@ package net.ME1312.SubServers.Bungee.Network.Packet;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.SubData.Server.Protocol.PacketObjectIn;
 import net.ME1312.SubData.Server.SubDataClient;
-import net.ME1312.SubServers.Bungee.SubPlugin;
+import net.ME1312.SubServers.Bungee.SubProxy;
 
 /**
  * Reload Packet
  */
 public class PacketInReload implements PacketObjectIn<Integer> {
-    private SubPlugin plugin;
+    private SubProxy plugin;
 
     /**
      * New PacketInReload
      *
      * @param plugin Plugin
      */
-    public PacketInReload(SubPlugin plugin) {
+    public PacketInReload(SubProxy plugin) {
         this.plugin = plugin;
     }
 

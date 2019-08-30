@@ -39,10 +39,10 @@ import static net.ME1312.SubServers.Bungee.Library.Compatibility.GalaxiCommand.*
 @SuppressWarnings("deprecation")
 public final class SubCommand extends CommandX {
     static HashMap<UUID, HashMap<ServerInfo, NamedContainer<Long, Boolean>>> players = new HashMap<UUID, HashMap<ServerInfo, NamedContainer<Long, Boolean>>>();
-    private SubPlugin plugin;
+    private SubProxy plugin;
     private String label;
 
-    protected static NamedContainer<SubCommand, CommandX> newInstance(SubPlugin plugin, String command) {
+    protected static NamedContainer<SubCommand, CommandX> newInstance(SubProxy plugin, String command) {
         NamedContainer<SubCommand, CommandX> cmd = new NamedContainer<>(new SubCommand(plugin, command), null);
         CommandX now = cmd.name();
         //if (plugin.api.getGameVersion()[plugin.api.getGameVersion().length - 1].compareTo(new Version("1.13")) >= 0) { // TODO Future Command Validator API?
@@ -52,7 +52,7 @@ public final class SubCommand extends CommandX {
         return cmd;
     }
 
-    private SubCommand(SubPlugin plugin, String command) {
+    private SubCommand(SubProxy plugin, String command) {
         super(command);
         this.plugin = plugin;
         this.label = '/' + command;
@@ -118,7 +118,7 @@ public final class SubCommand extends CommandX {
                     if (galaxi != null)
                         Util.isException(() -> sender.sendMessage("  GalaxiEngine v" + galaxi.toExtendedString() + ((galaxibuild != null)?" (" + galaxibuild + ')':"") + ','));
                     sender.sendMessage("  " + plugin.getBungeeName() + ((plugin.isGalaxi)?" v":" ") + ((bungee != null)?bungee:plugin.getVersion()) + ((bungeebuild != null)?" (" + bungeebuild + ')':"") + ((plugin.isPatched)?" [Patched]":"") + ',');
-                    sender.sendMessage("  SubServers.Bungee v" + SubPlugin.version.toExtendedString() + ((plugin.api.getWrapperBuild() != null)?" (" + plugin.api.getWrapperBuild() + ')':""));
+                    sender.sendMessage("  SubServers.Bungee v" + SubProxy.version.toExtendedString() + ((plugin.api.getWrapperBuild() != null)?" (" + plugin.api.getWrapperBuild() + ')':""));
                     sender.sendMessage("");
                     new Thread(() -> {
                         try {
@@ -976,8 +976,8 @@ public final class SubCommand extends CommandX {
      * BungeeCord /server
      */
     public static final class BungeeServer extends CommandX {
-        private SubPlugin plugin;
-        private BungeeServer(SubPlugin plugin, String command) {
+        private SubProxy plugin;
+        private BungeeServer(SubProxy plugin, String command) {
             super(command, "bungeecord.command.server");
             this.plugin = plugin;
 
@@ -992,7 +992,7 @@ public final class SubCommand extends CommandX {
             );
         }
 
-        protected static NamedContainer<BungeeServer, CommandX> newInstance(SubPlugin plugin, String command) {
+        protected static NamedContainer<BungeeServer, CommandX> newInstance(SubProxy plugin, String command) {
             NamedContainer<BungeeServer, CommandX> cmd = new NamedContainer<>(new BungeeServer(plugin, command), null);
             CommandX now = cmd.name();
             //if (plugin.api.getGameVersion()[plugin.api.getGameVersion().length - 1].compareTo(new Version("1.13")) >= 0) { // TODO Future Command Validator API?
@@ -1079,8 +1079,8 @@ public final class SubCommand extends CommandX {
      * BungeeCord /glist
      */
     public static final class BungeeList extends Command {
-        private SubPlugin plugin;
-        protected BungeeList(SubPlugin plugin, String command) {
+        private SubProxy plugin;
+        protected BungeeList(SubProxy plugin, String command) {
             super(command, "bungeecord.command.list");
             this.plugin = plugin;
 

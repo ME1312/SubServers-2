@@ -4,7 +4,7 @@ import net.ME1312.SubData.Server.SubDataClient;
 import net.ME1312.SubServers.Bungee.Host.External.ExternalHost;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubData.Server.Protocol.PacketIn;
-import net.ME1312.SubServers.Bungee.SubPlugin;
+import net.ME1312.SubServers.Bungee.SubProxy;
 
 import java.lang.reflect.InvocationTargetException;
 
@@ -12,12 +12,12 @@ import java.lang.reflect.InvocationTargetException;
  * External Host Queue Request Packet
  */
 public class PacketInExRequestQueue implements PacketIn {
-    private SubPlugin plugin;
+    private SubProxy plugin;
 
     /**
      * New PacketInExRequestQueue
      */
-    public PacketInExRequestQueue(SubPlugin plugin) {
+    public PacketInExRequestQueue(SubProxy plugin) {
         this.plugin = plugin;
     }
 

@@ -3,33 +3,29 @@ package net.ME1312.SubServers.Bungee.Network.Packet;
 import net.ME1312.SubServers.Bungee.Host.External.ExternalHost;
 import net.ME1312.SubServers.Bungee.Host.SubCreator;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
-import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubData.Server.SubDataClient;
 import net.ME1312.SubData.Server.Protocol.PacketIn;
 import net.ME1312.SubData.Server.Protocol.PacketObjectOut;
-import net.ME1312.SubServers.Bungee.SubPlugin;
-import org.msgpack.value.ValueFactory;
-
-import java.io.*;
+import net.ME1312.SubServers.Bungee.SubProxy;
 
 /**
  * External Host Configuration Packet
  */
 public class PacketExConfigureHost implements PacketIn, PacketObjectOut<Integer> {
-    private SubPlugin plugin;
+    private SubProxy plugin;
     private ExternalHost host;
 
     /**
      * New PacketExConfigureHost (In)
      */
-    public PacketExConfigureHost(SubPlugin plugin) {
+    public PacketExConfigureHost(SubProxy plugin) {
         this.plugin = plugin;
     }
 
     /**
      * New PacketExConfigureHost (Out)
      */
-    public PacketExConfigureHost(SubPlugin plugin, ExternalHost host) {
+    public PacketExConfigureHost(SubProxy plugin, ExternalHost host) {
         this.plugin = plugin;
         this.host = host;
     }

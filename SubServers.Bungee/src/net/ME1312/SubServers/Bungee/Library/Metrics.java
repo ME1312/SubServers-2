@@ -2,8 +2,7 @@ package net.ME1312.SubServers.Bungee.Library;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
-import net.ME1312.SubServers.Bungee.SubPlugin;
+import net.ME1312.SubServers.Bungee.SubProxy;
 import net.md_5.bungee.config.Configuration;
 import net.md_5.bungee.config.ConfigurationProvider;
 import net.md_5.bungee.config.YamlConfiguration;
@@ -55,7 +54,7 @@ public class Metrics {
     private static final String URL = "https://bStats.org/submitData/bungeecord";
 
     // The plugin
-    private final SubPlugin plugin;
+    private final SubProxy plugin;
 
     // Is bStats enabled on this server?
     private boolean enabled;
@@ -69,7 +68,7 @@ public class Metrics {
     // A list with all known metrics class objects including this one
     private static final List<Object> knownMetricsInstances = new ArrayList<>();
 
-    public Metrics(SubPlugin plugin) {
+    public Metrics(SubProxy plugin) {
         this.plugin = plugin;
 
         try {

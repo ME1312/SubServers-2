@@ -5,7 +5,7 @@ import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubData.Server.Protocol.PacketObjectOut;
 import net.ME1312.SubData.Server.Protocol.PacketObjectIn;
-import net.ME1312.SubServers.Bungee.SubPlugin;
+import net.ME1312.SubServers.Bungee.SubProxy;
 import net.md_5.bungee.api.config.ListenerInfo;
 
 import java.util.LinkedList;
@@ -15,7 +15,7 @@ import java.util.UUID;
  * Download Proxy Info Packet
  */
 public class PacketDownloadPlatformInfo implements PacketObjectIn<Integer>, PacketObjectOut<Integer> {
-    private SubPlugin plugin;
+    private SubProxy plugin;
     private UUID tracker;
 
     /**
@@ -23,7 +23,7 @@ public class PacketDownloadPlatformInfo implements PacketObjectIn<Integer>, Pack
      *
      * @param plugin SubPlugin
      */
-    public PacketDownloadPlatformInfo(SubPlugin plugin) {
+    public PacketDownloadPlatformInfo(SubProxy plugin) {
         this.plugin = plugin;
     }
 
@@ -33,7 +33,7 @@ public class PacketDownloadPlatformInfo implements PacketObjectIn<Integer>, Pack
      * @param plugin SubPlugin
      * @param tracker Receiver ID
      */
-    public PacketDownloadPlatformInfo(SubPlugin plugin, UUID tracker) {
+    public PacketDownloadPlatformInfo(SubProxy plugin, UUID tracker) {
         this.plugin = plugin;
         this.tracker = tracker;
     }

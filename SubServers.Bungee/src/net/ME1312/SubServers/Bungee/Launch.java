@@ -83,7 +83,7 @@ public final class Launch {
                 if (galaxi != null)
                     System.out.println("GalaxiEngine v" + galaxi.toExtendedString() + ((galaxibuild != null)?" (" + galaxibuild + ')':"") + ',');
                 System.out.println("BungeeCord" + net.md_5.bungee.Bootstrap.class.getPackage().getImplementationVersion() + ((patched)?" [Patched]":"") + ',');
-                System.out.println("SubServers.Bungee v" + SubPlugin.version.toExtendedString() + ((SubPlugin.class.getPackage().getSpecificationTitle() != null)?" (" + SubPlugin.class.getPackage().getSpecificationTitle() + ')':""));
+                System.out.println("SubServers.Bungee v" + SubProxy.version.toExtendedString() + ((SubProxy.class.getPackage().getSpecificationTitle() != null)?" (" + SubProxy.class.getPackage().getSpecificationTitle() + ')':""));
                 System.out.println("");
             } else {
                 boolean gb = Util.getDespiteException(() -> Class.forName("net.md_5.bungee.util.GalaxiBungeeInfo").getMethod("get").getReturnType().equals(Class.forName("net.ME1312.Galaxi.Plugin.PluginInfo")), false);
@@ -121,7 +121,7 @@ public final class Launch {
                     System.out.println("");
                 }
 
-                SubPlugin plugin = new SubPlugin(System.out, patched);
+                SubProxy plugin = new SubProxy(System.out, patched);
                 net.md_5.bungee.api.ProxyServer.class.getMethod("setInstance", net.md_5.bungee.api.ProxyServer.class).invoke(null, plugin);
                 if (!gb) plugin.getLogger().info("Enabled " + plugin.getBungeeName() + " version " + plugin.getVersion());
                 plugin.start();

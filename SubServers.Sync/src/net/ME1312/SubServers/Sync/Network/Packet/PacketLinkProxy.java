@@ -6,15 +6,15 @@ import net.ME1312.SubData.Client.Protocol.Initial.InitialPacket;
 import net.ME1312.SubData.Client.Protocol.PacketObjectIn;
 import net.ME1312.SubData.Client.Protocol.PacketObjectOut;
 import net.ME1312.SubData.Client.SubDataClient;
+import net.ME1312.SubServers.Sync.ExProxy;
 import net.ME1312.SubServers.Sync.Library.Compatibility.Logger;
 import net.ME1312.SubServers.Sync.SubAPI;
-import net.ME1312.SubServers.Sync.SubPlugin;
 
 /**
  * Link Proxy Packet
  */
 public class PacketLinkProxy implements InitialPacket, PacketObjectIn<Integer>, PacketObjectOut<Integer> {
-    private SubPlugin plugin;
+    private ExProxy plugin;
     private int channel;
 
     /**
@@ -22,7 +22,7 @@ public class PacketLinkProxy implements InitialPacket, PacketObjectIn<Integer>, 
      *
      * @param plugin SubServers.Client
      */
-    public PacketLinkProxy(SubPlugin plugin) {
+    public PacketLinkProxy(ExProxy plugin) {
         if (Util.isNull(plugin)) throw new NullPointerException();
         this.plugin = plugin;
     }
@@ -32,7 +32,7 @@ public class PacketLinkProxy implements InitialPacket, PacketObjectIn<Integer>, 
      * @param plugin SubServers.Client
      * @param channel Channel ID
      */
-    public PacketLinkProxy(SubPlugin plugin, int channel) {
+    public PacketLinkProxy(ExProxy plugin, int channel) {
         if (Util.isNull(plugin)) throw new NullPointerException();
         this.plugin = plugin;
         this.channel = channel;

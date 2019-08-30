@@ -6,7 +6,7 @@ import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.SubServers.Bungee.Library.SubEvent;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubData.Server.Protocol.PacketObjectOut;
-import net.ME1312.SubServers.Bungee.SubPlugin;
+import net.ME1312.SubServers.Bungee.SubProxy;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
 
@@ -17,7 +17,7 @@ import java.util.List;
  * Event Send Packet
  */
 public class PacketOutExRunEvent implements Listener, PacketObjectOut<Integer> {
-    private SubPlugin plugin;
+    private SubProxy plugin;
     private ObjectMap<String> args;
     private String type;
 
@@ -26,7 +26,7 @@ public class PacketOutExRunEvent implements Listener, PacketObjectOut<Integer> {
      *
      * @param plugin
      */
-    public PacketOutExRunEvent(SubPlugin plugin) {
+    public PacketOutExRunEvent(SubProxy plugin) {
         if (Util.isNull(plugin)) throw new NullPointerException();
         this.plugin = plugin;
     }
@@ -61,12 +61,14 @@ public class PacketOutExRunEvent implements Listener, PacketObjectOut<Integer> {
     }
 
     private void broadcast(Object self, PacketOutExRunEvent packet) {
-        List<SubDataClient> clients = new LinkedList<SubDataClient>();
-        clients.addAll(plugin.subdata.getClients().values());
-        for (SubDataClient client : clients) {
-            if (client.getHandler() == null || client.getHandler() != self) { // Don't send events about yourself to yourself
-                if (client.getHandler() == null || client.getHandler().getSubData()[0] == client) { // Don't send events over subchannels
-                    client.sendPacket(packet);
+        if (plugin.subdata != null) {
+            List<SubDataClient> clients = new LinkedList<SubDataClient>();
+            clients.addAll(plugin.subdata.getClients().values());
+            for (SubDataClient client : clients) {
+                if (client.getHandler() == null || client.getHandler() != self) { // Don't send events about yourself to yourself
+                    if (client.getHandler() == null || client.getHandler().getSubData()[0] == client) { // Don't send events over subchannels
+                        client.sendPacket(packet);
+                    }
                 }
             }
         }

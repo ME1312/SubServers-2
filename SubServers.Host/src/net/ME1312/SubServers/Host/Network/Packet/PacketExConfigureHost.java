@@ -4,12 +4,10 @@ import net.ME1312.Galaxi.Engine.GalaxiEngine;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.UniversalFile;
 import net.ME1312.Galaxi.Library.Util;
-import net.ME1312.Galaxi.Library.Version.Version;
-import net.ME1312.SubData.Client.Protocol.Initial.InitialPacket;
 import net.ME1312.SubData.Client.Protocol.PacketObjectIn;
 import net.ME1312.SubData.Client.Protocol.PacketOut;
 import net.ME1312.SubData.Client.SubDataClient;
-import net.ME1312.SubServers.Host.Executable.SubCreator;
+import net.ME1312.SubServers.Host.Executable.SubCreatorImpl;
 import net.ME1312.SubServers.Host.ExHost;
 
 import java.util.Map;
@@ -38,7 +36,7 @@ public class PacketExConfigureHost implements PacketObjectIn<Integer>, PacketOut
     @Override
     public void receive(SubDataClient client, ObjectMap<Integer> data) {
         host.host = new ObjectMap<>((Map<String, ?>) data.getObject(0x0000));
-        for (SubCreator.ServerTemplate template : host.templates.values()) {
+        for (SubCreatorImpl.ServerTemplate template : host.templates.values()) {
             Util.deleteDirectory(template.getDirectory());
         }
         host.templates.clear();
@@ -49,7 +47,7 @@ public class PacketExConfigureHost implements PacketObjectIn<Integer>, PacketOut
         for (String name : templates.getKeys()) {
             try {
                 UniversalFile dir = new UniversalFile(templatedir, name);
-                SubCreator.ServerTemplate template = new SubCreator.ServerTemplate(name, templates.getMap(name).getBoolean("enabled"), templates.getMap(name).getRawString("icon"), dir,
+                SubCreatorImpl.ServerTemplate template = new SubCreatorImpl.ServerTemplate(name, templates.getMap(name).getBoolean("enabled"), templates.getMap(name).getRawString("icon"), dir,
                         templates.getMap(name).getMap("build").clone(), templates.getMap(name).getMap("settings").clone());
                 host.templates.put(name.toLowerCase(), template);
                 if (!templates.getMap(name).getRawString("display").equals(name)) template.setDisplayName(templates.getMap(name).getRawString("display"));

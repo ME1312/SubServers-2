@@ -9,7 +9,7 @@ import net.ME1312.SubServers.Bungee.Event.SubNetworkDisconnectEvent;
 import net.ME1312.SubServers.Bungee.Event.SubNetworkLoginEvent;
 import net.ME1312.SubServers.Bungee.Network.Packet.*;
 import net.ME1312.SubServers.Bungee.SubAPI;
-import net.ME1312.SubServers.Bungee.SubPlugin;
+import net.ME1312.SubServers.Bungee.SubProxy;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -25,7 +25,7 @@ public class SubProtocol extends SubDataProtocol {
         if (instance == null) {
             instance = new SubProtocol();
             log = net.ME1312.SubServers.Bungee.Library.Compatibility.Logger.get("SubData");
-            SubPlugin plugin = SubAPI.getInstance().getInternals();
+            SubProxy plugin = SubAPI.getInstance().getInternals();
             plugin.getPluginManager().registerListener(null, new PacketOutExRunEvent(plugin));
 
             instance.setName("SubServers 2");
@@ -129,7 +129,7 @@ public class SubProtocol extends SubDataProtocol {
     @Override
     public SubDataServer open(Callback<Runnable> scheduler, Logger logger, InetAddress address, int port, String cipher) throws IOException {
         SubDataServer subdata = super.open(scheduler, logger, address, port, cipher);
-        SubPlugin plugin = SubAPI.getInstance().getInternals();
+        SubProxy plugin = SubAPI.getInstance().getInternals();
 
         subdata.on.closed(server -> plugin.subdata = null);
         subdata.on.connect(client -> {

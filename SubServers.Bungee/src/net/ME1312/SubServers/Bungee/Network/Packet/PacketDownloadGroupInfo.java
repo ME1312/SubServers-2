@@ -6,7 +6,7 @@ import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubData.Server.SubDataClient;
 import net.ME1312.SubData.Server.Protocol.PacketObjectIn;
 import net.ME1312.SubData.Server.Protocol.PacketObjectOut;
-import net.ME1312.SubServers.Bungee.SubPlugin;
+import net.ME1312.SubServers.Bungee.SubProxy;
 
 import java.util.UUID;
 
@@ -14,7 +14,7 @@ import java.util.UUID;
  * Download Group Info Packet
  */
 public class PacketDownloadGroupInfo implements PacketObjectIn<Integer>, PacketObjectOut<Integer> {
-    private SubPlugin plugin;
+    private SubProxy plugin;
     private String group;
     private UUID tracker;
 
@@ -23,7 +23,7 @@ public class PacketDownloadGroupInfo implements PacketObjectIn<Integer>, PacketO
      *
      * @param plugin SubPlugin
      */
-    public PacketDownloadGroupInfo(SubPlugin plugin) {
+    public PacketDownloadGroupInfo(SubProxy plugin) {
         if (Util.isNull(plugin)) throw new NullPointerException();
         this.plugin = plugin;
     }
@@ -35,7 +35,7 @@ public class PacketDownloadGroupInfo implements PacketObjectIn<Integer>, PacketO
      * @param group Group (or null for all)
      * @param tracker Receiver ID
      */
-    public PacketDownloadGroupInfo(SubPlugin plugin, String group, UUID tracker) {
+    public PacketDownloadGroupInfo(SubProxy plugin, String group, UUID tracker) {
         if (Util.isNull(plugin)) throw new NullPointerException();
         this.plugin = plugin;
         this.group = group;

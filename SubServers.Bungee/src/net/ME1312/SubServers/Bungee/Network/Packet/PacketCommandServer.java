@@ -7,7 +7,7 @@ import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubData.Server.Protocol.PacketObjectIn;
 import net.ME1312.SubData.Server.Protocol.PacketObjectOut;
-import net.ME1312.SubServers.Bungee.SubPlugin;
+import net.ME1312.SubServers.Bungee.SubProxy;
 
 import java.util.Map;
 import java.util.UUID;
@@ -16,7 +16,7 @@ import java.util.UUID;
  * Server Command Packet
  */
 public class PacketCommandServer implements PacketObjectIn<Integer>, PacketObjectOut<Integer> {
-    private SubPlugin plugin;
+    private SubProxy plugin;
     private int response;
     private UUID tracker;
 
@@ -25,7 +25,7 @@ public class PacketCommandServer implements PacketObjectIn<Integer>, PacketObjec
      *
      * @param plugin SubPlugin
      */
-    public PacketCommandServer(SubPlugin plugin) {
+    public PacketCommandServer(SubProxy plugin) {
         if (Util.isNull(plugin)) throw new NullPointerException();
         this.plugin = plugin;
     }

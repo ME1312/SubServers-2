@@ -9,11 +9,10 @@ import net.ME1312.SubData.Client.SubDataClient;
 import net.ME1312.SubData.Client.SubDataProtocol;
 import net.ME1312.SubServers.Sync.Event.SubNetworkConnectEvent;
 import net.ME1312.SubServers.Sync.Event.SubNetworkDisconnectEvent;
+import net.ME1312.SubServers.Sync.ExProxy;
 import net.ME1312.SubServers.Sync.Network.API.Server;
 import net.ME1312.SubServers.Sync.Network.Packet.*;
 import net.ME1312.SubServers.Sync.SubAPI;
-import net.ME1312.SubServers.Sync.SubPlugin;
-import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ListenerInfo;
 import net.md_5.bungee.conf.Configuration;
 
@@ -25,8 +24,6 @@ import java.util.LinkedList;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Handler;
-import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
 public class SubProtocol extends SubDataProtocol {
@@ -37,7 +34,7 @@ public class SubProtocol extends SubDataProtocol {
     public static SubProtocol get() {
         if (instance == null) {
             instance = new SubProtocol();
-            SubPlugin plugin = SubAPI.getInstance().getInternals();
+            ExProxy plugin = SubAPI.getInstance().getInternals();
 
             instance.setName("SubServers 2");
             instance.addVersion(new Version("2.14a+"));
@@ -111,8 +108,8 @@ public class SubProtocol extends SubDataProtocol {
 
     @Override
     protected SubDataClient sub(Callback<Runnable> scheduler, Logger logger, InetAddress address, int port) throws IOException {
-        SubPlugin plugin = SubAPI.getInstance().getInternals();
-        HashMap<Integer, SubDataClient> map = Util.getDespiteException(() -> Util.reflect(SubPlugin.class.getDeclaredField("subdata"), plugin), null);
+        ExProxy plugin = SubAPI.getInstance().getInternals();
+        HashMap<Integer, SubDataClient> map = Util.getDespiteException(() -> Util.reflect(ExProxy.class.getDeclaredField("subdata"), plugin), null);
 
         int channel = 1;
         while (map.keySet().contains(channel)) channel++;
@@ -129,9 +126,9 @@ public class SubProtocol extends SubDataProtocol {
     @SuppressWarnings("deprecation")
     @Override
     public SubDataClient open(Callback<Runnable> scheduler, Logger logger, InetAddress address, int port) throws IOException {
-        SubPlugin plugin = SubAPI.getInstance().getInternals();
+        ExProxy plugin = SubAPI.getInstance().getInternals();
         SubDataClient subdata = super.open(scheduler, logger, address, port);
-        HashMap<Integer, SubDataClient> map = Util.getDespiteException(() -> Util.reflect(SubPlugin.class.getDeclaredField("subdata"), plugin), null);
+        HashMap<Integer, SubDataClient> map = Util.getDespiteException(() -> Util.reflect(ExProxy.class.getDeclaredField("subdata"), plugin), null);
 
         subdata.sendPacket(new PacketLinkProxy(plugin, 0));
         subdata.sendPacket(new PacketDownloadLang());
@@ -169,7 +166,7 @@ public class SubProtocol extends SubDataProtocol {
             map.put(0, null);
 
             int reconnect = plugin.config.get().getMap("Settings").getMap("SubData").getInt("Reconnect", 30);
-            if (Util.getDespiteException(() -> Util.reflect(SubPlugin.class.getDeclaredField("reconnect"), plugin), false) && reconnect > 0
+            if (Util.getDespiteException(() -> Util.reflect(ExProxy.class.getDeclaredField("reconnect"), plugin), false) && reconnect > 0
                     && client.name() != DisconnectReason.PROTOCOL_MISMATCH && client.name() != DisconnectReason.ENCRYPTION_MISMATCH) {
                 net.ME1312.SubServers.Sync.Library.Compatibility.Logger.get("SubData").info("Attempting reconnect in " + reconnect + " seconds");
                 Timer timer = new Timer("SubServers.Sync::SubData_Reconnect_Handler");
@@ -177,7 +174,7 @@ public class SubProtocol extends SubDataProtocol {
                     @Override
                     public void run() {
                         try {
-                            Util.reflect(SubPlugin.class.getDeclaredMethod("connect"), plugin);
+                            Util.reflect(ExProxy.class.getDeclaredMethod("connect"), plugin);
                             timer.cancel();
                         } catch (InvocationTargetException e) {
                             if (e.getTargetException() instanceof IOException) {

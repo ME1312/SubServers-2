@@ -10,7 +10,7 @@ import net.ME1312.Galaxi.Library.NamedContainer;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubData.Server.ClientHandler;
 import net.ME1312.SubServers.Bungee.SubAPI;
-import net.ME1312.SubServers.Bungee.SubPlugin;
+import net.ME1312.SubServers.Bungee.SubProxy;
 import net.md_5.bungee.api.ProxyServer;
 
 import java.util.*;
@@ -114,7 +114,7 @@ public class Proxy implements ClientHandler, ExtraDataHandler {
      */
     @SuppressWarnings({"deprecation", "unchecked"})
     public boolean isRedis() {
-        SubPlugin plugin = SubAPI.getInstance().getInternals();
+        SubProxy plugin = SubAPI.getInstance().getInternals();
         return plugin.redis != null && Util.getDespiteException(() -> plugin.redis("getPlayersOnProxy", new NamedContainer<>(String.class, getName())) != null, false);
     }
 
@@ -126,7 +126,7 @@ public class Proxy implements ClientHandler, ExtraDataHandler {
     @SuppressWarnings({"deprecation", "unchecked"})
     public Collection<NamedContainer<String, UUID>> getPlayers() {
         List<NamedContainer<String, UUID>> players = new ArrayList<NamedContainer<String, UUID>>();
-        SubPlugin plugin = SubAPI.getInstance().getInternals();
+        SubProxy plugin = SubAPI.getInstance().getInternals();
         if (plugin.redis != null) {
             try {
                 for (UUID player : (Set<UUID>) plugin.redis("getPlayersOnProxy", new NamedContainer<>(String.class, getName())))

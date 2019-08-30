@@ -7,7 +7,7 @@ import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubData.Server.Protocol.PacketObjectIn;
 import net.ME1312.SubData.Server.Protocol.PacketObjectOut;
-import net.ME1312.SubServers.Bungee.SubPlugin;
+import net.ME1312.SubServers.Bungee.SubProxy;
 
 import java.util.Map;
 import java.util.UUID;
@@ -16,7 +16,7 @@ import java.util.UUID;
  * Start Server Packet
  */
 public class PacketStartServer implements PacketObjectIn<Integer>, PacketObjectOut<Integer> {
-    private SubPlugin plugin;
+    private SubProxy plugin;
     private int response;
     private String extra;
     private UUID tracker;
@@ -26,7 +26,7 @@ public class PacketStartServer implements PacketObjectIn<Integer>, PacketObjectO
      *
      * @param plugin SubPlugin
      */
-    public PacketStartServer(SubPlugin plugin) {
+    public PacketStartServer(SubProxy plugin) {
         if (Util.isNull(plugin)) throw new NullPointerException();
         this.plugin = plugin;
     }

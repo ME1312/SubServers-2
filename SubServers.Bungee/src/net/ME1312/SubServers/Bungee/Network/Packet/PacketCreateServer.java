@@ -6,7 +6,7 @@ import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubData.Server.Protocol.PacketObjectIn;
 import net.ME1312.SubData.Server.Protocol.PacketObjectOut;
-import net.ME1312.SubServers.Bungee.SubPlugin;
+import net.ME1312.SubServers.Bungee.SubProxy;
 
 import java.util.UUID;
 
@@ -14,7 +14,7 @@ import java.util.UUID;
  * Create Server Packet
  */
 public class PacketCreateServer implements PacketObjectIn<Integer>, PacketObjectOut<Integer> {
-    private SubPlugin plugin;
+    private SubProxy plugin;
     private int response;
     private UUID tracker;
 
@@ -23,7 +23,7 @@ public class PacketCreateServer implements PacketObjectIn<Integer>, PacketObject
      *
      * @param plugin SubPlugin
      */
-    public PacketCreateServer(SubPlugin plugin) {
+    public PacketCreateServer(SubProxy plugin) {
         this.plugin = plugin;
     }
 

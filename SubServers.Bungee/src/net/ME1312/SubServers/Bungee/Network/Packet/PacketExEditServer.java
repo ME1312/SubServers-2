@@ -5,19 +5,17 @@ import net.ME1312.SubServers.Bungee.Host.External.ExternalSubServer;
 import net.ME1312.SubServers.Bungee.Host.SubServer;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Util;
-import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubData.Server.Protocol.PacketObjectOut;
 import net.ME1312.SubData.Server.Protocol.PacketObjectIn;
-import net.ME1312.SubServers.Bungee.SubPlugin;
+import net.ME1312.SubServers.Bungee.SubProxy;
 
 import java.util.Arrays;
-import java.util.UUID;
 
 /**
  * Edit External Server Packet
  */
 public class PacketExEditServer implements PacketObjectIn<Integer>, PacketObjectOut<Integer> {
-    private SubPlugin plugin;
+    private SubProxy plugin;
     private SubServer server;
     private UpdateType type;
     private Object[] args;
@@ -55,7 +53,7 @@ public class PacketExEditServer implements PacketObjectIn<Integer>, PacketObject
      * New PacketExEditServer (In)
      * @param plugin SubPlugin
      */
-    public PacketExEditServer(SubPlugin plugin) {
+    public PacketExEditServer(SubProxy plugin) {
         this.plugin = plugin;
     }
 

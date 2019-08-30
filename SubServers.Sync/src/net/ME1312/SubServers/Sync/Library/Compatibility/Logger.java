@@ -1,9 +1,8 @@
 package net.ME1312.SubServers.Sync.Library.Compatibility;
 
 import net.ME1312.Galaxi.Library.Util;
+import net.ME1312.SubServers.Sync.ExProxy;
 import net.ME1312.SubServers.Sync.SubAPI;
-import net.ME1312.SubServers.Sync.SubPlugin;
-import net.md_5.bungee.api.ProxyServer;
 
 import java.util.HashMap;
 import java.util.logging.Handler;
@@ -14,7 +13,7 @@ import java.util.logging.LogRecord;
  */
 public class Logger {
     private static final HashMap<String, java.util.logging.Logger> existing = new HashMap<String, java.util.logging.Logger>();
-    private static SubPlugin plugin;
+    private static ExProxy plugin;
 
     /**
      * Get a logger
@@ -25,7 +24,7 @@ public class Logger {
     @SuppressWarnings("deprecation")
     public static java.util.logging.Logger get(String prefix) {
         if (!existing.keySet().contains(prefix)) {
-            SubPlugin plugin = SubAPI.getInstance().getInternals();
+            ExProxy plugin = SubAPI.getInstance().getInternals();
             java.util.logging.Logger log;
 
             if (plugin.isGalaxi) {

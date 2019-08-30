@@ -11,7 +11,7 @@ import net.ME1312.Galaxi.Library.NamedContainer;
 import net.ME1312.Galaxi.Library.UniversalFile;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
-import net.ME1312.SubServers.Bungee.SubPlugin;
+import net.ME1312.SubServers.Bungee.SubProxy;
 import net.md_5.bungee.BungeeServerInfo;
 import net.md_5.bungee.api.ChatColor;
 
@@ -79,14 +79,14 @@ public class InternalSubServer extends SubServerContainer {
 
         if (new UniversalFile(this.directory, "plugins:SubServers.Client.jar").exists()) {
             try {
-                JarInputStream updated = new JarInputStream(SubPlugin.class.getResourceAsStream("/net/ME1312/SubServers/Bungee/Library/Files/client.jar"));
+                JarInputStream updated = new JarInputStream(SubProxy.class.getResourceAsStream("/net/ME1312/SubServers/Bungee/Library/Files/client.jar"));
                 JarFile existing = new JarFile(new UniversalFile(this.directory, "plugins:SubServers.Client.jar"));
 
                 if (existing.getManifest().getMainAttributes().getValue("Implementation-Title") != null && existing.getManifest().getMainAttributes().getValue("Implementation-Title").startsWith("SubServers.Client") && existing.getManifest().getMainAttributes().getValue("Specification-Title") != null &&
                         updated.getManifest().getMainAttributes().getValue("Implementation-Title") != null && updated.getManifest().getMainAttributes().getValue("Implementation-Title").startsWith("SubServers.Client") && updated.getManifest().getMainAttributes().getValue("Specification-Title") != null) {
                     if (new Version(existing.getManifest().getMainAttributes().getValue("Specification-Title")).compareTo(new Version(updated.getManifest().getMainAttributes().getValue("Specification-Title"))) < 0) {
                         new UniversalFile(this.directory, "plugins:SubServers.Client.jar").delete();
-                        Util.copyFromJar(SubPlugin.class.getClassLoader(), "net/ME1312/SubServers/Bungee/Library/Files/client.jar", new UniversalFile(this.directory, "plugins:SubServers.Client.jar").getPath());
+                        Util.copyFromJar(SubProxy.class.getClassLoader(), "net/ME1312/SubServers/Bungee/Library/Files/client.jar", new UniversalFile(this.directory, "plugins:SubServers.Client.jar").getPath());
                     }
                 }
                 existing.close();
@@ -97,14 +97,14 @@ public class InternalSubServer extends SubServerContainer {
             }
         } else if (new UniversalFile(this.directory, "mods:SubServers.Client.jar").exists()) {
             try {
-                JarInputStream updated = new JarInputStream(SubPlugin.class.getResourceAsStream("/net/ME1312/SubServers/Bungee/Library/Files/client.jar"));
+                JarInputStream updated = new JarInputStream(SubProxy.class.getResourceAsStream("/net/ME1312/SubServers/Bungee/Library/Files/client.jar"));
                 JarFile existing = new JarFile(new UniversalFile(this.directory, "mods:SubServers.Client.jar"));
 
                 if (existing.getManifest().getMainAttributes().getValue("Implementation-Title") != null && existing.getManifest().getMainAttributes().getValue("Implementation-Title").startsWith("SubServers.Client") && existing.getManifest().getMainAttributes().getValue("Specification-Title") != null &&
                         updated.getManifest().getMainAttributes().getValue("Implementation-Title") != null && updated.getManifest().getMainAttributes().getValue("Implementation-Title").startsWith("SubServers.Client") && updated.getManifest().getMainAttributes().getValue("Specification-Title") != null) {
                     if (new Version(existing.getManifest().getMainAttributes().getValue("Specification-Title")).compareTo(new Version(updated.getManifest().getMainAttributes().getValue("Specification-Title"))) < 0) {
                         new UniversalFile(this.directory, "mods:SubServers.Client.jar").delete();
-                        Util.copyFromJar(SubPlugin.class.getClassLoader(), "net/ME1312/SubServers/Bungee/Library/Files/client.jar", new UniversalFile(this.directory, "mods:SubServers.Client.jar").getPath());
+                        Util.copyFromJar(SubProxy.class.getClassLoader(), "net/ME1312/SubServers/Bungee/Library/Files/client.jar", new UniversalFile(this.directory, "mods:SubServers.Client.jar").getPath());
                     }
                 }
                 existing.close();

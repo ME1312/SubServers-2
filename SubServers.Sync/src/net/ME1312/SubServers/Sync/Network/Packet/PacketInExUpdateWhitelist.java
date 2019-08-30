@@ -3,18 +3,18 @@ package net.ME1312.SubServers.Sync.Network.Packet;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.SubData.Client.Protocol.PacketObjectIn;
 import net.ME1312.SubData.Client.SubDataClient;
-import net.ME1312.SubServers.Sync.SubPlugin;
+import net.ME1312.SubServers.Sync.ExProxy;
 
 /**
  * Update External Whitelist Packet
  */
 public class PacketInExUpdateWhitelist implements PacketObjectIn<Integer> {
-    private SubPlugin plugin;
+    private ExProxy plugin;
 
     /**
      * New PacketInExUpdateWhitelist
      */
-    public PacketInExUpdateWhitelist(SubPlugin plugin) {
+    public PacketInExUpdateWhitelist(ExProxy plugin) {
         this.plugin = plugin;
     }
 

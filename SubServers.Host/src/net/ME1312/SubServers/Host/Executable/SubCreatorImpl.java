@@ -8,13 +8,13 @@ import net.ME1312.Galaxi.Library.UniversalFile;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubData.Client.SubDataClient;
+import net.ME1312.SubServers.Host.ExHost;
 import net.ME1312.SubServers.Host.Library.Exception.InvalidServerException;
 import net.ME1312.SubServers.Host.Library.Exception.InvalidTemplateException;
 import net.ME1312.SubServers.Host.Library.Exception.SubCreatorException;
 import net.ME1312.SubServers.Host.Network.API.SubCreator.ServerType;
 import net.ME1312.SubServers.Host.Network.Packet.PacketExCreateServer;
 import net.ME1312.SubServers.Host.Network.Packet.PacketOutExLogMessage;
-import net.ME1312.SubServers.Host.ExHost;
 import net.ME1312.SubServers.Host.SubAPI;
 import org.json.JSONObject;
 
@@ -27,7 +27,7 @@ import java.util.*;
 /**
  * Internal SubCreator Class
  */
-public class SubCreator {
+public class SubCreatorImpl {
     private ExHost host;
     private TreeMap<String, CreatorTask> thread;
 
@@ -204,7 +204,7 @@ public class SubCreator {
         private final File dir;
         private final UUID address;
         private final UUID tracker;
-        private final SubLogger log;
+        private final SubLoggerImpl log;
         private Process process;
 
         private CreatorTask(String name, ServerTemplate template, Version version, int port, String dir, UUID address, UUID tracker) {
@@ -215,7 +215,7 @@ public class SubCreator {
             this.version = version;
             this.port = port;
             this.dir = new File(host.host.getRawString("Directory"), dir);
-            this.log = new SubLogger(null, this, name + File.separator + ((update == null)?"Creator":"Updater"), address, new Container<Boolean>(true), null);
+            this.log = new SubLoggerImpl(null, this, name + File.separator + ((update == null)?"Creator":"Updater"), address, new Container<Boolean>(true), null);
             this.address = address;
             this.tracker = tracker;
         }
@@ -372,7 +372,7 @@ public class SubCreator {
                 log.logger.info.println("Couldn't build the server jar. Check the SubCreator logs for more detail.");
                 ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketExCreateServer(-1, "Couldn't build the server jar. Check the SubCreator logs for more detail.", tracker));
             }
-            SubCreator.this.thread.remove(name.toLowerCase());
+            SubCreatorImpl.this.thread.remove(name.toLowerCase());
         }
     }
 
@@ -381,7 +381,7 @@ public class SubCreator {
      *
      * @param host SubServers.Host
      */
-    public SubCreator(ExHost host) {
+    public SubCreatorImpl(ExHost host) {
         if (Util.isNull(host)) throw new NullPointerException();
         this.host = host;
         this.thread = new TreeMap<>();
@@ -428,8 +428,8 @@ public class SubCreator {
         }
     }
 
-    public List<SubLogger> getLoggers() {
-        List<SubLogger> loggers = new ArrayList<SubLogger>();
+    public List<SubLoggerImpl> getLoggers() {
+        List<SubLoggerImpl> loggers = new ArrayList<SubLoggerImpl>();
         HashMap<String, CreatorTask> temp = new HashMap<String, CreatorTask>();
         temp.putAll(thread);
         for (String i : temp.keySet()) {
@@ -438,7 +438,7 @@ public class SubCreator {
         return loggers;
     }
 
-    public SubLogger getLogger(String name) {
+    public SubLoggerImpl getLogger(String name) {
         return this.thread.get(name).log;
     }
 

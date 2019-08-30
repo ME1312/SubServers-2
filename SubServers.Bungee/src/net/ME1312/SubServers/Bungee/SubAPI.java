@@ -30,10 +30,10 @@ public final class SubAPI {
     LinkedList<Runnable> disableListeners = new LinkedList<Runnable>();
     private static HashMap<String, Object> knownSignatures = new HashMap<String, Object>();
     boolean ready = false;
-    private final SubPlugin plugin;
+    private final SubProxy plugin;
     private static SubAPI api;
 
-    protected SubAPI(SubPlugin plugin) {
+    protected SubAPI(SubProxy plugin) {
         this.plugin = plugin;
         GAME_VERSION = getGameVersion();
         api = this;
@@ -55,7 +55,7 @@ public final class SubAPI {
      * @return SubPlugin Internals
      */
     @Deprecated
-    public SubPlugin getInternals() {
+    public SubProxy getInternals() {
         return plugin;
     }
 
@@ -218,7 +218,7 @@ public final class SubAPI {
      */
     public Host addHost(UUID player, Class<? extends Host> driver, String name, boolean enabled, Range<Integer> ports, boolean log, InetAddress address, String directory, String gitBash) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
         if (Util.isNull(driver, name, enabled, ports, log, address, directory, gitBash)) throw new NullPointerException();
-        Host host = driver.getConstructor(SubPlugin.class, String.class, boolean.class, Range.class, boolean.class, InetAddress.class, String.class, String.class).newInstance(plugin, name, enabled, ports, log, address, directory, gitBash);
+        Host host = driver.getConstructor(SubProxy.class, String.class, boolean.class, Range.class, boolean.class, InetAddress.class, String.class, String.class).newInstance(plugin, name, enabled, ports, log, address, directory, gitBash);
         return addHost(player, host)?host:null;
     }
 
@@ -664,7 +664,7 @@ public final class SubAPI {
      * @return SubServers Build Signature (or null if unsigned)
      */
     public Version getWrapperBuild() {
-        return (SubPlugin.class.getPackage().getSpecificationTitle() != null)?new Version(SubPlugin.class.getPackage().getSpecificationTitle()):null;
+        return (SubProxy.class.getPackage().getSpecificationTitle() != null)?new Version(SubProxy.class.getPackage().getSpecificationTitle()):null;
     }
 
     /**

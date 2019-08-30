@@ -3,14 +3,12 @@ package net.ME1312.SubServers.Bungee.Host;
 import com.google.common.collect.Range;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Map.ObjectMapValue;
-import net.ME1312.SubData.Server.DataClient;
 import net.ME1312.SubServers.Bungee.Library.Exception.InvalidHostException;
 import net.ME1312.SubServers.Bungee.Library.Exception.InvalidServerException;
 import net.ME1312.Galaxi.Library.ExtraDataHandler;
 import net.ME1312.Galaxi.Library.Util;
-import net.ME1312.SubData.Server.ClientHandler;
 import net.ME1312.SubServers.Bungee.SubAPI;
-import net.ME1312.SubServers.Bungee.SubPlugin;
+import net.ME1312.SubServers.Bungee.SubProxy;
 
 import java.net.InetAddress;
 import java.util.*;
@@ -35,12 +33,13 @@ public abstract class Host implements ExtraDataHandler {
      * @param directory The runtime directory of your Host
      * @param gitBash The Git Bash directory
      */
-    public Host(SubPlugin plugin, String name, boolean enabled, Range<Integer> ports, boolean log, InetAddress address, String directory, String gitBash) {
+    @SuppressWarnings("deprecation")
+    public Host(SubProxy plugin, String name, boolean enabled, Range<Integer> ports, boolean log, InetAddress address, String directory, String gitBash) {
         if (name.contains(" ")) throw new InvalidHostException("Host names cannot have spaces: " + name);
         if (!ports.hasLowerBound() || !ports.hasUpperBound()) throw new InvalidHostException("Port range is not bound");
         if (Util.isNull(plugin, name, enabled, ports, log, address, directory, gitBash)) throw new NullPointerException();
         signature = plugin.api.signAnonymousObject();
-        SubAPI.getInstance().getSubDataNetwork().getProtocol().whitelist(address.getHostAddress());
+        SubAPI.getInstance().getInternals().subprotocol.whitelist(address.getHostAddress());
     }
 
     /**

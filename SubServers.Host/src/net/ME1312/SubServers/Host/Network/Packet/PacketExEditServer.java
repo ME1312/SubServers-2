@@ -5,7 +5,7 @@ import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubData.Client.Protocol.PacketObjectIn;
 import net.ME1312.SubData.Client.Protocol.PacketObjectOut;
 import net.ME1312.SubData.Client.SubDataClient;
-import net.ME1312.SubServers.Host.Executable.SubLogger;
+import net.ME1312.SubServers.Host.Executable.SubLoggerImpl;
 import net.ME1312.SubServers.Host.Executable.SubServerImpl;
 import net.ME1312.SubServers.Host.ExHost;
 
@@ -101,7 +101,7 @@ public class PacketExEditServer implements PacketObjectIn<Integer>, PacketObject
                     server.setLogging(data.getList(0x0002).get(0).asBoolean());
                     break;
                 case 6:
-                    Util.reflect(SubLogger.class.getDeclaredField("address"), server.getLogger(), data.getList(0x0002).get(0).asUUID());
+                    Util.reflect(SubLoggerImpl.class.getDeclaredField("address"), server.getLogger(), data.getList(0x0002).get(0).asUUID());
                     break;
                 case 7:
                     server.setStopCommand(data.getList(0x0002).get(0).asRawString());

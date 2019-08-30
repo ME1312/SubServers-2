@@ -13,7 +13,7 @@ import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubServers.Bungee.Network.Packet.PacketOutExRunEvent;
 import net.ME1312.SubServers.Bungee.Network.Packet.PacketOutExUpdateWhitelist;
 import net.ME1312.SubServers.Bungee.SubAPI;
-import net.ME1312.SubServers.Bungee.SubPlugin;
+import net.ME1312.SubServers.Bungee.SubProxy;
 import net.md_5.bungee.BungeeServerInfo;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -33,12 +33,13 @@ public class ServerContainer extends BungeeServerInfo implements Server {
     private boolean hidden;
     private final String signature;
 
+    @SuppressWarnings("deprecation")
     public ServerContainer(String name, InetSocketAddress address, String motd, boolean hidden, boolean restricted) throws InvalidServerException {
         super(name, address, motd, restricted);
         if (Util.isNull(name, address, motd, hidden, restricted)) throw new NullPointerException();
         if (name.contains(" ")) throw new InvalidServerException("Server names cannot have spaces: " + name);
         signature = SubAPI.getInstance().signAnonymousObject();
-        SubAPI.getInstance().getSubDataNetwork().getProtocol().whitelist(getAddress().getAddress().getHostAddress());
+        SubAPI.getInstance().getInternals().subprotocol.whitelist(getAddress().getAddress().getHostAddress());
         this.hidden = hidden;
 
         subdata.put(0, null);
@@ -125,7 +126,7 @@ public class ServerContainer extends BungeeServerInfo implements Server {
     @Override
     public Collection<NamedContainer<String, UUID>> getGlobalPlayers() {
         List<NamedContainer<String, UUID>> players = new ArrayList<NamedContainer<String, UUID>>();
-        SubPlugin plugin = SubAPI.getInstance().getInternals();
+        SubProxy plugin = SubAPI.getInstance().getInternals();
         if (plugin.redis != null) {
             try {
                 for (UUID player : (Set<UUID>) plugin.redis("getPlayersOnServer", new NamedContainer<>(String.class, getName()))) players.add(new NamedContainer<>((String) plugin.redis("getNameFromUuid", new NamedContainer<>(UUID.class, player)), player));

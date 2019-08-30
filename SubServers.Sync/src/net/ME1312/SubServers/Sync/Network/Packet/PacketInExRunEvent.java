@@ -3,10 +3,9 @@ package net.ME1312.SubServers.Sync.Network.Packet;
 import net.ME1312.Galaxi.Library.Callback.Callback;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.NamedContainer;
-import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubData.Client.Protocol.PacketObjectIn;
 import net.ME1312.SubData.Client.SubDataClient;
-import net.ME1312.SubServers.Sync.SubPlugin;
+import net.ME1312.SubServers.Sync.ExProxy;
 import net.ME1312.SubServers.Sync.Event.*;
 import net.md_5.bungee.api.ProxyServer;
 
@@ -24,7 +23,7 @@ public class PacketInExRunEvent implements PacketObjectIn<Integer> {
     /**
      * New PacketInExRunEvent
      */
-    public PacketInExRunEvent(SubPlugin plugin) {
+    public PacketInExRunEvent(ExProxy plugin) {
         callback("SubAddHostEvent", new Callback<ObjectMap<String>>() {
             @Override
             public void run(ObjectMap<String> data) {

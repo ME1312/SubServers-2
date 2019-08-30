@@ -13,7 +13,7 @@ import net.ME1312.SubServers.Bungee.Host.SubCreator;
 import net.ME1312.SubServers.Bungee.Host.SubServer;
 import net.ME1312.Galaxi.Library.UniversalFile;
 import net.ME1312.Galaxi.Library.Util;
-import net.ME1312.SubServers.Bungee.SubPlugin;
+import net.ME1312.SubServers.Bungee.SubProxy;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -31,7 +31,7 @@ public class InternalHost extends Host {
     private InetAddress address;
     private SubCreator creator;
     private String directory;
-    protected SubPlugin plugin;
+    protected SubProxy plugin;
 
     /**
      * Creates an Internal Host
@@ -45,7 +45,7 @@ public class InternalHost extends Host {
      * @param directory The runtime directory of your Host
      * @param gitBash The Git Bash directory
      */
-    public InternalHost(SubPlugin plugin, String name, boolean enabled, Range<Integer> ports, boolean log, InetAddress address, String directory, String gitBash) {
+    public InternalHost(SubProxy plugin, String name, boolean enabled, Range<Integer> ports, boolean log, InetAddress address, String directory, String gitBash) {
         super(plugin, name, enabled, ports, log, address, directory, gitBash);
         if (!DRM_ALLOW) throw new IllegalStateException("SubServers' hosting capabilities have been disabled by your provider");
         this.plugin = plugin;

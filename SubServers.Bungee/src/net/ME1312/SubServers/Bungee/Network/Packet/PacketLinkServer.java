@@ -1,6 +1,6 @@
 package net.ME1312.SubServers.Bungee.Network.Packet;
 
-import net.ME1312.SubData.Server.DataClient;
+import net.ME1312.SubData.Server.Library.DisconnectReason;
 import net.ME1312.SubData.Server.Protocol.Initial.InitialPacket;
 import net.ME1312.SubData.Server.SubDataClient;
 import net.ME1312.SubServers.Bungee.Event.SubStartedEvent;
@@ -13,18 +13,21 @@ import net.ME1312.SubData.Server.Protocol.PacketObjectIn;
 import net.ME1312.SubData.Server.Protocol.PacketObjectOut;
 import net.ME1312.SubServers.Bungee.Host.SubServerContainer;
 import net.ME1312.SubServers.Bungee.Library.Compatibility.Logger;
-import net.ME1312.SubServers.Bungee.SubPlugin;
+import net.ME1312.SubServers.Bungee.SubProxy;
 import net.md_5.bungee.api.ProxyServer;
 
 import java.net.InetSocketAddress;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Link Server Packet
  */
 public class PacketLinkServer implements InitialPacket, PacketObjectIn<Integer>, PacketObjectOut<Integer> {
-    private SubPlugin plugin;
+    private SubProxy plugin;
     private int response;
     private String message;
     private String name;
@@ -40,7 +43,7 @@ public class PacketLinkServer implements InitialPacket, PacketObjectIn<Integer>,
      *
      * @param plugin SubPlugin
      */
-    public PacketLinkServer(SubPlugin plugin) {
+    public PacketLinkServer(SubProxy plugin) {
         if (Util.isNull(plugin)) throw new NullPointerException();
         this.plugin = plugin;
     }
@@ -105,16 +108,34 @@ public class PacketLinkServer implements InitialPacket, PacketObjectIn<Integer>,
         if (!subdata.keySet().contains(channel) || (channel == 0 && subdata.get(0) == null)) {
             server.setSubData(client, channel);
             Logger.get("SubData").info(client.getAddress().toString() + " has been defined as " + ((server instanceof SubServer) ? "SubServer" : "Server") + ": " + server.getName() + ((channel > 0)?" (Sub-"+channel+")":""));
-            if (server instanceof SubServer && !((SubServer) server).isRunning()) {
-                Logger.get("SubServers").info("Sending shutdown signal to rogue SubServer: " + server.getName());
-                client.sendPacket(new PacketOutExReset("Rogue SubServer Detected"));
-            } else {
-                if (server instanceof SubServer && !Util.getDespiteException(() -> Util.reflect(SubServerContainer.class.getDeclaredField("started"), server), true)) {
-                    Util.isException(() -> Util.reflect(SubServerContainer.class.getDeclaredField("started"), server, true));
-                    SubStartedEvent event = new SubStartedEvent((SubServer) server);
-                    ProxyServer.getInstance().getPluginManager().callEvent(event);
+            Runnable register = () -> {
+                if (server instanceof SubServer && !((SubServer) server).isRunning()) {
+                    if (((SubServer) server).getHost().isAvailable()) {
+                        Logger.get("SubServers").info("Sending shutdown signal to rogue SubServer: " + server.getName());
+                        client.sendPacket(new PacketOutExReset("Rogue SubServer Detected"));
+                    } else {
+                        // Drop connection if host is unavailable for rogue checking (try again later)
+                        Util.isException(() -> Util.reflect(SubDataClient.class.getDeclaredMethod("close", DisconnectReason.class), client, DisconnectReason.CLOSE_REQUESTED));
+                    }
+                } else {
+                    if (server instanceof SubServer && !Util.getDespiteException(() -> Util.reflect(SubServerContainer.class.getDeclaredField("started"), server), true)) {
+                        Util.isException(() -> Util.reflect(SubServerContainer.class.getDeclaredField("started"), server, true));
+                        SubStartedEvent event = new SubStartedEvent((SubServer) server);
+                        ProxyServer.getInstance().getPluginManager().callEvent(event);
+                    }
+                    client.sendPacket(new PacketLinkServer(server.getName(), 0, null));
                 }
-                client.sendPacket(new PacketLinkServer(server.getName(), 0, null));
+            };
+
+            if (server instanceof SubServer && !((SubServer) server).isRunning()) {
+                new Timer("SubServers.Bungee::Rogue_SubServer_Detection(" + server.getName() + ")").schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        register.run();
+                    }
+                }, TimeUnit.SECONDS.toMillis(5));
+            } else {
+                register.run();
             }
             setReady(client, true);
         } else {

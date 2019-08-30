@@ -25,7 +25,7 @@ public final class Launch {
             System.out.println(">> https://github.com/ME1312/GalaxiEngine/releases");
             System.exit(1);
         } else {
-            net.ME1312.SubServers.Host.ExHost.main(args);
+            ExHost.main(args);
         }
     }
 }

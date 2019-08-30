@@ -6,7 +6,7 @@ import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubData.Server.Protocol.PacketObjectIn;
 import net.ME1312.SubData.Server.Protocol.PacketObjectOut;
-import net.ME1312.SubServers.Bungee.SubPlugin;
+import net.ME1312.SubServers.Bungee.SubProxy;
 
 import java.util.UUID;
 
@@ -14,7 +14,7 @@ import java.util.UUID;
  * Download Server Info Packet
  */
 public class PacketDownloadServerInfo implements PacketObjectIn<Integer>, PacketObjectOut<Integer> {
-    private SubPlugin plugin;
+    private SubProxy plugin;
     private String server;
     private UUID tracker;
 
@@ -23,7 +23,7 @@ public class PacketDownloadServerInfo implements PacketObjectIn<Integer>, Packet
      *
      * @param plugin SubPlugin
      */
-    public PacketDownloadServerInfo(SubPlugin plugin) {
+    public PacketDownloadServerInfo(SubProxy plugin) {
         if (Util.isNull(plugin)) throw new NullPointerException();
         this.plugin = plugin;
     }
@@ -35,7 +35,7 @@ public class PacketDownloadServerInfo implements PacketObjectIn<Integer>, Packet
      * @param server Server (or null for all)
      * @param tracker Receiver ID
      */
-    public PacketDownloadServerInfo(SubPlugin plugin, String server, UUID tracker) {
+    public PacketDownloadServerInfo(SubProxy plugin, String server, UUID tracker) {
         if (Util.isNull(plugin)) throw new NullPointerException();
         this.plugin = plugin;
         this.server = server;

@@ -7,7 +7,7 @@ import net.ME1312.SubData.Server.SubDataClient;
 import net.ME1312.SubData.Server.Protocol.PacketIn;
 import net.ME1312.SubData.Server.Protocol.PacketStreamOut;
 import net.ME1312.SubServers.Bungee.Library.Compatibility.Logger;
-import net.ME1312.SubServers.Bungee.SubPlugin;
+import net.ME1312.SubServers.Bungee.SubProxy;
 
 import java.io.*;
 
@@ -15,20 +15,20 @@ import java.io.*;
  * External Host Template Download Packet
  */
 public class PacketExDownloadTemplates implements PacketIn, PacketStreamOut {
-    private SubPlugin plugin;
+    private SubProxy plugin;
     private ExternalHost host;
 
     /**
      * New PacketExDownloadTemplates (In)
      */
-    public PacketExDownloadTemplates(SubPlugin plugin) {
+    public PacketExDownloadTemplates(SubProxy plugin) {
         this.plugin = plugin;
     }
 
     /**
      * New PacketExDownloadTemplates (Out)
      */
-    public PacketExDownloadTemplates(SubPlugin plugin, ExternalHost host) {
+    public PacketExDownloadTemplates(SubProxy plugin, ExternalHost host) {
         this.plugin = plugin;
         this.host = host;
     }

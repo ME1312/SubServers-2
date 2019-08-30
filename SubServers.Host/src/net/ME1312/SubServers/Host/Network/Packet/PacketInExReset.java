@@ -5,9 +5,6 @@ import net.ME1312.SubData.Client.Protocol.PacketObjectIn;
 import net.ME1312.SubData.Client.SubDataClient;
 import net.ME1312.SubServers.Host.ExHost;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Reset Packet
  */

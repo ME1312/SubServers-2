@@ -5,9 +5,9 @@ import net.ME1312.Galaxi.Library.UniversalFile;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubData.Client.SubDataClient;
+import net.ME1312.SubServers.Host.ExHost;
 import net.ME1312.SubServers.Host.Library.Exception.InvalidServerException;
 import net.ME1312.SubServers.Host.Network.Packet.PacketExEditServer;
-import net.ME1312.SubServers.Host.ExHost;
 import net.ME1312.SubServers.Host.SubAPI;
 
 import java.io.*;
@@ -29,7 +29,7 @@ public class SubServerImpl {
     private File directory;
     private String executable;
     private Process process;
-    private SubLogger logger;
+    private SubLoggerImpl logger;
     private Thread thread;
     private BufferedWriter command;
     private LinkedList<String> queue;
@@ -59,7 +59,7 @@ public class SubServerImpl {
         this.directory = new File(host.host.getRawString("Directory"), directory);
         this.executable = executable;
         this.process = null;
-        this.logger = new SubLogger(null, this, name, null, this.log, null);
+        this.logger = new SubLoggerImpl(null, this, name, null, this.log, null);
         this.thread = null;
         this.command = null;
         this.queue = new LinkedList<String>();
@@ -278,7 +278,7 @@ public class SubServerImpl {
     /**
      * Get Process Logger
      */
-    public SubLogger getLogger() {
+    public SubLoggerImpl getLogger() {
         return logger;
     }
 

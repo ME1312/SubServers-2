@@ -17,8 +17,8 @@ import net.ME1312.Galaxi.Plugin.PluginInfo;
 import net.ME1312.SubData.Client.Encryption.AES;
 import net.ME1312.SubData.Client.Encryption.RSA;
 import net.ME1312.SubData.Client.SubDataClient;
-import net.ME1312.SubServers.Host.Executable.SubCreator;
-import net.ME1312.SubServers.Host.Executable.SubLogger;
+import net.ME1312.SubServers.Host.Executable.SubCreatorImpl;
+import net.ME1312.SubServers.Host.Executable.SubLoggerImpl;
 import net.ME1312.SubServers.Host.Executable.SubServerImpl;
 import net.ME1312.SubServers.Host.Library.*;
 import net.ME1312.SubServers.Host.Library.Updates.ConfigUpdater;
@@ -41,9 +41,9 @@ import java.util.jar.Manifest;
 public final class ExHost {
     HashMap<Integer, SubDataClient> subdata = new HashMap<Integer, SubDataClient>();
     NamedContainer<Long, Map<String, Map<String, String>>> lang = null;
-    public HashMap<String, SubCreator.ServerTemplate> templates = new HashMap<String, SubCreator.ServerTemplate>();
+    public HashMap<String, SubCreatorImpl.ServerTemplate> templates = new HashMap<String, SubCreatorImpl.ServerTemplate>();
     public HashMap<String, SubServerImpl> servers = new HashMap<String, SubServerImpl>();
-    public SubCreator creator;
+    public SubCreatorImpl creator;
 
     public Logger log;
     public PluginInfo info;
@@ -186,13 +186,13 @@ public final class ExHost {
                 }
             }
 
-            Util.reflect(SubLogger.class.getDeclaredField("logn"), null, config.get().getMap("Settings").getBoolean("Network-Log", true));
-            Util.reflect(SubLogger.class.getDeclaredField("logc"), null, config.get().getMap("Settings").getBoolean("Console-Log", true));
+            Util.reflect(SubLoggerImpl.class.getDeclaredField("logn"), null, config.get().getMap("Settings").getBoolean("Network-Log", true));
+            Util.reflect(SubLoggerImpl.class.getDeclaredField("logc"), null, config.get().getMap("Settings").getBoolean("Console-Log", true));
 
             engine.getPluginManager().loadPlugins(new UniversalFile(engine.getRuntimeDirectory(), "Plugins"));
 
             running = true;
-            creator = new SubCreator(this);
+            creator = new SubCreatorImpl(this);
             subprotocol = SubProtocol.get();
             loadDefaults();
             reload(false);

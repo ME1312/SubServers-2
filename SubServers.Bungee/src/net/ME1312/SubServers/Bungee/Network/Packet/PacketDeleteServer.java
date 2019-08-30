@@ -7,8 +7,7 @@ import net.ME1312.SubData.Server.Protocol.PacketObjectOut;
 import net.ME1312.SubData.Server.SubDataClient;
 import net.ME1312.SubServers.Bungee.Host.Server;
 import net.ME1312.SubServers.Bungee.Host.SubServer;
-import net.ME1312.SubServers.Bungee.SubAPI;
-import net.ME1312.SubServers.Bungee.SubPlugin;
+import net.ME1312.SubServers.Bungee.SubProxy;
 
 import java.util.Map;
 import java.util.UUID;
@@ -17,7 +16,7 @@ import java.util.UUID;
  * Delete Server Packet
  */
 public class PacketDeleteServer implements PacketObjectIn<Integer>, PacketObjectOut<Integer> {
-    private SubPlugin plugin;
+    private SubProxy plugin;
     private int response;
     private UUID tracker;
 
@@ -26,7 +25,7 @@ public class PacketDeleteServer implements PacketObjectIn<Integer>, PacketObject
      *
      * @param plugin SubPlugin
      */
-    public PacketDeleteServer(SubPlugin plugin) {
+    public PacketDeleteServer(SubProxy plugin) {
         if (Util.isNull(plugin)) throw new NullPointerException();
         this.plugin = plugin;
     }

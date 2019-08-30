@@ -5,9 +5,7 @@ import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubData.Server.Protocol.PacketObjectIn;
 import net.ME1312.SubData.Server.Protocol.PacketObjectOut;
 import net.ME1312.SubData.Server.SubDataClient;
-import net.ME1312.SubServers.Bungee.Host.Server;
-import net.ME1312.SubServers.Bungee.Host.SubServer;
-import net.ME1312.SubServers.Bungee.SubPlugin;
+import net.ME1312.SubServers.Bungee.SubProxy;
 import net.md_5.bungee.api.ChatColor;
 
 import java.net.InetAddress;
@@ -18,7 +16,7 @@ import java.util.UUID;
  * Add Server Packet
  */
 public class PacketAddServer implements PacketObjectIn<Integer>, PacketObjectOut<Integer> {
-    private SubPlugin plugin;
+    private SubProxy plugin;
     private int response;
     private int status;
     private UUID tracker;
@@ -28,7 +26,7 @@ public class PacketAddServer implements PacketObjectIn<Integer>, PacketObjectOut
      *
      * @param plugin SubPlugin
      */
-    public PacketAddServer(SubPlugin plugin) {
+    public PacketAddServer(SubProxy plugin) {
         if (Util.isNull(plugin)) throw new NullPointerException();
         this.plugin = plugin;
     }

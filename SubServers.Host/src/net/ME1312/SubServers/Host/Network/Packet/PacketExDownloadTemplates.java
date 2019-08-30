@@ -1,7 +1,6 @@
 package net.ME1312.SubServers.Host.Network.Packet;
 
 import net.ME1312.Galaxi.Engine.GalaxiEngine;
-import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.UniversalFile;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubData.Client.Protocol.PacketOut;

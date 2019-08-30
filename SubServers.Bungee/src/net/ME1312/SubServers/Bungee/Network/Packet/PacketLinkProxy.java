@@ -5,13 +5,11 @@ import net.ME1312.SubServers.Bungee.Event.SubAddProxyEvent;
 import net.ME1312.SubServers.Bungee.Host.Proxy;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Util;
-import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubData.Server.SubDataClient;
 import net.ME1312.SubData.Server.Protocol.PacketObjectOut;
 import net.ME1312.SubData.Server.Protocol.PacketObjectIn;
-import net.ME1312.SubServers.Bungee.Host.ServerContainer;
 import net.ME1312.SubServers.Bungee.Library.Compatibility.Logger;
-import net.ME1312.SubServers.Bungee.SubPlugin;
+import net.ME1312.SubServers.Bungee.SubProxy;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -20,7 +18,7 @@ import java.util.Map;
  * Link Proxy Packet
  */
 public class PacketLinkProxy implements InitialPacket, PacketObjectIn<Integer>, PacketObjectOut<Integer> {
-    private SubPlugin plugin;
+    private SubProxy plugin;
     private int response;
     private String message;
     private String name;
@@ -30,7 +28,7 @@ public class PacketLinkProxy implements InitialPacket, PacketObjectIn<Integer>, 
      *
      * @param plugin SubPlugin
      */
-    public PacketLinkProxy(SubPlugin plugin) {
+    public PacketLinkProxy(SubProxy plugin) {
         if (Util.isNull(plugin)) throw new NullPointerException();
         this.plugin = plugin;
     }

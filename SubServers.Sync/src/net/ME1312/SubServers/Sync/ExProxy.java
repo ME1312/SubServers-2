@@ -43,7 +43,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Main Plugin Class
  */
-public final class SubPlugin extends BungeeCord implements Listener {
+public final class ExProxy extends BungeeCord implements Listener {
     HashMap<Integer, SubDataClient> subdata = new HashMap<Integer, SubDataClient>();
     NamedContainer<Long, Map<String, Map<String, String>>> lang = null;
     public final Map<String, ServerImpl> servers = new TreeMap<String, ServerImpl>();
@@ -63,7 +63,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
     private boolean reconnect = false;
     private boolean posted = false;
 
-    protected SubPlugin(PrintStream out, boolean isPatched) throws Exception {
+    protected ExProxy(PrintStream out, boolean isPatched) throws Exception {
         this.isPatched = isPatched;
         this.isGalaxi = !Util.isException(() ->
                 Util.reflect(Class.forName("net.ME1312.Galaxi.Engine.PluginManager").getMethod("findClasses", Class.class),
@@ -75,7 +75,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
 
         this.out = out;
         if (!(new UniversalFile(dir, "config.yml").exists())) {
-            Util.copyFromJar(SubPlugin.class.getClassLoader(), "net/ME1312/SubServers/Sync/Library/Files/bungee.yml", new UniversalFile(dir, "config.yml").getPath());
+            Util.copyFromJar(ExProxy.class.getClassLoader(), "net/ME1312/SubServers/Sync/Library/Files/bungee.yml", new UniversalFile(dir, "config.yml").getPath());
             YAMLConfig tmp = new YAMLConfig(new UniversalFile("config.yml"));
             tmp.get().set("stats", UUID.randomUUID().toString());
             tmp.save();
@@ -252,7 +252,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
     /**
      * Reset all changes made by startListeners
      *
-     * @see SubPlugin#startListeners()
+     * @see ExProxy#startListeners()
      */
     @Override
     public void stopListeners() {

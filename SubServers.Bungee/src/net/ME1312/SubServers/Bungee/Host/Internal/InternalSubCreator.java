@@ -6,7 +6,6 @@ import net.ME1312.Galaxi.Library.*;
 import net.ME1312.Galaxi.Library.Callback.Callback;
 import net.ME1312.Galaxi.Library.Callback.ReturnCallback;
 import net.ME1312.Galaxi.Library.Config.YAMLSection;
-import net.ME1312.Galaxi.Library.Map.ObjectMapValue;
 import net.ME1312.SubServers.Bungee.Event.SubCreateEvent;
 import net.ME1312.SubServers.Bungee.Host.*;
 import net.ME1312.Galaxi.Library.Config.YAMLConfig;
@@ -16,7 +15,7 @@ import net.ME1312.SubServers.Bungee.Library.Exception.InvalidServerException;
 import net.ME1312.SubServers.Bungee.Library.Exception.SubCreatorException;
 import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubServers.Bungee.SubAPI;
-import net.ME1312.SubServers.Bungee.SubPlugin;
+import net.ME1312.SubServers.Bungee.SubProxy;
 import net.md_5.bungee.api.ChatColor;
 
 import java.io.*;
@@ -524,11 +523,11 @@ public class InternalSubCreator extends SubCreator {
             if (type == ServerType.SPIGOT) {
                 if (!new UniversalFile(dir, "plugins").exists()) new UniversalFile(dir, "plugins").mkdirs();
                 if (!new UniversalFile(dir, "plugins:SubServers.Client.jar").exists())
-                    Util.copyFromJar(SubPlugin.class.getClassLoader(), "net/ME1312/SubServers/Bungee/Library/Files/client.jar", new UniversalFile(dir, "plugins:SubServers.Client.jar").getPath());
+                    Util.copyFromJar(SubProxy.class.getClassLoader(), "net/ME1312/SubServers/Bungee/Library/Files/client.jar", new UniversalFile(dir, "plugins:SubServers.Client.jar").getPath());
             } else if (type == ServerType.FORGE || type == ServerType.SPONGE) {
                 if (!new UniversalFile(dir, "mods").exists()) new UniversalFile(dir, "mods").mkdirs();
                 if (!new UniversalFile(dir, "mods:SubServers.Client.jar").exists())
-                    Util.copyFromJar(SubPlugin.class.getClassLoader(), "net/ME1312/SubServers/Bungee/Library/Files/client.jar", new UniversalFile(dir, "mods:SubServers.Client.jar").getPath());
+                    Util.copyFromJar(SubProxy.class.getClassLoader(), "net/ME1312/SubServers/Bungee/Library/Files/client.jar", new UniversalFile(dir, "mods:SubServers.Client.jar").getPath());
             }
             YAMLSection config = new YAMLSection();
             FileWriter writer = new FileWriter(new UniversalFile(dir, "subdata.json"), false);
