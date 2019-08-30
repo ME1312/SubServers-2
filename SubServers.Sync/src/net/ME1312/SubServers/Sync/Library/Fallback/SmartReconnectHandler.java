@@ -1,8 +1,8 @@
 package net.ME1312.SubServers.Sync.Library.Fallback;
 
 import net.ME1312.Galaxi.Library.Util;
-import net.ME1312.SubServers.Sync.Server.ServerContainer;
-import net.ME1312.SubServers.Sync.Server.SubServerContainer;
+import net.ME1312.SubServers.Sync.Server.ServerImpl;
+import net.ME1312.SubServers.Sync.Server.SubServerImpl;
 import net.ME1312.SubServers.Sync.SubAPI;
 import net.md_5.bungee.UserConnection;
 import net.md_5.bungee.api.AbstractReconnectHandler;
@@ -16,7 +16,6 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * Smart Reconnect Handler Class
@@ -75,12 +74,12 @@ public class SmartReconnectHandler implements ReconnectHandler {
             if (server != null) {
                 boolean valid = true;
                 int confidence = 0;
-                if (server instanceof ServerContainer) {
-                    if (!((ServerContainer) server).isHidden()) confidence++;
-                    if (!((ServerContainer) server).isRestricted()) confidence++;
-                    if (((ServerContainer) server).getSubData()[0] != null) confidence++;
-                } if (server instanceof SubServerContainer) {
-                    if (!((SubServerContainer) server).isRunning()) valid = false;
+                if (server instanceof ServerImpl) {
+                    if (!((ServerImpl) server).isHidden()) confidence++;
+                    if (!((ServerImpl) server).isRestricted()) confidence++;
+                    if (((ServerImpl) server).getSubData()[0] != null) confidence++;
+                } if (server instanceof SubServerImpl) {
+                    if (!((SubServerImpl) server).isRunning()) valid = false;
                 }
 
                 List<FallbackInspector> inspectors = new ArrayList<FallbackInspector>();

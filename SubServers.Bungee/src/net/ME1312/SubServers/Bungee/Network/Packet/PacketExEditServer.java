@@ -11,6 +11,7 @@ import net.ME1312.SubData.Server.Protocol.PacketObjectIn;
 import net.ME1312.SubServers.Bungee.SubPlugin;
 
 import java.util.Arrays;
+import java.util.UUID;
 
 /**
  * Edit External Server Packet
@@ -31,7 +32,8 @@ public class PacketExEditServer implements PacketObjectIn<Integer>, PacketObject
         // Data Manipulation
         SET_ENABLED(0, Boolean.class),
         SET_LOGGING(5, Boolean.class),
-        SET_STOP_COMMAND(6, String.class);
+        SET_LOGGING_ADDRESS(6, String.class),
+        SET_STOP_COMMAND(7, String.class);
 
         private short value;
         private Class<?>[] args;

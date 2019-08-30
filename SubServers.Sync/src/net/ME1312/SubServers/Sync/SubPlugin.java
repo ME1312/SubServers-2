@@ -18,8 +18,8 @@ import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubData.Client.SubDataClient;
 import net.ME1312.SubServers.Sync.Library.Updates.ConfigUpdater;
 import net.ME1312.SubServers.Sync.Network.SubProtocol;
-import net.ME1312.SubServers.Sync.Server.ServerContainer;
-import net.ME1312.SubServers.Sync.Server.SubServerContainer;
+import net.ME1312.SubServers.Sync.Server.ServerImpl;
+import net.ME1312.SubServers.Sync.Server.SubServerImpl;
 import net.md_5.bungee.BungeeCord;
 import net.md_5.bungee.UserConnection;
 import net.md_5.bungee.api.ChatColor;
@@ -46,7 +46,7 @@ import java.util.concurrent.TimeUnit;
 public final class SubPlugin extends BungeeCord implements Listener {
     HashMap<Integer, SubDataClient> subdata = new HashMap<Integer, SubDataClient>();
     NamedContainer<Long, Map<String, Map<String, String>>> lang = null;
-    public final Map<String, ServerContainer> servers = new TreeMap<String, ServerContainer>();
+    public final Map<String, ServerImpl> servers = new TreeMap<String, ServerImpl>();
     private final HashMap<UUID, List<ServerInfo>> fallbackLimbo = new HashMap<UUID, List<ServerInfo>>();
 
     public final PrintStream out;
@@ -285,7 +285,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
         int offline = 0;
         for (String name : e.getConnection().getListener().getServerPriority()) {
             ServerInfo server = getServerInfo(name);
-            if (server == null || server instanceof SubServerContainer && !((SubServerContainer) server).isRunning()) offline++;
+            if (server == null || server instanceof SubServerImpl && !((SubServerImpl) server).isRunning()) offline++;
         }
 
         if (offline >= e.getConnection().getListener().getServerPriority().size()) {
@@ -320,7 +320,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
                 e.getPlayer().sendMessage(getTranslation("no_server_permission"));
                 e.setCancelled(true);
             }
-        } else if (e.getPlayer().getServer() != null && !fallbackLimbo.keySet().contains(e.getPlayer().getUniqueId()) && e.getTarget() instanceof SubServerContainer && !((SubServerContainer) e.getTarget()).isRunning()) {
+        } else if (e.getPlayer().getServer() != null && !fallbackLimbo.keySet().contains(e.getPlayer().getUniqueId()) && e.getTarget() instanceof SubServerImpl && !((SubServerImpl) e.getTarget()).isRunning()) {
             e.getPlayer().sendMessage(api.getLang("SubServers", "Bungee.Server.Offline"));
             e.setCancelled(true);
         }
@@ -349,7 +349,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
             fallbacks.remove(e.getKickedFrom().getName());
             if (!fallbacks.isEmpty()) {
                 e.setCancelled(true);
-                e.getPlayer().sendMessage(api.getLang("SubServers", "Bungee.Feature.Smart-Fallback").replace("$str$", (e.getKickedFrom() instanceof ServerContainer)?((ServerContainer) e.getKickedFrom()).getDisplayName():e.getKickedFrom().getName()).replace("$msg$", e.getKickReason()));
+                e.getPlayer().sendMessage(api.getLang("SubServers", "Bungee.Feature.Smart-Fallback").replace("$str$", (e.getKickedFrom() instanceof ServerImpl)?((ServerImpl) e.getKickedFrom()).getDisplayName():e.getKickedFrom().getName()).replace("$msg$", e.getKickReason()));
                 if (!fallbackLimbo.keySet().contains(e.getPlayer().getUniqueId())) fallbackLimbo.put(e.getPlayer().getUniqueId(), new LinkedList<>(fallbacks.values()));
 
                 ServerInfo next = new LinkedList<Map.Entry<String, ServerInfo>>(fallbacks.entrySet()).getFirst().getValue();
@@ -369,7 +369,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
             public void run() {
                 if (e.getPlayer().getServer() != null && !((UserConnection) e.getPlayer()).isDimensionChange() && e.getPlayer().getServer().getInfo().getAddress().equals(e.getServer().getInfo().getAddress())) {
                     fallbackLimbo.remove(e.getPlayer().getUniqueId());
-                    e.getPlayer().sendMessage(api.getLang("SubServers", "Bungee.Feature.Smart-Fallback.Result").replace("$str$", (e.getServer().getInfo() instanceof ServerContainer)?((ServerContainer) e.getServer().getInfo()).getDisplayName():e.getServer().getInfo().getName()));
+                    e.getPlayer().sendMessage(api.getLang("SubServers", "Bungee.Feature.Smart-Fallback.Result").replace("$str$", (e.getServer().getInfo() instanceof ServerImpl)?((ServerImpl) e.getServer().getInfo()).getDisplayName():e.getServer().getInfo().getName()));
                 }
             }
         }, 1000);
@@ -393,11 +393,11 @@ public final class SubPlugin extends BungeeCord implements Listener {
         api.getServer(e.getServer(), server -> {
             if (server != null) {
                 if (server instanceof net.ME1312.SubServers.Sync.Network.API.SubServer) {
-                    servers.put(server.getName().toLowerCase(), new SubServerContainer(server.getSignature(), server.getName(), server.getDisplayName(), server.getAddress(),
+                    servers.put(server.getName().toLowerCase(), new SubServerImpl(server.getSignature(), server.getName(), server.getDisplayName(), server.getAddress(),
                             getSubDataAsMap(server), server.getMotd(), server.isHidden(), server.isRestricted(), server.getWhitelist(), ((net.ME1312.SubServers.Sync.Network.API.SubServer) server).isRunning()));
                     Logger.get("SubServers").info("Added SubServer: " + e.getServer());
                 } else {
-                    servers.put(server.getName().toLowerCase(), new ServerContainer(server.getSignature(), server.getName(), server.getDisplayName(), server.getAddress(),
+                    servers.put(server.getName().toLowerCase(), new ServerImpl(server.getSignature(), server.getName(), server.getDisplayName(), server.getAddress(),
                             getSubDataAsMap(server), server.getMotd(), server.isHidden(), server.isRestricted(), server.getWhitelist()));
                     Logger.get("SubServers").info("Added Server: " + e.getServer());
                 }
@@ -406,14 +406,14 @@ public final class SubPlugin extends BungeeCord implements Listener {
     }
 
     public Boolean merge(net.ME1312.SubServers.Sync.Network.API.Server server) {
-        ServerContainer current = servers.get(server.getName().toLowerCase());
-        if (current == null || server instanceof net.ME1312.SubServers.Sync.Network.API.SubServer || !(current instanceof SubServerContainer)) {
+        ServerImpl current = servers.get(server.getName().toLowerCase());
+        if (current == null || server instanceof net.ME1312.SubServers.Sync.Network.API.SubServer || !(current instanceof SubServerImpl)) {
             if (current == null || !current.getSignature().equals(server.getSignature())) {
                 if (server instanceof net.ME1312.SubServers.Sync.Network.API.SubServer) {
-                    servers.put(server.getName().toLowerCase(), new SubServerContainer(server.getSignature(), server.getName(), server.getDisplayName(), server.getAddress(),
+                    servers.put(server.getName().toLowerCase(), new SubServerImpl(server.getSignature(), server.getName(), server.getDisplayName(), server.getAddress(),
                             getSubDataAsMap(server), server.getMotd(), server.isHidden(), server.isRestricted(), server.getWhitelist(), ((net.ME1312.SubServers.Sync.Network.API.SubServer) server).isRunning()));
                 } else {
-                    servers.put(server.getName().toLowerCase(), new ServerContainer(server.getSignature(), server.getName(), server.getDisplayName(), server.getAddress(),
+                    servers.put(server.getName().toLowerCase(), new ServerImpl(server.getSignature(), server.getName(), server.getDisplayName(), server.getAddress(),
                             getSubDataAsMap(server), server.getMotd(), server.isHidden(), server.isRestricted(), server.getWhitelist()));
                 }
 
@@ -421,8 +421,8 @@ public final class SubPlugin extends BungeeCord implements Listener {
                 return true;
             } else {
                 if (server instanceof net.ME1312.SubServers.Sync.Network.API.SubServer) {
-                    if (((net.ME1312.SubServers.Sync.Network.API.SubServer) server).isRunning() != ((SubServerContainer) current).isRunning())
-                        ((SubServerContainer) current).setRunning(((net.ME1312.SubServers.Sync.Network.API.SubServer) server).isRunning());
+                    if (((net.ME1312.SubServers.Sync.Network.API.SubServer) server).isRunning() != ((SubServerImpl) current).isRunning())
+                        ((SubServerImpl) current).setRunning(((net.ME1312.SubServers.Sync.Network.API.SubServer) server).isRunning());
                 }
                 if (!server.getMotd().equals(current.getMotd()))
                     current.setMotd(server.getMotd());
@@ -443,7 +443,7 @@ public final class SubPlugin extends BungeeCord implements Listener {
     @EventHandler(priority = Byte.MIN_VALUE)
     public void edit(SubEditServerEvent e) {
         if (servers.keySet().contains(e.getServer().toLowerCase())) {
-            ServerContainer server = servers.get(e.getServer().toLowerCase());
+            ServerImpl server = servers.get(e.getServer().toLowerCase());
             switch (e.getEdit().name().toLowerCase()) {
                 case "display":
                     server.setDisplayName(e.getEdit().get().asString());
@@ -463,17 +463,17 @@ public final class SubPlugin extends BungeeCord implements Listener {
 
     @EventHandler(priority = Byte.MIN_VALUE)
     public void start(SubStartEvent e) {
-        if (servers.keySet().contains(e.getServer().toLowerCase()) && servers.get(e.getServer().toLowerCase()) instanceof SubServerContainer)
-            ((SubServerContainer) servers.get(e.getServer().toLowerCase())).setRunning(true);
+        if (servers.keySet().contains(e.getServer().toLowerCase()) && servers.get(e.getServer().toLowerCase()) instanceof SubServerImpl)
+            ((SubServerImpl) servers.get(e.getServer().toLowerCase())).setRunning(true);
     }
 
-    public void connect(ServerContainer server, int channel, UUID address) {
+    public void connect(ServerImpl server, int channel, UUID address) {
         if (server != null) {
             server.setSubData(address, channel);
         }
     }
 
-    public void disconnect(ServerContainer server, int channel) {
+    public void disconnect(ServerImpl server, int channel) {
         if (server != null) {
             server.setSubData(null, channel);
         }
@@ -481,8 +481,8 @@ public final class SubPlugin extends BungeeCord implements Listener {
 
     @EventHandler(priority = Byte.MIN_VALUE)
     public void stop(SubStoppedEvent e) {
-        if (servers.keySet().contains(e.getServer().toLowerCase()) && servers.get(e.getServer().toLowerCase()) instanceof SubServerContainer)
-            ((SubServerContainer) servers.get(e.getServer().toLowerCase())).setRunning(false);
+        if (servers.keySet().contains(e.getServer().toLowerCase()) && servers.get(e.getServer().toLowerCase()) instanceof SubServerImpl)
+            ((SubServerImpl) servers.get(e.getServer().toLowerCase())).setRunning(false);
     }
 
     @EventHandler(priority = Byte.MIN_VALUE)

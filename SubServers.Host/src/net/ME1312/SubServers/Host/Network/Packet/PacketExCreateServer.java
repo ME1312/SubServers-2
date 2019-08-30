@@ -90,7 +90,7 @@ public class PacketExCreateServer implements PacketObjectIn<Integer>, PacketObje
                 String template = data.getRawString(0x0003);
                 Version version =    (data.contains(0x0004)?data.getVersion(0x0004):null);
                 Integer port =          data.getInt(0x0005);
-                String dir =      data.getRawString(0x0006);
+                String dir =      data.getRawString(0x0006).replace("$address$", host.config.get().getMap("Settings").getRawString("Server-Bind"));
                 UUID log =             data.getUUID(0x0007);
 
                 host.creator.create(name, host.templates.get(template.toLowerCase()), version,

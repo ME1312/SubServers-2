@@ -12,14 +12,14 @@ import java.util.*;
 /**
  * Server Class
  */
-public class ServerContainer extends BungeeServerInfo {
+public class ServerImpl extends BungeeServerInfo {
     private HashMap<Integer, UUID> subdata = new HashMap<Integer, UUID>();
     private List<UUID> whitelist = new ArrayList<UUID>();
     private String nick = null;
     private boolean hidden;
     private final String signature;
 
-    public ServerContainer(String signature, String name, String display, InetSocketAddress address, Map<Integer, UUID> subdata, String motd, boolean hidden, boolean restricted, Collection<UUID> whitelist) {
+    public ServerImpl(String signature, String name, String display, InetSocketAddress address, Map<Integer, UUID> subdata, String motd, boolean hidden, boolean restricted, Collection<UUID> whitelist) {
         super(name, address, motd, restricted);
         if (Util.isNull(name, address, motd, hidden, restricted)) throw new NullPointerException();
         this.signature = signature;

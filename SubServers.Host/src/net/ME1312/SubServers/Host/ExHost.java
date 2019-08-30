@@ -2,9 +2,7 @@ package net.ME1312.SubServers.Host;
 
 import com.dosse.upnp.UPnP;
 import net.ME1312.Galaxi.Engine.GalaxiEngine;
-import net.ME1312.Galaxi.Engine.GalaxiOption;
 import net.ME1312.Galaxi.Event.GalaxiReloadEvent;
-import net.ME1312.Galaxi.Galaxi;
 import net.ME1312.Galaxi.Library.Config.YAMLConfig;
 import net.ME1312.Galaxi.Library.Config.YAMLSection;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
@@ -18,18 +16,16 @@ import net.ME1312.Galaxi.Plugin.App;
 import net.ME1312.Galaxi.Plugin.PluginInfo;
 import net.ME1312.SubData.Client.Encryption.AES;
 import net.ME1312.SubData.Client.Encryption.RSA;
-import net.ME1312.SubData.Client.Protocol.PacketObjectIn;
 import net.ME1312.SubData.Client.SubDataClient;
 import net.ME1312.SubServers.Host.Executable.SubCreator;
 import net.ME1312.SubServers.Host.Executable.SubLogger;
-import net.ME1312.SubServers.Host.Executable.SubServer;
+import net.ME1312.SubServers.Host.Executable.SubServerImpl;
 import net.ME1312.SubServers.Host.Library.*;
 import net.ME1312.SubServers.Host.Library.Updates.ConfigUpdater;
 import net.ME1312.SubServers.Host.Network.SubProtocol;
 import org.json.JSONObject;
 
 import java.io.*;
-import java.lang.reflect.Field;
 import java.net.InetAddress;
 import java.net.URL;
 import java.nio.charset.Charset;
@@ -46,7 +42,7 @@ public final class ExHost {
     HashMap<Integer, SubDataClient> subdata = new HashMap<Integer, SubDataClient>();
     NamedContainer<Long, Map<String, Map<String, String>>> lang = null;
     public HashMap<String, SubCreator.ServerTemplate> templates = new HashMap<String, SubCreator.ServerTemplate>();
-    public HashMap<String, SubServer> servers = new HashMap<String, SubServer>();
+    public HashMap<String, SubServerImpl> servers = new HashMap<String, SubServerImpl>();
     public SubCreator creator;
 
     public Logger log;

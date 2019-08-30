@@ -1,6 +1,7 @@
 package net.ME1312.SubServers.Host.Network;
 
 import net.ME1312.Galaxi.Library.Callback.Callback;
+import net.ME1312.Galaxi.Library.Config.YAMLSection;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubData.Client.Library.DisconnectReason;
@@ -162,7 +163,7 @@ public class SubProtocol extends SubDataProtocol {
             map.put(0, null);
 
             Logger log = Util.getDespiteException(() -> Util.reflect(SubDataClient.class.getDeclaredField("log"), client.get()), null);
-            int reconnect = host.config.get().getMap("Settings").getMap("SubData").getInt("Reconnect", 30);
+            int reconnect = host.config.get().getMap("Settings", new YAMLSection()).getMap("SubData", new YAMLSection()).getInt("Reconnect", 30);
             if (Util.getDespiteException(() -> Util.reflect(ExHost.class.getDeclaredField("reconnect"), host), false) && reconnect > 0
                     && client.name() != DisconnectReason.PROTOCOL_MISMATCH && client.name() != DisconnectReason.ENCRYPTION_MISMATCH) {
                 log.info("Attempting reconnect in " + reconnect + " seconds");

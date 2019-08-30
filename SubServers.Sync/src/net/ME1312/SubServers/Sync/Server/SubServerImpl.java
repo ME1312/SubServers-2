@@ -8,10 +8,10 @@ import java.util.UUID;
 /**
  * SubServer Class
  */
-public class SubServerContainer extends ServerContainer {
+public class SubServerImpl extends ServerImpl {
     private boolean running;
 
-    public SubServerContainer(String signature, String name, String display, InetSocketAddress address, Map<Integer, UUID> subdata, String motd, boolean hidden, boolean restricted, Collection<UUID> whitelist, boolean running) {
+    public SubServerImpl(String signature, String name, String display, InetSocketAddress address, Map<Integer, UUID> subdata, String motd, boolean hidden, boolean restricted, Collection<UUID> whitelist, boolean running) {
         super(signature, name, display, address, subdata, motd, hidden, restricted, whitelist);
         this.running = running;
     }

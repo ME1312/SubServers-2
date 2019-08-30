@@ -19,7 +19,7 @@ public class PacketInExReset implements PacketObjectIn<Integer> {
     }
 
     @Override
-    public void receive(SubDataClient client, ObjectMap<Integer> data) {
+    public void receive(SubDataClient client, ObjectMap<Integer> data) {/*
         List<String> subservers = new ArrayList<String>();
         subservers.addAll(host.servers.keySet());
 
@@ -32,7 +32,7 @@ public class PacketInExReset implements PacketObjectIn<Integer> {
             }
         }
         subservers.clear();
-        host.servers.clear();
+        host.servers.clear(); */
 
         host.creator.terminate();
         try {

@@ -19,6 +19,7 @@ import net.ME1312.SubServers.Bungee.Network.Packet.PacketExDeleteServer;
 import net.ME1312.SubServers.Bungee.Network.Packet.PacketExRemoveServer;
 import net.ME1312.SubServers.Bungee.Network.Packet.PacketOutExReset;
 import net.ME1312.SubServers.Bungee.SubPlugin;
+import net.md_5.bungee.BungeeCord;
 
 import java.net.InetAddress;
 import java.util.*;
@@ -106,7 +107,9 @@ public class ExternalHost extends Host implements ClientHandler {
             clean = true;
         }
         for (SubServer server : servers.values()) {
-            client.sendPacket(new PacketExAddServer(server.getName(), server.isEnabled(), server.getAddress().getPort(), server.isLogging(), server.getPath(), ((ExternalSubServer) server).exec, server.getStopCommand(), (server.isRunning())?((ExternalSubLogger) server.getLogger()).getExternalAddress():null));
+            client.sendPacket(new PacketExAddServer(server.getName(), server.isEnabled(), server.getAddress().getPort(), server.isLogging(), server.getPath(), ((ExternalSubServer) server).exec, server.getStopCommand(), (server.isRunning())?((ExternalSubLogger) server.getLogger()).getExternalAddress():null, data -> {
+                if (data.contains(0x0002)) ((ExternalSubServer) server).started(data.getUUID(0x0002));
+            }));
         }
         while (queue.size() != 0) {
             client.sendPacket(queue.get(0));
@@ -164,11 +167,13 @@ public class ExternalHost extends Host implements ClientHandler {
     @Override
     public SubServer addSubServer(UUID player, String name, boolean enabled, int port, String motd, boolean log, String directory, String executable, String stopcmd, boolean hidden, boolean restricted) throws InvalidServerException {
         if (plugin.api.getServers().keySet().contains(name.toLowerCase())) throw new InvalidServerException("A Server already exists with this name!");
-        SubServer server = new ExternalSubServer(this, name, enabled, port, motd, log, directory, executable, stopcmd, hidden, restricted);
+        ExternalSubServer server = new ExternalSubServer(this, name, enabled, port, motd, log, directory, executable, stopcmd, hidden, restricted);
         SubAddServerEvent event = new SubAddServerEvent(player, this, server);
         plugin.getPluginManager().callEvent(event);
         if (!event.isCancelled()) {
-            queue(new PacketExAddServer(name, enabled, port, log, directory, executable, stopcmd, (server.isRunning())?((ExternalSubLogger) server.getLogger()).getExternalAddress():null));
+            queue(new PacketExAddServer(name, enabled, port, log, directory, executable, stopcmd, (server.isRunning())?((ExternalSubLogger) server.getLogger()).getExternalAddress():null, data -> {
+                if (data.contains(0x0002)) server.started(data.getUUID(0x0002));
+            }));
             servers.put(name.toLowerCase(), server);
             return server;
         } else {
@@ -364,6 +369,14 @@ public class ExternalHost extends Host implements ClientHandler {
                 Logger.get("SubServers").info("Couldn't remove " + server + " from memory. See " + getName() + " console for more details");
             }
         }));
+        return true;
+    }
+
+    @Override
+    public boolean destroy() {
+        if (Util.getDespiteException(() -> Util.reflect(BungeeCord.class.getDeclaredField("isRunning"), plugin), true)) {
+            return super.destroy();
+        }
         return true;
     }
 

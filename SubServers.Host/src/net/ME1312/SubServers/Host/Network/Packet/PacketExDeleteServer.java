@@ -6,11 +6,10 @@ import net.ME1312.Galaxi.Library.Config.YAMLSection;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.UniversalFile;
 import net.ME1312.Galaxi.Library.Util;
-import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubData.Client.Protocol.PacketObjectIn;
 import net.ME1312.SubData.Client.Protocol.PacketObjectOut;
 import net.ME1312.SubData.Client.SubDataClient;
-import net.ME1312.SubServers.Host.Executable.SubServer;
+import net.ME1312.SubServers.Host.Executable.SubServerImpl;
 import net.ME1312.SubServers.Host.ExHost;
 import net.ME1312.SubServers.Host.SubAPI;
 
@@ -73,7 +72,7 @@ public class PacketExDeleteServer implements PacketObjectIn<Integer>, PacketObje
             } else if (host.servers.get(name.toLowerCase()).isRunning()) {
                 ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketExDeleteServer(3, tracker));
             } else {
-                SubServer server = host.servers.get(name.toLowerCase());
+                SubServerImpl server = host.servers.get(name.toLowerCase());
                 host.servers.remove(name.toLowerCase());
                 new Thread(() -> {
                     UniversalFile to = new UniversalFile(GalaxiEngine.getInstance().getRuntimeDirectory(), "Recently Deleted:" + server.getName().toLowerCase());

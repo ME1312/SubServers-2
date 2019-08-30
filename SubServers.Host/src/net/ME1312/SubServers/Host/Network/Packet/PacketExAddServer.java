@@ -6,7 +6,7 @@ import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubData.Client.Protocol.PacketObjectIn;
 import net.ME1312.SubData.Client.Protocol.PacketObjectOut;
 import net.ME1312.SubData.Client.SubDataClient;
-import net.ME1312.SubServers.Host.Executable.SubServer;
+import net.ME1312.SubServers.Host.Executable.SubServerImpl;
 import net.ME1312.SubServers.Host.ExHost;
 
 import java.util.UUID;
@@ -18,6 +18,7 @@ import java.util.logging.Logger;
 public class PacketExAddServer implements PacketObjectIn<Integer>, PacketObjectOut<Integer> {
     private ExHost host;
     private int response;
+    private UUID running;
     private UUID tracker;
 
     /**
@@ -37,9 +38,20 @@ public class PacketExAddServer implements PacketObjectIn<Integer>, PacketObjectO
      * @param tracker Receiver ID
      */
     public PacketExAddServer(int response, UUID tracker) {
+        this(response, null, tracker);
+    }
+
+    /**
+     * New PacketExAddServer (Out)
+     *
+     * @param response Response ID
+     * @param tracker Receiver ID
+     */
+    public PacketExAddServer(int response, UUID running, UUID tracker) {
         if (Util.isNull(response)) throw new NullPointerException();
         this.response = response;
         this.tracker = tracker;
+        this.running = running;
     }
 
     @Override
@@ -47,6 +59,7 @@ public class PacketExAddServer implements PacketObjectIn<Integer>, PacketObjectO
         ObjectMap<Integer> data = new ObjectMap<Integer>();
         if (tracker != null) data.set(0x0000, tracker);
         data.set(0x0001, response);
+        if (running != null) data.set(0x0002, running);
         return data;
     }
 
@@ -65,19 +78,38 @@ public class PacketExAddServer implements PacketObjectIn<Integer>, PacketObjectO
             UUID running =       data.contains(0x0008)?data.getUUID(0x0008):null;
 
             if (host.servers.keySet().contains(name.toLowerCase())) {
-                client.sendPacket(new PacketExAddServer(1, tracker));
+                SubServerImpl server = host.servers.get(name.toLowerCase());
+                if (server.getPort() == port && server.getExecutable().equals(exec) && server.getDirectory().equals(dir)) {
+                    if (server.isEnabled() != enabled || server.getLogger().isLogging() != log || !server.getStopCommand().equals(stopcmd)) {
+                        server.setEnabled(enabled);
+                        server.setLogging(log);
+                        server.setStopCommand(stopcmd);
+                        logger.info("Re-Added SubServer: " + server.getName());
+                    }
+                    client.sendPacket(new PacketExAddServer(0, (server.isRunning())?server.getLogger().getAddress():null, tracker));
+                } else {
+                    server.stop();
+                    server.waitFor();
+                    if (UPnP.isUPnPAvailable() && UPnP.isMappedTCP(server.getPort()))
+                        UPnP.closePortTCP(server.getPort());
+
+                    init(client, server = new SubServerImpl(host, name, enabled, port, log, dir, exec, stopcmd), running, tracker, logger);
+                }
             } else {
-                SubServer server = new SubServer(host, name, enabled, port, log, dir, exec, stopcmd);
-                host.servers.put(name.toLowerCase(), server);
-                if (UPnP.isUPnPAvailable() && host.config.get().getMap("Settings").getMap("UPnP", new ObjectMap<String>()).getBoolean("Forward-Servers", false)) UPnP.openPortTCP(server.getPort());
-                logger.info("Added SubServer: " + name);
-                if (running != null) server.start(running);
-                client.sendPacket(new PacketExAddServer(0, tracker));
+                init(client, new SubServerImpl(host, name, enabled, port, log, dir, exec, stopcmd), running, tracker, logger);
             }
         } catch (Throwable e) {
             client.sendPacket(new PacketExAddServer(2, tracker));
             host.log.error.println(e);
         }
+    }
+
+    private void init(SubDataClient client, SubServerImpl server, UUID running, UUID tracker, Logger logger) {
+        host.servers.put(server.getName().toLowerCase(), server);
+        if (UPnP.isUPnPAvailable() && host.config.get().getMap("Settings").getMap("UPnP", new ObjectMap<String>()).getBoolean("Forward-Servers", false)) UPnP.openPortTCP(server.getPort());
+        logger.info("Added SubServer: " + server.getName());
+        if (running != null) server.start(running);
+        client.sendPacket(new PacketExAddServer(0, tracker));
     }
 
     @Override

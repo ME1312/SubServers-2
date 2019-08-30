@@ -79,13 +79,17 @@ public class ExternalSubServer extends SubServerContainer {
             lock = false;
             if (!event.isCancelled()) {
                 Logger.get("SubServers").info("Now starting " + getName());
-                started = false;
-                running = true;
-                logger.start();
+                started(null);
                 host.queue(new PacketExEditServer(this, PacketExEditServer.UpdateType.START, logger.getExternalAddress().toString()));
                 return true;
             } else return false;
         } else return false;
+    }
+    void started(UUID address) {
+        started = false;
+        running = true;
+        logger.start();
+        if (address != null && address != logger.getExternalAddress()) host.queue(new PacketExEditServer(this, PacketExEditServer.UpdateType.SET_LOGGING_ADDRESS, logger.getExternalAddress().toString()));
     }
     private void falsestart() {
         Logger.get("SubServers").info("Couldn't start " + getName() + " - See the " + host.getName() + " console for more details");

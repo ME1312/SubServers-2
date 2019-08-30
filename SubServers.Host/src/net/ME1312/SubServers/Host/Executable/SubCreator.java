@@ -196,7 +196,7 @@ public class SubCreator {
     }
 
     private class CreatorTask extends Thread {
-        private final SubServer update;
+        private final SubServerImpl update;
         private final String name;
         private final ServerTemplate template;
         private final Version version;
@@ -214,7 +214,7 @@ public class SubCreator {
             this.template = template;
             this.version = version;
             this.port = port;
-            this.dir = new File(host.host.getRawString("Directory"), dir.replace("$address$", host.config.get().getMap("Settings").getRawString("Server-Bind")));
+            this.dir = new File(host.host.getRawString("Directory"), dir);
             this.log = new SubLogger(null, this, name + File.separator + ((update == null)?"Creator":"Updater"), address, new Container<Boolean>(true), null);
             this.address = address;
             this.tracker = tracker;

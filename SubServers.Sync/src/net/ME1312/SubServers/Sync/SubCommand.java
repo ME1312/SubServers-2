@@ -12,8 +12,8 @@ import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubServers.Sync.Library.Compatibility.GalaxiInfo;
 import net.ME1312.SubServers.Sync.Network.API.*;
 import net.ME1312.SubServers.Sync.Network.Packet.*;
-import net.ME1312.SubServers.Sync.Server.ServerContainer;
-import net.ME1312.SubServers.Sync.Server.SubServerContainer;
+import net.ME1312.SubServers.Sync.Server.ServerImpl;
+import net.ME1312.SubServers.Sync.Server.SubServerImpl;
 import net.md_5.bungee.BungeeCord;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.CommandSender;
@@ -683,7 +683,7 @@ public final class SubCommand extends CommandX {
                 // do nothing
             } else if (!players.keySet().contains(((ProxiedPlayer) sender).getUniqueId()) || !players.get(((ProxiedPlayer) sender).getUniqueId()).keySet().contains(((ProxiedPlayer) sender).getServer().getInfo())
                     || Calendar.getInstance().getTime().getTime() - players.get(((ProxiedPlayer) sender).getUniqueId()).get(((ProxiedPlayer) sender).getServer().getInfo()).name() >= TimeUnit.MINUTES.toMillis(1)) {
-                if (!(((ProxiedPlayer) sender).getServer().getInfo() instanceof ServerContainer) || ((ServerContainer) ((ProxiedPlayer) sender).getServer().getInfo()).getSubData()[0] == null) {
+                if (!(((ProxiedPlayer) sender).getServer().getInfo() instanceof ServerImpl) || ((ServerImpl) ((ProxiedPlayer) sender).getServer().getInfo()).getSubData()[0] == null) {
                     HashMap<ServerInfo, NamedContainer<Long, Boolean>> map = (players.keySet().contains(((ProxiedPlayer) sender).getUniqueId()))?players.get(((ProxiedPlayer) sender).getUniqueId()):new HashMap<ServerInfo, NamedContainer<Long, Boolean>>();
                     map.put(((ProxiedPlayer) sender).getServer().getInfo(), new NamedContainer<>(Calendar.getInstance().getTime().getTime(), false));
                     players.put(((ProxiedPlayer) sender).getUniqueId(), map);
@@ -723,7 +723,7 @@ public final class SubCommand extends CommandX {
                         for (String proxy : proxyCache) if (!list.contains(proxy)) list.add(proxy);
                         for (String host : hostCache.keySet()) if (!list.contains(host)) list.add(host);
                         for (String group : groupCache) if (!list.contains(group)) list.add(group);
-                        for (ServerContainer server : plugin.servers.values()) if (!list.contains(server.getName())) list.add(server.getName());
+                        for (ServerImpl server : plugin.servers.values()) if (!list.contains(server.getName())) list.add(server.getName());
                     } else {
                         for (String command : subcommands) {
                             if (!list.contains(command) && command.toLowerCase().startsWith(last))
@@ -741,7 +741,7 @@ public final class SubCommand extends CommandX {
                             if (!list.contains(group) && group.toLowerCase().startsWith(last))
                                 list.add(last + group.substring(last.length()));
                         }
-                        for (ServerContainer server : plugin.servers.values()) {
+                        for (ServerImpl server : plugin.servers.values()) {
                             if (!list.contains(server.getName()) && server.getName().toLowerCase().startsWith(last))
                                 list.add(last + server.getName().substring(last.length()));
                         }
@@ -767,7 +767,7 @@ public final class SubCommand extends CommandX {
                             case "s":
                             case "server":
                             case "subserver":
-                                for (ServerContainer server : plugin.servers.values()) list.add(server.getName());
+                                for (ServerImpl server : plugin.servers.values()) list.add(server.getName());
                                 break;
                         }
                     } else {
@@ -796,7 +796,7 @@ public final class SubCommand extends CommandX {
                             case "s":
                             case "server":
                             case "subserver":
-                                for (ServerContainer server : plugin.servers.values()) {
+                                for (ServerImpl server : plugin.servers.values()) {
                                     if (server.getName().toLowerCase().startsWith(last))
                                         list.add(last + server.getName().substring(last.length()));
                                 }
@@ -812,10 +812,10 @@ public final class SubCommand extends CommandX {
                 List<String> list = new ArrayList<String>();
                 if (args.length == 2) {
                     if (last.length() == 0) {
-                        for (ServerContainer server : plugin.servers.values()) if (server instanceof SubServerContainer) list.add(server.getName());
+                        for (ServerImpl server : plugin.servers.values()) if (server instanceof SubServerImpl) list.add(server.getName());
                     } else {
-                        for (ServerContainer server : plugin.servers.values()) {
-                            if (server instanceof SubServerContainer && server.getName().toLowerCase().startsWith(last)) list.add(last + server.getName().substring(last.length()));
+                        for (ServerImpl server : plugin.servers.values()) {
+                            if (server instanceof SubServerImpl && server.getName().toLowerCase().startsWith(last)) list.add(last + server.getName().substring(last.length()));
                         }
                     }
                     return new NamedContainer<>((list.size() <= 0)?plugin.api.getLang("SubServers", "Command.Generic.Unknown-SubServer").replace("$str$", args[0]):null, list);
@@ -828,11 +828,11 @@ public final class SubCommand extends CommandX {
                 if (args.length == 2) {
                     if (last.length() == 0) {
                         list.add("*");
-                        for (ServerContainer server : plugin.servers.values()) if (server instanceof SubServerContainer) list.add(server.getName());
+                        for (ServerImpl server : plugin.servers.values()) if (server instanceof SubServerImpl) list.add(server.getName());
                     } else {
                         if ("*".startsWith(last)) list.add("*");
-                        for (ServerContainer server : plugin.servers.values()) {
-                            if (server instanceof SubServerContainer && server.getName().toLowerCase().startsWith(last)) list.add(last + server.getName().substring(last.length()));
+                        for (ServerImpl server : plugin.servers.values()) {
+                            if (server instanceof SubServerImpl && server.getName().toLowerCase().startsWith(last)) list.add(last + server.getName().substring(last.length()));
                         }
                     }
                     return new NamedContainer<>((list.size() <= 0)?plugin.api.getLang("SubServers", "Command.Generic.Unknown-SubServer").replace("$str$", args[0]):null, list);
@@ -843,10 +843,10 @@ public final class SubCommand extends CommandX {
                 if (args.length == 2) {
                     List<String> list = new ArrayList<String>();
                     if (last.length() == 0) {
-                        for (ServerContainer server : plugin.servers.values()) if (server instanceof SubServerContainer) list.add(server.getName());
+                        for (ServerImpl server : plugin.servers.values()) if (server instanceof SubServerImpl) list.add(server.getName());
                     } else {
-                        for (ServerContainer server : plugin.servers.values()) {
-                            if (server instanceof SubServerContainer && server.getName().toLowerCase().startsWith(last)) list.add(last + server.getName().substring(last.length()));
+                        for (ServerImpl server : plugin.servers.values()) {
+                            if (server instanceof SubServerImpl && server.getName().toLowerCase().startsWith(last)) list.add(last + server.getName().substring(last.length()));
                         }
                     }
                     return new NamedContainer<>((list.size() <= 0)?plugin.api.getLang("SubServers", "Command.Generic.Unknown-SubServer").replace("$str$", args[0]):null, list);
@@ -900,9 +900,9 @@ public final class SubCommand extends CommandX {
                 if (args.length == 2) {
                     List<String> list = new ArrayList<String>();
                     if (last.length() == 0) {
-                        for (ServerContainer server : plugin.servers.values()) list.add(server.getName());
+                        for (ServerImpl server : plugin.servers.values()) list.add(server.getName());
                     } else {
-                        for (ServerContainer server : plugin.servers.values()) {
+                        for (ServerImpl server : plugin.servers.values()) {
                             if (server.getName().toLowerCase().startsWith(last)) list.add(last + server.getName().substring(last.length()));
                         }
                     }
@@ -985,7 +985,7 @@ public final class SubCommand extends CommandX {
         public void execute(CommandSender sender, String[] args) {
             if (sender instanceof ProxiedPlayer) {
                 if (args.length > 0) {
-                    Map<String, ServerContainer> servers = plugin.servers;
+                    Map<String, ServerImpl> servers = plugin.servers;
                     if (servers.keySet().contains(args[0].toLowerCase())) {
                         ((ProxiedPlayer) sender).connect(servers.get(args[0].toLowerCase()));
                     } else {
@@ -995,8 +995,8 @@ public final class SubCommand extends CommandX {
                     int i = 0;
                     TextComponent serverm = new TextComponent(ChatColor.RESET.toString());
                     TextComponent div = new TextComponent(plugin.api.getLang("SubServers", "Bungee.Server.Divider"));
-                    for (ServerContainer server : plugin.servers.values()) {
-                        if (!server.isHidden() && server.canAccess(sender) && (!(server instanceof SubServerContainer) || ((SubServerContainer) server).isRunning())) {
+                    for (ServerImpl server : plugin.servers.values()) {
+                        if (!server.isHidden() && server.canAccess(sender) && (!(server instanceof SubServerImpl) || ((SubServerImpl) server).isRunning())) {
                             if (i != 0) serverm.addExtra(div);
                             TextComponent message = new TextComponent(plugin.api.getLang("SubServers", "Bungee.Server.List").replace("$str$", server.getDisplayName()));
                             try {
@@ -1031,12 +1031,12 @@ public final class SubCommand extends CommandX {
                 String last = (args.length > 0)?args[args.length - 1].toLowerCase():"";
                 List<String> list = new ArrayList<String>();
                 if (last.length() == 0) {
-                    for (ServerContainer server : plugin.servers.values()) {
+                    for (ServerImpl server : plugin.servers.values()) {
                         if (!server.isHidden()) list.add(server.getName());
                     }
                     return new NamedContainer<>(null, new LinkedList<>(list));
                 } else {
-                    for (ServerContainer server : plugin.servers.values()) {
+                    for (ServerImpl server : plugin.servers.values()) {
                         if (server.getName().toLowerCase().startsWith(last) && !server.isHidden()) list.add(server.getName());
                     }
                     return new NamedContainer<>((list.size() <= 0)?plugin.api.getLang("SubServers", "Bungee.Server.Invalid").replace("$str$", args[0]):null, list);
@@ -1079,7 +1079,7 @@ public final class SubCommand extends CommandX {
         public void execute(CommandSender sender, String[] args) {
             List<String> messages = new LinkedList<String>();
             int players = 0;
-            for (ServerContainer server : plugin.servers.values()) {
+            for (ServerImpl server : plugin.servers.values()) {
                 List<String> playerlist = new ArrayList<String>();
                 if (plugin.redis) {
                     try {
@@ -1093,7 +1093,7 @@ public final class SubCommand extends CommandX {
                 Collections.sort(playerlist);
 
                 players += playerlist.size();
-                if (!server.isHidden() && (!(server instanceof SubServerContainer) || ((SubServerContainer) server).isRunning())) {
+                if (!server.isHidden() && (!(server instanceof SubServerImpl) || ((SubServerImpl) server).isRunning())) {
                     int i = 0;
                     String message = plugin.api.getLang("SubServers", "Bungee.List.Format").replace("$str$", server.getDisplayName()).replace("$int$", Integer.toString(playerlist.size()));
                     for (String player : playerlist) {

@@ -19,7 +19,7 @@ import java.util.jar.JarInputStream;
 /**
  * Internal SubServer Class
  */
-public class SubServer {
+public class SubServerImpl {
     private ExHost host;
     private String name;
     private boolean enabled;
@@ -48,7 +48,7 @@ public class SubServer {
      * @param stopcmd Stop Command
      * @throws InvalidServerException
      */
-    public SubServer(ExHost host, String name, boolean enabled, int port, boolean log, String directory, String executable, String stopcmd) throws InvalidServerException {
+    public SubServerImpl(ExHost host, String name, boolean enabled, int port, boolean log, String directory, String executable, String stopcmd) throws InvalidServerException {
         if (Util.isNull(host, name, enabled, log, directory, executable)) throw new NullPointerException();
         this.host = host;
         this.name = name;
@@ -133,7 +133,8 @@ public class SubServer {
             if (falsestart) ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketExEditServer(this, PacketExEditServer.UpdateType.LAUNCH_EXCEPTION));
         }
 
-        ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketExEditServer(this, PacketExEditServer.UpdateType.STOPPED, (Integer) process.exitValue(), (Boolean) allowrestart));
+        if (SubAPI.getInstance().getSubDataNetwork()[0] != null)
+            ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketExEditServer(this, PacketExEditServer.UpdateType.STOPPED, (Integer) process.exitValue(), (Boolean) allowrestart));
         host.log.info.println(name + " has stopped");
         process = null;
         command = null;
@@ -159,6 +160,7 @@ public class SubServer {
             try {
                 allowrestart = false;
                 if (process != null && process.isAlive()) {
+                    System.out.println(stopcmd);
                     command.write(stopcmd);
                     command.newLine();
                     command.flush();
@@ -287,6 +289,15 @@ public class SubServer {
      */
     public String getDirectory() {
         return dir;
+    }
+
+    /**
+     * Get the Server's Executable String
+     *
+     * @return Executable String
+     */
+    public String getExecutable() {
+        return executable;
     }
 
     /**

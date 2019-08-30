@@ -13,9 +13,7 @@ import net.ME1312.SubServers.Bungee.SubAPI;
 import net.ME1312.SubServers.Bungee.SubPlugin;
 
 import java.net.InetAddress;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Host Layout Class
@@ -389,6 +387,29 @@ public abstract class Host implements ExtraDataHandler {
      * @return Success Status
      */
     public abstract boolean forceDeleteSubServer(UUID player, String name) throws InterruptedException;
+
+    /**
+     * Resets this Host object
+     *
+     * @return Success Status
+     */
+    public boolean destroy() {
+        try {
+            List<String> subservers = new ArrayList<String>();
+            subservers.addAll(getSubServers().keySet());
+
+            for (String server : subservers) {
+                forceRemoveSubServer(server);
+            }
+            subservers.clear();
+            getCreator().terminate();
+            getCreator().waitFor();
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 
     /**
      * Get the Signature of this Object

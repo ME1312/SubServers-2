@@ -272,20 +272,10 @@ public final class SubAPI {
         SubRemoveHostEvent event = new SubRemoveHostEvent(player, getHost(name));
         plugin.getPluginManager().callEvent(event);
         if (event.isCancelled()) {
-            try {
-                List<String> subservers = new ArrayList<String>();
-                subservers.addAll(getHost(name).getSubServers().keySet());
-
-                for (String server : subservers) {
-                    getHost(name).removeSubServer(server);
-                }
-                subservers.clear();
-                getHost(name).getCreator().terminate();
-                getHost(name).getCreator().waitFor();
+            if (getHost(name).destroy()) {
                 plugin.hosts.remove(name.toLowerCase());
                 return true;
-            } catch (Exception e) {
-                e.printStackTrace();
+            } else {
                 return false;
             }
         } else return false;
@@ -312,20 +302,10 @@ public final class SubAPI {
         if (Util.isNull(name, getHost(name))) throw new NullPointerException();
         SubRemoveHostEvent event = new SubRemoveHostEvent(player, getHost(name));
         plugin.getPluginManager().callEvent(event);
-        try {
-            List<String> subservers = new ArrayList<String>();
-            subservers.addAll(getHost(name).getSubServers().keySet());
-
-            for (String server : subservers) {
-                getHost(name).removeSubServer(server);
-            }
-            subservers.clear();
-            getHost(name).getCreator().terminate();
-            getHost(name).getCreator().waitFor();
+        if (getHost(name).destroy()) {
             plugin.hosts.remove(name.toLowerCase());
             return true;
-        } catch (Exception e) {
-            e.printStackTrace();
+        } else {
             return false;
         }
     }

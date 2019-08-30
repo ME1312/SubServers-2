@@ -1,17 +1,25 @@
 package net.ME1312.SubServers.Host.Executable;
 
+import net.ME1312.Galaxi.Library.Callback.Callback;
+import net.ME1312.Galaxi.Library.Callback.ReturnCallback;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Container;
 import net.ME1312.Galaxi.Library.Log.LogStream;
 import net.ME1312.Galaxi.Library.Log.Logger;
+import net.ME1312.Galaxi.Library.NamedContainer;
 import net.ME1312.Galaxi.Library.Util;
+import net.ME1312.SubData.Client.DataClient;
+import net.ME1312.SubData.Client.Library.DisconnectReason;
 import net.ME1312.SubData.Client.SubDataClient;
+import net.ME1312.SubServers.Host.ExHost;
 import net.ME1312.SubServers.Host.Library.TextColor;
+import net.ME1312.SubServers.Host.Network.API.Host;
 import net.ME1312.SubServers.Host.Network.Packet.PacketOutExLogMessage;
 import net.ME1312.SubServers.Host.SubAPI;
 
 import java.io.*;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -59,7 +67,6 @@ public class SubLogger {
      */
     public void start() {
         started = true;
-        if (logn) Util.isException(() -> channel = (SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0].newChannel());
         if (file != null && writer == null) {
             try {
                 this.writer = new PrintWriter(file, "UTF-8");
@@ -69,6 +76,36 @@ public class SubLogger {
                 logger.error.println(e);
             }
         }
+        Process process = this.process;
+        ExHost host = SubAPI.getInstance().getInternals();
+        if (logn) Util.isException(() -> {
+            channel = (SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0].newChannel();
+            channel.on.closed(new Callback<NamedContainer<DisconnectReason, DataClient>>() {
+                @Override
+                public void run(NamedContainer<DisconnectReason, DataClient> client) {
+                    if (started && SubLogger.this.process != null && process == SubLogger.this.process && process.isAlive()) {
+                        int reconnect = host.config.get().getMap("Settings").getMap("SubData").getInt("Reconnect", 30);
+                        if (Util.getDespiteException(() -> Util.reflect(ExHost.class.getDeclaredField("reconnect"), host), false) && reconnect > 0
+                                && client.name() != DisconnectReason.PROTOCOL_MISMATCH && client.name() != DisconnectReason.ENCRYPTION_MISMATCH) {
+                            Timer timer = new Timer(SubAPI.getInstance().getAppInfo().getName() + "::Log_Reconnect_Handler");
+                            Callback<NamedContainer<DisconnectReason, DataClient>> run = this;
+                            timer.scheduleAtFixedRate(new TimerTask() {
+                                @Override
+                                public void run() {
+                                    if (!started || SubLogger.this.process == null || process != SubLogger.this.process || !process.isAlive()) {
+                                        timer.cancel();
+                                    } else try {
+                                        channel = (SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0].newChannel();
+                                        channel.on.closed(run);
+                                        timer.cancel();
+                                    } catch (NullPointerException | IOException e) {}
+                                }
+                            }, TimeUnit.SECONDS.toMillis(reconnect), TimeUnit.SECONDS.toMillis(reconnect));
+                        }
+                    }
+                }
+            });
+        });
         if (out == null) (out = new Thread(() -> start(process.getInputStream(), false), SubAPI.getInstance().getAppInfo().getName() + "::Log_Spooler(" + name + ')')).start();
         if (err == null) (err = new Thread(() -> start(process.getErrorStream(), true), SubAPI.getInstance().getAppInfo().getName() + "::Error_Spooler(" + name + ')')).start();
     }
@@ -193,5 +230,14 @@ public class SubLogger {
      */
     public boolean isLogging() {
         return log.get();
+    }
+
+    /**
+     * Get the Logging Address
+     *
+     * @return Address
+     */
+    public UUID getAddress() {
+        return address;
     }
 }

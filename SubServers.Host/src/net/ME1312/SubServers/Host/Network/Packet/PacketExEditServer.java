@@ -1,22 +1,22 @@
 package net.ME1312.SubServers.Host.Network.Packet;
 
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
-import net.ME1312.Galaxi.Library.Version.Version;
+import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubData.Client.Protocol.PacketObjectIn;
 import net.ME1312.SubData.Client.Protocol.PacketObjectOut;
 import net.ME1312.SubData.Client.SubDataClient;
-import net.ME1312.SubServers.Host.Executable.SubServer;
+import net.ME1312.SubServers.Host.Executable.SubLogger;
+import net.ME1312.SubServers.Host.Executable.SubServerImpl;
 import net.ME1312.SubServers.Host.ExHost;
 
 import java.util.Arrays;
-import java.util.UUID;
 
 /**
  * Edit Server Packet
  */
 public class PacketExEditServer implements PacketObjectIn<Integer>, PacketObjectOut<Integer> {
     private ExHost host;
-    private SubServer server;
+    private SubServerImpl server;
     private UpdateType type;
     private Object[] args;
 
@@ -56,7 +56,7 @@ public class PacketExEditServer implements PacketObjectIn<Integer>, PacketObject
      * @param type Update Type
      * @param arguments Arguments
      */
-    public PacketExEditServer(SubServer server, UpdateType type, Object... arguments) {
+    public PacketExEditServer(SubServerImpl server, UpdateType type, Object... arguments) {
         if (arguments.length != type.getArguments().length) throw new IllegalArgumentException(((arguments.length > type.getArguments().length)?"Too many":"Not enough") + " arguments for type: " + type.toString());
         int i = 0;
         while (i < arguments.length) {
@@ -80,7 +80,7 @@ public class PacketExEditServer implements PacketObjectIn<Integer>, PacketObject
     @Override
     public void receive(SubDataClient client, ObjectMap<Integer> data) {
         try {
-            SubServer server = host.servers.get(data.getString(0x0000).toLowerCase());
+            SubServerImpl server = host.servers.get(data.getString(0x0000).toLowerCase());
             switch (data.getInt(0x0001)) {
                 case 0:
                     server.setEnabled(data.getList(0x0002).get(0).asBoolean());
@@ -101,6 +101,9 @@ public class PacketExEditServer implements PacketObjectIn<Integer>, PacketObject
                     server.setLogging(data.getList(0x0002).get(0).asBoolean());
                     break;
                 case 6:
+                    Util.reflect(SubLogger.class.getDeclaredField("address"), server.getLogger(), data.getList(0x0002).get(0).asUUID());
+                    break;
+                case 7:
                     server.setStopCommand(data.getList(0x0002).get(0).asRawString());
                     break;
             }
