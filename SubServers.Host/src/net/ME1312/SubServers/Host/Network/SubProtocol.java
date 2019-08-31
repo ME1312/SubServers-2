@@ -2,6 +2,7 @@ package net.ME1312.SubServers.Host.Network;
 
 import net.ME1312.Galaxi.Library.Callback.Callback;
 import net.ME1312.Galaxi.Library.Config.YAMLSection;
+import net.ME1312.Galaxi.Library.NamedContainer;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubData.Client.Library.DisconnectReason;
@@ -163,27 +164,8 @@ public class SubProtocol extends SubDataProtocol {
             map.put(0, null);
 
             Logger log = Util.getDespiteException(() -> Util.reflect(SubDataClient.class.getDeclaredField("log"), client.get()), null);
-            int reconnect = host.config.get().getMap("Settings", new YAMLSection()).getMap("SubData", new YAMLSection()).getInt("Reconnect", 30);
-            if (Util.getDespiteException(() -> Util.reflect(ExHost.class.getDeclaredField("reconnect"), host), false) && reconnect > 0
-                    && client.name() != DisconnectReason.PROTOCOL_MISMATCH && client.name() != DisconnectReason.ENCRYPTION_MISMATCH) {
-                log.info("Attempting reconnect in " + reconnect + " seconds");
-                Timer timer = new Timer(SubAPI.getInstance().getAppInfo().getName() + "::SubData_Reconnect_Handler");
-                timer.scheduleAtFixedRate(new TimerTask() {
-                    @Override
-                    public void run() {
-                        try {
-                            Util.reflect(ExHost.class.getDeclaredMethod("connect"), host);
-                            timer.cancel();
-                        } catch (InvocationTargetException e) {
-                            if (e.getTargetException() instanceof IOException) {
-                                log.info("Connection was unsuccessful, retrying in " + reconnect + " seconds");
-                            } else e.printStackTrace();
-                        } catch (NoSuchMethodException | IllegalAccessException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }, TimeUnit.SECONDS.toMillis(reconnect), TimeUnit.SECONDS.toMillis(reconnect));
-            }
+            log.info("Attempting reconnect in " + host.config.get().getMap("Settings", new YAMLSection()).getMap("SubData", new YAMLSection()).getInt("Reconnect", 30) + " seconds");
+            Util.isException(() -> Util.reflect(ExHost.class.getDeclaredMethod("connect", Logger.class, NamedContainer.class), host, log, client));
         });
 
         return subdata;

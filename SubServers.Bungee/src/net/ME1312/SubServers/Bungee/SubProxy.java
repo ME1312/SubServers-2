@@ -72,7 +72,7 @@ public final class SubProxy extends BungeeCord implements Listener {
     public SubProtocol subprotocol;
     public SubDataServer subdata = null;
     public SubServer sudo = null;
-    public static final Version version = Version.fromString("2.14.2a");
+    public static final Version version = Version.fromString("2.14.4a");
 
     public Proxy redis = null;
     public boolean canSudo = false;
@@ -556,7 +556,7 @@ public final class SubProxy extends BungeeCord implements Listener {
             subdata = subprotocol.open((config.get().getMap("Settings").getMap("SubData").getRawString("Address", "127.0.0.1:4391").split(":")[0].equals("0.0.0.0"))?null:InetAddress.getByName(config.get().getMap("Settings").getMap("SubData").getRawString("Address", "127.0.0.1:4391").split(":")[0]),
                     Integer.parseInt(config.get().getMap("Settings").getMap("SubData").getRawString("Address", "127.0.0.1:4391").split(":")[1]), cipher);
         } // Add new entries to Allowed-Connections
-        for (String s : config.get().getMap("Settings").getMap("SubData").getStringList("Allowed-Connections", new ArrayList<String>())) {
+        for (String s : config.get().getMap("Settings").getMap("SubData").getStringList("Whitelist", new ArrayList<String>())) {
             try {
                 subdata.whitelist(s);
             } catch (Exception e) {

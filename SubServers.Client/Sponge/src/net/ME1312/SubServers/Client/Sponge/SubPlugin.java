@@ -2,8 +2,10 @@ package net.ME1312.SubServers.Client.Sponge;
 
 import com.google.gson.Gson;
 import com.google.inject.Inject;
+import net.ME1312.SubData.Client.DataClient;
 import net.ME1312.SubData.Client.Encryption.AES;
 import net.ME1312.SubData.Client.Encryption.RSA;
+import net.ME1312.SubData.Client.Library.DisconnectReason;
 import net.ME1312.SubData.Client.SubDataClient;
 import net.ME1312.SubServers.Client.Sponge.Graphic.UIHandler;
 import net.ME1312.Galaxi.Library.Config.YAMLConfig;
@@ -40,7 +42,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * SubServers Client Plugin Class
  */
-@Plugin(id = "subservers-client-sponge", name = "SubServers-Client-Sponge", authors = "ME1312", version = "2.14.2a", url = "https://github.com/ME1312/SubServers-2", description = "Access your SubServers from Anywhere")
+@Plugin(id = "subservers-client-sponge", name = "SubServers-Client-Sponge", authors = "ME1312", version = "2.14.4a", url = "https://github.com/ME1312/SubServers-2", description = "Take control of the server manager — from your servers")
 public final class SubPlugin {
     HashMap<Integer, SubDataClient> subdata = new HashMap<Integer, SubDataClient>();
     NamedContainer<Long, Map<String, Map<String, String>>> lang = null;
@@ -56,6 +58,7 @@ public final class SubPlugin {
     @Inject public PluginContainer plugin;
     @Inject public Game game;
 
+    private long resetDate = 0;
     private boolean reconnect = false;
 
     @Listener
@@ -130,6 +133,7 @@ public final class SubPlugin {
 
     public void reload(boolean notifyPlugins) throws IOException {
         reconnect = false;
+        resetDate = Calendar.getInstance().getTime().getTime();
         ArrayList<SubDataClient> tmp = new ArrayList<SubDataClient>();
         tmp.addAll(subdata.values());
         for (SubDataClient client : tmp) if (client != null) {
@@ -169,7 +173,8 @@ public final class SubPlugin {
 
         reconnect = true;
         log.info(" ");
-        connect();
+        log.info("Connecting to /" + config.get().getMap("Settings").getMap("SubData").getRawString("Address", "127.0.0.1:4391"));
+        connect(null);
 
         if (notifyPlugins) {
             List<Runnable> listeners = api.reloadListeners;
@@ -185,9 +190,27 @@ public final class SubPlugin {
         }
     }
 
-    private void connect() throws IOException {
-        subdata.put(0, subprotocol.open((config.get().getMap("Settings").getMap("SubData").getRawString("Address", "127.0.0.1:4391").split(":")[0].equals("0.0.0.0"))?null:InetAddress.getByName(config.get().getMap("Settings").getMap("SubData").getRawString("Address", "127.0.0.1:4391").split(":")[0]),
-                Integer.parseInt(config.get().getMap("Settings").getMap("SubData").getRawString("Address", "127.0.0.1:4391").split(":")[1])));
+    private void connect(NamedContainer<DisconnectReason, DataClient> disconnect) throws IOException {
+        int reconnect = config.get().getMap("Settings").getMap("SubData").getInt("Reconnect", 30);
+        if (disconnect == null || (this.reconnect && reconnect > 0 && disconnect.name() != DisconnectReason.PROTOCOL_MISMATCH && disconnect.name() != DisconnectReason.ENCRYPTION_MISMATCH)) {
+            long reset = resetDate;
+            Logger log = LoggerFactory.getLogger("SubData");
+            Sponge.getScheduler().createTaskBuilder().async().execute(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        if (reset == resetDate && subdata.getOrDefault(0, null) == null)
+                            subdata.put(0, subprotocol.open((config.get().getMap("Settings").getMap("SubData").getRawString("Address", "127.0.0.1:4391").split(":")[0].equals("0.0.0.0"))?
+                                        null:InetAddress.getByName(config.get().getMap("Settings").getMap("SubData").getRawString("Address", "127.0.0.1:4391").split(":")[0]),
+                                Integer.parseInt(config.get().getMap("Settings").getMap("SubData").getRawString("Address", "127.0.0.1:4391").split(":")[1])));
+                    } catch (IOException e) {
+                        log.info("Connection was unsuccessful, retrying in " + reconnect + " seconds");
+
+                        Sponge.getScheduler().createTaskBuilder().async().execute(this).delay(reconnect, TimeUnit.SECONDS).submit(plugin);
+                    }
+                }
+            }).delay((disconnect == null)?0:reconnect, TimeUnit.SECONDS).submit(plugin);
+        }
     }
 
     /**

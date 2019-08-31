@@ -53,9 +53,6 @@ public class ConfigUpdater {
                 if (existing.getMap("Settings", new YAMLSection()).contains("SubData") && !existing.getMap("Settings", new YAMLSection()).getMap("SubData").contains("Encryption"))
                     updated.getMap("Settings").getMap("SubData").set("Encryption", "NONE");
 
-                if (existing.getMap("Settings", new YAMLSection()).getMap("SubData", new YAMLSection()).contains("Allowed-Connections"))
-                    updated.getMap("Settings").getMap("SubData").safeSet("Whitelist", existing.getMap("Settings").getMap("SubData").getRawStringList("Allowed-Connections"));
-
                 if (existing.contains("Servers")) {
                     YAMLConfig sc = new YAMLConfig(new File(file.getParentFile(), "servers.yml"));
                     YAMLSection settings = new YAMLSection();
@@ -68,6 +65,12 @@ public class ConfigUpdater {
                     Logger.get("SubServers").info("Created ./SubServers/servers.yml (using existing data)");
                     sc.save();
                 }
+
+                existing = updated.clone();
+                i++;
+            } if (was.compareTo(new Version("19w35b")) <= 0) {
+                if (existing.getMap("Settings", new YAMLSection()).getMap("SubData", new YAMLSection()).contains("Allowed-Connections"))
+                    updated.getMap("Settings").getMap("SubData").safeSet("Whitelist", existing.getMap("Settings").getMap("SubData").getRawStringList("Allowed-Connections"));
 
                 existing = updated.clone();
                 i++;

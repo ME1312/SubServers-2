@@ -2,8 +2,10 @@ package net.ME1312.SubServers.Sync;
 
 import com.dosse.upnp.UPnP;
 import com.google.gson.Gson;
+import net.ME1312.SubData.Client.DataClient;
 import net.ME1312.SubData.Client.Encryption.AES;
 import net.ME1312.SubData.Client.Encryption.RSA;
+import net.ME1312.SubData.Client.Library.DisconnectReason;
 import net.ME1312.SubServers.Sync.Event.*;
 import net.ME1312.Galaxi.Library.Config.YAMLConfig;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
@@ -55,11 +57,12 @@ public final class ExProxy extends BungeeCord implements Listener {
     public boolean redis = false;
     public final SubAPI api = new SubAPI(this);
     public SubProtocol subprotocol;
-    public static final Version version = Version.fromString("2.14.2a");
+    public static final Version version = Version.fromString("2.14.4a");
 
     public final boolean isPatched;
     public final boolean isGalaxi;
     public long lastReload = -1;
+    private long resetDate = 0;
     private boolean reconnect = false;
     private boolean posted = false;
 
@@ -99,6 +102,7 @@ public final class ExProxy extends BungeeCord implements Listener {
     @Override
     public void startListeners() {
         try {
+            resetDate = Calendar.getInstance().getTime().getTime();
             redis = getPluginManager().getPlugin("RedisBungee") != null;
             ConfigUpdater.updateConfig(new UniversalFile(dir, "SubServers:sync.yml"));
             config.reload();
@@ -129,7 +133,8 @@ public final class ExProxy extends BungeeCord implements Listener {
 
             reconnect = true;
             Logger.get("SubData").info("");
-            connect();
+            Logger.get("SubData").info("Connecting to /" + config.get().getMap("Settings").getMap("SubData").getRawString("Address", "127.0.0.1:4391"));
+            connect(null);
 
             super.startListeners();
 
@@ -150,9 +155,26 @@ public final class ExProxy extends BungeeCord implements Listener {
         }
     }
 
-    private void connect() throws IOException {
-        subdata.put(0, subprotocol.open((config.get().getMap("Settings").getMap("SubData").getRawString("Address", "127.0.0.1:4391").split(":")[0].equals("0.0.0.0"))?null:InetAddress.getByName(config.get().getMap("Settings").getMap("SubData").getRawString("Address", "127.0.0.1:4391").split(":")[0]),
-                Integer.parseInt(config.get().getMap("Settings").getMap("SubData").getRawString("Address", "127.0.0.1:4391").split(":")[1])));
+    private void connect(NamedContainer<DisconnectReason, DataClient> disconnect) throws IOException {
+        int reconnect = config.get().getMap("Settings").getMap("SubData").getInt("Reconnect", 30);
+        if (disconnect == null || (this.reconnect && reconnect > 0 && disconnect.name() != DisconnectReason.PROTOCOL_MISMATCH && disconnect.name() != DisconnectReason.ENCRYPTION_MISMATCH)) {
+            long reset = resetDate;
+            Timer timer = new Timer("SubServers.Sync::SubData_Reconnect_Handler");
+            timer.scheduleAtFixedRate(new TimerTask() {
+                @Override
+                public void run() {
+                    try {
+                        if (reset == resetDate && subdata.getOrDefault(0, null) == null)
+                            subdata.put(0, subprotocol.open((config.get().getMap("Settings").getMap("SubData").getRawString("Address", "127.0.0.1:4391").split(":")[0].equals("0.0.0.0"))?
+                                        null:InetAddress.getByName(config.get().getMap("Settings").getMap("SubData").getRawString("Address", "127.0.0.1:4391").split(":")[0]),
+                                Integer.parseInt(config.get().getMap("Settings").getMap("SubData").getRawString("Address", "127.0.0.1:4391").split(":")[1])));
+                        timer.cancel();
+                    } catch (IOException e) {
+                        net.ME1312.SubServers.Sync.Library.Compatibility.Logger.get("SubData").info("Connection was unsuccessful, retrying in " + reconnect + " seconds");
+                    }
+                }
+            }, (disconnect == null)?0:TimeUnit.SECONDS.toMillis(reconnect), TimeUnit.SECONDS.toMillis(reconnect));
+        }
     }
 
     private void post() {

@@ -14,8 +14,10 @@ import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.Galaxi.Library.Version.VersionType;
 import net.ME1312.Galaxi.Plugin.App;
 import net.ME1312.Galaxi.Plugin.PluginInfo;
+import net.ME1312.SubData.Client.DataClient;
 import net.ME1312.SubData.Client.Encryption.AES;
 import net.ME1312.SubData.Client.Encryption.RSA;
+import net.ME1312.SubData.Client.Library.DisconnectReason;
 import net.ME1312.SubData.Client.SubDataClient;
 import net.ME1312.SubServers.Host.Executable.SubCreatorImpl;
 import net.ME1312.SubServers.Host.Executable.SubLoggerImpl;
@@ -37,7 +39,7 @@ import java.util.jar.Manifest;
 /**
  * SubServers.Host Main Class
  */
-@App(name = "SubServers.Host", version = "2.14.2a", authors = "ME1312", description = "Host SubServers from other Machines", website = "https://github.com/ME1312/SubServers-2")
+@App(name = "SubServers.Host", version = "2.14.4a", authors = "ME1312", website = "https://github.com/ME1312/SubServers-2", description = "Host subservers on separate machines")
 public final class ExHost {
     HashMap<Integer, SubDataClient> subdata = new HashMap<Integer, SubDataClient>();
     NamedContainer<Long, Map<String, Map<String, String>>> lang = null;
@@ -54,6 +56,7 @@ public final class ExHost {
 
     public final SubAPI api = new SubAPI(this);
 
+    private long resetDate = 0;
     private boolean reconnect = true;
     private boolean running = false;
 
@@ -238,6 +241,7 @@ public final class ExHost {
     }
 
     public void reload(boolean notifyPlugins) throws IOException {
+        resetDate = Calendar.getInstance().getTime().getTime();
         reconnect = false;
         ArrayList<SubDataClient> tmp = new ArrayList<SubDataClient>();
         tmp.addAll(subdata.values());
@@ -278,16 +282,34 @@ public final class ExHost {
 
         reconnect = true;
         log.info.println();
-        connect();
+        log.info.println("Connecting to /" + config.get().getMap("Settings").getMap("SubData").getRawString("Address", "127.0.0.1:4391"));
+        connect(log.toPrimitive(), null);
 
         if (notifyPlugins) {
             engine.getPluginManager().executeEvent(new GalaxiReloadEvent(engine));
         }
     }
 
-    private void connect() throws IOException {
-        subdata.put(0, subprotocol.open((config.get().getMap("Settings").getMap("SubData").getRawString("Address", "127.0.0.1:4391").split(":")[0].equals("0.0.0.0"))?null:InetAddress.getByName(config.get().getMap("Settings").getMap("SubData").getRawString("Address", "127.0.0.1:4391").split(":")[0]),
-                Integer.parseInt(config.get().getMap("Settings").getMap("SubData").getRawString("Address", "127.0.0.1:4391").split(":")[1])));
+    private void connect(java.util.logging.Logger log, NamedContainer<DisconnectReason, DataClient> disconnect) throws IOException {
+        int reconnect = config.get().getMap("Settings").getMap("SubData").getInt("Reconnect", 30);
+        if (disconnect == null || (this.reconnect && reconnect > 0 && disconnect.name() != DisconnectReason.PROTOCOL_MISMATCH && disconnect.name() != DisconnectReason.ENCRYPTION_MISMATCH)) {
+            long reset = resetDate;
+            Timer timer = new Timer(SubAPI.getInstance().getAppInfo().getName() + "::SubData_Reconnect_Handler");
+            timer.scheduleAtFixedRate(new TimerTask() {
+                @Override
+                public void run() {
+                    try {
+                        if (reset == resetDate && subdata.getOrDefault(0, null) == null)
+                            subdata.put(0, subprotocol.open((config.get().getMap("Settings").getMap("SubData").getRawString("Address", "127.0.0.1:4391").split(":")[0].equals("0.0.0.0"))?
+                                        null:InetAddress.getByName(config.get().getMap("Settings").getMap("SubData").getRawString("Address", "127.0.0.1:4391").split(":")[0]),
+                                    Integer.parseInt(config.get().getMap("Settings").getMap("SubData").getRawString("Address", "127.0.0.1:4391").split(":")[1])));
+                        timer.cancel();
+                    } catch (IOException e) {
+                        log.info("Connection was unsuccessful, retrying in " + reconnect + " seconds");
+                    }
+                }
+            }, (disconnect == null)?0:TimeUnit.SECONDS.toMillis(reconnect), TimeUnit.SECONDS.toMillis(reconnect));
+        }
     }
 
     private void stop() {

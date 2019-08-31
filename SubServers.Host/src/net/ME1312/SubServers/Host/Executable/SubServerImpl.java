@@ -160,7 +160,6 @@ public class SubServerImpl {
             try {
                 allowrestart = false;
                 if (process != null && process.isAlive()) {
-                    System.out.println(stopcmd);
                     command.write(stopcmd);
                     command.newLine();
                     command.flush();

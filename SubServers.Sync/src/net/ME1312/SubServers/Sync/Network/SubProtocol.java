@@ -2,6 +2,7 @@ package net.ME1312.SubServers.Sync.Network;
 
 import net.ME1312.Galaxi.Library.Callback.Callback;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
+import net.ME1312.Galaxi.Library.NamedContainer;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubData.Client.Library.DisconnectReason;
@@ -165,27 +166,8 @@ public class SubProtocol extends SubDataProtocol {
             plugin.getPluginManager().callEvent(event);
             map.put(0, null);
 
-            int reconnect = plugin.config.get().getMap("Settings").getMap("SubData").getInt("Reconnect", 30);
-            if (Util.getDespiteException(() -> Util.reflect(ExProxy.class.getDeclaredField("reconnect"), plugin), false) && reconnect > 0
-                    && client.name() != DisconnectReason.PROTOCOL_MISMATCH && client.name() != DisconnectReason.ENCRYPTION_MISMATCH) {
-                net.ME1312.SubServers.Sync.Library.Compatibility.Logger.get("SubData").info("Attempting reconnect in " + reconnect + " seconds");
-                Timer timer = new Timer("SubServers.Sync::SubData_Reconnect_Handler");
-                timer.scheduleAtFixedRate(new TimerTask() {
-                    @Override
-                    public void run() {
-                        try {
-                            Util.reflect(ExProxy.class.getDeclaredMethod("connect"), plugin);
-                            timer.cancel();
-                        } catch (InvocationTargetException e) {
-                            if (e.getTargetException() instanceof IOException) {
-                                net.ME1312.SubServers.Sync.Library.Compatibility.Logger.get("SubData").info("Connection was unsuccessful, retrying in " + reconnect + " seconds");
-                            } else e.printStackTrace();
-                        } catch (NoSuchMethodException | IllegalAccessException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }, TimeUnit.SECONDS.toMillis(reconnect), TimeUnit.SECONDS.toMillis(reconnect));
-            }
+            net.ME1312.SubServers.Sync.Library.Compatibility.Logger.get("SubData").info("Attempting reconnect in " + plugin.config.get().getMap("Settings").getMap("SubData").getInt("Reconnect", 30) + " seconds");
+            Util.isException(() -> Util.reflect(ExProxy.class.getDeclaredMethod("connect", NamedContainer.class), plugin, client));
         });
 
         return subdata;

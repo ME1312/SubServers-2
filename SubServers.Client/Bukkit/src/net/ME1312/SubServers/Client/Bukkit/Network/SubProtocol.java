@@ -1,6 +1,7 @@
 package net.ME1312.SubServers.Client.Bukkit.Network;
 
 import net.ME1312.Galaxi.Library.Callback.Callback;
+import net.ME1312.Galaxi.Library.NamedContainer;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubData.Client.Library.DisconnectReason;
@@ -165,26 +166,8 @@ public class SubProtocol extends SubDataProtocol {
             if (plugin.isEnabled()) Bukkit.getPluginManager().callEvent(event);
             map.put(0, null);
 
-            int reconnect = plugin.config.get().getMap("Settings").getMap("SubData").getInt("Reconnect", 30);
-            if (Util.getDespiteException(() -> Util.reflect(SubPlugin.class.getDeclaredField("reconnect"), plugin), false) && reconnect > 0
-                    && client.name() != DisconnectReason.PROTOCOL_MISMATCH && client.name() != DisconnectReason.ENCRYPTION_MISMATCH) {
-                Bukkit.getLogger().info("SubData > Attempting reconnect in " + reconnect + " seconds");
-                Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            Util.reflect(SubPlugin.class.getDeclaredMethod("connect"), plugin);
-                        } catch (InvocationTargetException e) {
-                            if (e.getTargetException() instanceof IOException) {
-                                Bukkit.getLogger().info("SubData > Connection was unsuccessful, retrying in " + reconnect + " seconds");
-                                Bukkit.getScheduler().runTaskLater(plugin, this, reconnect * 20);
-                            } else e.printStackTrace();
-                        } catch (NoSuchMethodException | IllegalAccessException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }, reconnect * 20);
-            }
+            Bukkit.getLogger().info("SubData > Attempting reconnect in " + plugin.config.get().getMap("Settings").getMap("SubData").getInt("Reconnect", 30) + " seconds");
+            Util.isException(() -> Util.reflect(SubPlugin.class.getDeclaredMethod("connect", NamedContainer.class), plugin, client));
         });
 
         return subdata;

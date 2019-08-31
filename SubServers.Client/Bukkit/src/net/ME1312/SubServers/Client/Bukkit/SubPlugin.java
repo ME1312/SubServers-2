@@ -1,6 +1,7 @@
 package net.ME1312.SubServers.Client.Bukkit;
 
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
+import net.ME1312.SubData.Client.DataClient;
 import net.ME1312.SubData.Client.Encryption.AES;
 import net.ME1312.SubData.Client.Encryption.RSA;
 import net.ME1312.SubData.Client.Library.DisconnectReason;
@@ -43,6 +44,7 @@ public final class SubPlugin extends JavaPlugin {
     public final Version version;
     public final SubAPI api = new SubAPI(this);
 
+    private long resetDate = 0;
     private boolean reconnect = false;
 
     public SubPlugin() {
@@ -116,6 +118,7 @@ public final class SubPlugin extends JavaPlugin {
 
     public void reload(boolean notifyPlugins) throws IOException {
         reconnect = false;
+        resetDate = Calendar.getInstance().getTime().getTime();
         ArrayList<SubDataClient> tmp = new ArrayList<SubDataClient>();
         tmp.addAll(subdata.values());
         for (SubDataClient client : tmp) if (client != null) {
@@ -154,7 +157,8 @@ public final class SubPlugin extends JavaPlugin {
 
         reconnect = true;
         System.out.println("SubData > ");
-        connect();
+        System.out.println("SubData > Connecting to /" + config.get().getMap("Settings").getMap("SubData").getRawString("Address", "127.0.0.1:4391"));
+        connect(null);
 
         if (notifyPlugins) {
             List<Runnable> listeners = api.reloadListeners;
@@ -170,9 +174,26 @@ public final class SubPlugin extends JavaPlugin {
         }
     }
 
-    private void connect() throws IOException {
-        subdata.put(0, subprotocol.open((config.get().getMap("Settings").getMap("SubData").getRawString("Address", "127.0.0.1:4391").split(":")[0].equals("0.0.0.0"))?null:InetAddress.getByName(config.get().getMap("Settings").getMap("SubData").getRawString("Address", "127.0.0.1:4391").split(":")[0]),
-                Integer.parseInt(config.get().getMap("Settings").getMap("SubData").getRawString("Address", "127.0.0.1:4391").split(":")[1])));
+    private void connect(NamedContainer<DisconnectReason, DataClient> disconnect) throws IOException {
+        int reconnect = config.get().getMap("Settings").getMap("SubData").getInt("Reconnect", 30);
+        if (disconnect == null || (this.reconnect && reconnect > 0 && disconnect.name() != DisconnectReason.PROTOCOL_MISMATCH && disconnect.name() != DisconnectReason.ENCRYPTION_MISMATCH)) {
+            long reset = resetDate;
+            Bukkit.getScheduler().runTaskLaterAsynchronously(this, new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        if (reset == resetDate && subdata.getOrDefault(0, null) == null)
+                            subdata.put(0, subprotocol.open((config.get().getMap("Settings").getMap("SubData").getRawString("Address", "127.0.0.1:4391").split(":")[0].equals("0.0.0.0"))?
+                                        null:InetAddress.getByName(config.get().getMap("Settings").getMap("SubData").getRawString("Address", "127.0.0.1:4391").split(":")[0]),
+                                Integer.parseInt(config.get().getMap("Settings").getMap("SubData").getRawString("Address", "127.0.0.1:4391").split(":")[1])));
+                    } catch (IOException e) {
+                        Bukkit.getLogger().info("SubData > Connection was unsuccessful, retrying in " + reconnect + " seconds");
+
+                        Bukkit.getScheduler().runTaskLater(SubPlugin.this, this, reconnect * 20);
+                    }
+                }
+            }, (disconnect == null)?0:reconnect * 20);
+        }
     }
 
     /**
