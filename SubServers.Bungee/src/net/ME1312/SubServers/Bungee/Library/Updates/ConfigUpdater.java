@@ -10,8 +10,12 @@ import net.ME1312.SubServers.Bungee.SubAPI;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.LinkedList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * SubServers Configuration Updater
@@ -68,14 +72,50 @@ public class ConfigUpdater {
 
                 existing = updated.clone();
                 i++;
-            } if (was.compareTo(new Version("19w35b")) <= 0) {
-                if (existing.getMap("Settings", new YAMLSection()).getMap("SubData", new YAMLSection()).contains("Allowed-Connections"))
-                    updated.getMap("Settings").getMap("SubData").safeSet("Whitelist", existing.getMap("Settings").getMap("SubData").getRawStringList("Allowed-Connections"));
+            } if (was.compareTo(new Version("19w35c")) <= 0) {
+                if (existing.getMap("Settings", new YAMLSection()).contains("SubData")) {
+                    LinkedList<String> whitelist = new LinkedList<>();
+                    LinkedList<String> newWhitelist = new LinkedList<>();
+                    whitelist.addAll(existing.getMap("Settings", new YAMLSection()).getMap("SubData", new YAMLSection()).getStringList("Allowed-Connections", Collections.emptyList()));
+                    whitelist.addAll(existing.getMap("Settings", new YAMLSection()).getMap("SubData", new YAMLSection()).getStringList("Whitelist", Collections.emptyList()));
+
+                    boolean warnPls = false;
+                    for (String address : whitelist) {
+                        Matcher regAddress = Pattern.compile("^(\\d{1,3}|%)\\.(\\d{1,3}|%)\\.(\\d{1,3}|%)\\.(\\d{1,3}|%)$").matcher(address);
+                        if (regAddress.find()) {
+                            StringBuilder newAddress = new StringBuilder();
+                            int subnet = -1;
+                            boolean warn = false;
+                            for (int o = 1; o <= 4; o++) {
+                                if (o > 1) newAddress.append('.');
+                                if (subnet == -1) {
+                                    if (!regAddress.group(o).equals("%")) {
+                                        newAddress.append(regAddress.group(o));
+                                    } else {
+                                        subnet = 8 * (o - 1);
+                                        newAddress.append('0');
+                                    }
+                                } else {
+                                    if (!regAddress.group(o).equals("%")) warn = warnPls = true;
+                                    newAddress.append('0');
+                                }
+                            }
+                            if (subnet < 0) subnet = 32;
+                            if (warn) Logger.get("SubServers").warning("Updating non-standard mask: " + address);
+                            newAddress.append('/');
+                            newAddress.append(subnet);
+                            newWhitelist.add(newAddress.toString());
+                        }
+                    }
+                    updated.getMap("Settings").getMap("SubData").set("Whitelist", newWhitelist);
+                    if (warnPls) Logger.get("SubServers").warning("Non-standard masks have been updated. This may expose SubData to unintended networks!");
+                }
 
                 existing = updated.clone();
                 i++;
             }// if (was.compareTo(new Version("99w99a")) <= 0) {
             //  // do something
+            //  existing = updated.clone();
             //  i++
             //}
 
@@ -250,7 +290,7 @@ public class ConfigUpdater {
             lang.set("Bungee.Feature.Smart-Fallback.Result", updated.getMap("Lang", new YAMLSection()).getRawString("Bungee.Feature.Smart-Fallback.Result", "&6You are now on $str$."));
             lang.set("Bungee.Ping.Offline", updated.getMap("Lang", new YAMLSection()).getRawString("Bungee.Ping.Offline", "&6&l[&e&lWarning&6&l] &7Backend server(s) are not running"));
             lang.set("Bungee.Server.Current", updated.getMap("Lang", new YAMLSection()).getRawString("Bungee.Server.Current", "&6You are currently connected to $str$"));
-            lang.set("Bungee.Server.Available", updated.getMap("Lang", new YAMLSection()).getRawString("Bungee.Server.Available", "&6You may connect to the following servers at this tRime:"));
+            lang.set("Bungee.Server.Available", updated.getMap("Lang", new YAMLSection()).getRawString("Bungee.Server.Available", "&6You may connect to the following servers at this time:"));
             lang.set("Bungee.Server.List", updated.getMap("Lang", new YAMLSection()).getRawString("Bungee.Server.List", "&6$str$"));
             lang.set("Bungee.Server.Hover", updated.getMap("Lang", new YAMLSection()).getRawString("Bungee.Server.Hover", "$int$ player(s)\n&oClick to connect to the server"));
             lang.set("Bungee.Server.Divider", updated.getMap("Lang", new YAMLSection()).getRawString("Bungee.Server.Divider", "&6, "));

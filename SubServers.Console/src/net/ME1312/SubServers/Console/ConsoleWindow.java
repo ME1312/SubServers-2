@@ -132,7 +132,7 @@ public final class ConsoleWindow implements SubLogFilter {
                         }
                         break;
                     case KeyEvent.VK_F:
-                        if (kpressed[KeyEvent.VK_SHIFT] == Boolean.TRUE) {
+                        if ((event.getModifiers() & ActionEvent.CTRL_MASK) == ActionEvent.CTRL_MASK && kpressed[KeyEvent.VK_SHIFT] == Boolean.TRUE) {
                             boolean open = false;
                             if (ifocus) {
                                 findT.setText(input.getSelectedText());
