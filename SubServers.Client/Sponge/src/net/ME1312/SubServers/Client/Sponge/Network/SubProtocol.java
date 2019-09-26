@@ -177,9 +177,11 @@ public class SubProtocol extends SubDataProtocol {
             Sponge.getEventManager().post(event);
             map.put(0, null);
 
-            Logger log = Util.getDespiteException(() -> Util.reflect(SubDataClient.class.getDeclaredField("log"), client.get()), null);
-            log.info("Attempting reconnect in " + plugin.config.get().getMap("Settings").getMap("SubData").getInt("Reconnect", 30) + " seconds");
-            Util.isException(() -> Util.reflect(SubPlugin.class.getDeclaredMethod("connect", NamedContainer.class), plugin, client));
+            if (Util.getDespiteException(() -> Util.reflect(SubPlugin.class.getDeclaredField("running"), plugin), true)) {
+                Logger log = Util.getDespiteException(() -> Util.reflect(SubDataClient.class.getDeclaredField("log"), client.get()), null);
+                log.info("Attempting reconnect in " + plugin.config.get().getMap("Settings").getMap("SubData").getInt("Reconnect", 30) + " seconds");
+                Util.isException(() -> Util.reflect(SubPlugin.class.getDeclaredMethod("connect", NamedContainer.class), plugin, client));
+            }
         });
 
         return subdata;

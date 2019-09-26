@@ -163,9 +163,11 @@ public class SubProtocol extends SubDataProtocol {
             host.engine.getPluginManager().executeEvent(event);
             map.put(0, null);
 
-            Logger log = Util.getDespiteException(() -> Util.reflect(SubDataClient.class.getDeclaredField("log"), client.get()), null);
-            log.info("Attempting reconnect in " + host.config.get().getMap("Settings", new YAMLSection()).getMap("SubData", new YAMLSection()).getInt("Reconnect", 30) + " seconds");
-            Util.isException(() -> Util.reflect(ExHost.class.getDeclaredMethod("connect", Logger.class, NamedContainer.class), host, log, client));
+            if (Util.getDespiteException(() -> Util.reflect(ExHost.class.getDeclaredField("running"), host), true)) {
+                Logger log = Util.getDespiteException(() -> Util.reflect(SubDataClient.class.getDeclaredField("log"), client.get()), null);
+                log.info("Attempting reconnect in " + host.config.get().getMap("Settings", new YAMLSection()).getMap("SubData", new YAMLSection()).getInt("Reconnect", 30) + " seconds");
+                Util.isException(() -> Util.reflect(ExHost.class.getDeclaredMethod("connect", Logger.class, NamedContainer.class), host, log, client));
+            }
         });
 
         return subdata;

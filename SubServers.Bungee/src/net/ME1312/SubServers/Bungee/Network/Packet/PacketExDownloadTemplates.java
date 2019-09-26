@@ -46,7 +46,7 @@ public class PacketExDownloadTemplates implements PacketIn, PacketStreamOut {
 
     @Override
     public void receive(SubDataClient client) {
-        if (client.getHandler() != null && client.getHandler() instanceof ExternalHost && plugin.config.get().getMap("Hosts").getKeys().contains(((ExternalHost) client.getHandler()).getName())) {
+        if (client.getHandler() != null && client.getHandler() instanceof ExternalHost) {
             client.sendPacket(new PacketExDownloadTemplates(plugin, (ExternalHost) client.getHandler()));
         }
     }

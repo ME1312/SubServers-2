@@ -166,8 +166,10 @@ public class SubProtocol extends SubDataProtocol {
             if (plugin.isEnabled()) Bukkit.getPluginManager().callEvent(event);
             map.put(0, null);
 
-            Bukkit.getLogger().info("SubData > Attempting reconnect in " + plugin.config.get().getMap("Settings").getMap("SubData").getInt("Reconnect", 30) + " seconds");
-            Util.isException(() -> Util.reflect(SubPlugin.class.getDeclaredMethod("connect", NamedContainer.class), plugin, client));
+            if (plugin.isEnabled()) {
+                Bukkit.getLogger().info("SubData > Attempting reconnect in " + plugin.config.get().getMap("Settings").getMap("SubData").getInt("Reconnect", 30) + " seconds");
+                Util.isException(() -> Util.reflect(SubPlugin.class.getDeclaredMethod("connect", NamedContainer.class), plugin, client));
+            }
         });
 
         return subdata;
