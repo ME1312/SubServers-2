@@ -1,4 +1,4 @@
 Manifest-Version: 1.0
-Class-Path: GalaxiEngine.jar
+Class-Path: GalaxiEngine.jar SubDataClient.jar
 Main-Class: net.ME1312.SubServers.Host.Launch
 Implementation-Title: SubServers.Host

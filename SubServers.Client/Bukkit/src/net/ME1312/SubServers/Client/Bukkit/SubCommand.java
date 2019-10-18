@@ -383,6 +383,7 @@ public final class SubCommand extends BukkitCommand {
                         }
                     } else if (args[0].equalsIgnoreCase("restart")) {
                         if (args.length > 1) {
+                            if (args[1].equals(".")) args[1] = plugin.api.getName();
                             if ((sender.hasPermission("subservers.subserver.stop.*") || sender.hasPermission("subservers.subserver.stop." + args[1].toLowerCase())) && (sender.hasPermission("subservers.subserver.start.*") || sender.hasPermission("subservers.subserver.start." + args[1].toLowerCase()))) {
                                 Runnable starter = () -> ((SubDataClient) plugin.api.getSubDataNetwork()[0]).sendPacket(new PacketStartServer(null, args[1], data -> {
                                     switch (data.getInt(0x0001)) {
@@ -462,6 +463,7 @@ public final class SubCommand extends BukkitCommand {
                         }
                     } else if (args[0].equalsIgnoreCase("stop")) {
                         if (args.length > 1) {
+                            if (args[1].equals(".")) args[1] = plugin.api.getName();
                             if (sender.hasPermission("subservers.subserver.stop.*") || sender.hasPermission("subservers.subserver.stop." + args[1].toLowerCase())) {
                                 ((SubDataClient) plugin.api.getSubDataNetwork()[0]).sendPacket(new PacketStopServer((sender instanceof Player)?((Player) sender).getUniqueId():null, args[1], false, data -> {
                                     switch (data.getInt(0x0001)) {
@@ -488,6 +490,7 @@ public final class SubCommand extends BukkitCommand {
                         }
                     } else if (args[0].equalsIgnoreCase("kill") || args[0].equalsIgnoreCase("terminate")) {
                         if (args.length > 1) {
+                            if (args[1].equals(".")) args[1] = plugin.api.getName();
                             if (sender.hasPermission("subservers.subserver.terminate.*") || sender.hasPermission("subservers.subserver.terminate." + args[1].toLowerCase())) {
                                 ((SubDataClient) plugin.api.getSubDataNetwork()[0]).sendPacket(new PacketStopServer((sender instanceof Player)?((Player) sender).getUniqueId():null, args[1], true, data -> {
                                     switch (data.getInt(0x0001)) {
@@ -514,6 +517,7 @@ public final class SubCommand extends BukkitCommand {
                         }
                     } else if (args[0].equalsIgnoreCase("cmd") || args[0].equalsIgnoreCase("command")) {
                         if (args.length > 2) {
+                            if (args[1].equals(".")) args[1] = plugin.api.getName();
                             if (sender.hasPermission("subservers.subserver.command.*") || sender.hasPermission("subservers.subserver.command." + args[1].toLowerCase())) {
                                 int i = 2;
                                 String str = args[2];

@@ -66,6 +66,7 @@
                 <artifactId>maven-antrun-plugin</artifactId>
                 <executions>
                     <execution>
+                        <id>process</id>
                         <phase>process-resources</phase>
                         <goals>
                             <goal>run</goal>
@@ -75,6 +76,20 @@
                                 <mkdir dir="${project.build.directory}" />
                                 <copy file="${basedir}/../LICENSE" todir="${project.build.directory}/classes" />
                                 <copy file="${basedir}/../Artifacts/SubServers.Client.jar" tofile="${project.build.directory}/classes/net/ME1312/SubServers/Host/Library/Files/client.jar" />
+                            </tasks>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>verify</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <tasks> <!-- Dependency Stripped Jar for Testing -->
+                                <jar destfile="${basedir}/../Artifacts/-Lite/SubServers.Host.jar" manifest="src/META-INF/MANIFEST.MF">
+                                    <zipfileset src="${basedir}/../Artifacts/SubServers.Host.jar" excludes="net/ME1312/Galaxi/** net/ME1312/SubData/**" />
+                                </jar>
                             </tasks>
                         </configuration>
                     </execution>

@@ -1,6 +1,7 @@
 package net.ME1312.SubServers.Client.Sponge;
 
 import com.google.gson.Gson;
+import net.ME1312.Galaxi.Library.NamedContainer;
 import net.ME1312.SubData.Client.SubDataClient;
 import net.ME1312.SubServers.Client.Sponge.Graphic.UIRenderer;
 import net.ME1312.Galaxi.Library.Callback.Callback;
@@ -701,10 +702,11 @@ public final class SubCommand implements CommandExecutor {
     public final class RESTART implements CommandExecutor {
         public CommandResult execute(CommandSource sender, CommandContext args) throws CommandException {
             if (canRun(sender)) {
-                Optional<String> subserver = args.getOne(Text.of("SubServer"));
-                if (subserver.isPresent()) {
-                    if (sender.hasPermission("subservers.subserver.stop." + subserver.get().toLowerCase()) && sender.hasPermission("subservers.subserver.start." + subserver.get().toLowerCase())) {
-                        Runnable starter = () -> ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketStartServer(null, subserver.get(), data -> {
+                Container<Optional<String>> subserver = new Container<>(args.getOne(Text.of("SubServer")));
+                if (subserver.get().isPresent()) {
+                    if (subserver.get().get().equals(".")) subserver.set(Optional.of(plugin.api.getName()));
+                    if (sender.hasPermission("subservers.subserver.stop." + subserver.get().get().toLowerCase()) && sender.hasPermission("subservers.subserver.start." + subserver.get().get().toLowerCase())) {
+                        Runnable starter = () -> ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketStartServer(null, subserver.get().get(), data -> {
                             switch (data.getInt(0x0001)) {
                                 case 3:
                                 case 4:
@@ -738,7 +740,7 @@ public final class SubCommand implements CommandExecutor {
                             @Override
                             public void run(ObjectMap<String> json) {
                                 try {
-                                    if (listening.get()) if (!json.getString("server").equalsIgnoreCase(subserver.get())) {
+                                    if (listening.get()) if (!json.getString("server").equalsIgnoreCase(subserver.get().get())) {
                                         PacketInExRunEvent.callback("SubStoppedEvent", this);
                                     } else {
                                         plugin.game.getScheduler().createTaskBuilder().execute(starter).delay(100, TimeUnit.MILLISECONDS).submit(plugin);
@@ -766,18 +768,18 @@ public final class SubCommand implements CommandExecutor {
                             }
                         };
 
-                        if (SubAPI.getInstance().getName().equalsIgnoreCase(subserver.get())) {
+                        if (SubAPI.getInstance().getName().equalsIgnoreCase(subserver.get().get())) {
                             listening.set(false);
-                            ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketRestartServer((sender instanceof Player)?((Player) sender).getUniqueId():null, subserver.get(), stopper));
+                            ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketRestartServer((sender instanceof Player)?((Player) sender).getUniqueId():null, subserver.get().get(), stopper));
                         } else {
-                            ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketStopServer((sender instanceof Player)?((Player) sender).getUniqueId():null, subserver.get(), false, stopper));
+                            ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketStopServer((sender instanceof Player)?((Player) sender).getUniqueId():null, subserver.get().get(), false, stopper));
                         }
                         return CommandResult.builder().successCount(1).build();
-                    } else if (!sender.hasPermission("subservers.subserver.stop." + subserver.get().toLowerCase())) {
-                        sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Generic.Invalid-Permission").replace("$str$", "subservers.subserver.stop." + subserver.get().toLowerCase())));
+                    } else if (!sender.hasPermission("subservers.subserver.stop." + subserver.get().get().toLowerCase())) {
+                        sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Generic.Invalid-Permission").replace("$str$", "subservers.subserver.stop." + subserver.get().get().toLowerCase())));
                         return CommandResult.builder().successCount(0).build();
                     } else {
-                        sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Generic.Invalid-Permission").replace("$str$", "subservers.subserver.start." + subserver.get().toLowerCase())));
+                        sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Generic.Invalid-Permission").replace("$str$", "subservers.subserver.start." + subserver.get().get().toLowerCase())));
                         return CommandResult.builder().successCount(0).build();
                     }
                 } else {
@@ -794,10 +796,11 @@ public final class SubCommand implements CommandExecutor {
     public final class STOP implements CommandExecutor {
         public CommandResult execute(CommandSource sender, CommandContext args) throws CommandException {
             if (canRun(sender)) {
-                Optional<String> subserver = args.getOne(Text.of("SubServer"));
-                if (subserver.isPresent()) {
-                    if (sender.hasPermission("subservers.subserver.stop." + subserver.get().toLowerCase())) {
-                        ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketStopServer((sender instanceof Player) ? ((Player) sender).getUniqueId():null, subserver.get(), false, data -> {
+                Container<Optional<String>> subserver = new Container<>(args.getOne(Text.of("SubServer")));
+                if (subserver.get().isPresent()) {
+                    if (subserver.get().get().equals(".")) subserver.set(Optional.of(plugin.api.getName()));
+                    if (sender.hasPermission("subservers.subserver.stop." + subserver.get().get().toLowerCase())) {
+                        ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketStopServer((sender instanceof Player) ? ((Player) sender).getUniqueId():null, subserver.get().get(), false, data -> {
                             switch (data.getInt(0x0001)) {
                                 case 3:
                                     sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Stop.Unknown")));
@@ -816,7 +819,7 @@ public final class SubCommand implements CommandExecutor {
                         }));
                         return CommandResult.builder().successCount(1).build();
                     } else {
-                        sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Generic.Invalid-Permission").replace("$str$", "subservers.subserver.stop." + subserver.get().toLowerCase())));
+                        sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Generic.Invalid-Permission").replace("$str$", "subservers.subserver.stop." + subserver.get().get().toLowerCase())));
                         return CommandResult.builder().successCount(0).build();
                     }
                 } else {
@@ -833,10 +836,11 @@ public final class SubCommand implements CommandExecutor {
     public final class TERMINATE implements CommandExecutor {
         public CommandResult execute(CommandSource sender, CommandContext args) throws CommandException {
             if (canRun(sender)) {
-                Optional<String> subserver = args.getOne(Text.of("SubServer"));
-                if (subserver.isPresent()) {
-                    if (sender.hasPermission("subservers.subserver.terminate." + subserver.get().toLowerCase())) {
-                        ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketStopServer((sender instanceof Player)?((Player) sender).getUniqueId():null, subserver.get(), true, data -> {
+                Container<Optional<String>> subserver = new Container<>(args.getOne(Text.of("SubServer")));
+                if (subserver.get().isPresent()) {
+                    if (subserver.get().get().equals(".")) subserver.set(Optional.of(plugin.api.getName()));
+                    if (sender.hasPermission("subservers.subserver.terminate." + subserver.get().get().toLowerCase())) {
+                        ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketStopServer((sender instanceof Player)?((Player) sender).getUniqueId():null, subserver.get().get(), true, data -> {
                             switch (data.getInt(0x0001)) {
                                 case 3:
                                     sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Terminate.Unknown")));
@@ -855,7 +859,7 @@ public final class SubCommand implements CommandExecutor {
                         }));
                         return CommandResult.builder().successCount(1).build();
                     } else {
-                        sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Generic.Invalid-Permission").replace("$str$", "subservers.subserver.terminate." + subserver.get().toLowerCase())));
+                        sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Generic.Invalid-Permission").replace("$str$", "subservers.subserver.terminate." + subserver.get().get().toLowerCase())));
                         return CommandResult.builder().successCount(0).build();
                     }
                 } else {
@@ -872,11 +876,12 @@ public final class SubCommand implements CommandExecutor {
     public final class COMMAND implements CommandExecutor {
         public CommandResult execute(CommandSource sender, CommandContext args) throws CommandException {
             if (canRun(sender)) {
-                Optional<String> subserver = args.getOne(Text.of("SubServer"));
+                Container<Optional<String>> subserver = new Container<>(args.getOne(Text.of("SubServer")));
                 Optional<String> command = args.getOne(Text.of("Command"));
-                if (subserver.isPresent() && command.isPresent()) {
-                    if (sender.hasPermission("subservers.subserver.command." + subserver.get().toLowerCase())) {
-                        ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketCommandServer((sender instanceof Player)?((Player) sender).getUniqueId():null, subserver.get(), command.get(), data -> {
+                if (subserver.get().isPresent() && command.isPresent()) {
+                    if (subserver.get().get().equals(".")) subserver.set(Optional.of(plugin.api.getName()));
+                    if (sender.hasPermission("subservers.subserver.command." + subserver.get().get().toLowerCase())) {
+                        ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketCommandServer((sender instanceof Player)?((Player) sender).getUniqueId():null, subserver.get().get(), command.get(), data -> {
                             switch (data.getInt(0x0001)) {
                                 case 3:
                                     sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Command.Unknown")));
@@ -895,7 +900,7 @@ public final class SubCommand implements CommandExecutor {
                         }));
                         return CommandResult.builder().successCount(1).build();
                     } else {
-                        sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Generic.Invalid-Permission").replace("$str$", "subservers.subserver.command." + subserver.get().toLowerCase())));
+                        sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Generic.Invalid-Permission").replace("$str$", "subservers.subserver.command." + subserver.get().get().toLowerCase())));
                         return CommandResult.builder().successCount(0).build();
                     }
                 } else {

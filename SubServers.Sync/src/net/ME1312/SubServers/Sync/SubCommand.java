@@ -807,8 +807,7 @@ public final class SubCommand extends CommandX {
                 } else {
                     return new NamedContainer<>(null, Collections.emptyList());
                 }
-            } else if (args[0].equals("start") ||
-                    args[0].equals("restart")) {
+            } else if (args[0].equals("start")) {
                 List<String> list = new ArrayList<String>();
                 if (args.length == 2) {
                     if (last.length() == 0) {
@@ -822,15 +821,18 @@ public final class SubCommand extends CommandX {
                 } else {
                     return new NamedContainer<>(null, Collections.emptyList());
                 }
-            } else if (args[0].equals("stop") ||
+            } else if (args[0].equals("restart") ||
+                    args[0].equals("stop") ||
                     args[0].equals("kill") || args[0].equals("terminate")) {
                 List<String> list = new ArrayList<String>();
                 if (args.length == 2) {
                     if (last.length() == 0) {
-                        list.add("*");
+                        if (sender instanceof ProxiedPlayer) list.add(".");
+                        if (!args[0].equals("restart")) list.add("*");
                         for (ServerImpl server : plugin.servers.values()) if (server instanceof SubServerImpl) list.add(server.getName());
                     } else {
-                        if ("*".startsWith(last)) list.add("*");
+                        if (sender instanceof ProxiedPlayer && ".".startsWith(last)) list.add(".");
+                        if (!args[0].equals("restart") && "*".startsWith(last)) list.add("*");
                         for (ServerImpl server : plugin.servers.values()) {
                             if (server instanceof SubServerImpl && server.getName().toLowerCase().startsWith(last)) list.add(last + server.getName().substring(last.length()));
                         }
@@ -843,8 +845,12 @@ public final class SubCommand extends CommandX {
                 if (args.length == 2) {
                     List<String> list = new ArrayList<String>();
                     if (last.length() == 0) {
+                        if (sender instanceof ProxiedPlayer) list.add(".");
+                        list.add("*");
                         for (ServerImpl server : plugin.servers.values()) if (server instanceof SubServerImpl) list.add(server.getName());
                     } else {
+                        if (sender instanceof ProxiedPlayer && ".".startsWith(last)) list.add(".");
+                        if ("*".startsWith(last)) list.add("*");
                         for (ServerImpl server : plugin.servers.values()) {
                             if (server instanceof SubServerImpl && server.getName().toLowerCase().startsWith(last)) list.add(last + server.getName().substring(last.length()));
                         }

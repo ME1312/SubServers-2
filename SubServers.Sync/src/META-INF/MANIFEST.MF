@@ -1,4 +1,4 @@
 Manifest-Version: 1.0
-Class-Path: BungeeCord.jar Waterfall.jar
+Class-Path: GalaxiEngine.jar SubDataClient.jar BungeeCord.jar Waterfall.jar
 Main-Class: net.ME1312.SubServers.Sync.Launch
 Implementation-Title: SubServers.Sync

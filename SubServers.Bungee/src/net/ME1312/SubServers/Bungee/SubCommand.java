@@ -859,7 +859,6 @@ public final class SubCommand extends CommandX {
                     }
                 }
             } else if (args[0].equals("start") ||
-                    args[0].equals("restart") ||
                     (!(sender instanceof ProxiedPlayer) && (
                                 args[0].equals("sudo") || args[0].equals("screen") ||
                                 args[0].equals("del") || args[0].equals("delete")
@@ -877,15 +876,18 @@ public final class SubCommand extends CommandX {
                 } else {
                     return new NamedContainer<>(null, Collections.emptyList());
                 }
-            } else if (args[0].equals("stop") ||
+            } else if (args[0].equals("restart") ||
+                    args[0].equals("stop") ||
                     args[0].equals("kill") || args[0].equals("terminate")) {
                 List<String> list = new ArrayList<String>();
                 if (args.length == 2) {
                     if (last.length() == 0) {
-                        list.add("*");
+                        if (sender instanceof ProxiedPlayer) list.add(".");
+                        if (!args[0].equals("restart")) list.add("*");
                         for (SubServer server : plugin.api.getSubServers().values()) list.add(server.getName());
                     } else {
-                        if ("*".startsWith(last)) list.add("*");
+                        if (sender instanceof ProxiedPlayer && ".".startsWith(last)) list.add(".");
+                        if (!args[0].equals("restart") && "*".startsWith(last)) list.add("*");
                         for (SubServer server : plugin.api.getSubServers().values()) {
                             if (server.getName().toLowerCase().startsWith(last)) list.add(last + server.getName().substring(last.length()));
                         }
@@ -898,9 +900,11 @@ public final class SubCommand extends CommandX {
                 if (args.length == 2) {
                     List<String> list = new ArrayList<String>();
                     if (last.length() == 0) {
+                        if (sender instanceof ProxiedPlayer) list.add(".");
                         list.add("*");
                         for (SubServer server : plugin.api.getSubServers().values()) list.add(server.getName());
                     } else {
+                        if (sender instanceof ProxiedPlayer && ".".startsWith(last)) list.add(".");
                         if ("*".startsWith(last)) list.add("*");
                         for (SubServer server : plugin.api.getSubServers().values()) {
                             if (server.getName().toLowerCase().startsWith(last)) list.add(last + server.getName().substring(last.length()));

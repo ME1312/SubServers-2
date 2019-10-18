@@ -40,6 +40,7 @@ crashlytics-build.properties
 /Artifacts/-Maven/
 /Artifacts/-History/
 /Artifacts/-Icon/
+/Artifacts/-Lite/
 /Artifacts/*.jar
 /Javadoc/
 /SubServers.Test/
