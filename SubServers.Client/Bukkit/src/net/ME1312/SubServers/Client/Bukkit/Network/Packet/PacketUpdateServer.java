@@ -6,7 +6,7 @@ import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubData.Client.Protocol.PacketObjectIn;
 import net.ME1312.SubData.Client.Protocol.PacketObjectOut;
-import net.ME1312.SubData.Client.SubDataClient;
+import net.ME1312.SubData.Client.SubDataSender;
 import net.ME1312.SubServers.Client.Bukkit.Graphic.UIRenderer;
 
 import java.util.HashMap;
@@ -62,7 +62,7 @@ public class PacketUpdateServer implements PacketObjectIn<Integer>, PacketObject
     }
 
     @Override
-    public ObjectMap<Integer> send(SubDataClient client) {
+    public ObjectMap<Integer> send(SubDataSender client) {
         ObjectMap<Integer> data = new ObjectMap<Integer>();
         data.set(0x0000, tracker);
         data.set(0x0001, name);
@@ -73,7 +73,7 @@ public class PacketUpdateServer implements PacketObjectIn<Integer>, PacketObject
     }
 
     @Override
-    public void receive(SubDataClient client, ObjectMap<Integer> data) {
+    public void receive(SubDataSender client, ObjectMap<Integer> data) {
         for (Callback<ObjectMap<Integer>> callback : callbacks.get(data.getUUID(0x0000))) callback.run(data);
         callbacks.remove(data.getUUID(0x0000));
     }

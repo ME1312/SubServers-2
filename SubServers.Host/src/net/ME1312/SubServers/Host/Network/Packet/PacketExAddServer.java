@@ -6,6 +6,7 @@ import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubData.Client.Protocol.PacketObjectIn;
 import net.ME1312.SubData.Client.Protocol.PacketObjectOut;
 import net.ME1312.SubData.Client.SubDataClient;
+import net.ME1312.SubData.Client.SubDataSender;
 import net.ME1312.SubServers.Host.Executable.SubServerImpl;
 import net.ME1312.SubServers.Host.ExHost;
 
@@ -55,7 +56,7 @@ public class PacketExAddServer implements PacketObjectIn<Integer>, PacketObjectO
     }
 
     @Override
-    public ObjectMap<Integer> send(SubDataClient client) {
+    public ObjectMap<Integer> send(SubDataSender client) {
         ObjectMap<Integer> data = new ObjectMap<Integer>();
         if (tracker != null) data.set(0x0000, tracker);
         data.set(0x0001, response);
@@ -64,8 +65,8 @@ public class PacketExAddServer implements PacketObjectIn<Integer>, PacketObjectO
     }
 
     @Override
-    public void receive(SubDataClient client, ObjectMap<Integer> data) {
-        Logger logger = Util.getDespiteException(() -> Util.reflect(SubDataClient.class.getDeclaredField("log"), client), null);
+    public void receive(SubDataSender client, ObjectMap<Integer> data) {
+        Logger logger = Util.getDespiteException(() -> Util.reflect(SubDataClient.class.getDeclaredField("log"), client.getConnection()), null);
         UUID tracker =          (data.contains(0x0000)?data.getUUID(0x0000):null);
         try {
             String name =    data.getRawString(0x0001);
@@ -93,10 +94,10 @@ public class PacketExAddServer implements PacketObjectIn<Integer>, PacketObjectO
                     if (UPnP.isUPnPAvailable() && UPnP.isMappedTCP(server.getPort()))
                         UPnP.closePortTCP(server.getPort());
 
-                    init(client, server = new SubServerImpl(host, name, enabled, port, log, dir, exec, stopcmd), running, tracker, logger);
+                    init(client.getConnection(), server = new SubServerImpl(host, name, enabled, port, log, dir, exec, stopcmd), running, tracker, logger);
                 }
             } else {
-                init(client, new SubServerImpl(host, name, enabled, port, log, dir, exec, stopcmd), running, tracker, logger);
+                init(client.getConnection(), new SubServerImpl(host, name, enabled, port, log, dir, exec, stopcmd), running, tracker, logger);
             }
         } catch (Throwable e) {
             client.sendPacket(new PacketExAddServer(2, tracker));

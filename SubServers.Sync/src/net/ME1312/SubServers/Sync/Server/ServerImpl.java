@@ -1,6 +1,11 @@
 package net.ME1312.SubServers.Sync.Server;
 
 import net.ME1312.Galaxi.Library.Util;
+import net.ME1312.SubData.Client.DataSender;
+import net.ME1312.SubData.Client.Library.ForwardedDataSender;
+import net.ME1312.SubData.Client.SubDataClient;
+import net.ME1312.SubData.Client.SubDataSender;
+import net.ME1312.SubServers.Sync.SubAPI;
 import net.md_5.bungee.BungeeServerInfo;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -36,12 +41,12 @@ public class ServerImpl extends BungeeServerInfo {
      *
      * @return SubData Client Channel ID Array
      */
-    public UUID[] getSubData() {
+    public DataSender[] getSubData() {
         LinkedList<Integer> keys = new LinkedList<Integer>(subdata.keySet());
-        LinkedList<UUID> channels = new LinkedList<UUID>();
+        LinkedList<SubDataSender> channels = new LinkedList<SubDataSender>();
         Collections.sort(keys);
-        for (Integer channel : keys) channels.add(subdata.get(channel));
-        return channels.toArray(new UUID[0]);
+        for (Integer channel : keys) channels.add((subdata.getOrDefault(channel, null) == null)?null:new ForwardedDataSender((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0], subdata.get(channel)));
+        return channels.toArray(new SubDataSender[0]);
     }
 
     /**

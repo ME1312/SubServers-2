@@ -6,45 +6,42 @@ import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubData.Server.Protocol.PacketObjectIn;
 import net.ME1312.SubData.Server.Protocol.PacketObjectOut;
 import net.ME1312.SubData.Server.SubDataClient;
+import net.md_5.bungee.api.ProxyServer;
 
-import java.util.HashMap;
 import java.util.UUID;
 
+import static net.ME1312.SubServers.Bungee.Network.Packet.PacketCheckPermission.callbacks;
+
+
 /**
- * Packet Check Permission
+ * Check Permission Response Packet
  */
-public class PacketExCheckPermission implements PacketObjectIn<Integer>, PacketObjectOut<Integer> {
-    private static HashMap<UUID, Callback<Boolean>[]> callbacks = new HashMap<UUID, Callback<Boolean>[]>();
-    private UUID player;
-    private String permission;
+public class PacketCheckPermissionResponse implements PacketObjectIn<Integer>, PacketObjectOut<Integer> {
+    private boolean result;
     private UUID tracker;
 
     /**
-     * New PacketCheckPermission (In)
+     * New PacketCheckPermissionResponse (In)
      */
-    public PacketExCheckPermission() {}
+    public PacketCheckPermissionResponse() {}
 
     /**
-     * New PacketCheckPermission (Out)
+     * New PacketCheckPermissionResponse (Out)
      *
      * @param player Player to check on
      * @param permission Permission to check
-     * @param callback Callbacks
+     * @param tracker Receiver ID
      */
-    @SafeVarargs
-    public PacketExCheckPermission(UUID player, String permission, Callback<Boolean>... callback) {
-        this.player = player;
-        this.permission = permission;
-        this.tracker = Util.getNew(callbacks.keySet(), UUID::randomUUID);
-        callbacks.put(tracker, callback);
+    public PacketCheckPermissionResponse(UUID player, String permission, UUID tracker) {
+        this.result = Util.getDespiteException(() -> ProxyServer.getInstance().getPlayer(player).hasPermission(permission), false);
+        this.tracker = tracker;
     }
 
     @Override
     public ObjectMap<Integer> send(SubDataClient client) throws Throwable {
         ObjectMap<Integer> data = new ObjectMap<Integer>();
         data.set(0x0000, tracker);
-        data.set(0x0001, player);
-        data.set(0x0002, permission);
+        data.set(0x0001, result);
         return data;
     }
 

@@ -3,7 +3,7 @@ package net.ME1312.SubServers.Host.Network.Packet;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubData.Client.Protocol.PacketObjectOut;
-import net.ME1312.SubData.Client.SubDataClient;
+import net.ME1312.SubData.Client.SubDataSender;
 
 import java.util.UUID;
 
@@ -34,8 +34,8 @@ public class PacketOutExLogMessage implements PacketObjectOut<Integer> {
     }
 
     @Override
-    public ObjectMap<Integer> send(SubDataClient client) throws Exception {
-        if (terminate) client.close();
+    public ObjectMap<Integer> send(SubDataSender client) throws Exception {
+        if (terminate) client.getConnection().close();
 
         ObjectMap<Integer> data = new ObjectMap<Integer>();
         data.set(0x0000, address);

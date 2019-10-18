@@ -9,6 +9,7 @@ import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubData.Client.Protocol.PacketObjectIn;
 import net.ME1312.SubData.Client.Protocol.PacketObjectOut;
 import net.ME1312.SubData.Client.SubDataClient;
+import net.ME1312.SubData.Client.SubDataSender;
 import net.ME1312.SubServers.Host.Executable.SubServerImpl;
 import net.ME1312.SubServers.Host.ExHost;
 import net.ME1312.SubServers.Host.SubAPI;
@@ -50,7 +51,7 @@ public class PacketExDeleteServer implements PacketObjectIn<Integer>, PacketObje
     }
 
     @Override
-    public ObjectMap<Integer> send(SubDataClient client) {
+    public ObjectMap<Integer> send(SubDataSender client) {
         ObjectMap<Integer> data = new ObjectMap<Integer>();
         if (tracker != null) data.set(0x0000, tracker);
         data.set(0x0001, response);
@@ -59,8 +60,8 @@ public class PacketExDeleteServer implements PacketObjectIn<Integer>, PacketObje
 
     @SuppressWarnings("unchecked")
     @Override
-    public void receive(SubDataClient client, ObjectMap<Integer> data) {
-        Logger log = Util.getDespiteException(() -> Util.reflect(SubDataClient.class.getDeclaredField("log"), client), null);
+    public void receive(SubDataSender client, ObjectMap<Integer> data) {
+        Logger log = Util.getDespiteException(() -> Util.reflect(SubDataClient.class.getDeclaredField("log"), client.getConnection()), null);
         UUID tracker =                     (data.contains(0x0000)?data.getUUID(0x0000):null);
         try {
             String name =               data.getRawString(0x0001);

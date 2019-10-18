@@ -54,6 +54,7 @@ public class SubProtocol extends SubDataProtocol {
             instance.registerPacket(0x0015, PacketDownloadServerInfo.class);
             instance.registerPacket(0x0016, PacketDownloadPlayerList.class);
             instance.registerPacket(0x0017, PacketCheckPermission.class);
+            instance.registerPacket(0x0017, PacketCheckPermissionResponse.class);
 
             instance.registerPacket(0x0010, new PacketDownloadLang(host));
             instance.registerPacket(0x0011, new PacketDownloadPlatformInfo());
@@ -63,6 +64,7 @@ public class SubProtocol extends SubDataProtocol {
             instance.registerPacket(0x0015, new PacketDownloadServerInfo());
             instance.registerPacket(0x0016, new PacketDownloadPlayerList());
             instance.registerPacket(0x0017, new PacketCheckPermission());
+            instance.registerPacket(0x0018, new PacketCheckPermissionResponse());
 
 
          // 30-4F: Control Packets
@@ -161,13 +163,12 @@ public class SubProtocol extends SubDataProtocol {
         subdata.on.closed(client -> {
             SubNetworkDisconnectEvent event = new SubNetworkDisconnectEvent(client.get(), client.name());
             host.engine.getPluginManager().executeEvent(event);
-            map.put(0, null);
 
             if (Util.getDespiteException(() -> Util.reflect(ExHost.class.getDeclaredField("running"), host), true)) {
                 Logger log = Util.getDespiteException(() -> Util.reflect(SubDataClient.class.getDeclaredField("log"), client.get()), null);
                 log.info("Attempting reconnect in " + host.config.get().getMap("Settings", new YAMLSection()).getMap("SubData", new YAMLSection()).getInt("Reconnect", 30) + " seconds");
                 Util.isException(() -> Util.reflect(ExHost.class.getDeclaredMethod("connect", Logger.class, NamedContainer.class), host, log, client));
-            }
+            } else map.put(0, null);
         });
 
         return subdata;

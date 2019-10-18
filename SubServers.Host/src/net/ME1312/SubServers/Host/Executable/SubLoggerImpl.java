@@ -76,7 +76,7 @@ public class SubLoggerImpl {
         Process process = this.process;
         ExHost host = SubAPI.getInstance().getInternals();
         if (logn) Util.isException(() -> {
-            channel = (SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0].newChannel();
+            channel = (SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0].openChannel();
             channel.on.closed(new Callback<NamedContainer<DisconnectReason, DataClient>>() {
                 @Override
                 public void run(NamedContainer<DisconnectReason, DataClient> client) {
@@ -93,8 +93,10 @@ public class SubLoggerImpl {
                                     if (!started || SubLoggerImpl.this.process == null || process != SubLoggerImpl.this.process || !process.isAlive()) {
                                         timer.cancel();
                                     } else try {
-                                        channel = (SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0].newChannel();
-                                        channel.on.closed(run);
+                                        SubDataClient open = (SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0].openChannel();
+                                        open.on.closed(run);
+                                        channel.reconnect(channel);
+                                        channel = open;
                                         timer.cancel();
                                     } catch (NullPointerException | IOException e) {}
                                 }

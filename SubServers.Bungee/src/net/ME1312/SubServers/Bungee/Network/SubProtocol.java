@@ -51,6 +51,7 @@ public class SubProtocol extends SubDataProtocol {
             instance.registerPacket(0x0015, PacketDownloadServerInfo.class);
             instance.registerPacket(0x0016, PacketDownloadPlayerList.class);
             instance.registerPacket(0x0017, PacketCheckPermission.class);
+            instance.registerPacket(0x0018, PacketCheckPermissionResponse.class);
 
             instance.registerPacket(0x0010, new PacketDownloadLang(plugin));
             instance.registerPacket(0x0011, new PacketDownloadPlatformInfo(plugin));
@@ -60,6 +61,7 @@ public class SubProtocol extends SubDataProtocol {
             instance.registerPacket(0x0015, new PacketDownloadServerInfo(plugin));
             instance.registerPacket(0x0016, new PacketDownloadPlayerList(plugin));
             instance.registerPacket(0x0017, new PacketCheckPermission());
+            instance.registerPacket(0x0018, new PacketCheckPermissionResponse());
 
 
          // 30-4F: Control Packets
@@ -113,13 +115,11 @@ public class SubProtocol extends SubDataProtocol {
             instance.registerPacket(0x0071, PacketOutExReset.class);
             instance.registerPacket(0x0072, PacketOutExReload.class);
             instance.registerPacket(0x0073, PacketOutExUpdateWhitelist.class);
-            instance.registerPacket(0x0074, PacketExCheckPermission.class);
 
           //instance.registerPacket(0x0070, new PacketOutRunEvent());
           //instance.registerPacket(0x0071, new PacketOutReset());
           //instance.registerPacket(0x0072, new PacketOutReload());
           //instance.registerPacket(0x0073, new PacketOutExUpdateWhitelist());
-            instance.registerPacket(0x0074, new PacketExCheckPermission());
         }
 
         return instance;

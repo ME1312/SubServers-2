@@ -6,7 +6,7 @@ import net.ME1312.Galaxi.Library.NamedContainer;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubData.Client.Protocol.PacketObjectIn;
 import net.ME1312.SubData.Client.Protocol.PacketObjectOut;
-import net.ME1312.SubData.Client.SubDataClient;
+import net.ME1312.SubData.Client.SubDataSender;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -40,7 +40,7 @@ public class PacketDownloadProxyInfo implements PacketObjectIn<Integer>, PacketO
     }
 
     @Override
-    public ObjectMap<Integer> send(SubDataClient client) {
+    public ObjectMap<Integer> send(SubDataSender client) {
         ObjectMap<Integer> json = new ObjectMap<Integer>();
         json.set(0x0000, tracker);
         if (proxy != null) json.set(0x0001, proxy);
@@ -49,7 +49,7 @@ public class PacketDownloadProxyInfo implements PacketObjectIn<Integer>, PacketO
 
     @SuppressWarnings("unchecked")
     @Override
-    public void receive(SubDataClient client, ObjectMap<Integer> data) {
+    public void receive(SubDataSender client, ObjectMap<Integer> data) {
         boolean mode = callbacks.get(data.getUUID(0x0000)).name();
         for (Callback<ObjectMap<String>> callback : callbacks.get(data.getUUID(0x0000)).get()) {
             if (mode) {

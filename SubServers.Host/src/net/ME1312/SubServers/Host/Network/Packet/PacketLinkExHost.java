@@ -8,6 +8,7 @@ import net.ME1312.SubData.Client.Protocol.Initial.InitialPacket;
 import net.ME1312.SubData.Client.Protocol.PacketObjectIn;
 import net.ME1312.SubData.Client.Protocol.PacketObjectOut;
 import net.ME1312.SubData.Client.SubDataClient;
+import net.ME1312.SubData.Client.SubDataSender;
 import net.ME1312.SubServers.Host.ExHost;
 
 import java.util.logging.Logger;
@@ -41,7 +42,7 @@ public class PacketLinkExHost implements InitialPacket, PacketObjectIn<Integer>,
     }
 
     @Override
-    public ObjectMap<Integer> send(SubDataClient client) {
+    public ObjectMap<Integer> send(SubDataSender client) {
         ObjectMap<Integer> data = new ObjectMap<Integer>();
         data.set(0x0000, host.api.getName());
         data.set(0x0001, channel);
@@ -49,10 +50,10 @@ public class PacketLinkExHost implements InitialPacket, PacketObjectIn<Integer>,
     }
 
     @Override
-    public void receive(SubDataClient client, ObjectMap<Integer> data) throws Throwable {
-        Logger log = Util.getDespiteException(() -> Util.reflect(SubDataClient.class.getDeclaredField("log"), client), null);
+    public void receive(SubDataSender client, ObjectMap<Integer> data) throws Throwable {
+        Logger log = Util.getDespiteException(() -> Util.reflect(SubDataClient.class.getDeclaredField("log"), client.getConnection()), null);
         if (data.getInt(0x0001) == 0) {
-            setReady(client, true);
+            setReady(client.getConnection(), true);
         } else {
             log.severe("Could not link name with host" + ((data.contains(0x0002))?": "+data.getRawString(0x0002):'.'));
             DebugUtil.logException(new IllegalStateException(), log);

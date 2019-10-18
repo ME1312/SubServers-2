@@ -4,6 +4,7 @@ import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubData.Client.Protocol.PacketObjectIn;
 import net.ME1312.SubData.Client.SubDataClient;
+import net.ME1312.SubData.Client.SubDataSender;
 import net.ME1312.SubServers.Host.ExHost;
 
 import java.util.logging.Logger;
@@ -24,8 +25,8 @@ public class PacketInExReload implements PacketObjectIn<Integer> {
     }
 
     @Override
-    public void receive(SubDataClient client, ObjectMap<Integer> data) {
-        Logger log = Util.getDespiteException(() -> Util.reflect(SubDataClient.class.getDeclaredField("log"), client), null);
+    public void receive(SubDataSender client, ObjectMap<Integer> data) {
+        Logger log = Util.getDespiteException(() -> Util.reflect(SubDataClient.class.getDeclaredField("log"), client.getConnection()), null);
         if (data != null && data.contains(0x0000)) log.warning("Received request for a plugin reload: " + data.getString(0x0000));
         else log.warning("Received request for a plugin reload");
         new Thread(() -> {

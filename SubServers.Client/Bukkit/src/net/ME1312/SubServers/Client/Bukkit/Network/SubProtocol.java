@@ -4,7 +4,6 @@ import net.ME1312.Galaxi.Library.Callback.Callback;
 import net.ME1312.Galaxi.Library.NamedContainer;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
-import net.ME1312.SubData.Client.Library.DisconnectReason;
 import net.ME1312.SubData.Client.SubDataClient;
 import net.ME1312.SubData.Client.SubDataProtocol;
 import net.ME1312.SubServers.Client.Bukkit.Event.SubNetworkConnectEvent;
@@ -15,7 +14,6 @@ import net.ME1312.SubServers.Client.Bukkit.SubPlugin;
 import org.bukkit.Bukkit;
 
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.net.InetAddress;
 import java.util.HashMap;
 import java.util.logging.Handler;
@@ -50,6 +48,7 @@ public class SubProtocol extends SubDataProtocol {
             instance.registerPacket(0x0015, PacketDownloadServerInfo.class);
             instance.registerPacket(0x0016, PacketDownloadPlayerList.class);
             instance.registerPacket(0x0017, PacketCheckPermission.class);
+            instance.registerPacket(0x0018, PacketCheckPermissionResponse.class);
 
             instance.registerPacket(0x0010, new PacketDownloadLang(plugin));
             instance.registerPacket(0x0011, new PacketDownloadPlatformInfo());
@@ -59,6 +58,7 @@ public class SubProtocol extends SubDataProtocol {
             instance.registerPacket(0x0015, new PacketDownloadServerInfo());
             instance.registerPacket(0x0016, new PacketDownloadPlayerList());
             instance.registerPacket(0x0017, new PacketCheckPermission());
+            instance.registerPacket(0x0018, new PacketCheckPermissionResponse());
 
 
             // 30-4F: Control Packets
@@ -89,12 +89,10 @@ public class SubProtocol extends SubDataProtocol {
           //instance.registerPacket(0x0070, PacketInExRunEvent.class);
           //instance.registerPacket(0x0071, PacketInExReset.class);
           //instance.registerPacket(0x0072, PacketInExReload.class);
-            instance.registerPacket(0x0074, PacketExCheckPermission.class);
 
             instance.registerPacket(0x0070, new PacketInExRunEvent(plugin));
             instance.registerPacket(0x0071, new PacketInExReset());
             instance.registerPacket(0x0072, new PacketInExReload(plugin));
-            instance.registerPacket(0x0074, new PacketExCheckPermission());
         }
 
         return instance;
@@ -164,12 +162,11 @@ public class SubProtocol extends SubDataProtocol {
         subdata.on.closed(client -> {
             SubNetworkDisconnectEvent event = new SubNetworkDisconnectEvent(client.get(), client.name());
             if (plugin.isEnabled()) Bukkit.getPluginManager().callEvent(event);
-            map.put(0, null);
 
             if (plugin.isEnabled()) {
                 Bukkit.getLogger().info("SubData > Attempting reconnect in " + plugin.config.get().getMap("Settings").getMap("SubData").getInt("Reconnect", 30) + " seconds");
                 Util.isException(() -> Util.reflect(SubPlugin.class.getDeclaredMethod("connect", NamedContainer.class), plugin, client));
-            }
+            } else map.put(0, null);
         });
 
         return subdata;

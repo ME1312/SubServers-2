@@ -11,7 +11,7 @@ import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubData.Server.ClientHandler;
 import net.ME1312.SubServers.Bungee.Library.Compatibility.GalaxiInfo;
 import net.ME1312.SubServers.Bungee.Library.Compatibility.Logger;
-import net.ME1312.SubServers.Bungee.Network.Packet.PacketExCheckPermission;
+import net.ME1312.SubServers.Bungee.Network.Packet.PacketCheckPermission;
 import net.md_5.bungee.BungeeCord;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.CommandSender;
@@ -719,7 +719,7 @@ public final class SubCommand extends CommandX {
                     HashMap<ServerInfo, NamedContainer<Long, Boolean>> map = (players.keySet().contains(((ProxiedPlayer) sender).getUniqueId()))?players.get(((ProxiedPlayer) sender).getUniqueId()):new HashMap<ServerInfo, NamedContainer<Long, Boolean>>();
                     map.put(((ProxiedPlayer) sender).getServer().getInfo(), new NamedContainer<>(null, false));
                     players.put(((ProxiedPlayer) sender).getUniqueId(), map);
-                    ((SubDataClient) ((Server) ((ProxiedPlayer) sender).getServer().getInfo()).getSubData()[0]).sendPacket(new PacketExCheckPermission(((ProxiedPlayer) sender).getUniqueId(), "subservers.command", result -> {
+                    ((SubDataClient) ((Server) ((ProxiedPlayer) sender).getServer().getInfo()).getSubData()[0]).sendPacket(new PacketCheckPermission(((ProxiedPlayer) sender).getUniqueId(), "subservers.command", result -> {
                         map.put(((ProxiedPlayer) sender).getServer().getInfo(), new NamedContainer<>(Calendar.getInstance().getTime().getTime(), result));
                     }));
                 }
@@ -727,7 +727,7 @@ public final class SubCommand extends CommandX {
             return new NamedContainer<>(null, Collections.emptyList());
         } else if (args.length <= 1) {
             List<String> cmds = new ArrayList<>();
-            cmds.addAll(Arrays.asList("help", "list", "info", "status", "version", "start", "stop", "restart", "kill", "terminate", "cmd", "command", "create", "update", "upgrade"));
+            cmds.addAll(Arrays.asList("help", "list", "info", "status", "version", "start", "restart", "stop", "kill", "terminate", "cmd", "command", "create", "update", "upgrade"));
             if (!(sender instanceof ProxiedPlayer)) cmds.addAll(Arrays.asList("reload", "sudo", "screen", "delete", "restore"));
             if (last.length() == 0) {
                 return new NamedContainer<>(null, cmds);

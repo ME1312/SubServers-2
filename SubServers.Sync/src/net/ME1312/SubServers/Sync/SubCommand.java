@@ -3,6 +3,7 @@ package net.ME1312.SubServers.Sync;
 import com.google.gson.Gson;
 import net.ME1312.Galaxi.Library.Callback.Callback;
 import net.ME1312.SubData.Client.SubDataClient;
+import net.ME1312.SubData.Client.SubDataSender;
 import net.ME1312.SubServers.Sync.Library.Compatibility.CommandX;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Container;
@@ -691,7 +692,7 @@ public final class SubCommand extends CommandX {
                     HashMap<ServerInfo, NamedContainer<Long, Boolean>> map = (players.keySet().contains(((ProxiedPlayer) sender).getUniqueId()))?players.get(((ProxiedPlayer) sender).getUniqueId()):new HashMap<ServerInfo, NamedContainer<Long, Boolean>>();
                     map.put(((ProxiedPlayer) sender).getServer().getInfo(), new NamedContainer<>(null, false));
                     players.put(((ProxiedPlayer) sender).getUniqueId(), map);
-                    ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketCheckPermission(((ProxiedPlayer) sender).getServer().getInfo().getName(), ((ProxiedPlayer) sender).getUniqueId(), "subservers.command", result -> {
+                    ((SubDataSender) ((ServerImpl) ((ProxiedPlayer) sender).getServer().getInfo()).getSubData()[0]).sendPacket(new PacketCheckPermission(((ProxiedPlayer) sender).getUniqueId(), "subservers.command", result -> {
                         map.put(((ProxiedPlayer) sender).getServer().getInfo(), new NamedContainer<>(Calendar.getInstance().getTime().getTime(), result));
                     }));
                 }
@@ -711,7 +712,6 @@ public final class SubCommand extends CommandX {
         } else {
             if (args[0].equals("info") || args[0].equals("status")) {
                 if (args.length == 2) {
-                    updateCache();
                     List<String> list = new ArrayList<String>();
                     List<String> subcommands = new ArrayList<String>();
                     subcommands.add("proxy");
@@ -748,7 +748,6 @@ public final class SubCommand extends CommandX {
                     }
                     return new NamedContainer<>((list.size() <= 0)?plugin.api.getLang("SubServers", "Command.Info.Unknown").replace("$str$", args[0]):null, list);
                 } else if (args.length == 3) {
-                    updateCache();
                     List<String> list = new ArrayList<String>();
                     if (last.length() == 0) {
                         switch (args[1].toLowerCase()) {
@@ -807,7 +806,34 @@ public final class SubCommand extends CommandX {
                 } else {
                     return new NamedContainer<>(null, Collections.emptyList());
                 }
-            } else if (args[0].equals("start")) {
+            } else if (!(sender instanceof ProxiedPlayer) && (args[0].equals("reload") || args[0].equals("restore"))) {
+                if (args[0].equals("reload")) {
+                    List<String> list = new ArrayList<String>(),
+                            completes = Arrays.asList("all", "config", "templates");
+                    if (args.length == 2) {
+                        if (last.length() == 0) {
+                            list = completes;
+                        } else {
+                            for (String complete : completes) {
+                                if (complete.toLowerCase().startsWith(last)) list.add(last + complete.substring(last.length()));
+                            }
+                        }
+                        return new NamedContainer<>((list.size() <= 0)?plugin.api.getLang("SubServers", "Command.Generic.Unknown").replace("$str$", args[0]):null, list);
+                    } else {
+                        return new NamedContainer<>(null, Collections.emptyList());
+                    }
+                } else /* if (args[0].equals("restore")) */ {
+                    if (args.length == 2) {
+                        return new NamedContainer<>(null, Collections.singletonList("<SubServer>"));
+                    } else {
+                        return new NamedContainer<>(null, Collections.emptyList());
+                    }
+                }
+            } else if (args[0].equals("start") ||
+                    (!(sender instanceof ProxiedPlayer) && (
+                            args[0].equals("sudo") || args[0].equals("screen") ||
+                                    args[0].equals("del") || args[0].equals("delete")
+                    ))) {
                 List<String> list = new ArrayList<String>();
                 if (args.length == 2) {
                     if (last.length() == 0) {

@@ -2,7 +2,7 @@ package net.ME1312.SubServers.Host.Network.Packet;
 
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.SubData.Client.Protocol.PacketObjectIn;
-import net.ME1312.SubData.Client.SubDataClient;
+import net.ME1312.SubData.Client.SubDataSender;
 import net.ME1312.SubServers.Host.ExHost;
 
 /**
@@ -16,7 +16,7 @@ public class PacketInExReset implements PacketObjectIn<Integer> {
     }
 
     @Override
-    public void receive(SubDataClient client, ObjectMap<Integer> data) {/*
+    public void receive(SubDataSender client, ObjectMap<Integer> data) {/*
         List<String> subservers = new ArrayList<String>();
         subservers.addAll(host.servers.keySet());
 

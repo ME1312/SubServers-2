@@ -43,7 +43,7 @@
         <dependency>
             <groupId>net.ME1312.SubData</groupId>
             <artifactId>Client</artifactId>
-            <version>19w39a</version>
+            <version>19w42c</version>
             <scope>compile</scope>
             <optional>true</optional>
         </dependency>

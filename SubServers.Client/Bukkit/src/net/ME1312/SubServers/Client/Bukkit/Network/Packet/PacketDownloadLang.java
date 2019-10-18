@@ -6,7 +6,7 @@ import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubData.Client.Protocol.PacketObjectIn;
 import net.ME1312.SubData.Client.Protocol.PacketObjectOut;
 import net.ME1312.SubData.Client.Protocol.PacketOut;
-import net.ME1312.SubData.Client.SubDataClient;
+import net.ME1312.SubData.Client.SubDataSender;
 import net.ME1312.SubServers.Client.Bukkit.SubPlugin;
 import org.bukkit.Bukkit;
 
@@ -34,7 +34,7 @@ public class PacketDownloadLang implements PacketObjectIn<Integer>, PacketOut {
     public PacketDownloadLang() {}
 
     @Override
-    public void receive(SubDataClient client, ObjectMap<Integer> data) {
+    public void receive(SubDataSender client, ObjectMap<Integer> data) {
         try {
             Util.reflect(SubPlugin.class.getDeclaredField("lang"), plugin, new NamedContainer<>(Calendar.getInstance().getTime().getTime(), data.getObject(0x0001)));
             Bukkit.getLogger().info("SubData > Lang Settings Downloaded");

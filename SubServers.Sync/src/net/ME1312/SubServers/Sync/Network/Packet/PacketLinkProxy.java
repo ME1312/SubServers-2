@@ -5,7 +5,7 @@ import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubData.Client.Protocol.Initial.InitialPacket;
 import net.ME1312.SubData.Client.Protocol.PacketObjectIn;
 import net.ME1312.SubData.Client.Protocol.PacketObjectOut;
-import net.ME1312.SubData.Client.SubDataClient;
+import net.ME1312.SubData.Client.SubDataSender;
 import net.ME1312.SubServers.Sync.ExProxy;
 import net.ME1312.SubServers.Sync.Library.Compatibility.Logger;
 import net.ME1312.SubServers.Sync.SubAPI;
@@ -39,7 +39,7 @@ public class PacketLinkProxy implements InitialPacket, PacketObjectIn<Integer>, 
     }
 
     @Override
-    public ObjectMap<Integer> send(SubDataClient client) {
+    public ObjectMap<Integer> send(SubDataSender client) {
         ObjectMap<Integer> json = new ObjectMap<Integer>();
         json.set(0x0000, plugin.api.getName());
         json.set(0x0001, channel);
@@ -47,11 +47,11 @@ public class PacketLinkProxy implements InitialPacket, PacketObjectIn<Integer>, 
     }
 
     @Override
-    public void receive(SubDataClient client, ObjectMap<Integer> data) {
+    public void receive(SubDataSender client, ObjectMap<Integer> data) {
         if (data.getInt(0x0001) == 0) {
             try {
                 if (data.contains(0x0000)) Util.reflect(SubAPI.class.getDeclaredField("name"), plugin.api, data.getRawString(0x0000));
-                setReady(client, true);
+                setReady(client.getConnection(), true);
             } catch (Throwable e) {
                 e.printStackTrace();
             }

@@ -5,7 +5,7 @@ import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.NamedContainer;
 import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubData.Client.Protocol.PacketObjectIn;
-import net.ME1312.SubData.Client.SubDataClient;
+import net.ME1312.SubData.Client.SubDataSender;
 import net.ME1312.SubServers.Client.Sponge.Event.*;
 import net.ME1312.SubServers.Client.Sponge.SubPlugin;
 import org.spongepowered.api.Sponge;
@@ -121,7 +121,7 @@ public class PacketInExRunEvent implements PacketObjectIn<Integer> {
 
     @SuppressWarnings("unchecked")
     @Override
-    public void receive(SubDataClient client, ObjectMap<Integer> data) {
+    public void receive(SubDataSender client, ObjectMap<Integer> data) {
         if (callbacks.keySet().contains(data.getString(0x0000))) {
             List<Callback<ObjectMap<String>>> callbacks = PacketInExRunEvent.callbacks.get(data.getString(0x0000));
             PacketInExRunEvent.callbacks.remove(data.getString(0x0000));

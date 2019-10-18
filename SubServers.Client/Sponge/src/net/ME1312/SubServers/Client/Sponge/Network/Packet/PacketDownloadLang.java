@@ -7,6 +7,7 @@ import net.ME1312.SubData.Client.Protocol.PacketObjectIn;
 import net.ME1312.SubData.Client.Protocol.PacketObjectOut;
 import net.ME1312.SubData.Client.Protocol.PacketOut;
 import net.ME1312.SubData.Client.SubDataClient;
+import net.ME1312.SubData.Client.SubDataSender;
 import net.ME1312.SubServers.Client.Sponge.SubPlugin;
 
 import java.util.Calendar;
@@ -34,8 +35,8 @@ public class PacketDownloadLang implements PacketObjectIn<Integer>, PacketOut {
     public PacketDownloadLang() {}
 
     @Override
-    public void receive(SubDataClient client, ObjectMap<Integer> data) {
-        Logger log = Util.getDespiteException(() -> Util.reflect(SubDataClient.class.getDeclaredField("log"), client), null);
+    public void receive(SubDataSender client, ObjectMap<Integer> data) {
+        Logger log = Util.getDespiteException(() -> Util.reflect(SubDataClient.class.getDeclaredField("log"), client.getConnection()), null);
         try {
             Util.reflect(SubPlugin.class.getDeclaredField("lang"), plugin, new NamedContainer<>(Calendar.getInstance().getTime().getTime(), data.getObject(0x0001)));
             log.info("Lang Settings Downloaded");

@@ -6,7 +6,7 @@ import net.ME1312.Galaxi.Library.UniversalFile;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubData.Client.Protocol.PacketObjectIn;
 import net.ME1312.SubData.Client.Protocol.PacketOut;
-import net.ME1312.SubData.Client.SubDataClient;
+import net.ME1312.SubData.Client.SubDataSender;
 import net.ME1312.SubServers.Host.Executable.SubCreatorImpl;
 import net.ME1312.SubServers.Host.ExHost;
 
@@ -27,14 +27,14 @@ public class PacketExConfigureHost implements PacketObjectIn<Integer>, PacketOut
     }
 
     @Override
-    public void sending(SubDataClient client) {
+    public void sending(SubDataSender client) {
         host.log.info.println("Downloading Host Settings...");
         first = true;
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    public void receive(SubDataClient client, ObjectMap<Integer> data) {
+    public void receive(SubDataSender client, ObjectMap<Integer> data) {
         host.host = new ObjectMap<>((Map<String, ?>) data.getObject(0x0000));
         for (SubCreatorImpl.ServerTemplate template : host.templates.values()) {
             Util.deleteDirectory(template.getDirectory());

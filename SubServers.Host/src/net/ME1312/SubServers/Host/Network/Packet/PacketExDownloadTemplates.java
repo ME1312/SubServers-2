@@ -5,7 +5,7 @@ import net.ME1312.Galaxi.Library.UniversalFile;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubData.Client.Protocol.PacketOut;
 import net.ME1312.SubData.Client.Protocol.PacketStreamIn;
-import net.ME1312.SubData.Client.SubDataClient;
+import net.ME1312.SubData.Client.SubDataSender;
 import net.ME1312.SubServers.Host.ExHost;
 import net.ME1312.SubServers.Host.SubAPI;
 
@@ -25,14 +25,14 @@ public class PacketExDownloadTemplates implements PacketOut, PacketStreamIn {
     }
 
     @Override
-    public void sending(SubDataClient client) throws Throwable {
+    public void sending(SubDataSender client) throws Throwable {
         UniversalFile dir = new UniversalFile(GalaxiEngine.getInstance().getRuntimeDirectory(), "Templates");
         if (dir.exists()) Util.deleteDirectory(dir);
         host.log.info.println("Downloading Template Files...");
     }
 
     @Override
-    public void receive(SubDataClient client, InputStream stream) {
+    public void receive(SubDataSender client, InputStream stream) {
         try {
             Util.unzip(stream, new UniversalFile(GalaxiEngine.getInstance().getRuntimeDirectory(), "Templates"));
             host.log.info.println("Template Files Downloaded");

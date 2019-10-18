@@ -4,7 +4,10 @@ import net.ME1312.Galaxi.Library.Callback.Callback;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Map.ObjectMapValue;
 import net.ME1312.Galaxi.Library.Util;
+import net.ME1312.SubData.Client.DataSender;
+import net.ME1312.SubData.Client.Library.ForwardedDataSender;
 import net.ME1312.SubData.Client.SubDataClient;
+import net.ME1312.SubData.Client.SubDataSender;
 import net.ME1312.SubServers.Client.Sponge.Network.Packet.PacketAddServer;
 import net.ME1312.SubServers.Client.Sponge.Network.Packet.PacketDeleteServer;
 import net.ME1312.SubServers.Client.Sponge.Network.Packet.PacketDownloadHostInfo;
@@ -61,16 +64,16 @@ public class Host {
      * @return SubData Client Channel ID Array (may be empty if unsupported)
      */
     @SuppressWarnings("unchecked")
-    public UUID[] getSubData() {
+    public DataSender[] getSubData() {
         if (raw.contains("subdata")) {
             ObjectMap<Integer> subdata = new ObjectMap<Integer>((Map<Integer, ?>) raw.getObject("subdata"));
             LinkedList<Integer> keys = new LinkedList<Integer>(subdata.getKeys());
-            LinkedList<UUID> channels = new LinkedList<UUID>();
+            LinkedList<SubDataSender> channels = new LinkedList<SubDataSender>();
             Collections.sort(keys);
-            for (Integer channel : keys) channels.add(subdata.getUUID(channel));
-            return channels.toArray(new UUID[0]);
+            for (Integer channel : keys) channels.add((subdata.isNull(channel))?null:new ForwardedDataSender((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0], subdata.getUUID(channel)));
+            return channels.toArray(new SubDataSender[0]);
         } else {
-            return new UUID[0];
+            return new SubDataSender[0];
         }
     }
 

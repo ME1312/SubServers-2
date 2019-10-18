@@ -10,8 +10,7 @@ public class PacketOutExRequestQueue implements PacketOut {
     /**
      * New PacketOutExRequestQueue
      */
-    public PacketOutExRequestQueue() {
-    }
+    public PacketOutExRequestQueue() {}
 
 
     @Override

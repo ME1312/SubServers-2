@@ -6,7 +6,7 @@ import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubData.Client.Protocol.PacketObjectIn;
 import net.ME1312.SubData.Client.Protocol.PacketObjectOut;
-import net.ME1312.SubData.Client.SubDataClient;
+import net.ME1312.SubData.Client.SubDataSender;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -40,7 +40,7 @@ public class PacketDownloadHostInfo implements PacketObjectIn<Integer>, PacketOb
     }
 
     @Override
-    public ObjectMap<Integer> send(SubDataClient client) {
+    public ObjectMap<Integer> send(SubDataSender client) {
         ObjectMap<Integer> json = new ObjectMap<Integer>();
         json.set(0x0000, tracker);
         if (group != null) json.set(0x0001, group);
@@ -49,7 +49,7 @@ public class PacketDownloadHostInfo implements PacketObjectIn<Integer>, PacketOb
 
     @SuppressWarnings("unchecked")
     @Override
-    public void receive(SubDataClient client, ObjectMap<Integer> data) {
+    public void receive(SubDataSender client, ObjectMap<Integer> data) {
         for (Callback<ObjectMap<String>> callback : callbacks.get(data.getUUID(0x0000))) callback.run(new ObjectMap<String>((Map<String, ?>) data.getObject(0x0001)));
         callbacks.remove(data.getUUID(0x0000));
     }

@@ -55,6 +55,7 @@ public class SubProtocol extends SubDataProtocol {
             instance.registerPacket(0x0015, PacketDownloadServerInfo.class);
             instance.registerPacket(0x0016, PacketDownloadPlayerList.class);
             instance.registerPacket(0x0017, PacketCheckPermission.class);
+            instance.registerPacket(0x0018, PacketCheckPermissionResponse.class);
 
             instance.registerPacket(0x0010, new PacketDownloadLang(plugin));
             instance.registerPacket(0x0011, new PacketDownloadPlatformInfo());
@@ -64,6 +65,7 @@ public class SubProtocol extends SubDataProtocol {
             instance.registerPacket(0x0015, new PacketDownloadServerInfo());
             instance.registerPacket(0x0016, new PacketDownloadPlayerList());
             instance.registerPacket(0x0017, new PacketCheckPermission());
+            instance.registerPacket(0x0018, new PacketCheckPermissionResponse());
 
 
             // 30-4F: Control Packets
@@ -164,12 +166,11 @@ public class SubProtocol extends SubDataProtocol {
         subdata.on.closed(client -> {
             SubNetworkDisconnectEvent event = new SubNetworkDisconnectEvent(client.get(), client.name());
             plugin.getPluginManager().callEvent(event);
-            map.put(0, null);
 
             if (plugin.isRunning) {
                 net.ME1312.SubServers.Sync.Library.Compatibility.Logger.get("SubData").info("Attempting reconnect in " + plugin.config.get().getMap("Settings").getMap("SubData").getInt("Reconnect", 30) + " seconds");
                 Util.isException(() -> Util.reflect(ExProxy.class.getDeclaredMethod("connect", NamedContainer.class), plugin, client));
-            }
+            } else map.put(0, null);
         });
 
         return subdata;

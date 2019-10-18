@@ -4,7 +4,6 @@ import net.ME1312.Galaxi.Library.Callback.Callback;
 import net.ME1312.Galaxi.Library.NamedContainer;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
-import net.ME1312.SubData.Client.Library.DisconnectReason;
 import net.ME1312.SubData.Client.SubDataClient;
 import net.ME1312.SubData.Client.SubDataProtocol;
 import net.ME1312.SubServers.Client.Sponge.Event.SubNetworkConnectEvent;
@@ -13,15 +12,11 @@ import net.ME1312.SubServers.Client.Sponge.Network.Packet.*;
 import net.ME1312.SubServers.Client.Sponge.SubAPI;
 import net.ME1312.SubServers.Client.Sponge.SubPlugin;
 import org.slf4j.LoggerFactory;
-import org.spongepowered.api.GameState;
 import org.spongepowered.api.Sponge;
 
-import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.net.InetAddress;
 import java.util.HashMap;
-import java.util.concurrent.TimeUnit;
 import java.util.logging.Handler;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
@@ -57,6 +52,7 @@ public class SubProtocol extends SubDataProtocol {
             instance.registerPacket(0x0015, PacketDownloadServerInfo.class);
             instance.registerPacket(0x0016, PacketDownloadPlayerList.class);
             instance.registerPacket(0x0017, PacketCheckPermission.class);
+            instance.registerPacket(0x0018, PacketCheckPermissionResponse.class);
 
             instance.registerPacket(0x0010, new PacketDownloadLang(plugin));
             instance.registerPacket(0x0011, new PacketDownloadPlatformInfo());
@@ -66,6 +62,7 @@ public class SubProtocol extends SubDataProtocol {
             instance.registerPacket(0x0015, new PacketDownloadServerInfo());
             instance.registerPacket(0x0016, new PacketDownloadPlayerList());
             instance.registerPacket(0x0017, new PacketCheckPermission());
+            instance.registerPacket(0x0018, new PacketCheckPermissionResponse());
 
 
             // 30-4F: Control Packets
@@ -96,12 +93,10 @@ public class SubProtocol extends SubDataProtocol {
           //instance.registerPacket(0x0070, PacketInExRunEvent.class);
           //instance.registerPacket(0x0071, PacketInExReset.class);
           //instance.registerPacket(0x0072, PacketInExReload.class);
-            instance.registerPacket(0x0074, PacketExCheckPermission.class);
 
             instance.registerPacket(0x0070, new PacketInExRunEvent(plugin));
             instance.registerPacket(0x0071, new PacketInExReset());
             instance.registerPacket(0x0072, new PacketInExReload(plugin));
-            instance.registerPacket(0x0074, new PacketExCheckPermission());
         }
 
         return instance;
@@ -175,13 +170,12 @@ public class SubProtocol extends SubDataProtocol {
         subdata.on.closed(client -> {
             SubNetworkDisconnectEvent event = new SubNetworkDisconnectEvent(client.get(), client.name());
             Sponge.getEventManager().post(event);
-            map.put(0, null);
 
             if (Util.getDespiteException(() -> Util.reflect(SubPlugin.class.getDeclaredField("running"), plugin), true)) {
                 Logger log = Util.getDespiteException(() -> Util.reflect(SubDataClient.class.getDeclaredField("log"), client.get()), null);
                 log.info("Attempting reconnect in " + plugin.config.get().getMap("Settings").getMap("SubData").getInt("Reconnect", 30) + " seconds");
                 Util.isException(() -> Util.reflect(SubPlugin.class.getDeclaredMethod("connect", NamedContainer.class), plugin, client));
-            }
+            } else map.put(0, null);
         });
 
         return subdata;
