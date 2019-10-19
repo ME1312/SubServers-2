@@ -161,9 +161,9 @@ public class SubProtocol extends SubDataProtocol {
         subdata.on.ready(client -> Bukkit.getPluginManager().callEvent(new SubNetworkConnectEvent((SubDataClient) client)));
         subdata.on.closed(client -> {
             SubNetworkDisconnectEvent event = new SubNetworkDisconnectEvent(client.get(), client.name());
-            if (plugin.isEnabled()) Bukkit.getPluginManager().callEvent(event);
 
             if (plugin.isEnabled()) {
+                Bukkit.getPluginManager().callEvent(event);
                 Bukkit.getLogger().info("SubData > Attempting reconnect in " + plugin.config.get().getMap("Settings").getMap("SubData").getInt("Reconnect", 30) + " seconds");
                 Util.isException(() -> Util.reflect(SubPlugin.class.getDeclaredMethod("connect", NamedContainer.class), plugin, client));
             } else map.put(0, null);

@@ -266,9 +266,11 @@ public class InternalSubCreator extends SubCreator {
                     callback.run(subserver);
                 } catch (Exception e) {
                     e.printStackTrace();
+                    callback.run(null);
                 }
             } else {
                 Logger.get(prefix).info("Couldn't build the server jar. Check the SubCreator logs for more detail.");
+                callback.run(null);
             }
             InternalSubCreator.this.thread.remove(name.toLowerCase());
         } private Object convert(Object value, NamedContainer<String, String>... replacements) {
@@ -354,7 +356,7 @@ public class InternalSubCreator extends SubCreator {
             }
 
             CreatorTask task = new CreatorTask(player, name, template, version, port, server -> {
-                if (callback != null && server != null) try {
+                if (callback != null) try {
                     callback.run(server);
                 } catch (Throwable e) {
                     Throwable ew = new InvocationTargetException(e);
@@ -378,7 +380,7 @@ public class InternalSubCreator extends SubCreator {
 
     @SuppressWarnings("deprecation")
     @Override
-    public boolean update(UUID player, SubServer server, Version version, Callback<SubServer> callback) {
+    public boolean update(UUID player, SubServer server, Version version, Callback<Boolean> callback) {
         if (Util.isNull(server)) throw new NullPointerException();
         if (host.isAvailable() && host.isEnabled() && host == server.getHost() && server.isAvailable() && !server.isRunning() && server.getTemplate() != null && server.getTemplate().isEnabled() && server.getTemplate().canUpdate() && (version != null || !server.getTemplate().requiresVersion())) {
             StackTraceElement[] origin = new Exception().getStackTrace();
@@ -387,8 +389,8 @@ public class InternalSubCreator extends SubCreator {
 
             CreatorTask task = new CreatorTask(player, server, version, x -> {
                 Util.isException(() -> Util.reflect(SubServerContainer.class.getDeclaredField("updating"), server, false));
-                if (callback != null && x != null) try {
-                    callback.run(x);
+                if (callback != null) try {
+                    callback.run(x != null);
                 } catch (Throwable e) {
                     Throwable ew = new InvocationTargetException(e);
                     ew.setStackTrace(origin);

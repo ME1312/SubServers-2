@@ -79,17 +79,10 @@ public class PacketUpdateServer implements PacketObjectIn<Integer>, PacketObject
             } else if (version == null && ((SubServer) servers.get(name.toLowerCase())).getTemplate().requiresVersion()) {
                 client.sendPacket(new PacketUpdateServer(12, tracker));
             } else {
-                if (((SubServer) servers.get(name.toLowerCase())).getHost().getCreator().update(player, (SubServer) servers.get(name.toLowerCase()), version)) {
-                    if (waitfor) {
-                        new Thread(() -> {
-                            try {
-                                ((SubServer) servers.get(name.toLowerCase())).getHost().getCreator().waitFor();
-                                client.sendPacket(new PacketUpdateServer(0, tracker));
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                            }
-                        }, "SubServers.Bungee::SubData_SubCreator_Update_Handler(" + client.getAddress().toString() + ')').start();
-                    } else {
+                if (((SubServer) servers.get(name.toLowerCase())).getHost().getCreator().update(player, (SubServer) servers.get(name.toLowerCase()), version, success -> {
+                    if (waitfor) client.sendPacket(new PacketUpdateServer((!success)?13:0, tracker));
+                })) {
+                    if (!waitfor) {
                         client.sendPacket(new PacketUpdateServer(0, tracker));
                     }
                 } else {

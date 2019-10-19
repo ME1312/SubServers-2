@@ -95,7 +95,6 @@ public class SubLoggerImpl {
                                     } else try {
                                         SubDataClient open = (SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0].openChannel();
                                         open.on.closed(run);
-                                        channel.reconnect(channel);
                                         channel = open;
                                         timer.cancel();
                                     } catch (NullPointerException | IOException e) {}

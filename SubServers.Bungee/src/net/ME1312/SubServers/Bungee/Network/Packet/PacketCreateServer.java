@@ -77,19 +77,10 @@ public class PacketCreateServer implements PacketObjectIn<Integer>, PacketObject
             } else if (port != null && (port <= 0 || port > 65535)) {
                 client.sendPacket(new PacketCreateServer(11, tracker));
             } else {
-                if (plugin.hosts.get(host.toLowerCase()).getCreator().create(player, name, plugin.hosts.get(host.toLowerCase()).getCreator().getTemplate(template), version, port)) {
-                    if (waitfor) {
-                        new Thread(() -> {
-                            try {
-                                plugin.hosts.get(host.toLowerCase()).getCreator().waitFor();
-                                client.sendPacket(new PacketCreateServer(0, tracker));
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                            }
-                        }, "SubServers.Bungee::SubData_SubCreator_Handler(" + client.getAddress().toString() + ')').start();
-                    } else {
-                        client.sendPacket(new PacketCreateServer(0, tracker));
-                    }
+                if (plugin.hosts.get(host.toLowerCase()).getCreator().create(player, name, plugin.hosts.get(host.toLowerCase()).getCreator().getTemplate(template), version, port, server -> {
+                    if (waitfor) client.sendPacket(new PacketCreateServer((server == null)?12:0, tracker));
+                })) {
+                    if (!waitfor) client.sendPacket(new PacketCreateServer(0, tracker));
                 } else {
                     client.sendPacket(new PacketCreateServer(1, tracker));
                 }

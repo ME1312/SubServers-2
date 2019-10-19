@@ -256,7 +256,7 @@ public abstract class SubCreator {
      * @param callback Callback
      * @return Success Status
      */
-    public abstract boolean update(UUID player, SubServer server, Version version, Callback<SubServer> callback);
+    public abstract boolean update(UUID player, SubServer server, Version version, Callback<Boolean> callback);
 
     /**
      * Update a SubServer
@@ -278,7 +278,7 @@ public abstract class SubCreator {
      * @param callback Callback
      * @return Success Status
      */
-    public boolean update(SubServer server, Version version, Callback<SubServer> callback) {
+    public boolean update(SubServer server, Version version, Callback<Boolean> callback) {
         return update(null, server, version, callback);
     }
 

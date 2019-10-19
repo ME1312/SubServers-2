@@ -146,18 +146,14 @@ public class ExternalSubCreator extends SubCreator {
                             if (template.getBuildOptions().getBoolean("Run-On-Finish", true))
                                 subserver.start();
 
-                            if (callback != null) try {
-                                callback.run(subserver);
-                            } catch (Throwable e) {
-                                Throwable ew = new InvocationTargetException(e);
-                                ew.setStackTrace(origin);
-                                ew.printStackTrace();
-                            }
+                            callback(origin, callback, subserver);
                         } else {
                             Logger.get(prefix).info(data.getString(0x0004));
+                            callback(origin, callback, null);
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
+                        callback(origin, callback, null);
                     }
                     logger.stop();
                     this.thread.remove(name.toLowerCase());
@@ -190,10 +186,18 @@ public class ExternalSubCreator extends SubCreator {
     } private String replace(String string, NamedContainer<String, String>... replacements) {
         for (NamedContainer<String, String> replacement : replacements) string = string.replace(replacement.name(), replacement.get());
         return string;
+    } private <T> void callback(StackTraceElement[] origin, Callback<T> callback, T value) {
+        if (callback != null) try {
+            callback.run(value);
+        } catch (Throwable e) {
+            Throwable ew = new InvocationTargetException(e);
+            ew.setStackTrace(origin);
+            ew.printStackTrace();
+        }
     }
 
     @Override
-    public boolean update(UUID player, SubServer server, Version version, Callback<SubServer> callback) {
+    public boolean update(UUID player, SubServer server, Version version, Callback<Boolean> callback) {
         if (Util.isNull(server)) throw new NullPointerException();
         if (host.isAvailable() && host.isEnabled() && host == server.getHost() && server.isAvailable() && !server.isRunning() && server.getTemplate() != null && server.getTemplate().isEnabled() && server.getTemplate().canUpdate() && (version != null || !server.getTemplate().requiresVersion())) {
             StackTraceElement[] origin = new Exception().getStackTrace();
@@ -210,21 +214,18 @@ public class ExternalSubCreator extends SubCreator {
                 logger.start();
                 host.queue(new PacketExCreateServer(server, version, logger.getExternalAddress(), data -> {
                     Util.isException(() -> Util.reflect(SubServerContainer.class.getDeclaredField("updating"), server, false));
-                    try {
-                        if (data.getInt(0x0001) == 0) {
-                            Logger.get(prefix).info("Saving...");
-                            if (callback != null) try {
-                                callback.run(server);
-                            } catch (Throwable e) {
-                                Throwable ew = new InvocationTargetException(e);
-                                ew.setStackTrace(origin);
-                                ew.printStackTrace();
-                            }
-                        } else {
-                            Logger.get(prefix).info(data.getString(0x0004));
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
+                    if (data.getInt(0x0001) == 0) {
+                        Logger.get(prefix).info("Saving...");
+                    } else {
+                        Logger.get(prefix).info(data.getString(0x0004));
+                    }
+
+                    if (callback != null) try {
+                        callback.run(data.getInt(0x0001) == 0);
+                    } catch (Throwable e) {
+                        Throwable ew = new InvocationTargetException(e);
+                        ew.setStackTrace(origin);
+                        ew.printStackTrace();
                     }
                     logger.stop();
                     this.thread.remove(name.toLowerCase());
