@@ -20,7 +20,7 @@ if [[ -z "$cache" ]] || [[ ! -f "$cache/Vanilla-$version.jar" ]]; then
     fi
     mkdir VanillaCord
     echo Downloading the VanillaCord Launcher...
-    __DL VanillaCord/VanillaCord.jar https://src.me1312.net/jenkins/job/VanillaCord/job/master/lastSuccessfulBuild/artifact/artifacts/VanillaCord.jar; __RETURN=$?
+    __DL VanillaCord/VanillaCord.jar https://dev.me1312.net/jenkins/job/VanillaCord/job/master/lastSuccessfulBuild/artifact/artifacts/VanillaCord.jar; __RETURN=$?
     if [[ $__RETURN -eq 0 ]]; then
         cd VanillaCord
         echo Launching VanillaCord

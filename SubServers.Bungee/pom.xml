@@ -16,7 +16,7 @@
         </repository>
         <repository>
             <id>me1312-repo</id>
-            <url>https://src.me1312.net/maven</url>
+            <url>https://dev.me1312.net/maven</url>
         </repository>
     </repositories>
 
@@ -167,8 +167,8 @@
                             <reportOutputDirectory>${basedir}/../Javadoc/SubServers.Bungee</reportOutputDirectory>
                             <additionalOptions>-Xdoclint:none</additionalOptions>
                             <links>
-                                <link>https://src.me1312.net/jenkins/job/GalaxiEngine/javadoc/GalaxiUtil/</link>
-                                <link>https://src.me1312.net/jenkins/job/SubData/javadoc/Server/</link>
+                                <link>https://dev.me1312.net/jenkins/job/GalaxiEngine/javadoc/GalaxiUtil/</link>
+                                <link>https://dev.me1312.net/jenkins/job/SubData/javadoc/Server/</link>
                                 <link>https://ci.md-5.net/job/BungeeCord/ws/api/target/apidocs/</link>
                             </links>
                         </configuration>

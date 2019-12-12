@@ -12,7 +12,7 @@
     <repositories>
         <repository>
             <id>me1312-repo</id>
-            <url>https://src.me1312.net/maven</url>
+            <url>https://dev.me1312.net/maven</url>
         </repository>
     </repositories>
 
@@ -139,8 +139,8 @@
                             <reportOutputDirectory>${basedir}/../Javadoc/SubServers.Host</reportOutputDirectory>
                             <additionalOptions>-Xdoclint:none</additionalOptions>
                             <links>
-                                <link>https://src.me1312.net/jenkins/job/GalaxiEngine/javadoc/GalaxiEngine/</link>
-                                <link>https://src.me1312.net/jenkins/job/SubData/javadoc/Client/</link>
+                                <link>https://dev.me1312.net/jenkins/job/GalaxiEngine/javadoc/GalaxiEngine/</link>
+                                <link>https://dev.me1312.net/jenkins/job/SubData/javadoc/Client/</link>
                             </links>
                         </configuration>
                     </execution>

@@ -321,14 +321,14 @@
 						switch (a.attr("href").toLowerCase()) {
 							case "%adfly_app_download%":
 								if (hash.hasOwnProperty("build")) {
-									a.attr("href", "https://adf.ly/18562515/https://src.me1312.net/maven/net/ME1312/SubServers/" + hash.app.replace(/^(.+?)\.([^.]*)$/, '$1') + "/" + hash.build + "/" + hash.app.replace(/^(.+?)\.([^.]*)$/, '$1') + "-" + hash.build + ".jar");
+									a.attr("href", "https://adf.ly/18562515/https://dev.me1312.net/maven/net/ME1312/SubServers/" + hash.app.replace(/^(.+?)\.([^.]*)$/, '$1') + "/" + hash.build + "/" + hash.app.replace(/^(.+?)\.([^.]*)$/, '$1') + "-" + hash.build + ".jar");
 								} else {
 									a.attr("href", "https://adf.ly/18562515/https://raw.githubusercontent.com/ME1312/SubServers-2/" + hash.commit.toLowerCase() + "/Artifacts/" + hash.app);
 								}
 								break;
 							case "%app_download%":
 								if (hash.hasOwnProperty("build")) {
-									a.attr("href", "https://src.me1312.net/maven/net/ME1312/SubServers/" + hash.app.replace(/^(.+?)\.([^.]*)$/, '$1') + "/" + hash.build + "/" + hash.app.replace(/^(.+?)\.([^.]*)$/, '$1') + "-" + hash.build + ".jar");
+									a.attr("href", "https://dev.me1312.net/maven/net/ME1312/SubServers/" + hash.app.replace(/^(.+?)\.([^.]*)$/, '$1') + "/" + hash.build + "/" + hash.app.replace(/^(.+?)\.([^.]*)$/, '$1') + "-" + hash.build + ".jar");
 								} else {
 									a.attr("href", "https://raw.githubusercontent.com/ME1312/SubServers-2/" + hash.commit.toLowerCase() + "/Artifacts/" + hash.app);
 								}

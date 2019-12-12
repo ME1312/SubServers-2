@@ -12,7 +12,7 @@
     <repositories>
         <repository>
             <id>me1312-repo</id>
-            <url>https://src.me1312.net/maven</url>
+            <url>https://dev.me1312.net/maven</url>
         </repository>
     </repositories>
 
