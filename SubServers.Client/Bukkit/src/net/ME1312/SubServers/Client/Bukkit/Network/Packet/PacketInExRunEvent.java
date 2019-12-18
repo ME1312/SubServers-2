@@ -62,6 +62,16 @@ public class PacketInExRunEvent implements PacketObjectIn<Integer> {
                 }
             }
         });
+        callback("SubCreatedEvent", new Callback<ObjectMap<String>>() {
+            @Override
+            public void run(ObjectMap<String> data) {
+                if (plugin.isEnabled()) {
+                    Bukkit.getPluginManager().callEvent(new SubCreatedEvent((data.contains("player"))?data.getUUID("player"):null, data.getString("host"), data.getString("name"),
+                            data.getString("template"), (data.contains("version"))?new Version(data.getString("version")):null, data.getInt("port"), data.getBoolean("update"), data.getBoolean("success")));
+                    callback("SubCreatedEvent", this);
+                }
+            }
+        });
         callback("SubSendCommandEvent", new Callback<ObjectMap<String>>() {
             @Override
             public void run(ObjectMap<String> data) {

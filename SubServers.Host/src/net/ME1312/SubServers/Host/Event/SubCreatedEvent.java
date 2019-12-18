@@ -1,21 +1,21 @@
-package net.ME1312.SubServers.Sync.Event;
+package net.ME1312.SubServers.Host.Event;
 
 import net.ME1312.Galaxi.Library.Callback.Callback;
-import net.ME1312.SubServers.Sync.Library.SubEvent;
+import net.ME1312.Galaxi.Library.Event.Event;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
-import net.ME1312.SubServers.Sync.Network.API.SubServer;
-import net.ME1312.SubServers.Sync.SubAPI;
-import net.md_5.bungee.api.plugin.Event;
+import net.ME1312.SubServers.Host.Network.API.SubServer;
+import net.ME1312.SubServers.Host.SubAPI;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.UUID;
 
 /**
- * Server Create Event
+ * Server Created Event
  */
-public class SubCreateEvent extends Event implements SubEvent {
+public class SubCreatedEvent extends Event {
     private UUID player;
+    private boolean success;
     private boolean update;
     private String host;
     private String name;
@@ -24,7 +24,7 @@ public class SubCreateEvent extends Event implements SubEvent {
     private int port;
 
     /**
-     * Server Create Event
+     * Server Created Event
      *
      * @param player Player Creating
      * @param host Potential Host
@@ -33,9 +33,10 @@ public class SubCreateEvent extends Event implements SubEvent {
      * @param version Server Version
      * @param port Server Port Number
      */
-    public SubCreateEvent(UUID player, String host, String name, String template, Version version, int port, boolean update) {
-        if (Util.isNull(host, name, template, version, port)) throw new NullPointerException();
+    public SubCreatedEvent(UUID player, String host, String name, String template, Version version, int port, boolean update, boolean success) {
+        if (Util.isNull(host, name, template, port)) throw new NullPointerException();
         this.player = player;
+        this.success = success;
         this.update = update;
         this.host = host;
         this.name = name;
@@ -45,21 +46,30 @@ public class SubCreateEvent extends Event implements SubEvent {
     }
 
     /**
-     * Get the Host the SubServer will run on
+     * Get the Host the SubServer runs on
      *
-     * @return Potential Host
+     * @return Host
      */
     public String getHost() {
         return host;
     }
 
     /**
-     * Get if SubCreator is being run in update mode
+     * Get if SubCreator was being run in update mode
      *
      * @return Update Mode Status
      */
-    public boolean isUpdate() {
+    public boolean wasUpdate() {
         return update;
+    }
+
+    /**
+     * Get if the operation was a success
+     *
+     * @return Success Status
+     */
+    public boolean wasSuccessful() {
+        return success;
     }
 
     /**
@@ -67,8 +77,8 @@ public class SubCreateEvent extends Event implements SubEvent {
      *
      * @param callback Updating Server
      */
-    public void getUpdatingServer(Callback<SubServer> callback) {
-        if (!update) {
+    public void getServer(Callback<SubServer> callback) {
+        if (!update && !success) {
             try {
                 callback.run(null);
             } catch (Throwable e) {
@@ -81,7 +91,7 @@ public class SubCreateEvent extends Event implements SubEvent {
     }
 
     /**
-     * Get the name the SubServer will use
+     * Get the name the SubServer used
      *
      * @return SubServer Name
      */
@@ -90,7 +100,7 @@ public class SubCreateEvent extends Event implements SubEvent {
     }
 
     /**
-     * Get the Template to Use
+     * Get the Template that was used
      *
      * @return Server Template
      */
@@ -99,7 +109,7 @@ public class SubCreateEvent extends Event implements SubEvent {
     }
 
     /**
-     * Get the Version the Server will use
+     * Get the Version the Server used
      *
      * @return Server Version
      */
@@ -108,7 +118,7 @@ public class SubCreateEvent extends Event implements SubEvent {
     }
 
     /**
-     * Get the Port the Server will use
+     * Get the Port the Server used
      *
      * @return Port Number
      */

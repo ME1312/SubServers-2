@@ -52,15 +52,6 @@ public class SubSendCommandEvent extends AbstractEvent implements SubEvent {
     }
 
     /**
-     * Sets the Command to be Sent
-     *
-     * @param value Value
-     */
-    public void setCommand(String value) {
-        command = value;
-    }
-
-    /**
      * Gets the cause of this Event
      *
      * @deprecated Use simplified methods where available

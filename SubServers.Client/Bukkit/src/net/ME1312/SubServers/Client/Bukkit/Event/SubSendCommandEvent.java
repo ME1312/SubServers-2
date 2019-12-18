@@ -51,15 +51,6 @@ public class SubSendCommandEvent extends Event implements SubEvent {
         return command;
     }
 
-    /**
-     * Sets the Command to be Sent
-     *
-     * @param value Value
-     */
-    public void setCommand(String value) {
-        command = value;
-    }
-
     @Override
     public HandlerList getHandlers() {
         return handlers;

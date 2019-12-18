@@ -7,6 +7,7 @@ import net.ME1312.Galaxi.Library.Callback.Callback;
 import net.ME1312.Galaxi.Library.Callback.ReturnCallback;
 import net.ME1312.Galaxi.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Bungee.Event.SubCreateEvent;
+import net.ME1312.SubServers.Bungee.Event.SubCreatedEvent;
 import net.ME1312.SubServers.Bungee.Host.*;
 import net.ME1312.Galaxi.Library.Config.YAMLConfig;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
@@ -263,13 +264,17 @@ public class InternalSubCreator extends SubCreator {
                     }
 
                     InternalSubCreator.this.thread.remove(name.toLowerCase());
+
+                    host.plugin.getPluginManager().callEvent(new SubCreatedEvent(player, host, name, template, version, port, subserver, update != null, true));
                     callback.run(subserver);
                 } catch (Exception e) {
                     e.printStackTrace();
+                    host.plugin.getPluginManager().callEvent(new SubCreatedEvent(player, host, name, template, version, port, update, update != null, false));
                     callback.run(null);
                 }
             } else {
                 Logger.get(prefix).info("Couldn't build the server jar. Check the SubCreator logs for more detail.");
+                host.plugin.getPluginManager().callEvent(new SubCreatedEvent(player, host, name, template, version, port, update, update != null, false));
                 callback.run(null);
             }
             InternalSubCreator.this.thread.remove(name.toLowerCase());

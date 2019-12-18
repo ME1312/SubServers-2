@@ -49,13 +49,4 @@ public class SubSendCommandEvent extends Event implements SubEvent {
     public String getCommand() {
         return command;
     }
-
-    /**
-     * Sets the Command to be Sent
-     *
-     * @param value Value
-     */
-    public void setCommand(String value) {
-        command = value;
-    }
 }

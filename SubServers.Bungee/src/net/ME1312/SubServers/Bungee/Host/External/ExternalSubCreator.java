@@ -6,6 +6,7 @@ import net.ME1312.Galaxi.Library.Callback.Callback;
 import net.ME1312.Galaxi.Library.Callback.ReturnCallback;
 import net.ME1312.SubData.Server.SubDataClient;
 import net.ME1312.SubServers.Bungee.Event.SubCreateEvent;
+import net.ME1312.SubServers.Bungee.Event.SubCreatedEvent;
 import net.ME1312.SubServers.Bungee.Host.*;
 import net.ME1312.Galaxi.Library.Config.YAMLConfig;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
@@ -146,9 +147,11 @@ public class ExternalSubCreator extends SubCreator {
                             if (template.getBuildOptions().getBoolean("Run-On-Finish", true))
                                 subserver.start();
 
+                            host.plugin.getPluginManager().callEvent(new SubCreatedEvent(player, host, name, template, version, fport, subserver, false, true));
                             callback(origin, callback, subserver);
                         } else {
                             Logger.get(prefix).info(data.getString(0x0004));
+                            host.plugin.getPluginManager().callEvent(new SubCreatedEvent(player, host, name, template, version, fport, null, false, false));
                             callback(origin, callback, null);
                         }
                     } catch (Exception e) {
@@ -220,6 +223,7 @@ public class ExternalSubCreator extends SubCreator {
                         Logger.get(prefix).info(data.getString(0x0004));
                     }
 
+                    host.plugin.getPluginManager().callEvent(new SubCreatedEvent(player, host, name, server.getTemplate(), version, server.getAddress().getPort(), server, true, data.getInt(0x0001) == 0));
                     if (callback != null) try {
                         callback.run(data.getInt(0x0001) == 0);
                     } catch (Throwable e) {

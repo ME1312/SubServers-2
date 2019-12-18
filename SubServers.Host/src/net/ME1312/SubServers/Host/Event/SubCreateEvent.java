@@ -66,7 +66,7 @@ public class SubCreateEvent extends Event {
      *
      * @param callback Updating Server
      */
-    public void getUpdating(Callback<SubServer> callback) {
+    public void getUpdatingServer(Callback<SubServer> callback) {
         if (!update) {
             try {
                 callback.run(null);
@@ -98,30 +98,12 @@ public class SubCreateEvent extends Event {
     }
 
     /**
-     * Set the Template to Use
-     *
-     * @param value Value
-     */
-    public void getTemplate(String value) {
-        this.template = value;
-    }
-
-    /**
      * Get the Version the Server will use
      *
      * @return Server Version
      */
     public Version getVersion() {
         return version;
-    }
-
-    /**
-     * Set the Version the Server will use
-     *
-     * @param value Value
-     */
-    public void setVersion(Version value) {
-        this.version = value;
     }
 
     /**
