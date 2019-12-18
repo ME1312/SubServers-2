@@ -1069,6 +1069,7 @@ public final class SubCommand implements CommandExecutor {
                                     else plugin.gui.getRenderer((Player) sender).groupMenu(1);
                                     break;
                                 case "server":
+                                case "subserver":
                                     if (menuopts.length > 2) plugin.gui.getRenderer((Player) sender).serverMenu(Integer.parseInt(menuopts[0]), menuopts[2], null);
                                     else if (menuopts.length > 1) plugin.gui.getRenderer((Player) sender).serverMenu(Integer.parseInt(menuopts[0]), null, menuopts[1]);
                                     else if (menuopts.length > 0) plugin.gui.getRenderer((Player) sender).serverMenu(Integer.parseInt(menuopts[0]), null, null);

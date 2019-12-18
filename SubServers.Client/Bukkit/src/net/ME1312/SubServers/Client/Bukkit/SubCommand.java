@@ -670,6 +670,7 @@ public final class SubCommand extends BukkitCommand {
                                             else plugin.gui.getRenderer((Player) sender).groupMenu(1);
                                             break;
                                         case "server":
+                                        case "subserver":
                                             if (args.length > 4) plugin.gui.getRenderer((Player) sender).serverMenu(Integer.parseInt(args[2]), args[4], null);
                                             else if (args.length > 3) plugin.gui.getRenderer((Player) sender).serverMenu(Integer.parseInt(args[2]), null, args[3]);
                                             else if (args.length > 2) plugin.gui.getRenderer((Player) sender).serverMenu(Integer.parseInt(args[2]), null, null);
