@@ -1,12 +1,12 @@
 Version: '2.15a+'
 Template:
   Enabled: true
-  Icon: 'anvil'
+  Icon: 'paper'
   Build:
-    Server-Type: 'Forge'
+    Server-Type: 'Spigot'
     Use-Cache: false
     Require-Version: true
     Can-Update: true
     Executable: 'bash build.sh'
   Settings:
-    Executable: 'java -Xmx2048M -jar Forge.jar'
+    Executable: 'java -Xmx1024M -jar Paper.jar'
