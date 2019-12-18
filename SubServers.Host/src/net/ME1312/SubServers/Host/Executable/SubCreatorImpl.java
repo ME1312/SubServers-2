@@ -260,6 +260,7 @@ public class SubCreatorImpl {
                 log.logger.info.println("Loading Template: " + template.getDisplayName());
                 ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketOutExLogMessage(address, "Loading Template: " + template.getDisplayName()));
                 Util.copyDirectory(template.getDirectory(), dir);
+                var.put("java", System.getProperty("java.home") + File.separator + "bin" + File.separator + "java");
                 var.put("mode", (update == null)?"CREATE":"UPDATE");
                 var.put("name", name);
                 if (SubAPI.getInstance().getSubDataNetwork()[0] != null) var.put("host", SubAPI.getInstance().getName());

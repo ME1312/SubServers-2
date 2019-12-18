@@ -131,13 +131,14 @@ public class InternalHost extends Host {
     }
 
     @Override
-    public boolean forceRemoveSubServer(UUID player, String name) {
+    public boolean forceRemoveSubServer(UUID player, String name) throws InterruptedException {
         if (Util.isNull(name)) throw new NullPointerException();
         String server = servers.get(name.toLowerCase()).getName();
         SubRemoveServerEvent event = new SubRemoveServerEvent(player, this, getSubServer(server));
         plugin.getPluginManager().callEvent(event);
         if (getSubServer(server).isRunning()) {
-            getSubServer(server).terminate();
+            getSubServer(server).stop();
+            getSubServer(server).waitFor();
         }
         if (UPnP.isUPnPAvailable() && UPnP.isMappedTCP(getSubServer(server).getAddress().getPort()))
             UPnP.closePortTCP(getSubServer(server).getAddress().getPort());

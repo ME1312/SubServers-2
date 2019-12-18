@@ -144,9 +144,11 @@ public class InternalSubLogger extends SubLogger {
 
     @Override
     public void stop() {
-        if (out != null) out.interrupt();
-        if (err != null) err.interrupt();
-        destroy();
+        try {
+            if (out != null) out.interrupt();
+            if (err != null) err.interrupt();
+            destroy();
+        } catch (NullPointerException e) {}
     }
 
     @Override

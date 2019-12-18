@@ -20,6 +20,10 @@ public class Executable {
      * @return
      */
     public static String[] parse(String gitbash, String exec) {
+        if (exec.startsWith("java ")) {
+            exec = '\"' + System.getProperty("java.home") + File.separator + "bin" + File.separator + "java" + '\"' + exec.substring(4);
+        }
+
         String[] cmd;
         if (System.getProperty("os.name").toLowerCase().startsWith("windows")) {
             if (gitbash != null && (exec.toLowerCase().startsWith("bash ") || exec.toLowerCase().startsWith("sh ")))

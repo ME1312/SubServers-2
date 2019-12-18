@@ -203,14 +203,15 @@ public class ExternalHost extends Host implements ClientHandler {
     }
 
     @Override
-    public boolean forceRemoveSubServer(UUID player, String name) {
+    public boolean forceRemoveSubServer(UUID player, String name) throws InterruptedException {
         if (Util.isNull(name)) throw new NullPointerException();
         String server = servers.get(name.toLowerCase()).getName();
 
         SubRemoveServerEvent event = new SubRemoveServerEvent(player, this, getSubServer(server));
         plugin.getPluginManager().callEvent(event);
         if (getSubServer(server).isRunning()) {
-            getSubServer(server).terminate();
+            getSubServer(server).stop();
+            getSubServer(server).waitFor();
         }
         queue(new PacketExRemoveServer(server, data -> {
             if (data.getInt(0x0001) == 0 || data.getInt(0x0001) == 1) {

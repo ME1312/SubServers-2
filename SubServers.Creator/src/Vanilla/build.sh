@@ -7,6 +7,10 @@ if [[ -z "$version" ]]
     rm -Rf "$0"
     exit 1
 fi
+if [[ -z "$java" ]]
+  then
+    export java="java"
+fi
 function __DL() {
     if [[ -x "$(command -v wget)" ]]; then
         wget -O "$1" "$2"; return $?
@@ -24,7 +28,7 @@ if [[ -z "$cache" ]] || [[ ! -f "$cache/Vanilla-$version.jar" ]]; then
     if [[ $__RETURN -eq 0 ]]; then
         cd VanillaCord
         echo Launching VanillaCord
-        java -jar VanillaCord.jar "$version"; __RETURN=$?;
+        "$java" -jar VanillaCord.jar "$version"; __RETURN=$?;
         if [[ $__RETURN -eq 0 ]]; then
             echo Copying Finished Jar...
             cd ../

@@ -7,6 +7,10 @@ if [[ -z "$mcf_version" ]] || [[ -z "$sp_version" ]]
     rm -Rf "$0"
     exit 1
 fi
+if [[ -z "$java" ]]
+  then
+    export java="java"
+fi
 function __DL() {
     if [[ -x "$(command -v wget)" ]]; then
         wget -O "$1" "$2"; return $?
@@ -18,7 +22,7 @@ echo Downloading the Minecraft Forge Installer...
 __DL "forge-$mcf_version-installer.jar" "http://files.minecraftforge.net/maven/net/minecraftforge/forge/$mcf_version/forge-$mcf_version-installer.jar"; __RETURN=$?
 if [[ $__RETURN -eq 0 ]]; then
     echo Installing Minecraft Forge...
-    java -jar "forge-$mcf_version-installer.jar" --installServer; __RETURN=$?
+    "$java" -jar "forge-$mcf_version-installer.jar" --installServer; __RETURN=$?
     if [[ $__RETURN -eq 0 ]]; then
         echo Cleaning Up...
         if [[ -f "Forge.jar" ]]; then

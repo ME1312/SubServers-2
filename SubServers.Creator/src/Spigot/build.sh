@@ -7,6 +7,10 @@ if [[ -z "$version" ]]
     rm -Rf "$0"
     exit 1
 fi
+if [[ -z "$java" ]]
+  then
+    export java="java"
+fi
 function __DL() {
     if [[ -x "$(command -v wget)" ]]; then
         wget -O "$1" "$2"; return $?
@@ -29,7 +33,7 @@ if [[ -z "$cache" ]] || [[ ! -f "$cache/Spigot-$version.jar" ]] || [[ "$mode" ==
             export HOME="$cache"
         fi
         export MAVEN_OPTS="-Xms2G"
-        java -Xms2G -jar ../Buildtools.jar --rev "$version"; __RETURN=$?
+        "$java" -Xms2G -jar ../Buildtools.jar --rev "$version"; __RETURN=$?
         if [[ ! -z "$cache" ]] && [[ ! -z "$__HOME" ]] && [[ "$cache" == "$HOME" ]]; then
             export HOME="$__HOME"
         fi

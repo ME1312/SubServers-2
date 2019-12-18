@@ -111,6 +111,7 @@ public class InternalSubCreator extends SubCreator {
             try {
                 Logger.get(prefix).info("Loading Template: " + template.getDisplayName());
                 Util.copyDirectory(template.getDirectory(), dir);
+                var.put("java", System.getProperty("java.home") + File.separator + "bin" + File.separator + "java");
                 var.put("mode", (update == null)?"CREATE":"UPDATE");
                 var.put("name", name);
                 var.put("host", host.getName());
