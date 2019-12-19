@@ -595,14 +595,14 @@ public final class SubCommand extends CommandX {
                             sender.sendMessage("SubServers > That Host is not enabled");
                         } else if (!plugin.hosts.get(args[2].toLowerCase()).getCreator().getTemplates().keySet().contains(args[3].toLowerCase())) {
                             sender.sendMessage("SubServers > There is no template with that name");
-                        } else if (!plugin.hosts.get(args[2].toLowerCase()).getCreator().getTemplate(args[3]).isEnabled()) {
+                        } else if (!plugin.hosts.get(args[2].toLowerCase()).getCreator().getTemplate(args[3].toLowerCase()).isEnabled()) {
                             sender.sendMessage("SubServers > That Template is not enabled");
-                        } else if (args.length <= 4 && plugin.hosts.get(args[2].toLowerCase()).getCreator().getTemplate(args[3]).requiresVersion()) {
+                        } else if (args.length <= 4 && plugin.hosts.get(args[2].toLowerCase()).getCreator().getTemplate(args[3].toLowerCase()).requiresVersion()) {
                             sender.sendMessage("SubServers > That Template requires a Minecraft Version to be specified");
                         } else if (args.length > 5 && (Util.isException(() -> Integer.parseInt(args[5])) || Integer.parseInt(args[5]) <= 0 || Integer.parseInt(args[5]) > 65535)) {
                             sender.sendMessage("SubServers > Invalid Port Number");
                         } else {
-                            plugin.hosts.get(args[2].toLowerCase()).getCreator().create(args[1], plugin.hosts.get(args[2].toLowerCase()).getCreator().getTemplate(args[3]), (args.length > 4)?new Version(args[4]):null, (args.length > 5)?Integer.parseInt(args[5]):null);
+                            plugin.hosts.get(args[2].toLowerCase()).getCreator().create(args[1], plugin.hosts.get(args[2].toLowerCase()).getCreator().getTemplate(args[3].toLowerCase()), (args.length > 4)?new Version(args[4]):null, (args.length > 5)?Integer.parseInt(args[5]):null);
                         }
                     } else {
                         sender.sendMessage("SubServers > Usage: " + label + " " + args[0].toLowerCase() + " <Name> <Host> <Template> [Version] [Port]");
