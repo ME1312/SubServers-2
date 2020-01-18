@@ -9,7 +9,7 @@ import net.ME1312.SubData.Client.Library.DisconnectReason;
 import net.ME1312.SubServers.Sync.Event.*;
 import net.ME1312.Galaxi.Library.Config.YAMLConfig;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
-import net.ME1312.SubServers.Sync.Library.Compatibility.GalaxiCommand;
+import net.ME1312.SubServers.Sync.Library.Compatibility.Galaxi.GalaxiCommand;
 import net.ME1312.SubServers.Sync.Library.Compatibility.Logger;
 import net.ME1312.SubServers.Sync.Library.Fallback.SmartReconnectHandler;
 import net.ME1312.SubServers.Sync.Library.Metrics;
@@ -57,7 +57,7 @@ public final class ExProxy extends BungeeCord implements Listener {
     public boolean redis = false;
     public final SubAPI api = new SubAPI(this);
     public SubProtocol subprotocol;
-    public static final Version version = Version.fromString("2.15a");
+    public static final Version version = Version.fromString("2.15a/rv2");
 
     public final boolean isPatched;
     public final boolean isGalaxi;

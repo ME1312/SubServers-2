@@ -9,7 +9,7 @@ import net.ME1312.Galaxi.Library.NamedContainer;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubData.Server.ClientHandler;
-import net.ME1312.SubServers.Bungee.Library.Compatibility.GalaxiInfo;
+import net.ME1312.SubServers.Bungee.Library.Compatibility.Galaxi.GalaxiInfo;
 import net.ME1312.SubServers.Bungee.Library.Compatibility.Logger;
 import net.ME1312.SubServers.Bungee.Network.Packet.PacketCheckPermission;
 import net.md_5.bungee.BungeeCord;
@@ -31,7 +31,7 @@ import java.nio.charset.Charset;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
-import static net.ME1312.SubServers.Bungee.Library.Compatibility.GalaxiCommand.*;
+import static net.ME1312.SubServers.Bungee.Library.Compatibility.Galaxi.GalaxiCommand.*;
 
 /**
  * Plugin Command Class

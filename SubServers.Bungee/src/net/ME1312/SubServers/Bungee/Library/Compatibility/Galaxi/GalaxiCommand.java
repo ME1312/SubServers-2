@@ -1,4 +1,4 @@
-package net.ME1312.SubServers.Bungee.Library.Compatibility;
+package net.ME1312.SubServers.Bungee.Library.Compatibility.Galaxi;
 
 import net.ME1312.Galaxi.Library.Util;
 import net.md_5.bungee.api.plugin.Command;

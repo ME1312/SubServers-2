@@ -15,7 +15,7 @@ import net.ME1312.SubServers.Bungee.Host.*;
 import net.ME1312.SubServers.Bungee.Library.*;
 import net.ME1312.Galaxi.Library.Config.YAMLConfig;
 import net.ME1312.Galaxi.Library.Config.YAMLSection;
-import net.ME1312.SubServers.Bungee.Library.Compatibility.GalaxiCommand;
+import net.ME1312.SubServers.Bungee.Library.Compatibility.Galaxi.GalaxiCommand;
 import net.ME1312.SubServers.Bungee.Library.Compatibility.Logger;
 import net.ME1312.SubServers.Bungee.Library.Fallback.SmartReconnectHandler;
 import net.ME1312.SubServers.Bungee.Library.Updates.ConfigUpdater;
@@ -72,7 +72,7 @@ public final class SubProxy extends BungeeCord implements Listener {
     public SubProtocol subprotocol;
     public SubDataServer subdata = null;
     public SubServer sudo = null;
-    public static final Version version = Version.fromString("2.15a");
+    public static final Version version = Version.fromString("2.15a/rv2");
 
     public Proxy redis = null;
     public boolean canSudo = false;
@@ -233,7 +233,7 @@ public final class SubProxy extends BungeeCord implements Listener {
 
         subprotocol = SubProtocol.get();
         Logger.get("SubServers").info("Loading BungeeCord Libraries...");
-        if (isGalaxi) Util.reflect(net.ME1312.SubServers.Bungee.Library.Compatibility.GalaxiEventListener.class.getConstructor(SubProxy.class), this);
+        if (isGalaxi) Util.reflect(net.ME1312.SubServers.Bungee.Library.Compatibility.Galaxi.GalaxiEventListener.class.getConstructor(SubProxy.class), this);
     }
 
     /**

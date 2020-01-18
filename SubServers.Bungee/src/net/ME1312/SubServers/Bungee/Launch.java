@@ -2,7 +2,7 @@ package net.ME1312.SubServers.Bungee;
 
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
-import net.ME1312.SubServers.Bungee.Library.Compatibility.GalaxiInfo;
+import net.ME1312.SubServers.Bungee.Library.Compatibility.Galaxi.GalaxiInfo;
 
 import java.security.Security;
 import java.text.SimpleDateFormat;
