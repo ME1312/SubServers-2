@@ -8,4 +8,4 @@ Template:
     Can-Update: true
     Executable: 'bash build.sh'
   Settings:
-    Executable: 'java -Xmx1024M -Dorg.bukkit.craftbukkit.libs.jline.terminal=unix -Djansi.passthrough=true -jar Spigot.jar'
+    Executable: 'java -Xmx1024M -Dorg.bukkit.craftbukkit.libs.jline.terminal=unix -Djansi.passthrough=true -jar Spigot.jar nogui'

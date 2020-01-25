@@ -57,7 +57,7 @@ public final class ExProxy extends BungeeCord implements Listener {
     public boolean redis = false;
     public final SubAPI api = new SubAPI(this);
     public SubProtocol subprotocol;
-    public static final Version version = Version.fromString("2.15a/rv2");
+    public static final Version version = Version.fromString("2.15a/rv3");
 
     public final boolean isPatched;
     public final boolean isGalaxi;
@@ -273,6 +273,25 @@ public final class ExProxy extends BungeeCord implements Listener {
         } else {
             return super.getServers();
         }
+    }
+
+    /**
+     * Emulate Waterfall's getServersCopy()
+     *
+     * @return Server Map Copy (which is the default, by the way)
+     */
+    public Map<String, ServerInfo> getServersCopy() {
+        return getServers();
+    }
+
+    /**
+     * Force BungeeCord's implementation of getServerInfo()
+     *
+     * @return ServerInfo
+     */
+    @Override
+    public ServerInfo getServerInfo(String name) {
+        return getServers().get(name);
     }
 
     /**

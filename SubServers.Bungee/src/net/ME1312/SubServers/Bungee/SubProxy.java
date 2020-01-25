@@ -72,7 +72,7 @@ public final class SubProxy extends BungeeCord implements Listener {
     public SubProtocol subprotocol;
     public SubDataServer subdata = null;
     public SubServer sudo = null;
-    public static final Version version = Version.fromString("2.15a/rv2");
+    public static final Version version = Version.fromString("2.15a/rv3");
 
     public Proxy redis = null;
     public boolean canSudo = false;
@@ -795,6 +795,25 @@ public final class SubProxy extends BungeeCord implements Listener {
             }
         }
         return servers;
+    }
+
+    /**
+     * Emulate Waterfall's getServersCopy()
+     *
+     * @return Server Map Copy (which is the default, by the way)
+     */
+    public Map<String, ServerInfo> getServersCopy() {
+        return getServers();
+    }
+
+    /**
+     * Force BungeeCord's implementation of getServerInfo()
+     *
+     * @return ServerInfo
+     */
+    @Override
+    public ServerInfo getServerInfo(String name) {
+        return getServers().get(name);
     }
 
     @EventHandler(priority = Byte.MAX_VALUE)
