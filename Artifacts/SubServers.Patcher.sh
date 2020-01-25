@@ -52,7 +52,7 @@ if [ $__RETURN -eq 0 ]
         rm -Rf LICENSE
     fi
     if [ -f "META-INF/MANIFEST.MF" ]; then
-        cat META-INF/MANIFEST.MF | sed -e "/^\s*$/d" -e "/^Main-Class:.*$/d" -e "/^Implementation-Title:.*$/d" -e "/^Specification-Title:.*$/d" -e "/^Build-Jdk:.*$/d" -e "/^Created-By:.*$/d" -e "/^Built-By:.*$/d" > ../MANIFEST.MF
+        cat META-INF/MANIFEST.MF | sed 's/\r$//' | sed ':a;N;$!ba;s/\n //g' | sed -e "/^\s*$/d" -e "/^Main-Class:.*$/d" -e "/^Implementation-Title:.*$/d" -e "/^Specification-Title:.*$/d" -e "/^Build-Jdk:.*$/d" -e "/^Created-By:.*$/d" -e "/^Built-By:.*$/d" > ../MANIFEST.MF
     else
         printf "Manifest-Version: 1.0\n" > ../MANIFEST.MF
     fi
@@ -67,8 +67,8 @@ if [ $__RETURN -eq 0 ]
       then
         echo ">> Writing Changes..."
         if [ -f "META-INF/MANIFEST.MF" ]
-          then
-            cat META-INF/MANIFEST.MF | sed -e "/^\s*$/d" -e "/^Manifest-Version:.*$/d" -e "/^Class-Path:.*$/d" -e "/^Build-Jdk:.*$/d" -e "/^Created-By:.*$/d" -e "/^Built-By:.*$/d" >> ../MANIFEST.MF
+          then #     (Read File)      (Convert to LF)    (Rejoin Split Lines)      (Omit Empty, Duplicate, and Unnecessary Properties)
+            cat META-INF/MANIFEST.MF | sed 's/\r$//' | sed ':a;N;$!ba;s/\n //g' | sed -e "/^\s*$/d" -e "/^Manifest-Version:.*$/d" -e "/^Class-Path:.*$/d" -e "/^Build-Jdk:.*$/d" -e "/^Created-By:.*$/d" -e "/^Built-By:.*$/d" >> ../MANIFEST.MF
         else
             if [ ! -d "META-INF" ]; then
                 mkdir META-INF
