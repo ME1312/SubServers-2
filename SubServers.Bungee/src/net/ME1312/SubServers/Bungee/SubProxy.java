@@ -72,7 +72,7 @@ public final class SubProxy extends BungeeCord implements Listener {
     public SubProtocol subprotocol;
     public SubDataServer subdata = null;
     public SubServer sudo = null;
-    public static final Version version = Version.fromString("2.15a/rv3");
+    public static final Version version = Version.fromString("2.15.2a");
 
     public Proxy redis = null;
     public boolean canSudo = false;

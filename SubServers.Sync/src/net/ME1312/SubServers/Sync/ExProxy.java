@@ -57,7 +57,7 @@ public final class ExProxy extends BungeeCord implements Listener {
     public boolean redis = false;
     public final SubAPI api = new SubAPI(this);
     public SubProtocol subprotocol;
-    public static final Version version = Version.fromString("2.15a/rv3");
+    public static final Version version = Version.fromString("2.15.2a");
 
     public final boolean isPatched;
     public final boolean isGalaxi;
