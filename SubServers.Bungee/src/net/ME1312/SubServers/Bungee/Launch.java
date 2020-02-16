@@ -23,6 +23,7 @@ public final class Launch {
      */
     @SuppressWarnings({"deprecation", "unchecked"})
     public static void main(String[] args) throws Exception {
+        System.setProperty("jdk.lang.Process.allowAmbiguousCommands", "true");
         System.setProperty("apple.laf.useScreenMenuBar", "true");
 
         if (Util.getDespiteException(() -> Class.forName("net.md_5.bungee.BungeeCord") == null, true)) {

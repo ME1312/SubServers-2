@@ -822,7 +822,7 @@ public final class SubProxy extends BungeeCord implements Listener {
         for (String name : e.getConnection().getListener().getServerPriority()) {
             ServerInfo server = api.getServer(name.toLowerCase());
             if (server == null) server = getServerInfo(name);
-            if (server == null || server instanceof SubServer && !((SubServer) server).isRunning()) offline++;
+            if (server == null || (server instanceof SubServer && !((SubServer) server).isRunning())) offline++;
         }
 
         if (offline >= e.getConnection().getListener().getServerPriority().size()) {

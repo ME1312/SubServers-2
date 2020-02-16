@@ -330,7 +330,7 @@ public final class ExProxy extends BungeeCord implements Listener {
         int offline = 0;
         for (String name : e.getConnection().getListener().getServerPriority()) {
             ServerInfo server = getServerInfo(name);
-            if (server == null || server instanceof SubServerImpl && !((SubServerImpl) server).isRunning()) offline++;
+            if (server == null || (server instanceof SubServerImpl && !((SubServerImpl) server).isRunning())) offline++;
         }
 
         if (offline >= e.getConnection().getListener().getServerPriority().size()) {
