@@ -15,6 +15,7 @@ import java.io.InputStream;
  * External Host Template Download Packet
  */
 public class PacketExDownloadTemplates implements PacketOut, PacketStreamIn {
+    private static boolean first = false;
     private ExHost host;
 
     /**
@@ -26,20 +27,27 @@ public class PacketExDownloadTemplates implements PacketOut, PacketStreamIn {
 
     @Override
     public void sending(SubDataSender client) throws Throwable {
-        UniversalFile dir = new UniversalFile(GalaxiEngine.getInstance().getRuntimeDirectory(), "Templates");
-        if (dir.exists()) Util.deleteDirectory(dir);
         host.log.info.println("Downloading Template Files...");
+        first = true;
     }
 
     @Override
     public void receive(SubDataSender client, InputStream stream) {
+        UniversalFile dir = new UniversalFile(GalaxiEngine.getInstance().getRuntimeDirectory(), "Templates");
         try {
-            Util.unzip(stream, new UniversalFile(GalaxiEngine.getInstance().getRuntimeDirectory(), "Templates"));
-            host.log.info.println("Template Files Downloaded");
+            if (dir.exists()) Util.deleteDirectory(dir);
+        } catch (Exception e) {
+            SubAPI.getInstance().getAppInfo().getLogger().error.println(e);
+        }
+
+        try {
+            Util.unzip(stream, dir);
+            host.log.info.println(((first)?"":"New ") + "Template Files Downloaded");
         } catch (Exception e) {
             SubAPI.getInstance().getAppInfo().getLogger().error.println("Problem decoding template files");
             SubAPI.getInstance().getAppInfo().getLogger().error.println(e);
         }
+        first = false;
     }
 
     @Override

@@ -3,6 +3,7 @@ package net.ME1312.SubServers.Bungee.Host.External;
 import com.google.common.collect.Range;
 import net.ME1312.SubData.Server.ClientHandler;
 import net.ME1312.SubData.Server.DataClient;
+import net.ME1312.SubData.Server.Protocol.PacketOut;
 import net.ME1312.SubData.Server.SubDataClient;
 import net.ME1312.SubServers.Bungee.Event.SubAddServerEvent;
 import net.ME1312.SubServers.Bungee.Event.SubRemoveServerEvent;
@@ -13,7 +14,6 @@ import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.SubServers.Bungee.Library.Compatibility.Logger;
 import net.ME1312.SubServers.Bungee.Library.Exception.InvalidServerException;
 import net.ME1312.Galaxi.Library.Util;
-import net.ME1312.SubData.Server.Protocol.PacketObjectOut;
 import net.ME1312.SubServers.Bungee.Network.Packet.PacketExAddServer;
 import net.ME1312.SubServers.Bungee.Network.Packet.PacketExDeleteServer;
 import net.ME1312.SubServers.Bungee.Network.Packet.PacketExRemoveServer;
@@ -36,7 +36,7 @@ public class ExternalHost extends Host implements ClientHandler {
     private InetAddress address;
     private SubCreator creator;
     private String directory;
-    private LinkedList<PacketObjectOut> queue;
+    private LinkedList<PacketOut> queue;
     private boolean clean;
     protected SubProxy plugin;
 
@@ -61,7 +61,7 @@ public class ExternalHost extends Host implements ClientHandler {
         this.address = address;
         this.creator = new ExternalSubCreator(this, ports, log, gitBash);
         this.directory = directory;
-        this.queue = new LinkedList<PacketObjectOut>();
+        this.queue = new LinkedList<PacketOut>();
         this.clean = false;
 
         subdata.put(0, null);
@@ -93,8 +93,8 @@ public class ExternalHost extends Host implements ClientHandler {
         for (Integer channel : Util.getBackwards(subdata, (SubDataClient) client)) setSubData(null, channel);
     }
 
-    protected void queue(PacketObjectOut... packet) {
-        for (PacketObjectOut p : packet) if (getSubData()[0] == null || !available) {
+    protected void queue(PacketOut... packet) {
+        for (PacketOut p : packet) if (getSubData()[0] == null || !available) {
             queue.add(p);
         } else {
             ((SubDataClient) getSubData()[0]).sendPacket(p);

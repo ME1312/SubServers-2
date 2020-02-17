@@ -14,6 +14,7 @@ import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubServers.Bungee.Library.Compatibility.Logger;
 import net.ME1312.SubServers.Bungee.Network.Packet.PacketExConfigureHost;
 import net.ME1312.SubServers.Bungee.Network.Packet.PacketExCreateServer;
+import net.ME1312.SubServers.Bungee.Network.Packet.PacketExDownloadTemplates;
 import net.ME1312.SubServers.Bungee.SubAPI;
 import net.md_5.bungee.api.ChatColor;
 
@@ -55,21 +56,25 @@ public class ExternalSubCreator extends SubCreator {
 
     @Override
     public void reload() {
-        templates.clear();
-        if (new UniversalFile(host.plugin.dir, "SubServers:Templates").exists()) for (File file : new UniversalFile(host.plugin.dir, "SubServers:Templates").listFiles()) {
-            try {
-                if (file.isDirectory() && !file.getName().endsWith(".x")) {
-                    ObjectMap<String> config = (new UniversalFile(file, "template.yml").exists())?new YAMLConfig(new UniversalFile(file, "template.yml")).get().getMap("Template", new ObjectMap<String>()):new ObjectMap<String>();
-                    ServerTemplate template = new ServerTemplate(file.getName(), config.getBoolean("Enabled", true), config.getRawString("Icon", "::NULL::"), file, config.getMap("Build", new ObjectMap<String>()), config.getMap("Settings", new ObjectMap<String>()));
-                    templates.put(file.getName().toLowerCase(), template);
-                    if (config.getKeys().contains("Display")) template.setDisplayName(config.getString("Display"));
+        if (host.available) {
+            templates.clear();
+            if (new UniversalFile(host.plugin.dir, "SubServers:Templates").exists()) for (File file : new UniversalFile(host.plugin.dir, "SubServers:Templates").listFiles()) {
+                try {
+                    if (file.isDirectory() && !file.getName().endsWith(".x")) {
+                        ObjectMap<String> config = (new UniversalFile(file, "template.yml").exists())?new YAMLConfig(new UniversalFile(file, "template.yml")).get().getMap("Template", new ObjectMap<String>()):new ObjectMap<String>();
+                        ServerTemplate template = new ServerTemplate(file.getName(), config.getBoolean("Enabled", true), config.getRawString("Icon", "::NULL::"), file, config.getMap("Build", new ObjectMap<String>()), config.getMap("Settings", new ObjectMap<String>()));
+                        templates.put(file.getName().toLowerCase(), template);
+                        if (config.getKeys().contains("Display")) template.setDisplayName(config.getString("Display"));
+                    }
+                } catch (Exception e) {
+                    System.out.println(host.getName() + "/Creator > Couldn't load template: " + file.getName());
+                    e.printStackTrace();
                 }
-            } catch (Exception e) {
-                System.out.println(host.getName() + "/Creator > Couldn't load template: " + file.getName());
-                e.printStackTrace();
             }
+
+            host.queue(new PacketExConfigureHost(host.plugin, host));
+            host.queue(new PacketExDownloadTemplates(host.plugin, host));
         }
-        if (host.available) host.queue(new PacketExConfigureHost(host.plugin, host));
     }
 
     @Override
