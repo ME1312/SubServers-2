@@ -86,10 +86,15 @@ public class ExternalSubServer extends SubServerContainer {
         } else return false;
     }
     void started(UUID address) {
-        started = false;
-        running = true;
-        logger.start();
-        if (address != null && address != logger.getExternalAddress()) host.queue(new PacketExEditServer(this, PacketExEditServer.UpdateType.SET_LOGGING_ADDRESS, logger.getExternalAddress().toString()));
+        if (!running) {
+            started = false;
+            running = true;
+            logger.start();
+            if (address != null) {
+                if (address != logger.getExternalAddress()) host.queue(new PacketExEditServer(this, PacketExEditServer.UpdateType.SET_LOGGING_ADDRESS, logger.getExternalAddress().toString()));
+                host.plugin.getPluginManager().callEvent(new SubStartEvent(null, this));
+            }
+        }
     }
     private void falsestart() {
         Logger.get("SubServers").info("Couldn't start " + getName() + " - See the " + host.getName() + " console for more details");
