@@ -4,7 +4,9 @@ import com.dosse.upnp.UPnP;
 import com.google.gson.Gson;
 import net.ME1312.SubData.Client.DataClient;
 import net.ME1312.SubData.Client.Encryption.AES;
+import net.ME1312.SubData.Client.Encryption.DHE;
 import net.ME1312.SubData.Client.Encryption.RSA;
+import net.ME1312.SubData.Client.Library.DataSize;
 import net.ME1312.SubData.Client.Library.DisconnectReason;
 import net.ME1312.SubServers.Sync.Event.*;
 import net.ME1312.Galaxi.Library.Config.YAMLConfig;
@@ -13,12 +15,12 @@ import net.ME1312.SubServers.Sync.Library.Compatibility.Galaxi.GalaxiCommand;
 import net.ME1312.SubServers.Sync.Library.Compatibility.Logger;
 import net.ME1312.SubServers.Sync.Library.Fallback.SmartReconnectHandler;
 import net.ME1312.SubServers.Sync.Library.Metrics;
-import net.ME1312.Galaxi.Library.NamedContainer;
+import net.ME1312.Galaxi.Library.Container.NamedContainer;
 import net.ME1312.Galaxi.Library.UniversalFile;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubData.Client.SubDataClient;
-import net.ME1312.SubServers.Sync.Library.Updates.ConfigUpdater;
+import net.ME1312.SubServers.Sync.Library.ConfigUpdater;
 import net.ME1312.SubServers.Sync.Network.SubProtocol;
 import net.ME1312.SubServers.Sync.Server.ServerImpl;
 import net.ME1312.SubServers.Sync.Server.SubServerImpl;
@@ -57,7 +59,7 @@ public final class ExProxy extends BungeeCord implements Listener {
     public boolean redis = false;
     public final SubAPI api = new SubAPI(this);
     public SubProtocol subprotocol;
-    public static final Version version = Version.fromString("2.15.2a");
+    public static final Version version = Version.fromString("2.16a");
 
     public final boolean isPatched;
     public final boolean isGalaxi;
@@ -66,7 +68,7 @@ public final class ExProxy extends BungeeCord implements Listener {
     private boolean reconnect = false;
     private boolean posted = false;
 
-    protected ExProxy(PrintStream out, boolean isPatched) throws Exception {
+    ExProxy(PrintStream out, boolean isPatched) throws Exception {
         this.isPatched = isPatched;
         this.isGalaxi = !Util.isException(() ->
                 Util.reflect(Class.forName("net.ME1312.Galaxi.Engine.PluginManager").getMethod("findClasses", Class.class),
@@ -91,6 +93,10 @@ public final class ExProxy extends BungeeCord implements Listener {
         config = new YAMLConfig(new UniversalFile(dir, "sync.yml"));
 
         subprotocol = SubProtocol.get();
+        subprotocol.registerCipher("DHE", DHE.get(128));
+        subprotocol.registerCipher("DHE-128", DHE.get(128));
+        subprotocol.registerCipher("DHE-192", DHE.get(192));
+        subprotocol.registerCipher("DHE-256", DHE.get(256));
         getPluginManager().registerListener(null, this);
 
         Logger.get("SubServers").info("Loading BungeeCord Libraries...");
@@ -112,6 +118,8 @@ public final class ExProxy extends BungeeCord implements Listener {
             subprotocol.unregisterCipher("AES-192");
             subprotocol.unregisterCipher("AES-256");
             subprotocol.unregisterCipher("RSA");
+
+            subprotocol.setBlockSize(config.get().getMap("Settings").getMap("SubData").getLong("Block-Size", (long) DataSize.MB));
             api.name = config.get().getMap("Settings").getMap("SubData").getString("Name", null);
 
             if (config.get().getMap("Settings").getMap("SubData").getRawString("Password", "").length() > 0) {
@@ -422,7 +430,7 @@ public final class ExProxy extends BungeeCord implements Listener {
     @EventHandler(priority = Byte.MIN_VALUE)
     public void resetLimbo(PlayerDisconnectEvent e) {
         fallbackLimbo.remove(e.getPlayer().getUniqueId());
-        SubCommand.players.remove(e.getPlayer().getUniqueId());
+        SubCommand.permitted.remove(e.getPlayer().getUniqueId());
     }
 
     @SuppressWarnings("unchecked")
@@ -438,11 +446,11 @@ public final class ExProxy extends BungeeCord implements Listener {
         api.getServer(e.getServer(), server -> {
             if (server != null) {
                 if (server instanceof net.ME1312.SubServers.Sync.Network.API.SubServer) {
-                    servers.put(server.getName().toLowerCase(), new SubServerImpl(server.getSignature(), server.getName(), server.getDisplayName(), server.getAddress(),
+                    servers.put(server.getName().toLowerCase(), SubServerImpl.construct(server.getSignature(), server.getName(), server.getDisplayName(), server.getAddress(),
                             getSubDataAsMap(server), server.getMotd(), server.isHidden(), server.isRestricted(), server.getWhitelist(), ((net.ME1312.SubServers.Sync.Network.API.SubServer) server).isRunning()));
                     Logger.get("SubServers").info("Added SubServer: " + e.getServer());
                 } else {
-                    servers.put(server.getName().toLowerCase(), new ServerImpl(server.getSignature(), server.getName(), server.getDisplayName(), server.getAddress(),
+                    servers.put(server.getName().toLowerCase(), ServerImpl.construct(server.getSignature(), server.getName(), server.getDisplayName(), server.getAddress(),
                             getSubDataAsMap(server), server.getMotd(), server.isHidden(), server.isRestricted(), server.getWhitelist()));
                     Logger.get("SubServers").info("Added Server: " + e.getServer());
                 }
@@ -455,10 +463,10 @@ public final class ExProxy extends BungeeCord implements Listener {
         if (current == null || server instanceof net.ME1312.SubServers.Sync.Network.API.SubServer || !(current instanceof SubServerImpl)) {
             if (current == null || !current.getSignature().equals(server.getSignature())) {
                 if (server instanceof net.ME1312.SubServers.Sync.Network.API.SubServer) {
-                    servers.put(server.getName().toLowerCase(), new SubServerImpl(server.getSignature(), server.getName(), server.getDisplayName(), server.getAddress(),
+                    servers.put(server.getName().toLowerCase(), SubServerImpl.construct(server.getSignature(), server.getName(), server.getDisplayName(), server.getAddress(),
                             getSubDataAsMap(server), server.getMotd(), server.isHidden(), server.isRestricted(), server.getWhitelist(), ((net.ME1312.SubServers.Sync.Network.API.SubServer) server).isRunning()));
                 } else {
-                    servers.put(server.getName().toLowerCase(), new ServerImpl(server.getSignature(), server.getName(), server.getDisplayName(), server.getAddress(),
+                    servers.put(server.getName().toLowerCase(), ServerImpl.construct(server.getSignature(), server.getName(), server.getDisplayName(), server.getAddress(),
                             getSubDataAsMap(server), server.getMotd(), server.isHidden(), server.isRestricted(), server.getWhitelist()));
                 }
 

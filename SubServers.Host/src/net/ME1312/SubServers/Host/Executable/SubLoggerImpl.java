@@ -1,10 +1,10 @@
 package net.ME1312.SubServers.Host.Executable;
 
 import net.ME1312.Galaxi.Library.Callback.Callback;
-import net.ME1312.Galaxi.Library.Container;
+import net.ME1312.Galaxi.Library.Container.Container;
 import net.ME1312.Galaxi.Library.Log.LogStream;
 import net.ME1312.Galaxi.Library.Log.Logger;
-import net.ME1312.Galaxi.Library.NamedContainer;
+import net.ME1312.Galaxi.Library.Container.NamedContainer;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubData.Client.DataClient;
 import net.ME1312.SubData.Client.Library.DisconnectReason;
@@ -24,15 +24,15 @@ import java.util.regex.Pattern;
  * Internal Process Logger Class
  */
 public class SubLoggerImpl {
-    protected Process process;
+    Process process;
     private Object handle;
-    protected final Logger logger;
-    protected final String name;
-    protected UUID address;
-    protected Container<Boolean> log;
-    protected static boolean logn = true;
-    protected static boolean logc = true;
-    protected File file;
+    final Logger logger;
+    final String name;
+    UUID address;
+    Container<Boolean> log;
+    static boolean logn = true;
+    static boolean logc = true;
+    File file;
     private SubDataClient channel = null;
     private PrintWriter writer = null;
     private boolean started = false;
@@ -49,7 +49,7 @@ public class SubLoggerImpl {
      * @param log Console Logging Status
      * @param file File to log to (or null for disabled)
      */
-    protected SubLoggerImpl(Process process, Object user, String name, UUID address, Container<Boolean> log, File file) {
+    SubLoggerImpl(Process process, Object user, String name, UUID address, Container<Boolean> log, File file) {
         this.process = process;
         this.handle = user;
         this.logger = new Logger(name);

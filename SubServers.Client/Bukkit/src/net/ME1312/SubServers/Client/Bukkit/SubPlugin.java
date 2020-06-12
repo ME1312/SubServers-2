@@ -3,22 +3,25 @@ package net.ME1312.SubServers.Client.Bukkit;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.SubData.Client.DataClient;
 import net.ME1312.SubData.Client.Encryption.AES;
+import net.ME1312.SubData.Client.Encryption.DHE;
 import net.ME1312.SubData.Client.Encryption.RSA;
+import net.ME1312.SubData.Client.Library.DataSize;
 import net.ME1312.SubData.Client.Library.DisconnectReason;
 import net.ME1312.SubServers.Client.Bukkit.Graphic.DefaultUIHandler;
 import net.ME1312.SubServers.Client.Bukkit.Graphic.UIHandler;
 import net.ME1312.Galaxi.Library.Config.YAMLConfig;
 import net.ME1312.Galaxi.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Client.Bukkit.Library.Metrics;
-import net.ME1312.Galaxi.Library.NamedContainer;
+import net.ME1312.Galaxi.Library.Container.NamedContainer;
 import net.ME1312.Galaxi.Library.UniversalFile;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubData.Client.SubDataClient;
-import net.ME1312.SubServers.Client.Bukkit.Library.Updates.ConfigUpdater;
+import net.ME1312.SubServers.Client.Bukkit.Library.ConfigUpdater;
 import net.ME1312.SubServers.Client.Bukkit.Network.SubProtocol;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandMap;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.*;
@@ -80,7 +83,12 @@ public final class SubPlugin extends JavaPlugin {
                 Files.move(new UniversalFile(new File(System.getProperty("user.dir")), "subdata.rsa.key").toPath(), new UniversalFile(getDataFolder(), "subdata.rsa.key").toPath());
             }
 
+            getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
             subprotocol = SubProtocol.get();
+            subprotocol.registerCipher("DHE", DHE.get(128));
+            subprotocol.registerCipher("DHE-128", DHE.get(128));
+            subprotocol.registerCipher("DHE-192", DHE.get(192));
+            subprotocol.registerCipher("DHE-256", DHE.get(256));
             reload(false);
 
             if (!config.get().getMap("Settings").getBoolean("API-Only-Mode", false)) {
@@ -136,7 +144,9 @@ public final class SubPlugin extends JavaPlugin {
         subprotocol.unregisterCipher("AES-192");
         subprotocol.unregisterCipher("AES-256");
         subprotocol.unregisterCipher("RSA");
-        api.name = config.get().getMap("Settings").getMap("SubData").getString("Name", null);
+
+        subprotocol.setBlockSize(config.get().getMap("Settings").getMap("SubData").getLong("Block-Size", (long) DataSize.MB));
+        api.name = config.get().getMap("Settings").getMap("SubData").getString("Name", System.getenv("name"));
 
         if (config.get().getMap("Settings").getMap("SubData").getRawString("Password", "").length() > 0) {
             subprotocol.registerCipher("AES", new AES(128, config.get().getMap("Settings").getMap("SubData").getRawString("Password")));
@@ -178,6 +188,7 @@ public final class SubPlugin extends JavaPlugin {
         int reconnect = config.get().getMap("Settings").getMap("SubData").getInt("Reconnect", 30);
         if (disconnect == null || (this.reconnect && reconnect > 0 && disconnect.name() != DisconnectReason.PROTOCOL_MISMATCH && disconnect.name() != DisconnectReason.ENCRYPTION_MISMATCH)) {
             long reset = resetDate;
+            if (disconnect != null) Bukkit.getLogger().info("SubData > Attempting reconnect in " + reconnect + " seconds");
             Bukkit.getScheduler().runTaskLaterAsynchronously(this, new Runnable() {
                 @Override
                 public void run() {
@@ -238,5 +249,25 @@ public final class SubPlugin extends JavaPlugin {
         Class<?> gson = Class.forName(((Util.getDespiteException(() -> Class.forName("com.google.gson.Gson") != null, false)?"":"org.bukkit.craftbukkit.libs.")) + "com.google.gson.Gson");
         //Class<?> gson = com.google.gson.Gson.class;
         return (Map<String, ?>) gson.getMethod("fromJson", String.class, Class.class).invoke(gson.newInstance(), json, Map.class);
+    }
+
+    /**
+     * Send a message to the BungeeCord Plugin Messaging Channel
+     *
+     * @param player Player that will send
+     * @param message Message contents
+     */
+    public void pmc(Player player, String... message) {
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        DataOutputStream data = new DataOutputStream(stream);
+
+        try {
+            for (String m : message) data.writeUTF(m);
+            data.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        player.sendPluginMessage(this, "BungeeCord", stream.toByteArray());
     }
 }

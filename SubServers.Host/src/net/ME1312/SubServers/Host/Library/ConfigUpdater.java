@@ -1,11 +1,10 @@
-package net.ME1312.SubServers.Sync.Library.Updates;
+package net.ME1312.SubServers.Host.Library;
 
 import net.ME1312.Galaxi.Library.Config.YAMLConfig;
 import net.ME1312.Galaxi.Library.Config.YAMLSection;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Version.Version;
-import net.ME1312.SubServers.Sync.Library.Compatibility.Logger;
-import net.ME1312.SubServers.Sync.SubAPI;
+import net.ME1312.SubServers.Host.SubAPI;
 
 import java.io.File;
 import java.io.IOException;
@@ -30,54 +29,50 @@ public class ConfigUpdater {
         YAMLSection rewritten = new YAMLSection();
 
         Version was = existing.getMap("Settings", new ObjectMap<>()).getVersion("Version", new Version(0));
-        Version now = SubAPI.getInstance().getWrapperBuild();
+        Version now = SubAPI.getInstance().getAppInfo().getSignature();
 
         int i = 0;
         if (now == null) now = UNSIGNED;
         if (!existing.contains("Settings") || !existing.getMap("Settings").contains("Version")) {
 
             i++;
-            Logger.get("SubServers").info("Created ./SubServers/sync.yml");
+            SubAPI.getInstance().getAppInfo().getLogger().info.println("Created ./config.yml");
         } else {
             if (was.compareTo(new Version("19w17a")) <= 0) {
+                if (existing.getMap("Settings", new YAMLSection()).contains("Log")) {
+                    updated.getMap("Settings").safeSet("Console-Log", existing.getMap("Settings").getBoolean("Log"));
+                    updated.getMap("Settings").safeSet("Network-Log", existing.getMap("Settings").getBoolean("Log"));
+                }
 
+                existing = updated.clone();
                 i++;
             }// if (was.compareTo(new Version("99w99a")) <= 0) {
             //  // do something
             //  i++
             //}
 
-            if (i > 0) Logger.get("SubServers").info("Updated ./SubServers/sync.yml (" + i + " pass" + ((i != 1)?"es":"") + ")");
+            if (i > 0) SubAPI.getInstance().getAppInfo().getLogger().info.println("Updated ./config.yml (" + i + " pass" + ((i != 1)?"es":"") + ")");
         }
 
         if (i > 0) {
             YAMLSection settings = new YAMLSection();
             settings.set("Version", ((now.compareTo(was) <= 0)?was:now).toString());
-            settings.set("Smart-Fallback", updated.getMap("Settings", new YAMLSection()).getBoolean("Smart-Fallback", true));
-            settings.set("Override-Bungee-Commands", updated.getMap("Settings", new YAMLSection()).getBoolean("Override-Bungee-Commands", true));
+            settings.set("Console-Log", updated.getMap("Settings", new YAMLSection()).getBoolean("Console-Log", true));
+            settings.set("Network-Log", updated.getMap("Settings", new YAMLSection()).getBoolean("Network-Log", true));
+            settings.set("Server-Bind", updated.getMap("Settings", new YAMLSection()).getRawString("Server-Bind", "127.0.0.1"));
 
             YAMLSection upnp = new YAMLSection();
-            upnp.set("Forward-Proxy", updated.getMap("Settings", new YAMLSection()).getMap("UPnP", new YAMLSection()).getBoolean("Forward-Proxy", true));
+            upnp.set("Forward-Servers", updated.getMap("Settings", new YAMLSection()).getMap("UPnP", new YAMLSection()).getBoolean("Forward-Servers", false));
             settings.set("UPnP", upnp);
 
             YAMLSection subdata = new YAMLSection();
-            if (updated.getMap("Settings", new YAMLSection()).getMap("SubData", new YAMLSection()).contains("Name")) subdata.set("Name", updated.getMap("Settings").getMap("SubData").getRawString("Name"));
+            subdata.set("Name", updated.getMap("Settings", new YAMLSection()).getMap("SubData", new YAMLSection()).getRawString("Name", "undefined"));
             subdata.set("Address", updated.getMap("Settings", new YAMLSection()).getMap("SubData", new YAMLSection()).getRawString("Address", "127.0.0.1:4391"));
             if (updated.getMap("Settings", new YAMLSection()).getMap("SubData", new YAMLSection()).contains("Password")) subdata.set("Password", updated.getMap("Settings").getMap("SubData").getRawString("Password"));
             if (updated.getMap("Settings", new YAMLSection()).getMap("SubData", new YAMLSection()).contains("Reconnect")) subdata.set("Reconnect", updated.getMap("Settings").getMap("SubData").getInt("Reconnect"));
             settings.set("SubData", subdata);
 
             rewritten.set("Settings", settings);
-
-
-            YAMLSection sync = new YAMLSection();
-            sync.set("Disabled-Commands", updated.getMap("Settings", new YAMLSection()).getBoolean("Disabled-Commands", false));
-            sync.set("Forced-Hosts", updated.getMap("Settings", new YAMLSection()).getBoolean("Forced-Hosts", true));
-            sync.set("Motd", updated.getMap("Settings", new YAMLSection()).getBoolean("Motd", false));
-            sync.set("Player-Limit", updated.getMap("Settings", new YAMLSection()).getBoolean("Player-Limit", false));
-            sync.set("Server-Priorities", updated.getMap("Settings", new YAMLSection()).getBoolean("Server-Priorities", true));
-
-            rewritten.set("Sync", sync);
 
             config.set(rewritten);
             config.save();

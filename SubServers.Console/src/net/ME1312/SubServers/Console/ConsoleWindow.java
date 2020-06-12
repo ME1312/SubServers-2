@@ -775,10 +775,10 @@ public final class ConsoleWindow implements SubLogFilter {
     }
 
     private class TextFieldPopup extends JPanel {
-        protected LinkedList<String> commands = new LinkedList<String>();
-        protected Boolean history = false;
-        protected int hpos = -1;
-        protected String hcache = "";
+        LinkedList<String> commands = new LinkedList<String>();
+        Boolean history = false;
+        int hpos = -1;
+        String hcache = "";
 
         public TextFieldPopup(JTextComponent field, boolean command) {
             JPopupMenu menu = new JPopupMenu();

@@ -2,7 +2,7 @@ package net.ME1312.SubServers.Bungee.Host.External;
 
 import net.ME1312.SubServers.Bungee.Host.SubLogFilter;
 import net.ME1312.SubServers.Bungee.Host.SubLogger;
-import net.ME1312.Galaxi.Library.Container;
+import net.ME1312.Galaxi.Library.Container.Container;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubServers.Bungee.Library.Compatibility.Logger;
 import net.ME1312.SubServers.Bungee.Network.Packet.PacketInExLogMessage;
@@ -27,11 +27,11 @@ import java.util.regex.Pattern;
  */
 public class ExternalSubLogger extends SubLogger {
     private Object handle;
-    protected UUID id = null;
-    protected String name;
-    protected Container<Boolean> log;
+    UUID id = null;
+    String name;
+    Container<Boolean> log;
     private List<SubLogFilter> filters = new CopyOnWriteArrayList<>();
-    protected File file;
+    File file;
     private PrintWriter writer = null;
     private boolean started = false;
 
@@ -43,7 +43,7 @@ public class ExternalSubLogger extends SubLogger {
      * @param log Console Logging Status
      * @param file File to log to (or null for disabled)
      */
-    protected ExternalSubLogger(Object user, String name, Container<Boolean> log, File file) {
+    ExternalSubLogger(Object user, String name, Container<Boolean> log, File file) {
         this.handle = user;
         this.name = name;
         this.log = log;

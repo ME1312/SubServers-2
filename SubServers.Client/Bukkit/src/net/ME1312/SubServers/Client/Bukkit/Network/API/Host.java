@@ -1,6 +1,7 @@
 package net.ME1312.SubServers.Client.Bukkit.Network.API;
 
 import net.ME1312.Galaxi.Library.Callback.Callback;
+import net.ME1312.Galaxi.Library.Container.NamedContainer;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Map.ObjectMapValue;
 import net.ME1312.Galaxi.Library.Util;
@@ -10,6 +11,7 @@ import net.ME1312.SubData.Client.SubDataClient;
 import net.ME1312.SubData.Client.SubDataSender;
 import net.ME1312.SubServers.Client.Bukkit.Network.Packet.*;
 import net.ME1312.SubServers.Client.Bukkit.SubAPI;
+import org.bukkit.permissions.Permissible;
 
 import java.lang.reflect.InvocationTargetException;
 import java.net.InetAddress;
@@ -19,6 +21,7 @@ import java.util.*;
 public class Host {
     HashMap<String, SubServer> servers = new HashMap<String, SubServer>();
     private SubCreator creator;
+    private List<RemotePlayer> players = null;
     ObjectMap<String> raw;
     long timestamp;
 
@@ -38,6 +41,7 @@ public class Host {
 
     private void load(ObjectMap<String> raw) {
         this.raw = raw;
+        this.players = null;
         this.timestamp = Calendar.getInstance().getTime().getTime();
 
         servers.clear();
@@ -52,7 +56,7 @@ public class Host {
      */
     public void refresh() {
         String name = getName();
-        ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketDownloadHostInfo(name, data -> load(data.getMap(name))));
+        ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketDownloadHostInfo(Collections.singletonList(name), data -> load(data.getMap(name))));
     }
 
     /**
@@ -72,6 +76,29 @@ public class Host {
         } else {
             return new SubDataSender[0];
         }
+    }
+
+    /**
+     * Determine if an <i>object</i> can perform some action on this host using possible permissions
+     *
+     * @param object Object to check against
+     * @param permissions Permissions to check (use <b>%</b> as a placeholder for the host name)
+     * @return Permission Check Result
+     */
+    public boolean permits(Permissible object, String... permissions) {
+        if (Util.isNull(object)) throw new NullPointerException();
+        boolean permitted = false;
+
+        for (int p = 0; !permitted && p < permissions.length; p++) {
+            String perm = permissions[p];
+            if (perm != null) {
+                // Check all proxies & individual proxies permission
+                permitted = object.hasPermission(perm.replace("%", "*"))
+                        || object.hasPermission(perm.replace("%", this.getName().toLowerCase()));
+            }
+        }
+
+        return permitted;
     }
 
     /**
@@ -130,6 +157,54 @@ public class Host {
      */
     public String getDisplayName() {
         return raw.getRawString("display");
+    }
+
+    /**
+     * Get players on servers provided by this host across all known proxies
+     *
+     * @return Remote Player Collection
+     */
+    public Collection<NamedContainer<String, UUID>> getGlobalPlayers() {
+        List<NamedContainer<String, UUID>> players = new ArrayList<NamedContainer<String, UUID>>();
+        for (String id : raw.getMap("players").getKeys()) {
+            players.add(new NamedContainer<String, UUID>(raw.getMap("players").getRawString(id), UUID.fromString(id)));
+        }
+        return players;
+    }
+
+    /**
+     * Get the players on servers provided by this host across all known proxies
+     *
+     * @param callback Remote Player Collection
+     */
+    public void getGlobalPlayers(Callback<Collection<RemotePlayer>> callback) {
+        if (Util.isNull(callback)) throw new NullPointerException();
+        StackTraceElement[] origin = new Exception().getStackTrace();
+        Runnable run = () -> {
+            try {
+                callback.run(players);
+            } catch (Throwable e) {
+                Throwable ew = new InvocationTargetException(e);
+                ew.setStackTrace(origin);
+                ew.printStackTrace();
+            }
+        };
+
+        if (players == null) {
+            LinkedList<UUID> ids = new LinkedList<UUID>();
+            for (SubServer server : getSubServers().values()) for (NamedContainer<String, UUID> player : server.getGlobalPlayers()) ids.add(player.get());
+            ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketDownloadPlayerInfo(ids, data -> {
+                LinkedList<RemotePlayer> players = new LinkedList<RemotePlayer>();
+                for (String player : data.getKeys()) {
+                    players.add(new RemotePlayer(data.getMap(player)));
+                }
+
+                this.players = players;
+                run.run();
+            }));
+        } else {
+            run.run();
+        }
     }
 
     /**
@@ -343,7 +418,7 @@ public class Host {
      *
      * @param name SubServer Name
      */
-    public void removeSubServer(String name) throws InterruptedException {
+    public void removeSubServer(String name) {
         removeSubServer(null, name);
     }
 
@@ -353,7 +428,7 @@ public class Host {
      * @param player Player Removing
      * @param name SubServer Name
      */
-    public void removeSubServer(UUID player, String name) throws InterruptedException {
+    public void removeSubServer(UUID player, String name) {
         if (Util.isNull(name)) throw new NullPointerException();
         removeSubServer(player, name, false, i -> {});
     }
@@ -363,7 +438,7 @@ public class Host {
      *
      * @param name SubServer Name
      */
-    public void forceRemoveSubServer(String name) throws InterruptedException {
+    public void forceRemoveSubServer(String name) {
         forceRemoveSubServer(null, name);
     }
 
@@ -384,7 +459,7 @@ public class Host {
      * @param name SubServer Name
      * @param response Response Code
      */
-    public void removeSubServer(String name, Callback<Integer> response) throws InterruptedException {
+    public void removeSubServer(String name, Callback<Integer> response) {
         removeSubServer(null, name, response);
     }
 
@@ -395,7 +470,7 @@ public class Host {
      * @param name SubServer Name
      * @param response Response Code
      */
-    public void removeSubServer(UUID player, String name, Callback<Integer> response) throws InterruptedException {
+    public void removeSubServer(UUID player, String name, Callback<Integer> response) {
         if (Util.isNull(name)) throw new NullPointerException();
         removeSubServer(player, name, false, response);
     }
@@ -406,7 +481,7 @@ public class Host {
      * @param name SubServer Name
      * @param response Response Code
      */
-    public void forceRemoveSubServer(String name, Callback<Integer> response) throws InterruptedException {
+    public void forceRemoveSubServer(String name, Callback<Integer> response) {
         forceRemoveSubServer(null, name, response);
     }
 
@@ -441,7 +516,7 @@ public class Host {
      *
      * @param name SubServer Name
      */
-    public void recycleSubServer(String name) throws InterruptedException {
+    public void recycleSubServer(String name) {
         recycleSubServer(null, name);
     }
 
@@ -451,7 +526,7 @@ public class Host {
      * @param player Player Deleting
      * @param name SubServer Name
      */
-    public void recycleSubServer(UUID player, String name) throws InterruptedException {
+    public void recycleSubServer(UUID player, String name) {
         if (Util.isNull(name)) throw new NullPointerException();
         deleteSubServer(player, name, true, false, i -> {});
     }
@@ -461,7 +536,7 @@ public class Host {
      *
      * @param name SubServer Name
      */
-    public void forceRecycleSubServer(String name) throws InterruptedException {
+    public void forceRecycleSubServer(String name) {
         forceRecycleSubServer(null, name);
     }
 
@@ -471,7 +546,7 @@ public class Host {
      * @param player Player Deleting
      * @param name SubServer Name
      */
-    public void forceRecycleSubServer(UUID player, String name) throws InterruptedException {
+    public void forceRecycleSubServer(UUID player, String name) {
         if (Util.isNull(name)) throw new NullPointerException();
         deleteSubServer(player, name, true, true, i -> {});
     }
@@ -482,7 +557,7 @@ public class Host {
      * @param name SubServer Name
      * @param response Response Code
      */
-    public void recycleSubServer(String name, Callback<Integer> response) throws InterruptedException {
+    public void recycleSubServer(String name, Callback<Integer> response) {
         recycleSubServer(null, name, response);
     }
 
@@ -493,7 +568,7 @@ public class Host {
      * @param name SubServer Name
      * @param response Response Code
      */
-    public void recycleSubServer(UUID player, String name, Callback<Integer> response) throws InterruptedException {
+    public void recycleSubServer(UUID player, String name, Callback<Integer> response) {
         if (Util.isNull(name)) throw new NullPointerException();
         deleteSubServer(player, name, true, false, response);
     }
@@ -504,7 +579,7 @@ public class Host {
      * @param name SubServer Name
      * @param response Response Code
      */
-    public void forceRecycleSubServer(String name, Callback<Integer> response) throws InterruptedException {
+    public void forceRecycleSubServer(String name, Callback<Integer> response) {
         forceRecycleSubServer(null, name, response);
     }
 
@@ -515,7 +590,7 @@ public class Host {
      * @param name SubServer Name
      * @param response Response Code
      */
-    public void forceRecycleSubServer(UUID player, String name, Callback<Integer> response) throws InterruptedException {
+    public void forceRecycleSubServer(UUID player, String name, Callback<Integer> response) {
         if (Util.isNull(name)) throw new NullPointerException();
         deleteSubServer(player, name, true, true, response);
     }
@@ -526,7 +601,7 @@ public class Host {
      * @param name SubServer Name
      * @return Success Status
      */
-    public void deleteSubServer(String name) throws InterruptedException {
+    public void deleteSubServer(String name) {
         deleteSubServer(null, name);
     }
 
@@ -537,7 +612,7 @@ public class Host {
      * @param name SubServer Name
      * @return Success Status
      */
-    public void deleteSubServer(UUID player, String name) throws InterruptedException {
+    public void deleteSubServer(UUID player, String name) {
         if (Util.isNull(name)) throw new NullPointerException();
         deleteSubServer(player, name, false, false, i -> {});
     }
@@ -548,7 +623,7 @@ public class Host {
      * @param name SubServer Name
      * @return Success Status
      */
-    public void forceDeleteSubServer(String name) throws InterruptedException {
+    public void forceDeleteSubServer(String name) {
         forceDeleteSubServer(null, name);
     }
 
@@ -559,7 +634,7 @@ public class Host {
      * @param name SubServer Name
      * @return Success Status
      */
-    public void forceDeleteSubServer(UUID player, String name) throws InterruptedException {
+    public void forceDeleteSubServer(UUID player, String name) {
         if (Util.isNull(name)) throw new NullPointerException();
         deleteSubServer(player, name, false, true, i -> {});
     }
@@ -570,7 +645,7 @@ public class Host {
      * @param name SubServer Name
      * @return Success Status
      */
-    public void deleteSubServer(String name, Callback<Integer> response) throws InterruptedException {
+    public void deleteSubServer(String name, Callback<Integer> response) {
         deleteSubServer(null, name, response);
     }
 
@@ -581,7 +656,7 @@ public class Host {
      * @param name SubServer Name
      * @return Success Status
      */
-    public void deleteSubServer(UUID player, String name, Callback<Integer> response) throws InterruptedException {
+    public void deleteSubServer(UUID player, String name, Callback<Integer> response) {
         if (Util.isNull(name)) throw new NullPointerException();
         deleteSubServer(player, name, false, false, response);
     }
@@ -592,7 +667,7 @@ public class Host {
      * @param name SubServer Name
      * @return Success Status
      */
-    public void forceDeleteSubServer(String name, Callback<Integer> response) throws InterruptedException {
+    public void forceDeleteSubServer(String name, Callback<Integer> response) {
         forceDeleteSubServer(null, name, response);
     }
 
@@ -603,7 +678,7 @@ public class Host {
      * @param name SubServer Name
      * @return Success Status
      */
-    public void forceDeleteSubServer(UUID player, String name, Callback<Integer> response) throws InterruptedException {
+    public void forceDeleteSubServer(UUID player, String name, Callback<Integer> response) {
         if (Util.isNull(name)) throw new NullPointerException();
         deleteSubServer(player, name, false, true, response);
     }

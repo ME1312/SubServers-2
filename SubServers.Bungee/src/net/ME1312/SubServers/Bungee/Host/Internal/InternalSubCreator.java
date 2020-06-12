@@ -6,6 +6,8 @@ import net.ME1312.Galaxi.Library.*;
 import net.ME1312.Galaxi.Library.Callback.Callback;
 import net.ME1312.Galaxi.Library.Callback.ReturnCallback;
 import net.ME1312.Galaxi.Library.Config.YAMLSection;
+import net.ME1312.Galaxi.Library.Container.Container;
+import net.ME1312.Galaxi.Library.Container.NamedContainer;
 import net.ME1312.SubServers.Bungee.Event.SubCreateEvent;
 import net.ME1312.SubServers.Bungee.Event.SubCreatedEvent;
 import net.ME1312.SubServers.Bungee.Host.*;
@@ -202,7 +204,7 @@ public class InternalSubCreator extends SubCreator {
 
         public void run() {
             ReturnCallback<Object, Object> conversion = obj -> convert(obj, new NamedContainer<>("$player$", (player == null)?"":player.toString()), new NamedContainer<>("$name$", name),
-                    new NamedContainer<>("$template$", template.getName()), new NamedContainer<>("$type$", template.getType().toString()), new NamedContainer<>("$version$", (version != null)?version.toString().replace(" ", "@"):""),
+                    new NamedContainer<>("$host$", host.getName()), new NamedContainer<>("$template$", template.getName()), new NamedContainer<>("$type$", template.getType().toString()), new NamedContainer<>("$version$", (version != null)?version.toString():""),
                     new NamedContainer<>("$address$", host.getAddress().getHostAddress()), new NamedContainer<>("$port$", Integer.toString(port)));
 
             File dir = (update != null)?new File(update.getFullPath()):new File(host.getPath(),
@@ -391,10 +393,10 @@ public class InternalSubCreator extends SubCreator {
         if (host.isAvailable() && host.isEnabled() && host == server.getHost() && server.isAvailable() && !server.isRunning() && server.getTemplate() != null && server.getTemplate().isEnabled() && server.getTemplate().canUpdate() && (version != null || !server.getTemplate().requiresVersion())) {
             StackTraceElement[] origin = new Exception().getStackTrace();
 
-            Util.isException(() -> Util.reflect(SubServerContainer.class.getDeclaredField("updating"), server, true));
+            Util.isException(() -> Util.reflect(SubServerImpl.class.getDeclaredField("updating"), server, true));
 
             CreatorTask task = new CreatorTask(player, server, version, x -> {
-                Util.isException(() -> Util.reflect(SubServerContainer.class.getDeclaredField("updating"), server, false));
+                Util.isException(() -> Util.reflect(SubServerImpl.class.getDeclaredField("updating"), server, false));
                 if (callback != null) try {
                     callback.run(x != null);
                 } catch (Throwable e) {
@@ -525,6 +527,17 @@ public class InternalSubCreator extends SubCreator {
         return getTemplates().get(name.toLowerCase());
     }
 
+    private static NamedContainer<YAMLSection, Map<String, Object>> subdata = null;
+    private Map<String, Object> getSubDataConfig() {
+        if (subdata == null || host.plugin.config.get() != subdata.name()) {
+            Map<String, Object> map = new HashMap<String, Object>();
+            map.put("Address", host.plugin.config.get().getMap("Settings").getMap("SubData").getRawString("Address", "127.0.0.1").replace("0.0.0.0", "127.0.0.1"));
+            if (host.plugin.config.get().getMap("Settings").getMap("SubData").getRawString("Password", "").length() > 0) map.put("Password", host.plugin.config.get().getMap("Settings").getMap("SubData").getRawString("Password"));
+            subdata = new NamedContainer<>(host.plugin.config.get(), map);
+        }
+        return subdata.get();
+    }
+
     private void generateClient(File dir, ServerType type, String name) throws IOException {
         if (new UniversalFile(dir, "subservers.client").exists()) {
             Files.delete(new UniversalFile(dir, "subservers.client").toPath());
@@ -540,8 +553,7 @@ public class InternalSubCreator extends SubCreator {
             YAMLSection config = new YAMLSection();
             FileWriter writer = new FileWriter(new UniversalFile(dir, "subdata.json"), false);
             config.set("Name", name);
-            config.set("Address", host.plugin.config.get().getMap("Settings").getMap("SubData").getRawString("Address", "127.0.0.1").replace("0.0.0.0", "127.0.0.1"));
-            if (host.plugin.config.get().getMap("Settings").getMap("SubData").getRawString("Password", "").length() > 0) config.set("Password", host.plugin.config.get().getMap("Settings").getMap("SubData").getRawString("Password"));
+            config.setAll(getSubDataConfig());
             writer.write(config.toJSON().toString());
             writer.close();
 

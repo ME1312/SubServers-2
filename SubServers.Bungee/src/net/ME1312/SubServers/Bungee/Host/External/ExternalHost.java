@@ -31,14 +31,14 @@ public class ExternalHost extends Host implements ClientHandler {
     private HashMap<Integer, SubDataClient> subdata = new HashMap<Integer, SubDataClient>();
     private HashMap<String, SubServer> servers = new HashMap<String, SubServer>();
     private String name;
-    protected boolean available;
+    boolean available;
     private boolean enabled;
     private InetAddress address;
     private SubCreator creator;
     private String directory;
     private LinkedList<PacketOut> queue;
     private boolean clean;
-    protected SubProxy plugin;
+    SubProxy plugin;
 
     /**
      * Creates an External Host
@@ -93,7 +93,7 @@ public class ExternalHost extends Host implements ClientHandler {
         for (Integer channel : Util.getBackwards(subdata, (SubDataClient) client)) setSubData(null, channel);
     }
 
-    protected void queue(PacketOut... packet) {
+    void queue(PacketOut... packet) {
         for (PacketOut p : packet) if (getSubData()[0] == null || !available) {
             queue.add(p);
         } else {
@@ -167,7 +167,7 @@ public class ExternalHost extends Host implements ClientHandler {
     @Override
     public SubServer addSubServer(UUID player, String name, boolean enabled, int port, String motd, boolean log, String directory, String executable, String stopcmd, boolean hidden, boolean restricted) throws InvalidServerException {
         if (plugin.api.getServers().keySet().contains(name.toLowerCase())) throw new InvalidServerException("A Server already exists with this name!");
-        ExternalSubServer server = new ExternalSubServer(this, name, enabled, port, motd, log, directory, executable, stopcmd, hidden, restricted);
+        ExternalSubServer server = ExternalSubServer.construct(this, name, enabled, port, motd, log, directory, executable, stopcmd, hidden, restricted);
         SubAddServerEvent event = new SubAddServerEvent(player, this, server);
         plugin.getPluginManager().callEvent(event);
         if (!event.isCancelled()) {
@@ -184,18 +184,18 @@ public class ExternalHost extends Host implements ClientHandler {
     @Override
     public boolean removeSubServer(UUID player, String name) throws InterruptedException {
         if (Util.isNull(name)) throw new NullPointerException();
-        String server = servers.get(name.toLowerCase()).getName();
+        SubServer server = servers.get(name.toLowerCase());
 
-        SubRemoveServerEvent event = new SubRemoveServerEvent(player, this, getSubServer(server));
+        SubRemoveServerEvent event = new SubRemoveServerEvent(player, this, server);
         plugin.getPluginManager().callEvent(event);
         if (!event.isCancelled()) {
-            if (getSubServer(server).isRunning()) {
-                getSubServer(server).stop();
-                getSubServer(server).waitFor();
+            if (server.isRunning()) {
+                server.stop();
+                server.waitFor();
             }
-            queue(new PacketExRemoveServer(server, data -> {
+            queue(new PacketExRemoveServer(name.toLowerCase(), data -> {
                 if (data.getInt(0x0001) == 0 || data.getInt(0x0001) == 1) {
-                    servers.remove(server.toLowerCase());
+                    servers.remove(name.toLowerCase());
                 }
             }));
             return true;
@@ -205,17 +205,17 @@ public class ExternalHost extends Host implements ClientHandler {
     @Override
     public boolean forceRemoveSubServer(UUID player, String name) throws InterruptedException {
         if (Util.isNull(name)) throw new NullPointerException();
-        String server = servers.get(name.toLowerCase()).getName();
+        SubServer server = servers.get(name.toLowerCase());
 
-        SubRemoveServerEvent event = new SubRemoveServerEvent(player, this, getSubServer(server));
+        SubRemoveServerEvent event = new SubRemoveServerEvent(player, this, server);
         plugin.getPluginManager().callEvent(event);
-        if (getSubServer(server).isRunning()) {
-            getSubServer(server).stop();
-            getSubServer(server).waitFor();
+        if (server.isRunning()) {
+            server.stop();
+            server.waitFor();
         }
-        queue(new PacketExRemoveServer(server, data -> {
+        queue(new PacketExRemoveServer(name.toLowerCase(), data -> {
             if (data.getInt(0x0001) == 0 || data.getInt(0x0001) == 1) {
-                servers.remove(server.toLowerCase());
+                servers.remove(name.toLowerCase());
             }
         }));
         return true;
@@ -224,14 +224,15 @@ public class ExternalHost extends Host implements ClientHandler {
     @Override
     public boolean recycleSubServer(UUID player, String name) throws InterruptedException {
         if (Util.isNull(name)) throw new NullPointerException();
-        String server = servers.get(name.toLowerCase()).getName();
+        SubServer s = servers.get(name.toLowerCase());
+        String server = s.getName();
 
-        SubRemoveServerEvent event = new SubRemoveServerEvent(player, this, getSubServer(server));
+        SubRemoveServerEvent event = new SubRemoveServerEvent(player, this, s);
         plugin.getPluginManager().callEvent(event);
         if (!event.isCancelled()) {
-            if (getSubServer(server).isRunning()) {
-                getSubServer(server).stop();
-                getSubServer(server).waitFor();
+            if (s.isRunning()) {
+                s.stop();
+                s.waitFor();
             }
 
             Logger.get("SubServers").info("Saving...");
@@ -263,12 +264,14 @@ public class ExternalHost extends Host implements ClientHandler {
     @Override
     public boolean forceRecycleSubServer(UUID player, String name) throws InterruptedException {
         if (Util.isNull(name)) throw new NullPointerException();
-        String server = servers.get(name.toLowerCase()).getName();
+        SubServer s = servers.get(name.toLowerCase());
+        String server = s.getName();
 
-        SubRemoveServerEvent event = new SubRemoveServerEvent(player, this, getSubServer(server));
+        SubRemoveServerEvent event = new SubRemoveServerEvent(player, this, s);
         plugin.getPluginManager().callEvent(event);
-        if (getSubServer(server).isRunning()) {
-            getSubServer(server).terminate();
+        if (s.isRunning()) {
+            s.stop();
+            s.waitFor();
         }
 
         Logger.get("SubServers").info("Saving...");
@@ -287,7 +290,6 @@ public class ExternalHost extends Host implements ClientHandler {
         Logger.get("SubServers").info("Moving Files...");
         queue(new PacketExDeleteServer(server, info, true, data -> {
             if (data.getInt(0x0001) == 0 || data.getInt(0x0001) == 1) {
-                for (String group : getSubServer(server).getGroups()) getSubServer(server).removeGroup(group);
                 servers.remove(server.toLowerCase());
                 Logger.get("SubServers").info("Deleted SubServer: " + server);
             } else {
@@ -300,14 +302,15 @@ public class ExternalHost extends Host implements ClientHandler {
     @Override
     public boolean deleteSubServer(UUID player, String name) throws InterruptedException {
         if (Util.isNull(name)) throw new NullPointerException();
-        String server = servers.get(name.toLowerCase()).getName();
+        SubServer s = servers.get(name.toLowerCase());
+        String server = s.getName();
 
         SubRemoveServerEvent event = new SubRemoveServerEvent(player, this, getSubServer(server));
         plugin.getPluginManager().callEvent(event);
         if (!event.isCancelled()) {
-            if (getSubServer(server).isRunning()) {
-                getSubServer(server).stop();
-                getSubServer(server).waitFor();
+            if (s.isRunning()) {
+                s.stop();
+                s.waitFor();
             }
 
             Logger.get("SubServers").info("Saving...");
@@ -339,12 +342,14 @@ public class ExternalHost extends Host implements ClientHandler {
     @Override
     public boolean forceDeleteSubServer(UUID player, String name) throws InterruptedException {
         if (Util.isNull(name)) throw new NullPointerException();
-        String server = servers.get(name.toLowerCase()).getName();
+        SubServer s = servers.get(name.toLowerCase());
+        String server = s.getName();
 
         SubRemoveServerEvent event = new SubRemoveServerEvent(player, this, getSubServer(server));
         plugin.getPluginManager().callEvent(event);
-        if (getSubServer(server).isRunning()) {
-            getSubServer(server).terminate();
+        if (s.isRunning()) {
+            s.stop();
+            s.waitFor();
         }
 
         Logger.get("SubServers").info("Saving...");
@@ -363,7 +368,6 @@ public class ExternalHost extends Host implements ClientHandler {
         Logger.get("SubServers").info("Removing Files...");
         queue(new PacketExDeleteServer(server, info, false, data -> {
             if (data.getInt(0x0001) == 0 || data.getInt(0x0001) == 1) {
-                for (String group : getSubServer(server).getGroups()) getSubServer(server).removeGroup(group);
                 servers.remove(server.toLowerCase());
                 Logger.get("SubServers").info("Deleted SubServer: " + server);
             } else {

@@ -2,8 +2,9 @@ package net.ME1312.SubServers.Host.Executable;
 
 import net.ME1312.Galaxi.Engine.GalaxiEngine;
 import net.ME1312.Galaxi.Library.Config.YAMLSection;
+import net.ME1312.Galaxi.Library.Container.NamedContainer;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
-import net.ME1312.Galaxi.Library.Container;
+import net.ME1312.Galaxi.Library.Container.Container;
 import net.ME1312.Galaxi.Library.UniversalFile;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
@@ -443,6 +444,17 @@ public class SubCreatorImpl {
         return this.thread.get(name).log;
     }
 
+    private static NamedContainer<YAMLSection, Map<String, Object>> subdata = null;
+    private Map<String, Object> getSubDataConfig() {
+        if (subdata == null || host.config.get() != subdata.name()) {
+            Map<String, Object> map = new HashMap<String, Object>();
+            map.put("Address", host.config.get().getMap("Settings").getMap("SubData").getRawString("Address"));
+            if (host.config.get().getMap("Settings").getMap("SubData").getRawString("Password", "").length() > 0) map.put("Password", host.config.get().getMap("Settings").getMap("SubData").getRawString("Password"));
+            subdata = new NamedContainer<>(host.config.get(), map);
+        }
+        return subdata.get();
+    }
+
     private void generateClient(File dir, ServerType type, String name) throws IOException {
         if (new UniversalFile(dir, "subservers.client").exists()) {
             Files.delete(new UniversalFile(dir, "subservers.client").toPath());
@@ -455,12 +467,11 @@ public class SubCreatorImpl {
                 if (!new UniversalFile(dir, "mods:SubServers.Client.jar").exists())
                     Util.copyFromJar(ExHost.class.getClassLoader(), "net/ME1312/SubServers/Host/Library/Files/client.jar", new UniversalFile(dir, "mods:SubServers.Client.jar").getPath());
             }
-            JSONObject config = new JSONObject();
+            YAMLSection config = new YAMLSection();
             FileWriter writer = new FileWriter(new UniversalFile(dir, "subdata.json"), false);
-            config.put("Name", name);
-            config.put("Address", host.config.get().getMap("Settings").getMap("SubData").getRawString("Address"));
-            if (host.config.get().getMap("Settings").getMap("SubData").getRawString("Password", "").length() > 0) config.put("Password", host.config.get().getMap("Settings").getMap("SubData").getRawString("Password"));
-            config.write(writer);
+            config.set("Name", name);
+            config.setAll(getSubDataConfig());
+            writer.write(config.toJSON().toString());
             writer.close();
 
             if (!new UniversalFile(dir, "subdata.rsa.key").exists() && new UniversalFile("subdata.rsa.key").exists()) {

@@ -8,6 +8,8 @@ import net.ME1312.SubData.Server.Protocol.PacketObjectIn;
 import net.ME1312.SubData.Server.Protocol.PacketObjectOut;
 import net.ME1312.SubServers.Bungee.SubProxy;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -15,7 +17,7 @@ import java.util.UUID;
  */
 public class PacketDownloadHostInfo implements PacketObjectIn<Integer>, PacketObjectOut<Integer> {
     private SubProxy plugin;
-    private String host;
+    private String[] hosts;
     private UUID tracker;
 
     /**
@@ -32,17 +34,21 @@ public class PacketDownloadHostInfo implements PacketObjectIn<Integer>, PacketOb
      * New PacketDownloadHostInfo (Out)
      *
      * @param plugin SubPlugin
-     * @param host Host (or null for all)
+     * @param hosts Hosts (or null for all)
      * @param tracker Receiver ID
      */
-    public PacketDownloadHostInfo(SubProxy plugin, String host, UUID tracker) {
+    public PacketDownloadHostInfo(SubProxy plugin, List<String> hosts, UUID tracker) {
         if (Util.isNull(plugin)) throw new NullPointerException();
         this.plugin = plugin;
-        this.host = host;
         this.tracker = tracker;
+
+        if (hosts != null) {
+            this.hosts = new String[hosts.size()];
+            for (int i = 0; i < this.hosts.length; ++i) this.hosts[i] = hosts.get(i).toLowerCase();
+            Arrays.sort(this.hosts);
+        }
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public ObjectMap<Integer> send(SubDataClient client) {
         ObjectMap<Integer> data = new ObjectMap<Integer>();
@@ -50,7 +56,7 @@ public class PacketDownloadHostInfo implements PacketObjectIn<Integer>, PacketOb
 
         ObjectMap<String> hosts = new ObjectMap<String>();
         for (Host host : plugin.api.getHosts().values()) {
-            if (this.host == null || this.host.length() <= 0 || this.host.equalsIgnoreCase(host.getName())) {
+            if (this.hosts == null || this.hosts.length <= 0 || Arrays.binarySearch(this.hosts, host.getName().toLowerCase()) >= 0) {
                 hosts.set(host.getName(), host.forSubData());
             }
         }
@@ -60,7 +66,7 @@ public class PacketDownloadHostInfo implements PacketObjectIn<Integer>, PacketOb
 
     @Override
     public void receive(SubDataClient client, ObjectMap<Integer> data) {
-        client.sendPacket(new PacketDownloadHostInfo(plugin, (data.contains(0x0001))?data.getRawString(0x0001):null, (data.contains(0x0000))?data.getUUID(0x0000):null));
+        client.sendPacket(new PacketDownloadHostInfo(plugin, (data.contains(0x0001))?data.getRawStringList(0x0001):null, (data.contains(0x0000))?data.getUUID(0x0000):null));
     }
 
     @Override

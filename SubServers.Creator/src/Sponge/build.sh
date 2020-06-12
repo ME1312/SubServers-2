@@ -27,7 +27,7 @@ if [[ $__RETURN -eq 0 ]]; then
     rm -Rf "$0"
     exit 0
 else
-    echo ERROR: Failed downloading Sponge. Is MinecraftForge.net down?
+    echo ERROR: Failed downloading Sponge. Is SpongePowered.org down?
     if [[ -f "Sponge.old.jar.x" ]]; then
         if [[ -f "Sponge.jar" ]]; then
             rm -Rf Sponge.jar

@@ -8,6 +8,7 @@ import net.ME1312.SubData.Client.Protocol.PacketObjectOut;
 import net.ME1312.SubData.Client.SubDataSender;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -16,7 +17,7 @@ import java.util.UUID;
  */
 public class PacketDownloadServerInfo implements PacketObjectIn<Integer>, PacketObjectOut<Integer> {
     private static HashMap<UUID, Callback<ObjectMap<String>>[]> callbacks = new HashMap<UUID, Callback<ObjectMap<String>>[]>();
-    private String server;
+    private List<String> servers;
     private UUID tracker;
 
     /**
@@ -27,13 +28,13 @@ public class PacketDownloadServerInfo implements PacketObjectIn<Integer>, Packet
     /**
      * New PacketDownloadServerInfo (Out)
      *
-     * @param server Server name (or null for all)
+     * @param servers Server names (or null for all)
      * @param callback Callbacks
      */
     @SafeVarargs
-    public PacketDownloadServerInfo(String server, Callback<ObjectMap<String>>... callback) {
+    public PacketDownloadServerInfo(List<String> servers, Callback<ObjectMap<String>>... callback) {
         if (Util.isNull((Object) callback)) throw new NullPointerException();
-        this.server = server;
+        this.servers = servers;
         this.tracker = Util.getNew(callbacks.keySet(), UUID::randomUUID);
         callbacks.put(tracker, callback);
     }
@@ -42,7 +43,7 @@ public class PacketDownloadServerInfo implements PacketObjectIn<Integer>, Packet
     public ObjectMap<Integer> send(SubDataSender client) {
         ObjectMap<Integer> json = new ObjectMap<Integer>();
         json.set(0x0000, tracker);
-        if (server != null) json.set(0x0001, server);
+        if (servers != null) json.set(0x0001, servers);
         return json;
     }
 

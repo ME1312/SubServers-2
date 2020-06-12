@@ -4,21 +4,24 @@ import com.dosse.upnp.UPnP;
 import com.google.common.collect.Range;
 import com.google.gson.Gson;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
-import net.ME1312.Galaxi.Library.NamedContainer;
+import net.ME1312.Galaxi.Library.Container.NamedContainer;
 import net.ME1312.Galaxi.Library.UniversalFile;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubData.Server.*;
 import net.ME1312.SubData.Server.Encryption.AES;
+import net.ME1312.SubData.Server.Encryption.DHE;
 import net.ME1312.SubData.Server.Encryption.RSA;
+import net.ME1312.SubData.Server.Library.DataSize;
 import net.ME1312.SubServers.Bungee.Event.*;
 import net.ME1312.SubServers.Bungee.Host.*;
 import net.ME1312.SubServers.Bungee.Library.*;
 import net.ME1312.Galaxi.Library.Config.YAMLConfig;
 import net.ME1312.Galaxi.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Bungee.Library.Compatibility.Galaxi.GalaxiCommand;
+import net.ME1312.SubServers.Bungee.Library.Compatibility.LegacyServerMap;
 import net.ME1312.SubServers.Bungee.Library.Compatibility.Logger;
 import net.ME1312.SubServers.Bungee.Library.Fallback.SmartReconnectHandler;
-import net.ME1312.SubServers.Bungee.Library.Updates.ConfigUpdater;
+import net.ME1312.SubServers.Bungee.Library.ConfigUpdater;
 import net.ME1312.SubServers.Bungee.Library.Exception.InvalidHostException;
 import net.ME1312.SubServers.Bungee.Library.Exception.InvalidServerException;
 import net.ME1312.Galaxi.Library.Version.Version;
@@ -54,8 +57,8 @@ import java.util.concurrent.TimeUnit;
  * Main Plugin Class
  */
 public final class SubProxy extends BungeeCord implements Listener {
-    protected final LinkedHashMap<String, LinkedHashMap<String, String>> exLang = new LinkedHashMap<String, LinkedHashMap<String, String>>();
-    protected final HashMap<String, Class<? extends Host>> hostDrivers = new HashMap<String, Class<? extends Host>>();
+    final LinkedHashMap<String, LinkedHashMap<String, String>> exLang = new LinkedHashMap<String, LinkedHashMap<String, String>>();
+    final HashMap<String, Class<? extends Host>> hostDrivers = new HashMap<String, Class<? extends Host>>();
     public final HashMap<String, Proxy> proxies = new HashMap<String, Proxy>();
     public final HashMap<String, Host> hosts = new HashMap<String, Host>();
     public final HashMap<String, Server> exServers = new HashMap<String, Server>();
@@ -72,7 +75,7 @@ public final class SubProxy extends BungeeCord implements Listener {
     public SubProtocol subprotocol;
     public SubDataServer subdata = null;
     public SubServer sudo = null;
-    public static final Version version = Version.fromString("2.15.2a");
+    public static final Version version = Version.fromString("2.16a");
 
     public Proxy redis = null;
     public boolean canSudo = false;
@@ -84,7 +87,7 @@ public final class SubProxy extends BungeeCord implements Listener {
     private static BigInteger lastSignature = BigInteger.valueOf(-1);
 
     @SuppressWarnings("unchecked")
-    protected SubProxy(PrintStream out, boolean isPatched) throws Exception {
+    SubProxy(PrintStream out, boolean isPatched) throws Exception {
         this.isPatched = isPatched;
         this.isGalaxi = !Util.isException(() ->
                 Util.reflect(Class.forName("net.ME1312.Galaxi.Engine.PluginManager").getMethod("findClasses", Class.class),
@@ -215,7 +218,7 @@ public final class SubProxy extends BungeeCord implements Listener {
             }
         }, TimeUnit.DAYS.toMillis(7), TimeUnit.DAYS.toMillis(7));
 
-        api.addHostDriver(net.ME1312.SubServers.Bungee.Host.Internal.InternalHost.class, "built-in");
+        api.addHostDriver(net.ME1312.SubServers.Bungee.Host.Internal.InternalHost.class, "virtual");
         api.addHostDriver(net.ME1312.SubServers.Bungee.Host.External.ExternalHost.class, "network");
 
         getPluginManager().registerListener(null, this);
@@ -224,7 +227,7 @@ public final class SubProxy extends BungeeCord implements Listener {
         for (String name : servers.get().getMap("Servers").getKeys()) {
             try {
                 if (Util.getCaseInsensitively(config.get().getMap("Hosts").get(), servers.get().getMap("Servers").getMap(name).getString("Host")) == null) throw new InvalidServerException("There is no host with this name: " + servers.get().getMap("Servers").getMap(name).getString("Host"));
-                legServers.put(name, new BungeeServerInfo(name, new InetSocketAddress(InetAddress.getByName((String) ((Map<String, ?>) Util.getCaseInsensitively(config.get().getMap("Hosts").get(), servers.get().getMap("Servers").getMap(name).getString("Host"))).get("Address")), servers.get().getMap("Servers").getMap(name).getInt("Port")),
+                legServers.put(name, constructServerInfo(name, new InetSocketAddress(InetAddress.getByName((String) ((Map<String, ?>) Util.getCaseInsensitively(config.get().getMap("Hosts").get(), servers.get().getMap("Servers").getMap(name).getString("Host"))).get("Address")), servers.get().getMap("Servers").getMap(name).getInt("Port")),
                         ChatColor.translateAlternateColorCodes('&', servers.get().getMap("Servers").getMap(name).getString("Motd")), servers.get().getMap("Servers").getMap(name).getBoolean("Restricted")));
             } catch (Exception e) {
                 e.printStackTrace();
@@ -232,6 +235,10 @@ public final class SubProxy extends BungeeCord implements Listener {
         }
 
         subprotocol = SubProtocol.get();
+        subprotocol.registerCipher("DHE", DHE.get(128));
+        subprotocol.registerCipher("DHE-128", DHE.get(128));
+        subprotocol.registerCipher("DHE-192", DHE.get(192));
+        subprotocol.registerCipher("DHE-256", DHE.get(256));
         Logger.get("SubServers").info("Loading BungeeCord Libraries...");
         if (isGalaxi) Util.reflect(net.ME1312.SubServers.Bungee.Library.Compatibility.Galaxi.GalaxiEventListener.class.getConstructor(SubProxy.class), this);
     }
@@ -349,6 +356,7 @@ public final class SubProxy extends BungeeCord implements Listener {
                         host.getCreator().setPortRange(Range.closed(Integer.parseInt(config.get().getMap("Hosts").getMap(name).getRawString("Port-Range", "25500-25559").split("-")[0]), Integer.parseInt(config.get().getMap("Hosts").getMap(name).getRawString("Port-Range", "25500-25559").split("-")[1])));
                     if (config.get().getMap("Hosts").getMap(name).getBoolean("Log-Creator", true) != host.getCreator().isLogging())
                         host.getCreator().setLogging(config.get().getMap("Hosts").getMap(name).getBoolean("Log-Creator", true));
+                    host.getCreator().reload();
                 } // Check for other changes
                 if (config.get().getMap("Hosts").getMap(name).getKeys().contains("Display") && ((config.get().getMap("Hosts").getMap(name).getString("Display").length() == 0 && !host.getName().equals(host.getDisplayName())) || (config.get().getMap("Hosts").getMap(name).getString("Display").length() > 0 && !config.get().getMap("Hosts").getMap(name).getString("Display").equals(host.getDisplayName()))))
                     host.setDisplayName(config.get().getMap("Hosts").getMap(name).getString("Display"));
@@ -527,8 +535,13 @@ public final class SubProxy extends BungeeCord implements Listener {
             subprotocol.unregisterCipher("AES-192");
             subprotocol.unregisterCipher("AES-256");
             subprotocol.unregisterCipher("RSA");
+
+            subprotocol.setBlockSize(config.get().getMap("Settings").getMap("SubData").getLong("Block-Size", (long) DataSize.MB));
+            subprotocol.setTimeout(TimeUnit.SECONDS.toMillis(config.get().getMap("Settings").getMap("SubData").getInt("Timeout", 30)));
+
             String cipher = config.get().getMap("Settings").getMap("SubData").getRawString("Encryption", "NULL");
             String[] ciphers = (cipher.contains("/"))?cipher.split("/"):new String[]{cipher};
+
             if (ciphers[0].equals("AES") || ciphers[0].equals("AES-128") || ciphers[0].equals("AES-192") || ciphers[0].equals("AES-256")) {
                 if (config.get().getMap("Settings").getMap("SubData").getRawString("Password", "").length() == 0) {
                     byte[] bytes = new byte[32];
@@ -545,7 +558,11 @@ public final class SubProxy extends BungeeCord implements Listener {
                 subprotocol.registerCipher("AES-256", new AES(256, config.get().getMap("Settings").getMap("SubData").getRawString("Password")));
 
                 Logger.get("SubData").info("Encrypting SubData with AES:");
-                Logger.get("SubData").info("Use the password in config.yml to allow clients to connect");
+                Logger.get("SubData").info("Use the password field in config.yml to allow clients to connect");
+            } else if (ciphers[0].equals("DHE") || ciphers[0].equals("DHE-128") || ciphers[0].equals("DHE-192") || ciphers[0].equals("DHE-256")) {
+
+                Logger.get("SubData").info("Encrypting SubData with DHE/AES:");
+                Logger.get("SubData").info("SubData will negotiate what password to use automatically using the Diffie-Hellman Exchange");
             } else if (ciphers[0].equals("RSA") || ciphers[0].equals("RSA-2048") || ciphers[0].equals("RSA-3072") || ciphers[0].equals("RSA-4096")) {
                 try {
                     int length = (ciphers[0].contains("-"))?Integer.parseInt(ciphers[0].split("-")[1]):2048;
@@ -750,7 +767,7 @@ public final class SubProxy extends BungeeCord implements Listener {
             for (int i = 0; i < args.length; i++) {
                 classargs[i] = args[i].name();
                 objargs[i] = args[i].get();
-                if (!classargs[i].isInstance(objargs[i])) throw new ClassCastException(classargs[i].getCanonicalName() + " != " + objargs[i].getClass().getCanonicalName());
+                if (!classargs[i].isPrimitive() && !classargs[i].isInstance(objargs[i])) throw new ClassCastException(classargs[i].getCanonicalName() + " != " + objargs[i].getClass().getCanonicalName());
             }
             return api.getClass().getMethod(method, classargs).invoke(api, objargs);
         } else {
@@ -784,6 +801,15 @@ public final class SubProxy extends BungeeCord implements Listener {
      */
     @Override
     public Map<String, ServerInfo> getServers() {
+        return new LegacyServerMap(getServersCopy());
+    }
+
+    /**
+     * Emulate Waterfall's getServersCopy()
+     *
+     * @return Server Map Copy
+     */
+    public Map<String, ServerInfo> getServersCopy() {
         HashMap<String, ServerInfo> servers = new HashMap<String, ServerInfo>();
         if (!api.ready) {
             servers.putAll(super.getServers());
@@ -798,22 +824,13 @@ public final class SubProxy extends BungeeCord implements Listener {
     }
 
     /**
-     * Emulate Waterfall's getServersCopy()
-     *
-     * @return Server Map Copy (which is the default, by the way)
-     */
-    public Map<String, ServerInfo> getServersCopy() {
-        return getServers();
-    }
-
-    /**
      * Force BungeeCord's implementation of getServerInfo()
      *
      * @return ServerInfo
      */
     @Override
     public ServerInfo getServerInfo(String name) {
-        return getServers().get(name);
+        return getServersCopy().get(name);
     }
 
     @EventHandler(priority = Byte.MAX_VALUE)

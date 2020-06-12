@@ -1,7 +1,7 @@
 package net.ME1312.SubServers.Bungee.Host;
 
 import net.ME1312.Galaxi.Library.ExtraDataHandler;
-import net.ME1312.Galaxi.Library.NamedContainer;
+import net.ME1312.Galaxi.Library.Container.NamedContainer;
 import net.ME1312.SubData.Server.ClientHandler;
 import net.ME1312.SubData.Server.DataClient;
 import net.md_5.bungee.api.config.ServerInfo;
@@ -61,9 +61,9 @@ public interface Server extends ServerInfo, ClientHandler, ExtraDataHandler {
     /**
      * Get players on this server across all known proxies
      *
-     * @return Player Collection
+     * @return Remote Player Collection
      */
-    Collection<NamedContainer<String, UUID>> getGlobalPlayers();
+    Collection<RemotePlayer> getGlobalPlayers();
 
     /**
      * If the server is hidden from players

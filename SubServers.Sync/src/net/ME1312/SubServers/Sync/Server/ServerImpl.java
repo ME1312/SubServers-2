@@ -12,6 +12,7 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 import java.lang.reflect.Field;
 import java.net.InetSocketAddress;
+import java.net.SocketAddress;
 import java.util.*;
 
 /**
@@ -24,10 +25,34 @@ public class ServerImpl extends BungeeServerInfo {
     private boolean hidden;
     private final String signature;
 
-    public ServerImpl(String signature, String name, String display, InetSocketAddress address, Map<Integer, UUID> subdata, String motd, boolean hidden, boolean restricted, Collection<UUID> whitelist) {
+    public static ServerImpl construct(String signature, String name, String display, SocketAddress address, Map<Integer, UUID> subdata, String motd, boolean hidden, boolean restricted, Collection<UUID> whitelist) {
+        try {
+            return new ServerImpl(signature, name, display, address, subdata, motd, hidden, restricted, whitelist);
+        } catch (NoSuchMethodError e) {
+            return new ServerImpl(signature, name, display, (InetSocketAddress) address, subdata, motd, hidden, restricted, whitelist);
+        }
+    }
+
+    /*
+     * Super Method 2
+     */
+    protected ServerImpl(String signature, String name, String display, SocketAddress address, Map<Integer, UUID> subdata, String motd, boolean hidden, boolean restricted, Collection<UUID> whitelist) {
         super(name, address, motd, restricted);
-        if (Util.isNull(name, address, motd, hidden, restricted)) throw new NullPointerException();
         this.signature = signature;
+        init(name, display, address, subdata, motd, hidden, restricted, whitelist);
+    }
+
+    /*
+     * Super Method 1
+     */
+    protected ServerImpl(String signature, String name, String display, InetSocketAddress address, Map<Integer, UUID> subdata, String motd, boolean hidden, boolean restricted, Collection<UUID> whitelist) {
+        super(name, address, motd, restricted);
+        this.signature = signature;
+        init(name, display, address, subdata, motd, hidden, restricted, whitelist);
+    }
+
+    private void init(String name, String display, SocketAddress address, Map<Integer, UUID> subdata, String motd, boolean hidden, boolean restricted, Collection<UUID> whitelist) {
+        if (Util.isNull(name, address, motd, hidden, restricted)) throw new NullPointerException();
         this.whitelist.addAll(whitelist);
         this.hidden = hidden;
         setDisplayName(display);

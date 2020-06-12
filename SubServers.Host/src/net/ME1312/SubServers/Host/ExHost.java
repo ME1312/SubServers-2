@@ -7,7 +7,8 @@ import net.ME1312.Galaxi.Library.Config.YAMLConfig;
 import net.ME1312.Galaxi.Library.Config.YAMLSection;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Log.Logger;
-import net.ME1312.Galaxi.Library.NamedContainer;
+import net.ME1312.Galaxi.Library.Container.NamedContainer;
+import net.ME1312.Galaxi.Library.Platform;
 import net.ME1312.Galaxi.Library.UniversalFile;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
@@ -16,14 +17,16 @@ import net.ME1312.Galaxi.Plugin.App;
 import net.ME1312.Galaxi.Plugin.PluginInfo;
 import net.ME1312.SubData.Client.DataClient;
 import net.ME1312.SubData.Client.Encryption.AES;
+import net.ME1312.SubData.Client.Encryption.DHE;
 import net.ME1312.SubData.Client.Encryption.RSA;
+import net.ME1312.SubData.Client.Library.DataSize;
 import net.ME1312.SubData.Client.Library.DisconnectReason;
 import net.ME1312.SubData.Client.SubDataClient;
 import net.ME1312.SubServers.Host.Executable.SubCreatorImpl;
 import net.ME1312.SubServers.Host.Executable.SubLoggerImpl;
 import net.ME1312.SubServers.Host.Executable.SubServerImpl;
 import net.ME1312.SubServers.Host.Library.*;
-import net.ME1312.SubServers.Host.Library.Updates.ConfigUpdater;
+import net.ME1312.SubServers.Host.Library.ConfigUpdater;
 import net.ME1312.SubServers.Host.Network.SubProtocol;
 import org.json.JSONObject;
 
@@ -39,7 +42,7 @@ import java.util.jar.Manifest;
 /**
  * SubServers.Host Main Class
  */
-@App(name = "SubServers.Host", version = "2.15.2a", authors = "ME1312", website = "https://github.com/ME1312/SubServers-2", description = "Host subservers on separate machines")
+@App(name = "SubServers.Host", version = "2.16a", authors = "ME1312", website = "https://github.com/ME1312/SubServers-2", description = "Host subservers on separate machines")
 public final class ExHost {
     HashMap<Integer, SubDataClient> subdata = new HashMap<Integer, SubDataClient>();
     NamedContainer<Long, Map<String, Map<String, String>>> lang = null;
@@ -75,33 +78,6 @@ public final class ExHost {
             parser.accepts("noconsole");
             joptsimple.OptionSet options = parser.parse(args);
             if(options.has("version") || options.has("v")) {
-                String osarch;
-                if (System.getProperty("os.name").toLowerCase().startsWith("windows")) {
-                    String arch = System.getenv("PROCESSOR_ARCHITECTURE");
-                    String wow64Arch = System.getenv("PROCESSOR_ARCHITEW6432");
-
-                    osarch = arch != null && arch.endsWith("64") || wow64Arch != null && wow64Arch.endsWith("64")?"x64":"x86";
-                } else if (System.getProperty("os.arch").endsWith("86")) {
-                    osarch = "x86";
-                } else if (System.getProperty("os.arch").endsWith("64")) {
-                    osarch = "x64";
-                } else {
-                    osarch = System.getProperty("os.arch");
-                }
-
-                String javaarch = null;
-                switch (System.getProperty("sun.arch.data.model")) {
-                    case "32":
-                        javaarch = "x86";
-                        break;
-                    case "64":
-                        javaarch = "x64";
-                        break;
-                    default:
-                        if (!System.getProperty("sun.arch.data.model").equalsIgnoreCase("unknown"))
-                            javaarch = System.getProperty("sun.arch.data.model");
-                }
-
                 Version galaxi = Version.fromString(GalaxiEngine.class.getAnnotation(App.class).version());
                 Version subservers = Version.fromString(ExHost.class.getAnnotation(App.class).version());
                 Version galaxibuild = null;
@@ -116,8 +92,8 @@ public final class ExHost {
                 } catch (Exception e) {}
 
                 System.out.println("");
-                System.out.println(System.getProperty("os.name") + ((!System.getProperty("os.name").toLowerCase().startsWith("windows"))?' ' + System.getProperty("os.version"):"") + ((osarch != null)?" [" + osarch + ']':"") + ',');
-                System.out.println("Java " + System.getProperty("java.version") + ((javaarch != null)?" [" + javaarch + ']':"") + ',');
+                System.out.println(Platform.getSystemName() + ' ' + Platform.getSystemVersion() + ((!Platform.getSystemArchitecture().equals("unknown"))?" [" + Platform.getSystemArchitecture() + ']':"") + ',');
+                System.out.println("Java " + Platform.getJavaVersion() + ((!Platform.getJavaArchitecture().equals("unknown"))?" [" + Platform.getJavaArchitecture() + ']':"") + ',');
                 System.out.println(GalaxiEngine.class.getAnnotation(App.class).name() + " v" + galaxi.toExtendedString() + ((galaxibuild != null)?" (" + galaxibuild + ')':"") + ',');
                 System.out.println(ExHost.class.getAnnotation(App.class).name() + " v" + subservers.toExtendedString() + ((subserversbuild != null)?" (" + subserversbuild + ')':""));
                 System.out.println("");
@@ -125,7 +101,7 @@ public final class ExHost {
                 new ExHost(options);
             }
         } else {
-            System.out.println(">> SubServers code has been disallowed to work on this machine");
+            System.out.println(">> SubServers' hosting capabilities have been disallowed on this machine");
             System.out.println(">> Check with your provider for more information");
             System.exit(1);
         }
@@ -197,6 +173,10 @@ public final class ExHost {
             running = true;
             creator = new SubCreatorImpl(this);
             subprotocol = SubProtocol.get();
+            subprotocol.registerCipher("DHE", DHE.get(128));
+            subprotocol.registerCipher("DHE-128", DHE.get(128));
+            subprotocol.registerCipher("DHE-192", DHE.get(192));
+            subprotocol.registerCipher("DHE-256", DHE.get(256));
             loadDefaults();
             reload(false);
 
@@ -237,7 +217,7 @@ public final class ExHost {
     }
 
     private void loadDefaults() {
-        SubCommand.load(this);
+        new SubCommand(this).load();
     }
 
     public void reload(boolean notifyPlugins) throws IOException {
@@ -260,6 +240,8 @@ public final class ExHost {
         subprotocol.unregisterCipher("AES-192");
         subprotocol.unregisterCipher("AES-256");
         subprotocol.unregisterCipher("RSA");
+
+        subprotocol.setBlockSize(config.get().getMap("Settings").getMap("SubData").getLong("Block-Size", (long) DataSize.MB));
         api.name = config.get().getMap("Settings").getMap("SubData").getString("Name", null);
         Logger log = new Logger("SubData");
 
@@ -295,6 +277,7 @@ public final class ExHost {
         if (disconnect == null || (this.reconnect && reconnect > 0 && disconnect.name() != DisconnectReason.PROTOCOL_MISMATCH && disconnect.name() != DisconnectReason.ENCRYPTION_MISMATCH)) {
             long reset = resetDate;
             Timer timer = new Timer(SubAPI.getInstance().getAppInfo().getName() + "::SubData_Reconnect_Handler");
+            if (disconnect != null) ;
             timer.scheduleAtFixedRate(new TimerTask() {
                 @Override
                 public void run() {

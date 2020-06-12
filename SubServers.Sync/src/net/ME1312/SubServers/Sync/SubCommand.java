@@ -1,13 +1,17 @@
 package net.ME1312.SubServers.Sync;
 
 import com.google.gson.Gson;
+import net.ME1312.Galaxi.Library.AsyncConsolidator;
 import net.ME1312.Galaxi.Library.Callback.Callback;
+import net.ME1312.Galaxi.Library.Callback.ReturnRunnable;
+import net.ME1312.Galaxi.Library.Container.PrimitiveContainer;
+import net.ME1312.Galaxi.Library.Platform;
 import net.ME1312.SubData.Client.SubDataClient;
 import net.ME1312.SubData.Client.SubDataSender;
 import net.ME1312.SubServers.Sync.Library.Compatibility.CommandX;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
-import net.ME1312.Galaxi.Library.Container;
-import net.ME1312.Galaxi.Library.NamedContainer;
+import net.ME1312.Galaxi.Library.Container.Container;
+import net.ME1312.Galaxi.Library.Container.NamedContainer;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubServers.Sync.Library.Compatibility.Galaxi.GalaxiInfo;
@@ -28,6 +32,7 @@ import net.md_5.bungee.command.ConsoleCommandSender;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.*;
@@ -37,15 +42,16 @@ import static net.ME1312.SubServers.Sync.Library.Compatibility.Galaxi.GalaxiComm
 
 @SuppressWarnings("deprecation")
 public final class SubCommand extends CommandX {
-    static HashMap<UUID, HashMap<ServerInfo, NamedContainer<Long, Boolean>>> players = new HashMap<UUID, HashMap<ServerInfo, NamedContainer<Long, Boolean>>>();
-    private LinkedList<String> proxyCache = new LinkedList<String>();
-    private TreeMap<String, List<String>> hostCache = new TreeMap<String, List<String>>();
-    private LinkedList<String> groupCache = new LinkedList<String>();
+    static HashMap<UUID, HashMap<ServerInfo, NamedContainer<Long, Boolean>>> permitted = new HashMap<UUID, HashMap<ServerInfo, NamedContainer<Long, Boolean>>>();
+    private TreeMap<String, Proxy> proxyCache = new TreeMap<String, Proxy>();
+    private TreeMap<String, Host> hostCache = new TreeMap<String, Host>();
+    private TreeMap<String, List<Server>> groupCache = new TreeMap<String, List<Server>>();
+    private Proxy proxyMasterCache = null;
     private long cacheDate = 0;
     private ExProxy plugin;
     private String label;
 
-    protected static NamedContainer<SubCommand, CommandX> newInstance(ExProxy plugin, String command) {
+    static NamedContainer<SubCommand, CommandX> newInstance(ExProxy plugin, String command) {
         NamedContainer<SubCommand, CommandX> cmd = new NamedContainer<>(new SubCommand(plugin, command), null);
         CommandX now = cmd.name();
         //if (plugin.api.getGameVersion()[plugin.api.getGameVersion().length - 1].compareTo(new Version("1.13")) >= 0) { // TODO Future Command Validator API?
@@ -82,43 +88,15 @@ public final class SubCommand extends CommandX {
                     if (args[0].equalsIgnoreCase("help") || args[0].equalsIgnoreCase("?")) {
                         sender.sendMessages(printHelp());
                     } else if (args[0].equalsIgnoreCase("version") || args[0].equalsIgnoreCase("ver")) {
-                        String osarch;
-                        if (System.getProperty("os.name").toLowerCase().startsWith("windows")) {
-                            String arch = System.getenv("PROCESSOR_ARCHITECTURE");
-                            String wow64Arch = System.getenv("PROCESSOR_ARCHITEW6432");
-
-                            osarch = arch != null && arch.endsWith("64") || wow64Arch != null && wow64Arch.endsWith("64")?"x64":"x86";
-                        } else if (System.getProperty("os.arch").endsWith("86")) {
-                            osarch = "x86";
-                        } else if (System.getProperty("os.arch").endsWith("64")) {
-                            osarch = "x64";
-                        } else {
-                            osarch = System.getProperty("os.arch");
-                        }
-
-                        String javaarch = null;
-                        switch (System.getProperty("sun.arch.data.model")) {
-                            case "32":
-                                javaarch = "x86";
-                                break;
-                            case "64":
-                                javaarch = "x64";
-                                break;
-                            default:
-                                if (!System.getProperty("sun.arch.data.model").equalsIgnoreCase("unknown"))
-                                    javaarch = System.getProperty("sun.arch.data.model");
-                        }
-
                         Version galaxi = GalaxiInfo.getVersion();
                         Version bungee = Util.getDespiteException(() -> (Version) BungeeCord.class.getMethod("getBuildVersion").invoke(plugin), null);
                         Version galaxibuild = GalaxiInfo.getSignature();
                         Version bungeebuild = Util.getDespiteException(() -> (Version) BungeeCord.class.getMethod("getBuildSignature").invoke(plugin), null);
 
                         sender.sendMessage("SubServers > These are the platforms and versions that are running SubServers.Sync:");
-                        sender.sendMessage("  " + System.getProperty("os.name") + ((!System.getProperty("os.name").toLowerCase().startsWith("windows"))?' ' + System.getProperty("os.version"):"") + ((osarch != null)?" [" + osarch + ']':"") + ',');
-                        sender.sendMessage("  Java " + System.getProperty("java.version") + ((javaarch != null)?" [" + javaarch + ']':"") + ',');
-                        if (galaxi != null)
-                            Util.isException(() -> sender.sendMessage("GalaxiEngine v" + galaxi.toExtendedString() + ((galaxibuild != null)?" (" + galaxibuild + ')':"") + ','));
+                        sender.sendMessage("  " + Platform.getSystemName() + ' ' + Platform.getSystemVersion() + ((!Platform.getSystemArchitecture().equals("unknown"))?" [" + Platform.getSystemArchitecture() + ']':"") + ',');
+                        sender.sendMessage("  Java " + Platform.getJavaVersion() + ((!Platform.getJavaArchitecture().equals("unknown"))?" [" + Platform.getJavaArchitecture() + ']':"") + ',');
+                        if (galaxi != null) Util.isException(() -> sender.sendMessage("  GalaxiEngine v" + galaxi.toExtendedString() + ((galaxibuild != null)?" (" + galaxibuild + ')':"") + ','));
                         sender.sendMessage("  " + plugin.getBungeeName() + ((plugin.isGalaxi)?" v":" ") + ((bungee != null)?bungee:plugin.getVersion()) + ((bungeebuild != null)?" (" + bungeebuild + ')':"") + ((plugin.isPatched)?" [Patched]":"") + ',');
                         sender.sendMessage("  SubServers.Sync v" + ExProxy.version.toExtendedString() + ((plugin.api.getWrapperBuild() != null)?" (" + plugin.api.getWrapperBuild() + ')':""));
                         sender.sendMessage("");
@@ -170,7 +148,7 @@ public final class SubCommand extends CommandX {
                                         } else {
                                             message += ChatColor.RED;
                                         }
-                                        message += server.getDisplayName() + " (" + server.getAddress().getAddress().getHostAddress()+':'+server.getAddress().getPort() + ((server.getName().equals(server.getDisplayName())) ? "" : ChatColor.stripColor(div) + server.getName()) + ")";
+                                        message += server.getDisplayName() + ((server.getName().equals(server.getDisplayName()))?"":" ["+server.getName()+']');
                                         i++;
                                     }
                                     if (i == 0) message += ChatColor.RESET + "(none)";
@@ -189,7 +167,7 @@ public final class SubCommand extends CommandX {
                                 } else {
                                     message += ChatColor.RED;
                                 }
-                                message += host.getDisplayName() + " (" + host.getAddress().getHostAddress() + ((host.getName().equals(host.getDisplayName()))?"":ChatColor.stripColor(div)+host.getName()) + ")" + ChatColor.RESET + ": ";
+                                message += host.getDisplayName() + " [" + ((host.getName().equals(host.getDisplayName()))?"":host.getName()+ChatColor.stripColor(div)) + host.getAddress().getHostAddress() + "]" + ChatColor.RESET + ": ";
                                 for (SubServer subserver : host.getSubServers().values()) {
                                     if (i != 0) message += div;
                                     if (subserver.isRunning()) {
@@ -203,7 +181,7 @@ public final class SubCommand extends CommandX {
                                     } else {
                                         message += ChatColor.RED;
                                     }
-                                    message += subserver.getDisplayName() + " (" + subserver.getAddress().getPort() + ((subserver.getName().equals(subserver.getDisplayName()))?"":ChatColor.stripColor(div)+subserver.getName()) + ")";
+                                    message += subserver.getDisplayName() + " [" + ((subserver.getName().equals(subserver.getDisplayName()))?"":subserver.getName()+ChatColor.stripColor(div)) + subserver.getAddress().getPort() + "]";
                                     i++;
                                 }
                                 if (i == 0) message += ChatColor.RESET + "(none)";
@@ -216,7 +194,7 @@ public final class SubCommand extends CommandX {
                             String message = "  ";
                             for (Server server : servers.values()) if (!(server instanceof SubServer)) {
                                 if (i != 0) message += div;
-                                message += ChatColor.WHITE + server.getDisplayName() + " (" + server.getAddress().getAddress().getHostAddress()+':'+server.getAddress().getPort() + ((server.getName().equals(server.getDisplayName()))?"":ChatColor.stripColor(div)+server.getName()) + ")";
+                                message += ChatColor.WHITE + server.getDisplayName() + " [" + ((server.getName().equals(server.getDisplayName()))?"":server.getName()+ChatColor.stripColor(div)) + server.getAddress().getAddress().getHostAddress()+':'+server.getAddress().getPort() + "]";
                                 i++;
                             }
                             if (i == 0) message += ChatColor.RESET + "(none)";
@@ -235,7 +213,7 @@ public final class SubCommand extends CommandX {
                                     } else {
                                         message += ChatColor.RED;
                                     }
-                                    message += proxy.getDisplayName() + ((proxy.getName().equals(proxy.getDisplayName()))?"":" ("+proxy.getName()+')');
+                                    message += proxy.getDisplayName() + ((proxy.getName().equals(proxy.getDisplayName()))?"":" ["+proxy.getName()+']');
                                 }
                                 sender.sendMessage(message);
                             }
@@ -245,16 +223,31 @@ public final class SubCommand extends CommandX {
                             String type = (args.length > 2)?args[1]:null;
                             String name = args[(type != null)?2:1];
 
+                            Runnable getPlayer = () -> plugin.api.getGlobalPlayer(name, player -> {
+                                if (player != null) {
+                                    sender.sendMessage("SubServers > Info on player: " + ChatColor.WHITE + player.getName());
+                                    if (player.getProxy() != null) sender.sendMessage(" -> Proxy: " + ChatColor.WHITE + player.getProxy());
+                                    if (player.getServer() != null) sender.sendMessage(" -> Server: " + ChatColor.WHITE + player.getServer());
+                                    if (player.getAddress() != null) sender.sendMessage(" -> Address: " + ChatColor.WHITE + player.getAddress().getHostAddress());
+                                    sender.sendMessage(" -> UUID: " + ChatColor.AQUA + player.getUniqueId());
+                                } else {
+                                    if (type == null) {
+                                        sender.sendMessage("SubServers > There is no object with that name");
+                                    } else {
+                                        sender.sendMessage("SubServers > There is no player with that name");
+                                    }
+                                }
+                            });
                             Runnable getServer = () -> plugin.api.getServer(name, server -> {
                                 if (server != null) {
-                                    sender.sendMessage("SubServers > Info on " + ((server instanceof SubServer)?"Sub":"") + "Server: " + ChatColor.WHITE + server.getDisplayName());
-                                    if (!server.getName().equals(server.getDisplayName())) sender.sendMessage(" -> System Name: " + ChatColor.WHITE  + server.getName());
+                                    sender.sendMessage("SubServers > Info on " + ((server instanceof SubServer)?"sub":"") + "server: " + ChatColor.WHITE + server.getDisplayName());
+                                    if (!server.getName().equals(server.getDisplayName())) sender.sendMessage(" -> System Name: " + ChatColor.WHITE + server.getName());
                                     if (server instanceof SubServer) {
                                         sender.sendMessage(" -> Available: " + ((((SubServer) server).isAvailable())?ChatColor.GREEN+"yes":ChatColor.RED+"no"));
                                         sender.sendMessage(" -> Enabled: " + ((((SubServer) server).isEnabled())?ChatColor.GREEN+"yes":ChatColor.RED+"no"));
                                         if (!((SubServer) server).isEditable()) sender.sendMessage(" -> Editable: " + ChatColor.RED + "no");
-                                        sender.sendMessage(" -> Host: " + ChatColor.WHITE  + ((SubServer) server).getHost());
-                                        if (((SubServer) server).getTemplate() != null) sender.sendMessage(" -> Template: " + ChatColor.WHITE  + ((SubServer) server).getHost());
+                                        sender.sendMessage(" -> Host: " + ChatColor.WHITE + ((SubServer) server).getHost());
+                                        if (((SubServer) server).getTemplate() != null) sender.sendMessage(" -> Template: " + ChatColor.WHITE + ((SubServer) server).getHost());
                                     }
                                     if (server.getGroups().size() > 0) sender.sendMessage(" -> Group" + ((server.getGroups().size() > 1)?"s:":": " + ChatColor.WHITE + server.getGroups().get(0)));
                                     if (server.getGroups().size() > 1) for (String group : server.getGroups()) sender.sendMessage("      - " + ChatColor.WHITE + group);
@@ -262,7 +255,7 @@ public final class SubCommand extends CommandX {
                                     if (server instanceof SubServer) sender.sendMessage(" -> Running: " + ((((SubServer) server).isRunning())?ChatColor.GREEN+"yes":ChatColor.RED+"no"));
                                     if (!(server instanceof SubServer) || ((SubServer) server).isRunning()) {
                                         sender.sendMessage(" -> Connected: " + ((server.getSubData()[0] != null)?ChatColor.GREEN+"yes"+((server.getSubData().length > 1)?ChatColor.AQUA+" +"+(server.getSubData().length-1)+" subchannel"+((server.getSubData().length == 2)?"":"s"):""):ChatColor.RED+"no"));
-                                        sender.sendMessage(" -> Players: " + ChatColor.AQUA + server.getPlayers().size() + " online");
+                                        sender.sendMessage(" -> Players: " + ChatColor.AQUA + server.getGlobalPlayers().size() + " online");
                                     }
                                     sender.sendMessage(" -> MOTD: " + ChatColor.WHITE + ChatColor.stripColor(server.getMotd()));
                                     if (server instanceof SubServer && ((SubServer) server).getStopAction() != SubServer.StopAction.NONE) sender.sendMessage(" -> Stop Action: " + ChatColor.WHITE + ((SubServer) server).getStopAction().toString());
@@ -278,7 +271,7 @@ public final class SubCommand extends CommandX {
                                     sender.sendMessage(" -> Hidden: " + ((server.isHidden())?ChatColor.GREEN+"yes":ChatColor.RED+"no"));
                                 } else {
                                     if (type == null) {
-                                        sender.sendMessage("SubServers > There is no object with that name");
+                                        getPlayer.run();
                                     } else {
                                         sender.sendMessage("SubServers > There is no server with that name");
                                     }
@@ -286,9 +279,9 @@ public final class SubCommand extends CommandX {
                             });
                             Runnable getGroup = () -> plugin.api.getGroup(name, group -> {
                                 if (group != null) {
-                                    sender.sendMessage("SubServers > Info on Group: " + ChatColor.WHITE + name);
-                                    sender.sendMessage(" -> Servers: " + ((group.size() <= 0)?ChatColor.GRAY + "(none)":ChatColor.AQUA.toString() + group.size()));
-                                    for (Server server : group) sender.sendMessage("      - " + ChatColor.WHITE + server.getDisplayName() + ((server.getName().equals(server.getDisplayName()))?"":" ("+server.getName()+')'));
+                                    sender.sendMessage("SubServers > Info on group: " + ChatColor.WHITE + group.name());
+                                    sender.sendMessage(" -> Servers: " + ((group.get().size() <= 0)?ChatColor.GRAY + "(none)":ChatColor.AQUA.toString() + group.get().size()));
+                                    for (Server server : group.get()) sender.sendMessage("      - " + ChatColor.WHITE + server.getDisplayName() + ((server.getName().equals(server.getDisplayName()))?"":" ["+server.getName()+']'));
                                 } else {
                                     if (type == null) {
                                         getServer.run();
@@ -299,16 +292,16 @@ public final class SubCommand extends CommandX {
                             });
                             Runnable getHost = () -> plugin.api.getHost(name, host -> {
                                 if (host != null) {
-                                    sender.sendMessage("SubServers > Info on Host: " + ChatColor.WHITE + host.getDisplayName());
-                                    if (!host.getName().equals(host.getDisplayName())) sender.sendMessage(" -> System Name: " + ChatColor.WHITE  + host.getName());
+                                    sender.sendMessage("SubServers > Info on host: " + ChatColor.WHITE + host.getDisplayName());
+                                    if (!host.getName().equals(host.getDisplayName())) sender.sendMessage(" -> System Name: " + ChatColor.WHITE + host.getName());
                                     sender.sendMessage(" -> Available: " + ((host.isAvailable())?ChatColor.GREEN+"yes":ChatColor.RED+"no"));
                                     sender.sendMessage(" -> Enabled: " + ((host.isEnabled())?ChatColor.GREEN+"yes":ChatColor.RED+"no"));
                                     sender.sendMessage(" -> Address: " + ChatColor.WHITE + host.getAddress().getHostAddress());
                                     if (host.getSubData().length > 0) sender.sendMessage(" -> Connected: " + ((host.getSubData()[0] != null)?ChatColor.GREEN+"yes"+((host.getSubData().length > 1)?ChatColor.AQUA+" +"+(host.getSubData().length-1)+" subchannel"+((host.getSubData().length == 2)?"":"s"):""):ChatColor.RED+"no"));
                                     sender.sendMessage(" -> SubServers: " + ((host.getSubServers().keySet().size() <= 0)?ChatColor.GRAY + "(none)":ChatColor.AQUA.toString() + host.getSubServers().keySet().size()));
-                                    for (SubServer subserver : host.getSubServers().values()) sender.sendMessage("      - " + ((subserver.isEnabled())?ChatColor.WHITE:ChatColor.GRAY) + subserver.getDisplayName() + ((subserver.getName().equals(subserver.getDisplayName()))?"":" ("+subserver.getName()+')'));
+                                    for (SubServer subserver : host.getSubServers().values()) sender.sendMessage("      - " + ((subserver.isEnabled())?ChatColor.WHITE:ChatColor.GRAY) + subserver.getDisplayName() + ((subserver.getName().equals(subserver.getDisplayName()))?"":" ["+subserver.getName()+']'));
                                     sender.sendMessage(" -> Templates: " + ((host.getCreator().getTemplates().keySet().size() <= 0)?ChatColor.GRAY + "(none)":ChatColor.AQUA.toString() + host.getCreator().getTemplates().keySet().size()));
-                                    for (SubCreator.ServerTemplate template : host.getCreator().getTemplates().values()) sender.sendMessage("      - " + ((template.isEnabled())?ChatColor.WHITE:ChatColor.GRAY) + template.getDisplayName() + ((template.getName().equals(template.getDisplayName()))?"":" ("+template.getName()+')'));
+                                    for (SubCreator.ServerTemplate template : host.getCreator().getTemplates().values()) sender.sendMessage("      - " + ((template.isEnabled())?ChatColor.WHITE:ChatColor.GRAY) + template.getDisplayName() + ((template.getName().equals(template.getDisplayName()))?"":" ["+template.getName()+']'));
                                     sender.sendMessage(" -> Signature: " + ChatColor.AQUA + host.getSignature());
                                 } else {
                                     if (type == null) {
@@ -320,10 +313,11 @@ public final class SubCommand extends CommandX {
                             });
                             Runnable getProxy = () -> plugin.api.getProxy(name, proxy -> {
                                 if (proxy != null) {
-                                    sender.sendMessage("SubServers > Info on Proxy: " + ChatColor.WHITE + proxy.getDisplayName());
-                                    if (!proxy.getName().equals(proxy.getDisplayName())) sender.sendMessage(" -> System Name: " + ChatColor.WHITE  + proxy.getName());
-                                    sender.sendMessage(" -> Connected: " + ((proxy.getSubData()[0] != null)?ChatColor.GREEN+"yes"+((proxy.getSubData().length > 1)?ChatColor.AQUA+" +"+(proxy.getSubData().length-1)+" subchannel"+((proxy.getSubData().length == 2)?"":"s"):""):ChatColor.RED+"no"));
-                                    sender.sendMessage(" -> Redis: "  + ((proxy.isRedis())?ChatColor.GREEN:ChatColor.RED+"un") + "available");
+                                    sender.sendMessage("SubServers > Info on proxy: " + ChatColor.WHITE + proxy.getDisplayName());
+                                    if (!proxy.getName().equals(proxy.getDisplayName())) sender.sendMessage(" -> System Name: " + ChatColor.WHITE + proxy.getName());
+                                    if (!proxy.isMaster()) sender.sendMessage(" -> Connected: " + ((proxy.getSubData()[0] != null)?ChatColor.GREEN+"yes"+((proxy.getSubData().length > 1)?ChatColor.AQUA+" +"+(proxy.getSubData().length-1)+" subchannel"+((proxy.getSubData().length == 2)?"":"s"):""):ChatColor.RED+"no"));
+                                    else if (!proxy.getDisplayName().toLowerCase().contains("master")) sender.sendMessage(" -> Type: " + ChatColor.WHITE + "Master");
+                                    sender.sendMessage(" -> Redis: " + ((proxy.isRedis())?ChatColor.GREEN:ChatColor.RED+"un") + "available");
                                     if (proxy.isRedis()) sender.sendMessage(" -> Players: " + ChatColor.AQUA + proxy.getPlayers().size() + " online");
                                     sender.sendMessage(" -> Signature: " + ChatColor.AQUA + proxy.getSignature());
                                 } else {
@@ -356,279 +350,393 @@ public final class SubCommand extends CommandX {
                                     case "subserver":
                                         getServer.run();
                                         break;
+                                    case "player":
+                                        getPlayer.run();
+                                        break;
                                     default:
                                         sender.sendMessage("SubServers > There is no object type with that name");
                                 }
                             }
                         } else {
-                            sender.sendMessage("SubServers > Usage: " + label + " " + args[0].toLowerCase() + " [proxy|host|group|server] <Name>");
+                            sender.sendMessage("SubServers > Usage: " + label + " " + args[0].toLowerCase() + " [proxy|host|group|server|player] <Name>");
                         }
                     } else if (args[0].equalsIgnoreCase("start")) {
                         if (args.length > 1) {
-                            ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketStartServer(null, args[1], data -> {
-                                switch (data.getInt(0x0001)) {
-                                    case 3:
-                                        sender.sendMessage("SubServers > There is no server with that name");
-                                        break;
-                                    case 4:
-                                        sender.sendMessage("SubServers > That Server is not a SubServer");
-                                        break;
-                                    case 5:
-                                        sender.sendMessage("SubServers > That SubServer's Host is not available");
-                                        break;
-                                    case 6:
-                                        sender.sendMessage("SubServers > That SubServer's Host is not enabled");
-                                        break;
-                                    case 7:
-                                        sender.sendMessage("SubServers > That SubServer is not available");
-                                        break;
-                                    case 8:
-                                        sender.sendMessage("SubServers > That SubServer is not enabled");
-                                        break;
-                                    case 9:
-                                        sender.sendMessage("SubServers > That SubServer is already running");
-                                        break;
-                                    case 10:
-                                        sender.sendMessage("SubServers > That SubServer cannot start while these server(s) are running: " + data.getRawString(0x0002));
-                                        break;
-                                    case 0:
-                                    case 1:
-                                        sender.sendMessage("SubServers > Server was started successfully");
-                                        break;
+                            selectServers(sender, args, 1, true, select -> {
+                                if (select.subservers.length > 0) {
+                                    PrimitiveContainer<Integer> success = new PrimitiveContainer<Integer>(0);
+                                    PrimitiveContainer<Integer> running = new PrimitiveContainer<Integer>(0);
+                                    AsyncConsolidator merge = new AsyncConsolidator(() -> {
+                                        if (running.value > 0) sender.sendMessage("SubServers > " + running.value + " subserver"+((running.value == 1)?"":"s") + " were already running");
+                                        if (success.value > 0) sender.sendMessage("SubServers > Started " + success.value + " subserver"+((success.value == 1)?"":"s"));
+                                    });
+                                    for (SubServer server : select.subservers) {
+                                        merge.reserve();
+                                        server.start(null, response -> {
+                                            switch (response) {
+                                                case 3:
+                                                case 4:
+                                                    sender.sendMessage("SubServers > Subserver " + server.getName() + " has disappeared");
+                                                    break;
+                                                case 5:
+                                                    sender.sendMessage("SubServers > The host for " + server.getName() + " is not available");
+                                                    break;
+                                                case 6:
+                                                    sender.sendMessage("SubServers > The host for " + server.getName() + " is not enabled");
+                                                    break;
+                                                case 7:
+                                                    sender.sendMessage("SubServers > Subserver " + server.getName() + " is not available");
+                                                    break;
+                                                case 8:
+                                                    sender.sendMessage("SubServers > SubServer " + server.getName() + " is not enabled");
+                                                    break;
+                                                case 9:
+                                                    running.value++;
+                                                    break;
+                                                case 10:
+                                                    sender.sendMessage("SubServers > Subserver " + server.getName() + " cannot start while incompatible server(s) are running");
+                                                    break;
+                                                case 0:
+                                                    success.value++;
+                                                    break;
+                                            }
+                                            merge.release();
+                                        });
+                                    }
                                 }
-                            }));
+                            });
                         } else {
-                            sender.sendMessage("Usage: " + label + " " + args[0].toLowerCase() + " <SubServer>");
+                            sender.sendMessage("Usage: " + label + " " + args[0].toLowerCase() + " <Subservers>");
                         }
                     } else if (args[0].equalsIgnoreCase("restart")) {
                         if (args.length > 1) {
-                            TimerTask starter = new TimerTask() {
-                                @Override
-                                public void run() {
-                                    ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketStartServer(null, args[1], data -> {
-                                        switch (data.getInt(0x0001)) {
+                            selectServers(sender, args, 1, true, select -> {
+                                if (select.subservers.length > 0) {
+                                    // Step 5: Start the stopped Servers once more
+                                    Callback<SubServer> starter = server -> server.start(response -> {
+                                        switch (response) {
                                             case 3:
                                             case 4:
-                                                sender.sendMessage("SubServers > Could not restart server: That SubServer has disappeared");
+                                                sender.sendMessage("SubServers > Could not restart server: Subserver " + server.getName() + " has disappeared");
                                                 break;
                                             case 5:
-                                                sender.sendMessage("SubServers > Could not restart server: That SubServer's Host is no longer available");
+                                                sender.sendMessage("SubServers > Could not restart server: The host for " + server.getName() + " is no longer available");
                                                 break;
                                             case 6:
-                                                sender.sendMessage("SubServers > Could not restart server: That SubServer's Host is no longer enabled");
+                                                sender.sendMessage("SubServers > Could not restart server: The host for " + server.getName() + " is no longer enabled");
                                                 break;
                                             case 7:
-                                                sender.sendMessage("SubServers > Could not restart server: That SubServer is no longer available");
+                                                sender.sendMessage("SubServers > Could not restart server: Subserver " + server.getName() + " is no longer available");
                                                 break;
                                             case 8:
-                                                sender.sendMessage("SubServers > Could not restart server: That SubServer is no longer enabled");
+                                                sender.sendMessage("SubServers > Could not restart server: Subserver " + server.getName() + " is no longer enabled");
                                                 break;
                                             case 10:
-                                                sender.sendMessage("SubServers > Could not restart server: That SubServer cannot start while these server(s) are running: " + data.getRawString(0x0002));
+                                                sender.sendMessage("SubServers > Could not restart server: Subserver " + server.getName() + " cannot start while incompatible server(s) are running");
                                                 break;
                                             case 9:
                                             case 0:
-                                            case 1:
-                                                sender.sendMessage("SubServers > Server was started successfully");
+                                                // success!
                                                 break;
                                         }
-                                    }));
-                                }
-                            };
+                                    });
 
-                            final Container<Boolean> listening = new Container<Boolean>(true);
-                            PacketInExRunEvent.callback("SubStoppedEvent", new Callback<ObjectMap<String>>() {
-                                @Override
-                                public void run(ObjectMap<String> json) {
-                                    try {
-                                        if (listening.get()) if (!json.getString("server").equalsIgnoreCase(args[1])) {
-                                            PacketInExRunEvent.callback("SubStoppedEvent", this);
-                                        } else {
-                                            new Timer("SubServers.Sync::Server_Restart_Command_Handler(" + args[1] + ')').schedule(starter, 100);
+                                    // Step 4: Listen for stopped Servers
+                                    final HashMap<String, SubServer> listening = new HashMap<String, SubServer>();
+                                    PacketInExRunEvent.callback("SubStoppedEvent", new Callback<ObjectMap<String>>() {
+                                        @Override
+                                        public void run(ObjectMap<String> json) {
+                                            try {
+                                                if (listening.size() > 0) {
+                                                    PacketInExRunEvent.callback("SubStoppedEvent", this);
+                                                    String name = json.getString("server").toLowerCase();
+                                                    if (listening.keySet().contains(name)) {
+                                                        new Timer("SubServers.Sync::Server_Restart_Command_Handler(" + name + ")").schedule(new TimerTask() {
+                                                            @Override
+                                                            public void run() {
+                                                                starter.run(listening.get(name));
+                                                                listening.remove(name);
+                                                            }
+                                                        }, 100);
+                                                    }
+                                                }
+                                            } catch (Exception e) {}
                                         }
-                                    } catch (Exception e) {}
+                                    });
+
+
+                                    // Step 1-3: Restart Servers / Receive command Responses
+                                    PrimitiveContainer<Integer> success = new PrimitiveContainer<Integer>(0);
+                                    AsyncConsolidator merge = new AsyncConsolidator(() -> {
+                                        if (success.value > 0) sender.sendMessage("SubServers > Restarting " + success.value + " subserver"+((success.value == 1)?"":"s"));
+                                    });
+                                    for (SubServer server : select.subservers) {
+                                        merge.reserve();
+                                        listening.put(server.getName().toLowerCase(), server);
+                                        server.stop(response -> {
+                                            if (response != 0) listening.remove(server.getName().toLowerCase());
+                                            switch (response) {
+                                                case 3:
+                                                case 4:
+                                                    sender.sendMessage("Could not restart server: Subserver " + server.getName() + " has disappeared");
+                                                    break;
+                                                case 5:
+                                                    starter.run(server);
+                                                case 0:
+                                                    success.value++;
+                                                    break;
+                                            }
+                                            merge.release();
+                                        });
+                                    }
                                 }
                             });
-
-                            ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketStopServer(null, args[1], false, data -> {
-                                if (data.getInt(0x0001) != 0) listening.set(false);
-                                switch (data.getInt(0x0001)) {
-                                    case 3:
-                                        sender.sendMessage("SubServers > There is no server with that name");
-                                        break;
-                                    case 4:
-                                        sender.sendMessage("SubServers > That Server is not a SubServer");
-                                        break;
-                                    case 5:
-                                        starter.run();
-                                        break;
-                                    case 0:
-                                    case 1:
-                                        sender.sendMessage("SubServers > Server was stopped successfully");
-                                        break;
-                                }
-                            }));
                         } else {
-                            sender.sendMessage("Usage: " + label + " " + args[0].toLowerCase() + " <SubServer>");
+                            sender.sendMessage("Usage: " + label + " " + args[0].toLowerCase() + " <Subservers>");
                         }
                     } else if (args[0].equalsIgnoreCase("stop")) {
                         if (args.length > 1) {
-                            ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketStopServer(null, args[1], false, data -> {
-                                switch (data.getInt(0x0001)) {
-                                    case 3:
-                                        sender.sendMessage("SubServers > There is no server with that name");
-                                        break;
-                                    case 4:
-                                        sender.sendMessage("SubServers > That Server is not a SubServer");
-                                        break;
-                                    case 5:
-                                        sender.sendMessage("SubServers > That SubServer is not running");
-                                        break;
-                                    case 0:
-                                    case 1:
-                                        sender.sendMessage("SubServers > Server was stopped successfully");
-                                        break;
+                            selectServers(sender, args, 1, true, select -> {
+                                if (select.subservers.length > 0) {
+                                    PrimitiveContainer<Integer> success = new PrimitiveContainer<Integer>(0);
+                                    PrimitiveContainer<Integer> running = new PrimitiveContainer<Integer>(0);
+                                    AsyncConsolidator merge = new AsyncConsolidator(() -> {
+                                        if (running.value > 0) sender.sendMessage("SubServers > " + running.value + " subserver"+((running.value == 1)?"":"s") + " were already offline");
+                                        if (success.value > 0) sender.sendMessage("SubServers > Stopping " + success.value + " subserver"+((success.value == 1)?"":"s"));
+                                    });
+                                    for (SubServer server : select.subservers) {
+                                        merge.reserve();
+                                        server.stop(response -> {
+                                            switch (response) {
+                                                case 3:
+                                                case 4:
+                                                    sender.sendMessage("SubServers > Subserver " + server.getName() + " has disappeared");
+                                                    break;
+                                                case 5:
+                                                    running.value++;
+                                                    break;
+                                                case 0:
+                                                    success.value++;
+                                                    break;
+                                            }
+                                            merge.release();
+                                        });
+                                    }
                                 }
-                            }));
+                            });
                         } else {
-                            sender.sendMessage("Usage: " + label + " " + args[0].toLowerCase() + " <SubServer>");
+                            sender.sendMessage("Usage: " + label + " " + args[0].toLowerCase() + " <Subservers>");
                         }
                     } else if (args[0].equalsIgnoreCase("kill") || args[0].equalsIgnoreCase("terminate")) {
                         if (args.length > 1) {
-                            ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketStopServer(null, args[1], true, data -> {
-                                switch (data.getInt(0x0001)) {
-                                    case 3:
-                                        sender.sendMessage("SubServers > There is no server with that name");
-                                        break;
-                                    case 4:
-                                        sender.sendMessage("SubServers > That Server is not a SubServer");
-                                        break;
-                                    case 5:
-                                        sender.sendMessage("SubServers > That SubServer is not running");
-                                        break;
-                                    case 0:
-                                    case 1:
-                                        sender.sendMessage("SubServers > Server was terminated successfully");
-                                        break;
+                            selectServers(sender, args, 1, true, select -> {
+                                if (select.subservers.length > 0) {
+                                    PrimitiveContainer<Integer> success = new PrimitiveContainer<Integer>(0);
+                                    PrimitiveContainer<Integer> running = new PrimitiveContainer<Integer>(0);
+                                    AsyncConsolidator merge = new AsyncConsolidator(() -> {
+                                        if (running.value > 0) sender.sendMessage("SubServers > " + running.value + " subserver"+((running.value == 1)?"":"s") + " were already offline");
+                                        if (success.value > 0) sender.sendMessage("SubServers > Terminated " + success.value + " subserver"+((success.value == 1)?"":"s"));
+                                    });
+                                    for (SubServer server : select.subservers) {
+                                        merge.reserve();
+                                        server.terminate(response -> {
+                                            switch (response) {
+                                                case 3:
+                                                case 4:
+                                                    sender.sendMessage("SubServers > Subserver " + server.getName() + " has disappeared");
+                                                    break;
+                                                case 5:
+                                                    running.value++;
+                                                    break;
+                                                case 0:
+                                                    success.value++;
+                                                    break;
+                                            }
+                                            merge.release();
+                                        });
+                                    }
                                 }
-                            }));
+                            });
                         } else {
-                            sender.sendMessage("Usage: " + label + " " + args[0].toLowerCase() + " <SubServer>");
+                            sender.sendMessage("Usage: " + label + " " + args[0].toLowerCase() + " <Subservers>");
                         }
                     } else if (args[0].equalsIgnoreCase("cmd") || args[0].equalsIgnoreCase("command")) {
-                        if (args.length > 2) {
-                            int i = 2;
-                            String str = args[2];
-                            if (args.length > 3) {
-                                do {
-                                    i++;
-                                    str = str + " " + args[i];
-                                } while ((i + 1) != args.length);
-                            }
-                            final String cmd = str;
-                            ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketCommandServer(null, args[1], cmd, data -> {
-                                switch (data.getInt(0x0001)) {
-                                    case 3:
-                                        sender.sendMessage("SubServers > There is no server with that name");
-                                        break;
-                                    case 4:
-                                        sender.sendMessage("SubServers > That Server is not a SubServer");
-                                        break;
-                                    case 5:
-                                        sender.sendMessage("SubServers > That SubServer is not running");
-                                        break;
-                                    case 0:
-                                    case 1:
-                                        sender.sendMessage("SubServers > Command was sent successfully");
-                                        break;
+                        if (args.length > 1) {
+                            selectServers(sender, args, 1, true, select -> {
+                                if (select.subservers.length > 0) {
+                                    if (select.args.length > 2) {
+                                        StringBuilder builder = new StringBuilder(select.args[2]);
+                                        for (int i = 3; i < select.args.length; i++) {
+                                            builder.append(' ');
+                                            builder.append(select.args[i]);
+                                        }
+
+                                        PrimitiveContainer<Integer> success = new PrimitiveContainer<Integer>(0);
+                                        PrimitiveContainer<Integer> running = new PrimitiveContainer<Integer>(0);
+                                        AsyncConsolidator merge = new AsyncConsolidator(() -> {
+                                            if (running.value > 0) sender.sendMessage("SubServers > " + running.value + " subserver"+((running.value == 1)?"":"s") + " were offline");
+                                            if (success.value > 0) sender.sendMessage("SubServers > Sent command to " + success.value + " subserver"+((success.value == 1)?"":"s"));
+                                        });
+                                        for (SubServer server : select.subservers) {
+                                            merge.reserve();
+                                            server.command(builder.toString(), response -> {
+                                                switch (response) {
+                                                    case 3:
+                                                    case 4:
+                                                        sender.sendMessage("SubServers > Subserver " + server.getName() + " has disappeared");
+                                                        break;
+                                                    case 5:
+                                                        running.value++;
+                                                        break;
+                                                    case 0:
+                                                        success.value++;
+                                                        break;
+                                                }
+                                                merge.release();
+                                            });
+                                        }
+                                    } else {
+                                        sender.sendMessage("SubServers > No command was entered");
+                                    }
                                 }
-                            }));
+                            });
                         } else {
-                            sender.sendMessage("Usage: " + label + " " + args[0].toLowerCase() + " <SubServer> <Command> [Args...]");
+                            sender.sendMessage("Usage: " + label + " " + args[0].toLowerCase() + " <Subservers> <Command> [Args...]");
                         }
                     } else if (args[0].equalsIgnoreCase("create")) {
                         if (args.length > 3) {
                             if (args.length > 5 && Util.isException(() -> Integer.parseInt(args[5]))) {
-                                sender.sendMessage("Invalid Port Number");
+                                sender.sendMessage("SubServers > Invalid port number");
                             } else {
                                 ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketCreateServer(null, args[1], args[2],args[3], (args.length > 4)?new Version(args[4]):null, (args.length > 5)?Integer.parseInt(args[5]):null, data -> {
                                     switch (data.getInt(0x0001)) {
                                         case 3:
                                         case 4:
-                                            sender.sendMessage("SubServers > There is already a SubServer with that name");
+                                            sender.sendMessage("SubServers > There is already a subserver with that name");
                                             break;
                                         case 5:
                                             sender.sendMessage("SubServers > There is no host with that name");
                                             break;
                                         case 6:
-                                            sender.sendMessage("SubServers > That Host is not available");
+                                            sender.sendMessage("SubServers > That host is not available");
                                             break;
                                         case 7:
-                                            sender.sendMessage("SubServers > That Host is not enabled");
+                                            sender.sendMessage("SubServers > That host is not enabled");
                                             break;
                                         case 8:
                                             sender.sendMessage("SubServers > There is no template with that name");
                                             break;
                                         case 9:
-                                            sender.sendMessage("SubServers > That Template is not available");
+                                            sender.sendMessage("SubServers > That template is not enabled");
                                             break;
                                         case 10:
-                                            sender.sendMessage("SubServers > That Template requires a Minecraft Version to be specified");
+                                            sender.sendMessage("SubServers > That template requires a Minecraft version to be specified");
                                             break;
                                         case 11:
-                                            sender.sendMessage("SubServers > Invalid Port Number");
+                                            sender.sendMessage("SubServers > Invalid port number");
                                             break;
                                         case 0:
-                                        case 1:
-                                            sender.sendMessage("SubServers > Launching SubCreator...");
+                                            sender.sendMessage("SubServers > Creating subserver " + args[1]);
                                             break;
                                     }
                                 }));
                             }
+                        } else {
+                            sender.sendMessage("SubServers > Usage: " + label + " " + args[0].toLowerCase() + " <Name> <Host> <Template> [Version] [Port]");
                         }
                     } else if (args[0].equalsIgnoreCase("update") || args[0].equalsIgnoreCase("upgrade")) {
                         if (args.length > 1) {
-                            ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketUpdateServer(null, args[1], (args.length > 2)?new Version(args[2]):null, data -> {
-                                switch (data.getInt(0x0001)) {
-                                    case 3:
-                                        sender.sendMessage("SubServers > There is no server with that name");
-                                        break;
-                                    case 4:
-                                        sender.sendMessage("SubServers > That Server is not a SubServer");
-                                        break;
-                                    case 5:
-                                        sender.sendMessage("SubServers > That SubServer's Host is not available");
-                                        break;
-                                    case 6:
-                                        sender.sendMessage("SubServers > That SubServer's Host is not enabled");
-                                        break;
-                                    case 7:
-                                        sender.sendMessage("SubServers > That SubServer is not available");
-                                        break;
-                                    case 8:
-                                        sender.sendMessage("SubServers > Cannot update servers while they are still running");
-                                        break;
-                                    case 9:
-                                        sender.sendMessage("SubServers > We don't know which template created that SubServer");
-                                        break;
-                                    case 10:
-                                        sender.sendMessage("SubServers > That SubServer's Template is not enabled");
-                                        break;
-                                    case 11:
-                                        sender.sendMessage("SubServers > That SubServer's Template does not support server updating");
-                                        break;
-                                    case 12:
-                                        sender.sendMessage("SubServers > That SubServer's Template requires a Minecraft Version to be specified");
-                                        break;
-                                    case 0:
-                                    case 1:
-                                        sender.sendMessage("SubServers > Launching SubCreator...");
-                                        break;
+                            selectServers(sender, args, 1, true, select -> {
+                                if (select.subservers.length > 0) {
+                                    PrimitiveContainer<Integer> success = new PrimitiveContainer<Integer>(0);
+                                    AsyncConsolidator merge = new AsyncConsolidator(() -> {
+                                        if (success.value > 0) sender.sendMessage("SubServers > Updating " + success.value + " subserver"+((success.value == 1)?"":"s"));
+                                    });
+                                    for (SubServer server : select.subservers) {
+                                        merge.reserve();
+                                        ((SubDataClient) plugin.api.getSubDataNetwork()[0]).sendPacket(new PacketUpdateServer(null, server.getName(), (select.args.length > 2)?new Version(select.args[2]):null, data -> {
+                                            switch (data.getInt(0x0001)) {
+                                                case 3:
+                                                case 4:
+                                                    sender.sendMessage("SubServers > Subserver " + server.getName() + " has disappeared");
+                                                    break;
+                                                case 5:
+                                                    sender.sendMessage("SubServers > The host for " + server.getName() + " is not available");
+                                                    break;
+                                                case 6:
+                                                    sender.sendMessage("SubServers > The host for " + server.getName() + " is not enabled");
+                                                    break;
+                                                case 7:
+                                                    sender.sendMessage("SubServers > Subserver " + server.getName() + " is not available");
+                                                    break;
+                                                case 8:
+                                                    sender.sendMessage("SubServers > Cannot update " + server.getName() + " while it is still running");
+                                                    break;
+                                                case 9:
+                                                    sender.sendMessage("SubServers > We don't know which template built " + server.getName());
+                                                    break;
+                                                case 10:
+                                                    sender.sendMessage("SubServers > The template that created " + server.getName() + " is not enabled");
+                                                    break;
+                                                case 11:
+                                                    sender.sendMessage("SubServers > The template that created " + server.getName() + " does not support subserver updating");
+                                                    break;
+                                                case 12:
+                                                    sender.sendMessage("SubServers > The template that created " + server.getName() + " requires a Minecraft version to be specified");
+                                                    break;
+                                                case 0:
+                                                    success.value++;
+                                                    break;
+                                            }
+                                            merge.release();
+                                        }));
+                                    }
                                 }
-                            }));
+                            });
                         } else {
-                            sender.sendMessage("Usage: " + label + " " + args[0].toLowerCase() + " <SubServer> [Version]");
+                            sender.sendMessage("Usage: " + label + " " + args[0].toLowerCase() + " <Subservers> [Version]");
                         }
+                    } else if (args[0].equalsIgnoreCase("remove") || args[0].equalsIgnoreCase("del") || args[0].equalsIgnoreCase("delete")) {
+                        if (args.length > 1) {
+                            selectServers(sender, args, 1, true, select -> {
+                                if (select.subservers.length > 0) {
+                                    PrimitiveContainer<Integer> success = new PrimitiveContainer<Integer>(0);
+                                    PrimitiveContainer<Integer> running = new PrimitiveContainer<Integer>(0);
+                                    AsyncConsolidator merge = new AsyncConsolidator(() -> {
+                                        if (success.value > 0) sender.sendMessage("SubServers > Removing " + success.value + " subserver"+((success.value == 1)?"":"s"));
+                                    });
+                                    for (SubServer server : select.subservers) {
+                                        if (server.isRunning()) {
+                                            sender.sendMessage("SubServers > Subserver " + server.getName() + " is still running");
+                                        } else {
+                                            server.getHost(host -> {
+                                                if (host == null) {
+                                                    sender.sendMessage("SubServers > Subserver " + server.getName() + " has disappeared");
+                                                } else {
+                                                    merge.reserve();
+                                                    host.recycleSubServer(server.getName(), response -> {
+                                                        switch (response) {
+                                                            case 3:
+                                                            case 4:
+                                                                sender.sendMessage("SubServers > Subserver " + server.getName() + " has disappeared");
+                                                                break;
+                                                            case 0:
+                                                                success.value++;
+                                                                break;
+                                                        }
+                                                        merge.release();
+                                                    });
+                                                }
+                                            });
+                                        }
+                                    }
+                                }
+                            });
+                        } else {
+                            sender.sendMessage("Usage: " + label + " " + args[0].toLowerCase() + " <Subservers>");
+                        }
+                    } else if (args[0].equalsIgnoreCase("restore")) {
+                        // TODO
                     } else {
                         sender.sendMessage("SubServers > Unknown sub-command: " + args[0]);
                     }
@@ -643,20 +751,197 @@ public final class SubCommand extends CommandX {
         }
     }
 
+    private void selectServers(CommandSender sender, String[] rargs, int index, boolean mode, Callback<ServerSelection> callback) {
+        StackTraceElement[] origin = new Exception().getStackTrace();
+        LinkedList<String> msgs = new LinkedList<String>();
+        LinkedList<String> args = new LinkedList<String>();
+        LinkedList<String> selection = new LinkedList<String>();
+        LinkedList<Server> select = new LinkedList<Server>();
+        Container<String> last = new Container<String>(null);
+
+        // Step 1
+        Container<Integer> ic = new Container<Integer>(0);
+        while (ic.get() < index) {
+            args.add(rargs[ic.get()]);
+            ic.set(ic.get() + 1);
+        }
+
+        // Step 3
+        StringBuilder completed = new StringBuilder();
+        Runnable finished = () -> {
+            args.add(completed.toString());
+
+            int i = ic.get();
+            while (i < rargs.length) {
+                args.add(rargs[i]);
+                last.set(null);
+                i++;
+            }
+
+            LinkedList<Server> history = new LinkedList<Server>();
+            LinkedList<Server> servers = new LinkedList<Server>();
+            LinkedList<SubServer> subservers = new LinkedList<SubServer>();
+            for (Server server : select) {
+                if (!history.contains(server)) {
+                    history.add(server);
+                    servers.add(server);
+                    if (server instanceof SubServer)
+                        subservers.add((SubServer) server);
+                }
+            }
+
+            if ((!mode && servers.size() <= 0) || (mode && subservers.size() <= 0)) {
+                String msg = "SubServers > No " + ((mode)?"sub":"") + "servers were selected";
+                if (sender != null) sender.sendMessage(msg);
+                msgs.add(msg);
+            }
+
+            try {
+                callback.run(new ServerSelection(msgs, selection, servers, subservers, args, last.get()));
+            } catch (Throwable e) {
+                Throwable ew = new InvocationTargetException(e);
+                ew.setStackTrace(origin);
+                ew.printStackTrace();
+            }
+        };
+
+        // Step 2
+        AsyncConsolidator merge = new AsyncConsolidator(finished);
+        for (boolean run = true; run && ic.get() < rargs.length; ic.set(ic.get() + 1)) {
+            String current = rargs[ic.get()];
+            last.set(current);
+            completed.append(current);
+            if (current.endsWith(",")) {
+                current = current.substring(0, current.length() - 1);
+                completed.append(' ');
+            } else run = false;
+            selection.add(current.toLowerCase());
+
+            if (current.length() > 0) {
+                merge.reserve();
+
+                if (current.startsWith("::") && current.length() > 2) {
+                    current = current.substring(2);
+
+                    if (current.equals("*")) {
+                        plugin.api.getHosts(hostMap -> {
+                            for (Host host : hostMap.values()) {
+                                select.addAll(host.getSubServers().values());
+                            }
+                            merge.release();
+                        });
+                    } else {
+                        final String fcurrent = current;
+                        plugin.api.getHost(current, host -> {
+                            if (host != null) {
+                                if (!select.addAll(host.getSubServers().values())) {
+                                    String msg = "SubServers > There are no " + ((mode)?"sub":"") + "servers on host: " + host.getName();
+                                    if (sender != null) sender.sendMessage(msg);
+                                    msgs.add(msg);
+                                }
+                            } else {
+                                String msg = "SubServers > There is no host with name: " + fcurrent;
+                                if (sender != null) sender.sendMessage(msg);
+                                msgs.add(msg);
+                            }
+                            merge.release();
+                        });
+                    }
+                } else if (current.startsWith(":") && current.length() > 1) {
+                    current = current.substring(1);
+
+                    if (current.equals("*")) {
+                        plugin.api.getGroups(groupMap -> {
+                            for (List<Server> group : groupMap.values()) for (Server server : group) {
+                                if (!mode || server instanceof SubServer) select.add(server);
+                            }
+                            merge.release();
+                        });
+                    } else {
+                        final String fcurrent = current;
+                        plugin.api.getGroup(current, group -> {
+                            if (group != null) {
+                                int i = 0;
+                                for (Server server : group.get()) {
+                                    if (!mode || server instanceof SubServer) {
+                                        select.add(server);
+                                        i++;
+                                    }
+                                }
+                                if (i <= 0) {
+                                    String msg = "SubServers > There are no " + ((mode)?"sub":"") + "servers in group: " + group.name();
+                                    if (sender != null) sender.sendMessage(msg);
+                                    msgs.add(msg);
+                                }
+                            } else {
+                                String msg = "SubServers > There is no group with name: " + fcurrent;
+                                if (sender != null) sender.sendMessage(msg);
+                                msgs.add(msg);
+                            }
+                            merge.release();
+                        });
+                    }
+                } else {
+
+                    if (current.equals("*")) {
+                        plugin.api.getServers(serverMap -> {
+                            for (Server server : serverMap.values()) {
+                                if (!mode || server instanceof SubServer) select.add(server);
+                            }
+                            merge.release();
+                        });
+                    } else {
+                        final String fcurrent = current;
+                        plugin.api.getServer(current, server -> {
+                            if (server != null) {
+                                select.add(server);
+                            } else {
+                                String msg = "SubServers > There is no " + ((mode)?"sub":"") + "server with name: " + fcurrent;
+                                if (sender != null) sender.sendMessage(msg);
+                                msgs.add(msg);
+                            }
+                            merge.release();
+                        });
+                    }
+                }
+            }
+        }
+    }
+    private static final class ServerSelection {
+        private final String[] msgs;
+        private final String[] selection;
+        private final Server[] servers;
+        private final SubServer[] subservers;
+        private final String[] args;
+        private final String last;
+
+        private ServerSelection(List<String> msgs, List<String> selection, List<Server> servers, List<SubServer> subservers, List<String> args, String last) {
+            this.msgs = msgs.toArray(new String[0]);
+            this.selection = selection.toArray(new String[0]);
+            this.servers = servers.toArray(new Server[0]);
+            this.subservers = subservers.toArray(new SubServer[0]);
+            this.args = args.toArray(new String[0]);
+            this.last = last;
+
+            Arrays.sort(this.selection);
+        }
+    }
+
     private String[] printHelp() {
         return new String[]{
                 "SubServers > Console Command Help:",
                 "   Help: /sub help",
                 "   List: /sub list",
                 "   Version: /sub version",
-                "   Info: /sub info [proxy|host|group|server] <Name>",
-                "   Start Server: /sub start <SubServer>",
-                "   Restart Server: /sub restart <SubServer>",
-                "   Stop Server: /sub stop <SubServer>",
-                "   Terminate Server: /sub kill <SubServer>",
-                "   Command Server: /sub cmd <SubServer> <Command> [Args...]",
+                "   Info: /sub info [proxy|host|group|server|player] <Name>",
+                "   Start Server: /sub start <Subservers>",
+                "   Restart Server: /sub restart <Subservers>",
+                "   Stop Server: /sub stop <Subservers>",
+                "   Terminate Server: /sub kill <Subservers>",
+                "   Command Server: /sub cmd <Subservers> <Command> [Args...]",
                 "   Create Server: /sub create <Name> <Host> <Template> [Version] [Port]",
-                "   Update Server: /sub update <SubServer> [Version]",
+                "   Update Server: /sub update <Subservers> [Version]",
+                "   Remove Server: /sub delete <Subservers>",
                 "",
                 "   To see BungeeCord Supplied Commands, please visit:",
                 "   https://www.spigotmc.org/wiki/bungeecord-commands/"
@@ -670,28 +955,30 @@ public final class SubCommand extends CommandX {
      * @param args Arguments
      * @return The validator's response and list of possible arguments
      */
+    @SuppressWarnings("unchecked")
     public NamedContainer<String, List<String>> suggestArguments(CommandSender sender, String[] args) {
-        String last = (args.length > 0)?args[args.length - 1].toLowerCase():"";
+        String Last = (args.length > 0)?args[args.length - 1]:"";
+        String last = Last.toLowerCase();
 
         if (plugin.api.getSubDataNetwork()[0] == null) {
             if (sender instanceof ConsoleCommandSender)
                 new IllegalStateException("SubData is not connected").printStackTrace();
             return new NamedContainer<>(null, Collections.emptyList());
-        } else if (sender instanceof ProxiedPlayer && (!players.keySet().contains(((ProxiedPlayer) sender).getUniqueId()) || !players.get(((ProxiedPlayer) sender).getUniqueId()).keySet().contains(((ProxiedPlayer) sender).getServer().getInfo())
-                || !players.get(((ProxiedPlayer) sender).getUniqueId()).get(((ProxiedPlayer) sender).getServer().getInfo()).get())) {
-            if (players.keySet().contains(((ProxiedPlayer) sender).getUniqueId()) && players.get(((ProxiedPlayer) sender).getUniqueId()).keySet().contains(((ProxiedPlayer) sender).getServer().getInfo())
-                    && players.get(((ProxiedPlayer) sender).getUniqueId()).get(((ProxiedPlayer) sender).getServer().getInfo()).name() == null) {
+        } else if (sender instanceof ProxiedPlayer && (!permitted.keySet().contains(((ProxiedPlayer) sender).getUniqueId()) || !permitted.get(((ProxiedPlayer) sender).getUniqueId()).keySet().contains(((ProxiedPlayer) sender).getServer().getInfo())
+                || !permitted.get(((ProxiedPlayer) sender).getUniqueId()).get(((ProxiedPlayer) sender).getServer().getInfo()).get())) {
+            if (permitted.keySet().contains(((ProxiedPlayer) sender).getUniqueId()) && permitted.get(((ProxiedPlayer) sender).getUniqueId()).keySet().contains(((ProxiedPlayer) sender).getServer().getInfo())
+                    && permitted.get(((ProxiedPlayer) sender).getUniqueId()).get(((ProxiedPlayer) sender).getServer().getInfo()).name() == null) {
                 // do nothing
-            } else if (!players.keySet().contains(((ProxiedPlayer) sender).getUniqueId()) || !players.get(((ProxiedPlayer) sender).getUniqueId()).keySet().contains(((ProxiedPlayer) sender).getServer().getInfo())
-                    || Calendar.getInstance().getTime().getTime() - players.get(((ProxiedPlayer) sender).getUniqueId()).get(((ProxiedPlayer) sender).getServer().getInfo()).name() >= TimeUnit.MINUTES.toMillis(1)) {
+            } else if (!permitted.keySet().contains(((ProxiedPlayer) sender).getUniqueId()) || !permitted.get(((ProxiedPlayer) sender).getUniqueId()).keySet().contains(((ProxiedPlayer) sender).getServer().getInfo())
+                    || Calendar.getInstance().getTime().getTime() - permitted.get(((ProxiedPlayer) sender).getUniqueId()).get(((ProxiedPlayer) sender).getServer().getInfo()).name() >= TimeUnit.MINUTES.toMillis(1)) {
                 if (!(((ProxiedPlayer) sender).getServer().getInfo() instanceof ServerImpl) || ((ServerImpl) ((ProxiedPlayer) sender).getServer().getInfo()).getSubData()[0] == null) {
-                    HashMap<ServerInfo, NamedContainer<Long, Boolean>> map = (players.keySet().contains(((ProxiedPlayer) sender).getUniqueId()))?players.get(((ProxiedPlayer) sender).getUniqueId()):new HashMap<ServerInfo, NamedContainer<Long, Boolean>>();
+                    HashMap<ServerInfo, NamedContainer<Long, Boolean>> map = (permitted.keySet().contains(((ProxiedPlayer) sender).getUniqueId()))? permitted.get(((ProxiedPlayer) sender).getUniqueId()):new HashMap<ServerInfo, NamedContainer<Long, Boolean>>();
                     map.put(((ProxiedPlayer) sender).getServer().getInfo(), new NamedContainer<>(Calendar.getInstance().getTime().getTime(), false));
-                    players.put(((ProxiedPlayer) sender).getUniqueId(), map);
+                    permitted.put(((ProxiedPlayer) sender).getUniqueId(), map);
                 } else {
-                    HashMap<ServerInfo, NamedContainer<Long, Boolean>> map = (players.keySet().contains(((ProxiedPlayer) sender).getUniqueId()))?players.get(((ProxiedPlayer) sender).getUniqueId()):new HashMap<ServerInfo, NamedContainer<Long, Boolean>>();
+                    HashMap<ServerInfo, NamedContainer<Long, Boolean>> map = (permitted.keySet().contains(((ProxiedPlayer) sender).getUniqueId()))? permitted.get(((ProxiedPlayer) sender).getUniqueId()):new HashMap<ServerInfo, NamedContainer<Long, Boolean>>();
                     map.put(((ProxiedPlayer) sender).getServer().getInfo(), new NamedContainer<>(null, false));
-                    players.put(((ProxiedPlayer) sender).getUniqueId(), map);
+                    permitted.put(((ProxiedPlayer) sender).getUniqueId(), map);
                     ((SubDataSender) ((ServerImpl) ((ProxiedPlayer) sender).getServer().getInfo()).getSubData()[0]).sendPacket(new PacketCheckPermission(((ProxiedPlayer) sender).getUniqueId(), "subservers.command", result -> {
                         map.put(((ProxiedPlayer) sender).getServer().getInfo(), new NamedContainer<>(Calendar.getInstance().getTime().getTime(), result));
                     }));
@@ -699,18 +986,34 @@ public final class SubCommand extends CommandX {
             }
             return new NamedContainer<>(null, Collections.emptyList());
         } else if (args.length <= 1) {
-            List<String> cmds = Arrays.asList("help", "list", "info", "status", "version", "start", "restart", "stop", "kill", "terminate", "cmd", "command", "create", "update", "upgrade");
-            if (last.length() == 0) {
-                return new NamedContainer<>(null, cmds);
-            } else {
-                List<String> list = new ArrayList<String>();
-                for (String cmd : cmds) {
-                    if (cmd.startsWith(last)) list.add(last + cmd.substring(last.length()));
-                }
-                return new NamedContainer<>((list.size() <= 0)?plugin.api.getLang("SubServers", "Command.Generic.Invalid-Subcommand").replace("$str$", args[0]):null, list);
+            List<String> cmds = new ArrayList<>();
+            cmds.addAll(Arrays.asList("help", "list", "info", "status", "version", "start", "restart", "stop", "kill", "terminate", "cmd", "command", "create", "update", "upgrade"));
+            if (!(sender instanceof ProxiedPlayer)) cmds.addAll(Arrays.asList("reload", "sudo", "screen", "remove", "delete", "restore"));
+
+            updateCache();
+
+            List<String> list = new ArrayList<String>();
+            for (String cmd : cmds) {
+                if (cmd.startsWith(last)) list.add(Last + cmd.substring(last.length()));
             }
+            return new NamedContainer<>((list.size() <= 0)?plugin.api.getLang("SubServers", "Command.Generic.Invalid-Subcommand").replace("$str$", args[0]):null, list);
         } else {
             if (args[0].equals("info") || args[0].equals("status")) {
+                ReturnRunnable<Collection<String>> getPlayers = () -> {
+                    LinkedList<String> names = new LinkedList<String>();
+                    for (ProxiedPlayer player : plugin.getPlayers()) names.add(player.getName());
+                    if (proxyMasterCache != null)
+                        for (NamedContainer<String, UUID> player : proxyMasterCache.getPlayers())
+                            if (!names.contains(player.name())) names.add(player.name());
+                    for (Proxy proxy : proxyCache.values())
+                        for (NamedContainer<String, UUID> player : proxy.getPlayers())
+                            if (!names.contains(player.name())) names.add(player.name());
+                    Collections.sort(names);
+                    return names;
+                };
+
+                updateCache();
+
                 if (args.length == 2) {
                     List<String> list = new ArrayList<String>();
                     List<String> subcommands = new ArrayList<String>();
@@ -718,201 +1021,167 @@ public final class SubCommand extends CommandX {
                     subcommands.add("host");
                     subcommands.add("group");
                     subcommands.add("server");
-                    if (last.length() == 0) {
-                        list.addAll(subcommands);
-                        for (String proxy : proxyCache) if (!list.contains(proxy)) list.add(proxy);
-                        for (String host : hostCache.keySet()) if (!list.contains(host)) list.add(host);
-                        for (String group : groupCache) if (!list.contains(group)) list.add(group);
-                        for (ServerImpl server : plugin.servers.values()) if (!list.contains(server.getName())) list.add(server.getName());
-                    } else {
-                        for (String command : subcommands) {
-                            if (!list.contains(command) && command.toLowerCase().startsWith(last))
-                                list.add(last + command.substring(last.length()));
-                        }
-                        for (String proxy : proxyCache) {
-                            if (!list.contains(proxy) && proxy.toLowerCase().startsWith(last))
-                                list.add(last + proxy.substring(last.length()));
-                        }
-                        for (String host : hostCache.keySet()) {
-                            if (!list.contains(host) && host.toLowerCase().startsWith(last))
-                                list.add(last + host.substring(last.length()));
-                        }
-                        for (String group : groupCache) {
-                            if (!list.contains(group) && group.toLowerCase().startsWith(last))
-                                list.add(last + group.substring(last.length()));
-                        }
-                        for (ServerImpl server : plugin.servers.values()) {
-                            if (!list.contains(server.getName()) && server.getName().toLowerCase().startsWith(last))
-                                list.add(last + server.getName().substring(last.length()));
-                        }
+                    subcommands.add("subserver");
+                    subcommands.add("player");
+                    for (String command : subcommands) {
+                        if (!list.contains(command) && command.toLowerCase().startsWith(last))
+                            list.add(Last + command.substring(last.length()));
+                    }
+                    Proxy master = proxyMasterCache;
+                    if (master != null && !list.contains(master.getName()) && master.getName().toLowerCase().startsWith(last))
+                        list.add(Last + master.getName().substring(last.length()));
+                    for (Proxy proxy : proxyCache.values()) {
+                        if (!list.contains(proxy.getName()) && proxy.getName().toLowerCase().startsWith(last))
+                            list.add(Last + proxy.getName().substring(last.length()));
+                    }
+                    for (Host host : hostCache.values()) {
+                        if (!list.contains(host.getName()) && host.getName().toLowerCase().startsWith(last))
+                            list.add(Last + host.getName().substring(last.length()));
+                    }
+                    for (String group : groupCache.keySet()) {
+                        if (!list.contains(group) && group.toLowerCase().startsWith(last))
+                            list.add(Last + group.substring(last.length()));
+                    }
+                    for (ServerImpl server : plugin.servers.values()) {
+                        if (!list.contains(server.getName()) && server.getName().toLowerCase().startsWith(last))
+                            list.add(Last + server.getName().substring(last.length()));
+                    }
+                    for (String player : getPlayers.run()) {
+                        if (!list.contains(player) && player.toLowerCase().startsWith(last))
+                            list.add(Last + player.substring(last.length()));
                     }
                     return new NamedContainer<>((list.size() <= 0)?plugin.api.getLang("SubServers", "Command.Info.Unknown").replace("$str$", args[0]):null, list);
                 } else if (args.length == 3) {
                     List<String> list = new ArrayList<String>();
-                    if (last.length() == 0) {
-                        switch (args[1].toLowerCase()) {
-                            case "p":
-                            case "proxy":
-                                list.addAll(proxyCache);
-                                break;
-                            case "h":
-                            case "host":
-                                list.addAll(hostCache.keySet());
-                                break;
-                            case "g":
-                            case "group":
-                                list.addAll(groupCache);
-                                break;
-                            case "s":
-                            case "server":
-                            case "subserver":
-                                for (ServerImpl server : plugin.servers.values()) list.add(server.getName());
-                                break;
-                        }
-                    } else {
-                        switch (args[1].toLowerCase()) {
-                            case "p":
-                            case "proxy":
-                                for (String proxy : proxyCache) {
-                                    if (proxy.toLowerCase().startsWith(last))
-                                        list.add(last + proxy.substring(last.length()));
-                                }
-                                break;
-                            case "h":
-                            case "host":
-                                for (String host : hostCache.keySet()) {
-                                    if (host.toLowerCase().startsWith(last))
-                                        list.add(last + host.substring(last.length()));
-                                }
-                                break;
-                            case "g":
-                            case "group":
-                                for (String group : groupCache) {
-                                    if (group.toLowerCase().startsWith(last))
-                                        list.add(last + group.substring(last.length()));
-                                }
-                                break;
-                            case "s":
-                            case "server":
-                            case "subserver":
-                                for (ServerImpl server : plugin.servers.values()) {
-                                    if (server.getName().toLowerCase().startsWith(last))
-                                        list.add(last + server.getName().substring(last.length()));
-                                }
-                                break;
-                        }
+
+                    switch (args[1].toLowerCase()) {
+                        case "p":
+                        case "proxy":
+                            Proxy master = proxyMasterCache;
+                            if (master != null && master.getName().toLowerCase().startsWith(last))
+                                list.add(Last + master.getName().substring(last.length()));
+                            for (Proxy proxy : proxyCache.values()) {
+                                if (!list.contains(proxy.getName()) && proxy.getName().toLowerCase().startsWith(last))
+                                    list.add(Last + proxy.getName().substring(last.length()));
+                            }
+                            break;
+                        case "h":
+                        case "host":
+                            for (Host host : hostCache.values()) {
+                                if (host.getName().toLowerCase().startsWith(last))
+                                    list.add(Last + host.getName().substring(last.length()));
+                            }
+                            break;
+                        case "g":
+                        case "group":
+                            for (String group : groupCache.keySet()) {
+                                if (group.toLowerCase().startsWith(last))
+                                    list.add(Last + group.substring(last.length()));
+                            }
+                            break;
+                        case "s":
+                        case "server":
+                        case "subserver":
+                            for (ServerImpl server : plugin.servers.values()) {
+                                if ((!args[1].equalsIgnoreCase("subserver") || server instanceof SubServerImpl) && server.getName().toLowerCase().startsWith(last))
+                                    list.add(Last + server.getName().substring(last.length()));
+                            }
+                            break;
+                        case "player":
+                            for (String player : getPlayers.run()) {
+                                if (player.toLowerCase().startsWith(last))
+                                    list.add(Last + player.substring(last.length()));
+                            }
+                            break;
                     }
                     return new NamedContainer<>((list.size() <= 0)?plugin.api.getLang("SubServers", "Command.Info.Unknown").replace("$str$", args[0]):null, list);
                 } else {
                     return new NamedContainer<>(null, Collections.emptyList());
                 }
-            } else if (!(sender instanceof ProxiedPlayer) && (args[0].equals("reload") || args[0].equals("restore"))) {
-                if (args[0].equals("reload")) {
-                    List<String> list = new ArrayList<String>(),
-                            completes = Arrays.asList("all", "config", "templates");
+            } else if (!(sender instanceof ProxiedPlayer) && (args[0].equals("restore"))) {
+             /* if (args[0].equals("restore")) */ {
                     if (args.length == 2) {
-                        if (last.length() == 0) {
-                            list = completes;
-                        } else {
-                            for (String complete : completes) {
-                                if (complete.toLowerCase().startsWith(last)) list.add(last + complete.substring(last.length()));
-                            }
-                        }
-                        return new NamedContainer<>((list.size() <= 0)?plugin.api.getLang("SubServers", "Command.Generic.Unknown").replace("$str$", args[0]):null, list);
-                    } else {
-                        return new NamedContainer<>(null, Collections.emptyList());
-                    }
-                } else /* if (args[0].equals("restore")) */ {
-                    if (args.length == 2) {
-                        return new NamedContainer<>(null, Collections.singletonList("<SubServer>"));
+                        return new NamedContainer<>(null, Collections.singletonList("<Subserver>"));
                     } else {
                         return new NamedContainer<>(null, Collections.emptyList());
                     }
                 }
             } else if (args[0].equals("start") ||
+                    args[0].equals("restart") ||
+                    args[0].equals("stop") ||
+                    args[0].equals("kill") || args[0].equals("terminate") ||
+                    args[0].equals("cmd") || args[0].equals("command") ||
+                    args[0].equals("update") || args[0].equals("upgrade") ||
                     (!(sender instanceof ProxiedPlayer) && (
                             args[0].equals("sudo") || args[0].equals("screen") ||
-                                    args[0].equals("del") || args[0].equals("delete")
+                                    args[0].equals("remove") || args[0].equals("del") || args[0].equals("delete")
                     ))) {
                 List<String> list = new ArrayList<String>();
-                if (args.length == 2) {
-                    if (last.length() == 0) {
-                        for (ServerImpl server : plugin.servers.values()) if (server instanceof SubServerImpl) list.add(server.getName());
-                    } else {
-                        for (ServerImpl server : plugin.servers.values()) {
-                            if (server instanceof SubServerImpl && server.getName().toLowerCase().startsWith(last)) list.add(last + server.getName().substring(last.length()));
+                RawServerSelection select = selectRawServers(null, args, 1, true);
+                if (select.last != null) {
+                    if (last.startsWith("::")) {
+                        Map<String, Host> hosts = hostCache;
+                        if (hosts.size() > 0) {
+                            if (Arrays.binarySearch(select.selection, "::*") < 0 && "::*".startsWith(last)) list.add("::*");
+                            if (sender instanceof ProxiedPlayer && Arrays.binarySearch(select.selection, "::.") < 0 && "::.".startsWith(last)) list.add("::.");
+                            for (Host host : hosts.values()) {
+                                String name = "::" + host.getName();
+                                if (Arrays.binarySearch(select.selection, name.toLowerCase()) < 0 && name.toLowerCase().startsWith(last)) list.add(Last + name.substring(last.length()));
+                            }
                         }
-                    }
-                    return new NamedContainer<>((list.size() <= 0)?plugin.api.getLang("SubServers", "Command.Generic.Unknown-SubServer").replace("$str$", args[0]):null, list);
-                } else {
-                    return new NamedContainer<>(null, Collections.emptyList());
-                }
-            } else if (args[0].equals("restart") ||
-                    args[0].equals("stop") ||
-                    args[0].equals("kill") || args[0].equals("terminate")) {
-                List<String> list = new ArrayList<String>();
-                if (args.length == 2) {
-                    if (last.length() == 0) {
-                        if (sender instanceof ProxiedPlayer) list.add(".");
-                        if (!args[0].equals("restart")) list.add("*");
-                        for (ServerImpl server : plugin.servers.values()) if (server instanceof SubServerImpl) list.add(server.getName());
-                    } else {
-                        if (sender instanceof ProxiedPlayer && ".".startsWith(last)) list.add(".");
-                        if (!args[0].equals("restart") && "*".startsWith(last)) list.add("*");
-                        for (ServerImpl server : plugin.servers.values()) {
-                            if (server instanceof SubServerImpl && server.getName().toLowerCase().startsWith(last)) list.add(last + server.getName().substring(last.length()));
+                        return new NamedContainer<>((list.size() <= 0)?plugin.api.getLang("SubServers", "Command.Generic.Unknown-Host").replace("$str$", select.last):null, list);
+                    } else if (last.startsWith(":")) {
+                        Map<String, List<Server>> groups = groupCache;
+                        if (groups.size() > 0) {
+                            if (Arrays.binarySearch(select.selection, ":*") < 0 && ":*".startsWith(last)) list.add(":*");
+                            if (sender instanceof ProxiedPlayer && Arrays.binarySearch(select.selection, ":.") < 0 && ":.".startsWith(last)) list.add(":.");
+                            for (String group : groups.keySet()) {
+                                group = ":" + group;
+                                if (Arrays.binarySearch(select.selection, group.toLowerCase()) < 0 && group.toLowerCase().startsWith(last)) list.add(Last + group.substring(last.length()));
+                            }
                         }
-                    }
-                    return new NamedContainer<>((list.size() <= 0)?plugin.api.getLang("SubServers", "Command.Generic.Unknown-SubServer").replace("$str$", args[0]):null, list);
-                } else {
-                    return new NamedContainer<>(null, Collections.emptyList());
-                }
-            } else if (args[0].equals("cmd") || args[0].equals("command")) {
-                if (args.length == 2) {
-                    List<String> list = new ArrayList<String>();
-                    if (last.length() == 0) {
-                        if (sender instanceof ProxiedPlayer) list.add(".");
-                        list.add("*");
-                        for (ServerImpl server : plugin.servers.values()) if (server instanceof SubServerImpl) list.add(server.getName());
+                        return new NamedContainer<>((list.size() <= 0)?plugin.api.getLang("SubServers", "Command.Generic.Unknown-Group").replace("$str$", select.last):null, list);
                     } else {
-                        if (sender instanceof ProxiedPlayer && ".".startsWith(last)) list.add(".");
-                        if ("*".startsWith(last)) list.add("*");
-                        for (ServerImpl server : plugin.servers.values()) {
-                            if (server instanceof SubServerImpl && server.getName().toLowerCase().startsWith(last)) list.add(last + server.getName().substring(last.length()));
+                        Map<String, ServerImpl> subservers = plugin.servers;
+                        if (subservers.size() > 0) {
+                            if (Arrays.binarySearch(select.selection, "*") < 0 && "*".startsWith(last)) list.add("*");
+                            if (sender instanceof ProxiedPlayer && Arrays.binarySearch(select.selection, ".") < 0 && ".".startsWith(last)) list.add(".");
+                            for (ServerImpl server : subservers.values()) {
+                                if (server instanceof SubServerImpl && Arrays.binarySearch(select.selection, server.getName().toLowerCase()) < 0 && server.getName().toLowerCase().startsWith(last)) list.add(Last + server.getName().substring(last.length()));
+                            }
                         }
+                        return new NamedContainer<>((list.size() <= 0)?plugin.api.getLang("SubServers", "Command.Generic.Unknown-SubServer").replace("$str$", select.last):null, list);
                     }
-                    return new NamedContainer<>((list.size() <= 0)?plugin.api.getLang("SubServers", "Command.Generic.Unknown-SubServer").replace("$str$", args[0]):null, list);
-                } else if (args.length == 3) {
-                    return new NamedContainer<>(null, Collections.singletonList("<Command>"));
-                } else {
-                    return new NamedContainer<>(null, Collections.singletonList("[Args...]"));
+                } else if (args[0].equals("cmd") || args[0].equals("command")) {
+                    if (select.args.length == 3) {
+                        return new NamedContainer<>(null, Collections.singletonList("<Command>"));
+                    } else {
+                        return new NamedContainer<>(null, Collections.singletonList("[Args...]"));
+                    }
+                } else if (args[0].equals("update") || args[0].equals("upgrade")) {
+                    if (select.args.length == 3) {
+                        return new NamedContainer<>(null, Collections.singletonList("[Version]"));
+                    }
                 }
+                return new NamedContainer<>(null, Collections.emptyList());
             } else if (args[0].equals("create")) {
+                updateCache();
                 if (args.length == 2) {
                     return new NamedContainer<>(null, Collections.singletonList("<Name>"));
                 } else if (args.length == 3) {
-                    updateCache();
                     List<String> list = new ArrayList<String>();
-                    if (cacheDate <= 0) {
-                        list.add("<Host>");
-                    } else if (last.length() == 0) {
-                        list.addAll(hostCache.keySet());
-                    } else {
-                        for (String host : hostCache.keySet()) {
-                            if (host.toLowerCase().startsWith(last)) list.add(last + host.substring(last.length()));
-                        }
+                    for (Host host : hostCache.values()) {
+                        if (host.getName().toLowerCase().startsWith(last)) list.add(Last + host.getName().substring(last.length()));
                     }
                     return new NamedContainer<>((list.size() <= 0)?plugin.api.getLang("SubServers", "Command.Generic.Unknown-Host").replace("$str$", args[0]):null, list);
                 } else if (args.length == 4) {
-                    updateCache();
                     List<String> list = new ArrayList<String>();
-                    if (cacheDate <= 0 || !hostCache.keySet().contains(args[2].toLowerCase())) {
+                    Map<String, Host> hosts = hostCache;
+                    if (!hosts.keySet().contains(args[2].toLowerCase())) {
                         list.add("<Template>");
-                    } else if (last.length() == 0) {
-                        list.addAll(hostCache.get(args[2].toLowerCase()));
                     } else {
-                        for (String template : hostCache.get(args[2].toLowerCase())) {
-                            if (template.toLowerCase().startsWith(last)) list.add(last + template.substring(last.length()));
+                        for (SubCreator.ServerTemplate template : hosts.get(args[2].toLowerCase()).getCreator().getTemplates().values()) {
+                            if (template.getName().toLowerCase().startsWith(last)) list.add(Last + template.getName().substring(last.length()));
                         }
                     }
                     return new NamedContainer<>((list.size() <= 0)?plugin.api.getLang("SubServers", "Command.Creator.Invalid-Template").replace("$str$", args[0]):null, list);
@@ -928,19 +1197,36 @@ public final class SubCommand extends CommandX {
                 } else {
                     return new NamedContainer<>(null, Collections.emptyList());
                 }
-            } else if (args[0].equals("update") || args[0].equals("upgrade")) {
-                if (args.length == 2) {
+            } else if (sender instanceof ProxiedPlayer && (args[0].equals("tp") || args[0].equals("teleport"))) {
+                if (args.length == 2 || args.length == 3) {
                     List<String> list = new ArrayList<String>();
-                    if (last.length() == 0) {
-                        for (ServerImpl server : plugin.servers.values()) list.add(server.getName());
-                    } else {
-                        for (ServerImpl server : plugin.servers.values()) {
-                            if (server.getName().toLowerCase().startsWith(last)) list.add(last + server.getName().substring(last.length()));
+                    if (args.length == 2) {
+                        list.add("@p");
+                        list.add("@a");
+                        list.add("@r");
+                        list.add("@s");
+
+                        List<UUID> used = new ArrayList<UUID>();
+                        for (ProxiedPlayer player : ((ProxiedPlayer) sender).getServer().getInfo().getPlayers()) {
+                            if (player.getName().toLowerCase().startsWith(last)) list.add(Last + player.getName().substring(last.length()));
+                            used.add(player.getUniqueId());
+                        }
+                        if (plugin.redis) {
+                            try {
+                                for (UUID id : (Set<UUID>) plugin.redis("getPlayersOnServer", new NamedContainer<>(String.class, ((ProxiedPlayer) sender).getServer().getInfo().getName()))) {
+                                    if (!used.contains(id)) {
+                                        String name = (String) plugin.redis("getNameFromUuid", new NamedContainer<>(UUID.class, id), new NamedContainer<>(boolean.class, false));
+                                        if (name.toLowerCase().startsWith(last)) list.add(Last + name.substring(last.length()));
+                                        used.add(id);
+                                    }
+                                }
+                            } catch (Exception e) {}
                         }
                     }
-                    return new NamedContainer<>((list.size() <= 0)?plugin.api.getLang("SubServers", "Command.Generic.Unknown-SubServer").replace("$str$", args[0]):null, list);
-                } else if (args.length == 3) {
-                    return new NamedContainer<>(null, Collections.singletonList("[Version]"));
+                    for (ServerImpl server : plugin.servers.values()) {
+                        if (server.getName().toLowerCase().startsWith(last)) list.add(Last + server.getName().substring(last.length()));
+                    }
+                    return new NamedContainer<>((list.size() <= 0)?plugin.api.getLang("SubServers", "Command.Generic.Unknown-Server").replace("$str$", args[0]):null, list);
                 } else {
                     return new NamedContainer<>(null, Collections.emptyList());
                 }
@@ -950,29 +1236,185 @@ public final class SubCommand extends CommandX {
         }
     }
 
+    private RawServerSelection selectRawServers(CommandSender sender, String[] rargs, int index, boolean mode) {
+        LinkedList<String> msgs = new LinkedList<String>();
+        LinkedList<String> args = new LinkedList<String>();
+        LinkedList<String> selection = new LinkedList<>();
+        LinkedList<ServerImpl> servers = new LinkedList<ServerImpl>();
+        String last = null;
+
+        updateCache();
+
+        int i = 0;
+        while (i < index) {
+            args.add(rargs[i]);
+            ++i;
+        }
+
+        Map<String, Host> hostMap = null;
+        Map<String, List<Server>> groupMap = null;
+        Map<String, ServerImpl> serverMap = null;
+
+        StringBuilder completed = new StringBuilder();
+        for (boolean run = true; run && i < rargs.length; i++) {
+            String current = last = rargs[i];
+            completed.append(current);
+            if (current.endsWith(",")) {
+                current = current.substring(0, current.length() - 1);
+                completed.append(' ');
+            } else run = false;
+            selection.add(current.toLowerCase());
+
+            if (current.length() > 0) {
+                LinkedList<ServerImpl> select = new LinkedList<ServerImpl>();
+                if (serverMap == null) serverMap = plugin.servers;
+
+                if (current.startsWith("::") && current.length() > 2) {
+                    current = current.substring(2);
+                    if (hostMap == null) hostMap = hostCache;
+
+                    if (current.equals("*")) {
+                        for (Host host : hostMap.values()) {
+                            for (SubServer server : host.getSubServers().values()) {
+                                ServerImpl translated = serverMap.getOrDefault(server.getName().toLowerCase(), null);
+                                if (translated != null) select.add(translated);
+                            }
+                        }
+                    } else {
+                        Host host = hostMap.getOrDefault(current.toLowerCase(), null);
+                        if (host != null) {
+                            for (SubServer server : host.getSubServers().values()) {
+                                ServerImpl translated = serverMap.getOrDefault(server.getName().toLowerCase(), null);
+                                if (translated != null) select.add(translated);
+                            }
+                            if (select.size() <= 0) {
+                                String msg = "SubServers > There are no " + ((mode)?"sub":"") + "servers on host: " + host.getName();
+                                if (sender != null) sender.sendMessage(msg);
+                                msgs.add(msg);
+                            }
+                        } else {
+                            String msg = "SubServers > There is no host with name: " + current;
+                            if (sender != null) sender.sendMessage(msg);
+                            msgs.add(msg);
+                        }
+                    }
+                } else if (current.startsWith(":") && current.length() > 1) {
+                    current = current.substring(1);
+                    if (groupMap == null) groupMap = groupCache;
+
+                    if (current.equals("*")) {
+                        for (List<Server> group : groupMap.values()) for (Server server : group) {
+                            if (!mode || server instanceof SubServer) {
+                                ServerImpl translated = serverMap.getOrDefault(server.getName().toLowerCase(), null);
+                                if (translated != null) select.add(translated);
+                            }
+                        }
+                    } else {
+                        Map.Entry<String, List<Server>> group = null;
+                        for (Map.Entry<String, List<Server>> entry : groupMap.entrySet()) if (current.equalsIgnoreCase(entry.getKey())) {
+                            group = entry;
+                            break;
+                        }
+                        if (group != null) {
+                            for (Server server : group.getValue()) {
+                                if (!mode || server instanceof SubServer) {
+                                    ServerImpl translated = serverMap.getOrDefault(server.getName().toLowerCase(), null);
+                                    if (translated != null) select.add(translated);
+                                }
+                            }
+                            if (select.size() <= 0) {
+                                String msg = "SubServers > There are no " + ((mode)?"sub":"") + "servers in group: " + group.getKey();
+                                if (sender != null) sender.sendMessage(msg);
+                                msgs.add(msg);
+                            }
+                        } else {
+                            String msg = "SubServers > There is no group with name: " + current;
+                            if (sender != null) sender.sendMessage(msg);
+                            msgs.add(msg);
+                        }
+                    }
+                } else {
+
+                    if (current.equals("*")) {
+                        for (ServerImpl server : serverMap.values()) {
+                            if (!mode || server instanceof SubServerImpl) select.add(server);
+                        }
+                    } else {
+                        ServerImpl server = serverMap.getOrDefault(current.toLowerCase(), null);
+                        if (server != null) {
+                            select.add(server);
+                        } else {
+                            String msg = "SubServers > There is no " + ((mode)?"sub":"") + "server with name: " + current;
+                            if (sender != null) sender.sendMessage(msg);
+                            msgs.add(msg);
+                        }
+                    }
+                }
+
+                for (ServerImpl server : select) {
+                    if (!servers.contains(server)) servers.add(server);
+                }
+            }
+        }
+        args.add(completed.toString());
+
+        while (i < rargs.length) {
+            args.add(rargs[i]);
+            last = null;
+            i++;
+        }
+
+        LinkedList<SubServerImpl> subservers = new LinkedList<SubServerImpl>();
+        for (ServerImpl server : servers) if (server instanceof SubServerImpl) subservers.add((SubServerImpl) server);
+
+        if ((!mode && servers.size() <= 0) || (mode && subservers.size() <= 0)) {
+            String msg = "SubServers > No " + ((mode)?"sub":"") + "servers were selected";
+            if (sender != null) sender.sendMessage(msg);
+            msgs.add(msg);
+        }
+
+        return new RawServerSelection(msgs, selection, servers, subservers, args, last);
+    }
+    private static final class RawServerSelection {
+        private final String[] msgs;
+        private final String[] selection;
+        private final ServerImpl[] servers;
+        private final SubServerImpl[] subservers;
+        private final String[] args;
+        private final String last;
+
+        private RawServerSelection(List<String> msgs, List<String> selection, List<ServerImpl> servers, List<SubServerImpl> subservers, List<String> args, String last) {
+            this.msgs = msgs.toArray(new String[0]);
+            this.selection = selection.toArray(new String[0]);
+            this.servers = servers.toArray(new ServerImpl[0]);
+            this.subservers = subservers.toArray(new SubServerImpl[0]);
+            this.args = args.toArray(new String[0]);
+            this.last = last;
+
+            Arrays.sort(this.selection);
+        }
+    }
+
     private void updateCache() {
         if (Calendar.getInstance().getTime().getTime() - cacheDate >= TimeUnit.MINUTES.toMillis(1)) {
             cacheDate = Calendar.getInstance().getTime().getTime();
             plugin.api.getProxies(proxies -> {
-                proxyCache = new LinkedList<String>(proxies.keySet());
+                proxyCache = new TreeMap<>(proxies);
+                cacheDate = Calendar.getInstance().getTime().getTime();
+            });
+            plugin.api.getMasterProxy(master -> {
+                proxyMasterCache = master;
                 cacheDate = Calendar.getInstance().getTime().getTime();
             });
             plugin.api.getHosts(hosts -> {
-                TreeMap<String, List<String>> cache = new TreeMap<String, List<String>>();
-                for (Host host : hosts.values()) {
-                    List<String> templates = new ArrayList<String>();
-                    templates.addAll(host.getCreator().getTemplates().keySet());
-                    cache.put(host.getName().toLowerCase(), templates);
-                }
-                hostCache = cache;
+                hostCache = new TreeMap<>(hosts);
                 cacheDate = Calendar.getInstance().getTime().getTime();
             });
             plugin.api.getGroups(groups -> {
-                groupCache = new LinkedList<String>(groups.keySet());
+                groupCache = new TreeMap<>(groups);
                 cacheDate = Calendar.getInstance().getTime().getTime();
             });
         }
-
     }
 
     /**
@@ -996,7 +1438,7 @@ public final class SubCommand extends CommandX {
             );
         }
 
-        protected static NamedContainer<BungeeServer, CommandX> newInstance(ExProxy plugin, String command) {
+        static NamedContainer<BungeeServer, CommandX> newInstance(ExProxy plugin, String command) {
             NamedContainer<BungeeServer, CommandX> cmd = new NamedContainer<>(new BungeeServer(plugin, command), null);
             CommandX now = cmd.name();
             //if (plugin.api.getGameVersion()[plugin.api.getGameVersion().length - 1].compareTo(new Version("1.13")) >= 0) { // TODO Future Command Validator API?
@@ -1085,7 +1527,7 @@ public final class SubCommand extends CommandX {
     @SuppressWarnings("unchecked")
     public static final class BungeeList extends Command {
         private ExProxy plugin;
-        protected BungeeList(ExProxy plugin, String command) {
+        BungeeList(ExProxy plugin, String command) {
             super(command, "bungeecord.command.list");
             this.plugin = plugin;
 

@@ -1,19 +1,25 @@
 package net.ME1312.SubServers.Client.Sponge.Network.API;
 
+import net.ME1312.Galaxi.Library.Callback.Callback;
+import net.ME1312.Galaxi.Library.Container.NamedContainer;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
-import net.ME1312.Galaxi.Library.NamedContainer;
+import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubData.Client.DataSender;
 import net.ME1312.SubData.Client.Library.ForwardedDataSender;
 import net.ME1312.SubData.Client.SubDataClient;
 import net.ME1312.SubData.Client.SubDataSender;
+import net.ME1312.SubServers.Client.Sponge.Network.Packet.PacketDownloadPlayerInfo;
 import net.ME1312.SubServers.Client.Sponge.Network.Packet.PacketDownloadServerInfo;
 import net.ME1312.SubServers.Client.Sponge.SubAPI;
+import org.spongepowered.api.service.permission.Subject;
 
+import java.lang.reflect.InvocationTargetException;
 import java.net.InetSocketAddress;
 import java.util.*;
 
 public class Server {
     ObjectMap<String> raw;
+    private List<RemotePlayer> players = null;
     long timestamp;
 
     /**
@@ -32,6 +38,7 @@ public class Server {
 
     void load(ObjectMap<String>  raw) {
         this.raw = raw;
+        this.players = null;
         this.timestamp = Calendar.getInstance().getTime().getTime();
     }
 
@@ -40,7 +47,7 @@ public class Server {
      */
     public void refresh() {
         String name = getName();
-        ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketDownloadServerInfo(name, data -> load(data.getMap(name))));
+        ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketDownloadServerInfo(Collections.singletonList(name), data -> load(data.getMap(name))));
     }
 
     /**
@@ -56,6 +63,44 @@ public class Server {
         Collections.sort(keys);
         for (Integer channel : keys) channels.add((subdata.isNull(channel))?null:new ForwardedDataSender((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0], subdata.getUUID(channel)));
         return channels.toArray(new SubDataSender[0]);
+    }
+
+    /**
+     * Determine if an <i>object</i> can perform some action on this server using possible permissions
+     *
+     * @param object Object to check against
+     * @param permissions Permissions to check (use <b>%</b> as a placeholder for the server name)
+     * @return Permission Check Result
+     */
+    public boolean permits(Subject object, String... permissions) {
+        if (Util.isNull(object)) throw new NullPointerException();
+        boolean permitted = false;
+
+        for (int p = 0; !permitted && p < permissions.length; p++) {
+            String perm = permissions[p];
+            if (perm != null) {
+                // Check all servers & individual servers permission
+                permitted = object.hasPermission(perm.replace("%", "*"))
+                         || object.hasPermission(perm.replace("%", this.getName().toLowerCase()));
+
+                // Check all hosts & individual hosts permission
+                if (this instanceof SubServer) {
+                    permitted = permitted || object.hasPermission(perm.replace("%", "::*"))
+                                          || object.hasPermission(perm.replace("%", "::" + ((SubServer) this).getHost().toLowerCase()));
+                }
+
+                // Check all groups & individual groups permission
+                List<String> groups = this.getGroups();
+                if (groups.size() > 0) {
+                    permitted = permitted || object.hasPermission(perm.replace("%", ":*"));
+                    for (int g = 0; !permitted && g < groups.size(); g++) {
+                        permitted = object.hasPermission(perm.replace("%", ":" + groups.get(g).toLowerCase()));
+                    }
+                }
+            }
+        }
+
+        return permitted;
     }
 
     /**
@@ -94,16 +139,51 @@ public class Server {
     }
 
     /**
-     * Get the players on this server
+     * Get players on this server across all known proxies
      *
-     * @return Player Collection
+     * @return Remote Player Collection
      */
-    public Collection<NamedContainer<String, UUID>> getPlayers() {
+    public Collection<NamedContainer<String, UUID>> getGlobalPlayers() {
         List<NamedContainer<String, UUID>> players = new ArrayList<NamedContainer<String, UUID>>();
         for (String id : raw.getMap("players").getKeys()) {
-            players.add(new NamedContainer<String, UUID>(raw.getMap("players").getMap(id).getRawString("name"), UUID.fromString(id)));
+            players.add(new NamedContainer<String, UUID>(raw.getMap("players").getRawString(id), UUID.fromString(id)));
         }
         return players;
+    }
+
+    /**
+     * Get players on this server across all known proxies
+     *
+     * @param callback Remote Player Collection
+     */
+    public void getGlobalPlayers(Callback<Collection<RemotePlayer>> callback) {
+        if (Util.isNull(callback)) throw new NullPointerException();
+        StackTraceElement[] origin = new Exception().getStackTrace();
+        Runnable run = () -> {
+            try {
+                callback.run(players);
+            } catch (Throwable e) {
+                Throwable ew = new InvocationTargetException(e);
+                ew.setStackTrace(origin);
+                ew.printStackTrace();
+            }
+        };
+
+        if (players == null) {
+            LinkedList<UUID> ids = new LinkedList<UUID>();
+            for (String id : raw.getMap("players").getKeys()) ids.add(UUID.fromString(id));
+            ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketDownloadPlayerInfo(ids, data -> {
+                LinkedList<RemotePlayer> players = new LinkedList<RemotePlayer>();
+                for (String player : data.getKeys()) {
+                    players.add(new RemotePlayer(data.getMap(player)));
+                }
+
+                this.players = players;
+                run.run();
+            }));
+        } else {
+            run.run();
+        }
     }
 
     /**

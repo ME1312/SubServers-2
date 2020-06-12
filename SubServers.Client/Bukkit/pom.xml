@@ -48,14 +48,14 @@
         <dependency>
             <groupId>net.ME1312.Galaxi</groupId>
             <artifactId>GalaxiUtil</artifactId>
-            <version>20w08c</version>
+            <version>20w15a</version>
             <scope>compile</scope>
             <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>net.ME1312.SubData</groupId>
             <artifactId>Client</artifactId>
-            <version>20w07d</version>
+            <version>20w15a</version>
             <scope>compile</scope>
             <optional>true</optional>
         </dependency>
@@ -150,7 +150,7 @@
                         <configuration>
                             <windowtitle>SubServers.Client.Bukkit Javadoc</windowtitle>
                             <doctitle>SubServers.Client.Bukkit Javadoc</doctitle>
-                            <show>public</show>
+                            <show>protected</show>
                             <destDir>./</destDir>
                             <outputDirectory>${basedir}/../../Javadoc/SubServers.Client.Bukkit</outputDirectory>
                             <reportOutputDirectory>${basedir}/../../Javadoc/SubServers.Client.Bukkit</reportOutputDirectory>

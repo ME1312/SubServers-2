@@ -4,28 +4,32 @@ import com.google.gson.Gson;
 import com.google.inject.Inject;
 import net.ME1312.SubData.Client.DataClient;
 import net.ME1312.SubData.Client.Encryption.AES;
+import net.ME1312.SubData.Client.Encryption.DHE;
 import net.ME1312.SubData.Client.Encryption.RSA;
+import net.ME1312.SubData.Client.Library.DataSize;
 import net.ME1312.SubData.Client.Library.DisconnectReason;
 import net.ME1312.SubData.Client.SubDataClient;
 import net.ME1312.SubServers.Client.Sponge.Graphic.UIHandler;
 import net.ME1312.Galaxi.Library.Config.YAMLConfig;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.SubServers.Client.Sponge.Library.Metrics;
-import net.ME1312.Galaxi.Library.NamedContainer;
+import net.ME1312.Galaxi.Library.Container.NamedContainer;
 import net.ME1312.Galaxi.Library.UniversalFile;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
-import net.ME1312.SubServers.Client.Sponge.Library.Updates.ConfigUpdater;
+import net.ME1312.SubServers.Client.Sponge.Library.ConfigUpdater;
 import net.ME1312.SubServers.Client.Sponge.Network.SubProtocol;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.config.ConfigDir;
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.state.GameInitializationEvent;
 import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
 import org.spongepowered.api.event.game.state.GameStoppingEvent;
+import org.spongepowered.api.network.ChannelBinding;
 import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.plugin.PluginContainer;
 
@@ -42,7 +46,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * SubServers Client Plugin Class
  */
-@Plugin(id = "subservers-client-sponge", name = "SubServers-Client-Sponge", authors = "ME1312", version = "2.15.2a", url = "https://github.com/ME1312/SubServers-2", description = "Take control of the server manager — from your servers")
+@Plugin(id = "subservers-client-sponge", name = "SubServers-Client-Sponge", authors = "ME1312", version = "2.16a", url = "https://github.com/ME1312/SubServers-2", description = "Take control of the server manager — from your servers")
 public final class SubPlugin {
     HashMap<Integer, SubDataClient> subdata = new HashMap<Integer, SubDataClient>();
     NamedContainer<Long, Map<String, Map<String, String>>> lang = null;
@@ -100,6 +104,10 @@ public final class SubPlugin {
 
             running = true;
             subprotocol = SubProtocol.get();
+            subprotocol.registerCipher("DHE", DHE.get(128));
+            subprotocol.registerCipher("DHE-128", DHE.get(128));
+            subprotocol.registerCipher("DHE-192", DHE.get(192));
+            subprotocol.registerCipher("DHE-256", DHE.get(256));
             reload(false);
 
             if (!config.get().getMap("Settings").getBoolean("API-Only-Mode", false)) {
@@ -153,7 +161,9 @@ public final class SubPlugin {
         subprotocol.unregisterCipher("AES-192");
         subprotocol.unregisterCipher("AES-256");
         subprotocol.unregisterCipher("RSA");
-        api.name = config.get().getMap("Settings").getMap("SubData").getString("Name", null);
+
+        subprotocol.setBlockSize(config.get().getMap("Settings").getMap("SubData").getLong("Block-Size", (long) DataSize.MB));
+        api.name = config.get().getMap("Settings").getMap("SubData").getString("Name", System.getenv("name"));
         Logger log = LoggerFactory.getLogger("SubData");
 
         if (config.get().getMap("Settings").getMap("SubData").getRawString("Password", "").length() > 0) {
@@ -197,6 +207,7 @@ public final class SubPlugin {
         if (disconnect == null || (this.reconnect && reconnect > 0 && disconnect.name() != DisconnectReason.PROTOCOL_MISMATCH && disconnect.name() != DisconnectReason.ENCRYPTION_MISMATCH)) {
             long reset = resetDate;
             Logger log = LoggerFactory.getLogger("SubData");
+            if (disconnect != null) log.info("Attempting reconnect in " + reconnect + " seconds");
             Sponge.getScheduler().createTaskBuilder().async().execute(new Runnable() {
                 @Override
                 public void run() {
@@ -217,6 +228,19 @@ public final class SubPlugin {
                 }
             }).delay((disconnect == null)?0:reconnect, TimeUnit.SECONDS).submit(plugin);
         }
+    }
+
+    /**
+     * Send a message to the BungeeCord Plugin Messaging Channel
+     *
+     * @param player Player that will send
+     * @param message Message contents
+     */
+    public void pmc(Player player, String... message) {
+        ChannelBinding.RawDataChannel channel = game.getChannelRegistrar().getOrCreateRaw(this, "BungeeCord");
+        channel.sendTo(player, buf -> {
+            for (String m : message) buf.writeUTF(m);
+        });
     }
 
     /**

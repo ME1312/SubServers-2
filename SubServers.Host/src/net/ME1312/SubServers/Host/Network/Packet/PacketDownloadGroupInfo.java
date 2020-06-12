@@ -8,6 +8,7 @@ import net.ME1312.SubData.Client.Protocol.PacketObjectOut;
 import net.ME1312.SubData.Client.SubDataSender;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -16,7 +17,7 @@ import java.util.UUID;
  */
 public class PacketDownloadGroupInfo implements PacketObjectIn<Integer>, PacketObjectOut<Integer> {
     private static HashMap<UUID, Callback<ObjectMap<String>>[]> callbacks = new HashMap<UUID, Callback<ObjectMap<String>>[]>();
-    private String group;
+    private List<String> groups;
     private UUID tracker;
 
     /**
@@ -27,13 +28,13 @@ public class PacketDownloadGroupInfo implements PacketObjectIn<Integer>, PacketO
     /**
      * New PacketDownloadGroupInfo (Out)
      *
-     * @param group Group name (or null for all)
+     * @param groups Group names (or null for all)
      * @param callback Callbacks
      */
     @SafeVarargs
-    public PacketDownloadGroupInfo(String group, Callback<ObjectMap<String>>... callback) {
+    public PacketDownloadGroupInfo(List<String> groups, Callback<ObjectMap<String>>... callback) {
         if (Util.isNull((Object) callback)) throw new NullPointerException();
-        this.group = group;
+        this.groups = groups;
         this.tracker = Util.getNew(callbacks.keySet(), UUID::randomUUID);
         callbacks.put(tracker, callback);
     }
@@ -42,7 +43,7 @@ public class PacketDownloadGroupInfo implements PacketObjectIn<Integer>, PacketO
     public ObjectMap<Integer> send(SubDataSender client) {
         ObjectMap<Integer> json = new ObjectMap<Integer>();
         json.set(0x0000, tracker);
-        if (group != null) json.set(0x0001, group);
+        if (groups != null) json.set(0x0001, groups);
         return json;
     }
 

@@ -11,8 +11,10 @@ import net.ME1312.SubData.Server.Protocol.PacketObjectOut;
 import net.ME1312.SubServers.Bungee.Library.Compatibility.Logger;
 import net.ME1312.SubServers.Bungee.SubProxy;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+
+import static net.ME1312.SubServers.Bungee.Network.Packet.PacketLinkServer.req;
+import static net.ME1312.SubServers.Bungee.Network.Packet.PacketLinkServer.last;
 
 /**
  * Link External Host Packet
@@ -64,7 +66,7 @@ public class PacketLinkExHost implements InitialPacket, PacketObjectIn<Integer>,
                     if (!subdata.keySet().contains(channel) || (channel == 0 && subdata.get(0) == null)) {
                         ((ExternalHost) host).setSubData(client, channel);
                         Logger.get("SubData").info(client.getAddress().toString() + " has been defined as Host: " + host.getName() + ((channel > 0)?" (Sub-"+channel+")":""));
-                        client.sendPacket(new PacketLinkExHost(0, null));
+                        queue(host.getName(), () -> client.sendPacket(new PacketLinkExHost(0, null)));
                         setReady(client, true);
                     } else {
                         client.sendPacket(new PacketLinkExHost(3, "Host already linked"));
@@ -79,6 +81,20 @@ public class PacketLinkExHost implements InitialPacket, PacketObjectIn<Integer>,
             client.sendPacket(new PacketLinkExHost(1, null));
             e.printStackTrace();
         }
+    }
+
+    private void queue(String name, Runnable action) {
+        final long now = Calendar.getInstance().getTime().getTime();
+        new Timer("SubServers.Bungee::ExHost_Linker(" + name + ")").schedule(new TimerTask() {
+            @Override
+            public void run() {
+                action.run();
+                --req;
+            }
+        }, (now - last < 500) ? (req * 500) : 0);
+
+        ++req;
+        last = now;
     }
 
     @Override

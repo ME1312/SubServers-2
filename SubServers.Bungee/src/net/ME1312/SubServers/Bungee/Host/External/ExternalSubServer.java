@@ -5,10 +5,10 @@ import net.ME1312.SubServers.Bungee.Event.*;
 import net.ME1312.SubServers.Bungee.Host.*;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Map.ObjectMapValue;
-import net.ME1312.Galaxi.Library.Container;
+import net.ME1312.Galaxi.Library.Container.Container;
 import net.ME1312.SubServers.Bungee.Library.Compatibility.Logger;
 import net.ME1312.SubServers.Bungee.Library.Exception.InvalidServerException;
-import net.ME1312.Galaxi.Library.NamedContainer;
+import net.ME1312.Galaxi.Library.Container.NamedContainer;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubServers.Bungee.Network.Packet.PacketExEditServer;
 import net.md_5.bungee.BungeeServerInfo;
@@ -24,12 +24,12 @@ import java.util.UUID;
 /**
  * External SubServer Class
  */
-public class ExternalSubServer extends SubServerContainer {
+public class ExternalSubServer extends SubServerImpl {
     private ExternalHost host;
     private boolean enabled;
     private Container<Boolean> log;
     private String dir;
-    protected String exec;
+    String exec;
     private String stopcmd;
     private StopAction stopaction;
     private LinkedList<LoggedCommand> history;
@@ -53,8 +53,33 @@ public class ExternalSubServer extends SubServerContainer {
      * @param restricted Restricted Status
      * @throws InvalidServerException
      */
-    public ExternalSubServer(ExternalHost host, String name, boolean enabled, int port, String motd, boolean log, String directory, String executable, String stopcmd, boolean hidden, boolean restricted) throws InvalidServerException {
+    public static ExternalSubServer construct(ExternalHost host, String name, boolean enabled, int port, String motd, boolean log, String directory, String executable, String stopcmd, boolean hidden, boolean restricted) throws InvalidServerException {
+        try {
+            return new ExternalSubServer(host, name, enabled, port, motd, log, directory, executable, stopcmd, hidden, restricted);
+        } catch (NoSuchMethodError e) {
+            return new ExternalSubServer(host, name, enabled, (Integer) port, motd, log, directory, executable, stopcmd, hidden, restricted);
+        }
+    }
+
+    /**
+     * Super Method 2 (newest)
+     * @see #construct(ExternalHost, String, boolean, int, String, boolean, String, String, String, boolean, boolean) for method details
+     */
+    protected ExternalSubServer(ExternalHost host, String name, boolean enabled, int port, String motd, boolean log, String directory, String executable, String stopcmd, boolean hidden, boolean restricted) throws InvalidServerException {
         super(host, name, port, motd, hidden, restricted);
+        init(host, name, enabled, port, motd, log, directory, executable, stopcmd, hidden, restricted);
+    }
+
+    /**
+     * Super Method 1 (oldest)
+     * @see #construct(ExternalHost, String, boolean, int, String, boolean, String, String, String, boolean, boolean) for method details
+     */
+    protected ExternalSubServer(ExternalHost host, String name, boolean enabled, Integer port, String motd, boolean log, String directory, String executable, String stopcmd, boolean hidden, boolean restricted) throws InvalidServerException {
+        super(host, name, port, motd, hidden, restricted);
+        init(host, name, enabled, port, motd, log, directory, executable, stopcmd, hidden, restricted);
+    }
+
+    private void init(ExternalHost host, String name, boolean enabled, int port, String motd, boolean log, String directory, String executable, String stopcmd, boolean hidden, boolean restricted) throws InvalidServerException {
         if (Util.isNull(host, name, enabled, port, motd, log, stopcmd, hidden, restricted)) throw new NullPointerException();
         this.host = host;
         this.enabled = enabled;
@@ -226,7 +251,7 @@ public class ExternalSubServer extends SubServerContainer {
                                 break;
                             case "display":
                                 if (value.isString()) {
-                                    Field f = ServerContainer.class.getDeclaredField("nick");
+                                    Field f = ServerImpl.class.getDeclaredField("nick");
                                     f.setAccessible(true);
                                     if (value.isNull() || value.asString().length() == 0 || getName().equals(value.asString())) {
                                         f.set(this, null);
@@ -259,7 +284,7 @@ public class ExternalSubServer extends SubServerContainer {
                                 break;
                             case "group":
                                 if (value.isList()) {
-                                    Util.reflect(ServerContainer.class.getDeclaredField("groups"), this, value.asStringList());
+                                    Util.reflect(ServerImpl.class.getDeclaredField("groups"), this, value.asStringList());
                                     if (perma && this.host.plugin.servers.get().getMap("Servers").getKeys().contains(getName())) {
                                         this.host.plugin.servers.get().getMap("Servers").getMap(getName()).set("Group", value.asStringList());
                                         this.host.plugin.servers.save();
@@ -283,7 +308,7 @@ public class ExternalSubServer extends SubServerContainer {
                                 break;
                             case "template":
                                 if (value.isString()) {
-                                    Util.reflect(SubServerContainer.class.getDeclaredField("template"), this, value.asString());
+                                    Util.reflect(SubServerImpl.class.getDeclaredField("template"), this, value.asString());
                                     if (perma && this.host.plugin.servers.get().getMap("Servers").getKeys().contains(getName())) {
                                         this.host.plugin.servers.get().getMap("Servers").getMap(getName()).set("Template", value.asString());
                                         this.host.plugin.servers.save();
@@ -422,7 +447,7 @@ public class ExternalSubServer extends SubServerContainer {
                                 break;
                             case "hidden":
                                 if (value.isBoolean()) {
-                                    Util.reflect(ServerContainer.class.getDeclaredField("hidden"), this, value.asBoolean());
+                                    Util.reflect(ServerImpl.class.getDeclaredField("hidden"), this, value.asBoolean());
                                     if (perma && this.host.plugin.servers.get().getMap("Servers").getKeys().contains(getName())) {
                                         this.host.plugin.servers.get().getMap("Servers").getMap(getName()).set("Hidden", isHidden());
                                         this.host.plugin.servers.save();
@@ -432,7 +457,7 @@ public class ExternalSubServer extends SubServerContainer {
                                 break;
                             case "whitelist":
                                 if (value.isList()) {
-                                    Util.reflect(ServerContainer.class.getDeclaredField("whitelist"), this, value.asUUIDList());
+                                    Util.reflect(ServerImpl.class.getDeclaredField("whitelist"), this, value.asUUIDList());
                                     c++;
                                 }
                                 break;
@@ -441,7 +466,7 @@ public class ExternalSubServer extends SubServerContainer {
                             forward.setStopAction(getStopAction());
                             if (!getName().equals(getDisplayName())) forward.setDisplayName(getDisplayName());
                             List<String> groups = new ArrayList<String>();
-                            Util.reflect(SubServerContainer.class.getDeclaredField("template"), forward, Util.reflect(SubServerContainer.class.getDeclaredField("template"), this));
+                            Util.reflect(SubServerImpl.class.getDeclaredField("template"), forward, Util.reflect(SubServerImpl.class.getDeclaredField("template"), this));
                             groups.addAll(getGroups());
                             for (String group : groups) {
                                 removeGroup(group);

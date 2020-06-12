@@ -30,14 +30,14 @@
         <dependency>
             <groupId>net.ME1312.Galaxi</groupId>
             <artifactId>GalaxiUtil</artifactId>
-            <version>20w08c</version>
+            <version>20w15a</version>
             <scope>compile</scope>
             <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>net.ME1312.SubData</groupId>
             <artifactId>Client</artifactId>
-            <version>20w07d</version>
+            <version>20w15a</version>
             <scope>compile</scope>
             <optional>true</optional>
         </dependency>
@@ -120,6 +120,7 @@
                         <configuration>
                             <windowtitle>SubServers.Client.Sponge Javadoc</windowtitle>
                             <doctitle>SubServers.Client.Sponge Javadoc</doctitle>
+                            <show>protected</show>
                             <destDir>./</destDir>
                             <outputDirectory>${basedir}/../../Javadoc/SubServers.Client.Sponge</outputDirectory>
                             <reportOutputDirectory>${basedir}/../../Javadoc/SubServers.Client.Sponge</reportOutputDirectory>

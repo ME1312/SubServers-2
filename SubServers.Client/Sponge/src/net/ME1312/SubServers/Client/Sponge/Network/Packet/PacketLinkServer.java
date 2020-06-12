@@ -44,7 +44,7 @@ public class PacketLinkServer implements InitialPacket, PacketObjectIn<Integer>,
     public ObjectMap<Integer> send(SubDataSender client) {
         ObjectMap<Integer> json = new ObjectMap<Integer>();
         if (plugin.api.getName() != null) json.set(0x0000, plugin.api.getName());
-        if (plugin.game.getServer().getBoundAddress().isPresent()) json.set(0x0001, plugin.game.getServer().getBoundAddress().get());
+        if (plugin.game.getServer().getBoundAddress().isPresent()) json.set(0x0001, plugin.game.getServer().getBoundAddress().get().getPort());
         json.set(0x0002, channel);
         return json;
     }
@@ -54,10 +54,8 @@ public class PacketLinkServer implements InitialPacket, PacketObjectIn<Integer>,
         Logger log = Util.getDespiteException(() -> Util.reflect(SubDataClient.class.getDeclaredField("log"), client), null);
         if (data.getInt(0x0001) == 0) {
             try {
-                if (data.contains(0x0000)) {
-                    Util.reflect(SubAPI.class.getDeclaredField("name"), plugin.api, data.getRawString(0x0000));
-                    setReady(client.getConnection(), true);
-                }
+                if (data.contains(0x0000)) Util.reflect(SubAPI.class.getDeclaredField("name"), plugin.api, data.getRawString(0x0000));
+                setReady(client.getConnection(), true);
             } catch (Throwable e) {
                 e.printStackTrace();
             }

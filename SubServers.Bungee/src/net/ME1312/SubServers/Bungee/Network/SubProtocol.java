@@ -29,7 +29,7 @@ public class SubProtocol extends SubDataProtocol {
             plugin.getPluginManager().registerListener(null, new PacketOutExRunEvent(plugin));
 
             instance.setName("SubServers 2");
-            instance.setVersion(new Version("2.14a+"));
+            instance.setVersion(new Version("2.16a+"));
 
 
          // 00-0F: Object Link Packets
@@ -49,7 +49,7 @@ public class SubProtocol extends SubDataProtocol {
             instance.registerPacket(0x0013, PacketDownloadHostInfo.class);
             instance.registerPacket(0x0014, PacketDownloadGroupInfo.class);
             instance.registerPacket(0x0015, PacketDownloadServerInfo.class);
-            instance.registerPacket(0x0016, PacketDownloadPlayerList.class);
+            instance.registerPacket(0x0016, PacketDownloadPlayerInfo.class);
             instance.registerPacket(0x0017, PacketCheckPermission.class);
             instance.registerPacket(0x0018, PacketCheckPermissionResponse.class);
 
@@ -59,7 +59,7 @@ public class SubProtocol extends SubDataProtocol {
             instance.registerPacket(0x0013, new PacketDownloadHostInfo(plugin));
             instance.registerPacket(0x0014, new PacketDownloadGroupInfo(plugin));
             instance.registerPacket(0x0015, new PacketDownloadServerInfo(plugin));
-            instance.registerPacket(0x0016, new PacketDownloadPlayerList(plugin));
+            instance.registerPacket(0x0016, new PacketDownloadPlayerInfo(plugin));
             instance.registerPacket(0x0017, new PacketCheckPermission());
             instance.registerPacket(0x0018, new PacketCheckPermissionResponse());
 
@@ -75,6 +75,9 @@ public class SubProtocol extends SubDataProtocol {
             instance.registerPacket(0x0037, PacketStopServer.class);
             instance.registerPacket(0x0038, PacketRemoveServer.class);
             instance.registerPacket(0x0039, PacketDeleteServer.class);
+          //instance.registerPacket(0x003A, PacketRestoreServer.class); // TODO
+          //instance.registerPacket(0x003B, PacketTeleportPlayer.class);
+          //instance.registerPacket(0x003C, PacketTeleportPlayerResponse.class);
 
             instance.registerPacket(0x0030, new PacketCreateServer(plugin));
             instance.registerPacket(0x0031, new PacketAddServer(plugin));
@@ -86,6 +89,9 @@ public class SubProtocol extends SubDataProtocol {
             instance.registerPacket(0x0037, new PacketStopServer(plugin));
             instance.registerPacket(0x0038, new PacketRemoveServer(plugin));
             instance.registerPacket(0x0039, new PacketDeleteServer(plugin));
+          //instance.registerPacket(0x003A, new PacketRestoreServer(plugin)); // TODO
+          //instance.registerPacket(0x003B, new PacketTeleportPlayer(plugin));
+          //instance.registerPacket(0x003C, new PacketTeleportPlayerResponse(plugin));
 
 
          // 50-6F: External Host Packets
@@ -96,8 +102,9 @@ public class SubProtocol extends SubDataProtocol {
             instance.registerPacket(0x0054, PacketExAddServer.class);
             instance.registerPacket(0x0055, PacketExEditServer.class);
           //instance.registerPacket(0x0056, PacketInExLogMessage.class);
-            instance.registerPacket(0x0057, PacketExDeleteServer.class);
-            instance.registerPacket(0x0058, PacketExRemoveServer.class);
+            instance.registerPacket(0x0057, PacketExRemoveServer.class);
+            instance.registerPacket(0x0058, PacketExDeleteServer.class);
+          //instance.registerPacket(0x0059, PacketExRestoreServer.class);
 
             instance.registerPacket(0x0050, new PacketExConfigureHost(plugin));
             instance.registerPacket(0x0051, new PacketExDownloadTemplates(plugin));
@@ -106,8 +113,9 @@ public class SubProtocol extends SubDataProtocol {
             instance.registerPacket(0x0054, new PacketExAddServer());
             instance.registerPacket(0x0055, new PacketExEditServer(plugin));
             instance.registerPacket(0x0056, new PacketInExLogMessage());
-            instance.registerPacket(0x0057, new PacketExDeleteServer());
-            instance.registerPacket(0x0058, new PacketExRemoveServer());
+            instance.registerPacket(0x0057, new PacketExRemoveServer());
+            instance.registerPacket(0x0058, new PacketExDeleteServer());
+          //instance.registerPacket(0x0059, new PacketExRestoreServer());
 
 
          // 70-7F: External Misc Packets

@@ -1,7 +1,7 @@
 package net.ME1312.SubServers.Client.Bukkit.Graphic;
 
-import net.ME1312.Galaxi.Library.Container;
-import net.ME1312.Galaxi.Library.NamedContainer;
+import net.ME1312.Galaxi.Library.Container.Container;
+import net.ME1312.Galaxi.Library.Container.NamedContainer;
 import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubData.Client.Protocol.PacketObjectOut;
 import net.ME1312.SubServers.Client.Bukkit.Network.API.Host;
@@ -12,6 +12,7 @@ import net.ME1312.SubServers.Client.Bukkit.SubPlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -25,14 +26,14 @@ import java.util.*;
 public class DefaultUIRenderer extends UIRenderer {
     private static int MAX_VISITED_OBJECTS = 2;
     private List<Runnable> windowHistory = new LinkedList<Runnable>();
-    protected Object[] lastVisitedObjects = new Object[MAX_VISITED_OBJECTS];
-    protected int lastPage = 1;
-    protected Runnable lastMenu = null;
-    protected boolean open = false;
-    protected final UUID player;
+    Object[] lastVisitedObjectz = new Object[MAX_VISITED_OBJECTS];
+    int lastPage = 1;
+    Runnable lastMenu = null;
+    boolean open = false;
+    final UUID player;
     private SubPlugin plugin;
 
-    protected DefaultUIRenderer(SubPlugin plugin, UUID player) {
+    DefaultUIRenderer(SubPlugin plugin, UUID player) {
         super(plugin, player);
         this.plugin = plugin;
         this.player = player;
@@ -83,7 +84,7 @@ public class DefaultUIRenderer extends UIRenderer {
         setDownloading(ChatColor.stripColor(plugin.api.getLang("SubServers", "Interface.Host-Menu.Title")));
         plugin.api.getHosts(hosts -> plugin.api.getGroups(groups -> {
             setDownloading(null);
-            lastVisitedObjects[0] = null;
+            lastVisitedObjectz[0] = null;
             lastPage = page;
             lastMenu = () -> hostMenu(1);
             windowHistory.add(() -> hostMenu(page));
@@ -219,7 +220,7 @@ public class DefaultUIRenderer extends UIRenderer {
                 if (hasHistory()) back();
             } else {
                 setDownloading(null);
-                lastVisitedObjects[0] = name;
+                lastVisitedObjectz[0] = host;
 
                 ItemStack block;
                 ItemMeta blockMeta;
@@ -236,7 +237,8 @@ public class DefaultUIRenderer extends UIRenderer {
                     i++;
                 }
 
-                if (!(Bukkit.getPlayer(player).hasPermission("subservers.host.create.*") || Bukkit.getPlayer(player).hasPermission("subservers.host.create." + name.toLowerCase()))) {
+                Player player = Bukkit.getPlayer(this.player);
+                if (!(player.hasPermission("subservers.host.*.*") || player.hasPermission("subservers.host.*.create") || player.hasPermission("subservers.host." + name.toLowerCase() + ".*") || player.hasPermission("subservers.host." + name.toLowerCase() + ".create"))) {
                     block = createItem("STAINED_GLASS_PANE", "GRAY_STAINED_GLASS_PANE", (short) 7);
                     blockMeta = block.getItemMeta();
                     blockMeta.setDisplayName(ChatColor.GRAY+ChatColor.stripColor(plugin.api.getLang("SubServers", "Interface.Host-Admin.Creator")));
@@ -317,7 +319,7 @@ public class DefaultUIRenderer extends UIRenderer {
                     inv.setItem(35, block);
                 }
 
-                Bukkit.getPlayer(player).openInventory(inv);
+                Bukkit.getPlayer(this.player).openInventory(inv);
                 open = true;
             }
         });
@@ -325,13 +327,12 @@ public class DefaultUIRenderer extends UIRenderer {
 
     public void hostCreator(final CreatorOptions options) {
         setDownloading(ChatColor.stripColor(plugin.api.getLang("SubServers", "Interface.Host-Creator.Title").replace("$str$", options.getHost())));
-        if (!options.init())
-            windowHistory.add(() -> hostCreator(options));
-        lastVisitedObjects[0] = options;
+        if (!options.init()) windowHistory.add(() -> hostCreator(options));
+        lastVisitedObjectz[0] = options;
 
         plugin.api.getHost(options.getHost(), host -> {
             if (host == null || !host.isAvailable() || !host.isEnabled()) {
-                lastVisitedObjects[0] = null;
+                lastVisitedObjectz[0] = null;
                 if (hasHistory()) back();
             } else {
                 setDownloading(null);
@@ -453,11 +454,11 @@ public class DefaultUIRenderer extends UIRenderer {
 
     public void hostCreatorTemplates(final int page, final CreatorOptions options) {
         setDownloading(ChatColor.stripColor(plugin.api.getLang("SubServers", "Interface.Host-Creator.Edit-Template.Title").replace("$str$", options.getHost())));
-        lastVisitedObjects[0] = options;
-        if (!options.init()) lastVisitedObjects[0] = options.getHost();
+        options.init();
+        lastVisitedObjectz[0] = options;
         plugin.api.getHost(options.getHost(), host -> {
             if (host == null || !host.isAvailable() || !host.isEnabled()) {
-                lastVisitedObjects[0] = null;
+                lastVisitedObjectz[0] = null;
                 if (hasHistory()) back();
             } else {
                 lastPage = page;
@@ -572,7 +573,7 @@ public class DefaultUIRenderer extends UIRenderer {
                 if (hasHistory()) back();
             } else {
                 setDownloading(null);
-                lastVisitedObjects[0] = name;
+                lastVisitedObjectz[0] = host;
                 lastPage = page;
                 List<String> renderers = new LinkedList<String>();
                 for (String renderer : renderers) {
@@ -676,7 +677,7 @@ public class DefaultUIRenderer extends UIRenderer {
         setDownloading(ChatColor.stripColor(plugin.api.getLang("SubServers", "Interface.Group-Menu.Title")));
         plugin.api.getGroups(groups -> {
             setDownloading(null);
-            lastVisitedObjects[0] = null;
+            lastVisitedObjectz[0] = null;
             lastPage = page;
             lastMenu = () -> groupMenu(1);
             windowHistory.add(() -> groupMenu(page));
@@ -790,8 +791,8 @@ public class DefaultUIRenderer extends UIRenderer {
             lastPage = page;
 
             List<Server> servers = servercontainer.get();
-            lastVisitedObjects[0] = host;
-            lastVisitedObjects[1] = group;
+            lastVisitedObjectz[0] = host;
+            lastVisitedObjectz[1] = group;
             windowHistory.add(() -> serverMenu(page, host, group));
 
             ItemStack block;
@@ -837,7 +838,7 @@ public class DefaultUIRenderer extends UIRenderer {
                         if (!server.getName().equals(server.getDisplayName()))
                             lore.add(ChatColor.GRAY + server.getName());
                         lore.add(plugin.api.getLang("SubServers", "Interface.Server-Menu.Server-External"));
-                        lore.add(plugin.api.getLang("SubServers", "Interface.Server-Menu.Server-Player-Count").replace("$int$", new DecimalFormat("#,###").format(server.getPlayers().size())));
+                        lore.add(plugin.api.getLang("SubServers", "Interface.Server-Menu.Server-Player-Count").replace("$int$", new DecimalFormat("#,###").format(server.getGlobalPlayers().size())));
                         lore.add(plugin.api.getLang("SubServers", "Interface.Server-Menu.SubServer-Invalid"));
                         lore.add(ChatColor.WHITE + ((plugin.config.get().getMap("Settings").getBoolean("Show-Addresses", false))?server.getAddress().getAddress().getHostAddress()+':':"") + server.getAddress().getPort());
                         blockMeta.setLore(lore);
@@ -852,7 +853,7 @@ public class DefaultUIRenderer extends UIRenderer {
                             blockMeta.setDisplayName(ChatColor.AQUA + server.getDisplayName());
                             lore.add(plugin.api.getLang("SubServers", "Interface.Server-Menu.SubServer-Temporary"));
                         } else blockMeta.setDisplayName(ChatColor.GREEN + server.getDisplayName());
-                        lore.add(plugin.api.getLang("SubServers", "Interface.Server-Menu.Server-Player-Count").replace("$int$", new DecimalFormat("#,###").format(server.getPlayers().size())));
+                        lore.add(plugin.api.getLang("SubServers", "Interface.Server-Menu.Server-Player-Count").replace("$int$", new DecimalFormat("#,###").format(server.getGlobalPlayers().size())));
                         lore.add(ChatColor.WHITE + ((plugin.config.get().getMap("Settings").getBoolean("Show-Addresses", false))?server.getAddress().getAddress().getHostAddress()+':':"") + server.getAddress().getPort());
                         blockMeta.setLore(lore);
                     } else if (((SubServer) server).isAvailable() && ((SubServer) server).isEnabled() && ((SubServer) server).getCurrentIncompatibilities().size() == 0) {
@@ -961,7 +962,7 @@ public class DefaultUIRenderer extends UIRenderer {
                 if (servers == null) {
                     if (hasHistory()) back();
                 } else {
-                    servercontainer.get().addAll(servers);
+                    servercontainer.get().addAll(servers.get());
                     renderer.run();
                 }
             });
@@ -984,7 +985,7 @@ public class DefaultUIRenderer extends UIRenderer {
                     if (hasHistory()) back();
                 } else {
                     setDownloading(null);
-                    lastVisitedObjects[0] = name;
+                    lastVisitedObjectz[0] = subserver;
                     ItemStack block;
                     ItemMeta blockMeta;
                     ItemStack div = createItem("STAINED_GLASS_PANE", "BLACK_STAINED_GLASS_PANE", (short) 15);
@@ -1001,8 +1002,9 @@ public class DefaultUIRenderer extends UIRenderer {
                     }
                     i = 0;
 
+                    Player player = Bukkit.getPlayer(this.player);
                     if (subserver.isRunning()) {
-                        if (!(Bukkit.getPlayer(player).hasPermission("subservers.subserver.terminate.*") || Bukkit.getPlayer(player).hasPermission("subservers.subserver.terminate." + name.toLowerCase()))) {
+                        if (!subserver.permits(player, "subservers.subserver.%.*", "subservers.subserver.%.terminate")) {
                             block = createItem("STAINED_GLASS_PANE", "GRAY_STAINED_GLASS_PANE", (short) 7);
                             blockMeta = block.getItemMeta();
                             blockMeta.setDisplayName(ChatColor.GRAY+ChatColor.stripColor(plugin.api.getLang("SubServers", "Interface.SubServer-Admin.Terminate")));
@@ -1017,7 +1019,7 @@ public class DefaultUIRenderer extends UIRenderer {
                         inv.setItem(1, block);
                         inv.setItem(10, block);
 
-                        if (!(Bukkit.getPlayer(player).hasPermission("subservers.subserver.stop.*") || Bukkit.getPlayer(player).hasPermission("subservers.subserver.stop." + name.toLowerCase()))) {
+                        if (!subserver.permits(player, "subservers.subserver.%.*", "subservers.subserver.%.stop")) {
                             block = createItem("STAINED_GLASS_PANE", "GRAY_STAINED_GLASS_PANE", (short) 7);
                             blockMeta = block.getItemMeta();
                             blockMeta.setDisplayName(ChatColor.GRAY+ChatColor.stripColor(plugin.api.getLang("SubServers", "Interface.SubServer-Admin.Stop")));
@@ -1033,7 +1035,7 @@ public class DefaultUIRenderer extends UIRenderer {
                         inv.setItem(11, block);
                         inv.setItem(12, block);
 
-                        if (!(Bukkit.getPlayer(player).hasPermission("subservers.subserver.command.*") || Bukkit.getPlayer(player).hasPermission("subservers.subserver.command." + name.toLowerCase()))) {
+                        if (!subserver.permits(player, "subservers.subserver.%.*", "subservers.subserver.%.command")) {
                             block = createItem("STAINED_GLASS_PANE", "GRAY_STAINED_GLASS_PANE", (short) 7);
                             blockMeta = block.getItemMeta();
                             blockMeta.setDisplayName(ChatColor.GRAY+ChatColor.stripColor(plugin.api.getLang("SubServers", "Interface.SubServer-Admin.Command")));
@@ -1051,7 +1053,7 @@ public class DefaultUIRenderer extends UIRenderer {
                         inv.setItem(15, block);
                         inv.setItem(16, block);
                     } else {
-                        if (!(Bukkit.getPlayer(player).hasPermission("subservers.subserver.start.*") || Bukkit.getPlayer(player).hasPermission("subservers.subserver.start." + name.toLowerCase()))) {
+                        if (!subserver.permits(player, "subservers.subserver.%.*", "subservers.subserver.%.start")) {
                             block = createItem("STAINED_GLASS_PANE", "GRAY_STAINED_GLASS_PANE", (short) 7);
                             blockMeta = block.getItemMeta();
                             blockMeta.setDisplayName(ChatColor.GRAY+ChatColor.stripColor(plugin.api.getLang("SubServers", "Interface.SubServer-Admin.Start")));
@@ -1082,7 +1084,7 @@ public class DefaultUIRenderer extends UIRenderer {
                             inv.setItem(11, block);
                             inv.setItem(12, block);
 
-                            if (!(Bukkit.getPlayer(player).hasPermission("subservers.subserver.update.*") || Bukkit.getPlayer(player).hasPermission("subservers.subserver.update." + name.toLowerCase()))) {
+                            if (!subserver.permits(player, "subservers.subserver.%.*", "subservers.subserver.%.update")) {
                                 block = createItem("STAINED_GLASS_PANE", "GRAY_STAINED_GLASS_PANE", (short) 7);
                                 blockMeta = block.getItemMeta();
                                 blockMeta.setDisplayName(ChatColor.GRAY+ChatColor.stripColor(plugin.api.getLang("SubServers", "Interface.SubServer-Admin.Update")));
@@ -1127,7 +1129,7 @@ public class DefaultUIRenderer extends UIRenderer {
                             blockMeta.setDisplayName(ChatColor.AQUA + subserver.getDisplayName());
                             lore.add(plugin.api.getLang("SubServers", "Interface.Server-Menu.SubServer-Temporary"));
                         } else blockMeta.setDisplayName(ChatColor.GREEN + subserver.getDisplayName());
-                        lore.add(plugin.api.getLang("SubServers", "Interface.Server-Menu.Server-Player-Count").replace("$int$", new DecimalFormat("#,###").format(subserver.getPlayers().size())));
+                        lore.add(plugin.api.getLang("SubServers", "Interface.Server-Menu.Server-Player-Count").replace("$int$", new DecimalFormat("#,###").format(subserver.getGlobalPlayers().size())));
                         lore.add(ChatColor.WHITE + ((plugin.config.get().getMap("Settings").getBoolean("Show-Addresses", false))?subserver.getAddress().getAddress().getHostAddress()+':':"") + subserver.getAddress().getPort());
                         blockMeta.setLore(lore);
                     } else if (subserver.isAvailable() && subserver.isEnabled() && subserver.getCurrentIncompatibilities().size() == 0) {
@@ -1173,7 +1175,7 @@ public class DefaultUIRenderer extends UIRenderer {
                         inv.setItem(35, block);
                     }
 
-                    Bukkit.getPlayer(player).openInventory(inv);
+                    player.openInventory(inv);
                     open = true;
                 }
             });
@@ -1189,7 +1191,7 @@ public class DefaultUIRenderer extends UIRenderer {
                 if (hasHistory()) back();
             } else {
                 setDownloading(null);
-                lastVisitedObjects[0] = name;
+                lastVisitedObjectz[0] = subserver;
                 lastPage = page;
                 List<String> renderers = new LinkedList<String>();
                 for (String renderer : renderers) {

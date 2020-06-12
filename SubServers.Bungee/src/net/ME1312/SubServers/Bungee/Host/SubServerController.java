@@ -9,7 +9,7 @@ import java.util.*;
  * API-Safe SubServer Layout Class
  */
 public abstract class SubServerController {
-    private final SubServerContainer control;
+    private final SubServerImpl control;
 
     /**
      * Creates a SubServer
@@ -22,138 +22,154 @@ public abstract class SubServerController {
      * @throws InvalidServerException
      */
     public SubServerController(Host host, String name, int port, String motd, boolean hidden, boolean restricted) throws InvalidServerException {
-        control = new SubServerContainer(host, name, port, motd, hidden, restricted) {
-            @Override
-            public boolean start() {
-                if (SubServerController.this.start()) {
-                    started = false;
-                    return true;
-                } else return false;
-            }
+        SubServerImpl control;
+        try {
+            control = new ControlledSubServer(host, name, port, motd, hidden, restricted);
+        } catch (NoSuchMethodError e) {
+            control = new ControlledSubServer(host, name, (Integer) port, motd, hidden, restricted);
+        }
+        this.control = control;
+    }
 
-            @Override
-            public boolean start(UUID player) {
-                if (SubServerController.this.start(player)) {
-                    started = false;
-                    return true;
-                } else return false;
-            }
+    private final class ControlledSubServer extends SubServerImpl {
+        public ControlledSubServer(Host host, String name, int port, String motd, boolean hidden, boolean restricted) throws InvalidServerException {
+            super(host, name, port, motd, hidden, restricted);
+        }
 
-            @Override
-            public boolean stop() {
-                return SubServerController.this.stop();
-            }
+        public ControlledSubServer(Host host, String name, Integer port, String motd, boolean hidden, boolean restricted) throws InvalidServerException {
+            super(host, name, port, motd, hidden, restricted);
+        }
 
-            @Override
-            public boolean stop(UUID player) {
-                return SubServerController.this.stop(player);
-            }
+        @Override
+        public boolean start() {
+            if (SubServerController.this.start()) {
+                started = false;
+                return true;
+            } else return false;
+        }
 
-            @Override
-            public boolean terminate() {
-                return SubServerController.this.terminate();
-            }
+        @Override
+        public boolean start(UUID player) {
+            if (SubServerController.this.start(player)) {
+                started = false;
+                return true;
+            } else return false;
+        }
 
-            @Override
-            public boolean terminate(UUID player) {
-                return SubServerController.this.terminate(player);
-            }
+        @Override
+        public boolean stop() {
+            return SubServerController.this.stop();
+        }
 
-            @Override
-            public boolean command(String command) {
-                return SubServerController.this.command(command);
-            }
+        @Override
+        public boolean stop(UUID player) {
+            return SubServerController.this.stop(player);
+        }
 
-            @Override
-            public boolean command(UUID player, String command) {
-                return SubServerController.this.command(player, command);
-            }
+        @Override
+        public boolean terminate() {
+            return SubServerController.this.terminate();
+        }
 
-            @Override
-            public int permaEdit(ObjectMap<String> edit) {
-                return SubServerController.this.edit(edit);
-            }
+        @Override
+        public boolean terminate(UUID player) {
+            return SubServerController.this.terminate(player);
+        }
 
-            @Override
-            public int permaEdit(UUID player, ObjectMap<String> edit) {
-                return SubServerController.this.edit(player, edit);
-            }
+        @Override
+        public boolean command(String command) {
+            return SubServerController.this.command(command);
+        }
 
-            @Override
-            public void waitFor() throws InterruptedException {
-                SubServerController.this.waitFor();
-            }
+        @Override
+        public boolean command(UUID player, String command) {
+            return SubServerController.this.command(player, command);
+        }
 
-            @Override
-            public boolean isRunning() {
-                return SubServerController.this.isRunning();
-            }
+        @Override
+        public int permaEdit(ObjectMap<String> edit) {
+            return SubServerController.this.edit(edit);
+        }
 
-            @Override
-            public Host getHost() {
-                return SubServerController.this.getHost();
-            }
+        @Override
+        public int permaEdit(UUID player, ObjectMap<String> edit) {
+            return SubServerController.this.edit(player, edit);
+        }
 
-            @Override
-            public boolean isEnabled() {
-                return SubServerController.this.isEnabled();
-            }
+        @Override
+        public void waitFor() throws InterruptedException {
+            SubServerController.this.waitFor();
+        }
 
-            @Override
-            public void setEnabled(boolean value) {
-                SubServerController.this.setEnabled(value);
-            }
+        @Override
+        public boolean isRunning() {
+            return SubServerController.this.isRunning();
+        }
 
-            @Override
-            public boolean isLogging() {
-                return SubServerController.this.isLogging();
-            }
+        @Override
+        public Host getHost() {
+            return SubServerController.this.getHost();
+        }
 
-            @Override
-            public void setLogging(boolean value) {
-                SubServerController.this.setLogging(value);
-            }
+        @Override
+        public boolean isEnabled() {
+            return SubServerController.this.isEnabled();
+        }
 
-            @Override
-            public SubLogger getLogger() {
-                return SubServerController.this.getLogger();
-            }
+        @Override
+        public void setEnabled(boolean value) {
+            SubServerController.this.setEnabled(value);
+        }
 
-            @Override
-            public LinkedList<LoggedCommand> getCommandHistory() {
-                return SubServerController.this.getCommandHistory();
-            }
+        @Override
+        public boolean isLogging() {
+            return SubServerController.this.isLogging();
+        }
 
-            @Override
-            public String getPath() {
-                return SubServerController.this.getPath();
-            }
+        @Override
+        public void setLogging(boolean value) {
+            SubServerController.this.setLogging(value);
+        }
 
-            @Override
-            public String getExecutable() {
-                return SubServerController.this.getExecutable();
-            }
+        @Override
+        public SubLogger getLogger() {
+            return SubServerController.this.getLogger();
+        }
 
-            @Override
-            public String getStopCommand() {
-                return SubServerController.this.getStopCommand();
-            }
+        @Override
+        public LinkedList<LoggedCommand> getCommandHistory() {
+            return SubServerController.this.getCommandHistory();
+        }
 
-            @Override
-            public void setStopCommand(String value) {
-                SubServerController.this.setStopCommand(value);
-            }
+        @Override
+        public String getPath() {
+            return SubServerController.this.getPath();
+        }
 
-            @Override
-            public StopAction getStopAction() {
-                return SubServerController.this.getStopAction();
-            }
+        @Override
+        public String getExecutable() {
+            return SubServerController.this.getExecutable();
+        }
 
-            @Override
-            public void setStopAction(StopAction action) {
-                SubServerController.this.setStopAction(action);
-            }
-        };
+        @Override
+        public String getStopCommand() {
+            return SubServerController.this.getStopCommand();
+        }
+
+        @Override
+        public void setStopCommand(String value) {
+            SubServerController.this.setStopCommand(value);
+        }
+
+        @Override
+        public StopAction getStopAction() {
+            return SubServerController.this.getStopAction();
+        }
+
+        @Override
+        public void setStopAction(StopAction action) {
+            SubServerController.this.setStopAction(action);
+        }
     }
 
     /**

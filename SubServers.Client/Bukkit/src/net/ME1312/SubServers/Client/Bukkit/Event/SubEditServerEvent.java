@@ -2,7 +2,7 @@ package net.ME1312.SubServers.Client.Bukkit.Event;
 
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Map.ObjectMapValue;
-import net.ME1312.Galaxi.Library.NamedContainer;
+import net.ME1312.Galaxi.Library.Container.NamedContainer;
 import net.ME1312.SubServers.Client.Bukkit.Library.SubEvent;
 import net.ME1312.Galaxi.Library.Util;
 import org.bukkit.event.Event;

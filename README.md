@@ -12,7 +12,7 @@ SubServers 2 is a rewrite of SubServers, the Server Management Platform.<br>
 These are some quick links for common resources of SubServers 2.
 
 ### How to Install
-> [https://github.com/ME1312/SubServers-2/wiki/Install](https://github.com/ME1312/SubServers-2/wiki/Install)
+> [https://github.com/ME1312/SubServers-2/wiki/Install](https://github.com/ME1312/SubServers-2/wiki/Installation)
 
 ### Snapshot Downloads
 > [https://dev.me1312.net/jenkins/job/SubServers Platform](https://dev.me1312.net/jenkins/job/SubServers%20Platform)

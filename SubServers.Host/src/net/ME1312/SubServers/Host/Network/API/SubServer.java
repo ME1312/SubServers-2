@@ -4,10 +4,7 @@ import net.ME1312.Galaxi.Library.Callback.Callback;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubData.Client.SubDataClient;
-import net.ME1312.SubServers.Host.Network.Packet.PacketCommandServer;
-import net.ME1312.SubServers.Host.Network.Packet.PacketEditServer;
-import net.ME1312.SubServers.Host.Network.Packet.PacketStartServer;
-import net.ME1312.SubServers.Host.Network.Packet.PacketStopServer;
+import net.ME1312.SubServers.Host.Network.Packet.*;
 import net.ME1312.SubServers.Host.SubAPI;
 
 import java.lang.reflect.InvocationTargetException;
@@ -18,6 +15,7 @@ import java.util.UUID;
 
 public class SubServer extends Server {
     private List<SubServer> incompatibilities = null;
+    private List<SubServer> currentIncompatibilities = null;
     private Host host = null;
 
     /**
@@ -65,6 +63,7 @@ public class SubServer extends Server {
     public void refresh() {
         host = null;
         incompatibilities = null;
+        currentIncompatibilities = null;
         super.refresh();
     }
 
@@ -649,16 +648,17 @@ public class SubServer extends Server {
         };
 
         if (incompatibilities == null) {
-            LinkedList<String> incompatableNames = new LinkedList<String>();
-            for (String subserver : raw.getRawStringList("incompatible-list")) incompatableNames.add(subserver.toLowerCase());
-            SubAPI.getInstance().getSubServers(subservers -> {
+            LinkedList<String> incompatible = new LinkedList<String>();
+            for (String subserver : raw.getRawStringList("incompatible-list")) incompatible.add(subserver.toLowerCase());
+            ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketDownloadServerInfo(incompatible, data -> {
                 LinkedList<SubServer> incompatibilities = new LinkedList<SubServer>();
-                for (SubServer subserver : subservers.values())
-                    if (incompatableNames.contains(subserver.getName().toLowerCase()))
-                        incompatibilities.add(subserver);
+                for (String server : data.getKeys()) {
+                    if (data.getMap(server).getRawString("type", "Server").equals("SubServer")) incompatibilities.add(new SubServer(data.getMap(server)));
+                }
+
                 this.incompatibilities = incompatibilities;
                 run.run();
-            });
+            }));
         } else {
             run.run();
         }
@@ -679,16 +679,33 @@ public class SubServer extends Server {
      * @param callback Current Incompatibility List
      */
     public void getCurrentIncompatibilities(Callback<List<SubServer>> callback) {
-        getIncompatibilities(incompatibilities -> {
-            LinkedList<String> incompatableNames = new LinkedList<String>();
-            for (String subserver : raw.getRawStringList("incompatible")) incompatableNames.add(subserver.toLowerCase());
+        if (Util.isNull(callback)) throw new NullPointerException();
+        StackTraceElement[] origin = new Exception().getStackTrace();
+        Runnable run = () -> {
+            try {
+                callback.run(currentIncompatibilities);
+            } catch (Throwable e) {
+                Throwable ew = new InvocationTargetException(e);
+                ew.setStackTrace(origin);
+                ew.printStackTrace();
+            }
+        };
 
-            LinkedList<SubServer> current = new LinkedList<SubServer>();
-            for (SubServer subserver : incompatibilities)
-                if (incompatableNames.contains(subserver.getName().toLowerCase()))
-                    current.add(subserver);
-            callback.run(current);
-        });
+        if (currentIncompatibilities == null) {
+            LinkedList<String> incompatible = new LinkedList<String>();
+            for (String subserver : raw.getRawStringList("incompatible")) incompatible.add(subserver.toLowerCase());
+            ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketDownloadServerInfo(incompatible, data -> {
+                LinkedList<SubServer> incompatibilities = new LinkedList<SubServer>();
+                for (String server : data.getKeys()) {
+                    if (data.getMap(server).getRawString("type", "Server").equals("SubServer")) incompatibilities.add(new SubServer(data.getMap(server)));
+                }
+
+                this.currentIncompatibilities = incompatibilities;
+                run.run();
+            }));
+        } else {
+            run.run();
+        }
     }
 
     /**

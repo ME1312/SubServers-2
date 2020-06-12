@@ -2,10 +2,10 @@ package net.ME1312.SubServers.Host.Network;
 
 import net.ME1312.Galaxi.Library.Callback.Callback;
 import net.ME1312.Galaxi.Library.Config.YAMLSection;
-import net.ME1312.Galaxi.Library.NamedContainer;
+import net.ME1312.Galaxi.Library.Container.NamedContainer;
+import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
-import net.ME1312.SubData.Client.Library.DisconnectReason;
 import net.ME1312.SubData.Client.SubDataClient;
 import net.ME1312.SubData.Client.SubDataProtocol;
 import net.ME1312.SubServers.Host.Event.SubNetworkConnectEvent;
@@ -16,12 +16,8 @@ import net.ME1312.SubServers.Host.SubAPI;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.net.InetAddress;
 import java.util.HashMap;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 public class SubProtocol extends SubDataProtocol {
@@ -36,7 +32,7 @@ public class SubProtocol extends SubDataProtocol {
             ExHost host = SubAPI.getInstance().getInternals();
 
             instance.setName("SubServers 2");
-            instance.addVersion(new Version("2.14a+"));
+            instance.addVersion(new Version("2.16a+"));
 
 
          // 00-0F: Object Link Packets
@@ -52,7 +48,7 @@ public class SubProtocol extends SubDataProtocol {
             instance.registerPacket(0x0013, PacketDownloadHostInfo.class);
             instance.registerPacket(0x0014, PacketDownloadGroupInfo.class);
             instance.registerPacket(0x0015, PacketDownloadServerInfo.class);
-            instance.registerPacket(0x0016, PacketDownloadPlayerList.class);
+            instance.registerPacket(0x0016, PacketDownloadPlayerInfo.class);
             instance.registerPacket(0x0017, PacketCheckPermission.class);
             instance.registerPacket(0x0017, PacketCheckPermissionResponse.class);
 
@@ -62,7 +58,7 @@ public class SubProtocol extends SubDataProtocol {
             instance.registerPacket(0x0013, new PacketDownloadHostInfo());
             instance.registerPacket(0x0014, new PacketDownloadGroupInfo());
             instance.registerPacket(0x0015, new PacketDownloadServerInfo());
-            instance.registerPacket(0x0016, new PacketDownloadPlayerList());
+            instance.registerPacket(0x0016, new PacketDownloadPlayerInfo());
             instance.registerPacket(0x0017, new PacketCheckPermission());
             instance.registerPacket(0x0018, new PacketCheckPermissionResponse());
 
@@ -99,8 +95,8 @@ public class SubProtocol extends SubDataProtocol {
             instance.registerPacket(0x0054, PacketExAddServer.class);
             instance.registerPacket(0x0055, PacketExEditServer.class);
             instance.registerPacket(0x0056, PacketOutExLogMessage.class);
-            instance.registerPacket(0x0057, PacketExDeleteServer.class);
-            instance.registerPacket(0x0058, PacketExRemoveServer.class);
+            instance.registerPacket(0x0057, PacketExRemoveServer.class);
+            instance.registerPacket(0x0058, PacketExDeleteServer.class);
 
             instance.registerPacket(0x0050, new PacketExConfigureHost(host));
             instance.registerPacket(0x0051, new PacketExDownloadTemplates(host));
@@ -109,8 +105,8 @@ public class SubProtocol extends SubDataProtocol {
             instance.registerPacket(0x0054, new PacketExAddServer(host));
             instance.registerPacket(0x0055, new PacketExEditServer(host));
           //instance.registerPacket(0x0056, new PacketOutExLogMessage());
-            instance.registerPacket(0x0057, new PacketExDeleteServer(host));
-            instance.registerPacket(0x0058, new PacketExRemoveServer(host));
+            instance.registerPacket(0x0057, new PacketExRemoveServer(host));
+            instance.registerPacket(0x0058, new PacketExDeleteServer(host));
 
 
          // 70-7F: External Misc Packets
@@ -131,7 +127,7 @@ public class SubProtocol extends SubDataProtocol {
     }
 
     @Override
-    protected SubDataClient sub(Callback<Runnable> scheduler, Logger logger, InetAddress address, int port) throws IOException {
+    protected SubDataClient sub(Callback<Runnable> scheduler, Logger logger, InetAddress address, int port, ObjectMap<?> login) throws IOException {
         ExHost host = SubAPI.getInstance().getInternals();
         HashMap<Integer, SubDataClient> map = Util.getDespiteException(() -> Util.reflect(ExHost.class.getDeclaredField("subdata"), host), null);
 
@@ -139,7 +135,7 @@ public class SubProtocol extends SubDataProtocol {
         while (map.keySet().contains(channel)) channel++;
         final int fc = channel;
 
-        SubDataClient subdata = super.open(scheduler, getLogger(fc), address, port);
+        SubDataClient subdata = super.open(scheduler, getLogger(fc), address, port, login);
         map.put(fc, subdata);
         subdata.sendPacket(new PacketLinkExHost(host, fc));
         subdata.on.closed(client -> map.remove(fc));

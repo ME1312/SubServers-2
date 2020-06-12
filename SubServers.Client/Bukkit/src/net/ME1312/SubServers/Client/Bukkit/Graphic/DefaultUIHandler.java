@@ -1,7 +1,7 @@
 package net.ME1312.SubServers.Client.Bukkit.Graphic;
 
 import net.ME1312.Galaxi.Library.Config.YAMLSection;
-import net.ME1312.Galaxi.Library.Container;
+import net.ME1312.Galaxi.Library.Container.Container;
 import net.ME1312.Galaxi.Library.Callback.Callback;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Util;
@@ -104,13 +104,14 @@ public class DefaultUIHandler implements UIHandler, Listener {
                             gui.back();
                         } else if (item.equals(plugin.api.getLang("SubServers", "Interface.Generic.Undo"))) {
                             player.closeInventory();
-                            ((UIRenderer.CreatorOptions) gui.lastVisitedObjects[0]).undo();
-                            gui.hostCreator((UIRenderer.CreatorOptions) gui.lastVisitedObjects[0]);
+                            ((UIRenderer.CreatorOptions) gui.lastVisitedObjectz[0]).undo();
+                            gui.hostCreator((UIRenderer.CreatorOptions) gui.lastVisitedObjectz[0]);
                         } else if (item.equals(plugin.api.getLang("SubServers", "Interface.Host-Creator.Submit"))) {
-                            if (player.hasPermission("subservers.host.create.*") || player.hasPermission("subservers.host.create." + ((UIRenderer.CreatorOptions) gui.lastVisitedObjects[0]).getHost().toLowerCase())) {
+                            String host = ((UIRenderer.CreatorOptions) gui.lastVisitedObjectz[0]).getHost().toLowerCase();
+                            if (player.hasPermission("subservers.host.*.*") || player.hasPermission("subservers.host.*.create") || player.hasPermission("subservers.host." + host + ".*") || player.hasPermission("subservers.host." + host + ".create")) {
                                 player.closeInventory();
                                 gui.setDownloading(plugin.api.getLang("SubServers", "Interface.Generic.Downloading.Response"));
-                                ((SubDataClient) plugin.api.getSubDataNetwork()[0]).sendPacket(new PacketCreateServer(player.getUniqueId(), ((UIRenderer.CreatorOptions) gui.lastVisitedObjects[0]), data -> {
+                                ((SubDataClient) plugin.api.getSubDataNetwork()[0]).sendPacket(new PacketCreateServer(player.getUniqueId(), ((UIRenderer.CreatorOptions) gui.lastVisitedObjectz[0]), data -> {
                                     gui.back();
                                 }));
                             } else {
@@ -124,7 +125,7 @@ public class DefaultUIHandler implements UIHandler, Listener {
                                 if (m.getString("message").contains(" ")) {
                                     if (!gui.sendTitle(plugin.api.getLang("SubServers", "Interface.Host-Creator.Edit-Name.Invalid-Title"), 4 * 20))
                                         player.sendMessage(plugin.api.getLang("SubServers", "Interface.Host-Creator.Edit-Name.Invalid"));
-                                    Bukkit.getScheduler().runTaskLater(plugin, () -> gui.hostCreator((UIRenderer.CreatorOptions) gui.lastVisitedObjects[0]), 4 * 20);
+                                    Bukkit.getScheduler().runTaskLater(plugin, () -> gui.hostCreator((UIRenderer.CreatorOptions) gui.lastVisitedObjectz[0]), 4 * 20);
                                 } else {
                                     gui.setDownloading(plugin.api.getLang("SubServers", "Interface.Generic.Downloading.Response"));
                                     plugin.api.getSubServer(m.getString("message"), server -> {
@@ -132,26 +133,26 @@ public class DefaultUIHandler implements UIHandler, Listener {
                                             gui.setDownloading(null);
                                             if (!gui.sendTitle(plugin.api.getLang("SubServers", "Interface.Host-Creator.Edit-Name.Exists-Title"), 4 * 20))
                                                 player.sendMessage(plugin.api.getLang("SubServers", "Interface.Host-Creator.Edit-Name.Exists"));
-                                            Bukkit.getScheduler().runTaskLater(plugin, () -> gui.hostCreator((UIRenderer.CreatorOptions) gui.lastVisitedObjects[0]), 4 * 20);
+                                            Bukkit.getScheduler().runTaskLater(plugin, () -> gui.hostCreator((UIRenderer.CreatorOptions) gui.lastVisitedObjectz[0]), 4 * 20);
                                         } else {
-                                            ((UIRenderer.CreatorOptions) gui.lastVisitedObjects[0]).setName(m.getString("message"));
-                                            gui.hostCreator((UIRenderer.CreatorOptions) gui.lastVisitedObjects[0]);
+                                            ((UIRenderer.CreatorOptions) gui.lastVisitedObjectz[0]).setName(m.getString("message"));
+                                            gui.hostCreator((UIRenderer.CreatorOptions) gui.lastVisitedObjectz[0]);
                                         }
                                     });
                                 }
                             });
                         } else if (ChatColor.stripColor(item).equals(ChatColor.stripColor(plugin.api.getLang("SubServers", "Interface.Host-Creator.Edit-Template")))) {
                             player.closeInventory();
-                            gui.hostCreatorTemplates(1, (UIRenderer.CreatorOptions) gui.lastVisitedObjects[0]);
+                            gui.hostCreatorTemplates(1, (UIRenderer.CreatorOptions) gui.lastVisitedObjectz[0]);
                         } else if (ChatColor.stripColor(item).equals(ChatColor.stripColor(plugin.api.getLang("SubServers", "Interface.Host-Creator.Edit-Version")))) {
                             player.closeInventory();
                             if (!gui.sendTitle(plugin.api.getLang("SubServers", "Interface.Host-Creator.Edit-Version.Title"), 4 * 20))
                                 player.sendMessage(plugin.api.getLang("SubServers", "Interface.Host-Creator.Edit-Version.Message"));
                             input.put(player.getUniqueId(), m -> {
                                 if (m.getString("message").length() <= 0) {
-                                    ((UIRenderer.CreatorOptions) gui.lastVisitedObjects[0]).setVersion(null);
-                                } else ((UIRenderer.CreatorOptions) gui.lastVisitedObjects[0]).setVersion(new Version(m.getString("message")));
-                                gui.hostCreator((UIRenderer.CreatorOptions) gui.lastVisitedObjects[0]);
+                                    ((UIRenderer.CreatorOptions) gui.lastVisitedObjectz[0]).setVersion(null);
+                                } else ((UIRenderer.CreatorOptions) gui.lastVisitedObjectz[0]).setVersion(new Version(m.getString("message")));
+                                gui.hostCreator((UIRenderer.CreatorOptions) gui.lastVisitedObjectz[0]);
                             });
                         } else if (ChatColor.stripColor(item).equals(ChatColor.stripColor(plugin.api.getLang("SubServers", "Interface.Host-Creator.Edit-Port")))) {
                             player.closeInventory();
@@ -159,15 +160,15 @@ public class DefaultUIHandler implements UIHandler, Listener {
                                 player.sendMessage(plugin.api.getLang("SubServers", "Interface.Host-Creator.Edit-Port.Message"));
                             input.put(player.getUniqueId(), m -> {
                                 if (m.getString("message").length() <= 0) {
-                                    ((UIRenderer.CreatorOptions) gui.lastVisitedObjects[0]).setPort(null);
-                                    gui.hostCreator((UIRenderer.CreatorOptions) gui.lastVisitedObjects[0]);
+                                    ((UIRenderer.CreatorOptions) gui.lastVisitedObjectz[0]).setPort(null);
+                                    gui.hostCreator((UIRenderer.CreatorOptions) gui.lastVisitedObjectz[0]);
                                 } else if (Util.isException(() -> Integer.parseInt(m.getString("message"))) || Integer.parseInt(m.getString("message")) <= 0 || Integer.parseInt(m.getString("message")) > 65535) {
                                     if (!gui.sendTitle(plugin.api.getLang("SubServers", "Interface.Host-Creator.Edit-Port.Invalid-Title"), 4 * 20))
                                         player.sendMessage(plugin.api.getLang("SubServers", "Interface.Host-Creator.Edit-Port.Invalid"));
-                                    Bukkit.getScheduler().runTaskLater(plugin, () -> gui.hostCreator((UIRenderer.CreatorOptions) gui.lastVisitedObjects[0]), 4 * 20);
+                                    Bukkit.getScheduler().runTaskLater(plugin, () -> gui.hostCreator((UIRenderer.CreatorOptions) gui.lastVisitedObjectz[0]), 4 * 20);
                                 } else {
-                                    ((UIRenderer.CreatorOptions) gui.lastVisitedObjects[0]).setPort(Integer.valueOf(m.getString("message")));
-                                    gui.hostCreator((UIRenderer.CreatorOptions) gui.lastVisitedObjects[0]);
+                                    ((UIRenderer.CreatorOptions) gui.lastVisitedObjectz[0]).setPort(Integer.valueOf(m.getString("message")));
+                                    gui.hostCreator((UIRenderer.CreatorOptions) gui.lastVisitedObjectz[0]);
                                 }
                             });
                         }
@@ -179,13 +180,13 @@ public class DefaultUIHandler implements UIHandler, Listener {
                         String item = event.getCurrentItem().getItemMeta().getDisplayName();
                         if (item.equals(plugin.api.getLang("SubServers", "Interface.Generic.Back-Arrow"))) {
                             player.closeInventory();
-                            gui.hostCreatorTemplates(gui.lastPage - 1, (UIRenderer.CreatorOptions) gui.lastVisitedObjects[0]);
+                            gui.hostCreatorTemplates(gui.lastPage - 1, (UIRenderer.CreatorOptions) gui.lastVisitedObjectz[0]);
                         } else if (item.equals(plugin.api.getLang("SubServers", "Interface.Generic.Next-Arrow"))) {
                             player.closeInventory();
-                            gui.hostCreatorTemplates(gui.lastPage + 1, (UIRenderer.CreatorOptions) gui.lastVisitedObjects[0]);
+                            gui.hostCreatorTemplates(gui.lastPage + 1, (UIRenderer.CreatorOptions) gui.lastVisitedObjectz[0]);
                         } else if (item.equals(plugin.api.getLang("SubServers", "Interface.Generic.Back"))) {
                             player.closeInventory();
-                            gui.hostCreator((UIRenderer.CreatorOptions) gui.lastVisitedObjects[0]);
+                            gui.hostCreator((UIRenderer.CreatorOptions) gui.lastVisitedObjectz[0]);
                         } else {
                             player.closeInventory();
                             String obj;
@@ -194,8 +195,8 @@ public class DefaultUIHandler implements UIHandler, Listener {
                             } else {
                                 obj = ChatColor.stripColor(item);
                             }
-                            ((UIRenderer.CreatorOptions) gui.lastVisitedObjects[0]).setTemplate(obj);
-                            gui.hostCreator((UIRenderer.CreatorOptions) gui.lastVisitedObjects[0]);
+                            ((UIRenderer.CreatorOptions) gui.lastVisitedObjectz[0]).setTemplate(obj);
+                            gui.hostCreator((UIRenderer.CreatorOptions) gui.lastVisitedObjectz[0]);
                         }
                     }
                 } else if (title.startsWith(plugin.api.getLang("SubServers", "Interface.Host-Plugin.Title").split("\\$str\\$")[0]) && // Host Plugin
@@ -205,10 +206,10 @@ public class DefaultUIHandler implements UIHandler, Listener {
                         String item = event.getCurrentItem().getItemMeta().getDisplayName();
                         if (item.equals(plugin.api.getLang("SubServers", "Interface.Generic.Back-Arrow"))) {
                             player.closeInventory();
-                            gui.hostPlugin(gui.lastPage - 1, ((String) gui.lastVisitedObjects[0]));
+                            gui.hostPlugin(gui.lastPage - 1, ((Host) gui.lastVisitedObjectz[0]).getName());
                         } else if (item.equals(plugin.api.getLang("SubServers", "Interface.Generic.Next-Arrow"))) {
                             player.closeInventory();
-                            gui.hostPlugin(gui.lastPage + 1, ((String) gui.lastVisitedObjects[0]));
+                            gui.hostPlugin(gui.lastPage + 1, ((Host) gui.lastVisitedObjectz[0]).getName());
                         } else if (item.equals(plugin.api.getLang("SubServers", "Interface.Generic.Back"))) {
                             player.closeInventory();
                             gui.back();
@@ -221,8 +222,8 @@ public class DefaultUIHandler implements UIHandler, Listener {
                             if (plugin.get() == null) {
                                 gui.reopen();
                             } else {
-                                gui.setDownloading(ChatColor.stripColor(this.plugin.api.getLang("SubServers", "Interface.Host-Plugin.Title").replace("$str$", (String) gui.lastVisitedObjects[0])));
-                                this.plugin.api.getHost((String) gui.lastVisitedObjects[0], host -> {
+                                gui.setDownloading(ChatColor.stripColor(this.plugin.api.getLang("SubServers", "Interface.Host-Plugin.Title").replace("$str$", ((Host) gui.lastVisitedObjectz[0]).getName())));
+                                this.plugin.api.getHost(((Host) gui.lastVisitedObjectz[0]).getName(), host -> {
                                     if (host != null) {
                                         gui.setDownloading(null);
                                         plugin.get().open(player, host);
@@ -264,10 +265,10 @@ public class DefaultUIHandler implements UIHandler, Listener {
 
                         if (item.equals(plugin.api.getLang("SubServers", "Interface.Generic.Back-Arrow"))) {
                             player.closeInventory();
-                            gui.serverMenu(gui.lastPage - 1, (String) gui.lastVisitedObjects[0], (String) gui.lastVisitedObjects[1]);
+                            gui.serverMenu(gui.lastPage - 1, (String) gui.lastVisitedObjectz[0], (String) gui.lastVisitedObjectz[1]);
                         } else if (item.equals(plugin.api.getLang("SubServers", "Interface.Generic.Next-Arrow"))) {
                             player.closeInventory();
-                            gui.serverMenu(gui.lastPage + 1, (String) gui.lastVisitedObjects[0], (String) gui.lastVisitedObjects[1]);
+                            gui.serverMenu(gui.lastPage + 1, (String) gui.lastVisitedObjectz[0], (String) gui.lastVisitedObjectz[1]);
                         } else if (item.equals(plugin.api.getLang("SubServers", "Interface.Server-Menu.Host-Menu"))) {
                             player.closeInventory();
                             gui.hostMenu(1);
@@ -296,15 +297,15 @@ public class DefaultUIHandler implements UIHandler, Listener {
                             gui.back();
                         } else if (item.equals(plugin.api.getLang("SubServers", "Interface.Host-Admin.Creator"))) {
                             player.closeInventory();
-                            if (player.hasPermission("subservers.host.create.*") || player.hasPermission("subservers.host.create." + ((String) gui.lastVisitedObjects[0]).toLowerCase())) {
-                                gui.hostCreator(new UIRenderer.CreatorOptions((String) gui.lastVisitedObjects[0]));
+                            if (player.hasPermission("subservers.host.create.*") || player.hasPermission("subservers.host.create." + ((Host) gui.lastVisitedObjectz[0]).getName().toLowerCase())) {
+                                gui.hostCreator(new UIRenderer.CreatorOptions(((Host) gui.lastVisitedObjectz[0]).getName()));
                             } else gui.reopen();
                         } else if (item.equals(plugin.api.getLang("SubServers", "Interface.Host-Admin.SubServers"))) {
                             player.closeInventory();
-                            gui.serverMenu(1, (String) gui.lastVisitedObjects[0], null);
+                            gui.serverMenu(1, ((Host) gui.lastVisitedObjectz[0]).getName(), null);
                         } else if (item.equals(plugin.api.getLang("SubServers", "Interface.Host-Admin.Plugins"))) {
                             player.closeInventory();
-                            gui.hostPlugin(1, (String) gui.lastVisitedObjects[0]);
+                            gui.hostPlugin(1, ((Host) gui.lastVisitedObjectz[0]).getName());
                         }
                     }
                 } else if (title.startsWith(plugin.api.getLang("SubServers", "Interface.SubServer-Admin.Title").split("\\$str\\$")[0]) && // SubServer Admin
@@ -318,12 +319,12 @@ public class DefaultUIHandler implements UIHandler, Listener {
                             gui.back();
                         } else if (item.equals(plugin.api.getLang("SubServers", "Interface.SubServer-Admin.Update"))) {
                             player.closeInventory();
-                            if (player.hasPermission("subservers.subserver.command.*") || player.hasPermission("subservers.subserver.update." + ((String) gui.lastVisitedObjects[0]).toLowerCase())) {
+                            if (((SubServer) gui.lastVisitedObjectz[0]).permits(player, "subservers.subserver.%.*", "subservers.subserver.%.update")) {
                                 if (!gui.sendTitle(plugin.api.getLang("SubServers", "Interface.SubServer-Admin.Update.Title"), 4 * 20))
                                     player.sendMessage(plugin.api.getLang("SubServers", "Interface.SubServer-Admin.Update.Message"));
                                 input.put(player.getUniqueId(), m -> {
                                     gui.setDownloading(plugin.api.getLang("SubServers", "Interface.Generic.Downloading.Response"));
-                                    ((SubDataClient) plugin.api.getSubDataNetwork()[0]).sendPacket(new PacketUpdateServer(player.getUniqueId(), (String) gui.lastVisitedObjects[0],
+                                    ((SubDataClient) plugin.api.getSubDataNetwork()[0]).sendPacket(new PacketUpdateServer(player.getUniqueId(), ((SubServer) gui.lastVisitedObjectz[0]).getName(),
                                             (m.getString("message").length() == 0 || m.getString("message").equals("/"))?null:new Version((m.getString("message").startsWith("/"))?m.getString("message").substring(1):m.getString("message")), data -> {
                                         gui.reopen();
                                     }));
@@ -331,23 +332,23 @@ public class DefaultUIHandler implements UIHandler, Listener {
                             } else gui.reopen();
                         } else if (item.equals(plugin.api.getLang("SubServers", "Interface.SubServer-Admin.Start"))) {
                             player.closeInventory();
-                            if (player.hasPermission("subservers.subserver.start.*") || player.hasPermission("subservers.subserver.start." + ((String) gui.lastVisitedObjects[0]).toLowerCase())) {
+                            if (((SubServer) gui.lastVisitedObjectz[0]).permits(player, "subservers.subserver.%.*", "subservers.subserver.%.start")) {
                                 gui.setDownloading(plugin.api.getLang("SubServers", "Interface.Generic.Downloading.Response"));
-                                ((SubDataClient) plugin.api.getSubDataNetwork()[0]).sendPacket(new PacketStartServer(player.getUniqueId(), (String) gui.lastVisitedObjects[0], data -> {
+                                ((SubServer) gui.lastVisitedObjectz[0]).start(player.getUniqueId(), response -> {
                                     gui.setDownloading(plugin.api.getLang("SubServers", "Interface.SubServer-Admin.Start.Title"));
                                     Bukkit.getScheduler().runTaskLater(plugin, gui::reopen, 30);
-                                }));
+                                });
                             } else gui.reopen();
                         } else if (item.equals(plugin.api.getLang("SubServers", "Interface.SubServer-Admin.Stop"))) {
                             player.closeInventory();
-                            if (player.hasPermission("subservers.subserver.stop.*") || player.hasPermission("subservers.subserver.stop." + ((String) gui.lastVisitedObjects[0]).toLowerCase())) {
+                            if (((SubServer) gui.lastVisitedObjectz[0]).permits(player, "subservers.subserver.%.*", "subservers.subserver.%.stop")) {
                                 gui.setDownloading(plugin.api.getLang("SubServers", "Interface.Generic.Downloading.Response"));
                                 final Container<Boolean> listening = new Container<Boolean>(true);
                                 PacketInExRunEvent.callback("SubStoppedEvent", new Callback<ObjectMap<String>>() {
                                     @Override
                                     public void run(ObjectMap<String> json) {
                                         try {
-                                            if (listening.get()) if (!json.getString("server").equalsIgnoreCase((String) gui.lastVisitedObjects[0])) {
+                                            if (listening.get()) if (!json.getString("server").equalsIgnoreCase(((SubServer) gui.lastVisitedObjectz[0]).getName())) {
                                                 PacketInExRunEvent.callback("SubStoppedEvent", this);
                                             } else {
                                                 Bukkit.getScheduler().runTaskLater(plugin, gui::reopen, 5);
@@ -355,23 +356,23 @@ public class DefaultUIHandler implements UIHandler, Listener {
                                         } catch (Exception e) {}
                                     }
                                 });
-                                ((SubDataClient) plugin.api.getSubDataNetwork()[0]).sendPacket(new PacketStopServer(player.getUniqueId(), (String) gui.lastVisitedObjects[0], false, data -> {
-                                    if (data.getInt(0x0001) != 0) {
+                                ((SubServer) gui.lastVisitedObjectz[0]).stop(player.getUniqueId(), response -> {
+                                    if (response != 0) {
                                         gui.reopen();
                                         listening.set(false);
-                                    } else gui.setDownloading(plugin.api.getLang("SubServers", "Interface.SubServer-Admin.Stop.Title").replace("$str$", (String) gui.lastVisitedObjects[0]));
-                                }));
+                                    } else gui.setDownloading(plugin.api.getLang("SubServers", "Interface.SubServer-Admin.Stop.Title").replace("$str$", ((SubServer) gui.lastVisitedObjectz[0]).getName()));
+                                });
                             } else gui.reopen();
                         } else if (item.equals(plugin.api.getLang("SubServers", "Interface.SubServer-Admin.Terminate"))) {
                             player.closeInventory();
-                            if (player.hasPermission("subservers.subserver.terminate.*") || player.hasPermission("subservers.subserver.terminate." + ((String) gui.lastVisitedObjects[0]).toLowerCase())) {
+                            if (((SubServer) gui.lastVisitedObjectz[0]).permits(player, "subservers.subserver.%.*", "subservers.subserver.%.terminate")) {
                                 gui.setDownloading(plugin.api.getLang("SubServers", "Interface.Generic.Downloading.Response"));
                                 final Container<Boolean> listening = new Container<Boolean>(true);
                                 PacketInExRunEvent.callback("SubStoppedEvent", new Callback<ObjectMap<String>>() {
                                     @Override
                                     public void run(ObjectMap<String> json) {
                                         try {
-                                            if (listening.get()) if (!json.getString("server").equalsIgnoreCase((String) gui.lastVisitedObjects[0])) {
+                                            if (listening.get()) if (!json.getString("server").equalsIgnoreCase(((SubServer) gui.lastVisitedObjectz[0]).getName())) {
                                                 PacketInExRunEvent.callback("SubStoppedEvent", this);
                                             } else {
                                                 gui.reopen();
@@ -379,28 +380,28 @@ public class DefaultUIHandler implements UIHandler, Listener {
                                         } catch (Exception e) {}
                                     }
                                 });
-                                ((SubDataClient) plugin.api.getSubDataNetwork()[0]).sendPacket(new PacketStopServer(player.getUniqueId(), (String) gui.lastVisitedObjects[0], false, data -> {
-                                    if (data.getInt(0x0001) != 0) {
+                                ((SubServer) gui.lastVisitedObjectz[0]).terminate(player.getUniqueId(), response -> {
+                                    if (response != 0) {
                                         gui.reopen();
                                         listening.set(false);
-                                    } else gui.setDownloading(plugin.api.getLang("SubServers", "Interface.SubServer-Admin.Terminate.Title").replace("$str$", (String) gui.lastVisitedObjects[0]));
-                                }));
+                                    } else gui.setDownloading(plugin.api.getLang("SubServers", "Interface.SubServer-Admin.Terminate.Title").replace("$str$", ((SubServer) gui.lastVisitedObjectz[0]).getName()));
+                                });
                             } else gui.reopen();
                         } else if (item.equals(plugin.api.getLang("SubServers", "Interface.SubServer-Admin.Command"))) {
                             player.closeInventory();
-                            if (player.hasPermission("subservers.subserver.command.*") || player.hasPermission("subservers.subserver.command." + ((String) gui.lastVisitedObjects[0]).toLowerCase())) {
+                            if (((SubServer) gui.lastVisitedObjectz[0]).permits(player, "subservers.subserver.%.*", "subservers.subserver.%.command")) {
                                 if (!gui.sendTitle(plugin.api.getLang("SubServers", "Interface.SubServer-Admin.Command.Title"), 4 * 20))
                                     player.sendMessage(plugin.api.getLang("SubServers", "Interface.SubServer-Admin.Command.Message"));
                                 input.put(player.getUniqueId(), m -> {
                                     gui.setDownloading(plugin.api.getLang("SubServers", "Interface.Generic.Downloading.Response"));
-                                    ((SubDataClient) plugin.api.getSubDataNetwork()[0]).sendPacket(new PacketCommandServer(player.getUniqueId(), (String) gui.lastVisitedObjects[0], (m.getString("message").startsWith("/"))?m.getString("message").substring(1):m.getString("message"), data -> {
+                                    ((SubServer) gui.lastVisitedObjectz[0]).command(player.getUniqueId(), (m.getString("message").startsWith("/"))?m.getString("message").substring(1):m.getString("message"), response -> {
                                         gui.reopen();
-                                    }));
+                                    });
                                 });
                             } else gui.reopen();
                         } else if (item.equals(plugin.api.getLang("SubServers", "Interface.SubServer-Admin.Plugins"))) {
                             player.closeInventory();
-                            gui.subserverPlugin(1, (String) gui.lastVisitedObjects[0]);
+                            gui.subserverPlugin(1, ((SubServer) gui.lastVisitedObjectz[0]).getName());
                         }
                     }
                 } else if (title.startsWith(plugin.api.getLang("SubServers", "Interface.SubServer-Plugin.Title").split("\\$str\\$")[0]) && // SubServer Plugin
@@ -410,10 +411,10 @@ public class DefaultUIHandler implements UIHandler, Listener {
                         String item = event.getCurrentItem().getItemMeta().getDisplayName();
                         if (item.equals(plugin.api.getLang("SubServers", "Interface.Generic.Back-Arrow"))) {
                             player.closeInventory();
-                            gui.subserverPlugin(gui.lastPage - 1, (String) gui.lastVisitedObjects[0]);
+                            gui.subserverPlugin(gui.lastPage - 1, ((SubServer) gui.lastVisitedObjectz[0]).getName());
                         } else if (item.equals(plugin.api.getLang("SubServers", "Interface.Generic.Next-Arrow"))) {
                             player.closeInventory();
-                            gui.subserverPlugin(gui.lastPage + 1, (String) gui.lastVisitedObjects[0]);
+                            gui.subserverPlugin(gui.lastPage + 1, ((SubServer) gui.lastVisitedObjectz[0]).getName());
                         } else if (item.equals(plugin.api.getLang("SubServers", "Interface.Generic.Back"))) {
                             player.closeInventory();
                             gui.back();
@@ -426,8 +427,8 @@ public class DefaultUIHandler implements UIHandler, Listener {
                             if (plugin.get() == null) {
                                 gui.reopen();
                             } else {
-                                gui.setDownloading(ChatColor.stripColor(this.plugin.api.getLang("SubServers", "Interface.SubServer-Plugin.Title").replace("$str$", (String) gui.lastVisitedObjects[0])));
-                                this.plugin.api.getSubServer((String) gui.lastVisitedObjects[0], subserver -> {
+                                gui.setDownloading(ChatColor.stripColor(this.plugin.api.getLang("SubServers", "Interface.SubServer-Plugin.Title").replace("$str$", ((SubServer) gui.lastVisitedObjectz[0]).getName())));
+                                this.plugin.api.getSubServer(((SubServer) gui.lastVisitedObjectz[0]).getName(), subserver -> {
                                     if (subserver != null) {
                                         gui.setDownloading(null);
                                         plugin.get().open(player, subserver);

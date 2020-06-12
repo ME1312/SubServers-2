@@ -3,17 +3,18 @@ package net.ME1312.SubServers.Bungee.Host;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.SubServers.Bungee.Event.SubEditServerEvent;
 import net.ME1312.SubServers.Bungee.Library.Exception.InvalidServerException;
-import net.ME1312.Galaxi.Library.NamedContainer;
+import net.ME1312.Galaxi.Library.Container.NamedContainer;
 import net.ME1312.SubServers.Bungee.SubAPI;
 
 import java.io.File;
 import java.net.InetSocketAddress;
+import java.net.SocketAddress;
 import java.util.*;
 
 /**
  * SubServer Layout Class
  */
-public abstract class SubServerContainer extends ServerContainer implements SubServer {
+public abstract class SubServerImpl extends ServerImpl implements SubServer {
     private List<NamedContainer<String, String>> incompatibilities = new ArrayList<NamedContainer<String, String>>();
     private String template = null;
     protected boolean started;
@@ -26,10 +27,30 @@ public abstract class SubServerContainer extends ServerContainer implements SubS
      * @param name Server Name
      * @param port Port Number
      * @param motd Server MOTD
-     * @param restricted Players will need a permission to join if true
+     * @param hidden Hidden Status
+     * @param restricted Restricted Status
+     *
+     * @see ServerImpl#ServerImpl(String, SocketAddress, String, boolean, boolean) Super Method 2
      * @throws InvalidServerException
      */
-    public SubServerContainer(Host host, String name, int port, String motd, boolean hidden, boolean restricted) throws InvalidServerException {
+    protected SubServerImpl(Host host, String name, int port, String motd, boolean hidden, boolean restricted) throws InvalidServerException {
+        super(name, (SocketAddress) new InetSocketAddress(host.getAddress().getHostAddress(), port), motd, hidden, restricted);
+    }
+
+    /**
+     * Creates a SubServer
+     *
+     * @param host Host
+     * @param name Server Name
+     * @param port Port Number
+     * @param motd Server MOTD
+     * @param hidden Hidden Status
+     * @param restricted Restricted Status
+     *
+     * @see ServerImpl#ServerImpl(String, InetSocketAddress, String, boolean, boolean) Super Method 1
+     * @throws InvalidServerException
+     */
+    protected SubServerImpl(Host host, String name, Integer port, String motd, boolean hidden, boolean restricted) throws InvalidServerException {
         super(name, new InetSocketAddress(host.getAddress().getHostAddress(), port), motd, hidden, restricted);
     }
 

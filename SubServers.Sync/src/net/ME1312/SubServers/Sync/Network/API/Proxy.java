@@ -1,20 +1,24 @@
 package net.ME1312.SubServers.Sync.Network.API;
 
+import net.ME1312.Galaxi.Library.Callback.Callback;
+import net.ME1312.Galaxi.Library.Container.NamedContainer;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Map.ObjectMapValue;
-import net.ME1312.Galaxi.Library.NamedContainer;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubData.Client.DataSender;
 import net.ME1312.SubData.Client.Library.ForwardedDataSender;
 import net.ME1312.SubData.Client.SubDataClient;
 import net.ME1312.SubData.Client.SubDataSender;
+import net.ME1312.SubServers.Sync.Network.Packet.PacketDownloadPlayerInfo;
 import net.ME1312.SubServers.Sync.Network.Packet.PacketDownloadProxyInfo;
 import net.ME1312.SubServers.Sync.SubAPI;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 public class Proxy {
     ObjectMap<String> raw;
+    private List<RemotePlayer> players = null;
     long timestamp;
 
     /**
@@ -33,6 +37,7 @@ public class Proxy {
 
     private void load(ObjectMap<String> raw) {
         this.raw = raw;
+        this.players = null;
         this.timestamp = Calendar.getInstance().getTime().getTime();
     }
 
@@ -41,7 +46,7 @@ public class Proxy {
      */
     public void refresh() {
         String name = getName();
-        ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketDownloadProxyInfo(name, data -> load(data.getMap(name))));
+        ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketDownloadProxyInfo(Collections.singletonList(name), data -> load(data.getMap(name))));
     }
 
     /**
@@ -78,7 +83,7 @@ public class Proxy {
     }
 
     /**
-     * Test if the proxy is connected to RedisBungee's server
+     * Determine if the proxy is connected to RedisBungee's server
      *
      * @return Redis Status
      */
@@ -87,16 +92,60 @@ public class Proxy {
     }
 
     /**
+     * Determine if the proxy is the Master Proxy
+     *
+     * @return Master Proxy Status
+     */
+    public boolean isMaster() {
+        return raw.getBoolean("master");
+    }
+
+    /**
      * Get the players on this proxy (via RedisBungee)
      *
-     * @return Player Collection
+     * @return Remote Player Collection
      */
     public Collection<NamedContainer<String, UUID>> getPlayers() {
         List<NamedContainer<String, UUID>> players = new ArrayList<NamedContainer<String, UUID>>();
         for (String id : raw.getMap("players").getKeys()) {
-            players.add(new NamedContainer<String, UUID>(raw.getMap("players").getMap(id).getRawString("name"), UUID.fromString(id)));
+            players.add(new NamedContainer<String, UUID>(raw.getMap("players").getRawString(id), UUID.fromString(id)));
         }
         return players;
+    }
+
+    /**
+     * Get the players on this proxy (via RedisBungee)
+     *
+     * @param callback Remote Player Collection
+     */
+    public void getPlayers(Callback<Collection<RemotePlayer>> callback) {
+        if (Util.isNull(callback)) throw new NullPointerException();
+        StackTraceElement[] origin = new Exception().getStackTrace();
+        Runnable run = () -> {
+            try {
+                callback.run(players);
+            } catch (Throwable e) {
+                Throwable ew = new InvocationTargetException(e);
+                ew.setStackTrace(origin);
+                ew.printStackTrace();
+            }
+        };
+
+        if (players == null) {
+            LinkedList<UUID> ids = new LinkedList<UUID>();
+            for (String id : raw.getMap("players").getKeys()) ids.add(UUID.fromString(id));
+            ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketDownloadPlayerInfo(ids, data -> {
+                LinkedList<RemotePlayer> players = new LinkedList<RemotePlayer>();
+                for (String player : data.getKeys()) {
+                    players.add(new RemotePlayer(data.getMap(player)));
+                }
+
+                this.players = players;
+                run.run();
+            }));
+        } else {
+            run.run();
+        }
     }
 
     /**

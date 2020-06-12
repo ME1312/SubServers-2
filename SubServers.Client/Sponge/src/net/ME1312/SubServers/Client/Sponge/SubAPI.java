@@ -1,16 +1,14 @@
 package net.ME1312.SubServers.Client.Sponge;
 
 import net.ME1312.SubData.Client.DataClient;
+import net.ME1312.SubData.Client.DataProtocol;
 import net.ME1312.SubData.Client.SubDataClient;
 import net.ME1312.SubServers.Client.Sponge.Graphic.UIHandler;
 import net.ME1312.Galaxi.Library.Callback.Callback;
-import net.ME1312.Galaxi.Library.NamedContainer;
+import net.ME1312.Galaxi.Library.Container.NamedContainer;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
-import net.ME1312.SubServers.Client.Sponge.Network.API.Host;
-import net.ME1312.SubServers.Client.Sponge.Network.API.Proxy;
-import net.ME1312.SubServers.Client.Sponge.Network.API.Server;
-import net.ME1312.SubServers.Client.Sponge.Network.API.SubServer;
+import net.ME1312.SubServers.Client.Sponge.Network.API.*;
 import net.ME1312.SubServers.Client.Sponge.Network.Packet.*;
 import org.spongepowered.api.Platform;
 import org.spongepowered.api.Sponge;
@@ -29,7 +27,7 @@ public final class SubAPI {
     private static SubAPI api;
     String name;
 
-    protected SubAPI(SubPlugin plugin) {
+    SubAPI(SubPlugin plugin) {
         this.plugin = plugin;
         GAME_VERSION = getGameVersion();
         api = this;
@@ -106,7 +104,7 @@ public final class SubAPI {
     public void getHost(String name, Callback<Host> callback) {
         if (Util.isNull(name, callback)) throw new NullPointerException();
         StackTraceElement[] origin = new Exception().getStackTrace();
-        ((SubDataClient) plugin.api.getSubDataNetwork()[0]).sendPacket(new PacketDownloadHostInfo(name, data -> {
+        ((SubDataClient) plugin.api.getSubDataNetwork()[0]).sendPacket(new PacketDownloadHostInfo(Collections.singletonList(name), data -> {
             Host host = null;
             if (data.getKeys().size() > 0) {
                 host = new Host(data.getMap(new LinkedList<String>(data.getKeys()).getFirst()));
@@ -176,14 +174,14 @@ public final class SubAPI {
      * @param name Group name
      * @param callback a Server Group
      */
-    public void getGroup(String name, Callback<List<Server>> callback) {
+    public void getGroup(String name, Callback<NamedContainer<String, List<Server>>> callback) {
         if (Util.isNull(name, callback)) throw new NullPointerException();
         StackTraceElement[] origin = new Exception().getStackTrace();
-        ((SubDataClient) plugin.api.getSubDataNetwork()[0]).sendPacket(new PacketDownloadGroupInfo(name, data -> {
-            List<Server> servers = null;
+        ((SubDataClient) plugin.api.getSubDataNetwork()[0]).sendPacket(new PacketDownloadGroupInfo(Collections.singletonList(name), data -> {
+            NamedContainer<String, List<Server>> group = null;
             if (data.getKeys().size() > 0) {
                 String key = new LinkedList<String>(data.getKeys()).getFirst();
-                servers = new ArrayList<Server>();
+                List<Server> servers = new ArrayList<Server>();
                 for (String server : data.getMap(key).getKeys()) {
                     if (data.getMap(key).getMap(server).getRawString("type", "Server").equals("SubServer")) {
                         servers.add(new SubServer(data.getMap(key).getMap(server)));
@@ -191,10 +189,11 @@ public final class SubAPI {
                         servers.add(new Server(data.getMap(key).getMap(server)));
                     }
                 }
+                group = new NamedContainer<>(key, servers);
             }
 
             try {
-                callback.run(servers);
+                callback.run(group);
             } catch (Throwable e) {
                 Throwable ew = new InvocationTargetException(e);
                 ew.setStackTrace(origin);
@@ -240,7 +239,7 @@ public final class SubAPI {
     public void getServer(String name, Callback<Server> callback) {
         if (Util.isNull(name, callback)) throw new NullPointerException();
         StackTraceElement[] origin = new Exception().getStackTrace();
-        ((SubDataClient) plugin.api.getSubDataNetwork()[0]).sendPacket(new PacketDownloadServerInfo(name, data -> {
+        ((SubDataClient) plugin.api.getSubDataNetwork()[0]).sendPacket(new PacketDownloadServerInfo(Collections.singletonList(name), data -> {
             Server server = null;
             if (data.getKeys().size() > 0) {
                 String key = new LinkedList<String>(data.getKeys()).getFirst();
@@ -489,7 +488,7 @@ public final class SubAPI {
     public void getProxy(String name, Callback<Proxy> callback) {
         if (Util.isNull(name, callback)) throw new NullPointerException();
         StackTraceElement[] origin = new Exception().getStackTrace();
-        ((SubDataClient) plugin.api.getSubDataNetwork()[0]).sendPacket(new PacketDownloadProxyInfo(name, data -> {
+        ((SubDataClient) plugin.api.getSubDataNetwork()[0]).sendPacket(new PacketDownloadProxyInfo(Collections.singletonList(name), data -> {
             Proxy proxy = null;
             if (data.getKeys().size() > 0) {
                 proxy = new Proxy(data.getMap(new LinkedList<String>(data.getKeys()).getFirst()));
@@ -513,10 +512,10 @@ public final class SubAPI {
     public void getMasterProxy(Callback<Proxy> callback) {
         if (Util.isNull(callback)) throw new NullPointerException();
         StackTraceElement[] origin = new Exception().getStackTrace();
-        ((SubDataClient) plugin.api.getSubDataNetwork()[0]).sendPacket(new PacketDownloadProxyInfo("", data -> {
+        ((SubDataClient) plugin.api.getSubDataNetwork()[0]).sendPacket(new PacketDownloadProxyInfo(Collections.emptyList(), data -> {
             Proxy proxy = null;
-            if (data != null) {
-                proxy = new Proxy(data);
+            if (data.getKeys().size() > 0) {
+                proxy = new Proxy(data.getMap(new LinkedList<String>(data.getKeys()).getFirst()));
             }
 
             try {
@@ -532,16 +531,15 @@ public final class SubAPI {
     /**
      * Get players on this network across all known proxies
      *
-     * @param callback Player Collection
+     * @param callback Remote Player Collection
      */
-    @SuppressWarnings("unchecked")
-    public void getGlobalPlayers(Callback<Collection<NamedContainer<String, UUID>>> callback) {
+    public void getGlobalPlayers(Callback<Map<UUID, RemotePlayer>> callback) {
         if (Util.isNull(callback)) throw new NullPointerException();
         StackTraceElement[] origin = new Exception().getStackTrace();
-        ((SubDataClient) plugin.api.getSubDataNetwork()[0]).sendPacket(new PacketDownloadPlayerList(data -> {
-            List<NamedContainer<String, UUID>> players = new ArrayList<NamedContainer<String, UUID>>();
-            for (String id : data.getKeys()) {
-                players.add(new NamedContainer<String, UUID>(data.getMap(id).getRawString("name"), UUID.fromString(id)));
+        ((SubDataClient) plugin.api.getSubDataNetwork()[0]).sendPacket(new PacketDownloadPlayerInfo((List<UUID>) null, data -> {
+            TreeMap<UUID, RemotePlayer> players = new TreeMap<UUID, RemotePlayer>();
+            for (String player : data.getKeys()) {
+                players.put(UUID.fromString(player), new RemotePlayer(data.getMap(player)));
             }
 
             try {
@@ -555,9 +553,59 @@ public final class SubAPI {
     }
 
     /**
-     * Gets the SubData Network Manager
+     * Get a player on this network by searching across all known proxies
      *
-     * @return SubData Network Manager
+     * @param name Player name
+     * @param callback Remote Player
+     */
+    public void getGlobalPlayer(String name, Callback<RemotePlayer> callback) {
+        if (Util.isNull(name, callback)) throw new NullPointerException();
+        StackTraceElement[] origin = new Exception().getStackTrace();
+        ((SubDataClient) plugin.api.getSubDataNetwork()[0]).sendPacket(new PacketDownloadPlayerInfo(Collections.singletonList(name), data -> {
+            RemotePlayer player = null;
+            if (data.getKeys().size() > 0) {
+                player = new RemotePlayer(data.getMap(new LinkedList<String>(data.getKeys()).getFirst()));
+            }
+
+            try {
+                callback.run(player);
+            } catch (Throwable e) {
+                Throwable ew = new InvocationTargetException(e);
+                ew.setStackTrace(origin);
+                ew.printStackTrace();
+            }
+        }));
+    }
+
+    /**
+     * Get a player on this network by searching across all known proxies
+     *
+     * @param id Player UUID
+     * @param callback Remote Player
+     */
+    public void getGlobalPlayer(UUID id, Callback<RemotePlayer> callback) {
+        if (Util.isNull(id, callback)) throw new NullPointerException();
+        StackTraceElement[] origin = new Exception().getStackTrace();
+        ((SubDataClient) plugin.api.getSubDataNetwork()[0]).sendPacket(new PacketDownloadPlayerInfo(Collections.singletonList(id), data -> {
+            RemotePlayer player = null;
+            if (data.getKeys().size() > 0) {
+                player = new RemotePlayer(data.getMap(new LinkedList<String>(data.getKeys()).getFirst()));
+            }
+
+            try {
+                callback.run(player);
+            } catch (Throwable e) {
+                Throwable ew = new InvocationTargetException(e);
+                ew.setStackTrace(origin);
+                ew.printStackTrace();
+            }
+        }));
+    }
+
+    /**
+     * Gets the SubData Network Connections
+     *
+     * @return SubData Network Connections
      */
     public DataClient[] getSubDataNetwork() {
         LinkedList<Integer> keys = new LinkedList<Integer>(plugin.subdata.keySet());
@@ -565,6 +613,15 @@ public final class SubAPI {
         Collections.sort(keys);
         for (Integer channel : keys) channels.add(plugin.subdata.get(channel));
         return channels.toArray(new DataClient[0]);
+    }
+
+    /**
+     * Gets the SubData Network Protocol
+     *
+     * @return SubData Network Protocol
+     */
+    public DataProtocol getSubDataProtocol() {
+        return plugin.subprotocol;
     }
 
     /**

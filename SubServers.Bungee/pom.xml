@@ -30,20 +30,20 @@
         <dependency>
             <groupId>net.ME1312.Galaxi</groupId>
             <artifactId>GalaxiUtil</artifactId>
-            <version>20w08c</version>
+            <version>20w15a</version>
             <scope>compile</scope>
             <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>net.ME1312.Galaxi</groupId>
             <artifactId>GalaxiEngine</artifactId>
-            <version>20w08c</version>
+            <version>20w15a</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>net.ME1312.SubData</groupId>
             <artifactId>Server</artifactId>
-            <version>20w07d</version>
+            <version>20w15a</version>
             <scope>compile</scope>
             <optional>true</optional>
         </dependency>
@@ -162,7 +162,7 @@
                         <configuration>
                             <windowtitle>SubServers.Bungee Javadoc</windowtitle>
                             <doctitle>SubServers.Bungee Javadoc</doctitle>
-                            <show>public</show>
+                            <show>protected</show>
                             <destDir>./</destDir>
                             <outputDirectory>${basedir}/../Javadoc/SubServers.Bungee</outputDirectory>
                             <reportOutputDirectory>${basedir}/../Javadoc/SubServers.Bungee</reportOutputDirectory>

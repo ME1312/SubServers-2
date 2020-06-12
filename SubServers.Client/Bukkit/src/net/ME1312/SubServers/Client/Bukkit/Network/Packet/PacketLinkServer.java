@@ -52,10 +52,8 @@ public class PacketLinkServer implements InitialPacket, PacketObjectIn<Integer>,
     public void receive(SubDataSender client, ObjectMap<Integer> data) {
         if (data.getInt(0x0001) == 0) {
             try {
-                if (data.contains(0x0000)) {
-                    Util.reflect(SubAPI.class.getDeclaredField("name"), plugin.api, data.getRawString(0x0000));
-                    setReady(client.getConnection(), true);
-                }
+                if (data.contains(0x0000)) Util.reflect(SubAPI.class.getDeclaredField("name"), plugin.api, data.getRawString(0x0000));
+                setReady(client.getConnection(), true);
             } catch (Throwable e) {
                 e.printStackTrace();
             }

@@ -42,6 +42,7 @@ crashlytics-build.properties
 /Artifacts/-Icon/
 /Artifacts/-Lite/
 /Artifacts/*.jar
+/BungeeCord/
 /Javadoc/
 /SubServers.Test/
 /build.ant

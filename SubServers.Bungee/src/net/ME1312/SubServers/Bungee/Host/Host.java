@@ -9,6 +9,7 @@ import net.ME1312.Galaxi.Library.ExtraDataHandler;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubServers.Bungee.SubAPI;
 import net.ME1312.SubServers.Bungee.SubProxy;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 import java.net.InetAddress;
 import java.util.*;
@@ -106,6 +107,32 @@ public abstract class Host implements ExtraDataHandler {
         } else {
             this.nick = value;
         }
+    }
+
+    /**
+     * Get players on servers provided by this host
+     *
+     * @return Local Player Collection
+     */
+    public Collection<ProxiedPlayer> getPlayers() {
+        LinkedList<ProxiedPlayer> players = new LinkedList<ProxiedPlayer>();
+        for (SubServer server : getSubServers().values()) {
+            players.addAll(server.getPlayers());
+        }
+        return players;
+    }
+
+    /**
+     * Get players on servers provided by this host across all known proxies
+     *
+     * @return Remote Player Collection
+     */
+    public Collection<RemotePlayer> getGlobalPlayers() {
+        LinkedList<RemotePlayer> players = new LinkedList<RemotePlayer>();
+        for (SubServer server : getSubServers().values()) {
+            players.addAll(server.getGlobalPlayers());
+        }
+        return players;
     }
 
     /**

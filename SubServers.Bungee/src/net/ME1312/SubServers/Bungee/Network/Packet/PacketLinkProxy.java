@@ -8,11 +8,15 @@ import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubData.Server.SubDataClient;
 import net.ME1312.SubData.Server.Protocol.PacketObjectOut;
 import net.ME1312.SubData.Server.Protocol.PacketObjectIn;
+import net.ME1312.SubServers.Bungee.Host.SubServer;
 import net.ME1312.SubServers.Bungee.Library.Compatibility.Logger;
 import net.ME1312.SubServers.Bungee.SubProxy;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
+
+import static net.ME1312.SubServers.Bungee.Network.Packet.PacketLinkServer.req;
+import static net.ME1312.SubServers.Bungee.Network.Packet.PacketLinkServer.last;
 
 /**
  * Link Proxy Packet
@@ -75,7 +79,7 @@ public class PacketLinkProxy implements InitialPacket, PacketObjectIn<Integer>, 
                 proxy.setSubData(client, channel);
                 if (isnew) plugin.getPluginManager().callEvent(new SubAddProxyEvent(proxy));
                 Logger.get("SubData").info(client.getAddress().toString() + " has been defined as Proxy: " + proxy.getName() + ((channel > 0)?" (Sub-"+channel+")":""));
-                client.sendPacket(new PacketLinkProxy(proxy.getName(), 0, null));
+                queue(proxy.getName(), () -> client.sendPacket(new PacketLinkProxy(proxy.getName(), 0, null)));
                 setReady(client, true);
             } else {
                 client.sendPacket(new PacketLinkProxy(proxy.getName(), 2, "Proxy already linked"));
@@ -85,6 +89,20 @@ public class PacketLinkProxy implements InitialPacket, PacketObjectIn<Integer>, 
             client.sendPacket(new PacketLinkProxy(null, 1, null));
             e.printStackTrace();
         }
+    }
+
+    private void queue(String name, Runnable action) {
+        final long now = Calendar.getInstance().getTime().getTime();
+        new Timer("SubServers.Bungee::Proxy_Linker(" + name + ")").schedule(new TimerTask() {
+            @Override
+            public void run() {
+                action.run();
+                --req;
+            }
+        }, (now - last < 500) ? (req * 500) : 0);
+
+        ++req;
+        last = now;
     }
 
     @Override

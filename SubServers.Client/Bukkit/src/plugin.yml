@@ -1,9 +1,9 @@
-name: 'SubServers-Client-Bukkit'
-main: 'net.ME1312.SubServers.Client.Bukkit.SubPlugin'
-version: '2.15.2a'
-authors: [ME1312]
+name: SubServers-Client-Bukkit
+main: net.ME1312.SubServers.Client.Bukkit.SubPlugin
+version: "2.16a"
+authors: ["ME1312"]
 softdepend: [Vault, TitleManager]
-website: 'https://github.com/ME1312/SubServers-2'
+website: "https://github.com/ME1312/SubServers-2"
 #commands:
 #  subservers:
 #    description: 'The SubServers Command'
@@ -26,38 +26,50 @@ permissions:
         description: 'Grants Access to the SubServers Command'
         default: op
       subservers.host.*:
-        description: 'Grants Access to SubServers Host Actions'
+        description: 'Grants Access to all Host Actions on all Hosts'
         default: op
         children:
-          subservers.host.create.*:
-            description: 'Grants Access to Create a SubServer'
+          subservers.host.*.*:
+            description: 'Grants Access to all Host Actions on all Hosts'
             default: op
+            children:
+              subservers.host.*.create:
+                description: 'Grants Access to Create a SubServer on all Hosts'
+                default: op
       subservers.subserver.*:
-        description: 'Grants Access to SubServers SubServer Actions'
+        description: 'Grants Access to all SubServer Actions on all SubServers'
         default: op
         children:
-          subservers.subserver.update.*:
-            description: 'Grants Access to Update a SubServer'
+          subservers.subserver.*.*:
+            description: 'Grants Access to all SubServer Actions on all SubServers'
             default: op
-          subservers.subserver.start.*:
-            description: 'Grants Access to Start a SubServer'
-            default: op
-          subservers.subserver.stop.*:
-            description: 'Grants Access to Stop a SubServer'
-            default: op
-          subservers.subserver.terminate.*:
-            description: 'Grants Access to Terminate a SubServer'
-            default: op
-          subservers.subserver.command.*:
-            description: 'Grants Access to Send Commands to a SubServer'
-            default: op
+            children:
+              subservers.subserver.*.start:
+                description: 'Grants Access to Start all SubServers'
+                default: op
+              subservers.subserver.*.stop:
+                description: 'Grants Access to Stop all SubServers'
+                default: op
+              subservers.subserver.*.terminate:
+                description: 'Grants Access to Terminate all SubServers'
+                default: op
+              subservers.subserver.*.command:
+                description: 'Grants Access to Send Commands to all SubServers'
+                default: op
+              subservers.subserver.*.update:
+                description: 'Grants Access to Update all SubServers'
+                default: op
       subservers.server.*:
-        description: 'Grants Access to SubServer Server Actions'
+        description: 'Grants Access to Server Actions on all Servers'
         default: op
         children:
-          subservers.server.teleport-others:
-            description: 'Grants Access to Teleport Others to a Server'
+          subservers.server.*.*:
+            description: 'Grants Access to Server Actions on all Servers'
             default: op
-          subservers.server.teleport.*:
-            description: 'Grants Access to Teleport to a Server'
-            default: op
+            children:
+              subservers.server.*.teleport:
+                description: 'Grants Access to Teleport to any Server'
+                default: op
+              subservers.server.*.teleport-others:
+                description: 'Grants Access to Teleport Others to any Server'
+                default: op

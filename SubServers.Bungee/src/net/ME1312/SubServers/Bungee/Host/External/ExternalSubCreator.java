@@ -4,6 +4,8 @@ import com.google.common.collect.Range;
 import net.ME1312.Galaxi.Library.*;
 import net.ME1312.Galaxi.Library.Callback.Callback;
 import net.ME1312.Galaxi.Library.Callback.ReturnCallback;
+import net.ME1312.Galaxi.Library.Container.Container;
+import net.ME1312.Galaxi.Library.Container.NamedContainer;
 import net.ME1312.SubData.Server.SubDataClient;
 import net.ME1312.SubServers.Bungee.Event.SubCreateEvent;
 import net.ME1312.SubServers.Bungee.Event.SubCreatedEvent;
@@ -103,7 +105,7 @@ public class ExternalSubCreator extends SubCreator {
             if (!event.isCancelled()) {
                 Container<String> address = new Container<>("$address$");
                 ReturnCallback<Object, Object> conversion = obj -> convert(obj, new NamedContainer<>("$player$", (player == null)?"":player.toString()), new NamedContainer<>("$name$", name),
-                        new NamedContainer<>("$template$", template.getName()), new NamedContainer<>("$type$", template.getType().toString()), new NamedContainer<>("$version$", (version != null)?version.toString().replace(" ", "@"):""),
+                        new NamedContainer<>("$host$", host.getName()), new NamedContainer<>("$template$", template.getName()), new NamedContainer<>("$type$", template.getType().toString()), new NamedContainer<>("$version$", (version != null)?version.toString():""),
                         new NamedContainer<>("$address$", address.get()), new NamedContainer<>("$port$", Integer.toString(fport)));
 
                 logger.start();
@@ -212,7 +214,7 @@ public class ExternalSubCreator extends SubCreator {
 
             String name = server.getName();
             String prefix = name + File.separator + "Updater";
-            Util.isException(() -> Util.reflect(SubServerContainer.class.getDeclaredField("updating"), server, true));
+            Util.isException(() -> Util.reflect(SubServerImpl.class.getDeclaredField("updating"), server, true));
             ExternalSubLogger logger = new ExternalSubLogger(this, prefix, log, null);
             thread.put(name.toLowerCase(), new NamedContainer<>(server.getAddress().getPort(), logger));
 
@@ -221,7 +223,7 @@ public class ExternalSubCreator extends SubCreator {
             if (!event.isCancelled()) {
                 logger.start();
                 host.queue(new PacketExCreateServer(server, version, logger.getExternalAddress(), data -> {
-                    Util.isException(() -> Util.reflect(SubServerContainer.class.getDeclaredField("updating"), server, false));
+                    Util.isException(() -> Util.reflect(SubServerImpl.class.getDeclaredField("updating"), server, false));
                     if (data.getInt(0x0001) == 0) {
                         Logger.get(prefix).info("Saving...");
                     } else {

@@ -8,6 +8,8 @@ import net.ME1312.SubData.Server.Protocol.PacketObjectOut;
 import net.ME1312.SubData.Server.Protocol.PacketObjectIn;
 import net.ME1312.SubServers.Bungee.SubProxy;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -15,7 +17,7 @@ import java.util.UUID;
  */
 public class PacketDownloadProxyInfo implements PacketObjectIn<Integer>, PacketObjectOut<Integer> {
     private SubProxy plugin;
-    private String proxy;
+    private String[] proxies;
     private UUID tracker;
 
     /**
@@ -32,17 +34,21 @@ public class PacketDownloadProxyInfo implements PacketObjectIn<Integer>, PacketO
      * New PacketDownloadProxyInfo (Out)
      *
      * @param plugin SubPlugin
-     * @param proxy Proxy (or null for all)
+     * @param proxies Proxies (or null for all)
      * @param tracker Receiver ID
      */
-    public PacketDownloadProxyInfo(SubProxy plugin, String proxy, UUID tracker) {
+    public PacketDownloadProxyInfo(SubProxy plugin, List<String> proxies, UUID tracker) {
         if (Util.isNull(plugin)) throw new NullPointerException();
         this.plugin = plugin;
-        this.proxy = proxy;
         this.tracker = tracker;
+
+        if (proxies != null) {
+            this.proxies = new String[proxies.size()];
+            for (int i = 0; i < this.proxies.length; ++i) this.proxies[i] = proxies.get(i).toLowerCase();
+            Arrays.sort(this.proxies);
+        }
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public ObjectMap<Integer> send(SubDataClient client) {
         ObjectMap<Integer> data = new ObjectMap<Integer>();
@@ -50,18 +56,18 @@ public class PacketDownloadProxyInfo implements PacketObjectIn<Integer>, PacketO
 
         ObjectMap<String> proxies = new ObjectMap<String>();
         for (Proxy proxy : plugin.api.getProxies().values()) {
-            if (this.proxy == null || this.proxy.equalsIgnoreCase(proxy.getName())) {
+            if (this.proxies == null || Arrays.binarySearch(this.proxies, proxy.getName().toLowerCase()) >= 0) {
                 proxies.set(proxy.getName(), proxy.forSubData());
             }
         }
         data.set(0x0001, proxies);
-        if ((this.proxy == null || this.proxy.length() <= 0) && plugin.api.getMasterProxy() != null) data.set(0x0002, plugin.api.getMasterProxy().forSubData());
+        if (this.proxies != null && plugin.api.getMasterProxy() != null && (this.proxies.length <= 0 || Arrays.binarySearch(this.proxies, plugin.api.getMasterProxy().getName().toLowerCase()) >= 0)) data.set(0x0002, plugin.api.getMasterProxy().forSubData());
         return data;
     }
 
     @Override
     public void receive(SubDataClient client, ObjectMap<Integer> data) {
-        client.sendPacket(new PacketDownloadProxyInfo(plugin, (data.contains(0x0001))?data.getRawString(0x0001):null, (data.contains(0x0000))?data.getUUID(0x0000):null));
+        client.sendPacket(new PacketDownloadProxyInfo(plugin, (data.contains(0x0001))?data.getRawStringList(0x0001):null, (data.contains(0x0000))?data.getUUID(0x0000):null));
     }
 
     @Override

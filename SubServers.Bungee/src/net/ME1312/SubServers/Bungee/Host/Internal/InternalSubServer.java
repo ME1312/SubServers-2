@@ -4,10 +4,10 @@ import net.ME1312.SubServers.Bungee.Event.*;
 import net.ME1312.SubServers.Bungee.Host.*;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Map.ObjectMapValue;
-import net.ME1312.Galaxi.Library.Container;
+import net.ME1312.Galaxi.Library.Container.Container;
 import net.ME1312.SubServers.Bungee.Library.Compatibility.Logger;
 import net.ME1312.SubServers.Bungee.Library.Exception.InvalidServerException;
-import net.ME1312.Galaxi.Library.NamedContainer;
+import net.ME1312.Galaxi.Library.Container.NamedContainer;
 import net.ME1312.Galaxi.Library.UniversalFile;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
@@ -27,7 +27,7 @@ import java.util.jar.JarInputStream;
 /**
  * Internal SubServer Class
  */
-public class InternalSubServer extends SubServerContainer {
+public class InternalSubServer extends SubServerImpl {
     private InternalHost host;
     private boolean enabled;
     private Container<Boolean> log;
@@ -60,8 +60,33 @@ public class InternalSubServer extends SubServerContainer {
      * @param restricted Restricted Status
      * @throws InvalidServerException
      */
-    public InternalSubServer(InternalHost host, String name, boolean enabled, int port, String motd, boolean log, String directory, String executable, String stopcmd, boolean hidden, boolean restricted) throws InvalidServerException {
+    public static InternalSubServer construct(InternalHost host, String name, boolean enabled, int port, String motd, boolean log, String directory, String executable, String stopcmd, boolean hidden, boolean restricted) throws InvalidServerException {
+        try {
+            return new InternalSubServer(host, name, enabled, port, motd, log, directory, executable, stopcmd, hidden, restricted);
+        } catch (NoSuchMethodError e) {
+            return new InternalSubServer(host, name, enabled, (Integer) port, motd, log, directory, executable, stopcmd, hidden, restricted);
+        }
+    }
+
+    /**
+     * Super Method 2 (newest)
+     * @see #construct(InternalHost, String, boolean, int, String, boolean, String, String, String, boolean, boolean) for method details
+     */
+    protected InternalSubServer(InternalHost host, String name, boolean enabled, int port, String motd, boolean log, String directory, String executable, String stopcmd, boolean hidden, boolean restricted) throws InvalidServerException {
         super(host, name, port, motd, hidden, restricted);
+        init(host, name, enabled, port, motd, log, directory, executable, stopcmd, hidden, restricted);
+    }
+
+    /**
+     * Super Method 1 (oldest)
+     * @see #construct(InternalHost, String, boolean, int, String, boolean, String, String, String, boolean, boolean) for method details
+     */
+    protected InternalSubServer(InternalHost host, String name, boolean enabled, Integer port, String motd, boolean log, String directory, String executable, String stopcmd, boolean hidden, boolean restricted) throws InvalidServerException {
+        super(host, name, port, motd, hidden, restricted);
+        init(host, name, enabled, port, motd, log, directory, executable, stopcmd, hidden, restricted);
+    }
+
+    private void init(InternalHost host, String name, boolean enabled, int port, String motd, boolean log, String directory, String executable, String stopcmd, boolean hidden, boolean restricted) throws InvalidServerException {
         if (Util.isNull(host, name, enabled, port, motd, log, directory, executable, stopcmd, hidden, restricted)) throw new NullPointerException();
         this.host = host;
         this.enabled = enabled;
@@ -302,7 +327,7 @@ public class InternalSubServer extends SubServerContainer {
                                 break;
                             case "display":
                                 if (value.isString()) {
-                                    Field f = ServerContainer.class.getDeclaredField("nick");
+                                    Field f = ServerImpl.class.getDeclaredField("nick");
                                     f.setAccessible(true);
                                     if (value.isNull() || value.asString().length() == 0 || getName().equals(value.asString())) {
                                         f.set(this, null);
@@ -334,7 +359,7 @@ public class InternalSubServer extends SubServerContainer {
                                 break;
                             case "group":
                                 if (value.isList()) {
-                                    Util.reflect(ServerContainer.class.getDeclaredField("groups"), this, value.asRawStringList());
+                                    Util.reflect(ServerImpl.class.getDeclaredField("groups"), this, value.asRawStringList());
                                     if (perma && this.host.plugin.servers.get().getMap("Servers").getKeys().contains(getName())) {
                                         this.host.plugin.servers.get().getMap("Servers").getMap(getName()).set("Group", value.asRawStringList());
                                         this.host.plugin.servers.save();
@@ -357,7 +382,7 @@ public class InternalSubServer extends SubServerContainer {
                                 break;
                             case "template":
                                 if (value.isString()) {
-                                    Util.reflect(SubServerContainer.class.getDeclaredField("template"), this, value.asRawString());
+                                    Util.reflect(SubServerImpl.class.getDeclaredField("template"), this, value.asRawString());
                                     if (perma && this.host.plugin.servers.get().getMap("Servers").getKeys().contains(getName())) {
                                         this.host.plugin.servers.get().getMap("Servers").getMap(getName()).set("Template", value.asRawString());
                                         this.host.plugin.servers.save();
@@ -494,7 +519,7 @@ public class InternalSubServer extends SubServerContainer {
                                 break;
                             case "hidden":
                                 if (value.isBoolean()) {
-                                    Util.reflect(ServerContainer.class.getDeclaredField("hidden"), this, value.asBoolean());
+                                    Util.reflect(ServerImpl.class.getDeclaredField("hidden"), this, value.asBoolean());
                                     if (perma && this.host.plugin.servers.get().getMap("Servers").getKeys().contains(getName())) {
                                         this.host.plugin.servers.get().getMap("Servers").getMap(getName()).set("Hidden", isHidden());
                                         this.host.plugin.servers.save();
@@ -504,7 +529,7 @@ public class InternalSubServer extends SubServerContainer {
                                 break;
                             case "whitelist":
                                 if (value.isList()) {
-                                    Util.reflect(ServerContainer.class.getDeclaredField("whitelist"), this, value.asUUIDList());
+                                    Util.reflect(ServerImpl.class.getDeclaredField("whitelist"), this, value.asUUIDList());
                                     c++;
                                 }
                                 break;
@@ -512,7 +537,7 @@ public class InternalSubServer extends SubServerContainer {
                         if (forward != null) {
                             forward.setStopAction(getStopAction());
                             if (!getName().equals(getDisplayName())) forward.setDisplayName(getDisplayName());
-                            Util.reflect(SubServerContainer.class.getDeclaredField("template"), forward, Util.reflect(SubServerContainer.class.getDeclaredField("template"), this));
+                            Util.reflect(SubServerImpl.class.getDeclaredField("template"), forward, Util.reflect(SubServerImpl.class.getDeclaredField("template"), this));
                             List<String> groups = new ArrayList<String>();
                             groups.addAll(getGroups());
                             for (String group : groups) {

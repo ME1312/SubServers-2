@@ -6,12 +6,13 @@ import net.ME1312.SubServers.Bungee.Event.SubRemoveProxyEvent;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Map.ObjectMapValue;
 import net.ME1312.Galaxi.Library.ExtraDataHandler;
-import net.ME1312.Galaxi.Library.NamedContainer;
+import net.ME1312.Galaxi.Library.Container.NamedContainer;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubData.Server.ClientHandler;
 import net.ME1312.SubServers.Bungee.SubAPI;
 import net.ME1312.SubServers.Bungee.SubProxy;
 import net.md_5.bungee.api.ProxyServer;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 import java.util.*;
 
@@ -108,7 +109,7 @@ public class Proxy implements ClientHandler, ExtraDataHandler {
     }
 
     /**
-     * Test if the proxy is connected to RedisBungee's server
+     * Determine if the proxy is connected to RedisBungee's server
      *
      * @return Redis Status
      */
@@ -119,18 +120,32 @@ public class Proxy implements ClientHandler, ExtraDataHandler {
     }
 
     /**
+     * Determine if the proxy is the Master Proxy
+     *
+     * @return Master Proxy Status
+     */
+    public boolean isMaster() {
+        return SubAPI.getInstance().getMasterProxy() == this;
+    }
+
+    /**
      * Get the players on this proxy (via RedisBungee)
      *
-     * @return Player Collection
+     * @return Remote Player Collection
      */
     @SuppressWarnings({"deprecation", "unchecked"})
-    public Collection<NamedContainer<String, UUID>> getPlayers() {
-        List<NamedContainer<String, UUID>> players = new ArrayList<NamedContainer<String, UUID>>();
+    public Collection<RemotePlayer> getPlayers() {
+        List<RemotePlayer> players = new LinkedList<RemotePlayer>();
+        //List<UUID> used = new ArrayList<UUID>();
         SubProxy plugin = SubAPI.getInstance().getInternals();
         if (plugin.redis != null) {
             try {
-                for (UUID player : (Set<UUID>) plugin.redis("getPlayersOnProxy", new NamedContainer<>(String.class, getName())))
-                    players.add(new NamedContainer<>((String) plugin.redis("getNameFromUuid", new NamedContainer<>(UUID.class, player)), player));
+                for (UUID id : (Set<UUID>) plugin.redis("getPlayersOnProxy", new NamedContainer<>(String.class, getName()))) {
+                  //if (!used.contains(id)) {
+                        players.add(new RemotePlayer(id));
+                  //    used.add(id);
+                  //}
+                }
             } catch (Exception e) {}
         }
         return players;
@@ -181,13 +196,11 @@ public class Proxy implements ClientHandler, ExtraDataHandler {
         info.set("name", getName());
         info.set("display", getDisplayName());
         ObjectMap<String> players = new ObjectMap<String>();
-        for (NamedContainer<String, UUID> player : getPlayers()) {
-            ObjectMap<String> pinfo = new ObjectMap<String>();
-            pinfo.set("name", player.name());
-            players.set(player.get().toString(), pinfo);
-        }
+        for (RemotePlayer player : getPlayers())
+            players.set(player.getUniqueId().toString(), player.getName());
         info.set("players", players);
         info.set("redis", isRedis());
+        info.set("master", isMaster());
         ObjectMap<Integer> subdata = new ObjectMap<Integer>();
         for (int channel : this.subdata.keySet()) subdata.set(channel, (this.subdata.get(channel) == null)?null:this.subdata.get(channel).getID());
         info.set("subdata", subdata);

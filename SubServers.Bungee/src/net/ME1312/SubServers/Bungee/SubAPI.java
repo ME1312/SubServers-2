@@ -1,6 +1,7 @@
 package net.ME1312.SubServers.Bungee;
 
 import com.google.common.collect.Range;
+import net.ME1312.SubData.Server.DataProtocol;
 import net.ME1312.SubData.Server.DataServer;
 import net.ME1312.SubServers.Bungee.Event.SubAddHostEvent;
 import net.ME1312.SubServers.Bungee.Event.SubAddServerEvent;
@@ -8,7 +9,7 @@ import net.ME1312.SubServers.Bungee.Event.SubRemoveHostEvent;
 import net.ME1312.SubServers.Bungee.Event.SubRemoveServerEvent;
 import net.ME1312.SubServers.Bungee.Host.*;
 import net.ME1312.SubServers.Bungee.Library.Exception.InvalidHostException;
-import net.ME1312.Galaxi.Library.NamedContainer;
+import net.ME1312.Galaxi.Library.Container.NamedContainer;
 import net.ME1312.Galaxi.Library.UniversalFile;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
@@ -33,7 +34,7 @@ public final class SubAPI {
     private final SubProxy plugin;
     private static SubAPI api;
 
-    protected SubAPI(SubProxy plugin) {
+    SubAPI(SubProxy plugin) {
         this.plugin = plugin;
         GAME_VERSION = getGameVersion();
         api = this;
@@ -83,12 +84,21 @@ public final class SubAPI {
     }
 
     /**
-     * Gets the SubData Network Manager
+     * Gets the SubData Network
      *
-     * @return SubData Network Manager
+     * @return SubData Network
      */
     public DataServer getSubDataNetwork() {
         return plugin.subdata;
+    }
+
+    /**
+     * Gets the SubData Network Protocol
+     *
+     * @return SubData Network Protocol
+     */
+    public DataProtocol getSubDataProtocol() {
+        return plugin.subprotocol;
     }
 
     /**
@@ -354,9 +364,12 @@ public final class SubAPI {
      * @param name Group name
      * @return a Server Group
      */
-    public List<Server> getGroup(String name) {
+    public NamedContainer<String, List<Server>> getGroup(String name) {
         if (Util.isNull(name)) throw new NullPointerException();
-        return Util.getCaseInsensitively(getGroups(), name);
+        for (Map.Entry<String, List<Server>> group : getLowercaseGroups().entrySet()) {
+            if (group.getKey().equalsIgnoreCase(name)) return new NamedContainer<>(group.getKey(), group.getValue());
+        }
+        return null;
     }
 
     /**
@@ -413,7 +426,7 @@ public final class SubAPI {
      */
     public Server addServer(UUID player, String name, InetAddress ip, int port, String motd, boolean hidden, boolean restricted) {
         if (getServers().keySet().contains(name.toLowerCase())) throw new InvalidServerException("A Server already exists with this name!");
-        Server server = new ServerContainer(name, new InetSocketAddress(ip, port), motd, hidden, restricted);
+        Server server = ServerImpl.construct(name, new InetSocketAddress(ip, port), motd, hidden, restricted);
         SubAddServerEvent event = new SubAddServerEvent(player, null, server);
         plugin.getPluginManager().callEvent(event);
         if (!event.isCancelled()) {
@@ -517,7 +530,9 @@ public final class SubAPI {
      */
     public Proxy getProxy(String name) {
         if (Util.isNull(name)) throw new NullPointerException();
-        return getProxies().get(name.toLowerCase());
+        Proxy proxy = getProxies().getOrDefault(name.toLowerCase(), null);
+        if (proxy == null && plugin.redis != null && plugin.redis.getName().equalsIgnoreCase(name)) proxy = plugin.redis;
+        return proxy;
     }
 
     /**
@@ -532,19 +547,60 @@ public final class SubAPI {
     /**
      * Get players on this network across all known proxies
      *
-     * @return Player Collection
+     * @return Remote Player Collection
      */
     @SuppressWarnings("unchecked")
-    public Collection<NamedContainer<String, UUID>> getGlobalPlayers() {
-        List<NamedContainer<String, UUID>> players = new ArrayList<NamedContainer<String, UUID>>();
+    public Map<UUID, RemotePlayer> getGlobalPlayers() {
+        TreeMap<UUID, RemotePlayer> players = new TreeMap<UUID, RemotePlayer>();
+        SubProxy plugin = SubAPI.getInstance().getInternals();
+        for (ProxiedPlayer player : plugin.getPlayers()) {
+            players.put(player.getUniqueId(), new RemotePlayer(player));
+        }
         if (plugin.redis != null) {
             try {
-                for (UUID player : (Set<UUID>) plugin.redis("getPlayersOnline")) players.add(new NamedContainer<>((String) plugin.redis("getNameFromUuid", new NamedContainer<>(UUID.class, player)), player));
+                for (UUID id : (Set<UUID>) plugin.redis("getPlayersOnline")) {
+                    if (!players.keySet().contains(id)) {
+                        players.put(id, new RemotePlayer(id));
+                    }
+                }
             } catch (Exception e) {}
-        } else {
-            for (ProxiedPlayer player : plugin.getPlayers()) players.add(new NamedContainer<>(player.getName(), player.getUniqueId()));
         }
         return players;
+    }
+
+    /**
+     * Get a player on this network by searching across all known proxies
+     *
+     * @param name Player name
+     * @return Remote Player
+     */
+    @SuppressWarnings("unchecked")
+    public RemotePlayer getGlobalPlayer(String name) {
+        if (Util.isNull(name)) throw new NullPointerException();
+        SubProxy plugin = SubAPI.getInstance().getInternals();
+
+        RemotePlayer remote;
+        ProxiedPlayer local = plugin.getPlayer(name);
+        if (local != null) remote = new RemotePlayer(local);
+        else remote = Util.getDespiteException(() -> new RemotePlayer((UUID) plugin.redis("getUuidFromName", new NamedContainer<>(String.class, name), new NamedContainer<>(boolean.class, false))), null);
+        return remote;
+    }
+
+    /**
+     * Get a player on this network by searching across all known proxies
+     *
+     * @param id Player UUID
+     * @return Remote Player
+     */
+    public RemotePlayer getGlobalPlayer(UUID id) {
+        if (Util.isNull(id)) throw new NullPointerException();
+        SubProxy plugin = SubAPI.getInstance().getInternals();
+
+        RemotePlayer remote;
+        ProxiedPlayer local = plugin.getPlayer(id);
+        if (local != null) remote = new RemotePlayer(local);
+        else remote = Util.getDespiteException(() -> new RemotePlayer(id), null);
+        return remote;
     }
 
     /**

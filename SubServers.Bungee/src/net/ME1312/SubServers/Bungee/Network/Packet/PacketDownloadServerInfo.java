@@ -8,6 +8,8 @@ import net.ME1312.SubData.Server.Protocol.PacketObjectIn;
 import net.ME1312.SubData.Server.Protocol.PacketObjectOut;
 import net.ME1312.SubServers.Bungee.SubProxy;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -15,7 +17,7 @@ import java.util.UUID;
  */
 public class PacketDownloadServerInfo implements PacketObjectIn<Integer>, PacketObjectOut<Integer> {
     private SubProxy plugin;
-    private String server;
+    private String[] servers;
     private UUID tracker;
 
     /**
@@ -32,17 +34,21 @@ public class PacketDownloadServerInfo implements PacketObjectIn<Integer>, Packet
      * New PacketDownloadServerInfo (Out)
      *
      * @param plugin SubPlugin
-     * @param server Server (or null for all)
+     * @param servers Servers (or null for all)
      * @param tracker Receiver ID
      */
-    public PacketDownloadServerInfo(SubProxy plugin, String server, UUID tracker) {
+    public PacketDownloadServerInfo(SubProxy plugin, List<String> servers, UUID tracker) {
         if (Util.isNull(plugin)) throw new NullPointerException();
         this.plugin = plugin;
-        this.server = server;
         this.tracker = tracker;
+
+        if (servers != null) {
+            this.servers = new String[servers.size()];
+            for (int i = 0; i < this.servers.length; ++i) this.servers[i] = servers.get(i).toLowerCase();
+            Arrays.sort(this.servers);
+        }
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public ObjectMap<Integer> send(SubDataClient client) {
         ObjectMap<Integer> data = new ObjectMap<Integer>();
@@ -50,7 +56,7 @@ public class PacketDownloadServerInfo implements PacketObjectIn<Integer>, Packet
 
         ObjectMap<String> servers = new ObjectMap<String>();
         for (Server server : plugin.api.getServers().values()) {
-            if (this.server == null || this.server.length() <= 0 || this.server.equalsIgnoreCase(server.getName())) {
+            if (this.servers == null || this.servers.length <= 0 || Arrays.binarySearch(this.servers, server.getName().toLowerCase()) >= 0) {
                 servers.set(server.getName(), server.forSubData());
             }
         }
@@ -60,7 +66,7 @@ public class PacketDownloadServerInfo implements PacketObjectIn<Integer>, Packet
 
     @Override
     public void receive(SubDataClient client, ObjectMap<Integer> data) {
-        client.sendPacket(new PacketDownloadServerInfo(plugin, (data.contains(0x0001))?data.getRawString(0x0001):null, (data.contains(0x0000))?data.getUUID(0x0000):null));
+        client.sendPacket(new PacketDownloadServerInfo(plugin, (data.contains(0x0001))?data.getRawStringList(0x0001):null, (data.contains(0x0000))?data.getUUID(0x0000):null));
     }
 
     @Override

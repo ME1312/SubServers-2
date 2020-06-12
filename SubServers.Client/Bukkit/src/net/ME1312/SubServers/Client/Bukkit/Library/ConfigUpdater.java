@@ -1,10 +1,10 @@
-package net.ME1312.SubServers.Client.Sponge.Library.Updates;
+package net.ME1312.SubServers.Client.Bukkit.Library;
 
 import net.ME1312.Galaxi.Library.Config.YAMLConfig;
 import net.ME1312.Galaxi.Library.Config.YAMLSection;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Version.Version;
-import net.ME1312.SubServers.Client.Sponge.SubAPI;
+import net.ME1312.SubServers.Client.Bukkit.SubAPI;
 
 import java.io.File;
 import java.io.IOException;
@@ -36,7 +36,7 @@ public class ConfigUpdater {
         if (!existing.contains("Settings") || !existing.getMap("Settings").contains("Version")) {
 
             i++;
-            System.out.println("SubServers > Created ./config/subservers-client-sponge/config.yml");
+            System.out.println("SubServers > Created ./plugins/SubServers-Client-Bukkit/config.yml");
         } else {
             if (was.compareTo(new Version("19w17a")) <= 0) {
                 if (existing.getMap("Settings", new YAMLSection()).contains("Ingame-Access"))
@@ -49,7 +49,7 @@ public class ConfigUpdater {
             //  i++
             //}
 
-            if (i > 0) System.out.println("SubServers > Updated ./config/subservers-client-sponge/config.yml (" + i + " pass" + ((i != 1)?"es":"") + ")");
+            if (i > 0) System.out.println("SubServers > Updated ./plugins/SubServers-Client-Bukkit/config.yml (" + i + " pass" + ((i != 1)?"es":"") + ")");
         }
 
         if (i > 0) {

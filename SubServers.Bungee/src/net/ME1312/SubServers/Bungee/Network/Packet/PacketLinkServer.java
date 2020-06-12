@@ -5,22 +5,19 @@ import net.ME1312.SubData.Server.Protocol.Initial.InitialPacket;
 import net.ME1312.SubData.Server.SubDataClient;
 import net.ME1312.SubServers.Bungee.Event.SubStartedEvent;
 import net.ME1312.SubServers.Bungee.Host.Server;
-import net.ME1312.SubServers.Bungee.Host.ServerContainer;
+import net.ME1312.SubServers.Bungee.Host.ServerImpl;
 import net.ME1312.SubServers.Bungee.Host.SubServer;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubData.Server.Protocol.PacketObjectIn;
 import net.ME1312.SubData.Server.Protocol.PacketObjectOut;
-import net.ME1312.SubServers.Bungee.Host.SubServerContainer;
+import net.ME1312.SubServers.Bungee.Host.SubServerImpl;
 import net.ME1312.SubServers.Bungee.Library.Compatibility.Logger;
 import net.ME1312.SubServers.Bungee.SubProxy;
 import net.md_5.bungee.api.ProxyServer;
 
 import java.net.InetSocketAddress;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -103,8 +100,10 @@ public class PacketLinkServer implements InitialPacket, PacketObjectIn<Integer>,
         }
     }
 
+    static int req = 1;
+    static long last = Calendar.getInstance().getTime().getTime();
     private void link(SubDataClient client, Server server, int channel) throws Throwable {
-        HashMap<Integer, SubDataClient> subdata = Util.getDespiteException(() -> Util.reflect(ServerContainer.class.getDeclaredField("subdata"), server), null);
+        HashMap<Integer, SubDataClient> subdata = Util.getDespiteException(() -> Util.reflect(ServerImpl.class.getDeclaredField("subdata"), server), null);
         if (!subdata.keySet().contains(channel) || (channel == 0 && subdata.get(0) == null)) {
             server.setSubData(client, channel);
             Logger.get("SubData").info(client.getAddress().toString() + " has been defined as " + ((server instanceof SubServer) ? "SubServer" : "Server") + ": " + server.getName() + ((channel > 0)?" (Sub-"+channel+")":""));
@@ -118,25 +117,26 @@ public class PacketLinkServer implements InitialPacket, PacketObjectIn<Integer>,
                         Util.isException(() -> Util.reflect(SubDataClient.class.getDeclaredMethod("close", DisconnectReason.class), client, DisconnectReason.CLOSE_REQUESTED));
                     }
                 } else {
-                    if (server instanceof SubServer && !Util.getDespiteException(() -> Util.reflect(SubServerContainer.class.getDeclaredField("started"), server), true)) {
-                        Util.isException(() -> Util.reflect(SubServerContainer.class.getDeclaredField("started"), server, true));
+                    if (server instanceof SubServer && !Util.getDespiteException(() -> Util.reflect(SubServerImpl.class.getDeclaredField("started"), server), true)) {
+                        Util.isException(() -> Util.reflect(SubServerImpl.class.getDeclaredField("started"), server, true));
                         SubStartedEvent event = new SubStartedEvent((SubServer) server);
                         ProxyServer.getInstance().getPluginManager().callEvent(event);
                     }
                     client.sendPacket(new PacketLinkServer(server.getName(), 0, null));
                 }
+                --req;
             };
 
-            if (server instanceof SubServer && !((SubServer) server).isRunning()) {
-                new Timer("SubServers.Bungee::Rogue_SubServer_Detection(" + server.getName() + ")").schedule(new TimerTask() {
-                    @Override
-                    public void run() {
-                        register.run();
-                    }
-                }, TimeUnit.SECONDS.toMillis(5));
-            } else {
-                register.run();
-            }
+            final long now = Calendar.getInstance().getTime().getTime();
+            new Timer("SubServers.Bungee::Server_Linker(" + server.getName() + ")").schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    register.run();
+                }
+            }, ((server instanceof SubServer && !((SubServer) server).isRunning()) ? TimeUnit.SECONDS.toMillis(5) : 0) + ((now - last < 500) ? (req * 500) : 0));
+
+            ++req;
+            last = now;
             setReady(client, true);
         } else {
             client.sendPacket(new PacketLinkServer(null, 4, "Server already linked"));

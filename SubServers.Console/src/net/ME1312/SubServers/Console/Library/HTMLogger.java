@@ -1,6 +1,6 @@
 package net.ME1312.SubServers.Console.Library;
 
-import net.ME1312.Galaxi.Library.Container;
+import net.ME1312.Galaxi.Library.Container.Container;
 import org.fusesource.jansi.AnsiOutputStream;
 
 import java.io.IOException;

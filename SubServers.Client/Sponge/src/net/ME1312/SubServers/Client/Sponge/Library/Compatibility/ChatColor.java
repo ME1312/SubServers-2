@@ -1,4 +1,4 @@
-package net.ME1312.SubServers.Client.Sponge.Library;
+package net.ME1312.SubServers.Client.Sponge.Library.Compatibility;
 
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColor;

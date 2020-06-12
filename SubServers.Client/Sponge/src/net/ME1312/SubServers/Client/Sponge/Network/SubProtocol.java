@@ -1,7 +1,8 @@
 package net.ME1312.SubServers.Client.Sponge.Network;
 
 import net.ME1312.Galaxi.Library.Callback.Callback;
-import net.ME1312.Galaxi.Library.NamedContainer;
+import net.ME1312.Galaxi.Library.Container.NamedContainer;
+import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubData.Client.SubDataClient;
@@ -35,7 +36,7 @@ public class SubProtocol extends SubDataProtocol {
             SubPlugin plugin = SubAPI.getInstance().getInternals();
 
             instance.setName("SubServers 2");
-            instance.addVersion(new Version("2.14a+"));
+            instance.addVersion(new Version("2.16a+"));
 
 
             // 00-0F: Object Link Packets
@@ -50,7 +51,7 @@ public class SubProtocol extends SubDataProtocol {
             instance.registerPacket(0x0013, PacketDownloadHostInfo.class);
             instance.registerPacket(0x0014, PacketDownloadGroupInfo.class);
             instance.registerPacket(0x0015, PacketDownloadServerInfo.class);
-            instance.registerPacket(0x0016, PacketDownloadPlayerList.class);
+            instance.registerPacket(0x0016, PacketDownloadPlayerInfo.class);
             instance.registerPacket(0x0017, PacketCheckPermission.class);
             instance.registerPacket(0x0018, PacketCheckPermissionResponse.class);
 
@@ -60,7 +61,7 @@ public class SubProtocol extends SubDataProtocol {
             instance.registerPacket(0x0013, new PacketDownloadHostInfo());
             instance.registerPacket(0x0014, new PacketDownloadGroupInfo());
             instance.registerPacket(0x0015, new PacketDownloadServerInfo());
-            instance.registerPacket(0x0016, new PacketDownloadPlayerList());
+            instance.registerPacket(0x0016, new PacketDownloadPlayerInfo());
             instance.registerPacket(0x0017, new PacketCheckPermission());
             instance.registerPacket(0x0018, new PacketCheckPermissionResponse());
 
@@ -141,7 +142,7 @@ public class SubProtocol extends SubDataProtocol {
     }
 
     @Override
-    protected SubDataClient sub(Callback<Runnable> scheduler, Logger logger, InetAddress address, int port) throws IOException {
+    protected SubDataClient sub(Callback<Runnable> scheduler, Logger logger, InetAddress address, int port, ObjectMap<?> login) throws IOException {
         SubPlugin plugin = SubAPI.getInstance().getInternals();
         HashMap<Integer, SubDataClient> map = Util.getDespiteException(() -> Util.reflect(SubPlugin.class.getDeclaredField("subdata"), plugin), null);
 
@@ -149,7 +150,7 @@ public class SubProtocol extends SubDataProtocol {
         while (map.keySet().contains(channel)) channel++;
         final int fc = channel;
 
-        SubDataClient subdata = super.open(scheduler, getLogger(fc), address, port);
+        SubDataClient subdata = super.open(scheduler, getLogger(fc), address, port, login);
         map.put(fc, subdata);
         subdata.sendPacket(new PacketLinkServer(plugin, fc));
         subdata.on.closed(client -> map.remove(fc));
@@ -172,8 +173,6 @@ public class SubProtocol extends SubDataProtocol {
             Sponge.getEventManager().post(event);
 
             if (Util.getDespiteException(() -> Util.reflect(SubPlugin.class.getDeclaredField("running"), plugin), true)) {
-                Logger log = Util.getDespiteException(() -> Util.reflect(SubDataClient.class.getDeclaredField("log"), client.get()), null);
-                log.info("Attempting reconnect in " + plugin.config.get().getMap("Settings").getMap("SubData").getInt("Reconnect", 30) + " seconds");
                 Util.isException(() -> Util.reflect(SubPlugin.class.getDeclaredMethod("connect", NamedContainer.class), plugin, client));
             } else map.put(0, null);
         });

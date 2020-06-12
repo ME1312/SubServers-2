@@ -53,7 +53,7 @@ if [[ -z "$cache" ]] || [[ ! -f "$cache/Vanilla-$version.jar" ]]; then
             exit 4
         fi
     else
-        echo ERROR: Failed Downloading Patcher. Is Github.com down?
+        echo ERROR: Failed Downloading VanillaCord. Is ME1312.net down?
         rm -Rf VanillaCord
         rm -Rf "$0"
         exit 3

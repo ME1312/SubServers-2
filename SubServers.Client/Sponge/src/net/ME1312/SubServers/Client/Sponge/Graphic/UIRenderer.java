@@ -1,8 +1,8 @@
 package net.ME1312.SubServers.Client.Sponge.Graphic;
 
-import net.ME1312.SubServers.Client.Sponge.Library.ChatColor;
-import net.ME1312.Galaxi.Library.Container;
-import net.ME1312.Galaxi.Library.NamedContainer;
+import net.ME1312.SubServers.Client.Sponge.Library.Compatibility.ChatColor;
+import net.ME1312.Galaxi.Library.Container.Container;
+import net.ME1312.Galaxi.Library.Container.NamedContainer;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubServers.Client.Sponge.Network.API.Host;
@@ -21,8 +21,8 @@ import java.util.concurrent.TimeUnit;
  * GUI Renderer Layout Class
  */
 public abstract class UIRenderer {
-    protected static HashMap<String, PluginRenderer<Host>> hostPlugins = new HashMap<String, PluginRenderer<Host>>();
-    protected static HashMap<String, PluginRenderer<SubServer>> subserverPlugins = new HashMap<String, PluginRenderer<SubServer>>();
+    static HashMap<String, PluginRenderer<Host>> hostPlugins = new HashMap<String, PluginRenderer<Host>>();
+    static HashMap<String, PluginRenderer<SubServer>> subserverPlugins = new HashMap<String, PluginRenderer<SubServer>>();
     private NamedContainer<String, Integer> tdownload = null;
     private UUID download = null;
     private final UUID player;

@@ -9,6 +9,7 @@ import net.ME1312.SubData.Client.SubDataClient;
 import net.ME1312.SubData.Client.SubDataSender;
 import net.ME1312.SubData.Client.SubDataSender;
 import net.ME1312.SubServers.Host.ExHost;
+import net.ME1312.SubServers.Host.Executable.SubServerImpl;
 import net.ME1312.SubServers.Host.SubAPI;
 
 import java.util.UUID;
@@ -63,10 +64,10 @@ public class PacketExRemoveServer implements PacketObjectIn<Integer>, PacketObje
             } else if (host.servers.get(name.toLowerCase()).isRunning()) {
                 ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketExRemoveServer(3, tracker));
             } else {
-                if (UPnP.isUPnPAvailable() && UPnP.isMappedTCP(host.servers.get(name.toLowerCase()).getPort()))
-                    UPnP.closePortTCP(host.servers.get(name.toLowerCase()).getPort());
+                SubServerImpl server  = host.servers.get(name.toLowerCase());
+                if (UPnP.isUPnPAvailable() && UPnP.isMappedTCP(server.getPort())) UPnP.closePortTCP(server.getPort());
                 host.servers.remove(name.toLowerCase());
-                log.info("Removed SubServer: " + name);
+                log.info("Removed SubServer: " + server.getName());
                 ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketExRemoveServer(0, tracker));
             }
         } catch (Throwable e) {

@@ -8,7 +8,7 @@ import net.ME1312.SubServers.Bungee.Event.SubNetworkDisconnectEvent;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Map.ObjectMapValue;
 import net.ME1312.SubServers.Bungee.Library.Exception.InvalidServerException;
-import net.ME1312.Galaxi.Library.NamedContainer;
+import net.ME1312.Galaxi.Library.Container.NamedContainer;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubServers.Bungee.Network.Packet.PacketOutExRunEvent;
 import net.ME1312.SubServers.Bungee.Network.Packet.PacketOutExUpdateWhitelist;
@@ -19,26 +19,61 @@ import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 import java.net.InetSocketAddress;
+import java.net.SocketAddress;
 import java.util.*;
 
 /**
  * Server Class
  */
-public class ServerContainer extends BungeeServerInfo implements Server {
+public class ServerImpl extends BungeeServerInfo implements Server {
     private HashMap<Integer, SubDataClient> subdata = new HashMap<Integer, SubDataClient>();
     private ObjectMap<String> extra = new ObjectMap<String>();
     private String nick = null;
     private List<String> groups = new ArrayList<String>();
     private List<UUID> whitelist = new ArrayList<UUID>();
     private boolean hidden;
-    private final String signature;
+    private final String signature = SubAPI.getInstance().signAnonymousObject();
+
+    /**
+     * Construct a new Server data type
+     *
+     * @param name Server name
+     * @param address Server Address
+     * @param motd Server MOTD
+     * @param hidden Hidden Status
+     * @param restricted Restricted Status
+     * @return
+     */
+    public static ServerImpl construct(String name, SocketAddress address, String motd, boolean hidden, boolean restricted) throws InvalidServerException {
+        try {
+            return new ServerImpl(name, address, motd, hidden, restricted);
+        } catch (NoSuchMethodError e) {
+            return new ServerImpl(name, (InetSocketAddress) address, motd, hidden, restricted);
+        }
+    }
+
+    /**
+     * Super Method 2 (newest)
+     * @see #construct(String, SocketAddress, String, boolean, boolean) for method details
+     */
+    protected ServerImpl(String name, SocketAddress address, String motd, boolean hidden, boolean restricted) throws InvalidServerException {
+        super(name, address, motd, restricted);
+        init(name, address, motd, hidden, restricted);
+    }
+
+    /**
+     * Super Method 1 (oldest)
+     * @see #construct(String, SocketAddress, String, boolean, boolean) for method details
+     */
+    protected ServerImpl(String name, InetSocketAddress address, String motd, boolean hidden, boolean restricted) throws InvalidServerException {
+        super(name, address, motd, restricted);
+        init(name, address, motd, hidden, restricted);
+    }
 
     @SuppressWarnings("deprecation")
-    public ServerContainer(String name, InetSocketAddress address, String motd, boolean hidden, boolean restricted) throws InvalidServerException {
-        super(name, address, motd, restricted);
+    private void init(String name, SocketAddress address, String motd, boolean hidden, boolean restricted) throws InvalidServerException {
         if (Util.isNull(name, address, motd, hidden, restricted)) throw new NullPointerException();
         if (name.contains(" ")) throw new InvalidServerException("Server names cannot have spaces: " + name);
-        signature = SubAPI.getInstance().signAnonymousObject();
         SubAPI.getInstance().getInternals().subprotocol.whitelist(getAddress().getAddress().getHostAddress());
         this.hidden = hidden;
 
@@ -124,15 +159,23 @@ public class ServerContainer extends BungeeServerInfo implements Server {
 
     @SuppressWarnings({"deprecation", "unchecked"})
     @Override
-    public Collection<NamedContainer<String, UUID>> getGlobalPlayers() {
-        List<NamedContainer<String, UUID>> players = new ArrayList<NamedContainer<String, UUID>>();
+    public Collection<RemotePlayer> getGlobalPlayers() {
+        List<RemotePlayer> players = new LinkedList<RemotePlayer>();
+        List<UUID> used = new ArrayList<UUID>();
         SubProxy plugin = SubAPI.getInstance().getInternals();
+        for (ProxiedPlayer player : getPlayers()) {
+            players.add(new RemotePlayer(player));
+            used.add(player.getUniqueId());
+        }
         if (plugin.redis != null) {
             try {
-                for (UUID player : (Set<UUID>) plugin.redis("getPlayersOnServer", new NamedContainer<>(String.class, getName()))) players.add(new NamedContainer<>((String) plugin.redis("getNameFromUuid", new NamedContainer<>(UUID.class, player)), player));
+                for (UUID id : (Set<UUID>) plugin.redis("getPlayersOnServer", new NamedContainer<>(String.class, getName()))) {
+                    if (!used.contains(id)) {
+                        players.add(new RemotePlayer(id));
+                        used.add(id);
+                    }
+                }
             } catch (Exception e) {}
-        } else {
-            for (ProxiedPlayer player : getPlayers()) players.add(new NamedContainer<>(player.getName(), player.getUniqueId()));
         }
         return players;
     }
@@ -254,11 +297,8 @@ public class ServerContainer extends BungeeServerInfo implements Server {
         info.set("restricted", isRestricted());
         info.set("hidden", isHidden());
         ObjectMap<String> players = new ObjectMap<String>();
-        for (NamedContainer<String, UUID> player : getGlobalPlayers()) {
-            ObjectMap<String> pinfo = new ObjectMap<String>();
-            pinfo.set("name", player.name());
-            players.set(player.get().toString(), pinfo);
-        }
+        for (RemotePlayer player : getGlobalPlayers())
+            players.set(player.getUniqueId().toString(), player.getName());
         info.set("players", players);
         ObjectMap<Integer> subdata = new ObjectMap<Integer>();
         for (int channel : this.subdata.keySet()) subdata.set(channel, (this.subdata.get(channel) == null)?null:this.subdata.get(channel).getID());

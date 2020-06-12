@@ -1,10 +1,10 @@
-package net.ME1312.SubServers.Host.Library.Updates;
+package net.ME1312.SubServers.Client.Sponge.Library;
 
 import net.ME1312.Galaxi.Library.Config.YAMLConfig;
 import net.ME1312.Galaxi.Library.Config.YAMLSection;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Version.Version;
-import net.ME1312.SubServers.Host.SubAPI;
+import net.ME1312.SubServers.Client.Sponge.SubAPI;
 
 import java.io.File;
 import java.io.IOException;
@@ -29,20 +29,18 @@ public class ConfigUpdater {
         YAMLSection rewritten = new YAMLSection();
 
         Version was = existing.getMap("Settings", new ObjectMap<>()).getVersion("Version", new Version(0));
-        Version now = SubAPI.getInstance().getAppInfo().getSignature();
+        Version now = SubAPI.getInstance().getPluginBuild();
 
         int i = 0;
         if (now == null) now = UNSIGNED;
         if (!existing.contains("Settings") || !existing.getMap("Settings").contains("Version")) {
 
             i++;
-            SubAPI.getInstance().getAppInfo().getLogger().info.println("SubServers > Created ./config.yml");
+            System.out.println("SubServers > Created ./config/subservers-client-sponge/config.yml");
         } else {
             if (was.compareTo(new Version("19w17a")) <= 0) {
-                if (existing.getMap("Settings", new YAMLSection()).contains("Log")) {
-                    updated.getMap("Settings").safeSet("Console-Log", existing.getMap("Settings").getBoolean("Log"));
-                    updated.getMap("Settings").safeSet("Network-Log", existing.getMap("Settings").getBoolean("Log"));
-                }
+                if (existing.getMap("Settings", new YAMLSection()).contains("Ingame-Access"))
+                    updated.getMap("Settings").safeSet("API-Only-Mode", !existing.getMap("Settings").getBoolean("Ingame-Access"));
 
                 existing = updated.clone();
                 i++;
@@ -51,22 +49,18 @@ public class ConfigUpdater {
             //  i++
             //}
 
-            if (i > 0) SubAPI.getInstance().getAppInfo().getLogger().info.println("Updated ./config.yml (" + i + " pass" + ((i != 1)?"es":"") + ")");
+            if (i > 0) System.out.println("SubServers > Updated ./config/subservers-client-sponge/config.yml (" + i + " pass" + ((i != 1)?"es":"") + ")");
         }
 
         if (i > 0) {
             YAMLSection settings = new YAMLSection();
             settings.set("Version", ((now.compareTo(was) <= 0)?was:now).toString());
-            settings.set("Console-Log", updated.getMap("Settings", new YAMLSection()).getBoolean("Console-Log", true));
-            settings.set("Network-Log", updated.getMap("Settings", new YAMLSection()).getBoolean("Network-Log", true));
-            settings.set("Server-Bind", updated.getMap("Settings", new YAMLSection()).getRawString("Server-Bind", "127.0.0.1"));
-
-            YAMLSection upnp = new YAMLSection();
-            upnp.set("Forward-Servers", updated.getMap("Settings", new YAMLSection()).getMap("UPnP", new YAMLSection()).getBoolean("Forward-Servers", false));
-            settings.set("UPnP", upnp);
+            settings.set("API-Only-Mode", updated.getMap("Settings", new YAMLSection()).getBoolean("API-Only-Mode", false));
+            settings.set("Show-Addresses", updated.getMap("Settings", new YAMLSection()).getBoolean("Show-Addresses", false));
+            settings.set("Use-Title-Messages", updated.getMap("Settings", new YAMLSection()).getBoolean("Use-Title-Messages", true));
 
             YAMLSection subdata = new YAMLSection();
-            subdata.set("Name", updated.getMap("Settings", new YAMLSection()).getMap("SubData", new YAMLSection()).getRawString("Name", "undefined"));
+            if (updated.getMap("Settings", new YAMLSection()).getMap("SubData", new YAMLSection()).contains("Name")) subdata.set("Name", updated.getMap("Settings").getMap("SubData").getRawString("Name"));
             subdata.set("Address", updated.getMap("Settings", new YAMLSection()).getMap("SubData", new YAMLSection()).getRawString("Address", "127.0.0.1:4391"));
             if (updated.getMap("Settings", new YAMLSection()).getMap("SubData", new YAMLSection()).contains("Password")) subdata.set("Password", updated.getMap("Settings").getMap("SubData").getRawString("Password"));
             if (updated.getMap("Settings", new YAMLSection()).getMap("SubData", new YAMLSection()).contains("Reconnect")) subdata.set("Reconnect", updated.getMap("Settings").getMap("SubData").getInt("Reconnect"));

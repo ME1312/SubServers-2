@@ -9,4 +9,4 @@ Template:
     Can-Update: true
     Executable: 'bash build.sh'
   Settings:
-    Executable: 'java -Xmx1024M -jar Paper.jar'
+    Executable: 'java -Xmx1024M -Dterminal.jline=false -jar Paper.jar nogui'
