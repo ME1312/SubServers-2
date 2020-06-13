@@ -80,7 +80,7 @@ public class PacketExAddServer implements PacketObjectIn<Integer>, PacketObjectO
 
             if (host.servers.keySet().contains(name.toLowerCase())) {
                 SubServerImpl server = host.servers.get(name.toLowerCase());
-                if (server.getPort() == port && server.getExecutable().equals(exec) && server.getDirectory().equals(dir)) {
+                if (server.getPort() == port && server.getExecutable().equals(exec) && server.getPath().equals(dir)) {
                     if (server.isEnabled() != enabled || server.getLogger().isLogging() != log || !server.getStopCommand().equals(stopcmd)) {
                         server.setEnabled(enabled);
                         server.setLogging(log);

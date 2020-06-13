@@ -18,6 +18,7 @@ import java.util.UUID;
  */
 public class PacketExCreateServer implements PacketObjectIn<Integer>, PacketObjectOut<Integer> {
     private static HashMap<UUID, Callback<ObjectMap<Integer>>[]> callbacks = new HashMap<UUID, Callback<ObjectMap<Integer>>[]>();
+    private UUID player;
     private String name;
     private SubCreator.ServerTemplate template;
     private Version version;
@@ -36,14 +37,16 @@ public class PacketExCreateServer implements PacketObjectIn<Integer>, PacketObje
     /**
      * New PacketExCreateServer (Out)
      *
+     * @param player Player
      * @param server Server to Update
      * @param version Server Version
      * @param log Log Address
      * @param callback Callbacks
      */
     @SafeVarargs
-    public PacketExCreateServer(SubServer server, Version version, UUID log, Callback<ObjectMap<Integer>>... callback) {
+    public PacketExCreateServer(UUID player, SubServer server, Version version, UUID log, Callback<ObjectMap<Integer>>... callback) {
         if (Util.isNull(server, log, callback)) throw new NullPointerException();
+        this.player = player;
         this.name = server.getName();
         this.template = server.getTemplate();
         this.version = version;
@@ -57,22 +60,22 @@ public class PacketExCreateServer implements PacketObjectIn<Integer>, PacketObje
     /**
      * New PacketExCreateServer (Out)
      *
+     * @param player Player
      * @param name Server Name
      * @param template Server Template
      * @param version Server Version
      * @param port Server Port Number
-     * @param directory Server Directory
      * @param log Log Address
      * @param callback Callbacks
      */
     @SafeVarargs
-    public PacketExCreateServer(String name, SubCreator.ServerTemplate template, Version version, int port, String directory, UUID log, Callback<ObjectMap<Integer>>... callback) {
+    public PacketExCreateServer(UUID player, String name, SubCreator.ServerTemplate template, Version version, int port, UUID log, Callback<ObjectMap<Integer>>... callback) {
         if (Util.isNull(name, template, port, log, callback)) throw new NullPointerException();
+        this.player = player;
         this.name = name;
         this.template = template;
         this.version = version;
         this.port = port;
-        this.dir = directory;
         this.log = log;
         this.tracker = Util.getNew(callbacks.keySet(), UUID::randomUUID);
         callbacks.put(tracker, callback);
@@ -89,8 +92,9 @@ public class PacketExCreateServer implements PacketObjectIn<Integer>, PacketObje
             data.set(0x0003, template.getName());
             data.set(0x0004, version);
             data.set(0x0005, port);
-            data.set(0x0006, dir);
-            data.set(0x0007, log);
+            data.set(0x0006, log);
+            if (player != null)
+                data.set(0x0007, player);
         }
         return data;
     }

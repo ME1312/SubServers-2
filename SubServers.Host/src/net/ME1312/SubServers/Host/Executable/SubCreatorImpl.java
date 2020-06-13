@@ -5,6 +5,7 @@ import net.ME1312.Galaxi.Library.Config.YAMLSection;
 import net.ME1312.Galaxi.Library.Container.NamedContainer;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Container.Container;
+import net.ME1312.Galaxi.Library.Map.ObjectMapValue;
 import net.ME1312.Galaxi.Library.UniversalFile;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
@@ -13,6 +14,7 @@ import net.ME1312.SubServers.Host.ExHost;
 import net.ME1312.SubServers.Host.Library.Exception.InvalidServerException;
 import net.ME1312.SubServers.Host.Library.Exception.InvalidTemplateException;
 import net.ME1312.SubServers.Host.Library.Exception.SubCreatorException;
+import net.ME1312.SubServers.Host.Library.ReplacementScanner;
 import net.ME1312.SubServers.Host.Network.API.SubCreator.ServerType;
 import net.ME1312.SubServers.Host.Network.Packet.PacketExCreateServer;
 import net.ME1312.SubServers.Host.Network.Packet.PacketOutExLogMessage;
@@ -23,6 +25,9 @@ import java.io.*;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.nio.file.LinkOption;
+import java.nio.file.StandardCopyOption;
+import java.security.MessageDigest;
 import java.util.*;
 
 /**
@@ -198,25 +203,27 @@ public class SubCreatorImpl {
 
     private class CreatorTask extends Thread {
         private final SubServerImpl update;
+        private final UUID player;
         private final String name;
         private final ServerTemplate template;
         private final Version version;
         private final int port;
-        private final File dir;
         private final UUID address;
         private final UUID tracker;
         private final SubLoggerImpl log;
+        private final HashMap<String, String> replacements;
         private Process process;
 
-        private CreatorTask(String name, ServerTemplate template, Version version, int port, String dir, UUID address, UUID tracker) {
+        private CreatorTask(UUID player, String name, ServerTemplate template, Version version, int port, UUID address, UUID tracker) {
             super(SubAPI.getInstance().getAppInfo().getName() + "::SubCreator_Process_Handler(" + name + ')');
             this.update = host.servers.getOrDefault(name.toLowerCase(), null);
+            this.player = player;
             this.name = name;
             this.template = template;
             this.version = version;
             this.port = port;
-            this.dir = new File(host.host.getRawString("Directory"), dir);
             this.log = new SubLoggerImpl(null, this, name + File.separator + ((update == null)?"Creator":"Updater"), address, new Container<Boolean>(true), null);
+            this.replacements = new HashMap<String, String>();
             this.address = address;
             this.tracker = tracker;
         }
@@ -260,15 +267,25 @@ public class SubCreatorImpl {
             try {
                 log.logger.info.println("Loading Template: " + template.getDisplayName());
                 ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketOutExLogMessage(address, "Loading Template: " + template.getDisplayName()));
-                Util.copyDirectory(template.getDirectory(), dir);
+                if (template.getBuildOptions().getBoolean("Update-Files", false)) updateDirectory(template.getDirectory(), dir);
+                else Util.copyDirectory(template.getDirectory(), dir);
+
+                for (ObjectMapValue<String> replacement : template.getBuildOptions().getMap("Replacements").getValues()) if (!replacement.isNull()) {
+                    replacements.put(replacement.getHandle().toLowerCase().replace('-', '_').replace(' ', '_'), replacement.asRawString());
+                }
+
+                var.putAll(replacements);
                 var.put("java", System.getProperty("java.home") + File.separator + "bin" + File.separator + "java");
                 var.put("mode", (update == null)?"CREATE":"UPDATE");
+                if (player != null) var.put("player", player.toString().toUpperCase());
+                else var.remove("player");
                 var.put("name", name);
-                if (SubAPI.getInstance().getSubDataNetwork()[0] != null) var.put("host", SubAPI.getInstance().getName());
+                var.put("host", SubAPI.getInstance().getName());
                 var.put("template", template.getName());
                 var.put("type", template.getType().toString().toUpperCase());
                 if (version != null) var.put("version", version.toString());
-                var.put("address", host.config.get().getMap("Settings").getRawString("Server-Bind"));
+                else var.remove("version");
+                var.put("address", getAddress());
                 var.put("port", Integer.toString(port));
                 switch (template.getType()) {
                     case SPONGE:
@@ -354,22 +371,51 @@ public class SubCreatorImpl {
             return server;
         }
 
+        @SuppressWarnings("unchecked")
         public void run() {
+            Runnable declaration = () -> {
+                replacements.put("player", (player == null)?"":player.toString());
+                replacements.put("name", name);
+                replacements.put("host", SubAPI.getInstance().getName());
+                replacements.put("template", template.getName());
+                replacements.put("type", template.getType().toString());
+                replacements.put("version", (version != null)?version.toString():"");
+                replacements.put("address", getAddress());
+                replacements.put("port", Integer.toString(port));
+            };
+            declaration.run();
+            File dir = (update != null)?new File(update.getFullPath()):new File(host.host.getRawString("Directory"),
+                    (template.getConfigOptions().contains("Directory"))?new ReplacementScanner(replacements).replace(template.getConfigOptions().getRawString("Directory")).toString():name);
             dir.mkdirs();
-            ObjectMap<String> server;
+
+            ObjectMap<String> config;
             try {
-                server = build(dir, template, new LinkedList<>());
-                generateProperties(dir, port);
-                generateClient(dir, template.getType(), name);
+                config = build(dir, template, new LinkedList<>());
             } catch (SubCreatorException e) {
-                server = null;
+                config = null;
             } catch (Exception e) {
-                server = null;
+                config = null;
                 log.logger.error.println(e);
             }
-            ObjectMap<String> config = template.getConfigOptions().clone();
-            if (server != null) {
-                ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketExCreateServer(0, null, config, host.config.get().getMap("Settings").getRawString("Server-Bind"), tracker));
+
+            declaration.run();
+            ReplacementScanner replacements = new ReplacementScanner(this.replacements);
+            if (config != null) {
+                try {
+                    if (template.getBuildOptions().getBoolean("Install-Client", true)) generateClient(dir, template.getType(), name);
+
+                    LinkedList<String> masks = new LinkedList<>();
+                    masks.add("/server.properties");
+                    masks.addAll(template.getBuildOptions().getRawStringList("Replace", Collections.emptyList()));
+                    replacements.replace(dir, masks.toArray(new String[0]));
+                } catch (Exception e) {
+                    config = null;
+                    e.printStackTrace();
+                }
+            }
+
+            if (config != null) {
+                ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketExCreateServer(0, null, (Map<String, ?>) replacements.replace(config.get()), tracker));
             } else {
                 log.logger.info.println("Couldn't build the server jar. Check the SubCreator logs for more detail.");
                 ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketExCreateServer(-1, "Couldn't build the server jar. Check the SubCreator logs for more detail.", tracker));
@@ -389,9 +435,9 @@ public class SubCreatorImpl {
         this.thread = new TreeMap<>();
     }
 
-    public boolean create(String name, ServerTemplate template, Version version, int port, String dir, UUID address, UUID tracker) {
-        if (Util.isNull(name, template, port, dir, address)) throw new NullPointerException();
-        CreatorTask task = new CreatorTask(name, template, version, port, dir, address, tracker);
+    public boolean create(UUID player, String name, ServerTemplate template, Version version, int port, UUID address, UUID tracker) {
+        if (Util.isNull(name, template, port, address)) throw new NullPointerException();
+        CreatorTask task = new CreatorTask(player, name, template, version, port, address, tracker);
         this.thread.put(name.toLowerCase(), task);
         task.start();
         return true;
@@ -444,8 +490,16 @@ public class SubCreatorImpl {
         return this.thread.get(name).log;
     }
 
+    private static NamedContainer<YAMLSection, String> address = null;
+    private String getAddress() {
+        if (address == null || host.config.get() != address.name()) {
+            address = new NamedContainer<>(host.config.get(), host.config.get().getMap("Settings").getRawString("Server-Bind"));
+        }
+        return address.get();
+    }
+
     private static NamedContainer<YAMLSection, Map<String, Object>> subdata = null;
-    private Map<String, Object> getSubDataConfig() {
+    private Map<String, Object> getSubData() {
         if (subdata == null || host.config.get() != subdata.name()) {
             Map<String, Object> map = new HashMap<String, Object>();
             map.put("Address", host.config.get().getMap("Settings").getMap("SubData").getRawString("Address"));
@@ -456,21 +510,24 @@ public class SubCreatorImpl {
     }
 
     private void generateClient(File dir, ServerType type, String name) throws IOException {
-        if (new UniversalFile(dir, "subservers.client").exists()) {
-            Files.delete(new UniversalFile(dir, "subservers.client").toPath());
-            if (type == ServerType.SPIGOT) {
-                if (!new UniversalFile(dir, "plugins").exists()) new UniversalFile(dir, "plugins").mkdirs();
-                if (!new UniversalFile(dir, "plugins:SubServers.Client.jar").exists())
-                    Util.copyFromJar(ExHost.class.getClassLoader(), "net/ME1312/SubServers/Host/Library/Files/client.jar", new UniversalFile(dir, "plugins:SubServers.Client.jar").getPath());
-            } else if (type == ServerType.FORGE || type == ServerType.SPONGE) {
-                if (!new UniversalFile(dir, "mods").exists()) new UniversalFile(dir, "mods").mkdirs();
-                if (!new UniversalFile(dir, "mods:SubServers.Client.jar").exists())
-                    Util.copyFromJar(ExHost.class.getClassLoader(), "net/ME1312/SubServers/Host/Library/Files/client.jar", new UniversalFile(dir, "mods:SubServers.Client.jar").getPath());
-            }
+        boolean installed = false;
+        if (type == ServerType.SPIGOT) {
+            installed = true;
+            if (!new UniversalFile(dir, "plugins").exists()) new UniversalFile(dir, "plugins").mkdirs();
+            if (!new UniversalFile(dir, "plugins:SubServers.Client.jar").exists())
+                Util.copyFromJar(ExHost.class.getClassLoader(), "net/ME1312/SubServers/Host/Library/Files/client.jar", new UniversalFile(dir, "plugins:SubServers.Client.jar").getPath());
+        } else if (type == ServerType.FORGE || type == ServerType.SPONGE) {
+            installed = true;
+            if (!new UniversalFile(dir, "mods").exists()) new UniversalFile(dir, "mods").mkdirs();
+            if (!new UniversalFile(dir, "mods:SubServers.Client.jar").exists())
+                Util.copyFromJar(ExHost.class.getClassLoader(), "net/ME1312/SubServers/Host/Library/Files/client.jar", new UniversalFile(dir, "mods:SubServers.Client.jar").getPath());
+        }
+
+        if (installed) {
             YAMLSection config = new YAMLSection();
             FileWriter writer = new FileWriter(new UniversalFile(dir, "subdata.json"), false);
             config.set("Name", name);
-            config.setAll(getSubDataConfig());
+            config.setAll(getSubData());
             writer.write(config.toJSON().toString());
             writer.close();
 
@@ -479,15 +536,46 @@ public class SubCreatorImpl {
             }
         }
     }
-    private void generateProperties(File dir, int port) throws IOException {
-        File file = new File(dir, "server.properties");
-        if (!file.exists()) file.createNewFile();
-        FileInputStream is = new FileInputStream(file);
-        String content = Util.readAll(new BufferedReader(new InputStreamReader(is))).replaceAll("server-port=.*(\r?\n)", "server-port=" + port + "$1").replaceAll("server-ip=.*(\r?\n)", "server-ip=" + host.config.get().getMap("Settings").getRawString("Server-Bind") + "$1");
-        is.close();
-        file.delete();
-        PrintWriter writer = new PrintWriter(file, "UTF-8");
-        writer.write(content);
-        writer.close();
+
+    private void updateDirectory(File from, File to) {
+        if (from.isDirectory() && !Files.isSymbolicLink(from.toPath())) {
+            if (!to.exists()) {
+                to.mkdirs();
+            }
+
+            String files[] = from.list();
+
+            for (String file : files) {
+                File srcFile = new File(from, file);
+                File destFile = new File(to, file);
+
+                updateDirectory(srcFile, destFile);
+            }
+        } else {
+            try {
+                if (!to.exists() || from.length() != to.length() || !Arrays.equals(generateSHA256(to), generateSHA256(from))) {
+                    if (to.exists()) {
+                        if (to.isDirectory()) Util.deleteDirectory(to);
+                        else to.delete();
+                    }
+                    Files.copy(from.toPath(), to.toPath(), LinkOption.NOFOLLOW_LINKS, StandardCopyOption.REPLACE_EXISTING);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    } private byte[] generateSHA256(File file) throws Exception {
+        MessageDigest md = MessageDigest.getInstance("SHA-256");
+        FileInputStream fis = new FileInputStream(file);
+        byte[] dataBytes = new byte[1024];
+
+        int nread;
+
+        while ((nread = fis.read(dataBytes)) != -1) {
+            md.update(dataBytes, 0, nread);
+        }
+
+        fis.close();
+        return md.digest();
     }
 }

@@ -14,6 +14,7 @@ import net.ME1312.Galaxi.Library.Config.YAMLConfig;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubServers.Bungee.Library.Compatibility.Logger;
+import net.ME1312.SubServers.Bungee.Library.ReplacementScanner;
 import net.ME1312.SubServers.Bungee.Network.Packet.PacketExConfigureHost;
 import net.ME1312.SubServers.Bungee.Network.Packet.PacketExCreateServer;
 import net.ME1312.SubServers.Bungee.Network.Packet.PacketExDownloadTemplates;
@@ -103,24 +104,16 @@ public class ExternalSubCreator extends SubCreator {
             final SubCreateEvent event = new SubCreateEvent(player, host, name, template, version, port);
             host.plugin.getPluginManager().callEvent(event);
             if (!event.isCancelled()) {
-                Container<String> address = new Container<>("$address$");
-                ReturnCallback<Object, Object> conversion = obj -> convert(obj, new NamedContainer<>("$player$", (player == null)?"":player.toString()), new NamedContainer<>("$name$", name),
-                        new NamedContainer<>("$host$", host.getName()), new NamedContainer<>("$template$", template.getName()), new NamedContainer<>("$type$", template.getType().toString()), new NamedContainer<>("$version$", (version != null)?version.toString():""),
-                        new NamedContainer<>("$address$", address.get()), new NamedContainer<>("$port$", Integer.toString(fport)));
-
                 logger.start();
-                host.queue(new PacketExCreateServer(name, template, version, port, (template.getConfigOptions().contains("Directory"))?conversion.run(template.getConfigOptions().getRawString("Directory")).toString():name, logger.getExternalAddress(), data -> {
+                host.queue(new PacketExCreateServer(player, name, template, version, port, logger.getExternalAddress(), data -> {
                     try {
                         if (data.getInt(0x0001) == 0) {
                             Logger.get(prefix).info("Saving...");
-                            address.set(data.getRawString(0x0003));
                             if (host.plugin.exServers.keySet().contains(name.toLowerCase()))
                                 host.plugin.exServers.remove(name.toLowerCase());
 
                             ObjectMap<String> server = new ObjectMap<String>();
-                            ObjectMap<String> config = new ObjectMap<String>((Map<String, ?>) conversion.run(data.getMap(0x0002).get()));
-
-                            config.remove("\033address");
+                            ObjectMap<String> config = new ObjectMap<String>((Map<String, ?>) data.getObject(0x0002));
 
                             server.set("Enabled", true);
                             server.set("Display", "");
@@ -157,7 +150,7 @@ public class ExternalSubCreator extends SubCreator {
                             host.plugin.getPluginManager().callEvent(new SubCreatedEvent(player, host, name, template, version, fport, subserver, false, true));
                             callback(origin, callback, subserver);
                         } else {
-                            Logger.get(prefix).info(data.getString(0x0004));
+                            Logger.get(prefix).info(data.getString(0x0003));
                             host.plugin.getPluginManager().callEvent(new SubCreatedEvent(player, host, name, template, version, fport, null, false, false));
                             callback(origin, callback, null);
                         }
@@ -174,28 +167,6 @@ public class ExternalSubCreator extends SubCreator {
                 return false;
             }
         } else return false;
-    } private Object convert(Object value, NamedContainer<String, String>... replacements) {
-        if (value instanceof Map) {
-            List<String> list = new ArrayList<String>();
-            list.addAll(((Map<String, Object>) value).keySet());
-            for (String key : list) ((Map<String, Object>) value).put(key, convert(((Map<String, Object>) value).get(key), replacements));
-            return value;
-        } else if (value instanceof Collection) {
-            List<Object> list = new ArrayList<Object>();
-            for (Object val : (Collection<Object>) value) list.add(convert(val, replacements));
-            return list;
-        } else if (value.getClass().isArray()) {
-            List<Object> list = new ArrayList<Object>();
-            for (int i = 0; i < ((Object[]) value).length; i++) list.add(convert(((Object[]) value)[i], replacements));
-            return list;
-        } else if (value instanceof String) {
-            return replace((String) value, replacements);
-        } else {
-            return value;
-        }
-    } private String replace(String string, NamedContainer<String, String>... replacements) {
-        for (NamedContainer<String, String> replacement : replacements) string = string.replace(replacement.name(), replacement.get());
-        return string;
     } private <T> void callback(StackTraceElement[] origin, Callback<T> callback, T value) {
         if (callback != null) try {
             callback.run(value);
@@ -222,12 +193,12 @@ public class ExternalSubCreator extends SubCreator {
             host.plugin.getPluginManager().callEvent(event);
             if (!event.isCancelled()) {
                 logger.start();
-                host.queue(new PacketExCreateServer(server, version, logger.getExternalAddress(), data -> {
+                host.queue(new PacketExCreateServer(player, server, version, logger.getExternalAddress(), data -> {
                     Util.isException(() -> Util.reflect(SubServerImpl.class.getDeclaredField("updating"), server, false));
                     if (data.getInt(0x0001) == 0) {
                         Logger.get(prefix).info("Saving...");
                     } else {
-                        Logger.get(prefix).info(data.getString(0x0004));
+                        Logger.get(prefix).info(data.getString(0x0003));
                     }
 
                     host.plugin.getPluginManager().callEvent(new SubCreatedEvent(player, host, name, server.getTemplate(), version, server.getAddress().getPort(), server, true, data.getInt(0x0001) == 0));

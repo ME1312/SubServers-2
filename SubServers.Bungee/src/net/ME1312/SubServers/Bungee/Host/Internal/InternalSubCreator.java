@@ -8,6 +8,7 @@ import net.ME1312.Galaxi.Library.Callback.ReturnCallback;
 import net.ME1312.Galaxi.Library.Config.YAMLSection;
 import net.ME1312.Galaxi.Library.Container.Container;
 import net.ME1312.Galaxi.Library.Container.NamedContainer;
+import net.ME1312.Galaxi.Library.Map.ObjectMapValue;
 import net.ME1312.SubServers.Bungee.Event.SubCreateEvent;
 import net.ME1312.SubServers.Bungee.Event.SubCreatedEvent;
 import net.ME1312.SubServers.Bungee.Host.*;
@@ -17,6 +18,7 @@ import net.ME1312.SubServers.Bungee.Library.Compatibility.Logger;
 import net.ME1312.SubServers.Bungee.Library.Exception.InvalidServerException;
 import net.ME1312.SubServers.Bungee.Library.Exception.SubCreatorException;
 import net.ME1312.Galaxi.Library.Version.Version;
+import net.ME1312.SubServers.Bungee.Library.ReplacementScanner;
 import net.ME1312.SubServers.Bungee.SubAPI;
 import net.ME1312.SubServers.Bungee.SubProxy;
 import net.md_5.bungee.api.ChatColor;
@@ -27,6 +29,9 @@ import java.net.InetSocketAddress;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.nio.file.LinkOption;
+import java.nio.file.StandardCopyOption;
+import java.security.MessageDigest;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -51,6 +56,7 @@ public class InternalSubCreator extends SubCreator {
         private final int port;
         private final String prefix;
         private final InternalSubLogger log;
+        private final HashMap<String, String> replacements;
         private final Callback<SubServer> callback;
         private Process process;
 
@@ -63,6 +69,7 @@ public class InternalSubCreator extends SubCreator {
             this.version = version;
             this.port = port;
             this.log = new InternalSubLogger(null, this, prefix = name + File.separator + "Creator", InternalSubCreator.this.log, null);
+            this.replacements = new HashMap<String, String>();
             this.callback = callback;
         }
 
@@ -75,6 +82,7 @@ public class InternalSubCreator extends SubCreator {
             this.version = version;
             this.port = server.getAddress().getPort();
             this.log = new InternalSubLogger(null, this, prefix = name + File.separator + "Updater", InternalSubCreator.this.log, null);
+            this.replacements = new HashMap<String, String>();
             this.callback = callback;
         }
 
@@ -112,14 +120,24 @@ public class InternalSubCreator extends SubCreator {
             server.setAll(template.getConfigOptions());
             try {
                 Logger.get(prefix).info("Loading Template: " + template.getDisplayName());
-                Util.copyDirectory(template.getDirectory(), dir);
+                if (template.getBuildOptions().getBoolean("Update-Files", false)) updateDirectory(template.getDirectory(), dir);
+                else Util.copyDirectory(template.getDirectory(), dir);
+
+                for (ObjectMapValue<String> replacement : template.getBuildOptions().getMap("Replacements").getValues()) if (!replacement.isNull()) {
+                    replacements.put(replacement.getHandle().toLowerCase().replace('-', '_').replace(' ', '_'), replacement.asRawString());
+                }
+
+                var.putAll(replacements);
                 var.put("java", System.getProperty("java.home") + File.separator + "bin" + File.separator + "java");
                 var.put("mode", (update == null)?"CREATE":"UPDATE");
+                if (player != null) var.put("player", player.toString().toUpperCase());
+                else var.remove("player");
                 var.put("name", name);
                 var.put("host", host.getName());
                 var.put("template", template.getName());
                 var.put("type", template.getType().toString().toUpperCase());
                 if (version != null) var.put("version", version.toString());
+                else var.remove("version");
                 var.put("address", host.getAddress().getHostAddress());
                 var.put("port", Integer.toString(port));
                 switch (template.getType()) {
@@ -203,24 +221,47 @@ public class InternalSubCreator extends SubCreator {
         }
 
         public void run() {
-            ReturnCallback<Object, Object> conversion = obj -> convert(obj, new NamedContainer<>("$player$", (player == null)?"":player.toString()), new NamedContainer<>("$name$", name),
-                    new NamedContainer<>("$host$", host.getName()), new NamedContainer<>("$template$", template.getName()), new NamedContainer<>("$type$", template.getType().toString()), new NamedContainer<>("$version$", (version != null)?version.toString():""),
-                    new NamedContainer<>("$address$", host.getAddress().getHostAddress()), new NamedContainer<>("$port$", Integer.toString(port)));
+            Runnable declaration = () -> {
+                replacements.put("player", (player == null)?"":player.toString());
+                replacements.put("name", name);
+                replacements.put("host", host.getName());
+                replacements.put("template", template.getName());
+                replacements.put("type", template.getType().toString());
+                replacements.put("version", (version != null)?version.toString():"");
+                replacements.put("address", host.getAddress().getHostAddress());
+                replacements.put("port", Integer.toString(port));
+            };
 
+            declaration.run();
             File dir = (update != null)?new File(update.getFullPath()):new File(host.getPath(),
-                    (template.getConfigOptions().contains("Directory"))?conversion.run(template.getConfigOptions().getRawString("Directory")).toString():name);
+                    (template.getConfigOptions().contains("Directory"))?new ReplacementScanner(replacements).replace(template.getConfigOptions().getRawString("Directory")).toString():name);
             dir.mkdirs();
+
             ObjectMap<String> server = new ObjectMap<String>();
             ObjectMap<String> config;
             try {
                 config = build(dir, template, new LinkedList<>());
-                generateProperties(dir, port);
-                generateClient(dir, template.getType(), name);
             } catch (SubCreatorException e) {
                 config = null;
             } catch (Exception e) {
                 config = null;
                 e.printStackTrace();
+            }
+
+            declaration.run();
+            ReplacementScanner replacements = new ReplacementScanner(this.replacements);
+            if (config != null) {
+                try {
+                    if (template.getBuildOptions().getBoolean("Install-Client", true)) generateClient(dir, template.getType(), name);
+
+                    LinkedList<String> masks = new LinkedList<>();
+                    masks.add("/server.properties");
+                    masks.addAll(template.getBuildOptions().getRawStringList("Replace", Collections.emptyList()));
+                    replacements.replace(dir, masks.toArray(new String[0]));
+                } catch (Exception e) {
+                    config = null;
+                    e.printStackTrace();
+                }
             }
 
             if (config != null) {
@@ -231,7 +272,7 @@ public class InternalSubCreator extends SubCreator {
                         if (host.plugin.exServers.keySet().contains(name.toLowerCase()))
                             host.plugin.exServers.remove(name.toLowerCase());
 
-                        config = new ObjectMap<String>((Map<String, ?>) conversion.run(config.get()));
+                        config = new ObjectMap<String>((Map<String, ?>) replacements.replace(config.get()));
 
                         server.set("Enabled", true);
                         server.set("Display", "");
@@ -281,28 +322,6 @@ public class InternalSubCreator extends SubCreator {
                 callback.run(null);
             }
             InternalSubCreator.this.thread.remove(name.toLowerCase());
-        } private Object convert(Object value, NamedContainer<String, String>... replacements) {
-            if (value instanceof Map) {
-                List<String> list = new ArrayList<String>();
-                list.addAll(((Map<String, Object>) value).keySet());
-                for (String key : list) ((Map<String, Object>) value).put(key, convert(((Map<String, Object>) value).get(key), replacements));
-                return value;
-            } else if (value instanceof Collection) {
-                List<Object> list = new ArrayList<Object>();
-                for (Object val : (Collection<Object>) value) list.add(convert(val, replacements));
-                return list;
-            } else if (value.getClass().isArray()) {
-                List<Object> list = new ArrayList<Object>();
-                for (int i = 0; i < ((Object[]) value).length; i++) list.add(convert(((Object[]) value)[i], replacements));
-                return list;
-            } else if (value instanceof String) {
-                return replace((String) value, replacements);
-            } else {
-                return value;
-            }
-        } private String replace(String string, NamedContainer<String, String>... replacements) {
-            for (NamedContainer<String, String> replacement : replacements) string = string.replace(replacement.name(), replacement.get());
-            return string;
         }
     }
 
@@ -528,7 +547,7 @@ public class InternalSubCreator extends SubCreator {
     }
 
     private static NamedContainer<YAMLSection, Map<String, Object>> subdata = null;
-    private Map<String, Object> getSubDataConfig() {
+    private Map<String, Object> getSubData() {
         if (subdata == null || host.plugin.config.get() != subdata.name()) {
             Map<String, Object> map = new HashMap<String, Object>();
             map.put("Address", host.plugin.config.get().getMap("Settings").getMap("SubData").getRawString("Address", "127.0.0.1").replace("0.0.0.0", "127.0.0.1"));
@@ -539,21 +558,24 @@ public class InternalSubCreator extends SubCreator {
     }
 
     private void generateClient(File dir, ServerType type, String name) throws IOException {
-        if (new UniversalFile(dir, "subservers.client").exists()) {
-            Files.delete(new UniversalFile(dir, "subservers.client").toPath());
-            if (type == ServerType.SPIGOT) {
-                if (!new UniversalFile(dir, "plugins").exists()) new UniversalFile(dir, "plugins").mkdirs();
-                if (!new UniversalFile(dir, "plugins:SubServers.Client.jar").exists())
-                    Util.copyFromJar(SubProxy.class.getClassLoader(), "net/ME1312/SubServers/Bungee/Library/Files/client.jar", new UniversalFile(dir, "plugins:SubServers.Client.jar").getPath());
-            } else if (type == ServerType.FORGE || type == ServerType.SPONGE) {
-                if (!new UniversalFile(dir, "mods").exists()) new UniversalFile(dir, "mods").mkdirs();
-                if (!new UniversalFile(dir, "mods:SubServers.Client.jar").exists())
-                    Util.copyFromJar(SubProxy.class.getClassLoader(), "net/ME1312/SubServers/Bungee/Library/Files/client.jar", new UniversalFile(dir, "mods:SubServers.Client.jar").getPath());
-            }
+        boolean installed = false;
+        if (type == ServerType.SPIGOT) {
+            installed = true;
+            if (!new UniversalFile(dir, "plugins").exists()) new UniversalFile(dir, "plugins").mkdirs();
+            if (!new UniversalFile(dir, "plugins:SubServers.Client.jar").exists())
+                Util.copyFromJar(SubProxy.class.getClassLoader(), "net/ME1312/SubServers/Bungee/Library/Files/client.jar", new UniversalFile(dir, "plugins:SubServers.Client.jar").getPath());
+        } else if (type == ServerType.FORGE || type == ServerType.SPONGE) {
+            installed = true;
+            if (!new UniversalFile(dir, "mods").exists()) new UniversalFile(dir, "mods").mkdirs();
+            if (!new UniversalFile(dir, "mods:SubServers.Client.jar").exists())
+                Util.copyFromJar(SubProxy.class.getClassLoader(), "net/ME1312/SubServers/Bungee/Library/Files/client.jar", new UniversalFile(dir, "mods:SubServers.Client.jar").getPath());
+        }
+
+        if (installed) {
             YAMLSection config = new YAMLSection();
             FileWriter writer = new FileWriter(new UniversalFile(dir, "subdata.json"), false);
             config.set("Name", name);
-            config.setAll(getSubDataConfig());
+            config.setAll(getSubData());
             writer.write(config.toJSON().toString());
             writer.close();
 
@@ -562,15 +584,46 @@ public class InternalSubCreator extends SubCreator {
             }
         }
     }
-    private void generateProperties(File dir, int port) throws IOException {
-        File file = new File(dir, "server.properties");
-        if (!file.exists()) file.createNewFile();
-        InputStream stream = new FileInputStream(file);
-        String content = Util.readAll(new BufferedReader(new InputStreamReader(stream))).replaceAll("server-port=.*(\r?\n)", "server-port=" + port + "$1").replaceAll("server-ip=.*(\r?\n)", "server-ip=" + host.getAddress().getHostAddress() + "$1");
-        stream.close();
-        file.delete();
-        PrintWriter writer = new PrintWriter(file, "UTF-8");
-        writer.write(content);
-        writer.close();
+
+    private void updateDirectory(File from, File to) {
+        if (from.isDirectory() && !Files.isSymbolicLink(from.toPath())) {
+            if (!to.exists()) {
+                to.mkdirs();
+            }
+
+            String files[] = from.list();
+
+            for (String file : files) {
+                File srcFile = new File(from, file);
+                File destFile = new File(to, file);
+
+                updateDirectory(srcFile, destFile);
+            }
+        } else {
+            try {
+                if (!to.exists() || from.length() != to.length() || !Arrays.equals(generateSHA256(to), generateSHA256(from))) {
+                    if (to.exists()) {
+                        if (to.isDirectory()) Util.deleteDirectory(to);
+                        else to.delete();
+                    }
+                    Files.copy(from.toPath(), to.toPath(), LinkOption.NOFOLLOW_LINKS, StandardCopyOption.REPLACE_EXISTING);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    } private byte[] generateSHA256(File file) throws Exception {
+        MessageDigest md = MessageDigest.getInstance("SHA-256");
+        FileInputStream fis = new FileInputStream(file);
+        byte[] dataBytes = new byte[1024];
+
+        int nread;
+
+        while ((nread = fis.read(dataBytes)) != -1) {
+            md.update(dataBytes, 0, nread);
+        }
+
+        fis.close();
+        return md.digest();
     }
 }

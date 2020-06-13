@@ -283,12 +283,21 @@ public class SubServerImpl {
     }
 
     /**
-     * Get the Server Directory
+     * Get the Server Directory Path
      *
-     * @return Server Directory
+     * @return Server Directory Path
      */
-    public String getDirectory() {
+    public String getPath() {
         return dir;
+    }
+
+    /**
+     * Get the Full Server Directory Path
+     *
+     * @return Full Server Directory Path
+     */
+    public String getFullPath() {
+        return directory.getPath();
     }
 
     /**

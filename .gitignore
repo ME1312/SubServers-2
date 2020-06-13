@@ -1,50 +1,17 @@
-# SubServers 2 Ignored Files
-
-*.iml
-
-# User-specific files
-*.suo
-*.user
-*.userosscache
-*.sln.docstates
-*.userprefs
-
-## Directory-based project format:
-.idea/
-
-## File-based project format:
-*.ipr
-*.iws
-
-# IntelliJ
+# Hide System and IDE Generated Files
 /out/
+.idea/
+*.iml
+.DS_STORE
 
-# mpeltonen/sbt-idea plugin
-.idea_modules/
+# Hide Unfinished Projects
+/SubServers.Test/
 
-# JIRA plugin
-atlassian-ide-plugin.xml
-
-# Crashlytics plugin (for Android Studio and IntelliJ)
-com_crashlytics_export_strings.xml
-crashlytics.properties
-crashlytics-build.properties
-
-# Hide Unfinished Project Files
-/SubServers.Client/Windows/
-/Artifacts/SubServers.Web.jar
-/SubServers.Velocity/
-/SubServers.Web/
-
-# Hide Others
-/Artifacts/-Maven/
-/Artifacts/-History/
-/Artifacts/-Icon/
-/Artifacts/-Lite/
-/Artifacts/*.jar
+# Hide Compiled Artifacts
+/Artifacts/*
 /BungeeCord/
 /Javadoc/
-/SubServers.Test/
-/build.ant
-/build.log
-.DS_STORE
+
+# Show Interpreted Artifacts
+!/Artifacts/Download/
+!/Artifacts/SubServers.Patcher.sh

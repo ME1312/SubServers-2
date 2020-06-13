@@ -76,7 +76,7 @@ public class RemotePlayer implements SubDataSerializable {
     }
 
     /**
-     * Get this connection's UUID, if set.
+     * Get the UUID of this player.
      *
      * @return the UUID
      */

@@ -78,7 +78,7 @@ public class PacketExDeleteServer implements PacketObjectIn<Integer>, PacketObje
                 new Thread(() -> {
                     UniversalFile to = new UniversalFile(GalaxiEngine.getInstance().getRuntimeDirectory(), "Recently Deleted:" + server.getName().toLowerCase());
                     try {
-                        File from = new File(host.host.getRawString("Directory"), server.getDirectory());
+                        File from = new File(host.host.getRawString("Directory"), server.getPath());
                         if (from.exists()) {
                             log.info("Removing Files...");
                             if (recycle) {
