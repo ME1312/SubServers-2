@@ -89,24 +89,26 @@ public class SubProtocol extends SubDataProtocol {
 
          // 50-6F: External Host Packets
             instance.registerPacket(0x0050, PacketExConfigureHost.class);
-            instance.registerPacket(0x0051, PacketExDownloadTemplates.class);
-            instance.registerPacket(0x0052, PacketOutExRequestQueue.class);
-            instance.registerPacket(0x0053, PacketExCreateServer.class);
-            instance.registerPacket(0x0054, PacketExAddServer.class);
-            instance.registerPacket(0x0055, PacketExEditServer.class);
-            instance.registerPacket(0x0056, PacketOutExLogMessage.class);
-            instance.registerPacket(0x0057, PacketExRemoveServer.class);
-            instance.registerPacket(0x0058, PacketExDeleteServer.class);
+            instance.registerPacket(0x0051, PacketExUploadTemplates.class);
+            instance.registerPacket(0x0052, PacketExDownloadTemplates.class);
+            instance.registerPacket(0x0053, PacketOutExRequestQueue.class);
+            instance.registerPacket(0x0054, PacketExCreateServer.class);
+            instance.registerPacket(0x0055, PacketExAddServer.class);
+            instance.registerPacket(0x0056, PacketExEditServer.class);
+            instance.registerPacket(0x0057, PacketOutExLogMessage.class);
+            instance.registerPacket(0x0058, PacketExRemoveServer.class);
+            instance.registerPacket(0x0059, PacketExDeleteServer.class);
 
             instance.registerPacket(0x0050, new PacketExConfigureHost(host));
-            instance.registerPacket(0x0051, new PacketExDownloadTemplates(host));
-          //instance.registerPacket(0x0052, new PacketOutExRequestQueue(host));
-            instance.registerPacket(0x0053, new PacketExCreateServer(host));
-            instance.registerPacket(0x0054, new PacketExAddServer(host));
-            instance.registerPacket(0x0055, new PacketExEditServer(host));
-          //instance.registerPacket(0x0056, new PacketOutExLogMessage());
-            instance.registerPacket(0x0057, new PacketExRemoveServer(host));
-            instance.registerPacket(0x0058, new PacketExDeleteServer(host));
+            instance.registerPacket(0x0051, new PacketExUploadTemplates(host));
+            instance.registerPacket(0x0052, new PacketExDownloadTemplates(host));
+          //instance.registerPacket(0x0053, new PacketOutExRequestQueue(host));
+            instance.registerPacket(0x0054, new PacketExCreateServer(host));
+            instance.registerPacket(0x0055, new PacketExAddServer(host));
+            instance.registerPacket(0x0056, new PacketExEditServer(host));
+          //instance.registerPacket(0x0057, new PacketOutExLogMessage());
+            instance.registerPacket(0x0058, new PacketExRemoveServer(host));
+            instance.registerPacket(0x0059, new PacketExDeleteServer(host));
 
 
          // 70-7F: External Misc Packets
@@ -152,7 +154,9 @@ public class SubProtocol extends SubDataProtocol {
         SubDataClient subdata = super.open(scheduler, logger, address, port);
         subdata.sendPacket(new PacketLinkExHost(host, 0));
         subdata.sendPacket(new PacketExConfigureHost(host));
-        subdata.sendPacket(new PacketExDownloadTemplates(host));
+        subdata.sendPacket(new PacketExUploadTemplates(host));
+        if (host.config.get().getMap("Settings").getBoolean("Download-Templates", true))
+            subdata.sendPacket(new PacketExDownloadTemplates(host));
         subdata.sendPacket(new PacketDownloadLang());
         subdata.sendPacket(new PacketOutExRequestQueue());
         subdata.on.ready(client -> host.engine.getPluginManager().executeEvent(new SubNetworkConnectEvent((SubDataClient) client)));

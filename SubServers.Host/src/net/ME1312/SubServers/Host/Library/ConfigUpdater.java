@@ -46,9 +46,13 @@ public class ConfigUpdater {
 
                 existing = updated.clone();
                 i++;
+            } if (was.compareTo(new Version("20w24c")) <= 0) {
+              // additions only this time
+
+              i++;
             }// if (was.compareTo(new Version("99w99a")) <= 0) {
             //  // do something
-            //  i++
+            //  i++;
             //}
 
             if (i > 0) SubAPI.getInstance().getAppInfo().getLogger().info.println("Updated ./config.yml (" + i + " pass" + ((i != 1)?"es":"") + ")");
@@ -59,6 +63,7 @@ public class ConfigUpdater {
             settings.set("Version", ((now.compareTo(was) <= 0)?was:now).toString());
             settings.set("Console-Log", updated.getMap("Settings", new YAMLSection()).getBoolean("Console-Log", true));
             settings.set("Network-Log", updated.getMap("Settings", new YAMLSection()).getBoolean("Network-Log", true));
+            settings.set("Download-Templates", updated.getMap("Settings", new YAMLSection()).getBoolean("Download-Templates", true));
             settings.set("Server-Bind", updated.getMap("Settings", new YAMLSection()).getRawString("Server-Bind", "127.0.0.1"));
 
             YAMLSection upnp = new YAMLSection();

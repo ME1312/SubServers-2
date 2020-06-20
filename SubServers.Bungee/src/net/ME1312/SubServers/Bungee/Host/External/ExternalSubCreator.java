@@ -3,7 +3,6 @@ package net.ME1312.SubServers.Bungee.Host.External;
 import com.google.common.collect.Range;
 import net.ME1312.Galaxi.Library.*;
 import net.ME1312.Galaxi.Library.Callback.Callback;
-import net.ME1312.Galaxi.Library.Callback.ReturnCallback;
 import net.ME1312.Galaxi.Library.Container.Container;
 import net.ME1312.Galaxi.Library.Container.NamedContainer;
 import net.ME1312.SubData.Server.SubDataClient;
@@ -14,11 +13,12 @@ import net.ME1312.Galaxi.Library.Config.YAMLConfig;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubServers.Bungee.Library.Compatibility.Logger;
-import net.ME1312.SubServers.Bungee.Library.ReplacementScanner;
 import net.ME1312.SubServers.Bungee.Network.Packet.PacketExConfigureHost;
 import net.ME1312.SubServers.Bungee.Network.Packet.PacketExCreateServer;
 import net.ME1312.SubServers.Bungee.Network.Packet.PacketExDownloadTemplates;
+import net.ME1312.SubServers.Bungee.Network.Packet.PacketExUploadTemplates;
 import net.ME1312.SubServers.Bungee.SubAPI;
+import net.ME1312.SubServers.Bungee.SubProxy;
 import net.md_5.bungee.api.ChatColor;
 
 import java.io.File;
@@ -32,6 +32,8 @@ import java.util.*;
 @SuppressWarnings("unchecked")
 public class ExternalSubCreator extends SubCreator {
     private HashMap<String, ServerTemplate> templates = new HashMap<String, ServerTemplate>();
+    private HashMap<String, ServerTemplate> templatesR = new HashMap<String, ServerTemplate>();
+    private Boolean enableRT = false;
     private ExternalHost host;
     private Range<Integer> ports;
     private Container<Boolean> log;
@@ -59,13 +61,13 @@ public class ExternalSubCreator extends SubCreator {
 
     @Override
     public void reload() {
-        templates.clear();
+        templatesR.clear();
         if (new UniversalFile(host.plugin.dir, "SubServers:Templates").exists()) for (File file : new UniversalFile(host.plugin.dir, "SubServers:Templates").listFiles()) {
             try {
                 if (file.isDirectory() && !file.getName().endsWith(".x")) {
                     ObjectMap<String> config = (new UniversalFile(file, "template.yml").exists())?new YAMLConfig(new UniversalFile(file, "template.yml")).get().getMap("Template", new ObjectMap<String>()):new ObjectMap<String>();
                     ServerTemplate template = new ServerTemplate(file.getName(), config.getBoolean("Enabled", true), config.getRawString("Icon", "::NULL::"), file, config.getMap("Build", new ObjectMap<String>()), config.getMap("Settings", new ObjectMap<String>()));
-                    templates.put(file.getName().toLowerCase(), template);
+                    templatesR.put(file.getName().toLowerCase(), template);
                     if (config.getKeys().contains("Display")) template.setDisplayName(config.getString("Display"));
                 }
             } catch (Exception e) {
@@ -74,9 +76,10 @@ public class ExternalSubCreator extends SubCreator {
             }
         }
 
-        if (host.available) {
+        if (host.available && !Util.getDespiteException(() -> Util.reflect(SubProxy.class.getDeclaredField("reloading"), host.plugin), false)) {
             host.queue(new PacketExConfigureHost(host.plugin, host));
-            host.queue(new PacketExDownloadTemplates(host.plugin, host));
+            host.queue(new PacketExUploadTemplates(host.plugin));
+            if (enableRT == null || enableRT) host.queue(new PacketExDownloadTemplates(host.plugin, host));
         }
     }
 
@@ -136,7 +139,7 @@ public class ExternalSubCreator extends SubCreator {
                             SubServer subserver = host.addSubServer(player, name, server.getBoolean("Enabled"), fport, ChatColor.translateAlternateColorCodes('&', server.getString("Motd")), server.getBoolean("Log"), server.getRawString("Directory"),
                                     server.getRawString("Executable"), server.getRawString("Stop-Command"), server.getBoolean("Hidden"), server.getBoolean("Restricted"));
                             if (server.getString("Display").length() > 0) subserver.setDisplayName(server.getString("Display"));
-                            subserver.setTemplate(getTemplate(server.getRawString("Template")));
+                            subserver.setTemplate(server.getRawString("Template"));
                             for (String group : server.getStringList("Group")) subserver.addGroup(group);
                             SubServer.StopAction action = Util.getDespiteException(() -> SubServer.StopAction.valueOf(server.getRawString("Stop-Action").toUpperCase().replace('-', '_').replace(' ', '_')), null);
                             if (action != null) subserver.setStopAction(action);
@@ -315,7 +318,10 @@ public class ExternalSubCreator extends SubCreator {
 
     @Override
     public Map<String, ServerTemplate> getTemplates() {
-        return new TreeMap<String, ServerTemplate>(templates);
+        TreeMap<String, ServerTemplate> map = new TreeMap<String, ServerTemplate>();
+        if (enableRT != null && enableRT) map.putAll(templatesR);
+        map.putAll(templates);
+        return map;
     }
 
     @Override

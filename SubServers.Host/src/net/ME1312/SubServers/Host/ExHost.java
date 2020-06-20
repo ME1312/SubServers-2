@@ -46,6 +46,7 @@ import java.util.jar.Manifest;
 public final class ExHost {
     HashMap<Integer, SubDataClient> subdata = new HashMap<Integer, SubDataClient>();
     NamedContainer<Long, Map<String, Map<String, String>>> lang = null;
+    public HashMap<String, SubCreatorImpl.ServerTemplate> templatesR = new HashMap<String, SubCreatorImpl.ServerTemplate>();
     public HashMap<String, SubCreatorImpl.ServerTemplate> templates = new HashMap<String, SubCreatorImpl.ServerTemplate>();
     public HashMap<String, SubServerImpl> servers = new HashMap<String, SubServerImpl>();
     public SubCreatorImpl creator;
@@ -122,7 +123,7 @@ public final class ExHost {
             config = new YAMLConfig(new UniversalFile(engine.getRuntimeDirectory(), "config.yml"));
 
             if (!(new UniversalFile(engine.getRuntimeDirectory(), "Templates").exists())) {
-                new UniversalFile(engine.getRuntimeDirectory(), "Templates").mkdir();
+                new UniversalFile(engine.getRuntimeDirectory(), "Templates").mkdirs();
                 log.info.println("Created ./Templates/");
             }
 
@@ -234,6 +235,7 @@ public final class ExHost {
 
         ConfigUpdater.updateConfig(new UniversalFile(engine.getRuntimeDirectory(), "config.yml"));
         config.reload();
+        creator.load(false);
 
         subprotocol.unregisterCipher("AES");
         subprotocol.unregisterCipher("AES-128");
@@ -347,7 +349,7 @@ public final class ExHost {
                 log.error.println(e);
             }
 
-            if (new File(engine.getRuntimeDirectory(), "Templates").exists()) Util.deleteDirectory(new File(engine.getRuntimeDirectory(), "Templates"));
+            if (new UniversalFile(engine.getRuntimeDirectory(), "Cache:Remote").exists()) Util.deleteDirectory(new UniversalFile(engine.getRuntimeDirectory(), "Cache:Remote"));
         }
     }
 }

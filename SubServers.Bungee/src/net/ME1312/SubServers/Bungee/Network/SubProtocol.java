@@ -96,26 +96,28 @@ public class SubProtocol extends SubDataProtocol {
 
          // 50-6F: External Host Packets
             instance.registerPacket(0x0050, PacketExConfigureHost.class);
-            instance.registerPacket(0x0051, PacketExDownloadTemplates.class);
-          //instance.registerPacket(0x0052, PacketInExRequestQueue.class);
-            instance.registerPacket(0x0053, PacketExCreateServer.class);
-            instance.registerPacket(0x0054, PacketExAddServer.class);
-            instance.registerPacket(0x0055, PacketExEditServer.class);
-          //instance.registerPacket(0x0056, PacketInExLogMessage.class);
-            instance.registerPacket(0x0057, PacketExRemoveServer.class);
-            instance.registerPacket(0x0058, PacketExDeleteServer.class);
-          //instance.registerPacket(0x0059, PacketExRestoreServer.class);
+            instance.registerPacket(0x0051, PacketExUploadTemplates.class);
+            instance.registerPacket(0x0052, PacketExDownloadTemplates.class);
+          //instance.registerPacket(0x0053, PacketInExRequestQueue.class);
+            instance.registerPacket(0x0054, PacketExCreateServer.class);
+            instance.registerPacket(0x0055, PacketExAddServer.class);
+            instance.registerPacket(0x0056, PacketExEditServer.class);
+          //instance.registerPacket(0x0057, PacketInExLogMessage.class);
+            instance.registerPacket(0x0058, PacketExRemoveServer.class);
+            instance.registerPacket(0x0059, PacketExDeleteServer.class);
+          //instance.registerPacket(0x005A, PacketExRestoreServer.class);
 
             instance.registerPacket(0x0050, new PacketExConfigureHost(plugin));
-            instance.registerPacket(0x0051, new PacketExDownloadTemplates(plugin));
-            instance.registerPacket(0x0052, new PacketInExRequestQueue(plugin));
-            instance.registerPacket(0x0053, new PacketExCreateServer(null));
-            instance.registerPacket(0x0054, new PacketExAddServer());
-            instance.registerPacket(0x0055, new PacketExEditServer(plugin));
-            instance.registerPacket(0x0056, new PacketInExLogMessage());
-            instance.registerPacket(0x0057, new PacketExRemoveServer());
-            instance.registerPacket(0x0058, new PacketExDeleteServer());
-          //instance.registerPacket(0x0059, new PacketExRestoreServer());
+            instance.registerPacket(0x0051, new PacketExUploadTemplates(plugin));
+            instance.registerPacket(0x0052, new PacketExDownloadTemplates(plugin));
+            instance.registerPacket(0x0053, new PacketInExRequestQueue(plugin));
+            instance.registerPacket(0x0054, new PacketExCreateServer(null));
+            instance.registerPacket(0x0055, new PacketExAddServer());
+            instance.registerPacket(0x0056, new PacketExEditServer(plugin));
+            instance.registerPacket(0x0057, new PacketInExLogMessage());
+            instance.registerPacket(0x0058, new PacketExRemoveServer());
+            instance.registerPacket(0x0059, new PacketExDeleteServer());
+          //instance.registerPacket(0x005A, new PacketExRestoreServer());
 
 
          // 70-7F: External Misc Packets

@@ -7,6 +7,7 @@ import net.ME1312.SubData.Client.Protocol.PacketObjectIn;
 import net.ME1312.SubData.Client.Protocol.PacketObjectOut;
 import net.ME1312.SubData.Client.SubDataSender;
 import net.ME1312.SubServers.Host.ExHost;
+import net.ME1312.SubServers.Host.Executable.SubCreatorImpl;
 
 import java.util.Map;
 import java.util.UUID;
@@ -90,7 +91,10 @@ public class PacketExCreateServer implements PacketObjectIn<Integer>, PacketObje
                 UUID log =             data.getUUID(0x0006);
                 UUID player =        (data.contains(0x0007)?data.getUUID(0x0007):null);
 
-                host.creator.create(player, name, host.templates.get(template.toLowerCase()), version, port, log, tracker);
+                SubCreatorImpl.ServerTemplate templateV = host.templates.get(template.toLowerCase());
+                if (templateV == null) templateV = host.templatesR.get(template.toLowerCase());
+
+                host.creator.create(player, name, templateV, version, port, log, tracker);
             }
         } catch (Throwable e) {
             host.log.error.println(e);

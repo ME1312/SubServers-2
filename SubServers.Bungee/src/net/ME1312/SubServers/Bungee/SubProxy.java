@@ -83,6 +83,7 @@ public final class SubProxy extends BungeeCord implements Listener {
     public final boolean isGalaxi;
     public long resetDate = 0;
     private boolean running = false;
+    private boolean reloading = false;
     private boolean posted = false;
     private static BigInteger lastSignature = BigInteger.valueOf(-1);
 
@@ -284,6 +285,7 @@ public final class SubProxy extends BungeeCord implements Listener {
         long begin = Calendar.getInstance().getTime().getTime();
         boolean status;
         if (!(status = running)) resetDate = begin;
+        reloading = true;
 
         ConfigUpdater.updateConfig(new UniversalFile(dir, "SubServers:config.yml"));
         ConfigUpdater.updateServers(new UniversalFile(dir, "SubServers:servers.yml"));
@@ -505,7 +507,7 @@ public final class SubProxy extends BungeeCord implements Listener {
                     if (this.servers.get().getMap("Servers").getMap(name).getKeys().contains("Display") && ((this.servers.get().getMap("Servers").getMap(name).getRawString("Display").length() == 0 && !server.getName().equals(server.getDisplayName())) || (this.servers.get().getMap("Servers").getMap(name).getRawString("Display").length() > 0 && !this.servers.get().getMap("Servers").getMap(name).getRawString("Display").equals(server.getDisplayName()))))
                         server.setDisplayName(this.servers.get().getMap("Servers").getMap(name).getRawString("Display"));
                     if (this.servers.get().getMap("Servers").getMap(name).getKeys().contains("Template") && ((this.servers.get().getMap("Servers").getMap(name).getRawString("Template").length() == 0 && server.getTemplate() != null) || (this.servers.get().getMap("Servers").getMap(name).getRawString("Template").length() > 0 && server.getTemplate() == null) || (server.getTemplate() != null && !this.servers.get().getMap("Servers").getMap(name).getString("Template").equalsIgnoreCase(server.getTemplate().getName()))))
-                        server.setTemplate(server.getHost().getCreator().getTemplate(this.servers.get().getMap("Servers").getMap(name).getString("Template")));
+                        server.setTemplate(this.servers.get().getMap("Servers").getMap(name).getRawString("Template"));
                     if (this.servers.get().getMap("Servers").getMap(name).getKeys().contains("Group")) {
                         for (String group : server.getGroups()) server.removeGroup(group);
                         for (String group : this.servers.get().getMap("Servers").getMap(name).getStringList("Group")) server.addGroup(group);
@@ -609,6 +611,7 @@ public final class SubProxy extends BungeeCord implements Listener {
             for (Server server : api.getServers().values()) if (server.getSubData()[0] != null) ((SubDataClient) server.getSubData()[0]).sendPacket(new PacketOutExReload(null));
         }
 
+        reloading = false;
         Logger.get("SubServers").info(((plugins > 0)?plugins+" Plugin"+((plugins == 1)?"":"s")+", ":"") + ((proxies > 1)?proxies+" Proxies, ":"") + hosts + " Host"+((hosts == 1)?"":"s")+", " + servers + " Server"+((servers == 1)?"":"s")+", and " + subservers + " SubServer"+((subservers == 1)?"":"s")+" "+((status)?"re":"")+"loaded in " + new DecimalFormat("0.000").format((Calendar.getInstance().getTime().getTime() - begin) / 1000D) + "s");
 
         long scd = TimeUnit.SECONDS.toMillis(this.servers.get().getMap("Settings").getLong("Run-On-Launch-Timeout", 0L));

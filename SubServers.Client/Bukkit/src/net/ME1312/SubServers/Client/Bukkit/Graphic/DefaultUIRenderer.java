@@ -3,7 +3,6 @@ package net.ME1312.SubServers.Client.Bukkit.Graphic;
 import net.ME1312.Galaxi.Library.Container.Container;
 import net.ME1312.Galaxi.Library.Container.NamedContainer;
 import net.ME1312.Galaxi.Library.Version.Version;
-import net.ME1312.SubData.Client.Protocol.PacketObjectOut;
 import net.ME1312.SubServers.Client.Bukkit.Network.API.Host;
 import net.ME1312.SubServers.Client.Bukkit.Network.API.Server;
 import net.ME1312.SubServers.Client.Bukkit.Network.API.SubCreator;
@@ -26,7 +25,7 @@ import java.util.*;
 public class DefaultUIRenderer extends UIRenderer {
     private static int MAX_VISITED_OBJECTS = 2;
     private List<Runnable> windowHistory = new LinkedList<Runnable>();
-    Object[] lastVisitedObjectz = new Object[MAX_VISITED_OBJECTS];
+    Object[] lastVisitedObjects = new Object[MAX_VISITED_OBJECTS];
     int lastPage = 1;
     Runnable lastMenu = null;
     boolean open = false;
@@ -84,7 +83,7 @@ public class DefaultUIRenderer extends UIRenderer {
         setDownloading(ChatColor.stripColor(plugin.api.getLang("SubServers", "Interface.Host-Menu.Title")));
         plugin.api.getHosts(hosts -> plugin.api.getGroups(groups -> {
             setDownloading(null);
-            lastVisitedObjectz[0] = null;
+            lastVisitedObjects[0] = null;
             lastPage = page;
             lastMenu = () -> hostMenu(1);
             windowHistory.add(() -> hostMenu(page));
@@ -220,7 +219,7 @@ public class DefaultUIRenderer extends UIRenderer {
                 if (hasHistory()) back();
             } else {
                 setDownloading(null);
-                lastVisitedObjectz[0] = host;
+                lastVisitedObjects[0] = host;
 
                 ItemStack block;
                 ItemMeta blockMeta;
@@ -328,11 +327,11 @@ public class DefaultUIRenderer extends UIRenderer {
     public void hostCreator(final CreatorOptions options) {
         setDownloading(ChatColor.stripColor(plugin.api.getLang("SubServers", "Interface.Host-Creator.Title").replace("$str$", options.getHost())));
         if (!options.init()) windowHistory.add(() -> hostCreator(options));
-        lastVisitedObjectz[0] = options;
+        lastVisitedObjects[0] = options;
 
         plugin.api.getHost(options.getHost(), host -> {
             if (host == null || !host.isAvailable() || !host.isEnabled()) {
-                lastVisitedObjectz[0] = null;
+                lastVisitedObjects[0] = null;
                 if (hasHistory()) back();
             } else {
                 setDownloading(null);
@@ -455,10 +454,10 @@ public class DefaultUIRenderer extends UIRenderer {
     public void hostCreatorTemplates(final int page, final CreatorOptions options) {
         setDownloading(ChatColor.stripColor(plugin.api.getLang("SubServers", "Interface.Host-Creator.Edit-Template.Title").replace("$str$", options.getHost())));
         options.init();
-        lastVisitedObjectz[0] = options;
+        lastVisitedObjects[0] = options;
         plugin.api.getHost(options.getHost(), host -> {
             if (host == null || !host.isAvailable() || !host.isEnabled()) {
-                lastVisitedObjectz[0] = null;
+                lastVisitedObjects[0] = null;
                 if (hasHistory()) back();
             } else {
                 lastPage = page;
@@ -573,7 +572,7 @@ public class DefaultUIRenderer extends UIRenderer {
                 if (hasHistory()) back();
             } else {
                 setDownloading(null);
-                lastVisitedObjectz[0] = host;
+                lastVisitedObjects[0] = host;
                 lastPage = page;
                 List<String> renderers = new LinkedList<String>();
                 for (String renderer : renderers) {
@@ -677,7 +676,7 @@ public class DefaultUIRenderer extends UIRenderer {
         setDownloading(ChatColor.stripColor(plugin.api.getLang("SubServers", "Interface.Group-Menu.Title")));
         plugin.api.getGroups(groups -> {
             setDownloading(null);
-            lastVisitedObjectz[0] = null;
+            lastVisitedObjects[0] = null;
             lastPage = page;
             lastMenu = () -> groupMenu(1);
             windowHistory.add(() -> groupMenu(page));
@@ -791,8 +790,8 @@ public class DefaultUIRenderer extends UIRenderer {
             lastPage = page;
 
             List<Server> servers = servercontainer.get();
-            lastVisitedObjectz[0] = host;
-            lastVisitedObjectz[1] = group;
+            lastVisitedObjects[0] = host;
+            lastVisitedObjects[1] = group;
             windowHistory.add(() -> serverMenu(page, host, group));
 
             ItemStack block;
@@ -985,7 +984,7 @@ public class DefaultUIRenderer extends UIRenderer {
                     if (hasHistory()) back();
                 } else {
                     setDownloading(null);
-                    lastVisitedObjectz[0] = subserver;
+                    lastVisitedObjects[0] = subserver;
                     ItemStack block;
                     ItemMeta blockMeta;
                     ItemStack div = createItem("STAINED_GLASS_PANE", "BLACK_STAINED_GLASS_PANE", (short) 15);
@@ -1191,7 +1190,7 @@ public class DefaultUIRenderer extends UIRenderer {
                 if (hasHistory()) back();
             } else {
                 setDownloading(null);
-                lastVisitedObjectz[0] = subserver;
+                lastVisitedObjects[0] = subserver;
                 lastPage = page;
                 List<String> renderers = new LinkedList<String>();
                 for (String renderer : renderers) {

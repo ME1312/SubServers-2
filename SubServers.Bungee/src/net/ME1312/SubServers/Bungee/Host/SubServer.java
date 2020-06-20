@@ -241,6 +241,13 @@ public interface SubServer extends Server {
     void setTemplate(SubCreator.ServerTemplate value);
 
     /**
+     * Sets the Template this Server was created from
+     *
+     * @param value Value
+     */
+    void setTemplate(String value);
+
+    /**
      * Is this Host Available?
      *
      * @return Availability Status

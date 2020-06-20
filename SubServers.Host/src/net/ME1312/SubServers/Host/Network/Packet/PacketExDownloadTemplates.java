@@ -27,13 +27,13 @@ public class PacketExDownloadTemplates implements PacketOut, PacketStreamIn {
 
     @Override
     public void sending(SubDataSender client) throws Throwable {
-        host.log.info.println("Downloading Template Files...");
+        host.log.info.println("Downloading Remote Template Files...");
         first = true;
     }
 
     @Override
     public void receive(SubDataSender client, InputStream stream) {
-        UniversalFile dir = new UniversalFile(GalaxiEngine.getInstance().getRuntimeDirectory(), "Templates");
+        UniversalFile dir = new UniversalFile(GalaxiEngine.getInstance().getRuntimeDirectory(), "Cache:Remote:Templates");
         try {
             if (dir.exists()) Util.deleteDirectory(dir);
         } catch (Exception e) {
@@ -41,8 +41,10 @@ public class PacketExDownloadTemplates implements PacketOut, PacketStreamIn {
         }
 
         try {
+            dir.mkdirs();
             Util.unzip(stream, dir);
-            host.log.info.println(((first)?"":"New ") + "Template Files Downloaded");
+            host.creator.load(true);
+            host.log.info.println(((first)?"":"New ") + "Remote Template Files Downloaded");
         } catch (Exception e) {
             SubAPI.getInstance().getAppInfo().getLogger().error.println("Problem decoding template files");
             SubAPI.getInstance().getAppInfo().getLogger().error.println(e);

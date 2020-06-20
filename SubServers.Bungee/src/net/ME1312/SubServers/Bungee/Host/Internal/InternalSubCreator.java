@@ -4,7 +4,6 @@ import com.google.common.collect.Range;
 import com.google.gson.Gson;
 import net.ME1312.Galaxi.Library.*;
 import net.ME1312.Galaxi.Library.Callback.Callback;
-import net.ME1312.Galaxi.Library.Callback.ReturnCallback;
 import net.ME1312.Galaxi.Library.Config.YAMLSection;
 import net.ME1312.Galaxi.Library.Container.Container;
 import net.ME1312.Galaxi.Library.Container.NamedContainer;
@@ -295,7 +294,7 @@ public class InternalSubCreator extends SubCreator {
                         subserver = host.addSubServer(player, name, server.getBoolean("Enabled"), port, ChatColor.translateAlternateColorCodes('&', server.getString("Motd")), server.getBoolean("Log"), server.getRawString("Directory"),
                                 server.getRawString("Executable"), server.getRawString("Stop-Command"), server.getBoolean("Hidden"), server.getBoolean("Restricted"));
                         if (server.getString("Display").length() > 0) subserver.setDisplayName(server.getString("Display"));
-                        subserver.setTemplate(getTemplate(server.getRawString("Template")));
+                        subserver.setTemplate(server.getRawString("Template"));
                         for (String group : server.getStringList("Group")) subserver.addGroup(group);
                         SubServer.StopAction action = Util.getDespiteException(() -> SubServer.StopAction.valueOf(server.getRawString("Stop-Action").toUpperCase().replace('-', '_').replace(' ', '_')), null);
                         if (action != null) subserver.setStopAction(action);

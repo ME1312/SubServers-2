@@ -16,7 +16,8 @@ import java.util.*;
  */
 public abstract class SubServerImpl extends ServerImpl implements SubServer {
     private List<NamedContainer<String, String>> incompatibilities = new ArrayList<NamedContainer<String, String>>();
-    private String template = null;
+    private SubCreator.ServerTemplate templateV = null;
+    private String templateS = null;
     protected boolean started;
     private boolean updating;
 
@@ -85,15 +86,25 @@ public abstract class SubServerImpl extends ServerImpl implements SubServer {
     }
 
     @Override
+    public void setTemplate(String template) {
+        SubAPI.getInstance().getInternals().getPluginManager().callEvent(new SubEditServerEvent(null, this, new NamedContainer<String, Object>("template", template), false));
+        this.templateV = null;
+        this.templateS = template;
+    }
+
+    @Override
     public void setTemplate(SubCreator.ServerTemplate template) {
         SubAPI.getInstance().getInternals().getPluginManager().callEvent(new SubEditServerEvent(null, this, new NamedContainer<String, Object>("template", (template != null)?template.getName():null), false));
-        this.template = (template != null)?template.getName():null;
+        this.templateV = template;
+        this.templateS = (template != null)?template.getName():null;
     }
 
     @Override
     public SubCreator.ServerTemplate getTemplate() {
-        if (template != null && getHost().getCreator().getTemplates().keySet().contains(template.toLowerCase())) {
-            return getHost().getCreator().getTemplate(template.toLowerCase());
+        if (templateV != null) {
+            return templateV;
+        } else if (templateS != null && getHost().getCreator().getTemplates().keySet().contains(templateS.toLowerCase())) {
+            return getHost().getCreator().getTemplate(templateS.toLowerCase());
         } else {
             return null;
         }

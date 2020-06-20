@@ -1,6 +1,7 @@
 package net.ME1312.SubServers.Host.Executable;
 
 import net.ME1312.Galaxi.Engine.GalaxiEngine;
+import net.ME1312.Galaxi.Library.Config.YAMLConfig;
 import net.ME1312.Galaxi.Library.Config.YAMLSection;
 import net.ME1312.Galaxi.Library.Container.NamedContainer;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
@@ -201,7 +202,32 @@ public class SubCreatorImpl {
         }
     }
 
+    /**
+     * Loads Template Metadata
+     *
+     * @param remote Loads from the Remote Templates directory when true
+     */
+    public void load(boolean remote) {
+        HashMap<String, ServerTemplate> templates = (remote)?host.templatesR:host.templates;
+        UniversalFile dir = new UniversalFile(GalaxiEngine.getInstance().getRuntimeDirectory(), ((remote)?"Cache:Remote:":"") + "Templates");
+        templates.clear();
+        if (dir.exists()) for (File file : dir.listFiles()) {
+                try {
+                    if (file.isDirectory() && !file.getName().endsWith(".x")) {
+                        ObjectMap<String> config = (new UniversalFile(file, "template.yml").exists())?new YAMLConfig(new UniversalFile(file, "template.yml")).get().getMap("Template", new ObjectMap<String>()):new ObjectMap<String>();
+                        ServerTemplate template = new ServerTemplate(file.getName(), config.getBoolean("Enabled", true), config.getRawString("Icon", "::NULL::"), file, config.getMap("Build", new ObjectMap<String>()), config.getMap("Settings", new ObjectMap<String>()));
+                        templates.put(file.getName().toLowerCase(), template);
+                        if (config.getKeys().contains("Display")) template.setDisplayName(config.getString("Display"));
+                    }
+                } catch (Exception e) {
+                    host.log.error.println("Couldn't load template: " + file.getName());
+                    host.log.error.println(e);
+                }
+            }
+    }
+
     private class CreatorTask extends Thread {
+        private final HashMap<String, ServerTemplate> templates;
         private final SubServerImpl update;
         private final UUID player;
         private final String name;
@@ -216,6 +242,7 @@ public class SubCreatorImpl {
 
         private CreatorTask(UUID player, String name, ServerTemplate template, Version version, int port, UUID address, UUID tracker) {
             super(SubAPI.getInstance().getAppInfo().getName() + "::SubCreator_Process_Handler(" + name + ')');
+            this.templates = new HashMap<String, ServerTemplate>();
             this.update = host.servers.getOrDefault(name.toLowerCase(), null);
             this.player = player;
             this.name = name;
@@ -226,6 +253,9 @@ public class SubCreatorImpl {
             this.replacements = new HashMap<String, String>();
             this.address = address;
             this.tracker = tracker;
+
+            templates.putAll(host.templatesR);
+            templates.putAll(host.templates);
         }
 
         private ObjectMap<String> build(File dir, ServerTemplate template, List<ServerTemplate> history) throws SubCreatorException {
@@ -236,11 +266,11 @@ public class SubCreatorImpl {
             if (history.contains(template)) throw new IllegalStateException("Template Import loop detected");
             history.add(template);
             for (String other : template.getBuildOptions().getStringList("Import", new ArrayList<String>())) {
-                if (host.templates.keySet().contains(other.toLowerCase())) {
-                    if (host.templates.get(other.toLowerCase()).isEnabled()) {
-                        if (version != null || !host.templates.get(other.toLowerCase()).requiresVersion()) {
-                            if (update == null || host.templates.get(other.toLowerCase()).canUpdate()) {
-                                ObjectMap<String> config = build(dir, host.templates.get(other.toLowerCase()), history);
+                if (templates.keySet().contains(other.toLowerCase())) {
+                    if (templates.get(other.toLowerCase()).isEnabled()) {
+                        if (version != null || !templates.get(other.toLowerCase()).requiresVersion()) {
+                            if (update == null || templates.get(other.toLowerCase()).canUpdate()) {
+                                ObjectMap<String> config = build(dir, templates.get(other.toLowerCase()), history);
                                 if (config == null) {
                                     throw new SubCreatorException();
                                 } else {
