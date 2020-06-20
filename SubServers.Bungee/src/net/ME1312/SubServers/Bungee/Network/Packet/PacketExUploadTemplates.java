@@ -35,7 +35,7 @@ public class PacketExUploadTemplates implements PacketObjectIn<Integer>, PacketO
             HashMap<String, SubCreator.ServerTemplate> map = Util.getDespiteException(() -> Util.reflect(ExternalSubCreator.class.getDeclaredField("templates"), ((ExternalHost) client.getHandler()).getCreator()), new HashMap<>());
             UniversalFile templatedir = new UniversalFile(plugin.dir, "SubServers:Cache:Remote:Templates");
             ObjectMap<String> templates = new ObjectMap<>((Map<String, ?>) data.getObject(0x0000));
-            templatedir.mkdirs();
+            map.clear();
             for (String name : templates.getKeys()) {
                 try {
                     UniversalFile dir = new UniversalFile(templatedir, name);

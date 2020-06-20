@@ -122,7 +122,7 @@ public class InternalSubCreator extends SubCreator {
                 if (template.getBuildOptions().getBoolean("Update-Files", false)) updateDirectory(template.getDirectory(), dir);
                 else Util.copyDirectory(template.getDirectory(), dir);
 
-                for (ObjectMapValue<String> replacement : template.getBuildOptions().getMap("Replacements").getValues()) if (!replacement.isNull()) {
+                for (ObjectMapValue<String> replacement : template.getBuildOptions().getMap("Replacements", new ObjectMap<>()).getValues()) if (!replacement.isNull()) {
                     replacements.put(replacement.getHandle().toLowerCase().replace('-', '_').replace(' ', '_'), replacement.asRawString());
                 }
 

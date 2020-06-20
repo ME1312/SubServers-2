@@ -27,8 +27,9 @@ public class PacketExUploadTemplates implements PacketIn, PacketObjectOut<Intege
 
     @Override
     public ObjectMap<Integer> send(SubDataSender client) {
-        host.log.info.println(((first)?"S":"Res") + "ending Local Template Metadata...");
         if (!first) host.creator.load(false);
+        if (!host.templates.isEmpty())
+            host.log.info.println(((first)?"S":"Res") + "ending Local Template Metadata...");
 
         ObjectMap<Integer> data = new ObjectMap<Integer>();
         ObjectMap<String> templates = new ObjectMap<String>();
