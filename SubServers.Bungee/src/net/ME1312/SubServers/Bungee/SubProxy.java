@@ -20,7 +20,7 @@ import net.ME1312.Galaxi.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Bungee.Library.Compatibility.Galaxi.GalaxiCommand;
 import net.ME1312.SubServers.Bungee.Library.Compatibility.LegacyServerMap;
 import net.ME1312.SubServers.Bungee.Library.Compatibility.Logger;
-import net.ME1312.SubServers.Bungee.Library.Fallback.SmartReconnectHandler;
+import net.ME1312.SubServers.Bungee.Library.Fallback.SmartFallback;
 import net.ME1312.SubServers.Bungee.Library.ConfigUpdater;
 import net.ME1312.SubServers.Bungee.Library.Exception.InvalidHostException;
 import net.ME1312.SubServers.Bungee.Library.Exception.InvalidServerException;
@@ -28,7 +28,6 @@ import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubServers.Bungee.Network.Packet.PacketOutExReload;
 import net.ME1312.SubServers.Bungee.Network.SubProtocol;
 import net.md_5.bungee.BungeeCord;
-import net.md_5.bungee.BungeeServerInfo;
 import net.md_5.bungee.UserConnection;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ServerPing;
@@ -654,7 +653,7 @@ public final class SubProxy extends BungeeCord implements Listener {
             getPluginManager().registerCommand(null, new SubCommand.BungeeList(this, "glist"));
         }
         if (config.get().getMap("Settings").getBoolean("Smart-Fallback", true)) {
-            setReconnectHandler(new SmartReconnectHandler());
+            setReconnectHandler(new SmartFallback());
         }
         getPluginManager().registerCommand(null, SubCommand.newInstance(this, "subservers").get());
         getPluginManager().registerCommand(null, SubCommand.newInstance(this, "subserver").get());
@@ -900,7 +899,7 @@ public final class SubProxy extends BungeeCord implements Listener {
         if (e.getPlayer() instanceof UserConnection && config.get().getMap("Settings").getBoolean("Smart-Fallback", true)) {
             Map<String, ServerInfo> fallbacks;
             if (!fallbackLimbo.keySet().contains(e.getPlayer().getUniqueId())) {
-                fallbacks = SmartReconnectHandler.getFallbackServers(e.getPlayer().getPendingConnection().getListener());
+                fallbacks = SmartFallback.getFallbackServers(e.getPlayer().getPendingConnection().getListener(), e.getPlayer());
             } else {
                 fallbacks = new LinkedHashMap<String, ServerInfo>();
                 for (ServerInfo server : fallbackLimbo.get(e.getPlayer().getUniqueId())) fallbacks.put(server.getName(), server);

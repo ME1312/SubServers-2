@@ -13,7 +13,7 @@ import net.ME1312.Galaxi.Library.Config.YAMLConfig;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.SubServers.Sync.Library.Compatibility.Galaxi.GalaxiCommand;
 import net.ME1312.SubServers.Sync.Library.Compatibility.Logger;
-import net.ME1312.SubServers.Sync.Library.Fallback.SmartReconnectHandler;
+import net.ME1312.SubServers.Sync.Library.Fallback.SmartFallback;
 import net.ME1312.SubServers.Sync.Library.Metrics;
 import net.ME1312.Galaxi.Library.Container.NamedContainer;
 import net.ME1312.Galaxi.Library.UniversalFile;
@@ -393,7 +393,7 @@ public final class ExProxy extends BungeeCord implements Listener {
         if (e.getPlayer() instanceof UserConnection && config.get().getMap("Settings").getBoolean("Smart-Fallback", true)) {
             Map<String, ServerInfo> fallbacks;
             if (!fallbackLimbo.keySet().contains(e.getPlayer().getUniqueId())) {
-                fallbacks = SmartReconnectHandler.getFallbackServers(e.getPlayer().getPendingConnection().getListener());
+                fallbacks = SmartFallback.getFallbackServers(e.getPlayer().getPendingConnection().getListener(), e.getPlayer());
             } else {
                 fallbacks = new LinkedHashMap<String, ServerInfo>();
                 for (ServerInfo server : fallbackLimbo.get(e.getPlayer().getUniqueId())) fallbacks.put(server.getName(), server);

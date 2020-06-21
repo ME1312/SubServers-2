@@ -16,12 +16,11 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.LinkedBlockingQueue;
 
 /**
- * Smart Reconnect Handler Class
+ * Smart Fallback Handler Class
  */
-public class SmartReconnectHandler implements ReconnectHandler {
+public class SmartFallback implements ReconnectHandler {
     private static List<FallbackInspector> inspectors = new CopyOnWriteArrayList<FallbackInspector>();
 
     @Override
@@ -30,7 +29,7 @@ public class SmartReconnectHandler implements ReconnectHandler {
         if (forced != null) {
             return forced;
         } else {
-            Map<String, ServerInfo> fallbacks = getFallbackServers(player.getPendingConnection().getListener());
+            Map<String, ServerInfo> fallbacks = getFallbackServers(player.getPendingConnection().getListener(), player);
             if (fallbacks.isEmpty()) {
                 return null;
             } else {
@@ -67,25 +66,40 @@ public class SmartReconnectHandler implements ReconnectHandler {
      * @return Fallback Server Map (with legacy bungee case-sensitive keys)
      */
     public static Map<String, ServerInfo> getFallbackServers(ListenerInfo listener) {
-        TreeMap<Integer, List<ServerInfo>> score = new TreeMap<Integer, List<ServerInfo>>(Collections.reverseOrder());
+        return getFallbackServers(listener, null);
+    }
+
+    /**
+     * Generates a <i>smart</i> sorted map of fallback servers using a generated confidence score
+     *
+     * @param listener Listener to grab fallback servers from
+     * @param player Player that is requesting fallback servers
+     * @return Fallback Server Map (with legacy bungee case-sensitive keys)
+     */
+    public static Map<String, ServerInfo> getFallbackServers(ListenerInfo listener, ProxiedPlayer player) {
+        TreeMap<Double, List<ServerInfo>> score = new TreeMap<Double, List<ServerInfo>>(Collections.reverseOrder());
         for (String name : listener.getServerPriority()) {
             ServerInfo server = SubAPI.getInstance().getServer(name.toLowerCase());
             if (server == null) server = ProxyServer.getInstance().getServerInfo(name);
             if (server != null) {
                 boolean valid = true;
-                int confidence = 0;
+                double confidence = 0;
                 if (server instanceof Server) {
                     if (!((Server) server).isHidden()) confidence++;
                     if (!((Server) server).isRestricted()) confidence++;
                     if (((Server) server).getSubData()[0] != null) confidence++;
+
+                    if (player != null) {
+                        if (((Server) server).canAccess(player)) confidence++;
+                    }
                 } if (server instanceof SubServer) {
                     if (!((SubServer) server).isRunning()) valid = false;
                 }
 
                 List<FallbackInspector> inspectors = new ArrayList<FallbackInspector>();
-                inspectors.addAll(SmartReconnectHandler.inspectors);
+                inspectors.addAll(SmartFallback.inspectors);
                 for (FallbackInspector inspector : inspectors) try {
-                    Integer response = inspector.inspect(server);
+                    Double response = inspector.inspect(player, server);
                     if (response == null) {
                         valid = false;
                     } else {
