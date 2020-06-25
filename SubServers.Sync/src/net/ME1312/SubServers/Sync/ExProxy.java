@@ -92,6 +92,10 @@ public final class ExProxy extends BungeeCord implements Listener {
         ConfigUpdater.updateConfig(new UniversalFile(dir, "sync.yml"));
         config = new YAMLConfig(new UniversalFile(dir, "sync.yml"));
 
+        if (config.get().getMap("Settings").getBoolean("Smart-Fallback", true)) {
+            setReconnectHandler(new SmartFallback());
+        }
+
         subprotocol = SubProtocol.get();
         subprotocol.registerCipher("DHE", DHE.get(128));
         subprotocol.registerCipher("DHE-128", DHE.get(128));

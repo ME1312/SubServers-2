@@ -101,7 +101,7 @@ public class DefaultUIRenderer extends UIRenderer {
             int min = ((page - 1) * 36);
             int max = (min + 35);
             int count = (index.size() == 0)?27:((index.size() - min >= max)?36:index.size() - min);
-            int area = (count % 9 == 0) ? count : (int) (Math.floor(count / 9) + 1) * 9;
+            int area = (count % 9 == 0) ? count : ((count / 9) + 1) * 9;
 
             Inventory inv = Bukkit.createInventory(null, 18 + area, plugin.api.getLang("SubServers", "Interface.Host-Menu.Title"));
             block = createItem("STAINED_GLASS_PANE", "GRAY_STAINED_GLASS_PANE", (short) 7);
@@ -111,7 +111,7 @@ public class DefaultUIRenderer extends UIRenderer {
                 i++;
             }
             ItemStack adiv = block;
-            i = (int) ((count < 9) ? Math.floor((9 - count) / 2) : 0);
+            i = ((count < 9) ? ((9 - count) / 2) : 0);
 
             boolean even = (count & 1) == 0 && count < 9;
             NamedContainer<String, Short> enabled, disabled;
@@ -149,7 +149,7 @@ public class DefaultUIRenderer extends UIRenderer {
 
                     count--;
                     if (count < 9 && (i == 8 || i == 17 || i == 26)) {
-                        i += (int) Math.floor((9 - count) / 2) + 1;
+                        i += ((9 - count) / 2) + 1;
                         even = (count & 1) == 0;
                     } else {
                         i++;
@@ -478,7 +478,7 @@ public class DefaultUIRenderer extends UIRenderer {
                 int min = ((page - 1) * 36);
                 int max = (min + 35);
                 int count = (index.size() == 0)?27:((index.size() - min >= max)?36:index.size() - min);
-                int area = (count % 9 == 0)?count: (int) (Math.floor(count / 9) + 1) * 9;
+                int area = (count % 9 == 0)?count: ((count / 9) + 1) * 9;
 
                 Inventory inv = Bukkit.createInventory(null, 18 + area, plugin.api.getLang("SubServers", "Interface.Host-Creator.Edit-Template.Title").replace("$str$", host.getDisplayName()));
                 block = createItem("STAINED_GLASS_PANE", "GRAY_STAINED_GLASS_PANE", (short) 7);
@@ -488,7 +488,7 @@ public class DefaultUIRenderer extends UIRenderer {
                     i++;
                 }
                 ItemStack adiv = block;
-                i = (int) ((count < 9) ? Math.floor((9 - count) / 2) : 0);
+                i = ((count < 9) ? ((9 - count) / 2) : 0);
 
                 boolean even = (count & 1) == 0 && count < 9;
                 for (SubCreator.ServerTemplate template : index) {
@@ -507,7 +507,7 @@ public class DefaultUIRenderer extends UIRenderer {
 
                         count--;
                         if (count < 9 && (i == 8 || i == 17 || i == 26)) {
-                            i += (int) Math.floor((9 - count) / 2) + 1;
+                            i += ((9 - count) / 2) + 1;
                             even = (count & 1) == 0;
                         } else {
                             i++;
@@ -591,7 +591,7 @@ public class DefaultUIRenderer extends UIRenderer {
                 int min = ((page - 1) * 36);
                 int max = (min + 35);
                 int count = (renderers.size() == 0)?27:((renderers.size() - min >= max)?36:renderers.size() - min);
-                int area = (count % 9 == 0) ? count : (int) (Math.floor(count / 9) + 1) * 9;
+                int area = (count % 9 == 0) ? count : ((count / 9) + 1) * 9;
 
                 Inventory inv = Bukkit.createInventory(null, 18 + area, plugin.api.getLang("SubServers", "Interface.Host-Plugin.Title").replace("$str$", host.getDisplayName()));
                 block = createItem("STAINED_GLASS_PANE", "GRAY_STAINED_GLASS_PANE", (short) 7);
@@ -601,7 +601,7 @@ public class DefaultUIRenderer extends UIRenderer {
                     i++;
                 }
                 ItemStack adiv = block;
-                i = (int) ((count < 9) ? Math.floor((9 - count) / 2) : 0);
+                i = ((count < 9) ? ((9 - count) / 2) : 0);
 
                 boolean even = (count & 1) == 0 && count < 9;
 
@@ -613,7 +613,7 @@ public class DefaultUIRenderer extends UIRenderer {
 
                         count--;
                         if (count < 9 && (i == 8 || i == 17 || i == 26)) {
-                            i += (int) Math.floor((9 - count) / 2) + 1;
+                            i += ((9 - count) / 2) + 1;
                             even = (count & 1) == 0;
                         } else {
                             i++;
@@ -694,7 +694,7 @@ public class DefaultUIRenderer extends UIRenderer {
             int min = ((page - 1) * 36);
             int max = (min + 35);
             int count = (index.size() == 0)?27:((index.size() - min >= max)?36:index.size() - min);
-            int area = (count % 9 == 0) ? count : (int) (Math.floor(count / 9) + 1) * 9;
+            int area = (count % 9 == 0) ? count : ((count / 9) + 1) * 9;
 
             Inventory inv = Bukkit.createInventory(null, 18 + area, plugin.api.getLang("SubServers", "Interface.Group-Menu.Title"));
             block = createItem("STAINED_GLASS_PANE", "GRAY_STAINED_GLASS_PANE", (short) 7);
@@ -704,7 +704,7 @@ public class DefaultUIRenderer extends UIRenderer {
                 i++;
             }
             ItemStack adiv = block;
-            i = (int) ((count < 9) ? Math.floor((9 - count) / 2) : 0);
+            i = ((count < 9) ? ((9 - count) / 2) : 0);
 
             boolean even = (count & 1) == 0 && count < 9;
             NamedContainer<String, Short> color;
@@ -725,7 +725,7 @@ public class DefaultUIRenderer extends UIRenderer {
 
                     count--;
                     if (count < 9 && (i == 8 || i == 17 || i == 26)) {
-                        i += (int) Math.floor((9 - count) / 2) + 1;
+                        i += ((9 - count) / 2) + 1;
                         even = (count & 1) == 0;
                     } else {
                         i++;
@@ -805,7 +805,7 @@ public class DefaultUIRenderer extends UIRenderer {
             int min = ((page - 1) * 36);
             int max = (min + 35);
             int count = (servers.size() == 0)?27:((servers.size() - min >= max)?36:servers.size() - min);
-            int area = (count % 9 == 0) ? count : (int) (Math.floor(count / 9) + 1) * 9;
+            int area = (count % 9 == 0) ? count : ((count / 9) + 1) * 9;
 
             Inventory inv = Bukkit.createInventory(null, 18 + area, (host == null)?((group == null)?plugin.api.getLang("SubServers", "Interface.Server-Menu.Title"):plugin.api.getLang("SubServers", "Interface.Group-SubServer.Title").replace("$str$", group)):plugin.api.getLang("SubServers", "Interface.Host-SubServer.Title").replace("$str$", hostname.get()));
             block = createItem("STAINED_GLASS_PANE", "GRAY_STAINED_GLASS_PANE", (short) 7);
@@ -815,7 +815,7 @@ public class DefaultUIRenderer extends UIRenderer {
                 i++;
             }
             ItemStack adiv = block;
-            i = (int) ((count < 9) ? Math.floor((9 - count) / 2) : 0);
+            i = ((count < 9) ? ((9 - count) / 2) : 0);
 
             boolean even = (count & 1) == 0 && count < 9;
             NamedContainer<String, Short> external, online, temp, offline, disabled;
@@ -889,7 +889,7 @@ public class DefaultUIRenderer extends UIRenderer {
 
                     count--;
                     if (count < 9 && (i == 8 || i == 17 || i == 26)) {
-                        i += (int) Math.floor((9 - count) / 2) + 1;
+                        i += ((9 - count) / 2) + 1;
                         even = (count & 1) == 0;
                     } else {
                         i++;
@@ -1209,7 +1209,7 @@ public class DefaultUIRenderer extends UIRenderer {
                 int min = ((page - 1) * 36);
                 int max = (min + 35);
                 int count = (renderers.size() == 0)?27:((renderers.size() - min >= max)?36:renderers.size() - min);
-                int area = (count % 9 == 0) ? count : (int) (Math.floor(count / 9) + 1) * 9;
+                int area = (count % 9 == 0) ? count : ((count / 9) + 1) * 9;
 
                 Inventory inv = Bukkit.createInventory(null, 18 + area, plugin.api.getLang("SubServers", "Interface.SubServer-Plugin.Title").replace("$str$", subserver.getDisplayName()));
                 block = createItem("STAINED_GLASS_PANE", "GRAY_STAINED_GLASS_PANE", (short) 7);
@@ -1219,7 +1219,7 @@ public class DefaultUIRenderer extends UIRenderer {
                     i++;
                 }
                 ItemStack adiv = block;
-                i = (int) ((count < 9) ? Math.floor((9 - count) / 2) : 0);
+                i = ((count < 9) ? ((9 - count) / 2) : 0);
 
                 boolean even = (count & 1) == 0 && count < 9;
 
@@ -1231,7 +1231,7 @@ public class DefaultUIRenderer extends UIRenderer {
 
                         count--;
                         if (count < 9 && (i == 8 || i == 17 || i == 26)) {
-                            i += (int) Math.floor((9 - count) / 2) + 1;
+                            i += ((9 - count) / 2) + 1;
                             even = (count & 1) == 0;
                         } else {
                             i++;

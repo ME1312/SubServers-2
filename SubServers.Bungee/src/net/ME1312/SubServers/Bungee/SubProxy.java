@@ -237,6 +237,10 @@ public final class SubProxy extends BungeeCord implements Listener {
             }
         }
 
+        if (config.get().getMap("Settings").getBoolean("Smart-Fallback", true)) {
+            setReconnectHandler(new SmartFallback());
+        }
+
         subprotocol = SubProtocol.get();
         subprotocol.registerCipher("DHE", DHE.get(128));
         subprotocol.registerCipher("DHE-128", DHE.get(128));
@@ -651,9 +655,6 @@ public final class SubProxy extends BungeeCord implements Listener {
         if (config.get().getMap("Settings").getBoolean("Override-Bungee-Commands", true)) {
             getPluginManager().registerCommand(null, SubCommand.BungeeServer.newInstance(this, "server").get());
             getPluginManager().registerCommand(null, new SubCommand.BungeeList(this, "glist"));
-        }
-        if (config.get().getMap("Settings").getBoolean("Smart-Fallback", true)) {
-            setReconnectHandler(new SmartFallback());
         }
         getPluginManager().registerCommand(null, SubCommand.newInstance(this, "subservers").get());
         getPluginManager().registerCommand(null, SubCommand.newInstance(this, "subserver").get());

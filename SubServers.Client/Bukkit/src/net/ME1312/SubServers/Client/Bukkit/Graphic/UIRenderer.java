@@ -10,6 +10,7 @@ import net.ME1312.SubServers.Client.Bukkit.SubPlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
@@ -108,19 +109,25 @@ public abstract class UIRenderer {
                 line2 = ChatColor.RESET.toString();
             }
             try {
+                Player player = Bukkit.getPlayer(this.player);
                 if (plugin.api.getGameVersion().compareTo(new Version("1.11")) >= 0) {
                     if (ChatColor.stripColor(line1).length() == 0 && ChatColor.stripColor(line2).length() == 0) {
-                        Bukkit.getPlayer(player).resetTitle();
+                        player.resetTitle();
                     } else {
-                        Bukkit.getPlayer(player).sendTitle(line1, line2, (fadein >= 0)?fadein:10, (stay >= 0)?stay:70, (fadeout >= 0)?fadeout:20);
+                        player.sendTitle(line1, line2, (fadein >= 0)?fadein:10, (stay >= 0)?stay:70, (fadeout >= 0)?fadeout:20);
                     }
                     return true;
                 } else if (Bukkit.getPluginManager().getPlugin("TitleManager") != null) {
-                    io.puharesource.mc.titlemanager.api.TitleObject obj = io.puharesource.mc.titlemanager.api.TitleObject.class.getConstructor(String.class, String.class).newInstance(line1, line2);
-                    if (fadein >= 0) obj.setFadeIn(fadein);
-                    if (stay >= 0) obj.setStay(stay);
-                    if (fadeout >= 0) obj.setFadeOut(fadeout);
-                    obj.send(Bukkit.getPlayer(player));
+                    if (Util.isException(() -> Util.reflect(Class.forName("io.puharesource.mc.titlemanager.api.v2.TitleManagerAPI").getMethod("sendTitles", Player.class, String.class, String.class, int.class, int.class, int.class),
+                            Bukkit.getPluginManager().getPlugin("TitleManager"), player, line1, line2, (fadein >= 0)?fadein:10, (stay >= 0)?stay:70, (fadeout >= 0)?fadeout:20))) { // Attempt TitleAPI v2
+
+                        // Fallback to TitleAPI v1
+                        io.puharesource.mc.titlemanager.api.TitleObject obj = io.puharesource.mc.titlemanager.api.TitleObject.class.getConstructor(String.class, String.class).newInstance(line1, line2);
+                        if (fadein >= 0) obj.setFadeIn(fadein);
+                        if (stay >= 0) obj.setStay(stay);
+                        if (fadeout >= 0) obj.setFadeOut(fadeout);
+                        obj.send(player);
+                    }
                     return true;
                 } else return false;
             } catch (Throwable e) {
@@ -248,16 +255,6 @@ public abstract class UIRenderer {
                 return new ItemStack((Material) Material.class.getMethod("getMaterial", String.class, boolean.class).invoke(null, item.get().toUpperCase(), false), 1);
             }
         } catch (Exception e) {}
-
-        // vault name
-        if (!Util.isException(() -> Class.forName("net.milkbowl.vault.item.Items"))) {
-            net.milkbowl.vault.item.ItemInfo info = net.milkbowl.vault.item.Items.itemByString(item.get());
-            if (info != null) {
-                ItemStack stack = info.toStack();
-                stack.setAmount(1);
-                return stack;
-            }
-        }
 
         return def;
     }

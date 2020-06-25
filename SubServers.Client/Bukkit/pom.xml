@@ -26,10 +26,6 @@
             <id>puharesource-repo</id>
             <url>https://repo.puha.io/repo/</url>
         </repository>
-        <repository>
-            <id>vault-repo</id>
-            <url>http://nexus.hc.to/content/repositories/pub_releases</url>
-        </repository>
     </repositories>
 
     <dependencies>
@@ -62,13 +58,7 @@
         <dependency>
             <groupId>io.puharesource.mc</groupId>
             <artifactId>TitleManager</artifactId>
-            <version>1.5.11</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>net.milkbowl.vault</groupId>
-            <artifactId>VaultAPI</artifactId>
-            <version>1.6</version>
+            <version>1.5.11</version> <!-- Use this plugin to enable title messages on 1.8, 1.9, and 1.10 servers -->
             <scope>provided</scope>
         </dependency>
     </dependencies>
