@@ -452,7 +452,7 @@ public class SubCommand {
                                 PrimitiveContainer<Integer> success = new PrimitiveContainer<Integer>(0);
                                 PrimitiveContainer<Integer> running = new PrimitiveContainer<Integer>(0);
                                 AsyncConsolidator merge = new AsyncConsolidator(() -> {
-                                    if (running.value > 0) sender.sendMessage(running.value + " subserver"+((running.value == 1)?"":"s") + " were already running");
+                                    if (running.value > 0) sender.sendMessage(running.value + " subserver"+((running.value == 1)?" was":"s were") + " already running");
                                     if (success.value > 0) sender.sendMessage("Started " + success.value + " subserver"+((success.value == 1)?"":"s"));
                                 });
                                 for (SubServer server : select.subservers) {
@@ -609,7 +609,7 @@ public class SubCommand {
                                 PrimitiveContainer<Integer> success = new PrimitiveContainer<Integer>(0);
                                 PrimitiveContainer<Integer> running = new PrimitiveContainer<Integer>(0);
                                 AsyncConsolidator merge = new AsyncConsolidator(() -> {
-                                    if (running.value > 0) sender.sendMessage(running.value + " subserver"+((running.value == 1)?"":"s") + " were already offline");
+                                    if (running.value > 0) sender.sendMessage(running.value + " subserver"+((running.value == 1)?" was":"s were") + " already offline");
                                     if (success.value > 0) sender.sendMessage("Stopping " + success.value + " subserver"+((success.value == 1)?"":"s"));
                                 });
                                 for (SubServer server : select.subservers) {
@@ -653,7 +653,7 @@ public class SubCommand {
                                 PrimitiveContainer<Integer> success = new PrimitiveContainer<Integer>(0);
                                 PrimitiveContainer<Integer> running = new PrimitiveContainer<Integer>(0);
                                 AsyncConsolidator merge = new AsyncConsolidator(() -> {
-                                    if (running.value > 0) sender.sendMessage(running.value + " subserver"+((running.value == 1)?"":"s") + " were already offline");
+                                    if (running.value > 0) sender.sendMessage(running.value + " subserver"+((running.value == 1)?" was":"s were") + " already offline");
                                     if (success.value > 0) sender.sendMessage("Terminated " + success.value + " subserver"+((success.value == 1)?"":"s"));
                                 });
                                 for (SubServer server : select.subservers) {
@@ -707,7 +707,7 @@ public class SubCommand {
                                     PrimitiveContainer<Integer> success = new PrimitiveContainer<Integer>(0);
                                     PrimitiveContainer<Integer> running = new PrimitiveContainer<Integer>(0);
                                     AsyncConsolidator merge = new AsyncConsolidator(() -> {
-                                        if (running.value > 0) sender.sendMessage(running.value + " subserver"+((running.value == 1)?"":"s") + " were offline");
+                                        if (running.value > 0) sender.sendMessage(running.value + " subserver"+((running.value == 1)?" was":"s were") + " offline");
                                         if (success.value > 0) sender.sendMessage("Sent command to " + success.value + " subserver"+((success.value == 1)?"":"s"));
                                     });
                                     for (SubServer server : select.subservers) {

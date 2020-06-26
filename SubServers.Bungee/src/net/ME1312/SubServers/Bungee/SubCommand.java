@@ -439,7 +439,7 @@ public final class SubCommand extends CommandX {
                                     success++;
                                 }
                             }
-                            if (running > 0) sender.sendMessage("SubServers > " + running + " subserver"+((running == 1)?"":"s") + " were already running");
+                            if (running > 0) sender.sendMessage("SubServers > " + running + " subserver"+((running == 1)?" was":"s were") + " already running");
                             if (success > 0) sender.sendMessage("SubServers > Started " + success + " subserver"+((success == 1)?"":"s"));
                         }
                     } else {
@@ -513,7 +513,7 @@ public final class SubCommand extends CommandX {
                                     success++;
                                 }
                             }
-                            if (running > 0) sender.sendMessage("SubServers > " + running + " subserver"+((running == 1)?"":"s") + " were already offline");
+                            if (running > 0) sender.sendMessage("SubServers > " + running + " subserver"+((running == 1)?" was":"s were") + " already offline");
                             if (success > 0) sender.sendMessage("SubServers > Stopping " + success + " subserver"+((success == 1)?"":"s"));
                         }
                     } else {
@@ -531,7 +531,7 @@ public final class SubCommand extends CommandX {
                                     success++;
                                 }
                             }
-                            if (running > 0) sender.sendMessage("SubServers > " + running + " subserver"+((running == 1)?"":"s") + " were already offline");
+                            if (running > 0) sender.sendMessage("SubServers > " + running + " subserver"+((running == 1)?" was":"s were") + " already offline");
                             if (success > 0) sender.sendMessage("SubServers > Terminated " + success + " subserver"+((success == 1)?"":"s"));
                         }
                     } else {
@@ -557,7 +557,7 @@ public final class SubCommand extends CommandX {
                                         success++;
                                     }
                                 }
-                                if (running > 0) sender.sendMessage("SubServers > " + running + " subserver"+((running == 1)?"":"s") + " were offline");
+                                if (running > 0) sender.sendMessage("SubServers > " + running + " subserver"+((running == 1)?" was":"s were") + " offline");
                                 if (success > 0) sender.sendMessage("SubServers > Sent command to " + success + " subserver"+((success == 1)?"":"s"));
                             } else {
                                 sender.sendMessage("SubServers > No command was entered");
