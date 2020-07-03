@@ -74,7 +74,7 @@ public final class SubProxy extends BungeeCord implements Listener {
     public SubProtocol subprotocol;
     public SubDataServer subdata = null;
     public SubServer sudo = null;
-    public static final Version version = Version.fromString("2.16a");
+    public static final Version version = Version.fromString("2.16.1a");
 
     public Proxy redis = null;
     public boolean canSudo = false;
@@ -237,9 +237,8 @@ public final class SubProxy extends BungeeCord implements Listener {
             }
         }
 
-        if (config.get().getMap("Settings").getBoolean("Smart-Fallback", true)) {
-            setReconnectHandler(new SmartFallback());
-        }
+        if (config.get().getMap("Settings").getMap("Smart-Fallback", new ObjectMap<>()).getBoolean("Enabled", true))
+            setReconnectHandler(new SmartFallback(this));
 
         subprotocol = SubProtocol.get();
         subprotocol.registerCipher("DHE", DHE.get(128));
@@ -661,6 +660,9 @@ public final class SubProxy extends BungeeCord implements Listener {
         getPluginManager().registerCommand(null, SubCommand.newInstance(this, "sub").get());
         GalaxiCommand.group(SubCommand.class);
 
+        if (getReconnectHandler() != null && getReconnectHandler().getClass().equals(SmartFallback.class))
+            setReconnectHandler(new SmartFallback(this)); // Re-initialize Smart Fallback
+
         new Metrics(this);
         new Timer("SubServers.Bungee::Routine_Update_Check").schedule(new TimerTask() {
             @SuppressWarnings("unchecked")
@@ -695,7 +697,7 @@ public final class SubProxy extends BungeeCord implements Listener {
     public void stopListeners() {
         try {
             legServers.clear();
-            legServers.putAll(getServers());
+            legServers.putAll(getServersCopy());
             if (api.disableListeners.size() > 0) {
                 Logger.get("SubServers").info("Resetting SubAPI Plugins...");
                 for (Runnable listener : api.disableListeners) {
@@ -860,7 +862,7 @@ public final class SubProxy extends BungeeCord implements Listener {
         if (servers.keySet().contains(e.getTarget().getName().toLowerCase()) && e.getTarget() != servers.get(e.getTarget().getName().toLowerCase())) {
             e.setTarget(servers.get(e.getTarget().getName().toLowerCase()));
         } else {
-            servers = getServers();
+            servers = getServersCopy();
             if (servers.keySet().contains(e.getTarget().getName()) && e.getTarget() != servers.get(e.getTarget().getName())) {
                 e.setTarget(servers.get(e.getTarget().getName()));
             }
@@ -897,7 +899,7 @@ public final class SubProxy extends BungeeCord implements Listener {
     @SuppressWarnings("deprecation")
     @EventHandler(priority = Byte.MAX_VALUE)
     public void fallback(ServerKickEvent e) {
-        if (e.getPlayer() instanceof UserConnection && config.get().getMap("Settings").getBoolean("Smart-Fallback", true)) {
+        if (e.getPlayer() instanceof UserConnection && config.get().getMap("Settings").getMap("Smart-Fallback", new ObjectMap<>()).getBoolean("Fallback", true)) {
             Map<String, ServerInfo> fallbacks;
             if (!fallbackLimbo.keySet().contains(e.getPlayer().getUniqueId())) {
                 fallbacks = SmartFallback.getFallbackServers(e.getPlayer().getPendingConnection().getListener(), e.getPlayer());

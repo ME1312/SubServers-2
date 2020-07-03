@@ -1,9 +1,11 @@
 package net.ME1312.SubServers.Bungee.Library.Fallback;
 
+import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubServers.Bungee.Host.Server;
 import net.ME1312.SubServers.Bungee.Host.SubServer;
 import net.ME1312.SubServers.Bungee.SubAPI;
+import net.ME1312.SubServers.Bungee.SubProxy;
 import net.md_5.bungee.UserConnection;
 import net.md_5.bungee.api.AbstractReconnectHandler;
 import net.md_5.bungee.api.ProxyServer;
@@ -22,12 +24,22 @@ import java.util.concurrent.CopyOnWriteArrayList;
  */
 public class SmartFallback implements ReconnectHandler {
     private static List<FallbackInspector> inspectors = new CopyOnWriteArrayList<FallbackInspector>();
+    private static ReconnectHandler reconnect;
+
+    public SmartFallback(SubProxy proxy) {
+        if (reconnect == null && proxy.config.get().getMap("Settings").getMap("Smart-Fallback", new ObjectMap<>()).getBoolean("Reconnect", false))
+            reconnect = Util.getDespiteException(() -> Util.reflect(ProxyServer.getInstance().getPluginManager().getPlugin("reconnect_yaml").getClass().getClassLoader().loadClass("net.md_5.bungee.module.reconnect.yaml.YamlReconnectHandler").getConstructor()), null);
+    }
 
     @Override
     public ServerInfo getServer(ProxiedPlayer player) {
-        ServerInfo forced = getForcedHost(player.getPendingConnection());
-        if (forced != null) {
-            return forced;
+        ServerInfo override;
+        if ((override = getForcedHost(player.getPendingConnection())) != null) {
+            return override;
+        } else if ((override = getDNS(player.getPendingConnection())) != null) {
+            return override;
+        } else if ((override = getReconnectServer(player)) != null) {
+            return override;
         } else {
             Map<String, ServerInfo> fallbacks = getFallbackServers(player.getPendingConnection().getListener(), player);
             if (fallbacks.isEmpty()) {
@@ -56,6 +68,45 @@ public class SmartFallback implements ReconnectHandler {
             //}                                                             // :(
 
             return ProxyServer.getInstance().getServerInfo(forced);
+        }
+    }
+
+    /**
+     * Grabs the Server that a connection's DNS matches
+     *
+     * @param connection Connection to check
+     * @return DNS Forward Server
+     */
+    public static ServerInfo getDNS(PendingConnection connection) {
+        if (connection.getVirtualHost() == null || !((SubProxy) ProxyServer.getInstance()).config.get().getMap("Settings").getMap("Smart-Fallback", new ObjectMap<>()).getBoolean("DNS-Forward", false)) {
+            return null;
+        } else {
+            Map.Entry<String, ServerInfo> server = null;
+            String dns = connection.getVirtualHost().getHostString().toLowerCase();
+            for (Map.Entry<String, ServerInfo> s : ((SubProxy) ProxyServer.getInstance()).getServersCopy().entrySet()) {
+                if (dns.startsWith(s.getKey().toLowerCase() + '.'))
+                    if (server == null || server.getKey().length() < s.getKey().length())
+                        server = s;
+            }
+
+            return (server == null)?null:server.getValue();
+        }
+    }
+
+    /**
+     * Grabs the Server that a player was last connected to
+     *
+     * @param player Player
+     * @return Reconnect Server
+     */
+    public static ServerInfo getReconnectServer(ProxiedPlayer player) {
+        if (reconnect == null) {
+            return null;
+        } else try {
+            return Util.reflect(reconnect.getClass().getDeclaredMethod("getStoredServer", ProxiedPlayer.class), reconnect, player);
+        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+            e.printStackTrace();
+            return null;
         }
     }
 
@@ -151,16 +202,16 @@ public class SmartFallback implements ReconnectHandler {
 
     @Override
     public void setServer(ProxiedPlayer player) {
-        // Ignore server switching
+        if (reconnect != null) reconnect.setServer(player);
     }
 
     @Override
     public void save() {
-        // Nothing to save
+        if (reconnect != null) reconnect.save();
     }
 
     @Override
     public void close() {
-        // Nothing to close
+        if (reconnect != null) reconnect.close();
     }
 }

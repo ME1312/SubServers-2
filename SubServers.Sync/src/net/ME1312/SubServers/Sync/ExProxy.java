@@ -59,7 +59,7 @@ public final class ExProxy extends BungeeCord implements Listener {
     public boolean redis = false;
     public final SubAPI api = new SubAPI(this);
     public SubProtocol subprotocol;
-    public static final Version version = Version.fromString("2.16a");
+    public static final Version version = Version.fromString("2.16.1a");
 
     public final boolean isPatched;
     public final boolean isGalaxi;
@@ -92,9 +92,8 @@ public final class ExProxy extends BungeeCord implements Listener {
         ConfigUpdater.updateConfig(new UniversalFile(dir, "sync.yml"));
         config = new YAMLConfig(new UniversalFile(dir, "sync.yml"));
 
-        if (config.get().getMap("Settings").getBoolean("Smart-Fallback", true)) {
-            setReconnectHandler(new SmartFallback());
-        }
+        if (config.get().getMap("Settings").getMap("Smart-Fallback", new ObjectMap<>()).getBoolean("Enabled", true))
+            setReconnectHandler(new SmartFallback(this));
 
         subprotocol = SubProtocol.get();
         subprotocol.registerCipher("DHE", DHE.get(128));
@@ -202,6 +201,9 @@ public final class ExProxy extends BungeeCord implements Listener {
         getPluginManager().registerCommand(null, SubCommand.newInstance(this, "subserver").get());
         getPluginManager().registerCommand(null, SubCommand.newInstance(this, "sub").get());
         GalaxiCommand.group(SubCommand.class);
+
+        if (getReconnectHandler() != null && getReconnectHandler().getClass().equals(SmartFallback.class))
+            setReconnectHandler(new SmartFallback(this)); // Re-initialize Smart Fallback
 
         new Metrics(this);
         new Timer("SubServers.Sync::Routine_Update_Check").schedule(new TimerTask() {
@@ -394,7 +396,7 @@ public final class ExProxy extends BungeeCord implements Listener {
     @SuppressWarnings("deprecation")
     @EventHandler(priority = Byte.MAX_VALUE)
     public void fallback(ServerKickEvent e) {
-        if (e.getPlayer() instanceof UserConnection && config.get().getMap("Settings").getBoolean("Smart-Fallback", true)) {
+        if (e.getPlayer() instanceof UserConnection && config.get().getMap("Settings").getMap("Smart-Fallback", new ObjectMap<>()).getBoolean("Fallback", true)) {
             Map<String, ServerInfo> fallbacks;
             if (!fallbackLimbo.keySet().contains(e.getPlayer().getUniqueId())) {
                 fallbacks = SmartFallback.getFallbackServers(e.getPlayer().getPendingConnection().getListener(), e.getPlayer());

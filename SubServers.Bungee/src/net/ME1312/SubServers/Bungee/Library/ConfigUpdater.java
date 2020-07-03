@@ -120,6 +120,16 @@ public class ConfigUpdater {
 
                 existing = updated.clone();
                 i++;
+            } if (was.compareTo(new Version("20w26a")) <= 0) {
+                if (existing.getMap("Settings", new YAMLSection()).contains("Smart-Fallback") && existing.getMap("Settings").isBoolean("Smart-Fallback")) {
+                    YAMLSection smart_fallback = new YAMLSection();
+                    smart_fallback.set("Enabled", existing.getMap("Settings").getBoolean("Smart-Fallback"));
+                    smart_fallback.set("Fallback", existing.getMap("Settings").getBoolean("Smart-Fallback"));
+                    updated.getMap("Settings").set("Smart-Fallback", smart_fallback);
+                }
+
+                existing = updated.clone();
+                i++;
             }// if (was.compareTo(new Version("99w99a")) <= 0) {
             //  // do something
             //  existing = updated.clone();
@@ -132,8 +142,14 @@ public class ConfigUpdater {
         if (i > 0) {
             YAMLSection settings = new YAMLSection();
             settings.set("Version", ((now.compareTo(was) <= 0)?was:now).toString());
-            settings.set("Smart-Fallback", updated.getMap("Settings", new YAMLSection()).getBoolean("Smart-Fallback", true));
             settings.set("Override-Bungee-Commands", updated.getMap("Settings", new YAMLSection()).getBoolean("Override-Bungee-Commands", true));
+
+            YAMLSection smart_fallback = new YAMLSection();
+            smart_fallback.set("Enabled", updated.getMap("Settings", new YAMLSection()).getMap("Smart-Fallback", new YAMLSection()).getBoolean("Enabled", true));
+            smart_fallback.set("Fallback", updated.getMap("Settings", new YAMLSection()).getMap("Smart-Fallback", new YAMLSection()).getBoolean("Fallback", true));
+            smart_fallback.set("Reconnect", updated.getMap("Settings", new YAMLSection()).getMap("Smart-Fallback", new YAMLSection()).getBoolean("Reconnect", false));
+            smart_fallback.set("DNS-Forward", updated.getMap("Settings", new YAMLSection()).getMap("Smart-Fallback", new YAMLSection()).getBoolean("DNS-Forward", false));
+            settings.set("Smart-Fallback", smart_fallback);
 
             YAMLSection upnp = new YAMLSection();
             upnp.set("Forward-Proxy", updated.getMap("Settings", new YAMLSection()).getMap("UPnP", new YAMLSection()).getBoolean("Forward-Proxy", true));
