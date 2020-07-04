@@ -2,6 +2,7 @@ package net.ME1312.SubServers.Sync;
 
 import com.dosse.upnp.UPnP;
 import com.google.gson.Gson;
+import net.ME1312.Galaxi.Library.Container.PrimitiveContainer;
 import net.ME1312.SubData.Client.DataClient;
 import net.ME1312.SubData.Client.Encryption.AES;
 import net.ME1312.SubData.Client.Encryption.DHE;
@@ -25,6 +26,7 @@ import net.ME1312.SubServers.Sync.Network.SubProtocol;
 import net.ME1312.SubServers.Sync.Server.ServerImpl;
 import net.ME1312.SubServers.Sync.Server.SubServerImpl;
 import net.md_5.bungee.BungeeCord;
+import net.md_5.bungee.BungeeServerInfo;
 import net.md_5.bungee.UserConnection;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ServerPing;
@@ -34,6 +36,7 @@ import net.md_5.bungee.api.config.ListenerInfo;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.event.*;
 import net.md_5.bungee.api.plugin.Listener;
+import net.md_5.bungee.connection.InitialHandler;
 import net.md_5.bungee.event.EventHandler;
 
 import java.io.*;
@@ -339,16 +342,45 @@ public final class ExProxy extends BungeeCord implements Listener {
         super.stopListeners();
     }
 
+    @EventHandler(priority = Byte.MIN_VALUE)
+    public void ping_passthrough(ProxyPingEvent e) {
+        ServerInfo override;
+        if (SmartFallback.getForcedHost(e.getConnection()) == null && (override = SmartFallback.getDNS(e.getConnection())) != null) {
+            if (!(override instanceof SubServerImpl) || ((SubServerImpl) override).isRunning()) {
+                if (!e.getConnection().getListener().isPingPassthrough()) {
+                    e.setResponse(new ServerPing(e.getResponse().getVersion(), e.getResponse().getPlayers(), new TextComponent(override.getMotd()), null));
+                } else {
+                    PrimitiveContainer<Boolean> lock = new PrimitiveContainer<>(true);
+                    ((BungeeServerInfo) override).ping((ping, error) -> {
+                        if (error != null) {
+                            e.setResponse(new ServerPing(e.getResponse().getVersion(), e.getResponse().getPlayers(), new TextComponent(getTranslation("ping_cannot_connect")), null));
+                        } else e.setResponse(ping);
+                        lock.value = false;
+                    }, ((InitialHandler) e.getConnection()).getHandshake().getProtocolVersion());
+                    while (lock.value) Util.isException(() -> Thread.sleep(4));
+                }
+            }
+        }
+    }
+
     @EventHandler(priority = Byte.MAX_VALUE)
     public void ping(ProxyPingEvent e) {
-        int offline = 0;
-        for (String name : e.getConnection().getListener().getServerPriority()) {
-            ServerInfo server = getServerInfo(name);
-            if (server == null || (server instanceof SubServerImpl && !((SubServerImpl) server).isRunning())) offline++;
-        }
+        boolean forced;
+        ServerInfo override;
+        if ((forced = (override = SmartFallback.getForcedHost(e.getConnection())) != null) || (override = SmartFallback.getDNS(e.getConnection())) != null) {
+            if (override instanceof SubServerImpl && !((SubServerImpl) override).isRunning()) {
+                e.setResponse(new ServerPing(e.getResponse().getVersion(), e.getResponse().getPlayers(), new TextComponent(api.getLang("SubServers", "Bungee.Ping.Offline")), null));
+            }
+        } else {
+            int offline = 0;
+            for (String name : e.getConnection().getListener().getServerPriority()) {
+                ServerInfo server = getServerInfo(name);
+                if (server == null || (server instanceof SubServerImpl && !((SubServerImpl) server).isRunning())) offline++;
+            }
 
-        if (offline >= e.getConnection().getListener().getServerPriority().size()) {
-            e.setResponse(new ServerPing(e.getResponse().getVersion(), e.getResponse().getPlayers(), new TextComponent(api.getLang("SubServers", "Bungee.Ping.Offline")), null));
+            if (offline >= e.getConnection().getListener().getServerPriority().size()) {
+                e.setResponse(new ServerPing(e.getResponse().getVersion(), e.getResponse().getPlayers(), new TextComponent(api.getLang("SubServers", "Bungee.Ping.Offline")), null));
+            }
         }
     }
 

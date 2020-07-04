@@ -844,6 +844,27 @@ public final class SubProxy extends BungeeCord implements Listener {
         return getServersCopy().get(name);
     }
 
+    @EventHandler(priority = Byte.MIN_VALUE)
+    public void ping_passthrough(ProxyPingEvent e) {
+        ServerInfo override;
+        if (SmartFallback.getForcedHost(e.getConnection()) == null && (override = SmartFallback.getDNS(e.getConnection())) != null) {
+            if (!(override instanceof SubServer) || ((SubServer) override).isRunning()) {
+                if (!e.getConnection().getListener().isPingPassthrough()) {
+                    e.setResponse(new ServerPing(e.getResponse().getVersion(), e.getResponse().getPlayers(), new TextComponent(override.getMotd()), null));
+                } else {
+                    PrimitiveContainer<Boolean> lock = new PrimitiveContainer<>(true);
+                    ((BungeeServerInfo) override).ping((ping, error) -> {
+                        if (error != null) {
+                            e.setResponse(new ServerPing(e.getResponse().getVersion(), e.getResponse().getPlayers(), new TextComponent(getTranslation("ping_cannot_connect")), null));
+                        } else e.setResponse(ping);
+                        lock.value = false;
+                    }, ((InitialHandler) e.getConnection()).getHandshake().getProtocolVersion());
+                    while (lock.value) Util.isException(() -> Thread.sleep(4));
+                }
+            }
+        }
+    }
+
     @EventHandler(priority = Byte.MAX_VALUE)
     public void ping(ProxyPingEvent e) {
         boolean forced;
@@ -851,19 +872,6 @@ public final class SubProxy extends BungeeCord implements Listener {
         if ((forced = (override = SmartFallback.getForcedHost(e.getConnection())) != null) || (override = SmartFallback.getDNS(e.getConnection())) != null) {
             if (override instanceof SubServer && !((SubServer) override).isRunning()) {
                 e.setResponse(new ServerPing(e.getResponse().getVersion(), e.getResponse().getPlayers(), new TextComponent(api.getLang("SubServers", "Bungee.Ping.Offline")), null));
-            } else if (!forced) { // "forced_hosts" already have "ping_passthrough"
-                if (!e.getConnection().getListener().isPingPassthrough()) {
-                    e.setResponse(new ServerPing(e.getResponse().getVersion(), e.getResponse().getPlayers(), new TextComponent(override.getMotd()), null));
-                } else {
-                    PrimitiveContainer<Boolean> lock = new PrimitiveContainer<>(true);
-                    ((BungeeServerInfo) override).ping((ping, error) -> {
-                        if (error != null) {
-                            e.setResponse(new ServerPing(e.getResponse().getVersion(), e.getResponse().getPlayers(), new TextComponent(getTranslation( "ping_cannot_connect" )), null));
-                        } else e.setResponse(ping);
-                        lock.value = false;
-                    }, ((InitialHandler) e.getConnection()).getHandshake().getProtocolVersion());
-                    while (lock.value) Util.isException(() -> Thread.sleep(4));
-                }
             }
         } else {
             int offline = 0;
