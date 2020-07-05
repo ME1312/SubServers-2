@@ -101,8 +101,8 @@ public class PlaceholderImpl extends PlaceholderExpansion implements Taskable, C
 
     @Override
     public String onPlaceholderRequest(Player player, String request) {
-        boolean colored = request.startsWith("color_");
-        if (colored) request = request.substring(6);
+        boolean colored = !request.startsWith("plain_");
+        if (!colored || request.startsWith("color_")) request = request.substring(6);
 
         String response = parseRequest(request);
         if (!init) init();
@@ -128,7 +128,7 @@ public class PlaceholderImpl extends PlaceholderExpansion implements Taskable, C
             } else if (!arg.contains(",")) {
                 args = new String[]{ arg };
             } else {
-                args = arg.split(",\\s*");
+                args = arg.split(",");
             }
 
             for (int i = 0; i < args.length; ++i)
@@ -139,7 +139,7 @@ public class PlaceholderImpl extends PlaceholderExpansion implements Taskable, C
             } else if (!response.contains(",")) {
                 responses = new String[]{ response };
             } else {
-                responses = response.split(",\\s*");
+                responses = response.split(",");
             }
 
             for (int i = 0; i < responses.length; ++i)
