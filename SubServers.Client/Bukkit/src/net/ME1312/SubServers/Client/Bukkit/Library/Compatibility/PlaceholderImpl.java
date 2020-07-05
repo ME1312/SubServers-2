@@ -137,9 +137,7 @@ public class PlaceholderImpl extends PlaceholderExpansion implements Taskable, C
         Server server = (plugin.api.getName() != null)? cache.getServer(plugin.api.getName()) : null;
         SubServer subserver = (server instanceof SubServer)? (SubServer) server : null;
         Host host = (subserver != null)? cache.getHost(subserver.getHost()) : null;
-        Proxy proxy = null;
-
-        String debug = Arrays.asList(args).toString();
+        Proxy proxy = cache.getMasterProxy();
 
         method = method.toLowerCase();
         if (method.startsWith("proxy.")) {
@@ -182,6 +180,9 @@ public class PlaceholderImpl extends PlaceholderExpansion implements Taskable, C
                 return null;
             }
         } else switch (method) { // --- Straight up Methods ---
+            case "example": {
+                return ChatColor.LIGHT_PURPLE + "Example!";
+            }
             case "proxy":
             case "proxies": {
                 return ChatColor.AQUA + Integer.toString(cache.getProxies().size() + 1);
