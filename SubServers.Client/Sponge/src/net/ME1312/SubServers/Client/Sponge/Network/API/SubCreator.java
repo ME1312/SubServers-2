@@ -40,7 +40,7 @@ public class SubCreator {
 
         public ServerTemplate(ObjectMap<String> raw) {
             this.raw = raw;
-            this.type = (Util.isException(() -> ServerType.valueOf(raw.getRawString("type").toUpperCase())))? ServerType.valueOf(raw.getRawString("type").toUpperCase()): ServerType.CUSTOM;
+            this.type = Util.getDespiteException(() -> ServerType.valueOf(raw.getRawString("type").toUpperCase().replace('-', '_').replace(' ', '_')), ServerType.CUSTOM);
         }
 
         /**

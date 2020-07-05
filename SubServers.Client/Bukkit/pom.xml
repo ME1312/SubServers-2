@@ -26,6 +26,10 @@
             <id>puharesource-repo</id>
             <url>https://repo.puha.io/repo/</url>
         </repository>
+        <repository>
+            <id>placeholderapi</id>
+            <url>https://repo.extendedclip.com/content/repositories/placeholderapi/</url>
+        </repository>
     </repositories>
 
     <dependencies>
@@ -59,6 +63,12 @@
             <groupId>io.puharesource.mc</groupId>
             <artifactId>TitleManager</artifactId>
             <version>1.5.11</version> <!-- Use this plugin to enable title messages on 1.8, 1.9, and 1.10 servers -->
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>me.clip</groupId>
+            <artifactId>placeholderapi</artifactId>
+            <version>2.10.6</version> <!-- Use this plugin to fill variables in other supported plugins -->
             <scope>provided</scope>
         </dependency>
     </dependencies>

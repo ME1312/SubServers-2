@@ -360,6 +360,16 @@ public class SubServer extends Server {
     }
 
     /**
+     * If the Server is Online<br>
+     * <b>This method can only be true when a SubData connection is made!</b>
+     *
+     * @return Online Status
+     */
+    public boolean isOnline() {
+        return raw.getBoolean("online");
+    }
+
+    /**
      * Grabs the Host of the Server
      *
      * @return The Host Name
@@ -549,7 +559,7 @@ public class SubServer extends Server {
      * @return Stop Action
      */
     public StopAction getStopAction() {
-        return Util.getDespiteException(() -> StopAction.valueOf(raw.getRawString("stop-action").toUpperCase().replace('-', '_').replace(' ', '_')), null);
+        return Util.getDespiteException(() -> StopAction.valueOf(raw.getRawString("stop-action").toUpperCase().replace('-', '_').replace(' ', '_')), StopAction.NONE);
     }
 
     /**

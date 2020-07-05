@@ -86,6 +86,11 @@ public abstract class SubServerImpl extends ServerImpl implements SubServer {
     }
 
     @Override
+    public boolean isOnline() {
+        return isRunning() && started;
+    }
+
+    @Override
     public void setTemplate(String template) {
         SubAPI.getInstance().getInternals().getPluginManager().callEvent(new SubEditServerEvent(null, this, new NamedContainer<String, Object>("template", template), false));
         this.templateV = null;
@@ -176,6 +181,7 @@ public abstract class SubServerImpl extends ServerImpl implements SubServer {
         sinfo.set("dir", getPath());
         sinfo.set("exec", getExecutable());
         sinfo.set("running", isRunning());
+        sinfo.set("online", isOnline());
         sinfo.set("stop-cmd", getStopCommand());
         sinfo.set("stop-action", getStopAction().toString());
         sinfo.set("auto-run", SubAPI.getInstance().getInternals().servers.get().getMap("Servers").getMap(getName(), new ObjectMap<String>()).getBoolean("Run-On-Launch", false));

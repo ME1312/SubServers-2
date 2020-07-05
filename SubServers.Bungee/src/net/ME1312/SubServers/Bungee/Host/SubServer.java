@@ -220,6 +220,14 @@ public interface SubServer extends Server {
     boolean isRunning();
 
     /**
+     * If the Server is Online<br>
+     * <b>This method can only be true when a SubData connection is made!</b>
+     *
+     * @return Online Status
+     */
+    boolean isOnline();
+
+    /**
      * Grabs the Host of the Server
      *
      * @return The Host

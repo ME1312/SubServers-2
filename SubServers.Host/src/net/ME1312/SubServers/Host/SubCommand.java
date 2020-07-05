@@ -219,7 +219,7 @@ public class SubCommand {
                                 if (server.getGroups().size() > 0) sender.sendMessage(" -> Group" + ((server.getGroups().size() > 1)?"s:":": " + TextColor.WHITE + server.getGroups().get(0)));
                                 if (server.getGroups().size() > 1) for (String group : server.getGroups()) sender.sendMessage("      - " + TextColor.WHITE + group);
                                 sender.sendMessage(" -> Address: " + TextColor.WHITE + server.getAddress().getAddress().getHostAddress()+':'+server.getAddress().getPort());
-                                if (server instanceof SubServer) sender.sendMessage(" -> Running: " + ((((SubServer) server).isRunning())?TextColor.GREEN+"yes":TextColor.RED+"no"));
+                                if (server instanceof SubServer) sender.sendMessage(" -> " + ((((SubServer) server).isOnline())?"Online":"Running") + ": " + ((((SubServer) server).isRunning())?TextColor.GREEN+"yes":TextColor.RED+"no"));
                                 if (!(server instanceof SubServer) || ((SubServer) server).isRunning()) {
                                     sender.sendMessage(" -> Connected: " + ((server.getSubData()[0] != null)?TextColor.GREEN+"yes"+((server.getSubData().length > 1)?TextColor.AQUA+" +"+(server.getSubData().length-1)+" subchannel"+((server.getSubData().length == 2)?"":"s"):""):TextColor.RED+"no"));
                                     sender.sendMessage(" -> Players: " + TextColor.AQUA + server.getGlobalPlayers().size() + " online");

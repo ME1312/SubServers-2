@@ -100,6 +100,10 @@ public final class SubPlugin extends JavaPlugin {
                 cmd.register("subservers", new SubCommand(this, "sub"));
             }
 
+            if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
+                new net.ME1312.SubServers.Client.Bukkit.Library.Compatibility.PlaceholderImpl(this).register();
+            }
+
             new Metrics(this);
             Bukkit.getScheduler().runTaskTimerAsynchronously(this, () -> {
                 try {
