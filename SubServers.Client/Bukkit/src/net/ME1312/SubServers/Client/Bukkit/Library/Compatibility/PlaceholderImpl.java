@@ -42,6 +42,8 @@ public class PlaceholderImpl extends PlaceholderExpansion implements Taskable, C
         if (plugin.config.get().getMap("Settings").getBoolean("PlaceholderAPI-Ready", false)) init();
     }
 
+
+
     @Override
     public String getIdentifier() {
         return "subservers";
@@ -66,18 +68,20 @@ public class PlaceholderImpl extends PlaceholderExpansion implements Taskable, C
         if (!init) {
             init = true;
             Bukkit.getPluginManager().registerEvents(cache.events, plugin);
-            Bukkit.getScheduler().runTaskLater(plugin, this::start, 120L);
+            Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                if (task == null) {
+                    int interval = plugin.config.get().getMap("Settings").getInt("PlaceholderAPI-Cache-Interval", 300);
+                    int start = interval - new Random().nextInt((interval / 3) + 1); // Don't have all servers request at the same time
+                    task = Bukkit.getScheduler().runTaskTimer(plugin, cache::refresh, 20L * start, 20L * interval);
+                    cache.refresh();
+                }
+            }, 120L);
         }
     }
 
     @Override
     public void start() {
-        if (task == null) {
-            int interval = plugin.config.get().getMap("Settings").getInt("PlaceholderAPI-Cache-Interval", 300);
-            int start = interval - new Random().nextInt((interval / 3) + 1); // Don't have all servers request at the same time
-            task = Bukkit.getScheduler().runTaskTimer(plugin, cache::refresh, 20L * start, 20L * interval);
-            cache.refresh();
-        }
+        // do nothing
     }
 
     @Override
@@ -356,11 +360,11 @@ public class PlaceholderImpl extends PlaceholderExpansion implements Taskable, C
         }
     }
 
-    private static final class Cache {
-        private static HashMap<String, Proxy> proxies = new HashMap<String, Proxy>();
-        private static HashMap<String, Host> hosts = new HashMap<String, Host>();
-        private static HashMap<String, Server> servers = new HashMap<String, Server>();
-        private static Proxy master = null;
+    private final class Cache {
+        private HashMap<String, Proxy> proxies = new HashMap<String, Proxy>();
+        private HashMap<String, Host> hosts = new HashMap<String, Host>();
+        private HashMap<String, Server> servers = new HashMap<String, Server>();
+        private Proxy master = null;
         private Listener events = new Events();
 
         private void reset() {
@@ -373,52 +377,71 @@ public class PlaceholderImpl extends PlaceholderExpansion implements Taskable, C
         private void refresh() {
             if (SubAPI.getInstance().getSubDataNetwork()[0] != null) {
                 SubAPI.getInstance().getProxies(proxies -> {
-                    Cache.proxies = new HashMap<>(proxies);
+                    this.proxies = new HashMap<>(proxies);
                 });
                 SubAPI.getInstance().getMasterProxy(master -> {
-                    Cache.master = master;
+                    this.master = master;
                 });
                 SubAPI.getInstance().getHosts(hosts -> {
-                    Cache.hosts = new HashMap<>(hosts);
+                    this.hosts = new HashMap<>(hosts);
                 });
                 SubAPI.getInstance().getServers(servers -> {
-                    Cache.servers = new HashMap<>(servers);
+                    this.servers = new HashMap<>(servers);
                 });
             }
         }
 
         private final class Events implements Listener {
+            private HashMap<String, BukkitTask> edits = new HashMap<String, BukkitTask>();
+
             @EventHandler
             public void add(SubAddProxyEvent e) {
                 SubAPI.getInstance().getProxy(e.getProxy(), proxy -> {
-                    proxies.put(proxy.getName().toLowerCase(), proxy);
+                    if (proxy != null) proxies.put(proxy.getName().toLowerCase(), proxy);
                 });
             }
 
             @EventHandler
             public void add(SubAddHostEvent e) {
                 SubAPI.getInstance().getHost(e.getHost(), host -> {
-                    hosts.put(host.getName().toLowerCase(), host);
+                    if (host != null) hosts.put(host.getName().toLowerCase(), host);
                 });
             }
 
             @EventHandler
             public void add(SubAddServerEvent e) {
-                SubAPI.getInstance().getServer(e.getServer(), server -> {
-                    servers.put(server.getName().toLowerCase(), server);
+                add(e.getServer());
+            }
+
+            public void add(String s) {
+                SubAPI.getInstance().getServer(s, server -> {
+                    if (server != null) servers.put(server.getName().toLowerCase(), server);
                 });
+            }
+
+            @EventHandler
+            public void edit(SubEditServerEvent e) {
+                String s = e.getServer().toLowerCase();
+                if (edits.keySet().contains(s)) edits.get(s).cancel();
+                edits.put(s, Bukkit.getScheduler().runTaskLater(plugin, () -> add(s), 120L));
             }
 
             @EventHandler
             public void start(SubStartEvent e) {
                 Server server = getServer(e.getServer());
-                if (server != null) Util.isException(() -> Util.<ObjectMap<String>>reflect(Server.class.getDeclaredField("raw"), server).set("running", true));
+                if (server != null) {
+                    Util.isException(() -> Util.<ObjectMap<String>>reflect(Server.class.getDeclaredField("raw"), server).set("running", true));
+                    add(e.getServer());
+                }
             }
 
             @EventHandler
             public void started(SubStartedEvent e) {
                 Server server = getServer(e.getServer());
-                if (server != null) Util.isException(() -> Util.<ObjectMap<String>>reflect(Server.class.getDeclaredField("raw"), server).set("online", true));
+                if (server != null) {
+                    Util.isException(() -> Util.<ObjectMap<String>>reflect(Server.class.getDeclaredField("raw"), server).set("online", true));
+                    add(e.getServer());
+                }
             }
 
             @EventHandler
@@ -428,6 +451,7 @@ public class PlaceholderImpl extends PlaceholderExpansion implements Taskable, C
                     ObjectMap<String> raw = Util.reflect(Server.class.getDeclaredField("raw"), server);
                     raw.set("online", false);
                     raw.set("running", false);
+                    add(e.getServer());
                 });
             }
         }
@@ -467,7 +491,7 @@ public class PlaceholderImpl extends PlaceholderExpansion implements Taskable, C
 
         public Map<String, SubServer> getSubServers() {
             TreeMap<String, SubServer> servers = new TreeMap<String, SubServer>();
-            for (Map.Entry<String, Server> server : Cache.servers.entrySet()) {
+            for (Map.Entry<String, Server> server : this.servers.entrySet()) {
                 if (server.getValue() instanceof SubServer) servers.put(server.getKey(), (SubServer) server.getValue());
             }
             return servers;
