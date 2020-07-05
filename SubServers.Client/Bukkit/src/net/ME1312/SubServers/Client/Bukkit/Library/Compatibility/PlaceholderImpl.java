@@ -104,7 +104,7 @@ public class PlaceholderImpl extends PlaceholderExpansion implements Taskable, C
         boolean colored = request.startsWith("color_");
         if (colored) request = request.substring(6);
 
-        String response = parse(request);
+        String response = parseRequest(request);
         if (!init) init();
 
         if (response != null && !colored) {
@@ -114,30 +114,45 @@ public class PlaceholderImpl extends PlaceholderExpansion implements Taskable, C
         }
     }
 
-    private String parse(String placeholder) {
-        Matcher m = Pattern.compile("^(.+?)(?:\\((.*)\\))?$", Pattern.CASE_INSENSITIVE).matcher(placeholder);
+    private String parseRequest(String placeholder) {
+        Matcher m = Pattern.compile("^(.+?)(?:[\\s_]*\\((.*)\\))?(?:[\\s_]*\\{(.*)})?$", Pattern.CASE_INSENSITIVE).matcher(placeholder);
 
         if (m.find()) {
             String method = m.group(1);
-            String arguments = m.group(2);
-            String[] args;
+            String arg = m.group(2);
+            String response = m.group(3);
+            String[] args, responses;
 
-            if (arguments == null || arguments.isEmpty()) {
+            if (arg == null || arg.isEmpty()) {
                 args = new String[0];
-            } else if (!arguments.contains(",")) {
-                args = new String[]{ arguments };
+            } else if (!arg.contains(",")) {
+                args = new String[]{ arg };
             } else {
-                args = arguments.split(",\\s*");
+                args = arg.split(",\\s*");
             }
 
-            return run(method, args);
+            for (int i = 0; i < args.length; ++i)
+                args[i] = args[i].trim();
+
+            if (response == null || response.isEmpty()) {
+                responses = new String[0];
+            } else if (!response.contains(",")) {
+                responses = new String[]{ response };
+            } else {
+                responses = response.split(",\\s*");
+            }
+
+            for (int i = 0; i < responses.length; ++i)
+                responses[i] = ChatColor.translateAlternateColorCodes('&', responses[i].trim());
+
+            return runMethod(method, args, responses);
         } else {
             return null;
         }
     }
 
     @SuppressWarnings("ConstantConditions")
-    private String run(String method, String... args) {
+    private String runMethod(String method, String[] args, String[] responses) {
         Server server = (plugin.api.getName() != null)? cache.getServer(plugin.api.getName()) : null;
         SubServer subserver = (server instanceof SubServer)? (SubServer) server : null;
         Host host = (subserver != null)? cache.getHost(subserver.getHost()) : null;
@@ -168,24 +183,24 @@ public class PlaceholderImpl extends PlaceholderExpansion implements Taskable, C
                 arguments.addAll(Arrays.asList(args));
                 if (args.length > 0) arguments.removeFirst();
                 arguments.addFirst(subserver.getHost());
-                return run(method.substring(10), arguments.toArray(new String[0]));
+                return runMethod(method.substring(10), arguments.toArray(new String[0]), responses);
             }
         } else if (method.startsWith("subserver.template")) {
             if (method.equals("subserver.template")) {
-                return (subserver.getTemplate() != null)?subserver.getTemplate():"(custom)";
+                return (subserver.getTemplate() != null)?subserver.getTemplate():defaults(responses, "(custom)")[0];
             } else if (subserver.getTemplate() != null) {
                 LinkedList<String> arguments = new LinkedList<String>();
                 arguments.addAll(Arrays.asList(args));
                 if (args.length > 0) arguments.removeFirst();
                 arguments.addFirst(subserver.getTemplate());
                 arguments.addFirst(subserver.getHost());
-                return run("host.creator." + method.substring(10), arguments.toArray(new String[0]));
+                return runMethod("host.creator." + method.substring(10), arguments.toArray(new String[0]), responses);
             } else {
                 return null;
             }
         } else switch (method) { // --- Straight up Methods ---
             case "example": {
-                return ChatColor.LIGHT_PURPLE + "Example!";
+                return defaults(responses, ChatColor.LIGHT_PURPLE+"Example!")[0];
             }
             case "proxy":
             case "proxies": {
@@ -195,16 +210,16 @@ public class PlaceholderImpl extends PlaceholderExpansion implements Taskable, C
                 return proxy.getDisplayName();
             }
             case "proxy.type": {
-                return ((proxy.isMaster())?"Master ":"") + "Proxy";
+                return defaults(responses, "Master Proxy", "Proxy") [((proxy.isMaster())?0:1)];
             }
             case "proxy.redis": {
-                return (proxy.isRedis())?ChatColor.GREEN+"Available":ChatColor.RED+"Unavailable";
+                return defaults(responses, ChatColor.GREEN+"Available", ChatColor.RED+"Unavailable") [(proxy.isRedis())?0:1];
             }
             case "proxy.players": {
                 return ChatColor.AQUA + Integer.toString(proxy.getPlayers().size());
             }
             case "proxy.subdata": {
-                return (proxy.getSubData()[0] == null)?ChatColor.RED+"Disconnected":ChatColor.GREEN+"Connected";
+                return defaults(responses, ChatColor.GREEN+"Connected", ChatColor.RED+"Disconnected") [(proxy.getSubData()[0] == null)?1:0];
             }
             case "proxy.subdata.channels":
             case "proxy.subdata.subchannels": {
@@ -221,10 +236,10 @@ public class PlaceholderImpl extends PlaceholderExpansion implements Taskable, C
                 return host.getDisplayName();
             }
             case "host.available": {
-                return (host.isAvailable())?ChatColor.GREEN+"Available":ChatColor.RED+"Unavailable";
+                return defaults(responses, ChatColor.GREEN+"Available", ChatColor.RED+"Unavailable") [(host.isAvailable())?0:1];
             }
             case "host.enabled": {
-                return (host.isEnabled())?ChatColor.GREEN+"Enabled":ChatColor.RED+"Disabled";
+                return defaults(responses, ChatColor.GREEN+"Enabled", ChatColor.RED+"Disabled") [(host.isEnabled())?0:1];
             }
             case "host.address": {
                 return host.getAddress().getHostAddress();
@@ -241,16 +256,28 @@ public class PlaceholderImpl extends PlaceholderExpansion implements Taskable, C
                 if (template != null) return template.getDisplayName();
                 else return null;
             }
+            case "host.creator.template.enabled":
+            case "host.subcreator.template.enabled": {
+                SubCreator.ServerTemplate template = (args.length > 1 && !args[1].isEmpty())? host.getCreator().getTemplate(args[1]) : null;
+                if (template != null) return defaults(responses, ChatColor.GREEN+"Enabled", ChatColor.RED+"Disabled") [((template.isEnabled())?0:1)];
+                else return null;
+            }
             case "host.creator.template.type":
             case "host.subcreator.template.type": {
                 SubCreator.ServerTemplate template = (args.length > 1 && !args[1].isEmpty())? host.getCreator().getTemplate(args[1]) : null;
                 if (template != null) return template.getType().toString();
                 else return null;
             }
+            case "host.creator.template.requiresversion":
+            case "host.subcreator.template.requiresversion": {
+                SubCreator.ServerTemplate template = (args.length > 1 && !args[1].isEmpty())? host.getCreator().getTemplate(args[1]) : null;
+                if (template != null) return defaults(responses, ChatColor.GREEN+"Optional", ChatColor.YELLOW+"Required") [((template.requiresVersion())?1:0)];
+                else return null;
+            }
             case "host.creator.template.updatable":
             case "host.subcreator.template.updatable": {
                 SubCreator.ServerTemplate template = (args.length > 1 && !args[1].isEmpty())? host.getCreator().getTemplate(args[1]) : null;
-                if (template != null) return ((template.canUpdate())?ChatColor.GREEN:ChatColor.RED+"Not ") + "Updatable";
+                if (template != null) return defaults(responses, ChatColor.GREEN+"Updatable", ChatColor.RED+"Not Updatable") [((template.canUpdate())?0:1)];
                 else return null;
             }
             case "host.servers":
@@ -261,7 +288,7 @@ public class PlaceholderImpl extends PlaceholderExpansion implements Taskable, C
                 return ChatColor.AQUA + Integer.toString(host.getGlobalPlayers().size());
             }
             case "host.subdata": {
-                return (host.getSubData().length <= 0)?ChatColor.YELLOW+"Unsupported":((host.getSubData()[0] == null)?ChatColor.RED+"Disconnected":ChatColor.GREEN+"Connected");
+                return defaults(responses, ChatColor.GREEN+"Connected", ChatColor.YELLOW+"Unsupported", ChatColor.RED+"Disconnected") [(host.getSubData().length <= 0)?1:((host.getSubData()[0] == null)?2:0)];
             }
             case "host.subdata.channels":
             case "host.subdata.subchannels": {
@@ -280,7 +307,7 @@ public class PlaceholderImpl extends PlaceholderExpansion implements Taskable, C
             }
             case "server.type":
             case "subserver.type": {
-                return ((server instanceof SubServer)?"Subs":"S")+"erver";
+                return defaults(responses, "Subserver", "Server") [((server instanceof SubServer)?0:1)];
             }
             case "server.groups":
             case "subserver.groups": {
@@ -296,11 +323,11 @@ public class PlaceholderImpl extends PlaceholderExpansion implements Taskable, C
             }
             case "server.restricted":
             case "subserver.restricted": {
-                return (server.isRestricted())?ChatColor.RED+"Private":ChatColor.GREEN+"Public";
+                return defaults(responses, ChatColor.GREEN+"Public", ChatColor.RED+"Private") [(server.isRestricted())?1:0];
             }
             case "server.hidden":
             case "subserver.hidden": {
-                return (server.isHidden())?ChatColor.RED+"Hidden":ChatColor.GREEN+"Visible";
+                return defaults(responses, ChatColor.GREEN+"Visible", ChatColor.RED+"Hidden") [(server.isHidden())?1:0];
             }
             case "server.players":
             case "subserver.players": {
@@ -308,7 +335,7 @@ public class PlaceholderImpl extends PlaceholderExpansion implements Taskable, C
             }
             case "server.subdata":
             case "subserver.subdata": {
-                return (server.getSubData()[0] == null)?ChatColor.RED+"Disconnected":ChatColor.GREEN+"Connected";
+                return defaults(responses, ChatColor.GREEN+"Connected", ChatColor.RED+"Disconnected") [(server.getSubData()[0] == null)?1:0];
             }
             case "server.subdata.channels":
             case "subserver.subdata.channels":
@@ -325,26 +352,27 @@ public class PlaceholderImpl extends PlaceholderExpansion implements Taskable, C
                 return ChatColor.AQUA + Integer.toString(cache.getSubServers().size());
             }
             case "subserver.available": {
-                return (subserver.isAvailable())?ChatColor.GREEN+"Available":ChatColor.RED+"Unavailable";
+                return defaults(responses, ChatColor.GREEN+"Available", ChatColor.RED+"Unavailable") [(subserver.isAvailable())?0:1];
             }
             case "subserver.enabled": {
-                return (subserver.isEnabled())?ChatColor.GREEN+"Enabled":ChatColor.RED+"Disabled";
+                return defaults(responses, ChatColor.GREEN+"Enabled", ChatColor.RED+"Disabled") [(subserver.isEnabled())?0:1];
             }
             case "subserver.editable": {
-                return (subserver.isEditable())?ChatColor.GREEN+"Editable":ChatColor.RED+"Locked";
+                return defaults(responses, ChatColor.GREEN+"Editable", ChatColor.RED+"Locked") [(subserver.isEditable())?0:1];
             }
             case "subserver.running": {
-                return (subserver.isRunning())?ChatColor.GREEN+"Running":ChatColor.RED+"Offline";
+                return defaults(responses, ChatColor.GREEN+"Running", ChatColor.RED+"Offline") [(subserver.isRunning())?0:1];
             }
             case "subserver.online": {
-                return (subserver.isOnline())?ChatColor.GREEN+"Online":((subserver.isRunning())?ChatColor.YELLOW+"Starting":ChatColor.RED+"Offline");
+                return defaults(responses, ChatColor.GREEN+"Online", ChatColor.YELLOW+"Starting", ChatColor.RED+"Offline") [(subserver.isOnline())?0:((subserver.isRunning())?1:2)];
             }
             case "subserver.logging": {
-                return (subserver.isLogging())?ChatColor.GREEN+"Logging":ChatColor.RED+"Muted";
+                return defaults(responses, ChatColor.GREEN+"Logging", ChatColor.RED+"Muted") [(subserver.isLogging())?0:1];
             }
             case "subserver.temporary": {
-                return (subserver.getStopAction() == SubServer.StopAction.REMOVE_SERVER || subserver.getStopAction() == SubServer.StopAction.RECYCLE_SERVER || subserver.getStopAction() == SubServer.StopAction.DELETE_SERVER)?
-                        ChatColor.AQUA+"Temporary":ChatColor.GREEN+"Permanent";
+                return defaults(responses, ChatColor.GREEN+"Permanent", ChatColor.AQUA+"Temporary") [
+                        (subserver.getStopAction() == SubServer.StopAction.REMOVE_SERVER || subserver.getStopAction() == SubServer.StopAction.RECYCLE_SERVER || subserver.getStopAction() == SubServer.StopAction.DELETE_SERVER)?1:0
+                ];
             }
             case "subserver.stopaction": {
                 return subserver.getStopAction().toString();
@@ -358,6 +386,13 @@ public class PlaceholderImpl extends PlaceholderExpansion implements Taskable, C
                 return null;
             }
         }
+    }
+
+    private static <T> T[] defaults(T[] overrides, T... defaults) {
+        for (int i = 0; i < defaults.length; ++i) {
+            defaults[i] = (((i < overrides.length)?overrides:defaults)[i]);
+        }
+        return defaults;
     }
 
     private final class Cache {
