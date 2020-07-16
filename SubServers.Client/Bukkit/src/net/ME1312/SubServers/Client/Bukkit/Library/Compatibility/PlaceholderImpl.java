@@ -1,5 +1,6 @@
 package net.ME1312.SubServers.Client.Bukkit.Library.Compatibility;
 
+import me.clip.placeholderapi.PlaceholderAPI;
 import me.clip.placeholderapi.expansion.Cacheable;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import me.clip.placeholderapi.expansion.Taskable;
@@ -11,6 +12,7 @@ import net.ME1312.SubServers.Client.Bukkit.SubAPI;
 import net.ME1312.SubServers.Client.Bukkit.SubPlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -101,10 +103,15 @@ public class PlaceholderImpl extends PlaceholderExpansion implements Taskable, C
 
     @Override
     public String onPlaceholderRequest(Player player, String request) {
+        return onRequest(player, request);
+    }
+
+    @Override
+    public String onRequest(OfflinePlayer player, String request) {
         boolean colored = !request.startsWith("plain_");
         if (!colored || request.startsWith("color_")) request = request.substring(6);
 
-        String response = parseRequest(request);
+        String response = runMethod(player, request);
         if (!init) init();
 
         if (response != null && !colored) {
@@ -114,45 +121,230 @@ public class PlaceholderImpl extends PlaceholderExpansion implements Taskable, C
         }
     }
 
-    private String parseRequest(String placeholder) {
-        Matcher m = Pattern.compile("^(.+?)(?:[\\s_]*\\((.*)\\))?(?:[\\s_]*\\{(.*)})?$", Pattern.CASE_INSENSITIVE).matcher(placeholder);
+    private static final Pattern replacements = Pattern.compile("#?([^\\s#]+?\\(.*?\\))|\\$([^$]+)\\$", Pattern.CASE_INSENSITIVE);
+    private String[] arguments(OfflinePlayer player, String text, boolean replace) {
+        LinkedList<String> arguments = new LinkedList<>();
+
+        if (text != null && !text.isEmpty()) {
+            Pattern p = replacements;
+            Matcher m = p.matcher(text);
+
+            StringBuilder argument = new StringBuilder();
+            while (m.find()) {
+                String[] replacement = findMethod(player, text, m.start(), replace);
+
+                if (replacement[0].contains(",")) {
+                    String[] s = replacement[0].split(",");
+                    argument.append(s[0]);
+                    arguments.add(argument.toString().trim());
+
+                    for (int i = 1; i < s.length - 1; ++i) {
+                        arguments.add(s[i].trim());
+                    }
+
+                    argument = new StringBuilder();
+                    argument.append(s[s.length - 1]);
+                } else {
+                    argument.append(replacement[0]);
+                }
+
+                argument.append(replacement[1]);
+
+                text = replacement[2];
+                m = p.matcher(text);
+            }
+
+            if (text.contains(",")) {
+                String[] s = text.split(",");
+                argument.append(s[0]);
+                arguments.add(argument.toString().trim());
+                argument = null;
+
+                for (int i = 1; i < s.length; ++i) {
+                    arguments.add(s[i].trim());
+                }
+            } else if (text.length() > 0) {
+                argument.append(text);
+            }
+
+            if (argument != null && argument.length() > 0) {
+                arguments.add(argument.toString().trim());
+            }
+        }
+
+        return arguments.toArray(new String[0]);
+    }
+
+    private String replace(OfflinePlayer player, String text) {
+        if (text != null) {
+            Pattern p = replacements;
+            Matcher m = p.matcher(text);
+
+            StringBuilder str = new StringBuilder();
+            while (m.find()) {
+                String[] replacement = findMethod(player, text, m.start(), true);
+
+                str.append(replacement[0]);
+                str.append(replacement[1]);
+
+                text = replacement[2];
+                m = p.matcher(text);
+            }
+
+            str.append(text);
+            return str.toString();
+        } else {
+            return null;
+        }
+    }
+
+    private String[] findMethod(OfflinePlayer player, String text, int start, boolean run) {
+        String[] values = new String[3];
+        values[0] = text.substring(0, start);
+        text = text.substring(start);
+
+        int[] open =  {'(', '[', '{'};
+        int[] close = {')', ']', '}'};
+        Arrays.sort(open);
+        Arrays.sort(close);
+
+        int i = -1;
+        if (text.codePointAt(0) == '$') {
+            Matcher m = Pattern.compile("^\\$([^$]+)\\$", Pattern.CASE_INSENSITIVE).matcher(text);
+            if (m.find()) {
+                String str = '%' + m.group(1) + '%';
+                text = text.substring(m.end());
+                if (run) {
+                    String response = PlaceholderAPI.setPlaceholders(player, str);
+                    values[1] = (response == null)?m.group():response;
+                } else {
+                    values[1] = m.group();
+                }
+            }
+        } else {
+            ++i;
+            boolean responses = false;
+            StringBuilder str = new StringBuilder();
+            for (int level = 0; i < text.codePoints().count(); ++i) {
+                int c = text.codePointAt(i);
+                str.appendCodePoint(c);
+
+                if (Arrays.binarySearch(open, c) >= 0) {
+                    ++level;
+                } else if (Arrays.binarySearch(close, c) >= 0) {
+                    --level;
+                    if (level <= 0) {
+                        if (responses) break;
+                        boolean more = false;
+                        for (int ix = i + 1; ix < text.codePoints().count(); ++ix) {
+                            int cx = text.codePointAt(ix);
+                            if (!Character.isWhitespace(cx) && cx != '_') {
+                                more = cx == '{';
+                                break;
+                            }
+                        }
+                        if (!more) break;
+                        else responses = true;
+                    }
+                }
+            }
+            if (run) {
+                String response = runMethod(player, str.toString());
+                values[1] = (response == null)?str.toString():response;
+            } else {
+                values[1] = str.toString();
+            }
+        }
+
+        StringBuilder str = new StringBuilder();
+        for (i += 1; i < text.codePoints().count(); ++i) {
+            str.appendCodePoint(text.codePointAt(i));
+        }
+        values[2] = str.toString();
+
+        return values;
+    }
+
+    private String[] parseMethod(OfflinePlayer player, String text) {
+        Matcher m = Pattern.compile("^#?(.+?)(?:[\\s_]*\\((.*?)\\))?(?:[\\s_]*\\{(.*)})?$", Pattern.CASE_INSENSITIVE).matcher(text);
 
         if (m.find()) {
-            String method = m.group(1);
-            String arg = m.group(2);
-            String response = m.group(3);
-            String[] args, responses;
+            String[] values = new String[3];
 
-            if (arg == null || arg.isEmpty()) {
-                args = new String[0];
-            } else if (!arg.contains(",")) {
-                args = new String[]{ arg };
+            values[0] = m.group(1);
+            if (m.group(2) == null || m.group(2).trim().isEmpty() ||
+                    m.group(3) == null || m.group(3).trim().isEmpty()) {
+                // Simple parsing << () or {} >>
+                values[1] = m.group(2);
+                values[2] = m.group(3);
             } else {
-                args = arg.split(",");
+                // Complex parsing << () and {} >>
+                text = text.substring(m.end(1));
+                int stage = 1, level = 0, i = 0;
+                char open = '(', close = ')';
+                boolean responses = false;
+                StringBuilder str = new StringBuilder();
+                for (; i < text.codePoints().count(); ++i) {
+                    int c = text.codePointAt(i);
+                    if (c == open) {
+                        if (level > 0) str.appendCodePoint(c);
+                        ++level;
+                    } else if (c == close) {
+                        --level;
+                        if (level > 0) str.appendCodePoint(c);
+                        else {
+                            if (responses) break;
+                            boolean more = false;
+                            for (int ix = i + 1; ix < text.codePoints().count(); ++ix) {
+                                int cx = text.codePointAt(ix);
+                                if (!Character.isWhitespace(cx) && cx != '_') {
+                                    more = cx == '{';
+                                    break;
+                                }
+                            }
+                            if (!more) break;
+                            else {
+                                responses = true;
+                                open = '{'; close = '}';
+                                values[stage++] = str.toString();
+                                str = new StringBuilder();
+                            }
+                        }
+                    } else {
+                        if (level > 0) str.appendCodePoint(c);
+                    }
+                }
+                values[stage] = str.toString();
+                if (level > 0 || ++i < text.codePoints().count()) {
+                    return null;
+                }
             }
 
-            for (int i = 0; i < args.length; ++i)
-                args[i] = args[i].trim();
+            return values;
+        } else {
+            return null;
+        }
+    }
 
-            if (response == null || response.isEmpty()) {
-                responses = new String[0];
-            } else if (!response.contains(",")) {
-                responses = new String[]{ response };
-            } else {
-                responses = response.split(",");
-            }
+    private String runMethod(OfflinePlayer player, String text) {
+        String[] parsed = parseMethod(player, text);
+
+        if (parsed != null) {
+            String method = parsed[0];
+            String[] args = arguments(player, parsed[1], true);
+            String[] responses = arguments(player, parsed[2], false);
 
             for (int i = 0; i < responses.length; ++i)
                 responses[i] = ChatColor.translateAlternateColorCodes('&', responses[i].trim());
 
-            return runMethod(method, args, responses);
+            return replace(player, runMethod(player, method, args, responses));
         } else {
             return null;
         }
     }
 
     @SuppressWarnings("ConstantConditions")
-    private String runMethod(String method, String[] args, String[] responses) {
+    private String runMethod(OfflinePlayer player, String method, String[] args, String[] responses) {
         Server server = (plugin.api.getName() != null)? cache.getServer(plugin.api.getName()) : null;
         SubServer subserver = (server instanceof SubServer)? (SubServer) server : null;
         Host host = (subserver != null)? cache.getHost(subserver.getHost()) : null;
@@ -183,7 +375,7 @@ public class PlaceholderImpl extends PlaceholderExpansion implements Taskable, C
                 arguments.addAll(Arrays.asList(args));
                 if (args.length > 0) arguments.removeFirst();
                 arguments.addFirst(subserver.getHost());
-                return runMethod(method.substring(10), arguments.toArray(new String[0]), responses);
+                return runMethod(player, method.substring(10), arguments.toArray(new String[0]), responses);
             }
         } else if (method.startsWith("subserver.template")) {
             if (method.equals("subserver.template")) {
@@ -194,17 +386,17 @@ public class PlaceholderImpl extends PlaceholderExpansion implements Taskable, C
                 if (args.length > 0) arguments.removeFirst();
                 arguments.addFirst(subserver.getTemplate());
                 arguments.addFirst(subserver.getHost());
-                return runMethod("host.creator." + method.substring(10), arguments.toArray(new String[0]), responses);
+                return runMethod(player, "host.creator." + method.substring(10), arguments.toArray(new String[0]), responses);
             } else {
                 return null;
             }
         } else switch (method) { // --- Straight up Methods ---
             case "example": {
-                return defaults(responses, ChatColor.LIGHT_PURPLE+"Example!")[0];
+                return defaults(responses, "Example!")[0];
             }
             case "proxy":
             case "proxies": {
-                return ChatColor.AQUA + Integer.toString(cache.getProxies().size() + 1);
+                return Integer.toString(cache.getProxies().size() + 1);
             }
             case "proxy.displayname": {
                 return proxy.getDisplayName();
@@ -216,21 +408,21 @@ public class PlaceholderImpl extends PlaceholderExpansion implements Taskable, C
                 return defaults(responses, ChatColor.GREEN+"Available", ChatColor.RED+"Unavailable") [(proxy.isRedis())?0:1];
             }
             case "proxy.players": {
-                return ChatColor.AQUA + Integer.toString(proxy.getPlayers().size());
+                return Integer.toString(proxy.getPlayers().size());
             }
             case "proxy.subdata": {
                 return defaults(responses, ChatColor.GREEN+"Connected", ChatColor.RED+"Disconnected") [(proxy.getSubData()[0] == null)?1:0];
             }
             case "proxy.subdata.channels":
             case "proxy.subdata.subchannels": {
-                return ChatColor.AQUA + Integer.toString(proxy.getSubData().length - ((method.endsWith(".subchannels"))?1:0));
+                return Integer.toString(proxy.getSubData().length - ((method.endsWith(".subchannels"))?1:0));
             }
             case "proxy.signature": {
-                return ChatColor.AQUA + proxy.getSignature();
+                return proxy.getSignature();
             }
             case "host":
             case "hosts": {
-                return ChatColor.AQUA + Integer.toString(cache.getHosts().size());
+                return Integer.toString(cache.getHosts().size());
             }
             case "host.displayname": {
                 return host.getDisplayName();
@@ -248,7 +440,7 @@ public class PlaceholderImpl extends PlaceholderExpansion implements Taskable, C
             case "host.subcreator.template":
             case "host.creator.templates":
             case "host.subcreator.templates": {
-                return ChatColor.AQUA + Integer.toString(host.getCreator().getTemplates().size());
+                return Integer.toString(host.getCreator().getTemplates().size());
             }
             case "host.creator.template.displayname":
             case "host.subcreator.template.displayname": {
@@ -282,24 +474,24 @@ public class PlaceholderImpl extends PlaceholderExpansion implements Taskable, C
             }
             case "host.servers":
             case "host.subservers": {
-                return ChatColor.AQUA + Integer.toString(host.getSubServers().size());
+                return Integer.toString(host.getSubServers().size());
             }
             case "host.players": {
-                return ChatColor.AQUA + Integer.toString(host.getGlobalPlayers().size());
+                return Integer.toString(host.getGlobalPlayers().size());
             }
             case "host.subdata": {
                 return defaults(responses, ChatColor.GREEN+"Connected", ChatColor.YELLOW+"Unsupported", ChatColor.RED+"Disconnected") [(host.getSubData().length <= 0)?1:((host.getSubData()[0] == null)?2:0)];
             }
             case "host.subdata.channels":
             case "host.subdata.subchannels": {
-                return ChatColor.AQUA + Integer.toString(Math.max(host.getSubData().length - ((method.endsWith(".subchannels"))?1:0), 0));
+                return Integer.toString(Math.max(host.getSubData().length - ((method.endsWith(".subchannels"))?1:0), 0));
             }
             case "host.signature": {
-                return ChatColor.AQUA + host.getSignature();
+                return host.getSignature();
             }
             case "server":
             case "servers": {
-                return ChatColor.AQUA + Integer.toString(cache.getServers().size());
+                return Integer.toString(cache.getServers().size());
             }
             case "server.displayname":
             case "subserver.displayname": {
@@ -311,7 +503,7 @@ public class PlaceholderImpl extends PlaceholderExpansion implements Taskable, C
             }
             case "server.groups":
             case "subserver.groups": {
-                return ChatColor.AQUA + Integer.toString(server.getGroups().size());
+                return Integer.toString(server.getGroups().size());
             }
             case "server.address":
             case "subserver.address": {
@@ -331,7 +523,7 @@ public class PlaceholderImpl extends PlaceholderExpansion implements Taskable, C
             }
             case "server.players":
             case "subserver.players": {
-                return ChatColor.AQUA + Integer.toString(server.getGlobalPlayers().size());
+                return Integer.toString(server.getGlobalPlayers().size());
             }
             case "server.subdata":
             case "subserver.subdata": {
@@ -341,15 +533,15 @@ public class PlaceholderImpl extends PlaceholderExpansion implements Taskable, C
             case "subserver.subdata.channels":
             case "server.subdata.subchannels":
             case "subserver.subdata.subchannels": {
-                return ChatColor.AQUA + Integer.toString(server.getSubData().length - ((method.endsWith(".subchannels"))?1:0));
+                return Integer.toString(server.getSubData().length - ((method.endsWith(".subchannels"))?1:0));
             }
             case "server.signature":
             case "subserver.signature": {
-                return ChatColor.AQUA + server.getSignature();
+                return server.getSignature();
             }
             case "subserver":
             case "subservers": {
-                return ChatColor.AQUA + Integer.toString(cache.getSubServers().size());
+                return Integer.toString(cache.getSubServers().size());
             }
             case "subserver.available": {
                 return defaults(responses, ChatColor.GREEN+"Available", ChatColor.RED+"Unavailable") [(subserver.isAvailable())?0:1];
@@ -380,7 +572,7 @@ public class PlaceholderImpl extends PlaceholderExpansion implements Taskable, C
             case "subserver.incompatibilities":
             case "subserver.incompatibilities.current": {
                 List<String> list = (method.endsWith(".current"))?subserver.getCurrentIncompatibilities():subserver.getIncompatibilities();
-                return ((list.isEmpty())?ChatColor.AQUA:ChatColor.RED) + Integer.toString(list.size());
+                return Integer.toString(list.size());
             }
             default: {
                 return null;
@@ -388,9 +580,9 @@ public class PlaceholderImpl extends PlaceholderExpansion implements Taskable, C
         }
     }
 
-    private static <T> T[] defaults(T[] overrides, T... defaults) {
+    private static String[] defaults(String[] overrides, String... defaults) {
         for (int i = 0; i < defaults.length; ++i) {
-            defaults[i] = (((i < overrides.length)?overrides:defaults)[i]);
+            defaults[i] = (((i < overrides.length && overrides[i].length() > 0)?overrides:defaults)[i]);
         }
         return defaults;
     }
