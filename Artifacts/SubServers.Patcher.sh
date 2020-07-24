@@ -79,13 +79,13 @@ if [ $__RETURN -eq 0 ]
         fi
         yes | cp -rf . ../Patched.jar
         cd ../
-        printf "Built-By: SubServers.Bungee.Patcher\n" >> MANIFEST.MF
+        printf "Built-By: SubServers.Patcher\n" >> MANIFEST.MF
         cp -f MANIFEST.MF Patched.jar/META-INF
         if [ -f "Patched.jar/bungee.yml" ]; then
             rm -Rf Patched.jar/bungee.yml
         fi
         if [ ! -f "MODIFICATIONS" ]; then
-            printf "# SubServers.Bungee.Patcher generated difference list (may be empty if git is not installed)\n#\n" > MODIFICATIONS
+            printf "# SubServers.Patcher generated difference list (may be empty if git is not installed)\n#\n" > MODIFICATIONS
         fi
         printf "@ `date`\n> git --no-pager diff --no-index --name-status SubServers.Patcher/Original.jar SubServers.Patcher/Patched.jar\n" >> MODIFICATIONS
         git --no-pager diff --no-index --name-status Original.jar Patched.jar | sed -e "s/\tOriginal.jar\//\t\//" -e "s/\tPatched.jar\//\t\//" >> MODIFICATIONS

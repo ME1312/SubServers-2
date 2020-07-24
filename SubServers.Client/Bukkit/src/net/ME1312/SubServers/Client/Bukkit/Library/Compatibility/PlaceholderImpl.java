@@ -203,8 +203,8 @@ public class PlaceholderImpl extends PlaceholderExpansion implements Taskable, C
         values[0] = text.substring(0, start);
         text = text.substring(start);
 
-        int[] open =  {'(', '[', '{'};
-        int[] close = {')', ']', '}'};
+        int[] open =  {'(', '{'};
+        int[] close = {')', '}'};
         Arrays.sort(open);
         Arrays.sort(close);
 
