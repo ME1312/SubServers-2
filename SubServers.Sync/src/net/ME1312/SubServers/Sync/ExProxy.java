@@ -22,6 +22,8 @@ import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubData.Client.SubDataClient;
 import net.ME1312.SubServers.Sync.Library.ConfigUpdater;
+import net.ME1312.SubServers.Sync.Network.API.RemotePlayer;
+import net.ME1312.SubServers.Sync.Network.Packet.PacketExSyncPlayer;
 import net.ME1312.SubServers.Sync.Network.SubProtocol;
 import net.ME1312.SubServers.Sync.Server.ServerImpl;
 import net.ME1312.SubServers.Sync.Server.SubServerImpl;
@@ -54,12 +56,14 @@ public final class ExProxy extends BungeeCord implements Listener {
     HashMap<Integer, SubDataClient> subdata = new HashMap<Integer, SubDataClient>();
     NamedContainer<Long, Map<String, Map<String, String>>> lang = null;
     public final Map<String, ServerImpl> servers = new TreeMap<String, ServerImpl>();
+    public final HashMap<UUID, ServerImpl> rPlayerLinkS = new HashMap<UUID, ServerImpl>();
+    public final HashMap<UUID, String> rPlayerLinkP = new HashMap<UUID, String>();
+    public final HashMap<UUID, RemotePlayer> rPlayers = new HashMap<UUID, RemotePlayer>();
     private final HashMap<UUID, List<ServerInfo>> fallbackLimbo = new HashMap<UUID, List<ServerInfo>>();
 
     public final PrintStream out;
     public final UniversalFile dir = new UniversalFile(new File(System.getProperty("user.dir")));
     public YAMLConfig config;
-    public boolean redis = false;
     public final SubAPI api = new SubAPI(this);
     public SubProtocol subprotocol;
     public static final Version version = Version.fromString("2.16.1a");
@@ -115,7 +119,6 @@ public final class ExProxy extends BungeeCord implements Listener {
     public void startListeners() {
         try {
             resetDate = Calendar.getInstance().getTime().getTime();
-            redis = getPluginManager().getPlugin("RedisBungee") != null;
             ConfigUpdater.updateConfig(new UniversalFile(dir, "SubServers:sync.yml"));
             config.reload();
 
@@ -231,30 +234,6 @@ public final class ExProxy extends BungeeCord implements Listener {
                 } catch (Exception e) {}
             }
         }, 0, TimeUnit.DAYS.toMillis(2));
-    }
-
-    /**
-     * Reference a RedisBungee method via reflection
-     *
-     * @param method Method to reference
-     * @param args Method arguments
-     * @return Method Response
-     */
-    @SuppressWarnings("unchecked")
-    public Object redis(String method, NamedContainer<Class<?>, ?>... args) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-        if (redis) {
-            Object api = getPluginManager().getPlugin("RedisBungee").getClass().getMethod("getApi").invoke(null);
-            Class<?>[] classargs = new Class<?>[args.length];
-            Object[] objargs = new Object[args.length];
-            for (int i = 0; i < args.length; i++) {
-                classargs[i] = args[i].name();
-                objargs[i] = args[i].get();
-                if (!classargs[i].isInstance(objargs[i])) throw new ClassCastException(classargs[i].getCanonicalName() + " != " + objargs[i].getClass().getCanonicalName());
-            }
-            return api.getClass().getMethod(method, classargs).invoke(api, objargs);
-        } else {
-            throw new IllegalStateException("RedisBungee is not installed");
-        }
     }
 
     /**
@@ -384,7 +363,6 @@ public final class ExProxy extends BungeeCord implements Listener {
         }
     }
 
-    @SuppressWarnings("deprecation")
     @EventHandler(priority = Byte.MAX_VALUE)
     public void validate(ServerConnectEvent e) {
         Map<String, ServerInfo> servers = new TreeMap<String, ServerInfo>(this.servers);
@@ -422,6 +400,20 @@ public final class ExProxy extends BungeeCord implements Listener {
             } else if (e.getPlayer().getServer() != null) {
                 e.setCancelled(true);
             }
+        }
+    }
+
+    @SuppressWarnings("deprecation")
+    @EventHandler(priority = Byte.MAX_VALUE)
+    public void setPlayer(ServerConnectedEvent e) {
+        ObjectMap<String> raw = RemotePlayer.translate(e.getPlayer());
+        raw.set("server", e.getServer().getInfo().getName());
+        RemotePlayer player = new RemotePlayer(raw);
+        rPlayers.put(player.getUniqueId(), player);
+        rPlayerLinkP.put(player.getUniqueId(), player.getProxy());
+        if (e.getServer().getInfo() instanceof ServerImpl) rPlayerLinkS.put(player.getUniqueId(), (ServerImpl) e.getServer().getInfo());
+        if (api.getSubDataNetwork()[0] != null) {
+            ((SubDataClient) api.getSubDataNetwork()[0]).sendPacket(new PacketExSyncPlayer(true, player));
         }
     }
 
@@ -466,9 +458,18 @@ public final class ExProxy extends BungeeCord implements Listener {
         }, 1000);
     }
     @EventHandler(priority = Byte.MIN_VALUE)
-    public void resetLimbo(PlayerDisconnectEvent e) {
+    public void resetPlayer(PlayerDisconnectEvent e) {
         fallbackLimbo.remove(e.getPlayer().getUniqueId());
         SubCommand.permitted.remove(e.getPlayer().getUniqueId());
+
+        if (rPlayers.containsKey(e.getPlayer().getUniqueId())) {
+            if (api.getSubDataNetwork()[0] != null) {
+                ((SubDataClient) api.getSubDataNetwork()[0]).sendPacket(new PacketExSyncPlayer(false, rPlayers.get(e.getPlayer().getUniqueId())));
+            }
+            rPlayerLinkS.remove(e.getPlayer().getUniqueId());
+            rPlayerLinkP.remove(e.getPlayer().getUniqueId());
+            rPlayers.remove(e.getPlayer().getUniqueId());
+        }
     }
 
     @SuppressWarnings("unchecked")

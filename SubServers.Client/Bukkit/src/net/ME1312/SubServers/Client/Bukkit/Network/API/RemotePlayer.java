@@ -9,6 +9,7 @@ import net.ME1312.SubServers.Client.Bukkit.SubAPI;
 
 import java.lang.reflect.InvocationTargetException;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.util.*;
 
 public class RemotePlayer {
@@ -69,8 +70,8 @@ public class RemotePlayer {
      *
      * @return the remote address
      */
-    public InetAddress getAddress() {
-        return Util.getDespiteException(() -> InetAddress.getByName(raw.getRawString("address")), null);
+    public InetSocketAddress getAddress() {
+        return new InetSocketAddress(raw.getRawString("address").split(":")[0], Integer.parseInt(raw.getRawString("address").split(":")[1]));
     }
 
     /**

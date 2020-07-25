@@ -5,6 +5,8 @@ import net.ME1312.SubData.Client.DataSender;
 import net.ME1312.SubData.Client.Library.ForwardedDataSender;
 import net.ME1312.SubData.Client.SubDataClient;
 import net.ME1312.SubData.Client.SubDataSender;
+import net.ME1312.SubServers.Sync.ExProxy;
+import net.ME1312.SubServers.Sync.Network.API.RemotePlayer;
 import net.ME1312.SubServers.Sync.SubAPI;
 import net.md_5.bungee.BungeeServerInfo;
 import net.md_5.bungee.api.CommandSender;
@@ -114,32 +116,18 @@ public class ServerImpl extends BungeeServerInfo {
     }
 
     /**
-     * See if a player is whitelisted
+     * Get players on this server across all known proxies
      *
-     * @param player Player
-     * @return Whitelisted Status
+     * @return Remote Player Collection
      */
-    public boolean canAccess(CommandSender player) {
-        return (player instanceof ProxiedPlayer && whitelist.contains(((ProxiedPlayer) player).getUniqueId())) || super.canAccess(player);
-    }
-
-    /**
-     * Add a player to the whitelist (for use with restricted servers)
-     *
-     * @param player Player to add
-     */
-    public void whitelist(UUID player) {
-        if (Util.isNull(player)) throw new NullPointerException();
-        whitelist.add(player);
-    }
-
-    /**
-     * Remove a player to the whitelist
-     *
-     * @param player Player to remove
-     */
-    public void unwhitelist(UUID player) {
-        whitelist.remove(player);
+    @SuppressWarnings("deprecation")
+    public Collection<RemotePlayer> getGlobalPlayers() {
+        ExProxy plugin = SubAPI.getInstance().getInternals();
+        ArrayList<RemotePlayer> players = new ArrayList<RemotePlayer>();
+        for (UUID id : Util.getBackwards(plugin.rPlayerLinkS, this)) {
+            players.add(plugin.rPlayers.get(id));
+        }
+        return players;
     }
 
     /**
@@ -187,6 +175,35 @@ public class ServerImpl extends BungeeServerInfo {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * See if a player is whitelisted
+     *
+     * @param player Player
+     * @return Whitelisted Status
+     */
+    public boolean canAccess(CommandSender player) {
+        return (player instanceof ProxiedPlayer && whitelist.contains(((ProxiedPlayer) player).getUniqueId())) || super.canAccess(player);
+    }
+
+    /**
+     * Add a player to the whitelist (for use with restricted servers)
+     *
+     * @param player Player to add
+     */
+    public void whitelist(UUID player) {
+        if (Util.isNull(player)) throw new NullPointerException();
+        whitelist.add(player);
+    }
+
+    /**
+     * Remove a player to the whitelist
+     *
+     * @param player Player to remove
+     */
+    public void unwhitelist(UUID player) {
+        whitelist.remove(player);
     }
 
     /**

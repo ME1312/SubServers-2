@@ -404,9 +404,6 @@ public class PlaceholderImpl extends PlaceholderExpansion implements Taskable, C
             case "proxy.type": {
                 return defaults(responses, "Master Proxy", "Proxy") [((proxy.isMaster())?0:1)];
             }
-            case "proxy.redis": {
-                return defaults(responses, ChatColor.GREEN+"Available", ChatColor.RED+"Unavailable") [(proxy.isRedis())?0:1];
-            }
             case "proxy.players": {
                 return Integer.toString(proxy.getPlayers().size());
             }

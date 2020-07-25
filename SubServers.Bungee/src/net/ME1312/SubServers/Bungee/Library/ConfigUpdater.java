@@ -446,8 +446,6 @@ public class ConfigUpdater {
             def.put("Interface.Generic.Invalid-Permission", "&4You need &n$str$");
             def.put("Interface.Proxy-Menu.Proxy-Player-Count", "&2$int$ Player(s) Online");
             def.put("Interface.Proxy-Menu.Proxy-Master", "&8Master Proxy");
-            def.put("Interface.Proxy-Menu.Proxy-SubData", "&9SubData Only");
-            def.put("Interface.Proxy-Menu.Proxy-Redis", "&7Redis Only");
             def.put("Interface.Proxy-Menu.Proxy-Disconnected", "&4Disconnected");
             def.put("Interface.Host-Menu.Title", "Host Menu");
             def.put("Interface.Host-Menu.Host-Unavailable", "&4Unavailable");

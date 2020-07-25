@@ -5,7 +5,6 @@ import com.google.common.collect.Range;
 import com.google.gson.Gson;
 import net.ME1312.Galaxi.Library.Container.PrimitiveContainer;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
-import net.ME1312.Galaxi.Library.Container.NamedContainer;
 import net.ME1312.Galaxi.Library.UniversalFile;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubData.Server.*;
@@ -26,6 +25,7 @@ import net.ME1312.SubServers.Bungee.Library.ConfigUpdater;
 import net.ME1312.SubServers.Bungee.Library.Exception.InvalidHostException;
 import net.ME1312.SubServers.Bungee.Library.Exception.InvalidServerException;
 import net.ME1312.Galaxi.Library.Version.Version;
+import net.ME1312.SubServers.Bungee.Network.Packet.PacketExSyncPlayer;
 import net.ME1312.SubServers.Bungee.Network.Packet.PacketOutExReload;
 import net.ME1312.SubServers.Bungee.Network.SubProtocol;
 import net.md_5.bungee.BungeeCord;
@@ -65,6 +65,9 @@ public final class SubProxy extends BungeeCord implements Listener {
     public final HashMap<String, Host> hosts = new HashMap<String, Host>();
     public final HashMap<String, Server> exServers = new HashMap<String, Server>();
     private final HashMap<String, ServerInfo> legServers = new HashMap<String, ServerInfo>();
+    public final HashMap<UUID, Server> rPlayerLinkS = new HashMap<UUID, Server>();
+    public final HashMap<UUID, Proxy> rPlayerLinkP = new HashMap<UUID, Proxy>();
+    public final HashMap<UUID, RemotePlayer> rPlayers = new HashMap<UUID, RemotePlayer>();
     private final HashMap<UUID, List<ServerInfo>> fallbackLimbo = new HashMap<UUID, List<ServerInfo>>();
 
     public final PrintStream out;
@@ -79,7 +82,7 @@ public final class SubProxy extends BungeeCord implements Listener {
     public SubServer sudo = null;
     public static final Version version = Version.fromString("2.16.1a");
 
-    public Proxy redis = null;
+    public final Proxy mProxy;
     public boolean canSudo = false;
     public final boolean isPatched;
     public final boolean isGalaxi;
@@ -224,6 +227,8 @@ public final class SubProxy extends BungeeCord implements Listener {
             }
         }, TimeUnit.DAYS.toMillis(7), TimeUnit.DAYS.toMillis(7));
 
+        mProxy = new Proxy("(master)");
+
         api.addHostDriver(net.ME1312.SubServers.Bungee.Host.Internal.InternalHost.class, "virtual");
         api.addHostDriver(net.ME1312.SubServers.Bungee.Host.External.ExternalHost.class, "network");
 
@@ -259,7 +264,6 @@ public final class SubProxy extends BungeeCord implements Listener {
     @SuppressWarnings("unchecked")
     public void startListeners() {
         try {
-            if (getPluginManager().getPlugin("RedisBungee") != null) redis = Util.getDespiteException(() -> new Proxy((String) redis("getServerId")), null);
             reload();
 
             if (UPnP.isUPnPAvailable()) {
@@ -313,34 +317,6 @@ public final class SubProxy extends BungeeCord implements Listener {
             Util.isException(subdata::waitFor);
             subdata = null;
         }
-        int proxies = 1;
-        if (redis != null) {
-            try {
-                boolean first = true;
-                String master = (String) redis("getServerId");
-                if (!master.equals(redis.getName())) redis = new Proxy(master);
-                if (!redis.getDisplayName().equals("(master)")) redis.setDisplayName("(master)");
-                for (String name : (List<String>) redis("getAllServers")) {
-                    if (!ukeys.contains(name.toLowerCase()) && !master.equals(name)) try {
-                        if (first) Logger.get("SubServers").info(((status)?"Rel":"L")+"oading Proxies...");
-                        first = false;
-                        Proxy proxy = this.proxies.get(name.toLowerCase());
-                        if (proxy == null) {
-                            proxy = new Proxy(name);
-                            getPluginManager().callEvent(new SubAddProxyEvent(proxy));
-                            this.proxies.put(name.toLowerCase(), proxy);
-                        }
-                        ukeys.add(name.toLowerCase());
-                        proxies++;
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-        ukeys.clear();
 
         int hosts = 0;
         Logger.get("SubServers").info(((status)?"Rel":"L")+"oading Hosts...");
@@ -619,7 +595,7 @@ public final class SubProxy extends BungeeCord implements Listener {
         }
 
         reloading = false;
-        Logger.get("SubServers").info(((plugins > 0)?plugins+" Plugin"+((plugins == 1)?"":"s")+", ":"") + ((proxies > 1)?proxies+" Proxies, ":"") + hosts + " Host"+((hosts == 1)?"":"s")+", " + servers + " Server"+((servers == 1)?"":"s")+", and " + subservers + " SubServer"+((subservers == 1)?"":"s")+" "+((status)?"re":"")+"loaded in " + new DecimalFormat("0.000").format((Calendar.getInstance().getTime().getTime() - begin) / 1000D) + "s");
+        Logger.get("SubServers").info(((plugins > 0)?plugins+" Plugin"+((plugins == 1)?"":"s")+", ":"") + hosts + " Host"+((hosts == 1)?"":"s")+", " + servers + " Server"+((servers == 1)?"":"s")+", and " + subservers + " SubServer"+((subservers == 1)?"":"s")+" "+((status)?"re":"")+"loaded in " + new DecimalFormat("0.000").format((Calendar.getInstance().getTime().getTime() - begin) / 1000D) + "s");
 
         long scd = TimeUnit.SECONDS.toMillis(this.servers.get().getMap("Settings").getLong("Run-On-Launch-Timeout", 0L));
         if (autorun.size() > 0) for (Host host : api.getHosts().values()) {
@@ -745,6 +721,10 @@ public final class SubProxy extends BungeeCord implements Listener {
         for (ListenerInfo listener : getConfig().getListeners()) {
             if (UPnP.isUPnPAvailable() && UPnP.isMappedTCP(listener.getHost().getPort())) UPnP.closePortTCP(listener.getHost().getPort());
         }
+
+        rPlayerLinkS.clear();
+        rPlayerLinkP.clear();
+        rPlayers.clear();
     }
 
     String getNewSignature() {
@@ -760,30 +740,6 @@ public final class SubProxy extends BungeeCord implements Listener {
             result.insert(0, DIGITS.charAt(digit));
         }
         return (result.length() == 0) ? DIGITS.substring(0, 1) : result.toString();
-    }
-
-    /**
-     * Reference a RedisBungee method via reflection
-     *
-     * @param method Method to reference
-     * @param args Method arguments
-     * @return Method Response
-     */
-    @SuppressWarnings("unchecked")
-    public Object redis(String method, NamedContainer<Class<?>, ?>... args) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-        if (getPluginManager().getPlugin("RedisBungee") != null) {
-            Object api = getPluginManager().getPlugin("RedisBungee").getClass().getMethod("getApi").invoke(null);
-            Class<?>[] classargs = new Class<?>[args.length];
-            Object[] objargs = new Object[args.length];
-            for (int i = 0; i < args.length; i++) {
-                classargs[i] = args[i].name();
-                objargs[i] = args[i].get();
-                if (!classargs[i].isPrimitive() && !classargs[i].isInstance(objargs[i])) throw new ClassCastException(classargs[i].getCanonicalName() + " != " + objargs[i].getClass().getCanonicalName());
-            }
-            return api.getClass().getMethod(method, classargs).invoke(api, objargs);
-        } else {
-            throw new IllegalStateException("RedisBungee is not installed");
-        }
     }
 
     /**
@@ -887,7 +843,6 @@ public final class SubProxy extends BungeeCord implements Listener {
         }
     }
 
-    @SuppressWarnings("deprecation")
     @EventHandler(priority = Byte.MAX_VALUE)
     public void validate(ServerConnectEvent e) {
         Map<String, ServerInfo> servers = new TreeMap<String, ServerInfo>(api.getServers());
@@ -926,6 +881,19 @@ public final class SubProxy extends BungeeCord implements Listener {
                 e.setCancelled(true);
             }
         }
+    }
+
+    @SuppressWarnings("deprecation")
+    @EventHandler(priority = Byte.MAX_VALUE)
+    public void setPlayer(ServerConnectedEvent e) {
+        RemotePlayer player = new RemotePlayer(e.getPlayer().getName(), e.getPlayer().getUniqueId(), mProxy, (e.getServer().getInfo() instanceof Server)?(Server) e.getServer().getInfo():null, e.getPlayer().getAddress());
+        rPlayers.put(player.getUniqueId(), player);
+        rPlayerLinkP.put(player.getUniqueId(), player.getProxy());
+        if (player.getServer() != null) rPlayerLinkS.put(player.getUniqueId(), player.getServer());
+        for (Proxy proxy : SubAPI.getInstance().getProxies().values()) if (proxy.getSubData()[0] != null) {
+            ((SubDataClient) proxy.getSubData()[0]).sendPacket(new PacketExSyncPlayer(mProxy.getName(), true, player));
+        }
+
     }
 
     @SuppressWarnings("deprecation")
@@ -969,9 +937,18 @@ public final class SubProxy extends BungeeCord implements Listener {
         }, 1000);
     }
     @EventHandler(priority = Byte.MIN_VALUE)
-    public void resetLimbo(PlayerDisconnectEvent e) {
+    public void resetPlayer(PlayerDisconnectEvent e) {
         fallbackLimbo.remove(e.getPlayer().getUniqueId());
         SubCommand.players.remove(e.getPlayer().getUniqueId());
+
+        if (rPlayers.containsKey(e.getPlayer().getUniqueId())) {
+            for (Proxy proxy : SubAPI.getInstance().getProxies().values()) if (proxy.getSubData()[0] != null) {
+                ((SubDataClient) proxy.getSubData()[0]).sendPacket(new PacketExSyncPlayer(mProxy.getName(), false, rPlayers.get(e.getPlayer().getUniqueId())));
+            }
+            rPlayerLinkS.remove(e.getPlayer().getUniqueId());
+            rPlayerLinkP.remove(e.getPlayer().getUniqueId());
+            rPlayers.remove(e.getPlayer().getUniqueId());
+        }
     }
 
     @EventHandler(priority = Byte.MIN_VALUE)

@@ -125,11 +125,13 @@ public class SubProtocol extends SubDataProtocol {
             instance.registerPacket(0x0071, PacketOutExReset.class);
             instance.registerPacket(0x0072, PacketOutExReload.class);
             instance.registerPacket(0x0073, PacketOutExUpdateWhitelist.class);
+            instance.registerPacket(0x0074, PacketExSyncPlayer.class);
 
           //instance.registerPacket(0x0070, new PacketOutRunEvent());
           //instance.registerPacket(0x0071, new PacketOutReset());
           //instance.registerPacket(0x0072, new PacketOutReload());
           //instance.registerPacket(0x0073, new PacketOutExUpdateWhitelist());
+            instance.registerPacket(0x0074, new PacketExSyncPlayer(plugin));
         }
 
         return instance;

@@ -531,17 +531,17 @@ public final class SubAPI {
     public Proxy getProxy(String name) {
         if (Util.isNull(name)) throw new NullPointerException();
         Proxy proxy = getProxies().getOrDefault(name.toLowerCase(), null);
-        if (proxy == null && plugin.redis != null && plugin.redis.getName().equalsIgnoreCase(name)) proxy = plugin.redis;
+        if (proxy == null && plugin.mProxy != null && plugin.mProxy.getName().equalsIgnoreCase(name)) proxy = plugin.mProxy;
         return proxy;
     }
 
     /**
-     * Get the Master Proxy redis container (null if unavailable)
+     * Get the Master Proxy Container
      *
      * @return Master Proxy
      */
     public Proxy getMasterProxy() {
-        return plugin.redis;
+        return plugin.mProxy;
     }
 
     /**
@@ -549,23 +549,8 @@ public final class SubAPI {
      *
      * @return Remote Player Collection
      */
-    @SuppressWarnings("unchecked")
     public Map<UUID, RemotePlayer> getGlobalPlayers() {
-        TreeMap<UUID, RemotePlayer> players = new TreeMap<UUID, RemotePlayer>();
-        SubProxy plugin = SubAPI.getInstance().getInternals();
-        for (ProxiedPlayer player : plugin.getPlayers()) {
-            players.put(player.getUniqueId(), new RemotePlayer(player));
-        }
-        if (plugin.redis != null) {
-            try {
-                for (UUID id : (Set<UUID>) plugin.redis("getPlayersOnline")) {
-                    if (!players.keySet().contains(id)) {
-                        players.put(id, new RemotePlayer(id));
-                    }
-                }
-            } catch (Exception e) {}
-        }
-        return players;
+        return new HashMap<UUID, RemotePlayer>(plugin.rPlayers);
     }
 
     /**
@@ -574,16 +559,12 @@ public final class SubAPI {
      * @param name Player name
      * @return Remote Player
      */
-    @SuppressWarnings("unchecked")
     public RemotePlayer getGlobalPlayer(String name) {
         if (Util.isNull(name)) throw new NullPointerException();
-        SubProxy plugin = SubAPI.getInstance().getInternals();
-
-        RemotePlayer remote;
-        ProxiedPlayer local = plugin.getPlayer(name);
-        if (local != null) remote = new RemotePlayer(local);
-        else remote = Util.getDespiteException(() -> new RemotePlayer((UUID) plugin.redis("getUuidFromName", new NamedContainer<>(String.class, name), new NamedContainer<>(boolean.class, false))), null);
-        return remote;
+        for (RemotePlayer player : getGlobalPlayers().values()) {
+            if (player.getName().equalsIgnoreCase(name)) return player;
+        }
+        return null;
     }
 
     /**
@@ -594,13 +575,7 @@ public final class SubAPI {
      */
     public RemotePlayer getGlobalPlayer(UUID id) {
         if (Util.isNull(id)) throw new NullPointerException();
-        SubProxy plugin = SubAPI.getInstance().getInternals();
-
-        RemotePlayer remote;
-        ProxiedPlayer local = plugin.getPlayer(id);
-        if (local != null) remote = new RemotePlayer(local);
-        else remote = Util.getDespiteException(() -> new RemotePlayer(id), null);
-        return remote;
+        return getGlobalPlayers().getOrDefault(id, null);
     }
 
     /**

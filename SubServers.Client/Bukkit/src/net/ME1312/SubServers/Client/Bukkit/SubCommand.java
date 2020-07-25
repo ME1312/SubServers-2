@@ -175,12 +175,8 @@ public final class SubCommand extends BukkitCommand {
                                     message = "  (master)";
                                     for (Proxy proxy : proxies.values()) {
                                         message += div;
-                                        if (proxy.getSubData()[0] != null && proxy.isRedis()) {
-                                            message += ChatColor.GREEN;
-                                        } else if (proxy.getSubData()[0] != null) {
+                                        if (proxy.getSubData()[0] != null) {
                                             message += ChatColor.AQUA;
-                                        } else if (proxy.isRedis()) {
-                                            message += ChatColor.WHITE;
                                         } else {
                                             message += ChatColor.RED;
                                         }
@@ -201,7 +197,7 @@ public final class SubCommand extends BukkitCommand {
                                     if (player.getProxy() != null) sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Proxy") + ChatColor.WHITE + player.getProxy());
                                     if (player.getServer() != null) sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Server") + ChatColor.WHITE + player.getServer());
                                     if (player.getAddress() != null && plugin.config.get().getMap("Settings").getBoolean("Show-Addresses", false))
-                                        sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Address") + ChatColor.WHITE + player.getAddress().getHostAddress());
+                                        sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Address") + ChatColor.WHITE + player.getAddress().getAddress().getHostAddress() + ':' + player.getAddress().getPort());
                                     sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "UUID") + ChatColor.AQUA + player.getUniqueId());
                                 } else {
                                     if (type == null) {
@@ -291,8 +287,7 @@ public final class SubCommand extends BukkitCommand {
                                     if (!proxy.getName().equals(proxy.getDisplayName())) sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "System Name") + ChatColor.WHITE + proxy.getName());
                                     if (!proxy.isMaster()) sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Connected") + ((proxy.getSubData()[0] != null)?ChatColor.GREEN+"yes"+((proxy.getSubData().length > 1)?ChatColor.AQUA+" +"+(proxy.getSubData().length-1)+" subchannel"+((proxy.getSubData().length == 2)?"":"s"):""):ChatColor.RED+"no"));
                                     else if (!proxy.getDisplayName().toLowerCase().contains("master")) sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Type") + ChatColor.WHITE + "Master");
-                                    sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Redis") + ((proxy.isRedis())?ChatColor.GREEN:ChatColor.RED+"un") + "available");
-                                    if (proxy.isRedis()) sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Players") + ChatColor.AQUA + proxy.getPlayers().size() + " online");
+                                    sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Players") + ChatColor.AQUA + proxy.getPlayers().size() + " online");
                                     sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Signature") + ChatColor.AQUA + proxy.getSignature());
                                 } else {
                                     if (type == null) {

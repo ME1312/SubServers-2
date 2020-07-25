@@ -83,15 +83,6 @@ public class Proxy {
     }
 
     /**
-     * Determine if the proxy is connected to RedisBungee's server
-     *
-     * @return Redis Status
-     */
-    public boolean isRedis() {
-        return raw.getBoolean("redis");
-    }
-
-    /**
      * Determine if the proxy is the Master Proxy
      *
      * @return Master Proxy Status

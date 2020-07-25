@@ -109,17 +109,6 @@ public class Proxy implements ClientHandler, ExtraDataHandler {
     }
 
     /**
-     * Determine if the proxy is connected to RedisBungee's server
-     *
-     * @return Redis Status
-     */
-    @SuppressWarnings({"deprecation", "unchecked"})
-    public boolean isRedis() {
-        SubProxy plugin = SubAPI.getInstance().getInternals();
-        return plugin.redis != null && Util.getDespiteException(() -> plugin.redis("getPlayersOnProxy", new NamedContainer<>(String.class, getName())) != null, false);
-    }
-
-    /**
      * Determine if the proxy is the Master Proxy
      *
      * @return Master Proxy Status
@@ -133,20 +122,12 @@ public class Proxy implements ClientHandler, ExtraDataHandler {
      *
      * @return Remote Player Collection
      */
-    @SuppressWarnings({"deprecation", "unchecked"})
+    @SuppressWarnings("deprecation")
     public Collection<RemotePlayer> getPlayers() {
-        List<RemotePlayer> players = new LinkedList<RemotePlayer>();
-        //List<UUID> used = new ArrayList<UUID>();
         SubProxy plugin = SubAPI.getInstance().getInternals();
-        if (plugin.redis != null) {
-            try {
-                for (UUID id : (Set<UUID>) plugin.redis("getPlayersOnProxy", new NamedContainer<>(String.class, getName()))) {
-                  //if (!used.contains(id)) {
-                        players.add(new RemotePlayer(id));
-                  //    used.add(id);
-                  //}
-                }
-            } catch (Exception e) {}
+        ArrayList<RemotePlayer> players = new ArrayList<RemotePlayer>();
+        for (UUID id : Util.getBackwards(plugin.rPlayerLinkP, this)) {
+            players.add(plugin.rPlayers.get(id));
         }
         return players;
     }
@@ -199,7 +180,6 @@ public class Proxy implements ClientHandler, ExtraDataHandler {
         for (RemotePlayer player : getPlayers())
             players.set(player.getUniqueId().toString(), player.getName());
         info.set("players", players);
-        info.set("redis", isRedis());
         info.set("master", isMaster());
         ObjectMap<Integer> subdata = new ObjectMap<Integer>();
         for (int channel : this.subdata.keySet()) subdata.set(channel, (this.subdata.get(channel) == null)?null:this.subdata.get(channel).getID());

@@ -426,8 +426,10 @@ public final class SubCommand implements CommandExecutor {
                         message.color(TextColors.GRAY);
                         hover.color(TextColors.GRAY);
                         if (proxymaster != null) {
+                            if (!proxymaster.getName().equals(proxymaster.getDisplayName())) {
+                                hover.append(Text.builder('\n' + proxymaster.getDisplayName()).color(TextColors.GRAY).build());
+                            }
                             hover.append(
-                                    Text.builder('\n' + proxymaster.getName()).color(TextColors.GRAY).build(),
                                     ChatColor.convertColor('\n' + plugin.api.getLang("SubServers", "Interface.Proxy-Menu.Proxy-Master")),
                                     ChatColor.convertColor('\n' + plugin.api.getLang("SubServers", "Interface.Proxy-Menu.Proxy-Player-Count").replace("$int$", new DecimalFormat("#,###").format(proxymaster.getPlayers().size())))
                             );
@@ -437,32 +439,13 @@ public final class SubCommand implements CommandExecutor {
                         for (Proxy proxy : proxies.values()) {
                             message = Text.builder(proxy.getDisplayName());
                             hover = Text.builder(proxy.getDisplayName());
-                            if (proxy.getSubData()[0] != null && proxy.isRedis()) {
-                                message.color(TextColors.GREEN);
-                                hover.color(TextColors.GREEN);
-                                if (!proxy.getName().equals(proxy.getDisplayName())) {
-                                    hover.append(Text.builder('\n' + proxy.getName()).color(TextColors.GRAY).build());
-                                }
-                                hover.append(ChatColor.convertColor('\n' + plugin.api.getLang("SubServers", "Interface.Proxy-Menu.Proxy-Player-Count").replace("$int$", new DecimalFormat("#,###").format(proxy.getPlayers().size()))));
-                            } else if (proxy.getSubData()[0] != null) {
+                            if (proxy.getSubData()[0] != null) {
                                 message.color(TextColors.AQUA);
                                 hover.color(TextColors.AQUA);
                                 if (!proxy.getName().equals(proxy.getDisplayName())) {
                                     hover.append(Text.builder('\n' + proxy.getName()).color(TextColors.GRAY).build());
                                 }
-                                if (proxymaster != null) {
-                                    hover.append(ChatColor.convertColor('\n' + plugin.api.getLang("SubServers", "Interface.Proxy-Menu.Proxy-SubData")));
-                                }
-                            } else if (proxy.isRedis()) {
-                                message.color(TextColors.WHITE);
-                                hover.color(TextColors.WHITE);
-                                if (!proxy.getName().equals(proxy.getDisplayName())) {
-                                    hover.append(Text.builder('\n' + proxy.getName()).color(TextColors.GRAY).build());
-                                }
-                                hover.append(
-                                        ChatColor.convertColor('\n' + plugin.api.getLang("SubServers", "Interface.Proxy-Menu.Proxy-Redis")),
-                                        ChatColor.convertColor('\n' + plugin.api.getLang("SubServers", "Interface.Proxy-Menu.Proxy-Player-Count").replace("$int$", new DecimalFormat("#,###").format(proxy.getPlayers().size())))
-                                );
+                                hover.append(ChatColor.convertColor('\n' + plugin.api.getLang("SubServers", "Interface.Proxy-Menu.Proxy-Player-Count").replace("$int$", new DecimalFormat("#,###").format(proxy.getPlayers().size()))));
                             } else {
                                 message.color(TextColors.RED);
                                 hover.color(TextColors.RED);
@@ -507,7 +490,7 @@ public final class SubCommand implements CommandExecutor {
                             if (player.getProxy() != null) sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Proxy")).toBuilder().append(Text.builder(player.getProxy()).color(TextColors.WHITE).build()).build());
                             if (player.getServer() != null) sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Server")).toBuilder().append(Text.builder(player.getServer()).color(TextColors.WHITE).build()).build());
                             if (player.getAddress() != null && plugin.config.get().getMap("Settings").getBoolean("Show-Addresses", false))
-                                sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Address")).toBuilder().append(Text.builder(player.getAddress().getHostAddress()).color(TextColors.WHITE).build()).build());
+                                sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Address")).toBuilder().append(Text.builder(player.getAddress().getAddress().getHostAddress() + ':' + player.getAddress().getPort()).color(TextColors.WHITE).build()).build());
                             sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "UUID")).toBuilder().append(Text.builder(player.getUniqueId().toString()).color(TextColors.AQUA).build()).build());
                         } else {
                             if (type == null) {
@@ -597,8 +580,7 @@ public final class SubCommand implements CommandExecutor {
                             if (!proxy.getName().equals(proxy.getDisplayName())) sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "System Name")).toBuilder().append(Text.builder(proxy.getName()).color(TextColors.WHITE).build()).build());
                             if (!proxy.isMaster()) sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Connected")).toBuilder().append(Text.builder((proxy.getSubData()[0] != null)?"yes":"no").color((proxy.getSubData()[0] != null)?TextColors.GREEN:TextColors.RED).build(), Text.builder((proxy.getSubData().length > 1)?" +"+(proxy.getSubData().length-1)+" subchannel"+((proxy.getSubData().length == 2)?"":"s"):"").color(TextColors.AQUA).build()).build());
                             else if (!proxy.getDisplayName().toLowerCase().contains("master")) sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Type")).toBuilder().append(Text.builder("Master").color(TextColors.WHITE).build()).build());
-                            sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Redis")).toBuilder().append(Text.builder(((proxy.isRedis())?"":"un") + "available").color((proxy.isRedis())?TextColors.GREEN:TextColors.RED).build()).build());
-                            if (proxy.isRedis()) sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Players")).toBuilder().append(Text.builder(proxy.getPlayers().size() + " online").color(TextColors.AQUA).build()).build());
+                            sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Players")).toBuilder().append(Text.builder(proxy.getPlayers().size() + " online").color(TextColors.AQUA).build()).build());
                             sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Signature")).toBuilder().append(Text.builder(proxy.getSignature()).color(TextColors.AQUA).build()).build());
                         } else {
                             if (type == null) {

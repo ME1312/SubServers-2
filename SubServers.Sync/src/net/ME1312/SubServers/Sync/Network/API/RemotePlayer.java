@@ -6,9 +6,11 @@ import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubData.Client.SubDataClient;
 import net.ME1312.SubServers.Sync.Network.Packet.PacketDownloadPlayerInfo;
 import net.ME1312.SubServers.Sync.SubAPI;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 import java.lang.reflect.InvocationTargetException;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.UUID;
@@ -18,6 +20,32 @@ public class RemotePlayer {
     private Proxy proxy = null;
     private Server server = null;
     long timestamp;
+
+    /**
+     * Convert a Local Player to a Raw representation of a Remote Player
+     *
+     * @param player Local Player
+     * @return Raw representation of the Remote Player
+     */
+    public static ObjectMap<String> translate(ProxiedPlayer player) {
+        ObjectMap<String> raw = new ObjectMap<String>();
+        raw = new ObjectMap<String>();
+        raw.set("name", player.getName());
+        raw.set("id", player.getUniqueId());
+        raw.set("address", player.getAddress().getAddress().getHostAddress() + ':' + player.getAddress().getPort());
+        if (player.getServer() != null) raw.set("server", player.getServer().getInfo().getName());
+        if (SubAPI.getInstance().getName() != null) raw.set("proxy", SubAPI.getInstance().getName());
+        return raw;
+    }
+
+    /**
+     * Convert a Local Player to an API representation of a Remote Player
+     *
+     * @param player Local Player
+     */
+    public RemotePlayer(ProxiedPlayer player) {
+        this(translate(player));
+    }
 
     /**
      * Create an API representation of a Remote Player
@@ -71,8 +99,8 @@ public class RemotePlayer {
      *
      * @return the remote address
      */
-    public InetAddress getAddress() {
-        return Util.getDespiteException(() -> InetAddress.getByName(raw.getRawString("address")), null);
+    public InetSocketAddress getAddress() {
+        return new InetSocketAddress(raw.getRawString("address").split(":")[0], Integer.parseInt(raw.getRawString("address").split(":")[1]));
     }
 
     /**

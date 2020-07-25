@@ -251,12 +251,8 @@ public final class SubCommand extends CommandX {
                         message = "  (master)";
                         for (Proxy proxy : plugin.api.getProxies().values()) {
                             message += div;
-                            if (proxy.getSubData()[0] != null && proxy.isRedis()) {
-                                message += ChatColor.GREEN;
-                            } else if (proxy.getSubData()[0] != null) {
+                            if (proxy.getSubData()[0] != null) {
                                 message += ChatColor.AQUA;
-                            } else if (proxy.isRedis()) {
-                                message += ChatColor.WHITE;
                             } else {
                                 message += ChatColor.RED;
                             }
@@ -275,7 +271,7 @@ public final class SubCommand extends CommandX {
                                 sender.sendMessage("SubServers > Info on player: " + ChatColor.WHITE + player.getName());
                                 if (player.getProxy() != null) sender.sendMessage(" -> Proxy: " + ChatColor.WHITE + player.getProxy().getName());
                                 if (player.getServer() != null) sender.sendMessage(" -> Server: " + ChatColor.WHITE + player.getServer().getName());
-                                if (player.getAddress() != null) sender.sendMessage(" -> Address: " + ChatColor.WHITE + player.getAddress().getHostAddress());
+                                if (player.getAddress() != null) sender.sendMessage(" -> Address: " + ChatColor.WHITE + player.getAddress().getAddress().getHostAddress() + ':' + player.getAddress().getPort());
                                 sender.sendMessage(" -> UUID: " + ChatColor.AQUA + player.getUniqueId());
                             } else {
                                 if (type == null) {
@@ -368,8 +364,7 @@ public final class SubCommand extends CommandX {
                                 if (!proxy.getName().equals(proxy.getDisplayName())) sender.sendMessage(" -> System Name: " + ChatColor.WHITE + proxy.getName());
                                 if (!proxy.isMaster()) sender.sendMessage(" -> Connected: " + ((proxy.getSubData()[0] != null)?ChatColor.GREEN+"yes"+((proxy.getSubData().length > 1)?ChatColor.AQUA+" +"+(proxy.getSubData().length-1)+" subchannel"+((proxy.getSubData().length == 2)?"":"s"):""):ChatColor.RED+"no"));
                                 else if (!proxy.getDisplayName().toLowerCase().contains("master")) sender.sendMessage(" -> Type: " + ChatColor.WHITE + "Master");
-                                sender.sendMessage(" -> Redis: " + ((proxy.isRedis())?ChatColor.GREEN:ChatColor.RED+"un") + "available");
-                                if (proxy.isRedis()) sender.sendMessage(" -> Players: " + ChatColor.AQUA + proxy.getPlayers().size() + " online");
+                                sender.sendMessage(" -> Players: " + ChatColor.AQUA + proxy.getPlayers().size() + " online");
                                 sender.sendMessage(" -> Signature: " + ChatColor.AQUA + proxy.getSignature());
                             } else {
                                 if (type == null) {
@@ -887,9 +882,7 @@ public final class SubCommand extends CommandX {
                 ReturnRunnable<Collection<String>> getPlayers = () -> {
                     LinkedList<String> names = new LinkedList<String>();
                     for (ProxiedPlayer player : plugin.getPlayers()) names.add(player.getName());
-                    if (plugin.redis != null) {
-                        for (String name : Util.<Collection<String>>getDespiteException(() -> (Collection<String>) plugin.redis("getHumanPlayersOnline"), Collections.emptyList())) if (!names.contains(name)) names.add(name);
-                    }
+                    for (RemotePlayer player : plugin.api.getGlobalPlayers().values()) if (!names.contains(player.getName())) names.add(player.getName());
                     Collections.sort(names);
                     return names;
                 };
@@ -1101,16 +1094,14 @@ public final class SubCommand extends CommandX {
                             if (player.getName().toLowerCase().startsWith(last)) list.add(Last + player.getName().substring(last.length()));
                             used.add(player.getUniqueId());
                         }
-                        if (plugin.redis != null) {
-                            try {
-                                for (UUID id : (Set<UUID>) plugin.redis("getPlayersOnServer", new NamedContainer<>(String.class, ((ProxiedPlayer) sender).getServer().getInfo().getName()))) {
-                                    if (!used.contains(id)) {
-                                        String name = (String) plugin.redis("getNameFromUuid", new NamedContainer<>(UUID.class, id), new NamedContainer<>(boolean.class, false));
-                                        if (name.toLowerCase().startsWith(last)) list.add(Last + name.substring(last.length()));
-                                        used.add(id);
-                                    }
+
+                        if (((ProxiedPlayer) sender).getServer().getInfo() instanceof Server) {
+                            for (RemotePlayer player : ((Server) ((ProxiedPlayer) sender).getServer().getInfo()).getGlobalPlayers()) {
+                                if (!used.contains(player.getUniqueId())) {
+                                    if (player.getName().toLowerCase().startsWith(last)) list.add(Last + player.getName().substring(last.length()));
+                                    used.add(player.getUniqueId());
                                 }
-                            } catch (Exception e) {}
+                            }
                         }
                     }
                     for (Server server : plugin.api.getServers().values()) {

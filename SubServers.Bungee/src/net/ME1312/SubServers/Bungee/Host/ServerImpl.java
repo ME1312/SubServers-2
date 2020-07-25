@@ -157,25 +157,13 @@ public class ServerImpl extends BungeeServerInfo implements Server {
         Collections.sort(groups);
     }
 
-    @SuppressWarnings({"deprecation", "unchecked"})
+    @SuppressWarnings("deprecation")
     @Override
     public Collection<RemotePlayer> getGlobalPlayers() {
-        List<RemotePlayer> players = new LinkedList<RemotePlayer>();
-        List<UUID> used = new ArrayList<UUID>();
         SubProxy plugin = SubAPI.getInstance().getInternals();
-        for (ProxiedPlayer player : getPlayers()) {
-            players.add(new RemotePlayer(player));
-            used.add(player.getUniqueId());
-        }
-        if (plugin.redis != null) {
-            try {
-                for (UUID id : (Set<UUID>) plugin.redis("getPlayersOnServer", new NamedContainer<>(String.class, getName()))) {
-                    if (!used.contains(id)) {
-                        players.add(new RemotePlayer(id));
-                        used.add(id);
-                    }
-                }
-            } catch (Exception e) {}
+        ArrayList<RemotePlayer> players = new ArrayList<RemotePlayer>();
+        for (UUID id : Util.getBackwards(plugin.rPlayerLinkS, this)) {
+            players.add(plugin.rPlayers.get(id));
         }
         return players;
     }

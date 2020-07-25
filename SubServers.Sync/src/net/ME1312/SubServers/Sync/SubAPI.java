@@ -72,12 +72,6 @@ public final class SubAPI {
     public String getName() {
         if (name != null) {
             return name;
-        } else if (plugin.redis) {
-            try {
-                return (String) plugin.redis("getServerId");
-            } catch (Exception e) {
-                return null;
-            }
         } else {
             return null;
         }
@@ -517,7 +511,7 @@ public final class SubAPI {
     }
 
     /**
-     * Get the Master Proxy redis container (null if unavailable)
+     * Get the Master Proxy Container
      *
      * @param callback Master Proxy
      */
@@ -538,6 +532,15 @@ public final class SubAPI {
                 ew.printStackTrace();
             }
         }));
+    }
+
+    /**
+     * Get players on this network across all known proxies (Cached)
+     *
+     * @return Remote Player Collection
+     */
+    public Map<UUID, RemotePlayer> getGlobalPlayers() {
+        return new HashMap<UUID, RemotePlayer>(plugin.rPlayers);
     }
 
     /**
@@ -565,6 +568,20 @@ public final class SubAPI {
     }
 
     /**
+     * Get a player on this network by searching across all known proxies (Cached)
+     *
+     * @param name Player name
+     * @return Remote Player
+     */
+    public RemotePlayer getGlobalPlayer(String name) {
+        if (Util.isNull(name)) throw new NullPointerException();
+        for (RemotePlayer player : getGlobalPlayers().values()) {
+            if (player.getName().equalsIgnoreCase(name)) return player;
+        }
+        return null;
+    }
+
+    /**
      * Get a player on this network by searching across all known proxies
      *
      * @param name Player name
@@ -587,6 +604,17 @@ public final class SubAPI {
                 ew.printStackTrace();
             }
         }));
+    }
+
+    /**
+     * Get a player on this network by searching across all known proxies (Cached)
+     *
+     * @param id Player UUID
+     * @return Remote Player
+     */
+    public RemotePlayer getGlobalPlayer(UUID id) {
+        if (Util.isNull(id)) throw new NullPointerException();
+        return getGlobalPlayers().getOrDefault(id, null);
     }
 
     /**

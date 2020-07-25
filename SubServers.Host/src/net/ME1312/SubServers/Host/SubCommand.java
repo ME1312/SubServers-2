@@ -159,12 +159,8 @@ public class SubCommand {
                         message = "  (master)";
                         for (Proxy proxy : proxies.values()) {
                             message += div;
-                            if (proxy.getSubData()[0] != null && proxy.isRedis()) {
-                                message += TextColor.GREEN;
-                            } else if (proxy.getSubData()[0] != null) {
+                            if (proxy.getSubData()[0] != null) {
                                 message += TextColor.AQUA;
-                            } else if (proxy.isRedis()) {
-                                message += TextColor.WHITE;
                             } else {
                                 message += TextColor.RED;
                             }
@@ -195,7 +191,7 @@ public class SubCommand {
                                 sender.sendMessage("Info on player: " + TextColor.WHITE + player.getName());
                                 if (player.getProxy() != null) sender.sendMessage(" -> Proxy: " + TextColor.WHITE + player.getProxy());
                                 if (player.getServer() != null) sender.sendMessage(" -> Server: " + TextColor.WHITE + player.getServer());
-                                if (player.getAddress() != null) sender.sendMessage(" -> Address: " + TextColor.WHITE + player.getAddress().getHostAddress());
+                                if (player.getAddress() != null) sender.sendMessage(" -> Address: " + TextColor.WHITE + player.getAddress().getAddress().getHostAddress() + ':' + player.getAddress().getPort());
                                 sender.sendMessage(" -> UUID: " + TextColor.AQUA + player.getUniqueId());
                             } else {
                                 if (type == null) {
@@ -284,8 +280,7 @@ public class SubCommand {
                                 if (!proxy.getName().equals(proxy.getDisplayName())) sender.sendMessage(" -> System Name: " + TextColor.WHITE + proxy.getName());
                                 if (!proxy.isMaster()) sender.sendMessage(" -> Connected: " + ((proxy.getSubData()[0] != null)?TextColor.GREEN+"yes"+((proxy.getSubData().length > 1)?TextColor.AQUA+" +"+(proxy.getSubData().length-1)+" subchannel"+((proxy.getSubData().length == 2)?"":"s"):""):TextColor.RED+"no"));
                                 else if (!proxy.getDisplayName().toLowerCase().contains("master")) sender.sendMessage(" -> Type: " + TextColor.WHITE + "Master");
-                                sender.sendMessage(" -> Redis: " + ((proxy.isRedis())?TextColor.GREEN:TextColor.RED+"un") + "available");
-                                if (proxy.isRedis()) sender.sendMessage(" -> Players: " + TextColor.AQUA + proxy.getPlayers().size() + " online");
+                                sender.sendMessage(" -> Players: " + TextColor.AQUA + proxy.getPlayers().size() + " online");
                                 sender.sendMessage(" -> Signature: " + TextColor.AQUA + proxy.getSignature());
                             } else {
                                 if (type == null) {

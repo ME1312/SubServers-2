@@ -294,9 +294,11 @@ public class BungeeChat {
                 hover.setColor(ChatColor.GRAY);
                 hoverm.add(hover);
                 if (proxymaster != null) {
-                    hover = new TextComponent('\n' + proxymaster.getName());
-                    hover.setColor(ChatColor.GRAY);
-                    hoverm.add(hover);
+                    if (!proxymaster.getName().equals(proxymaster.getDisplayName())) {
+                        hover = new TextComponent('\n' + proxymaster.getDisplayName());
+                        hover.setColor(ChatColor.GRAY);
+                        hoverm.add(hover);
+                    }
                     hover = new TextComponent('\n' + plugin.api.getLang("SubServers", "Interface.Proxy-Menu.Proxy-Master"));
                     hoverm.add(hover);
                     hover = new TextComponent('\n' + plugin.api.getLang("SubServers", "Interface.Proxy-Menu.Proxy-Player-Count").replace("$int$", new DecimalFormat("#,###").format(proxymaster.getPlayers().size())) + ChatColor.RESET);
@@ -311,17 +313,7 @@ public class BungeeChat {
                     hoverm = new LinkedList<TextComponent>();
                     message = new TextComponent(proxy.getDisplayName());
                     hover = new TextComponent(proxy.getDisplayName());
-                    if (proxy.getSubData()[0] != null && proxy.isRedis()) {
-                        message.setColor(ChatColor.GREEN);
-                        hover.setColor(ChatColor.GREEN);
-                        if (!proxy.getName().equals(proxy.getDisplayName())) {
-                            hoverm.add(hover);
-                            hover = new TextComponent('\n' + proxy.getName());
-                            hover.setColor(ChatColor.GRAY);
-                        }
-                        hoverm.add(hover);
-                        hover = new TextComponent('\n' + plugin.api.getLang("SubServers", "Interface.Proxy-Menu.Proxy-Player-Count").replace("$int$", new DecimalFormat("#,###").format(proxy.getPlayers().size())));
-                    } else if (proxy.getSubData()[0] != null) {
+                    if (proxy.getSubData()[0] != null) {
                         message.setColor(ChatColor.AQUA);
                         hover.setColor(ChatColor.AQUA);
                         if (!proxy.getName().equals(proxy.getDisplayName())) {
@@ -329,20 +321,6 @@ public class BungeeChat {
                             hover = new TextComponent('\n' + proxy.getName());
                             hover.setColor(ChatColor.GRAY);
                         }
-                        if (proxymaster != null) {
-                            hoverm.add(hover);
-                            hover = new TextComponent('\n' + plugin.api.getLang("SubServers", "Interface.Proxy-Menu.Proxy-SubData"));
-                        }
-                    } else if (proxy.isRedis()) {
-                        message.setColor(ChatColor.WHITE);
-                        hover.setColor(ChatColor.WHITE);
-                        hoverm.add(hover);
-                        if (!proxy.getName().equals(proxy.getDisplayName())) {
-                            hover = new TextComponent('\n' + proxy.getName());
-                            hover.setColor(ChatColor.GRAY);
-                            hoverm.add(hover);
-                        }
-                        hover = new TextComponent('\n' + plugin.api.getLang("SubServers", "Interface.Proxy-Menu.Proxy-Redis"));
                         hoverm.add(hover);
                         hover = new TextComponent('\n' + plugin.api.getLang("SubServers", "Interface.Proxy-Menu.Proxy-Player-Count").replace("$int$", new DecimalFormat("#,###").format(proxy.getPlayers().size())));
                     } else {

@@ -11,10 +11,13 @@ import net.ME1312.SubData.Client.SubDataProtocol;
 import net.ME1312.SubServers.Sync.Event.SubNetworkConnectEvent;
 import net.ME1312.SubServers.Sync.Event.SubNetworkDisconnectEvent;
 import net.ME1312.SubServers.Sync.ExProxy;
+import net.ME1312.SubServers.Sync.Network.API.RemotePlayer;
 import net.ME1312.SubServers.Sync.Network.API.Server;
 import net.ME1312.SubServers.Sync.Network.Packet.*;
+import net.ME1312.SubServers.Sync.Server.ServerImpl;
 import net.ME1312.SubServers.Sync.SubAPI;
 import net.md_5.bungee.api.config.ListenerInfo;
+import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.conf.Configuration;
 
 import java.io.IOException;
@@ -96,10 +99,12 @@ public class SubProtocol extends SubDataProtocol {
           //instance.registerPacket(0x0070, PacketInExRunEvent.class);
           //instance.registerPacket(0x0071, PacketInExReset.class);
           //instance.registerPacket(0x0073, PacketInExReload.class);
+            instance.registerPacket(0x0074, PacketExSyncPlayer.class);
 
             instance.registerPacket(0x0070, new PacketInExRunEvent(plugin));
             instance.registerPacket(0x0071, new PacketInExReset());
             instance.registerPacket(0x0073, new PacketInExUpdateWhitelist(plugin));
+            instance.registerPacket(0x0074, new PacketExSyncPlayer(plugin));
         }
 
         return instance;
@@ -160,7 +165,19 @@ public class SubProtocol extends SubDataProtocol {
                 for (Server server : servers.values()) {
                     plugin.merge(server);
                 }
+
+                plugin.api.getGlobalPlayers(players -> {
+                    for (RemotePlayer player : players.values()) {
+                        plugin.rPlayers.put(player.getUniqueId(), player);
+                        plugin.rPlayerLinkP.put(player.getUniqueId(), player.getProxy().toLowerCase());
+
+                        ServerInfo server = plugin.getServerInfo(player.getServer());
+                        if (server instanceof ServerImpl)
+                            plugin.rPlayerLinkS.put(player.getUniqueId(), (ServerImpl) server);
+                    }
+                });
             });
+
         }));
         subdata.on.ready(client -> plugin.getPluginManager().callEvent(new SubNetworkConnectEvent((SubDataClient) client)));
         subdata.on.closed(client -> {
