@@ -23,10 +23,7 @@ import net.md_5.bungee.conf.Configuration;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.InetAddress;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
@@ -160,6 +157,18 @@ public class SubProtocol extends SubDataProtocol {
                 net.ME1312.SubServers.Sync.Library.Compatibility.Logger.get("SubServers").info("Problem syncing BungeeCord configuration options");
                 e.printStackTrace();
             }
+
+            ArrayList<RemotePlayer> localPlayers = new ArrayList<RemotePlayer>();
+            for (UUID id : new ArrayList<UUID>(plugin.rPlayers.keySet())) {
+                if (plugin.getPlayer(id) != null) {
+                    localPlayers.add(plugin.rPlayers.get(id));
+                } else {
+                    plugin.rPlayerLinkS.remove(id);
+                    plugin.rPlayerLinkP.remove(id);
+                    plugin.rPlayers.remove(id);
+                }
+            }
+            subdata.sendPacket(new PacketExSyncPlayer(null, localPlayers.toArray(new RemotePlayer[0])));
 
             plugin.api.getServers(servers -> {
                 for (Server server : servers.values()) {

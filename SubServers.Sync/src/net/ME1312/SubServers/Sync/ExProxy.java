@@ -314,6 +314,10 @@ public final class ExProxy extends BungeeCord implements Listener {
             for (ListenerInfo listener : getConfig().getListeners()) {
                 if (UPnP.isUPnPAvailable() && UPnP.isMappedTCP(listener.getHost().getPort())) UPnP.closePortTCP(listener.getHost().getPort());
             }
+
+            rPlayerLinkS.clear();
+            rPlayerLinkP.clear();
+            rPlayers.clear();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -410,7 +414,7 @@ public final class ExProxy extends BungeeCord implements Listener {
         raw.set("server", e.getServer().getInfo().getName());
         RemotePlayer player = new RemotePlayer(raw);
         rPlayers.put(player.getUniqueId(), player);
-        rPlayerLinkP.put(player.getUniqueId(), player.getProxy());
+        rPlayerLinkP.put(player.getUniqueId(), player.getProxy().toLowerCase());
         if (e.getServer().getInfo() instanceof ServerImpl) rPlayerLinkS.put(player.getUniqueId(), (ServerImpl) e.getServer().getInfo());
         if (api.getSubDataNetwork()[0] != null) {
             ((SubDataClient) api.getSubDataNetwork()[0]).sendPacket(new PacketExSyncPlayer(true, player));

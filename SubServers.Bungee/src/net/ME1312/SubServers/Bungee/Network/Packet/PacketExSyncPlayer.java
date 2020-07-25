@@ -20,7 +20,7 @@ import java.util.*;
 public class PacketExSyncPlayer implements PacketObjectIn<Integer>, PacketObjectOut<Integer> {
     private SubProxy plugin;
     private String name;
-    private boolean mode;
+    private Boolean mode;
     private RemotePlayer[] values;
 
     /**
@@ -41,7 +41,6 @@ public class PacketExSyncPlayer implements PacketObjectIn<Integer>, PacketObject
      * @param values RemotePlayers
      */
     public PacketExSyncPlayer(String name, Boolean mode, RemotePlayer... values) {
-        if (Util.isNull(mode)) throw new NullPointerException();
         this.name = name;
         this.mode = mode;
         this.values = values;
@@ -73,7 +72,7 @@ public class PacketExSyncPlayer implements PacketObjectIn<Integer>, PacketObject
                 }
             }
             if (data.getBoolean(0x0001) != Boolean.FALSE) {
-                for (Map<String, Object> object : (List<Map<String, Object>>) data.getObjectList(0x0002)) {
+                if (data.contains(0x0002)) for (Map<String, Object> object : (List<Map<String, Object>>) data.getObjectList(0x0002)) {
                     Server server = (object.getOrDefault("server", null) != null)?plugin.api.getServer(object.get("server").toString()):null;
                     RemotePlayer player = new RemotePlayer(object.get("name").toString(), UUID.fromString(object.get("id").toString()), (Proxy) client.getHandler(), server,
                             new InetSocketAddress(object.get("address").toString().split(":")[0], Integer.parseInt(object.get("address").toString().split(":")[1])));
@@ -84,7 +83,7 @@ public class PacketExSyncPlayer implements PacketObjectIn<Integer>, PacketObject
                     if (server != null) plugin.rPlayerLinkS.put(player.getUniqueId(), server);
                 }
             } else {
-                for (Map<String, Object> object : (List<Map<String, Object>>) data.getObjectList(0x0002)) {
+                if (data.contains(0x0002)) for (Map<String, Object> object : (List<Map<String, Object>>) data.getObjectList(0x0002)) {
                     UUID id = UUID.fromString(object.get("id").toString());
                     RemotePlayer player = plugin.rPlayers.get(id);
 
@@ -95,7 +94,7 @@ public class PacketExSyncPlayer implements PacketObjectIn<Integer>, PacketObject
                 }
             }
             for (Proxy proxy : SubAPI.getInstance().getProxies().values()) if (proxy.getSubData()[0] != null && proxy != client.getHandler()) {
-                ((SubDataClient) proxy.getSubData()[0]).sendPacket(new PacketExSyncPlayer(proxy.getName(), data.getBoolean(0x0001), forward.toArray(new RemotePlayer[0])));
+                ((SubDataClient) proxy.getSubData()[0]).sendPacket(new PacketExSyncPlayer(((Proxy) client.getHandler()).getName(), data.getBoolean(0x0001), forward.toArray(new RemotePlayer[0])));
             }
         }
     }

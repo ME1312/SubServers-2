@@ -9,6 +9,7 @@ import net.ME1312.Galaxi.Library.ExtraDataHandler;
 import net.ME1312.Galaxi.Library.Container.NamedContainer;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubData.Server.ClientHandler;
+import net.ME1312.SubServers.Bungee.Network.Packet.PacketExSyncPlayer;
 import net.ME1312.SubServers.Bungee.SubAPI;
 import net.ME1312.SubServers.Bungee.SubProxy;
 import net.md_5.bungee.api.ProxyServer;
@@ -49,6 +50,7 @@ public class Proxy implements ClientHandler, ExtraDataHandler {
         return channels.toArray(new DataClient[0]);
     }
 
+    @SuppressWarnings("deprecation")
     public void setSubData(SubDataClient client, int channel) {
         boolean update = false;
         if (channel < 0) throw new IllegalArgumentException("Subchannel ID cannot be less than zero");
@@ -65,9 +67,20 @@ public class Proxy implements ClientHandler, ExtraDataHandler {
 
         if (update) {
             DataClient[] subdata = getSubData();
-            if (subdata[0] == null && subdata.length <= 1 && !persistent) {
-                ProxyServer.getInstance().getPluginManager().callEvent(new SubRemoveProxyEvent(this));
-                SubAPI.getInstance().getInternals().proxies.remove(getName().toLowerCase());
+            if (subdata[0] == null && subdata.length <= 1) {
+                SubProxy plugin = SubAPI.getInstance().getInternals();
+                for (UUID id : Util.getBackwards(plugin.rPlayerLinkP, this)) {
+                    plugin.rPlayerLinkS.remove(id);
+                    plugin.rPlayerLinkP.remove(id);
+                    plugin.rPlayers.remove(id);
+                }
+                for (Proxy proxy : SubAPI.getInstance().getProxies().values()) if (proxy.getSubData()[0] != null && proxy != this) {
+                    ((SubDataClient) proxy.getSubData()[0]).sendPacket(new PacketExSyncPlayer(getName(), null, (RemotePlayer[]) null));
+                }
+                if (!persistent) {
+                    ProxyServer.getInstance().getPluginManager().callEvent(new SubRemoveProxyEvent(this));
+                    SubAPI.getInstance().getInternals().proxies.remove(getName().toLowerCase());
+                }
             }
         }
     }

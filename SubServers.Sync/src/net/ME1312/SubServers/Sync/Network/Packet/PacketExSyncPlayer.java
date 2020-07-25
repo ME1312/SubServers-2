@@ -16,7 +16,7 @@ import java.util.*;
  */
 public class PacketExSyncPlayer implements PacketObjectIn<Integer>, PacketObjectOut<Integer> {
     private ExProxy plugin;
-    private boolean mode;
+    private Boolean mode;
     private RemotePlayer[] values;
 
     /**
@@ -36,7 +36,6 @@ public class PacketExSyncPlayer implements PacketObjectIn<Integer>, PacketObject
      * @param values RemotePlayers
      */
     public PacketExSyncPlayer(Boolean mode, RemotePlayer... values) {
-        if (Util.isNull(mode)) throw new NullPointerException();
         this.mode = mode;
         this.values = values;
     }
@@ -65,7 +64,7 @@ public class PacketExSyncPlayer implements PacketObjectIn<Integer>, PacketObject
             }
         }
         if (data.getBoolean(0x0001) != Boolean.FALSE) {
-            for (Map<String, Object> object : (List<Map<String, Object>>) data.getObjectList(0x0002)) {
+            if (data.contains(0x0002)) for (Map<String, Object> object : (List<Map<String, Object>>) data.getObjectList(0x0002)) {
                 ServerImpl server = (object.getOrDefault("server", null) != null)?plugin.servers.getOrDefault(object.get("server").toString().toLowerCase(), null):null;
                 RemotePlayer player = new RemotePlayer(new ObjectMap<>(object));
 
@@ -74,7 +73,7 @@ public class PacketExSyncPlayer implements PacketObjectIn<Integer>, PacketObject
                 if (server != null) plugin.rPlayerLinkS.put(player.getUniqueId(), server);
             }
         } else {
-            for (Map<String, Object> object : (List<Map<String, Object>>) data.getObjectList(0x0002)) {
+            if (data.contains(0x0002)) for (Map<String, Object> object : (List<Map<String, Object>>) data.getObjectList(0x0002)) {
                 UUID id = UUID.fromString(object.get("id").toString());
                 plugin.rPlayerLinkS.remove(id);
                 plugin.rPlayerLinkP.remove(id);
