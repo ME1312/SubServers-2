@@ -20,106 +20,109 @@ import java.net.InetAddress;
 import java.util.HashMap;
 import java.util.logging.Logger;
 
+/**
+ * SubServers Protocol Class
+ */
 public class SubProtocol extends SubDataProtocol {
     private static SubProtocol instance;
-    private SubProtocol() {}
 
     @SuppressWarnings("deprecation")
+    protected SubProtocol() {
+        ExHost host = SubAPI.getInstance().getInternals();
+
+        setName("SubServers 2");
+        addVersion(new Version("2.16a+"));
+
+
+     // 00-0F: Object Link Packets
+        registerPacket(0x0001, PacketLinkExHost.class);
+
+        registerPacket(0x0001, new PacketLinkExHost(host));
+
+
+     // 10-2F: Download Packets
+        registerPacket(0x0010, PacketDownloadLang.class);
+        registerPacket(0x0011, PacketDownloadPlatformInfo.class);
+        registerPacket(0x0012, PacketDownloadProxyInfo.class);
+        registerPacket(0x0013, PacketDownloadHostInfo.class);
+        registerPacket(0x0014, PacketDownloadGroupInfo.class);
+        registerPacket(0x0015, PacketDownloadServerInfo.class);
+        registerPacket(0x0016, PacketDownloadPlayerInfo.class);
+        registerPacket(0x0017, PacketCheckPermission.class);
+        registerPacket(0x0017, PacketCheckPermissionResponse.class);
+
+        registerPacket(0x0010, new PacketDownloadLang(host));
+        registerPacket(0x0011, new PacketDownloadPlatformInfo());
+        registerPacket(0x0012, new PacketDownloadProxyInfo());
+        registerPacket(0x0013, new PacketDownloadHostInfo());
+        registerPacket(0x0014, new PacketDownloadGroupInfo());
+        registerPacket(0x0015, new PacketDownloadServerInfo());
+        registerPacket(0x0016, new PacketDownloadPlayerInfo());
+        registerPacket(0x0017, new PacketCheckPermission());
+        registerPacket(0x0018, new PacketCheckPermissionResponse());
+
+
+     // 30-4F: Control Packets
+        registerPacket(0x0030, PacketCreateServer.class);
+        registerPacket(0x0031, PacketAddServer.class);
+        registerPacket(0x0032, PacketStartServer.class);
+        registerPacket(0x0033, PacketUpdateServer.class);
+        registerPacket(0x0034, PacketEditServer.class);
+        registerPacket(0x0035, PacketRestartServer.class);
+        registerPacket(0x0036, PacketCommandServer.class);
+        registerPacket(0x0037, PacketStopServer.class);
+        registerPacket(0x0038, PacketRemoveServer.class);
+        registerPacket(0x0039, PacketDeleteServer.class);
+
+        registerPacket(0x0030, new PacketCreateServer());
+        registerPacket(0x0031, new PacketAddServer());
+        registerPacket(0x0032, new PacketStartServer());
+        registerPacket(0x0033, new PacketUpdateServer());
+        registerPacket(0x0034, new PacketEditServer());
+        registerPacket(0x0035, new PacketRestartServer());
+        registerPacket(0x0036, new PacketCommandServer());
+        registerPacket(0x0037, new PacketStopServer());
+        registerPacket(0x0038, new PacketRemoveServer());
+        registerPacket(0x0039, new PacketDeleteServer());
+
+
+     // 50-6F: External Host Packets
+        registerPacket(0x0050, PacketExConfigureHost.class);
+        registerPacket(0x0051, PacketExUploadTemplates.class);
+        registerPacket(0x0052, PacketExDownloadTemplates.class);
+        registerPacket(0x0053, PacketOutExRequestQueue.class);
+        registerPacket(0x0054, PacketExCreateServer.class);
+        registerPacket(0x0055, PacketExAddServer.class);
+        registerPacket(0x0056, PacketExEditServer.class);
+        registerPacket(0x0057, PacketOutExLogMessage.class);
+        registerPacket(0x0058, PacketExRemoveServer.class);
+        registerPacket(0x0059, PacketExDeleteServer.class);
+
+        registerPacket(0x0050, new PacketExConfigureHost(host));
+        registerPacket(0x0051, new PacketExUploadTemplates(host));
+        registerPacket(0x0052, new PacketExDownloadTemplates(host));
+      //registerPacket(0x0053, new PacketOutExRequestQueue(host));
+        registerPacket(0x0054, new PacketExCreateServer(host));
+        registerPacket(0x0055, new PacketExAddServer(host));
+        registerPacket(0x0056, new PacketExEditServer(host));
+      //registerPacket(0x0057, new PacketOutExLogMessage());
+        registerPacket(0x0058, new PacketExRemoveServer(host));
+        registerPacket(0x0059, new PacketExDeleteServer(host));
+
+
+     // 70-7F: External Misc Packets
+      //registerPacket(0x0070, PacketInExRunEvent.class);
+      //registerPacket(0x0071, PacketInExReset.class);
+      //registerPacket(0x0072, PacketInExReload.class);
+
+        registerPacket(0x0070, new PacketInExRunEvent());
+        registerPacket(0x0071, new PacketInExReset(host));
+        registerPacket(0x0072, new PacketInExReload(host));
+    }
+
     public static SubProtocol get() {
-        if (instance == null) {
+        if (instance == null)
             instance = new SubProtocol();
-
-            ExHost host = SubAPI.getInstance().getInternals();
-
-            instance.setName("SubServers 2");
-            instance.addVersion(new Version("2.16a+"));
-
-
-         // 00-0F: Object Link Packets
-            instance.registerPacket(0x0001, PacketLinkExHost.class);
-
-            instance.registerPacket(0x0001, new PacketLinkExHost(host));
-
-
-         // 10-2F: Download Packets
-            instance.registerPacket(0x0010, PacketDownloadLang.class);
-            instance.registerPacket(0x0011, PacketDownloadPlatformInfo.class);
-            instance.registerPacket(0x0012, PacketDownloadProxyInfo.class);
-            instance.registerPacket(0x0013, PacketDownloadHostInfo.class);
-            instance.registerPacket(0x0014, PacketDownloadGroupInfo.class);
-            instance.registerPacket(0x0015, PacketDownloadServerInfo.class);
-            instance.registerPacket(0x0016, PacketDownloadPlayerInfo.class);
-            instance.registerPacket(0x0017, PacketCheckPermission.class);
-            instance.registerPacket(0x0017, PacketCheckPermissionResponse.class);
-
-            instance.registerPacket(0x0010, new PacketDownloadLang(host));
-            instance.registerPacket(0x0011, new PacketDownloadPlatformInfo());
-            instance.registerPacket(0x0012, new PacketDownloadProxyInfo());
-            instance.registerPacket(0x0013, new PacketDownloadHostInfo());
-            instance.registerPacket(0x0014, new PacketDownloadGroupInfo());
-            instance.registerPacket(0x0015, new PacketDownloadServerInfo());
-            instance.registerPacket(0x0016, new PacketDownloadPlayerInfo());
-            instance.registerPacket(0x0017, new PacketCheckPermission());
-            instance.registerPacket(0x0018, new PacketCheckPermissionResponse());
-
-
-         // 30-4F: Control Packets
-            instance.registerPacket(0x0030, PacketCreateServer.class);
-            instance.registerPacket(0x0031, PacketAddServer.class);
-            instance.registerPacket(0x0032, PacketStartServer.class);
-            instance.registerPacket(0x0033, PacketUpdateServer.class);
-            instance.registerPacket(0x0034, PacketEditServer.class);
-            instance.registerPacket(0x0035, PacketRestartServer.class);
-            instance.registerPacket(0x0036, PacketCommandServer.class);
-            instance.registerPacket(0x0037, PacketStopServer.class);
-            instance.registerPacket(0x0038, PacketRemoveServer.class);
-            instance.registerPacket(0x0039, PacketDeleteServer.class);
-
-            instance.registerPacket(0x0030, new PacketCreateServer());
-            instance.registerPacket(0x0031, new PacketAddServer());
-            instance.registerPacket(0x0032, new PacketStartServer());
-            instance.registerPacket(0x0033, new PacketUpdateServer());
-            instance.registerPacket(0x0034, new PacketEditServer());
-            instance.registerPacket(0x0035, new PacketRestartServer());
-            instance.registerPacket(0x0036, new PacketCommandServer());
-            instance.registerPacket(0x0037, new PacketStopServer());
-            instance.registerPacket(0x0038, new PacketRemoveServer());
-            instance.registerPacket(0x0039, new PacketDeleteServer());
-
-
-         // 50-6F: External Host Packets
-            instance.registerPacket(0x0050, PacketExConfigureHost.class);
-            instance.registerPacket(0x0051, PacketExUploadTemplates.class);
-            instance.registerPacket(0x0052, PacketExDownloadTemplates.class);
-            instance.registerPacket(0x0053, PacketOutExRequestQueue.class);
-            instance.registerPacket(0x0054, PacketExCreateServer.class);
-            instance.registerPacket(0x0055, PacketExAddServer.class);
-            instance.registerPacket(0x0056, PacketExEditServer.class);
-            instance.registerPacket(0x0057, PacketOutExLogMessage.class);
-            instance.registerPacket(0x0058, PacketExRemoveServer.class);
-            instance.registerPacket(0x0059, PacketExDeleteServer.class);
-
-            instance.registerPacket(0x0050, new PacketExConfigureHost(host));
-            instance.registerPacket(0x0051, new PacketExUploadTemplates(host));
-            instance.registerPacket(0x0052, new PacketExDownloadTemplates(host));
-          //instance.registerPacket(0x0053, new PacketOutExRequestQueue(host));
-            instance.registerPacket(0x0054, new PacketExCreateServer(host));
-            instance.registerPacket(0x0055, new PacketExAddServer(host));
-            instance.registerPacket(0x0056, new PacketExEditServer(host));
-          //instance.registerPacket(0x0057, new PacketOutExLogMessage());
-            instance.registerPacket(0x0058, new PacketExRemoveServer(host));
-            instance.registerPacket(0x0059, new PacketExDeleteServer(host));
-
-
-         // 70-7F: External Misc Packets
-          //instance.registerPacket(0x0070, PacketInExRunEvent.class);
-          //instance.registerPacket(0x0071, PacketInExReset.class);
-          //instance.registerPacket(0x0072, PacketInExReload.class);
-
-            instance.registerPacket(0x0070, new PacketInExRunEvent());
-            instance.registerPacket(0x0071, new PacketInExReset(host));
-            instance.registerPacket(0x0072, new PacketInExReload(host));
-        }
 
         return instance;
     }

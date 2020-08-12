@@ -3,22 +3,26 @@ package net.ME1312.SubServers.Sync.Network.API;
 import net.ME1312.Galaxi.Library.Callback.Callback;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Util;
+import net.ME1312.SubData.Client.DataClient;
 import net.ME1312.SubData.Client.SubDataClient;
 import net.ME1312.SubServers.Sync.Network.Packet.PacketDownloadPlayerInfo;
 import net.ME1312.SubServers.Sync.SubAPI;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 import java.lang.reflect.InvocationTargetException;
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.UUID;
 
+/**
+ * Simplified RemotePlayer Data Class
+ */
 public class RemotePlayer {
     ObjectMap<String> raw;
     private Proxy proxy = null;
     private Server server = null;
+    DataClient client;
     long timestamp;
 
     /**
@@ -53,6 +57,17 @@ public class RemotePlayer {
      * @param raw Raw representation of the Remote Player
      */
     public RemotePlayer(ObjectMap<String> raw) {
+        this(null, raw);
+    }
+
+    /**
+     * Create an API representation of a Remote Player
+     *
+     * @param client SubData connection
+     * @param raw Raw representation of the Remote Player
+     */
+    RemotePlayer(DataClient client, ObjectMap<String> raw) {
+        this.client = client;
         load(raw);
     }
 
@@ -68,12 +83,16 @@ public class RemotePlayer {
         this.timestamp = Calendar.getInstance().getTime().getTime();
     }
 
+    private SubDataClient client() {
+        return SimplifiedData.client(client);
+    }
+
     /**
      * Download a new copy of the data from SubData
      */
     public void refresh() {
         UUID id = getUniqueId();
-        ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketDownloadPlayerInfo(Collections.singletonList(id), data -> load(data.getMap(id.toString()))));
+        client().sendPacket(new PacketDownloadPlayerInfo(Collections.singletonList(id), data -> load(data.getMap(id.toString()))));
     }
 
     /**

@@ -15,6 +15,9 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.UUID;
 
+/**
+ * Simplified SubCreator Data Class
+ */
 public class SubCreator {
     HashMap<String, ServerTemplate> templates = new HashMap<String, ServerTemplate>();
     Host host;

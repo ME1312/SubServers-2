@@ -27,82 +27,86 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
+/**
+ * SubServers Protocol Class
+ */
 public class SubProtocol extends SubDataProtocol {
     private static SubProtocol instance;
-    private SubProtocol() {}
 
     @SuppressWarnings("deprecation")
+    protected SubProtocol() {
+        ExProxy plugin = SubAPI.getInstance().getInternals();
+
+        setName("SubServers 2");
+        addVersion(new Version("2.16a+"));
+
+
+        // 00-0F: Object Link Packets
+        registerPacket(0x0000, PacketLinkProxy.class);
+        registerPacket(0x0000, new PacketLinkProxy(plugin));
+
+
+        // 10-2F: Download Packets
+        registerPacket(0x0010, PacketDownloadLang.class);
+        registerPacket(0x0011, PacketDownloadPlatformInfo.class);
+        registerPacket(0x0012, PacketDownloadProxyInfo.class);
+        registerPacket(0x0013, PacketDownloadHostInfo.class);
+        registerPacket(0x0014, PacketDownloadGroupInfo.class);
+        registerPacket(0x0015, PacketDownloadServerInfo.class);
+        registerPacket(0x0016, PacketDownloadPlayerInfo.class);
+        registerPacket(0x0017, PacketCheckPermission.class);
+        registerPacket(0x0018, PacketCheckPermissionResponse.class);
+
+        registerPacket(0x0010, new PacketDownloadLang(plugin));
+        registerPacket(0x0011, new PacketDownloadPlatformInfo());
+        registerPacket(0x0012, new PacketDownloadProxyInfo());
+        registerPacket(0x0013, new PacketDownloadHostInfo());
+        registerPacket(0x0014, new PacketDownloadGroupInfo());
+        registerPacket(0x0015, new PacketDownloadServerInfo());
+        registerPacket(0x0016, new PacketDownloadPlayerInfo());
+        registerPacket(0x0017, new PacketCheckPermission());
+        registerPacket(0x0018, new PacketCheckPermissionResponse());
+
+
+        // 30-4F: Control Packets
+        registerPacket(0x0030, PacketCreateServer.class);
+        registerPacket(0x0031, PacketAddServer.class);
+        registerPacket(0x0032, PacketStartServer.class);
+        registerPacket(0x0033, PacketUpdateServer.class);
+        registerPacket(0x0034, PacketEditServer.class);
+        registerPacket(0x0035, PacketRestartServer.class);
+        registerPacket(0x0036, PacketCommandServer.class);
+        registerPacket(0x0037, PacketStopServer.class);
+        registerPacket(0x0038, PacketRemoveServer.class);
+        registerPacket(0x0039, PacketDeleteServer.class);
+
+        registerPacket(0x0030, new PacketCreateServer());
+        registerPacket(0x0031, new PacketAddServer());
+        registerPacket(0x0032, new PacketStartServer());
+        registerPacket(0x0033, new PacketUpdateServer());
+        registerPacket(0x0034, new PacketEditServer());
+        registerPacket(0x0035, new PacketRestartServer());
+        registerPacket(0x0036, new PacketCommandServer());
+        registerPacket(0x0037, new PacketStopServer());
+        registerPacket(0x0038, new PacketRemoveServer());
+        registerPacket(0x0039, new PacketDeleteServer());
+
+
+        // 70-7F: External Misc Packets
+      //registerPacket(0x0070, PacketInExRunEvent.class);
+      //registerPacket(0x0071, PacketInExReset.class);
+      //registerPacket(0x0073, PacketInExReload.class);
+        registerPacket(0x0074, PacketExSyncPlayer.class);
+
+        registerPacket(0x0070, new PacketInExRunEvent(plugin));
+        registerPacket(0x0071, new PacketInExReset());
+        registerPacket(0x0073, new PacketInExUpdateWhitelist(plugin));
+        registerPacket(0x0074, new PacketExSyncPlayer(plugin));
+    }
+
     public static SubProtocol get() {
-        if (instance == null) {
+        if (instance == null)
             instance = new SubProtocol();
-            ExProxy plugin = SubAPI.getInstance().getInternals();
-
-            instance.setName("SubServers 2");
-            instance.addVersion(new Version("2.16a+"));
-
-
-            // 00-0F: Object Link Packets
-            instance.registerPacket(0x0000, PacketLinkProxy.class);
-            instance.registerPacket(0x0000, new PacketLinkProxy(plugin));
-
-
-            // 10-2F: Download Packets
-            instance.registerPacket(0x0010, PacketDownloadLang.class);
-            instance.registerPacket(0x0011, PacketDownloadPlatformInfo.class);
-            instance.registerPacket(0x0012, PacketDownloadProxyInfo.class);
-            instance.registerPacket(0x0013, PacketDownloadHostInfo.class);
-            instance.registerPacket(0x0014, PacketDownloadGroupInfo.class);
-            instance.registerPacket(0x0015, PacketDownloadServerInfo.class);
-            instance.registerPacket(0x0016, PacketDownloadPlayerInfo.class);
-            instance.registerPacket(0x0017, PacketCheckPermission.class);
-            instance.registerPacket(0x0018, PacketCheckPermissionResponse.class);
-
-            instance.registerPacket(0x0010, new PacketDownloadLang(plugin));
-            instance.registerPacket(0x0011, new PacketDownloadPlatformInfo());
-            instance.registerPacket(0x0012, new PacketDownloadProxyInfo());
-            instance.registerPacket(0x0013, new PacketDownloadHostInfo());
-            instance.registerPacket(0x0014, new PacketDownloadGroupInfo());
-            instance.registerPacket(0x0015, new PacketDownloadServerInfo());
-            instance.registerPacket(0x0016, new PacketDownloadPlayerInfo());
-            instance.registerPacket(0x0017, new PacketCheckPermission());
-            instance.registerPacket(0x0018, new PacketCheckPermissionResponse());
-
-
-            // 30-4F: Control Packets
-            instance.registerPacket(0x0030, PacketCreateServer.class);
-            instance.registerPacket(0x0031, PacketAddServer.class);
-            instance.registerPacket(0x0032, PacketStartServer.class);
-            instance.registerPacket(0x0033, PacketUpdateServer.class);
-            instance.registerPacket(0x0034, PacketEditServer.class);
-            instance.registerPacket(0x0035, PacketRestartServer.class);
-            instance.registerPacket(0x0036, PacketCommandServer.class);
-            instance.registerPacket(0x0037, PacketStopServer.class);
-            instance.registerPacket(0x0038, PacketRemoveServer.class);
-            instance.registerPacket(0x0039, PacketDeleteServer.class);
-
-            instance.registerPacket(0x0030, new PacketCreateServer());
-            instance.registerPacket(0x0031, new PacketAddServer());
-            instance.registerPacket(0x0032, new PacketStartServer());
-            instance.registerPacket(0x0033, new PacketUpdateServer());
-            instance.registerPacket(0x0034, new PacketEditServer());
-            instance.registerPacket(0x0035, new PacketRestartServer());
-            instance.registerPacket(0x0036, new PacketCommandServer());
-            instance.registerPacket(0x0037, new PacketStopServer());
-            instance.registerPacket(0x0038, new PacketRemoveServer());
-            instance.registerPacket(0x0039, new PacketDeleteServer());
-
-
-            // 70-7F: External Misc Packets
-          //instance.registerPacket(0x0070, PacketInExRunEvent.class);
-          //instance.registerPacket(0x0071, PacketInExReset.class);
-          //instance.registerPacket(0x0073, PacketInExReload.class);
-            instance.registerPacket(0x0074, PacketExSyncPlayer.class);
-
-            instance.registerPacket(0x0070, new PacketInExRunEvent(plugin));
-            instance.registerPacket(0x0071, new PacketInExReset());
-            instance.registerPacket(0x0073, new PacketInExUpdateWhitelist(plugin));
-            instance.registerPacket(0x0074, new PacketExSyncPlayer(plugin));
-        }
 
         return instance;
     }

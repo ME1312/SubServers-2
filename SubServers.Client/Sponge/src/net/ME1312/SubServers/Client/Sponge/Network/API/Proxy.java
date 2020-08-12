@@ -1,10 +1,11 @@
 package net.ME1312.SubServers.Client.Sponge.Network.API;
 
 import net.ME1312.Galaxi.Library.Callback.Callback;
-import net.ME1312.Galaxi.Library.Container.NamedContainer;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Map.ObjectMapValue;
+import net.ME1312.Galaxi.Library.Container.NamedContainer;
 import net.ME1312.Galaxi.Library.Util;
+import net.ME1312.SubData.Client.DataClient;
 import net.ME1312.SubData.Client.DataSender;
 import net.ME1312.SubData.Client.Library.ForwardedDataSender;
 import net.ME1312.SubData.Client.SubDataClient;
@@ -17,9 +18,13 @@ import org.spongepowered.api.service.permission.Subject;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
+/**
+ * Simplified Proxy Data Class
+ */
 public class Proxy {
     ObjectMap<String> raw;
     private List<RemotePlayer> players = null;
+    DataClient client;
     long timestamp;
 
     /**
@@ -28,6 +33,17 @@ public class Proxy {
      * @param raw Raw representation of the Proxy
      */
     public Proxy(ObjectMap<String> raw) {
+        this(null, raw);
+    }
+
+    /**
+     * Create an API representation of a Proxy
+     *
+     * @param client SubData connection
+     * @param raw Raw representation of the Proxy
+     */
+    Proxy(DataClient client, ObjectMap<String> raw) {
+        this.client = client;
         load(raw);
     }
 
@@ -42,12 +58,16 @@ public class Proxy {
         this.timestamp = Calendar.getInstance().getTime().getTime();
     }
 
+    private SubDataClient client() {
+        return SimplifiedData.client(client);
+    }
+
     /**
      * Download a new copy of the data from SubData
      */
     public void refresh() {
         String name = getName();
-        ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketDownloadProxyInfo(Collections.singletonList(name), data -> load(data.getMap(name))));
+        client().sendPacket(new PacketDownloadProxyInfo(Collections.singletonList(name), data -> load(data.getMap(name))));
     }
 
     /**
@@ -149,7 +169,7 @@ public class Proxy {
         if (players == null) {
             LinkedList<UUID> ids = new LinkedList<UUID>();
             for (String id : raw.getMap("players").getKeys()) ids.add(UUID.fromString(id));
-            ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketDownloadPlayerInfo(ids, data -> {
+            client().sendPacket(new PacketDownloadPlayerInfo(ids, data -> {
                 LinkedList<RemotePlayer> players = new LinkedList<RemotePlayer>();
                 for (String player : data.getKeys()) {
                     players.add(new RemotePlayer(data.getMap(player)));

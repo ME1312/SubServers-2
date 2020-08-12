@@ -5,6 +5,7 @@ import net.ME1312.Galaxi.Library.Container.NamedContainer;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Map.ObjectMapValue;
 import net.ME1312.Galaxi.Library.Util;
+import net.ME1312.SubData.Client.DataClient;
 import net.ME1312.SubData.Client.DataSender;
 import net.ME1312.SubData.Client.Library.ForwardedDataSender;
 import net.ME1312.SubData.Client.SubDataClient;
@@ -17,11 +18,15 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.*;
 
+/**
+ * Simplified Host Data Class
+ */
 public class Host {
     HashMap<String, SubServer> servers = new HashMap<String, SubServer>();
     private SubCreator creator;
     private List<RemotePlayer> players = null;
     ObjectMap<String> raw;
+    DataClient client;
     long timestamp;
 
     /**
@@ -30,6 +35,17 @@ public class Host {
      * @param raw Raw representation of the Host
      */
     public Host(ObjectMap<String> raw) {
+        this(null, raw);
+    }
+
+    /**
+     * Create an API representation of a Host
+     *
+     * @param client SubData connection
+     * @param raw Raw representation of the Host
+     */
+    Host(DataClient client, ObjectMap<String> raw) {
+        this.client = client;
         load(raw);
     }
 
@@ -50,12 +66,16 @@ public class Host {
         }
     }
 
+    private SubDataClient client() {
+        return SimplifiedData.client(client);
+    }
+
     /**
      * Download a new copy of the data from SubData
      */
     public void refresh() {
         String name = getName();
-        ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketDownloadHostInfo(Collections.singletonList(name), data -> load(data.getMap(name))));
+        client().sendPacket(new PacketDownloadHostInfo(Collections.singletonList(name), data -> load(data.getMap(name))));
     }
 
     /**
@@ -169,7 +189,7 @@ public class Host {
         if (players == null) {
             LinkedList<UUID> ids = new LinkedList<UUID>();
             for (SubServer server : getSubServers().values()) for (NamedContainer<String, UUID> player : server.getGlobalPlayers()) ids.add(player.get());
-            ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketDownloadPlayerInfo(ids, data -> {
+            client().sendPacket(new PacketDownloadPlayerInfo(ids, data -> {
                 LinkedList<RemotePlayer> players = new LinkedList<RemotePlayer>();
                 for (String player : data.getKeys()) {
                     players.add(new RemotePlayer(data.getMap(player)));
@@ -339,7 +359,7 @@ public class Host {
     public void addSubServer(UUID player, String name, boolean enabled, int port, String motd, boolean log, String directory, String executable, String stopcmd, boolean hidden, boolean restricted, Callback<Integer> response) {
         if (Util.isNull(response)) throw new NullPointerException();
         StackTraceElement[] origin = new Exception().getStackTrace();
-        ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketAddServer(player, name, enabled, getName(), port, motd, log, directory, executable, stopcmd, hidden, restricted, data -> {
+        client().sendPacket(new PacketAddServer(player, name, enabled, getName(), port, motd, log, directory, executable, stopcmd, hidden, restricted, data -> {
             try {
                 response.run(data.getInt(0x0001));
             } catch (Throwable e) {
@@ -476,7 +496,7 @@ public class Host {
     private void removeSubServer(UUID player, String name, boolean force, Callback<Integer> response) {
         if (Util.isNull(response)) throw new NullPointerException();
         StackTraceElement[] origin = new Exception().getStackTrace();
-        ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketRemoveServer(player, name, force, data -> {
+        client().sendPacket(new PacketRemoveServer(player, name, force, data -> {
             try {
                 response.run(data.getInt(0x0001));
             } catch (Throwable e) {
@@ -662,7 +682,7 @@ public class Host {
     private void deleteSubServer(UUID player, String name, boolean recycle, boolean force, Callback<Integer> response) {
         if (Util.isNull(response)) throw new NullPointerException();
         StackTraceElement[] origin = new Exception().getStackTrace();
-        ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketDeleteServer(player, name, recycle, force, data -> {
+        client().sendPacket(new PacketDeleteServer(player, name, recycle, force, data -> {
             try {
                 response.run(data.getInt(0x0001));
             } catch (Throwable e) {

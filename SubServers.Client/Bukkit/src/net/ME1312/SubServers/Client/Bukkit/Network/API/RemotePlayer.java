@@ -3,6 +3,7 @@ package net.ME1312.SubServers.Client.Bukkit.Network.API;
 import net.ME1312.Galaxi.Library.Callback.Callback;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Util;
+import net.ME1312.SubData.Client.DataClient;
 import net.ME1312.SubData.Client.SubDataClient;
 import net.ME1312.SubServers.Client.Bukkit.Network.Packet.PacketDownloadPlayerInfo;
 import net.ME1312.SubServers.Client.Bukkit.SubAPI;
@@ -12,10 +13,14 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.*;
 
+/**
+ * Simplified RemotePlayer Data Class
+ */
 public class RemotePlayer {
     ObjectMap<String> raw;
     private Proxy proxy = null;
     private Server server = null;
+    DataClient client;
     long timestamp;
 
     /**
@@ -24,6 +29,17 @@ public class RemotePlayer {
      * @param raw Raw representation of the Remote Player
      */
     public RemotePlayer(ObjectMap<String> raw) {
+        this(null, raw);
+    }
+
+    /**
+     * Create an API representation of a Remote Player
+     *
+     * @param client SubData connection
+     * @param raw Raw representation of the Remote Player
+     */
+    RemotePlayer(DataClient client, ObjectMap<String> raw) {
+        this.client = client;
         load(raw);
     }
 
@@ -39,12 +55,16 @@ public class RemotePlayer {
         this.timestamp = Calendar.getInstance().getTime().getTime();
     }
 
+    private SubDataClient client() {
+        return SimplifiedData.client(client);
+    }
+
     /**
      * Download a new copy of the data from SubData
      */
     public void refresh() {
         UUID id = getUniqueId();
-        ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketDownloadPlayerInfo(Collections.singletonList(id), data -> load(data.getMap(id.toString()))));
+        client().sendPacket(new PacketDownloadPlayerInfo(Collections.singletonList(id), data -> load(data.getMap(id.toString()))));
     }
 
     /**

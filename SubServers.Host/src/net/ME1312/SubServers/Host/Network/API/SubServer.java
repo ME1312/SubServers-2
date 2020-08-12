@@ -3,7 +3,7 @@ package net.ME1312.SubServers.Host.Network.API;
 import net.ME1312.Galaxi.Library.Callback.Callback;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Util;
-import net.ME1312.SubData.Client.SubDataClient;
+import net.ME1312.SubData.Client.DataClient;
 import net.ME1312.SubServers.Host.Network.Packet.*;
 import net.ME1312.SubServers.Host.SubAPI;
 
@@ -13,6 +13,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Simplified SubServer Data Class
+ */
 public class SubServer extends Server {
     private List<SubServer> incompatibilities = null;
     private List<SubServer> currentIncompatibilities = null;
@@ -35,22 +38,33 @@ public class SubServer extends Server {
     }
 
     /**
-     * Create an API representation of a Server
+     * Create an API representation of a SubServer
      *
-     * @param raw JSON representation of the Server
+     * @param raw JSON representation of the SubServer
      */
     public SubServer(ObjectMap<String> raw) {
-        super(raw);
+        super(null, raw);
     }
 
     /**
-     * Create an API representation of a Server
+     * Create an API representation of a SubServer
+     *
+     * @param client SubData connection
+     * @param raw JSON representation of the SubServer
+     */
+    SubServer(DataClient client, ObjectMap<String> raw) {
+        super(client, raw);
+    }
+
+
+    /**
+     * Create an API representation of a SubServer
      *
      * @param host Host
-     * @param raw JSON representation of the Server
+     * @param raw JSON representation of the SubServer
      */
     SubServer(Host host, ObjectMap<String> raw) {
-        super(raw);
+        super(host.client, raw);
         this.host = host;
     }
 
@@ -76,7 +90,7 @@ public class SubServer extends Server {
     public void start(UUID player, Callback<Integer> response) {
         if (Util.isNull(response)) throw new NullPointerException();
         StackTraceElement[] origin = new Exception().getStackTrace();
-        ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketStartServer(player, getName(), data -> {
+        client().sendPacket(new PacketStartServer(player, getName(), data -> {
             try {
                 response.run(data.getInt(0x0001));
             } catch (Throwable e) {
@@ -121,7 +135,7 @@ public class SubServer extends Server {
     public void stop(UUID player, Callback<Integer> response) {
         if (Util.isNull(response)) throw new NullPointerException();
         StackTraceElement[] origin = new Exception().getStackTrace();
-        ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketStopServer(player, getName(), false, data -> {
+        client().sendPacket(new PacketStopServer(player, getName(), false, data -> {
             try {
                 response.run(data.getInt(0x0001));
             } catch (Throwable e) {
@@ -166,7 +180,7 @@ public class SubServer extends Server {
     public void terminate(UUID player, Callback<Integer> response) {
         if (Util.isNull(response)) throw new NullPointerException();
         StackTraceElement[] origin = new Exception().getStackTrace();
-        ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketStopServer(player, getName(), true, data -> {
+        client().sendPacket(new PacketStopServer(player, getName(), true, data -> {
             try {
                 response.run(data.getInt(0x0001));
             } catch (Throwable e) {
@@ -212,7 +226,7 @@ public class SubServer extends Server {
     public void command(UUID player, String command, Callback<Integer> response) {
         if (Util.isNull(command, response)) throw new NullPointerException();
         StackTraceElement[] origin = new Exception().getStackTrace();
-        ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketCommandServer(player, getName(), command, data -> {
+        client().sendPacket(new PacketCommandServer(player, getName(), command, data -> {
             try {
                 response.run(data.getInt(0x0001));
             } catch (Throwable e) {
@@ -335,7 +349,7 @@ public class SubServer extends Server {
     private void edit(UUID player, ObjectMap<String> edit, boolean perma, Callback<Integer> response) {
         if (Util.isNull(response)) throw new NullPointerException();
         StackTraceElement[] origin = new Exception().getStackTrace();
-        ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketEditServer(player, getName(), edit, perma, data -> {
+        client().sendPacket(new PacketEditServer(player, getName(), edit, perma, data -> {
             try {
                 if (data.getInt(0x0001) != 0) {
                     response.run(data.getInt(0x0001) * -1);
@@ -660,7 +674,7 @@ public class SubServer extends Server {
         if (incompatibilities == null) {
             LinkedList<String> incompatible = new LinkedList<String>();
             for (String subserver : raw.getRawStringList("incompatible-list")) incompatible.add(subserver.toLowerCase());
-            ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketDownloadServerInfo(incompatible, data -> {
+            client().sendPacket(new PacketDownloadServerInfo(incompatible, data -> {
                 LinkedList<SubServer> incompatibilities = new LinkedList<SubServer>();
                 for (String server : data.getKeys()) {
                     if (data.getMap(server).getRawString("type", "Server").equals("SubServer")) incompatibilities.add(new SubServer(data.getMap(server)));
@@ -704,7 +718,7 @@ public class SubServer extends Server {
         if (currentIncompatibilities == null) {
             LinkedList<String> incompatible = new LinkedList<String>();
             for (String subserver : raw.getRawStringList("incompatible")) incompatible.add(subserver.toLowerCase());
-            ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketDownloadServerInfo(incompatible, data -> {
+            client().sendPacket(new PacketDownloadServerInfo(incompatible, data -> {
                 LinkedList<SubServer> incompatibilities = new LinkedList<SubServer>();
                 for (String server : data.getKeys()) {
                     if (data.getMap(server).getRawString("type", "Server").equals("SubServer")) incompatibilities.add(new SubServer(data.getMap(server)));
