@@ -80,7 +80,7 @@ public final class SubProxy extends BungeeCord implements Listener {
     public SubProtocol subprotocol;
     public SubDataServer subdata = null;
     public SubServer sudo = null;
-    public static final Version version = Version.fromString("2.16.1a");
+    public static final Version version = Version.fromString("2.16.2a");
 
     public final Proxy mProxy;
     public boolean canSudo = false;
@@ -802,8 +802,9 @@ public final class SubProxy extends BungeeCord implements Listener {
 
     @EventHandler(priority = Byte.MIN_VALUE)
     public void ping_passthrough(ProxyPingEvent e) {
+        boolean dynamic;
         ServerInfo override;
-        if (SmartFallback.getForcedHost(e.getConnection()) == null && (override = SmartFallback.getDNS(e.getConnection())) != null) {
+        if ((dynamic = SmartFallback.getForcedHost(e.getConnection()) == null) && getReconnectHandler() instanceof SmartFallback && (override = SmartFallback.getDNS(e.getConnection())) != null) {
             if (!(override instanceof SubServer) || ((SubServer) override).isRunning()) {
                 if (!e.getConnection().getListener().isPingPassthrough()) {
                     e.setResponse(new ServerPing(e.getResponse().getVersion(), e.getResponse().getPlayers(), new TextComponent(override.getMotd()), null));
@@ -818,14 +819,15 @@ public final class SubProxy extends BungeeCord implements Listener {
                     while (lock.value) Util.isException(() -> Thread.sleep(4));
                 }
             }
+        } else if (dynamic) {
+            e.getResponse().getPlayers().setOnline(rPlayers.size());
         }
     }
 
     @EventHandler(priority = Byte.MAX_VALUE)
     public void ping(ProxyPingEvent e) {
-        boolean forced;
         ServerInfo override;
-        if ((forced = (override = SmartFallback.getForcedHost(e.getConnection())) != null) || (override = SmartFallback.getDNS(e.getConnection())) != null) {
+        if ((override = SmartFallback.getForcedHost(e.getConnection())) != null || (override = SmartFallback.getDNS(e.getConnection())) != null) {
             if (override instanceof SubServer && !((SubServer) override).isRunning()) {
                 e.setResponse(new ServerPing(e.getResponse().getVersion(), e.getResponse().getPlayers(), new TextComponent(api.getLang("SubServers", "Bungee.Ping.Offline")), null));
             }
@@ -840,6 +842,14 @@ public final class SubProxy extends BungeeCord implements Listener {
             if (offline >= e.getConnection().getListener().getServerPriority().size()) {
                 e.setResponse(new ServerPing(e.getResponse().getVersion(), e.getResponse().getPlayers(), new TextComponent(api.getLang("SubServers", "Bungee.Ping.Offline")), null));
             }
+        }
+    }
+
+    @EventHandler(priority = Byte.MIN_VALUE)
+    public void login(LoginEvent e) {
+        if (rPlayers.containsKey(e.getConnection().getUniqueId())) {
+            e.setCancelled(true);
+            e.setCancelReason(new TextComponent(getTranslation("already_connected_proxy")));
         }
     }
 
@@ -885,7 +895,7 @@ public final class SubProxy extends BungeeCord implements Listener {
 
     @SuppressWarnings("deprecation")
     @EventHandler(priority = Byte.MAX_VALUE)
-    public void setPlayer(ServerConnectedEvent e) {
+    public void connected(ServerConnectedEvent e) {
         RemotePlayer player = new RemotePlayer(e.getPlayer().getName(), e.getPlayer().getUniqueId(), mProxy, (e.getServer().getInfo() instanceof Server)?(Server) e.getServer().getInfo():null, e.getPlayer().getAddress());
         rPlayers.put(player.getUniqueId(), player);
         rPlayerLinkP.put(player.getUniqueId(), player.getProxy());
@@ -894,6 +904,16 @@ public final class SubProxy extends BungeeCord implements Listener {
             ((SubDataClient) proxy.getSubData()[0]).sendPacket(new PacketExSyncPlayer(mProxy.getName(), true, player));
         }
 
+
+        if (fallbackLimbo.keySet().contains(e.getPlayer().getUniqueId())) new Timer("SubServers.Bungee::Fallback_Limbo_Timer(" + e.getPlayer().getUniqueId() + ')').schedule(new TimerTask() {
+            @Override
+            public void run() {
+                if (e.getPlayer().getServer() != null && !((UserConnection) e.getPlayer()).isDimensionChange() && e.getPlayer().getServer().getInfo().getAddress().equals(e.getServer().getInfo().getAddress())) {
+                    fallbackLimbo.remove(e.getPlayer().getUniqueId());
+                    e.getPlayer().sendMessage(api.getLang("SubServers", "Bungee.Feature.Smart-Fallback.Result").replace("$str$", (e.getServer().getInfo() instanceof Server)?((Server) e.getServer().getInfo()).getDisplayName():e.getServer().getInfo().getName()));
+                }
+            }
+        }, 1000);
     }
 
     @SuppressWarnings("deprecation")
@@ -923,19 +943,7 @@ public final class SubProxy extends BungeeCord implements Listener {
             }
         }
     }
-    @SuppressWarnings("deprecation")
-    @EventHandler(priority = Byte.MAX_VALUE)
-    public void fallbackFound(ServerConnectedEvent e) {
-        if (fallbackLimbo.keySet().contains(e.getPlayer().getUniqueId())) new Timer("SubServers.Bungee::Fallback_Limbo_Timer(" + e.getPlayer().getUniqueId() + ')').schedule(new TimerTask() {
-            @Override
-            public void run() {
-               if (e.getPlayer().getServer() != null && !((UserConnection) e.getPlayer()).isDimensionChange() && e.getPlayer().getServer().getInfo().getAddress().equals(e.getServer().getInfo().getAddress())) {
-                   fallbackLimbo.remove(e.getPlayer().getUniqueId());
-                   e.getPlayer().sendMessage(api.getLang("SubServers", "Bungee.Feature.Smart-Fallback.Result").replace("$str$", (e.getServer().getInfo() instanceof Server)?((Server) e.getServer().getInfo()).getDisplayName():e.getServer().getInfo().getName()));
-               }
-            }
-        }, 1000);
-    }
+
     @EventHandler(priority = Byte.MIN_VALUE)
     public void resetPlayer(PlayerDisconnectEvent e) {
         fallbackLimbo.remove(e.getPlayer().getUniqueId());

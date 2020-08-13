@@ -66,7 +66,7 @@ public final class ExProxy extends BungeeCord implements Listener {
     public YAMLConfig config;
     public final SubAPI api = new SubAPI(this);
     public SubProtocol subprotocol;
-    public static final Version version = Version.fromString("2.16.1a");
+    public static final Version version = Version.fromString("2.16.2a");
 
     public final boolean isPatched;
     public final boolean isGalaxi;
@@ -327,8 +327,9 @@ public final class ExProxy extends BungeeCord implements Listener {
 
     @EventHandler(priority = Byte.MIN_VALUE)
     public void ping_passthrough(ProxyPingEvent e) {
+        boolean dynamic;
         ServerInfo override;
-        if (SmartFallback.getForcedHost(e.getConnection()) == null && (override = SmartFallback.getDNS(e.getConnection())) != null) {
+        if ((dynamic = SmartFallback.getForcedHost(e.getConnection()) == null) && getReconnectHandler() instanceof SmartFallback && (override = SmartFallback.getDNS(e.getConnection())) != null) {
             if (!(override instanceof SubServerImpl) || ((SubServerImpl) override).isRunning()) {
                 if (!e.getConnection().getListener().isPingPassthrough()) {
                     e.setResponse(new ServerPing(e.getResponse().getVersion(), e.getResponse().getPlayers(), new TextComponent(override.getMotd()), null));
@@ -343,14 +344,15 @@ public final class ExProxy extends BungeeCord implements Listener {
                     while (lock.value) Util.isException(() -> Thread.sleep(4));
                 }
             }
+        } else if (dynamic) {
+            e.getResponse().getPlayers().setOnline(rPlayers.size());
         }
     }
 
     @EventHandler(priority = Byte.MAX_VALUE)
     public void ping(ProxyPingEvent e) {
-        boolean forced;
         ServerInfo override;
-        if ((forced = (override = SmartFallback.getForcedHost(e.getConnection())) != null) || (override = SmartFallback.getDNS(e.getConnection())) != null) {
+        if ((override = SmartFallback.getForcedHost(e.getConnection())) != null || (override = SmartFallback.getDNS(e.getConnection())) != null) {
             if (override instanceof SubServerImpl && !((SubServerImpl) override).isRunning()) {
                 e.setResponse(new ServerPing(e.getResponse().getVersion(), e.getResponse().getPlayers(), new TextComponent(api.getLang("SubServers", "Bungee.Ping.Offline")), null));
             }
@@ -364,6 +366,14 @@ public final class ExProxy extends BungeeCord implements Listener {
             if (offline >= e.getConnection().getListener().getServerPriority().size()) {
                 e.setResponse(new ServerPing(e.getResponse().getVersion(), e.getResponse().getPlayers(), new TextComponent(api.getLang("SubServers", "Bungee.Ping.Offline")), null));
             }
+        }
+    }
+
+    @EventHandler(priority = Byte.MIN_VALUE)
+    public void login(LoginEvent e) {
+        if (rPlayers.containsKey(e.getConnection().getUniqueId())) {
+            e.setCancelled(true);
+            e.setCancelReason(new TextComponent(getTranslation("already_connected_proxy")));
         }
     }
 
@@ -409,7 +419,7 @@ public final class ExProxy extends BungeeCord implements Listener {
 
     @SuppressWarnings("deprecation")
     @EventHandler(priority = Byte.MAX_VALUE)
-    public void setPlayer(ServerConnectedEvent e) {
+    public void connected(ServerConnectedEvent e) {
         ObjectMap<String> raw = RemotePlayer.translate(e.getPlayer());
         raw.set("server", e.getServer().getInfo().getName());
         RemotePlayer player = new RemotePlayer(raw);
@@ -419,6 +429,17 @@ public final class ExProxy extends BungeeCord implements Listener {
         if (api.getSubDataNetwork()[0] != null) {
             ((SubDataClient) api.getSubDataNetwork()[0]).sendPacket(new PacketExSyncPlayer(true, player));
         }
+
+
+        if (fallbackLimbo.keySet().contains(e.getPlayer().getUniqueId())) new Timer("SubServers.Sync::Fallback_Limbo_Timer(" + e.getPlayer().getUniqueId() + ')').schedule(new TimerTask() {
+            @Override
+            public void run() {
+                if (e.getPlayer().getServer() != null && !((UserConnection) e.getPlayer()).isDimensionChange() && e.getPlayer().getServer().getInfo().getAddress().equals(e.getServer().getInfo().getAddress())) {
+                    fallbackLimbo.remove(e.getPlayer().getUniqueId());
+                    e.getPlayer().sendMessage(api.getLang("SubServers", "Bungee.Feature.Smart-Fallback.Result").replace("$str$", (e.getServer().getInfo() instanceof ServerImpl)?((ServerImpl) e.getServer().getInfo()).getDisplayName():e.getServer().getInfo().getName()));
+                }
+            }
+        }, 1000);
     }
 
     @SuppressWarnings("deprecation")
@@ -448,19 +469,7 @@ public final class ExProxy extends BungeeCord implements Listener {
             }
         }
     }
-    @SuppressWarnings("deprecation")
-    @EventHandler(priority = Byte.MAX_VALUE)
-    public void fallbackFound(ServerConnectedEvent e) {
-        if (fallbackLimbo.keySet().contains(e.getPlayer().getUniqueId())) new Timer("SubServers.Sync::Fallback_Limbo_Timer(" + e.getPlayer().getUniqueId() + ')').schedule(new TimerTask() {
-            @Override
-            public void run() {
-                if (e.getPlayer().getServer() != null && !((UserConnection) e.getPlayer()).isDimensionChange() && e.getPlayer().getServer().getInfo().getAddress().equals(e.getServer().getInfo().getAddress())) {
-                    fallbackLimbo.remove(e.getPlayer().getUniqueId());
-                    e.getPlayer().sendMessage(api.getLang("SubServers", "Bungee.Feature.Smart-Fallback.Result").replace("$str$", (e.getServer().getInfo() instanceof ServerImpl)?((ServerImpl) e.getServer().getInfo()).getDisplayName():e.getServer().getInfo().getName()));
-                }
-            }
-        }, 1000);
-    }
+
     @EventHandler(priority = Byte.MIN_VALUE)
     public void resetPlayer(PlayerDisconnectEvent e) {
         fallbackLimbo.remove(e.getPlayer().getUniqueId());

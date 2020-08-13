@@ -46,7 +46,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * SubServers Client Plugin Class
  */
-@Plugin(id = "subservers-client-sponge", name = "SubServers-Client-Sponge", authors = "ME1312", version = "2.16.1a", url = "https://github.com/ME1312/SubServers-2", description = "Take control of the server manager — from your servers")
+@Plugin(id = "subservers-client-sponge", name = "SubServers-Client-Sponge", authors = "ME1312", version = "2.16.2a", url = "https://github.com/ME1312/SubServers-2", description = "Take control of the server manager — from your servers")
 public final class SubPlugin {
     HashMap<Integer, SubDataClient> subdata = new HashMap<Integer, SubDataClient>();
     NamedContainer<Long, Map<String, Map<String, String>>> lang = null;
