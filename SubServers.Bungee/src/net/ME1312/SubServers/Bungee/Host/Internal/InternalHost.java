@@ -114,11 +114,20 @@ public class InternalHost extends Host {
 
     @Override
     public boolean removeSubServer(UUID player, String name) throws InterruptedException {
+        return removeSubServer(player, name, false);
+    }
+
+    @Override
+    public boolean forceRemoveSubServer(UUID player, String name) throws InterruptedException {
+        return removeSubServer(player, name, true);
+    }
+
+    protected boolean removeSubServer(UUID player, String name, boolean forced) throws InterruptedException {
         if (Util.isNull(name)) throw new NullPointerException();
         SubServer server = servers.get(name.toLowerCase());
         SubRemoveServerEvent event = new SubRemoveServerEvent(player, this, server);
         plugin.getPluginManager().callEvent(event);
-        if (!event.isCancelled()) {
+        if (forced || !event.isCancelled()) {
             if (server.isRunning()) {
                 server.stop();
                 server.waitFor();
@@ -131,73 +140,21 @@ public class InternalHost extends Host {
     }
 
     @Override
-    public boolean forceRemoveSubServer(UUID player, String name) throws InterruptedException {
-        if (Util.isNull(name)) throw new NullPointerException();
-        SubServer server = servers.get(name.toLowerCase());
-        SubRemoveServerEvent event = new SubRemoveServerEvent(player, this, server);
-        plugin.getPluginManager().callEvent(event);
-        if (server.isRunning()) {
-            server.stop();
-            server.waitFor();
-        }
-        if (UPnP.isUPnPAvailable() && UPnP.isMappedTCP(server.getAddress().getPort()))
-            UPnP.closePortTCP(server.getAddress().getPort());
-        servers.remove(name.toLowerCase());
-        return true;
-    }
-
-    @Override
     public boolean recycleSubServer(UUID player, String name) throws InterruptedException {
-        if (Util.isNull(name)) throw new NullPointerException();
-        String server = servers.get(name.toLowerCase()).getName();
-        File from = new File(getPath(), servers.get(server.toLowerCase()).getPath());
-        if (removeSubServer(player, server)) {
-            new Thread(() -> {
-                UniversalFile to = new UniversalFile(plugin.dir, "SubServers:Recently Deleted:" + server.toLowerCase());
-                try {
-                    if (from.exists()) {
-                        Logger.get("SubServers").info("Moving Files...");
-                        if (to.exists()) {
-                            if (to.isDirectory()) Util.deleteDirectory(to);
-                            else to.delete();
-                        }
-                        to.mkdirs();
-                        Util.copyDirectory(from, to);
-                        Util.deleteDirectory(from);
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-
-                Logger.get("SubServers").info("Saving...");
-                YAMLSection info = (plugin.servers.get().getMap("Servers").getKeys().contains(server))?new YAMLSection(plugin.servers.get().getMap("Servers").getMap(server).get()):new YAMLSection();
-                info.set("Name", server);
-                info.set("Timestamp", Calendar.getInstance().getTime().getTime());
-                try {
-                    if (plugin.servers.get().getMap("Servers").getKeys().contains(server)) {
-                        plugin.servers.get().getMap("Servers").remove(server);
-                        plugin.servers.save();
-                    }
-                    if (!to.exists()) to.mkdirs();
-                    FileWriter writer = new FileWriter(new File(to, "info.json"));
-                    writer.write(info.toJSON().toString());
-                    writer.close();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                Logger.get("SubServers").info("Deleted SubServer: " + server);
-            }, "SubServers.Bungee::Internal_Server_Recycler(" + name + ')').start();
-            return true;
-        } else return false;
+        return recycleSubServer(player, name, false, true);
     }
 
     @Override
     public boolean forceRecycleSubServer(UUID player, String name) throws InterruptedException {
+        return recycleSubServer(player, name, true, true);
+    }
+
+    protected boolean recycleSubServer(UUID player, String name, boolean forced, boolean multithreading) throws InterruptedException {
         if (Util.isNull(name)) throw new NullPointerException();
         String server = servers.get(name.toLowerCase()).getName();
         File from = new File(getPath(), servers.get(server.toLowerCase()).getPath());
-        if (forceRemoveSubServer(player, server)) {
-            new Thread(() -> {
+        if (removeSubServer(player, server, forced)) {
+            Runnable method = () -> {
                 UniversalFile to = new UniversalFile(plugin.dir, "SubServers:Recently Deleted:" + server.toLowerCase());
                 try {
                     if (from.exists()) {
@@ -231,49 +188,31 @@ public class InternalHost extends Host {
                     e.printStackTrace();
                 }
                 Logger.get("SubServers").info("Deleted SubServer: " + server);
-            }, "SubServers.Bungee::Internal_Server_Recycler(" + name + ')').start();
+            };
+
+            if (multithreading) {
+                new Thread(method, "SubServers.Bungee::Internal_Server_Recycler(" + name + ')').start();
+            } else method.run();
             return true;
         } else return false;
     }
 
     @Override
     public boolean deleteSubServer(UUID player, String name) throws InterruptedException {
-        if (Util.isNull(name)) throw new NullPointerException();
-        String server = servers.get(name.toLowerCase()).getName();
-        File from = new File(getPath(), servers.get(server.toLowerCase()).getPath());
-        if (removeSubServer(player, server)) {
-            new Thread(() -> {
-                try {
-                    if (from.exists()) {
-                        Logger.get("SubServers").info("Removing Files...");
-                        Util.deleteDirectory(from);
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-
-                Logger.get("SubServers").info("Saving...");
-                try {
-                    if (plugin.servers.get().getMap("Servers").getKeys().contains(server)) {
-                        plugin.servers.get().getMap("Servers").remove(server);
-                        plugin.servers.save();
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                Logger.get("SubServers").info("Deleted SubServer: " + server);
-            }, "SubServers.Bungee::Internal_Server_Deletion(" + name + ')').start();
-            return true;
-        } else return false;
+        return deleteSubServer(player, name, false, true);
     }
 
     @Override
     public boolean forceDeleteSubServer(UUID player, String name) throws InterruptedException {
+        return deleteSubServer(player, name, true, true);
+    }
+
+    protected boolean deleteSubServer(UUID player, String name, boolean forced, boolean multithreading) throws InterruptedException {
         if (Util.isNull(name)) throw new NullPointerException();
         String server = servers.get(name.toLowerCase()).getName();
         File from = new File(getPath(), servers.get(server.toLowerCase()).getPath());
-        if (forceRemoveSubServer(player, server)) {
-            new Thread(() -> {
+        if (removeSubServer(player, server, forced)) {
+            Runnable method = () -> {
                 try {
                     if (from.exists()) {
                         Logger.get("SubServers").info("Removing Files...");
@@ -293,7 +232,11 @@ public class InternalHost extends Host {
                     e.printStackTrace();
                 }
                 Logger.get("SubServers").info("Deleted SubServer: " + server);
-            }, "SubServers.Bungee::Internal_Server_Deletion(" + name + ')').start();
+            };
+
+            if (multithreading) {
+                new Thread(method, "SubServers.Bungee::Internal_Server_Deletion(" + name + ')').start();
+            } else method.run();
             return true;
         } else return false;
     }

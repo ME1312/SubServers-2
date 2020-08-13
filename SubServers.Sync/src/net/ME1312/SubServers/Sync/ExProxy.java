@@ -241,9 +241,9 @@ public final class ExProxy extends BungeeCord implements Listener {
      *
      * @return Software Name
      */
-    @Override
+    @Override // SubServers.Bungee is used here to hide the fact that this isn't the controller instance
     public String getName() {
-        return (isPatched)?"SubServers Platform":super.getName();
+        return (isPatched)?"SubServers.Bungee":super.getName();
     }
 
     /**

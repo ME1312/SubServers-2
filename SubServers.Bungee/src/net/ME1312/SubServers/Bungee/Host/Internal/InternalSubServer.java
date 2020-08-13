@@ -180,9 +180,9 @@ public class InternalSubServer extends SubServerImpl {
         if (stopaction == StopAction.REMOVE_SERVER || stopaction == StopAction.RECYCLE_SERVER || stopaction == StopAction.DELETE_SERVER) {
             try {
                 if (stopaction == StopAction.RECYCLE_SERVER) {
-                    host.recycleSubServer(getName());
+                    host.recycleSubServer(null, getName(), false, false);
                 } else if (stopaction == StopAction.DELETE_SERVER) {
-                    host.deleteSubServer(getName());
+                    host.deleteSubServer(null, getName(), false, false);
                 } else {
                     try {
                         if (host.plugin.servers.get().getMap("Servers").getKeys().contains(getName())) {

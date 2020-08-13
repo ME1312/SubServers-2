@@ -24,18 +24,20 @@ public class Proxy implements ClientHandler, ExtraDataHandler {
     private HashMap<Integer, SubDataClient> subdata = new HashMap<Integer, SubDataClient>();
     private ObjectMap<String> extra = new ObjectMap<String>();
     private final String signature;
-    private boolean persistent = true;
+    private boolean persistent;
     private String nick = null;
     private final String name;
 
-    @SuppressWarnings("deprecation")
     public Proxy(String name) throws IllegalArgumentException {
-        if (name == null) {
-            name = Util.getNew(SubAPI.getInstance().getInternals().proxies.keySet(), () -> UUID.randomUUID().toString());
-            persistent = false;
-        }
+        this(name, name != null);
+    }
+
+    @SuppressWarnings("deprecation")
+    public Proxy(String name, boolean persistent) throws IllegalArgumentException {
+        if (name == null) name = Util.getNew(SubAPI.getInstance().getInternals().proxies.keySet(), () -> UUID.randomUUID().toString());
         if (name.contains(" ")) throw new IllegalArgumentException("Proxy names cannot have spaces: " + name);
         this.name = name;
+        this.persistent = persistent;
         this.signature = SubAPI.getInstance().signAnonymousObject();
 
         subdata.put(0, null);
@@ -57,8 +59,8 @@ public class Proxy implements ClientHandler, ExtraDataHandler {
         if (client != null || channel == 0) {
             if (!subdata.keySet().contains(channel) || (channel == 0 && (client == null || subdata.get(channel) == null))) {
                 update = true;
-                subdata.put(channel, (SubDataClient) client);
-                if (client != null && (client.getHandler() == null || !equals(client.getHandler()))) ((SubDataClient) client).setHandler(this);
+                subdata.put(channel, client);
+                if (client != null && (client.getHandler() == null || !equals(client.getHandler()))) client.setHandler(this);
             }
         } else {
             update = true;

@@ -749,7 +749,7 @@ public final class SubProxy extends BungeeCord implements Listener {
      */
     @Override
     public String getName() {
-        return (isPatched)?"SubServers Platform":super.getName();
+        return (isPatched)?"SubServers.Bungee":super.getName();
     }
 
     /**
