@@ -211,16 +211,9 @@ public class ExternalSubServer extends SubServerImpl {
         } else return false;
     }
 
-    public int edit(UUID player, ObjectMap<String> edit) {
-        return edit(player, edit, false);
-    }
-
-    public int permaEdit(UUID player, ObjectMap<String> edit) {
-        return edit(player, edit, true);
-    }
-
     @SuppressWarnings({"deprecation", "unchecked"})
-    private int edit(UUID player, ObjectMap<String> edit, boolean perma) {
+    @Override
+    protected int edit(UUID player, ObjectMap<String> edit, boolean perma) {
         if (isAvailable()) {
             int c = 0;
             boolean state = isRunning();

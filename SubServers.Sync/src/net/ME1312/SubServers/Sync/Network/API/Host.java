@@ -439,7 +439,7 @@ public class Host {
     }
 
     /**
-     * Forces the Removal of a SubServer (will move to 'Recently Deleted')
+     * Forces the Removal of a SubServer
      *
      * @param player Player Removing
      * @param name SubServer Name
@@ -482,7 +482,7 @@ public class Host {
     }
 
     /**
-     * Forces the Removal of a SubServer (will move to 'Recently Deleted')
+     * Forces the Removal of a SubServer
      *
      * @param player Player Removing
      * @param name SubServer Name
@@ -508,7 +508,7 @@ public class Host {
     }
 
     /**
-     * Delete a SubServer (will move to 'Recently Deleted')
+     * Deletes a SubServer (will move to 'Recently Deleted')
      *
      * @param name SubServer Name
      */
@@ -517,7 +517,7 @@ public class Host {
     }
 
     /**
-     * Delete a SubServer
+     * Deletes a SubServer (will move to 'Recently Deleted')
      *
      * @param player Player Deleting
      * @param name SubServer Name
@@ -528,7 +528,7 @@ public class Host {
     }
 
     /**
-     * Forced the Deletion of a SubServer (will move to 'Recently Deleted')
+     * Forces the Deletion of a SubServer (will move to 'Recently Deleted')
      *
      * @param name SubServer Name
      */
@@ -548,7 +548,7 @@ public class Host {
     }
 
     /**
-     * Delete a SubServer (will move to 'Recently Deleted')
+     * Deletes a SubServer (will move to 'Recently Deleted')
      *
      * @param name SubServer Name
      * @param response Response Code
@@ -558,7 +558,7 @@ public class Host {
     }
 
     /**
-     * Delete a SubServer
+     * Deletes a SubServer (will move to 'Recently Deleted')
      *
      * @param player Player Deleting
      * @param name SubServer Name
@@ -570,7 +570,7 @@ public class Host {
     }
 
     /**
-     * Forced the Deletion of a SubServer (will move to 'Recently Deleted')
+     * Forces the Deletion of a SubServer (will move to 'Recently Deleted')
      *
      * @param name SubServer Name
      * @param response Response Code
@@ -592,7 +592,7 @@ public class Host {
     }
 
     /**
-     * Delete a SubServer
+     * Deletes a SubServer
      *
      * @param name SubServer Name
      * @return Success Status
@@ -602,7 +602,7 @@ public class Host {
     }
 
     /**
-     * Forces the Deletion of a SubServer
+     * Deletes a SubServer
      *
      * @param player Player Deleting
      * @param name SubServer Name
@@ -614,7 +614,7 @@ public class Host {
     }
 
     /**
-     * Forced the Deletion of a SubServer
+     * Forces the Deletion of a SubServer
      *
      * @param name SubServer Name
      * @return Success Status
@@ -636,7 +636,7 @@ public class Host {
     }
 
     /**
-     * Delete a SubServer
+     * Deletes a SubServer
      *
      * @param name SubServer Name
      * @return Success Status
@@ -646,7 +646,7 @@ public class Host {
     }
 
     /**
-     * Forces the Deletion of a SubServer
+     * Deletes a SubServer
      *
      * @param player Player Deleting
      * @param name SubServer Name
@@ -658,7 +658,7 @@ public class Host {
     }
 
     /**
-     * Forced the Deletion of a SubServer
+     * Forces the Deletion of a SubServer
      *
      * @param name SubServer Name
      * @return Success Status

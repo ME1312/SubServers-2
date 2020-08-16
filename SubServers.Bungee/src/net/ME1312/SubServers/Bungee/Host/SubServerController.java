@@ -87,13 +87,8 @@ public abstract class SubServerController {
         }
 
         @Override
-        public int permaEdit(ObjectMap<String> edit) {
-            return SubServerController.this.edit(edit);
-        }
-
-        @Override
-        public int permaEdit(UUID player, ObjectMap<String> edit) {
-            return SubServerController.this.edit(player, edit);
+        public int edit(UUID player, ObjectMap<String> edit, boolean perma) {
+            return SubServerController.this.edit(player, edit, perma);
         }
 
         @Override
@@ -256,19 +251,10 @@ public abstract class SubServerController {
      *
      * @param player Player Editing
      * @param edit Edits
+     * @param perma Saves Changes
      * @return Success Status
      */
-    public int edit(UUID player, ObjectMap<String> edit) {
-        return -1;
-    }
-
-    /**
-     * Edits the Server
-     *
-     * @param edit Edits
-     * @return Success Status
-     */
-    public int edit(ObjectMap<String> edit) {
+    protected int edit(UUID player, ObjectMap<String> edit, boolean perma) {
         return -1;
     }
 

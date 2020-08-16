@@ -182,15 +182,6 @@ public class ExternalHost extends Host implements ClientHandler {
     }
 
     @Override
-    public boolean removeSubServer(UUID player, String name) throws InterruptedException {
-        return removeSubServer(player, name, false);
-    }
-
-    @Override
-    public boolean forceRemoveSubServer(UUID player, String name) throws InterruptedException {
-        return removeSubServer(player, name, true);
-    }
-
     protected boolean removeSubServer(UUID player, String name, boolean forced) throws InterruptedException {
         if (Util.isNull(name)) throw new NullPointerException();
         SubServer server = servers.get(name.toLowerCase());
@@ -212,15 +203,6 @@ public class ExternalHost extends Host implements ClientHandler {
     }
 
     @Override
-    public boolean recycleSubServer(UUID player, String name) throws InterruptedException {
-        return recycleSubServer(player, name, false);
-    }
-
-    @Override
-    public boolean forceRecycleSubServer(UUID player, String name) throws InterruptedException {
-        return recycleSubServer(player, name, true);
-    }
-
     protected boolean recycleSubServer(UUID player, String name, boolean forced) throws InterruptedException {
         if (Util.isNull(name)) throw new NullPointerException();
         SubServer s = servers.get(name.toLowerCase());
@@ -261,15 +243,6 @@ public class ExternalHost extends Host implements ClientHandler {
     }
 
     @Override
-    public boolean deleteSubServer(UUID player, String name) throws InterruptedException {
-        return deleteSubServer(player, name, false);
-    }
-
-    @Override
-    public boolean forceDeleteSubServer(UUID player, String name) throws InterruptedException {
-        return deleteSubServer(player, name, true);
-    }
-
     protected boolean deleteSubServer(UUID player, String name, boolean forced) throws InterruptedException {
         if (Util.isNull(name)) throw new NullPointerException();
         SubServer s = servers.get(name.toLowerCase());

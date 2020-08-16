@@ -75,9 +75,24 @@ public abstract class SubServerImpl extends ServerImpl implements SubServer {
         return command(null, command);
     }
 
-    @Override
-    public int permaEdit(ObjectMap<String> edit) {
-        return permaEdit(null, edit);
+    public int edit(UUID player, ObjectMap<String> edit) {
+        return edit(player, edit, false);
+    }
+
+    public int permaEdit(UUID player, ObjectMap<String> edit) {
+        return edit(player, edit, true);
+    }
+
+    /**
+     * Edits the Server
+     *
+     * @param player Player Editing
+     * @param edit Edits
+     * @param perma Saves Changes
+     * @return Success Status
+     */
+    protected int edit(UUID player, ObjectMap<String> edit, boolean perma) {
+        return -1;
     }
 
     @Override

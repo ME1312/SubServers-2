@@ -113,15 +113,6 @@ public class InternalHost extends Host {
     }
 
     @Override
-    public boolean removeSubServer(UUID player, String name) throws InterruptedException {
-        return removeSubServer(player, name, false);
-    }
-
-    @Override
-    public boolean forceRemoveSubServer(UUID player, String name) throws InterruptedException {
-        return removeSubServer(player, name, true);
-    }
-
     protected boolean removeSubServer(UUID player, String name, boolean forced) throws InterruptedException {
         if (Util.isNull(name)) throw new NullPointerException();
         SubServer server = servers.get(name.toLowerCase());
@@ -140,15 +131,19 @@ public class InternalHost extends Host {
     }
 
     @Override
-    public boolean recycleSubServer(UUID player, String name) throws InterruptedException {
-        return recycleSubServer(player, name, false, true);
+    protected boolean recycleSubServer(UUID player, String name, boolean forced) throws InterruptedException {
+        return recycleSubServer(player, name, forced, true);
     }
 
-    @Override
-    public boolean forceRecycleSubServer(UUID player, String name) throws InterruptedException {
-        return recycleSubServer(player, name, true, true);
-    }
-
+    /**
+     * Deletes a SubServer (will move to 'Recently Deleted')
+     *
+     * @param player Player Deleting
+     * @param name SubServer Name
+     * @param forced Forces the Deletion
+     * @param multithreading Uses Multithreading for I/O
+     * @return Success Status
+     */
     protected boolean recycleSubServer(UUID player, String name, boolean forced, boolean multithreading) throws InterruptedException {
         if (Util.isNull(name)) throw new NullPointerException();
         String server = servers.get(name.toLowerCase()).getName();
@@ -198,15 +193,19 @@ public class InternalHost extends Host {
     }
 
     @Override
-    public boolean deleteSubServer(UUID player, String name) throws InterruptedException {
-        return deleteSubServer(player, name, false, true);
+    protected boolean deleteSubServer(UUID player, String name, boolean forced) throws InterruptedException {
+        return deleteSubServer(player, name, forced, true);
     }
 
-    @Override
-    public boolean forceDeleteSubServer(UUID player, String name) throws InterruptedException {
-        return deleteSubServer(player, name, true, true);
-    }
-
+    /**
+     * Deletes a SubServer
+     *
+     * @param player Player Deleting
+     * @param name SubServer Name
+     * @param forced Forces the Deletion
+     * @param multithreading Uses Multithreading for I/O
+     * @return Success Status
+     */
     protected boolean deleteSubServer(UUID player, String name, boolean forced, boolean multithreading) throws InterruptedException {
         if (Util.isNull(name)) throw new NullPointerException();
         String server = servers.get(name.toLowerCase()).getName();

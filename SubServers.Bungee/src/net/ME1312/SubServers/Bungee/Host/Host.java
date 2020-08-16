@@ -317,7 +317,20 @@ public abstract class Host implements ExtraDataHandler {
      * @throws InterruptedException
      * @return Success Status
      */
-    public abstract boolean removeSubServer(UUID player, String name) throws InterruptedException;
+    public boolean removeSubServer(UUID player, String name) throws InterruptedException {
+        return removeSubServer(player, name, false);
+    }
+
+    /**
+     * Removes a SubServer
+     *
+     * @param player Player Removing
+     * @param name SubServer Name
+     * @param forced Forces the Removal
+     * @throws InterruptedException
+     * @return Success Status
+     */
+    protected abstract boolean removeSubServer(UUID player, String name, boolean forced) throws InterruptedException;
 
     /**
      * Forces the Removal of a SubServer
@@ -330,16 +343,18 @@ public abstract class Host implements ExtraDataHandler {
     }
 
     /**
-     * Forces the Removal of a SubServer (will move to 'Recently Deleted')
+     * Forces the Removal of a SubServer
      *
      * @param player Player Removing
      * @param name SubServer Name
      * @return Success Status
      */
-    public abstract boolean forceRemoveSubServer(UUID player, String name) throws InterruptedException;
+    public boolean forceRemoveSubServer(UUID player, String name) throws InterruptedException {
+        return removeSubServer(player, name, true);
+    }
 
     /**
-     * Delete a SubServer (will move to 'Recently Deleted')
+     * Deletes a SubServer (will move to 'Recently Deleted')
      *
      * @param name SubServer Name
      * @return Success Status
@@ -349,16 +364,28 @@ public abstract class Host implements ExtraDataHandler {
     }
 
     /**
-     * Delete a SubServer
+     * Deletes a SubServer (will move to 'Recently Deleted')
      *
      * @param player Player Deleting
      * @param name SubServer Name
      * @return Success Status
      */
-    public abstract boolean recycleSubServer(UUID player, String name) throws InterruptedException;
+    public boolean recycleSubServer(UUID player, String name) throws InterruptedException {
+        return recycleSubServer(player, name, false);
+    }
 
     /**
-     * Forced the Deletion of a SubServer (will move to 'Recently Deleted')
+     * Deletes a SubServer (will move to 'Recently Deleted')
+     *
+     * @param player Player Deleting
+     * @param name SubServer Name
+     * @param forced Forces the Deletion
+     * @return Success Status
+     */
+    protected abstract boolean recycleSubServer(UUID player, String name, boolean forced) throws InterruptedException;
+
+    /**
+     * Forces the Deletion of a SubServer (will move to 'Recently Deleted')
      *
      * @param name SubServer Name
      * @return Success Status
@@ -374,10 +401,12 @@ public abstract class Host implements ExtraDataHandler {
      * @param name SubServer Name
      * @return Success Status
      */
-    public abstract boolean forceRecycleSubServer(UUID player, String name) throws InterruptedException;
+    public boolean forceRecycleSubServer(UUID player, String name) throws InterruptedException {
+        return recycleSubServer(player, name, true);
+    }
 
     /**
-     * Delete a SubServer
+     * Deletes a SubServer
      *
      * @param name SubServer Name
      * @return Success Status
@@ -387,16 +416,28 @@ public abstract class Host implements ExtraDataHandler {
     }
 
     /**
-     * Delete a SubServer
+     * Deletes a SubServer
      *
      * @param player Player Deleting
      * @param name SubServer Name
      * @return Success Status
      */
-    public abstract boolean deleteSubServer(UUID player, String name) throws InterruptedException;
+    public boolean deleteSubServer(UUID player, String name) throws InterruptedException {
+        return deleteSubServer(player, name, false);
+    }
 
     /**
-     * Forced the Deletion of a SubServer
+     * Deletes a SubServer
+     *
+     * @param player Player Deleting
+     * @param name SubServer Name
+     * @param forced Forces the Deletion
+     * @return Success Status
+     */
+    protected abstract boolean deleteSubServer(UUID player, String name, boolean forced) throws InterruptedException;
+
+    /**
+     * Forces the Deletion of a SubServer
      *
      * @param name SubServer Name
      * @return Success Status
@@ -412,7 +453,9 @@ public abstract class Host implements ExtraDataHandler {
      * @param name SubServer Name
      * @return Success Status
      */
-    public abstract boolean forceDeleteSubServer(UUID player, String name) throws InterruptedException;
+    public boolean forceDeleteSubServer(UUID player, String name) throws InterruptedException {
+        return deleteSubServer(player, name, true);
+    }
 
     /**
      * Resets this Host object
