@@ -75,7 +75,7 @@ public class SubProtocol extends SubDataProtocol {
         registerPacket(0x0039, PacketDeleteServer.class);
       //registerPacket(0x003A, PacketRestoreServer.class); // TODO
       //registerPacket(0x003B, PacketTeleportPlayer.class);
-      //registerPacket(0x003C, PacketTeleportPlayerResponse.class);
+        registerPacket(0x003C, PacketDisconnectPlayer.class);
 
         registerPacket(0x0030, new PacketCreateServer(plugin));
         registerPacket(0x0031, new PacketAddServer(plugin));
@@ -89,7 +89,7 @@ public class SubProtocol extends SubDataProtocol {
         registerPacket(0x0039, new PacketDeleteServer(plugin));
       //registerPacket(0x003A, new PacketRestoreServer(plugin)); // TODO
       //registerPacket(0x003B, new PacketTeleportPlayer(plugin));
-      //registerPacket(0x003C, new PacketTeleportPlayerResponse(plugin));
+        registerPacket(0x003C, new PacketDisconnectPlayer(plugin));
 
 
      // 50-6F: External Host Packets
@@ -124,12 +124,14 @@ public class SubProtocol extends SubDataProtocol {
         registerPacket(0x0072, PacketOutExReload.class);
         registerPacket(0x0073, PacketOutExUpdateWhitelist.class);
         registerPacket(0x0074, PacketExSyncPlayer.class);
+        registerPacket(0x0076, PacketExDisconnectPlayer.class);
 
       //registerPacket(0x0070, new PacketOutRunEvent());
       //registerPacket(0x0071, new PacketOutReset());
       //registerPacket(0x0072, new PacketOutReload());
       //registerPacket(0x0073, new PacketOutExUpdateWhitelist());
         registerPacket(0x0074, new PacketExSyncPlayer(plugin));
+        registerPacket(0x0076, new PacketExDisconnectPlayer());
     }
 
     @SuppressWarnings("deprecation")

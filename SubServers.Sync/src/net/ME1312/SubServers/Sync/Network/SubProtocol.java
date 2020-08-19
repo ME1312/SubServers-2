@@ -5,7 +5,6 @@ import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Container.NamedContainer;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
-import net.ME1312.SubData.Client.Library.DisconnectReason;
 import net.ME1312.SubData.Client.SubDataClient;
 import net.ME1312.SubData.Client.SubDataProtocol;
 import net.ME1312.SubServers.Sync.Event.SubNetworkConnectEvent;
@@ -21,10 +20,8 @@ import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.conf.Configuration;
 
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.net.InetAddress;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 /**
@@ -79,6 +76,7 @@ public class SubProtocol extends SubDataProtocol {
         registerPacket(0x0037, PacketStopServer.class);
         registerPacket(0x0038, PacketRemoveServer.class);
         registerPacket(0x0039, PacketDeleteServer.class);
+        registerPacket(0x003C, PacketDisconnectPlayer.class);
 
         registerPacket(0x0030, new PacketCreateServer());
         registerPacket(0x0031, new PacketAddServer());
@@ -90,6 +88,7 @@ public class SubProtocol extends SubDataProtocol {
         registerPacket(0x0037, new PacketStopServer());
         registerPacket(0x0038, new PacketRemoveServer());
         registerPacket(0x0039, new PacketDeleteServer());
+        registerPacket(0x003C, new PacketDisconnectPlayer());
 
 
         // 70-7F: External Misc Packets
@@ -97,11 +96,13 @@ public class SubProtocol extends SubDataProtocol {
       //registerPacket(0x0071, PacketInExReset.class);
       //registerPacket(0x0073, PacketInExReload.class);
         registerPacket(0x0074, PacketExSyncPlayer.class);
+        registerPacket(0x0076, PacketExDisconnectPlayer.class);
 
         registerPacket(0x0070, new PacketInExRunEvent(plugin));
         registerPacket(0x0071, new PacketInExReset());
         registerPacket(0x0073, new PacketInExUpdateWhitelist(plugin));
         registerPacket(0x0074, new PacketExSyncPlayer(plugin));
+        registerPacket(0x0076, new PacketExDisconnectPlayer(plugin));
     }
 
     public static SubProtocol get() {
@@ -181,8 +182,8 @@ public class SubProtocol extends SubDataProtocol {
 
                 plugin.api.getGlobalPlayers(players -> {
                     for (RemotePlayer player : players.values()) {
-                        plugin.rPlayers.put(player.getUniqueId(), player);
                         plugin.rPlayerLinkP.put(player.getUniqueId(), player.getProxy().toLowerCase());
+                        plugin.rPlayers.put(player.getUniqueId(), player);
 
                         ServerInfo server = plugin.getServerInfo(player.getServer());
                         if (server instanceof ServerImpl)

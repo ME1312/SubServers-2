@@ -23,6 +23,7 @@ import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubData.Client.SubDataClient;
 import net.ME1312.SubServers.Sync.Library.ConfigUpdater;
 import net.ME1312.SubServers.Sync.Network.API.RemotePlayer;
+import net.ME1312.SubServers.Sync.Network.Packet.PacketDisconnectPlayer;
 import net.ME1312.SubServers.Sync.Network.Packet.PacketExSyncPlayer;
 import net.ME1312.SubServers.Sync.Network.SubProtocol;
 import net.ME1312.SubServers.Sync.Server.ServerImpl;
@@ -373,8 +374,13 @@ public final class ExProxy extends BungeeCord implements Listener {
     @EventHandler(priority = Byte.MIN_VALUE)
     public void login(LoginEvent e) {
         if (rPlayers.containsKey(e.getConnection().getUniqueId())) {
-            e.setCancelled(true);
-            e.setCancelReason(new TextComponent(getTranslation("already_connected_proxy")));
+            Logger.get("SubServers").info(e.getConnection().getName() + " connected, but already had a database entry");
+            RemotePlayer player = rPlayers.get(e.getConnection().getUniqueId());
+            if (player.getProxy() != null && player.getProxy().equalsIgnoreCase(api.getName())) {
+                getPlayer(player.getUniqueId()).disconnect(new TextComponent(getTranslation("already_connected_proxy")));
+            } else {
+                ((SubDataClient) api.getSubDataNetwork()[0]).sendPacket(new PacketDisconnectPlayer(player.getUniqueId(), getTranslation("already_connected_proxy")));
+            }
         }
     }
 
@@ -421,14 +427,16 @@ public final class ExProxy extends BungeeCord implements Listener {
     @SuppressWarnings("deprecation")
     @EventHandler(priority = Byte.MAX_VALUE)
     public void connected(ServerConnectedEvent e) {
-        ObjectMap<String> raw = RemotePlayer.translate(e.getPlayer());
-        raw.set("server", e.getServer().getInfo().getName());
-        RemotePlayer player = new RemotePlayer(raw);
-        rPlayers.put(player.getUniqueId(), player);
-        rPlayerLinkP.put(player.getUniqueId(), player.getProxy().toLowerCase());
-        if (e.getServer().getInfo() instanceof ServerImpl) rPlayerLinkS.put(player.getUniqueId(), (ServerImpl) e.getServer().getInfo());
-        if (api.getSubDataNetwork()[0] != null) {
-            ((SubDataClient) api.getSubDataNetwork()[0]).sendPacket(new PacketExSyncPlayer(true, player));
+        synchronized (rPlayers) {
+            ObjectMap<String> raw = RemotePlayer.translate(e.getPlayer());
+            raw.set("server", e.getServer().getInfo().getName());
+            RemotePlayer player = new RemotePlayer(raw);
+            rPlayerLinkP.put(player.getUniqueId(), player.getProxy().toLowerCase());
+            rPlayers.put(player.getUniqueId(), player);
+            if (e.getServer().getInfo() instanceof ServerImpl) rPlayerLinkS.put(player.getUniqueId(), (ServerImpl) e.getServer().getInfo());
+            if (api.getSubDataNetwork()[0] != null) {
+                ((SubDataClient) api.getSubDataNetwork()[0]).sendPacket(new PacketExSyncPlayer(true, player));
+            }
         }
 
 
@@ -476,13 +484,15 @@ public final class ExProxy extends BungeeCord implements Listener {
         fallbackLimbo.remove(e.getPlayer().getUniqueId());
         SubCommand.permitted.remove(e.getPlayer().getUniqueId());
 
-        if (rPlayers.containsKey(e.getPlayer().getUniqueId())) {
-            if (api.getSubDataNetwork()[0] != null) {
-                ((SubDataClient) api.getSubDataNetwork()[0]).sendPacket(new PacketExSyncPlayer(false, rPlayers.get(e.getPlayer().getUniqueId())));
+        synchronized (rPlayers) {
+            if (rPlayers.containsKey(e.getPlayer().getUniqueId()) && (!rPlayerLinkP.containsKey(e.getPlayer().getUniqueId()) || rPlayerLinkP.get(e.getPlayer().getUniqueId()).equalsIgnoreCase(api.getName()))) {
+                if (api.getSubDataNetwork()[0] != null) {
+                    ((SubDataClient) api.getSubDataNetwork()[0]).sendPacket(new PacketExSyncPlayer(false, rPlayers.get(e.getPlayer().getUniqueId())));
+                }
+                rPlayerLinkS.remove(e.getPlayer().getUniqueId());
+                rPlayerLinkP.remove(e.getPlayer().getUniqueId());
+                rPlayers.remove(e.getPlayer().getUniqueId());
             }
-            rPlayerLinkS.remove(e.getPlayer().getUniqueId());
-            rPlayerLinkP.remove(e.getPlayer().getUniqueId());
-            rPlayers.remove(e.getPlayer().getUniqueId());
         }
     }
 

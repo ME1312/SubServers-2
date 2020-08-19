@@ -63,21 +63,27 @@ public class PacketExSyncPlayer implements PacketObjectIn<Integer>, PacketObject
                 plugin.rPlayers.remove(id);
             }
         }
-        if (data.getBoolean(0x0001) != Boolean.FALSE) {
-            if (data.contains(0x0002)) for (Map<String, Object> object : (List<Map<String, Object>>) data.getObjectList(0x0002)) {
-                ServerImpl server = (object.getOrDefault("server", null) != null)?plugin.servers.getOrDefault(object.get("server").toString().toLowerCase(), null):null;
-                RemotePlayer player = new RemotePlayer(new ObjectMap<>(object));
+        synchronized (plugin.rPlayers) {
+            if (data.getBoolean(0x0001) != Boolean.FALSE) {
+                if (data.contains(0x0002)) for (Map<String, Object> object : (List<Map<String, Object>>) data.getObjectList(0x0002)) {
+                    ServerImpl server = (object.getOrDefault("server", null) != null)?plugin.servers.getOrDefault(object.get("server").toString().toLowerCase(), null):null;
+                    RemotePlayer player = new RemotePlayer(new ObjectMap<>(object));
 
-                plugin.rPlayers.put(player.getUniqueId(), player);
-                plugin.rPlayerLinkP.put(player.getUniqueId(), proxy);
-                if (server != null) plugin.rPlayerLinkS.put(player.getUniqueId(), server);
-            }
-        } else {
-            if (data.contains(0x0002)) for (Map<String, Object> object : (List<Map<String, Object>>) data.getObjectList(0x0002)) {
-                UUID id = UUID.fromString(object.get("id").toString());
-                plugin.rPlayerLinkS.remove(id);
-                plugin.rPlayerLinkP.remove(id);
-                plugin.rPlayers.remove(id);
+                    plugin.rPlayerLinkP.put(player.getUniqueId(), proxy);
+                    plugin.rPlayers.put(player.getUniqueId(), player);
+                    if (server != null) plugin.rPlayerLinkS.put(player.getUniqueId(), server);
+                }
+            } else {
+                if (data.contains(0x0002)) for (Map<String, Object> object : (List<Map<String, Object>>) data.getObjectList(0x0002)) {
+                    UUID id = UUID.fromString(object.get("id").toString());
+
+                    // Don't accept removal requests when we're managing players
+                    if ((!plugin.rPlayerLinkP.containsKey(id) || !plugin.rPlayerLinkP.get(id).equalsIgnoreCase(plugin.api.getName()))) {
+                        plugin.rPlayerLinkS.remove(id);
+                        plugin.rPlayerLinkP.remove(id);
+                        plugin.rPlayers.remove(id);
+                    }
+                }
             }
         }
     }
