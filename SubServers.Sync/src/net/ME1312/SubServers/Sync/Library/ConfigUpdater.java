@@ -11,6 +11,9 @@ import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * SubServers Configuration Updater
@@ -42,12 +45,20 @@ public class ConfigUpdater {
             if (was.compareTo(new Version("19w17a")) <= 0) {
 
                 i++;
-            } if (was.compareTo(new Version("20w26a")) <= 0) {
+            } if (was.compareTo(new Version("20w34a")) <= 0) {
                 if (existing.getMap("Settings", new YAMLSection()).contains("Smart-Fallback") && existing.getMap("Settings").isBoolean("Smart-Fallback")) {
                     YAMLSection smart_fallback = new YAMLSection();
                     smart_fallback.set("Enabled", existing.getMap("Settings").getBoolean("Smart-Fallback"));
                     smart_fallback.set("Fallback", existing.getMap("Settings").getBoolean("Smart-Fallback"));
                     updated.getMap("Settings").set("Smart-Fallback", smart_fallback);
+                }
+                if (existing.getMap("Settings", new YAMLSection()).contains("Override-Bungee-Commands") && existing.getMap("Settings").isBoolean("Override-Bungee-Commands")) {
+                    List<String> overrides = new LinkedList<>();
+                    if (!existing.getMap("Settings").getBoolean("Override-Bungee-Commands")) {
+                        overrides.add("/server");
+                        overrides.add("/glist");
+                    }
+                    updated.getMap("Settings").set("Disabled-Overrides", overrides);
                 }
 
                 existing = updated.clone();
@@ -63,7 +74,7 @@ public class ConfigUpdater {
         if (i > 0) {
             YAMLSection settings = new YAMLSection();
             settings.set("Version", ((now.compareTo(was) <= 0)?was:now).toString());
-            settings.set("Override-Bungee-Commands", updated.getMap("Settings", new YAMLSection()).getBoolean("Override-Bungee-Commands", true));
+            settings.set("Disabled-Overrides", updated.getMap("Settings", new YAMLSection()).getRawStringList("Disabled-Overrides", Collections.emptyList()));
 
             YAMLSection smart_fallback = new YAMLSection();
             smart_fallback.set("Enabled", updated.getMap("Settings", new YAMLSection()).getMap("Smart-Fallback", new YAMLSection()).getBoolean("Enabled", true));

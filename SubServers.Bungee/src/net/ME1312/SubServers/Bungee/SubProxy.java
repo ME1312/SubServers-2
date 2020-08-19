@@ -630,10 +630,11 @@ public final class SubProxy extends BungeeCord implements Listener {
     }
 
     private void post() {
-        if (config.get().getMap("Settings").getBoolean("Override-Bungee-Commands", true)) {
+        if (!config.get().getMap("Settings").getRawStringList("Disabled-Overrides", Collections.emptyList()).contains("/server"))
             getPluginManager().registerCommand(null, SubCommand.BungeeServer.newInstance(this, "server").get());
+        if (!config.get().getMap("Settings").getRawStringList("Disabled-Overrides", Collections.emptyList()).contains("/glist"))
             getPluginManager().registerCommand(null, new SubCommand.BungeeList(this, "glist"));
-        }
+
         getPluginManager().registerCommand(null, SubCommand.newInstance(this, "subservers").get());
         getPluginManager().registerCommand(null, SubCommand.newInstance(this, "subserver").get());
         getPluginManager().registerCommand(null, SubCommand.newInstance(this, "sub").get());
