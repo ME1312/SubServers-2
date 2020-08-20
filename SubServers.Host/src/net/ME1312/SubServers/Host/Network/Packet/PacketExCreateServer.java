@@ -89,12 +89,13 @@ public class PacketExCreateServer implements PacketObjectIn<Integer>, PacketObje
                 Version version =    (data.contains(0x0004)?data.getVersion(0x0004):null);
                 Integer port =          data.getInt(0x0005);
                 UUID log =             data.getUUID(0x0006);
-                UUID player =        (data.contains(0x0007)?data.getUUID(0x0007):null);
+                Boolean mode =       (data.contains(0x0007)?data.getBoolean(0x0007):null);
+                UUID player =        (data.contains(0x0008)?data.getUUID(0x0008):null);
 
                 SubCreatorImpl.ServerTemplate templateV = host.templates.get(template.toLowerCase());
                 if (templateV == null) templateV = host.templatesR.get(template.toLowerCase());
 
-                host.creator.create(player, name, templateV, version, port, log, tracker);
+                host.creator.create(player, name, templateV, version, port, mode, log, tracker);
             }
         } catch (Throwable e) {
             host.log.error.println(e);
@@ -103,6 +104,6 @@ public class PacketExCreateServer implements PacketObjectIn<Integer>, PacketObje
 
     @Override
     public int version() {
-        return 0x0001;
+        return 0x0002;
     }
 }

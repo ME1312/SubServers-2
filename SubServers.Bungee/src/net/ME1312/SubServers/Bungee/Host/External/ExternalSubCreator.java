@@ -109,58 +109,7 @@ public class ExternalSubCreator extends SubCreator {
             if (!event.isCancelled()) {
                 logger.start();
                 host.queue(new PacketExCreateServer(player, name, template, version, port, logger.getExternalAddress(), data -> {
-                    try {
-                        if (data.getInt(0x0001) == 0) {
-                            Logger.get(prefix).info("Saving...");
-                            if (host.plugin.exServers.keySet().contains(name.toLowerCase()))
-                                host.plugin.exServers.remove(name.toLowerCase());
-
-                            ObjectMap<String> server = new ObjectMap<String>();
-                            ObjectMap<String> config = new ObjectMap<String>((Map<String, ?>) data.getObject(0x0002));
-
-                            server.set("Enabled", true);
-                            server.set("Display", "");
-                            server.set("Host", host.getName());
-                            server.set("Template", template.getName());
-                            server.set("Group", new ArrayList<String>());
-                            server.set("Port", fport);
-                            server.set("Motd", "Some SubServer");
-                            server.set("Log", true);
-                            server.set("Directory", "./" + name);
-                            server.set("Executable", "java -Xmx1024M -jar " + template.getType().toString() + ".jar");
-                            server.set("Stop-Command", "stop");
-                            server.set("Stop-Action", "NONE");
-                            server.set("Run-On-Launch", false);
-                            server.set("Restricted", false);
-                            server.set("Incompatible", new ArrayList<String>());
-                            server.set("Hidden", false);
-                            server.setAll(config);
-
-                            SubServer subserver = host.addSubServer(player, name, server.getBoolean("Enabled"), fport, ChatColor.translateAlternateColorCodes('&', server.getString("Motd")), server.getBoolean("Log"), server.getRawString("Directory"),
-                                    server.getRawString("Executable"), server.getRawString("Stop-Command"), server.getBoolean("Hidden"), server.getBoolean("Restricted"));
-                            if (server.getString("Display").length() > 0) subserver.setDisplayName(server.getString("Display"));
-                            subserver.setTemplate(server.getRawString("Template"));
-                            for (String group : server.getStringList("Group")) subserver.addGroup(group);
-                            SubServer.StopAction action = Util.getDespiteException(() -> SubServer.StopAction.valueOf(server.getRawString("Stop-Action").toUpperCase().replace('-', '_').replace(' ', '_')), null);
-                            if (action != null) subserver.setStopAction(action);
-                            if (server.contains("Extra")) for (String extra : server.getMap("Extra").getKeys())
-                                subserver.addExtra(extra, server.getMap("Extra").getObject(extra));
-                            host.plugin.servers.get().getMap("Servers").set(name, server);
-                            host.plugin.servers.save();
-                            if (template.getBuildOptions().getBoolean("Run-On-Finish", true))
-                                subserver.start();
-
-                            host.plugin.getPluginManager().callEvent(new SubCreatedEvent(player, host, name, template, version, fport, subserver, false, true));
-                            callback(origin, callback, subserver);
-                        } else {
-                            Logger.get(prefix).info(data.getString(0x0003));
-                            host.plugin.getPluginManager().callEvent(new SubCreatedEvent(player, host, name, template, version, fport, null, false, false));
-                            callback(origin, callback, null);
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        callback(origin, callback, null);
-                    }
+                    finish(player, null, name, template, version, fport, prefix, origin, data, callback);
                     logger.stop();
                     this.thread.remove(name.toLowerCase());
                 }));
@@ -181,9 +130,10 @@ public class ExternalSubCreator extends SubCreator {
     }
 
     @Override
-    public boolean update(UUID player, SubServer server, Version version, Callback<Boolean> callback) {
+    public boolean update(UUID player, SubServer server, ServerTemplate template, Version version, Callback<Boolean> callback) {
         if (Util.isNull(server)) throw new NullPointerException();
-        if (host.isAvailable() && host.isEnabled() && host == server.getHost() && server.isAvailable() && !server.isRunning() && server.getTemplate() != null && server.getTemplate().isEnabled() && server.getTemplate().canUpdate() && (version != null || !server.getTemplate().requiresVersion())) {
+        final ServerTemplate ft = (template == null)?server.getTemplate():template;
+        if (host.isAvailable() && host.isEnabled() && host == server.getHost() && server.isAvailable() && !server.isRunning() && ft != null && ft.isEnabled() && ft.canUpdate() && (version != null || !ft.requiresVersion())) {
             StackTraceElement[] origin = new Exception().getStackTrace();
 
             String name = server.getName();
@@ -196,22 +146,11 @@ public class ExternalSubCreator extends SubCreator {
             host.plugin.getPluginManager().callEvent(event);
             if (!event.isCancelled()) {
                 logger.start();
-                host.queue(new PacketExCreateServer(player, server, version, logger.getExternalAddress(), data -> {
-                    Util.isException(() -> Util.reflect(SubServerImpl.class.getDeclaredField("updating"), server, false));
-                    if (data.getInt(0x0001) == 0) {
-                        Logger.get(prefix).info("Saving...");
-                    } else {
-                        Logger.get(prefix).info(data.getString(0x0003));
-                    }
-
-                    host.plugin.getPluginManager().callEvent(new SubCreatedEvent(player, host, name, server.getTemplate(), version, server.getAddress().getPort(), server, true, data.getInt(0x0001) == 0));
-                    if (callback != null) try {
-                        callback.run(data.getInt(0x0001) == 0);
-                    } catch (Throwable e) {
-                        Throwable ew = new InvocationTargetException(e);
-                        ew.setStackTrace(origin);
-                        ew.printStackTrace();
-                    }
+                host.queue(new PacketExCreateServer(player, server, ft, version, logger.getExternalAddress(), data -> {
+                    finish(player, server, server.getName(), ft, version, server.getAddress().getPort(), prefix, origin, data, s -> {
+                        Util.isException(() -> Util.reflect(SubServerImpl.class.getDeclaredField("updating"), server, false));
+                        if (callback != null) callback.run(s != null);
+                    });
                     logger.stop();
                     this.thread.remove(name.toLowerCase());
                 }));
@@ -221,6 +160,72 @@ public class ExternalSubCreator extends SubCreator {
                 return false;
             }
         } else return false;
+    }
+
+    private void finish(UUID player, SubServer update, String name, ServerTemplate template, Version version, int port, String prefix, StackTraceElement[] origin, ObjectMap<Integer> data, Callback<SubServer> callback) {
+        try {
+            if (data.getInt(0x0001) == 0) {
+                Logger.get(prefix).info("Saving...");
+                SubServer subserver = update;
+                if (update == null || update.getTemplate() != template || template.getBuildOptions().getBoolean("Update-Settings", false)) {
+                    if (host.plugin.exServers.keySet().contains(name.toLowerCase()))
+                        host.plugin.exServers.remove(name.toLowerCase());
+
+                    ObjectMap<String> server = new ObjectMap<String>();
+                    ObjectMap<String> config = new ObjectMap<String>((Map<String, ?>) data.getObject(0x0002));
+
+                    if (update == null) {
+                        server.set("Enabled", true);
+                        server.set("Display", "");
+                        server.set("Host", host.getName());
+                        server.set("Template", template.getName());
+                        server.set("Group", new ArrayList<String>());
+                        server.set("Port", port);
+                        server.set("Motd", "Some SubServer");
+                        server.set("Log", true);
+                        server.set("Directory", "./" + name);
+                        server.set("Executable", "java -Xmx1024M -jar " + template.getType().toString() + ".jar");
+                        server.set("Stop-Command", "stop");
+                        server.set("Stop-Action", "NONE");
+                        server.set("Run-On-Launch", false);
+                        server.set("Restricted", false);
+                        server.set("Incompatible", new ArrayList<String>());
+                        server.set("Hidden", false);
+                    } else {
+                        server.setAll(host.plugin.servers.get().getMap("Servers").getMap(name, new HashMap<>()));
+                        server.set("Template", template.getName());
+                    }
+                    server.setAll(config);
+
+                    if (update != null) Util.isException(() -> update.getHost().forceRemoveSubServer(name));
+                    subserver = host.addSubServer(player, name, server.getBoolean("Enabled"), port, ChatColor.translateAlternateColorCodes('&', server.getString("Motd")), server.getBoolean("Log"),
+                            server.getRawString("Directory"), server.getRawString("Executable"), server.getRawString("Stop-Command"), server.getBoolean("Hidden"), server.getBoolean("Restricted"));
+
+                    if (server.getString("Display").length() > 0) subserver.setDisplayName(server.getString("Display"));
+                    subserver.setTemplate(server.getRawString("Template"));
+                    for (String group : server.getStringList("Group")) subserver.addGroup(group);
+                    SubServer.StopAction action = Util.getDespiteException(() -> SubServer.StopAction.valueOf(server.getRawString("Stop-Action").toUpperCase().replace('-', '_').replace(' ', '_')), null);
+                    if (action != null) subserver.setStopAction(action);
+                    if (server.contains("Extra")) for (String extra : server.getMap("Extra").getKeys())
+                        subserver.addExtra(extra, server.getMap("Extra").getObject(extra));
+                    host.plugin.servers.get().getMap("Servers").set(name, server);
+                    host.plugin.servers.save();
+
+                    if (update == null && template.getBuildOptions().getBoolean("Run-On-Finish", true))
+                        subserver.start();
+                }
+
+                host.plugin.getPluginManager().callEvent(new SubCreatedEvent(player, host, name, template, version, port, subserver, update != null, true));
+                callback(origin, callback, subserver);
+            } else {
+                Logger.get(prefix).info(data.getString(0x0003));
+                host.plugin.getPluginManager().callEvent(new SubCreatedEvent(player, host, name, template, version, port, update, update != null, false));
+                callback(origin, callback, null);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            callback(origin, callback, null);
+        }
     }
 
     @Override

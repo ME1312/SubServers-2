@@ -18,6 +18,7 @@ public class PacketUpdateServer implements PacketObjectIn<Integer>, PacketObject
     private static HashMap<UUID, Callback<ObjectMap<Integer>>[]> callbacks = new HashMap<UUID, Callback<ObjectMap<Integer>>[]>();
     private UUID player;
     private String name;
+    private String template;
     private Version version;
     private boolean waitfor;
     private UUID tracker;
@@ -32,12 +33,13 @@ public class PacketUpdateServer implements PacketObjectIn<Integer>, PacketObject
      *
      * @param player Player Creating
      * @param name Server Name
+     * @param template Server Template
      * @param version Server Version
      * @param callback Callbacks
      */
     @SafeVarargs
-    public PacketUpdateServer(UUID player, String name, Version version, Callback<ObjectMap<Integer>>... callback) {
-        this(player, name, version, false, callback);
+    public PacketUpdateServer(UUID player, String name, String template, Version version, Callback<ObjectMap<Integer>>... callback) {
+        this(player, name, template, version, false, callback);
     }
 
     /**
@@ -45,15 +47,17 @@ public class PacketUpdateServer implements PacketObjectIn<Integer>, PacketObject
      *
      * @param player Player Creating
      * @param name Server Name
+     * @param template Server Template
      * @param version Server Version
      * @param waitfor Wait until completion to send callback
      * @param callback Callbacks
      */
     @SafeVarargs
-    public PacketUpdateServer(UUID player, String name, Version version, boolean waitfor, Callback<ObjectMap<Integer>>... callback) {
+    public PacketUpdateServer(UUID player, String name, String template, Version version, boolean waitfor, Callback<ObjectMap<Integer>>... callback) {
         if (Util.isNull(name, callback)) throw new NullPointerException();
         this.player = player;
         this.name = name;
+        this.template = template;
         this.version = version;
         this.waitfor = waitfor;
         this.tracker = Util.getNew(callbacks.keySet(), UUID::randomUUID);
@@ -65,9 +69,10 @@ public class PacketUpdateServer implements PacketObjectIn<Integer>, PacketObject
         ObjectMap<Integer> data = new ObjectMap<Integer>();
         data.set(0x0000, tracker);
         data.set(0x0001, name);
-        if (version != null) data.set(0x0002, version);
-        if (player != null) data.set(0x0003, player);
-        if (waitfor) data.set(0x0004, true);
+        if (template != null) data.set(0x0002, template);
+        if (version != null) data.set(0x0003, version);
+        if (player != null) data.set(0x0004, player);
+        if (waitfor) data.set(0x0005, true);
         return data;
     }
 
@@ -79,6 +84,6 @@ public class PacketUpdateServer implements PacketObjectIn<Integer>, PacketObject
 
     @Override
     public int version() {
-        return 0x0001;
+        return 0x0002;
     }
 }

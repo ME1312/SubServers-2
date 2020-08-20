@@ -831,13 +831,17 @@ public class SubCommand {
                     if (args.length > 0) {
                         selectServers(sender, args, 0, true, select -> {
                             if (select.subservers.length > 0) {
+                                String template = (select.args.length > 2)?select.args[1].toLowerCase():null;
+                                Version version = (select.args.length > 1)?new Version(select.args[(template == null)?1:2]):null;
+                                boolean ts = template == null;
+
                                 PrimitiveContainer<Integer> success = new PrimitiveContainer<Integer>(0);
                                 AsyncConsolidator merge = new AsyncConsolidator(() -> {
                                     if (success.value > 0) sender.sendMessage("Updating " + success.value + " subserver"+((success.value == 1)?"":"s"));
                                 });
                                 for (SubServer server : select.subservers) {
                                     merge.reserve();
-                                    ((SubDataClient) host.api.getSubDataNetwork()[0]).sendPacket(new PacketUpdateServer(null, server.getName(), (select.args.length > 1)?new Version(select.args[1]):null, data -> {
+                                    ((SubDataClient) host.api.getSubDataNetwork()[0]).sendPacket(new PacketUpdateServer(null, server.getName(), template, version, data -> {
                                         switch (data.getInt(0x0001)) {
                                             case 3:
                                             case 4:
@@ -856,13 +860,16 @@ public class SubCommand {
                                                 sender.sendMessage("Cannot update " + server.getName() + " while it is still running");
                                                 break;
                                             case 9:
-                                                sender.sendMessage("We don't know which template built " + server.getName());
+                                                if (ts) sender.sendMessage("We don't know which template built " + server.getName());
+                                                else    sender.sendMessage("There is no template with that name");
                                                 break;
                                             case 10:
-                                                sender.sendMessage("The template that created " + server.getName() + " is not enabled");
+                                                if (ts) sender.sendMessage("The template that created " + server.getName() + " is not enabled");
+                                                else    sender.sendMessage("That template is not enabled");
                                                 break;
                                             case 11:
-                                                sender.sendMessage("The template that created " + server.getName() + " does not support subserver updating");
+                                                if (ts) sender.sendMessage("The template that created " + server.getName() + " does not support subserver updating");
+                                                else    sender.sendMessage("That template does not support subserver updating");
                                                 break;
                                             case 12:
                                                 sender.sendMessage("The template that created " + server.getName() + " requires a Minecraft version to be specified");
@@ -877,11 +884,11 @@ public class SubCommand {
                             }
                         });
                     } else {
-                        sender.sendMessage("Usage: /" + handle + " <Subservers> [Version]");
+                        sender.sendMessage("Usage: /" + handle + " <Subservers> [[Template] <Version>]");
                     }
                 }
             }
-        }.autocomplete(defaultCompletor).usage("<Subservers>", "[Version]").description("Updates one or more subservers").help(
+        }.autocomplete(defaultCompletor).usage("<Subservers>", "[[Template]", "<Version>]").description("Updates one or more subservers").help(
                 "Updates one or more subservers on the network.",
                 "",
                 "The version argument is template-dependent in this command,",
@@ -897,7 +904,8 @@ public class SubCommand {
                 "",
                 "Examples:",
                 "  /update Server2",
-                "  /update Server2 1.14.4"
+                "  /update Server2 1.14.4",
+                "  /update Server2 Paper 1.14.4"
         ).register("update", "upgrade");
         new Command(host.info) {
             @Override

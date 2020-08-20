@@ -325,7 +325,7 @@ public class DefaultUIHandler implements UIHandler, Listener {
                                 input.put(player.getUniqueId(), m -> {
                                     gui.setDownloading(plugin.api.getLang("SubServers", "Interface.Generic.Downloading.Response"));
                                     ((SubDataClient) plugin.api.getSubDataNetwork()[0]).sendPacket(new PacketUpdateServer(player.getUniqueId(), ((SubServer) gui.lastVisitedObjects[0]).getName(),
-                                            (m.getString("message").length() == 0 || m.getString("message").equals("/"))?null:new Version((m.getString("message").startsWith("/"))?m.getString("message").substring(1):m.getString("message")), data -> {
+                                            null, (m.getString("message").length() == 0 || m.getString("message").equals("/"))?null:new Version((m.getString("message").startsWith("/"))?m.getString("message").substring(1):m.getString("message")), data -> {
                                         gui.reopen();
                                     }));
                                 });

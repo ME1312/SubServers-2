@@ -72,12 +72,12 @@ public class InternalSubCreator extends SubCreator {
             this.callback = callback;
         }
 
-        private CreatorTask(UUID player, SubServer server, Version version, Callback<SubServer> callback) {
+        private CreatorTask(UUID player, SubServer server, ServerTemplate template, Version version, Callback<SubServer> callback) {
             super("SubServers.Bungee::Internal_SubCreator_Process_Handler(" + server.getName() + ')');
             this.player = player;
             this.update = server;
             this.name = server.getName();
-            this.template = server.getTemplate();
+            this.template = template;
             this.version = version;
             this.port = server.getAddress().getPort();
             this.log = new InternalSubLogger(null, this, prefix = name + File.separator + "Updater", InternalSubCreator.this.log, null);
@@ -128,7 +128,7 @@ public class InternalSubCreator extends SubCreator {
 
                 var.putAll(replacements);
                 var.put("java", System.getProperty("java.home") + File.separator + "bin" + File.separator + "java");
-                var.put("mode", (update == null)?"CREATE":"UPDATE");
+                var.put("mode", (update == null)? "CREATE" : ((CreatorTask.this.template.equals(update.getTemplate()))?"UPDATE":"SWITCH"));
                 if (player != null) var.put("player", player.toString().toUpperCase());
                 else var.remove("player");
                 var.put("name", name);
@@ -267,32 +267,39 @@ public class InternalSubCreator extends SubCreator {
                 try {
                     Logger.get(prefix).info("Saving...");
                     SubServer subserver = update;
-                    if (update == null) {
+                    if (update == null || update.getTemplate() != template || template.getBuildOptions().getBoolean("Update-Settings", false)) {
                         if (host.plugin.exServers.keySet().contains(name.toLowerCase()))
                             host.plugin.exServers.remove(name.toLowerCase());
 
                         config = new ObjectMap<String>((Map<String, ?>) replacements.replace(config.get()));
 
-                        server.set("Enabled", true);
-                        server.set("Display", "");
-                        server.set("Host", host.getName());
-                        server.set("Template", template.getName());
-                        server.set("Group", new ArrayList<String>());
-                        server.set("Port", port);
-                        server.set("Motd", "Some SubServer");
-                        server.set("Log", true);
-                        server.set("Directory", "./" + name);
-                        server.set("Executable", "java -Xmx1024M -jar " + template.getType().toString() + ".jar");
-                        server.set("Stop-Command", "stop");
-                        server.set("Stop-Action", "NONE");
-                        server.set("Run-On-Launch", false);
-                        server.set("Restricted", false);
-                        server.set("Incompatible", new ArrayList<String>());
-                        server.set("Hidden", false);
+                        if (update == null) {
+                            server.set("Enabled", true);
+                            server.set("Display", "");
+                            server.set("Host", host.getName());
+                            server.set("Template", template.getName());
+                            server.set("Group", new ArrayList<String>());
+                            server.set("Port", port);
+                            server.set("Motd", "Some SubServer");
+                            server.set("Log", true);
+                            server.set("Directory", "./" + name);
+                            server.set("Executable", "java -Xmx1024M -jar " + template.getType().toString() + ".jar");
+                            server.set("Stop-Command", "stop");
+                            server.set("Stop-Action", "NONE");
+                            server.set("Run-On-Launch", false);
+                            server.set("Restricted", false);
+                            server.set("Incompatible", new ArrayList<String>());
+                            server.set("Hidden", false);
+                        } else {
+                            server.setAll(host.plugin.servers.get().getMap("Servers").getMap(name, new HashMap<>()));
+                            server.set("Template", template.getName());
+                        }
                         server.setAll(config);
 
-                        subserver = host.addSubServer(player, name, server.getBoolean("Enabled"), port, ChatColor.translateAlternateColorCodes('&', server.getString("Motd")), server.getBoolean("Log"), server.getRawString("Directory"),
-                                server.getRawString("Executable"), server.getRawString("Stop-Command"), server.getBoolean("Hidden"), server.getBoolean("Restricted"));
+                        if (update != null) Util.isException(() -> update.getHost().forceRemoveSubServer(name));
+                        subserver = host.addSubServer(player, name, server.getBoolean("Enabled"), port, ChatColor.translateAlternateColorCodes('&', server.getString("Motd")), server.getBoolean("Log"),
+                                server.getRawString("Directory"), server.getRawString("Executable"), server.getRawString("Stop-Command"), server.getBoolean("Hidden"), server.getBoolean("Restricted"));
+
                         if (server.getString("Display").length() > 0) subserver.setDisplayName(server.getString("Display"));
                         subserver.setTemplate(server.getRawString("Template"));
                         for (String group : server.getStringList("Group")) subserver.addGroup(group);
@@ -302,7 +309,8 @@ public class InternalSubCreator extends SubCreator {
                             subserver.addExtra(extra, server.getMap("Extra").getObject(extra));
                         host.plugin.servers.get().getMap("Servers").set(name, server);
                         host.plugin.servers.save();
-                        if (template.getBuildOptions().getBoolean("Run-On-Finish", true))
+
+                        if (update == null && template.getBuildOptions().getBoolean("Run-On-Finish", true))
                             subserver.start();
                     }
 
@@ -406,14 +414,15 @@ public class InternalSubCreator extends SubCreator {
 
     @SuppressWarnings("deprecation")
     @Override
-    public boolean update(UUID player, SubServer server, Version version, Callback<Boolean> callback) {
+    public boolean update(UUID player, SubServer server, ServerTemplate template, Version version, Callback<Boolean> callback) {
         if (Util.isNull(server)) throw new NullPointerException();
-        if (host.isAvailable() && host.isEnabled() && host == server.getHost() && server.isAvailable() && !server.isRunning() && server.getTemplate() != null && server.getTemplate().isEnabled() && server.getTemplate().canUpdate() && (version != null || !server.getTemplate().requiresVersion())) {
+        final ServerTemplate ft = (template == null)?server.getTemplate():template;
+        if (host.isAvailable() && host.isEnabled() && host == server.getHost() && server.isAvailable() && !server.isRunning() && ft != null && ft.isEnabled() && ft.canUpdate() && (version != null || !ft.requiresVersion())) {
             StackTraceElement[] origin = new Exception().getStackTrace();
 
             Util.isException(() -> Util.reflect(SubServerImpl.class.getDeclaredField("updating"), server, true));
 
-            CreatorTask task = new CreatorTask(player, server, version, x -> {
+            CreatorTask task = new CreatorTask(player, server, ft, version, x -> {
                 Util.isException(() -> Util.reflect(SubServerImpl.class.getDeclaredField("updating"), server, false));
                 if (callback != null) try {
                     callback.run(x != null);

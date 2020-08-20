@@ -252,11 +252,50 @@ public abstract class SubCreator {
      *
      * @param player Player Updating
      * @param server Server to Update
+     * @param template Server Template
      * @param version Server Version (may be null)
      * @param callback Callback
      * @return Success Status
      */
-    public abstract boolean update(UUID player, SubServer server, Version version, Callback<Boolean> callback);
+    public abstract boolean update(UUID player, SubServer server, ServerTemplate template, Version version, Callback<Boolean> callback);
+
+    /**
+     * Update a SubServer
+     *
+     * @param player Player Updating
+     * @param server Server to Update
+     * @param template Server Template
+     * @param version Server Version (may be null)
+     * @return Success Status
+     */
+    public boolean update(UUID player, SubServer server, ServerTemplate template, Version version) {
+        return update(player, server, template, version, null);
+    }
+
+    /**
+     * Update a SubServer
+     *
+     * @param server Server to Update
+     * @param template Server Template
+     * @param version Server Version (may be null)
+     * @param callback Callback
+     * @return Success Status
+     */
+    public boolean update(SubServer server, ServerTemplate template, Version version, Callback<Boolean> callback) {
+        return update(null, server, template, version, callback);
+    }
+
+    /**
+     * Update a SubServer
+     *
+     * @param server Server to Update
+     * @param template Server Template
+     * @param version Server Version (may be null)
+     * @return Success Status
+     */
+    public boolean update(SubServer server, ServerTemplate template, Version version) {
+        return update(null, server, template, version);
+    }
 
     /**
      * Update a SubServer
@@ -267,19 +306,7 @@ public abstract class SubCreator {
      * @return Success Status
      */
     public boolean update(UUID player, SubServer server, Version version) {
-        return update(player, server, version, null);
-    }
-
-    /**
-     * Update a SubServer
-     *
-     * @param server Server to Update
-     * @param version Server Version (may be null)
-     * @param callback Callback
-     * @return Success Status
-     */
-    public boolean update(SubServer server, Version version, Callback<Boolean> callback) {
-        return update(null, server, version, callback);
+        return update(player, server, null, version);
     }
 
     /**

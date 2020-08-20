@@ -112,7 +112,7 @@ public final class SubCommand implements CommandExecutor {
                 .child(CommandSpec.builder()
                         .description(Text.of("The SubServers Command - Update"))
                         .executor(new UPDATE())
-                        .arguments(GenericArguments.optional(new ListArgument(Text.of("Subservers"))), GenericArguments.optional(GenericArguments.string(Text.of("Version"))), GenericArguments.optional(GenericArguments.remainingJoinedStrings(Text.of("extra"))))
+                        .arguments(GenericArguments.optional(new ListArgument(Text.of("Subservers"))), GenericArguments.optional(GenericArguments.string(Text.of("Template"))), GenericArguments.optional(GenericArguments.string(Text.of("Version"))), GenericArguments.optional(GenericArguments.remainingJoinedStrings(Text.of("extra"))))
                         .build(), "update", "upgrade")
                 .child(CommandSpec.builder()
                         .description(Text.of("The SubServers Command - Teleport"))
@@ -1017,7 +1017,7 @@ public final class SubCommand implements CommandExecutor {
                                         break;
                                     case 0:
                                     case 1:
-                                        sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Creator")));
+                                        sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Creator").replace("$str$", name.get())));
                                         break;
                                 }
                             }));
@@ -1042,17 +1042,34 @@ public final class SubCommand implements CommandExecutor {
         public CommandResult execute(CommandSource sender, CommandContext args) throws CommandException {
             if (canRun(sender)) {
                 Optional<String[]> s = args.getOne(Text.of("Subservers"));
+                Optional<String> template = args.getOne(Text.of("Template"));
                 Optional<String> version = args.getOne(Text.of("Version"));
+
+                final String ft;
+                final Version fv;
+                if (version.isPresent()) {
+                    ft = template.get();
+                    fv = new Version(version.get());
+                } else if (template.isPresent()) {
+                    ft = null;
+                    fv = new Version(template.get());
+                } else {
+                    ft = null;
+                    fv = null;
+                }
+
                 if (s.isPresent()) {
                     selectServers(sender, s.get(), true, Arrays.asList("subservers.subserver.%.*", "subservers.subserver.%.update"), select -> {
                         if (select.subservers.length > 0) {
+                            boolean ts = ft == null;
+
                             PrimitiveContainer<Integer> success = new PrimitiveContainer<Integer>(0);
                             AsyncConsolidator merge = new AsyncConsolidator(() -> {
                                 if (success.value > 0) sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", "Command.Update").replace("$int$", success.value.toString())));
                             });
                             for (SubServer server : select.subservers) {
                                 merge.reserve();
-                                ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketUpdateServer((sender instanceof Player)?((Player) sender).getUniqueId():null, server.getName(), (version.isPresent() && version.get().length() > 0)?new Version(version.get()):null, data -> {
+                                ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketUpdateServer((sender instanceof Player)?((Player) sender).getUniqueId():null, server.getName(), ft, fv, data -> {
                                     switch (data.getInt(0x0001)) {
                                         case 3:
                                         case 4:
@@ -1071,13 +1088,16 @@ public final class SubCommand implements CommandExecutor {
                                             sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", "Command.Update.Running").replace("$str$", server.getName())));
                                             break;
                                         case 9:
-                                            sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", "Command.Update.Unknown-Template").replace("$str$", server.getName())));
+                                            if (ts) sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", "Command.Update.Unknown-Template").replace("$str$", server.getName())));
+                                            else    sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", "Command.Creator.Unknown-Template")));
                                             break;
                                         case 10:
-                                            sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", "Command.Update.Template-Disabled").replace("$str$", server.getName())));
+                                            if (ts) sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", "Command.Update.Template-Disabled").replace("$str$", server.getName())));
+                                            else    sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", "Command.Creator.Template-Disabled")));
                                             break;
                                         case 11:
-                                            sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", "Command.Update.Template-Invalid").replace("$str$", server.getName())));
+                                            if (ts) sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", "Command.Update.Template-Invalid").replace("$str$", server.getName())));
+                                            else    sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", "Command.Creator.Template-Invalid")));
                                             break;
                                         case 12:
                                             sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", "Command.Update.Version-Required").replace("$str$", server.getName())));
@@ -1093,7 +1113,7 @@ public final class SubCommand implements CommandExecutor {
                     });
                     return CommandResult.builder().successCount(1).build();
                 } else {
-                    sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Generic.Usage").replace("$str$", "/sub update <Subservers> [Version]")));
+                    sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Generic.Usage").replace("$str$", "/sub update <Subservers> [[Template] <Version>]")));
                     return CommandResult.builder().successCount(0).build();
                 }
             } else {
@@ -1451,7 +1471,7 @@ public final class SubCommand implements CommandExecutor {
                 ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Help.SubServer.Terminate").replace("$str$", "/sub kill <Subservers>")),
                 ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Help.SubServer.Command").replace("$str$", "/sub cmd <Subservers> <Command> [Args...]")),
                 ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Help.Host.Create").replace("$str$", "/sub create <Name> <Host> <Template> [Version] [Port]")),
-                ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Help.SubServer.Update").replace("$str$", "/sub update <Subservers> [Version]")),
+                ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Help.SubServer.Update").replace("$str$", "/sub update <Subservers> [[Template] <Version>]")),
         };
     }
 }

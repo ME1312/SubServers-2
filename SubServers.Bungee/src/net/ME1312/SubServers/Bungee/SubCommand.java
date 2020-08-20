@@ -608,6 +608,9 @@ public final class SubCommand extends CommandX {
                     if (args.length > 1) {
                         ServerSelection select = selectServers(sender, args, 1, true);
                         if (select.subservers.length > 0) {
+                            String template = (select.args.length > 3)?select.args[2].toLowerCase():null;
+                            Version version = (select.args.length > 2)?new Version(select.args[(template == null)?2:3]):null;
+
                             int success = 0;
                             for (SubServer server : select.subservers) {
                                 if (!server.isAvailable()) {
@@ -618,22 +621,29 @@ public final class SubCommand extends CommandX {
                                     sender.sendMessage("SubServers > Subserver " + server.getName() + " is not available");
                                 } else if (server.isRunning()) {
                                     sender.sendMessage("SubServers > Cannot update " + server.getName() + " while it is still running");
-                                } else if (server.getTemplate() == null) {
-                                    sender.sendMessage("SubServers > We don't know which template built " + server.getName());
-                                } else if (!server.getTemplate().isEnabled()) {
-                                    sender.sendMessage("SubServers > The template that created " + server.getName() + " is not enabled");
-                                } else if (!server.getTemplate().canUpdate()) {
-                                    sender.sendMessage("SubServers > The template that created " + server.getName() + " does not support subserver updating");
-                                } else if (select.args.length <= 2 && server.getTemplate().requiresVersion()) {
-                                    sender.sendMessage("SubServers > The template that created " + server.getName() + " requires a Minecraft version to be specified");
-                                } else if (server.getHost().getCreator().update(server, (select.args.length > 2)?new Version(select.args[2]):null)) {
-                                    success++;
+                                } else {
+                                    SubCreator.ServerTemplate ft = (template != null)?server.getHost().getCreator().getTemplate(template):server.getTemplate();
+                                    boolean ts = template == null;
+                                    if (ft == null) {
+                                        if (ts) sender.sendMessage("SubServers > We don't know which template built " + server.getName());
+                                        else    sender.sendMessage("SubServers > There is no template with that name");
+                                    } else if (!ft.isEnabled()) {
+                                        if (ts) sender.sendMessage("SubServers > The template that created " + server.getName() + " is not enabled");
+                                        else    sender.sendMessage("SubServers > That template is not enabled");
+                                    } else if (!ft.canUpdate()) {
+                                        if (ts) sender.sendMessage("SubServers > The template that created " + server.getName() + " does not support subserver updating");
+                                        else    sender.sendMessage("SubServers > That template does not support subserver updating");
+                                    } else if (version == null && ft.requiresVersion()) {
+                                        sender.sendMessage("SubServers > The template that created " + server.getName() + " requires a Minecraft version to be specified");
+                                    } else if (server.getHost().getCreator().update(server, ft, version)) {
+                                        success++;
+                                    }
                                 }
                             }
                             if (success > 0) sender.sendMessage("SubServers > Updating " + success + " subserver"+((success == 1)?"":"s"));
                         }
                     } else {
-                        sender.sendMessage("SubServers > Usage: " + label + " " + args[0].toLowerCase() + " <Subservers> [Version]");
+                        sender.sendMessage("SubServers > Usage: " + label + " " + args[0].toLowerCase() + " <Subservers> [[Template] <Version>]");
                     }
                 } else if (args[0].equalsIgnoreCase("remove") || args[0].equalsIgnoreCase("del") || args[0].equalsIgnoreCase("delete")) {
                     if (args.length > 1) {
@@ -826,7 +836,7 @@ public final class SubCommand extends CommandX {
                 "   Command Server: /sub cmd <Subservers> <Command> [Args...]",
                 "   Sudo Server: /sub sudo <Subserver>",
                 "   Create Server: /sub create <Name> <Host> <Template> [Version] [Port]",
-                "   Update Server: /sub update <Subservers> [Version]",
+                "   Update Server: /sub update <Subservers> [[Template] <Version>]",
                 "   Remove Server: /sub delete <Subservers>",
               //"   Restore Server: /sub restore <Subservers>",
                 "",
@@ -1044,7 +1054,9 @@ public final class SubCommand extends CommandX {
                     }
                 } else if (args[0].equals("update") || args[0].equals("upgrade")) {
                     if (select.args.length == 3) {
-                        return new NamedContainer<>(null, Collections.singletonList("[Version]"));
+                        return new NamedContainer<>(null, Arrays.asList("[Template]", "[Version]"));
+                    } else if (select.args.length == 4) {
+                        return new NamedContainer<>(null, Collections.singletonList("<Version>"));
                     }
                 }
                 return new NamedContainer<>(null, Collections.emptyList());

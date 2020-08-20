@@ -643,13 +643,17 @@ public final class SubCommand extends CommandX {
                         if (args.length > 1) {
                             selectServers(sender, args, 1, true, select -> {
                                 if (select.subservers.length > 0) {
+                                    String template = (select.args.length > 3)?select.args[2].toLowerCase():null;
+                                    Version version = (select.args.length > 2)?new Version(select.args[(template == null)?2:3]):null;
+                                    boolean ts = template == null;
+
                                     PrimitiveContainer<Integer> success = new PrimitiveContainer<Integer>(0);
                                     AsyncConsolidator merge = new AsyncConsolidator(() -> {
                                         if (success.value > 0) sender.sendMessage("SubServers > Updating " + success.value + " subserver"+((success.value == 1)?"":"s"));
                                     });
                                     for (SubServer server : select.subservers) {
                                         merge.reserve();
-                                        ((SubDataClient) plugin.api.getSubDataNetwork()[0]).sendPacket(new PacketUpdateServer(null, server.getName(), (select.args.length > 2)?new Version(select.args[2]):null, data -> {
+                                        ((SubDataClient) plugin.api.getSubDataNetwork()[0]).sendPacket(new PacketUpdateServer(null, server.getName(), template, version, data -> {
                                             switch (data.getInt(0x0001)) {
                                                 case 3:
                                                 case 4:
@@ -668,13 +672,16 @@ public final class SubCommand extends CommandX {
                                                     sender.sendMessage("SubServers > Cannot update " + server.getName() + " while it is still running");
                                                     break;
                                                 case 9:
-                                                    sender.sendMessage("SubServers > We don't know which template built " + server.getName());
+                                                    if (ts) sender.sendMessage("SubServers > We don't know which template built " + server.getName());
+                                                    else    sender.sendMessage("SubServers > There is no template with that name");
                                                     break;
                                                 case 10:
-                                                    sender.sendMessage("SubServers > The template that created " + server.getName() + " is not enabled");
+                                                    if (ts) sender.sendMessage("SubServers > The template that created " + server.getName() + " is not enabled");
+                                                    else    sender.sendMessage("SubServers > That template is not enabled");
                                                     break;
                                                 case 11:
-                                                    sender.sendMessage("SubServers > The template that created " + server.getName() + " does not support subserver updating");
+                                                    if (ts) sender.sendMessage("SubServers > The template that created " + server.getName() + " does not support subserver updating");
+                                                    else    sender.sendMessage("SubServers > That template does not support subserver updating");
                                                     break;
                                                 case 12:
                                                     sender.sendMessage("SubServers > The template that created " + server.getName() + " requires a Minecraft version to be specified");
@@ -689,7 +696,7 @@ public final class SubCommand extends CommandX {
                                 }
                             });
                         } else {
-                            sender.sendMessage("Usage: " + label + " " + args[0].toLowerCase() + " <Subservers> [Version]");
+                            sender.sendMessage("Usage: " + label + " " + args[0].toLowerCase() + " <Subservers> [[Template] <Version>]");
                         }
                     } else if (args[0].equalsIgnoreCase("remove") || args[0].equalsIgnoreCase("del") || args[0].equalsIgnoreCase("delete")) {
                         if (args.length > 1) {
@@ -935,7 +942,7 @@ public final class SubCommand extends CommandX {
                 "   Terminate Server: /sub kill <Subservers>",
                 "   Command Server: /sub cmd <Subservers> <Command> [Args...]",
                 "   Create Server: /sub create <Name> <Host> <Template> [Version] [Port]",
-                "   Update Server: /sub update <Subservers> [Version]",
+                "   Update Server: /sub update <Subservers> [[Template] <Version>]",
                 "   Remove Server: /sub delete <Subservers>",
                 "",
                 "   To see BungeeCord Supplied Commands, please visit:",
@@ -1150,7 +1157,9 @@ public final class SubCommand extends CommandX {
                     }
                 } else if (args[0].equals("update") || args[0].equals("upgrade")) {
                     if (select.args.length == 3) {
-                        return new NamedContainer<>(null, Collections.singletonList("[Version]"));
+                        return new NamedContainer<>(null, Arrays.asList("[Template]", "[Version]"));
+                    } else if (select.args.length == 4) {
+                        return new NamedContainer<>(null, Collections.singletonList("<Version>"));
                     }
                 }
                 return new NamedContainer<>(null, Collections.emptyList());

@@ -1,5 +1,6 @@
 package net.ME1312.SubServers.Host.Executable;
 
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import net.ME1312.Galaxi.Engine.GalaxiEngine;
 import net.ME1312.Galaxi.Library.Config.YAMLConfig;
 import net.ME1312.Galaxi.Library.Config.YAMLSection;
@@ -234,13 +235,14 @@ public class SubCreatorImpl {
         private final ServerTemplate template;
         private final Version version;
         private final int port;
+        private final Boolean mode;
         private final UUID address;
         private final UUID tracker;
         private final SubLoggerImpl log;
         private final HashMap<String, String> replacements;
         private Process process;
 
-        private CreatorTask(UUID player, String name, ServerTemplate template, Version version, int port, UUID address, UUID tracker) {
+        private CreatorTask(UUID player, String name, ServerTemplate template, Version version, int port, Boolean mode, UUID address, UUID tracker) {
             super(SubAPI.getInstance().getAppInfo().getName() + "::SubCreator_Process_Handler(" + name + ')');
             this.templates = new HashMap<String, ServerTemplate>();
             this.update = host.servers.getOrDefault(name.toLowerCase(), null);
@@ -249,6 +251,7 @@ public class SubCreatorImpl {
             this.template = template;
             this.version = version;
             this.port = port;
+            this.mode = mode;
             this.log = new SubLoggerImpl(null, this, name + File.separator + ((update == null)?"Creator":"Updater"), address, new Container<Boolean>(true), null);
             this.replacements = new HashMap<String, String>();
             this.address = address;
@@ -306,7 +309,7 @@ public class SubCreatorImpl {
 
                 var.putAll(replacements);
                 var.put("java", System.getProperty("java.home") + File.separator + "bin" + File.separator + "java");
-                var.put("mode", (update == null)?"CREATE":"UPDATE");
+                var.put("mode", (update == null)? "CREATE" : ((mode)?"UPDATE":"SWITCH"));
                 if (player != null) var.put("player", player.toString().toUpperCase());
                 else var.remove("player");
                 var.put("name", name);
@@ -465,9 +468,9 @@ public class SubCreatorImpl {
         this.thread = new TreeMap<>();
     }
 
-    public boolean create(UUID player, String name, ServerTemplate template, Version version, int port, UUID address, UUID tracker) {
+    public boolean create(UUID player, String name, ServerTemplate template, Version version, int port, Boolean mode, UUID address, UUID tracker) {
         if (Util.isNull(name, template, port, address)) throw new NullPointerException();
-        CreatorTask task = new CreatorTask(player, name, template, version, port, address, tracker);
+        CreatorTask task = new CreatorTask(player, name, template, version, port, mode, address, tracker);
         this.thread.put(name.toLowerCase(), task);
         task.start();
         return true;

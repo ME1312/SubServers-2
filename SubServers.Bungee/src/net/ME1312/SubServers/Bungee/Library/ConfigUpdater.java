@@ -317,6 +317,10 @@ public class ConfigUpdater {
 
                 existing = updated.clone();
                 i++;
+            } if (was.compareTo(new Version("20w34c")) <= 0) {
+
+              //existing = updated.clone();
+                i++;
             }// if (was.compareTo(new Version("99w99a")) <= 0) {
             //  // do something
             //  i++
@@ -428,6 +432,7 @@ public class ConfigUpdater {
             def.put("Command.Creator.Host-Disabled", "&cSubServers &4&l\\u00BB&c That host is not enabled");
             def.put("Command.Creator.Unknown-Template", "&cSubServers &4&l\\u00BB&c There is no template with that name");
             def.put("Command.Creator.Template-Disabled", "&cSubServers &4&l\\u00BB&c That template is not enabled");
+            def.put("Command.Creator.Template-Invalid", "&cSubServers &4&l\\u00BB&c That template does not support subserver updating");
             def.put("Command.Creator.Version-Required", "&cSubServers &4&l\\u00BB&c That template requires a Minecraft version to be specified");
             def.put("Command.Creator.Invalid-Port", "&cSubServers &4&l\\u00BB&c Invalid port number");
             def.put("Command.Update", "&aSubServers &2&l\\u00BB&a Updating &2$int$&a subserver(s)");

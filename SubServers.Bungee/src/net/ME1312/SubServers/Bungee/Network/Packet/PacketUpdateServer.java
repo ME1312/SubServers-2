@@ -6,6 +6,7 @@ import net.ME1312.SubData.Server.Protocol.PacketObjectIn;
 import net.ME1312.SubData.Server.Protocol.PacketObjectOut;
 import net.ME1312.SubData.Server.SubDataClient;
 import net.ME1312.SubServers.Bungee.Host.Server;
+import net.ME1312.SubServers.Bungee.Host.SubCreator;
 import net.ME1312.SubServers.Bungee.Host.SubServer;
 import net.ME1312.SubServers.Bungee.SubProxy;
 
@@ -53,9 +54,10 @@ public class PacketUpdateServer implements PacketObjectIn<Integer>, PacketObject
         UUID tracker =        (data.contains(0x0000)?data.getUUID(0x0000):null);
         try {
             String name =  data.getRawString(0x0001);
-            Version version = (data.contains(0x0002)?data.getVersion(0x0002):null);
-            UUID player =     (data.contains(0x0003)?data.getUUID(0x0003):null);
-            boolean waitfor = (data.contains(0x0004)?data.getBoolean(0x0004):false);
+            String template = (data.contains(0x0002)?data.getRawString(0x0002):null);
+            Version version = (data.contains(0x0003)?data.getVersion(0x0003):null);
+            UUID player =     (data.contains(0x0004)?data.getUUID(0x0004):null);
+            boolean waitfor = (data.contains(0x0005)?data.getBoolean(0x0005):false);
 
             Map<String, Server> servers = plugin.api.getServers();
             if (!servers.keySet().contains(name.toLowerCase())) {
@@ -70,25 +72,28 @@ public class PacketUpdateServer implements PacketObjectIn<Integer>, PacketObject
                 client.sendPacket(new PacketUpdateServer(7, tracker));
             } else if (((SubServer) servers.get(name.toLowerCase())).isRunning()) {
                 client.sendPacket(new PacketUpdateServer(8, tracker));
-            } else if (((SubServer) servers.get(name.toLowerCase())).getTemplate() == null) {
-                client.sendPacket(new PacketUpdateServer(9, tracker));
-            } else if (!((SubServer) servers.get(name.toLowerCase())).getTemplate().isEnabled()) {
-                client.sendPacket(new PacketUpdateServer(10, tracker));
-            } else if (!((SubServer) servers.get(name.toLowerCase())).getTemplate().canUpdate()) {
-                client.sendPacket(new PacketUpdateServer(11, tracker));
-            } else if (version == null && ((SubServer) servers.get(name.toLowerCase())).getTemplate().requiresVersion()) {
-                client.sendPacket(new PacketUpdateServer(12, tracker));
             } else {
-                if (((SubServer) servers.get(name.toLowerCase())).getHost().getCreator().update(player, (SubServer) servers.get(name.toLowerCase()), version, success -> {
-                    if (waitfor) client.sendPacket(new PacketUpdateServer((!success)?13:0, tracker));
-                })) {
-                    if (!waitfor) {
-                        client.sendPacket(new PacketUpdateServer(0, tracker));
-                    }
+                SubCreator.ServerTemplate ft = (template != null)?((SubServer) servers.get(name.toLowerCase())).getHost().getCreator().getTemplate(template):((SubServer) servers.get(name.toLowerCase())).getTemplate();
+                if (ft == null) {
+                    client.sendPacket(new PacketUpdateServer(9, tracker));
+                } else if (!ft.isEnabled()) {
+                    client.sendPacket(new PacketUpdateServer(10, tracker));
+                } else if (!ft.canUpdate()) {
+                    client.sendPacket(new PacketUpdateServer(11, tracker));
+                } else if (version == null && ft.requiresVersion()) {
+                    client.sendPacket(new PacketUpdateServer(12, tracker));
                 } else {
-                    client.sendPacket(new PacketUpdateServer(1, tracker));
-                }
+                    if (((SubServer) servers.get(name.toLowerCase())).getHost().getCreator().update(player, (SubServer) servers.get(name.toLowerCase()), ft, version, success -> {
+                        if (waitfor) client.sendPacket(new PacketUpdateServer((!success)?13:0, tracker));
+                    })) {
+                        if (!waitfor) {
+                            client.sendPacket(new PacketUpdateServer(0, tracker));
+                        }
+                    } else {
+                        client.sendPacket(new PacketUpdateServer(1, tracker));
+                    }
 
+                }
             }
         } catch (Throwable e) {
             client.sendPacket(new PacketUpdateServer(2, tracker));
@@ -98,6 +103,6 @@ public class PacketUpdateServer implements PacketObjectIn<Integer>, PacketObject
 
     @Override
     public int version() {
-        return 0x0001;
+        return 0x0002;
     }
 }

@@ -23,7 +23,7 @@ public class PacketExCreateServer implements PacketObjectIn<Integer>, PacketObje
     private SubCreator.ServerTemplate template;
     private Version version;
     private int port;
-    private String dir;
+    private Boolean mode;
     private UUID log;
     private UUID tracker = null;
 
@@ -39,19 +39,20 @@ public class PacketExCreateServer implements PacketObjectIn<Integer>, PacketObje
      *
      * @param player Player
      * @param server Server to Update
+     * @param template Server Template
      * @param version Server Version
      * @param log Log Address
      * @param callback Callbacks
      */
     @SafeVarargs
-    public PacketExCreateServer(UUID player, SubServer server, Version version, UUID log, Callback<ObjectMap<Integer>>... callback) {
-        if (Util.isNull(server, log, callback)) throw new NullPointerException();
+    public PacketExCreateServer(UUID player, SubServer server, SubCreator.ServerTemplate template, Version version, UUID log, Callback<ObjectMap<Integer>>... callback) {
+        if (Util.isNull(server, template, log, callback)) throw new NullPointerException();
         this.player = player;
         this.name = server.getName();
-        this.template = server.getTemplate();
+        this.template = template;
         this.version = version;
         this.port = server.getAddress().getPort();
-        this.dir = server.getPath();
+        this.mode = template == server.getTemplate();
         this.log = log;
         this.tracker = Util.getNew(callbacks.keySet(), UUID::randomUUID);
         callbacks.put(tracker, callback);
@@ -76,6 +77,7 @@ public class PacketExCreateServer implements PacketObjectIn<Integer>, PacketObje
         this.template = template;
         this.version = version;
         this.port = port;
+        this.mode = null;
         this.log = log;
         this.tracker = Util.getNew(callbacks.keySet(), UUID::randomUUID);
         callbacks.put(tracker, callback);
@@ -93,8 +95,10 @@ public class PacketExCreateServer implements PacketObjectIn<Integer>, PacketObje
             data.set(0x0004, version);
             data.set(0x0005, port);
             data.set(0x0006, log);
+            if (mode != null)
+                data.set(0x0007, mode);
             if (player != null)
-                data.set(0x0007, player);
+                data.set(0x0008, player);
         }
         return data;
     }
@@ -107,6 +111,6 @@ public class PacketExCreateServer implements PacketObjectIn<Integer>, PacketObje
 
     @Override
     public int version() {
-        return 0x0001;
+        return 0x0002;
     }
 }

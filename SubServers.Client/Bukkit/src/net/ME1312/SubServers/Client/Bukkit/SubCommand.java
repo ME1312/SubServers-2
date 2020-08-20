@@ -666,13 +666,17 @@ public final class SubCommand extends BukkitCommand {
                         if (args.length > 1) {
                             selectServers(sender, args, 1, true, Arrays.asList("subservers.subserver.%.*", "subservers.subserver.%.update"), select -> {
                                 if (select.subservers.length > 0) {
+                                    String template = (select.args.length > 3)?select.args[2].toLowerCase():null;
+                                    Version version = (select.args.length > 2)?new Version(select.args[(template == null)?2:3]):null;
+                                    boolean ts = template == null;
+
                                     PrimitiveContainer<Integer> success = new PrimitiveContainer<Integer>(0);
                                     AsyncConsolidator merge = new AsyncConsolidator(() -> {
                                         if (success.value > 0) sender.sendMessage(plugin.api.getLang("SubServers", "Command.Update").replace("$int$", success.value.toString()));
                                     });
                                     for (SubServer server : select.subservers) {
                                         merge.reserve();
-                                        ((SubDataClient) plugin.api.getSubDataNetwork()[0]).sendPacket(new PacketUpdateServer((sender instanceof Player)?((Player) sender).getUniqueId():null, server.getName(), (select.args.length > 2)?new Version(select.args[2]):null, data -> {
+                                        ((SubDataClient) plugin.api.getSubDataNetwork()[0]).sendPacket(new PacketUpdateServer((sender instanceof Player)?((Player) sender).getUniqueId():null, server.getName(), template, version, data -> {
                                             switch (data.getInt(0x0001)) {
                                                 case 3:
                                                 case 4:
@@ -691,13 +695,16 @@ public final class SubCommand extends BukkitCommand {
                                                     sender.sendMessage(plugin.api.getLang("SubServers", "Command.Update.Running").replace("$str$", server.getName()));
                                                     break;
                                                 case 9:
-                                                    sender.sendMessage(plugin.api.getLang("SubServers", "Command.Update.Unknown-Template").replace("$str$", server.getName()));
+                                                    if (ts) sender.sendMessage(plugin.api.getLang("SubServers", "Command.Update.Unknown-Template").replace("$str$", server.getName()));
+                                                    else    sender.sendMessage(plugin.api.getLang("SubServers", "Command.Creator.Unknown-Template"));
                                                     break;
                                                 case 10:
-                                                    sender.sendMessage(plugin.api.getLang("SubServers", "Command.Update.Template-Disabled").replace("$str$", server.getName()));
+                                                    if (ts) sender.sendMessage(plugin.api.getLang("SubServers", "Command.Update.Template-Disabled").replace("$str$", server.getName()));
+                                                    else    sender.sendMessage(plugin.api.getLang("SubServers", "Command.Creator.Template-Disabled"));
                                                     break;
                                                 case 11:
-                                                    sender.sendMessage(plugin.api.getLang("SubServers", "Command.Update.Template-Invalid").replace("$str$", server.getName()));
+                                                    if (ts) sender.sendMessage(plugin.api.getLang("SubServers", "Command.Update.Template-Invalid").replace("$str$", server.getName()));
+                                                    else    sender.sendMessage(plugin.api.getLang("SubServers", "Command.Creator.Template-Invalid"));
                                                     break;
                                                 case 12:
                                                     sender.sendMessage(plugin.api.getLang("SubServers", "Command.Update.Version-Required").replace("$str$", server.getName()));
@@ -712,7 +719,7 @@ public final class SubCommand extends BukkitCommand {
                                 }
                             });
                         } else {
-                            sender.sendMessage(plugin.api.getLang("SubServers", "Command.Generic.Usage").replace("$str$", label.toLowerCase() + " " + args[0].toLowerCase() + " <Subservers> [Version]"));
+                            sender.sendMessage(plugin.api.getLang("SubServers", "Command.Generic.Usage").replace("$str$", label.toLowerCase() + " " + args[0].toLowerCase() + " <Subservers> [[Template] <Version>]"));
                         }
                     } else if (args[0].equalsIgnoreCase("tp") || args[0].equalsIgnoreCase("teleport")) {
                         if (args.length > ((sender instanceof Player)?1:2)) {
@@ -1063,7 +1070,7 @@ public final class SubCommand extends BukkitCommand {
                 plugin.api.getLang("SubServers", "Command.Help.SubServer.Terminate").replace("$str$", label.toLowerCase() + " kill <Subservers>"),
                 plugin.api.getLang("SubServers", "Command.Help.SubServer.Command").replace("$str$", label.toLowerCase() + " cmd <Subservers> <Command> [Args...]"),
                 plugin.api.getLang("SubServers", "Command.Help.Host.Create").replace("$str$", label.toLowerCase() + " create <Name> <Host> <Template> [Version] [Port]"),
-                plugin.api.getLang("SubServers", "Command.Help.SubServer.Update").replace("$str$", label.toLowerCase() + " update <Subservers> [Version]"),
+                plugin.api.getLang("SubServers", "Command.Help.SubServer.Update").replace("$str$", label.toLowerCase() + " update <Subservers> [[Template] <Version>]"),
         };
     }
 }

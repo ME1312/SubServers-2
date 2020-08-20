@@ -854,7 +854,7 @@ public final class SubProxy extends BungeeCord implements Listener {
             RemotePlayer player = rPlayers.get(e.getConnection().getUniqueId());
             if (player.getProxy() == null || player.getProxy().isMaster()) {
                 getPlayer(player.getUniqueId()).disconnect(new TextComponent(getTranslation("already_connected_proxy")));
-            } else {
+            } else if (player.getProxy().getSubData()[0] != null) {
                 ((SubDataClient) player.getProxy().getSubData()[0]).sendPacket(new PacketExDisconnectPlayer(player.getUniqueId(), getTranslation("already_connected_proxy")));
             }
         }

@@ -193,9 +193,10 @@ public class ExternalHost extends Host implements ClientHandler {
                 server.stop();
                 server.waitFor();
             }
+            servers.remove(name.toLowerCase());
             queue(new PacketExRemoveServer(name.toLowerCase(), data -> {
-                if (data.getInt(0x0001) == 0 || data.getInt(0x0001) == 1) {
-                    servers.remove(name.toLowerCase());
+                if (data.getInt(0x0001) != 0 && data.getInt(0x0001) != 1) {
+                    servers.put(name.toLowerCase(), server);
                 }
             }));
             return true;

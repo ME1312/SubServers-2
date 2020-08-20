@@ -189,13 +189,14 @@ public class SubCreator {
      *
      * @param player Player Updating
      * @param server Server to Update
+     * @param template Server Template
      * @param version Server Version (may be null)
      * @param response Response Code
      */
-    public void update(UUID player, String server, Version version, Callback<Integer> response) {
+    public void update(UUID player, SubServer server, ServerTemplate template, Version version, Callback<Integer> response) {
         if (Util.isNull(response)) throw new NullPointerException();
         StackTraceElement[] origin = new Exception().getStackTrace();
-        ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketUpdateServer(player, server, version, data -> {
+        ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketUpdateServer(player, server.getName(), template.getName(), version, data -> {
             try {
                 response.run(data.getInt(0x0001));
             } catch (Throwable e) {
@@ -204,17 +205,41 @@ public class SubCreator {
                 ew.printStackTrace();
             }
         }));
+    };
+
+    /**
+     * Update a SubServer
+     *
+     * @param player Player Updating
+     * @param server Server to Update
+     * @param template Server Template
+     * @param version Server Version (may be null)
+     */
+    public void update(UUID player, SubServer server, ServerTemplate template, Version version) {
+        update(player, server, template, version, null);
     }
 
     /**
      * Update a SubServer
      *
      * @param server Server to Update
+     * @param template Server Template
      * @param version Server Version (may be null)
      * @param response Response Code
      */
-    public void update(String server, Version version, Callback<Integer> response) {
-        update(null, server, version, response);
+    public void update(SubServer server, ServerTemplate template, Version version, Callback<Integer> response) {
+        update(null, server, template, version, response);
+    }
+
+    /**
+     * Update a SubServer
+     *
+     * @param server Server to Update
+     * @param template Server Template
+     * @param version Server Version (may be null)
+     */
+    public void update(SubServer server, ServerTemplate template, Version version) {
+        update(null, server, template, version);
     }
 
     /**
@@ -224,8 +249,8 @@ public class SubCreator {
      * @param server Server to Update
      * @param version Server Version (may be null)
      */
-    public void update(UUID player, String server, Version version) {
-        update(player, server, version, i -> {});
+    public void update(UUID player, SubServer server, Version version) {
+        update(player, server, null, version);
     }
 
     /**
@@ -234,7 +259,7 @@ public class SubCreator {
      * @param server Server to Update
      * @param version Server Version (may be null)
      */
-    public void update(String server, Version version) {
+    public void update(SubServer server, Version version) {
         update(null, server, version);
     }
 
