@@ -65,10 +65,15 @@ public class PacketDisconnectPlayer implements PacketObjectIn<Integer>, PacketOb
                 } else {
                     local.disconnect();
                 }
-                client.sendPacket(new PacketDisconnectPlayer(2, tracker));
+                client.sendPacket(new PacketDisconnectPlayer(0, tracker));
             } else if ((remote = plugin.api.getGlobalPlayer(id)) != null) {
-
-                client.sendPacket(new PacketDisconnectPlayer(2, tracker));
+                if (remote.getProxy().getSubData()[0] != null) {
+                    ((SubDataClient) remote.getProxy().getSubData()[0]).sendPacket(new PacketExDisconnectPlayer(remote.getUniqueId(), (data.contains(0x0002)?data.getRawString(0x0002):null), r -> {
+                        client.sendPacket(new PacketDisconnectPlayer(r.getInt(0x0001), tracker));
+                    }));
+                } else {
+                    client.sendPacket(new PacketDisconnectPlayer(4, tracker));
+                }
             } else {
                 client.sendPacket(new PacketDisconnectPlayer(3, tracker));
             }

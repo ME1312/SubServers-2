@@ -38,6 +38,7 @@ import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.config.ListenerInfo;
 import net.md_5.bungee.api.config.ServerInfo;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.*;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.connection.InitialHandler;
@@ -853,7 +854,8 @@ public final class SubProxy extends BungeeCord implements Listener {
             Logger.get("SubServers").info(e.getConnection().getName() + " connected, but already had a database entry");
             RemotePlayer player = rPlayers.get(e.getConnection().getUniqueId());
             if (player.getProxy() == null || player.getProxy().isMaster()) {
-                getPlayer(player.getUniqueId()).disconnect(new TextComponent(getTranslation("already_connected_proxy")));
+                ProxiedPlayer p = getPlayer(player.getUniqueId());
+                if (p != null) p.disconnect(new TextComponent(getTranslation("already_connected_proxy")));
             } else if (player.getProxy().getSubData()[0] != null) {
                 ((SubDataClient) player.getProxy().getSubData()[0]).sendPacket(new PacketExDisconnectPlayer(player.getUniqueId(), getTranslation("already_connected_proxy")));
             }

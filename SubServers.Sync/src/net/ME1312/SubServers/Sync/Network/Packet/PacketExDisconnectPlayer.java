@@ -56,7 +56,7 @@ public class PacketExDisconnectPlayer implements PacketObjectIn<Integer>, Packet
                 } else {
                     local.disconnect();
                 }
-                client.sendPacket(new PacketExDisconnectPlayer(2, tracker));
+                client.sendPacket(new PacketExDisconnectPlayer(0, tracker));
             } else {
                 client.sendPacket(new PacketExDisconnectPlayer(3, tracker));
             }
