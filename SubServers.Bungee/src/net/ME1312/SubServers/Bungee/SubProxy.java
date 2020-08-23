@@ -33,6 +33,7 @@ import net.md_5.bungee.BungeeCord;
 import net.md_5.bungee.BungeeServerInfo;
 import net.md_5.bungee.UserConnection;
 import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.ServerPing;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -668,6 +669,46 @@ public final class SubProxy extends BungeeCord implements Listener {
                 } catch (Exception e) {}
             }
         }, 0, TimeUnit.DAYS.toMillis(2));
+
+        int interval = config.get().getMap("Settings").getInt("RemotePlayer-Cache-Interval", 300);
+        int start = interval - new Random().nextInt((interval / 3) + 1);
+        new Timer("SubServers.Bungee::RemotePlayer_Error_Checking").schedule(new TimerTask() {
+            @Override
+            public void run() {
+                synchronized (rPlayers) {
+                    ArrayList<RemotePlayer> add = new ArrayList<RemotePlayer>();
+                    for (ProxiedPlayer player : getPlayers()) {
+                        if (!rPlayers.containsKey(player.getUniqueId())) { // Add players that don't exist
+                            Logger.get("SubServers").info("RPEC::Add(" + player.getUniqueId() + ")");
+                            RemotePlayer p = new RemotePlayer(player);
+                            rPlayerLinkP.put(player.getUniqueId(), p.getProxy());
+                            rPlayers.put(player.getUniqueId(), p);
+                            if (p.getServer() != null) rPlayerLinkS.put(player.getUniqueId(), p.getServer());
+                            add.add(p);
+                        }
+                    }
+                    ArrayList<RemotePlayer> remove = new ArrayList<RemotePlayer>();
+                    for (UUID player : Util.getBackwards(rPlayerLinkP, mProxy)) { // Remove players that shouldn't exist
+                        if (getPlayer(player) == null) {
+                            Logger.get("SubServers").info("RPEC::Remove(" + player + ")");
+                            remove.add(rPlayers.get(player));
+                            rPlayerLinkS.remove(player);
+                            rPlayerLinkP.remove(player);
+                            rPlayers.remove(player);
+                        }
+                    }
+                    LinkedList<PacketExSyncPlayer> packets = new LinkedList<PacketExSyncPlayer>(); // Compile change data for external proxies
+                    if (add.size() > 0) packets.add(new PacketExSyncPlayer(mProxy.getName(), true, add.toArray(new RemotePlayer[0])));
+                    if (remove.size() > 0) packets.add(new PacketExSyncPlayer(mProxy.getName(), false, remove.toArray(new RemotePlayer[0])));
+                    if (packets.size() > 0) {
+                        PacketExSyncPlayer[] packet = packets.toArray(new PacketExSyncPlayer[0]);
+                        for (Proxy proxy : SubAPI.getInstance().getProxies().values()) if (proxy.getSubData()[0] != null) {
+                            ((SubDataClient) proxy.getSubData()[0]).sendPacket(packet);
+                        }
+                    }
+                }
+            }
+        }, TimeUnit.SECONDS.toMillis(start), TimeUnit.SECONDS.toMillis(interval));
     }
 
     /**
@@ -850,8 +891,9 @@ public final class SubProxy extends BungeeCord implements Listener {
 
     @EventHandler(priority = Byte.MIN_VALUE)
     public void login(LoginEvent e) {
+        ProxyServer.getInstance().getLogger().info("UUID of player " + e.getConnection().getName() + " is " + e.getConnection().getUniqueId());
         if (rPlayers.containsKey(e.getConnection().getUniqueId())) {
-            Logger.get("SubServers").info(e.getConnection().getName() + " connected, but already had a database entry");
+            Logger.get("SubServers").warning(e.getConnection().getName() + " connected, but already had a database entry");
             RemotePlayer player = rPlayers.get(e.getConnection().getUniqueId());
             if (player.getProxy() == null || player.getProxy().isMaster()) {
                 ProxiedPlayer p = getPlayer(player.getUniqueId());
@@ -962,12 +1004,14 @@ public final class SubProxy extends BungeeCord implements Listener {
 
         synchronized (rPlayers) {
             if (rPlayers.containsKey(e.getPlayer().getUniqueId()) && (!rPlayerLinkP.containsKey(e.getPlayer().getUniqueId()) || rPlayerLinkP.get(e.getPlayer().getUniqueId()).isMaster())) {
-                for (Proxy proxy : SubAPI.getInstance().getProxies().values()) if (proxy.getSubData()[0] != null) {
-                    ((SubDataClient) proxy.getSubData()[0]).sendPacket(new PacketExSyncPlayer(mProxy.getName(), false, rPlayers.get(e.getPlayer().getUniqueId())));
-                }
+                RemotePlayer player = rPlayers.get(e.getPlayer().getUniqueId());
                 rPlayerLinkS.remove(e.getPlayer().getUniqueId());
                 rPlayerLinkP.remove(e.getPlayer().getUniqueId());
                 rPlayers.remove(e.getPlayer().getUniqueId());
+
+                for (Proxy proxy : SubAPI.getInstance().getProxies().values()) if (proxy.getSubData()[0] != null) {
+                    ((SubDataClient) proxy.getSubData()[0]).sendPacket(new PacketExSyncPlayer(mProxy.getName(), false, player));
+                }
             }
         }
     }

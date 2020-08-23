@@ -56,14 +56,14 @@ public class PacketExSyncPlayer implements PacketObjectIn<Integer>, PacketObject
     @Override
     public void receive(SubDataSender client, ObjectMap<Integer> data) {
         String proxy = (data.contains(0x0000)?data.getRawString(0x0000).toLowerCase():null);
-        if (data.getBoolean(0x0001) == null) {
-            for (UUID id : Util.getBackwards(plugin.rPlayerLinkP, proxy)) {
-                plugin.rPlayerLinkS.remove(id);
-                plugin.rPlayerLinkP.remove(id);
-                plugin.rPlayers.remove(id);
-            }
-        }
         synchronized (plugin.rPlayers) {
+            if (data.getBoolean(0x0001) == null) {
+                for (UUID id : Util.getBackwards(plugin.rPlayerLinkP, proxy)) {
+                    plugin.rPlayerLinkS.remove(id);
+                    plugin.rPlayerLinkP.remove(id);
+                    plugin.rPlayers.remove(id);
+                }
+            }
             if (data.getBoolean(0x0001) != Boolean.FALSE) {
                 if (data.contains(0x0002)) for (Map<String, Object> object : (List<Map<String, Object>>) data.getObjectList(0x0002)) {
                     ServerImpl server = (object.getOrDefault("server", null) != null)?plugin.servers.getOrDefault(object.get("server").toString().toLowerCase(), null):null;
@@ -78,7 +78,7 @@ public class PacketExSyncPlayer implements PacketObjectIn<Integer>, PacketObject
                     UUID id = UUID.fromString(object.get("id").toString());
 
                     // Don't accept removal requests when we're managing players
-                    if ((!plugin.rPlayerLinkP.containsKey(id) || !plugin.rPlayerLinkP.get(id).equalsIgnoreCase(plugin.api.getName()))) {
+                    if ((!plugin.rPlayerLinkP.containsKey(id) || !plugin.rPlayerLinkP.get(id).equalsIgnoreCase(plugin.api.getName().toLowerCase()))) {
                         plugin.rPlayerLinkS.remove(id);
                         plugin.rPlayerLinkP.remove(id);
                         plugin.rPlayers.remove(id);

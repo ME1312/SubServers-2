@@ -64,14 +64,14 @@ public class PacketExSyncPlayer implements PacketObjectIn<Integer>, PacketObject
     public void receive(SubDataClient client, ObjectMap<Integer> data) {
         if (client.getHandler() instanceof Proxy) {
             ArrayList<RemotePlayer> forward = new ArrayList<RemotePlayer>();
-            if (data.getBoolean(0x0001) == null) {
-                for (UUID id : Util.getBackwards(plugin.rPlayerLinkP, (Proxy) client.getHandler())) {
-                    plugin.rPlayerLinkS.remove(id);
-                    plugin.rPlayerLinkP.remove(id);
-                    plugin.rPlayers.remove(id);
-                }
-            }
             synchronized (plugin.rPlayers) {
+                if (data.getBoolean(0x0001) == null) {
+                    for (UUID id : Util.getBackwards(plugin.rPlayerLinkP, (Proxy) client.getHandler())) {
+                        plugin.rPlayerLinkS.remove(id);
+                        plugin.rPlayerLinkP.remove(id);
+                        plugin.rPlayers.remove(id);
+                    }
+                }
                 if (data.getBoolean(0x0001) != Boolean.FALSE) {
                     if (data.contains(0x0002)) for (Map<String, Object> object : (List<Map<String, Object>>) data.getObjectList(0x0002)) {
                         Server server = (object.getOrDefault("server", null) != null)?plugin.api.getServer(object.get("server").toString()):null;
@@ -99,8 +99,9 @@ public class PacketExSyncPlayer implements PacketObjectIn<Integer>, PacketObject
                 }
 
                 if (data.getBoolean(0x0001) == null || forward.size() > 0) {
+                    PacketExSyncPlayer packet = new PacketExSyncPlayer(((Proxy) client.getHandler()).getName(), data.getBoolean(0x0001), forward.toArray(new RemotePlayer[0]));
                     for (Proxy proxy : SubAPI.getInstance().getProxies().values()) if (proxy.getSubData()[0] != null && proxy != client.getHandler()) {
-                        ((SubDataClient) proxy.getSubData()[0]).sendPacket(new PacketExSyncPlayer(((Proxy) client.getHandler()).getName(), data.getBoolean(0x0001), forward.toArray(new RemotePlayer[0])));
+                        ((SubDataClient) proxy.getSubData()[0]).sendPacket(packet);
                     }
                 }
             }
