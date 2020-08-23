@@ -14,6 +14,14 @@ function __DL() {
         curl -o "$1" "$2"; return $?
     fi
 }
+function __Restore() {
+    if [[ -f "Sponge.old.jar.x" ]]; then
+        if [[ -f "Sponge.jar" ]]; then
+            rm -Rf Sponge.jar
+        fi
+        mv Sponge.old.jar.x Sponge.jar
+    fi
+}
 echo Downloading SpongeVanilla...
 if [[ -f "Sponge.jar" ]]; then
     if [[ -f "Sponge.old.jar.x" ]]; then
@@ -28,12 +36,7 @@ if [[ $__RETURN -eq 0 ]]; then
     exit 0
 else
     echo ERROR: Failed downloading Sponge. Is SpongePowered.org down?
-    if [[ -f "Sponge.old.jar.x" ]]; then
-        if [[ -f "Sponge.jar" ]]; then
-            rm -Rf Sponge.jar
-        fi
-        mv Sponge.old.jar.x Sponge.jar
-    fi
+    __Restore
     rm -Rf "$0"
     exit 3
 fi

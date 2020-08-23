@@ -18,6 +18,20 @@ function __DL() {
         curl -o "$1" "$2"; return $?
     fi
 }
+function __Restore() {
+    if [[ -f "Forge.old.jar.x" ]]; then
+        if [[ -f "Forge.jar" ]]; then
+            rm -Rf Forge.jar
+        fi
+        mv Forge.old.jar.x Forge.jar
+    fi
+    if [[ -f "mods/Sponge.old.jar.x" ]]; then
+        if [[ -f "mods/Sponge.jar" ]]; then
+            rm -Rf mods/Sponge.jar
+        fi
+        mv mods/Sponge.old.jar.x mods/Sponge.jar
+    fi
+}
 echo Downloading the Minecraft Forge Installer...
 __DL "forge-$mcf_version-installer.jar" "http://files.minecraftforge.net/maven/net/minecraftforge/forge/$mcf_version/forge-$mcf_version-installer.jar"; __RETURN=$?
 if [[ $__RETURN -eq 0 ]]; then
@@ -25,12 +39,6 @@ if [[ $__RETURN -eq 0 ]]; then
     "$java" -jar "forge-$mcf_version-installer.jar" --installServer; __RETURN=$?
     if [[ $__RETURN -eq 0 ]]; then
         echo Cleaning Up...
-        if [[ -f "Forge.jar" ]]; then
-            if [[ -f "Forge.old.jar.x" ]]; then
-                rm -Rf Forge.old.jar.x
-            fi
-            mv Forge.jar Forge.old.jar.x
-        fi
         if [[ ! -d "mods" ]]; then
             mkdir mods
         fi
@@ -51,23 +59,13 @@ if [[ $__RETURN -eq 0 ]]; then
             exit 0
         else
             echo ERROR: Failed downloading Sponge. Is SpongePowered.org down?
-            if [[ -f "mods/Sponge.old.jar.x" ]]; then
-                if [[ -f "mods/Sponge.jar" ]]; then
-                    rm -Rf mods/Sponge.jar
-                fi
-                mv mods/Sponge.old.jar.x mods/Sponge.jar
-            fi
-            if [[ -f "Forge.old.jar.x" ]]; then
-                if [[ -f "Forge.jar" ]]; then
-                    rm -Rf Forge.jar
-                fi
-                mv Forge.old.jar.x Forge.jar
-            fi
+            __Restore
             rm -Rf "$0"
             exit 5
         fi
     else
         echo ERROR: The Installer exited with an error. Please try again
+        __Restore
         rm -Rf "forge-$mcf_version-installer.jar"
         rm -Rf "forge-$mcf_version-installer.jar.log"
         rm -Rf "$0"

@@ -779,7 +779,7 @@ public class SubCommand {
                                         sender.sendMessage("Invalid port number");
                                         break;
                                     case 0:
-                                        sender.sendMessage("Creating subserver " + args[1]);
+                                        sender.sendMessage("Creating subserver " + args[0]);
                                         break;
                                 }
                             }));
