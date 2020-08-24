@@ -999,15 +999,18 @@ public final class SubProxy extends BungeeCord implements Listener {
 
     @EventHandler(priority = Byte.MIN_VALUE)
     public void resetPlayer(PlayerDisconnectEvent e) {
-        fallbackLimbo.remove(e.getPlayer().getUniqueId());
-        SubCommand.players.remove(e.getPlayer().getUniqueId());
+        UUID id = e.getPlayer().getUniqueId();
+        fallbackLimbo.remove(id);
+        SubCommand.players.remove(id);
+        Logger.get("SubServers").info("PlayerDisconnectEvent(" + id + ")");
 
         synchronized (rPlayers) {
-            if (rPlayers.containsKey(e.getPlayer().getUniqueId()) && (!rPlayerLinkP.containsKey(e.getPlayer().getUniqueId()) || rPlayerLinkP.get(e.getPlayer().getUniqueId()).isMaster())) {
-                RemotePlayer player = rPlayers.get(e.getPlayer().getUniqueId());
-                rPlayerLinkS.remove(e.getPlayer().getUniqueId());
-                rPlayerLinkP.remove(e.getPlayer().getUniqueId());
-                rPlayers.remove(e.getPlayer().getUniqueId());
+            if (rPlayers.containsKey(id) && (!rPlayerLinkP.containsKey(id) || rPlayerLinkP.get(id).isMaster())) {
+                Logger.get("SubServers").info("RP::Remove(" + id + ")");
+                RemotePlayer player = rPlayers.get(id);
+                rPlayerLinkS.remove(id);
+                rPlayerLinkP.remove(id);
+                rPlayers.remove(id);
 
                 for (Proxy proxy : SubAPI.getInstance().getProxies().values()) if (proxy.getSubData()[0] != null) {
                     ((SubDataClient) proxy.getSubData()[0]).sendPacket(new PacketExSyncPlayer(mProxy.getName(), false, player));

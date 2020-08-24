@@ -150,7 +150,7 @@ public class ConfigUpdater {
         if (i > 0) {
             YAMLSection settings = new YAMLSection();
             settings.set("Version", ((now.compareTo(was) <= 0)?was:now).toString());
-            if (updated.getMap("Settings", new YAMLSection()).contains("RemotePlayer-Cache-Interval")) settings.set("RemotePlayer-Cache-Interval", updated.getMap("Settings").getRawString("RemotePlayer-Cache-Interval"));
+            if (updated.getMap("Settings", new YAMLSection()).contains("RPEC-Check-Interval")) settings.set("RPEC-Check-Interval", updated.getMap("Settings").getRawString("RPEC-Check-Interval"));
             settings.set("Disabled-Overrides", updated.getMap("Settings", new YAMLSection()).getRawStringList("Disabled-Overrides", Collections.emptyList()));
 
             YAMLSection smart_fallback = new YAMLSection();

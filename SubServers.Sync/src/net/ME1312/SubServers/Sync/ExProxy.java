@@ -250,7 +250,6 @@ public final class ExProxy extends BungeeCord implements Listener {
                             ArrayList<RemotePlayer> add = new ArrayList<RemotePlayer>();
                             for (ProxiedPlayer player : getPlayers()) {
                                 if (!rPlayers.containsKey(player.getUniqueId())) { // Add players that don't exist
-                                    Logger.get("SubServers").info("RPEC::Add(" + player.getUniqueId() + ")");
                                     RemotePlayer p = new RemotePlayer(player);
                                     rPlayerLinkP.put(player.getUniqueId(), p.getProxy().toLowerCase());
                                     rPlayers.put(player.getUniqueId(), p);
@@ -261,7 +260,6 @@ public final class ExProxy extends BungeeCord implements Listener {
                             ArrayList<RemotePlayer> remove = new ArrayList<RemotePlayer>();
                             for (NamedContainer<String, UUID> player : proxy.getPlayers()) { // Remove players that shouldn't exist
                                 if (getPlayer(player.get()) == null) {
-                                    Logger.get("SubServers").info("RPEC::Remove(" + player + ")");
                                     remove.add(rPlayers.get(player.get()));
                                     rPlayerLinkS.remove(player.get());
                                     rPlayerLinkP.remove(player.get());
@@ -270,7 +268,6 @@ public final class ExProxy extends BungeeCord implements Listener {
                             }
                             for (UUID player : Util.getBackwards(rPlayerLinkP, api.getName().toLowerCase())) { // Remove players that shouldn't exist (internally)
                                 if (getPlayer(player) == null) {
-                                    Logger.get("SubServers").info("RPEC::Internal(" + player + ")");
                                     rPlayerLinkS.remove(player);
                                     rPlayerLinkP.remove(player);
                                     rPlayers.remove(player);
@@ -537,17 +534,20 @@ public final class ExProxy extends BungeeCord implements Listener {
 
     @EventHandler(priority = Byte.MIN_VALUE)
     public void resetPlayer(PlayerDisconnectEvent e) {
-        fallbackLimbo.remove(e.getPlayer().getUniqueId());
-        SubCommand.permitted.remove(e.getPlayer().getUniqueId());
+        UUID id = e.getPlayer().getUniqueId();
+        fallbackLimbo.remove(id);
+        SubCommand.permitted.remove(id);
 
         synchronized (rPlayers) {
-            if (rPlayers.containsKey(e.getPlayer().getUniqueId()) && (!rPlayerLinkP.containsKey(e.getPlayer().getUniqueId()) || rPlayerLinkP.get(e.getPlayer().getUniqueId()).equalsIgnoreCase(api.getName()))) {
+            if (rPlayers.containsKey(id) && (!rPlayerLinkP.containsKey(id) || rPlayerLinkP.get(id).equalsIgnoreCase(api.getName()))) {
+                RemotePlayer player = rPlayers.get(id);
+                rPlayerLinkS.remove(id);
+                rPlayerLinkP.remove(id);
+                rPlayers.remove(id);
+
                 if (api.getSubDataNetwork()[0] != null) {
-                    ((SubDataClient) api.getSubDataNetwork()[0]).sendPacket(new PacketExSyncPlayer(false, rPlayers.get(e.getPlayer().getUniqueId())));
+                    ((SubDataClient) api.getSubDataNetwork()[0]).sendPacket(new PacketExSyncPlayer(false, player));
                 }
-                rPlayerLinkS.remove(e.getPlayer().getUniqueId());
-                rPlayerLinkP.remove(e.getPlayer().getUniqueId());
-                rPlayers.remove(e.getPlayer().getUniqueId());
             }
         }
     }

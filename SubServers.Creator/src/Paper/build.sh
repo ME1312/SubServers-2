@@ -44,9 +44,9 @@ if [[ $__RETURN -eq 0 ]]; then
         exit 4
     fi
 else
-	  echo ERROR: Failed downloading Paper. Is PaperMC.io down?
-	  __Restore
-	  rm -Rf "$0"
-	  exit 3
+    echo ERROR: Failed downloading Paper. Is PaperMC.io down?
+    __Restore
+    rm -Rf "$0"
+    exit 3
 fi
 exit 2
