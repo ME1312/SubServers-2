@@ -670,7 +670,7 @@ public final class SubProxy extends BungeeCord implements Listener {
             }
         }, 0, TimeUnit.DAYS.toMillis(2));
 
-        int interval = config.get().getMap("Settings").getInt("RemotePlayer-Cache-Interval", 300);
+        int interval = config.get().getMap("Settings").getInt("RPEC-Check-Interval", 300);
         int start = interval - new Random().nextInt((interval / 3) + 1);
         new Timer("SubServers.Bungee::RemotePlayer_Error_Checking").schedule(new TimerTask() {
             @Override
