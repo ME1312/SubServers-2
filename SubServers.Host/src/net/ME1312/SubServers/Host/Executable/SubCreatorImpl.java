@@ -266,7 +266,7 @@ public class SubCreatorImpl {
             Version version = this.version;
             HashMap<String, String> var = new HashMap<String, String>();
             boolean error = false;
-            if (history.contains(template)) throw new IllegalStateException("Template Import loop detected");
+            if (history.contains(template)) throw new IllegalStateException("Template import loop detected");
             history.add(template);
             for (String other : template.getBuildOptions().getStringList("Import", new ArrayList<String>())) {
                 if (templates.keySet().contains(other.toLowerCase())) {
@@ -284,8 +284,8 @@ public class SubCreatorImpl {
                                 ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketOutExLogMessage(address, "Skipping template that cannot be run in update mode: " + other));
                             }
                         } else {
-                            log.logger.warn.println("Skipping template that requires extra versioning: " + other);
-                            ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketOutExLogMessage(address, "Skipping template that requires extra versioning: " + other));
+                            log.logger.warn.println("Skipping template that requires extra versioning information: " + other);
+                            ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketOutExLogMessage(address, "Skipping template that requires extra versioning information: " + other));
                         }
                     } else {
                         log.logger.warn.println("Skipping disabled template: " + other);

@@ -90,7 +90,7 @@ public class InternalSubCreator extends SubCreator {
             Version version = this.version;
             HashMap<String, String> var = new HashMap<String, String>();
             boolean error = false;
-            if (history.contains(template)) throw new IllegalStateException("Template Import loop detected");
+            if (history.contains(template)) throw new IllegalStateException("Template import loop detected");
             history.add(template);
             for (String other : template.getBuildOptions().getStringList("Import", new ArrayList<String>())) {
                 if (templates.keySet().contains(other.toLowerCase())) {
@@ -107,7 +107,7 @@ public class InternalSubCreator extends SubCreator {
                                 Logger.get(prefix).info("Skipping template that cannot be run in update mode: " + other);
                             }
                         } else {
-                            Logger.get(prefix).info("Skipping template that requires extra versioning: " + other);
+                            Logger.get(prefix).info("Skipping template that requires extra versioning information: " + other);
                         }
                     } else {
                         Logger.get(prefix).info("Skipping disabled template: " + other);

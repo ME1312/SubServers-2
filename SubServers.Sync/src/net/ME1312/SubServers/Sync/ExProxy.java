@@ -32,7 +32,6 @@ import net.md_5.bungee.BungeeCord;
 import net.md_5.bungee.BungeeServerInfo;
 import net.md_5.bungee.UserConnection;
 import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.ServerPing;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -424,7 +423,7 @@ public final class ExProxy extends BungeeCord implements Listener {
 
     @EventHandler(priority = Byte.MIN_VALUE)
     public void login(LoginEvent e) {
-        ProxyServer.getInstance().getLogger().info("UUID of player " + e.getConnection().getName() + " is " + e.getConnection().getUniqueId());
+        super.getLogger().info("UUID of player " + e.getConnection().getName() + " is " + e.getConnection().getUniqueId());
         if (rPlayers.containsKey(e.getConnection().getUniqueId())) {
             Logger.get("SubServers").warning(e.getConnection().getName() + " connected, but already had a database entry");
             RemotePlayer player = rPlayers.get(e.getConnection().getUniqueId());
@@ -439,75 +438,81 @@ public final class ExProxy extends BungeeCord implements Listener {
 
     @EventHandler(priority = Byte.MAX_VALUE)
     public void validate(ServerConnectEvent e) {
-        Map<String, ServerInfo> servers = new TreeMap<String, ServerInfo>(this.servers);
-        if (servers.keySet().contains(e.getTarget().getName().toLowerCase()) && e.getTarget() != servers.get(e.getTarget().getName().toLowerCase())) {
-            e.setTarget(servers.get(e.getTarget().getName().toLowerCase()));
-        } else {
-            servers = getServers();
-            if (servers.keySet().contains(e.getTarget().getName()) && e.getTarget() != servers.get(e.getTarget().getName())) {
-                e.setTarget(servers.get(e.getTarget().getName()));
-            }
-        }
-
-        if (!e.getTarget().canAccess(e.getPlayer())) {
-            if (e.getPlayer().getServer() == null || fallbackLimbo.keySet().contains(e.getPlayer().getUniqueId())) {
-                if (!fallbackLimbo.keySet().contains(e.getPlayer().getUniqueId()) || fallbackLimbo.get(e.getPlayer().getUniqueId()).contains(e.getTarget())) {
-                    ServerKickEvent kick = new ServerKickEvent(e.getPlayer(), e.getTarget(), new BaseComponent[]{
-                            new TextComponent(getTranslation("no_server_permission"))
-                    }, null, ServerKickEvent.State.CONNECTING);
-                    fallback(kick);
-                    if (!kick.isCancelled()) e.getPlayer().disconnect(kick.getKickReasonComponent());
-                    if (e.getPlayer().getServer() != null) e.setCancelled(true);
-                }
+        if (e.getPlayer().isConnected()) {
+            Map<String, ServerInfo> servers = new TreeMap<String, ServerInfo>(this.servers);
+            if (servers.keySet().contains(e.getTarget().getName().toLowerCase()) && e.getTarget() != servers.get(e.getTarget().getName().toLowerCase())) {
+                e.setTarget(servers.get(e.getTarget().getName().toLowerCase()));
             } else {
-                e.getPlayer().sendMessage(getTranslation("no_server_permission"));
-                e.setCancelled(true);
+                servers = getServers();
+                if (servers.keySet().contains(e.getTarget().getName()) && e.getTarget() != servers.get(e.getTarget().getName())) {
+                    e.setTarget(servers.get(e.getTarget().getName()));
+                }
             }
-        } else if (e.getPlayer().getServer() != null && !fallbackLimbo.keySet().contains(e.getPlayer().getUniqueId()) && e.getTarget() instanceof SubServerImpl && !((SubServerImpl) e.getTarget()).isRunning()) {
-            e.getPlayer().sendMessage(api.getLang("SubServers", "Bungee.Server.Offline"));
-            e.setCancelled(true);
-        }
 
-        if (fallbackLimbo.keySet().contains(e.getPlayer().getUniqueId())) {
-            if (fallbackLimbo.get(e.getPlayer().getUniqueId()).contains(e.getTarget())) {
-                fallbackLimbo.get(e.getPlayer().getUniqueId()).remove(e.getTarget());
-            } else if (e.getPlayer().getServer() != null) {
+            if (!e.getTarget().canAccess(e.getPlayer())) {
+                if (e.getPlayer().getServer() == null || fallbackLimbo.keySet().contains(e.getPlayer().getUniqueId())) {
+                    if (!fallbackLimbo.keySet().contains(e.getPlayer().getUniqueId()) || fallbackLimbo.get(e.getPlayer().getUniqueId()).contains(e.getTarget())) {
+                        ServerKickEvent kick = new ServerKickEvent(e.getPlayer(), e.getTarget(), new BaseComponent[]{
+                                new TextComponent(getTranslation("no_server_permission"))
+                        }, null, ServerKickEvent.State.CONNECTING);
+                        fallback(kick);
+                        if (!kick.isCancelled()) e.getPlayer().disconnect(kick.getKickReasonComponent());
+                        if (e.getPlayer().getServer() != null) e.setCancelled(true);
+                    }
+                } else {
+                    e.getPlayer().sendMessage(getTranslation("no_server_permission"));
+                    e.setCancelled(true);
+                }
+            } else if (e.getPlayer().getServer() != null && !fallbackLimbo.keySet().contains(e.getPlayer().getUniqueId()) && e.getTarget() instanceof SubServerImpl && !((SubServerImpl) e.getTarget()).isRunning()) {
+                e.getPlayer().sendMessage(api.getLang("SubServers", "Bungee.Server.Offline"));
                 e.setCancelled(true);
             }
+
+            if (fallbackLimbo.keySet().contains(e.getPlayer().getUniqueId())) {
+                if (fallbackLimbo.get(e.getPlayer().getUniqueId()).contains(e.getTarget())) {
+                    fallbackLimbo.get(e.getPlayer().getUniqueId()).remove(e.getTarget());
+                } else if (e.getPlayer().getServer() != null) {
+                    e.setCancelled(true);
+                }
+            }
+        } else {
+            e.setCancelled(true);
         }
     }
 
     @SuppressWarnings("deprecation")
     @EventHandler(priority = Byte.MAX_VALUE)
     public void connected(ServerConnectedEvent e) {
-        synchronized (rPlayers) {
-            ObjectMap<String> raw = RemotePlayer.translate(e.getPlayer());
-            raw.set("server", e.getServer().getInfo().getName());
-            RemotePlayer player = new RemotePlayer(raw);
-            rPlayerLinkP.put(player.getUniqueId(), player.getProxy().toLowerCase());
-            rPlayers.put(player.getUniqueId(), player);
-            if (e.getServer().getInfo() instanceof ServerImpl) rPlayerLinkS.put(player.getUniqueId(), (ServerImpl) e.getServer().getInfo());
-            if (api.getSubDataNetwork()[0] != null) {
-                ((SubDataClient) api.getSubDataNetwork()[0]).sendPacket(new PacketExSyncPlayer(true, player));
-            }
-        }
-
-
-        if (fallbackLimbo.keySet().contains(e.getPlayer().getUniqueId())) new Timer("SubServers.Sync::Fallback_Limbo_Timer(" + e.getPlayer().getUniqueId() + ')').schedule(new TimerTask() {
-            @Override
-            public void run() {
-                if (e.getPlayer().getServer() != null && !((UserConnection) e.getPlayer()).isDimensionChange() && e.getPlayer().getServer().getInfo().getAddress().equals(e.getServer().getInfo().getAddress())) {
-                    fallbackLimbo.remove(e.getPlayer().getUniqueId());
-                    e.getPlayer().sendMessage(api.getLang("SubServers", "Bungee.Feature.Smart-Fallback.Result").replace("$str$", (e.getServer().getInfo() instanceof ServerImpl)?((ServerImpl) e.getServer().getInfo()).getDisplayName():e.getServer().getInfo().getName()));
+        if (e.getPlayer().isConnected()) {
+            synchronized (rPlayers) {
+                ObjectMap<String> raw = RemotePlayer.translate(e.getPlayer());
+                raw.set("server", e.getServer().getInfo().getName());
+                RemotePlayer player = new RemotePlayer(raw);
+                rPlayerLinkP.put(player.getUniqueId(), player.getProxy().toLowerCase());
+                rPlayers.put(player.getUniqueId(), player);
+                if (e.getServer().getInfo() instanceof ServerImpl) rPlayerLinkS.put(player.getUniqueId(), (ServerImpl) e.getServer().getInfo());
+                if (api.getSubDataNetwork()[0] != null) {
+                    ((SubDataClient) api.getSubDataNetwork()[0]).sendPacket(new PacketExSyncPlayer(true, player));
                 }
             }
-        }, 1000);
+
+
+            if (fallbackLimbo.keySet().contains(e.getPlayer().getUniqueId())) new Timer("SubServers.Sync::Fallback_Limbo_Timer(" + e.getPlayer().getUniqueId() + ')').schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    if (e.getPlayer().getServer() != null && !((UserConnection) e.getPlayer()).isDimensionChange() && e.getPlayer().getServer().getInfo().getAddress().equals(e.getServer().getInfo().getAddress())) {
+                        fallbackLimbo.remove(e.getPlayer().getUniqueId());
+                        e.getPlayer().sendMessage(api.getLang("SubServers", "Bungee.Feature.Smart-Fallback.Result").replace("$str$", (e.getServer().getInfo() instanceof ServerImpl)?((ServerImpl) e.getServer().getInfo()).getDisplayName():e.getServer().getInfo().getName()));
+                    }
+                }
+            }, 1000);
+        }
     }
 
     @SuppressWarnings("deprecation")
     @EventHandler(priority = Byte.MAX_VALUE)
     public void fallback(ServerKickEvent e) {
-        if (e.getPlayer() instanceof UserConnection && config.get().getMap("Settings").getMap("Smart-Fallback", new ObjectMap<>()).getBoolean("Fallback", true)) {
+        if (e.getPlayer().isConnected() && e.getPlayer() instanceof UserConnection && config.get().getMap("Settings").getMap("Smart-Fallback", new ObjectMap<>()).getBoolean("Fallback", true)) {
             Map<String, ServerInfo> fallbacks;
             if (!fallbackLimbo.keySet().contains(e.getPlayer().getUniqueId())) {
                 fallbacks = SmartFallback.getFallbackServers(e.getPlayer().getPendingConnection().getListener(), e.getPlayer());
@@ -532,7 +537,7 @@ public final class ExProxy extends BungeeCord implements Listener {
         }
     }
 
-    @EventHandler(priority = Byte.MIN_VALUE)
+    @EventHandler(priority = Byte.MAX_VALUE)
     public void resetPlayer(PlayerDisconnectEvent e) {
         UUID id = e.getPlayer().getUniqueId();
         fallbackLimbo.remove(id);
