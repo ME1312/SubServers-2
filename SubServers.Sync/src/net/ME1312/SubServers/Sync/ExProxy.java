@@ -68,7 +68,7 @@ public final class ExProxy extends BungeeCord implements Listener {
     public YAMLConfig config;
     public final SubAPI api = new SubAPI(this);
     public SubProtocol subprotocol;
-    public static final Version version = Version.fromString("2.16.2a");
+    public static final Version version = Version.fromString("2.16.4a");
 
     public final boolean isPatched;
     public final boolean isGalaxi;
@@ -238,8 +238,8 @@ public final class ExProxy extends BungeeCord implements Listener {
             }
         }, 0, TimeUnit.DAYS.toMillis(2));
 
-        int interval = config.get().getMap("Settings").getInt("RPEC-Check-Interval", 300);
-        int start = interval - new Random().nextInt((interval / 3) + 1);
+        int rpec_i = config.get().getMap("Settings").getInt("RPEC-Check-Interval", 300);
+        int rpec_s = rpec_i - new Random().nextInt((rpec_i / 3) + 1);
         new Timer("SubServers.Sync::RemotePlayer_Error_Checking").schedule(new TimerTask() {
             @Override
             public void run() {
@@ -285,7 +285,7 @@ public final class ExProxy extends BungeeCord implements Listener {
                     });
                 }
             }
-        }, TimeUnit.SECONDS.toMillis(start), TimeUnit.SECONDS.toMillis(interval));
+        }, TimeUnit.SECONDS.toMillis(rpec_s), TimeUnit.SECONDS.toMillis(rpec_i));
     }
 
     /**

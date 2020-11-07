@@ -82,7 +82,7 @@ public final class SubProxy extends BungeeCord implements Listener {
     public SubProtocol subprotocol;
     public SubDataServer subdata = null;
     public SubServer sudo = null;
-    public static final Version version = Version.fromString("2.16.2a");
+    public static final Version version = Version.fromString("2.16.4a");
 
     public final Proxy mProxy;
     public boolean canSudo = false;
@@ -208,7 +208,7 @@ public final class SubProxy extends BungeeCord implements Listener {
                                 Logger.get("SubServers").info("Removed ./SubServers/Recently Deleted/" + file.getName());
                             }
                         } catch (Exception e) {
-                            Logger.get("SubServers").info("Problem scanning .SubServers/Recently Deleted/" + file.getName());
+                            Logger.get("SubServers").info("Problem scanning ./SubServers/Recently Deleted/" + file.getName());
                             e.printStackTrace();
                             Files.delete(file.toPath());
                         }
@@ -669,8 +669,8 @@ public final class SubProxy extends BungeeCord implements Listener {
             }
         }, 0, TimeUnit.DAYS.toMillis(2));
 
-        int interval = config.get().getMap("Settings").getInt("RPEC-Check-Interval", 300);
-        int start = interval - new Random().nextInt((interval / 3) + 1);
+        int rpec_i = config.get().getMap("Settings").getInt("RPEC-Check-Interval", 300);
+        int rpec_s = rpec_i - new Random().nextInt((rpec_i / 3) + 1);
         new Timer("SubServers.Bungee::RemotePlayer_Error_Checking").schedule(new TimerTask() {
             @Override
             public void run() {
@@ -678,7 +678,6 @@ public final class SubProxy extends BungeeCord implements Listener {
                     ArrayList<RemotePlayer> add = new ArrayList<RemotePlayer>();
                     for (ProxiedPlayer player : getPlayers()) {
                         if (!rPlayers.containsKey(player.getUniqueId())) { // Add players that don't exist
-                            Logger.get("SubServers").info("RPEC::Add(" + player.getUniqueId() + ")");
                             RemotePlayer p = new RemotePlayer(player);
                             rPlayerLinkP.put(player.getUniqueId(), p.getProxy());
                             rPlayers.put(player.getUniqueId(), p);
@@ -689,7 +688,6 @@ public final class SubProxy extends BungeeCord implements Listener {
                     ArrayList<RemotePlayer> remove = new ArrayList<RemotePlayer>();
                     for (UUID player : Util.getBackwards(rPlayerLinkP, mProxy)) { // Remove players that shouldn't exist
                         if (getPlayer(player) == null) {
-                            Logger.get("SubServers").info("RPEC::Remove(" + player + ")");
                             remove.add(rPlayers.get(player));
                             rPlayerLinkS.remove(player);
                             rPlayerLinkP.remove(player);
@@ -707,7 +705,7 @@ public final class SubProxy extends BungeeCord implements Listener {
                     }
                 }
             }
-        }, TimeUnit.SECONDS.toMillis(start), TimeUnit.SECONDS.toMillis(interval));
+        }, TimeUnit.SECONDS.toMillis(rpec_s), TimeUnit.SECONDS.toMillis(rpec_i));
     }
 
     /**
@@ -1007,11 +1005,9 @@ public final class SubProxy extends BungeeCord implements Listener {
         UUID id = e.getPlayer().getUniqueId();
         fallbackLimbo.remove(id);
         SubCommand.players.remove(id);
-        Logger.get("SubServers").info("PlayerDisconnectEvent(" + id + ")");
 
         synchronized (rPlayers) {
             if (rPlayers.containsKey(id) && (!rPlayerLinkP.containsKey(id) || rPlayerLinkP.get(id).isMaster())) {
-                Logger.get("SubServers").info("RP::Remove(" + id + ")");
                 RemotePlayer player = rPlayers.get(id);
                 rPlayerLinkS.remove(id);
                 rPlayerLinkP.remove(id);

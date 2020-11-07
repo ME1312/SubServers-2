@@ -43,7 +43,7 @@
         <dependency>
             <groupId>net.ME1312.SubData</groupId>
             <artifactId>Server</artifactId>
-            <version>20w15a</version>
+            <version>20w42a</version>
             <scope>compile</scope>
             <optional>true</optional>
         </dependency>
@@ -91,14 +91,14 @@
                             <tasks>
                                 <mkdir dir="${project.build.directory}" />
                                 <copy file="${basedir}/../LICENSE" todir="${project.build.directory}/classes" />
-                                <mkdir dir="${basedir}/../Artifacts/-Lite" />
-                                <copy file="${basedir}/../Artifacts/SubServers.Client.jar" tofile="${project.build.directory}/classes/net/ME1312/SubServers/Bungee/Library/Files/client.jar" />
+                                <mkdir dir="${basedir}/../Artifacts/Modulized" />
+                                <copy file="${basedir}/../Artifacts/SubServers.Client.Universal.jar" tofile="${project.build.directory}/classes/net/ME1312/SubServers/Bungee/Library/Files/client.jar" />
                                 <mkdir dir="${project.build.directory}/classes/net/ME1312/SubServers/Bungee/Library/Files/Templates" />
-                                <zip basedir="${basedir}/../SubServers.Creator/src" destfile="${project.build.directory}/classes/net/ME1312/SubServers/Bungee/Library/Files/Templates/forge.zip" includes="Forge/**" />
-                                <zip basedir="${basedir}/../SubServers.Creator/src" destfile="${project.build.directory}/classes/net/ME1312/SubServers/Bungee/Library/Files/Templates/paper.zip" includes="Paper/**" />
-                                <zip basedir="${basedir}/../SubServers.Creator/src" destfile="${project.build.directory}/classes/net/ME1312/SubServers/Bungee/Library/Files/Templates/spigot.zip" includes="Spigot/**" />
-                                <zip basedir="${basedir}/../SubServers.Creator/src" destfile="${project.build.directory}/classes/net/ME1312/SubServers/Bungee/Library/Files/Templates/sponge.zip" includes="Sponge/**" />
-                                <zip basedir="${basedir}/../SubServers.Creator/src" destfile="${project.build.directory}/classes/net/ME1312/SubServers/Bungee/Library/Files/Templates/vanilla.zip" includes="Vanilla/**" />
+                                <zip basedir="${basedir}/../SubServers.Creator" destfile="${project.build.directory}/classes/net/ME1312/SubServers/Bungee/Library/Files/Templates/forge.zip" includes="Forge/**" />
+                                <zip basedir="${basedir}/../SubServers.Creator" destfile="${project.build.directory}/classes/net/ME1312/SubServers/Bungee/Library/Files/Templates/paper.zip" includes="Paper/**" />
+                                <zip basedir="${basedir}/../SubServers.Creator" destfile="${project.build.directory}/classes/net/ME1312/SubServers/Bungee/Library/Files/Templates/spigot.zip" includes="Spigot/**" />
+                                <zip basedir="${basedir}/../SubServers.Creator" destfile="${project.build.directory}/classes/net/ME1312/SubServers/Bungee/Library/Files/Templates/sponge.zip" includes="Sponge/**" />
+                                <zip basedir="${basedir}/../SubServers.Creator" destfile="${project.build.directory}/classes/net/ME1312/SubServers/Bungee/Library/Files/Templates/vanilla.zip" includes="Vanilla/**" />
                             </tasks>
                         </configuration>
                     </execution>
@@ -110,7 +110,7 @@
                         </goals>
                         <configuration>
                             <tasks> <!-- Dependency Stripped Jar for Testing -->
-                                <jar destfile="${basedir}/../Artifacts/-Lite/SubServers.Bungee.jar" manifest="src/META-INF/MANIFEST.MF">
+                                <jar destfile="${basedir}/../Artifacts/Modulized/SubServers.Bungee.jar" manifest="src/META-INF/MANIFEST.MOD.MF">
                                     <zipfileset src="${basedir}/../Artifacts/SubServers.Bungee.jar" excludes="net/ME1312/Galaxi/** net/ME1312/SubData/**" />
                                 </jar>
                             </tasks>

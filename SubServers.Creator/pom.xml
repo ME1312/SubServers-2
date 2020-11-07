@@ -3,16 +3,9 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>net.ME1312.SubServers</groupId>
-    <artifactId>SubServers</artifactId>
+    <artifactId>SubServers.Creator</artifactId>
     <version>-PLACEHOLDER</version>
     <packaging>pom</packaging>
 
-    <modules>
-        <module>SubServers.Client</module>
-        <module>SubServers.Bungee</module>
-        <module>SubServers.Console</module>
-        <module>SubServers.Creator</module>
-        <module>SubServers.Host</module>
-        <module>SubServers.Sync</module>
-    </modules>
+    <!-- This module is a placeholder; it has no real maven artifacts. -->
 </project>

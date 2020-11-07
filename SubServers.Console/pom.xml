@@ -106,7 +106,7 @@
                 <version>2.2-beta-5</version>
                 <configuration>
                     <finalName>SubServers.Console</finalName>
-                    <outputDirectory>../Artifacts</outputDirectory>
+                    <outputDirectory>../Artifacts/Plugins</outputDirectory>
                     <descriptorRefs>
                         <descriptorRef>jar-with-dependencies</descriptorRef>
                     </descriptorRefs>

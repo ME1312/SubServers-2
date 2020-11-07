@@ -55,7 +55,7 @@
         <dependency>
             <groupId>net.ME1312.SubData</groupId>
             <artifactId>Client</artifactId>
-            <version>20w15a</version>
+            <version>20w42a</version>
             <scope>compile</scope>
             <optional>true</optional>
         </dependency>

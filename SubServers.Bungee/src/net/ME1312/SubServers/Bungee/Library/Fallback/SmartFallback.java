@@ -33,24 +33,25 @@ public class SmartFallback implements ReconnectHandler {
 
     @Override
     public ServerInfo getServer(ProxiedPlayer player) {
-        Map<String, ServerInfo> fallbacks = getFallbackServers(player.getPendingConnection().getListener(), player);
-        LinkedList<String> queue = new LinkedList<String>(fallbacks.keySet());
+        return getServer(player, player instanceof UserConnection);
+    }
 
-        ServerInfo server;
-        if ((server = getForcedHost(player.getPendingConnection())) == null
-                && (server = getDNS(player.getPendingConnection())) == null
-                && (server = getReconnectServer(player)) == null) {
-            if (!fallbacks.isEmpty()) {
-                server = new LinkedList<ServerInfo>(fallbacks.values()).getFirst();
-            }
+    protected ServerInfo getServer(ProxiedPlayer player, boolean queue) {
+        ServerInfo override;
+        if ((override = getForcedHost(player.getPendingConnection())) != null
+                || (override = getDNS(player.getPendingConnection())) != null) {
+            if (queue) ((UserConnection) player).setServerJoinQueue(new LinkedList<>());
+            return override;
         } else {
-            queue.addFirst(server.getName());
+            Map<String, ServerInfo> fallbacks = getFallbackServers(player.getPendingConnection().getListener(), player);
+
+            if ((override = getReconnectServer(player)) != null || !fallbacks.isEmpty()) {
+                if (queue) ((UserConnection) player).setServerJoinQueue(new LinkedList<>(fallbacks.keySet()));
+                return (override != null)? override : new LinkedList<>(fallbacks.values()).getFirst();
+            } else {
+                return null;
+            }
         }
-
-
-        if (server != null && player instanceof UserConnection)
-            ((UserConnection) player).setServerJoinQueue(new LinkedList<>(fallbacks.keySet()));
-        return server;
     }
 
     /**
