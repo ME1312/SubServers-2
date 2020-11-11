@@ -140,7 +140,7 @@ public class SubProtocol extends SubDataProtocol {
             instance = new SubProtocol();
             log = net.ME1312.SubServers.Bungee.Library.Compatibility.Logger.get("SubData");
             SubProxy plugin = SubAPI.getInstance().getInternals();
-            plugin.getPluginManager().registerListener(null, new PacketOutExRunEvent(plugin));
+            plugin.getPluginManager().registerListener(plugin.plugin, new PacketOutExRunEvent(plugin));
         }
 
         return instance;

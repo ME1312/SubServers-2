@@ -20,6 +20,7 @@ import net.ME1312.Galaxi.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Bungee.Library.Compatibility.Galaxi.GalaxiCommand;
 import net.ME1312.SubServers.Bungee.Library.Compatibility.LegacyServerMap;
 import net.ME1312.SubServers.Bungee.Library.Compatibility.Logger;
+import net.ME1312.SubServers.Bungee.Library.Compatibility.Plugin;
 import net.ME1312.SubServers.Bungee.Library.Fallback.SmartFallback;
 import net.ME1312.SubServers.Bungee.Library.ConfigUpdater;
 import net.ME1312.SubServers.Bungee.Library.Exception.InvalidHostException;
@@ -78,6 +79,7 @@ public final class SubProxy extends BungeeCord implements Listener {
     public YAMLConfig servers;
     private YAMLConfig bungee;
     public YAMLConfig lang;
+    public final Plugin plugin;
     public final SubAPI api = new SubAPI(this);
     public SubProtocol subprotocol;
     public SubDataServer subdata = null;
@@ -234,7 +236,10 @@ public final class SubProxy extends BungeeCord implements Listener {
         api.addHostDriver(net.ME1312.SubServers.Bungee.Host.Internal.InternalHost.class, "virtual");
         api.addHostDriver(net.ME1312.SubServers.Bungee.Host.External.ExternalHost.class, "network");
 
-        getPluginManager().registerListener(null, this);
+        plugin = Util.getDespiteException(() -> new Plugin(this), null);
+        if (plugin == null) Logger.get("SubServers").warning("Could not initialize plugin object emulation");
+
+        getPluginManager().registerListener(plugin, this);
 
         Logger.get("SubServers").info("Pre-Parsing Config...");
         for (String name : servers.get().getMap("Servers").getKeys()) {
@@ -273,7 +278,7 @@ public final class SubProxy extends BungeeCord implements Listener {
                     UPnP.openPortTCP(listener.getHost().getPort());
                 }
             } else {
-                getLogger().warning("UPnP is currently unavailable; Ports may not be automatically forwarded on this device");
+                getLogger().warning("UPnP is currently unavailable. Ports may not be automatically forwarded on this device.");
             }
 
             super.startListeners();
@@ -633,13 +638,13 @@ public final class SubProxy extends BungeeCord implements Listener {
 
     private void post() {
         if (!config.get().getMap("Settings").getRawStringList("Disabled-Overrides", Collections.emptyList()).contains("/server"))
-            getPluginManager().registerCommand(null, SubCommand.BungeeServer.newInstance(this, "server").get());
+            getPluginManager().registerCommand(plugin, SubCommand.BungeeServer.newInstance(this, "server").get());
         if (!config.get().getMap("Settings").getRawStringList("Disabled-Overrides", Collections.emptyList()).contains("/glist"))
-            getPluginManager().registerCommand(null, new SubCommand.BungeeList(this, "glist"));
+            getPluginManager().registerCommand(plugin, new SubCommand.BungeeList(this, "glist"));
 
-        getPluginManager().registerCommand(null, SubCommand.newInstance(this, "subservers").get());
-        getPluginManager().registerCommand(null, SubCommand.newInstance(this, "subserver").get());
-        getPluginManager().registerCommand(null, SubCommand.newInstance(this, "sub").get());
+        getPluginManager().registerCommand(plugin, SubCommand.newInstance(this, "subservers").get());
+        getPluginManager().registerCommand(plugin, SubCommand.newInstance(this, "subserver").get());
+        getPluginManager().registerCommand(plugin, SubCommand.newInstance(this, "sub").get());
         GalaxiCommand.group(SubCommand.class);
 
         if (getReconnectHandler() != null && getReconnectHandler().getClass().equals(SmartFallback.class))
@@ -851,13 +856,16 @@ public final class SubProxy extends BungeeCord implements Listener {
                     e.setResponse(new ServerPing(e.getResponse().getVersion(), e.getResponse().getPlayers(), new TextComponent(override.getMotd()), null));
                 } else {
                     PrimitiveContainer<Boolean> lock = new PrimitiveContainer<>(true);
+                    boolean mode = plugin != null;
+                    if (mode) e.registerIntent(plugin);
                     ((BungeeServerInfo) override).ping((ping, error) -> {
                         if (error != null) {
                             e.setResponse(new ServerPing(e.getResponse().getVersion(), e.getResponse().getPlayers(), new TextComponent(getTranslation("ping_cannot_connect")), null));
                         } else e.setResponse(ping);
                         lock.value = false;
+                        if (mode) e.completeIntent(plugin);
                     }, ((InitialHandler) e.getConnection()).getHandshake().getProtocolVersion());
-                    while (lock.value) Util.isException(() -> Thread.sleep(4));
+                    if (!mode) while (lock.value) Util.isException(() -> Thread.sleep(4));
                 }
             }
         } else if (dynamic) {
@@ -1001,7 +1009,7 @@ public final class SubProxy extends BungeeCord implements Listener {
     }
 
     @EventHandler(priority = Byte.MAX_VALUE)
-    public void resetPlayer(PlayerDisconnectEvent e) {
+    public void disconnected(PlayerDisconnectEvent e) {
         UUID id = e.getPlayer().getUniqueId();
         fallbackLimbo.remove(id);
         SubCommand.players.remove(id);

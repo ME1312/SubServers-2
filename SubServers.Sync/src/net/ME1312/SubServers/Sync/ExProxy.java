@@ -14,6 +14,7 @@ import net.ME1312.Galaxi.Library.Config.YAMLConfig;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.SubServers.Sync.Library.Compatibility.Galaxi.GalaxiCommand;
 import net.ME1312.SubServers.Sync.Library.Compatibility.Logger;
+import net.ME1312.SubServers.Sync.Library.Compatibility.Plugin;
 import net.ME1312.SubServers.Sync.Library.Fallback.SmartFallback;
 import net.ME1312.SubServers.Sync.Library.Metrics;
 import net.ME1312.Galaxi.Library.Container.NamedContainer;
@@ -44,7 +45,6 @@ import net.md_5.bungee.connection.InitialHandler;
 import net.md_5.bungee.event.EventHandler;
 
 import java.io.*;
-import java.lang.reflect.InvocationTargetException;
 import java.net.InetAddress;
 import java.net.URL;
 import java.nio.charset.Charset;
@@ -66,6 +66,7 @@ public final class ExProxy extends BungeeCord implements Listener {
     public final PrintStream out;
     public final UniversalFile dir = new UniversalFile(new File(System.getProperty("user.dir")));
     public YAMLConfig config;
+    public final Plugin plugin;
     public final SubAPI api = new SubAPI(this);
     public SubProtocol subprotocol;
     public static final Version version = Version.fromString("2.16.4a");
@@ -109,7 +110,11 @@ public final class ExProxy extends BungeeCord implements Listener {
         subprotocol.registerCipher("DHE-128", DHE.get(128));
         subprotocol.registerCipher("DHE-192", DHE.get(192));
         subprotocol.registerCipher("DHE-256", DHE.get(256));
-        getPluginManager().registerListener(null, this);
+
+        plugin = Util.getDespiteException(() -> new Plugin(this), null);
+        if (plugin == null) Logger.get("SubServers").warning("Could not initialize plugin object emulation");
+
+        getPluginManager().registerListener(plugin, this);
 
         Logger.get("SubServers").info("Loading BungeeCord Libraries...");
     }
@@ -162,7 +167,7 @@ public final class ExProxy extends BungeeCord implements Listener {
                     UPnP.openPortTCP(listener.getHost().getPort());
                 }
             } else {
-                getLogger().warning("UPnP is currently unavailable; Ports may not be automatically forwarded on this device");
+                getLogger().warning("UPnP is currently unavailable. Ports may not be automatically forwarded on this device.");
             }
 
             if (!posted) {
@@ -193,7 +198,7 @@ public final class ExProxy extends BungeeCord implements Listener {
                         }
                         timer.cancel();
                     } catch (IOException e) {
-                        net.ME1312.SubServers.Sync.Library.Compatibility.Logger.get("SubData").info("Connection was unsuccessful, retrying in " + reconnect + " seconds");
+                        Logger.get("SubData").info("Connection was unsuccessful, retrying in " + reconnect + " seconds");
                     }
                 }
             }, (disconnect == null)?0:TimeUnit.SECONDS.toMillis(reconnect), TimeUnit.SECONDS.toMillis(reconnect));
@@ -202,13 +207,13 @@ public final class ExProxy extends BungeeCord implements Listener {
 
     private void post() {
         if (!config.get().getMap("Settings").getRawStringList("Disabled-Overrides", Collections.emptyList()).contains("/server"))
-            getPluginManager().registerCommand(null, SubCommand.BungeeServer.newInstance(this, "server").get());
+            getPluginManager().registerCommand(plugin, SubCommand.BungeeServer.newInstance(this, "server").get());
         if (!config.get().getMap("Settings").getRawStringList("Disabled-Overrides", Collections.emptyList()).contains("/glist"))
-            getPluginManager().registerCommand(null, new SubCommand.BungeeList(this, "glist"));
+            getPluginManager().registerCommand(plugin, new SubCommand.BungeeList(this, "glist"));
 
-        getPluginManager().registerCommand(null, SubCommand.newInstance(this, "subservers").get());
-        getPluginManager().registerCommand(null, SubCommand.newInstance(this, "subserver").get());
-        getPluginManager().registerCommand(null, SubCommand.newInstance(this, "sub").get());
+        getPluginManager().registerCommand(plugin, SubCommand.newInstance(this, "subservers").get());
+        getPluginManager().registerCommand(plugin, SubCommand.newInstance(this, "subserver").get());
+        getPluginManager().registerCommand(plugin, SubCommand.newInstance(this, "sub").get());
         GalaxiCommand.group(SubCommand.class);
 
         if (getReconnectHandler() != null && getReconnectHandler().getClass().equals(SmartFallback.class))
@@ -387,13 +392,16 @@ public final class ExProxy extends BungeeCord implements Listener {
                     e.setResponse(new ServerPing(e.getResponse().getVersion(), e.getResponse().getPlayers(), new TextComponent(override.getMotd()), null));
                 } else {
                     PrimitiveContainer<Boolean> lock = new PrimitiveContainer<>(true);
+                    boolean mode = plugin != null;
+                    if (mode) e.registerIntent(plugin);
                     ((BungeeServerInfo) override).ping((ping, error) -> {
                         if (error != null) {
                             e.setResponse(new ServerPing(e.getResponse().getVersion(), e.getResponse().getPlayers(), new TextComponent(getTranslation("ping_cannot_connect")), null));
                         } else e.setResponse(ping);
                         lock.value = false;
+                        if (mode) e.completeIntent(plugin);
                     }, ((InitialHandler) e.getConnection()).getHandshake().getProtocolVersion());
-                    while (lock.value) Util.isException(() -> Thread.sleep(4));
+                    if (!mode) while (lock.value) Util.isException(() -> Thread.sleep(4));
                 }
             }
         } else if (dynamic) {
@@ -538,7 +546,7 @@ public final class ExProxy extends BungeeCord implements Listener {
     }
 
     @EventHandler(priority = Byte.MAX_VALUE)
-    public void resetPlayer(PlayerDisconnectEvent e) {
+    public void disconnected(PlayerDisconnectEvent e) {
         UUID id = e.getPlayer().getUniqueId();
         fallbackLimbo.remove(id);
         SubCommand.permitted.remove(id);

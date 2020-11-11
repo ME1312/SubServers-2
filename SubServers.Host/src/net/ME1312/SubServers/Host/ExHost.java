@@ -204,7 +204,7 @@ public final class ExHost {
             engine.start(this::stop);
 
             if (!UPnP.isUPnPAvailable()) {
-                log.warn.println("UPnP is currently unavailable; Ports may not be automatically forwarded on this device");
+                log.warn.println("UPnP is currently unavailable. Ports may not be automatically forwarded on this device.");
             }
         } catch (Exception e) {
             if (engine == null) {
