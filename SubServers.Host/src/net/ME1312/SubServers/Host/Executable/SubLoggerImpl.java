@@ -81,7 +81,7 @@ public class SubLoggerImpl {
                 @Override
                 public void run(NamedContainer<DisconnectReason, DataClient> client) {
                     if (started && SubLoggerImpl.this.process != null && process == SubLoggerImpl.this.process && process.isAlive()) {
-                        int reconnect = host.config.get().getMap("Settings").getMap("SubData").getInt("Reconnect", 30);
+                        int reconnect = host.config.get().getMap("Settings").getMap("SubData").getInt("Reconnect", 60);
                         if (Util.getDespiteException(() -> Util.reflect(ExHost.class.getDeclaredField("reconnect"), host), false) && reconnect > 0
                                 && client.name() != DisconnectReason.PROTOCOL_MISMATCH && client.name() != DisconnectReason.ENCRYPTION_MISMATCH) {
                             Timer timer = new Timer(SubAPI.getInstance().getAppInfo().getName() + "::Log_Reconnect_Handler");

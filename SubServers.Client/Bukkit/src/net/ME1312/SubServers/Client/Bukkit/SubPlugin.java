@@ -189,7 +189,7 @@ public final class SubPlugin extends JavaPlugin {
     }
 
     private void connect(NamedContainer<DisconnectReason, DataClient> disconnect) throws IOException {
-        int reconnect = config.get().getMap("Settings").getMap("SubData").getInt("Reconnect", 30);
+        int reconnect = config.get().getMap("Settings").getMap("SubData").getInt("Reconnect", 60);
         if (disconnect == null || (this.reconnect && reconnect > 0 && disconnect.name() != DisconnectReason.PROTOCOL_MISMATCH && disconnect.name() != DisconnectReason.ENCRYPTION_MISMATCH)) {
             long reset = resetDate;
             if (disconnect != null) Bukkit.getLogger().info("SubData > Attempting reconnect in " + reconnect + " seconds");

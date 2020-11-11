@@ -104,6 +104,6 @@ public class PacketExCreateServer implements PacketObjectIn<Integer>, PacketObje
 
     @Override
     public int version() {
-        return 0x0002;
+        return 0x0001;
     }
 }

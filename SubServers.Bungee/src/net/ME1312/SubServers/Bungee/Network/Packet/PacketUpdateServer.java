@@ -103,6 +103,6 @@ public class PacketUpdateServer implements PacketObjectIn<Integer>, PacketObject
 
     @Override
     public int version() {
-        return 0x0002;
+        return 0x0001;
     }
 }

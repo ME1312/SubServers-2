@@ -275,7 +275,7 @@ public final class ExHost {
     }
 
     private void connect(java.util.logging.Logger log, NamedContainer<DisconnectReason, DataClient> disconnect) throws IOException {
-        int reconnect = config.get().getMap("Settings").getMap("SubData").getInt("Reconnect", 30);
+        int reconnect = config.get().getMap("Settings").getMap("SubData").getInt("Reconnect", 60);
         if (disconnect == null || (this.reconnect && reconnect > 0 && disconnect.name() != DisconnectReason.PROTOCOL_MISMATCH && disconnect.name() != DisconnectReason.ENCRYPTION_MISMATCH)) {
             long reset = resetDate;
             Timer timer = new Timer(SubAPI.getInstance().getAppInfo().getName() + "::SubData_Reconnect_Handler");

@@ -180,7 +180,7 @@ public final class ExProxy extends BungeeCord implements Listener {
     }
 
     private void connect(NamedContainer<DisconnectReason, DataClient> disconnect) throws IOException {
-        int reconnect = config.get().getMap("Settings").getMap("SubData").getInt("Reconnect", 30);
+        int reconnect = config.get().getMap("Settings").getMap("SubData").getInt("Reconnect", 60);
         if (disconnect == null || (this.reconnect && reconnect > 0 && disconnect.name() != DisconnectReason.PROTOCOL_MISMATCH && disconnect.name() != DisconnectReason.ENCRYPTION_MISMATCH)) {
             long reset = resetDate;
             Timer timer = new Timer("SubServers.Sync::SubData_Reconnect_Handler");

@@ -199,7 +199,7 @@ public class SubProtocol extends SubDataProtocol {
             plugin.getPluginManager().callEvent(event);
 
             if (plugin.isRunning) {
-                net.ME1312.SubServers.Sync.Library.Compatibility.Logger.get("SubData").info("Attempting reconnect in " + plugin.config.get().getMap("Settings").getMap("SubData").getInt("Reconnect", 30) + " seconds");
+                net.ME1312.SubServers.Sync.Library.Compatibility.Logger.get("SubData").info("Attempting reconnect in " + plugin.config.get().getMap("Settings").getMap("SubData").getInt("Reconnect", 60) + " seconds");
                 Util.isException(() -> Util.reflect(ExProxy.class.getDeclaredMethod("connect", NamedContainer.class), plugin, client));
             } else map.put(0, null);
         });
