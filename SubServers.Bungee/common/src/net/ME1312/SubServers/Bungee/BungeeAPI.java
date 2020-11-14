@@ -5,6 +5,7 @@ import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubServers.Bungee.Library.Compatibility.RemotePlayer;
 import net.md_5.bungee.api.ProxyServer;
+import net.md_5.bungee.api.config.ServerInfo;
 
 import java.util.*;
 
@@ -35,16 +36,22 @@ public interface BungeeAPI {
      *
      * @return Remote Player Collection
      */
-    default int getRemotePlayerCount() {
-        return getGlobalPlayers().size();
-    }
+    int getRemotePlayerCount();
+
+    /**
+     * Get players on this server across all known proxies
+     *
+     * @param server Server to search
+     * @return Remote Player Map
+     */
+    Map<UUID, ? extends RemotePlayer> getRemotePlayers(ServerInfo server);
 
     /**
      * Get players on this network across all known proxies
      *
-     * @return Remote Player Collection
+     * @return Remote Player Map
      */
-    Map<UUID, ? extends RemotePlayer> getGlobalPlayers();
+    Map<UUID, ? extends RemotePlayer> getRemotePlayers();
 
     /**
      * Get a player on this network by searching across all known proxies
@@ -52,7 +59,7 @@ public interface BungeeAPI {
      * @param name Player name
      * @return Remote Player
      */
-    RemotePlayer getGlobalPlayer(String name);
+    RemotePlayer getRemotePlayer(String name);
 
     /**
      * Get a player on this network by searching across all known proxies
@@ -60,7 +67,7 @@ public interface BungeeAPI {
      * @param id Player UUID
      * @return Remote Player
      */
-    RemotePlayer getGlobalPlayer(UUID id);
+    RemotePlayer getRemotePlayer(UUID id);
 
     /**
      * Gets the current SubServers Lang Channels

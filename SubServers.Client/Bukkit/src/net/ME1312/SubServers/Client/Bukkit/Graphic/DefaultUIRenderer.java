@@ -841,7 +841,7 @@ public class DefaultUIRenderer extends UIRenderer {
                         if (!server.getName().equals(server.getDisplayName()))
                             lore.add(ChatColor.GRAY + server.getName());
                         lore.add(plugin.api.getLang("SubServers", "Interface.Server-Menu.Server-External"));
-                        lore.add(plugin.api.getLang("SubServers", "Interface.Server-Menu.Server-Player-Count").replace("$int$", new DecimalFormat("#,###").format(server.getGlobalPlayers().size())));
+                        lore.add(plugin.api.getLang("SubServers", "Interface.Server-Menu.Server-Player-Count").replace("$int$", new DecimalFormat("#,###").format(server.getRemotePlayers().size())));
                         lore.add(plugin.api.getLang("SubServers", "Interface.Server-Menu.SubServer-Invalid"));
                         lore.add(ChatColor.WHITE + ((plugin.config.get().getMap("Settings").getBoolean("Show-Addresses", false))?server.getAddress().getAddress().getHostAddress()+':':"") + server.getAddress().getPort());
                         blockMeta.setLore(lore);
@@ -856,7 +856,7 @@ public class DefaultUIRenderer extends UIRenderer {
                             blockMeta.setDisplayName(ChatColor.AQUA + server.getDisplayName());
                             lore.add(plugin.api.getLang("SubServers", "Interface.Server-Menu.SubServer-Temporary"));
                         } else blockMeta.setDisplayName(ChatColor.GREEN + server.getDisplayName());
-                        lore.add(plugin.api.getLang("SubServers", "Interface.Server-Menu.Server-Player-Count").replace("$int$", new DecimalFormat("#,###").format(server.getGlobalPlayers().size())));
+                        lore.add(plugin.api.getLang("SubServers", "Interface.Server-Menu.Server-Player-Count").replace("$int$", new DecimalFormat("#,###").format(server.getRemotePlayers().size())));
                         lore.add(ChatColor.WHITE + ((plugin.config.get().getMap("Settings").getBoolean("Show-Addresses", false))?server.getAddress().getAddress().getHostAddress()+':':"") + server.getAddress().getPort());
                         blockMeta.setLore(lore);
                     } else if (((SubServer) server).isAvailable() && ((SubServer) server).isEnabled() && ((SubServer) server).getCurrentIncompatibilities().size() == 0) {
@@ -1132,7 +1132,7 @@ public class DefaultUIRenderer extends UIRenderer {
                             blockMeta.setDisplayName(ChatColor.AQUA + subserver.getDisplayName());
                             lore.add(plugin.api.getLang("SubServers", "Interface.Server-Menu.SubServer-Temporary"));
                         } else blockMeta.setDisplayName(ChatColor.GREEN + subserver.getDisplayName());
-                        lore.add(plugin.api.getLang("SubServers", "Interface.Server-Menu.Server-Player-Count").replace("$int$", new DecimalFormat("#,###").format(subserver.getGlobalPlayers().size())));
+                        lore.add(plugin.api.getLang("SubServers", "Interface.Server-Menu.Server-Player-Count").replace("$int$", new DecimalFormat("#,###").format(subserver.getRemotePlayers().size())));
                         lore.add(ChatColor.WHITE + ((plugin.config.get().getMap("Settings").getBoolean("Show-Addresses", false))?subserver.getAddress().getAddress().getHostAddress()+':':"") + subserver.getAddress().getPort());
                         blockMeta.setLore(lore);
                     } else if (subserver.isAvailable() && subserver.isEnabled() && subserver.getCurrentIncompatibilities().size() == 0) {

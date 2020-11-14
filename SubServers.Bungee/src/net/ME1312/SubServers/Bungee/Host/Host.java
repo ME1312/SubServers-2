@@ -127,10 +127,10 @@ public abstract class Host implements ExtraDataHandler {
      *
      * @return Remote Player Collection
      */
-    public Collection<RemotePlayer> getGlobalPlayers() {
+    public Collection<RemotePlayer> getRemotePlayers() {
         LinkedList<RemotePlayer> players = new LinkedList<RemotePlayer>();
         for (SubServer server : getSubServers().values()) {
-            players.addAll(server.getGlobalPlayers());
+            players.addAll(server.getRemotePlayers());
         }
         return players;
     }

@@ -222,7 +222,7 @@ public final class SubCommand extends CommandX {
                             String type = (args.length > 2)?args[1]:null;
                             String name = args[(type != null)?2:1];
 
-                            Runnable getPlayer = () -> plugin.api.getGlobalPlayer(name, player -> {
+                            Runnable getPlayer = () -> plugin.api.getRemotePlayer(name, player -> {
                                 if (player != null) {
                                     sender.sendMessage("SubServers > Info on player: " + ChatColor.WHITE + player.getName());
                                     if (player.getProxy() != null) sender.sendMessage(" -> Proxy: " + ChatColor.WHITE + player.getProxy());
@@ -254,7 +254,7 @@ public final class SubCommand extends CommandX {
                                     if (server instanceof SubServer) sender.sendMessage(" -> " + ((((SubServer) server).isOnline())?"Online":"Running") + ": " + ((((SubServer) server).isRunning())?ChatColor.GREEN+"yes":ChatColor.RED+"no"));
                                     if (!(server instanceof SubServer) || ((SubServer) server).isRunning()) {
                                         sender.sendMessage(" -> Connected: " + ((server.getSubData()[0] != null)?ChatColor.GREEN+"yes"+((server.getSubData().length > 1)?ChatColor.AQUA+" +"+(server.getSubData().length-1)+" subchannel"+((server.getSubData().length == 2)?"":"s"):""):ChatColor.RED+"no"));
-                                        sender.sendMessage(" -> Players: " + ChatColor.AQUA + server.getGlobalPlayers().size() + " online");
+                                        sender.sendMessage(" -> Players: " + ChatColor.AQUA + server.getRemotePlayers().size() + " online");
                                     }
                                     sender.sendMessage(" -> MOTD: " + ChatColor.WHITE + ChatColor.stripColor(server.getMotd()));
                                     if (server instanceof SubServer && ((SubServer) server).getStopAction() != SubServer.StopAction.NONE) sender.sendMessage(" -> Stop Action: " + ChatColor.WHITE + ((SubServer) server).getStopAction().toString());
@@ -1007,7 +1007,7 @@ public final class SubCommand extends CommandX {
                 ReturnRunnable<Collection<String>> getPlayers = () -> {
                     LinkedList<String> names = new LinkedList<String>();
                     for (ProxiedPlayer player : plugin.getPlayers()) names.add(player.getName());
-                    for (CachedPlayer player : plugin.api.getGlobalPlayers().values()) if (!names.contains(player.getName())) names.add(player.getName());
+                    for (CachedPlayer player : plugin.api.getRemotePlayers().values()) if (!names.contains(player.getName())) names.add(player.getName());
                     Collections.sort(names);
                     return names;
                 };
@@ -1215,7 +1215,7 @@ public final class SubCommand extends CommandX {
                         }
 
                         if (((ProxiedPlayer) sender).getServer().getInfo() instanceof ServerImpl) {
-                            for (CachedPlayer player : ((ServerImpl) ((ProxiedPlayer) sender).getServer().getInfo()).getGlobalPlayers()) {
+                            for (CachedPlayer player : ((ServerImpl) ((ProxiedPlayer) sender).getServer().getInfo()).getRemotePlayers()) {
                                 if (!used.contains(player.getUniqueId())) {
                                     if (player.getName().toLowerCase().startsWith(last)) list.add(Last + player.getName().substring(last.length()));
                                     used.add(player.getUniqueId());
@@ -1474,7 +1474,7 @@ public final class SubCommand extends CommandX {
                             if (i != 0) serverm.addExtra(div);
                             TextComponent message = new TextComponent(plugin.api.getLang("SubServers", "Bungee.Server.List").replace("$str$", server.getDisplayName()));
                             try {
-                                message.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[]{new TextComponent(plugin.api.getLang("SubServers", "Bungee.Server.Hover").replace("$int$", Integer.toString(server.getGlobalPlayers().size())))}));
+                                message.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[]{new TextComponent(plugin.api.getLang("SubServers", "Bungee.Server.Hover").replace("$int$", Integer.toString(server.getRemotePlayers().size())))}));
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
@@ -1555,7 +1555,7 @@ public final class SubCommand extends CommandX {
             int players = 0;
             for (ServerImpl server : plugin.servers.values()) {
                 List<String> playerlist = new ArrayList<String>();
-                for (CachedPlayer player : server.getGlobalPlayers()) playerlist.add(player.getName());
+                for (CachedPlayer player : server.getRemotePlayers()) playerlist.add(player.getName());
                 Collections.sort(playerlist);
 
                 players += playerlist.size();

@@ -197,7 +197,7 @@ public final class SubCommand extends BukkitCommand {
                             String type = (args.length > 2)?args[1]:null;
                             String name = args[(type != null)?2:1];
 
-                            Runnable getPlayer = () -> plugin.api.getGlobalPlayer(name, player -> {
+                            Runnable getPlayer = () -> plugin.api.getRemotePlayer(name, player -> {
                                 if (player != null) {
                                     sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info").replace("$str$", "player") + ChatColor.WHITE + player.getName());
                                     if (player.getProxy() != null) sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Proxy") + ChatColor.WHITE + player.getProxy());
@@ -231,7 +231,7 @@ public final class SubCommand extends BukkitCommand {
                                     if (server instanceof SubServer) sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", ((((SubServer) server).isOnline())?"Online":"Running")) + ((((SubServer) server).isRunning())?ChatColor.GREEN+"yes":ChatColor.RED+"no"));
                                     if (!(server instanceof SubServer) || ((SubServer) server).isRunning()) {
                                         sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Connected") + ((server.getSubData()[0] != null)?ChatColor.GREEN+"yes"+((server.getSubData().length > 1)?ChatColor.AQUA+" +"+(server.getSubData().length-1)+" subchannel"+((server.getSubData().length == 2)?"":"s"):""):ChatColor.RED+"no"));
-                                        sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Players") + ChatColor.AQUA + server.getGlobalPlayers().size() + " online");
+                                        sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Players") + ChatColor.AQUA + server.getRemotePlayers().size() + " online");
                                     }
                                     sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "MOTD") + ChatColor.WHITE + ChatColor.stripColor(server.getMotd()));
                                     if (server instanceof SubServer && ((SubServer) server).getStopAction() != SubServer.StopAction.NONE) sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Stop Action") + ChatColor.WHITE + ((SubServer) server).getStopAction().toString());

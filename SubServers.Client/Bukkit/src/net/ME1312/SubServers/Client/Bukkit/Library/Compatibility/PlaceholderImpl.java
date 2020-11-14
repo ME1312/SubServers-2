@@ -474,7 +474,7 @@ public class PlaceholderImpl extends PlaceholderExpansion implements Taskable, C
                 return Integer.toString(host.getSubServers().size());
             }
             case "host.players": {
-                return Integer.toString(host.getGlobalPlayers().size());
+                return Integer.toString(host.getRemotePlayers().size());
             }
             case "host.subdata": {
                 return defaults(responses, ChatColor.GREEN+"Connected", ChatColor.YELLOW+"Unsupported", ChatColor.RED+"Disconnected") [(host.getSubData().length <= 0)?1:((host.getSubData()[0] == null)?2:0)];
@@ -520,7 +520,7 @@ public class PlaceholderImpl extends PlaceholderExpansion implements Taskable, C
             }
             case "server.players":
             case "subserver.players": {
-                return Integer.toString(server.getGlobalPlayers().size());
+                return Integer.toString(server.getRemotePlayers().size());
             }
             case "server.subdata":
             case "subserver.subdata": {

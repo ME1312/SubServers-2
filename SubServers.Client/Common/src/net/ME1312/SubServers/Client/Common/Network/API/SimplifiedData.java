@@ -328,7 +328,7 @@ public final class SimplifiedData {
      * @param client SubData connection
      * @param callback Remote Player Collection
      */
-    public static void requestGlobalPlayers(DataClient client, Callback<Map<UUID, RemotePlayer>> callback) {
+    public static void requestRemotePlayers(DataClient client, Callback<Map<UUID, RemotePlayer>> callback) {
         if (Util.isNull(callback)) throw new NullPointerException();
         StackTraceElement[] origin = new Exception().getStackTrace();
         client(client).sendPacket(new PacketDownloadPlayerInfo((List<UUID>) null, data -> {
@@ -354,7 +354,7 @@ public final class SimplifiedData {
      * @param name Player name
      * @param callback Remote Player
      */
-    public static void requestGlobalPlayer(DataClient client, String name, Callback<RemotePlayer> callback) {
+    public static void requestRemotePlayer(DataClient client, String name, Callback<RemotePlayer> callback) {
         if (Util.isNull(name, callback)) throw new NullPointerException();
         StackTraceElement[] origin = new Exception().getStackTrace();
         client(client).sendPacket(new PacketDownloadPlayerInfo(Collections.singletonList(name), data -> {
@@ -380,7 +380,7 @@ public final class SimplifiedData {
      * @param id Player UUID
      * @param callback Remote Player
      */
-    public static void requestGlobalPlayer(DataClient client, UUID id, Callback<RemotePlayer> callback) {
+    public static void requestRemotePlayer(DataClient client, UUID id, Callback<RemotePlayer> callback) {
         if (Util.isNull(id, callback)) throw new NullPointerException();
         StackTraceElement[] origin = new Exception().getStackTrace();
         client(client).sendPacket(new PacketDownloadPlayerInfo(Collections.singletonList(id), data -> {

@@ -118,14 +118,8 @@ public class ServerImpl extends BungeeServerInfo {
      *
      * @return Remote Player Collection
      */
-    @SuppressWarnings("deprecation")
-    public Collection<CachedPlayer> getGlobalPlayers() {
-        ExProxy plugin = SubAPI.getInstance().getInternals();
-        ArrayList<CachedPlayer> players = new ArrayList<CachedPlayer>();
-        for (UUID id : Util.getBackwards(plugin.rPlayerLinkS, this)) {
-            players.add(plugin.rPlayers.get(id));
-        }
-        return players;
+    public Collection<CachedPlayer> getRemotePlayers() {
+        return SubAPI.getInstance().getRemotePlayers(this).values();
     }
 
     /**

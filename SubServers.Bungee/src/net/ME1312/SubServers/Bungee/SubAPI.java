@@ -15,6 +15,7 @@ import net.ME1312.Galaxi.Library.UniversalFile;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubServers.Bungee.Library.Exception.InvalidServerException;
+import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.protocol.ProtocolConstants;
 
 import java.lang.reflect.InvocationTargetException;
@@ -545,11 +546,37 @@ public final class SubAPI implements BungeeAPI {
     }
 
     /**
+     * Get the number of players on this network across all known proxies
+     *
+     * @return Remote Player Count
+     */
+    public int getRemotePlayerCount() {
+        return plugin.rPlayers.size();
+    }
+
+    /**
+     * Get players on this server across all known proxies
+     *
+     * @param server Server to search
+     * @return Remote Player Map
+     */
+    public Map<UUID, RemotePlayer> getRemotePlayers(ServerInfo server) {
+        if (server instanceof Server) {
+            HashMap<UUID, RemotePlayer> players = new HashMap<UUID, RemotePlayer>();
+            for (UUID id : Util.getBackwards(plugin.rPlayerLinkS, (Server) server))
+                players.put(id, plugin.rPlayers.get(id));
+            return players;
+        } else {
+            return new HashMap<>();
+        }
+    }
+
+    /**
      * Get players on this network across all known proxies
      *
-     * @return Remote Player Collection
+     * @return Remote Player Map
      */
-    public Map<UUID, RemotePlayer> getGlobalPlayers() {
+    public Map<UUID, RemotePlayer> getRemotePlayers() {
         return new HashMap<UUID, RemotePlayer>(plugin.rPlayers);
     }
 
@@ -559,9 +586,9 @@ public final class SubAPI implements BungeeAPI {
      * @param name Player name
      * @return Remote Player
      */
-    public RemotePlayer getGlobalPlayer(String name) {
+    public RemotePlayer getRemotePlayer(String name) {
         if (Util.isNull(name)) throw new NullPointerException();
-        for (RemotePlayer player : getGlobalPlayers().values()) {
+        for (RemotePlayer player : getRemotePlayers().values()) {
             if (player.getName().equalsIgnoreCase(name)) return player;
         }
         return null;
@@ -573,9 +600,9 @@ public final class SubAPI implements BungeeAPI {
      * @param id Player UUID
      * @return Remote Player
      */
-    public RemotePlayer getGlobalPlayer(UUID id) {
+    public RemotePlayer getRemotePlayer(UUID id) {
         if (Util.isNull(id)) throw new NullPointerException();
-        return getGlobalPlayers().getOrDefault(id, null);
+        return getRemotePlayers().getOrDefault(id, null);
     }
 
     /**

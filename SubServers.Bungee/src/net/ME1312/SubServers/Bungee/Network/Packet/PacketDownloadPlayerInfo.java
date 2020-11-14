@@ -61,16 +61,16 @@ public class PacketDownloadPlayerInfo implements PacketObjectIn<Integer>, Packet
 
         ObjectMap<String> players = new ObjectMap<String>();
         if (ids == null && names == null) {
-            for (RemotePlayer player : plugin.api.getGlobalPlayers().values()) {
+            for (RemotePlayer player : plugin.api.getRemotePlayers().values()) {
                 players.set(player.getUniqueId().toString(), player.forSubData());
             }
         } else {
             if (ids != null) for (UUID id : ids) {
-                RemotePlayer player = plugin.api.getGlobalPlayer(id);
+                RemotePlayer player = plugin.api.getRemotePlayer(id);
                 if (player != null) players.set(player.getUniqueId().toString(), player.forSubData());
             }
             if (names != null) for (String name : names) {
-                RemotePlayer player = plugin.api.getGlobalPlayer(name);
+                RemotePlayer player = plugin.api.getRemotePlayer(name);
                 if (player != null) players.set(player.getUniqueId().toString(), player.forSubData());
             }
         }

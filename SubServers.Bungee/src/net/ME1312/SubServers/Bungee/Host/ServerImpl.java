@@ -158,15 +158,9 @@ public class ServerImpl extends BungeeServerInfo implements Server {
         Collections.sort(groups);
     }
 
-    @SuppressWarnings("deprecation")
     @Override
-    public Collection<RemotePlayer> getGlobalPlayers() {
-        SubProxy plugin = SubAPI.getInstance().getInternals();
-        ArrayList<RemotePlayer> players = new ArrayList<RemotePlayer>();
-        for (UUID id : Util.getBackwards(plugin.rPlayerLinkS, this)) {
-            players.add(plugin.rPlayers.get(id));
-        }
-        return players;
+    public Collection<RemotePlayer> getRemotePlayers() {
+        return SubAPI.getInstance().getRemotePlayers(this).values();
     }
 
     @Override
@@ -286,7 +280,7 @@ public class ServerImpl extends BungeeServerInfo implements Server {
         info.set("restricted", isRestricted());
         info.set("hidden", isHidden());
         ObjectMap<String> players = new ObjectMap<String>();
-        for (RemotePlayer player : getGlobalPlayers())
+        for (RemotePlayer player : getRemotePlayers())
             players.set(player.getUniqueId().toString(), player.getName());
         info.set("players", players);
         ObjectMap<Integer> subdata = new ObjectMap<Integer>();

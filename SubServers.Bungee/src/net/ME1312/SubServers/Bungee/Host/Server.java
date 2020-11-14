@@ -63,7 +63,7 @@ public interface Server extends ServerInfo, ClientHandler, ExtraDataHandler {
      *
      * @return Remote Player Collection
      */
-    Collection<RemotePlayer> getGlobalPlayers();
+    Collection<RemotePlayer> getRemotePlayers();
 
     /**
      * If the server is hidden from players

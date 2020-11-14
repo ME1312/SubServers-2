@@ -70,7 +70,7 @@ public class PacketDownloadPlatformInfo implements PacketObjectIn<Integer>, Pack
         LinkedList<String> mcversions = new LinkedList<String>();
         for (Version version : plugin.api.getGameVersion()) mcversions.add(version.toString());
         minecraft.set("version", mcversions);
-        minecraft.set("players", plugin.api.getGlobalPlayers().size());
+        minecraft.set("players", plugin.api.getRemotePlayers().size());
         info.set("minecraft", minecraft);
         ObjectMap<String> system = new ObjectMap<String>();
         ObjectMap<String> os = new ObjectMap<String>();

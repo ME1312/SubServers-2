@@ -161,7 +161,7 @@ public class Host {
      *
      * @return Remote Player Collection
      */
-    public Collection<Pair<String, UUID>> getGlobalPlayers() {
+    public Collection<Pair<String, UUID>> getRemotePlayers() {
         List<Pair<String, UUID>> players = new ArrayList<Pair<String, UUID>>();
         for (String id : raw.getMap("players").getKeys()) {
             players.add(new ContainedPair<String, UUID>(raw.getMap("players").getRawString(id), UUID.fromString(id)));
@@ -174,7 +174,7 @@ public class Host {
      *
      * @param callback Remote Player Collection
      */
-    public void getGlobalPlayers(Callback<Collection<RemotePlayer>> callback) {
+    public void getRemotePlayers(Callback<Collection<RemotePlayer>> callback) {
         if (Util.isNull(callback)) throw new NullPointerException();
         StackTraceElement[] origin = new Exception().getStackTrace();
         Runnable run = () -> {
@@ -189,7 +189,7 @@ public class Host {
 
         if (players == null) {
             LinkedList<UUID> ids = new LinkedList<UUID>();
-            for (SubServer server : getSubServers().values()) for (Pair<String, UUID> player : server.getGlobalPlayers()) ids.add(player.value());
+            for (SubServer server : getSubServers().values()) for (Pair<String, UUID> player : server.getRemotePlayers()) ids.add(player.value());
             client().sendPacket(new PacketDownloadPlayerInfo(ids, data -> {
                 LinkedList<RemotePlayer> players = new LinkedList<RemotePlayer>();
                 for (String player : data.getKeys()) {

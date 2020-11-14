@@ -10,6 +10,8 @@ import net.ME1312.SubServers.Bungee.BungeeAPI;
 import net.ME1312.SubServers.Client.Common.ClientAPI;
 import net.ME1312.SubData.Client.SubDataClient;
 import net.ME1312.SubServers.Sync.Server.CachedPlayer;
+import net.ME1312.SubServers.Sync.Server.ServerImpl;
+import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.protocol.ProtocolConstants;
 
 import java.lang.reflect.InvocationTargetException;
@@ -73,11 +75,37 @@ public final class SubAPI extends ClientAPI implements BungeeAPI {
     }
 
     /**
+     * Get the number of players on this network across all known proxies
+     *
+     * @return Remote Player Count
+     */
+    public int getRemotePlayerCount() {
+        return plugin.rPlayers.size();
+    }
+
+    /**
+     * Get players on this server across all known proxies (Cached)
+     *
+     * @param server Server to search
+     * @return Remote Player Map
+     */
+    public Map<UUID, CachedPlayer> getRemotePlayers(ServerInfo server) {
+        if (server instanceof ServerImpl) {
+            HashMap<UUID, CachedPlayer> players = new HashMap<UUID, CachedPlayer>();
+            for (UUID id : Util.getBackwards(plugin.rPlayerLinkS, (ServerImpl) server))
+                players.put(id, plugin.rPlayers.get(id));
+            return players;
+        } else {
+            return new HashMap<>();
+        }
+    }
+
+    /**
      * Gets players on this network across all known proxies (Cached)
      *
-     * @return Remote Player Collection
+     * @return Remote Player Map
      */
-    public Map<UUID, CachedPlayer> getGlobalPlayers() {
+    public Map<UUID, CachedPlayer> getRemotePlayers() {
         return new HashMap<UUID, CachedPlayer>(plugin.rPlayers);
     }
 
@@ -87,9 +115,9 @@ public final class SubAPI extends ClientAPI implements BungeeAPI {
      * @param name Player name
      * @return Remote Player
      */
-    public CachedPlayer getGlobalPlayer(String name) {
+    public CachedPlayer getRemotePlayer(String name) {
         if (Util.isNull(name)) throw new NullPointerException();
-        for (CachedPlayer player : getGlobalPlayers().values()) {
+        for (CachedPlayer player : getRemotePlayers().values()) {
             if (player.getName().equalsIgnoreCase(name)) return player;
         }
         return null;
@@ -101,9 +129,9 @@ public final class SubAPI extends ClientAPI implements BungeeAPI {
      * @param id Player UUID
      * @return Remote Player
      */
-    public CachedPlayer getGlobalPlayer(UUID id) {
+    public CachedPlayer getRemotePlayer(UUID id) {
         if (Util.isNull(id)) throw new NullPointerException();
-        return getGlobalPlayers().getOrDefault(id, null);
+        return getRemotePlayers().getOrDefault(id, null);
     }
 
     /**

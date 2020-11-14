@@ -52,6 +52,54 @@
                     <target>1.8</target>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>2.2-beta-5</version>
+                <configuration>
+                    <finalName>SubServers.Client.Common</finalName>
+                    <outputDirectory>../../Artifacts/Modulized</outputDirectory>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                    <appendAssemblyId>false</appendAssemblyId>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>make-assembly</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.0.0</version>
+                <executions>
+                    <execution>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>javadoc</goal>
+                        </goals>
+                        <configuration>
+                            <windowtitle>SubServers.Client.Common Javadoc</windowtitle>
+                            <doctitle>SubServers.Client.Common Javadoc</doctitle>
+                            <show>protected</show>
+                            <destDir>./</destDir>
+                            <outputDirectory>${basedir}/../../Javadoc/SubServers.Client.Common</outputDirectory>
+                            <reportOutputDirectory>${basedir}/../../Javadoc/SubServers.Client.Common</reportOutputDirectory>
+                            <additionalOptions>-Xdoclint:none</additionalOptions>
+                            <links>
+                                <link>https://dev.me1312.net/jenkins/job/GalaxiEngine/javadoc/GalaxiUtil/</link>
+                                <link>https://dev.me1312.net/jenkins/job/SubData/javadoc/Client/</link>
+                            </links>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 </project>

@@ -182,7 +182,7 @@ public class SubProtocol extends SubDataProtocol {
                     plugin.merge(server);
                 }
 
-                plugin.api.getGlobalPlayers(players -> {
+                plugin.api.getRemotePlayers(players -> {
                     for (RemotePlayer player : players.values()) {
                         plugin.rPlayerLinkP.put(player.getUniqueId(), player.getProxy().toLowerCase());
                         plugin.rPlayers.put(player.getUniqueId(), new CachedPlayer(player));

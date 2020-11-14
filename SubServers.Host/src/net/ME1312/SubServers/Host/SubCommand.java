@@ -187,7 +187,7 @@ public class SubCommand {
                         String type = (args.length > 1)?args[0]:null;
                         String name = args[(type != null)?1:0];
 
-                        Runnable getPlayer = () -> host.api.getGlobalPlayer(name, player -> {
+                        Runnable getPlayer = () -> host.api.getRemotePlayer(name, player -> {
                             if (player != null) {
                                 sender.sendMessage("Info on player: " + TextColor.WHITE + player.getName());
                                 if (player.getProxy() != null) sender.sendMessage(" -> Proxy: " + TextColor.WHITE + player.getProxy());
@@ -219,7 +219,7 @@ public class SubCommand {
                                 if (server instanceof SubServer) sender.sendMessage(" -> " + ((((SubServer) server).isOnline())?"Online":"Running") + ": " + ((((SubServer) server).isRunning())?TextColor.GREEN+"yes":TextColor.RED+"no"));
                                 if (!(server instanceof SubServer) || ((SubServer) server).isRunning()) {
                                     sender.sendMessage(" -> Connected: " + ((server.getSubData()[0] != null)?TextColor.GREEN+"yes"+((server.getSubData().length > 1)?TextColor.AQUA+" +"+(server.getSubData().length-1)+" subchannel"+((server.getSubData().length == 2)?"":"s"):""):TextColor.RED+"no"));
-                                    sender.sendMessage(" -> Players: " + TextColor.AQUA + server.getGlobalPlayers().size() + " online");
+                                    sender.sendMessage(" -> Players: " + TextColor.AQUA + server.getRemotePlayers().size() + " online");
                                 }
                                 sender.sendMessage(" -> MOTD: " + TextColor.WHITE + TextColor.stripColor(server.getMotd()));
                                 if (server instanceof SubServer && ((SubServer) server).getStopAction() != SubServer.StopAction.NONE) sender.sendMessage(" -> Stop Action: " + TextColor.WHITE + ((SubServer) server).getStopAction().toString());

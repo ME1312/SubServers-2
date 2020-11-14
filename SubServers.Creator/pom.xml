@@ -7,5 +7,5 @@
     <version>-PLACEHOLDER</version>
     <packaging>pom</packaging>
 
-    <!-- This module is a placeholder; it has no real maven artifacts. -->
+    <!-- This module is a placeholder. It has no real maven artifacts. -->
 </project>

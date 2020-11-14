@@ -324,8 +324,8 @@ public abstract class ClientAPI {
      *
      * @param callback Remote Player Collection
      */
-    public void getGlobalPlayers(Callback<Map<UUID, RemotePlayer>> callback) {
-        requestGlobalPlayers(null, callback);
+    public void getRemotePlayers(Callback<Map<UUID, RemotePlayer>> callback) {
+        requestRemotePlayers(null, callback);
     }
 
     /**
@@ -334,8 +334,8 @@ public abstract class ClientAPI {
      * @param name Player name
      * @param callback Remote Player
      */
-    public void getGlobalPlayer(String name, Callback<RemotePlayer> callback) {
-        requestGlobalPlayer(null, name, callback);
+    public void getRemotePlayer(String name, Callback<RemotePlayer> callback) {
+        requestRemotePlayer(null, name, callback);
     }
 
     /**
@@ -344,8 +344,8 @@ public abstract class ClientAPI {
      * @param id Player UUID
      * @param callback Remote Player
      */
-    public void getGlobalPlayer(UUID id, Callback<RemotePlayer> callback) {
-        requestGlobalPlayer(null, id, callback);
+    public void getRemotePlayer(UUID id, Callback<RemotePlayer> callback) {
+        requestRemotePlayer(null, id, callback);
     }
 
     /**
