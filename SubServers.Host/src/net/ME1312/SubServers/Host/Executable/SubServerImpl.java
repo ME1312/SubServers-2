@@ -64,42 +64,30 @@ public class SubServerImpl {
         this.command = null;
         this.queue = new LinkedList<String>();
         this.stopcmd = stopcmd;
+        final UniversalFile[] locations = new UniversalFile[] {
+                new UniversalFile(this.directory, "plugins:SubServers.Client.jar"),
+                new UniversalFile(this.directory, "mods:SubServers.Client.jar")
+        };
 
-        if (new UniversalFile(this.directory, "plugins:SubServers.Client.jar").exists()) {
-            try {
-                JarInputStream updated = new JarInputStream(ExHost.class.getResourceAsStream("/net/ME1312/SubServers/Host/Library/Files/client.jar"));
-                JarFile existing = new JarFile(new UniversalFile(this.directory, "plugins:SubServers.Client.jar"));
+        for (UniversalFile location : locations) {
+            if (location.exists()) {
+                try {
+                    JarInputStream updated = new JarInputStream(ExHost.class.getResourceAsStream("/net/ME1312/SubServers/Host/Library/Files/client.jar"));
+                    JarFile existing = new JarFile(location);
 
-                if (existing.getManifest().getMainAttributes().getValue("Implementation-Title") != null && existing.getManifest().getMainAttributes().getValue("Implementation-Title").startsWith("SubServers.Client") && existing.getManifest().getMainAttributes().getValue("Specification-Title") != null &&
-                        updated.getManifest().getMainAttributes().getValue("Implementation-Title") != null && updated.getManifest().getMainAttributes().getValue("Implementation-Title").startsWith("SubServers.Client") && updated.getManifest().getMainAttributes().getValue("Specification-Title") != null) {
-                    if (new Version(existing.getManifest().getMainAttributes().getValue("Specification-Title")).compareTo(new Version(updated.getManifest().getMainAttributes().getValue("Specification-Title"))) < 0) {
-                        new UniversalFile(this.directory, "plugins:SubServers.Client.jar").delete();
-                        Util.copyFromJar(ExHost.class.getClassLoader(), "net/ME1312/SubServers/Host/Library/Files/client.jar", new UniversalFile(this.directory, "plugins:SubServers.Client.jar").getPath());
+                    if (existing.getManifest().getMainAttributes().getValue("Implementation-Title") != null && existing.getManifest().getMainAttributes().getValue("Implementation-Title").startsWith("SubServers.Client") && existing.getManifest().getMainAttributes().getValue("Specification-Title") != null &&
+                            updated.getManifest().getMainAttributes().getValue("Implementation-Title") != null && updated.getManifest().getMainAttributes().getValue("Implementation-Title").startsWith("SubServers.Client") && updated.getManifest().getMainAttributes().getValue("Specification-Title") != null) {
+                        if (new Version(existing.getManifest().getMainAttributes().getValue("Specification-Title")).compareTo(new Version(updated.getManifest().getMainAttributes().getValue("Specification-Title"))) < 0) {
+                            location.delete();
+                            Util.copyFromJar(ExHost.class.getClassLoader(), "net/ME1312/SubServers/Host/Library/Files/client.jar", location.getPath());
+                        }
                     }
+                    existing.close();
+                    updated.close();
+                } catch (Throwable e) {
+                    host.log.info.println("Couldn't auto-update SubServers.Client for subserver: " + name);
+                    host.log.error.println(e);
                 }
-                existing.close();
-                updated.close();
-            } catch (Throwable e) {
-                host.log.info.println("Couldn't auto-update SubServers.Client.jar for " + name);
-                host.log.error.println(e);
-            }
-        } else if (new UniversalFile(this.directory, "mods:SubServers.Client.jar").exists()) {
-            try {
-                JarInputStream updated = new JarInputStream(ExHost.class.getResourceAsStream("/net/ME1312/SubServers/Host/Library/Files/client.jar"));
-                JarFile existing = new JarFile(new UniversalFile(this.directory, "mods:SubServers.Client.jar"));
-
-                if (existing.getManifest().getMainAttributes().getValue("Implementation-Title") != null && existing.getManifest().getMainAttributes().getValue("Implementation-Title").startsWith("SubServers.Client") && existing.getManifest().getMainAttributes().getValue("Specification-Title") != null &&
-                        updated.getManifest().getMainAttributes().getValue("Implementation-Title") != null && updated.getManifest().getMainAttributes().getValue("Implementation-Title").startsWith("SubServers.Client") && updated.getManifest().getMainAttributes().getValue("Specification-Title") != null) {
-                    if (new Version(existing.getManifest().getMainAttributes().getValue("Specification-Title")).compareTo(new Version(updated.getManifest().getMainAttributes().getValue("Specification-Title"))) < 0) {
-                        new UniversalFile(this.directory, "mods:SubServers.Client.jar").delete();
-                        Util.copyFromJar(ExHost.class.getClassLoader(), "net/ME1312/SubServers/Host/Library/Files/client.jar", new UniversalFile(this.directory, "mods:SubServers.Client.jar").getPath());
-                    }
-                }
-                existing.close();
-                updated.close();
-            } catch (Throwable e) {
-                host.log.info.println("Couldn't auto-update SubServers.Client.jar for " + name);
-                host.log.error.println(e);
             }
         }
     }

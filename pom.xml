@@ -9,6 +9,7 @@
 
     <modules>
         <module>SubServers.Client</module>
+        <module>SuBServers.Bungee/common</module>
         <module>SubServers.Bungee</module>
         <module>SubServers.Console</module>
         <module>SubServers.Creator</module>

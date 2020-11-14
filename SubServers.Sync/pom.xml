@@ -41,9 +41,16 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>net.ME1312.SubServers</groupId>
+            <artifactId>SubServers.Bungee.Common</artifactId>
+            <version>-PLACEHOLDER</version>
+            <scope>compile</scope>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
             <groupId>net.ME1312.SubData</groupId>
             <artifactId>Client</artifactId>
-            <version>20w46a</version>
+            <version>20w46b</version>
             <scope>compile</scope>
             <optional>true</optional>
         </dependency>
@@ -164,6 +171,10 @@
                                 <link>https://dev.me1312.net/jenkins/job/SubData/javadoc/Client/</link>
                                 <link>https://ci.md-5.net/job/BungeeCord/ws/api/target/apidocs/</link>
                             </links>
+                            <includeDependencySources>true</includeDependencySources>
+                            <dependencySourceIncludes>
+                                <dependencySourceInclude>net.ME1312.SubServers:SubServers.Bungee.Common:*</dependencySourceInclude>
+                            </dependencySourceIncludes>
                         </configuration>
                     </execution>
                 </executions>

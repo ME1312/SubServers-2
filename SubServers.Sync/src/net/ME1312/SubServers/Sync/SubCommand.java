@@ -8,13 +8,13 @@ import net.ME1312.Galaxi.Library.Container.PrimitiveContainer;
 import net.ME1312.Galaxi.Library.Platform;
 import net.ME1312.SubData.Client.SubDataClient;
 import net.ME1312.SubData.Client.SubDataSender;
-import net.ME1312.SubServers.Sync.Library.Compatibility.CommandX;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Container.Container;
 import net.ME1312.Galaxi.Library.Container.NamedContainer;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
-import net.ME1312.SubServers.Sync.Library.Compatibility.Galaxi.GalaxiInfo;
+import net.ME1312.SubServers.Bungee.Library.Compatibility.CommandX;
+import net.ME1312.SubServers.Bungee.Library.Compatibility.Galaxi.GalaxiInfo;
 import net.ME1312.SubServers.Sync.Network.API.*;
 import net.ME1312.SubServers.Sync.Network.Packet.*;
 import net.ME1312.SubServers.Sync.Server.ServerImpl;
@@ -38,7 +38,7 @@ import java.nio.charset.Charset;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
-import static net.ME1312.SubServers.Sync.Library.Compatibility.Galaxi.GalaxiCommand.*;
+import static net.ME1312.SubServers.Bungee.Library.Compatibility.Galaxi.GalaxiCommand.*;
 
 @SuppressWarnings("deprecation")
 public final class SubCommand extends CommandX {

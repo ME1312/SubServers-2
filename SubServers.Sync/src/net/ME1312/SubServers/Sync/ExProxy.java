@@ -9,13 +9,14 @@ import net.ME1312.SubData.Client.Encryption.DHE;
 import net.ME1312.SubData.Client.Encryption.RSA;
 import net.ME1312.SubData.Client.Library.DataSize;
 import net.ME1312.SubData.Client.Library.DisconnectReason;
+import net.ME1312.SubServers.Bungee.BungeeCommon;
+import net.ME1312.SubServers.Bungee.Library.Compatibility.Galaxi.GalaxiCommand;
+import net.ME1312.SubServers.Bungee.Library.Compatibility.Logger;
+import net.ME1312.SubServers.Bungee.Library.Fallback.SmartFallback;
 import net.ME1312.SubServers.Sync.Event.*;
 import net.ME1312.Galaxi.Library.Config.YAMLConfig;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
-import net.ME1312.SubServers.Sync.Library.Compatibility.Galaxi.GalaxiCommand;
-import net.ME1312.SubServers.Sync.Library.Compatibility.Logger;
 import net.ME1312.SubServers.Sync.Library.Compatibility.Plugin;
-import net.ME1312.SubServers.Sync.Library.Fallback.SmartFallback;
 import net.ME1312.SubServers.Sync.Library.Metrics;
 import net.ME1312.Galaxi.Library.Container.NamedContainer;
 import net.ME1312.Galaxi.Library.UniversalFile;
@@ -29,7 +30,6 @@ import net.ME1312.SubServers.Sync.Network.Packet.PacketExSyncPlayer;
 import net.ME1312.SubServers.Sync.Network.SubProtocol;
 import net.ME1312.SubServers.Sync.Server.ServerImpl;
 import net.ME1312.SubServers.Sync.Server.SubServerImpl;
-import net.md_5.bungee.BungeeCord;
 import net.md_5.bungee.BungeeServerInfo;
 import net.md_5.bungee.UserConnection;
 import net.md_5.bungee.api.ChatColor;
@@ -54,7 +54,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Main Plugin Class
  */
-public final class ExProxy extends BungeeCord implements Listener {
+public final class ExProxy extends BungeeCommon implements Listener {
     HashMap<Integer, SubDataClient> subdata = new HashMap<Integer, SubDataClient>();
     NamedContainer<Long, Map<String, Map<String, String>>> lang = null;
     public final Map<String, ServerImpl> servers = new TreeMap<String, ServerImpl>();
@@ -79,13 +79,13 @@ public final class ExProxy extends BungeeCord implements Listener {
     private boolean posted = false;
 
     ExProxy(PrintStream out, boolean isPatched) throws Exception {
+        super(SubAPI::getInstance);
         this.isPatched = isPatched;
         this.isGalaxi = !Util.isException(() ->
                 Util.reflect(Class.forName("net.ME1312.Galaxi.Engine.PluginManager").getMethod("findClasses", Class.class),
                         Util.reflect(Class.forName("net.ME1312.Galaxi.Engine.GalaxiEngine").getMethod("getPluginManager"),
                                 Util.reflect(Class.forName("net.ME1312.Galaxi.Engine.GalaxiEngine").getMethod("getInstance"), null)), Launch.class));
 
-        Util.reflect(Logger.class.getDeclaredField("plugin"), null, this);
         Logger.get("SubServers").info("Loading SubServers.Sync v" + version.toString() + " Libraries (for Minecraft " + api.getGameVersion()[api.getGameVersion().length - 1] + ")");
 
         this.out = out;
@@ -102,8 +102,24 @@ public final class ExProxy extends BungeeCord implements Listener {
         ConfigUpdater.updateConfig(new UniversalFile(dir, "sync.yml"));
         config = new YAMLConfig(new UniversalFile(dir, "sync.yml"));
 
+        SmartFallback.addInspector((player, server) -> {
+            double confidence = 0;
+            if (server instanceof ServerImpl) {
+                if (!((ServerImpl) server).isHidden()) confidence++;
+                if (!((ServerImpl) server).isRestricted()) confidence++;
+                if (((ServerImpl) server).getSubData()[0] != null) confidence++;
+
+                if (player != null) {
+                    if (((ServerImpl) server).canAccess(player)) confidence++;
+                }
+            } if (server instanceof SubServerImpl) {
+                if (!((SubServerImpl) server).isRunning()) return null;
+            }
+            return confidence;
+        });
+
         if (config.get().getMap("Settings").getMap("Smart-Fallback", new ObjectMap<>()).getBoolean("Enabled", true))
-            setReconnectHandler(new SmartFallback(this));
+            setReconnectHandler(new SmartFallback(config.get().getMap("Settings").getMap("Smart-Fallback", new ObjectMap<>())));
 
         subprotocol = SubProtocol.get();
         subprotocol.registerCipher("DHE", DHE.get(128));
@@ -125,6 +141,8 @@ public final class ExProxy extends BungeeCord implements Listener {
     @Override
     public void startListeners() {
         try {
+            SmartFallback.dns_forward = config.get().getMap("Settings").getMap("Smart-Fallback", new ObjectMap<>()).getBoolean("DNS-Forward", false);
+
             resetDate = Calendar.getInstance().getTime().getTime();
             ConfigUpdater.updateConfig(new UniversalFile(dir, "SubServers:sync.yml"));
             config.reload();
@@ -217,7 +235,7 @@ public final class ExProxy extends BungeeCord implements Listener {
         GalaxiCommand.group(SubCommand.class);
 
         if (getReconnectHandler() != null && getReconnectHandler().getClass().equals(SmartFallback.class))
-            setReconnectHandler(new SmartFallback(this)); // Re-initialize Smart Fallback
+            setReconnectHandler(new SmartFallback(config.get().getMap("Settings").getMap("Smart-Fallback", new ObjectMap<>()))); // Re-initialize Smart Fallback
 
         new Metrics(this);
         new Timer("SubServers.Sync::Routine_Update_Check").schedule(new TimerTask() {
@@ -308,6 +326,7 @@ public final class ExProxy extends BungeeCord implements Listener {
      *
      * @return BungeeCord Software Name
      */
+    @Override
     public String getBungeeName() {
         return super.getName();
     }

@@ -12,7 +12,7 @@ import java.util.UUID;
 /**
  * Remote Player Class
  */
-public class RemotePlayer implements SubDataSerializable {
+public class RemotePlayer implements net.ME1312.SubServers.Bungee.Library.Compatibility.RemotePlayer, SubDataSerializable {
     private ProxiedPlayer local;
     private UUID id;
     private String name;
@@ -103,6 +103,12 @@ public class RemotePlayer implements SubDataSerializable {
         } else return proxy;
     }
 
+    @Override
+    public String getProxyName() {
+        Proxy proxy = getProxy();
+        return (proxy == null)? null : proxy.getName();
+    }
+
     /**
      * Gets the server this player is connected to.
      *
@@ -112,6 +118,12 @@ public class RemotePlayer implements SubDataSerializable {
         if (local != null) {
             return (Server) local.getServer().getInfo();
         } else return server;
+    }
+
+    @Override
+    public String getServerName() {
+        Server server = getServer();
+        return (server == null)? null : server.getName();
     }
 
     @Override

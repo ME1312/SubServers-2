@@ -113,7 +113,7 @@ public class SubProtocol extends SubDataProtocol {
     }
 
     private Logger getLogger(int channel) {
-        return net.ME1312.SubServers.Sync.Library.Compatibility.Logger.get("SubData" + ((channel != 0)? "/Sub-"+channel:""));
+        return net.ME1312.SubServers.Bungee.Library.Compatibility.Logger.get("SubData" + ((channel != 0)? "/Sub-"+channel:""));
     }
 
     @Override
@@ -144,7 +144,7 @@ public class SubProtocol extends SubDataProtocol {
         subdata.sendPacket(new PacketDownloadLang());
         subdata.sendPacket(new PacketDownloadPlatformInfo(platform -> {
             if (plugin.lastReload != platform.getMap("subservers").getLong("last-reload")) {
-                net.ME1312.SubServers.Sync.Library.Compatibility.Logger.get("SubServers").info("Resetting Server Data");
+                net.ME1312.SubServers.Bungee.Library.Compatibility.Logger.get("SubServers").info("Resetting Server Data");
                 plugin.servers.clear();
                 plugin.lastReload = platform.getMap("subservers").getLong("last-reload");
             }
@@ -159,7 +159,7 @@ public class SubProtocol extends SubDataProtocol {
                 if (plugin.config.get().getMap("Sync", new ObjectMap<>()).getBoolean("Disabled-Commands", false)) Util.reflect(Configuration.class.getDeclaredField("disabledCommands"), plugin.getConfig(), platform.getMap("bungee").getRawStringList("disabled-cmds"));
                 if (plugin.config.get().getMap("Sync", new ObjectMap<>()).getBoolean("Player-Limit", false)) Util.reflect(Configuration.class.getDeclaredField("playerLimit"), plugin.getConfig(), platform.getMap("bungee").getInt("player-limit"));
             } catch (Exception e) {
-                net.ME1312.SubServers.Sync.Library.Compatibility.Logger.get("SubServers").info("Problem syncing BungeeCord configuration options");
+                net.ME1312.SubServers.Bungee.Library.Compatibility.Logger.get("SubServers").info("Problem syncing BungeeCord configuration options");
                 e.printStackTrace();
             }
 
@@ -199,7 +199,7 @@ public class SubProtocol extends SubDataProtocol {
             plugin.getPluginManager().callEvent(event);
 
             if (plugin.isRunning) {
-                net.ME1312.SubServers.Sync.Library.Compatibility.Logger.get("SubData").info("Attempting reconnect in " + plugin.config.get().getMap("Settings").getMap("SubData").getInt("Reconnect", 60) + " seconds");
+                net.ME1312.SubServers.Bungee.Library.Compatibility.Logger.get("SubData").info("Attempting reconnect in " + plugin.config.get().getMap("Settings").getMap("SubData").getInt("Reconnect", 60) + " seconds");
                 Util.isException(() -> Util.reflect(ExProxy.class.getDeclaredMethod("connect", NamedContainer.class), plugin, client));
             } else map.put(0, null);
         });

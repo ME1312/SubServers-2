@@ -18,7 +18,7 @@ import java.util.UUID;
 /**
  * Simplified RemotePlayer Data Class
  */
-public class RemotePlayer {
+public class RemotePlayer implements net.ME1312.SubServers.Bungee.Library.Compatibility.RemotePlayer {
     ObjectMap<String> raw;
     private Proxy proxy = null;
     private Server server = null;
@@ -159,6 +159,11 @@ public class RemotePlayer {
         }
     }
 
+    @Override
+    public String getProxyName() {
+        return getProxy();
+    }
+
     /**
      * Gets the server this player is connected to.
      *
@@ -194,6 +199,11 @@ public class RemotePlayer {
         } else {
             run.run();
         }
+    }
+
+    @Override
+    public String getServerName() {
+        return getServer();
     }
 
     /**

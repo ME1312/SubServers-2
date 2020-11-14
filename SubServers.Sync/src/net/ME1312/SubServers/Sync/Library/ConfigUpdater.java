@@ -4,7 +4,7 @@ import net.ME1312.Galaxi.Library.Config.YAMLConfig;
 import net.ME1312.Galaxi.Library.Config.YAMLSection;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Version.Version;
-import net.ME1312.SubServers.Sync.Library.Compatibility.Logger;
+import net.ME1312.SubServers.Bungee.Library.Compatibility.Logger;
 import net.ME1312.SubServers.Sync.SubAPI;
 
 import java.io.File;

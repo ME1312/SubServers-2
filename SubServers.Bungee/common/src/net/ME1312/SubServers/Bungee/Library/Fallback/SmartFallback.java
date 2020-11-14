@@ -2,10 +2,7 @@ package net.ME1312.SubServers.Bungee.Library.Fallback;
 
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Util;
-import net.ME1312.SubServers.Bungee.Host.Server;
-import net.ME1312.SubServers.Bungee.Host.SubServer;
-import net.ME1312.SubServers.Bungee.SubAPI;
-import net.ME1312.SubServers.Bungee.SubProxy;
+import net.ME1312.SubServers.Bungee.BungeeCommon;
 import net.md_5.bungee.UserConnection;
 import net.md_5.bungee.api.AbstractReconnectHandler;
 import net.md_5.bungee.api.ProxyServer;
@@ -25,9 +22,11 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class SmartFallback implements ReconnectHandler {
     private static List<FallbackInspector> inspectors = new CopyOnWriteArrayList<FallbackInspector>();
     private static ReconnectHandler reconnect;
+    public static boolean dns_forward = false;
 
-    public SmartFallback(SubProxy proxy) {
-        if (reconnect == null && proxy.config.get().getMap("Settings").getMap("Smart-Fallback", new ObjectMap<>()).getBoolean("Reconnect", false))
+    public SmartFallback(ObjectMap<String> settings) {
+        dns_forward = settings.getBoolean("DNS-Forward", false);
+        if (reconnect == null && settings.getBoolean("Reconnect", false))
             reconnect = Util.getDespiteException(() -> Util.reflect(ProxyServer.getInstance().getPluginManager().getPlugin("reconnect_yaml").getClass().getClassLoader().loadClass("net.md_5.bungee.module.reconnect.yaml.YamlReconnectHandler").getConstructor()), null);
     }
 
@@ -81,12 +80,12 @@ public class SmartFallback implements ReconnectHandler {
      * @return DNS Forward Server
      */
     public static ServerInfo getDNS(PendingConnection connection) {
-        if (connection.getVirtualHost() == null || !((SubProxy) ProxyServer.getInstance()).config.get().getMap("Settings").getMap("Smart-Fallback", new ObjectMap<>()).getBoolean("DNS-Forward", false)) {
+        if (connection.getVirtualHost() == null || !dns_forward) {
             return null;
         } else {
             Map.Entry<String, ServerInfo> server = null;
             String dns = connection.getVirtualHost().getHostString().toLowerCase();
-            for (Map.Entry<String, ServerInfo> s : ((SubProxy) ProxyServer.getInstance()).getServersCopy().entrySet()) {
+            for (Map.Entry<String, ServerInfo> s : ((BungeeCommon) ProxyServer.getInstance()).getServersCopy().entrySet()) {
                 if (dns.startsWith(s.getKey().toLowerCase() + '.'))
                     if (server == null || server.getKey().length() < s.getKey().length())
                         server = s;
@@ -133,22 +132,10 @@ public class SmartFallback implements ReconnectHandler {
     public static Map<String, ServerInfo> getFallbackServers(ListenerInfo listener, ProxiedPlayer player) {
         TreeMap<Double, List<ServerInfo>> score = new TreeMap<Double, List<ServerInfo>>(Collections.reverseOrder());
         for (String name : listener.getServerPriority()) {
-            ServerInfo server = SubAPI.getInstance().getServer(name.toLowerCase());
-            if (server == null) server = ProxyServer.getInstance().getServerInfo(name);
+            ServerInfo server = ProxyServer.getInstance().getServerInfo(name);
             if (server != null) {
                 boolean valid = true;
                 double confidence = 0;
-                if (server instanceof Server) {
-                    if (!((Server) server).isHidden()) confidence++;
-                    if (!((Server) server).isRestricted()) confidence++;
-                    if (((Server) server).getSubData()[0] != null) confidence++;
-
-                    if (player != null) {
-                        if (((Server) server).canAccess(player)) confidence++;
-                    }
-                } if (server instanceof SubServer) {
-                    if (!((SubServer) server).isRunning()) valid = false;
-                }
 
                 List<FallbackInspector> inspectors = new ArrayList<FallbackInspector>();
                 inspectors.addAll(SmartFallback.inspectors);

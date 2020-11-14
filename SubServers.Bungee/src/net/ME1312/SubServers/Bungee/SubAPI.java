@@ -14,7 +14,6 @@ import net.ME1312.Galaxi.Library.UniversalFile;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubServers.Bungee.Library.Exception.InvalidServerException;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.protocol.ProtocolConstants;
 
 import java.lang.reflect.InvocationTargetException;
@@ -25,7 +24,7 @@ import java.util.*;
 /**
  * SubAPI Class
  */
-public final class SubAPI {
+public final class SubAPI implements BungeeAPI {
     LinkedList<Runnable> enableListeners = new LinkedList<Runnable>();
     LinkedList<Runnable> reloadListeners = new LinkedList<Runnable>();
     LinkedList<Runnable> disableListeners = new LinkedList<Runnable>();
@@ -610,18 +609,6 @@ public final class SubAPI {
     public Map<String, String> getLang(String channel) {
         if (Util.isNull(channel)) throw new NullPointerException();
         return new LinkedHashMap<>(plugin.exLang.get(channel.toLowerCase()));
-    }
-
-    /**
-     * Gets a value from the SubServers Lang
-     *
-     * @param channel Lang Channel
-     * @param key Key
-     * @return Lang Values
-     */
-    public String getLang(String channel, String key) {
-        if (Util.isNull(channel, key)) throw new NullPointerException();
-        return getLang(channel).get(key);
     }
 
     /**

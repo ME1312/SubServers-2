@@ -7,6 +7,7 @@ import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubData.Client.DataClient;
 import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubData.Client.DataProtocol;
+import net.ME1312.SubServers.Bungee.BungeeAPI;
 import net.ME1312.SubServers.Sync.Network.API.*;
 import net.ME1312.SubServers.Sync.Network.Packet.*;
 import net.ME1312.SubData.Client.SubDataClient;
@@ -21,7 +22,7 @@ import static net.ME1312.SubServers.Sync.Network.API.SimplifiedData.*;
 /**
  * SubAPI Class
  */
-public final class SubAPI {
+public final class SubAPI implements BungeeAPI {
     LinkedList<Runnable> enableListeners = new LinkedList<Runnable>();
     LinkedList<Runnable> disableListeners = new LinkedList<Runnable>();
     private final ExProxy plugin;
@@ -458,18 +459,6 @@ public final class SubAPI {
     public Map<String, String> getLang(String channel) {
         if (Util.isNull(channel)) throw new NullPointerException();
         return new LinkedHashMap<>(plugin.lang.get().get(channel.toLowerCase()));
-    }
-
-    /**
-     * Gets a value from the SubServers Lang
-     *
-     * @param channel Lang Channel
-     * @param key Key
-     * @return Lang Values
-     */
-    public String getLang(String channel, String key) {
-        if (Util.isNull(channel, key)) throw new NullPointerException();
-        return getLang(channel).get(key);
     }
 
     /**

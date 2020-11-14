@@ -6,8 +6,8 @@ import net.ME1312.SubData.Client.Protocol.Initial.InitialPacket;
 import net.ME1312.SubData.Client.Protocol.PacketObjectIn;
 import net.ME1312.SubData.Client.Protocol.PacketObjectOut;
 import net.ME1312.SubData.Client.SubDataSender;
+import net.ME1312.SubServers.Bungee.Library.Compatibility.Logger;
 import net.ME1312.SubServers.Sync.ExProxy;
-import net.ME1312.SubServers.Sync.Library.Compatibility.Logger;
 import net.ME1312.SubServers.Sync.SubAPI;
 
 /**

@@ -18,6 +18,7 @@ import net.ME1312.SubServers.Bungee.Library.*;
 import net.ME1312.Galaxi.Library.Config.YAMLConfig;
 import net.ME1312.Galaxi.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Bungee.Library.Compatibility.Galaxi.GalaxiCommand;
+import net.ME1312.SubServers.Bungee.Library.Compatibility.Galaxi.GalaxiEventListener;
 import net.ME1312.SubServers.Bungee.Library.Compatibility.LegacyServerMap;
 import net.ME1312.SubServers.Bungee.Library.Compatibility.Logger;
 import net.ME1312.SubServers.Bungee.Library.Compatibility.Plugin;
@@ -61,7 +62,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Main Plugin Class
  */
-public final class SubProxy extends BungeeCord implements Listener {
+public final class SubProxy extends BungeeCommon implements Listener {
     final LinkedHashMap<String, LinkedHashMap<String, String>> exLang = new LinkedHashMap<String, LinkedHashMap<String, String>>();
     final HashMap<String, Class<? extends Host>> hostDrivers = new HashMap<String, Class<? extends Host>>();
     public final HashMap<String, Proxy> proxies = new HashMap<String, Proxy>();
@@ -98,13 +99,13 @@ public final class SubProxy extends BungeeCord implements Listener {
 
     @SuppressWarnings("unchecked")
     SubProxy(PrintStream out, boolean isPatched) throws Exception {
+        super(SubAPI::getInstance);
         this.isPatched = isPatched;
         this.isGalaxi = !Util.isException(() ->
                 Util.reflect(Class.forName("net.ME1312.Galaxi.Engine.PluginManager").getMethod("findClasses", Class.class),
                         Util.reflect(Class.forName("net.ME1312.Galaxi.Engine.GalaxiEngine").getMethod("getPluginManager"),
                                 Util.reflect(Class.forName("net.ME1312.Galaxi.Engine.GalaxiEngine").getMethod("getInstance"), null)), Launch.class));
 
-        Util.reflect(Logger.class.getDeclaredField("plugin"), null, this);
         Logger.get("SubServers").info("Loading SubServers.Bungee v" + version.toString() + " Libraries (for Minecraft " + api.getGameVersion()[api.getGameVersion().length - 1] + ")");
 
         this.out = out;
@@ -252,8 +253,24 @@ public final class SubProxy extends BungeeCord implements Listener {
             }
         }
 
+        SmartFallback.addInspector((player, server) -> {
+            double confidence = 0;
+            if (server instanceof Server) {
+                if (!((Server) server).isHidden()) confidence++;
+                if (!((Server) server).isRestricted()) confidence++;
+                if (((Server) server).getSubData()[0] != null) confidence++;
+
+                if (player != null) {
+                    if (((Server) server).canAccess(player)) confidence++;
+                }
+            } if (server instanceof SubServer) {
+                if (!((SubServer) server).isRunning()) return null;
+            }
+            return confidence;
+        });
+
         if (config.get().getMap("Settings").getMap("Smart-Fallback", new ObjectMap<>()).getBoolean("Enabled", true))
-            setReconnectHandler(new SmartFallback(this));
+            setReconnectHandler(new SmartFallback(config.get().getMap("Settings").getMap("Smart-Fallback", new ObjectMap<>())));
 
         subprotocol = SubProtocol.get();
         subprotocol.registerCipher("DHE", DHE.get(128));
@@ -261,7 +278,7 @@ public final class SubProxy extends BungeeCord implements Listener {
         subprotocol.registerCipher("DHE-192", DHE.get(192));
         subprotocol.registerCipher("DHE-256", DHE.get(256));
         Logger.get("SubServers").info("Loading BungeeCord Libraries...");
-        if (isGalaxi) Util.reflect(net.ME1312.SubServers.Bungee.Library.Compatibility.Galaxi.GalaxiEventListener.class.getConstructor(SubProxy.class), this);
+        if (isGalaxi) Util.reflect(GalaxiEventListener.class.getConstructor(SubProxy.class), this);
     }
 
     /**
@@ -324,6 +341,8 @@ public final class SubProxy extends BungeeCord implements Listener {
             Util.isException(subdata::waitFor);
             subdata = null;
         }
+
+        SmartFallback.dns_forward = config.get().getMap("Settings").getMap("Smart-Fallback", new ObjectMap<>()).getBoolean("DNS-Forward", false);
 
         int hosts = 0;
         Logger.get("SubServers").info(((status)?"Rel":"L")+"oading Hosts...");
@@ -648,7 +667,7 @@ public final class SubProxy extends BungeeCord implements Listener {
         GalaxiCommand.group(SubCommand.class);
 
         if (getReconnectHandler() != null && getReconnectHandler().getClass().equals(SmartFallback.class))
-            setReconnectHandler(new SmartFallback(this)); // Re-initialize Smart Fallback
+            setReconnectHandler(new SmartFallback(config.get().getMap("Settings").getMap("Smart-Fallback", new ObjectMap<>()))); // Re-initialize Smart Fallback
 
         new Metrics(this);
         new Timer("SubServers.Bungee::Routine_Update_Check").schedule(new TimerTask() {
@@ -803,6 +822,7 @@ public final class SubProxy extends BungeeCord implements Listener {
      *
      * @return BungeeCord Software Name
      */
+    @Override
     public String getBungeeName() {
         return super.getName();
     }
@@ -822,6 +842,7 @@ public final class SubProxy extends BungeeCord implements Listener {
      *
      * @return Server Map Copy
      */
+    @Override
     public Map<String, ServerInfo> getServersCopy() {
         HashMap<String, ServerInfo> servers = new HashMap<String, ServerInfo>();
         if (!api.ready) {

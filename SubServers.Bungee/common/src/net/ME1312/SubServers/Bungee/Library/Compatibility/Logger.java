@@ -1,8 +1,7 @@
-package net.ME1312.SubServers.Sync.Library.Compatibility;
+package net.ME1312.SubServers.Bungee.Library.Compatibility;
 
 import net.ME1312.Galaxi.Library.Util;
-import net.ME1312.SubServers.Sync.ExProxy;
-import net.ME1312.SubServers.Sync.SubAPI;
+import net.md_5.bungee.api.ProxyServer;
 
 import java.util.HashMap;
 import java.util.logging.Handler;
@@ -13,7 +12,6 @@ import java.util.logging.LogRecord;
  */
 public class Logger {
     private static final HashMap<String, java.util.logging.Logger> existing = new HashMap<String, java.util.logging.Logger>();
-    private static ExProxy plugin;
 
     /**
      * Get a logger
@@ -24,13 +22,10 @@ public class Logger {
     @SuppressWarnings("deprecation")
     public static java.util.logging.Logger get(String prefix) {
         if (!existing.keySet().contains(prefix)) {
-            ExProxy plugin = SubAPI.getInstance().getInternals();
-            java.util.logging.Logger log;
+            java.util.logging.Logger log = Util.getDespiteException(() -> Util.reflect(Class.forName("net.ME1312.Galaxi.Library.Log.Logger").getDeclaredMethod("toPrimitive"),
+                    Util.reflect(Class.forName("net.ME1312.Galaxi.Library.Log.Logger").getConstructor(String.class), prefix)), null);
 
-            if (plugin.isGalaxi) {
-                log = Util.getDespiteException(() -> Util.reflect(Class.forName("net.ME1312.Galaxi.Library.Log.Logger").getDeclaredMethod("toPrimitive"),
-                        Util.reflect(Class.forName("net.ME1312.Galaxi.Library.Log.Logger").getConstructor(String.class), prefix)), null);
-            } else {
+            if (log == null) {
                 log = java.util.logging.Logger.getAnonymousLogger();
                 log.setUseParentHandlers(false);
                 log.addHandler(new Handler() {
@@ -39,7 +34,7 @@ public class Logger {
                     @Override
                     public void publish(LogRecord record) {
                         if (open)
-                            plugin.getLogger().log(record.getLevel(), prefix + " > " + record.getMessage(), record.getParameters());
+                            ProxyServer.getInstance().getLogger().log(record.getLevel(), prefix + " > " + record.getMessage(), record.getParameters());
                     }
 
                     @Override
