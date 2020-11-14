@@ -1,7 +1,7 @@
 package net.ME1312.SubServers.Bungee.Host;
 
 import net.ME1312.Galaxi.Library.ExtraDataHandler;
-import net.ME1312.Galaxi.Library.Container.NamedContainer;
+import net.ME1312.Galaxi.Library.Container.Pair;
 import net.ME1312.SubData.Server.ClientHandler;
 import net.ME1312.SubData.Server.DataClient;
 import net.md_5.bungee.api.config.ServerInfo;

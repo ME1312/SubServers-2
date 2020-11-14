@@ -1,13 +1,15 @@
 package net.ME1312.SubServers.Bungee.Host.Internal;
 
+import net.ME1312.Galaxi.Library.Container.ContainedPair;
+import net.ME1312.Galaxi.Library.Container.Container;
 import net.ME1312.SubServers.Bungee.Event.*;
 import net.ME1312.SubServers.Bungee.Host.*;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Map.ObjectMapValue;
-import net.ME1312.Galaxi.Library.Container.Container;
+import net.ME1312.Galaxi.Library.Container.Value;
 import net.ME1312.SubServers.Bungee.Library.Compatibility.Logger;
 import net.ME1312.SubServers.Bungee.Library.Exception.InvalidServerException;
-import net.ME1312.Galaxi.Library.Container.NamedContainer;
+import net.ME1312.Galaxi.Library.Container.Pair;
 import net.ME1312.Galaxi.Library.UniversalFile;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
@@ -30,7 +32,7 @@ import java.util.jar.JarInputStream;
 public class InternalSubServer extends SubServerImpl {
     private InternalHost host;
     private boolean enabled;
-    private Container<Boolean> log;
+    private Value<Boolean> log;
     private String dir;
     private File directory;
     private String executable;
@@ -287,7 +289,7 @@ public class InternalSubServer extends SubServerImpl {
             for (String key : edit.getKeys()) {
                 pending.remove(key);
                 ObjectMapValue value = edit.get(key);
-                SubEditServerEvent event = new SubEditServerEvent(player, this, new NamedContainer<String, ObjectMapValue>(key, value), perma);
+                SubEditServerEvent event = new SubEditServerEvent(player, this, new ContainedPair<String, ObjectMapValue>(key, value), perma);
                 host.plugin.getPluginManager().callEvent(event);
                 if (!event.isCancelled()) {
                     try {
@@ -397,7 +399,7 @@ public class InternalSubServer extends SubServerImpl {
                                 break;
                             case "log":
                                 if (value.isBoolean()) {
-                                    log.set(value.asBoolean());
+                                    log.value(value.asBoolean());
                                     if (perma && this.host.plugin.servers.get().getMap("Servers").getKeys().contains(getName())) {
                                         this.host.plugin.servers.get().getMap("Servers").getMap(getName()).set("Log", isLogging());
                                         this.host.plugin.servers.save();
@@ -577,20 +579,20 @@ public class InternalSubServer extends SubServerImpl {
     @Override
     public void setEnabled(boolean value) {
         if (Util.isNull(value)) throw new NullPointerException();
-        host.plugin.getPluginManager().callEvent(new SubEditServerEvent(null, this, new NamedContainer<String, Object>("enabled", value), false));
+        host.plugin.getPluginManager().callEvent(new SubEditServerEvent(null, this, new ContainedPair<String, Object>("enabled", value), false));
         enabled = value;
     }
 
     @Override
     public boolean isLogging() {
-        return log.get();
+        return log.value();
     }
 
     @Override
     public void setLogging(boolean value) {
         if (Util.isNull(value)) throw new NullPointerException();
-        host.plugin.getPluginManager().callEvent(new SubEditServerEvent(null, this, new NamedContainer<String, Object>("log", value), false));
-        log.set(value);
+        host.plugin.getPluginManager().callEvent(new SubEditServerEvent(null, this, new ContainedPair<String, Object>("log", value), false));
+        log.value(value);
     }
 
     @Override
@@ -621,7 +623,7 @@ public class InternalSubServer extends SubServerImpl {
     @Override
     public void setStopCommand(String value) {
         if (Util.isNull(value)) throw new NullPointerException();
-        host.plugin.getPluginManager().callEvent(new SubEditServerEvent(null, this, new NamedContainer<String, Object>("stop-cmd", value), false));
+        host.plugin.getPluginManager().callEvent(new SubEditServerEvent(null, this, new ContainedPair<String, Object>("stop-cmd", value), false));
         stopcmd = value;
     }
 
@@ -633,7 +635,7 @@ public class InternalSubServer extends SubServerImpl {
     @Override
     public void setStopAction(StopAction action) {
         if (Util.isNull(action)) throw new NullPointerException();
-        host.plugin.getPluginManager().callEvent(new SubEditServerEvent(null, this, new NamedContainer<String, Object>("stop-action", action), false));
+        host.plugin.getPluginManager().callEvent(new SubEditServerEvent(null, this, new ContainedPair<String, Object>("stop-action", action), false));
         stopaction = action;
     }
 }

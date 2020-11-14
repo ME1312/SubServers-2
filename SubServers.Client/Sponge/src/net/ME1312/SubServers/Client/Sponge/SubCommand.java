@@ -2,15 +2,16 @@ package net.ME1312.SubServers.Client.Sponge;
 
 import com.google.gson.Gson;
 import net.ME1312.Galaxi.Library.AsyncConsolidator;
-import net.ME1312.Galaxi.Library.Container.NamedContainer;
+import net.ME1312.Galaxi.Library.Container.ContainedPair;
+import net.ME1312.Galaxi.Library.Container.Container;
+import net.ME1312.Galaxi.Library.Container.Pair;
 import net.ME1312.Galaxi.Library.Platform;
-import net.ME1312.Galaxi.Library.Container.PrimitiveContainer;
 import net.ME1312.SubData.Client.SubDataClient;
 import net.ME1312.SubServers.Client.Sponge.Graphic.UIRenderer;
 import net.ME1312.Galaxi.Library.Callback.Callback;
 import net.ME1312.SubServers.Client.Sponge.Library.Compatibility.ChatColor;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
-import net.ME1312.Galaxi.Library.Container.Container;
+import net.ME1312.Galaxi.Library.Container.Value;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubServers.Client.Sponge.Library.Compatibility.ListArgument;
@@ -176,7 +177,7 @@ public final class SubCommand implements CommandExecutor {
         @SuppressWarnings("unchecked")
         public CommandResult execute(CommandSource sender, CommandContext args) throws CommandException {
             if (canRun(sender)) {
-                PluginContainer container        = Util.getDespiteException(() -> (PluginContainer) org.spongepowered.api.Platform.class.getMethod("getContainer", Class.forName("org.spongepowered.api.Platform$Component")).invoke(Sponge.getPlatform(), Enum.valueOf((Class<Enum>) Class.forName("org.spongepowered.api.Platform$Component"), "IMPLEMENTATION")), null);
+                PluginContainer container        = Util.getDespiteException(() -> (PluginContainer) org.spongepowered.api.Platform.class.getMethod("getValue", Class.forName("org.spongepowered.api.Platform$Component")).invoke(Sponge.getPlatform(), Enum.valueOf((Class<Enum>) Class.forName("org.spongepowered.api.Platform$Component"), "IMPLEMENTATION")), null);
                 if (container == null) container = Util.getDespiteException(() -> (PluginContainer) org.spongepowered.api.Platform.class.getMethod("getImplementation").invoke(Sponge.getPlatform()), null);
 
                 sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Version").replace("$str$", "SubServers.Client.Sponge")));
@@ -545,9 +546,9 @@ public final class SubCommand implements CommandExecutor {
                     });
                     Runnable getGroup = () -> plugin.api.getGroup(name, group -> {
                         if (group != null) {
-                            sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", "Command.Info").replace("$str$", "group")).toBuilder().append(Text.builder(group.name()).color(TextColors.WHITE).build()).build());
-                            sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Servers")).toBuilder().append(Text.builder((group.get().size() <= 0)?"(none)":Integer.toString(group.get().size())).color((group.get().size() <= 0)?TextColors.GRAY:TextColors.AQUA).build()).build());
-                            for (Server server : group.get()) sender.sendMessage(ChatColor.convertColor("    " + plugin.api.getLang("SubServers", "Command.Info.List")).toBuilder().append(Text.builder(server.getDisplayName() + ((server.getName().equals(server.getDisplayName()))?"":" ["+server.getName()+']')).color(TextColors.WHITE).build()).build());
+                            sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", "Command.Info").replace("$str$", "group")).toBuilder().append(Text.builder(group.key()).color(TextColors.WHITE).build()).build());
+                            sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Servers")).toBuilder().append(Text.builder((group.value().size() <= 0)?"(none)":Integer.toString(group.value().size())).color((group.value().size() <= 0)?TextColors.GRAY:TextColors.AQUA).build()).build());
+                            for (Server server : group.value()) sender.sendMessage(ChatColor.convertColor("    " + plugin.api.getLang("SubServers", "Command.Info.List")).toBuilder().append(Text.builder(server.getDisplayName() + ((server.getName().equals(server.getDisplayName()))?"":" ["+server.getName()+']')).color(TextColors.WHITE).build()).build());
                         } else {
                             if (type == null) {
                                 getServer.run();
@@ -641,8 +642,8 @@ public final class SubCommand implements CommandExecutor {
                 if (s.isPresent()) {
                     selectServers(sender, s.get(), true, Arrays.asList("subservers.subserver.%.*", "subservers.subserver.%.start"), select -> {
                         if (select.subservers.length > 0) {
-                            PrimitiveContainer<Integer> success = new PrimitiveContainer<Integer>(0);
-                            PrimitiveContainer<Integer> running = new PrimitiveContainer<Integer>(0);
+                            Container<Integer> success = new Container<Integer>(0);
+                            Container<Integer> running = new Container<Integer>(0);
                             AsyncConsolidator merge = new AsyncConsolidator(() -> {
                                 if (running.value > 0) sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", "Command.Start.Running").replace("$int$", running.value.toString())));
                                 if (success.value > 0) sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", "Command.Start").replace("$int$", success.value.toString())));
@@ -752,19 +753,19 @@ public final class SubCommand implements CommandExecutor {
                             });
 
                             // Step 3: Receive command Responses
-                            PrimitiveContainer<Integer> success = new PrimitiveContainer<Integer>(0);
+                            Container<Integer> success = new Container<Integer>(0);
                             AsyncConsolidator merge = new AsyncConsolidator(() -> {
                                 if (success.value > 0) sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", "Command.Restart").replace("$int$", success.value.toString())));
                             });
-                            Callback<NamedContainer<Integer, SubServer>> stopper = data -> {
-                                if (data.name() != 0) listening.remove(data.get().getName().toLowerCase());
-                                switch (data.name()) {
+                            Callback<Pair<Integer, SubServer>> stopper = data -> {
+                                if (data.key() != 0) listening.remove(data.value().getName().toLowerCase());
+                                switch (data.key()) {
                                     case 3:
                                     case 4:
-                                        sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", "Command.Restart.Disappeared").replace("$str$", data.get().getName())));
+                                        sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", "Command.Restart.Disappeared").replace("$str$", data.value().getName())));
                                         break;
                                     case 5:
-                                        starter.run(data.get());
+                                        starter.run(data.value());
                                     case 0:
                                         success.value++;
                                         break;
@@ -786,14 +787,14 @@ public final class SubCommand implements CommandExecutor {
                                 merge.reserve();
                                 if (self == null) {
                                     listening.put(server.getName().toLowerCase(), server);
-                                    server.stop(player, response -> stopper.run(new NamedContainer<>(response, server)));
+                                    server.stop(player, response -> stopper.run(new ContainedPair<>(response, server)));
                                 } else if (self != server) {
-                                    ((SubDataClient) plugin.api.getSubDataNetwork()[0]).sendPacket(new PacketRestartServer(player, server.getName(), data -> stopper.run(new NamedContainer<>(data.getInt(0x0001), server))));
+                                    ((SubDataClient) plugin.api.getSubDataNetwork()[0]).sendPacket(new PacketRestartServer(player, server.getName(), data -> stopper.run(new ContainedPair<>(data.getInt(0x0001), server))));
                                 }
                             }
                             if (self != null) {
                                 final SubServer fself = self;
-                                ((SubDataClient) plugin.api.getSubDataNetwork()[0]).sendPacket(new PacketRestartServer(player, self.getName(), data -> stopper.run(new NamedContainer<>(data.getInt(0x0001), fself))));
+                                ((SubDataClient) plugin.api.getSubDataNetwork()[0]).sendPacket(new PacketRestartServer(player, self.getName(), data -> stopper.run(new ContainedPair<>(data.getInt(0x0001), fself))));
                             }
                         }
                     });
@@ -816,17 +817,17 @@ public final class SubCommand implements CommandExecutor {
                 if (s.isPresent()) {
                     selectServers(sender, s.get(), true, Arrays.asList("subservers.subserver.%.*", "subservers.subserver.%.stop"), select -> {
                         if (select.subservers.length > 0) {
-                            PrimitiveContainer<Integer> success = new PrimitiveContainer<Integer>(0);
-                            PrimitiveContainer<Integer> running = new PrimitiveContainer<Integer>(0);
+                            Container<Integer> success = new Container<Integer>(0);
+                            Container<Integer> running = new Container<Integer>(0);
                             AsyncConsolidator merge = new AsyncConsolidator(() -> {
                                 if (running.value > 0) sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", "Command.Stop.Not-Running").replace("$int$", running.value.toString())));
                                 if (success.value > 0) sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", "Command.Stop").replace("$int$", success.value.toString())));
                             });
-                            Callback<NamedContainer<Integer, SubServer>> stopper = data -> {
-                                switch (data.name()) {
+                            Callback<Pair<Integer, SubServer>> stopper = data -> {
+                                switch (data.key()) {
                                     case 3:
                                     case 4:
-                                        sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Stop.Disappeared").replace("$str$", data.get().getName())));
+                                        sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Stop.Disappeared").replace("$str$", data.value().getName())));
                                         break;
                                     case 5:
                                         running.value++;
@@ -848,11 +849,11 @@ public final class SubCommand implements CommandExecutor {
 
                             for (SubServer server : select.subservers) {
                                 merge.reserve();
-                                if (self != server) server.stop((sender instanceof Player)?((Player) sender).getUniqueId():null, response -> stopper.run(new NamedContainer<>(response, server)));
+                                if (self != server) server.stop((sender instanceof Player)?((Player) sender).getUniqueId():null, response -> stopper.run(new ContainedPair<>(response, server)));
                             }
                             if (self != null) {
                                 final SubServer fself = self;
-                                self.stop((sender instanceof Player)?((Player) sender).getUniqueId():null, response -> stopper.run(new NamedContainer<>(response, fself)));
+                                self.stop((sender instanceof Player)?((Player) sender).getUniqueId():null, response -> stopper.run(new ContainedPair<>(response, fself)));
                             }
                         }
                     });
@@ -875,17 +876,17 @@ public final class SubCommand implements CommandExecutor {
                 if (s.isPresent()) {
                     selectServers(sender, s.get(), true, Arrays.asList("subservers.subserver.%.*", "subservers.subserver.%.terminate"), select -> {
                         if (select.subservers.length > 0) {
-                            PrimitiveContainer<Integer> success = new PrimitiveContainer<Integer>(0);
-                            PrimitiveContainer<Integer> running = new PrimitiveContainer<Integer>(0);
+                            Container<Integer> success = new Container<Integer>(0);
+                            Container<Integer> running = new Container<Integer>(0);
                             AsyncConsolidator merge = new AsyncConsolidator(() -> {
                                 if (running.value > 0) sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", "Command.Terminate.Not-Running").replace("$int$", running.value.toString())));
                                 if (success.value > 0) sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", "Command.Terminate").replace("$int$", success.value.toString())));
                             });
-                            Callback<NamedContainer<Integer, SubServer>> stopper = data -> {
-                                switch (data.name()) {
+                            Callback<Pair<Integer, SubServer>> stopper = data -> {
+                                switch (data.key()) {
                                     case 3:
                                     case 4:
-                                        sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Terminate.Disappeared").replace("$str$", data.get().getName())));
+                                        sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Terminate.Disappeared").replace("$str$", data.value().getName())));
                                         break;
                                     case 5:
                                         running.value++;
@@ -907,11 +908,11 @@ public final class SubCommand implements CommandExecutor {
 
                             for (SubServer server : select.subservers) {
                                 merge.reserve();
-                                if (self != server) server.terminate((sender instanceof Player)?((Player) sender).getUniqueId():null, response -> stopper.run(new NamedContainer<>(response, server)));
+                                if (self != server) server.terminate((sender instanceof Player)?((Player) sender).getUniqueId():null, response -> stopper.run(new ContainedPair<>(response, server)));
                             }
                             if (self != null) {
                                 final SubServer fself = self;
-                                fself.terminate((sender instanceof Player) ? ((Player) sender).getUniqueId() : null, response -> stopper.run(new NamedContainer<>(response, fself)));
+                                fself.terminate((sender instanceof Player) ? ((Player) sender).getUniqueId() : null, response -> stopper.run(new ContainedPair<>(response, fself)));
                             }
                         }
                     });
@@ -936,8 +937,8 @@ public final class SubCommand implements CommandExecutor {
                     selectServers(sender, s.get(), true, Arrays.asList("subservers.subserver.%.*", "subservers.subserver.%.command"), select -> {
                         if (select.subservers.length > 0) {
                             if (command.isPresent()) {
-                                PrimitiveContainer<Integer> success = new PrimitiveContainer<Integer>(0);
-                                PrimitiveContainer<Integer> running = new PrimitiveContainer<Integer>(0);
+                                Container<Integer> success = new Container<Integer>(0);
+                                Container<Integer> running = new Container<Integer>(0);
                                 AsyncConsolidator merge = new AsyncConsolidator(() -> {
                                     if (running.value > 0) sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", "Command.Command.Not-Running").replace("$int$", running.value.toString())));
                                     if (success.value > 0) sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", "Command.Command").replace("$int$", success.value.toString())));
@@ -1066,7 +1067,7 @@ public final class SubCommand implements CommandExecutor {
                         if (select.subservers.length > 0) {
                             boolean ts = ft == null;
 
-                            PrimitiveContainer<Integer> success = new PrimitiveContainer<Integer>(0);
+                            Container<Integer> success = new Container<Integer>(0);
                             AsyncConsolidator merge = new AsyncConsolidator(() -> {
                                 if (success.value > 0) sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", "Command.Update").replace("$int$", success.value.toString())));
                             });
@@ -1144,19 +1145,19 @@ public final class SubCommand implements CommandExecutor {
                         if (server != null) {
                             if (permits(server, sender, "subservers.server.%.*", "subservers.server.%.teleport")) {
                                 if (!(server instanceof SubServer) || ((SubServer) server).isRunning()) {
-                                    Container<Boolean> msg = new Container<>(false);
+                                    Value<Boolean> msg = new Container<>(false);
                                     Callback<Player> action = target -> {
                                         if (target == sender || permits(server, sender, "subservers.server.%.*", "subservers.server.%.teleport-others")) {
                                             sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", "Command.Teleport").replace("$str$", target.getName())));
                                             plugin.pmc(target, "Connect", server.getName());
-                                        } else if (!msg.get()) {
-                                            msg.set(true);
+                                        } else if (!msg.value()) {
+                                            msg.value(true);
                                             sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", "Command.Generic.Invalid-Permission").replace("$str$", "subservers.server." + server.getName() + ".teleport-others")));
                                         }
                                     };
 
                                     Optional<Player> player;
-                                    PrimitiveContainer<Set<Entity>> entities = new PrimitiveContainer<>(null);
+                                    Container<Set<Entity>> entities = new Container<>(null);
                                     if (name == null) {
                                         action.run((Player) sender);
                                     } else if ((player = plugin.game.getServer().getPlayer(name)).isPresent()) {
@@ -1319,8 +1320,8 @@ public final class SubCommand implements CommandExecutor {
 
         // Step 2
         AsyncConsolidator merge = new AsyncConsolidator(finished);
-        for (Container<Integer> ic = new Container<Integer>(0); ic.get() < selection.length; ic.set(ic.get() + 1)) {
-            String current = selection[ic.get()];
+        for (Value<Integer> ic = new Container<Integer>(0); ic.value() < selection.length; ic.value(ic.value() + 1)) {
+            String current = selection[ic.value()];
 
             if (current.length() > 0) {
                 merge.reserve();
@@ -1376,7 +1377,7 @@ public final class SubCommand implements CommandExecutor {
                             for (String name : self.getGroups()) {
                                 merge2.reserve();
                                 plugin.api.getGroup(name, group -> {
-                                    for (Server server : group.get()) {
+                                    for (Server server : group.value()) {
                                         if (!mode || server instanceof SubServer) select.add(server);
                                     }
                                     merge2.release();
@@ -1395,14 +1396,14 @@ public final class SubCommand implements CommandExecutor {
                         plugin.api.getGroup(current, group -> {
                             if (group != null) {
                                 int i = 0;
-                                for (Server server : group.get()) {
+                                for (Server server : group.value()) {
                                     if (!mode || server instanceof SubServer) {
                                         select.add(server);
                                         i++;
                                     }
                                 }
                                 if (i <= 0) {
-                                    Text msg = ChatColor.convertColor(plugin.api.getLang("SubServers", "Command.Generic.No-" + ((mode)?"Sub":"") + "Servers-In-Group").replace("$str$", group.name()));
+                                    Text msg = ChatColor.convertColor(plugin.api.getLang("SubServers", "Command.Generic.No-" + ((mode)?"Sub":"") + "Servers-In-Group").replace("$str$", group.key()));
                                     if (sender != null) sender.sendMessage(msg);
                                     msgs.add(msg);
                                 }

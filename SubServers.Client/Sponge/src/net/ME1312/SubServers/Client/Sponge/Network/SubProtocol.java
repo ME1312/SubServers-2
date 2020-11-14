@@ -1,7 +1,7 @@
 package net.ME1312.SubServers.Client.Sponge.Network;
 
 import net.ME1312.Galaxi.Library.Callback.Callback;
-import net.ME1312.Galaxi.Library.Container.NamedContainer;
+import net.ME1312.Galaxi.Library.Container.Pair;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
@@ -173,11 +173,11 @@ public class SubProtocol extends SubDataProtocol {
         subdata.sendPacket(new PacketDownloadLang());
         subdata.on.ready(client -> Sponge.getEventManager().post(new SubNetworkConnectEvent((SubDataClient) client)));
         subdata.on.closed(client -> {
-            SubNetworkDisconnectEvent event = new SubNetworkDisconnectEvent(client.get(), client.name());
+            SubNetworkDisconnectEvent event = new SubNetworkDisconnectEvent(client.value(), client.key());
             Sponge.getEventManager().post(event);
 
             if (Util.getDespiteException(() -> Util.reflect(SubPlugin.class.getDeclaredField("running"), plugin), true)) {
-                Util.isException(() -> Util.reflect(SubPlugin.class.getDeclaredMethod("connect", NamedContainer.class), plugin, client));
+                Util.isException(() -> Util.reflect(SubPlugin.class.getDeclaredMethod("connect", Pair.class), plugin, client));
             } else map.put(0, null);
         });
 

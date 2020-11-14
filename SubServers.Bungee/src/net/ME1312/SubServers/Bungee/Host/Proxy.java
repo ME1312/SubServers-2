@@ -6,7 +6,7 @@ import net.ME1312.SubServers.Bungee.Event.SubRemoveProxyEvent;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Map.ObjectMapValue;
 import net.ME1312.Galaxi.Library.ExtraDataHandler;
-import net.ME1312.Galaxi.Library.Container.NamedContainer;
+import net.ME1312.Galaxi.Library.Container.Pair;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubData.Server.ClientHandler;
 import net.ME1312.SubServers.Bungee.Network.Packet.PacketExSyncPlayer;

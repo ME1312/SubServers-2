@@ -1,7 +1,7 @@
 package net.ME1312.SubServers.Client.Bukkit.Network;
 
 import net.ME1312.Galaxi.Library.Callback.Callback;
-import net.ME1312.Galaxi.Library.Container.NamedContainer;
+import net.ME1312.Galaxi.Library.Container.Pair;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
@@ -166,11 +166,11 @@ public class SubProtocol extends SubDataProtocol {
         subdata.sendPacket(new PacketDownloadLang());
         subdata.on.ready(client -> Bukkit.getPluginManager().callEvent(new SubNetworkConnectEvent((SubDataClient) client)));
         subdata.on.closed(client -> {
-            SubNetworkDisconnectEvent event = new SubNetworkDisconnectEvent(client.get(), client.name());
+            SubNetworkDisconnectEvent event = new SubNetworkDisconnectEvent(client.value(), client.key());
 
             if (plugin.isEnabled()) {
                 Bukkit.getPluginManager().callEvent(event);
-                Util.isException(() -> Util.reflect(SubPlugin.class.getDeclaredMethod("connect", NamedContainer.class), plugin, client));
+                Util.isException(() -> Util.reflect(SubPlugin.class.getDeclaredMethod("connect", Pair.class), plugin, client));
             } else map.put(0, null);
         });
 

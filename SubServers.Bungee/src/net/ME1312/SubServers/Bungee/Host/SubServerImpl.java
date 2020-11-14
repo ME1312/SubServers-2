@@ -1,9 +1,10 @@
 package net.ME1312.SubServers.Bungee.Host;
 
+import net.ME1312.Galaxi.Library.Container.ContainedPair;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.SubServers.Bungee.Event.SubEditServerEvent;
 import net.ME1312.SubServers.Bungee.Library.Exception.InvalidServerException;
-import net.ME1312.Galaxi.Library.Container.NamedContainer;
+import net.ME1312.Galaxi.Library.Container.Pair;
 import net.ME1312.SubServers.Bungee.SubAPI;
 
 import java.io.File;
@@ -15,7 +16,7 @@ import java.util.*;
  * SubServer Layout Class
  */
 public abstract class SubServerImpl extends ServerImpl implements SubServer {
-    private List<NamedContainer<String, String>> incompatibilities = new ArrayList<NamedContainer<String, String>>();
+    private List<Pair<String, String>> incompatibilities = new ArrayList<Pair<String, String>>();
     private SubCreator.ServerTemplate templateV = null;
     private String templateS = null;
     protected boolean started;
@@ -107,14 +108,14 @@ public abstract class SubServerImpl extends ServerImpl implements SubServer {
 
     @Override
     public void setTemplate(String template) {
-        SubAPI.getInstance().getInternals().getPluginManager().callEvent(new SubEditServerEvent(null, this, new NamedContainer<String, Object>("template", template), false));
+        SubAPI.getInstance().getInternals().getPluginManager().callEvent(new SubEditServerEvent(null, this, new ContainedPair<String, Object>("template", template), false));
         this.templateV = null;
         this.templateS = template;
     }
 
     @Override
     public void setTemplate(SubCreator.ServerTemplate template) {
-        SubAPI.getInstance().getInternals().getPluginManager().callEvent(new SubEditServerEvent(null, this, new NamedContainer<String, Object>("template", (template != null)?template.getName():null), false));
+        SubAPI.getInstance().getInternals().getPluginManager().callEvent(new SubEditServerEvent(null, this, new ContainedPair<String, Object>("template", (template != null)?template.getName():null), false));
         this.templateV = template;
         this.templateS = (template != null)?template.getName():null;
     }
@@ -139,7 +140,7 @@ public abstract class SubServerImpl extends ServerImpl implements SubServer {
     public void toggleCompatibility(SubServer... server) {
         for (SubServer s : server) {
             if (!equals(s)) {
-                NamedContainer<String, String> info = new NamedContainer<String, String>(s.getHost().getName(), s.getName());
+                Pair<String, String> info = new ContainedPair<String, String>(s.getHost().getName(), s.getName());
                 if (isCompatible(s)) {
                     incompatibilities.add(info);
                     if (s.isCompatible(this)) toggleCompatibility(this);
@@ -153,17 +154,17 @@ public abstract class SubServerImpl extends ServerImpl implements SubServer {
 
     @Override
     public boolean isCompatible(SubServer server) {
-        return !incompatibilities.contains(new NamedContainer<String, String>(server.getHost().getName(), server.getName()));
+        return !incompatibilities.contains(new ContainedPair<String, String>(server.getHost().getName(), server.getName()));
     }
 
     @Override
     public List<SubServer> getIncompatibilities() {
         List<SubServer> servers = new ArrayList<SubServer>();
-        List<NamedContainer<String, String>> temp = new ArrayList<NamedContainer<String, String>>();
+        List<Pair<String, String>> temp = new ArrayList<Pair<String, String>>();
         temp.addAll(incompatibilities);
-        for (NamedContainer<String, String> info : temp) {
+        for (Pair<String, String> info : temp) {
             try {
-                SubServer server = SubAPI.getInstance().getHost(info.name()).getSubServer(info.get());
+                SubServer server = SubAPI.getInstance().getHost(info.key()).getSubServer(info.value());
                 if (server == null) throw new NullPointerException();
                 servers.add(server);
             } catch (Throwable e) {

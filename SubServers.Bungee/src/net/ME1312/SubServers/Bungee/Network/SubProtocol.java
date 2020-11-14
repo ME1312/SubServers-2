@@ -156,7 +156,7 @@ public class SubProtocol extends SubDataProtocol {
         subdata.on.connect(client -> {
             if (!plugin.getPluginManager().callEvent(new SubNetworkConnectEvent(client.getServer(), client)).isCancelled()) {
                 client.on.ready(c -> plugin.getPluginManager().callEvent(new SubNetworkLoginEvent(c.getServer(), c)));
-                client.on.closed(c -> plugin.getPluginManager().callEvent(new SubNetworkDisconnectEvent(c.get().getServer(), c.get(), c.name())));
+                client.on.closed(c -> plugin.getPluginManager().callEvent(new SubNetworkDisconnectEvent(c.value().getServer(), c.value(), c.key())));
                 return true;
             } else return false;
         });

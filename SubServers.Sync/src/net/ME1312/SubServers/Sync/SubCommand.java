@@ -4,13 +4,14 @@ import com.google.gson.Gson;
 import net.ME1312.Galaxi.Library.AsyncConsolidator;
 import net.ME1312.Galaxi.Library.Callback.Callback;
 import net.ME1312.Galaxi.Library.Callback.ReturnRunnable;
-import net.ME1312.Galaxi.Library.Container.PrimitiveContainer;
+import net.ME1312.Galaxi.Library.Container.ContainedPair;
+import net.ME1312.Galaxi.Library.Container.Container;
 import net.ME1312.Galaxi.Library.Platform;
 import net.ME1312.SubData.Client.SubDataClient;
 import net.ME1312.SubData.Client.SubDataSender;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
-import net.ME1312.Galaxi.Library.Container.Container;
-import net.ME1312.Galaxi.Library.Container.NamedContainer;
+import net.ME1312.Galaxi.Library.Container.Value;
+import net.ME1312.Galaxi.Library.Container.Pair;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubServers.Bungee.Library.Compatibility.CommandX;
@@ -44,7 +45,7 @@ import static net.ME1312.SubServers.Bungee.Library.Compatibility.Galaxi.GalaxiCo
 
 @SuppressWarnings("deprecation")
 public final class SubCommand extends CommandX {
-    static HashMap<UUID, HashMap<ServerInfo, NamedContainer<Long, Boolean>>> permitted = new HashMap<UUID, HashMap<ServerInfo, NamedContainer<Long, Boolean>>>();
+    static HashMap<UUID, HashMap<ServerInfo, Pair<Long, Boolean>>> permitted = new HashMap<UUID, HashMap<ServerInfo, Pair<Long, Boolean>>>();
     private TreeMap<String, Proxy> proxyCache = new TreeMap<String, Proxy>();
     private TreeMap<String, Host> hostCache = new TreeMap<String, Host>();
     private TreeMap<String, List<Server>> groupCache = new TreeMap<String, List<Server>>();
@@ -53,13 +54,13 @@ public final class SubCommand extends CommandX {
     private ExProxy plugin;
     private String label;
 
-    static NamedContainer<SubCommand, CommandX> newInstance(ExProxy plugin, String command) {
-        NamedContainer<SubCommand, CommandX> cmd = new NamedContainer<>(new SubCommand(plugin, command), null);
-        CommandX now = cmd.name();
+    static Pair<SubCommand, CommandX> newInstance(ExProxy plugin, String command) {
+        Pair<SubCommand, CommandX> cmd = new ContainedPair<>(new SubCommand(plugin, command), null);
+        CommandX now = cmd.key();
         //if (plugin.api.getGameVersion()[plugin.api.getGameVersion().length - 1].compareTo(new Version("1.13")) >= 0) { // TODO Future Command Validator API?
         //    now = new net.ME1312.SubServers.Sync.Library.Compatibility.mc1_13.CommandX(cmd.name());
         //}
-        cmd.set(now);
+        cmd.value(now);
         return cmd;
     }
 
@@ -277,9 +278,9 @@ public final class SubCommand extends CommandX {
                             });
                             Runnable getGroup = () -> plugin.api.getGroup(name, group -> {
                                 if (group != null) {
-                                    sender.sendMessage("SubServers > Info on group: " + ChatColor.WHITE + group.name());
-                                    sender.sendMessage(" -> Servers: " + ((group.get().size() <= 0)?ChatColor.GRAY + "(none)":ChatColor.AQUA.toString() + group.get().size()));
-                                    for (Server server : group.get()) sender.sendMessage("      - " + ChatColor.WHITE + server.getDisplayName() + ((server.getName().equals(server.getDisplayName()))?"":" ["+server.getName()+']'));
+                                    sender.sendMessage("SubServers > Info on group: " + ChatColor.WHITE + group.key());
+                                    sender.sendMessage(" -> Servers: " + ((group.value().size() <= 0)?ChatColor.GRAY + "(none)":ChatColor.AQUA.toString() + group.value().size()));
+                                    for (Server server : group.value()) sender.sendMessage("      - " + ChatColor.WHITE + server.getDisplayName() + ((server.getName().equals(server.getDisplayName()))?"":" ["+server.getName()+']'));
                                 } else {
                                     if (type == null) {
                                         getServer.run();
@@ -361,8 +362,8 @@ public final class SubCommand extends CommandX {
                         if (args.length > 1) {
                             selectServers(sender, args, 1, true, select -> {
                                 if (select.subservers.length > 0) {
-                                    PrimitiveContainer<Integer> success = new PrimitiveContainer<Integer>(0);
-                                    PrimitiveContainer<Integer> running = new PrimitiveContainer<Integer>(0);
+                                    Container<Integer> success = new Container<Integer>(0);
+                                    Container<Integer> running = new Container<Integer>(0);
                                     AsyncConsolidator merge = new AsyncConsolidator(() -> {
                                         if (running.value > 0) sender.sendMessage("SubServers > " + running.value + " subserver"+((running.value == 1)?" was":"s were") + " already running");
                                         if (success.value > 0) sender.sendMessage("SubServers > Started " + success.value + " subserver"+((success.value == 1)?"":"s"));
@@ -463,7 +464,7 @@ public final class SubCommand extends CommandX {
 
 
                                     // Step 1-3: Restart Servers / Receive command Responses
-                                    PrimitiveContainer<Integer> success = new PrimitiveContainer<Integer>(0);
+                                    Container<Integer> success = new Container<Integer>(0);
                                     AsyncConsolidator merge = new AsyncConsolidator(() -> {
                                         if (success.value > 0) sender.sendMessage("SubServers > Restarting " + success.value + " subserver"+((success.value == 1)?"":"s"));
                                     });
@@ -495,8 +496,8 @@ public final class SubCommand extends CommandX {
                         if (args.length > 1) {
                             selectServers(sender, args, 1, true, select -> {
                                 if (select.subservers.length > 0) {
-                                    PrimitiveContainer<Integer> success = new PrimitiveContainer<Integer>(0);
-                                    PrimitiveContainer<Integer> running = new PrimitiveContainer<Integer>(0);
+                                    Container<Integer> success = new Container<Integer>(0);
+                                    Container<Integer> running = new Container<Integer>(0);
                                     AsyncConsolidator merge = new AsyncConsolidator(() -> {
                                         if (running.value > 0) sender.sendMessage("SubServers > " + running.value + " subserver"+((running.value == 1)?" was":"s were") + " already offline");
                                         if (success.value > 0) sender.sendMessage("SubServers > Stopping " + success.value + " subserver"+((success.value == 1)?"":"s"));
@@ -528,8 +529,8 @@ public final class SubCommand extends CommandX {
                         if (args.length > 1) {
                             selectServers(sender, args, 1, true, select -> {
                                 if (select.subservers.length > 0) {
-                                    PrimitiveContainer<Integer> success = new PrimitiveContainer<Integer>(0);
-                                    PrimitiveContainer<Integer> running = new PrimitiveContainer<Integer>(0);
+                                    Container<Integer> success = new Container<Integer>(0);
+                                    Container<Integer> running = new Container<Integer>(0);
                                     AsyncConsolidator merge = new AsyncConsolidator(() -> {
                                         if (running.value > 0) sender.sendMessage("SubServers > " + running.value + " subserver"+((running.value == 1)?" was":"s were") + " already offline");
                                         if (success.value > 0) sender.sendMessage("SubServers > Terminated " + success.value + " subserver"+((success.value == 1)?"":"s"));
@@ -568,8 +569,8 @@ public final class SubCommand extends CommandX {
                                             builder.append(select.args[i]);
                                         }
 
-                                        PrimitiveContainer<Integer> success = new PrimitiveContainer<Integer>(0);
-                                        PrimitiveContainer<Integer> running = new PrimitiveContainer<Integer>(0);
+                                        Container<Integer> success = new Container<Integer>(0);
+                                        Container<Integer> running = new Container<Integer>(0);
                                         AsyncConsolidator merge = new AsyncConsolidator(() -> {
                                             if (running.value > 0) sender.sendMessage("SubServers > " + running.value + " subserver"+((running.value == 1)?" was":"s were") + " offline");
                                             if (success.value > 0) sender.sendMessage("SubServers > Sent command to " + success.value + " subserver"+((success.value == 1)?"":"s"));
@@ -649,7 +650,7 @@ public final class SubCommand extends CommandX {
                                     Version version = (select.args.length > 2)?new Version(select.args[(template == null)?2:3]):null;
                                     boolean ts = template == null;
 
-                                    PrimitiveContainer<Integer> success = new PrimitiveContainer<Integer>(0);
+                                    Container<Integer> success = new Container<Integer>(0);
                                     AsyncConsolidator merge = new AsyncConsolidator(() -> {
                                         if (success.value > 0) sender.sendMessage("SubServers > Updating " + success.value + " subserver"+((success.value == 1)?"":"s"));
                                     });
@@ -704,8 +705,8 @@ public final class SubCommand extends CommandX {
                         if (args.length > 1) {
                             selectServers(sender, args, 1, true, select -> {
                                 if (select.subservers.length > 0) {
-                                    PrimitiveContainer<Integer> success = new PrimitiveContainer<Integer>(0);
-                                    PrimitiveContainer<Integer> running = new PrimitiveContainer<Integer>(0);
+                                    Container<Integer> success = new Container<Integer>(0);
+                                    Container<Integer> running = new Container<Integer>(0);
                                     AsyncConsolidator merge = new AsyncConsolidator(() -> {
                                         if (success.value > 0) sender.sendMessage("SubServers > Removing " + success.value + " subserver"+((success.value == 1)?"":"s"));
                                     });
@@ -761,13 +762,13 @@ public final class SubCommand extends CommandX {
         LinkedList<String> args = new LinkedList<String>();
         LinkedList<String> selection = new LinkedList<String>();
         LinkedList<Server> select = new LinkedList<Server>();
-        Container<String> last = new Container<String>(null);
+        Value<String> last = new Container<String>(null);
 
         // Step 1
-        Container<Integer> ic = new Container<Integer>(0);
-        while (ic.get() < index) {
-            args.add(rargs[ic.get()]);
-            ic.set(ic.get() + 1);
+        Value<Integer> ic = new Container<Integer>(0);
+        while (ic.value() < index) {
+            args.add(rargs[ic.value()]);
+            ic.value(ic.value() + 1);
         }
 
         // Step 3
@@ -775,10 +776,10 @@ public final class SubCommand extends CommandX {
         Runnable finished = () -> {
             args.add(completed.toString());
 
-            int i = ic.get();
+            int i = ic.value();
             while (i < rargs.length) {
                 args.add(rargs[i]);
-                last.set(null);
+                last.value(null);
                 i++;
             }
 
@@ -801,7 +802,7 @@ public final class SubCommand extends CommandX {
             }
 
             try {
-                callback.run(new ServerSelection(msgs, selection, servers, subservers, args, last.get()));
+                callback.run(new ServerSelection(msgs, selection, servers, subservers, args, last.value()));
             } catch (Throwable e) {
                 Throwable ew = new InvocationTargetException(e);
                 ew.setStackTrace(origin);
@@ -811,9 +812,9 @@ public final class SubCommand extends CommandX {
 
         // Step 2
         AsyncConsolidator merge = new AsyncConsolidator(finished);
-        for (boolean run = true; run && ic.get() < rargs.length; ic.set(ic.get() + 1)) {
-            String current = rargs[ic.get()];
-            last.set(current);
+        for (boolean run = true; run && ic.value() < rargs.length; ic.value(ic.value() + 1)) {
+            String current = rargs[ic.value()];
+            last.value(current);
             completed.append(current);
             if (current.endsWith(",")) {
                 current = current.substring(0, current.length() - 1);
@@ -866,14 +867,14 @@ public final class SubCommand extends CommandX {
                         plugin.api.getGroup(current, group -> {
                             if (group != null) {
                                 int i = 0;
-                                for (Server server : group.get()) {
+                                for (Server server : group.value()) {
                                     if (!mode || server instanceof SubServer) {
                                         select.add(server);
                                         i++;
                                     }
                                 }
                                 if (i <= 0) {
-                                    String msg = "SubServers > There are no " + ((mode)?"sub":"") + "servers in group: " + group.name();
+                                    String msg = "SubServers > There are no " + ((mode)?"sub":"") + "servers in group: " + group.key();
                                     if (sender != null) sender.sendMessage(msg);
                                     msgs.add(msg);
                                 }
@@ -960,35 +961,35 @@ public final class SubCommand extends CommandX {
      * @return The validator's response and list of possible arguments
      */
     @SuppressWarnings("unchecked")
-    public NamedContainer<String, List<String>> suggestArguments(CommandSender sender, String[] args) {
+    public Pair<String, List<String>> suggestArguments(CommandSender sender, String[] args) {
         String Last = (args.length > 0)?args[args.length - 1]:"";
         String last = Last.toLowerCase();
 
         if (plugin.api.getSubDataNetwork()[0] == null) {
             if (sender instanceof ConsoleCommandSender)
                 new IllegalStateException("SubData is not connected").printStackTrace();
-            return new NamedContainer<>(null, Collections.emptyList());
+            return new ContainedPair<>(null, Collections.emptyList());
         } else if (sender instanceof ProxiedPlayer && (!permitted.keySet().contains(((ProxiedPlayer) sender).getUniqueId()) || !permitted.get(((ProxiedPlayer) sender).getUniqueId()).keySet().contains(((ProxiedPlayer) sender).getServer().getInfo())
-                || !permitted.get(((ProxiedPlayer) sender).getUniqueId()).get(((ProxiedPlayer) sender).getServer().getInfo()).get())) {
+                || !permitted.get(((ProxiedPlayer) sender).getUniqueId()).get(((ProxiedPlayer) sender).getServer().getInfo()).value())) {
             if (permitted.keySet().contains(((ProxiedPlayer) sender).getUniqueId()) && permitted.get(((ProxiedPlayer) sender).getUniqueId()).keySet().contains(((ProxiedPlayer) sender).getServer().getInfo())
-                    && permitted.get(((ProxiedPlayer) sender).getUniqueId()).get(((ProxiedPlayer) sender).getServer().getInfo()).name() == null) {
+                    && permitted.get(((ProxiedPlayer) sender).getUniqueId()).get(((ProxiedPlayer) sender).getServer().getInfo()).key() == null) {
                 // do nothing
             } else if (!permitted.keySet().contains(((ProxiedPlayer) sender).getUniqueId()) || !permitted.get(((ProxiedPlayer) sender).getUniqueId()).keySet().contains(((ProxiedPlayer) sender).getServer().getInfo())
-                    || Calendar.getInstance().getTime().getTime() - permitted.get(((ProxiedPlayer) sender).getUniqueId()).get(((ProxiedPlayer) sender).getServer().getInfo()).name() >= TimeUnit.MINUTES.toMillis(1)) {
+                    || Calendar.getInstance().getTime().getTime() - permitted.get(((ProxiedPlayer) sender).getUniqueId()).get(((ProxiedPlayer) sender).getServer().getInfo()).key() >= TimeUnit.MINUTES.toMillis(1)) {
                 if (!(((ProxiedPlayer) sender).getServer().getInfo() instanceof ServerImpl) || ((ServerImpl) ((ProxiedPlayer) sender).getServer().getInfo()).getSubData()[0] == null) {
-                    HashMap<ServerInfo, NamedContainer<Long, Boolean>> map = (permitted.keySet().contains(((ProxiedPlayer) sender).getUniqueId()))? permitted.get(((ProxiedPlayer) sender).getUniqueId()):new HashMap<ServerInfo, NamedContainer<Long, Boolean>>();
-                    map.put(((ProxiedPlayer) sender).getServer().getInfo(), new NamedContainer<>(Calendar.getInstance().getTime().getTime(), false));
+                    HashMap<ServerInfo, Pair<Long, Boolean>> map = (permitted.keySet().contains(((ProxiedPlayer) sender).getUniqueId()))? permitted.get(((ProxiedPlayer) sender).getUniqueId()):new HashMap<ServerInfo, Pair<Long, Boolean>>();
+                    map.put(((ProxiedPlayer) sender).getServer().getInfo(), new ContainedPair<>(Calendar.getInstance().getTime().getTime(), false));
                     permitted.put(((ProxiedPlayer) sender).getUniqueId(), map);
                 } else {
-                    HashMap<ServerInfo, NamedContainer<Long, Boolean>> map = (permitted.keySet().contains(((ProxiedPlayer) sender).getUniqueId()))? permitted.get(((ProxiedPlayer) sender).getUniqueId()):new HashMap<ServerInfo, NamedContainer<Long, Boolean>>();
-                    map.put(((ProxiedPlayer) sender).getServer().getInfo(), new NamedContainer<>(null, false));
+                    HashMap<ServerInfo, Pair<Long, Boolean>> map = (permitted.keySet().contains(((ProxiedPlayer) sender).getUniqueId()))? permitted.get(((ProxiedPlayer) sender).getUniqueId()):new HashMap<ServerInfo, Pair<Long, Boolean>>();
+                    map.put(((ProxiedPlayer) sender).getServer().getInfo(), new ContainedPair<>(null, false));
                     permitted.put(((ProxiedPlayer) sender).getUniqueId(), map);
                     ((SubDataSender) ((ServerImpl) ((ProxiedPlayer) sender).getServer().getInfo()).getSubData()[0]).sendPacket(new PacketCheckPermission(((ProxiedPlayer) sender).getUniqueId(), "subservers.command", result -> {
-                        map.put(((ProxiedPlayer) sender).getServer().getInfo(), new NamedContainer<>(Calendar.getInstance().getTime().getTime(), result));
+                        map.put(((ProxiedPlayer) sender).getServer().getInfo(), new ContainedPair<>(Calendar.getInstance().getTime().getTime(), result));
                     }));
                 }
             }
-            return new NamedContainer<>(null, Collections.emptyList());
+            return new ContainedPair<>(null, Collections.emptyList());
         } else if (args.length <= 1) {
             List<String> cmds = new ArrayList<>();
             cmds.addAll(Arrays.asList("help", "list", "info", "status", "version", "start", "restart", "stop", "kill", "terminate", "cmd", "command", "create", "update", "upgrade"));
@@ -1000,7 +1001,7 @@ public final class SubCommand extends CommandX {
             for (String cmd : cmds) {
                 if (cmd.startsWith(last)) list.add(Last + cmd.substring(last.length()));
             }
-            return new NamedContainer<>((list.size() <= 0)?plugin.api.getLang("SubServers", "Command.Generic.Invalid-Subcommand").replace("$str$", args[0]):null, list);
+            return new ContainedPair<>((list.size() <= 0)?plugin.api.getLang("SubServers", "Command.Generic.Invalid-Subcommand").replace("$str$", args[0]):null, list);
         } else {
             if (args[0].equals("info") || args[0].equals("status")) {
                 ReturnRunnable<Collection<String>> getPlayers = () -> {
@@ -1049,7 +1050,7 @@ public final class SubCommand extends CommandX {
                         if (!list.contains(player) && player.toLowerCase().startsWith(last))
                             list.add(Last + player.substring(last.length()));
                     }
-                    return new NamedContainer<>((list.size() <= 0)?plugin.api.getLang("SubServers", "Command.Info.Unknown").replace("$str$", args[0]):null, list);
+                    return new ContainedPair<>((list.size() <= 0)?plugin.api.getLang("SubServers", "Command.Info.Unknown").replace("$str$", args[0]):null, list);
                 } else if (args.length == 3) {
                     List<String> list = new ArrayList<String>();
 
@@ -1093,16 +1094,16 @@ public final class SubCommand extends CommandX {
                             }
                             break;
                     }
-                    return new NamedContainer<>((list.size() <= 0)?plugin.api.getLang("SubServers", "Command.Info.Unknown").replace("$str$", args[0]):null, list);
+                    return new ContainedPair<>((list.size() <= 0)?plugin.api.getLang("SubServers", "Command.Info.Unknown").replace("$str$", args[0]):null, list);
                 } else {
-                    return new NamedContainer<>(null, Collections.emptyList());
+                    return new ContainedPair<>(null, Collections.emptyList());
                 }
             } else if (!(sender instanceof ProxiedPlayer) && (args[0].equals("restore"))) {
              /* if (args[0].equals("restore")) */ {
                     if (args.length == 2) {
-                        return new NamedContainer<>(null, Collections.singletonList("<Subserver>"));
+                        return new ContainedPair<>(null, Collections.singletonList("<Subserver>"));
                     } else {
-                        return new NamedContainer<>(null, Collections.emptyList());
+                        return new ContainedPair<>(null, Collections.emptyList());
                     }
                 }
             } else if (args[0].equals("start") ||
@@ -1128,7 +1129,7 @@ public final class SubCommand extends CommandX {
                                 if (Arrays.binarySearch(select.selection, name.toLowerCase()) < 0 && name.toLowerCase().startsWith(last)) list.add(Last + name.substring(last.length()));
                             }
                         }
-                        return new NamedContainer<>((list.size() <= 0)?plugin.api.getLang("SubServers", "Command.Generic.Unknown-Host").replace("$str$", select.last):null, list);
+                        return new ContainedPair<>((list.size() <= 0)?plugin.api.getLang("SubServers", "Command.Generic.Unknown-Host").replace("$str$", select.last):null, list);
                     } else if (last.startsWith(":")) {
                         Map<String, List<Server>> groups = groupCache;
                         if (groups.size() > 0) {
@@ -1139,7 +1140,7 @@ public final class SubCommand extends CommandX {
                                 if (Arrays.binarySearch(select.selection, group.toLowerCase()) < 0 && group.toLowerCase().startsWith(last)) list.add(Last + group.substring(last.length()));
                             }
                         }
-                        return new NamedContainer<>((list.size() <= 0)?plugin.api.getLang("SubServers", "Command.Generic.Unknown-Group").replace("$str$", select.last):null, list);
+                        return new ContainedPair<>((list.size() <= 0)?plugin.api.getLang("SubServers", "Command.Generic.Unknown-Group").replace("$str$", select.last):null, list);
                     } else {
                         Map<String, ServerImpl> subservers = plugin.servers;
                         if (subservers.size() > 0) {
@@ -1149,32 +1150,32 @@ public final class SubCommand extends CommandX {
                                 if (server instanceof SubServerImpl && Arrays.binarySearch(select.selection, server.getName().toLowerCase()) < 0 && server.getName().toLowerCase().startsWith(last)) list.add(Last + server.getName().substring(last.length()));
                             }
                         }
-                        return new NamedContainer<>((list.size() <= 0)?plugin.api.getLang("SubServers", "Command.Generic.Unknown-SubServer").replace("$str$", select.last):null, list);
+                        return new ContainedPair<>((list.size() <= 0)?plugin.api.getLang("SubServers", "Command.Generic.Unknown-SubServer").replace("$str$", select.last):null, list);
                     }
                 } else if (args[0].equals("cmd") || args[0].equals("command")) {
                     if (select.args.length == 3) {
-                        return new NamedContainer<>(null, Collections.singletonList("<Command>"));
+                        return new ContainedPair<>(null, Collections.singletonList("<Command>"));
                     } else {
-                        return new NamedContainer<>(null, Collections.singletonList("[Args...]"));
+                        return new ContainedPair<>(null, Collections.singletonList("[Args...]"));
                     }
                 } else if (args[0].equals("update") || args[0].equals("upgrade")) {
                     if (select.args.length == 3) {
-                        return new NamedContainer<>(null, Arrays.asList("[Template]", "[Version]"));
+                        return new ContainedPair<>(null, Arrays.asList("[Template]", "[Version]"));
                     } else if (select.args.length == 4) {
-                        return new NamedContainer<>(null, Collections.singletonList("<Version>"));
+                        return new ContainedPair<>(null, Collections.singletonList("<Version>"));
                     }
                 }
-                return new NamedContainer<>(null, Collections.emptyList());
+                return new ContainedPair<>(null, Collections.emptyList());
             } else if (args[0].equals("create")) {
                 updateCache();
                 if (args.length == 2) {
-                    return new NamedContainer<>(null, Collections.singletonList("<Name>"));
+                    return new ContainedPair<>(null, Collections.singletonList("<Name>"));
                 } else if (args.length == 3) {
                     List<String> list = new ArrayList<String>();
                     for (Host host : hostCache.values()) {
                         if (host.getName().toLowerCase().startsWith(last)) list.add(Last + host.getName().substring(last.length()));
                     }
-                    return new NamedContainer<>((list.size() <= 0)?plugin.api.getLang("SubServers", "Command.Generic.Unknown-Host").replace("$str$", args[0]):null, list);
+                    return new ContainedPair<>((list.size() <= 0)?plugin.api.getLang("SubServers", "Command.Generic.Unknown-Host").replace("$str$", args[0]):null, list);
                 } else if (args.length == 4) {
                     List<String> list = new ArrayList<String>();
                     Map<String, Host> hosts = hostCache;
@@ -1185,18 +1186,18 @@ public final class SubCommand extends CommandX {
                             if (template.getName().toLowerCase().startsWith(last)) list.add(Last + template.getName().substring(last.length()));
                         }
                     }
-                    return new NamedContainer<>((list.size() <= 0)?plugin.api.getLang("SubServers", "Command.Creator.Invalid-Template").replace("$str$", args[0]):null, list);
+                    return new ContainedPair<>((list.size() <= 0)?plugin.api.getLang("SubServers", "Command.Creator.Invalid-Template").replace("$str$", args[0]):null, list);
                 } else if (args.length == 5) {
-                    return new NamedContainer<>(null, Collections.singletonList("[Version]"));
+                    return new ContainedPair<>(null, Collections.singletonList("[Version]"));
                 } else if (args.length == 6) {
                     if (last.length() > 0) {
                         if (Util.isException(() -> Integer.parseInt(last)) || Integer.parseInt(last) <= 0 || Integer.parseInt(last) > 65535) {
-                            return new NamedContainer<>(plugin.api.getLang("SubServers", "Command.Creator.Invalid-Port"), Collections.emptyList());
+                            return new ContainedPair<>(plugin.api.getLang("SubServers", "Command.Creator.Invalid-Port"), Collections.emptyList());
                         }
                     }
-                    return new NamedContainer<>(null, Collections.singletonList("[Port]"));
+                    return new ContainedPair<>(null, Collections.singletonList("[Port]"));
                 } else {
-                    return new NamedContainer<>(null, Collections.emptyList());
+                    return new ContainedPair<>(null, Collections.emptyList());
                 }
             } else if (sender instanceof ProxiedPlayer && (args[0].equals("tp") || args[0].equals("teleport"))) {
                 if (args.length == 2 || args.length == 3) {
@@ -1225,12 +1226,12 @@ public final class SubCommand extends CommandX {
                     for (ServerImpl server : plugin.servers.values()) {
                         if (server.getName().toLowerCase().startsWith(last)) list.add(Last + server.getName().substring(last.length()));
                     }
-                    return new NamedContainer<>((list.size() <= 0)?plugin.api.getLang("SubServers", "Command.Generic.Unknown-Server").replace("$str$", args[0]):null, list);
+                    return new ContainedPair<>((list.size() <= 0)?plugin.api.getLang("SubServers", "Command.Generic.Unknown-Server").replace("$str$", args[0]):null, list);
                 } else {
-                    return new NamedContainer<>(null, Collections.emptyList());
+                    return new ContainedPair<>(null, Collections.emptyList());
                 }
             } else {
-                return new NamedContainer<>(plugin.api.getLang("SubServers", "Command.Generic.Invalid-Subcommand").replace("$str$", args[0]), Collections.emptyList());
+                return new ContainedPair<>(plugin.api.getLang("SubServers", "Command.Generic.Invalid-Subcommand").replace("$str$", args[0]), Collections.emptyList());
             }
         }
     }
@@ -1437,13 +1438,13 @@ public final class SubCommand extends CommandX {
             );
         }
 
-        static NamedContainer<BungeeServer, CommandX> newInstance(ExProxy plugin, String command) {
-            NamedContainer<BungeeServer, CommandX> cmd = new NamedContainer<>(new BungeeServer(plugin, command), null);
-            CommandX now = cmd.name();
+        static Pair<BungeeServer, CommandX> newInstance(ExProxy plugin, String command) {
+            Pair<BungeeServer, CommandX> cmd = new ContainedPair<>(new BungeeServer(plugin, command), null);
+            CommandX now = cmd.key();
             //if (plugin.api.getGameVersion()[plugin.api.getGameVersion().length - 1].compareTo(new Version("1.13")) >= 0) { // TODO Future Command Validator API?
             //    now = new net.ME1312.SubServers.Sync.Library.Compatibility.mc1_13.CommandX(cmd.name());
             //}
-            cmd.set(now);
+            cmd.value(now);
             return cmd;
         }
 
@@ -1499,7 +1500,7 @@ public final class SubCommand extends CommandX {
          * @param args Arguments
          * @return The validator's response and list of possible arguments
          */
-        public NamedContainer<String, List<String>> suggestArguments(CommandSender sender, String[] args) {
+        public Pair<String, List<String>> suggestArguments(CommandSender sender, String[] args) {
             if (args.length <= 1) {
                 String last = (args.length > 0)?args[args.length - 1].toLowerCase():"";
                 List<String> list = new ArrayList<String>();
@@ -1507,15 +1508,15 @@ public final class SubCommand extends CommandX {
                     for (ServerImpl server : plugin.servers.values()) {
                         if (!server.isHidden()) list.add(server.getName());
                     }
-                    return new NamedContainer<>(null, new LinkedList<>(list));
+                    return new ContainedPair<>(null, new LinkedList<>(list));
                 } else {
                     for (ServerImpl server : plugin.servers.values()) {
                         if (server.getName().toLowerCase().startsWith(last) && !server.isHidden()) list.add(server.getName());
                     }
-                    return new NamedContainer<>((list.size() <= 0)?plugin.api.getLang("SubServers", "Bungee.Server.Invalid").replace("$str$", args[0]):null, list);
+                    return new ContainedPair<>((list.size() <= 0)?plugin.api.getLang("SubServers", "Bungee.Server.Invalid").replace("$str$", args[0]):null, list);
                 }
             } else {
-                return new NamedContainer<>(null, Collections.emptyList());
+                return new ContainedPair<>(null, Collections.emptyList());
             }
         }
     }

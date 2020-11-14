@@ -148,8 +148,8 @@ public class PacketOutExRunEvent implements Listener, PacketObjectOut<Integer> {
             ObjectMap<String> args = new ObjectMap<String>();
             if (event.getPlayer() != null) args.set("player", event.getPlayer().toString());
             args.set("server", event.getServer().getName());
-            args.set("edit", event.getEdit().name());
-            args.set("value", event.getEdit().get().asObject());
+            args.set("edit", event.getEdit().key());
+            args.set("value", event.getEdit().value().asObject());
             args.set("perm", event.isPermanent());
             broadcast(new PacketOutExRunEvent(event.getClass(), args));
         }

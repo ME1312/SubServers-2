@@ -1,7 +1,9 @@
 package net.ME1312.SubServers.Client.Bukkit.Graphic;
 
+import net.ME1312.Galaxi.Library.Container.ContainedPair;
 import net.ME1312.Galaxi.Library.Container.Container;
-import net.ME1312.Galaxi.Library.Container.NamedContainer;
+import net.ME1312.Galaxi.Library.Container.Value;
+import net.ME1312.Galaxi.Library.Container.Pair;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubServers.Client.Common.Network.API.Host;
@@ -23,7 +25,7 @@ import java.util.regex.Pattern;
 public abstract class UIRenderer {
     static HashMap<String, PluginRenderer<Host>> hostPlugins = new HashMap<String, PluginRenderer<Host>>();
     static HashMap<String, PluginRenderer<SubServer>> subserverPlugins = new HashMap<String, PluginRenderer<SubServer>>();
-    private NamedContainer<String, Integer> tdownload = null;
+    private Pair<String, Integer> tdownload = null;
     private int download = -1;
     private final UUID player;
     private SubPlugin plugin;
@@ -149,22 +151,22 @@ public abstract class UIRenderer {
                 download = -1;
             }, 50L);
         } if (subtitle != null && tdownload == null) {
-            tdownload = new NamedContainer<String, Integer>(subtitle, 0);
-            final Container<Integer> delay = new Container<Integer>(0);
+            tdownload = new ContainedPair<String, Integer>(subtitle, 0);
+            final Value<Integer> delay = new Container<Integer>(0);
             Bukkit.getScheduler().runTask(plugin, new Runnable() {
                 @Override
                 public void run() {
                     if (tdownload != null) {
                         String word = ChatColor.stripColor(plugin.api.getLang("SubServers", "Interface.Generic.Downloading.Title"));
                         int i = 0;
-                        int start = (tdownload.get() - 3 < 0)?0: tdownload.get()-3;
-                        int end = (tdownload.get() >= word.length())?word.length(): tdownload.get();
-                        String str = plugin.api.getLang("SubServers", (delay.get() > 7 && start == 0)?"Interface.Generic.Downloading.Title-Color-Alt":"Interface.Generic.Downloading.Title-Color");
-                        delay.set(delay.get() + 1);
-                        if (delay.get() > 7) tdownload.set(tdownload.get() + 1);
-                        if (tdownload.get() >= word.length() + 3) {
-                            tdownload.set(0);
-                            delay.set(0);
+                        int start = (tdownload.value() - 3 < 0)?0: tdownload.value()-3;
+                        int end = (tdownload.value() >= word.length())?word.length(): tdownload.value();
+                        String str = plugin.api.getLang("SubServers", (delay.value() > 7 && start == 0)?"Interface.Generic.Downloading.Title-Color-Alt":"Interface.Generic.Downloading.Title-Color");
+                        delay.value(delay.value() + 1);
+                        if (delay.value() > 7) tdownload.value(tdownload.value() + 1);
+                        if (tdownload.value() >= word.length() + 3) {
+                            tdownload.value(0);
+                            delay.value(0);
                         }
 
                         for (char c : word.toCharArray()) {
@@ -174,7 +176,7 @@ public abstract class UIRenderer {
                             if (i == end) str += plugin.api.getLang("SubServers", "Interface.Generic.Downloading.Title-Color");
                         }
 
-                        str += '\n' + plugin.api.getLang("SubServers", "Interface.Generic.Downloading.Title-Color-Alt") + tdownload.name();
+                        str += '\n' + plugin.api.getLang("SubServers", "Interface.Generic.Downloading.Title-Color-Alt") + tdownload.key();
                         sendTitle(str, 0, 10, 5);
                         Bukkit.getScheduler().runTaskLater(plugin, this, 1);
                     } else {
@@ -183,7 +185,7 @@ public abstract class UIRenderer {
                 }
             });
         } else if (subtitle != null) {
-            tdownload.rename(subtitle);
+            tdownload.key(subtitle);
         } else {
             if (tdownload != null) {
                 tdownload = null;
@@ -213,17 +215,17 @@ public abstract class UIRenderer {
      * @return ItemStack
      */
     public ItemStack parseItem(String str, ItemStack def) {
-        final Container<String> item = new Container<String>(str);
+        final Value<String> item = new Container<String>(str);
         if (plugin.api.getGameVersion().compareTo(new Version("1.13")) < 0) {
             try {
                 // int
-                Matcher matcher = Pattern.compile("(?i)^(\\d+)$").matcher(item.get());
+                Matcher matcher = Pattern.compile("(?i)^(\\d+)$").matcher(item.value());
                 if (matcher.find()) {
                     return ItemStack.class.getConstructor(int.class, int.class).newInstance(Integer.parseInt(matcher.group(1)), 1);
                 }
                 // int:int
                 matcher.reset();
-                matcher = Pattern.compile("(?i)^(\\d+):(\\d+)$").matcher(item.get());
+                matcher = Pattern.compile("(?i)^(\\d+):(\\d+)$").matcher(item.value());
                 if (matcher.find()) {
                     return ItemStack.class.getConstructor(int.class, int.class, short.class).newInstance(Integer.parseInt(matcher.group(1)), 1, Short.parseShort(matcher.group(2)));
                 }
@@ -232,27 +234,27 @@ public abstract class UIRenderer {
             }
         }
         // minecraft:name
-        if (item.get().toLowerCase().startsWith("minecraft:")) {
-            item.set(item.get().substring(10));
+        if (item.value().toLowerCase().startsWith("minecraft:")) {
+            item.value(item.value().substring(10));
         } else
 
         // bukkit:name
-        if (item.get().toLowerCase().startsWith("bukkit:")) {
-            item.set(item.get().substring(7));
+        if (item.value().toLowerCase().startsWith("bukkit:")) {
+            item.value(item.value().substring(7));
 
-            if (!Util.isException(() -> Material.valueOf(item.get().toUpperCase()))) {
-                return new ItemStack(Material.valueOf(item.get().toUpperCase()), 1);
+            if (!Util.isException(() -> Material.valueOf(item.value().toUpperCase()))) {
+                return new ItemStack(Material.valueOf(item.value().toUpperCase()), 1);
             }
         }
 
         // material name
         if (plugin.api.getGameVersion().compareTo(new Version("1.13")) < 0) {
-            if (!Util.isException(() -> Material.valueOf(item.get().toUpperCase()))) {
-                return new ItemStack(Material.valueOf(item.get().toUpperCase()), 1);
+            if (!Util.isException(() -> Material.valueOf(item.value().toUpperCase()))) {
+                return new ItemStack(Material.valueOf(item.value().toUpperCase()), 1);
             }
         } else try {
-            if (Material.class.getMethod("getMaterial", String.class, boolean.class).invoke(null, item.get().toUpperCase(), false) != null) {
-                return new ItemStack((Material) Material.class.getMethod("getMaterial", String.class, boolean.class).invoke(null, item.get().toUpperCase(), false), 1);
+            if (Material.class.getMethod("getMaterial", String.class, boolean.class).invoke(null, item.value().toUpperCase(), false) != null) {
+                return new ItemStack((Material) Material.class.getMethod("getMaterial", String.class, boolean.class).invoke(null, item.value().toUpperCase(), false), 1);
             }
         } catch (Exception e) {}
 

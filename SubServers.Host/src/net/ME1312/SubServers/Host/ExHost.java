@@ -7,7 +7,7 @@ import net.ME1312.Galaxi.Library.Config.YAMLConfig;
 import net.ME1312.Galaxi.Library.Config.YAMLSection;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Log.Logger;
-import net.ME1312.Galaxi.Library.Container.NamedContainer;
+import net.ME1312.Galaxi.Library.Container.Pair;
 import net.ME1312.Galaxi.Library.Platform;
 import net.ME1312.Galaxi.Library.UniversalFile;
 import net.ME1312.Galaxi.Library.Util;
@@ -42,10 +42,10 @@ import java.util.jar.Manifest;
 /**
  * SubServers.Host Main Class
  */
-@App(name = "SubServers.Host", version = "2.16.4a", authors = "ME1312", website = "https://github.com/ME1312/SubServers-2", description = "Host subservers on separate machines")
+@App(name = "SubServers.Host", version = "2.17a", authors = "ME1312", website = "https://github.com/ME1312/SubServers-2", description = "Host subservers on separate machines")
 public final class ExHost {
     HashMap<Integer, SubDataClient> subdata = new HashMap<Integer, SubDataClient>();
-    NamedContainer<Long, Map<String, Map<String, String>>> lang = null;
+    Pair<Long, Map<String, Map<String, String>>> lang = null;
     public HashMap<String, SubCreatorImpl.ServerTemplate> templatesR = new HashMap<String, SubCreatorImpl.ServerTemplate>();
     public HashMap<String, SubCreatorImpl.ServerTemplate> templates = new HashMap<String, SubCreatorImpl.ServerTemplate>();
     public HashMap<String, SubServerImpl> servers = new HashMap<String, SubServerImpl>();
@@ -274,9 +274,9 @@ public final class ExHost {
         }
     }
 
-    private void connect(java.util.logging.Logger log, NamedContainer<DisconnectReason, DataClient> disconnect) throws IOException {
+    private void connect(java.util.logging.Logger log, Pair<DisconnectReason, DataClient> disconnect) throws IOException {
         int reconnect = config.get().getMap("Settings").getMap("SubData").getInt("Reconnect", 60);
-        if (disconnect == null || (this.reconnect && reconnect > 0 && disconnect.name() != DisconnectReason.PROTOCOL_MISMATCH && disconnect.name() != DisconnectReason.ENCRYPTION_MISMATCH)) {
+        if (disconnect == null || (this.reconnect && reconnect > 0 && disconnect.key() != DisconnectReason.PROTOCOL_MISMATCH && disconnect.key() != DisconnectReason.ENCRYPTION_MISMATCH)) {
             long reset = resetDate;
             Timer timer = new Timer(SubAPI.getInstance().getAppInfo().getName() + "::SubData_Reconnect_Handler");
             if (disconnect != null) ;

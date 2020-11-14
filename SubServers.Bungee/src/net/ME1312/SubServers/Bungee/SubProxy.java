@@ -3,7 +3,7 @@ package net.ME1312.SubServers.Bungee;
 import com.dosse.upnp.UPnP;
 import com.google.common.collect.Range;
 import com.google.gson.Gson;
-import net.ME1312.Galaxi.Library.Container.PrimitiveContainer;
+import net.ME1312.Galaxi.Library.Container.Container;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.UniversalFile;
 import net.ME1312.Galaxi.Library.Util;
@@ -85,7 +85,7 @@ public final class SubProxy extends BungeeCommon implements Listener {
     public SubProtocol subprotocol;
     public SubDataServer subdata = null;
     public SubServer sudo = null;
-    public static final Version version = Version.fromString("2.16.4a");
+    public static final Version version = Version.fromString("2.17a");
 
     public final Proxy mProxy;
     public boolean canSudo = false;
@@ -657,13 +657,13 @@ public final class SubProxy extends BungeeCommon implements Listener {
 
     private void post() {
         if (!config.get().getMap("Settings").getRawStringList("Disabled-Overrides", Collections.emptyList()).contains("/server"))
-            getPluginManager().registerCommand(plugin, SubCommand.BungeeServer.newInstance(this, "server").get());
+            getPluginManager().registerCommand(plugin, SubCommand.BungeeServer.newInstance(this, "server").value());
         if (!config.get().getMap("Settings").getRawStringList("Disabled-Overrides", Collections.emptyList()).contains("/glist"))
             getPluginManager().registerCommand(plugin, new SubCommand.BungeeList(this, "glist"));
 
-        getPluginManager().registerCommand(plugin, SubCommand.newInstance(this, "subservers").get());
-        getPluginManager().registerCommand(plugin, SubCommand.newInstance(this, "subserver").get());
-        getPluginManager().registerCommand(plugin, SubCommand.newInstance(this, "sub").get());
+        getPluginManager().registerCommand(plugin, SubCommand.newInstance(this, "subservers").value());
+        getPluginManager().registerCommand(plugin, SubCommand.newInstance(this, "subserver").value());
+        getPluginManager().registerCommand(plugin, SubCommand.newInstance(this, "sub").value());
         GalaxiCommand.group(SubCommand.class);
 
         if (getReconnectHandler() != null && getReconnectHandler().getClass().equals(SmartFallback.class))
@@ -876,7 +876,7 @@ public final class SubProxy extends BungeeCommon implements Listener {
                 if (!e.getConnection().getListener().isPingPassthrough()) {
                     e.setResponse(new ServerPing(e.getResponse().getVersion(), e.getResponse().getPlayers(), new TextComponent(override.getMotd()), null));
                 } else {
-                    PrimitiveContainer<Boolean> lock = new PrimitiveContainer<>(true);
+                    Container<Boolean> lock = new Container<>(true);
                     boolean mode = plugin != null;
                     if (mode) e.registerIntent(plugin);
                     ((BungeeServerInfo) override).ping((ping, error) -> {

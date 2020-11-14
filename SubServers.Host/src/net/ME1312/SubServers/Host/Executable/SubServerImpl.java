@@ -1,6 +1,7 @@
 package net.ME1312.SubServers.Host.Executable;
 
 import net.ME1312.Galaxi.Library.Container.Container;
+import net.ME1312.Galaxi.Library.Container.Value;
 import net.ME1312.Galaxi.Library.UniversalFile;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
@@ -24,7 +25,7 @@ public class SubServerImpl {
     private String name;
     private boolean enabled;
     private int port;
-    private Container<Boolean> log;
+    private Value<Boolean> log;
     private String dir;
     private File directory;
     private String executable;
@@ -250,7 +251,7 @@ public class SubServerImpl {
      * @return Logging Status
      */
     public boolean isLogging() {
-        return log.get();
+        return log.value();
     }
 
     /**
@@ -260,7 +261,7 @@ public class SubServerImpl {
      */
     public void setLogging(boolean value) {
         if (Util.isNull(value)) throw new NullPointerException();
-        log.set(value);
+        log.value(value);
     }
 
     /**

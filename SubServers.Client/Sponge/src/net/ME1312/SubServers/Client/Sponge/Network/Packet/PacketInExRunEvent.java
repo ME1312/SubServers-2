@@ -1,8 +1,9 @@
 package net.ME1312.SubServers.Client.Sponge.Network.Packet;
 
 import net.ME1312.Galaxi.Library.Callback.Callback;
+import net.ME1312.Galaxi.Library.Container.ContainedPair;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
-import net.ME1312.Galaxi.Library.Container.NamedContainer;
+import net.ME1312.Galaxi.Library.Container.Pair;
 import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubData.Client.Protocol.PacketObjectIn;
 import net.ME1312.SubData.Client.SubDataSender;
@@ -72,7 +73,7 @@ public class PacketInExRunEvent implements PacketObjectIn<Integer> {
         callback("SubEditServerEvent", new Callback<ObjectMap<String>>() {
             @Override
             public void run(ObjectMap<String> data) {
-                Sponge.getEventManager().post(new SubEditServerEvent((data.contains("player"))?data.getUUID("player"):null, data.getString("server"), new NamedContainer<String, Object>(data.getString("edit"), data.get("value")), data.getBoolean("perm")));
+                Sponge.getEventManager().post(new SubEditServerEvent((data.contains("player"))?data.getUUID("player"):null, data.getString("server"), new ContainedPair<String, Object>(data.getString("edit"), data.get("value")), data.getBoolean("perm")));
                 callback("SubEditServerEvent", this);
             }
         });

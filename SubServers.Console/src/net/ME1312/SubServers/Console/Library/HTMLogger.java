@@ -1,6 +1,7 @@
 package net.ME1312.SubServers.Console.Library;
 
 import net.ME1312.Galaxi.Library.Container.Container;
+import net.ME1312.Galaxi.Library.Container.Value;
 import org.fusesource.jansi.AnsiOutputStream;
 
 import java.io.IOException;
@@ -48,8 +49,8 @@ public class HTMLogger extends AnsiOutputStream {
      * @return HTMLogger
      */
     public static <T extends HTMLogger> T wrap(final OutputStream raw, HTMConstructor<T> constructor) {
-        final Container<T> html = new Container<T>(null);
-        html.set(constructor.construct(raw, new OutputStream() {
+        final Value<T> html = new Container<T>(null);
+        html.value(constructor.construct(raw, new OutputStream() {
             private boolean nbsp = false;
 
             @Override
@@ -74,14 +75,14 @@ public class HTMLogger extends AnsiOutputStream {
                             raw.write(BYTES_GT);
                             break;
                         case 10:
-                            html.get().closeAttributes();
+                            html.value().closeAttributes();
                         default:
                             raw.write(data);
                     }
                 }
             }
         }));
-        return html.get();
+        return html.value();
     }
     protected HTMLogger(final OutputStream raw, OutputStream wrapped) {
         super(wrapped);

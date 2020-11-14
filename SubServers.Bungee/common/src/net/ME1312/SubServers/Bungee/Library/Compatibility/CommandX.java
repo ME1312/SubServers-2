@@ -1,6 +1,6 @@
 package net.ME1312.SubServers.Bungee.Library.Compatibility;
 
-import net.ME1312.Galaxi.Library.Container.NamedContainer;
+import net.ME1312.Galaxi.Library.Container.Pair;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.plugin.Command;
 import net.md_5.bungee.api.plugin.TabExecutor;
@@ -39,7 +39,7 @@ public abstract class CommandX extends Command implements TabExecutor {
      * @param args Arguments (including the final unfinished one)
      * @return An Error Message (if there was one, otherwise null) and a List of Suggestions
      */
-    public abstract NamedContainer<String, List<String>> suggestArguments(CommandSender sender, String[] args);
+    public abstract Pair<String, List<String>> suggestArguments(CommandSender sender, String[] args);
 
     /**
      * Override the BungeeCord Method of {@link #suggestArguments(CommandSender, String[])}
@@ -50,6 +50,6 @@ public abstract class CommandX extends Command implements TabExecutor {
      */
     @Override
     public Iterable<String> onTabComplete(CommandSender sender, String[] args) {
-        return suggestArguments(sender, args).get();
+        return suggestArguments(sender, args).value();
     }
 }

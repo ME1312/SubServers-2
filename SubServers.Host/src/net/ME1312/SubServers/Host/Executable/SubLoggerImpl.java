@@ -1,10 +1,10 @@
 package net.ME1312.SubServers.Host.Executable;
 
 import net.ME1312.Galaxi.Library.Callback.Callback;
-import net.ME1312.Galaxi.Library.Container.Container;
+import net.ME1312.Galaxi.Library.Container.Value;
 import net.ME1312.Galaxi.Library.Log.LogStream;
 import net.ME1312.Galaxi.Library.Log.Logger;
-import net.ME1312.Galaxi.Library.Container.NamedContainer;
+import net.ME1312.Galaxi.Library.Container.Pair;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubData.Client.DataClient;
 import net.ME1312.SubData.Client.Library.DisconnectReason;
@@ -29,7 +29,7 @@ public class SubLoggerImpl {
     final Logger logger;
     final String name;
     UUID address;
-    Container<Boolean> log;
+    Value<Boolean> log;
     static boolean logn = true;
     static boolean logc = true;
     File file;
@@ -49,7 +49,7 @@ public class SubLoggerImpl {
      * @param log Console Logging Status
      * @param file File to log to (or null for disabled)
      */
-    SubLoggerImpl(Process process, Object user, String name, UUID address, Container<Boolean> log, File file) {
+    SubLoggerImpl(Process process, Object user, String name, UUID address, Value<Boolean> log, File file) {
         this.process = process;
         this.handle = user;
         this.logger = new Logger(name);
@@ -77,15 +77,15 @@ public class SubLoggerImpl {
         ExHost host = SubAPI.getInstance().getInternals();
         if (logn) Util.isException(() -> {
             channel = (SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0].openChannel();
-            channel.on.closed(new Callback<NamedContainer<DisconnectReason, DataClient>>() {
+            channel.on.closed(new Callback<Pair<DisconnectReason, DataClient>>() {
                 @Override
-                public void run(NamedContainer<DisconnectReason, DataClient> client) {
+                public void run(Pair<DisconnectReason, DataClient> client) {
                     if (started && SubLoggerImpl.this.process != null && process == SubLoggerImpl.this.process && process.isAlive()) {
                         int reconnect = host.config.get().getMap("Settings").getMap("SubData").getInt("Reconnect", 60);
                         if (Util.getDespiteException(() -> Util.reflect(ExHost.class.getDeclaredField("reconnect"), host), false) && reconnect > 0
-                                && client.name() != DisconnectReason.PROTOCOL_MISMATCH && client.name() != DisconnectReason.ENCRYPTION_MISMATCH) {
+                                && client.key() != DisconnectReason.PROTOCOL_MISMATCH && client.key() != DisconnectReason.ENCRYPTION_MISMATCH) {
                             Timer timer = new Timer(SubAPI.getInstance().getAppInfo().getName() + "::Log_Reconnect_Handler");
-                            Callback<NamedContainer<DisconnectReason, DataClient>> run = this;
+                            Callback<Pair<DisconnectReason, DataClient>> run = this;
                             reconnect++;
                             timer.scheduleAtFixedRate(new TimerTask() {
                                 @Override
@@ -161,10 +161,10 @@ public class SubLoggerImpl {
             }
 
             // Log to NETWORK
-            if (log.get() && channel != null && !channel.isClosed()) channel.sendPacket(new PacketOutExLogMessage(address, line));
+            if (log.value() && channel != null && !channel.isClosed()) channel.sendPacket(new PacketOutExLogMessage(address, line));
 
             // Log to CONSOLE
-            if (log.get() && logc) level.println(TextColor.convertColor(msg));
+            if (log.value() && logc) level.println(TextColor.convertColor(msg));
 
             // Log to FILE
             if (writer != null) {
@@ -230,7 +230,7 @@ public class SubLoggerImpl {
      * @return Logging Status
      */
     public boolean isLogging() {
-        return log.get();
+        return log.value();
     }
 
     /**

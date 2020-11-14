@@ -3,8 +3,10 @@ package net.ME1312.SubServers.Bungee.Host.External;
 import com.google.common.collect.Range;
 import net.ME1312.Galaxi.Library.*;
 import net.ME1312.Galaxi.Library.Callback.Callback;
+import net.ME1312.Galaxi.Library.Container.ContainedPair;
 import net.ME1312.Galaxi.Library.Container.Container;
-import net.ME1312.Galaxi.Library.Container.NamedContainer;
+import net.ME1312.Galaxi.Library.Container.Value;
+import net.ME1312.Galaxi.Library.Container.Pair;
 import net.ME1312.SubData.Server.SubDataClient;
 import net.ME1312.SubServers.Bungee.Event.SubCreateEvent;
 import net.ME1312.SubServers.Bungee.Event.SubCreatedEvent;
@@ -36,9 +38,9 @@ public class ExternalSubCreator extends SubCreator {
     private Boolean enableRT = false;
     private ExternalHost host;
     private Range<Integer> ports;
-    private Container<Boolean> log;
+    private Value<Boolean> log;
     private String gitBash;
-    private TreeMap<String, NamedContainer<Integer, ExternalSubLogger>> thread;
+    private TreeMap<String, Pair<Integer, ExternalSubLogger>> thread;
 
     /**
      * Creates an External SubCreator
@@ -55,7 +57,7 @@ public class ExternalSubCreator extends SubCreator {
         this.ports = ports;
         this.log = new Container<Boolean>(log);
         this.gitBash = gitBash;
-        this.thread = new TreeMap<String, NamedContainer<Integer, ExternalSubLogger>>();
+        this.thread = new TreeMap<String, Pair<Integer, ExternalSubLogger>>();
         reload();
     }
 
@@ -93,15 +95,15 @@ public class ExternalSubCreator extends SubCreator {
                 Container<Integer> i = new Container<Integer>(ports.lowerEndpoint() - 1);
                 port = Util.getNew(getAllReservedAddresses(), () -> {
                     do {
-                        i.set(i.get() + 1);
-                        if (i.get() > ports.upperEndpoint()) throw new IllegalStateException("There are no more ports available in range: " + ports.toString());
-                    } while (!ports.contains(i.get()));
-                    return new InetSocketAddress(host.getAddress(), i.get());
+                        ++i.value;
+                        if (i.value > ports.upperEndpoint()) throw new IllegalStateException("There are no more ports available in range: " + ports.toString());
+                    } while (!ports.contains(i.value));
+                    return new InetSocketAddress(host.getAddress(), i.value);
                 }).getPort();
             }
             String prefix = name + File.separator + "Creator";
             ExternalSubLogger logger = new ExternalSubLogger(this, prefix, log, null);
-            thread.put(name.toLowerCase(), new NamedContainer<>(port, logger));
+            thread.put(name.toLowerCase(), new ContainedPair<>(port, logger));
 
             final int fport = port;
             final SubCreateEvent event = new SubCreateEvent(player, host, name, template, version, port);
@@ -140,7 +142,7 @@ public class ExternalSubCreator extends SubCreator {
             String prefix = name + File.separator + "Updater";
             Util.isException(() -> Util.reflect(SubServerImpl.class.getDeclaredField("updating"), server, true));
             ExternalSubLogger logger = new ExternalSubLogger(this, prefix, log, null);
-            thread.put(name.toLowerCase(), new NamedContainer<>(server.getAddress().getPort(), logger));
+            thread.put(name.toLowerCase(), new ContainedPair<>(server.getAddress().getPort(), logger));
 
             final SubCreateEvent event = new SubCreateEvent(player, server, version);
             host.plugin.getPluginManager().callEvent(event);
@@ -230,7 +232,7 @@ public class ExternalSubCreator extends SubCreator {
 
     @Override
     public void terminate() {
-        HashMap<String, NamedContainer<Integer, ExternalSubLogger>> thread = new HashMap<String, NamedContainer<Integer, ExternalSubLogger>>();
+        HashMap<String, Pair<Integer, ExternalSubLogger>> thread = new HashMap<String, Pair<Integer, ExternalSubLogger>>();
         thread.putAll(this.thread);
         for (String i : thread.keySet()) {
             terminate(i);
@@ -247,7 +249,7 @@ public class ExternalSubCreator extends SubCreator {
 
     @Override
     public void waitFor() throws InterruptedException {
-        HashMap<String, NamedContainer<Integer, ExternalSubLogger>> thread = new HashMap<String, NamedContainer<Integer, ExternalSubLogger>>();
+        HashMap<String, Pair<Integer, ExternalSubLogger>> thread = new HashMap<String, Pair<Integer, ExternalSubLogger>>();
         thread.putAll(this.thread);
         for (String i : thread.keySet()) {
             waitFor(i);
@@ -285,7 +287,7 @@ public class ExternalSubCreator extends SubCreator {
     @Override
     public List<SubLogger> getLoggers() {
         List<SubLogger> loggers = new ArrayList<SubLogger>();
-        HashMap<String, NamedContainer<Integer, ExternalSubLogger>> temp = new HashMap<String, NamedContainer<Integer, ExternalSubLogger>>();
+        HashMap<String, Pair<Integer, ExternalSubLogger>> temp = new HashMap<String, Pair<Integer, ExternalSubLogger>>();
         temp.putAll(thread);
         for (String i : temp.keySet()) {
             loggers.add(getLogger(i));
@@ -295,18 +297,18 @@ public class ExternalSubCreator extends SubCreator {
 
     @Override
     public SubLogger getLogger(String name) {
-        return this.thread.get(name.toLowerCase()).get();
+        return this.thread.get(name.toLowerCase()).value();
     }
 
     @Override
     public boolean isLogging() {
-        return log.get();
+        return log.value();
     }
 
     @Override
     public void setLogging(boolean value) {
         if (Util.isNull(value)) throw new NullPointerException();
-        log.set(value);
+        log.value(value);
     }
 
     @Override
@@ -317,7 +319,7 @@ public class ExternalSubCreator extends SubCreator {
     @Override
     public List<Integer> getReservedPorts() {
         List<Integer> ports = new ArrayList<Integer>();
-        for (NamedContainer<Integer, ExternalSubLogger> task : thread.values()) ports.add(task.name());
+        for (Pair<Integer, ExternalSubLogger> task : thread.values()) ports.add(task.key());
         return ports;
     }
 

@@ -1,9 +1,10 @@
 package net.ME1312.SubServers.Client.Bukkit;
 
 import net.ME1312.Galaxi.Library.*;
+import net.ME1312.Galaxi.Library.Container.ContainedPair;
 import net.ME1312.Galaxi.Library.Container.Container;
-import net.ME1312.Galaxi.Library.Container.NamedContainer;
-import net.ME1312.Galaxi.Library.Container.PrimitiveContainer;
+import net.ME1312.Galaxi.Library.Container.Value;
+import net.ME1312.Galaxi.Library.Container.Pair;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.SubData.Client.SubDataClient;
 import net.ME1312.SubServers.Client.Bukkit.Graphic.UIRenderer;
@@ -254,9 +255,9 @@ public final class SubCommand extends BukkitCommand {
                             });
                             Runnable getGroup = () -> plugin.api.getGroup(name, group -> {
                                 if (group != null) {
-                                    sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info").replace("$str$", "group") + ChatColor.WHITE + group.name());
-                                    sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Servers") + ((group.get().size() <= 0)?ChatColor.GRAY + "(none)":ChatColor.AQUA.toString() + group.get().size()));
-                                    for (Server server : group.get()) sender.sendMessage("    " + plugin.api.getLang("SubServers", "Command.Info.List") + ChatColor.WHITE + server.getDisplayName() + ((server.getName().equals(server.getDisplayName()))?"":" ["+server.getName()+']'));
+                                    sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info").replace("$str$", "group") + ChatColor.WHITE + group.key());
+                                    sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Servers") + ((group.value().size() <= 0)?ChatColor.GRAY + "(none)":ChatColor.AQUA.toString() + group.value().size()));
+                                    for (Server server : group.value()) sender.sendMessage("    " + plugin.api.getLang("SubServers", "Command.Info.List") + ChatColor.WHITE + server.getDisplayName() + ((server.getName().equals(server.getDisplayName()))?"":" ["+server.getName()+']'));
                                 } else {
                                     if (type == null) {
                                         getServer.run();
@@ -338,8 +339,8 @@ public final class SubCommand extends BukkitCommand {
                         if (args.length > 1) {
                             selectServers(sender, args, 1, true, Arrays.asList("subservers.subserver.%.*", "subservers.subserver.%.start"), select -> {
                                 if (select.subservers.length > 0) {
-                                    PrimitiveContainer<Integer> success = new PrimitiveContainer<Integer>(0);
-                                    PrimitiveContainer<Integer> running = new PrimitiveContainer<Integer>(0);
+                                    Container<Integer> success = new Container<Integer>(0);
+                                    Container<Integer> running = new Container<Integer>(0);
                                     AsyncConsolidator merge = new AsyncConsolidator(() -> {
                                         if (running.value > 0) sender.sendMessage(plugin.api.getLang("SubServers", "Command.Start.Running").replace("$int$", running.value.toString()));
                                         if (success.value > 0) sender.sendMessage(plugin.api.getLang("SubServers", "Command.Start").replace("$int$", success.value.toString()));
@@ -437,19 +438,19 @@ public final class SubCommand extends BukkitCommand {
                                     });
 
                                     // Step 3: Receive command Responses
-                                    PrimitiveContainer<Integer> success = new PrimitiveContainer<Integer>(0);
+                                    Container<Integer> success = new Container<Integer>(0);
                                     AsyncConsolidator merge = new AsyncConsolidator(() -> {
                                         if (success.value > 0) sender.sendMessage(plugin.api.getLang("SubServers", "Command.Restart").replace("$int$", success.value.toString()));
                                     });
-                                    Callback<NamedContainer<Integer, SubServer>> stopper = data -> {
-                                        if (data.name() != 0) listening.remove(data.get().getName().toLowerCase());
-                                        switch (data.name()) {
+                                    Callback<Pair<Integer, SubServer>> stopper = data -> {
+                                        if (data.key() != 0) listening.remove(data.value().getName().toLowerCase());
+                                        switch (data.key()) {
                                             case 3:
                                             case 4:
-                                                sender.sendMessage(plugin.api.getLang("SubServers", "Command.Restart.Disappeared").replace("$str$", data.get().getName()));
+                                                sender.sendMessage(plugin.api.getLang("SubServers", "Command.Restart.Disappeared").replace("$str$", data.value().getName()));
                                                 break;
                                             case 5:
-                                                starter.run(data.get());
+                                                starter.run(data.value());
                                             case 0:
                                                 success.value++;
                                                 break;
@@ -471,14 +472,14 @@ public final class SubCommand extends BukkitCommand {
                                         merge.reserve();
                                         if (self == null) {
                                             listening.put(server.getName().toLowerCase(), server);
-                                            server.stop(player, response -> stopper.run(new NamedContainer<>(response, server)));
+                                            server.stop(player, response -> stopper.run(new ContainedPair<>(response, server)));
                                         } else if (self != server) {
-                                            ((SubDataClient) plugin.api.getSubDataNetwork()[0]).sendPacket(new PacketRestartServer(player, server.getName(), data -> stopper.run(new NamedContainer<>(data.getInt(0x0001), server))));
+                                            ((SubDataClient) plugin.api.getSubDataNetwork()[0]).sendPacket(new PacketRestartServer(player, server.getName(), data -> stopper.run(new ContainedPair<>(data.getInt(0x0001), server))));
                                         }
                                     }
                                     if (self != null) {
                                         final SubServer fself = self;
-                                        ((SubDataClient) plugin.api.getSubDataNetwork()[0]).sendPacket(new PacketRestartServer(player, self.getName(), data -> stopper.run(new NamedContainer<>(data.getInt(0x0001), fself))));
+                                        ((SubDataClient) plugin.api.getSubDataNetwork()[0]).sendPacket(new PacketRestartServer(player, self.getName(), data -> stopper.run(new ContainedPair<>(data.getInt(0x0001), fself))));
                                     }
                                 }
                             });
@@ -489,17 +490,17 @@ public final class SubCommand extends BukkitCommand {
                         if (args.length > 1) {
                             selectServers(sender, args, 1, true, Arrays.asList("subservers.subserver.%.*", "subservers.subserver.%.stop"), select -> {
                                 if (select.subservers.length > 0) {
-                                    PrimitiveContainer<Integer> success = new PrimitiveContainer<Integer>(0);
-                                    PrimitiveContainer<Integer> running = new PrimitiveContainer<Integer>(0);
+                                    Container<Integer> success = new Container<Integer>(0);
+                                    Container<Integer> running = new Container<Integer>(0);
                                     AsyncConsolidator merge = new AsyncConsolidator(() -> {
                                         if (running.value > 0) sender.sendMessage(plugin.api.getLang("SubServers", "Command.Stop.Not-Running").replace("$int$", running.value.toString()));
                                         if (success.value > 0) sender.sendMessage(plugin.api.getLang("SubServers", "Command.Stop").replace("$int$", success.value.toString()));
                                     });
-                                    Callback<NamedContainer<Integer, SubServer>> stopper = data -> {
-                                        switch (data.name()) {
+                                    Callback<Pair<Integer, SubServer>> stopper = data -> {
+                                        switch (data.key()) {
                                             case 3:
                                             case 4:
-                                                sender.sendMessage(plugin.api.getLang("SubServers", "Command.Stop.Disappeared").replace("$str$", data.get().getName()));
+                                                sender.sendMessage(plugin.api.getLang("SubServers", "Command.Stop.Disappeared").replace("$str$", data.value().getName()));
                                                 break;
                                             case 5:
                                                 running.value++;
@@ -521,11 +522,11 @@ public final class SubCommand extends BukkitCommand {
 
                                     for (SubServer server : select.subservers) {
                                         merge.reserve();
-                                        if (self != server) server.stop((sender instanceof Player)?((Player) sender).getUniqueId():null, response -> stopper.run(new NamedContainer<>(response, server)));
+                                        if (self != server) server.stop((sender instanceof Player)?((Player) sender).getUniqueId():null, response -> stopper.run(new ContainedPair<>(response, server)));
                                     }
                                     if (self != null) {
                                         final SubServer fself = self;
-                                        fself.stop((sender instanceof Player) ? ((Player) sender).getUniqueId() : null, response -> stopper.run(new NamedContainer<>(response, fself)));
+                                        fself.stop((sender instanceof Player) ? ((Player) sender).getUniqueId() : null, response -> stopper.run(new ContainedPair<>(response, fself)));
                                     }
                                 }
                             });
@@ -536,17 +537,17 @@ public final class SubCommand extends BukkitCommand {
                         if (args.length > 1) {
                             selectServers(sender, args, 1, true, Arrays.asList("subservers.subserver.%.*", "subservers.subserver.%.terminate"), select -> {
                                 if (select.subservers.length > 0) {
-                                    PrimitiveContainer<Integer> success = new PrimitiveContainer<Integer>(0);
-                                    PrimitiveContainer<Integer> running = new PrimitiveContainer<Integer>(0);
+                                    Container<Integer> success = new Container<Integer>(0);
+                                    Container<Integer> running = new Container<Integer>(0);
                                     AsyncConsolidator merge = new AsyncConsolidator(() -> {
                                         if (running.value > 0) sender.sendMessage(plugin.api.getLang("SubServers", "Command.Terminate.Not-Running").replace("$int$", running.value.toString()));
                                         if (success.value > 0) sender.sendMessage(plugin.api.getLang("SubServers", "Command.Terminate").replace("$int$", success.value.toString()));
                                     });
-                                    Callback<NamedContainer<Integer, SubServer>> stopper = data -> {
-                                        switch (data.name()) {
+                                    Callback<Pair<Integer, SubServer>> stopper = data -> {
+                                        switch (data.key()) {
                                             case 3:
                                             case 4:
-                                                sender.sendMessage(plugin.api.getLang("SubServers", "Command.Terminate.Disappeared").replace("$str$", data.get().getName()));
+                                                sender.sendMessage(plugin.api.getLang("SubServers", "Command.Terminate.Disappeared").replace("$str$", data.value().getName()));
                                                 break;
                                             case 5:
                                                 running.value++;
@@ -568,11 +569,11 @@ public final class SubCommand extends BukkitCommand {
 
                                     for (SubServer server : select.subservers) {
                                         merge.reserve();
-                                        if (self != server) server.terminate((sender instanceof Player)?((Player) sender).getUniqueId():null, response -> stopper.run(new NamedContainer<>(response, server)));
+                                        if (self != server) server.terminate((sender instanceof Player)?((Player) sender).getUniqueId():null, response -> stopper.run(new ContainedPair<>(response, server)));
                                     }
                                     if (self != null) {
                                         final SubServer fself = self;
-                                        fself.terminate((sender instanceof Player) ? ((Player) sender).getUniqueId() : null, response -> stopper.run(new NamedContainer<>(response, fself)));
+                                        fself.terminate((sender instanceof Player) ? ((Player) sender).getUniqueId() : null, response -> stopper.run(new ContainedPair<>(response, fself)));
                                     }
                                 }
                             });
@@ -590,8 +591,8 @@ public final class SubCommand extends BukkitCommand {
                                             builder.append(select.args[i]);
                                         }
 
-                                        PrimitiveContainer<Integer> success = new PrimitiveContainer<Integer>(0);
-                                        PrimitiveContainer<Integer> running = new PrimitiveContainer<Integer>(0);
+                                        Container<Integer> success = new Container<Integer>(0);
+                                        Container<Integer> running = new Container<Integer>(0);
                                         AsyncConsolidator merge = new AsyncConsolidator(() -> {
                                             if (running.value > 0) sender.sendMessage(plugin.api.getLang("SubServers", "Command.Command.Not-Running").replace("$int$", running.value.toString()));
                                             if (success.value > 0) sender.sendMessage(plugin.api.getLang("SubServers", "Command.Command").replace("$int$", success.value.toString()));
@@ -675,7 +676,7 @@ public final class SubCommand extends BukkitCommand {
                                     Version version = (select.args.length > 2)?new Version(select.args[(template == null)?2:3]):null;
                                     boolean ts = template == null;
 
-                                    PrimitiveContainer<Integer> success = new PrimitiveContainer<Integer>(0);
+                                    Container<Integer> success = new Container<Integer>(0);
                                     AsyncConsolidator merge = new AsyncConsolidator(() -> {
                                         if (success.value > 0) sender.sendMessage(plugin.api.getLang("SubServers", "Command.Update").replace("$int$", success.value.toString()));
                                     });
@@ -841,13 +842,13 @@ public final class SubCommand extends BukkitCommand {
         LinkedList<String> args = new LinkedList<String>();
         LinkedList<String> selection = new LinkedList<String>();
         LinkedList<Server> select = new LinkedList<Server>();
-        Container<String> last = new Container<String>(null);
+        Value<String> last = new Container<String>(null);
 
         // Step 1
-        Container<Integer> ic = new Container<Integer>(0);
-        while (ic.get() < index) {
-            args.add(rargs[ic.get()]);
-            ic.set(ic.get() + 1);
+        Value<Integer> ic = new Container<Integer>(0);
+        while (ic.value() < index) {
+            args.add(rargs[ic.value()]);
+            ic.value(ic.value() + 1);
         }
 
         // Step 3
@@ -855,10 +856,10 @@ public final class SubCommand extends BukkitCommand {
         Runnable finished = () -> {
             args.add(completed.toString());
 
-            int i = ic.get();
+            int i = ic.value();
             while (i < rargs.length) {
                 args.add(rargs[i]);
-                last.set(null);
+                last.value(null);
                 i++;
             }
 
@@ -899,7 +900,7 @@ public final class SubCommand extends BukkitCommand {
             }
 
             try {
-                callback.run(new ServerSelection(msgs, selection, servers, subservers, args, last.get()));
+                callback.run(new ServerSelection(msgs, selection, servers, subservers, args, last.value()));
             } catch (Throwable e) {
                 Throwable ew = new InvocationTargetException(e);
                 ew.setStackTrace(origin);
@@ -909,9 +910,9 @@ public final class SubCommand extends BukkitCommand {
 
         // Step 2
         AsyncConsolidator merge = new AsyncConsolidator(finished);
-        for (boolean run = true; run && ic.get() < rargs.length; ic.set(ic.get() + 1)) {
-            String current = rargs[ic.get()];
-            last.set(current);
+        for (boolean run = true; run && ic.value() < rargs.length; ic.value(ic.value() + 1)) {
+            String current = rargs[ic.value()];
+            last.value(current);
             completed.append(current);
             if (current.endsWith(",")) {
                 current = current.substring(0, current.length() - 1);
@@ -973,7 +974,7 @@ public final class SubCommand extends BukkitCommand {
                             for (String name : self.getGroups()) {
                                 merge2.reserve();
                                 plugin.api.getGroup(name, group -> {
-                                    for (Server server : group.get()) {
+                                    for (Server server : group.value()) {
                                         if (!mode || server instanceof SubServer) select.add(server);
                                     }
                                     merge2.release();
@@ -992,14 +993,14 @@ public final class SubCommand extends BukkitCommand {
                         plugin.api.getGroup(current, group -> {
                             if (group != null) {
                                 int i = 0;
-                                for (Server server : group.get()) {
+                                for (Server server : group.value()) {
                                     if (!mode || server instanceof SubServer) {
                                         select.add(server);
                                         i++;
                                     }
                                 }
                                 if (i <= 0) {
-                                    String msg = plugin.api.getLang("SubServers", "Command.Generic.No-" + ((mode)?"Sub":"") + "Servers-In-Group").replace("$str$", group.name());
+                                    String msg = plugin.api.getLang("SubServers", "Command.Generic.No-" + ((mode)?"Sub":"") + "Servers-In-Group").replace("$str$", group.key());
                                     if (sender != null) sender.sendMessage(msg);
                                     msgs.add(msg);
                                 }

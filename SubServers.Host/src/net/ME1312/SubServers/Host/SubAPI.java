@@ -79,7 +79,7 @@ public final class SubAPI extends ClientAPI {
      * @return SubServers Lang Channel list
      */
     public Collection<String> getLangChannels() {
-        return host.lang.get().keySet();
+        return host.lang.value().keySet();
     }
 
     /**
@@ -90,7 +90,7 @@ public final class SubAPI extends ClientAPI {
      */
     public Map<String, String> getLang(String channel) {
         if (Util.isNull(channel)) throw new NullPointerException();
-        return new LinkedHashMap<>(host.lang.get().get(channel.toLowerCase()));
+        return new LinkedHashMap<>(host.lang.value().get(channel.toLowerCase()));
     }
 
     /**

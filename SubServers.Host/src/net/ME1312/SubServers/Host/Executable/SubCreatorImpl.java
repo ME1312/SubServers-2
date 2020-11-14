@@ -1,12 +1,13 @@
 package net.ME1312.SubServers.Host.Executable;
 
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import net.ME1312.Galaxi.Engine.GalaxiEngine;
 import net.ME1312.Galaxi.Library.Config.YAMLConfig;
 import net.ME1312.Galaxi.Library.Config.YAMLSection;
-import net.ME1312.Galaxi.Library.Container.NamedContainer;
-import net.ME1312.Galaxi.Library.Map.ObjectMap;
+import net.ME1312.Galaxi.Library.Container.ContainedPair;
 import net.ME1312.Galaxi.Library.Container.Container;
+import net.ME1312.Galaxi.Library.Container.Pair;
+import net.ME1312.Galaxi.Library.Map.ObjectMap;
+import net.ME1312.Galaxi.Library.Container.Value;
 import net.ME1312.Galaxi.Library.Map.ObjectMapValue;
 import net.ME1312.Galaxi.Library.UniversalFile;
 import net.ME1312.Galaxi.Library.Util;
@@ -524,23 +525,23 @@ public class SubCreatorImpl {
         return this.thread.get(name).log;
     }
 
-    private static NamedContainer<YAMLSection, String> address = null;
+    private static Pair<YAMLSection, String> address = null;
     private String getAddress() {
-        if (address == null || host.config.get() != address.name()) {
-            address = new NamedContainer<>(host.config.get(), host.config.get().getMap("Settings").getRawString("Server-Bind"));
+        if (address == null || host.config.get() != address.key()) {
+            address = new ContainedPair<>(host.config.get(), host.config.get().getMap("Settings").getRawString("Server-Bind"));
         }
-        return address.get();
+        return address.value();
     }
 
-    private static NamedContainer<YAMLSection, Map<String, Object>> subdata = null;
+    private static Pair<YAMLSection, Map<String, Object>> subdata = null;
     private Map<String, Object> getSubData() {
-        if (subdata == null || host.config.get() != subdata.name()) {
+        if (subdata == null || host.config.get() != subdata.key()) {
             Map<String, Object> map = new HashMap<String, Object>();
             map.put("Address", host.config.get().getMap("Settings").getMap("SubData").getRawString("Address"));
             if (host.config.get().getMap("Settings").getMap("SubData").getRawString("Password", "").length() > 0) map.put("Password", host.config.get().getMap("Settings").getMap("SubData").getRawString("Password"));
-            subdata = new NamedContainer<>(host.config.get(), map);
+            subdata = new ContainedPair<>(host.config.get(), map);
         }
-        return subdata.get();
+        return subdata.value();
     }
 
     private void generateClient(File dir, ServerType type, String name) throws IOException {

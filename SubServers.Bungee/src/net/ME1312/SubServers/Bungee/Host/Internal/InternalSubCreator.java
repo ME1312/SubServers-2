@@ -5,8 +5,10 @@ import com.google.gson.Gson;
 import net.ME1312.Galaxi.Library.*;
 import net.ME1312.Galaxi.Library.Callback.Callback;
 import net.ME1312.Galaxi.Library.Config.YAMLSection;
+import net.ME1312.Galaxi.Library.Container.ContainedPair;
 import net.ME1312.Galaxi.Library.Container.Container;
-import net.ME1312.Galaxi.Library.Container.NamedContainer;
+import net.ME1312.Galaxi.Library.Container.Value;
+import net.ME1312.Galaxi.Library.Container.Pair;
 import net.ME1312.Galaxi.Library.Map.ObjectMapValue;
 import net.ME1312.SubServers.Bungee.Event.SubCreateEvent;
 import net.ME1312.SubServers.Bungee.Event.SubCreatedEvent;
@@ -42,7 +44,7 @@ public class InternalSubCreator extends SubCreator {
     private HashMap<String, ServerTemplate> templates = new HashMap<String, ServerTemplate>();
     private InternalHost host;
     private Range<Integer> ports;
-    private Container<Boolean> log;
+    private Value<Boolean> log;
     private String gitBash;
     private TreeMap<String, CreatorTask> thread;
 
@@ -379,13 +381,13 @@ public class InternalSubCreator extends SubCreator {
             StackTraceElement[] origin = new Exception().getStackTrace();
 
             if (port == null) {
-                Container<Integer> i = new Container<Integer>(ports.lowerEndpoint() - 1);
+                Value<Integer> i = new Container<Integer>(ports.lowerEndpoint() - 1);
                 port = Util.getNew(getAllReservedAddresses(), () -> {
                     do {
-                        i.set(i.get() + 1);
-                        if (i.get() > ports.upperEndpoint()) throw new IllegalStateException("There are no more ports available in range: " + ports.toString());
-                    } while (!ports.contains(i.get()));
-                    return new InetSocketAddress(host.getAddress(), i.get());
+                        i.value(i.value() + 1);
+                        if (i.value() > ports.upperEndpoint()) throw new IllegalStateException("There are no more ports available in range: " + ports.toString());
+                    } while (!ports.contains(i.value()));
+                    return new InetSocketAddress(host.getAddress(), i.value());
                 }).getPort();
             }
 
@@ -522,13 +524,13 @@ public class InternalSubCreator extends SubCreator {
 
     @Override
     public boolean isLogging() {
-        return log.get();
+        return log.value();
     }
 
     @Override
     public void setLogging(boolean value) {
         if (Util.isNull(value)) throw new NullPointerException();
-        log.set(value);
+        log.value(value);
     }
 
     @Override
@@ -554,15 +556,15 @@ public class InternalSubCreator extends SubCreator {
         return getTemplates().get(name.toLowerCase());
     }
 
-    private static NamedContainer<YAMLSection, Map<String, Object>> subdata = null;
+    private static Pair<YAMLSection, Map<String, Object>> subdata = null;
     private Map<String, Object> getSubData() {
-        if (subdata == null || host.plugin.config.get() != subdata.name()) {
+        if (subdata == null || host.plugin.config.get() != subdata.key()) {
             Map<String, Object> map = new HashMap<String, Object>();
             map.put("Address", host.plugin.config.get().getMap("Settings").getMap("SubData").getRawString("Address", "127.0.0.1").replace("0.0.0.0", "127.0.0.1"));
             if (host.plugin.config.get().getMap("Settings").getMap("SubData").getRawString("Password", "").length() > 0) map.put("Password", host.plugin.config.get().getMap("Settings").getMap("SubData").getRawString("Password"));
-            subdata = new NamedContainer<>(host.plugin.config.get(), map);
+            subdata = new ContainedPair<>(host.plugin.config.get(), map);
         }
-        return subdata.get();
+        return subdata.value();
     }
 
     private void generateClient(File dir, ServerType type, String name) throws IOException {

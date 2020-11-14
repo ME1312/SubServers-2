@@ -2,7 +2,7 @@ package net.ME1312.SubServers.Bungee.Host.External;
 
 import net.ME1312.SubServers.Bungee.Host.SubLogFilter;
 import net.ME1312.SubServers.Bungee.Host.SubLogger;
-import net.ME1312.Galaxi.Library.Container.Container;
+import net.ME1312.Galaxi.Library.Container.Value;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubServers.Bungee.Library.Compatibility.Logger;
 import net.ME1312.SubServers.Bungee.Network.Packet.PacketInExLogMessage;
@@ -29,7 +29,7 @@ public class ExternalSubLogger extends SubLogger {
     private Object handle;
     UUID id = null;
     String name;
-    Container<Boolean> log;
+    Value<Boolean> log;
     private List<SubLogFilter> filters = new CopyOnWriteArrayList<>();
     File file;
     private PrintWriter writer = null;
@@ -43,7 +43,7 @@ public class ExternalSubLogger extends SubLogger {
      * @param log Console Logging Status
      * @param file File to log to (or null for disabled)
      */
-    ExternalSubLogger(Object user, String name, Container<Boolean> log, File file) {
+    ExternalSubLogger(Object user, String name, Value<Boolean> log, File file) {
         this.handle = user;
         this.name = name;
         this.log = log;
@@ -103,7 +103,7 @@ public class ExternalSubLogger extends SubLogger {
             }
 
             // Filter Message
-            boolean allow = (SubAPI.getInstance().getInternals().sudo == getHandler() && SubAPI.getInstance().getInternals().canSudo) || (log.get() && (SubAPI.getInstance().getInternals().sudo == null || !SubAPI.getInstance().getInternals().canSudo));
+            boolean allow = (SubAPI.getInstance().getInternals().sudo == getHandler() && SubAPI.getInstance().getInternals().canSudo) || (log.value() && (SubAPI.getInstance().getInternals().sudo == null || !SubAPI.getInstance().getInternals().canSudo));
             List<SubLogFilter> filters = new ArrayList<SubLogFilter>();
             filters.addAll(this.filters);
             for (SubLogFilter filter : filters)
@@ -182,6 +182,6 @@ public class ExternalSubLogger extends SubLogger {
 
     @Override
     public boolean isLogging() {
-        return log.get();
+        return log.value();
     }
 }

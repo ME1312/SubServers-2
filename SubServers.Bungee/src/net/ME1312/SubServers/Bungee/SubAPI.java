@@ -1,6 +1,7 @@
 package net.ME1312.SubServers.Bungee;
 
 import com.google.common.collect.Range;
+import net.ME1312.Galaxi.Library.Container.ContainedPair;
 import net.ME1312.SubData.Server.DataProtocol;
 import net.ME1312.SubData.Server.DataServer;
 import net.ME1312.SubServers.Bungee.Event.SubAddHostEvent;
@@ -9,7 +10,7 @@ import net.ME1312.SubServers.Bungee.Event.SubRemoveHostEvent;
 import net.ME1312.SubServers.Bungee.Event.SubRemoveServerEvent;
 import net.ME1312.SubServers.Bungee.Host.*;
 import net.ME1312.SubServers.Bungee.Library.Exception.InvalidHostException;
-import net.ME1312.Galaxi.Library.Container.NamedContainer;
+import net.ME1312.Galaxi.Library.Container.Pair;
 import net.ME1312.Galaxi.Library.UniversalFile;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
@@ -363,10 +364,10 @@ public final class SubAPI implements BungeeAPI {
      * @param name Group name
      * @return a Server Group
      */
-    public NamedContainer<String, List<Server>> getGroup(String name) {
+    public Pair<String, List<Server>> getGroup(String name) {
         if (Util.isNull(name)) throw new NullPointerException();
         for (Map.Entry<String, List<Server>> group : getLowercaseGroups().entrySet()) {
-            if (group.getKey().equalsIgnoreCase(name)) return new NamedContainer<>(group.getKey(), group.getValue());
+            if (group.getKey().equalsIgnoreCase(name)) return new ContainedPair<>(group.getKey(), group.getValue());
         }
         return null;
     }
@@ -535,7 +536,7 @@ public final class SubAPI implements BungeeAPI {
     }
 
     /**
-     * Get the Master Proxy Container
+     * Get the Master Proxy Value
      *
      * @return Master Proxy
      */

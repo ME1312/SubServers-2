@@ -2,7 +2,7 @@ package net.ME1312.SubServers.Sync.Network;
 
 import net.ME1312.Galaxi.Library.Callback.Callback;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
-import net.ME1312.Galaxi.Library.Container.NamedContainer;
+import net.ME1312.Galaxi.Library.Container.Pair;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubData.Client.SubDataClient;
@@ -197,12 +197,12 @@ public class SubProtocol extends SubDataProtocol {
         }));
         subdata.on.ready(client -> plugin.getPluginManager().callEvent(new SubNetworkConnectEvent((SubDataClient) client)));
         subdata.on.closed(client -> {
-            SubNetworkDisconnectEvent event = new SubNetworkDisconnectEvent(client.get(), client.name());
+            SubNetworkDisconnectEvent event = new SubNetworkDisconnectEvent(client.value(), client.key());
             plugin.getPluginManager().callEvent(event);
 
             if (plugin.isRunning) {
                 net.ME1312.SubServers.Bungee.Library.Compatibility.Logger.get("SubData").info("Attempting reconnect in " + plugin.config.get().getMap("Settings").getMap("SubData").getInt("Reconnect", 60) + " seconds");
-                Util.isException(() -> Util.reflect(ExProxy.class.getDeclaredMethod("connect", NamedContainer.class), plugin, client));
+                Util.isException(() -> Util.reflect(ExProxy.class.getDeclaredMethod("connect", Pair.class), plugin, client));
             } else map.put(0, null);
         });
 

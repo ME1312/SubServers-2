@@ -1,7 +1,8 @@
 package net.ME1312.SubServers.Sync.Network.Packet;
 
+import net.ME1312.Galaxi.Library.Container.ContainedPair;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
-import net.ME1312.Galaxi.Library.Container.NamedContainer;
+import net.ME1312.Galaxi.Library.Container.Pair;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubData.Client.Protocol.PacketObjectIn;
 import net.ME1312.SubData.Client.Protocol.PacketOut;
@@ -35,7 +36,7 @@ public class PacketDownloadLang implements PacketObjectIn<Integer>, PacketOut {
     @Override
     public void receive(SubDataSender client, ObjectMap<Integer> data) {
         try {
-            Util.reflect(ExProxy.class.getDeclaredField("lang"), plugin, new NamedContainer<>(Calendar.getInstance().getTime().getTime(), data.getObject(0x0001)));
+            Util.reflect(ExProxy.class.getDeclaredField("lang"), plugin, new ContainedPair<>(Calendar.getInstance().getTime().getTime(), data.getObject(0x0001)));
             Logger.get("SubData").info("Lang Settings Downloaded");
         } catch (IllegalAccessException | NoSuchFieldException e) {
             e.printStackTrace();

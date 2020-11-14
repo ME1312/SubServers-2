@@ -1,5 +1,6 @@
 package net.ME1312.SubServers.Bungee.Host;
 
+import net.ME1312.Galaxi.Library.Container.ContainedPair;
 import net.ME1312.SubData.Server.DataClient;
 import net.ME1312.SubData.Server.SubDataClient;
 import net.ME1312.SubServers.Bungee.Event.SubEditServerEvent;
@@ -8,7 +9,7 @@ import net.ME1312.SubServers.Bungee.Event.SubNetworkDisconnectEvent;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Map.ObjectMapValue;
 import net.ME1312.SubServers.Bungee.Library.Exception.InvalidServerException;
-import net.ME1312.Galaxi.Library.Container.NamedContainer;
+import net.ME1312.Galaxi.Library.Container.Pair;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubServers.Bungee.Network.Packet.PacketOutExRunEvent;
 import net.ME1312.SubServers.Bungee.Network.Packet.PacketOutExUpdateWhitelist;
@@ -126,10 +127,10 @@ public class ServerImpl extends BungeeServerInfo implements Server {
     @SuppressWarnings("deprecation")
     public void setDisplayName(String value) {
         if (value == null || value.length() == 0 || getName().equals(value)) {
-            SubAPI.getInstance().getInternals().getPluginManager().callEvent(new SubEditServerEvent(null, this, new NamedContainer<String, Object>("display", getName()), false));
+            SubAPI.getInstance().getInternals().getPluginManager().callEvent(new SubEditServerEvent(null, this, new ContainedPair<String, Object>("display", getName()), false));
             this.nick = null;
         } else {
-            SubAPI.getInstance().getInternals().getPluginManager().callEvent(new SubEditServerEvent(null, this, new NamedContainer<String, Object>("display", value), false));
+            SubAPI.getInstance().getInternals().getPluginManager().callEvent(new SubEditServerEvent(null, this, new ContainedPair<String, Object>("display", value), false));
             this.nick = value;
         }
     }
@@ -177,14 +178,14 @@ public class ServerImpl extends BungeeServerInfo implements Server {
     @SuppressWarnings("deprecation")
     public void setHidden(boolean value) {
         if (Util.isNull(value)) throw new NullPointerException();
-        SubAPI.getInstance().getInternals().getPluginManager().callEvent(new SubEditServerEvent(null, this, new NamedContainer<String, Object>("hidden", value), false));
+        SubAPI.getInstance().getInternals().getPluginManager().callEvent(new SubEditServerEvent(null, this, new ContainedPair<String, Object>("hidden", value), false));
         this.hidden = value;
     }
 
     @SuppressWarnings("deprecation")
     public void setMotd(String value) {
         if (Util.isNull(value)) throw new NullPointerException();
-        SubAPI.getInstance().getInternals().getPluginManager().callEvent(new SubEditServerEvent(null, this, new NamedContainer<String, Object>("motd", value), false));
+        SubAPI.getInstance().getInternals().getPluginManager().callEvent(new SubEditServerEvent(null, this, new ContainedPair<String, Object>("motd", value), false));
         try {
             Util.reflect(BungeeServerInfo.class.getDeclaredField("motd"), this, value);
         } catch (Exception e) {
@@ -195,7 +196,7 @@ public class ServerImpl extends BungeeServerInfo implements Server {
     @SuppressWarnings("deprecation")
     public void setRestricted(boolean value) {
         if (Util.isNull(value)) throw new NullPointerException();
-        SubAPI.getInstance().getInternals().getPluginManager().callEvent(new SubEditServerEvent(null, this, new NamedContainer<String, Object>("restricted", value), false));
+        SubAPI.getInstance().getInternals().getPluginManager().callEvent(new SubEditServerEvent(null, this, new ContainedPair<String, Object>("restricted", value), false));
         try {
             Util.reflect(BungeeServerInfo.class.getDeclaredField("restricted"), this, value);
         } catch (Exception e) {

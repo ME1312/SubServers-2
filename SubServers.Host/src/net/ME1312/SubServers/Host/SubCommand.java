@@ -5,10 +5,10 @@ import net.ME1312.Galaxi.Engine.Library.ConsoleReader;
 import net.ME1312.Galaxi.Library.AsyncConsolidator;
 import net.ME1312.Galaxi.Library.Callback.Callback;
 import net.ME1312.Galaxi.Library.Callback.ReturnRunnable;
-import net.ME1312.Galaxi.Library.Container.NamedContainer;
-import net.ME1312.Galaxi.Library.Container.PrimitiveContainer;
-import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Container.Container;
+import net.ME1312.Galaxi.Library.Container.Pair;
+import net.ME1312.Galaxi.Library.Map.ObjectMap;
+import net.ME1312.Galaxi.Library.Container.Value;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.Galaxi.Plugin.Command.Command;
@@ -243,9 +243,9 @@ public class SubCommand {
                         });
                         Runnable getGroup = () -> host.api.getGroup(name, group -> {
                             if (group != null) {
-                                sender.sendMessage("Info on group: " + TextColor.WHITE + group.name());
-                                sender.sendMessage(" -> Servers: " + ((group.get().size() <= 0)?TextColor.GRAY + "(none)":TextColor.AQUA.toString() + group.get().size()));
-                                for (Server server : group.get()) sender.sendMessage("      - " + TextColor.WHITE + server.getDisplayName() + ((server.getName().equals(server.getDisplayName()))?"":" ["+server.getName()+']'));
+                                sender.sendMessage("Info on group: " + TextColor.WHITE + group.key());
+                                sender.sendMessage(" -> Servers: " + ((group.value().size() <= 0)?TextColor.GRAY + "(none)":TextColor.AQUA.toString() + group.value().size()));
+                                for (Server server : group.value()) sender.sendMessage("      - " + TextColor.WHITE + server.getDisplayName() + ((server.getName().equals(server.getDisplayName()))?"":" ["+server.getName()+']'));
                             } else {
                                 if (type == null) {
                                     getServer.run();
@@ -332,11 +332,11 @@ public class SubCommand {
             ReturnRunnable<Collection<String>> getPlayers = () -> {
                 LinkedList<String> names = new LinkedList<String>();
                 if (proxyMasterCache != null)
-                    for (NamedContainer<String, UUID> player : proxyMasterCache.getPlayers())
-                        names.add(player.name());
+                    for (Pair<String, UUID> player : proxyMasterCache.getPlayers())
+                        names.add(player.key());
                 for (Proxy proxy : proxyCache.values())
-                    for (NamedContainer<String, UUID> player : proxy.getPlayers())
-                        if (!names.contains(player.name())) names.add(player.name());
+                    for (Pair<String, UUID> player : proxy.getPlayers())
+                        if (!names.contains(player.key())) names.add(player.key());
                 Collections.sort(names);
                 return names;
             };
@@ -445,8 +445,8 @@ public class SubCommand {
                     if (args.length > 0) {
                         selectServers(sender, args, 0, true, select -> {
                             if (select.subservers.length > 0) {
-                                PrimitiveContainer<Integer> success = new PrimitiveContainer<Integer>(0);
-                                PrimitiveContainer<Integer> running = new PrimitiveContainer<Integer>(0);
+                                Container<Integer> success = new Container<Integer>(0);
+                                Container<Integer> running = new Container<Integer>(0);
                                 AsyncConsolidator merge = new AsyncConsolidator(() -> {
                                     if (running.value > 0) sender.sendMessage(running.value + " subserver"+((running.value == 1)?" was":"s were") + " already running");
                                     if (success.value > 0) sender.sendMessage("Started " + success.value + " subserver"+((success.value == 1)?"":"s"));
@@ -559,7 +559,7 @@ public class SubCommand {
 
 
                                 // Step 1-3: Restart Servers / Receive command Responses
-                                PrimitiveContainer<Integer> success = new PrimitiveContainer<Integer>(0);
+                                Container<Integer> success = new Container<Integer>(0);
                                 AsyncConsolidator merge = new AsyncConsolidator(() -> {
                                     if (success.value > 0) sender.sendMessage("Restarting " + success.value + " subserver"+((success.value == 1)?"":"s"));
                                 });
@@ -602,8 +602,8 @@ public class SubCommand {
                     if (args.length > 0) {
                         selectServers(sender, args, 0, true, select -> {
                             if (select.subservers.length > 0) {
-                                PrimitiveContainer<Integer> success = new PrimitiveContainer<Integer>(0);
-                                PrimitiveContainer<Integer> running = new PrimitiveContainer<Integer>(0);
+                                Container<Integer> success = new Container<Integer>(0);
+                                Container<Integer> running = new Container<Integer>(0);
                                 AsyncConsolidator merge = new AsyncConsolidator(() -> {
                                     if (running.value > 0) sender.sendMessage(running.value + " subserver"+((running.value == 1)?" was":"s were") + " already offline");
                                     if (success.value > 0) sender.sendMessage("Stopping " + success.value + " subserver"+((success.value == 1)?"":"s"));
@@ -646,8 +646,8 @@ public class SubCommand {
                     if (args.length > 0) {
                         selectServers(sender, args, 0, true, select -> {
                             if (select.subservers.length > 0) {
-                                PrimitiveContainer<Integer> success = new PrimitiveContainer<Integer>(0);
-                                PrimitiveContainer<Integer> running = new PrimitiveContainer<Integer>(0);
+                                Container<Integer> success = new Container<Integer>(0);
+                                Container<Integer> running = new Container<Integer>(0);
                                 AsyncConsolidator merge = new AsyncConsolidator(() -> {
                                     if (running.value > 0) sender.sendMessage(running.value + " subserver"+((running.value == 1)?" was":"s were") + " already offline");
                                     if (success.value > 0) sender.sendMessage("Terminated " + success.value + " subserver"+((success.value == 1)?"":"s"));
@@ -700,8 +700,8 @@ public class SubCommand {
                                         builder.append(select.args[i]);
                                     }
 
-                                    PrimitiveContainer<Integer> success = new PrimitiveContainer<Integer>(0);
-                                    PrimitiveContainer<Integer> running = new PrimitiveContainer<Integer>(0);
+                                    Container<Integer> success = new Container<Integer>(0);
+                                    Container<Integer> running = new Container<Integer>(0);
                                     AsyncConsolidator merge = new AsyncConsolidator(() -> {
                                         if (running.value > 0) sender.sendMessage(running.value + " subserver"+((running.value == 1)?" was":"s were") + " offline");
                                         if (success.value > 0) sender.sendMessage("Sent command to " + success.value + " subserver"+((success.value == 1)?"":"s"));
@@ -836,7 +836,7 @@ public class SubCommand {
                                 Version version = (select.args.length > 1)?new Version(select.args[(template == null)?1:2]):null;
                                 boolean ts = template == null;
 
-                                PrimitiveContainer<Integer> success = new PrimitiveContainer<Integer>(0);
+                                Container<Integer> success = new Container<Integer>(0);
                                 AsyncConsolidator merge = new AsyncConsolidator(() -> {
                                     if (success.value > 0) sender.sendMessage("Updating " + success.value + " subserver"+((success.value == 1)?"":"s"));
                                 });
@@ -920,8 +920,8 @@ public class SubCommand {
                     if (args.length > 0) {
                         selectServers(sender, args, 0, true, select -> {
                             if (select.subservers.length > 0) {
-                                PrimitiveContainer<Integer> success = new PrimitiveContainer<Integer>(0);
-                                PrimitiveContainer<Integer> running = new PrimitiveContainer<Integer>(0);
+                                Container<Integer> success = new Container<Integer>(0);
+                                Container<Integer> running = new Container<Integer>(0);
                                 AsyncConsolidator merge = new AsyncConsolidator(() -> {
                                     if (success.value > 0) sender.sendMessage("Removing " + success.value + " subserver"+((success.value == 1)?"":"s"));
                                 });
@@ -978,13 +978,13 @@ public class SubCommand {
         LinkedList<String> args = new LinkedList<String>();
         LinkedList<String> selection = new LinkedList<String>();
         LinkedList<Server> select = new LinkedList<Server>();
-        Container<String> last = new Container<String>(null);
+        Value<String> last = new Container<String>(null);
 
         // Step 1
-        Container<Integer> ic = new Container<Integer>(0);
-        while (ic.get() < index) {
-            args.add(rargs[ic.get()]);
-            ic.set(ic.get() + 1);
+        Value<Integer> ic = new Container<Integer>(0);
+        while (ic.value() < index) {
+            args.add(rargs[ic.value()]);
+            ic.value(ic.value() + 1);
         }
 
         // Step 3
@@ -992,10 +992,10 @@ public class SubCommand {
         Runnable finished = () -> {
             args.add(completed.toString());
 
-            int i = ic.get();
+            int i = ic.value();
             while (i < rargs.length) {
                 args.add(rargs[i]);
-                last.set(null);
+                last.value(null);
                 i++;
             }
 
@@ -1018,7 +1018,7 @@ public class SubCommand {
             }
 
             try {
-                callback.run(new ServerSelection(msgs, selection, servers, subservers, args, last.get()));
+                callback.run(new ServerSelection(msgs, selection, servers, subservers, args, last.value()));
             } catch (Throwable e) {
                 Throwable ew = new InvocationTargetException(e);
                 ew.setStackTrace(origin);
@@ -1028,9 +1028,9 @@ public class SubCommand {
 
         // Step 2
         AsyncConsolidator merge = new AsyncConsolidator(finished);
-        for (boolean run = true; run && ic.get() < rargs.length; ic.set(ic.get() + 1)) {
-            String current = rargs[ic.get()];
-            last.set(current);
+        for (boolean run = true; run && ic.value() < rargs.length; ic.value(ic.value() + 1)) {
+            String current = rargs[ic.value()];
+            last.value(current);
             completed.append(current);
             if (current.endsWith(",")) {
                 current = current.substring(0, current.length() - 1);
@@ -1083,14 +1083,14 @@ public class SubCommand {
                         host.api.getGroup(current, group -> {
                             if (group != null) {
                                 int i = 0;
-                                for (Server server : group.get()) {
+                                for (Server server : group.value()) {
                                     if (!mode || server instanceof SubServer) {
                                         select.add(server);
                                         i++;
                                     }
                                 }
                                 if (i <= 0) {
-                                    String msg = "There are no " + ((mode)?"sub":"") + "servers in group: " + group.name();
+                                    String msg = "There are no " + ((mode)?"sub":"") + "servers in group: " + group.key();
                                     if (sender != null) sender.sendMessage(msg);
                                     msgs.add(msg);
                                 }

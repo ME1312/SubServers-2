@@ -1,7 +1,8 @@
 package net.ME1312.SubServers.Client.Common.Network.API;
 
 import net.ME1312.Galaxi.Library.Callback.Callback;
-import net.ME1312.Galaxi.Library.Container.NamedContainer;
+import net.ME1312.Galaxi.Library.Container.ContainedPair;
+import net.ME1312.Galaxi.Library.Container.Pair;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubData.Client.DataClient;
@@ -124,10 +125,10 @@ public class Server {
      *
      * @return Remote Player Collection
      */
-    public Collection<NamedContainer<String, UUID>> getGlobalPlayers() {
-        List<NamedContainer<String, UUID>> players = new ArrayList<NamedContainer<String, UUID>>();
+    public Collection<Pair<String, UUID>> getGlobalPlayers() {
+        List<Pair<String, UUID>> players = new ArrayList<Pair<String, UUID>>();
         for (String id : raw.getMap("players").getKeys()) {
-            players.add(new NamedContainer<String, UUID>(raw.getMap("players").getRawString(id), UUID.fromString(id)));
+            players.add(new ContainedPair<String, UUID>(raw.getMap("players").getRawString(id), UUID.fromString(id)));
         }
         return players;
     }

@@ -1,14 +1,16 @@
 package net.ME1312.SubServers.Bungee.Host.External;
 
 import net.ME1312.Galaxi.Library.Callback.ReturnRunnable;
+import net.ME1312.Galaxi.Library.Container.ContainedPair;
+import net.ME1312.Galaxi.Library.Container.Container;
 import net.ME1312.SubServers.Bungee.Event.*;
 import net.ME1312.SubServers.Bungee.Host.*;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Map.ObjectMapValue;
-import net.ME1312.Galaxi.Library.Container.Container;
+import net.ME1312.Galaxi.Library.Container.Value;
 import net.ME1312.SubServers.Bungee.Library.Compatibility.Logger;
 import net.ME1312.SubServers.Bungee.Library.Exception.InvalidServerException;
-import net.ME1312.Galaxi.Library.Container.NamedContainer;
+import net.ME1312.Galaxi.Library.Container.Pair;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubServers.Bungee.Network.Packet.PacketExEditServer;
 import net.md_5.bungee.BungeeServerInfo;
@@ -27,7 +29,7 @@ import java.util.UUID;
 public class ExternalSubServer extends SubServerImpl {
     private ExternalHost host;
     private boolean enabled;
-    private Container<Boolean> log;
+    private Value<Boolean> log;
     private String dir;
     String exec;
     private String stopcmd;
@@ -222,7 +224,7 @@ public class ExternalSubServer extends SubServerImpl {
             for (String key : edit.getKeys()) {
                 pending.remove(key);
                 ObjectMapValue value = edit.get(key);
-                SubEditServerEvent event = new SubEditServerEvent(player, this, new NamedContainer<String, ObjectMapValue>(key, value), perma);
+                SubEditServerEvent event = new SubEditServerEvent(player, this, new ContainedPair<String, ObjectMapValue>(key, value), perma);
                 host.plugin.getPluginManager().callEvent(event);
                 if (!event.isCancelled()) {
                     try {
@@ -335,8 +337,8 @@ public class ExternalSubServer extends SubServerImpl {
                                 break;
                             case "log":
                                 if (value.isBoolean()) {
-                                    if (log.get() != value.asBoolean()) host.queue(new PacketExEditServer(this, PacketExEditServer.UpdateType.SET_LOGGING, (Boolean) value.asBoolean()));
-                                    log.set(value.asBoolean());
+                                    if (log.value() != value.asBoolean()) host.queue(new PacketExEditServer(this, PacketExEditServer.UpdateType.SET_LOGGING, (Boolean) value.asBoolean()));
+                                    log.value(value.asBoolean());
                                     if (perma && this.host.plugin.servers.get().getMap("Servers").getKeys().contains(getName())) {
                                         this.host.plugin.servers.get().getMap("Servers").getMap(getName()).set("Log", isLogging());
                                         this.host.plugin.servers.save();
@@ -505,7 +507,7 @@ public class ExternalSubServer extends SubServerImpl {
     public void setDisplayName(String value) {
         super.setDisplayName(value);
         logger.name = getDisplayName();
-        host.plugin.getPluginManager().callEvent(new SubEditServerEvent(null, this, new NamedContainer<String, Object>("display", value), false));
+        host.plugin.getPluginManager().callEvent(new SubEditServerEvent(null, this, new ContainedPair<String, Object>("display", value), false));
     }
 
     @Override
@@ -521,22 +523,22 @@ public class ExternalSubServer extends SubServerImpl {
     @Override
     public void setEnabled(boolean value) {
         if (Util.isNull(value)) throw new NullPointerException();
-        host.plugin.getPluginManager().callEvent(new SubEditServerEvent(null, this, new NamedContainer<String, Object>("enabled", value), false));
+        host.plugin.getPluginManager().callEvent(new SubEditServerEvent(null, this, new ContainedPair<String, Object>("enabled", value), false));
         if (enabled != value) host.queue(new PacketExEditServer(this, PacketExEditServer.UpdateType.SET_ENABLED, (Boolean) value));
         enabled = value;
     }
 
     @Override
     public boolean isLogging() {
-        return log.get();
+        return log.value();
     }
 
     @Override
     public void setLogging(boolean value) {
         if (Util.isNull(value)) throw new NullPointerException();
-        host.plugin.getPluginManager().callEvent(new SubEditServerEvent(null, this, new NamedContainer<String, Object>("log", value), false));
-        if (log.get() != value) host.queue(new PacketExEditServer(this, PacketExEditServer.UpdateType.SET_LOGGING, (Boolean) value));
-        log.set(value);
+        host.plugin.getPluginManager().callEvent(new SubEditServerEvent(null, this, new ContainedPair<String, Object>("log", value), false));
+        if (log.value() != value) host.queue(new PacketExEditServer(this, PacketExEditServer.UpdateType.SET_LOGGING, (Boolean) value));
+        log.value(value);
     }
 
     @Override
@@ -567,7 +569,7 @@ public class ExternalSubServer extends SubServerImpl {
     @Override
     public void setStopCommand(String value) {
         if (Util.isNull(value)) throw new NullPointerException();
-        host.plugin.getPluginManager().callEvent(new SubEditServerEvent(null, this, new NamedContainer<String, Object>("stop-cmd", value), false));
+        host.plugin.getPluginManager().callEvent(new SubEditServerEvent(null, this, new ContainedPair<String, Object>("stop-cmd", value), false));
         if (!stopcmd.equals(value)) host.queue(new PacketExEditServer(this, PacketExEditServer.UpdateType.SET_STOP_COMMAND, value));
         stopcmd = value;
     }
@@ -580,7 +582,7 @@ public class ExternalSubServer extends SubServerImpl {
     @Override
     public void setStopAction(StopAction action) {
         if (Util.isNull(action)) throw new NullPointerException();
-        host.plugin.getPluginManager().callEvent(new SubEditServerEvent(null, this, new NamedContainer<String, Object>("stop-action", action), false));
+        host.plugin.getPluginManager().callEvent(new SubEditServerEvent(null, this, new ContainedPair<String, Object>("stop-action", action), false));
         stopaction = action;
     }
 }

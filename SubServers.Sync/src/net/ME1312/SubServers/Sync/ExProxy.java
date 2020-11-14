@@ -2,7 +2,7 @@ package net.ME1312.SubServers.Sync;
 
 import com.dosse.upnp.UPnP;
 import com.google.gson.Gson;
-import net.ME1312.Galaxi.Library.Container.PrimitiveContainer;
+import net.ME1312.Galaxi.Library.Container.Container;
 import net.ME1312.SubData.Client.DataClient;
 import net.ME1312.SubData.Client.Encryption.AES;
 import net.ME1312.SubData.Client.Encryption.DHE;
@@ -18,7 +18,7 @@ import net.ME1312.Galaxi.Library.Config.YAMLConfig;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.SubServers.Sync.Library.Compatibility.Plugin;
 import net.ME1312.SubServers.Sync.Library.Metrics;
-import net.ME1312.Galaxi.Library.Container.NamedContainer;
+import net.ME1312.Galaxi.Library.Container.Pair;
 import net.ME1312.Galaxi.Library.UniversalFile;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
@@ -56,7 +56,7 @@ import java.util.concurrent.TimeUnit;
  */
 public final class ExProxy extends BungeeCommon implements Listener {
     HashMap<Integer, SubDataClient> subdata = new HashMap<Integer, SubDataClient>();
-    NamedContainer<Long, Map<String, Map<String, String>>> lang = null;
+    Pair<Long, Map<String, Map<String, String>>> lang = null;
     public final Map<String, ServerImpl> servers = new TreeMap<String, ServerImpl>();
     public final HashMap<UUID, ServerImpl> rPlayerLinkS = new HashMap<UUID, ServerImpl>();
     public final HashMap<UUID, String> rPlayerLinkP = new HashMap<UUID, String>();
@@ -69,7 +69,7 @@ public final class ExProxy extends BungeeCommon implements Listener {
     public final Plugin plugin;
     public final SubAPI api = new SubAPI(this);
     public SubProtocol subprotocol;
-    public static final Version version = Version.fromString("2.16.4a");
+    public static final Version version = Version.fromString("2.17a");
 
     public final boolean isPatched;
     public final boolean isGalaxi;
@@ -197,9 +197,9 @@ public final class ExProxy extends BungeeCommon implements Listener {
         }
     }
 
-    private void connect(NamedContainer<DisconnectReason, DataClient> disconnect) throws IOException {
+    private void connect(Pair<DisconnectReason, DataClient> disconnect) throws IOException {
         int reconnect = config.get().getMap("Settings").getMap("SubData").getInt("Reconnect", 60);
-        if (disconnect == null || (this.reconnect && reconnect > 0 && disconnect.name() != DisconnectReason.PROTOCOL_MISMATCH && disconnect.name() != DisconnectReason.ENCRYPTION_MISMATCH)) {
+        if (disconnect == null || (this.reconnect && reconnect > 0 && disconnect.key() != DisconnectReason.PROTOCOL_MISMATCH && disconnect.key() != DisconnectReason.ENCRYPTION_MISMATCH)) {
             long reset = resetDate;
             Timer timer = new Timer("SubServers.Sync::SubData_Reconnect_Handler");
             timer.scheduleAtFixedRate(new TimerTask() {
@@ -225,13 +225,13 @@ public final class ExProxy extends BungeeCommon implements Listener {
 
     private void post() {
         if (!config.get().getMap("Settings").getRawStringList("Disabled-Overrides", Collections.emptyList()).contains("/server"))
-            getPluginManager().registerCommand(plugin, SubCommand.BungeeServer.newInstance(this, "server").get());
+            getPluginManager().registerCommand(plugin, SubCommand.BungeeServer.newInstance(this, "server").value());
         if (!config.get().getMap("Settings").getRawStringList("Disabled-Overrides", Collections.emptyList()).contains("/glist"))
             getPluginManager().registerCommand(plugin, new SubCommand.BungeeList(this, "glist"));
 
-        getPluginManager().registerCommand(plugin, SubCommand.newInstance(this, "subservers").get());
-        getPluginManager().registerCommand(plugin, SubCommand.newInstance(this, "subserver").get());
-        getPluginManager().registerCommand(plugin, SubCommand.newInstance(this, "sub").get());
+        getPluginManager().registerCommand(plugin, SubCommand.newInstance(this, "subservers").value());
+        getPluginManager().registerCommand(plugin, SubCommand.newInstance(this, "subserver").value());
+        getPluginManager().registerCommand(plugin, SubCommand.newInstance(this, "sub").value());
         GalaxiCommand.group(SubCommand.class);
 
         if (getReconnectHandler() != null && getReconnectHandler().getClass().equals(SmartFallback.class))
@@ -280,12 +280,12 @@ public final class ExProxy extends BungeeCommon implements Listener {
                                 }
                             }
                             ArrayList<CachedPlayer> remove = new ArrayList<CachedPlayer>();
-                            for (NamedContainer<String, UUID> player : proxy.getPlayers()) { // Remove players that shouldn't exist
-                                if (getPlayer(player.get()) == null) {
-                                    remove.add(rPlayers.get(player.get()));
-                                    rPlayerLinkS.remove(player.get());
-                                    rPlayerLinkP.remove(player.get());
-                                    rPlayers.remove(player.get());
+                            for (Pair<String, UUID> player : proxy.getPlayers()) { // Remove players that shouldn't exist
+                                if (getPlayer(player.value()) == null) {
+                                    remove.add(rPlayers.get(player.value()));
+                                    rPlayerLinkS.remove(player.value());
+                                    rPlayerLinkP.remove(player.value());
+                                    rPlayers.remove(player.value());
                                 }
                             }
                             for (UUID player : Util.getBackwards(rPlayerLinkP, api.getName().toLowerCase())) { // Remove players that shouldn't exist (internally)
@@ -410,7 +410,7 @@ public final class ExProxy extends BungeeCommon implements Listener {
                 if (!e.getConnection().getListener().isPingPassthrough()) {
                     e.setResponse(new ServerPing(e.getResponse().getVersion(), e.getResponse().getPlayers(), new TextComponent(override.getMotd()), null));
                 } else {
-                    PrimitiveContainer<Boolean> lock = new PrimitiveContainer<>(true);
+                    Container<Boolean> lock = new Container<>(true);
                     boolean mode = plugin != null;
                     if (mode) e.registerIntent(plugin);
                     ((BungeeServerInfo) override).ping((ping, error) -> {
@@ -648,18 +648,18 @@ public final class ExProxy extends BungeeCommon implements Listener {
     public void edit(SubEditServerEvent e) {
         if (servers.keySet().contains(e.getServer().toLowerCase())) {
             ServerImpl server = servers.get(e.getServer().toLowerCase());
-            switch (e.getEdit().name().toLowerCase()) {
+            switch (e.getEdit().key().toLowerCase()) {
                 case "display":
-                    server.setDisplayName(e.getEdit().get().asString());
+                    server.setDisplayName(e.getEdit().value().asString());
                     break;
                 case "motd":
-                    server.setMotd(ChatColor.translateAlternateColorCodes('&', e.getEdit().get().asString()));
+                    server.setMotd(ChatColor.translateAlternateColorCodes('&', e.getEdit().value().asString()));
                     break;
                 case "restricted":
-                    server.setRestricted(e.getEdit().get().asBoolean());
+                    server.setRestricted(e.getEdit().value().asBoolean());
                     break;
                 case "hidden":
-                    server.setHidden(e.getEdit().get().asBoolean());
+                    server.setHidden(e.getEdit().value().asBoolean());
                     break;
             }
         }

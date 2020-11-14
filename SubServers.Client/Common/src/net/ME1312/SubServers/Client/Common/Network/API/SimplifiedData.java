@@ -1,7 +1,8 @@
 package net.ME1312.SubServers.Client.Common.Network.API;
 
 import net.ME1312.Galaxi.Library.Callback.Callback;
-import net.ME1312.Galaxi.Library.Container.NamedContainer;
+import net.ME1312.Galaxi.Library.Container.ContainedPair;
+import net.ME1312.Galaxi.Library.Container.Pair;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubData.Client.DataClient;
 import net.ME1312.SubData.Client.SubDataClient;
@@ -128,11 +129,11 @@ public final class SimplifiedData {
      * @param name Group name
      * @param callback a Server Group
      */
-    public static void requestGroup(DataClient client, String name, Callback<NamedContainer<String, List<Server>>> callback) {
+    public static void requestGroup(DataClient client, String name, Callback<Pair<String, List<Server>>> callback) {
         if (Util.isNull(name, callback)) throw new NullPointerException();
         StackTraceElement[] origin = new Exception().getStackTrace();
         client(client).sendPacket(new PacketDownloadGroupInfo(Collections.singletonList(name), data -> {
-            NamedContainer<String, List<Server>> group = null;
+            Pair<String, List<Server>> group = null;
             if (data.getKeys().size() > 0) {
                 String key = new LinkedList<String>(data.getKeys()).getFirst();
                 List<Server> servers = new ArrayList<Server>();
@@ -143,7 +144,7 @@ public final class SimplifiedData {
                         servers.add(new Server(client, data.getMap(key).getMap(server)));
                     }
                 }
-                group = new NamedContainer<>(key, servers);
+                group = new ContainedPair<>(key, servers);
             }
 
             try {

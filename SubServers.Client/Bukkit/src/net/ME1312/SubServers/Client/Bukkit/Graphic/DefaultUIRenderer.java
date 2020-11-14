@@ -1,7 +1,9 @@
 package net.ME1312.SubServers.Client.Bukkit.Graphic;
 
+import net.ME1312.Galaxi.Library.Container.ContainedPair;
 import net.ME1312.Galaxi.Library.Container.Container;
-import net.ME1312.Galaxi.Library.Container.NamedContainer;
+import net.ME1312.Galaxi.Library.Container.Value;
+import net.ME1312.Galaxi.Library.Container.Pair;
 import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubServers.Client.Common.Network.API.Host;
 import net.ME1312.SubServers.Client.Common.Network.API.Server;
@@ -116,16 +118,16 @@ public class DefaultUIRenderer extends UIRenderer {
             i = ((count < 9) ? ((9 - count) / 2) : 0);
 
             boolean even = (count & 1) == 0 && count < 9;
-            NamedContainer<String, Short> enabled, disabled;
+            Pair<String, Short> enabled, disabled;
 
             for (Host host : index) {
                 if (index.indexOf(host) >= min && index.indexOf(host) <= max) {
                     if (even && (i == 4 || i == 13 || i == 22 || i == 31)) inv.setItem(i++, adiv);
-                    enabled = (((i & 1) == 0) ? new NamedContainer<>("BLUE_STAINED_GLASS_PANE", (short) 3) : new NamedContainer<>("LIGHT_BLUE_STAINED_GLASS_PANE", (short) 11));
-                    disabled = (((i & 1) == 0) ? new NamedContainer<>("MAGENTA_STAINED_GLASS_PANE", (short) 2) : new NamedContainer<>("RED_STAINED_GLASS_PANE", (short) 14));
+                    enabled = (((i & 1) == 0) ? new ContainedPair<>("BLUE_STAINED_GLASS_PANE", (short) 3) : new ContainedPair<>("LIGHT_BLUE_STAINED_GLASS_PANE", (short) 11));
+                    disabled = (((i & 1) == 0) ? new ContainedPair<>("MAGENTA_STAINED_GLASS_PANE", (short) 2) : new ContainedPair<>("RED_STAINED_GLASS_PANE", (short) 14));
 
                     if (host.isAvailable() && host.isEnabled()) {
-                        block = createItem("STAINED_GLASS_PANE", enabled.name(), enabled.get());
+                        block = createItem("STAINED_GLASS_PANE", enabled.key(), enabled.value());
                         blockMeta = block.getItemMeta();
                         blockMeta.setDisplayName(ChatColor.AQUA + host.getDisplayName());
                         LinkedList<String> lore = new LinkedList<String>();
@@ -135,7 +137,7 @@ public class DefaultUIRenderer extends UIRenderer {
                         if (plugin.config.get().getMap("Settings").getBoolean("Show-Addresses", false)) lore.add(ChatColor.WHITE + host.getAddress().getHostAddress());
                         blockMeta.setLore(lore);
                     } else {
-                        block = createItem("STAINED_GLASS_PANE", disabled.name(), disabled.get());
+                        block = createItem("STAINED_GLASS_PANE", disabled.key(), disabled.value());
                         blockMeta = block.getItemMeta();
                         blockMeta.setDisplayName(ChatColor.RED + host.getDisplayName());
                         LinkedList<String> lore = new LinkedList<String>();
@@ -709,14 +711,14 @@ public class DefaultUIRenderer extends UIRenderer {
             i = ((count < 9) ? ((9 - count) / 2) : 0);
 
             boolean even = (count & 1) == 0 && count < 9;
-            NamedContainer<String, Short> color;
+            Pair<String, Short> color;
 
             for (String group : index) {
                 if (index.indexOf(group) >= min && index.indexOf(group) <= max) {
                     if (even && (i == 4 || i == 13 || i == 22 || i == 31)) inv.setItem(i++, adiv);
-                    color = (((i & 1) == 0) ? new NamedContainer<>("ORANGE_STAINED_GLASS_PANE", (short) 1) : new NamedContainer<>("YELLOW_STAINED_GLASS_PANE", (short) 4));
+                    color = (((i & 1) == 0) ? new ContainedPair<>("ORANGE_STAINED_GLASS_PANE", (short) 1) : new ContainedPair<>("YELLOW_STAINED_GLASS_PANE", (short) 4));
 
-                    block = createItem("STAINED_GLASS_PANE", color.name(), color.get());
+                    block = createItem("STAINED_GLASS_PANE", color.key(), color.value());
                     blockMeta = block.getItemMeta();
                     blockMeta.setDisplayName(ChatColor.GOLD + group);
                     LinkedList<String> lore = new LinkedList<String>();
@@ -785,13 +787,13 @@ public class DefaultUIRenderer extends UIRenderer {
 
     public void serverMenu(final int page, final String host, final String group) {
         setDownloading(ChatColor.stripColor((host == null)?((group == null)?plugin.api.getLang("SubServers", "Interface.Server-Menu.Title"):plugin.api.getLang("SubServers", "Interface.Group-SubServer.Title").replace("$str$", group)):plugin.api.getLang("SubServers", "Interface.Host-SubServer.Title").replace("$str$", host)));
-        Container<String> hostname = new Container<String>(host);
-        Container<List<Server>> servercontainer = new Container<List<Server>>(new LinkedList<Server>());
+        Value<String> hostname = new Container<String>(host);
+        Value<List<Server>> servercontainer = new Container<List<Server>>(new LinkedList<Server>());
         Runnable renderer = () -> {
             setDownloading(null);
             lastPage = page;
 
-            List<Server> servers = servercontainer.get();
+            List<Server> servers = servercontainer.value();
             lastVisitedObjects[0] = host;
             lastVisitedObjects[1] = group;
             windowHistory.add(() -> serverMenu(page, host, group));
@@ -809,7 +811,7 @@ public class DefaultUIRenderer extends UIRenderer {
             int count = (servers.size() == 0)?27:((servers.size() - min >= max)?36:servers.size() - min);
             int area = (count % 9 == 0) ? count : ((count / 9) + 1) * 9;
 
-            Inventory inv = Bukkit.createInventory(null, 18 + area, (host == null)?((group == null)?plugin.api.getLang("SubServers", "Interface.Server-Menu.Title"):plugin.api.getLang("SubServers", "Interface.Group-SubServer.Title").replace("$str$", group)):plugin.api.getLang("SubServers", "Interface.Host-SubServer.Title").replace("$str$", hostname.get()));
+            Inventory inv = Bukkit.createInventory(null, 18 + area, (host == null)?((group == null)?plugin.api.getLang("SubServers", "Interface.Server-Menu.Title"):plugin.api.getLang("SubServers", "Interface.Group-SubServer.Title").replace("$str$", group)):plugin.api.getLang("SubServers", "Interface.Host-SubServer.Title").replace("$str$", hostname.value()));
             block = createItem("STAINED_GLASS_PANE", "GRAY_STAINED_GLASS_PANE", (short) 7);
             block.setItemMeta(divMeta);
             while (i < area) {
@@ -820,19 +822,19 @@ public class DefaultUIRenderer extends UIRenderer {
             i = ((count < 9) ? ((9 - count) / 2) : 0);
 
             boolean even = (count & 1) == 0 && count < 9;
-            NamedContainer<String, Short> external, online, temp, offline, disabled;
+            Pair<String, Short> external, online, temp, offline, disabled;
 
             for (Server server : servers) {
                 if (servers.indexOf(server) >= min && servers.indexOf(server) <= max) {
                     if (even && (i == 4 || i == 13 || i == 22 || i == 31)) inv.setItem(i++, adiv);
-                    external = (((i & 1) == 0) ? new NamedContainer<>("WHITE_STAINED_GLASS_PANE", (short) 0) : new NamedContainer<>("LIGHT_GRAY_STAINED_GLASS_PANE", (short) 8));
-                    online = (((i & 1) == 0) ? new NamedContainer<>("LIME_STAINED_GLASS_PANE", (short) 5) : new NamedContainer<>("GREEN_STAINED_GLASS_PANE", (short) 13));
-                    temp = (((i & 1) == 0) ? new NamedContainer<>("LIGHT_BLUE_STAINED_GLASS_PANE", (short) 3) : new NamedContainer<>("BLUE_STAINED_GLASS_PANE", (short) 11));
-                    offline = (((i & 1) == 0) ? new NamedContainer<>("YELLOW_STAINED_GLASS_PANE", (short) 4) : new NamedContainer<>("ORANGE_STAINED_GLASS_PANE", (short) 1));
-                    disabled = (((i & 1) == 0) ? new NamedContainer<>("MAGENTA_STAINED_GLASS_PANE", (short) 2) : new NamedContainer<>("RED_STAINED_GLASS_PANE", (short) 14));
+                    external = (((i & 1) == 0) ? new ContainedPair<>("WHITE_STAINED_GLASS_PANE", (short) 0) : new ContainedPair<>("LIGHT_GRAY_STAINED_GLASS_PANE", (short) 8));
+                    online = (((i & 1) == 0) ? new ContainedPair<>("LIME_STAINED_GLASS_PANE", (short) 5) : new ContainedPair<>("GREEN_STAINED_GLASS_PANE", (short) 13));
+                    temp = (((i & 1) == 0) ? new ContainedPair<>("LIGHT_BLUE_STAINED_GLASS_PANE", (short) 3) : new ContainedPair<>("BLUE_STAINED_GLASS_PANE", (short) 11));
+                    offline = (((i & 1) == 0) ? new ContainedPair<>("YELLOW_STAINED_GLASS_PANE", (short) 4) : new ContainedPair<>("ORANGE_STAINED_GLASS_PANE", (short) 1));
+                    disabled = (((i & 1) == 0) ? new ContainedPair<>("MAGENTA_STAINED_GLASS_PANE", (short) 2) : new ContainedPair<>("RED_STAINED_GLASS_PANE", (short) 14));
 
                     if (!(server instanceof SubServer)) {
-                        block = createItem("STAINED_GLASS_PANE", external.name(), external.get());
+                        block = createItem("STAINED_GLASS_PANE", external.key(), external.value());
                         blockMeta = block.getItemMeta();
                         blockMeta.setDisplayName(ChatColor.WHITE + server.getDisplayName());
                         LinkedList<String> lore = new LinkedList<String>();
@@ -844,8 +846,8 @@ public class DefaultUIRenderer extends UIRenderer {
                         lore.add(ChatColor.WHITE + ((plugin.config.get().getMap("Settings").getBoolean("Show-Addresses", false))?server.getAddress().getAddress().getHostAddress()+':':"") + server.getAddress().getPort());
                         blockMeta.setLore(lore);
                     } else if (((SubServer) server).isRunning()) {
-                        NamedContainer<String, Short> blockinfo = (((SubServer) server).getStopAction() == SubServer.StopAction.REMOVE_SERVER || ((SubServer) server).getStopAction() == SubServer.StopAction.RECYCLE_SERVER || ((SubServer) server).getStopAction() == SubServer.StopAction.DELETE_SERVER)?temp:online;
-                        block = createItem("STAINED_GLASS_PANE", blockinfo.name(), blockinfo.get());
+                        Pair<String, Short> blockinfo = (((SubServer) server).getStopAction() == SubServer.StopAction.REMOVE_SERVER || ((SubServer) server).getStopAction() == SubServer.StopAction.RECYCLE_SERVER || ((SubServer) server).getStopAction() == SubServer.StopAction.DELETE_SERVER)?temp:online;
+                        block = createItem("STAINED_GLASS_PANE", blockinfo.key(), blockinfo.value());
                         blockMeta = block.getItemMeta();
                         LinkedList<String> lore = new LinkedList<String>();
                         if (!server.getName().equals(server.getDisplayName()))
@@ -858,7 +860,7 @@ public class DefaultUIRenderer extends UIRenderer {
                         lore.add(ChatColor.WHITE + ((plugin.config.get().getMap("Settings").getBoolean("Show-Addresses", false))?server.getAddress().getAddress().getHostAddress()+':':"") + server.getAddress().getPort());
                         blockMeta.setLore(lore);
                     } else if (((SubServer) server).isAvailable() && ((SubServer) server).isEnabled() && ((SubServer) server).getCurrentIncompatibilities().size() == 0) {
-                        block = createItem("STAINED_GLASS_PANE", offline.name(), offline.get());
+                        block = createItem("STAINED_GLASS_PANE", offline.key(), offline.value());
                         blockMeta = block.getItemMeta();
                         blockMeta.setDisplayName(ChatColor.YELLOW + server.getDisplayName());
                         LinkedList<String> lore = new LinkedList<String>();
@@ -868,7 +870,7 @@ public class DefaultUIRenderer extends UIRenderer {
                         lore.add(ChatColor.WHITE + ((plugin.config.get().getMap("Settings").getBoolean("Show-Addresses", false))?server.getAddress().getAddress().getHostAddress()+':':"") + server.getAddress().getPort());
                         blockMeta.setLore(lore);
                     } else {
-                        block = createItem("STAINED_GLASS_PANE", disabled.name(), disabled.get());
+                        block = createItem("STAINED_GLASS_PANE", disabled.key(), disabled.value());
                         blockMeta = block.getItemMeta();
                         blockMeta.setDisplayName(ChatColor.RED + server.getDisplayName());
                         LinkedList<String> lore = new LinkedList<String>();
@@ -953,8 +955,8 @@ public class DefaultUIRenderer extends UIRenderer {
                 if (object == null) {
                     if (hasHistory()) back();
                 } else {
-                    hostname.set(object.getDisplayName());
-                    servercontainer.get().addAll(object.getSubServers().values());
+                    hostname.value(object.getDisplayName());
+                    servercontainer.value().addAll(object.getSubServers().values());
                     renderer.run();
                 }
             });
@@ -963,13 +965,13 @@ public class DefaultUIRenderer extends UIRenderer {
                 if (servers == null) {
                     if (hasHistory()) back();
                 } else {
-                    servercontainer.get().addAll(servers.get());
+                    servercontainer.value().addAll(servers.value());
                     renderer.run();
                 }
             });
         } else {
             plugin.api.getServers(servers -> {
-                servercontainer.get().addAll(servers.values());
+                servercontainer.value().addAll(servers.values());
                 renderer.run();
             });
         }

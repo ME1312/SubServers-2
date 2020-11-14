@@ -12,7 +12,7 @@ import net.ME1312.SubServers.Client.Bukkit.Graphic.UIHandler;
 import net.ME1312.Galaxi.Library.Config.YAMLConfig;
 import net.ME1312.Galaxi.Library.Config.YAMLSection;
 import net.ME1312.SubServers.Client.Bukkit.Library.Metrics;
-import net.ME1312.Galaxi.Library.Container.NamedContainer;
+import net.ME1312.Galaxi.Library.Container.Pair;
 import net.ME1312.Galaxi.Library.UniversalFile;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
@@ -39,7 +39,7 @@ import java.util.concurrent.TimeUnit;
  */
 public final class SubPlugin extends JavaPlugin {
     HashMap<Integer, SubDataClient> subdata = new HashMap<Integer, SubDataClient>();
-    NamedContainer<Long, Map<String, Map<String, String>>> lang = null;
+    Pair<Long, Map<String, Map<String, String>>> lang = null;
     public YAMLConfig config;
     public SubProtocol subprotocol;
 
@@ -188,9 +188,9 @@ public final class SubPlugin extends JavaPlugin {
         }
     }
 
-    private void connect(NamedContainer<DisconnectReason, DataClient> disconnect) throws IOException {
+    private void connect(Pair<DisconnectReason, DataClient> disconnect) throws IOException {
         int reconnect = config.get().getMap("Settings").getMap("SubData").getInt("Reconnect", 60);
-        if (disconnect == null || (this.reconnect && reconnect > 0 && disconnect.name() != DisconnectReason.PROTOCOL_MISMATCH && disconnect.name() != DisconnectReason.ENCRYPTION_MISMATCH)) {
+        if (disconnect == null || (this.reconnect && reconnect > 0 && disconnect.key() != DisconnectReason.PROTOCOL_MISMATCH && disconnect.key() != DisconnectReason.ENCRYPTION_MISMATCH)) {
             long reset = resetDate;
             if (disconnect != null) Bukkit.getLogger().info("SubData > Attempting reconnect in " + reconnect + " seconds");
             Bukkit.getScheduler().runTaskLaterAsynchronously(this, new Runnable() {

@@ -1,7 +1,7 @@
 package net.ME1312.SubServers.Client.Common;
 
 import net.ME1312.Galaxi.Library.Callback.Callback;
-import net.ME1312.Galaxi.Library.Container.NamedContainer;
+import net.ME1312.Galaxi.Library.Container.Pair;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubData.Client.DataClient;
 import net.ME1312.SubData.Client.DataProtocol;
@@ -81,7 +81,7 @@ public abstract class ClientAPI {
      * @param name Group name
      * @param callback a Server Group
      */
-    public void getGroup(String name, Callback<NamedContainer<String, List<Server>>> callback) {
+    public void getGroup(String name, Callback<Pair<String, List<Server>>> callback) {
         requestGroup(null, name, callback);
     }
 
@@ -311,7 +311,7 @@ public abstract class ClientAPI {
     }
 
     /**
-     * Get the Master Proxy Container
+     * Get the Master Proxy Value
      *
      * @param callback Master Proxy
      */

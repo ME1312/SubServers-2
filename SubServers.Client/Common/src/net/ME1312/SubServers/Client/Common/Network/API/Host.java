@@ -1,7 +1,8 @@
 package net.ME1312.SubServers.Client.Common.Network.API;
 
 import net.ME1312.Galaxi.Library.Callback.Callback;
-import net.ME1312.Galaxi.Library.Container.NamedContainer;
+import net.ME1312.Galaxi.Library.Container.ContainedPair;
+import net.ME1312.Galaxi.Library.Container.Pair;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Map.ObjectMapValue;
 import net.ME1312.Galaxi.Library.Util;
@@ -160,10 +161,10 @@ public class Host {
      *
      * @return Remote Player Collection
      */
-    public Collection<NamedContainer<String, UUID>> getGlobalPlayers() {
-        List<NamedContainer<String, UUID>> players = new ArrayList<NamedContainer<String, UUID>>();
+    public Collection<Pair<String, UUID>> getGlobalPlayers() {
+        List<Pair<String, UUID>> players = new ArrayList<Pair<String, UUID>>();
         for (String id : raw.getMap("players").getKeys()) {
-            players.add(new NamedContainer<String, UUID>(raw.getMap("players").getRawString(id), UUID.fromString(id)));
+            players.add(new ContainedPair<String, UUID>(raw.getMap("players").getRawString(id), UUID.fromString(id)));
         }
         return players;
     }
@@ -188,7 +189,7 @@ public class Host {
 
         if (players == null) {
             LinkedList<UUID> ids = new LinkedList<UUID>();
-            for (SubServer server : getSubServers().values()) for (NamedContainer<String, UUID> player : server.getGlobalPlayers()) ids.add(player.get());
+            for (SubServer server : getSubServers().values()) for (Pair<String, UUID> player : server.getGlobalPlayers()) ids.add(player.value());
             client().sendPacket(new PacketDownloadPlayerInfo(ids, data -> {
                 LinkedList<RemotePlayer> players = new LinkedList<RemotePlayer>();
                 for (String player : data.getKeys()) {

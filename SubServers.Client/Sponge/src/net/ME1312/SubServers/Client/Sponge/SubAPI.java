@@ -94,7 +94,7 @@ public final class SubAPI extends ClientAPI {
      * @return SubServers Lang Channel list
      */
     public Collection<String> getLangChannels() {
-        return plugin.lang.get().keySet();
+        return plugin.lang.value().keySet();
     }
 
     /**
@@ -105,7 +105,7 @@ public final class SubAPI extends ClientAPI {
      */
     public Map<String, String> getLang(String channel) {
         if (Util.isNull(channel)) throw new NullPointerException();
-        return new LinkedHashMap<>(plugin.lang.get().get(channel.toLowerCase()));
+        return new LinkedHashMap<>(plugin.lang.value().get(channel.toLowerCase()));
     }
 
     /**
@@ -152,7 +152,7 @@ public final class SubAPI extends ClientAPI {
      */
     public Version getServerVersion() {
         PluginContainer container = null;
-        if (container == null) container = Util.getDespiteException(() -> (PluginContainer) Platform.class.getMethod("getContainer", Class.forName("org.spongepowered.api.Platform$Component")).invoke(Sponge.getPlatform(), Enum.valueOf((Class<Enum>) Class.forName("org.spongepowered.api.Platform$Component"), "IMPLEMENTATION")), null);
+        if (container == null) container = Util.getDespiteException(() -> (PluginContainer) Platform.class.getMethod("getValue", Class.forName("org.spongepowered.api.Platform$Component")).invoke(Sponge.getPlatform(), Enum.valueOf((Class<Enum>) Class.forName("org.spongepowered.api.Platform$Component"), "IMPLEMENTATION")), null);
         if (container == null) container = Util.getDespiteException(() -> (PluginContainer) Platform.class.getMethod("getImplementation").invoke(Sponge.getPlatform()), null);
         return (container == null || !container.getVersion().isPresent())?null:new Version(container.getVersion().get());
     }

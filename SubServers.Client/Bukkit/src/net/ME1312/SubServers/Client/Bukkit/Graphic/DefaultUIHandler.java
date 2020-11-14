@@ -2,6 +2,7 @@ package net.ME1312.SubServers.Client.Bukkit.Graphic;
 
 import net.ME1312.Galaxi.Library.Config.YAMLSection;
 import net.ME1312.Galaxi.Library.Container.Container;
+import net.ME1312.Galaxi.Library.Container.Value;
 import net.ME1312.Galaxi.Library.Callback.Callback;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Util;
@@ -220,18 +221,18 @@ public class DefaultUIHandler implements UIHandler, Listener {
                             gui.back();
                         } else {
                             player.closeInventory();
-                            final Container<PluginRenderer<Host>> plugin = new Container<PluginRenderer<Host>>(null);
+                            final Value<PluginRenderer<Host>> plugin = new Container<PluginRenderer<Host>>(null);
                             for (PluginRenderer<Host> renderer : DefaultUIRenderer.hostPlugins.values()) {
-                                if (item.equals(renderer.getIcon().getItemMeta().getDisplayName())) plugin.set(renderer);
+                                if (item.equals(renderer.getIcon().getItemMeta().getDisplayName())) plugin.value(renderer);
                             }
-                            if (plugin.get() == null) {
+                            if (plugin.value() == null) {
                                 gui.reopen();
                             } else {
                                 gui.setDownloading(ChatColor.stripColor(this.plugin.api.getLang("SubServers", "Interface.Host-Plugin.Title").replace("$str$", ((Host) gui.lastVisitedObjects[0]).getName())));
                                 this.plugin.api.getHost(((Host) gui.lastVisitedObjects[0]).getName(), host -> {
                                     if (host != null) {
                                         gui.setDownloading(null);
-                                        plugin.get().open(player, host);
+                                        plugin.value().open(player, host);
                                     } else {
                                         gui.back();
                                     }
@@ -348,12 +349,12 @@ public class DefaultUIHandler implements UIHandler, Listener {
                             player.closeInventory();
                             if (permits((SubServer) gui.lastVisitedObjects[0], player, "subservers.subserver.%.*", "subservers.subserver.%.stop")) {
                                 gui.setDownloading(plugin.api.getLang("SubServers", "Interface.Generic.Downloading.Response"));
-                                final Container<Boolean> listening = new Container<Boolean>(true);
+                                final Value<Boolean> listening = new Container<Boolean>(true);
                                 PacketInExRunEvent.callback("SubStoppedEvent", new Callback<ObjectMap<String>>() {
                                     @Override
                                     public void run(ObjectMap<String> json) {
                                         try {
-                                            if (listening.get()) if (!json.getString("server").equalsIgnoreCase(((SubServer) gui.lastVisitedObjects[0]).getName())) {
+                                            if (listening.value()) if (!json.getString("server").equalsIgnoreCase(((SubServer) gui.lastVisitedObjects[0]).getName())) {
                                                 PacketInExRunEvent.callback("SubStoppedEvent", this);
                                             } else {
                                                 Bukkit.getScheduler().runTaskLater(plugin, gui::reopen, 5);
@@ -364,7 +365,7 @@ public class DefaultUIHandler implements UIHandler, Listener {
                                 ((SubServer) gui.lastVisitedObjects[0]).stop(player.getUniqueId(), response -> {
                                     if (response != 0) {
                                         gui.reopen();
-                                        listening.set(false);
+                                        listening.value(false);
                                     } else gui.setDownloading(plugin.api.getLang("SubServers", "Interface.SubServer-Admin.Stop.Title").replace("$str$", ((SubServer) gui.lastVisitedObjects[0]).getName()));
                                 });
                             } else gui.reopen();
@@ -372,12 +373,12 @@ public class DefaultUIHandler implements UIHandler, Listener {
                             player.closeInventory();
                             if (permits((SubServer) gui.lastVisitedObjects[0], player, "subservers.subserver.%.*", "subservers.subserver.%.terminate")) {
                                 gui.setDownloading(plugin.api.getLang("SubServers", "Interface.Generic.Downloading.Response"));
-                                final Container<Boolean> listening = new Container<Boolean>(true);
+                                final Value<Boolean> listening = new Container<Boolean>(true);
                                 PacketInExRunEvent.callback("SubStoppedEvent", new Callback<ObjectMap<String>>() {
                                     @Override
                                     public void run(ObjectMap<String> json) {
                                         try {
-                                            if (listening.get()) if (!json.getString("server").equalsIgnoreCase(((SubServer) gui.lastVisitedObjects[0]).getName())) {
+                                            if (listening.value()) if (!json.getString("server").equalsIgnoreCase(((SubServer) gui.lastVisitedObjects[0]).getName())) {
                                                 PacketInExRunEvent.callback("SubStoppedEvent", this);
                                             } else {
                                                 gui.reopen();
@@ -388,7 +389,7 @@ public class DefaultUIHandler implements UIHandler, Listener {
                                 ((SubServer) gui.lastVisitedObjects[0]).terminate(player.getUniqueId(), response -> {
                                     if (response != 0) {
                                         gui.reopen();
-                                        listening.set(false);
+                                        listening.value(false);
                                     } else gui.setDownloading(plugin.api.getLang("SubServers", "Interface.SubServer-Admin.Terminate.Title").replace("$str$", ((SubServer) gui.lastVisitedObjects[0]).getName()));
                                 });
                             } else gui.reopen();
@@ -425,18 +426,18 @@ public class DefaultUIHandler implements UIHandler, Listener {
                             gui.back();
                         } else {
                             player.closeInventory();
-                            Container<PluginRenderer<SubServer>> plugin = new Container<PluginRenderer<SubServer>>(null);
+                            Value<PluginRenderer<SubServer>> plugin = new Container<PluginRenderer<SubServer>>(null);
                             for (PluginRenderer<SubServer> renderer : DefaultUIRenderer.subserverPlugins.values()) {
-                                if (item.equals(renderer.getIcon().getItemMeta().getDisplayName())) plugin.set(renderer);
+                                if (item.equals(renderer.getIcon().getItemMeta().getDisplayName())) plugin.value(renderer);
                             }
-                            if (plugin.get() == null) {
+                            if (plugin.value() == null) {
                                 gui.reopen();
                             } else {
                                 gui.setDownloading(ChatColor.stripColor(this.plugin.api.getLang("SubServers", "Interface.SubServer-Plugin.Title").replace("$str$", ((SubServer) gui.lastVisitedObjects[0]).getName())));
                                 this.plugin.api.getSubServer(((SubServer) gui.lastVisitedObjects[0]).getName(), subserver -> {
                                     if (subserver != null) {
                                         gui.setDownloading(null);
-                                        plugin.get().open(player, subserver);
+                                        plugin.value().open(player, subserver);
                                     } else {
                                         gui.back();
                                     }
