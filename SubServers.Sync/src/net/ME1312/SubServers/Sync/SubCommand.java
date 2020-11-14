@@ -15,8 +15,10 @@ import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubServers.Bungee.Library.Compatibility.CommandX;
 import net.ME1312.SubServers.Bungee.Library.Compatibility.Galaxi.GalaxiInfo;
-import net.ME1312.SubServers.Sync.Network.API.*;
+import net.ME1312.SubServers.Client.Common.Network.API.*;
+import net.ME1312.SubServers.Client.Common.Network.Packet.*;
 import net.ME1312.SubServers.Sync.Network.Packet.*;
+import net.ME1312.SubServers.Sync.Server.CachedPlayer;
 import net.ME1312.SubServers.Sync.Server.ServerImpl;
 import net.ME1312.SubServers.Sync.Server.SubServerImpl;
 import net.md_5.bungee.BungeeCord;
@@ -1004,7 +1006,7 @@ public final class SubCommand extends CommandX {
                 ReturnRunnable<Collection<String>> getPlayers = () -> {
                     LinkedList<String> names = new LinkedList<String>();
                     for (ProxiedPlayer player : plugin.getPlayers()) names.add(player.getName());
-                    for (RemotePlayer player : plugin.api.getGlobalPlayers().values()) if (!names.contains(player.getName())) names.add(player.getName());
+                    for (CachedPlayer player : plugin.api.getGlobalPlayers().values()) if (!names.contains(player.getName())) names.add(player.getName());
                     Collections.sort(names);
                     return names;
                 };
@@ -1212,7 +1214,7 @@ public final class SubCommand extends CommandX {
                         }
 
                         if (((ProxiedPlayer) sender).getServer().getInfo() instanceof ServerImpl) {
-                            for (RemotePlayer player : ((ServerImpl) ((ProxiedPlayer) sender).getServer().getInfo()).getGlobalPlayers()) {
+                            for (CachedPlayer player : ((ServerImpl) ((ProxiedPlayer) sender).getServer().getInfo()).getGlobalPlayers()) {
                                 if (!used.contains(player.getUniqueId())) {
                                     if (player.getName().toLowerCase().startsWith(last)) list.add(Last + player.getName().substring(last.length()));
                                     used.add(player.getUniqueId());
@@ -1552,7 +1554,7 @@ public final class SubCommand extends CommandX {
             int players = 0;
             for (ServerImpl server : plugin.servers.values()) {
                 List<String> playerlist = new ArrayList<String>();
-                for (RemotePlayer player : server.getGlobalPlayers()) playerlist.add(player.getName());
+                for (CachedPlayer player : server.getGlobalPlayers()) playerlist.add(player.getName());
                 Collections.sort(playerlist);
 
                 players += playerlist.size();

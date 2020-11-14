@@ -4,7 +4,7 @@ import net.ME1312.Galaxi.Library.Callback.Callback;
 import net.ME1312.SubServers.Client.Sponge.Library.SubEvent;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
-import net.ME1312.SubServers.Client.Sponge.Network.API.SubServer;
+import net.ME1312.SubServers.Client.Common.Network.API.SubServer;
 import net.ME1312.SubServers.Client.Sponge.SubAPI;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.impl.AbstractEvent;

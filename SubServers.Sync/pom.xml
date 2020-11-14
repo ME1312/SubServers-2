@@ -48,6 +48,13 @@
             <optional>true</optional>
         </dependency>
         <dependency>
+            <groupId>net.ME1312.SubServers</groupId>
+            <artifactId>SubServers.Client.Common</artifactId>
+            <version>-PLACEHOLDER</version>
+            <scope>compile</scope>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
             <groupId>net.ME1312.SubData</groupId>
             <artifactId>Client</artifactId>
             <version>20w46b</version>
@@ -174,6 +181,7 @@
                             <includeDependencySources>true</includeDependencySources>
                             <dependencySourceIncludes>
                                 <dependencySourceInclude>net.ME1312.SubServers:SubServers.Bungee.Common:*</dependencySourceInclude>
+                                <dependencySourceInclude>net.ME1312.SubServers:SubServers.Client.Common:*</dependencySourceInclude>
                             </dependencySourceIncludes>
                         </configuration>
                     </execution>

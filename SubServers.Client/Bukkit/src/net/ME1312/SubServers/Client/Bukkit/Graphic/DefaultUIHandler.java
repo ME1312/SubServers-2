@@ -7,10 +7,12 @@ import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubData.Client.SubDataClient;
-import net.ME1312.SubServers.Client.Bukkit.Network.API.Host;
-import net.ME1312.SubServers.Client.Bukkit.Network.API.SubServer;
 import net.ME1312.SubServers.Client.Bukkit.Network.Packet.*;
 import net.ME1312.SubServers.Client.Bukkit.SubPlugin;
+import net.ME1312.SubServers.Client.Common.Network.API.Host;
+import net.ME1312.SubServers.Client.Common.Network.API.SubServer;
+import net.ME1312.SubServers.Client.Common.Network.Packet.PacketCreateServer;
+import net.ME1312.SubServers.Client.Common.Network.Packet.PacketUpdateServer;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -25,6 +27,8 @@ import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.util.HashMap;
 import java.util.UUID;
+
+import static net.ME1312.SubServers.Client.Bukkit.Library.ObjectPermission.*;
 
 /**
  * Default GUI Listener
@@ -111,7 +115,8 @@ public class DefaultUIHandler implements UIHandler, Listener {
                             if (player.hasPermission("subservers.host.*.*") || player.hasPermission("subservers.host.*.create") || player.hasPermission("subservers.host." + host + ".*") || player.hasPermission("subservers.host." + host + ".create")) {
                                 player.closeInventory();
                                 gui.setDownloading(plugin.api.getLang("SubServers", "Interface.Generic.Downloading.Response"));
-                                ((SubDataClient) plugin.api.getSubDataNetwork()[0]).sendPacket(new PacketCreateServer(player.getUniqueId(), ((UIRenderer.CreatorOptions) gui.lastVisitedObjects[0]), data -> {
+                                UIRenderer.CreatorOptions options = ((UIRenderer.CreatorOptions) gui.lastVisitedObjects[0]);
+                                ((SubDataClient) plugin.api.getSubDataNetwork()[0]).sendPacket(new PacketCreateServer(player.getUniqueId(), options.getName(), options.getHost(), options.getTemplate(), options.getVersion(), options.getPort(), data -> {
                                     gui.back();
                                 }));
                             } else {
@@ -319,7 +324,7 @@ public class DefaultUIHandler implements UIHandler, Listener {
                             gui.back();
                         } else if (item.equals(plugin.api.getLang("SubServers", "Interface.SubServer-Admin.Update"))) {
                             player.closeInventory();
-                            if (((SubServer) gui.lastVisitedObjects[0]).permits(player, "subservers.subserver.%.*", "subservers.subserver.%.update")) {
+                            if (permits((SubServer) gui.lastVisitedObjects[0], player, "subservers.subserver.%.*", "subservers.subserver.%.update")) {
                                 if (!gui.sendTitle(plugin.api.getLang("SubServers", "Interface.SubServer-Admin.Update.Title"), 4 * 20))
                                     player.sendMessage(plugin.api.getLang("SubServers", "Interface.SubServer-Admin.Update.Message"));
                                 input.put(player.getUniqueId(), m -> {
@@ -332,7 +337,7 @@ public class DefaultUIHandler implements UIHandler, Listener {
                             } else gui.reopen();
                         } else if (item.equals(plugin.api.getLang("SubServers", "Interface.SubServer-Admin.Start"))) {
                             player.closeInventory();
-                            if (((SubServer) gui.lastVisitedObjects[0]).permits(player, "subservers.subserver.%.*", "subservers.subserver.%.start")) {
+                            if (permits((SubServer) gui.lastVisitedObjects[0], player, "subservers.subserver.%.*", "subservers.subserver.%.start")) {
                                 gui.setDownloading(plugin.api.getLang("SubServers", "Interface.Generic.Downloading.Response"));
                                 ((SubServer) gui.lastVisitedObjects[0]).start(player.getUniqueId(), response -> {
                                     gui.setDownloading(plugin.api.getLang("SubServers", "Interface.SubServer-Admin.Start.Title"));
@@ -341,7 +346,7 @@ public class DefaultUIHandler implements UIHandler, Listener {
                             } else gui.reopen();
                         } else if (item.equals(plugin.api.getLang("SubServers", "Interface.SubServer-Admin.Stop"))) {
                             player.closeInventory();
-                            if (((SubServer) gui.lastVisitedObjects[0]).permits(player, "subservers.subserver.%.*", "subservers.subserver.%.stop")) {
+                            if (permits((SubServer) gui.lastVisitedObjects[0], player, "subservers.subserver.%.*", "subservers.subserver.%.stop")) {
                                 gui.setDownloading(plugin.api.getLang("SubServers", "Interface.Generic.Downloading.Response"));
                                 final Container<Boolean> listening = new Container<Boolean>(true);
                                 PacketInExRunEvent.callback("SubStoppedEvent", new Callback<ObjectMap<String>>() {
@@ -365,7 +370,7 @@ public class DefaultUIHandler implements UIHandler, Listener {
                             } else gui.reopen();
                         } else if (item.equals(plugin.api.getLang("SubServers", "Interface.SubServer-Admin.Terminate"))) {
                             player.closeInventory();
-                            if (((SubServer) gui.lastVisitedObjects[0]).permits(player, "subservers.subserver.%.*", "subservers.subserver.%.terminate")) {
+                            if (permits((SubServer) gui.lastVisitedObjects[0], player, "subservers.subserver.%.*", "subservers.subserver.%.terminate")) {
                                 gui.setDownloading(plugin.api.getLang("SubServers", "Interface.Generic.Downloading.Response"));
                                 final Container<Boolean> listening = new Container<Boolean>(true);
                                 PacketInExRunEvent.callback("SubStoppedEvent", new Callback<ObjectMap<String>>() {
@@ -389,7 +394,7 @@ public class DefaultUIHandler implements UIHandler, Listener {
                             } else gui.reopen();
                         } else if (item.equals(plugin.api.getLang("SubServers", "Interface.SubServer-Admin.Command"))) {
                             player.closeInventory();
-                            if (((SubServer) gui.lastVisitedObjects[0]).permits(player, "subservers.subserver.%.*", "subservers.subserver.%.command")) {
+                            if (permits((SubServer) gui.lastVisitedObjects[0], player, "subservers.subserver.%.*", "subservers.subserver.%.command")) {
                                 if (!gui.sendTitle(plugin.api.getLang("SubServers", "Interface.SubServer-Admin.Command.Title"), 4 * 20))
                                     player.sendMessage(plugin.api.getLang("SubServers", "Interface.SubServer-Admin.Command.Message"));
                                 input.put(player.getUniqueId(), m -> {

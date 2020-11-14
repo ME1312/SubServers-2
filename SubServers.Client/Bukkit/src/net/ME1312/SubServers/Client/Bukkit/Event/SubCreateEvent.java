@@ -4,7 +4,7 @@ import net.ME1312.Galaxi.Library.Callback.Callback;
 import net.ME1312.SubServers.Client.Bukkit.Library.SubEvent;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
-import net.ME1312.SubServers.Client.Bukkit.Network.API.SubServer;
+import net.ME1312.SubServers.Client.Common.Network.API.SubServer;
 import net.ME1312.SubServers.Client.Bukkit.SubAPI;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;

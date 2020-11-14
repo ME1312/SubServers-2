@@ -14,7 +14,8 @@ import net.ME1312.Galaxi.Library.Container.Container;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubServers.Client.Sponge.Library.Compatibility.ListArgument;
-import net.ME1312.SubServers.Client.Sponge.Network.API.*;
+import net.ME1312.SubServers.Client.Common.Network.API.*;
+import net.ME1312.SubServers.Client.Common.Network.Packet.*;
 import net.ME1312.SubServers.Client.Sponge.Network.Packet.*;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandException;
@@ -40,6 +41,8 @@ import java.nio.charset.Charset;
 import java.text.DecimalFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+
+import static net.ME1312.SubServers.Client.Sponge.Library.ObjectPermission.*;
 
 public final class SubCommand implements CommandExecutor {
     private SubPlugin plugin;
@@ -1139,11 +1142,11 @@ public final class SubCommand implements CommandExecutor {
                     String select = s.get();
                     plugin.api.getServer(select, server -> {
                         if (server != null) {
-                            if (server.permits(sender, "subservers.server.%.*", "subservers.server.%.teleport")) {
+                            if (permits(server, sender, "subservers.server.%.*", "subservers.server.%.teleport")) {
                                 if (!(server instanceof SubServer) || ((SubServer) server).isRunning()) {
                                     Container<Boolean> msg = new Container<>(false);
                                     Callback<Player> action = target -> {
-                                        if (target == sender || server.permits(sender, "subservers.server.%.*", "subservers.server.%.teleport-others")) {
+                                        if (target == sender || permits(server, sender, "subservers.server.%.*", "subservers.server.%.teleport-others")) {
                                             sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", "Command.Teleport").replace("$str$", target.getName())));
                                             plugin.pmc(target, "Connect", server.getName());
                                         } else if (!msg.get()) {
@@ -1282,7 +1285,7 @@ public final class SubCommand implements CommandExecutor {
                         List<String>[] checks = permissions.toArray(new List[0]);
                         for (int p = 0; permitted && p < permissions.size(); p++) {
                             if (checks[p] == null || checks[p].size() <= 0) continue;
-                            else permitted = server.permits(sender, checks[p].toArray(new String[0]));
+                            else permitted = permits(server, sender, checks[p].toArray(new String[0]));
                         }
                     }
 

@@ -12,12 +12,13 @@ import net.ME1312.Galaxi.Library.UniversalFile;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubData.Client.SubDataClient;
+import net.ME1312.SubServers.Client.Common.Network.API.SubCreator;
+import net.ME1312.SubServers.Client.Common.Network.API.SubCreator.ServerType;
 import net.ME1312.SubServers.Host.ExHost;
 import net.ME1312.SubServers.Host.Library.Exception.InvalidServerException;
 import net.ME1312.SubServers.Host.Library.Exception.InvalidTemplateException;
 import net.ME1312.SubServers.Host.Library.Exception.SubCreatorException;
 import net.ME1312.SubServers.Host.Library.ReplacementScanner;
-import net.ME1312.SubServers.Host.Network.API.SubCreator.ServerType;
 import net.ME1312.SubServers.Host.Network.Packet.PacketExCreateServer;
 import net.ME1312.SubServers.Host.Network.Packet.PacketOutExLogMessage;
 import net.ME1312.SubServers.Host.SubAPI;
@@ -39,7 +40,7 @@ public class SubCreatorImpl {
     private ExHost host;
     private TreeMap<String, CreatorTask> thread;
 
-    public static class ServerTemplate extends net.ME1312.SubServers.Host.Network.API.SubCreator.ServerTemplate {
+    public static class ServerTemplate extends SubCreator.ServerTemplate {
         private String name;
         private String nick = null;
         private boolean enabled;

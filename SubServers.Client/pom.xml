@@ -8,6 +8,7 @@
     <packaging>pom</packaging>
 
     <modules>
+        <module>Common</module>
         <module>Bukkit</module>
         <module>Sponge</module>
         <module>Universal</module>

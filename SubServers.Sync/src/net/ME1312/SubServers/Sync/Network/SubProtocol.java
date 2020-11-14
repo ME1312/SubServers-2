@@ -7,12 +7,14 @@ import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubData.Client.SubDataClient;
 import net.ME1312.SubData.Client.SubDataProtocol;
+import net.ME1312.SubServers.Client.Common.Network.API.RemotePlayer;
+import net.ME1312.SubServers.Client.Common.Network.API.Server;
+import net.ME1312.SubServers.Client.Common.Network.Packet.*;
 import net.ME1312.SubServers.Sync.Event.SubNetworkConnectEvent;
 import net.ME1312.SubServers.Sync.Event.SubNetworkDisconnectEvent;
 import net.ME1312.SubServers.Sync.ExProxy;
-import net.ME1312.SubServers.Sync.Network.API.RemotePlayer;
-import net.ME1312.SubServers.Sync.Network.API.Server;
 import net.ME1312.SubServers.Sync.Network.Packet.*;
+import net.ME1312.SubServers.Sync.Server.CachedPlayer;
 import net.ME1312.SubServers.Sync.Server.ServerImpl;
 import net.ME1312.SubServers.Sync.SubAPI;
 import net.md_5.bungee.api.config.ListenerInfo;
@@ -163,7 +165,7 @@ public class SubProtocol extends SubDataProtocol {
                 e.printStackTrace();
             }
 
-            ArrayList<RemotePlayer> localPlayers = new ArrayList<RemotePlayer>();
+            ArrayList<CachedPlayer> localPlayers = new ArrayList<CachedPlayer>();
             for (UUID id : new ArrayList<UUID>(plugin.rPlayers.keySet())) {
                 if (plugin.getPlayer(id) != null) {
                     localPlayers.add(plugin.rPlayers.get(id));
@@ -173,7 +175,7 @@ public class SubProtocol extends SubDataProtocol {
                     plugin.rPlayers.remove(id);
                 }
             }
-            subdata.sendPacket(new PacketExSyncPlayer(null, localPlayers.toArray(new RemotePlayer[0])));
+            subdata.sendPacket(new PacketExSyncPlayer(null, localPlayers.toArray(new CachedPlayer[0])));
 
             plugin.api.getServers(servers -> {
                 for (Server server : servers.values()) {
@@ -183,7 +185,7 @@ public class SubProtocol extends SubDataProtocol {
                 plugin.api.getGlobalPlayers(players -> {
                     for (RemotePlayer player : players.values()) {
                         plugin.rPlayerLinkP.put(player.getUniqueId(), player.getProxy().toLowerCase());
-                        plugin.rPlayers.put(player.getUniqueId(), player);
+                        plugin.rPlayers.put(player.getUniqueId(), new CachedPlayer(player));
 
                         ServerInfo server = plugin.getServerInfo(player.getServer());
                         if (server instanceof ServerImpl)

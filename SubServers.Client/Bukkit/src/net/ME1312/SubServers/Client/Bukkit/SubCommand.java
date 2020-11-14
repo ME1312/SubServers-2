@@ -10,7 +10,10 @@ import net.ME1312.SubServers.Client.Bukkit.Graphic.UIRenderer;
 import net.ME1312.Galaxi.Library.Callback.Callback;
 import net.ME1312.Galaxi.Library.Config.YAMLSection;
 import net.ME1312.Galaxi.Library.Version.Version;
-import net.ME1312.SubServers.Client.Bukkit.Network.API.*;
+import net.ME1312.SubServers.Client.Common.Network.API.*;
+import net.ME1312.SubServers.Client.Common.Network.Packet.PacketCreateServer;
+import net.ME1312.SubServers.Client.Common.Network.Packet.PacketRestartServer;
+import net.ME1312.SubServers.Client.Common.Network.Packet.PacketUpdateServer;
 import net.ME1312.SubServers.Client.Bukkit.Network.Packet.*;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -25,6 +28,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.*;
+
+import static net.ME1312.SubServers.Client.Bukkit.Library.ObjectPermission.*;
 
 public final class SubCommand extends BukkitCommand {
     private SubPlugin plugin;
@@ -726,11 +731,11 @@ public final class SubCommand extends BukkitCommand {
                             String select = args[(args.length > 2)?2:1];
                             plugin.api.getServer(select, server -> {
                                 if (server != null) {
-                                    if (server.permits(sender, "subservers.server.%.*", "subservers.server.%.teleport")) {
+                                    if (permits(server, sender, "subservers.server.%.*", "subservers.server.%.teleport")) {
                                         if (!(server instanceof SubServer) || ((SubServer) server).isRunning()) {
                                             Player target = (args.length > 2)?Bukkit.getPlayer(args[1]):null;
                                             if (target != null || args.length == 2) {
-                                                if (target == null || target == sender || server.permits(sender, "subservers.server.%.*", "subservers.server.%.teleport-others")) {
+                                                if (target == null || target == sender || permits(server, sender, "subservers.server.%.*", "subservers.server.%.teleport-others")) {
                                                     if (target == null) target = (Player) sender;
 
                                                     sender.sendMessage(plugin.api.getLang("SubServers", "Command.Teleport").replace("$str$", target.getName()));
@@ -870,7 +875,7 @@ public final class SubCommand extends BukkitCommand {
                         List<String>[] checks = permissions.toArray(new List[0]);
                         for (int p = 0; permitted && p < permissions.size(); p++) {
                             if (checks[p] == null || checks[p].size() <= 0) continue;
-                            else permitted = server.permits(sender, checks[p].toArray(new String[0]));
+                            else permitted = permits(server, sender, checks[p].toArray(new String[0]));
                         }
                     }
 

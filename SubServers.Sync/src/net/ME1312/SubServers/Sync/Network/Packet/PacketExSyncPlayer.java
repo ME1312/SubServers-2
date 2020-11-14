@@ -5,7 +5,7 @@ import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubData.Client.Protocol.PacketObjectIn;
 import net.ME1312.SubData.Client.Protocol.PacketObjectOut;
 import net.ME1312.SubData.Client.SubDataSender;
-import net.ME1312.SubServers.Sync.Network.API.RemotePlayer;
+import net.ME1312.SubServers.Sync.Server.CachedPlayer;
 import net.ME1312.SubServers.Sync.Server.ServerImpl;
 import net.ME1312.SubServers.Sync.ExProxy;
 
@@ -17,7 +17,7 @@ import java.util.*;
 public class PacketExSyncPlayer implements PacketObjectIn<Integer>, PacketObjectOut<Integer> {
     private ExProxy plugin;
     private Boolean mode;
-    private RemotePlayer[] values;
+    private CachedPlayer[] values;
 
     /**
      * New PacketExSyncPlayer (In)
@@ -35,7 +35,7 @@ public class PacketExSyncPlayer implements PacketObjectIn<Integer>, PacketObject
      * @param mode Update Mode (true for add, false for remove, null for reset)
      * @param values RemotePlayers
      */
-    public PacketExSyncPlayer(Boolean mode, RemotePlayer... values) {
+    public PacketExSyncPlayer(Boolean mode, CachedPlayer... values) {
         this.mode = mode;
         this.values = values;
     }
@@ -46,7 +46,7 @@ public class PacketExSyncPlayer implements PacketObjectIn<Integer>, PacketObject
         data.set(0x0001, mode);
         if (values != null) {
             ArrayList<ObjectMap<String>> list = new ArrayList<ObjectMap<String>>();
-            for (RemotePlayer value : values) list.add(value.getRaw());
+            for (CachedPlayer value : values) list.add(value.getRaw());
             data.set(0x0002, list);
         }
         return data;
@@ -67,7 +67,7 @@ public class PacketExSyncPlayer implements PacketObjectIn<Integer>, PacketObject
             if (data.getBoolean(0x0001) != Boolean.FALSE) {
                 if (data.contains(0x0002)) for (Map<String, Object> object : (List<Map<String, Object>>) data.getObjectList(0x0002)) {
                     ServerImpl server = (object.getOrDefault("server", null) != null)?plugin.servers.getOrDefault(object.get("server").toString().toLowerCase(), null):null;
-                    RemotePlayer player = new RemotePlayer(new ObjectMap<>(object));
+                    CachedPlayer player = new CachedPlayer(new ObjectMap<>(object));
 
                     plugin.rPlayerLinkP.put(player.getUniqueId(), proxy);
                     plugin.rPlayers.put(player.getUniqueId(), player);

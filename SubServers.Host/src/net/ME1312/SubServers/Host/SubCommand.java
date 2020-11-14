@@ -15,8 +15,9 @@ import net.ME1312.Galaxi.Plugin.Command.Command;
 import net.ME1312.Galaxi.Plugin.Command.CommandSender;
 import net.ME1312.Galaxi.Plugin.Command.CompletionHandler;
 import net.ME1312.SubData.Client.SubDataClient;
+import net.ME1312.SubServers.Client.Common.Network.API.*;
+import net.ME1312.SubServers.Client.Common.Network.Packet.*;
 import net.ME1312.SubServers.Host.Library.TextColor;
-import net.ME1312.SubServers.Host.Network.API.*;
 import net.ME1312.SubServers.Host.Network.Packet.*;
 
 import java.lang.reflect.InvocationTargetException;

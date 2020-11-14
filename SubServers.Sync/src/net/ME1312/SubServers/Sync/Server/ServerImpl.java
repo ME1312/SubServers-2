@@ -6,13 +6,11 @@ import net.ME1312.SubData.Client.Library.ForwardedDataSender;
 import net.ME1312.SubData.Client.SubDataClient;
 import net.ME1312.SubData.Client.SubDataSender;
 import net.ME1312.SubServers.Sync.ExProxy;
-import net.ME1312.SubServers.Sync.Network.API.RemotePlayer;
 import net.ME1312.SubServers.Sync.SubAPI;
 import net.md_5.bungee.BungeeServerInfo;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
-import java.lang.reflect.Field;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.util.*;
@@ -121,9 +119,9 @@ public class ServerImpl extends BungeeServerInfo {
      * @return Remote Player Collection
      */
     @SuppressWarnings("deprecation")
-    public Collection<RemotePlayer> getGlobalPlayers() {
+    public Collection<CachedPlayer> getGlobalPlayers() {
         ExProxy plugin = SubAPI.getInstance().getInternals();
-        ArrayList<RemotePlayer> players = new ArrayList<RemotePlayer>();
+        ArrayList<CachedPlayer> players = new ArrayList<CachedPlayer>();
         for (UUID id : Util.getBackwards(plugin.rPlayerLinkS, this)) {
             players.add(plugin.rPlayers.get(id));
         }

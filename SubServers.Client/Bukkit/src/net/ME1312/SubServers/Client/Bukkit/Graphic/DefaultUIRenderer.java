@@ -3,10 +3,10 @@ package net.ME1312.SubServers.Client.Bukkit.Graphic;
 import net.ME1312.Galaxi.Library.Container.Container;
 import net.ME1312.Galaxi.Library.Container.NamedContainer;
 import net.ME1312.Galaxi.Library.Version.Version;
-import net.ME1312.SubServers.Client.Bukkit.Network.API.Host;
-import net.ME1312.SubServers.Client.Bukkit.Network.API.Server;
-import net.ME1312.SubServers.Client.Bukkit.Network.API.SubCreator;
-import net.ME1312.SubServers.Client.Bukkit.Network.API.SubServer;
+import net.ME1312.SubServers.Client.Common.Network.API.Host;
+import net.ME1312.SubServers.Client.Common.Network.API.Server;
+import net.ME1312.SubServers.Client.Common.Network.API.SubCreator;
+import net.ME1312.SubServers.Client.Common.Network.API.SubServer;
 import net.ME1312.SubServers.Client.Bukkit.SubPlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -18,6 +18,8 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import java.text.DecimalFormat;
 import java.util.*;
+
+import static net.ME1312.SubServers.Client.Bukkit.Library.ObjectPermission.*;
 
 /**
  * Default GUI Renderer Class
@@ -1003,7 +1005,7 @@ public class DefaultUIRenderer extends UIRenderer {
 
                     Player player = Bukkit.getPlayer(this.player);
                     if (subserver.isRunning()) {
-                        if (!subserver.permits(player, "subservers.subserver.%.*", "subservers.subserver.%.terminate")) {
+                        if (!permits(subserver, player, "subservers.subserver.%.*", "subservers.subserver.%.terminate")) {
                             block = createItem("STAINED_GLASS_PANE", "GRAY_STAINED_GLASS_PANE", (short) 7);
                             blockMeta = block.getItemMeta();
                             blockMeta.setDisplayName(ChatColor.GRAY+ChatColor.stripColor(plugin.api.getLang("SubServers", "Interface.SubServer-Admin.Terminate")));
@@ -1018,7 +1020,7 @@ public class DefaultUIRenderer extends UIRenderer {
                         inv.setItem(1, block);
                         inv.setItem(10, block);
 
-                        if (!subserver.permits(player, "subservers.subserver.%.*", "subservers.subserver.%.stop")) {
+                        if (!permits(subserver, player, "subservers.subserver.%.*", "subservers.subserver.%.stop")) {
                             block = createItem("STAINED_GLASS_PANE", "GRAY_STAINED_GLASS_PANE", (short) 7);
                             blockMeta = block.getItemMeta();
                             blockMeta.setDisplayName(ChatColor.GRAY+ChatColor.stripColor(plugin.api.getLang("SubServers", "Interface.SubServer-Admin.Stop")));
@@ -1034,7 +1036,7 @@ public class DefaultUIRenderer extends UIRenderer {
                         inv.setItem(11, block);
                         inv.setItem(12, block);
 
-                        if (!subserver.permits(player, "subservers.subserver.%.*", "subservers.subserver.%.command")) {
+                        if (!permits(subserver, player, "subservers.subserver.%.*", "subservers.subserver.%.command")) {
                             block = createItem("STAINED_GLASS_PANE", "GRAY_STAINED_GLASS_PANE", (short) 7);
                             blockMeta = block.getItemMeta();
                             blockMeta.setDisplayName(ChatColor.GRAY+ChatColor.stripColor(plugin.api.getLang("SubServers", "Interface.SubServer-Admin.Command")));
@@ -1052,7 +1054,7 @@ public class DefaultUIRenderer extends UIRenderer {
                         inv.setItem(15, block);
                         inv.setItem(16, block);
                     } else {
-                        if (!subserver.permits(player, "subservers.subserver.%.*", "subservers.subserver.%.start")) {
+                        if (!permits(subserver, player, "subservers.subserver.%.*", "subservers.subserver.%.start")) {
                             block = createItem("STAINED_GLASS_PANE", "GRAY_STAINED_GLASS_PANE", (short) 7);
                             blockMeta = block.getItemMeta();
                             blockMeta.setDisplayName(ChatColor.GRAY+ChatColor.stripColor(plugin.api.getLang("SubServers", "Interface.SubServer-Admin.Start")));
@@ -1083,7 +1085,7 @@ public class DefaultUIRenderer extends UIRenderer {
                             inv.setItem(11, block);
                             inv.setItem(12, block);
 
-                            if (!subserver.permits(player, "subservers.subserver.%.*", "subservers.subserver.%.update")) {
+                            if (!permits(subserver, player, "subservers.subserver.%.*", "subservers.subserver.%.update")) {
                                 block = createItem("STAINED_GLASS_PANE", "GRAY_STAINED_GLASS_PANE", (short) 7);
                                 blockMeta = block.getItemMeta();
                                 blockMeta.setDisplayName(ChatColor.GRAY+ChatColor.stripColor(plugin.api.getLang("SubServers", "Interface.SubServer-Admin.Update")));

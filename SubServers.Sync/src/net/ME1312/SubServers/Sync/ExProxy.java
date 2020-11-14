@@ -24,7 +24,7 @@ import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubData.Client.SubDataClient;
 import net.ME1312.SubServers.Sync.Library.ConfigUpdater;
-import net.ME1312.SubServers.Sync.Network.API.RemotePlayer;
+import net.ME1312.SubServers.Sync.Server.CachedPlayer;
 import net.ME1312.SubServers.Sync.Network.Packet.PacketDisconnectPlayer;
 import net.ME1312.SubServers.Sync.Network.Packet.PacketExSyncPlayer;
 import net.ME1312.SubServers.Sync.Network.SubProtocol;
@@ -60,7 +60,7 @@ public final class ExProxy extends BungeeCommon implements Listener {
     public final Map<String, ServerImpl> servers = new TreeMap<String, ServerImpl>();
     public final HashMap<UUID, ServerImpl> rPlayerLinkS = new HashMap<UUID, ServerImpl>();
     public final HashMap<UUID, String> rPlayerLinkP = new HashMap<UUID, String>();
-    public final HashMap<UUID, RemotePlayer> rPlayers = new HashMap<UUID, RemotePlayer>();
+    public final HashMap<UUID, CachedPlayer> rPlayers = new HashMap<UUID, CachedPlayer>();
     private final HashMap<UUID, List<ServerInfo>> fallbackLimbo = new HashMap<UUID, List<ServerInfo>>();
 
     public final PrintStream out;
@@ -90,7 +90,7 @@ public final class ExProxy extends BungeeCommon implements Listener {
 
         this.out = out;
         if (!(new UniversalFile(dir, "config.yml").exists())) {
-            Util.copyFromJar(ExProxy.class.getClassLoader(), "net/ME1312/SubServers/Sync/Library/Files/bungee.yml", new UniversalFile(dir, "config.yml").getPath());
+            Util.copyFromJar(ExProxy.class.getClassLoader(), "net/ME1312/SubServers/Bungee/Library/Files/bungee.yml", new UniversalFile(dir, "config.yml").getPath());
             YAMLConfig tmp = new YAMLConfig(new UniversalFile("config.yml"));
             tmp.get().set("stats", UUID.randomUUID().toString());
             tmp.save();
@@ -269,17 +269,17 @@ public final class ExProxy extends BungeeCommon implements Listener {
                 if (api.getSubDataNetwork()[0] != null && !api.getSubDataNetwork()[0].isClosed()) {
                     api.getProxy(api.getName(), proxy -> {
                         synchronized (rPlayers) {
-                            ArrayList<RemotePlayer> add = new ArrayList<RemotePlayer>();
+                            ArrayList<CachedPlayer> add = new ArrayList<CachedPlayer>();
                             for (ProxiedPlayer player : getPlayers()) {
                                 if (!rPlayers.containsKey(player.getUniqueId())) { // Add players that don't exist
-                                    RemotePlayer p = new RemotePlayer(player);
+                                    CachedPlayer p = new CachedPlayer(player);
                                     rPlayerLinkP.put(player.getUniqueId(), p.getProxy().toLowerCase());
                                     rPlayers.put(player.getUniqueId(), p);
                                     if (player.getServer().getInfo() instanceof ServerImpl) rPlayerLinkS.put(player.getUniqueId(), (ServerImpl) player.getServer().getInfo());
                                     add.add(p);
                                 }
                             }
-                            ArrayList<RemotePlayer> remove = new ArrayList<RemotePlayer>();
+                            ArrayList<CachedPlayer> remove = new ArrayList<CachedPlayer>();
                             for (NamedContainer<String, UUID> player : proxy.getPlayers()) { // Remove players that shouldn't exist
                                 if (getPlayer(player.get()) == null) {
                                     remove.add(rPlayers.get(player.get()));
@@ -296,8 +296,8 @@ public final class ExProxy extends BungeeCommon implements Listener {
                                 }
                             }
                             LinkedList<PacketExSyncPlayer> packets = new LinkedList<PacketExSyncPlayer>(); // Compile change data for external proxies
-                            if (add.size() > 0) packets.add(new PacketExSyncPlayer(true, add.toArray(new RemotePlayer[0])));
-                            if (remove.size() > 0) packets.add(new PacketExSyncPlayer(false, remove.toArray(new RemotePlayer[0])));
+                            if (add.size() > 0) packets.add(new PacketExSyncPlayer(true, add.toArray(new CachedPlayer[0])));
+                            if (remove.size() > 0) packets.add(new PacketExSyncPlayer(false, remove.toArray(new CachedPlayer[0])));
                             if (packets.size() > 0) {
                                 PacketExSyncPlayer[] packet = packets.toArray(new PacketExSyncPlayer[0]);
                                 if (api.getSubDataNetwork()[0] != null) {
@@ -453,7 +453,7 @@ public final class ExProxy extends BungeeCommon implements Listener {
         super.getLogger().info("UUID of player " + e.getConnection().getName() + " is " + e.getConnection().getUniqueId());
         if (rPlayers.containsKey(e.getConnection().getUniqueId())) {
             Logger.get("SubServers").warning(e.getConnection().getName() + " connected, but already had a database entry");
-            RemotePlayer player = rPlayers.get(e.getConnection().getUniqueId());
+            CachedPlayer player = rPlayers.get(e.getConnection().getUniqueId());
             if (player.getProxy() != null && player.getProxy().equalsIgnoreCase(api.getName())) {
                 ProxiedPlayer p = getPlayer(player.getUniqueId());
                 if (p != null) p.disconnect(new TextComponent(getTranslation("already_connected_proxy")));
@@ -512,9 +512,9 @@ public final class ExProxy extends BungeeCommon implements Listener {
     public void connected(ServerConnectedEvent e) {
         if (e.getPlayer().isConnected()) {
             synchronized (rPlayers) {
-                ObjectMap<String> raw = RemotePlayer.translate(e.getPlayer());
+                ObjectMap<String> raw = CachedPlayer.translate(e.getPlayer());
                 raw.set("server", e.getServer().getInfo().getName());
-                RemotePlayer player = new RemotePlayer(raw);
+                CachedPlayer player = new CachedPlayer(raw);
                 rPlayerLinkP.put(player.getUniqueId(), player.getProxy().toLowerCase());
                 rPlayers.put(player.getUniqueId(), player);
                 if (e.getServer().getInfo() instanceof ServerImpl) rPlayerLinkS.put(player.getUniqueId(), (ServerImpl) e.getServer().getInfo());
@@ -572,7 +572,7 @@ public final class ExProxy extends BungeeCommon implements Listener {
 
         synchronized (rPlayers) {
             if (rPlayers.containsKey(id) && (!rPlayerLinkP.containsKey(id) || rPlayerLinkP.get(id).equalsIgnoreCase(api.getName()))) {
-                RemotePlayer player = rPlayers.get(id);
+                CachedPlayer player = rPlayers.get(id);
                 rPlayerLinkS.remove(id);
                 rPlayerLinkP.remove(id);
                 rPlayers.remove(id);
@@ -585,7 +585,7 @@ public final class ExProxy extends BungeeCommon implements Listener {
     }
 
     @SuppressWarnings("unchecked")
-    private Map<Integer, UUID> getSubDataAsMap(net.ME1312.SubServers.Sync.Network.API.Server server) {
+    private Map<Integer, UUID> getSubDataAsMap(net.ME1312.SubServers.Client.Common.Network.API.Server server) {
         HashMap<Integer, UUID> map = new HashMap<Integer, UUID>();
         ObjectMap<Integer> subdata = new ObjectMap<Integer>((Map<Integer, ?>) server.getRaw().getObject("subdata"));
         for (Integer channel : subdata.getKeys()) map.put(channel, subdata.getUUID(channel));
@@ -596,9 +596,9 @@ public final class ExProxy extends BungeeCommon implements Listener {
     public void add(SubAddServerEvent e) {
         api.getServer(e.getServer(), server -> {
             if (server != null) {
-                if (server instanceof net.ME1312.SubServers.Sync.Network.API.SubServer) {
+                if (server instanceof net.ME1312.SubServers.Client.Common.Network.API.SubServer) {
                     servers.put(server.getName().toLowerCase(), SubServerImpl.construct(server.getSignature(), server.getName(), server.getDisplayName(), server.getAddress(),
-                            getSubDataAsMap(server), server.getMotd(), server.isHidden(), server.isRestricted(), server.getWhitelist(), ((net.ME1312.SubServers.Sync.Network.API.SubServer) server).isRunning()));
+                            getSubDataAsMap(server), server.getMotd(), server.isHidden(), server.isRestricted(), server.getWhitelist(), ((net.ME1312.SubServers.Client.Common.Network.API.SubServer) server).isRunning()));
                     Logger.get("SubServers").info("Added SubServer: " + e.getServer());
                 } else {
                     servers.put(server.getName().toLowerCase(), ServerImpl.construct(server.getSignature(), server.getName(), server.getDisplayName(), server.getAddress(),
@@ -609,24 +609,24 @@ public final class ExProxy extends BungeeCommon implements Listener {
         });
     }
 
-    public Boolean merge(net.ME1312.SubServers.Sync.Network.API.Server server) {
+    public Boolean merge(net.ME1312.SubServers.Client.Common.Network.API.Server server) {
         ServerImpl current = servers.get(server.getName().toLowerCase());
-        if (current == null || server instanceof net.ME1312.SubServers.Sync.Network.API.SubServer || !(current instanceof SubServerImpl)) {
+        if (current == null || server instanceof net.ME1312.SubServers.Client.Common.Network.API.SubServer || !(current instanceof SubServerImpl)) {
             if (current == null || !current.getSignature().equals(server.getSignature())) {
-                if (server instanceof net.ME1312.SubServers.Sync.Network.API.SubServer) {
+                if (server instanceof net.ME1312.SubServers.Client.Common.Network.API.SubServer) {
                     servers.put(server.getName().toLowerCase(), SubServerImpl.construct(server.getSignature(), server.getName(), server.getDisplayName(), server.getAddress(),
-                            getSubDataAsMap(server), server.getMotd(), server.isHidden(), server.isRestricted(), server.getWhitelist(), ((net.ME1312.SubServers.Sync.Network.API.SubServer) server).isRunning()));
+                            getSubDataAsMap(server), server.getMotd(), server.isHidden(), server.isRestricted(), server.getWhitelist(), ((net.ME1312.SubServers.Client.Common.Network.API.SubServer) server).isRunning()));
                 } else {
                     servers.put(server.getName().toLowerCase(), ServerImpl.construct(server.getSignature(), server.getName(), server.getDisplayName(), server.getAddress(),
                             getSubDataAsMap(server), server.getMotd(), server.isHidden(), server.isRestricted(), server.getWhitelist()));
                 }
 
-                Logger.get("SubServers").info("Added "+((server instanceof net.ME1312.SubServers.Sync.Network.API.SubServer)?"Sub":"")+"Server: " + server.getName());
+                Logger.get("SubServers").info("Added "+((server instanceof net.ME1312.SubServers.Client.Common.Network.API.SubServer)?"Sub":"")+"Server: " + server.getName());
                 return true;
             } else {
-                if (server instanceof net.ME1312.SubServers.Sync.Network.API.SubServer) {
-                    if (((net.ME1312.SubServers.Sync.Network.API.SubServer) server).isRunning() != ((SubServerImpl) current).isRunning())
-                        ((SubServerImpl) current).setRunning(((net.ME1312.SubServers.Sync.Network.API.SubServer) server).isRunning());
+                if (server instanceof net.ME1312.SubServers.Client.Common.Network.API.SubServer) {
+                    if (((net.ME1312.SubServers.Client.Common.Network.API.SubServer) server).isRunning() != ((SubServerImpl) current).isRunning())
+                        ((SubServerImpl) current).setRunning(((net.ME1312.SubServers.Client.Common.Network.API.SubServer) server).isRunning());
                 }
                 if (!server.getMotd().equals(current.getMotd()))
                     current.setMotd(server.getMotd());
@@ -637,7 +637,7 @@ public final class ExProxy extends BungeeCommon implements Listener {
                 if (!server.getDisplayName().equals(current.getDisplayName()))
                     current.setDisplayName(server.getDisplayName());
 
-                Logger.get("SubServers").info("Re-added "+((server instanceof net.ME1312.SubServers.Sync.Network.API.SubServer)?"Sub":"")+"Server: " + server.getName());
+                Logger.get("SubServers").info("Re-added "+((server instanceof net.ME1312.SubServers.Client.Common.Network.API.SubServer)?"Sub":"")+"Server: " + server.getName());
                 return false;
             }
         }

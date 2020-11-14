@@ -7,6 +7,7 @@ import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubData.Client.SubDataClient;
 import net.ME1312.SubData.Client.SubDataProtocol;
+import net.ME1312.SubServers.Client.Common.Network.Packet.*;
 import net.ME1312.SubServers.Client.Sponge.Event.SubNetworkConnectEvent;
 import net.ME1312.SubServers.Client.Sponge.Event.SubNetworkDisconnectEvent;
 import net.ME1312.SubServers.Client.Sponge.Network.Packet.*;
