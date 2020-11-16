@@ -4,7 +4,7 @@ import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubData.Server.DataClient;
 import net.ME1312.SubData.Server.DataServer;
 import net.ME1312.SubServers.Bungee.Library.SubEvent;
-import net.md_5.bungee.api.plugin.Cancellable;
+
 import net.md_5.bungee.api.plugin.Event;
 
 /**

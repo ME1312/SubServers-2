@@ -6,9 +6,9 @@ import net.ME1312.SubData.Client.Protocol.Initial.InitialPacket;
 import net.ME1312.SubData.Client.Protocol.PacketObjectIn;
 import net.ME1312.SubData.Client.Protocol.PacketObjectOut;
 import net.ME1312.SubData.Client.SubDataSender;
-import net.ME1312.SubServers.Client.Bukkit.Event.SubNetworkConnectEvent;
 import net.ME1312.SubServers.Client.Bukkit.SubAPI;
 import net.ME1312.SubServers.Client.Bukkit.SubPlugin;
+
 import org.bukkit.Bukkit;
 
 /**

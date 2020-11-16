@@ -5,11 +5,14 @@ import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubData.Client.Protocol.PacketObjectIn;
 import net.ME1312.SubData.Client.Protocol.PacketObjectOut;
 import net.ME1312.SubData.Client.SubDataSender;
+import net.ME1312.SubServers.Sync.ExProxy;
 import net.ME1312.SubServers.Sync.Server.CachedPlayer;
 import net.ME1312.SubServers.Sync.Server.ServerImpl;
-import net.ME1312.SubServers.Sync.ExProxy;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 /**
  * External Player Sync Packet

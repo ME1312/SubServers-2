@@ -1,7 +1,11 @@
 package net.ME1312.SubServers.Client.Bukkit.Library.Compatibility;
 
-import net.ME1312.SubServers.Client.Common.Network.API.*;
 import net.ME1312.SubServers.Client.Bukkit.SubPlugin;
+import net.ME1312.SubServers.Client.Common.Network.API.Host;
+import net.ME1312.SubServers.Client.Common.Network.API.Proxy;
+import net.ME1312.SubServers.Client.Common.Network.API.Server;
+import net.ME1312.SubServers.Client.Common.Network.API.SubServer;
+
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;

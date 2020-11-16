@@ -5,6 +5,7 @@ import net.ME1312.SubData.Client.Protocol.PacketObjectIn;
 import net.ME1312.SubData.Client.Protocol.PacketObjectOut;
 import net.ME1312.SubData.Client.SubDataSender;
 import net.ME1312.SubServers.Sync.ExProxy;
+
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 import java.util.UUID;

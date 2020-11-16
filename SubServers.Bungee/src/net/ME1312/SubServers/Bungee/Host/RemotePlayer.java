@@ -4,6 +4,7 @@ import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubData.Server.SubDataSerializable;
 import net.ME1312.SubServers.Bungee.SubAPI;
+
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 import java.net.InetSocketAddress;
@@ -58,34 +59,22 @@ public class RemotePlayer implements net.ME1312.SubServers.Bungee.Library.Compat
         return local;
     }
 
-    /**
-     * Get the UUID of this player.
-     *
-     * @return the UUID
-     */
+    @Override
     public UUID getUniqueId() {
         if (local != null) {
             return local.getUniqueId();
         } else return id;
     }
 
-    /**
-     * Get the unique name of this player.
-     *
-     * @return the players username
-     */
+    @Override
     public String getName() {
         if (local != null) {
             return local.getName();
         } else return name;
     }
 
-    /**
-     * Gets the remote address of this connection.
-     *
-     * @return the remote address
-     */
     @SuppressWarnings("deprecation")
+    @Override
     public InetSocketAddress getAddress() {
         if (local != null) {
             return local.getAddress();
@@ -109,11 +98,7 @@ public class RemotePlayer implements net.ME1312.SubServers.Bungee.Library.Compat
         return (proxy == null)? null : proxy.getName();
     }
 
-    /**
-     * Gets the server this player is connected to.
-     *
-     * @return the server this player is connected to
-     */
+    @Override
     public Server getServer() {
         if (local != null) {
             return (Server) local.getServer().getInfo();

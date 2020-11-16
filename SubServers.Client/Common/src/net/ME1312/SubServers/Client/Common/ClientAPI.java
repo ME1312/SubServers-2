@@ -7,11 +7,15 @@ import net.ME1312.SubData.Client.DataClient;
 import net.ME1312.SubData.Client.DataProtocol;
 import net.ME1312.SubData.Client.SubDataClient;
 import net.ME1312.SubServers.Client.Common.Network.API.*;
-import net.ME1312.SubServers.Client.Common.Network.Packet.*;
+import net.ME1312.SubServers.Client.Common.Network.Packet.PacketAddServer;
+import net.ME1312.SubServers.Client.Common.Network.Packet.PacketRemoveServer;
 
 import java.lang.reflect.InvocationTargetException;
 import java.net.InetAddress;
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 import static net.ME1312.SubServers.Client.Common.Network.API.SimplifiedData.*;
 

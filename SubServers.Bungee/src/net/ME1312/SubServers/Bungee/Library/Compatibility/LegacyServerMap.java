@@ -1,6 +1,7 @@
 package net.ME1312.SubServers.Bungee.Library.Compatibility;
 
 import net.ME1312.SubServers.Bungee.SubAPI;
+
 import net.md_5.bungee.api.config.ServerInfo;
 
 import java.util.Collection;

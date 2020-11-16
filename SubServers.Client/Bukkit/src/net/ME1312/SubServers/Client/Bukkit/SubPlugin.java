@@ -1,24 +1,25 @@
 package net.ME1312.SubServers.Client.Bukkit;
 
+import net.ME1312.Galaxi.Library.Config.YAMLConfig;
+import net.ME1312.Galaxi.Library.Config.YAMLSection;
+import net.ME1312.Galaxi.Library.Container.Pair;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
+import net.ME1312.Galaxi.Library.UniversalFile;
+import net.ME1312.Galaxi.Library.Util;
+import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubData.Client.DataClient;
 import net.ME1312.SubData.Client.Encryption.AES;
 import net.ME1312.SubData.Client.Encryption.DHE;
 import net.ME1312.SubData.Client.Encryption.RSA;
 import net.ME1312.SubData.Client.Library.DataSize;
 import net.ME1312.SubData.Client.Library.DisconnectReason;
+import net.ME1312.SubData.Client.SubDataClient;
 import net.ME1312.SubServers.Client.Bukkit.Graphic.DefaultUIHandler;
 import net.ME1312.SubServers.Client.Bukkit.Graphic.UIHandler;
-import net.ME1312.Galaxi.Library.Config.YAMLConfig;
-import net.ME1312.Galaxi.Library.Config.YAMLSection;
-import net.ME1312.SubServers.Client.Bukkit.Library.Metrics;
-import net.ME1312.Galaxi.Library.Container.Pair;
-import net.ME1312.Galaxi.Library.UniversalFile;
-import net.ME1312.Galaxi.Library.Util;
-import net.ME1312.Galaxi.Library.Version.Version;
-import net.ME1312.SubData.Client.SubDataClient;
 import net.ME1312.SubServers.Client.Bukkit.Library.ConfigUpdater;
+import net.ME1312.SubServers.Client.Bukkit.Library.Metrics;
 import net.ME1312.SubServers.Client.Bukkit.Network.SubProtocol;
+
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandMap;
 import org.bukkit.entity.Player;

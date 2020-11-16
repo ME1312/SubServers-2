@@ -1,7 +1,8 @@
 package net.ME1312.SubServers.Client.Bukkit.Event;
 
-import net.ME1312.SubServers.Client.Bukkit.Library.SubEvent;
 import net.ME1312.Galaxi.Library.Util;
+import net.ME1312.SubServers.Client.Bukkit.Library.SubEvent;
+
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 

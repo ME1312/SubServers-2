@@ -1,12 +1,11 @@
 package net.ME1312.SubServers.Bungee.Host.Internal;
 
-import net.ME1312.SubServers.Bungee.Host.SubLogFilter;
-import net.ME1312.SubServers.Bungee.Host.SubLogger;
 import net.ME1312.Galaxi.Library.Container.Value;
 import net.ME1312.Galaxi.Library.Util;
+import net.ME1312.SubServers.Bungee.Host.SubLogFilter;
+import net.ME1312.SubServers.Bungee.Host.SubLogger;
 import net.ME1312.SubServers.Bungee.Library.Compatibility.Logger;
 import net.ME1312.SubServers.Bungee.SubAPI;
-import net.md_5.bungee.api.ProxyServer;
 
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;

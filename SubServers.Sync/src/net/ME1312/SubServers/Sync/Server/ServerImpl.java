@@ -5,8 +5,8 @@ import net.ME1312.SubData.Client.DataSender;
 import net.ME1312.SubData.Client.Library.ForwardedDataSender;
 import net.ME1312.SubData.Client.SubDataClient;
 import net.ME1312.SubData.Client.SubDataSender;
-import net.ME1312.SubServers.Sync.ExProxy;
 import net.ME1312.SubServers.Sync.SubAPI;
+
 import net.md_5.bungee.BungeeServerInfo;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.connection.ProxiedPlayer;

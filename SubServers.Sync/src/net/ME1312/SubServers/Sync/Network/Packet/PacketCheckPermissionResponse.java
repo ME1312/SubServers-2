@@ -7,6 +7,7 @@ import net.ME1312.SubData.Client.Protocol.Forwardable;
 import net.ME1312.SubData.Client.Protocol.PacketObjectIn;
 import net.ME1312.SubData.Client.Protocol.PacketObjectOut;
 import net.ME1312.SubData.Client.SubDataSender;
+
 import net.md_5.bungee.api.ProxyServer;
 
 import java.util.UUID;

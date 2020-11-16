@@ -2,11 +2,11 @@ package net.ME1312.SubServers.Console;
 
 import net.ME1312.Galaxi.Library.Callback.ExceptionReturnRunnable;
 import net.ME1312.Galaxi.Library.Callback.ExceptionRunnable;
+import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubServers.Bungee.Host.SubCreator;
 import net.ME1312.SubServers.Bungee.Host.SubLogFilter;
 import net.ME1312.SubServers.Bungee.Host.SubLogger;
 import net.ME1312.SubServers.Bungee.Host.SubServer;
-import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubServers.Console.Library.HTMLogger;
 
 import javax.imageio.ImageIO;
@@ -22,8 +22,8 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.text.SimpleDateFormat;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 import java.util.logging.Level;
 
 public final class ConsoleWindow implements SubLogFilter {

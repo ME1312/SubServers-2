@@ -1,12 +1,13 @@
 package net.ME1312.SubServers.Client.Sponge;
 
+import net.ME1312.Galaxi.Library.Util;
+import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubData.Client.DataClient;
 import net.ME1312.SubData.Client.DataProtocol;
 import net.ME1312.SubData.Client.SubDataClient;
 import net.ME1312.SubServers.Client.Common.ClientAPI;
 import net.ME1312.SubServers.Client.Sponge.Graphic.UIHandler;
-import net.ME1312.Galaxi.Library.Util;
-import net.ME1312.Galaxi.Library.Version.Version;
+
 import org.spongepowered.api.Platform;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.plugin.PluginContainer;

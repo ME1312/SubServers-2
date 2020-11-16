@@ -4,10 +4,13 @@ import net.ME1312.Galaxi.Library.UniversalFile;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubServers.Bungee.Library.Compatibility.RemotePlayer;
+
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Map;
+import java.util.UUID;
 
 /**
  * SubAPI BungeeCord Common Class

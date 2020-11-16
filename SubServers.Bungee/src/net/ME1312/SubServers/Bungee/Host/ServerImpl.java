@@ -1,20 +1,19 @@
 package net.ME1312.SubServers.Bungee.Host;
 
 import net.ME1312.Galaxi.Library.Container.ContainedPair;
+import net.ME1312.Galaxi.Library.Map.ObjectMap;
+import net.ME1312.Galaxi.Library.Map.ObjectMapValue;
+import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubData.Server.DataClient;
 import net.ME1312.SubData.Server.SubDataClient;
 import net.ME1312.SubServers.Bungee.Event.SubEditServerEvent;
 import net.ME1312.SubServers.Bungee.Event.SubNetworkConnectEvent;
 import net.ME1312.SubServers.Bungee.Event.SubNetworkDisconnectEvent;
-import net.ME1312.Galaxi.Library.Map.ObjectMap;
-import net.ME1312.Galaxi.Library.Map.ObjectMapValue;
 import net.ME1312.SubServers.Bungee.Library.Exception.InvalidServerException;
-import net.ME1312.Galaxi.Library.Container.Pair;
-import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubServers.Bungee.Network.Packet.PacketOutExRunEvent;
 import net.ME1312.SubServers.Bungee.Network.Packet.PacketOutExUpdateWhitelist;
 import net.ME1312.SubServers.Bungee.SubAPI;
-import net.ME1312.SubServers.Bungee.SubProxy;
+
 import net.md_5.bungee.BungeeServerInfo;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -198,11 +197,6 @@ public class ServerImpl extends BungeeServerInfo implements Server {
         }
     }
 
-    @Override
-    public Collection<UUID> getWhitelist() {
-        return new ArrayList<UUID>(whitelist);
-    }
-
     /**
      * See if a player can access this server
      *
@@ -212,6 +206,11 @@ public class ServerImpl extends BungeeServerInfo implements Server {
     @Override
     public boolean canAccess(CommandSender player) {
         return (player instanceof ProxiedPlayer && whitelist.contains(((ProxiedPlayer) player).getUniqueId())) || super.canAccess(player);
+    }
+
+    @Override
+    public Collection<UUID> getWhitelist() {
+        return new ArrayList<UUID>(whitelist);
     }
 
     @Override

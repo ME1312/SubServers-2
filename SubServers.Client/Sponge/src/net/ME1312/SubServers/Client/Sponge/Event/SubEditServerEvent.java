@@ -1,11 +1,12 @@
 package net.ME1312.SubServers.Client.Sponge.Event;
 
 import net.ME1312.Galaxi.Library.Container.ContainedPair;
+import net.ME1312.Galaxi.Library.Container.Pair;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Map.ObjectMapValue;
-import net.ME1312.Galaxi.Library.Container.Pair;
-import net.ME1312.SubServers.Client.Sponge.Library.SubEvent;
 import net.ME1312.Galaxi.Library.Util;
+import net.ME1312.SubServers.Client.Sponge.Library.SubEvent;
+
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.impl.AbstractEvent;
 

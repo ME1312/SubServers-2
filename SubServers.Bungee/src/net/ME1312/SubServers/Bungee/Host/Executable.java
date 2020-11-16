@@ -1,7 +1,7 @@
 package net.ME1312.SubServers.Bungee.Host;
 
-import net.ME1312.SubServers.Bungee.Library.Compatibility.JNA;
 import net.ME1312.Galaxi.Library.Util;
+import net.ME1312.SubServers.Bungee.Library.Compatibility.JNA;
 
 import java.io.File;
 

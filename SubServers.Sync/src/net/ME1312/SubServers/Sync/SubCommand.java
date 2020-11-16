@@ -1,27 +1,30 @@
 package net.ME1312.SubServers.Sync;
 
-import com.google.gson.Gson;
 import net.ME1312.Galaxi.Library.AsyncConsolidator;
 import net.ME1312.Galaxi.Library.Callback.Callback;
 import net.ME1312.Galaxi.Library.Callback.ReturnRunnable;
 import net.ME1312.Galaxi.Library.Container.ContainedPair;
 import net.ME1312.Galaxi.Library.Container.Container;
-import net.ME1312.Galaxi.Library.Platform;
-import net.ME1312.SubData.Client.SubDataClient;
-import net.ME1312.SubData.Client.SubDataSender;
-import net.ME1312.Galaxi.Library.Map.ObjectMap;
-import net.ME1312.Galaxi.Library.Container.Value;
 import net.ME1312.Galaxi.Library.Container.Pair;
+import net.ME1312.Galaxi.Library.Container.Value;
+import net.ME1312.Galaxi.Library.Map.ObjectMap;
+import net.ME1312.Galaxi.Library.Platform;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
+import net.ME1312.SubData.Client.SubDataClient;
+import net.ME1312.SubData.Client.SubDataSender;
 import net.ME1312.SubServers.Bungee.Library.Compatibility.CommandX;
 import net.ME1312.SubServers.Bungee.Library.Compatibility.Galaxi.GalaxiInfo;
 import net.ME1312.SubServers.Client.Common.Network.API.*;
-import net.ME1312.SubServers.Client.Common.Network.Packet.*;
-import net.ME1312.SubServers.Sync.Network.Packet.*;
+import net.ME1312.SubServers.Client.Common.Network.Packet.PacketCreateServer;
+import net.ME1312.SubServers.Client.Common.Network.Packet.PacketUpdateServer;
+import net.ME1312.SubServers.Sync.Network.Packet.PacketCheckPermission;
+import net.ME1312.SubServers.Sync.Network.Packet.PacketInExRunEvent;
 import net.ME1312.SubServers.Sync.Server.CachedPlayer;
 import net.ME1312.SubServers.Sync.Server.ServerImpl;
 import net.ME1312.SubServers.Sync.Server.SubServerImpl;
+
+import com.google.gson.Gson;
 import net.md_5.bungee.BungeeCord;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.CommandSender;
@@ -41,7 +44,8 @@ import java.nio.charset.Charset;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
-import static net.ME1312.SubServers.Bungee.Library.Compatibility.Galaxi.GalaxiCommand.*;
+import static net.ME1312.SubServers.Bungee.Library.Compatibility.Galaxi.GalaxiCommand.description;
+import static net.ME1312.SubServers.Bungee.Library.Compatibility.Galaxi.GalaxiCommand.help;
 
 @SuppressWarnings("deprecation")
 public final class SubCommand extends CommandX {
@@ -225,8 +229,8 @@ public final class SubCommand extends CommandX {
                             Runnable getPlayer = () -> plugin.api.getRemotePlayer(name, player -> {
                                 if (player != null) {
                                     sender.sendMessage("SubServers > Info on player: " + ChatColor.WHITE + player.getName());
-                                    if (player.getProxy() != null) sender.sendMessage(" -> Proxy: " + ChatColor.WHITE + player.getProxy());
-                                    if (player.getServer() != null) sender.sendMessage(" -> Server: " + ChatColor.WHITE + player.getServer());
+                                    if (player.getProxyName() != null) sender.sendMessage(" -> Proxy: " + ChatColor.WHITE + player.getProxyName());
+                                    if (player.getServerName() != null) sender.sendMessage(" -> Server: " + ChatColor.WHITE + player.getServerName());
                                     if (player.getAddress() != null) sender.sendMessage(" -> Address: " + ChatColor.WHITE + player.getAddress().getAddress().getHostAddress() + ':' + player.getAddress().getPort());
                                     sender.sendMessage(" -> UUID: " + ChatColor.AQUA + player.getUniqueId());
                                 } else {

@@ -3,7 +3,6 @@ package net.ME1312.SubServers.Client.Common.Network.Packet;
 import net.ME1312.Galaxi.Library.Callback.Callback;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Util;
-import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubData.Client.Protocol.PacketObjectIn;
 import net.ME1312.SubData.Client.Protocol.PacketObjectOut;
 import net.ME1312.SubData.Client.SubDataSender;

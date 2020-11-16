@@ -3,10 +3,8 @@ package net.ME1312.SubServers.Bungee.Event;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubServers.Bungee.Host.SubServer;
 import net.ME1312.SubServers.Bungee.Library.SubEvent;
-import net.md_5.bungee.api.plugin.Cancellable;
-import net.md_5.bungee.api.plugin.Event;
 
-import java.util.UUID;
+import net.md_5.bungee.api.plugin.Event;
 
 /**
  * Server Started Event

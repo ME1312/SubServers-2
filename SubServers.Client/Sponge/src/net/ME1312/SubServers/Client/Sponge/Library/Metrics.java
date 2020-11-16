@@ -1,9 +1,10 @@
 package net.ME1312.SubServers.Client.Sponge.Library;
 
+import net.ME1312.SubServers.Client.Sponge.SubPlugin;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.inject.Inject;
-import net.ME1312.SubServers.Client.Sponge.SubPlugin;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
 import org.apache.commons.lang3.Validate;
@@ -13,22 +14,11 @@ import org.spongepowered.api.scheduler.Scheduler;
 import org.spongepowered.api.scheduler.Task;
 
 import javax.net.ssl.HttpsURLConnection;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.UUID;
+import java.util.*;
 import java.util.zip.GZIPOutputStream;
 
 /**

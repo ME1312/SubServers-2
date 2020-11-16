@@ -1,7 +1,11 @@
 package net.ME1312.SubServers.Client.Sponge;
 
-import com.google.gson.Gson;
-import com.google.inject.Inject;
+import net.ME1312.Galaxi.Library.Config.YAMLConfig;
+import net.ME1312.Galaxi.Library.Container.Pair;
+import net.ME1312.Galaxi.Library.Map.ObjectMap;
+import net.ME1312.Galaxi.Library.UniversalFile;
+import net.ME1312.Galaxi.Library.Util;
+import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubData.Client.DataClient;
 import net.ME1312.SubData.Client.Encryption.AES;
 import net.ME1312.SubData.Client.Encryption.DHE;
@@ -10,15 +14,12 @@ import net.ME1312.SubData.Client.Library.DataSize;
 import net.ME1312.SubData.Client.Library.DisconnectReason;
 import net.ME1312.SubData.Client.SubDataClient;
 import net.ME1312.SubServers.Client.Sponge.Graphic.UIHandler;
-import net.ME1312.Galaxi.Library.Config.YAMLConfig;
-import net.ME1312.Galaxi.Library.Map.ObjectMap;
-import net.ME1312.SubServers.Client.Sponge.Library.Metrics;
-import net.ME1312.Galaxi.Library.Container.Pair;
-import net.ME1312.Galaxi.Library.UniversalFile;
-import net.ME1312.Galaxi.Library.Util;
-import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubServers.Client.Sponge.Library.ConfigUpdater;
+import net.ME1312.SubServers.Client.Sponge.Library.Metrics;
 import net.ME1312.SubServers.Client.Sponge.Network.SubProtocol;
+
+import com.google.gson.Gson;
+import com.google.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongepowered.api.Game;

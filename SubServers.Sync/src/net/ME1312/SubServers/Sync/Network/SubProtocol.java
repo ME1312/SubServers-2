@@ -1,8 +1,8 @@
 package net.ME1312.SubServers.Sync.Network;
 
 import net.ME1312.Galaxi.Library.Callback.Callback;
-import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Container.Pair;
+import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubData.Client.SubDataClient;
@@ -17,13 +17,17 @@ import net.ME1312.SubServers.Sync.Network.Packet.*;
 import net.ME1312.SubServers.Sync.Server.CachedPlayer;
 import net.ME1312.SubServers.Sync.Server.ServerImpl;
 import net.ME1312.SubServers.Sync.SubAPI;
+
 import net.md_5.bungee.api.config.ListenerInfo;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.conf.Configuration;
 
 import java.io.IOException;
 import java.net.InetAddress;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.UUID;
 import java.util.logging.Logger;
 
 /**
@@ -184,10 +188,10 @@ public class SubProtocol extends SubDataProtocol {
 
                 plugin.api.getRemotePlayers(players -> {
                     for (RemotePlayer player : players.values()) {
-                        plugin.rPlayerLinkP.put(player.getUniqueId(), player.getProxy().toLowerCase());
+                        plugin.rPlayerLinkP.put(player.getUniqueId(), player.getProxyName().toLowerCase());
                         plugin.rPlayers.put(player.getUniqueId(), new CachedPlayer(player));
 
-                        ServerInfo server = plugin.getServerInfo(player.getServer());
+                        ServerInfo server = plugin.getServerInfo(player.getServerName());
                         if (server instanceof ServerImpl)
                             plugin.rPlayerLinkS.put(player.getUniqueId(), (ServerImpl) server);
                     }

@@ -2,13 +2,14 @@ package net.ME1312.SubServers.Client.Bukkit.Graphic;
 
 import net.ME1312.Galaxi.Library.Container.ContainedPair;
 import net.ME1312.Galaxi.Library.Container.Container;
-import net.ME1312.Galaxi.Library.Container.Value;
 import net.ME1312.Galaxi.Library.Container.Pair;
+import net.ME1312.Galaxi.Library.Container.Value;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
+import net.ME1312.SubServers.Client.Bukkit.SubPlugin;
 import net.ME1312.SubServers.Client.Common.Network.API.Host;
 import net.ME1312.SubServers.Client.Common.Network.API.SubServer;
-import net.ME1312.SubServers.Client.Bukkit.SubPlugin;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;

@@ -7,8 +7,8 @@ import net.ME1312.Galaxi.Library.Callback.Callback;
 import net.ME1312.Galaxi.Library.Callback.ReturnRunnable;
 import net.ME1312.Galaxi.Library.Container.Container;
 import net.ME1312.Galaxi.Library.Container.Pair;
-import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Container.Value;
+import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.Galaxi.Plugin.Command.Command;
@@ -16,13 +16,13 @@ import net.ME1312.Galaxi.Plugin.Command.CommandSender;
 import net.ME1312.Galaxi.Plugin.Command.CompletionHandler;
 import net.ME1312.SubData.Client.SubDataClient;
 import net.ME1312.SubServers.Client.Common.Network.API.*;
-import net.ME1312.SubServers.Client.Common.Network.Packet.*;
+import net.ME1312.SubServers.Client.Common.Network.Packet.PacketCreateServer;
+import net.ME1312.SubServers.Client.Common.Network.Packet.PacketUpdateServer;
 import net.ME1312.SubServers.Host.Library.TextColor;
-import net.ME1312.SubServers.Host.Network.Packet.*;
+import net.ME1312.SubServers.Host.Network.Packet.PacketInExRunEvent;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -190,8 +190,8 @@ public class SubCommand {
                         Runnable getPlayer = () -> host.api.getRemotePlayer(name, player -> {
                             if (player != null) {
                                 sender.sendMessage("Info on player: " + TextColor.WHITE + player.getName());
-                                if (player.getProxy() != null) sender.sendMessage(" -> Proxy: " + TextColor.WHITE + player.getProxy());
-                                if (player.getServer() != null) sender.sendMessage(" -> Server: " + TextColor.WHITE + player.getServer());
+                                if (player.getProxyName() != null) sender.sendMessage(" -> Proxy: " + TextColor.WHITE + player.getProxyName());
+                                if (player.getServerName() != null) sender.sendMessage(" -> Server: " + TextColor.WHITE + player.getServerName());
                                 if (player.getAddress() != null) sender.sendMessage(" -> Address: " + TextColor.WHITE + player.getAddress().getAddress().getHostAddress() + ':' + player.getAddress().getPort());
                                 sender.sendMessage(" -> UUID: " + TextColor.AQUA + player.getUniqueId());
                             } else {

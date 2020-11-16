@@ -1,7 +1,7 @@
 package net.ME1312.SubServers.Bungee.Library.Compatibility;
 
 import net.ME1312.Galaxi.Library.Util;
-import net.md_5.bungee.api.ProxyServer;
+import net.ME1312.SubServers.Bungee.BungeeCommon;
 
 import java.util.HashMap;
 import java.util.logging.Handler;
@@ -34,7 +34,7 @@ public class Logger {
                     @Override
                     public void publish(LogRecord record) {
                         if (open)
-                            ProxyServer.getInstance().getLogger().log(record.getLevel(), prefix + " > " + record.getMessage(), record.getParameters());
+                            BungeeCommon.getInstance().getLogger().log(record.getLevel(), prefix + " > " + record.getMessage(), record.getParameters());
                     }
 
                     @Override

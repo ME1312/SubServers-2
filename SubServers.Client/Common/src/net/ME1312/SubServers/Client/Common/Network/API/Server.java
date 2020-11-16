@@ -10,9 +10,9 @@ import net.ME1312.SubData.Client.DataSender;
 import net.ME1312.SubData.Client.Library.ForwardedDataSender;
 import net.ME1312.SubData.Client.SubDataClient;
 import net.ME1312.SubData.Client.SubDataSender;
+import net.ME1312.SubServers.Client.Common.ClientAPI;
 import net.ME1312.SubServers.Client.Common.Network.Packet.PacketDownloadPlayerInfo;
 import net.ME1312.SubServers.Client.Common.Network.Packet.PacketDownloadServerInfo;
-import net.ME1312.SubServers.Client.Common.ClientAPI;
 
 import java.lang.reflect.InvocationTargetException;
 import java.net.InetSocketAddress;

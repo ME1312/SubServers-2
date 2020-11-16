@@ -1,15 +1,16 @@
 package net.ME1312.SubServers.Client.Bukkit.Library.Compatibility;
 
+import net.ME1312.Galaxi.Library.Map.ObjectMap;
+import net.ME1312.Galaxi.Library.Util;
+import net.ME1312.SubServers.Client.Bukkit.Event.*;
+import net.ME1312.SubServers.Client.Bukkit.SubAPI;
+import net.ME1312.SubServers.Client.Bukkit.SubPlugin;
+import net.ME1312.SubServers.Client.Common.Network.API.*;
+
 import me.clip.placeholderapi.PlaceholderAPI;
 import me.clip.placeholderapi.expansion.Cacheable;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import me.clip.placeholderapi.expansion.Taskable;
-import net.ME1312.Galaxi.Library.Map.ObjectMap;
-import net.ME1312.Galaxi.Library.Util;
-import net.ME1312.SubServers.Client.Common.Network.API.*;
-import net.ME1312.SubServers.Client.Bukkit.Event.*;
-import net.ME1312.SubServers.Client.Bukkit.SubAPI;
-import net.ME1312.SubServers.Client.Bukkit.SubPlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;

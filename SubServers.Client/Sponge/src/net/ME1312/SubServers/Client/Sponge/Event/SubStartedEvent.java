@@ -2,6 +2,7 @@ package net.ME1312.SubServers.Client.Sponge.Event;
 
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubServers.Client.Sponge.Library.SubEvent;
+
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.impl.AbstractEvent;
 

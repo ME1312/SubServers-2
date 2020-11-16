@@ -1,35 +1,36 @@
 package net.ME1312.SubServers.Sync;
 
-import com.dosse.upnp.UPnP;
-import com.google.gson.Gson;
+import net.ME1312.Galaxi.Library.Config.YAMLConfig;
 import net.ME1312.Galaxi.Library.Container.Container;
+import net.ME1312.Galaxi.Library.Container.Pair;
+import net.ME1312.Galaxi.Library.Map.ObjectMap;
+import net.ME1312.Galaxi.Library.UniversalFile;
+import net.ME1312.Galaxi.Library.Util;
+import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubData.Client.DataClient;
 import net.ME1312.SubData.Client.Encryption.AES;
 import net.ME1312.SubData.Client.Encryption.DHE;
 import net.ME1312.SubData.Client.Encryption.RSA;
 import net.ME1312.SubData.Client.Library.DataSize;
 import net.ME1312.SubData.Client.Library.DisconnectReason;
+import net.ME1312.SubData.Client.SubDataClient;
 import net.ME1312.SubServers.Bungee.BungeeCommon;
 import net.ME1312.SubServers.Bungee.Library.Compatibility.Galaxi.GalaxiCommand;
 import net.ME1312.SubServers.Bungee.Library.Compatibility.Logger;
 import net.ME1312.SubServers.Bungee.Library.Fallback.SmartFallback;
 import net.ME1312.SubServers.Sync.Event.*;
-import net.ME1312.Galaxi.Library.Config.YAMLConfig;
-import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.SubServers.Sync.Library.Compatibility.Plugin;
-import net.ME1312.SubServers.Sync.Library.Metrics;
-import net.ME1312.Galaxi.Library.Container.Pair;
-import net.ME1312.Galaxi.Library.UniversalFile;
-import net.ME1312.Galaxi.Library.Util;
-import net.ME1312.Galaxi.Library.Version.Version;
-import net.ME1312.SubData.Client.SubDataClient;
 import net.ME1312.SubServers.Sync.Library.ConfigUpdater;
-import net.ME1312.SubServers.Sync.Server.CachedPlayer;
+import net.ME1312.SubServers.Sync.Library.Metrics;
 import net.ME1312.SubServers.Sync.Network.Packet.PacketDisconnectPlayer;
 import net.ME1312.SubServers.Sync.Network.Packet.PacketExSyncPlayer;
 import net.ME1312.SubServers.Sync.Network.SubProtocol;
+import net.ME1312.SubServers.Sync.Server.CachedPlayer;
 import net.ME1312.SubServers.Sync.Server.ServerImpl;
 import net.ME1312.SubServers.Sync.Server.SubServerImpl;
+
+import com.dosse.upnp.UPnP;
+import com.google.gson.Gson;
 import net.md_5.bungee.BungeeServerInfo;
 import net.md_5.bungee.UserConnection;
 import net.md_5.bungee.api.ChatColor;
@@ -273,7 +274,7 @@ public final class ExProxy extends BungeeCommon implements Listener {
                             for (ProxiedPlayer player : getPlayers()) {
                                 if (!rPlayers.containsKey(player.getUniqueId())) { // Add players that don't exist
                                     CachedPlayer p = new CachedPlayer(player);
-                                    rPlayerLinkP.put(player.getUniqueId(), p.getProxy().toLowerCase());
+                                    rPlayerLinkP.put(player.getUniqueId(), p.getProxyName().toLowerCase());
                                     rPlayers.put(player.getUniqueId(), p);
                                     if (player.getServer().getInfo() instanceof ServerImpl) rPlayerLinkS.put(player.getUniqueId(), (ServerImpl) player.getServer().getInfo());
                                     add.add(p);
@@ -454,7 +455,7 @@ public final class ExProxy extends BungeeCommon implements Listener {
         if (rPlayers.containsKey(e.getConnection().getUniqueId())) {
             Logger.get("SubServers").warning(e.getConnection().getName() + " connected, but already had a database entry");
             CachedPlayer player = rPlayers.get(e.getConnection().getUniqueId());
-            if (player.getProxy() != null && player.getProxy().equalsIgnoreCase(api.getName())) {
+            if (player.getProxyName() != null && player.getProxyName().equalsIgnoreCase(api.getName())) {
                 ProxiedPlayer p = getPlayer(player.getUniqueId());
                 if (p != null) p.disconnect(new TextComponent(getTranslation("already_connected_proxy")));
             } else {
@@ -515,7 +516,7 @@ public final class ExProxy extends BungeeCommon implements Listener {
                 ObjectMap<String> raw = CachedPlayer.translate(e.getPlayer());
                 raw.set("server", e.getServer().getInfo().getName());
                 CachedPlayer player = new CachedPlayer(raw);
-                rPlayerLinkP.put(player.getUniqueId(), player.getProxy().toLowerCase());
+                rPlayerLinkP.put(player.getUniqueId(), player.getProxyName().toLowerCase());
                 rPlayers.put(player.getUniqueId(), player);
                 if (e.getServer().getInfo() instanceof ServerImpl) rPlayerLinkS.put(player.getUniqueId(), (ServerImpl) e.getServer().getInfo());
                 if (api.getSubDataNetwork()[0] != null) {

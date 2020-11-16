@@ -1,23 +1,26 @@
 package net.ME1312.SubServers.Client.Sponge;
 
-import com.google.gson.Gson;
 import net.ME1312.Galaxi.Library.AsyncConsolidator;
+import net.ME1312.Galaxi.Library.Callback.Callback;
 import net.ME1312.Galaxi.Library.Container.ContainedPair;
 import net.ME1312.Galaxi.Library.Container.Container;
 import net.ME1312.Galaxi.Library.Container.Pair;
-import net.ME1312.Galaxi.Library.Platform;
-import net.ME1312.SubData.Client.SubDataClient;
-import net.ME1312.SubServers.Client.Sponge.Graphic.UIRenderer;
-import net.ME1312.Galaxi.Library.Callback.Callback;
-import net.ME1312.SubServers.Client.Sponge.Library.Compatibility.ChatColor;
-import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Container.Value;
+import net.ME1312.Galaxi.Library.Map.ObjectMap;
+import net.ME1312.Galaxi.Library.Platform;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
-import net.ME1312.SubServers.Client.Sponge.Library.Compatibility.ListArgument;
+import net.ME1312.SubData.Client.SubDataClient;
 import net.ME1312.SubServers.Client.Common.Network.API.*;
-import net.ME1312.SubServers.Client.Common.Network.Packet.*;
-import net.ME1312.SubServers.Client.Sponge.Network.Packet.*;
+import net.ME1312.SubServers.Client.Common.Network.Packet.PacketCreateServer;
+import net.ME1312.SubServers.Client.Common.Network.Packet.PacketRestartServer;
+import net.ME1312.SubServers.Client.Common.Network.Packet.PacketUpdateServer;
+import net.ME1312.SubServers.Client.Sponge.Graphic.UIRenderer;
+import net.ME1312.SubServers.Client.Sponge.Library.Compatibility.ChatColor;
+import net.ME1312.SubServers.Client.Sponge.Library.Compatibility.ListArgument;
+import net.ME1312.SubServers.Client.Sponge.Network.Packet.PacketInExRunEvent;
+
+import com.google.gson.Gson;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
@@ -43,7 +46,7 @@ import java.text.DecimalFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
-import static net.ME1312.SubServers.Client.Sponge.Library.ObjectPermission.*;
+import static net.ME1312.SubServers.Client.Sponge.Library.ObjectPermission.permits;
 
 public final class SubCommand implements CommandExecutor {
     private SubPlugin plugin;
@@ -491,8 +494,8 @@ public final class SubCommand implements CommandExecutor {
                     Runnable getPlayer = () -> plugin.api.getRemotePlayer(name, player -> {
                         if (player != null) {
                             sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", "Command.Info").replace("$str$", "player")).toBuilder().append(Text.builder(player.getName()).color(TextColors.WHITE).build()).build());
-                            if (player.getProxy() != null) sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Proxy")).toBuilder().append(Text.builder(player.getProxy()).color(TextColors.WHITE).build()).build());
-                            if (player.getServer() != null) sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Server")).toBuilder().append(Text.builder(player.getServer()).color(TextColors.WHITE).build()).build());
+                            if (player.getProxyName() != null) sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Proxy")).toBuilder().append(Text.builder(player.getProxyName()).color(TextColors.WHITE).build()).build());
+                            if (player.getServerName() != null) sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Server")).toBuilder().append(Text.builder(player.getServerName()).color(TextColors.WHITE).build()).build());
                             if (player.getAddress() != null && plugin.config.get().getMap("Settings").getBoolean("Show-Addresses", false))
                                 sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Address")).toBuilder().append(Text.builder(player.getAddress().getAddress().getHostAddress() + ':' + player.getAddress().getPort()).color(TextColors.WHITE).build()).build());
                             sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "UUID")).toBuilder().append(Text.builder(player.getUniqueId().toString()).color(TextColors.AQUA).build()).build());

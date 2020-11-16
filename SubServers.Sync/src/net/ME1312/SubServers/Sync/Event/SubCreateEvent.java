@@ -1,11 +1,12 @@
 package net.ME1312.SubServers.Sync.Event;
 
 import net.ME1312.Galaxi.Library.Callback.Callback;
-import net.ME1312.SubServers.Sync.Library.SubEvent;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubServers.Client.Common.Network.API.SubServer;
+import net.ME1312.SubServers.Sync.Library.SubEvent;
 import net.ME1312.SubServers.Sync.SubAPI;
+
 import net.md_5.bungee.api.plugin.Event;
 
 import java.lang.reflect.InvocationTargetException;

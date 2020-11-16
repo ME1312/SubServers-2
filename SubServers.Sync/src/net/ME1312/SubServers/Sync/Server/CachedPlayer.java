@@ -3,6 +3,9 @@ package net.ME1312.SubServers.Sync.Server;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.SubServers.Client.Common.Network.API.RemotePlayer;
 import net.ME1312.SubServers.Sync.SubAPI;
+
+import net.md_5.bungee.api.ProxyServer;
+import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 /**
@@ -54,14 +57,9 @@ public class CachedPlayer extends RemotePlayer implements net.ME1312.SubServers.
         super(raw);
     }
 
-
     @Override
-    public String getProxyName() {
-        return getProxy();
-    }
-
-    @Override
-    public String getServerName() {
-        return getServer();
+    public ServerInfo getServer() {
+        String name = getServerName();
+        return (name == null)? null : ProxyServer.getInstance().getServerInfo(name);
     }
 }

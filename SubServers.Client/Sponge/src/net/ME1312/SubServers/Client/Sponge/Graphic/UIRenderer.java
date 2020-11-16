@@ -2,14 +2,15 @@ package net.ME1312.SubServers.Client.Sponge.Graphic;
 
 import net.ME1312.Galaxi.Library.Container.ContainedPair;
 import net.ME1312.Galaxi.Library.Container.Container;
-import net.ME1312.SubServers.Client.Sponge.Library.Compatibility.ChatColor;
-import net.ME1312.Galaxi.Library.Container.Value;
 import net.ME1312.Galaxi.Library.Container.Pair;
+import net.ME1312.Galaxi.Library.Container.Value;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubServers.Client.Common.Network.API.Host;
 import net.ME1312.SubServers.Client.Common.Network.API.SubServer;
+import net.ME1312.SubServers.Client.Sponge.Library.Compatibility.ChatColor;
 import net.ME1312.SubServers.Client.Sponge.SubPlugin;
+
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.ItemTypes;

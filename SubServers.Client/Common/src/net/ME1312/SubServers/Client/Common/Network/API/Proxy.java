@@ -11,9 +11,9 @@ import net.ME1312.SubData.Client.DataSender;
 import net.ME1312.SubData.Client.Library.ForwardedDataSender;
 import net.ME1312.SubData.Client.SubDataClient;
 import net.ME1312.SubData.Client.SubDataSender;
+import net.ME1312.SubServers.Client.Common.ClientAPI;
 import net.ME1312.SubServers.Client.Common.Network.Packet.PacketDownloadPlayerInfo;
 import net.ME1312.SubServers.Client.Common.Network.Packet.PacketDownloadProxyInfo;
-import net.ME1312.SubServers.Client.Common.ClientAPI;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
@@ -113,7 +113,7 @@ public class Proxy {
     }
 
     /**
-     * Get the players on this proxy (via RedisBungee)
+     * Get the players on this proxy
      *
      * @return Remote Player Collection
      */
@@ -126,7 +126,7 @@ public class Proxy {
     }
 
     /**
-     * Get the players on this proxy (via RedisBungee)
+     * Get the players on this proxy
      *
      * @param callback Remote Player Collection
      */

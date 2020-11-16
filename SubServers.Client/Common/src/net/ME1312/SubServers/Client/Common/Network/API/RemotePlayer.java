@@ -5,8 +5,8 @@ import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubData.Client.DataClient;
 import net.ME1312.SubData.Client.SubDataClient;
-import net.ME1312.SubServers.Client.Common.Network.Packet.PacketDownloadPlayerInfo;
 import net.ME1312.SubServers.Client.Common.ClientAPI;
+import net.ME1312.SubServers.Client.Common.Network.Packet.PacketDownloadPlayerInfo;
 
 import java.lang.reflect.InvocationTargetException;
 import java.net.InetSocketAddress;
@@ -80,7 +80,7 @@ public class RemotePlayer {
     /**
      * Get the unique name of this player.
      *
-     * @return the players username
+     * @return the player's username
      */
     public String getName() {
         return raw.getRawString("name");
@@ -100,7 +100,7 @@ public class RemotePlayer {
      *
      * @return the proxy this player is connected to
      */
-    public String getProxy() {
+    public String getProxyName() {
         return raw.getRawString("proxy");
     }
 
@@ -137,7 +137,7 @@ public class RemotePlayer {
      *
      * @return the server this player is connected to
      */
-    public String getServer() {
+    public String getServerName() {
         return raw.getRawString("server");
     }
 

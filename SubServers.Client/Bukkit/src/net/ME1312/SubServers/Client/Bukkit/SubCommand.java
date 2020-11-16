@@ -1,21 +1,24 @@
 package net.ME1312.SubServers.Client.Bukkit;
 
-import net.ME1312.Galaxi.Library.*;
-import net.ME1312.Galaxi.Library.Container.ContainedPair;
-import net.ME1312.Galaxi.Library.Container.Container;
-import net.ME1312.Galaxi.Library.Container.Value;
-import net.ME1312.Galaxi.Library.Container.Pair;
-import net.ME1312.Galaxi.Library.Map.ObjectMap;
-import net.ME1312.SubData.Client.SubDataClient;
-import net.ME1312.SubServers.Client.Bukkit.Graphic.UIRenderer;
+import net.ME1312.Galaxi.Library.AsyncConsolidator;
 import net.ME1312.Galaxi.Library.Callback.Callback;
 import net.ME1312.Galaxi.Library.Config.YAMLSection;
+import net.ME1312.Galaxi.Library.Container.ContainedPair;
+import net.ME1312.Galaxi.Library.Container.Container;
+import net.ME1312.Galaxi.Library.Container.Pair;
+import net.ME1312.Galaxi.Library.Container.Value;
+import net.ME1312.Galaxi.Library.Map.ObjectMap;
+import net.ME1312.Galaxi.Library.Platform;
+import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
+import net.ME1312.SubData.Client.SubDataClient;
+import net.ME1312.SubServers.Client.Bukkit.Graphic.UIRenderer;
+import net.ME1312.SubServers.Client.Bukkit.Network.Packet.PacketInExRunEvent;
 import net.ME1312.SubServers.Client.Common.Network.API.*;
 import net.ME1312.SubServers.Client.Common.Network.Packet.PacketCreateServer;
 import net.ME1312.SubServers.Client.Common.Network.Packet.PacketRestartServer;
 import net.ME1312.SubServers.Client.Common.Network.Packet.PacketUpdateServer;
-import net.ME1312.SubServers.Client.Bukkit.Network.Packet.*;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -30,7 +33,7 @@ import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.*;
 
-import static net.ME1312.SubServers.Client.Bukkit.Library.ObjectPermission.*;
+import static net.ME1312.SubServers.Client.Bukkit.Library.ObjectPermission.permits;
 
 public final class SubCommand extends BukkitCommand {
     private SubPlugin plugin;
@@ -200,8 +203,8 @@ public final class SubCommand extends BukkitCommand {
                             Runnable getPlayer = () -> plugin.api.getRemotePlayer(name, player -> {
                                 if (player != null) {
                                     sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info").replace("$str$", "player") + ChatColor.WHITE + player.getName());
-                                    if (player.getProxy() != null) sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Proxy") + ChatColor.WHITE + player.getProxy());
-                                    if (player.getServer() != null) sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Server") + ChatColor.WHITE + player.getServer());
+                                    if (player.getProxyName() != null) sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Proxy") + ChatColor.WHITE + player.getProxyName());
+                                    if (player.getServerName() != null) sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Server") + ChatColor.WHITE + player.getServerName());
                                     if (player.getAddress() != null && plugin.config.get().getMap("Settings").getBoolean("Show-Addresses", false))
                                         sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Address") + ChatColor.WHITE + player.getAddress().getAddress().getHostAddress() + ':' + player.getAddress().getPort());
                                     sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "UUID") + ChatColor.AQUA + player.getUniqueId());

@@ -1,15 +1,16 @@
 package net.ME1312.SubServers.Console;
 
+import net.ME1312.Galaxi.Library.Config.YAMLConfig;
 import net.ME1312.SubServers.Bungee.Event.SubCreateEvent;
 import net.ME1312.SubServers.Bungee.Event.SubSendCommandEvent;
 import net.ME1312.SubServers.Bungee.Event.SubStartEvent;
 import net.ME1312.SubServers.Bungee.Host.Host;
 import net.ME1312.SubServers.Bungee.Host.SubCreator;
 import net.ME1312.SubServers.Bungee.Host.SubServer;
-import net.ME1312.Galaxi.Library.Config.YAMLConfig;
 import net.ME1312.SubServers.Bungee.SubAPI;
 import net.ME1312.SubServers.Bungee.SubProxy;
 import net.ME1312.SubServers.Console.Library.Metrics;
+
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.event.EventHandler;

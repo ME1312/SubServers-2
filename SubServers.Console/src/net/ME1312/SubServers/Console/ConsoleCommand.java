@@ -4,6 +4,7 @@ import net.ME1312.Galaxi.Library.Callback.Callback;
 import net.ME1312.SubServers.Bungee.Host.Host;
 import net.ME1312.SubServers.Bungee.Host.SubServer;
 import net.ME1312.SubServers.Bungee.Library.Compatibility.Logger;
+
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;

@@ -6,12 +6,10 @@ import net.ME1312.SubData.Server.Protocol.PacketObjectIn;
 import net.ME1312.SubData.Server.Protocol.PacketObjectOut;
 import net.ME1312.SubData.Server.SubDataClient;
 import net.ME1312.SubServers.Bungee.Host.RemotePlayer;
-import net.ME1312.SubServers.Bungee.Host.Server;
-import net.ME1312.SubServers.Bungee.Host.SubServer;
 import net.ME1312.SubServers.Bungee.SubProxy;
+
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
-import java.util.Map;
 import java.util.UUID;
 
 /**

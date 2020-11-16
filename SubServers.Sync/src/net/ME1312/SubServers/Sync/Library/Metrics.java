@@ -1,8 +1,9 @@
 package net.ME1312.SubServers.Sync.Library;
 
+import net.ME1312.SubServers.Sync.ExProxy;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import net.ME1312.SubServers.Sync.ExProxy;
 import net.md_5.bungee.config.Configuration;
 import net.md_5.bungee.config.ConfigurationProvider;
 import net.md_5.bungee.config.YamlConfiguration;

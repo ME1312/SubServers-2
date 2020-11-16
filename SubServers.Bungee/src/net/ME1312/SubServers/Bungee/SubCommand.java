@@ -1,21 +1,22 @@
 package net.ME1312.SubServers.Bungee;
 
-import com.google.gson.Gson;
 import net.ME1312.Galaxi.Library.Callback.Callback;
 import net.ME1312.Galaxi.Library.Callback.ReturnRunnable;
 import net.ME1312.Galaxi.Library.Container.ContainedPair;
-import net.ME1312.Galaxi.Library.Platform;
-import net.ME1312.SubData.Server.SubDataClient;
-import net.ME1312.SubServers.Bungee.Host.*;
-import net.ME1312.SubServers.Bungee.Library.Compatibility.CommandX;
-import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Container.Pair;
+import net.ME1312.Galaxi.Library.Map.ObjectMap;
+import net.ME1312.Galaxi.Library.Platform;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubData.Server.ClientHandler;
+import net.ME1312.SubData.Server.SubDataClient;
+import net.ME1312.SubServers.Bungee.Host.*;
+import net.ME1312.SubServers.Bungee.Library.Compatibility.CommandX;
 import net.ME1312.SubServers.Bungee.Library.Compatibility.Galaxi.GalaxiInfo;
 import net.ME1312.SubServers.Bungee.Library.Compatibility.Logger;
 import net.ME1312.SubServers.Bungee.Network.Packet.PacketCheckPermission;
+
+import com.google.gson.Gson;
 import net.md_5.bungee.BungeeCord;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.CommandSender;
@@ -35,7 +36,8 @@ import java.nio.charset.Charset;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
-import static net.ME1312.SubServers.Bungee.Library.Compatibility.Galaxi.GalaxiCommand.*;
+import static net.ME1312.SubServers.Bungee.Library.Compatibility.Galaxi.GalaxiCommand.description;
+import static net.ME1312.SubServers.Bungee.Library.Compatibility.Galaxi.GalaxiCommand.help;
 
 /**
  * Plugin Command Class

@@ -1,19 +1,18 @@
 package net.ME1312.SubServers.Bungee.Host;
 
+import net.ME1312.Galaxi.Library.ExtraDataHandler;
+import net.ME1312.Galaxi.Library.Map.ObjectMap;
+import net.ME1312.Galaxi.Library.Map.ObjectMapValue;
+import net.ME1312.Galaxi.Library.Util;
+import net.ME1312.SubData.Server.ClientHandler;
 import net.ME1312.SubData.Server.DataClient;
 import net.ME1312.SubData.Server.SubDataClient;
 import net.ME1312.SubServers.Bungee.Event.SubRemoveProxyEvent;
-import net.ME1312.Galaxi.Library.Map.ObjectMap;
-import net.ME1312.Galaxi.Library.Map.ObjectMapValue;
-import net.ME1312.Galaxi.Library.ExtraDataHandler;
-import net.ME1312.Galaxi.Library.Container.Pair;
-import net.ME1312.Galaxi.Library.Util;
-import net.ME1312.SubData.Server.ClientHandler;
 import net.ME1312.SubServers.Bungee.Network.Packet.PacketExSyncPlayer;
 import net.ME1312.SubServers.Bungee.SubAPI;
 import net.ME1312.SubServers.Bungee.SubProxy;
+
 import net.md_5.bungee.api.ProxyServer;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 import java.util.*;
 
@@ -133,7 +132,7 @@ public class Proxy implements ClientHandler, ExtraDataHandler {
     }
 
     /**
-     * Get the players on this proxy (via RedisBungee)
+     * Get the players on this proxy
      *
      * @return Remote Player Collection
      */

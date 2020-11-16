@@ -6,8 +6,8 @@ import net.ME1312.Galaxi.Library.Container.Pair;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubData.Client.DataClient;
 import net.ME1312.SubData.Client.SubDataClient;
-import net.ME1312.SubServers.Client.Common.Network.Packet.*;
 import net.ME1312.SubServers.Client.Common.ClientAPI;
+import net.ME1312.SubServers.Client.Common.Network.Packet.*;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;

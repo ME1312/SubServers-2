@@ -1,10 +1,10 @@
 package net.ME1312.SubServers.Host.Event;
 
 import net.ME1312.Galaxi.Library.Container.ContainedPair;
+import net.ME1312.Galaxi.Library.Container.Pair;
+import net.ME1312.Galaxi.Library.Event.Event;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Map.ObjectMapValue;
-import net.ME1312.Galaxi.Library.Event.Event;
-import net.ME1312.Galaxi.Library.Container.Pair;
 import net.ME1312.Galaxi.Library.Util;
 
 import java.util.UUID;
