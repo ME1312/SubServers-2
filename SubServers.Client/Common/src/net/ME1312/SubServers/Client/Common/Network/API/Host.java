@@ -163,8 +163,8 @@ public class Host {
      */
     public Collection<Pair<String, UUID>> getRemotePlayers() {
         List<Pair<String, UUID>> players = new ArrayList<Pair<String, UUID>>();
-        for (String id : raw.getMap("players").getKeys()) {
-            players.add(new ContainedPair<String, UUID>(raw.getMap("players").getRawString(id), UUID.fromString(id)));
+        for (SubServer server : getSubServers().values()) {
+            players.addAll(server.getRemotePlayers());
         }
         return players;
     }
