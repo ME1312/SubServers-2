@@ -129,10 +129,12 @@ public class PacketLinkServer implements InitialPacket, PacketObjectIn<Integer>,
             };
 
             final long now = Calendar.getInstance().getTime().getTime();
-            new Timer("SubServers.Bungee::Server_Linker(" + server.getName() + ")").schedule(new TimerTask() {
+            Timer timer = new Timer("SubServers.Bungee::Server_Linker(" + server.getName() + ")");
+            timer.schedule(new TimerTask() {
                 @Override
                 public void run() {
                     register.run();
+                    timer.cancel();
                 }
             }, ((server instanceof SubServer && !((SubServer) server).isRunning()) ? TimeUnit.SECONDS.toMillis(5) : 0) + ((now - last < 500) ? (req * 500) : 0));
 

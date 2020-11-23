@@ -85,11 +85,13 @@ public class PacketLinkExHost implements InitialPacket, PacketObjectIn<Integer>,
 
     private void queue(String name, Runnable action) {
         final long now = Calendar.getInstance().getTime().getTime();
-        new Timer("SubServers.Bungee::ExHost_Linker(" + name + ")").schedule(new TimerTask() {
+        Timer timer = new Timer("SubServers.Bungee::ExHost_Linker(" + name + ")");
+        timer.schedule(new TimerTask() {
             @Override
             public void run() {
                 action.run();
                 --req;
+                timer.cancel();
             }
         }, (now - last < 500) ? (req * 500) : 0);
 

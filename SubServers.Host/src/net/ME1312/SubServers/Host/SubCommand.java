@@ -544,11 +544,13 @@ public class SubCommand {
                                                 PacketInExRunEvent.callback("SubStoppedEvent", this);
                                                 String name = json.getString("server").toLowerCase();
                                                 if (listening.keySet().contains(name)) {
-                                                    new Timer("SubServers.Sync::Server_Restart_Command_Handler(" + name + ")").schedule(new TimerTask() {
+                                                    Timer timer = new Timer("SubServers.Host::Server_Restart_Command_Handler(" + name + ")");
+                                                    timer.schedule(new TimerTask() {
                                                         @Override
                                                         public void run() {
                                                             starter.run(listening.get(name));
                                                             listening.remove(name);
+                                                            timer.cancel();
                                                         }
                                                     }, 100);
                                                 }

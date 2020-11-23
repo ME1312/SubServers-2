@@ -992,15 +992,19 @@ public final class SubProxy extends BungeeCommon implements Listener {
             }
 
 
-            if (fallbackLimbo.keySet().contains(e.getPlayer().getUniqueId())) new Timer("SubServers.Bungee::Fallback_Limbo_Timer(" + e.getPlayer().getUniqueId() + ')').schedule(new TimerTask() {
-                @Override
-                public void run() {
-                    if (e.getPlayer().getServer() != null && !((UserConnection) e.getPlayer()).isDimensionChange() && e.getPlayer().getServer().getInfo().getAddress().equals(e.getServer().getInfo().getAddress())) {
-                        fallbackLimbo.remove(e.getPlayer().getUniqueId());
-                        e.getPlayer().sendMessage(api.getLang("SubServers", "Bungee.Feature.Smart-Fallback.Result").replace("$str$", (e.getServer().getInfo() instanceof Server)?((Server) e.getServer().getInfo()).getDisplayName():e.getServer().getInfo().getName()));
+            if (fallbackLimbo.keySet().contains(e.getPlayer().getUniqueId())) {
+                Timer timer = new Timer("SubServers.Bungee::Fallback_Limbo_Timer(" + e.getPlayer().getUniqueId() + ')');
+                timer.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        if (e.getPlayer().getServer() != null && !((UserConnection) e.getPlayer()).isDimensionChange() && e.getPlayer().getServer().getInfo().getAddress().equals(e.getServer().getInfo().getAddress())) {
+                            fallbackLimbo.remove(e.getPlayer().getUniqueId());
+                            e.getPlayer().sendMessage(api.getLang("SubServers", "Bungee.Feature.Smart-Fallback.Result").replace("$str$", (e.getServer().getInfo() instanceof Server)?((Server) e.getServer().getInfo()).getDisplayName():e.getServer().getInfo().getName()));
+                        }
+                        timer.cancel();
                     }
-                }
-            }, 1000);
+                }, 1000);
+            }
         }
     }
 
