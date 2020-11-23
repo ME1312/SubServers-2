@@ -26,7 +26,7 @@
         <dependency>
             <groupId>net.ME1312.SubData</groupId>
             <artifactId>Client</artifactId>
-            <version>20w48a</version>
+            <version>20w48b</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
