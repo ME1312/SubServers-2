@@ -25,7 +25,7 @@ public class PacketInExReload implements PacketObjectIn<Integer> {
     @Override
     public void receive(SubDataSender client, ObjectMap<Integer> data) {
         if (data != null && data.contains(0x0000)) Bukkit.getLogger().warning("SubData > Received request for a plugin reload: " + data.getString(0x0000));
-        else Bukkit.getLogger().warning("SubData > Received request for a plugin reload");
+     // else Bukkit.getLogger().warning("SubData > Received request for a plugin reload");
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
             try {
                 plugin.reload(true);

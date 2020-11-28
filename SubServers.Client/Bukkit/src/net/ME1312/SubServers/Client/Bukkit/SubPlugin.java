@@ -85,12 +85,38 @@ public final class SubPlugin extends JavaPlugin {
             }
 
             getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
+            reload(false);
+
+            subdata.put(0, null);
             subprotocol = SubProtocol.get();
             subprotocol.registerCipher("DHE", DHE.get(128));
             subprotocol.registerCipher("DHE-128", DHE.get(128));
             subprotocol.registerCipher("DHE-192", DHE.get(192));
             subprotocol.registerCipher("DHE-256", DHE.get(256));
-            reload(false);
+            subprotocol.setBlockSize(config.get().getMap("Settings").getMap("SubData").getLong("Block-Size", (long) DataSize.MB));
+            api.name = config.get().getMap("Settings").getMap("SubData").getString("Name", System.getenv("name"));
+
+            if (config.get().getMap("Settings").getMap("SubData").getRawString("Password", "").length() > 0) {
+                subprotocol.registerCipher("AES", new AES(128, config.get().getMap("Settings").getMap("SubData").getRawString("Password")));
+                subprotocol.registerCipher("AES-128", new AES(128, config.get().getMap("Settings").getMap("SubData").getRawString("Password")));
+                subprotocol.registerCipher("AES-192", new AES(192, config.get().getMap("Settings").getMap("SubData").getRawString("Password")));
+                subprotocol.registerCipher("AES-256", new AES(256, config.get().getMap("Settings").getMap("SubData").getRawString("Password")));
+
+                System.out.println("SubData > AES Encryption Available");
+            }
+            if (new UniversalFile(getDataFolder(), "subdata.rsa.key").exists()) {
+                try {
+                    subprotocol.registerCipher("RSA", new RSA(new UniversalFile(getDataFolder(), "subdata.rsa.key")));
+                    System.out.println("SubData > RSA Encryption Available");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+            reconnect = true;
+            System.out.println("SubData > ");
+            System.out.println("SubData > Connecting to /" + config.get().getMap("Settings").getMap("SubData").getRawString("Address", "127.0.0.1:4391"));
+            connect(null);
 
             if (!config.get().getMap("Settings").getBoolean("API-Only-Mode", false)) {
                 CommandMap cmd = Util.reflect(Bukkit.getServer().getClass().getDeclaredField("commandMap"), Bukkit.getServer());
@@ -130,50 +156,10 @@ public final class SubPlugin extends JavaPlugin {
     }
 
     public void reload(boolean notifyPlugins) throws IOException {
-        reconnect = false;
         resetDate = Calendar.getInstance().getTime().getTime();
-        ArrayList<SubDataClient> tmp = new ArrayList<SubDataClient>();
-        tmp.addAll(subdata.values());
-        for (SubDataClient client : tmp) if (client != null) {
-            client.close();
-            Util.isException(client::waitFor);
-        }
-        subdata.clear();
-        subdata.put(0, null);
 
         ConfigUpdater.updateConfig(new UniversalFile(getDataFolder(), "config.yml"));
         config.reload();
-
-        subprotocol.unregisterCipher("AES");
-        subprotocol.unregisterCipher("AES-128");
-        subprotocol.unregisterCipher("AES-192");
-        subprotocol.unregisterCipher("AES-256");
-        subprotocol.unregisterCipher("RSA");
-
-        subprotocol.setBlockSize(config.get().getMap("Settings").getMap("SubData").getLong("Block-Size", (long) DataSize.MB));
-        api.name = config.get().getMap("Settings").getMap("SubData").getString("Name", System.getenv("name"));
-
-        if (config.get().getMap("Settings").getMap("SubData").getRawString("Password", "").length() > 0) {
-            subprotocol.registerCipher("AES", new AES(128, config.get().getMap("Settings").getMap("SubData").getRawString("Password")));
-            subprotocol.registerCipher("AES-128", new AES(128, config.get().getMap("Settings").getMap("SubData").getRawString("Password")));
-            subprotocol.registerCipher("AES-192", new AES(192, config.get().getMap("Settings").getMap("SubData").getRawString("Password")));
-            subprotocol.registerCipher("AES-256", new AES(256, config.get().getMap("Settings").getMap("SubData").getRawString("Password")));
-
-            System.out.println("SubData > AES Encryption Available");
-        }
-        if (new UniversalFile(getDataFolder(), "subdata.rsa.key").exists()) {
-            try {
-                subprotocol.registerCipher("RSA", new RSA(new UniversalFile(getDataFolder(), "subdata.rsa.key")));
-                System.out.println("SubData > RSA Encryption Available");
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-
-        reconnect = true;
-        System.out.println("SubData > ");
-        System.out.println("SubData > Connecting to /" + config.get().getMap("Settings").getMap("SubData").getRawString("Address", "127.0.0.1:4391"));
-        connect(null);
 
         if (notifyPlugins) {
             List<Runnable> listeners = api.reloadListeners;

@@ -170,17 +170,44 @@ public final class ExHost {
             Util.reflect(SubLoggerImpl.class.getDeclaredField("logn"), null, config.get().getMap("Settings").getBoolean("Network-Log", true));
             Util.reflect(SubLoggerImpl.class.getDeclaredField("logc"), null, config.get().getMap("Settings").getBoolean("Console-Log", true));
 
+            loadDefaults();
             engine.getPluginManager().loadPlugins(new UniversalFile(engine.getRuntimeDirectory(), "Plugins"));
 
             running = true;
             creator = new SubCreatorImpl(this);
+            reload(false);
+
+            subdata.put(0, null);
             subprotocol = SubProtocol.get();
             subprotocol.registerCipher("DHE", DHE.get(128));
             subprotocol.registerCipher("DHE-128", DHE.get(128));
             subprotocol.registerCipher("DHE-192", DHE.get(192));
             subprotocol.registerCipher("DHE-256", DHE.get(256));
-            loadDefaults();
-            reload(false);
+            subprotocol.setBlockSize(config.get().getMap("Settings").getMap("SubData").getLong("Block-Size", (long) DataSize.MB));
+            api.name = config.get().getMap("Settings").getMap("SubData").getString("Name", null);
+            Logger log = new Logger("SubData");
+
+            if (config.get().getMap("Settings").getMap("SubData").getRawString("Password", "").length() > 0) {
+                subprotocol.registerCipher("AES", new AES(128, config.get().getMap("Settings").getMap("SubData").getRawString("Password")));
+                subprotocol.registerCipher("AES-128", new AES(128, config.get().getMap("Settings").getMap("SubData").getRawString("Password")));
+                subprotocol.registerCipher("AES-192", new AES(192, config.get().getMap("Settings").getMap("SubData").getRawString("Password")));
+                subprotocol.registerCipher("AES-256", new AES(256, config.get().getMap("Settings").getMap("SubData").getRawString("Password")));
+
+                log.info.println("AES Encryption Available");
+            }
+            if (new UniversalFile(engine.getRuntimeDirectory(), "subdata.rsa.key").exists()) {
+                try {
+                    subprotocol.registerCipher("RSA", new RSA(new UniversalFile(engine.getRuntimeDirectory(), "subdata.rsa.key")));
+                    log.info.println("RSA Encryption Available");
+                } catch (Exception e) {
+                    log.error.println(e);
+                }
+            }
+
+            reconnect = true;
+            log.info.println();
+            log.info.println("Connecting to /" + config.get().getMap("Settings").getMap("SubData").getRawString("Address", "127.0.0.1:4391"));
+            connect(log.toPrimitive(), null);
 
             new Metrics(this);
             info.setUpdateChecker(() -> {
@@ -224,51 +251,10 @@ public final class ExHost {
 
     public void reload(boolean notifyPlugins) throws IOException {
         resetDate = Calendar.getInstance().getTime().getTime();
-        reconnect = false;
-        ArrayList<SubDataClient> tmp = new ArrayList<SubDataClient>();
-        tmp.addAll(subdata.values());
-        for (SubDataClient client : tmp) if (client != null) {
-            client.close();
-            Util.isException(client::waitFor);
-        }
-        subdata.clear();
-        subdata.put(0, null);
 
         ConfigUpdater.updateConfig(new UniversalFile(engine.getRuntimeDirectory(), "config.yml"));
         config.reload();
         creator.load(false);
-
-        subprotocol.unregisterCipher("AES");
-        subprotocol.unregisterCipher("AES-128");
-        subprotocol.unregisterCipher("AES-192");
-        subprotocol.unregisterCipher("AES-256");
-        subprotocol.unregisterCipher("RSA");
-
-        subprotocol.setBlockSize(config.get().getMap("Settings").getMap("SubData").getLong("Block-Size", (long) DataSize.MB));
-        api.name = config.get().getMap("Settings").getMap("SubData").getString("Name", null);
-        Logger log = new Logger("SubData");
-
-        if (config.get().getMap("Settings").getMap("SubData").getRawString("Password", "").length() > 0) {
-            subprotocol.registerCipher("AES", new AES(128, config.get().getMap("Settings").getMap("SubData").getRawString("Password")));
-            subprotocol.registerCipher("AES-128", new AES(128, config.get().getMap("Settings").getMap("SubData").getRawString("Password")));
-            subprotocol.registerCipher("AES-192", new AES(192, config.get().getMap("Settings").getMap("SubData").getRawString("Password")));
-            subprotocol.registerCipher("AES-256", new AES(256, config.get().getMap("Settings").getMap("SubData").getRawString("Password")));
-
-            log.info.println("AES Encryption Available");
-        }
-        if (new UniversalFile(engine.getRuntimeDirectory(), "subdata.rsa.key").exists()) {
-            try {
-                subprotocol.registerCipher("RSA", new RSA(new UniversalFile(engine.getRuntimeDirectory(), "subdata.rsa.key")));
-                log.info.println("RSA Encryption Available");
-            } catch (Exception e) {
-                log.error.println(e);
-            }
-        }
-
-        reconnect = true;
-        log.info.println();
-        log.info.println("Connecting to /" + config.get().getMap("Settings").getMap("SubData").getRawString("Address", "127.0.0.1:4391"));
-        connect(log.toPrimitive(), null);
 
         if (notifyPlugins) {
             engine.getPluginManager().executeEvent(new GalaxiReloadEvent(engine));
@@ -280,7 +266,7 @@ public final class ExHost {
         if (disconnect == null || (this.reconnect && reconnect > 0 && disconnect.key() != DisconnectReason.PROTOCOL_MISMATCH && disconnect.key() != DisconnectReason.ENCRYPTION_MISMATCH)) {
             long reset = resetDate;
             Timer timer = new Timer(SubAPI.getInstance().getAppInfo().getName() + "::SubData_Reconnect_Handler");
-            if (disconnect != null) ;
+            if (disconnect != null) log.info("Attempting reconnect in " + reconnect + " seconds");
             timer.scheduleAtFixedRate(new TimerTask() {
                 @Override
                 public void run() {

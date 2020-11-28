@@ -30,7 +30,7 @@ public class PacketInExReload implements PacketObjectIn<Integer> {
     public void receive(SubDataSender client, ObjectMap<Integer> data) {
         Logger log = Util.getDespiteException(() -> Util.reflect(SubDataClient.class.getDeclaredField("log"), client.getConnection()), null);
         if (data != null && data.contains(0x0000)) log.warning("Received request for a plugin reload: " + data.getString(0x0000));
-        else log.warning("Received request for a plugin reload");
+     // else log.warning("Received request for a plugin reload");
         Sponge.getScheduler().createTaskBuilder().async().execute(() -> {
             try {
                 plugin.reload(true);
