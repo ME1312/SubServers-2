@@ -156,10 +156,20 @@ public class ReplacementScanner {
         String string = Util.readAll(new InputStreamReader(stream));
         stream.close();
 
-        for (Map.Entry<String, String> replacement : replacements.entrySet()) string = string.replace("SubServers::" + replacement.getKey(), replacement.getValue());
-        FileWriter writer = new FileWriter(file, false);
-        writer.write(string);
-        writer.close();
+        boolean update = false;
+        for (Map.Entry<String, String> replacement : replacements.entrySet()) {
+            String placeholder = "SubServers::" + replacement.getKey();
+            if (string.contains(placeholder)) {
+                string = string.replace(placeholder, replacement.getValue());
+                update = true;
+            }
+        }
+
+        if (update) {
+            FileWriter writer = new FileWriter(file, false);
+            writer.write(string);
+            writer.close();
+        }
     }
 
 

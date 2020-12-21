@@ -128,6 +128,7 @@ public final class SubCommand extends CommandX {
                             case "system":
                             case "bungee":
                             case "bungeecord":
+                            case "subdata":
                             case "network":
                                 plugin.getPluginManager().dispatchCommand(ConsoleCommandSender.getInstance(), "greload");
                                 break;
@@ -137,7 +138,6 @@ public final class SubCommand extends CommandX {
                             case "servers":
                             case "subserver":
                             case "subservers":
-                            case "subdata":
                             case "config":
                             case "configs":
                                 try {
