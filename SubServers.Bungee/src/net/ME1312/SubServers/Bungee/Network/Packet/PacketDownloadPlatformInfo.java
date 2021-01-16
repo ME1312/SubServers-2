@@ -44,13 +44,18 @@ public class PacketDownloadPlatformInfo implements PacketObjectIn<Integer>, Pack
         ObjectMap<Integer> data = new ObjectMap<Integer>();
         if (tracker != null) data.set(0x0000, tracker);
         ObjectMap<String> info = new ObjectMap<String>();
+
+
         ObjectMap<String> subservers = new ObjectMap<String>();
         subservers.set("version", plugin.api.getWrapperVersion().toString());
         if (plugin.api.getWrapperBuild() != null) subservers.set("build", plugin.api.getWrapperBuild().toString());
         subservers.set("last-reload", plugin.resetDate);
+        subservers.set("proxies", plugin.api.getProxies().size());
         subservers.set("hosts", plugin.api.getHosts().size());
         subservers.set("subservers", plugin.api.getSubServers().size());
         info.set("subservers", subservers);
+
+
         ObjectMap<String> bungee = new ObjectMap<String>();
         bungee.set("version", plugin.api.getProxyVersion().toString());
         bungee.set("disabled-cmds", plugin.getConfig().getDisabledCommands());
@@ -67,12 +72,16 @@ public class PacketDownloadPlatformInfo implements PacketObjectIn<Integer>, Pack
         }
         bungee.set("listeners", listeners);
         info.set("bungee", bungee);
+
+
         ObjectMap<String> minecraft = new ObjectMap<String>();
         LinkedList<String> mcversions = new LinkedList<String>();
         for (Version version : plugin.api.getGameVersion()) mcversions.add(version.toString());
         minecraft.set("version", mcversions);
         minecraft.set("players", plugin.api.getRemotePlayers().size());
         info.set("minecraft", minecraft);
+
+
         ObjectMap<String> system = new ObjectMap<String>();
         ObjectMap<String> os = new ObjectMap<String>();
         os.set("name", System.getProperty("os.name"));
@@ -82,6 +91,8 @@ public class PacketDownloadPlatformInfo implements PacketObjectIn<Integer>, Pack
         java.set("version",  System.getProperty("java.version"));
         system.set("java", java);
         info.set("system", system);
+
+
         data.set(0x0001, info);
         return data;
     }

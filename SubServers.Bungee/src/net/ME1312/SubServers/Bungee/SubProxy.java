@@ -734,6 +734,23 @@ public final class SubProxy extends BungeeCommon implements Listener {
                 }
             }
         }, TimeUnit.SECONDS.toMillis(rpec_s), TimeUnit.SECONDS.toMillis(rpec_i));
+        new Timer("SubServers.Bungee::Garbo_Collector").schedule(new TimerTask() {
+            @Override
+            public void run() {
+                long start = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+                System.gc();
+                Timer timer = new Timer("SubServers.Bungee::Garbo_Collector_Result");
+                timer.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        long end = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+                        Logger.get("SGC").info("Cleared " + (start - end) + " bytes of extremely useless memory data. Now using " + end + " bytes.");
+                        if (subdata != null) Logger.get("SDD").info(subdata.getClients().size() + " SubData channels are open.");
+                        timer.cancel();
+                    }
+                }, TimeUnit.MINUTES.toMillis(1));
+            }
+        }, TimeUnit.HOURS.toMillis(1), TimeUnit.HOURS.toMillis(1));
     }
 
     /**

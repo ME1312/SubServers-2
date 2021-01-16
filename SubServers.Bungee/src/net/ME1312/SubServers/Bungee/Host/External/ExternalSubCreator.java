@@ -14,6 +14,7 @@ import net.ME1312.SubData.Server.SubDataClient;
 import net.ME1312.SubServers.Bungee.Event.SubCreateEvent;
 import net.ME1312.SubServers.Bungee.Event.SubCreatedEvent;
 import net.ME1312.SubServers.Bungee.Host.*;
+import net.ME1312.SubServers.Bungee.Host.SubServer.StopAction;
 import net.ME1312.SubServers.Bungee.Library.Compatibility.Logger;
 import net.ME1312.SubServers.Bungee.Network.Packet.PacketExConfigureHost;
 import net.ME1312.SubServers.Bungee.Network.Packet.PacketExCreateServer;
@@ -212,8 +213,11 @@ public class ExternalSubCreator extends SubCreator {
                     if (action != null) subserver.setStopAction(action);
                     if (server.contains("Extra")) for (String extra : server.getMap("Extra").getKeys())
                         subserver.addExtra(extra, server.getMap("Extra").getObject(extra));
-                    host.plugin.servers.get().getMap("Servers").set(name, server);
-                    host.plugin.servers.save();
+
+                    if (!(subserver.getStopAction() == StopAction.REMOVE_SERVER || subserver.getStopAction() == StopAction.RECYCLE_SERVER || subserver.getStopAction() == StopAction.DELETE_SERVER)) {
+                        host.plugin.servers.get().getMap("Servers").set(name, server);
+                        host.plugin.servers.save();
+                    }
 
                     if (update == null && template.getBuildOptions().getBoolean("Run-On-Finish", true))
                         subserver.start();
