@@ -140,7 +140,7 @@ public class PacketLinkServer implements InitialPacket, PacketObjectIn<Integer>,
 
             ++req;
             last = now;
-            setReady(client, true);
+            setReady(client);
         } else {
             client.sendPacket(new PacketLinkServer(null, 4, "Server already linked"));
         }

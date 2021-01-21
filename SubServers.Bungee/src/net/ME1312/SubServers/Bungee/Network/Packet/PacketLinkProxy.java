@@ -78,7 +78,7 @@ public class PacketLinkProxy implements InitialPacket, PacketObjectIn<Integer>, 
                 if (isnew) plugin.getPluginManager().callEvent(new SubAddProxyEvent(proxy));
                 Logger.get("SubData").info(client.getAddress().toString() + " has been defined as Proxy: " + proxy.getName() + ((channel > 0)?" (Sub-"+channel+")":""));
                 queue(proxy.getName(), () -> client.sendPacket(new PacketLinkProxy(proxy.getName(), 0, null)));
-                setReady(client, true);
+                setReady(client);
             } else {
                 client.sendPacket(new PacketLinkProxy(proxy.getName(), 2, "Proxy already linked"));
 

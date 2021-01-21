@@ -50,7 +50,7 @@
         <dependency>
             <groupId>net.ME1312.SubData</groupId>
             <artifactId>Server</artifactId>
-            <version>20w48b</version>
+            <version>21w04b</version>
             <scope>compile</scope>
             <optional>true</optional>
         </dependency>

@@ -552,7 +552,6 @@ public final class SubProxy extends BungeeCommon implements Listener {
             subprotocol.unregisterCipher("AES-256");
             subprotocol.unregisterCipher("RSA");
 
-            subprotocol.setBlockSize(config.get().getMap("Settings").getMap("SubData").getLong("Block-Size", (long) DataSize.MB));
             subprotocol.setTimeout(TimeUnit.SECONDS.toMillis(config.get().getMap("Settings").getMap("SubData").getInt("Timeout", 30)));
 
             String cipher = config.get().getMap("Settings").getMap("SubData").getRawString("Encryption", "NULL");

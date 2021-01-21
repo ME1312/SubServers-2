@@ -155,7 +155,6 @@ public final class ExProxy extends BungeeCommon implements Listener {
             subprotocol.unregisterCipher("AES-256");
             subprotocol.unregisterCipher("RSA");
 
-            subprotocol.setBlockSize(config.get().getMap("Settings").getMap("SubData").getLong("Block-Size", (long) DataSize.MB));
             api.name = config.get().getMap("Settings").getMap("SubData").getString("Name", null);
 
             if (config.get().getMap("Settings").getMap("SubData").getRawString("Password", "").length() > 0) {
@@ -178,7 +177,7 @@ public final class ExProxy extends BungeeCommon implements Listener {
             reconnect = true;
             Logger.get("SubData").info("");
             Logger.get("SubData").info("Connecting to /" + config.get().getMap("Settings").getMap("SubData").getRawString("Address", "127.0.0.1:4391"));
-            connect(null);
+            connect(Logger.get("SubData"), null);
 
             super.startListeners();
 
@@ -199,11 +198,12 @@ public final class ExProxy extends BungeeCommon implements Listener {
         }
     }
 
-    private void connect(Pair<DisconnectReason, DataClient> disconnect) throws IOException {
+    private void connect(java.util.logging.Logger log, Pair<DisconnectReason, DataClient> disconnect) throws IOException {
         int reconnect = config.get().getMap("Settings").getMap("SubData").getInt("Reconnect", 60);
         if (disconnect == null || (this.reconnect && reconnect > 0 && disconnect.key() != DisconnectReason.PROTOCOL_MISMATCH && disconnect.key() != DisconnectReason.ENCRYPTION_MISMATCH)) {
             long reset = resetDate;
             Timer timer = new Timer("SubServers.Sync::SubData_Reconnect_Handler");
+            if (disconnect != null) log.info("Attempting reconnect in " + reconnect + " seconds");
             timer.scheduleAtFixedRate(new TimerTask() {
                 @Override
                 public void run() {

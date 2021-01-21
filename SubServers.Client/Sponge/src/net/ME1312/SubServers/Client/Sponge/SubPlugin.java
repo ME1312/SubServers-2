@@ -112,7 +112,6 @@ public final class SubPlugin {
             subprotocol.registerCipher("DHE-128", DHE.get(128));
             subprotocol.registerCipher("DHE-192", DHE.get(192));
             subprotocol.registerCipher("DHE-256", DHE.get(256));
-            subprotocol.setBlockSize(config.get().getMap("Settings").getMap("SubData").getLong("Block-Size", (long) DataSize.MB));
             api.name = config.get().getMap("Settings").getMap("SubData").getString("Name", System.getenv("name"));
             Logger log = LoggerFactory.getLogger("SubData");
 
@@ -247,7 +246,7 @@ public final class SubPlugin {
             }
             subdata.clear();
             subdata.put(0, null);
-        } catch (IOException | InterruptedException e) {
+        } catch (InterruptedException e) {
             e.printStackTrace();
         }
     }

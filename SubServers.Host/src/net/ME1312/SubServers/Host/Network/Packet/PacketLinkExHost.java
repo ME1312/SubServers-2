@@ -53,7 +53,7 @@ public class PacketLinkExHost implements InitialPacket, PacketObjectIn<Integer>,
     public void receive(SubDataSender client, ObjectMap<Integer> data) throws Throwable {
         Logger log = Util.getDespiteException(() -> Util.reflect(SubDataClient.class.getDeclaredField("log"), client.getConnection()), null);
         if (data.getInt(0x0001) == 0) {
-            setReady(client.getConnection(), true);
+            setReady(client.getConnection());
         } else {
             log.severe("Could not link name with host" + ((data.contains(0x0002))?": "+data.getRawString(0x0002):'.'));
             DebugUtil.logException(new IllegalStateException(), log);

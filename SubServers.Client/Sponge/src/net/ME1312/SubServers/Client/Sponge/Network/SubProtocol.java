@@ -5,6 +5,7 @@ import net.ME1312.Galaxi.Library.Container.Pair;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
+import net.ME1312.SubData.Client.Library.DataSize;
 import net.ME1312.SubData.Client.SubDataClient;
 import net.ME1312.SubData.Client.SubDataProtocol;
 import net.ME1312.SubServers.Client.Common.Network.Packet.*;
@@ -38,6 +39,7 @@ public class SubProtocol extends SubDataProtocol {
 
         setName("SubServers 2");
         addVersion(new Version("2.16a+"));
+        setBlockSize(DataSize.MB);
 
 
         // 00-0F: Object Link Packets
@@ -172,7 +174,10 @@ public class SubProtocol extends SubDataProtocol {
         SubDataClient subdata = super.open(scheduler, logger, address, port);
         subdata.sendPacket(new PacketLinkServer(plugin, 0));
         subdata.sendPacket(new PacketDownloadLang());
-        subdata.on.ready(client -> Sponge.getEventManager().post(new SubNetworkConnectEvent((SubDataClient) client)));
+        subdata.on.ready(client -> {
+            ((SubDataClient) client).setBlockSize((int) DataSize.KBB);
+            Sponge.getEventManager().post(new SubNetworkConnectEvent((SubDataClient) client));
+        });
         subdata.on.closed(client -> {
             SubNetworkDisconnectEvent event = new SubNetworkDisconnectEvent(client.value(), client.key());
             Sponge.getEventManager().post(event);

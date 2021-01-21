@@ -6,6 +6,7 @@ import net.ME1312.Galaxi.Library.Container.Pair;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
+import net.ME1312.SubData.Client.Library.DataSize;
 import net.ME1312.SubData.Client.SubDataClient;
 import net.ME1312.SubData.Client.SubDataProtocol;
 import net.ME1312.SubServers.Client.Common.Network.Packet.*;
@@ -33,6 +34,7 @@ public class SubProtocol extends SubDataProtocol {
 
         setName("SubServers 2");
         addVersion(new Version("2.16a+"));
+        setBlockSize(DataSize.MB);
 
 
      // 00-0F: Object Link Packets
@@ -163,14 +165,16 @@ public class SubProtocol extends SubDataProtocol {
             subdata.sendPacket(new PacketExDownloadTemplates(host));
         subdata.sendPacket(new PacketDownloadLang());
         subdata.sendPacket(new PacketOutExRequestQueue());
-        subdata.on.ready(client -> host.engine.getPluginManager().executeEvent(new SubNetworkConnectEvent((SubDataClient) client)));
+        subdata.on.ready(client -> {
+            ((SubDataClient) client).setBlockSize((int) DataSize.KBB);
+            host.engine.getPluginManager().executeEvent(new SubNetworkConnectEvent((SubDataClient) client));
+        });
         subdata.on.closed(client -> {
             SubNetworkDisconnectEvent event = new SubNetworkDisconnectEvent(client.value(), client.key());
             host.engine.getPluginManager().executeEvent(event);
 
             if (Util.getDespiteException(() -> Util.reflect(ExHost.class.getDeclaredField("running"), host), true)) {
                 Logger log = Util.getDespiteException(() -> Util.reflect(SubDataClient.class.getDeclaredField("log"), client.value()), null);
-                log.info("Attempting reconnect in " + host.config.get().getMap("Settings", new YAMLSection()).getMap("SubData", new YAMLSection()).getInt("Reconnect", 60) + " seconds");
                 Util.isException(() -> Util.reflect(ExHost.class.getDeclaredMethod("connect", Logger.class, Pair.class), host, log, client));
             } else map.put(0, null);
         });

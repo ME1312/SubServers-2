@@ -2,6 +2,8 @@ package net.ME1312.SubServers.Bungee.Network;
 
 import net.ME1312.Galaxi.Library.Callback.Callback;
 import net.ME1312.Galaxi.Library.Version.Version;
+import net.ME1312.SubData.Server.Library.DataSize;
+import net.ME1312.SubData.Server.SubDataClient;
 import net.ME1312.SubData.Server.SubDataProtocol;
 import net.ME1312.SubData.Server.SubDataServer;
 import net.ME1312.SubServers.Bungee.Event.SubNetworkConnectEvent;
@@ -28,6 +30,7 @@ public class SubProtocol extends SubDataProtocol {
 
         setName("SubServers 2");
         setVersion(new Version("2.16a+"));
+        setBlockSize(DataSize.MB);
 
 
      // 00-0F: Object Link Packets
@@ -155,7 +158,10 @@ public class SubProtocol extends SubDataProtocol {
         subdata.on.closed(server -> plugin.subdata = null);
         subdata.on.connect(client -> {
             if (!plugin.getPluginManager().callEvent(new SubNetworkConnectEvent(client.getServer(), client)).isCancelled()) {
-                client.on.ready(c -> plugin.getPluginManager().callEvent(new SubNetworkLoginEvent(c.getServer(), c)));
+                client.on.ready(c -> {
+                    ((SubDataClient) c).setBlockSize((int) DataSize.KBB);
+                    plugin.getPluginManager().callEvent(new SubNetworkLoginEvent(c.getServer(), c));
+                });
                 client.on.closed(c -> plugin.getPluginManager().callEvent(new SubNetworkDisconnectEvent(c.value().getServer(), c.value(), c.key())));
                 return true;
             } else return false;
