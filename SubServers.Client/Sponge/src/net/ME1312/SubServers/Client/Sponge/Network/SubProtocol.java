@@ -173,10 +173,7 @@ public class SubProtocol extends SubDataProtocol {
         SubDataClient subdata = super.open(scheduler, logger, address, port);
         subdata.sendPacket(new PacketLinkServer(plugin, 0));
         subdata.sendPacket(new PacketDownloadLang());
-        subdata.on.ready(client -> {
-            ((SubDataClient) client).setBlockSize((int) DataSize.KBB);
-            Sponge.getEventManager().post(new SubNetworkConnectEvent((SubDataClient) client));
-        });
+        subdata.on.ready(client -> Sponge.getEventManager().post(new SubNetworkConnectEvent((SubDataClient) client)));
         subdata.on.closed(client -> {
             SubNetworkDisconnectEvent event = new SubNetworkDisconnectEvent(client.value(), client.key());
             Sponge.getEventManager().post(event);

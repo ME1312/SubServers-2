@@ -166,10 +166,7 @@ public class SubProtocol extends SubDataProtocol {
 
         subdata.sendPacket(new PacketLinkServer(plugin, 0));
         subdata.sendPacket(new PacketDownloadLang());
-        subdata.on.ready(client -> {
-            ((SubDataClient) client).setBlockSize((int) DataSize.KBB);
-            Bukkit.getPluginManager().callEvent(new SubNetworkConnectEvent((SubDataClient) client));
-        });
+        subdata.on.ready(client -> Bukkit.getPluginManager().callEvent(new SubNetworkConnectEvent((SubDataClient) client)));
         subdata.on.closed(client -> {
             SubNetworkDisconnectEvent event = new SubNetworkDisconnectEvent(client.value(), client.key());
 

@@ -200,10 +200,7 @@ public class SubProtocol extends SubDataProtocol {
             });
 
         }));
-        subdata.on.ready(client -> {
-            ((SubDataClient) client).setBlockSize((int) DataSize.KBB);
-            plugin.getPluginManager().callEvent(new SubNetworkConnectEvent((SubDataClient) client));
-        });
+        subdata.on.ready(client -> plugin.getPluginManager().callEvent(new SubNetworkConnectEvent((SubDataClient) client)));
         subdata.on.closed(client -> {
             SubNetworkDisconnectEvent event = new SubNetworkDisconnectEvent(client.value(), client.key());
             plugin.getPluginManager().callEvent(event);

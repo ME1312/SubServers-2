@@ -164,10 +164,7 @@ public class SubProtocol extends SubDataProtocol {
             subdata.sendPacket(new PacketExDownloadTemplates(host));
         subdata.sendPacket(new PacketDownloadLang());
         subdata.sendPacket(new PacketOutExRequestQueue());
-        subdata.on.ready(client -> {
-            ((SubDataClient) client).setBlockSize((int) DataSize.KBB);
-            host.engine.getPluginManager().executeEvent(new SubNetworkConnectEvent((SubDataClient) client));
-        });
+        subdata.on.ready(client -> host.engine.getPluginManager().executeEvent(new SubNetworkConnectEvent((SubDataClient) client)));
         subdata.on.closed(client -> {
             SubNetworkDisconnectEvent event = new SubNetworkDisconnectEvent(client.value(), client.key());
             host.engine.getPluginManager().executeEvent(event);
