@@ -34,7 +34,6 @@ public class SubProtocol extends SubDataProtocol {
 
         setName("SubServers 2");
         addVersion(new Version("2.16a+"));
-        setBlockSize(DataSize.MB);
 
 
      // 00-0F: Object Link Packets

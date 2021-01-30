@@ -38,10 +38,8 @@ public class PacketExDownloadTemplates implements PacketIn, PacketStreamOut {
     @Override
     public void send(SubDataClient client, OutputStream stream) throws Throwable {
         try {
-            int initial = client.getBlockSize();
-            client.setBlockSize(DataSize.MBB);
+            if (client.getBlockSize() < DataSize.MBB) client.tempBlockSize(DataSize.MBB);
             Util.zip(new UniversalFile(plugin.dir, "SubServers:Templates"), stream);
-            client.setBlockSize(initial);
             stream.close();
 
             Util.isException(() -> Util.reflect(ExternalSubCreator.class.getDeclaredField("enableRT"), host.getCreator(), true));
