@@ -20,8 +20,6 @@ import java.util.*;
  * SubAPI Class
  */
 public final class SubAPI extends ClientAPI implements BungeeAPI {
-    LinkedList<Runnable> enableListeners = new LinkedList<Runnable>();
-    LinkedList<Runnable> disableListeners = new LinkedList<Runnable>();
     private final ExProxy plugin;
     private static SubAPI api;
     String name;
@@ -50,17 +48,6 @@ public final class SubAPI extends ClientAPI implements BungeeAPI {
     @Deprecated
     public ExProxy getInternals() {
         return plugin;
-    }
-
-    /**
-     * Adds a SubAPI Listener
-     *
-     * @param enable An Event that will be called when SubAPI is ready
-     * @param disable An Event that will be called before SubAPI is disabled (your plugin should reset it's values in case this is a hard-reset instead of a shutdown)
-     */
-    public void addListener(Runnable enable, Runnable disable) {
-        if (enable != null) enableListeners.add(enable);
-        if (disable != null) disableListeners.add(disable);
     }
 
     /**

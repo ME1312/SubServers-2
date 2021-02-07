@@ -45,12 +45,12 @@ public final class ConsolePlugin extends Plugin implements Listener {
             e.printStackTrace();
         }
 
-        SubAPI.getInstance().addListener(null, new Runnable() {
+        SubAPI.getInstance().addListener(new Runnable() {
             @Override
             public void run() {
                 reload();
             }
-        }, null);
+        });
     }
 
     private void reload() {

@@ -27,14 +27,6 @@ public interface BungeeAPI {
     }
 
     /**
-     * Adds a SubAPI Listener
-     *
-     * @param enable An Event that will be called when SubAPI is ready
-     * @param disable An Event that will be called before SubAPI is disabled (your plugin should reset it's values in case this is a hard-reset instead of a shutdown)
-     */
-    void addListener(Runnable enable, Runnable disable);
-
-    /**
      * Get the number of players on this network across all known proxies
      *
      * @return Remote Player Collection

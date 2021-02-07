@@ -11,7 +11,6 @@ import net.ME1312.SubData.Server.ClientHandler;
 import net.ME1312.SubData.Server.Encryption.AES;
 import net.ME1312.SubData.Server.Encryption.DHE;
 import net.ME1312.SubData.Server.Encryption.RSA;
-import net.ME1312.SubData.Server.Library.DataSize;
 import net.ME1312.SubData.Server.SubDataClient;
 import net.ME1312.SubData.Server.SubDataServer;
 import net.ME1312.SubServers.Bungee.Event.SubRemoveProxyEvent;
@@ -47,6 +46,7 @@ import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.*;
 import net.md_5.bungee.api.plugin.Listener;
+import net.md_5.bungee.api.plugin.PluginManager;
 import net.md_5.bungee.connection.InitialHandler;
 import net.md_5.bungee.event.EventHandler;
 
@@ -62,6 +62,7 @@ import java.security.SecureRandom;
 import java.text.DecimalFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Handler;
 
 /**
  * Main Plugin Class
@@ -241,8 +242,9 @@ public final class SubProxy extends BungeeCommon implements Listener {
         api.addHostDriver(net.ME1312.SubServers.Bungee.Host.Internal.InternalHost.class, "virtual");
         api.addHostDriver(net.ME1312.SubServers.Bungee.Host.External.ExternalHost.class, "network");
 
-        plugin = Util.getDespiteException(() -> new Plugin(this), null);
+        plugin = Util.getDespiteException(() -> new Plugin(this, this::reload, this::shutdown), null);
         if (plugin == null) Logger.get("SubServers").warning("Could not initialize plugin object emulation");
+        else Util.isException(() -> Util.<LinkedHashMap<String, net.md_5.bungee.api.plugin.Plugin>>reflect(PluginManager.class.getDeclaredField("plugins"), getPluginManager()).put(null, plugin));
 
         getPluginManager().registerListener(plugin, this);
 
@@ -292,21 +294,21 @@ public final class SubProxy extends BungeeCommon implements Listener {
     @SuppressWarnings("unchecked")
     public void startListeners() {
         try {
-            reload();
+            if (posted || !api.ready) reload();
 
             if (UPnP.isUPnPAvailable()) {
                 if (config.get().getMap("Settings").getMap("UPnP", new ObjectMap<String>()).getBoolean("Forward-Proxy", true)) for (ListenerInfo listener : getConfig().getListeners()) {
                     UPnP.openPortTCP(listener.getHost().getPort());
                 }
             } else {
-                getLogger().warning("UPnP is currently unavailable. Ports may not be automatically forwarded on this device.");
+                getLogger().warning("UPnP service is unavailable. SubServers can't port-forward for you from this device.");
             }
 
             super.startListeners();
 
             if (!posted) {
-                post();
                 posted = true;
+                post();
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -429,16 +431,7 @@ public final class SubProxy extends BungeeCommon implements Listener {
 
         int subservers = 0;
         Logger.get("SubServers").info(((status)?"Rel":"L")+"oading SubServers...");
-        if (!posted) Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            if (running) {
-                Logger.get("SubServers").info("Received request from system to shutdown");
-                try {
-                    shutdown();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        }, "SubServers.Bungee::System_Shutdown"));
+        if (!posted) Runtime.getRuntime().addShutdownHook(new Thread(this::shutdown, "SubServers.Bungee::System_Shutdown"));
         running = true;
         List<String> autorun = new LinkedList<String>();
         for (String name : this.servers.get().getMap("Servers").getKeys()) {
@@ -605,20 +598,20 @@ public final class SubProxy extends BungeeCommon implements Listener {
         }
 
         int plugins = 0;
-        List<Runnable> listeners = (status)?api.reloadListeners:api.enableListeners;
-        if (listeners.size() > 0) {
-            Logger.get("SubServers").info(((status)?"Rel":"L")+"oading SubAPI Plugins...");
-            for (Runnable obj : listeners) {
-                try {
-                    obj.run();
-                    plugins++;
-                } catch (Throwable e) {
-                    new InvocationTargetException(e, "Problem " + ((status)?"reloading":"enabling") + " plugin").printStackTrace();
+        if (status) {
+            List<Runnable> listeners = api.reloadListeners;
+            if (listeners.size() > 0) {
+                Logger.get("SubServers").info(((status)?"Rel":"L")+"oading SubAPI Plugins...");
+                for (Runnable obj : listeners) {
+                    try {
+                        obj.run();
+                        plugins++;
+                    } catch (Throwable e) {
+                        new InvocationTargetException(e, "Problem " + ((status)?"reloading":"enabling") + " plugin").printStackTrace();
+                    }
                 }
             }
-        }
 
-        if (status) {
             for (Host host : api.getHosts().values()) if (host instanceof ClientHandler && ((ClientHandler) host).getSubData()[0] != null) ((SubDataClient) ((ClientHandler) host).getSubData()[0]).sendPacket(new PacketOutExReload(null));
             for (Server server : api.getServers().values()) if (server.getSubData()[0] != null) ((SubDataClient) server.getSubData()[0]).sendPacket(new PacketOutExReload(null));
         }
@@ -733,23 +726,6 @@ public final class SubProxy extends BungeeCommon implements Listener {
                 }
             }
         }, TimeUnit.SECONDS.toMillis(rpec_s), TimeUnit.SECONDS.toMillis(rpec_i));
-        new Timer("SubServers.Bungee::Garbo_Collector").schedule(new TimerTask() {
-            @Override
-            public void run() {
-                long start = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
-                System.gc();
-                Timer timer = new Timer("SubServers.Bungee::Garbo_Collector_Result");
-                timer.schedule(new TimerTask() {
-                    @Override
-                    public void run() {
-                        long end = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
-                        Logger.get("SGC").info("Cleared " + (start - end) + " bytes of extremely useless memory data. Now using " + end + " bytes.");
-                        if (subdata != null) Logger.get("SDD").info(subdata.getClients().size() + " SubData channels are open.");
-                        timer.cancel();
-                    }
-                }, TimeUnit.MINUTES.toMillis(1));
-            }
-        }, TimeUnit.HOURS.toMillis(1), TimeUnit.HOURS.toMillis(1));
     }
 
     /**
@@ -759,57 +735,49 @@ public final class SubProxy extends BungeeCommon implements Listener {
      */
     @Override
     public void stopListeners() {
-        try {
+        if (running) {
             legServers.clear();
             legServers.putAll(getServersCopy());
-            if (api.disableListeners.size() > 0) {
-                Logger.get("SubServers").info("Resetting SubAPI Plugins...");
-                for (Runnable listener : api.disableListeners) {
-                    try {
-                        listener.run();
-                    } catch (Throwable e) {
-                        new InvocationTargetException(e, "Problem disabling plugin").printStackTrace();
-                    }
+
+            ListenerInfo[] listeners = getConfig().getListeners().toArray(new ListenerInfo[0]);
+            super.stopListeners();
+
+            if (UPnP.isUPnPAvailable()) {
+                for (ListenerInfo listener : listeners) {
+                    if (UPnP.isMappedTCP(listener.getHost().getPort())) UPnP.closePortTCP(listener.getHost().getPort());
                 }
             }
+        }
+    } protected void shutdown() {
+        if (running) {
+            api.ready = false;
+            Logger.get("SubServers").info("Stopping hosted servers");
+            String[] hosts = this.hosts.keySet().toArray(new String[0]);
 
-            shutdown();
-
-            subdata.close();
-
-            for (ListenerInfo listener : getConfig().getListeners()) {
-                if (UPnP.isUPnPAvailable() && UPnP.isMappedTCP(listener.getHost().getPort())) UPnP.closePortTCP(listener.getHost().getPort());
+            for (String host : hosts) {
+                api.forceRemoveHost(host);
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+
+            Logger.get("SubServers").info("Removing dynamic data");
+            running = false;
+            exServers.clear();
+            this.hosts.clear();
+
+            String[] proxies = this.proxies.keySet().toArray(new String[0]);
+            for (String proxy : proxies) {
+                getPluginManager().callEvent(new SubRemoveProxyEvent(this.proxies.get(proxy)));
+            }
+            this.proxies.clear();
+
+            rPlayerLinkS.clear();
+            rPlayerLinkP.clear();
+            rPlayers.clear();
+
+            try {
+                subdata.close();
+                Thread.sleep(500);
+            } catch (InterruptedException | IOException e) {}
         }
-
-        super.stopListeners();
-    } private void shutdown() throws Exception {
-        api.ready = false;
-        Logger.get("SubServers").info("Resetting Hosts and Server Data");
-        List<String> hosts = new ArrayList<String>();
-        hosts.addAll(this.hosts.keySet());
-
-        for (String host : hosts) {
-            api.forceRemoveHost(host);
-        }
-        running = false;
-        this.hosts.clear();
-        exServers.clear();
-
-        for (String proxy : proxies.keySet()) {
-            getPluginManager().callEvent(new SubRemoveProxyEvent(proxies.get(proxy)));
-        }
-        proxies.clear();
-
-        for (ListenerInfo listener : getConfig().getListeners()) {
-            if (UPnP.isUPnPAvailable() && UPnP.isMappedTCP(listener.getHost().getPort())) UPnP.closePortTCP(listener.getHost().getPort());
-        }
-
-        rPlayerLinkS.clear();
-        rPlayerLinkP.clear();
-        rPlayers.clear();
     }
 
     String getNewSignature() {

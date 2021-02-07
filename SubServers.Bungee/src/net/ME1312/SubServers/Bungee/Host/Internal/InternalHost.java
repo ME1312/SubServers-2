@@ -124,9 +124,9 @@ public class InternalHost extends Host {
                 server.stop();
                 server.waitFor();
             }
+            servers.remove(name.toLowerCase());
             if (UPnP.isUPnPAvailable() && UPnP.isMappedTCP(server.getAddress().getPort()))
                 UPnP.closePortTCP(server.getAddress().getPort());
-            servers.remove(name.toLowerCase());
             return true;
         } else return false;
     }

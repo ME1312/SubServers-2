@@ -19,7 +19,6 @@ public class Logger {
      * @param prefix Prefix
      * @return Logger
      */
-    @SuppressWarnings("deprecation")
     public static java.util.logging.Logger get(String prefix) {
         if (!existing.keySet().contains(prefix)) {
             java.util.logging.Logger log = Util.getDespiteException(() -> Util.reflect(Class.forName("net.ME1312.Galaxi.Library.Log.Logger").getDeclaredMethod("toPrimitive"),
@@ -29,23 +28,14 @@ public class Logger {
                 log = java.util.logging.Logger.getAnonymousLogger();
                 log.setUseParentHandlers(false);
                 log.addHandler(new Handler() {
-                    private boolean open = true;
-
                     @Override
                     public void publish(LogRecord record) {
-                        if (open)
-                            BungeeCommon.getInstance().getLogger().log(record.getLevel(), prefix + " > " + record.getMessage(), record.getParameters());
+                        BungeeCommon.getInstance().getLogger().log(record.getLevel(), prefix + " > " + record.getMessage(), record.getParameters());
                     }
 
                     @Override
-                    public void flush() {
-
-                    }
-
-                    @Override
-                    public void close() throws SecurityException {
-                        open = false;
-                    }
+                    public void flush() {}
+                    public void close() {}
                 });
             }
             existing.put(prefix, log);

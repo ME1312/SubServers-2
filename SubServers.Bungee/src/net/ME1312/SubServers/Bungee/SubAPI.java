@@ -28,9 +28,7 @@ import java.util.*;
  * SubAPI Class
  */
 public final class SubAPI implements BungeeAPI {
-    LinkedList<Runnable> enableListeners = new LinkedList<Runnable>();
     LinkedList<Runnable> reloadListeners = new LinkedList<Runnable>();
-    LinkedList<Runnable> disableListeners = new LinkedList<Runnable>();
     private static HashMap<String, Object> knownSignatures = new HashMap<String, Object>();
     boolean ready = false;
     private final SubProxy plugin;
@@ -63,25 +61,11 @@ public final class SubAPI implements BungeeAPI {
     }
 
     /**
-     * Adds a SubAPI Listener
+     * Adds a SubAPI Reload Listener
      *
-     * @param enable An Event that will be called when SubAPI is ready
-     * @param disable An Event that will be called before SubAPI is disabled (your plugin should reset it's values in case this is a hard-reset instead of a shutdown)
-     */
-    public void addListener(Runnable enable, Runnable disable) {
-        if (enable != null) enableListeners.add(enable);
-        if (disable != null) disableListeners.add(disable);
-    }
-
-    /**
-     * Adds a SubAPI Listener
-     *
-     * @param enable An Event that will be called when SubAPI is ready
      * @param reload An Event that will be called after SubAPI is soft-reloaded
-     * @param disable An Event that will be called before SubAPI is disabled (your plugin should reset it's values in case this is a hard-reset instead of a shutdown)
      */
-    public void addListener(Runnable enable, Runnable reload, Runnable disable) {
-        addListener(enable, disable);
+    public void addListener(Runnable reload) {
         if (reload != null) reloadListeners.add(reload);
     }
 

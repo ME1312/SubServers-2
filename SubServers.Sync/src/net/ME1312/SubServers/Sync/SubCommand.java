@@ -1463,39 +1463,43 @@ public final class SubCommand extends CommandX {
         @SuppressWarnings("deprecation")
         @Override
         public void execute(CommandSender sender, String[] args) {
-            if (sender instanceof ProxiedPlayer) {
-                if (args.length > 0) {
-                    Map<String, ServerImpl> servers = plugin.servers;
-                    if (servers.keySet().contains(args[0].toLowerCase())) {
-                        ((ProxiedPlayer) sender).connect(servers.get(args[0].toLowerCase()));
+            if (plugin.lang == null) {
+                throw new IllegalStateException("There are no lang options available at this time");
+            } else {
+                if (sender instanceof ProxiedPlayer) {
+                    if (args.length > 0) {
+                        Map<String, ServerImpl> servers = plugin.servers;
+                        if (servers.keySet().contains(args[0].toLowerCase())) {
+                            ((ProxiedPlayer) sender).connect(servers.get(args[0].toLowerCase()));
+                        } else {
+                            sender.sendMessage(plugin.api.getLang("SubServers", "Bungee.Server.Invalid"));
+                        }
                     } else {
-                        sender.sendMessage(plugin.api.getLang("SubServers", "Bungee.Server.Invalid"));
+                        int i = 0;
+                        TextComponent serverm = new TextComponent(ChatColor.RESET.toString());
+                        TextComponent div = new TextComponent(plugin.api.getLang("SubServers", "Bungee.Server.Divider"));
+                        for (ServerImpl server : plugin.servers.values()) {
+                            if (!server.isHidden() && server.canAccess(sender) && (!(server instanceof SubServerImpl) || ((SubServerImpl) server).isRunning())) {
+                                if (i != 0) serverm.addExtra(div);
+                                TextComponent message = new TextComponent(plugin.api.getLang("SubServers", "Bungee.Server.List").replace("$str$", server.getDisplayName()));
+                                try {
+                                    message.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[]{new TextComponent(plugin.api.getLang("SubServers", "Bungee.Server.Hover").replace("$int$", Integer.toString(server.getRemotePlayers().size())))}));
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                                message.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/server " + server.getName()));
+                                serverm.addExtra(message);
+                                i++;
+                            }
+                        }
+                        sender.sendMessages(
+                                plugin.api.getLang("SubServers", "Bungee.Server.Current").replace("$str$", ((ProxiedPlayer) sender).getServer().getInfo().getName()),
+                                plugin.api.getLang("SubServers", "Bungee.Server.Available"));
+                        sender.sendMessage(serverm);
                     }
                 } else {
-                    int i = 0;
-                    TextComponent serverm = new TextComponent(ChatColor.RESET.toString());
-                    TextComponent div = new TextComponent(plugin.api.getLang("SubServers", "Bungee.Server.Divider"));
-                    for (ServerImpl server : plugin.servers.values()) {
-                        if (!server.isHidden() && server.canAccess(sender) && (!(server instanceof SubServerImpl) || ((SubServerImpl) server).isRunning())) {
-                            if (i != 0) serverm.addExtra(div);
-                            TextComponent message = new TextComponent(plugin.api.getLang("SubServers", "Bungee.Server.List").replace("$str$", server.getDisplayName()));
-                            try {
-                                message.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[]{new TextComponent(plugin.api.getLang("SubServers", "Bungee.Server.Hover").replace("$int$", Integer.toString(server.getRemotePlayers().size())))}));
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
-                            message.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/server " + server.getName()));
-                            serverm.addExtra(message);
-                            i++;
-                        }
-                    }
-                    sender.sendMessages(
-                            plugin.api.getLang("SubServers", "Bungee.Server.Current").replace("$str$", ((ProxiedPlayer) sender).getServer().getInfo().getName()),
-                            plugin.api.getLang("SubServers", "Bungee.Server.Available"));
-                    sender.sendMessage(serverm);
+                    sender.sendMessage(plugin.api.getLang("SubServers", "Command.Generic.Player-Only"));
                 }
-            } else {
-                sender.sendMessage(plugin.api.getLang("SubServers", "Command.Generic.Player-Only"));
             }
         }
 
@@ -1507,7 +1511,7 @@ public final class SubCommand extends CommandX {
          * @return The validator's response and list of possible arguments
          */
         public Pair<String, List<String>> suggestArguments(CommandSender sender, String[] args) {
-            if (args.length <= 1) {
+            if (plugin.lang != null && args.length <= 1) {
                 String last = (args.length > 0)?args[args.length - 1].toLowerCase():"";
                 List<String> list = new ArrayList<String>();
                 if (last.length() == 0) {
@@ -1557,27 +1561,31 @@ public final class SubCommand extends CommandX {
         @SuppressWarnings("deprecation")
         @Override
         public void execute(CommandSender sender, String[] args) {
-            List<String> messages = new LinkedList<String>();
-            int players = 0;
-            for (ServerImpl server : plugin.servers.values()) {
-                List<String> playerlist = new ArrayList<String>();
-                for (CachedPlayer player : server.getRemotePlayers()) playerlist.add(player.getName());
-                Collections.sort(playerlist);
+            if (plugin.lang == null) {
+                throw new IllegalStateException("There are no lang options available at this time");
+            } else {
+                List<String> messages = new LinkedList<String>();
+                int players = 0;
+                for (ServerImpl server : plugin.servers.values()) {
+                    List<String> playerlist = new ArrayList<String>();
+                    for (CachedPlayer player : server.getRemotePlayers()) playerlist.add(player.getName());
+                    Collections.sort(playerlist);
 
-                players += playerlist.size();
-                if (!server.isHidden() && (!(server instanceof SubServerImpl) || ((SubServerImpl) server).isRunning())) {
-                    int i = 0;
-                    String message = plugin.api.getLang("SubServers", "Bungee.List.Format").replace("$str$", server.getDisplayName()).replace("$int$", Integer.toString(playerlist.size()));
-                    for (String player : playerlist) {
-                        if (i != 0) message += plugin.api.getLang("SubServers", "Bungee.List.Divider");
-                        message += plugin.api.getLang("SubServers", "Bungee.List.List").replace("$str$", player);
-                        i++;
+                    players += playerlist.size();
+                    if (!server.isHidden() && (!(server instanceof SubServerImpl) || ((SubServerImpl) server).isRunning())) {
+                        int i = 0;
+                        String message = plugin.api.getLang("SubServers", "Bungee.List.Format").replace("$str$", server.getDisplayName()).replace("$int$", Integer.toString(playerlist.size()));
+                        for (String player : playerlist) {
+                            if (i != 0) message += plugin.api.getLang("SubServers", "Bungee.List.Divider");
+                            message += plugin.api.getLang("SubServers", "Bungee.List.List").replace("$str$", player);
+                            i++;
+                        }
+                        messages.add(message);
                     }
-                    messages.add(message);
                 }
+                sender.sendMessages(messages.toArray(new String[messages.size()]));
+                sender.sendMessage(plugin.api.getLang("SubServers", "Bungee.List.Total").replace("$int$", Integer.toString(players)));
             }
-            sender.sendMessages(messages.toArray(new String[messages.size()]));
-            sender.sendMessage(plugin.api.getLang("SubServers", "Bungee.List.Total").replace("$int$", Integer.toString(players)));
         }
     }
 }

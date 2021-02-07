@@ -224,14 +224,18 @@ public final class ExHost {
                             updcount++;
                         }
                     }
-                    if (updcount > 0) log.info.println("SubServers.Host v" + updversion + " is available. You are " + updcount + " version" + ((updcount == 1)?"":"s") + " behind.");
+                    if (updcount > 0) {
+                        log.info.println("SubServers.Host v" + updversion + " is available. You are " + updcount + " version" + ((updcount == 1)?"":"s") + " behind.");
+                        return true;
+                    }
                 } catch (Exception e) {}
+                return false;
             });
 
             engine.start(this::stop);
 
             if (!UPnP.isUPnPAvailable()) {
-                log.warn.println("UPnP is currently unavailable. Ports may not be automatically forwarded on this device.");
+                log.warn.println("UPnP service is unavailable. SubServers can't port-forward for you from this device.");
             }
         } catch (Exception e) {
             if (engine == null) {
@@ -289,19 +293,19 @@ public final class ExHost {
 
     private void stop() {
         if (running) {
-            log.info.println("Shutting down...");
+            log.info.println("Stopping hosted servers");
+            String[] subservers = servers.keySet().toArray(new String[0]);
 
-            List<String> subservers = new ArrayList<String>();
-            subservers.addAll(servers.keySet());
-
-            for (String server : subservers) {
-                servers.get(server).stop();
+            for (String name : subservers) {
+                SubServerImpl server = servers.get(name);
+                server.stop();
                 try {
-                    servers.get(server).waitFor();
+                    server.waitFor();
                 } catch (Exception e) {
                     log.error.println(e);
                 }
-                if (UPnP.isUPnPAvailable() && UPnP.isMappedTCP(servers.get(server).getPort())) UPnP.closePortTCP(servers.get(server).getPort());
+                servers.remove(name);
+                if (UPnP.isUPnPAvailable() && UPnP.isMappedTCP(server.getPort())) UPnP.closePortTCP(server.getPort());
             }
             servers.clear();
 

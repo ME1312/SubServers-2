@@ -268,7 +268,7 @@ public final class ExProxy extends BungeeCommon implements Listener {
         new Timer("SubServers.Sync::RemotePlayer_Error_Checking").schedule(new TimerTask() {
             @Override
             public void run() {
-                if (api.getSubDataNetwork()[0] != null && !api.getSubDataNetwork()[0].isClosed()) {
+                if (api.getName() != null && api.getSubDataNetwork()[0] != null && !api.getSubDataNetwork()[0].isClosed()) {
                     api.getProxy(api.getName(), proxy -> {
                         synchronized (rPlayers) {
                             ArrayList<CachedPlayer> add = new ArrayList<CachedPlayer>();
@@ -376,7 +376,7 @@ public final class ExProxy extends BungeeCommon implements Listener {
     @Override
     public void stopListeners() {
         try {
-            Logger.get("SubServers").info("Resetting Server Data");
+            Logger.get("SubServers").info("Removing synced data");
             servers.clear();
 
             reconnect = false;
@@ -389,8 +389,10 @@ public final class ExProxy extends BungeeCommon implements Listener {
             subdata.clear();
             subdata.put(0, null);
 
-            for (ListenerInfo listener : getConfig().getListeners()) {
-                if (UPnP.isUPnPAvailable() && UPnP.isMappedTCP(listener.getHost().getPort())) UPnP.closePortTCP(listener.getHost().getPort());
+            if (UPnP.isUPnPAvailable()) {
+                for (ListenerInfo listener : getConfig().getListeners()) {
+                    if (UPnP.isMappedTCP(listener.getHost().getPort())) UPnP.closePortTCP(listener.getHost().getPort());
+                }
             }
 
             rPlayerLinkS.clear();

@@ -465,13 +465,11 @@ public abstract class Host implements ExtraDataHandler {
      */
     public boolean destroy() {
         try {
-            List<String> subservers = new ArrayList<String>();
-            subservers.addAll(getSubServers().keySet());
+            String[] subservers = getSubServers().keySet().toArray(new String[0]);
 
             for (String server : subservers) {
                 forceRemoveSubServer(server);
             }
-            subservers.clear();
             getCreator().terminate();
             getCreator().waitFor();
             return true;

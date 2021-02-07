@@ -121,52 +121,64 @@ public final class SubCommand extends CommandX {
                         } catch (Exception e) {}
                     }, "SubServers.Bungee::Update_Check").start();
                 } else if (args[0].equalsIgnoreCase("reload")) {
-                    if (args.length > 1) {
-                        switch (args[1].toLowerCase()) {
-                            case "*":
-                            case "all":
-                            case "system":
-                            case "bungee":
-                            case "bungeecord":
-                            case "subdata":
-                            case "network":
-                                plugin.getPluginManager().dispatchCommand(ConsoleCommandSender.getInstance(), "greload");
-                                break;
-                            case "host":
-                            case "hosts":
-                            case "server":
-                            case "servers":
-                            case "subserver":
-                            case "subservers":
-                            case "config":
-                            case "configs":
-                                try {
-                                    plugin.reload();
-                                } catch (IOException e) {
-                                    e.printStackTrace();
-                                }
-                                break;
-                            case "creator":
-                            case "creators":
-                            case "subcreator":
-                            case "subcreators":
-                            case "template":
-                            case "templates":
-                                for (Host host : plugin.api.getHosts().values()) {
-                                    host.getCreator().reload();
-                                }
-                                sender.sendMessage("SubServers > SubCreator instances reloaded");
-                                break;
-                            default:
-                                sender.sendMessage("SubServers > Unknown reload type: " + args[1]);
+                    new Thread(() -> {
+                        if (args.length > 1) {
+                            switch (args[1].toLowerCase()) {
+                                case "*":
+                                case "all":
+                                case "hard":
+                                case "system":
+                                case "subdata":
+                                case "network":
+                                    plugin.stopListeners();
+                                    plugin.getLogger().info("Closing player connections");
+                                    for (ProxiedPlayer player : plugin.getPlayers()) {
+                                        Util.isException(() -> player.disconnect(plugin.getTranslation("restart")));
+                                    }
+                                    plugin.shutdown();
+                                case "soft":
+                                case "bungee":
+                                case "bungeecord":
+                                case "plugin":
+                                case "plugins":
+                                    plugin.getPluginManager().dispatchCommand(sender, "greload");
+                                    break;
+                                case "host":
+                                case "hosts":
+                                case "server":
+                                case "servers":
+                                case "subserver":
+                                case "subservers":
+                                case "config":
+                                case "configs":
+                                    try {
+                                        plugin.reload();
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
+                                    }
+                                    break;
+                                case "creator":
+                                case "creators":
+                                case "subcreator":
+                                case "subcreators":
+                                case "template":
+                                case "templates":
+                                    for (Host host : plugin.api.getHosts().values()) {
+                                        host.getCreator().reload();
+                                    }
+                                    sender.sendMessage("SubServers > SubCreator instances reloaded");
+                                    break;
+                                default:
+                                    sender.sendMessage("SubServers > Unknown reload type: " + args[1]);
+                            }
+                        } else {
+                            try {
+                                plugin.reload();
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
                         }
-                    } else {
-                        try {
-                            plugin.reload();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    }
+                    }, "SubServers.Bungee::Reload_Command_Handler").start();
                 } else if (args[0].equalsIgnoreCase("list")) {
                     String div = ChatColor.RESET + ", ";
                     int i = 0;
@@ -830,7 +842,7 @@ public final class SubCommand extends CommandX {
                 "   Help: /sub help",
                 "   List: /sub list",
                 "   Version: /sub version",
-                "   Reload: /sub reload [all|config|templates]",
+                "   Reload: /sub reload [hard|bungee|servers|templates]",
                 "   Info: /sub info [proxy|host|group|server|player] <Name>",
                 "   Start Server: /sub start <Subservers>",
                 "   Restart Server: /sub restart <Subservers>",
@@ -987,12 +999,12 @@ public final class SubCommand extends CommandX {
             } else if (!(sender instanceof ProxiedPlayer) && (args[0].equals("reload") || args[0].equals("restore"))) {
                 if (args[0].equals("reload")) {
                     List<String> list = new ArrayList<String>(),
-                            completes = Arrays.asList("all", "config", "templates");
+                            completes = Arrays.asList("hard", "bungee", "servers", "templates");
                     if (args.length == 2) {
                         for (String complete : completes) {
                             if (complete.toLowerCase().startsWith(last)) list.add(Last + complete.substring(last.length()));
                         }
-                        return new ContainedPair<>((list.size() <= 0)?plugin.api.getLang("SubServers", "Command.Generic.Unknown").replace("$str$", args[0]):null, list);
+                        return new ContainedPair<>(null, list);
                     } else {
                         return new ContainedPair<>(null, Collections.emptyList());
                     }

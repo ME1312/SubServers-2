@@ -1,19 +1,23 @@
 package net.ME1312.SubServers.Bungee.Library.Compatibility;
 
+import net.ME1312.Galaxi.Library.Callback.ExceptionRunnable;
 import net.ME1312.Galaxi.Library.Util;
 
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.plugin.PluginDescription;
 
 import java.io.File;
+import java.io.IOException;
 
 public final class Plugin extends net.md_5.bungee.api.plugin.Plugin {
     private static final PluginDescription description = new PluginDescription();
-    private final boolean invalid;
+    private final ExceptionRunnable enable;
+    private final Runnable disable;
 
     @Deprecated
     public Plugin() {
-        this.invalid = true;
+        enable = null;
+        disable = null;
     }
 
     private static PluginDescription describe() {
@@ -25,9 +29,10 @@ public final class Plugin extends net.md_5.bungee.api.plugin.Plugin {
         return description;
     }
 
-    public Plugin(ProxyServer proxy) {
+    public Plugin(ProxyServer proxy, ExceptionRunnable enable, Runnable disable) {
         super(proxy, describe());
-        this.invalid = false;
+        this.enable = enable;
+        this.disable = disable;
 
         // 2020 BungeeCord builds don't run init(), but future builds may uncomment that line. We wouldn't want to repeat ourselves.
         if (getDescription() == null) Util.isException(() -> Util.reflect(net.md_5.bungee.api.plugin.Plugin.class.getDeclaredMethod("init", ProxyServer.class, PluginDescription.class), this, proxy, description));
@@ -35,6 +40,17 @@ public final class Plugin extends net.md_5.bungee.api.plugin.Plugin {
 
     @Override
     public void onEnable() {
-        if (invalid) throw new IllegalStateException("SubServers.Bungee does not run as a plugin, but a wrapper. For more information on how to install, please visit this page: https://github.com/ME1312/SubServers-2/wiki/Install");
+        if (enable == null) {
+            throw new IllegalStateException("SubServers.Bungee does not run as a plugin, but a wrapper. For more information on how to install, please visit this page: https://github.com/ME1312/SubServers-2/wiki/Install");
+        } else try {
+            enable.run();
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void onDisable() {
+        if (disable != null) disable.run();
     }
 }
