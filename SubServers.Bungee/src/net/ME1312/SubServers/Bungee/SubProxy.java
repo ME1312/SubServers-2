@@ -731,6 +731,11 @@ public final class SubProxy extends BungeeCommon implements Listener {
     @Override
     public void stopListeners() {
         if (running) {
+            if (plugin != null && plugin.isActive()) {
+                shutdown = !super.isRunning;
+                super.isRunning = true;
+            }
+
             ListenerInfo[] listeners = getConfig().getListeners().toArray(new ListenerInfo[0]);
             super.stopListeners();
 
@@ -742,6 +747,7 @@ public final class SubProxy extends BungeeCommon implements Listener {
         }
     }
 
+    private boolean shutdown = false;
     protected void shutdown() {
         if (running) {
             legServers.clear();
@@ -771,6 +777,8 @@ public final class SubProxy extends BungeeCommon implements Listener {
                 subdata.close();
                 Thread.sleep(500);
             } catch (InterruptedException | IOException e) {}
+
+            if (shutdown) super.isRunning = false;
         }
     }
 

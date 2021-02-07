@@ -291,21 +291,24 @@ public final class ExHost {
         }
     }
 
+    @SuppressWarnings("unchecked")
     private void stop() {
         if (running) {
             log.info.println("Stopping hosted servers");
-            String[] subservers = servers.keySet().toArray(new String[0]);
+            Map.Entry<String, SubServerImpl>[] subservers = servers.entrySet().toArray(new Map.Entry[0]);
 
-            for (String name : subservers) {
-                SubServerImpl server = servers.get(name);
-                server.stop();
-                try {
-                    server.waitFor();
-                } catch (Exception e) {
-                    log.error.println(e);
+            for (Map.Entry<String, SubServerImpl> entry : subservers) {
+                if (entry.getValue().isRunning()) {
+                    log.info.println("Stopping " + entry.getValue().getName());
+                    entry.getValue().stop();
+                    try {
+                        entry.getValue().waitFor();
+                    } catch (Exception e) {
+                        log.error.println(e);
+                    }
                 }
-                servers.remove(name);
-                if (UPnP.isUPnPAvailable() && UPnP.isMappedTCP(server.getPort())) UPnP.closePortTCP(server.getPort());
+                servers.remove(entry.getKey());
+                if (UPnP.isUPnPAvailable() && UPnP.isMappedTCP(entry.getValue().getPort())) UPnP.closePortTCP(entry.getValue().getPort());
             }
             servers.clear();
 

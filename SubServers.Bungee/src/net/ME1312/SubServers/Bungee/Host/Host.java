@@ -4,6 +4,7 @@ import net.ME1312.Galaxi.Library.ExtraDataHandler;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Map.ObjectMapValue;
 import net.ME1312.Galaxi.Library.Util;
+import net.ME1312.SubServers.Bungee.Library.Compatibility.Logger;
 import net.ME1312.SubServers.Bungee.Library.Exception.InvalidHostException;
 import net.ME1312.SubServers.Bungee.Library.Exception.InvalidServerException;
 import net.ME1312.SubServers.Bungee.SubAPI;
@@ -463,12 +464,14 @@ public abstract class Host implements ExtraDataHandler {
      *
      * @return Success Status
      */
+    @SuppressWarnings("unchecked")
     public boolean destroy() {
         try {
-            String[] subservers = getSubServers().keySet().toArray(new String[0]);
+            Map.Entry<String, SubServer>[] subservers = getSubServers().entrySet().toArray(new Map.Entry[0]);
 
-            for (String server : subservers) {
-                forceRemoveSubServer(server);
+            for (Map.Entry<String, SubServer> entry : subservers) {
+                if (entry.getValue().isRunning()) Logger.get("SubServers").info("Stopping " + entry.getValue().getName());
+                forceRemoveSubServer(entry.getKey());
             }
             getCreator().terminate();
             getCreator().waitFor();

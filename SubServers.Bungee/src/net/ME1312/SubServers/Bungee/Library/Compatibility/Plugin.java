@@ -7,12 +7,12 @@ import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.plugin.PluginDescription;
 
 import java.io.File;
-import java.io.IOException;
 
 public final class Plugin extends net.md_5.bungee.api.plugin.Plugin {
     private static final PluginDescription description = new PluginDescription();
     private final ExceptionRunnable enable;
     private final Runnable disable;
+    private boolean enabled;
 
     @Deprecated
     public Plugin() {
@@ -43,10 +43,15 @@ public final class Plugin extends net.md_5.bungee.api.plugin.Plugin {
         if (enable == null) {
             throw new IllegalStateException("SubServers.Bungee does not run as a plugin, but a wrapper. For more information on how to install, please visit this page: https://github.com/ME1312/SubServers-2/wiki/Install");
         } else try {
+            enabled = true;
             enable.run();
         } catch (Throwable e) {
             e.printStackTrace();
         }
+    }
+
+    public boolean isActive() {
+        return enabled;
     }
 
     @Override
