@@ -45,6 +45,7 @@ import static net.ME1312.SubServers.Bungee.Library.Compatibility.Galaxi.GalaxiCo
 @SuppressWarnings("deprecation")
 public final class SubCommand extends CommandX {
     static HashMap<UUID, HashMap<ServerInfo, Pair<Long, Boolean>>> players = new HashMap<UUID, HashMap<ServerInfo, Pair<Long, Boolean>>>();
+    private static Thread reload;
     private SubProxy plugin;
     private String label;
 
@@ -121,7 +122,7 @@ public final class SubCommand extends CommandX {
                         } catch (Exception e) {}
                     }, "SubServers.Bungee::Update_Check").start();
                 } else if (args[0].equalsIgnoreCase("reload")) {
-                    new Thread(() -> {
+                    if (reload == null || !reload.isAlive()) (reload = new Thread(() -> {
                         if (args.length > 1) {
                             switch (args[1].toLowerCase()) {
                                 case "*":
@@ -141,7 +142,7 @@ public final class SubCommand extends CommandX {
                                 case "bungeecord":
                                 case "plugin":
                                 case "plugins":
-                                    plugin.getPluginManager().dispatchCommand(sender, "greload");
+                                    plugin.getPluginManager().dispatchCommand(ConsoleCommandSender.getInstance(), "greload");
                                     break;
                                 case "host":
                                 case "hosts":
@@ -178,7 +179,7 @@ public final class SubCommand extends CommandX {
                                 e.printStackTrace();
                             }
                         }
-                    }, "SubServers.Bungee::Reload_Command_Handler").start();
+                    }, "SubServers.Bungee::Reload_Command_Handler")).start();
                 } else if (args[0].equalsIgnoreCase("list")) {
                     String div = ChatColor.RESET + ", ";
                     int i = 0;

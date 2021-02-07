@@ -100,6 +100,7 @@ public final class SubProxy extends BungeeCommon implements Listener {
     private boolean running = false;
     private boolean reloading = false;
     private boolean posted = false;
+    private LinkedList<String> autorun = null;
     private static BigInteger lastSignature = BigInteger.valueOf(-1);
 
     @SuppressWarnings("unchecked")
@@ -288,39 +289,10 @@ public final class SubProxy extends BungeeCommon implements Listener {
     }
 
     /**
-     * Load SubServers before BungeeCord finishes
-     */
-    @Override
-    @SuppressWarnings("unchecked")
-    public void startListeners() {
-        try {
-            if (posted || !api.ready) reload();
-
-            if (UPnP.isUPnPAvailable()) {
-                if (config.get().getMap("Settings").getMap("UPnP", new ObjectMap<String>()).getBoolean("Forward-Proxy", true)) for (ListenerInfo listener : getConfig().getListeners()) {
-                    UPnP.openPortTCP(listener.getHost().getPort());
-                }
-            } else {
-                getLogger().warning("UPnP service is unavailable. SubServers can't port-forward for you from this device.");
-            }
-
-            super.startListeners();
-
-            if (!posted) {
-                posted = true;
-                post();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    /**
      * Load data from the config (will attempt to merge with current configuration)
      *
      * @throws IOException
      */
-    @SuppressWarnings("unchecked")
     public void reload() throws IOException {
         List<String> ukeys = new ArrayList<String>();
         long begin = Calendar.getInstance().getTime().getTime();
@@ -431,9 +403,7 @@ public final class SubProxy extends BungeeCommon implements Listener {
 
         int subservers = 0;
         Logger.get("SubServers").info(((status)?"Rel":"L")+"oading SubServers...");
-        if (!posted) Runtime.getRuntime().addShutdownHook(new Thread(this::shutdown, "SubServers.Bungee::System_Shutdown"));
-        running = true;
-        List<String> autorun = new LinkedList<String>();
+        autorun = new LinkedList<String>();
         for (String name : this.servers.get().getMap("Servers").getKeys()) {
             if (!ukeys.contains(name.toLowerCase())) try {
                 if (!this.hosts.keySet().contains(this.servers.get().getMap("Servers").getMap(name).getString("Host").toLowerCase())) throw new InvalidServerException("There is no host with this name: " + this.servers.get().getMap("Servers").getMap(name).getString("Host"));
@@ -534,7 +504,9 @@ public final class SubProxy extends BungeeCommon implements Listener {
             }
         }
         ukeys.clear();
-        api.ready = true;
+
+        if (!posted) Runtime.getRuntime().addShutdownHook(new Thread(this::shutdown, "SubServers.Bungee::System_Shutdown"));
+        running = true;
         legServers.clear();
 
         // Initialize SubData
@@ -601,7 +573,7 @@ public final class SubProxy extends BungeeCommon implements Listener {
         if (status) {
             List<Runnable> listeners = api.reloadListeners;
             if (listeners.size() > 0) {
-                Logger.get("SubServers").info(((status)?"Rel":"L")+"oading SubAPI Plugins...");
+                Logger.get("SubServers").info("Reloading SubAPI Plugins...");
                 for (Runnable obj : listeners) {
                     try {
                         obj.run();
@@ -618,36 +590,64 @@ public final class SubProxy extends BungeeCommon implements Listener {
 
         reloading = false;
         Logger.get("SubServers").info(((plugins > 0)?plugins+" Plugin"+((plugins == 1)?"":"s")+", ":"") + hosts + " Host"+((hosts == 1)?"":"s")+", " + servers + " Server"+((servers == 1)?"":"s")+", and " + subservers + " SubServer"+((subservers == 1)?"":"s")+" "+((status)?"re":"")+"loaded in " + new DecimalFormat("0.000").format((Calendar.getInstance().getTime().getTime() - begin) / 1000D) + "s");
+    }
 
-        long scd = TimeUnit.SECONDS.toMillis(this.servers.get().getMap("Settings").getLong("Run-On-Launch-Timeout", 0L));
-        if (autorun.size() > 0) for (Host host : api.getHosts().values()) {
-            List<String> ar = new LinkedList<String>();
-            for (String name : autorun) if (host.getSubServer(name) != null) ar.add(name);
-            if (ar.size() > 0) new Thread(() -> {
-                try {
-                    while (running && begin == resetDate && !host.isAvailable()) {
-                        Thread.sleep(250);
-                    }
-                    long init = Calendar.getInstance().getTime().getTime();
-                    while (running && begin == resetDate && ar.size() > 0) {
-                        SubServer server = host.getSubServer(ar.get(0));
-                        ar.remove(0);
-                        if (server != null && !server.isRunning()) {
-                            server.start();
-                            if (ar.size() > 0 && scd > 0) {
-                                long sleep = Calendar.getInstance().getTime().getTime();
-                                while (running && begin == resetDate && server.getSubData()[0] == null && Calendar.getInstance().getTime().getTime() - sleep < scd) {
-                                    Thread.sleep(250);
+    @Override
+    public void startListeners() {
+        try {
+            if (posted || !running) reload();
+
+            if (UPnP.isUPnPAvailable()) {
+                if (config.get().getMap("Settings").getMap("UPnP", new ObjectMap<String>()).getBoolean("Forward-Proxy", true)) for (ListenerInfo listener : getConfig().getListeners()) {
+                    UPnP.openPortTCP(listener.getHost().getPort());
+                }
+            } else {
+                getLogger().warning("UPnP service is unavailable. SubServers can't port-forward for you from this device.");
+            }
+
+            super.startListeners();
+
+            if (autorun != null && autorun.size() > 0) {
+                final long begin = resetDate;
+                final long scd = TimeUnit.SECONDS.toMillis(this.servers.get().getMap("Settings").getLong("Run-On-Launch-Timeout", 0L));
+                for (Host host : api.getHosts().values()) {
+                    List<String> ar = new LinkedList<String>();
+                    for (String name : autorun) if (host.getSubServer(name) != null) ar.add(name);
+                    if (ar.size() > 0) new Thread(() -> {
+                        try {
+                            while (running && begin == resetDate && !host.isAvailable()) {
+                                Thread.sleep(250);
+                            }
+                            long init = Calendar.getInstance().getTime().getTime();
+                            while (running && begin == resetDate && ar.size() > 0) {
+                                SubServer server = host.getSubServer(ar.get(0));
+                                ar.remove(0);
+                                if (server != null && !server.isRunning()) {
+                                    server.start();
+                                    if (ar.size() > 0 && scd > 0) {
+                                        long sleep = Calendar.getInstance().getTime().getTime();
+                                        while (running && begin == resetDate && server.getSubData()[0] == null && Calendar.getInstance().getTime().getTime() - sleep < scd) {
+                                            Thread.sleep(250);
+                                        }
+                                    }
                                 }
                             }
+                            if (running && begin == resetDate && Calendar.getInstance().getTime().getTime() - init >= 5000)
+                                Logger.get("SubServers").info("The auto-start queue for " + host.getName() + " has been finished");
+                        } catch (Exception e) {
+                            e.printStackTrace();
                         }
-                    }
-                    if (running && begin == resetDate && Calendar.getInstance().getTime().getTime() - init >= 5000)
-                        Logger.get("SubServers").info("The auto-start queue for " + host.getName() + " has been finished");
-                } catch (Exception e) {
-                    e.printStackTrace();
+                    }, "SubServers.Bungee::Automatic_Server_Starter(" + host.getName() + ")").start();
                 }
-            }, "SubServers.Bungee::Automatic_Server_Starter(" + host.getName() + ")").start();
+            }
+            autorun = null;
+
+            if (!posted) {
+                posted = true;
+                post();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -728,17 +728,9 @@ public final class SubProxy extends BungeeCommon implements Listener {
         }, TimeUnit.SECONDS.toMillis(rpec_s), TimeUnit.SECONDS.toMillis(rpec_i));
     }
 
-    /**
-     * Reset all changes made by startListeners
-     *
-     * @see SubProxy#startListeners()
-     */
     @Override
     public void stopListeners() {
         if (running) {
-            legServers.clear();
-            legServers.putAll(getServersCopy());
-
             ListenerInfo[] listeners = getConfig().getListeners().toArray(new ListenerInfo[0]);
             super.stopListeners();
 
@@ -748,18 +740,21 @@ public final class SubProxy extends BungeeCommon implements Listener {
                 }
             }
         }
-    } protected void shutdown() {
+    }
+
+    protected void shutdown() {
         if (running) {
-            api.ready = false;
+            legServers.clear();
+            legServers.putAll(getServersCopy());
+            running = false;
+
             Logger.get("SubServers").info("Stopping hosted servers");
             String[] hosts = this.hosts.keySet().toArray(new String[0]);
-
             for (String host : hosts) {
                 api.forceRemoveHost(host);
             }
 
             Logger.get("SubServers").info("Removing dynamic data");
-            running = false;
             exServers.clear();
             this.hosts.clear();
 
@@ -768,7 +763,6 @@ public final class SubProxy extends BungeeCommon implements Listener {
                 getPluginManager().callEvent(new SubRemoveProxyEvent(this.proxies.get(proxy)));
             }
             this.proxies.clear();
-
             rPlayerLinkS.clear();
             rPlayerLinkP.clear();
             rPlayers.clear();
@@ -833,7 +827,7 @@ public final class SubProxy extends BungeeCommon implements Listener {
     @Override
     public Map<String, ServerInfo> getServersCopy() {
         HashMap<String, ServerInfo> servers = new HashMap<String, ServerInfo>();
-        if (!api.ready) {
+        if (!running) {
             servers.putAll(super.getServers());
             servers.putAll(legServers);
         } else {

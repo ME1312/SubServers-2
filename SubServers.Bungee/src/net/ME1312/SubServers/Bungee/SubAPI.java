@@ -30,7 +30,6 @@ import java.util.*;
 public final class SubAPI implements BungeeAPI {
     LinkedList<Runnable> reloadListeners = new LinkedList<Runnable>();
     private static HashMap<String, Object> knownSignatures = new HashMap<String, Object>();
-    boolean ready = false;
     private final SubProxy plugin;
     private static SubAPI api;
 
