@@ -101,7 +101,7 @@ public final class SubCommand extends CommandX {
                         Version bungeebuild = Util.getDespiteException(() -> (Version) BungeeCord.class.getMethod("getForkBuild").invoke(plugin), null);
 
                         sender.sendMessage("SubServers > These are the platforms and versions that are running SubServers.Sync:");
-                        sender.sendMessage("  " + Platform.getSystemName() + ' ' + Platform.getSystemVersion() + ((!Platform.getSystemVersion().equals(Platform.getSystemBuild()))?" (" + Platform.getSystemBuild() + ')':"") + ((!Platform.getSystemArchitecture().equals("unknown"))?" [" + Platform.getSystemArchitecture() + ']':"") + ',');
+                        sender.sendMessage("  " + Platform.getSystemName() + ' ' + Platform.getSystemVersion() + ((Platform.getSystemBuild() != null)?" (" + Platform.getSystemBuild() + ')':"") + ((!Platform.getSystemArchitecture().equals("unknown"))?" [" + Platform.getSystemArchitecture() + ']':"") + ',');
                         sender.sendMessage("  Java " + Platform.getJavaVersion() + ((!Platform.getJavaArchitecture().equals("unknown"))?" [" + Platform.getJavaArchitecture() + ']':"") + ',');
                         if (galaxi != null) Util.isException(() -> sender.sendMessage("  GalaxiEngine v" + galaxi.toExtendedString() + ((galaxibuild != null)?" (" + galaxibuild + ')':"") + ','));
                         sender.sendMessage("  " + plugin.getBungeeName() + ((plugin.isGalaxi)?" v":" ") + ((bungee != null)?bungee:plugin.getVersion()) + ((bungeebuild != null)?" (" + bungeebuild + ')':"") + ((plugin.isPatched)?" [Patched]":"") + ',');

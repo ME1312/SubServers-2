@@ -52,7 +52,7 @@ public final class Launch {
                 Version galaxibuild = GalaxiInfo.getBuild();
 
                 System.out.println("");
-                System.out.println(Platform.getSystemName() + ' ' + Platform.getSystemVersion() + ((!Platform.getSystemVersion().equals(Platform.getSystemBuild()))?" (" + Platform.getSystemBuild() + ')':"") + ((!Platform.getSystemArchitecture().equals("unknown"))?" [" + Platform.getSystemArchitecture() + ']':"") + ',');
+                System.out.println(Platform.getSystemName() + ' ' + Platform.getSystemVersion() + ((Platform.getSystemBuild() != null)?" (" + Platform.getSystemBuild() + ')':"") + ((!Platform.getSystemArchitecture().equals("unknown"))?" [" + Platform.getSystemArchitecture() + ']':"") + ',');
                 System.out.println("Java " + Platform.getJavaVersion() + ((!Platform.getJavaArchitecture().equals("unknown"))?" [" + Platform.getJavaArchitecture() + ']':"") + ',');
                 if (galaxi != null) System.out.println("GalaxiEngine v" + galaxi.toExtendedString() + ((galaxibuild != null)?" (" + galaxibuild + ')':"") + ',');
                 System.out.println("BungeeCord " + net.md_5.bungee.Bootstrap.class.getPackage().getImplementationVersion() + ((patched)?" [Patched]":"") + ',');

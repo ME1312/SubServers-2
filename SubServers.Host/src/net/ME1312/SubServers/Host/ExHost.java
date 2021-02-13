@@ -94,7 +94,7 @@ public final class ExHost {
                 } catch (Exception e) {}
 
                 System.out.println("");
-                System.out.println(Platform.getSystemName() + ' ' + Platform.getSystemVersion() + ((!Platform.getSystemVersion().equals(Platform.getSystemBuild()))?" (" + Platform.getSystemBuild() + ')':"") + ((!Platform.getSystemArchitecture().equals("unknown"))?" [" + Platform.getSystemArchitecture() + ']':"") + ',');
+                System.out.println(Platform.getSystemName() + ' ' + Platform.getSystemVersion() + ((Platform.getSystemBuild() != null)?" (" + Platform.getSystemBuild() + ')':"") + ((!Platform.getSystemArchitecture().equals("unknown"))?" [" + Platform.getSystemArchitecture() + ']':"") + ',');
                 System.out.println("Java " + Platform.getJavaVersion() + ((!Platform.getJavaArchitecture().equals("unknown"))?" [" + Platform.getJavaArchitecture() + ']':"") + ',');
                 System.out.println(GalaxiEngine.class.getAnnotation(App.class).name() + " v" + galaxi.toExtendedString() + ((galaxibuild != null)?" (" + galaxibuild + ')':"") + ',');
                 System.out.println(ExHost.class.getAnnotation(App.class).name() + " v" + subservers.toExtendedString() + ((subserversbuild != null)?" (" + subserversbuild + ')':""));
