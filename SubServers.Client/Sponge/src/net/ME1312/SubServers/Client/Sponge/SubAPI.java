@@ -138,9 +138,9 @@ public final class SubAPI extends ClientAPI {
     }
 
     /**
-     * Gets the SubServers Build Signature
+     * Gets the SubServers Build Version
      *
-     * @return SubServers Build Signature (or null if unsigned)
+     * @return SubServers Build Version (or null if unsigned)
      */
     public Version getPluginBuild() {
         return (SubPlugin.class.getPackage().getSpecificationTitle() != null)?new Version(SubPlugin.class.getPackage().getSpecificationTitle()):null;

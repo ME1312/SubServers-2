@@ -180,9 +180,9 @@ public final class SubAPI extends ClientAPI implements BungeeAPI {
     }
 
     /**
-     * Gets the SubServers Build Signature
+     * Gets the SubServers Build Version
      *
-     * @return SubServers Build Signature (or null if unsigned)
+     * @return SubServers Build Version (or null if unsigned)
      */
     public Version getWrapperBuild() {
         return (ExProxy.class.getPackage().getSpecificationTitle() != null)?new Version(ExProxy.class.getPackage().getSpecificationTitle()):null;

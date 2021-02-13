@@ -28,11 +28,11 @@ public class GalaxiInfo {
     }
 
     /**
-     * Get the Galaxi Build Signature
+     * Get the Galaxi Build Version
      *
-     * @return Galaxi Build Signature
+     * @return Galaxi Build Version
      */
-    public static Version getSignature() {
+    public static Version getBuild() {
         try {
             Manifest manifest = new Manifest(Class.forName("net.ME1312.Galaxi.Engine.GalaxiEngine").getResourceAsStream("/META-INF/GalaxiEngine.MF"));
             if (manifest.getMainAttributes().getValue("Implementation-Version") != null && manifest.getMainAttributes().getValue("Implementation-Version").length() > 0) {

@@ -106,9 +106,9 @@ public interface BungeeAPI {
     Version getWrapperVersion();
 
     /**
-     * Gets the SubServers Build Signature
+     * Gets the SubServers Build Version
      *
-     * @return SubServers Build Signature (or null if unsigned)
+     * @return SubServers Build Version (or null if unsigned)
      */
     Version getWrapperBuild();
 

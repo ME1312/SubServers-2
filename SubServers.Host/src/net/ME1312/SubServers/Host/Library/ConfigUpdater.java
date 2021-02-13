@@ -29,7 +29,7 @@ public class ConfigUpdater {
         YAMLSection rewritten = new YAMLSection();
 
         Version was = existing.getMap("Settings", new ObjectMap<>()).getVersion("Version", new Version(0));
-        Version now = SubAPI.getInstance().getAppInfo().getSignature();
+        Version now = SubAPI.getInstance().getAppInfo().getBuild();
 
         int i = 0;
         if (now == null) now = UNSIGNED;

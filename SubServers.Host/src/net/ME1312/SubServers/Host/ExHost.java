@@ -94,7 +94,7 @@ public final class ExHost {
                 } catch (Exception e) {}
 
                 System.out.println("");
-                System.out.println(Platform.getSystemName() + ' ' + Platform.getSystemVersion() + ((!Platform.getSystemArchitecture().equals("unknown"))?" [" + Platform.getSystemArchitecture() + ']':"") + ',');
+                System.out.println(Platform.getSystemName() + ' ' + Platform.getSystemVersion() + ((!Platform.getSystemVersion().equals(Platform.getSystemBuild()))?" (" + Platform.getSystemBuild() + ')':"") + ((!Platform.getSystemArchitecture().equals("unknown"))?" [" + Platform.getSystemArchitecture() + ']':"") + ',');
                 System.out.println("Java " + Platform.getJavaVersion() + ((!Platform.getJavaArchitecture().equals("unknown"))?" [" + Platform.getJavaArchitecture() + ']':"") + ',');
                 System.out.println(GalaxiEngine.class.getAnnotation(App.class).name() + " v" + galaxi.toExtendedString() + ((galaxibuild != null)?" (" + galaxibuild + ')':"") + ',');
                 System.out.println(ExHost.class.getAnnotation(App.class).name() + " v" + subservers.toExtendedString() + ((subserversbuild != null)?" (" + subserversbuild + ')':""));
@@ -115,7 +115,7 @@ public final class ExHost {
         try {
             info = PluginInfo.getPluginInfo(this);
             info.setLogger(log);
-            if (ExHost.class.getPackage().getSpecificationTitle() != null) info.setSignature(new Version(ExHost.class.getPackage().getSpecificationTitle()));
+            if (ExHost.class.getPackage().getSpecificationTitle() != null) info.setBuild(new Version(ExHost.class.getPackage().getSpecificationTitle()));
             info.setIcon(ExHost.class.getResourceAsStream("/net/ME1312/SubServers/Host/Library/Files/icon.png"));
             engine = GalaxiEngine.init(info);
             log.info.println("Loading SubServers.Host v" + info.getVersion().toString() + " Libraries");

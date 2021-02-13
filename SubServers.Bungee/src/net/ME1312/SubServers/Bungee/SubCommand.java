@@ -88,12 +88,12 @@ public final class SubCommand extends CommandX {
                     sender.sendMessages(printHelp());
                 } else if (args[0].equalsIgnoreCase("version") || args[0].equalsIgnoreCase("ver")) {
                     Version galaxi = GalaxiInfo.getVersion();
-                    Version bungee = Util.getDespiteException(() -> (Version) BungeeCord.class.getMethod("getBuildVersion").invoke(plugin), null);
-                    Version galaxibuild = GalaxiInfo.getSignature();
-                    Version bungeebuild = Util.getDespiteException(() -> (Version) BungeeCord.class.getMethod("getBuildSignature").invoke(plugin), null);
+                    Version bungee = Util.getDespiteException(() -> (Version) BungeeCord.class.getMethod("getForkVersion").invoke(plugin), null);
+                    Version galaxibuild = GalaxiInfo.getBuild();
+                    Version bungeebuild = Util.getDespiteException(() -> (Version) BungeeCord.class.getMethod("getForkBuild").invoke(plugin), null);
 
                     sender.sendMessage("SubServers > These are the platforms and versions that are running SubServers.Bungee:");
-                    sender.sendMessage("  " + Platform.getSystemName() + ' ' + Platform.getSystemVersion() + ((!Platform.getSystemArchitecture().equals("unknown"))?" [" + Platform.getSystemArchitecture() + ']':"") + ',');
+                    sender.sendMessage("  " + Platform.getSystemName() + ' ' + Platform.getSystemVersion() + ((!Platform.getSystemVersion().equals(Platform.getSystemBuild()))?" (" + Platform.getSystemBuild() + ')':"") + ((!Platform.getSystemArchitecture().equals("unknown"))?" [" + Platform.getSystemArchitecture() + ']':"") + ',');
                     sender.sendMessage("  Java " + Platform.getJavaVersion() + ((!Platform.getJavaArchitecture().equals("unknown"))?" [" + Platform.getJavaArchitecture() + ']':"") + ',');
                     if (galaxi != null) Util.isException(() -> sender.sendMessage("  GalaxiEngine v" + galaxi.toExtendedString() + ((galaxibuild != null)?" (" + galaxibuild + ')':"") + ','));
                     sender.sendMessage("  " + plugin.getBungeeName() + ((plugin.isGalaxi)?" v":" ") + ((bungee != null)?bungee:plugin.getVersion()) + ((bungeebuild != null)?" (" + bungeebuild + ')':"") + ((plugin.isPatched)?" [Patched]":"") + ',');
