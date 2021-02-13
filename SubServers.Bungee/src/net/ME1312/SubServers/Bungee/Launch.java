@@ -56,7 +56,7 @@ public final class Launch {
                 System.out.println(Platform.getSystemName() + ' ' + Platform.getSystemVersion() + ((!Platform.getSystemVersion().equals(Platform.getSystemBuild()))?" (" + Platform.getSystemBuild() + ')':"") + ((!Platform.getSystemArchitecture().equals("unknown"))?" [" + Platform.getSystemArchitecture() + ']':"") + ',');
                 System.out.println("Java " + Platform.getJavaVersion() + ((!Platform.getJavaArchitecture().equals("unknown"))?" [" + Platform.getJavaArchitecture() + ']':"") + ',');
                 if (galaxi != null) System.out.println("GalaxiEngine v" + galaxi.toExtendedString() + ((galaxibuild != null)?" (" + galaxibuild + ')':"") + ',');
-                System.out.println("BungeeCord" + net.md_5.bungee.Bootstrap.class.getPackage().getImplementationVersion() + ((patched)?" [Patched]":"") + ',');
+                System.out.println("BungeeCord " + net.md_5.bungee.Bootstrap.class.getPackage().getImplementationVersion() + ((patched)?" [Patched]":"") + ',');
                 System.out.println("SubServers.Bungee v" + SubProxy.version.toExtendedString() + ((SubProxy.class.getPackage().getSpecificationTitle() != null)?" (" + SubProxy.class.getPackage().getSpecificationTitle() + ')':""));
                 System.out.println("");
             } else {

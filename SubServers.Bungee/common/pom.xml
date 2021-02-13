@@ -30,13 +30,13 @@
         <dependency>
             <groupId>net.ME1312.Galaxi</groupId>
             <artifactId>GalaxiUtil</artifactId>
-            <version>21w07a</version>
+            <version>21w07c</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>net.ME1312.Galaxi</groupId>
             <artifactId>GalaxiEngine</artifactId>
-            <version>21w07a</version>
+            <version>21w07c</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
