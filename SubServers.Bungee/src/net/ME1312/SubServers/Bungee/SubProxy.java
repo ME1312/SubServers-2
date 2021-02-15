@@ -20,7 +20,6 @@ import net.ME1312.SubServers.Bungee.Library.Compatibility.Galaxi.GalaxiCommand;
 import net.ME1312.SubServers.Bungee.Library.Compatibility.Galaxi.GalaxiEventListener;
 import net.ME1312.SubServers.Bungee.Library.Compatibility.LegacyServerMap;
 import net.ME1312.SubServers.Bungee.Library.Compatibility.Logger;
-import net.ME1312.SubServers.Bungee.Library.Compatibility.Plugin;
 import net.ME1312.SubServers.Bungee.Library.ConfigUpdater;
 import net.ME1312.SubServers.Bungee.Library.Exception.InvalidHostException;
 import net.ME1312.SubServers.Bungee.Library.Exception.InvalidServerException;
@@ -38,6 +37,7 @@ import com.google.gson.Gson;
 import net.md_5.bungee.BungeeServerInfo;
 import net.md_5.bungee.UserConnection;
 import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.ServerPing;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -46,6 +46,8 @@ import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.*;
 import net.md_5.bungee.api.plugin.Listener;
+import net.md_5.bungee.api.plugin.Plugin;
+import net.md_5.bungee.api.plugin.PluginDescription;
 import net.md_5.bungee.api.plugin.PluginManager;
 import net.md_5.bungee.connection.InitialHandler;
 import net.md_5.bungee.event.EventHandler;
@@ -62,7 +64,6 @@ import java.security.SecureRandom;
 import java.text.DecimalFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Handler;
 
 /**
  * Main Plugin Class
@@ -97,6 +98,7 @@ public final class SubProxy extends BungeeCommon implements Listener {
     public final boolean isPatched;
     public final boolean isGalaxi;
     public long resetDate = 0;
+    private boolean pluginDeployed = false;
     private boolean running = false;
     private boolean reloading = false;
     private boolean posted = false;
@@ -239,14 +241,54 @@ public final class SubProxy extends BungeeCommon implements Listener {
         }, TimeUnit.DAYS.toMillis(7), TimeUnit.DAYS.toMillis(7));
 
         mProxy = new Proxy("(master)");
-
         api.addHostDriver(net.ME1312.SubServers.Bungee.Host.Internal.InternalHost.class, "virtual");
         api.addHostDriver(net.ME1312.SubServers.Bungee.Host.External.ExternalHost.class, "network");
 
-        plugin = Util.getDespiteException(() -> new Plugin(this, this::reload, this::shutdown), null);
-        if (plugin == null) Logger.get("SubServers").warning("Could not initialize plugin object emulation");
-        else Util.isException(() -> Util.<LinkedHashMap<String, net.md_5.bungee.api.plugin.Plugin>>reflect(PluginManager.class.getDeclaredField("plugins"), getPluginManager()).put(null, plugin));
+        {
+            PluginDescription description = new PluginDescription();
+            description.setName("SubServers-Bungee");
+            description.setMain(net.ME1312.SubServers.Bungee.Library.Compatibility.Plugin.class.getCanonicalName());
+            description.setFile(Util.getDespiteException(() -> new File(SubProxy.class.getProtectionDomain().getCodeSource().getLocation().toURI()), null));
+            description.setVersion(version.toString());
+            description.setAuthor("ME1312");
 
+            Plugin plugin = null;
+            String stage = "access";
+            try {
+                plugin = new Plugin(this, description) {
+                    @Override
+                    public void onEnable() {
+                        try {
+                            pluginDeployed = true;
+                            reload();
+                        } catch (Throwable e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    @Override
+                    public void onDisable() {
+                        try {
+                            shutdown();
+                        } catch (Throwable e) {
+                            e.printStackTrace();
+                        }
+                    }
+                };
+
+                if (plugin.getDescription() == null) {
+                    stage = "initialize";
+                    Util.reflect(Plugin.class.getDeclaredMethod("init", ProxyServer.class, PluginDescription.class), plugin, this, description);
+                }
+
+                stage = "deploy";
+                Util.<Map<String, Plugin>>reflect(PluginManager.class.getDeclaredField("plugins"), getPluginManager()).put(null, plugin);
+            } catch (Throwable e) {
+                Logger.get("SubServers").warning("Could not " + stage + " plugin emulation");
+            } finally {
+                this.plugin = plugin;
+            }
+        }
         getPluginManager().registerListener(plugin, this);
 
         Logger.get("SubServers").info("Pre-Parsing Config...");
@@ -731,7 +773,7 @@ public final class SubProxy extends BungeeCommon implements Listener {
     @Override
     public void stopListeners() {
         if (running) {
-            if (plugin != null && plugin.isActive()) {
+            if (pluginDeployed) {
                 shutdown = !super.isRunning;
                 super.isRunning = true;
             }

@@ -11,7 +11,6 @@ import net.ME1312.SubData.Client.DataClient;
 import net.ME1312.SubData.Client.Encryption.AES;
 import net.ME1312.SubData.Client.Encryption.DHE;
 import net.ME1312.SubData.Client.Encryption.RSA;
-import net.ME1312.SubData.Client.Library.DataSize;
 import net.ME1312.SubData.Client.Library.DisconnectReason;
 import net.ME1312.SubData.Client.SubDataClient;
 import net.ME1312.SubServers.Bungee.BungeeCommon;
@@ -20,7 +19,6 @@ import net.ME1312.SubServers.Bungee.Library.Compatibility.Logger;
 import net.ME1312.SubServers.Bungee.Library.Fallback.FallbackState;
 import net.ME1312.SubServers.Bungee.Library.Fallback.SmartFallback;
 import net.ME1312.SubServers.Sync.Event.*;
-import net.ME1312.SubServers.Sync.Library.Compatibility.Plugin;
 import net.ME1312.SubServers.Sync.Library.ConfigUpdater;
 import net.ME1312.SubServers.Sync.Library.Metrics;
 import net.ME1312.SubServers.Sync.Network.Packet.PacketDisconnectPlayer;
@@ -35,6 +33,7 @@ import com.google.gson.Gson;
 import net.md_5.bungee.BungeeServerInfo;
 import net.md_5.bungee.UserConnection;
 import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.ServerPing;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -43,6 +42,8 @@ import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.*;
 import net.md_5.bungee.api.plugin.Listener;
+import net.md_5.bungee.api.plugin.Plugin;
+import net.md_5.bungee.api.plugin.PluginDescription;
 import net.md_5.bungee.connection.InitialHandler;
 import net.md_5.bungee.event.EventHandler;
 
@@ -129,9 +130,31 @@ public final class ExProxy extends BungeeCommon implements Listener {
         subprotocol.registerCipher("DHE-192", DHE.get(192));
         subprotocol.registerCipher("DHE-256", DHE.get(256));
 
-        plugin = Util.getDespiteException(() -> new Plugin(this), null);
-        if (plugin == null) Logger.get("SubServers").warning("Could not initialize plugin object emulation");
+        {
+            PluginDescription description = new PluginDescription();
+            description.setName("SubServers-Sync");
+            description.setMain(net.ME1312.SubServers.Sync.Library.Compatibility.Plugin.class.getCanonicalName());
+            description.setFile(Util.getDespiteException(() -> new File(ExProxy.class.getProtectionDomain().getCodeSource().getLocation().toURI()), null));
+            description.setVersion(version.toString());
+            description.setAuthor("ME1312");
 
+            String stage = "access";
+            Plugin plugin = null;
+            try {
+                plugin = new Plugin(this, description) {
+                    // SubServers.Sync doesn't deploy code here at this time.
+                };
+
+                if (plugin.getDescription() == null) {
+                    stage = "initialize";
+                    Util.reflect(Plugin.class.getDeclaredMethod("init", ProxyServer.class, PluginDescription.class), plugin, this, description);
+                }
+            } catch (Throwable e) {
+                Logger.get("SubServers").warning("Could not " + stage + " plugin emulation");
+            } finally {
+                this.plugin = plugin;
+            }
+        }
         getPluginManager().registerListener(plugin, this);
 
         Logger.get("SubServers").info("Loading BungeeCord Libraries...");
