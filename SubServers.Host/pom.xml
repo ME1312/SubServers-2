@@ -18,10 +18,30 @@
 
     <dependencies>
         <dependency>
+            <groupId>org.fusesource.jansi</groupId>
+            <artifactId>jansi</artifactId>
+            <version>1.18</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.sf.jopt-simple</groupId>
+            <artifactId>jopt-simple</artifactId>
+            <version>5.0.4</version>
+            <scope>compile</scope>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
             <groupId>net.ME1312.Galaxi</groupId>
             <artifactId>GalaxiEngine</artifactId>
-            <version>21w08b</version>
+            <version>21w08m</version>
             <scope>compile</scope>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>net.ME1312.Galaxi</groupId>
+            <artifactId>GalaxiUI</artifactId>
+            <version>21w08m</version>
+            <scope>runtime</scope>
             <optional>true</optional>
         </dependency>
         <dependency>
@@ -34,7 +54,7 @@
         <dependency>
             <groupId>net.ME1312.SubData</groupId>
             <artifactId>Client</artifactId>
-            <version>21w05f</version>
+            <version>21w08a</version>
             <scope>compile</scope>
             <optional>true</optional>
         </dependency>

@@ -24,7 +24,7 @@ public class GalaxiInfo {
      */
     public static Version getVersion() {
         return Util.getDespiteException(() -> Version.fromString((String) Class.forName("net.ME1312.Galaxi.Plugin.App").getMethod("version").invoke(
-                Class.forName("net.ME1312.Galaxi.Engine.GalaxiEngine").getAnnotation(asAnnotation(Class.forName("net.ME1312.Galaxi.Plugin.App"))))), null);
+                Class.forName("net.ME1312.Galaxi.Engine.Runtime.Engine").getAnnotation(asAnnotation(Class.forName("net.ME1312.Galaxi.Plugin.App"))))), null);
     }
 
     /**

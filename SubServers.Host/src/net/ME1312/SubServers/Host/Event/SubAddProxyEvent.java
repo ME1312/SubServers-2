@@ -1,6 +1,6 @@
 package net.ME1312.SubServers.Host.Event;
 
-import net.ME1312.Galaxi.Library.Event.Event;
+import net.ME1312.Galaxi.Event.Event;
 import net.ME1312.Galaxi.Library.Util;
 
 /**

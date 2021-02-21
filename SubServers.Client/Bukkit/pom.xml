@@ -48,7 +48,7 @@
         <dependency>
             <groupId>net.ME1312.Galaxi</groupId>
             <artifactId>GalaxiUtil</artifactId>
-            <version>21w08b</version>
+            <version>21w08m</version>
             <scope>compile</scope>
             <optional>true</optional>
         </dependency>
@@ -62,7 +62,7 @@
         <dependency>
             <groupId>net.ME1312.SubData</groupId>
             <artifactId>Client</artifactId>
-            <version>21w05f</version>
+            <version>21w08a</version>
             <scope>compile</scope>
             <optional>true</optional>
         </dependency>

@@ -110,7 +110,7 @@ public final class SubProxy extends BungeeCommon implements Listener {
         super(SubAPI::getInstance);
         this.isPatched = isPatched;
         this.isGalaxi = !Util.isException(() ->
-                Util.reflect(Class.forName("net.ME1312.Galaxi.Engine.PluginManager").getMethod("findClasses", Class.class),
+                Util.reflect(Class.forName("net.ME1312.Galaxi.Engine.CodeManager").getMethod("catalogLibrary", Class.class),
                         Util.reflect(Class.forName("net.ME1312.Galaxi.Engine.GalaxiEngine").getMethod("getPluginManager"),
                                 Util.reflect(Class.forName("net.ME1312.Galaxi.Engine.GalaxiEngine").getMethod("getInstance"), null)), Launch.class));
 

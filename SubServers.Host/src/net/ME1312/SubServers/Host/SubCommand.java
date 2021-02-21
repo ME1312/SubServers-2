@@ -1,7 +1,7 @@
 package net.ME1312.SubServers.Host;
 
+import net.ME1312.Galaxi.Engine.CommandParser;
 import net.ME1312.Galaxi.Engine.GalaxiEngine;
-import net.ME1312.Galaxi.Engine.Library.ConsoleReader;
 import net.ME1312.Galaxi.Library.AsyncConsolidator;
 import net.ME1312.Galaxi.Library.Callback.Callback;
 import net.ME1312.Galaxi.Library.Callback.ReturnRunnable;
@@ -11,9 +11,9 @@ import net.ME1312.Galaxi.Library.Container.Value;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
-import net.ME1312.Galaxi.Plugin.Command.Command;
-import net.ME1312.Galaxi.Plugin.Command.CommandSender;
-import net.ME1312.Galaxi.Plugin.Command.CompletionHandler;
+import net.ME1312.Galaxi.Command.Command;
+import net.ME1312.Galaxi.Command.CommandSender;
+import net.ME1312.Galaxi.Command.CompletionHandler;
 import net.ME1312.SubData.Client.SubDataClient;
 import net.ME1312.SubServers.Client.Common.Network.API.*;
 import net.ME1312.SubServers.Client.Common.Network.Packet.PacketCreateServer;
@@ -58,7 +58,7 @@ public class SubCommand {
                     LinkedList<String> args = new LinkedList<String>(Arrays.asList(rargs));
                     args.removeFirst();
 
-                    ConsoleReader console = GalaxiEngine.getInstance().getConsoleReader();
+                    CommandParser console = GalaxiEngine.getInstance().getCommandProcessor();
                     console.runCommand(sender, console.escapeCommand(rargs[0], args.toArray(new String[0])));
                 } else {
                     sender.sendMessage("Usage: /" + label + " <Command> [Args...]");
@@ -68,7 +68,7 @@ public class SubCommand {
             LinkedList<String> args = new LinkedList<String>(Arrays.asList(rargs));
             args.removeFirst();
 
-            ConsoleReader console = GalaxiEngine.getInstance().getConsoleReader();
+            CommandParser console = GalaxiEngine.getInstance().getCommandProcessor();
             return console.complete(sender, console.escapeCommand(rargs[0], args.toArray(new String[0]))).toArray(new String[0]);
         }).usage("<Command>", "[Args...]").description("An alias for commands").help(
                 "This command is an alias for all registered commands for ease of use.",

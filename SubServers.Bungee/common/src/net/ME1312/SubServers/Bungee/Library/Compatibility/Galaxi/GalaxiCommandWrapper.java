@@ -2,9 +2,9 @@ package net.ME1312.SubServers.Bungee.Library.Compatibility.Galaxi;
 
 import net.ME1312.Galaxi.Galaxi;
 import net.ME1312.Galaxi.Library.Util;
-import net.ME1312.Galaxi.Plugin.Command.Command;
-import net.ME1312.Galaxi.Plugin.Command.CommandSender;
-import net.ME1312.Galaxi.Plugin.Command.CompletionHandler;
+import net.ME1312.Galaxi.Command.Command;
+import net.ME1312.Galaxi.Command.CommandSender;
+import net.ME1312.Galaxi.Command.CompletionHandler;
 import net.ME1312.Galaxi.Plugin.PluginManager;
 
 import java.util.ArrayList;

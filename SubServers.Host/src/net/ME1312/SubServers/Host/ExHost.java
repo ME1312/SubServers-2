@@ -1,11 +1,11 @@
 package net.ME1312.SubServers.Host;
 
 import net.ME1312.Galaxi.Engine.GalaxiEngine;
-import net.ME1312.Galaxi.Event.GalaxiReloadEvent;
+import net.ME1312.Galaxi.Event.Engine.GalaxiReloadEvent;
 import net.ME1312.Galaxi.Library.Config.YAMLConfig;
 import net.ME1312.Galaxi.Library.Config.YAMLSection;
 import net.ME1312.Galaxi.Library.Container.Pair;
-import net.ME1312.Galaxi.Library.Log.Logger;
+import net.ME1312.Galaxi.Log.Logger;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Platform;
 import net.ME1312.Galaxi.Library.UniversalFile;
@@ -18,7 +18,6 @@ import net.ME1312.SubData.Client.DataClient;
 import net.ME1312.SubData.Client.Encryption.AES;
 import net.ME1312.SubData.Client.Encryption.DHE;
 import net.ME1312.SubData.Client.Encryption.RSA;
-import net.ME1312.SubData.Client.Library.DataSize;
 import net.ME1312.SubData.Client.Library.DisconnectReason;
 import net.ME1312.SubData.Client.SubDataClient;
 import net.ME1312.SubServers.Host.Executable.SubCreatorImpl;
@@ -32,6 +31,7 @@ import com.dosse.upnp.UPnP;
 import org.json.JSONObject;
 
 import java.io.*;
+import java.lang.reflect.InvocationTargetException;
 import java.net.InetAddress;
 import java.net.URL;
 import java.nio.charset.Charset;
@@ -113,7 +113,7 @@ public final class ExHost {
         log = new Logger("SubServers");
 
         try {
-            info = PluginInfo.getPluginInfo(this);
+            info = PluginInfo.load(this);
             info.setLogger(log);
             if (ExHost.class.getPackage().getSpecificationTitle() != null) info.setBuild(new Version(ExHost.class.getPackage().getSpecificationTitle()));
             info.setIcon(ExHost.class.getResourceAsStream("/net/ME1312/SubServers/Host/Library/Files/icon.png"));

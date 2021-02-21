@@ -1,9 +1,9 @@
 package net.ME1312.SubServers.Bungee.Library.Compatibility.Galaxi;
 
-import net.ME1312.Galaxi.Event.ConsoleInputEvent;
+import net.ME1312.Galaxi.Event.Engine.ConsoleInputEvent;
 import net.ME1312.Galaxi.Galaxi;
-import net.ME1312.Galaxi.Library.Event.ListenerOrder;
-import net.ME1312.Galaxi.Library.Event.Subscribe;
+import net.ME1312.Galaxi.Event.ListenerOrder;
+import net.ME1312.Galaxi.Event.Subscribe;
 import net.ME1312.SubServers.Bungee.Library.Compatibility.Logger;
 import net.ME1312.SubServers.Bungee.SubProxy;
 

@@ -1,7 +1,7 @@
 package net.ME1312.SubServers.Host.Event;
 
 import net.ME1312.Galaxi.Library.Callback.Callback;
-import net.ME1312.Galaxi.Library.Event.Event;
+import net.ME1312.Galaxi.Event.Event;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubServers.Client.Common.Network.API.SubServer;

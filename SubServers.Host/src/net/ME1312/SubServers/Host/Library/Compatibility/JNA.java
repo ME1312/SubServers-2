@@ -1,7 +1,7 @@
 package net.ME1312.SubServers.Host.Library.Compatibility;
 
 import net.ME1312.Galaxi.Galaxi;
-import net.ME1312.Galaxi.Library.Log.Logger;
+import net.ME1312.Galaxi.Log.Logger;
 import net.ME1312.Galaxi.Library.UniversalFile;
 
 import java.io.FileNotFoundException;
