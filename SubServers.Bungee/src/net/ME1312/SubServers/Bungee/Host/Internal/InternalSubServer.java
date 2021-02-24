@@ -137,6 +137,7 @@ public class InternalSubServer extends SubServerImpl {
     }
 
     private void run() {
+        lock = false;
         allowrestart = true;
         started = false;
         try {
@@ -213,11 +214,13 @@ public class InternalSubServer extends SubServerImpl {
             lock = true;
             SubStartEvent event = new SubStartEvent(player, this);
             host.plugin.getPluginManager().callEvent(event);
-            lock = false;
             if (!event.isCancelled()) {
                 (thread = new Thread(this::run, "SubServers.Bungee::Internal_Server_Process_Handler(" + getName() + ')')).start();
                 return true;
-            } else return false;
+            } else {
+                lock = false;
+                return false;
+            }
         } else return false;
     }
 
@@ -560,7 +563,7 @@ public class InternalSubServer extends SubServerImpl {
 
     @Override
     public boolean isRunning() {
-        return process != null && process.isAlive();
+        return (process != null && process.isAlive()) || lock;
     }
 
     @Override

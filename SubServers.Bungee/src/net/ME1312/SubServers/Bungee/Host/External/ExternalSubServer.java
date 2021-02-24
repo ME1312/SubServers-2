@@ -103,19 +103,22 @@ public class ExternalSubServer extends SubServerImpl {
             lock = true;
             SubStartEvent event = new SubStartEvent(player, this);
             host.plugin.getPluginManager().callEvent(event);
-            lock = false;
             if (!event.isCancelled()) {
                 Logger.get("SubServers").info("Now starting " + getName());
                 started(null);
                 host.queue(new PacketExEditServer(this, PacketExEditServer.UpdateType.START, logger.getExternalAddress().toString()));
                 return true;
-            } else return false;
+            } else {
+                lock = false;
+                return false;
+            }
         } else return false;
     }
     void started(UUID address) {
         if (!running) {
             started = false;
             running = true;
+            lock = false;
             logger.start();
             if (address != null) {
                 if (address != logger.getExternalAddress()) host.queue(new PacketExEditServer(this, PacketExEditServer.UpdateType.SET_LOGGING_ADDRESS, logger.getExternalAddress().toString()));
@@ -500,7 +503,7 @@ public class ExternalSubServer extends SubServerImpl {
 
     @Override
     public boolean isRunning() {
-        return running;
+        return running || lock;
     }
 
     @Override
