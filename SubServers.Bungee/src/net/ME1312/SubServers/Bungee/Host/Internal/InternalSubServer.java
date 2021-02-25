@@ -137,6 +137,7 @@ public class InternalSubServer extends SubServerImpl {
     }
 
     private void run() {
+        boolean locked = lock;
         allowrestart = true;
         started = false;
         try {
@@ -150,7 +151,7 @@ public class InternalSubServer extends SubServerImpl {
             Logger.get("SubServers").info("Now starting " + getName());
             logger.process = process;
             logger.start();
-            lock = false;
+            lock = locked = false;
             command = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
             for (LoggedCommand command : history) if (process.isAlive()) {
                 this.command.write(command.getCommand());
@@ -161,8 +162,8 @@ public class InternalSubServer extends SubServerImpl {
             if (process.isAlive()) process.waitFor();
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
+            if (locked) lock = false;
             allowrestart = false;
-            lock = false;
         }
 
         Logger.get("SubServers").info(getName() + " has stopped");

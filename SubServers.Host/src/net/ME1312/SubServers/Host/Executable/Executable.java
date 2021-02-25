@@ -1,9 +1,11 @@
 package net.ME1312.SubServers.Host.Executable;
 
+import net.ME1312.Galaxi.Library.Platform;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubServers.Host.Library.Compatibility.JNA;
 
 import java.io.File;
+import java.io.IOException;
 
 /**
  * Executable Handler Class
@@ -41,30 +43,34 @@ public class Executable {
      * @param process Process
      * @return Process ID (null if unknown)
      */
+    @SuppressWarnings("JavaReflectionMemberAccess")
     public static Long pid(Process process) {
         if (process.isAlive()) {
-            try {
-                return (long) Process.class.getDeclaredMethod("pid").invoke(process);
-            } catch (Throwable ex) {
-                try {
-                    if (process.getClass().getName().equals("java.lang.Win32Process") || process.getClass().getName().equals("java.lang.ProcessImpl")) {
+            try { // Java 9 Standard
+                return (long) Process.class.getMethod("pid").invoke(process);
+            } catch (Throwable e) {
+                try { // Java 8 Not-so-standard
+                    Object response = Util.reflect(process.getClass().getDeclaredField("pid"), process);
+
+                    if (response instanceof Number) {
+                        return ((Number) response).longValue();
+                    } else throw e;
+                } catch (Throwable e2) {
+                    if (Platform.getSystem() == Platform.WINDOWS) try {
                         long handle = Util.reflect(process.getClass().getDeclaredField("handle"), process);
 
                         ClassLoader jna = JNA.get();
                         Class<?> pc = jna.loadClass("com.sun.jna.Pointer"),
                                 ntc = jna.loadClass("com.sun.jna.platform.win32.WinNT$HANDLE"),
-                                k32c = jna.loadClass("com.sun.jna.platform.win32.Kernel32");
+                               k32c = jna.loadClass("com.sun.jna.platform.win32.Kernel32");
                         Object k32 = k32c.getField("INSTANCE").get(null),
                                 nt = ntc.getConstructor().newInstance();
                         ntc.getMethod("setPointer", pc).invoke(nt, pc.getMethod("createConstant", long.class).invoke(null, handle));
                         return ((Number) k32c.getMethod("GetProcessId", ntc).invoke(k32, nt)).longValue();
-                    } else if (process.getClass().getName().equals("java.lang.UNIXProcess")) {
-                        Object response = Util.reflect(process.getClass().getDeclaredField("pid"), process);
-
-                        if (response instanceof Number)
-                            return ((Number) response).longValue();
+                    } catch (Throwable e3) {
+                        // No way to find pid, I suppose.
                     }
-                } catch (Throwable e) {}
+                }
             }
         }
         return null;
@@ -77,14 +83,16 @@ public class Executable {
      */
     public static void terminate(Process process) {
         if (process.isAlive()) {
-            if (System.getProperty("os.name").toLowerCase().startsWith("windows")) {
-                Long pid = pid(process);
-                if (pid != null) try {
-                    Process terminator = Runtime.getRuntime().exec(new String[]{"taskkill.exe", "/T", "/F", "/PID", pid.toString()});
-                    terminator.waitFor();
-                } catch (Throwable e) {}
+            Long pid = pid(process);
+            if (pid != null) try {
+                if (Platform.getSystem() == Platform.WINDOWS) {
+                    Runtime.getRuntime().exec(new String[]{"taskkill.exe", "/T", "/F", "/PID", pid.toString()}).waitFor();
+                }
+            } catch (IOException | InterruptedException e) {}
+
+            if (process.isAlive()) {
+                process.destroyForcibly();
             }
-            if (process.isAlive()) process.destroyForcibly();
         }
     }
 }
