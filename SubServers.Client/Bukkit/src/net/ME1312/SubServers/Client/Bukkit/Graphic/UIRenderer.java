@@ -215,6 +215,7 @@ public abstract class UIRenderer {
      * @param def Default to return if unable to parse
      * @return ItemStack
      */
+    @SuppressWarnings({"deprecation", "JavaReflectionMemberAccess"})
     public ItemStack parseItem(String str, ItemStack def) {
         final Value<String> item = new Container<String>(str);
         if (plugin.api.getGameVersion().compareTo(new Version("1.13")) < 0) {
@@ -222,37 +223,41 @@ public abstract class UIRenderer {
                 // int
                 Matcher matcher = Pattern.compile("(?i)^(\\d+)$").matcher(item.value());
                 if (matcher.find()) {
-                    return ItemStack.class.getConstructor(int.class, int.class).newInstance(Integer.parseInt(matcher.group(1)), 1);
+                    return new ItemStack(Integer.parseInt(matcher.group(1)), 1);
                 }
                 // int:int
                 matcher.reset();
                 matcher = Pattern.compile("(?i)^(\\d+):(\\d+)$").matcher(item.value());
                 if (matcher.find()) {
-                    return ItemStack.class.getConstructor(int.class, int.class, short.class).newInstance(Integer.parseInt(matcher.group(1)), 1, Short.parseShort(matcher.group(2)));
+                    return new ItemStack(Integer.parseInt(matcher.group(1)), 1, Short.parseShort(matcher.group(2)));
                 }
             } catch (Exception e) {
                 return def;
             }
         }
-        // minecraft:name
+
         if (item.value().toLowerCase().startsWith("minecraft:")) {
             item.value(item.value().substring(10));
-        } else
-
-        // bukkit:name
-        if (item.value().toLowerCase().startsWith("bukkit:")) {
+        } else if (item.value().toLowerCase().startsWith("bukkit:")) {
             item.value(item.value().substring(7));
 
-            if (!Util.isException(() -> Material.valueOf(item.value().toUpperCase()))) {
-                return new ItemStack(Material.valueOf(item.value().toUpperCase()), 1);
-            }
+            // Legacy Material Name
+            Matcher matcher = Pattern.compile("(?i)\\W(\\d+)$").matcher(item.value());
+            try {
+                if (matcher.find()) {
+                    item.value(item.value().substring(0, item.value().length() - matcher.group().length()));
+                    return new ItemStack(Material.valueOf(item.value().toUpperCase()), 1, Short.parseShort(matcher.group(1)));
+                } else {
+                    return new ItemStack(Material.valueOf(item.value().toUpperCase()), 1);
+                }
+            } catch (IllegalArgumentException e) {}
         }
 
-        // material name
+        // Material Name
         if (plugin.api.getGameVersion().compareTo(new Version("1.13")) < 0) {
-            if (!Util.isException(() -> Material.valueOf(item.value().toUpperCase()))) {
+            try {
                 return new ItemStack(Material.valueOf(item.value().toUpperCase()), 1);
-            }
+            } catch (IllegalArgumentException e) {}
         } else try {
             if (Material.class.getMethod("getMaterial", String.class, boolean.class).invoke(null, item.value().toUpperCase(), false) != null) {
                 return new ItemStack((Material) Material.class.getMethod("getMaterial", String.class, boolean.class).invoke(null, item.value().toUpperCase(), false), 1);

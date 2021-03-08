@@ -695,13 +695,13 @@ public final class SubProxy extends BungeeCommon implements Listener {
 
     private void post() {
         if (!config.get().getMap("Settings").getRawStringList("Disabled-Overrides", Collections.emptyList()).contains("/server"))
-            getPluginManager().registerCommand(plugin, SubCommand.BungeeServer.newInstance(this, "server").value());
+            getPluginManager().registerCommand(plugin, new SubCommand.BungeeServer(this, "server"));
         if (!config.get().getMap("Settings").getRawStringList("Disabled-Overrides", Collections.emptyList()).contains("/glist"))
             getPluginManager().registerCommand(plugin, new SubCommand.BungeeList(this, "glist"));
 
-        getPluginManager().registerCommand(plugin, SubCommand.newInstance(this, "subservers").value());
-        getPluginManager().registerCommand(plugin, SubCommand.newInstance(this, "subserver").value());
-        getPluginManager().registerCommand(plugin, SubCommand.newInstance(this, "sub").value());
+        getPluginManager().registerCommand(plugin, new SubCommand(this, "subservers"));
+        getPluginManager().registerCommand(plugin, new SubCommand(this, "subserver"));
+        getPluginManager().registerCommand(plugin, new SubCommand(this, "sub"));
         GalaxiCommand.group(SubCommand.class);
 
         if (getReconnectHandler() != null && getReconnectHandler().getClass().equals(SmartFallback.class))

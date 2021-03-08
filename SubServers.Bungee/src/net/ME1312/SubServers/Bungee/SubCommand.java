@@ -11,7 +11,6 @@ import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubData.Server.ClientHandler;
 import net.ME1312.SubData.Server.SubDataClient;
 import net.ME1312.SubServers.Bungee.Host.*;
-import net.ME1312.SubServers.Bungee.Library.Compatibility.CommandX;
 import net.ME1312.SubServers.Bungee.Library.Compatibility.Galaxi.GalaxiInfo;
 import net.ME1312.SubServers.Bungee.Library.Compatibility.Logger;
 import net.ME1312.SubServers.Bungee.Network.Packet.PacketCheckPermission;
@@ -26,6 +25,7 @@ import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
+import net.md_5.bungee.api.plugin.TabExecutor;
 import net.md_5.bungee.command.ConsoleCommandSender;
 
 import java.io.BufferedReader;
@@ -43,23 +43,13 @@ import static net.ME1312.SubServers.Bungee.Library.Compatibility.Galaxi.GalaxiCo
  * Plugin Command Class
  */
 @SuppressWarnings("deprecation")
-public final class SubCommand extends CommandX {
+public final class SubCommand extends Command implements TabExecutor {
     static HashMap<UUID, HashMap<ServerInfo, Pair<Long, Boolean>>> players = new HashMap<UUID, HashMap<ServerInfo, Pair<Long, Boolean>>>();
     private static Thread reload;
     private SubProxy plugin;
     private String label;
 
-    static Pair<SubCommand, CommandX> newInstance(SubProxy plugin, String command) {
-        Pair<SubCommand, CommandX> cmd = new ContainedPair<>(new SubCommand(plugin, command), null);
-        CommandX now = cmd.key();
-        //if (plugin.api.getGameVersion()[plugin.api.getGameVersion().length - 1].compareTo(new Version("1.13")) >= 0) { // TODO Future Command Validator API?
-        //    now = new net.ME1312.SubServers.Bungee.Library.Compatibility.mc1_13.CommandX(cmd.name());
-        //}
-        cmd.value(now);
-        return cmd;
-    }
-
-    private SubCommand(SubProxy plugin, String command) {
+    SubCommand(SubProxy plugin, String command) {
         super(command);
         this.plugin = plugin;
         this.label = '/' + command;
@@ -869,7 +859,7 @@ public final class SubCommand extends CommandX {
      * @return The validator's response and list of possible arguments
      */
     @SuppressWarnings("unchecked")
-    public Pair<String, List<String>> suggestArguments(CommandSender sender, String[] args) {
+    public List<String> onTabComplete(CommandSender sender, String[] args) {
         String Last = (args.length > 0)?args[args.length - 1]:"";
         String last = Last.toLowerCase();
 
@@ -893,7 +883,7 @@ public final class SubCommand extends CommandX {
                     }));
                 }
             }
-            return new ContainedPair<>(null, Collections.emptyList());
+            return Collections.emptyList();
         } else if (args.length <= 1) {
             List<String> cmds = new ArrayList<>();
             cmds.addAll(Arrays.asList("help", "list", "info", "status", "version", "start", "restart", "stop", "kill", "terminate", "cmd", "command", "create", "update", "upgrade"));
@@ -902,7 +892,7 @@ public final class SubCommand extends CommandX {
             for (String cmd : cmds) {
                 if (cmd.startsWith(last)) list.add(Last + cmd.substring(last.length()));
             }
-            return new ContainedPair<>((list.size() <= 0)?plugin.api.getLang("SubServers", "Command.Generic.Invalid-Subcommand").replace("$str$", args[0]):null, list);
+            return list;
         } else {
             if (args[0].equals("info") || args[0].equals("status")) {
                 ReturnRunnable<Collection<String>> getPlayers = () -> {
@@ -949,7 +939,7 @@ public final class SubCommand extends CommandX {
                         if (!list.contains(player) && player.toLowerCase().startsWith(last))
                             list.add(Last + player.substring(last.length()));
                     }
-                    return new ContainedPair<>((list.size() <= 0)?plugin.api.getLang("SubServers", "Command.Info.Unknown").replace("$str$", args[0]):null, list);
+                    return list;
                 } else if (args.length == 3) {
                     List<String> list = new ArrayList<String>();
 
@@ -993,9 +983,9 @@ public final class SubCommand extends CommandX {
                             }
                             break;
                     }
-                    return new ContainedPair<>((list.size() <= 0)?plugin.api.getLang("SubServers", "Command.Info.Unknown").replace("$str$", args[0]):null, list);
+                    return list;
                 } else {
-                    return new ContainedPair<>(null, Collections.emptyList());
+                    return Collections.emptyList();
                 }
             } else if (!(sender instanceof ProxiedPlayer) && (args[0].equals("reload") || args[0].equals("restore"))) {
                 if (args[0].equals("reload")) {
@@ -1005,15 +995,15 @@ public final class SubCommand extends CommandX {
                         for (String complete : completes) {
                             if (complete.toLowerCase().startsWith(last)) list.add(Last + complete.substring(last.length()));
                         }
-                        return new ContainedPair<>(null, list);
+                        return list;
                     } else {
-                        return new ContainedPair<>(null, Collections.emptyList());
+                        return Collections.emptyList();
                     }
                 } else /* if (args[0].equals("restore")) */ {
                     if (args.length == 2) {
-                        return new ContainedPair<>(null, Collections.singletonList("<Subserver>"));
+                        return Collections.singletonList("<Subserver>");
                     } else {
-                        return new ContainedPair<>(null, Collections.emptyList());
+                        return Collections.emptyList();
                     }
                 }
             } else if (args[0].equals("start") ||
@@ -1039,7 +1029,7 @@ public final class SubCommand extends CommandX {
                                 if (Arrays.binarySearch(select.selection, name.toLowerCase()) < 0 && name.toLowerCase().startsWith(last)) list.add(Last + name.substring(last.length()));
                             }
                         }
-                        return new ContainedPair<>((list.size() <= 0)?plugin.api.getLang("SubServers", "Command.Generic.Unknown-Host").replace("$str$", select.last):null, list);
+                        return list;
                     } else if (last.startsWith(":")) {
                         Map<String, List<Server>> groups = plugin.api.getGroups();
                         if (groups.size() > 0) {
@@ -1050,7 +1040,7 @@ public final class SubCommand extends CommandX {
                                 if (Arrays.binarySearch(select.selection, group.toLowerCase()) < 0 && group.toLowerCase().startsWith(last)) list.add(Last + group.substring(last.length()));
                             }
                         }
-                        return new ContainedPair<>((list.size() <= 0)?plugin.api.getLang("SubServers", "Command.Generic.Unknown-Group").replace("$str$", select.last):null, list);
+                        return list;
                     } else {
                         Map<String, SubServer> subservers = plugin.api.getSubServers();
                         if (subservers.size() > 0) {
@@ -1060,31 +1050,31 @@ public final class SubCommand extends CommandX {
                                 if (Arrays.binarySearch(select.selection, server.getName().toLowerCase()) < 0 && server.getName().toLowerCase().startsWith(last)) list.add(Last + server.getName().substring(last.length()));
                             }
                         }
-                        return new ContainedPair<>((list.size() <= 0)?plugin.api.getLang("SubServers", "Command.Generic.Unknown-SubServer").replace("$str$", select.last):null, list);
+                        return list;
                     }
                 } else if (args[0].equals("cmd") || args[0].equals("command")) {
                     if (select.args.length == 3) {
-                        return new ContainedPair<>(null, Collections.singletonList("<Command>"));
+                        return Collections.singletonList("<Command>");
                     } else {
-                        return new ContainedPair<>(null, Collections.singletonList("[Args...]"));
+                        return Collections.singletonList("[Args...]");
                     }
                 } else if (args[0].equals("update") || args[0].equals("upgrade")) {
                     if (select.args.length == 3) {
-                        return new ContainedPair<>(null, Arrays.asList("[Template]", "[Version]"));
+                        return Arrays.asList("[Template]", "[Version]");
                     } else if (select.args.length == 4) {
-                        return new ContainedPair<>(null, Collections.singletonList("<Version>"));
+                        return Collections.singletonList("<Version>");
                     }
                 }
-                return new ContainedPair<>(null, Collections.emptyList());
+                return Collections.emptyList();
             } else if (args[0].equals("create")) {
                 if (args.length == 2) {
-                    return new ContainedPair<>(null, Collections.singletonList("<Name>"));
+                    return Collections.singletonList("<Name>");
                 } else if (args.length == 3) {
                     List<String> list = new ArrayList<String>();
                     for (Host host : plugin.api.getHosts().values()) {
                         if (host.getName().toLowerCase().startsWith(last)) list.add(Last + host.getName().substring(last.length()));
                     }
-                    return new ContainedPair<>((list.size() <= 0)?plugin.api.getLang("SubServers", "Command.Generic.Unknown-Host").replace("$str$", args[0]):null, list);
+                    return list;
                 } else if (args.length == 4) {
                     List<String> list = new ArrayList<String>();
                     Map<String, Host> hosts = plugin.api.getHosts();
@@ -1095,18 +1085,18 @@ public final class SubCommand extends CommandX {
                             if (template.getName().toLowerCase().startsWith(last)) list.add(Last + template.getName().substring(last.length()));
                         }
                     }
-                    return new ContainedPair<>((list.size() <= 0)?plugin.api.getLang("SubServers", "Command.Creator.Invalid-Template").replace("$str$", args[0]):null, list);
+                    return list;
                 } else if (args.length == 5) {
-                    return new ContainedPair<>(null, Collections.singletonList("[Version]"));
+                    return Collections.singletonList("[Version]");
                 } else if (args.length == 6) {
                     if (last.length() > 0) {
                         if (Util.isException(() -> Integer.parseInt(last)) || Integer.parseInt(last) <= 0 || Integer.parseInt(last) > 65535) {
-                            return new ContainedPair<>(plugin.api.getLang("SubServers", "Command.Creator.Invalid-Port"), Collections.emptyList());
+                            return Collections.emptyList();
                         }
                     }
-                    return new ContainedPair<>(null, Collections.singletonList("[Port]"));
+                    return Collections.singletonList("[Port]");
                 } else {
-                    return new ContainedPair<>(null, Collections.emptyList());
+                    return Collections.emptyList();
                 }
             } else if (sender instanceof ProxiedPlayer && (args[0].equals("tp") || args[0].equals("teleport"))) {
                 if (args.length == 2 || args.length == 3) {
@@ -1135,12 +1125,12 @@ public final class SubCommand extends CommandX {
                     for (Server server : plugin.api.getServers().values()) {
                         if (server.getName().toLowerCase().startsWith(last)) list.add(Last + server.getName().substring(last.length()));
                     }
-                    return new ContainedPair<>((list.size() <= 0)?plugin.api.getLang("SubServers", "Command.Generic.Unknown-Server").replace("$str$", args[0]):null, list);
+                    return list;
                 } else {
-                    return new ContainedPair<>(null, Collections.emptyList());
+                    return Collections.emptyList();
                 }
             } else {
-                return new ContainedPair<>(plugin.api.getLang("SubServers", "Command.Generic.Invalid-Subcommand").replace("$str$", args[0]), Collections.emptyList());
+                return Collections.emptyList();
             }
         }
     }
@@ -1148,9 +1138,9 @@ public final class SubCommand extends CommandX {
     /**
      * BungeeCord /server
      */
-    public static final class BungeeServer extends CommandX {
+    public static final class BungeeServer extends Command implements TabExecutor {
         private SubProxy plugin;
-        private BungeeServer(SubProxy plugin, String command) {
+        BungeeServer(SubProxy plugin, String command) {
             super(command, "bungeecord.command.server");
             this.plugin = plugin;
 
@@ -1163,16 +1153,6 @@ public final class SubCommand extends CommandX {
                     "Example:",
                     "  /glist"
             );
-        }
-
-        static Pair<BungeeServer, CommandX> newInstance(SubProxy plugin, String command) {
-            Pair<BungeeServer, CommandX> cmd = new ContainedPair<>(new BungeeServer(plugin, command), null);
-            CommandX now = cmd.key();
-            //if (plugin.api.getGameVersion()[plugin.api.getGameVersion().length - 1].compareTo(new Version("1.13")) >= 0) { // TODO Future Command Validator API?
-            //    now = new net.ME1312.SubServers.Bungee.Library.Compatibility.mc1_13.CommandX(cmd.name());
-            //}
-            cmd.value(now);
-            return cmd;
         }
 
         /**
@@ -1227,16 +1207,16 @@ public final class SubCommand extends CommandX {
          * @param args Arguments
          * @return The validator's response and list of possible arguments
          */
-        public Pair<String, List<String>> suggestArguments(CommandSender sender, String[] args) {
+        public List<String> onTabComplete(CommandSender sender, String[] args) {
             if (args.length <= 1) {
                 String last = (args.length > 0)?args[args.length - 1].toLowerCase():"";
                 List<String> list = new ArrayList<String>();
                 for (Server server : plugin.api.getServers().values()) {
                     if (server.getName().toLowerCase().startsWith(last) && !server.isHidden()) list.add(server.getName());
                 }
-                return new ContainedPair<>((list.size() <= 0)?plugin.api.getLang("SubServers", "Bungee.Server.Invalid").replace("$str$", args[0]):null, list);
+                return list;
             } else {
-                return new ContainedPair<>(null, Collections.emptyList());
+                return Collections.emptyList();
             }
         }
     }
