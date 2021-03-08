@@ -206,8 +206,8 @@ public class PlaceholderImpl extends PlaceholderExpansion implements Taskable, C
         values[0] = text.substring(0, start);
         text = text.substring(start);
 
-        int[] open =  {'(', '{'};
-        int[] close = {')', '}'};
+        int[] open =  {'(', '<'};
+        int[] close = {')', '>'};
         Arrays.sort(open);
         Arrays.sort(close);
 
@@ -242,7 +242,7 @@ public class PlaceholderImpl extends PlaceholderExpansion implements Taskable, C
                         for (int ix = i + 1; ix < text.codePoints().count(); ++ix) {
                             int cx = text.codePointAt(ix);
                             if (!Character.isWhitespace(cx) && cx != '_') {
-                                more = cx == '{';
+                                more = cx == '<';
                                 break;
                             }
                         }
@@ -269,7 +269,7 @@ public class PlaceholderImpl extends PlaceholderExpansion implements Taskable, C
     }
 
     private String[] parseMethod(OfflinePlayer player, String text) {
-        Matcher m = Pattern.compile("^#?(.+?)(?:[\\s_]*\\((.*?)\\))?(?:[\\s_]*\\{(.*)})?$", Pattern.CASE_INSENSITIVE).matcher(text);
+        Matcher m = Pattern.compile("^#?(.+?)(?:[\\s_]*\\((.*?)\\))?(?:[\\s_]*<(.*)>)?$", Pattern.CASE_INSENSITIVE).matcher(text);
 
         if (m.find()) {
             String[] values = new String[3];
@@ -277,11 +277,11 @@ public class PlaceholderImpl extends PlaceholderExpansion implements Taskable, C
             values[0] = m.group(1);
             if (m.group(2) == null || m.group(2).trim().isEmpty() ||
                     m.group(3) == null || m.group(3).trim().isEmpty()) {
-                // Simple parsing << () or {} >>
+                // Simple parsing: () or <>
                 values[1] = m.group(2);
                 values[2] = m.group(3);
             } else {
-                // Complex parsing << () and {} >>
+                // Complex parsing: () and <>
                 text = text.substring(m.end(1));
                 int stage = 1, level = 0, i = 0;
                 char open = '(', close = ')';
@@ -301,14 +301,14 @@ public class PlaceholderImpl extends PlaceholderExpansion implements Taskable, C
                             for (int ix = i + 1; ix < text.codePoints().count(); ++ix) {
                                 int cx = text.codePointAt(ix);
                                 if (!Character.isWhitespace(cx) && cx != '_') {
-                                    more = cx == '{';
+                                    more = cx == '<';
                                     break;
                                 }
                             }
                             if (!more) break;
                             else {
                                 responses = true;
-                                open = '{'; close = '}';
+                                open = '<'; close = '>';
                                 values[stage++] = str.toString();
                                 str = new StringBuilder();
                             }
