@@ -18,12 +18,11 @@ public class Executable {
      *
      * @param gitbash Git Bash location (optional)
      * @param exec Executable String
-     * @return
+     * @return Formatted Executable
      */
     public static String[] parse(String gitbash, String exec) {
-        if (exec.startsWith("java ")) {
+        if (exec.startsWith("java "))
             exec = '\"' + System.getProperty("java.home") + File.separator + "bin" + File.separator + "java" + '\"' + exec.substring(4);
-        }
 
         String[] cmd;
         if (System.getProperty("os.name").toLowerCase().startsWith("windows")) {

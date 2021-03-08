@@ -1,5 +1,7 @@
 package net.ME1312.SubServers.Client.Bukkit.Library.Compatibility;
 
+import net.ME1312.Galaxi.Library.Container.ContainedPair;
+import net.ME1312.Galaxi.Library.Container.Pair;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubServers.Client.Bukkit.Event.*;
@@ -348,6 +350,7 @@ public class PlaceholderImpl extends PlaceholderExpansion implements Taskable, C
     private String runMethod(OfflinePlayer player, String method, String[] args, String[] responses) {
         Server server = (plugin.api.getName() != null)? cache.getServer(plugin.api.getName()) : null;
         SubServer subserver = (server instanceof SubServer)? (SubServer) server : null;
+        Pair<String, List<Server>> group = null;
         Host host = (subserver != null)? cache.getHost(subserver.getHost()) : null;
         Proxy proxy = cache.getMasterProxy();
 
@@ -358,6 +361,9 @@ public class PlaceholderImpl extends PlaceholderExpansion implements Taskable, C
         } else if (method.startsWith("host.")) {
             if (args.length > 0 && !args[0].isEmpty()) host = cache.getHost(args[0]);
             if (host == null) return null;
+        } else if (method.startsWith("group.")) {
+            if (args.length > 0 && !args[0].isEmpty()) group = cache.getGroup(args[0]);
+//          if (group == null) return null; // Empty groups are null
         } else if (method.startsWith("server.")) {
             if (args.length > 0 && !args[0].isEmpty()) server = cache.getServer(args[0]);
             if (server == null) return null;
@@ -393,7 +399,12 @@ public class PlaceholderImpl extends PlaceholderExpansion implements Taskable, C
             }
         } else switch (method) { // --- Straight up Methods ---
             case "example": {
-                return defaults(responses, "Example!")[0];
+                return defaults(responses, ChatColor.LIGHT_PURPLE+"Example!")[0];
+            }
+            case "players": {
+                int i = cache.getMasterProxy().getPlayers().size();
+                for (Proxy p : cache.getProxies().values()) i += p.getPlayers().size();
+                return Integer.toString(i);
             }
             case "proxy":
             case "proxies": {
@@ -486,6 +497,18 @@ public class PlaceholderImpl extends PlaceholderExpansion implements Taskable, C
             }
             case "host.signature": {
                 return host.getSignature();
+            }
+            case "group":
+            case "groups": {
+                return Integer.toString(cache.getGroups().size());
+            }
+            case "group.servers": {
+                return Integer.toString((group == null)?0:group.value().size());
+            }
+            case "group.players": {
+                int i = 0;
+                if (group != null) for (Server s : group.value()) i += s.getRemotePlayers().size();
+                return Integer.toString(i);
             }
             case "server":
             case "servers": {
@@ -703,6 +726,42 @@ public class PlaceholderImpl extends PlaceholderExpansion implements Taskable, C
         private Host getHost(String name) {
             if (Util.isNull(name)) throw new NullPointerException();
             return getHosts().get(name.toLowerCase());
+        }
+
+        public Map<String, List<Server>> getGroups() {
+            TreeMap<String, List<Server>> groups = new TreeMap<String, List<Server>>();
+            HashMap<String, String> conflitresolver = new HashMap<String, String>();
+            for (Server server : getServers().values()) {
+                for (String name : server.getGroups()) {
+                    String group = name;
+                    if (conflitresolver.keySet().contains(name.toLowerCase())) {
+                        group = conflitresolver.get(name.toLowerCase());
+                    } else {
+                        conflitresolver.put(name.toLowerCase(), name);
+                    }
+                    List<Server> list = (groups.keySet().contains(group))?groups.get(group):new ArrayList<Server>();
+                    list.add(server);
+                    groups.put(group, list);
+                }
+            }
+            return groups;
+        }
+
+        public Map<String, List<Server>> getLowercaseGroups() {
+            Map<String, List<Server>> groups = getGroups();
+            TreeMap<String, List<Server>> lowercaseGroups = new TreeMap<String, List<Server>>();
+            for (String key : groups.keySet()) {
+                lowercaseGroups.put(key.toLowerCase(), groups.get(key));
+            }
+            return lowercaseGroups;
+        }
+
+        public Pair<String, List<Server>> getGroup(String name) {
+            if (Util.isNull(name)) throw new NullPointerException();
+            for (Map.Entry<String, List<Server>> group : getLowercaseGroups().entrySet()) {
+                if (group.getKey().equalsIgnoreCase(name)) return new ContainedPair<>(group.getKey(), group.getValue());
+            }
+            return null;
         }
 
         public Map<String, Server> getServers() {
