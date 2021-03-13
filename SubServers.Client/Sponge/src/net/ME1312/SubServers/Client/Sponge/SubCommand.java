@@ -135,12 +135,16 @@ public final class SubCommand implements CommandExecutor {
     }
 
     private boolean canRun(CommandSource sender) throws CommandException {
+        return canRun(sender, false);
+    }
+
+    private boolean canRun(CommandSource sender, boolean permitted) throws CommandException {
         if (SubAPI.getInstance().getSubDataNetwork()[0] == null) {
             throw new CommandException(Text.builder("An exception has occurred while running this command").color(TextColors.RED).build(), new IllegalStateException("SubData is not connected"), false);
         } else if (plugin.lang == null) {
             throw new CommandException(Text.builder("An exception has occurred while running this command").color(TextColors.RED).build(), new IllegalStateException("There are no lang options available at this time"), false);
         } else {
-            return sender.hasPermission("subservers.command");
+            return permitted || sender.hasPermission("subservers.command");
         }
     }
 
@@ -1132,7 +1136,7 @@ public final class SubCommand implements CommandExecutor {
 
     public final class TELEPORT implements CommandExecutor {
         public CommandResult execute(CommandSource sender, CommandContext args) throws CommandException {
-            if (canRun(sender)) {
+            if (canRun(sender, true)) {
                 Optional<String> p = args.getOne(Text.of("Player"));
                 Optional<String> s = args.getOne(Text.of("Server"));
                 if (!s.isPresent()) {
