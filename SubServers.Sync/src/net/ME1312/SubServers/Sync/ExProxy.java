@@ -46,6 +46,7 @@ import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.api.plugin.PluginDescription;
 import net.md_5.bungee.connection.InitialHandler;
 import net.md_5.bungee.event.EventHandler;
+import net.md_5.bungee.util.CaseInsensitiveMap;
 
 import java.io.*;
 import java.net.InetAddress;
@@ -364,7 +365,7 @@ public final class ExProxy extends BungeeCommon implements Listener {
     @Override
     public Map<String, ServerInfo> getServers() {
         if (servers.size() > 0) {
-            HashMap<String, ServerInfo> servers = new HashMap<String, ServerInfo>();
+            Map<String, ServerInfo> servers = new CaseInsensitiveMap<ServerInfo>();
             for (ServerInfo server : this.servers.values()) servers.put(server.getName(), server);
             return servers;
         } else {

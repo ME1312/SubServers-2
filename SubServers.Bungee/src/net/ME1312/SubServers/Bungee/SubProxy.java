@@ -51,6 +51,7 @@ import net.md_5.bungee.api.plugin.PluginDescription;
 import net.md_5.bungee.api.plugin.PluginManager;
 import net.md_5.bungee.connection.InitialHandler;
 import net.md_5.bungee.event.EventHandler;
+import net.md_5.bungee.util.CaseInsensitiveMap;
 
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
@@ -876,7 +877,7 @@ public final class SubProxy extends BungeeCommon implements Listener {
      */
     @Override
     public Map<String, ServerInfo> getServersCopy() {
-        HashMap<String, ServerInfo> servers = new HashMap<String, ServerInfo>();
+        Map<String, ServerInfo> servers = new CaseInsensitiveMap<ServerInfo>();
         if (!running) {
             servers.putAll(super.getServers());
             servers.putAll(legServers);
