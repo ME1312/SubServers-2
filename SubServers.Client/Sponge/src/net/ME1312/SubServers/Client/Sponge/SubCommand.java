@@ -65,46 +65,46 @@ public final class SubCommand implements CommandExecutor {
         return CommandSpec.builder()
                 .description(Text.of("The SubServers Command"))
                 .executor(root)
-                .arguments(GenericArguments.optional(GenericArguments.string(Text.of("subcommand"))), GenericArguments.optional(GenericArguments.remainingJoinedStrings(Text.of("extra"))))
+                .arguments(GenericArguments.optional(GenericArguments.string(Text.of("subcommand"))), GenericArguments.optional(GenericArguments.remainingJoinedStrings(Text.of("..."))))
                 .child(CommandSpec.builder()
                         .description(Text.of("The SubServers Command - Help"))
                         .executor(new HELP())
-                        .arguments(GenericArguments.optional(GenericArguments.remainingJoinedStrings(Text.of("extra"))))
+                        .arguments(GenericArguments.optional(GenericArguments.remainingJoinedStrings(Text.of("..."))))
                         .build(), "help", "?")
                 .child(CommandSpec.builder()
                         .description(Text.of("The SubServers Command - Version"))
                         .executor(new VERSION())
-                        .arguments(GenericArguments.optional(GenericArguments.remainingJoinedStrings(Text.of("extra"))))
+                        .arguments(GenericArguments.optional(GenericArguments.remainingJoinedStrings(Text.of("..."))))
                         .build(), "version", "ver")
                 .child(CommandSpec.builder()
                         .description(Text.of("The SubServers Command - List"))
                         .executor(new LIST())
-                        .arguments(GenericArguments.optional(GenericArguments.remainingJoinedStrings(Text.of("extra"))))
+                        .arguments(GenericArguments.optional(GenericArguments.remainingJoinedStrings(Text.of("..."))))
                         .build(), "list")
                 .child(CommandSpec.builder()
                         .description(Text.of("The SubServers Command - Info"))
                         .executor(new INFO())
-                        .arguments(GenericArguments.optional(GenericArguments.string(Text.of("Type"))), GenericArguments.optional(GenericArguments.string(Text.of("Name"))), GenericArguments.optional(GenericArguments.remainingJoinedStrings(Text.of("extra"))))
+                        .arguments(GenericArguments.optional(GenericArguments.string(Text.of("Type"))), GenericArguments.optional(GenericArguments.string(Text.of("Name"))), GenericArguments.optional(GenericArguments.remainingJoinedStrings(Text.of("..."))))
                         .build(), "info", "status")
                 .child(CommandSpec.builder()
                         .description(Text.of("The SubServers Command - Start"))
                         .executor(new START())
-                        .arguments(GenericArguments.optional(new ListArgument(Text.of("Subservers"))), GenericArguments.optional(GenericArguments.remainingJoinedStrings(Text.of("extra"))))
+                        .arguments(GenericArguments.optional(new ListArgument(Text.of("Subservers"))), GenericArguments.optional(GenericArguments.remainingJoinedStrings(Text.of("..."))))
                         .build(), "start")
                 .child(CommandSpec.builder()
                         .description(Text.of("The SubServers Command - Restart"))
                         .executor(new RESTART())
-                        .arguments(GenericArguments.optional(new ListArgument(Text.of("Subservers"))), GenericArguments.optional(GenericArguments.remainingJoinedStrings(Text.of("extra"))))
+                        .arguments(GenericArguments.optional(new ListArgument(Text.of("Subservers"))), GenericArguments.optional(GenericArguments.remainingJoinedStrings(Text.of("..."))))
                         .build(), "restart")
                 .child(CommandSpec.builder()
                         .description(Text.of("The SubServers Command - Stop"))
                         .executor(new STOP())
-                        .arguments(GenericArguments.optional(new ListArgument(Text.of("Subservers"))), GenericArguments.optional(GenericArguments.remainingJoinedStrings(Text.of("extra"))))
+                        .arguments(GenericArguments.optional(new ListArgument(Text.of("Subservers"))), GenericArguments.optional(GenericArguments.remainingJoinedStrings(Text.of("..."))))
                         .build(), "stop")
                 .child(CommandSpec.builder()
                         .description(Text.of("The SubServers Command - Terminate"))
                         .executor(new TERMINATE())
-                        .arguments(GenericArguments.optional(new ListArgument(Text.of("Subservers"))), GenericArguments.optional(GenericArguments.remainingJoinedStrings(Text.of("extra"))))
+                        .arguments(GenericArguments.optional(new ListArgument(Text.of("Subservers"))), GenericArguments.optional(GenericArguments.remainingJoinedStrings(Text.of("..."))))
                         .build(), "kill", "terminate")
                 .child(CommandSpec.builder()
                         .description(Text.of("The SubServers Command - Command"))
@@ -114,22 +114,22 @@ public final class SubCommand implements CommandExecutor {
                 .child(CommandSpec.builder()
                         .description(Text.of("The SubServers Command - Create"))
                         .executor(new CREATE())
-                        .arguments(GenericArguments.optional(GenericArguments.string(Text.of("Name"))), GenericArguments.optional(GenericArguments.string(Text.of("Host"))), GenericArguments.optional(GenericArguments.string(Text.of("Template"))), GenericArguments.optional(GenericArguments.string(Text.of("Version"))), GenericArguments.optional(GenericArguments.string(Text.of("Port"))), GenericArguments.optional(GenericArguments.remainingJoinedStrings(Text.of("extra"))))
+                        .arguments(GenericArguments.optional(GenericArguments.string(Text.of("Name"))), GenericArguments.optional(GenericArguments.string(Text.of("Host"))), GenericArguments.optional(GenericArguments.string(Text.of("Template"))), GenericArguments.optional(GenericArguments.string(Text.of("Version"))), GenericArguments.optional(GenericArguments.string(Text.of("Port"))), GenericArguments.optional(GenericArguments.remainingJoinedStrings(Text.of("..."))))
                         .build(), "create")
                 .child(CommandSpec.builder()
                         .description(Text.of("The SubServers Command - Update"))
                         .executor(new UPDATE())
-                        .arguments(GenericArguments.optional(new ListArgument(Text.of("Subservers"))), GenericArguments.optional(GenericArguments.string(Text.of("Template"))), GenericArguments.optional(GenericArguments.string(Text.of("Version"))), GenericArguments.optional(GenericArguments.remainingJoinedStrings(Text.of("extra"))))
+                        .arguments(GenericArguments.optional(new ListArgument(Text.of("Subservers"))), GenericArguments.optional(GenericArguments.string(Text.of("Template"))), GenericArguments.optional(GenericArguments.string(Text.of("Version"))), GenericArguments.optional(GenericArguments.remainingJoinedStrings(Text.of("..."))))
                         .build(), "update", "upgrade")
                 .child(CommandSpec.builder()
                         .description(Text.of("The SubServers Command - Teleport"))
                         .executor(new TELEPORT())
-                        .arguments(GenericArguments.optional(GenericArguments.string(Text.of("Player"))), GenericArguments.optional(GenericArguments.string(Text.of("Server"))), GenericArguments.optional(GenericArguments.remainingJoinedStrings(Text.of("extra"))))
+                        .arguments(GenericArguments.optional(GenericArguments.string(Text.of("Player"))), GenericArguments.optional(GenericArguments.string(Text.of("Server"))), GenericArguments.optional(GenericArguments.remainingJoinedStrings(Text.of("..."))))
                         .build(), "tp", "teleport")
                 .child(CommandSpec.builder()
                         .description(Text.of("The SubServers Command - Open Menu"))
                         .executor(new OPEN())
-                        .arguments(GenericArguments.optional(GenericArguments.string(Text.of("MenuID"))), GenericArguments.optional(GenericArguments.allOf(GenericArguments.string(Text.of("Args")))))
+                        .arguments(GenericArguments.optional(GenericArguments.string(Text.of("Menu"))), GenericArguments.optional(GenericArguments.allOf(GenericArguments.string(Text.of("Args")))))
                         .build(), "open", "view")
                 .build();
     }
@@ -1136,7 +1136,7 @@ public final class SubCommand implements CommandExecutor {
 
     public final class TELEPORT implements CommandExecutor {
         public CommandResult execute(CommandSource sender, CommandContext args) throws CommandException {
-            if (canRun(sender, true)) {
+            if (canRun(sender, true) && (sender.hasPermission("subservers.command") || sender.hasPermission("subservers.request"))) {
                 Optional<String> p = args.getOne(Text.of("Player"));
                 Optional<String> s = args.getOne(Text.of("Server"));
                 if (!s.isPresent()) {
@@ -1196,7 +1196,7 @@ public final class SubCommand implements CommandExecutor {
                     return CommandResult.builder().successCount(0).build();
                 }
             } else {
-                sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Generic.Invalid-Permission").replace("$str$", "subservers.command")));
+                sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Generic.Invalid-Permission").replace("$str$", "subservers.request")));
                 return CommandResult.builder().successCount(0).build();
             }
         }

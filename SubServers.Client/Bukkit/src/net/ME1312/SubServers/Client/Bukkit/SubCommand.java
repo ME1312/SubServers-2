@@ -794,7 +794,11 @@ public final class SubCommand extends BukkitCommand {
                     }
                 }
             } else if (args.length > 0 && (args[0].equalsIgnoreCase("tp") || args[0].equalsIgnoreCase("teleport"))) {
-                executeTeleport(sender, label, args);
+                if (sender.hasPermission("subservers.request")) {
+                    executeTeleport(sender, label, args);
+                } else {
+                    sender.sendMessage(plugin.api.getLang("SubServers", "Command.Generic.Invalid-Permission").replace("$str$", "subservers.request"));
+                }
             } else if (sender.hasPermission("subservers.interface") && sender instanceof Player) {
                 plugin.gui.getRenderer((Player) sender).newUI();
             } else {
