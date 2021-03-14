@@ -6,70 +6,63 @@ softdepend: [TitleManager, PlaceholderAPI]
 website: "https://github.com/ME1312/SubServers-2"
 #commands:
 #  subservers:
-#    description: 'The SubServers Command'
-#    usage: '/subservers is currently unavailable'
+#    description: "The SubServers Command"
+#    usage: "/subservers is currently unavailable"
 #  subserver:
-#    description: 'The SubServers Command'
-#    usage: '/subserver is currently unavailable'
+#    description: "The SubServers Command"
+#    usage: "/subserver is currently unavailable"
 #  sub:
-#    description: 'The SubServers Command'
-#    usage: '/sub is currently unavailable'
+#    description: "The SubServers Command"
+#    usage: "/sub is currently unavailable"
 permissions:
   subservers.*:
-    description: 'Grants Access to to Everything in SubServers.Client'
+    description: "Access everything in SubServers.Client"
     default: op
     children:
       subservers.interface:
-        description: 'Grants Access to the SubServers Interface'
+        description: "Access to the SubServers Interface"
         default: op
       subservers.command:
-        description: 'Grants Access to the SubServers Command'
+        description: "Access to the SubServers Command"
+        default: op
+        children:
+          subservers.teleport:
+            description: "Access to SubServers' Teleport Command"
+            default: op
+      subservers.teleport-others:
+        description: "Access to Teleport other players using the Teleport Command"
         default: op
       subservers.host.*:
-        description: 'Grants Access to all Host Actions on all Hosts'
+        description: "Access to all Host Actions on all Hosts"
         default: op
         children:
           subservers.host.*.*:
-            description: 'Grants Access to all Host Actions on all Hosts'
+            description: "Access to all Host Actions on all Hosts"
             default: op
             children:
               subservers.host.*.create:
-                description: 'Grants Access to Create a SubServer on all Hosts'
+                description: "Access to Create a Subserver on all Hosts"
                 default: op
       subservers.subserver.*:
-        description: 'Grants Access to all SubServer Actions on all SubServers'
+        description: "Access to all Subserver Actions on all Subservers"
         default: op
         children:
           subservers.subserver.*.*:
-            description: 'Grants Access to all SubServer Actions on all SubServers'
+            description: "Access to all Subserver Actions on all Subservers"
             default: op
             children:
               subservers.subserver.*.start:
-                description: 'Grants Access to Start all SubServers'
+                description: "Access to Start all Subservers"
                 default: op
               subservers.subserver.*.stop:
-                description: 'Grants Access to Stop all SubServers'
+                description: "Access to Stop all Subservers"
                 default: op
               subservers.subserver.*.terminate:
-                description: 'Grants Access to Terminate all SubServers'
+                description: "Access to Terminate all Subservers"
                 default: op
               subservers.subserver.*.command:
-                description: 'Grants Access to Send Commands to all SubServers'
+                description: "Access to Send Commands to all Subservers"
                 default: op
               subservers.subserver.*.update:
-                description: 'Grants Access to Update all SubServers'
-                default: op
-      subservers.server.*:
-        description: 'Grants Access to Server Actions on all Servers'
-        default: op
-        children:
-          subservers.server.*.*:
-            description: 'Grants Access to Server Actions on all Servers'
-            default: op
-            children:
-              subservers.server.*.teleport:
-                description: 'Grants Access to Teleport to any Server'
-                default: op
-              subservers.server.*.teleport-others:
-                description: 'Grants Access to Teleport Others to any Server'
+                description: "Access to Update all Subservers"
                 default: op

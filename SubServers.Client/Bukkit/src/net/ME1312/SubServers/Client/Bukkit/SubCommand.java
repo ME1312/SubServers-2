@@ -794,11 +794,7 @@ public final class SubCommand extends BukkitCommand {
                     }
                 }
             } else if (args.length > 0 && (args[0].equalsIgnoreCase("tp") || args[0].equalsIgnoreCase("teleport"))) {
-                if (sender.hasPermission("subservers.request")) {
-                    executeTeleport(sender, label, args);
-                } else {
-                    sender.sendMessage(plugin.api.getLang("SubServers", "Command.Generic.Invalid-Permission").replace("$str$", "subservers.request"));
-                }
+                executeTeleport(sender, label, args);
             } else if (sender.hasPermission("subservers.interface") && sender instanceof Player) {
                 plugin.gui.getRenderer((Player) sender).newUI();
             } else {
@@ -809,20 +805,20 @@ public final class SubCommand extends BukkitCommand {
     }
     private void executeTeleport(CommandSender sender, String label, String[] args) {
         if (args.length > ((sender instanceof Player)?1:2)) {
-            String select = args[(args.length > 2)?2:1];
-            plugin.api.getServer(select, server -> {
-                if (server != null) {
-                    if (permits(server, sender, "subservers.server.%.*", "subservers.server.%.teleport")) {
+            if (sender.hasPermission("subservers.teleport")) {
+                String select = args[(args.length > 2)?2:1];
+                plugin.api.getServer(select, server -> {
+                    if (server != null) {
                         if (!(server instanceof SubServer) || ((SubServer) server).isRunning()) {
                             Player target = (args.length > 2)?Bukkit.getPlayer(args[1]):null;
                             if (target != null || args.length == 2) {
-                                if (target == null || target == sender || permits(server, sender, "subservers.server.%.*", "subservers.server.%.teleport-others")) {
+                                if (target == null || target == sender || sender.hasPermission("subservers.teleport-others")) {
                                     if (target == null) target = (Player) sender;
 
                                     sender.sendMessage(plugin.api.getLang("SubServers", "Command.Teleport").replace("$str$", target.getName()));
                                     plugin.pmc(target, "Connect", server.getName());
                                 } else {
-                                    sender.sendMessage(plugin.api.getLang("SubServers", "Command.Generic.Invalid-Permission").replace("$str$", "subservers.server." + server.getName() + ".teleport-others"));
+                                    sender.sendMessage(plugin.api.getLang("SubServers", "Command.Generic.Invalid-Permission").replace("$str$", "subservers.teleport-others"));
                                 }
                             } else {
                                 sender.sendMessage(plugin.api.getLang("SubServers", "Command.Generic.Unknown-Player").replace("$str$", args[1]));
@@ -831,12 +827,12 @@ public final class SubCommand extends BukkitCommand {
                             sender.sendMessage(plugin.api.getLang("SubServers", "Command.Teleport.Not-Running").replace("$str$", server.getName()));
                         }
                     } else {
-                        sender.sendMessage(plugin.api.getLang("SubServers", "Command.Generic.Invalid-Select-Permission").replace("$str$", server.getName()));
+                        sender.sendMessage(plugin.api.getLang("SubServers", "Command.Generic.Unknown-Server").replace("$str$", select));
                     }
-                } else {
-                    sender.sendMessage(plugin.api.getLang("SubServers", "Command.Generic.Unknown-Server").replace("$str$", select));
-                }
-            });
+                });
+            } else {
+                sender.sendMessage(plugin.api.getLang("SubServers", "Command.Generic.Invalid-Permission").replace("$str$", "subservers.teleport"));
+            }
         } else {
             sender.sendMessage(plugin.api.getLang("SubServers", "Command.Generic.Usage").replace("$str$", label.toLowerCase() + " " + args[0].toLowerCase() + " " + ((sender instanceof Player)?"[Player]":"<Player>") + " <Server>"));
         }

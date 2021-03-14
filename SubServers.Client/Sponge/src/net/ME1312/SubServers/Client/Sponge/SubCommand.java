@@ -1136,7 +1136,7 @@ public final class SubCommand implements CommandExecutor {
 
     public final class TELEPORT implements CommandExecutor {
         public CommandResult execute(CommandSource sender, CommandContext args) throws CommandException {
-            if (canRun(sender, true) && (sender.hasPermission("subservers.command") || sender.hasPermission("subservers.request"))) {
+            if (canRun(sender, true)) {
                 Optional<String> p = args.getOne(Text.of("Player"));
                 Optional<String> s = args.getOne(Text.of("Server"));
                 if (!s.isPresent()) {
@@ -1146,20 +1146,20 @@ public final class SubCommand implements CommandExecutor {
                 }
 
                 if (s.isPresent() && (p.isPresent() || sender instanceof Player)) {
-                    String name = (p.isPresent())?p.get():null;
-                    String select = s.get();
-                    plugin.api.getServer(select, server -> {
-                        if (server != null) {
-                            if (permits(server, sender, "subservers.server.%.*", "subservers.server.%.teleport")) {
+                    if (sender.hasPermission("subservers.command") || sender.hasPermission("subservers.teleport")) {
+                        String name = (p.isPresent())?p.get():null;
+                        String select = s.get();
+                        plugin.api.getServer(select, server -> {
+                            if (server != null) {
                                 if (!(server instanceof SubServer) || ((SubServer) server).isRunning()) {
                                     Value<Boolean> msg = new Container<>(false);
                                     Callback<Player> action = target -> {
-                                        if (target == sender || permits(server, sender, "subservers.server.%.*", "subservers.server.%.teleport-others")) {
+                                        if (target == sender || sender.hasPermission("subservers.teleport-others")) {
                                             sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", "Command.Teleport").replace("$str$", target.getName())));
                                             plugin.pmc(target, "Connect", server.getName());
                                         } else if (!msg.value()) {
                                             msg.value(true);
-                                            sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", "Command.Generic.Invalid-Permission").replace("$str$", "subservers.server." + server.getName() + ".teleport-others")));
+                                            sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", "Command.Generic.Invalid-Permission").replace("$str$", "subservers.teleport-others")));
                                         }
                                     };
 
@@ -1184,13 +1184,14 @@ public final class SubCommand implements CommandExecutor {
                                     sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", "Command.Teleport.Not-Running").replace("$str$", server.getName())));
                                 }
                             } else {
-                                sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", "Command.Generic.Invalid-Select-Permission").replace("$str$", server.getName())));
+                                sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", "Command.Generic.Unknown-Server").replace("$str$", select)));
                             }
-                        } else {
-                            sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", "Command.Generic.Unknown-Server").replace("$str$", select)));
-                        }
-                    });
-                    return CommandResult.builder().successCount(1).build();
+                        });
+                        return CommandResult.builder().successCount(1).build();
+                    } else {
+                        sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", "Command.Generic.Invalid-Permission").replace("$str$", "subservers.teleport")));
+                        return CommandResult.builder().successCount(0).build();
+                    }
                 } else {
                     sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Generic.Usage").replace("$str$", "/sub teleport " + ((sender instanceof Player)?"[Player]":"<Player>") + " <Server>")));
                     return CommandResult.builder().successCount(0).build();
