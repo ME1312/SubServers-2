@@ -787,7 +787,7 @@ public final class SubCommand extends BukkitCommand {
                         sender.sendMessage(plugin.api.getLang("SubServers", "Command.Generic.Invalid-Subcommand").replace("$str$", args[0]));
                     }
                 } else {
-                    if (sender.hasPermission("subservers.interface") && sender instanceof Player && plugin.gui != null) {
+                    if (plugin.gui != null && sender instanceof Player && sender.hasPermission("subservers.interface")) {
                         plugin.gui.getRenderer((Player) sender).newUI();
                     } else {
                         sender.sendMessage(printHelp(sender, label));
@@ -795,7 +795,7 @@ public final class SubCommand extends BukkitCommand {
                 }
             } else if (args.length > 0 && (args[0].equalsIgnoreCase("tp") || args[0].equalsIgnoreCase("teleport"))) {
                 executeTeleport(sender, label, args);
-            } else if (sender.hasPermission("subservers.interface") && sender instanceof Player) {
+            } else if (plugin.gui != null && sender instanceof Player && sender.hasPermission("subservers.interface")) {
                 plugin.gui.getRenderer((Player) sender).newUI();
             } else {
                 sender.sendMessage(plugin.api.getLang("SubServers", "Command.Generic.Invalid-Permission").replace("$str$", "subservers.command"));

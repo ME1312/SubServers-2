@@ -25,10 +25,9 @@ permissions:
       subservers.command:
         description: "Access to the SubServers Command"
         default: op
-        children:
-          subservers.teleport:
-            description: "Access to SubServers' Teleport Command"
-            default: op
+      subservers.teleport:
+        description: "Access to SubServers' Teleport Command"
+        default: op
       subservers.teleport-others:
         description: "Access to Teleport other players using the Teleport Command"
         default: op

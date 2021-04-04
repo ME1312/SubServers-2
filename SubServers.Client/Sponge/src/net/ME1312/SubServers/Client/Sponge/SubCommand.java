@@ -65,7 +65,7 @@ public final class SubCommand implements CommandExecutor {
         return CommandSpec.builder()
                 .description(Text.of("The SubServers Command"))
                 .executor(root)
-                .arguments(GenericArguments.optional(GenericArguments.string(Text.of("subcommand"))), GenericArguments.optional(GenericArguments.remainingJoinedStrings(Text.of("..."))))
+                .arguments(GenericArguments.optional(GenericArguments.string(Text.of("Command"))), GenericArguments.optional(GenericArguments.remainingJoinedStrings(Text.of("..."))))
                 .child(CommandSpec.builder()
                         .description(Text.of("The SubServers Command - Help"))
                         .executor(new HELP())
@@ -150,18 +150,21 @@ public final class SubCommand implements CommandExecutor {
 
     public CommandResult execute(CommandSource sender, CommandContext args) throws CommandException {
         if (canRun(sender)) {
-            Optional<String> subcommand = args.getOne(Text.of("subcommand"));
+            Optional<String> subcommand = args.getOne(Text.of("Command"));
             if (subcommand.isPresent()) {
-                sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Generic.Invalid-Subcommand").replace("$str$", subcommand.get())));
+                sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", "Command.Generic.Invalid-Subcommand").replace("$str$", subcommand.get())));
                 return CommandResult.builder().successCount(0).build();
             } else {
-                if (sender.hasPermission("subservers.interface") && sender instanceof Player && plugin.gui != null) {
+                if (plugin.gui != null && sender instanceof Player && sender.hasPermission("subservers.interface")) {
                     plugin.gui.getRenderer((Player) sender).newUI();
                 } else {
                     sender.sendMessages(printHelp());
                 }
                 return CommandResult.builder().successCount(1).build();
             }
+        } else if (plugin.gui != null && sender instanceof Player && sender.hasPermission("subservers.interface")) {
+            plugin.gui.getRenderer((Player) sender).newUI();
+            return CommandResult.builder().successCount(1).build();
         } else {
             sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Generic.Invalid-Permission").replace("$str$", "subservers.command")));
             return CommandResult.builder().successCount(0).build();
@@ -1146,7 +1149,7 @@ public final class SubCommand implements CommandExecutor {
                 }
 
                 if (s.isPresent() && (p.isPresent() || sender instanceof Player)) {
-                    if (sender.hasPermission("subservers.command") || sender.hasPermission("subservers.teleport")) {
+                    if (sender.hasPermission("subservers.teleport")) {
                         String name = (p.isPresent())?p.get():null;
                         String select = s.get();
                         plugin.api.getServer(select, server -> {
