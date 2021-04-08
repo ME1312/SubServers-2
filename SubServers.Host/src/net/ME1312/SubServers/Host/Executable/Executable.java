@@ -25,11 +25,13 @@ public class Executable {
             exec = '\"' + System.getProperty("java.home") + File.separator + "bin" + File.separator + "java" + '\"' + exec.substring(4);
 
         String[] cmd;
-        if (System.getProperty("os.name").toLowerCase().startsWith("windows")) {
+        if (Platform.getSystem() == Platform.WINDOWS) {
             if (gitbash != null && (exec.toLowerCase().startsWith("bash ") || exec.toLowerCase().startsWith("sh ")))
                 exec = '"' + gitbash + ((gitbash.endsWith(File.separator))?"":File.separator) + "bin" + File.separatorChar + "sh.exe\" -lc \"" +
                         exec.replace("\\", "/\\").replace("\"", "\\\"").replace("^", "^^").replace("%", "^%").replace("&", "^&").replace("<", "^<").replace(">", "^>").replace("|", "^|") + '"';
             cmd = new String[]{"cmd.exe", "/q", "/c", '"'+exec+'"'};
+        } else if (Platform.getSystem() == Platform.LINUX) {
+            cmd = new String[]{"setsid", "-w", "sh", "-lc", exec};
         } else {
             cmd = new String[]{"sh", "-lc", exec};
         }
@@ -86,6 +88,8 @@ public class Executable {
             if (pid != null) try {
                 if (Platform.getSystem() == Platform.WINDOWS) {
                     Runtime.getRuntime().exec(new String[]{"taskkill.exe", "/T", "/F", "/PID", pid.toString()}).waitFor();
+                } else if (Platform.getSystem() == Platform.LINUX) {
+                    Runtime.getRuntime().exec(new String[]{"bash", "-c", "kill -9 $(ps -o pid= --sid $(ps -o sid= --pid " + pid + "))"}).waitFor();
                 }
             } catch (IOException | InterruptedException e) {}
 
