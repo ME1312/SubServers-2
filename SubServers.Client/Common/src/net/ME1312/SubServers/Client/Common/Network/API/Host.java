@@ -88,11 +88,11 @@ public class Host {
     public DataSender[] getSubData() {
         if (raw.contains("subdata")) {
             ObjectMap<Integer> subdata = new ObjectMap<Integer>((Map<Integer, ?>) raw.getObject("subdata"));
-            LinkedList<Integer> keys = new LinkedList<Integer>(subdata.getKeys());
-            LinkedList<SubDataSender> channels = new LinkedList<SubDataSender>();
-            Collections.sort(keys);
-            for (Integer channel : keys) channels.add((subdata.isNull(channel))?null:new ForwardedDataSender((SubDataClient) ClientAPI.getInstance().getSubDataNetwork()[0], subdata.getUUID(channel)));
-            return channels.toArray(new SubDataSender[0]);
+            Integer[] keys = subdata.getKeys().toArray(new Integer[0]);
+            DataSender[] channels = new DataSender[keys.length];
+            Arrays.sort(keys);
+            for (int i = 0; i < keys.length; ++i) channels[i] = (subdata.isNull(keys[i]))? null : new ForwardedDataSender((SubDataClient) ClientAPI.getInstance().getSubDataNetwork()[0], subdata.getUUID(keys[i]));
+            return channels;
         } else {
             return new SubDataSender[0];
         }

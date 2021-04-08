@@ -67,11 +67,11 @@ public class ServerImpl extends BungeeServerInfo {
      * @return SubData Client Channel ID Array
      */
     public DataSender[] getSubData() {
-        LinkedList<Integer> keys = new LinkedList<Integer>(subdata.keySet());
-        LinkedList<SubDataSender> channels = new LinkedList<SubDataSender>();
-        Collections.sort(keys);
-        for (Integer channel : keys) channels.add((subdata.getOrDefault(channel, null) == null)?null:new ForwardedDataSender((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0], subdata.get(channel)));
-        return channels.toArray(new SubDataSender[0]);
+        Integer[] keys = subdata.keySet().toArray(new Integer[0]);
+        DataSender[] channels = new DataSender[keys.length];
+        Arrays.sort(keys);
+        for (int i = 0; i < keys.length; ++i) channels[i] = (subdata.getOrDefault(keys[i], null) == null)? null : new ForwardedDataSender((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0], subdata.get(keys[i]));
+        return channels;
     }
 
     /**

@@ -73,11 +73,11 @@ public final class SubAPI extends ClientAPI {
      * @return SubData Network Connections
      */
     public DataClient[] getSubDataNetwork() {
-        LinkedList<Integer> keys = new LinkedList<Integer>(plugin.subdata.keySet());
-        LinkedList<SubDataClient> channels = new LinkedList<SubDataClient>();
-        Collections.sort(keys);
-        for (Integer channel : keys) channels.add(plugin.subdata.get(channel));
-        return channels.toArray(new DataClient[0]);
+        Integer[] keys = plugin.subdata.keySet().toArray(new Integer[0]);
+        DataClient[] channels = new DataClient[keys.length];
+        Arrays.sort(keys);
+        for (int i = 0; i < keys.length; ++i) channels[i] = plugin.subdata.get(keys[i]);
+        return channels;
     }
 
     /**

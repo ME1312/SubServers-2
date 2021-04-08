@@ -82,11 +82,11 @@ public class ServerImpl extends BungeeServerInfo implements Server {
 
     @Override
     public DataClient[] getSubData() {
-        LinkedList<Integer> keys = new LinkedList<Integer>(subdata.keySet());
-        LinkedList<SubDataClient> channels = new LinkedList<SubDataClient>();
-        Collections.sort(keys);
-        for (Integer channel : keys) channels.add(subdata.get(channel));
-        return channels.toArray(new DataClient[0]);
+        Integer[] keys = subdata.keySet().toArray(new Integer[0]);
+        DataClient[] channels = new DataClient[keys.length];
+        Arrays.sort(keys);
+        for (int i = 0; i < keys.length; ++i) channels[i] = subdata.get(keys[i]);
+        return channels;
     }
 
     public void setSubData(DataClient client, int channel) {

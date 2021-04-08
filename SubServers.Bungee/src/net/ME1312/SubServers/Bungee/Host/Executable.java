@@ -12,6 +12,7 @@ import java.io.IOException;
  */
 public class Executable {
     private Executable() {}
+    private static final boolean USE_SESSION_TRACKING;
 
     /**
      * Format a command to be executed
@@ -30,12 +31,20 @@ public class Executable {
                 exec = '"' + gitbash + ((gitbash.endsWith(File.separator))?"":File.separator) + "bin" + File.separatorChar + "sh.exe\" -lc \"" +
                         exec.replace("\\", "/\\").replace("\"", "\\\"").replace("^", "^^").replace("%", "^%").replace("&", "^&").replace("<", "^<").replace(">", "^>").replace("|", "^|") + '"';
             cmd = new String[]{"cmd.exe", "/q", "/c", '"'+exec+'"'};
-        } else if (Platform.getSystem() == Platform.LINUX) {
+        } else if (USE_SESSION_TRACKING) {
             cmd = new String[]{"setsid", "-w", "sh", "-lc", exec};
         } else {
             cmd = new String[]{"sh", "-lc", exec};
         }
         return cmd;
+    }
+
+    static {
+        USE_SESSION_TRACKING = Platform.getSystem() != Platform.WINDOWS && Util.getDespiteException(() -> {
+            Process test = Runtime.getRuntime().exec(new String[]{"setsid", "-w", "bash", "-c", "exit 0"});
+            test.waitFor(); // The purpose of this block is to test for the 'setsid' command
+            return test.exitValue() == 0;
+        }, false);
     }
 
     /**
@@ -88,7 +97,7 @@ public class Executable {
             if (pid != null) try {
                 if (Platform.getSystem() == Platform.WINDOWS) {
                     Runtime.getRuntime().exec(new String[]{"taskkill.exe", "/T", "/F", "/PID", pid.toString()}).waitFor();
-                } else if (Platform.getSystem() == Platform.LINUX) {
+                } else if (USE_SESSION_TRACKING) {
                     Runtime.getRuntime().exec(new String[]{"bash", "-c", "kill -9 $(ps -o pid= --sid $(ps -o sid= --pid " + pid + "))"}).waitFor();
                 }
             } catch (IOException | InterruptedException e) {}

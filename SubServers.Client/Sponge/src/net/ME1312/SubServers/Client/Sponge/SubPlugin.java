@@ -106,7 +106,6 @@ public final class SubPlugin {
             running = true;
             reload(false);
 
-            subdata.put(0, null);
             subprotocol = SubProtocol.get();
             subprotocol.registerCipher("DHE", DHE.get(128));
             subprotocol.registerCipher("DHE-128", DHE.get(128));
