@@ -98,7 +98,7 @@ public class Executable {
                 if (Platform.getSystem() == Platform.WINDOWS) {
                     Runtime.getRuntime().exec(new String[]{"taskkill.exe", "/T", "/F", "/PID", pid.toString()}).waitFor();
                 } else if (USE_SESSION_TRACKING) {
-                    Runtime.getRuntime().exec(new String[]{"bash", "-c", "kill -9 $(ps -o pid= --sid $(ps -o sid= --pid " + pid + "))"}).waitFor();
+                    Runtime.getRuntime().exec(new String[]{"bash", "-c", "kill -9 $(ps -s " + pid + " -o pid=)"}).waitFor();
                 }
             } catch (IOException | InterruptedException e) {}
 
