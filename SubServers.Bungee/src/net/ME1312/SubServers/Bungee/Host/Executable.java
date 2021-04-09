@@ -32,7 +32,7 @@ public class Executable {
                         exec.replace("\\", "/\\").replace("\"", "\\\"").replace("^", "^^").replace("%", "^%").replace("&", "^&").replace("<", "^<").replace(">", "^>").replace("|", "^|") + '"';
             cmd = new String[]{"cmd.exe", "/q", "/c", '"'+exec+'"'};
         } else if (USE_SESSION_TRACKING) {
-            cmd = new String[]{"setsid", "-w", "sh", "-lc", exec};
+            cmd = new String[]{"setsid", "sh", "-lc", exec};
         } else {
             cmd = new String[]{"sh", "-lc", exec};
         }
@@ -41,7 +41,7 @@ public class Executable {
 
     static {
         USE_SESSION_TRACKING = Platform.getSystem() != Platform.WINDOWS && Util.getDespiteException(() -> {
-            Process test = Runtime.getRuntime().exec(new String[]{"setsid", "-w", "bash", "-c", "exit 0"});
+            Process test = Runtime.getRuntime().exec(new String[]{"setsid", "bash", "-c", "exit 0"});
             test.waitFor(); // The purpose of this block is to test for the 'setsid' command
             return test.exitValue() == 0;
         }, false);
