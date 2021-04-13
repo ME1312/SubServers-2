@@ -601,7 +601,8 @@ public final class SubProxy extends BungeeCommon implements Listener {
             }
 
             Logger.get("SubData").info("");
-            subdata = subprotocol.open((config.get().getMap("Settings").getMap("SubData").getRawString("Address", "127.0.0.1:4391").split(":")[0].equals("0.0.0.0"))?null:InetAddress.getByName(config.get().getMap("Settings").getMap("SubData").getRawString("Address", "127.0.0.1:4391").split(":")[0]),
+            subdata = subprotocol.open((config.get().getMap("Settings").getMap("SubData").getRawString("Address", "127.0.0.1:4391").split(":")[0].equals("0.0.0.0"))?
+                            null:InetAddress.getByName(config.get().getMap("Settings").getMap("SubData").getRawString("Address", "127.0.0.1:4391").split(":")[0]),
                     Integer.parseInt(config.get().getMap("Settings").getMap("SubData").getRawString("Address", "127.0.0.1:4391").split(":")[1]), cipher);
         } // Add new entries to Allowed-Connections
         for (String s : config.get().getMap("Settings").getMap("SubData").getStringList("Whitelist", new ArrayList<String>())) {
@@ -1053,6 +1054,7 @@ public final class SubProxy extends BungeeCommon implements Listener {
             }
 
             if (!state.servers.isEmpty()) {
+                Logger.get("SFD").info("Triggered Fallback for " + e.getPlayer().getName() + " from " + e.getKickedFrom().getName());
                 e.setCancelled(true);
                 e.getPlayer().sendMessage(api.getLang("SubServers", "Bungee.Feature.Smart-Fallback").replace("$str$", (e.getKickedFrom() instanceof Server)?((Server) e.getKickedFrom()).getDisplayName():e.getKickedFrom().getName()).replace("$msg$", e.getKickReason()));
                 if (init) fallback.put(e.getPlayer().getUniqueId(), state);

@@ -233,8 +233,7 @@ public final class ExProxy extends BungeeCommon implements Listener {
                 public void run() {
                     try {
                         if (reset == resetDate && (subdata.getOrDefault(0, null) == null || subdata.get(0).isClosed())) {
-                            SubDataClient open = subprotocol.open((config.get().getMap("Settings").getMap("SubData").getRawString("Address", "127.0.0.1:4391").split(":")[0].equals("0.0.0.0"))?
-                                            null:InetAddress.getByName(config.get().getMap("Settings").getMap("SubData").getRawString("Address", "127.0.0.1:4391").split(":")[0]),
+                            SubDataClient open = subprotocol.open(InetAddress.getByName(config.get().getMap("Settings").getMap("SubData").getRawString("Address", "127.0.0.1:4391").split(":")[0]),
                                     Integer.parseInt(config.get().getMap("Settings").getMap("SubData").getRawString("Address", "127.0.0.1:4391").split(":")[1]));
 
                             if (subdata.getOrDefault(0, null) != null) subdata.get(0).reconnect(open);
@@ -583,6 +582,7 @@ public final class ExProxy extends BungeeCommon implements Listener {
             }
 
             if (!state.servers.isEmpty()) {
+                Logger.get("SFD").info("Triggered Fallback for " + e.getPlayer().getName() + " from " + e.getKickedFrom().getName());
                 e.setCancelled(true);
                 e.getPlayer().sendMessage(api.getLang("SubServers", "Bungee.Feature.Smart-Fallback").replace("$str$", (e.getKickedFrom() instanceof ServerImpl)?((ServerImpl) e.getKickedFrom()).getDisplayName():e.getKickedFrom().getName()).replace("$msg$", e.getKickReason()));
                 if (init) fallback.put(e.getPlayer().getUniqueId(), state);
