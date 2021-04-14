@@ -1054,7 +1054,6 @@ public final class SubProxy extends BungeeCommon implements Listener {
             }
 
             if (!state.servers.isEmpty()) {
-                Logger.get("SFD").info("Triggered Fallback for " + e.getPlayer().getName() + " from " + e.getKickedFrom().getName() + "(current server is " + ((e.getPlayer().getServer().getInfo() == null)?"NULL":e.getPlayer().getServer().getInfo().getName()) + ')');
                 e.setCancelled(true);
                 e.getPlayer().sendMessage(api.getLang("SubServers", "Bungee.Feature.Smart-Fallback").replace("$str$", (e.getKickedFrom() instanceof Server)?((Server) e.getKickedFrom()).getDisplayName():e.getKickedFrom().getName()).replace("$msg$", e.getKickReason()));
                 if (init) fallback.put(e.getPlayer().getUniqueId(), state);
