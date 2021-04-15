@@ -587,7 +587,7 @@ public final class ExProxy extends BungeeCommon implements Listener {
                 if (init) fallback.put(e.getPlayer().getUniqueId(), state);
 
                 e.setCancelServer(state.servers.getFirst());
-                if (Util.isException(() -> Util.reflect(ServerKickEvent.class.getDeclaredMethod("setCancelServers", ServerInfo[].class), e, (Object) state.servers.toArray(new ServerInfo[0])))) {
+                if (Util.isException(() -> ServerKickEvent.class.getMethod("setCancelServers", ServerInfo[].class).invoke(e, (Object) state.servers.toArray(new ServerInfo[0])))) {
                     ((UserConnection) e.getPlayer()).setServerJoinQueue(new LinkedList<>(state.names));
                 }
             }

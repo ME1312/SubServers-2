@@ -21,8 +21,8 @@ public class Logger {
      */
     public static java.util.logging.Logger get(String prefix) {
         if (!existing.keySet().contains(prefix)) {
-            java.util.logging.Logger log = Util.getDespiteException(() -> Util.reflect(Class.forName("net.ME1312.Galaxi.Log.Logger").getDeclaredMethod("toPrimitive"),
-                    Util.reflect(Class.forName("net.ME1312.Galaxi.Log.Logger").getConstructor(String.class), prefix)), null);
+            java.util.logging.Logger log = Util.getDespiteException(() -> (java.util.logging.Logger) Class.forName("net.ME1312.Galaxi.Log.Logger").getMethod("toPrimitive")
+                    .invoke(Class.forName("net.ME1312.Galaxi.Log.Logger").getConstructor(String.class).newInstance(prefix)), null);
 
             if (log == null) {
                 log = java.util.logging.Logger.getAnonymousLogger();

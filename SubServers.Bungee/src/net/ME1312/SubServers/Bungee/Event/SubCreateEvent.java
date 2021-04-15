@@ -50,15 +50,16 @@ public class SubCreateEvent extends Event implements SubEvent, Cancellable {
      *
      * @param player Player Updating
      * @param server Server to be Updated
+     * @param template Server Template
      * @param version Server Version
      */
-    public SubCreateEvent(UUID player, SubServer server, Version version) {
+    public SubCreateEvent(UUID player, SubServer server, SubCreator.ServerTemplate template, Version version) {
         if (Util.isNull(server)) throw new NullPointerException();
         this.player = player;
         this.update = server;
         this.name = server.getName();
         this.host = server.getHost();
-        this.template = server.getTemplate();
+        this.template = template;
         this.version = version;
         this.port = server.getAddress().getPort();
     }

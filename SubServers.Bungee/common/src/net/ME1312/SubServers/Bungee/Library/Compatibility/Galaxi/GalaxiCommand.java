@@ -27,7 +27,7 @@ public class GalaxiCommand {
      * @return The Command
      */
     public static Command description(Command command, String value) {
-        Util.isException(() -> Util.reflect(Class.forName("net.ME1312.Galaxi.Command.Command").getMethod("description", String.class), command, value));
+        Util.isException(() -> Class.forName("net.ME1312.Galaxi.Command.Command").getMethod("description", String.class).invoke(command, value));
         return command;
     }
 
@@ -39,7 +39,7 @@ public class GalaxiCommand {
      * @return The Command
      */
     public static Command help(Command command, String... lines) {
-        Util.isException(() -> Util.reflect(Class.forName("net.ME1312.Galaxi.Command.Command").getMethod("help", String[].class), command, (Object) lines));
+        Util.isException(() -> Class.forName("net.ME1312.Galaxi.Command.Command").getMethod("help", String[].class).invoke(command, (Object) lines));
         return command;
     }
 
@@ -51,7 +51,7 @@ public class GalaxiCommand {
      * @return The Command
      */
     public static Command usage(Command command, String... args) {
-        Util.isException(() -> Util.reflect(Class.forName("net.ME1312.Galaxi.Command.Command").getMethod("usage", String[].class), command, (Object) args));
+        Util.isException(() -> Class.forName("net.ME1312.Galaxi.Command.Command").getMethod("usage", String[].class).invoke(command, (Object) args));
         return command;
     }
 

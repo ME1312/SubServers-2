@@ -313,7 +313,8 @@ public class InternalSubCreator extends SubCreator {
                         if (server.contains("Extra")) for (String extra : server.getMap("Extra").getKeys())
                             subserver.addExtra(extra, server.getMap("Extra").getObject(extra));
 
-                        if (!(subserver.getStopAction() == StopAction.REMOVE_SERVER || subserver.getStopAction() == StopAction.RECYCLE_SERVER || subserver.getStopAction() == StopAction.DELETE_SERVER)) {
+                        if ((update != null && host.plugin.servers.get().getMap("Servers").contains(name)) ||
+                                !(subserver.getStopAction() == StopAction.REMOVE_SERVER || subserver.getStopAction() == StopAction.RECYCLE_SERVER || subserver.getStopAction() == StopAction.DELETE_SERVER)) {
                             host.plugin.servers.get().getMap("Servers").set(name, server);
                             host.plugin.servers.save();
                         }
@@ -442,7 +443,7 @@ public class InternalSubCreator extends SubCreator {
             });
             this.thread.put(server.getName().toLowerCase(), task);
 
-            final SubCreateEvent event = new SubCreateEvent(player, server, version);
+            final SubCreateEvent event = new SubCreateEvent(player, server, ft, version);
             host.plugin.getPluginManager().callEvent(event);
             if (!event.isCancelled()) {
                 task.start();
