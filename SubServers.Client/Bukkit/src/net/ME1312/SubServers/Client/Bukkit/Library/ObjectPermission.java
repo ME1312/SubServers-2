@@ -48,11 +48,11 @@ public class ObjectPermission {
      * @param permissions Permissions to check (use <b>%</b> as a placeholder for the object name)
      * @return Permission Check Result
      */
-    private static boolean permits(String string, Permissible object, String... permissions) {
+    public static boolean permits(String string, Permissible object, String... permissions) {
         if (Util.isNull(object)) throw new NullPointerException();
         boolean permitted = false;
 
-        for (int p = 0; !permitted && p < permissions.length; p++) {
+        for (int p = 0; !permitted && p < permissions.length; ++p) {
             String perm = permissions[p];
             if (perm != null) {
                 // Check all proxies & individual proxies permission
@@ -76,7 +76,7 @@ public class ObjectPermission {
         if (Util.isNull(object)) throw new NullPointerException();
         boolean permitted = false;
 
-        for (int p = 0; !permitted && p < permissions.length; p++) {
+        for (int p = 0; !permitted && p < permissions.length; ++p) {
             String perm = permissions[p];
             if (perm != null) {
                 // Check all servers & individual servers permission
@@ -93,7 +93,7 @@ public class ObjectPermission {
                 List<String> groups = server.getGroups();
                 if (groups.size() > 0) {
                     permitted = permitted || object.hasPermission(perm.replace("%", ":*"));
-                    for (int g = 0; !permitted && g < groups.size(); g++) {
+                    for (int g = 0; !permitted && g < groups.size(); ++g) {
                         permitted = object.hasPermission(perm.replace("%", ":" + groups.get(g).toLowerCase()));
                     }
                 }

@@ -340,7 +340,7 @@ public final class SubCommand extends BukkitCommand {
                         }
                     } else if (args[0].equalsIgnoreCase("start")) {
                         if (args.length > 1) {
-                            selectServers(sender, args, 1, true, Arrays.asList("subservers.subserver.%.*", "subservers.subserver.%.start"), select -> {
+                            selectServers(sender, args, 1, true, new String[]{"subservers.subserver.%.*", "subservers.subserver.%.start"}, select -> {
                                 if (select.subservers.length > 0) {
                                     Container<Integer> success = new Container<Integer>(0);
                                     Container<Integer> running = new Container<Integer>(0);
@@ -388,7 +388,7 @@ public final class SubCommand extends BukkitCommand {
                         }
                     } else if (args[0].equalsIgnoreCase("restart")) {
                         if (args.length > 1) {
-                            selectServers(sender, args, 1, true, Arrays.asList(Arrays.asList("subservers.subserver.%.*", "subservers.subserver.%.start"), Arrays.asList("subservers.subserver.%.*", "subservers.subserver.%.stop")), select -> {
+                            selectServers(sender, args, 1, true, new String[][]{{"subservers.subserver.%.*", "subservers.subserver.%.start"}, {"subservers.subserver.%.*", "subservers.subserver.%.stop"}}, select -> {
                                 if (select.subservers.length > 0) {
                                     // Step 5: Start the stopped Servers once more
                                     final UUID player = (sender instanceof Player)?((Player) sender).getUniqueId():null;
@@ -491,7 +491,7 @@ public final class SubCommand extends BukkitCommand {
                         }
                     } else if (args[0].equalsIgnoreCase("stop")) {
                         if (args.length > 1) {
-                            selectServers(sender, args, 1, true, Arrays.asList("subservers.subserver.%.*", "subservers.subserver.%.stop"), select -> {
+                            selectServers(sender, args, 1, true, new String[]{"subservers.subserver.%.*", "subservers.subserver.%.stop"}, select -> {
                                 if (select.subservers.length > 0) {
                                     Container<Integer> success = new Container<Integer>(0);
                                     Container<Integer> running = new Container<Integer>(0);
@@ -538,7 +538,7 @@ public final class SubCommand extends BukkitCommand {
                         }
                     } else if (args[0].equalsIgnoreCase("kill") || args[0].equalsIgnoreCase("terminate")) {
                         if (args.length > 1) {
-                            selectServers(sender, args, 1, true, Arrays.asList("subservers.subserver.%.*", "subservers.subserver.%.terminate"), select -> {
+                            selectServers(sender, args, 1, true, new String[]{"subservers.subserver.%.*", "subservers.subserver.%.terminate"}, select -> {
                                 if (select.subservers.length > 0) {
                                     Container<Integer> success = new Container<Integer>(0);
                                     Container<Integer> running = new Container<Integer>(0);
@@ -585,7 +585,7 @@ public final class SubCommand extends BukkitCommand {
                         }
                     } else if (args[0].equalsIgnoreCase("cmd") || args[0].equalsIgnoreCase("command")) {
                         if (args.length > 1) {
-                            selectServers(sender, args, 1, true, Arrays.asList("subservers.subserver.%.*", "subservers.subserver.%.command"), select -> {
+                            selectServers(sender, args, 1, true, new String[]{"subservers.subserver.%.*", "subservers.subserver.%.command"}, select -> {
                                 if (select.subservers.length > 0) {
                                     if (select.args.length > 2) {
                                         StringBuilder builder = new StringBuilder(select.args[2]);
@@ -628,7 +628,7 @@ public final class SubCommand extends BukkitCommand {
                         }
                     } else if (args[0].equalsIgnoreCase("create")) {
                         if (args.length > 3) {
-                            if (sender.hasPermission("subservers.host.*.*") || sender.hasPermission("subservers.host.*.create") || sender.hasPermission("subservers.host." + args[2].toLowerCase() + ".*") || sender.hasPermission("subservers.host." + args[2].toLowerCase() + ".create")) {
+                            if (permits(args[2], sender, "subservers.host.%.*", "subservers.host.%.create")) {
                                 if (args.length > 5 && Util.isException(() -> Integer.parseInt(args[5]))) {
                                     sender.sendMessage(plugin.api.getLang("SubServers", "Command.Creator.Invalid-Port"));
                                 } else {
@@ -673,7 +673,7 @@ public final class SubCommand extends BukkitCommand {
                         }
                     } else if (args[0].equalsIgnoreCase("update") || args[0].equalsIgnoreCase("upgrade")) {
                         if (args.length > 1) {
-                            selectServers(sender, args, 1, true, Arrays.asList("subservers.subserver.%.*", "subservers.subserver.%.update"), select -> {
+                            selectServers(sender, args, 1, true, new String[]{"subservers.subserver.%.*", "subservers.subserver.%.update"}, select -> {
                                 if (select.subservers.length > 0) {
                                     String template = (select.args.length > 3)?select.args[2].toLowerCase():null;
                                     Version version = (select.args.length > 2)?new Version(select.args[(template == null)?2:3]):null;
@@ -746,7 +746,7 @@ public final class SubCommand extends BukkitCommand {
                                             plugin.gui.getRenderer((Player) sender).hostAdmin(args[2]);
                                             break;
                                         case "host/creator":
-                                            if (sender.hasPermission("subservers.host.*.*") || sender.hasPermission("subservers.host.*.create") || sender.hasPermission("subservers.host." + args[2].toLowerCase() + ".*") || sender.hasPermission("subservers.host." + args[2].toLowerCase() + ".create"))
+                                            if (permits(args[2], sender, "subservers.host.%.*", "subservers.host.%.create"))
                                                 plugin.gui.getRenderer((Player) sender).hostCreator(new UIRenderer.CreatorOptions(args[2]));
                                             else throw new IllegalStateException("Player does not meet the requirements to render this page");
                                             break;
@@ -838,13 +838,13 @@ public final class SubCommand extends BukkitCommand {
         }
     }
     private void selectServers(CommandSender sender, String[] rargs, int index, boolean mode, String permissions, Callback<ServerSelection> callback) {
-        selectServers(sender, rargs, index, mode, Arrays.asList(permissions), callback);
+        selectServers(sender, rargs, index, mode, new String[]{ permissions }, callback);
     }
-    private void selectServers(CommandSender sender, String[] rargs, int index, boolean mode, List<String> permissions, Callback<ServerSelection> callback) {
-        selectServers(sender, rargs, index, mode, Arrays.asList(permissions), callback);
+    private void selectServers(CommandSender sender, String[] rargs, int index, boolean mode, String[] permissions, Callback<ServerSelection> callback) {
+        selectServers(sender, rargs, index, mode, new String[][]{ permissions }, callback);
     }
     @SuppressWarnings("unchecked")
-    private void selectServers(CommandSender sender, String[] rargs, int index, boolean mode, Collection<List<String>> permissions, Callback<ServerSelection> callback) {
+    private void selectServers(CommandSender sender, String[] rargs, int index, boolean mode, String[][] permissions, Callback<ServerSelection> callback) {
         StackTraceElement[] origin = new Exception().getStackTrace();
         LinkedList<String> msgs = new LinkedList<String>();
         LinkedList<String> args = new LinkedList<String>();
@@ -878,13 +878,12 @@ public final class SubCommand extends BukkitCommand {
                 if (!history.contains(server)) {
                     history.add(server);
 
-                    boolean permitted = sender == null || permissions == null || permissions.size() <= 0;
+                    boolean permitted = sender == null || permissions == null || permissions.length == 0;
                     if (!permitted) {
                         permitted = true;
-                        List<String>[] checks = permissions.toArray(new List[0]);
-                        for (int p = 0; permitted && p < permissions.size(); p++) {
-                            if (checks[p] == null || checks[p].size() <= 0) continue;
-                            else permitted = permits(server, sender, checks[p].toArray(new String[0]));
+                        for (int p = 0; permitted && p < permissions.length; ++p) {
+                            if (permissions[p] == null || permissions[p].length == 0) continue;
+                            else permitted = permits(server, sender, permissions[p]);
                         }
                     }
 

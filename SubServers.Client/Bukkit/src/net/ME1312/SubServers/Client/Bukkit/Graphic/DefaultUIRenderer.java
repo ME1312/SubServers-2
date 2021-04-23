@@ -258,7 +258,7 @@ public class DefaultUIRenderer extends UIRenderer {
                 }
 
                 Player player = Bukkit.getPlayer(this.player);
-                if (!(player.hasPermission("subservers.host.*.*") || player.hasPermission("subservers.host.*.create") || player.hasPermission("subservers.host." + name.toLowerCase() + ".*") || player.hasPermission("subservers.host." + name.toLowerCase() + ".create"))) {
+                if (!permits(name, player, "subservers.host.%.*", "subservers.host.%.create")) {
                     block = color(7);
                     blockMeta = block.getItemMeta();
                     blockMeta.setDisplayName(ChatColor.GRAY+ChatColor.stripColor(plugin.api.getLang("SubServers", "Interface.Host-Admin.Creator")));

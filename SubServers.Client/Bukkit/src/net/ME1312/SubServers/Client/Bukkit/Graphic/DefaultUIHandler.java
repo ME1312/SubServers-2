@@ -113,8 +113,7 @@ public class DefaultUIHandler implements UIHandler, Listener {
                             ((UIRenderer.CreatorOptions) gui.lastVisitedObjects[0]).undo();
                             gui.hostCreator((UIRenderer.CreatorOptions) gui.lastVisitedObjects[0]);
                         } else if (item.equals(plugin.api.getLang("SubServers", "Interface.Host-Creator.Submit"))) {
-                            String host = ((UIRenderer.CreatorOptions) gui.lastVisitedObjects[0]).getHost().toLowerCase();
-                            if (player.hasPermission("subservers.host.*.*") || player.hasPermission("subservers.host.*.create") || player.hasPermission("subservers.host." + host + ".*") || player.hasPermission("subservers.host." + host + ".create")) {
+                            if (permits(((UIRenderer.CreatorOptions) gui.lastVisitedObjects[0]).getHost(), player, "subservers.host.%.*", "subservers.host.%.create")) {
                                 player.closeInventory();
                                 gui.setDownloading(plugin.api.getLang("SubServers", "Interface.Generic.Downloading.Response"));
                                 UIRenderer.CreatorOptions options = ((UIRenderer.CreatorOptions) gui.lastVisitedObjects[0]);

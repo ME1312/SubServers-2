@@ -286,7 +286,7 @@ public class ExternalHost extends Host implements ClientHandler {
 
     @Override
     public boolean destroy() {
-        if (Util.getDespiteException(() -> Util.reflect(BungeeCord.class.getDeclaredField("isRunning"), plugin), true)) {
+        if (Util.getDespiteException(() -> Util.reflect(SubProxy.class.getDeclaredField("running"), plugin), true)) {
             return super.destroy();
         }
         return true;

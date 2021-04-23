@@ -650,7 +650,7 @@ public final class SubCommand implements CommandExecutor {
             if (canRun(sender)) {
                 Optional<String[]> s = args.getOne(Text.of("Subservers"));
                 if (s.isPresent()) {
-                    selectServers(sender, s.get(), true, Arrays.asList("subservers.subserver.%.*", "subservers.subserver.%.start"), select -> {
+                    selectServers(sender, s.get(), true, new String[]{"subservers.subserver.%.*", "subservers.subserver.%.start"}, select -> {
                         if (select.subservers.length > 0) {
                             Container<Integer> success = new Container<Integer>(0);
                             Container<Integer> running = new Container<Integer>(0);
@@ -710,7 +710,7 @@ public final class SubCommand implements CommandExecutor {
             if (canRun(sender)) {
                 Optional<String[]> s = args.getOne(Text.of("Subservers"));
                 if (s.isPresent()) {
-                    selectServers(sender, s.get(), true, Arrays.asList(Arrays.asList("subservers.subserver.%.*", "subservers.subserver.%.start"), Arrays.asList("subservers.subserver.%.*", "subservers.subserver.%.stop")), select -> {
+                    selectServers(sender, s.get(), true, new String[][]{{"subservers.subserver.%.*", "subservers.subserver.%.start"}, {"subservers.subserver.%.*", "subservers.subserver.%.stop"}}, select -> {
                         if (select.subservers.length > 0) {
                             // Step 5: Start the stopped Servers once more
                             final UUID player = (sender instanceof Player)?((Player) sender).getUniqueId():null;
@@ -825,7 +825,7 @@ public final class SubCommand implements CommandExecutor {
             if (canRun(sender)) {
                 Optional<String[]> s = args.getOne(Text.of("Subservers"));;
                 if (s.isPresent()) {
-                    selectServers(sender, s.get(), true, Arrays.asList("subservers.subserver.%.*", "subservers.subserver.%.stop"), select -> {
+                    selectServers(sender, s.get(), true, new String[]{"subservers.subserver.%.*", "subservers.subserver.%.stop"}, select -> {
                         if (select.subservers.length > 0) {
                             Container<Integer> success = new Container<Integer>(0);
                             Container<Integer> running = new Container<Integer>(0);
@@ -884,7 +884,7 @@ public final class SubCommand implements CommandExecutor {
             if (canRun(sender)) {
                 Optional<String[]> s = args.getOne(Text.of("Subservers"));
                 if (s.isPresent()) {
-                    selectServers(sender, s.get(), true, Arrays.asList("subservers.subserver.%.*", "subservers.subserver.%.terminate"), select -> {
+                    selectServers(sender, s.get(), true, new String[]{"subservers.subserver.%.*", "subservers.subserver.%.terminate"}, select -> {
                         if (select.subservers.length > 0) {
                             Container<Integer> success = new Container<Integer>(0);
                             Container<Integer> running = new Container<Integer>(0);
@@ -944,7 +944,7 @@ public final class SubCommand implements CommandExecutor {
                 Optional<String[]> s = args.getOne(Text.of("Subservers"));
                 Optional<String> command = args.getOne(Text.of("Command"));
                 if (s.isPresent()) {
-                    selectServers(sender, s.get(), true, Arrays.asList("subservers.subserver.%.*", "subservers.subserver.%.command"), select -> {
+                    selectServers(sender, s.get(), true, new String[]{"subservers.subserver.%.*", "subservers.subserver.%.command"}, select -> {
                         if (select.subservers.length > 0) {
                             if (command.isPresent()) {
                                 Container<Integer> success = new Container<Integer>(0);
@@ -997,7 +997,7 @@ public final class SubCommand implements CommandExecutor {
                 Optional<String> version = args.getOne(Text.of("Version"));
                 Optional<String> port = args.getOne(Text.of("Port"));
                 if (name.isPresent() && host.isPresent() && template.isPresent()) {
-                    if (sender.hasPermission("subservers.host.*.*") || sender.hasPermission("subservers.host.*.create") || sender.hasPermission("subservers.host." + host.get().toLowerCase() + ".*") || sender.hasPermission("subservers.host." + host.get().toLowerCase() + ".create")) {
+                    if (permits(host.get(), sender, "subservers.host.%.*", "subservers.host.%.create")) {
                         if (port.isPresent() && Util.isException(() -> Integer.parseInt(port.get()))) {
                             sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Creator.Invalid-Port")));
                             return CommandResult.builder().successCount(0).build();
@@ -1073,7 +1073,7 @@ public final class SubCommand implements CommandExecutor {
                 }
 
                 if (s.isPresent()) {
-                    selectServers(sender, s.get(), true, Arrays.asList("subservers.subserver.%.*", "subservers.subserver.%.update"), select -> {
+                    selectServers(sender, s.get(), true, new String[]{"subservers.subserver.%.*", "subservers.subserver.%.update"}, select -> {
                         if (select.subservers.length > 0) {
                             boolean ts = ft == null;
 
@@ -1224,7 +1224,7 @@ public final class SubCommand implements CommandExecutor {
                                     plugin.gui.getRenderer((Player) sender).hostAdmin(menuopts[0]);
                                     break;
                                 case "host/creator":
-                                    if (sender.hasPermission("subservers.host.*.*") || sender.hasPermission("subservers.host.*.create") || sender.hasPermission("subservers.host." + menuopts[0].toLowerCase() + ".*") || sender.hasPermission("subservers.host." + menuopts[0].toLowerCase() + ".create"))
+                                    if (permits(menuopts[0], sender, "subservers.host.%.*", "subservers.host.%.create"))
                                         plugin.gui.getRenderer((Player) sender).hostCreator(new UIRenderer.CreatorOptions(menuopts[0]));
                                     else throw new IllegalStateException("Player does not meet the requirements to render this page");
                                     break;
@@ -1271,13 +1271,13 @@ public final class SubCommand implements CommandExecutor {
         }
     }
     private void selectServers(CommandSource sender, String[] selection, boolean mode, String permissions, Callback<ServerSelection> callback) {
-        selectServers(sender, selection, mode, Arrays.asList(permissions), callback);
+        selectServers(sender, selection, mode, new String[]{ permissions }, callback);
     }
-    private void selectServers(CommandSource sender, String[] selection, boolean mode, List<String> permissions, Callback<ServerSelection> callback) {
-        selectServers(sender, selection, mode, Arrays.asList(permissions), callback);
+    private void selectServers(CommandSource sender, String[] selection, boolean mode, String[] permissions, Callback<ServerSelection> callback) {
+        selectServers(sender, selection, mode, new String[][]{ permissions }, callback);
     }
     @SuppressWarnings("unchecked")
-    private void selectServers(CommandSource sender, String[] selection, boolean mode, Collection<List<String>> permissions, Callback<ServerSelection> callback) {
+    private void selectServers(CommandSource sender, String[] selection, boolean mode, String[][] permissions, Callback<ServerSelection> callback) {
         StackTraceElement[] origin = new Exception().getStackTrace();
         LinkedList<Text> msgs = new LinkedList<Text>();
         LinkedList<Server> select = new LinkedList<Server>();
@@ -1291,13 +1291,12 @@ public final class SubCommand implements CommandExecutor {
                 if (!history.contains(server)) {
                     history.add(server);
 
-                    boolean permitted = sender == null || permissions == null || permissions.size() <= 0;
+                    boolean permitted = sender == null || permissions == null || permissions.length == 0;
                     if (!permitted) {
                         permitted = true;
-                        List<String>[] checks = permissions.toArray(new List[0]);
-                        for (int p = 0; permitted && p < permissions.size(); p++) {
-                            if (checks[p] == null || checks[p].size() <= 0) continue;
-                            else permitted = permits(server, sender, checks[p].toArray(new String[0]));
+                        for (int p = 0; permitted && p < permissions.length; ++p) {
+                            if (permissions[p] == null || permissions[p].length == 0) continue;
+                            else permitted = permits(server, sender, permissions[p]);
                         }
                     }
 

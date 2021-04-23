@@ -101,6 +101,7 @@ public final class SubProxy extends BungeeCommon implements Listener {
     public long resetDate = 0;
     private boolean pluginDeployed = false;
     private boolean running = false;
+    private boolean ready = false;
     private boolean reloading = false;
     private boolean posted = false;
     private LinkedList<String> autorun = null;
@@ -340,7 +341,7 @@ public final class SubProxy extends BungeeCommon implements Listener {
         List<String> ukeys = new ArrayList<String>();
         long begin = Calendar.getInstance().getTime().getTime();
         boolean status;
-        if (!(status = running)) resetDate = begin;
+        if (!(status = ready)) resetDate = begin;
         reloading = true;
 
         ConfigUpdater.updateConfig(new UniversalFile(dir, "SubServers:config.yml"));
@@ -549,7 +550,7 @@ public final class SubProxy extends BungeeCommon implements Listener {
         ukeys.clear();
 
         if (!posted) Runtime.getRuntime().addShutdownHook(new Thread(this::shutdown, "SubServers.Bungee::System_Shutdown"));
-        running = true;
+        running = ready = true;
         legServers.clear();
 
         // Initialize SubData
@@ -639,7 +640,7 @@ public final class SubProxy extends BungeeCommon implements Listener {
     @Override
     public void startListeners() {
         try {
-            if (posted || !running) reload();
+            if (posted || !ready) reload();
 
             if (UPnP.isUPnPAvailable()) {
                 if (config.get().getMap("Settings").getMap("UPnP", new ObjectMap<String>()).getBoolean("Forward-Proxy", true)) for (ListenerInfo listener : getConfig().getListeners()) {
@@ -659,24 +660,24 @@ public final class SubProxy extends BungeeCommon implements Listener {
                     for (String name : autorun) if (host.getSubServer(name) != null) ar.add(name);
                     if (ar.size() > 0) new Thread(() -> {
                         try {
-                            while (running && begin == resetDate && !host.isAvailable()) {
+                            while (ready && begin == resetDate && !host.isAvailable()) {
                                 Thread.sleep(250);
                             }
                             long init = Calendar.getInstance().getTime().getTime();
-                            while (running && begin == resetDate && ar.size() > 0) {
+                            while (ready && begin == resetDate && ar.size() > 0) {
                                 SubServer server = host.getSubServer(ar.get(0));
                                 ar.remove(0);
                                 if (server != null && !server.isRunning()) {
                                     server.start();
                                     if (ar.size() > 0 && scd > 0) {
                                         long sleep = Calendar.getInstance().getTime().getTime();
-                                        while (running && begin == resetDate && server.getSubData()[0] == null && Calendar.getInstance().getTime().getTime() - sleep < scd) {
+                                        while (ready && begin == resetDate && server.getSubData()[0] == null && Calendar.getInstance().getTime().getTime() - sleep < scd) {
                                             Thread.sleep(250);
                                         }
                                     }
                                 }
                             }
-                            if (running && begin == resetDate && Calendar.getInstance().getTime().getTime() - init >= 5000)
+                            if (ready && begin == resetDate && Calendar.getInstance().getTime().getTime() - init >= 5000)
                                 Logger.get("SubServers").info("The auto-start queue for " + host.getName() + " has been finished");
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -774,7 +775,7 @@ public final class SubProxy extends BungeeCommon implements Listener {
 
     @Override
     public void stopListeners() {
-        if (running) {
+        if (ready) {
             if (pluginDeployed) {
                 shutdown = !super.isRunning;
                 super.isRunning = true;
@@ -793,13 +794,14 @@ public final class SubProxy extends BungeeCommon implements Listener {
 
     private boolean shutdown = false;
     protected void shutdown() {
-        if (running) {
+        if (ready) {
             legServers.clear();
             legServers.putAll(getServersCopy());
-            running = false;
+            ready = false;
 
             Logger.get("SubServers").info("Stopping hosted servers");
             String[] hosts = this.hosts.keySet().toArray(new String[0]);
+            if (shutdown || !super.isRunning) running = false;
             for (String host : hosts) {
                 api.forceRemoveHost(host);
             }
@@ -879,7 +881,7 @@ public final class SubProxy extends BungeeCommon implements Listener {
     @Override
     public Map<String, ServerInfo> getServersCopy() {
         Map<String, ServerInfo> servers = new CaseInsensitiveMap<ServerInfo>();
-        if (!running) {
+        if (!ready) {
             servers.putAll(super.getServers());
             servers.putAll(legServers);
         } else {
