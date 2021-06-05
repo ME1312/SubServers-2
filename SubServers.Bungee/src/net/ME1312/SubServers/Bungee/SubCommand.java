@@ -115,8 +115,6 @@ public final class SubCommand extends Command implements TabExecutor {
                     if (reload == null || !reload.isAlive()) (reload = new Thread(() -> {
                         if (args.length > 1) {
                             switch (args[1].toLowerCase()) {
-                                case "*":
-                                case "all":
                                 case "hard":
                                 case "system":
                                 case "subdata":
@@ -127,6 +125,8 @@ public final class SubCommand extends Command implements TabExecutor {
                                         Util.isException(() -> player.disconnect(plugin.getTranslation("restart")));
                                     }
                                     plugin.shutdown();
+                                case "*":
+                                case "all":
                                 case "soft":
                                 case "bungee":
                                 case "bungeecord":

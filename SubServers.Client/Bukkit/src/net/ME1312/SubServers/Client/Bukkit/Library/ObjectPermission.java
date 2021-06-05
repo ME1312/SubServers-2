@@ -55,7 +55,7 @@ public class ObjectPermission {
         for (int p = 0; !permitted && p < permissions.length; ++p) {
             String perm = permissions[p];
             if (perm != null) {
-                // Check all proxies & individual proxies permission
+                // Check all objects & individual objects permission
                 permitted = object.hasPermission(perm.replace("%", "*"))
                         || object.hasPermission(perm.replace("%", string.toLowerCase()));
             }

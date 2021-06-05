@@ -31,14 +31,14 @@
         <dependency>
             <groupId>net.ME1312.Galaxi</groupId>
             <artifactId>GalaxiEngine</artifactId>
-            <version>21w15b</version>
+            <version>21w23c</version>
             <scope>compile</scope>
             <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>net.ME1312.Galaxi</groupId>
             <artifactId>GalaxiUI</artifactId>
-            <version>21w15b</version>
+            <version>21w23c</version>
             <scope>runtime</scope>
             <optional>true</optional>
         </dependency>

@@ -1,5 +1,6 @@
 package net.ME1312.SubServers.Host;
 
+import net.ME1312.Galaxi.Command.CommandProcessor.Status;
 import net.ME1312.Galaxi.Engine.CommandParser;
 import net.ME1312.Galaxi.Engine.GalaxiEngine;
 import net.ME1312.Galaxi.Library.AsyncConsolidator;
@@ -59,7 +60,10 @@ public class SubCommand {
                     args.removeFirst();
 
                     CommandParser console = GalaxiEngine.getInstance().getCommandProcessor();
-                    console.runCommand(sender, console.escapeCommand(rargs[0], args.toArray(new String[0])));
+                    String command = console.escapeCommand(rargs[0], args.toArray(new String[0]));
+                    if (console.runCommand(sender, command) == Status.UNKNOWN) {
+                        sender.sendMessage("Unknown Command: " + command);
+                    }
                 } else {
                     sender.sendMessage("Usage: /" + label + " <Command> [Args...]");
                 }
