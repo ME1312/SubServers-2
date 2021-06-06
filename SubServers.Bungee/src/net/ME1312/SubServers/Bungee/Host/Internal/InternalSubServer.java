@@ -297,14 +297,18 @@ public class InternalSubServer extends SubServerImpl {
             for (String key : edit.getKeys()) {
                 pending.remove(key);
                 ObjectMapValue value = edit.get(key);
-                SubEditServerEvent event = new SubEditServerEvent(player, this, new ContainedPair<String, ObjectMapValue>(key, value), perma);
-                host.plugin.getPluginManager().callEvent(event);
-                if (!event.isCancelled()) {
+                boolean allowed = true;
+                if (perma) {
+                    SubEditServerEvent event = new SubEditServerEvent(player, this, new ContainedPair<String, ObjectMapValue>(key, value));
+                    host.plugin.getPluginManager().callEvent(event);
+                    allowed = !event.isCancelled();
+                }
+                if (allowed) {
                     try {
                         switch (key.toLowerCase()) {
                             case "name":
                                 if (value.isString() && host.removeSubServer(player, getName())) {
-                                    SubServer server = host.addSubServer(player, value.asRawString(), isEnabled(), getAddress().getPort(), getMotd(), isLogging(), getPath(), getExecutable(), getStopCommand(), isHidden(), isRestricted());
+                                    SubServer server = host.constructSubServer(value.asRawString(), isEnabled(), getAddress().getPort(), getMotd(), isLogging(), getPath(), getExecutable(), getStopCommand(), isHidden(), isRestricted());
                                     if (server != null) {
                                         if (perma && this.host.plugin.servers.get().getMap("Servers").getKeys().contains(getName())) {
                                             ObjectMap<String> config = this.host.plugin.servers.get().getMap("Servers").getMap(getName());
@@ -361,7 +365,7 @@ public class InternalSubServer extends SubServerImpl {
                                 break;
                             case "host":
                                 if (value.isString() && host.removeSubServer(player, getName())) {
-                                    SubServer server = this.host.plugin.api.getHost(value.asRawString()).addSubServer(player, getName(), isEnabled(), getAddress().getPort(), getMotd(), isLogging(), getPath(), getExecutable(), getStopCommand(), isHidden(), isRestricted());
+                                    SubServer server = this.host.plugin.api.getHost(value.asRawString()).constructSubServer(getName(), isEnabled(), getAddress().getPort(), getMotd(), isLogging(), getPath(), getExecutable(), getStopCommand(), isHidden(), isRestricted());
                                     if (server != null) {
                                         if (perma && this.host.plugin.servers.get().getMap("Servers").getKeys().contains(getName())) {
                                             this.host.plugin.servers.get().getMap("Servers").getMap(getName()).set("Host", server.getHost().getName());
@@ -374,7 +378,7 @@ public class InternalSubServer extends SubServerImpl {
                                 break;
                             case "template":
                                 if (value.isString()) {
-                                    Util.reflect(SubServerImpl.class.getDeclaredField("template"), this, value.asRawString());
+                                    setTemplate(value.asRawString());
                                     if (perma && this.host.plugin.servers.get().getMap("Servers").getKeys().contains(getName())) {
                                         this.host.plugin.servers.get().getMap("Servers").getMap(getName()).set("Template", value.asRawString());
                                         this.host.plugin.servers.save();
@@ -384,7 +388,7 @@ public class InternalSubServer extends SubServerImpl {
                                 break;
                             case "port":
                                 if (value.isNumber() && host.removeSubServer(player, getName())) {
-                                    SubServer server = host.addSubServer(player, getName(), isEnabled(), value.asInt(), getMotd(), isLogging(), getPath(), getExecutable(), getStopCommand(), isHidden(), isRestricted());
+                                    SubServer server = host.constructSubServer(getName(), isEnabled(), value.asInt(), getMotd(), isLogging(), getPath(), getExecutable(), getStopCommand(), isHidden(), isRestricted());
                                     if (server != null) {
                                         if (perma && this.host.plugin.servers.get().getMap("Servers").getKeys().contains(getName())) {
                                             this.host.plugin.servers.get().getMap("Servers").getMap(getName()).set("Port", server.getAddress().getPort());
@@ -397,7 +401,7 @@ public class InternalSubServer extends SubServerImpl {
                                 break;
                             case "motd":
                                 if (value.isString()) {
-                                    Util.reflect(BungeeServerInfo.class.getDeclaredField("motd"), this, ChatColor.translateAlternateColorCodes('&', value.asString()));
+                                    setMotd(ChatColor.translateAlternateColorCodes('&', value.asString()));
                                     if (perma && this.host.plugin.servers.get().getMap("Servers").getKeys().contains(getName())) {
                                         this.host.plugin.servers.get().getMap("Servers").getMap(getName()).set("Motd", value.asString());
                                         this.host.plugin.servers.save();
@@ -501,7 +505,7 @@ public class InternalSubServer extends SubServerImpl {
                                 break;
                             case "restricted":
                                 if (value.isBoolean()) {
-                                    Util.reflect(BungeeServerInfo.class.getDeclaredField("restricted"), this, value.asBoolean());
+                                    setRestricted(value.asBoolean());
                                     if (perma && this.host.plugin.servers.get().getMap("Servers").getKeys().contains(getName())) {
                                         this.host.plugin.servers.get().getMap("Servers").getMap(getName()).set("Restricted", isRestricted());
                                         this.host.plugin.servers.save();
@@ -511,7 +515,7 @@ public class InternalSubServer extends SubServerImpl {
                                 break;
                             case "hidden":
                                 if (value.isBoolean()) {
-                                    Util.reflect(ServerImpl.class.getDeclaredField("hidden"), this, value.asBoolean());
+                                    setHidden(value.asBoolean());
                                     if (perma && this.host.plugin.servers.get().getMap("Servers").getKeys().contains(getName())) {
                                         this.host.plugin.servers.get().getMap("Servers").getMap(getName()).set("Hidden", isHidden());
                                         this.host.plugin.servers.save();
@@ -529,7 +533,7 @@ public class InternalSubServer extends SubServerImpl {
                         if (forward != null) {
                             forward.setStopAction(getStopAction());
                             if (!getName().equals(getDisplayName())) forward.setDisplayName(getDisplayName());
-                            Util.reflect(SubServerImpl.class.getDeclaredField("template"), forward, Util.reflect(SubServerImpl.class.getDeclaredField("template"), this));
+                            forward.setTemplate(getTemplate());
                             List<String> groups = new ArrayList<String>();
                             groups.addAll(getGroups());
                             for (String group : groups) {
@@ -541,6 +545,7 @@ public class InternalSubServer extends SubServerImpl {
                                 forward.toggleCompatibility(server);
                             }
                             for (String extra : getExtra().getKeys()) forward.addExtra(extra, getExtra(extra));
+                            forward.getHost().addSubServer(player, forward);
 
                             if (state) pending.set("state", true);
                             c += (perma)?forward.permaEdit(player, pending):forward.edit(player, pending);
@@ -587,7 +592,6 @@ public class InternalSubServer extends SubServerImpl {
     @Override
     public void setEnabled(boolean value) {
         if (Util.isNull(value)) throw new NullPointerException();
-        host.plugin.getPluginManager().callEvent(new SubEditServerEvent(null, this, new ContainedPair<String, Object>("enabled", value), false));
         enabled = value;
     }
 
@@ -599,7 +603,6 @@ public class InternalSubServer extends SubServerImpl {
     @Override
     public void setLogging(boolean value) {
         if (Util.isNull(value)) throw new NullPointerException();
-        host.plugin.getPluginManager().callEvent(new SubEditServerEvent(null, this, new ContainedPair<String, Object>("log", value), false));
         log.value(value);
     }
 
@@ -631,7 +634,6 @@ public class InternalSubServer extends SubServerImpl {
     @Override
     public void setStopCommand(String value) {
         if (Util.isNull(value)) throw new NullPointerException();
-        host.plugin.getPluginManager().callEvent(new SubEditServerEvent(null, this, new ContainedPair<String, Object>("stop-cmd", value), false));
         stopcmd = value;
     }
 
@@ -643,7 +645,6 @@ public class InternalSubServer extends SubServerImpl {
     @Override
     public void setStopAction(StopAction action) {
         if (Util.isNull(action)) throw new NullPointerException();
-        host.plugin.getPluginManager().callEvent(new SubEditServerEvent(null, this, new ContainedPair<String, Object>("stop-action", action), false));
         stopaction = action;
     }
 }

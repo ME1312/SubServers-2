@@ -86,7 +86,7 @@ public class PacketInExRunEvent implements PacketObjectIn<Integer> {
             @Override
             public void run(ObjectMap<String> data) {
                 if (plugin.isEnabled()) {
-                    Bukkit.getPluginManager().callEvent(new SubEditServerEvent((data.contains("player"))?data.getUUID("player"):null, data.getString("server"), new ContainedPair<String, Object>(data.getString("edit"), data.get("value")), data.getBoolean("perm")));
+                    Bukkit.getPluginManager().callEvent(new SubEditServerEvent((data.contains("player"))?data.getUUID("player"):null, data.getString("server"), new ContainedPair<String, Object>(data.getString("edit"), data.get("value"))));
                     callback("SubEditServerEvent", this);
                 }
             }

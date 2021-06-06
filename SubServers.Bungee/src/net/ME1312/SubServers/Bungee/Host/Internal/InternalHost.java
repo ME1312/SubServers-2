@@ -99,17 +99,22 @@ public class InternalHost extends Host {
     }
 
     @Override
-    public SubServer addSubServer(UUID player, String name, boolean enabled, int port, String motd, boolean log, String directory, String executable, String stopcmd, boolean hidden, boolean restricted) throws InvalidServerException {
-        if (plugin.api.getServers().keySet().contains(name.toLowerCase())) throw new InvalidServerException("A Server already exists with this name!");
-        SubServer server = InternalSubServer.construct(this, name, enabled, port, motd, log, directory, executable, stopcmd, hidden, restricted);
+    public SubServer constructSubServer(String name, boolean enabled, int port, String motd, boolean log, String directory, String executable, String stopcmd, boolean hidden, boolean restricted) throws InvalidServerException {
+        return InternalSubServer.construct(this, name, enabled, port, motd, log, directory, executable, stopcmd, hidden, restricted);
+    }
+
+    @Override
+    public boolean addSubServer(UUID player, SubServer server) throws InvalidServerException {
+        if (server.getHost() != this) throw new IllegalArgumentException("That Server does not belong to this Host!");
+        if (plugin.api.getServers().keySet().contains(server.getName().toLowerCase())) throw new InvalidServerException("A Server already exists with this name!");
         SubAddServerEvent event = new SubAddServerEvent(player, this, server);
         plugin.getPluginManager().callEvent(event);
         if (!event.isCancelled()) {
-            servers.put(name.toLowerCase(), server);
-            if (UPnP.isUPnPAvailable() && plugin.config.get().getMap("Settings").getMap("UPnP", new ObjectMap<String>()).getBoolean("Forward-Servers", false)) UPnP.openPortTCP(port);
-            return server;
+            servers.put(server.getName().toLowerCase(), server);
+            if (UPnP.isUPnPAvailable() && plugin.config.get().getMap("Settings").getMap("UPnP", new ObjectMap<String>()).getBoolean("Forward-Servers", false)) UPnP.openPortTCP(server.getAddress().getPort());
+            return true;
         } else {
-            return null;
+            return false;
         }
     }
 

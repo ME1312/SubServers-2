@@ -126,10 +126,8 @@ public class ServerImpl extends BungeeServerInfo implements Server {
     @SuppressWarnings("deprecation")
     public void setDisplayName(String value) {
         if (value == null || value.length() == 0 || getName().equals(value)) {
-            SubAPI.getInstance().getInternals().getPluginManager().callEvent(new SubEditServerEvent(null, this, new ContainedPair<String, Object>("display", getName()), false));
             this.nick = null;
         } else {
-            SubAPI.getInstance().getInternals().getPluginManager().callEvent(new SubEditServerEvent(null, this, new ContainedPair<String, Object>("display", value), false));
             this.nick = value;
         }
     }
@@ -168,17 +166,13 @@ public class ServerImpl extends BungeeServerInfo implements Server {
     }
 
     @Override
-    @SuppressWarnings("deprecation")
     public void setHidden(boolean value) {
         if (Util.isNull(value)) throw new NullPointerException();
-        SubAPI.getInstance().getInternals().getPluginManager().callEvent(new SubEditServerEvent(null, this, new ContainedPair<String, Object>("hidden", value), false));
         this.hidden = value;
     }
 
-    @SuppressWarnings("deprecation")
     public void setMotd(String value) {
         if (Util.isNull(value)) throw new NullPointerException();
-        SubAPI.getInstance().getInternals().getPluginManager().callEvent(new SubEditServerEvent(null, this, new ContainedPair<String, Object>("motd", value), false));
         try {
             Util.reflect(BungeeServerInfo.class.getDeclaredField("motd"), this, value);
         } catch (Exception e) {
@@ -186,10 +180,8 @@ public class ServerImpl extends BungeeServerInfo implements Server {
         }
     }
 
-    @SuppressWarnings("deprecation")
     public void setRestricted(boolean value) {
         if (Util.isNull(value)) throw new NullPointerException();
-        SubAPI.getInstance().getInternals().getPluginManager().callEvent(new SubEditServerEvent(null, this, new ContainedPair<String, Object>("restricted", value), false));
         try {
             Util.reflect(BungeeServerInfo.class.getDeclaredField("restricted"), this, value);
         } catch (Exception e) {

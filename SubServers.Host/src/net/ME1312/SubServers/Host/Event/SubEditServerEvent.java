@@ -16,7 +16,6 @@ public class SubEditServerEvent extends Event {
     private UUID player;
     private String server;
     private Pair<String, ObjectMapValue<String>> edit;
-    private boolean perm;
 
     /**
      * Server Edit Event
@@ -24,16 +23,14 @@ public class SubEditServerEvent extends Event {
      * @param player Player Adding Server
      * @param server Server to be Edited
      * @param edit Edit to make
-     * @param permanent If the change is permanent
      */
-    public SubEditServerEvent(UUID player, String server, Pair<String, ?> edit, boolean permanent) {
+    public SubEditServerEvent(UUID player, String server, Pair<String, ?> edit) {
         if (Util.isNull(server, edit)) throw new NullPointerException();
         ObjectMap<String> section = new ObjectMap<String>();
         section.set(".", edit.value());
         this.player = player;
         this.server = server;
         this.edit = new ContainedPair<String, ObjectMapValue<String>>(edit.key(), section.get("."));
-        this.perm = permanent;
     }
 
     /**
@@ -57,14 +54,5 @@ public class SubEditServerEvent extends Event {
      */
     public Pair<String, ObjectMapValue<String>> getEdit() {
         return edit;
-    }
-
-    /**
-     * Gets if the edit is permanent
-     *
-     * @return Permanent Status
-     */
-    public boolean isPermanent() {
-        return perm;
     }
 }

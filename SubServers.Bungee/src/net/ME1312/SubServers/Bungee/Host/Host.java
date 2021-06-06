@@ -262,9 +262,8 @@ public abstract class Host implements ExtraDataHandler {
     public abstract SubServer getSubServer(String name);
 
     /**
-     * Adds a SubServer
+     * Constructs a SubServer (but doesn't add it to the server manager)
      *
-     * @param player Player who Added
      * @param name Name of Server
      * @param enabled Enabled Status
      * @param port Port Number
@@ -278,7 +277,7 @@ public abstract class Host implements ExtraDataHandler {
      * @return The SubServer
      * @throws InvalidServerException
      */
-    public abstract SubServer addSubServer(UUID player, String name, boolean enabled, int port, String motd, boolean log, String directory, String executable, String stopcmd, boolean hidden, boolean restricted) throws InvalidServerException;
+    public abstract SubServer constructSubServer(String name, boolean enabled, int port, String motd, boolean log, String directory, String executable, String stopcmd, boolean hidden, boolean restricted) throws InvalidServerException;
 
     /**
      * Adds a SubServer
@@ -299,6 +298,47 @@ public abstract class Host implements ExtraDataHandler {
     public SubServer addSubServer(String name, boolean enabled, int port, String motd, boolean log, String directory, String executable, String stopcmd, boolean hidden, boolean restricted) throws InvalidServerException {
         return addSubServer(null, name, enabled, port, motd, log, directory, executable, stopcmd, hidden, restricted);
     }
+
+    /**
+     * Adds a SubServer
+     *
+     * @param player Player who Added
+     * @param name Name of Server
+     * @param enabled Enabled Status
+     * @param port Port Number
+     * @param motd Motd of the Server
+     * @param log Logging Status
+     * @param directory Directory
+     * @param executable Executable String
+     * @param stopcmd Command to Stop the Server
+     * @param hidden if the server should be hidden from players
+     * @param restricted Players will need a permission to join if true
+     * @return The SubServer
+     * @throws InvalidServerException
+     */
+    public SubServer addSubServer(UUID player, String name, boolean enabled, int port, String motd, boolean log, String directory, String executable, String stopcmd, boolean hidden, boolean restricted) throws InvalidServerException {
+        SubServer server = constructSubServer(name, enabled, port, motd, log, directory, executable, stopcmd, hidden, restricted);
+        return (addSubServer(player, server))?server:null;
+    }
+
+    /**
+     * Adds a SubServer
+     *
+     * @param server SubServer to add
+     * @return Success status
+     */
+    public boolean addSubServer(SubServer server) throws InvalidServerException {
+        return addSubServer(null, server);
+    }
+
+    /**
+     * Adds a SubServer
+     *
+     * @param player Player who added
+     * @param server SubServer to add
+     * @return Success status
+     */
+    public abstract boolean addSubServer(UUID player, SubServer server) throws InvalidServerException;
 
     /**
      * Removes a SubServer

@@ -6,6 +6,7 @@ import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubData.Server.Protocol.PacketObjectIn;
 import net.ME1312.SubData.Server.Protocol.PacketObjectOut;
 import net.ME1312.SubData.Server.SubDataClient;
+import net.ME1312.SubServers.Bungee.Host.External.ExternalSubServer;
 
 import java.util.HashMap;
 import java.util.UUID;
@@ -32,23 +33,17 @@ public class PacketExAddServer implements PacketObjectIn<Integer>, PacketObjectO
 
     /**
      * New PacketExAddServer (Out)
-     *
-     * @param name Name of Server
-     * @param enabled Enabled Status
-     * @param log Logging Status
-     * @param directory Directory
-     * @param executable Executable
      */
     @SafeVarargs
-    public PacketExAddServer(String name, boolean enabled, int port, boolean log, String directory, String executable, String stopcmd, UUID running, Callback<ObjectMap<Integer>>... callback) {
-        if (Util.isNull(name, enabled, log, directory, executable, callback)) throw new NullPointerException();
-        this.name = name;
-        this.enabled = enabled;
-        this.port = port;
-        this.log = log;
-        this.directory = directory;
-        this.executable = executable;
-        this.stopcmd = stopcmd;
+    public PacketExAddServer(ExternalSubServer server, UUID running, Callback<ObjectMap<Integer>>... callback) {
+        if (callback == null) throw new NullPointerException();
+        this.name = server.getName();
+        this.enabled = server.isEnabled();
+        this.port = server.getAddress().getPort();
+        this.log = server.isLogging();
+        this.directory = server.getPath();
+        this.executable = server.getExecutable();
+        this.stopcmd = server.getStopCommand();
         this.running = running;
         this.tracker = Util.getNew(callbacks.keySet(), UUID::randomUUID);
         callbacks.put(tracker, callback);

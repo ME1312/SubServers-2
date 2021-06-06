@@ -213,7 +213,7 @@ public final class SubAPI implements BungeeAPI {
      */
     public Host addHost(UUID player, Class<? extends Host> driver, String name, boolean enabled, Range<Integer> ports, boolean log, InetAddress address, String directory, String gitBash) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
         if (Util.isNull(driver, name, enabled, ports, log, address, directory, gitBash)) throw new NullPointerException();
-        Host host = driver.getConstructor(SubProxy.class, String.class, boolean.class, Range.class, boolean.class, InetAddress.class, String.class, String.class).newInstance(plugin, name, enabled, ports, log, address, directory, gitBash);
+        Host host = plugin.constructHost(driver, name, enabled, ports, log, address, directory, gitBash);
         return addHost(player, host)?host:null;
     }
 
@@ -410,15 +410,37 @@ public final class SubAPI implements BungeeAPI {
      * @return The Server
      */
     public Server addServer(UUID player, String name, InetAddress ip, int port, String motd, boolean hidden, boolean restricted) {
-        if (getServers().keySet().contains(name.toLowerCase())) throw new InvalidServerException("A Server already exists with this name!");
         Server server = ServerImpl.construct(name, new InetSocketAddress(ip, port), motd, hidden, restricted);
+        return (addServer(player, server))?server:null;
+    }
+
+    /**
+     * Adds a Server to the Network
+     *
+     * @param server Server to add
+     * @return Success status
+     */
+    public boolean addServer(Server server) {
+        return addServer(null, server);
+    }
+
+
+    /**
+     * Adds a Server to the Network
+     *
+     * @param player Player who added
+     * @param server Server to add
+     * @return Success status
+     */
+    public boolean addServer(UUID player, Server server) {
+        if (getServers().keySet().contains(server.getName().toLowerCase())) throw new InvalidServerException("A Server already exists with this name!");
         SubAddServerEvent event = new SubAddServerEvent(player, null, server);
         plugin.getPluginManager().callEvent(event);
         if (!event.isCancelled()) {
-            plugin.exServers.put(name.toLowerCase(), server);
-            return server;
+            plugin.exServers.put(server.getName().toLowerCase(), server);
+            return true;
         } else {
-            return null;
+            return false;
         }
     }
 

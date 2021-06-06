@@ -3,7 +3,6 @@ package net.ME1312.SubServers.Bungee.Host;
 import net.ME1312.Galaxi.Library.Container.ContainedPair;
 import net.ME1312.Galaxi.Library.Container.Pair;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
-import net.ME1312.SubServers.Bungee.Event.SubEditServerEvent;
 import net.ME1312.SubServers.Bungee.Library.Exception.InvalidServerException;
 import net.ME1312.SubServers.Bungee.SubAPI;
 
@@ -21,6 +20,7 @@ public abstract class SubServerImpl extends ServerImpl implements SubServer {
     private List<Pair<String, String>> incompatibilities = new ArrayList<Pair<String, String>>();
     private SubCreator.ServerTemplate templateV = null;
     private String templateS = null;
+    protected boolean registered;
     protected boolean started;
     private boolean updating;
 
@@ -110,14 +110,12 @@ public abstract class SubServerImpl extends ServerImpl implements SubServer {
 
     @Override
     public void setTemplate(String template) {
-        SubAPI.getInstance().getInternals().getPluginManager().callEvent(new SubEditServerEvent(null, this, new ContainedPair<String, Object>("template", template), false));
         this.templateV = null;
         this.templateS = template;
     }
 
     @Override
     public void setTemplate(SubCreator.ServerTemplate template) {
-        SubAPI.getInstance().getInternals().getPluginManager().callEvent(new SubEditServerEvent(null, this, new ContainedPair<String, Object>("template", (template != null)?template.getName():null), false));
         this.templateV = template;
         this.templateS = (template != null)?template.getName():null;
     }

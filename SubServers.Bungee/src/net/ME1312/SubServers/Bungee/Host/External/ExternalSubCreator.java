@@ -203,7 +203,7 @@ public class ExternalSubCreator extends SubCreator {
                     server.setAll(config);
 
                     if (update != null) Util.isException(() -> update.getHost().forceRemoveSubServer(name));
-                    subserver = host.addSubServer(player, name, server.getBoolean("Enabled"), port, ChatColor.translateAlternateColorCodes('&', server.getString("Motd")), server.getBoolean("Log"),
+                    subserver = host.constructSubServer(name, server.getBoolean("Enabled"), port, ChatColor.translateAlternateColorCodes('&', server.getString("Motd")), server.getBoolean("Log"),
                             server.getRawString("Directory"), server.getRawString("Executable"), server.getRawString("Stop-Command"), server.getBoolean("Hidden"), server.getBoolean("Restricted"));
 
                     if (server.getString("Display").length() > 0) subserver.setDisplayName(server.getString("Display"));
@@ -220,6 +220,7 @@ public class ExternalSubCreator extends SubCreator {
                         host.plugin.servers.save();
                     }
 
+                    host.addSubServer(subserver);
                     if (update == null && template.getBuildOptions().getBoolean("Run-On-Finish", true))
                         subserver.start();
                 }

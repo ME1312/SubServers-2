@@ -370,8 +370,10 @@ public final class SubProxy extends BungeeCommon implements Listener {
         Logger.get("SubServers").info(((status)?"Rel":"L")+"oading Hosts...");
         for (String name : config.get().getMap("Hosts").getKeys()) {
             if (!ukeys.contains(name.toLowerCase())) try {
-                if (!hostDrivers.keySet().contains(config.get().getMap("Hosts").getMap(name).getRawString("Driver").toUpperCase().replace('-', '_').replace(' ', '_'))) throw new InvalidHostException("Invalid Driver for host: " + name);
+                boolean add = false;
                 Host host = this.hosts.get(name.toLowerCase());
+                Class<? extends Host> driver = hostDrivers.get(config.get().getMap("Hosts").getMap(name).getRawString("Driver").toUpperCase().replace('-', '_').replace(' ', '_'));
+                if (driver == null) throw new InvalidHostException("Invalid Driver for host: " + name);
                 if (host == null || // Host must be reset
                         !hostDrivers.get(config.get().getMap("Hosts").getMap(name).getRawString("Driver").toUpperCase().replace('-', '_').replace(' ', '_')).equals(host.getClass()) ||
                         !config.get().getMap("Hosts").getMap(name).getRawString("Address").equals(host.getAddress().getHostAddress()) ||
@@ -379,7 +381,8 @@ public final class SubProxy extends BungeeCommon implements Listener {
                         !config.get().getMap("Hosts").getMap(name).getRawString("Git-Bash").equals(host.getCreator().getBashDirectory())
                         ) {
                     if (host != null) api.forceRemoveHost(name);
-                    host = api.addHost(config.get().getMap("Hosts").getMap(name).getRawString("Driver").toLowerCase(), name, config.get().getMap("Hosts").getMap(name).getBoolean("Enabled"),
+                    add = true;
+                    host = constructHost(driver, name, config.get().getMap("Hosts").getMap(name).getBoolean("Enabled"),
                             Range.closed(Integer.parseInt(config.get().getMap("Hosts").getMap(name).getRawString("Port-Range", "25500-25559").split("-")[0]), Integer.parseInt(config.get().getMap("Hosts").getMap(name).getRawString("Port-Range", "25500-25559").split("-")[1])),
                             config.get().getMap("Hosts").getMap(name).getBoolean("Log-Creator", true), InetAddress.getByName(config.get().getMap("Hosts").getMap(name).getRawString("Address")),
                             config.get().getMap("Hosts").getMap(name).getRawString("Directory"), config.get().getMap("Hosts").getMap(name).getRawString("Git-Bash"));
@@ -396,6 +399,8 @@ public final class SubProxy extends BungeeCommon implements Listener {
                     host.setDisplayName(config.get().getMap("Hosts").getMap(name).getString("Display"));
                 if (config.get().getMap("Hosts").getMap(name).getKeys().contains("Extra"))
                     for (String extra : config.get().getMap("Hosts").getMap(name).getMap("Extra").getKeys()) host.addExtra(extra, config.get().getMap("Hosts").getMap(name).getMap("Extra").getObject(extra));
+                if (add)
+                    api.addHost(host);
                 ukeys.add(name.toLowerCase());
                 hosts++;
             } catch (Exception e) {
@@ -409,14 +414,16 @@ public final class SubProxy extends BungeeCommon implements Listener {
         bungee.reload();
         for (String name : bungee.get().getMap("servers").getKeys()) {
             if (!ukeys.contains(name.toLowerCase())) try {
+                boolean add = false;
                 Server server = api.getServer(name);
                 if (server == null || !(server instanceof SubServer)) {
                     if (server == null || // Server must be reset
                             bungee.get().getMap("servers").getMap(name).getRawString("address").equals(server.getAddress().getAddress().getHostAddress() + ':' + server.getAddress().getPort())
                     ) {
                         if (server != null) api.forceRemoveServer(name);
-                        server = api.addServer(name, InetAddress.getByName(bungee.get().getMap("servers").getMap(name).getRawString("address").split(":")[0]),
-                                Integer.parseInt(bungee.get().getMap("servers").getMap(name).getRawString("address").split(":")[1]), ChatColor.translateAlternateColorCodes('&', bungee.get().getMap("servers").getMap(name).getString("motd")),
+                        add = true;
+                        server = ServerImpl.construct(name, new InetSocketAddress(InetAddress.getByName(bungee.get().getMap("servers").getMap(name).getRawString("address").split(":")[0]),
+                                Integer.parseInt(bungee.get().getMap("servers").getMap(name).getRawString("address").split(":")[1])), ChatColor.translateAlternateColorCodes('&', bungee.get().getMap("servers").getMap(name).getString("motd")),
                                 bungee.get().getMap("servers").getMap(name).getBoolean("hidden", false), bungee.get().getMap("servers").getMap(name).getBoolean("restricted"));
                     } else { // Server wasn't reset, so check for these changes
                         if (!ChatColor.translateAlternateColorCodes('&', bungee.get().getMap("servers").getMap(name).getString("motd")).equals(server.getMotd()))
@@ -436,6 +443,8 @@ public final class SubProxy extends BungeeCommon implements Listener {
                         for (String extra : config.get().getMap("servers").getMap(name).getMap("extra").getKeys()) server.addExtra(extra, config.get().getMap("servers").getMap(name).getMap("extra").getObject(extra));
                     if (server.getSubData()[0] != null)
                         ((SubDataClient) server.getSubData()[0]).sendPacket(new PacketOutExReload(null));
+                    if (add)
+                        api.addServer(server);
                     ukeys.add(name.toLowerCase());
                     servers++;
                 }
@@ -455,6 +464,7 @@ public final class SubProxy extends BungeeCommon implements Listener {
                     exServers.remove(name.toLowerCase());
                     servers--;
                 }
+                boolean add = false;
                 SubServer server = api.getSubServer(name);
                 if (server != null && server.isEditable()) { // Server can edit() (May be reset depending on change severity)
                     ObjectMap<String> edits = new ObjectMap<String>();
@@ -501,7 +511,8 @@ public final class SubProxy extends BungeeCommon implements Listener {
                             !this.servers.get().getMap("Servers").getMap(name).getRawString("Executable").equals(server.getExecutable())
                             ) {
                             if (server != null) server.getHost().forceRemoveSubServer(name);
-                            server = this.hosts.get(this.servers.get().getMap("Servers").getMap(name).getString("Host").toLowerCase()).addSubServer(name, this.servers.get().getMap("Servers").getMap(name).getBoolean("Enabled"),
+                            add = true;
+                            server = this.hosts.get(this.servers.get().getMap("Servers").getMap(name).getString("Host").toLowerCase()).constructSubServer(name, this.servers.get().getMap("Servers").getMap(name).getBoolean("Enabled"),
                                     this.servers.get().getMap("Servers").getMap(name).getInt("Port"), ChatColor.translateAlternateColorCodes('&', this.servers.get().getMap("Servers").getMap(name).getString("Motd")), this.servers.get().getMap("Servers").getMap(name).getBoolean("Log"),
                                     this.servers.get().getMap("Servers").getMap(name).getRawString("Directory"), this.servers.get().getMap("Servers").getMap(name).getRawString("Executable"), this.servers.get().getMap("Servers").getMap(name).getRawString("Stop-Command"),
                                     this.servers.get().getMap("Servers").getMap(name).getBoolean("Hidden"), this.servers.get().getMap("Servers").getMap(name).getBoolean("Restricted"));
@@ -534,6 +545,7 @@ public final class SubProxy extends BungeeCommon implements Listener {
                     }
                 } // Apply these changes regardless of edit/reset
                 if (this.servers.get().getMap("Servers").getMap(name).getKeys().contains("Extra")) for (String extra : this.servers.get().getMap("Servers").getMap(name).getMap("Extra").getKeys()) server.addExtra(extra, this.servers.get().getMap("Servers").getMap(name).getMap("Extra").getObject(extra));
+                if (add) server.getHost().addSubServer(server);
                 ukeys.add(name.toLowerCase());
                 subservers++;
             } catch (Exception e) {
@@ -847,6 +859,11 @@ public final class SubProxy extends BungeeCommon implements Listener {
             result.insert(0, DIGITS.charAt(digit));
         }
         return (result.length() == 0) ? DIGITS.substring(0, 1) : result.toString();
+    }
+
+    Host constructHost(Class<? extends Host> driver, String name, boolean enabled, Range<Integer> ports, boolean log, InetAddress address, String directory, String gitBash) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
+        if (Util.isNull(driver, name, enabled, ports, log, address, directory, gitBash)) throw new NullPointerException();
+        return driver.getConstructor(SubProxy.class, String.class, boolean.class, Range.class, boolean.class, InetAddress.class, String.class, String.class).newInstance(this, name, enabled, ports, log, address, directory, gitBash);
     }
 
     /**

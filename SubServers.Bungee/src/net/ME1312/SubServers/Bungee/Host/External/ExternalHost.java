@@ -108,7 +108,7 @@ public class ExternalHost extends Host implements ClientHandler {
             clean = true;
         }
         for (SubServer server : servers.values()) {
-            client.sendPacket(new PacketExAddServer(server.getName(), server.isEnabled(), server.getAddress().getPort(), server.isLogging(), server.getPath(), ((ExternalSubServer) server).exec, server.getStopCommand(), (server.isRunning())?((ExternalSubLogger) server.getLogger()).getExternalAddress():null, data -> {
+            client.sendPacket(new PacketExAddServer((ExternalSubServer) server, (server.isRunning())?((ExternalSubLogger) server.getLogger()).getExternalAddress():null, data -> {
                 if (data.contains(0x0002)) ((ExternalSubServer) server).started(data.getUUID(0x0002));
             }));
         }
@@ -166,19 +166,24 @@ public class ExternalHost extends Host implements ClientHandler {
     }
 
     @Override
-    public SubServer addSubServer(UUID player, String name, boolean enabled, int port, String motd, boolean log, String directory, String executable, String stopcmd, boolean hidden, boolean restricted) throws InvalidServerException {
-        if (plugin.api.getServers().keySet().contains(name.toLowerCase())) throw new InvalidServerException("A Server already exists with this name!");
-        ExternalSubServer server = ExternalSubServer.construct(this, name, enabled, port, motd, log, directory, executable, stopcmd, hidden, restricted);
+    public SubServer constructSubServer(String name, boolean enabled, int port, String motd, boolean log, String directory, String executable, String stopcmd, boolean hidden, boolean restricted) throws InvalidServerException {
+        return ExternalSubServer.construct(this, name, enabled, port, motd, log, directory, executable, stopcmd, hidden, restricted);
+    }
+
+    @Override
+    public boolean addSubServer(UUID player, SubServer server) throws InvalidServerException {
+        if (server.getHost() != this) throw new IllegalArgumentException("That Server does not belong to this Host!");
+        if (plugin.api.getServers().keySet().contains(server.getName().toLowerCase())) throw new InvalidServerException("A Server already exists with this name!");
         SubAddServerEvent event = new SubAddServerEvent(player, this, server);
         plugin.getPluginManager().callEvent(event);
         if (!event.isCancelled()) {
-            queue(new PacketExAddServer(name, enabled, port, log, directory, executable, stopcmd, (server.isRunning())?((ExternalSubLogger) server.getLogger()).getExternalAddress():null, data -> {
-                if (data.contains(0x0002)) server.started(data.getUUID(0x0002));
+            queue(new PacketExAddServer(((ExternalSubServer) server), (server.isRunning())?((ExternalSubLogger) server.getLogger()).getExternalAddress():null, data -> {
+                if (data.contains(0x0002)) ((ExternalSubServer) server).started(data.getUUID(0x0002));
             }));
-            servers.put(name.toLowerCase(), server);
-            return server;
+            servers.put(server.getName().toLowerCase(), server);
+            return true;
         } else {
-            return null;
+            return false;
         }
     }
 
