@@ -2,18 +2,18 @@ package net.ME1312.SubServers.Host.Event;
 
 import net.ME1312.Galaxi.Event.Event;
 import net.ME1312.Galaxi.Library.Util;
-import net.ME1312.SubData.Client.SubDataClient;
+import net.ME1312.SubData.Client.DataClient;
 
 /**
  * SubData Network Connect Event
  */
 public class SubNetworkConnectEvent extends Event {
-    private SubDataClient network;
+    private DataClient network;
 
     /**
      * SubData Network Connect Event
      */
-    public SubNetworkConnectEvent(SubDataClient network) {
+    public SubNetworkConnectEvent(DataClient network) {
         if (Util.isNull(network)) throw new NullPointerException();
         this.network = network;
     }
@@ -23,7 +23,7 @@ public class SubNetworkConnectEvent extends Event {
      *
      * @return SubData Network
      */
-    public SubDataClient getNetwork() {
+    public DataClient getNetwork() {
         return network;
     }
 }

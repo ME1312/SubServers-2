@@ -1,6 +1,7 @@
 package net.ME1312.SubServers.Host.Network.Packet;
 
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
+import net.ME1312.Galaxi.Library.Map.ObjectMapValue;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubData.Client.Protocol.PacketObjectIn;
@@ -8,7 +9,9 @@ import net.ME1312.SubData.Client.Protocol.PacketObjectOut;
 import net.ME1312.SubData.Client.SubDataSender;
 import net.ME1312.SubServers.Host.ExHost;
 import net.ME1312.SubServers.Host.Executable.SubCreatorImpl;
+import net.ME1312.SubServers.Host.Executable.SubCreatorImpl.ServerTemplate;
 
+import java.io.File;
 import java.util.Map;
 import java.util.UUID;
 
@@ -74,7 +77,7 @@ public class PacketExCreateServer implements PacketObjectIn<Integer>, PacketObje
 
     @Override
     public void receive(SubDataSender client, ObjectMap<Integer> data) {
-        UUID tracker =          (data.contains(0x0000)?data.getUUID(0x0000):null);
+        UUID tracker =             (data.contains(0x0000)?data.getUUID(0x0000):null);
         try {
             if (data.contains(0x0001)) {
                 if (data.contains(0x0001)) {
@@ -84,16 +87,30 @@ public class PacketExCreateServer implements PacketObjectIn<Integer>, PacketObje
                 }
                 client.sendPacket(new PacketExCreateServer(1, null, tracker));
             } else {
-                String name =     data.getRawString(0x0002);
-                String template = data.getRawString(0x0003);
-                Version version =    (data.contains(0x0004)?data.getVersion(0x0004):null);
-                Integer port =          data.getInt(0x0005);
-                UUID log =             data.getUUID(0x0006);
-                Boolean mode =       (data.contains(0x0007)?data.getBoolean(0x0007):null);
-                UUID player =        (data.contains(0x0008)?data.getUUID(0x0008):null);
+                String name =    data.getRawString(0x0002);
+                ObjectMapValue<Integer> template = data.get(0x0003);
+                Version version =   (data.contains(0x0004)?data.getVersion(0x0004):null);
+                Integer port =         data.getInt(0x0005);
+                UUID log =            data.getUUID(0x0006);
+                Boolean mode =      (data.contains(0x0007)?data.getBoolean(0x0007):null);
+                UUID player =       (data.contains(0x0008)?data.getUUID(0x0008):null);
 
-                SubCreatorImpl.ServerTemplate templateV = host.templates.get(template.toLowerCase());
-                if (templateV == null) templateV = host.templatesR.get(template.toLowerCase());
+                SubCreatorImpl.ServerTemplate templateV;
+
+                if (template.isString()) {
+                    templateV = host.templates.get(template.asRawString().toLowerCase());
+                    if (templateV == null) templateV = host.templatesR.get(template.asRawString().toLowerCase());
+                } else {
+                    ObjectMap<String> templateM = template.asMap().key();
+                    templateV = new ServerTemplate(
+                            templateM.getRawString("name"),
+                            templateM.getBoolean("enabled"),
+                            templateM.getRawString("icon"),
+                            new File(templateM.getRawString("dir").replace('/', File.separatorChar)),
+                            templateM.getMap("build"),
+                            templateM.getMap("def"));
+                    templateV.setDisplayName(templateM.getRawString("display"));
+                }
 
                 host.creator.create(player, name, templateV, version, port, mode, log, tracker);
             }

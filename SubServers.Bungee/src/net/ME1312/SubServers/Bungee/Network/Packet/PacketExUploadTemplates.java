@@ -11,6 +11,7 @@ import net.ME1312.SubServers.Bungee.Host.External.ExternalSubCreator;
 import net.ME1312.SubServers.Bungee.Host.SubCreator;
 import net.ME1312.SubServers.Bungee.SubProxy;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -39,7 +40,8 @@ public class PacketExUploadTemplates implements PacketObjectIn<Integer>, PacketO
             for (String name : templates.getKeys()) {
                 try {
                     UniversalFile dir = new UniversalFile(templatedir, name);
-                    SubCreator.ServerTemplate template = new SubCreator.ServerTemplate(name, templates.getMap(name).getBoolean("enabled"), templates.getMap(name).getRawString("icon"), dir,
+                    SubCreator.ServerTemplate template = Util.reflect(SubCreator.class.getDeclaredMethod("loadTemplate", String.class, boolean.class, String.class, File.class, ObjectMap.class, ObjectMap.class),
+                            ((ExternalHost) client.getHandler()).getCreator(), name, templates.getMap(name).getBoolean("enabled"), templates.getMap(name).getRawString("icon"), dir,
                             templates.getMap(name).getMap("build").clone(), templates.getMap(name).getMap("settings").clone());
                     map.put(name.toLowerCase(), template);
                     if (!templates.getMap(name).getRawString("display").equals(name)) template.setDisplayName(templates.getMap(name).getRawString("display"));

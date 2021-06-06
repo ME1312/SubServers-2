@@ -91,7 +91,19 @@ public class PacketExCreateServer implements PacketObjectIn<Integer>, PacketObje
         } else {
             data.set(0x0000, tracker);
             data.set(0x0002, name);
-            data.set(0x0003, template.getName());
+            if (template.isDynamic()) {
+                ObjectMap<String> template = new ObjectMap<>();
+                template.set("name", this.template.getName());
+                template.set("display", this.template.getDisplayName());
+                template.set("enabled", this.template.isEnabled());
+                template.set("icon", this.template.getIcon());
+                template.set("dir", this.template.getDirectory().toString());
+                template.set("build", this.template.getBuildOptions().clone());
+                template.set("def", this.template.getConfigOptions().clone());
+                data.set(0x0003, template);
+            } else {
+                data.set(0x0003, template.getName());
+            }
             data.set(0x0004, version);
             data.set(0x0005, port);
             data.set(0x0006, log);

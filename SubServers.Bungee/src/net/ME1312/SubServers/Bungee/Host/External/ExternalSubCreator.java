@@ -71,7 +71,7 @@ public class ExternalSubCreator extends SubCreator {
             try {
                 if (file.isDirectory() && !file.getName().endsWith(".x")) {
                     ObjectMap<String> config = (new UniversalFile(file, "template.yml").exists())?new YAMLConfig(new UniversalFile(file, "template.yml")).get().getMap("Template", new ObjectMap<String>()):new ObjectMap<String>();
-                    ServerTemplate template = new ServerTemplate(file.getName(), config.getBoolean("Enabled", true), config.getRawString("Icon", "::NULL::"), file, config.getMap("Build", new ObjectMap<String>()), config.getMap("Settings", new ObjectMap<String>()));
+                    ServerTemplate template = loadTemplate(file.getName(), config.getBoolean("Enabled", true), config.getRawString("Icon", "::NULL::"), file, config.getMap("Build", new ObjectMap<String>()), config.getMap("Settings", new ObjectMap<String>()));
                     templatesR.put(file.getName().toLowerCase(), template);
                     if (config.getKeys().contains("Display")) template.setDisplayName(config.getString("Display"));
                 }

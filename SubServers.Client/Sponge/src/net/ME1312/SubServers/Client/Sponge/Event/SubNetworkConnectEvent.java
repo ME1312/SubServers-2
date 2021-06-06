@@ -1,7 +1,7 @@
 package net.ME1312.SubServers.Client.Sponge.Event;
 
 import net.ME1312.Galaxi.Library.Util;
-import net.ME1312.SubData.Client.SubDataClient;
+import net.ME1312.SubData.Client.DataClient;
 import net.ME1312.SubServers.Client.Sponge.Library.SubEvent;
 
 import org.spongepowered.api.event.cause.Cause;
@@ -11,12 +11,12 @@ import org.spongepowered.api.event.impl.AbstractEvent;
  * SubData Network Connect Event
  */
 public class SubNetworkConnectEvent extends AbstractEvent implements SubEvent {
-    private SubDataClient network;
+    private DataClient network;
 
     /**
      * SubData Network Connect Event
      */
-    public SubNetworkConnectEvent(SubDataClient network) {
+    public SubNetworkConnectEvent(DataClient network) {
         if (Util.isNull(network)) throw new NullPointerException();
         this.network = network;
     }
@@ -26,7 +26,7 @@ public class SubNetworkConnectEvent extends AbstractEvent implements SubEvent {
      *
      * @return SubData Network
      */
-    public SubDataClient getNetwork() {
+    public DataClient getNetwork() {
         return network;
     }
 

@@ -340,8 +340,8 @@ public final class SubProxy extends BungeeCommon implements Listener {
     public void reload() throws IOException {
         List<String> ukeys = new ArrayList<String>();
         long begin = Calendar.getInstance().getTime().getTime();
-        boolean status;
-        if (!(status = ready)) resetDate = begin;
+        boolean status = ready;
+        if (!status) resetDate = begin;
         reloading = true;
 
         ConfigUpdater.updateConfig(new UniversalFile(dir, "SubServers:config.yml"));
@@ -359,9 +359,9 @@ public final class SubProxy extends BungeeCommon implements Listener {
                 !config.get().getMap("Settings").getMap("SubData").getRawString("Address", "127.0.0.1:4391").equals(prevconfig.getMap("Settings").getMap("SubData").getRawString("Address", "127.0.0.1:4391")) ||
                 !config.get().getMap("Settings").getMap("SubData").getRawString("Encryption", "NONE").equals(prevconfig.getMap("Settings").getMap("SubData").getRawString("Encryption", "NONE"))
                 )) {
+            SubDataServer subdata = this.subdata;
             subdata.close();
             Util.isException(subdata::waitFor);
-            subdata = null;
         }
 
         SmartFallback.dns_forward = config.get().getMap("Settings").getMap("Smart-Fallback", new ObjectMap<>()).getBoolean("DNS-Forward", false);
@@ -553,7 +553,31 @@ public final class SubProxy extends BungeeCommon implements Listener {
         running = ready = true;
         legServers.clear();
 
-        // Initialize SubData
+        int plugins = 0;
+        if (status) {
+            List<Runnable> listeners = api.reloadListeners;
+            if (listeners.size() > 0) {
+                Logger.get("SubServers").info("Reloading SubAPI Plugins...");
+                for (Runnable obj : listeners) {
+                    try {
+                        obj.run();
+                        plugins++;
+                    } catch (Throwable e) {
+                        new InvocationTargetException(e, "Problem " + ((status)?"reloading":"enabling") + " plugin").printStackTrace();
+                    }
+                }
+            }
+
+            for (Host host : api.getHosts().values()) if (host instanceof ClientHandler && ((ClientHandler) host).getSubData()[0] != null) ((SubDataClient) ((ClientHandler) host).getSubData()[0]).sendPacket(new PacketOutExReload(null));
+            for (Server server : api.getServers().values()) if (server.getSubData()[0] != null) ((SubDataClient) server.getSubData()[0]).sendPacket(new PacketOutExReload(null));
+        }
+
+        reloading = false;
+        Logger.get("SubServers").info(((plugins > 0)?plugins+" Plugin"+((plugins == 1)?"":"s")+", ":"") + hosts + " Host"+((hosts == 1)?"":"s")+", " + servers + " Server"+((servers == 1)?"":"s")+", and " + subservers + " SubServer"+((subservers == 1)?"":"s")+" "+((status)?"re":"")+"loaded in " + new DecimalFormat("0.000").format((Calendar.getInstance().getTime().getTime() - begin) / 1000D) + "s");
+        if (status) startDataListeners();
+    }
+	
+	private void startDataListeners() throws IOException {
         if (subdata == null) {
             subprotocol.unregisterCipher("AES");
             subprotocol.unregisterCipher("AES-128");
@@ -605,7 +629,9 @@ public final class SubProxy extends BungeeCommon implements Listener {
             subdata = subprotocol.open((config.get().getMap("Settings").getMap("SubData").getRawString("Address", "127.0.0.1:4391").split(":")[0].equals("0.0.0.0"))?
                             null:InetAddress.getByName(config.get().getMap("Settings").getMap("SubData").getRawString("Address", "127.0.0.1:4391").split(":")[0]),
                     Integer.parseInt(config.get().getMap("Settings").getMap("SubData").getRawString("Address", "127.0.0.1:4391").split(":")[1]), cipher);
-        } // Add new entries to Allowed-Connections
+        }
+
+        // Add new entries to Allowed-Connections
         for (String s : config.get().getMap("Settings").getMap("SubData").getStringList("Whitelist", new ArrayList<String>())) {
             try {
                 subdata.whitelist(s);
@@ -613,28 +639,6 @@ public final class SubProxy extends BungeeCommon implements Listener {
                 e.printStackTrace();
             }
         }
-
-        int plugins = 0;
-        if (status) {
-            List<Runnable> listeners = api.reloadListeners;
-            if (listeners.size() > 0) {
-                Logger.get("SubServers").info("Reloading SubAPI Plugins...");
-                for (Runnable obj : listeners) {
-                    try {
-                        obj.run();
-                        plugins++;
-                    } catch (Throwable e) {
-                        new InvocationTargetException(e, "Problem " + ((status)?"reloading":"enabling") + " plugin").printStackTrace();
-                    }
-                }
-            }
-
-            for (Host host : api.getHosts().values()) if (host instanceof ClientHandler && ((ClientHandler) host).getSubData()[0] != null) ((SubDataClient) ((ClientHandler) host).getSubData()[0]).sendPacket(new PacketOutExReload(null));
-            for (Server server : api.getServers().values()) if (server.getSubData()[0] != null) ((SubDataClient) server.getSubData()[0]).sendPacket(new PacketOutExReload(null));
-        }
-
-        reloading = false;
-        Logger.get("SubServers").info(((plugins > 0)?plugins+" Plugin"+((plugins == 1)?"":"s")+", ":"") + hosts + " Host"+((hosts == 1)?"":"s")+", " + servers + " Server"+((servers == 1)?"":"s")+", and " + subservers + " SubServer"+((subservers == 1)?"":"s")+" "+((status)?"re":"")+"loaded in " + new DecimalFormat("0.000").format((Calendar.getInstance().getTime().getTime() - begin) / 1000D) + "s");
     }
 
     @Override
@@ -650,6 +654,7 @@ public final class SubProxy extends BungeeCommon implements Listener {
                 getLogger().warning("UPnP service is unavailable. SubServers can't port-forward for you from this device.");
             }
 
+            startDataListeners();
             super.startListeners();
 
             if (autorun != null && autorun.size() > 0) {
@@ -819,9 +824,10 @@ public final class SubProxy extends BungeeCommon implements Listener {
             rPlayerLinkP.clear();
             rPlayers.clear();
 
-            try {
+            if (subdata != null) try {
+                SubDataServer subdata = this.subdata;
                 subdata.close();
-                Thread.sleep(500);
+                subdata.waitFor();
             } catch (InterruptedException | IOException e) {}
 
             if (shutdown) super.isRunning = false;
