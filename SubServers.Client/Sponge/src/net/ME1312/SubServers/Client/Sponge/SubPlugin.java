@@ -44,6 +44,8 @@ import java.nio.file.StandardCopyOption;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
+import static net.ME1312.SubServers.Client.Sponge.Library.AccessMode.NO_COMMANDS;
+
 /**
  * SubServers Client Plugin Class
  */
@@ -63,7 +65,7 @@ public final class SubPlugin {
     @Inject public PluginContainer plugin;
     @Inject public Game game;
 
-    private boolean running = false;
+    boolean running = false;
     private long resetDate = 0;
     private boolean reconnect = false;
 
@@ -136,8 +138,8 @@ public final class SubPlugin {
             log.info("Connecting to /" + config.get().getMap("Settings").getMap("SubData").getRawString("Address", "127.0.0.1:4391"));
             connect(null);
 
-            if (!config.get().getMap("Settings").getBoolean("API-Only-Mode", false)) {
-                //gui = new InternalUIHandler(this);
+            //gui = new InternalUIHandler(this);
+            if (api.access.value > NO_COMMANDS.value && !config.get().getMap("Settings").getBoolean("API-Only-Mode", false)) {
                 Sponge.getCommandManager().register(plugin, new SubCommand(this).spec(), "sub", "subserver", "subservers");
             }
 

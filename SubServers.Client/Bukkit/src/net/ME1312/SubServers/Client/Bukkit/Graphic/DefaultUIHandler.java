@@ -89,7 +89,7 @@ public class DefaultUIHandler implements UIHandler, Listener {
                         } else if (item.equals(plugin.api.getLang("SubServers", "Interface.Host-Menu.Server-Menu"))) {
                             player.closeInventory();
                             gui.serverMenu(1, null, null);
-                        } else if (!item.equals(ChatColor.RESET.toString()) && !item.equals(plugin.api.getLang("SubServers", "Interface.Host-Menu.No-Hosts"))) {
+                        } else if ((item.length() != 0 && !item.equals(ChatColor.RESET.toString())) && !item.equals(plugin.api.getLang("SubServers", "Interface.Host-Menu.No-Hosts"))) {
                             player.closeInventory();
                             String obj;
                             if (event.getCurrentItem().getItemMeta().getLore() != null && event.getCurrentItem().getItemMeta().getLore().size() > 0 && event.getCurrentItem().getItemMeta().getLore().get(0).startsWith(ChatColor.GRAY.toString())) {
@@ -193,7 +193,7 @@ public class DefaultUIHandler implements UIHandler, Listener {
                         } else if (item.equals(plugin.api.getLang("SubServers", "Interface.Generic.Back"))) {
                             player.closeInventory();
                             gui.hostCreator((UIRenderer.CreatorOptions) gui.lastVisitedObjects[0]);
-                        } else {
+                        } else if ((item.length() != 0 && !item.equals(ChatColor.RESET.toString())) && !item.equals(plugin.api.getLang("SubServers", "Interface.Host-Creator.Edit-Template.No-Templates"))) {
                             player.closeInventory();
                             String obj;
                             if (event.getCurrentItem().getItemMeta().getLore() != null && event.getCurrentItem().getItemMeta().getLore().size() > 0 && event.getCurrentItem().getItemMeta().getLore().get(0).startsWith(ChatColor.GRAY.toString())) {
@@ -219,7 +219,7 @@ public class DefaultUIHandler implements UIHandler, Listener {
                         } else if (item.equals(plugin.api.getLang("SubServers", "Interface.Generic.Back"))) {
                             player.closeInventory();
                             gui.back();
-                        } else {
+                        } else if ((item.length() != 0 && !item.equals(ChatColor.RESET.toString())) && !item.equals(plugin.api.getLang("SubServers", "Interface.Host-Plugin.No-Plugins"))) {
                             player.closeInventory();
                             final Value<PluginRenderer<Host>> plugin = new Container<PluginRenderer<Host>>(null);
                             for (PluginRenderer<Host> renderer : DefaultUIRenderer.hostPlugins.values()) {
@@ -254,7 +254,7 @@ public class DefaultUIHandler implements UIHandler, Listener {
                         } else if (item.equals(plugin.api.getLang("SubServers", "Interface.Group-Menu.Server-Menu"))) {
                             player.closeInventory();
                             gui.serverMenu(1, null, null);
-                        } else if (!item.equals(ChatColor.RESET.toString()) && !item.equals(plugin.api.getLang("SubServers", "Interface.Group-Menu.No-Groups"))) {
+                        } else if ((item.length() != 0 && !item.equals(ChatColor.RESET.toString())) && !item.equals(plugin.api.getLang("SubServers", "Interface.Group-Menu.No-Groups"))) {
                             player.closeInventory();
                             gui.serverMenu(1, null, ChatColor.stripColor(item));
                         }
@@ -281,7 +281,7 @@ public class DefaultUIHandler implements UIHandler, Listener {
                         } else if (item.equals(plugin.api.getLang("SubServers", "Interface.Generic.Back"))) {
                             player.closeInventory();
                             gui.back();
-                        } else if (!item.equals(ChatColor.RESET.toString()) && !item.startsWith(ChatColor.WHITE.toString()) && !item.equals(plugin.api.getLang("SubServers", "Interface.Server-Menu.No-Servers"))) {
+                        } else if ((item.length() != 0 && !item.equals(ChatColor.RESET.toString())) && !item.startsWith(ChatColor.WHITE.toString()) && !item.equals(plugin.api.getLang("SubServers", "Interface.Server-Menu.No-Servers"))) {
                             player.closeInventory();
                             String obj;
                             if (event.getCurrentItem().getItemMeta().getLore() != null && event.getCurrentItem().getItemMeta().getLore().size() > 0 && event.getCurrentItem().getItemMeta().getLore().get(0).startsWith(ChatColor.GRAY.toString())) {
@@ -424,7 +424,7 @@ public class DefaultUIHandler implements UIHandler, Listener {
                         } else if (item.equals(plugin.api.getLang("SubServers", "Interface.Generic.Back"))) {
                             player.closeInventory();
                             gui.back();
-                        } else {
+                        } else if ((item.length() != 0 && !item.equals(ChatColor.RESET.toString())) && !item.equals(plugin.api.getLang("SubServers", "Interface.SubServer-Plugin.No-Plugins"))) {
                             player.closeInventory();
                             Value<PluginRenderer<SubServer>> plugin = new Container<PluginRenderer<SubServer>>(null);
                             for (PluginRenderer<SubServer> renderer : DefaultUIRenderer.subserverPlugins.values()) {

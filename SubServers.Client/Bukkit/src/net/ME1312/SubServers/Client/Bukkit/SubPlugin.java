@@ -11,7 +11,6 @@ import net.ME1312.SubData.Client.DataClient;
 import net.ME1312.SubData.Client.Encryption.AES;
 import net.ME1312.SubData.Client.Encryption.DHE;
 import net.ME1312.SubData.Client.Encryption.RSA;
-import net.ME1312.SubData.Client.Library.DataSize;
 import net.ME1312.SubData.Client.Library.DisconnectReason;
 import net.ME1312.SubData.Client.SubDataClient;
 import net.ME1312.SubServers.Client.Bukkit.Graphic.DefaultUIHandler;
@@ -34,6 +33,8 @@ import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+
+import static net.ME1312.SubServers.Client.Bukkit.Library.AccessMode.*;
 
 /**
  * SubServers Client Plugin Class
@@ -116,16 +117,16 @@ public final class SubPlugin extends JavaPlugin {
             System.out.println("SubData > Connecting to /" + config.get().getMap("Settings").getMap("SubData").getRawString("Address", "127.0.0.1:4391"));
             connect(null);
 
-            if (!config.get().getMap("Settings").getBoolean("API-Only-Mode", false)) {
+            gui = new DefaultUIHandler(this);
+            if (api.access.value > NO_COMMANDS.value && !config.get().getMap("Settings").getBoolean("API-Only-Mode", false)) {
                 CommandMap cmd = Util.reflect(Bukkit.getServer().getClass().getDeclaredField("commandMap"), Bukkit.getServer());
-                gui = new DefaultUIHandler(this);
 
                 cmd.register("subservers", new SubCommand(this, "subservers"));
                 cmd.register("subservers", new SubCommand(this, "subserver"));
                 cmd.register("subservers", new SubCommand(this, "sub"));
             }
 
-            if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
+            if (api.access.value > NO_INTEGRATIONS.value && Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
                 new net.ME1312.SubServers.Client.Bukkit.Library.Compatibility.PlaceholderImpl(this).register();
             }
 

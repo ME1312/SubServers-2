@@ -23,7 +23,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
-import org.bukkit.command.defaults.BukkitCommand;
+import org.bukkit.command.Command;
 import org.bukkit.entity.Player;
 
 import java.io.BufferedReader;
@@ -35,7 +35,7 @@ import java.util.*;
 
 import static net.ME1312.SubServers.Client.Bukkit.Library.ObjectPermission.permits;
 
-public final class SubCommand extends BukkitCommand {
+public final class SubCommand extends Command {
     private SubPlugin plugin;
 
     public SubCommand(SubPlugin plugin, String name) {

@@ -7,6 +7,7 @@ import net.ME1312.SubData.Client.DataProtocol;
 import net.ME1312.SubData.Client.SubDataClient;
 import net.ME1312.SubServers.Client.Common.ClientAPI;
 import net.ME1312.SubServers.Client.Sponge.Graphic.UIHandler;
+import net.ME1312.SubServers.Client.Sponge.Library.AccessMode;
 
 import org.spongepowered.api.Platform;
 import org.spongepowered.api.Sponge;
@@ -21,11 +22,13 @@ public final class SubAPI extends ClientAPI {
     LinkedList<Runnable> reloadListeners = new LinkedList<Runnable>();
     private final SubPlugin plugin;
     private static SubAPI api;
+    AccessMode access;
     String name;
 
     SubAPI(SubPlugin plugin) {
         this.plugin = plugin;
         GAME_VERSION = getGameVersion();
+        access = AccessMode.DEFAULT;
         api = this;
     }
 
@@ -107,6 +110,26 @@ public final class SubAPI extends ClientAPI {
     public Map<String, String> getLang(String channel) {
         if (Util.isNull(channel)) throw new NullPointerException();
         return new LinkedHashMap<>(plugin.lang.value().get(channel.toLowerCase()));
+    }
+
+    /**
+     * Get the plugin's access mode
+     *
+     * @return Access Mode
+     */
+    public AccessMode getAccessMode() {
+        return access;
+    }
+
+    /**
+     * Set the plugin's access mode
+     *
+     * @param mode Access Mode
+     */
+    public void setAccessMode(AccessMode mode) {
+        if (mode.value <= access.value && !plugin.running) {
+            access = mode;
+        }
     }
 
     /**
