@@ -20,9 +20,7 @@ public abstract class SubServerImpl extends ServerImpl implements SubServer {
     private List<Pair<String, String>> incompatibilities = new ArrayList<Pair<String, String>>();
     private SubCreator.ServerTemplate templateV = null;
     private String templateS = null;
-    protected boolean registered;
-    protected boolean started;
-    private boolean updating;
+    protected boolean registered, started, updating;
 
     /**
      * Creates a SubServer

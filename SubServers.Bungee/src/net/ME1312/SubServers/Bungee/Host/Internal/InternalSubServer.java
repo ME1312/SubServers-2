@@ -136,8 +136,12 @@ public class InternalSubServer extends SubServerImpl {
         this.lock = false;
     }
 
-    void register() {
-        registered = true;
+    void registered(boolean value) {
+        registered = value;
+    }
+
+    void updating(boolean value) {
+        updating = value;
     }
 
     private void run() {

@@ -20,7 +20,6 @@ import net.ME1312.SubServers.Bungee.Network.Packet.PacketOutExReset;
 import net.ME1312.SubServers.Bungee.SubProxy;
 
 import com.google.common.collect.Range;
-import net.md_5.bungee.BungeeCord;
 
 import java.net.InetAddress;
 import java.util.*;
@@ -180,7 +179,7 @@ public class ExternalHost extends Host implements ClientHandler {
             queue(new PacketExAddServer(((ExternalSubServer) server), (server.isRunning())?((ExternalSubLogger) server.getLogger()).getExternalAddress():null, data -> {
                 if (data.contains(0x0002)) ((ExternalSubServer) server).started(data.getUUID(0x0002));
             }));
-            ((ExternalSubServer) server).register();
+            ((ExternalSubServer) server).registered(true);
             servers.put(server.getName().toLowerCase(), server);
             return true;
         } else {
@@ -191,18 +190,21 @@ public class ExternalHost extends Host implements ClientHandler {
     @Override
     protected boolean removeSubServer(UUID player, String name, boolean forced) throws InterruptedException {
         if (Util.isNull(name)) throw new NullPointerException();
-        SubServer server = servers.get(name.toLowerCase());
+        ExternalSubServer server = (ExternalSubServer) servers.get(name.toLowerCase());
 
         SubRemoveServerEvent event = new SubRemoveServerEvent(player, this, server);
         plugin.getPluginManager().callEvent(event);
         if (forced || !event.isCancelled()) {
+            server.registered(false);
             if (server.isRunning()) {
                 server.stop();
                 server.waitFor();
             }
+
             servers.remove(name.toLowerCase());
             queue(new PacketExRemoveServer(name.toLowerCase(), data -> {
                 if (data.getInt(0x0001) != 0 && data.getInt(0x0001) != 1) {
+                    server.registered(true);
                     servers.put(name.toLowerCase(), server);
                 }
             }));
@@ -213,12 +215,13 @@ public class ExternalHost extends Host implements ClientHandler {
     @Override
     protected boolean recycleSubServer(UUID player, String name, boolean forced) throws InterruptedException {
         if (Util.isNull(name)) throw new NullPointerException();
-        SubServer s = servers.get(name.toLowerCase());
+        ExternalSubServer s = (ExternalSubServer) servers.get(name.toLowerCase());
         String server = s.getName();
 
         SubRemoveServerEvent event = new SubRemoveServerEvent(player, this, s);
         plugin.getPluginManager().callEvent(event);
         if (forced || !event.isCancelled()) {
+            s.registered(false);
             if (s.isRunning()) {
                 s.stop();
                 s.waitFor();
@@ -243,6 +246,7 @@ public class ExternalHost extends Host implements ClientHandler {
                     servers.remove(server.toLowerCase());
                     Logger.get("SubServers").info("Deleted SubServer: " + server);
                 } else {
+                    s.registered(true);
                     Logger.get("SubServers").info("Couldn't remove " + server + " from memory. See " + getName() + " console for more details");
                 }
             }));
@@ -253,12 +257,13 @@ public class ExternalHost extends Host implements ClientHandler {
     @Override
     protected boolean deleteSubServer(UUID player, String name, boolean forced) throws InterruptedException {
         if (Util.isNull(name)) throw new NullPointerException();
-        SubServer s = servers.get(name.toLowerCase());
+        ExternalSubServer s = (ExternalSubServer) servers.get(name.toLowerCase());
         String server = s.getName();
 
         SubRemoveServerEvent event = new SubRemoveServerEvent(player, this, getSubServer(server));
         plugin.getPluginManager().callEvent(event);
         if (forced || !event.isCancelled()) {
+            s.registered(false);
             if (s.isRunning()) {
                 s.stop();
                 s.waitFor();
@@ -283,6 +288,7 @@ public class ExternalHost extends Host implements ClientHandler {
                     servers.remove(server.toLowerCase());
                     Logger.get("SubServers").info("Deleted SubServer: " + server);
                 } else {
+                    s.registered(true);
                     Logger.get("SubServers").info("Couldn't remove " + server + " from memory. See " + getName() + " console for more details");
                 }
             }));

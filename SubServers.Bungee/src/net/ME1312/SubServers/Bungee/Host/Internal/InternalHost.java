@@ -110,7 +110,7 @@ public class InternalHost extends Host {
         SubAddServerEvent event = new SubAddServerEvent(player, this, server);
         plugin.getPluginManager().callEvent(event);
         if (!event.isCancelled()) {
-            ((InternalSubServer) server).register();
+            ((InternalSubServer) server).registered(true);
             servers.put(server.getName().toLowerCase(), server);
             if (UPnP.isUPnPAvailable() && plugin.config.get().getMap("Settings").getMap("UPnP", new ObjectMap<String>()).getBoolean("Forward-Servers", false)) UPnP.openPortTCP(server.getAddress().getPort());
             return true;
@@ -122,10 +122,11 @@ public class InternalHost extends Host {
     @Override
     protected boolean removeSubServer(UUID player, String name, boolean forced) throws InterruptedException {
         if (Util.isNull(name)) throw new NullPointerException();
-        SubServer server = servers.get(name.toLowerCase());
+        InternalSubServer server = (InternalSubServer) servers.get(name.toLowerCase());
         SubRemoveServerEvent event = new SubRemoveServerEvent(player, this, server);
         plugin.getPluginManager().callEvent(event);
         if (forced || !event.isCancelled()) {
+            server.registered(false);
             if (server.isRunning()) {
                 server.stop();
                 server.waitFor();

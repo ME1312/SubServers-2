@@ -143,7 +143,7 @@ public class ExternalSubCreator extends SubCreator {
 
             String name = server.getName();
             String prefix = name + File.separator + "Updater";
-            Util.isException(() -> Util.reflect(SubServerImpl.class.getDeclaredField("updating"), server, true));
+            ((ExternalSubServer) server).updating(true);
             ExternalSubLogger logger = new ExternalSubLogger(this, prefix, log, null);
             thread.put(name.toLowerCase(), new ContainedPair<>(server.getAddress().getPort(), logger));
 
@@ -153,7 +153,7 @@ public class ExternalSubCreator extends SubCreator {
                 logger.start();
                 host.queue(new PacketExCreateServer(player, server, ft, version, logger.getExternalAddress(), data -> {
                     finish(player, server, server.getName(), ft, version, server.getAddress().getPort(), prefix, origin, data, s -> {
-                        Util.isException(() -> Util.reflect(SubServerImpl.class.getDeclaredField("updating"), server, false));
+                        ((ExternalSubServer) server).updating(false);
                         if (callback != null) callback.run(s != null);
                     });
                     logger.stop();
