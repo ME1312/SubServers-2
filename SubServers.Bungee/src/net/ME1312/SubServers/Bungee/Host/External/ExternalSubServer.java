@@ -97,6 +97,10 @@ public class ExternalSubServer extends SubServerImpl {
         this.lock = false;
     }
 
+    void register() {
+        registered = true;
+    }
+
     @Override
     public boolean start(UUID player) {
         if (!lock && isAvailable() && isEnabled() && !running && getCurrentIncompatibilities().size() == 0) {

@@ -106,10 +106,11 @@ public class InternalHost extends Host {
     @Override
     public boolean addSubServer(UUID player, SubServer server) throws InvalidServerException {
         if (server.getHost() != this) throw new IllegalArgumentException("That Server does not belong to this Host!");
-        if (plugin.api.getServers().keySet().contains(server.getName().toLowerCase())) throw new InvalidServerException("A Server already exists with this name!");
+        if (plugin.api.getServers().containsKey(server.getName().toLowerCase())) throw new InvalidServerException("A Server already exists with this name!");
         SubAddServerEvent event = new SubAddServerEvent(player, this, server);
         plugin.getPluginManager().callEvent(event);
         if (!event.isCancelled()) {
+            ((InternalSubServer) server).register();
             servers.put(server.getName().toLowerCase(), server);
             if (UPnP.isUPnPAvailable() && plugin.config.get().getMap("Settings").getMap("UPnP", new ObjectMap<String>()).getBoolean("Forward-Servers", false)) UPnP.openPortTCP(server.getAddress().getPort());
             return true;

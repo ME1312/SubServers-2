@@ -136,6 +136,10 @@ public class InternalSubServer extends SubServerImpl {
         this.lock = false;
     }
 
+    void register() {
+        registered = true;
+    }
+
     private void run() {
         boolean locked = lock;
         allowrestart = true;

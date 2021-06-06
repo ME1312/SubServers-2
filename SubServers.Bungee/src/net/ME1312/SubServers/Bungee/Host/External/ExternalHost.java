@@ -173,13 +173,14 @@ public class ExternalHost extends Host implements ClientHandler {
     @Override
     public boolean addSubServer(UUID player, SubServer server) throws InvalidServerException {
         if (server.getHost() != this) throw new IllegalArgumentException("That Server does not belong to this Host!");
-        if (plugin.api.getServers().keySet().contains(server.getName().toLowerCase())) throw new InvalidServerException("A Server already exists with this name!");
+        if (plugin.api.getServers().containsKey(server.getName().toLowerCase())) throw new InvalidServerException("A Server already exists with this name!");
         SubAddServerEvent event = new SubAddServerEvent(player, this, server);
         plugin.getPluginManager().callEvent(event);
         if (!event.isCancelled()) {
             queue(new PacketExAddServer(((ExternalSubServer) server), (server.isRunning())?((ExternalSubLogger) server.getLogger()).getExternalAddress():null, data -> {
                 if (data.contains(0x0002)) ((ExternalSubServer) server).started(data.getUUID(0x0002));
             }));
+            ((ExternalSubServer) server).register();
             servers.put(server.getName().toLowerCase(), server);
             return true;
         } else {
