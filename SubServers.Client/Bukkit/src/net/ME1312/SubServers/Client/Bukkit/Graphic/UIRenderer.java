@@ -15,6 +15,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
+import java.util.PrimitiveIterator.OfInt;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -26,9 +27,10 @@ public abstract class UIRenderer {
     private final boolean TAPI_1_11;
     private final boolean TAPI_PLUGIN;
 
-    static HashMap<String, PluginRenderer<Host>> hostPlugins = new HashMap<String, PluginRenderer<Host>>();
-    static HashMap<String, PluginRenderer<SubServer>> subserverPlugins = new HashMap<String, PluginRenderer<SubServer>>();
+    static final HashMap<String, PluginRenderer<Host>> hostPlugins = new HashMap<String, PluginRenderer<Host>>();
+    static final HashMap<String, PluginRenderer<SubServer>> subserverPlugins = new HashMap<String, PluginRenderer<SubServer>>();
     private ContainedPair<String, Integer> tdownload = null;
+    private final String[] adownload;
     private int download = -1;
     private final UUID player;
     private SubPlugin plugin;
@@ -51,8 +53,45 @@ public abstract class UIRenderer {
             } else {
                 TAPI_PLUGIN = Bukkit.getPluginManager().getPlugin("TitleAPI") != null;
             }
-        } else{
+        } else {
             TAPI_1_11 = TAPI_PLUGIN = false;
+        }
+
+        // Pre-render Animations
+        {
+            String a = plugin.api.getLang("SubServers", "Interface.Generic.Downloading.Title-Color-Alt");
+            String b = plugin.api.getLang("SubServers", "Interface.Generic.Downloading.Title-Color");
+            String word = ChatColor.stripColor(plugin.api.getLang("SubServers", "Interface.Generic.Downloading.Title"));
+            String bword = b + word;
+
+            final LinkedList<String> frames = new LinkedList<String>();
+            for (int i = 0; i < 10; ++i) {
+                frames.add(bword);
+            }
+
+            int wordpoints = (int) word.codePoints().count();
+            int frame = 0;
+            do {
+                ++frame;
+                int start = Math.max(frame - 3, 0);
+                int end = Math.min(frame, wordpoints);
+                if (start < wordpoints) {
+                    StringBuilder s = new StringBuilder((start == 0)? a : b);
+
+                    int i = 0;
+                    for (OfInt iterator = word.codePoints().iterator(); iterator.hasNext(); ) {
+                        ++i;
+                        if (start == i) s.append(a);
+                        s.appendCodePoint(iterator.nextInt());
+                        if (end == i) s.append(b);
+                    }
+
+                    frames.add(s.toString());
+                } else {
+                    break;
+                }
+            } while (true);
+            adownload = frames.toArray(new String[0]);
         }
     }
 
@@ -114,35 +153,50 @@ public abstract class UIRenderer {
      * @return Success Status
      */
     public boolean sendTitle(String str, int fadein, int stay, int fadeout) {
-        if (USE_TITLES) {
-            String line1, line2;
-            if (str == null) {
-                line1 = line2 = null;
+        String line1, line2;
+        if (str == null) {
+            line1 = line2 = null;
+        } else {
+            if (!str.contains("\n")) {
+                line1 = str;
+                line2 = ChatColor.RESET.toString();
+            } else if (str.startsWith("\n")) {
+                line1 = str.replace("\n", "");
+                line2 = ChatColor.RESET.toString();
             } else {
-                if (!str.contains("\n")) {
-                    line1 = str;
-                    line2 = ChatColor.RESET.toString();
-                } else if (str.startsWith("\n")) {
-                    line1 = str.replace("\n", "");
-                    line2 = ChatColor.RESET.toString();
-                } else {
-                    String[] arr = str.split("\\n", 2);
-                    line1 = arr[0];
-                    line2 = arr[1];
-                }
+                String[] arr = str.split("\\n", 2);
+                line1 = arr[0];
+                line2 = arr[1];
             }
+        }
+        return sendTitle(line1, line2, fadein, stay, fadeout);
+    }
+
+
+    /**
+     * Attempt to send a Title Message
+     *
+     * @param line1 Message
+     * @param line2 Message
+     * @param fadein FadeIn Transition length (in ticks)
+     * @param stay How long the message should stay (in ticks)
+     * @param fadeout FadeOut Transition length (in ticks)
+     * @return Success Status
+     */
+    public boolean sendTitle(String line1, String line2, int fadein, int stay, int fadeout) {
+        if (USE_TITLES) {
             try {
                 Player player = Bukkit.getPlayer(this.player);
                 if (player != null) {
                     if (TAPI_1_11) {
-                        if (str == null) {
+                        if (line1 == null) {
                             player.resetTitle();
                         } else {
                             player.sendTitle(line1, line2, (fadein >= 0)?fadein:10, (stay >= 0)?stay:70, (fadeout >= 0)?fadeout:20);
                         }
                         return true;
                     } else if (TAPI_PLUGIN) {
-                        if (str == null) {
+                        if (line1 == null) {
                             com.connorlinfoot.titleapi.TitleAPI.clearTitle(player);
                         } else {
                             com.connorlinfoot.titleapi.TitleAPI.sendTitle(player, (fadein >= 0)?fadein:10, (stay >= 0)?stay:70, (fadeout >= 0)?fadeout:20, line1, line2);
@@ -172,45 +226,32 @@ public abstract class UIRenderer {
      * @param subtitle Subtitle to display (or null to hide)
      */
     public void setDownloading(String subtitle) {
-        if (subtitle != null && !canSendTitle()) {
+        final String text = subtitle;
+
+        if (text != null && !canSendTitle()) {
             if (download != -1) Bukkit.getScheduler().cancelTask(download);
             download = Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, () -> {
-                if (tdownload != null) Bukkit.getPlayer(player).sendMessage(plugin.api.getLang("SubServers", "Interface.Generic.Downloading").replace("$str$", subtitle));
+                if (tdownload != null) Bukkit.getPlayer(player).sendMessage(plugin.api.getLang("SubServers", "Interface.Generic.Downloading").replace("$str$", text));
                 download = -1;
             }, 50L);
-        } if (subtitle != null && tdownload == null) {
-            tdownload = new ContainedPair<String, Integer>(subtitle, 0);
-            final Container<Integer> delay = new Container<Integer>(0);
+            return;
+        }
 
-            String word = ChatColor.stripColor(plugin.api.getLang("SubServers", "Interface.Generic.Downloading.Title"));
-            String a = plugin.api.getLang("SubServers", "Interface.Generic.Downloading.Title-Color-Alt");
-            String b = plugin.api.getLang("SubServers", "Interface.Generic.Downloading.Title-Color");
+        if (subtitle != null && !subtitle.startsWith(Character.toString(ChatColor.COLOR_CHAR))) {
+            subtitle = plugin.api.getLang("SubServers", "Interface.Generic.Downloading.Title-Color-Alt") + subtitle;
+        }
+        if (subtitle != null && tdownload == null) {
+            tdownload = new ContainedPair<String, Integer>(subtitle, 0);
+
             Bukkit.getScheduler().runTask(plugin, new Runnable() {
                 @Override
                 public void run() {
                     if (tdownload != null) {
-                        int i = 0;
-                        int start = Math.max(tdownload.value - 3, 0);
-                        int end = Math.min(tdownload.value, word.length());
-                        StringBuilder s = new StringBuilder((delay.value > 7 && start == 0)?a:b);
-                        ++delay.value;
-                        if (delay.value > 7) ++tdownload.value;
-                        if (tdownload.value >= word.length() + 3) {
+                        if (++tdownload.value >= adownload.length) {
                             tdownload.value = 0;
-                            delay.value = 0;
                         }
 
-                        for (char c : word.toCharArray()) {
-                            ++i;
-                            if (i == start) s.append(a);
-                            s.append(c);
-                            if (i == end) s.append(b);
-                        }
-
-                        s.append('\n');
-                        s.append(a);
-                        s.append(tdownload.key);
-                        if (sendTitle(s.toString(), 0, 10, 5)) {
+                        if (sendTitle(adownload[tdownload.value], tdownload.key, 0, 10, 5)) {
                             Bukkit.getScheduler().runTaskLater(plugin, this, 1);
                         }
                     } else {
