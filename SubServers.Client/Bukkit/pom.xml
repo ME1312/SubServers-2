@@ -21,8 +21,8 @@
             <url>https://dev.me1312.net/maven</url>
         </repository>
         <repository>
-            <id>puharesource-repo</id>
-            <url>https://repo.puha.io/repo/</url>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
         </repository>
         <repository>
             <id>placeholderapi</id>
@@ -65,9 +65,9 @@
             <optional>true</optional>
         </dependency>
         <dependency>
-            <groupId>io.puharesource.mc</groupId>
-            <artifactId>TitleManager</artifactId>
-            <version>1.5.11</version> <!-- Use this plugin to enable title messages on 1.8, 1.9, and 1.10 servers -->
+            <groupId>com.github.ConnorLinfoot</groupId>
+            <artifactId>TitleAPI</artifactId>
+            <version>1.7.6</version> <!-- Use this plugin to enable title messages on 1.8, 1.9, and 1.10 servers -->
             <scope>provided</scope>
         </dependency>
         <dependency>

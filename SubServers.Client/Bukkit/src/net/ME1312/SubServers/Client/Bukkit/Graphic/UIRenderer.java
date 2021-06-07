@@ -2,8 +2,6 @@ package net.ME1312.SubServers.Client.Bukkit.Graphic;
 
 import net.ME1312.Galaxi.Library.Container.ContainedPair;
 import net.ME1312.Galaxi.Library.Container.Container;
-import net.ME1312.Galaxi.Library.Container.Pair;
-import net.ME1312.Galaxi.Library.Container.Value;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubServers.Client.Bukkit.SubPlugin;
@@ -24,9 +22,13 @@ import java.util.regex.Pattern;
  * GUI Renderer Layout Class
  */
 public abstract class UIRenderer {
+    private final boolean USE_TITLES;
+    private final boolean TAPI_1_11;
+    private final boolean TAPI_PLUGIN;
+
     static HashMap<String, PluginRenderer<Host>> hostPlugins = new HashMap<String, PluginRenderer<Host>>();
     static HashMap<String, PluginRenderer<SubServer>> subserverPlugins = new HashMap<String, PluginRenderer<SubServer>>();
-    private Pair<String, Integer> tdownload = null;
+    private ContainedPair<String, Integer> tdownload = null;
     private int download = -1;
     private final UUID player;
     private SubPlugin plugin;
@@ -41,6 +43,17 @@ public abstract class UIRenderer {
         if (Util.isNull(plugin, player)) throw new NullPointerException();
         this.plugin = plugin;
         this.player = player;
+
+        // Detect Title API
+        if (USE_TITLES = plugin.config.get().getMap("Settings").getBoolean("Use-Title-Messages", true)) {
+            if (TAPI_1_11 = plugin.api.getGameVersion().compareTo(new Version("1.11")) >= 0) {
+                TAPI_PLUGIN = false;
+            } else {
+                TAPI_PLUGIN = Bukkit.getPluginManager().getPlugin("TitleAPI") != null;
+            }
+        } else{
+            TAPI_1_11 = TAPI_PLUGIN = false;
+        }
     }
 
     /**
@@ -101,42 +114,56 @@ public abstract class UIRenderer {
      * @return Success Status
      */
     public boolean sendTitle(String str, int fadein, int stay, int fadeout) {
-        if (Util.isNull(str, fadein, stay, fadeout)) throw new NullPointerException();
-        if (plugin.config.get().getMap("Settings").getBoolean("Use-Title-Messages", true)) {
+        if (USE_TITLES) {
             String line1, line2;
-            if (!str.startsWith("\n") && str.contains("\n")) {
-                line1 = str.split("\\n")[0];
-                line2 = str.split("\\n")[1];
+            if (str == null) {
+                line1 = line2 = null;
             } else {
-                line1 = str.replace("\n", "");
-                line2 = ChatColor.RESET.toString();
+                if (!str.contains("\n")) {
+                    line1 = str;
+                    line2 = ChatColor.RESET.toString();
+                } else if (str.startsWith("\n")) {
+                    line1 = str.replace("\n", "");
+                    line2 = ChatColor.RESET.toString();
+                } else {
+                    String[] arr = str.split("\\n", 2);
+                    line1 = arr[0];
+                    line2 = arr[1];
+                }
             }
             try {
                 Player player = Bukkit.getPlayer(this.player);
-                if (plugin.api.getGameVersion().compareTo(new Version("1.11")) >= 0) {
-                    if (ChatColor.stripColor(line1).length() == 0 && ChatColor.stripColor(line2).length() == 0) {
-                        player.resetTitle();
-                    } else {
-                        player.sendTitle(line1, line2, (fadein >= 0)?fadein:10, (stay >= 0)?stay:70, (fadeout >= 0)?fadeout:20);
+                if (player != null) {
+                    if (TAPI_1_11) {
+                        if (str == null) {
+                            player.resetTitle();
+                        } else {
+                            player.sendTitle(line1, line2, (fadein >= 0)?fadein:10, (stay >= 0)?stay:70, (fadeout >= 0)?fadeout:20);
+                        }
+                        return true;
+                    } else if (TAPI_PLUGIN) {
+                        if (str == null) {
+                            com.connorlinfoot.titleapi.TitleAPI.clearTitle(player);
+                        } else {
+                            com.connorlinfoot.titleapi.TitleAPI.sendTitle(player, (fadein >= 0)?fadein:10, (stay >= 0)?stay:70, (fadeout >= 0)?fadeout:20, line1, line2);
+                        }
+                        return true;
                     }
-                    return true;
-                } else if (Bukkit.getPluginManager().getPlugin("TitleManager") != null) {
-                    if (Util.isException(() -> Util.reflect(Class.forName("io.puharesource.mc.titlemanager.api.v2.TitleManagerAPI").getMethod("sendTitles", Player.class, String.class, String.class, int.class, int.class, int.class),
-                            Bukkit.getPluginManager().getPlugin("TitleManager"), player, line1, line2, (fadein >= 0)?fadein:10, (stay >= 0)?stay:70, (fadeout >= 0)?fadeout:20))) { // Attempt TitleAPI v2
-
-                        // Fallback to TitleAPI v1
-                        io.puharesource.mc.titlemanager.api.TitleObject obj = io.puharesource.mc.titlemanager.api.TitleObject.class.getConstructor(String.class, String.class).newInstance(line1, line2);
-                        if (fadein >= 0) obj.setFadeIn(fadein);
-                        if (stay >= 0) obj.setStay(stay);
-                        if (fadeout >= 0) obj.setFadeOut(fadeout);
-                        obj.send(player);
-                    }
-                    return true;
-                } else return false;
+                }
             } catch (Throwable e) {
                 return false;
             }
-        } else return false;
+        }
+        return false;
+    }
+
+    /**
+     * See if Title Messages are available for use
+     *
+     * @return Title Message Availability
+     */
+    public boolean canSendTitle() {
+        return USE_TITLES && (TAPI_1_11 || TAPI_PLUGIN);
     }
 
     /**
@@ -145,7 +172,7 @@ public abstract class UIRenderer {
      * @param subtitle Subtitle to display (or null to hide)
      */
     public void setDownloading(String subtitle) {
-        if (subtitle != null && !(plugin.config.get().getMap("Settings").getBoolean("Use-Title-Messages", true) && (plugin.api.getGameVersion().compareTo(new Version("1.11")) >= 0 || Bukkit.getPluginManager().getPlugin("TitleManager") != null))) {
+        if (subtitle != null && !canSendTitle()) {
             if (download != -1) Bukkit.getScheduler().cancelTask(download);
             download = Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, () -> {
                 if (tdownload != null) Bukkit.getPlayer(player).sendMessage(plugin.api.getLang("SubServers", "Interface.Generic.Downloading").replace("$str$", subtitle));
@@ -153,40 +180,46 @@ public abstract class UIRenderer {
             }, 50L);
         } if (subtitle != null && tdownload == null) {
             tdownload = new ContainedPair<String, Integer>(subtitle, 0);
-            final Value<Integer> delay = new Container<Integer>(0);
+            final Container<Integer> delay = new Container<Integer>(0);
+
+            String word = ChatColor.stripColor(plugin.api.getLang("SubServers", "Interface.Generic.Downloading.Title"));
+            String a = plugin.api.getLang("SubServers", "Interface.Generic.Downloading.Title-Color-Alt");
+            String b = plugin.api.getLang("SubServers", "Interface.Generic.Downloading.Title-Color");
             Bukkit.getScheduler().runTask(plugin, new Runnable() {
                 @Override
                 public void run() {
                     if (tdownload != null) {
-                        String word = ChatColor.stripColor(plugin.api.getLang("SubServers", "Interface.Generic.Downloading.Title"));
                         int i = 0;
-                        int start = (tdownload.value() - 3 < 0)?0: tdownload.value()-3;
-                        int end = (tdownload.value() >= word.length())?word.length(): tdownload.value();
-                        String str = plugin.api.getLang("SubServers", (delay.value() > 7 && start == 0)?"Interface.Generic.Downloading.Title-Color-Alt":"Interface.Generic.Downloading.Title-Color");
-                        delay.value(delay.value() + 1);
-                        if (delay.value() > 7) tdownload.value(tdownload.value() + 1);
-                        if (tdownload.value() >= word.length() + 3) {
-                            tdownload.value(0);
-                            delay.value(0);
+                        int start = Math.max(tdownload.value - 3, 0);
+                        int end = Math.min(tdownload.value, word.length());
+                        StringBuilder s = new StringBuilder((delay.value > 7 && start == 0)?a:b);
+                        ++delay.value;
+                        if (delay.value > 7) ++tdownload.value;
+                        if (tdownload.value >= word.length() + 3) {
+                            tdownload.value = 0;
+                            delay.value = 0;
                         }
 
                         for (char c : word.toCharArray()) {
-                            i++;
-                            if (i == start) str += plugin.api.getLang("SubServers", "Interface.Generic.Downloading.Title-Color-Alt");
-                            str += c;
-                            if (i == end) str += plugin.api.getLang("SubServers", "Interface.Generic.Downloading.Title-Color");
+                            ++i;
+                            if (i == start) s.append(a);
+                            s.append(c);
+                            if (i == end) s.append(b);
                         }
 
-                        str += '\n' + plugin.api.getLang("SubServers", "Interface.Generic.Downloading.Title-Color-Alt") + tdownload.key();
-                        sendTitle(str, 0, 10, 5);
-                        Bukkit.getScheduler().runTaskLater(plugin, this, 1);
+                        s.append('\n');
+                        s.append(a);
+                        s.append(tdownload.key);
+                        if (sendTitle(s.toString(), 0, 10, 5)) {
+                            Bukkit.getScheduler().runTaskLater(plugin, this, 1);
+                        }
                     } else {
-                        sendTitle(ChatColor.RESET.toString(), 0, 1, 0);
+                        sendTitle(null);
                     }
                 }
             });
         } else if (subtitle != null) {
-            tdownload.key(subtitle);
+            tdownload.key = subtitle;
         } else {
             if (tdownload != null) {
                 tdownload = null;
@@ -217,17 +250,17 @@ public abstract class UIRenderer {
      */
     @SuppressWarnings({"deprecation", "JavaReflectionMemberAccess"})
     public ItemStack parseItem(String str, ItemStack def) {
-        final Value<String> item = new Container<String>(str);
+        final Container<String> item = new Container<String>(str);
         if (plugin.api.getGameVersion().compareTo(new Version("1.13")) < 0) {
             try {
                 // int
-                Matcher matcher = Pattern.compile("(?i)^(\\d+)$").matcher(item.value());
+                Matcher matcher = Pattern.compile("(?i)^(\\d+)$").matcher(item.value);
                 if (matcher.find()) {
                     return new ItemStack(Integer.parseInt(matcher.group(1)), 1);
                 }
                 // int:int
                 matcher.reset();
-                matcher = Pattern.compile("(?i)^(\\d+):(\\d+)$").matcher(item.value());
+                matcher = Pattern.compile("(?i)^(\\d+):(\\d+)$").matcher(item.value);
                 if (matcher.find()) {
                     return new ItemStack(Integer.parseInt(matcher.group(1)), 1, Short.parseShort(matcher.group(2)));
                 }
@@ -236,19 +269,19 @@ public abstract class UIRenderer {
             }
         }
 
-        if (item.value().toLowerCase().startsWith("minecraft:")) {
-            item.value(item.value().substring(10));
-        } else if (item.value().toLowerCase().startsWith("bukkit:")) {
-            item.value(item.value().substring(7));
+        if (item.value.toLowerCase().startsWith("minecraft:")) {
+            item.value(item.value.substring(10));
+        } else if (item.value.toLowerCase().startsWith("bukkit:")) {
+            item.value(item.value.substring(7));
 
             // Legacy Material Name
-            Matcher matcher = Pattern.compile("(?i)\\W(\\d+)$").matcher(item.value());
+            Matcher matcher = Pattern.compile("(?i)\\W(\\d+)$").matcher(item.value);
             try {
                 if (matcher.find()) {
-                    item.value(item.value().substring(0, item.value().length() - matcher.group().length()));
-                    return new ItemStack(Material.valueOf(item.value().toUpperCase()), 1, Short.parseShort(matcher.group(1)));
+                    item.value(item.value.substring(0, item.value.length() - matcher.group().length()));
+                    return new ItemStack(Material.valueOf(item.value.toUpperCase()), 1, Short.parseShort(matcher.group(1)));
                 } else {
-                    return new ItemStack(Material.valueOf(item.value().toUpperCase()), 1);
+                    return new ItemStack(Material.valueOf(item.value.toUpperCase()), 1);
                 }
             } catch (IllegalArgumentException e) {}
         }
@@ -256,11 +289,11 @@ public abstract class UIRenderer {
         // Material Name
         if (plugin.api.getGameVersion().compareTo(new Version("1.13")) < 0) {
             try {
-                return new ItemStack(Material.valueOf(item.value().toUpperCase()), 1);
+                return new ItemStack(Material.valueOf(item.value.toUpperCase()), 1);
             } catch (IllegalArgumentException e) {}
         } else try {
-            if (Material.class.getMethod("getMaterial", String.class, boolean.class).invoke(null, item.value().toUpperCase(), false) != null) {
-                return new ItemStack((Material) Material.class.getMethod("getMaterial", String.class, boolean.class).invoke(null, item.value().toUpperCase(), false), 1);
+            if (Material.class.getMethod("getMaterial", String.class, boolean.class).invoke(null, item.value.toUpperCase(), false) != null) {
+                return new ItemStack((Material) Material.class.getMethod("getMaterial", String.class, boolean.class).invoke(null, item.value.toUpperCase(), false), 1);
             }
         } catch (Exception e) {}
 
