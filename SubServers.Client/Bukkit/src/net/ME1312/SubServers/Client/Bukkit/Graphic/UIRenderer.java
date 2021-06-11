@@ -13,6 +13,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
 import java.util.PrimitiveIterator.OfInt;
@@ -243,7 +244,7 @@ public abstract class UIRenderer {
         if (subtitle != null && tdownload == null) {
             tdownload = new ContainedPair<String, Integer>(subtitle, 0);
 
-            Bukkit.getScheduler().runTask(plugin, new Runnable() {
+            new BukkitRunnable() {
                 @Override
                 public void run() {
                     if (tdownload != null) {
@@ -251,14 +252,15 @@ public abstract class UIRenderer {
                             tdownload.value = 0;
                         }
 
-                        if (sendTitle(adownload[tdownload.value], tdownload.key, 0, 10, 5)) {
-                            Bukkit.getScheduler().runTaskLater(plugin, this, 1);
+                        if (!sendTitle(adownload[tdownload.value], tdownload.key, 0, 10, 5)) {
+                            cancel();
                         }
                     } else {
                         sendTitle(null);
+                        cancel();
                     }
                 }
-            });
+            }.runTaskTimer(plugin, 0, 1);
         } else if (subtitle != null) {
             tdownload.key = subtitle;
         } else {
