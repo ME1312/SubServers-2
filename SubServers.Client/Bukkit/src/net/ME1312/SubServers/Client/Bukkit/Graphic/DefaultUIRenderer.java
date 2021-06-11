@@ -2,7 +2,6 @@ package net.ME1312.SubServers.Client.Bukkit.Graphic;
 
 import net.ME1312.Galaxi.Library.Container.Container;
 import net.ME1312.Galaxi.Library.Container.Value;
-import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubServers.Client.Bukkit.SubPlugin;
 import net.ME1312.SubServers.Client.Common.Network.API.Host;
 import net.ME1312.SubServers.Client.Common.Network.API.Server;
@@ -695,13 +694,39 @@ public class DefaultUIRenderer extends UIRenderer {
 
     public void groupMenu(final int page) {
         setDownloading(ChatColor.stripColor(plugin.api.getLang("SubServers", "Interface.Group-Menu.Title")));
-        plugin.api.getGroups(groups -> {
+        plugin.api.getServers(servers -> {
             setDownloading(null);
             lastVisitedObjects[0] = null;
             lastPage = page;
             lastMenu = () -> groupMenu(1);
             windowHistory.add(() -> groupMenu(page));
+
+            TreeMap<String, List<Server>> groups = new TreeMap<String, List<Server>>();
+            List<Server> ungrouped = new ArrayList<Server>();
+            {
+                HashMap<String, String> conflitresolver = new HashMap<String, String>();
+                for (Server server : servers.values()) {
+                    List<String> sgl = server.getGroups();
+                    if (sgl.size() == 0) {
+                        ungrouped.add(server);
+                    } else {
+                        for (String name : sgl) {
+                            String group = name;
+                            if (conflitresolver.keySet().contains(name.toLowerCase())) {
+                                group = conflitresolver.get(name.toLowerCase());
+                            } else {
+                                conflitresolver.put(name.toLowerCase(), name);
+                            }
+                            List<Server> list = (groups.keySet().contains(group))? groups.get(group) : new ArrayList<Server>();
+                            list.add(server);
+                            groups.put(group, list);
+                        }
+                    }
+                }
+            }
+
             List<String> index = new LinkedList<String>();
+            if (ungrouped.size() != 0) index.add(null);
             index.addAll(groups.keySet());
 
             ItemStack block;
@@ -737,9 +762,16 @@ public class DefaultUIRenderer extends UIRenderer {
 
                     block = color(color);
                     blockMeta = block.getItemMeta();
-                    blockMeta.setDisplayName(ChatColor.GOLD + group);
+                    int size;
+                    if (group == null) {
+                        blockMeta.setDisplayName(plugin.api.getLang("SubServers", "Interface.Group-Menu.Ungrouped"));
+                        size = ungrouped.size();
+                    } else {
+                        blockMeta.setDisplayName(ChatColor.GOLD + group);
+                        size = groups.get(group).size();
+                    }
                     LinkedList<String> lore = new LinkedList<String>();
-                    lore.add(plugin.api.getLang("SubServers", "Interface.Group-Menu.Group-Server-Count").replace("$int$", new DecimalFormat("#,###").format(groups.get(group).size())));
+                    lore.add(plugin.api.getLang("SubServers", "Interface.Group-Menu.Group-Server-Count").replace("$int$", new DecimalFormat("#,###").format(size)));
                     blockMeta.setLore(lore);
                     block.setItemMeta(blockMeta);
                     inv.setItem(i, block);
@@ -752,16 +784,6 @@ public class DefaultUIRenderer extends UIRenderer {
                         i++;
                     }
                 }
-            }
-
-            if (index.size() == 0) {
-                block = color(14);
-                blockMeta = block.getItemMeta();
-                blockMeta.setDisplayName(plugin.api.getLang("SubServers", "Interface.Group-Menu.No-Groups"));
-                block.setItemMeta(blockMeta);
-                inv.setItem(12, block);
-                inv.setItem(13, block);
-                inv.setItem(14, block);
             }
 
             i = inv.getSize() - 18;
@@ -803,7 +825,7 @@ public class DefaultUIRenderer extends UIRenderer {
     }
 
     public void serverMenu(final int page, final String host, final String group) {
-        setDownloading(ChatColor.stripColor((host == null)?((group == null)?plugin.api.getLang("SubServers", "Interface.Server-Menu.Title"):plugin.api.getLang("SubServers", "Interface.Group-SubServer.Title").replace("$str$", group)):plugin.api.getLang("SubServers", "Interface.Host-SubServer.Title").replace("$str$", host)));
+        setDownloading(ChatColor.stripColor((host == null)?((group == null)?plugin.api.getLang("SubServers", "Interface.Server-Menu.Title"):((group.length() == 0)?plugin.api.getLang("SubServers", "Interface.Group-SubServer.Title-Ungrouped"):plugin.api.getLang("SubServers", "Interface.Group-SubServer.Title").replace("$str$", group))):plugin.api.getLang("SubServers", "Interface.Host-SubServer.Title").replace("$str$", host)));
         Value<String> hostname = new Container<String>(host);
         Value<List<Server>> servercontainer = new Container<List<Server>>(new LinkedList<Server>());
         Runnable renderer = () -> {
@@ -828,7 +850,7 @@ public class DefaultUIRenderer extends UIRenderer {
             int count = (servers.size() == 0)?27:((servers.size() - min >= max)?36:servers.size() - min);
             int area = (count % 9 == 0) ? count : ((count / 9) + 1) * 9;
 
-            Inventory inv = Bukkit.createInventory(null, 18 + area, (host == null)?((group == null)?plugin.api.getLang("SubServers", "Interface.Server-Menu.Title"):plugin.api.getLang("SubServers", "Interface.Group-SubServer.Title").replace("$str$", group)):plugin.api.getLang("SubServers", "Interface.Host-SubServer.Title").replace("$str$", hostname.value()));
+            Inventory inv = Bukkit.createInventory(null, 18 + area, (host == null)?((group == null)?plugin.api.getLang("SubServers", "Interface.Server-Menu.Title"):((group.length() == 0)?plugin.api.getLang("SubServers", "Interface.Group-SubServer.Title-Ungrouped"):plugin.api.getLang("SubServers", "Interface.Group-SubServer.Title").replace("$str$", group))):plugin.api.getLang("SubServers", "Interface.Host-SubServer.Title").replace("$str$", hostname.value()));
             block = color(7);
             block.setItemMeta(divMeta);
             while (i < area) {
@@ -977,8 +999,8 @@ public class DefaultUIRenderer extends UIRenderer {
                     renderer.run();
                 }
             });
-        } else if (group != null && group.length() > 0) {
-            plugin.api.getGroup(group, servers -> {
+        } else if (group != null) {
+            plugin.api.getGroup((group.length() == 0)?null:group, servers -> {
                 if (servers == null) {
                     if (hasHistory()) back();
                 } else {

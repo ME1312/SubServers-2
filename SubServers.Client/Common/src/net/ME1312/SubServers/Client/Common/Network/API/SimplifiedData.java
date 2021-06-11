@@ -130,13 +130,13 @@ public final class SimplifiedData {
      * @param callback a Server Group
      */
     public static void requestGroup(DataClient client, String name, Callback<Pair<String, List<Server>>> callback) {
-        if (Util.isNull(name, callback)) throw new NullPointerException();
+        if (Util.isNull(callback)) throw new NullPointerException();
         StackTraceElement[] origin = new Exception().getStackTrace();
-        client(client).sendPacket(new PacketDownloadGroupInfo(Collections.singletonList(name), data -> {
+        client(client).sendPacket(new PacketDownloadGroupInfo((name == null)?Collections.emptyList():Collections.singletonList(name), data -> {
             Pair<String, List<Server>> group = null;
             if (data.getKeys().size() > 0) {
                 String key = new LinkedList<String>(data.getKeys()).getFirst();
-                List<Server> servers = new ArrayList<Server>();
+                List<Server> servers = new LinkedList<Server>();
                 for (String server : data.getMap(key).getKeys()) {
                     if (data.getMap(key).getMap(server).getRawString("type", "Server").equals("SubServer")) {
                         servers.add(new SubServer(client, data.getMap(key).getMap(server)));

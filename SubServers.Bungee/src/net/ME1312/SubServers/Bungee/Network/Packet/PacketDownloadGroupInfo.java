@@ -8,10 +8,7 @@ import net.ME1312.SubData.Server.SubDataClient;
 import net.ME1312.SubServers.Bungee.Host.Server;
 import net.ME1312.SubServers.Bungee.SubProxy;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Download Group Info Packet
@@ -55,17 +52,27 @@ public class PacketDownloadGroupInfo implements PacketObjectIn<Integer>, PacketO
         ObjectMap<Integer> data = new ObjectMap<Integer>();
         if (tracker != null) data.set(0x0000, tracker);
 
-        ObjectMap<String> groups = new ObjectMap<String>();
-        for (Map.Entry<String, List<Server>> group : plugin.api.getGroups().entrySet()) {
-            if (this.groups == null || this.groups.length <= 0 || Arrays.binarySearch(this.groups, group.getKey().toLowerCase()) >= 0) {
-                ObjectMap<String> servers = new ObjectMap<String>();
-                for (Server server : group.getValue()) {
-                    servers.set(server.getName(), server.forSubData());
+        if (this.groups == null || this.groups.length > 0) {
+            ObjectMap<String> groups = new ObjectMap<String>();
+            for (Map.Entry<String, List<Server>> group : plugin.api.getGroups().entrySet()) {
+                if (this.groups == null || Arrays.binarySearch(this.groups, group.getKey().toLowerCase()) >= 0) {
+                    ObjectMap<String> servers = new ObjectMap<String>();
+                    for (Server server : group.getValue()) {
+                        servers.set(server.getName(), server.forSubData());
+                    }
+                    groups.set(group.getKey(), servers);
                 }
-                groups.set(group.getKey(), servers);
             }
+            data.set(0x0001, groups);
+        } else {
+            ObjectMap<String> ungrouped = new ObjectMap<String>();
+            for (Server server : plugin.api.getServers().values()) {
+                if (server.getGroups().size() <= 0) ungrouped.set(server.getName(), server.forSubData());
+            }
+
+            data.set(0x0001, Collections.emptyMap());
+            data.set(0x0002, ungrouped);
         }
-        data.set(0x0001, groups);
         return data;
     }
 

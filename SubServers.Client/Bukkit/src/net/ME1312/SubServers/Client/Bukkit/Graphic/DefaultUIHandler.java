@@ -241,7 +241,7 @@ public class DefaultUIHandler implements UIHandler, Listener {
                         }
                     }
 
-                } else if (title.equals(plugin.api.getLang("SubServers", "Interface.Group-Menu.Title"))) { // Host Menu
+                } else if (title.equals(plugin.api.getLang("SubServers", "Interface.Group-Menu.Title"))) { // Group Menu
                     if (event.getCurrentItem() != null && event.getCurrentItem().getType() != Material.AIR && event.getCurrentItem().hasItemMeta()) {
                         String item = event.getCurrentItem().getItemMeta().getDisplayName();
 
@@ -254,7 +254,10 @@ public class DefaultUIHandler implements UIHandler, Listener {
                         } else if (item.equals(plugin.api.getLang("SubServers", "Interface.Group-Menu.Server-Menu"))) {
                             player.closeInventory();
                             gui.serverMenu(1, null, null);
-                        } else if ((item.length() != 0 && !item.equals(ChatColor.RESET.toString())) && !item.equals(plugin.api.getLang("SubServers", "Interface.Group-Menu.No-Groups"))) {
+                        } else if (item.equals(plugin.api.getLang("SubServers", "Interface.Group-Menu.Ungrouped"))) {
+                            player.closeInventory();
+                            gui.serverMenu(1, null, "");
+                        } else if (item.length() != 0 && !item.equals(ChatColor.RESET.toString())) {
                             player.closeInventory();
                             gui.serverMenu(1, null, ChatColor.stripColor(item));
                         }
@@ -265,7 +268,8 @@ public class DefaultUIHandler implements UIHandler, Listener {
                                         title.endsWith(plugin.api.getLang("SubServers", "Interface.Host-SubServer.Title").split("\\$str\\$")[1])) ||
                         title.startsWith(plugin.api.getLang("SubServers", "Interface.Group-SubServer.Title").split("\\$str\\$")[0]) &&
                                 (plugin.api.getLang("SubServers", "Interface.Group-SubServer.Title").split("\\$str\\$").length == 1 ||
-                                        title.endsWith(plugin.api.getLang("SubServers", "Interface.Group-SubServer.Title").split("\\$str\\$")[1]))) {
+                                        title.endsWith(plugin.api.getLang("SubServers", "Interface.Group-SubServer.Title").split("\\$str\\$")[1])) ||
+                        title.equals(plugin.api.getLang("SubServers", "Interface.Group-SubServer.Title-Ungrouped"))) {
                     if (event.getCurrentItem() != null && event.getCurrentItem().getType() != Material.AIR && event.getCurrentItem().hasItemMeta()) {
                         String item = event.getCurrentItem().getItemMeta().getDisplayName();
 

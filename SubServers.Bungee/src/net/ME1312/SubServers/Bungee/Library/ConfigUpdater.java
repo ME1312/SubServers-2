@@ -318,7 +318,7 @@ public class ConfigUpdater {
 
                 existing = updated.clone();
                 i++;
-            } if (was.compareTo(new Version("20w34c")) <= 0) {
+            } if (was.compareTo(new Version("21w24h")) <= 0) {
 
               //existing = updated.clone();
                 i++;
@@ -498,9 +498,10 @@ public class ConfigUpdater {
             def.put("Interface.Host-SubServer.Title", "Host/$str$/SubServers");
             def.put("Interface.Group-Menu.Title", "Group Menu");
             def.put("Interface.Group-Menu.Group-Server-Count", "&9$int$ Server(s)");
-            def.put("Interface.Group-Menu.No-Groups", "&c&oThere are No Groups");
+            def.put("Interface.Group-Menu.Ungrouped", "&7(ungrouped)");
             def.put("Interface.Group-Menu.Server-Menu", "&a&lView All Servers");
             def.put("Interface.Group-SubServer.Title", "Group/$str$/Servers");
+            def.put("Interface.Group-SubServer.Title-Ungrouped", "Ungrouped Server Menu");
             def.put("Interface.Server-Menu.Title", "Server Menu");
             def.put("Interface.Server-Menu.Server-Player-Count", "&2$int$ Player(s) Online");
             def.put("Interface.Server-Menu.Server-External", "&7External Server");

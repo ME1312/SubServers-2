@@ -61,7 +61,9 @@ public class PacketDownloadProxyInfo implements PacketObjectIn<Integer>, PacketO
             }
         }
         data.set(0x0001, proxies);
-        if (this.proxies != null && plugin.api.getMasterProxy() != null && (this.proxies.length <= 0 || Arrays.binarySearch(this.proxies, plugin.api.getMasterProxy().getName().toLowerCase()) >= 0)) data.set(0x0002, plugin.api.getMasterProxy().forSubData());
+        if (this.proxies != null && plugin.api.getMasterProxy() != null && (this.proxies.length <= 0 || Arrays.binarySearch(this.proxies, plugin.api.getMasterProxy().getName().toLowerCase()) >= 0)) {
+            data.set(0x0002, plugin.api.getMasterProxy().forSubData());
+        }
         return data;
     }
 

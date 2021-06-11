@@ -321,7 +321,7 @@ public final class SubAPI implements BungeeAPI {
                 } else {
                     conflitresolver.put(name.toLowerCase(), name);
                 }
-                List<Server> list = (groups.keySet().contains(group))?groups.get(group):new ArrayList<Server>();
+                List<Server> list = (groups.keySet().contains(group))?groups.get(group):new LinkedList<Server>();
                 list.add(server);
                 groups.put(group, list);
             }
