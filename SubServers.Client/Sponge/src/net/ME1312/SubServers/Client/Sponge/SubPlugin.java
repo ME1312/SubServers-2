@@ -57,7 +57,8 @@ public final class SubPlugin {
     public SubProtocol subprotocol;
 
     @ConfigDir(sharedRoot = false)
-    @Inject public File dir;
+    @Inject public File xdir;
+    public UniversalFile dir;
     public Logger log = LoggerFactory.getLogger("SubServers");
     public UIHandler gui = null;
     public Version version;
@@ -86,11 +87,10 @@ public final class SubPlugin {
         api = new SubAPI(this);
         try {
             log.info("Loading SubServers.Client.Sponge v" + version.toString() + " Libraries (for Minecraft " + api.getGameVersion() + ")");
-            dir.mkdirs();
-            if (new UniversalFile(dir.getParentFile(), "SubServers-Client:config.yml").exists()) {
-                Files.move(new UniversalFile(dir.getParentFile(), "SubServers-Client:config.yml").toPath(), new UniversalFile(dir, "config.yml").toPath(), StandardCopyOption.REPLACE_EXISTING);
-                Util.deleteDirectory(new UniversalFile(dir.getParentFile(), "SubServers-Client"));
-            }
+            dir = new UniversalFile(xdir.getParentFile(), "subservers-client");
+            if (xdir.exists()) {
+                Files.move(xdir.toPath(), dir.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            } else dir.mkdirs();
             ConfigUpdater.updateConfig(new UniversalFile(dir, "config.yml"));
             config = new YAMLConfig(new UniversalFile(dir, "config.yml"));
             if (new UniversalFile(new File(System.getProperty("user.dir")), "subdata.json").exists()) {

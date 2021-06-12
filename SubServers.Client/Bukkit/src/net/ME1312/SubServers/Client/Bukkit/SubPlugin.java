@@ -42,6 +42,7 @@ import static net.ME1312.SubServers.Client.Bukkit.Library.AccessMode.*;
 public final class SubPlugin extends JavaPlugin {
     HashMap<Integer, SubDataClient> subdata = new HashMap<Integer, SubDataClient>();
     Pair<Long, Map<String, Map<String, String>>> lang = null;
+    private UniversalFile dir;
     public YAMLConfig config;
     public SubProtocol subprotocol;
 
@@ -66,13 +67,12 @@ public final class SubPlugin extends JavaPlugin {
     public void onEnable() {
         try {
             Bukkit.getLogger().info("SubServers > Loading SubServers.Client.Bukkit v" + version.toString() + " Libraries (for Minecraft " + api.getGameVersion() + ")");
-            getDataFolder().mkdirs();
-            if (new UniversalFile(getDataFolder().getParentFile(), "SubServers-Client:config.yml").exists()) {
-                Files.move(new UniversalFile(getDataFolder().getParentFile(), "SubServers-Client:config.yml").toPath(), new UniversalFile(getDataFolder(), "config.yml").toPath(), StandardCopyOption.REPLACE_EXISTING);
-                Util.deleteDirectory(new UniversalFile(getDataFolder().getParentFile(), "SubServers-Client"));
-            }
-            ConfigUpdater.updateConfig(new UniversalFile(getDataFolder(), "config.yml"));
-            config = new YAMLConfig(new UniversalFile(getDataFolder(), "config.yml"));
+            dir = new UniversalFile(getDataFolder().getParentFile(), "SubServers-Client");
+            if (getDataFolder().exists()) {
+                Files.move(getDataFolder().toPath(), dir.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            } else dir.mkdirs();
+            ConfigUpdater.updateConfig(new UniversalFile(dir, "config.yml"));
+            config = new YAMLConfig(new UniversalFile(dir, "config.yml"));
             if (new UniversalFile(new File(System.getProperty("user.dir")), "subdata.json").exists()) {
                 FileReader reader = new FileReader(new UniversalFile(new File(System.getProperty("user.dir")), "subdata.json"));
                 config.get().getMap("Settings").set("SubData", new YAMLSection(parseJSON(Util.readAll(reader))));
@@ -81,8 +81,8 @@ public final class SubPlugin extends JavaPlugin {
                 new UniversalFile(new File(System.getProperty("user.dir")), "subdata.json").delete();
             }
             if (new UniversalFile(new File(System.getProperty("user.dir")), "subdata.rsa.key").exists()) {
-                if (new UniversalFile(getDataFolder(), "subdata.rsa.key").exists()) new UniversalFile(getDataFolder(), "subdata.rsa.key").delete();
-                Files.move(new UniversalFile(new File(System.getProperty("user.dir")), "subdata.rsa.key").toPath(), new UniversalFile(getDataFolder(), "subdata.rsa.key").toPath());
+                if (new UniversalFile(dir, "subdata.rsa.key").exists()) new UniversalFile(dir, "subdata.rsa.key").delete();
+                Files.move(new UniversalFile(new File(System.getProperty("user.dir")), "subdata.rsa.key").toPath(), new UniversalFile(dir, "subdata.rsa.key").toPath());
             }
 
             getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
@@ -103,9 +103,9 @@ public final class SubPlugin extends JavaPlugin {
 
                 System.out.println("SubData > AES Encryption Available");
             }
-            if (new UniversalFile(getDataFolder(), "subdata.rsa.key").exists()) {
+            if (new UniversalFile(dir, "subdata.rsa.key").exists()) {
                 try {
-                    subprotocol.registerCipher("RSA", new RSA(new UniversalFile(getDataFolder(), "subdata.rsa.key")));
+                    subprotocol.registerCipher("RSA", new RSA(new UniversalFile(dir, "subdata.rsa.key")));
                     System.out.println("SubData > RSA Encryption Available");
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -157,7 +157,7 @@ public final class SubPlugin extends JavaPlugin {
     public void reload(boolean notifyPlugins) throws IOException {
         resetDate = Calendar.getInstance().getTime().getTime();
 
-        ConfigUpdater.updateConfig(new UniversalFile(getDataFolder(), "config.yml"));
+        ConfigUpdater.updateConfig(new UniversalFile(dir, "config.yml"));
         config.reload();
 
         if (notifyPlugins) {
