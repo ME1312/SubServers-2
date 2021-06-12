@@ -33,12 +33,6 @@
             <optional>true</optional>
         </dependency>
         <dependency>
-            <groupId>net.ME1312.Galaxi</groupId>
-            <artifactId>GalaxiEngine</artifactId>
-            <version>21w24a</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
             <groupId>net.ME1312.SubServers</groupId>
             <artifactId>SubServers.Bungee.Common</artifactId>
             <version>-PLACEHOLDER</version>

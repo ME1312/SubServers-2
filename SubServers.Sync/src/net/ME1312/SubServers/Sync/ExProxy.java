@@ -14,7 +14,6 @@ import net.ME1312.SubData.Client.Encryption.RSA;
 import net.ME1312.SubData.Client.Library.DisconnectReason;
 import net.ME1312.SubData.Client.SubDataClient;
 import net.ME1312.SubServers.Bungee.BungeeCommon;
-import net.ME1312.SubServers.Bungee.Library.Compatibility.Galaxi.GalaxiCommand;
 import net.ME1312.SubServers.Bungee.Library.Compatibility.Logger;
 import net.ME1312.SubServers.Bungee.Library.Fallback.FallbackState;
 import net.ME1312.SubServers.Bungee.Library.Fallback.SmartFallback;
@@ -76,7 +75,6 @@ public final class ExProxy extends BungeeCommon implements Listener {
     public static final Version version = Version.fromString("2.17a");
 
     public final boolean isPatched;
-    public final boolean isGalaxi;
     public long lastReload = -1;
     private long resetDate = 0;
     private boolean reconnect = false;
@@ -85,10 +83,6 @@ public final class ExProxy extends BungeeCommon implements Listener {
     ExProxy(PrintStream out, boolean isPatched) throws Exception {
         super(SubAPI::getInstance);
         this.isPatched = isPatched;
-        this.isGalaxi = !Util.isException(() ->
-                Util.reflect(Class.forName("net.ME1312.Galaxi.Engine.CodeManager").getMethod("catalogLibrary", Class.class),
-                        Util.reflect(Class.forName("net.ME1312.Galaxi.Engine.GalaxiEngine").getMethod("getPluginManager"),
-                                Util.reflect(Class.forName("net.ME1312.Galaxi.Engine.GalaxiEngine").getMethod("getInstance"), null)), Launch.class));
 
         Logger.get("SubServers").info("Loading SubServers.Sync v" + version.toString() + " Libraries (for Minecraft " + api.getGameVersion()[api.getGameVersion().length - 1] + ")");
 
@@ -257,7 +251,6 @@ public final class ExProxy extends BungeeCommon implements Listener {
         getPluginManager().registerCommand(plugin, new SubCommand(this, "subservers"));
         getPluginManager().registerCommand(plugin, new SubCommand(this, "subserver"));
         getPluginManager().registerCommand(plugin, new SubCommand(this, "sub"));
-        GalaxiCommand.group(SubCommand.class);
 
         if (getReconnectHandler() != null && getReconnectHandler().getClass().equals(SmartFallback.class))
             setReconnectHandler(new SmartFallback(config.get().getMap("Settings").getMap("Smart-Fallback", new ObjectMap<>()))); // Re-initialize Smart Fallback

@@ -1,6 +1,5 @@
 package net.ME1312.SubServers.Bungee.Library.Compatibility;
 
-import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubServers.Bungee.BungeeCommon;
 
 import java.util.HashMap;
@@ -21,11 +20,7 @@ public class Logger {
      */
     public static java.util.logging.Logger get(String prefix) {
         if (!existing.keySet().contains(prefix)) {
-            java.util.logging.Logger log = Util.getDespiteException(() -> (java.util.logging.Logger) Class.forName("net.ME1312.Galaxi.Log.Logger").getMethod("toPrimitive")
-                    .invoke(Class.forName("net.ME1312.Galaxi.Log.Logger").getConstructor(String.class).newInstance(prefix)), null);
-
-            if (log == null) {
-                log = java.util.logging.Logger.getAnonymousLogger();
+            java.util.logging.Logger log = java.util.logging.Logger.getAnonymousLogger();
                 log.setUseParentHandlers(false);
                 log.addHandler(new Handler() {
                     @Override
@@ -37,7 +32,6 @@ public class Logger {
                     public void flush() {}
                     public void close() {}
                 });
-            }
             existing.put(prefix, log);
         }
         return existing.get(prefix);

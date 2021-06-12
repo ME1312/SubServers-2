@@ -11,12 +11,10 @@ import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubData.Server.ClientHandler;
 import net.ME1312.SubData.Server.SubDataClient;
 import net.ME1312.SubServers.Bungee.Host.*;
-import net.ME1312.SubServers.Bungee.Library.Compatibility.Galaxi.GalaxiInfo;
 import net.ME1312.SubServers.Bungee.Library.Compatibility.Logger;
 import net.ME1312.SubServers.Bungee.Network.Packet.PacketCheckPermission;
 
 import com.google.gson.Gson;
-import net.md_5.bungee.BungeeCord;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -36,9 +34,6 @@ import java.nio.charset.Charset;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
-import static net.ME1312.SubServers.Bungee.Library.Compatibility.Galaxi.GalaxiCommand.description;
-import static net.ME1312.SubServers.Bungee.Library.Compatibility.Galaxi.GalaxiCommand.help;
-
 /**
  * Plugin Command Class
  */
@@ -53,15 +48,6 @@ public final class SubCommand extends Command implements TabExecutor {
         super(command);
         this.plugin = plugin;
         this.label = '/' + command;
-
-        description(this, "The SubServers Command");
-        help(this,
-                "The command for accessing the SubServers Server Manager.",
-                "",
-                "Permission: subservers.command",
-                "Extended help entries:",
-                "  /sub help"
-        );
     }
 
     /**
@@ -77,16 +63,10 @@ public final class SubCommand extends Command implements TabExecutor {
                 if (args[0].equalsIgnoreCase("help") || args[0].equalsIgnoreCase("?")) {
                     sender.sendMessages(printHelp());
                 } else if (args[0].equalsIgnoreCase("version") || args[0].equalsIgnoreCase("ver")) {
-                    Version galaxi = GalaxiInfo.getVersion();
-                    Version bungee = Util.getDespiteException(() -> (Version) BungeeCord.class.getMethod("getForkVersion").invoke(plugin), null);
-                    Version galaxibuild = GalaxiInfo.getBuild();
-                    Version bungeebuild = Util.getDespiteException(() -> (Version) BungeeCord.class.getMethod("getForkBuild").invoke(plugin), null);
-
                     sender.sendMessage("SubServers > These are the platforms and versions that are running SubServers.Bungee:");
                     sender.sendMessage("  " + Platform.getSystemName() + ' ' + Platform.getSystemVersion() + ((Platform.getSystemBuild() != null)?" (" + Platform.getSystemBuild() + ')':"") + ((!Platform.getSystemArchitecture().equals("unknown"))?" [" + Platform.getSystemArchitecture() + ']':"") + ',');
                     sender.sendMessage("  Java " + Platform.getJavaVersion() + ((!Platform.getJavaArchitecture().equals("unknown"))?" [" + Platform.getJavaArchitecture() + ']':"") + ',');
-                    if (galaxi != null) Util.isException(() -> sender.sendMessage("  GalaxiEngine v" + galaxi.toExtendedString() + ((galaxibuild != null)?" (" + galaxibuild + ')':"") + ','));
-                    sender.sendMessage("  " + plugin.getBungeeName() + ((plugin.isGalaxi)?" v":" ") + ((bungee != null)?bungee:plugin.getVersion()) + ((bungeebuild != null)?" (" + bungeebuild + ')':"") + ((plugin.isPatched)?" [Patched]":"") + ',');
+                    sender.sendMessage("  " + plugin.getBungeeName() + ' ' + plugin.getVersion() + ((plugin.isPatched)?" [Patched]":"") + ',');
                     sender.sendMessage("  SubServers.Bungee v" + SubProxy.version.toExtendedString() + ((plugin.api.getWrapperBuild() != null)?" (" + plugin.api.getWrapperBuild() + ')':""));
                     sender.sendMessage("");
                     new Thread(() -> {
@@ -1143,16 +1123,6 @@ public final class SubCommand extends Command implements TabExecutor {
         BungeeServer(SubProxy plugin, String command) {
             super(command, "bungeecord.command.server");
             this.plugin = plugin;
-
-            description(this, "Displays a list of or connects you to servers");
-            help(this,
-                    "Displays a list of all players connected to BungeeCord.",
-                    "This list is separated into groups by server.",
-                    "",
-                    "Permission: bungeecord.command.list",
-                    "Example:",
-                    "  /glist"
-            );
         }
 
         /**
@@ -1229,16 +1199,6 @@ public final class SubCommand extends Command implements TabExecutor {
         BungeeList(SubProxy plugin, String command) {
             super(command, "bungeecord.command.list");
             this.plugin = plugin;
-
-            description(this, "Displays a list of all players");
-            help(this,
-                    "Displays a list of all players connected to BungeeCord.",
-                    "This list is separated into groups by server.",
-                    "",
-                    "Permission: bungeecord.command.list",
-                    "Example:",
-                    "  /glist"
-            );
         }
 
         /**

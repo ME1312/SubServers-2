@@ -31,12 +31,6 @@
             <version>21w24a</version>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>net.ME1312.Galaxi</groupId>
-            <artifactId>GalaxiEngine</artifactId>
-            <version>21w24a</version>
-            <scope>provided</scope>
-        </dependency>
     </dependencies>
 
     <build>
