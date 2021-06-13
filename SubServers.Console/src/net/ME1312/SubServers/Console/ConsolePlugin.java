@@ -5,6 +5,7 @@ import net.ME1312.SubServers.Bungee.Event.SubCreateEvent;
 import net.ME1312.SubServers.Bungee.Event.SubSendCommandEvent;
 import net.ME1312.SubServers.Bungee.Event.SubStartEvent;
 import net.ME1312.SubServers.Bungee.Host.Host;
+import net.ME1312.SubServers.Bungee.Host.RemotePlayer;
 import net.ME1312.SubServers.Bungee.Host.SubCreator;
 import net.ME1312.SubServers.Bungee.Host.SubServer;
 import net.ME1312.SubServers.Bungee.SubAPI;
@@ -19,6 +20,7 @@ import net.md_5.bungee.event.EventPriority;
 import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashMap;
 
@@ -103,7 +105,8 @@ public final class ConsolePlugin extends Plugin implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onServerCommand(SubSendCommandEvent event) {
         if (!event.isCancelled() && sCurrent.keySet().contains(event.getServer().getName().toLowerCase())) {
-            sCurrent.get(event.getServer().getName().toLowerCase()).log('<' + ((event.getPlayer() == null)?"CONSOLE":((getProxy().getPlayer(event.getPlayer()) == null)?event.getPlayer().toString():getProxy().getPlayer(event.getPlayer()).getName())) + "> /" + event.getCommand());
+            RemotePlayer player = (event.getPlayer() == null)? null : SubAPI.getInstance().getRemotePlayer(event.getPlayer());
+            sCurrent.get(event.getServer().getName().toLowerCase()).log(((player == null)? "CONSOLE" : player.getName()) + "> /" + event.getCommand());
         }
     }
 
