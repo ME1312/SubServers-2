@@ -1,14 +1,28 @@
 package net.ME1312.SubServers.Bungee.Library.Compatibility;
 
+import net.ME1312.Galaxi.Library.Callback.Callback;
+
+import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.config.ServerInfo;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 import java.net.InetSocketAddress;
+import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.UUID;
 
 /**
  * RemotePlayer Layout Class
  */
 public interface RemotePlayer {
+
+    /**
+     * Get Local Player
+     *
+     * @return Local Player (or null when not local)
+     */
+    ProxiedPlayer get();
 
     /**
      * Get the UUID of this player.
@@ -51,4 +65,105 @@ public interface RemotePlayer {
      * @return the server this player is connected to
      */
     ServerInfo getServer();
+
+    /**
+     * Sends messages to this player
+     *
+     * @param messages Messages to send
+     */
+    default void sendMessage(String... messages) {
+        sendMessage(messages, i -> {});
+    }
+
+    /**
+     * Sends messages to this player
+     *
+     * @param messages Messages to send
+     * @param response Success Status
+     */
+    void sendMessage(String[] messages, Callback<Integer> response);
+
+    /**
+     * Sends messages to this player
+     *
+     * @param messages Messages to send
+     */
+    default void sendMessage(BaseComponent... messages) {
+        sendMessage(messages, i -> {});
+    }
+
+    /**
+     * Sends messages to this player
+     *
+     * @param messages Messages to send
+     * @param response Success Status
+     */
+    void sendMessage(BaseComponent[] messages, Callback<Integer> response);
+
+    /**
+     * Transfers this player to another server
+     *
+     * @param server Target server
+     */
+    default void transfer(String server) {
+        transfer(server, i -> {});
+    }
+
+    /**
+     * Transfers this player to another server
+     *
+     * @param server Target server
+     * @param response Success status
+     */
+    void transfer(String server, Callback<Integer> response);
+
+    /**
+     * Transfers this player to another server
+     *
+     * @param server Target server
+     */
+    default void transfer(ServerInfo server) {
+        transfer(server, i -> {});
+    }
+
+    /**
+     * Transfers this player to another server
+     *
+     * @param server Target server
+     * @param response Success status
+     */
+    void transfer(ServerInfo server, Callback<Integer> response);
+
+    /**
+     * Disconnects this player from the network
+     */
+    default void disconnect() {
+        disconnect(i -> {});
+    }
+
+    /**
+     * Disconnects this player from the network
+     *
+     * @param response Success status
+     */
+    default void disconnect(Callback<Integer> response) {
+        disconnect(null, response);
+    }
+
+    /**
+     * Disconnects this player from the network
+     *
+     * @param message Disconnect Message
+     */
+    default void disconnect(String message) {
+        disconnect(message, i -> {});
+    }
+
+    /**
+     * Disconnects this player from the network
+     *
+     * @param message Disconnect Message
+     * @param response Success status
+     */
+    void disconnect(String message, Callback<Integer> response);
 }

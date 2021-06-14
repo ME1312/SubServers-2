@@ -26,7 +26,6 @@
             <artifactId>forms_rt</artifactId>
             <version>7.0.3</version>
             <scope>compile</scope>
-            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>net.md_5</groupId>
@@ -37,7 +36,7 @@
         <dependency>
             <groupId>net.ME1312.SubServers</groupId>
             <artifactId>SubServers.Bungee</artifactId>
-            <version>-PLACEHOLDER</version>
+            <version>${project.version}</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>

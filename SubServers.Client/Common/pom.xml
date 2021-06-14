@@ -19,13 +19,13 @@
             <groupId>net.ME1312.Galaxi</groupId>
             <artifactId>GalaxiUtil</artifactId>
             <version>21w24a</version>
-            <scope>provided</scope>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>net.ME1312.SubData</groupId>
             <artifactId>Client</artifactId>
             <version>21w08a</version>
-            <scope>provided</scope>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 
@@ -48,6 +48,33 @@
                 <configuration>
                     <source>1.8</source>
                     <target>1.8</target>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <tasks>
+                                <mkdir dir="${project.build.directory}" />
+                                <copy file="${basedir}/../../LICENSE" todir="${project.build.directory}/classes" />
+                            </tasks>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.2.0</version>
+                <configuration>
+                    <finalName>SubServers.Client.Common</finalName>
+                    <outputDirectory>../../Artifacts/Maven</outputDirectory>
                 </configuration>
             </plugin>
             <plugin>
@@ -85,6 +112,32 @@
                         <configuration>
                             <windowtitle>SubServers.Client.Common Javadoc</windowtitle>
                             <doctitle>SubServers.Client.Common Javadoc</doctitle>
+                            <show>protected</show>
+                            <destDir>./</destDir>
+                            <outputDirectory>${basedir}/../../Javadoc/SubServers.Client.Common</outputDirectory>
+                            <reportOutputDirectory>${basedir}/../../Javadoc/SubServers.Client.Common</reportOutputDirectory>
+                            <additionalOptions>-Xdoclint:none</additionalOptions>
+                            <links>
+                                <link>https://dev.me1312.net/jenkins/job/GalaxiEngine/javadoc/GalaxiUtil/</link>
+                                <link>https://dev.me1312.net/jenkins/job/SubData/javadoc/Client/</link>
+                            </links>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.0.0</version>
+                <executions>
+                    <execution>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>javadoc</goal>
+                        </goals>
+                        <configuration>
+                            <windowtitle>SubServers.Client.Common Javadoc</windowtitle>
+                            <doctitle>SubServers.Client.Common ${project.version}</doctitle>
                             <show>protected</show>
                             <destDir>./</destDir>
                             <outputDirectory>${basedir}/../../Javadoc/SubServers.Client.Common</outputDirectory>

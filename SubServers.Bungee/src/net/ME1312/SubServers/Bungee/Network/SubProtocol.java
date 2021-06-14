@@ -2,8 +2,6 @@ package net.ME1312.SubServers.Bungee.Network;
 
 import net.ME1312.Galaxi.Library.Callback.Callback;
 import net.ME1312.Galaxi.Library.Version.Version;
-import net.ME1312.SubData.Server.Library.DataSize;
-import net.ME1312.SubData.Server.SubDataClient;
 import net.ME1312.SubData.Server.SubDataProtocol;
 import net.ME1312.SubData.Server.SubDataServer;
 import net.ME1312.SubServers.Bungee.Event.SubNetworkConnectEvent;
@@ -76,8 +74,9 @@ public class SubProtocol extends SubDataProtocol {
         registerPacket(0x0038, PacketRemoveServer.class);
         registerPacket(0x0039, PacketDeleteServer.class);
       //registerPacket(0x003A, PacketRestoreServer.class); // TODO
-      //registerPacket(0x003B, PacketTeleportPlayer.class);
+        registerPacket(0x003B, PacketTransferPlayer.class);
         registerPacket(0x003C, PacketDisconnectPlayer.class);
+        registerPacket(0x003D, PacketMessagePlayer.class);
 
         registerPacket(0x0030, new PacketCreateServer(plugin));
         registerPacket(0x0031, new PacketAddServer(plugin));
@@ -90,8 +89,9 @@ public class SubProtocol extends SubDataProtocol {
         registerPacket(0x0038, new PacketRemoveServer(plugin));
         registerPacket(0x0039, new PacketDeleteServer(plugin));
       //registerPacket(0x003A, new PacketRestoreServer(plugin)); // TODO
-      //registerPacket(0x003B, new PacketTeleportPlayer(plugin));
+        registerPacket(0x003B, new PacketTransferPlayer(plugin));
         registerPacket(0x003C, new PacketDisconnectPlayer(plugin));
+        registerPacket(0x003D, new PacketMessagePlayer(plugin));
 
 
      // 50-6F: External Host Packets
@@ -120,20 +120,24 @@ public class SubProtocol extends SubDataProtocol {
       //registerPacket(0x005A, new PacketExRestoreServer());
 
 
-     // 70-7F: External Misc Packets
+     // 70-7F: External Sync Packets
         registerPacket(0x0070, PacketOutExRunEvent.class);
         registerPacket(0x0071, PacketOutExReset.class);
         registerPacket(0x0072, PacketOutExReload.class);
         registerPacket(0x0073, PacketOutExUpdateWhitelist.class);
         registerPacket(0x0074, PacketExSyncPlayer.class);
+        registerPacket(0x0075, PacketExTransferPlayer.class);
         registerPacket(0x0076, PacketExDisconnectPlayer.class);
+        registerPacket(0x0077, PacketExMessagePlayer.class);
 
       //registerPacket(0x0070, new PacketOutRunEvent());
       //registerPacket(0x0071, new PacketOutReset());
       //registerPacket(0x0072, new PacketOutReload());
       //registerPacket(0x0073, new PacketOutExUpdateWhitelist());
         registerPacket(0x0074, new PacketExSyncPlayer(plugin));
+        registerPacket(0x0075, new PacketExTransferPlayer());
         registerPacket(0x0076, new PacketExDisconnectPlayer());
+        registerPacket(0x0077, new PacketExMessagePlayer());
     }
 
     @SuppressWarnings("deprecation")

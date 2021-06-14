@@ -17,10 +17,10 @@ import net.ME1312.SubServers.Bungee.BungeeCommon;
 import net.ME1312.SubServers.Bungee.Library.Compatibility.Logger;
 import net.ME1312.SubServers.Bungee.Library.Fallback.FallbackState;
 import net.ME1312.SubServers.Bungee.Library.Fallback.SmartFallback;
+import net.ME1312.SubServers.Client.Common.Network.Packet.PacketDisconnectPlayer;
 import net.ME1312.SubServers.Sync.Event.*;
 import net.ME1312.SubServers.Sync.Library.ConfigUpdater;
 import net.ME1312.SubServers.Sync.Library.Metrics;
-import net.ME1312.SubServers.Sync.Network.Packet.PacketDisconnectPlayer;
 import net.ME1312.SubServers.Sync.Network.Packet.PacketExSyncPlayer;
 import net.ME1312.SubServers.Sync.Network.SubProtocol;
 import net.ME1312.SubServers.Sync.Server.CachedPlayer;
@@ -72,7 +72,7 @@ public final class ExProxy extends BungeeCommon implements Listener {
     public final Plugin plugin;
     public final SubAPI api = new SubAPI(this);
     public SubProtocol subprotocol;
-    public static final Version version = Version.fromString("2.17a");
+    public static final Version version = Version.fromString("2.17b/p1");
 
     public final boolean isPatched;
     public long lastReload = -1;

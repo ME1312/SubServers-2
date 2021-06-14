@@ -26,45 +26,22 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>net.ME1312.Galaxi</groupId>
-            <artifactId>GalaxiUtil</artifactId>
-            <version>21w24a</version>
-            <scope>compile</scope>
-            <optional>true</optional>
-        </dependency>
-        <dependency>
             <groupId>net.ME1312.SubServers</groupId>
             <artifactId>SubServers.Bungee.Common</artifactId>
-            <version>-PLACEHOLDER</version>
+            <version>${project.version}</version>
             <scope>compile</scope>
-            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>net.ME1312.SubServers</groupId>
             <artifactId>SubServers.Client.Common</artifactId>
-            <version>-PLACEHOLDER</version>
+            <version>${project.version}</version>
             <scope>compile</scope>
-            <optional>true</optional>
-        </dependency>
-        <dependency>
-            <groupId>net.ME1312.SubData</groupId>
-            <artifactId>Client</artifactId>
-            <version>21w08a</version>
-            <scope>compile</scope>
-            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>com.dosse.upnp</groupId>
             <artifactId>WaifUPnP</artifactId>
             <version>1.1</version>
             <scope>compile</scope>
-            <optional>true</optional>
-        </dependency>
-        <dependency>
-            <groupId>com.imaginarycode.minecraft</groupId>
-            <artifactId>RedisBungee</artifactId>
-            <version>0.3.8-SNAPSHOT</version>
-            <scope>provided</scope>
         </dependency>
     </dependencies>
 
@@ -124,6 +101,15 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.2.0</version>
+                <configuration>
+                    <finalName>SubServers.Sync</finalName>
+                    <outputDirectory>../Artifacts/Maven</outputDirectory>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <version>2.2-beta-5</version>
                 <configuration>
@@ -159,7 +145,7 @@
                         </goals>
                         <configuration>
                             <windowtitle>SubServers.Sync Javadoc</windowtitle>
-                            <doctitle>SubServers.Sync Javadoc</doctitle>
+                            <doctitle>SubServers.Sync ${project.version}</doctitle>
                             <show>protected</show>
                             <destDir>./</destDir>
                             <outputDirectory>${basedir}/../Javadoc/SubServers.Sync</outputDirectory>

@@ -1,6 +1,6 @@
 name: SubServers-Client-Bukkit
 main: net.ME1312.SubServers.Client.Bukkit.SubPlugin
-version: "2.17a"
+version: "2.17b/p1"
 authors: ["ME1312"]
 softdepend: [TitleAPI, PlaceholderAPI]
 website: "https://github.com/ME1312/SubServers-2"

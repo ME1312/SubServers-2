@@ -1,5 +1,6 @@
 package net.ME1312.SubServers.Sync;
 
+import net.ME1312.Galaxi.Library.Callback.Callback;
 import net.ME1312.Galaxi.Library.UniversalFile;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
@@ -8,6 +9,7 @@ import net.ME1312.SubData.Client.DataProtocol;
 import net.ME1312.SubData.Client.SubDataClient;
 import net.ME1312.SubServers.Bungee.BungeeAPI;
 import net.ME1312.SubServers.Client.Common.ClientAPI;
+import net.ME1312.SubServers.Client.Common.Network.API.RemotePlayer;
 import net.ME1312.SubServers.Sync.Server.CachedPlayer;
 import net.ME1312.SubServers.Sync.Server.ServerImpl;
 
@@ -94,6 +96,14 @@ public final class SubAPI extends ClientAPI implements BungeeAPI {
         return new HashMap<UUID, CachedPlayer>(plugin.rPlayers);
     }
 
+    @Override
+    public void getRemotePlayers(Callback<Map<UUID, RemotePlayer>> callback) {
+        super.getRemotePlayers(map -> {
+            map.replaceAll((k, v) -> new CachedPlayer(v));
+            callback.run(map);
+        });
+    }
+
     /**
      * Gets a player on this network by searching across all known proxies (Cached)
      *
@@ -108,6 +118,11 @@ public final class SubAPI extends ClientAPI implements BungeeAPI {
         return null;
     }
 
+    @Override
+    public void getRemotePlayer(String name, Callback<RemotePlayer> callback) {
+        super.getRemotePlayer(name, p -> callback.run(new CachedPlayer(p)));
+    }
+
     /**
      * Gets a player on this network by searching across all known proxies (Cached)
      *
@@ -117,6 +132,11 @@ public final class SubAPI extends ClientAPI implements BungeeAPI {
     public CachedPlayer getRemotePlayer(UUID id) {
         if (Util.isNull(id)) throw new NullPointerException();
         return getRemotePlayers().getOrDefault(id, null);
+    }
+
+    @Override
+    public void getRemotePlayer(UUID id, Callback<RemotePlayer> callback) {
+        super.getRemotePlayer(id, p -> callback.run(new CachedPlayer(p)));
     }
 
     /**

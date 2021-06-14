@@ -83,7 +83,9 @@ public class SubProtocol extends SubDataProtocol {
         registerPacket(0x0037, PacketStopServer.class);
         registerPacket(0x0038, PacketRemoveServer.class);
         registerPacket(0x0039, PacketDeleteServer.class);
+        registerPacket(0x003B, PacketTransferPlayer.class);
         registerPacket(0x003C, PacketDisconnectPlayer.class);
+        registerPacket(0x003D, PacketMessagePlayer.class);
 
         registerPacket(0x0030, new PacketCreateServer());
         registerPacket(0x0031, new PacketAddServer());
@@ -95,21 +97,27 @@ public class SubProtocol extends SubDataProtocol {
         registerPacket(0x0037, new PacketStopServer());
         registerPacket(0x0038, new PacketRemoveServer());
         registerPacket(0x0039, new PacketDeleteServer());
+        registerPacket(0x003B, new PacketTransferPlayer());
         registerPacket(0x003C, new PacketDisconnectPlayer());
+        registerPacket(0x003D, new PacketMessagePlayer());
 
 
-        // 70-7F: External Misc Packets
+        // 70-7F: External Sync Packets
       //registerPacket(0x0070, PacketInExRunEvent.class);
       //registerPacket(0x0071, PacketInExReset.class);
       //registerPacket(0x0073, PacketInExReload.class);
         registerPacket(0x0074, PacketExSyncPlayer.class);
+        registerPacket(0x0075, PacketExTransferPlayer.class);
         registerPacket(0x0076, PacketExDisconnectPlayer.class);
+        registerPacket(0x0077, PacketExMessagePlayer.class);
 
         registerPacket(0x0070, new PacketInExRunEvent(plugin));
         registerPacket(0x0071, new PacketInExReset());
         registerPacket(0x0073, new PacketInExUpdateWhitelist(plugin));
         registerPacket(0x0074, new PacketExSyncPlayer(plugin));
+        registerPacket(0x0075, new PacketExTransferPlayer(plugin));
         registerPacket(0x0076, new PacketExDisconnectPlayer(plugin));
+        registerPacket(0x0077, new PacketExMessagePlayer(plugin));
     }
 
     public static SubProtocol get() {
@@ -190,7 +198,7 @@ public class SubProtocol extends SubDataProtocol {
                 plugin.api.getRemotePlayers(players -> {
                     for (RemotePlayer player : players.values()) {
                         plugin.rPlayerLinkP.put(player.getUniqueId(), player.getProxyName().toLowerCase());
-                        plugin.rPlayers.put(player.getUniqueId(), new CachedPlayer(player));
+                        plugin.rPlayers.put(player.getUniqueId(), (CachedPlayer) player);
 
                         ServerInfo server = plugin.getServerInfo(player.getServerName());
                         if (server instanceof ServerImpl)

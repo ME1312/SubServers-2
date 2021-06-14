@@ -6,13 +6,11 @@ import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubData.Client.DataClient;
 import net.ME1312.SubData.Client.SubDataClient;
 import net.ME1312.SubServers.Client.Common.ClientAPI;
-import net.ME1312.SubServers.Client.Common.Network.Packet.PacketDownloadPlayerInfo;
+import net.ME1312.SubServers.Client.Common.Network.Packet.*;
 
 import java.lang.reflect.InvocationTargetException;
 import java.net.InetSocketAddress;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Simplified RemotePlayer Data Class
@@ -167,6 +165,153 @@ public class RemotePlayer {
         } else {
             run.run();
         }
+    }
+
+    /**
+     * Sends messages to this player
+     *
+     * @param messages Messages to send
+     */
+    public void sendMessage(String... messages) {
+        sendMessage(messages, i -> {});
+    }
+
+    /**
+     * Sends messages to this player
+     *
+     * @param messages Messages to send
+     * @param response Success Status
+     */
+    public void sendMessage(String[] messages, Callback<Integer> response) {
+        StackTraceElement[] origin = new Exception().getStackTrace();
+        client().sendPacket(new PacketMessagePlayer(getUniqueId(), messages, null, data -> {
+            try {
+                response.run(data.getInt(0x0001));
+            } catch (Throwable e) {
+                Throwable ew = new InvocationTargetException(e);
+                ew.setStackTrace(origin);
+                ew.printStackTrace();
+            }
+        }));
+    }
+
+    /**
+     * Sends JSON format messages to this player
+     *
+     * @param messages Messages to send
+     */
+    public void sendRawMessage(String... messages) {
+        sendRawMessage(messages, i -> {});
+    }
+
+    /**
+     * Sends JSON format messages to this player
+     *
+     * @param messages Messages to send
+     * @param response Success Status
+     */
+    public void sendRawMessage(String[] messages, Callback<Integer> response) {
+        StackTraceElement[] origin = new Exception().getStackTrace();
+        client().sendPacket(new PacketMessagePlayer(getUniqueId(), null, messages, data -> {
+            try {
+                response.run(data.getInt(0x0001));
+            } catch (Throwable e) {
+                Throwable ew = new InvocationTargetException(e);
+                ew.setStackTrace(origin);
+                ew.printStackTrace();
+            }
+        }));
+    }
+
+    /**
+     * Transfers this player to another server
+     *
+     * @param server Target server
+     */
+    public void transfer(String server) {
+        transfer(server, i -> {});
+    }
+
+    /**
+     * Transfers this player to another server
+     *
+     * @param server Target server
+     * @param response Success status
+     */
+    public void transfer(String server, Callback<Integer> response) {
+        StackTraceElement[] origin = new Exception().getStackTrace();
+        client().sendPacket(new PacketTransferPlayer(getUniqueId(), server, data -> {
+            try {
+                response.run(data.getInt(0x0001));
+            } catch (Throwable e) {
+                Throwable ew = new InvocationTargetException(e);
+                ew.setStackTrace(origin);
+                ew.printStackTrace();
+            }
+        }));
+    }
+
+    /**
+     * Transfers this player to another server
+     *
+     * @param server Target server
+     */
+    public void transfer(Server server) {
+        transfer(server, i -> {});
+    }
+
+    /**
+     * Transfers this player to another server
+     *
+     * @param server Target server
+     * @param response Success status
+     */
+    public void transfer(Server server, Callback<Integer> response) {
+        transfer(server.getName(), response);
+    }
+
+    /**
+     * Disconnects this player from the network
+     */
+    public void disconnect() {
+        disconnect(i -> {});
+    }
+
+    /**
+     * Disconnects this player from the network
+     *
+     * @param response Success status
+     */
+    public void disconnect(Callback<Integer> response) {
+        disconnect(null, response);
+    }
+
+    /**
+     * Disconnects this player from the network
+     *
+     * @param message Disconnect Message
+     */
+    public void disconnect(String message) {
+        disconnect(message, i -> {});
+    }
+
+    /**
+     * Disconnects this player from the network
+     *
+     * @param message Disconnect Message
+     * @param response Success status
+     */
+    public void disconnect(String message, Callback<Integer> response) {
+        StackTraceElement[] origin = new Exception().getStackTrace();
+        client().sendPacket(new PacketDisconnectPlayer(getUniqueId(), message, data -> {
+            try {
+                response.run(data.getInt(0x0001));
+            } catch (Throwable e) {
+                Throwable ew = new InvocationTargetException(e);
+                ew.setStackTrace(origin);
+                ew.printStackTrace();
+            }
+        }));
     }
 
     /**

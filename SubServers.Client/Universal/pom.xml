@@ -11,13 +11,13 @@
         <dependency>
             <groupId>net.ME1312.SubServers</groupId>
             <artifactId>SubServers.Client.Bukkit</artifactId>
-            <version>-PLACEHOLDER</version>
+            <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>net.ME1312.SubServers</groupId>
             <artifactId>SubServers.Client.Sponge</artifactId>
-            <version>-PLACEHOLDER</version>
+            <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>

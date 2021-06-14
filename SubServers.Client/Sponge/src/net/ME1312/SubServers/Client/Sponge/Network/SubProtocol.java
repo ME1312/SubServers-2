@@ -79,6 +79,9 @@ public class SubProtocol extends SubDataProtocol {
         registerPacket(0x0037, PacketStopServer.class);
         registerPacket(0x0038, PacketRemoveServer.class);
         registerPacket(0x0039, PacketDeleteServer.class);
+        registerPacket(0x003B, PacketTransferPlayer.class);
+        registerPacket(0x003C, PacketDisconnectPlayer.class);
+        registerPacket(0x003D, PacketMessagePlayer.class);
 
         registerPacket(0x0030, new PacketCreateServer());
         registerPacket(0x0031, new PacketAddServer());
@@ -90,9 +93,12 @@ public class SubProtocol extends SubDataProtocol {
         registerPacket(0x0037, new PacketStopServer());
         registerPacket(0x0038, new PacketRemoveServer());
         registerPacket(0x0039, new PacketDeleteServer());
+        registerPacket(0x003B, new PacketTransferPlayer());
+        registerPacket(0x003C, new PacketDisconnectPlayer());
+        registerPacket(0x003D, new PacketMessagePlayer());
 
 
-        // 70-7F: External Misc Packets
+        // 70-7F: External Sync Packets
       //registerPacket(0x0070, PacketInExRunEvent.class);
       //registerPacket(0x0071, PacketInExReset.class);
       //registerPacket(0x0072, PacketInExReload.class);

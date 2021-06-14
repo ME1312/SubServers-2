@@ -90,7 +90,7 @@ public final class SubProxy extends BungeeCommon implements Listener {
     public SubProtocol subprotocol;
     public SubDataServer subdata = null;
     public SubServer sudo = null;
-    public static final Version version = Version.fromString("2.17a");
+    public static final Version version = Version.fromString("2.17b/p1");
 
     public final Proxy mProxy;
     public boolean canSudo = false;
@@ -1030,7 +1030,7 @@ public final class SubProxy extends BungeeCommon implements Listener {
     public void connected(ServerConnectedEvent e) {
         if (e.getPlayer().isConnected()) {
             synchronized (rPlayers) {
-                RemotePlayer player = new RemotePlayer(e.getPlayer().getName(), e.getPlayer().getUniqueId(), mProxy, (e.getServer().getInfo() instanceof Server)?(Server) e.getServer().getInfo():null, e.getPlayer().getAddress());
+                RemotePlayer player = new RemotePlayer(e.getPlayer(), e.getServer().getInfo());
                 rPlayerLinkP.put(player.getUniqueId(), player.getProxy());
                 rPlayers.put(player.getUniqueId(), player);
                 if (player.getServer() != null) rPlayerLinkS.put(player.getUniqueId(), player.getServer());
