@@ -8,6 +8,7 @@ import net.ME1312.SubData.Server.Protocol.PacketObjectOut;
 import net.ME1312.SubData.Server.SubDataClient;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -16,7 +17,7 @@ import java.util.UUID;
 public class PacketExMessagePlayer implements PacketObjectIn<Integer>, PacketObjectOut<Integer> {
     private static HashMap<UUID, Callback<ObjectMap<Integer>>[]> callbacks = new HashMap<UUID, Callback<ObjectMap<Integer>>[]>();
     private UUID player;
-    private String[] legacy, raw;
+    private List<String> legacy, raw;
     private UUID id;
 
     /**
@@ -33,7 +34,7 @@ public class PacketExMessagePlayer implements PacketObjectIn<Integer>, PacketObj
      * @param callback Callbacks
      */
     @SafeVarargs
-    public PacketExMessagePlayer(UUID player, String[] legacy, String[] raw, Callback<ObjectMap<Integer>>... callback) {
+    public PacketExMessagePlayer(UUID player, List<String> legacy, List<String> raw, Callback<ObjectMap<Integer>>... callback) {
         if (Util.isNull(player, callback)) throw new NullPointerException();
         this.player = player;
         this.legacy = legacy;

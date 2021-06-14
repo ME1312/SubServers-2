@@ -139,15 +139,15 @@ public class CachedPlayer extends RemotePlayer implements net.ME1312.SubServers.
     }
 
     @Override
-    public void disconnect(String message, Callback<Integer> response) {
+    public void disconnect(String reason, Callback<Integer> response) {
         ProxiedPlayer local = get();
         if (local != null) {
-            if (message != null) {
-                local.disconnect(message);
+            if (reason != null) {
+                local.disconnect(reason);
             } else local.disconnect();
             response.run(0);
         } else {
-            super.disconnect(message, response);
+            super.disconnect(reason, response);
         }
     }
 }

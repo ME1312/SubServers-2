@@ -78,6 +78,16 @@ public interface RemotePlayer {
     /**
      * Sends messages to this player
      *
+     * @param message Message to send
+     * @param response Success Status
+     */
+    default void sendMessage(String message, Callback<Integer> response) {
+        sendMessage(new String[]{ message }, response);
+    }
+
+    /**
+     * Sends messages to this player
+     *
      * @param messages Messages to send
      * @param response Success Status
      */
@@ -90,6 +100,16 @@ public interface RemotePlayer {
      */
     default void sendMessage(BaseComponent... messages) {
         sendMessage(messages, i -> {});
+    }
+
+    /**
+     * Sends messages to this player
+     *
+     * @param message Message to send
+     * @param response Success Status
+     */
+    default void sendMessage(BaseComponent message, Callback<Integer> response) {
+        sendMessage(new BaseComponent[]{ message }, response);
     }
 
     /**
@@ -153,17 +173,17 @@ public interface RemotePlayer {
     /**
      * Disconnects this player from the network
      *
-     * @param message Disconnect Message
+     * @param reason Disconnect Reason
      */
-    default void disconnect(String message) {
-        disconnect(message, i -> {});
+    default void disconnect(String reason) {
+        disconnect(reason, i -> {});
     }
 
     /**
      * Disconnects this player from the network
      *
-     * @param message Disconnect Message
+     * @param reason Disconnect Reason
      * @param response Success status
      */
-    void disconnect(String message, Callback<Integer> response);
+    void disconnect(String reason, Callback<Integer> response);
 }

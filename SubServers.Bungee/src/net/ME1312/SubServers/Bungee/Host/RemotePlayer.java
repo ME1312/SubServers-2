@@ -17,6 +17,8 @@ import net.md_5.bungee.chat.ComponentSerializer;
 
 import java.lang.reflect.InvocationTargetException;
 import java.net.InetSocketAddress;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.UUID;
 
 /**
@@ -140,7 +142,7 @@ public class RemotePlayer implements net.ME1312.SubServers.Bungee.Library.Compat
             SubDataClient client = getProxyConnection();
             if (client != null) {
                 StackTraceElement[] origin = new Exception().getStackTrace();
-                client.sendPacket(new PacketExMessagePlayer(getUniqueId(), messages, null, data -> {
+                client.sendPacket(new PacketExMessagePlayer(getUniqueId(), Arrays.asList(messages), null, data -> {
                     try {
                         response.run(data.getInt(0x0001));
                     } catch (Throwable e) {
@@ -162,7 +164,7 @@ public class RemotePlayer implements net.ME1312.SubServers.Bungee.Library.Compat
             SubDataClient client = getProxyConnection();
             if (client != null) {
                 StackTraceElement[] origin = new Exception().getStackTrace();
-                client.sendPacket(new PacketExMessagePlayer(getUniqueId(), null, new String[]{ ComponentSerializer.toString(messages) }, data -> {
+                client.sendPacket(new PacketExMessagePlayer(getUniqueId(), null, Collections.singletonList(ComponentSerializer.toString(messages)), data -> {
                     try {
                         response.run(data.getInt(0x0001));
                     } catch (Throwable e) {
@@ -223,17 +225,17 @@ public class RemotePlayer implements net.ME1312.SubServers.Bungee.Library.Compat
     }
 
     @Override
-    public void disconnect(String message, Callback<Integer> response) {
+    public void disconnect(String reason, Callback<Integer> response) {
         if (local != null) {
-            if (message != null) {
-                local.disconnect(message);
+            if (reason != null) {
+                local.disconnect(reason);
             } else local.disconnect();
             response.run(0);
         } else {
             SubDataClient client = getProxyConnection();
             if (client != null) {
                 StackTraceElement[] origin = new Exception().getStackTrace();
-                client.sendPacket(new PacketExDisconnectPlayer(getUniqueId(), message, data -> {
+                client.sendPacket(new PacketExDisconnectPlayer(getUniqueId(), reason, data -> {
                     try {
                         response.run(data.getInt(0x0001));
                     } catch (Throwable e) {

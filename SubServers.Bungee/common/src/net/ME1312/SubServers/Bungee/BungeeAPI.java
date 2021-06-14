@@ -27,6 +27,15 @@ public interface BungeeAPI {
     }
 
     /**
+     * Gets the BungeeCommon Internals
+     *
+     * @deprecated Use BungeeAPI Methods when available
+     * @return BungeeCommon Internals
+     */
+    @Deprecated
+    BungeeCommon getInternals();
+
+    /**
      * Get the number of players on this network across all known proxies
      *
      * @return Remote Player Collection

@@ -179,6 +179,16 @@ public class RemotePlayer {
     /**
      * Sends messages to this player
      *
+     * @param message Message to send
+     * @param response Success Status
+     */
+    public void sendMessage(String message, Callback<Integer> response) {
+        sendMessage(new String[]{ message }, response);
+    }
+
+    /**
+     * Sends messages to this player
+     *
      * @param messages Messages to send
      * @param response Success Status
      */
@@ -202,6 +212,16 @@ public class RemotePlayer {
      */
     public void sendRawMessage(String... messages) {
         sendRawMessage(messages, i -> {});
+    }
+
+    /**
+     * Sends JSON format messages to this player
+     *
+     * @param message Message to send
+     * @param response Success Status
+     */
+    public void sendRawMessage(String message, Callback<Integer> response) {
+        sendRawMessage(new String[]{ message }, response);
     }
 
     /**
@@ -289,21 +309,21 @@ public class RemotePlayer {
     /**
      * Disconnects this player from the network
      *
-     * @param message Disconnect Message
+     * @param reason Disconnect Reason
      */
-    public void disconnect(String message) {
-        disconnect(message, i -> {});
+    public void disconnect(String reason) {
+        disconnect(reason, i -> {});
     }
 
     /**
      * Disconnects this player from the network
      *
-     * @param message Disconnect Message
+     * @param reason Disconnect Reason
      * @param response Success status
      */
-    public void disconnect(String message, Callback<Integer> response) {
+    public void disconnect(String reason, Callback<Integer> response) {
         StackTraceElement[] origin = new Exception().getStackTrace();
-        client().sendPacket(new PacketDisconnectPlayer(getUniqueId(), message, data -> {
+        client().sendPacket(new PacketDisconnectPlayer(getUniqueId(), reason, data -> {
             try {
                 response.run(data.getInt(0x0001));
             } catch (Throwable e) {
