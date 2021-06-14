@@ -110,8 +110,8 @@
                             <goal>javadoc</goal>
                         </goals>
                         <configuration>
-                            <windowtitle>SubServers.Client.Common Javadoc</windowtitle>
-                            <doctitle>SubServers.Client.Common Javadoc</doctitle>
+                            <windowtitle>SubServers.Client.Common</windowtitle>
+                            <doctitle>SubServers.Client.Common ${project.version}</doctitle>
                             <show>protected</show>
                             <destDir>./</destDir>
                             <outputDirectory>${basedir}/../../Javadoc/SubServers.Client.Common</outputDirectory>

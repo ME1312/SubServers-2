@@ -147,7 +147,7 @@
                             <goal>javadoc</goal>
                         </goals>
                         <configuration>
-                            <windowtitle>SubServers.Client.Bukkit Javadoc</windowtitle>
+                            <windowtitle>SubServers.Client.Bukkit</windowtitle>
                             <doctitle>SubServers.Client.Bukkit ${project.version}</doctitle>
                             <show>protected</show>
                             <destDir>./</destDir>

@@ -152,7 +152,7 @@
                             <goal>javadoc</goal>
                         </goals>
                         <configuration>
-                            <windowtitle>SubServers.Bungee Javadoc</windowtitle>
+                            <windowtitle>SubServers.Bungee</windowtitle>
                             <doctitle>SubServers.Bungee ${project.version}</doctitle>
                             <show>protected</show>
                             <destDir>./</destDir>

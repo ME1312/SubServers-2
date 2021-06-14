@@ -117,7 +117,7 @@
                             <goal>javadoc</goal>
                         </goals>
                         <configuration>
-                            <windowtitle>SubServers.Client.Sponge Javadoc</windowtitle>
+                            <windowtitle>SubServers.Client.Sponge</windowtitle>
                             <doctitle>SubServers.Client.Sponge ${project.version}</doctitle>
                             <show>protected</show>
                             <destDir>./</destDir>

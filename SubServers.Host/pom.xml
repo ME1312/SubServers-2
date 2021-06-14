@@ -153,7 +153,7 @@
                             <goal>javadoc</goal>
                         </goals>
                         <configuration>
-                            <windowtitle>SubServers.Host Javadoc</windowtitle>
+                            <windowtitle>SubServers.Host</windowtitle>
                             <doctitle>SubServers.Host ${project.version}</doctitle>
                             <show>protected</show>
                             <destDir>./</destDir>

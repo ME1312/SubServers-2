@@ -144,7 +144,7 @@
                             <goal>javadoc</goal>
                         </goals>
                         <configuration>
-                            <windowtitle>SubServers.Sync Javadoc</windowtitle>
+                            <windowtitle>SubServers.Sync</windowtitle>
                             <doctitle>SubServers.Sync ${project.version}</doctitle>
                             <show>protected</show>
                             <destDir>./</destDir>
