@@ -75,7 +75,7 @@ public class PacketMessagePlayer implements PacketObjectIn<Integer>, PacketObjec
                 client.sendPacket(new PacketMessagePlayer(0, tracker));
             } else if ((remote = plugin.api.getRemotePlayer(id)) != null) {
                 if (remote.getProxy().getSubData()[0] != null) {
-                    ((SubDataClient) remote.getProxy().getSubData()[0]).sendPacket(new PacketExDisconnectPlayer(remote.getUniqueId(), (data.contains(0x0002)?data.getRawString(0x0002):null), r -> {
+                    ((SubDataClient) remote.getProxy().getSubData()[0]).sendPacket(new PacketExMessagePlayer(remote.getUniqueId(), (data.contains(0x0002)?data.getRawStringList(0x0002).toArray(new String[0]):null), (data.contains(0x0003)?data.getRawStringList(0x0003).toArray(new String[0]):null), r -> {
                         client.sendPacket(new PacketMessagePlayer(r.getInt(0x0001), tracker));
                     }));
                 } else {
