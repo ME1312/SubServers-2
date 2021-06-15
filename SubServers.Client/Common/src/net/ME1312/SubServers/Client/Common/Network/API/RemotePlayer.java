@@ -16,7 +16,7 @@ import java.util.*;
  * Simplified RemotePlayer Data Class
  */
 public class RemotePlayer {
-    protected static StaticImpl st4tic = new StaticImpl();
+    protected static StaticImpl instance = new StaticImpl();
     ObjectMap<String> raw;
     private Proxy proxy = null;
     private Server server = null;
@@ -223,7 +223,7 @@ public class RemotePlayer {
      * @param response Success Status
      */
     public void sendMessage(String[] messages, Callback<Integer> response) {
-        st4tic.sendMessage(client(), new UUID[]{ getUniqueId() }, messages, response);
+        instance.sendMessage(client(), new UUID[]{ getUniqueId() }, messages, response);
     }
 
     /**
@@ -255,7 +255,7 @@ public class RemotePlayer {
      * @param response Success Status
      */
     public static void sendMessage(UUID[] players, String[] messages, Callback<Integer> response) {
-        st4tic.sendMessage(SimplifiedData.client(ClientAPI.getInstance().getSubDataNetwork()[0]), players, messages, response);
+        instance.sendMessage(SimplifiedData.client(ClientAPI.getInstance().getSubDataNetwork()[0]), players, messages, response);
     }
 
     /**
@@ -313,7 +313,7 @@ public class RemotePlayer {
      * @param response Success Status
      */
     public void sendRawMessage(String[] message, Callback<Integer> response) {
-        st4tic.sendRawMessage(client(), new UUID[]{ getUniqueId() }, message, response);
+        instance.sendRawMessage(client(), new UUID[]{ getUniqueId() }, message, response);
     }
 
     /**
@@ -345,7 +345,7 @@ public class RemotePlayer {
      * @param response Success Status
      */
     public static void sendRawMessage(UUID[] players, String[] messages, Callback<Integer> response) {
-        st4tic.sendRawMessage(SimplifiedData.client(ClientAPI.getInstance().getSubDataNetwork()[0]), players, messages, response);
+        instance.sendRawMessage(SimplifiedData.client(ClientAPI.getInstance().getSubDataNetwork()[0]), players, messages, response);
     }
 
     /**
@@ -364,7 +364,7 @@ public class RemotePlayer {
      * @param response Success status
      */
     public void transfer(String server, Callback<Integer> response) {
-        st4tic.transfer(client(), new UUID[]{ getUniqueId() }, server, response);
+        instance.transfer(client(), new UUID[]{ getUniqueId() }, server, response);
     }
 
     /**
@@ -385,7 +385,7 @@ public class RemotePlayer {
      * @param response Success status
      */
     public static void transfer(UUID[] players, String server, Callback<Integer> response) {
-        st4tic.transfer(SimplifiedData.client(ClientAPI.getInstance().getSubDataNetwork()[0]), players, server, response);
+        instance.transfer(SimplifiedData.client(ClientAPI.getInstance().getSubDataNetwork()[0]), players, server, response);
     }
 
     /**
@@ -420,7 +420,7 @@ public class RemotePlayer {
      * @param response Success status
      */
     public void disconnect(String reason, Callback<Integer> response) {
-        st4tic.disconnect(client(), new UUID[]{ getUniqueId() }, reason, response);
+        instance.disconnect(client(), new UUID[]{ getUniqueId() }, reason, response);
     }
 
     /**
@@ -460,7 +460,7 @@ public class RemotePlayer {
      * @param response Success status
      */
     public static void disconnect(UUID[] players, String reason, Callback<Integer> response) {
-        st4tic.disconnect(SimplifiedData.client(ClientAPI.getInstance().getSubDataNetwork()[0]), players, reason, response);
+        instance.disconnect(SimplifiedData.client(ClientAPI.getInstance().getSubDataNetwork()[0]), players, reason, response);
     }
 
     /**
@@ -511,7 +511,7 @@ public class RemotePlayer {
          * @param raw Raw representation of the Remote Player
          */
         final RemotePlayer construct(Server server, ObjectMap<String> raw) {
-            RemotePlayer player = new RemotePlayer(server.client, raw);
+            RemotePlayer player = construct(server.client, raw);
             player.server = server;
             return player;
         }
@@ -523,7 +523,7 @@ public class RemotePlayer {
          * @param raw Raw representation of the Remote Player
          */
         final RemotePlayer construct(Proxy proxy, ObjectMap<String> raw) {
-            RemotePlayer player = new RemotePlayer(proxy.client, raw);
+            RemotePlayer player = construct(proxy.client, raw);
             player.proxy = proxy;
             return player;
         }

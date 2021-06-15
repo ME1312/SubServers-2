@@ -1,7 +1,6 @@
 package net.ME1312.SubServers.Client.Common.Network.API;
 
 import net.ME1312.Galaxi.Library.Callback.Callback;
-import net.ME1312.Galaxi.Library.Container.ContainedPair;
 import net.ME1312.Galaxi.Library.Container.Pair;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Map.ObjectMapValue;
@@ -197,7 +196,7 @@ public class Host {
             client().sendPacket(new PacketDownloadPlayerInfo(ids, data -> {
                 LinkedList<RemotePlayer> players = new LinkedList<RemotePlayer>();
                 for (String player : data.getKeys()) {
-                    players.add(RemotePlayer.st4tic.construct(servers.get(UUID.fromString(player)), data.getMap(player)));
+                    players.add(RemotePlayer.instance.construct(servers.get(UUID.fromString(player)), data.getMap(player)));
                 }
 
                 this.players = players;

@@ -107,7 +107,7 @@ public class CachedPlayer extends RemotePlayer implements net.ME1312.SubServers.
             }
         };
         // These overrides prevent sending unnecessary packets in ClientCommon
-        st4tic = new StaticImpl() {
+        instance = new StaticImpl() {
             @Override
             protected RemotePlayer construct(DataClient client, ObjectMap<String> raw) {
                 return new CachedPlayer(client, raw);
@@ -168,54 +168,46 @@ public class CachedPlayer extends RemotePlayer implements net.ME1312.SubServers.
 
             @Override
             protected void transfer(SubDataClient client, UUID[] players, String server, Callback<Integer> response) {
-                if (players != null && players.length > 0) {
-                    ArrayList<UUID> ids = new ArrayList<UUID>();
-                    ServerImpl info = SubAPI.getInstance().getInternals().servers.get(server.toLowerCase());
-                    int failures = 0;
-                    for (UUID id : players) {
-                        ProxiedPlayer local = get(id);
-                        if (local != null) {
-                            if (info != null) {
-                                local.connect(info);
-                            } else ++failures;
-                        } else {
-                            ids.add(id);
-                        }
-                    }
-
-                    if (ids.size() == 0) {
-                        response.run(failures);
+                ArrayList<UUID> ids = new ArrayList<UUID>();
+                ServerImpl info = SubAPI.getInstance().getInternals().servers.get(server.toLowerCase());
+                int failures = 0;
+                for (UUID id : players) {
+                    ProxiedPlayer local = get(id);
+                    if (local != null) {
+                        if (info != null) {
+                            local.connect(info);
+                        } else ++failures;
                     } else {
-                        final int ff = failures;
-                        super.transfer(client, ids.toArray(new UUID[0]), server, i -> response.run(i + ff));
+                        ids.add(id);
                     }
+                }
+
+                if (ids.size() == 0) {
+                    response.run(failures);
                 } else {
-                    super.transfer(client, players, server, response);
+                    final int ff = failures;
+                    super.transfer(client, ids.toArray(new UUID[0]), server, i -> response.run(i + ff));
                 }
             }
 
             @Override
             protected void disconnect(SubDataClient client, UUID[] players, String reason, Callback<Integer> response) {
-                if (players != null && players.length > 0) {
-                    ArrayList<UUID> ids = new ArrayList<UUID>();
-                    for (UUID id : players) {
-                        ProxiedPlayer local = get(id);
-                        if (local != null) {
-                            if (reason != null) {
-                                local.disconnect(reason);
-                            } else local.disconnect();
-                        } else {
-                            ids.add(id);
-                        }
-                    }
-
-                    if (ids.size() == 0) {
-                        response.run(0);
+                ArrayList<UUID> ids = new ArrayList<UUID>();
+                for (UUID id : players) {
+                    ProxiedPlayer local = get(id);
+                    if (local != null) {
+                        if (reason != null) {
+                            local.disconnect(reason);
+                        } else local.disconnect();
                     } else {
-                        super.disconnect(client, ids.toArray(new UUID[0]), reason, response);
+                        ids.add(id);
                     }
+                }
+
+                if (ids.size() == 0) {
+                    response.run(0);
                 } else {
-                    super.disconnect(client, players, reason, response);
+                    super.disconnect(client, ids.toArray(new UUID[0]), reason, response);
                 }
             }
         };

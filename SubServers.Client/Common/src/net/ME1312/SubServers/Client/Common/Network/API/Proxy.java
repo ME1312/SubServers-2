@@ -10,7 +10,6 @@ import net.ME1312.SubData.Client.DataClient;
 import net.ME1312.SubData.Client.DataSender;
 import net.ME1312.SubData.Client.Library.ForwardedDataSender;
 import net.ME1312.SubData.Client.SubDataClient;
-import net.ME1312.SubData.Client.SubDataSender;
 import net.ME1312.SubServers.Client.Common.ClientAPI;
 import net.ME1312.SubServers.Client.Common.Network.Packet.PacketDownloadPlayerInfo;
 import net.ME1312.SubServers.Client.Common.Network.Packet.PacketDownloadProxyInfo;
@@ -149,7 +148,7 @@ public class Proxy {
             client().sendPacket(new PacketDownloadPlayerInfo(ids, data -> {
                 LinkedList<RemotePlayer> players = new LinkedList<RemotePlayer>();
                 for (String player : data.getKeys()) {
-                    players.add(RemotePlayer.st4tic.construct(this, data.getMap(player)));
+                    players.add(RemotePlayer.instance.construct(this, data.getMap(player)));
                 }
 
                 this.players = players;
