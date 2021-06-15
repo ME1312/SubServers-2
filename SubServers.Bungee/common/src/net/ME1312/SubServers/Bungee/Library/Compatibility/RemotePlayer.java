@@ -75,7 +75,7 @@ public interface RemotePlayer {
     }
 
     /**
-     * Sends messages to all players
+     * Sends a message to all players
      *
      * @param message Message to send
      * @param response Success Status
@@ -104,7 +104,7 @@ public interface RemotePlayer {
     }
 
     /**
-     * Sends messages to this player
+     * Sends a message to this player
      *
      * @param message Message to send
      * @param response Success Status
@@ -124,8 +124,9 @@ public interface RemotePlayer {
     }
 
     /**
-     * Sends messages to this player
+     * Sends messages to these players
      *
+     * @param players Players to select
      * @param messages Messages to send
      */
     static void sendMessage(UUID[] players, String... messages) {
@@ -133,8 +134,9 @@ public interface RemotePlayer {
     }
 
     /**
-     * Sends messages to this player
+     * Sends a message to these players
      *
+     * @param players Players to select
      * @param message Message to send
      * @param response Success Status
      */
@@ -143,8 +145,9 @@ public interface RemotePlayer {
     }
 
     /**
-     * Sends messages to this player
+     * Sends messages to these players
      *
+     * @param players Players to select
      * @param messages Messages to send
      * @param response Success Status
      */
@@ -153,16 +156,16 @@ public interface RemotePlayer {
     }
 
     /**
-     * Sends messages to all players
+     * Sends a message to all players
      *
-     * @param messages Messages to send
+     * @param message Message to send
      */
-    static void broadcastMessage(BaseComponent... messages) {
-        broadcastMessage(messages, i -> {});
+    static void broadcastMessage(BaseComponent... message) {
+        broadcastMessage(message, i -> {});
     }
 
     /**
-     * Sends messages to all players
+     * Sends a message to all players
      *
      * @param message Message to send
      * @param response Success Status
@@ -172,26 +175,45 @@ public interface RemotePlayer {
     }
 
     /**
+     * Sends a messages to all players
+     *
+     * @param message Message to send
+     * @param response Success Status
+     */
+    static void broadcastMessage(BaseComponent[] message, Callback<Integer> response) {
+        broadcastMessage(new BaseComponent[][]{ message }, response);
+    }
+
+    /**
+     * Sends messages to all players
+     *
+     * @param messages Messages to send
+     */
+    static void broadcastMessage(BaseComponent[]... messages) {
+        broadcastMessage(messages, i -> {});
+    }
+
+    /**
      * Sends messages to all players
      *
      * @param messages Messages to send
      * @param response Success Status
      */
-    static void broadcastMessage(BaseComponent[] messages, Callback<Integer> response) {
+    static void broadcastMessage(BaseComponent[][] messages, Callback<Integer> response) {
         sendMessage(null, messages, response);
     }
 
     /**
-     * Sends messages to this player
+     * Sends a message to this player
      *
-     * @param messages Messages to send
+     * @param message Message to send
      */
-    default void sendMessage(BaseComponent... messages) {
-        sendMessage(messages, i -> {});
+    default void sendMessage(BaseComponent... message) {
+        sendMessage(message, i -> {});
     }
 
     /**
-     * Sends messages to this player
+     * Sends a message to this player
      *
      * @param message Message to send
      * @param response Success Status
@@ -201,27 +223,46 @@ public interface RemotePlayer {
     }
 
     /**
+     * Sends a message to this player
+     *
+     * @param message Message to send
+     * @param response Success Status
+     */
+    default void sendMessage(BaseComponent[] message, Callback<Integer> response) {
+        sendMessage(new BaseComponent[][]{ message }, response);
+    }
+
+    /**
+     * Sends messages to this player
+     *
+     * @param messages Messages to send
+     */
+    default void sendMessage(BaseComponent[]... messages) {
+        sendMessage(messages, i -> {});
+    }
+
+    /**
      * Sends messages to this player
      *
      * @param messages Messages to send
      * @param response Success Status
      */
-    default void sendMessage(BaseComponent[] messages, Callback<Integer> response) {
+    default void sendMessage(BaseComponent[][] messages, Callback<Integer> response) {
         sendMessage(new UUID[]{ getUniqueId() }, messages, response);
     }
 
     /**
-     * Sends messages to this player
+     * Sends a message to these players
      *
      * @param players Players to select
-     * @param messages Messages to send
+     * @param message Message to send
      */
-    static void sendMessage(UUID[] players, BaseComponent... messages) {
-        sendMessage(players, messages, i -> {});
+    static void sendMessage(UUID[] players, BaseComponent... message) {
+        sendMessage(players, message, i -> {});
     }
 
     /**
-     * Sends messages to this player
+     * Sends a message to these players
      *
      * @param players Players to select
      * @param message Message to send
@@ -232,14 +273,35 @@ public interface RemotePlayer {
     }
 
     /**
-     * Sends messages to this player
+     * Sends a message to these players
      *
      * @param players Players to select
      * @param message Message to send
      * @param response Success Status
      */
     static void sendMessage(UUID[] players, BaseComponent[] message, Callback<Integer> response) {
-        instance.sendMessage(players, message, response);
+        sendMessage(players, new BaseComponent[][]{ message }, response);
+    }
+
+    /**
+     * Sends messages to these players
+     *
+     * @param players Players to select
+     * @param messages Messages to send
+     */
+    static void sendMessage(UUID[] players, BaseComponent[]... messages) {
+        sendMessage(players, messages, i -> {});
+    }
+
+    /**
+     * Sends messages to these players
+     *
+     * @param players Players to select
+     * @param messages Message to send
+     * @param response Success Status
+     */
+    static void sendMessage(UUID[] players, BaseComponent[][] messages, Callback<Integer> response) {
+        instance.sendMessage(players, messages, response);
     }
 
     /**
@@ -262,7 +324,7 @@ public interface RemotePlayer {
     }
 
     /**
-     * Transfers this player to another server
+     * Transfers these players to another server
      *
      * @param players Players to select
      * @param server Target server
@@ -272,7 +334,7 @@ public interface RemotePlayer {
     }
 
     /**
-     * Transfers this player to another server
+     * Transfers these players to another server
      *
      * @param players Players to select
      * @param server Target server
@@ -302,7 +364,7 @@ public interface RemotePlayer {
     }
 
     /**
-     * Transfers this player to another server
+     * Transfers these players to another server
      *
      * @param players Players to select
      * @param server Target server
@@ -312,7 +374,7 @@ public interface RemotePlayer {
     }
 
     /**
-     * Transfers this player to another server
+     * Transfers these players to another server
      *
      * @param players Players to select
      * @param server Target server
@@ -358,7 +420,7 @@ public interface RemotePlayer {
     }
 
     /**
-     * Disconnects this player from the network
+     * Disconnects these players from the network
      *
      * @param players Players to select
      */
@@ -367,7 +429,7 @@ public interface RemotePlayer {
     }
 
     /**
-     * Disconnects this player from the network
+     * Disconnects these players from the network
      *
      * @param players Players to select
      * @param response Success status
@@ -377,7 +439,7 @@ public interface RemotePlayer {
     }
 
     /**
-     * Disconnects this player from the network
+     * Disconnects these players from the network
      *
      * @param players Players to select
      * @param reason Disconnect Reason
@@ -387,7 +449,7 @@ public interface RemotePlayer {
     }
 
     /**
-     * Disconnects this player from the network
+     * Disconnects these players from the network
      *
      * @param players Players to select
      * @param reason Disconnect Reason

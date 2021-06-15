@@ -178,7 +178,7 @@ public class RemotePlayer {
     }
 
     /**
-     * Sends messages to all players
+     * Sends a message to all players
      *
      * @param message Message to send
      * @param response Success Status
@@ -207,7 +207,7 @@ public class RemotePlayer {
     }
 
     /**
-     * Sends messages to this player
+     * Sends a message to this player
      *
      * @param message Message to send
      * @param response Success Status
@@ -227,8 +227,9 @@ public class RemotePlayer {
     }
 
     /**
-     * Sends messages to this player
+     * Sends messages to these players
      *
+     * @param players Players to select
      * @param messages Messages to send
      */
     public static void sendMessage(UUID[] players, String... messages) {
@@ -236,8 +237,9 @@ public class RemotePlayer {
     }
 
     /**
-     * Sends messages to this player
+     * Sends a message to these players
      *
+     * @param players Players to select
      * @param message Message to send
      * @param response Success Status
      */
@@ -246,8 +248,9 @@ public class RemotePlayer {
     }
 
     /**
-     * Sends messages to this player
+     * Sends messages to these players
      *
+     * @param players Players to select
      * @param messages Messages to send
      * @param response Success Status
      */
@@ -265,7 +268,7 @@ public class RemotePlayer {
     }
 
     /**
-     * Sends JSON format messages to all players
+     * Sends a JSON format message to all players
      *
      * @param message Message to send
      * @param response Success Status
@@ -294,7 +297,7 @@ public class RemotePlayer {
     }
 
     /**
-     * Sends JSON format messages to this player
+     * Sends a JSON format message to this player
      *
      * @param message Message to send
      * @param response Success Status
@@ -314,7 +317,7 @@ public class RemotePlayer {
     }
 
     /**
-     * Sends JSON format messages to this player
+     * Sends JSON format messages to these players
      *
      * @param players Players to select
      * @param messages Messages to send
@@ -324,7 +327,7 @@ public class RemotePlayer {
     }
 
     /**
-     * Sends JSON format messages to this player
+     * Sends a JSON format message to these players
      *
      * @param players Players to select
      * @param message Message to send
@@ -335,14 +338,14 @@ public class RemotePlayer {
     }
 
     /**
-     * Sends JSON format messages to this player
+     * Sends JSON format messages to these players
      *
      * @param players Players to select
-     * @param message Message to send
+     * @param messages Messages to send
      * @param response Success Status
      */
-    public static void sendRawMessage(UUID[] players, String[] message, Callback<Integer> response) {
-        st4tic.sendRawMessage(SimplifiedData.client(ClientAPI.getInstance().getSubDataNetwork()[0]), players, message, response);
+    public static void sendRawMessage(UUID[] players, String[] messages, Callback<Integer> response) {
+        st4tic.sendRawMessage(SimplifiedData.client(ClientAPI.getInstance().getSubDataNetwork()[0]), players, messages, response);
     }
 
     /**
@@ -365,7 +368,7 @@ public class RemotePlayer {
     }
 
     /**
-     * Transfers this player to another server
+     * Transfers these players to another server
      *
      * @param players Players to select
      * @param server Target server
@@ -375,7 +378,7 @@ public class RemotePlayer {
     }
 
     /**
-     * Transfers this player to another server
+     * Transfers these players to another server
      *
      * @param players Players to select
      * @param server Target server
@@ -421,7 +424,7 @@ public class RemotePlayer {
     }
 
     /**
-     * Disconnects this player from the network
+     * Disconnects these players from the network
      *
      * @param players Players to select
      */
@@ -430,7 +433,7 @@ public class RemotePlayer {
     }
 
     /**
-     * Disconnects this player from the network
+     * Disconnects these players from the network
      *
      * @param players Players to select
      * @param response Success status
@@ -440,7 +443,7 @@ public class RemotePlayer {
     }
 
     /**
-     * Disconnects this player from the network
+     * Disconnects these players from the network
      *
      * @param players Players to select
      * @param reason Disconnect Reason
@@ -450,7 +453,7 @@ public class RemotePlayer {
     }
 
     /**
-     * Disconnects this player from the network
+     * Disconnects these players from the network
      *
      * @param players Players to select
      * @param reason Disconnect Reason

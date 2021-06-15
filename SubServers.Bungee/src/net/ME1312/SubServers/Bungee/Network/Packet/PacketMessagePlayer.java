@@ -63,7 +63,7 @@ public class PacketMessagePlayer implements PacketObjectIn<Integer>, PacketObjec
     }
 
     @SuppressWarnings("deprecation")
-    public static void run(List<UUID> ids, ContainedPair<String[], BaseComponent[]> message, ObjectMap<Integer> data, Callback<Integer> callback) {
+    public static void run(List<UUID> ids, ContainedPair<String[], BaseComponent[][]> message, ObjectMap<Integer> data, Callback<Integer> callback) {
         try {
             Container<Integer> failures = new Container<>(0);
             HashMap<Proxy, List<UUID>> requests = new HashMap<Proxy, List<UUID>>();
@@ -73,8 +73,8 @@ public class PacketMessagePlayer implements PacketObjectIn<Integer>, PacketObjec
 
                     if (message.key != null) for (String s : message.key)
                         ProxyServer.getInstance().broadcast(s);
-                    if (message.value != null)
-                        ProxyServer.getInstance().broadcast(message.value);
+                    if (message.value != null) for (BaseComponent[] c : message.value)
+                        ProxyServer.getInstance().broadcast(c);
                 }
                 for (Proxy proxy : SubAPI.getInstance().getProxies().values()) {
                     if (proxy.getPlayers().size() > 0) requests.put(proxy, null);
@@ -87,8 +87,8 @@ public class PacketMessagePlayer implements PacketObjectIn<Integer>, PacketObjec
                         if (message == null) message = parseMessage(data);
                         if (message.key != null)
                             local.sendMessages(message.key);
-                        if (message.value != null)
-                            local.sendMessage(message.value);
+                        if (message.value != null) for (BaseComponent[] c : message.value)
+                            local.sendMessage(c);
                     } else if ((remote = SubAPI.getInstance().getRemotePlayer(id)) != null && remote.getProxy().getSubData()[0] != null) {
                         Proxy proxy = remote.getProxy();
                         List<UUID> list = requests.getOrDefault(proxy, new ArrayList<>());
@@ -109,7 +109,12 @@ public class PacketMessagePlayer implements PacketObjectIn<Integer>, PacketObjec
                 List<String> legacy, raw;
                 if (data == null) {
                     legacy = (message.key != null?Arrays.asList(message.key):null);
-                    raw = (message.value != null?Collections.singletonList(ComponentSerializer.toString(message.value)):null);
+                    if (message.value != null) {
+                        raw = new LinkedList<String>();
+                        for (BaseComponent[] c : message.value) raw.add(ComponentSerializer.toString(c));
+                    } else {
+                        raw = null;
+                    }
                 } else {
                     legacy = (data.contains(0x0002)?data.getRawStringList(0x0002):null);
                     raw =    (data.contains(0x0003)?data.getRawStringList(0x0003):null);
@@ -128,15 +133,15 @@ public class PacketMessagePlayer implements PacketObjectIn<Integer>, PacketObjec
         }
     }
 
-    private static ContainedPair<String[], BaseComponent[]> parseMessage(ObjectMap<Integer> data) {
-        ContainedPair<String[], BaseComponent[]> value = new ContainedPair<>();
+    private static ContainedPair<String[], BaseComponent[][]> parseMessage(ObjectMap<Integer> data) {
+        ContainedPair<String[], BaseComponent[][]> value = new ContainedPair<>();
         if (data.contains(0x0002))
             value.key = data.getRawStringList(0x0002).toArray(new String[0]);
         if (data.contains(0x0003)) {
             List<String> messages = data.getRawStringList(0x0003);
-            LinkedList<BaseComponent> components = new LinkedList<BaseComponent>();
-            for (String message : messages) components.addAll(Arrays.asList(ComponentSerializer.parse(message)));
-            value.value = components.toArray(new BaseComponent[0]);
+            BaseComponent[][] components = new BaseComponent[messages.size()][];
+            for (int i = 0; i < components.length; ++i) components[i] = ComponentSerializer.parse(messages.get(i));
+            value.value = components;
         }
         return value;
     }

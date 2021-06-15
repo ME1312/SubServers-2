@@ -90,8 +90,10 @@ public class CachedPlayer extends RemotePlayer implements net.ME1312.SubServers.
             }
 
             @Override
-            protected void sendMessage(UUID[] players, BaseComponent[] messages, Callback<Integer> response) {
-                RemotePlayer.sendRawMessage(players, ComponentSerializer.toString(messages), response);
+            protected void sendMessage(UUID[] players, BaseComponent[][] messages, Callback<Integer> response) {
+                String[] raw = new String[messages.length];
+                for (int i = 0; i < raw.length; ++i) raw[i] = ComponentSerializer.toString(messages[i]);
+                RemotePlayer.sendRawMessage(players, raw, response);
             }
 
             @Override
@@ -138,16 +140,17 @@ public class CachedPlayer extends RemotePlayer implements net.ME1312.SubServers.
             protected void sendRawMessage(SubDataClient client, UUID[] players, String[] messages, Callback<Integer> response) {
                 if (players != null && players.length > 0) {
                     ArrayList<UUID> ids = new ArrayList<UUID>();
-                    BaseComponent[] components = null;
+                    BaseComponent[][] components = null;
                     for (UUID id : players) {
                         ProxiedPlayer local = get(id);
                         if (local != null) {
                             if (components == null) {
-                                LinkedList<BaseComponent> list = new LinkedList<BaseComponent>();
-                                for (String message : messages) list.addAll(Arrays.asList(ComponentSerializer.parse(message)));
-                                components = list.toArray(new BaseComponent[0]);
+                                components = new BaseComponent[messages.length][];
+                                for (int i = 0; i < components.length; ++i) components[i] = ComponentSerializer.parse(messages[i]);
                             }
-                            local.sendMessage(components);
+                            for (BaseComponent[] c : components) {
+                                local.sendMessage(c);
+                            }
                         } else {
                             ids.add(id);
                         }

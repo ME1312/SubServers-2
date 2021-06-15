@@ -31,7 +31,7 @@ public abstract class RPSI {
      * @param messages Messages to send
      * @param response Success Status
      */
-    protected abstract void sendMessage(UUID[] players, BaseComponent[] messages, Callback<Integer> response);
+    protected abstract void sendMessage(UUID[] players, BaseComponent[][] messages, Callback<Integer> response);
 
     /**
      * Transfers this player to another server

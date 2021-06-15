@@ -57,31 +57,30 @@ public class PacketExMessagePlayer implements PacketObjectIn<Integer>, PacketObj
         List<UUID> ids = (data.contains(0x0001)?data.getUUIDList(0x0001):null);
         try {
                 String[] legacy = null;
-                BaseComponent[] components = null;
+                BaseComponent[][] components = null;
 
                 if (data.contains(0x0002))
                     legacy = data.getRawStringList(0x0002).toArray(new String[0]);
                 if (data.contains(0x0003)) {
                     List<String> messages = data.getRawStringList(0x0003);
-                    LinkedList<BaseComponent> list = new LinkedList<BaseComponent>();
-                    for (String message : messages) list.addAll(Arrays.asList(ComponentSerializer.parse(message)));
-                    components = list.toArray(new BaseComponent[0]);
+                    components = new BaseComponent[messages.size()][];
+                    for (int i = 0; i < components.length; ++i) components[i] = ComponentSerializer.parse(messages.get(i));
                 }
 
                 int failures = 0;
                 if (ids == null || ids.size() == 0) {
                     if (legacy != null) for (String s : legacy)
                         ProxyServer.getInstance().broadcast(s);
-                    if (components != null)
-                        ProxyServer.getInstance().broadcast(components);
+                    if (components != null) for (BaseComponent[] c : components)
+                        ProxyServer.getInstance().broadcast(c);
                 } else {
                     for (UUID id : ids) {
                         ProxiedPlayer local;
                         if ((local = ProxyServer.getInstance().getPlayer(id)) != null) {
                             if (legacy != null)
                                 local.sendMessages(legacy);
-                            if (components != null)
-                                local.sendMessage(components);
+                            if (components != null) for (BaseComponent[] c : components)
+                                local.sendMessage(c);
                         } else {
                             ++failures;
                         }
