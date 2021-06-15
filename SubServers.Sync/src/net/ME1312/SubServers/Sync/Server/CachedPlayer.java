@@ -212,4 +212,54 @@ public class CachedPlayer extends RemotePlayer implements net.ME1312.SubServers.
             }
         };
     }
+
+    // The following methods all redirect to their BungeeCommon counterparts
+    public static void broadcastMessage(BaseComponent... message) {
+        net.ME1312.SubServers.Bungee.Library.Compatibility.RemotePlayer.broadcastMessage(message);
+    }
+
+    public static void broadcastMessage(BaseComponent message, Callback<Integer> response) {
+        net.ME1312.SubServers.Bungee.Library.Compatibility.RemotePlayer.broadcastMessage(message, response);
+    }
+
+    public static void broadcastMessage(BaseComponent[] message, Callback<Integer> response) {
+        net.ME1312.SubServers.Bungee.Library.Compatibility.RemotePlayer.broadcastMessage(message, response);
+    }
+
+    public static void broadcastMessage(BaseComponent[]... messages) {
+        net.ME1312.SubServers.Bungee.Library.Compatibility.RemotePlayer.broadcastMessage(messages);
+    }
+
+    public static void broadcastMessage(BaseComponent[][] messages, Callback<Integer> response) {
+        net.ME1312.SubServers.Bungee.Library.Compatibility.RemotePlayer.broadcastMessage(messages, response);
+    }
+
+    public static void sendMessage(UUID[] players, BaseComponent... message) {
+        net.ME1312.SubServers.Bungee.Library.Compatibility.RemotePlayer.sendMessage(players, message);
+    }
+
+    public static void sendMessage(UUID[] players, BaseComponent message, Callback<Integer> response) {
+        net.ME1312.SubServers.Bungee.Library.Compatibility.RemotePlayer.sendMessage(players, message, response);
+    }
+
+    public static void sendMessage(UUID[] players, BaseComponent[] message, Callback<Integer> response) {
+        net.ME1312.SubServers.Bungee.Library.Compatibility.RemotePlayer.sendMessage(players, message, response);
+    }
+
+    public static void sendMessage(UUID[] players, BaseComponent[]... messages) {
+        net.ME1312.SubServers.Bungee.Library.Compatibility.RemotePlayer.sendMessage(players, messages);
+    }
+
+    public static void sendMessage(UUID[] players, BaseComponent[][] messages, Callback<Integer> response) {
+        net.ME1312.SubServers.Bungee.Library.Compatibility.RemotePlayer.sendMessage(players, messages, response);
+    }
+
+    public static void transfer(UUID[] players, ServerInfo server) {
+        net.ME1312.SubServers.Bungee.Library.Compatibility.RemotePlayer.transfer(players, server);
+    }
+
+    public static void transfer(UUID[] players, ServerInfo server, Callback<Integer> response) {
+        net.ME1312.SubServers.Bungee.Library.Compatibility.RemotePlayer.transfer(players, server, response);
+    }
+
 }

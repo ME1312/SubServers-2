@@ -136,6 +136,22 @@ public class RemotePlayer implements net.ME1312.SubServers.Bungee.Library.Compat
         return (server == null)? null : server.getName();
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        return obj instanceof RemotePlayer && getUniqueId().equals(((RemotePlayer) obj).getUniqueId());
+    }
+
+    @Override
+    public ObjectMap<String> forSubData() {
+        ObjectMap<String> pinfo = new ObjectMap<String>();
+        pinfo.set("name", getName());
+        pinfo.set("id", getUniqueId());
+        pinfo.set("address", getAddress().getAddress().getHostAddress() + ':' + getAddress().getPort());
+        if (getServer() != null) pinfo.set("server", getServer().getName());
+        if (getProxy() != null) pinfo.set("proxy", getProxy().getName());
+        return pinfo;
+    }
+
     static {
         // These overrides provide for the static methods in BungeeCommon
         new RPSI() {
@@ -197,19 +213,100 @@ public class RemotePlayer implements net.ME1312.SubServers.Bungee.Library.Compat
         };
     }
 
-    @Override
-    public boolean equals(Object obj) {
-        return obj instanceof RemotePlayer && getUniqueId().equals(((RemotePlayer) obj).getUniqueId());
+    // The following methods all redirect to their BungeeCommon counterparts
+    public static void broadcastMessage(String... messages) {
+        net.ME1312.SubServers.Bungee.Library.Compatibility.RemotePlayer.broadcastMessage(messages);
     }
 
-    @Override
-    public ObjectMap<String> forSubData() {
-        ObjectMap<String> pinfo = new ObjectMap<String>();
-        pinfo.set("name", getName());
-        pinfo.set("id", getUniqueId());
-        pinfo.set("address", getAddress().getAddress().getHostAddress() + ':' + getAddress().getPort());
-        if (getServer() != null) pinfo.set("server", getServer().getName());
-        if (getProxy() != null) pinfo.set("proxy", getProxy().getName());
-        return pinfo;
+    public static void broadcastMessage(String message, Callback<Integer> response) {
+        net.ME1312.SubServers.Bungee.Library.Compatibility.RemotePlayer.broadcastMessage(message, response);
+    }
+
+    public static void broadcastMessage(String[] messages, Callback<Integer> response) {
+        net.ME1312.SubServers.Bungee.Library.Compatibility.RemotePlayer.broadcastMessage(messages, response);
+    }
+
+    public static void sendMessage(UUID[] players, String... messages) {
+        net.ME1312.SubServers.Bungee.Library.Compatibility.RemotePlayer.sendMessage(players, messages);
+    }
+
+    public static void sendMessage(UUID[] players, String message, Callback<Integer> response) {
+        net.ME1312.SubServers.Bungee.Library.Compatibility.RemotePlayer.sendMessage(players, message, response);
+    }
+
+    public static void sendMessage(UUID[] players, String[] messages, Callback<Integer> response) {
+        net.ME1312.SubServers.Bungee.Library.Compatibility.RemotePlayer.sendMessage(players, messages, response);
+    }
+
+    public static void broadcastMessage(BaseComponent... message) {
+        net.ME1312.SubServers.Bungee.Library.Compatibility.RemotePlayer.broadcastMessage(message);
+    }
+
+    public static void broadcastMessage(BaseComponent message, Callback<Integer> response) {
+        net.ME1312.SubServers.Bungee.Library.Compatibility.RemotePlayer.broadcastMessage(message, response);
+    }
+
+    public static void broadcastMessage(BaseComponent[] message, Callback<Integer> response) {
+        net.ME1312.SubServers.Bungee.Library.Compatibility.RemotePlayer.broadcastMessage(message, response);
+    }
+
+    public static void broadcastMessage(BaseComponent[]... messages) {
+        net.ME1312.SubServers.Bungee.Library.Compatibility.RemotePlayer.broadcastMessage(messages);
+    }
+
+    public static void broadcastMessage(BaseComponent[][] messages, Callback<Integer> response) {
+        net.ME1312.SubServers.Bungee.Library.Compatibility.RemotePlayer.broadcastMessage(messages, response);
+    }
+
+    public static void sendMessage(UUID[] players, BaseComponent... message) {
+        net.ME1312.SubServers.Bungee.Library.Compatibility.RemotePlayer.sendMessage(players, message);
+    }
+
+    public static void sendMessage(UUID[] players, BaseComponent message, Callback<Integer> response) {
+        net.ME1312.SubServers.Bungee.Library.Compatibility.RemotePlayer.sendMessage(players, message, response);
+    }
+
+    public static void sendMessage(UUID[] players, BaseComponent[] message, Callback<Integer> response) {
+        net.ME1312.SubServers.Bungee.Library.Compatibility.RemotePlayer.sendMessage(players, message, response);
+    }
+
+    public static void sendMessage(UUID[] players, BaseComponent[]... messages) {
+        net.ME1312.SubServers.Bungee.Library.Compatibility.RemotePlayer.sendMessage(players, messages);
+    }
+
+    public static void sendMessage(UUID[] players, BaseComponent[][] messages, Callback<Integer> response) {
+        net.ME1312.SubServers.Bungee.Library.Compatibility.RemotePlayer.sendMessage(players, messages, response);
+    }
+
+    public static void transfer(UUID[] players, String server) {
+        net.ME1312.SubServers.Bungee.Library.Compatibility.RemotePlayer.transfer(players, server);
+    }
+
+    public static void transfer(UUID[] players, String server, Callback<Integer> response) {
+        net.ME1312.SubServers.Bungee.Library.Compatibility.RemotePlayer.transfer(players, server, response);
+    }
+
+    public static void transfer(UUID[] players, ServerInfo server) {
+        net.ME1312.SubServers.Bungee.Library.Compatibility.RemotePlayer.transfer(players, server);
+    }
+
+    public static void transfer(UUID[] players, ServerInfo server, Callback<Integer> response) {
+        net.ME1312.SubServers.Bungee.Library.Compatibility.RemotePlayer.transfer(players, server, response);
+    }
+
+    public static void disconnect(UUID... players) {
+        net.ME1312.SubServers.Bungee.Library.Compatibility.RemotePlayer.disconnect(players);
+    }
+
+    public static void disconnect(UUID[] players, Callback<Integer> response) {
+        net.ME1312.SubServers.Bungee.Library.Compatibility.RemotePlayer.disconnect(players, response);
+    }
+
+    public static void disconnect(UUID[] players, String reason) {
+        net.ME1312.SubServers.Bungee.Library.Compatibility.RemotePlayer.disconnect(players, reason);
+    }
+
+    public static void disconnect(UUID[] players, String reason, Callback<Integer> response) {
+        net.ME1312.SubServers.Bungee.Library.Compatibility.RemotePlayer.disconnect(players, reason, response);
     }
 }
