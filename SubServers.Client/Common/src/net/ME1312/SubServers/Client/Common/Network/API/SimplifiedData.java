@@ -334,7 +334,7 @@ public final class SimplifiedData {
         client(client).sendPacket(new PacketDownloadPlayerInfo((List<UUID>) null, data -> {
             TreeMap<UUID, RemotePlayer> players = new TreeMap<UUID, RemotePlayer>();
             for (String player : data.getKeys()) {
-                players.put(UUID.fromString(player), new RemotePlayer(client, data.getMap(player)));
+                players.put(UUID.fromString(player), RemotePlayer.st4tic.construct(client, data.getMap(player)));
             }
 
             try {
@@ -360,7 +360,7 @@ public final class SimplifiedData {
         client(client).sendPacket(new PacketDownloadPlayerInfo(Collections.singletonList(name), data -> {
             RemotePlayer player = null;
             if (data.getKeys().size() > 0) {
-                player = new RemotePlayer(client, data.getMap(new LinkedList<String>(data.getKeys()).getFirst()));
+                player = RemotePlayer.st4tic.construct(client, data.getMap(new LinkedList<String>(data.getKeys()).getFirst()));
             }
 
             try {
@@ -386,7 +386,7 @@ public final class SimplifiedData {
         client(client).sendPacket(new PacketDownloadPlayerInfo(Collections.singletonList(id), data -> {
             RemotePlayer player = null;
             if (data.getKeys().size() > 0) {
-                player = new RemotePlayer(client, data.getMap(new LinkedList<String>(data.getKeys()).getFirst()));
+                player = RemotePlayer.st4tic.construct(client, data.getMap(new LinkedList<String>(data.getKeys()).getFirst()));
             }
 
             try {

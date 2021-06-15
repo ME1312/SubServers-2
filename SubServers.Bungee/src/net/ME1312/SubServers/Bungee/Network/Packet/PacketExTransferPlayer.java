@@ -8,6 +8,7 @@ import net.ME1312.SubData.Server.Protocol.PacketObjectOut;
 import net.ME1312.SubData.Server.SubDataClient;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -15,7 +16,7 @@ import java.util.UUID;
  */
 public class PacketExTransferPlayer implements PacketObjectIn<Integer>, PacketObjectOut<Integer> {
     private static HashMap<UUID, Callback<ObjectMap<Integer>>[]> callbacks = new HashMap<UUID, Callback<ObjectMap<Integer>>[]>();
-    private UUID player;
+    private List<UUID> players;
     private String server;
     private UUID id;
 
@@ -27,14 +28,14 @@ public class PacketExTransferPlayer implements PacketObjectIn<Integer>, PacketOb
     /**
      * New PacketExTransferPlayer (Out)
      *
-     * @param player Player
+     * @param players Players
      * @param server Server
      * @param callback Callbacks
      */
     @SafeVarargs
-    public PacketExTransferPlayer(UUID player, String server, Callback<ObjectMap<Integer>>... callback) {
-        if (Util.isNull(player, callback)) throw new NullPointerException();
-        this.player = player;
+    public PacketExTransferPlayer(List<UUID> players, String server, Callback<ObjectMap<Integer>>... callback) {
+        if (Util.isNull(players, server, callback)) throw new NullPointerException();
+        this.players = players;
         this.server = server;
         this.id = Util.getNew(callbacks.keySet(), UUID::randomUUID);
         callbacks.put(id, callback);
@@ -44,8 +45,8 @@ public class PacketExTransferPlayer implements PacketObjectIn<Integer>, PacketOb
     public ObjectMap<Integer> send(SubDataClient client) {
         ObjectMap<Integer> data = new ObjectMap<Integer>();
         data.set(0x0000, id);
-        data.set(0x0001, player);
-        if (server != null) data.set(0x0002, server);
+        data.set(0x0001, players);
+        data.set(0x0002, server);
         return data;
     }
 

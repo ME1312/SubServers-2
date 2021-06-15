@@ -15,7 +15,7 @@ import java.util.UUID;
  */
 public class PacketTransferPlayer implements PacketObjectIn<Integer>, PacketObjectOut<Integer> {
     private static HashMap<UUID, Callback<ObjectMap<Integer>>[]> callbacks = new HashMap<UUID, Callback<ObjectMap<Integer>>[]>();
-    private UUID player;
+    private UUID[] players;
     private String server;
     private UUID id;
 
@@ -27,14 +27,14 @@ public class PacketTransferPlayer implements PacketObjectIn<Integer>, PacketObje
     /**
      * New PacketTransferPlayer (Out)
      *
-     * @param player Player
+     * @param players Players
      * @param server Server
      * @param callback Callbacks
      */
     @SafeVarargs
-    public PacketTransferPlayer(UUID player, String server, Callback<ObjectMap<Integer>>... callback) {
-        if (Util.isNull(player, callback)) throw new NullPointerException();
-        this.player = player;
+    public PacketTransferPlayer(UUID[] players, String server, Callback<ObjectMap<Integer>>... callback) {
+        if (Util.isNull(players, server)) throw new NullPointerException();
+        this.players = players;
         this.server = server;
         this.id = Util.getNew(callbacks.keySet(), UUID::randomUUID);
         callbacks.put(id, callback);
@@ -44,7 +44,7 @@ public class PacketTransferPlayer implements PacketObjectIn<Integer>, PacketObje
     public ObjectMap<Integer> send(SubDataSender client) {
         ObjectMap<Integer> data = new ObjectMap<Integer>();
         data.set(0x0000, id);
-        data.set(0x0001, player);
+        data.set(0x0001, players);
         if (server != null) data.set(0x0002, server);
         return data;
     }

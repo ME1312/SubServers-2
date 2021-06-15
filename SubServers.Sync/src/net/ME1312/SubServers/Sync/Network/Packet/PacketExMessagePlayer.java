@@ -6,6 +6,7 @@ import net.ME1312.SubData.Client.Protocol.PacketObjectOut;
 import net.ME1312.SubData.Client.SubDataSender;
 import net.ME1312.SubServers.Sync.ExProxy;
 
+import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.chat.ComponentSerializer;
@@ -52,26 +53,43 @@ public class PacketExMessagePlayer implements PacketObjectIn<Integer>, PacketObj
     @SuppressWarnings("deprecation")
     @Override
     public void receive(SubDataSender client, ObjectMap<Integer> data) {
-        UUID tracker = (data.contains(0x0000)?data.getUUID(0x0000):null);
+        UUID tracker =   (data.contains(0x0000)?data.getUUID(0x0000):null);
+        List<UUID> ids = (data.contains(0x0001)?data.getUUIDList(0x0001):null);
         try {
-            UUID id =    data.getUUID(0x0001);
+                String[] legacy = null;
+                BaseComponent[] components = null;
 
-            ProxiedPlayer local;
-            if ((local = plugin.getPlayer(id)) != null) {
                 if (data.contains(0x0002))
-                    local.sendMessages(data.getRawStringList(0x0002).toArray(new String[0]));
+                    legacy = data.getRawStringList(0x0002).toArray(new String[0]);
                 if (data.contains(0x0003)) {
                     List<String> messages = data.getRawStringList(0x0003);
-                    LinkedList<BaseComponent> components = new LinkedList<BaseComponent>();
-                    for (String message : messages) components.addAll(Arrays.asList(ComponentSerializer.parse(message)));
-                    local.sendMessage(components.toArray(new BaseComponent[0]));
+                    LinkedList<BaseComponent> list = new LinkedList<BaseComponent>();
+                    for (String message : messages) list.addAll(Arrays.asList(ComponentSerializer.parse(message)));
+                    components = list.toArray(new BaseComponent[0]);
                 }
-                client.sendPacket(new PacketExMessagePlayer(0, tracker));
-            } else {
-                client.sendPacket(new PacketExMessagePlayer(3, tracker));
-            }
+
+                int failures = 0;
+                if (ids == null || ids.size() == 0) {
+                    if (legacy != null) for (String s : legacy)
+                        ProxyServer.getInstance().broadcast(s);
+                    if (components != null)
+                        ProxyServer.getInstance().broadcast(components);
+                } else {
+                    for (UUID id : ids) {
+                        ProxiedPlayer local;
+                        if ((local = ProxyServer.getInstance().getPlayer(id)) != null) {
+                            if (legacy != null)
+                                local.sendMessages(legacy);
+                            if (components != null)
+                                local.sendMessage(components);
+                        } else {
+                            ++failures;
+                        }
+                    }
+                }
+                client.sendPacket(new PacketExMessagePlayer(failures, tracker));
         } catch (Throwable e) {
-            client.sendPacket(new PacketExMessagePlayer(2, tracker));
+            client.sendPacket(new PacketExMessagePlayer((ids == null || ids.size() == 0)? 1 : ids.size(), tracker));
             e.printStackTrace();
         }
     }

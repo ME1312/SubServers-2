@@ -149,7 +149,7 @@ public class Proxy {
             client().sendPacket(new PacketDownloadPlayerInfo(ids, data -> {
                 LinkedList<RemotePlayer> players = new LinkedList<RemotePlayer>();
                 for (String player : data.getKeys()) {
-                    players.add(new RemotePlayer(data.getMap(player)));
+                    players.add(RemotePlayer.st4tic.construct(this, data.getMap(player)));
                 }
 
                 this.players = players;

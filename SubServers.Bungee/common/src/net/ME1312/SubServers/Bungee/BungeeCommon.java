@@ -12,10 +12,12 @@ import java.util.Map;
  * BungeeCord Common Layout Class
  */
 public abstract class BungeeCommon extends BungeeCord {
+    private static BungeeCommon instance;
     final ReturnRunnable<BungeeAPI> api;
 
     protected BungeeCommon(ReturnRunnable<BungeeAPI> api) throws IOException {
         this.api = api;
+        instance = this;
     }
 
     /**
@@ -31,4 +33,13 @@ public abstract class BungeeCommon extends BungeeCord {
      * @return Server Map Copy
      */
     public abstract Map<String, ServerInfo> getServersCopy();
+
+    /**
+     * Gets the ProxyServer Common Object
+     *
+     * @return ProxyServer Common
+     */
+    public static BungeeCommon getInstance() {
+        return instance;
+    }
 }

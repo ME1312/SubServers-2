@@ -189,11 +189,15 @@ public class Host {
 
         if (players == null) {
             LinkedList<UUID> ids = new LinkedList<UUID>();
-            for (SubServer server : getSubServers().values()) for (Pair<String, UUID> player : server.getRemotePlayers()) ids.add(player.value());
+            HashMap<UUID, SubServer> servers = new HashMap<UUID, SubServer>();
+            for (SubServer server : getSubServers().values()) for (Pair<String, UUID> player : server.getRemotePlayers()) {
+                ids.add(player.value());
+                servers.put(player.value(), server);
+            }
             client().sendPacket(new PacketDownloadPlayerInfo(ids, data -> {
                 LinkedList<RemotePlayer> players = new LinkedList<RemotePlayer>();
                 for (String player : data.getKeys()) {
-                    players.add(new RemotePlayer(data.getMap(player)));
+                    players.add(RemotePlayer.st4tic.construct(servers.get(UUID.fromString(player)), data.getMap(player)));
                 }
 
                 this.players = players;

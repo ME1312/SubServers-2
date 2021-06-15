@@ -2,8 +2,10 @@ package net.ME1312.SubServers.Sync.Server;
 
 import net.ME1312.Galaxi.Library.Callback.Callback;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
+import net.ME1312.SubData.Client.DataClient;
+import net.ME1312.SubData.Client.SubDataClient;
+import net.ME1312.SubServers.Bungee.Library.Compatibility.RPSI;
 import net.ME1312.SubServers.Client.Common.Network.API.RemotePlayer;
-import net.ME1312.SubServers.Client.Common.Network.API.Server;
 import net.ME1312.SubServers.Sync.SubAPI;
 
 import net.md_5.bungee.api.ProxyServer;
@@ -12,9 +14,7 @@ import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.chat.ComponentSerializer;
 
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Cached RemotePlayer Data Class
@@ -48,26 +48,31 @@ public class CachedPlayer extends RemotePlayer implements net.ME1312.SubServers.
     }
 
     /**
-     * Cache a Remote Player
-     *
-     * @param player Remote Player
-     */
-    public CachedPlayer(RemotePlayer player) {
-        this(raw(player));
-    }
-
-    /**
      * Create a Cached Remote Player
      *
      * @param raw Raw representation of the Remote Player
      */
     public CachedPlayer(ObjectMap<String> raw) {
-        super(raw);
+        this(null, raw);
+    }
+
+    /**
+     * Create a Cached Remote Player
+     *
+     * @param client SubData connection
+     * @param raw Raw representation of the Remote Player
+     */
+    CachedPlayer(DataClient client, ObjectMap<String> raw) {
+        super(client, raw);
     }
 
     @Override
     public ProxiedPlayer get() {
-        return ProxyServer.getInstance().getPlayer(getUniqueId());
+        return get(getUniqueId());
+    }
+
+    private static ProxiedPlayer get(UUID player) {
+        return ProxyServer.getInstance().getPlayer(player);
     }
 
     @Override
@@ -76,78 +81,140 @@ public class CachedPlayer extends RemotePlayer implements net.ME1312.SubServers.
         return (name == null)? null : ProxyServer.getInstance().getServerInfo(name);
     }
 
-    // These overrides prevent sending unnecessary packets
+    static {
+        // These overrides provide for the static methods in BungeeCommon
+        new RPSI() {
+            @Override
+            protected void sendMessage(UUID[] players, String[] messages, Callback<Integer> response) {
+                RemotePlayer.sendMessage(players, messages, response);
+            }
 
-    @Override
-    public void sendMessage(String[] messages, Callback<Integer> response) {
-        ProxiedPlayer local = get();
-        if (local != null) {
-            local.sendMessages(messages);
-            response.run(0);
-        } else {
-            super.sendMessage(messages, response);
-        }
-    }
+            @Override
+            protected void sendMessage(UUID[] players, BaseComponent[] messages, Callback<Integer> response) {
+                RemotePlayer.sendRawMessage(players, ComponentSerializer.toString(messages), response);
+            }
 
-    @Override
-    public void sendMessage(BaseComponent[] messages, Callback<Integer> response) {
-        ProxiedPlayer local = get();
-        if (local != null) {
-            local.sendMessage(messages);
-            response.run(0);
-        } else {
-            super.sendRawMessage(new String[]{ComponentSerializer.toString(messages)}, response);
-        }
-    }
+            @Override
+            protected void transfer(UUID[] players, String server, Callback<Integer> response) {
+                RemotePlayer.transfer(players, server, response);
+            }
 
-    @Override
-    public void sendRawMessage(String[] messages, Callback<Integer> response) {
-        ProxiedPlayer local = get();
-        if (local != null) {
-            LinkedList<BaseComponent> components = new LinkedList<BaseComponent>();
-            for (String message : messages) components.addAll(Arrays.asList(ComponentSerializer.parse(message)));
-            local.sendMessage(components.toArray(new BaseComponent[0]));
-            response.run(0);
-        } else {
-            super.sendRawMessage(messages, response);
-        }
-    }
+            @Override
+            protected void disconnect(UUID[] players, String reason, Callback<Integer> response) {
+                RemotePlayer.disconnect(players, reason, response);
+            }
+        };
+        // These overrides prevent sending unnecessary packets in ClientCommon
+        st4tic = new StaticImpl() {
+            @Override
+            protected RemotePlayer construct(DataClient client, ObjectMap<String> raw) {
+                return new CachedPlayer(client, raw);
+            }
 
-    @Override
-    public void transfer(String server, Callback<Integer> response) {
-        ProxiedPlayer local = get();
-        if (local != null) {
-            ServerImpl info = SubAPI.getInstance().getInternals().servers.get(server.toLowerCase());
-            if (info != null) {
-                local.connect(info);
-                response.run(0);
-            } else response.run(1);
-        } else {
-            super.transfer(server, response);
-        }
-    }
+            @Override
+            protected void sendMessage(SubDataClient client, UUID[] players, String[] messages, Callback<Integer> response) {
+                if (players != null && players.length > 0) {
+                    ArrayList<UUID> ids = new ArrayList<UUID>();
+                    for (UUID id : players) {
+                        ProxiedPlayer local = get(id);
+                        if (local != null) {
+                            local.sendMessages(messages);
+                        } else {
+                            ids.add(id);
+                        }
+                    }
 
-    @Override
-    public void transfer(ServerInfo server, Callback<Integer> response) {
-        ProxiedPlayer local = get();
-        if (local != null) {
-            local.connect(server);
-            response.run(0);
-        } else {
-            super.transfer(server.getName(), response);
-        }
-    }
+                    if (ids.size() == 0) {
+                        response.run(0);
+                    } else {
+                        super.sendMessage(client, ids.toArray(new UUID[0]), messages, response);
+                    }
+                } else {
+                    super.sendMessage(client, players, messages, response);
+                }
+            }
 
-    @Override
-    public void disconnect(String reason, Callback<Integer> response) {
-        ProxiedPlayer local = get();
-        if (local != null) {
-            if (reason != null) {
-                local.disconnect(reason);
-            } else local.disconnect();
-            response.run(0);
-        } else {
-            super.disconnect(reason, response);
-        }
+            @Override
+            protected void sendRawMessage(SubDataClient client, UUID[] players, String[] messages, Callback<Integer> response) {
+                if (players != null && players.length > 0) {
+                    ArrayList<UUID> ids = new ArrayList<UUID>();
+                    BaseComponent[] components = null;
+                    for (UUID id : players) {
+                        ProxiedPlayer local = get(id);
+                        if (local != null) {
+                            if (components == null) {
+                                LinkedList<BaseComponent> list = new LinkedList<BaseComponent>();
+                                for (String message : messages) list.addAll(Arrays.asList(ComponentSerializer.parse(message)));
+                                components = list.toArray(new BaseComponent[0]);
+                            }
+                            local.sendMessage(components);
+                        } else {
+                            ids.add(id);
+                        }
+                    }
+
+                    if (ids.size() == 0) {
+                        response.run(0);
+                    } else {
+                        super.sendRawMessage(client, ids.toArray(new UUID[0]), messages, response);
+                    }
+                } else {
+                    super.sendRawMessage(client, players, messages, response);
+                }
+            }
+
+            @Override
+            protected void transfer(SubDataClient client, UUID[] players, String server, Callback<Integer> response) {
+                if (players != null && players.length > 0) {
+                    ArrayList<UUID> ids = new ArrayList<UUID>();
+                    ServerImpl info = SubAPI.getInstance().getInternals().servers.get(server.toLowerCase());
+                    int failures = 0;
+                    for (UUID id : players) {
+                        ProxiedPlayer local = get(id);
+                        if (local != null) {
+                            if (info != null) {
+                                local.connect(info);
+                            } else ++failures;
+                        } else {
+                            ids.add(id);
+                        }
+                    }
+
+                    if (ids.size() == 0) {
+                        response.run(failures);
+                    } else {
+                        final int ff = failures;
+                        super.transfer(client, ids.toArray(new UUID[0]), server, i -> response.run(i + ff));
+                    }
+                } else {
+                    super.transfer(client, players, server, response);
+                }
+            }
+
+            @Override
+            protected void disconnect(SubDataClient client, UUID[] players, String reason, Callback<Integer> response) {
+                if (players != null && players.length > 0) {
+                    ArrayList<UUID> ids = new ArrayList<UUID>();
+                    for (UUID id : players) {
+                        ProxiedPlayer local = get(id);
+                        if (local != null) {
+                            if (reason != null) {
+                                local.disconnect(reason);
+                            } else local.disconnect();
+                        } else {
+                            ids.add(id);
+                        }
+                    }
+
+                    if (ids.size() == 0) {
+                        response.run(0);
+                    } else {
+                        super.disconnect(client, ids.toArray(new UUID[0]), reason, response);
+                    }
+                } else {
+                    super.disconnect(client, players, reason, response);
+                }
+            }
+        };
     }
 }

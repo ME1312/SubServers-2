@@ -110,6 +110,7 @@ public final class SubProxy extends BungeeCommon implements Listener {
         this.isPatched = isPatched;
 
         Logger.get("SubServers").info("Loading SubServers.Bungee v" + version.toString() + " Libraries (for Minecraft " + api.getGameVersion()[api.getGameVersion().length - 1] + ")");
+        Util.isException(() -> new RemotePlayer(null)); // runs <clinit>
 
         this.out = out;
         if (!(new UniversalFile(dir, "config.yml").exists())) {
@@ -914,7 +915,11 @@ public final class SubProxy extends BungeeCommon implements Listener {
      */
     @Override
     public ServerInfo getServerInfo(String name) {
-        return getServersCopy().get(name);
+        if (!ready) {
+            return getServersCopy().get(name);
+        } else {
+            return api.getServer(name);
+        }
     }
 
     @EventHandler(priority = Byte.MIN_VALUE)
@@ -975,7 +980,7 @@ public final class SubProxy extends BungeeCommon implements Listener {
                 ProxiedPlayer p = getPlayer(player.getUniqueId());
                 if (p != null) p.disconnect(new TextComponent(getTranslation("already_connected_proxy")));
             } else if (player.getProxy().getSubData()[0] != null) {
-                ((SubDataClient) player.getProxy().getSubData()[0]).sendPacket(new PacketExDisconnectPlayer(player.getUniqueId(), getTranslation("already_connected_proxy")));
+                ((SubDataClient) player.getProxy().getSubData()[0]).sendPacket(new PacketExDisconnectPlayer(Collections.singletonList(player.getUniqueId()), getTranslation("already_connected_proxy")));
             }
         }
     }

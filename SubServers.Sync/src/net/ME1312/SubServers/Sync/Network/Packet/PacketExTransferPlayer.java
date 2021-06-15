@@ -50,27 +50,28 @@ public class PacketExTransferPlayer implements PacketObjectIn<Integer>, PacketOb
         return json;
     }
 
-    @SuppressWarnings("deprecation")
     @Override
     public void receive(SubDataSender client, ObjectMap<Integer> data) {
-        UUID tracker = (data.contains(0x0000)?data.getUUID(0x0000):null);
+        UUID tracker =     (data.contains(0x0000)?data.getUUID(0x0000):null);
+        List<UUID> ids = data.getUUIDList(0x0001);
         try {
-            UUID id =    data.getUUID(0x0001);
-
-            ProxiedPlayer local;
-            if ((local = plugin.getPlayer(id)) != null) {
-                ServerImpl server;
-                if (data.contains(0x0002) && (server = plugin.servers.get(data.getRawString(0x0002).toLowerCase())) != null) {
-                    local.connect(server);
-                    client.sendPacket(new PacketExTransferPlayer(0, tracker));
-                } else {
-                    client.sendPacket(new PacketExTransferPlayer(1, tracker));
+            ServerImpl server = plugin.servers.getOrDefault(data.getRawString(0x0002).toLowerCase(), null);
+            if (server != null) {
+                int failures = 0;
+                for (UUID id : ids) {
+                    ProxiedPlayer local;
+                    if ((local = plugin.getPlayer(id)) != null) {
+                        local.connect(server);
+                    } else {
+                        ++failures;
+                    }
                 }
+                client.sendPacket(new PacketExTransferPlayer(failures, tracker));
             } else {
-                client.sendPacket(new PacketExTransferPlayer(3, tracker));
+                client.sendPacket(new PacketExTransferPlayer(ids.size(), tracker));
             }
         } catch (Throwable e) {
-            client.sendPacket(new PacketExTransferPlayer(2, tracker));
+            client.sendPacket(new PacketExTransferPlayer(ids.size(), tracker));
             e.printStackTrace();
         }
     }

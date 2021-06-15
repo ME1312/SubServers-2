@@ -1,15 +1,16 @@
 package net.ME1312.SubServers.Bungee.Host;
 
 import net.ME1312.Galaxi.Library.Callback.Callback;
+import net.ME1312.Galaxi.Library.Container.ContainedPair;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubData.Server.SubDataClient;
 import net.ME1312.SubData.Server.SubDataSerializable;
-import net.ME1312.SubServers.Bungee.Network.Packet.PacketExDisconnectPlayer;
-import net.ME1312.SubServers.Bungee.Network.Packet.PacketExMessagePlayer;
-import net.ME1312.SubServers.Bungee.Network.Packet.PacketExTransferPlayer;
+import net.ME1312.SubServers.Bungee.Library.Compatibility.RPSI;
+import net.ME1312.SubServers.Bungee.Network.Packet.*;
 import net.ME1312.SubServers.Bungee.SubAPI;
 
+import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -17,6 +18,7 @@ import net.md_5.bungee.chat.ComponentSerializer;
 
 import java.lang.reflect.InvocationTargetException;
 import java.net.InetSocketAddress;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.UUID;
@@ -78,6 +80,10 @@ public class RemotePlayer implements net.ME1312.SubServers.Bungee.Library.Compat
         return local;
     }
 
+    private static ProxiedPlayer get(UUID player) {
+        return ProxyServer.getInstance().getPlayer(player);
+    }
+
     @Override
     public UUID getUniqueId() {
         if (local != null) {
@@ -133,119 +139,29 @@ public class RemotePlayer implements net.ME1312.SubServers.Bungee.Library.Compat
         return (server == null)? null : server.getName();
     }
 
-    @Override
-    public void sendMessage(String[] messages, Callback<Integer> response) {
-        if (local != null) {
-            local.sendMessages(messages);
-            response.run(0);
-        } else {
-            SubDataClient client = getProxyConnection();
-            if (client != null) {
-                StackTraceElement[] origin = new Exception().getStackTrace();
-                client.sendPacket(new PacketExMessagePlayer(getUniqueId(), Arrays.asList(messages), null, data -> {
-                    try {
-                        response.run(data.getInt(0x0001));
-                    } catch (Throwable e) {
-                        Throwable ew = new InvocationTargetException(e);
-                        ew.setStackTrace(origin);
-                        ew.printStackTrace();
-                    }
-                }));
-            } else response.run(4);
-        }
-    }
+    static {
+        // These overrides provide for the static methods in BungeeCommon
+        new RPSI() {
+            @Override
+            protected void sendMessage(UUID[] players, String[] messages, Callback<Integer> response) {
+                PacketMessagePlayer.run(Arrays.asList(players), new ContainedPair<>(messages, null), null, response);
+            }
 
-    @Override
-    public void sendMessage(BaseComponent[] messages, Callback<Integer> response) {
-        if (local != null) {
-            local.sendMessage(messages);
-            response.run(0);
-        } else {
-            SubDataClient client = getProxyConnection();
-            if (client != null) {
-                StackTraceElement[] origin = new Exception().getStackTrace();
-                client.sendPacket(new PacketExMessagePlayer(getUniqueId(), null, Collections.singletonList(ComponentSerializer.toString(messages)), data -> {
-                    try {
-                        response.run(data.getInt(0x0001));
-                    } catch (Throwable e) {
-                        Throwable ew = new InvocationTargetException(e);
-                        ew.setStackTrace(origin);
-                        ew.printStackTrace();
-                    }
-                }));
-            } else response.run(4);
-        }
-    }
+            @Override
+            protected void sendMessage(UUID[] players, BaseComponent[] messages, Callback<Integer> response) {
+                PacketMessagePlayer.run(Arrays.asList(players), new ContainedPair<>(null, messages), null, response);
+            }
 
-    @Override
-    public void transfer(String server, Callback<Integer> response) {
-        if (local != null) {
-            Server info = SubAPI.getInstance().getServer(server);
-            if (info != null) {
-                local.connect(info);
-                response.run(0);
-            } else response.run(1);
-        } else {
-            SubDataClient client = getProxyConnection();
-            if (client != null) {
-                StackTraceElement[] origin = new Exception().getStackTrace();
-                client.sendPacket(new PacketExTransferPlayer(getUniqueId(), server, data -> {
-                    try {
-                        response.run(data.getInt(0x0001));
-                    } catch (Throwable e) {
-                        Throwable ew = new InvocationTargetException(e);
-                        ew.setStackTrace(origin);
-                        ew.printStackTrace();
-                    }
-                }));
-            } else response.run(4);
-        }
-    }
+            @Override
+            protected void transfer(UUID[] players, String server, Callback<Integer> response) {
+                PacketTransferPlayer.run(Arrays.asList(players), server, response);
+            }
 
-    @Override
-    public void transfer(ServerInfo server, Callback<Integer> response) {
-        if (local != null) {
-            local.connect(server);
-            response.run(0);
-        } else {
-            SubDataClient client = getProxyConnection();
-            if (client != null) {
-                StackTraceElement[] origin = new Exception().getStackTrace();
-                client.sendPacket(new PacketExTransferPlayer(getUniqueId(), server.getName(), data -> {
-                    try {
-                        response.run(data.getInt(0x0001));
-                    } catch (Throwable e) {
-                        Throwable ew = new InvocationTargetException(e);
-                        ew.setStackTrace(origin);
-                        ew.printStackTrace();
-                    }
-                }));
-            } else response.run(4);
-        }
-    }
-
-    @Override
-    public void disconnect(String reason, Callback<Integer> response) {
-        if (local != null) {
-            if (reason != null) {
-                local.disconnect(reason);
-            } else local.disconnect();
-            response.run(0);
-        } else {
-            SubDataClient client = getProxyConnection();
-            if (client != null) {
-                StackTraceElement[] origin = new Exception().getStackTrace();
-                client.sendPacket(new PacketExDisconnectPlayer(getUniqueId(), reason, data -> {
-                    try {
-                        response.run(data.getInt(0x0001));
-                    } catch (Throwable e) {
-                        Throwable ew = new InvocationTargetException(e);
-                        ew.setStackTrace(origin);
-                        ew.printStackTrace();
-                    }
-                }));
-            } else response.run(4);
-        }
+            @Override
+            protected void disconnect(UUID[] players, String reason, Callback<Integer> response) {
+                PacketDisconnectPlayer.run(Arrays.asList(players), reason, response);
+            }
+        };
     }
 
     @Override

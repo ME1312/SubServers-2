@@ -3,14 +3,13 @@ package net.ME1312.SubServers.Bungee.Library.Compatibility;
 import net.ME1312.Galaxi.Library.Callback.Callback;
 
 import net.md_5.bungee.api.chat.BaseComponent;
-import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 import java.net.InetSocketAddress;
-import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.UUID;
+
+import static net.ME1312.SubServers.Bungee.Library.Compatibility.RPSI.instance;
 
 /**
  * RemotePlayer Layout Class
@@ -67,6 +66,35 @@ public interface RemotePlayer {
     ServerInfo getServer();
 
     /**
+     * Sends messages to all players
+     *
+     * @param messages Messages to send
+     */
+    static void broadcastMessage(String... messages) {
+        broadcastMessage(messages, i -> {});
+    }
+
+    /**
+     * Sends messages to all players
+     *
+     * @param message Message to send
+     * @param response Success Status
+     */
+    static void broadcastMessage(String message, Callback<Integer> response) {
+        broadcastMessage(new String[]{ message }, response);
+    }
+
+    /**
+     * Sends messages to all players
+     *
+     * @param messages Messages to send
+     * @param response Success Status
+     */
+    static void broadcastMessage(String[] messages, Callback<Integer> response) {
+        sendMessage(null, messages, response);
+    }
+
+    /**
      * Sends messages to this player
      *
      * @param messages Messages to send
@@ -91,7 +119,67 @@ public interface RemotePlayer {
      * @param messages Messages to send
      * @param response Success Status
      */
-    void sendMessage(String[] messages, Callback<Integer> response);
+    default void sendMessage(String[] messages, Callback<Integer> response) {
+        sendMessage(new UUID[]{ getUniqueId() }, messages, response);
+    }
+
+    /**
+     * Sends messages to this player
+     *
+     * @param messages Messages to send
+     */
+    static void sendMessage(UUID[] players, String... messages) {
+        sendMessage(players, messages, i -> {});
+    }
+
+    /**
+     * Sends messages to this player
+     *
+     * @param message Message to send
+     * @param response Success Status
+     */
+    static void sendMessage(UUID[] players, String message, Callback<Integer> response) {
+        sendMessage(players, new String[]{ message }, response);
+    }
+
+    /**
+     * Sends messages to this player
+     *
+     * @param messages Messages to send
+     * @param response Success Status
+     */
+    static void sendMessage(UUID[] players, String[] messages, Callback<Integer> response) {
+        instance.sendMessage(players, messages, response);
+    }
+
+    /**
+     * Sends messages to all players
+     *
+     * @param messages Messages to send
+     */
+    static void broadcastMessage(BaseComponent... messages) {
+        broadcastMessage(messages, i -> {});
+    }
+
+    /**
+     * Sends messages to all players
+     *
+     * @param message Message to send
+     * @param response Success Status
+     */
+    static void broadcastMessage(BaseComponent message, Callback<Integer> response) {
+        broadcastMessage(new BaseComponent[]{ message }, response);
+    }
+
+    /**
+     * Sends messages to all players
+     *
+     * @param messages Messages to send
+     * @param response Success Status
+     */
+    static void broadcastMessage(BaseComponent[] messages, Callback<Integer> response) {
+        sendMessage(null, messages, response);
+    }
 
     /**
      * Sends messages to this player
@@ -118,7 +206,41 @@ public interface RemotePlayer {
      * @param messages Messages to send
      * @param response Success Status
      */
-    void sendMessage(BaseComponent[] messages, Callback<Integer> response);
+    default void sendMessage(BaseComponent[] messages, Callback<Integer> response) {
+        sendMessage(new UUID[]{ getUniqueId() }, messages, response);
+    }
+
+    /**
+     * Sends messages to this player
+     *
+     * @param players Players to select
+     * @param messages Messages to send
+     */
+    static void sendMessage(UUID[] players, BaseComponent... messages) {
+        sendMessage(players, messages, i -> {});
+    }
+
+    /**
+     * Sends messages to this player
+     *
+     * @param players Players to select
+     * @param message Message to send
+     * @param response Success Status
+     */
+    static void sendMessage(UUID[] players, BaseComponent message, Callback<Integer> response) {
+        sendMessage(players, new BaseComponent[]{ message }, response);
+    }
+
+    /**
+     * Sends messages to this player
+     *
+     * @param players Players to select
+     * @param message Message to send
+     * @param response Success Status
+     */
+    static void sendMessage(UUID[] players, BaseComponent[] message, Callback<Integer> response) {
+        instance.sendMessage(players, message, response);
+    }
 
     /**
      * Transfers this player to another server
@@ -135,7 +257,30 @@ public interface RemotePlayer {
      * @param server Target server
      * @param response Success status
      */
-    void transfer(String server, Callback<Integer> response);
+    default void transfer(String server, Callback<Integer> response) {
+        transfer(new UUID[]{ getUniqueId() }, server, response);
+    }
+
+    /**
+     * Transfers this player to another server
+     *
+     * @param players Players to select
+     * @param server Target server
+     */
+    static void transfer(UUID[] players, String server) {
+        transfer(players, server, i -> {});
+    }
+
+    /**
+     * Transfers this player to another server
+     *
+     * @param players Players to select
+     * @param server Target server
+     * @param response Success status
+     */
+    static void transfer(UUID[] players, String server, Callback<Integer> response) {
+        instance.transfer(players, server, response);
+    }
 
     /**
      * Transfers this player to another server
@@ -152,13 +297,36 @@ public interface RemotePlayer {
      * @param server Target server
      * @param response Success status
      */
-    void transfer(ServerInfo server, Callback<Integer> response);
+    default void transfer(ServerInfo server, Callback<Integer> response) {
+        transfer(new UUID[]{ getUniqueId() }, server, response);
+    }
+
+    /**
+     * Transfers this player to another server
+     *
+     * @param players Players to select
+     * @param server Target server
+     */
+    static void transfer(UUID[] players, ServerInfo server) {
+        transfer(players, server, i -> {});
+    }
+
+    /**
+     * Transfers this player to another server
+     *
+     * @param players Players to select
+     * @param server Target server
+     * @param response Success status
+     */
+    static void transfer(UUID[] players, ServerInfo server, Callback<Integer> response) {
+        instance.transfer(players, server.getName(), response);
+    }
 
     /**
      * Disconnects this player from the network
      */
     default void disconnect() {
-        disconnect(i -> {});
+        disconnect((String) null);
     }
 
     /**
@@ -167,7 +335,7 @@ public interface RemotePlayer {
      * @param response Success status
      */
     default void disconnect(Callback<Integer> response) {
-        disconnect(null, response);
+        disconnect((String) null, response);
     }
 
     /**
@@ -185,5 +353,47 @@ public interface RemotePlayer {
      * @param reason Disconnect Reason
      * @param response Success status
      */
-    void disconnect(String reason, Callback<Integer> response);
+    default void disconnect(String reason, Callback<Integer> response) {
+        disconnect(new UUID[]{ getUniqueId() }, reason, response);
+    }
+
+    /**
+     * Disconnects this player from the network
+     *
+     * @param players Players to select
+     */
+    static void disconnect(UUID... players) {
+        disconnect(players, (String) null);
+    }
+
+    /**
+     * Disconnects this player from the network
+     *
+     * @param players Players to select
+     * @param response Success status
+     */
+    static void disconnect(UUID[] players, Callback<Integer> response) {
+        disconnect(players, null, response);
+    }
+
+    /**
+     * Disconnects this player from the network
+     *
+     * @param players Players to select
+     * @param reason Disconnect Reason
+     */
+    static void disconnect(UUID[] players, String reason) {
+        disconnect(players, reason, i -> {});
+    }
+
+    /**
+     * Disconnects this player from the network
+     *
+     * @param players Players to select
+     * @param reason Disconnect Reason
+     * @param response Success status
+     */
+    static void disconnect(UUID[] players, String reason, Callback<Integer> response) {
+        instance.disconnect(players, reason, response);
+    }
 }

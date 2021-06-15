@@ -85,6 +85,7 @@ public final class ExProxy extends BungeeCommon implements Listener {
         this.isPatched = isPatched;
 
         Logger.get("SubServers").info("Loading SubServers.Sync v" + version.toString() + " Libraries (for Minecraft " + api.getGameVersion()[api.getGameVersion().length - 1] + ")");
+        Util.isException(() -> new CachedPlayer((ProxiedPlayer) null)); // runs <clinit>
 
         this.out = out;
         if (!(new UniversalFile(dir, "config.yml").exists())) {
@@ -478,7 +479,7 @@ public final class ExProxy extends BungeeCommon implements Listener {
                 ProxiedPlayer p = getPlayer(player.getUniqueId());
                 if (p != null) p.disconnect(new TextComponent(getTranslation("already_connected_proxy")));
             } else {
-                ((SubDataClient) api.getSubDataNetwork()[0]).sendPacket(new PacketDisconnectPlayer(player.getUniqueId(), getTranslation("already_connected_proxy")));
+                ((SubDataClient) api.getSubDataNetwork()[0]).sendPacket(new PacketDisconnectPlayer(new UUID[]{ player.getUniqueId() }, getTranslation("already_connected_proxy")));
             }
         }
     }

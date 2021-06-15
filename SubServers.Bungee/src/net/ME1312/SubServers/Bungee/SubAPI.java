@@ -123,8 +123,8 @@ public final class SubAPI implements BungeeAPI {
      * @return a Host
      */
     public Host getHost(String name) {
-        if (Util.isNull(name)) throw new NullPointerException();
-        return getHosts().get(name.toLowerCase());
+        if (Util.isNull(name)) return null;
+        return plugin.hosts.get(name.toLowerCase());
     }
 
     /**
@@ -350,7 +350,7 @@ public final class SubAPI implements BungeeAPI {
      * @return a Server Group
      */
     public Pair<String, List<Server>> getGroup(String name) {
-        if (Util.isNull(name)) throw new NullPointerException();
+        if (Util.isNull(name)) return null;
         for (Map.Entry<String, List<Server>> group : getLowercaseGroups().entrySet()) {
             if (group.getKey().equalsIgnoreCase(name)) return new ContainedPair<>(group.getKey(), group.getValue());
         }
@@ -378,8 +378,9 @@ public final class SubAPI implements BungeeAPI {
      * @return a Server
      */
     public Server getServer(String name) {
-        if (Util.isNull(name)) throw new NullPointerException();
-        return getServers().get(name.toLowerCase());
+        if (Util.isNull(name)) return null;
+        Server server = plugin.exServers.getOrDefault(name.toLowerCase(), null);
+        return (server == null)? getSubServer(name) : server;
     }
 
     /**
@@ -516,8 +517,13 @@ public final class SubAPI implements BungeeAPI {
      * @return a SubServer
      */
     public SubServer getSubServer(String name) {
-        if (Util.isNull(name)) throw new NullPointerException();
-        return getSubServers().get(name.toLowerCase());
+        if (Util.isNull(name)) return null;
+        SubServer server;
+        for (Host host : plugin.hosts.values()) {
+            server = host.getSubServer(name);
+            if (server != null) return server;
+        }
+        return null;
     }
 
     /**
@@ -536,8 +542,8 @@ public final class SubAPI implements BungeeAPI {
      * @return a Proxy
      */
     public Proxy getProxy(String name) {
-        if (Util.isNull(name)) throw new NullPointerException();
-        Proxy proxy = getProxies().getOrDefault(name.toLowerCase(), null);
+        if (Util.isNull(name)) return null;
+        Proxy proxy = plugin.proxies.getOrDefault(name.toLowerCase(), null);
         if (proxy == null && plugin.mProxy != null && plugin.mProxy.getName().equalsIgnoreCase(name)) proxy = plugin.mProxy;
         return proxy;
     }
@@ -594,7 +600,7 @@ public final class SubAPI implements BungeeAPI {
      */
     public RemotePlayer getRemotePlayer(String name) {
         if (Util.isNull(name)) throw new NullPointerException();
-        for (RemotePlayer player : getRemotePlayers().values()) {
+        for (RemotePlayer player : plugin.rPlayers.values()) {
             if (player.getName().equalsIgnoreCase(name)) return player;
         }
         return null;
@@ -608,7 +614,7 @@ public final class SubAPI implements BungeeAPI {
      */
     public RemotePlayer getRemotePlayer(UUID id) {
         if (Util.isNull(id)) throw new NullPointerException();
-        return getRemotePlayers().getOrDefault(id, null);
+        return plugin.rPlayers.getOrDefault(id, null);
     }
 
     /**
@@ -620,7 +626,7 @@ public final class SubAPI implements BungeeAPI {
      */
     public void setLang(String channel, String key, String value) {
         if (Util.isNull(channel, key, value)) throw new NullPointerException();
-        LinkedHashMap<String, String> map = (plugin.exLang.keySet().contains(channel.toLowerCase()))?plugin.exLang.get(channel.toLowerCase()):new LinkedHashMap<String, String>();
+        LinkedHashMap<String, String> map = (plugin.exLang.containsKey(channel.toLowerCase()))?plugin.exLang.get(channel.toLowerCase()):new LinkedHashMap<String, String>();
         map.put(key, value);
         plugin.exLang.put(channel.toLowerCase(), map);
     }
@@ -641,7 +647,7 @@ public final class SubAPI implements BungeeAPI {
      * @return Lang Value
      */
     public Map<String, String> getLang(String channel) {
-        if (Util.isNull(channel)) throw new NullPointerException();
+        if (Util.isNull(channel)) return null;
         return new LinkedHashMap<>(plugin.exLang.get(channel.toLowerCase()));
     }
 
@@ -680,7 +686,7 @@ public final class SubAPI implements BungeeAPI {
     @SuppressWarnings("unchecked")
     public <R> R getObjectBySignature(String signature) {
         if (Util.isNull(signature)) throw new NullPointerException();
-        return (R) knownSignatures.get(signature);
+        return (R) knownSignatures.getOrDefault(signature, null);
     }
 
     /**

@@ -94,8 +94,8 @@ public class InternalHost extends Host {
 
     @Override
     public SubServer getSubServer(String name) {
-        if (Util.isNull(name)) throw new NullPointerException();
-        return getSubServers().get(name.toLowerCase());
+        if (Util.isNull(name)) return null;
+        return servers.get(name.toLowerCase());
     }
 
     @Override

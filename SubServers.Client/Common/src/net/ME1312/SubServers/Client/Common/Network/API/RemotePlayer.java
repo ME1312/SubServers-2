@@ -16,6 +16,7 @@ import java.util.*;
  * Simplified RemotePlayer Data Class
  */
 public class RemotePlayer {
+    protected static StaticImpl st4tic = new StaticImpl();
     ObjectMap<String> raw;
     private Proxy proxy = null;
     private Server server = null;
@@ -37,7 +38,7 @@ public class RemotePlayer {
      * @param client SubData connection
      * @param raw Raw representation of the Remote Player
      */
-    RemotePlayer(DataClient client, ObjectMap<String> raw) {
+    protected RemotePlayer(DataClient client, ObjectMap<String> raw) {
         this.client = client;
         load(raw);
     }
@@ -168,6 +169,35 @@ public class RemotePlayer {
     }
 
     /**
+     * Sends messages to all players
+     *
+     * @param messages Messages to send
+     */
+    public static void broadcastMessage(String... messages) {
+        broadcastMessage(messages, i -> {});
+    }
+
+    /**
+     * Sends messages to all players
+     *
+     * @param message Message to send
+     * @param response Success Status
+     */
+    public static void broadcastMessage(String message, Callback<Integer> response) {
+        broadcastMessage(new String[]{ message }, response);
+    }
+
+    /**
+     * Sends messages to all players
+     *
+     * @param messages Messages to send
+     * @param response Success Status
+     */
+    public static void broadcastMessage(String[] messages, Callback<Integer> response) {
+        sendMessage(null, messages, response);
+    }
+
+    /**
      * Sends messages to this player
      *
      * @param messages Messages to send
@@ -193,16 +223,65 @@ public class RemotePlayer {
      * @param response Success Status
      */
     public void sendMessage(String[] messages, Callback<Integer> response) {
-        StackTraceElement[] origin = new Exception().getStackTrace();
-        client().sendPacket(new PacketMessagePlayer(getUniqueId(), messages, null, data -> {
-            try {
-                response.run(data.getInt(0x0001));
-            } catch (Throwable e) {
-                Throwable ew = new InvocationTargetException(e);
-                ew.setStackTrace(origin);
-                ew.printStackTrace();
-            }
-        }));
+        st4tic.sendMessage(client(), new UUID[]{ getUniqueId() }, messages, response);
+    }
+
+    /**
+     * Sends messages to this player
+     *
+     * @param messages Messages to send
+     */
+    public static void sendMessage(UUID[] players, String... messages) {
+        sendMessage(players, messages, i -> {});
+    }
+
+    /**
+     * Sends messages to this player
+     *
+     * @param message Message to send
+     * @param response Success Status
+     */
+    public static void sendMessage(UUID[] players, String message, Callback<Integer> response) {
+        sendMessage(players, new String[]{ message }, response);
+    }
+
+    /**
+     * Sends messages to this player
+     *
+     * @param messages Messages to send
+     * @param response Success Status
+     */
+    public static void sendMessage(UUID[] players, String[] messages, Callback<Integer> response) {
+        st4tic.sendMessage(SimplifiedData.client(ClientAPI.getInstance().getSubDataNetwork()[0]), players, messages, response);
+    }
+
+    /**
+     * Sends JSON format messages to all players
+     *
+     * @param messages Messages to send
+     */
+    public static void broadcastRawMessage(String... messages) {
+        broadcastRawMessage(messages, i -> {});
+    }
+
+    /**
+     * Sends JSON format messages to all players
+     *
+     * @param message Message to send
+     * @param response Success Status
+     */
+    public static void broadcastRawMessage(String message, Callback<Integer> response) {
+        broadcastRawMessage(new String[]{ message }, response);
+    }
+
+    /**
+     * Sends JSON format messages to all players
+     *
+     * @param messages Messages to send
+     * @param response Success Status
+     */
+    public static void broadcastRawMessage(String[] messages, Callback<Integer> response) {
+        sendRawMessage(null, messages, response);
     }
 
     /**
@@ -227,20 +306,43 @@ public class RemotePlayer {
     /**
      * Sends JSON format messages to this player
      *
-     * @param messages Messages to send
+     * @param message Message to send
      * @param response Success Status
      */
-    public void sendRawMessage(String[] messages, Callback<Integer> response) {
-        StackTraceElement[] origin = new Exception().getStackTrace();
-        client().sendPacket(new PacketMessagePlayer(getUniqueId(), null, messages, data -> {
-            try {
-                response.run(data.getInt(0x0001));
-            } catch (Throwable e) {
-                Throwable ew = new InvocationTargetException(e);
-                ew.setStackTrace(origin);
-                ew.printStackTrace();
-            }
-        }));
+    public void sendRawMessage(String[] message, Callback<Integer> response) {
+        st4tic.sendRawMessage(client(), new UUID[]{ getUniqueId() }, message, response);
+    }
+
+    /**
+     * Sends JSON format messages to this player
+     *
+     * @param players Players to select
+     * @param messages Messages to send
+     */
+    public static void sendRawMessage(UUID[] players, String... messages) {
+        sendRawMessage(players, messages, i -> {});
+    }
+
+    /**
+     * Sends JSON format messages to this player
+     *
+     * @param players Players to select
+     * @param message Message to send
+     * @param response Success Status
+     */
+    public static void sendRawMessage(UUID[] players, String message, Callback<Integer> response) {
+        sendRawMessage(players, new String[]{ message }, response);
+    }
+
+    /**
+     * Sends JSON format messages to this player
+     *
+     * @param players Players to select
+     * @param message Message to send
+     * @param response Success Status
+     */
+    public static void sendRawMessage(UUID[] players, String[] message, Callback<Integer> response) {
+        st4tic.sendRawMessage(SimplifiedData.client(ClientAPI.getInstance().getSubDataNetwork()[0]), players, message, response);
     }
 
     /**
@@ -259,42 +361,35 @@ public class RemotePlayer {
      * @param response Success status
      */
     public void transfer(String server, Callback<Integer> response) {
-        StackTraceElement[] origin = new Exception().getStackTrace();
-        client().sendPacket(new PacketTransferPlayer(getUniqueId(), server, data -> {
-            try {
-                response.run(data.getInt(0x0001));
-            } catch (Throwable e) {
-                Throwable ew = new InvocationTargetException(e);
-                ew.setStackTrace(origin);
-                ew.printStackTrace();
-            }
-        }));
+        st4tic.transfer(client(), new UUID[]{ getUniqueId() }, server, response);
     }
 
     /**
      * Transfers this player to another server
      *
+     * @param players Players to select
      * @param server Target server
      */
-    public void transfer(Server server) {
-        transfer(server, i -> {});
+    public static void transfer(UUID[] players, String server) {
+        transfer(players, server, i -> {});
     }
 
     /**
      * Transfers this player to another server
      *
+     * @param players Players to select
      * @param server Target server
      * @param response Success status
      */
-    public void transfer(Server server, Callback<Integer> response) {
-        transfer(server.getName(), response);
+    public static void transfer(UUID[] players, String server, Callback<Integer> response) {
+        st4tic.transfer(SimplifiedData.client(ClientAPI.getInstance().getSubDataNetwork()[0]), players, server, response);
     }
 
     /**
      * Disconnects this player from the network
      */
     public void disconnect() {
-        disconnect(i -> {});
+        disconnect((String) null);
     }
 
     /**
@@ -303,7 +398,7 @@ public class RemotePlayer {
      * @param response Success status
      */
     public void disconnect(Callback<Integer> response) {
-        disconnect(null, response);
+        disconnect((String) null, response);
     }
 
     /**
@@ -322,16 +417,47 @@ public class RemotePlayer {
      * @param response Success status
      */
     public void disconnect(String reason, Callback<Integer> response) {
-        StackTraceElement[] origin = new Exception().getStackTrace();
-        client().sendPacket(new PacketDisconnectPlayer(getUniqueId(), reason, data -> {
-            try {
-                response.run(data.getInt(0x0001));
-            } catch (Throwable e) {
-                Throwable ew = new InvocationTargetException(e);
-                ew.setStackTrace(origin);
-                ew.printStackTrace();
-            }
-        }));
+        st4tic.disconnect(client(), new UUID[]{ getUniqueId() }, reason, response);
+    }
+
+    /**
+     * Disconnects this player from the network
+     *
+     * @param players Players to select
+     */
+    public static void disconnect(UUID... players) {
+        disconnect(players, (String) null);
+    }
+
+    /**
+     * Disconnects this player from the network
+     *
+     * @param players Players to select
+     * @param response Success status
+     */
+    public static void disconnect(UUID[] players, Callback<Integer> response) {
+        disconnect(players, null, response);
+    }
+
+    /**
+     * Disconnects this player from the network
+     *
+     * @param players Players to select
+     * @param reason Disconnect Reason
+     */
+    public static void disconnect(UUID[] players, String reason) {
+        disconnect(players, reason, i -> {});
+    }
+
+    /**
+     * Disconnects this player from the network
+     *
+     * @param players Players to select
+     * @param reason Disconnect Reason
+     * @param response Success status
+     */
+    public static void disconnect(UUID[] players, String reason, Callback<Integer> response) {
+        st4tic.disconnect(SimplifiedData.client(ClientAPI.getInstance().getSubDataNetwork()[0]), players, reason, response);
     }
 
     /**
@@ -353,11 +479,134 @@ public class RemotePlayer {
     }
 
     /**
-     * Get the raw representation of the Server
-     *
-     * @return Raw Server
+     * RemotePlayer Static Implementation Class
      */
-    protected static ObjectMap<String> raw(RemotePlayer player) {
-        return player.raw;
+    protected static class StaticImpl {
+        /**
+         * Create an API representation of a Remote Player
+         *
+         * @param raw Raw representation of the Remote Player
+         */
+        protected final RemotePlayer construct(ObjectMap<String> raw) {
+            return construct((DataClient) null, raw);
+        }
+
+        /**
+         * Create an API representation of a Remote Player
+         *
+         * @param client SubData connection
+         * @param raw Raw representation of the Remote Player
+         */
+        protected RemotePlayer construct(DataClient client, ObjectMap<String> raw) {
+            return new RemotePlayer(client, raw);
+        }
+
+        /**
+         * Create an API representation of a Remote Player
+         *
+         * @param server Server
+         * @param raw Raw representation of the Remote Player
+         */
+        final RemotePlayer construct(Server server, ObjectMap<String> raw) {
+            RemotePlayer player = new RemotePlayer(server.client, raw);
+            player.server = server;
+            return player;
+        }
+
+        /**
+         * Create an API representation of a Remote Player
+         *
+         * @param proxy Proxy
+         * @param raw Raw representation of the Remote Player
+         */
+        final RemotePlayer construct(Proxy proxy, ObjectMap<String> raw) {
+            RemotePlayer player = new RemotePlayer(proxy.client, raw);
+            player.proxy = proxy;
+            return player;
+        }
+
+        /**
+         * Sends messages to this player
+         *
+         * @param client SubData Connection
+         * @param players Players to send to
+         * @param messages Messages to send
+         * @param response Success Status
+         */
+        protected void sendMessage(SubDataClient client, UUID[] players, String[] messages, Callback<Integer> response) {
+            StackTraceElement[] origin = new Exception().getStackTrace();
+            client.sendPacket(new PacketMessagePlayer(players, messages, null, data -> {
+                try {
+                    response.run(data.getInt(0x0001));
+                } catch (Throwable e) {
+                    Throwable ew = new InvocationTargetException(e);
+                    ew.setStackTrace(origin);
+                    ew.printStackTrace();
+                }
+            }));
+        }
+
+        /**
+         * Sends JSON format messages to this player
+         *
+         * @param client SubData Connection
+         * @param players Players to send to
+         * @param messages Messages to send
+         * @param response Success Status
+         */
+        protected void sendRawMessage(SubDataClient client, UUID[] players, String[] messages, Callback<Integer> response) {
+            StackTraceElement[] origin = new Exception().getStackTrace();
+            client.sendPacket(new PacketMessagePlayer(players, null, messages, data -> {
+                try {
+                    response.run(data.getInt(0x0001));
+                } catch (Throwable e) {
+                    Throwable ew = new InvocationTargetException(e);
+                    ew.setStackTrace(origin);
+                    ew.printStackTrace();
+                }
+            }));
+        }
+
+        /**
+         * Transfers this player to another server
+         *
+         * @param client SubData Connection
+         * @param players Players to send to
+         * @param server Target server
+         * @param response Success Status
+         */
+        protected void transfer(SubDataClient client, UUID[] players, String server, Callback<Integer> response) {
+            StackTraceElement[] origin = new Exception().getStackTrace();
+            client.sendPacket(new PacketTransferPlayer(players, server, data -> {
+                try {
+                    response.run(data.getInt(0x0001));
+                } catch (Throwable e) {
+                    Throwable ew = new InvocationTargetException(e);
+                    ew.setStackTrace(origin);
+                    ew.printStackTrace();
+                }
+            }));
+        }
+
+        /**
+         * Disconnects this player from the network
+         *
+         * @param client SubData Connection
+         * @param players Players to send to
+         * @param reason Disconnect Reason
+         * @param response Success status
+         */
+        protected void disconnect(SubDataClient client, UUID[] players, String reason, Callback<Integer> response) {
+            StackTraceElement[] origin = new Exception().getStackTrace();
+            client.sendPacket(new PacketDisconnectPlayer(players, reason, data -> {
+                try {
+                    response.run(data.getInt(0x0001));
+                } catch (Throwable e) {
+                    Throwable ew = new InvocationTargetException(e);
+                    ew.setStackTrace(origin);
+                    ew.printStackTrace();
+                }
+            }));
+        }
     }
 }

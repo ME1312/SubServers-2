@@ -16,7 +16,7 @@ import java.util.UUID;
  */
 public class PacketExMessagePlayer implements PacketObjectIn<Integer>, PacketObjectOut<Integer> {
     private static HashMap<UUID, Callback<ObjectMap<Integer>>[]> callbacks = new HashMap<UUID, Callback<ObjectMap<Integer>>[]>();
-    private UUID player;
+    private List<UUID> players;
     private List<String> legacy, raw;
     private UUID id;
 
@@ -28,15 +28,14 @@ public class PacketExMessagePlayer implements PacketObjectIn<Integer>, PacketObj
     /**
      * New PacketExMessagePlayer (Out)
      *
-     * @param player Player
+     * @param players Players
      * @param legacy Messages (Legacy)
      * @param raw Messages (JSON)
      * @param callback Callbacks
      */
     @SafeVarargs
-    public PacketExMessagePlayer(UUID player, List<String> legacy, List<String> raw, Callback<ObjectMap<Integer>>... callback) {
-        if (Util.isNull(player, callback)) throw new NullPointerException();
-        this.player = player;
+    public PacketExMessagePlayer(List<UUID> players, List<String> legacy, List<String> raw, Callback<ObjectMap<Integer>>... callback) {
+        this.players = players;
         this.legacy = legacy;
         this.raw = raw;
         this.id = Util.getNew(callbacks.keySet(), UUID::randomUUID);
@@ -47,7 +46,7 @@ public class PacketExMessagePlayer implements PacketObjectIn<Integer>, PacketObj
     public ObjectMap<Integer> send(SubDataClient client) {
         ObjectMap<Integer> data = new ObjectMap<Integer>();
         data.set(0x0000, id);
-        data.set(0x0001, player);
+        if (players != null) data.set(0x0001, players);
         if (legacy != null) data.set(0x0002, legacy);
         if (raw != null) data.set(0x0003, raw);
         return data;

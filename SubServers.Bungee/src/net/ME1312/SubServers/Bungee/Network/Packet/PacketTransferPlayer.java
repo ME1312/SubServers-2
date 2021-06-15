@@ -1,34 +1,34 @@
 package net.ME1312.SubServers.Bungee.Network.Packet;
 
+import net.ME1312.Galaxi.Library.AsyncConsolidator;
+import net.ME1312.Galaxi.Library.Callback.Callback;
+import net.ME1312.Galaxi.Library.Container.Container;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
-import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubData.Server.Protocol.PacketObjectIn;
 import net.ME1312.SubData.Server.Protocol.PacketObjectOut;
 import net.ME1312.SubData.Server.SubDataClient;
+import net.ME1312.SubServers.Bungee.Host.Proxy;
 import net.ME1312.SubServers.Bungee.Host.RemotePlayer;
 import net.ME1312.SubServers.Bungee.Host.Server;
-import net.ME1312.SubServers.Bungee.SubProxy;
+import net.ME1312.SubServers.Bungee.SubAPI;
 
+import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Transfer Player Packet
  */
 public class PacketTransferPlayer implements PacketObjectIn<Integer>, PacketObjectOut<Integer> {
-    private SubProxy plugin;
     private int response;
     private UUID tracker;
 
     /**
      * New PacketTransferPlayer (In)
-     *
-     * @param plugin SubPlugin
      */
-    public PacketTransferPlayer(SubProxy plugin) {
-        if (Util.isNull(plugin)) throw new NullPointerException();
-        this.plugin = plugin;
+    public PacketTransferPlayer() {
+
     }
 
     /**
@@ -53,33 +53,50 @@ public class PacketTransferPlayer implements PacketObjectIn<Integer>, PacketObje
     @Override
     public void receive(SubDataClient client, ObjectMap<Integer> data) {
         UUID tracker = (data.contains(0x0000)?data.getUUID(0x0000):null);
-        try {
-            UUID id =    data.getUUID(0x0001);
+        run(data.getUUIDList(0x0001), data.getRawString(0x0002), i -> {
+            client.sendPacket(new PacketTransferPlayer(i, tracker));
+        });
+    }
 
-            ProxiedPlayer local;
-            RemotePlayer remote;
-            if ((local = plugin.getPlayer(id)) != null) {
-                Server server;
-                if (data.contains(0x0002) && (server = plugin.api.getServer(data.getRawString(0x0002))) != null) {
-                    local.connect(server);
-                    client.sendPacket(new PacketTransferPlayer(0, tracker));
+    public static void run(List<UUID> ids, String name, Callback<Integer> callback) {
+        try {
+            Container<Integer> failures = new Container<>(0);
+            HashMap<Proxy, List<UUID>> requests = new HashMap<Proxy, List<UUID>>();
+            Server server = SubAPI.getInstance().getServer(name);
+            for (UUID id : ids) {
+                ProxiedPlayer local;
+                RemotePlayer remote;
+                if ((local = ProxyServer.getInstance().getPlayer(id)) != null) {
+                    if (name != null) {
+                        local.connect(server);
+                    } else ++failures.value;
+                } else if ((remote = SubAPI.getInstance().getRemotePlayer(id)) != null && remote.getProxy().getSubData()[0] != null) {
+                    Proxy proxy = remote.getProxy();
+                    List<UUID> list = requests.getOrDefault(proxy, new ArrayList<>());
+                    list.add(id);
+                    requests.put(proxy, list);
                 } else {
-                    client.sendPacket(new PacketTransferPlayer(1, tracker));
+                    ++failures.value;
                 }
-            } else if ((remote = plugin.api.getRemotePlayer(id)) != null) {
-                if (remote.getProxy().getSubData()[0] != null) {
-                    ((SubDataClient) remote.getProxy().getSubData()[0]).sendPacket(new PacketExTransferPlayer(remote.getUniqueId(), (data.contains(0x0002)?data.getRawString(0x0002):null), r -> {
-                        client.sendPacket(new PacketTransferPlayer(r.getInt(0x0001), tracker));
-                    }));
-                } else {
-                    client.sendPacket(new PacketTransferPlayer(4, tracker));
-                }
+            }
+
+            if (requests.size() == 0) {
+                callback.run(failures.value);
             } else {
-                client.sendPacket(new PacketTransferPlayer(3, tracker));
+                AsyncConsolidator merge = new AsyncConsolidator(() -> {
+                    callback.run(failures.value);
+                });
+                for (Map.Entry<Proxy, List<UUID>> entry : requests.entrySet()) {
+                    merge.reserve();
+                    ((SubDataClient) entry.getKey().getSubData()[0]).sendPacket(new PacketExTransferPlayer(entry.getValue(), name, r -> {
+                        failures.value += r.getInt(0x0001);
+                        merge.release();
+                    }));
+                }
             }
         } catch (Throwable e) {
-            client.sendPacket(new PacketTransferPlayer(2, tracker));
             e.printStackTrace();
+            callback.run(-1);
         }
     }
 

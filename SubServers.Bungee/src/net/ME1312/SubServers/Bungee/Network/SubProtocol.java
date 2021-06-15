@@ -89,9 +89,9 @@ public class SubProtocol extends SubDataProtocol {
         registerPacket(0x0038, new PacketRemoveServer(plugin));
         registerPacket(0x0039, new PacketDeleteServer(plugin));
       //registerPacket(0x003A, new PacketRestoreServer(plugin)); // TODO
-        registerPacket(0x003B, new PacketTransferPlayer(plugin));
-        registerPacket(0x003C, new PacketDisconnectPlayer(plugin));
-        registerPacket(0x003D, new PacketMessagePlayer(plugin));
+        registerPacket(0x003B, new PacketTransferPlayer());
+        registerPacket(0x003C, new PacketDisconnectPlayer());
+        registerPacket(0x003D, new PacketMessagePlayer());
 
 
      // 50-6F: External Host Packets

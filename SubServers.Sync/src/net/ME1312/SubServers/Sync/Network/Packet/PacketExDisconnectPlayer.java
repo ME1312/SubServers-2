@@ -5,9 +5,11 @@ import net.ME1312.SubData.Client.Protocol.PacketObjectIn;
 import net.ME1312.SubData.Client.Protocol.PacketObjectOut;
 import net.ME1312.SubData.Client.SubDataSender;
 import net.ME1312.SubServers.Sync.ExProxy;
+import net.ME1312.SubServers.Sync.Server.ServerImpl;
 
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -44,25 +46,26 @@ public class PacketExDisconnectPlayer implements PacketObjectIn<Integer>, Packet
         return json;
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public void receive(SubDataSender client, ObjectMap<Integer> data) {
-        UUID tracker = (data.contains(0x0000)?data.getUUID(0x0000):null);
+        UUID tracker =     (data.contains(0x0000)?data.getUUID(0x0000):null);
+        List<UUID> ids = data.getUUIDList(0x0001);
         try {
-            UUID id =    data.getUUID(0x0001);
-
-            ProxiedPlayer local;
-            if ((local = plugin.getPlayer(id)) != null) {
-                if (data.contains(0x0002)) {
-                    local.disconnect(data.getRawString(0x0002));
+            int failures = 0;
+            for (UUID id : ids) {
+                ProxiedPlayer local;
+                if ((local = plugin.getPlayer(id)) != null) {
+                    if (data.contains(0x0002)) {
+                        local.disconnect(data.getRawString(0x0002));
+                    } else local.disconnect();
                 } else {
-                    local.disconnect();
+                    ++failures;
                 }
-                client.sendPacket(new PacketExDisconnectPlayer(0, tracker));
-            } else {
-                client.sendPacket(new PacketExDisconnectPlayer(3, tracker));
             }
+            client.sendPacket(new PacketExDisconnectPlayer(failures, tracker));
         } catch (Throwable e) {
-            client.sendPacket(new PacketExDisconnectPlayer(2, tracker));
+            client.sendPacket(new PacketExDisconnectPlayer(ids.size(), tracker));
             e.printStackTrace();
         }
     }

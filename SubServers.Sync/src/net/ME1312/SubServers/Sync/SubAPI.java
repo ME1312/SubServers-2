@@ -96,14 +96,6 @@ public final class SubAPI extends ClientAPI implements BungeeAPI {
         return new HashMap<UUID, CachedPlayer>(plugin.rPlayers);
     }
 
-    @Override
-    public void getRemotePlayers(Callback<Map<UUID, RemotePlayer>> callback) {
-        super.getRemotePlayers(map -> {
-            map.replaceAll((k, v) -> new CachedPlayer(v));
-            callback.run(map);
-        });
-    }
-
     /**
      * Gets a player on this network by searching across all known proxies (Cached)
      *
@@ -118,11 +110,6 @@ public final class SubAPI extends ClientAPI implements BungeeAPI {
         return null;
     }
 
-    @Override
-    public void getRemotePlayer(String name, Callback<RemotePlayer> callback) {
-        super.getRemotePlayer(name, p -> callback.run(new CachedPlayer(p)));
-    }
-
     /**
      * Gets a player on this network by searching across all known proxies (Cached)
      *
@@ -132,11 +119,6 @@ public final class SubAPI extends ClientAPI implements BungeeAPI {
     public CachedPlayer getRemotePlayer(UUID id) {
         if (Util.isNull(id)) throw new NullPointerException();
         return getRemotePlayers().getOrDefault(id, null);
-    }
-
-    @Override
-    public void getRemotePlayer(UUID id, Callback<RemotePlayer> callback) {
-        super.getRemotePlayer(id, p -> callback.run(new CachedPlayer(p)));
     }
 
     /**

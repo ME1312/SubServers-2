@@ -64,7 +64,7 @@ public class SubServer extends Server {
      * @param raw JSON representation of the SubServer
      */
     SubServer(Host host, ObjectMap<String> raw) {
-        super(host.client, raw);
+        this(host.client, raw);
         this.host = host;
     }
 
