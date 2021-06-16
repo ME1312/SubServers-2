@@ -178,17 +178,13 @@ public class InternalSubCreator extends SubCreator {
             }
 
             if (template.getBuildOptions().contains("Executable")) {
-                File cache;
+                File cache = null;
                 if (template.getBuildOptions().getBoolean("Use-Cache", true)) {
                     cache = new UniversalFile(host.plugin.dir, "SubServers:Cache:Templates:" + template.getName());
                     cache.mkdirs();
-                    String c = cache.toString();
-                    if (System.getProperty("os.name").toLowerCase().startsWith("windows") &&
-                            (template.getBuildOptions().getRawString("Executable").toLowerCase().startsWith("bash ") || template.getBuildOptions().getRawString("Executable").toLowerCase().startsWith("sh "))) c = c.replace(File.separatorChar, '/');
-                    var.put("cache", c);
-                } else {
-                    cache = null;
+                    var.put("cache", cache.getAbsolutePath());
                 }
+                var.put("source", dir.getAbsolutePath());
 
                 try {
                     Logger.get(prefix).info("Launching Build Script...");

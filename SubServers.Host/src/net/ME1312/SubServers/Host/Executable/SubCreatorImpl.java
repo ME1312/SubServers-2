@@ -378,17 +378,13 @@ public class SubCreatorImpl {
             }
 
             if (template.getBuildOptions().contains("Executable")) {
-                File cache;
+                File cache = null;
                 if (template.getBuildOptions().getBoolean("Use-Cache", true)) {
                     cache = new UniversalFile(GalaxiEngine.getInstance().getRuntimeDirectory(), "Cache:Templates:" + template.getName());
                     cache.mkdirs();
-                    String c = cache.toString();
-                    if (System.getProperty("os.name").toLowerCase().startsWith("windows") &&
-                            (template.getBuildOptions().getRawString("Executable").toLowerCase().startsWith("bash ") || template.getBuildOptions().getRawString("Executable").toLowerCase().startsWith("sh "))) c = c.replace(File.separatorChar, '/');
-                    var.put("cache", c);
-                } else {
-                    cache = null;
+                    var.put("cache", cache.getAbsolutePath());
                 }
+                var.put("source", dir.getAbsolutePath());
 
                 try {
                     log.logger.info.println("Launching Build Script...");
