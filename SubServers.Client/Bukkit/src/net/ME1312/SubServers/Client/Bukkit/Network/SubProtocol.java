@@ -118,7 +118,7 @@ public class SubProtocol extends SubDataProtocol {
         log.setUseParentHandlers(false);
         log.addHandler(new Handler() {
             private boolean open = true;
-            private String prefix = "SubData" + ((channel != 0)? "/Sub-"+channel:"");
+            private String prefix = "SubData" + ((channel != 0)?"/+"+channel:"");
 
             @Override
             public void publish(LogRecord record) {

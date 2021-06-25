@@ -136,7 +136,7 @@ public class SubProtocol extends SubDataProtocol {
     }
 
     private Logger getLogger(int channel) {
-        return new net.ME1312.Galaxi.Log.Logger("SubData" + ((channel != 0)?File.separator+"Sub-"+channel:"")).toPrimitive();
+        return new net.ME1312.Galaxi.Log.Logger("SubData" + ((channel != 0)?File.separator+"+"+channel:"")).toPrimitive();
     }
 
     @Override

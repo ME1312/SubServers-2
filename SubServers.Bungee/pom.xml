@@ -85,6 +85,7 @@
                                 <mkdir dir="${project.build.directory}/classes/net/ME1312/SubServers/Bungee/Library/Files/Templates" />
                                 <zip basedir="${basedir}/../SubServers.Creator" destfile="${project.build.directory}/classes/net/ME1312/SubServers/Bungee/Library/Files/Templates/forge.zip" includes="Forge/**" />
                                 <zip basedir="${basedir}/../SubServers.Creator" destfile="${project.build.directory}/classes/net/ME1312/SubServers/Bungee/Library/Files/Templates/paper.zip" includes="Paper/**" />
+                                <zip basedir="${basedir}/../SubServers.Creator" destfile="${project.build.directory}/classes/net/ME1312/SubServers/Bungee/Library/Files/Templates/purpur.zip" includes="Purpur/**" />
                                 <zip basedir="${basedir}/../SubServers.Creator" destfile="${project.build.directory}/classes/net/ME1312/SubServers/Bungee/Library/Files/Templates/spigot.zip" includes="Spigot/**" />
                                 <zip basedir="${basedir}/../SubServers.Creator" destfile="${project.build.directory}/classes/net/ME1312/SubServers/Bungee/Library/Files/Templates/sponge.zip" includes="Sponge/**" />
                                 <zip basedir="${basedir}/../SubServers.Creator" destfile="${project.build.directory}/classes/net/ME1312/SubServers/Bungee/Library/Files/Templates/vanilla.zip" includes="Vanilla/**" />

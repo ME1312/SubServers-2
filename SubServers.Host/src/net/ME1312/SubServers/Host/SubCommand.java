@@ -39,7 +39,7 @@ public class SubCommand {
     private final ExHost host;
 
     private static boolean canRun() {
-        if (SubAPI.getInstance().getSubDataNetwork()[0] == null) {
+        if (SubAPI.getInstance().getSubDataNetwork()[0] == null || SubAPI.getInstance().getSubDataNetwork()[0].isClosed()) {
             throw new IllegalStateException("SubData is not connected");
         } else {
             return true;

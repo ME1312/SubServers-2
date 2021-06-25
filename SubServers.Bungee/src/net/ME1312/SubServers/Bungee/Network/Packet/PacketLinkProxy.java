@@ -76,7 +76,7 @@ public class PacketLinkProxy implements InitialPacket, PacketObjectIn<Integer>, 
             if (!subdata.keySet().contains(channel) || (channel == 0 && subdata.get(0) == null)) {
                 proxy.setSubData(client, channel);
                 if (isnew) plugin.getPluginManager().callEvent(new SubAddProxyEvent(proxy));
-                Logger.get("SubData").info(client.getAddress().toString() + " has been defined as Proxy: " + proxy.getName() + ((channel > 0)?" (Sub-"+channel+")":""));
+                Logger.get("SubData").info(client.getAddress().toString() + " has been defined as Proxy: " + proxy.getName() + ((channel > 0)?" [+"+channel+"]":""));
                 queue(proxy.getName(), () -> client.sendPacket(new PacketLinkProxy(proxy.getName(), 0, null)));
                 setReady(client);
             } else {

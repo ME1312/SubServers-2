@@ -107,7 +107,7 @@ public class PacketLinkServer implements InitialPacket, PacketObjectIn<Integer>,
         HashMap<Integer, SubDataClient> subdata = Util.getDespiteException(() -> Util.reflect(ServerImpl.class.getDeclaredField("subdata"), server), null);
         if (!subdata.keySet().contains(channel) || (channel == 0 && subdata.get(0) == null)) {
             server.setSubData(client, channel);
-            Logger.get("SubData").info(client.getAddress().toString() + " has been defined as " + ((server instanceof SubServer) ? "SubServer" : "Server") + ": " + server.getName() + ((channel > 0)?" (Sub-"+channel+")":""));
+            Logger.get("SubData").info(client.getAddress().toString() + " has been defined as " + ((server instanceof SubServer) ? "SubServer" : "Server") + ": " + server.getName() + ((channel > 0)?" [+"+channel+"]":""));
             Runnable register = () -> {
                 if (server instanceof SubServer && !((SubServer) server).isRunning()) {
                     if (((SubServer) server).getHost().isAvailable()) {

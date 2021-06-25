@@ -72,7 +72,7 @@ public final class ExProxy extends BungeeCommon implements Listener {
     public final Plugin plugin;
     public final SubAPI api = new SubAPI(this);
     public SubProtocol subprotocol;
-    public static final Version version = Version.fromString("2.17b/p1");
+    public static final Version version = Version.fromString("2.17.1a");
 
     public final boolean isPatched;
     public long lastReload = -1;

@@ -128,7 +128,7 @@ public class SubProtocol extends SubDataProtocol {
     }
 
     private Logger getLogger(int channel) {
-        return net.ME1312.SubServers.Bungee.Library.Compatibility.Logger.get("SubData" + ((channel != 0)? "/Sub-"+channel:""));
+        return net.ME1312.SubServers.Bungee.Library.Compatibility.Logger.get("SubData" + ((channel != 0)?"/+"+channel:""));
     }
 
     @Override

@@ -36,6 +36,7 @@ public class PacketExUploadTemplates implements PacketIn, PacketObjectOut<Intege
         for (SubCreatorImpl.ServerTemplate template : host.templates.values()) {
             ObjectMap<String> tinfo = new ObjectMap<String>();
             tinfo.set("enabled", template.isEnabled());
+            tinfo.set("internal", template.isInternal());
             tinfo.set("display", template.getDisplayName());
             tinfo.set("icon", template.getIcon());
             tinfo.set("build", template.getBuildOptions().clone());
@@ -54,6 +55,6 @@ public class PacketExUploadTemplates implements PacketIn, PacketObjectOut<Intege
 
     @Override
     public int version() {
-        return 0x0001;
+        return 0x0002;
     }
 }

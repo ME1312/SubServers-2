@@ -71,7 +71,7 @@ public class ExternalSubCreator extends SubCreator {
             try {
                 if (file.isDirectory() && !file.getName().endsWith(".x")) {
                     ObjectMap<String> config = (new UniversalFile(file, "template.yml").exists())?new YAMLConfig(new UniversalFile(file, "template.yml")).get().getMap("Template", new ObjectMap<String>()):new ObjectMap<String>();
-                    ServerTemplate template = loadTemplate(file.getName(), config.getBoolean("Enabled", true), config.getRawString("Icon", "::NULL::"), file, config.getMap("Build", new ObjectMap<String>()), config.getMap("Settings", new ObjectMap<String>()));
+                    ServerTemplate template = loadTemplate(file.getName(), config.getBoolean("Enabled", true), config.getBoolean("Internal", false), config.getRawString("Icon", "::NULL::"), file, config.getMap("Build", new ObjectMap<String>()), config.getMap("Settings", new ObjectMap<String>()));
                     templatesR.put(file.getName().toLowerCase(), template);
                     if (config.getKeys().contains("Display")) template.setDisplayName(config.getString("Display"));
                 }
@@ -82,7 +82,6 @@ public class ExternalSubCreator extends SubCreator {
         }
 
         if (host.available && !Util.getDespiteException(() -> Util.reflect(SubProxy.class.getDeclaredField("reloading"), host.plugin), false)) {
-            host.queue(new PacketExConfigureHost(host.plugin, host));
             host.queue(new PacketExUploadTemplates(host.plugin));
             if (enableRT == null || enableRT) host.queue(new PacketExDownloadTemplates(host.plugin, host));
         }
@@ -115,7 +114,6 @@ public class ExternalSubCreator extends SubCreator {
                 logger.start();
                 host.queue(new PacketExCreateServer(player, name, template, version, port, logger.getExternalAddress(), data -> {
                     finish(player, null, name, template, version, fport, prefix, origin, data, callback);
-                    logger.stop();
                     this.thread.remove(name.toLowerCase());
                 }));
                 return true;
@@ -156,7 +154,6 @@ public class ExternalSubCreator extends SubCreator {
                         ((ExternalSubServer) server).updating(false);
                         if (callback != null) callback.run(s != null);
                     });
-                    logger.stop();
                     this.thread.remove(name.toLowerCase());
                 }));
                 return true;
@@ -334,14 +331,26 @@ public class ExternalSubCreator extends SubCreator {
     @Override
     public Map<String, ServerTemplate> getTemplates() {
         TreeMap<String, ServerTemplate> map = new TreeMap<String, ServerTemplate>();
-        if (enableRT != null && enableRT) map.putAll(templatesR);
-        map.putAll(templates);
+        if (enableRT != null && enableRT) for (Map.Entry<String, ServerTemplate> template : templatesR.entrySet()) {
+            if (!template.getValue().isInternal()) map.put(template.getKey(), template.getValue());
+        }
+        for (Map.Entry<String, ServerTemplate> template : templates.entrySet()) {
+            if (!template.getValue().isInternal()) map.put(template.getKey(), template.getValue());
+        }
         return map;
     }
 
     @Override
     public ServerTemplate getTemplate(String name) {
         if (Util.isNull(name)) throw new NullPointerException();
-        return getTemplates().get(name.toLowerCase());
+        name = name.toLowerCase();
+
+        ServerTemplate template = templates.getOrDefault(name, null);
+        if (template == null && enableRT != null && enableRT) template = templatesR.getOrDefault(name, null);
+        if (template == null || template.isInternal()) {
+            return null;
+        } else {
+            return template;
+        }
     }
 }

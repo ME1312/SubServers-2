@@ -139,7 +139,7 @@ public final class SubCommand implements CommandExecutor {
     }
 
     private boolean canRun(CommandSource sender, boolean permitted) throws CommandException {
-        if (SubAPI.getInstance().getSubDataNetwork()[0] == null) {
+        if (SubAPI.getInstance().getSubDataNetwork()[0] == null || plugin.api.getSubDataNetwork()[0].isClosed()) {
             throw new CommandException(Text.builder("An exception has occurred while running this command").color(TextColors.RED).build(), new IllegalStateException("SubData is not connected"), false);
         } else if (plugin.lang == null) {
             throw new CommandException(Text.builder("An exception has occurred while running this command").color(TextColors.RED).build(), new IllegalStateException("There are no lang options available at this time"), false);

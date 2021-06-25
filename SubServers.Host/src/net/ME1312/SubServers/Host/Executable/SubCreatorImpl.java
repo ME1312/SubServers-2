@@ -46,6 +46,7 @@ public class SubCreatorImpl {
         private String name;
         private String nick = null;
         private boolean enabled;
+        private boolean internal;
         private String icon;
         private File directory;
         private ServerType type;
@@ -63,14 +64,15 @@ public class SubCreatorImpl {
          * @param options Configuration Options
          */
         public ServerTemplate(String name, boolean enabled, String icon, File directory, ObjectMap<String> build, ObjectMap<String> options) {
-            this(name, enabled, icon, directory, build, options, true);
+            this(name, enabled, false, icon, directory, build, options, true);
         }
 
-        private ServerTemplate(String name, boolean enabled, String icon, File directory, ObjectMap<String> build, ObjectMap<String> options, boolean dynamic) {
+        private ServerTemplate(String name, boolean enabled, boolean internal, String icon, File directory, ObjectMap<String> build, ObjectMap<String> options, boolean dynamic) {
             super(toRaw(name, enabled, icon, directory, build, options));
             if (name.contains(" ")) throw new InvalidTemplateException("Template names cannot have spaces: " + name);
             this.name = name;
             this.enabled = enabled;
+            this.internal = internal;
             this.icon = icon;
             this.directory = directory;
             this.type = (build.contains("Server-Type"))?ServerType.valueOf(build.getRawString("Server-Type").toUpperCase()):ServerType.CUSTOM;
@@ -126,6 +128,15 @@ public class SubCreatorImpl {
          */
         public void setEnabled(boolean value) {
             enabled = value;
+        }
+
+        /**
+         * Get if this Template is for Internal use only
+         *
+         * @return Internal Status
+         */
+        public boolean isInternal() {
+            return internal;
         }
 
         /**
@@ -237,7 +248,7 @@ public class SubCreatorImpl {
                 try {
                     if (file.isDirectory() && !file.getName().endsWith(".x")) {
                         ObjectMap<String> config = (new UniversalFile(file, "template.yml").exists())?new YAMLConfig(new UniversalFile(file, "template.yml")).get().getMap("Template", new ObjectMap<String>()):new ObjectMap<String>();
-                        ServerTemplate template = new ServerTemplate(file.getName(), config.getBoolean("Enabled", true), config.getRawString("Icon", "::NULL::"), file, config.getMap("Build", new ObjectMap<String>()), config.getMap("Settings", new ObjectMap<String>()), false);
+                        ServerTemplate template = new ServerTemplate(file.getName(), config.getBoolean("Enabled", true), config.getBoolean("Internal", false), config.getRawString("Icon", "::NULL::"), file, config.getMap("Build", new ObjectMap<String>()), config.getMap("Settings", new ObjectMap<String>()), false);
                         templates.put(file.getName().toLowerCase(), template);
                         if (config.getKeys().contains("Display")) template.setDisplayName(config.getString("Display"));
                     }
@@ -294,35 +305,24 @@ public class SubCreatorImpl {
                     if (templates.get(other.toLowerCase()).isEnabled()) {
                         if (version != null || !templates.get(other.toLowerCase()).requiresVersion()) {
                             if (update == null || templates.get(other.toLowerCase()).canUpdate()) {
-                                ObjectMap<String> config = build(dir, templates.get(other.toLowerCase()), history);
-                                if (config == null) {
-                                    throw new SubCreatorException();
-                                } else {
-                                    server.setAll(config);
-                                }
+                                server.setAll(this.build(dir, templates.get(other.toLowerCase()), history));
                             } else {
                                 log.logger.warn.println("Skipping template that cannot be run in update mode: " + other);
-                                ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketOutExLogMessage(address, "Skipping template that cannot be run in update mode: " + other));
                             }
                         } else {
                             log.logger.warn.println("Skipping template that requires extra versioning information: " + other);
-                            ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketOutExLogMessage(address, "Skipping template that requires extra versioning information: " + other));
                         }
                     } else {
                         log.logger.warn.println("Skipping disabled template: " + other);
-                        ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketOutExLogMessage(address, "Skipping disabled template: " + other));
                     }
                 } else {
                     log.logger.warn.println("Skipping missing template: " + other);
-                    ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketOutExLogMessage(address, "Skipping missing template: " + other));
                 }
             }
             server.setAll(template.getConfigOptions());
             try {
                 log.logger.info.println("Loading" + ((template.isDynamic())?" Dynamic":"") + " Template: " + template.getDisplayName());
-                ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketOutExLogMessage(address, "Loading Template: " + template.getDisplayName()));
-                if (template.getBuildOptions().getBoolean("Update-Files", false)) updateDirectory(template.getDirectory(), dir);
-                else Util.copyDirectory(template.getDirectory(), dir);
+                updateDirectory(template.getDirectory(), dir, template.getBuildOptions().getBoolean("Update-Files", false));
 
                 for (ObjectMapValue<String> replacement : template.getBuildOptions().getMap("Replacements", new ObjectMap<>()).getValues()) if (!replacement.isNull()) {
                     replacements.put(replacement.getHandle().toLowerCase().replace('-', '_').replace(' ', '_'), replacement.asRawString());
@@ -346,7 +346,6 @@ public class SubCreatorImpl {
                     case FORGE:
                         if (version != null) {
                             log.logger.info.println("Searching Versions...");
-                            ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketOutExLogMessage(address, "Searching Versions..."));
                             YAMLSection spversionmanifest = new YAMLSection(new JSONObject("{\"versions\":" + Util.readAll(new BufferedReader(new InputStreamReader(new URL("https://dl-api.spongepowered.org/v1/org.spongepowered/sponge" + ((template.getType() == ServerType.FORGE)?"forge":"vanilla") + "/downloads?type=stable&minecraft=" + version).openStream(), Charset.forName("UTF-8")))) + '}'));
 
                             ObjectMap<String> spprofile = null;
@@ -357,15 +356,12 @@ public class SubCreatorImpl {
                                     spversion = new Version(profile.getRawString("version"));
                                 }
                             }
-                            if (spversion == null)
-                                throw new InvalidServerException("Cannot find Sponge version for Minecraft " + version.toString());
+                            if (spversion == null) throw new InvalidServerException("Cannot find Sponge version for Minecraft " + version.toString());
                             log.logger.info.println("Found \"sponge" + ((template.getType() == ServerType.FORGE)?"forge":"vanilla") + "-" + spversion.toString() + '"');
-                            ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketOutExLogMessage(address, "Found \"sponge" + ((template.getType() == ServerType.FORGE)?"forge":"vanilla") + "-" + spversion.toString() + '"'));
 
                             if (template.getType() == ServerType.FORGE) {
                                 Version mcfversion = new Version(((spprofile.getMap("dependencies").getRawString("forge").contains("-"))?"":spprofile.getMap("dependencies").getRawString("minecraft") + '-') + spprofile.getMap("dependencies").getRawString("forge"));
                                 log.logger.info.println("Found \"forge-" + mcfversion.toString() + '"');
-                                ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketOutExLogMessage(address, "Found \"forge-" + mcfversion.toString() + '"'));
 
                                 var.put("mcf_version", mcfversion.toString());
                             }
@@ -388,7 +384,6 @@ public class SubCreatorImpl {
 
                 try {
                     log.logger.info.println("Launching Build Script...");
-                    ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketOutExLogMessage(address, "Launching Build Script..."));
                     ProcessBuilder pb = new ProcessBuilder().command(Executable.parse(host.host.getRawString("Git-Bash"), template.getBuildOptions().getRawString("Executable"))).directory(dir);
                     pb.environment().putAll(var);
                     process = pb.start();
@@ -436,7 +431,6 @@ public class SubCreatorImpl {
             declaration.run();
             File dir = (update != null)?new File(update.getFullPath()):new File(host.host.getRawString("Directory"),
                     (template.getConfigOptions().contains("Directory"))?new ReplacementScanner(replacements).replace(template.getConfigOptions().getRawString("Directory")).toString():name);
-            dir.mkdirs();
 
             ObjectMap<String> config;
             try {
@@ -587,23 +581,21 @@ public class SubCreatorImpl {
         }
     }
 
-    private void updateDirectory(File from, File to) {
-        if (from.isDirectory() && !Files.isSymbolicLink(from.toPath())) {
-            if (!to.exists()) {
-                to.mkdirs();
-            }
-
+    private void updateDirectory(File from, File to, boolean overwrite) {
+        if (!to.exists()) {
+            Util.copyDirectory(from, to);
+        } else if (from.isDirectory() && !Files.isSymbolicLink(from.toPath())) {
             String files[] = from.list();
 
             for (String file : files) {
                 File srcFile = new File(from, file);
                 File destFile = new File(to, file);
 
-                updateDirectory(srcFile, destFile);
+                updateDirectory(srcFile, destFile, overwrite);
             }
         } else {
             try {
-                if (!to.exists() || from.length() != to.length() || !Arrays.equals(generateSHA256(to), generateSHA256(from))) {
+                if (overwrite && (from.length() != to.length() || !Arrays.equals(generateSHA256(to), generateSHA256(from)))) {
                     if (to.exists()) {
                         if (to.isDirectory()) Util.deleteDirectory(to);
                         else to.delete();

@@ -1,8 +1,10 @@
 package net.ME1312.SubServers.Host.Executable;
 
 import net.ME1312.Galaxi.Library.Callback.Callback;
+import net.ME1312.Galaxi.Library.Container.ContainedPair;
 import net.ME1312.Galaxi.Library.Container.Pair;
 import net.ME1312.Galaxi.Library.Container.Value;
+import net.ME1312.Galaxi.Log.LogFilter;
 import net.ME1312.Galaxi.Log.LogStream;
 import net.ME1312.Galaxi.Log.Logger;
 import net.ME1312.Galaxi.Library.Util;
@@ -15,10 +17,12 @@ import net.ME1312.SubServers.Host.Network.Packet.PacketOutExLogMessage;
 import net.ME1312.SubServers.Host.SubAPI;
 
 import java.io.*;
+import java.util.LinkedList;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -36,6 +40,7 @@ public class SubLoggerImpl {
     static boolean logc = true;
     File file;
     private SubDataClient channel = null;
+    private LinkedList<Pair<String, String>> ccache = null;
     private PrintWriter writer = null;
     private boolean started = false;
     private Thread out = null;
@@ -59,6 +64,25 @@ public class SubLoggerImpl {
         this.address = address;
         this.log = log;
         this.file = file;
+
+        logger.addFilter((stream, message) -> {
+            // Log to NETWORK
+            if (logn) {
+                if (this.address != null && channel != null && !channel.isClosed()) {
+                    if (ccache != null) {
+                        for (Pair<String, String> val : ccache) channel.sendPacket(new PacketOutExLogMessage(this.address, val.key(), val.value()));
+                        ccache = null;
+                    }
+                    channel.sendPacket(new PacketOutExLogMessage(this.address, stream.getLevel().getName(), message));
+                } else {
+                    if (ccache == null) ccache = new LinkedList<Pair<String, String>>();
+                    ccache.add(new ContainedPair<>(stream.getLevel().getName(), message));
+                }
+            }
+
+            // Log to CONSOLE
+            return logc || !started;
+        });
     }
 
     /**
@@ -131,6 +155,7 @@ public class SubLoggerImpl {
         }
     }
 
+    private static final String PATTERN = "^((?:\\s*\\[?([0-9]{2}:[0-9]{2}:[0-9]{2})]?)?[\\s\\/\\\\\\|]*(?:\\[|\\[.*\\/)?(MESSAGE|MSG|" + Pattern.quote(Level.INFO.getLocalizedName()) + "|INFO|" + Pattern.quote(Level.WARNING.getLocalizedName()) + "|WARNING|WARN|ERROR|ERR|" + Pattern.quote(Level.SEVERE.getLocalizedName()) + "|SEVERE)\\]?:?(?:\\s*>)?\\s*)";
     private void log(String line) {
         if (!line.startsWith(">")) {
             String msg = line;
@@ -138,15 +163,19 @@ public class SubLoggerImpl {
 
             // REGEX Formatting
             String type = "";
-            Matcher matcher = Pattern.compile("^((?:\\s*\\[?([0-9]{2}:[0-9]{2}:[0-9]{2})]?)?[\\s\\/\\\\\\|]*(?:\\[|\\[.*\\/)?(MESSAGE|INFO|WARNING|WARN|ERROR|ERR|SEVERE)\\]?:?(?:\\s*>)?\\s*)").matcher(msg.replaceAll("\u001B\\[[;\\d]*m", ""));
+            Matcher matcher = Pattern.compile(PATTERN).matcher(msg.replaceAll("\u001B\\[[;\\d]*m", ""));
             while (matcher.find()) {
                 type = matcher.group(3).toUpperCase();
             }
 
-            msg = msg.replaceAll("^((?:\\s*\\[?([0-9]{2}:[0-9]{2}:[0-9]{2})]?)?[\\s\\/\\\\\\|]*(?:\\[|\\[.*\\/)?(MESSAGE|INFO|WARNING|WARN|ERROR|ERR|SEVERE)\\]?:?(?:\\s*>)?\\s*)", "");
+            msg = msg.replaceAll(PATTERN, "");
 
             // Determine LOG LEVEL
-            switch (type) {
+            if (type.equalsIgnoreCase(Level.WARNING.getLocalizedName())) {
+                level = logger.warn;
+            } else if (type.equalsIgnoreCase(Level.SEVERE.getLocalizedName())) {
+                level = logger.severe;
+            } else switch (type) {
                 case "WARNING":
                 case "WARN":
                     level = logger.warn;
@@ -158,15 +187,16 @@ public class SubLoggerImpl {
                 case "ERR":
                     level = logger.error;
                     break;
+                case "MSG":
+                case "MESSAGE":
+                    level = logger.message;
+                    break;
                 default:
                     level = logger.info;
             }
 
-            // Log to NETWORK
-            if (log.value() && channel != null && !channel.isClosed()) channel.sendPacket(new PacketOutExLogMessage(address, line));
-
-            // Log to CONSOLE
-            if (log.value() && logc) level.println(TextColor.convertColor(msg));
+            // Log to FILTER
+            if (log.value()) level.println(TextColor.convertColor(msg));
 
             // Log to FILE
             if (writer != null) {
@@ -202,7 +232,7 @@ public class SubLoggerImpl {
                 }
             }
             if (channel != null && !channel.isClosed()) {
-                channel.sendPacket(new PacketOutExLogMessage(address, true));
+                channel.sendPacket(new PacketOutExLogMessage(address));
             }
             channel = null;
         }

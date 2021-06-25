@@ -63,7 +63,7 @@ public final class SubCommand extends Command implements TabExecutor {
     @Override
     public void execute(CommandSender sender, String[] args) {
         if (!(sender instanceof ProxiedPlayer)) {
-            if (plugin.api.getSubDataNetwork()[0] == null) {
+            if (plugin.api.getSubDataNetwork()[0] == null || plugin.api.getSubDataNetwork()[0].isClosed()) {
                 new IllegalStateException("SubData is not connected").printStackTrace();
                 if (!(sender instanceof ConsoleCommandSender)) sender.sendMessage(ChatColor.RED + "An exception has occurred while running this command");
             } else {

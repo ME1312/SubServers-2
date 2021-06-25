@@ -65,7 +65,7 @@ public class PacketLinkExHost implements InitialPacket, PacketObjectIn<Integer>,
                     HashMap<Integer, SubDataClient> subdata = Util.getDespiteException(() -> Util.reflect(ExternalHost.class.getDeclaredField("subdata"), host), null);
                     if (!subdata.keySet().contains(channel) || (channel == 0 && subdata.get(0) == null)) {
                         ((ExternalHost) host).setSubData(client, channel);
-                        Logger.get("SubData").info(client.getAddress().toString() + " has been defined as Host: " + host.getName() + ((channel > 0)?" (Sub-"+channel+")":""));
+                        Logger.get("SubData").info(client.getAddress().toString() + " has been defined as Host: " + host.getName() + ((channel > 0)?" [+"+channel+"]":""));
                         queue(host.getName(), () -> client.sendPacket(new PacketLinkExHost(0, null)));
                         setReady(client);
                     } else {

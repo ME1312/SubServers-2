@@ -90,7 +90,7 @@ public final class SubProxy extends BungeeCommon implements Listener {
     public SubProtocol subprotocol;
     public SubDataServer subdata = null;
     public SubServer sudo = null;
-    public static final Version version = Version.fromString("2.17b/p1");
+    public static final Version version = Version.fromString("2.17.1a");
 
     public final Proxy mProxy;
     public boolean canSudo = false;
@@ -146,6 +146,9 @@ public final class SubProxy extends BungeeCommon implements Listener {
             Util.unzip(SubProxy.class.getResourceAsStream("/net/ME1312/SubServers/Bungee/Library/Files/Templates/paper.zip"), new UniversalFile(dir, "Templates"));
             Logger.get("SubServers").info("Created ./SubServers/Templates/Paper");
 
+            Util.unzip(SubProxy.class.getResourceAsStream("/net/ME1312/SubServers/Bungee/Library/Files/Templates/purpur.zip"), new UniversalFile(dir, "Templates"));
+            Logger.get("SubServers").info("Created ./SubServers/Templates/Purpur");
+
             Util.unzip(SubProxy.class.getResourceAsStream("/net/ME1312/SubServers/Bungee/Library/Files/Templates/forge.zip"), new UniversalFile(dir, "Templates"));
             Logger.get("SubServers").info("Created ./SubServers/Templates/Forge");
 
@@ -169,6 +172,11 @@ public final class SubProxy extends BungeeCommon implements Listener {
                 Files.move(new UniversalFile(dir, "Templates:Paper").toPath(), new UniversalFile(dir, "Templates:Paper." + stamp + ".x").toPath());
                 Util.unzip(SubProxy.class.getResourceAsStream("/net/ME1312/SubServers/Bungee/Library/Files/Templates/paper.zip"), new UniversalFile(dir, "Templates"));
                 Logger.get("SubServers").info("Updated ./SubServers/Templates/Paper");
+            }
+            if (new UniversalFile(dir, "Templates:Purpur:template.yml").exists() && ((new YAMLConfig(new UniversalFile(dir, "Templates:Purpur:template.yml"))).get().getVersion("Version", version)).compareTo(version) != 0) {
+                Files.move(new UniversalFile(dir, "Templates:Purpur").toPath(), new UniversalFile(dir, "Templates:Purpur." + stamp + ".x").toPath());
+                Util.unzip(SubProxy.class.getResourceAsStream("/net/ME1312/SubServers/Bungee/Library/Files/Templates/purpur.zip"), new UniversalFile(dir, "Templates"));
+                Logger.get("SubServers").info("Updated ./SubServers/Templates/Purpur");
             }
             if (new UniversalFile(dir, "Templates:Forge:template.yml").exists() && ((new YAMLConfig(new UniversalFile(dir, "Templates:Forge:template.yml"))).get().getVersion("Version", version)).compareTo(version) != 0) {
                 Files.move(new UniversalFile(dir, "Templates:Forge").toPath(), new UniversalFile(dir, "Templates:Forge." + stamp + ".x").toPath());

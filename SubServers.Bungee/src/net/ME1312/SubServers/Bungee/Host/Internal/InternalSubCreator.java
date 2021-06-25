@@ -102,30 +102,24 @@ public class InternalSubCreator extends SubCreator {
                     if (templates.get(other.toLowerCase()).isEnabled()) {
                         if (version != null || !templates.get(other.toLowerCase()).requiresVersion()) {
                             if (update == null || templates.get(other.toLowerCase()).canUpdate()) {
-                                ObjectMap<String> config = build(dir, templates.get(other.toLowerCase()), history);
-                                if (config == null) {
-                                    throw new SubCreatorException();
-                                } else {
-                                    server.setAll(config);
-                                }
+                                server.setAll(this.build(dir, templates.get(other.toLowerCase()), history));
                             } else {
-                                Logger.get(prefix).info("Skipping template that cannot be run in update mode: " + other);
+                                Logger.get(prefix).warning("Skipping template that cannot be run in update mode: " + other);
                             }
                         } else {
-                            Logger.get(prefix).info("Skipping template that requires extra versioning information: " + other);
+                            Logger.get(prefix).warning("Skipping template that requires extra versioning information: " + other);
                         }
                     } else {
-                        Logger.get(prefix).info("Skipping disabled template: " + other);
+                        Logger.get(prefix).warning("Skipping disabled template: " + other);
                     }
                 } else {
-                    Logger.get(prefix).info("Skipping missing template: " + other);
+                    Logger.get(prefix).warning("Skipping missing template: " + other);
                 }
             }
             server.setAll(template.getConfigOptions());
             try {
                 Logger.get(prefix).info("Loading" + ((template.isDynamic())?" Dynamic":"") + " Template: " + template.getDisplayName());
-                if (template.getBuildOptions().getBoolean("Update-Files", false)) updateDirectory(template.getDirectory(), dir);
-                else Util.copyDirectory(template.getDirectory(), dir);
+                updateDirectory(template.getDirectory(), dir, template.getBuildOptions().getBoolean("Update-Files", false));
 
                 for (ObjectMapValue<String> replacement : template.getBuildOptions().getMap("Replacements", new ObjectMap<>()).getValues()) if (!replacement.isNull()) {
                     replacements.put(replacement.getHandle().toLowerCase().replace('-', '_').replace(' ', '_'), replacement.asRawString());
@@ -235,7 +229,6 @@ public class InternalSubCreator extends SubCreator {
             declaration.run();
             File dir = (update != null)?new File(update.getFullPath()):new File(host.getPath(),
                     (template.getConfigOptions().contains("Directory"))?new ReplacementScanner(replacements).replace(template.getConfigOptions().getRawString("Directory")).toString():name);
-            dir.mkdirs();
 
             ObjectMap<String> server = new ObjectMap<String>();
             ObjectMap<String> config;
@@ -366,7 +359,7 @@ public class InternalSubCreator extends SubCreator {
                 try {
                     if (file.isDirectory() && !file.getName().endsWith(".x")) {
                         ObjectMap<String> config = (new UniversalFile(file, "template.yml").exists()) ? new YAMLConfig(new UniversalFile(file, "template.yml")).get().getMap("Template", new ObjectMap<String>()) : new ObjectMap<String>();
-                        ServerTemplate template = loadTemplate(file.getName(), config.getBoolean("Enabled", true), config.getRawString("Icon", "::NULL::"), file, config.getMap("Build", new ObjectMap<String>()), config.getMap("Settings", new ObjectMap<String>()));
+                        ServerTemplate template = loadTemplate(file.getName(), config.getBoolean("Enabled", true), config.getBoolean("Internal", false), config.getRawString("Icon", "::NULL::"), file, config.getMap("Build", new ObjectMap<String>()), config.getMap("Settings", new ObjectMap<String>()));
                         templates.put(file.getName().toLowerCase(), template);
                         if (config.getKeys().contains("Display")) template.setDisplayName(config.getString("Display"));
                     }
@@ -550,13 +543,23 @@ public class InternalSubCreator extends SubCreator {
 
     @Override
     public Map<String, ServerTemplate> getTemplates() {
-        return new TreeMap<String, ServerTemplate>(templates);
+        TreeMap<String, ServerTemplate> map = new TreeMap<String, ServerTemplate>();
+        for (Map.Entry<String, ServerTemplate> template : templates.entrySet()) {
+            if (!template.getValue().isInternal()) map.put(template.getKey(), template.getValue());
+        }
+        return map;
     }
 
     @Override
     public ServerTemplate getTemplate(String name) {
         if (Util.isNull(name)) throw new NullPointerException();
-        return getTemplates().get(name.toLowerCase());
+
+        ServerTemplate template = templates.getOrDefault(name.toLowerCase(), null);
+        if (template == null || template.isInternal()) {
+            return null;
+        } else {
+            return template;
+        }
     }
 
     private static Pair<YAMLSection, Map<String, Object>> subdata = null;
@@ -598,23 +601,21 @@ public class InternalSubCreator extends SubCreator {
         }
     }
 
-    private void updateDirectory(File from, File to) {
-        if (from.isDirectory() && !Files.isSymbolicLink(from.toPath())) {
-            if (!to.exists()) {
-                to.mkdirs();
-            }
-
+    private void updateDirectory(File from, File to, boolean overwrite) {
+        if (!to.exists()) {
+            Util.copyDirectory(from, to);
+        } else if (from.isDirectory() && !Files.isSymbolicLink(from.toPath())) {
             String files[] = from.list();
 
             for (String file : files) {
                 File srcFile = new File(from, file);
                 File destFile = new File(to, file);
 
-                updateDirectory(srcFile, destFile);
+                updateDirectory(srcFile, destFile, overwrite);
             }
         } else {
             try {
-                if (!to.exists() || from.length() != to.length() || !Arrays.equals(generateSHA256(to), generateSHA256(from))) {
+                if (overwrite && (from.length() != to.length() || !Arrays.equals(generateSHA256(to), generateSHA256(from)))) {
                     if (to.exists()) {
                         if (to.isDirectory()) Util.deleteDirectory(to);
                         else to.delete();

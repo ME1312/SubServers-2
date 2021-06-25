@@ -119,7 +119,7 @@ public class SubProtocol extends SubDataProtocol {
         Logger log = Logger.getAnonymousLogger();
         log.setUseParentHandlers(false);
         log.addHandler(new Handler() {
-            private org.slf4j.Logger log = LoggerFactory.getLogger("SubData" + ((channel != 0)? "/Sub-"+channel:""));
+            private org.slf4j.Logger log = LoggerFactory.getLogger("SubData" + ((channel != 0)? "/+"+channel:""));
             private boolean open = true;
 
             @Override

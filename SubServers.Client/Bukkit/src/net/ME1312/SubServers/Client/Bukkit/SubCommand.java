@@ -52,7 +52,7 @@ public final class SubCommand extends Command {
     @Override
     public boolean execute(CommandSender sender, String label, String[] args) {
         label = "/" + label;
-        if (plugin.api.getSubDataNetwork()[0] == null) {
+        if (plugin.api.getSubDataNetwork()[0] == null || plugin.api.getSubDataNetwork()[0].isClosed()) {
             new IllegalStateException("SubData is not connected").printStackTrace();
             if (!(sender instanceof ConsoleCommandSender)) sender.sendMessage(ChatColor.RED + "An exception has occurred while running this command");
         } else if (plugin.lang == null) {

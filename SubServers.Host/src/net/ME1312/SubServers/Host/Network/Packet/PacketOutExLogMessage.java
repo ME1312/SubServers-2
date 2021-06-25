@@ -11,14 +11,15 @@ import java.util.UUID;
  */
 public class PacketOutExLogMessage implements PacketObjectOut<Integer> {
     private UUID address;
-    private String line;
+    private String level, line;
     private boolean terminate;
 
     /**
      * New PacketInExLogMessage (Out)
      */
-    public PacketOutExLogMessage(UUID address, String line) {
+    public PacketOutExLogMessage(UUID address, String level, String line) {
         this.address = address;
+        this.level = level;
         this.line = line;
         this.terminate = false;
     }
@@ -26,10 +27,9 @@ public class PacketOutExLogMessage implements PacketObjectOut<Integer> {
     /**
      * New PacketInExLogMessage (Out)
      */
-    public PacketOutExLogMessage(UUID address, boolean terminate) {
+    public PacketOutExLogMessage(UUID address) {
         this.address = address;
-        this.line = null;
-        this.terminate = terminate;
+        this.terminate = true;
     }
 
     @Override
@@ -38,12 +38,13 @@ public class PacketOutExLogMessage implements PacketObjectOut<Integer> {
 
         ObjectMap<Integer> data = new ObjectMap<Integer>();
         data.set(0x0000, address);
-        if (line != null) data.set(0x0001, line);
+        if (level != null) data.set(0x0001, level);
+        if (line != null)  data.set(0x0002, line);
         return data;
     }
 
     @Override
     public int version() {
-        return 0x0001;
+        return 0x0002;
     }
 }

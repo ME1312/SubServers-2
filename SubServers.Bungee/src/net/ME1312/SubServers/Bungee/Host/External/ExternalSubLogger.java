@@ -13,7 +13,9 @@ import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -72,29 +74,17 @@ public class ExternalSubLogger extends SubLogger {
     }
 
     @SuppressWarnings("deprecation")
-    private void log(String line) {
+    private void log(String type, String msg) {
         if (started) {
-            String msg = line;
             Level level;
-
-            // REGEX Formatting
-            String type = "";
-            Matcher matcher = Pattern.compile("^((?:\\s*\\[?([0-9]{2}:[0-9]{2}:[0-9]{2})]?)?[\\s\\/\\\\\\|]*(?:\\[|\\[.*\\/)?(MESSAGE|INFO|WARNING|WARN|ERROR|ERR|SEVERE)\\]?:?(?:\\s*>)?\\s*)").matcher(msg.replaceAll("\u001B\\[[;\\d]*m", ""));
-            while (matcher.find()) {
-                type = matcher.group(3).toUpperCase();
-            }
-
-            msg = msg.substring(msg.length() - msg.replaceAll("^((?:\\s*\\[?([0-9]{2}:[0-9]{2}:[0-9]{2})]?)?[\\s\\/\\\\\\|]*(?:\\[|\\[.*\\/)?(MESSAGE|INFO|WARNING|WARN|ERROR|ERR|SEVERE)\\]?:?(?:\\s*>)?\\s*)", "").length());
 
             // Determine LOG LEVEL
             switch (type) {
-                case "WARNING":
                 case "WARN":
                     level = Level.WARNING;
                     break;
                 case "SEVERE":
                 case "ERROR":
-                case "ERR":
                     level = Level.SEVERE;
                     break;
                 default:
@@ -117,7 +107,7 @@ public class ExternalSubLogger extends SubLogger {
 
             // Log to FILE
             if (writer != null) {
-                writer.println(line);
+                writer.println('[' + new SimpleDateFormat("HH:mm:ss").format(Calendar.getInstance().getTime()) + "] [" + level + "] > " + msg);
                 writer.flush();
             }
         }
@@ -147,7 +137,6 @@ public class ExternalSubLogger extends SubLogger {
     @Override
     public void stop() {
         if (started) {
-            PacketInExLogMessage.unregister(id);
             id = null;
             started = false;
             List<SubLogFilter> filters = new ArrayList<SubLogFilter>();

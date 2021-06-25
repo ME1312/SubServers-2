@@ -90,6 +90,7 @@ public class InternalSubLogger extends SubLogger {
         }
     }
 
+    private static final String PATTERN = "^((?:\\s*\\[?([0-9]{2}:[0-9]{2}:[0-9]{2})]?)?[\\s\\/\\\\\\|]*(?:\\[|\\[.*\\/)?(DEBUG|MESSAGE|MSG|" + Pattern.quote(Level.INFO.getLocalizedName()) + "|INFO|" + Pattern.quote(Level.WARNING.getLocalizedName()) + "|WARNING|WARN|ERROR|ERR|" + Pattern.quote(Level.SEVERE.getLocalizedName()) + "|SEVERE)\\]?:?(?:\\s*>)?\\s*)";
     private void log(String line) {
         if (!line.startsWith(">")) {
             String msg = line;
@@ -97,15 +98,19 @@ public class InternalSubLogger extends SubLogger {
 
             // REGEX Formatting
             String type = "";
-            Matcher matcher = Pattern.compile("^((?:\\s*\\[?([0-9]{2}:[0-9]{2}:[0-9]{2})]?)?[\\s\\/\\\\\\|]*(?:\\[|\\[.*\\/)?(MESSAGE|INFO|WARNING|WARN|ERROR|ERR|SEVERE)\\]?:?(?:\\s*>)?\\s*)").matcher(msg.replaceAll("\u001B\\[[;\\d]*m", ""));
+            Matcher matcher = Pattern.compile(PATTERN).matcher(msg.replaceAll("\u001B\\[[;\\d]*m", ""));
             while (matcher.find()) {
                 type = matcher.group(3).toUpperCase();
             }
 
-            msg = msg.replaceAll("^((?:\\s*\\[?([0-9]{2}:[0-9]{2}:[0-9]{2})]?)?[\\s\\/\\\\\\|]*(?:\\[|\\[.*\\/)?(MESSAGE|INFO|WARNING|WARN|ERROR|ERR|SEVERE)\\]?:?(?:\\s*>)?\\s*)", "");
+            msg = msg.replaceAll(PATTERN, "");
 
             // Determine LOG LEVEL
-            switch (type) {
+            if (type.equalsIgnoreCase(Level.WARNING.getLocalizedName())) {
+                level = Level.WARNING;
+            } else if (type.equalsIgnoreCase(Level.SEVERE.getLocalizedName())) {
+                level = Level.SEVERE;
+            } else switch (type) {
                 case "WARNING":
                 case "WARN":
                     level = Level.WARNING;
