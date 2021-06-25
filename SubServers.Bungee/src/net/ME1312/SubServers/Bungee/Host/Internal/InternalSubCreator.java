@@ -39,6 +39,8 @@ import java.security.MessageDigest;
 import java.util.*;
 import java.util.regex.Pattern;
 
+import static java.util.logging.Level.*;
+
 /**
  * Internal SubCreator Class
  */
@@ -90,35 +92,42 @@ public class InternalSubCreator extends SubCreator {
             this.callback = callback;
         }
 
-        private ObjectMap<String> build(File dir, ServerTemplate template, List<ServerTemplate> history) throws SubCreatorException {
+        private ObjectMap<String> build(File dir, ServerTemplate template, List<ServerTemplate> history, List<ServerTemplate> stack) throws SubCreatorException {
             ObjectMap<String> server = new ObjectMap<String>();
             Version version = this.version;
             HashMap<String, String> var = new HashMap<String, String>();
             boolean error = false;
-            if (history.contains(template)) throw new IllegalStateException("Template import loop detected");
-            history.add(template);
+            if (stack.contains(template)) throw new IllegalStateException("Infinite template import loop detected");
+            stack.add(template);
             for (String other : template.getBuildOptions().getStringList("Import", new ArrayList<String>())) {
-                if (templates.keySet().contains(other.toLowerCase())) {
-                    if (templates.get(other.toLowerCase()).isEnabled()) {
-                        if (version != null || !templates.get(other.toLowerCase()).requiresVersion()) {
-                            if (update == null || templates.get(other.toLowerCase()).canUpdate()) {
-                                server.setAll(this.build(dir, templates.get(other.toLowerCase()), history));
+                if (templates.containsKey(other.toLowerCase())) {
+                    final ServerTemplate ot = templates.get(other.toLowerCase());
+                    if (ot.isEnabled()) {
+                        if (version != null || !ot.requiresVersion()) {
+                            if (update == null || ot.canUpdate()) {
+                                if (!history.contains(ot)) {
+                                    server.setAll(this.build(dir, ot, history, stack));
+                                } else {
+                                    log.log(WARNING, "Skipping template that is already loaded: " + other);
+                                }
                             } else {
-                                Logger.get(prefix).warning("Skipping template that cannot be run in update mode: " + other);
+                                log.log(WARNING, "Skipping template that cannot be run in update mode: " + other);
                             }
                         } else {
-                            Logger.get(prefix).warning("Skipping template that requires extra versioning information: " + other);
+                            log.log(WARNING, "Skipping template that requires extra versioning information: " + other);
                         }
                     } else {
-                        Logger.get(prefix).warning("Skipping disabled template: " + other);
+                        log.log(WARNING, "Skipping disabled template: " + other);
                     }
                 } else {
-                    Logger.get(prefix).warning("Skipping missing template: " + other);
+                    log.log(WARNING, "Skipping missing template: " + other);
                 }
             }
+            history.add(template);
+            stack.remove(template);
             server.setAll(template.getConfigOptions());
             try {
-                Logger.get(prefix).info("Loading" + ((template.isDynamic())?" Dynamic":"") + " Template: " + template.getDisplayName());
+                log.log(INFO, "Loading" + ((template.isDynamic())?" Dynamic":"") + " Template: " + template.getDisplayName());
                 updateDirectory(template.getDirectory(), dir, template.getBuildOptions().getBoolean("Update-Files", false));
 
                 for (ObjectMapValue<String> replacement : template.getBuildOptions().getMap("Replacements", new ObjectMap<>()).getValues()) if (!replacement.isNull()) {
@@ -142,7 +151,7 @@ public class InternalSubCreator extends SubCreator {
                     case SPONGE:
                     case FORGE:
                         if (version != null) {
-                            Logger.get(prefix).info("Searching Versions...");
+                            log.log(INFO, "Searching Versions...");
                             ObjectMap<String> spversionmanifest = new ObjectMap<String>(new Gson().fromJson("{\"versions\":" + Util.readAll(new BufferedReader(new InputStreamReader(new URL("https://dl-api.spongepowered.org/v1/org.spongepowered/sponge" + ((template.getType() == ServerType.FORGE)?"forge":"vanilla") + "/downloads?type=stable&minecraft=" + version).openStream(), Charset.forName("UTF-8")))) + '}', Map.class));
 
                             ObjectMap<String> spprofile = null;
@@ -155,11 +164,11 @@ public class InternalSubCreator extends SubCreator {
                             }
                             if (spversion == null)
                                 throw new InvalidServerException("Cannot find Sponge version for Minecraft " + version.toString());
-                            Logger.get(prefix).info("Found \"sponge" + ((template.getType() == ServerType.FORGE)?"forge":"vanilla") + "-" + spversion.toString() + '"');
+                            log.log(INFO, "Found \"sponge" + ((template.getType() == ServerType.FORGE)?"forge":"vanilla") + "-" + spversion.toString() + '"');
 
                             if (template.getType() == ServerType.FORGE) {
                                 Version mcfversion = new Version(((spprofile.getMap("dependencies").getRawString("forge").contains("-"))?"":spprofile.getMap("dependencies").getRawString("minecraft") + '-') + spprofile.getMap("dependencies").getRawString("forge"));
-                                Logger.get(prefix).info("Found \"forge-" + mcfversion.toString() + '"');
+                                log.log(INFO, "Found \"forge-" + mcfversion.toString() + '"');
 
                                 var.put("mcf_version", mcfversion.toString());
                             }
@@ -181,16 +190,16 @@ public class InternalSubCreator extends SubCreator {
                 var.put("source", dir.getAbsolutePath());
 
                 try {
-                    Logger.get(prefix).info("Launching Build Script...");
+                    log.log(INFO, "Launching Build Script...");
                     ProcessBuilder pb = new ProcessBuilder().command(Executable.parse(gitBash, template.getBuildOptions().getRawString("Executable"))).directory(dir);
                     pb.environment().putAll(var);
-                    process = pb.start();
                     log.file = new File(dir, "SubCreator-" + template.getName() + ((version != null)?"-"+version.toString():"") + ".log");
+                    process = pb.start();
                     log.process = process;
                     log.start();
 
                     process.waitFor();
-                    Thread.sleep(500);
+                    Thread.sleep(250);
 
                     if (process.exitValue() != 0) error = true;
                 } catch (InterruptedException e) {
@@ -233,12 +242,15 @@ public class InternalSubCreator extends SubCreator {
             ObjectMap<String> server = new ObjectMap<String>();
             ObjectMap<String> config;
             try {
-                config = build(dir, template, new LinkedList<>());
+                log.init();
+                config = build(dir, template, new LinkedList<>(), new LinkedList<>());
             } catch (SubCreatorException e) {
                 config = null;
             } catch (Exception e) {
                 config = null;
                 e.printStackTrace();
+            } finally {
+                log.destroy();
             }
 
             declaration.run();
@@ -364,7 +376,7 @@ public class InternalSubCreator extends SubCreator {
                         if (config.getKeys().contains("Display")) template.setDisplayName(config.getString("Display"));
                     }
                 } catch (Exception e) {
-                    Logger.get(host.getName() + File.separator + "Creator").info("Couldn't load template: " + file.getName());
+                    Logger.get(host.getName()).severe("Couldn't load template: " + file.getName());
                     e.printStackTrace();
                 }
             }

@@ -74,17 +74,20 @@ public class ExternalSubLogger extends SubLogger {
     }
 
     @SuppressWarnings("deprecation")
-    private void log(String type, String msg) {
+    private void log(int type, String msg) {
         if (started) {
             Level level;
 
             // Determine LOG LEVEL
             switch (type) {
-                case "WARN":
+                case 80:
+                    level = Level.FINE;
+                    break;
+                case 40:
                     level = Level.WARNING;
                     break;
-                case "SEVERE":
-                case "ERROR":
+                case 30:
+                case 20:
                     level = Level.SEVERE;
                     break;
                 default:

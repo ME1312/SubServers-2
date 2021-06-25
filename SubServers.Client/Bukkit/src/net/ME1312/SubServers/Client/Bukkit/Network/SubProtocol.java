@@ -16,6 +16,7 @@ import net.ME1312.SubServers.Client.Common.Network.Packet.*;
 
 import org.bukkit.Bukkit;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.util.HashMap;
@@ -118,7 +119,7 @@ public class SubProtocol extends SubDataProtocol {
         log.setUseParentHandlers(false);
         log.addHandler(new Handler() {
             private boolean open = true;
-            private String prefix = "SubData" + ((channel != 0)?"/+"+channel:"");
+            private String prefix = "SubData" + ((channel != 0)?File.separator+"+"+channel:"");
 
             @Override
             public void publish(LogRecord record) {

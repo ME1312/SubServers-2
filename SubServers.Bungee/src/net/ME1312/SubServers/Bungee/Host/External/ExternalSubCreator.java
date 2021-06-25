@@ -76,7 +76,7 @@ public class ExternalSubCreator extends SubCreator {
                     if (config.getKeys().contains("Display")) template.setDisplayName(config.getString("Display"));
                 }
             } catch (Exception e) {
-                System.out.println(host.getName() + "/Creator > Couldn't load template: " + file.getName());
+                Logger.get(host.getName()).severe("Couldn't load template: " + file.getName());
                 e.printStackTrace();
             }
         }

@@ -48,6 +48,16 @@ public class InternalSubLogger extends SubLogger {
         this.file = file;
     }
 
+    void init() {
+        List<SubLogFilter> filters = new ArrayList<SubLogFilter>();
+        filters.addAll(this.filters);
+        for (SubLogFilter filter : filters) try {
+            filter.start();
+        } catch (Throwable e) {
+            new InvocationTargetException(e, "Exception while running SubLogger Event").printStackTrace();
+        }
+    }
+
     @Override
     public void start() {
         started = true;
@@ -62,13 +72,6 @@ public class InternalSubLogger extends SubLogger {
         }
         if (out == null) (out = new Thread(() -> start(process.getInputStream(), false), "SubServers.Bungee::Internal_Log_Spooler(" + name + ')')).start();
         if (err == null) (err = new Thread(() -> start(process.getErrorStream(), true), "SubServers.Bungee::Internal_Error_Spooler(" + name + ')')).start();
-        List<SubLogFilter> filters = new ArrayList<SubLogFilter>();
-        filters.addAll(this.filters);
-        for (SubLogFilter filter : filters) try {
-            filter.start();
-        } catch (Throwable e) {
-            new InvocationTargetException(e, "Exception while running SubLogger Event").printStackTrace();
-        }
     }
 
     @SuppressWarnings("deprecation")
@@ -124,19 +127,7 @@ public class InternalSubLogger extends SubLogger {
                     level = Level.INFO;
             }
 
-            // Filter Message
-            boolean allow = (SubAPI.getInstance().getInternals().sudo == getHandler() && SubAPI.getInstance().getInternals().canSudo) || (log.value() && (SubAPI.getInstance().getInternals().sudo == null || !SubAPI.getInstance().getInternals().canSudo));
-            List<SubLogFilter> filters = new ArrayList<SubLogFilter>();
-            filters.addAll(this.filters);
-            for (SubLogFilter filter : filters)
-                try {
-                    allow = (filter.log(level, msg) && allow);
-                } catch (Throwable e) {
-                    new InvocationTargetException(e, "Exception while running SubLogger Event").printStackTrace();
-                }
-
-            // Log to CONSOLE
-            if (allow) Logger.get(name).log(level, msg);
+            log(level, msg);
 
             // Log to FILE
             if (writer != null) {
@@ -146,13 +137,54 @@ public class InternalSubLogger extends SubLogger {
         }
     }
 
+    void log(Level level, String message) {
+        // Filter Message
+        boolean allow = (SubAPI.getInstance().getInternals().sudo == getHandler() && SubAPI.getInstance().getInternals().canSudo) || (log.value() && (SubAPI.getInstance().getInternals().sudo == null || !SubAPI.getInstance().getInternals().canSudo));
+        List<SubLogFilter> filters = new ArrayList<SubLogFilter>();
+        filters.addAll(this.filters);
+        for (SubLogFilter filter : filters) {
+            try {
+                allow = (filter.log(level, message) && allow);
+            } catch (Throwable e) {
+                new InvocationTargetException(e, "Exception while running SubLogger Event").printStackTrace();
+            }
+        }
+
+        // Log to CONSOLE
+        if (allow || !started) {
+            Logger.get(name).log(level, message);
+        }
+    }
+
     @Override
     public void stop() {
         try {
             if (out != null) out.interrupt();
             if (err != null) err.interrupt();
-            destroy();
+            if (started) {
+                started = false;
+                if (writer != null) {
+                    PrintWriter writer = this.writer;
+                    this.writer = null;
+                    int l = (int) Math.floor((("---------- LOG START \u2014 " + name + " ----------").length() - 9) / 2);
+                    String s = "";
+                    while (s.length() < l) s += '-';
+                    if (writer != null) {
+                        writer.println(s + " LOG END " + s);
+                        writer.close();
+                    }
+                }
+            }
         } catch (NullPointerException e) {}
+    }
+
+    void destroy() {
+        filters.addAll(this.filters);
+        for (SubLogFilter filter : filters) try {
+            filter.stop();
+        } catch (Throwable e) {
+            new InvocationTargetException(e, "Exception while running SubLogger Event").printStackTrace();
+        }
     }
 
     @Override
@@ -165,30 +197,6 @@ public class InternalSubLogger extends SubLogger {
     public void unregisterFilter(SubLogFilter filter) {
         if (Util.isNull(filter)) throw new NullPointerException();
         Util.isException(() -> filters.remove(filter));
-    }
-
-    private void destroy() {
-        if (started) {
-            started = false;
-            List<SubLogFilter> filters = new ArrayList<SubLogFilter>();
-            filters.addAll(this.filters);
-            for (SubLogFilter filter : filters) try {
-                filter.stop();
-            } catch (Throwable e) {
-                new InvocationTargetException(e, "Exception while running SubLogger Event").printStackTrace();
-            }
-            if (writer != null) {
-                PrintWriter writer = this.writer;
-                this.writer = null;
-                int l = (int) Math.floor((("---------- LOG START \u2014 " + name + " ----------").length() - 9) / 2);
-                String s = "";
-                while (s.length() < l) s += '-';
-                if (writer != null) {
-                    writer.println(s + " LOG END " + s);
-                    writer.close();
-                }
-            }
-        }
     }
 
     @Override

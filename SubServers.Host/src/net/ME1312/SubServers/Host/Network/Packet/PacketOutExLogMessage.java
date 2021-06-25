@@ -11,31 +11,27 @@ import java.util.UUID;
  */
 public class PacketOutExLogMessage implements PacketObjectOut<Integer> {
     private UUID address;
-    private String level, line;
-    private boolean terminate;
+    private Byte level;
+    private String line;
 
     /**
      * New PacketInExLogMessage (Out)
      */
-    public PacketOutExLogMessage(UUID address, String level, String line) {
+    public PacketOutExLogMessage(UUID address, byte level, String line) {
         this.address = address;
         this.level = level;
         this.line = line;
-        this.terminate = false;
     }
 
     /**
-     * New PacketInExLogMessage (Out)
+     * New PacketInExLogMessage (Reset)
      */
     public PacketOutExLogMessage(UUID address) {
         this.address = address;
-        this.terminate = true;
     }
 
     @Override
     public ObjectMap<Integer> send(SubDataSender client) throws Exception {
-        if (terminate) client.getConnection().close();
-
         ObjectMap<Integer> data = new ObjectMap<Integer>();
         data.set(0x0000, address);
         if (level != null) data.set(0x0001, level);

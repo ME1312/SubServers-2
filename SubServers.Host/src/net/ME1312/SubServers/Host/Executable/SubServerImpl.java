@@ -106,6 +106,7 @@ public class SubServerImpl {
             if (SubAPI.getInstance().getSubDataNetwork()[0] != null) pb.environment().put("host", SubAPI.getInstance().getName());
             pb.environment().put("address", host.config.get().getMap("Settings").getRawString("Server-Bind"));
             pb.environment().put("port", Integer.toString(getPort()));
+            logger.init();
             process = pb.start();
             falsestart = false;
             host.log.info.println("Now starting " + name);
@@ -126,8 +127,10 @@ public class SubServerImpl {
             if (falsestart) ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketExEditServer(this, PacketExEditServer.UpdateType.LAUNCH_EXCEPTION));
         }
 
-        if (SubAPI.getInstance().getSubDataNetwork()[0] != null)
+        logger.destroy();
+        if (SubAPI.getInstance().getSubDataNetwork()[0] != null) {
             ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketExEditServer(this, PacketExEditServer.UpdateType.STOPPED, (Integer) process.exitValue(), (Boolean) allowrestart));
+        }
         host.log.info.println(name + " has stopped");
         process = null;
         command = null;

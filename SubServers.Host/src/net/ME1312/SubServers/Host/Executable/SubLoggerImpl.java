@@ -40,7 +40,7 @@ public class SubLoggerImpl {
     static boolean logc = true;
     File file;
     private SubDataClient channel = null;
-    private LinkedList<Pair<String, String>> ccache = null;
+    private LinkedList<Pair<Byte, String>> ccache = null;
     private PrintWriter writer = null;
     private boolean started = false;
     private Thread out = null;
@@ -70,13 +70,13 @@ public class SubLoggerImpl {
             if (logn) {
                 if (this.address != null && channel != null && !channel.isClosed()) {
                     if (ccache != null) {
-                        for (Pair<String, String> val : ccache) channel.sendPacket(new PacketOutExLogMessage(this.address, val.key(), val.value()));
+                        for (Pair<Byte, String> val : ccache) channel.sendPacket(new PacketOutExLogMessage(this.address, val.key(), val.value()));
                         ccache = null;
                     }
-                    channel.sendPacket(new PacketOutExLogMessage(this.address, stream.getLevel().getName(), message));
+                    channel.sendPacket(new PacketOutExLogMessage(this.address, stream.getLevel().getID(), message));
                 } else {
-                    if (ccache == null) ccache = new LinkedList<Pair<String, String>>();
-                    ccache.add(new ContainedPair<>(stream.getLevel().getName(), message));
+                    if (ccache == null) ccache = new LinkedList<Pair<Byte, String>>();
+                    ccache.add(new ContainedPair<>(stream.getLevel().getID(), message));
                 }
             }
 
@@ -85,23 +85,10 @@ public class SubLoggerImpl {
         });
     }
 
-    /**
-     * Start Logger
-     */
-    public void start() {
-        started = true;
-        if (file != null && writer == null) {
-            try {
-                this.writer = new PrintWriter(file, "UTF-8");
-                this.writer.println("---------- LOG START \u2014 " + name + " ----------");
-                this.writer.flush();
-            } catch (IOException e) {
-                logger.error.println(e);
-            }
-        }
-        Process process = this.process;
-        ExHost host = SubAPI.getInstance().getInternals();
+    @SuppressWarnings("deprecation")
+    void init() {
         if (logn) Util.isException(() -> {
+            ExHost host = SubAPI.getInstance().getInternals();
             channel = (SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0].newChannel();
             channel.on.closed(new Callback<Pair<DisconnectReason, DataClient>>() {
                 @Override
@@ -131,10 +118,23 @@ public class SubLoggerImpl {
                 }
             });
         });
+    }
+
+    public void start() {
+        started = true;
+        if (file != null && writer == null) {
+            try {
+                this.writer = new PrintWriter(file, "UTF-8");
+                this.writer.println("---------- LOG START \u2014 " + name + " ----------");
+                this.writer.flush();
+            } catch (IOException e) {
+                logger.error.println(e);
+            }
+        }
+        Process process = this.process;
         if (out == null) (out = new Thread(() -> start(process.getInputStream(), false), SubAPI.getInstance().getAppInfo().getName() + "::Log_Spooler(" + name + ')')).start();
         if (err == null) (err = new Thread(() -> start(process.getErrorStream(), true), SubAPI.getInstance().getAppInfo().getName() + "::Error_Spooler(" + name + ')')).start();
     }
-
 
     @SuppressWarnings("deprecation")
     private void start(InputStream in, boolean isErr) {
@@ -213,29 +213,28 @@ public class SubLoggerImpl {
         try {
             if (out != null) out.interrupt();
             if (err != null) err.interrupt();
-            destroy();
+            if (started) {
+                started = false;
+                if (writer != null) {
+                    PrintWriter writer = this.writer;
+                    this.writer = null;
+                    int l = (int) Math.floor((("---------- LOG START \u2014 " + name + " ----------").length() - 9) / 2);
+                    String s = "";
+                    while (s.length() < l) s += '-';
+                    if (writer != null) {
+                        writer.println(s + " LOG END " + s);
+                        writer.close();
+                    }
+                }
+            }
         } catch (NullPointerException e) {}
     }
 
-    private void destroy() {
-        if (started) {
-            started = false;
-            if (writer != null) {
-                PrintWriter writer = this.writer;
-                this.writer = null;
-                int l = (int) Math.floor((("---------- LOG START \u2014 " + name + " ----------").length() - 9) / 2);
-                String s = "";
-                while (s.length() < l) s += '-';
-                if (writer != null) {
-                    writer.println(s + " LOG END " + s);
-                    writer.close();
-                }
-            }
-            if (channel != null && !channel.isClosed()) {
-                channel.sendPacket(new PacketOutExLogMessage(address));
-            }
-            channel = null;
+    void destroy() {
+        if (channel != null && !channel.isClosed()) {
+            channel.sendPacket(new PacketOutExLogMessage(address));
         }
+        channel = null;
     }
 
     /**

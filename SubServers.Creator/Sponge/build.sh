@@ -11,7 +11,7 @@ function __DL() {
     if [[ -x "$(command -v wget)" ]]; then
         wget -O "$1" "$2"; return $?
     else
-        curl -o "$1" "$2"; return $?
+        curl -Lo "$1" "$2"; return $?
     fi
 }
 function __Restore() {

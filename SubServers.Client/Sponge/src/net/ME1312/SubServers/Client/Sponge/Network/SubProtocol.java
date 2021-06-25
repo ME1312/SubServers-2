@@ -18,6 +18,7 @@ import net.ME1312.SubServers.Client.Sponge.SubPlugin;
 import org.slf4j.LoggerFactory;
 import org.spongepowered.api.Sponge;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.util.HashMap;
@@ -119,7 +120,7 @@ public class SubProtocol extends SubDataProtocol {
         Logger log = Logger.getAnonymousLogger();
         log.setUseParentHandlers(false);
         log.addHandler(new Handler() {
-            private org.slf4j.Logger log = LoggerFactory.getLogger("SubData" + ((channel != 0)? "/+"+channel:""));
+            private org.slf4j.Logger log = LoggerFactory.getLogger("SubData" + ((channel != 0)?File.separator+"+"+channel:""));
             private boolean open = true;
 
             @Override

@@ -23,6 +23,7 @@ import net.md_5.bungee.api.config.ListenerInfo;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.conf.Configuration;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.util.ArrayList;
@@ -128,7 +129,7 @@ public class SubProtocol extends SubDataProtocol {
     }
 
     private Logger getLogger(int channel) {
-        return net.ME1312.SubServers.Bungee.Library.Compatibility.Logger.get("SubData" + ((channel != 0)?"/+"+channel:""));
+        return net.ME1312.SubServers.Bungee.Library.Compatibility.Logger.get("SubData" + ((channel != 0)?File.separator+"+"+channel:""));
     }
 
     @Override

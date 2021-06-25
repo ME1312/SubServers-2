@@ -155,6 +155,7 @@ public class InternalSubServer extends SubServerImpl {
             pb.environment().put("host", host.getName());
             pb.environment().put("address", host.getAddress().getHostAddress());
             pb.environment().put("port", Integer.toString(getAddress().getPort()));
+            logger.init();
             process = pb.start();
             Logger.get("SubServers").info("Now starting " + getName());
             logger.process = process;
@@ -174,6 +175,7 @@ public class InternalSubServer extends SubServerImpl {
             allowrestart = false;
         }
 
+        logger.destroy();
         Logger.get("SubServers").info(getName() + " has stopped");
         process = null;
         command = null;

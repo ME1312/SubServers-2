@@ -23,11 +23,14 @@ public class PacketInExLogMessage implements PacketObjectIn<Integer> {
     @Override
     public void receive(SubDataClient client, ObjectMap<Integer> data) {
         try {
-            if (data.contains(0x0000) && loggers.keySet().contains(data.getUUID(0x0000))) {
-                if (data.contains(0x0001) && data.contains(0x0002)) {
-                    Util.reflect(ExternalSubLogger.class.getDeclaredMethod("log", String.class, String.class), loggers.get(data.getUUID(0x0000)), data.getRawString(0x0001), data.getRawString(0x0002));
+            if (data.contains(0x0000)) {
+                if (data.contains(0x0002) && data.contains(0x0001)) {
+                    if (loggers.containsKey(data.getUUID(0x0000))) {
+                        Util.reflect(ExternalSubLogger.class.getDeclaredMethod("log", int.class, String.class), loggers.get(data.getUUID(0x0000)), data.getInt(0x0001), data.getRawString(0x0002));
+                    }
                 } else {
                     unregister(data.getUUID(0x0000));
+                    client.close();
                 }
             }
         } catch (Exception e) {
@@ -58,6 +61,6 @@ public class PacketInExLogMessage implements PacketObjectIn<Integer> {
      * @param id External Address
      */
     public static void unregister(UUID id) {
-        loggers.remove(id).stop();
+        if (loggers.containsKey(id)) loggers.remove(id).stop();
     }
 }

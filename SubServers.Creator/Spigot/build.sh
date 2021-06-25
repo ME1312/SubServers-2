@@ -15,7 +15,7 @@ function __DL() {
     if [[ -x "$(command -v wget)" ]]; then
         wget -O "$1" "$2"; return $?
     else
-        curl -o "$1" "$2"; return $?
+        curl -Lo "$1" "$2"; return $?
     fi
 }
 if [[ -z "$cache" ]] || [[ ! -f "$cache/Spigot-$version.jar" ]] || [[ "$mode" == "UPDATE" && $(find "$cache/Spigot-$version.jar" -mtime +1 -print) ]]; then

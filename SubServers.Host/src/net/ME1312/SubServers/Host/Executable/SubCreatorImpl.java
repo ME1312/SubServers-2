@@ -293,19 +293,24 @@ public class SubCreatorImpl {
             templates.putAll(host.templates);
         }
 
-        private ObjectMap<String> build(File dir, ServerTemplate template, List<ServerTemplate> history) throws SubCreatorException {
+        private ObjectMap<String> build(File dir, ServerTemplate template, List<ServerTemplate> history, List<ServerTemplate> stack) throws SubCreatorException {
             ObjectMap<String> server = new ObjectMap<String>();
             Version version = this.version;
             HashMap<String, String> var = new HashMap<String, String>();
             boolean error = false;
-            if (history.contains(template)) throw new IllegalStateException("Template import loop detected");
-            history.add(template);
+            if (stack.contains(template)) throw new IllegalStateException("Infinite template import loop detected");
+            stack.add(template);
             for (String other : template.getBuildOptions().getStringList("Import", new ArrayList<String>())) {
-                if (templates.keySet().contains(other.toLowerCase())) {
-                    if (templates.get(other.toLowerCase()).isEnabled()) {
-                        if (version != null || !templates.get(other.toLowerCase()).requiresVersion()) {
-                            if (update == null || templates.get(other.toLowerCase()).canUpdate()) {
-                                server.setAll(this.build(dir, templates.get(other.toLowerCase()), history));
+                if (templates.containsKey(other.toLowerCase())) {
+                    final ServerTemplate ot = templates.get(other.toLowerCase());
+                    if (ot.isEnabled()) {
+                        if (version != null || !ot.requiresVersion()) {
+                            if (update == null || ot.canUpdate()) {
+                                if (!history.contains(ot)) {
+                                    server.setAll(this.build(dir, ot, history, stack));
+                                } else {
+                                    log.logger.warn.println("Skipping template that's already loaded: " + other);
+                                }
                             } else {
                                 log.logger.warn.println("Skipping template that cannot be run in update mode: " + other);
                             }
@@ -319,6 +324,8 @@ public class SubCreatorImpl {
                     log.logger.warn.println("Skipping missing template: " + other);
                 }
             }
+            history.add(template);
+            stack.remove(template);
             server.setAll(template.getConfigOptions());
             try {
                 log.logger.info.println("Loading" + ((template.isDynamic())?" Dynamic":"") + " Template: " + template.getDisplayName());
@@ -386,8 +393,8 @@ public class SubCreatorImpl {
                     log.logger.info.println("Launching Build Script...");
                     ProcessBuilder pb = new ProcessBuilder().command(Executable.parse(host.host.getRawString("Git-Bash"), template.getBuildOptions().getRawString("Executable"))).directory(dir);
                     pb.environment().putAll(var);
-                    process = pb.start();
                     log.file = new File(dir, "SubCreator-" + template.getName() + "-" + ((version != null)?"-"+version.toString():"") + ".log");
+                    process = pb.start();
                     log.process = process;
                     log.start();
 
@@ -434,12 +441,15 @@ public class SubCreatorImpl {
 
             ObjectMap<String> config;
             try {
-                config = build(dir, template, new LinkedList<>());
+                log.init();
+                config = build(dir, template, new LinkedList<>(), new LinkedList<>());
             } catch (SubCreatorException e) {
                 config = null;
             } catch (Exception e) {
                 config = null;
                 log.logger.error.println(e);
+            } finally {
+                log.destroy();
             }
 
             declaration.run();
