@@ -45,11 +45,6 @@ if [[ $__RETURN -eq 0 ]]; then
             rm -Rf "forge-installer-installer.jar"
             echo Installing Minecraft Forge...
             "$java" -jar "forge-$mcf_version-installer.jar" --installServer; __RETURN=$?
-            if [[ $__RETURN -ne 0 ]]; then
-                echo ""
-                echo Retrying...
-                "$java" -jar "forge-$mcf_version-installer.jar" --installServer --offline; __RETURN=$?
-            fi
             if [[ $__RETURN -eq 0 ]]; then
                 echo Cleaning Up...
                 if [[ ! -d "mods" ]]; then
