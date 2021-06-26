@@ -18,13 +18,13 @@ These are some quick links for common resources of SubServers 2.
 > [https://dev.me1312.net/jenkins/job/SubServers Platform](https://dev.me1312.net/jenkins/job/SubServers%20Platform)
 
 ### Javadocs for Developers
-> [https://dev.me1312.net/jenkins/job/SubServers Platform/javadoc/SubServers.Bungee/](https://dev.me1312.net/jenkins/job/SubServers%20Platform/javadoc/SubServers.Bungee/)<br>
-> [https://dev.me1312.net/jenkins/job/SubServers Platform/javadoc/SubServers.Bungee.Common/](https://dev.me1312.net/jenkins/job/SubServers%20Platform/javadoc/SubServers.Bungee.Common/)<br>
-> [https://dev.me1312.net/jenkins/job/SubServers Platform/javadoc/SubServers.Host/](https://dev.me1312.net/jenkins/job/SubServers%20Platform/javadoc/SubServers.Host/)<br>
-> [https://dev.me1312.net/jenkins/job/SubServers Platform/javadoc/SubServers.Sync/](https://dev.me1312.net/jenkins/job/SubServers%20Platform/javadoc/SubServers.Sync/)<br>
-> [https://dev.me1312.net/jenkins/job/SubServers Platform/javadoc/SubServers.Client.Common/](https://dev.me1312.net/jenkins/job/SubServers%20Platform/javadoc/SubServers.Client.Common/)<br>
-> [https://dev.me1312.net/jenkins/job/SubServers Platform/javadoc/SubServers.Client.Bukkit/](https://dev.me1312.net/jenkins/job/SubServers%20Platform/javadoc/SubServers.Client.Bukkit/)<br>
-> [https://dev.me1312.net/jenkins/job/SubServers Platform/javadoc/SubServers.Client.Sponge/](https://dev.me1312.net/jenkins/job/SubServers%20Platform/javadoc/SubServers.Client.Sponge/)
+> [https://dev.me1312.net/jenkins/job/SubServers Platform/javadoc/SubServers.Bungee](https://dev.me1312.net/jenkins/job/SubServers%20Platform/javadoc/SubServers.Bungee)<br>
+> [https://dev.me1312.net/jenkins/job/SubServers Platform/javadoc/SubServers.Bungee.Common](https://dev.me1312.net/jenkins/job/SubServers%20Platform/javadoc/SubServers.Bungee.Common)<br>
+> [https://dev.me1312.net/jenkins/job/SubServers Platform/javadoc/SubServers.Host](https://dev.me1312.net/jenkins/job/SubServers%20Platform/javadoc/SubServers.Host)<br>
+> [https://dev.me1312.net/jenkins/job/SubServers Platform/javadoc/SubServers.Sync](https://dev.me1312.net/jenkins/job/SubServers%20Platform/javadoc/SubServers.Sync)<br>
+> [https://dev.me1312.net/jenkins/job/SubServers Platform/javadoc/SubServers.Client.Bukkit](https://dev.me1312.net/jenkins/job/SubServers%20Platform/javadoc/SubServers.Client.Bukkit)<br>
+> [https://dev.me1312.net/jenkins/job/SubServers Platform/javadoc/SubServers.Client.Common](https://dev.me1312.net/jenkins/job/SubServers%20Platform/javadoc/SubServers.Client.Common)<br>
+> [https://dev.me1312.net/jenkins/job/SubServers Platform/javadoc/SubServers.Client.Sponge](https://dev.me1312.net/jenkins/job/SubServers%20Platform/javadoc/SubServers.Client.Sponge)
 
 ### Stats for nerds
 > [https://bstats.org/plugin/bungeecord/SubServers_Bungee](https://bstats.org/plugin/bungeecord/SubServers%202)<br>
