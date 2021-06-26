@@ -619,7 +619,7 @@ public class SubCreatorImpl {
     } private byte[] generateSHA256(File file) throws Exception {
         MessageDigest md = MessageDigest.getInstance("SHA-256");
         FileInputStream fis = new FileInputStream(file);
-        byte[] dataBytes = new byte[1024];
+        byte[] dataBytes = new byte[4096];
 
         int nread;
 

@@ -656,7 +656,7 @@ public final class ConsoleWindow implements SubLogFilter {
             }
 
             int i;
-            byte[] b = new byte[1024];
+            byte[] b = new byte[4096];
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
             while ((i = reader.read(b)) != -1) {
                 stream.write(b, 0, i);
