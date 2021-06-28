@@ -19,12 +19,7 @@ public abstract class FileScanner {
      * @param whitelist File Whitelist
      */
     protected void scan(File dir, String... whitelist) throws IOException {
-        List<String> files;
-        try {
-            files = Util.reflect(Util.class.getDeclaredMethod("zipsearch", File.class, File.class), null, dir, dir);
-        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-            throw new IllegalStateException("Cannot access zipsearch()", e);
-        }
+        List<String> files = Util.searchDirectory(dir);
         if (files.size() <= 0 || whitelist.length <= 0)
             return;
 

@@ -9,6 +9,12 @@ import net.ME1312.SubData.Client.SubDataSender;
 import net.ME1312.SubServers.Host.ExHost;
 import net.ME1312.SubServers.Host.SubAPI;
 
+import org.kamranzafar.jtar.TarEntry;
+import org.kamranzafar.jtar.TarInputStream;
+import org.tukaani.xz.XZInputStream;
+
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.InputStream;
 
 /**
@@ -42,7 +48,36 @@ public class PacketExDownloadTemplates implements PacketOut, PacketStreamIn {
 
         try {
             dir.mkdirs();
-            Util.unzip(stream, dir);
+            TarInputStream tar = new TarInputStream(new XZInputStream(stream));
+
+            byte[] buffer = new byte[4096];
+            TarEntry entry;
+            while ((entry = tar.getNextEntry()) != null) {
+                File newFile = new File(dir + File.separator + entry.getName().replace('/', File.separatorChar));
+                if (newFile.exists()) {
+                    if (newFile.isDirectory()) {
+                        Util.deleteDirectory(newFile);
+                    } else {
+                        newFile.delete();
+                    }
+                }
+
+                if (entry.isDirectory()) {
+                    newFile.mkdirs();
+                    continue;
+                } else if (!newFile.getParentFile().exists()) {
+                    newFile.getParentFile().mkdirs();
+                }
+
+                FileOutputStream fos = new FileOutputStream(newFile);
+                int len;
+                while ((len = tar.read(buffer)) != -1) {
+                    fos.write(buffer, 0, len);
+                }
+                fos.close();
+            }
+            tar.close();
+
             host.creator.load(true);
             host.log.info.println(((first)?"":"New ") + "Remote Template Files Downloaded");
         } catch (Exception e) {
@@ -54,6 +89,6 @@ public class PacketExDownloadTemplates implements PacketOut, PacketStreamIn {
 
     @Override
     public int version() {
-        return 0x0001;
+        return 0x0002;
     }
 }

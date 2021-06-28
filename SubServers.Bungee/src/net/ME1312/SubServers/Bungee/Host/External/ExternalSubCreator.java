@@ -82,8 +82,9 @@ public class ExternalSubCreator extends SubCreator {
         }
 
         if (host.available && !Util.getDespiteException(() -> Util.reflect(SubProxy.class.getDeclaredField("reloading"), host.plugin), false)) {
-            host.queue(new PacketExUploadTemplates(host.plugin));
-            if (enableRT == null || enableRT) host.queue(new PacketExDownloadTemplates(host.plugin, host));
+            host.queue(new PacketExConfigureHost(host.plugin, host), new PacketExUploadTemplates(host.plugin, () -> {
+                if (enableRT == null || enableRT) host.queue(new PacketExDownloadTemplates(host.plugin, host));
+            }));
         }
     }
 

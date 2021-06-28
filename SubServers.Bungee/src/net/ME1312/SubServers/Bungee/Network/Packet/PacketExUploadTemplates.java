@@ -12,7 +12,9 @@ import net.ME1312.SubServers.Bungee.Host.SubCreator;
 import net.ME1312.SubServers.Bungee.SubProxy;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -20,13 +22,15 @@ import java.util.logging.Logger;
  * External Host Template Upload Packet
  */
 public class PacketExUploadTemplates implements PacketObjectIn<Integer>, PacketOut {
+    private static LinkedList<Runnable> callbacks = new LinkedList<Runnable>();
     private SubProxy plugin;
 
     /**
      * New PacketExUploadTemplates
      */
-    public PacketExUploadTemplates(SubProxy plugin) {
+    public PacketExUploadTemplates(SubProxy plugin, Runnable... callbacks) {
         this.plugin = plugin;
+        PacketExUploadTemplates.callbacks.addAll(Arrays.asList(callbacks));
     }
 
     @SuppressWarnings("unchecked")
@@ -49,6 +53,12 @@ public class PacketExUploadTemplates implements PacketObjectIn<Integer>, PacketO
                     Logger.getLogger("SubServers").severe("Couldn't load template: " + name);
                     e.printStackTrace();
                 }
+            }
+
+            LinkedList<Runnable> callbacks = PacketExUploadTemplates.callbacks;
+            PacketExUploadTemplates.callbacks = new LinkedList<Runnable>();
+            for (Runnable r : callbacks) {
+                r.run();
             }
         }
     }
