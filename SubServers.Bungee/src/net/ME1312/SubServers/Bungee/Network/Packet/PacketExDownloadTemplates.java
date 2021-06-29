@@ -12,18 +12,12 @@ import net.ME1312.SubServers.Bungee.Host.SubCreator.ServerTemplate;
 import net.ME1312.SubServers.Bungee.Library.Compatibility.Logger;
 import net.ME1312.SubServers.Bungee.SubProxy;
 
-import org.kamranzafar.jtar.TarEntry;
-import org.kamranzafar.jtar.TarOutputStream;
-import org.tukaani.xz.LZMA2Options;
-import org.tukaani.xz.XZOutputStream;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.OutputStream;
 import java.util.HashMap;
-
-import static org.tukaani.xz.LZMA2Options.MODE_FAST;
-import static org.tukaani.xz.XZ.CHECK_SHA256;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 /**
  * External Host Template Download Packet
@@ -52,26 +46,26 @@ public class PacketExDownloadTemplates implements PacketIn, PacketStreamOut {
         try {
             if (client.getBlockSize() < DataSize.MBB) client.tempBlockSize(DataSize.MBB);
             HashMap<String, ServerTemplate> map = Util.getDespiteException(() -> Util.reflect(ExternalSubCreator.class.getDeclaredField("templates"), ((ExternalHost) client.getHandler()).getCreator()), new HashMap<>());
-            TarOutputStream tar = new TarOutputStream(new XZOutputStream(stream, new LZMA2Options(MODE_FAST), CHECK_SHA256));
             File dir = new UniversalFile(plugin.dir, "SubServers:Templates");
+            ZipOutputStream zip = new ZipOutputStream(stream);
 
             byte[] buffer = new byte[4096];
             for (String file : Util.searchDirectory(dir)) {
                 int index = file.indexOf(File.separatorChar);
                 if (index != -1 && !map.containsKey(file.substring(0, index).toLowerCase())) {
 
-                    tar.putNextEntry(new TarEntry(new File(dir, file), file.replace(File.separatorChar, '/')));
+                    zip.putNextEntry(new ZipEntry(file.replace(File.separatorChar, '/')));
                     FileInputStream in = new FileInputStream(dir.getAbsolutePath() + File.separator + file);
 
                     int len;
                     while ((len = in.read(buffer)) != -1) {
-                        tar.write(buffer, 0, len);
+                        zip.write(buffer, 0, len);
                     }
 
                     in.close();
                 }
             }
-            tar.close();
+            zip.close();
 
             Util.isException(() -> Util.reflect(ExternalSubCreator.class.getDeclaredField("enableRT"), host.getCreator(), true));
         } catch (Exception e) {
