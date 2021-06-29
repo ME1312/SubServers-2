@@ -12,11 +12,13 @@ import java.net.SocketAddress;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.regex.Pattern;
 
 /**
  * SubServer Layout Class
  */
 public abstract class SubServerImpl extends ServerImpl implements SubServer {
+    protected static final Pattern DISALLOWED_COMMANDS = Pattern.compile("^/?(?:[^\\s]+:)?sub(?:servers?)?(?:\\s|$)", Pattern.CASE_INSENSITIVE & Pattern.UNICODE_CASE);
     private List<Pair<String, String>> incompatibilities = new ArrayList<Pair<String, String>>();
     private SubCreator.ServerTemplate templateV = null;
     private String templateS = null;

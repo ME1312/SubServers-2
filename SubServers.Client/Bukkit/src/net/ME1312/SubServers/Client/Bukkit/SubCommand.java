@@ -51,7 +51,6 @@ public final class SubCommand extends Command {
 
     @Override
     public boolean execute(CommandSender sender, String label, String[] args) {
-        label = "/" + label;
         if (plugin.api.getSubDataNetwork()[0] == null || plugin.api.getSubDataNetwork()[0].isClosed()) {
             new IllegalStateException("SubData is not connected").printStackTrace();
             if (!(sender instanceof ConsoleCommandSender)) sender.sendMessage(ChatColor.RED + "An exception has occurred while running this command");
@@ -59,6 +58,7 @@ public final class SubCommand extends Command {
             new IllegalStateException("There are no lang options available at this time").printStackTrace();
             if (!(sender instanceof ConsoleCommandSender)) sender.sendMessage(ChatColor.RED + "An exception has occurred while running this command");
         } else {
+            label = "/" + label;
             if (sender.hasPermission("subservers.command")) {
                 if (args.length > 0) {
                     if (args[0].equalsIgnoreCase("help") || args[0].equalsIgnoreCase("?")) {
@@ -730,6 +730,46 @@ public final class SubCommand extends Command {
                         } else {
                             sender.sendMessage(plugin.api.getLang("SubServers", "Command.Generic.Usage").replace("$str$", label.toLowerCase() + " " + args[0].toLowerCase() + " <Subservers> [[Template] <Version>]"));
                         }
+                    } else if ((args[0].equalsIgnoreCase("remove") || args[0].equalsIgnoreCase("del") || args[0].equalsIgnoreCase("delete")) && plugin.config.get().getMap("Settings").getBoolean("Allow-Deletion", false)) {
+                        if (args.length > 1) {
+                            selectServers(sender, args, 1, true, "subservers.subserver.%.delete", select -> {
+                                if (select.subservers.length > 0) {
+                                    Container<Integer> success = new Container<Integer>(0);
+                                    AsyncConsolidator merge = new AsyncConsolidator(() -> {
+                                        if (success.value > 0) sender.sendMessage(plugin.api.getLang("SubServers", "Command.Delete").replace("$int$", success.value.toString()));
+                                    });
+                                    for (SubServer server : select.subservers) {
+                                        if (server.isRunning()) {
+                                            sender.sendMessage(plugin.api.getLang("SubServers", "Command.Delete.Running").replace("$str$", server.getName()));
+                                        } else {
+                                            server.getHost(host -> {
+                                                if (host == null) {
+                                                    sender.sendMessage(plugin.api.getLang("SubServers", "Command.Delete.Disappeared").replace("$str$", server.getName()));
+                                                } else {
+                                                    merge.reserve();
+                                                    host.recycleSubServer(server.getName(), response -> {
+                                                        switch (response) {
+                                                            case 3:
+                                                            case 4:
+                                                                sender.sendMessage(plugin.api.getLang("SubServers", "Command.Delete.Disappeared").replace("$str$", server.getName()));
+                                                                break;
+                                                            case 0:
+                                                                success.value++;
+                                                                break;
+                                                        }
+                                                        merge.release();
+                                                    });
+                                                }
+                                            });
+                                        }
+                                    }
+                                }
+                            });
+                        } else {
+                            sender.sendMessage("Usage: " + label + " " + args[0].toLowerCase() + " <Subservers>");
+                        }
+                    } else if (args[0].equalsIgnoreCase("restore")) {
+                        // TODO
                     } else if (args[0].equalsIgnoreCase("tp") || args[0].equalsIgnoreCase("teleport")) {
                         executeTeleport(sender, label, args);
                     } else if ((args[0].equalsIgnoreCase("view") || args[0].equalsIgnoreCase("open")) && sender instanceof Player) {

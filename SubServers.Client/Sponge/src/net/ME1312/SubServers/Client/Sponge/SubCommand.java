@@ -122,6 +122,11 @@ public final class SubCommand implements CommandExecutor {
                         .arguments(GenericArguments.optional(new ListArgument(Text.of("Subservers"))), GenericArguments.optional(GenericArguments.string(Text.of("Template"))), GenericArguments.optional(GenericArguments.string(Text.of("Version"))), GenericArguments.optional(GenericArguments.remainingJoinedStrings(Text.of("..."))))
                         .build(), "update", "upgrade")
                 .child(CommandSpec.builder()
+                        .description(Text.of("The SubServers Command - Delete"))
+                        .executor(new DELETE())
+                        .arguments(GenericArguments.optional(new ListArgument(Text.of("Subservers"))), GenericArguments.optional(GenericArguments.remainingJoinedStrings(Text.of("..."))))
+                        .build(), "remove", "del", "delete")
+                .child(CommandSpec.builder()
                         .description(Text.of("The SubServers Command - Teleport"))
                         .executor(new TELEPORT())
                         .arguments(GenericArguments.optional(GenericArguments.string(Text.of("Player"))), GenericArguments.optional(GenericArguments.string(Text.of("Server"))), GenericArguments.optional(GenericArguments.remainingJoinedStrings(Text.of("..."))))
@@ -1132,6 +1137,60 @@ public final class SubCommand implements CommandExecutor {
                 }
             } else {
                 sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Generic.Invalid-Permission").replace("$str$", "subservers.command")));
+                return CommandResult.builder().successCount(0).build();
+            }
+        }
+    }
+
+    public final class DELETE implements CommandExecutor {
+        public CommandResult execute(CommandSource sender, CommandContext args) throws CommandException {
+            if (plugin.config.get().getMap("Settings").getBoolean("Allow-Deletion", false)) {
+                if (canRun(sender)) {
+                    Optional<String[]> s = args.getOne(Text.of("Subservers"));
+                    if (s.isPresent()) {
+                        selectServers(sender, s.get(), true, "subservers.subserver.%.delete", select -> {
+                            if (select.subservers.length > 0) {
+                                Container<Integer> success = new Container<Integer>(0);
+                                AsyncConsolidator merge = new AsyncConsolidator(() -> {
+                                    if (success.value > 0) sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", "Command.Delete").replace("$int$", success.value.toString())));
+                                });
+                                for (SubServer server : select.subservers) {
+                                    if (server.isRunning()) {
+                                        sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", "Command.Delete.Running").replace("$str$", server.getName())));
+                                    } else {
+                                        server.getHost(host -> {
+                                            if (host == null) {
+                                                sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", "Command.Delete.Disappeared").replace("$str$", server.getName())));
+                                            } else {
+                                                merge.reserve();
+                                                host.recycleSubServer(server.getName(), response -> {
+                                                    switch (response) {
+                                                        case 3:
+                                                        case 4:
+                                                            sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", "Command.Delete.Disappeared").replace("$str$", server.getName())));
+                                                            break;
+                                                        case 0:
+                                                            success.value++;
+                                                            break;
+                                                    }
+                                                    merge.release();
+                                                });
+                                            }
+                                        });
+                                    }
+                                }
+                            }
+                        });
+                        return CommandResult.builder().successCount(1).build();
+                    } else {
+                        sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Generic.Usage").replace("$str$", "/sub delete <Subservers>")));
+                        return CommandResult.builder().successCount(0).build();
+                    }
+                } else {
+                    sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Generic.Invalid-Permission").replace("$str$", "subservers.command")));
+                    return CommandResult.builder().successCount(0).build();
+                }
+            } else {
                 return CommandResult.builder().successCount(0).build();
             }
         }

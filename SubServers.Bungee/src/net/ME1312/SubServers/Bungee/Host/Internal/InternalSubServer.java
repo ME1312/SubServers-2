@@ -22,10 +22,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.jar.JarFile;
 import java.util.jar.JarInputStream;
 
@@ -278,7 +275,7 @@ public class InternalSubServer extends SubServerImpl {
         if (thread != null && thread.isAlive()) {
             SubSendCommandEvent event = new SubSendCommandEvent(player, this, command);
             host.plugin.getPluginManager().callEvent(event);
-            if (!event.isCancelled()) {
+            if (!event.isCancelled() && (player == null || !DISALLOWED_COMMANDS.matcher(command).find())) {
                 try {
                     if (event.getCommand().equalsIgnoreCase(stopcmd)) allowrestart = false;
                     history.add(new LoggedCommand(player, event.getCommand()));

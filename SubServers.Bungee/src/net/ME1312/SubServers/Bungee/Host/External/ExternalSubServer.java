@@ -18,10 +18,7 @@ import net.md_5.bungee.api.ChatColor;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * External SubServer Class
@@ -212,7 +209,7 @@ public class ExternalSubServer extends SubServerImpl {
         if (running) {
             SubSendCommandEvent event = new SubSendCommandEvent(player, this, command);
             host.plugin.getPluginManager().callEvent(event);
-            if (!event.isCancelled()) {
+            if (!event.isCancelled() && (player == null || !DISALLOWED_COMMANDS.matcher(command).find())) {
                 history.add(new LoggedCommand(player, event.getCommand()));
                 if (event.getCommand().equalsIgnoreCase(stopcmd)) {
                     host.queue(new PacketExEditServer(this, PacketExEditServer.UpdateType.STOP));

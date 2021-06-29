@@ -638,7 +638,7 @@ public final class SubCommand extends Command implements TabExecutor {
                             int success = 0;
                             for (SubServer server : select.subservers) try {
                                 if (server.isRunning()) {
-                                    sender.sendMessage("SubServers > Subserver " + server.getName() + " is still running");
+                                    sender.sendMessage("SubServers > Cannot delete " + server.getName() + " while it is still running");
                                 } else if (server.getHost().recycleSubServer(server.getName())) {
                                     success++;
                                 }
@@ -866,8 +866,8 @@ public final class SubCommand extends Command implements TabExecutor {
             return Collections.emptyList();
         } else if (args.length <= 1) {
             List<String> cmds = new ArrayList<>();
-            cmds.addAll(Arrays.asList("help", "list", "info", "status", "version", "start", "restart", "stop", "kill", "terminate", "cmd", "command", "create", "update", "upgrade"));
-            if (!(sender instanceof ProxiedPlayer)) cmds.addAll(Arrays.asList("reload", "sudo", "screen", "remove", "delete", "restore"));
+            cmds.addAll(Arrays.asList("help", "list", "info", "status", "version", "start", "restart", "stop", "kill", "terminate", "cmd", "command", "create", "update", "upgrade", "restore"));
+            if (!(sender instanceof ProxiedPlayer)) cmds.addAll(Arrays.asList("reload", "sudo", "screen", "remove", "delete"));
             List<String> list = new ArrayList<String>();
             for (String cmd : cmds) {
                 if (cmd.startsWith(last)) list.add(Last + cmd.substring(last.length()));
@@ -992,10 +992,10 @@ public final class SubCommand extends Command implements TabExecutor {
                     args[0].equals("kill") || args[0].equals("terminate") ||
                     args[0].equals("cmd") || args[0].equals("command") ||
                     args[0].equals("update") || args[0].equals("upgrade") ||
+                    args[0].equals("remove") || args[0].equals("del") || args[0].equals("delete") ||
                     (!(sender instanceof ProxiedPlayer) && (
-                                args[0].equals("sudo") || args[0].equals("screen") ||
-                                args[0].equals("remove") || args[0].equals("del") || args[0].equals("delete")
-                            ))) {
+                            args[0].equals("sudo") || args[0].equals("screen")
+                    ))) {
                 List<String> list = new ArrayList<String>();
                 ServerSelection select = selectServers(null, args, 1, true);
                 if (select.last != null) {
@@ -1075,6 +1075,12 @@ public final class SubCommand extends Command implements TabExecutor {
                         }
                     }
                     return Collections.singletonList("[Port]");
+                } else {
+                    return Collections.emptyList();
+                }
+            } else if (args[0].equals("restore")) {
+                if (args.length == 2) {
+                    return Collections.singletonList("<Subserver>");
                 } else {
                     return Collections.emptyList();
                 }

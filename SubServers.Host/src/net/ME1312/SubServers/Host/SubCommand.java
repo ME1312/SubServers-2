@@ -927,13 +927,12 @@ public class SubCommand {
                         selectServers(sender, args, 0, true, select -> {
                             if (select.subservers.length > 0) {
                                 Container<Integer> success = new Container<Integer>(0);
-                                Container<Integer> running = new Container<Integer>(0);
                                 AsyncConsolidator merge = new AsyncConsolidator(() -> {
                                     if (success.value > 0) sender.sendMessage("Removing " + success.value + " subserver"+((success.value == 1)?"":"s"));
                                 });
                                 for (SubServer server : select.subservers) {
                                     if (server.isRunning()) {
-                                        sender.sendMessage("Subserver " + server.getName() + " is still running");
+                                        sender.sendMessage("Cannot delete " + server.getName() + " while it is still running");
                                     } else {
                                         server.getHost(host -> {
                                             if (host == null) {

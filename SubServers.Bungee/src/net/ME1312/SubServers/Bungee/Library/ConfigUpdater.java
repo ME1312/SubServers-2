@@ -318,7 +318,7 @@ public class ConfigUpdater {
 
                 existing = updated.clone();
                 i++;
-            } if (was.compareTo(new Version("21w24h")) <= 0) {
+            } if (was.compareTo(new Version("21w27a")) <= 0) {
 
               //existing = updated.clone();
                 i++;
@@ -446,6 +446,9 @@ public class ConfigUpdater {
             def.put("Command.Update.Template-Disabled", "&cSubServers &4&l\\u00BB&c The template that created &4$str$&c is not enabled");
             def.put("Command.Update.Template-Invalid", "&cSubServers &4&l\\u00BB&c The template that created &4$str$&c does not support subserver updating");
             def.put("Command.Update.Version-Required", "&cSubServers &4&l\\u00BB&c The template that created &4$str$&c requires a Minecraft version to be specified");
+            def.put("Command.Delete.Disappeared", "&cSubServers &4&l\\u00BB&c Subserver &4$str$&c has disappeared");
+            def.put("Command.Delete.Running", "&cSubServers &4&l\\u00BB&c Cannot delete &4$str$&c while it is still running");
+            def.put("Command.Delete", "&aSubServers &2&l\\u00BB&a Deleting &2$int$&a subserver(s)");
             def.put("Command.Teleport", "&aSubServers &2&l\\u00BB&a Teleporting &2$str$&a to server");
             def.put("Command.Teleport.Not-Running", "&cSubServers &4&l\\u00BB&c Subserver &4$str$&c is not running");
             def.put("Interface.Generic.Back", "&cBack");

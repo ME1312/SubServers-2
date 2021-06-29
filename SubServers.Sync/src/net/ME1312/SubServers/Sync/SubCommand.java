@@ -682,13 +682,12 @@ public final class SubCommand extends Command implements TabExecutor {
                             selectServers(sender, args, 1, true, select -> {
                                 if (select.subservers.length > 0) {
                                     Container<Integer> success = new Container<Integer>(0);
-                                    Container<Integer> running = new Container<Integer>(0);
                                     AsyncConsolidator merge = new AsyncConsolidator(() -> {
                                         if (success.value > 0) sender.sendMessage("SubServers > Removing " + success.value + " subserver"+((success.value == 1)?"":"s"));
                                     });
                                     for (SubServer server : select.subservers) {
                                         if (server.isRunning()) {
-                                            sender.sendMessage("SubServers > Subserver " + server.getName() + " is still running");
+                                            sender.sendMessage("SubServers > Cannot delete " + server.getName() + " while it is still running");
                                         } else {
                                             server.getHost(host -> {
                                                 if (host == null) {
@@ -968,8 +967,8 @@ public final class SubCommand extends Command implements TabExecutor {
             return Collections.emptyList();
         } else if (args.length <= 1) {
             List<String> cmds = new ArrayList<>();
-            cmds.addAll(Arrays.asList("help", "list", "info", "status", "version", "start", "restart", "stop", "kill", "terminate", "cmd", "command", "create", "update", "upgrade"));
-            if (!(sender instanceof ProxiedPlayer)) cmds.addAll(Arrays.asList("reload", "sudo", "screen", "remove", "delete", "restore"));
+            cmds.addAll(Arrays.asList("help", "list", "info", "status", "version", "start", "restart", "stop", "kill", "terminate", "cmd", "command", "create", "update", "upgrade", "restore"));
+            if (!(sender instanceof ProxiedPlayer)) cmds.addAll(Arrays.asList("remove", "delete"));
 
             updateCache();
 
@@ -1074,24 +1073,13 @@ public final class SubCommand extends Command implements TabExecutor {
                 } else {
                     return Collections.emptyList();
                 }
-            } else if (!(sender instanceof ProxiedPlayer) && (args[0].equals("restore"))) {
-             /* if (args[0].equals("restore")) */ {
-                    if (args.length == 2) {
-                        return Collections.singletonList("<Subserver>");
-                    } else {
-                        return Collections.emptyList();
-                    }
-                }
             } else if (args[0].equals("start") ||
                     args[0].equals("restart") ||
                     args[0].equals("stop") ||
                     args[0].equals("kill") || args[0].equals("terminate") ||
                     args[0].equals("cmd") || args[0].equals("command") ||
                     args[0].equals("update") || args[0].equals("upgrade") ||
-                    (!(sender instanceof ProxiedPlayer) && (
-                            args[0].equals("sudo") || args[0].equals("screen") ||
-                                    args[0].equals("remove") || args[0].equals("del") || args[0].equals("delete")
-                    ))) {
+                    args[0].equals("remove") || args[0].equals("del") || args[0].equals("delete")) {
                 List<String> list = new ArrayList<String>();
                 RawServerSelection select = selectRawServers(null, args, 1, true);
                 if (select.last != null) {
@@ -1172,6 +1160,12 @@ public final class SubCommand extends Command implements TabExecutor {
                         }
                     }
                     return Collections.singletonList("[Port]");
+                } else {
+                    return Collections.emptyList();
+                }
+            } else if (args[0].equals("restore")) {
+                if (args.length == 2) {
+                    return Collections.singletonList("<Subserver>");
                 } else {
                     return Collections.emptyList();
                 }

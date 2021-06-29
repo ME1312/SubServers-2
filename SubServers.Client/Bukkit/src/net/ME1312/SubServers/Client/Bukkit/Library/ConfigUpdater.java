@@ -56,6 +56,7 @@ public class ConfigUpdater {
             YAMLSection settings = new YAMLSection();
             settings.set("Version", ((now.compareTo(was) <= 0)?was:now).toString());
             settings.set("API-Only-Mode", updated.getMap("Settings", new YAMLSection()).getBoolean("API-Only-Mode", false));
+            settings.set("Allow-Deletion", updated.getMap("Settings", new YAMLSection()).getBoolean("Allow-Deletion", false));
             settings.set("Show-Addresses", updated.getMap("Settings", new YAMLSection()).getBoolean("Show-Addresses", false));
             settings.set("Use-Title-Messages", updated.getMap("Settings", new YAMLSection()).getBoolean("Use-Title-Messages", true));
             settings.set("PlaceholderAPI-Ready", updated.getMap("Settings", new YAMLSection()).getBoolean("PlaceholderAPI-Ready", false));
