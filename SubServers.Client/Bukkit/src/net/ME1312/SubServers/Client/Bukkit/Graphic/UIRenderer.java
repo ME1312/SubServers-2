@@ -227,42 +227,43 @@ public abstract class UIRenderer {
      * @param subtitle Subtitle to display (or null to hide)
      */
     public void setDownloading(String subtitle) {
-        final String text = subtitle;
+        if (subtitle != null) {
+            if (!canSendTitle()) {
+                final String text = subtitle;
+                if (download != -1) Bukkit.getScheduler().cancelTask(download);
+                download = Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, () -> {
+                    if (tdownload != null) Bukkit.getPlayer(player).sendMessage(plugin.api.getLang("SubServers", "Interface.Generic.Downloading").replace("$str$", text));
+                    download = -1;
+                }, 50L);
+                return;
+            }
 
-        if (text != null && !canSendTitle()) {
-            if (download != -1) Bukkit.getScheduler().cancelTask(download);
-            download = Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, () -> {
-                if (tdownload != null) Bukkit.getPlayer(player).sendMessage(plugin.api.getLang("SubServers", "Interface.Generic.Downloading").replace("$str$", text));
-                download = -1;
-            }, 50L);
-            return;
-        }
+            if (!subtitle.startsWith(Character.toString(ChatColor.COLOR_CHAR))) {
+                subtitle = plugin.api.getLang("SubServers", "Interface.Generic.Downloading.Title-Color-Alt") + subtitle;
+            }
+            if (tdownload == null) {
+                tdownload = new ContainedPair<String, Integer>(subtitle, 0);
 
-        if (subtitle != null && !subtitle.startsWith(Character.toString(ChatColor.COLOR_CHAR))) {
-            subtitle = plugin.api.getLang("SubServers", "Interface.Generic.Downloading.Title-Color-Alt") + subtitle;
-        }
-        if (subtitle != null && tdownload == null) {
-            tdownload = new ContainedPair<String, Integer>(subtitle, 0);
+                new BukkitRunnable() {
+                    @Override
+                    public void run() {
+                        if (tdownload != null) {
+                            if (++tdownload.value >= adownload.length) {
+                                tdownload.value = 0;
+                            }
 
-            new BukkitRunnable() {
-                @Override
-                public void run() {
-                    if (tdownload != null) {
-                        if (++tdownload.value >= adownload.length) {
-                            tdownload.value = 0;
-                        }
-
-                        if (!sendTitle(adownload[tdownload.value], tdownload.key, 0, 10, 5)) {
+                            if (!sendTitle(adownload[tdownload.value], tdownload.key, 0, 10, 5)) {
+                                cancel();
+                            }
+                        } else {
+                            sendTitle(null);
                             cancel();
                         }
-                    } else {
-                        sendTitle(null);
-                        cancel();
                     }
-                }
-            }.runTaskTimer(plugin, 0, 1);
-        } else if (subtitle != null) {
-            tdownload.key = subtitle;
+                }.runTaskTimer(plugin, 0, 1);
+            } else {
+                tdownload.key = subtitle;
+            }
         } else {
             if (tdownload != null) {
                 tdownload = null;

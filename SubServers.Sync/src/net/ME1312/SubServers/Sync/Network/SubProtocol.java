@@ -114,7 +114,7 @@ public class SubProtocol extends SubDataProtocol {
 
         registerPacket(0x0070, new PacketInExRunEvent(plugin));
         registerPacket(0x0071, new PacketInExReset());
-        registerPacket(0x0073, new PacketInExUpdateWhitelist(plugin));
+        registerPacket(0x0073, new PacketInExEditServer(plugin));
         registerPacket(0x0074, new PacketExSyncPlayer(plugin));
         registerPacket(0x0075, new PacketExTransferPlayer(plugin));
         registerPacket(0x0076, new PacketExDisconnectPlayer(plugin));

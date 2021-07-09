@@ -580,7 +580,6 @@ public class SubCreatorImpl {
         if (installed) {
             YAMLSection config = new YAMLSection();
             FileWriter writer = new FileWriter(new UniversalFile(dir, "subdata.json"), false);
-            config.set("Name", name);
             config.setAll(getSubData());
             writer.write(config.toJSON().toString());
             writer.close();

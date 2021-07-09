@@ -15,5 +15,6 @@
         <module>SubServers.Creator</module>
         <module>SubServers.Host</module>
         <module>SubServers.Sync</module>
+        <module>SubServers.Sync/velocity</module>
     </modules>
 </project>

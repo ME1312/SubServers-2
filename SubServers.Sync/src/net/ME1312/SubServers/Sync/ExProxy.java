@@ -429,14 +429,14 @@ public final class ExProxy extends BungeeCommon implements Listener {
         if ((dynamic = SmartFallback.getForcedHost(e.getConnection()) == null) && getReconnectHandler() instanceof SmartFallback && (override = SmartFallback.getDNS(e.getConnection())) != null) {
             if (!(override instanceof SubServerImpl) || ((SubServerImpl) override).isRunning()) {
                 if (!e.getConnection().getListener().isPingPassthrough()) {
-                    e.setResponse(new ServerPing(e.getResponse().getVersion(), e.getResponse().getPlayers(), new TextComponent(override.getMotd()), null));
+                    e.setResponse(new ServerPing(e.getResponse().getVersion(), e.getResponse().getPlayers(), new TextComponent(override.getMotd()), e.getResponse().getFaviconObject()));
                 } else {
                     Container<Boolean> lock = new Container<>(true);
                     boolean mode = plugin != null;
                     if (mode) e.registerIntent(plugin);
                     ((BungeeServerInfo) override).ping((ping, error) -> {
                         if (error != null) {
-                            e.setResponse(new ServerPing(e.getResponse().getVersion(), e.getResponse().getPlayers(), new TextComponent(getTranslation("ping_cannot_connect")), null));
+                            e.setResponse(new ServerPing(e.getResponse().getVersion(), e.getResponse().getPlayers(), new TextComponent(getTranslation("ping_cannot_connect")), e.getResponse().getFaviconObject()));
                         } else e.setResponse(ping);
                         lock.value = false;
                         if (mode) e.completeIntent(plugin);
@@ -454,17 +454,17 @@ public final class ExProxy extends BungeeCommon implements Listener {
         ServerInfo override;
         if ((override = SmartFallback.getForcedHost(e.getConnection())) != null || (override = SmartFallback.getDNS(e.getConnection())) != null) {
             if (override instanceof SubServerImpl && !((SubServerImpl) override).isRunning()) {
-                e.setResponse(new ServerPing(e.getResponse().getVersion(), e.getResponse().getPlayers(), new TextComponent(api.getLang("SubServers", "Bungee.Ping.Offline")), null));
+                e.setResponse(new ServerPing(e.getResponse().getVersion(), e.getResponse().getPlayers(), new TextComponent(api.getLang("SubServers", "Bungee.Ping.Offline")), e.getResponse().getFaviconObject()));
             }
         } else {
             int offline = 0;
             for (String name : e.getConnection().getListener().getServerPriority()) {
                 ServerInfo server = getServerInfo(name);
-                if (server == null || (server instanceof SubServerImpl && !((SubServerImpl) server).isRunning())) offline++;
+                if (server instanceof SubServerImpl && !((SubServerImpl) server).isRunning()) offline++;
             }
 
             if (offline >= e.getConnection().getListener().getServerPriority().size()) {
-                e.setResponse(new ServerPing(e.getResponse().getVersion(), e.getResponse().getPlayers(), new TextComponent(api.getLang("SubServers", "Bungee.Ping.Offline")), null));
+                e.setResponse(new ServerPing(e.getResponse().getVersion(), e.getResponse().getPlayers(), new TextComponent(api.getLang("SubServers", "Bungee.Ping.Offline")), e.getResponse().getFaviconObject()));
             }
         }
     }
@@ -501,14 +501,14 @@ public final class ExProxy extends BungeeCommon implements Listener {
                 if (e.getPlayer().getServer() == null || fallback.containsKey(e.getPlayer().getUniqueId())) {
                     if (!fallback.containsKey(e.getPlayer().getUniqueId()) || fallback.get(e.getPlayer().getUniqueId()).names.contains(e.getTarget().getName())) {
                         ServerKickEvent kick = new ServerKickEvent(e.getPlayer(), e.getTarget(), new BaseComponent[]{
-                                new TextComponent(getTranslation("no_server_permission"))
+                                new TextComponent(api.getLang("SubServers", "Bungee.Restricted"))
                         }, null, ServerKickEvent.State.CONNECTING);
                         fallback(kick);
                         if (!kick.isCancelled()) e.getPlayer().disconnect(kick.getKickReasonComponent());
                         if (e.getPlayer().getServer() != null) e.setCancelled(true);
                     }
                 } else {
-                    e.getPlayer().sendMessage(getTranslation("no_server_permission"));
+                    e.getPlayer().sendMessage(api.getLang("SubServers", "Bungee.Restricted"));
                     e.setCancelled(true);
                 }
             } else if (e.getPlayer().getServer() != null && !fallback.containsKey(e.getPlayer().getUniqueId()) && e.getTarget() instanceof SubServerImpl && !((SubServerImpl) e.getTarget()).isRunning()) {
@@ -560,7 +560,7 @@ public final class ExProxy extends BungeeCommon implements Listener {
     @SuppressWarnings("deprecation")
     @EventHandler(priority = Byte.MAX_VALUE)
     public void fallback(ServerKickEvent e) {
-        if (e.getPlayer().isConnected() && e.getPlayer() instanceof UserConnection && config.get().getMap("Settings").getMap("Smart-Fallback", new ObjectMap<>()).getBoolean("Fallback", true)) {
+        if (e.getPlayer().isConnected() && config.get().getMap("Settings").getMap("Smart-Fallback", new ObjectMap<>()).getBoolean("Fallback", true)) {
             FallbackState state;
             boolean init = !fallback.containsKey(e.getPlayer().getUniqueId());
             if (init) {
@@ -581,9 +581,6 @@ public final class ExProxy extends BungeeCommon implements Listener {
                 if (init) fallback.put(e.getPlayer().getUniqueId(), state);
 
                 e.setCancelServer(state.servers.getFirst());
-                if (Util.isException(() -> ServerKickEvent.class.getMethod("setCancelServers", ServerInfo[].class).invoke(e, (Object) state.servers.toArray(new ServerInfo[0])))) {
-                    ((UserConnection) e.getPlayer()).setServerJoinQueue(new LinkedList<>(state.names));
-                }
             }
         }
     }
@@ -635,7 +632,7 @@ public final class ExProxy extends BungeeCommon implements Listener {
 
     public Boolean merge(net.ME1312.SubServers.Client.Common.Network.API.Server server) {
         ServerImpl current = servers.get(server.getName().toLowerCase());
-        if (current == null || server instanceof net.ME1312.SubServers.Client.Common.Network.API.SubServer || !(current instanceof SubServerImpl)) {
+        if (server instanceof net.ME1312.SubServers.Client.Common.Network.API.SubServer || !(current instanceof SubServerImpl)) {
             if (current == null || !current.getSignature().equals(server.getSignature())) {
                 if (server instanceof net.ME1312.SubServers.Client.Common.Network.API.SubServer) {
                     servers.put(server.getName().toLowerCase(), SubServerImpl.construct(server.getSignature(), server.getName(), server.getDisplayName(), server.getAddress(),
@@ -669,42 +666,9 @@ public final class ExProxy extends BungeeCommon implements Listener {
     }
 
     @EventHandler(priority = Byte.MIN_VALUE)
-    public void edit(SubEditServerEvent e) {
-        if (servers.keySet().contains(e.getServer().toLowerCase())) {
-            ServerImpl server = servers.get(e.getServer().toLowerCase());
-            switch (e.getEdit().key().toLowerCase()) {
-                case "display":
-                    server.setDisplayName(e.getEdit().value().asString());
-                    break;
-                case "motd":
-                    server.setMotd(ChatColor.translateAlternateColorCodes('&', e.getEdit().value().asString()));
-                    break;
-                case "restricted":
-                    server.setRestricted(e.getEdit().value().asBoolean());
-                    break;
-                case "hidden":
-                    server.setHidden(e.getEdit().value().asBoolean());
-                    break;
-            }
-        }
-    }
-
-    @EventHandler(priority = Byte.MIN_VALUE)
     public void start(SubStartEvent e) {
         if (servers.keySet().contains(e.getServer().toLowerCase()) && servers.get(e.getServer().toLowerCase()) instanceof SubServerImpl)
             ((SubServerImpl) servers.get(e.getServer().toLowerCase())).setRunning(true);
-    }
-
-    public void connect(ServerImpl server, int channel, UUID address) {
-        if (server != null) {
-            server.setSubData(address, channel);
-        }
-    }
-
-    public void disconnect(ServerImpl server, int channel) {
-        if (server != null) {
-            server.setSubData(null, channel);
-        }
     }
 
     @EventHandler(priority = Byte.MIN_VALUE)

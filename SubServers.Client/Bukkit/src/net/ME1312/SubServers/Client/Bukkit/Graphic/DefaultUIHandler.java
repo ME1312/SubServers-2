@@ -53,7 +53,7 @@ public class DefaultUIHandler implements UIHandler, Listener {
     }
 
     public DefaultUIRenderer getRenderer(Player player) {
-        if (!gui.keySet().contains(player.getUniqueId())) gui.put(player.getUniqueId(), new DefaultUIRenderer(plugin, player.getUniqueId()));
+        if (!gui.containsKey(player.getUniqueId())) gui.put(player.getUniqueId(), new DefaultUIRenderer(plugin, player.getUniqueId()));
         return gui.get(player.getUniqueId());
     }
 
@@ -64,7 +64,7 @@ public class DefaultUIHandler implements UIHandler, Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void click(InventoryClickEvent event) {
         Player player = (Player) event.getWhoClicked();
-        if (!event.isCancelled() && enabled && gui.keySet().contains(player.getUniqueId())) {
+        if (!event.isCancelled() && enabled && gui.containsKey(player.getUniqueId())) {
             DefaultUIRenderer gui = this.gui.get(player.getUniqueId());
             String title = event.getView().getTitle();
             
@@ -463,7 +463,7 @@ public class DefaultUIHandler implements UIHandler, Listener {
     @SuppressWarnings("deprecation")
     @EventHandler(priority = EventPriority.LOWEST)
     public void input(org.bukkit.event.player.PlayerChatEvent event) {
-        if (!event.isCancelled() && enabled && input.keySet().contains(event.getPlayer().getUniqueId())) {
+        if (!event.isCancelled() && enabled && input.containsKey(event.getPlayer().getUniqueId())) {
             YAMLSection data = new YAMLSection();
             data.set("message", event.getMessage());
             input.get(event.getPlayer().getUniqueId()).run(data);
@@ -479,7 +479,7 @@ public class DefaultUIHandler implements UIHandler, Listener {
      */
     @EventHandler(priority = EventPriority.LOWEST)
     public void input(PlayerCommandPreprocessEvent event) {
-        if (!event.isCancelled() && enabled && input.keySet().contains(event.getPlayer().getUniqueId())) {
+        if (!event.isCancelled() && enabled && input.containsKey(event.getPlayer().getUniqueId())) {
             YAMLSection data = new YAMLSection();
             data.set("message", (event.getMessage().startsWith("/"))?event.getMessage().substring(1):event.getMessage());
             input.get(event.getPlayer().getUniqueId()).run(data);

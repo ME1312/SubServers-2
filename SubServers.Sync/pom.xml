@@ -83,20 +83,6 @@
                             </tasks>
                         </configuration>
                     </execution>
-                    <execution>
-                        <id>verify</id>
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                        <configuration>
-                            <tasks> <!-- Dependency Stripped Jar for Testing -->
-                                <jar destfile="${basedir}/../Artifacts/Modulized/SubServers.Sync.jar" manifest="src/META-INF/MANIFEST.MOD.MF">
-                                    <zipfileset src="${basedir}/../Artifacts/SubServers.Sync.jar" excludes="net/ME1312/Galaxi/** net/ME1312/SubData/**" />
-                                </jar>
-                            </tasks>
-                        </configuration>
-                    </execution>
                 </executions>
             </plugin>
             <plugin>
@@ -107,31 +93,6 @@
                     <finalName>SubServers.Sync</finalName>
                     <outputDirectory>../Artifacts/Maven</outputDirectory>
                 </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <version>2.2-beta-5</version>
-                <configuration>
-                    <finalName>SubServers.Sync</finalName>
-                    <outputDirectory>../Artifacts</outputDirectory>
-                    <archive>
-                        <manifestFile>src/META-INF/MANIFEST.MF</manifestFile>
-                    </archive>
-                    <descriptorRefs>
-                        <descriptorRef>jar-with-dependencies</descriptorRef>
-                    </descriptorRefs>
-                    <appendAssemblyId>false</appendAssemblyId>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>make-assembly</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

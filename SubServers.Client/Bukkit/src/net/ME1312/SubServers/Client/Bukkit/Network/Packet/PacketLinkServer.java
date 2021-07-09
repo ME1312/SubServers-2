@@ -43,7 +43,15 @@ public class PacketLinkServer implements InitialPacket, PacketObjectIn<Integer>,
     public ObjectMap<Integer> send(SubDataSender client) {
         ObjectMap<Integer> json = new ObjectMap<Integer>();
         if (plugin.api.getName() != null) json.set(0x0000, plugin.api.getName());
-        json.set(0x0001, Bukkit.getServer().getPort());
+
+        String address = plugin.server_address;
+        if (address != null) {
+            if (address.indexOf(':') == -1) address += ":" + Bukkit.getServer().getPort();
+            json.set(0x0001, address);
+        } else {
+            json.set(0x0001, Bukkit.getServer().getPort());
+        }
+
         json.set(0x0002, channel);
         return json;
     }

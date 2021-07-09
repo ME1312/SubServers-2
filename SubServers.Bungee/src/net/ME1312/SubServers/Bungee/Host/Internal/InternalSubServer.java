@@ -8,10 +8,14 @@ import net.ME1312.Galaxi.Library.Map.ObjectMapValue;
 import net.ME1312.Galaxi.Library.UniversalFile;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
+import net.ME1312.SubData.Server.SubDataClient;
 import net.ME1312.SubServers.Bungee.Event.*;
 import net.ME1312.SubServers.Bungee.Host.*;
 import net.ME1312.SubServers.Bungee.Library.Compatibility.Logger;
 import net.ME1312.SubServers.Bungee.Library.Exception.InvalidServerException;
+import net.ME1312.SubServers.Bungee.Network.Packet.PacketOutExEditServer;
+import net.ME1312.SubServers.Bungee.Network.Packet.PacketOutExEditServer.Edit;
+import net.ME1312.SubServers.Bungee.SubAPI;
 import net.ME1312.SubServers.Bungee.SubProxy;
 
 import net.md_5.bungee.BungeeServerInfo;
@@ -330,14 +334,7 @@ public class InternalSubServer extends SubServerImpl {
                                 break;
                             case "display":
                                 if (value.isString()) {
-                                    Field f = ServerImpl.class.getDeclaredField("nick");
-                                    f.setAccessible(true);
-                                    if (value.isNull() || value.asString().length() == 0 || getName().equals(value.asString())) {
-                                        f.set(this, null);
-                                    } else {
-                                        f.set(this, value.asString());
-                                    }
-                                    f.setAccessible(false);
+                                    setDisplayName(value.asRawString());
                                     logger.name = getDisplayName();
                                     if (perma && this.host.plugin.servers.get().getMap("Servers").getKeys().contains(getName())) {
                                         if (getName().equals(getDisplayName())) {
@@ -533,6 +530,9 @@ public class InternalSubServer extends SubServerImpl {
                             case "whitelist":
                                 if (value.isList()) {
                                     Util.reflect(ServerImpl.class.getDeclaredField("whitelist"), this, value.asUUIDList());
+                                    if (isRegistered()) for (Proxy proxy : SubAPI.getInstance().getProxies().values()) if (proxy.getSubData()[0] != null) {
+                                        ((SubDataClient) proxy.getSubData()[0]).sendPacket(new PacketOutExEditServer(this, Edit.WHITELIST_SET, value.asUUIDList()));
+                                    }
                                     c++;
                                 }
                                 break;

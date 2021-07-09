@@ -23,20 +23,14 @@ public class Proxy implements ClientHandler, ExtraDataHandler {
     private HashMap<Integer, SubDataClient> subdata = new HashMap<Integer, SubDataClient>();
     private ObjectMap<String> extra = new ObjectMap<String>();
     private final String signature;
-    private boolean persistent;
+    private boolean persistent = false;
     private String nick = null;
     private final String name;
 
     public Proxy(String name) throws IllegalArgumentException {
-        this(name, name != null);
-    }
-
-    @SuppressWarnings("deprecation")
-    public Proxy(String name, boolean persistent) throws IllegalArgumentException {
         if (name == null) name = Util.getNew(SubAPI.getInstance().getInternals().proxies.keySet(), () -> UUID.randomUUID().toString());
         if (name.contains(" ")) throw new IllegalArgumentException("Proxy names cannot have spaces: " + name);
         this.name = name;
-        this.persistent = persistent;
         this.signature = SubAPI.getInstance().signAnonymousObject();
 
         subdata.put(0, null);
@@ -144,6 +138,13 @@ public class Proxy implements ClientHandler, ExtraDataHandler {
             players.add(plugin.rPlayers.get(id));
         }
         return players;
+    }
+
+    /**
+     * Makes it so the proxy object will still exist within the server manager even if it is disconnected
+     */
+    public final void persist() {
+        persistent = true;
     }
 
     /**

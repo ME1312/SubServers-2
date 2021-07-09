@@ -266,7 +266,7 @@ public final class SubAPI implements BungeeAPI {
         if (Util.isNull(name, getHost(name))) throw new NullPointerException();
         SubRemoveHostEvent event = new SubRemoveHostEvent(player, getHost(name));
         plugin.getPluginManager().callEvent(event);
-        if (event.isCancelled()) {
+        if (!event.isCancelled()) {
             if (getHost(name).destroy()) {
                 plugin.hosts.remove(name.toLowerCase());
                 return true;
@@ -466,7 +466,7 @@ public final class SubAPI implements BungeeAPI {
         if (Util.isNull(name, getServer(name))) throw new NullPointerException();
         SubRemoveServerEvent event = new SubRemoveServerEvent(player, null, getServer(name));
         plugin.getPluginManager().callEvent(event);
-        if (event.isCancelled()) {
+        if (!event.isCancelled()) {
             plugin.exServers.remove(name.toLowerCase());
             return true;
         } else return false;

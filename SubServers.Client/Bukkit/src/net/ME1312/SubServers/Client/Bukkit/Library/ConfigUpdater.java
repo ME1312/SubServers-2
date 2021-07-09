@@ -60,7 +60,8 @@ public class ConfigUpdater {
             settings.set("Show-Addresses", updated.getMap("Settings", new YAMLSection()).getBoolean("Show-Addresses", false));
             settings.set("Use-Title-Messages", updated.getMap("Settings", new YAMLSection()).getBoolean("Use-Title-Messages", true));
             settings.set("PlaceholderAPI-Ready", updated.getMap("Settings", new YAMLSection()).getBoolean("PlaceholderAPI-Ready", false));
-            if (updated.getMap("Settings", new YAMLSection()).contains("PlaceholderAPI-Cache-Interval")) settings.set("PlaceholderAPI-Cache-Interval", updated.getMap("Settings").getRawString("PlaceholderAPI-Cache-Interval"));
+            if (updated.getMap("Settings", new YAMLSection()).contains("PlaceholderAPI-Cache-Interval")) settings.set("PlaceholderAPI-Cache-Interval", updated.getMap("Settings").getInt("PlaceholderAPI-Cache-Interval"));
+            if (updated.getMap("Settings", new YAMLSection()).contains("Connect-Address")) settings.set("Connect-Address", updated.getMap("Settings").getRawString("Connect-Address"));
 
             YAMLSection subdata = new YAMLSection();
             if (updated.getMap("Settings", new YAMLSection()).getMap("SubData", new YAMLSection()).contains("Name")) subdata.set("Name", updated.getMap("Settings").getMap("SubData").getRawString("Name"));

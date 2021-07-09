@@ -101,7 +101,7 @@ public class SubProtocol extends SubDataProtocol {
       //registerPacket(0x0053, PacketInExRequestQueue.class);
         registerPacket(0x0054, PacketExCreateServer.class);
         registerPacket(0x0055, PacketExAddServer.class);
-        registerPacket(0x0056, PacketExEditServer.class);
+        registerPacket(0x0056, PacketExControlServer.class);
       //registerPacket(0x0057, PacketInExLogMessage.class);
         registerPacket(0x0058, PacketExRemoveServer.class);
         registerPacket(0x0059, PacketExDeleteServer.class);
@@ -113,7 +113,7 @@ public class SubProtocol extends SubDataProtocol {
         registerPacket(0x0053, new PacketInExRequestQueue(plugin));
         registerPacket(0x0054, new PacketExCreateServer(null));
         registerPacket(0x0055, new PacketExAddServer());
-        registerPacket(0x0056, new PacketExEditServer(plugin));
+        registerPacket(0x0056, new PacketExControlServer(plugin));
         registerPacket(0x0057, new PacketInExLogMessage());
         registerPacket(0x0058, new PacketExRemoveServer());
         registerPacket(0x0059, new PacketExDeleteServer());
@@ -124,7 +124,7 @@ public class SubProtocol extends SubDataProtocol {
         registerPacket(0x0070, PacketOutExRunEvent.class);
         registerPacket(0x0071, PacketOutExReset.class);
         registerPacket(0x0072, PacketOutExReload.class);
-        registerPacket(0x0073, PacketOutExUpdateWhitelist.class);
+        registerPacket(0x0073, PacketOutExEditServer.class);
         registerPacket(0x0074, PacketExSyncPlayer.class);
         registerPacket(0x0075, PacketExTransferPlayer.class);
         registerPacket(0x0076, PacketExDisconnectPlayer.class);

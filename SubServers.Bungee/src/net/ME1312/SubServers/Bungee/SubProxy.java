@@ -26,6 +26,7 @@ import net.ME1312.SubServers.Bungee.Library.Fallback.SmartFallback;
 import net.ME1312.SubServers.Bungee.Library.Metrics;
 import net.ME1312.SubServers.Bungee.Network.Packet.PacketExDisconnectPlayer;
 import net.ME1312.SubServers.Bungee.Network.Packet.PacketExSyncPlayer;
+import net.ME1312.SubServers.Bungee.Network.Packet.PacketLinkServer;
 import net.ME1312.SubServers.Bungee.Network.Packet.PacketOutExReload;
 import net.ME1312.SubServers.Bungee.Network.SubProtocol;
 
@@ -365,6 +366,7 @@ public final class SubProxy extends BungeeCommon implements Listener {
             Util.isException(subdata::waitFor);
         }
 
+        PacketLinkServer.strict = config.get().getMap("Settings").getBoolean("Strict-Server-Linking", true);
         SmartFallback.dns_forward = config.get().getMap("Settings").getMap("Smart-Fallback", new ObjectMap<>()).getBoolean("DNS-Forward", false);
 
         int hosts = 0;
@@ -937,14 +939,14 @@ public final class SubProxy extends BungeeCommon implements Listener {
         if ((dynamic = SmartFallback.getForcedHost(e.getConnection()) == null) && getReconnectHandler() instanceof SmartFallback && (override = SmartFallback.getDNS(e.getConnection())) != null) {
             if (!(override instanceof SubServer) || ((SubServer) override).isRunning()) {
                 if (!e.getConnection().getListener().isPingPassthrough()) {
-                    e.setResponse(new ServerPing(e.getResponse().getVersion(), e.getResponse().getPlayers(), new TextComponent(override.getMotd()), null));
+                    e.setResponse(new ServerPing(e.getResponse().getVersion(), e.getResponse().getPlayers(), new TextComponent(override.getMotd()), e.getResponse().getFaviconObject()));
                 } else {
                     Container<Boolean> lock = new Container<>(true);
                     boolean mode = plugin != null;
                     if (mode) e.registerIntent(plugin);
                     ((BungeeServerInfo) override).ping((ping, error) -> {
                         if (error != null) {
-                            e.setResponse(new ServerPing(e.getResponse().getVersion(), e.getResponse().getPlayers(), new TextComponent(getTranslation("ping_cannot_connect")), null));
+                            e.setResponse(new ServerPing(e.getResponse().getVersion(), e.getResponse().getPlayers(), new TextComponent(getTranslation("ping_cannot_connect")), e.getResponse().getFaviconObject()));
                         } else e.setResponse(ping);
                         lock.value = false;
                         if (mode) e.completeIntent(plugin);
@@ -962,7 +964,7 @@ public final class SubProxy extends BungeeCommon implements Listener {
         ServerInfo override;
         if ((override = SmartFallback.getForcedHost(e.getConnection())) != null || (override = SmartFallback.getDNS(e.getConnection())) != null) {
             if (override instanceof SubServer && !((SubServer) override).isRunning()) {
-                e.setResponse(new ServerPing(e.getResponse().getVersion(), e.getResponse().getPlayers(), new TextComponent(api.getLang("SubServers", "Bungee.Ping.Offline")), null));
+                e.setResponse(new ServerPing(e.getResponse().getVersion(), e.getResponse().getPlayers(), new TextComponent(api.getLang("SubServers", "Bungee.Ping.Offline")), e.getResponse().getFaviconObject()));
             }
         } else {
             int offline = 0;
@@ -973,7 +975,7 @@ public final class SubProxy extends BungeeCommon implements Listener {
             }
 
             if (offline >= e.getConnection().getListener().getServerPriority().size()) {
-                e.setResponse(new ServerPing(e.getResponse().getVersion(), e.getResponse().getPlayers(), new TextComponent(api.getLang("SubServers", "Bungee.Ping.Offline")), null));
+                e.setResponse(new ServerPing(e.getResponse().getVersion(), e.getResponse().getPlayers(), new TextComponent(api.getLang("SubServers", "Bungee.Ping.Offline")), e.getResponse().getFaviconObject()));
             }
         }
     }
@@ -1010,14 +1012,14 @@ public final class SubProxy extends BungeeCommon implements Listener {
                 if (e.getPlayer().getServer() == null || fallback.containsKey(e.getPlayer().getUniqueId())) {
                     if (!fallback.containsKey(e.getPlayer().getUniqueId()) || fallback.get(e.getPlayer().getUniqueId()).names.contains(e.getTarget().getName())) {
                         ServerKickEvent kick = new ServerKickEvent(e.getPlayer(), e.getTarget(), new BaseComponent[]{
-                                new TextComponent(getTranslation("no_server_permission"))
+                                new TextComponent(api.getLang("SubServers", "Bungee.Restricted"))
                         }, null, ServerKickEvent.State.CONNECTING);
                         fallback(kick);
                         if (!kick.isCancelled()) e.getPlayer().disconnect(kick.getKickReasonComponent());
                         if (e.getPlayer().getServer() != null) e.setCancelled(true);
                     }
                 } else {
-                    e.getPlayer().sendMessage(getTranslation("no_server_permission"));
+                    e.getPlayer().sendMessage(api.getLang("SubServers", "Bungee.Restricted"));
                     e.setCancelled(true);
                 }
             } else if (e.getPlayer().getServer() != null && !fallback.containsKey(e.getPlayer().getUniqueId()) && e.getTarget() instanceof SubServer && !((SubServer) e.getTarget()).isRunning()) {
@@ -1088,9 +1090,6 @@ public final class SubProxy extends BungeeCommon implements Listener {
                 if (init) fallback.put(e.getPlayer().getUniqueId(), state);
 
                 e.setCancelServer(state.servers.getFirst());
-                if (Util.isException(() -> ServerKickEvent.class.getMethod("setCancelServers", ServerInfo[].class).invoke(e, (Object) state.servers.toArray(new ServerInfo[0])))) {
-                    ((UserConnection) e.getPlayer()).setServerJoinQueue(new LinkedList<>(state.names));
-                }
             }
         }
     }

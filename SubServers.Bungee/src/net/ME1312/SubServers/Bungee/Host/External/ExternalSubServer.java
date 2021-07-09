@@ -7,13 +7,17 @@ import net.ME1312.Galaxi.Library.Container.Value;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Map.ObjectMapValue;
 import net.ME1312.Galaxi.Library.Util;
+import net.ME1312.SubData.Server.SubDataClient;
 import net.ME1312.SubServers.Bungee.Event.*;
 import net.ME1312.SubServers.Bungee.Host.*;
 import net.ME1312.SubServers.Bungee.Library.Compatibility.Logger;
 import net.ME1312.SubServers.Bungee.Library.Exception.InvalidServerException;
-import net.ME1312.SubServers.Bungee.Network.Packet.PacketExEditServer;
+import net.ME1312.SubServers.Bungee.Network.Packet.PacketExControlServer;
+import net.ME1312.SubServers.Bungee.Network.Packet.PacketExControlServer.Action;
+import net.ME1312.SubServers.Bungee.Network.Packet.PacketOutExEditServer;
+import net.ME1312.SubServers.Bungee.Network.Packet.PacketOutExEditServer.Edit;
+import net.ME1312.SubServers.Bungee.SubAPI;
 
-import net.md_5.bungee.BungeeServerInfo;
 import net.md_5.bungee.api.ChatColor;
 
 import java.io.IOException;
@@ -111,7 +115,7 @@ public class ExternalSubServer extends SubServerImpl {
             if (!event.isCancelled()) {
                 Logger.get("SubServers").info("Now starting " + getName());
                 started(null);
-                host.queue(new PacketExEditServer(this, PacketExEditServer.UpdateType.START, logger.getExternalAddress().toString()));
+                host.queue(new PacketExControlServer(this, Action.START, logger.getExternalAddress().toString()));
                 return true;
             } else {
                 lock = false;
@@ -126,7 +130,7 @@ public class ExternalSubServer extends SubServerImpl {
             lock = false;
             logger.start();
             if (address != null) {
-                if (address != logger.getExternalAddress()) host.queue(new PacketExEditServer(this, PacketExEditServer.UpdateType.SET_LOGGING_ADDRESS, logger.getExternalAddress().toString()));
+                if (address != logger.getExternalAddress()) host.queue(new PacketExControlServer(this, Action.SET_LOGGING_ADDRESS, logger.getExternalAddress().toString()));
                 host.plugin.getPluginManager().callEvent(new SubStartEvent(null, this));
             }
         }
@@ -144,7 +148,7 @@ public class ExternalSubServer extends SubServerImpl {
             host.plugin.getPluginManager().callEvent(event);
             if (!event.isCancelled()) {
                 history.add(new LoggedCommand(player, stopcmd));
-                host.queue(new PacketExEditServer(this, PacketExEditServer.UpdateType.STOP));
+                host.queue(new PacketExControlServer(this, Action.STOP));
                 return true;
             } else return false;
         } else return false;
@@ -197,7 +201,7 @@ public class ExternalSubServer extends SubServerImpl {
             SubStopEvent event = new SubStopEvent(player, this, true);
             host.plugin.getPluginManager().callEvent(event);
             if (!event.isCancelled()) {
-                host.queue(new PacketExEditServer(this, PacketExEditServer.UpdateType.TERMINATE));
+                host.queue(new PacketExControlServer(this, Action.TERMINATE));
                 return true;
             } else return false;
         } else return false;
@@ -212,9 +216,9 @@ public class ExternalSubServer extends SubServerImpl {
             if (!event.isCancelled() && (player == null || !DISALLOWED_COMMANDS.matcher(command).find())) {
                 history.add(new LoggedCommand(player, event.getCommand()));
                 if (event.getCommand().equalsIgnoreCase(stopcmd)) {
-                    host.queue(new PacketExEditServer(this, PacketExEditServer.UpdateType.STOP));
+                    host.queue(new PacketExControlServer(this, Action.STOP));
                 } else {
-                    host.queue(new PacketExEditServer(this, PacketExEditServer.UpdateType.COMMAND, event.getCommand()));
+                    host.queue(new PacketExControlServer(this, Action.COMMAND, event.getCommand()));
                 }
                 return true;
             } else return false;
@@ -258,14 +262,7 @@ public class ExternalSubServer extends SubServerImpl {
                                 break;
                             case "display":
                                 if (value.isString()) {
-                                    Field f = ServerImpl.class.getDeclaredField("nick");
-                                    f.setAccessible(true);
-                                    if (value.isNull() || value.asString().length() == 0 || getName().equals(value.asString())) {
-                                        f.set(this, null);
-                                    } else {
-                                        f.set(this, value.asString());
-                                    }
-                                    f.setAccessible(false);
+                                    setDisplayName(value.asRawString());
                                     logger.name = getDisplayName();
                                     if (perma && this.host.plugin.servers.get().getMap("Servers").getKeys().contains(getName())) {
                                         if (getName().equals(getDisplayName())) {
@@ -280,7 +277,7 @@ public class ExternalSubServer extends SubServerImpl {
                                 break;
                             case "enabled":
                                 if (value.isBoolean()) {
-                                    if (enabled != value.asBoolean()) host.queue(new PacketExEditServer(this, PacketExEditServer.UpdateType.SET_ENABLED, (Boolean) value.asBoolean()));
+                                    if (enabled != value.asBoolean()) host.queue(new PacketExControlServer(this, Action.SET_ENABLED, (Boolean) value.asBoolean()));
                                     enabled = value.asBoolean();
                                     if (perma && this.host.plugin.servers.get().getMap("Servers").getKeys().contains(getName())) {
                                         this.host.plugin.servers.get().getMap("Servers").getMap(getName()).set("Enabled", isEnabled());
@@ -349,7 +346,7 @@ public class ExternalSubServer extends SubServerImpl {
                                 break;
                             case "log":
                                 if (value.isBoolean()) {
-                                    if (log.value() != value.asBoolean()) host.queue(new PacketExEditServer(this, PacketExEditServer.UpdateType.SET_LOGGING, (Boolean) value.asBoolean()));
+                                    if (log.value() != value.asBoolean()) host.queue(new PacketExControlServer(this, Action.SET_LOGGING, (Boolean) value.asBoolean()));
                                     log.value(value.asBoolean());
                                     if (perma && this.host.plugin.servers.get().getMap("Servers").getKeys().contains(getName())) {
                                         this.host.plugin.servers.get().getMap("Servers").getMap(getName()).set("Log", isLogging());
@@ -396,7 +393,7 @@ public class ExternalSubServer extends SubServerImpl {
                             case "stop-cmd":
                             case "stop-command":
                                 if (value.isString()) {
-                                    if (!stopcmd.equals(value)) host.queue(new PacketExEditServer(this, PacketExEditServer.UpdateType.SET_STOP_COMMAND, value.asRawString()));
+                                    if (!stopcmd.equals(value)) host.queue(new PacketExControlServer(this, Action.SET_STOP_COMMAND, value.asRawString()));
                                     stopcmd = value.asRawString();
                                     if (perma && this.host.plugin.servers.get().getMap("Servers").getKeys().contains(getName())) {
                                         this.host.plugin.servers.get().getMap("Servers").getMap(getName()).set("Stop-Command", getStopCommand());
@@ -465,6 +462,9 @@ public class ExternalSubServer extends SubServerImpl {
                             case "whitelist":
                                 if (value.isList()) {
                                     Util.reflect(ServerImpl.class.getDeclaredField("whitelist"), this, value.asUUIDList());
+                                    if (isRegistered()) for (Proxy proxy : SubAPI.getInstance().getProxies().values()) if (proxy.getSubData()[0] != null) {
+                                        ((SubDataClient) proxy.getSubData()[0]).sendPacket(new PacketOutExEditServer(this, Edit.WHITELIST_SET, value.asUUIDList()));
+                                    }
                                     c++;
                                 }
                                 break;
@@ -534,7 +534,7 @@ public class ExternalSubServer extends SubServerImpl {
     @Override
     public void setEnabled(boolean value) {
         if (Util.isNull(value)) throw new NullPointerException();
-        if (enabled != value) host.queue(new PacketExEditServer(this, PacketExEditServer.UpdateType.SET_ENABLED, (Boolean) value));
+        if (enabled != value) host.queue(new PacketExControlServer(this, Action.SET_ENABLED, (Boolean) value));
         enabled = value;
     }
 
@@ -546,7 +546,7 @@ public class ExternalSubServer extends SubServerImpl {
     @Override
     public void setLogging(boolean value) {
         if (Util.isNull(value)) throw new NullPointerException();
-        if (log.value() != value) host.queue(new PacketExEditServer(this, PacketExEditServer.UpdateType.SET_LOGGING, (Boolean) value));
+        if (log.value() != value) host.queue(new PacketExControlServer(this, Action.SET_LOGGING, (Boolean) value));
         log.value(value);
     }
 
@@ -578,7 +578,7 @@ public class ExternalSubServer extends SubServerImpl {
     @Override
     public void setStopCommand(String value) {
         if (Util.isNull(value)) throw new NullPointerException();
-        if (!stopcmd.equals(value)) host.queue(new PacketExEditServer(this, PacketExEditServer.UpdateType.SET_STOP_COMMAND, value));
+        if (!stopcmd.equals(value)) host.queue(new PacketExControlServer(this, Action.SET_STOP_COMMAND, value));
         stopcmd = value;
     }
 

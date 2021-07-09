@@ -44,7 +44,16 @@ public class PacketLinkServer implements InitialPacket, PacketObjectIn<Integer>,
     public ObjectMap<Integer> send(SubDataSender client) {
         ObjectMap<Integer> json = new ObjectMap<Integer>();
         if (plugin.api.getName() != null) json.set(0x0000, plugin.api.getName());
-        if (plugin.game.getServer().getBoundAddress().isPresent()) json.set(0x0001, plugin.game.getServer().getBoundAddress().get().getPort());
+        if (plugin.game.getServer().getBoundAddress().isPresent()) {
+            String address = plugin.server_address;
+            if (address != null) {
+                if (address.indexOf(':') == -1) address += ":" + plugin.game.getServer().getBoundAddress().get().getPort();
+                json.set(0x0001, address);
+            } else {
+                json.set(0x0001, plugin.game.getServer().getBoundAddress().get().getPort());
+            }
+        }
+
         json.set(0x0002, channel);
         return json;
     }

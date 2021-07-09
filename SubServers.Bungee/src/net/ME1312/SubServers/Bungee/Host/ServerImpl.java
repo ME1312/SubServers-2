@@ -1,21 +1,19 @@
 package net.ME1312.SubServers.Bungee.Host;
 
-import net.ME1312.Galaxi.Library.Container.ContainedPair;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Map.ObjectMapValue;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubData.Server.DataClient;
 import net.ME1312.SubData.Server.SubDataClient;
-import net.ME1312.SubServers.Bungee.Event.SubEditServerEvent;
-import net.ME1312.SubServers.Bungee.Event.SubNetworkConnectEvent;
-import net.ME1312.SubServers.Bungee.Event.SubNetworkDisconnectEvent;
+import net.ME1312.SubServers.Bungee.Event.SubRemoveProxyEvent;
 import net.ME1312.SubServers.Bungee.Library.Exception.InvalidServerException;
-import net.ME1312.SubServers.Bungee.Network.Packet.PacketOutExRunEvent;
-import net.ME1312.SubServers.Bungee.Network.Packet.PacketOutExUpdateWhitelist;
+import net.ME1312.SubServers.Bungee.Network.Packet.PacketOutExEditServer;
+import net.ME1312.SubServers.Bungee.Network.Packet.PacketOutExEditServer.Edit;
 import net.ME1312.SubServers.Bungee.SubAPI;
 
 import net.md_5.bungee.BungeeServerInfo;
 import net.md_5.bungee.api.CommandSender;
+import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 import java.net.InetSocketAddress;
@@ -33,6 +31,7 @@ public class ServerImpl extends BungeeServerInfo implements Server {
     private List<UUID> whitelist = new ArrayList<UUID>();
     private boolean hidden;
     private final String signature = SubAPI.getInstance().signAnonymousObject();
+    private volatile boolean persistent = true;
 
     /**
      * Construct a new Server data type
@@ -80,6 +79,16 @@ public class ServerImpl extends BungeeServerInfo implements Server {
         subdata.put(0, null);
     }
 
+    /**
+     * Get if this server has been registered
+     *
+     * @return Registered status
+     */
+    @SuppressWarnings("deprecation")
+    protected boolean isRegistered() {
+        return SubAPI.getInstance().getInternals().exServers.containsKey(getName().toLowerCase());
+    }
+
     @Override
     public DataClient[] getSubData() {
         Integer[] keys = subdata.keySet().toArray(new Integer[0]);
@@ -103,12 +112,20 @@ public class ServerImpl extends BungeeServerInfo implements Server {
             subdata.remove(channel);
         }
 
-        if (update) for (Proxy proxy : SubAPI.getInstance().getProxies().values()) if (proxy.getSubData()[0] != null) {
-            ObjectMap<String> args = new ObjectMap<String>();
-            args.set("server", getName());
-            args.set("channel", channel);
-            if (client != null) args.set("id", client.getID());
-            ((SubDataClient) proxy.getSubData()[0]).sendPacket(new PacketOutExRunEvent((client != null)?SubNetworkConnectEvent.class:SubNetworkDisconnectEvent.class, args));
+        if (update) {
+            for (Proxy proxy : SubAPI.getInstance().getProxies().values()) if (proxy.getSubData()[0] != null) {
+                if (client != null) {
+                    ((SubDataClient) proxy.getSubData()[0]).sendPacket(new PacketOutExEditServer(this, Edit.CONNECTED, channel, client.getID()));
+                } else {
+                    ((SubDataClient) proxy.getSubData()[0]).sendPacket(new PacketOutExEditServer(this, Edit.DISCONNECTED, channel));
+                }
+            }
+            if (!persistent) {
+                DataClient[] subdata = getSubData();
+                if (subdata[0] == null && subdata.length <= 1) {
+                    SubAPI.getInstance().removeServer(getName());
+                }
+            }
         }
     }
 
@@ -129,6 +146,9 @@ public class ServerImpl extends BungeeServerInfo implements Server {
             this.nick = null;
         } else {
             this.nick = value;
+        }
+        for (Proxy proxy : SubAPI.getInstance().getProxies().values()) if (proxy.getSubData()[0] != null) {
+            ((SubDataClient) proxy.getSubData()[0]).sendPacket(new PacketOutExEditServer(this, Edit.DISPLAY_NAME, getDisplayName()));
         }
     }
 
@@ -167,14 +187,19 @@ public class ServerImpl extends BungeeServerInfo implements Server {
 
     @Override
     public void setHidden(boolean value) {
-        if (Util.isNull(value)) throw new NullPointerException();
         this.hidden = value;
+        if (isRegistered()) for (Proxy proxy : SubAPI.getInstance().getProxies().values()) if (proxy.getSubData()[0] != null) {
+            ((SubDataClient) proxy.getSubData()[0]).sendPacket(new PacketOutExEditServer(this, Edit.HIDDEN, isHidden()));
+        }
     }
 
     public void setMotd(String value) {
         if (Util.isNull(value)) throw new NullPointerException();
         try {
             Util.reflect(BungeeServerInfo.class.getDeclaredField("motd"), this, value);
+            for (Proxy proxy : SubAPI.getInstance().getProxies().values()) if (proxy.getSubData()[0] != null) {
+                ((SubDataClient) proxy.getSubData()[0]).sendPacket(new PacketOutExEditServer(this, Edit.MOTD, getMotd()));
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -184,6 +209,10 @@ public class ServerImpl extends BungeeServerInfo implements Server {
         if (Util.isNull(value)) throw new NullPointerException();
         try {
             Util.reflect(BungeeServerInfo.class.getDeclaredField("restricted"), this, value);
+
+            if (isRegistered()) for (Proxy proxy : SubAPI.getInstance().getProxies().values()) if (proxy.getSubData()[0] != null) {
+                ((SubDataClient) proxy.getSubData()[0]).sendPacket(new PacketOutExEditServer(this, Edit.RESTRICTED, isRestricted()));
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -197,7 +226,7 @@ public class ServerImpl extends BungeeServerInfo implements Server {
      */
     @Override
     public boolean canAccess(CommandSender player) {
-        return (player instanceof ProxiedPlayer && whitelist.contains(((ProxiedPlayer) player).getUniqueId())) || super.canAccess(player);
+        return super.canAccess(player) || (player instanceof ProxiedPlayer && whitelist.contains(((ProxiedPlayer) player).getUniqueId()));
     }
 
     @Override
@@ -214,14 +243,23 @@ public class ServerImpl extends BungeeServerInfo implements Server {
     public void whitelist(UUID player) {
         if (Util.isNull(player)) throw new NullPointerException();
         if (!whitelist.contains(player)) whitelist.add(player);
-        for (Proxy proxy : SubAPI.getInstance().getProxies().values()) if (proxy.getSubData()[0] != null) ((SubDataClient) proxy.getSubData()[0]).sendPacket(new PacketOutExUpdateWhitelist(getName(), true, player));
+        if (isRegistered()) for (Proxy proxy : SubAPI.getInstance().getProxies().values()) if (proxy.getSubData()[0] != null) {
+            ((SubDataClient) proxy.getSubData()[0]).sendPacket(new PacketOutExEditServer(this, Edit.WHITELIST_ADD, player));
+        }
     }
 
     @Override
     public void unwhitelist(UUID player) {
         if (Util.isNull(player)) throw new NullPointerException();
         whitelist.remove(player);
-        for (Proxy proxy : SubAPI.getInstance().getProxies().values()) if (proxy.getSubData()[0] != null) ((SubDataClient) proxy.getSubData()[0]).sendPacket(new PacketOutExUpdateWhitelist(getName(), false, player));
+        if (isRegistered()) for (Proxy proxy : SubAPI.getInstance().getProxies().values()) if (proxy.getSubData()[0] != null) {
+            ((SubDataClient) proxy.getSubData()[0]).sendPacket(new PacketOutExEditServer(this, Edit.WHITELIST_REMOVE, player));
+        }
+    }
+
+    @Override
+    public final void persist() {
+        persistent = true;
     }
 
     @Override

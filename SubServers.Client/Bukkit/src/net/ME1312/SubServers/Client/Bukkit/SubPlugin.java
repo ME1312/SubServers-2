@@ -49,6 +49,7 @@ public final class SubPlugin extends JavaPlugin {
     public UIHandler gui = null;
     public final Version version;
     public final SubAPI api = new SubAPI(this);
+    public String server_address;
 
     private long resetDate = 0;
     private boolean reconnect = false;
@@ -94,6 +95,7 @@ public final class SubPlugin extends JavaPlugin {
             subprotocol.registerCipher("DHE-192", DHE.get(192));
             subprotocol.registerCipher("DHE-256", DHE.get(256));
             api.name = config.get().getMap("Settings").getMap("SubData").getString("Name", System.getenv("name"));
+            server_address = config.get().getMap("Settings").getRawString("Connect-Address", System.getenv("address"));
 
             if (config.get().getMap("Settings").getMap("SubData").getRawString("Password", "").length() > 0) {
                 subprotocol.registerCipher("AES", new AES(128, config.get().getMap("Settings").getMap("SubData").getRawString("Password")));

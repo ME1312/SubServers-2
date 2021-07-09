@@ -59,6 +59,7 @@ public class ConfigUpdater {
             settings.set("Allow-Deletion", updated.getMap("Settings", new YAMLSection()).getBoolean("Allow-Deletion", false));
             settings.set("Show-Addresses", updated.getMap("Settings", new YAMLSection()).getBoolean("Show-Addresses", false));
             settings.set("Use-Title-Messages", updated.getMap("Settings", new YAMLSection()).getBoolean("Use-Title-Messages", true));
+            if (updated.getMap("Settings", new YAMLSection()).contains("Connect-Address")) settings.set("Connect-Address", updated.getMap("Settings").getRawString("Connect-Address"));
 
             YAMLSection subdata = new YAMLSection();
             if (updated.getMap("Settings", new YAMLSection()).getMap("SubData", new YAMLSection()).contains("Name")) subdata.set("Name", updated.getMap("Settings").getMap("SubData").getRawString("Name"));

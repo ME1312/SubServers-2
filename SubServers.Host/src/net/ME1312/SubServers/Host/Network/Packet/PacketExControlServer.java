@@ -12,15 +12,15 @@ import net.ME1312.SubServers.Host.Executable.SubServerImpl;
 import java.util.Arrays;
 
 /**
- * Edit Server Packet
+ * Control Server Packet
  */
-public class PacketExEditServer implements PacketObjectIn<Integer>, PacketObjectOut<Integer> {
+public class PacketExControlServer implements PacketObjectIn<Integer>, PacketObjectOut<Integer> {
     private ExHost host;
     private SubServerImpl server;
-    private UpdateType type;
+    private Response type;
     private Object[] args;
 
-    public enum UpdateType {
+    public enum Response {
         // Status
         LAUNCH_EXCEPTION(1),
         STOPPED(2, Integer.class, Boolean.class);
@@ -28,7 +28,7 @@ public class PacketExEditServer implements PacketObjectIn<Integer>, PacketObject
 
         private short value;
         private Class<?>[] args;
-        UpdateType(int value, Class<?>... args) {
+        Response(int value, Class<?>... args) {
             this.value = (short) value;
             this.args = args;
         }
@@ -43,29 +43,30 @@ public class PacketExEditServer implements PacketObjectIn<Integer>, PacketObject
     }
 
     /**
-     * New PacketExEditServer (In)
+     * New PacketExControlServer (In)
      * @param host ExHost
      */
-    public PacketExEditServer(ExHost host) {
+    public PacketExControlServer(ExHost host) {
         this.host = host;
     }
 
     /**
-     * New PacketExEditServer (Out)
+     * New PacketExControlServer (Out)
      *
      * @param type Update Type
      * @param arguments Arguments
      */
-    public PacketExEditServer(SubServerImpl server, UpdateType type, Object... arguments) {
-        if (arguments.length != type.getArguments().length) throw new IllegalArgumentException(((arguments.length > type.getArguments().length)?"Too many":"Not enough") + " arguments for type: " + type.toString());
-        int i = 0;
-        while (i < arguments.length) {
-            if (!type.getArguments()[i].isInstance(arguments[i])) throw new IllegalArgumentException("Argument " + (i+1) + " is not " + type.getArguments()[i].getCanonicalName());
-            i++;
-        }
+    public PacketExControlServer(SubServerImpl server, Response type, Object... arguments) {
+        if (arguments.length < type.getArguments().length) throw new IllegalArgumentException("Not enough arguments for type: " + type);
+
         this.server = server;
         this.type = type;
-        this.args = arguments;
+        this.args = new Object[type.getArguments().length];
+
+        for (int i = 0; i < type.getArguments().length; ++i) {
+            if (!type.getArguments()[i].isInstance(arguments[i])) throw new IllegalArgumentException("Argument " + (i+1) + " is not " + type.getArguments()[i].getCanonicalName());
+            args[i] = arguments[i];
+        }
     }
 
     @Override
@@ -80,7 +81,7 @@ public class PacketExEditServer implements PacketObjectIn<Integer>, PacketObject
     @Override
     public void receive(SubDataSender client, ObjectMap<Integer> data) {
         try {
-            SubServerImpl server = host.servers.get(data.getString(0x0000).toLowerCase());
+            SubServerImpl server = host.servers.get(data.getRawString(0x0000).toLowerCase());
             switch (data.getInt(0x0001)) {
                 case 0:
                     server.setEnabled(data.getList(0x0002).get(0).asBoolean());

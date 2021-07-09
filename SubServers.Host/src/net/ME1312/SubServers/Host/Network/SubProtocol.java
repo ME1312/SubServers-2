@@ -1,12 +1,10 @@
 package net.ME1312.SubServers.Host.Network;
 
 import net.ME1312.Galaxi.Library.Callback.Callback;
-import net.ME1312.Galaxi.Library.Config.YAMLSection;
 import net.ME1312.Galaxi.Library.Container.Pair;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
-import net.ME1312.SubData.Client.Library.DataSize;
 import net.ME1312.SubData.Client.SubDataClient;
 import net.ME1312.SubData.Client.SubDataProtocol;
 import net.ME1312.SubServers.Client.Common.Network.Packet.*;
@@ -101,7 +99,7 @@ public class SubProtocol extends SubDataProtocol {
         registerPacket(0x0053, PacketOutExRequestQueue.class);
         registerPacket(0x0054, PacketExCreateServer.class);
         registerPacket(0x0055, PacketExAddServer.class);
-        registerPacket(0x0056, PacketExEditServer.class);
+        registerPacket(0x0056, PacketExControlServer.class);
         registerPacket(0x0057, PacketOutExLogMessage.class);
         registerPacket(0x0058, PacketExRemoveServer.class);
         registerPacket(0x0059, PacketExDeleteServer.class);
@@ -112,7 +110,7 @@ public class SubProtocol extends SubDataProtocol {
       //registerPacket(0x0053, new PacketOutExRequestQueue(host));
         registerPacket(0x0054, new PacketExCreateServer(host));
         registerPacket(0x0055, new PacketExAddServer(host));
-        registerPacket(0x0056, new PacketExEditServer(host));
+        registerPacket(0x0056, new PacketExControlServer(host));
       //registerPacket(0x0057, new PacketOutExLogMessage());
         registerPacket(0x0058, new PacketExRemoveServer(host));
         registerPacket(0x0059, new PacketExDeleteServer(host));

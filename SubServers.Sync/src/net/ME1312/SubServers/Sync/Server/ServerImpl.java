@@ -20,7 +20,7 @@ import java.util.*;
  */
 public class ServerImpl extends BungeeServerInfo {
     private HashMap<Integer, UUID> subdata = new HashMap<Integer, UUID>();
-    private List<UUID> whitelist = new ArrayList<UUID>();
+    public List<UUID> whitelist = new ArrayList<UUID>();
     private String nick = null;
     private boolean hidden;
     private final String signature;
@@ -176,7 +176,7 @@ public class ServerImpl extends BungeeServerInfo {
      * @return Whitelisted Status
      */
     public boolean canAccess(CommandSender player) {
-        return (player instanceof ProxiedPlayer && whitelist.contains(((ProxiedPlayer) player).getUniqueId())) || super.canAccess(player);
+        return super.canAccess(player) || (player instanceof ProxiedPlayer && whitelist.contains(((ProxiedPlayer) player).getUniqueId()));
     }
 
     /**

@@ -90,20 +90,6 @@ public class PacketInExRunEvent implements PacketObjectIn<Integer> {
                 callback("SubStartedEvent", this);
             }
         });
-        callback("SubNetworkConnectEvent", new Callback<ObjectMap<String>>() {
-            @Override
-            public void run(ObjectMap<String> data) {
-                plugin.connect(plugin.servers.get(data.getRawString("server").toLowerCase()), data.getInt("channel"), data.getUUID("id"));
-                callback("SubNetworkConnectEvent", this);
-            }
-        });
-        callback("SubNetworkDisconnectEvent", new Callback<ObjectMap<String>>() {
-            @Override
-            public void run(ObjectMap<String> data) {
-                plugin.disconnect(plugin.servers.get(data.getRawString("server").toLowerCase()), data.getInt("channel"));
-                callback("SubNetworkDisconnectEvent", this);
-            }
-        });
         callback("SubStopEvent", new Callback<ObjectMap<String>>() {
             @Override
             public void run(ObjectMap<String> data) {

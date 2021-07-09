@@ -63,6 +63,7 @@ public final class SubPlugin {
     public UIHandler gui = null;
     public Version version;
     public SubAPI api;
+    public String server_address;
     @Inject public PluginContainer plugin;
     @Inject public Game game;
 
@@ -114,6 +115,7 @@ public final class SubPlugin {
             subprotocol.registerCipher("DHE-192", DHE.get(192));
             subprotocol.registerCipher("DHE-256", DHE.get(256));
             api.name = config.get().getMap("Settings").getMap("SubData").getString("Name", System.getenv("name"));
+            server_address = config.get().getMap("Settings").getRawString("Connect-Address", System.getenv("address"));
             Logger log = LoggerFactory.getLogger("SubData");
 
             if (config.get().getMap("Settings").getMap("SubData").getRawString("Password", "").length() > 0) {

@@ -62,7 +62,7 @@ public final class SubCommand implements CommandExecutor {
      */
     public CommandSpec spec() {
         SubCommand root = new SubCommand(plugin);
-        return CommandSpec.builder()
+        CommandSpec.Builder spec = CommandSpec.builder()
                 .description(Text.of("The SubServers Command"))
                 .executor(root)
                 .arguments(GenericArguments.optional(GenericArguments.string(Text.of("Command"))), GenericArguments.optional(GenericArguments.remainingJoinedStrings(Text.of("..."))))
@@ -122,11 +122,6 @@ public final class SubCommand implements CommandExecutor {
                         .arguments(GenericArguments.optional(new ListArgument(Text.of("Subservers"))), GenericArguments.optional(GenericArguments.string(Text.of("Template"))), GenericArguments.optional(GenericArguments.string(Text.of("Version"))), GenericArguments.optional(GenericArguments.remainingJoinedStrings(Text.of("..."))))
                         .build(), "update", "upgrade")
                 .child(CommandSpec.builder()
-                        .description(Text.of("The SubServers Command - Delete"))
-                        .executor(new DELETE())
-                        .arguments(GenericArguments.optional(new ListArgument(Text.of("Subservers"))), GenericArguments.optional(GenericArguments.remainingJoinedStrings(Text.of("..."))))
-                        .build(), "remove", "del", "delete")
-                .child(CommandSpec.builder()
                         .description(Text.of("The SubServers Command - Teleport"))
                         .executor(new TELEPORT())
                         .arguments(GenericArguments.optional(GenericArguments.string(Text.of("Player"))), GenericArguments.optional(GenericArguments.string(Text.of("Server"))), GenericArguments.optional(GenericArguments.remainingJoinedStrings(Text.of("..."))))
@@ -135,8 +130,16 @@ public final class SubCommand implements CommandExecutor {
                         .description(Text.of("The SubServers Command - Open Menu"))
                         .executor(new OPEN())
                         .arguments(GenericArguments.optional(GenericArguments.string(Text.of("Menu"))), GenericArguments.optional(GenericArguments.allOf(GenericArguments.string(Text.of("Args")))))
-                        .build(), "open", "view")
-                .build();
+                        .build(), "open", "view");
+
+        if (plugin.config.get().getMap("Settings").getBoolean("Allow-Deletion", false)) spec
+                .child(CommandSpec.builder()
+                        .description(Text.of("The SubServers Command - Delete"))
+                        .executor(new DELETE())
+                        .arguments(GenericArguments.optional(new ListArgument(Text.of("Subservers"))), GenericArguments.optional(GenericArguments.remainingJoinedStrings(Text.of("..."))))
+                        .build(), "remove", "del", "delete");
+
+        return spec.build();
     }
 
     private boolean canRun(CommandSource sender) throws CommandException {

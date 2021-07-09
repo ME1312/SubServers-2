@@ -8,7 +8,8 @@ import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubData.Client.SubDataClient;
 import net.ME1312.SubServers.Host.ExHost;
 import net.ME1312.SubServers.Host.Library.Exception.InvalidServerException;
-import net.ME1312.SubServers.Host.Network.Packet.PacketExEditServer;
+import net.ME1312.SubServers.Host.Network.Packet.PacketExControlServer;
+import net.ME1312.SubServers.Host.Network.Packet.PacketExControlServer.Response;
 import net.ME1312.SubServers.Host.SubAPI;
 
 import java.io.BufferedWriter;
@@ -124,12 +125,12 @@ public class SubServerImpl {
         } catch (IOException | InterruptedException e) {
             host.log.error.println(e);
             allowrestart = false;
-            if (falsestart) ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketExEditServer(this, PacketExEditServer.UpdateType.LAUNCH_EXCEPTION));
+            if (falsestart) ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketExControlServer(this, Response.LAUNCH_EXCEPTION));
         }
 
         logger.destroy();
         if (SubAPI.getInstance().getSubDataNetwork()[0] != null) {
-            ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketExEditServer(this, PacketExEditServer.UpdateType.STOPPED, (Integer) process.exitValue(), (Boolean) allowrestart));
+            ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketExControlServer(this, Response.STOPPED, (Integer) process.exitValue(), (Boolean) allowrestart));
         }
         host.log.info.println(name + " has stopped");
         process = null;

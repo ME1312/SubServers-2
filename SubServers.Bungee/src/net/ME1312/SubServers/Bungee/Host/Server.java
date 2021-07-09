@@ -137,6 +137,11 @@ public interface Server extends ServerInfo, ClientHandler, ExtraDataHandler {
     void unwhitelist(UUID player);
 
     /**
+     * Makes it so the server object will still exist within the server manager even if it is disconnected
+     */
+    void persist();
+
+    /**
      * Get the Signature of this Object
      *
      * @return Object Signature

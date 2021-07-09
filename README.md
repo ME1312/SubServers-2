@@ -22,6 +22,7 @@ These are some quick links for common resources of SubServers 2.
 > [https://dev.me1312.net/jenkins/job/SubServers Platform/javadoc/SubServers.Bungee.Common](https://dev.me1312.net/jenkins/job/SubServers%20Platform/javadoc/SubServers.Bungee.Common)<br>
 > [https://dev.me1312.net/jenkins/job/SubServers Platform/javadoc/SubServers.Host](https://dev.me1312.net/jenkins/job/SubServers%20Platform/javadoc/SubServers.Host)<br>
 > [https://dev.me1312.net/jenkins/job/SubServers Platform/javadoc/SubServers.Sync](https://dev.me1312.net/jenkins/job/SubServers%20Platform/javadoc/SubServers.Sync)<br>
+> [https://dev.me1312.net/jenkins/job/SubServers Platform/javadoc/SubServers.Sync.Velocity](https://dev.me1312.net/jenkins/job/SubServers%20Platform/javadoc/SubServers.Sync.Velocity)<br>
 > [https://dev.me1312.net/jenkins/job/SubServers Platform/javadoc/SubServers.Client.Bukkit](https://dev.me1312.net/jenkins/job/SubServers%20Platform/javadoc/SubServers.Client.Bukkit)<br>
 > [https://dev.me1312.net/jenkins/job/SubServers Platform/javadoc/SubServers.Client.Common](https://dev.me1312.net/jenkins/job/SubServers%20Platform/javadoc/SubServers.Client.Common)<br>
 > [https://dev.me1312.net/jenkins/job/SubServers Platform/javadoc/SubServers.Client.Sponge](https://dev.me1312.net/jenkins/job/SubServers%20Platform/javadoc/SubServers.Client.Sponge)
@@ -30,6 +31,7 @@ These are some quick links for common resources of SubServers 2.
 > [https://bstats.org/plugin/bungeecord/SubServers_Bungee](https://bstats.org/plugin/bungeecord/SubServers%202)<br>
 > [https://bstats.org/plugin/other/SubServers_Host](https://bstats.org/plugin/other/SubServers%20Host)<br>
 > [https://bstats.org/plugin/bungeecord/SubServers_Sync](https://bstats.org/plugin/bungeecord/SubServers%20Sync)<br>
+> [https://bstats.org/plugin/velocity/SubServers_Sync](https://bstats.org/plugin/velocity/SubServers%20Sync)<br>
 > [https://bstats.org/plugin/bungeecord/SubServers_Console](https://bstats.org/plugin/bungeecord/SubServers%20Console)<br>
 > [https://bstats.org/plugin/bukkit/SubServers_Client](https://bstats.org/plugin/bukkit/SubServers%20Client)<br>
 > [https://bstats.org/plugin/sponge/SubServers_Client](https://bstats.org/plugin/sponge/SubServers%20Client)

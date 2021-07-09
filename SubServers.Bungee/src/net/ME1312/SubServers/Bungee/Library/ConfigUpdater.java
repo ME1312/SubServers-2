@@ -138,6 +138,11 @@ public class ConfigUpdater {
 
                 existing = updated.clone();
                 i++;
+            } else if (was.compareTo(new Version("21w27b")) <= 0) {
+
+              //existing = updated.clone();
+                i++;
+
             }// if (was.compareTo(new Version("99w99a")) <= 0) {
             //  // do something
             //  existing = updated.clone();
@@ -151,6 +156,7 @@ public class ConfigUpdater {
             YAMLSection settings = new YAMLSection();
             settings.set("Version", ((now.compareTo(was) <= 0)?was:now).toString());
             if (updated.getMap("Settings", new YAMLSection()).contains("RPEC-Check-Interval")) settings.set("RPEC-Check-Interval", updated.getMap("Settings").getRawString("RPEC-Check-Interval"));
+            settings.set("Strict-Server-Linking", updated.getMap("Settings", new YAMLSection()).getBoolean("Strict-Server-Linking", true));
             settings.set("Disabled-Overrides", updated.getMap("Settings", new YAMLSection()).getRawStringList("Disabled-Overrides", Collections.emptyList()));
 
             YAMLSection smart_fallback = new YAMLSection();
@@ -318,7 +324,7 @@ public class ConfigUpdater {
 
                 existing = updated.clone();
                 i++;
-            } if (was.compareTo(new Version("21w27a")) <= 0) {
+            } if (was.compareTo(new Version("21w27b")) <= 0) {
 
               //existing = updated.clone();
                 i++;
@@ -339,6 +345,7 @@ public class ConfigUpdater {
             LinkedHashMap<String, String> def = new LinkedHashMap<String, String>();
             def.put("Bungee.Feature.Smart-Fallback", "&6Returning from $str$: &r$msg$");
             def.put("Bungee.Feature.Smart-Fallback.Result", "&6You are now on $str$.");
+            def.put("Bungee.Restricted", "&cYou don't have permission to access this server.");
             def.put("Bungee.Ping.Offline", "&6&l[&e&lWarning&6&l] &7Backend server(s) are not running");
             def.put("Bungee.Server.Current", "&6You are currently connected to $str$");
             def.put("Bungee.Server.Available", "&6You may connect to the following servers at this time:");

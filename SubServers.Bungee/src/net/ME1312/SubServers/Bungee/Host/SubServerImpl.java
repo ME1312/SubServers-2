@@ -99,6 +99,11 @@ public abstract class SubServerImpl extends ServerImpl implements SubServer {
     }
 
     @Override
+    protected final boolean isRegistered() {
+        return registered;
+    }
+
+    @Override
     public boolean isAvailable() {
         return registered && !updating && getHost().isAvailable();
     }

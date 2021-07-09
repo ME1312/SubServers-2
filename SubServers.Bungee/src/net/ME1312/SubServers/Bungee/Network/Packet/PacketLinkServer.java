@@ -13,6 +13,7 @@ import net.ME1312.SubServers.Bungee.Host.ServerImpl;
 import net.ME1312.SubServers.Bungee.Host.SubServer;
 import net.ME1312.SubServers.Bungee.Host.SubServerImpl;
 import net.ME1312.SubServers.Bungee.Library.Compatibility.Logger;
+import net.ME1312.SubServers.Bungee.SubAPI;
 import net.ME1312.SubServers.Bungee.SubProxy;
 
 import net.md_5.bungee.api.ProxyServer;
@@ -25,6 +26,7 @@ import java.util.concurrent.TimeUnit;
  * Link Server Packet
  */
 public class PacketLinkServer implements InitialPacket, PacketObjectIn<Integer>, PacketObjectOut<Integer> {
+    public static boolean strict = true;
     private SubProxy plugin;
     private int response;
     private String message;
@@ -72,19 +74,28 @@ public class PacketLinkServer implements InitialPacket, PacketObjectIn<Integer>,
     @Override
     public void receive(SubDataClient client, ObjectMap<Integer> data) {
         String name =  (data.contains(0x0000))?data.getRawString(0x0000):null;
-        Integer port = (data.contains(0x0001))?data.getInt(0x0001):null;
         Integer channel = data.getInt(0x0002);
+        InetSocketAddress address;
 
         try {
+            if (!data.contains(0x0001)) {
+                address = null;
+            } else if (data.isNumber(0x0001)) {
+                address = new InetSocketAddress(client.getAddress().getAddress(), data.getInt(0x0001));
+            } else {
+                String[] sa = data.getRawString(0x0001).split(":");
+                address = new InetSocketAddress(sa[0], Integer.parseInt(sa[1]));
+            }
+
             Map<String, Server> servers = plugin.api.getServers();
             Server server;
             if (name != null && servers.keySet().contains(name.toLowerCase())) {
-                link(client, servers.get(name.toLowerCase()), channel);
-            } else if (port != null) {
-                if ((server = search(new InetSocketAddress(client.getAddress().getAddress(), port))) != null) {
-                    link(client, server, channel);
+                link(client, name, address, servers.get(name.toLowerCase()), channel);
+            } else if (address != null) {
+                if ((server = search(address)) != null || !strict) {
+                    link(client, name, address, server, channel);
                 } else {
-                    throw new ServerLinkException("There is no server with address: " + client.getAddress().getAddress().getHostAddress() + ':' + port);
+                    throw new ServerLinkException("There is no server with address: " + address.getAddress().getHostAddress() + ':' + address.getPort());
                 }
             } else {
                 throw new ServerLinkException("Not enough arguments");
@@ -101,9 +112,18 @@ public class PacketLinkServer implements InitialPacket, PacketObjectIn<Integer>,
         }
     }
 
-    static int req = 1;
+    static long req = 1;
     static long last = Calendar.getInstance().getTime().getTime();
-    private void link(SubDataClient client, Server server, int channel) throws Throwable {
+    private void link(SubDataClient client, String name, InetSocketAddress address, Server resolved, int channel) throws Throwable {
+        final Server server;
+        if (resolved == null) {
+            String id = (name == null)? Util.getNew(SubAPI.getInstance().getServers().keySet(), () -> UUID.randomUUID().toString()) : name;
+            server = SubAPI.getInstance().addServer(id, address.getAddress(), address.getPort(), "Some Dynamic Server", name == null, false);
+            Util.reflect(ServerImpl.class.getDeclaredField("persistent"), server, false);
+        } else {
+            server = resolved;
+        }
+
         HashMap<Integer, SubDataClient> subdata = Util.getDespiteException(() -> Util.reflect(ServerImpl.class.getDeclaredField("subdata"), server), null);
         if (!subdata.keySet().contains(channel) || (channel == 0 && subdata.get(0) == null)) {
             server.setSubData(client, channel);
