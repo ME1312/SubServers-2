@@ -278,6 +278,7 @@ public class InternalSubCreator extends SubCreator {
                             host.plugin.exServers.remove(name.toLowerCase());
 
                         config = new ObjectMap<String>((Map<String, ?>) replacements.replace(config.get()));
+                        if (config.contains("Directory") && (update != null || !template.getConfigOptions().contains("Directory"))) config.remove("Directory");
 
                         if (update == null) {
                             server.set("Enabled", true);

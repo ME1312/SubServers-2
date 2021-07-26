@@ -9,8 +9,10 @@ import net.ME1312.Galaxi.Log.LogStream;
 import net.ME1312.Galaxi.Log.Logger;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubData.Client.DataClient;
+import net.ME1312.SubData.Client.DataSender;
 import net.ME1312.SubData.Client.Library.DisconnectReason;
 import net.ME1312.SubData.Client.SubDataClient;
+import net.ME1312.SubData.Client.SubDataSender;
 import net.ME1312.SubServers.Host.ExHost;
 import net.ME1312.SubServers.Host.Library.TextColor;
 import net.ME1312.SubServers.Host.Network.Packet.PacketOutExLogMessage;
@@ -69,10 +71,7 @@ public class SubLoggerImpl {
             // Log to NETWORK
             if (logn) {
                 if (this.address != null && channel != null && !channel.isClosed()) {
-                    if (ccache != null) {
-                        for (Pair<Byte, String> val : ccache) channel.sendPacket(new PacketOutExLogMessage(this.address, val.key(), val.value()));
-                        ccache = null;
-                    }
+                    flushCache(channel);
                     channel.sendPacket(new PacketOutExLogMessage(this.address, stream.getLevel().getID(), message));
                 } else {
                     if (ccache == null) ccache = new LinkedList<Pair<Byte, String>>();
@@ -85,9 +84,18 @@ public class SubLoggerImpl {
         });
     }
 
+    private void flushCache(DataSender sender) {
+        if (ccache != null) {
+            SubDataSender channel = (SubDataSender) sender;
+            for (Pair<Byte, String> val : ccache) channel.sendPacket(new PacketOutExLogMessage(this.address, val.key(), val.value()));
+            ccache = null;
+        }
+    }
+
     @SuppressWarnings("deprecation")
     void init() {
         if (logn) Util.isException(() -> {
+            Process process = this.process;
             ExHost host = SubAPI.getInstance().getInternals();
             channel = (SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0].newChannel();
             channel.on.closed(new Callback<Pair<DisconnectReason, DataClient>>() {
@@ -107,6 +115,7 @@ public class SubLoggerImpl {
                                         timer.cancel();
                                     } else try {
                                         SubDataClient open = (SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0].newChannel();
+                                        open.on.ready(SubLoggerImpl.this::flushCache);
                                         open.on.closed(run);
                                         channel = open;
                                         timer.cancel();

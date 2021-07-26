@@ -176,6 +176,7 @@ public class ExternalSubCreator extends SubCreator {
 
                     ObjectMap<String> server = new ObjectMap<String>();
                     ObjectMap<String> config = new ObjectMap<String>((Map<String, ?>) data.getObject(0x0002));
+                    if (config.contains("Directory") && (update != null || !template.getConfigOptions().contains("Directory"))) config.remove("Directory");
 
                     if (update == null) {
                         server.set("Enabled", true);

@@ -87,13 +87,13 @@ public class PacketLinkServer implements InitialPacket, PacketObjectIn<Integer>,
                 address = new InetSocketAddress(sa[0], Integer.parseInt(sa[1]));
             }
 
-            Map<String, Server> servers = plugin.api.getServers();
             Server server;
+            Map<String, Server> servers = plugin.api.getServers();
             if (name != null && servers.keySet().contains(name.toLowerCase())) {
-                link(client, name, address, servers.get(name.toLowerCase()), channel);
+                link(client, servers.get(name.toLowerCase()), channel);
             } else if (address != null) {
-                if ((server = search(address)) != null || !strict) {
-                    link(client, name, address, server, channel);
+                if ((server = search(address)) != null || (server = create(name, address)) != null) {
+                    link(client, server, channel);
                 } else {
                     throw new ServerLinkException("There is no server with address: " + address.getAddress().getHostAddress() + ':' + address.getPort());
                 }
@@ -112,18 +112,31 @@ public class PacketLinkServer implements InitialPacket, PacketObjectIn<Integer>,
         }
     }
 
+    private Server create(String name, InetSocketAddress address) throws Throwable {
+        if (strict) {
+            return null;
+        } else {
+            String id = (name == null)? Util.getNew(SubAPI.getInstance().getServers().keySet(), () -> UUID.randomUUID().toString()) : name;
+            Server server = SubAPI.getInstance().addServer(id, address.getAddress(), address.getPort(), "Some Dynamic Server", name == null, false);
+            if (server != null) Util.reflect(ServerImpl.class.getDeclaredField("persistent"), server, false);
+            return server;
+        }
+    }
+
+    private Server search(InetSocketAddress address) {
+        Server server = null;
+        for (Server s : plugin.api.getServers().values()) {
+            if (s.getAddress().equals(address)) {
+                if (server != null) throw new ServerLinkException("Multiple servers match address: " + address.getAddress().getHostAddress() + ':' + address.getPort());
+                server = s;
+            }
+        }
+        return server;
+    }
+
     static long req = 1;
     static long last = Calendar.getInstance().getTime().getTime();
-    private void link(SubDataClient client, String name, InetSocketAddress address, Server resolved, int channel) throws Throwable {
-        final Server server;
-        if (resolved == null) {
-            String id = (name == null)? Util.getNew(SubAPI.getInstance().getServers().keySet(), () -> UUID.randomUUID().toString()) : name;
-            server = SubAPI.getInstance().addServer(id, address.getAddress(), address.getPort(), "Some Dynamic Server", name == null, false);
-            Util.reflect(ServerImpl.class.getDeclaredField("persistent"), server, false);
-        } else {
-            server = resolved;
-        }
-
+    private void link(SubDataClient client, Server server, int channel) throws Throwable {
         HashMap<Integer, SubDataClient> subdata = Util.getDespiteException(() -> Util.reflect(ServerImpl.class.getDeclaredField("subdata"), server), null);
         if (!subdata.keySet().contains(channel) || (channel == 0 && subdata.get(0) == null)) {
             server.setSubData(client, channel);
@@ -164,17 +177,6 @@ public class PacketLinkServer implements InitialPacket, PacketObjectIn<Integer>,
         } else {
             client.sendPacket(new PacketLinkServer(null, 4, "Server already linked"));
         }
-    }
-
-    private Server search(InetSocketAddress address) throws ServerLinkException {
-        Server server = null;
-        for (Server s : plugin.api.getServers().values()) {
-            if (s.getAddress().equals(address)) {
-                if (server != null) throw new ServerLinkException("Multiple servers match address: " + address.getAddress().getHostAddress() + ':' + address.getPort());
-                server = s;
-            }
-        }
-        return server;
     }
 
     @Override
