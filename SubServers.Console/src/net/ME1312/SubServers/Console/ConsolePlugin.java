@@ -8,9 +8,9 @@ import net.ME1312.SubServers.Bungee.Host.Host;
 import net.ME1312.SubServers.Bungee.Host.RemotePlayer;
 import net.ME1312.SubServers.Bungee.Host.SubCreator;
 import net.ME1312.SubServers.Bungee.Host.SubServer;
+import net.ME1312.SubServers.Bungee.Library.Metrics;
 import net.ME1312.SubServers.Bungee.SubAPI;
 import net.ME1312.SubServers.Bungee.SubProxy;
-import net.ME1312.SubServers.Console.Library.Metrics;
 
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.api.plugin.Plugin;
@@ -20,7 +20,6 @@ import net.md_5.bungee.event.EventPriority;
 import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashMap;
 
@@ -38,7 +37,7 @@ public final class ConsolePlugin extends Plugin implements Listener {
         getProxy().getPluginManager().registerCommand(this, new ConsoleCommand.AUTO_POPOUT(this, "apopout"));
         getProxy().getPluginManager().registerCommand(this, new ConsoleCommand.AUTO_POPOUT(this, "autopopout"));
 
-        new Metrics(this);
+        new Metrics(this, 3853).appendPluginData();
 
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());

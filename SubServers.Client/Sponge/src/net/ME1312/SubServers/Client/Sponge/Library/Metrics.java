@@ -268,11 +268,11 @@ public class Metrics {
 
             // Add information about bStats
             node.getNode("enabled").setComment(
-                    "bStats collects some data for plugin authors like how many servers are using their plugins.\n" +
-                            "To honor their work, you should not disable it.\n" +
-                            "This has nearly no effect on the server performance!\n" +
-                            "Check out https://bStats.org/ to learn more :)"
-            );
+                    "bStats (https://bStats.org) collects some basic information for plugin authors, like how\n"
+                            + "many people use their plugin and their total player count. It's recommended to keep bStats\n"
+                            + "enabled, but if you're not comfortable with this, you can turn this setting off. There is no\n"
+                            + "performance penalty associated with having metrics enabled, and data sent to bStats is fully\n"
+                            + "anonymous.");
 
             configurationLoader.save(node);
         } else {

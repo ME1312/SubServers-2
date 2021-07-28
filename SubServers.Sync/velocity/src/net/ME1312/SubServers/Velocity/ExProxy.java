@@ -1,7 +1,6 @@
 package net.ME1312.SubServers.Velocity;
 
 import net.ME1312.Galaxi.Library.Config.YAMLConfig;
-import net.ME1312.Galaxi.Library.Container.Container;
 import net.ME1312.Galaxi.Library.Container.Pair;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.UniversalFile;
@@ -21,6 +20,7 @@ import net.ME1312.SubServers.Velocity.Library.ConfigUpdater;
 import net.ME1312.SubServers.Velocity.Library.Fallback.FallbackState;
 import net.ME1312.SubServers.Velocity.Library.Fallback.SmartFallback;
 import net.ME1312.SubServers.Velocity.Library.Metrics;
+import net.ME1312.SubServers.Velocity.Library.Metrics.AdvancedPie;
 import net.ME1312.SubServers.Velocity.Network.Packet.PacketExSyncPlayer;
 import net.ME1312.SubServers.Velocity.Network.SubProtocol;
 import net.ME1312.SubServers.Velocity.Server.CachedPlayer;
@@ -30,7 +30,6 @@ import net.ME1312.SubServers.Velocity.Server.SubServerData;
 import com.dosse.upnp.UPnP;
 import com.google.gson.Gson;
 import com.google.inject.Inject;
-import com.velocitypowered.api.command.CommandMeta;
 import com.velocitypowered.api.event.PostOrder;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.connection.DisconnectEvent;
@@ -49,17 +48,16 @@ import com.velocitypowered.api.proxy.server.RegisteredServer;
 import com.velocitypowered.api.proxy.server.ServerInfo;
 import com.velocitypowered.api.proxy.server.ServerPing;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.ComponentLike;
 import net.kyori.adventure.text.TextReplacementConfig;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
 import java.net.InetAddress;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.*;
+import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
 @Plugin(id = "subservers-sync", name = "SubServers-Sync", authors = "ME1312", version = "2.17.1a/pr1", url = "https://github.com/ME1312/SubServers-2", description = "Dynamically sync player and server connection info over multiple proxy instances")
@@ -218,7 +216,20 @@ public class ExProxy {
         if (config.get().getMap("Settings").getMap("Smart-Fallback", new ObjectMap<>()).getBoolean("Enabled", true))
             proxy.getEventManager().register(this, new SmartFallback(config.get().getMap("Settings").getMap("Smart-Fallback", new ObjectMap<>())));
 
-        metrics.make(this, 11953);
+        metrics.make(this, 11953).addCustomChart(new AdvancedPie("player_versions", new Callable<Map<String, Integer>>() {
+            @Override
+            public Map<String, Integer> call() throws Exception {
+                HashMap<String, Integer> players = new HashMap<String, Integer>();
+                for (Player player : proxy.getAllPlayers()) {
+                    String name = player.getProtocolVersion().getVersionIntroducedIn();
+                    if (name != null) {
+                        players.put(name, players.getOrDefault(name, 0) + 1);
+                    }
+                }
+                return players;
+            }
+        }));
+
         new Timer("SubServers.Sync::Routine_Update_Check").schedule(new TimerTask() {
             @SuppressWarnings("unchecked")
             @Override

@@ -60,10 +60,11 @@ public class Metrics {
         try {
             if (!configFile.exists()) {
                 FileWriter writer = new FileWriter(configFile);
-                writer.write("#bStats collects some data for plugin authors like how many servers are using their plugins.\n");
-                writer.write("#To honor their work, you should not disable it.\n");
-                writer.write("#This has nearly no effect on the server performance!\n");
-                writer.write("#Check out https://bStats.org/ to learn more :)\n");
+                writer.write("# bStats (https://bStats.org) collects some basic information for plugin authors, like how\n");
+                writer.write("# many people use their plugin and their total player count. It's recommended to keep bStats\n");
+                writer.write("# enabled, but if you're not comfortable with this, you can turn this setting off. There is no\n");
+                writer.write("# performance penalty associated with having metrics enabled, and data sent to bStats is fully\n");
+                writer.write("# anonymous.\n");
                 writer.write("enabled: true\n");
                 writer.write("serverUuid: \"" + UUID.randomUUID().toString() + "\"\n");
                 writer.write("logFailedRequests: false\n");

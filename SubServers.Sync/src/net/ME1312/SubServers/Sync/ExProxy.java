@@ -256,7 +256,7 @@ public final class ExProxy extends BungeeCommon implements Listener {
         if (getReconnectHandler() != null && getReconnectHandler().getClass().equals(SmartFallback.class))
             setReconnectHandler(new SmartFallback(config.get().getMap("Settings").getMap("Smart-Fallback", new ObjectMap<>()))); // Re-initialize Smart Fallback
 
-        new Metrics(this);
+        if (plugin != null) new Metrics(plugin, 1461).appendAppData();
         new Timer("SubServers.Sync::Routine_Update_Check").schedule(new TimerTask() {
             @SuppressWarnings("unchecked")
             @Override

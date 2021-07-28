@@ -132,7 +132,7 @@ public final class SubPlugin extends JavaPlugin {
                 new net.ME1312.SubServers.Client.Bukkit.Library.Compatibility.PlaceholderImpl(this).register();
             }
 
-            new Metrics(this);
+            new Metrics(this, 2334);
             Bukkit.getScheduler().runTaskTimerAsynchronously(this, () -> {
                 try {
                     YAMLSection tags = new YAMLSection(parseJSON("{\"tags\":" + Util.readAll(new BufferedReader(new InputStreamReader(new URL("https://api.github.com/repos/ME1312/SubServers-2/git/refs/tags").openStream(), Charset.forName("UTF-8")))) + '}'));
