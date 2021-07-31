@@ -2,6 +2,7 @@ package net.ME1312.SubServers.Sync.Library;
 
 import net.ME1312.SubServers.Sync.SubAPI;
 
+import gnu.trove.map.hash.TIntObjectHashMap;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Plugin;
@@ -128,9 +129,10 @@ public class Metrics {
 
     private static final AdvancedPie PLAYER_VERSIONS;
     static {
-        final Map.Entry<Integer, String>[] PROTOCOLS;
+        final int[] PROTOCOL_VERSIONS;
+        final String[] PROTOCOL_NAMES;
         {
-            TreeMap<Integer, String> protocols = new TreeMap<Integer, String>(Collections.reverseOrder());
+            TIntObjectHashMap<String> protocols = new TIntObjectHashMap<String>();
             try {
                 for (Field f : ProtocolConstants.class.getDeclaredFields()) {
                     int fm = f.getModifiers();
@@ -141,25 +143,29 @@ public class Metrics {
             } catch (Throwable e) {
                 e.printStackTrace();
             }
-            PROTOCOLS = protocols.entrySet().toArray(new Map.Entry[0]);
+            PROTOCOL_VERSIONS = protocols.keys();
+            PROTOCOL_NAMES = new String[PROTOCOL_VERSIONS.length];
+
+            Arrays.sort(PROTOCOL_VERSIONS);
+            for (int i = 0; i < PROTOCOL_VERSIONS.length; ++i) {
+                PROTOCOL_NAMES[i] = protocols.get(PROTOCOL_VERSIONS[i]);
+            }
         }
 
         PLAYER_VERSIONS = new AdvancedPie("player_versions", () -> {
-            HashMap<String, Integer> players = new HashMap<String, Integer>();
+            int[] players = new int[PROTOCOL_VERSIONS.length];
             for (ProxiedPlayer player : ProxyServer.getInstance().getPlayers()) {
-                String name = null;
-                int protocol = player.getPendingConnection().getVersion();
-                for (Map.Entry<Integer, String> p : PROTOCOLS) {
-                    if (protocol >= p.getKey()) {
-                        name = p.getValue();
-                        break;
-                    }
-                }
-                if (name != null) {
-                    players.put(name, players.getOrDefault(name, 0) + 1);
+                int i = Arrays.binarySearch(PROTOCOL_VERSIONS, player.getPendingConnection().getVersion());
+                if (i != -1) {
+                    ++players[i];
                 }
             }
-            return players;
+
+            HashMap<String, Integer> map = new HashMap<String, Integer>();
+            for (int i = 0; i < PROTOCOL_NAMES.length; ++i) if (players[i] != 0) {
+                map.put(PROTOCOL_NAMES[i], players[i]);
+            }
+            return map;
         });
     }
 

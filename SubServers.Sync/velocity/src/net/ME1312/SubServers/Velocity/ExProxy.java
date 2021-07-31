@@ -20,7 +20,6 @@ import net.ME1312.SubServers.Velocity.Library.ConfigUpdater;
 import net.ME1312.SubServers.Velocity.Library.Fallback.FallbackState;
 import net.ME1312.SubServers.Velocity.Library.Fallback.SmartFallback;
 import net.ME1312.SubServers.Velocity.Library.Metrics;
-import net.ME1312.SubServers.Velocity.Library.Metrics.AdvancedPie;
 import net.ME1312.SubServers.Velocity.Network.Packet.PacketExSyncPlayer;
 import net.ME1312.SubServers.Velocity.Network.SubProtocol;
 import net.ME1312.SubServers.Velocity.Server.CachedPlayer;
@@ -57,7 +56,6 @@ import java.net.InetAddress;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.*;
-import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
 @Plugin(id = "subservers-sync", name = "SubServers-Sync", authors = "ME1312", version = "2.17.1a/pr1", url = "https://github.com/ME1312/SubServers-2", description = "Dynamically sync player and server connection info over multiple proxy instances")
@@ -216,20 +214,7 @@ public class ExProxy {
         if (config.get().getMap("Settings").getMap("Smart-Fallback", new ObjectMap<>()).getBoolean("Enabled", true))
             proxy.getEventManager().register(this, new SmartFallback(config.get().getMap("Settings").getMap("Smart-Fallback", new ObjectMap<>())));
 
-        metrics.make(this, 11953).addCustomChart(new AdvancedPie("player_versions", new Callable<Map<String, Integer>>() {
-            @Override
-            public Map<String, Integer> call() throws Exception {
-                HashMap<String, Integer> players = new HashMap<String, Integer>();
-                for (Player player : proxy.getAllPlayers()) {
-                    String name = player.getProtocolVersion().getVersionIntroducedIn();
-                    if (name != null) {
-                        players.put(name, players.getOrDefault(name, 0) + 1);
-                    }
-                }
-                return players;
-            }
-        }));
-
+        metrics.make(this, 11953).appendAppData();
         new Timer("SubServers.Sync::Routine_Update_Check").schedule(new TimerTask() {
             @SuppressWarnings("unchecked")
             @Override

@@ -1,9 +1,14 @@
 package net.ME1312.SubServers.Velocity.Library;
 
+import net.ME1312.SubServers.Velocity.ExProxy;
+import net.ME1312.SubServers.Velocity.SubAPI;
+
 import com.google.inject.Inject;
+import com.velocitypowered.api.network.ProtocolVersion;
 import com.velocitypowered.api.plugin.PluginContainer;
 import com.velocitypowered.api.plugin.PluginDescription;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
+import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -17,15 +22,7 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -135,6 +132,39 @@ public class Metrics {
         if (metricsBase != null) {
             metricsBase.addCustomChart(chart);
         }
+    }
+
+    private static final AdvancedPie PLAYER_VERSIONS;
+    static {
+        final ProtocolVersion[] PROTOCOLS = ProtocolVersion.SUPPORTED_VERSIONS.toArray(new ProtocolVersion[0]);
+        Arrays.sort(PROTOCOLS);
+
+        PLAYER_VERSIONS = new AdvancedPie("player_versions", () -> {
+            int[] players = new int[PROTOCOLS.length];
+            for (Player player : ExProxy.getInstance().getAllPlayers()) {
+                int i = Arrays.binarySearch(PROTOCOLS, player.getProtocolVersion());
+                if (i != -1) {
+                    ++players[i];
+                }
+            }
+
+            HashMap<String, Integer> map = new HashMap<String, Integer>();
+            for (int i = 0; i < PROTOCOLS.length; ++i) if (players[i] != 0) {
+                map.put(PROTOCOLS[i].getVersionIntroducedIn(), players[i]);
+            }
+            return map;
+        });
+    }
+
+    public void appendAppData() {
+        addCustomChart(PLAYER_VERSIONS);
+    }
+
+    public void appendPluginData() {
+        addCustomChart(new SimplePie("subservers_version", () -> {
+            return SubAPI.getInstance().getPluginVersion().toString();
+        }));
+        addCustomChart(PLAYER_VERSIONS);
     }
 
     private void appendPlatformData(JsonObjectBuilder builder) {
