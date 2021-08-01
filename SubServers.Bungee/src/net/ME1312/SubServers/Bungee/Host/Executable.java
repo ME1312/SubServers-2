@@ -6,6 +6,7 @@ import net.ME1312.SubServers.Bungee.Library.Compatibility.JNA;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.stream.Stream;
 
 /**
  * Executable Handler Class
@@ -93,18 +94,28 @@ public class Executable {
      */
     public static void terminate(Process process) {
         if (process.isAlive()) {
-            Long pid = pid(process);
-            if (pid != null) try {
-                if (Platform.getSystem() == Platform.WINDOWS) {
-                    Runtime.getRuntime().exec(new String[]{"taskkill.exe", "/T", "/F", "/PID", pid.toString()}).waitFor();
-                } else if (USE_SESSION_TRACKING) {
-                    Runtime.getRuntime().exec(new String[]{"bash", "-c", "kill -9 $(ps -s " + pid + " -o pid=)"}).waitFor();
-                }
-            } catch (IOException | InterruptedException e) {}
+            Long pid;
+            if (Platform.getSystem() == Platform.WINDOWS) {
+                if ((pid = pid(process)) != null) Util.isException(() -> Runtime.getRuntime().exec(new String[]{"taskkill.exe", "/T", "/F", "/PID", pid.toString()}).waitFor());
+            } else if (USE_SESSION_TRACKING) {
+                if ((pid = pid(process)) != null) Util.isException(() -> Runtime.getRuntime().exec(new String[]{"bash", "-c", "kill -9 $(ps -s " + pid + " -o pid=)"}).waitFor());
+            }
 
-            if (process.isAlive()) {
+            if (process.isAlive() && terminate9(process)) {
                 process.destroyForcibly();
             }
+        }
+    }
+
+    private static boolean terminate9(Object handle) {
+        try { // Attempt iteration over Java 9 ProcessHandle objects
+            Class<?> clazz = handle.getClass();
+            Stream<?> children = (Stream<?>) clazz.getMethod("descendants").invoke(handle);
+            clazz.getMethod("destroyForcibly").invoke(handle);
+            children.forEach(Executable::terminate9);
+            return false;
+        } catch (Throwable e) {
+            return true;
         }
     }
 }
