@@ -220,8 +220,14 @@ public class ExternalSubCreator extends SubCreator {
                     }
 
                     host.addSubServer(subserver);
-                    if (update == null && template.getBuildOptions().getBoolean("Run-On-Finish", true))
-                        subserver.start();
+                    if (update == null && template.getBuildOptions().getBoolean("Run-On-Finish", true)) {
+                        while (!subserver.isAvailable() && host.isAvailable()) {
+                            Thread.sleep(250);
+                        }
+                        if (subserver.isAvailable()) {
+                            subserver.start();
+                        }
+                    }
                 }
 
                 host.plugin.getPluginManager().callEvent(new SubCreatedEvent(player, host, name, template, version, port, subserver, update != null, true));

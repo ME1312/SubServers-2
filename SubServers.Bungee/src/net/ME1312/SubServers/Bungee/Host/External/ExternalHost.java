@@ -177,9 +177,9 @@ public class ExternalHost extends Host implements ClientHandler {
         plugin.getPluginManager().callEvent(event);
         if (!event.isCancelled()) {
             queue(new PacketExAddServer(((ExternalSubServer) server), (server.isRunning())?((ExternalSubLogger) server.getLogger()).getExternalAddress():null, data -> {
+                ((ExternalSubServer) server).registered(true);
                 if (data.contains(0x0002)) ((ExternalSubServer) server).started(data.getUUID(0x0002));
             }));
-            ((ExternalSubServer) server).registered(true);
             servers.put(server.getName().toLowerCase(), server);
             return true;
         } else {
