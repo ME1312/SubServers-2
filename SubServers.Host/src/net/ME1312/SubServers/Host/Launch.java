@@ -13,6 +13,7 @@ public final class Launch {
      */
     public static void main(String[] args) throws Exception {
         System.setProperty("jdk.lang.Process.allowAmbiguousCommands", "true");
+        System.setProperty("jdk.util.jar.enableMultiRelease", "force");
         System.setProperty("apple.laf.useScreenMenuBar", "true");
         boolean exists = false;
         try {

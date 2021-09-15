@@ -6,6 +6,8 @@ import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubServers.Client.Bukkit.SubAPI;
 
+import org.bukkit.Bukkit;
+
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -36,7 +38,7 @@ public class ConfigUpdater {
         if (!existing.contains("Settings") || !existing.getMap("Settings").contains("Version")) {
 
             i++;
-            System.out.println("SubServers > Created ./plugins/SubServers-Client-Bukkit/config.yml");
+            Bukkit.getLogger().info("SubServers > Created ./plugins/SubServers-Client-Bukkit/config.yml");
         } else {
             if (was.compareTo(new Version("19w17a")) <= 0) {
                 if (existing.getMap("Settings", new YAMLSection()).contains("Ingame-Access"))
@@ -49,7 +51,7 @@ public class ConfigUpdater {
             //  i++
             //}
 
-            if (i > 0) System.out.println("SubServers > Updated ./plugins/SubServers-Client-Bukkit/config.yml (" + i + " pass" + ((i != 1)?"es":"") + ")");
+            if (i > 0) Bukkit.getLogger().info("SubServers > Updated ./plugins/SubServers-Client-Bukkit/config.yml (" + i + " pass" + ((i != 1)?"es":"") + ")");
         }
 
         if (i > 0) {

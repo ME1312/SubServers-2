@@ -23,6 +23,7 @@ public final class Launch {
     @SuppressWarnings({"deprecation", "unchecked"})
     public static void main(String[] args) throws Exception {
         System.setProperty("jdk.lang.Process.allowAmbiguousCommands", "true");
+        System.setProperty("jdk.util.jar.enableMultiRelease", "force");
         System.setProperty("apple.laf.useScreenMenuBar", "true");
 
         if (Util.getDespiteException(() -> Class.forName("net.md_5.bungee.BungeeCord") == null, true)) {
@@ -65,7 +66,7 @@ public final class Launch {
                     if (net.md_5.bungee.BungeeCord.class.getPackage().getSpecificationVersion() != null) {
                         Date date = (new SimpleDateFormat("yyyyMMdd")).parse(net.md_5.bungee.BungeeCord.class.getPackage().getSpecificationVersion());
                         Calendar line = Calendar.getInstance();
-                        line.add(3, -4);
+                        line.add(Calendar.WEEK_OF_YEAR, -8);
                         if (date.before(line.getTime())) {
                             System.out.println("***   Warning: BungeeCord is outdated   ***");
                             System.out.println("***  Please download a new build from:  ***");

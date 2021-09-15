@@ -103,20 +103,20 @@ public final class SubPlugin extends JavaPlugin {
                 subprotocol.registerCipher("AES-192", new AES(192, config.get().getMap("Settings").getMap("SubData").getRawString("Password")));
                 subprotocol.registerCipher("AES-256", new AES(256, config.get().getMap("Settings").getMap("SubData").getRawString("Password")));
 
-                System.out.println("SubData > AES Encryption Available");
+                Bukkit.getLogger().info("SubData > AES Encryption Available");
             }
             if (new UniversalFile(dir, "subdata.rsa.key").exists()) {
                 try {
                     subprotocol.registerCipher("RSA", new RSA(new UniversalFile(dir, "subdata.rsa.key")));
-                    System.out.println("SubData > RSA Encryption Available");
+                    Bukkit.getLogger().info("SubData > RSA Encryption Available");
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
 
             reconnect = true;
-            System.out.println("SubData > ");
-            System.out.println("SubData > Connecting to /" + config.get().getMap("Settings").getMap("SubData").getRawString("Address", "127.0.0.1:4391"));
+            Bukkit.getLogger().info("SubData > ");
+            Bukkit.getLogger().info("SubData > Connecting to /" + config.get().getMap("Settings").getMap("SubData").getRawString("Address", "127.0.0.1:4391"));
             connect(null);
 
             gui = new DefaultUIHandler(this);
