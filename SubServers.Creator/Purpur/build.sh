@@ -29,7 +29,7 @@ if [[ -f "Purpur.jar" ]]; then
     fi
     mv Purpur.jar Purpur.old.jar.x
 fi
-__DL Purpur.jar "https://purpur.pl3x.net/api/v1/purpur/$version/latest/download"; __RETURN=$?
+__DL Purpur.jar "https://api.pl3x.net/v2/purpur/$version/latest/download"; __RETURN=$?
 if [[ $__RETURN -eq 0 ]]; then
     if [[ $(stat -c%s "Purpur.jar") -ge 1000000 ]]; then
         echo Cleaning Up...
