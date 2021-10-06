@@ -168,6 +168,15 @@ public final class ExProxy extends BungeeCommon implements Listener {
             ConfigUpdater.updateConfig(new UniversalFile(dir, "SubServers:sync.yml"));
             config.reload();
 
+            synchronized (rPlayers) {
+                for (ProxiedPlayer local : getPlayers()) {
+                    CachedPlayer player = new CachedPlayer(local);
+                    rPlayerLinkP.put(player.getUniqueId(), player.getProxyName().toLowerCase());
+                    rPlayers.put(player.getUniqueId(), player);
+                    if (local.getServer().getInfo() instanceof ServerImpl) rPlayerLinkS.put(player.getUniqueId(), (ServerImpl) local.getServer().getInfo());
+                }
+            }
+
             subprotocol.unregisterCipher("AES");
             subprotocol.unregisterCipher("AES-128");
             subprotocol.unregisterCipher("AES-192");
@@ -198,8 +207,6 @@ public final class ExProxy extends BungeeCommon implements Listener {
             Logger.get("SubData").info("Connecting to /" + config.get().getMap("Settings").getMap("SubData").getRawString("Address", "127.0.0.1:4391"));
             connect(Logger.get("SubData"), null);
 
-            super.startListeners();
-
             if (UPnP.isUPnPAvailable()) {
                 if (config.get().getMap("Settings").getMap("UPnP", new ObjectMap<String>()).getBoolean("Forward-Proxy", true)) for (ListenerInfo listener : getConfig().getListeners()) {
                     UPnP.openPortTCP(listener.getHost().getPort());
@@ -207,6 +214,8 @@ public final class ExProxy extends BungeeCommon implements Listener {
             } else {
                 getLogger().warning("UPnP is currently unavailable. Ports may not be automatically forwarded on this device.");
             }
+
+            super.startListeners();
 
             if (!posted) {
                 posted = true;

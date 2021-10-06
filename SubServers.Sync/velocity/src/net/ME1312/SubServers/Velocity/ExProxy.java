@@ -138,6 +138,16 @@ public class ExProxy {
             ConfigUpdater.updateConfig(new UniversalFile(dir, "SubServers:sync.yml"));
             config.reload();
 
+            synchronized (rPlayers) {
+                for (Player local : proxy.getAllPlayers()) {
+                    CachedPlayer player = new CachedPlayer(local);
+                    rPlayerLinkP.put(player.getUniqueId(), player.getProxyName().toLowerCase());
+                    rPlayers.put(player.getUniqueId(), player);
+                    ServerInfo server = local.getCurrentServer().map(ServerConnection::getServerInfo).orElse(null);
+                    if (servers.containsKey(server)) rPlayerLinkS.put(player.getUniqueId(), servers.get(server));
+                }
+            }
+
             subprotocol.unregisterCipher("AES");
             subprotocol.unregisterCipher("AES-128");
             subprotocol.unregisterCipher("AES-192");

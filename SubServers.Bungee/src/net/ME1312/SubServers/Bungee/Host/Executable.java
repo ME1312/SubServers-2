@@ -5,7 +5,6 @@ import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubServers.Bungee.Library.Compatibility.JNA;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.stream.Stream;
 
 /**

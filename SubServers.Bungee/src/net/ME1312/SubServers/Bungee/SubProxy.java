@@ -661,6 +661,15 @@ public final class SubProxy extends BungeeCommon implements Listener {
         try {
             if (posted || !ready) reload();
 
+            synchronized (rPlayers) {
+                for (ProxiedPlayer local : getPlayers()) {
+                    RemotePlayer player = new RemotePlayer(local);
+                    rPlayerLinkP.put(player.getUniqueId(), player.getProxy());
+                    rPlayers.put(player.getUniqueId(), player);
+                    if (player.getServer() != null) rPlayerLinkS.put(player.getUniqueId(), player.getServer());
+                }
+            }
+
             if (UPnP.isUPnPAvailable()) {
                 if (config.get().getMap("Settings").getMap("UPnP", new ObjectMap<String>()).getBoolean("Forward-Proxy", true)) for (ListenerInfo listener : getConfig().getListeners()) {
                     UPnP.openPortTCP(listener.getHost().getPort());
