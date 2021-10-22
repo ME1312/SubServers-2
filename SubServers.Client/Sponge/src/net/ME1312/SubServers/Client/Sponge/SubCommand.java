@@ -634,6 +634,8 @@ public final class SubCommand implements CommandExecutor {
                             case "subserver":
                                 getServer.run();
                                 break;
+                            case "u":
+                            case "user":
                             case "player":
                                 getPlayer.run();
                                 break;

@@ -688,8 +688,7 @@ public final class ExProxy extends BungeeCommon implements Listener {
 
     @EventHandler(priority = Byte.MIN_VALUE)
     public void remove(SubRemoveServerEvent e) {
-        if (servers.keySet().contains(e.getServer().toLowerCase()))
-            servers.remove(e.getServer().toLowerCase());
+        if (servers.remove(e.getServer().toLowerCase()) != null)
             Logger.get("SubServers").info("Removed Server: " + e.getServer());
     }
 }

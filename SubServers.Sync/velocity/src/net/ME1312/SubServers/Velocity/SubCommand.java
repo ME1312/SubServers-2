@@ -327,6 +327,8 @@ public final class SubCommand implements SimpleCommand {
                                     case "subserver":
                                         getServer.run();
                                         break;
+                                    case "u":
+                                    case "user":
                                     case "player":
                                         getPlayer.run();
                                         break;

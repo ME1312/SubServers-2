@@ -5,7 +5,6 @@ import net.ME1312.Galaxi.Library.Container.Pair;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
-import net.ME1312.SubData.Client.Library.DataSize;
 import net.ME1312.SubData.Client.SubDataClient;
 import net.ME1312.SubData.Client.SubDataProtocol;
 import net.ME1312.SubServers.Client.Common.Network.API.RemotePlayer;
@@ -13,6 +12,7 @@ import net.ME1312.SubServers.Client.Common.Network.API.Server;
 import net.ME1312.SubServers.Client.Common.Network.Packet.*;
 import net.ME1312.SubServers.Sync.Event.SubNetworkConnectEvent;
 import net.ME1312.SubServers.Sync.Event.SubNetworkDisconnectEvent;
+import net.ME1312.SubServers.Sync.Event.SubRemoveServerEvent;
 import net.ME1312.SubServers.Sync.ExProxy;
 import net.ME1312.SubServers.Sync.Network.Packet.*;
 import net.ME1312.SubServers.Sync.Server.CachedPlayer;
@@ -192,18 +192,28 @@ public class SubProtocol extends SubDataProtocol {
             subdata.sendPacket(new PacketExSyncPlayer(null, localPlayers.toArray(new CachedPlayer[0])));
 
             plugin.api.getServers(servers -> {
+                HashMap<String, ServerImpl> localServers = new HashMap<String, ServerImpl>(plugin.servers);
                 for (Server server : servers.values()) {
+                    localServers.remove(server.getName().toLowerCase());
                     plugin.merge(server);
+                }
+                for (ServerImpl server : localServers.values()) {
+                    plugin.remove(new SubRemoveServerEvent(null, null, server.getName()));
                 }
 
                 plugin.api.getRemotePlayers(players -> {
-                    for (RemotePlayer player : players.values()) {
-                        plugin.rPlayerLinkP.put(player.getUniqueId(), player.getProxyName().toLowerCase());
-                        plugin.rPlayers.put(player.getUniqueId(), (CachedPlayer) player);
+                    synchronized (plugin.rPlayers) {
+                        plugin.rPlayerLinkS.clear();
+                        plugin.rPlayerLinkP.clear();
+                        plugin.rPlayers.clear();
+                        for (RemotePlayer player : players.values()) {
+                            plugin.rPlayerLinkP.put(player.getUniqueId(), player.getProxyName().toLowerCase());
+                            plugin.rPlayers.put(player.getUniqueId(), (CachedPlayer) player);
 
-                        ServerInfo server = plugin.getServerInfo(player.getServerName());
-                        if (server instanceof ServerImpl)
-                            plugin.rPlayerLinkS.put(player.getUniqueId(), (ServerImpl) server);
+                            ServerInfo server = plugin.getServerInfo(player.getServerName());
+                            if (server instanceof ServerImpl)
+                                plugin.rPlayerLinkS.put(player.getUniqueId(), (ServerImpl) server);
+                        }
                     }
                 });
             });

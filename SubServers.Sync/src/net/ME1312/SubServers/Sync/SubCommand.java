@@ -322,6 +322,8 @@ public final class SubCommand extends Command implements TabExecutor {
                                     case "subserver":
                                         getServer.run();
                                         break;
+                                    case "u":
+                                    case "user":
                                     case "player":
                                         getPlayer.run();
                                         break;

@@ -328,6 +328,8 @@ public final class SubCommand extends Command {
                                     case "subserver":
                                         getServer.run();
                                         break;
+                                    case "u":
+                                    case "user":
                                     case "player":
                                         getPlayer.run();
                                         break;
