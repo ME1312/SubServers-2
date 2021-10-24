@@ -1,7 +1,6 @@
 package net.ME1312.SubServers.Bungee.Network.Packet;
 
 import net.ME1312.Galaxi.Library.AsyncConsolidator;
-import net.ME1312.Galaxi.Library.Callback.Callback;
 import net.ME1312.Galaxi.Library.Container.Container;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.SubData.Server.Protocol.PacketObjectIn;
@@ -16,6 +15,7 @@ import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 import java.util.*;
+import java.util.function.IntConsumer;
 
 /**
  * Transfer Player Packet
@@ -58,7 +58,7 @@ public class PacketTransferPlayer implements PacketObjectIn<Integer>, PacketObje
         });
     }
 
-    public static void run(List<UUID> ids, String name, Callback<Integer> callback) {
+    public static void run(List<UUID> ids, String name, IntConsumer callback) {
         try {
             Container<Integer> failures = new Container<>(0);
             HashMap<Proxy, List<UUID>> requests = new HashMap<Proxy, List<UUID>>();
@@ -81,10 +81,10 @@ public class PacketTransferPlayer implements PacketObjectIn<Integer>, PacketObje
             }
 
             if (requests.size() == 0) {
-                callback.run(failures.value);
+                callback.accept(failures.value);
             } else {
                 AsyncConsolidator merge = new AsyncConsolidator(() -> {
-                    callback.run(failures.value);
+                    callback.accept(failures.value);
                 });
                 for (Map.Entry<Proxy, List<UUID>> entry : requests.entrySet()) {
                     merge.reserve();
@@ -96,7 +96,7 @@ public class PacketTransferPlayer implements PacketObjectIn<Integer>, PacketObje
             }
         } catch (Throwable e) {
             e.printStackTrace();
-            callback.run(-1);
+            callback.accept(-1);
         }
     }
 

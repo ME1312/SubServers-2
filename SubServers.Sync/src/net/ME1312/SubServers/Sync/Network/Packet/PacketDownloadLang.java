@@ -23,7 +23,7 @@ public class PacketDownloadLang implements PacketObjectIn<Integer>, PacketOut {
      * @param plugin SubServers.Client
      */
     public PacketDownloadLang(ExProxy plugin) {
-        if (Util.isNull(plugin)) throw new NullPointerException();
+        Util.nullpo(plugin);
         this.plugin = plugin;
     }
 

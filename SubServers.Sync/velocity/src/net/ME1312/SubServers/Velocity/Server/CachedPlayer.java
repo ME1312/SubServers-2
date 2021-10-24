@@ -1,6 +1,5 @@
 package net.ME1312.SubServers.Velocity.Server;
 
-import net.ME1312.Galaxi.Library.Callback.Callback;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.SubData.Client.DataClient;
 import net.ME1312.SubData.Client.SubDataClient;
@@ -14,11 +13,11 @@ import com.velocitypowered.api.proxy.server.RegisteredServer;
 import com.velocitypowered.api.proxy.server.ServerInfo;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.IntConsumer;
 
 /**
  * Cached RemotePlayer Data Class
@@ -107,7 +106,7 @@ public class CachedPlayer extends RemotePlayer {
             }
 
             @Override
-            protected void sendMessage(SubDataClient client, UUID[] players, String[] messages, Callback<Integer> response) {
+            protected void sendMessage(SubDataClient client, UUID[] players, String[] messages, IntConsumer response) {
                 if (players != null && players.length > 0) {
                     ArrayList<UUID> ids = new ArrayList<UUID>();
                     for (UUID id : players) {
@@ -122,7 +121,7 @@ public class CachedPlayer extends RemotePlayer {
                     }
 
                     if (ids.size() == 0) {
-                        response.run(0);
+                        response.accept(0);
                     } else {
                         super.sendMessage(client, ids.toArray(new UUID[0]), messages, response);
                     }
@@ -132,7 +131,7 @@ public class CachedPlayer extends RemotePlayer {
             }
 
             @Override
-            protected void sendRawMessage(SubDataClient client, UUID[] players, String[] messages, Callback<Integer> response) {
+            protected void sendRawMessage(SubDataClient client, UUID[] players, String[] messages, IntConsumer response) {
                 if (players != null && players.length > 0) {
                     ArrayList<UUID> ids = new ArrayList<UUID>();
                     Component[] components = null;
@@ -152,7 +151,7 @@ public class CachedPlayer extends RemotePlayer {
                     }
 
                     if (ids.size() == 0) {
-                        response.run(0);
+                        response.accept(0);
                     } else {
                         super.sendRawMessage(client, ids.toArray(new UUID[0]), messages, response);
                     }
@@ -162,7 +161,7 @@ public class CachedPlayer extends RemotePlayer {
             }
 
             @Override
-            protected void transfer(SubDataClient client, UUID[] players, String server, Callback<Integer> response) {
+            protected void transfer(SubDataClient client, UUID[] players, String server, IntConsumer response) {
                 ArrayList<UUID> ids = new ArrayList<UUID>();
                 Optional<RegisteredServer> rs = ExProxy.getInstance().getServer(server.toLowerCase());
                 int failures = 0;
@@ -178,15 +177,15 @@ public class CachedPlayer extends RemotePlayer {
                 }
 
                 if (ids.size() == 0) {
-                    response.run(failures);
+                    response.accept(failures);
                 } else {
                     final int ff = failures;
-                    super.transfer(client, ids.toArray(new UUID[0]), server, i -> response.run(i + ff));
+                    super.transfer(client, ids.toArray(new UUID[0]), server, i -> response.accept(i + ff));
                 }
             }
 
             @Override
-            protected void disconnect(SubDataClient client, UUID[] players, String reason, Callback<Integer> response) {
+            protected void disconnect(SubDataClient client, UUID[] players, String reason, IntConsumer response) {
                 Component message = (reason == null)? Component.text().build() : ChatColor.convertColor(reason);
                 ArrayList<UUID> ids = new ArrayList<UUID>();
                 for (UUID id : players) {
@@ -199,7 +198,7 @@ public class CachedPlayer extends RemotePlayer {
                 }
 
                 if (ids.size() == 0) {
-                    response.run(0);
+                    response.accept(0);
                 } else {
                     super.disconnect(client, ids.toArray(new UUID[0]), reason, response);
                 }

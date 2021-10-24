@@ -31,7 +31,7 @@ public class PacketExCreateServer implements PacketObjectIn<Integer>, PacketObje
      * @param host ExHost
      */
     public PacketExCreateServer(ExHost host) {
-        if (Util.isNull(host)) throw new NullPointerException();
+        Util.nullpo(host);
         this.host = host;
     }
 
@@ -43,7 +43,7 @@ public class PacketExCreateServer implements PacketObjectIn<Integer>, PacketObje
      * @param tracker Receiver ID
      */
     public PacketExCreateServer(int response, String message, UUID tracker) {
-        if (Util.isNull(response)) throw new NullPointerException();
+        Util.nullpo(response);
         this.response = response;
         this.message = message;
         this.tracker = tracker;
@@ -58,7 +58,7 @@ public class PacketExCreateServer implements PacketObjectIn<Integer>, PacketObje
      * @param tracker Receiver ID
      */
     public PacketExCreateServer(int response, String message, Map<String, ?> info, UUID tracker) {
-        if (Util.isNull(response)) throw new NullPointerException();
+        Util.nullpo(response);
         this.response = response;
         this.message = message;
         this.info = info;

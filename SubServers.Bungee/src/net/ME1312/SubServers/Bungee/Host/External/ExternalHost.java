@@ -1,6 +1,7 @@
 package net.ME1312.SubServers.Bungee.Host.External;
 
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
+import net.ME1312.Galaxi.Library.Try;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubData.Server.ClientHandler;
 import net.ME1312.SubData.Server.DataClient;
@@ -189,7 +190,7 @@ public class ExternalHost extends Host implements ClientHandler {
 
     @Override
     protected boolean removeSubServer(UUID player, String name, boolean forced) throws InterruptedException {
-        if (Util.isNull(name)) throw new NullPointerException();
+        Util.nullpo(name);
         ExternalSubServer server = (ExternalSubServer) servers.get(name.toLowerCase());
 
         SubRemoveServerEvent event = new SubRemoveServerEvent(player, this, server);
@@ -214,7 +215,7 @@ public class ExternalHost extends Host implements ClientHandler {
 
     @Override
     protected boolean recycleSubServer(UUID player, String name, boolean forced) throws InterruptedException {
-        if (Util.isNull(name)) throw new NullPointerException();
+        Util.nullpo(name);
         ExternalSubServer s = (ExternalSubServer) servers.get(name.toLowerCase());
         String server = s.getName();
 
@@ -256,7 +257,7 @@ public class ExternalHost extends Host implements ClientHandler {
 
     @Override
     protected boolean deleteSubServer(UUID player, String name, boolean forced) throws InterruptedException {
-        if (Util.isNull(name)) throw new NullPointerException();
+        Util.nullpo(name);
         ExternalSubServer s = (ExternalSubServer) servers.get(name.toLowerCase());
         String server = s.getName();
 
@@ -298,7 +299,7 @@ public class ExternalHost extends Host implements ClientHandler {
 
     @Override
     public boolean destroy() {
-        if (Util.getDespiteException(() -> Util.reflect(SubProxy.class.getDeclaredField("running"), plugin), true)) {
+        if (Try.all.get(() -> Util.reflect(SubProxy.class.getDeclaredField("running"), plugin), true)) {
             return super.destroy();
         }
         return true;

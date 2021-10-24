@@ -9,7 +9,6 @@ import net.ME1312.SubServers.Velocity.Library.Compatibility.ChatColor;
 
 import com.velocitypowered.api.proxy.Player;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 
 import java.util.List;
 import java.util.Optional;

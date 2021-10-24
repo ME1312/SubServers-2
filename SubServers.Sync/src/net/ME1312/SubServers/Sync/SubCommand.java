@@ -1,14 +1,13 @@
 package net.ME1312.SubServers.Sync;
 
 import net.ME1312.Galaxi.Library.AsyncConsolidator;
-import net.ME1312.Galaxi.Library.Callback.Callback;
-import net.ME1312.Galaxi.Library.Callback.ReturnRunnable;
 import net.ME1312.Galaxi.Library.Container.ContainedPair;
 import net.ME1312.Galaxi.Library.Container.Container;
 import net.ME1312.Galaxi.Library.Container.Pair;
 import net.ME1312.Galaxi.Library.Container.Value;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Platform;
+import net.ME1312.Galaxi.Library.Try;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubData.Client.SubDataClient;
@@ -41,6 +40,8 @@ import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 @SuppressWarnings("deprecation")
 public final class SubCommand extends Command implements TabExecutor {
@@ -387,7 +388,7 @@ public final class SubCommand extends Command implements TabExecutor {
                             selectServers(sender, args, 1, true, select -> {
                                 if (select.subservers.length > 0) {
                                     // Step 5: Start the stopped Servers once more
-                                    Callback<SubServer> starter = server -> server.start(response -> {
+                                    Consumer<SubServer> starter = server -> server.start(response -> {
                                         switch (response) {
                                             case 3:
                                             case 4:
@@ -417,9 +418,9 @@ public final class SubCommand extends Command implements TabExecutor {
 
                                     // Step 4: Listen for stopped Servers
                                     final HashMap<String, SubServer> listening = new HashMap<String, SubServer>();
-                                    PacketInExRunEvent.callback("SubStoppedEvent", new Callback<ObjectMap<String>>() {
+                                    PacketInExRunEvent.callback("SubStoppedEvent", new Consumer<ObjectMap<String>>() {
                                         @Override
-                                        public void run(ObjectMap<String> json) {
+                                        public void accept(ObjectMap<String> json) {
                                             try {
                                                 if (listening.size() > 0) {
                                                     PacketInExRunEvent.callback("SubStoppedEvent", this);
@@ -429,7 +430,7 @@ public final class SubCommand extends Command implements TabExecutor {
                                                         timer.schedule(new TimerTask() {
                                                             @Override
                                                             public void run() {
-                                                                starter.run(listening.get(name));
+                                                                starter.accept(listening.get(name));
                                                                 listening.remove(name);
                                                                 timer.cancel();
                                                             }
@@ -457,7 +458,7 @@ public final class SubCommand extends Command implements TabExecutor {
                                                     sender.sendMessage("Could not restart server: Subserver " + server.getName() + " has disappeared");
                                                     break;
                                                 case 5:
-                                                    starter.run(server);
+                                                    starter.accept(server);
                                                 case 0:
                                                     success.value++;
                                                     break;
@@ -581,7 +582,7 @@ public final class SubCommand extends Command implements TabExecutor {
                         }
                     } else if (args[0].equalsIgnoreCase("create")) {
                         if (args.length > 3) {
-                            if (args.length > 5 && Util.isException(() -> Integer.parseInt(args[5]))) {
+                            if (args.length > 5 && !Try.all.run(() -> Integer.parseInt(args[5]))) {
                                 sender.sendMessage("SubServers > Invalid port number");
                             } else {
                                 ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketCreateServer(null, args[1], args[2],args[3], (args.length > 4)?new Version(args[4]):null, (args.length > 5)?Integer.parseInt(args[5]):null, data -> {
@@ -733,7 +734,7 @@ public final class SubCommand extends Command implements TabExecutor {
         }
     }
 
-    private void selectServers(CommandSender sender, String[] rargs, int index, boolean mode, Callback<ServerSelection> callback) {
+    private void selectServers(CommandSender sender, String[] rargs, int index, boolean mode, Consumer<ServerSelection> callback) {
         StackTraceElement[] origin = new Exception().getStackTrace();
         LinkedList<String> msgs = new LinkedList<String>();
         LinkedList<String> args = new LinkedList<String>();
@@ -779,7 +780,7 @@ public final class SubCommand extends Command implements TabExecutor {
             }
 
             try {
-                callback.run(new ServerSelection(msgs, selection, servers, subservers, args, last.value()));
+                callback.accept(new ServerSelection(msgs, selection, servers, subservers, args, last.value()));
             } catch (Throwable e) {
                 Throwable ew = new InvocationTargetException(e);
                 ew.setStackTrace(origin);
@@ -981,7 +982,7 @@ public final class SubCommand extends Command implements TabExecutor {
             return list;
         } else {
             if (args[0].equals("info") || args[0].equals("status")) {
-                ReturnRunnable<Collection<String>> getPlayers = () -> {
+                Supplier<Collection<String>> getPlayers = () -> {
                     LinkedList<String> names = new LinkedList<String>();
                     for (ProxiedPlayer player : plugin.getPlayers()) names.add(player.getName());
                     for (CachedPlayer player : plugin.api.getRemotePlayers().values()) if (!names.contains(player.getName())) names.add(player.getName());
@@ -1023,7 +1024,7 @@ public final class SubCommand extends Command implements TabExecutor {
                         if (!list.contains(server.getName()) && server.getName().toLowerCase().startsWith(last))
                             list.add(Last + server.getName().substring(last.length()));
                     }
-                    for (String player : getPlayers.run()) {
+                    for (String player : getPlayers.get()) {
                         if (!list.contains(player) && player.toLowerCase().startsWith(last))
                             list.add(Last + player.substring(last.length()));
                     }
@@ -1064,8 +1065,10 @@ public final class SubCommand extends Command implements TabExecutor {
                                     list.add(Last + server.getName().substring(last.length()));
                             }
                             break;
+                        case "u":
+                        case "user":
                         case "player":
-                            for (String player : getPlayers.run()) {
+                            for (String player : getPlayers.get()) {
                                 if (player.toLowerCase().startsWith(last))
                                     list.add(Last + player.substring(last.length()));
                             }
@@ -1157,7 +1160,7 @@ public final class SubCommand extends Command implements TabExecutor {
                     return Collections.singletonList("[Version]");
                 } else if (args.length == 6) {
                     if (last.length() > 0) {
-                        if (Util.isException(() -> Integer.parseInt(last)) || Integer.parseInt(last) <= 0 || Integer.parseInt(last) > 65535) {
+                        if (!Try.all.run(() -> Integer.parseInt(last)) || Integer.parseInt(last) <= 0 || Integer.parseInt(last) > 65535) {
                             return Collections.emptyList();
                         }
                     }

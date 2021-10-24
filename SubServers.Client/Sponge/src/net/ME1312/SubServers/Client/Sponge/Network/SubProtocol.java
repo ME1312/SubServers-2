@@ -1,11 +1,10 @@
 package net.ME1312.SubServers.Client.Sponge.Network;
 
-import net.ME1312.Galaxi.Library.Callback.Callback;
 import net.ME1312.Galaxi.Library.Container.Pair;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
+import net.ME1312.Galaxi.Library.Try;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
-import net.ME1312.SubData.Client.Library.DataSize;
 import net.ME1312.SubData.Client.SubDataClient;
 import net.ME1312.SubData.Client.SubDataProtocol;
 import net.ME1312.SubServers.Client.Common.Network.Packet.*;
@@ -22,6 +21,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.util.HashMap;
+import java.util.function.Consumer;
 import java.util.logging.Handler;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
@@ -155,9 +155,9 @@ public class SubProtocol extends SubDataProtocol {
     }
 
     @Override
-    protected SubDataClient sub(Callback<Runnable> scheduler, Logger logger, InetAddress address, int port, ObjectMap<?> login) throws IOException {
+    protected SubDataClient sub(Consumer<Runnable> scheduler, Logger logger, InetAddress address, int port, ObjectMap<?> login) throws IOException {
         SubPlugin plugin = SubAPI.getInstance().getInternals();
-        HashMap<Integer, SubDataClient> map = Util.getDespiteException(() -> Util.reflect(SubPlugin.class.getDeclaredField("subdata"), plugin), null);
+        HashMap<Integer, SubDataClient> map = Try.all.get(() -> Util.reflect(SubPlugin.class.getDeclaredField("subdata"), plugin));
 
         int channel = 1;
         while (map.keySet().contains(channel)) channel++;
@@ -173,9 +173,9 @@ public class SubProtocol extends SubDataProtocol {
 
     @SuppressWarnings("deprecation")
     @Override
-    public SubDataClient open(Callback<Runnable> scheduler, Logger logger, InetAddress address, int port) throws IOException {
+    public SubDataClient open(Consumer<Runnable> scheduler, Logger logger, InetAddress address, int port) throws IOException {
         SubPlugin plugin = SubAPI.getInstance().getInternals();
-        HashMap<Integer, SubDataClient> map = Util.getDespiteException(() -> Util.reflect(SubPlugin.class.getDeclaredField("subdata"), plugin), null);
+        HashMap<Integer, SubDataClient> map = Try.all.get(() -> Util.reflect(SubPlugin.class.getDeclaredField("subdata"), plugin));
 
         SubDataClient subdata = super.open(scheduler, logger, address, port);
         subdata.sendPacket(new PacketLinkServer(plugin, 0));
@@ -185,8 +185,8 @@ public class SubProtocol extends SubDataProtocol {
             SubNetworkDisconnectEvent event = new SubNetworkDisconnectEvent(client.value(), client.key());
             Sponge.getEventManager().post(event);
 
-            if (Util.getDespiteException(() -> Util.reflect(SubPlugin.class.getDeclaredField("running"), plugin), true)) {
-                Util.isException(() -> Util.reflect(SubPlugin.class.getDeclaredMethod("connect", Pair.class), plugin, client));
+            if (Try.all.get(() -> Util.reflect(SubPlugin.class.getDeclaredField("running"), plugin), true)) {
+                Try.all.run(() -> Util.reflect(SubPlugin.class.getDeclaredMethod("connect", Pair.class), plugin, client));
             } else map.put(0, null);
         });
 

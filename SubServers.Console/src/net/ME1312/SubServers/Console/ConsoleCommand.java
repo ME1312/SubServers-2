@@ -1,6 +1,5 @@
 package net.ME1312.SubServers.Console;
 
-import net.ME1312.Galaxi.Library.Callback.Callback;
 import net.ME1312.SubServers.Bungee.Host.Host;
 import net.ME1312.SubServers.Bungee.Host.SubServer;
 import net.ME1312.SubServers.Bungee.Library.Compatibility.Logger;
@@ -11,6 +10,7 @@ import net.md_5.bungee.api.plugin.Command;
 import net.md_5.bungee.command.ConsoleCommandSender;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 @SuppressWarnings("unchecked")
 public final class ConsoleCommand {
@@ -158,9 +158,9 @@ public final class ConsoleCommand {
                             }
                         }
                     };
-                    final Callback<Boolean> forCreator = new Callback<Boolean>() {
+                    final Consumer<Boolean> forCreator = new Consumer<Boolean>() {
                         @Override
-                        public void run(Boolean force) {
+                        public void accept(Boolean force) {
                             Host host = plugin.getProxy().api.getHost(name);
                             if (force || host != null) {
                                 List<String> list = plugin.config.get().getStringList("Enabled-Creators");
@@ -186,7 +186,7 @@ public final class ConsoleCommand {
                     };
 
                     if (type == null) {
-                        forCreator.run(false);
+                        forCreator.accept(false);
                     } else {
                         switch (type.toLowerCase()) {
                             case "h":
@@ -194,7 +194,7 @@ public final class ConsoleCommand {
                             case "c":
                             case "creator":
                             case "subcreator":
-                                forCreator.run(true);
+                                forCreator.accept(true);
                                 break;
                             case "s":
                             case "server":

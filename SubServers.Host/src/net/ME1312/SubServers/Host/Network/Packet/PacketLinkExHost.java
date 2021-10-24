@@ -2,6 +2,7 @@ package net.ME1312.SubServers.Host.Network.Packet;
 
 import net.ME1312.Galaxi.Engine.GalaxiEngine;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
+import net.ME1312.Galaxi.Library.Try;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubData.Client.Library.DebugUtil;
 import net.ME1312.SubData.Client.Protocol.Initial.InitialPacket;
@@ -26,7 +27,7 @@ public class PacketLinkExHost implements InitialPacket, PacketObjectIn<Integer>,
      * @param host SubServers.Host
      */
     public PacketLinkExHost(ExHost host) {
-        if (Util.isNull(host)) throw new NullPointerException();
+        Util.nullpo(host);
         this.host = host;
     }
 
@@ -36,7 +37,7 @@ public class PacketLinkExHost implements InitialPacket, PacketObjectIn<Integer>,
      * @param host SubServers.Host
      */
     public PacketLinkExHost(ExHost host, int channel) {
-        if (Util.isNull(host)) throw new NullPointerException();
+        Util.nullpo(host);
         this.host = host;
         this.channel = channel;
     }
@@ -51,7 +52,7 @@ public class PacketLinkExHost implements InitialPacket, PacketObjectIn<Integer>,
 
     @Override
     public void receive(SubDataSender client, ObjectMap<Integer> data) throws Throwable {
-        Logger log = Util.getDespiteException(() -> Util.reflect(SubDataClient.class.getDeclaredField("log"), client.getConnection()), null);
+        Logger log = Try.all.get(() -> Util.reflect(SubDataClient.class.getDeclaredField("log"), client.getConnection()));
         if (data.getInt(0x0001) == 0) {
             setReady(client.getConnection());
         } else {

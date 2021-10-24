@@ -1,6 +1,5 @@
 package net.ME1312.SubServers.Client.Common.Network.Packet;
 
-import net.ME1312.Galaxi.Library.Callback.Callback;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubData.Client.Protocol.PacketObjectIn;
@@ -11,12 +10,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 /**
  * Download Group Info Packet
  */
 public class PacketDownloadGroupInfo implements PacketObjectIn<Integer>, PacketObjectOut<Integer> {
-    private static HashMap<UUID, Callback<ObjectMap<String>>[]> callbacks = new HashMap<UUID, Callback<ObjectMap<String>>[]>();
+    private static HashMap<UUID, Consumer<ObjectMap<String>>[]> callbacks = new HashMap<UUID, Consumer<ObjectMap<String>>[]>();
     private List<String> groups;
     private UUID tracker;
 
@@ -32,8 +32,8 @@ public class PacketDownloadGroupInfo implements PacketObjectIn<Integer>, PacketO
      * @param callback Callbacks
      */
     @SafeVarargs
-    public PacketDownloadGroupInfo(List<String> groups, Callback<ObjectMap<String>>... callback) {
-        if (Util.isNull((Object) callback)) throw new NullPointerException();
+    public PacketDownloadGroupInfo(List<String> groups, Consumer<ObjectMap<String>>... callback) {
+        Util.nullpo((Object) callback);
         this.groups = groups;
         this.tracker = Util.getNew(callbacks.keySet(), UUID::randomUUID);
         callbacks.put(tracker, callback);
@@ -50,12 +50,12 @@ public class PacketDownloadGroupInfo implements PacketObjectIn<Integer>, PacketO
     @SuppressWarnings("unchecked")
     @Override
     public void receive(SubDataSender client, ObjectMap<Integer> data) {
-        for (Callback<ObjectMap<String>> callback : callbacks.get(data.getUUID(0x0000))) {
+        for (Consumer<ObjectMap<String>> callback : callbacks.get(data.getUUID(0x0000))) {
             ObjectMap<String> map = new ObjectMap<String>((Map<String, ?>) data.getObject(0x0001));
             ObjectMap<String> ungrouped = (data.contains(0x0002))?new ObjectMap<String>((Map<String, ?>) data.getObject(0x0002)):null;
 
             if (ungrouped != null) map.set("", ungrouped);
-            callback.run(map);
+            callback.accept(map);
         }
         callbacks.remove(data.getUUID(0x0000));
     }

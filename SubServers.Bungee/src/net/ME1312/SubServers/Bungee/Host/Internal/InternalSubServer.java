@@ -5,7 +5,7 @@ import net.ME1312.Galaxi.Library.Container.Container;
 import net.ME1312.Galaxi.Library.Container.Value;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Map.ObjectMapValue;
-import net.ME1312.Galaxi.Library.UniversalFile;
+import net.ME1312.Galaxi.Library.Try;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubData.Server.SubDataClient;
@@ -18,15 +18,16 @@ import net.ME1312.SubServers.Bungee.Network.Packet.PacketOutExEditServer.Edit;
 import net.ME1312.SubServers.Bungee.SubAPI;
 import net.ME1312.SubServers.Bungee.SubProxy;
 
-import net.md_5.bungee.BungeeServerInfo;
 import net.md_5.bungee.api.ChatColor;
 
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
-import java.lang.reflect.Field;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.UUID;
 import java.util.jar.JarFile;
 import java.util.jar.JarInputStream;
 
@@ -93,7 +94,7 @@ public class InternalSubServer extends SubServerImpl {
     }
 
     private void init(InternalHost host, String name, boolean enabled, int port, String motd, boolean log, String directory, String executable, String stopcmd, boolean hidden, boolean restricted) throws InvalidServerException {
-        if (Util.isNull(host, name, enabled, port, motd, log, directory, executable, stopcmd, hidden, restricted)) throw new NullPointerException();
+        Util.nullpo(host, name, enabled, port, motd, log, directory, executable, stopcmd, hidden, restricted);
         this.host = host;
         this.enabled = enabled;
         this.log = new Container<Boolean>(log);
@@ -107,12 +108,12 @@ public class InternalSubServer extends SubServerImpl {
         this.logger = new InternalSubLogger(null, this, getName(), this.log, null);
         this.thread = null;
         this.command = null;
-        final UniversalFile[] locations = new UniversalFile[] {
-                new UniversalFile(this.directory, "plugins:SubServers.Client.jar"),
-                new UniversalFile(this.directory, "mods:SubServers.Client.jar")
+        final File[] locations = new File[] {
+                new File(this.directory, "plugins/SubServers.Client.jar"),
+                new File(this.directory, "mods/SubServers.Client.jar")
         };
 
-        for (UniversalFile location : locations) {
+        for (File location : locations) {
             if (location.exists()) {
                 try {
                     JarInputStream updated = new JarInputStream(SubProxy.class.getResourceAsStream("/net/ME1312/SubServers/Bungee/Library/Files/client.jar"));
@@ -275,7 +276,7 @@ public class InternalSubServer extends SubServerImpl {
 
     @Override
     public boolean command(UUID player, String command) {
-        if (Util.isNull(command)) throw new NullPointerException();
+        Util.nullpo(command);
         if (thread != null && thread.isAlive()) {
             SubSendCommandEvent event = new SubSendCommandEvent(player, this, command);
             host.plugin.getPluginManager().callEvent(event);
@@ -467,7 +468,7 @@ public class InternalSubServer extends SubServerImpl {
                                 break;
                             case "stop-action":
                                 if (value.isString()) {
-                                    StopAction action = Util.getDespiteException(() -> StopAction.valueOf(value.asRawString().toUpperCase().replace('-', '_').replace(' ', '_')), null);
+                                    StopAction action = Try.all.get(() -> StopAction.valueOf(value.asRawString().toUpperCase().replace('-', '_').replace(' ', '_')));
                                     if (action != null) {
                                         stopaction = action;
                                         if (perma && this.host.plugin.servers.get().getMap("Servers").getKeys().contains(getName())) {
@@ -598,7 +599,7 @@ public class InternalSubServer extends SubServerImpl {
 
     @Override
     public void setEnabled(boolean value) {
-        if (Util.isNull(value)) throw new NullPointerException();
+        Util.nullpo(value);
         enabled = value;
     }
 
@@ -609,7 +610,7 @@ public class InternalSubServer extends SubServerImpl {
 
     @Override
     public void setLogging(boolean value) {
-        if (Util.isNull(value)) throw new NullPointerException();
+        Util.nullpo(value);
         log.value(value);
     }
 
@@ -640,7 +641,7 @@ public class InternalSubServer extends SubServerImpl {
 
     @Override
     public void setStopCommand(String value) {
-        if (Util.isNull(value)) throw new NullPointerException();
+        Util.nullpo(value);
         stopcmd = value;
     }
 
@@ -651,7 +652,7 @@ public class InternalSubServer extends SubServerImpl {
 
     @Override
     public void setStopAction(StopAction action) {
-        if (Util.isNull(action)) throw new NullPointerException();
+        Util.nullpo(action);
         stopaction = action;
     }
 }

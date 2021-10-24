@@ -1,6 +1,7 @@
 package net.ME1312.SubServers.Bungee.Network.Packet;
 
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
+import net.ME1312.Galaxi.Library.Try;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubData.Server.Protocol.Initial.InitialPacket;
 import net.ME1312.SubData.Server.Protocol.PacketObjectIn;
@@ -30,7 +31,7 @@ public class PacketLinkExHost implements InitialPacket, PacketObjectIn<Integer>,
      * @param plugin SubPlugin
      */
     public PacketLinkExHost(SubProxy plugin) {
-        if (Util.isNull(plugin)) throw new NullPointerException();
+        Util.nullpo(plugin);
         this.plugin = plugin;
     }
 
@@ -41,7 +42,7 @@ public class PacketLinkExHost implements InitialPacket, PacketObjectIn<Integer>,
      * @param message Message
      */
     public PacketLinkExHost(int response, String message) {
-        if (Util.isNull(response)) throw new NullPointerException();
+        Util.nullpo(response);
         this.response = response;
         this.message = message;
     }
@@ -62,7 +63,7 @@ public class PacketLinkExHost implements InitialPacket, PacketObjectIn<Integer>,
                 Host host = hosts.get(data.getRawString(0x0000).toLowerCase());
                 if (host instanceof ExternalHost) {
                     Integer channel = data.getInt(0x0001);
-                    HashMap<Integer, SubDataClient> subdata = Util.getDespiteException(() -> Util.reflect(ExternalHost.class.getDeclaredField("subdata"), host), null);
+                    HashMap<Integer, SubDataClient> subdata = Try.all.get(() -> Util.reflect(ExternalHost.class.getDeclaredField("subdata"), host));
                     if (!subdata.keySet().contains(channel) || (channel == 0 && subdata.get(0) == null)) {
                         ((ExternalHost) host).setSubData(client, channel);
                         Logger.get("SubData").info(client.getAddress().toString() + " has been defined as Host: " + host.getName() + ((channel > 0)?" [+"+channel+"]":""));

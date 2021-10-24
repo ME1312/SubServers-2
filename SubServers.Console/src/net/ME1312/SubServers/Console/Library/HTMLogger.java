@@ -4,7 +4,6 @@ import net.ME1312.Galaxi.Library.Container.Container;
 
 import org.fusesource.jansi.AnsiOutputStream;
 
-import java.awt.*;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.LinkedList;

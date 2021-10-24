@@ -4,7 +4,7 @@ import net.ME1312.Galaxi.Library.Config.YAMLConfig;
 import net.ME1312.Galaxi.Library.Config.YAMLSection;
 import net.ME1312.Galaxi.Library.Container.Pair;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
-import net.ME1312.Galaxi.Library.UniversalFile;
+import net.ME1312.Galaxi.Library.Try;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubData.Client.DataClient;
@@ -34,7 +34,8 @@ import java.nio.file.StandardCopyOption;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
-import static net.ME1312.SubServers.Client.Bukkit.Library.AccessMode.*;
+import static net.ME1312.SubServers.Client.Bukkit.Library.AccessMode.NO_COMMANDS;
+import static net.ME1312.SubServers.Client.Bukkit.Library.AccessMode.NO_INTEGRATIONS;
 
 /**
  * SubServers Client Plugin Class
@@ -42,7 +43,7 @@ import static net.ME1312.SubServers.Client.Bukkit.Library.AccessMode.*;
 public final class SubPlugin extends JavaPlugin {
     HashMap<Integer, SubDataClient> subdata = new HashMap<Integer, SubDataClient>();
     Pair<Long, Map<String, Map<String, String>>> lang = null;
-    private UniversalFile dir;
+    private File dir;
     public YAMLConfig config;
     public SubProtocol subprotocol;
 
@@ -68,22 +69,22 @@ public final class SubPlugin extends JavaPlugin {
     public void onEnable() {
         try {
             Bukkit.getLogger().info("SubServers > Loading SubServers.Client.Bukkit v" + version.toString() + " Libraries (for Minecraft " + api.getGameVersion() + ")");
-            dir = new UniversalFile(getDataFolder().getParentFile(), "SubServers-Client");
+            dir = new File(getDataFolder().getParentFile(), "SubServers-Client");
             if (getDataFolder().exists()) {
                 Files.move(getDataFolder().toPath(), dir.toPath(), StandardCopyOption.REPLACE_EXISTING);
             } else dir.mkdirs();
-            ConfigUpdater.updateConfig(new UniversalFile(dir, "config.yml"));
-            config = new YAMLConfig(new UniversalFile(dir, "config.yml"));
-            if (new UniversalFile(new File(System.getProperty("user.dir")), "subdata.json").exists()) {
-                FileReader reader = new FileReader(new UniversalFile(new File(System.getProperty("user.dir")), "subdata.json"));
+            ConfigUpdater.updateConfig(new File(dir, "config.yml"));
+            config = new YAMLConfig(new File(dir, "config.yml"));
+            if (new File(new File(System.getProperty("user.dir")), "subdata.json").exists()) {
+                FileReader reader = new FileReader(new File(new File(System.getProperty("user.dir")), "subdata.json"));
                 config.get().getMap("Settings").set("SubData", new YAMLSection(parseJSON(Util.readAll(reader))));
                 config.save();
                 reader.close();
-                new UniversalFile(new File(System.getProperty("user.dir")), "subdata.json").delete();
+                new File(new File(System.getProperty("user.dir")), "subdata.json").delete();
             }
-            if (new UniversalFile(new File(System.getProperty("user.dir")), "subdata.rsa.key").exists()) {
-                if (new UniversalFile(dir, "subdata.rsa.key").exists()) new UniversalFile(dir, "subdata.rsa.key").delete();
-                Files.move(new UniversalFile(new File(System.getProperty("user.dir")), "subdata.rsa.key").toPath(), new UniversalFile(dir, "subdata.rsa.key").toPath());
+            if (new File(new File(System.getProperty("user.dir")), "subdata.rsa.key").exists()) {
+                if (new File(dir, "subdata.rsa.key").exists()) new File(dir, "subdata.rsa.key").delete();
+                Files.move(new File(new File(System.getProperty("user.dir")), "subdata.rsa.key").toPath(), new File(dir, "subdata.rsa.key").toPath());
             }
 
             getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
@@ -105,9 +106,9 @@ public final class SubPlugin extends JavaPlugin {
 
                 Bukkit.getLogger().info("SubData > AES Encryption Available");
             }
-            if (new UniversalFile(dir, "subdata.rsa.key").exists()) {
+            if (new File(dir, "subdata.rsa.key").exists()) {
                 try {
-                    subprotocol.registerCipher("RSA", new RSA(new UniversalFile(dir, "subdata.rsa.key")));
+                    subprotocol.registerCipher("RSA", new RSA(new File(dir, "subdata.rsa.key")));
                     Bukkit.getLogger().info("SubData > RSA Encryption Available");
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -159,7 +160,7 @@ public final class SubPlugin extends JavaPlugin {
     public void reload(boolean notifyPlugins) throws IOException {
         resetDate = Calendar.getInstance().getTime().getTime();
 
-        ConfigUpdater.updateConfig(new UniversalFile(dir, "config.yml"));
+        ConfigUpdater.updateConfig(new File(dir, "config.yml"));
         config.reload();
 
         if (notifyPlugins) {
@@ -237,7 +238,7 @@ public final class SubPlugin extends JavaPlugin {
      */
     @SuppressWarnings("unchecked")
     public Map<String, ?> parseJSON(String json) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException, ClassNotFoundException {
-        Class<?> gson = Class.forName(((Util.getDespiteException(() -> Class.forName("com.google.gson.Gson") != null, false)?"":"org.bukkit.craftbukkit.libs.")) + "com.google.gson.Gson");
+        Class<?> gson = Class.forName(((Try.all.get(() -> Class.forName("com.google.gson.Gson") != null, false)?"":"org.bukkit.craftbukkit.libs.")) + "com.google.gson.Gson");
         //Class<?> gson = com.google.gson.Gson.class;
         return (Map<String, ?>) gson.getMethod("fromJson", String.class, Class.class).invoke(gson.newInstance(), json, Map.class);
     }

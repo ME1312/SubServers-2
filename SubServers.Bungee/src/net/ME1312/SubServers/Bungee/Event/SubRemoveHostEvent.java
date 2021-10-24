@@ -24,7 +24,7 @@ public class SubRemoveHostEvent extends Event implements SubEvent, Cancellable {
      * @param host Host to be added
      */
     public SubRemoveHostEvent(UUID player, Host host) {
-        if (Util.isNull(host)) throw new NullPointerException();
+        Util.nullpo(host);
         this.player = player;
         this.host = host;
     }

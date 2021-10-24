@@ -1,10 +1,11 @@
 package net.ME1312.SubServers.Bungee.Library.Compatibility;
 
-import net.ME1312.Galaxi.Library.UniversalFile;
+
 import net.ME1312.SubServers.Bungee.SubAPI;
 
 import com.google.common.io.Resources;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.net.URL;
@@ -28,8 +29,8 @@ public class JNA {
     public static ClassLoader get() {
         if (JNA == null) {
             boolean announced = false;
-            UniversalFile library = new UniversalFile(SubAPI.getInstance().getInternals().dir, "SubServers:Cache:Libraries");
-            UniversalFile jna = new UniversalFile(library, "jna-" + JNA_VERSION + ".jar");
+            File library = new File(SubAPI.getInstance().getInternals().dir, "SubServers/Cache/Libraries");
+            File jna = new File(library, "jna-" + JNA_VERSION + ".jar");
             jna.getParentFile().mkdirs();
             if (!jna.exists()) {
                 announced = true;
@@ -41,7 +42,7 @@ public class JNA {
                     e.printStackTrace();
                 }
             }
-            UniversalFile platform = new UniversalFile(library, "jna-platform-" + JNA_VERSION + ".jar");
+            File platform = new File(library, "jna-platform-" + JNA_VERSION + ".jar");
             platform.getParentFile().mkdirs();
             if (!platform.exists()) {
                 if (!announced) System.out.println(">> Downloading JNA Library v" + JNA_VERSION);

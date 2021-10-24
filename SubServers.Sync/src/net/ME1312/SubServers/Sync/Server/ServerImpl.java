@@ -4,7 +4,6 @@ import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubData.Client.DataSender;
 import net.ME1312.SubData.Client.Library.ForwardedDataSender;
 import net.ME1312.SubData.Client.SubDataClient;
-import net.ME1312.SubData.Client.SubDataSender;
 import net.ME1312.SubServers.Sync.SubAPI;
 
 import net.md_5.bungee.BungeeServerInfo;
@@ -52,7 +51,7 @@ public class ServerImpl extends BungeeServerInfo {
     }
 
     private void init(String name, String display, SocketAddress address, Map<Integer, UUID> subdata, String motd, boolean hidden, boolean restricted, Collection<UUID> whitelist) {
-        if (Util.isNull(name, address, motd, hidden, restricted)) throw new NullPointerException();
+        Util.nullpo(name, address, motd, hidden, restricted);
         this.whitelist.addAll(whitelist);
         this.hidden = hidden;
         setDisplayName(display);
@@ -137,7 +136,7 @@ public class ServerImpl extends BungeeServerInfo {
      * @param value Value
      */
     public void setHidden(boolean value) {
-        if (Util.isNull(value)) throw new NullPointerException();
+        Util.nullpo(value);
         this.hidden = value;
     }
 
@@ -147,7 +146,7 @@ public class ServerImpl extends BungeeServerInfo {
      * @param value Value
      */
     public void setMotd(String value) {
-        if (Util.isNull(value)) throw new NullPointerException();
+        Util.nullpo(value);
         try {
             Util.reflect(BungeeServerInfo.class.getDeclaredField("motd"), this, value);
         } catch (Exception e) {
@@ -161,7 +160,7 @@ public class ServerImpl extends BungeeServerInfo {
      * @param value Value
      */
     public void setRestricted(boolean value) {
-        if (Util.isNull(value)) throw new NullPointerException();
+        Util.nullpo(value);
         try {
             Util.reflect(BungeeServerInfo.class.getDeclaredField("restricted"), this, value);
         } catch (Exception e) {
@@ -185,7 +184,7 @@ public class ServerImpl extends BungeeServerInfo {
      * @param player Player to add
      */
     public void whitelist(UUID player) {
-        if (Util.isNull(player)) throw new NullPointerException();
+        Util.nullpo(player);
         whitelist.add(player);
     }
 

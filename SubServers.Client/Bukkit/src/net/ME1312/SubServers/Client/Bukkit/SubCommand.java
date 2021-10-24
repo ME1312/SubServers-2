@@ -1,7 +1,6 @@
 package net.ME1312.SubServers.Client.Bukkit;
 
 import net.ME1312.Galaxi.Library.AsyncConsolidator;
-import net.ME1312.Galaxi.Library.Callback.Callback;
 import net.ME1312.Galaxi.Library.Config.YAMLSection;
 import net.ME1312.Galaxi.Library.Container.ContainedPair;
 import net.ME1312.Galaxi.Library.Container.Container;
@@ -9,6 +8,7 @@ import net.ME1312.Galaxi.Library.Container.Pair;
 import net.ME1312.Galaxi.Library.Container.Value;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Platform;
+import net.ME1312.Galaxi.Library.Try;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubData.Client.SubDataClient;
@@ -21,9 +21,9 @@ import net.ME1312.SubServers.Client.Common.Network.Packet.PacketUpdateServer;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
-import org.bukkit.command.Command;
 import org.bukkit.entity.Player;
 
 import java.io.BufferedReader;
@@ -32,6 +32,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.*;
+import java.util.function.Consumer;
 
 import static net.ME1312.SubServers.Client.Bukkit.Library.ObjectPermission.permits;
 
@@ -93,7 +94,7 @@ public final class SubCommand extends Command {
                             } catch (Exception e) {}
                         });
                     } else if (args[0].equalsIgnoreCase("list")) {
-                        if (Util.getDespiteException(() -> Class.forName("net.md_5.bungee.api.chat.BaseComponent") != null, false) && sender instanceof Player) {
+                        if (Try.all.get(() -> Class.forName("net.md_5.bungee.api.chat.BaseComponent") != null, false) && sender instanceof Player) {
                             new net.ME1312.SubServers.Client.Bukkit.Library.Compatibility.BungeeChat(plugin).listCommand(sender, label);
                         } else {
                             final String fLabel = label;
@@ -394,7 +395,7 @@ public final class SubCommand extends Command {
                                 if (select.subservers.length > 0) {
                                     // Step 5: Start the stopped Servers once more
                                     final UUID player = (sender instanceof Player)?((Player) sender).getUniqueId():null;
-                                    Callback<SubServer> starter = server -> server.start(player, response -> {
+                                    Consumer<SubServer> starter = server -> server.start(player, response -> {
                                         switch (response) {
                                             case 3:
                                             case 4:
@@ -424,16 +425,16 @@ public final class SubCommand extends Command {
 
                                     // Step 4: Listen for stopped Servers
                                     final HashMap<String, SubServer> listening = new HashMap<String, SubServer>();
-                                    PacketInExRunEvent.callback("SubStoppedEvent", new Callback<ObjectMap<String>>() {
+                                    PacketInExRunEvent.callback("SubStoppedEvent", new Consumer<ObjectMap<String>>() {
                                         @Override
-                                        public void run(ObjectMap<String> json) {
+                                        public void accept(ObjectMap<String> json) {
                                             try {
                                                 if (listening.size() > 0) {
                                                     PacketInExRunEvent.callback("SubStoppedEvent", this);
                                                     String name = json.getString("server").toLowerCase();
                                                     if (listening.keySet().contains(name)) {
                                                         Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                                                            starter.run(listening.get(name));
+                                                            starter.accept(listening.get(name));
                                                             listening.remove(name);
                                                         }, 5);
                                                     }
@@ -447,7 +448,7 @@ public final class SubCommand extends Command {
                                     AsyncConsolidator merge = new AsyncConsolidator(() -> {
                                         if (success.value > 0) sender.sendMessage(plugin.api.getLang("SubServers", "Command.Restart").replace("$int$", success.value.toString()));
                                     });
-                                    Callback<Pair<Integer, SubServer>> stopper = data -> {
+                                    Consumer<Pair<Integer, SubServer>> stopper = data -> {
                                         if (data.key() != 0) listening.remove(data.value().getName().toLowerCase());
                                         switch (data.key()) {
                                             case 3:
@@ -455,7 +456,7 @@ public final class SubCommand extends Command {
                                                 sender.sendMessage(plugin.api.getLang("SubServers", "Command.Restart.Disappeared").replace("$str$", data.value().getName()));
                                                 break;
                                             case 5:
-                                                starter.run(data.value());
+                                                starter.accept(data.value());
                                             case 0:
                                                 success.value++;
                                                 break;
@@ -477,14 +478,14 @@ public final class SubCommand extends Command {
                                         merge.reserve();
                                         if (self == null) {
                                             listening.put(server.getName().toLowerCase(), server);
-                                            server.stop(player, response -> stopper.run(new ContainedPair<>(response, server)));
+                                            server.stop(player, response -> stopper.accept(new ContainedPair<>(response, server)));
                                         } else if (self != server) {
-                                            ((SubDataClient) plugin.api.getSubDataNetwork()[0]).sendPacket(new PacketRestartServer(player, server.getName(), data -> stopper.run(new ContainedPair<>(data.getInt(0x0001), server))));
+                                            ((SubDataClient) plugin.api.getSubDataNetwork()[0]).sendPacket(new PacketRestartServer(player, server.getName(), data -> stopper.accept(new ContainedPair<>(data.getInt(0x0001), server))));
                                         }
                                     }
                                     if (self != null) {
                                         final SubServer fself = self;
-                                        ((SubDataClient) plugin.api.getSubDataNetwork()[0]).sendPacket(new PacketRestartServer(player, self.getName(), data -> stopper.run(new ContainedPair<>(data.getInt(0x0001), fself))));
+                                        ((SubDataClient) plugin.api.getSubDataNetwork()[0]).sendPacket(new PacketRestartServer(player, self.getName(), data -> stopper.accept(new ContainedPair<>(data.getInt(0x0001), fself))));
                                     }
                                 }
                             });
@@ -501,7 +502,7 @@ public final class SubCommand extends Command {
                                         if (running.value > 0) sender.sendMessage(plugin.api.getLang("SubServers", "Command.Stop.Not-Running").replace("$int$", running.value.toString()));
                                         if (success.value > 0) sender.sendMessage(plugin.api.getLang("SubServers", "Command.Stop").replace("$int$", success.value.toString()));
                                     });
-                                    Callback<Pair<Integer, SubServer>> stopper = data -> {
+                                    Consumer<Pair<Integer, SubServer>> stopper = data -> {
                                         switch (data.key()) {
                                             case 3:
                                             case 4:
@@ -527,11 +528,11 @@ public final class SubCommand extends Command {
 
                                     for (SubServer server : select.subservers) {
                                         merge.reserve();
-                                        if (self != server) server.stop((sender instanceof Player)?((Player) sender).getUniqueId():null, response -> stopper.run(new ContainedPair<>(response, server)));
+                                        if (self != server) server.stop((sender instanceof Player)?((Player) sender).getUniqueId():null, response -> stopper.accept(new ContainedPair<>(response, server)));
                                     }
                                     if (self != null) {
                                         final SubServer fself = self;
-                                        fself.stop((sender instanceof Player) ? ((Player) sender).getUniqueId() : null, response -> stopper.run(new ContainedPair<>(response, fself)));
+                                        fself.stop((sender instanceof Player) ? ((Player) sender).getUniqueId() : null, response -> stopper.accept(new ContainedPair<>(response, fself)));
                                     }
                                 }
                             });
@@ -548,7 +549,7 @@ public final class SubCommand extends Command {
                                         if (running.value > 0) sender.sendMessage(plugin.api.getLang("SubServers", "Command.Terminate.Not-Running").replace("$int$", running.value.toString()));
                                         if (success.value > 0) sender.sendMessage(plugin.api.getLang("SubServers", "Command.Terminate").replace("$int$", success.value.toString()));
                                     });
-                                    Callback<Pair<Integer, SubServer>> stopper = data -> {
+                                    Consumer<Pair<Integer, SubServer>> stopper = data -> {
                                         switch (data.key()) {
                                             case 3:
                                             case 4:
@@ -574,11 +575,11 @@ public final class SubCommand extends Command {
 
                                     for (SubServer server : select.subservers) {
                                         merge.reserve();
-                                        if (self != server) server.terminate((sender instanceof Player)?((Player) sender).getUniqueId():null, response -> stopper.run(new ContainedPair<>(response, server)));
+                                        if (self != server) server.terminate((sender instanceof Player)?((Player) sender).getUniqueId():null, response -> stopper.accept(new ContainedPair<>(response, server)));
                                     }
                                     if (self != null) {
                                         final SubServer fself = self;
-                                        fself.terminate((sender instanceof Player) ? ((Player) sender).getUniqueId() : null, response -> stopper.run(new ContainedPair<>(response, fself)));
+                                        fself.terminate((sender instanceof Player) ? ((Player) sender).getUniqueId() : null, response -> stopper.accept(new ContainedPair<>(response, fself)));
                                     }
                                 }
                             });
@@ -631,7 +632,7 @@ public final class SubCommand extends Command {
                     } else if (args[0].equalsIgnoreCase("create")) {
                         if (args.length > 3) {
                             if (permits(args[2], sender, "subservers.host.%.*", "subservers.host.%.create")) {
-                                if (args.length > 5 && Util.isException(() -> Integer.parseInt(args[5]))) {
+                                if (args.length > 5 && !Try.all.run(() -> Integer.parseInt(args[5]))) {
                                     sender.sendMessage(plugin.api.getLang("SubServers", "Command.Creator.Invalid-Port"));
                                 } else {
                                     ((SubDataClient) plugin.api.getSubDataNetwork()[0]).sendPacket(new PacketCreateServer((sender instanceof Player)?((Player) sender).getUniqueId():null, args[1], args[2], args[3], (args.length > 4)?new Version(args[4]):null, (args.length > 5)?Integer.parseInt(args[5]):null, data -> {
@@ -879,14 +880,14 @@ public final class SubCommand extends Command {
             sender.sendMessage(plugin.api.getLang("SubServers", "Command.Generic.Usage").replace("$str$", label.toLowerCase() + " " + args[0].toLowerCase() + " " + ((sender instanceof Player)?"[Player]":"<Player>") + " <Server>"));
         }
     }
-    private void selectServers(CommandSender sender, String[] rargs, int index, boolean mode, String permissions, Callback<ServerSelection> callback) {
+    private void selectServers(CommandSender sender, String[] rargs, int index, boolean mode, String permissions, Consumer<ServerSelection> callback) {
         selectServers(sender, rargs, index, mode, new String[]{ permissions }, callback);
     }
-    private void selectServers(CommandSender sender, String[] rargs, int index, boolean mode, String[] permissions, Callback<ServerSelection> callback) {
+    private void selectServers(CommandSender sender, String[] rargs, int index, boolean mode, String[] permissions, Consumer<ServerSelection> callback) {
         selectServers(sender, rargs, index, mode, new String[][]{ permissions }, callback);
     }
     @SuppressWarnings("unchecked")
-    private void selectServers(CommandSender sender, String[] rargs, int index, boolean mode, String[][] permissions, Callback<ServerSelection> callback) {
+    private void selectServers(CommandSender sender, String[] rargs, int index, boolean mode, String[][] permissions, Consumer<ServerSelection> callback) {
         StackTraceElement[] origin = new Exception().getStackTrace();
         LinkedList<String> msgs = new LinkedList<String>();
         LinkedList<String> args = new LinkedList<String>();
@@ -949,7 +950,7 @@ public final class SubCommand extends Command {
             }
 
             try {
-                callback.run(new ServerSelection(msgs, selection, servers, subservers, args, last.value()));
+                callback.accept(new ServerSelection(msgs, selection, servers, subservers, args, last.value()));
             } catch (Throwable e) {
                 Throwable ew = new InvocationTargetException(e);
                 ew.setStackTrace(origin);

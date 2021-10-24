@@ -1,6 +1,7 @@
 package net.ME1312.SubServers.Bungee.Host;
 
 import net.ME1312.Galaxi.Library.Platform;
+import net.ME1312.Galaxi.Library.Try;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubServers.Bungee.Library.Compatibility.JNA;
 
@@ -40,7 +41,7 @@ public class Executable {
     }
 
     static {
-        USE_SESSION_TRACKING = Platform.getSystem() != Platform.WINDOWS && Util.getDespiteException(() -> {
+        USE_SESSION_TRACKING = Platform.getSystem() != Platform.WINDOWS && Try.all.get(() -> {
             Process test = Runtime.getRuntime().exec(new String[]{"setsid", "bash", "-c", "exit 0"});
             test.waitFor(); // The purpose of this block is to test for the 'setsid' command
             return test.exitValue() == 0;
@@ -95,9 +96,9 @@ public class Executable {
         if (process.isAlive()) {
             Long pid;
             if (Platform.getSystem() == Platform.WINDOWS) {
-                if ((pid = pid(process)) != null) Util.isException(() -> Runtime.getRuntime().exec(new String[]{"taskkill.exe", "/T", "/F", "/PID", pid.toString()}).waitFor());
+                if ((pid = pid(process)) != null) Try.all.run(() -> Runtime.getRuntime().exec(new String[]{"taskkill.exe", "/T", "/F", "/PID", pid.toString()}).waitFor());
             } else if (USE_SESSION_TRACKING) {
-                if ((pid = pid(process)) != null) Util.isException(() -> Runtime.getRuntime().exec(new String[]{"bash", "-c", "kill -9 $(ps -s " + pid + " -o pid=)"}).waitFor());
+                if ((pid = pid(process)) != null) Try.all.run(() -> Runtime.getRuntime().exec(new String[]{"bash", "-c", "kill -9 $(ps -s " + pid + " -o pid=)"}).waitFor());
             }
 
             if (process.isAlive() && terminate9(process)) {

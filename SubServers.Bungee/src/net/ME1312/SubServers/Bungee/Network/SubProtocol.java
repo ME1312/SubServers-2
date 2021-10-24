@@ -1,6 +1,5 @@
 package net.ME1312.SubServers.Bungee.Network;
 
-import net.ME1312.Galaxi.Library.Callback.Callback;
 import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubData.Server.SubDataProtocol;
 import net.ME1312.SubData.Server.SubDataServer;
@@ -13,6 +12,7 @@ import net.ME1312.SubServers.Bungee.SubProxy;
 
 import java.io.IOException;
 import java.net.InetAddress;
+import java.util.function.Consumer;
 import java.util.logging.Logger;
 
 /**
@@ -154,7 +154,7 @@ public class SubProtocol extends SubDataProtocol {
 
     @SuppressWarnings("deprecation")
     @Override
-    public SubDataServer open(Callback<Runnable> scheduler, Logger logger, InetAddress address, int port, String cipher) throws IOException {
+    public SubDataServer open(Consumer<Runnable> scheduler, Logger logger, InetAddress address, int port, String cipher) throws IOException {
         SubDataServer subdata = super.open(scheduler, logger, address, port, cipher);
         SubProxy plugin = SubAPI.getInstance().getInternals();
 

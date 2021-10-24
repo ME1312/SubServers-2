@@ -1,20 +1,18 @@
 package net.ME1312.SubServers.Host;
 
+import net.ME1312.Galaxi.Command.Command;
 import net.ME1312.Galaxi.Command.CommandProcessor.Status;
+import net.ME1312.Galaxi.Command.CommandSender;
+import net.ME1312.Galaxi.Command.CompletionHandler;
 import net.ME1312.Galaxi.Engine.CommandParser;
 import net.ME1312.Galaxi.Engine.GalaxiEngine;
 import net.ME1312.Galaxi.Library.AsyncConsolidator;
-import net.ME1312.Galaxi.Library.Callback.Callback;
-import net.ME1312.Galaxi.Library.Callback.ReturnRunnable;
 import net.ME1312.Galaxi.Library.Container.Container;
 import net.ME1312.Galaxi.Library.Container.Pair;
 import net.ME1312.Galaxi.Library.Container.Value;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
-import net.ME1312.Galaxi.Library.Util;
+import net.ME1312.Galaxi.Library.Try;
 import net.ME1312.Galaxi.Library.Version.Version;
-import net.ME1312.Galaxi.Command.Command;
-import net.ME1312.Galaxi.Command.CommandSender;
-import net.ME1312.Galaxi.Command.CompletionHandler;
 import net.ME1312.SubData.Client.SubDataClient;
 import net.ME1312.SubServers.Client.Common.Network.API.*;
 import net.ME1312.SubServers.Client.Common.Network.Packet.PacketCreateServer;
@@ -25,6 +23,8 @@ import net.ME1312.SubServers.Host.Network.Packet.PacketInExRunEvent;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 /**
  * Command Class
@@ -335,7 +335,7 @@ public class SubCommand {
             String Last = (args.length > 0)?args[args.length - 1]:"";
             String last = Last.toLowerCase();
 
-            ReturnRunnable<Collection<String>> getPlayers = () -> {
+            Supplier<Collection<String>> getPlayers = () -> {
                 LinkedList<String> names = new LinkedList<String>();
                 if (proxyMasterCache != null)
                     for (Pair<String, UUID> player : proxyMasterCache.getPlayers())
@@ -381,7 +381,7 @@ public class SubCommand {
                     if (!list.contains(server.getName()) && server.getName().toLowerCase().startsWith(last))
                         list.add(Last + server.getName().substring(last.length()));
                 }
-                for (String player : getPlayers.run()) {
+                for (String player : getPlayers.get()) {
                     if (!list.contains(player) && player.toLowerCase().startsWith(last))
                         list.add(Last + player.substring(last.length()));
                 }
@@ -422,8 +422,10 @@ public class SubCommand {
                                 list.add(Last + server.getName().substring(last.length()));
                         }
                         break;
+                    case "u":
+                    case "user":
                     case "player":
-                        for (String player : getPlayers.run()) {
+                        for (String player : getPlayers.get()) {
                             if (player.toLowerCase().startsWith(last))
                                 list.add(Last + player.substring(last.length()));
                         }
@@ -512,7 +514,7 @@ public class SubCommand {
                         selectServers(sender, args, 0, true, select -> {
                             if (select.subservers.length > 0) {
                                 // Step 5: Start the stopped Servers once more
-                                Callback<SubServer> starter = server -> server.start(response -> {
+                                Consumer<SubServer> starter = server -> server.start(response -> {
                                     switch (response) {
                                         case 3:
                                         case 4:
@@ -542,9 +544,9 @@ public class SubCommand {
 
                                 // Step 4: Listen for stopped Servers
                                 final HashMap<String, SubServer> listening = new HashMap<String, SubServer>();
-                                PacketInExRunEvent.callback("SubStoppedEvent", new Callback<ObjectMap<String>>() {
+                                PacketInExRunEvent.callback("SubStoppedEvent", new Consumer<ObjectMap<String>>() {
                                     @Override
-                                    public void run(ObjectMap<String> json) {
+                                    public void accept(ObjectMap<String> json) {
                                         try {
                                             if (listening.size() > 0) {
                                                 PacketInExRunEvent.callback("SubStoppedEvent", this);
@@ -554,7 +556,7 @@ public class SubCommand {
                                                     timer.schedule(new TimerTask() {
                                                         @Override
                                                         public void run() {
-                                                            starter.run(listening.get(name));
+                                                            starter.accept(listening.get(name));
                                                             listening.remove(name);
                                                             timer.cancel();
                                                         }
@@ -582,7 +584,7 @@ public class SubCommand {
                                                 sender.sendMessage("Could not restart server: Subserver " + server.getName() + " has disappeared");
                                                 break;
                                             case 5:
-                                                starter.run(server);
+                                                starter.accept(server);
                                             case 0:
                                                 success.value++;
                                                 break;
@@ -755,7 +757,7 @@ public class SubCommand {
             public void command(CommandSender sender, String handle, String[] args) {
                 if (canRun()) {
                     if (args.length > 2) {
-                        if (args.length > 4 && Util.isException(() -> Integer.parseInt(args[4]))) {
+                        if (args.length > 4 && !Try.all.run(() -> Integer.parseInt(args[4]))) {
                             sender.sendMessage("Invalid port number");
                         } else {
                             ((SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketCreateServer(null, args[0], args[1], args[2], (args.length > 3)?new Version(args[3]):null, (args.length > 4)?Integer.parseInt(args[4]):null, data -> {
@@ -979,7 +981,7 @@ public class SubCommand {
         ).register("del", "delete", "remove");
     }
 
-    private void selectServers(CommandSender sender, String[] rargs, int index, boolean mode, Callback<ServerSelection> callback) {
+    private void selectServers(CommandSender sender, String[] rargs, int index, boolean mode, Consumer<ServerSelection> callback) {
         StackTraceElement[] origin = new Exception().getStackTrace();
         LinkedList<String> msgs = new LinkedList<String>();
         LinkedList<String> args = new LinkedList<String>();
@@ -1025,7 +1027,7 @@ public class SubCommand {
             }
 
             try {
-                callback.run(new ServerSelection(msgs, selection, servers, subservers, args, last.value()));
+                callback.accept(new ServerSelection(msgs, selection, servers, subservers, args, last.value()));
             } catch (Throwable e) {
                 Throwable ew = new InvocationTargetException(e);
                 ew.setStackTrace(origin);

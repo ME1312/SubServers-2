@@ -1,10 +1,10 @@
 package net.ME1312.SubServers.Client.Sponge;
 
+import net.ME1312.Galaxi.Library.Try;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubData.Client.DataClient;
 import net.ME1312.SubData.Client.DataProtocol;
-import net.ME1312.SubData.Client.SubDataClient;
 import net.ME1312.SubServers.Client.Common.ClientAPI;
 import net.ME1312.SubServers.Client.Sponge.Graphic.UIHandler;
 import net.ME1312.SubServers.Client.Sponge.Library.AccessMode;
@@ -108,7 +108,7 @@ public final class SubAPI extends ClientAPI {
      * @return Lang Value
      */
     public Map<String, String> getLang(String channel) {
-        if (Util.isNull(channel)) throw new NullPointerException();
+        Util.nullpo(channel);
         return new LinkedHashMap<>(plugin.lang.value().get(channel.toLowerCase()));
     }
 
@@ -175,9 +175,8 @@ public final class SubAPI extends ClientAPI {
      * @return Server Version
      */
     public Version getServerVersion() {
-        PluginContainer container = null;
-        if (container == null) container = Util.getDespiteException(() -> (PluginContainer) Platform.class.getMethod("getValue", Class.forName("org.spongepowered.api.Platform$Component")).invoke(Sponge.getPlatform(), Enum.valueOf((Class<Enum>) Class.forName("org.spongepowered.api.Platform$Component"), "IMPLEMENTATION")), null);
-        if (container == null) container = Util.getDespiteException(() -> (PluginContainer) Platform.class.getMethod("getImplementation").invoke(Sponge.getPlatform()), null);
+        PluginContainer container =        Try.all.get(() -> (PluginContainer) Platform.class.getMethod("getValue", Class.forName("org.spongepowered.api.Platform$Component")).invoke(Sponge.getPlatform(), Enum.valueOf((Class<Enum>) Class.forName("org.spongepowered.api.Platform$Component"), "IMPLEMENTATION")));
+        if (container == null) container = Try.all.get(() -> (PluginContainer) Platform.class.getMethod("getImplementation").invoke(Sponge.getPlatform()));
         return (container == null || !container.getVersion().isPresent())?null:new Version(container.getVersion().get());
     }
 

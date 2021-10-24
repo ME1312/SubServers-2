@@ -2,6 +2,7 @@ package net.ME1312.SubServers.Client.Sponge.Network.Packet;
 
 import net.ME1312.Galaxi.Library.Container.ContainedPair;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
+import net.ME1312.Galaxi.Library.Try;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubData.Client.Protocol.PacketObjectIn;
 import net.ME1312.SubData.Client.Protocol.PacketOut;
@@ -24,7 +25,7 @@ public class PacketDownloadLang implements PacketObjectIn<Integer>, PacketOut {
      * @param plugin SubServers.Client
      */
     public PacketDownloadLang(SubPlugin plugin) {
-        if (Util.isNull(plugin)) throw new NullPointerException();
+        Util.nullpo(plugin);
         this.plugin = plugin;
     }
 
@@ -35,7 +36,7 @@ public class PacketDownloadLang implements PacketObjectIn<Integer>, PacketOut {
 
     @Override
     public void receive(SubDataSender client, ObjectMap<Integer> data) {
-        Logger log = Util.getDespiteException(() -> Util.reflect(SubDataClient.class.getDeclaredField("log"), client.getConnection()), null);
+        Logger log = Try.all.get(() -> Util.reflect(SubDataClient.class.getDeclaredField("log"), client.getConnection()));
         try {
             Util.reflect(SubPlugin.class.getDeclaredField("lang"), plugin, new ContainedPair<>(Calendar.getInstance().getTime().getTime(), data.getObject(0x0001)));
             log.info("Lang Settings Downloaded");

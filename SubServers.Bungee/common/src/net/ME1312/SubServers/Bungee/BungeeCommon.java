@@ -1,21 +1,20 @@
 package net.ME1312.SubServers.Bungee;
 
-import net.ME1312.Galaxi.Library.Callback.ReturnRunnable;
-
 import net.md_5.bungee.BungeeCord;
 import net.md_5.bungee.api.config.ServerInfo;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.function.Supplier;
 
 /**
  * BungeeCord Common Layout Class
  */
 public abstract class BungeeCommon extends BungeeCord {
     private static BungeeCommon instance;
-    final ReturnRunnable<BungeeAPI> api;
+    final Supplier<BungeeAPI> api;
 
-    protected BungeeCommon(ReturnRunnable<BungeeAPI> api) throws IOException {
+    protected BungeeCommon(Supplier<BungeeAPI> api) throws IOException {
         this.api = api;
         instance = this;
     }

@@ -1,18 +1,15 @@
 package net.ME1312.SubServers.Bungee.Network.Packet;
 
 import net.ME1312.Galaxi.Library.AsyncConsolidator;
-import net.ME1312.Galaxi.Library.Callback.Callback;
 import net.ME1312.Galaxi.Library.Container.ContainedPair;
 import net.ME1312.Galaxi.Library.Container.Container;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
-import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubData.Server.Protocol.PacketObjectIn;
 import net.ME1312.SubData.Server.Protocol.PacketObjectOut;
 import net.ME1312.SubData.Server.SubDataClient;
 import net.ME1312.SubServers.Bungee.Host.Proxy;
 import net.ME1312.SubServers.Bungee.Host.RemotePlayer;
 import net.ME1312.SubServers.Bungee.SubAPI;
-import net.ME1312.SubServers.Bungee.SubProxy;
 
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.BaseComponent;
@@ -20,6 +17,7 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.chat.ComponentSerializer;
 
 import java.util.*;
+import java.util.function.IntConsumer;
 
 /**
  * Message Player Packet
@@ -63,7 +61,7 @@ public class PacketMessagePlayer implements PacketObjectIn<Integer>, PacketObjec
     }
 
     @SuppressWarnings("deprecation")
-    public static void run(List<UUID> ids, ContainedPair<String[], BaseComponent[][]> message, ObjectMap<Integer> data, Callback<Integer> callback) {
+    public static void run(List<UUID> ids, ContainedPair<String[], BaseComponent[][]> message, ObjectMap<Integer> data, IntConsumer callback) {
         try {
             Container<Integer> failures = new Container<>(0);
             HashMap<Proxy, List<UUID>> requests = new HashMap<Proxy, List<UUID>>();
@@ -101,10 +99,10 @@ public class PacketMessagePlayer implements PacketObjectIn<Integer>, PacketObjec
             }
 
             if (requests.size() == 0) {
-                callback.run(failures.value);
+                callback.accept(failures.value);
             } else {
                 AsyncConsolidator merge = new AsyncConsolidator(() -> {
-                    callback.run(failures.value);
+                    callback.accept(failures.value);
                 });
                 List<String> legacy, raw;
                 if (data == null) {
@@ -129,7 +127,7 @@ public class PacketMessagePlayer implements PacketObjectIn<Integer>, PacketObjec
             }
         } catch (Throwable e) {
             e.printStackTrace();
-            callback.run((ids == null || ids.size() == 0)? 1 : ids.size());
+            callback.accept((ids == null || ids.size() == 0)? 1 : ids.size());
         }
     }
 

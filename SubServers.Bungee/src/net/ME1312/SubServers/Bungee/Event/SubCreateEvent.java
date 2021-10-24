@@ -36,7 +36,7 @@ public class SubCreateEvent extends Event implements SubEvent, Cancellable {
      * @param port Server Port Number
      */
     public SubCreateEvent(UUID player, Host host, String name, SubCreator.ServerTemplate template, Version version, int port) {
-        if (Util.isNull(host, name, template, port)) throw new NullPointerException();
+        Util.nullpo(host, name, template, port);
         this.player = player;
         this.host = host;
         this.name = name;
@@ -54,7 +54,7 @@ public class SubCreateEvent extends Event implements SubEvent, Cancellable {
      * @param version Server Version
      */
     public SubCreateEvent(UUID player, SubServer server, SubCreator.ServerTemplate template, Version version) {
-        if (Util.isNull(server)) throw new NullPointerException();
+        Util.nullpo(server);
         this.player = player;
         this.update = server;
         this.name = server.getName();

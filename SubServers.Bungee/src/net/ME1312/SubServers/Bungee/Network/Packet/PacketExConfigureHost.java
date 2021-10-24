@@ -1,6 +1,7 @@
 package net.ME1312.SubServers.Bungee.Network.Packet;
 
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
+import net.ME1312.Galaxi.Library.Try;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubData.Server.Protocol.PacketObjectIn;
 import net.ME1312.SubData.Server.Protocol.PacketObjectOut;
@@ -43,7 +44,7 @@ public class PacketExConfigureHost implements PacketObjectIn<Integer>, PacketObj
     public void receive(SubDataClient client, ObjectMap<Integer> data) {
         if (client.getHandler() != null && client.getHandler() instanceof ExternalHost && plugin.config.get().getMap("Hosts").getKeys().contains(((ExternalHost) client.getHandler()).getName())) {
             client.sendPacket(new PacketExConfigureHost(plugin, (ExternalHost) client.getHandler()));
-            Util.isException(() -> Util.reflect(ExternalSubCreator.class.getDeclaredField("enableRT"), ((ExternalHost) client.getHandler()).getCreator(), ((data == null || data.getBoolean(0x0000, false))?null:false)));
+            Try.all.run(() -> Util.reflect(ExternalSubCreator.class.getDeclaredField("enableRT"), ((ExternalHost) client.getHandler()).getCreator(), ((data == null || data.getBoolean(0x0000, false))?null:false)));
         }
     }
 

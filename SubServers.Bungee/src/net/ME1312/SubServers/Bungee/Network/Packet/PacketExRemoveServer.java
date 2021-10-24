@@ -1,6 +1,5 @@
 package net.ME1312.SubServers.Bungee.Network.Packet;
 
-import net.ME1312.Galaxi.Library.Callback.Callback;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubData.Server.Protocol.PacketObjectIn;
@@ -9,12 +8,13 @@ import net.ME1312.SubData.Server.SubDataClient;
 
 import java.util.HashMap;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 /**
  * Create Server External Host Packet
  */
 public class PacketExRemoveServer implements PacketObjectIn<Integer>, PacketObjectOut<Integer> {
-    private static HashMap<UUID, Callback<ObjectMap<Integer>>[]> callbacks = new HashMap<UUID, Callback<ObjectMap<Integer>>[]>();
+    private static HashMap<UUID, Consumer<ObjectMap<Integer>>[]> callbacks = new HashMap<UUID, Consumer<ObjectMap<Integer>>[]>();
     private String name;
     private UUID tracker;
 
@@ -30,8 +30,8 @@ public class PacketExRemoveServer implements PacketObjectIn<Integer>, PacketObje
      * @param callback Callbacks
      */
     @SafeVarargs
-    public PacketExRemoveServer(String name, Callback<ObjectMap<Integer>>... callback) {
-        if (Util.isNull(name, callback)) throw new NullPointerException();
+    public PacketExRemoveServer(String name, Consumer<ObjectMap<Integer>>... callback) {
+        Util.nullpo(name, callback);
         this.name = name;
         this.tracker = Util.getNew(callbacks.keySet(), UUID::randomUUID);
         callbacks.put(tracker, callback);
@@ -47,7 +47,7 @@ public class PacketExRemoveServer implements PacketObjectIn<Integer>, PacketObje
 
     @Override
     public void receive(SubDataClient client, ObjectMap<Integer> data) {
-        for (Callback<ObjectMap<Integer>> callback : callbacks.get(data.getUUID(0x0000))) callback.run(data);
+        for (Consumer<ObjectMap<Integer>> callback : callbacks.get(data.getUUID(0x0000))) callback.accept(data);
         callbacks.remove(data.getUUID(0x0000));
     }
 

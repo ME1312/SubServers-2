@@ -3,14 +3,12 @@ package net.ME1312.SubServers.Client.Sponge;
 import net.ME1312.Galaxi.Library.Config.YAMLConfig;
 import net.ME1312.Galaxi.Library.Container.Pair;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
-import net.ME1312.Galaxi.Library.UniversalFile;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubData.Client.DataClient;
 import net.ME1312.SubData.Client.Encryption.AES;
 import net.ME1312.SubData.Client.Encryption.DHE;
 import net.ME1312.SubData.Client.Encryption.RSA;
-import net.ME1312.SubData.Client.Library.DataSize;
 import net.ME1312.SubData.Client.Library.DisconnectReason;
 import net.ME1312.SubData.Client.SubDataClient;
 import net.ME1312.SubServers.Client.Sponge.Graphic.UIHandler;
@@ -58,7 +56,7 @@ public final class SubPlugin {
 
     @ConfigDir(sharedRoot = false)
     @Inject public File xdir;
-    public UniversalFile dir;
+    public File dir;
     public Logger log = LoggerFactory.getLogger("SubServers");
     public UIHandler gui = null;
     public Version version;
@@ -88,22 +86,22 @@ public final class SubPlugin {
         api = new SubAPI(this);
         try {
             log.info("Loading SubServers.Client.Sponge v" + version.toString() + " Libraries (for Minecraft " + api.getGameVersion() + ")");
-            dir = new UniversalFile(xdir.getParentFile(), "subservers-client");
+            dir = new File(xdir.getParentFile(), "subservers-client");
             if (xdir.exists()) {
                 Files.move(xdir.toPath(), dir.toPath(), StandardCopyOption.REPLACE_EXISTING);
             } else dir.mkdirs();
-            ConfigUpdater.updateConfig(new UniversalFile(dir, "config.yml"));
-            config = new YAMLConfig(new UniversalFile(dir, "config.yml"));
-            if (new UniversalFile(new File(System.getProperty("user.dir")), "subdata.json").exists()) {
-                FileReader reader = new FileReader(new UniversalFile(new File(System.getProperty("user.dir")), "subdata.json"));
+            ConfigUpdater.updateConfig(new File(dir, "config.yml"));
+            config = new YAMLConfig(new File(dir, "config.yml"));
+            if (new File(new File(System.getProperty("user.dir")), "subdata.json").exists()) {
+                FileReader reader = new FileReader(new File(new File(System.getProperty("user.dir")), "subdata.json"));
                 config.get().getMap("Settings").set("SubData", new ObjectMap<String>(new Gson().fromJson(Util.readAll(reader), Map.class)));
                 config.save();
                 reader.close();
-                new UniversalFile(new File(System.getProperty("user.dir")), "subdata.json").delete();
+                new File(new File(System.getProperty("user.dir")), "subdata.json").delete();
             }
-            if (new UniversalFile(new File(System.getProperty("user.dir")), "subdata.rsa.key").exists()) {
-                if (new UniversalFile(dir, "subdata.rsa.key").exists()) new UniversalFile(dir, "subdata.rsa.key").delete();
-                Files.move(new UniversalFile(new File(System.getProperty("user.dir")), "subdata.rsa.key").toPath(), new UniversalFile(dir, "subdata.rsa.key").toPath());
+            if (new File(new File(System.getProperty("user.dir")), "subdata.rsa.key").exists()) {
+                if (new File(dir, "subdata.rsa.key").exists()) new File(dir, "subdata.rsa.key").delete();
+                Files.move(new File(new File(System.getProperty("user.dir")), "subdata.rsa.key").toPath(), new File(dir, "subdata.rsa.key").toPath());
             }
 
             running = true;
@@ -126,9 +124,9 @@ public final class SubPlugin {
 
                 log.info("AES Encryption Available");
             }
-            if (new UniversalFile(dir, "subdata.rsa.key").exists()) {
+            if (new File(dir, "subdata.rsa.key").exists()) {
                 try {
-                    subprotocol.registerCipher("RSA", new RSA(new UniversalFile(dir, "subdata.rsa.key")));
+                    subprotocol.registerCipher("RSA", new RSA(new File(dir, "subdata.rsa.key")));
                     log.info("RSA Encryption Available");
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -174,7 +172,7 @@ public final class SubPlugin {
     public void reload(boolean notifyPlugins) throws IOException {
         resetDate = Calendar.getInstance().getTime().getTime();
 
-        ConfigUpdater.updateConfig(new UniversalFile(dir, "config.yml"));
+        ConfigUpdater.updateConfig(new File(dir, "config.yml"));
         config.reload();
 
         if (notifyPlugins) {

@@ -28,7 +28,7 @@ public class PacketOutExRunEvent implements Listener, PacketObjectOut<Integer> {
      * @param plugin
      */
     public PacketOutExRunEvent(SubProxy plugin) {
-        if (Util.isNull(plugin)) throw new NullPointerException();
+        Util.nullpo(plugin);
         this.plugin = plugin;
     }
 
@@ -39,7 +39,7 @@ public class PacketOutExRunEvent implements Listener, PacketObjectOut<Integer> {
      * @param args Arguments
      */
     public PacketOutExRunEvent(Class<? extends SubEvent> event, ObjectMap<String> args) {
-        if (Util.isNull(event, args)) throw new NullPointerException();
+        Util.nullpo(event, args);
         this.type = event.getSimpleName();
         this.args = args;
     }

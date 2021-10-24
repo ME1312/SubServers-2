@@ -1,13 +1,12 @@
 package net.ME1312.SubServers.Bungee.Library.Compatibility;
 
-import net.ME1312.Galaxi.Library.Callback.Callback;
-
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 import java.net.InetSocketAddress;
 import java.util.UUID;
+import java.util.function.IntConsumer;
 
 import static net.ME1312.SubServers.Bungee.Library.Compatibility.RPSI.instance;
 
@@ -80,7 +79,7 @@ public interface RemotePlayer {
      * @param message Message to send
      * @param response Success Status
      */
-    static void broadcastMessage(String message, Callback<Integer> response) {
+    static void broadcastMessage(String message, IntConsumer response) {
         broadcastMessage(new String[]{ message }, response);
     }
 
@@ -90,7 +89,7 @@ public interface RemotePlayer {
      * @param messages Messages to send
      * @param response Success Status
      */
-    static void broadcastMessage(String[] messages, Callback<Integer> response) {
+    static void broadcastMessage(String[] messages, IntConsumer response) {
         sendMessage(null, messages, response);
     }
 
@@ -109,7 +108,7 @@ public interface RemotePlayer {
      * @param message Message to send
      * @param response Success Status
      */
-    default void sendMessage(String message, Callback<Integer> response) {
+    default void sendMessage(String message, IntConsumer response) {
         sendMessage(new String[]{ message }, response);
     }
 
@@ -119,7 +118,7 @@ public interface RemotePlayer {
      * @param messages Messages to send
      * @param response Success Status
      */
-    default void sendMessage(String[] messages, Callback<Integer> response) {
+    default void sendMessage(String[] messages, IntConsumer response) {
         sendMessage(new UUID[]{ getUniqueId() }, messages, response);
     }
 
@@ -140,7 +139,7 @@ public interface RemotePlayer {
      * @param message Message to send
      * @param response Success Status
      */
-    static void sendMessage(UUID[] players, String message, Callback<Integer> response) {
+    static void sendMessage(UUID[] players, String message, IntConsumer response) {
         sendMessage(players, new String[]{ message }, response);
     }
 
@@ -151,7 +150,7 @@ public interface RemotePlayer {
      * @param messages Messages to send
      * @param response Success Status
      */
-    static void sendMessage(UUID[] players, String[] messages, Callback<Integer> response) {
+    static void sendMessage(UUID[] players, String[] messages, IntConsumer response) {
         instance.sendMessage(players, messages, response);
     }
 
@@ -170,7 +169,7 @@ public interface RemotePlayer {
      * @param message Message to send
      * @param response Success Status
      */
-    static void broadcastMessage(BaseComponent message, Callback<Integer> response) {
+    static void broadcastMessage(BaseComponent message, IntConsumer response) {
         broadcastMessage(new BaseComponent[]{ message }, response);
     }
 
@@ -180,7 +179,7 @@ public interface RemotePlayer {
      * @param message Message to send
      * @param response Success Status
      */
-    static void broadcastMessage(BaseComponent[] message, Callback<Integer> response) {
+    static void broadcastMessage(BaseComponent[] message, IntConsumer response) {
         broadcastMessage(new BaseComponent[][]{ message }, response);
     }
 
@@ -199,7 +198,7 @@ public interface RemotePlayer {
      * @param messages Messages to send
      * @param response Success Status
      */
-    static void broadcastMessage(BaseComponent[][] messages, Callback<Integer> response) {
+    static void broadcastMessage(BaseComponent[][] messages, IntConsumer response) {
         sendMessage(null, messages, response);
     }
 
@@ -218,7 +217,7 @@ public interface RemotePlayer {
      * @param message Message to send
      * @param response Success Status
      */
-    default void sendMessage(BaseComponent message, Callback<Integer> response) {
+    default void sendMessage(BaseComponent message, IntConsumer response) {
         sendMessage(new BaseComponent[]{ message }, response);
     }
 
@@ -228,7 +227,7 @@ public interface RemotePlayer {
      * @param message Message to send
      * @param response Success Status
      */
-    default void sendMessage(BaseComponent[] message, Callback<Integer> response) {
+    default void sendMessage(BaseComponent[] message, IntConsumer response) {
         sendMessage(new BaseComponent[][]{ message }, response);
     }
 
@@ -247,7 +246,7 @@ public interface RemotePlayer {
      * @param messages Messages to send
      * @param response Success Status
      */
-    default void sendMessage(BaseComponent[][] messages, Callback<Integer> response) {
+    default void sendMessage(BaseComponent[][] messages, IntConsumer response) {
         sendMessage(new UUID[]{ getUniqueId() }, messages, response);
     }
 
@@ -268,7 +267,7 @@ public interface RemotePlayer {
      * @param message Message to send
      * @param response Success Status
      */
-    static void sendMessage(UUID[] players, BaseComponent message, Callback<Integer> response) {
+    static void sendMessage(UUID[] players, BaseComponent message, IntConsumer response) {
         sendMessage(players, new BaseComponent[]{ message }, response);
     }
 
@@ -279,7 +278,7 @@ public interface RemotePlayer {
      * @param message Message to send
      * @param response Success Status
      */
-    static void sendMessage(UUID[] players, BaseComponent[] message, Callback<Integer> response) {
+    static void sendMessage(UUID[] players, BaseComponent[] message, IntConsumer response) {
         sendMessage(players, new BaseComponent[][]{ message }, response);
     }
 
@@ -300,7 +299,7 @@ public interface RemotePlayer {
      * @param messages Message to send
      * @param response Success Status
      */
-    static void sendMessage(UUID[] players, BaseComponent[][] messages, Callback<Integer> response) {
+    static void sendMessage(UUID[] players, BaseComponent[][] messages, IntConsumer response) {
         instance.sendMessage(players, messages, response);
     }
 
@@ -319,7 +318,7 @@ public interface RemotePlayer {
      * @param server Target server
      * @param response Success status
      */
-    default void transfer(String server, Callback<Integer> response) {
+    default void transfer(String server, IntConsumer response) {
         transfer(new UUID[]{ getUniqueId() }, server, response);
     }
 
@@ -340,7 +339,7 @@ public interface RemotePlayer {
      * @param server Target server
      * @param response Success status
      */
-    static void transfer(UUID[] players, String server, Callback<Integer> response) {
+    static void transfer(UUID[] players, String server, IntConsumer response) {
         instance.transfer(players, server, response);
     }
 
@@ -359,7 +358,7 @@ public interface RemotePlayer {
      * @param server Target server
      * @param response Success status
      */
-    default void transfer(ServerInfo server, Callback<Integer> response) {
+    default void transfer(ServerInfo server, IntConsumer response) {
         transfer(new UUID[]{ getUniqueId() }, server, response);
     }
 
@@ -380,7 +379,7 @@ public interface RemotePlayer {
      * @param server Target server
      * @param response Success status
      */
-    static void transfer(UUID[] players, ServerInfo server, Callback<Integer> response) {
+    static void transfer(UUID[] players, ServerInfo server, IntConsumer response) {
         instance.transfer(players, server.getName(), response);
     }
 
@@ -396,7 +395,7 @@ public interface RemotePlayer {
      *
      * @param response Success status
      */
-    default void disconnect(Callback<Integer> response) {
+    default void disconnect(IntConsumer response) {
         disconnect((String) null, response);
     }
 
@@ -415,7 +414,7 @@ public interface RemotePlayer {
      * @param reason Disconnect Reason
      * @param response Success status
      */
-    default void disconnect(String reason, Callback<Integer> response) {
+    default void disconnect(String reason, IntConsumer response) {
         disconnect(new UUID[]{ getUniqueId() }, reason, response);
     }
 
@@ -434,7 +433,7 @@ public interface RemotePlayer {
      * @param players Players to select
      * @param response Success status
      */
-    static void disconnect(UUID[] players, Callback<Integer> response) {
+    static void disconnect(UUID[] players, IntConsumer response) {
         disconnect(players, null, response);
     }
 
@@ -455,7 +454,7 @@ public interface RemotePlayer {
      * @param reason Disconnect Reason
      * @param response Success status
      */
-    static void disconnect(UUID[] players, String reason, Callback<Integer> response) {
+    static void disconnect(UUID[] players, String reason, IntConsumer response) {
         instance.disconnect(players, reason, response);
     }
 }

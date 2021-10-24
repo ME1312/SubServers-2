@@ -1,8 +1,8 @@
 package net.ME1312.SubServers.Host.Network;
 
-import net.ME1312.Galaxi.Library.Callback.Callback;
 import net.ME1312.Galaxi.Library.Container.Pair;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
+import net.ME1312.Galaxi.Library.Try;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubData.Client.SubDataClient;
@@ -18,6 +18,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.util.HashMap;
+import java.util.function.Consumer;
 import java.util.logging.Logger;
 
 /**
@@ -138,9 +139,9 @@ public class SubProtocol extends SubDataProtocol {
     }
 
     @Override
-    protected SubDataClient sub(Callback<Runnable> scheduler, Logger logger, InetAddress address, int port, ObjectMap<?> login) throws IOException {
+    protected SubDataClient sub(Consumer<Runnable> scheduler, Logger logger, InetAddress address, int port, ObjectMap<?> login) throws IOException {
         ExHost host = SubAPI.getInstance().getInternals();
-        HashMap<Integer, SubDataClient> map = Util.getDespiteException(() -> Util.reflect(ExHost.class.getDeclaredField("subdata"), host), null);
+        HashMap<Integer, SubDataClient> map = Try.all.get(() -> Util.reflect(ExHost.class.getDeclaredField("subdata"), host));
 
         int channel = 1;
         while (map.keySet().contains(channel)) channel++;
@@ -156,9 +157,9 @@ public class SubProtocol extends SubDataProtocol {
 
     @SuppressWarnings("deprecation")
     @Override
-    public SubDataClient open(Callback<Runnable> scheduler, Logger logger, InetAddress address, int port) throws IOException {
+    public SubDataClient open(Consumer<Runnable> scheduler, Logger logger, InetAddress address, int port) throws IOException {
         ExHost host = SubAPI.getInstance().getInternals();
-        HashMap<Integer, SubDataClient> map = Util.getDespiteException(() -> Util.reflect(ExHost.class.getDeclaredField("subdata"), host), null);
+        HashMap<Integer, SubDataClient> map = Try.all.get(() -> Util.reflect(ExHost.class.getDeclaredField("subdata"), host));
 
         SubDataClient subdata = super.open(scheduler, logger, address, port);
         subdata.sendPacket(new PacketLinkExHost(host, 0));
@@ -173,9 +174,9 @@ public class SubProtocol extends SubDataProtocol {
             SubNetworkDisconnectEvent event = new SubNetworkDisconnectEvent(client.value(), client.key());
             host.engine.getPluginManager().executeEvent(event);
 
-            if (Util.getDespiteException(() -> Util.reflect(ExHost.class.getDeclaredField("running"), host), true)) {
-                Logger log = Util.getDespiteException(() -> Util.reflect(SubDataClient.class.getDeclaredField("log"), client.value()), null);
-                Util.isException(() -> Util.reflect(ExHost.class.getDeclaredMethod("connect", Logger.class, Pair.class), host, log, client));
+            if (Try.all.get(() -> Util.reflect(ExHost.class.getDeclaredField("running"), host), true)) {
+                Logger log = Try.all.get(() -> Util.reflect(SubDataClient.class.getDeclaredField("log"), client.value()));
+                Try.all.run(() -> Util.reflect(ExHost.class.getDeclaredMethod("connect", Logger.class, Pair.class), host, log, client));
             } else map.put(0, null);
         });
 

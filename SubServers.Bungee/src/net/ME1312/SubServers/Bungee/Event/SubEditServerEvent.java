@@ -30,7 +30,7 @@ public class SubEditServerEvent extends Event implements SubEvent, Cancellable {
      * @param edit Edit to make
      */
     public SubEditServerEvent(UUID player, Server server, Pair<String, ?> edit) {
-        if (Util.isNull(server, edit)) throw new NullPointerException();
+        Util.nullpo(server, edit);
         ObjectMap<String> section = new ObjectMap<String>();
         section.set(".", edit.value());
         this.player = player;

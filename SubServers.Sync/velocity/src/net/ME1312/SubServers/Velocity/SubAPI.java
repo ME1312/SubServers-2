@@ -1,6 +1,7 @@
 package net.ME1312.SubServers.Velocity;
 
-import net.ME1312.Galaxi.Library.UniversalFile;
+
+import net.ME1312.Galaxi.Library.Try;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubData.Client.DataClient;
@@ -13,6 +14,7 @@ import net.ME1312.SubServers.Velocity.Server.ServerData;
 import com.velocitypowered.api.network.ProtocolVersion;
 import com.velocitypowered.api.proxy.server.ServerInfo;
 
+import java.io.File;
 import java.util.*;
 
 /**
@@ -101,7 +103,7 @@ public final class SubAPI extends ClientAPI {
      * @return Remote Player
      */
     public CachedPlayer getRemotePlayer(String name) {
-        if (Util.isNull(name)) throw new NullPointerException();
+        Util.nullpo(name);
         for (CachedPlayer player : getRemotePlayers().values()) {
             if (player.getName().equalsIgnoreCase(name)) return player;
         }
@@ -115,7 +117,7 @@ public final class SubAPI extends ClientAPI {
      * @return Remote Player
      */
     public CachedPlayer getRemotePlayer(UUID id) {
-        if (Util.isNull(id)) throw new NullPointerException();
+        Util.nullpo(id);
         return getRemotePlayers().getOrDefault(id, null);
     }
 
@@ -157,7 +159,7 @@ public final class SubAPI extends ClientAPI {
      * @return Lang Value
      */
     public Map<String, String> getLang(String channel) {
-        if (Util.isNull(channel)) throw new NullPointerException();
+        Util.nullpo(channel);
         return new LinkedHashMap<>(plugin.lang.value().get(channel.toLowerCase()));
     }
 
@@ -166,7 +168,7 @@ public final class SubAPI extends ClientAPI {
      *
      * @return Directory
      */
-    public UniversalFile getRuntimeDirectory() {
+    public File getRuntimeDirectory() {
         return plugin.dir;
     }
 
@@ -206,7 +208,7 @@ public final class SubAPI extends ClientAPI {
         if (GAME_VERSION == null) {
             if (System.getProperty("subservers.minecraft.version", "").length() > 0) {
                 return new Version[]{new Version(System.getProperty("subservers.minecraft.version"))};
-            } else if (Util.getDespiteException(() -> ProtocolVersion.SUPPORTED_VERSIONS != null, false)) {
+            } else if (Try.all.get(() -> ProtocolVersion.SUPPORTED_VERSIONS != null, false)) {
                 List<Version> versions = new LinkedList<Version>();
                 for (ProtocolVersion protocol : ProtocolVersion.SUPPORTED_VERSIONS) for (String version : protocol.getVersionsSupportedBy()) versions.add(new Version(version));
                 Collections.sort(versions);

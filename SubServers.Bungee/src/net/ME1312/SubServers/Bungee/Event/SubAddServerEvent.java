@@ -27,7 +27,7 @@ public class SubAddServerEvent extends Event implements SubEvent, Cancellable {
      * @param server Server Starting
      */
     public SubAddServerEvent(UUID player, Host host, Server server) {
-        if (Util.isNull(server)) throw new NullPointerException();
+        Util.nullpo(server);
         this.player = player;
         this.host = host;
         this.server = server;

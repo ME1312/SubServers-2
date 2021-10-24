@@ -3,8 +3,9 @@ package net.ME1312.SubServers.Bungee;
 import net.ME1312.Galaxi.Library.Config.YAMLConfig;
 import net.ME1312.Galaxi.Library.Config.YAMLSection;
 import net.ME1312.Galaxi.Library.Container.Container;
+import net.ME1312.Galaxi.Library.Directories;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
-import net.ME1312.Galaxi.Library.UniversalFile;
+import net.ME1312.Galaxi.Library.Try;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubData.Server.ClientHandler;
@@ -81,7 +82,7 @@ public final class SubProxy extends BungeeCommon implements Listener {
     private final HashMap<UUID, FallbackState> fallback = new HashMap<UUID, FallbackState>();
 
     public final PrintStream out;
-    public final UniversalFile dir = new UniversalFile(new File(System.getProperty("user.dir")));
+    public final File dir = new File(System.getProperty("user.dir"));
     public YAMLConfig config;
     public YAMLConfig servers;
     private YAMLConfig bungee;
@@ -111,110 +112,110 @@ public final class SubProxy extends BungeeCommon implements Listener {
         this.isPatched = isPatched;
 
         Logger.get("SubServers").info("Loading SubServers.Bungee v" + version.toString() + " Libraries (for Minecraft " + api.getGameVersion()[api.getGameVersion().length - 1] + ")");
-        Util.isException(() -> new RemotePlayer(null)); // runs <clinit>
+        Try.all.run(() -> new RemotePlayer(null)); // runs <clinit>
 
         this.out = out;
-        if (!(new UniversalFile(dir, "config.yml").exists())) {
-            Util.copyFromJar(SubProxy.class.getClassLoader(), "net/ME1312/SubServers/Bungee/Library/Files/bungee.yml", new UniversalFile(dir, "config.yml").getPath());
-            YAMLConfig tmp = new YAMLConfig(new UniversalFile("config.yml"));
+        if (!(new File(dir, "config.yml").exists())) {
+            Util.copyFromJar(SubProxy.class.getClassLoader(), "net/ME1312/SubServers/Bungee/Library/Files/bungee.yml", new File(dir, "config.yml").getPath());
+            YAMLConfig tmp = new YAMLConfig(new File("config.yml"));
             tmp.get().set("stats", UUID.randomUUID().toString());
             tmp.save();
             Logger.get("SubServers").info("Created ./config.yml");
         }
-        bungee = new YAMLConfig(new UniversalFile(dir, "config.yml"));
+        bungee = new YAMLConfig(new File(dir, "config.yml"));
 
-        UniversalFile dir = new UniversalFile(this.dir, "SubServers");
+        File dir = new File(this.dir, "SubServers");
         dir.mkdir();
 
-        ConfigUpdater.updateConfig(new UniversalFile(dir, "config.yml"));
-        config = new YAMLConfig(new UniversalFile(dir, "config.yml"));
+        ConfigUpdater.updateConfig(new File(dir, "config.yml"));
+        config = new YAMLConfig(new File(dir, "config.yml"));
 
-        ConfigUpdater.updateServers(new UniversalFile(dir, "servers.yml"));
-        servers = new YAMLConfig(new UniversalFile(dir, "servers.yml"));
+        ConfigUpdater.updateServers(new File(dir, "servers.yml"));
+        servers = new YAMLConfig(new File(dir, "servers.yml"));
 
-        ConfigUpdater.updateLang(new UniversalFile(dir, "lang.yml"));
-        lang = new YAMLConfig(new UniversalFile(dir, "lang.yml"));
+        ConfigUpdater.updateLang(new File(dir, "lang.yml"));
+        lang = new YAMLConfig(new File(dir, "lang.yml"));
 
-        if (!(new UniversalFile(dir, "Templates").exists())) {
-            new UniversalFile(dir, "Templates").mkdirs();
+        if (!(new File(dir, "Templates").exists())) {
+            new File(dir, "Templates").mkdirs();
 
-            Util.unzip(SubProxy.class.getResourceAsStream("/net/ME1312/SubServers/Bungee/Library/Files/Templates/vanilla.zip"), new UniversalFile(dir, "Templates"));
+            Directories.unzip(SubProxy.class.getResourceAsStream("/net/ME1312/SubServers/Bungee/Library/Files/Templates/vanilla.zip"), new File(dir, "Templates"));
             Logger.get("SubServers").info("Created ./SubServers/Templates/Vanilla");
 
-            Util.unzip(SubProxy.class.getResourceAsStream("/net/ME1312/SubServers/Bungee/Library/Files/Templates/spigot.zip"), new UniversalFile(dir, "Templates"));
+            Directories.unzip(SubProxy.class.getResourceAsStream("/net/ME1312/SubServers/Bungee/Library/Files/Templates/spigot.zip"), new File(dir, "Templates"));
             Logger.get("SubServers").info("Created ./SubServers/Templates/Spigot");
 
-            Util.unzip(SubProxy.class.getResourceAsStream("/net/ME1312/SubServers/Bungee/Library/Files/Templates/paper.zip"), new UniversalFile(dir, "Templates"));
+            Directories.unzip(SubProxy.class.getResourceAsStream("/net/ME1312/SubServers/Bungee/Library/Files/Templates/paper.zip"), new File(dir, "Templates"));
             Logger.get("SubServers").info("Created ./SubServers/Templates/Paper");
 
-            Util.unzip(SubProxy.class.getResourceAsStream("/net/ME1312/SubServers/Bungee/Library/Files/Templates/purpur.zip"), new UniversalFile(dir, "Templates"));
+            Directories.unzip(SubProxy.class.getResourceAsStream("/net/ME1312/SubServers/Bungee/Library/Files/Templates/purpur.zip"), new File(dir, "Templates"));
             Logger.get("SubServers").info("Created ./SubServers/Templates/Purpur");
 
-            Util.unzip(SubProxy.class.getResourceAsStream("/net/ME1312/SubServers/Bungee/Library/Files/Templates/forge.zip"), new UniversalFile(dir, "Templates"));
+            Directories.unzip(SubProxy.class.getResourceAsStream("/net/ME1312/SubServers/Bungee/Library/Files/Templates/forge.zip"), new File(dir, "Templates"));
             Logger.get("SubServers").info("Created ./SubServers/Templates/Forge");
 
-            Util.unzip(SubProxy.class.getResourceAsStream("/net/ME1312/SubServers/Bungee/Library/Files/Templates/sponge.zip"), new UniversalFile(dir, "Templates"));
+            Directories.unzip(SubProxy.class.getResourceAsStream("/net/ME1312/SubServers/Bungee/Library/Files/Templates/sponge.zip"), new File(dir, "Templates"));
             Logger.get("SubServers").info("Created ./SubServers/Templates/Sponge");
         } else {
             long stamp = Math.round(Math.random() * 100000);
             Version version = new Version("2.16a+");
 
-            if (new UniversalFile(dir, "Templates:Vanilla:template.yml").exists() && ((new YAMLConfig(new UniversalFile(dir, "Templates:Vanilla:template.yml"))).get().getVersion("Version", version)).compareTo(version) != 0) {
-                Files.move(new UniversalFile(dir, "Templates:Vanilla").toPath(), new UniversalFile(dir, "Templates:Vanilla." + stamp + ".x").toPath());
-                Util.unzip(SubProxy.class.getResourceAsStream("/net/ME1312/SubServers/Bungee/Library/Files/Templates/vanilla.zip"), new UniversalFile(dir, "Templates"));
+            if (new File(dir, "Templates/Vanilla/template.yml").exists() && ((new YAMLConfig(new File(dir, "Templates/Vanilla/template.yml"))).get().getVersion("Version", version)).compareTo(version) != 0) {
+                Files.move(new File(dir, "Templates/Vanilla").toPath(), new File(dir, "Templates/Vanilla." + stamp + ".x").toPath());
+                Directories.unzip(SubProxy.class.getResourceAsStream("/net/ME1312/SubServers/Bungee/Library/Files/Templates/vanilla.zip"), new File(dir, "Templates"));
                 Logger.get("SubServers").info("Updated ./SubServers/Templates/Vanilla");
             }
-            if (new UniversalFile(dir, "Templates:Spigot:template.yml").exists() && ((new YAMLConfig(new UniversalFile(dir, "Templates:Spigot:template.yml"))).get().getVersion("Version", version)).compareTo(version) != 0) {
-                Files.move(new UniversalFile(dir, "Templates:Spigot").toPath(), new UniversalFile(dir, "Templates:Spigot." + stamp + ".x").toPath());
-                Util.unzip(SubProxy.class.getResourceAsStream("/net/ME1312/SubServers/Bungee/Library/Files/Templates/spigot.zip"), new UniversalFile(dir, "Templates"));
+            if (new File(dir, "Templates/Spigot/template.yml").exists() && ((new YAMLConfig(new File(dir, "Templates/Spigot/template.yml"))).get().getVersion("Version", version)).compareTo(version) != 0) {
+                Files.move(new File(dir, "Templates/Spigot").toPath(), new File(dir, "Templates/Spigot." + stamp + ".x").toPath());
+                Directories.unzip(SubProxy.class.getResourceAsStream("/net/ME1312/SubServers/Bungee/Library/Files/Templates/spigot.zip"), new File(dir, "Templates"));
                 Logger.get("SubServers").info("Updated ./SubServers/Templates/Spigot");
             }
-            if (new UniversalFile(dir, "Templates:Paper:template.yml").exists() && ((new YAMLConfig(new UniversalFile(dir, "Templates:Paper:template.yml"))).get().getVersion("Version", version)).compareTo(version) != 0) {
-                Files.move(new UniversalFile(dir, "Templates:Paper").toPath(), new UniversalFile(dir, "Templates:Paper." + stamp + ".x").toPath());
-                Util.unzip(SubProxy.class.getResourceAsStream("/net/ME1312/SubServers/Bungee/Library/Files/Templates/paper.zip"), new UniversalFile(dir, "Templates"));
+            if (new File(dir, "Templates/Paper/template.yml").exists() && ((new YAMLConfig(new File(dir, "Templates/Paper/template.yml"))).get().getVersion("Version", version)).compareTo(version) != 0) {
+                Files.move(new File(dir, "Templates/Paper").toPath(), new File(dir, "Templates/Paper." + stamp + ".x").toPath());
+                Directories.unzip(SubProxy.class.getResourceAsStream("/net/ME1312/SubServers/Bungee/Library/Files/Templates/paper.zip"), new File(dir, "Templates"));
                 Logger.get("SubServers").info("Updated ./SubServers/Templates/Paper");
             }
-            if (new UniversalFile(dir, "Templates:Purpur:template.yml").exists() && ((new YAMLConfig(new UniversalFile(dir, "Templates:Purpur:template.yml"))).get().getVersion("Version", version)).compareTo(version) != 0) {
-                Files.move(new UniversalFile(dir, "Templates:Purpur").toPath(), new UniversalFile(dir, "Templates:Purpur." + stamp + ".x").toPath());
-                Util.unzip(SubProxy.class.getResourceAsStream("/net/ME1312/SubServers/Bungee/Library/Files/Templates/purpur.zip"), new UniversalFile(dir, "Templates"));
+            if (new File(dir, "Templates/Purpur/template.yml").exists() && ((new YAMLConfig(new File(dir, "Templates/Purpur/template.yml"))).get().getVersion("Version", version)).compareTo(version) != 0) {
+                Files.move(new File(dir, "Templates/Purpur").toPath(), new File(dir, "Templates/Purpur." + stamp + ".x").toPath());
+                Directories.unzip(SubProxy.class.getResourceAsStream("/net/ME1312/SubServers/Bungee/Library/Files/Templates/purpur.zip"), new File(dir, "Templates"));
                 Logger.get("SubServers").info("Updated ./SubServers/Templates/Purpur");
             }
-            if (new UniversalFile(dir, "Templates:Forge:template.yml").exists() && ((new YAMLConfig(new UniversalFile(dir, "Templates:Forge:template.yml"))).get().getVersion("Version", version)).compareTo(version) != 0) {
-                Files.move(new UniversalFile(dir, "Templates:Forge").toPath(), new UniversalFile(dir, "Templates:Forge." + stamp + ".x").toPath());
-                Util.unzip(SubProxy.class.getResourceAsStream("/net/ME1312/SubServers/Bungee/Library/Files/Templates/forge.zip"), new UniversalFile(dir, "Templates"));
+            if (new File(dir, "Templates/Forge/template.yml").exists() && ((new YAMLConfig(new File(dir, "Templates/Forge/template.yml"))).get().getVersion("Version", version)).compareTo(version) != 0) {
+                Files.move(new File(dir, "Templates/Forge").toPath(), new File(dir, "Templates/Forge." + stamp + ".x").toPath());
+                Directories.unzip(SubProxy.class.getResourceAsStream("/net/ME1312/SubServers/Bungee/Library/Files/Templates/forge.zip"), new File(dir, "Templates"));
                 Logger.get("SubServers").info("Updated ./SubServers/Templates/Forge");
             }
-            if (new UniversalFile(dir, "Templates:Sponge:template.yml").exists() && ((new YAMLConfig(new UniversalFile(dir, "Templates:Sponge:template.yml"))).get().getVersion("Version", version)).compareTo(version) != 0) {
-                Files.move(new UniversalFile(dir, "Templates:Sponge").toPath(), new UniversalFile(dir, "Templates:Sponge." + stamp + ".x").toPath());
-                Util.unzip(SubProxy.class.getResourceAsStream("/net/ME1312/SubServers/Bungee/Library/Files/Templates/sponge.zip"), new UniversalFile(dir, "Templates"));
+            if (new File(dir, "Templates/Sponge/template.yml").exists() && ((new YAMLConfig(new File(dir, "Templates/Sponge/template.yml"))).get().getVersion("Version", version)).compareTo(version) != 0) {
+                Files.move(new File(dir, "Templates/Sponge").toPath(), new File(dir, "Templates/Sponge." + stamp + ".x").toPath());
+                Directories.unzip(SubProxy.class.getResourceAsStream("/net/ME1312/SubServers/Bungee/Library/Files/Templates/sponge.zip"), new File(dir, "Templates"));
                 Logger.get("SubServers").info("Updated ./SubServers/Templates/Sponge");
             }
         }
 
         Runnable clean = () -> {
             try {
-                if (new UniversalFile(dir, "Recently Deleted").exists()) {
-                    int f = new UniversalFile(dir, "Recently Deleted").listFiles().length;
-                    for (File file : new UniversalFile(dir, "Recently Deleted").listFiles()) {
+                if (new File(dir, "Recently Deleted").exists()) {
+                    int f = new File(dir, "Recently Deleted").listFiles().length;
+                    for (File file : new File(dir, "Recently Deleted").listFiles()) {
                         try {
                             if (file.isDirectory()) {
-                                if (new UniversalFile(dir, "Recently Deleted:" + file.getName() + ":info.json").exists()) {
-                                    FileReader reader = new FileReader(new UniversalFile(dir, "Recently Deleted:" + file.getName() + ":info.json"));
+                                if (new File(dir, "Recently Deleted/" + file.getName() + "/info.json").exists()) {
+                                    FileReader reader = new FileReader(new File(dir, "Recently Deleted/" + file.getName() + "/info.json"));
                                     YAMLSection info = new YAMLSection(new Gson().fromJson(Util.readAll(reader), Map.class));
                                     reader.close();
                                     if (info.contains("Timestamp")) {
                                         if (TimeUnit.MILLISECONDS.toDays(Calendar.getInstance().getTime().getTime() - info.getLong("Timestamp")) >= 7) {
-                                            Util.deleteDirectory(file);
+                                            Directories.delete(file);
                                             f--;
                                             Logger.get("SubServers").info("Removed ./SubServers/Recently Deleted/" + file.getName());
                                         }
                                     } else {
-                                        Util.deleteDirectory(file);
+                                        Directories.delete(file);
                                         f--;
                                         Logger.get("SubServers").info("Removed ./SubServers/Recently Deleted/" + file.getName());
                                     }
                                 } else {
-                                    Util.deleteDirectory(file);
+                                    Directories.delete(file);
                                     f--;
                                     Logger.get("SubServers").info("Removed ./SubServers/Recently Deleted/" + file.getName());
                                 }
@@ -230,7 +231,7 @@ public final class SubProxy extends BungeeCommon implements Listener {
                         }
                     }
                     if (f <= 0) {
-                        Files.delete(new UniversalFile(dir, "Recently Deleted").toPath());
+                        Files.delete(new File(dir, "Recently Deleted").toPath());
                     }
                 }
             } catch (Exception e) {
@@ -253,7 +254,7 @@ public final class SubProxy extends BungeeCommon implements Listener {
             PluginDescription description = new PluginDescription();
             description.setName("SubServers-Bungee");
             description.setMain(net.ME1312.SubServers.Bungee.Library.Compatibility.Plugin.class.getCanonicalName());
-            description.setFile(Util.getDespiteException(() -> new File(SubProxy.class.getProtectionDomain().getCodeSource().getLocation().toURI()), null));
+            description.setFile(Try.all.get(() -> new File(SubProxy.class.getProtectionDomain().getCodeSource().getLocation().toURI())));
             description.setVersion(version.toString());
             description.setAuthor("ME1312");
 
@@ -346,9 +347,9 @@ public final class SubProxy extends BungeeCommon implements Listener {
         if (!status) resetDate = begin;
         reloading = true;
 
-        ConfigUpdater.updateConfig(new UniversalFile(dir, "SubServers:config.yml"));
-        ConfigUpdater.updateServers(new UniversalFile(dir, "SubServers:servers.yml"));
-        ConfigUpdater.updateLang(new UniversalFile(dir, "SubServers:lang.yml"));
+        ConfigUpdater.updateConfig(new File(dir, "SubServers/config.yml"));
+        ConfigUpdater.updateServers(new File(dir, "SubServers/servers.yml"));
+        ConfigUpdater.updateLang(new File(dir, "SubServers/lang.yml"));
 
         YAMLSection prevconfig = config.get();
         config.reload();
@@ -363,7 +364,7 @@ public final class SubProxy extends BungeeCommon implements Listener {
                 )) {
             SubDataServer subdata = this.subdata;
             subdata.close();
-            Util.isException(subdata::waitFor);
+            Try.all.run(subdata::waitFor);
         }
 
         PacketLinkServer.strict = config.get().getMap("Settings").getBoolean("Strict-Server-Linking", true);
@@ -493,7 +494,7 @@ public final class SubProxy extends BungeeCommon implements Listener {
                         edits.set("exec", this.servers.get().getMap("Servers").getMap(name).getRawString("Executable"));
                     if (!this.servers.get().getMap("Servers").getMap(name).getRawString("Stop-Command").equals(server.getStopCommand()))
                         edits.set("stop-cmd", this.servers.get().getMap("Servers").getMap(name).getRawString("Stop-Command"));
-                    SubServer.StopAction action = Util.getDespiteException(() -> SubServer.StopAction.valueOf(this.servers.get().getMap("Servers").getMap(name).getRawString("Stop-Action", "NONE").toUpperCase().replace('-', '_').replace(' ', '_')), null);
+                    SubServer.StopAction action = Try.all.get(() -> SubServer.StopAction.valueOf(this.servers.get().getMap("Servers").getMap(name).getRawString("Stop-Action", "NONE").toUpperCase().replace('-', '_').replace(' ', '_')));
                     if (action != null && action != server.getStopAction())
                         edits.set("stop-action", action.toString());
                     if (this.servers.get().getMap("Servers").getMap(name).getBoolean("Restricted") != server.isRestricted())
@@ -533,7 +534,7 @@ public final class SubProxy extends BungeeCommon implements Listener {
                         if (this.servers.get().getMap("Servers").getMap(name).getBoolean("Hidden") != server.isHidden())
                             server.setHidden(this.servers.get().getMap("Servers").getMap(name).getBoolean("Hidden"));
                     } // Apply these changes regardless of reset
-                    SubServer.StopAction action = Util.getDespiteException(() -> SubServer.StopAction.valueOf(this.servers.get().getMap("Servers").getMap(name).getRawString("Stop-Action", "NONE").toUpperCase().replace('-', '_').replace(' ', '_')), null);
+                    SubServer.StopAction action = Try.all.get(() -> SubServer.StopAction.valueOf(this.servers.get().getMap("Servers").getMap(name).getRawString("Stop-Action", "NONE").toUpperCase().replace('-', '_').replace(' ', '_')));
                     if (action != null && action != server.getStopAction())
                         server.setStopAction(action);
                     if (!status && this.servers.get().getMap("Servers").getMap(name).getBoolean("Run-On-Launch"))
@@ -629,8 +630,8 @@ public final class SubProxy extends BungeeCommon implements Listener {
             } else if (ciphers[0].equals("RSA") || ciphers[0].equals("RSA-2048") || ciphers[0].equals("RSA-3072") || ciphers[0].equals("RSA-4096")) {
                 try {
                     int length = (ciphers[0].contains("-"))?Integer.parseInt(ciphers[0].split("-")[1]):2048;
-                    if (!(new UniversalFile("SubServers:Cache").exists())) new UniversalFile("SubServers:Cache").mkdirs();
-                    subprotocol.registerCipher("RSA", new RSA(length, new UniversalFile("SubServers:Cache:private.rsa.key"), new UniversalFile("SubServers:subdata.rsa.key")));
+                    if (!(new File("SubServers/Cache").exists())) new File("SubServers/Cache").mkdirs();
+                    subprotocol.registerCipher("RSA", new RSA(length, new File("SubServers/Cache/private.rsa.key"), new File("SubServers/subdata.rsa.key")));
                     cipher = "RSA" + cipher.substring(ciphers[0].length());
 
                     Logger.get("SubData").info("Encrypting SubData with RSA:");
@@ -873,7 +874,7 @@ public final class SubProxy extends BungeeCommon implements Listener {
     }
 
     Host constructHost(Class<? extends Host> driver, String name, boolean enabled, Range<Integer> ports, boolean log, InetAddress address, String directory, String gitBash) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
-        if (Util.isNull(driver, name, enabled, ports, log, address, directory, gitBash)) throw new NullPointerException();
+        Util.nullpo(driver, name, enabled, ports, log, address, directory, gitBash);
         return driver.getConstructor(SubProxy.class, String.class, boolean.class, Range.class, boolean.class, InetAddress.class, String.class, String.class).newInstance(this, name, enabled, ports, log, address, directory, gitBash);
     }
 
@@ -960,7 +961,7 @@ public final class SubProxy extends BungeeCommon implements Listener {
                         lock.value = false;
                         if (mode) e.completeIntent(plugin);
                     }, ((InitialHandler) e.getConnection()).getHandshake().getProtocolVersion());
-                    if (!mode) while (lock.value) Util.isException(() -> Thread.sleep(4));
+                    if (!mode) while (lock.value) Try.all.run(() -> Thread.sleep(4));
                 }
             }
         } else if (dynamic) {

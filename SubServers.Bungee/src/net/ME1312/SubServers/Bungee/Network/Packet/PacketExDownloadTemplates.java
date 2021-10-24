@@ -1,6 +1,7 @@
 package net.ME1312.SubServers.Bungee.Network.Packet;
 
-import net.ME1312.Galaxi.Library.UniversalFile;
+import net.ME1312.Galaxi.Library.Directories;
+import net.ME1312.Galaxi.Library.Try;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubData.Server.Library.DataSize;
 import net.ME1312.SubData.Server.Protocol.PacketIn;
@@ -45,12 +46,12 @@ public class PacketExDownloadTemplates implements PacketIn, PacketStreamOut {
     public void send(SubDataClient client, OutputStream stream) throws Throwable {
         try {
             if (client.getBlockSize() < DataSize.MBB) client.tempBlockSize(DataSize.MBB);
-            HashMap<String, ServerTemplate> map = Util.getDespiteException(() -> Util.reflect(ExternalSubCreator.class.getDeclaredField("templates"), ((ExternalHost) client.getHandler()).getCreator()), new HashMap<>());
-            File dir = new UniversalFile(plugin.dir, "SubServers:Templates");
+            HashMap<String, ServerTemplate> map = Try.all.getOrSupply(() -> Util.reflect(ExternalSubCreator.class.getDeclaredField("templates"), ((ExternalHost) client.getHandler()).getCreator()), HashMap::new);
+            File dir = new File(plugin.dir, "SubServers/Templates");
             ZipOutputStream zip = new ZipOutputStream(stream);
 
             byte[] buffer = new byte[4096];
-            for (String file : Util.searchDirectory(dir)) {
+            for (String file : Directories.search(dir)) {
                 int index = file.indexOf(File.separatorChar);
                 if (index != -1 && !map.containsKey(file.substring(0, index).toLowerCase())) {
 
@@ -67,7 +68,7 @@ public class PacketExDownloadTemplates implements PacketIn, PacketStreamOut {
             }
             zip.close();
 
-            Util.isException(() -> Util.reflect(ExternalSubCreator.class.getDeclaredField("enableRT"), host.getCreator(), true));
+            Try.all.run(() -> Util.reflect(ExternalSubCreator.class.getDeclaredField("enableRT"), host.getCreator(), true));
         } catch (Exception e) {
             Logger.get("SubData").info("Problem encoding template files for Host: " + host.getName());
             e.printStackTrace();

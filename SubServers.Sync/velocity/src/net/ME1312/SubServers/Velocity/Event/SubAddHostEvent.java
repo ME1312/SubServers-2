@@ -19,7 +19,7 @@ public class SubAddHostEvent implements SubEvent {
      * @param host Host to be added
      */
     public SubAddHostEvent(UUID player, String host) {
-        if (Util.isNull(host)) throw new NullPointerException();
+        Util.nullpo(host);
         this.player = player;
         this.host = host;
     }

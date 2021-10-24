@@ -19,9 +19,9 @@ import java.util.*;
 /**
  * Proxy Class
  */
-public class Proxy implements ClientHandler, ExtraDataHandler {
-    private HashMap<Integer, SubDataClient> subdata = new HashMap<Integer, SubDataClient>();
-    private ObjectMap<String> extra = new ObjectMap<String>();
+public class Proxy implements ClientHandler, ExtraDataHandler<String> {
+    private final HashMap<Integer, SubDataClient> subdata = new HashMap<Integer, SubDataClient>();
+    private final ObjectMap<String> extra = new ObjectMap<String>();
     private final String signature;
     private boolean persistent = false;
     private String nick = null;
@@ -158,19 +158,19 @@ public class Proxy implements ClientHandler, ExtraDataHandler {
 
     @Override
     public void addExtra(String handle, Object value) {
-        if (Util.isNull(handle, value)) throw new NullPointerException();
+        Util.nullpo(handle, value);
         extra.set(handle, value);
     }
 
     @Override
     public boolean hasExtra(String handle) {
-        if (Util.isNull(handle)) throw new NullPointerException();
+        Util.nullpo(handle);
         return extra.getKeys().contains(handle);
     }
 
     @Override
     public ObjectMapValue getExtra(String handle) {
-        if (Util.isNull(handle)) throw new NullPointerException();
+        Util.nullpo(handle);
         return extra.get(handle);
     }
 
@@ -181,7 +181,7 @@ public class Proxy implements ClientHandler, ExtraDataHandler {
 
     @Override
     public void removeExtra(String handle) {
-        if (Util.isNull(handle)) throw new NullPointerException();
+        Util.nullpo(handle);
         extra.remove(handle);
     }
 

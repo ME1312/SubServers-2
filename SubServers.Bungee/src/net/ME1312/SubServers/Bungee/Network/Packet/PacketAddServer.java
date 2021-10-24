@@ -28,7 +28,7 @@ public class PacketAddServer implements PacketObjectIn<Integer>, PacketObjectOut
      * @param plugin SubPlugin
      */
     public PacketAddServer(SubProxy plugin) {
-        if (Util.isNull(plugin)) throw new NullPointerException();
+        Util.nullpo(plugin);
         this.plugin = plugin;
     }
 

@@ -1,16 +1,22 @@
 package net.ME1312.SubServers.Client.Common.Network.API;
 
-import net.ME1312.Galaxi.Library.Callback.Callback;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubData.Client.DataClient;
 import net.ME1312.SubData.Client.SubDataClient;
 import net.ME1312.SubServers.Client.Common.ClientAPI;
-import net.ME1312.SubServers.Client.Common.Network.Packet.*;
+import net.ME1312.SubServers.Client.Common.Network.Packet.PacketDisconnectPlayer;
+import net.ME1312.SubServers.Client.Common.Network.Packet.PacketDownloadPlayerInfo;
+import net.ME1312.SubServers.Client.Common.Network.Packet.PacketMessagePlayer;
+import net.ME1312.SubServers.Client.Common.Network.Packet.PacketTransferPlayer;
 
 import java.lang.reflect.InvocationTargetException;
 import java.net.InetSocketAddress;
-import java.util.*;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.UUID;
+import java.util.function.Consumer;
+import java.util.function.IntConsumer;
 
 /**
  * Simplified RemotePlayer Data Class
@@ -108,12 +114,12 @@ public class RemotePlayer {
      *
      * @param callback  the proxy this player is connected to
      */
-    public void getProxy(Callback<Proxy> callback) {
-        if (Util.isNull(callback)) throw new NullPointerException();
+    public void getProxy(Consumer<Proxy> callback) {
+        Util.nullpo(callback);
         StackTraceElement[] origin = new Exception().getStackTrace();
         Runnable run = () -> {
             try {
-                callback.run(proxy);
+                callback.accept(proxy);
             } catch (Throwable e) {
                 Throwable ew = new InvocationTargetException(e);
                 ew.setStackTrace(origin);
@@ -145,12 +151,12 @@ public class RemotePlayer {
      *
      * @param callback  the server this player is connected to
      */
-    public void getServer(Callback<Server> callback) {
-        if (Util.isNull(callback)) throw new NullPointerException();
+    public void getServer(Consumer<Server> callback) {
+        Util.nullpo(callback);
         StackTraceElement[] origin = new Exception().getStackTrace();
         Runnable run = () -> {
             try {
-                callback.run(server);
+                callback.accept(server);
             } catch (Throwable e) {
                 Throwable ew = new InvocationTargetException(e);
                 ew.setStackTrace(origin);
@@ -183,7 +189,7 @@ public class RemotePlayer {
      * @param message Message to send
      * @param response Success Status
      */
-    public static void broadcastMessage(String message, Callback<Integer> response) {
+    public static void broadcastMessage(String message, IntConsumer response) {
         broadcastMessage(new String[]{ message }, response);
     }
 
@@ -193,7 +199,7 @@ public class RemotePlayer {
      * @param messages Messages to send
      * @param response Success Status
      */
-    public static void broadcastMessage(String[] messages, Callback<Integer> response) {
+    public static void broadcastMessage(String[] messages, IntConsumer response) {
         sendMessage(null, messages, response);
     }
 
@@ -212,7 +218,7 @@ public class RemotePlayer {
      * @param message Message to send
      * @param response Success Status
      */
-    public void sendMessage(String message, Callback<Integer> response) {
+    public void sendMessage(String message, IntConsumer response) {
         sendMessage(new String[]{ message }, response);
     }
 
@@ -222,7 +228,7 @@ public class RemotePlayer {
      * @param messages Messages to send
      * @param response Success Status
      */
-    public void sendMessage(String[] messages, Callback<Integer> response) {
+    public void sendMessage(String[] messages, IntConsumer response) {
         instance.sendMessage(client(), new UUID[]{ getUniqueId() }, messages, response);
     }
 
@@ -243,7 +249,7 @@ public class RemotePlayer {
      * @param message Message to send
      * @param response Success Status
      */
-    public static void sendMessage(UUID[] players, String message, Callback<Integer> response) {
+    public static void sendMessage(UUID[] players, String message, IntConsumer response) {
         sendMessage(players, new String[]{ message }, response);
     }
 
@@ -254,7 +260,7 @@ public class RemotePlayer {
      * @param messages Messages to send
      * @param response Success Status
      */
-    public static void sendMessage(UUID[] players, String[] messages, Callback<Integer> response) {
+    public static void sendMessage(UUID[] players, String[] messages, IntConsumer response) {
         instance.sendMessage(SimplifiedData.client(ClientAPI.getInstance().getSubDataNetwork()[0]), players, messages, response);
     }
 
@@ -273,7 +279,7 @@ public class RemotePlayer {
      * @param message Message to send
      * @param response Success Status
      */
-    public static void broadcastRawMessage(String message, Callback<Integer> response) {
+    public static void broadcastRawMessage(String message, IntConsumer response) {
         broadcastRawMessage(new String[]{ message }, response);
     }
 
@@ -283,7 +289,7 @@ public class RemotePlayer {
      * @param messages Messages to send
      * @param response Success Status
      */
-    public static void broadcastRawMessage(String[] messages, Callback<Integer> response) {
+    public static void broadcastRawMessage(String[] messages, IntConsumer response) {
         sendRawMessage(null, messages, response);
     }
 
@@ -302,7 +308,7 @@ public class RemotePlayer {
      * @param message Message to send
      * @param response Success Status
      */
-    public void sendRawMessage(String message, Callback<Integer> response) {
+    public void sendRawMessage(String message, IntConsumer response) {
         sendRawMessage(new String[]{ message }, response);
     }
 
@@ -312,7 +318,7 @@ public class RemotePlayer {
      * @param message Message to send
      * @param response Success Status
      */
-    public void sendRawMessage(String[] message, Callback<Integer> response) {
+    public void sendRawMessage(String[] message, IntConsumer response) {
         instance.sendRawMessage(client(), new UUID[]{ getUniqueId() }, message, response);
     }
 
@@ -333,7 +339,7 @@ public class RemotePlayer {
      * @param message Message to send
      * @param response Success Status
      */
-    public static void sendRawMessage(UUID[] players, String message, Callback<Integer> response) {
+    public static void sendRawMessage(UUID[] players, String message, IntConsumer response) {
         sendRawMessage(players, new String[]{ message }, response);
     }
 
@@ -344,7 +350,7 @@ public class RemotePlayer {
      * @param messages Messages to send
      * @param response Success Status
      */
-    public static void sendRawMessage(UUID[] players, String[] messages, Callback<Integer> response) {
+    public static void sendRawMessage(UUID[] players, String[] messages, IntConsumer response) {
         instance.sendRawMessage(SimplifiedData.client(ClientAPI.getInstance().getSubDataNetwork()[0]), players, messages, response);
     }
 
@@ -363,7 +369,7 @@ public class RemotePlayer {
      * @param server Target server
      * @param response Success status
      */
-    public void transfer(String server, Callback<Integer> response) {
+    public void transfer(String server, IntConsumer response) {
         instance.transfer(client(), new UUID[]{ getUniqueId() }, server, response);
     }
 
@@ -384,7 +390,7 @@ public class RemotePlayer {
      * @param server Target server
      * @param response Success status
      */
-    public static void transfer(UUID[] players, String server, Callback<Integer> response) {
+    public static void transfer(UUID[] players, String server, IntConsumer response) {
         instance.transfer(SimplifiedData.client(ClientAPI.getInstance().getSubDataNetwork()[0]), players, server, response);
     }
 
@@ -400,7 +406,7 @@ public class RemotePlayer {
      *
      * @param response Success status
      */
-    public void disconnect(Callback<Integer> response) {
+    public void disconnect(IntConsumer response) {
         disconnect((String) null, response);
     }
 
@@ -419,7 +425,7 @@ public class RemotePlayer {
      * @param reason Disconnect Reason
      * @param response Success status
      */
-    public void disconnect(String reason, Callback<Integer> response) {
+    public void disconnect(String reason, IntConsumer response) {
         instance.disconnect(client(), new UUID[]{ getUniqueId() }, reason, response);
     }
 
@@ -438,7 +444,7 @@ public class RemotePlayer {
      * @param players Players to select
      * @param response Success status
      */
-    public static void disconnect(UUID[] players, Callback<Integer> response) {
+    public static void disconnect(UUID[] players, IntConsumer response) {
         disconnect(players, null, response);
     }
 
@@ -459,7 +465,7 @@ public class RemotePlayer {
      * @param reason Disconnect Reason
      * @param response Success status
      */
-    public static void disconnect(UUID[] players, String reason, Callback<Integer> response) {
+    public static void disconnect(UUID[] players, String reason, IntConsumer response) {
         instance.disconnect(SimplifiedData.client(ClientAPI.getInstance().getSubDataNetwork()[0]), players, reason, response);
     }
 
@@ -536,11 +542,11 @@ public class RemotePlayer {
          * @param messages Messages to send
          * @param response Success Status
          */
-        protected void sendMessage(SubDataClient client, UUID[] players, String[] messages, Callback<Integer> response) {
+        protected void sendMessage(SubDataClient client, UUID[] players, String[] messages, IntConsumer response) {
             StackTraceElement[] origin = new Exception().getStackTrace();
             client.sendPacket(new PacketMessagePlayer(players, messages, null, data -> {
                 try {
-                    response.run(data.getInt(0x0001));
+                    response.accept(data.getInt(0x0001));
                 } catch (Throwable e) {
                     Throwable ew = new InvocationTargetException(e);
                     ew.setStackTrace(origin);
@@ -557,11 +563,11 @@ public class RemotePlayer {
          * @param messages Messages to send
          * @param response Success Status
          */
-        protected void sendRawMessage(SubDataClient client, UUID[] players, String[] messages, Callback<Integer> response) {
+        protected void sendRawMessage(SubDataClient client, UUID[] players, String[] messages, IntConsumer response) {
             StackTraceElement[] origin = new Exception().getStackTrace();
             client.sendPacket(new PacketMessagePlayer(players, null, messages, data -> {
                 try {
-                    response.run(data.getInt(0x0001));
+                    response.accept(data.getInt(0x0001));
                 } catch (Throwable e) {
                     Throwable ew = new InvocationTargetException(e);
                     ew.setStackTrace(origin);
@@ -578,11 +584,11 @@ public class RemotePlayer {
          * @param server Target server
          * @param response Success Status
          */
-        protected void transfer(SubDataClient client, UUID[] players, String server, Callback<Integer> response) {
+        protected void transfer(SubDataClient client, UUID[] players, String server, IntConsumer response) {
             StackTraceElement[] origin = new Exception().getStackTrace();
             client.sendPacket(new PacketTransferPlayer(players, server, data -> {
                 try {
-                    response.run(data.getInt(0x0001));
+                    response.accept(data.getInt(0x0001));
                 } catch (Throwable e) {
                     Throwable ew = new InvocationTargetException(e);
                     ew.setStackTrace(origin);
@@ -599,11 +605,11 @@ public class RemotePlayer {
          * @param reason Disconnect Reason
          * @param response Success status
          */
-        protected void disconnect(SubDataClient client, UUID[] players, String reason, Callback<Integer> response) {
+        protected void disconnect(SubDataClient client, UUID[] players, String reason, IntConsumer response) {
             StackTraceElement[] origin = new Exception().getStackTrace();
             client.sendPacket(new PacketDisconnectPlayer(players, reason, data -> {
                 try {
-                    response.run(data.getInt(0x0001));
+                    response.accept(data.getInt(0x0001));
                 } catch (Throwable e) {
                     Throwable ew = new InvocationTargetException(e);
                     ew.setStackTrace(origin);

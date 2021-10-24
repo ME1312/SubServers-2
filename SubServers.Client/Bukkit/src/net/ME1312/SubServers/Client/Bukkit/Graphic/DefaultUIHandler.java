@@ -1,10 +1,10 @@
 package net.ME1312.SubServers.Client.Bukkit.Graphic;
 
-import net.ME1312.Galaxi.Library.Callback.Callback;
 import net.ME1312.Galaxi.Library.Config.YAMLSection;
 import net.ME1312.Galaxi.Library.Container.Container;
 import net.ME1312.Galaxi.Library.Container.Value;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
+import net.ME1312.Galaxi.Library.Try;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubData.Client.SubDataClient;
@@ -29,6 +29,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.util.HashMap;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 import static net.ME1312.SubServers.Client.Bukkit.Library.ObjectPermission.permits;
 
@@ -36,7 +37,7 @@ import static net.ME1312.SubServers.Client.Bukkit.Library.ObjectPermission.permi
  * Default GUI Listener
  */
 public class DefaultUIHandler implements UIHandler, Listener {
-    private HashMap<UUID, Callback<YAMLSection>> input = new HashMap<UUID, Callback<YAMLSection>>();
+    private HashMap<UUID, Consumer<YAMLSection>> input = new HashMap<UUID, Consumer<YAMLSection>>();
     private HashMap<UUID, DefaultUIRenderer> gui = new HashMap<UUID, DefaultUIRenderer>();
     private boolean enabled = true;
     private SubPlugin plugin;
@@ -47,7 +48,7 @@ public class DefaultUIHandler implements UIHandler, Listener {
      * @param plugin Event
      */
     public DefaultUIHandler(SubPlugin plugin) {
-        if (Util.isNull(plugin)) throw new NullPointerException();
+        Util.nullpo(plugin);
         this.plugin = plugin;
         Bukkit.getPluginManager().registerEvents(this, plugin);
     }
@@ -71,7 +72,7 @@ public class DefaultUIHandler implements UIHandler, Listener {
             if (gui.open && event.getClickedInventory() != null && title != null) {
                 if (plugin.api.getSubDataNetwork()[0] == null) {
                     new IllegalStateException("SubData is not connected").printStackTrace();
-                } else if (Util.isException(() -> plugin.api.getLangChannels())) {
+                } else if (!Try.all.run(() -> plugin.api.getLangChannels())) {
                     new IllegalStateException("There are no lang options available at this time").printStackTrace();
                 } else if (title.equals(plugin.api.getLang("SubServers", "Interface.Host-Menu.Title"))) { // Host Menu
                     if (event.getCurrentItem() != null && event.getCurrentItem().getType() != Material.AIR && event.getCurrentItem().hasItemMeta()) {
@@ -168,7 +169,7 @@ public class DefaultUIHandler implements UIHandler, Listener {
                                 if (m.getString("message").length() <= 0) {
                                     ((UIRenderer.CreatorOptions) gui.lastVisitedObjects[0]).setPort(null);
                                     gui.hostCreator((UIRenderer.CreatorOptions) gui.lastVisitedObjects[0]);
-                                } else if (Util.isException(() -> Integer.parseInt(m.getString("message"))) || Integer.parseInt(m.getString("message")) <= 0 || Integer.parseInt(m.getString("message")) > 65535) {
+                                } else if (!Try.all.run(() -> Integer.parseInt(m.getString("message"))) || Integer.parseInt(m.getString("message")) <= 0 || Integer.parseInt(m.getString("message")) > 65535) {
                                     if (!gui.sendTitle(plugin.api.getLang("SubServers", "Interface.Host-Creator.Edit-Port.Invalid-Title"), 4 * 20))
                                         player.sendMessage(plugin.api.getLang("SubServers", "Interface.Host-Creator.Edit-Port.Invalid"));
                                     Bukkit.getScheduler().runTaskLater(plugin, () -> gui.hostCreator((UIRenderer.CreatorOptions) gui.lastVisitedObjects[0]), 4 * 20);
@@ -354,9 +355,9 @@ public class DefaultUIHandler implements UIHandler, Listener {
                             if (permits((SubServer) gui.lastVisitedObjects[0], player, "subservers.subserver.%.*", "subservers.subserver.%.stop")) {
                                 gui.setDownloading(plugin.api.getLang("SubServers", "Interface.Generic.Downloading.Response"));
                                 final Value<Boolean> listening = new Container<Boolean>(true);
-                                PacketInExRunEvent.callback("SubStoppedEvent", new Callback<ObjectMap<String>>() {
+                                PacketInExRunEvent.callback("SubStoppedEvent", new Consumer<ObjectMap<String>>() {
                                     @Override
-                                    public void run(ObjectMap<String> json) {
+                                    public void accept(ObjectMap<String> json) {
                                         try {
                                             if (listening.value()) if (!json.getString("server").equalsIgnoreCase(((SubServer) gui.lastVisitedObjects[0]).getName())) {
                                                 PacketInExRunEvent.callback("SubStoppedEvent", this);
@@ -378,9 +379,9 @@ public class DefaultUIHandler implements UIHandler, Listener {
                             if (permits((SubServer) gui.lastVisitedObjects[0], player, "subservers.subserver.%.*", "subservers.subserver.%.terminate")) {
                                 gui.setDownloading(plugin.api.getLang("SubServers", "Interface.Generic.Downloading.Response"));
                                 final Value<Boolean> listening = new Container<Boolean>(true);
-                                PacketInExRunEvent.callback("SubStoppedEvent", new Callback<ObjectMap<String>>() {
+                                PacketInExRunEvent.callback("SubStoppedEvent", new Consumer<ObjectMap<String>>() {
                                     @Override
-                                    public void run(ObjectMap<String> json) {
+                                    public void accept(ObjectMap<String> json) {
                                         try {
                                             if (listening.value()) if (!json.getString("server").equalsIgnoreCase(((SubServer) gui.lastVisitedObjects[0]).getName())) {
                                                 PacketInExRunEvent.callback("SubStoppedEvent", this);
@@ -466,7 +467,7 @@ public class DefaultUIHandler implements UIHandler, Listener {
         if (!event.isCancelled() && enabled && input.containsKey(event.getPlayer().getUniqueId())) {
             YAMLSection data = new YAMLSection();
             data.set("message", event.getMessage());
-            input.get(event.getPlayer().getUniqueId()).run(data);
+            input.get(event.getPlayer().getUniqueId()).accept(data);
             input.remove(event.getPlayer().getUniqueId());
             event.setCancelled(true);
         }
@@ -482,7 +483,7 @@ public class DefaultUIHandler implements UIHandler, Listener {
         if (!event.isCancelled() && enabled && input.containsKey(event.getPlayer().getUniqueId())) {
             YAMLSection data = new YAMLSection();
             data.set("message", (event.getMessage().startsWith("/"))?event.getMessage().substring(1):event.getMessage());
-            input.get(event.getPlayer().getUniqueId()).run(data);
+            input.get(event.getPlayer().getUniqueId()).accept(data);
             input.remove(event.getPlayer().getUniqueId());
             event.setCancelled(true);
         }

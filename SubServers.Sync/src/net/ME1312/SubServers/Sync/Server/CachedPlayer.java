@@ -1,6 +1,5 @@
 package net.ME1312.SubServers.Sync.Server;
 
-import net.ME1312.Galaxi.Library.Callback.Callback;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.SubData.Client.DataClient;
 import net.ME1312.SubData.Client.SubDataClient;
@@ -14,7 +13,9 @@ import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.chat.ComponentSerializer;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.UUID;
+import java.util.function.IntConsumer;
 
 /**
  * Cached RemotePlayer Data Class
@@ -85,24 +86,24 @@ public class CachedPlayer extends RemotePlayer implements net.ME1312.SubServers.
         // These overrides provide for the static methods in BungeeCommon
         new RPSI() {
             @Override
-            protected void sendMessage(UUID[] players, String[] messages, Callback<Integer> response) {
+            protected void sendMessage(UUID[] players, String[] messages, IntConsumer response) {
                 RemotePlayer.sendMessage(players, messages, response);
             }
 
             @Override
-            protected void sendMessage(UUID[] players, BaseComponent[][] messages, Callback<Integer> response) {
+            protected void sendMessage(UUID[] players, BaseComponent[][] messages, IntConsumer response) {
                 String[] raw = new String[messages.length];
                 for (int i = 0; i < raw.length; ++i) raw[i] = ComponentSerializer.toString(messages[i]);
                 RemotePlayer.sendRawMessage(players, raw, response);
             }
 
             @Override
-            protected void transfer(UUID[] players, String server, Callback<Integer> response) {
+            protected void transfer(UUID[] players, String server, IntConsumer response) {
                 RemotePlayer.transfer(players, server, response);
             }
 
             @Override
-            protected void disconnect(UUID[] players, String reason, Callback<Integer> response) {
+            protected void disconnect(UUID[] players, String reason, IntConsumer response) {
                 RemotePlayer.disconnect(players, reason, response);
             }
         };
@@ -114,7 +115,7 @@ public class CachedPlayer extends RemotePlayer implements net.ME1312.SubServers.
             }
 
             @Override
-            protected void sendMessage(SubDataClient client, UUID[] players, String[] messages, Callback<Integer> response) {
+            protected void sendMessage(SubDataClient client, UUID[] players, String[] messages, IntConsumer response) {
                 if (players != null && players.length > 0) {
                     ArrayList<UUID> ids = new ArrayList<UUID>();
                     for (UUID id : players) {
@@ -127,7 +128,7 @@ public class CachedPlayer extends RemotePlayer implements net.ME1312.SubServers.
                     }
 
                     if (ids.size() == 0) {
-                        response.run(0);
+                        response.accept(0);
                     } else {
                         super.sendMessage(client, ids.toArray(new UUID[0]), messages, response);
                     }
@@ -137,7 +138,7 @@ public class CachedPlayer extends RemotePlayer implements net.ME1312.SubServers.
             }
 
             @Override
-            protected void sendRawMessage(SubDataClient client, UUID[] players, String[] messages, Callback<Integer> response) {
+            protected void sendRawMessage(SubDataClient client, UUID[] players, String[] messages, IntConsumer response) {
                 if (players != null && players.length > 0) {
                     ArrayList<UUID> ids = new ArrayList<UUID>();
                     BaseComponent[][] components = null;
@@ -157,7 +158,7 @@ public class CachedPlayer extends RemotePlayer implements net.ME1312.SubServers.
                     }
 
                     if (ids.size() == 0) {
-                        response.run(0);
+                        response.accept(0);
                     } else {
                         super.sendRawMessage(client, ids.toArray(new UUID[0]), messages, response);
                     }
@@ -167,7 +168,7 @@ public class CachedPlayer extends RemotePlayer implements net.ME1312.SubServers.
             }
 
             @Override
-            protected void transfer(SubDataClient client, UUID[] players, String server, Callback<Integer> response) {
+            protected void transfer(SubDataClient client, UUID[] players, String server, IntConsumer response) {
                 ArrayList<UUID> ids = new ArrayList<UUID>();
                 ServerImpl info = SubAPI.getInstance().getInternals().servers.get(server.toLowerCase());
                 int failures = 0;
@@ -183,15 +184,15 @@ public class CachedPlayer extends RemotePlayer implements net.ME1312.SubServers.
                 }
 
                 if (ids.size() == 0) {
-                    response.run(failures);
+                    response.accept(failures);
                 } else {
                     final int ff = failures;
-                    super.transfer(client, ids.toArray(new UUID[0]), server, i -> response.run(i + ff));
+                    super.transfer(client, ids.toArray(new UUID[0]), server, i -> response.accept(i + ff));
                 }
             }
 
             @Override
-            protected void disconnect(SubDataClient client, UUID[] players, String reason, Callback<Integer> response) {
+            protected void disconnect(SubDataClient client, UUID[] players, String reason, IntConsumer response) {
                 ArrayList<UUID> ids = new ArrayList<UUID>();
                 for (UUID id : players) {
                     ProxiedPlayer local = get(id);
@@ -205,7 +206,7 @@ public class CachedPlayer extends RemotePlayer implements net.ME1312.SubServers.
                 }
 
                 if (ids.size() == 0) {
-                    response.run(0);
+                    response.accept(0);
                 } else {
                     super.disconnect(client, ids.toArray(new UUID[0]), reason, response);
                 }
@@ -218,11 +219,11 @@ public class CachedPlayer extends RemotePlayer implements net.ME1312.SubServers.
         net.ME1312.SubServers.Bungee.Library.Compatibility.RemotePlayer.broadcastMessage(message);
     }
 
-    public static void broadcastMessage(BaseComponent message, Callback<Integer> response) {
+    public static void broadcastMessage(BaseComponent message, IntConsumer response) {
         net.ME1312.SubServers.Bungee.Library.Compatibility.RemotePlayer.broadcastMessage(message, response);
     }
 
-    public static void broadcastMessage(BaseComponent[] message, Callback<Integer> response) {
+    public static void broadcastMessage(BaseComponent[] message, IntConsumer response) {
         net.ME1312.SubServers.Bungee.Library.Compatibility.RemotePlayer.broadcastMessage(message, response);
     }
 
@@ -230,7 +231,7 @@ public class CachedPlayer extends RemotePlayer implements net.ME1312.SubServers.
         net.ME1312.SubServers.Bungee.Library.Compatibility.RemotePlayer.broadcastMessage(messages);
     }
 
-    public static void broadcastMessage(BaseComponent[][] messages, Callback<Integer> response) {
+    public static void broadcastMessage(BaseComponent[][] messages, IntConsumer response) {
         net.ME1312.SubServers.Bungee.Library.Compatibility.RemotePlayer.broadcastMessage(messages, response);
     }
 
@@ -238,11 +239,11 @@ public class CachedPlayer extends RemotePlayer implements net.ME1312.SubServers.
         net.ME1312.SubServers.Bungee.Library.Compatibility.RemotePlayer.sendMessage(players, message);
     }
 
-    public static void sendMessage(UUID[] players, BaseComponent message, Callback<Integer> response) {
+    public static void sendMessage(UUID[] players, BaseComponent message, IntConsumer response) {
         net.ME1312.SubServers.Bungee.Library.Compatibility.RemotePlayer.sendMessage(players, message, response);
     }
 
-    public static void sendMessage(UUID[] players, BaseComponent[] message, Callback<Integer> response) {
+    public static void sendMessage(UUID[] players, BaseComponent[] message, IntConsumer response) {
         net.ME1312.SubServers.Bungee.Library.Compatibility.RemotePlayer.sendMessage(players, message, response);
     }
 
@@ -250,7 +251,7 @@ public class CachedPlayer extends RemotePlayer implements net.ME1312.SubServers.
         net.ME1312.SubServers.Bungee.Library.Compatibility.RemotePlayer.sendMessage(players, messages);
     }
 
-    public static void sendMessage(UUID[] players, BaseComponent[][] messages, Callback<Integer> response) {
+    public static void sendMessage(UUID[] players, BaseComponent[][] messages, IntConsumer response) {
         net.ME1312.SubServers.Bungee.Library.Compatibility.RemotePlayer.sendMessage(players, messages, response);
     }
 
@@ -258,7 +259,7 @@ public class CachedPlayer extends RemotePlayer implements net.ME1312.SubServers.
         net.ME1312.SubServers.Bungee.Library.Compatibility.RemotePlayer.transfer(players, server);
     }
 
-    public static void transfer(UUID[] players, ServerInfo server, Callback<Integer> response) {
+    public static void transfer(UUID[] players, ServerInfo server, IntConsumer response) {
         net.ME1312.SubServers.Bungee.Library.Compatibility.RemotePlayer.transfer(players, server, response);
     }
 

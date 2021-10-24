@@ -20,7 +20,7 @@ public class SubNetworkDisconnectEvent extends Event implements SubEvent {
      * SubData Network Disconnect Event
      */
     public SubNetworkDisconnectEvent(DataServer network, DataClient client, DisconnectReason reason) {
-        if (Util.isNull(network, client, reason)) throw new NullPointerException();
+        Util.nullpo(network, client, reason);
         this.network = network;
         this.client = client;
         this.reason = reason;

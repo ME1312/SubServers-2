@@ -1,7 +1,6 @@
 package net.ME1312.SubServers.Sync;
 
-import net.ME1312.Galaxi.Library.Callback.Callback;
-import net.ME1312.Galaxi.Library.UniversalFile;
+import net.ME1312.Galaxi.Library.Try;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubData.Client.DataClient;
@@ -9,13 +8,13 @@ import net.ME1312.SubData.Client.DataProtocol;
 import net.ME1312.SubData.Client.SubDataClient;
 import net.ME1312.SubServers.Bungee.BungeeAPI;
 import net.ME1312.SubServers.Client.Common.ClientAPI;
-import net.ME1312.SubServers.Client.Common.Network.API.RemotePlayer;
 import net.ME1312.SubServers.Sync.Server.CachedPlayer;
 import net.ME1312.SubServers.Sync.Server.ServerImpl;
 
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.protocol.ProtocolConstants;
 
+import java.io.File;
 import java.util.*;
 
 /**
@@ -103,7 +102,7 @@ public final class SubAPI extends ClientAPI implements BungeeAPI {
      * @return Remote Player
      */
     public CachedPlayer getRemotePlayer(String name) {
-        if (Util.isNull(name)) throw new NullPointerException();
+        Util.nullpo(name);
         for (CachedPlayer player : getRemotePlayers().values()) {
             if (player.getName().equalsIgnoreCase(name)) return player;
         }
@@ -117,7 +116,7 @@ public final class SubAPI extends ClientAPI implements BungeeAPI {
      * @return Remote Player
      */
     public CachedPlayer getRemotePlayer(UUID id) {
-        if (Util.isNull(id)) throw new NullPointerException();
+        Util.nullpo(id);
         return getRemotePlayers().getOrDefault(id, null);
     }
 
@@ -159,7 +158,7 @@ public final class SubAPI extends ClientAPI implements BungeeAPI {
      * @return Lang Value
      */
     public Map<String, String> getLang(String channel) {
-        if (Util.isNull(channel)) throw new NullPointerException();
+        Util.nullpo(channel);
         return new LinkedHashMap<>(plugin.lang.value().get(channel.toLowerCase()));
     }
 
@@ -168,7 +167,7 @@ public final class SubAPI extends ClientAPI implements BungeeAPI {
      *
      * @return Directory
      */
-    public UniversalFile getRuntimeDirectory() {
+    public File getRuntimeDirectory() {
         return plugin.dir;
     }
 
@@ -208,12 +207,12 @@ public final class SubAPI extends ClientAPI implements BungeeAPI {
         if (GAME_VERSION == null) {
             if (System.getProperty("subservers.minecraft.version", "").length() > 0) {
                 return new Version[]{new Version(System.getProperty("subservers.minecraft.version"))};
-            } else if (Util.getDespiteException(() -> ProtocolConstants.SUPPORTED_VERSIONS != null, false)) {
+            } else if (Try.all.get(() -> ProtocolConstants.SUPPORTED_VERSIONS != null, false)) {
                 List<Version> versions = new LinkedList<Version>();
                 for (String version : ProtocolConstants.SUPPORTED_VERSIONS) versions.add(new Version(version));
                 Collections.sort(versions);
                 return versions.toArray(new Version[versions.size()]);
-            } else if (Util.getDespiteException(() -> plugin.getGameVersion() != null, false)) {
+            } else if (Try.all.get(() -> plugin.getGameVersion() != null, false)) {
                 String raw = plugin.getGameVersion();
                 if (raw.contains("-") || raw.contains(",")) {
                     List<Version> versions = new LinkedList<Version>();

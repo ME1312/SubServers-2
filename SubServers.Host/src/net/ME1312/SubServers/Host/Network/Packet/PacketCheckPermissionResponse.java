@@ -1,6 +1,5 @@
 package net.ME1312.SubServers.Host.Network.Packet;
 
-import net.ME1312.Galaxi.Library.Callback.Callback;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.SubData.Client.Protocol.Forwardable;
 import net.ME1312.SubData.Client.Protocol.PacketObjectIn;
@@ -8,6 +7,7 @@ import net.ME1312.SubData.Client.Protocol.PacketObjectOut;
 import net.ME1312.SubData.Client.SubDataSender;
 
 import java.util.UUID;
+import java.util.function.Consumer;
 
 import static net.ME1312.SubServers.Host.Network.Packet.PacketCheckPermission.callbacks;
 
@@ -46,7 +46,7 @@ public class PacketCheckPermissionResponse implements Forwardable, PacketObjectI
 
     @Override
     public void receive(SubDataSender client, ObjectMap<Integer> data) throws Throwable {
-        for (Callback<Boolean> callback : callbacks.get(data.getUUID(0x0000))) callback.run(data.getBoolean(0x0001));
+        for (Consumer<Boolean> callback : callbacks.get(data.getUUID(0x0000))) callback.accept(data.getBoolean(0x0001));
         callbacks.remove(data.getUUID(0x0000));
     }
 

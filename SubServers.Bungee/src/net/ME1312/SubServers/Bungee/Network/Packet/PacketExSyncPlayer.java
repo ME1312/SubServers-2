@@ -32,7 +32,7 @@ public class PacketExSyncPlayer implements PacketObjectIn<Integer>, PacketObject
      * @param plugin SubPlugin
      */
     public PacketExSyncPlayer(SubProxy plugin) {
-        if (Util.isNull(plugin)) throw new NullPointerException();
+        Util.nullpo(plugin);
         this.plugin = plugin;
     }
 

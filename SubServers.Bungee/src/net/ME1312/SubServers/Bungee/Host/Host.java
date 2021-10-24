@@ -14,13 +14,16 @@ import com.google.common.collect.Range;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 import java.net.InetAddress;
-import java.util.*;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.UUID;
 
 /**
  * Host Layout Class
  */
-public abstract class Host implements ExtraDataHandler {
-    private ObjectMap<String> extra = new ObjectMap<String>();
+public abstract class Host implements ExtraDataHandler<String> {
+    private final ObjectMap<String> extra = new ObjectMap<String>();
     private final String signature;
     private String nick = null;
 
@@ -40,7 +43,7 @@ public abstract class Host implements ExtraDataHandler {
     public Host(SubProxy plugin, String name, boolean enabled, Range<Integer> ports, boolean log, InetAddress address, String directory, String gitBash) {
         if (name.contains(" ")) throw new InvalidHostException("Host names cannot have spaces: " + name);
         if (!ports.hasLowerBound() || !ports.hasUpperBound()) throw new InvalidHostException("Port range is not bound");
-        if (Util.isNull(plugin, name, enabled, ports, log, address, directory, gitBash)) throw new NullPointerException();
+        Util.nullpo(plugin, name, enabled, ports, log, address, directory, gitBash);
         signature = plugin.api.signAnonymousObject();
         SubAPI.getInstance().getInternals().subprotocol.whitelist(address.getHostAddress());
     }
@@ -533,19 +536,19 @@ public abstract class Host implements ExtraDataHandler {
 
     @Override
     public void addExtra(String handle, Object value) {
-        if (Util.isNull(handle, value)) throw new NullPointerException();
+        Util.nullpo(handle, value);
         extra.set(handle, value);
     }
 
     @Override
     public boolean hasExtra(String handle) {
-        if (Util.isNull(handle)) throw new NullPointerException();
+        Util.nullpo(handle);
         return extra.getKeys().contains(handle);
     }
 
     @Override
     public ObjectMapValue getExtra(String handle) {
-        if (Util.isNull(handle)) throw new NullPointerException();
+        Util.nullpo(handle);
         return extra.get(handle);
     }
 
@@ -556,7 +559,7 @@ public abstract class Host implements ExtraDataHandler {
 
     @Override
     public void removeExtra(String handle) {
-        if (Util.isNull(handle)) throw new NullPointerException();
+        Util.nullpo(handle);
         extra.remove(handle);
     }
 

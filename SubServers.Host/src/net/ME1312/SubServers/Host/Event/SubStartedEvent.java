@@ -16,7 +16,7 @@ public class SubStartedEvent extends Event {
      * @param server Server that Started
      */
     public SubStartedEvent(String server) {
-        if (Util.isNull(server)) throw new NullPointerException();
+        Util.nullpo(server);
         this.server = server;
     }
 

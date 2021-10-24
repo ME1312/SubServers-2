@@ -43,7 +43,7 @@ public abstract class UIRenderer {
      * @param player Player
      */
     public UIRenderer(SubPlugin plugin, UUID player) {
-        if (Util.isNull(plugin, player)) throw new NullPointerException();
+        Util.nullpo(plugin, player);
         this.plugin = plugin;
         this.player = player;
 
@@ -351,7 +351,7 @@ public abstract class UIRenderer {
      * @param renderer Renderer
      */
     public static void addHostPlugin(String handle, PluginRenderer<Host> renderer) {
-        if (Util.isNull(handle, renderer)) throw new NullPointerException();
+        Util.nullpo(handle, renderer);
         hostPlugins.put(handle, renderer);
     }
 
@@ -370,7 +370,7 @@ public abstract class UIRenderer {
      * @param handle Handle
      */
     public static void removeHostPlugin(String handle) {
-        if (Util.isNull(handle)) throw new NullPointerException();
+        Util.nullpo(handle);
         hostPlugins.remove(handle);
     }
 
@@ -381,7 +381,7 @@ public abstract class UIRenderer {
      * @param renderer Renderer
      */
     public static void addSubServerPlugin(String handle, PluginRenderer<SubServer> renderer) {
-        if (Util.isNull(handle, renderer)) throw new NullPointerException();
+        Util.nullpo(handle, renderer);
         subserverPlugins.put(handle, renderer);
     }
 
@@ -400,7 +400,7 @@ public abstract class UIRenderer {
      * @param handle Handle
      */
     public static void removeSubServerPlugin(String handle) {
-        if (Util.isNull(handle)) throw new NullPointerException();
+        Util.nullpo(handle);
         subserverPlugins.remove(handle);
     }
 
@@ -539,7 +539,7 @@ public abstract class UIRenderer {
          * @param value Value
          */
         public void setName(String value) {
-            if (Util.isNull(value)) throw new NullPointerException();
+            Util.nullpo(value);
             final String name = this.name;
             history.add(() -> this.name = name);
             this.name = value;
@@ -560,7 +560,7 @@ public abstract class UIRenderer {
          * @param value Value
          */
         public void setTemplate(String value) {
-            if (Util.isNull(value)) throw new NullPointerException();
+            Util.nullpo(value);
             final String template = this.template;
             history.add(() -> this.template = template);
             this.template = value;

@@ -1,11 +1,10 @@
 package net.ME1312.SubServers.Bungee;
 
-import net.ME1312.Galaxi.Library.Callback.Callback;
-import net.ME1312.Galaxi.Library.Callback.ReturnRunnable;
 import net.ME1312.Galaxi.Library.Container.ContainedPair;
 import net.ME1312.Galaxi.Library.Container.Pair;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Platform;
+import net.ME1312.Galaxi.Library.Try;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubData.Server.ClientHandler;
@@ -33,6 +32,8 @@ import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 /**
  * Plugin Command Class
@@ -102,7 +103,7 @@ public final class SubCommand extends Command implements TabExecutor {
                                     plugin.stopListeners();
                                     plugin.getLogger().info("Closing player connections");
                                     for (ProxiedPlayer player : plugin.getPlayers()) {
-                                        Util.isException(() -> player.disconnect(plugin.getTranslation("restart")));
+                                        Try.all.run(() -> player.disconnect(plugin.getTranslation("restart")));
                                     }
                                     plugin.shutdown();
                                 case "*":
@@ -432,7 +433,7 @@ public final class SubCommand extends Command implements TabExecutor {
                     if (args.length > 1) {
                         ServerSelection select = selectServers(sender, args, 1, true);
                         if (select.subservers.length > 0) {
-                            Callback<SubServer> starter = server -> {
+                            Consumer<SubServer> starter = server -> {
                                 Map<String, Server> servers = plugin.api.getServers();
                                 if (!servers.keySet().contains(server.getName().toLowerCase()) || !(servers.get(server.getName().toLowerCase()) instanceof SubServer)) {
                                     sender.sendMessage("SubServers > Could not restart server: Subserver " + server.getName() + " has disappeared");
@@ -467,7 +468,7 @@ public final class SubCommand extends Command implements TabExecutor {
                                             try {
                                                 server.waitFor();
                                                 Thread.sleep(100);
-                                                starter.run(server);
+                                                starter.accept(server);
                                             } catch (Exception e) {
                                                 e.printStackTrace();
                                             }
@@ -475,7 +476,7 @@ public final class SubCommand extends Command implements TabExecutor {
                                         success++;
                                     }
                                 } else {
-                                    starter.run(server);
+                                    starter.accept(server);
                                     success++;
                                 }
                             }
@@ -583,7 +584,7 @@ public final class SubCommand extends Command implements TabExecutor {
                             sender.sendMessage("SubServers > That template is not enabled");
                         } else if (args.length <= 4 && plugin.hosts.get(args[2].toLowerCase()).getCreator().getTemplate(args[3].toLowerCase()).requiresVersion()) {
                             sender.sendMessage("SubServers > That template requires a Minecraft version to be specified");
-                        } else if (args.length > 5 && (Util.isException(() -> Integer.parseInt(args[5])) || Integer.parseInt(args[5]) <= 0 || Integer.parseInt(args[5]) > 65535)) {
+                        } else if (args.length > 5 && (!Try.all.run(() -> Integer.parseInt(args[5])) || Integer.parseInt(args[5]) <= 0 || Integer.parseInt(args[5]) > 65535)) {
                             sender.sendMessage("SubServers > Invalid port number");
                         } else {
                             plugin.hosts.get(args[2].toLowerCase()).getCreator().create(args[1], plugin.hosts.get(args[2].toLowerCase()).getCreator().getTemplate(args[3].toLowerCase()), (args.length > 4)?new Version(args[4]):null, (args.length > 5)?Integer.parseInt(args[5]):null);
@@ -877,7 +878,7 @@ public final class SubCommand extends Command implements TabExecutor {
             return list;
         } else {
             if (args[0].equals("info") || args[0].equals("status")) {
-                ReturnRunnable<Collection<String>> getPlayers = () -> {
+                Supplier<Collection<String>> getPlayers = () -> {
                     LinkedList<String> names = new LinkedList<String>();
                     for (ProxiedPlayer player : plugin.getPlayers()) names.add(player.getName());
                     for (RemotePlayer player : plugin.api.getRemotePlayers().values()) if (!names.contains(player.getName())) names.add(player.getName());
@@ -917,7 +918,7 @@ public final class SubCommand extends Command implements TabExecutor {
                         if (!list.contains(server.getName()) && server.getName().toLowerCase().startsWith(last))
                             list.add(Last + server.getName().substring(last.length()));
                     }
-                    for (String player : getPlayers.run()) {
+                    for (String player : getPlayers.get()) {
                         if (!list.contains(player) && player.toLowerCase().startsWith(last))
                             list.add(Last + player.substring(last.length()));
                     }
@@ -958,8 +959,10 @@ public final class SubCommand extends Command implements TabExecutor {
                                     list.add(Last + server.getName().substring(last.length()));
                             }
                             break;
+                        case "u":
+                        case "user":
                         case "player":
-                            for (String player : getPlayers.run()) {
+                            for (String player : getPlayers.get()) {
                                 if (player.toLowerCase().startsWith(last))
                                     list.add(Last + player.substring(last.length()));
                             }
@@ -1072,7 +1075,7 @@ public final class SubCommand extends Command implements TabExecutor {
                     return Collections.singletonList("[Version]");
                 } else if (args.length == 6) {
                     if (last.length() > 0) {
-                        if (Util.isException(() -> Integer.parseInt(last)) || Integer.parseInt(last) <= 0 || Integer.parseInt(last) > 65535) {
+                        if (!Try.all.run(() -> Integer.parseInt(last)) || Integer.parseInt(last) <= 0 || Integer.parseInt(last) > 65535) {
                             return Collections.emptyList();
                         }
                     }

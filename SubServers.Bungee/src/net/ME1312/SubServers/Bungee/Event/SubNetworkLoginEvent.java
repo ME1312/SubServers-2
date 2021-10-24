@@ -18,7 +18,7 @@ public class SubNetworkLoginEvent extends Event implements SubEvent {
      * SubData Network Login Event
      */
     public SubNetworkLoginEvent(DataServer network, DataClient client) {
-        if (Util.isNull(network, client)) throw new NullPointerException();
+        Util.nullpo(network, client);
         this.network = network;
         this.client = client;
     }

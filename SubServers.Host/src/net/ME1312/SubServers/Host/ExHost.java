@@ -5,13 +5,13 @@ import net.ME1312.Galaxi.Event.Engine.GalaxiReloadEvent;
 import net.ME1312.Galaxi.Library.Config.YAMLConfig;
 import net.ME1312.Galaxi.Library.Config.YAMLSection;
 import net.ME1312.Galaxi.Library.Container.Pair;
-import net.ME1312.Galaxi.Log.Logger;
+import net.ME1312.Galaxi.Library.Directories;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Platform;
-import net.ME1312.Galaxi.Library.UniversalFile;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.Galaxi.Library.Version.VersionType;
+import net.ME1312.Galaxi.Log.Logger;
 import net.ME1312.Galaxi.Plugin.App;
 import net.ME1312.Galaxi.Plugin.PluginInfo;
 import net.ME1312.SubData.Client.DataClient;
@@ -31,7 +31,6 @@ import com.dosse.upnp.UPnP;
 import org.json.JSONObject;
 
 import java.io.*;
-import java.lang.reflect.InvocationTargetException;
 import java.net.InetAddress;
 import java.net.URL;
 import java.nio.charset.Charset;
@@ -120,36 +119,36 @@ public final class ExHost {
             engine = GalaxiEngine.init(info);
             log.info.println("Loading SubServers.Host v" + info.getVersion().toString() + " Libraries");
 
-            ConfigUpdater.updateConfig(new UniversalFile(engine.getRuntimeDirectory(), "config.yml"));
-            config = new YAMLConfig(new UniversalFile(engine.getRuntimeDirectory(), "config.yml"));
+            ConfigUpdater.updateConfig(new File(engine.getRuntimeDirectory(), "config.yml"));
+            config = new YAMLConfig(new File(engine.getRuntimeDirectory(), "config.yml"));
 
-            if (!(new UniversalFile(engine.getRuntimeDirectory(), "Templates").exists())) {
-                new UniversalFile(engine.getRuntimeDirectory(), "Templates").mkdirs();
+            if (!(new File(engine.getRuntimeDirectory(), "Templates").exists())) {
+                new File(engine.getRuntimeDirectory(), "Templates").mkdirs();
                 log.info.println("Created ./Templates/");
             }
 
-            if (new UniversalFile(engine.getRuntimeDirectory(), "Recently Deleted").exists()) {
-                int f = new UniversalFile(engine.getRuntimeDirectory(), "Recently Deleted").listFiles().length;
-                for (File file : new UniversalFile(engine.getRuntimeDirectory(), "Recently Deleted").listFiles()) {
+            if (new File(engine.getRuntimeDirectory(), "Recently Deleted").exists()) {
+                int f = new File(engine.getRuntimeDirectory(), "Recently Deleted").listFiles().length;
+                for (File file : new File(engine.getRuntimeDirectory(), "Recently Deleted").listFiles()) {
                     try {
                         if (file.isDirectory()) {
-                            if (new UniversalFile(engine.getRuntimeDirectory(), "Recently Deleted:" + file.getName() + ":info.json").exists()) {
-                                FileReader reader = new FileReader(new UniversalFile(engine.getRuntimeDirectory(), "Recently Deleted:" + file.getName() + ":info.json"));
+                            if (new File(engine.getRuntimeDirectory(), "Recently Deleted/" + file.getName() + "/info.json").exists()) {
+                                FileReader reader = new FileReader(new File(engine.getRuntimeDirectory(), "Recently Deleted/" + file.getName() + "/info.json"));
                                 JSONObject json = new JSONObject(Util.readAll(reader));
                                 reader.close();
                                 if (json.keySet().contains("Timestamp")) {
                                     if (TimeUnit.MILLISECONDS.toDays(Calendar.getInstance().getTime().getTime() - json.getLong("Timestamp")) >= 7) {
-                                        Util.deleteDirectory(file);
+                                        Directories.delete(file);
                                         f--;
                                         log.info.println("Removed ./Recently Deleted/" + file.getName());
                                     }
                                 } else {
-                                    Util.deleteDirectory(file);
+                                    Directories.delete(file);
                                     f--;
                                     log.info.println("Removed ./Recently Deleted/" + file.getName());
                                 }
                             } else {
-                                Util.deleteDirectory(file);
+                                Directories.delete(file);
                                 f--;
                                 log.info.println("Removed ./Recently Deleted/" + file.getName());
                             }
@@ -163,7 +162,7 @@ public final class ExHost {
                     }
                 }
                 if (f <= 0) {
-                    Files.delete(new UniversalFile(engine.getRuntimeDirectory(), "Recently Deleted").toPath());
+                    Files.delete(new File(engine.getRuntimeDirectory(), "Recently Deleted").toPath());
                 }
             }
 
@@ -171,7 +170,7 @@ public final class ExHost {
             Util.reflect(SubLoggerImpl.class.getDeclaredField("logc"), null, config.get().getMap("Settings").getBoolean("Console-Log", true));
 
             loadDefaults();
-            engine.getPluginManager().loadPlugins(new UniversalFile(engine.getRuntimeDirectory(), "Plugins"));
+            engine.getPluginManager().loadPlugins(new File(engine.getRuntimeDirectory(), "Plugins"));
 
             running = true;
             creator = new SubCreatorImpl(this);
@@ -194,9 +193,9 @@ public final class ExHost {
 
                 log.info.println("AES Encryption Available");
             }
-            if (new UniversalFile(engine.getRuntimeDirectory(), "subdata.rsa.key").exists()) {
+            if (new File(engine.getRuntimeDirectory(), "subdata.rsa.key").exists()) {
                 try {
-                    subprotocol.registerCipher("RSA", new RSA(new UniversalFile(engine.getRuntimeDirectory(), "subdata.rsa.key")));
+                    subprotocol.registerCipher("RSA", new RSA(new File(engine.getRuntimeDirectory(), "subdata.rsa.key")));
                     log.info.println("RSA Encryption Available");
                 } catch (Exception e) {
                     log.error.println(e);
@@ -255,7 +254,7 @@ public final class ExHost {
     public void reload(boolean notifyPlugins) throws IOException {
         resetDate = Calendar.getInstance().getTime().getTime();
 
-        ConfigUpdater.updateConfig(new UniversalFile(engine.getRuntimeDirectory(), "config.yml"));
+        ConfigUpdater.updateConfig(new File(engine.getRuntimeDirectory(), "config.yml"));
         config.reload();
         creator.load(false);
 
@@ -341,7 +340,7 @@ public final class ExHost {
                 log.error.println(e);
             }
 
-            if (new UniversalFile(engine.getRuntimeDirectory(), "Cache:Remote").exists()) Util.deleteDirectory(new UniversalFile(engine.getRuntimeDirectory(), "Cache:Remote"));
+            if (new File(engine.getRuntimeDirectory(), "Cache/Remote").exists()) Directories.delete(new File(engine.getRuntimeDirectory(), "Cache/Remote"));
         }
     }
 }

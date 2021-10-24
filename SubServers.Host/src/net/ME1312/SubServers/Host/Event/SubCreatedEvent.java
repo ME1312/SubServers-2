@@ -1,6 +1,5 @@
 package net.ME1312.SubServers.Host.Event;
 
-import net.ME1312.Galaxi.Library.Callback.Callback;
 import net.ME1312.Galaxi.Event.Event;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
@@ -9,6 +8,7 @@ import net.ME1312.SubServers.Host.SubAPI;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 /**
  * Server Created Event
@@ -34,7 +34,7 @@ public class SubCreatedEvent extends Event {
      * @param port Server Port Number
      */
     public SubCreatedEvent(UUID player, String host, String name, String template, Version version, int port, boolean update, boolean success) {
-        if (Util.isNull(host, name, template, port)) throw new NullPointerException();
+        Util.nullpo(host, name, template, port);
         this.player = player;
         this.success = success;
         this.update = update;
@@ -77,10 +77,10 @@ public class SubCreatedEvent extends Event {
      *
      * @param callback Updating Server
      */
-    public void getServer(Callback<SubServer> callback) {
+    public void getServer(Consumer<SubServer> callback) {
         if (!update && !success) {
             try {
-                callback.run(null);
+                callback.accept(null);
             } catch (Throwable e) {
                 Throwable ew = new InvocationTargetException(e);
                 ew.printStackTrace();

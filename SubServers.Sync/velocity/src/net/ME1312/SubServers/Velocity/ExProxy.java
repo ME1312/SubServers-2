@@ -3,7 +3,7 @@ package net.ME1312.SubServers.Velocity;
 import net.ME1312.Galaxi.Library.Config.YAMLConfig;
 import net.ME1312.Galaxi.Library.Container.Pair;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
-import net.ME1312.Galaxi.Library.UniversalFile;
+import net.ME1312.Galaxi.Library.Try;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubData.Client.DataClient;
@@ -13,7 +13,10 @@ import net.ME1312.SubData.Client.Encryption.RSA;
 import net.ME1312.SubData.Client.Library.DisconnectReason;
 import net.ME1312.SubData.Client.SubDataClient;
 import net.ME1312.SubServers.Client.Common.Network.Packet.PacketDisconnectPlayer;
-import net.ME1312.SubServers.Velocity.Event.*;
+import net.ME1312.SubServers.Velocity.Event.SubAddServerEvent;
+import net.ME1312.SubServers.Velocity.Event.SubRemoveServerEvent;
+import net.ME1312.SubServers.Velocity.Event.SubStartEvent;
+import net.ME1312.SubServers.Velocity.Event.SubStoppedEvent;
 import net.ME1312.SubServers.Velocity.Library.Compatibility.ChatColor;
 import net.ME1312.SubServers.Velocity.Library.Compatibility.Logger;
 import net.ME1312.SubServers.Velocity.Library.ConfigUpdater;
@@ -51,7 +54,10 @@ import net.kyori.adventure.text.TextReplacementConfig;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.InetAddress;
 import java.net.URL;
 import java.nio.charset.Charset;
@@ -70,7 +76,7 @@ public class ExProxy {
     private final HashMap<UUID, FallbackState> fallback = new HashMap<UUID, FallbackState>();
 
     public final org.apache.logging.log4j.Logger out;
-    public final UniversalFile dir = new UniversalFile(new File(System.getProperty("user.dir")));
+    public final File dir = new File(System.getProperty("user.dir"));
     public YAMLConfig config;
     public final PluginDescription plugin;
     private final ProxyServer proxy;
@@ -93,13 +99,13 @@ public class ExProxy {
         Util.reflect(Logger.class.getDeclaredField("parent"), null, (this.out = Util.reflect(proxy.getClass().getDeclaredField("logger"), proxy)));
 
         Logger.get("SubServers").info("Loading SubServers.Sync v" + version.toString() + " Libraries (for Minecraft " + api.getGameVersion()[api.getGameVersion().length - 1] + ")");
-        Util.isException(() -> new CachedPlayer((Player) null)); // runs <clinit>
+        Try.all.run(() -> new CachedPlayer((Player) null)); // runs <clinit>
 
-        UniversalFile dir = new UniversalFile(this.dir, "SubServers");
+        File dir = new File(this.dir, "SubServers");
         dir.mkdir();
 
-        ConfigUpdater.updateConfig(new UniversalFile(dir, "sync.yml"));
-        config = new YAMLConfig(new UniversalFile(dir, "sync.yml"));
+        ConfigUpdater.updateConfig(new File(dir, "sync.yml"));
+        config = new YAMLConfig(new File(dir, "sync.yml"));
 
         SmartFallback.addInspector((player, info) -> {
             ServerData server = getData(info.getServerInfo());
@@ -135,7 +141,7 @@ public class ExProxy {
             SmartFallback.dns_forward = config.get().getMap("Settings").getMap("Smart-Fallback", new ObjectMap<>()).getBoolean("DNS-Forward", false);
 
             resetDate = Calendar.getInstance().getTime().getTime();
-            ConfigUpdater.updateConfig(new UniversalFile(dir, "SubServers:sync.yml"));
+            ConfigUpdater.updateConfig(new File(dir, "SubServers/sync.yml"));
             config.reload();
 
             synchronized (rPlayers) {
@@ -164,9 +170,9 @@ public class ExProxy {
 
                 Logger.get("SubData").info("AES Encryption Available");
             }
-            if (new UniversalFile(dir, "SubServers:subdata.rsa.key").exists()) {
+            if (new File(dir, "SubServers/subdata.rsa.key").exists()) {
                 try {
-                    subprotocol.registerCipher("RSA", new RSA(new UniversalFile(dir, "SubServers:subdata.rsa.key")));
+                    subprotocol.registerCipher("RSA", new RSA(new File(dir, "SubServers/subdata.rsa.key")));
                     Logger.get("SubData").info("RSA Encryption Available");
                 } catch (Exception x) {
                     x.printStackTrace();
@@ -369,7 +375,7 @@ public class ExProxy {
             tmp.addAll(subdata.values());
             for (SubDataClient client : tmp) if (client != null) {
                 client.close();
-                Util.isException(client::waitFor);
+                Try.all.run(client::waitFor);
             }
             subdata.clear();
             subdata.put(0, null);

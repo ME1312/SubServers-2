@@ -28,7 +28,7 @@ public class SubEditServerEvent extends AbstractEvent implements SubEvent {
      * @param edit Edit to make
      */
     public SubEditServerEvent(UUID player, String server, Pair<String, ?> edit) {
-        if (Util.isNull(server, edit)) throw new NullPointerException();
+        Util.nullpo(server, edit);
         ObjectMap<String> section = new ObjectMap<String>();
         section.set(".", edit.value());
         this.player = player;

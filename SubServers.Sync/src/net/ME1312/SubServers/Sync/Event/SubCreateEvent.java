@@ -1,6 +1,5 @@
 package net.ME1312.SubServers.Sync.Event;
 
-import net.ME1312.Galaxi.Library.Callback.Callback;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubServers.Client.Common.Network.API.SubServer;
@@ -11,6 +10,7 @@ import net.md_5.bungee.api.plugin.Event;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 /**
  * Server Create Event
@@ -35,7 +35,7 @@ public class SubCreateEvent extends Event implements SubEvent {
      * @param port Server Port Number
      */
     public SubCreateEvent(UUID player, String host, String name, String template, Version version, int port, boolean update) {
-        if (Util.isNull(host, name, template, version, port)) throw new NullPointerException();
+        Util.nullpo(host, name, template, version, port);
         this.player = player;
         this.update = update;
         this.host = host;
@@ -68,10 +68,10 @@ public class SubCreateEvent extends Event implements SubEvent {
      *
      * @param callback Updating Server
      */
-    public void getUpdatingServer(Callback<SubServer> callback) {
+    public void getUpdatingServer(Consumer<SubServer> callback) {
         if (!update) {
             try {
-                callback.run(null);
+                callback.accept(null);
             } catch (Throwable e) {
                 Throwable ew = new InvocationTargetException(e);
                 ew.printStackTrace();

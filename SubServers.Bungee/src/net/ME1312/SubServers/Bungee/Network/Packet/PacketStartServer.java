@@ -27,7 +27,7 @@ public class PacketStartServer implements PacketObjectIn<Integer>, PacketObjectO
      * @param plugin SubPlugin
      */
     public PacketStartServer(SubProxy plugin) {
-        if (Util.isNull(plugin)) throw new NullPointerException();
+        Util.nullpo(plugin);
         this.plugin = plugin;
     }
 

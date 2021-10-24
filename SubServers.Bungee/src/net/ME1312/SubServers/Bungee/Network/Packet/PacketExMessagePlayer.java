@@ -1,6 +1,5 @@
 package net.ME1312.SubServers.Bungee.Network.Packet;
 
-import net.ME1312.Galaxi.Library.Callback.Callback;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubData.Server.Protocol.PacketObjectIn;
@@ -10,12 +9,13 @@ import net.ME1312.SubData.Server.SubDataClient;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 /**
  * Message External Player Packet
  */
 public class PacketExMessagePlayer implements PacketObjectIn<Integer>, PacketObjectOut<Integer> {
-    private static HashMap<UUID, Callback<ObjectMap<Integer>>[]> callbacks = new HashMap<UUID, Callback<ObjectMap<Integer>>[]>();
+    private static HashMap<UUID, Consumer<ObjectMap<Integer>>[]> callbacks = new HashMap<UUID, Consumer<ObjectMap<Integer>>[]>();
     private List<UUID> players;
     private List<String> legacy, raw;
     private UUID id;
@@ -34,7 +34,7 @@ public class PacketExMessagePlayer implements PacketObjectIn<Integer>, PacketObj
      * @param callback Callbacks
      */
     @SafeVarargs
-    public PacketExMessagePlayer(List<UUID> players, List<String> legacy, List<String> raw, Callback<ObjectMap<Integer>>... callback) {
+    public PacketExMessagePlayer(List<UUID> players, List<String> legacy, List<String> raw, Consumer<ObjectMap<Integer>>... callback) {
         this.players = players;
         this.legacy = legacy;
         this.raw = raw;
@@ -54,7 +54,7 @@ public class PacketExMessagePlayer implements PacketObjectIn<Integer>, PacketObj
 
     @Override
     public void receive(SubDataClient client, ObjectMap<Integer> data) {
-        for (Callback<ObjectMap<Integer>> callback : callbacks.get(data.getUUID(0x0000))) callback.run(data);
+        for (Consumer<ObjectMap<Integer>> callback : callbacks.get(data.getUUID(0x0000))) callback.accept(data);
         callbacks.remove(data.getUUID(0x0000));
     }
 

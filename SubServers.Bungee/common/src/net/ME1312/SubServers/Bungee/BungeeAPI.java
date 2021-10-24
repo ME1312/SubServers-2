@@ -1,6 +1,5 @@
 package net.ME1312.SubServers.Bungee;
 
-import net.ME1312.Galaxi.Library.UniversalFile;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubServers.Bungee.Library.Compatibility.RemotePlayer;
@@ -8,6 +7,7 @@ import net.ME1312.SubServers.Bungee.Library.Compatibility.RemotePlayer;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;
 
+import java.io.File;
 import java.util.Collection;
 import java.util.Map;
 import java.util.UUID;
@@ -23,7 +23,7 @@ public interface BungeeAPI {
      * @return SubAPI BungeeCord Common
      */
     static BungeeAPI getInstance() {
-        return ((BungeeCommon) ProxyServer.getInstance()).api.run();
+        return ((BungeeCommon) ProxyServer.getInstance()).api.get();
     }
 
     /**
@@ -96,7 +96,7 @@ public interface BungeeAPI {
      * @return Lang Values
      */
     default String getLang(String channel, String key) {
-        if (Util.isNull(channel, key)) throw new NullPointerException();
+        Util.nullpo(channel, key);
         return getLang(channel).get(key);
     }
 
@@ -105,7 +105,7 @@ public interface BungeeAPI {
      *
      * @return Directory
      */
-    UniversalFile getRuntimeDirectory();
+    File getRuntimeDirectory();
 
     /**
      * Gets the SubServers Version

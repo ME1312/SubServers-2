@@ -1,13 +1,10 @@
 package net.ME1312.SubServers.Sync.Network.Packet;
 
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
-import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubData.Client.Protocol.PacketObjectIn;
 import net.ME1312.SubData.Client.SubDataSender;
 import net.ME1312.SubServers.Sync.ExProxy;
 import net.ME1312.SubServers.Sync.Server.ServerImpl;
-
-import java.util.ArrayList;
 
 /**
  * Server Edit Notification Packet

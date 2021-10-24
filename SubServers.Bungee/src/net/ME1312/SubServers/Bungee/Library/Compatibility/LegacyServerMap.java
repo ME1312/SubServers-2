@@ -5,10 +5,8 @@ import net.ME1312.SubServers.Bungee.SubAPI;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.util.CaseInsensitiveMap;
 
-import java.util.Collection;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 
 /**
  * Legacy Server Map Translation Class

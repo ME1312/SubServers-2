@@ -1,8 +1,6 @@
 package net.ME1312.SubServers.Console;
 
-import net.ME1312.Galaxi.Library.Callback.ExceptionReturnRunnable;
-import net.ME1312.Galaxi.Library.Callback.ExceptionRunnable;
-import net.ME1312.Galaxi.Library.Util;
+import net.ME1312.Galaxi.Library.Try;
 import net.ME1312.SubServers.Bungee.Host.SubCreator;
 import net.ME1312.SubServers.Bungee.Host.SubLogFilter;
 import net.ME1312.SubServers.Bungee.Host.SubLogger;
@@ -370,7 +368,7 @@ public final class ConsoleWindow implements SubLogFilter {
         window.setJMenuBar(jMenu);
         window.setContentPane(panel);
         window.pack();
-        Util.isException(new ExceptionRunnable() {
+        Try.all.run(new Try.Runnable() {
             @Override
             public void run() throws Throwable {
                 window.setIconImage(ImageIO.read(ConsolePlugin.class.getResourceAsStream("/net/ME1312/SubServers/Console/ConsoleIcon.png")));

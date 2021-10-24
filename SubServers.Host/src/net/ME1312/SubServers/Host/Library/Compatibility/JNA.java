@@ -2,8 +2,8 @@ package net.ME1312.SubServers.Host.Library.Compatibility;
 
 import net.ME1312.Galaxi.Galaxi;
 import net.ME1312.Galaxi.Log.Logger;
-import net.ME1312.Galaxi.Library.UniversalFile;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.net.URL;
@@ -30,8 +30,8 @@ public class JNA {
         if (JNA == null) {
             boolean announced = false;
             Logger log = new Logger("JNA");
-            UniversalFile library = new UniversalFile(Galaxi.getInstance().getRuntimeDirectory(), "Cache:Libraries");
-            UniversalFile jna = new UniversalFile(library, "jna-" + JNA_VERSION + ".jar");
+            File library = new File(Galaxi.getInstance().getRuntimeDirectory(), "Cache/Libraries");
+            File jna = new File(library, "jna-" + JNA_VERSION + ".jar");
             jna.getParentFile().mkdirs();
             if (!jna.exists()) {
                 log.info.println("Downloading JNA Library v" + JNA_VERSION);
@@ -43,7 +43,7 @@ public class JNA {
                     log.error.println(e);
                 }
             }
-            UniversalFile platform = new UniversalFile(library, "jna-platform-" + JNA_VERSION + ".jar");
+            File platform = new File(library, "jna-platform-" + JNA_VERSION + ".jar");
             platform.getParentFile().mkdirs();
             if (!platform.exists()) {
                 if (!announced) log.info.println("Downloading JNA Library v" + JNA_VERSION);

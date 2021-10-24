@@ -20,7 +20,7 @@ public class SubNetworkConnectEvent extends Event implements SubEvent, Cancellab
      * SubData Network Connect Event
      */
     public SubNetworkConnectEvent(DataServer network, DataClient client) {
-        if (Util.isNull(network, client)) throw new NullPointerException();
+        Util.nullpo(network, client);
         this.network = network;
         this.client = client;
     }

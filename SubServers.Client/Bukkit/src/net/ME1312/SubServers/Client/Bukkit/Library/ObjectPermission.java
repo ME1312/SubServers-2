@@ -49,7 +49,7 @@ public class ObjectPermission {
      * @return Permission Check Result
      */
     public static boolean permits(String string, Permissible object, String... permissions) {
-        if (Util.isNull(object)) throw new NullPointerException();
+        Util.nullpo(object);
         boolean permitted = false;
 
         for (int p = 0; !permitted && p < permissions.length; ++p) {
@@ -73,7 +73,7 @@ public class ObjectPermission {
      * @return Permission Check Result
      */
     public static boolean permits(Server server, Permissible object, String... permissions) {
-        if (Util.isNull(object)) throw new NullPointerException();
+        Util.nullpo(object);
         boolean permitted = false;
 
         for (int p = 0; !permitted && p < permissions.length; ++p) {

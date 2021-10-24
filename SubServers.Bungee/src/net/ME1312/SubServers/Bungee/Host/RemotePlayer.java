@@ -1,13 +1,14 @@
 package net.ME1312.SubServers.Bungee.Host;
 
-import net.ME1312.Galaxi.Library.Callback.Callback;
 import net.ME1312.Galaxi.Library.Container.ContainedPair;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubData.Server.SubDataClient;
 import net.ME1312.SubData.Server.SubDataSerializable;
 import net.ME1312.SubServers.Bungee.Library.Compatibility.RPSI;
-import net.ME1312.SubServers.Bungee.Network.Packet.*;
+import net.ME1312.SubServers.Bungee.Network.Packet.PacketDisconnectPlayer;
+import net.ME1312.SubServers.Bungee.Network.Packet.PacketMessagePlayer;
+import net.ME1312.SubServers.Bungee.Network.Packet.PacketTransferPlayer;
 import net.ME1312.SubServers.Bungee.SubAPI;
 
 import net.md_5.bungee.api.ProxyServer;
@@ -19,6 +20,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.InetSocketAddress;
 import java.util.Arrays;
 import java.util.UUID;
+import java.util.function.IntConsumer;
 
 /**
  * Remote Player Class
@@ -48,7 +50,7 @@ public class RemotePlayer implements net.ME1312.SubServers.Bungee.Library.Compat
      * @param server Server the player is on
      */
     public RemotePlayer(ProxiedPlayer player, ServerInfo server) {
-        if (Util.isNull(player)) throw new NullPointerException();
+        Util.nullpo(player);
         this.local = player;
         this.id = player.getUniqueId();
         this.server = (server instanceof Server)? (Server) server : null;
@@ -64,7 +66,7 @@ public class RemotePlayer implements net.ME1312.SubServers.Bungee.Library.Compat
      * @param ip Player IP Address
      */
     public RemotePlayer(String name, UUID id, Proxy proxy, ServerInfo server, InetSocketAddress ip) {
-        if (Util.isNull(name, id, proxy, ip)) throw new NullPointerException();
+        Util.nullpo(name, id, proxy, ip);
         this.id = id;
         this.name = name;
         this.ip = ip;
@@ -156,11 +158,11 @@ public class RemotePlayer implements net.ME1312.SubServers.Bungee.Library.Compat
         // These overrides provide for the static methods in BungeeCommon
         new RPSI() {
             @Override
-            protected void sendMessage(UUID[] players, String[] messages, Callback<Integer> response) {
+            protected void sendMessage(UUID[] players, String[] messages, IntConsumer response) {
                 StackTraceElement[] origin = new Exception().getStackTrace();
                 PacketMessagePlayer.run(Arrays.asList(players), new ContainedPair<>(messages, null), null, i -> {
                     try {
-                        response.run(i);
+                        response.accept(i);
                     } catch (Throwable e) {
                         Throwable ew = new InvocationTargetException(e);
                         ew.setStackTrace(origin);
@@ -170,11 +172,11 @@ public class RemotePlayer implements net.ME1312.SubServers.Bungee.Library.Compat
             }
 
             @Override
-            protected void sendMessage(UUID[] players, BaseComponent[][] messages, Callback<Integer> response) {
+            protected void sendMessage(UUID[] players, BaseComponent[][] messages, IntConsumer response) {
                 StackTraceElement[] origin = new Exception().getStackTrace();
                 PacketMessagePlayer.run(Arrays.asList(players), new ContainedPair<>(null, messages), null, i -> {
                     try {
-                        response.run(i);
+                        response.accept(i);
                     } catch (Throwable e) {
                         Throwable ew = new InvocationTargetException(e);
                         ew.setStackTrace(origin);
@@ -184,11 +186,11 @@ public class RemotePlayer implements net.ME1312.SubServers.Bungee.Library.Compat
             }
 
             @Override
-            protected void transfer(UUID[] players, String server, Callback<Integer> response) {
+            protected void transfer(UUID[] players, String server, IntConsumer response) {
                 StackTraceElement[] origin = new Exception().getStackTrace();
                 PacketTransferPlayer.run(Arrays.asList(players), server, i -> {
                     try {
-                        response.run(i);
+                        response.accept(i);
                     } catch (Throwable e) {
                         Throwable ew = new InvocationTargetException(e);
                         ew.setStackTrace(origin);
@@ -198,11 +200,11 @@ public class RemotePlayer implements net.ME1312.SubServers.Bungee.Library.Compat
             }
 
             @Override
-            protected void disconnect(UUID[] players, String reason, Callback<Integer> response) {
+            protected void disconnect(UUID[] players, String reason, IntConsumer response) {
                 StackTraceElement[] origin = new Exception().getStackTrace();
                 PacketDisconnectPlayer.run(Arrays.asList(players), reason, i -> {
                     try {
-                        response.run(i);
+                        response.accept(i);
                     } catch (Throwable e) {
                         Throwable ew = new InvocationTargetException(e);
                         ew.setStackTrace(origin);
@@ -218,11 +220,11 @@ public class RemotePlayer implements net.ME1312.SubServers.Bungee.Library.Compat
         net.ME1312.SubServers.Bungee.Library.Compatibility.RemotePlayer.broadcastMessage(messages);
     }
 
-    public static void broadcastMessage(String message, Callback<Integer> response) {
+    public static void broadcastMessage(String message, IntConsumer response) {
         net.ME1312.SubServers.Bungee.Library.Compatibility.RemotePlayer.broadcastMessage(message, response);
     }
 
-    public static void broadcastMessage(String[] messages, Callback<Integer> response) {
+    public static void broadcastMessage(String[] messages, IntConsumer response) {
         net.ME1312.SubServers.Bungee.Library.Compatibility.RemotePlayer.broadcastMessage(messages, response);
     }
 
@@ -230,11 +232,11 @@ public class RemotePlayer implements net.ME1312.SubServers.Bungee.Library.Compat
         net.ME1312.SubServers.Bungee.Library.Compatibility.RemotePlayer.sendMessage(players, messages);
     }
 
-    public static void sendMessage(UUID[] players, String message, Callback<Integer> response) {
+    public static void sendMessage(UUID[] players, String message, IntConsumer response) {
         net.ME1312.SubServers.Bungee.Library.Compatibility.RemotePlayer.sendMessage(players, message, response);
     }
 
-    public static void sendMessage(UUID[] players, String[] messages, Callback<Integer> response) {
+    public static void sendMessage(UUID[] players, String[] messages, IntConsumer response) {
         net.ME1312.SubServers.Bungee.Library.Compatibility.RemotePlayer.sendMessage(players, messages, response);
     }
 
@@ -242,11 +244,11 @@ public class RemotePlayer implements net.ME1312.SubServers.Bungee.Library.Compat
         net.ME1312.SubServers.Bungee.Library.Compatibility.RemotePlayer.broadcastMessage(message);
     }
 
-    public static void broadcastMessage(BaseComponent message, Callback<Integer> response) {
+    public static void broadcastMessage(BaseComponent message, IntConsumer response) {
         net.ME1312.SubServers.Bungee.Library.Compatibility.RemotePlayer.broadcastMessage(message, response);
     }
 
-    public static void broadcastMessage(BaseComponent[] message, Callback<Integer> response) {
+    public static void broadcastMessage(BaseComponent[] message, IntConsumer response) {
         net.ME1312.SubServers.Bungee.Library.Compatibility.RemotePlayer.broadcastMessage(message, response);
     }
 
@@ -254,7 +256,7 @@ public class RemotePlayer implements net.ME1312.SubServers.Bungee.Library.Compat
         net.ME1312.SubServers.Bungee.Library.Compatibility.RemotePlayer.broadcastMessage(messages);
     }
 
-    public static void broadcastMessage(BaseComponent[][] messages, Callback<Integer> response) {
+    public static void broadcastMessage(BaseComponent[][] messages, IntConsumer response) {
         net.ME1312.SubServers.Bungee.Library.Compatibility.RemotePlayer.broadcastMessage(messages, response);
     }
 
@@ -262,11 +264,11 @@ public class RemotePlayer implements net.ME1312.SubServers.Bungee.Library.Compat
         net.ME1312.SubServers.Bungee.Library.Compatibility.RemotePlayer.sendMessage(players, message);
     }
 
-    public static void sendMessage(UUID[] players, BaseComponent message, Callback<Integer> response) {
+    public static void sendMessage(UUID[] players, BaseComponent message, IntConsumer response) {
         net.ME1312.SubServers.Bungee.Library.Compatibility.RemotePlayer.sendMessage(players, message, response);
     }
 
-    public static void sendMessage(UUID[] players, BaseComponent[] message, Callback<Integer> response) {
+    public static void sendMessage(UUID[] players, BaseComponent[] message, IntConsumer response) {
         net.ME1312.SubServers.Bungee.Library.Compatibility.RemotePlayer.sendMessage(players, message, response);
     }
 
@@ -274,7 +276,7 @@ public class RemotePlayer implements net.ME1312.SubServers.Bungee.Library.Compat
         net.ME1312.SubServers.Bungee.Library.Compatibility.RemotePlayer.sendMessage(players, messages);
     }
 
-    public static void sendMessage(UUID[] players, BaseComponent[][] messages, Callback<Integer> response) {
+    public static void sendMessage(UUID[] players, BaseComponent[][] messages, IntConsumer response) {
         net.ME1312.SubServers.Bungee.Library.Compatibility.RemotePlayer.sendMessage(players, messages, response);
     }
 
@@ -282,7 +284,7 @@ public class RemotePlayer implements net.ME1312.SubServers.Bungee.Library.Compat
         net.ME1312.SubServers.Bungee.Library.Compatibility.RemotePlayer.transfer(players, server);
     }
 
-    public static void transfer(UUID[] players, String server, Callback<Integer> response) {
+    public static void transfer(UUID[] players, String server, IntConsumer response) {
         net.ME1312.SubServers.Bungee.Library.Compatibility.RemotePlayer.transfer(players, server, response);
     }
 
@@ -290,7 +292,7 @@ public class RemotePlayer implements net.ME1312.SubServers.Bungee.Library.Compat
         net.ME1312.SubServers.Bungee.Library.Compatibility.RemotePlayer.transfer(players, server);
     }
 
-    public static void transfer(UUID[] players, ServerInfo server, Callback<Integer> response) {
+    public static void transfer(UUID[] players, ServerInfo server, IntConsumer response) {
         net.ME1312.SubServers.Bungee.Library.Compatibility.RemotePlayer.transfer(players, server, response);
     }
 
@@ -298,7 +300,7 @@ public class RemotePlayer implements net.ME1312.SubServers.Bungee.Library.Compat
         net.ME1312.SubServers.Bungee.Library.Compatibility.RemotePlayer.disconnect(players);
     }
 
-    public static void disconnect(UUID[] players, Callback<Integer> response) {
+    public static void disconnect(UUID[] players, IntConsumer response) {
         net.ME1312.SubServers.Bungee.Library.Compatibility.RemotePlayer.disconnect(players, response);
     }
 
@@ -306,7 +308,7 @@ public class RemotePlayer implements net.ME1312.SubServers.Bungee.Library.Compat
         net.ME1312.SubServers.Bungee.Library.Compatibility.RemotePlayer.disconnect(players, reason);
     }
 
-    public static void disconnect(UUID[] players, String reason, Callback<Integer> response) {
+    public static void disconnect(UUID[] players, String reason, IntConsumer response) {
         net.ME1312.SubServers.Bungee.Library.Compatibility.RemotePlayer.disconnect(players, reason, response);
     }
 }

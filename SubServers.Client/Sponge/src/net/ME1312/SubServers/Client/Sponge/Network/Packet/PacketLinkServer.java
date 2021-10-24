@@ -1,6 +1,7 @@
 package net.ME1312.SubServers.Client.Sponge.Network.Packet;
 
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
+import net.ME1312.Galaxi.Library.Try;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubData.Client.Protocol.Initial.InitialPacket;
 import net.ME1312.SubData.Client.Protocol.PacketObjectIn;
@@ -25,7 +26,7 @@ public class PacketLinkServer implements InitialPacket, PacketObjectIn<Integer>,
      * @param plugin SubServers.Client
      */
     public PacketLinkServer(SubPlugin plugin) {
-        if (Util.isNull(plugin)) throw new NullPointerException();
+        Util.nullpo(plugin);
         this.plugin = plugin;
     }
     /**
@@ -35,7 +36,7 @@ public class PacketLinkServer implements InitialPacket, PacketObjectIn<Integer>,
      * @param channel Channel ID
      */
     public PacketLinkServer(SubPlugin plugin, int channel) {
-        if (Util.isNull(plugin)) throw new NullPointerException();
+        Util.nullpo(plugin);
         this.plugin = plugin;
         this.channel = channel;
     }
@@ -60,7 +61,7 @@ public class PacketLinkServer implements InitialPacket, PacketObjectIn<Integer>,
 
     @Override
     public void receive(SubDataSender client, ObjectMap<Integer> data) {
-        Logger log = Util.getDespiteException(() -> Util.reflect(SubDataClient.class.getDeclaredField("log"), client), null);
+        Logger log = Try.all.get(() -> Util.reflect(SubDataClient.class.getDeclaredField("log"), client));
         if (data.getInt(0x0001) == 0) {
             try {
                 if (data.contains(0x0000)) Util.reflect(SubAPI.class.getDeclaredField("name"), plugin.api, data.getRawString(0x0000));

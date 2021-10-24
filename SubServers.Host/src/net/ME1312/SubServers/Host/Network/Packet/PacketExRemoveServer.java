@@ -1,6 +1,7 @@
 package net.ME1312.SubServers.Host.Network.Packet;
 
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
+import net.ME1312.Galaxi.Library.Try;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubData.Client.Protocol.PacketObjectIn;
 import net.ME1312.SubData.Client.Protocol.PacketObjectOut;
@@ -29,7 +30,7 @@ public class PacketExRemoveServer implements PacketObjectIn<Integer>, PacketObje
      * @param host ExHost
      */
     public PacketExRemoveServer(ExHost host) {
-        if (Util.isNull(host)) throw new NullPointerException();
+        Util.nullpo(host);
         this.host = host;
     }
 
@@ -40,7 +41,7 @@ public class PacketExRemoveServer implements PacketObjectIn<Integer>, PacketObje
      * @param tracker Receiver ID
      */
     public PacketExRemoveServer(int response, UUID tracker) {
-        if (Util.isNull(response)) throw new NullPointerException();
+        Util.nullpo(response);
         this.response = response;
         this.tracker = tracker;
     }
@@ -55,7 +56,7 @@ public class PacketExRemoveServer implements PacketObjectIn<Integer>, PacketObje
 
     @Override
     public void receive(SubDataSender client, ObjectMap<Integer> data) {
-        Logger log = Util.getDespiteException(() -> Util.reflect(SubDataClient.class.getDeclaredField("log"), client.getConnection()), null);
+        Logger log = Try.all.get(() -> Util.reflect(SubDataClient.class.getDeclaredField("log"), client.getConnection()));
         UUID tracker =       (data.contains(0x0000)?data.getUUID(0x0000):null);
         try {
             String name = data.getRawString(0x0001);

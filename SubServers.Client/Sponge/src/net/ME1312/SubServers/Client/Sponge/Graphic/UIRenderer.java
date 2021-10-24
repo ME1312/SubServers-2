@@ -38,7 +38,7 @@ public abstract class UIRenderer {
      * @param player Player
      */
     public UIRenderer(SubPlugin plugin, UUID player) {
-        if (Util.isNull(plugin, player)) throw new NullPointerException();
+        Util.nullpo(plugin, player);
         this.plugin = plugin;
         this.player = player;
     }
@@ -101,7 +101,7 @@ public abstract class UIRenderer {
      * @return Success Status
      */
     public boolean sendTitle(String str, int fadein, int stay, int fadeout) {
-        if (Util.isNull(str, fadein, stay, fadeout)) throw new NullPointerException();
+        Util.nullpo(str, fadein, stay, fadeout);
         if (plugin.config.get().getMap("Settings").getBoolean("Use-Title-Messages", true)) {
             String line1, line2;
             if (!str.startsWith("\n") && str.contains("\n")) {
@@ -205,19 +205,20 @@ public abstract class UIRenderer {
         // minecraft:name
         if (item.value().toLowerCase().startsWith("minecraft:")) {
             item.value(item.value().substring(10));
-        } else
+        } else {
 
             // bukkit:name (ignored on sponge)
             if (item.value().toLowerCase().startsWith("bukkit:")) {
                 item.value(item.value().substring(7));
             }
-
-        // material name
-        if (!Util.isException(() -> ItemTypes.class.getDeclaredField(item.value().toUpperCase()).get(null))) {
-            return ItemStack.builder().itemType((ItemType) Util.getDespiteException(() -> ItemTypes.class.getDeclaredField(item.value().toUpperCase()).get(null), null)).quantity(1).build();
         }
 
-        return def;
+        // material name
+        try {
+            return ItemStack.builder().itemType((ItemType) ItemTypes.class.getDeclaredField(item.value().toUpperCase()).get(null)).quantity(1).build();
+        } catch (NoSuchFieldException | NoSuchFieldError | IllegalAccessException | IllegalAccessError e) {
+            return def;
+        }
     }
 
     /**
@@ -227,7 +228,7 @@ public abstract class UIRenderer {
      * @param renderer Renderer
      */
     public static void addHostPlugin(String handle, PluginRenderer<Host> renderer) {
-        if (Util.isNull(handle, renderer)) throw new NullPointerException();
+        Util.nullpo(handle, renderer);
         hostPlugins.put(handle, renderer);
     }
 
@@ -246,7 +247,7 @@ public abstract class UIRenderer {
      * @param handle Handle
      */
     public static void removeHostPlugin(String handle) {
-        if (Util.isNull(handle)) throw new NullPointerException();
+        Util.nullpo(handle);
         hostPlugins.remove(handle);
     }
 
@@ -257,7 +258,7 @@ public abstract class UIRenderer {
      * @param renderer Renderer
      */
     public static void addSubServerPlugin(String handle, PluginRenderer<SubServer> renderer) {
-        if (Util.isNull(handle, renderer)) throw new NullPointerException();
+        Util.nullpo(handle, renderer);
         subserverPlugins.put(handle, renderer);
     }
 
@@ -276,7 +277,7 @@ public abstract class UIRenderer {
      * @param handle Handle
      */
     public static void removeSubServerPlugin(String handle) {
-        if (Util.isNull(handle)) throw new NullPointerException();
+        Util.nullpo(handle);
         subserverPlugins.remove(handle);
     }
 
@@ -415,7 +416,7 @@ public abstract class UIRenderer {
          * @param value Value
          */
         public void setName(String value) {
-            if (Util.isNull(value)) throw new NullPointerException();
+            Util.nullpo(value);
             final String name = this.name;
             history.add(() -> this.name = name);
             this.name = value;
@@ -436,7 +437,7 @@ public abstract class UIRenderer {
          * @param value Value
          */
         public void setTemplate(String value) {
-            if (Util.isNull(value)) throw new NullPointerException();
+            Util.nullpo(value);
             final String template = this.template;
             history.add(() -> this.template = template);
             this.template = value;
@@ -457,7 +458,7 @@ public abstract class UIRenderer {
          * @param value Value
          */
         public void setVersion(Version value) {
-            if (Util.isNull(value)) throw new NullPointerException();
+            Util.nullpo(value);
             final Version version = this.version;
             history.add(() -> this.version = version);
             this.version = value;
@@ -478,7 +479,7 @@ public abstract class UIRenderer {
          * @param value Value (null for auto-select)
          */
         public void setPort(Integer value) {
-            if (Util.isNull(value)) throw new NullPointerException();
+            Util.nullpo(value);
             final int port = this.port;
             history.add(() -> this.port = port);
             this.port = value;

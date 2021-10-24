@@ -1,6 +1,7 @@
 package net.ME1312.SubServers.Velocity.Library.Fallback;
 
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
+import net.ME1312.Galaxi.Library.Try;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubServers.Velocity.ExProxy;
 
@@ -167,7 +168,7 @@ public class SmartFallback {
      * @param inspector Inspector
      */
     public static void addInspector(FallbackInspector inspector) {
-        if (Util.isNull(inspector)) throw new NullPointerException();
+        Util.nullpo(inspector);
         inspectors.add(inspector);
     }
 
@@ -177,7 +178,7 @@ public class SmartFallback {
      * @param inspector Inspector
      */
     public static void removeInspector(FallbackInspector inspector) {
-        if (Util.isNull(inspector)) throw new NullPointerException();
-        Util.isException(() -> inspectors.remove(inspector));
+        Util.nullpo(inspector);
+        Try.all.run(() -> inspectors.remove(inspector));
     }
 }

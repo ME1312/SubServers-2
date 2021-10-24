@@ -1,7 +1,6 @@
 package net.ME1312.SubServers.Velocity.Server;
 
 import java.net.InetSocketAddress;
-import java.net.SocketAddress;
 import java.util.Collection;
 import java.util.Map;
 import java.util.UUID;

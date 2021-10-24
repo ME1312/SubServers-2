@@ -2,7 +2,7 @@ package net.ME1312.SubServers.Bungee;
 
 import net.ME1312.Galaxi.Library.Container.ContainedPair;
 import net.ME1312.Galaxi.Library.Container.Pair;
-import net.ME1312.Galaxi.Library.UniversalFile;
+import net.ME1312.Galaxi.Library.Try;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubData.Server.DataProtocol;
@@ -19,6 +19,7 @@ import com.google.common.collect.Range;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.protocol.ProtocolConstants;
 
+import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -93,7 +94,7 @@ public final class SubAPI implements BungeeAPI {
      * @param handle Handle to Bind
      */
     public void addHostDriver(Class<? extends Host> driver, String handle) {
-        if (Util.isNull(driver, handle)) throw new NullPointerException();
+        Util.nullpo(driver, handle);
         if (plugin.hostDrivers.keySet().contains(handle.toUpperCase().replace('-', '_').replace(' ', '_'))) throw new IllegalStateException("Driver already exists: " + handle);
         plugin.hostDrivers.put(handle.toUpperCase().replace('-', '_').replace(' ', '_'), driver);
     }
@@ -167,7 +168,7 @@ public final class SubAPI implements BungeeAPI {
      * @throws InstantiationException
      */
     public Host addHost(UUID player, String driver, String name, boolean enabled, Range<Integer> ports, boolean log, InetAddress address, String directory, String gitBash) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
-        if (Util.isNull(driver, name, enabled, ports, log, address, directory, gitBash)) throw new NullPointerException();
+        Util.nullpo(driver, name, enabled, ports, log, address, directory, gitBash);
         if (!getHostDrivers().contains(driver.toUpperCase().replace('-', '_').replace(' ', '_'))) throw new InvalidHostException("Invalid Driver for host: " + name);
         return addHost(player, plugin.hostDrivers.get(driver.toUpperCase().replace('-', '_').replace(' ', '_')), name, enabled, ports, log, address, directory, gitBash);
 }
@@ -212,7 +213,7 @@ public final class SubAPI implements BungeeAPI {
      * @throws InstantiationException
      */
     public Host addHost(UUID player, Class<? extends Host> driver, String name, boolean enabled, Range<Integer> ports, boolean log, InetAddress address, String directory, String gitBash) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
-        if (Util.isNull(driver, name, enabled, ports, log, address, directory, gitBash)) throw new NullPointerException();
+        Util.nullpo(driver, name, enabled, ports, log, address, directory, gitBash);
         Host host = plugin.constructHost(driver, name, enabled, ports, log, address, directory, gitBash);
         return addHost(player, host)?host:null;
     }
@@ -263,7 +264,7 @@ public final class SubAPI implements BungeeAPI {
      * @return Success Status
      */
     public boolean removeHost(UUID player, String name) {
-        if (Util.isNull(name, getHost(name))) throw new NullPointerException();
+        Util.nullpo(name, getHost(name));
         SubRemoveHostEvent event = new SubRemoveHostEvent(player, getHost(name));
         plugin.getPluginManager().callEvent(event);
         if (!event.isCancelled()) {
@@ -294,7 +295,7 @@ public final class SubAPI implements BungeeAPI {
      * @return Success Status
      */
     public boolean forceRemoveHost(UUID player, String name) {
-        if (Util.isNull(name, getHost(name))) throw new NullPointerException();
+        Util.nullpo(name, getHost(name));
         SubRemoveHostEvent event = new SubRemoveHostEvent(player, getHost(name));
         plugin.getPluginManager().callEvent(event);
         if (getHost(name).destroy()) {
@@ -463,7 +464,7 @@ public final class SubAPI implements BungeeAPI {
      * @return Success Status
      */
     public boolean removeServer(UUID player, String name) {
-        if (Util.isNull(name, getServer(name))) throw new NullPointerException();
+        Util.nullpo(name, getServer(name));
         SubRemoveServerEvent event = new SubRemoveServerEvent(player, null, getServer(name));
         plugin.getPluginManager().callEvent(event);
         if (!event.isCancelled()) {
@@ -490,7 +491,7 @@ public final class SubAPI implements BungeeAPI {
      * @return Success Status
      */
     public boolean forceRemoveServer(UUID player, String name) {
-        if (Util.isNull(name, getServer(name))) throw new NullPointerException();
+        Util.nullpo(name, getServer(name));
         SubRemoveServerEvent event = new SubRemoveServerEvent(player, null, getServer(name));
         plugin.getPluginManager().callEvent(event);
         plugin.exServers.remove(name.toLowerCase());
@@ -599,7 +600,7 @@ public final class SubAPI implements BungeeAPI {
      * @return Remote Player
      */
     public RemotePlayer getRemotePlayer(String name) {
-        if (Util.isNull(name)) throw new NullPointerException();
+        Util.nullpo(name);
         for (RemotePlayer player : plugin.rPlayers.values()) {
             if (player.getName().equalsIgnoreCase(name)) return player;
         }
@@ -613,7 +614,7 @@ public final class SubAPI implements BungeeAPI {
      * @return Remote Player
      */
     public RemotePlayer getRemotePlayer(UUID id) {
-        if (Util.isNull(id)) throw new NullPointerException();
+        Util.nullpo(id);
         return plugin.rPlayers.getOrDefault(id, null);
     }
 
@@ -625,7 +626,7 @@ public final class SubAPI implements BungeeAPI {
      * @param value Lang Value
      */
     public void setLang(String channel, String key, String value) {
-        if (Util.isNull(channel, key, value)) throw new NullPointerException();
+        Util.nullpo(channel, key, value);
         LinkedHashMap<String, String> map = (plugin.exLang.containsKey(channel.toLowerCase()))?plugin.exLang.get(channel.toLowerCase()):new LinkedHashMap<String, String>();
         map.put(key, value);
         plugin.exLang.put(channel.toLowerCase(), map);
@@ -685,7 +686,7 @@ public final class SubAPI implements BungeeAPI {
      */
     @SuppressWarnings("unchecked")
     public <R> R getObjectBySignature(String signature) {
-        if (Util.isNull(signature)) throw new NullPointerException();
+        Util.nullpo(signature);
         return (R) knownSignatures.getOrDefault(signature, null);
     }
 
@@ -703,7 +704,7 @@ public final class SubAPI implements BungeeAPI {
      *
      * @return Directory
      */
-    public UniversalFile getRuntimeDirectory() {
+    public File getRuntimeDirectory() {
         return plugin.dir;
     }
 
@@ -743,12 +744,12 @@ public final class SubAPI implements BungeeAPI {
         if (GAME_VERSION == null) {
             if (System.getProperty("subservers.minecraft.version", "").length() > 0) {
                 return new Version[]{new Version(System.getProperty("subservers.minecraft.version"))};
-            } else if (Util.getDespiteException(() -> ProtocolConstants.SUPPORTED_VERSIONS != null, false)) {
+            } else if (Try.all.get(() -> ProtocolConstants.SUPPORTED_VERSIONS != null, false)) {
                 List<Version> versions = new LinkedList<Version>();
                 for (String version : ProtocolConstants.SUPPORTED_VERSIONS) versions.add(new Version(version));
                 Collections.sort(versions);
                 return versions.toArray(new Version[versions.size()]);
-            } else if (Util.getDespiteException(() -> plugin.getGameVersion() != null, false)) {
+            } else if (Try.all.get(() -> plugin.getGameVersion() != null, false)) {
                 String raw = plugin.getGameVersion();
                 if (raw.contains("-") || raw.contains(",")) {
                     List<Version> versions = new LinkedList<Version>();

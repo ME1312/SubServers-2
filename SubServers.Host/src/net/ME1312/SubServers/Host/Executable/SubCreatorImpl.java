@@ -6,9 +6,9 @@ import net.ME1312.Galaxi.Library.Config.YAMLSection;
 import net.ME1312.Galaxi.Library.Container.ContainedPair;
 import net.ME1312.Galaxi.Library.Container.Container;
 import net.ME1312.Galaxi.Library.Container.Pair;
+import net.ME1312.Galaxi.Library.Directories;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Map.ObjectMapValue;
-import net.ME1312.Galaxi.Library.UniversalFile;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubData.Client.SubDataClient;
@@ -20,7 +20,6 @@ import net.ME1312.SubServers.Host.Library.Exception.InvalidTemplateException;
 import net.ME1312.SubServers.Host.Library.Exception.SubCreatorException;
 import net.ME1312.SubServers.Host.Library.ReplacementScanner;
 import net.ME1312.SubServers.Host.Network.Packet.PacketExCreateServer;
-import net.ME1312.SubServers.Host.Network.Packet.PacketOutExLogMessage;
 import net.ME1312.SubServers.Host.SubAPI;
 
 import org.json.JSONObject;
@@ -222,7 +221,7 @@ public class SubCreatorImpl {
         }
 
         private static ObjectMap<String> toRaw(String name, boolean enabled, String icon, File directory, ObjectMap<String> build, ObjectMap<String> options) {
-            if (Util.isNull(name, enabled, directory, build, options)) throw new NullPointerException();
+            Util.nullpo(name, enabled, directory, build, options);
             ObjectMap<String> tinfo = new ObjectMap<String>();
             tinfo.set("enabled", enabled);
             tinfo.set("name", name);
@@ -242,12 +241,12 @@ public class SubCreatorImpl {
      */
     public void load(boolean remote) {
         HashMap<String, ServerTemplate> templates = (remote)?host.templatesR:host.templates;
-        UniversalFile dir = new UniversalFile(GalaxiEngine.getInstance().getRuntimeDirectory(), ((remote)?"Cache:Remote:":"") + "Templates");
+        File dir = new File(GalaxiEngine.getInstance().getRuntimeDirectory(), ((remote)?"Cache/Remote/":"") + "Templates");
         templates.clear();
         if (dir.exists()) for (File file : dir.listFiles()) {
                 try {
                     if (file.isDirectory() && !file.getName().endsWith(".x")) {
-                        ObjectMap<String> config = (new UniversalFile(file, "template.yml").exists())?new YAMLConfig(new UniversalFile(file, "template.yml")).get().getMap("Template", new ObjectMap<String>()):new ObjectMap<String>();
+                        ObjectMap<String> config = (new File(file, "template.yml").exists())?new YAMLConfig(new File(file, "template.yml")).get().getMap("Template", new ObjectMap<String>()):new ObjectMap<String>();
                         ServerTemplate template = new ServerTemplate(file.getName(), config.getBoolean("Enabled", true), config.getBoolean("Internal", false), config.getRawString("Icon", "::NULL::"), file, config.getMap("Build", new ObjectMap<String>()), config.getMap("Settings", new ObjectMap<String>()), false);
                         templates.put(file.getName().toLowerCase(), template);
                         if (config.getKeys().contains("Display")) template.setDisplayName(config.getString("Display"));
@@ -383,7 +382,7 @@ public class SubCreatorImpl {
             if (template.getBuildOptions().contains("Executable")) {
                 File cache = null;
                 if (template.getBuildOptions().getBoolean("Use-Cache", true)) {
-                    cache = new UniversalFile(GalaxiEngine.getInstance().getRuntimeDirectory(), "Cache:Templates:" + template.getName());
+                    cache = new File(GalaxiEngine.getInstance().getRuntimeDirectory(), "Cache/Templates/" + template.getName());
                     cache.mkdirs();
                     var.put("cache", cache.getAbsolutePath());
                 }
@@ -411,14 +410,14 @@ public class SubCreatorImpl {
 
                 if (cache != null) {
                     if (cache.isDirectory() && cache.listFiles().length == 0) cache.delete();
-                    cache = new UniversalFile(GalaxiEngine.getInstance().getRuntimeDirectory(), "Cache:Templates");
+                    cache = new File(GalaxiEngine.getInstance().getRuntimeDirectory(), "Cache/Templates");
                     if (cache.isDirectory() && cache.listFiles().length == 0) cache.delete();
-                    cache = new UniversalFile(GalaxiEngine.getInstance().getRuntimeDirectory(), "Cache");
+                    cache = new File(GalaxiEngine.getInstance().getRuntimeDirectory(), "Cache");
                     if (cache.isDirectory() && cache.listFiles().length == 0) cache.delete();
                 }
             }
 
-            new UniversalFile(dir, "template.yml").delete();
+            new File(dir, "template.yml").delete();
             if (error) throw new SubCreatorException();
             return server;
         }
@@ -484,13 +483,13 @@ public class SubCreatorImpl {
      * @param host SubServers.Host
      */
     public SubCreatorImpl(ExHost host) {
-        if (Util.isNull(host)) throw new NullPointerException();
+        Util.nullpo(host);
         this.host = host;
         this.thread = new TreeMap<>();
     }
 
     public boolean create(UUID player, String name, ServerTemplate template, Version version, int port, Boolean mode, UUID address, UUID tracker) {
-        if (Util.isNull(name, template, port, address)) throw new NullPointerException();
+        Util.nullpo(name, template, port, address);
         CreatorTask task = new CreatorTask(player, name, template, version, port, mode, address, tracker);
         this.thread.put(name.toLowerCase(), task);
         task.start();
@@ -567,32 +566,32 @@ public class SubCreatorImpl {
         boolean installed = false;
         if (type == ServerType.SPIGOT) {
             installed = true;
-            if (!new UniversalFile(dir, "plugins").exists()) new UniversalFile(dir, "plugins").mkdirs();
-            if (!new UniversalFile(dir, "plugins:SubServers.Client.jar").exists())
-                Util.copyFromJar(ExHost.class.getClassLoader(), "net/ME1312/SubServers/Host/Library/Files/client.jar", new UniversalFile(dir, "plugins:SubServers.Client.jar").getPath());
+            if (!new File(dir, "plugins").exists()) new File(dir, "plugins").mkdirs();
+            if (!new File(dir, "plugins/SubServers.Client.jar").exists())
+                Util.copyFromJar(ExHost.class.getClassLoader(), "net/ME1312/SubServers/Host/Library/Files/client.jar", new File(dir, "plugins/SubServers.Client.jar").getPath());
         } else if (type == ServerType.FORGE || type == ServerType.SPONGE) {
             installed = true;
-            if (!new UniversalFile(dir, "mods").exists()) new UniversalFile(dir, "mods").mkdirs();
-            if (!new UniversalFile(dir, "mods:SubServers.Client.jar").exists())
-                Util.copyFromJar(ExHost.class.getClassLoader(), "net/ME1312/SubServers/Host/Library/Files/client.jar", new UniversalFile(dir, "mods:SubServers.Client.jar").getPath());
+            if (!new File(dir, "mods").exists()) new File(dir, "mods").mkdirs();
+            if (!new File(dir, "mods/SubServers.Client.jar").exists())
+                Util.copyFromJar(ExHost.class.getClassLoader(), "net/ME1312/SubServers/Host/Library/Files/client.jar", new File(dir, "mods/SubServers.Client.jar").getPath());
         }
 
         if (installed) {
             YAMLSection config = new YAMLSection();
-            FileWriter writer = new FileWriter(new UniversalFile(dir, "subdata.json"), false);
+            FileWriter writer = new FileWriter(new File(dir, "subdata.json"), false);
             config.setAll(getSubData());
             writer.write(config.toJSON().toString());
             writer.close();
 
-            if (!new UniversalFile(dir, "subdata.rsa.key").exists() && new UniversalFile("subdata.rsa.key").exists()) {
-                Files.copy(new UniversalFile("subdata.rsa.key").toPath(), new UniversalFile(dir, "subdata.rsa.key").toPath());
+            if (!new File(dir, "subdata.rsa.key").exists() && new File("subdata.rsa.key").exists()) {
+                Files.copy(new File("subdata.rsa.key").toPath(), new File(dir, "subdata.rsa.key").toPath());
             }
         }
     }
 
     private void updateDirectory(File from, File to, boolean overwrite) {
         if (!to.exists()) {
-            Util.copyDirectory(from, to);
+            Directories.copy(from, to);
         } else if (from.isDirectory() && !Files.isSymbolicLink(from.toPath())) {
             String files[] = from.list();
 
@@ -606,7 +605,7 @@ public class SubCreatorImpl {
             try {
                 if (overwrite && (from.length() != to.length() || !Arrays.equals(generateSHA256(to), generateSHA256(from)))) {
                     if (to.exists()) {
-                        if (to.isDirectory()) Util.deleteDirectory(to);
+                        if (to.isDirectory()) Directories.delete(to);
                         else to.delete();
                     }
                     Files.copy(from.toPath(), to.toPath(), LinkOption.NOFOLLOW_LINKS, StandardCopyOption.REPLACE_EXISTING);

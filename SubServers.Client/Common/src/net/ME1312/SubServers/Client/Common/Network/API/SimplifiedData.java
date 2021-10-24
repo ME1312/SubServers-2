@@ -1,6 +1,5 @@
 package net.ME1312.SubServers.Client.Common.Network.API;
 
-import net.ME1312.Galaxi.Library.Callback.Callback;
 import net.ME1312.Galaxi.Library.Container.ContainedPair;
 import net.ME1312.Galaxi.Library.Container.Pair;
 import net.ME1312.Galaxi.Library.Util;
@@ -11,6 +10,7 @@ import net.ME1312.SubServers.Client.Common.Network.Packet.*;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
+import java.util.function.Consumer;
 
 /**
  * Simplified Data Requesting Class
@@ -27,8 +27,8 @@ public final class SimplifiedData {
      * @param client SubData connection
      * @param callback Host Map
      */
-    public static void requestHosts(DataClient client, Callback<Map<String, Host>> callback) {
-        if (Util.isNull(callback)) throw new NullPointerException();
+    public static void requestHosts(DataClient client, Consumer<Map<String, Host>> callback) {
+        Util.nullpo(callback);
         StackTraceElement[] origin = new Exception().getStackTrace();
         client(client).sendPacket(new PacketDownloadHostInfo(null, data -> {
             TreeMap<String, Host> hosts = new TreeMap<String, Host>();
@@ -37,7 +37,7 @@ public final class SimplifiedData {
             }
 
             try {
-                callback.run(hosts);
+                callback.accept(hosts);
             } catch (Throwable e) {
                 Throwable ew = new InvocationTargetException(e);
                 ew.setStackTrace(origin);
@@ -53,8 +53,8 @@ public final class SimplifiedData {
      * @param name Host name
      * @param callback a Host
      */
-    public static void requestHost(DataClient client, String name, Callback<Host> callback) {
-        if (Util.isNull(name, callback)) throw new NullPointerException();
+    public static void requestHost(DataClient client, String name, Consumer<Host> callback) {
+        Util.nullpo(name, callback);
         StackTraceElement[] origin = new Exception().getStackTrace();
         client(client).sendPacket(new PacketDownloadHostInfo(Collections.singletonList(name), data -> {
             Host host = null;
@@ -63,7 +63,7 @@ public final class SimplifiedData {
             }
 
             try {
-                callback.run(host);
+                callback.accept(host);
             } catch (Throwable e) {
                 Throwable ew = new InvocationTargetException(e);
                 ew.setStackTrace(origin);
@@ -78,8 +78,8 @@ public final class SimplifiedData {
      * @param client SubData connection
      * @param callback Group Map
      */
-    public static void requestGroups(DataClient client, Callback<Map<String, List<Server>>> callback) {
-        if (Util.isNull(callback)) throw new NullPointerException();
+    public static void requestGroups(DataClient client, Consumer<Map<String, List<Server>>> callback) {
+        Util.nullpo(callback);
         StackTraceElement[] origin = new Exception().getStackTrace();
         client(client).sendPacket(new PacketDownloadGroupInfo(null, data -> {
             TreeMap<String, List<Server>> groups = new TreeMap<String, List<Server>>();
@@ -96,7 +96,7 @@ public final class SimplifiedData {
             }
 
             try {
-                callback.run(groups);
+                callback.accept(groups);
             } catch (Throwable e) {
                 Throwable ew = new InvocationTargetException(e);
                 ew.setStackTrace(origin);
@@ -111,14 +111,14 @@ public final class SimplifiedData {
      * @param client SubData connection
      * @param callback Group Map
      */
-    public static void requestLowercaseGroups(DataClient client, Callback<Map<String, List<Server>>> callback) {
-        if (Util.isNull(callback)) throw new NullPointerException();
+    public static void requestLowercaseGroups(DataClient client, Consumer<Map<String, List<Server>>> callback) {
+        Util.nullpo(callback);
         requestGroups(client, groups -> {
             TreeMap<String, List<Server>> lowercaseGroups = new TreeMap<String, List<Server>>();
             for (String key : groups.keySet()) {
                 lowercaseGroups.put(key.toLowerCase(), groups.get(key));
             }
-            callback.run(lowercaseGroups);
+            callback.accept(lowercaseGroups);
         });
     }
 
@@ -129,8 +129,8 @@ public final class SimplifiedData {
      * @param name Group name
      * @param callback a Server Group
      */
-    public static void requestGroup(DataClient client, String name, Callback<Pair<String, List<Server>>> callback) {
-        if (Util.isNull(callback)) throw new NullPointerException();
+    public static void requestGroup(DataClient client, String name, Consumer<Pair<String, List<Server>>> callback) {
+        Util.nullpo(callback);
         StackTraceElement[] origin = new Exception().getStackTrace();
         client(client).sendPacket(new PacketDownloadGroupInfo((name == null)?Collections.emptyList():Collections.singletonList(name), data -> {
             Pair<String, List<Server>> group = null;
@@ -148,7 +148,7 @@ public final class SimplifiedData {
             }
 
             try {
-                callback.run(group);
+                callback.accept(group);
             } catch (Throwable e) {
                 Throwable ew = new InvocationTargetException(e);
                 ew.setStackTrace(origin);
@@ -163,8 +163,8 @@ public final class SimplifiedData {
      * @param client SubData connection
      * @param callback Server Map
      */
-    public static void requestServers(DataClient client, Callback<Map<String, Server>> callback) {
-        if (Util.isNull(callback)) throw new NullPointerException();
+    public static void requestServers(DataClient client, Consumer<Map<String, Server>> callback) {
+        Util.nullpo(callback);
         StackTraceElement[] origin = new Exception().getStackTrace();
         client(client).sendPacket(new PacketDownloadServerInfo(null, data -> {
             TreeMap<String, Server> servers = new TreeMap<String, Server>();
@@ -177,7 +177,7 @@ public final class SimplifiedData {
             }
 
             try {
-                callback.run(servers);
+                callback.accept(servers);
             } catch (Throwable e) {
                 Throwable ew = new InvocationTargetException(e);
                 ew.setStackTrace(origin);
@@ -193,8 +193,8 @@ public final class SimplifiedData {
      * @param name Server name
      * @param callback a Server
      */
-    public static void requestServer(DataClient client, String name, Callback<Server> callback) {
-        if (Util.isNull(name, callback)) throw new NullPointerException();
+    public static void requestServer(DataClient client, String name, Consumer<Server> callback) {
+        Util.nullpo(name, callback);
         StackTraceElement[] origin = new Exception().getStackTrace();
         client(client).sendPacket(new PacketDownloadServerInfo(Collections.singletonList(name), data -> {
             Server server = null;
@@ -208,7 +208,7 @@ public final class SimplifiedData {
             }
 
             try {
-                callback.run(server);
+                callback.accept(server);
             } catch (Throwable e) {
                 Throwable ew = new InvocationTargetException(e);
                 ew.setStackTrace(origin);
@@ -223,14 +223,14 @@ public final class SimplifiedData {
      * @param client SubData connection
      * @param callback SubServer Map
      */
-    public static void requestSubServers(DataClient client, Callback<Map<String, SubServer>> callback) {
-        if (Util.isNull(callback)) throw new NullPointerException();
+    public static void requestSubServers(DataClient client, Consumer<Map<String, SubServer>> callback) {
+        Util.nullpo(callback);
         requestServers(client, servers -> {
             TreeMap<String, SubServer> subservers = new TreeMap<String, SubServer>();
             for (String server : servers.keySet()) {
                 if (servers.get(server) instanceof SubServer) subservers.put(server, (SubServer) servers.get(server));
             }
-            callback.run(subservers);
+            callback.accept(subservers);
         });
     }
 
@@ -241,9 +241,9 @@ public final class SimplifiedData {
      * @param name SubServer name
      * @param callback a SubServer
      */
-    public static void requestSubServer(DataClient client, String name, Callback<SubServer> callback) {
-        if (Util.isNull(name, callback)) throw new NullPointerException();
-        requestServer(client, name, server -> callback.run((server instanceof SubServer)?(SubServer) server:null));
+    public static void requestSubServer(DataClient client, String name, Consumer<SubServer> callback) {
+        Util.nullpo(name, callback);
+        requestServer(client, name, server -> callback.accept((server instanceof SubServer)?(SubServer) server:null));
     }
 
     /**
@@ -252,8 +252,8 @@ public final class SimplifiedData {
      * @param client SubData connection
      * @param callback Proxy Map
      */
-    public static void requestProxies(DataClient client, Callback<Map<String, Proxy>> callback) {
-        if (Util.isNull(callback)) throw new NullPointerException();
+    public static void requestProxies(DataClient client, Consumer<Map<String, Proxy>> callback) {
+        Util.nullpo(callback);
         StackTraceElement[] origin = new Exception().getStackTrace();
         client(client).sendPacket(new PacketDownloadProxyInfo(null, data -> {
             TreeMap<String, Proxy> proxies = new TreeMap<String, Proxy>();
@@ -262,7 +262,7 @@ public final class SimplifiedData {
             }
 
             try {
-                callback.run(proxies);
+                callback.accept(proxies);
             } catch (Throwable e) {
                 Throwable ew = new InvocationTargetException(e);
                 ew.setStackTrace(origin);
@@ -278,8 +278,8 @@ public final class SimplifiedData {
      * @param name Proxy name
      * @param callback a Proxy
      */
-    public static void requestProxy(DataClient client, String name, Callback<Proxy> callback) {
-        if (Util.isNull(name, callback)) throw new NullPointerException();
+    public static void requestProxy(DataClient client, String name, Consumer<Proxy> callback) {
+        Util.nullpo(name, callback);
         StackTraceElement[] origin = new Exception().getStackTrace();
         client(client).sendPacket(new PacketDownloadProxyInfo(Collections.singletonList(name), data -> {
             Proxy proxy = null;
@@ -288,7 +288,7 @@ public final class SimplifiedData {
             }
 
             try {
-                callback.run(proxy);
+                callback.accept(proxy);
             } catch (Throwable e) {
                 Throwable ew = new InvocationTargetException(e);
                 ew.setStackTrace(origin);
@@ -303,8 +303,8 @@ public final class SimplifiedData {
      * @param client SubData connection
      * @param callback Master Proxy
      */
-    public static void requestMasterProxy(DataClient client, Callback<Proxy> callback) {
-        if (Util.isNull(callback)) throw new NullPointerException();
+    public static void requestMasterProxy(DataClient client, Consumer<Proxy> callback) {
+        Util.nullpo(callback);
         StackTraceElement[] origin = new Exception().getStackTrace();
         client(client).sendPacket(new PacketDownloadProxyInfo(Collections.emptyList(), data -> {
             Proxy proxy = null;
@@ -313,7 +313,7 @@ public final class SimplifiedData {
             }
 
             try {
-                callback.run(proxy);
+                callback.accept(proxy);
             } catch (Throwable e) {
                 Throwable ew = new InvocationTargetException(e);
                 ew.setStackTrace(origin);
@@ -328,8 +328,8 @@ public final class SimplifiedData {
      * @param client SubData connection
      * @param callback Remote Player Collection
      */
-    public static void requestRemotePlayers(DataClient client, Callback<Map<UUID, RemotePlayer>> callback) {
-        if (Util.isNull(callback)) throw new NullPointerException();
+    public static void requestRemotePlayers(DataClient client, Consumer<Map<UUID, RemotePlayer>> callback) {
+        Util.nullpo(callback);
         StackTraceElement[] origin = new Exception().getStackTrace();
         client(client).sendPacket(new PacketDownloadPlayerInfo((List<UUID>) null, data -> {
             TreeMap<UUID, RemotePlayer> players = new TreeMap<UUID, RemotePlayer>();
@@ -338,7 +338,7 @@ public final class SimplifiedData {
             }
 
             try {
-                callback.run(players);
+                callback.accept(players);
             } catch (Throwable e) {
                 Throwable ew = new InvocationTargetException(e);
                 ew.setStackTrace(origin);
@@ -354,8 +354,8 @@ public final class SimplifiedData {
      * @param name Player name
      * @param callback Remote Player
      */
-    public static void requestRemotePlayer(DataClient client, String name, Callback<RemotePlayer> callback) {
-        if (Util.isNull(name, callback)) throw new NullPointerException();
+    public static void requestRemotePlayer(DataClient client, String name, Consumer<RemotePlayer> callback) {
+        Util.nullpo(name, callback);
         StackTraceElement[] origin = new Exception().getStackTrace();
         client(client).sendPacket(new PacketDownloadPlayerInfo(Collections.singletonList(name), data -> {
             RemotePlayer player = null;
@@ -364,7 +364,7 @@ public final class SimplifiedData {
             }
 
             try {
-                callback.run(player);
+                callback.accept(player);
             } catch (Throwable e) {
                 Throwable ew = new InvocationTargetException(e);
                 ew.setStackTrace(origin);
@@ -380,8 +380,8 @@ public final class SimplifiedData {
      * @param id Player UUID
      * @param callback Remote Player
      */
-    public static void requestRemotePlayer(DataClient client, UUID id, Callback<RemotePlayer> callback) {
-        if (Util.isNull(id, callback)) throw new NullPointerException();
+    public static void requestRemotePlayer(DataClient client, UUID id, Consumer<RemotePlayer> callback) {
+        Util.nullpo(id, callback);
         StackTraceElement[] origin = new Exception().getStackTrace();
         client(client).sendPacket(new PacketDownloadPlayerInfo(Collections.singletonList(id), data -> {
             RemotePlayer player = null;
@@ -390,7 +390,7 @@ public final class SimplifiedData {
             }
 
             try {
-                callback.run(player);
+                callback.accept(player);
             } catch (Throwable e) {
                 Throwable ew = new InvocationTargetException(e);
                 ew.setStackTrace(origin);

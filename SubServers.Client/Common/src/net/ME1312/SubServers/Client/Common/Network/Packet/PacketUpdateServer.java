@@ -1,6 +1,5 @@
 package net.ME1312.SubServers.Client.Common.Network.Packet;
 
-import net.ME1312.Galaxi.Library.Callback.Callback;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
@@ -10,12 +9,13 @@ import net.ME1312.SubData.Client.SubDataSender;
 
 import java.util.HashMap;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 /**
  * Create Server Packet
  */
 public class PacketUpdateServer implements PacketObjectIn<Integer>, PacketObjectOut<Integer> {
-    private static HashMap<UUID, Callback<ObjectMap<Integer>>[]> callbacks = new HashMap<UUID, Callback<ObjectMap<Integer>>[]>();
+    private static HashMap<UUID, Consumer<ObjectMap<Integer>>[]> callbacks = new HashMap<UUID, Consumer<ObjectMap<Integer>>[]>();
     private UUID player;
     private String name;
     private String template;
@@ -38,7 +38,7 @@ public class PacketUpdateServer implements PacketObjectIn<Integer>, PacketObject
      * @param callback Callbacks
      */
     @SafeVarargs
-    public PacketUpdateServer(UUID player, String name, String template, Version version, Callback<ObjectMap<Integer>>... callback) {
+    public PacketUpdateServer(UUID player, String name, String template, Version version, Consumer<ObjectMap<Integer>>... callback) {
         this(player, name, template, version, false, callback);
     }
 
@@ -53,8 +53,8 @@ public class PacketUpdateServer implements PacketObjectIn<Integer>, PacketObject
      * @param callback Callbacks
      */
     @SafeVarargs
-    public PacketUpdateServer(UUID player, String name, String template, Version version, boolean waitfor, Callback<ObjectMap<Integer>>... callback) {
-        if (Util.isNull(name, callback)) throw new NullPointerException();
+    public PacketUpdateServer(UUID player, String name, String template, Version version, boolean waitfor, Consumer<ObjectMap<Integer>>... callback) {
+        Util.nullpo(name, callback);
         this.player = player;
         this.name = name;
         this.template = template;
@@ -78,7 +78,7 @@ public class PacketUpdateServer implements PacketObjectIn<Integer>, PacketObject
 
     @Override
     public void receive(SubDataSender client, ObjectMap<Integer> data) {
-        for (Callback<ObjectMap<Integer>> callback : callbacks.get(data.getUUID(0x0000))) callback.run(data);
+        for (Consumer<ObjectMap<Integer>> callback : callbacks.get(data.getUUID(0x0000))) callback.accept(data);
         callbacks.remove(data.getUUID(0x0000));
     }
 

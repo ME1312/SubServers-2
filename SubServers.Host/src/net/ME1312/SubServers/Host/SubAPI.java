@@ -4,10 +4,12 @@ import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Plugin.PluginInfo;
 import net.ME1312.SubData.Client.DataClient;
 import net.ME1312.SubData.Client.DataProtocol;
-import net.ME1312.SubData.Client.SubDataClient;
 import net.ME1312.SubServers.Client.Common.ClientAPI;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * SubAPI Class
@@ -89,7 +91,7 @@ public final class SubAPI extends ClientAPI {
      * @return Lang Value
      */
     public Map<String, String> getLang(String channel) {
-        if (Util.isNull(channel)) throw new NullPointerException();
+        Util.nullpo(channel);
         return new LinkedHashMap<>(host.lang.value().get(channel.toLowerCase()));
     }
 

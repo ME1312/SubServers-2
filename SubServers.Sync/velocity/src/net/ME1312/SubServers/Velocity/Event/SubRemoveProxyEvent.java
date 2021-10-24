@@ -15,7 +15,7 @@ public class SubRemoveProxyEvent implements SubEvent {
      * @param proxy Host Being Added
      */
     public SubRemoveProxyEvent(String proxy) {
-        if (Util.isNull(proxy)) throw new NullPointerException();
+        Util.nullpo(proxy);
         this.proxy = proxy;
     }
 

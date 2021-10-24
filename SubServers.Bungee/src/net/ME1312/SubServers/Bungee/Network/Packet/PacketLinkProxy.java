@@ -1,6 +1,7 @@
 package net.ME1312.SubServers.Bungee.Network.Packet;
 
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
+import net.ME1312.Galaxi.Library.Try;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubData.Server.Protocol.Initial.InitialPacket;
 import net.ME1312.SubData.Server.Protocol.PacketObjectIn;
@@ -31,7 +32,7 @@ public class PacketLinkProxy implements InitialPacket, PacketObjectIn<Integer>, 
      * @param plugin SubPlugin
      */
     public PacketLinkProxy(SubProxy plugin) {
-        if (Util.isNull(plugin)) throw new NullPointerException();
+        Util.nullpo(plugin);
         this.plugin = plugin;
     }
 
@@ -72,7 +73,7 @@ public class PacketLinkProxy implements InitialPacket, PacketObjectIn<Integer>, 
                 isnew = true;
                 plugin.proxies.put(proxy.getName().toLowerCase(), proxy);
             }
-            HashMap<Integer, SubDataClient> subdata = Util.getDespiteException(() -> Util.reflect(Proxy.class.getDeclaredField("subdata"), proxy), null);
+            HashMap<Integer, SubDataClient> subdata = Try.all.get(() -> Util.reflect(Proxy.class.getDeclaredField("subdata"), proxy));
             if (!subdata.keySet().contains(channel) || (channel == 0 && subdata.get(0) == null)) {
                 proxy.setSubData(client, channel);
                 if (isnew) plugin.getPluginManager().callEvent(new SubAddProxyEvent(proxy));

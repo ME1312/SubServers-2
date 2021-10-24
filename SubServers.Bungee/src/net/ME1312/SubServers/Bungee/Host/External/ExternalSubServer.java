@@ -1,11 +1,11 @@
 package net.ME1312.SubServers.Bungee.Host.External;
 
-import net.ME1312.Galaxi.Library.Callback.ReturnRunnable;
 import net.ME1312.Galaxi.Library.Container.ContainedPair;
 import net.ME1312.Galaxi.Library.Container.Container;
 import net.ME1312.Galaxi.Library.Container.Value;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Map.ObjectMapValue;
+import net.ME1312.Galaxi.Library.Try;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubData.Server.SubDataClient;
 import net.ME1312.SubServers.Bungee.Event.*;
@@ -21,8 +21,11 @@ import net.ME1312.SubServers.Bungee.SubAPI;
 import net.md_5.bungee.api.ChatColor;
 
 import java.io.IOException;
-import java.lang.reflect.Field;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.UUID;
+import java.util.function.Supplier;
 
 /**
  * External SubServer Class
@@ -83,7 +86,7 @@ public class ExternalSubServer extends SubServerImpl {
     }
 
     private void init(ExternalHost host, String name, boolean enabled, int port, String motd, boolean log, String directory, String executable, String stopcmd, boolean hidden, boolean restricted) throws InvalidServerException {
-        if (Util.isNull(host, name, enabled, port, motd, log, stopcmd, hidden, restricted)) throw new NullPointerException();
+        Util.nullpo(host, name, enabled, port, motd, log, stopcmd, hidden, restricted);
         this.host = host;
         this.enabled = enabled;
         this.log = new Container<Boolean>(log);
@@ -209,7 +212,7 @@ public class ExternalSubServer extends SubServerImpl {
 
     @Override
     public boolean command(UUID player, String command) {
-        if (Util.isNull(command)) throw new NullPointerException();
+        Util.nullpo(command);
         if (running) {
             SubSendCommandEvent event = new SubSendCommandEvent(player, this, command);
             host.plugin.getPluginManager().callEvent(event);
@@ -393,7 +396,7 @@ public class ExternalSubServer extends SubServerImpl {
                             case "stop-cmd":
                             case "stop-command":
                                 if (value.isString()) {
-                                    if (!stopcmd.equals(value)) host.queue(new PacketExControlServer(this, Action.SET_STOP_COMMAND, value.asRawString()));
+                                    if (!stopcmd.equals(value.asRawString())) host.queue(new PacketExControlServer(this, Action.SET_STOP_COMMAND, value.asRawString()));
                                     stopcmd = value.asRawString();
                                     if (perma && this.host.plugin.servers.get().getMap("Servers").getKeys().contains(getName())) {
                                         this.host.plugin.servers.get().getMap("Servers").getMap(getName()).set("Stop-Command", getStopCommand());
@@ -404,7 +407,7 @@ public class ExternalSubServer extends SubServerImpl {
                                 break;
                             case "stop-action":
                                 if (value.isString()) {
-                                    StopAction action = Util.getDespiteException(() -> StopAction.valueOf(value.asRawString().toUpperCase().replace('-', '_').replace(' ', '_')), null);
+                                    StopAction action = Try.all.get(() -> StopAction.valueOf(value.asRawString().toUpperCase().replace('-', '_').replace(' ', '_')));
                                     if (action != null) {
                                         stopaction = action;
                                         if (perma && this.host.plugin.servers.get().getMap("Servers").getKeys().contains(getName())) {
@@ -497,8 +500,8 @@ public class ExternalSubServer extends SubServerImpl {
             if (!isRunning() && forward == null && state) start(player);
             return c;
         } else return -1;
-    } private <V> void waitFor(ReturnRunnable<V> method, V value) throws InterruptedException {
-        while (method.run() != value) {
+    } private <V> void waitFor(Supplier<V> method, V value) throws InterruptedException {
+        while (method.get() != value) {
             Thread.sleep(250);
         }
     }
@@ -533,7 +536,7 @@ public class ExternalSubServer extends SubServerImpl {
 
     @Override
     public void setEnabled(boolean value) {
-        if (Util.isNull(value)) throw new NullPointerException();
+        Util.nullpo(value);
         if (enabled != value) host.queue(new PacketExControlServer(this, Action.SET_ENABLED, (Boolean) value));
         enabled = value;
     }
@@ -545,7 +548,7 @@ public class ExternalSubServer extends SubServerImpl {
 
     @Override
     public void setLogging(boolean value) {
-        if (Util.isNull(value)) throw new NullPointerException();
+        Util.nullpo(value);
         if (log.value() != value) host.queue(new PacketExControlServer(this, Action.SET_LOGGING, (Boolean) value));
         log.value(value);
     }
@@ -577,7 +580,7 @@ public class ExternalSubServer extends SubServerImpl {
 
     @Override
     public void setStopCommand(String value) {
-        if (Util.isNull(value)) throw new NullPointerException();
+        Util.nullpo(value);
         if (!stopcmd.equals(value)) host.queue(new PacketExControlServer(this, Action.SET_STOP_COMMAND, value));
         stopcmd = value;
     }
@@ -589,7 +592,7 @@ public class ExternalSubServer extends SubServerImpl {
 
     @Override
     public void setStopAction(StopAction action) {
-        if (Util.isNull(action)) throw new NullPointerException();
+        Util.nullpo(action);
         stopaction = action;
     }
 }

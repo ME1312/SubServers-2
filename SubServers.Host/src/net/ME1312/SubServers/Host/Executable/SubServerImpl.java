@@ -2,7 +2,6 @@ package net.ME1312.SubServers.Host.Executable;
 
 import net.ME1312.Galaxi.Library.Container.Container;
 import net.ME1312.Galaxi.Library.Container.Value;
-import net.ME1312.Galaxi.Library.UniversalFile;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubData.Client.SubDataClient;
@@ -54,7 +53,7 @@ public class SubServerImpl {
      * @throws InvalidServerException
      */
     public SubServerImpl(ExHost host, String name, boolean enabled, int port, boolean log, String directory, String executable, String stopcmd) throws InvalidServerException {
-        if (Util.isNull(host, name, enabled, log, directory, executable)) throw new NullPointerException();
+        Util.nullpo(host, name, enabled, log, directory, executable);
         this.host = host;
         this.name = name;
         this.enabled = enabled;
@@ -69,12 +68,12 @@ public class SubServerImpl {
         this.command = null;
         this.queue = new LinkedList<String>();
         this.stopcmd = stopcmd;
-        final UniversalFile[] locations = new UniversalFile[] {
-                new UniversalFile(this.directory, "plugins:SubServers.Client.jar"),
-                new UniversalFile(this.directory, "mods:SubServers.Client.jar")
+        final File[] locations = new File[] {
+                new File(this.directory, "plugins/SubServers.Client.jar"),
+                new File(this.directory, "mods/SubServers.Client.jar")
         };
 
-        for (UniversalFile location : locations) {
+        for (File location : locations) {
             if (location.exists()) {
                 try {
                     JarInputStream updated = new JarInputStream(ExHost.class.getResourceAsStream("/net/ME1312/SubServers/Host/Library/Files/client.jar"));
@@ -180,7 +179,7 @@ public class SubServerImpl {
      * @param command Command to Send
      */
     public void command(String command) {
-        if (Util.isNull(command)) throw new NullPointerException();
+        Util.nullpo(command);
         if (thread != null && thread.isAlive()) {
             try {
                 if (command.equalsIgnoreCase(stopcmd)) allowrestart = false;
@@ -239,7 +238,7 @@ public class SubServerImpl {
      * @param value Value
      */
     public void setEnabled(boolean value) {
-        if (Util.isNull(value)) throw new NullPointerException();
+        Util.nullpo(value);
         enabled = value;
     }
 
@@ -267,7 +266,7 @@ public class SubServerImpl {
      * @param value Value
      */
     public void setLogging(boolean value) {
-        if (Util.isNull(value)) throw new NullPointerException();
+        Util.nullpo(value);
         log.value(value);
     }
 
@@ -320,7 +319,7 @@ public class SubServerImpl {
      * @param value Value
      */
     public void setStopCommand(String value) {
-        if (Util.isNull(value)) throw new NullPointerException();
+        Util.nullpo(value);
         stopcmd = value;
     }
 }

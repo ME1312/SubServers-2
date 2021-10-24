@@ -20,7 +20,7 @@ public class SubStartEvent extends Event {
      * @param server Server Starting
      */
     public SubStartEvent(UUID player, String server) {
-        if (Util.isNull(server)) throw new NullPointerException();
+        Util.nullpo(server);
         this.player = player;
         this.server = server;
     }

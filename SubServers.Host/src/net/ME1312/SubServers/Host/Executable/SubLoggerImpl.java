@@ -1,13 +1,12 @@
 package net.ME1312.SubServers.Host.Executable;
 
-import net.ME1312.Galaxi.Library.Callback.Callback;
 import net.ME1312.Galaxi.Library.Container.ContainedPair;
 import net.ME1312.Galaxi.Library.Container.Pair;
 import net.ME1312.Galaxi.Library.Container.Value;
-import net.ME1312.Galaxi.Log.LogFilter;
+import net.ME1312.Galaxi.Library.Try;
+import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Log.LogStream;
 import net.ME1312.Galaxi.Log.Logger;
-import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubData.Client.DataClient;
 import net.ME1312.SubData.Client.DataSender;
 import net.ME1312.SubData.Client.Library.DisconnectReason;
@@ -24,6 +23,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -94,19 +94,19 @@ public class SubLoggerImpl {
 
     @SuppressWarnings("deprecation")
     void init() {
-        if (logn) Util.isException(() -> {
+        if (logn) Try.all.run(() -> {
             Process process = this.process;
             ExHost host = SubAPI.getInstance().getInternals();
             channel = (SubDataClient) SubAPI.getInstance().getSubDataNetwork()[0].newChannel();
-            channel.on.closed(new Callback<Pair<DisconnectReason, DataClient>>() {
+            channel.on.closed(new Consumer<Pair<DisconnectReason, DataClient>>() {
                 @Override
-                public void run(Pair<DisconnectReason, DataClient> client) {
+                public void accept(Pair<DisconnectReason, DataClient> client) {
                     if (started && SubLoggerImpl.this.process != null && process == SubLoggerImpl.this.process && process.isAlive()) {
                         int reconnect = host.config.get().getMap("Settings").getMap("SubData").getInt("Reconnect", 60);
-                        if (Util.getDespiteException(() -> Util.reflect(ExHost.class.getDeclaredField("reconnect"), host), false) && reconnect > 0
+                        if (Try.all.get(() -> Util.reflect(ExHost.class.getDeclaredField("reconnect"), host), false) && reconnect > 0
                                 && client.key() != DisconnectReason.PROTOCOL_MISMATCH && client.key() != DisconnectReason.ENCRYPTION_MISMATCH) {
                             Timer timer = new Timer(SubAPI.getInstance().getAppInfo().getName() + "::Log_Reconnect_Handler");
-                            Callback<Pair<DisconnectReason, DataClient>> run = this;
+                            Consumer<Pair<DisconnectReason, DataClient>> run = this;
                             reconnect++;
                             timer.scheduleAtFixedRate(new TimerTask() {
                                 @Override

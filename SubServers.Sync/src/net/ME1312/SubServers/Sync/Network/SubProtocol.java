@@ -1,8 +1,8 @@
 package net.ME1312.SubServers.Sync.Network;
 
-import net.ME1312.Galaxi.Library.Callback.Callback;
 import net.ME1312.Galaxi.Library.Container.Pair;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
+import net.ME1312.Galaxi.Library.Try;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubData.Client.SubDataClient;
@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.UUID;
+import java.util.function.Consumer;
 import java.util.logging.Logger;
 
 /**
@@ -133,9 +134,9 @@ public class SubProtocol extends SubDataProtocol {
     }
 
     @Override
-    protected SubDataClient sub(Callback<Runnable> scheduler, Logger logger, InetAddress address, int port, ObjectMap<?> login) throws IOException {
+    protected SubDataClient sub(Consumer<Runnable> scheduler, Logger logger, InetAddress address, int port, ObjectMap<?> login) throws IOException {
         ExProxy plugin = SubAPI.getInstance().getInternals();
-        HashMap<Integer, SubDataClient> map = Util.getDespiteException(() -> Util.reflect(ExProxy.class.getDeclaredField("subdata"), plugin), null);
+        HashMap<Integer, SubDataClient> map = Try.all.get(() -> Util.reflect(ExProxy.class.getDeclaredField("subdata"), plugin));
 
         int channel = 1;
         while (map.keySet().contains(channel)) channel++;
@@ -151,10 +152,10 @@ public class SubProtocol extends SubDataProtocol {
 
     @SuppressWarnings("deprecation")
     @Override
-    public SubDataClient open(Callback<Runnable> scheduler, Logger logger, InetAddress address, int port) throws IOException {
+    public SubDataClient open(Consumer<Runnable> scheduler, Logger logger, InetAddress address, int port) throws IOException {
         ExProxy plugin = SubAPI.getInstance().getInternals();
         SubDataClient subdata = super.open(scheduler, logger, address, port);
-        HashMap<Integer, SubDataClient> map = Util.getDespiteException(() -> Util.reflect(ExProxy.class.getDeclaredField("subdata"), plugin), null);
+        HashMap<Integer, SubDataClient> map = Try.all.get(() -> Util.reflect(ExProxy.class.getDeclaredField("subdata"), plugin));
 
         subdata.sendPacket(new PacketLinkProxy(plugin, 0));
         subdata.sendPacket(new PacketDownloadLang());
@@ -226,7 +227,7 @@ public class SubProtocol extends SubDataProtocol {
 
             if (plugin.isRunning) {
                 Logger log = net.ME1312.SubServers.Bungee.Library.Compatibility.Logger.get("SubData");
-                Util.isException(() -> Util.reflect(ExProxy.class.getDeclaredMethod("connect", Logger.class, Pair.class), plugin, log, client));
+                Try.all.run(() -> Util.reflect(ExProxy.class.getDeclaredMethod("connect", Logger.class, Pair.class), plugin, log, client));
             } else map.put(0, null);
         });
 

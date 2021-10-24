@@ -1,6 +1,7 @@
 package net.ME1312.SubServers.Bungee.Network.Packet;
 
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
+import net.ME1312.Galaxi.Library.Try;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubData.Server.Library.DisconnectReason;
 import net.ME1312.SubData.Server.Protocol.Initial.InitialPacket;
@@ -44,7 +45,7 @@ public class PacketLinkServer implements InitialPacket, PacketObjectIn<Integer>,
      * @param plugin SubPlugin
      */
     public PacketLinkServer(SubProxy plugin) {
-        if (Util.isNull(plugin)) throw new NullPointerException();
+        Util.nullpo(plugin);
         this.plugin = plugin;
     }
 
@@ -56,7 +57,7 @@ public class PacketLinkServer implements InitialPacket, PacketObjectIn<Integer>,
      * @param message Message
      */
     public PacketLinkServer(String name, int response, String message) {
-        if (Util.isNull(response)) throw new NullPointerException();
+        Util.nullpo(response);
         this.name = name;
         this.response = response;
         this.message = message;
@@ -137,7 +138,7 @@ public class PacketLinkServer implements InitialPacket, PacketObjectIn<Integer>,
     static long req = 1;
     static long last = Calendar.getInstance().getTime().getTime();
     private void link(SubDataClient client, Server server, int channel) throws Throwable {
-        HashMap<Integer, SubDataClient> subdata = Util.getDespiteException(() -> Util.reflect(ServerImpl.class.getDeclaredField("subdata"), server), null);
+        HashMap<Integer, SubDataClient> subdata = Try.all.get(() -> Util.reflect(ServerImpl.class.getDeclaredField("subdata"), server));
         if (!subdata.keySet().contains(channel) || (channel == 0 && subdata.get(0) == null)) {
             server.setSubData(client, channel);
             Logger.get("SubData").info(client.getAddress().toString() + " has been defined as " + ((server instanceof SubServer) ? "SubServer" : "Server") + ": " + server.getName() + ((channel > 0)?" [+"+channel+"]":""));
@@ -148,11 +149,11 @@ public class PacketLinkServer implements InitialPacket, PacketObjectIn<Integer>,
                         client.sendPacket(new PacketOutExReset("Rogue SubServer Detected"));
                     } else {
                         // Drop connection if host is unavailable for rogue checking (try again later)
-                        Util.isException(() -> Util.reflect(SubDataClient.class.getDeclaredMethod("close", DisconnectReason.class), client, DisconnectReason.CLOSE_REQUESTED));
+                        Try.all.run(() -> Util.reflect(SubDataClient.class.getDeclaredMethod("close", DisconnectReason.class), client, DisconnectReason.CLOSE_REQUESTED));
                     }
                 } else {
-                    if (server instanceof SubServer && !Util.getDespiteException(() -> Util.reflect(SubServerImpl.class.getDeclaredField("started"), server), true)) {
-                        Util.isException(() -> Util.reflect(SubServerImpl.class.getDeclaredField("started"), server, true));
+                    if (server instanceof SubServer && !Try.all.get(() -> Util.reflect(SubServerImpl.class.getDeclaredField("started"), server), true)) {
+                        Try.all.run(() -> Util.reflect(SubServerImpl.class.getDeclaredField("started"), server, true));
                         SubStartedEvent event = new SubStartedEvent((SubServer) server);
                         ProxyServer.getInstance().getPluginManager().callEvent(event);
                     }

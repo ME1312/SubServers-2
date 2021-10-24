@@ -1,8 +1,8 @@
 package net.ME1312.SubServers.Bungee.Host.Internal;
 
 import net.ME1312.Galaxi.Library.Config.YAMLSection;
+import net.ME1312.Galaxi.Library.Directories;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
-import net.ME1312.Galaxi.Library.UniversalFile;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubServers.Bungee.Event.SubAddServerEvent;
 import net.ME1312.SubServers.Bungee.Event.SubRemoveServerEvent;
@@ -121,7 +121,7 @@ public class InternalHost extends Host {
 
     @Override
     protected boolean removeSubServer(UUID player, String name, boolean forced) throws InterruptedException {
-        if (Util.isNull(name)) throw new NullPointerException();
+        Util.nullpo(name);
         InternalSubServer server = (InternalSubServer) servers.get(name.toLowerCase());
         SubRemoveServerEvent event = new SubRemoveServerEvent(player, this, server);
         plugin.getPluginManager().callEvent(event);
@@ -153,22 +153,22 @@ public class InternalHost extends Host {
      * @return Success Status
      */
     protected boolean recycleSubServer(UUID player, String name, boolean forced, boolean multithreading) throws InterruptedException {
-        if (Util.isNull(name)) throw new NullPointerException();
+        Util.nullpo(name);
         String server = servers.get(name.toLowerCase()).getName();
         File from = new File(getPath(), servers.get(server.toLowerCase()).getPath());
         if (removeSubServer(player, server, forced)) {
             Runnable method = () -> {
-                UniversalFile to = new UniversalFile(plugin.dir, "SubServers:Recently Deleted:" + server.toLowerCase());
+                File to = new File(plugin.dir, "SubServers/Recently Deleted/" + server.toLowerCase());
                 try {
                     if (from.exists()) {
                         Logger.get("SubServers").info("Moving Files...");
                         if (to.exists()) {
-                            if (to.isDirectory()) Util.deleteDirectory(to);
+                            if (to.isDirectory()) Directories.delete(to);
                             else to.delete();
                         }
                         to.mkdirs();
-                        Util.copyDirectory(from, to);
-                        Util.deleteDirectory(from);
+                        Directories.copy(from, to);
+                        Directories.delete(from);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -215,7 +215,7 @@ public class InternalHost extends Host {
      * @return Success Status
      */
     protected boolean deleteSubServer(UUID player, String name, boolean forced, boolean multithreading) throws InterruptedException {
-        if (Util.isNull(name)) throw new NullPointerException();
+        Util.nullpo(name);
         String server = servers.get(name.toLowerCase()).getName();
         File from = new File(getPath(), servers.get(server.toLowerCase()).getPath());
         if (removeSubServer(player, server, forced)) {
@@ -223,7 +223,7 @@ public class InternalHost extends Host {
                 try {
                     if (from.exists()) {
                         Logger.get("SubServers").info("Removing Files...");
-                        Util.deleteDirectory(from);
+                        Directories.delete(from);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();

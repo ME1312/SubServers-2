@@ -1,8 +1,8 @@
 package net.ME1312.SubServers.Host.Event;
 
+import net.ME1312.Galaxi.Event.Event;
 import net.ME1312.Galaxi.Library.Container.ContainedPair;
 import net.ME1312.Galaxi.Library.Container.Pair;
-import net.ME1312.Galaxi.Event.Event;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Map.ObjectMapValue;
 import net.ME1312.Galaxi.Library.Util;
@@ -25,7 +25,7 @@ public class SubEditServerEvent extends Event {
      * @param edit Edit to make
      */
     public SubEditServerEvent(UUID player, String server, Pair<String, ?> edit) {
-        if (Util.isNull(server, edit)) throw new NullPointerException();
+        Util.nullpo(server, edit);
         ObjectMap<String> section = new ObjectMap<String>();
         section.set(".", edit.value());
         this.player = player;

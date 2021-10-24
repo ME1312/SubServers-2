@@ -1,6 +1,7 @@
 package net.ME1312.SubServers.Bungee.Library.Fallback;
 
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
+import net.ME1312.Galaxi.Library.Try;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubServers.Bungee.BungeeCommon;
 
@@ -28,7 +29,7 @@ public class SmartFallback implements ReconnectHandler {
     public SmartFallback(ObjectMap<String> settings) {
         dns_forward = settings.getBoolean("DNS-Forward", false);
         if (reconnect == null && settings.getBoolean("Reconnect", false))
-            reconnect = Util.getDespiteException(() -> Util.reflect(ProxyServer.getInstance().getPluginManager().getPlugin("reconnect_yaml").getClass().getClassLoader().loadClass("net.md_5.bungee.module.reconnect.yaml.YamlReconnectHandler").getConstructor()), null);
+            reconnect = Try.all.get(() -> Util.reflect(ProxyServer.getInstance().getPluginManager().getPlugin("reconnect_yaml").getClass().getClassLoader().loadClass("net.md_5.bungee.module.reconnect.yaml.YamlReconnectHandler").getConstructor()));
     }
 
     @Override
@@ -177,7 +178,7 @@ public class SmartFallback implements ReconnectHandler {
      * @param inspector Inspector
      */
     public static void addInspector(FallbackInspector inspector) {
-        if (Util.isNull(inspector)) throw new NullPointerException();
+        Util.nullpo(inspector);
         inspectors.add(inspector);
     }
 
@@ -187,8 +188,8 @@ public class SmartFallback implements ReconnectHandler {
      * @param inspector Inspector
      */
     public static void removeInspector(FallbackInspector inspector) {
-        if (Util.isNull(inspector)) throw new NullPointerException();
-        Util.isException(() -> inspectors.remove(inspector));
+        Util.nullpo(inspector);
+        Try.all.run(() -> inspectors.remove(inspector));
     }
 
     @Override

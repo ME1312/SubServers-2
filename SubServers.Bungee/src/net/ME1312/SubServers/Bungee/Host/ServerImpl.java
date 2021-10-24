@@ -5,7 +5,6 @@ import net.ME1312.Galaxi.Library.Map.ObjectMapValue;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubData.Server.DataClient;
 import net.ME1312.SubData.Server.SubDataClient;
-import net.ME1312.SubServers.Bungee.Event.SubRemoveProxyEvent;
 import net.ME1312.SubServers.Bungee.Library.Exception.InvalidServerException;
 import net.ME1312.SubServers.Bungee.Network.Packet.PacketOutExEditServer;
 import net.ME1312.SubServers.Bungee.Network.Packet.PacketOutExEditServer.Edit;
@@ -13,7 +12,6 @@ import net.ME1312.SubServers.Bungee.SubAPI;
 
 import net.md_5.bungee.BungeeServerInfo;
 import net.md_5.bungee.api.CommandSender;
-import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 import java.net.InetSocketAddress;
@@ -71,7 +69,7 @@ public class ServerImpl extends BungeeServerInfo implements Server {
 
     @SuppressWarnings("deprecation")
     private void init(String name, SocketAddress address, String motd, boolean hidden, boolean restricted) throws InvalidServerException {
-        if (Util.isNull(name, address, motd, hidden, restricted)) throw new NullPointerException();
+        Util.nullpo(name, address, motd, hidden, restricted);
         if (name.contains(" ")) throw new InvalidServerException("Server names cannot have spaces: " + name);
         SubAPI.getInstance().getInternals().subprotocol.whitelist(getAddress().getAddress().getHostAddress());
         this.hidden = hidden;
@@ -160,7 +158,7 @@ public class ServerImpl extends BungeeServerInfo implements Server {
     @Override
     @SuppressWarnings("deprecation")
     public void addGroup(String value) {
-        if (Util.isNull(value)) throw new NullPointerException();
+        Util.nullpo(value);
         if (value.length() > 0 && !groups.contains(value)) {
             groups.add(value);
             Collections.sort(groups);
@@ -170,7 +168,7 @@ public class ServerImpl extends BungeeServerInfo implements Server {
     @Override
     @SuppressWarnings("deprecation")
     public void removeGroup(String value) {
-        if (Util.isNull(value)) throw new NullPointerException();
+        Util.nullpo(value);
         groups.remove(value);
         Collections.sort(groups);
     }
@@ -194,7 +192,7 @@ public class ServerImpl extends BungeeServerInfo implements Server {
     }
 
     public void setMotd(String value) {
-        if (Util.isNull(value)) throw new NullPointerException();
+        Util.nullpo(value);
         try {
             Util.reflect(BungeeServerInfo.class.getDeclaredField("motd"), this, value);
             for (Proxy proxy : SubAPI.getInstance().getProxies().values()) if (proxy.getSubData()[0] != null) {
@@ -206,7 +204,7 @@ public class ServerImpl extends BungeeServerInfo implements Server {
     }
 
     public void setRestricted(boolean value) {
-        if (Util.isNull(value)) throw new NullPointerException();
+        Util.nullpo(value);
         try {
             Util.reflect(BungeeServerInfo.class.getDeclaredField("restricted"), this, value);
 
@@ -241,7 +239,7 @@ public class ServerImpl extends BungeeServerInfo implements Server {
 
     @Override
     public void whitelist(UUID player) {
-        if (Util.isNull(player)) throw new NullPointerException();
+        Util.nullpo(player);
         if (!whitelist.contains(player)) whitelist.add(player);
         if (isRegistered()) for (Proxy proxy : SubAPI.getInstance().getProxies().values()) if (proxy.getSubData()[0] != null) {
             ((SubDataClient) proxy.getSubData()[0]).sendPacket(new PacketOutExEditServer(this, Edit.WHITELIST_ADD, player));
@@ -250,7 +248,7 @@ public class ServerImpl extends BungeeServerInfo implements Server {
 
     @Override
     public void unwhitelist(UUID player) {
-        if (Util.isNull(player)) throw new NullPointerException();
+        Util.nullpo(player);
         whitelist.remove(player);
         if (isRegistered()) for (Proxy proxy : SubAPI.getInstance().getProxies().values()) if (proxy.getSubData()[0] != null) {
             ((SubDataClient) proxy.getSubData()[0]).sendPacket(new PacketOutExEditServer(this, Edit.WHITELIST_REMOVE, player));
@@ -269,19 +267,19 @@ public class ServerImpl extends BungeeServerInfo implements Server {
 
     @Override
     public void addExtra(String handle, Object value) {
-        if (Util.isNull(handle, value)) throw new NullPointerException();
+        Util.nullpo(handle, value);
         extra.set(handle, value);
     }
 
     @Override
     public boolean hasExtra(String handle) {
-        if (Util.isNull(handle)) throw new NullPointerException();
+        Util.nullpo(handle);
         return extra.getKeys().contains(handle);
     }
 
     @Override
     public ObjectMapValue getExtra(String handle) {
-        if (Util.isNull(handle)) throw new NullPointerException();
+        Util.nullpo(handle);
         return extra.get(handle);
     }
 
@@ -292,7 +290,7 @@ public class ServerImpl extends BungeeServerInfo implements Server {
 
     @Override
     public void removeExtra(String handle) {
-        if (Util.isNull(handle)) throw new NullPointerException();
+        Util.nullpo(handle);
         extra.remove(handle);
     }
 

@@ -1,10 +1,9 @@
 package net.ME1312.SubServers.Host.Library;
 
-import net.ME1312.Galaxi.Library.Util;
+import net.ME1312.Galaxi.Library.Directories;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,7 +22,7 @@ public abstract class FileScanner {
      * @param whitelist File Whitelist
      */
     protected void scan(File dir, String... whitelist) throws IOException {
-        List<String> files = Util.searchDirectory(dir);
+        List<String> files = Directories.search(dir);
         if (files.size() <= 0 || whitelist.length <= 0)
             return;
 

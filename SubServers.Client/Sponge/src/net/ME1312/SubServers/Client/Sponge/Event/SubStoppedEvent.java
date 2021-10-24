@@ -18,7 +18,7 @@ public class SubStoppedEvent extends AbstractEvent implements SubEvent {
      * @param server Server that Stopped
      */
     public SubStoppedEvent(String server) {
-        if (Util.isNull(server)) throw new NullPointerException();
+        Util.nullpo(server);
         this.server = server;
     }
 

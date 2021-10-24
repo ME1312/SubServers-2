@@ -1,19 +1,21 @@
 package net.ME1312.SubServers.Bungee.Host.External;
 
-import net.ME1312.Galaxi.Library.Callback.Callback;
 import net.ME1312.Galaxi.Library.Config.YAMLConfig;
 import net.ME1312.Galaxi.Library.Container.ContainedPair;
 import net.ME1312.Galaxi.Library.Container.Container;
 import net.ME1312.Galaxi.Library.Container.Pair;
 import net.ME1312.Galaxi.Library.Container.Value;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
-import net.ME1312.Galaxi.Library.UniversalFile;
+import net.ME1312.Galaxi.Library.Try;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubData.Server.SubDataClient;
 import net.ME1312.SubServers.Bungee.Event.SubCreateEvent;
 import net.ME1312.SubServers.Bungee.Event.SubCreatedEvent;
-import net.ME1312.SubServers.Bungee.Host.*;
+import net.ME1312.SubServers.Bungee.Host.Host;
+import net.ME1312.SubServers.Bungee.Host.SubCreator;
+import net.ME1312.SubServers.Bungee.Host.SubLogger;
+import net.ME1312.SubServers.Bungee.Host.SubServer;
 import net.ME1312.SubServers.Bungee.Host.SubServer.StopAction;
 import net.ME1312.SubServers.Bungee.Library.Compatibility.Logger;
 import net.ME1312.SubServers.Bungee.Network.Packet.PacketExConfigureHost;
@@ -30,6 +32,7 @@ import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.net.InetSocketAddress;
 import java.util.*;
+import java.util.function.Consumer;
 
 /**
  * External SubCreator Class
@@ -55,7 +58,7 @@ public class ExternalSubCreator extends SubCreator {
      */
     public ExternalSubCreator(ExternalHost host, Range<Integer> ports, boolean log, String gitBash) {
         if (!ports.hasLowerBound() || !ports.hasUpperBound()) throw new IllegalArgumentException("Port range is not bound");
-        if (Util.isNull(host, ports, log, gitBash)) throw new NullPointerException();
+        Util.nullpo(host, ports, log, gitBash);
         this.host = host;
         this.ports = ports;
         this.log = new Container<Boolean>(log);
@@ -67,10 +70,10 @@ public class ExternalSubCreator extends SubCreator {
     @Override
     public void reload() {
         templatesR.clear();
-        if (new UniversalFile(host.plugin.dir, "SubServers:Templates").exists()) for (File file : new UniversalFile(host.plugin.dir, "SubServers:Templates").listFiles()) {
+        if (new File(host.plugin.dir, "SubServers/Templates").exists()) for (File file : new File(host.plugin.dir, "SubServers/Templates").listFiles()) {
             try {
                 if (file.isDirectory() && !file.getName().endsWith(".x")) {
-                    ObjectMap<String> config = (new UniversalFile(file, "template.yml").exists())?new YAMLConfig(new UniversalFile(file, "template.yml")).get().getMap("Template", new ObjectMap<String>()):new ObjectMap<String>();
+                    ObjectMap<String> config = (new File(file, "template.yml").exists())? new YAMLConfig(new File(file, "template.yml")).get().getMap("Template", new ObjectMap<String>()) : new ObjectMap<String>();
                     ServerTemplate template = loadTemplate(file.getName(), config.getBoolean("Enabled", true), config.getBoolean("Internal", false), config.getRawString("Icon", "::NULL::"), file, config.getMap("Build", new ObjectMap<String>()), config.getMap("Settings", new ObjectMap<String>()));
                     templatesR.put(file.getName().toLowerCase(), template);
                     if (config.getKeys().contains("Display")) template.setDisplayName(config.getString("Display"));
@@ -81,7 +84,7 @@ public class ExternalSubCreator extends SubCreator {
             }
         }
 
-        if (host.available && !Util.getDespiteException(() -> Util.reflect(SubProxy.class.getDeclaredField("reloading"), host.plugin), false)) {
+        if (host.available && !Try.all.get(() -> Util.reflect(SubProxy.class.getDeclaredField("reloading"), host.plugin), false)) {
             host.queue(new PacketExConfigureHost(host.plugin, host), new PacketExUploadTemplates(host.plugin, () -> {
                 if (enableRT == null || enableRT) host.queue(new PacketExDownloadTemplates(host.plugin, host));
             }));
@@ -89,8 +92,8 @@ public class ExternalSubCreator extends SubCreator {
     }
 
     @Override
-    public boolean create(UUID player, String name, ServerTemplate template, Version version, Integer port, Callback<SubServer> callback) {
-        if (Util.isNull(name, template)) throw new NullPointerException();
+    public boolean create(UUID player, String name, ServerTemplate template, Version version, Integer port, Consumer<SubServer> callback) {
+        Util.nullpo(name, template);
         if (host.isAvailable() && host.isEnabled() && template.isEnabled() && !SubAPI.getInstance().getSubServers().keySet().contains(name.toLowerCase()) && !SubCreator.isReserved(name) && (version != null || !template.requiresVersion())) {
             StackTraceElement[] origin = new Exception().getStackTrace();
 
@@ -123,9 +126,9 @@ public class ExternalSubCreator extends SubCreator {
                 return false;
             }
         } else return false;
-    } private <T> void callback(StackTraceElement[] origin, Callback<T> callback, T value) {
+    } private <T> void callback(StackTraceElement[] origin, Consumer<T> callback, T value) {
         if (callback != null) try {
-            callback.run(value);
+            callback.accept(value);
         } catch (Throwable e) {
             Throwable ew = new InvocationTargetException(e);
             ew.setStackTrace(origin);
@@ -134,8 +137,8 @@ public class ExternalSubCreator extends SubCreator {
     }
 
     @Override
-    public boolean update(UUID player, SubServer server, ServerTemplate template, Version version, Callback<Boolean> callback) {
-        if (Util.isNull(server)) throw new NullPointerException();
+    public boolean update(UUID player, SubServer server, ServerTemplate template, Version version, Consumer<Boolean> callback) {
+        Util.nullpo(server);
         final ServerTemplate ft = (template == null)?server.getTemplate():template;
         if (host.isAvailable() && host.isEnabled() && host == server.getHost() && server.isAvailable() && !server.isRunning() && ft != null && ft.isEnabled() && ft.canUpdate() && (version != null || !ft.requiresVersion())) {
             StackTraceElement[] origin = new Exception().getStackTrace();
@@ -153,7 +156,7 @@ public class ExternalSubCreator extends SubCreator {
                 host.queue(new PacketExCreateServer(player, server, ft, version, logger.getExternalAddress(), data -> {
                     finish(player, server, server.getName(), ft, version, server.getAddress().getPort(), prefix, origin, data, s -> {
                         ((ExternalSubServer) server).updating(false);
-                        if (callback != null) callback.run(s != null);
+                        if (callback != null) callback.accept(s != null);
                     });
                     this.thread.remove(name.toLowerCase());
                 }));
@@ -165,7 +168,7 @@ public class ExternalSubCreator extends SubCreator {
         } else return false;
     }
 
-    private void finish(UUID player, SubServer update, String name, ServerTemplate template, Version version, int port, String prefix, StackTraceElement[] origin, ObjectMap<Integer> data, Callback<SubServer> callback) {
+    private void finish(UUID player, SubServer update, String name, ServerTemplate template, Version version, int port, String prefix, StackTraceElement[] origin, ObjectMap<Integer> data, Consumer<SubServer> callback) {
         try {
             if (data.getInt(0x0001) == 0) {
                 Logger.get(prefix).info("Saving...");
@@ -201,14 +204,14 @@ public class ExternalSubCreator extends SubCreator {
                     }
                     server.setAll(config);
 
-                    if (update != null) Util.isException(() -> update.getHost().forceRemoveSubServer(name));
+                    if (update != null) Try.all.run(() -> update.getHost().forceRemoveSubServer(name));
                     subserver = host.constructSubServer(name, server.getBoolean("Enabled"), port, ChatColor.translateAlternateColorCodes('&', server.getString("Motd")), server.getBoolean("Log"),
                             server.getRawString("Directory"), server.getRawString("Executable"), server.getRawString("Stop-Command"), server.getBoolean("Hidden"), server.getBoolean("Restricted"));
 
                     if (server.getString("Display").length() > 0) subserver.setDisplayName(server.getString("Display"));
                     subserver.setTemplate(server.getRawString("Template"));
                     for (String group : server.getStringList("Group")) subserver.addGroup(group);
-                    SubServer.StopAction action = Util.getDespiteException(() -> SubServer.StopAction.valueOf(server.getRawString("Stop-Action").toUpperCase().replace('-', '_').replace(' ', '_')), null);
+                    SubServer.StopAction action = Try.all.get(() -> SubServer.StopAction.valueOf(server.getRawString("Stop-Action").toUpperCase().replace('-', '_').replace(' ', '_')));
                     if (action != null) subserver.setStopAction(action);
                     if (server.contains("Extra")) for (String extra : server.getMap("Extra").getKeys())
                         subserver.addExtra(extra, server.getMap("Extra").getObject(extra));
@@ -320,7 +323,7 @@ public class ExternalSubCreator extends SubCreator {
 
     @Override
     public void setLogging(boolean value) {
-        if (Util.isNull(value)) throw new NullPointerException();
+        Util.nullpo(value);
         log.value(value);
     }
 
@@ -350,7 +353,7 @@ public class ExternalSubCreator extends SubCreator {
 
     @Override
     public ServerTemplate getTemplate(String name) {
-        if (Util.isNull(name)) throw new NullPointerException();
+        Util.nullpo(name);
         name = name.toLowerCase();
 
         ServerTemplate template = templates.getOrDefault(name, null);

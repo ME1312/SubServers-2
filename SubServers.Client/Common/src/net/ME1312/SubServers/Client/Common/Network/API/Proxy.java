@@ -1,6 +1,5 @@
 package net.ME1312.SubServers.Client.Common.Network.API;
 
-import net.ME1312.Galaxi.Library.Callback.Callback;
 import net.ME1312.Galaxi.Library.Container.ContainedPair;
 import net.ME1312.Galaxi.Library.Container.Pair;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
@@ -16,6 +15,7 @@ import net.ME1312.SubServers.Client.Common.Network.Packet.PacketDownloadProxyInf
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
+import java.util.function.Consumer;
 
 /**
  * Simplified Proxy Data Class
@@ -129,12 +129,12 @@ public class Proxy {
      *
      * @param callback Remote Player Collection
      */
-    public void getPlayers(Callback<Collection<RemotePlayer>> callback) {
-        if (Util.isNull(callback)) throw new NullPointerException();
+    public void getPlayers(Consumer<Collection<RemotePlayer>> callback) {
+        Util.nullpo(callback);
         StackTraceElement[] origin = new Exception().getStackTrace();
         Runnable run = () -> {
             try {
-                callback.run(players);
+                callback.accept(players);
             } catch (Throwable e) {
                 Throwable ew = new InvocationTargetException(e);
                 ew.setStackTrace(origin);
@@ -184,7 +184,7 @@ public class Proxy {
      * @return Value Status
      */
     public boolean hasExtra(String handle) {
-        if (Util.isNull(handle)) throw new NullPointerException();
+        Util.nullpo(handle);
         return raw.getMap("extra").getKeys().contains(handle);
     }
 
@@ -195,7 +195,7 @@ public class Proxy {
      * @return Value
      */
     public ObjectMapValue<String> getExtra(String handle) {
-        if (Util.isNull(handle)) throw new NullPointerException();
+        Util.nullpo(handle);
         return raw.getMap("extra").get(handle);
     }
 

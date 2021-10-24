@@ -1,6 +1,5 @@
 package net.ME1312.SubServers.Client.Common.Network.API;
 
-import net.ME1312.Galaxi.Library.Callback.Callback;
 import net.ME1312.Galaxi.Library.Container.Pair;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Map.ObjectMapValue;
@@ -17,6 +16,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.*;
+import java.util.function.Consumer;
+import java.util.function.IntConsumer;
 
 /**
  * Simplified Host Data Class
@@ -173,12 +174,12 @@ public class Host {
      *
      * @param callback Remote Player Collection
      */
-    public void getRemotePlayers(Callback<Collection<RemotePlayer>> callback) {
-        if (Util.isNull(callback)) throw new NullPointerException();
+    public void getRemotePlayers(Consumer<Collection<RemotePlayer>> callback) {
+        Util.nullpo(callback);
         StackTraceElement[] origin = new Exception().getStackTrace();
         Runnable run = () -> {
             try {
-                callback.run(players);
+                callback.accept(players);
             } catch (Throwable e) {
                 Throwable ew = new InvocationTargetException(e);
                 ew.setStackTrace(origin);
@@ -319,7 +320,7 @@ public class Host {
      * @return a SubServer
      */
     public SubServer getSubServer(String name) {
-        if (Util.isNull(name)) throw new NullPointerException();
+        Util.nullpo(name);
         return getSubServers().get(name.toLowerCase());
     }
 
@@ -339,7 +340,7 @@ public class Host {
      * @param response Response Code
      * @return The SubServer
      */
-    public void addSubServer(String name, boolean enabled, int port, String motd, boolean log, String directory, String executable, String stopcmd, boolean hidden, boolean restricted, Callback<Integer> response) {
+    public void addSubServer(String name, boolean enabled, int port, String motd, boolean log, String directory, String executable, String stopcmd, boolean hidden, boolean restricted, IntConsumer response) {
         addSubServer(null, name, enabled, port, motd, log, directory, executable, stopcmd, hidden, restricted, response);
     }
 
@@ -360,12 +361,12 @@ public class Host {
      * @param response Response Code
      * @return The SubServer
      */
-    public void addSubServer(UUID player, String name, boolean enabled, int port, String motd, boolean log, String directory, String executable, String stopcmd, boolean hidden, boolean restricted, Callback<Integer> response) {
-        if (Util.isNull(response)) throw new NullPointerException();
+    public void addSubServer(UUID player, String name, boolean enabled, int port, String motd, boolean log, String directory, String executable, String stopcmd, boolean hidden, boolean restricted, IntConsumer response) {
+        Util.nullpo(response);
         StackTraceElement[] origin = new Exception().getStackTrace();
         client().sendPacket(new PacketAddServer(player, name, enabled, getName(), port, motd, log, directory, executable, stopcmd, hidden, restricted, data -> {
             try {
-                response.run(data.getInt(0x0001));
+                response.accept(data.getInt(0x0001));
             } catch (Throwable e) {
                 Throwable ew = new InvocationTargetException(e);
                 ew.setStackTrace(origin);
@@ -429,7 +430,7 @@ public class Host {
      * @param name SubServer Name
      */
     public void removeSubServer(UUID player, String name) {
-        if (Util.isNull(name)) throw new NullPointerException();
+        Util.nullpo(name);
         removeSubServer(player, name, false, i -> {});
     }
 
@@ -449,7 +450,7 @@ public class Host {
      * @param name SubServer Name
      */
     public void forceRemoveSubServer(UUID player, String name) {
-        if (Util.isNull(name)) throw new NullPointerException();
+        Util.nullpo(name);
         removeSubServer(player, name, true, i -> {});
     }
 
@@ -459,7 +460,7 @@ public class Host {
      * @param name SubServer Name
      * @param response Response Code
      */
-    public void removeSubServer(String name, Callback<Integer> response) {
+    public void removeSubServer(String name, IntConsumer response) {
         removeSubServer(null, name, response);
     }
 
@@ -470,8 +471,8 @@ public class Host {
      * @param name SubServer Name
      * @param response Response Code
      */
-    public void removeSubServer(UUID player, String name, Callback<Integer> response) {
-        if (Util.isNull(name)) throw new NullPointerException();
+    public void removeSubServer(UUID player, String name, IntConsumer response) {
+        Util.nullpo(name);
         removeSubServer(player, name, false, response);
     }
 
@@ -481,7 +482,7 @@ public class Host {
      * @param name SubServer Name
      * @param response Response Code
      */
-    public void forceRemoveSubServer(String name, Callback<Integer> response) {
+    public void forceRemoveSubServer(String name, IntConsumer response) {
         forceRemoveSubServer(null, name, response);
     }
 
@@ -492,17 +493,17 @@ public class Host {
      * @param name SubServer Name
      * @param response Response Code
      */
-    public void forceRemoveSubServer(UUID player, String name, Callback<Integer> response) {
-        if (Util.isNull(name)) throw new NullPointerException();
+    public void forceRemoveSubServer(UUID player, String name, IntConsumer response) {
+        Util.nullpo(name);
         removeSubServer(player, name, true, response);
     }
 
-    private void removeSubServer(UUID player, String name, boolean force, Callback<Integer> response) {
-        if (Util.isNull(response)) throw new NullPointerException();
+    private void removeSubServer(UUID player, String name, boolean force, IntConsumer response) {
+        Util.nullpo(response);
         StackTraceElement[] origin = new Exception().getStackTrace();
         client().sendPacket(new PacketRemoveServer(player, name, force, data -> {
             try {
-                response.run(data.getInt(0x0001));
+                response.accept(data.getInt(0x0001));
             } catch (Throwable e) {
                 Throwable ew = new InvocationTargetException(e);
                 ew.setStackTrace(origin);
@@ -527,7 +528,7 @@ public class Host {
      * @param name SubServer Name
      */
     public void recycleSubServer(UUID player, String name) {
-        if (Util.isNull(name)) throw new NullPointerException();
+        Util.nullpo(name);
         deleteSubServer(player, name, true, false, i -> {});
     }
 
@@ -547,7 +548,7 @@ public class Host {
      * @param name SubServer Name
      */
     public void forceRecycleSubServer(UUID player, String name) {
-        if (Util.isNull(name)) throw new NullPointerException();
+        Util.nullpo(name);
         deleteSubServer(player, name, true, true, i -> {});
     }
 
@@ -557,7 +558,7 @@ public class Host {
      * @param name SubServer Name
      * @param response Response Code
      */
-    public void recycleSubServer(String name, Callback<Integer> response) {
+    public void recycleSubServer(String name, IntConsumer response) {
         recycleSubServer(null, name, response);
     }
 
@@ -568,8 +569,8 @@ public class Host {
      * @param name SubServer Name
      * @param response Response Code
      */
-    public void recycleSubServer(UUID player, String name, Callback<Integer> response) {
-        if (Util.isNull(name)) throw new NullPointerException();
+    public void recycleSubServer(UUID player, String name, IntConsumer response) {
+        Util.nullpo(name);
         deleteSubServer(player, name, true, false, response);
     }
 
@@ -579,7 +580,7 @@ public class Host {
      * @param name SubServer Name
      * @param response Response Code
      */
-    public void forceRecycleSubServer(String name, Callback<Integer> response) {
+    public void forceRecycleSubServer(String name, IntConsumer response) {
         forceRecycleSubServer(null, name, response);
     }
 
@@ -590,8 +591,8 @@ public class Host {
      * @param name SubServer Name
      * @param response Response Code
      */
-    public void forceRecycleSubServer(UUID player, String name, Callback<Integer> response) {
-        if (Util.isNull(name)) throw new NullPointerException();
+    public void forceRecycleSubServer(UUID player, String name, IntConsumer response) {
+        Util.nullpo(name);
         deleteSubServer(player, name, true, true, response);
     }
 
@@ -613,7 +614,7 @@ public class Host {
      * @return Success Status
      */
     public void deleteSubServer(UUID player, String name) {
-        if (Util.isNull(name)) throw new NullPointerException();
+        Util.nullpo(name);
         deleteSubServer(player, name, false, false, i -> {});
     }
 
@@ -635,7 +636,7 @@ public class Host {
      * @return Success Status
      */
     public void forceDeleteSubServer(UUID player, String name) {
-        if (Util.isNull(name)) throw new NullPointerException();
+        Util.nullpo(name);
         deleteSubServer(player, name, false, true, i -> {});
     }
 
@@ -645,7 +646,7 @@ public class Host {
      * @param name SubServer Name
      * @return Success Status
      */
-    public void deleteSubServer(String name, Callback<Integer> response) {
+    public void deleteSubServer(String name, IntConsumer response) {
         deleteSubServer(null, name, response);
     }
 
@@ -656,8 +657,8 @@ public class Host {
      * @param name SubServer Name
      * @return Success Status
      */
-    public void deleteSubServer(UUID player, String name, Callback<Integer> response) {
-        if (Util.isNull(name)) throw new NullPointerException();
+    public void deleteSubServer(UUID player, String name, IntConsumer response) {
+        Util.nullpo(name);
         deleteSubServer(player, name, false, false, response);
     }
 
@@ -667,7 +668,7 @@ public class Host {
      * @param name SubServer Name
      * @return Success Status
      */
-    public void forceDeleteSubServer(String name, Callback<Integer> response) {
+    public void forceDeleteSubServer(String name, IntConsumer response) {
         forceDeleteSubServer(null, name, response);
     }
 
@@ -678,17 +679,17 @@ public class Host {
      * @param name SubServer Name
      * @return Success Status
      */
-    public void forceDeleteSubServer(UUID player, String name, Callback<Integer> response) {
-        if (Util.isNull(name)) throw new NullPointerException();
+    public void forceDeleteSubServer(UUID player, String name, IntConsumer response) {
+        Util.nullpo(name);
         deleteSubServer(player, name, false, true, response);
     }
 
-    private void deleteSubServer(UUID player, String name, boolean recycle, boolean force, Callback<Integer> response) {
-        if (Util.isNull(response)) throw new NullPointerException();
+    private void deleteSubServer(UUID player, String name, boolean recycle, boolean force, IntConsumer response) {
+        Util.nullpo(response);
         StackTraceElement[] origin = new Exception().getStackTrace();
         client().sendPacket(new PacketDeleteServer(player, name, recycle, force, data -> {
             try {
-                response.run(data.getInt(0x0001));
+                response.accept(data.getInt(0x0001));
             } catch (Throwable e) {
                 Throwable ew = new InvocationTargetException(e);
                 ew.setStackTrace(origin);
@@ -722,7 +723,7 @@ public class Host {
      * @return Value Status
      */
     public boolean hasExtra(String handle) {
-        if (Util.isNull(handle)) throw new NullPointerException();
+        Util.nullpo(handle);
         return raw.getMap("extra").getKeys().contains(handle);
     }
 
@@ -733,7 +734,7 @@ public class Host {
      * @return Value
      */
     public ObjectMapValue<String> getExtra(String handle) {
-        if (Util.isNull(handle)) throw new NullPointerException();
+        Util.nullpo(handle);
         return raw.getMap("extra").get(handle);
     }
 

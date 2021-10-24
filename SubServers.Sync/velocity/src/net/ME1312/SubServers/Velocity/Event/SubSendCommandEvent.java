@@ -20,7 +20,7 @@ public class SubSendCommandEvent implements SubEvent {
      * @param server Server being Commanded
      */
     public SubSendCommandEvent(UUID player, String server, String command) {
-        if (Util.isNull(server, command)) throw new NullPointerException();
+        Util.nullpo(server, command);
         this.player = player;
         this.server = server;
         this.command = command;

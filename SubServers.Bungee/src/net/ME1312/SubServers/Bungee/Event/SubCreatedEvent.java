@@ -39,7 +39,7 @@ public class SubCreatedEvent extends Event implements SubEvent {
      * @param success Success Status
      */
     public SubCreatedEvent(UUID player, Host host, String name, SubCreator.ServerTemplate template, Version version, int port, SubServer server, boolean update, boolean success) {
-        if (Util.isNull(host, name, template, port)) throw new NullPointerException();
+        Util.nullpo(host, name, template, port);
         this.player = player;
         this.host = host;
         this.name = name;

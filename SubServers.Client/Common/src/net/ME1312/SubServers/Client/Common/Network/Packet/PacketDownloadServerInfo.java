@@ -1,6 +1,5 @@
 package net.ME1312.SubServers.Client.Common.Network.Packet;
 
-import net.ME1312.Galaxi.Library.Callback.Callback;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubData.Client.Protocol.PacketObjectIn;
@@ -11,12 +10,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 /**
  * Download Server Info Packet
  */
 public class PacketDownloadServerInfo implements PacketObjectIn<Integer>, PacketObjectOut<Integer> {
-    private static HashMap<UUID, Callback<ObjectMap<String>>[]> callbacks = new HashMap<UUID, Callback<ObjectMap<String>>[]>();
+    private static HashMap<UUID, Consumer<ObjectMap<String>>[]> callbacks = new HashMap<UUID, Consumer<ObjectMap<String>>[]>();
     private List<String> servers;
     private UUID tracker;
 
@@ -32,8 +32,8 @@ public class PacketDownloadServerInfo implements PacketObjectIn<Integer>, Packet
      * @param callback Callbacks
      */
     @SafeVarargs
-    public PacketDownloadServerInfo(List<String> servers, Callback<ObjectMap<String>>... callback) {
-        if (Util.isNull((Object) callback)) throw new NullPointerException();
+    public PacketDownloadServerInfo(List<String> servers, Consumer<ObjectMap<String>>... callback) {
+        Util.nullpo((Object) callback);
         this.servers = servers;
         this.tracker = Util.getNew(callbacks.keySet(), UUID::randomUUID);
         callbacks.put(tracker, callback);
@@ -50,7 +50,7 @@ public class PacketDownloadServerInfo implements PacketObjectIn<Integer>, Packet
     @SuppressWarnings("unchecked")
     @Override
     public void receive(SubDataSender client, ObjectMap<Integer> data) {
-        for (Callback<ObjectMap<String>> callback : callbacks.get(data.getUUID(0x0000))) callback.run(new ObjectMap<String>((Map<String, ?>) data.getObject(0x0001)));
+        for (Consumer<ObjectMap<String>> callback : callbacks.get(data.getUUID(0x0000))) callback.accept(new ObjectMap<String>((Map<String, ?>) data.getObject(0x0001)));
         callbacks.remove(data.getUUID(0x0000));
     }
 

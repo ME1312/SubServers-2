@@ -25,7 +25,7 @@ public class SubSendCommandEvent extends Event implements SubEvent, Cancellable 
      * @param server Server being Commanded
      */
     public SubSendCommandEvent(UUID player, SubServer server, String command) {
-        if (Util.isNull(server, command)) throw new NullPointerException();
+        Util.nullpo(server, command);
         this.player = player;
         this.server = server;
         this.command = command;

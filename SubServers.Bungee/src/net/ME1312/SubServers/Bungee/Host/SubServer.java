@@ -40,7 +40,7 @@ public interface SubServer extends Server {
          * @param command Command
          */
         public LoggedCommand(String command) {
-            if (Util.isNull(command)) throw new NullPointerException();
+            Util.nullpo(command);
             this.date = Calendar.getInstance().getTime();
             this.sender = null;
             this.command = command;
@@ -53,7 +53,7 @@ public interface SubServer extends Server {
          * @param command Command
          */
         public LoggedCommand(UUID sender, String command) {
-            if (Util.isNull(command)) throw new NullPointerException();
+            Util.nullpo(command);
             this.date = Calendar.getInstance().getTime();
             this.sender = sender;
             this.command = command;
@@ -67,7 +67,7 @@ public interface SubServer extends Server {
          * @param command Command
          */
         public LoggedCommand(Date date, UUID sender, String command) {
-            if (Util.isNull(date, command)) throw new NullPointerException();
+            Util.nullpo(date, command);
             this.date = date;
             this.sender = sender;
             this.command = command;

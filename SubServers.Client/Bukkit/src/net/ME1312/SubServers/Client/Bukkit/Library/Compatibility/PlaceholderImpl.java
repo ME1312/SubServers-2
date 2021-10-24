@@ -3,6 +3,7 @@ package net.ME1312.SubServers.Client.Bukkit.Library.Compatibility;
 import net.ME1312.Galaxi.Library.Container.ContainedPair;
 import net.ME1312.Galaxi.Library.Container.Pair;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
+import net.ME1312.Galaxi.Library.Try;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubServers.Client.Bukkit.Event.*;
 import net.ME1312.SubServers.Client.Bukkit.SubAPI;
@@ -678,7 +679,7 @@ public class PlaceholderImpl extends PlaceholderExpansion implements Taskable, C
             public void start(SubStartEvent e) {
                 Server server = getServer(e.getServer());
                 if (server != null) {
-                    Util.isException(() -> Util.<ObjectMap<String>>reflect(Server.class.getDeclaredField("raw"), server).set("running", true));
+                    Try.all.run(() -> Util.<ObjectMap<String>>reflect(Server.class.getDeclaredField("raw"), server).set("running", true));
                     add(e.getServer());
                 }
             }
@@ -687,7 +688,7 @@ public class PlaceholderImpl extends PlaceholderExpansion implements Taskable, C
             public void started(SubStartedEvent e) {
                 Server server = getServer(e.getServer());
                 if (server != null) {
-                    Util.isException(() -> Util.<ObjectMap<String>>reflect(Server.class.getDeclaredField("raw"), server).set("online", true));
+                    Try.all.run(() -> Util.<ObjectMap<String>>reflect(Server.class.getDeclaredField("raw"), server).set("online", true));
                     add(e.getServer());
                 }
             }
@@ -695,7 +696,7 @@ public class PlaceholderImpl extends PlaceholderExpansion implements Taskable, C
             @EventHandler
             public void stopped(SubStoppedEvent e) {
                 Server server = getServer(e.getServer());
-                if (server != null) Util.isException(() -> {
+                if (server != null) Try.all.run(() -> {
                     ObjectMap<String> raw = Util.reflect(Server.class.getDeclaredField("raw"), server);
                     raw.set("online", false);
                     raw.set("running", false);
@@ -709,7 +710,7 @@ public class PlaceholderImpl extends PlaceholderExpansion implements Taskable, C
         }
 
         public Proxy getProxy(String name) {
-            if (Util.isNull(name)) throw new NullPointerException();
+            Util.nullpo(name);
             Proxy proxy = getProxies().getOrDefault(name.toLowerCase(), null);
             if (proxy == null && master != null && master.getName().equalsIgnoreCase(name)) proxy = master;
             return proxy;
@@ -724,7 +725,7 @@ public class PlaceholderImpl extends PlaceholderExpansion implements Taskable, C
         }
 
         private Host getHost(String name) {
-            if (Util.isNull(name)) throw new NullPointerException();
+            Util.nullpo(name);
             return getHosts().get(name.toLowerCase());
         }
 
@@ -757,7 +758,7 @@ public class PlaceholderImpl extends PlaceholderExpansion implements Taskable, C
         }
 
         public Pair<String, List<Server>> getGroup(String name) {
-            if (Util.isNull(name)) throw new NullPointerException();
+            Util.nullpo(name);
             for (Map.Entry<String, List<Server>> group : getLowercaseGroups().entrySet()) {
                 if (group.getKey().equalsIgnoreCase(name)) return new ContainedPair<>(group.getKey(), group.getValue());
             }
@@ -769,7 +770,7 @@ public class PlaceholderImpl extends PlaceholderExpansion implements Taskable, C
         }
 
         public Server getServer(String name) {
-            if (Util.isNull(name)) throw new NullPointerException();
+            Util.nullpo(name);
             return getServers().get(name.toLowerCase());
         }
 
@@ -782,7 +783,7 @@ public class PlaceholderImpl extends PlaceholderExpansion implements Taskable, C
         }
 
         public SubServer getSubServer(String name) {
-            if (Util.isNull(name)) throw new NullPointerException();
+            Util.nullpo(name);
             return getSubServers().get(name.toLowerCase());
         }
     }

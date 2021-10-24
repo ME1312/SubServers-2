@@ -4,7 +4,7 @@ import net.ME1312.Galaxi.Library.Config.YAMLConfig;
 import net.ME1312.Galaxi.Library.Container.Container;
 import net.ME1312.Galaxi.Library.Container.Pair;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
-import net.ME1312.Galaxi.Library.UniversalFile;
+import net.ME1312.Galaxi.Library.Try;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubData.Client.DataClient;
@@ -18,7 +18,10 @@ import net.ME1312.SubServers.Bungee.Library.Compatibility.Logger;
 import net.ME1312.SubServers.Bungee.Library.Fallback.FallbackState;
 import net.ME1312.SubServers.Bungee.Library.Fallback.SmartFallback;
 import net.ME1312.SubServers.Client.Common.Network.Packet.PacketDisconnectPlayer;
-import net.ME1312.SubServers.Sync.Event.*;
+import net.ME1312.SubServers.Sync.Event.SubAddServerEvent;
+import net.ME1312.SubServers.Sync.Event.SubRemoveServerEvent;
+import net.ME1312.SubServers.Sync.Event.SubStartEvent;
+import net.ME1312.SubServers.Sync.Event.SubStoppedEvent;
 import net.ME1312.SubServers.Sync.Library.ConfigUpdater;
 import net.ME1312.SubServers.Sync.Library.Metrics;
 import net.ME1312.SubServers.Sync.Network.Packet.PacketExSyncPlayer;
@@ -31,7 +34,6 @@ import com.dosse.upnp.UPnP;
 import com.google.gson.Gson;
 import net.md_5.bungee.BungeeServerInfo;
 import net.md_5.bungee.UserConnection;
-import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.ServerPing;
 import net.md_5.bungee.api.chat.BaseComponent;
@@ -67,7 +69,7 @@ public final class ExProxy extends BungeeCommon implements Listener {
     private final HashMap<UUID, FallbackState> fallback = new HashMap<UUID, FallbackState>();
 
     public final PrintStream out;
-    public final UniversalFile dir = new UniversalFile(new File(System.getProperty("user.dir")));
+    public final File dir = new File(System.getProperty("user.dir"));
     public YAMLConfig config;
     public final Plugin plugin;
     public final SubAPI api = new SubAPI(this);
@@ -85,21 +87,21 @@ public final class ExProxy extends BungeeCommon implements Listener {
         this.isPatched = isPatched;
 
         Logger.get("SubServers").info("Loading SubServers.Sync v" + version.toString() + " Libraries (for Minecraft " + api.getGameVersion()[api.getGameVersion().length - 1] + ")");
-        Util.isException(() -> new CachedPlayer((ProxiedPlayer) null)); // runs <clinit>
+        Try.all.run(() -> new CachedPlayer((ProxiedPlayer) null)); // runs <clinit>
 
         this.out = out;
-        if (!(new UniversalFile(dir, "config.yml").exists())) {
-            Util.copyFromJar(ExProxy.class.getClassLoader(), "net/ME1312/SubServers/Bungee/Library/Files/bungee.yml", new UniversalFile(dir, "config.yml").getPath());
-            YAMLConfig tmp = new YAMLConfig(new UniversalFile("config.yml"));
+        if (!(new File(dir, "config.yml").exists())) {
+            Util.copyFromJar(ExProxy.class.getClassLoader(), "net/ME1312/SubServers/Bungee/Library/Files/bungee.yml", new File(dir, "config.yml").getPath());
+            YAMLConfig tmp = new YAMLConfig(new File("config.yml"));
             tmp.get().set("stats", UUID.randomUUID().toString());
             tmp.save();
             Logger.get("SubServers").info("Created ./config.yml");
         }
-        UniversalFile dir = new UniversalFile(this.dir, "SubServers");
+        File dir = new File(this.dir, "SubServers");
         dir.mkdir();
 
-        ConfigUpdater.updateConfig(new UniversalFile(dir, "sync.yml"));
-        config = new YAMLConfig(new UniversalFile(dir, "sync.yml"));
+        ConfigUpdater.updateConfig(new File(dir, "sync.yml"));
+        config = new YAMLConfig(new File(dir, "sync.yml"));
 
         SmartFallback.addInspector((player, server) -> {
             double confidence = 0;
@@ -130,7 +132,7 @@ public final class ExProxy extends BungeeCommon implements Listener {
             PluginDescription description = new PluginDescription();
             description.setName("SubServers-Sync");
             description.setMain(net.ME1312.SubServers.Sync.Library.Compatibility.Plugin.class.getCanonicalName());
-            description.setFile(Util.getDespiteException(() -> new File(ExProxy.class.getProtectionDomain().getCodeSource().getLocation().toURI()), null));
+            description.setFile(Try.all.get(() -> new File(ExProxy.class.getProtectionDomain().getCodeSource().getLocation().toURI())));
             description.setVersion(version.toString());
             description.setAuthor("ME1312");
 
@@ -165,7 +167,7 @@ public final class ExProxy extends BungeeCommon implements Listener {
             SmartFallback.dns_forward = config.get().getMap("Settings").getMap("Smart-Fallback", new ObjectMap<>()).getBoolean("DNS-Forward", false);
 
             resetDate = Calendar.getInstance().getTime().getTime();
-            ConfigUpdater.updateConfig(new UniversalFile(dir, "SubServers:sync.yml"));
+            ConfigUpdater.updateConfig(new File(dir, "SubServers/sync.yml"));
             config.reload();
 
             synchronized (rPlayers) {
@@ -193,9 +195,9 @@ public final class ExProxy extends BungeeCommon implements Listener {
 
                 Logger.get("SubData").info("AES Encryption Available");
             }
-            if (new UniversalFile(dir, "SubServers:subdata.rsa.key").exists()) {
+            if (new File(dir, "SubServers/subdata.rsa.key").exists()) {
                 try {
-                    subprotocol.registerCipher("RSA", new RSA(new UniversalFile(dir, "SubServers:subdata.rsa.key")));
+                    subprotocol.registerCipher("RSA", new RSA(new File(dir, "SubServers/subdata.rsa.key")));
                     Logger.get("SubData").info("RSA Encryption Available");
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -410,7 +412,7 @@ public final class ExProxy extends BungeeCommon implements Listener {
             tmp.addAll(subdata.values());
             for (SubDataClient client : tmp) if (client != null) {
                 client.close();
-                Util.isException(client::waitFor);
+                Try.all.run(client::waitFor);
             }
             subdata.clear();
             subdata.put(0, null);
@@ -450,7 +452,7 @@ public final class ExProxy extends BungeeCommon implements Listener {
                         lock.value = false;
                         if (mode) e.completeIntent(plugin);
                     }, ((InitialHandler) e.getConnection()).getHandshake().getProtocolVersion());
-                    if (!mode) while (lock.value) Util.isException(() -> Thread.sleep(4));
+                    if (!mode) while (lock.value) Try.all.run(() -> Thread.sleep(4));
                 }
             }
         } else if (dynamic) {

@@ -1,14 +1,12 @@
 package net.ME1312.SubServers.Sync;
 
 import net.ME1312.Galaxi.Library.Platform;
-import net.ME1312.Galaxi.Library.Util;
-import net.ME1312.Galaxi.Library.Version.Version;
+import net.ME1312.Galaxi.Library.Try;
 
 import java.security.Security;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.logging.Logger;
 
 /**
  * SubServers/BungeeCord Launch Class
@@ -26,7 +24,7 @@ public final class Launch {
         System.setProperty("jdk.util.jar.enableMultiRelease", "force");
         System.setProperty("apple.laf.useScreenMenuBar", "true");
 
-        if (Util.getDespiteException(() -> Class.forName("net.md_5.bungee.BungeeCord") == null, true)) {
+        if (Try.all.get(() -> Class.forName("net.md_5.bungee.BungeeCord") == null, true)) {
             System.out.println("");
             System.out.println("*******************************************");
             System.out.println("*** Error: BungeeCord.jar Doesn't Exist ***");
@@ -92,9 +90,9 @@ public final class Launch {
 
             if (!options.has("noconsole")) {
                 try {
-                    if (Util.getDespiteException(() -> Class.forName("io.github.waterfallmc.waterfall.console.WaterfallConsole").getMethod("readCommands") != null, false)) { // Waterfall Setup
+                    if (Try.all.get(() -> Class.forName("io.github.waterfallmc.waterfall.console.WaterfallConsole").getMethod("readCommands") != null, false)) { // Waterfall Setup
                         Class.forName("io.github.waterfallmc.waterfall.console.WaterfallConsole").getMethod("readCommands").invoke(null);
-                    } else if (Util.getDespiteException(() -> Class.forName("io.github.waterfallmc.waterfall.console.WaterfallConsole").getMethod("start") != null, false)) {
+                    } else if (Try.all.get(() -> Class.forName("io.github.waterfallmc.waterfall.console.WaterfallConsole").getMethod("start") != null, false)) {
                         Class console = Class.forName("io.github.waterfallmc.waterfall.console.WaterfallConsole");
                         console.getMethod("start").invoke(console.getConstructor().newInstance());
                     } else {

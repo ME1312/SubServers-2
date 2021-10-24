@@ -1,6 +1,5 @@
 package net.ME1312.SubServers.Client.Common;
 
-import net.ME1312.Galaxi.Library.Callback.Callback;
 import net.ME1312.Galaxi.Library.Container.Pair;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubData.Client.DataClient;
@@ -16,6 +15,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.Consumer;
+import java.util.function.IntConsumer;
 
 import static net.ME1312.SubServers.Client.Common.Network.API.SimplifiedData.*;
 
@@ -47,7 +48,7 @@ public abstract class ClientAPI {
      *
      * @param callback Host Map
      */
-    public void getHosts(Callback<Map<String, Host>> callback) {
+    public void getHosts(Consumer<Map<String, Host>> callback) {
         requestHosts(null, callback);
     }
 
@@ -57,7 +58,7 @@ public abstract class ClientAPI {
      * @param name Host name
      * @param callback a Host
      */
-    public void getHost(String name, Callback<Host> callback) {
+    public void getHost(String name, Consumer<Host> callback) {
         requestHost(null, name, callback);
     }
 
@@ -66,7 +67,7 @@ public abstract class ClientAPI {
      *
      * @param callback Group Map
      */
-    public void getGroups(Callback<Map<String, List<Server>>> callback) {
+    public void getGroups(Consumer<Map<String, List<Server>>> callback) {
         requestGroups(null, callback);
     }
 
@@ -75,7 +76,7 @@ public abstract class ClientAPI {
      *
      * @param callback Group Map
      */
-    public void getLowercaseGroups(Callback<Map<String, List<Server>>> callback) {
+    public void getLowercaseGroups(Consumer<Map<String, List<Server>>> callback) {
         requestLowercaseGroups(null, callback);
     }
 
@@ -85,7 +86,7 @@ public abstract class ClientAPI {
      * @param name Group name
      * @param callback a Server Group
      */
-    public void getGroup(String name, Callback<Pair<String, List<Server>>> callback) {
+    public void getGroup(String name, Consumer<Pair<String, List<Server>>> callback) {
         requestGroup(null, name, callback);
     }
 
@@ -94,7 +95,7 @@ public abstract class ClientAPI {
      *
      * @param callback Server Map
      */
-    public void getServers(Callback<Map<String, Server>> callback) {
+    public void getServers(Consumer<Map<String, Server>> callback) {
         requestServers(null, callback);
     }
 
@@ -104,7 +105,7 @@ public abstract class ClientAPI {
      * @param name Server name
      * @param callback a Server
      */
-    public void getServer(String name, Callback<Server> callback) {
+    public void getServer(String name, Consumer<Server> callback) {
         requestServer(null, name, callback);
     }
 
@@ -119,7 +120,7 @@ public abstract class ClientAPI {
      * @param restricted Players will need a permission to join if true
      * @param response Response Code
      */
-    public void addServer(String name, InetAddress ip, int port, String motd, boolean hidden, boolean restricted, Callback<Integer> response) {
+    public void addServer(String name, InetAddress ip, int port, String motd, boolean hidden, boolean restricted, IntConsumer response) {
         addServer(null, name, ip, port, motd, hidden, restricted, response);
     }
 
@@ -135,12 +136,12 @@ public abstract class ClientAPI {
      * @param restricted Players will need a permission to join if true
      * @param response Response Code
      */
-    public void addServer(UUID player, String name, InetAddress ip, int port, String motd, boolean hidden, boolean restricted, Callback<Integer> response) {
-        if (Util.isNull(response)) throw new NullPointerException();
+    public void addServer(UUID player, String name, InetAddress ip, int port, String motd, boolean hidden, boolean restricted, IntConsumer response) {
+        Util.nullpo(response);
         StackTraceElement[] origin = new Exception().getStackTrace();
         ((SubDataClient) getSubDataNetwork()[0]).sendPacket(new PacketAddServer(player, name, ip, port, motd, hidden, restricted, data -> {
             try {
-                response.run(data.getInt(0x0001));
+                response.accept(data.getInt(0x0001));
             } catch (Throwable e) {
                 Throwable ew = new InvocationTargetException(e);
                 ew.setStackTrace(origin);
@@ -184,7 +185,7 @@ public abstract class ClientAPI {
      * @param name Name of the Server
      * @param response Response Code
      */
-    public void removeServer(String name, Callback<Integer> response) {
+    public void removeServer(String name, IntConsumer response) {
         removeServer(null, name, response);
     }
 
@@ -195,8 +196,8 @@ public abstract class ClientAPI {
      * @param name Name of the Server
      * @param response Response Code
      */
-    public void removeServer(UUID player, String name, Callback<Integer> response) {
-        if (Util.isNull(name)) throw new NullPointerException();
+    public void removeServer(UUID player, String name, IntConsumer response) {
+        Util.nullpo(name);
         removeServer(player, name, false, response);
     }
 
@@ -216,7 +217,7 @@ public abstract class ClientAPI {
      * @param name Name of the Server
      */
     public void removeServer(UUID player, String name) {
-        if (Util.isNull(name)) throw new NullPointerException();
+        Util.nullpo(name);
         removeServer(player, name, i -> {});
     }
 
@@ -226,7 +227,7 @@ public abstract class ClientAPI {
      * @param name Name of the Server
      * @param response Response Code
      */
-    public void forceRemoveServer(String name, Callback<Integer> response) {
+    public void forceRemoveServer(String name, IntConsumer response) {
         forceRemoveServer(null, name, response);
     }
 
@@ -237,8 +238,8 @@ public abstract class ClientAPI {
      * @param name Name of the Server
      * @param response Response Code
      */
-    public void forceRemoveServer(UUID player, String name, Callback<Integer> response) {
-        if (Util.isNull(name)) throw new NullPointerException();
+    public void forceRemoveServer(UUID player, String name, IntConsumer response) {
+        Util.nullpo(name);
         removeServer(player, name, true, response);
     }
 
@@ -258,16 +259,16 @@ public abstract class ClientAPI {
      * @param name Name of the Server
      */
     public void forceRemoveServer(UUID player, String name) {
-        if (Util.isNull(name)) throw new NullPointerException();
+        Util.nullpo(name);
         forceRemoveServer(player, name, i -> {});
     }
 
-    private void removeServer(UUID player, String name, boolean force, Callback<Integer> response) {
-        if (Util.isNull(response)) throw new NullPointerException();
+    private void removeServer(UUID player, String name, boolean force, IntConsumer response) {
+        Util.nullpo(response);
         StackTraceElement[] origin = new Exception().getStackTrace();
         ((SubDataClient) getSubDataNetwork()[0]).sendPacket(new PacketRemoveServer(player, name, force, data -> {
             try {
-                response.run(data.getInt(0x0001));
+                response.accept(data.getInt(0x0001));
             } catch (Throwable e) {
                 Throwable ew = new InvocationTargetException(e);
                 ew.setStackTrace(origin);
@@ -281,7 +282,7 @@ public abstract class ClientAPI {
      *
      * @param callback SubServer Map
      */
-    public void getSubServers(Callback<Map<String, SubServer>> callback) {
+    public void getSubServers(Consumer<Map<String, SubServer>> callback) {
         requestSubServers(null, callback);
     }
 
@@ -291,7 +292,7 @@ public abstract class ClientAPI {
      * @param name SubServer name
      * @param callback a SubServer
      */
-    public void getSubServer(String name, Callback<SubServer> callback) {
+    public void getSubServer(String name, Consumer<SubServer> callback) {
         requestSubServer(null, name, callback);
     }
 
@@ -300,7 +301,7 @@ public abstract class ClientAPI {
      *
      * @param callback Proxy Map
      */
-    public void getProxies(Callback<Map<String, Proxy>> callback) {
+    public void getProxies(Consumer<Map<String, Proxy>> callback) {
         requestProxies(null, callback);
     }
 
@@ -310,7 +311,7 @@ public abstract class ClientAPI {
      * @param name Proxy name
      * @param callback a Proxy
      */
-    public void getProxy(String name, Callback<Proxy> callback) {
+    public void getProxy(String name, Consumer<Proxy> callback) {
         requestProxy(null, name, callback);
     }
 
@@ -319,7 +320,7 @@ public abstract class ClientAPI {
      *
      * @param callback Master Proxy
      */
-    public void getMasterProxy(Callback<Proxy> callback) {
+    public void getMasterProxy(Consumer<Proxy> callback) {
         requestMasterProxy(null, callback);
     }
 
@@ -328,7 +329,7 @@ public abstract class ClientAPI {
      *
      * @param callback Remote Player Collection
      */
-    public void getRemotePlayers(Callback<Map<UUID, RemotePlayer>> callback) {
+    public void getRemotePlayers(Consumer<Map<UUID, RemotePlayer>> callback) {
         requestRemotePlayers(null, callback);
     }
 
@@ -338,7 +339,7 @@ public abstract class ClientAPI {
      * @param name Player name
      * @param callback Remote Player
      */
-    public void getRemotePlayer(String name, Callback<RemotePlayer> callback) {
+    public void getRemotePlayer(String name, Consumer<RemotePlayer> callback) {
         requestRemotePlayer(null, name, callback);
     }
 
@@ -348,7 +349,7 @@ public abstract class ClientAPI {
      * @param id Player UUID
      * @param callback Remote Player
      */
-    public void getRemotePlayer(UUID id, Callback<RemotePlayer> callback) {
+    public void getRemotePlayer(UUID id, Consumer<RemotePlayer> callback) {
         requestRemotePlayer(null, id, callback);
     }
 
@@ -389,7 +390,7 @@ public abstract class ClientAPI {
      * @return Lang Values
      */
     public String getLang(String channel, String key) {
-        if (Util.isNull(channel, key)) throw new NullPointerException();
+        Util.nullpo(channel, key);
         return getLang(channel).get(key);
     }
 }

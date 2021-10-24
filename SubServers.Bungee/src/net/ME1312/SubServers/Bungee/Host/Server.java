@@ -13,7 +13,7 @@ import java.util.UUID;
 /**
  * Server Interface
  */
-public interface Server extends ServerInfo, ClientHandler, ExtraDataHandler {
+public interface Server extends ServerInfo, ClientHandler, ExtraDataHandler<String> {
 
     /**
      * Link a SubData Client to this Object

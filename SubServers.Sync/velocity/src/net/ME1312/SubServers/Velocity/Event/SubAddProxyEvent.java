@@ -15,7 +15,7 @@ public class SubAddProxyEvent implements SubEvent {
      * @param proxy Host Being Added
      */
     public SubAddProxyEvent(String proxy) {
-        if (Util.isNull(proxy)) throw new NullPointerException();
+        Util.nullpo(proxy);
         this.proxy = proxy;
     }
 

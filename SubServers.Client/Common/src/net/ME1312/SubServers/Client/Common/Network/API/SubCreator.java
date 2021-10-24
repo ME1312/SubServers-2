@@ -1,7 +1,7 @@
 package net.ME1312.SubServers.Client.Common.Network.API;
 
-import net.ME1312.Galaxi.Library.Callback.Callback;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
+import net.ME1312.Galaxi.Library.Try;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubData.Client.SubDataClient;
@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.UUID;
+import java.util.function.IntConsumer;
 
 /**
  * Simplified SubCreator Data Class
@@ -43,7 +44,7 @@ public class SubCreator {
 
         public ServerTemplate(ObjectMap<String> raw) {
             this.raw = raw;
-            this.type = Util.getDespiteException(() -> ServerType.valueOf(raw.getRawString("type").toUpperCase().replace('-', '_').replace(' ', '_')), ServerType.CUSTOM);
+            this.type = Try.all.get(() -> ServerType.valueOf(raw.getRawString("type").toUpperCase().replace('-', '_').replace(' ', '_')), ServerType.CUSTOM);
         }
 
         /**
@@ -132,12 +133,12 @@ public class SubCreator {
      * @param port Server Port Number (null to auto-select)
      * @param response Response Code
      */
-    public void create(UUID player, String name, ServerTemplate template, Version version, Integer port, Callback<Integer> response) {
-        if (Util.isNull(response)) throw new NullPointerException();
+    public void create(UUID player, String name, ServerTemplate template, Version version, Integer port, IntConsumer response) {
+        Util.nullpo(response);
         StackTraceElement[] origin = new Exception().getStackTrace();
         ((SubDataClient) ClientAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketCreateServer(player, name, host.getName(), template.getName(), version, port, data -> {
             try {
-                response.run(data.getInt(0x0001));
+                response.accept(data.getInt(0x0001));
             } catch (Throwable e) {
                 Throwable ew = new InvocationTargetException(e);
                 ew.setStackTrace(origin);
@@ -155,7 +156,7 @@ public class SubCreator {
      * @param port Server Port Number (null to auto-select)
      * @param response Response Code
      */
-    public void create(String name, ServerTemplate template, Version version, Integer port, Callback<Integer> response) {
+    public void create(String name, ServerTemplate template, Version version, Integer port, IntConsumer response) {
         create(null, name, template, version, port, response);
     }
 
@@ -193,12 +194,12 @@ public class SubCreator {
      * @param version Server Version (may be null)
      * @param response Response Code
      */
-    public void update(UUID player, SubServer server, ServerTemplate template, Version version, Callback<Integer> response) {
-        if (Util.isNull(response)) throw new NullPointerException();
+    public void update(UUID player, SubServer server, ServerTemplate template, Version version, IntConsumer response) {
+        Util.nullpo(response);
         StackTraceElement[] origin = new Exception().getStackTrace();
         ((SubDataClient) ClientAPI.getInstance().getSubDataNetwork()[0]).sendPacket(new PacketUpdateServer(player, server.getName(), template.getName(), version, data -> {
             try {
-                response.run(data.getInt(0x0001));
+                response.accept(data.getInt(0x0001));
             } catch (Throwable e) {
                 Throwable ew = new InvocationTargetException(e);
                 ew.setStackTrace(origin);
@@ -227,7 +228,7 @@ public class SubCreator {
      * @param version Server Version (may be null)
      * @param response Response Code
      */
-    public void update(SubServer server, ServerTemplate template, Version version, Callback<Integer> response) {
+    public void update(SubServer server, ServerTemplate template, Version version, IntConsumer response) {
         update(null, server, template, version, response);
     }
 

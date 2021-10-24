@@ -21,7 +21,7 @@ public class SubRemoveHostEvent extends Event implements SubEvent {
      * @param host Server Starting
      */
     public SubRemoveHostEvent(UUID player, String host) {
-        if (Util.isNull(host)) throw new NullPointerException();
+        Util.nullpo(host);
         this.player = player;
         this.host = host;
     }

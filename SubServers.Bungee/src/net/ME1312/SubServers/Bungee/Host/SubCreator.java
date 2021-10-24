@@ -1,6 +1,5 @@
 package net.ME1312.SubServers.Bungee.Host;
 
-import net.ME1312.Galaxi.Library.Callback.Callback;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
@@ -12,6 +11,7 @@ import com.google.common.collect.Range;
 import java.io.File;
 import java.net.InetSocketAddress;
 import java.util.*;
+import java.util.function.Consumer;
 
 /**
  * SubCreator Layout Class
@@ -44,7 +44,7 @@ public abstract class SubCreator {
         }
 
         private ServerTemplate(String name, boolean enabled, boolean internal, String icon, File directory, ObjectMap<String> build, ObjectMap<String> options, boolean dynamic) {
-            if (Util.isNull(name, enabled, directory, build, options)) throw new NullPointerException();
+            Util.nullpo(name, enabled, directory, build, options);
             if (name.contains(" ")) throw new InvalidTemplateException("Template names cannot have spaces: " + name);
             this.name = name;
             this.enabled = enabled;
@@ -233,7 +233,7 @@ public abstract class SubCreator {
      * @param callback Callback
      * @return Success Status
      */
-    public abstract boolean create(UUID player, String name, ServerTemplate template, Version version, Integer port, Callback<SubServer> callback);
+    public abstract boolean create(UUID player, String name, ServerTemplate template, Version version, Integer port, Consumer<SubServer> callback);
 
     /**
      * Create a SubServer
@@ -259,7 +259,7 @@ public abstract class SubCreator {
      * @param callback Callback
      * @return Success Status
      */
-    public boolean create(String name, ServerTemplate template, Version version, Integer port, Callback<SubServer> callback) {
+    public boolean create(String name, ServerTemplate template, Version version, Integer port, Consumer<SubServer> callback) {
         return create(null, name, template, version, port, callback);
     }
 
@@ -286,7 +286,7 @@ public abstract class SubCreator {
      * @param callback Callback
      * @return Success Status
      */
-    public abstract boolean update(UUID player, SubServer server, ServerTemplate template, Version version, Callback<Boolean> callback);
+    public abstract boolean update(UUID player, SubServer server, ServerTemplate template, Version version, Consumer<Boolean> callback);
 
     /**
      * Update a SubServer
@@ -310,7 +310,7 @@ public abstract class SubCreator {
      * @param callback Callback
      * @return Success Status
      */
-    public boolean update(SubServer server, ServerTemplate template, Version version, Callback<Boolean> callback) {
+    public boolean update(SubServer server, ServerTemplate template, Version version, Consumer<Boolean> callback) {
         return update(null, server, template, version, callback);
     }
 

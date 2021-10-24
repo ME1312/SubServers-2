@@ -133,7 +133,7 @@ public class ServerData {
      * @param value Value
      */
     public void setHidden(boolean value) {
-        if (Util.isNull(value)) throw new NullPointerException();
+        Util.nullpo(value);
         this.hidden = value;
     }
 
@@ -189,7 +189,7 @@ public class ServerData {
      * @param player Player to add
      */
     public void whitelist(UUID player) {
-        if (Util.isNull(player)) throw new NullPointerException();
+        Util.nullpo(player);
         whitelist.add(player);
     }
 

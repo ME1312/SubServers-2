@@ -1,13 +1,13 @@
 package net.ME1312.SubServers.Client.Sponge;
 
 import net.ME1312.Galaxi.Library.AsyncConsolidator;
-import net.ME1312.Galaxi.Library.Callback.Callback;
 import net.ME1312.Galaxi.Library.Container.ContainedPair;
 import net.ME1312.Galaxi.Library.Container.Container;
 import net.ME1312.Galaxi.Library.Container.Pair;
 import net.ME1312.Galaxi.Library.Container.Value;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Platform;
+import net.ME1312.Galaxi.Library.Try;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubData.Client.SubDataClient;
@@ -45,6 +45,7 @@ import java.nio.charset.Charset;
 import java.text.DecimalFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 import static net.ME1312.SubServers.Client.Sponge.Library.ObjectPermission.permits;
 
@@ -195,8 +196,8 @@ public final class SubCommand implements CommandExecutor {
         @SuppressWarnings("unchecked")
         public CommandResult execute(CommandSource sender, CommandContext args) throws CommandException {
             if (canRun(sender)) {
-                PluginContainer container        = Util.getDespiteException(() -> (PluginContainer) org.spongepowered.api.Platform.class.getMethod("getValue", Class.forName("org.spongepowered.api.Platform$Component")).invoke(Sponge.getPlatform(), Enum.valueOf((Class<Enum>) Class.forName("org.spongepowered.api.Platform$Component"), "IMPLEMENTATION")), null);
-                if (container == null) container = Util.getDespiteException(() -> (PluginContainer) org.spongepowered.api.Platform.class.getMethod("getImplementation").invoke(Sponge.getPlatform()), null);
+                PluginContainer container        = Try.all.get(() -> (PluginContainer) org.spongepowered.api.Platform.class.getMethod("getValue", Class.forName("org.spongepowered.api.Platform$Component")).invoke(Sponge.getPlatform(), Enum.valueOf((Class<Enum>) Class.forName("org.spongepowered.api.Platform$Component"), "IMPLEMENTATION")));
+                if (container == null) container = Try.all.get(() -> (PluginContainer) org.spongepowered.api.Platform.class.getMethod("getImplementation").invoke(Sponge.getPlatform()));
 
                 sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Version").replace("$str$", "SubServers.Client.Sponge")));
                 sender.sendMessage(Text.builder("  " + Platform.getSystemName() + ' ' + Platform.getSystemVersion() + ((Platform.getSystemBuild() != null)?" (" + Platform.getSystemBuild() + ')':"") + ((!Platform.getSystemArchitecture().equals("unknown"))?" [" + Platform.getSystemArchitecture() + ']':"")).color(TextColors.WHITE).append(Text.of(",")).build());
@@ -724,7 +725,7 @@ public final class SubCommand implements CommandExecutor {
                         if (select.subservers.length > 0) {
                             // Step 5: Start the stopped Servers once more
                             final UUID player = (sender instanceof Player)?((Player) sender).getUniqueId():null;
-                            Callback<SubServer> starter = server -> server.start(player, response -> {
+                            Consumer<SubServer> starter = server -> server.start(player, response -> {
                                 switch (response) {
                                     case 3:
                                     case 4:
@@ -754,16 +755,16 @@ public final class SubCommand implements CommandExecutor {
 
                             // Step 4: Listen for stopped Servers
                             final HashMap<String, SubServer> listening = new HashMap<String, SubServer>();
-                            PacketInExRunEvent.callback("SubStoppedEvent", new Callback<ObjectMap<String>>() {
+                            PacketInExRunEvent.callback("SubStoppedEvent", new Consumer<ObjectMap<String>>() {
                                 @Override
-                                public void run(ObjectMap<String> json) {
+                                public void accept(ObjectMap<String> json) {
                                     try {
                                         if (listening.size() > 0) {
                                             PacketInExRunEvent.callback("SubStoppedEvent", this);
                                             String name = json.getString("server").toLowerCase();
                                             if (listening.keySet().contains(name)) {
                                                 plugin.game.getScheduler().createTaskBuilder().execute(() -> {
-                                                    starter.run(listening.get(name));
+                                                    starter.accept(listening.get(name));
                                                     listening.remove(name);
                                                 }).delay(100, TimeUnit.MILLISECONDS).submit(plugin);
                                             }
@@ -777,7 +778,7 @@ public final class SubCommand implements CommandExecutor {
                             AsyncConsolidator merge = new AsyncConsolidator(() -> {
                                 if (success.value > 0) sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", "Command.Restart").replace("$int$", success.value.toString())));
                             });
-                            Callback<Pair<Integer, SubServer>> stopper = data -> {
+                            Consumer<Pair<Integer, SubServer>> stopper = data -> {
                                 if (data.key() != 0) listening.remove(data.value().getName().toLowerCase());
                                 switch (data.key()) {
                                     case 3:
@@ -785,7 +786,7 @@ public final class SubCommand implements CommandExecutor {
                                         sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", "Command.Restart.Disappeared").replace("$str$", data.value().getName())));
                                         break;
                                     case 5:
-                                        starter.run(data.value());
+                                        starter.accept(data.value());
                                     case 0:
                                         success.value++;
                                         break;
@@ -807,14 +808,14 @@ public final class SubCommand implements CommandExecutor {
                                 merge.reserve();
                                 if (self == null) {
                                     listening.put(server.getName().toLowerCase(), server);
-                                    server.stop(player, response -> stopper.run(new ContainedPair<>(response, server)));
+                                    server.stop(player, response -> stopper.accept(new ContainedPair<>(response, server)));
                                 } else if (self != server) {
-                                    ((SubDataClient) plugin.api.getSubDataNetwork()[0]).sendPacket(new PacketRestartServer(player, server.getName(), data -> stopper.run(new ContainedPair<>(data.getInt(0x0001), server))));
+                                    ((SubDataClient) plugin.api.getSubDataNetwork()[0]).sendPacket(new PacketRestartServer(player, server.getName(), data -> stopper.accept(new ContainedPair<>(data.getInt(0x0001), server))));
                                 }
                             }
                             if (self != null) {
                                 final SubServer fself = self;
-                                ((SubDataClient) plugin.api.getSubDataNetwork()[0]).sendPacket(new PacketRestartServer(player, self.getName(), data -> stopper.run(new ContainedPair<>(data.getInt(0x0001), fself))));
+                                ((SubDataClient) plugin.api.getSubDataNetwork()[0]).sendPacket(new PacketRestartServer(player, self.getName(), data -> stopper.accept(new ContainedPair<>(data.getInt(0x0001), fself))));
                             }
                         }
                     });
@@ -843,7 +844,7 @@ public final class SubCommand implements CommandExecutor {
                                 if (running.value > 0) sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", "Command.Stop.Not-Running").replace("$int$", running.value.toString())));
                                 if (success.value > 0) sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", "Command.Stop").replace("$int$", success.value.toString())));
                             });
-                            Callback<Pair<Integer, SubServer>> stopper = data -> {
+                            Consumer<Pair<Integer, SubServer>> stopper = data -> {
                                 switch (data.key()) {
                                     case 3:
                                     case 4:
@@ -869,11 +870,11 @@ public final class SubCommand implements CommandExecutor {
 
                             for (SubServer server : select.subservers) {
                                 merge.reserve();
-                                if (self != server) server.stop((sender instanceof Player)?((Player) sender).getUniqueId():null, response -> stopper.run(new ContainedPair<>(response, server)));
+                                if (self != server) server.stop((sender instanceof Player)?((Player) sender).getUniqueId():null, response -> stopper.accept(new ContainedPair<>(response, server)));
                             }
                             if (self != null) {
                                 final SubServer fself = self;
-                                self.stop((sender instanceof Player)?((Player) sender).getUniqueId():null, response -> stopper.run(new ContainedPair<>(response, fself)));
+                                self.stop((sender instanceof Player)?((Player) sender).getUniqueId():null, response -> stopper.accept(new ContainedPair<>(response, fself)));
                             }
                         }
                     });
@@ -902,7 +903,7 @@ public final class SubCommand implements CommandExecutor {
                                 if (running.value > 0) sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", "Command.Terminate.Not-Running").replace("$int$", running.value.toString())));
                                 if (success.value > 0) sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", "Command.Terminate").replace("$int$", success.value.toString())));
                             });
-                            Callback<Pair<Integer, SubServer>> stopper = data -> {
+                            Consumer<Pair<Integer, SubServer>> stopper = data -> {
                                 switch (data.key()) {
                                     case 3:
                                     case 4:
@@ -928,11 +929,11 @@ public final class SubCommand implements CommandExecutor {
 
                             for (SubServer server : select.subservers) {
                                 merge.reserve();
-                                if (self != server) server.terminate((sender instanceof Player)?((Player) sender).getUniqueId():null, response -> stopper.run(new ContainedPair<>(response, server)));
+                                if (self != server) server.terminate((sender instanceof Player)?((Player) sender).getUniqueId():null, response -> stopper.accept(new ContainedPair<>(response, server)));
                             }
                             if (self != null) {
                                 final SubServer fself = self;
-                                fself.terminate((sender instanceof Player) ? ((Player) sender).getUniqueId() : null, response -> stopper.run(new ContainedPair<>(response, fself)));
+                                fself.terminate((sender instanceof Player) ? ((Player) sender).getUniqueId() : null, response -> stopper.accept(new ContainedPair<>(response, fself)));
                             }
                         }
                     });
@@ -1008,7 +1009,7 @@ public final class SubCommand implements CommandExecutor {
                 Optional<String> port = args.getOne(Text.of("Port"));
                 if (name.isPresent() && host.isPresent() && template.isPresent()) {
                     if (permits(host.get(), sender, "subservers.host.%.*", "subservers.host.%.create")) {
-                        if (port.isPresent() && Util.isException(() -> Integer.parseInt(port.get()))) {
+                        if (port.isPresent() && !Try.all.run(() -> Integer.parseInt(port.get()))) {
                             sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Creator.Invalid-Port")));
                             return CommandResult.builder().successCount(0).build();
                         } else {
@@ -1220,7 +1221,7 @@ public final class SubCommand implements CommandExecutor {
                             if (server != null) {
                                 if (!(server instanceof SubServer) || ((SubServer) server).isRunning()) {
                                     Value<Boolean> msg = new Container<>(false);
-                                    Callback<Player> action = target -> {
+                                    Consumer<Player> action = target -> {
                                         if (target == sender || sender.hasPermission("subservers.teleport-others")) {
                                             sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", "Command.Teleport").replace("$str$", target.getName())));
                                             plugin.pmc(target, "Connect", server.getName());
@@ -1233,13 +1234,13 @@ public final class SubCommand implements CommandExecutor {
                                     Optional<Player> player;
                                     Container<Set<Entity>> entities = new Container<>(null);
                                     if (name == null) {
-                                        action.run((Player) sender);
+                                        action.accept((Player) sender);
                                     } else if ((player = plugin.game.getServer().getPlayer(name)).isPresent()) {
-                                        action.run(player.get());
-                                    } else if (Util.getDespiteException(() -> (entities.value = Selector.parse(name).resolve(sender)).size() > 0, false)) {
+                                        action.accept(player.get());
+                                    } else if (Try.all.get(() -> (entities.value = Selector.parse(name).resolve(sender)).size() > 0, false)) {
                                         for (Entity entity : entities.value) {
                                             if (entity instanceof Player) {
-                                                action.run((Player) entity);
+                                                action.accept((Player) entity);
                                             } else {
                                                 sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", "Command.Generic.Unknown-Player").replace("$str$", entity.getUniqueId().toString())));
                                             }
@@ -1334,14 +1335,14 @@ public final class SubCommand implements CommandExecutor {
             }
         }
     }
-    private void selectServers(CommandSource sender, String[] selection, boolean mode, String permissions, Callback<ServerSelection> callback) {
+    private void selectServers(CommandSource sender, String[] selection, boolean mode, String permissions, Consumer<ServerSelection> callback) {
         selectServers(sender, selection, mode, new String[]{ permissions }, callback);
     }
-    private void selectServers(CommandSource sender, String[] selection, boolean mode, String[] permissions, Callback<ServerSelection> callback) {
+    private void selectServers(CommandSource sender, String[] selection, boolean mode, String[] permissions, Consumer<ServerSelection> callback) {
         selectServers(sender, selection, mode, new String[][]{ permissions }, callback);
     }
     @SuppressWarnings("unchecked")
-    private void selectServers(CommandSource sender, String[] selection, boolean mode, String[][] permissions, Callback<ServerSelection> callback) {
+    private void selectServers(CommandSource sender, String[] selection, boolean mode, String[][] permissions, Consumer<ServerSelection> callback) {
         StackTraceElement[] origin = new Exception().getStackTrace();
         LinkedList<Text> msgs = new LinkedList<Text>();
         LinkedList<Server> select = new LinkedList<Server>();
@@ -1384,7 +1385,7 @@ public final class SubCommand implements CommandExecutor {
             }
 
             try {
-                callback.run(new ServerSelection(msgs, selection, servers, subservers));
+                callback.accept(new ServerSelection(msgs, selection, servers, subservers));
             } catch (Throwable e) {
                 Throwable ew = new InvocationTargetException(e);
                 ew.setStackTrace(origin);

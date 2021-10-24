@@ -1,6 +1,5 @@
 package net.ME1312.SubServers.Client.Common.Network.Packet;
 
-import net.ME1312.Galaxi.Library.Callback.Callback;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
@@ -10,12 +9,13 @@ import net.ME1312.SubData.Client.SubDataSender;
 
 import java.util.HashMap;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 /**
  * Create Server Packet
  */
 public class PacketCreateServer implements PacketObjectIn<Integer>, PacketObjectOut<Integer> {
-    private static HashMap<UUID, Callback<ObjectMap<Integer>>[]> callbacks = new HashMap<UUID, Callback<ObjectMap<Integer>>[]>();
+    private static HashMap<UUID, Consumer<ObjectMap<Integer>>[]> callbacks = new HashMap<UUID, Consumer<ObjectMap<Integer>>[]>();
     private UUID player;
     private String name;
     private String host;
@@ -42,7 +42,7 @@ public class PacketCreateServer implements PacketObjectIn<Integer>, PacketObject
      * @param callback Callbacks
      */
     @SafeVarargs
-    public PacketCreateServer(UUID player, String name, String host, String template, Version version, Integer port, Callback<ObjectMap<Integer>>... callback) {
+    public PacketCreateServer(UUID player, String name, String host, String template, Version version, Integer port, Consumer<ObjectMap<Integer>>... callback) {
         this(player, name, host, template, version, port, false, callback);
     }
 
@@ -59,8 +59,8 @@ public class PacketCreateServer implements PacketObjectIn<Integer>, PacketObject
      * @param callback Callbacks
      */
     @SafeVarargs
-    public PacketCreateServer(UUID player, String name, String host, String template, Version version, Integer port, boolean waitfor, Callback<ObjectMap<Integer>>... callback) {
-        if (Util.isNull(name, host, template, callback)) throw new NullPointerException();
+    public PacketCreateServer(UUID player, String name, String host, String template, Version version, Integer port, boolean waitfor, Consumer<ObjectMap<Integer>>... callback) {
+        Util.nullpo(name, host, template, callback);
         this.player = player;
         this.name = name;
         this.host = host;
@@ -88,7 +88,7 @@ public class PacketCreateServer implements PacketObjectIn<Integer>, PacketObject
 
     @Override
     public void receive(SubDataSender client, ObjectMap<Integer> data) {
-        for (Callback<ObjectMap<Integer>> callback : callbacks.get(data.getUUID(0x0000))) callback.run(data);
+        for (Consumer<ObjectMap<Integer>> callback : callbacks.get(data.getUUID(0x0000))) callback.accept(data);
         callbacks.remove(data.getUUID(0x0000));
     }
 

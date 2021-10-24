@@ -1,6 +1,5 @@
 package net.ME1312.SubServers.Client.Common.Network.API;
 
-import net.ME1312.Galaxi.Library.Callback.Callback;
 import net.ME1312.Galaxi.Library.Container.ContainedPair;
 import net.ME1312.Galaxi.Library.Container.Pair;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
@@ -16,6 +15,7 @@ import net.ME1312.SubServers.Client.Common.Network.Packet.PacketDownloadServerIn
 import java.lang.reflect.InvocationTargetException;
 import java.net.InetSocketAddress;
 import java.util.*;
+import java.util.function.Consumer;
 
 /**
  * Simplified Server Data Class
@@ -137,12 +137,12 @@ public class Server {
      *
      * @param callback Remote Player Collection
      */
-    public void getRemotePlayers(Callback<Collection<RemotePlayer>> callback) {
-        if (Util.isNull(callback)) throw new NullPointerException();
+    public void getRemotePlayers(Consumer<Collection<RemotePlayer>> callback) {
+        Util.nullpo(callback);
         StackTraceElement[] origin = new Exception().getStackTrace();
         Runnable run = () -> {
             try {
-                callback.run(players);
+                callback.accept(players);
             } catch (Throwable e) {
                 Throwable ew = new InvocationTargetException(e);
                 ew.setStackTrace(origin);

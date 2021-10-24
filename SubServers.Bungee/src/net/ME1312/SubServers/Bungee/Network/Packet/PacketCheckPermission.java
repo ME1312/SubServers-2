@@ -1,6 +1,5 @@
 package net.ME1312.SubServers.Bungee.Network.Packet;
 
-import net.ME1312.Galaxi.Library.Callback.Callback;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubData.Server.Protocol.PacketObjectIn;
@@ -9,12 +8,13 @@ import net.ME1312.SubData.Server.SubDataClient;
 
 import java.util.HashMap;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 /**
  * Check Permission Packet
  */
 public class PacketCheckPermission implements PacketObjectIn<Integer>, PacketObjectOut<Integer> {
-    static HashMap<UUID, Callback<Boolean>[]> callbacks = new HashMap<UUID, Callback<Boolean>[]>();
+    static HashMap<UUID, Consumer<Boolean>[]> callbacks = new HashMap<UUID, Consumer<Boolean>[]>();
     private UUID player;
     private String permission;
     private UUID tracker;
@@ -32,7 +32,7 @@ public class PacketCheckPermission implements PacketObjectIn<Integer>, PacketObj
      * @param callback Callbacks
      */
     @SafeVarargs
-    public PacketCheckPermission(UUID player, String permission, Callback<Boolean>... callback) {
+    public PacketCheckPermission(UUID player, String permission, Consumer<Boolean>... callback) {
         this.player = player;
         this.permission = permission;
         this.tracker = Util.getNew(callbacks.keySet(), UUID::randomUUID);

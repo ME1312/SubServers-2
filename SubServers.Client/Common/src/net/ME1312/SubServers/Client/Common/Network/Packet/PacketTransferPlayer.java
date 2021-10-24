@@ -1,6 +1,5 @@
 package net.ME1312.SubServers.Client.Common.Network.Packet;
 
-import net.ME1312.Galaxi.Library.Callback.Callback;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubData.Client.Protocol.PacketObjectIn;
@@ -9,12 +8,13 @@ import net.ME1312.SubData.Client.SubDataSender;
 
 import java.util.HashMap;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 /**
  * Transfer Player Packet
  */
 public class PacketTransferPlayer implements PacketObjectIn<Integer>, PacketObjectOut<Integer> {
-    private static HashMap<UUID, Callback<ObjectMap<Integer>>[]> callbacks = new HashMap<UUID, Callback<ObjectMap<Integer>>[]>();
+    private static HashMap<UUID, Consumer<ObjectMap<Integer>>[]> callbacks = new HashMap<UUID, Consumer<ObjectMap<Integer>>[]>();
     private UUID[] players;
     private String server;
     private UUID id;
@@ -32,8 +32,8 @@ public class PacketTransferPlayer implements PacketObjectIn<Integer>, PacketObje
      * @param callback Callbacks
      */
     @SafeVarargs
-    public PacketTransferPlayer(UUID[] players, String server, Callback<ObjectMap<Integer>>... callback) {
-        if (Util.isNull(players, server)) throw new NullPointerException();
+    public PacketTransferPlayer(UUID[] players, String server, Consumer<ObjectMap<Integer>>... callback) {
+        Util.nullpo(players, server);
         this.players = players;
         this.server = server;
         this.id = Util.getNew(callbacks.keySet(), UUID::randomUUID);
@@ -51,7 +51,7 @@ public class PacketTransferPlayer implements PacketObjectIn<Integer>, PacketObje
 
     @Override
     public void receive(SubDataSender client, ObjectMap<Integer> data) {
-        for (Callback<ObjectMap<Integer>> callback : callbacks.get(data.getUUID(0x0000))) callback.run(data);
+        for (Consumer<ObjectMap<Integer>> callback : callbacks.get(data.getUUID(0x0000))) callback.accept(data);
         callbacks.remove(data.getUUID(0x0000));
     }
 

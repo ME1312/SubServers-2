@@ -1,6 +1,5 @@
 package net.ME1312.SubServers.Bungee.Network.Packet;
 
-import net.ME1312.Galaxi.Library.Callback.Callback;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubData.Server.Protocol.PacketObjectIn;
@@ -10,12 +9,13 @@ import net.ME1312.SubServers.Bungee.Host.External.ExternalSubServer;
 
 import java.util.HashMap;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 /**
  * Add Server External Host Packet
  */
 public class PacketExAddServer implements PacketObjectIn<Integer>, PacketObjectOut<Integer> {
-    private static HashMap<UUID, Callback<ObjectMap<Integer>>[]> callbacks = new HashMap<UUID, Callback<ObjectMap<Integer>>[]>();
+    private static HashMap<UUID, Consumer<ObjectMap<Integer>>[]> callbacks = new HashMap<UUID, Consumer<ObjectMap<Integer>>[]>();
     private String name;
     private boolean enabled;
     private int port;
@@ -35,7 +35,7 @@ public class PacketExAddServer implements PacketObjectIn<Integer>, PacketObjectO
      * New PacketExAddServer (Out)
      */
     @SafeVarargs
-    public PacketExAddServer(ExternalSubServer server, UUID running, Callback<ObjectMap<Integer>>... callback) {
+    public PacketExAddServer(ExternalSubServer server, UUID running, Consumer<ObjectMap<Integer>>... callback) {
         if (callback == null) throw new NullPointerException();
         this.name = server.getName();
         this.enabled = server.isEnabled();
@@ -66,7 +66,7 @@ public class PacketExAddServer implements PacketObjectIn<Integer>, PacketObjectO
 
     @Override
     public void receive(SubDataClient client, ObjectMap<Integer> data) {
-        for (Callback<ObjectMap<Integer>> callback : callbacks.get(data.getUUID(0x0000))) callback.run(data);
+        for (Consumer<ObjectMap<Integer>> callback : callbacks.get(data.getUUID(0x0000))) callback.accept(data);
         callbacks.remove(data.getUUID(0x0000));
     }
 

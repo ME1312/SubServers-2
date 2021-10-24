@@ -1,6 +1,7 @@
 package net.ME1312.SubServers.Bungee.Host.External;
 
 import net.ME1312.Galaxi.Library.Container.Value;
+import net.ME1312.Galaxi.Library.Try;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubServers.Bungee.Host.SubLogFilter;
 import net.ME1312.SubServers.Bungee.Host.SubLogger;
@@ -20,8 +21,6 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * External Process Logger Class
@@ -127,14 +126,14 @@ public class ExternalSubLogger extends SubLogger {
 
     @Override
     public void registerFilter(SubLogFilter filter) {
-        if (Util.isNull(filter)) throw new NullPointerException();
+        Util.nullpo(filter);
         filters.add(filter);
     }
 
     @Override
     public void unregisterFilter(SubLogFilter filter) {
-        if (Util.isNull(filter)) throw new NullPointerException();
-        Util.isException(() -> filters.remove(filter));
+        Util.nullpo(filter);
+        Try.all.run(() -> filters.remove(filter));
     }
 
     @Override

@@ -2,8 +2,9 @@ package net.ME1312.SubServers.Host.Network.Packet;
 
 import net.ME1312.Galaxi.Engine.GalaxiEngine;
 import net.ME1312.Galaxi.Library.Config.YAMLSection;
+import net.ME1312.Galaxi.Library.Directories;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
-import net.ME1312.Galaxi.Library.UniversalFile;
+import net.ME1312.Galaxi.Library.Try;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubData.Client.Protocol.PacketObjectIn;
 import net.ME1312.SubData.Client.Protocol.PacketObjectOut;
@@ -35,7 +36,7 @@ public class PacketExDeleteServer implements PacketObjectIn<Integer>, PacketObje
      * @param host ExHost
      */
     public PacketExDeleteServer(ExHost host) {
-        if (Util.isNull(host)) throw new NullPointerException();
+        Util.nullpo(host);
         this.host = host;
     }
 
@@ -46,7 +47,7 @@ public class PacketExDeleteServer implements PacketObjectIn<Integer>, PacketObje
      * @param tracker Receiver ID
      */
     public PacketExDeleteServer(int response, UUID tracker) {
-        if (Util.isNull(response)) throw new NullPointerException();
+        Util.nullpo(response);
         this.response = response;
         this.tracker = tracker;
     }
@@ -62,7 +63,7 @@ public class PacketExDeleteServer implements PacketObjectIn<Integer>, PacketObje
     @SuppressWarnings("unchecked")
     @Override
     public void receive(SubDataSender client, ObjectMap<Integer> data) {
-        Logger log = Util.getDespiteException(() -> Util.reflect(SubDataClient.class.getDeclaredField("log"), client.getConnection()), null);
+        Logger log = Try.all.get(() -> Util.reflect(SubDataClient.class.getDeclaredField("log"), client.getConnection()), null);
         UUID tracker =                     (data.contains(0x0000)?data.getUUID(0x0000):null);
         try {
             String name =               data.getRawString(0x0001);
@@ -77,20 +78,20 @@ public class PacketExDeleteServer implements PacketObjectIn<Integer>, PacketObje
                 SubServerImpl server = host.servers.get(name.toLowerCase());
                 host.servers.remove(name.toLowerCase());
                 new Thread(() -> {
-                    UniversalFile to = new UniversalFile(GalaxiEngine.getInstance().getRuntimeDirectory(), "Recently Deleted:" + server.getName().toLowerCase());
+                    File to = new File(GalaxiEngine.getInstance().getRuntimeDirectory(), "Recently Deleted/" + server.getName().toLowerCase());
                     try {
                         File from = new File(host.host.getRawString("Directory"), server.getPath());
                         if (from.exists()) {
                             log.info("Removing Files...");
                             if (recycle) {
                                 if (to.exists()) {
-                                    if (to.isDirectory()) Util.deleteDirectory(to);
+                                    if (to.isDirectory()) Directories.delete(to);
                                     else to.delete();
                                 }
                                 to.mkdirs();
-                                Util.copyDirectory(from, to);
+                                Directories.copy(from, to);
                             }
-                            Util.deleteDirectory(from);
+                            Directories.delete(from);
                         }
                     } catch (Exception e) {
                         SubAPI.getInstance().getAppInfo().getLogger().error.println(e);

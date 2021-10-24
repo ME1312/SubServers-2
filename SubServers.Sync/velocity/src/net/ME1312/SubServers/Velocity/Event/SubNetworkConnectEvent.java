@@ -14,7 +14,7 @@ public class SubNetworkConnectEvent implements SubEvent {
      * SubData Network Connect Event
      */
     public SubNetworkConnectEvent(DataClient network) {
-        if (Util.isNull(network)) throw new NullPointerException();
+        Util.nullpo(network);
         this.network = network;
     }
 

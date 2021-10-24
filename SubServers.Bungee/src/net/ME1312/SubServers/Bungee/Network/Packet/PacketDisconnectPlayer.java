@@ -1,7 +1,6 @@
 package net.ME1312.SubServers.Bungee.Network.Packet;
 
 import net.ME1312.Galaxi.Library.AsyncConsolidator;
-import net.ME1312.Galaxi.Library.Callback.Callback;
 import net.ME1312.Galaxi.Library.Container.Container;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.SubData.Server.Protocol.PacketObjectIn;
@@ -9,13 +8,13 @@ import net.ME1312.SubData.Server.Protocol.PacketObjectOut;
 import net.ME1312.SubData.Server.SubDataClient;
 import net.ME1312.SubServers.Bungee.Host.Proxy;
 import net.ME1312.SubServers.Bungee.Host.RemotePlayer;
-import net.ME1312.SubServers.Bungee.Host.Server;
 import net.ME1312.SubServers.Bungee.SubAPI;
 
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 import java.util.*;
+import java.util.function.IntConsumer;
 
 /**
  * Disconnect Player Packet
@@ -59,7 +58,7 @@ public class PacketDisconnectPlayer implements PacketObjectIn<Integer>, PacketOb
     }
 
     @SuppressWarnings("deprecation")
-    public static void run(List<UUID> ids, String reason, Callback<Integer> callback) {
+    public static void run(List<UUID> ids, String reason, IntConsumer callback) {
         try {
             Container<Integer> failures = new Container<>(0);
             HashMap<Proxy, List<UUID>> requests = new HashMap<Proxy, List<UUID>>();
@@ -81,10 +80,10 @@ public class PacketDisconnectPlayer implements PacketObjectIn<Integer>, PacketOb
             }
 
             if (requests.size() == 0) {
-                callback.run(failures.value);
+                callback.accept(failures.value);
             } else {
                 AsyncConsolidator merge = new AsyncConsolidator(() -> {
-                    callback.run(failures.value);
+                    callback.accept(failures.value);
                 });
                 for (Map.Entry<Proxy, List<UUID>> entry : requests.entrySet()) {
                     merge.reserve();
@@ -96,7 +95,7 @@ public class PacketDisconnectPlayer implements PacketObjectIn<Integer>, PacketOb
             }
         } catch (Throwable e) {
             e.printStackTrace();
-            callback.run(-1);
+            callback.accept(-1);
         }
     }
 

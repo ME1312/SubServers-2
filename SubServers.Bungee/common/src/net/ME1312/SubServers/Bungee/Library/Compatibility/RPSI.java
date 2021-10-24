@@ -1,10 +1,9 @@
 package net.ME1312.SubServers.Bungee.Library.Compatibility;
 
-import net.ME1312.Galaxi.Library.Callback.Callback;
-
 import net.md_5.bungee.api.chat.BaseComponent;
 
 import java.util.UUID;
+import java.util.function.IntConsumer;
 
 /**
  * RemotePlayer Static Implementation Layout Class
@@ -22,7 +21,7 @@ public abstract class RPSI {
      * @param messages Messages to send
      * @param response Success Status
      */
-    protected abstract void sendMessage(UUID[] players, String[] messages, Callback<Integer> response);
+    protected abstract void sendMessage(UUID[] players, String[] messages, IntConsumer response);
 
     /**
      * Sends messages to this player
@@ -31,7 +30,7 @@ public abstract class RPSI {
      * @param messages Messages to send
      * @param response Success Status
      */
-    protected abstract void sendMessage(UUID[] players, BaseComponent[][] messages, Callback<Integer> response);
+    protected abstract void sendMessage(UUID[] players, BaseComponent[][] messages, IntConsumer response);
 
     /**
      * Transfers this player to another server
@@ -40,7 +39,7 @@ public abstract class RPSI {
      * @param server Target server
      * @param response Success Status
      */
-    protected abstract void transfer(UUID[] players, String server, Callback<Integer> response);
+    protected abstract void transfer(UUID[] players, String server, IntConsumer response);
 
     /**
      * Disconnects this player from the network
@@ -49,5 +48,5 @@ public abstract class RPSI {
      * @param reason Disconnect Reason
      * @param response Success status
      */
-    protected abstract void disconnect(UUID[] players, String reason, Callback<Integer> response);
+    protected abstract void disconnect(UUID[] players, String reason, IntConsumer response);
 }

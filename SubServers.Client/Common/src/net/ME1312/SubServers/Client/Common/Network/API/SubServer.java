@@ -1,7 +1,7 @@
 package net.ME1312.SubServers.Client.Common.Network.API;
 
-import net.ME1312.Galaxi.Library.Callback.Callback;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
+import net.ME1312.Galaxi.Library.Try;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubData.Client.DataClient;
 import net.ME1312.SubServers.Client.Common.ClientAPI;
@@ -12,6 +12,8 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
+import java.util.function.Consumer;
+import java.util.function.IntConsumer;
 
 /**
  * Simplified SubServer Data Class
@@ -87,12 +89,12 @@ public class SubServer extends Server {
      * @param player Player who Started
      * @param response Response Code
      */
-    public void start(UUID player, Callback<Integer> response) {
-        if (Util.isNull(response)) throw new NullPointerException();
+    public void start(UUID player, IntConsumer response) {
+        Util.nullpo(response);
         StackTraceElement[] origin = new Exception().getStackTrace();
         client().sendPacket(new PacketStartServer(player, getName(), data -> {
             try {
-                response.run(data.getInt(0x0001));
+                response.accept(data.getInt(0x0001));
             } catch (Throwable e) {
                 Throwable ew = new InvocationTargetException(e);
                 ew.setStackTrace(origin);
@@ -106,7 +108,7 @@ public class SubServer extends Server {
      *
      * @param response Response Code
      */
-    public void start(Callback<Integer> response) {
+    public void start(IntConsumer response) {
         start(null, response);
     }
 
@@ -132,12 +134,12 @@ public class SubServer extends Server {
      * @param player Player who Stopped
      * @param response Response Code
      */
-    public void stop(UUID player, Callback<Integer> response) {
-        if (Util.isNull(response)) throw new NullPointerException();
+    public void stop(UUID player, IntConsumer response) {
+        Util.nullpo(response);
         StackTraceElement[] origin = new Exception().getStackTrace();
         client().sendPacket(new PacketStopServer(player, getName(), false, data -> {
             try {
-                response.run(data.getInt(0x0001));
+                response.accept(data.getInt(0x0001));
             } catch (Throwable e) {
                 Throwable ew = new InvocationTargetException(e);
                 ew.setStackTrace(origin);
@@ -151,7 +153,7 @@ public class SubServer extends Server {
      *
      * @param response Response Code
      */
-    public void stop(Callback<Integer> response) {
+    public void stop(IntConsumer response) {
         stop(null, response);
     }
 
@@ -177,12 +179,12 @@ public class SubServer extends Server {
      * @param player Player who Terminated
      * @param response Response Code
      */
-    public void terminate(UUID player, Callback<Integer> response) {
-        if (Util.isNull(response)) throw new NullPointerException();
+    public void terminate(UUID player, IntConsumer response) {
+        Util.nullpo(response);
         StackTraceElement[] origin = new Exception().getStackTrace();
         client().sendPacket(new PacketStopServer(player, getName(), true, data -> {
             try {
-                response.run(data.getInt(0x0001));
+                response.accept(data.getInt(0x0001));
             } catch (Throwable e) {
                 Throwable ew = new InvocationTargetException(e);
                 ew.setStackTrace(origin);
@@ -196,7 +198,7 @@ public class SubServer extends Server {
      *
      * @param response Response Code
      */
-    public void terminate(Callback<Integer> response) {
+    public void terminate(IntConsumer response) {
         terminate(null, response);
     }
 
@@ -223,12 +225,12 @@ public class SubServer extends Server {
      * @param command Commmand to Send
      * @param response Response Code
      */
-    public void command(UUID player, String command, Callback<Integer> response) {
-        if (Util.isNull(command, response)) throw new NullPointerException();
+    public void command(UUID player, String command, IntConsumer response) {
+        Util.nullpo(command, response);
         StackTraceElement[] origin = new Exception().getStackTrace();
         client().sendPacket(new PacketCommandServer(player, getName(), command, data -> {
             try {
-                response.run(data.getInt(0x0001));
+                response.accept(data.getInt(0x0001));
             } catch (Throwable e) {
                 Throwable ew = new InvocationTargetException(e);
                 ew.setStackTrace(origin);
@@ -243,7 +245,7 @@ public class SubServer extends Server {
      * @param command Commmand to Send
      * @param response Response Code
      */
-    public void command(String command, Callback<Integer> response) {
+    public void command(String command, IntConsumer response) {
         command(null, command, response);
     }
 
@@ -273,7 +275,7 @@ public class SubServer extends Server {
      * @param edit Edits
      * @param response Negative Response Code -or- Positive Success Status
      */
-    public void edit(UUID player, ObjectMap<String> edit, Callback<Integer> response) {
+    public void edit(UUID player, ObjectMap<String> edit, IntConsumer response) {
         edit(player, edit, false, response);
     }
 
@@ -283,7 +285,7 @@ public class SubServer extends Server {
      * @param edit Edits
      * @param response Negative Response Code -or- Positive Success Status
      */
-    public void edit(ObjectMap<String> edit, Callback<Integer> response) {
+    public void edit(ObjectMap<String> edit, IntConsumer response) {
         edit(null, edit, response);
     }
 
@@ -313,7 +315,7 @@ public class SubServer extends Server {
      * @param edit Edits
      * @param response Negative Response Code -or- Positive Success Status
      */
-    public void permaEdit(UUID player, ObjectMap<String> edit, Callback<Integer> response) {
+    public void permaEdit(UUID player, ObjectMap<String> edit, IntConsumer response) {
         edit(player, edit, true, response);
     }
 
@@ -323,7 +325,7 @@ public class SubServer extends Server {
      * @param edit Edits
      * @param response Negative Response Code -or- Positive Success Status
      */
-    public void permaEdit(ObjectMap<String> edit, Callback<Integer> response) {
+    public void permaEdit(ObjectMap<String> edit, IntConsumer response) {
         permaEdit(null, edit, response);
     }
 
@@ -346,15 +348,15 @@ public class SubServer extends Server {
         permaEdit(null, edit);
     }
 
-    private void edit(UUID player, ObjectMap<String> edit, boolean perma, Callback<Integer> response) {
-        if (Util.isNull(response)) throw new NullPointerException();
+    private void edit(UUID player, ObjectMap<String> edit, boolean perma, IntConsumer response) {
+        Util.nullpo(response);
         StackTraceElement[] origin = new Exception().getStackTrace();
         client().sendPacket(new PacketEditServer(player, getName(), edit, perma, data -> {
             try {
                 if (data.getInt(0x0001) != 0) {
-                    response.run(data.getInt(0x0001) * -1);
+                    response.accept(data.getInt(0x0001) * -1);
                 } else {
-                    response.run(data.getInt(0x0002));
+                    response.accept(data.getInt(0x0002));
                 }
             } catch (Throwable e) {
                 Throwable ew = new InvocationTargetException(e);
@@ -397,12 +399,12 @@ public class SubServer extends Server {
      *
      * @param callback The Host
      */
-    public void getHost(Callback<Host> callback) {
-        if (Util.isNull(callback)) throw new NullPointerException();
+    public void getHost(Consumer<Host> callback) {
+        Util.nullpo(callback);
         StackTraceElement[] origin = new Exception().getStackTrace();
         Runnable run = () -> {
             try {
-                callback.run(host);
+                callback.accept(host);
             } catch (Throwable e) {
                 Throwable ew = new InvocationTargetException(e);
                 ew.setStackTrace(origin);
@@ -462,13 +464,13 @@ public class SubServer extends Server {
      * @param value Value
      * @param response Success Status
      */
-    public void setEnabled(boolean value, Callback<Boolean> response) {
-        if (Util.isNull(value, response)) throw new NullPointerException();
+    public void setEnabled(boolean value, Consumer<Boolean> response) {
+        Util.nullpo(value, response);
         ObjectMap<String> edit = new ObjectMap<String>();
         edit.set("enabled", value);
         edit(edit, r -> {
             if (r > 0) raw.set("enabled", value);
-            response.run(r > 0);
+            response.accept(r > 0);
         });
     }
 
@@ -505,13 +507,13 @@ public class SubServer extends Server {
      * @param value Value
      * @param response Success Status
      */
-    public void setLogging(boolean value, Callback<Boolean> response) {
-        if (Util.isNull(value, response)) throw new NullPointerException();
+    public void setLogging(boolean value, Consumer<Boolean> response) {
+        Util.nullpo(value, response);
         ObjectMap<String> edit = new ObjectMap<String>();
         edit.set("log", value);
         edit(edit, r -> {
             if (r > 0) raw.set("log", value);
-            response.run(r > 0);
+            response.accept(r > 0);
         });
     }
 
@@ -557,13 +559,13 @@ public class SubServer extends Server {
      * @param value Value
      * @param response Success Status
      */
-    public void setStopCommand(String value, Callback<Boolean> response) {
-        if (Util.isNull(value, response)) throw new NullPointerException();
+    public void setStopCommand(String value, Consumer<Boolean> response) {
+        Util.nullpo(value, response);
         ObjectMap<String> edit = new ObjectMap<String>();
         edit.set("stop-cmd", value);
         edit(edit, r -> {
             if (r > 0) raw.set("stop-cmd", value);
-            response.run(r > 0);
+            response.accept(r > 0);
         });
     }
 
@@ -573,7 +575,7 @@ public class SubServer extends Server {
      * @return Stop Action
      */
     public StopAction getStopAction() {
-        return Util.getDespiteException(() -> StopAction.valueOf(raw.getRawString("stop-action").toUpperCase().replace('-', '_').replace(' ', '_')), StopAction.NONE);
+        return Try.all.get(() -> StopAction.valueOf(raw.getRawString("stop-action").toUpperCase().replace('-', '_').replace(' ', '_')), StopAction.NONE);
     }
 
     /**
@@ -591,13 +593,13 @@ public class SubServer extends Server {
      * @param action Stop Action
      * @param response Success Status
      */
-    public void setStopAction(StopAction action, Callback<Boolean> response) {
-        if (Util.isNull(action, response)) throw new NullPointerException();
+    public void setStopAction(StopAction action, Consumer<Boolean> response) {
+        Util.nullpo(action, response);
         ObjectMap<String> edit = new ObjectMap<String>();
         edit.set("stop-action", action.toString());
         edit(edit, r -> {
             if (r > 0) raw.set("stop-action", action.toString());
-            response.run(r > 0);
+            response.accept(r > 0);
         });
     }
 
@@ -615,8 +617,8 @@ public class SubServer extends Server {
      *
      * @param server SubServer to toggle
      */
-    public void toggleCompatibility(String server, Callback<Boolean> response) {
-        if (Util.isNull(server, response)) throw new NullPointerException();
+    public void toggleCompatibility(String server, Consumer<Boolean> response) {
+        Util.nullpo(server, response);
         ArrayList<String> value = new ArrayList<String>();
         value.addAll(getIncompatibilities());
         if (!value.contains(server)) value.add(server);
@@ -626,7 +628,7 @@ public class SubServer extends Server {
         edit.set("incompatible", value);
         edit(edit, r -> {
             if (r > 0) raw.set("incompatible", value);
-            response.run(r > 0);
+            response.accept(r > 0);
         });
     }
 
@@ -658,12 +660,12 @@ public class SubServer extends Server {
      *
      * @param callback Incompatibility List
      */
-    public void getIncompatibilities(Callback<List<SubServer>> callback) {
-        if (Util.isNull(callback)) throw new NullPointerException();
+    public void getIncompatibilities(Consumer<List<SubServer>> callback) {
+        Util.nullpo(callback);
         StackTraceElement[] origin = new Exception().getStackTrace();
         Runnable run = () -> {
             try {
-                callback.run(incompatibilities);
+                callback.accept(incompatibilities);
             } catch (Throwable e) {
                 Throwable ew = new InvocationTargetException(e);
                 ew.setStackTrace(origin);
@@ -702,12 +704,12 @@ public class SubServer extends Server {
      *
      * @param callback Current Incompatibility List
      */
-    public void getCurrentIncompatibilities(Callback<List<SubServer>> callback) {
-        if (Util.isNull(callback)) throw new NullPointerException();
+    public void getCurrentIncompatibilities(Consumer<List<SubServer>> callback) {
+        Util.nullpo(callback);
         StackTraceElement[] origin = new Exception().getStackTrace();
         Runnable run = () -> {
             try {
-                callback.run(currentIncompatibilities);
+                callback.accept(currentIncompatibilities);
             } catch (Throwable e) {
                 Throwable ew = new InvocationTargetException(e);
                 ew.setStackTrace(origin);
@@ -747,13 +749,13 @@ public class SubServer extends Server {
      * @param value Value (or null to reset)
      * @param response Success Status
      */
-    public void setDisplayName(String value, Callback<Boolean> response) {
-        if (Util.isNull(value, response)) throw new NullPointerException();
+    public void setDisplayName(String value, Consumer<Boolean> response) {
+        Util.nullpo(value, response);
         ObjectMap<String> edit = new ObjectMap<String>();
         edit.set("display", (value == null)?"":value);
         edit(edit, r -> {
             if (r > 0) raw.set("display", (value == null)?getName():value);
-            response.run(r > 0);
+            response.accept(r > 0);
         });
     }
 
@@ -772,8 +774,8 @@ public class SubServer extends Server {
      * @param value Group name
      * @param response Success Status
      */
-    public void addGroup(String value, Callback<Boolean> response) {
-        if (Util.isNull(value, response)) throw new NullPointerException();
+    public void addGroup(String value, Consumer<Boolean> response) {
+        Util.nullpo(value, response);
         ArrayList<String> v = new ArrayList<String>();
         v.addAll(getGroups());
         if (!v.contains(value)) v.add(value);
@@ -782,7 +784,7 @@ public class SubServer extends Server {
         edit.set("group", v);
         edit(edit, r -> {
             if (r > 0) raw.set("group", v);
-            response.run(r > 0);
+            response.accept(r > 0);
         });
     }
 
@@ -801,8 +803,8 @@ public class SubServer extends Server {
      * @param value value Group name
      * @param response Success Status
      */
-    public void removeGroup(String value, Callback<Boolean> response) {
-        if (Util.isNull(value, response)) throw new NullPointerException();
+    public void removeGroup(String value, Consumer<Boolean> response) {
+        Util.nullpo(value, response);
         ArrayList<UUID> v = new ArrayList<UUID>();
         v.addAll(getWhitelist());
         v.remove(value);
@@ -811,7 +813,7 @@ public class SubServer extends Server {
         edit.set("group", v);
         edit(edit, r -> {
             if (r > 0) raw.set("group", v);
-            response.run(r > 0);
+            response.accept(r > 0);
         });
     }
 
@@ -830,13 +832,13 @@ public class SubServer extends Server {
      * @param value Value
      * @param response Success Status
      */
-    public void setHidden(boolean value, Callback<Boolean> response) {
-        if (Util.isNull(value, response)) throw new NullPointerException();
+    public void setHidden(boolean value, Consumer<Boolean> response) {
+        Util.nullpo(value, response);
         ObjectMap<String> edit = new ObjectMap<String>();
         edit.set("restricted", value);
         edit(edit, r -> {
             if (r > 0) raw.set("restricted", value);
-            response.run(r > 0);
+            response.accept(r > 0);
         });
     }
 
@@ -855,13 +857,13 @@ public class SubServer extends Server {
      * @param value Value
      * @param response Success Status
      */
-    public void setMotd(String value, Callback<Boolean> response) {
-        if (Util.isNull(value, response)) throw new NullPointerException();
+    public void setMotd(String value, Consumer<Boolean> response) {
+        Util.nullpo(value, response);
         ObjectMap<String> edit = new ObjectMap<String>();
         edit.set("motd", value);
         edit(edit, r -> {
             if (r > 0) raw.set("motd", value);
-            response.run(r > 0);
+            response.accept(r > 0);
         });
     }
 
@@ -880,13 +882,13 @@ public class SubServer extends Server {
      * @param value Value
      * @param response Success Status
      */
-    public void setRestricted(boolean value, Callback<Boolean> response) {
-        if (Util.isNull(value, response)) throw new NullPointerException();
+    public void setRestricted(boolean value, Consumer<Boolean> response) {
+        Util.nullpo(value, response);
         ObjectMap<String> edit = new ObjectMap<String>();
         edit.set("restricted", value);
         edit(edit, r -> {
             if (r > 0) raw.set("restricted", value);
-            response.run(r > 0);
+            response.accept(r > 0);
         });
     }
 
@@ -905,8 +907,8 @@ public class SubServer extends Server {
      * @param player Player to add
      * @param response Success Status
      */
-    public void whitelist(UUID player, Callback<Boolean> response) {
-        if (Util.isNull(player, response)) throw new NullPointerException();
+    public void whitelist(UUID player, Consumer<Boolean> response) {
+        Util.nullpo(player, response);
         ArrayList<UUID> value = new ArrayList<UUID>();
         value.addAll(getWhitelist());
         if (!value.contains(player)) value.add(player);
@@ -915,7 +917,7 @@ public class SubServer extends Server {
         edit.set("whitelist", value);
         edit(edit, r -> {
             if (r > 0) raw.set("whitelist", value);
-            response.run(r > 0);
+            response.accept(r > 0);
         });
     }
 
@@ -934,8 +936,8 @@ public class SubServer extends Server {
      * @param player Player to remove
      * @param response Success Status
      */
-    public void unwhitelist(UUID player, Callback<Boolean> response) {
-        if (Util.isNull(player, response)) throw new NullPointerException();
+    public void unwhitelist(UUID player, Consumer<Boolean> response) {
+        Util.nullpo(player, response);
         ArrayList<UUID> value = new ArrayList<UUID>();
         value.addAll(getWhitelist());
         value.remove(player);
@@ -944,7 +946,7 @@ public class SubServer extends Server {
         edit.set("whitelist", value);
         edit(edit, r -> {
             if (r > 0) raw.set("whitelist", value);
-            response.run(r > 0);
+            response.accept(r > 0);
         });
     }
 }
