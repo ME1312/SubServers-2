@@ -61,7 +61,7 @@ public class PacketLinkProxy implements InitialPacket, PacketObjectIn<Integer>, 
     public void receive(SubDataClient client, ObjectMap<Integer> data) {
         try {
             Map<String, Proxy> proxies = plugin.api.getProxies();
-            String name = ((data.contains(0x0000))?data.getRawString(0x0000):null);
+            String name = ((data.contains(0x0000))?data.getString(0x0000):null);
             Integer channel = data.getInt(0x0001);
 
             boolean isnew = false;

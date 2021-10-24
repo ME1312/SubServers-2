@@ -28,100 +28,100 @@ public class PacketInExRunEvent implements PacketObjectIn<Integer> {
         callback("SubAddHostEvent", new Consumer<ObjectMap<String>>() {
             @Override
             public void accept(ObjectMap<String> data) {
-                ProxyServer.getInstance().getPluginManager().callEvent(new SubAddHostEvent((data.contains("player"))?data.getUUID("player"):null, data.getRawString("host")));
+                ProxyServer.getInstance().getPluginManager().callEvent(new SubAddHostEvent((data.contains("player"))?data.getUUID("player"):null, data.getString("host")));
                 callback("SubAddHostEvent", this);
             }
         });
         callback("SubAddProxyEvent", new Consumer<ObjectMap<String>>() {
             @Override
             public void accept(ObjectMap<String> data) {
-                ProxyServer.getInstance().getPluginManager().callEvent(new SubAddProxyEvent(data.getRawString("proxy")));
+                ProxyServer.getInstance().getPluginManager().callEvent(new SubAddProxyEvent(data.getString("proxy")));
                 callback("SubAddProxyEvent", this);
             }
         });
         callback("SubAddServerEvent", new Consumer<ObjectMap<String>>() {
             @Override
             public void accept(ObjectMap<String> data) {
-                ProxyServer.getInstance().getPluginManager().callEvent(new SubAddServerEvent((data.contains("player"))?data.getUUID("player"):null, (data.contains("host"))?data.getRawString("host"):null, data.getRawString("server")));
+                ProxyServer.getInstance().getPluginManager().callEvent(new SubAddServerEvent((data.contains("player"))?data.getUUID("player"):null, (data.contains("host"))?data.getString("host"):null, data.getString("server")));
                 callback("SubAddServerEvent", this);
             }
         });
         callback("SubCreateEvent", new Consumer<ObjectMap<String>>() {
             @Override
             public void accept(ObjectMap<String> data) {
-                ProxyServer.getInstance().getPluginManager().callEvent(new SubCreateEvent((data.contains("player"))?data.getUUID("player"):null, data.getRawString("host"), data.getRawString("name"),
-                        data.getRawString("template"), data.getVersion("version"), data.getInt("port"), data.getBoolean("update")));
+                ProxyServer.getInstance().getPluginManager().callEvent(new SubCreateEvent((data.contains("player"))?data.getUUID("player"):null, data.getString("host"), data.getString("name"),
+                        data.getString("template"), data.getVersion("version"), data.getInt("port"), data.getBoolean("update")));
                 callback("SubCreateEvent", this);
             }
         });
         callback("SubCreatedEvent", new Consumer<ObjectMap<String>>() {
             @Override
             public void accept(ObjectMap<String> data) {
-                ProxyServer.getInstance().getPluginManager().callEvent(new SubCreatedEvent((data.contains("player"))?data.getUUID("player"):null, data.getRawString("host"), data.getRawString("name"),
-                        data.getRawString("template"), data.getVersion("version"), data.getInt("port"), data.getBoolean("update"), data.getBoolean("success")));
+                ProxyServer.getInstance().getPluginManager().callEvent(new SubCreatedEvent((data.contains("player"))?data.getUUID("player"):null, data.getString("host"), data.getString("name"),
+                        data.getString("template"), data.getVersion("version"), data.getInt("port"), data.getBoolean("update"), data.getBoolean("success")));
                 callback("SubCreatedEvent", this);
             }
         });
         callback("SubSendCommandEvent", new Consumer<ObjectMap<String>>() {
             @Override
             public void accept(ObjectMap<String> data) {
-                ProxyServer.getInstance().getPluginManager().callEvent(new SubSendCommandEvent((data.contains("player"))?data.getUUID("player"):null, data.getRawString("server"), data.getRawString("command")));
+                ProxyServer.getInstance().getPluginManager().callEvent(new SubSendCommandEvent((data.contains("player"))?data.getUUID("player"):null, data.getString("server"), data.getString("command")));
                 callback("SubSendCommandEvent", this);
             }
         });
         callback("SubEditServerEvent", new Consumer<ObjectMap<String>>() {
             @Override
             public void accept(ObjectMap<String> data) {
-                ProxyServer.getInstance().getPluginManager().callEvent(new SubEditServerEvent((data.contains("player"))?data.getUUID("player"):null, data.getRawString("server"), new ContainedPair<String, Object>(data.getRawString("edit"), data.get("value"))));
+                ProxyServer.getInstance().getPluginManager().callEvent(new SubEditServerEvent((data.contains("player"))?data.getUUID("player"):null, data.getString("server"), new ContainedPair<String, Object>(data.getString("edit"), data.get("value"))));
                 callback("SubEditServerEvent", this);
             }
         });
         callback("SubStartEvent", new Consumer<ObjectMap<String>>() {
             @Override
             public void accept(ObjectMap<String> data) {
-                ProxyServer.getInstance().getPluginManager().callEvent(new SubStartEvent((data.contains("player"))?data.getUUID("player"):null, data.getRawString("server")));
+                ProxyServer.getInstance().getPluginManager().callEvent(new SubStartEvent((data.contains("player"))?data.getUUID("player"):null, data.getString("server")));
                 callback("SubStartEvent", this);
             }
         });
         callback("SubStartedEvent", new Consumer<ObjectMap<String>>() {
             @Override
             public void accept(ObjectMap<String> data) {
-                ProxyServer.getInstance().getPluginManager().callEvent(new SubStartedEvent(data.getRawString("server")));
+                ProxyServer.getInstance().getPluginManager().callEvent(new SubStartedEvent(data.getString("server")));
                 callback("SubStartedEvent", this);
             }
         });
         callback("SubStopEvent", new Consumer<ObjectMap<String>>() {
             @Override
             public void accept(ObjectMap<String> data) {
-                ProxyServer.getInstance().getPluginManager().callEvent(new SubStopEvent((data.contains("player"))?data.getUUID("player"):null, data.getRawString("server"), data.getBoolean("force")));
+                ProxyServer.getInstance().getPluginManager().callEvent(new SubStopEvent((data.contains("player"))?data.getUUID("player"):null, data.getString("server"), data.getBoolean("force")));
                 callback("SubStopEvent", this);
             }
         });
         callback("SubStoppedEvent", new Consumer<ObjectMap<String>>() {
             @Override
             public void accept(ObjectMap<String> data) {
-                ProxyServer.getInstance().getPluginManager().callEvent(new SubStoppedEvent(data.getRawString("server")));
+                ProxyServer.getInstance().getPluginManager().callEvent(new SubStoppedEvent(data.getString("server")));
                 callback("SubStoppedEvent", this);
             }
         });
         callback("SubRemoveServerEvent", new Consumer<ObjectMap<String>>() {
             @Override
             public void accept(ObjectMap<String> data) {
-                ProxyServer.getInstance().getPluginManager().callEvent(new SubRemoveServerEvent((data.contains("player"))?data.getUUID("player"):null, (data.contains("host"))?data.getRawString("host"):null, data.getRawString("server")));
+                ProxyServer.getInstance().getPluginManager().callEvent(new SubRemoveServerEvent((data.contains("player"))?data.getUUID("player"):null, (data.contains("host"))?data.getString("host"):null, data.getString("server")));
                 callback("SubRemoveServerEvent", this);
             }
         });
         callback("SubRemoveProxyEvent", new Consumer<ObjectMap<String>>() {
             @Override
             public void accept(ObjectMap<String> data) {
-                ProxyServer.getInstance().getPluginManager().callEvent(new SubAddProxyEvent(data.getRawString("proxy")));
+                ProxyServer.getInstance().getPluginManager().callEvent(new SubAddProxyEvent(data.getString("proxy")));
                 callback("SubRemoveProxyEvent", this);
             }
         });
         callback("SubRemoveHostEvent", new Consumer<ObjectMap<String>>() {
             @Override
             public void accept(ObjectMap<String> data) {
-                ProxyServer.getInstance().getPluginManager().callEvent(new SubRemoveHostEvent((data.contains("player"))?data.getUUID("player"):null, data.getRawString("host")));
+                ProxyServer.getInstance().getPluginManager().callEvent(new SubRemoveHostEvent((data.contains("player"))?data.getUUID("player"):null, data.getString("host")));
                 callback("SubRemoveHostEvent", this);
             }
         });

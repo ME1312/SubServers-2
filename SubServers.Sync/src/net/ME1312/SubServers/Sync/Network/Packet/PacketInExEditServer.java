@@ -21,14 +21,14 @@ public class PacketInExEditServer implements PacketObjectIn<Integer> {
 
     @Override
     public void receive(SubDataSender client, ObjectMap<Integer> data) {
-        if (plugin.servers.containsKey(data.getRawString(0x0000).toLowerCase())) {
-            ServerImpl server = plugin.servers.get(data.getRawString(0x0000).toLowerCase());
+        if (plugin.servers.containsKey(data.getString(0x0000).toLowerCase())) {
+            ServerImpl server = plugin.servers.get(data.getString(0x0000).toLowerCase());
             switch (data.getInt(0x0001)) {
                 case 0:
-                    server.setDisplayName(data.getList(0x0002).get(0).asRawString());
+                    server.setDisplayName(data.getList(0x0002).get(0).asString());
                     break;
                 case 1:
-                    server.setMotd(data.getList(0x0002).get(0).asRawString());
+                    server.setMotd(data.getList(0x0002).get(0).asString());
                     break;
                 case 2:
                     server.setRestricted(data.getList(0x0002).get(0).asBoolean());

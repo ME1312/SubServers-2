@@ -74,9 +74,9 @@ public class ExternalSubCreator extends SubCreator {
             try {
                 if (file.isDirectory() && !file.getName().endsWith(".x")) {
                     ObjectMap<String> config = (new File(file, "template.yml").exists())? new YAMLConfig(new File(file, "template.yml")).get().getMap("Template", new ObjectMap<String>()) : new ObjectMap<String>();
-                    ServerTemplate template = loadTemplate(file.getName(), config.getBoolean("Enabled", true), config.getBoolean("Internal", false), config.getRawString("Icon", "::NULL::"), file, config.getMap("Build", new ObjectMap<String>()), config.getMap("Settings", new ObjectMap<String>()));
+                    ServerTemplate template = loadTemplate(file.getName(), config.getBoolean("Enabled", true), config.getBoolean("Internal", false), config.getString("Icon", "::NULL::"), file, config.getMap("Build", new ObjectMap<String>()), config.getMap("Settings", new ObjectMap<String>()));
                     templatesR.put(file.getName().toLowerCase(), template);
-                    if (config.getKeys().contains("Display")) template.setDisplayName(config.getString("Display"));
+                    if (config.getKeys().contains("Display")) template.setDisplayName(Util.unescapeJavaString(config.getString("Display")));
                 }
             } catch (Exception e) {
                 Logger.get(host.getName()).severe("Couldn't load template: " + file.getName());
@@ -205,13 +205,13 @@ public class ExternalSubCreator extends SubCreator {
                     server.setAll(config);
 
                     if (update != null) Try.all.run(() -> update.getHost().forceRemoveSubServer(name));
-                    subserver = host.constructSubServer(name, server.getBoolean("Enabled"), port, ChatColor.translateAlternateColorCodes('&', server.getString("Motd")), server.getBoolean("Log"),
-                            server.getRawString("Directory"), server.getRawString("Executable"), server.getRawString("Stop-Command"), server.getBoolean("Hidden"), server.getBoolean("Restricted"));
+                    subserver = host.constructSubServer(name, server.getBoolean("Enabled"), port, ChatColor.translateAlternateColorCodes('&', Util.unescapeJavaString(server.getString("Motd"))), server.getBoolean("Log"),
+                            server.getString("Directory"), server.getString("Executable"), server.getString("Stop-Command"), server.getBoolean("Hidden"), server.getBoolean("Restricted"));
 
-                    if (server.getString("Display").length() > 0) subserver.setDisplayName(server.getString("Display"));
-                    subserver.setTemplate(server.getRawString("Template"));
+                    if (server.getString("Display").length() > 0) subserver.setDisplayName(Util.unescapeJavaString(server.getString("Display")));
+                    subserver.setTemplate(server.getString("Template"));
                     for (String group : server.getStringList("Group")) subserver.addGroup(group);
-                    SubServer.StopAction action = Try.all.get(() -> SubServer.StopAction.valueOf(server.getRawString("Stop-Action").toUpperCase().replace('-', '_').replace(' ', '_')));
+                    SubServer.StopAction action = Try.all.get(() -> SubServer.StopAction.valueOf(server.getString("Stop-Action").toUpperCase().replace('-', '_').replace(' ', '_')));
                     if (action != null) subserver.setStopAction(action);
                     if (server.contains("Extra")) for (String extra : server.getMap("Extra").getKeys())
                         subserver.addExtra(extra, server.getMap("Extra").getObject(extra));

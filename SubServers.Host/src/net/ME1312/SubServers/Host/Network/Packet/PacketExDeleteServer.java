@@ -66,7 +66,7 @@ public class PacketExDeleteServer implements PacketObjectIn<Integer>, PacketObje
         Logger log = Try.all.get(() -> Util.reflect(SubDataClient.class.getDeclaredField("log"), client.getConnection()), null);
         UUID tracker =                     (data.contains(0x0000)?data.getUUID(0x0000):null);
         try {
-            String name =               data.getRawString(0x0001);
+            String name =               data.getString(0x0001);
             YAMLSection info = new YAMLSection((Map<String, ?>) data.getObject(0x0002));
             boolean recycle =             data.getBoolean(0x0003, false);
 
@@ -80,7 +80,7 @@ public class PacketExDeleteServer implements PacketObjectIn<Integer>, PacketObje
                 new Thread(() -> {
                     File to = new File(GalaxiEngine.getInstance().getRuntimeDirectory(), "Recently Deleted/" + server.getName().toLowerCase());
                     try {
-                        File from = new File(host.host.getRawString("Directory"), server.getPath());
+                        File from = new File(host.host.getString("Directory"), server.getPath());
                         if (from.exists()) {
                             log.info("Removing Files...");
                             if (recycle) {

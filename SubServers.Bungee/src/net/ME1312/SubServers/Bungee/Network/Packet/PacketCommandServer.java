@@ -53,8 +53,8 @@ public class PacketCommandServer implements PacketObjectIn<Integer>, PacketObjec
     public void receive(SubDataClient client, ObjectMap<Integer> data) {
         UUID tracker =      (data.contains(0x0000)?data.getUUID(0x0000):null);
         try {
-            String server =  data.getRawString(0x0001);
-            String command = data.getRawString(0x0002);
+            String server =  data.getString(0x0001);
+            String command = data.getString(0x0002);
             UUID player =       (data.contains(0x0003)?data.getUUID(0x0003):null);
 
             Map<String, Server> servers = plugin.api.getServers();

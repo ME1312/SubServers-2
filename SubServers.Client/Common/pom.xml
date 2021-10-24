@@ -18,13 +18,13 @@
         <dependency>
             <groupId>net.ME1312.Galaxi</groupId>
             <artifactId>GalaxiUtil</artifactId>
-            <version>21w44a</version>
+            <version>21w44b</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>net.ME1312.SubData</groupId>
             <artifactId>Client</artifactId>
-            <version>21w43a</version>
+            <version>21w44a</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>

@@ -114,8 +114,8 @@ public class PacketMessagePlayer implements PacketObjectIn<Integer>, PacketObjec
                         raw = null;
                     }
                 } else {
-                    legacy = (data.contains(0x0002)?data.getRawStringList(0x0002):null);
-                    raw =    (data.contains(0x0003)?data.getRawStringList(0x0003):null);
+                    legacy = (data.contains(0x0002)?data.getStringList(0x0002):null);
+                    raw =    (data.contains(0x0003)?data.getStringList(0x0003):null);
                 }
                 for (Map.Entry<Proxy, List<UUID>> entry : requests.entrySet()) {
                     merge.reserve();
@@ -134,9 +134,9 @@ public class PacketMessagePlayer implements PacketObjectIn<Integer>, PacketObjec
     private static ContainedPair<String[], BaseComponent[][]> parseMessage(ObjectMap<Integer> data) {
         ContainedPair<String[], BaseComponent[][]> value = new ContainedPair<>();
         if (data.contains(0x0002))
-            value.key = data.getRawStringList(0x0002).toArray(new String[0]);
+            value.key = data.getStringList(0x0002).toArray(new String[0]);
         if (data.contains(0x0003)) {
-            List<String> messages = data.getRawStringList(0x0003);
+            List<String> messages = data.getStringList(0x0003);
             BaseComponent[][] components = new BaseComponent[messages.size()][];
             for (int i = 0; i < components.length; ++i) components[i] = ComponentSerializer.parse(messages.get(i));
             value.value = components;

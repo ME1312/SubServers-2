@@ -53,7 +53,7 @@ public class PacketTransferPlayer implements PacketObjectIn<Integer>, PacketObje
     @Override
     public void receive(SubDataClient client, ObjectMap<Integer> data) {
         UUID tracker = (data.contains(0x0000)?data.getUUID(0x0000):null);
-        run(data.getUUIDList(0x0001), data.getRawString(0x0002), i -> {
+        run(data.getUUIDList(0x0001), data.getString(0x0002), i -> {
             client.sendPacket(new PacketTransferPlayer(i, tracker));
         });
     }

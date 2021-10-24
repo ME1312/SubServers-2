@@ -50,20 +50,20 @@ public class PacketLinkProxy implements InitialPacket, PacketObjectIn<Integer>, 
     public void receive(SubDataSender client, ObjectMap<Integer> data) {
         if (data.getInt(0x0001) == 0) {
             try {
-                if (data.contains(0x0000)) Util.reflect(SubAPI.class.getDeclaredField("name"), plugin.api, data.getRawString(0x0000));
+                if (data.contains(0x0000)) Util.reflect(SubAPI.class.getDeclaredField("name"), plugin.api, data.getString(0x0000));
                 setReady(client.getConnection());
             } catch (Throwable e) {
                 e.printStackTrace();
             }
         } else {
-            Logger.get("SubData").info("Could not link name with proxy" + ((data.contains(0x0002))?": "+data.getRawString(0x0002):'.'));
+            Logger.get("SubData").info("Could not link name with proxy" + ((data.contains(0x0002))?": "+data.getString(0x0002):'.'));
             try {
                 if (data.getInt(0x0001) == 2) {
                     if (!plugin.config.get().getMap("Settings").getMap("SubData").contains("Name")) {
                         plugin.config.get().getMap("Settings").getMap("SubData").set("Name", "");
                         plugin.config.save();
                     }
-                    if (plugin.config.get().getMap("Settings").getMap("SubData").getRawString("Name").length() <= 0)
+                    if (plugin.config.get().getMap("Settings").getMap("SubData").getString("Name").length() <= 0)
                         Logger.get("SubData").info("Use the proxy \"Name\" option to override auto-linking");
                 }
             } catch (Exception e) {}

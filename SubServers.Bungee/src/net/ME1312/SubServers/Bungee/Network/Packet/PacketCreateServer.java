@@ -50,9 +50,9 @@ public class PacketCreateServer implements PacketObjectIn<Integer>, PacketObject
     public void receive(SubDataClient client, ObjectMap<Integer> data) {
         UUID tracker =       (data.contains(0x0000)?data.getUUID(0x0000):null);
         try {
-            String name =     data.getRawString(0x0001);
-            String host =     data.getRawString(0x0002);
-            String template = data.getRawString(0x0003);
+            String name =     data.getString(0x0001);
+            String host =     data.getString(0x0002);
+            String template = data.getString(0x0003);
             Version version =       (data.contains(0x0004)?data.getVersion(0x0004):null);
             Integer port =       (data.contains(0x0005)?data.getInt(0x0005):null);
             UUID player =        (data.contains(0x0006)?data.getUUID(0x0006):null);

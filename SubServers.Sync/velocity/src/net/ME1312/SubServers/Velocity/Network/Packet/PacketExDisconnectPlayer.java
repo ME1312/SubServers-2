@@ -54,7 +54,7 @@ public class PacketExDisconnectPlayer implements PacketObjectIn<Integer>, Packet
         UUID tracker =     (data.contains(0x0000)?data.getUUID(0x0000):null);
         List<UUID> ids = data.getUUIDList(0x0001);
         try {
-            Component message = (data.contains(0x0002))? ChatColor.convertColor(data.getRawString(0x0002)) : Component.text().build();
+            Component message = (data.contains(0x0002))? ChatColor.convertColor(data.getString(0x0002)) : Component.text().build();
             int failures = 0;
             for (UUID id : ids) {
                 Optional<Player> local = ExProxy.getInstance().getPlayer(id);

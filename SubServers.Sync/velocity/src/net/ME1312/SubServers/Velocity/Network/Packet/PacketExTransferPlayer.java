@@ -52,7 +52,7 @@ public class PacketExTransferPlayer implements PacketObjectIn<Integer>, PacketOb
         UUID tracker =     (data.contains(0x0000)?data.getUUID(0x0000):null);
         List<UUID> ids = data.getUUIDList(0x0001);
         try {
-            Optional<RegisteredServer> server = ExProxy.getInstance().getServer(data.getRawString(0x0002).toLowerCase());
+            Optional<RegisteredServer> server = ExProxy.getInstance().getServer(data.getString(0x0002).toLowerCase());
             if (server.isPresent()) {
                 int failures = 0;
                 for (UUID id : ids) {

@@ -24,14 +24,14 @@ public class PacketInExEditServer implements PacketObjectIn<Integer> {
 
     @Override
     public void receive(SubDataSender client, ObjectMap<Integer> data) {
-        ServerData server = ExProxy.getInstance().getServer(data.getRawString(0x0000)).map(RegisteredServer::getServerInfo).map(plugin::getData).orElse(null);
+        ServerData server = ExProxy.getInstance().getServer(data.getString(0x0000)).map(RegisteredServer::getServerInfo).map(plugin::getData).orElse(null);
         if (server != null) {
             switch (data.getInt(0x0001)) {
                 case 0:
-                    server.setDisplayName(data.getList(0x0002).get(0).asRawString());
+                    server.setDisplayName(data.getList(0x0002).get(0).asString());
                     break;
                 case 1:
-                    server.setMotd(ChatColor.parseColor('&', data.getList(0x0002).get(0).asRawString()));
+                    server.setMotd(ChatColor.parseColor('&', data.getList(0x0002).get(0).asString()));
                     break;
                 case 2:
                     server.setRestricted(data.getList(0x0002).get(0).asBoolean());

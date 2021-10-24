@@ -123,7 +123,7 @@ public class Host {
      */
     public InetAddress getAddress() {
         try {
-            return InetAddress.getByName(raw.getRawString("address"));
+            return InetAddress.getByName(raw.getString("address"));
         } catch (UnknownHostException e) {
             throw new IllegalStateException("Invalid address response from raw data key: address");
         }
@@ -135,7 +135,7 @@ public class Host {
      * @return Host Directory Path
      */
     public String getPath() {
-        return raw.getRawString("dir");
+        return raw.getString("dir");
     }
 
     /**
@@ -144,7 +144,7 @@ public class Host {
      * @return Host Name
      */
     public String getName() {
-        return raw.getRawString("name");
+        return raw.getString("name");
     }
 
     /**
@@ -153,7 +153,7 @@ public class Host {
      * @return Display Name
      */
     public String getDisplayName() {
-        return raw.getRawString("display");
+        return raw.getString("display");
     }
 
     /**
@@ -704,7 +704,7 @@ public class Host {
      * @return Object Signature
      */
     public final String getSignature() {
-        return raw.getRawString("signature");
+        return raw.getString("signature");
     }
 
     /**

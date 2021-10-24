@@ -56,7 +56,7 @@ public class PacketExDisconnectPlayer implements PacketObjectIn<Integer>, Packet
                 ProxiedPlayer local;
                 if ((local = plugin.getPlayer(id)) != null) {
                     if (data.contains(0x0002)) {
-                        local.disconnect(data.getRawString(0x0002));
+                        local.disconnect(data.getString(0x0002));
                     } else local.disconnect();
                 } else {
                     ++failures;

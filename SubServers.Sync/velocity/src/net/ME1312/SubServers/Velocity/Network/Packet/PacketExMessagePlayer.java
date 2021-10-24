@@ -59,12 +59,12 @@ public class PacketExMessagePlayer implements PacketObjectIn<Integer>, PacketObj
                 Component[] components = null;
 
                 if (data.contains(0x0002)) {
-                    List<String> messages = data.getRawStringList(0x0002);
+                    List<String> messages = data.getStringList(0x0002);
                     legacy = new Component[messages.size()];
                     for (int i = 0; i < legacy.length; ++i) legacy[i] = ChatColor.convertColor(messages.get(i));
                 }
                 if (data.contains(0x0003)) {
-                    List<String> messages = data.getRawStringList(0x0003);
+                    List<String> messages = data.getStringList(0x0003);
                     components = new Component[messages.size()];
                     for (int i = 0; i < components.length; ++i) components[i] = GsonComponentSerializer.gson().deserialize(messages.get(i));
                 }

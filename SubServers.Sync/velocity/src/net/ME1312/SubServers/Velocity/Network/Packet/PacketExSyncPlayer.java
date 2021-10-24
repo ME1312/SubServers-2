@@ -60,7 +60,7 @@ public class PacketExSyncPlayer implements PacketObjectIn<Integer>, PacketObject
     @SuppressWarnings("unchecked")
     @Override
     public void receive(SubDataSender client, ObjectMap<Integer> data) {
-        String proxy = (data.contains(0x0000)?data.getRawString(0x0000).toLowerCase():null);
+        String proxy = (data.contains(0x0000)?data.getString(0x0000).toLowerCase():null);
         synchronized (plugin.rPlayers) {
             if (data.getBoolean(0x0001) == null) {
                 for (UUID id : Util.getBackwards(plugin.rPlayerLinkP, proxy)) {

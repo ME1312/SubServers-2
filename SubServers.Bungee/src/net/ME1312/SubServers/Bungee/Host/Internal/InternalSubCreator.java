@@ -133,7 +133,7 @@ public class InternalSubCreator extends SubCreator {
                 updateDirectory(template.getDirectory(), dir, template.getBuildOptions().getBoolean("Update-Files", false));
 
                 for (ObjectMapValue<String> replacement : template.getBuildOptions().getMap("Replacements", new ObjectMap<>()).getValues()) if (!replacement.isNull()) {
-                    replacements.put(replacement.getHandle().toLowerCase().replace('-', '_').replace(' ', '_'), replacement.asRawString());
+                    replacements.put(replacement.getHandle().toLowerCase().replace('-', '_').replace(' ', '_'), replacement.asString());
                 }
 
                 var.putAll(replacements);
@@ -159,9 +159,9 @@ public class InternalSubCreator extends SubCreator {
                             ObjectMap<String> spprofile = null;
                             Version spversion = null;
                             for (ObjectMap<String> profile : spversionmanifest.getMapList("versions")) {
-                                if (profile.getMap("dependencies").getRawString("minecraft").equalsIgnoreCase(version.toString()) && (spversion == null || new Version(profile.getRawString("version")).compareTo(spversion) >= 0)) {
+                                if (profile.getMap("dependencies").getString("minecraft").equalsIgnoreCase(version.toString()) && (spversion == null || new Version(profile.getString("version")).compareTo(spversion) >= 0)) {
                                     spprofile = profile;
-                                    spversion = new Version(profile.getRawString("version"));
+                                    spversion = new Version(profile.getString("version"));
                                 }
                             }
                             if (spversion == null)
@@ -169,7 +169,7 @@ public class InternalSubCreator extends SubCreator {
                             log.log(INFO, "Found \"sponge" + ((template.getType() == ServerType.FORGE)?"forge":"vanilla") + "-" + spversion.toString() + '"');
 
                             if (template.getType() == ServerType.FORGE) {
-                                Version mcfversion = new Version(((spprofile.getMap("dependencies").getRawString("forge").contains("-"))?"":spprofile.getMap("dependencies").getRawString("minecraft") + '-') + spprofile.getMap("dependencies").getRawString("forge"));
+                                Version mcfversion = new Version(((spprofile.getMap("dependencies").getString("forge").contains("-"))?"":spprofile.getMap("dependencies").getString("minecraft") + '-') + spprofile.getMap("dependencies").getString("forge"));
                                 log.log(INFO, "Found \"forge-" + mcfversion.toString() + '"');
 
                                 var.put("mcf_version", mcfversion.toString());
@@ -193,7 +193,7 @@ public class InternalSubCreator extends SubCreator {
 
                 try {
                     log.log(INFO, "Launching Build Script...");
-                    ProcessBuilder pb = new ProcessBuilder().command(Executable.parse(gitBash, template.getBuildOptions().getRawString("Executable"))).directory(dir);
+                    ProcessBuilder pb = new ProcessBuilder().command(Executable.parse(gitBash, template.getBuildOptions().getString("Executable"))).directory(dir);
                     pb.environment().putAll(var);
                     log.file = new File(dir, "SubCreator-" + template.getName() + ((version != null)?"-"+version.toString():"") + ".log");
                     process = pb.start();
@@ -239,7 +239,7 @@ public class InternalSubCreator extends SubCreator {
 
             declaration.run();
             File dir = (update != null)?new File(update.getFullPath()):new File(host.getPath(),
-                    (template.getConfigOptions().contains("Directory"))?new ReplacementScanner(replacements).replace(template.getConfigOptions().getRawString("Directory")).toString():name);
+                    (template.getConfigOptions().contains("Directory"))?new ReplacementScanner(replacements).replace(template.getConfigOptions().getString("Directory")).toString():name);
 
             ObjectMap<String> server = new ObjectMap<String>();
             ObjectMap<String> config;
@@ -263,7 +263,7 @@ public class InternalSubCreator extends SubCreator {
 
                     LinkedList<String> masks = new LinkedList<>();
                     masks.add("/server.properties");
-                    masks.addAll(template.getBuildOptions().getRawStringList("Replace", Collections.emptyList()));
+                    masks.addAll(template.getBuildOptions().getStringList("Replace", Collections.emptyList()));
                     replacements.replace(dir, masks.toArray(new String[0]));
                 } catch (Exception e) {
                     config = null;
@@ -306,13 +306,13 @@ public class InternalSubCreator extends SubCreator {
                         server.setAll(config);
 
                         if (update != null) Try.all.run(() -> update.getHost().forceRemoveSubServer(name));
-                        subserver = host.constructSubServer(name, server.getBoolean("Enabled"), port, ChatColor.translateAlternateColorCodes('&', server.getString("Motd")), server.getBoolean("Log"),
-                                server.getRawString("Directory"), server.getRawString("Executable"), server.getRawString("Stop-Command"), server.getBoolean("Hidden"), server.getBoolean("Restricted"));
+                        subserver = host.constructSubServer(name, server.getBoolean("Enabled"), port, ChatColor.translateAlternateColorCodes('&', Util.unescapeJavaString(server.getString("Motd"))), server.getBoolean("Log"),
+                                server.getString("Directory"), server.getString("Executable"), server.getString("Stop-Command"), server.getBoolean("Hidden"), server.getBoolean("Restricted"));
 
-                        if (server.getString("Display").length() > 0) subserver.setDisplayName(server.getString("Display"));
-                        subserver.setTemplate(server.getRawString("Template"));
+                        if (server.getString("Display").length() > 0) subserver.setDisplayName(Util.unescapeJavaString(server.getString("Display")));
+                        subserver.setTemplate(server.getString("Template"));
                         for (String group : server.getStringList("Group")) subserver.addGroup(group);
-                        SubServer.StopAction action = Try.all.get(() -> SubServer.StopAction.valueOf(server.getRawString("Stop-Action").toUpperCase().replace('-', '_').replace(' ', '_')));
+                        SubServer.StopAction action = Try.all.get(() -> SubServer.StopAction.valueOf(server.getString("Stop-Action").toUpperCase().replace('-', '_').replace(' ', '_')));
                         if (action != null) subserver.setStopAction(action);
                         if (server.contains("Extra")) for (String extra : server.getMap("Extra").getKeys())
                             subserver.addExtra(extra, server.getMap("Extra").getObject(extra));
@@ -374,9 +374,9 @@ public class InternalSubCreator extends SubCreator {
                 try {
                     if (file.isDirectory() && !file.getName().endsWith(".x")) {
                         ObjectMap<String> config = (new File(file, "template.yml").exists())? new YAMLConfig(new File(file, "template.yml")).get().getMap("Template", new ObjectMap<String>()) : new ObjectMap<String>();
-                        ServerTemplate template = loadTemplate(file.getName(), config.getBoolean("Enabled", true), config.getBoolean("Internal", false), config.getRawString("Icon", "::NULL::"), file, config.getMap("Build", new ObjectMap<String>()), config.getMap("Settings", new ObjectMap<String>()));
+                        ServerTemplate template = loadTemplate(file.getName(), config.getBoolean("Enabled", true), config.getBoolean("Internal", false), config.getString("Icon", "::NULL::"), file, config.getMap("Build", new ObjectMap<String>()), config.getMap("Settings", new ObjectMap<String>()));
                         templates.put(file.getName().toLowerCase(), template);
-                        if (config.getKeys().contains("Display")) template.setDisplayName(config.getString("Display"));
+                        if (config.getKeys().contains("Display")) template.setDisplayName(Util.unescapeJavaString(config.getString("Display")));
                     }
                 } catch (Exception e) {
                     Logger.get(host.getName()).severe("Couldn't load template: " + file.getName());
@@ -581,8 +581,8 @@ public class InternalSubCreator extends SubCreator {
     private Map<String, Object> getSubData() {
         if (subdata == null || host.plugin.config.get() != subdata.key()) {
             Map<String, Object> map = new HashMap<String, Object>();
-            map.put("Address", host.plugin.config.get().getMap("Settings").getMap("SubData").getRawString("Address", "127.0.0.1").replace("0.0.0.0", "127.0.0.1"));
-            if (host.plugin.config.get().getMap("Settings").getMap("SubData").getRawString("Password", "").length() > 0) map.put("Password", host.plugin.config.get().getMap("Settings").getMap("SubData").getRawString("Password"));
+            map.put("Address", host.plugin.config.get().getMap("Settings").getMap("SubData").getString("Address", "127.0.0.1").replace("0.0.0.0", "127.0.0.1"));
+            if (host.plugin.config.get().getMap("Settings").getMap("SubData").getString("Password", "").length() > 0) map.put("Password", host.plugin.config.get().getMap("Settings").getMap("SubData").getString("Password"));
             subdata = new ContainedPair<>(host.plugin.config.get(), map);
         }
         return subdata.value();

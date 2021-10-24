@@ -52,7 +52,7 @@ public class PacketDisconnectPlayer implements PacketObjectIn<Integer>, PacketOb
     @Override
     public void receive(SubDataClient client, ObjectMap<Integer> data) {
         UUID tracker = (data.contains(0x0000)?data.getUUID(0x0000):null);
-        run(data.getUUIDList(0x0001), data.contains(0x0002)?data.getRawString(0x0002):null, i -> {
+        run(data.getUUIDList(0x0001), data.contains(0x0002)?data.getString(0x0002):null, i -> {
             client.sendPacket(new PacketDisconnectPlayer(i, tracker));
         });
     }

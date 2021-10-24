@@ -90,7 +90,7 @@ public class Proxy {
      * @return Name
      */
     public String getName() {
-        return raw.getRawString("name");
+        return raw.getString("name");
     }
 
     /**
@@ -99,7 +99,7 @@ public class Proxy {
      * @return Display Name
      */
     public String getDisplayName() {
-        return raw.getRawString("display");
+        return raw.getString("display");
     }
 
     /**
@@ -119,7 +119,7 @@ public class Proxy {
     public Collection<Pair<String, UUID>> getPlayers() {
         List<Pair<String, UUID>> players = new ArrayList<Pair<String, UUID>>();
         for (String id : raw.getMap("players").getKeys()) {
-            players.add(new ContainedPair<String, UUID>(raw.getMap("players").getRawString(id), UUID.fromString(id)));
+            players.add(new ContainedPair<String, UUID>(raw.getMap("players").getString(id), UUID.fromString(id)));
         }
         return players;
     }
@@ -165,7 +165,7 @@ public class Proxy {
      * @return Object Signature
      */
     public final String getSignature() {
-        return raw.getRawString("signature");
+        return raw.getString("signature");
     }
 
     /**

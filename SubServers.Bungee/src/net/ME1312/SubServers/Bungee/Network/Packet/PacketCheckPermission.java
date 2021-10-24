@@ -50,7 +50,7 @@ public class PacketCheckPermission implements PacketObjectIn<Integer>, PacketObj
 
     @Override
     public void receive(SubDataClient client, ObjectMap<Integer> data) throws Throwable {
-        client.sendPacket(new PacketCheckPermissionResponse(data.getUUID(0x0001), data.getRawString(0x0002), (data.contains(0x0000))?data.getUUID(0x0000):null));
+        client.sendPacket(new PacketCheckPermissionResponse(data.getUUID(0x0001), data.getString(0x0002), (data.contains(0x0000))?data.getUUID(0x0000):null));
     }
 
     @Override

@@ -44,7 +44,7 @@ public class SubCreator {
 
         public ServerTemplate(ObjectMap<String> raw) {
             this.raw = raw;
-            this.type = Try.all.get(() -> ServerType.valueOf(raw.getRawString("type").toUpperCase().replace('-', '_').replace(' ', '_')), ServerType.CUSTOM);
+            this.type = Try.all.get(() -> ServerType.valueOf(raw.getString("type").toUpperCase().replace('-', '_').replace(' ', '_')), ServerType.CUSTOM);
         }
 
         /**
@@ -53,7 +53,7 @@ public class SubCreator {
          * @return Template Name
          */
         public String getName() {
-            return raw.getRawString("name");
+            return raw.getString("name");
         }
 
         /**
@@ -62,7 +62,7 @@ public class SubCreator {
          * @return Display Name
          */
         public String getDisplayName() {
-            return raw.getRawString("display");
+            return raw.getString("display");
         }
 
         /**

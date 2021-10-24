@@ -90,7 +90,7 @@ public class Server {
      * @return Server Name
      */
     public String getName() {
-        return raw.getRawString("name");
+        return raw.getString("name");
     }
 
     /**
@@ -99,7 +99,7 @@ public class Server {
      * @return Display Name
      */
     public String getDisplayName() {
-        return raw.getRawString("display");
+        return raw.getString("display");
     }
     /**
      * Get the Address of this Server
@@ -107,7 +107,7 @@ public class Server {
      * @return Server Address
      */
     public InetSocketAddress getAddress() {
-        return new InetSocketAddress(raw.getRawString("address").split(":")[0], Integer.parseInt(raw.getRawString("address").split(":")[1]));
+        return new InetSocketAddress(raw.getString("address").split(":")[0], Integer.parseInt(raw.getString("address").split(":")[1]));
     }
 
     /**
@@ -116,7 +116,7 @@ public class Server {
      * @return Group names
      */
     public List<String> getGroups() {
-        return new LinkedList<String>(raw.getRawStringList("group"));
+        return new LinkedList<String>(raw.getStringList("group"));
     }
 
     /**
@@ -127,7 +127,7 @@ public class Server {
     public Collection<Pair<String, UUID>> getRemotePlayers() {
         List<Pair<String, UUID>> players = new ArrayList<Pair<String, UUID>>();
         for (String id : raw.getMap("players").getKeys()) {
-            players.add(new ContainedPair<String, UUID>(raw.getMap("players").getRawString(id), UUID.fromString(id)));
+            players.add(new ContainedPair<String, UUID>(raw.getMap("players").getString(id), UUID.fromString(id)));
         }
         return players;
     }
@@ -182,7 +182,7 @@ public class Server {
      * @return Server MOTD
      */
     public String getMotd() {
-        return raw.getRawString("motd");
+        return raw.getString("motd");
     }
 
     /**
@@ -219,7 +219,7 @@ public class Server {
      * @return Object Signature
      */
     public String getSignature() {
-        return raw.getRawString("signature");
+        return raw.getString("signature");
     }
 
     /**

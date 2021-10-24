@@ -51,7 +51,7 @@ public abstract class SubCreator {
             this.internal = internal;
             this.icon = icon;
             this.directory = directory;
-            this.type = (build.contains("Server-Type"))?ServerType.valueOf(build.getRawString("Server-Type").toUpperCase()):ServerType.CUSTOM;
+            this.type = (build.contains("Server-Type"))?ServerType.valueOf(build.getString("Server-Type").toUpperCase()):ServerType.CUSTOM;
             this.build = build;
             this.options = options;
             this.dynamic = dynamic;

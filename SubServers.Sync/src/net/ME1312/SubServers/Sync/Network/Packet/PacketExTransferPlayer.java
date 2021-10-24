@@ -51,7 +51,7 @@ public class PacketExTransferPlayer implements PacketObjectIn<Integer>, PacketOb
         UUID tracker =     (data.contains(0x0000)?data.getUUID(0x0000):null);
         List<UUID> ids = data.getUUIDList(0x0001);
         try {
-            ServerImpl server = plugin.servers.getOrDefault(data.getRawString(0x0002).toLowerCase(), null);
+            ServerImpl server = plugin.servers.getOrDefault(data.getString(0x0002).toLowerCase(), null);
             if (server != null) {
                 int failures = 0;
                 for (UUID id : ids) {

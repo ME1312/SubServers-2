@@ -160,13 +160,13 @@ public class ExProxy {
             subprotocol.unregisterCipher("AES-256");
             subprotocol.unregisterCipher("RSA");
 
-            api.name = config.get().getMap("Settings").getMap("SubData").getString("Name", null);
+            api.name = config.get().getMap("Settings").getMap("SubData").getString("Name");
 
-            if (config.get().getMap("Settings").getMap("SubData").getRawString("Password", "").length() > 0) {
-                subprotocol.registerCipher("AES", new AES(128, config.get().getMap("Settings").getMap("SubData").getRawString("Password")));
-                subprotocol.registerCipher("AES-128", new AES(128, config.get().getMap("Settings").getMap("SubData").getRawString("Password")));
-                subprotocol.registerCipher("AES-192", new AES(192, config.get().getMap("Settings").getMap("SubData").getRawString("Password")));
-                subprotocol.registerCipher("AES-256", new AES(256, config.get().getMap("Settings").getMap("SubData").getRawString("Password")));
+            if (config.get().getMap("Settings").getMap("SubData").getString("Password", "").length() > 0) {
+                subprotocol.registerCipher("AES", new AES(128, config.get().getMap("Settings").getMap("SubData").getString("Password")));
+                subprotocol.registerCipher("AES-128", new AES(128, config.get().getMap("Settings").getMap("SubData").getString("Password")));
+                subprotocol.registerCipher("AES-192", new AES(192, config.get().getMap("Settings").getMap("SubData").getString("Password")));
+                subprotocol.registerCipher("AES-256", new AES(256, config.get().getMap("Settings").getMap("SubData").getString("Password")));
 
                 Logger.get("SubData").info("AES Encryption Available");
             }
@@ -181,7 +181,7 @@ public class ExProxy {
 
             reconnect = true;
             Logger.get("SubData").info("");
-            Logger.get("SubData").info("Connecting to /" + config.get().getMap("Settings").getMap("SubData").getRawString("Address", "127.0.0.1:4391"));
+            Logger.get("SubData").info("Connecting to /" + config.get().getMap("Settings").getMap("SubData").getString("Address", "127.0.0.1:4391"));
             connect(Logger.get("SubData"), null);
 
             if (!posted) {
@@ -204,8 +204,8 @@ public class ExProxy {
                 public void run() {
                     try {
                         if (reset == resetDate && (subdata.getOrDefault(0, null) == null || subdata.get(0).isClosed())) {
-                            SubDataClient open = subprotocol.open(InetAddress.getByName(config.get().getMap("Settings").getMap("SubData").getRawString("Address", "127.0.0.1:4391").split(":")[0]),
-                                    Integer.parseInt(config.get().getMap("Settings").getMap("SubData").getRawString("Address", "127.0.0.1:4391").split(":")[1]));
+                            SubDataClient open = subprotocol.open(InetAddress.getByName(config.get().getMap("Settings").getMap("SubData").getString("Address", "127.0.0.1:4391").split(":")[0]),
+                                    Integer.parseInt(config.get().getMap("Settings").getMap("SubData").getString("Address", "127.0.0.1:4391").split(":")[1]));
 
                             if (subdata.getOrDefault(0, null) != null) subdata.get(0).reconnect(open);
                             subdata.put(0, open);
@@ -220,9 +220,9 @@ public class ExProxy {
     }
 
     private void post() {
-        if (!config.get().getMap("Settings").getRawStringList("Disabled-Overrides", Collections.emptyList()).contains("/server"))
+        if (!config.get().getMap("Settings").getStringList("Disabled-Overrides", Collections.emptyList()).contains("/server"))
             proxy.getCommandManager().register("server", new SubCommand.BungeeServer(this));
-        if (!config.get().getMap("Settings").getRawStringList("Disabled-Overrides", Collections.emptyList()).contains("/glist"))
+        if (!config.get().getMap("Settings").getStringList("Disabled-Overrides", Collections.emptyList()).contains("/glist"))
             proxy.getCommandManager().register("glist", new SubCommand.BungeeList(this));
 
         proxy.getCommandManager().register("subservers", new SubCommand(this), "subserver", "sub");

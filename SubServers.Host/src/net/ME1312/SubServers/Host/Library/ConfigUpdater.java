@@ -64,16 +64,16 @@ public class ConfigUpdater {
             settings.set("Console-Log", updated.getMap("Settings", new YAMLSection()).getBoolean("Console-Log", true));
             settings.set("Network-Log", updated.getMap("Settings", new YAMLSection()).getBoolean("Network-Log", true));
             settings.set("Download-Templates", updated.getMap("Settings", new YAMLSection()).getBoolean("Download-Templates", true));
-            settings.set("Server-Bind", updated.getMap("Settings", new YAMLSection()).getRawString("Server-Bind", "127.0.0.1"));
+            settings.set("Server-Bind", updated.getMap("Settings", new YAMLSection()).getString("Server-Bind", "127.0.0.1"));
 
             YAMLSection upnp = new YAMLSection();
             upnp.set("Forward-Servers", updated.getMap("Settings", new YAMLSection()).getMap("UPnP", new YAMLSection()).getBoolean("Forward-Servers", false));
             settings.set("UPnP", upnp);
 
             YAMLSection subdata = new YAMLSection();
-            subdata.set("Name", updated.getMap("Settings", new YAMLSection()).getMap("SubData", new YAMLSection()).getRawString("Name", "undefined"));
-            subdata.set("Address", updated.getMap("Settings", new YAMLSection()).getMap("SubData", new YAMLSection()).getRawString("Address", "127.0.0.1:4391"));
-            if (updated.getMap("Settings", new YAMLSection()).getMap("SubData", new YAMLSection()).contains("Password")) subdata.set("Password", updated.getMap("Settings").getMap("SubData").getRawString("Password"));
+            subdata.set("Name", updated.getMap("Settings", new YAMLSection()).getMap("SubData", new YAMLSection()).getString("Name", "undefined"));
+            subdata.set("Address", updated.getMap("Settings", new YAMLSection()).getMap("SubData", new YAMLSection()).getString("Address", "127.0.0.1:4391"));
+            if (updated.getMap("Settings", new YAMLSection()).getMap("SubData", new YAMLSection()).contains("Password")) subdata.set("Password", updated.getMap("Settings").getMap("SubData").getString("Password"));
             if (updated.getMap("Settings", new YAMLSection()).getMap("SubData", new YAMLSection()).contains("Reconnect")) subdata.set("Reconnect", updated.getMap("Settings").getMap("SubData").getInt("Reconnect"));
             settings.set("SubData", subdata);
 

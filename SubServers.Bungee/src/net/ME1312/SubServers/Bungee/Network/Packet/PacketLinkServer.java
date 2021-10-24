@@ -74,7 +74,7 @@ public class PacketLinkServer implements InitialPacket, PacketObjectIn<Integer>,
 
     @Override
     public void receive(SubDataClient client, ObjectMap<Integer> data) {
-        String name =  (data.contains(0x0000))?data.getRawString(0x0000):null;
+        String name =  (data.contains(0x0000))?data.getString(0x0000):null;
         Integer channel = data.getInt(0x0002);
         InetSocketAddress address;
 
@@ -84,7 +84,7 @@ public class PacketLinkServer implements InitialPacket, PacketObjectIn<Integer>,
             } else if (data.isNumber(0x0001)) {
                 address = new InetSocketAddress(client.getAddress().getAddress(), data.getInt(0x0001));
             } else {
-                String[] sa = data.getRawString(0x0001).split(":");
+                String[] sa = data.getString(0x0001).split(":");
                 address = new InetSocketAddress(sa[0], Integer.parseInt(sa[1]));
             }
 

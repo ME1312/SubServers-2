@@ -43,7 +43,7 @@ public class PacketInExRunEvent implements PacketObjectIn<Integer> {
         callback("SubAddServerEvent", new Consumer<ObjectMap<String>>() {
             @Override
             public void accept(ObjectMap<String> data) {
-                Sponge.getEventManager().post(new SubAddServerEvent((data.contains("player"))?data.getUUID("player"):null, (data.contains("host"))?data.getRawString("host"):null, data.getString("server")));
+                Sponge.getEventManager().post(new SubAddServerEvent((data.contains("player"))?data.getUUID("player"):null, (data.contains("host"))?data.getString("host"):null, data.getString("server")));
                 callback("SubAddServerEvent", this);
             }
         });
@@ -108,7 +108,7 @@ public class PacketInExRunEvent implements PacketObjectIn<Integer> {
         callback("SubRemoveServerEvent", new Consumer<ObjectMap<String>>() {
             @Override
             public void accept(ObjectMap<String> data) {
-                Sponge.getEventManager().post(new SubRemoveServerEvent((data.contains("player"))?data.getUUID("player"):null, (data.contains("host"))?data.getRawString("host"):null, data.getString("server")));
+                Sponge.getEventManager().post(new SubRemoveServerEvent((data.contains("player"))?data.getUUID("player"):null, (data.contains("host"))?data.getString("host"):null, data.getString("server")));
                 callback("SubRemoveServerEvent", this);
             }
         });

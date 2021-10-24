@@ -302,7 +302,7 @@ public final class SubProxy extends BungeeCommon implements Listener {
             try {
                 if (Util.getCaseInsensitively(config.get().getMap("Hosts").get(), servers.get().getMap("Servers").getMap(name).getString("Host")) == null) throw new InvalidServerException("There is no host with this name: " + servers.get().getMap("Servers").getMap(name).getString("Host"));
                 legServers.put(name, constructServerInfo(name, new InetSocketAddress(InetAddress.getByName((String) ((Map<String, ?>) Util.getCaseInsensitively(config.get().getMap("Hosts").get(), servers.get().getMap("Servers").getMap(name).getString("Host"))).get("Address")), servers.get().getMap("Servers").getMap(name).getInt("Port")),
-                        ChatColor.translateAlternateColorCodes('&', servers.get().getMap("Servers").getMap(name).getString("Motd")), servers.get().getMap("Servers").getMap(name).getBoolean("Restricted")));
+                        ChatColor.translateAlternateColorCodes('&', Util.unescapeJavaString(servers.get().getMap("Servers").getMap(name).getString("Motd"))), servers.get().getMap("Servers").getMap(name).getBoolean("Restricted")));
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -356,11 +356,11 @@ public final class SubProxy extends BungeeCommon implements Listener {
         servers.reload();
         lang.reload();
         for (String key : lang.get().getMap("Lang").getKeys())
-            api.setLang("SubServers", key, ChatColor.translateAlternateColorCodes('&', lang.get().getMap("Lang").getString(key)));
+            api.setLang("SubServers", key, ChatColor.translateAlternateColorCodes('&', Util.unescapeJavaString(lang.get().getMap("Lang").getString(key))));
 
         if (subdata != null && ( // SubData Server must be reset
-                !config.get().getMap("Settings").getMap("SubData").getRawString("Address", "127.0.0.1:4391").equals(prevconfig.getMap("Settings").getMap("SubData").getRawString("Address", "127.0.0.1:4391")) ||
-                !config.get().getMap("Settings").getMap("SubData").getRawString("Encryption", "NONE").equals(prevconfig.getMap("Settings").getMap("SubData").getRawString("Encryption", "NONE"))
+                !config.get().getMap("Settings").getMap("SubData").getString("Address", "127.0.0.1:4391").equals(prevconfig.getMap("Settings").getMap("SubData").getString("Address", "127.0.0.1:4391")) ||
+                !config.get().getMap("Settings").getMap("SubData").getString("Encryption", "NONE").equals(prevconfig.getMap("Settings").getMap("SubData").getString("Encryption", "NONE"))
                 )) {
             SubDataServer subdata = this.subdata;
             subdata.close();
@@ -376,31 +376,31 @@ public final class SubProxy extends BungeeCommon implements Listener {
             if (!ukeys.contains(name.toLowerCase())) try {
                 boolean add = false;
                 Host host = this.hosts.get(name.toLowerCase());
-                Class<? extends Host> driver = hostDrivers.get(config.get().getMap("Hosts").getMap(name).getRawString("Driver").toUpperCase().replace('-', '_').replace(' ', '_'));
+                Class<? extends Host> driver = hostDrivers.get(config.get().getMap("Hosts").getMap(name).getString("Driver").toUpperCase().replace('-', '_').replace(' ', '_'));
                 if (driver == null) throw new InvalidHostException("Invalid Driver for host: " + name);
                 if (host == null || // Host must be reset
-                        !hostDrivers.get(config.get().getMap("Hosts").getMap(name).getRawString("Driver").toUpperCase().replace('-', '_').replace(' ', '_')).equals(host.getClass()) ||
-                        !config.get().getMap("Hosts").getMap(name).getRawString("Address").equals(host.getAddress().getHostAddress()) ||
-                        !config.get().getMap("Hosts").getMap(name).getRawString("Directory").equals(host.getPath()) ||
-                        !config.get().getMap("Hosts").getMap(name).getRawString("Git-Bash").equals(host.getCreator().getBashDirectory())
+                        !hostDrivers.get(config.get().getMap("Hosts").getMap(name).getString("Driver").toUpperCase().replace('-', '_').replace(' ', '_')).equals(host.getClass()) ||
+                        !config.get().getMap("Hosts").getMap(name).getString("Address").equals(host.getAddress().getHostAddress()) ||
+                        !config.get().getMap("Hosts").getMap(name).getString("Directory").equals(host.getPath()) ||
+                        !config.get().getMap("Hosts").getMap(name).getString("Git-Bash").equals(host.getCreator().getBashDirectory())
                         ) {
                     if (host != null) api.forceRemoveHost(name);
                     add = true;
                     host = constructHost(driver, name, config.get().getMap("Hosts").getMap(name).getBoolean("Enabled"),
-                            Range.closed(Integer.parseInt(config.get().getMap("Hosts").getMap(name).getRawString("Port-Range", "25500-25559").split("-")[0]), Integer.parseInt(config.get().getMap("Hosts").getMap(name).getRawString("Port-Range", "25500-25559").split("-")[1])),
-                            config.get().getMap("Hosts").getMap(name).getBoolean("Log-Creator", true), InetAddress.getByName(config.get().getMap("Hosts").getMap(name).getRawString("Address")),
-                            config.get().getMap("Hosts").getMap(name).getRawString("Directory"), config.get().getMap("Hosts").getMap(name).getRawString("Git-Bash"));
+                            Range.closed(Integer.parseInt(config.get().getMap("Hosts").getMap(name).getString("Port-Range", "25500-25559").split("-")[0]), Integer.parseInt(config.get().getMap("Hosts").getMap(name).getString("Port-Range", "25500-25559").split("-")[1])),
+                            config.get().getMap("Hosts").getMap(name).getBoolean("Log-Creator", true), InetAddress.getByName(config.get().getMap("Hosts").getMap(name).getString("Address")),
+                            config.get().getMap("Hosts").getMap(name).getString("Directory"), config.get().getMap("Hosts").getMap(name).getString("Git-Bash"));
                 } else { // Host wasn't reset, so check for these changes
                     if (config.get().getMap("Hosts").getMap(name).getBoolean("Enabled") != host.isEnabled())
                         host.setEnabled(config.get().getMap("Hosts").getMap(name).getBoolean("Enabled"));
-                    if (!config.get().getMap("Hosts").getMap(name).getRawString("Port-Range", "25500-25559").equals(prevconfig.getMap("Hosts", new ObjectMap<String>()).getMap(name, new ObjectMap<String>()).getRawString("Port-Range", "25500-25559")))
-                        host.getCreator().setPortRange(Range.closed(Integer.parseInt(config.get().getMap("Hosts").getMap(name).getRawString("Port-Range", "25500-25559").split("-")[0]), Integer.parseInt(config.get().getMap("Hosts").getMap(name).getRawString("Port-Range", "25500-25559").split("-")[1])));
+                    if (!config.get().getMap("Hosts").getMap(name).getString("Port-Range", "25500-25559").equals(prevconfig.getMap("Hosts", new ObjectMap<String>()).getMap(name, new ObjectMap<String>()).getString("Port-Range", "25500-25559")))
+                        host.getCreator().setPortRange(Range.closed(Integer.parseInt(config.get().getMap("Hosts").getMap(name).getString("Port-Range", "25500-25559").split("-")[0]), Integer.parseInt(config.get().getMap("Hosts").getMap(name).getString("Port-Range", "25500-25559").split("-")[1])));
                     if (config.get().getMap("Hosts").getMap(name).getBoolean("Log-Creator", true) != host.getCreator().isLogging())
                         host.getCreator().setLogging(config.get().getMap("Hosts").getMap(name).getBoolean("Log-Creator", true));
                     host.getCreator().reload();
                 } // Check for other changes
-                if (config.get().getMap("Hosts").getMap(name).getKeys().contains("Display") && ((config.get().getMap("Hosts").getMap(name).getString("Display").length() == 0 && !host.getName().equals(host.getDisplayName())) || (config.get().getMap("Hosts").getMap(name).getString("Display").length() > 0 && !config.get().getMap("Hosts").getMap(name).getString("Display").equals(host.getDisplayName()))))
-                    host.setDisplayName(config.get().getMap("Hosts").getMap(name).getString("Display"));
+                if (config.get().getMap("Hosts").getMap(name).getKeys().contains("Display") && ((config.get().getMap("Hosts").getMap(name).getString("Display").length() == 0 && !host.getName().equals(host.getDisplayName())) || (config.get().getMap("Hosts").getMap(name).getString("Display").length() > 0 && !Util.unescapeJavaString(config.get().getMap("Hosts").getMap(name).getString("Display")).equals(host.getDisplayName()))))
+                    host.setDisplayName(Util.unescapeJavaString(config.get().getMap("Hosts").getMap(name).getString("Display")));
                 if (config.get().getMap("Hosts").getMap(name).getKeys().contains("Extra"))
                     for (String extra : config.get().getMap("Hosts").getMap(name).getMap("Extra").getKeys()) host.addExtra(extra, config.get().getMap("Hosts").getMap(name).getMap("Extra").getObject(extra));
                 if (add)
@@ -422,23 +422,23 @@ public final class SubProxy extends BungeeCommon implements Listener {
                 Server server = api.getServer(name);
                 if (server == null || !(server instanceof SubServer)) {
                     if (server == null || // Server must be reset
-                            bungee.get().getMap("servers").getMap(name).getRawString("address").equals(server.getAddress().getAddress().getHostAddress() + ':' + server.getAddress().getPort())
+                            bungee.get().getMap("servers").getMap(name).getString("address").equals(server.getAddress().getAddress().getHostAddress() + ':' + server.getAddress().getPort())
                     ) {
                         if (server != null) api.forceRemoveServer(name);
                         add = true;
-                        server = ServerImpl.construct(name, new InetSocketAddress(InetAddress.getByName(bungee.get().getMap("servers").getMap(name).getRawString("address").split(":")[0]),
-                                Integer.parseInt(bungee.get().getMap("servers").getMap(name).getRawString("address").split(":")[1])), ChatColor.translateAlternateColorCodes('&', bungee.get().getMap("servers").getMap(name).getString("motd")),
+                        server = ServerImpl.construct(name, new InetSocketAddress(InetAddress.getByName(bungee.get().getMap("servers").getMap(name).getString("address").split(":")[0]),
+                                Integer.parseInt(bungee.get().getMap("servers").getMap(name).getString("address").split(":")[1])), ChatColor.translateAlternateColorCodes('&', Util.unescapeJavaString(bungee.get().getMap("servers").getMap(name).getString("motd"))),
                                 bungee.get().getMap("servers").getMap(name).getBoolean("hidden", false), bungee.get().getMap("servers").getMap(name).getBoolean("restricted"));
                     } else { // Server wasn't reset, so check for these changes
-                        if (!ChatColor.translateAlternateColorCodes('&', bungee.get().getMap("servers").getMap(name).getString("motd")).equals(server.getMotd()))
-                            server.setMotd(ChatColor.translateAlternateColorCodes('&', bungee.get().getMap("servers").getMap(name).getString("motd")));
+                        if (!ChatColor.translateAlternateColorCodes('&', Util.unescapeJavaString(bungee.get().getMap("servers").getMap(name).getString("motd"))).equals(server.getMotd()))
+                            server.setMotd(ChatColor.translateAlternateColorCodes('&', Util.unescapeJavaString(bungee.get().getMap("servers").getMap(name).getString("motd"))));
                         if (bungee.get().getMap("servers").getMap(name).getBoolean("hidden", false) != server.isHidden())
                             server.setHidden(bungee.get().getMap("servers").getMap(name).getBoolean("hidden", false));
                         if (bungee.get().getMap("servers").getMap(name).getBoolean("restricted") != server.isRestricted())
                             server.setRestricted(bungee.get().getMap("servers").getMap(name).getBoolean("restricted"));
                     } // Check for other changes
-                    if (bungee.get().getMap("servers").getMap(name).getKeys().contains("display") && ((bungee.get().getMap("servers").getMap(name).getRawString("display").length() == 0 && !server.getName().equals(server.getDisplayName())) || (bungee.get().getMap("servers").getMap(name).getRawString("display").length() > 0 && !bungee.get().getMap("servers").getMap(name).getRawString("display").equals(server.getDisplayName()))))
-                        server.setDisplayName(bungee.get().getMap("servers").getMap(name).getString("display"));
+                    if (bungee.get().getMap("servers").getMap(name).getKeys().contains("display") && ((bungee.get().getMap("servers").getMap(name).getString("display").length() == 0 && !server.getName().equals(server.getDisplayName())) || (bungee.get().getMap("servers").getMap(name).getString("display").length() > 0 && !bungee.get().getMap("servers").getMap(name).getString("display").equals(server.getDisplayName()))))
+                        server.setDisplayName(Util.unescapeJavaString(bungee.get().getMap("servers").getMap(name).getString("display")));
                     if (bungee.get().getMap("servers").getMap(name).getKeys().contains("group")) {
                         for (String group : server.getGroups()) server.removeGroup(group);
                         for (String group : bungee.get().getMap("servers").getMap(name).getStringList("group")) server.addGroup(group);
@@ -474,27 +474,27 @@ public final class SubProxy extends BungeeCommon implements Listener {
                     ObjectMap<String> edits = new ObjectMap<String>();
                     if (this.servers.get().getMap("Servers").getMap(name).getBoolean("Enabled") != server.isEnabled())
                         edits.set("enabled", this.servers.get().getMap("Servers").getMap(name).getBoolean("Enabled"));
-                    if (this.servers.get().getMap("Servers").getMap(name).getKeys().contains("Display") && ((this.servers.get().getMap("Servers").getMap(name).getRawString("Display").length() == 0 && !server.getName().equals(server.getDisplayName())) || (this.servers.get().getMap("Servers").getMap(name).getRawString("Display").length() > 0 && !this.servers.get().getMap("Servers").getMap(name).getRawString("Display").equals(server.getDisplayName()))))
-                        edits.set("display", this.servers.get().getMap("Servers").getMap(name).getRawString("Display"));
+                    if (this.servers.get().getMap("Servers").getMap(name).getKeys().contains("Display") && ((this.servers.get().getMap("Servers").getMap(name).getString("Display").length() == 0 && !server.getName().equals(server.getDisplayName())) || (this.servers.get().getMap("Servers").getMap(name).getString("Display").length() > 0 && !Util.unescapeJavaString(this.servers.get().getMap("Servers").getMap(name).getString("Display")).equals(server.getDisplayName()))))
+                        edits.set("display", Util.unescapeJavaString(this.servers.get().getMap("Servers").getMap(name).getString("Display")));
                     if (!this.servers.get().getMap("Servers").getMap(name).getString("Host").equalsIgnoreCase(server.getHost().getName()))
-                        edits.set("host", this.servers.get().getMap("Servers").getMap(name).getRawString("Host"));
-                    if (this.servers.get().getMap("Servers").getMap(name).getKeys().contains("Template") && ((this.servers.get().getMap("Servers").getMap(name).getRawString("Template").length() == 0 && server.getTemplate() != null) || (this.servers.get().getMap("Servers").getMap(name).getRawString("Template").length() > 0 && server.getTemplate() == null) || (server.getTemplate() != null && !this.servers.get().getMap("Servers").getMap(name).getString("Template").equalsIgnoreCase(server.getTemplate().getName()))))
+                        edits.set("host", this.servers.get().getMap("Servers").getMap(name).getString("Host"));
+                    if (this.servers.get().getMap("Servers").getMap(name).getKeys().contains("Template") && ((this.servers.get().getMap("Servers").getMap(name).getString("Template").length() == 0 && server.getTemplate() != null) || (this.servers.get().getMap("Servers").getMap(name).getString("Template").length() > 0 && server.getTemplate() == null) || (server.getTemplate() != null && !this.servers.get().getMap("Servers").getMap(name).getString("Template").equalsIgnoreCase(server.getTemplate().getName()))))
                         edits.set("template", this.servers.get().getMap("Servers").getMap(name).getString("Template"));
                     if (!this.servers.get().getMap("Servers").getMap(name).getStringList("Group").equals(server.getGroups()))
-                        edits.set("group", this.servers.get().getMap("Servers").getMap(name).getRawStringList("Group"));
+                        edits.set("group", this.servers.get().getMap("Servers").getMap(name).getStringList("Group"));
                     if (this.servers.get().getMap("Servers").getMap(name).getInt("Port") != server.getAddress().getPort())
                         edits.set("port", this.servers.get().getMap("Servers").getMap(name).getInt("Port"));
-                    if (!(ChatColor.translateAlternateColorCodes('&', this.servers.get().getMap("Servers").getMap(name).getString("Motd")).equals(server.getMotd())))
-                        edits.set("motd", this.servers.get().getMap("Servers").getMap(name).getRawString("Motd"));
+                    if (!(ChatColor.translateAlternateColorCodes('&', Util.unescapeJavaString(this.servers.get().getMap("Servers").getMap(name).getString("Motd"))).equals(server.getMotd())))
+                        edits.set("motd", this.servers.get().getMap("Servers").getMap(name).getString("Motd"));
                     if (this.servers.get().getMap("Servers").getMap(name).getBoolean("Log") != server.isLogging())
                         edits.set("log", this.servers.get().getMap("Servers").getMap(name).getBoolean("Log"));
-                    if (!this.servers.get().getMap("Servers").getMap(name).getRawString("Directory").equals(server.getPath()))
-                        edits.set("dir", this.servers.get().getMap("Servers").getMap(name).getRawString("Directory"));
-                    if (!this.servers.get().getMap("Servers").getMap(name).getRawString("Executable").equals(server.getExecutable()))
-                        edits.set("exec", this.servers.get().getMap("Servers").getMap(name).getRawString("Executable"));
-                    if (!this.servers.get().getMap("Servers").getMap(name).getRawString("Stop-Command").equals(server.getStopCommand()))
-                        edits.set("stop-cmd", this.servers.get().getMap("Servers").getMap(name).getRawString("Stop-Command"));
-                    SubServer.StopAction action = Try.all.get(() -> SubServer.StopAction.valueOf(this.servers.get().getMap("Servers").getMap(name).getRawString("Stop-Action", "NONE").toUpperCase().replace('-', '_').replace(' ', '_')));
+                    if (!this.servers.get().getMap("Servers").getMap(name).getString("Directory").equals(server.getPath()))
+                        edits.set("dir", this.servers.get().getMap("Servers").getMap(name).getString("Directory"));
+                    if (!this.servers.get().getMap("Servers").getMap(name).getString("Executable").equals(server.getExecutable()))
+                        edits.set("exec", this.servers.get().getMap("Servers").getMap(name).getString("Executable"));
+                    if (!this.servers.get().getMap("Servers").getMap(name).getString("Stop-Command").equals(server.getStopCommand()))
+                        edits.set("stop-cmd", this.servers.get().getMap("Servers").getMap(name).getString("Stop-Command"));
+                    SubServer.StopAction action = Try.all.get(() -> SubServer.StopAction.valueOf(this.servers.get().getMap("Servers").getMap(name).getString("Stop-Action", "NONE").toUpperCase().replace('-', '_').replace(' ', '_')));
                     if (action != null && action != server.getStopAction())
                         edits.set("stop-action", action.toString());
                     if (this.servers.get().getMap("Servers").getMap(name).getBoolean("Restricted") != server.isRestricted())
@@ -511,38 +511,38 @@ public final class SubProxy extends BungeeCommon implements Listener {
                     if (server == null ||  // Server must be reset
                             !this.servers.get().getMap("Servers").getMap(name).getString("Host").equalsIgnoreCase(server.getHost().getName()) ||
                             this.servers.get().getMap("Servers").getMap(name).getInt("Port") != server.getAddress().getPort() ||
-                            !this.servers.get().getMap("Servers").getMap(name).getRawString("Directory").equals(server.getPath()) ||
-                            !this.servers.get().getMap("Servers").getMap(name).getRawString("Executable").equals(server.getExecutable())
+                            !this.servers.get().getMap("Servers").getMap(name).getString("Directory").equals(server.getPath()) ||
+                            !this.servers.get().getMap("Servers").getMap(name).getString("Executable").equals(server.getExecutable())
                             ) {
                             if (server != null) server.getHost().forceRemoveSubServer(name);
                             add = true;
                             server = this.hosts.get(this.servers.get().getMap("Servers").getMap(name).getString("Host").toLowerCase()).constructSubServer(name, this.servers.get().getMap("Servers").getMap(name).getBoolean("Enabled"),
-                                    this.servers.get().getMap("Servers").getMap(name).getInt("Port"), ChatColor.translateAlternateColorCodes('&', this.servers.get().getMap("Servers").getMap(name).getString("Motd")), this.servers.get().getMap("Servers").getMap(name).getBoolean("Log"),
-                                    this.servers.get().getMap("Servers").getMap(name).getRawString("Directory"), this.servers.get().getMap("Servers").getMap(name).getRawString("Executable"), this.servers.get().getMap("Servers").getMap(name).getRawString("Stop-Command"),
+                                    this.servers.get().getMap("Servers").getMap(name).getInt("Port"), ChatColor.translateAlternateColorCodes('&', Util.unescapeJavaString(this.servers.get().getMap("Servers").getMap(name).getString("Motd"))), this.servers.get().getMap("Servers").getMap(name).getBoolean("Log"),
+                                    this.servers.get().getMap("Servers").getMap(name).getString("Directory"), this.servers.get().getMap("Servers").getMap(name).getString("Executable"), this.servers.get().getMap("Servers").getMap(name).getString("Stop-Command"),
                                     this.servers.get().getMap("Servers").getMap(name).getBoolean("Hidden"), this.servers.get().getMap("Servers").getMap(name).getBoolean("Restricted"));
                     } else { // Server doesn't need to reset
                         if (this.servers.get().getMap("Servers").getMap(name).getBoolean("Enabled") != server.isEnabled())
                             server.setEnabled(this.servers.get().getMap("Servers").getMap(name).getBoolean("Enabled"));
-                        if (!ChatColor.translateAlternateColorCodes('&', this.servers.get().getMap("Servers").getMap(name).getString("Motd")).equals(server.getMotd()))
-                            server.setMotd(ChatColor.translateAlternateColorCodes('&', this.servers.get().getMap("Servers").getMap(name).getString("Motd")));
+                        if (!ChatColor.translateAlternateColorCodes('&', Util.unescapeJavaString(this.servers.get().getMap("Servers").getMap(name).getString("Motd"))).equals(server.getMotd()))
+                            server.setMotd(ChatColor.translateAlternateColorCodes('&', Util.unescapeJavaString(this.servers.get().getMap("Servers").getMap(name).getString("Motd"))));
                         if (this.servers.get().getMap("Servers").getMap(name).getBoolean("Log") != server.isLogging())
                             server.setLogging(this.servers.get().getMap("Servers").getMap(name).getBoolean("Log"));
-                        if (!this.servers.get().getMap("Servers").getMap(name).getRawString("Stop-Command").equals(server.getStopCommand()))
-                            server.setStopCommand(this.servers.get().getMap("Servers").getMap(name).getRawString("Stop-Command"));
+                        if (!this.servers.get().getMap("Servers").getMap(name).getString("Stop-Command").equals(server.getStopCommand()))
+                            server.setStopCommand(this.servers.get().getMap("Servers").getMap(name).getString("Stop-Command"));
                         if (this.servers.get().getMap("Servers").getMap(name).getBoolean("Restricted") != server.isRestricted())
                             server.setRestricted(this.servers.get().getMap("Servers").getMap(name).getBoolean("Restricted"));
                         if (this.servers.get().getMap("Servers").getMap(name).getBoolean("Hidden") != server.isHidden())
                             server.setHidden(this.servers.get().getMap("Servers").getMap(name).getBoolean("Hidden"));
                     } // Apply these changes regardless of reset
-                    SubServer.StopAction action = Try.all.get(() -> SubServer.StopAction.valueOf(this.servers.get().getMap("Servers").getMap(name).getRawString("Stop-Action", "NONE").toUpperCase().replace('-', '_').replace(' ', '_')));
+                    SubServer.StopAction action = Try.all.get(() -> SubServer.StopAction.valueOf(this.servers.get().getMap("Servers").getMap(name).getString("Stop-Action", "NONE").toUpperCase().replace('-', '_').replace(' ', '_')));
                     if (action != null && action != server.getStopAction())
                         server.setStopAction(action);
                     if (!status && this.servers.get().getMap("Servers").getMap(name).getBoolean("Run-On-Launch"))
                         autorun.add(name.toLowerCase());
-                    if (this.servers.get().getMap("Servers").getMap(name).getKeys().contains("Display") && ((this.servers.get().getMap("Servers").getMap(name).getRawString("Display").length() == 0 && !server.getName().equals(server.getDisplayName())) || (this.servers.get().getMap("Servers").getMap(name).getRawString("Display").length() > 0 && !this.servers.get().getMap("Servers").getMap(name).getRawString("Display").equals(server.getDisplayName()))))
-                        server.setDisplayName(this.servers.get().getMap("Servers").getMap(name).getRawString("Display"));
-                    if (this.servers.get().getMap("Servers").getMap(name).getKeys().contains("Template") && ((this.servers.get().getMap("Servers").getMap(name).getRawString("Template").length() == 0 && server.getTemplate() != null) || (this.servers.get().getMap("Servers").getMap(name).getRawString("Template").length() > 0 && server.getTemplate() == null) || (server.getTemplate() != null && !this.servers.get().getMap("Servers").getMap(name).getString("Template").equalsIgnoreCase(server.getTemplate().getName()))))
-                        server.setTemplate(this.servers.get().getMap("Servers").getMap(name).getRawString("Template"));
+                    if (this.servers.get().getMap("Servers").getMap(name).getKeys().contains("Display") && ((this.servers.get().getMap("Servers").getMap(name).getString("Display").length() == 0 && !server.getName().equals(server.getDisplayName())) || (this.servers.get().getMap("Servers").getMap(name).getString("Display").length() > 0 && !Util.unescapeJavaString(this.servers.get().getMap("Servers").getMap(name).getString("Display")).equals(server.getDisplayName()))))
+                        server.setDisplayName(Util.unescapeJavaString(this.servers.get().getMap("Servers").getMap(name).getString("Display")));
+                    if (this.servers.get().getMap("Servers").getMap(name).getKeys().contains("Template") && ((this.servers.get().getMap("Servers").getMap(name).getString("Template").length() == 0 && server.getTemplate() != null) || (this.servers.get().getMap("Servers").getMap(name).getString("Template").length() > 0 && server.getTemplate() == null) || (server.getTemplate() != null && !this.servers.get().getMap("Servers").getMap(name).getString("Template").equalsIgnoreCase(server.getTemplate().getName()))))
+                        server.setTemplate(this.servers.get().getMap("Servers").getMap(name).getString("Template"));
                     if (this.servers.get().getMap("Servers").getMap(name).getKeys().contains("Group")) {
                         for (String group : server.getGroups()) server.removeGroup(group);
                         for (String group : this.servers.get().getMap("Servers").getMap(name).getStringList("Group")) server.addGroup(group);
@@ -558,7 +558,7 @@ public final class SubProxy extends BungeeCommon implements Listener {
         }
         for (String name : ukeys) {
             SubServer server = api.getSubServer(name);
-            for (String oname : this.servers.get().getMap("Servers").getMap(server.getName()).getRawStringList("Incompatible", new ArrayList<>())) {
+            for (String oname : this.servers.get().getMap("Servers").getMap(server.getName()).getStringList("Incompatible", new ArrayList<>())) {
                 SubServer oserver = api.getSubServer(oname);
                 if (oserver != null && server.isCompatible(oserver)) server.toggleCompatibility(oserver);
             }
@@ -603,11 +603,11 @@ public final class SubProxy extends BungeeCommon implements Listener {
 
             subprotocol.setTimeout(TimeUnit.SECONDS.toMillis(config.get().getMap("Settings").getMap("SubData").getInt("Timeout", 30)));
 
-            String cipher = config.get().getMap("Settings").getMap("SubData").getRawString("Encryption", "NULL");
+            String cipher = config.get().getMap("Settings").getMap("SubData").getString("Encryption", "NULL");
             String[] ciphers = (cipher.contains("/"))?cipher.split("/"):new String[]{cipher};
 
             if (ciphers[0].equals("AES") || ciphers[0].equals("AES-128") || ciphers[0].equals("AES-192") || ciphers[0].equals("AES-256")) {
-                if (config.get().getMap("Settings").getMap("SubData").getRawString("Password", "").length() == 0) {
+                if (config.get().getMap("Settings").getMap("SubData").getString("Password", "").length() == 0) {
                     byte[] bytes = new byte[32];
                     new SecureRandom().nextBytes(bytes);
                     String random = Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
@@ -616,10 +616,10 @@ public final class SubProxy extends BungeeCommon implements Listener {
                     config.save();
                 }
 
-                subprotocol.registerCipher("AES", new AES(128, config.get().getMap("Settings").getMap("SubData").getRawString("Password")));
-                subprotocol.registerCipher("AES-128", new AES(128, config.get().getMap("Settings").getMap("SubData").getRawString("Password")));
-                subprotocol.registerCipher("AES-192", new AES(192, config.get().getMap("Settings").getMap("SubData").getRawString("Password")));
-                subprotocol.registerCipher("AES-256", new AES(256, config.get().getMap("Settings").getMap("SubData").getRawString("Password")));
+                subprotocol.registerCipher("AES", new AES(128, config.get().getMap("Settings").getMap("SubData").getString("Password")));
+                subprotocol.registerCipher("AES-128", new AES(128, config.get().getMap("Settings").getMap("SubData").getString("Password")));
+                subprotocol.registerCipher("AES-192", new AES(192, config.get().getMap("Settings").getMap("SubData").getString("Password")));
+                subprotocol.registerCipher("AES-256", new AES(256, config.get().getMap("Settings").getMap("SubData").getString("Password")));
 
                 Logger.get("SubData").info("Encrypting SubData with AES:");
                 Logger.get("SubData").info("Use the password field in config.yml to allow clients to connect");
@@ -642,9 +642,9 @@ public final class SubProxy extends BungeeCommon implements Listener {
             }
 
             Logger.get("SubData").info("");
-            subdata = subprotocol.open((config.get().getMap("Settings").getMap("SubData").getRawString("Address", "127.0.0.1:4391").split(":")[0].equals("0.0.0.0"))?
-                            null:InetAddress.getByName(config.get().getMap("Settings").getMap("SubData").getRawString("Address", "127.0.0.1:4391").split(":")[0]),
-                    Integer.parseInt(config.get().getMap("Settings").getMap("SubData").getRawString("Address", "127.0.0.1:4391").split(":")[1]), cipher);
+            subdata = subprotocol.open((config.get().getMap("Settings").getMap("SubData").getString("Address", "127.0.0.1:4391").split(":")[0].equals("0.0.0.0"))?
+                            null:InetAddress.getByName(config.get().getMap("Settings").getMap("SubData").getString("Address", "127.0.0.1:4391").split(":")[0]),
+                    Integer.parseInt(config.get().getMap("Settings").getMap("SubData").getString("Address", "127.0.0.1:4391").split(":")[1]), cipher);
         }
 
         // Add new entries to Allowed-Connections
@@ -727,9 +727,9 @@ public final class SubProxy extends BungeeCommon implements Listener {
     }
 
     private void post() {
-        if (!config.get().getMap("Settings").getRawStringList("Disabled-Overrides", Collections.emptyList()).contains("/server"))
+        if (!config.get().getMap("Settings").getStringList("Disabled-Overrides", Collections.emptyList()).contains("/server"))
             getPluginManager().registerCommand(plugin, new SubCommand.BungeeServer(this, "server"));
-        if (!config.get().getMap("Settings").getRawStringList("Disabled-Overrides", Collections.emptyList()).contains("/glist"))
+        if (!config.get().getMap("Settings").getStringList("Disabled-Overrides", Collections.emptyList()).contains("/glist"))
             getPluginManager().registerCommand(plugin, new SubCommand.BungeeList(this, "glist"));
 
         getPluginManager().registerCommand(plugin, new SubCommand(this, "subservers"));

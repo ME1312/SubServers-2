@@ -74,7 +74,7 @@ public class SubCreatorImpl {
             this.internal = internal;
             this.icon = icon;
             this.directory = directory;
-            this.type = (build.contains("Server-Type"))?ServerType.valueOf(build.getRawString("Server-Type").toUpperCase()):ServerType.CUSTOM;
+            this.type = (build.contains("Server-Type"))?ServerType.valueOf(build.getString("Server-Type").toUpperCase()):ServerType.CUSTOM;
             this.build = build;
             this.options = options;
             this.dynamic = dynamic;
@@ -227,7 +227,7 @@ public class SubCreatorImpl {
             tinfo.set("name", name);
             tinfo.set("display", name);
             tinfo.set("icon", icon);
-            tinfo.set("type", (build.contains("Server-Type"))?ServerType.valueOf(build.getRawString("Server-Type").toUpperCase()):ServerType.CUSTOM);
+            tinfo.set("type", (build.contains("Server-Type"))?ServerType.valueOf(build.getString("Server-Type").toUpperCase()):ServerType.CUSTOM);
             tinfo.set("version-req", build.getBoolean("Require-Version", false));
             tinfo.set("can-update", build.getBoolean("Can-Update", false));
             return tinfo;
@@ -247,9 +247,9 @@ public class SubCreatorImpl {
                 try {
                     if (file.isDirectory() && !file.getName().endsWith(".x")) {
                         ObjectMap<String> config = (new File(file, "template.yml").exists())?new YAMLConfig(new File(file, "template.yml")).get().getMap("Template", new ObjectMap<String>()):new ObjectMap<String>();
-                        ServerTemplate template = new ServerTemplate(file.getName(), config.getBoolean("Enabled", true), config.getBoolean("Internal", false), config.getRawString("Icon", "::NULL::"), file, config.getMap("Build", new ObjectMap<String>()), config.getMap("Settings", new ObjectMap<String>()), false);
+                        ServerTemplate template = new ServerTemplate(file.getName(), config.getBoolean("Enabled", true), config.getBoolean("Internal", false), config.getString("Icon", "::NULL::"), file, config.getMap("Build", new ObjectMap<String>()), config.getMap("Settings", new ObjectMap<String>()), false);
                         templates.put(file.getName().toLowerCase(), template);
-                        if (config.getKeys().contains("Display")) template.setDisplayName(config.getString("Display"));
+                        if (config.getKeys().contains("Display")) template.setDisplayName(Util.unescapeJavaString(config.getString("Display")));
                     }
                 } catch (Exception e) {
                     host.log.error.println("Couldn't load template: " + file.getName());
@@ -331,7 +331,7 @@ public class SubCreatorImpl {
                 updateDirectory(template.getDirectory(), dir, template.getBuildOptions().getBoolean("Update-Files", false));
 
                 for (ObjectMapValue<String> replacement : template.getBuildOptions().getMap("Replacements", new ObjectMap<>()).getValues()) if (!replacement.isNull()) {
-                    replacements.put(replacement.getHandle().toLowerCase().replace('-', '_').replace(' ', '_'), replacement.asRawString());
+                    replacements.put(replacement.getHandle().toLowerCase().replace('-', '_').replace(' ', '_'), replacement.asString());
                 }
 
                 var.putAll(replacements);
@@ -357,16 +357,16 @@ public class SubCreatorImpl {
                             ObjectMap<String> spprofile = null;
                             Version spversion = null;
                             for (ObjectMap<String> profile : spversionmanifest.getMapList("versions")) {
-                                if (profile.getMap("dependencies").getRawString("minecraft").equalsIgnoreCase(version.toString()) && (spversion == null || new Version(profile.getRawString("version")).compareTo(spversion) >= 0)) {
+                                if (profile.getMap("dependencies").getString("minecraft").equalsIgnoreCase(version.toString()) && (spversion == null || new Version(profile.getString("version")).compareTo(spversion) >= 0)) {
                                     spprofile = profile;
-                                    spversion = new Version(profile.getRawString("version"));
+                                    spversion = new Version(profile.getString("version"));
                                 }
                             }
                             if (spversion == null) throw new InvalidServerException("Cannot find Sponge version for Minecraft " + version.toString());
                             log.logger.info.println("Found \"sponge" + ((template.getType() == ServerType.FORGE)?"forge":"vanilla") + "-" + spversion.toString() + '"');
 
                             if (template.getType() == ServerType.FORGE) {
-                                Version mcfversion = new Version(((spprofile.getMap("dependencies").getRawString("forge").contains("-"))?"":spprofile.getMap("dependencies").getRawString("minecraft") + '-') + spprofile.getMap("dependencies").getRawString("forge"));
+                                Version mcfversion = new Version(((spprofile.getMap("dependencies").getString("forge").contains("-"))?"":spprofile.getMap("dependencies").getString("minecraft") + '-') + spprofile.getMap("dependencies").getString("forge"));
                                 log.logger.info.println("Found \"forge-" + mcfversion.toString() + '"');
 
                                 var.put("mcf_version", mcfversion.toString());
@@ -390,7 +390,7 @@ public class SubCreatorImpl {
 
                 try {
                     log.logger.info.println("Launching Build Script...");
-                    ProcessBuilder pb = new ProcessBuilder().command(Executable.parse(host.host.getRawString("Git-Bash"), template.getBuildOptions().getRawString("Executable"))).directory(dir);
+                    ProcessBuilder pb = new ProcessBuilder().command(Executable.parse(host.host.getString("Git-Bash"), template.getBuildOptions().getString("Executable"))).directory(dir);
                     pb.environment().putAll(var);
                     log.file = new File(dir, "SubCreator-" + template.getName() + "-" + ((version != null)?"-"+version.toString():"") + ".log");
                     process = pb.start();
@@ -435,8 +435,8 @@ public class SubCreatorImpl {
                 replacements.put("port", Integer.toString(port));
             };
             declaration.run();
-            File dir = (update != null)?new File(update.getFullPath()):new File(host.host.getRawString("Directory"),
-                    (template.getConfigOptions().contains("Directory"))?new ReplacementScanner(replacements).replace(template.getConfigOptions().getRawString("Directory")).toString():name);
+            File dir = (update != null)?new File(update.getFullPath()):new File(host.host.getString("Directory"),
+                    (template.getConfigOptions().contains("Directory"))?new ReplacementScanner(replacements).replace(template.getConfigOptions().getString("Directory")).toString():name);
 
             ObjectMap<String> config;
             try {
@@ -459,7 +459,7 @@ public class SubCreatorImpl {
 
                     LinkedList<String> masks = new LinkedList<>();
                     masks.add("/server.properties");
-                    masks.addAll(template.getBuildOptions().getRawStringList("Replace", Collections.emptyList()));
+                    masks.addAll(template.getBuildOptions().getStringList("Replace", Collections.emptyList()));
                     replacements.replace(dir, masks.toArray(new String[0]));
                 } catch (Exception e) {
                     config = null;
@@ -546,7 +546,7 @@ public class SubCreatorImpl {
     private static Pair<YAMLSection, String> address = null;
     private String getAddress() {
         if (address == null || host.config.get() != address.key()) {
-            address = new ContainedPair<>(host.config.get(), host.config.get().getMap("Settings").getRawString("Server-Bind"));
+            address = new ContainedPair<>(host.config.get(), host.config.get().getMap("Settings").getString("Server-Bind"));
         }
         return address.value();
     }
@@ -555,8 +555,8 @@ public class SubCreatorImpl {
     private Map<String, Object> getSubData() {
         if (subdata == null || host.config.get() != subdata.key()) {
             Map<String, Object> map = new HashMap<String, Object>();
-            map.put("Address", host.config.get().getMap("Settings").getMap("SubData").getRawString("Address"));
-            if (host.config.get().getMap("Settings").getMap("SubData").getRawString("Password", "").length() > 0) map.put("Password", host.config.get().getMap("Settings").getMap("SubData").getRawString("Password"));
+            map.put("Address", host.config.get().getMap("Settings").getMap("SubData").getString("Address"));
+            if (host.config.get().getMap("Settings").getMap("SubData").getString("Password", "").length() > 0) map.put("Password", host.config.get().getMap("Settings").getMap("SubData").getString("Password"));
             subdata = new ContainedPair<>(host.config.get(), map);
         }
         return subdata.value();

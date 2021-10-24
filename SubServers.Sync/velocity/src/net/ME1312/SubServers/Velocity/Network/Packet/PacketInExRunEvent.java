@@ -26,100 +26,100 @@ public class PacketInExRunEvent implements PacketObjectIn<Integer> {
         callback("SubAddHostEvent", new Consumer<ObjectMap<String>>() {
             @Override
             public void accept(ObjectMap<String> data) {
-                ExProxy.getInstance().getEventManager().fire(new SubAddHostEvent((data.contains("player"))?data.getUUID("player"):null, data.getRawString("host")));
+                ExProxy.getInstance().getEventManager().fire(new SubAddHostEvent((data.contains("player"))?data.getUUID("player"):null, data.getString("host")));
                 callback("SubAddHostEvent", this);
             }
         });
         callback("SubAddProxyEvent", new Consumer<ObjectMap<String>>() {
             @Override
             public void accept(ObjectMap<String> data) {
-                ExProxy.getInstance().getEventManager().fire(new SubAddProxyEvent(data.getRawString("proxy")));
+                ExProxy.getInstance().getEventManager().fire(new SubAddProxyEvent(data.getString("proxy")));
                 callback("SubAddProxyEvent", this);
             }
         });
         callback("SubAddServerEvent", new Consumer<ObjectMap<String>>() {
             @Override
             public void accept(ObjectMap<String> data) {
-                ExProxy.getInstance().getEventManager().fire(new SubAddServerEvent((data.contains("player"))?data.getUUID("player"):null, (data.contains("host"))?data.getRawString("host"):null, data.getRawString("server")));
+                ExProxy.getInstance().getEventManager().fire(new SubAddServerEvent((data.contains("player"))?data.getUUID("player"):null, (data.contains("host"))?data.getString("host"):null, data.getString("server")));
                 callback("SubAddServerEvent", this);
             }
         });
         callback("SubCreateEvent", new Consumer<ObjectMap<String>>() {
             @Override
             public void accept(ObjectMap<String> data) {
-                ExProxy.getInstance().getEventManager().fire(new SubCreateEvent((data.contains("player"))?data.getUUID("player"):null, data.getRawString("host"), data.getRawString("name"),
-                        data.getRawString("template"), data.getVersion("version"), data.getInt("port"), data.getBoolean("update")));
+                ExProxy.getInstance().getEventManager().fire(new SubCreateEvent((data.contains("player"))?data.getUUID("player"):null, data.getString("host"), data.getString("name"),
+                        data.getString("template"), data.getVersion("version"), data.getInt("port"), data.getBoolean("update")));
                 callback("SubCreateEvent", this);
             }
         });
         callback("SubCreatedEvent", new Consumer<ObjectMap<String>>() {
             @Override
             public void accept(ObjectMap<String> data) {
-                ExProxy.getInstance().getEventManager().fire(new SubCreatedEvent((data.contains("player"))?data.getUUID("player"):null, data.getRawString("host"), data.getRawString("name"),
-                        data.getRawString("template"), data.getVersion("version"), data.getInt("port"), data.getBoolean("update"), data.getBoolean("success")));
+                ExProxy.getInstance().getEventManager().fire(new SubCreatedEvent((data.contains("player"))?data.getUUID("player"):null, data.getString("host"), data.getString("name"),
+                        data.getString("template"), data.getVersion("version"), data.getInt("port"), data.getBoolean("update"), data.getBoolean("success")));
                 callback("SubCreatedEvent", this);
             }
         });
         callback("SubSendCommandEvent", new Consumer<ObjectMap<String>>() {
             @Override
             public void accept(ObjectMap<String> data) {
-                ExProxy.getInstance().getEventManager().fire(new SubSendCommandEvent((data.contains("player"))?data.getUUID("player"):null, data.getRawString("server"), data.getRawString("command")));
+                ExProxy.getInstance().getEventManager().fire(new SubSendCommandEvent((data.contains("player"))?data.getUUID("player"):null, data.getString("server"), data.getString("command")));
                 callback("SubSendCommandEvent", this);
             }
         });
         callback("SubEditServerEvent", new Consumer<ObjectMap<String>>() {
             @Override
             public void accept(ObjectMap<String> data) {
-                ExProxy.getInstance().getEventManager().fire(new SubEditServerEvent((data.contains("player"))?data.getUUID("player"):null, data.getRawString("server"), new ContainedPair<String, Object>(data.getRawString("edit"), data.get("value"))));
+                ExProxy.getInstance().getEventManager().fire(new SubEditServerEvent((data.contains("player"))?data.getUUID("player"):null, data.getString("server"), new ContainedPair<String, Object>(data.getString("edit"), data.get("value"))));
                 callback("SubEditServerEvent", this);
             }
         });
         callback("SubStartEvent", new Consumer<ObjectMap<String>>() {
             @Override
             public void accept(ObjectMap<String> data) {
-                ExProxy.getInstance().getEventManager().fire(new SubStartEvent((data.contains("player"))?data.getUUID("player"):null, data.getRawString("server")));
+                ExProxy.getInstance().getEventManager().fire(new SubStartEvent((data.contains("player"))?data.getUUID("player"):null, data.getString("server")));
                 callback("SubStartEvent", this);
             }
         });
         callback("SubStartedEvent", new Consumer<ObjectMap<String>>() {
             @Override
             public void accept(ObjectMap<String> data) {
-                ExProxy.getInstance().getEventManager().fire(new SubStartedEvent(data.getRawString("server")));
+                ExProxy.getInstance().getEventManager().fire(new SubStartedEvent(data.getString("server")));
                 callback("SubStartedEvent", this);
             }
         });
         callback("SubStopEvent", new Consumer<ObjectMap<String>>() {
             @Override
             public void accept(ObjectMap<String> data) {
-                ExProxy.getInstance().getEventManager().fire(new SubStopEvent((data.contains("player"))?data.getUUID("player"):null, data.getRawString("server"), data.getBoolean("force")));
+                ExProxy.getInstance().getEventManager().fire(new SubStopEvent((data.contains("player"))?data.getUUID("player"):null, data.getString("server"), data.getBoolean("force")));
                 callback("SubStopEvent", this);
             }
         });
         callback("SubStoppedEvent", new Consumer<ObjectMap<String>>() {
             @Override
             public void accept(ObjectMap<String> data) {
-                ExProxy.getInstance().getEventManager().fire(new SubStoppedEvent(data.getRawString("server")));
+                ExProxy.getInstance().getEventManager().fire(new SubStoppedEvent(data.getString("server")));
                 callback("SubStoppedEvent", this);
             }
         });
         callback("SubRemoveServerEvent", new Consumer<ObjectMap<String>>() {
             @Override
             public void accept(ObjectMap<String> data) {
-                ExProxy.getInstance().getEventManager().fire(new SubRemoveServerEvent((data.contains("player"))?data.getUUID("player"):null, (data.contains("host"))?data.getRawString("host"):null, data.getRawString("server")));
+                ExProxy.getInstance().getEventManager().fire(new SubRemoveServerEvent((data.contains("player"))?data.getUUID("player"):null, (data.contains("host"))?data.getString("host"):null, data.getString("server")));
                 callback("SubRemoveServerEvent", this);
             }
         });
         callback("SubRemoveProxyEvent", new Consumer<ObjectMap<String>>() {
             @Override
             public void accept(ObjectMap<String> data) {
-                ExProxy.getInstance().getEventManager().fire(new SubAddProxyEvent(data.getRawString("proxy")));
+                ExProxy.getInstance().getEventManager().fire(new SubAddProxyEvent(data.getString("proxy")));
                 callback("SubRemoveProxyEvent", this);
             }
         });
         callback("SubRemoveHostEvent", new Consumer<ObjectMap<String>>() {
             @Override
             public void accept(ObjectMap<String> data) {
-                ExProxy.getInstance().getEventManager().fire(new SubRemoveHostEvent((data.contains("player"))?data.getUUID("player"):null, data.getRawString("host")));
+                ExProxy.getInstance().getEventManager().fire(new SubRemoveHostEvent((data.contains("player"))?data.getUUID("player"):null, data.getString("host")));
                 callback("SubRemoveHostEvent", this);
             }
         });

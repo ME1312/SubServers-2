@@ -86,7 +86,7 @@ public final class SimplifiedData {
             for (String group : data.getKeys()) {
                 ArrayList<Server> servers = new ArrayList<Server>();
                 for (String server : data.getMap(group).getKeys()) {
-                    if (data.getMap(group).getMap(server).getRawString("type", "Server").equals("SubServer")) {
+                    if (data.getMap(group).getMap(server).getString("type", "Server").equals("SubServer")) {
                         servers.add(new SubServer(client, data.getMap(group).getMap(server)));
                     } else {
                         servers.add(new Server(client, data.getMap(group).getMap(server)));
@@ -138,7 +138,7 @@ public final class SimplifiedData {
                 String key = new LinkedList<String>(data.getKeys()).getFirst();
                 List<Server> servers = new LinkedList<Server>();
                 for (String server : data.getMap(key).getKeys()) {
-                    if (data.getMap(key).getMap(server).getRawString("type", "Server").equals("SubServer")) {
+                    if (data.getMap(key).getMap(server).getString("type", "Server").equals("SubServer")) {
                         servers.add(new SubServer(client, data.getMap(key).getMap(server)));
                     } else {
                         servers.add(new Server(client, data.getMap(key).getMap(server)));
@@ -169,7 +169,7 @@ public final class SimplifiedData {
         client(client).sendPacket(new PacketDownloadServerInfo(null, data -> {
             TreeMap<String, Server> servers = new TreeMap<String, Server>();
             for (String server : data.getKeys()) {
-                if (data.getMap(server).getRawString("type", "Server").equals("SubServer")) {
+                if (data.getMap(server).getString("type", "Server").equals("SubServer")) {
                     servers.put(server.toLowerCase(), new SubServer(client, data.getMap(server)));
                 } else {
                     servers.put(server.toLowerCase(), new Server(client, data.getMap(server)));
@@ -200,7 +200,7 @@ public final class SimplifiedData {
             Server server = null;
             if (data.getKeys().size() > 0) {
                 String key = new LinkedList<String>(data.getKeys()).getFirst();
-                if (data.getMap(key).getRawString("type", "Server").equals("SubServer")) {
+                if (data.getMap(key).getString("type", "Server").equals("SubServer")) {
                     server = new SubServer(client, data.getMap(key));
                 } else {
                     server = new Server(client, data.getMap(key));

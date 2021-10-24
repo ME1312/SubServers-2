@@ -74,8 +74,8 @@ public class ConfigUpdater {
         if (i > 0) {
             YAMLSection settings = new YAMLSection();
             settings.set("Version", ((now.compareTo(was) <= 0)?was:now).toString());
-            if (updated.getMap("Settings", new YAMLSection()).contains("RPEC-Check-Interval")) settings.set("RPEC-Check-Interval", updated.getMap("Settings").getRawString("RPEC-Check-Interval"));
-            settings.set("Disabled-Overrides", updated.getMap("Settings", new YAMLSection()).getRawStringList("Disabled-Overrides", Collections.emptyList()));
+            if (updated.getMap("Settings", new YAMLSection()).contains("RPEC-Check-Interval")) settings.set("RPEC-Check-Interval", updated.getMap("Settings").getString("RPEC-Check-Interval"));
+            settings.set("Disabled-Overrides", updated.getMap("Settings", new YAMLSection()).getStringList("Disabled-Overrides", Collections.emptyList()));
 
             YAMLSection smart_fallback = new YAMLSection();
             smart_fallback.set("Enabled", updated.getMap("Settings", new YAMLSection()).getMap("Smart-Fallback", new YAMLSection()).getBoolean("Enabled", true));
@@ -89,9 +89,9 @@ public class ConfigUpdater {
             settings.set("UPnP", upnp);
 
             YAMLSection subdata = new YAMLSection();
-            if (updated.getMap("Settings", new YAMLSection()).getMap("SubData", new YAMLSection()).contains("Name")) subdata.set("Name", updated.getMap("Settings").getMap("SubData").getRawString("Name"));
-            subdata.set("Address", updated.getMap("Settings", new YAMLSection()).getMap("SubData", new YAMLSection()).getRawString("Address", "127.0.0.1:4391"));
-            if (updated.getMap("Settings", new YAMLSection()).getMap("SubData", new YAMLSection()).contains("Password")) subdata.set("Password", updated.getMap("Settings").getMap("SubData").getRawString("Password"));
+            if (updated.getMap("Settings", new YAMLSection()).getMap("SubData", new YAMLSection()).contains("Name")) subdata.set("Name", updated.getMap("Settings").getMap("SubData").getString("Name"));
+            subdata.set("Address", updated.getMap("Settings", new YAMLSection()).getMap("SubData", new YAMLSection()).getString("Address", "127.0.0.1:4391"));
+            if (updated.getMap("Settings", new YAMLSection()).getMap("SubData", new YAMLSection()).contains("Password")) subdata.set("Password", updated.getMap("Settings").getMap("SubData").getString("Password"));
             if (updated.getMap("Settings", new YAMLSection()).getMap("SubData", new YAMLSection()).contains("Reconnect")) subdata.set("Reconnect", updated.getMap("Settings").getMap("SubData").getInt("Reconnect"));
             settings.set("SubData", subdata);
 

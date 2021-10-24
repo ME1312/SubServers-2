@@ -57,7 +57,7 @@ public class PacketAddServer implements PacketObjectIn<Integer>, PacketObjectOut
     public void receive(SubDataClient client, ObjectMap<Integer> data) {
         UUID tracker =     (data.contains(0x0000)?data.getUUID(0x0000):null);
         try {
-            String name =                    data.getRawString(0x0001);
+            String name =                    data.getString(0x0001);
             boolean subserver =                data.getBoolean(0x0002);
             ObjectMap<String> opt = new ObjectMap<>((Map<String, ?>)data.getObject(0x0003));
             UUID player =                      (data.contains(0x0004)?data.getUUID(0x0004):null);
@@ -66,17 +66,17 @@ public class PacketAddServer implements PacketObjectIn<Integer>, PacketObjectOut
                 client.sendPacket(new PacketAddServer(3, tracker));
             } else {
                 if (!subserver) {
-                    if (plugin.api.addServer(player, name, InetAddress.getByName(opt.getRawString("address").split(":")[0]), Integer.parseInt(opt.getRawString("address").split(":")[1]),
-                            ChatColor.translateAlternateColorCodes('&', opt.getString("motd")), opt.getBoolean("hidden"), opt.getBoolean("restricted")) != null) {
+                    if (plugin.api.addServer(player, name, InetAddress.getByName(opt.getString("address").split(":")[0]), Integer.parseInt(opt.getString("address").split(":")[1]),
+                            ChatColor.translateAlternateColorCodes('&', Util.unescapeJavaString(opt.getString("motd"))), opt.getBoolean("hidden"), opt.getBoolean("restricted")) != null) {
                         client.sendPacket(new PacketAddServer(0, tracker));
                     } else {
                         client.sendPacket(new PacketAddServer(1, tracker));
                     }
-                } else if (!plugin.api.getHosts().keySet().contains(opt.getRawString("host").toLowerCase())) {
+                } else if (!plugin.api.getHosts().keySet().contains(opt.getString("host").toLowerCase())) {
                     client.sendPacket(new PacketAddServer(4, tracker));
                 } else {
-                    if (plugin.api.getHost(opt.getRawString("host")).addSubServer(player, name, opt.getBoolean("enabled"), opt.getInt("port"), ChatColor.translateAlternateColorCodes('&', opt.getString("motd")),
-                            opt.getBoolean("log"), opt.getRawString("dir"), opt.getRawString("exec"), opt.getRawString("stop-cmd"), opt.getBoolean("hidden"), opt.getBoolean("restricted")) != null) {
+                    if (plugin.api.getHost(opt.getString("host")).addSubServer(player, name, opt.getBoolean("enabled"), opt.getInt("port"), ChatColor.translateAlternateColorCodes('&', Util.unescapeJavaString(opt.getString("motd"))),
+                            opt.getBoolean("log"), opt.getString("dir"), opt.getString("exec"), opt.getString("stop-cmd"), opt.getBoolean("hidden"), opt.getBoolean("restricted")) != null) {
                         client.sendPacket(new PacketAddServer(0, tracker));
                     } else {
                         client.sendPacket(new PacketAddServer(1, tracker));

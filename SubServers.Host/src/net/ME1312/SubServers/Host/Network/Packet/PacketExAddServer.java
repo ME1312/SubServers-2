@@ -71,13 +71,13 @@ public class PacketExAddServer implements PacketObjectIn<Integer>, PacketObjectO
         Logger logger = Try.all.get(() -> Util.reflect(SubDataClient.class.getDeclaredField("log"), client.getConnection()), null);
         UUID tracker =          (data.contains(0x0000)?data.getUUID(0x0000):null);
         try {
-            String name =    data.getRawString(0x0001);
+            String name =    data.getString(0x0001);
             boolean enabled =  data.getBoolean(0x0002);
             int port =             data.getInt(0x0003);
             boolean log =      data.getBoolean(0x0004);
-            String dir =     data.getRawString(0x0005);
-            String exec =    data.getRawString(0x0006);
-            String stopcmd = data.getRawString(0x0007);
+            String dir =     data.getString(0x0005);
+            String exec =    data.getString(0x0006);
+            String stopcmd = data.getString(0x0007);
             UUID running =       data.contains(0x0008)?data.getUUID(0x0008):null;
 
             if (host.servers.keySet().contains(name.toLowerCase())) {

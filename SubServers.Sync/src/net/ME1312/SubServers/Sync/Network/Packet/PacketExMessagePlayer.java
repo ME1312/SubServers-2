@@ -58,9 +58,9 @@ public class PacketExMessagePlayer implements PacketObjectIn<Integer>, PacketObj
                 BaseComponent[][] components = null;
 
                 if (data.contains(0x0002))
-                    legacy = data.getRawStringList(0x0002).toArray(new String[0]);
+                    legacy = data.getStringList(0x0002).toArray(new String[0]);
                 if (data.contains(0x0003)) {
-                    List<String> messages = data.getRawStringList(0x0003);
+                    List<String> messages = data.getStringList(0x0003);
                     components = new BaseComponent[messages.size()][];
                     for (int i = 0; i < components.length; ++i) components[i] = ComponentSerializer.parse(messages.get(i));
                 }

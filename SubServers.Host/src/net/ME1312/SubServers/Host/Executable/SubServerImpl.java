@@ -60,7 +60,7 @@ public class SubServerImpl {
         this.port = port;
         this.log = new Container<Boolean>(log);
         this.dir = directory;
-        this.directory = new File(host.host.getRawString("Directory"), directory);
+        this.directory = new File(host.host.getString("Directory"), directory);
         this.executable = executable;
         this.process = null;
         this.logger = new SubLoggerImpl(null, this, name, null, this.log, null);
@@ -100,11 +100,11 @@ public class SubServerImpl {
         boolean falsestart = true;
         allowrestart = true;
         try {
-            ProcessBuilder pb = new ProcessBuilder().command(Executable.parse(host.host.getRawString("Git-Bash"), executable)).directory(directory);
+            ProcessBuilder pb = new ProcessBuilder().command(Executable.parse(host.host.getString("Git-Bash"), executable)).directory(directory);
             pb.environment().put("java", System.getProperty("java.home") + File.separator + "bin" + File.separator + "java");
             pb.environment().put("name", getName());
             if (SubAPI.getInstance().getSubDataNetwork()[0] != null) pb.environment().put("host", SubAPI.getInstance().getName());
-            pb.environment().put("address", host.config.get().getMap("Settings").getRawString("Server-Bind"));
+            pb.environment().put("address", host.config.get().getMap("Settings").getString("Server-Bind"));
             pb.environment().put("port", Integer.toString(getPort()));
             logger.init();
             process = pb.start();

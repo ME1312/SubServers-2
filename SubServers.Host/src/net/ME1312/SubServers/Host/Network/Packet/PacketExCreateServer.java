@@ -81,13 +81,13 @@ public class PacketExCreateServer implements PacketObjectIn<Integer>, PacketObje
         try {
             if (data.contains(0x0001)) {
                 if (data.contains(0x0001)) {
-                    host.creator.terminate(data.getRawString(0x0001).toLowerCase());
+                    host.creator.terminate(data.getString(0x0001).toLowerCase());
                 } else {
                     host.creator.terminate();
                 }
                 client.sendPacket(new PacketExCreateServer(1, null, tracker));
             } else {
-                String name =    data.getRawString(0x0002);
+                String name =    data.getString(0x0002);
                 ObjectMapValue<Integer> template = data.get(0x0003);
                 Version version =   (data.contains(0x0004)?data.getVersion(0x0004):null);
                 Integer port =         data.getInt(0x0005);
@@ -98,18 +98,18 @@ public class PacketExCreateServer implements PacketObjectIn<Integer>, PacketObje
                 SubCreatorImpl.ServerTemplate templateV;
 
                 if (template.isString()) {
-                    templateV = host.templates.get(template.asRawString().toLowerCase());
-                    if (templateV == null) templateV = host.templatesR.get(template.asRawString().toLowerCase());
+                    templateV = host.templates.get(template.asString().toLowerCase());
+                    if (templateV == null) templateV = host.templatesR.get(template.asString().toLowerCase());
                 } else {
                     ObjectMap<String> templateM = template.asMap().key();
                     templateV = new ServerTemplate(
-                            templateM.getRawString("name"),
+                            templateM.getString("name"),
                             templateM.getBoolean("enabled"),
-                            templateM.getRawString("icon"),
-                            new File(templateM.getRawString("dir").replace('/', File.separatorChar)),
+                            templateM.getString("icon"),
+                            new File(templateM.getString("dir").replace('/', File.separatorChar)),
                             templateM.getMap("build"),
                             templateM.getMap("def"));
-                    templateV.setDisplayName(templateM.getRawString("display"));
+                    templateV.setDisplayName(templateM.getString("display"));
                 }
 
                 host.creator.create(player, name, templateV, version, port, mode, log, tracker);

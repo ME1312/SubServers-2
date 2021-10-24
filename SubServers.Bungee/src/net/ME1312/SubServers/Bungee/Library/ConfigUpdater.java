@@ -113,7 +113,7 @@ public class ConfigUpdater {
             } if (was.compareTo(new Version("20w08d")) <= 0) {
                 if (existing.contains("Hosts")) {
                     for (String name : existing.getMap("Hosts", new YAMLSection()).getKeys()) {
-                        if (existing.getMap("Hosts").getMap(name).getRawString("Driver", "BUILT_IN").replace('-', '_').replace(' ', '_').equalsIgnoreCase("BUILT_IN"))
+                        if (existing.getMap("Hosts").getMap(name).getString("Driver", "BUILT_IN").replace('-', '_').replace(' ', '_').equalsIgnoreCase("BUILT_IN"))
                             updated.getMap("Hosts").getMap(name).set("Driver", "VIRTUAL");
                     }
                 }
@@ -155,9 +155,9 @@ public class ConfigUpdater {
         if (i > 0) {
             YAMLSection settings = new YAMLSection();
             settings.set("Version", ((now.compareTo(was) <= 0)?was:now).toString());
-            if (updated.getMap("Settings", new YAMLSection()).contains("RPEC-Check-Interval")) settings.set("RPEC-Check-Interval", updated.getMap("Settings").getRawString("RPEC-Check-Interval"));
+            if (updated.getMap("Settings", new YAMLSection()).contains("RPEC-Check-Interval")) settings.set("RPEC-Check-Interval", updated.getMap("Settings").getString("RPEC-Check-Interval"));
             settings.set("Strict-Server-Linking", updated.getMap("Settings", new YAMLSection()).getBoolean("Strict-Server-Linking", true));
-            settings.set("Disabled-Overrides", updated.getMap("Settings", new YAMLSection()).getRawStringList("Disabled-Overrides", Collections.emptyList()));
+            settings.set("Disabled-Overrides", updated.getMap("Settings", new YAMLSection()).getStringList("Disabled-Overrides", Collections.emptyList()));
 
             YAMLSection smart_fallback = new YAMLSection();
             smart_fallback.set("Enabled", updated.getMap("Settings", new YAMLSection()).getMap("Smart-Fallback", new YAMLSection()).getBoolean("Enabled", true));
@@ -173,10 +173,10 @@ public class ConfigUpdater {
             settings.set("UPnP", upnp);
 
             YAMLSection subdata = new YAMLSection();
-            subdata.set("Address", updated.getMap("Settings", new YAMLSection()).getMap("SubData", new YAMLSection()).getRawString("Address", "127.0.0.1:4391"));
-            if (updated.getMap("Settings", new YAMLSection()).getMap("SubData", new YAMLSection()).contains("Password")) subdata.set("Password", updated.getMap("Settings").getMap("SubData").getRawString("Password"));
-            subdata.set("Encryption", updated.getMap("Settings", new YAMLSection()).getMap("SubData", new YAMLSection()).getRawString("Encryption", "RSA/AES"));
-            subdata.set("Whitelist", updated.getMap("Settings", new YAMLSection()).getMap("SubData", new YAMLSection()).getRawStringList("Whitelist", Collections.emptyList()));
+            subdata.set("Address", updated.getMap("Settings", new YAMLSection()).getMap("SubData", new YAMLSection()).getString("Address", "127.0.0.1:4391"));
+            if (updated.getMap("Settings", new YAMLSection()).getMap("SubData", new YAMLSection()).contains("Password")) subdata.set("Password", updated.getMap("Settings").getMap("SubData").getString("Password"));
+            subdata.set("Encryption", updated.getMap("Settings", new YAMLSection()).getMap("SubData", new YAMLSection()).getString("Encryption", "RSA/AES"));
+            subdata.set("Whitelist", updated.getMap("Settings", new YAMLSection()).getMap("SubData", new YAMLSection()).getStringList("Whitelist", Collections.emptyList()));
             settings.set("SubData", subdata);
 
             rewritten.set("Settings", settings);
@@ -186,12 +186,12 @@ public class ConfigUpdater {
             for (String name : updated.getMap("Hosts", new YAMLSection()).getKeys()) {
                 YAMLSection host = new YAMLSection();
                 host.set("Enabled", updated.getMap("Hosts").getMap(name).getBoolean("Enabled", false));
-                host.set("Display", updated.getMap("Hosts").getMap(name).getRawString("Display", ""));
-                host.set("Driver", updated.getMap("Hosts").getMap(name).getRawString("Driver", "VIRTUAL"));
-                host.set("Address", updated.getMap("Hosts").getMap(name).getRawString("Address", "127.0.0.1"));
-                host.set("Port-Range", updated.getMap("Hosts").getMap(name).getRawString("Port-Range", "25500-25559"));
-                host.set("Directory", updated.getMap("Hosts").getMap(name).getRawString("Directory", (host.getRawString("Driver").equalsIgnoreCase("VIRTUAL"))?"./SubServers/Servers":"./Servers"));
-                host.set("Git-Bash", updated.getMap("Hosts").getMap(name).getRawString("Git-Bash", "%ProgramFiles%\\Git"));
+                host.set("Display", updated.getMap("Hosts").getMap(name).getString("Display", ""));
+                host.set("Driver", updated.getMap("Hosts").getMap(name).getString("Driver", "VIRTUAL"));
+                host.set("Address", updated.getMap("Hosts").getMap(name).getString("Address", "127.0.0.1"));
+                host.set("Port-Range", updated.getMap("Hosts").getMap(name).getString("Port-Range", "25500-25559"));
+                host.set("Directory", updated.getMap("Hosts").getMap(name).getString("Directory", (host.getString("Driver").equalsIgnoreCase("VIRTUAL"))?"./SubServers/Servers":"./Servers"));
+                host.set("Git-Bash", updated.getMap("Hosts").getMap(name).getString("Git-Bash", "%ProgramFiles%\\Git"));
                 host.set("Log-Creator", updated.getMap("Hosts").getMap(name).getBoolean("Log-Creator", true));
                 if (updated.getMap("Hosts").getMap(name).contains("Extra")) host.set("Extra", updated.getMap("Hosts").getMap(name).getMap("Extra"));
                 hosts.set(name, host);
@@ -233,7 +233,7 @@ public class ConfigUpdater {
                         if (existing.getMap("Servers").getMap(name).getBoolean("Auto-Restart", true))
                             updated.getMap("Servers").getMap(name).safeSet("Stop-Action", "RESTART");
 
-                        if (existing.getMap("Servers").getMap(name).getRawString("Stop-Action", "NONE").equalsIgnoreCase("DELETE_SERVER"))
+                        if (existing.getMap("Servers").getMap(name).getString("Stop-Action", "NONE").equalsIgnoreCase("DELETE_SERVER"))
                             updated.getMap("Servers").getMap(name).set("Stop-Action", "RECYCLE_SERVER");
                     }
                 }
@@ -260,20 +260,20 @@ public class ConfigUpdater {
             for (String name : updated.getMap("Servers", new YAMLSection()).getKeys()) {
                 YAMLSection server = new YAMLSection();
                 server.set("Enabled", updated.getMap("Servers").getMap(name).getBoolean("Enabled", false));
-                server.set("Display", updated.getMap("Servers").getMap(name).getRawString("Display", ""));
-                server.set("Host", updated.getMap("Servers").getMap(name).getRawString("Host", "~"));
-                if (updated.getMap("Servers").getMap(name).contains("Template")) server.set("Template", updated.getMap("Servers").getMap(name).getRawString("Template"));
-                server.set("Group", updated.getMap("Servers").getMap(name).getRawStringList("Groups", Collections.emptyList()));
+                server.set("Display", updated.getMap("Servers").getMap(name).getString("Display", ""));
+                server.set("Host", updated.getMap("Servers").getMap(name).getString("Host", "~"));
+                if (updated.getMap("Servers").getMap(name).contains("Template")) server.set("Template", updated.getMap("Servers").getMap(name).getString("Template"));
+                server.set("Group", updated.getMap("Servers").getMap(name).getStringList("Groups", Collections.emptyList()));
                 server.set("Port", updated.getMap("Servers").getMap(name).getInt("Port", 25567));
-                server.set("Motd", updated.getMap("Servers").getMap(name).getRawString("Motd", "Some SubServer"));
+                server.set("Motd", updated.getMap("Servers").getMap(name).getString("Motd", "Some SubServer"));
                 server.set("Log", updated.getMap("Servers").getMap(name).getBoolean("Log", true));
-                server.set("Directory", updated.getMap("Servers").getMap(name).getRawString("Directory", "." + File.separatorChar));
-                server.set("Executable", updated.getMap("Servers").getMap(name).getRawString("Executable", "java -Xmx1024M -Djline.terminal=jline.UnsupportedTerminal -jar Spigot.jar"));
-                server.set("Stop-Command", updated.getMap("Servers").getMap(name).getRawString("Stop-Command", "stop"));
-                server.set("Stop-Action", updated.getMap("Servers").getMap(name).getRawString("Stop-Action", "NONE"));
+                server.set("Directory", updated.getMap("Servers").getMap(name).getString("Directory", "." + File.separatorChar));
+                server.set("Executable", updated.getMap("Servers").getMap(name).getString("Executable", "java -Xmx1024M -Djline.terminal=jline.UnsupportedTerminal -jar Spigot.jar"));
+                server.set("Stop-Command", updated.getMap("Servers").getMap(name).getString("Stop-Command", "stop"));
+                server.set("Stop-Action", updated.getMap("Servers").getMap(name).getString("Stop-Action", "NONE"));
                 server.set("Run-On-Launch", updated.getMap("Servers").getMap(name).getBoolean("Run-On-Launch", false));
                 server.set("Restricted", updated.getMap("Servers").getMap(name).getBoolean("Restricted", false));
-                server.set("Incompatible", updated.getMap("Servers").getMap(name).getRawStringList("Incompatible", Collections.emptyList()));
+                server.set("Incompatible", updated.getMap("Servers").getMap(name).getStringList("Incompatible", Collections.emptyList()));
                 server.set("Hidden", updated.getMap("Servers").getMap(name).getBoolean("Hidden", false));
                 if (updated.getMap("Servers").getMap(name).contains("Extra")) server.set("Extra", updated.getMap("Servers").getMap(name).getMap("Extra"));
                 servers.set(name, server);
@@ -541,7 +541,7 @@ public class ConfigUpdater {
             def.put("Interface.SubServer-Plugin.No-Plugins", "&c&oThere are No Plugins Available");
 
             YAMLSection lang = new YAMLSection();
-            for (String key : def.keySet()) lang.set(key, updated.getMap("Lang", new YAMLSection()).getRawString(key, def.get(key)));
+            for (String key : def.keySet()) lang.set(key, updated.getMap("Lang", new YAMLSection()).getString(key, def.get(key)));
             rewritten.set("Lang", lang);
 
             config.set(rewritten);

@@ -391,7 +391,7 @@ public class SubServer extends Server {
      * @return The Host Name
      */
     public String getHost() {
-        return raw.getRawString("host");
+        return raw.getString("host");
     }
 
     /**
@@ -412,8 +412,8 @@ public class SubServer extends Server {
             }
         };
 
-        if (host == null || !host.getName().equalsIgnoreCase(raw.getRawString("host"))) {
-            ClientAPI.getInstance().getHost(raw.getRawString("host"), host -> {
+        if (host == null || !host.getName().equalsIgnoreCase(raw.getString("host"))) {
+            ClientAPI.getInstance().getHost(raw.getString("host"), host -> {
                 this.host = host;
                 run.run();
             });
@@ -428,7 +428,7 @@ public class SubServer extends Server {
      * @return The Template
      */
     public String getTemplate() {
-        return raw.getRawString("template");
+        return raw.getString("template");
     }
 
     /**
@@ -523,7 +523,7 @@ public class SubServer extends Server {
      * @return Server Directory Path
      */
     public String getPath() {
-        return raw.getRawString("dir");
+        return raw.getString("dir");
     }
 
     /**
@@ -532,7 +532,7 @@ public class SubServer extends Server {
      * @return Executable String
      */
     public String getExecutable() {
-        return raw.getRawString("exec");
+        return raw.getString("exec");
     }
 
     /**
@@ -541,7 +541,7 @@ public class SubServer extends Server {
      * @return Stop Command
      */
     public String getStopCommand() {
-        return raw.getRawString("stop-cmd");
+        return raw.getString("stop-cmd");
     }
 
     /**
@@ -575,7 +575,7 @@ public class SubServer extends Server {
      * @return Stop Action
      */
     public StopAction getStopAction() {
-        return Try.all.get(() -> StopAction.valueOf(raw.getRawString("stop-action").toUpperCase().replace('-', '_').replace(' ', '_')), StopAction.NONE);
+        return Try.all.get(() -> StopAction.valueOf(raw.getString("stop-action").toUpperCase().replace('-', '_').replace(' ', '_')), StopAction.NONE);
     }
 
     /**
@@ -652,7 +652,7 @@ public class SubServer extends Server {
      * @return Incompatibility List
      */
     public List<String> getIncompatibilities() {
-        return new LinkedList<String>(raw.getRawStringList("incompatible-list"));
+        return new LinkedList<String>(raw.getStringList("incompatible-list"));
     }
 
     /**
@@ -675,11 +675,11 @@ public class SubServer extends Server {
 
         if (incompatibilities == null) {
             LinkedList<String> incompatible = new LinkedList<String>();
-            for (String subserver : raw.getRawStringList("incompatible-list")) incompatible.add(subserver.toLowerCase());
+            for (String subserver : raw.getStringList("incompatible-list")) incompatible.add(subserver.toLowerCase());
             client().sendPacket(new PacketDownloadServerInfo(incompatible, data -> {
                 LinkedList<SubServer> incompatibilities = new LinkedList<SubServer>();
                 for (String server : data.getKeys()) {
-                    if (data.getMap(server).getRawString("type", "Server").equals("SubServer")) incompatibilities.add(new SubServer(data.getMap(server)));
+                    if (data.getMap(server).getString("type", "Server").equals("SubServer")) incompatibilities.add(new SubServer(data.getMap(server)));
                 }
 
                 this.incompatibilities = incompatibilities;
@@ -696,7 +696,7 @@ public class SubServer extends Server {
      * @return Current Incompatibility List
      */
     public List<String> getCurrentIncompatibilities() {
-        return new LinkedList<String>(raw.getRawStringList("incompatible"));
+        return new LinkedList<String>(raw.getStringList("incompatible"));
     }
 
     /**
@@ -719,11 +719,11 @@ public class SubServer extends Server {
 
         if (currentIncompatibilities == null) {
             LinkedList<String> incompatible = new LinkedList<String>();
-            for (String subserver : raw.getRawStringList("incompatible")) incompatible.add(subserver.toLowerCase());
+            for (String subserver : raw.getStringList("incompatible")) incompatible.add(subserver.toLowerCase());
             client().sendPacket(new PacketDownloadServerInfo(incompatible, data -> {
                 LinkedList<SubServer> incompatibilities = new LinkedList<SubServer>();
                 for (String server : data.getKeys()) {
-                    if (data.getMap(server).getRawString("type", "Server").equals("SubServer")) incompatibilities.add(new SubServer(data.getMap(server)));
+                    if (data.getMap(server).getString("type", "Server").equals("SubServer")) incompatibilities.add(new SubServer(data.getMap(server)));
                 }
 
                 this.currentIncompatibilities = incompatibilities;

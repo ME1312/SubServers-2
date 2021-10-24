@@ -54,7 +54,7 @@ public class PacketRemoveServer implements PacketObjectIn<Integer>, PacketObject
     public void receive(SubDataClient client, ObjectMap<Integer> data) {
         UUID tracker =       (data.contains(0x0000)?data.getUUID(0x0000):null);
         try {
-            String name = data.getRawString(0x0001);
+            String name = data.getString(0x0001);
             boolean force = data.getBoolean(0x0002);
             UUID player =    (data.contains(0x0003)?data.getUUID(0x0003):null);
 

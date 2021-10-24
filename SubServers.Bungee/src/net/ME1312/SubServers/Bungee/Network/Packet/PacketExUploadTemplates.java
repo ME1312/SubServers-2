@@ -45,10 +45,10 @@ public class PacketExUploadTemplates implements PacketObjectIn<Integer>, PacketO
                 try {
                     File dir = new File(templatedir, name);
                     SubCreator.ServerTemplate template = Util.reflect(SubCreator.class.getDeclaredMethod("loadTemplate", String.class, boolean.class, boolean.class, String.class, File.class, ObjectMap.class, ObjectMap.class),
-                            ((ExternalHost) client.getHandler()).getCreator(), name, templates.getMap(name).getBoolean("enabled"), templates.getMap(name).getBoolean("internal"), templates.getMap(name).getRawString("icon"), dir,
+                            ((ExternalHost) client.getHandler()).getCreator(), name, templates.getMap(name).getBoolean("enabled"), templates.getMap(name).getBoolean("internal"), templates.getMap(name).getString("icon"), dir,
                             templates.getMap(name).getMap("build").clone(), templates.getMap(name).getMap("settings").clone());
                     map.put(name.toLowerCase(), template);
-                    if (!templates.getMap(name).getRawString("display").equals(name)) template.setDisplayName(templates.getMap(name).getRawString("display"));
+                    if (!templates.getMap(name).getString("display").equals(name)) template.setDisplayName(templates.getMap(name).getString("display"));
                 } catch (Exception e) {
                     Logger.getLogger("SubServers").severe("Couldn't load template: " + name);
                     e.printStackTrace();

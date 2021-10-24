@@ -88,7 +88,7 @@ public class RemotePlayer {
      * @return the player's username
      */
     public String getName() {
-        return raw.getRawString("name");
+        return raw.getString("name");
     }
 
     /**
@@ -97,7 +97,7 @@ public class RemotePlayer {
      * @return the remote address
      */
     public InetSocketAddress getAddress() {
-        return new InetSocketAddress(raw.getRawString("address").split(":")[0], Integer.parseInt(raw.getRawString("address").split(":")[1]));
+        return new InetSocketAddress(raw.getString("address").split(":")[0], Integer.parseInt(raw.getString("address").split(":")[1]));
     }
 
     /**
@@ -106,7 +106,7 @@ public class RemotePlayer {
      * @return the proxy this player is connected to
      */
     public String getProxyName() {
-        return raw.getRawString("proxy");
+        return raw.getString("proxy");
     }
 
     /**
@@ -127,8 +127,8 @@ public class RemotePlayer {
             }
         };
 
-        if (proxy == null || !proxy.getName().equalsIgnoreCase(raw.getRawString("proxy"))) {
-            ClientAPI.getInstance().getProxy(raw.getRawString("proxy"), proxy -> {
+        if (proxy == null || !proxy.getName().equalsIgnoreCase(raw.getString("proxy"))) {
+            ClientAPI.getInstance().getProxy(raw.getString("proxy"), proxy -> {
                 this.proxy = proxy;
                 run.run();
             });
@@ -143,7 +143,7 @@ public class RemotePlayer {
      * @return the server this player is connected to
      */
     public String getServerName() {
-        return raw.getRawString("server");
+        return raw.getString("server");
     }
 
     /**
@@ -164,8 +164,8 @@ public class RemotePlayer {
             }
         };
 
-        if (server == null || !server.getName().equalsIgnoreCase(raw.getRawString("server"))) {
-            ClientAPI.getInstance().getServer(raw.getRawString("server"), server -> {
+        if (server == null || !server.getName().equalsIgnoreCase(raw.getString("server"))) {
+            ClientAPI.getInstance().getServer(raw.getString("server"), server -> {
                 this.server = server;
                 run.run();
             });

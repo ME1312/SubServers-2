@@ -59,8 +59,8 @@ public class PacketLinkExHost implements InitialPacket, PacketObjectIn<Integer>,
     public void receive(SubDataClient client, ObjectMap<Integer> data) {
         try {
             Map<String, Host> hosts = plugin.api.getHosts();
-            if (hosts.keySet().contains(data.getRawString(0x0000).toLowerCase())) {
-                Host host = hosts.get(data.getRawString(0x0000).toLowerCase());
+            if (hosts.keySet().contains(data.getString(0x0000).toLowerCase())) {
+                Host host = hosts.get(data.getString(0x0000).toLowerCase());
                 if (host instanceof ExternalHost) {
                     Integer channel = data.getInt(0x0001);
                     HashMap<Integer, SubDataClient> subdata = Try.all.get(() -> Util.reflect(ExternalHost.class.getDeclaredField("subdata"), host));
@@ -76,7 +76,7 @@ public class PacketLinkExHost implements InitialPacket, PacketObjectIn<Integer>,
                     client.sendPacket(new PacketLinkExHost(4, "That host does not support a network interface"));
                 }
             } else {
-                client.sendPacket(new PacketLinkExHost(2, "There is no host with name: " + data.getRawString(0x0000)));
+                client.sendPacket(new PacketLinkExHost(2, "There is no host with name: " + data.getString(0x0000)));
             }
         } catch (Throwable e) {
             client.sendPacket(new PacketLinkExHost(1, null));

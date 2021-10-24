@@ -113,14 +113,14 @@ public final class SubPlugin {
             subprotocol.registerCipher("DHE-192", DHE.get(192));
             subprotocol.registerCipher("DHE-256", DHE.get(256));
             api.name = config.get().getMap("Settings").getMap("SubData").getString("Name", System.getenv("name"));
-            server_address = config.get().getMap("Settings").getRawString("Connect-Address", System.getenv("address"));
+            server_address = config.get().getMap("Settings").getString("Connect-Address", System.getenv("address"));
             Logger log = LoggerFactory.getLogger("SubData");
 
-            if (config.get().getMap("Settings").getMap("SubData").getRawString("Password", "").length() > 0) {
-                subprotocol.registerCipher("AES", new AES(128, config.get().getMap("Settings").getMap("SubData").getRawString("Password")));
-                subprotocol.registerCipher("AES-128", new AES(128, config.get().getMap("Settings").getMap("SubData").getRawString("Password")));
-                subprotocol.registerCipher("AES-192", new AES(192, config.get().getMap("Settings").getMap("SubData").getRawString("Password")));
-                subprotocol.registerCipher("AES-256", new AES(256, config.get().getMap("Settings").getMap("SubData").getRawString("Password")));
+            if (config.get().getMap("Settings").getMap("SubData").getString("Password", "").length() > 0) {
+                subprotocol.registerCipher("AES", new AES(128, config.get().getMap("Settings").getMap("SubData").getString("Password")));
+                subprotocol.registerCipher("AES-128", new AES(128, config.get().getMap("Settings").getMap("SubData").getString("Password")));
+                subprotocol.registerCipher("AES-192", new AES(192, config.get().getMap("Settings").getMap("SubData").getString("Password")));
+                subprotocol.registerCipher("AES-256", new AES(256, config.get().getMap("Settings").getMap("SubData").getString("Password")));
 
                 log.info("AES Encryption Available");
             }
@@ -135,7 +135,7 @@ public final class SubPlugin {
 
             reconnect = true;
             log.info(" ");
-            log.info("Connecting to /" + config.get().getMap("Settings").getMap("SubData").getRawString("Address", "127.0.0.1:4391"));
+            log.info("Connecting to /" + config.get().getMap("Settings").getMap("SubData").getString("Address", "127.0.0.1:4391"));
             connect(null);
 
             //gui = new InternalUIHandler(this);
@@ -200,8 +200,8 @@ public final class SubPlugin {
                 public void run() {
                     try {
                         if (reset == resetDate && (subdata.getOrDefault(0, null) == null || subdata.get(0).isClosed())) {
-                            SubDataClient open = subprotocol.open(InetAddress.getByName(config.get().getMap("Settings").getMap("SubData").getRawString("Address", "127.0.0.1:4391").split(":")[0]),
-                                    Integer.parseInt(config.get().getMap("Settings").getMap("SubData").getRawString("Address", "127.0.0.1:4391").split(":")[1]));
+                            SubDataClient open = subprotocol.open(InetAddress.getByName(config.get().getMap("Settings").getMap("SubData").getString("Address", "127.0.0.1:4391").split(":")[0]),
+                                    Integer.parseInt(config.get().getMap("Settings").getMap("SubData").getString("Address", "127.0.0.1:4391").split(":")[1]));
 
                             if (subdata.getOrDefault(0, null) != null) subdata.get(0).reconnect(open);
                             subdata.put(0, open);

@@ -81,7 +81,7 @@ public class PacketExControlServer implements PacketObjectIn<Integer>, PacketObj
     @Override
     public void receive(SubDataSender client, ObjectMap<Integer> data) {
         try {
-            SubServerImpl server = host.servers.get(data.getRawString(0x0000).toLowerCase());
+            SubServerImpl server = host.servers.get(data.getString(0x0000).toLowerCase());
             switch (data.getInt(0x0001)) {
                 case 0:
                     server.setEnabled(data.getList(0x0002).get(0).asBoolean());
@@ -90,7 +90,7 @@ public class PacketExControlServer implements PacketObjectIn<Integer>, PacketObj
                     server.start(data.getList(0x0002).get(0).asUUID());
                     break;
                 case 2:
-                    server.command(data.getList(0x0002).get(0).asRawString());
+                    server.command(data.getList(0x0002).get(0).asString());
                     break;
                 case 3:
                     server.stop();
@@ -105,7 +105,7 @@ public class PacketExControlServer implements PacketObjectIn<Integer>, PacketObj
                     Util.reflect(SubLoggerImpl.class.getDeclaredField("address"), server.getLogger(), data.getList(0x0002).get(0).asUUID());
                     break;
                 case 7:
-                    server.setStopCommand(data.getList(0x0002).get(0).asRawString());
+                    server.setStopCommand(data.getList(0x0002).get(0).asString());
                     break;
             }
         } catch (Exception e) {

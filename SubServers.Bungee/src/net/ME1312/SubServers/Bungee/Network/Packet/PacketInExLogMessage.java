@@ -26,7 +26,7 @@ public class PacketInExLogMessage implements PacketObjectIn<Integer> {
             if (data.contains(0x0000)) {
                 if (data.contains(0x0002) && data.contains(0x0001)) {
                     if (loggers.containsKey(data.getUUID(0x0000))) {
-                        Util.reflect(ExternalSubLogger.class.getDeclaredMethod("log", int.class, String.class), loggers.get(data.getUUID(0x0000)), data.getInt(0x0001), data.getRawString(0x0002));
+                        Util.reflect(ExternalSubLogger.class.getDeclaredMethod("log", int.class, String.class), loggers.get(data.getUUID(0x0000)), data.getInt(0x0001), data.getString(0x0002));
                     }
                 } else {
                     unregister(data.getUUID(0x0000));

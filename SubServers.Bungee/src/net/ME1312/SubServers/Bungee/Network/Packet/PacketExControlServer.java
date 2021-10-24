@@ -89,7 +89,7 @@ public class PacketExControlServer implements PacketObjectIn<Integer>, PacketObj
     @Override
     public void receive(SubDataClient client, ObjectMap<Integer> data) {
         try {
-            ExternalSubServer server = (ExternalSubServer) plugin.api.getSubServer(data.getRawString(0x0000));
+            ExternalSubServer server = (ExternalSubServer) plugin.api.getSubServer(data.getString(0x0000));
             switch (data.getInt(0x0001)) {
                 case 1:
                     Util.reflect(ExternalSubServer.class.getDeclaredMethod("falsestart"), server);

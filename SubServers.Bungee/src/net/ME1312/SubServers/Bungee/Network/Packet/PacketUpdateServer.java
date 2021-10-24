@@ -53,8 +53,8 @@ public class PacketUpdateServer implements PacketObjectIn<Integer>, PacketObject
     public void receive(SubDataClient client, ObjectMap<Integer> data) {
         UUID tracker =        (data.contains(0x0000)?data.getUUID(0x0000):null);
         try {
-            String name =  data.getRawString(0x0001);
-            String template = (data.contains(0x0002)?data.getRawString(0x0002):null);
+            String name =  data.getString(0x0001);
+            String template = (data.contains(0x0002)?data.getString(0x0002):null);
             Version version = (data.contains(0x0003)?data.getVersion(0x0003):null);
             UUID player =     (data.contains(0x0004)?data.getUUID(0x0004):null);
             boolean waitfor = (data.contains(0x0005)?data.getBoolean(0x0005):false);

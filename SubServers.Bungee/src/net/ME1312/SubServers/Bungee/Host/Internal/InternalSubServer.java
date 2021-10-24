@@ -320,7 +320,7 @@ public class InternalSubServer extends SubServerImpl {
                         switch (key.toLowerCase()) {
                             case "name":
                                 if (value.isString() && host.removeSubServer(player, getName())) {
-                                    SubServer server = host.constructSubServer(value.asRawString(), isEnabled(), getAddress().getPort(), getMotd(), isLogging(), getPath(), getExecutable(), getStopCommand(), isHidden(), isRestricted());
+                                    SubServer server = host.constructSubServer(value.asString(), isEnabled(), getAddress().getPort(), getMotd(), isLogging(), getPath(), getExecutable(), getStopCommand(), isHidden(), isRestricted());
                                     if (server != null) {
                                         if (perma && this.host.plugin.servers.get().getMap("Servers").getKeys().contains(getName())) {
                                             ObjectMap<String> config = this.host.plugin.servers.get().getMap("Servers").getMap(getName());
@@ -335,7 +335,7 @@ public class InternalSubServer extends SubServerImpl {
                                 break;
                             case "display":
                                 if (value.isString()) {
-                                    setDisplayName(value.asRawString());
+                                    setDisplayName(value.asString());
                                     logger.name = getDisplayName();
                                     if (perma && this.host.plugin.servers.get().getMap("Servers").getKeys().contains(getName())) {
                                         if (getName().equals(getDisplayName())) {
@@ -360,9 +360,9 @@ public class InternalSubServer extends SubServerImpl {
                                 break;
                             case "group":
                                 if (value.isList()) {
-                                    Util.reflect(ServerImpl.class.getDeclaredField("groups"), this, value.asRawStringList());
+                                    Util.reflect(ServerImpl.class.getDeclaredField("groups"), this, value.asStringList());
                                     if (perma && this.host.plugin.servers.get().getMap("Servers").getKeys().contains(getName())) {
-                                        this.host.plugin.servers.get().getMap("Servers").getMap(getName()).set("Group", value.asRawStringList());
+                                        this.host.plugin.servers.get().getMap("Servers").getMap(getName()).set("Group", value.asStringList());
                                         this.host.plugin.servers.save();
                                     }
                                     c++;
@@ -370,7 +370,7 @@ public class InternalSubServer extends SubServerImpl {
                                 break;
                             case "host":
                                 if (value.isString() && host.removeSubServer(player, getName())) {
-                                    SubServer server = this.host.plugin.api.getHost(value.asRawString()).constructSubServer(getName(), isEnabled(), getAddress().getPort(), getMotd(), isLogging(), getPath(), getExecutable(), getStopCommand(), isHidden(), isRestricted());
+                                    SubServer server = this.host.plugin.api.getHost(value.asString()).constructSubServer(getName(), isEnabled(), getAddress().getPort(), getMotd(), isLogging(), getPath(), getExecutable(), getStopCommand(), isHidden(), isRestricted());
                                     if (server != null) {
                                         if (perma && this.host.plugin.servers.get().getMap("Servers").getKeys().contains(getName())) {
                                             this.host.plugin.servers.get().getMap("Servers").getMap(getName()).set("Host", server.getHost().getName());
@@ -383,9 +383,9 @@ public class InternalSubServer extends SubServerImpl {
                                 break;
                             case "template":
                                 if (value.isString()) {
-                                    setTemplate(value.asRawString());
+                                    setTemplate(value.asString());
                                     if (perma && this.host.plugin.servers.get().getMap("Servers").getKeys().contains(getName())) {
-                                        this.host.plugin.servers.get().getMap("Servers").getMap(getName()).set("Template", value.asRawString());
+                                        this.host.plugin.servers.get().getMap("Servers").getMap(getName()).set("Template", value.asString());
                                         this.host.plugin.servers.save();
                                     }
                                     c++;
@@ -406,7 +406,7 @@ public class InternalSubServer extends SubServerImpl {
                                 break;
                             case "motd":
                                 if (value.isString()) {
-                                    setMotd(ChatColor.translateAlternateColorCodes('&', value.asString()));
+                                    setMotd(ChatColor.translateAlternateColorCodes('&', Util.unescapeJavaString(value.asString())));
                                     if (perma && this.host.plugin.servers.get().getMap("Servers").getKeys().contains(getName())) {
                                         this.host.plugin.servers.get().getMap("Servers").getMap(getName()).set("Motd", value.asString());
                                         this.host.plugin.servers.save();
@@ -431,8 +431,8 @@ public class InternalSubServer extends SubServerImpl {
                                         stop(player);
                                         waitFor();
                                     }
-                                    dir = value.asRawString();
-                                    directory = new File(getHost().getPath(), value.asRawString());
+                                    dir = value.asString();
+                                    directory = new File(getHost().getPath(), value.asString());
                                     if (perma && this.host.plugin.servers.get().getMap("Servers").getKeys().contains(getName())) {
                                         this.host.plugin.servers.get().getMap("Servers").getMap(getName()).set("Directory", getPath());
                                         this.host.plugin.servers.save();
@@ -447,9 +447,9 @@ public class InternalSubServer extends SubServerImpl {
                                         stop(player);
                                         waitFor();
                                     }
-                                    executable = value.asRawString();
+                                    executable = value.asString();
                                     if (perma && this.host.plugin.servers.get().getMap("Servers").getKeys().contains(getName())) {
-                                        this.host.plugin.servers.get().getMap("Servers").getMap(getName()).set("Executable", value.asRawString());
+                                        this.host.plugin.servers.get().getMap("Servers").getMap(getName()).set("Executable", value.asString());
                                         this.host.plugin.servers.save();
                                     }
                                     c++;
@@ -458,7 +458,7 @@ public class InternalSubServer extends SubServerImpl {
                             case "stop-cmd":
                             case "stop-command":
                                 if (value.isString()) {
-                                    stopcmd = value.asRawString();
+                                    stopcmd = value.asString();
                                     if (perma && this.host.plugin.servers.get().getMap("Servers").getKeys().contains(getName())) {
                                         this.host.plugin.servers.get().getMap("Servers").getMap(getName()).set("Stop-Command", getStopCommand());
                                         this.host.plugin.servers.save();
@@ -468,7 +468,7 @@ public class InternalSubServer extends SubServerImpl {
                                 break;
                             case "stop-action":
                                 if (value.isString()) {
-                                    StopAction action = Try.all.get(() -> StopAction.valueOf(value.asRawString().toUpperCase().replace('-', '_').replace(' ', '_')));
+                                    StopAction action = Try.all.get(() -> StopAction.valueOf(value.asString().toUpperCase().replace('-', '_').replace(' ', '_')));
                                     if (action != null) {
                                         stopaction = action;
                                         if (perma && this.host.plugin.servers.get().getMap("Servers").getKeys().contains(getName())) {

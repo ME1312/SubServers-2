@@ -182,14 +182,14 @@ public final class ExHost {
             subprotocol.registerCipher("DHE-128", DHE.get(128));
             subprotocol.registerCipher("DHE-192", DHE.get(192));
             subprotocol.registerCipher("DHE-256", DHE.get(256));
-            api.name = config.get().getMap("Settings").getMap("SubData").getString("Name", null);
+            api.name = config.get().getMap("Settings").getMap("SubData").getString("Name");
             Logger log = new Logger("SubData");
 
-            if (config.get().getMap("Settings").getMap("SubData").getRawString("Password", "").length() > 0) {
-                subprotocol.registerCipher("AES", new AES(128, config.get().getMap("Settings").getMap("SubData").getRawString("Password")));
-                subprotocol.registerCipher("AES-128", new AES(128, config.get().getMap("Settings").getMap("SubData").getRawString("Password")));
-                subprotocol.registerCipher("AES-192", new AES(192, config.get().getMap("Settings").getMap("SubData").getRawString("Password")));
-                subprotocol.registerCipher("AES-256", new AES(256, config.get().getMap("Settings").getMap("SubData").getRawString("Password")));
+            if (config.get().getMap("Settings").getMap("SubData").getString("Password", "").length() > 0) {
+                subprotocol.registerCipher("AES", new AES(128, config.get().getMap("Settings").getMap("SubData").getString("Password")));
+                subprotocol.registerCipher("AES-128", new AES(128, config.get().getMap("Settings").getMap("SubData").getString("Password")));
+                subprotocol.registerCipher("AES-192", new AES(192, config.get().getMap("Settings").getMap("SubData").getString("Password")));
+                subprotocol.registerCipher("AES-256", new AES(256, config.get().getMap("Settings").getMap("SubData").getString("Password")));
 
                 log.info.println("AES Encryption Available");
             }
@@ -204,7 +204,7 @@ public final class ExHost {
 
             reconnect = true;
             log.info.println();
-            log.info.println("Connecting to /" + config.get().getMap("Settings").getMap("SubData").getRawString("Address", "127.0.0.1:4391"));
+            log.info.println("Connecting to /" + config.get().getMap("Settings").getMap("SubData").getString("Address", "127.0.0.1:4391"));
             connect(log.toPrimitive(), null);
 
             new Metrics(this);
@@ -274,8 +274,8 @@ public final class ExHost {
                 public void run() {
                     try {
                         if (reset == resetDate && (subdata.getOrDefault(0, null) == null || subdata.get(0).isClosed())) {
-                            SubDataClient open = subprotocol.open(InetAddress.getByName(config.get().getMap("Settings").getMap("SubData").getRawString("Address", "127.0.0.1:4391").split(":")[0]),
-                                    Integer.parseInt(config.get().getMap("Settings").getMap("SubData").getRawString("Address", "127.0.0.1:4391").split(":")[1]));
+                            SubDataClient open = subprotocol.open(InetAddress.getByName(config.get().getMap("Settings").getMap("SubData").getString("Address", "127.0.0.1:4391").split(":")[0]),
+                                    Integer.parseInt(config.get().getMap("Settings").getMap("SubData").getString("Address", "127.0.0.1:4391").split(":")[1]));
 
                             if (subdata.getOrDefault(0, null) != null) subdata.get(0).reconnect(open);
                             subdata.put(0, open);
