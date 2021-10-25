@@ -52,7 +52,7 @@ public class PacketExAddServer implements PacketObjectIn<Integer>, PacketObjectO
     @Override
     public ObjectMap<Integer> send(SubDataClient client) {
         ObjectMap<Integer> data = new ObjectMap<Integer>();
-        if (tracker != null) data.set(0x0000, tracker);
+        data.set(0x0000, tracker);
         data.set(0x0001, name);
         data.set(0x0002, enabled);
         data.set(0x0003, port);

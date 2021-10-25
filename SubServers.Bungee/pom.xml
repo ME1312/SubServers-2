@@ -34,7 +34,7 @@
         <dependency>
             <groupId>net.ME1312.SubData</groupId>
             <artifactId>Server</artifactId>
-            <version>21w44a</version>
+            <version>21w44b</version>
             <scope>compile</scope>
         </dependency>
         <dependency>

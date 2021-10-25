@@ -44,16 +44,12 @@ public class PacketExDeleteServer implements PacketObjectIn<Integer>, PacketObje
 
     @Override
     public ObjectMap<Integer> send(SubDataClient client) {
-        if (tracker == null) {
-            return null;
-        } else {
-            ObjectMap<Integer> data = new ObjectMap<Integer>();
-            data.set(0x0000, tracker);
-            data.set(0x0001, name);
-            data.set(0x0002, info);
-            if (recycle) data.set(0x0003, true);
-            return data;
-        }
+        ObjectMap<Integer> data = new ObjectMap<Integer>();
+        data.set(0x0000, tracker);
+        data.set(0x0001, name);
+        data.set(0x0002, info);
+        if (recycle) data.set(0x0003, true);
+        return data;
     }
 
     @Override
