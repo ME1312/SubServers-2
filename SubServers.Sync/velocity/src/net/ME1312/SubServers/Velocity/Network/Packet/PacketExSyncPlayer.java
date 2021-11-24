@@ -70,17 +70,17 @@ public class PacketExSyncPlayer implements PacketObjectIn<Integer>, PacketObject
                 }
             }
             if (data.getBoolean(0x0001) != Boolean.FALSE) {
-                if (data.contains(0x0002)) for (Map<String, Object> object : (List<Map<String, Object>>) data.getObjectList(0x0002)) {
-                    ServerData server = (object.getOrDefault("server", null) != null)?ExProxy.getInstance().getServer(object.get("server").toString()).map(RegisteredServer::getServerInfo).map(plugin::getData).orElse(null):null;
-                    CachedPlayer player = new CachedPlayer(new ObjectMap<>(object));
+                if (data.contains(0x0002)) for (ObjectMap<String> object : (List<ObjectMap<String>>) (List<?>) data.getMapList(0x0002)) {
+                    ServerData server = (object.contains("server"))?ExProxy.getInstance().getServer(object.getString("server")).map(RegisteredServer::getServerInfo).map(plugin::getData).orElse(null):null;
+                    CachedPlayer player = new CachedPlayer(object);
 
                     plugin.rPlayerLinkP.put(player.getUniqueId(), proxy);
                     plugin.rPlayers.put(player.getUniqueId(), player);
                     if (server != null) plugin.rPlayerLinkS.put(player.getUniqueId(), server);
                 }
             } else {
-                if (data.contains(0x0002)) for (Map<String, Object> object : (List<Map<String, Object>>) data.getObjectList(0x0002)) {
-                    UUID id = UUID.fromString(object.get("id").toString());
+                if (data.contains(0x0002)) for (ObjectMap<String> object : (List<ObjectMap<String>>) (List<?>) data.getMapList(0x0002)) {
+                    UUID id = object.getUUID("id");
 
                     // Don't accept removal requests when we're managing players
                     if ((!plugin.rPlayerLinkP.containsKey(id) || !plugin.rPlayerLinkP.get(id).equalsIgnoreCase(plugin.api.getName().toLowerCase()))) {

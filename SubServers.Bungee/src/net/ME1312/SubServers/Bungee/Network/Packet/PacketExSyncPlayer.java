@@ -76,10 +76,10 @@ public class PacketExSyncPlayer implements PacketObjectIn<Integer>, PacketObject
                     }
                 }
                 if (data.getBoolean(0x0001) != Boolean.FALSE) {
-                    if (data.contains(0x0002)) for (Map<String, Object> object : (List<Map<String, Object>>) data.getObjectList(0x0002)) {
-                        Server server = (object.getOrDefault("server", null) != null)?plugin.api.getServer(object.get("server").toString()):null;
-                        RemotePlayer player = new RemotePlayer(object.get("name").toString(), UUID.fromString(object.get("id").toString()), (Proxy) client.getHandler(), server,
-                                new InetSocketAddress(object.get("address").toString().split(":")[0], Integer.parseInt(object.get("address").toString().split(":")[1])));
+                    if (data.contains(0x0002)) for (ObjectMap<String> object : (List<ObjectMap<String>>) (List<?>) data.getMapList(0x0002)) {
+                        Server server = (object.contains("server"))?plugin.api.getServer(object.getString("server")):null;
+                        RemotePlayer player = new RemotePlayer(object.getString("name"), object.getUUID("id"), (Proxy) client.getHandler(), server,
+                                new InetSocketAddress(object.getString("address").split(":")[0], Integer.parseInt(object.getString("address").split(":")[1])));
 
                         forward.add(player);
                         plugin.rPlayerLinkP.put(player.getUniqueId(), (Proxy) client.getHandler());
@@ -87,8 +87,8 @@ public class PacketExSyncPlayer implements PacketObjectIn<Integer>, PacketObject
                         if (server != null) plugin.rPlayerLinkS.put(player.getUniqueId(), server);
                     }
                 } else {
-                    if (data.contains(0x0002)) for (Map<String, Object> object : (List<Map<String, Object>>) data.getObjectList(0x0002)) {
-                        UUID id = UUID.fromString(object.get("id").toString());
+                    if (data.contains(0x0002)) for (ObjectMap<String> object : (List<ObjectMap<String>>) (List<?>) data.getMapList(0x0002)) {
+                        UUID id = object.getUUID("id");
                         RemotePlayer player = plugin.rPlayers.get(id);
 
                         // Don't accept removal requests from non-managing proxies
