@@ -132,6 +132,7 @@ public class InternalSubLogger extends SubLogger {
                 }
             }
 
+            // Log to FILTER
             log(level, msg);
 
             // Log to FILE

@@ -141,7 +141,6 @@ public class SubLoggerImpl {
             }
         }
         Process process = this.process;
-        if (level == null) level = logger.info;
         if (out == null) (out = new Thread(() -> start(process.getInputStream(), false), SubAPI.getInstance().getAppInfo().getName() + "::Log_Spooler(" + name + ')')).start();
         if (err == null) (err = new Thread(() -> start(process.getErrorStream(), true), SubAPI.getInstance().getAppInfo().getName() + "::Error_Spooler(" + name + ')')).start();
     }
@@ -207,6 +206,8 @@ public class SubLoggerImpl {
                     default:
                         level = logger.info;
                 }
+            } else if (level == null) {
+                level = logger.info;
             }
 
             // Log to FILTER
