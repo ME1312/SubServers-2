@@ -141,6 +141,7 @@ public class SubLoggerImpl {
             }
         }
         Process process = this.process;
+        if (level == null) level = logger.info;
         if (out == null) (out = new Thread(() -> start(process.getInputStream(), false), SubAPI.getInstance().getAppInfo().getName() + "::Log_Spooler(" + name + ')')).start();
         if (err == null) (err = new Thread(() -> start(process.getErrorStream(), true), SubAPI.getInstance().getAppInfo().getName() + "::Error_Spooler(" + name + ')')).start();
     }
@@ -164,44 +165,48 @@ public class SubLoggerImpl {
         }
     }
 
-    private static final String PATTERN = "^((?:\\s*\\[?([0-9]{2}:[0-9]{2}:[0-9]{2})]?)?[\\s\\/\\\\\\|]*(?:\\[|\\[.*\\/)?(MESSAGE|MSG|" + Pattern.quote(Level.INFO.getLocalizedName()) + "|INFO|" + Pattern.quote(Level.WARNING.getLocalizedName()) + "|WARNING|WARN|ERROR|ERR|" + Pattern.quote(Level.SEVERE.getLocalizedName()) + "|SEVERE)\\]?:?(?:\\s*>)?\\s*)";
+    private LogStream level;
+    private static final String PATTERN = "^((?:\\s*\\[?([0-9]{2}:[0-9]{2}:[0-9]{2})]?)?[\\s\\/\\\\\\|]*(?:\\[|\\[.*\\/)?(MESSAGE|MSG|" + Pattern.quote(Level.INFO.getLocalizedName()) + "|INFO|" + Pattern.quote(Level.WARNING.getLocalizedName()) + "|WARNING|WARN|ERROR|ERR|" + Pattern.quote(Level.SEVERE.getLocalizedName()) + "|SEVERE)\\]?(?::|\\s*>)?\\s*)";
     private void log(String line) {
         if (!line.startsWith(">")) {
             String msg = line;
-            LogStream level;
 
             // REGEX Formatting
-            String type = "";
+            String type = null;
             Matcher matcher = Pattern.compile(PATTERN).matcher(msg.replaceAll("\u001B\\[[;\\d]*m", ""));
-            while (matcher.find()) {
+            if (matcher.find()) {
                 type = matcher.group(3).toUpperCase();
             }
 
             msg = msg.replaceAll(PATTERN, "");
 
             // Determine LOG LEVEL
-            if (type.equalsIgnoreCase(Level.WARNING.getLocalizedName())) {
-                level = logger.warn;
-            } else if (type.equalsIgnoreCase(Level.SEVERE.getLocalizedName())) {
-                level = logger.severe;
-            } else switch (type) {
-                case "WARNING":
-                case "WARN":
-                    level = logger.warn;
-                    break;
-                case "SEVERE":
-                    level = logger.severe;
-                    break;
-                case "ERROR":
-                case "ERR":
-                    level = logger.error;
-                    break;
-                case "MSG":
-                case "MESSAGE":
-                    level = logger.message;
-                    break;
-                default:
+            if (type != null) {
+                if (type.equalsIgnoreCase(Level.INFO.getLocalizedName())) {
                     level = logger.info;
+                } else if (type.equalsIgnoreCase(Level.WARNING.getLocalizedName())) {
+                    level = logger.warn;
+                } else if (type.equalsIgnoreCase(Level.SEVERE.getLocalizedName())) {
+                    level = logger.severe;
+                } else switch (type) {
+                    case "WARNING":
+                    case "WARN":
+                        level = logger.warn;
+                        break;
+                    case "SEVERE":
+                        level = logger.severe;
+                        break;
+                    case "ERROR":
+                    case "ERR":
+                        level = logger.error;
+                        break;
+                    case "MSG":
+                    case "MESSAGE":
+                        level = logger.message;
+                        break;
+                    default:
+                        level = logger.info;
+                }
             }
 
             // Log to FILTER
@@ -222,6 +227,8 @@ public class SubLoggerImpl {
         try {
             if (out != null) out.interrupt();
             if (err != null) err.interrupt();
+            level = null;
+
             if (started) {
                 started = false;
                 if (writer != null) {
