@@ -219,56 +219,6 @@ public class SubServer extends Server {
     }
 
     /**
-     * Commands the Server
-     *
-     * @param player Player who Commanded
-     * @param command Commmand to Send
-     * @param response Response Code
-     */
-    public void command(UUID player, String command, IntConsumer response) {
-        Util.nullpo(command, response);
-        StackTraceElement[] origin = new Exception().getStackTrace();
-        client().sendPacket(new PacketCommandServer(player, getName(), command, data -> {
-            try {
-                response.accept(data.getInt(0x0001));
-            } catch (Throwable e) {
-                Throwable ew = new InvocationTargetException(e);
-                ew.setStackTrace(origin);
-                ew.printStackTrace();
-            }
-        }));
-    }
-
-    /**
-     * Commands the Server
-     *
-     * @param command Commmand to Send
-     * @param response Response Code
-     */
-    public void command(String command, IntConsumer response) {
-        command(null, command, response);
-    }
-
-    /**
-     * Commands the Server
-     *
-     * @param player Player who Commanded
-     * @param command Command to Send
-     */
-    public void command(UUID player, String command) {
-        command(player, command, i -> {});
-    }
-
-    /**
-     * Commands the Server
-     *
-     * @param command Command to Send
-     */
-    public void command(String command) {
-        command(command, i -> {});
-    }
-
-    /**
      * Edits the Server
      *
      * @param player Player Editing

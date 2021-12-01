@@ -15,18 +15,22 @@ public class SubSendCommandEvent extends AbstractEvent implements SubEvent {
     private UUID player;
     private String server;
     private String command;
+    private UUID target;
 
     /**
      * Server Command Event
      *
-     * @param player Player Commanding Server
-     * @param server Server being Commanded
+     * @param player Player Commanding
+     * @param server Target Server
+     * @param command Command to Send
+     * @param target Player that will send
      */
-    public SubSendCommandEvent(UUID player, String server, String command) {
+    public SubSendCommandEvent(UUID player, String server, String command, UUID target) {
         Util.nullpo(server, command);
         this.player = player;
         this.server = server;
         this.command = command;
+        this.target = target;
     }
 
     /**
@@ -50,6 +54,15 @@ public class SubSendCommandEvent extends AbstractEvent implements SubEvent {
      */
     public String getCommand() {
         return command;
+    }
+
+    /**
+     * Gets the Player that will be forced to send the Command
+     *
+     * @return Target Player or null if Console
+     */
+    public UUID getTarget() {
+        return target;
     }
 
     /**

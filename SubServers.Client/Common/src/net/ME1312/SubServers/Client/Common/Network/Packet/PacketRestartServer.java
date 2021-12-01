@@ -45,7 +45,7 @@ public class PacketRestartServer implements PacketObjectIn<Integer>, PacketObjec
         ObjectMap<Integer> data = new ObjectMap<Integer>();
         data.set(0x0000, tracker);
         data.set(0x0001, server);
-        if (player != null) data.set(0x0002, player.toString());
+        if (player != null) data.set(0x0002, player);
         return data;
     }
 

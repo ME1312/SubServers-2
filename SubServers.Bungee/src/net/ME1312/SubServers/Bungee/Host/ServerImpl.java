@@ -5,15 +5,20 @@ import net.ME1312.Galaxi.Library.Map.ObjectMapValue;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.SubData.Server.DataClient;
 import net.ME1312.SubData.Server.SubDataClient;
+import net.ME1312.SubServers.Bungee.Event.SubSendCommandEvent;
+import net.ME1312.SubServers.Bungee.Host.SubServer.LoggedCommand;
 import net.ME1312.SubServers.Bungee.Library.Exception.InvalidServerException;
+import net.ME1312.SubServers.Bungee.Network.Packet.PacketExControlPlayer;
 import net.ME1312.SubServers.Bungee.Network.Packet.PacketOutExEditServer;
 import net.ME1312.SubServers.Bungee.Network.Packet.PacketOutExEditServer.Edit;
 import net.ME1312.SubServers.Bungee.SubAPI;
 
 import net.md_5.bungee.BungeeServerInfo;
 import net.md_5.bungee.api.CommandSender;
+import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
+import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.util.*;
@@ -171,6 +176,20 @@ public class ServerImpl extends BungeeServerInfo implements Server {
         Util.nullpo(value);
         groups.remove(value);
         Collections.sort(groups);
+    }
+
+    @Override
+    public boolean command(UUID player, UUID target, String command) {
+        Util.nullpo(command);
+        SubDataClient channel = (SubDataClient) getSubData()[0];
+        if (channel != null) {
+            SubSendCommandEvent event = new SubSendCommandEvent(player, this, command, target);
+            ProxyServer.getInstance().getPluginManager().callEvent(event);
+            if (!event.isCancelled() && (player == null || !SubServerImpl.DISALLOWED_COMMANDS.matcher(command).find())) {
+                channel.sendPacket(new PacketExControlPlayer(target, command));
+                return true;
+            } else return false;
+        } else return false;
     }
 
     @Override

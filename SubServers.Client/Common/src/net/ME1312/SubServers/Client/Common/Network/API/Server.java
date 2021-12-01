@@ -9,6 +9,7 @@ import net.ME1312.SubData.Client.DataSender;
 import net.ME1312.SubData.Client.Library.ForwardedDataSender;
 import net.ME1312.SubData.Client.SubDataClient;
 import net.ME1312.SubServers.Client.Common.ClientAPI;
+import net.ME1312.SubServers.Client.Common.Network.Packet.PacketCommandServer;
 import net.ME1312.SubServers.Client.Common.Network.Packet.PacketDownloadPlayerInfo;
 import net.ME1312.SubServers.Client.Common.Network.Packet.PacketDownloadServerInfo;
 
@@ -16,6 +17,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.InetSocketAddress;
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.function.IntConsumer;
 
 /**
  * Simplified Server Data Class
@@ -117,6 +119,79 @@ public class Server {
      */
     public List<String> getGroups() {
         return new LinkedList<String>(raw.getStringList("group"));
+    }
+
+    /**
+     * Commands the Server
+     *
+     * @param player Player who's Commanding
+     * @param target Player who will Send
+     * @param command Commmand to Send
+     * @param response Response Code
+     */
+    public void command(UUID player, UUID target, String command, IntConsumer response) {
+        Util.nullpo(command, response);
+        StackTraceElement[] origin = new Exception().getStackTrace();
+        client().sendPacket(new PacketCommandServer(player, target, getName(), command, data -> {
+            try {
+                response.accept(data.getInt(0x0001));
+            } catch (Throwable e) {
+                Throwable ew = new InvocationTargetException(e);
+                ew.setStackTrace(origin);
+                ew.printStackTrace();
+            }
+        }));
+    }
+
+    /**
+     * Commands the Server
+     *
+     * @param player Player who's Commanding
+     * @param command Commmand to Send
+     * @param response Response Code
+     */
+    public void command(UUID player, String command, IntConsumer response) {
+        command(player, null, command, response);
+    }
+
+    /**
+     * Commands the Server
+     *
+     * @param command Commmand to Send
+     * @param response Response Code
+     */
+    public void command(String command, IntConsumer response) {
+        command(null, command, response);
+    }
+
+    /**
+     * Commands the Server
+     *
+     * @param player Player who's Commanding
+     * @param target Player who's Commanding
+     * @param command Command to Send
+     */
+    public void command(UUID player, UUID target, String command) {
+        command(player, target, command, i -> {});
+    }
+
+    /**
+     * Commands the Server
+     *
+     * @param player Player who's Commanding
+     * @param command Command to Send
+     */
+    public void command(UUID player, String command) {
+        command(player, command, i -> {});
+    }
+
+    /**
+     * Commands the Server
+     *
+     * @param command Command to Send
+     */
+    public void command(String command) {
+        command(command, i -> {});
     }
 
     /**

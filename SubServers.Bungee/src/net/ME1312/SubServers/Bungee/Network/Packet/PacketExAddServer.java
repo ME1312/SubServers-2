@@ -60,7 +60,7 @@ public class PacketExAddServer implements PacketObjectIn<Integer>, PacketObjectO
         data.set(0x0005, directory);
         data.set(0x0006, executable);
         data.set(0x0007, stopcmd);
-        if (running != null) data.set(0x0008, running.toString());
+        if (running != null) data.set(0x0008, running);
         return data;
     }
 

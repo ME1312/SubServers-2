@@ -51,7 +51,7 @@ public class PacketDeleteServer implements PacketObjectIn<Integer>, PacketObject
         data.set(0x0001, server);
         data.set(0x0002, recycle);
         data.set(0x0003, force);
-        if (player != null) data.set(0x0004, player.toString());
+        if (player != null) data.set(0x0004, player);
         return data;
     }
 

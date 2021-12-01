@@ -309,7 +309,7 @@ public class ConfigUpdater {
             if (was.compareTo(new Version("19w22b")) <= 0) {
                 if (existing.contains("Lang")) {
                     updated.getMap("Lang").remove("Interface.Host-Admin.SubServers");
-                    updated.getMap("Lang").remove("Interface.SubServer-Admin.Command");
+                    updated.getMap("Lang").remove("Interface.Server-Admin.Command");
                 }
 
                 existing = updated.clone();
@@ -324,7 +324,7 @@ public class ConfigUpdater {
 
                 existing = updated.clone();
                 i++;
-            } if (was.compareTo(new Version("21w27b")) <= 0) {
+            } if (was.compareTo(new Version("21w49b")) <= 0) {
 
               //existing = updated.clone();
                 i++;
@@ -430,9 +430,10 @@ public class ConfigUpdater {
             def.put("Command.Terminate", "&aSubServers &2&l\\u00BB&a Terminated &2$int$&a subserver(s)");
             def.put("Command.Terminate.Disappeared", "&cSubServers &4&l\\u00BB&c Subserver &4$str$&c has disappeared");
             def.put("Command.Terminate.Not-Running", "&7SubServers &8&l\\u00BB&7 &f$int$&7 subserver(s) were already offline");
-            def.put("Command.Command", "&aSubServers &2&l\\u00BB&a Sent command to &2$int$&a subserver(s)");
+            def.put("Command.Command", "&aSubServers &2&l\\u00BB&a Sent command to &2$int$&a server(s)");
+            def.put("Command.Command.Disappeared", "&cSubServers &4&l\\u00BB&c Server &4$str$&c has disappeared");
             def.put("Command.Command.No-Command", "&cSubServers &4&l\\u00BB&c No command was entered");
-            def.put("Command.Command.Not-Running", "&7SubServers &8&l\\u00BB&7 &f$int$&7 subserver(s) were offline");
+            def.put("Command.Command.Not-Running", "&7SubServers &8&l\\u00BB&7 &f$int$&7 server(s) were unavailable");
             def.put("Command.Creator", "&aSubServers &2&l\\u00BB&a Creating subserver &2$str$&a");
             def.put("Command.Creator.Exists", "&cSubServers &4&l\\u00BB&c There is already a subserver with that name");
             def.put("Command.Creator.Unknown-Host", "&cSubServers &4&l\\u00BB&c There is no host with that name");
@@ -520,24 +521,23 @@ public class ConfigUpdater {
             def.put("Interface.Server-Menu.SubServer-Incompatible", "&4Incompatible with $str$");
             def.put("Interface.Server-Menu.SubServer-Unavailable", "&4Unavailable");
             def.put("Interface.Server-Menu.SubServer-Disabled", "&4Disabled");
-            def.put("Interface.Server-Menu.SubServer-Invalid", "&4Cannot be managed by SubServers");
             def.put("Interface.Server-Menu.No-Servers", "&c&oThere are No Servers");
             def.put("Interface.Server-Menu.Host-Menu", "&b&lView Hosts");
-            def.put("Interface.SubServer-Admin.Title", "SubServer/$str$");
-            def.put("Interface.SubServer-Admin.Start", "&aStart SubServer");
-            def.put("Interface.SubServer-Admin.Start.Title", "&aStarting SubServer");
-            def.put("Interface.SubServer-Admin.Stop", "&cStop SubServer");
-            def.put("Interface.SubServer-Admin.Stop.Title", "&cStopping $str$");
-            def.put("Interface.SubServer-Admin.Terminate", "&4Terminate SubServer");
-            def.put("Interface.SubServer-Admin.Terminate.Title", "&cTerminating $str$");
-            def.put("Interface.SubServer-Admin.Command", "&bSend a Command to the SubServer");
-            def.put("Interface.SubServer-Admin.Command.Title", "&eSubServers\\n&6Enter a Command to send via Chat");
-            def.put("Interface.SubServer-Admin.Command.Message", "&eSubServers &6&l\\u00BB&e Enter a Command to send via Chat");
-            def.put("Interface.SubServer-Admin.Update", "&eUpdate SubServer");
-            def.put("Interface.SubServer-Admin.Update.Title", "&eSubServers\\n&6Enter a Server Version to update to");
-            def.put("Interface.SubServer-Admin.Update.Message", "&eSubServers &6&l\\u00BB&e Enter a Server Version to update to via Chat");
-            def.put("Interface.SubServer-Admin.Plugins", "&bPlugins...");
-            def.put("Interface.SubServer-Plugin.Title", "SubServer/$str$/Plugins");
+            def.put("Interface.Server-Admin.Title", "Server/$str$");
+            def.put("Interface.Server-Admin.Start", "&aStart SubServer");
+            def.put("Interface.Server-Admin.Start.Title", "&aStarting SubServer");
+            def.put("Interface.Server-Admin.Stop", "&cStop SubServer");
+            def.put("Interface.Server-Admin.Stop.Title", "&cStopping $str$");
+            def.put("Interface.Server-Admin.Terminate", "&4Terminate SubServer");
+            def.put("Interface.Server-Admin.Terminate.Title", "&cTerminating $str$");
+            def.put("Interface.Server-Admin.Command", "&bSend a Command to the Server");
+            def.put("Interface.Server-Admin.Command.Title", "&eSubServers\\n&6Enter a Command to send via Chat");
+            def.put("Interface.Server-Admin.Command.Message", "&eSubServers &6&l\\u00BB&e Enter a Command to send via Chat");
+            def.put("Interface.Server-Admin.Update", "&eUpdate SubServer");
+            def.put("Interface.Server-Admin.Update.Title", "&eSubServers\\n&6Enter a Server Version to update to");
+            def.put("Interface.Server-Admin.Update.Message", "&eSubServers &6&l\\u00BB&e Enter a Server Version to update to via Chat");
+            def.put("Interface.Server-Admin.Plugins", "&bPlugins...");
+            def.put("Interface.SubServer-Plugin.Title", "Server/$str$/Plugins");
             def.put("Interface.SubServer-Plugin.No-Plugins", "&c&oThere are No Plugins Available");
 
             YAMLSection lang = new YAMLSection();

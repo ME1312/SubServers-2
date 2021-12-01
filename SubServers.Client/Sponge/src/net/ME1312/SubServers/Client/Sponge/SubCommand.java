@@ -255,7 +255,7 @@ public final class SubCommand implements CommandExecutor {
                                 Text.Builder message = Text.builder(server.getDisplayName());
                                 Text.Builder hover = Text.builder(server.getDisplayName() + '\n');
                                 if (server instanceof SubServer) {
-                                    message.onClick(TextActions.runCommand("/subservers open SubServer/ " + server.getName()));
+                                    message.onClick(TextActions.runCommand("/subservers open Server/ " + server.getName()));
                                     if (((SubServer) server).isRunning()) {
                                         message.color(TextColors.GREEN);
                                         hover.color(TextColors.GREEN);
@@ -302,7 +302,7 @@ public final class SubCommand implements CommandExecutor {
                                     } else {
                                         hover.append(Text.builder("\n" + server.getAddress().getPort()).color(TextColors.WHITE).build());
                                     }
-                                    message.onClick(TextActions.runCommand("/subservers open SubServer/ " + server.getName()));
+                                    message.onClick(TextActions.runCommand("/subservers open Server/ " + server.getName()));
                                 } else {
                                     message.color(TextColors.WHITE);
                                     hover.color(TextColors.WHITE);
@@ -404,7 +404,7 @@ public final class SubCommand implements CommandExecutor {
                             } else {
                                 hover.append(Text.builder("\n" + subserver.getAddress().getPort()).color(TextColors.WHITE).build());
                             }
-                            message.onClick(TextActions.runCommand("/subservers open SubServer/ " + subserver.getName()));
+                            message.onClick(TextActions.runCommand("/subservers open Server/ " + subserver.getName()));
                             message.onHover(TextActions.showText(hover.build()));
                             if (i != 0) msg.append(div);
                             msg.append(message.build());
@@ -434,6 +434,7 @@ public final class SubCommand implements CommandExecutor {
                         } else {
                             hover.append(Text.builder("\n" + server.getAddress().getPort()).color(TextColors.WHITE).build());
                         }
+                        message.onClick(TextActions.runCommand("/subservers open Server/ " + server.getName()));
                         message.onHover(TextActions.showText(hover.build()));
                         if (i != 0) msg.append(div);
                         msg.append(message.build());
@@ -955,8 +956,8 @@ public final class SubCommand implements CommandExecutor {
                 Optional<String[]> s = args.getOne(Text.of("Subservers"));
                 Optional<String> command = args.getOne(Text.of("Command"));
                 if (s.isPresent()) {
-                    selectServers(sender, s.get(), true, new String[]{"subservers.subserver.%.*", "subservers.subserver.%.command"}, select -> {
-                        if (select.subservers.length > 0) {
+                    selectServers(sender, s.get(), false, new String[]{"subservers.subserver.%.*", "subservers.subserver.%.command"}, select -> {
+                        if (select.servers.length > 0) {
                             if (command.isPresent()) {
                                 Container<Integer> success = new Container<Integer>(0);
                                 Container<Integer> running = new Container<Integer>(0);
@@ -964,7 +965,7 @@ public final class SubCommand implements CommandExecutor {
                                     if (running.value > 0) sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", "Command.Command.Not-Running").replace("$int$", running.value.toString())));
                                     if (success.value > 0) sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", "Command.Command").replace("$int$", success.value.toString())));
                                 });
-                                for (SubServer server : select.subservers) {
+                                for (Server server : select.servers) {
                                     merge.reserve();
                                     server.command((sender instanceof Player)?((Player) sender).getUniqueId():null, command.get(), response -> {
                                         switch (response) {
@@ -989,7 +990,7 @@ public final class SubCommand implements CommandExecutor {
                     });
                     return CommandResult.builder().successCount(1).build();
                 } else {
-                    sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Generic.Usage").replace("$str$", "/sub command <Subservers> <Command> [Args...]")));
+                    sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Generic.Usage").replace("$str$", "/sub command <Servers> <Command> [Args...]")));
                     return CommandResult.builder().successCount(0).build();
                 }
             } else {
@@ -1308,12 +1309,14 @@ public final class SubCommand implements CommandExecutor {
                                     else if (menuopts.length > 0) plugin.gui.getRenderer((Player) sender).serverMenu(Integer.parseInt(menuopts[0]), null, null);
                                     else plugin.gui.getRenderer((Player) sender).serverMenu(1, null, null);
                                     break;
+                                case "server/":
                                 case "subserver/":
-                                    plugin.gui.getRenderer((Player) sender).subserverAdmin(menuopts[0]);
+                                    plugin.gui.getRenderer((Player) sender).serverAdmin(menuopts[0]);
                                     break;
+                                case "server/plugin":
                                 case "subserver/plugin":
-                                    if (menuopts.length > 1) plugin.gui.getRenderer((Player) sender).subserverPlugin(Integer.parseInt(menuopts[1]), menuopts[0]);
-                                    else plugin.gui.getRenderer((Player) sender).subserverPlugin(1, menuopts[0]);
+                                    if (menuopts.length > 1) plugin.gui.getRenderer((Player) sender).serverPlugin(Integer.parseInt(menuopts[1]), menuopts[0]);
+                                    else plugin.gui.getRenderer((Player) sender).serverPlugin(1, menuopts[0]);
                                     break;
                             }
                             return CommandResult.builder().successCount(1).build();
@@ -1548,7 +1551,7 @@ public final class SubCommand implements CommandExecutor {
                 ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Help.SubServer.Restart").replace("$str$", "/sub restart <Subservers>")),
                 ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Help.SubServer.Stop").replace("$str$", "/sub stop <Subservers>")),
                 ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Help.SubServer.Terminate").replace("$str$", "/sub kill <Subservers>")),
-                ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Help.SubServer.Command").replace("$str$", "/sub cmd <Subservers> <Command> [Args...]")),
+                ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Help.SubServer.Command").replace("$str$", "/sub cmd <Servers> <Command> [Args...]")),
                 ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Help.Host.Create").replace("$str$", "/sub create <Name> <Host> <Template> [Version] [Port]")),
                 ChatColor.convertColor(plugin.api.getLang("SubServers","Command.Help.SubServer.Update").replace("$str$", "/sub update <Subservers> [[Template] <Version>]")),
         };

@@ -51,27 +51,28 @@ public class PacketCommandServer implements PacketObjectIn<Integer>, PacketObjec
 
     @Override
     public void receive(SubDataClient client, ObjectMap<Integer> data) {
-        UUID tracker =      (data.contains(0x0000)?data.getUUID(0x0000):null);
+        UUID tracker =       (data.contains(0x0000)?data.getUUID(0x0000):null);
         try {
             String server =  data.getString(0x0001);
             String command = data.getString(0x0002);
-            UUID player =       (data.contains(0x0003)?data.getUUID(0x0003):null);
+            UUID player =    (data.contains(0x0003)?data.getUUID(0x0003):null);
+            UUID target =    (data.contains(0x0004)?data.getUUID(0x0004):null);
 
             Map<String, Server> servers = plugin.api.getServers();
             if (!server.equals("*") && !servers.keySet().contains(server.toLowerCase())) {
                 client.sendPacket(new PacketCommandServer(3, tracker));
-            } else if (!server.equals("*") && !(servers.get(server.toLowerCase()) instanceof SubServer)) {
+            } else if (!server.equals("*") && !(target == null && servers.get(server.toLowerCase()) instanceof SubServer) && servers.get(server.toLowerCase()).getSubData()[0] == null) {
                 client.sendPacket(new PacketCommandServer(4, tracker));
-            } else if (!server.equals("*") && !((SubServer) servers.get(server.toLowerCase())).isRunning()) {
+            } else if (!server.equals("*") && servers.get(server.toLowerCase()) instanceof SubServer && !((SubServer) servers.get(server.toLowerCase())).isRunning()) {
                 client.sendPacket(new PacketCommandServer(5, tracker));
             } else {
                 if (server.equals("*")) {
                     boolean sent = false;
                     for (Server next : servers.values()) {
-                        if (next instanceof SubServer && ((SubServer) next).isRunning()) {
-                            if (((SubServer) next).command(player, command)) {
-                                sent = true;
-                            }
+                        if (target == null) {
+                            sent |= next.command(player, command);
+                        } else {
+                            sent |= next.command(player, target, command);
                         }
                     }
                     if (sent) {
@@ -80,10 +81,10 @@ public class PacketCommandServer implements PacketObjectIn<Integer>, PacketObjec
                         client.sendPacket(new PacketCommandServer(1, tracker));
                     }
                 } else {
-                    if (((SubServer) servers.get(server.toLowerCase())).command(player, command)) {
-                        client.sendPacket(new PacketCommandServer(0, tracker));
+                    if (target == null) {
+                        client.sendPacket(new PacketCommandServer((servers.get(server.toLowerCase()).command(player, command))? 0 : 1, tracker));
                     } else {
-                        client.sendPacket(new PacketCommandServer(1, tracker));
+                        client.sendPacket(new PacketCommandServer((servers.get(server.toLowerCase()).command(player, target, command))? 0 : 1, tracker));
                     }
                 }
             }

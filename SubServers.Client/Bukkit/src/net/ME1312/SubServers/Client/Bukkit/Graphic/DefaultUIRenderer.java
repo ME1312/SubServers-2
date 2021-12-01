@@ -18,6 +18,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import java.text.DecimalFormat;
 import java.util.*;
+import java.util.function.BiConsumer;
 
 import static net.ME1312.SubServers.Client.Bukkit.Library.ObjectPermission.permits;
 
@@ -290,7 +291,7 @@ public class DefaultUIRenderer extends UIRenderer {
                 inv.setItem(15, block);
                 inv.setItem(16, block);
 
-                if (!host.isAvailable() || !host.isEnabled() || hostPlugins.size() <= 0) {
+                if (hostPlugins.size() <= 0) {
                     block = div;
                 } else {
                     block = color(11);
@@ -595,7 +596,7 @@ public class DefaultUIRenderer extends UIRenderer {
                 lastVisitedObjects[0] = host;
                 lastPage = page;
                 List<String> renderers = new LinkedList<String>();
-                for (String renderer : renderers) {
+                for (String renderer : hostPlugins.keySet()) {
                     if (hostPlugins.get(renderer).isEnabled(host)) renderers.add(renderer);
                 }
                 Collections.sort(renderers);
@@ -881,7 +882,6 @@ public class DefaultUIRenderer extends UIRenderer {
                             lore.add(ChatColor.GRAY + server.getName());
                         lore.add(plugin.api.getLang("SubServers", "Interface.Server-Menu.Server-External"));
                         lore.add(plugin.api.getLang("SubServers", "Interface.Server-Menu.Server-Player-Count").replace("$int$", new DecimalFormat("#,###").format(server.getRemotePlayers().size())));
-                        lore.add(plugin.api.getLang("SubServers", "Interface.Server-Menu.SubServer-Invalid"));
                         lore.add(ChatColor.WHITE + ((plugin.config.get().getMap("Settings").getBoolean("Show-Addresses", false))?server.getAddress().getAddress().getHostAddress()+':':"") + server.getAddress().getPort());
                         blockMeta.setLore(lore);
                     } else if (((SubServer) server).isRunning()) {
@@ -1016,229 +1016,250 @@ public class DefaultUIRenderer extends UIRenderer {
         }
     }
 
-    public void subserverAdmin(final String name) {
-        setDownloading(ChatColor.stripColor(plugin.api.getLang("SubServers", "Interface.SubServer-Admin.Title").replace("$str$", name)));
-        plugin.api.getSubServer(name, subserver -> {
-            windowHistory.add(() -> subserverAdmin(name));
-            if (subserver == null) {
-                if (hasHistory()) back();
-            } else subserver.getHost(host -> {
-                if (host == null) {
-                    if (hasHistory()) back();
+    public void serverAdmin(final String name) {
+        setDownloading(ChatColor.stripColor(plugin.api.getLang("SubServers", "Interface.Server-Admin.Title").replace("$str$", name)));
+        BiConsumer<Server, Host> renderer = (server, host) -> {
+            setDownloading(null);
+            lastVisitedObjects[0] = server;
+            ItemStack block;
+            ItemMeta blockMeta;
+            ItemStack div = color(15);
+            ItemMeta divMeta = div.getItemMeta();
+            divMeta.setDisplayName(ChatColor.RESET.toString());
+            div.setItemMeta(divMeta);
+
+            Inventory inv = Bukkit.createInventory(null, 36, plugin.api.getLang("SubServers", "Interface.Server-Admin.Title").replace("$str$", server.getDisplayName()));
+            SubServer subserver = (host != null)? (SubServer) server : null;
+
+            int i = 0;
+            while (i < inv.getSize()) {
+                inv.setItem(i, div);
+                i++;
+            }
+            i = 0;
+
+            Player player = Bukkit.getPlayer(this.player);
+            if (host == null || ((SubServer) server).isRunning()) {
+                if (host == null || !permits(server, player, "subservers.subserver.%.*", "subservers.subserver.%.terminate")) {
+                    block = color(7);
+                    blockMeta = block.getItemMeta();
+                    blockMeta.setDisplayName(ChatColor.GRAY+ChatColor.stripColor(plugin.api.getLang("SubServers", "Interface.Server-Admin.Terminate")));
+                    if (host != null) blockMeta.setLore(Arrays.asList(plugin.api.getLang("SubServers", "Interface.Generic.Invalid-Permission").replace("$str$", "subservers.subserver.terminate." + name.toLowerCase())));
                 } else {
-                    setDownloading(null);
-                    lastVisitedObjects[0] = subserver;
-                    ItemStack block;
-                    ItemMeta blockMeta;
-                    ItemStack div = color(15);
-                    ItemMeta divMeta = div.getItemMeta();
-                    divMeta.setDisplayName(ChatColor.RESET.toString());
-                    div.setItemMeta(divMeta);
+                    block = color(14);
+                    blockMeta = block.getItemMeta();
+                    blockMeta.setDisplayName(plugin.api.getLang("SubServers", "Interface.Server-Admin.Terminate"));
+                }
 
-                    Inventory inv = Bukkit.createInventory(null, 36, plugin.api.getLang("SubServers", "Interface.SubServer-Admin.Title").replace("$str$", subserver.getDisplayName()));
+                block.setItemMeta(blockMeta);
+                inv.setItem(1, block);
+                inv.setItem(10, block);
 
-                    int i = 0;
-                    while (i < inv.getSize()) {
-                        inv.setItem(i, div);
-                        i++;
-                    }
-                    i = 0;
+                if (host == null || !permits(server, player, "subservers.subserver.%.*", "subservers.subserver.%.stop")) {
+                    block = color(7);
+                    blockMeta = block.getItemMeta();
+                    blockMeta.setDisplayName(ChatColor.GRAY+ChatColor.stripColor(plugin.api.getLang("SubServers", "Interface.Server-Admin.Stop")));
+                    if (host != null) blockMeta.setLore(Arrays.asList(plugin.api.getLang("SubServers", "Interface.Generic.Invalid-Permission").replace("$str$", "subservers.subserver.stop." + name.toLowerCase())));
+                } else {
+                    block = color(2);
+                    blockMeta = block.getItemMeta();
+                    blockMeta.setDisplayName(plugin.api.getLang("SubServers", "Interface.Server-Admin.Stop"));
+                }
+                block.setItemMeta(blockMeta);
+                inv.setItem(2, block);
+                inv.setItem(3, block);
+                inv.setItem(11, block);
+                inv.setItem(12, block);
 
-                    Player player = Bukkit.getPlayer(this.player);
-                    if (subserver.isRunning()) {
-                        if (!permits(subserver, player, "subservers.subserver.%.*", "subservers.subserver.%.terminate")) {
-                            block = color(7);
-                            blockMeta = block.getItemMeta();
-                            blockMeta.setDisplayName(ChatColor.GRAY+ChatColor.stripColor(plugin.api.getLang("SubServers", "Interface.SubServer-Admin.Terminate")));
-                            blockMeta.setLore(Arrays.asList(plugin.api.getLang("SubServers", "Interface.Generic.Invalid-Permission").replace("$str$", "subservers.subserver.terminate." + name.toLowerCase())));
-                        } else {
-                            block = color(14);
-                            blockMeta = block.getItemMeta();
-                            blockMeta.setDisplayName(plugin.api.getLang("SubServers", "Interface.SubServer-Admin.Terminate"));
-                        }
+                if ((host == null && server.getSubData()[0] == null) || !permits(server, player, "subservers.subserver.%.*", "subservers.subserver.%.command")) {
+                    block = color(7);
+                    blockMeta = block.getItemMeta();
+                    blockMeta.setDisplayName(ChatColor.GRAY+ChatColor.stripColor(plugin.api.getLang("SubServers", "Interface.Server-Admin.Command")));
+                    if (host != null) blockMeta.setLore(Arrays.asList(plugin.api.getLang("SubServers", "Interface.Generic.Invalid-Permission").replace("$str$", "subservers.subserver.command." + name.toLowerCase())));
+                } else {
+                    block = color(3);
+                    blockMeta = block.getItemMeta();
+                    blockMeta.setDisplayName(plugin.api.getLang("SubServers", "Interface.Server-Admin.Command"));
+                }
+                block.setItemMeta(blockMeta);
+                inv.setItem(5, block);
+                inv.setItem(6, block);
+                inv.setItem(7, block);
+                inv.setItem(14, block);
+                inv.setItem(15, block);
+                inv.setItem(16, block);
+            } else {
+                if (!permits(subserver, player, "subservers.subserver.%.*", "subservers.subserver.%.start")) {
+                    block = color(7);
+                    blockMeta = block.getItemMeta();
+                    blockMeta.setDisplayName(ChatColor.GRAY+ChatColor.stripColor(plugin.api.getLang("SubServers", "Interface.Server-Admin.Start")));
+                    blockMeta.setLore(Arrays.asList(plugin.api.getLang("SubServers", "Interface.Generic.Invalid-Permission").replace("$str$", "subservers.subserver.start." + name.toLowerCase())));
+                } else if (!host.isAvailable() || !host.isEnabled() || !subserver.isAvailable() || !subserver.isEnabled() || subserver.getCurrentIncompatibilities().size() != 0) {
+                    block = color(7);
+                    blockMeta = block.getItemMeta();
+                    blockMeta.setDisplayName(ChatColor.GRAY+ChatColor.stripColor(plugin.api.getLang("SubServers", "Interface.Server-Admin.Start")));
+                } else {
+                    block = color(5);
+                    blockMeta = block.getItemMeta();
+                    blockMeta.setDisplayName(plugin.api.getLang("SubServers", "Interface.Server-Admin.Start"));
+                }
+                block.setItemMeta(blockMeta);
+                SubCreator.ServerTemplate template;
+                if (subserver.getTemplate() == null || !(template = host.getCreator().getTemplate(subserver.getTemplate())).isEnabled() || !template.canUpdate()) {
+                    inv.setItem(3, block);
+                    inv.setItem(4, block);
+                    inv.setItem(5, block);
+                    inv.setItem(12, block);
+                    inv.setItem(13, block);
+                    inv.setItem(14, block);
+                } else {
+                    inv.setItem(1, block);
+                    inv.setItem(2, block);
+                    inv.setItem(3, block);
+                    inv.setItem(10, block);
+                    inv.setItem(11, block);
+                    inv.setItem(12, block);
 
-                        block.setItemMeta(blockMeta);
-                        inv.setItem(1, block);
-                        inv.setItem(10, block);
-
-                        if (!permits(subserver, player, "subservers.subserver.%.*", "subservers.subserver.%.stop")) {
-                            block = color(7);
-                            blockMeta = block.getItemMeta();
-                            blockMeta.setDisplayName(ChatColor.GRAY+ChatColor.stripColor(plugin.api.getLang("SubServers", "Interface.SubServer-Admin.Stop")));
-                            blockMeta.setLore(Arrays.asList(plugin.api.getLang("SubServers", "Interface.Generic.Invalid-Permission").replace("$str$", "subservers.subserver.stop." + name.toLowerCase())));
-                        } else {
-                            block = color(2);
-                            blockMeta = block.getItemMeta();
-                            blockMeta.setDisplayName(plugin.api.getLang("SubServers", "Interface.SubServer-Admin.Stop"));
-                        }
-                        block.setItemMeta(blockMeta);
-                        inv.setItem(2, block);
-                        inv.setItem(3, block);
-                        inv.setItem(11, block);
-                        inv.setItem(12, block);
-
-                        if (!permits(subserver, player, "subservers.subserver.%.*", "subservers.subserver.%.command")) {
-                            block = color(7);
-                            blockMeta = block.getItemMeta();
-                            blockMeta.setDisplayName(ChatColor.GRAY+ChatColor.stripColor(plugin.api.getLang("SubServers", "Interface.SubServer-Admin.Command")));
-                            blockMeta.setLore(Arrays.asList(plugin.api.getLang("SubServers", "Interface.Generic.Invalid-Permission").replace("$str$", "subservers.subserver.command." + name.toLowerCase())));
-                        } else {
-                            block = color(3);
-                            blockMeta = block.getItemMeta();
-                            blockMeta.setDisplayName(plugin.api.getLang("SubServers", "Interface.SubServer-Admin.Command"));
-                        }
-                        block.setItemMeta(blockMeta);
-                        inv.setItem(5, block);
-                        inv.setItem(6, block);
-                        inv.setItem(7, block);
-                        inv.setItem(14, block);
-                        inv.setItem(15, block);
-                        inv.setItem(16, block);
-                    } else {
-                        if (!permits(subserver, player, "subservers.subserver.%.*", "subservers.subserver.%.start")) {
-                            block = color(7);
-                            blockMeta = block.getItemMeta();
-                            blockMeta.setDisplayName(ChatColor.GRAY+ChatColor.stripColor(plugin.api.getLang("SubServers", "Interface.SubServer-Admin.Start")));
-                            blockMeta.setLore(Arrays.asList(plugin.api.getLang("SubServers", "Interface.Generic.Invalid-Permission").replace("$str$", "subservers.subserver.start." + name.toLowerCase())));
-                        } else if (!host.isAvailable() || !host.isEnabled() || !subserver.isAvailable() || !subserver.isEnabled() || subserver.getCurrentIncompatibilities().size() != 0) {
-                            block = color(7);
-                            blockMeta = block.getItemMeta();
-                            blockMeta.setDisplayName(ChatColor.GRAY+ChatColor.stripColor(plugin.api.getLang("SubServers", "Interface.SubServer-Admin.Start")));
-                        } else {
-                            block = color(5);
-                            blockMeta = block.getItemMeta();
-                            blockMeta.setDisplayName(plugin.api.getLang("SubServers", "Interface.SubServer-Admin.Start"));
-                        }
-                        block.setItemMeta(blockMeta);
-                        SubCreator.ServerTemplate template;
-                        if (subserver.getTemplate() == null || !(template = host.getCreator().getTemplate(subserver.getTemplate())).isEnabled() || !template.canUpdate()) {
-                            inv.setItem(3, block);
-                            inv.setItem(4, block);
-                            inv.setItem(5, block);
-                            inv.setItem(12, block);
-                            inv.setItem(13, block);
-                            inv.setItem(14, block);
-                        } else {
-                            inv.setItem(1, block);
-                            inv.setItem(2, block);
-                            inv.setItem(3, block);
-                            inv.setItem(10, block);
-                            inv.setItem(11, block);
-                            inv.setItem(12, block);
-
-                            if (!permits(subserver, player, "subservers.subserver.%.*", "subservers.subserver.%.update")) {
-                                block = color(7);
-                                blockMeta = block.getItemMeta();
-                                blockMeta.setDisplayName(ChatColor.GRAY+ChatColor.stripColor(plugin.api.getLang("SubServers", "Interface.SubServer-Admin.Update")));
-                                blockMeta.setLore(Arrays.asList(plugin.api.getLang("SubServers", "Interface.Generic.Invalid-Permission").replace("$str$", "subservers.subserver.update." + name.toLowerCase())));
-                            } else if (!host.isAvailable() || !host.isEnabled() || !subserver.isAvailable() || subserver.getCurrentIncompatibilities().size() != 0) {
-                                block = color(7);
-                                blockMeta = block.getItemMeta();
-                                blockMeta.setDisplayName(ChatColor.GRAY+ChatColor.stripColor(plugin.api.getLang("SubServers", "Interface.SubServer-Admin.Update")));
-                            } else {
-                                block = color(4);
-                                blockMeta = block.getItemMeta();
-                                blockMeta.setDisplayName(plugin.api.getLang("SubServers", "Interface.SubServer-Admin.Update"));
-                            }
-                            block.setItemMeta(blockMeta);
-                            inv.setItem(5, block);
-                            inv.setItem(6, block);
-                            inv.setItem(7, block);
-                            inv.setItem(14, block);
-                            inv.setItem(15, block);
-                            inv.setItem(16, block);
-                        }
-                    }
-
-                    if (!host.isAvailable() || !host.isEnabled() || !subserver.isAvailable() || !subserver.isEnabled() || subserverPlugins.size() <= 0) {
-                        block = div;
-                    } else {
-                        block = color(11);
+                    if (!permits(subserver, player, "subservers.subserver.%.*", "subservers.subserver.%.update")) {
+                        block = color(7);
                         blockMeta = block.getItemMeta();
-                        blockMeta.setDisplayName(plugin.api.getLang("SubServers", "Interface.SubServer-Admin.Plugins"));
-                        block.setItemMeta(blockMeta);
-                    }
-                    inv.setItem(27, block);
-                    inv.setItem(28, block);
-
-                    if (subserver.isRunning()) {
-                        int blocktype = (subserver.getStopAction() == SubServer.StopAction.REMOVE_SERVER || subserver.getStopAction() == SubServer.StopAction.RECYCLE_SERVER || subserver.getStopAction() == SubServer.StopAction.DELETE_SERVER)? 11 : 5;
-                        block = color(blocktype);
+                        blockMeta.setDisplayName(ChatColor.GRAY+ChatColor.stripColor(plugin.api.getLang("SubServers", "Interface.Server-Admin.Update")));
+                        blockMeta.setLore(Arrays.asList(plugin.api.getLang("SubServers", "Interface.Generic.Invalid-Permission").replace("$str$", "subservers.subserver.update." + name.toLowerCase())));
+                    } else if (!host.isAvailable() || !host.isEnabled() || !subserver.isAvailable() || subserver.getCurrentIncompatibilities().size() != 0) {
+                        block = color(7);
                         blockMeta = block.getItemMeta();
-                        LinkedList<String> lore = new LinkedList<String>();
-                        if (!subserver.getName().equals(subserver.getDisplayName()))
-                            lore.add(ChatColor.GRAY + subserver.getName());
-                        if (subserver.getStopAction() != SubServer.StopAction.REMOVE_SERVER || subserver.getStopAction() != SubServer.StopAction.RECYCLE_SERVER || subserver.getStopAction() != SubServer.StopAction.DELETE_SERVER) {
-                            blockMeta.setDisplayName(ChatColor.AQUA + subserver.getDisplayName());
-                            lore.add(plugin.api.getLang("SubServers", "Interface.Server-Menu.SubServer-Temporary"));
-                        } else blockMeta.setDisplayName(ChatColor.GREEN + subserver.getDisplayName());
-                        lore.add(plugin.api.getLang("SubServers", "Interface.Server-Menu.Server-Player-Count").replace("$int$", new DecimalFormat("#,###").format(subserver.getRemotePlayers().size())));
-                        lore.add(ChatColor.WHITE + ((plugin.config.get().getMap("Settings").getBoolean("Show-Addresses", false))?subserver.getAddress().getAddress().getHostAddress()+':':"") + subserver.getAddress().getPort());
-                        blockMeta.setLore(lore);
-                    } else if (subserver.isAvailable() && subserver.isEnabled() && subserver.getCurrentIncompatibilities().size() == 0) {
+                        blockMeta.setDisplayName(ChatColor.GRAY+ChatColor.stripColor(plugin.api.getLang("SubServers", "Interface.Server-Admin.Update")));
+                    } else {
                         block = color(4);
                         blockMeta = block.getItemMeta();
-                        blockMeta.setDisplayName(ChatColor.YELLOW + subserver.getDisplayName());
-                        LinkedList<String> lore = new LinkedList<String>();
-                        if (!subserver.getName().equals(subserver.getDisplayName()))
-                            lore.add(ChatColor.GRAY + subserver.getName());
-                        lore.add(plugin.api.getLang("SubServers", "Interface.Server-Menu.SubServer-Offline"));
-                        lore.add(ChatColor.WHITE + ((plugin.config.get().getMap("Settings").getBoolean("Show-Addresses", false))?subserver.getAddress().getAddress().getHostAddress()+':':"") + subserver.getAddress().getPort());
-                        blockMeta.setLore(lore);
-                    } else {
-                        block = color(14);
-                        blockMeta = block.getItemMeta();
-                        blockMeta.setDisplayName(ChatColor.RED + subserver.getDisplayName());
-                        LinkedList<String> lore = new LinkedList<String>();
-                        if (!subserver.getName().equals(subserver.getDisplayName()))
-                            lore.add(ChatColor.GRAY + subserver.getName());
-                        if (subserver.getCurrentIncompatibilities().size() != 0) {
-                            String list = "";
-                            for (String other : subserver.getCurrentIncompatibilities()) {
-                                if (list.length() != 0) list += ", ";
-                                list += other;
-                            }
-                            lore.add(plugin.api.getLang("SubServers", "Interface.Server-Menu.SubServer-Incompatible").replace("$str$", list));
-                        }
-                        if (!subserver.isAvailable() || !subserver.isEnabled()) lore.add(plugin.api.getLang("SubServers", (!subserver.isAvailable())?"Interface.Server-Menu.SubServer-Unavailable":"Interface.Server-Menu.SubServer-Disabled"));
-                        lore.add(ChatColor.WHITE + ((plugin.config.get().getMap("Settings").getBoolean("Show-Addresses", false))?subserver.getAddress().getAddress().getHostAddress()+':':"") + subserver.getAddress().getPort());
-                        blockMeta.setLore(lore);
+                        blockMeta.setDisplayName(plugin.api.getLang("SubServers", "Interface.Server-Admin.Update"));
                     }
                     block.setItemMeta(blockMeta);
-                    inv.setItem(30, block);
-                    inv.setItem(31, block);
-                    inv.setItem(32, block);
-
-                    if (hasHistory()) {
-                        block = color(14);
-                        blockMeta = block.getItemMeta();
-                        blockMeta.setDisplayName(plugin.api.getLang("SubServers", "Interface.Generic.Back"));
-                        block.setItemMeta(blockMeta);
-                        inv.setItem(34, block);
-                        inv.setItem(35, block);
-                    }
-
-                    player.openInventory(inv);
-                    open = true;
+                    inv.setItem(5, block);
+                    inv.setItem(6, block);
+                    inv.setItem(7, block);
+                    inv.setItem(14, block);
+                    inv.setItem(15, block);
+                    inv.setItem(16, block);
                 }
-            });
-        });
+            }
 
+            if (serverPlugins.size() > 0) {
+                block = color(11);
+                blockMeta = block.getItemMeta();
+                blockMeta.setDisplayName(plugin.api.getLang("SubServers", "Interface.Server-Admin.Plugins"));
+                block.setItemMeta(blockMeta);
+            } else {
+                block = div;
+            }
+            inv.setItem(27, block);
+            inv.setItem(28, block);
+
+            if (host == null) {
+                block = color(0);
+                blockMeta = block.getItemMeta();
+                blockMeta.setDisplayName(ChatColor.WHITE + server.getDisplayName());
+                LinkedList<String> lore = new LinkedList<String>();
+                if (!server.getName().equals(server.getDisplayName()))
+                    lore.add(ChatColor.GRAY + server.getName());
+                lore.add(plugin.api.getLang("SubServers", "Interface.Server-Menu.Server-External"));
+                lore.add(plugin.api.getLang("SubServers", "Interface.Server-Menu.Server-Player-Count").replace("$int$", new DecimalFormat("#,###").format(server.getRemotePlayers().size())));
+                lore.add(ChatColor.WHITE + ((plugin.config.get().getMap("Settings").getBoolean("Show-Addresses", false))?server.getAddress().getAddress().getHostAddress()+':':"") + server.getAddress().getPort());
+                blockMeta.setLore(lore);
+            } else if (subserver.isRunning()) {
+                int blocktype = (subserver.getStopAction() == SubServer.StopAction.REMOVE_SERVER || subserver.getStopAction() == SubServer.StopAction.RECYCLE_SERVER || subserver.getStopAction() == SubServer.StopAction.DELETE_SERVER)? 11 : 5;
+                block = color(blocktype);
+                blockMeta = block.getItemMeta();
+                LinkedList<String> lore = new LinkedList<String>();
+                if (!subserver.getName().equals(subserver.getDisplayName()))
+                    lore.add(ChatColor.GRAY + subserver.getName());
+                if (subserver.getStopAction() == SubServer.StopAction.REMOVE_SERVER || subserver.getStopAction() == SubServer.StopAction.RECYCLE_SERVER || subserver.getStopAction() == SubServer.StopAction.DELETE_SERVER) {
+                    blockMeta.setDisplayName(ChatColor.AQUA + subserver.getDisplayName());
+                    lore.add(plugin.api.getLang("SubServers", "Interface.Server-Menu.SubServer-Temporary"));
+                } else blockMeta.setDisplayName(ChatColor.GREEN + subserver.getDisplayName());
+                lore.add(plugin.api.getLang("SubServers", "Interface.Server-Menu.Server-Player-Count").replace("$int$", new DecimalFormat("#,###").format(subserver.getRemotePlayers().size())));
+                lore.add(ChatColor.WHITE + ((plugin.config.get().getMap("Settings").getBoolean("Show-Addresses", false))?subserver.getAddress().getAddress().getHostAddress()+':':"") + subserver.getAddress().getPort());
+                blockMeta.setLore(lore);
+            } else if (subserver.isAvailable() && subserver.isEnabled() && subserver.getCurrentIncompatibilities().size() == 0) {
+                block = color(4);
+                blockMeta = block.getItemMeta();
+                blockMeta.setDisplayName(ChatColor.YELLOW + subserver.getDisplayName());
+                LinkedList<String> lore = new LinkedList<String>();
+                if (!subserver.getName().equals(subserver.getDisplayName()))
+                    lore.add(ChatColor.GRAY + subserver.getName());
+                lore.add(plugin.api.getLang("SubServers", "Interface.Server-Menu.SubServer-Offline"));
+                lore.add(ChatColor.WHITE + ((plugin.config.get().getMap("Settings").getBoolean("Show-Addresses", false))?subserver.getAddress().getAddress().getHostAddress()+':':"") + subserver.getAddress().getPort());
+                blockMeta.setLore(lore);
+            } else {
+                block = color(14);
+                blockMeta = block.getItemMeta();
+                blockMeta.setDisplayName(ChatColor.RED + subserver.getDisplayName());
+                LinkedList<String> lore = new LinkedList<String>();
+                if (!subserver.getName().equals(subserver.getDisplayName()))
+                    lore.add(ChatColor.GRAY + subserver.getName());
+                if (subserver.getCurrentIncompatibilities().size() != 0) {
+                    String list = "";
+                    for (String other : subserver.getCurrentIncompatibilities()) {
+                        if (list.length() != 0) list += ", ";
+                        list += other;
+                    }
+                    lore.add(plugin.api.getLang("SubServers", "Interface.Server-Menu.SubServer-Incompatible").replace("$str$", list));
+                }
+                if (!subserver.isAvailable() || !subserver.isEnabled()) lore.add(plugin.api.getLang("SubServers", (!subserver.isAvailable())?"Interface.Server-Menu.SubServer-Unavailable":"Interface.Server-Menu.SubServer-Disabled"));
+                lore.add(ChatColor.WHITE + ((plugin.config.get().getMap("Settings").getBoolean("Show-Addresses", false))?subserver.getAddress().getAddress().getHostAddress()+':':"") + subserver.getAddress().getPort());
+                blockMeta.setLore(lore);
+            }
+            block.setItemMeta(blockMeta);
+            inv.setItem(30, block);
+            inv.setItem(31, block);
+            inv.setItem(32, block);
+
+            if (hasHistory()) {
+                block = color(14);
+                blockMeta = block.getItemMeta();
+                blockMeta.setDisplayName(plugin.api.getLang("SubServers", "Interface.Generic.Back"));
+                block.setItemMeta(blockMeta);
+                inv.setItem(34, block);
+                inv.setItem(35, block);
+            }
+
+            player.openInventory(inv);
+            open = true;
+        };
+
+        plugin.api.getServer(name, server -> {
+            windowHistory.add(() -> serverAdmin(name));
+            if (server == null) {
+                if (hasHistory()) back();
+            } else {
+                if (server instanceof SubServer) {
+                    ((SubServer) server).getHost(host -> {
+                        if (host == null) {
+                            if (hasHistory()) back();
+                        } else {
+                            renderer.accept(server, host);
+                        }
+                    });
+                } else {
+                    renderer.accept(server, null);
+                }
+            }
+        });
     }
 
-    public void subserverPlugin(final int page, final String name) {
+    public void serverPlugin(final int page, final String name) {
         setDownloading(ChatColor.stripColor(plugin.api.getLang("SubServers", "Interface.SubServer-Plugin.Title").replace("$str$", name)));
-        plugin.api.getSubServer(name, subserver -> {
-            windowHistory.add(() -> subserverPlugin(page, name));
-            if (subserver == null) {
+        plugin.api.getServer(name, server -> {
+            windowHistory.add(() -> serverPlugin(page, name));
+            if (server == null) {
                 if (hasHistory()) back();
             } else {
                 setDownloading(null);
-                lastVisitedObjects[0] = subserver;
+                lastVisitedObjects[0] = server;
                 lastPage = page;
                 List<String> renderers = new LinkedList<String>();
-                for (String renderer : renderers) {
-                    if (subserverPlugins.get(renderer).isEnabled(subserver)) renderers.add(renderer);
+                for (String renderer : serverPlugins.keySet()) {
+                    if (serverPlugins.get(renderer).isEnabled(server)) renderers.add(renderer);
                 }
                 Collections.sort(renderers);
 
@@ -1255,7 +1276,7 @@ public class DefaultUIRenderer extends UIRenderer {
                 int count = (renderers.size() == 0)?27:((renderers.size() - min >= max)?36:renderers.size() - min);
                 int area = (count % 9 == 0) ? count : ((count / 9) + 1) * 9;
 
-                Inventory inv = Bukkit.createInventory(null, 18 + area, plugin.api.getLang("SubServers", "Interface.SubServer-Plugin.Title").replace("$str$", subserver.getDisplayName()));
+                Inventory inv = Bukkit.createInventory(null, 18 + area, plugin.api.getLang("SubServers", "Interface.SubServer-Plugin.Title").replace("$str$", server.getDisplayName()));
                 block = color(7);
                 block.setItemMeta(divMeta);
                 while (i < area) {
@@ -1271,7 +1292,7 @@ public class DefaultUIRenderer extends UIRenderer {
                     if (renderers.indexOf(renderer) >= min && renderers.indexOf(renderer) <= max) {
                         if (even && (i == 4 || i == 13 || i == 22 || i == 31)) inv.setItem(i++, adiv);
 
-                        inv.setItem(i, subserverPlugins.get(renderer).getIcon());
+                        inv.setItem(i, serverPlugins.get(renderer).getIcon());
 
                         count--;
                         if (count < 9 && (i == 8 || i == 17 || i == 26)) {

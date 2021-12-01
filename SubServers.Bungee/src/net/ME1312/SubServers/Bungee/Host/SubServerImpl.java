@@ -58,26 +58,6 @@ public abstract class SubServerImpl extends ServerImpl implements SubServer {
         super(name, new InetSocketAddress(host.getAddress().getHostAddress(), port), motd, hidden, restricted);
     }
 
-    @Override
-    public boolean start() {
-        return start(null);
-    }
-
-    @Override
-    public boolean stop() {
-        return stop(null);
-    }
-
-    @Override
-    public boolean terminate() {
-        return terminate(null);
-    }
-
-    @Override
-    public boolean command(String command) {
-        return command(null, command);
-    }
-
     public int edit(UUID player, ObjectMap<String> edit) {
         return edit(player, edit, false);
     }
@@ -134,11 +114,6 @@ public abstract class SubServerImpl extends ServerImpl implements SubServer {
         } else {
             return null;
         }
-    }
-
-    @Override
-    public String getFullPath() {
-        return new File(getHost().getPath(), getPath()).getPath();
     }
 
     @Override

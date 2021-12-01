@@ -588,8 +588,8 @@ public final class SubCommand extends Command {
                         }
                     } else if (args[0].equalsIgnoreCase("cmd") || args[0].equalsIgnoreCase("command")) {
                         if (args.length > 1) {
-                            selectServers(sender, args, 1, true, new String[]{"subservers.subserver.%.*", "subservers.subserver.%.command"}, select -> {
-                                if (select.subservers.length > 0) {
+                            selectServers(sender, args, 1, false, new String[]{"subservers.subserver.%.*", "subservers.subserver.%.command"}, select -> {
+                                if (select.servers.length > 0) {
                                     if (select.args.length > 2) {
                                         StringBuilder builder = new StringBuilder(select.args[2]);
                                         for (int i = 3; i < select.args.length; i++) {
@@ -603,7 +603,7 @@ public final class SubCommand extends Command {
                                             if (running.value > 0) sender.sendMessage(plugin.api.getLang("SubServers", "Command.Command.Not-Running").replace("$int$", running.value.toString()));
                                             if (success.value > 0) sender.sendMessage(plugin.api.getLang("SubServers", "Command.Command").replace("$int$", success.value.toString()));
                                         });
-                                        for (SubServer server : select.subservers) {
+                                        for (Server server : select.servers) {
                                             merge.reserve();
                                             server.command((sender instanceof Player)?((Player) sender).getUniqueId():null, builder.toString(), response -> {
                                                 switch (response) {
@@ -627,7 +627,7 @@ public final class SubCommand extends Command {
                                 }
                             });
                         } else {
-                            sender.sendMessage(plugin.api.getLang("SubServers", "Command.Generic.Usage").replace("$str$", label.toLowerCase() + " " + args[0].toLowerCase() + " <Subservers> <Command> [Args...]"));
+                            sender.sendMessage(plugin.api.getLang("SubServers", "Command.Generic.Usage").replace("$str$", label.toLowerCase() + " " + args[0].toLowerCase() + " <Servers> <Command> [Args...]"));
                         }
                     } else if (args[0].equalsIgnoreCase("create")) {
                         if (args.length > 3) {
@@ -808,12 +808,14 @@ public final class SubCommand extends Command {
                                             else if (args.length > 2) plugin.gui.getRenderer((Player) sender).serverMenu(Integer.parseInt(args[2]), null, null);
                                             else plugin.gui.getRenderer((Player) sender).serverMenu(1, null, null);
                                             break;
+                                        case "server/":
                                         case "subserver/":
-                                            plugin.gui.getRenderer((Player) sender).subserverAdmin(args[2]);
+                                            plugin.gui.getRenderer((Player) sender).serverAdmin(args[2]);
                                             break;
+                                        case "server/plugin":
                                         case "subserver/plugin":
-                                            if (args.length > 3) plugin.gui.getRenderer((Player) sender).subserverPlugin(Integer.parseInt(args[3]), args[2]);
-                                            else plugin.gui.getRenderer((Player) sender).subserverPlugin(1, args[2]);
+                                            if (args.length > 3) plugin.gui.getRenderer((Player) sender).serverPlugin(Integer.parseInt(args[3]), args[2]);
+                                            else plugin.gui.getRenderer((Player) sender).serverPlugin(1, args[2]);
                                             break;
                                     }
                                 } catch (Throwable e) { /*
@@ -1124,7 +1126,7 @@ public final class SubCommand extends Command {
                 plugin.api.getLang("SubServers", "Command.Help.SubServer.Restart").replace("$str$", label.toLowerCase() + " restart <Subservers>"),
                 plugin.api.getLang("SubServers", "Command.Help.SubServer.Stop").replace("$str$", label.toLowerCase() + " stop <Subservers>"),
                 plugin.api.getLang("SubServers", "Command.Help.SubServer.Terminate").replace("$str$", label.toLowerCase() + " kill <Subservers>"),
-                plugin.api.getLang("SubServers", "Command.Help.SubServer.Command").replace("$str$", label.toLowerCase() + " cmd <Subservers> <Command> [Args...]"),
+                plugin.api.getLang("SubServers", "Command.Help.SubServer.Command").replace("$str$", label.toLowerCase() + " cmd <Servers> <Command> [Args...]"),
                 plugin.api.getLang("SubServers", "Command.Help.Host.Create").replace("$str$", label.toLowerCase() + " create <Name> <Host> <Template> [Version] [Port]"),
                 plugin.api.getLang("SubServers", "Command.Help.SubServer.Update").replace("$str$", label.toLowerCase() + " update <Subservers> [[Template] <Version>]"),
         };

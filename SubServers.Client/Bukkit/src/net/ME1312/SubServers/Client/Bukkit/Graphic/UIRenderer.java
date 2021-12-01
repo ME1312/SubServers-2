@@ -6,6 +6,7 @@ import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubServers.Client.Bukkit.SubPlugin;
 import net.ME1312.SubServers.Client.Common.Network.API.Host;
+import net.ME1312.SubServers.Client.Common.Network.API.Server;
 import net.ME1312.SubServers.Client.Common.Network.API.SubServer;
 
 import org.bukkit.Bukkit;
@@ -29,7 +30,7 @@ public abstract class UIRenderer {
     private final boolean TAPI_PLUGIN;
 
     static final HashMap<String, PluginRenderer<Host>> hostPlugins = new HashMap<String, PluginRenderer<Host>>();
-    static final HashMap<String, PluginRenderer<SubServer>> subserverPlugins = new HashMap<String, PluginRenderer<SubServer>>();
+    static final HashMap<String, PluginRenderer<Server>> serverPlugins = new HashMap<String, PluginRenderer<Server>>();
     private ContainedPair<String, Integer> tdownload = null;
     private final String[] adownload;
     private int download = -1;
@@ -360,8 +361,8 @@ public abstract class UIRenderer {
      *
      * @return Host Plugins
      */
-    public static Map<String, PluginRenderer> getHostPlugins() {
-        return new HashMap<String, PluginRenderer>(hostPlugins);
+    public static Map<String, PluginRenderer<Host>> getHostPlugins() {
+        return new HashMap<String, PluginRenderer<Host>>(hostPlugins);
     }
 
     /**
@@ -375,33 +376,33 @@ public abstract class UIRenderer {
     }
 
     /**
-     * Add SubServer Plugin
+     * Add Server Plugin
      *
      * @param handle Handle to bind
      * @param renderer Renderer
      */
-    public static void addSubServerPlugin(String handle, PluginRenderer<SubServer> renderer) {
+    public static void addServerPlugin(String handle, PluginRenderer<Server> renderer) {
         Util.nullpo(handle, renderer);
-        subserverPlugins.put(handle, renderer);
+        serverPlugins.put(handle, renderer);
     }
 
     /**
-     * Get SubServer Plugins
+     * Get Server Plugins
      *
      * @return SubServer Plugins
      */
-    public static Map<String, PluginRenderer> getSubServerPlugins() {
-        return new HashMap<String, PluginRenderer>(subserverPlugins);
+    public static Map<String, PluginRenderer<Server>> getServerPlugins() {
+        return new HashMap<String, PluginRenderer<Server>>(serverPlugins);
     }
 
     /**
-     * Remove SubServer Plugin
+     * Remove Server Plugin
      *
      * @param handle Handle
      */
-    public static void removeSubServerPlugin(String handle) {
+    public static void removeServerPlugin(String handle) {
         Util.nullpo(handle);
-        subserverPlugins.remove(handle);
+        serverPlugins.remove(handle);
     }
 
     /**
@@ -448,18 +449,18 @@ public abstract class UIRenderer {
     public abstract void serverMenu(int page, String host, String group);
 
     /**
-     * Opens SubServer/&lt;name&gt;
+     * Opens Server/&lt;name&gt;
      *
      * @param server SubServer Name
      */
-    public abstract void subserverAdmin(String server);
+    public abstract void serverAdmin(String server);
 
     /**
-     * Opens SubServer/&lt;name&gt;/Plugins
+     * Opens Server/&lt;name&gt;/Plugins
      *
      * @param server SubServer Name
      */
-    public abstract void subserverPlugin(int page, String server);
+    public abstract void serverPlugin(int page, String server);
 
     /**
      * Options Layout Class

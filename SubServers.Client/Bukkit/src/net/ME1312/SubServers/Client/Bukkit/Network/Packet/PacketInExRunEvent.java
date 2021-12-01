@@ -77,7 +77,7 @@ public class PacketInExRunEvent implements PacketObjectIn<Integer> {
             @Override
             public void accept(ObjectMap<String> data) {
                 if (plugin.isEnabled()) {
-                    Bukkit.getPluginManager().callEvent(new SubSendCommandEvent((data.contains("player"))?data.getUUID("player"):null, data.getString("server"), data.getString("command")));
+                    Bukkit.getPluginManager().callEvent(new SubSendCommandEvent((data.contains("player"))?data.getUUID("player"):null, data.getString("server"), data.getString("command"), (data.contains("target"))?data.getUUID("target"):null));
                     callback("SubSendCommandEvent", this);
                 }
             }

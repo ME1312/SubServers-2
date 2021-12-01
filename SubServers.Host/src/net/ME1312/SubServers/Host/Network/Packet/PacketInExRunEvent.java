@@ -63,7 +63,7 @@ public class PacketInExRunEvent implements PacketObjectIn<Integer> {
         callback("SubSendCommandEvent", new Consumer<ObjectMap<String>>() {
             @Override
             public void accept(ObjectMap<String> data) {
-                GalaxiEngine.getInstance().getPluginManager().executeEvent(new SubSendCommandEvent((data.contains("player"))?data.getUUID("player"):null, data.getString("server"), data.getString("command")));
+                GalaxiEngine.getInstance().getPluginManager().executeEvent(new SubSendCommandEvent((data.contains("player"))?data.getUUID("player"):null, data.getString("server"), data.getString("command"), (data.contains("target"))?data.getUUID("target"):null));
                 callback("SubSendCommandEvent", this);
             }
         });

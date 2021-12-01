@@ -464,8 +464,11 @@ public final class SubAPI implements BungeeAPI {
      * @return Success Status
      */
     public boolean removeServer(UUID player, String name) {
-        Util.nullpo(name, getServer(name));
-        SubRemoveServerEvent event = new SubRemoveServerEvent(player, null, getServer(name));
+        Util.nullpo(name);
+        Server server = getServer(name);
+        if (server == null) return true;
+
+        SubRemoveServerEvent event = new SubRemoveServerEvent(player, null, server);
         plugin.getPluginManager().callEvent(event);
         if (!event.isCancelled()) {
             plugin.exServers.remove(name.toLowerCase());
@@ -491,8 +494,11 @@ public final class SubAPI implements BungeeAPI {
      * @return Success Status
      */
     public boolean forceRemoveServer(UUID player, String name) {
-        Util.nullpo(name, getServer(name));
-        SubRemoveServerEvent event = new SubRemoveServerEvent(player, null, getServer(name));
+        Util.nullpo(name);
+        Server server = getServer(name);
+        if (server == null) return true;
+
+        SubRemoveServerEvent event = new SubRemoveServerEvent(player, null, server);
         plugin.getPluginManager().callEvent(event);
         plugin.exServers.remove(name.toLowerCase());
         return true;

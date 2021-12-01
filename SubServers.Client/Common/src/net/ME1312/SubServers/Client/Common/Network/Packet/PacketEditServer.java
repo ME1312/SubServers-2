@@ -53,7 +53,7 @@ public class PacketEditServer implements PacketObjectIn<Integer>, PacketObjectOu
         data.set(0x0001, server);
         data.set(0x0002, edit);
         data.set(0x0003, perma);
-        if (player != null) data.set(0x0004, player.toString());
+        if (player != null) data.set(0x0004, player);
         return data;
     }
 

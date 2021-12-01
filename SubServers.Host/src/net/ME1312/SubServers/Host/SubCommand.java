@@ -701,8 +701,8 @@ public class SubCommand {
             public void command(CommandSender sender, String handle, String[] args) {
                 if (canRun()) {
                     if (args.length > 0) {
-                        selectServers(sender, args, 0, true, select -> {
-                            if (select.subservers.length > 0) {
+                        selectServers(sender, args, 0, false, select -> {
+                            if (select.servers.length > 0) {
                                 if (select.args.length > 1) {
                                     StringBuilder builder = new StringBuilder(select.args[1]);
                                     for (int i = 2; i < select.args.length; i++) {
@@ -713,16 +713,16 @@ public class SubCommand {
                                     Container<Integer> success = new Container<Integer>(0);
                                     Container<Integer> running = new Container<Integer>(0);
                                     AsyncConsolidator merge = new AsyncConsolidator(() -> {
-                                        if (running.value > 0) sender.sendMessage(running.value + " subserver"+((running.value == 1)?" was":"s were") + " offline");
-                                        if (success.value > 0) sender.sendMessage("Sent command to " + success.value + " subserver"+((success.value == 1)?"":"s"));
+                                        if (running.value > 0) sender.sendMessage(running.value + " server"+((running.value == 1)?" was":"s were") + " offline");
+                                        if (success.value > 0) sender.sendMessage("Sent command to " + success.value + " server"+((success.value == 1)?"":"s"));
                                     });
-                                    for (SubServer server : select.subservers) {
+                                    for (Server server : select.servers) {
                                         merge.reserve();
                                         server.command(builder.toString(), response -> {
                                             switch (response) {
                                                 case 3:
                                                 case 4:
-                                                    sender.sendMessage("Subserver " + server.getName() + " has disappeared");
+                                                    sender.sendMessage("Server " + server.getName() + " has disappeared");
                                                     break;
                                                 case 5:
                                                     running.value++;
@@ -744,8 +744,8 @@ public class SubCommand {
                     }
                 }
             }
-        }.autocomplete(defaultCompletor).usage("<Subservers>", "<Command>", "[Args...]").description("Sends a command to the console of one or more subservers").help(
-                "Sends a command to the console of one or more subservers on the network.",
+        }.autocomplete(new ServerCompletion(0, false, ((sender, label, args, select) -> new String[0]))).usage("<Servers>", "<Command>", "[Args...]").description("Sends a command to the console of one or more servers").help(
+                "Sends a command to the console of one or more servers on the network.",
                 "",
                 "Examples:",
                 "  /command Server1 version",

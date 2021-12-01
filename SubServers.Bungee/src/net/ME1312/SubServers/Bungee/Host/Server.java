@@ -59,6 +59,34 @@ public interface Server extends ServerInfo, ClientHandler, ExtraDataHandler<Stri
     void removeGroup(String value);
 
     /**
+     * Commands the Server
+     *
+     * @param player Player who's Commanding
+     * @param target Player who will Send
+     * @param command Command to Send
+     */
+    boolean command(UUID player, UUID target, String command);
+
+    /**
+     * Commands the Server
+     *
+     * @param player Player who's Commanding
+     * @param command Command to Send
+     */
+    default boolean command(UUID player, String command) {
+        return command(player, null, command);
+    }
+
+    /**
+     * Commands the Server
+     *
+     * @param command Command to Send
+     */
+    default boolean command(String command) {
+        return command(null, command);
+    }
+
+    /**
      * Get players on this server across all known proxies
      *
      * @return Remote Player Collection

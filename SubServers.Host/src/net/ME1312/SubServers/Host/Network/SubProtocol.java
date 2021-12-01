@@ -32,7 +32,7 @@ public class SubProtocol extends SubDataProtocol {
         ExHost host = SubAPI.getInstance().getInternals();
 
         setName("SubServers 2");
-        addVersion(new Version("2.16a+"));
+        addVersion(new Version("2.18a+"));
 
 
      // 00-0F: Object Link Packets

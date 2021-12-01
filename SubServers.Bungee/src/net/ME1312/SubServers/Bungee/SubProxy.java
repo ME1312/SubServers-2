@@ -155,7 +155,7 @@ public final class SubProxy extends BungeeCommon implements Listener {
             Logger.get("SubServers").info("Created ./SubServers/Templates/Sponge");
         } else {
             long stamp = Math.round(Math.random() * 100000);
-            Version tv1 = new Version("2.16a+");
+            Version tv1 = new Version("2.18a+");
             Version tv2 = new Version("2.18a+");
 
             if (new File(dir, "Templates/Vanilla/template.yml").exists() && ((new YAMLConfig(new File(dir, "Templates/Vanilla/template.yml"))).get().getVersion("Version", tv2)).compareTo(tv2) != 0) {

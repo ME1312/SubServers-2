@@ -3,6 +3,7 @@ package net.ME1312.SubServers.Bungee.Host;
 import net.ME1312.Galaxi.Library.Map.ObjectMap;
 import net.ME1312.Galaxi.Library.Util;
 
+import java.io.File;
 import java.util.*;
 
 /**
@@ -114,7 +115,9 @@ public interface SubServer extends Server {
      *
      * @return Success Status
      */
-    boolean start();
+    default boolean start() {
+        return start(null);
+    }
 
     /**
      * Stops the Server
@@ -129,7 +132,9 @@ public interface SubServer extends Server {
      *
      * @return Success Status
      */
-    boolean stop();
+    default boolean stop() {
+        return stop(null);
+    }
 
     /**
      * Terminates the Server
@@ -144,24 +149,9 @@ public interface SubServer extends Server {
      *
      * @return Success Status
      */
-    boolean terminate();
-
-    /**
-     * Commands the Server
-     *
-     * @param player Player who Commanded
-     * @param command Command to Send
-     * @return Success Status
-     */
-    boolean command(UUID player, String command);
-
-    /**
-     * Commands the Server
-     *
-     * @param command Command to Send
-     * @return Success Status
-     */
-    boolean command(String command);
+    default boolean terminate() {
+        return terminate(null);
+    }
 
     /**
      * Edits the Server
@@ -325,7 +315,9 @@ public interface SubServer extends Server {
      *
      * @return Full Server Directory Path
      */
-    String getFullPath();
+    default String getFullPath()  {
+        return new File(getHost().getPath(), getPath()).getPath();
+    }
 
     /**
      * Get the Server's Executable String

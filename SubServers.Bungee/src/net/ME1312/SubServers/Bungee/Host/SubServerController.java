@@ -231,7 +231,7 @@ public abstract class SubServerController {
     /**
      * Commands the Server
      *
-     * @param player Player who Commanded
+     * @param player Player who's Commanding
      * @param command Command to Send
      * @return Success Status
      */

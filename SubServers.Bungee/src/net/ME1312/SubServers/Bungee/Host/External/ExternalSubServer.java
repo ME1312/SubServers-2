@@ -214,7 +214,7 @@ public class ExternalSubServer extends SubServerImpl {
     public boolean command(UUID player, String command) {
         Util.nullpo(command);
         if (running) {
-            SubSendCommandEvent event = new SubSendCommandEvent(player, this, command);
+            SubSendCommandEvent event = new SubSendCommandEvent(player, this, command, null);
             host.plugin.getPluginManager().callEvent(event);
             if (!event.isCancelled() && (player == null || !DISALLOWED_COMMANDS.matcher(command).find())) {
                 history.add(new LoggedCommand(player, event.getCommand()));

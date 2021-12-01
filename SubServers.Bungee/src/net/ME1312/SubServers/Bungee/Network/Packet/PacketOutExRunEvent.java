@@ -86,7 +86,7 @@ public class PacketOutExRunEvent implements Listener, PacketObjectOut<Integer> {
     public void event(SubAddHostEvent event) {
         if (!event.isCancelled()) {
             ObjectMap<String> args = new ObjectMap<String>();
-            if (event.getPlayer() != null) args.set("player", event.getPlayer().toString());
+            if (event.getPlayer() != null) args.set("player", event.getPlayer());
             args.set("host", event.getHost().getName());
             broadcast(event.getHost(), new PacketOutExRunEvent(event.getClass(), args));
         }
@@ -96,7 +96,7 @@ public class PacketOutExRunEvent implements Listener, PacketObjectOut<Integer> {
     public void event(SubAddServerEvent event) {
         if (!event.isCancelled()) {
             ObjectMap<String> args = new ObjectMap<String>();
-            if (event.getPlayer() != null) args.set("player", event.getPlayer().toString());
+            if (event.getPlayer() != null) args.set("player", event.getPlayer());
             if (event.getHost() != null) args.set("host", event.getHost().getName());
             args.set("server", event.getServer().getName());
             broadcast(event.getServer(), new PacketOutExRunEvent(event.getClass(), args));
@@ -107,7 +107,7 @@ public class PacketOutExRunEvent implements Listener, PacketObjectOut<Integer> {
     public void event(SubCreateEvent event) {
         if (!event.isCancelled()) {
             ObjectMap<String> args = new ObjectMap<String>();
-            if (event.getPlayer() != null) args.set("player", event.getPlayer().toString());
+            if (event.getPlayer() != null) args.set("player", event.getPlayer());
             args.set("update", event.isUpdate());
             args.set("name", event.getName());
             args.set("host", event.getHost().getName());
@@ -121,7 +121,7 @@ public class PacketOutExRunEvent implements Listener, PacketObjectOut<Integer> {
     @EventHandler(priority = Byte.MAX_VALUE)
     public void event(SubCreatedEvent event) {
         ObjectMap<String> args = new ObjectMap<String>();
-        if (event.getPlayer() != null) args.set("player", event.getPlayer().toString());
+        if (event.getPlayer() != null) args.set("player", event.getPlayer());
         args.set("success", event.wasSuccessful());
         args.set("update", event.wasUpdate());
         args.set("name", event.getName());
@@ -136,9 +136,10 @@ public class PacketOutExRunEvent implements Listener, PacketObjectOut<Integer> {
     public void event(SubSendCommandEvent event) {
         if (!event.isCancelled()) {
             ObjectMap<String> args = new ObjectMap<String>();
-            if (event.getPlayer() != null) args.set("player", event.getPlayer().toString());
+            if (event.getPlayer() != null) args.set("player", event.getPlayer());
             args.set("server", event.getServer().getName());
             args.set("command", event.getCommand());
+            if (event.getTarget() != null) args.set("target", event.getTarget());
             broadcast(new PacketOutExRunEvent(event.getClass(), args));
         }
     }
@@ -147,7 +148,7 @@ public class PacketOutExRunEvent implements Listener, PacketObjectOut<Integer> {
     public void event(SubEditServerEvent event) {
         if (!event.isCancelled()) {
             ObjectMap<String> args = new ObjectMap<String>();
-            if (event.getPlayer() != null) args.set("player", event.getPlayer().toString());
+            if (event.getPlayer() != null) args.set("player", event.getPlayer());
             args.set("server", event.getServer().getName());
             args.set("edit", event.getEdit().key());
             args.set("value", event.getEdit().value().asObject());
@@ -159,7 +160,7 @@ public class PacketOutExRunEvent implements Listener, PacketObjectOut<Integer> {
     public void event(SubStartEvent event) {
         if (!event.isCancelled()) {
             ObjectMap<String> args = new ObjectMap<String>();
-            if (event.getPlayer() != null) args.set("player", event.getPlayer().toString());
+            if (event.getPlayer() != null) args.set("player", event.getPlayer());
             args.set("server", event.getServer().getName());
             broadcast(new PacketOutExRunEvent(event.getClass(), args));
         }
@@ -176,7 +177,7 @@ public class PacketOutExRunEvent implements Listener, PacketObjectOut<Integer> {
     public void event(SubStopEvent event) {
         if (!event.isCancelled()) {
             ObjectMap<String> args = new ObjectMap<String>();
-            if (event.getPlayer() != null) args.set("player", event.getPlayer().toString());
+            if (event.getPlayer() != null) args.set("player", event.getPlayer());
             args.set("server", event.getServer().getName());
             args.set("force", event.isForced());
             broadcast(new PacketOutExRunEvent(event.getClass(), args));
@@ -195,7 +196,7 @@ public class PacketOutExRunEvent implements Listener, PacketObjectOut<Integer> {
     public void event(SubRemoveServerEvent event) {
         if (!event.isCancelled()) {
             ObjectMap<String> args = new ObjectMap<String>();
-            if (event.getPlayer() != null) args.set("player", event.getPlayer().toString());
+            if (event.getPlayer() != null) args.set("player", event.getPlayer());
             if (event.getHost() != null) args.set("host", event.getHost().getName());
             args.set("server", event.getServer().getName());
             broadcast(event.getServer(), new PacketOutExRunEvent(event.getClass(), args));
@@ -206,7 +207,7 @@ public class PacketOutExRunEvent implements Listener, PacketObjectOut<Integer> {
     public void event(SubRemoveHostEvent event) {
         if (!event.isCancelled()) {
             ObjectMap<String> args = new ObjectMap<String>();
-            if (event.getPlayer() != null) args.set("player", event.getPlayer().toString());
+            if (event.getPlayer() != null) args.set("player", event.getPlayer());
             args.set("host", event.getHost().getName());
             broadcast(event.getHost(), new PacketOutExRunEvent(event.getClass(), args));
         }

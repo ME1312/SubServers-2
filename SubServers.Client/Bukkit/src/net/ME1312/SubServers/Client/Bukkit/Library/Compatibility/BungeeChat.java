@@ -107,7 +107,7 @@ public class BungeeChat {
                             }
                             hover.setColor(ChatColor.WHITE);
                             hoverm.add(hover);
-                            message.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, label + " open SubServer/ " + server.getName()));
+                            message.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, label + " open Server/ " + server.getName()));
                         } else {
                             message.setColor(ChatColor.WHITE);
                             hover.setColor(ChatColor.WHITE);
@@ -184,7 +184,7 @@ public class BungeeChat {
                     hoverm = new LinkedList<TextComponent>();
                     message = new TextComponent(subserver.getDisplayName());
                     hover = new TextComponent(subserver.getDisplayName() + '\n');
-                    message.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, label + " open SubServer/ " + subserver));
+                    message.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, label + " open Server/ " + subserver));
                     if (subserver.isRunning()) {
                         message.setColor(ChatColor.GREEN);
                         hover.setColor(ChatColor.GREEN);
@@ -241,7 +241,7 @@ public class BungeeChat {
                     }
                     hover.setColor(ChatColor.WHITE);
                     hoverm.add(hover);
-                    message.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, label + " open SubServer/ " + subserver.getName()));
+                    message.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, label + " open Server/ " + subserver.getName()));
                     message.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, hoverm.toArray(new TextComponent[hoverm.size()])));
                     if (i != 0) msg.addExtra(div);
                     msg.addExtra(message);
@@ -278,6 +278,7 @@ public class BungeeChat {
                 }
                 hover.setColor(ChatColor.WHITE);
                 hoverm.add(hover);
+                message.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, label + " open Server/ " + server.getName()));
                 message.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, hoverm.toArray(new TextComponent[hoverm.size()])));
                 if (i != 0) msg.addExtra(div);
                 msg.addExtra(message);

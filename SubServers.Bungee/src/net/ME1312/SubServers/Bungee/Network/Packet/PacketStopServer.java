@@ -68,44 +68,28 @@ public class PacketStopServer implements PacketObjectIn<Integer>, PacketObjectOu
                 boolean sent = false;
                 if (force) {
                     for (Server server : servers.values()) {
-                        if (server instanceof SubServer && ((SubServer) server).isRunning()) {
-                            if (((SubServer) server).terminate(player)) {
-                                sent = true;
-                            }
+                        if (server instanceof SubServer) {
+                            sent |= ((SubServer) server).terminate(player);
                         }
-                    }
-                    if (sent) {
-                        client.sendPacket(new PacketStopServer(0, tracker));
-                    } else {
-                        client.sendPacket(new PacketStopServer(1, tracker));
                     }
                 } else {
                     for (Server server : servers.values()) {
-                        if (server instanceof SubServer && ((SubServer) server).isRunning()) {
-                            if (((SubServer) server).stop(player)) {
-                                sent = true;
-                            }
+                        if (server instanceof SubServer) {
+                            sent |= ((SubServer) server).stop(player);
                         }
                     }
-                    if (sent) {
-                        client.sendPacket(new PacketStopServer(0, tracker));
-                    } else {
-                        client.sendPacket(new PacketStopServer(1, tracker));
-                    }
+                }
+
+                if (sent) {
+                    client.sendPacket(new PacketStopServer(0, tracker));
+                } else {
+                    client.sendPacket(new PacketStopServer(1, tracker));
                 }
             } else {
                 if (force) {
-                    if (((SubServer) servers.get(name.toLowerCase())).terminate(player)) {
-                        client.sendPacket(new PacketStopServer(0, tracker));
-                    } else {
-                        client.sendPacket(new PacketStopServer(1, tracker));
-                    }
+                    client.sendPacket(new PacketStopServer((((SubServer) servers.get(name.toLowerCase())).terminate(player))? 0 : 1, tracker));
                 } else {
-                    if (((SubServer) servers.get(name.toLowerCase())).stop(player)) {
-                        client.sendPacket(new PacketStopServer(0, tracker));
-                    } else {
-                        client.sendPacket(new PacketStopServer(1, tracker));
-                    }
+                    client.sendPacket(new PacketStopServer((((SubServer) servers.get(name.toLowerCase())).stop(player))? 0 : 1, tracker));
                 }
             }
         } catch (Throwable e) {

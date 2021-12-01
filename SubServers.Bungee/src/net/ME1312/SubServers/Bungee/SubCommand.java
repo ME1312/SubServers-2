@@ -523,8 +523,8 @@ public final class SubCommand extends Command implements TabExecutor {
                     }
                 } else if (args[0].equalsIgnoreCase("cmd") || args[0].equalsIgnoreCase("command")) {
                     if (args.length > 1) {
-                        ServerSelection select = selectServers(sender, args, 1, true);
-                        if (select.subservers.length > 0) {
+                        ServerSelection select = selectServers(sender, args, 1, false);
+                        if (select.servers.length > 0) {
                             if (select.args.length > 2) {
                                 StringBuilder builder = new StringBuilder(select.args[2]);
                                 for (int i = 3; i < select.args.length; i++) {
@@ -534,21 +534,29 @@ public final class SubCommand extends Command implements TabExecutor {
 
                                 int success = 0, running = 0;
                                 String command = builder.toString();
-                                for (SubServer server : select.subservers) {
-                                    if (!server.isRunning()) {
-                                        running++;
-                                    } else if (server.command(command)) {
-                                        success++;
+                                for (Server server : select.servers) {
+                                    if (server instanceof SubServer) {
+                                        if (!((SubServer) server).isRunning()) {
+                                            running++;
+                                        } else if (server.command(command)) {
+                                            success++;
+                                        }
+                                    } else {
+                                        if (server.getSubData()[0] == null) {
+                                            running++;
+                                        } else if (server.command(command)) {
+                                            success++;
+                                        }
                                     }
                                 }
-                                if (running > 0) sender.sendMessage("SubServers > " + running + " subserver"+((running == 1)?" was":"s were") + " offline");
-                                if (success > 0) sender.sendMessage("SubServers > Sent command to " + success + " subserver"+((success == 1)?"":"s"));
+                                if (running > 0) sender.sendMessage("SubServers > " + running + " server"+((running == 1)?" was":"s were") + " unavailable");
+                                if (success > 0) sender.sendMessage("SubServers > Sent command to " + success + " server"+((success == 1)?"":"s"));
                             } else {
                                 sender.sendMessage("SubServers > No command was entered");
                             }
                         }
                     } else {
-                        sender.sendMessage("SubServers > Usage: " + label + " " + args[0].toLowerCase() + " <Subservers> <Command> [Args...]");
+                        sender.sendMessage("SubServers > Usage: " + label + " " + args[0].toLowerCase() + " <Servers> <Command> [Args...]");
                     }
                 } else if (args[0].equalsIgnoreCase("sudo") || args[0].equalsIgnoreCase("screen")) {
                     if (plugin.canSudo) {
@@ -822,7 +830,7 @@ public final class SubCommand extends Command implements TabExecutor {
                 "   Restart Server: /sub restart <Subservers>",
                 "   Stop Server: /sub stop <Subservers>",
                 "   Terminate Server: /sub kill <Subservers>",
-                "   Command Server: /sub cmd <Subservers> <Command> [Args...]",
+                "   Command Server: /sub cmd <Servers> <Command> [Args...]",
                 "   Sudo Server: /sub sudo <Subserver>",
                 "   Create Server: /sub create <Name> <Host> <Template> [Version] [Port]",
                 "   Update Server: /sub update <Subservers> [[Template] <Version>]",
@@ -1002,7 +1010,8 @@ public final class SubCommand extends Command implements TabExecutor {
                             args[0].equals("sudo") || args[0].equals("screen")
                     ))) {
                 List<String> list = new ArrayList<String>();
-                ServerSelection select = selectServers(null, args, 1, true);
+                boolean mode = !args[0].equals("cmd") && !args[0].equals("command");
+                ServerSelection select = selectServers(null, args, 1, mode);
                 if (select.last != null) {
                     if (last.startsWith("::")) {
                         Map<String, Host> hosts = plugin.api.getHosts();
@@ -1027,11 +1036,11 @@ public final class SubCommand extends Command implements TabExecutor {
                         }
                         return list;
                     } else {
-                        Map<String, SubServer> subservers = plugin.api.getSubServers();
-                        if (subservers.size() > 0) {
+                        Map<String, Server> servers = (mode)? (Map<String, Server>) (Map<String, ?>) plugin.api.getSubServers() : plugin.api.getServers();
+                        if (servers.size() > 0) {
                             if (Arrays.binarySearch(select.selection, "*") < 0 && "*".startsWith(last)) list.add("*");
                             if (sender instanceof ProxiedPlayer && Arrays.binarySearch(select.selection, ".") < 0 && ".".startsWith(last)) list.add(".");
-                            for (SubServer server : subservers.values()) {
+                            for (Server server : servers.values()) {
                                 if (Arrays.binarySearch(select.selection, server.getName().toLowerCase()) < 0 && server.getName().toLowerCase().startsWith(last)) list.add(Last + server.getName().substring(last.length()));
                             }
                         }

@@ -544,8 +544,8 @@ public final class SubCommand implements SimpleCommand {
                         }
                     } else if (args[0].equalsIgnoreCase("cmd") || args[0].equalsIgnoreCase("command")) {
                         if (args.length > 1) {
-                            selectServers(sender, args, 1, true, select -> {
-                                if (select.subservers.length > 0) {
+                            selectServers(sender, args, 1, false, select -> {
+                                if (select.servers.length > 0) {
                                     if (select.args.length > 2) {
                                         StringBuilder builder = new StringBuilder(select.args[2]);
                                         for (int i = 3; i < select.args.length; i++) {
@@ -556,16 +556,16 @@ public final class SubCommand implements SimpleCommand {
                                         Container<Integer> success = new Container<Integer>(0);
                                         Container<Integer> running = new Container<Integer>(0);
                                         AsyncConsolidator merge = new AsyncConsolidator(() -> {
-                                            if (running.value > 0) sender.sendMessage(Component.text("SubServers > " + running.value + " subserver"+((running.value == 1)?" was":"s were") + " offline"));
-                                            if (success.value > 0) sender.sendMessage(Component.text("SubServers > Sent command to " + success.value + " subserver"+((success.value == 1)?"":"s")));
+                                            if (running.value > 0) sender.sendMessage(Component.text("SubServers > " + running.value + " server"+((running.value == 1)?" was":"s were") + " offline"));
+                                            if (success.value > 0) sender.sendMessage(Component.text("SubServers > Sent command to " + success.value + " server"+((success.value == 1)?"":"s")));
                                         });
-                                        for (SubServer server : select.subservers) {
+                                        for (Server server : select.servers) {
                                             merge.reserve();
                                             server.command(builder.toString(), response -> {
                                                 switch (response) {
                                                     case 3:
                                                     case 4:
-                                                        sender.sendMessage(Component.text("SubServers > Subserver " + server.getName() + " has disappeared"));
+                                                        sender.sendMessage(Component.text("SubServers > Server " + server.getName() + " has disappeared"));
                                                         break;
                                                     case 5:
                                                         running.value++;
@@ -583,7 +583,7 @@ public final class SubCommand implements SimpleCommand {
                                 }
                             });
                         } else {
-                            sender.sendMessage(Component.text("Usage: " + label + " " + args[0].toLowerCase() + " <Subservers> <Command> [Args...]"));
+                            sender.sendMessage(Component.text("Usage: " + label + " " + args[0].toLowerCase() + " <Servers> <Command> [Args...]"));
                         }
                     } else if (args[0].equalsIgnoreCase("create")) {
                         if (args.length > 3) {
@@ -924,7 +924,7 @@ public final class SubCommand implements SimpleCommand {
                 "   Restart Server: /sub restart <Subservers>",
                 "   Stop Server: /sub stop <Subservers>",
                 "   Terminate Server: /sub kill <Subservers>",
-                "   Command Server: /sub cmd <Subservers> <Command> [Args...]",
+                "   Command Server: /sub cmd <Servers> <Command> [Args...]",
                 "   Create Server: /sub create <Name> <Host> <Template> [Version] [Port]",
                 "   Update Server: /sub update <Subservers> [[Template] <Version>]",
                 "   Remove Server: /sub delete <Subservers>",
@@ -1093,7 +1093,8 @@ public final class SubCommand implements SimpleCommand {
                     args[0].equals("update") || args[0].equals("upgrade") ||
                     args[0].equals("remove") || args[0].equals("del") || args[0].equals("delete")) {
                 List<String> list = new ArrayList<String>();
-                RawServerSelection select = selectRawServers(null, args, 1, true);
+                boolean mode = !args[0].equals("cmd") && !args[0].equals("command");
+                RawServerSelection select = selectRawServers(null, args, 1, mode);
                 if (select.last != null) {
                     if (last.startsWith("::")) {
                         Map<String, Host> hosts = hostCache;
@@ -1123,7 +1124,7 @@ public final class SubCommand implements SimpleCommand {
                             if (Arrays.binarySearch(select.selection, "*") < 0 && "*".startsWith(last)) list.add("*");
                             if (sender instanceof Player && Arrays.binarySearch(select.selection, ".") < 0 && ".".startsWith(last)) list.add(".");
                             for (ServerData server : subservers.values()) {
-                                if (server instanceof SubServerData && Arrays.binarySearch(select.selection, server.getName().toLowerCase()) < 0 && server.getName().toLowerCase().startsWith(last)) list.add(Last + server.getName().substring(last.length()));
+                                if ((!mode || server instanceof SubServerData) && Arrays.binarySearch(select.selection, server.getName().toLowerCase()) < 0 && server.getName().toLowerCase().startsWith(last)) list.add(Last + server.getName().substring(last.length()));
                             }
                         }
                         return list;

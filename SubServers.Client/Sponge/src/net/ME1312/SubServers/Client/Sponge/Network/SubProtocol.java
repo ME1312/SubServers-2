@@ -39,7 +39,7 @@ public class SubProtocol extends SubDataProtocol {
         SubPlugin plugin = SubAPI.getInstance().getInternals();
 
         setName("SubServers 2");
-        addVersion(new Version("2.16a+"));
+        addVersion(new Version("2.18a+"));
 
 
         // 00-0F: Object Link Packets
@@ -103,10 +103,12 @@ public class SubProtocol extends SubDataProtocol {
       //registerPacket(0x0070, PacketInExRunEvent.class);
       //registerPacket(0x0071, PacketInExReset.class);
       //registerPacket(0x0072, PacketInExReload.class);
+        registerPacket(0x0078, PacketExControlPlayer.class);
 
         registerPacket(0x0070, new PacketInExRunEvent(plugin));
         registerPacket(0x0071, new PacketInExReset());
         registerPacket(0x0072, new PacketInExReload(plugin));
+        registerPacket(0x0078, new PacketExControlPlayer());
     }
 
     public static SubProtocol get() {

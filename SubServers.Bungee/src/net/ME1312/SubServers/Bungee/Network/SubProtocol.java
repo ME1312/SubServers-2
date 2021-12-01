@@ -27,7 +27,7 @@ public class SubProtocol extends SubDataProtocol {
         SubProxy plugin = SubAPI.getInstance().getInternals();
 
         setName("SubServers 2");
-        setVersion(new Version("2.16a+"));
+        setVersion(new Version("2.18a+"));
 
 
      // 00-0F: Object Link Packets
@@ -129,6 +129,7 @@ public class SubProtocol extends SubDataProtocol {
         registerPacket(0x0075, PacketExTransferPlayer.class);
         registerPacket(0x0076, PacketExDisconnectPlayer.class);
         registerPacket(0x0077, PacketExMessagePlayer.class);
+        registerPacket(0x0078, PacketExControlPlayer.class);
 
       //registerPacket(0x0070, new PacketOutRunEvent());
       //registerPacket(0x0071, new PacketOutReset());
@@ -138,6 +139,7 @@ public class SubProtocol extends SubDataProtocol {
         registerPacket(0x0075, new PacketExTransferPlayer());
         registerPacket(0x0076, new PacketExDisconnectPlayer());
         registerPacket(0x0077, new PacketExMessagePlayer());
+        registerPacket(0x0078, new PacketExControlPlayer());
     }
 
     @SuppressWarnings("deprecation")

@@ -49,7 +49,7 @@ public class PacketStopServer implements PacketObjectIn<Integer>, PacketObjectOu
         data.set(0x0000, id);
         data.set(0x0001, server);
         data.set(0x0002, force);
-        if (player != null) data.set(0x0003, player.toString());
+        if (player != null) data.set(0x0003, player);
         return data;
     }
 
