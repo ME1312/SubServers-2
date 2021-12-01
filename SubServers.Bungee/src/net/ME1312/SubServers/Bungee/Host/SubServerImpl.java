@@ -188,7 +188,12 @@ public abstract class SubServerImpl extends ServerImpl implements SubServer {
         return servers;
     }
 
-    @SuppressWarnings({"deprecation", "unchecked"})
+    @Override
+    public boolean equals(Object obj) {
+        return obj instanceof SubServerImpl && super.equals(obj);
+    }
+
+    @SuppressWarnings("deprecation")
     @Override
     public ObjectMap<String> forSubData() {
         ObjectMap<String> sinfo = super.forSubData();

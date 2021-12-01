@@ -84,7 +84,6 @@
                                 <copy file="${basedir}/../Artifacts/SubServers.Client.Universal.jar" tofile="${project.build.directory}/classes/net/ME1312/SubServers/Bungee/Library/Files/client.jar" />
                                 <mkdir dir="${project.build.directory}/classes/net/ME1312/SubServers/Bungee/Library/Files/Templates" />
                                 <zip basedir="${basedir}/../SubServers.Creator" destfile="${project.build.directory}/classes/net/ME1312/SubServers/Bungee/Library/Files/Templates/forge.zip" includes="Forge/**" />
-                                <zip basedir="${basedir}/../SubServers.Creator" destfile="${project.build.directory}/classes/net/ME1312/SubServers/Bungee/Library/Files/Templates/paper.zip" includes="Paper/**" />
                                 <zip basedir="${basedir}/../SubServers.Creator" destfile="${project.build.directory}/classes/net/ME1312/SubServers/Bungee/Library/Files/Templates/purpur.zip" includes="Purpur/**" />
                                 <zip basedir="${basedir}/../SubServers.Creator" destfile="${project.build.directory}/classes/net/ME1312/SubServers/Bungee/Library/Files/Templates/spigot.zip" includes="Spigot/**" />
                                 <zip basedir="${basedir}/../SubServers.Creator" destfile="${project.build.directory}/classes/net/ME1312/SubServers/Bungee/Library/Files/Templates/sponge.zip" includes="Sponge/**" />

@@ -157,6 +157,11 @@ public class Proxy implements ClientHandler, ExtraDataHandler<String> {
     }
 
     @Override
+    public boolean equals(Object obj) {
+        return obj instanceof Proxy && signature.equals(((Proxy) obj).signature);
+    }
+
+    @Override
     public void addExtra(String handle, Object value) {
         Util.nullpo(handle, value);
         extra.set(handle, value);

@@ -761,12 +761,10 @@ public final class SubCommand extends Command implements TabExecutor {
                 i++;
             }
 
-            LinkedList<Server> history = new LinkedList<Server>();
             LinkedList<Server> servers = new LinkedList<Server>();
             LinkedList<SubServer> subservers = new LinkedList<SubServer>();
             for (Server server : select) {
-                if (!history.contains(server)) {
-                    history.add(server);
+                if (!servers.contains(server)) {
                     servers.add(server);
                     if (server instanceof SubServer)
                         subservers.add((SubServer) server);

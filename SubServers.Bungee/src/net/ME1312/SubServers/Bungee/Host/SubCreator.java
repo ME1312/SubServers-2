@@ -537,4 +537,9 @@ public abstract class SubCreator {
      * Reload SubCreator
      */
     public abstract void reload();
+
+    @Override
+    public boolean equals(Object obj) {
+        return obj instanceof SubCreator && getHost().getSignature().equals(((SubCreator) obj).getHost().getSignature());
+    }
 }

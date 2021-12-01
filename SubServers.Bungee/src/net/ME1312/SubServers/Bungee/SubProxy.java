@@ -92,7 +92,7 @@ public final class SubProxy extends BungeeCommon implements Listener {
     public SubProtocol subprotocol;
     public SubDataServer subdata = null;
     public SubServer sudo = null;
-    public static final Version version = Version.fromString("2.17.1a");
+    public static final Version version = Version.fromString("2.18a");
 
     public final Proxy mProxy;
     public boolean canSudo = false;
@@ -145,9 +145,6 @@ public final class SubProxy extends BungeeCommon implements Listener {
             Directories.unzip(SubProxy.class.getResourceAsStream("/net/ME1312/SubServers/Bungee/Library/Files/Templates/spigot.zip"), new File(dir, "Templates"));
             Logger.get("SubServers").info("Created ./SubServers/Templates/Spigot");
 
-            Directories.unzip(SubProxy.class.getResourceAsStream("/net/ME1312/SubServers/Bungee/Library/Files/Templates/paper.zip"), new File(dir, "Templates"));
-            Logger.get("SubServers").info("Created ./SubServers/Templates/Paper");
-
             Directories.unzip(SubProxy.class.getResourceAsStream("/net/ME1312/SubServers/Bungee/Library/Files/Templates/purpur.zip"), new File(dir, "Templates"));
             Logger.get("SubServers").info("Created ./SubServers/Templates/Purpur");
 
@@ -158,34 +155,30 @@ public final class SubProxy extends BungeeCommon implements Listener {
             Logger.get("SubServers").info("Created ./SubServers/Templates/Sponge");
         } else {
             long stamp = Math.round(Math.random() * 100000);
-            Version version = new Version("2.16a+");
+            Version tv1 = new Version("2.16a+");
+            Version tv2 = new Version("2.18a+");
 
-            if (new File(dir, "Templates/Vanilla/template.yml").exists() && ((new YAMLConfig(new File(dir, "Templates/Vanilla/template.yml"))).get().getVersion("Version", version)).compareTo(version) != 0) {
+            if (new File(dir, "Templates/Vanilla/template.yml").exists() && ((new YAMLConfig(new File(dir, "Templates/Vanilla/template.yml"))).get().getVersion("Version", tv2)).compareTo(tv2) != 0) {
                 Files.move(new File(dir, "Templates/Vanilla").toPath(), new File(dir, "Templates/Vanilla." + stamp + ".x").toPath());
                 Directories.unzip(SubProxy.class.getResourceAsStream("/net/ME1312/SubServers/Bungee/Library/Files/Templates/vanilla.zip"), new File(dir, "Templates"));
                 Logger.get("SubServers").info("Updated ./SubServers/Templates/Vanilla");
             }
-            if (new File(dir, "Templates/Spigot/template.yml").exists() && ((new YAMLConfig(new File(dir, "Templates/Spigot/template.yml"))).get().getVersion("Version", version)).compareTo(version) != 0) {
+            if (new File(dir, "Templates/Spigot/template.yml").exists() && ((new YAMLConfig(new File(dir, "Templates/Spigot/template.yml"))).get().getVersion("Version", tv1)).compareTo(tv1) != 0) {
                 Files.move(new File(dir, "Templates/Spigot").toPath(), new File(dir, "Templates/Spigot." + stamp + ".x").toPath());
                 Directories.unzip(SubProxy.class.getResourceAsStream("/net/ME1312/SubServers/Bungee/Library/Files/Templates/spigot.zip"), new File(dir, "Templates"));
                 Logger.get("SubServers").info("Updated ./SubServers/Templates/Spigot");
             }
-            if (new File(dir, "Templates/Paper/template.yml").exists() && ((new YAMLConfig(new File(dir, "Templates/Paper/template.yml"))).get().getVersion("Version", version)).compareTo(version) != 0) {
-                Files.move(new File(dir, "Templates/Paper").toPath(), new File(dir, "Templates/Paper." + stamp + ".x").toPath());
-                Directories.unzip(SubProxy.class.getResourceAsStream("/net/ME1312/SubServers/Bungee/Library/Files/Templates/paper.zip"), new File(dir, "Templates"));
-                Logger.get("SubServers").info("Updated ./SubServers/Templates/Paper");
-            }
-            if (new File(dir, "Templates/Purpur/template.yml").exists() && ((new YAMLConfig(new File(dir, "Templates/Purpur/template.yml"))).get().getVersion("Version", version)).compareTo(version) != 0) {
+            if (new File(dir, "Templates/Purpur/template.yml").exists() && ((new YAMLConfig(new File(dir, "Templates/Purpur/template.yml"))).get().getVersion("Version", tv2)).compareTo(tv2) != 0) {
                 Files.move(new File(dir, "Templates/Purpur").toPath(), new File(dir, "Templates/Purpur." + stamp + ".x").toPath());
                 Directories.unzip(SubProxy.class.getResourceAsStream("/net/ME1312/SubServers/Bungee/Library/Files/Templates/purpur.zip"), new File(dir, "Templates"));
                 Logger.get("SubServers").info("Updated ./SubServers/Templates/Purpur");
             }
-            if (new File(dir, "Templates/Forge/template.yml").exists() && ((new YAMLConfig(new File(dir, "Templates/Forge/template.yml"))).get().getVersion("Version", version)).compareTo(version) != 0) {
+            if (new File(dir, "Templates/Forge/template.yml").exists() && ((new YAMLConfig(new File(dir, "Templates/Forge/template.yml"))).get().getVersion("Version", tv2)).compareTo(tv2) != 0) {
                 Files.move(new File(dir, "Templates/Forge").toPath(), new File(dir, "Templates/Forge." + stamp + ".x").toPath());
                 Directories.unzip(SubProxy.class.getResourceAsStream("/net/ME1312/SubServers/Bungee/Library/Files/Templates/forge.zip"), new File(dir, "Templates"));
                 Logger.get("SubServers").info("Updated ./SubServers/Templates/Forge");
             }
-            if (new File(dir, "Templates/Sponge/template.yml").exists() && ((new YAMLConfig(new File(dir, "Templates/Sponge/template.yml"))).get().getVersion("Version", version)).compareTo(version) != 0) {
+            if (new File(dir, "Templates/Sponge/template.yml").exists() && ((new YAMLConfig(new File(dir, "Templates/Sponge/template.yml"))).get().getVersion("Version", tv1)).compareTo(tv1) != 0) {
                 Files.move(new File(dir, "Templates/Sponge").toPath(), new File(dir, "Templates/Sponge." + stamp + ".x").toPath());
                 Directories.unzip(SubProxy.class.getResourceAsStream("/net/ME1312/SubServers/Bungee/Library/Files/Templates/sponge.zip"), new File(dir, "Templates"));
                 Logger.get("SubServers").info("Updated ./SubServers/Templates/Sponge");

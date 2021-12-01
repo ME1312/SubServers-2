@@ -266,6 +266,11 @@ public class ServerImpl extends BungeeServerInfo implements Server {
     }
 
     @Override
+    public boolean equals(Object obj) {
+        return obj instanceof ServerImpl && signature.equals(((ServerImpl) obj).signature);
+    }
+
+    @Override
     public void addExtra(String handle, Object value) {
         Util.nullpo(handle, value);
         extra.set(handle, value);

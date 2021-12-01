@@ -535,6 +535,11 @@ public abstract class Host implements ExtraDataHandler<String> {
     }
 
     @Override
+    public boolean equals(Object obj) {
+        return obj instanceof Host && signature.equals(((Host) obj).signature);
+    }
+
+    @Override
     public void addExtra(String handle, Object value) {
         Util.nullpo(handle, value);
         extra.set(handle, value);
