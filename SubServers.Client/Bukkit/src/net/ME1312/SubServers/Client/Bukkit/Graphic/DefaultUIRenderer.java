@@ -262,7 +262,7 @@ public class DefaultUIRenderer extends UIRenderer {
                     block = color(7);
                     blockMeta = block.getItemMeta();
                     blockMeta.setDisplayName(ChatColor.GRAY+ChatColor.stripColor(plugin.api.getLang("SubServers", "Interface.Host-Admin.Creator")));
-                    blockMeta.setLore(Arrays.asList(plugin.api.getLang("SubServers", "Interface.Generic.Invalid-Permission").replace("$str$", "subservers.host.create." + name.toLowerCase())));
+                    blockMeta.setLore(Arrays.asList(plugin.api.getLang("SubServers", "Interface.Generic.Invalid-Permission").replace("$str$", "subservers.host." + name.toLowerCase() + ".create")));
                 } else if (!host.isAvailable() || !host.isEnabled()) {
                     block = color(7);
                     blockMeta = block.getItemMeta();
@@ -1044,7 +1044,7 @@ public class DefaultUIRenderer extends UIRenderer {
                     block = color(7);
                     blockMeta = block.getItemMeta();
                     blockMeta.setDisplayName(ChatColor.GRAY+ChatColor.stripColor(plugin.api.getLang("SubServers", "Interface.Server-Admin.Terminate")));
-                    if (host != null) blockMeta.setLore(Arrays.asList(plugin.api.getLang("SubServers", "Interface.Generic.Invalid-Permission").replace("$str$", "subservers.subserver.terminate." + name.toLowerCase())));
+                    if (host != null) blockMeta.setLore(Arrays.asList(plugin.api.getLang("SubServers", "Interface.Generic.Invalid-Permission").replace("$str$", "subservers.subserver." + name.toLowerCase() + ".terminate")));
                 } else {
                     block = color(14);
                     blockMeta = block.getItemMeta();
@@ -1059,7 +1059,7 @@ public class DefaultUIRenderer extends UIRenderer {
                     block = color(7);
                     blockMeta = block.getItemMeta();
                     blockMeta.setDisplayName(ChatColor.GRAY+ChatColor.stripColor(plugin.api.getLang("SubServers", "Interface.Server-Admin.Stop")));
-                    if (host != null) blockMeta.setLore(Arrays.asList(plugin.api.getLang("SubServers", "Interface.Generic.Invalid-Permission").replace("$str$", "subservers.subserver.stop." + name.toLowerCase())));
+                    if (host != null) blockMeta.setLore(Arrays.asList(plugin.api.getLang("SubServers", "Interface.Generic.Invalid-Permission").replace("$str$", "subservers.subserver." + name.toLowerCase() + ".stop")));
                 } else {
                     block = color(2);
                     blockMeta = block.getItemMeta();
@@ -1071,11 +1071,12 @@ public class DefaultUIRenderer extends UIRenderer {
                 inv.setItem(11, block);
                 inv.setItem(12, block);
 
-                if ((host == null && server.getSubData()[0] == null) || !permits(server, player, "subservers.subserver.%.*", "subservers.subserver.%.command")) {
+                boolean permits;
+                if ((host == null && server.getSubData()[0] == null) | (permits = !permits(server, player, "subservers.subserver.%.*", "subservers.subserver.%.command"))) {
                     block = color(7);
                     blockMeta = block.getItemMeta();
                     blockMeta.setDisplayName(ChatColor.GRAY+ChatColor.stripColor(plugin.api.getLang("SubServers", "Interface.Server-Admin.Command")));
-                    if (host != null) blockMeta.setLore(Arrays.asList(plugin.api.getLang("SubServers", "Interface.Generic.Invalid-Permission").replace("$str$", "subservers.subserver.command." + name.toLowerCase())));
+                    if (permits) blockMeta.setLore(Arrays.asList(plugin.api.getLang("SubServers", "Interface.Generic.Invalid-Permission").replace("$str$", "subservers.subserver." + name.toLowerCase() + ".command")));
                 } else {
                     block = color(3);
                     blockMeta = block.getItemMeta();
@@ -1093,7 +1094,7 @@ public class DefaultUIRenderer extends UIRenderer {
                     block = color(7);
                     blockMeta = block.getItemMeta();
                     blockMeta.setDisplayName(ChatColor.GRAY+ChatColor.stripColor(plugin.api.getLang("SubServers", "Interface.Server-Admin.Start")));
-                    blockMeta.setLore(Arrays.asList(plugin.api.getLang("SubServers", "Interface.Generic.Invalid-Permission").replace("$str$", "subservers.subserver.start." + name.toLowerCase())));
+                    blockMeta.setLore(Arrays.asList(plugin.api.getLang("SubServers", "Interface.Generic.Invalid-Permission").replace("$str$", "subservers.subserver." + name.toLowerCase() + ".start")));
                 } else if (!host.isAvailable() || !host.isEnabled() || !subserver.isAvailable() || !subserver.isEnabled() || subserver.getCurrentIncompatibilities().size() != 0) {
                     block = color(7);
                     blockMeta = block.getItemMeta();
@@ -1124,7 +1125,7 @@ public class DefaultUIRenderer extends UIRenderer {
                         block = color(7);
                         blockMeta = block.getItemMeta();
                         blockMeta.setDisplayName(ChatColor.GRAY+ChatColor.stripColor(plugin.api.getLang("SubServers", "Interface.Server-Admin.Update")));
-                        blockMeta.setLore(Arrays.asList(plugin.api.getLang("SubServers", "Interface.Generic.Invalid-Permission").replace("$str$", "subservers.subserver.update." + name.toLowerCase())));
+                        blockMeta.setLore(Arrays.asList(plugin.api.getLang("SubServers", "Interface.Generic.Invalid-Permission").replace("$str$", "subservers.subserver." + name.toLowerCase() + ".update")));
                     } else if (!host.isAvailable() || !host.isEnabled() || !subserver.isAvailable() || subserver.getCurrentIncompatibilities().size() != 0) {
                         block = color(7);
                         blockMeta = block.getItemMeta();
