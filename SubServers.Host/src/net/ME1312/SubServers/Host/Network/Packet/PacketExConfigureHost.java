@@ -40,9 +40,4 @@ public class PacketExConfigureHost implements PacketObjectIn<Integer>, PacketObj
         host.log.info.println(((first)?"":"New ") + "Host Settings Downloaded");
         first = false;
     }
-
-    @Override
-    public int version() {
-        return 0x0001;
-    }
 }

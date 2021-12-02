@@ -31,9 +31,4 @@ public class PacketInReload implements PacketObjectIn<Integer> {
             e.printStackTrace();
         }
     }
-
-    @Override
-    public int version() {
-        return 0x0001;
-    }
 }

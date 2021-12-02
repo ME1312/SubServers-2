@@ -71,9 +71,4 @@ public class PacketExTransferPlayer implements PacketObjectIn<Integer>, PacketOb
             e.printStackTrace();
         }
     }
-
-    @Override
-    public int version() {
-        return 0x0001;
-    }
 }

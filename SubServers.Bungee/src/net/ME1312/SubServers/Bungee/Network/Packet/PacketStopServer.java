@@ -97,9 +97,4 @@ public class PacketStopServer implements PacketObjectIn<Integer>, PacketObjectOu
             e.printStackTrace();
         }
     }
-
-    @Override
-    public int version() {
-        return 0x0001;
-    }
 }

@@ -91,9 +91,4 @@ public class PacketCreateServer implements PacketObjectIn<Integer>, PacketObject
             e.printStackTrace();
         }
     }
-
-    @Override
-    public int version() {
-        return 0x0001;
-    }
 }

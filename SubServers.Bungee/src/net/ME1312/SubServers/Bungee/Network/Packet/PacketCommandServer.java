@@ -93,9 +93,4 @@ public class PacketCommandServer implements PacketObjectIn<Integer>, PacketObjec
             e.printStackTrace();
         }
     }
-
-    @Override
-    public int version() {
-        return 0x0001;
-    }
 }

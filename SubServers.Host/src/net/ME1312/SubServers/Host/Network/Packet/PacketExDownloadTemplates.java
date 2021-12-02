@@ -83,9 +83,4 @@ public class PacketExDownloadTemplates implements PacketOut, PacketStreamIn {
         }
         first = false;
     }
-
-    @Override
-    public int version() {
-        return 0x0002;
-    }
 }

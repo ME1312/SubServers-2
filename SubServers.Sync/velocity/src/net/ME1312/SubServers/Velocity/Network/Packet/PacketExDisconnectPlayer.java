@@ -70,9 +70,4 @@ public class PacketExDisconnectPlayer implements PacketObjectIn<Integer>, Packet
             e.printStackTrace();
         }
     }
-
-    @Override
-    public int version() {
-        return 0x0001;
-    }
 }

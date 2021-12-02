@@ -53,9 +53,4 @@ public class PacketDownloadHostInfo implements PacketObjectIn<Integer>, PacketOb
         for (Consumer<ObjectMap<String>> callback : callbacks.get(data.getUUID(0x0000))) callback.accept(new ObjectMap<String>((Map<String, ?>) data.getObject(0x0001)));
         callbacks.remove(data.getUUID(0x0000));
     }
-
-    @Override
-    public int version() {
-        return 0x0001;
-    }
 }

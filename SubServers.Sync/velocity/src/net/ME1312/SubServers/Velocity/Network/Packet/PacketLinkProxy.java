@@ -70,9 +70,4 @@ public class PacketLinkProxy implements InitialPacket, PacketObjectIn<Integer>, 
             new IllegalStateException().printStackTrace();
         }
     }
-
-    @Override
-    public int version() {
-        return 0x0001;
-    }
 }

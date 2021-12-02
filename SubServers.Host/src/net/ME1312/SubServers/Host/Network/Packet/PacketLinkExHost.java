@@ -61,9 +61,4 @@ public class PacketLinkExHost implements InitialPacket, PacketObjectIn<Integer>,
             GalaxiEngine.getInstance().stop();
         }
     }
-
-    @Override
-    public int version() {
-        return 0x0001;
-    }
 }

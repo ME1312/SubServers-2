@@ -38,9 +38,4 @@ public class PacketOutExLogMessage implements PacketObjectOut<Integer> {
         if (line != null)  data.set(0x0002, line);
         return data;
     }
-
-    @Override
-    public int version() {
-        return 0x0002;
-    }
 }

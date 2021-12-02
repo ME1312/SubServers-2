@@ -60,9 +60,4 @@ public class PacketDeleteServer implements PacketObjectIn<Integer>, PacketObject
         for (Consumer<ObjectMap<Integer>> callback : callbacks.get(data.getUUID(0x0000))) callback.accept(data);
         callbacks.remove(data.getUUID(0x0000));
     }
-
-    @Override
-    public int version() {
-        return 0x0001;
-    }
 }

@@ -38,11 +38,6 @@ public class PacketInExLogMessage implements PacketObjectIn<Integer> {
         }
     }
 
-    @Override
-    public int version() {
-        return 0x0002;
-    }
-
     /**
      * Register External Logger
      *

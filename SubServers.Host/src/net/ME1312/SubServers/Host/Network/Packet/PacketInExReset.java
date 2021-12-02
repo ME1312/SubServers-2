@@ -38,9 +38,4 @@ public class PacketInExReset implements PacketObjectIn<Integer> {
             host.log.error.println(e);
         }
     }
-
-    @Override
-    public int version() {
-        return 0x0001;
-    }
 }

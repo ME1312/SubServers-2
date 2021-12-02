@@ -38,9 +38,4 @@ public class PacketInExReload implements PacketObjectIn<Integer> {
             }
         }, "SubServers.Host::Network_Reload_Handler").start();
     }
-
-    @Override
-    public int version() {
-        return 0x0001;
-    }
 }

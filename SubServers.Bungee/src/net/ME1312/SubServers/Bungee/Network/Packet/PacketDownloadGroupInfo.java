@@ -80,9 +80,4 @@ public class PacketDownloadGroupInfo implements PacketObjectIn<Integer>, PacketO
     public void receive(SubDataClient client, ObjectMap<Integer> data) {
         client.sendPacket(new PacketDownloadGroupInfo(plugin, (data.contains(0x0001))?data.getStringList(0x0001):null, (data.contains(0x0000))?data.getUUID(0x0000):null));
     }
-
-    @Override
-    public int version() {
-        return 0x0001;
-    }
 }

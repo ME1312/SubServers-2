@@ -31,9 +31,4 @@ public class PacketInExRequestQueue implements PacketIn {
             }
         }
     }
-
-    @Override
-    public int version() {
-        return 0x0001;
-    }
 }

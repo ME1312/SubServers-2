@@ -110,9 +110,4 @@ public class PacketExSyncPlayer implements PacketObjectIn<Integer>, PacketObject
             }
         }
     }
-
-    @Override
-    public int version() {
-        return 0x0001;
-    }
 }

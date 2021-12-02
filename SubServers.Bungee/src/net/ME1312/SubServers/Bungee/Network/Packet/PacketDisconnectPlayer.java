@@ -98,9 +98,4 @@ public class PacketDisconnectPlayer implements PacketObjectIn<Integer>, PacketOb
             callback.accept(-1);
         }
     }
-
-    @Override
-    public int version() {
-        return 0x0001;
-    }
 }

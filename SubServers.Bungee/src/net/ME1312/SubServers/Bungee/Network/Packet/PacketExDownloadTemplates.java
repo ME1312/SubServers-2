@@ -81,9 +81,4 @@ public class PacketExDownloadTemplates implements PacketIn, PacketStreamOut {
             client.sendPacket(new PacketExDownloadTemplates(plugin, (ExternalHost) client.getHandler()));
         }
     }
-
-    @Override
-    public int version() {
-        return 0x0002;
-    }
 }

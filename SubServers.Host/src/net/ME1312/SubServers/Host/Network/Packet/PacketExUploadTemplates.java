@@ -52,9 +52,4 @@ public class PacketExUploadTemplates implements PacketIn, PacketObjectOut<Intege
     public void receive(SubDataSender client) {
         client.sendPacket(new PacketExUploadTemplates(host, false));
     }
-
-    @Override
-    public int version() {
-        return 0x0002;
-    }
 }

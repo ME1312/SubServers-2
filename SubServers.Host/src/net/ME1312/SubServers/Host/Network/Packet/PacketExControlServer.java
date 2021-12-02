@@ -112,9 +112,4 @@ public class PacketExControlServer implements PacketObjectIn<Integer>, PacketObj
             host.log.error.println(e);
         }
     }
-
-    @Override
-    public int version() {
-        return 0x0001;
-    }
 }

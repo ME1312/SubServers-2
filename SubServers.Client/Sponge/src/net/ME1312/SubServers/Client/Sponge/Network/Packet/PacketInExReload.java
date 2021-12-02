@@ -40,9 +40,4 @@ public class PacketInExReload implements PacketObjectIn<Integer> {
             }
         }).submit(plugin);
     }
-
-    @Override
-    public int version() {
-        return 0x0001;
-    }
 }

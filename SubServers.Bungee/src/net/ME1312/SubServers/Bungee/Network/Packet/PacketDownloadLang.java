@@ -52,9 +52,4 @@ public class PacketDownloadLang implements PacketObjectIn<Integer>, PacketObject
     public void receive(SubDataClient client, ObjectMap<Integer> data) {
         client.sendPacket(new PacketDownloadLang(plugin, (data != null && data.contains(0x0000))?data.getUUID(0x0000):null));
     }
-
-    @Override
-    public int version() {
-        return 0x0001;
-    }
 }

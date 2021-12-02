@@ -85,9 +85,4 @@ public class PacketLinkServer implements InitialPacket, PacketObjectIn<Integer>,
             plugin.disable(null);
         }
     }
-
-    @Override
-    public int version() {
-        return 0x0001;
-    }
 }

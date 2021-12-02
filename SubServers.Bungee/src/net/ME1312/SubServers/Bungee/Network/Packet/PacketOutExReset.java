@@ -29,9 +29,4 @@ public class PacketOutExReset implements PacketObjectOut<Integer> {
             return json;
         }
     }
-
-    @Override
-    public int version() {
-        return 0x0001;
-    }
 }

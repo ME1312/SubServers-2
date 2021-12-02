@@ -34,9 +34,4 @@ public class PacketInExReload implements PacketObjectIn<Integer> {
             }
         });
     }
-
-    @Override
-    public int version() {
-        return 0x0001;
-    }
 }

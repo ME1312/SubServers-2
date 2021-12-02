@@ -87,9 +87,4 @@ public class PacketOutExEditServer implements PacketObjectOut<Integer> {
         data.set(0x0002, Arrays.asList(args));
         return data;
     }
-
-    @Override
-    public int version() {
-        return 0x0002;
-    }
 }

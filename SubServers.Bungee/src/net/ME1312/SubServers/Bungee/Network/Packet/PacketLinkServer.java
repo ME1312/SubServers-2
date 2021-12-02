@@ -179,9 +179,4 @@ public class PacketLinkServer implements InitialPacket, PacketObjectIn<Integer>,
             client.sendPacket(new PacketLinkServer(null, 4, "Server already linked"));
         }
     }
-
-    @Override
-    public int version() {
-        return 0x0001;
-    }
 }

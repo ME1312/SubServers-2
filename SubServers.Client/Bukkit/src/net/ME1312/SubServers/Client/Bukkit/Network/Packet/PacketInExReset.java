@@ -17,9 +17,4 @@ public class PacketInExReset implements PacketObjectIn<Integer> {
         else Bukkit.getLogger().warning("SubData > Received shutdown signal");
         Bukkit.shutdown();
     }
-
-    @Override
-    public int version() {
-        return 0x0001;
-    }
 }

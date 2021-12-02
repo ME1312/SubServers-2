@@ -143,9 +143,4 @@ public class PacketMessagePlayer implements PacketObjectIn<Integer>, PacketObjec
         }
         return value;
     }
-
-    @Override
-    public int version() {
-        return 0x0001;
-    }
 }

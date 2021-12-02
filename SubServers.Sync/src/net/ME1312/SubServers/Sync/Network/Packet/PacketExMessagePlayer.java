@@ -90,9 +90,4 @@ public class PacketExMessagePlayer implements PacketObjectIn<Integer>, PacketObj
             e.printStackTrace();
         }
     }
-
-    @Override
-    public int version() {
-        return 0x0001;
-    }
 }

@@ -59,9 +59,4 @@ public class PacketDownloadGroupInfo implements PacketObjectIn<Integer>, PacketO
         }
         callbacks.remove(data.getUUID(0x0000));
     }
-
-    @Override
-    public int version() {
-        return 0x0001;
-    }
 }

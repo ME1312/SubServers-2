@@ -62,9 +62,4 @@ public class PacketExUploadTemplates implements PacketObjectIn<Integer>, PacketO
             }
         }
     }
-
-    @Override
-    public int version() {
-        return 0x0002;
-    }
 }

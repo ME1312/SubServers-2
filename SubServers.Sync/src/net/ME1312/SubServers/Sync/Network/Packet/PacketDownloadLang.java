@@ -41,9 +41,4 @@ public class PacketDownloadLang implements PacketObjectIn<Integer>, PacketOut {
             e.printStackTrace();
         }
     }
-
-    @Override
-    public int version() {
-        return 0x0001;
-    }
 }

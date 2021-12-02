@@ -47,9 +47,4 @@ public class PacketExConfigureHost implements PacketObjectIn<Integer>, PacketObj
             Try.all.run(() -> Util.reflect(ExternalSubCreator.class.getDeclaredField("enableRT"), ((ExternalHost) client.getHandler()).getCreator(), ((data == null || data.getBoolean(0x0000, false))?null:false)));
         }
     }
-
-    @Override
-    public int version() {
-        return 0x0001;
-    }
 }

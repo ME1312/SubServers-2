@@ -103,9 +103,4 @@ public class PacketStartServer implements PacketObjectIn<Integer>, PacketObjectO
             e.printStackTrace();
         }
     }
-
-    @Override
-    public int version() {
-        return 0x0001;
-    }
 }

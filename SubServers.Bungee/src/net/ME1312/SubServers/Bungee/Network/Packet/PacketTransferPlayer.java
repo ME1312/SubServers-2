@@ -99,9 +99,4 @@ public class PacketTransferPlayer implements PacketObjectIn<Integer>, PacketObje
             callback.accept(-1);
         }
     }
-
-    @Override
-    public int version() {
-        return 0x0001;
-    }
 }

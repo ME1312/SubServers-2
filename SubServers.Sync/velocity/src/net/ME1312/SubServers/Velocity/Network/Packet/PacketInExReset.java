@@ -13,9 +13,4 @@ public class PacketInExReset implements PacketIn {
     public void receive(SubDataSender client) {
         SubAPI.getInstance().getInternals().servers.clear();
     }
-
-    @Override
-    public int version() {
-        return 0x0001;
-    }
 }

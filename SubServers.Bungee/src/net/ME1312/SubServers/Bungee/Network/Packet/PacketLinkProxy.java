@@ -105,9 +105,4 @@ public class PacketLinkProxy implements InitialPacket, PacketObjectIn<Integer>, 
         ++req;
         last = now;
     }
-
-    @Override
-    public int version() {
-        return 0x0001;
-    }
 }

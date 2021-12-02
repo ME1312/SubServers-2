@@ -88,9 +88,4 @@ public class PacketAddServer implements PacketObjectIn<Integer>, PacketObjectOut
             e.printStackTrace();
         }
     }
-
-    @Override
-    public int version() {
-        return 0x0001;
-    }
 }

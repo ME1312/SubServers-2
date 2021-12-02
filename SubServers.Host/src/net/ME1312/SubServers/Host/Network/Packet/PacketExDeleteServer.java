@@ -116,9 +116,4 @@ public class PacketExDeleteServer implements PacketObjectIn<Integer>, PacketObje
             host.log.error.println(e);
         }
     }
-
-    @Override
-    public int version() {
-        return 0x0001;
-    }
 }

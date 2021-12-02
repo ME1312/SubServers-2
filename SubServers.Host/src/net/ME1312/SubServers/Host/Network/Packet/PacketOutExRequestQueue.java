@@ -12,9 +12,4 @@ public class PacketOutExRequestQueue implements PacketOut {
      */
     public PacketOutExRequestQueue() {}
 
-
-    @Override
-    public int version() {
-        return 0x0001;
-    }
 }

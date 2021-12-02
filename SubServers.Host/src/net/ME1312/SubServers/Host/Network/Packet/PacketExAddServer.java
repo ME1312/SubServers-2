@@ -114,9 +114,4 @@ public class PacketExAddServer implements PacketObjectIn<Integer>, PacketObjectO
         if (running != null) server.start(running);
         client.sendPacket(new PacketExAddServer(0, tracker));
     }
-
-    @Override
-    public int version() {
-        return 0x0001;
-    }
 }

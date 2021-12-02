@@ -29,9 +29,4 @@ public class PacketOutExReload implements PacketObjectOut<Integer> {
             return data;
         }
     }
-
-    @Override
-    public int version() {
-        return 0x0001;
-    }
 }

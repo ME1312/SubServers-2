@@ -139,11 +139,6 @@ public class PacketInExRunEvent implements PacketObjectIn<Integer> {
         }
     }
 
-    @Override
-    public int version() {
-        return 0x0001;
-    }
-
     public static void callback(String event, Consumer<ObjectMap<String>> callback) {
         List<Consumer<ObjectMap<String>>> callbacks = (PacketInExRunEvent.callbacks.keySet().contains(event))? PacketInExRunEvent.callbacks.get(event):new ArrayList<Consumer<ObjectMap<String>>>();
         callbacks.add(callback);
