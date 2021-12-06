@@ -382,6 +382,21 @@ public class SubServer extends Server {
     }
 
     /**
+     * Grabs the Template this Server was created from
+     *
+     * @param callback  The Template
+     */
+    public void getTemplate(Consumer<SubCreator.ServerTemplate> callback) {
+        Util.nullpo(callback);
+        String name = getTemplate();
+        if (name == null) {
+            callback.accept(null);
+        } else getHost(host -> {
+            callback.accept(host.getCreator().getTemplate(name));
+        });
+    }
+
+    /**
      * Is this Server Available?
      *
      * @return Availability Status
