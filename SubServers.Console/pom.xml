@@ -17,7 +17,7 @@
     <dependencies>
         <dependency>
             <groupId>org.fusesource.jansi</groupId>
-            <artifactId>jansi</artifactId>
+            <artifactId>jansi</artifactId> <!--suppress MavenPackageUpdate-->
             <version>1.18</version>
             <scope>compile</scope>
         </dependency>
