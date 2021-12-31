@@ -75,7 +75,7 @@ public class PacketMessagePlayer implements PacketObjectIn<Integer>, PacketObjec
                         ProxyServer.getInstance().broadcast(c);
                 }
                 for (Proxy proxy : SubAPI.getInstance().getProxies().values()) {
-                    if (proxy.getPlayers().size() > 0) requests.put(proxy, null);
+                    if (proxy.getPlayers().size() > 0 && proxy.getSubData()[0] != null) requests.put(proxy, null);
                 }
             } else {
                 for (UUID id : ids) {

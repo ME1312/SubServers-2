@@ -982,7 +982,7 @@ public class SubCommand {
     }
 
     private void selectServers(CommandSender sender, String[] rargs, int index, boolean mode, Consumer<ServerSelection> callback) {
-        StackTraceElement[] origin = new Exception().getStackTrace();
+        StackTraceElement[] origin = new Throwable().getStackTrace();
         LinkedList<String> msgs = new LinkedList<String>();
         LinkedList<String> args = new LinkedList<String>();
         LinkedList<String> selection = new LinkedList<String>();

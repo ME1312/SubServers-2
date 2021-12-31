@@ -176,7 +176,7 @@ public class Host {
      */
     public void getRemotePlayers(Consumer<Collection<RemotePlayer>> callback) {
         Util.nullpo(callback);
-        StackTraceElement[] origin = new Exception().getStackTrace();
+        StackTraceElement[] origin = new Throwable().getStackTrace();
         Runnable run = () -> {
             try {
                 callback.accept(players);
@@ -363,7 +363,7 @@ public class Host {
      */
     public void addSubServer(UUID player, String name, boolean enabled, int port, String motd, boolean log, String directory, String executable, String stopcmd, boolean hidden, boolean restricted, IntConsumer response) {
         Util.nullpo(response);
-        StackTraceElement[] origin = new Exception().getStackTrace();
+        StackTraceElement[] origin = new Throwable().getStackTrace();
         client().sendPacket(new PacketAddServer(player, name, enabled, getName(), port, motd, log, directory, executable, stopcmd, hidden, restricted, data -> {
             try {
                 response.accept(data.getInt(0x0001));
@@ -500,7 +500,7 @@ public class Host {
 
     private void removeSubServer(UUID player, String name, boolean force, IntConsumer response) {
         Util.nullpo(response);
-        StackTraceElement[] origin = new Exception().getStackTrace();
+        StackTraceElement[] origin = new Throwable().getStackTrace();
         client().sendPacket(new PacketRemoveServer(player, name, force, data -> {
             try {
                 response.accept(data.getInt(0x0001));
@@ -686,7 +686,7 @@ public class Host {
 
     private void deleteSubServer(UUID player, String name, boolean recycle, boolean force, IntConsumer response) {
         Util.nullpo(response);
-        StackTraceElement[] origin = new Exception().getStackTrace();
+        StackTraceElement[] origin = new Throwable().getStackTrace();
         client().sendPacket(new PacketDeleteServer(player, name, recycle, force, data -> {
             try {
                 response.accept(data.getInt(0x0001));

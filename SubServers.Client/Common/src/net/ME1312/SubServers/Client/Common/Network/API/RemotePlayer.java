@@ -116,7 +116,7 @@ public class RemotePlayer {
      */
     public void getProxy(Consumer<Proxy> callback) {
         Util.nullpo(callback);
-        StackTraceElement[] origin = new Exception().getStackTrace();
+        StackTraceElement[] origin = new Throwable().getStackTrace();
         Runnable run = () -> {
             try {
                 callback.accept(proxy);
@@ -153,7 +153,7 @@ public class RemotePlayer {
      */
     public void getServer(Consumer<Server> callback) {
         Util.nullpo(callback);
-        StackTraceElement[] origin = new Exception().getStackTrace();
+        StackTraceElement[] origin = new Throwable().getStackTrace();
         Runnable run = () -> {
             try {
                 callback.accept(server);
@@ -543,7 +543,7 @@ public class RemotePlayer {
          * @param response Success Status
          */
         protected void sendMessage(SubDataClient client, UUID[] players, String[] messages, IntConsumer response) {
-            StackTraceElement[] origin = new Exception().getStackTrace();
+            StackTraceElement[] origin = new Throwable().getStackTrace();
             client.sendPacket(new PacketMessagePlayer(players, messages, null, data -> {
                 try {
                     response.accept(data.getInt(0x0001));
@@ -564,7 +564,7 @@ public class RemotePlayer {
          * @param response Success Status
          */
         protected void sendRawMessage(SubDataClient client, UUID[] players, String[] messages, IntConsumer response) {
-            StackTraceElement[] origin = new Exception().getStackTrace();
+            StackTraceElement[] origin = new Throwable().getStackTrace();
             client.sendPacket(new PacketMessagePlayer(players, null, messages, data -> {
                 try {
                     response.accept(data.getInt(0x0001));
@@ -585,7 +585,7 @@ public class RemotePlayer {
          * @param response Success Status
          */
         protected void transfer(SubDataClient client, UUID[] players, String server, IntConsumer response) {
-            StackTraceElement[] origin = new Exception().getStackTrace();
+            StackTraceElement[] origin = new Throwable().getStackTrace();
             client.sendPacket(new PacketTransferPlayer(players, server, data -> {
                 try {
                     response.accept(data.getInt(0x0001));
@@ -606,7 +606,7 @@ public class RemotePlayer {
          * @param response Success status
          */
         protected void disconnect(SubDataClient client, UUID[] players, String reason, IntConsumer response) {
-            StackTraceElement[] origin = new Exception().getStackTrace();
+            StackTraceElement[] origin = new Throwable().getStackTrace();
             client.sendPacket(new PacketDisconnectPlayer(players, reason, data -> {
                 try {
                     response.accept(data.getInt(0x0001));

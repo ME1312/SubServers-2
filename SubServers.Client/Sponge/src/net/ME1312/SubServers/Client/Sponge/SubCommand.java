@@ -1346,7 +1346,7 @@ public final class SubCommand implements CommandExecutor {
     }
     @SuppressWarnings("unchecked")
     private void selectServers(CommandSource sender, String[] selection, boolean mode, String[][] permissions, Consumer<ServerSelection> callback) {
-        StackTraceElement[] origin = new Exception().getStackTrace();
+        StackTraceElement[] origin = new Throwable().getStackTrace();
         LinkedList<Text> msgs = new LinkedList<Text>();
         LinkedList<Server> select = new LinkedList<Server>();
 

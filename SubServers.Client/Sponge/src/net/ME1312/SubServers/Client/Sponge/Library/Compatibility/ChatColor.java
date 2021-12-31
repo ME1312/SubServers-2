@@ -7,9 +7,7 @@ import org.spongepowered.api.text.format.TextStyle;
 import org.spongepowered.api.text.format.TextStyles;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.regex.Pattern;
 
 /**
@@ -127,16 +125,15 @@ public enum ChatColor {
         }
 
         if (str.contains(Character.toString(character))) {
-            LinkedList<String> pieces = new LinkedList<String>(Arrays.asList(str.split(Pattern.quote(Character.toString(character)))));
-            Collections.reverse(pieces);
+            String[] pieces = str.split(Pattern.quote(Character.toString(character)));
+            String piece;
 
             Text result = null;
-            int i = pieces.size();
-            for (String piece : pieces) {
-                i--;
-                Text.Builder current;
+            Text.Builder current;
+            for (int i = pieces.length; i > 0;) {
+                piece = pieces[--i];
                 if (i > 0 && piece.length() > 0) {
-                    if (map.keySet().contains(piece.toCharArray()[0])) {
+                    if (map.containsKey(piece.toCharArray()[0])) {
                         current = Text.builder(piece.substring(1));
                         ChatColor color = map.get(piece.toCharArray()[0]);
                         current.style(color.getStyles());

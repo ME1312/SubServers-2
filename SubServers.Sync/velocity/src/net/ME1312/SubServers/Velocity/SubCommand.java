@@ -740,7 +740,7 @@ public final class SubCommand implements SimpleCommand {
     }
 
     private void selectServers(CommandSource sender, String[] rargs, int index, boolean mode, Consumer<ServerSelection> callback) {
-        StackTraceElement[] origin = new Exception().getStackTrace();
+        StackTraceElement[] origin = new Throwable().getStackTrace();
         LinkedList<Component> msgs = new LinkedList<Component>();
         LinkedList<String> args = new LinkedList<String>();
         LinkedList<String> selection = new LinkedList<String>();

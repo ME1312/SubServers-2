@@ -131,7 +131,7 @@ public class Proxy {
      */
     public void getPlayers(Consumer<Collection<RemotePlayer>> callback) {
         Util.nullpo(callback);
-        StackTraceElement[] origin = new Exception().getStackTrace();
+        StackTraceElement[] origin = new Throwable().getStackTrace();
         Runnable run = () -> {
             try {
                 callback.accept(players);

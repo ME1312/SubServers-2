@@ -390,7 +390,7 @@ public class InternalSubCreator extends SubCreator {
     public boolean create(UUID player, String name, ServerTemplate template, Version version, Integer port, Consumer<SubServer> callback) {
         Util.nullpo(name, template);
         if (host.isAvailable() && host.isEnabled() && template.isEnabled() && !SubAPI.getInstance().getSubServers().keySet().contains(name.toLowerCase()) && !SubCreator.isReserved(name) && (version != null || !template.requiresVersion())) {
-            StackTraceElement[] origin = new Exception().getStackTrace();
+            StackTraceElement[] origin = new Throwable().getStackTrace();
 
             if (port == null) {
                 Value<Integer> i = new Container<Integer>(ports.lowerEndpoint() - 1);
@@ -432,7 +432,7 @@ public class InternalSubCreator extends SubCreator {
         Util.nullpo(server);
         final ServerTemplate ft = (template == null)?server.getTemplate():template;
         if (host.isAvailable() && host.isEnabled() && host == server.getHost() && server.isAvailable() && !server.isRunning() && ft != null && ft.isEnabled() && ft.canUpdate() && (version != null || !ft.requiresVersion())) {
-            StackTraceElement[] origin = new Exception().getStackTrace();
+            StackTraceElement[] origin = new Throwable().getStackTrace();
 
             ((InternalSubServer) server).updating(true);
             CreatorTask task = new CreatorTask(player, server, ft, version, x -> {

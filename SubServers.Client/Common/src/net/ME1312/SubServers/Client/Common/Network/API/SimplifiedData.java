@@ -29,7 +29,7 @@ public final class SimplifiedData {
      */
     public static void requestHosts(DataClient client, Consumer<Map<String, Host>> callback) {
         Util.nullpo(callback);
-        StackTraceElement[] origin = new Exception().getStackTrace();
+        StackTraceElement[] origin = new Throwable().getStackTrace();
         client(client).sendPacket(new PacketDownloadHostInfo(null, data -> {
             TreeMap<String, Host> hosts = new TreeMap<String, Host>();
             for (String host : data.getKeys()) {
@@ -55,7 +55,7 @@ public final class SimplifiedData {
      */
     public static void requestHost(DataClient client, String name, Consumer<Host> callback) {
         Util.nullpo(name, callback);
-        StackTraceElement[] origin = new Exception().getStackTrace();
+        StackTraceElement[] origin = new Throwable().getStackTrace();
         client(client).sendPacket(new PacketDownloadHostInfo(Collections.singletonList(name), data -> {
             Host host = null;
             if (data.getKeys().size() > 0) {
@@ -80,7 +80,7 @@ public final class SimplifiedData {
      */
     public static void requestGroups(DataClient client, Consumer<Map<String, List<Server>>> callback) {
         Util.nullpo(callback);
-        StackTraceElement[] origin = new Exception().getStackTrace();
+        StackTraceElement[] origin = new Throwable().getStackTrace();
         client(client).sendPacket(new PacketDownloadGroupInfo(null, data -> {
             TreeMap<String, List<Server>> groups = new TreeMap<String, List<Server>>();
             for (String group : data.getKeys()) {
@@ -131,7 +131,7 @@ public final class SimplifiedData {
      */
     public static void requestGroup(DataClient client, String name, Consumer<Pair<String, List<Server>>> callback) {
         Util.nullpo(callback);
-        StackTraceElement[] origin = new Exception().getStackTrace();
+        StackTraceElement[] origin = new Throwable().getStackTrace();
         client(client).sendPacket(new PacketDownloadGroupInfo((name == null)?Collections.emptyList():Collections.singletonList(name), data -> {
             Pair<String, List<Server>> group = null;
             if (data.getKeys().size() > 0) {
@@ -165,7 +165,7 @@ public final class SimplifiedData {
      */
     public static void requestServers(DataClient client, Consumer<Map<String, Server>> callback) {
         Util.nullpo(callback);
-        StackTraceElement[] origin = new Exception().getStackTrace();
+        StackTraceElement[] origin = new Throwable().getStackTrace();
         client(client).sendPacket(new PacketDownloadServerInfo(null, data -> {
             TreeMap<String, Server> servers = new TreeMap<String, Server>();
             for (String server : data.getKeys()) {
@@ -195,7 +195,7 @@ public final class SimplifiedData {
      */
     public static void requestServer(DataClient client, String name, Consumer<Server> callback) {
         Util.nullpo(name, callback);
-        StackTraceElement[] origin = new Exception().getStackTrace();
+        StackTraceElement[] origin = new Throwable().getStackTrace();
         client(client).sendPacket(new PacketDownloadServerInfo(Collections.singletonList(name), data -> {
             Server server = null;
             if (data.getKeys().size() > 0) {
@@ -254,7 +254,7 @@ public final class SimplifiedData {
      */
     public static void requestProxies(DataClient client, Consumer<Map<String, Proxy>> callback) {
         Util.nullpo(callback);
-        StackTraceElement[] origin = new Exception().getStackTrace();
+        StackTraceElement[] origin = new Throwable().getStackTrace();
         client(client).sendPacket(new PacketDownloadProxyInfo(null, data -> {
             TreeMap<String, Proxy> proxies = new TreeMap<String, Proxy>();
             for (String proxy : data.getKeys()) {
@@ -280,7 +280,7 @@ public final class SimplifiedData {
      */
     public static void requestProxy(DataClient client, String name, Consumer<Proxy> callback) {
         Util.nullpo(name, callback);
-        StackTraceElement[] origin = new Exception().getStackTrace();
+        StackTraceElement[] origin = new Throwable().getStackTrace();
         client(client).sendPacket(new PacketDownloadProxyInfo(Collections.singletonList(name), data -> {
             Proxy proxy = null;
             if (data.getKeys().size() > 0) {
@@ -305,7 +305,7 @@ public final class SimplifiedData {
      */
     public static void requestMasterProxy(DataClient client, Consumer<Proxy> callback) {
         Util.nullpo(callback);
-        StackTraceElement[] origin = new Exception().getStackTrace();
+        StackTraceElement[] origin = new Throwable().getStackTrace();
         client(client).sendPacket(new PacketDownloadProxyInfo(Collections.emptyList(), data -> {
             Proxy proxy = null;
             if (data.getKeys().size() > 0) {
@@ -330,7 +330,7 @@ public final class SimplifiedData {
      */
     public static void requestRemotePlayers(DataClient client, Consumer<Map<UUID, RemotePlayer>> callback) {
         Util.nullpo(callback);
-        StackTraceElement[] origin = new Exception().getStackTrace();
+        StackTraceElement[] origin = new Throwable().getStackTrace();
         client(client).sendPacket(new PacketDownloadPlayerInfo((List<UUID>) null, data -> {
             TreeMap<UUID, RemotePlayer> players = new TreeMap<UUID, RemotePlayer>();
             for (String player : data.getKeys()) {
@@ -356,7 +356,7 @@ public final class SimplifiedData {
      */
     public static void requestRemotePlayer(DataClient client, String name, Consumer<RemotePlayer> callback) {
         Util.nullpo(name, callback);
-        StackTraceElement[] origin = new Exception().getStackTrace();
+        StackTraceElement[] origin = new Throwable().getStackTrace();
         client(client).sendPacket(new PacketDownloadPlayerInfo(Collections.singletonList(name), data -> {
             RemotePlayer player = null;
             if (data.getKeys().size() > 0) {
@@ -382,7 +382,7 @@ public final class SimplifiedData {
      */
     public static void requestRemotePlayer(DataClient client, UUID id, Consumer<RemotePlayer> callback) {
         Util.nullpo(id, callback);
-        StackTraceElement[] origin = new Exception().getStackTrace();
+        StackTraceElement[] origin = new Throwable().getStackTrace();
         client(client).sendPacket(new PacketDownloadPlayerInfo(Collections.singletonList(id), data -> {
             RemotePlayer player = null;
             if (data.getKeys().size() > 0) {

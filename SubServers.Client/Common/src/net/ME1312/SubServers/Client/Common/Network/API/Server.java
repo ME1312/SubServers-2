@@ -131,7 +131,7 @@ public class Server {
      */
     public void command(UUID player, UUID target, String command, IntConsumer response) {
         Util.nullpo(command, response);
-        StackTraceElement[] origin = new Exception().getStackTrace();
+        StackTraceElement[] origin = new Throwable().getStackTrace();
         client().sendPacket(new PacketCommandServer(player, target, getName(), command, data -> {
             try {
                 response.accept(data.getInt(0x0001));
@@ -214,7 +214,7 @@ public class Server {
      */
     public void getRemotePlayers(Consumer<Collection<RemotePlayer>> callback) {
         Util.nullpo(callback);
-        StackTraceElement[] origin = new Exception().getStackTrace();
+        StackTraceElement[] origin = new Throwable().getStackTrace();
         Runnable run = () -> {
             try {
                 callback.accept(players);

@@ -91,7 +91,7 @@ public class SubServer extends Server {
      */
     public void start(UUID player, IntConsumer response) {
         Util.nullpo(response);
-        StackTraceElement[] origin = new Exception().getStackTrace();
+        StackTraceElement[] origin = new Throwable().getStackTrace();
         client().sendPacket(new PacketStartServer(player, getName(), data -> {
             try {
                 response.accept(data.getInt(0x0001));
@@ -136,7 +136,7 @@ public class SubServer extends Server {
      */
     public void stop(UUID player, IntConsumer response) {
         Util.nullpo(response);
-        StackTraceElement[] origin = new Exception().getStackTrace();
+        StackTraceElement[] origin = new Throwable().getStackTrace();
         client().sendPacket(new PacketStopServer(player, getName(), false, data -> {
             try {
                 response.accept(data.getInt(0x0001));
@@ -181,7 +181,7 @@ public class SubServer extends Server {
      */
     public void terminate(UUID player, IntConsumer response) {
         Util.nullpo(response);
-        StackTraceElement[] origin = new Exception().getStackTrace();
+        StackTraceElement[] origin = new Throwable().getStackTrace();
         client().sendPacket(new PacketStopServer(player, getName(), true, data -> {
             try {
                 response.accept(data.getInt(0x0001));
@@ -300,7 +300,7 @@ public class SubServer extends Server {
 
     private void edit(UUID player, ObjectMap<String> edit, boolean perma, IntConsumer response) {
         Util.nullpo(response);
-        StackTraceElement[] origin = new Exception().getStackTrace();
+        StackTraceElement[] origin = new Throwable().getStackTrace();
         client().sendPacket(new PacketEditServer(player, getName(), edit, perma, data -> {
             try {
                 if (data.getInt(0x0001) != 0) {
@@ -351,7 +351,7 @@ public class SubServer extends Server {
      */
     public void getHost(Consumer<Host> callback) {
         Util.nullpo(callback);
-        StackTraceElement[] origin = new Exception().getStackTrace();
+        StackTraceElement[] origin = new Throwable().getStackTrace();
         Runnable run = () -> {
             try {
                 callback.accept(host);
@@ -627,7 +627,7 @@ public class SubServer extends Server {
      */
     public void getIncompatibilities(Consumer<List<SubServer>> callback) {
         Util.nullpo(callback);
-        StackTraceElement[] origin = new Exception().getStackTrace();
+        StackTraceElement[] origin = new Throwable().getStackTrace();
         Runnable run = () -> {
             try {
                 callback.accept(incompatibilities);
@@ -671,7 +671,7 @@ public class SubServer extends Server {
      */
     public void getCurrentIncompatibilities(Consumer<List<SubServer>> callback) {
         Util.nullpo(callback);
-        StackTraceElement[] origin = new Exception().getStackTrace();
+        StackTraceElement[] origin = new Throwable().getStackTrace();
         Runnable run = () -> {
             try {
                 callback.accept(currentIncompatibilities);

@@ -138,7 +138,7 @@ public abstract class ClientAPI {
      */
     public void addServer(UUID player, String name, InetAddress ip, int port, String motd, boolean hidden, boolean restricted, IntConsumer response) {
         Util.nullpo(response);
-        StackTraceElement[] origin = new Exception().getStackTrace();
+        StackTraceElement[] origin = new Throwable().getStackTrace();
         ((SubDataClient) getSubDataNetwork()[0]).sendPacket(new PacketAddServer(player, name, ip, port, motd, hidden, restricted, data -> {
             try {
                 response.accept(data.getInt(0x0001));
@@ -265,7 +265,7 @@ public abstract class ClientAPI {
 
     private void removeServer(UUID player, String name, boolean force, IntConsumer response) {
         Util.nullpo(response);
-        StackTraceElement[] origin = new Exception().getStackTrace();
+        StackTraceElement[] origin = new Throwable().getStackTrace();
         ((SubDataClient) getSubDataNetwork()[0]).sendPacket(new PacketRemoveServer(player, name, force, data -> {
             try {
                 response.accept(data.getInt(0x0001));

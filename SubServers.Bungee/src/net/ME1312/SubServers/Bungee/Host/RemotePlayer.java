@@ -159,7 +159,7 @@ public class RemotePlayer implements net.ME1312.SubServers.Bungee.Library.Compat
         new RPSI() {
             @Override
             protected void sendMessage(UUID[] players, String[] messages, IntConsumer response) {
-                StackTraceElement[] origin = new Exception().getStackTrace();
+                StackTraceElement[] origin = new Throwable().getStackTrace();
                 PacketMessagePlayer.run(Arrays.asList(players), new ContainedPair<>(messages, null), null, i -> {
                     try {
                         response.accept(i);
@@ -173,7 +173,7 @@ public class RemotePlayer implements net.ME1312.SubServers.Bungee.Library.Compat
 
             @Override
             protected void sendMessage(UUID[] players, BaseComponent[][] messages, IntConsumer response) {
-                StackTraceElement[] origin = new Exception().getStackTrace();
+                StackTraceElement[] origin = new Throwable().getStackTrace();
                 PacketMessagePlayer.run(Arrays.asList(players), new ContainedPair<>(null, messages), null, i -> {
                     try {
                         response.accept(i);
@@ -187,7 +187,7 @@ public class RemotePlayer implements net.ME1312.SubServers.Bungee.Library.Compat
 
             @Override
             protected void transfer(UUID[] players, String server, IntConsumer response) {
-                StackTraceElement[] origin = new Exception().getStackTrace();
+                StackTraceElement[] origin = new Throwable().getStackTrace();
                 PacketTransferPlayer.run(Arrays.asList(players), server, i -> {
                     try {
                         response.accept(i);
@@ -201,7 +201,7 @@ public class RemotePlayer implements net.ME1312.SubServers.Bungee.Library.Compat
 
             @Override
             protected void disconnect(UUID[] players, String reason, IntConsumer response) {
-                StackTraceElement[] origin = new Exception().getStackTrace();
+                StackTraceElement[] origin = new Throwable().getStackTrace();
                 PacketDisconnectPlayer.run(Arrays.asList(players), reason, i -> {
                     try {
                         response.accept(i);
