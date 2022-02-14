@@ -76,15 +76,15 @@ public final class ExHost {
             parser.allowsUnrecognizedOptions();
             parser.accepts("v");
             parser.accepts("version");
-            parser.accepts("noconsole");
             joptsimple.OptionSet options = parser.parse(args);
-            if(options.has("version") || options.has("v")) {
-                Version galaxi = Version.fromString(GalaxiEngine.class.getAnnotation(App.class).version());
+            if (options.has("version") || options.has("v")) {
+                Class<?> GalaxiEngine = Class.forName("net.ME1312.Galaxi.Engine.Runtime.Engine");
+                Version galaxi = Version.fromString(GalaxiEngine.getAnnotation(App.class).version());
                 Version subservers = Version.fromString(ExHost.class.getAnnotation(App.class).version());
                 Version galaxibuild = null;
                 Version subserversbuild = null;
                 try {
-                    Manifest manifest = new Manifest(GalaxiEngine.class.getResourceAsStream("/META-INF/GalaxiEngine.MF"));
+                    Manifest manifest = new Manifest(GalaxiEngine.getResourceAsStream("/META-INF/GalaxiEngine.MF"));
                     if (manifest.getMainAttributes().getValue("Implementation-Version") != null && manifest.getMainAttributes().getValue("Implementation-Version").length() > 0)
                         galaxibuild = new Version(manifest.getMainAttributes().getValue("Implementation-Version"));
                 } catch (Exception e) {} try {
@@ -95,7 +95,7 @@ public final class ExHost {
                 System.out.println("");
                 System.out.println(Platform.getSystemName() + ' ' + Platform.getSystemVersion() + ((Platform.getSystemBuild() != null)?" (" + Platform.getSystemBuild() + ')':"") + ((!Platform.getSystemArchitecture().equals("unknown"))?" [" + Platform.getSystemArchitecture() + ']':"") + ',');
                 System.out.println("Java " + Platform.getJavaVersion() + ((!Platform.getJavaArchitecture().equals("unknown"))?" [" + Platform.getJavaArchitecture() + ']':"") + ',');
-                System.out.println(GalaxiEngine.class.getAnnotation(App.class).name() + " v" + galaxi.toExtendedString() + ((galaxibuild != null)?" (" + galaxibuild + ')':"") + ',');
+                System.out.println(GalaxiEngine.getAnnotation(App.class).name() + " v" + galaxi.toExtendedString() + ((galaxibuild != null)?" (" + galaxibuild + ')':"") + ',');
                 System.out.println(ExHost.class.getAnnotation(App.class).name() + " v" + subservers.toExtendedString() + ((subserversbuild != null)?" (" + subserversbuild + ')':""));
                 System.out.println("");
             } else {

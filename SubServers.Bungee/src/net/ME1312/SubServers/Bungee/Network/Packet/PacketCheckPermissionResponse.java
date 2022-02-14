@@ -48,7 +48,6 @@ public class PacketCheckPermissionResponse implements PacketObjectIn<Integer>, P
 
     @Override
     public void receive(SubDataClient client, ObjectMap<Integer> data) throws Throwable {
-        for (Consumer<Boolean> callback : callbacks.get(data.getUUID(0x0000))) callback.accept(data.getBoolean(0x0001));
-        callbacks.remove(data.getUUID(0x0000));
+        for (Consumer<Boolean> callback : callbacks.remove(data.getUUID(0x0000))) callback.accept(data.getBoolean(0x0001));
     }
 }

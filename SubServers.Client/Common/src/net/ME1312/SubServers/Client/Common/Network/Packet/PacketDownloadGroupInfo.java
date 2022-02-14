@@ -50,13 +50,12 @@ public class PacketDownloadGroupInfo implements PacketObjectIn<Integer>, PacketO
     @SuppressWarnings("unchecked")
     @Override
     public void receive(SubDataSender client, ObjectMap<Integer> data) {
-        for (Consumer<ObjectMap<String>> callback : callbacks.get(data.getUUID(0x0000))) {
+        for (Consumer<ObjectMap<String>> callback : callbacks.remove(data.getUUID(0x0000))) {
             ObjectMap<String> map = new ObjectMap<String>((Map<String, ?>) data.getObject(0x0001));
             ObjectMap<String> ungrouped = (data.contains(0x0002))?new ObjectMap<String>((Map<String, ?>) data.getObject(0x0002)):null;
 
             if (ungrouped != null) map.set("", ungrouped);
             callback.accept(map);
         }
-        callbacks.remove(data.getUUID(0x0000));
     }
 }

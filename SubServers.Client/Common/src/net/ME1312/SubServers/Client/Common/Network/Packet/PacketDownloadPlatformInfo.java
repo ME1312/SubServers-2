@@ -39,7 +39,6 @@ public class PacketDownloadPlatformInfo implements PacketObjectIn<Integer>, Pack
     @SuppressWarnings("unchecked")
     @Override
     public void receive(SubDataSender client, ObjectMap<Integer> data) {
-        for (Consumer<ObjectMap<String>> callback : callbacks.get(data.getUUID(0x0000))) callback.accept(new ObjectMap<String>((Map<String, ?>) data.getObject(0x0001)));
-        callbacks.remove(data.getUUID(0x0000));
+        for (Consumer<ObjectMap<String>> callback : callbacks.remove(data.getUUID(0x0000))) callback.accept(new ObjectMap<String>((Map<String, ?>) data.getObject(0x0001)));
     }
 }

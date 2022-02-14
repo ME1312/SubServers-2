@@ -49,6 +49,10 @@ public class PacketExAddServer implements PacketObjectIn<Integer>, PacketObjectO
         callbacks.put(tracker, callback);
     }
 
+    public String peek() {
+        return name;
+    }
+
     @Override
     public ObjectMap<Integer> send(SubDataClient client) {
         ObjectMap<Integer> data = new ObjectMap<Integer>();
@@ -66,7 +70,6 @@ public class PacketExAddServer implements PacketObjectIn<Integer>, PacketObjectO
 
     @Override
     public void receive(SubDataClient client, ObjectMap<Integer> data) {
-        for (Consumer<ObjectMap<Integer>> callback : callbacks.get(data.getUUID(0x0000))) callback.accept(data);
-        callbacks.remove(data.getUUID(0x0000));
+        for (Consumer<ObjectMap<Integer>> callback : callbacks.remove(data.getUUID(0x0000))) callback.accept(data);
     }
 }

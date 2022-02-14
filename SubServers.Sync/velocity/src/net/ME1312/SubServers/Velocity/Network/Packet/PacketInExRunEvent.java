@@ -129,9 +129,7 @@ public class PacketInExRunEvent implements PacketObjectIn<Integer> {
     @Override
     public void receive(SubDataSender client, ObjectMap<Integer> data) {
         if (callbacks.keySet().contains(data.getString(0x0000))) {
-            List<Consumer<ObjectMap<String>>> callbacks = PacketInExRunEvent.callbacks.get(data.getString(0x0000));
-            PacketInExRunEvent.callbacks.remove(data.getString(0x0000));
-            for (Consumer<ObjectMap<String>> callback : callbacks) {
+            for (Consumer<ObjectMap<String>> callback : PacketInExRunEvent.callbacks.remove(data.getString(0x0000))) {
                 callback.accept(new ObjectMap<>((Map<String, ?>) data.getObject(0x0001)));
             }
         }

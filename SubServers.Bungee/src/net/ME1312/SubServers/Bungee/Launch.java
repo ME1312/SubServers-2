@@ -82,38 +82,38 @@ public final class Launch {
                     System.out.println("*******************************************");
                 }
                 System.out.println("");
-            }
 
-            SubProxy plugin = new SubProxy(System.out, patched);
-            net.md_5.bungee.api.ProxyServer.class.getMethod("setInstance", net.md_5.bungee.api.ProxyServer.class).invoke(null, plugin);
-            plugin.getLogger().info("Enabled " + plugin.getBungeeName() + " version " + plugin.getVersion());
-            plugin.start();
+                SubProxy plugin = new SubProxy(System.out, patched);
+                net.md_5.bungee.api.ProxyServer.class.getMethod("setInstance", net.md_5.bungee.api.ProxyServer.class).invoke(null, plugin);
+                plugin.getLogger().info("Enabled " + plugin.getBungeeName() + " version " + plugin.getVersion());
+                plugin.start();
 
-            if (!options.has("noconsole")) {
-                try {
-                    if (Try.all.get(() -> Class.forName("io.github.waterfallmc.waterfall.console.WaterfallConsole").getMethod("readCommands") != null, false)) { // Waterfall Setup
-                        Class.forName("io.github.waterfallmc.waterfall.console.WaterfallConsole").getMethod("readCommands").invoke(null);
-                    } else if (Try.all.get(() -> Class.forName("io.github.waterfallmc.waterfall.console.WaterfallConsole").getMethod("start") != null, false)) {
-                        Class console = Class.forName("io.github.waterfallmc.waterfall.console.WaterfallConsole");
-                        console.getMethod("start").invoke(console.getConstructor().newInstance());
-                    } else {
-                        plugin.canSudo = true;
-                        String line;
-                        while (plugin.isRunning && (line = plugin.getConsoleReader().readLine(">")) != null) {
-                            if (plugin.sudo == null) {
-                                if (!plugin.getPluginManager().dispatchCommand(net.md_5.bungee.command.ConsoleCommandSender.class.cast(net.md_5.bungee.command.ConsoleCommandSender.class.getMethod("getInstance").invoke(null)), line)) {
-                                    plugin.getConsole().sendMessage(net.md_5.bungee.api.ChatColor.RED + "Command not found");
+                if (!options.has("noconsole")) {
+                    try {
+                        if (Try.all.get(() -> Class.forName("io.github.waterfallmc.waterfall.console.WaterfallConsole").getMethod("readCommands") != null, false)) { // Waterfall Setup
+                            Class.forName("io.github.waterfallmc.waterfall.console.WaterfallConsole").getMethod("readCommands").invoke(null);
+                        } else if (Try.all.get(() -> Class.forName("io.github.waterfallmc.waterfall.console.WaterfallConsole").getMethod("start") != null, false)) {
+                            Class console = Class.forName("io.github.waterfallmc.waterfall.console.WaterfallConsole");
+                            console.getMethod("start").invoke(console.getConstructor().newInstance());
+                        } else {
+                            plugin.canSudo = true;
+                            String line;
+                            while (plugin.isRunning && (line = plugin.getConsoleReader().readLine(">")) != null) {
+                                if (plugin.sudo == null) {
+                                    if (!plugin.getPluginManager().dispatchCommand(net.md_5.bungee.command.ConsoleCommandSender.class.cast(net.md_5.bungee.command.ConsoleCommandSender.class.getMethod("getInstance").invoke(null)), line)) {
+                                        plugin.getConsole().sendMessage(net.md_5.bungee.api.ChatColor.RED + "Command not found");
+                                    }
+                                } else if (line.equalsIgnoreCase("exit")) {
+                                    plugin.sudo = null;
+                                    net.ME1312.SubServers.Bungee.Library.Compatibility.Logger.get("SubServers").info("Reverting to the BungeeCord Console");
+                                } else {
+                                    plugin.sudo.command(line);
                                 }
-                            } else if (line.equalsIgnoreCase("exit")) {
-                                plugin.sudo = null;
-                                net.ME1312.SubServers.Bungee.Library.Compatibility.Logger.get("SubServers").info("Reverting to the BungeeCord Console");
-                            } else {
-                                plugin.sudo.command(line);
                             }
                         }
+                    } catch (NoSuchMethodError | NoSuchMethodException e) {
+                        plugin.getLogger().warning("Standard BungeeCord console not found; Console commands may now be disabled.");
                     }
-                } catch (NoSuchMethodError | NoSuchMethodException e) {
-                    plugin.getLogger().warning("Standard BungeeCord console not found; Console commands may now be disabled.");
                 }
             }
         }

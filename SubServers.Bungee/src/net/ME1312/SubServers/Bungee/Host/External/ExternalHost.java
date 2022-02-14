@@ -79,6 +79,7 @@ public class ExternalHost extends Host implements ClientHandler {
 
     public void setSubData(DataClient client, int channel) {
         if (channel < 0) throw new IllegalArgumentException("Subchannel ID cannot be less than zero");
+        if (client == null && channel == 0) available = false;
         if (client != null || channel == 0) {
             if (!subdata.keySet().contains(channel) || (channel == 0 && (client == null || subdata.get(channel) == null))) {
                 subdata.put(channel, (SubDataClient) client);
@@ -107,16 +108,26 @@ public class ExternalHost extends Host implements ClientHandler {
             client.sendPacket(new PacketOutExReset("Prevent Desync"));
             clean = true;
         }
+        HashSet<String> served = new HashSet<String>();
+        LinkedList<PacketOut> queue = this.queue; this.queue = new LinkedList<PacketOut>();
+        PacketOut[] payload = new PacketOut[queue.size()];
+        for (int i = 0; i < payload.length; ++i) {
+            PacketOut packet = queue.get(i);
+            if (packet instanceof PacketExAddServer) served.add(((PacketExAddServer) packet).peek());
+            payload[i] = packet;
+        }
         for (SubServer server : servers.values()) {
-            client.sendPacket(new PacketExAddServer((ExternalSubServer) server, (server.isRunning())?((ExternalSubLogger) server.getLogger()).getExternalAddress():null, data -> {
-                if (data.contains(0x0002)) ((ExternalSubServer) server).started(data.getUUID(0x0002));
-            }));
+            if (!served.contains(server.getName())) {
+                client.sendPacket(new PacketExAddServer((ExternalSubServer) server, (server.isRunning())?((ExternalSubLogger) server.getLogger()).getExternalAddress():null, data -> {
+                    if (data.contains(0x0002)) ((ExternalSubServer) server).started(data.getUUID(0x0002));
+                }));
+            }
         }
-        while (queue.size() != 0) {
-            client.sendPacket(queue.get(0));
-            queue.remove(0);
-        }
+        client.sendPacket(payload);
         available = true;
+        while (this.queue.size() != 0) {
+            client.sendPacket(this.queue.remove(0));
+        }
     }
 
     @Override

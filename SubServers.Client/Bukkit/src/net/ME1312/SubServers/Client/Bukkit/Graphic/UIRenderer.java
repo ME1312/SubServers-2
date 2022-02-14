@@ -1,13 +1,14 @@
 package net.ME1312.SubServers.Client.Bukkit.Graphic;
 
+import net.ME1312.Galaxi.Library.Access;
 import net.ME1312.Galaxi.Library.Container.ContainedPair;
 import net.ME1312.Galaxi.Library.Container.Container;
+import net.ME1312.Galaxi.Library.Try;
 import net.ME1312.Galaxi.Library.Util;
 import net.ME1312.Galaxi.Library.Version.Version;
 import net.ME1312.SubServers.Client.Bukkit.SubPlugin;
 import net.ME1312.SubServers.Client.Common.Network.API.Host;
 import net.ME1312.SubServers.Client.Common.Network.API.Server;
-import net.ME1312.SubServers.Client.Common.Network.API.SubServer;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -16,6 +17,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.lang.invoke.MethodHandle;
 import java.util.*;
 import java.util.PrimitiveIterator.OfInt;
 import java.util.regex.Matcher;
@@ -28,6 +30,7 @@ public abstract class UIRenderer {
     private final boolean USE_TITLES;
     private final boolean TAPI_1_11;
     private final boolean TAPI_PLUGIN;
+    private final MethodHandle MAPI_1_13;
 
     static final HashMap<String, PluginRenderer<Host>> hostPlugins = new HashMap<String, PluginRenderer<Host>>();
     static final HashMap<String, PluginRenderer<Server>> serverPlugins = new HashMap<String, PluginRenderer<Server>>();
@@ -47,6 +50,13 @@ public abstract class UIRenderer {
         Util.nullpo(plugin, player);
         this.plugin = plugin;
         this.player = player;
+
+        // Detect Material API
+        if (plugin.api.getGameVersion().compareTo(new Version("1.13")) < 0) {
+            MAPI_1_13 = null;
+        } else {
+            MAPI_1_13 = Try.all.get(Access.shared.type(Material.class).method("getMaterial").parameters(String.class, boolean.class).returns(Material.class)::handle);
+        }
 
         // Detect Title API
         if (USE_TITLES = plugin.config.get().getMap("Settings").getBoolean("Use-Title-Messages", true)) {
@@ -296,7 +306,7 @@ public abstract class UIRenderer {
     @SuppressWarnings({"deprecation", "JavaReflectionMemberAccess"})
     public ItemStack parseItem(String str, ItemStack def) {
         final Container<String> item = new Container<String>(str);
-        if (plugin.api.getGameVersion().compareTo(new Version("1.13")) < 0) {
+        if (MAPI_1_13 == null) {
             try {
                 // int
                 Matcher matcher = Pattern.compile("(?i)^(\\d+)$").matcher(item.value);
@@ -332,15 +342,16 @@ public abstract class UIRenderer {
         }
 
         // Material Name
-        if (plugin.api.getGameVersion().compareTo(new Version("1.13")) < 0) {
+        if (MAPI_1_13 == null) {
             try {
                 return new ItemStack(Material.valueOf(item.value.toUpperCase()), 1);
             } catch (IllegalArgumentException e) {}
         } else try {
-            if (Material.class.getMethod("getMaterial", String.class, boolean.class).invoke(null, item.value.toUpperCase(), false) != null) {
-                return new ItemStack((Material) Material.class.getMethod("getMaterial", String.class, boolean.class).invoke(null, item.value.toUpperCase(), false), 1);
+            Material material = (Material) MAPI_1_13.invokeExact(item.value.toUpperCase(), false);
+            if (material != null) {
+                return new ItemStack(material, 1);
             }
-        } catch (Exception e) {}
+        } catch (Throwable e) {}
 
         return def;
     }
