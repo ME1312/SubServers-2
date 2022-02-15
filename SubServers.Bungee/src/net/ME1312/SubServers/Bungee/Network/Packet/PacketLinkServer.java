@@ -144,7 +144,7 @@ public class PacketLinkServer implements InitialPacket, PacketObjectIn<Integer>,
             Logger.get("SubData").info(client.getAddress().toString() + " has been defined as " + ((server instanceof SubServer) ? "SubServer" : "Server") + ": " + server.getName() + ((channel > 0)?" [+"+channel+"]":""));
             Runnable register = () -> {
                 if (server instanceof SubServer && !((SubServer) server).isRunning()) {
-                    if (((SubServer) server).getHost().isAvailable()) {
+                    if (((SubServer) server).isAvailable()) {
                         Logger.get("SubServers").info("Sending shutdown signal to rogue SubServer: " + server.getName());
                         client.sendPacket(new PacketOutExReset("Rogue SubServer Detected"));
                     } else {
