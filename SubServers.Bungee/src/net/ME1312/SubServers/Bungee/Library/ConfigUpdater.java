@@ -324,7 +324,7 @@ public class ConfigUpdater {
 
                 existing = updated.clone();
                 i++;
-            } if (was.compareTo(new Version("21w49b")) <= 0) {
+            } if (was.compareTo(new Version("22w10a")) <= 0) {
                 if (existing.contains("Lang")) {
                     updated.getMap("Lang").remove("Command.Teleport");
                 }
