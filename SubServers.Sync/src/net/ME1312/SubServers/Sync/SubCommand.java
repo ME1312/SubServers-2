@@ -232,7 +232,10 @@ public final class SubCommand extends Command implements TabExecutor {
                                         sender.sendMessage(" -> Players: " + ChatColor.AQUA + server.getRemotePlayers().size() + " online");
                                     }
                                     sender.sendMessage(" -> MOTD: " + ChatColor.WHITE + ChatColor.stripColor(server.getMotd()));
-                                    if (server instanceof SubServer && ((SubServer) server).getStopAction() != SubServer.StopAction.NONE) sender.sendMessage(" -> Stop Action: " + ChatColor.WHITE + ((SubServer) server).getStopAction().toString());
+                                    if (server instanceof SubServer) {
+                                        if (((SubServer) server).getStopAction() != SubServer.StopAction.NONE) sender.sendMessage(" -> Stop Action: " + ChatColor.WHITE + ((SubServer) server).getStopAction().toString());
+                                        if (((SubServer) server).isStopping()) sender.sendMessage(" -> Stopping: " + ChatColor.GREEN+"yes");
+                                    }
                                     sender.sendMessage(" -> Signature: " + ChatColor.AQUA + server.getSignature());
                                     if (server instanceof SubServer) sender.sendMessage(" -> Logging: " + ((((SubServer) server).isLogging())?ChatColor.GREEN+"yes":ChatColor.RED+"no"));
                                     sender.sendMessage(" -> Restricted: " + ((server.isRestricted())?ChatColor.GREEN+"yes":ChatColor.RED+"no"));

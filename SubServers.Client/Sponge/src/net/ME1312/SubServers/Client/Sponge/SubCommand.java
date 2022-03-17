@@ -545,7 +545,10 @@ public final class SubCommand implements CommandExecutor {
                                 sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Players")).toBuilder().append(Text.builder(server.getRemotePlayers().size() + " online").color(TextColors.AQUA).build()).build());
                             }
                             sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "MOTD")).toBuilder().append(Text.builder(server.getMotd().replaceAll("\\u00A7[0-9a-fA-Fk-oK-ORr]", "")).color(TextColors.WHITE).build()).build());
-                            if (server instanceof SubServer && ((SubServer) server).getStopAction() != SubServer.StopAction.NONE) sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Stop Action")).toBuilder().append(Text.builder(((SubServer) server).getStopAction().toString()).color(TextColors.WHITE).build()).build());
+                            if (server instanceof SubServer) {
+                                if (((SubServer) server).getStopAction() != SubServer.StopAction.NONE) sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Stop Action")).toBuilder().append(Text.builder(((SubServer) server).getStopAction().toString()).color(TextColors.WHITE).build()).build());
+                                if (((SubServer) server).isStopping()) sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Stopping")).toBuilder().append(Text.builder("yes").color(TextColors.GREEN).build()).build());
+                            }
                             sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Signature")).toBuilder().append(Text.builder(server.getSignature()).color(TextColors.AQUA).build()).build());
                             if (server instanceof SubServer) sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Logging")).toBuilder().append(Text.builder((((SubServer) server).isLogging())?"yes":"no").color((((SubServer) server).isLogging())?TextColors.GREEN:TextColors.RED).build()).build());
                             sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Restricted")).toBuilder().append(Text.builder((server.isRestricted())?"yes":"no").color((server.isRestricted())?TextColors.GREEN:TextColors.RED).build()).build());
@@ -1224,7 +1227,7 @@ public final class SubCommand implements CommandExecutor {
                                     Value<Boolean> msg = new Container<>(false);
                                     Consumer<Player> action = target -> {
                                         if (target == sender || sender.hasPermission("subservers.teleport-others")) {
-                                            sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", "Command.Teleport").replace("$str$", target.getName())));
+                                            sender.sendMessage(ChatColor.convertColor(plugin.api.getLang("SubServers", (target == sender)?"Command.Teleport":"Command.Teleport.Others").replace("$name$", target.getName()).replace("$str$", server.getDisplayName())));
                                             plugin.pmc(target, "Connect", server.getName());
                                         } else if (!msg.value()) {
                                             msg.value(true);

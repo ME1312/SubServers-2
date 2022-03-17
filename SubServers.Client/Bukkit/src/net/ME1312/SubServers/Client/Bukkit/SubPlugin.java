@@ -1,5 +1,6 @@
 package net.ME1312.SubServers.Client.Bukkit;
 
+import net.ME1312.Galaxi.Library.Access;
 import net.ME1312.Galaxi.Library.Config.YAMLConfig;
 import net.ME1312.Galaxi.Library.Config.YAMLSection;
 import net.ME1312.Galaxi.Library.Container.Pair;
@@ -15,6 +16,8 @@ import net.ME1312.SubData.Client.Library.DisconnectReason;
 import net.ME1312.SubData.Client.SubDataClient;
 import net.ME1312.SubServers.Client.Bukkit.Graphic.DefaultUIHandler;
 import net.ME1312.SubServers.Client.Bukkit.Graphic.UIHandler;
+import net.ME1312.SubServers.Client.Bukkit.Library.Compatibility.PlaceholderImpl;
+import net.ME1312.SubServers.Client.Bukkit.Library.Placeholders;
 import net.ME1312.SubServers.Client.Bukkit.Library.ConfigUpdater;
 import net.ME1312.SubServers.Client.Bukkit.Library.Metrics;
 import net.ME1312.SubServers.Client.Bukkit.Network.SubProtocol;
@@ -25,6 +28,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.*;
+import java.lang.invoke.MethodHandle;
 import java.lang.reflect.InvocationTargetException;
 import java.net.InetAddress;
 import java.net.URL;
@@ -50,13 +54,18 @@ public final class SubPlugin extends JavaPlugin {
     public UIHandler gui = null;
     public final Version version;
     public final SubAPI api = new SubAPI(this);
+    public final Placeholders phi = new Placeholders(this);
     public String server_address;
 
+    private MethodHandle gson;
     private long resetDate = 0;
     private boolean reconnect = false;
 
-    public SubPlugin() {
+    @SuppressWarnings("ConstantConditions")
+    public SubPlugin() throws Throwable {
         super();
+        Class<?> gson = Class.forName(((Try.all.get(() -> Class.forName("com.google.gson.Gson") != null, false)?"":"org.bukkit.craftbukkit.libs.")) + "com.google.gson.Gson");
+        this.gson = Access.shared.type(gson).method("fromJson").instance(gson.newInstance()).parameters(String.class, Class.class).returns(Object.class).handle();
         version = Version.fromString(getDescription().getVersion());
         subdata.put(0, null);
     }
@@ -65,7 +74,6 @@ public final class SubPlugin extends JavaPlugin {
      * Enable Plugin
      */
     @Override
-    @SuppressWarnings("unchecked")
     public void onEnable() {
         try {
             Bukkit.getLogger().info("SubServers > Loading SubServers.Client.Bukkit v" + version.toString() + " Libraries (for Minecraft " + api.getGameVersion() + ")");
@@ -122,6 +130,7 @@ public final class SubPlugin extends JavaPlugin {
 
             gui = new DefaultUIHandler(this);
             if (api.access.value > NO_COMMANDS.value && !config.get().getMap("Settings").getBoolean("API-Only-Mode", false)) {
+                Bukkit.getPluginManager().registerEvents(new SubSigns(this, new File(dir, "signs.dat")), this);
                 CommandMap cmd = Util.reflect(Bukkit.getServer().getClass().getDeclaredField("commandMap"), Bukkit.getServer());
 
                 cmd.register("subservers", new SubCommand(this, "subservers"));
@@ -129,8 +138,9 @@ public final class SubPlugin extends JavaPlugin {
                 cmd.register("subservers", new SubCommand(this, "sub"));
             }
 
-            if (api.access.value > NO_INTEGRATIONS.value && Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
-                new net.ME1312.SubServers.Client.Bukkit.Library.Compatibility.PlaceholderImpl(this).register();
+            if (api.access.value > NO_INTEGRATIONS.value) {
+                if (config.get().getMap("Settings").getBoolean("PlaceholderAPI-Ready", false)) phi.start();
+                if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) new PlaceholderImpl(this).register();
             }
 
             new Metrics(this, 2334);
@@ -150,9 +160,9 @@ public final class SubPlugin extends JavaPlugin {
                         }
                     }
                     if (updcount > 0) Bukkit.getLogger().info("SubServers > SubServers.Client.Bukkit v" + updversion + " is available. You are " + updcount + " version" + ((updcount == 1)?"":"s") + " behind.");
-                } catch (Exception e) {}
+                } catch (Throwable e) {}
             }, 0, TimeUnit.DAYS.toSeconds(2) * 20);
-        } catch (Exception e) {
+        } catch (Throwable e) {
             e.printStackTrace();
         }
     }
@@ -220,7 +230,8 @@ public final class SubPlugin extends JavaPlugin {
             }
             subdata.clear();
             subdata.put(0, null);
-        } catch (InterruptedException e) {
+            SubSigns.save();
+        } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }
     }
@@ -230,17 +241,10 @@ public final class SubPlugin extends JavaPlugin {
      *
      * @param json JSON to parse
      * @return JSON as a map
-     * @throws NoSuchMethodException
-     * @throws IllegalAccessException
-     * @throws InvocationTargetException
-     * @throws InstantiationException
-     * @throws ClassNotFoundException
      */
     @SuppressWarnings("unchecked")
-    public Map<String, ?> parseJSON(String json) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException, ClassNotFoundException {
-        Class<?> gson = Class.forName(((Try.all.get(() -> Class.forName("com.google.gson.Gson") != null, false)?"":"org.bukkit.craftbukkit.libs.")) + "com.google.gson.Gson");
-        //Class<?> gson = com.google.gson.Gson.class;
-        return (Map<String, ?>) gson.getMethod("fromJson", String.class, Class.class).invoke(gson.newInstance(), json, Map.class);
+    public Map<String, ?> parseJSON(String json) throws Throwable {
+        return (Map<String, ?>) (Object) gson.invokeExact(json, Map.class);
     }
 
     /**

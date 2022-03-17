@@ -92,7 +92,7 @@ public final class SubProxy extends BungeeCommon implements Listener {
     public SubProtocol subprotocol;
     public SubDataServer subdata = null;
     public SubServer sudo = null;
-    public static final Version version = Version.fromString("2.18a");
+    public static final Version version = Version.fromString("2.18.2a");
 
     public final Proxy mProxy;
     public boolean canSudo = false;

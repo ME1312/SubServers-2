@@ -336,6 +336,16 @@ public class SubServer extends Server {
     }
 
     /**
+     * If the Server is Stopping<br>
+     * <b>This method can only be true when the server is stopped through the server manager!</b>
+     *
+     * @return Stopping Status
+     */
+    public boolean isStopping() {
+        return raw.getBoolean("stopping");
+    }
+
+    /**
      * Grabs the Host of the Server
      *
      * @return The Host Name

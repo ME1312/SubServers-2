@@ -226,7 +226,10 @@ public class SubCommand {
                                     sender.sendMessage(" -> Players: " + TextColor.AQUA + server.getRemotePlayers().size() + " online");
                                 }
                                 sender.sendMessage(" -> MOTD: " + TextColor.WHITE + TextColor.stripColor(server.getMotd()));
-                                if (server instanceof SubServer && ((SubServer) server).getStopAction() != SubServer.StopAction.NONE) sender.sendMessage(" -> Stop Action: " + TextColor.WHITE + ((SubServer) server).getStopAction().toString());
+                                if (server instanceof SubServer) {
+                                    if (((SubServer) server).getStopAction() != SubServer.StopAction.NONE) sender.sendMessage(" -> Stop Action: " + TextColor.WHITE + ((SubServer) server).getStopAction().toString());
+                                    if (((SubServer) server).isStopping()) sender.sendMessage(" -> Stopping: " + TextColor.GREEN+"yes");
+                                }
                                 sender.sendMessage(" -> Signature: " + TextColor.AQUA + server.getSignature());
                                 if (server instanceof SubServer) sender.sendMessage(" -> Logging: " + ((((SubServer) server).isLogging())?TextColor.GREEN+"yes":TextColor.RED+"no"));
                                 sender.sendMessage(" -> Restricted: " + ((server.isRestricted())?TextColor.GREEN+"yes":TextColor.RED+"no"));

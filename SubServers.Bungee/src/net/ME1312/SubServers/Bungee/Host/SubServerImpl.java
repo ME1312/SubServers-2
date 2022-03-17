@@ -22,7 +22,7 @@ public abstract class SubServerImpl extends ServerImpl implements SubServer {
     private List<Pair<String, String>> incompatibilities = new ArrayList<Pair<String, String>>();
     private SubCreator.ServerTemplate templateV = null;
     private String templateS = null;
-    protected boolean registered, started, updating;
+    protected boolean registered, started, stopping, updating;
 
     /**
      * Creates a SubServer
@@ -91,6 +91,11 @@ public abstract class SubServerImpl extends ServerImpl implements SubServer {
     @Override
     public boolean isOnline() {
         return isRunning() && started;
+    }
+
+    @Override
+    public boolean isStopping() {
+        return isRunning() && stopping;
     }
 
     @Override
@@ -183,6 +188,7 @@ public abstract class SubServerImpl extends ServerImpl implements SubServer {
         sinfo.set("exec", getExecutable());
         sinfo.set("running", isRunning());
         sinfo.set("online", isOnline());
+        sinfo.set("stopping", isStopping());
         sinfo.set("stop-cmd", getStopCommand());
         sinfo.set("stop-action", getStopAction().toString());
         sinfo.set("auto-run", SubAPI.getInstance().getInternals().servers.get().getMap("Servers").getMap(getName(), new ObjectMap<String>()).getBoolean("Run-On-Launch", false));

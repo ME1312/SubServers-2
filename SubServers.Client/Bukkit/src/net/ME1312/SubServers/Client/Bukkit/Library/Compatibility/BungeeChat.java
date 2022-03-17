@@ -17,6 +17,9 @@ import java.text.DecimalFormat;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * BungeeCord Chat Library Compatibility Class
+ */
 public class BungeeChat {
     private SubPlugin plugin;
 
@@ -24,6 +27,9 @@ public class BungeeChat {
         this.plugin = plugin;
     }
 
+    /**
+     * Output for <b>/sub list</b>
+     */
     public void listCommand(CommandSender sender, String label) {
         plugin.api.getGroups(groups -> plugin.api.getHosts(hosts -> plugin.api.getServers(servers -> plugin.api.getMasterProxy(proxymaster -> plugin.api.getProxies(proxies -> {
             int i = 0;

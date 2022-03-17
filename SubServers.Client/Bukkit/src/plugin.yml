@@ -1,6 +1,6 @@
 name: SubServers-Client-Bukkit
 main: net.ME1312.SubServers.Client.Bukkit.SubPlugin
-version: "2.18a"
+version: "2.18.2a"
 authors: ["ME1312"]
 softdepend: [TitleAPI, PlaceholderAPI]
 website: "https://github.com/ME1312/SubServers-2"
@@ -19,17 +19,20 @@ permissions:
     description: "Access everything in SubServers.Client"
     default: op
     children:
-      subservers.interface:
-        description: "Access to the SubServers Interface"
-        default: op
-      subservers.command:
-        description: "Access to the SubServers Command"
-        default: op
       subservers.teleport:
         description: "Access to SubServers' Teleport Command"
         default: op
       subservers.teleport-others:
         description: "Access to Teleport other players using the Teleport Command"
+        default: op
+      subservers.signs:
+        description: "Access to manage SubServers Signs"
+        default: op
+      subservers.command:
+        description: "Access to the SubServers Command"
+        default: op
+      subservers.interface:
+        description: "Access to the SubServers Interface"
         default: op
       subservers.host.*:
         description: "Access to all Host Actions on all Hosts"

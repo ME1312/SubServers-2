@@ -237,7 +237,10 @@ public final class SubCommand implements SimpleCommand {
                                         sender.sendMessage(ChatColor.convertColor(" -> Players: " + ChatColor.AQUA + server.getRemotePlayers().size() + " online"));
                                     }
                                     sender.sendMessage(ChatColor.convertColor(" -> MOTD: " + ChatColor.WHITE + ChatColor.stripColor(server.getMotd())));
-                                    if (server instanceof SubServer && ((SubServer) server).getStopAction() != SubServer.StopAction.NONE) sender.sendMessage(ChatColor.convertColor(" -> Stop Action: " + ChatColor.WHITE + ((SubServer) server).getStopAction().toString()));
+                                    if (server instanceof SubServer) {
+                                        if (((SubServer) server).getStopAction() != SubServer.StopAction.NONE) sender.sendMessage(ChatColor.convertColor(" -> Stop Action: " + ChatColor.WHITE + ((SubServer) server).getStopAction().toString()));
+                                        if (((SubServer) server).isStopping()) sender.sendMessage(ChatColor.convertColor(" -> Stopping: " + ChatColor.GREEN+"yes"));
+                                    }
                                     sender.sendMessage(ChatColor.convertColor(" -> Signature: " + ChatColor.AQUA + server.getSignature()));
                                     if (server instanceof SubServer) sender.sendMessage(ChatColor.convertColor(" -> Logging: " + ((((SubServer) server).isLogging())?ChatColor.GREEN+"yes":ChatColor.RED+"no")));
                                     sender.sendMessage(ChatColor.convertColor(" -> Restricted: " + ((server.isRestricted())?ChatColor.GREEN+"yes":ChatColor.RED+"no")));

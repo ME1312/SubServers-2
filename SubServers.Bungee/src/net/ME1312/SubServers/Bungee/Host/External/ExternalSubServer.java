@@ -128,6 +128,7 @@ public class ExternalSubServer extends SubServerImpl {
     }
     void started(UUID address) {
         if (!running) {
+            stopping = false;
             started = false;
             running = true;
             lock = false;
@@ -152,6 +153,7 @@ public class ExternalSubServer extends SubServerImpl {
             if (!event.isCancelled()) {
                 history.add(new LoggedCommand(player, stopcmd));
                 host.queue(new PacketExControlServer(this, Action.STOP));
+                stopping = true;
                 return true;
             } else return false;
         } else return false;
@@ -159,7 +161,9 @@ public class ExternalSubServer extends SubServerImpl {
     private void stopped(Boolean allowrestart) {
         logger.stop();
         history.clear();
+        started = false;
         running = false;
+        stopping = false;
         SubStoppedEvent event = new SubStoppedEvent(this);
         host.plugin.getPluginManager().callEvent(event);
         Logger.get("SubServers").info(getName() + " has stopped");
@@ -205,6 +209,7 @@ public class ExternalSubServer extends SubServerImpl {
             host.plugin.getPluginManager().callEvent(event);
             if (!event.isCancelled()) {
                 host.queue(new PacketExControlServer(this, Action.TERMINATE));
+                stopping = true;
                 return true;
             } else return false;
         } else return false;
@@ -220,6 +225,7 @@ public class ExternalSubServer extends SubServerImpl {
                 history.add(new LoggedCommand(player, event.getCommand()));
                 if (event.getCommand().equalsIgnoreCase(stopcmd)) {
                     host.queue(new PacketExControlServer(this, Action.STOP));
+                    stopping = true;
                 } else {
                     host.queue(new PacketExControlServer(this, Action.COMMAND, event.getCommand()));
                 }

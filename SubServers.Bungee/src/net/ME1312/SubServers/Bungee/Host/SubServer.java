@@ -218,6 +218,14 @@ public interface SubServer extends Server {
     boolean isOnline();
 
     /**
+     * If the Server is Stopping<br>
+     * <b>This method can only be true when the server is stopped through the server manager!</b>
+     *
+     * @return Stopping Status
+     */
+    boolean isStopping();
+
+    /**
      * Grabs the Host of the Server
      *
      * @return The Host

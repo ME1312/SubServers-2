@@ -91,7 +91,7 @@ public final class SubCommand extends Command {
                                 } else {
                                     sender.sendMessage(plugin.api.getLang("SubServers", "Command.Version.Outdated").replace("$name$", "SubServers.Client.Bukkit").replace("$str$", updversion.toString()).replace("$int$", Integer.toString(updcount)));
                                 }
-                            } catch (Exception e) {}
+                            } catch (Throwable e) {}
                         });
                     } else if (args[0].equalsIgnoreCase("list")) {
                         if (Try.all.get(() -> Class.forName("net.md_5.bungee.api.chat.BaseComponent") != null, false) && sender instanceof Player) {
@@ -236,9 +236,12 @@ public final class SubCommand extends Command {
                                     if (!(server instanceof SubServer) || ((SubServer) server).isRunning()) {
                                         sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Connected") + ((server.getSubData()[0] != null)?ChatColor.GREEN+"yes"+((server.getSubData().length > 1)?ChatColor.AQUA+" +"+(server.getSubData().length-1)+" subchannel"+((server.getSubData().length == 2)?"":"s"):""):ChatColor.RED+"no"));
                                         sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Players") + ChatColor.AQUA + server.getRemotePlayers().size() + " online");
-                                    }
+                                        }
                                     sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "MOTD") + ChatColor.WHITE + ChatColor.stripColor(server.getMotd()));
-                                    if (server instanceof SubServer && ((SubServer) server).getStopAction() != SubServer.StopAction.NONE) sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Stop Action") + ChatColor.WHITE + ((SubServer) server).getStopAction().toString());
+                                    if (server instanceof SubServer) {
+                                        if (((SubServer) server).getStopAction() != SubServer.StopAction.NONE) sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Stop Action") + ChatColor.WHITE + ((SubServer) server).getStopAction().toString());
+                                        if (((SubServer) server).isStopping()) sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Stopping") + ChatColor.GREEN+"yes");
+                                    }
                                     sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Signature") + ChatColor.AQUA + server.getSignature());
                                     if (server instanceof SubServer) sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Logging") + ((((SubServer) server).isLogging())?ChatColor.GREEN+"yes":ChatColor.RED+"no"));
                                     sender.sendMessage(plugin.api.getLang("SubServers", "Command.Info.Format").replace("$str$", "Restricted") + ((server.isRestricted())?ChatColor.GREEN+"yes":ChatColor.RED+"no"));
@@ -860,7 +863,7 @@ public final class SubCommand extends Command {
                                 if (target == null || target == sender || sender.hasPermission("subservers.teleport-others")) {
                                     if (target == null) target = (Player) sender;
 
-                                    sender.sendMessage(plugin.api.getLang("SubServers", "Command.Teleport").replace("$str$", target.getName()));
+                                    sender.sendMessage(plugin.api.getLang("SubServers", (target == sender)?"Command.Teleport":"Command.Teleport.Others").replace("$name$", target.getName()).replace("$str$", server.getDisplayName()));
                                     plugin.pmc(target, "Connect", server.getName());
                                 } else {
                                     sender.sendMessage(plugin.api.getLang("SubServers", "Command.Generic.Invalid-Permission").replace("$str$", "subservers.teleport-others"));

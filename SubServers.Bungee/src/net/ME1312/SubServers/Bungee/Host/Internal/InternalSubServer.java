@@ -149,6 +149,7 @@ public class InternalSubServer extends SubServerImpl {
     private void run() {
         boolean locked = lock;
         allowrestart = true;
+        stopping = false;
         started = false;
         try {
             ProcessBuilder pb = new ProcessBuilder().command(Executable.parse(host.getCreator().getBashDirectory(), executable)).directory(directory);
@@ -181,6 +182,8 @@ public class InternalSubServer extends SubServerImpl {
         Logger.get("SubServers").info(getName() + " has stopped");
         process = null;
         command = null;
+        started = false;
+        stopping = false;
         history.clear();
 
         SubStoppedEvent event = new SubStoppedEvent(this);
@@ -245,6 +248,7 @@ public class InternalSubServer extends SubServerImpl {
             host.plugin.getPluginManager().callEvent(event);
             if (!event.isCancelled()) {
                 try {
+                    stopping = true;
                     allowrestart = false;
                     history.add(new LoggedCommand(player, stopcmd));
                     if (process != null && process.isAlive()) {
@@ -267,6 +271,7 @@ public class InternalSubServer extends SubServerImpl {
             SubStopEvent event = new SubStopEvent(player, this, true);
             host.plugin.getPluginManager().callEvent(event);
             if (!event.isCancelled()) {
+                stopping = true;
                 allowrestart = false;
                 if (process != null && process.isAlive()) Executable.terminate(process);
                 return true;
@@ -282,7 +287,10 @@ public class InternalSubServer extends SubServerImpl {
             host.plugin.getPluginManager().callEvent(event);
             if (!event.isCancelled() && (player == null || !DISALLOWED_COMMANDS.matcher(command).find())) {
                 try {
-                    if (event.getCommand().equalsIgnoreCase(stopcmd)) allowrestart = false;
+                    if (event.getCommand().equalsIgnoreCase(stopcmd)) {
+                        stopping = true;
+                        allowrestart = false;
+                    }
                     history.add(new LoggedCommand(player, event.getCommand()));
                     if (process != null && process.isAlive()) {
                         this.command.write(event.getCommand());
