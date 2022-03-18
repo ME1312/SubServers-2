@@ -627,7 +627,7 @@ public class SubServer extends Server {
      * @return Incompatibility List
      */
     public List<String> getIncompatibilities() {
-        return new LinkedList<String>(raw.getStringList("incompatible-list"));
+        return raw.getStringList("incompatible-list");
     }
 
     /**
@@ -671,7 +671,7 @@ public class SubServer extends Server {
      * @return Current Incompatibility List
      */
     public List<String> getCurrentIncompatibilities() {
-        return new LinkedList<String>(raw.getStringList("incompatible"));
+        return raw.getStringList("incompatible");
     }
 
     /**

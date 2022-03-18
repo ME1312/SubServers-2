@@ -118,7 +118,7 @@ public class Server {
      * @return Group names
      */
     public List<String> getGroups() {
-        return new LinkedList<String>(raw.getStringList("group"));
+        return raw.getStringList("group");
     }
 
     /**
